@@ -2167,3 +2167,65 @@ QAbstractView:selected {
 
 /* Qt Advanced Docking System */
 
+ads--CDockContainerWidget {
+    background: %color:Window Background%;
+}
+
+ads--CDockContainerWidget > QSplitter {
+    padding: 1 0 1 0;
+}
+
+ads--CDockContainerWidget ads--CDockSplitter::handle {
+    background: %color:Input Background%;
+}
+
+ads--CDockAreaWidget {
+    background: %color:Widget Background%;
+}
+
+#dockAreaTitleBar {
+    border-bottom: 1px solid %color:Border Color%;
+    bottom: 1px;
+}
+
+ads--CDockWidgetTab {
+    border: 1px solid transparent;
+    padding: 0px;
+}
+
+ads--CDockWidgetTab[activeTab="true"] {
+    border-top: 1px solid %color:Border Color%;
+    border-left: 1px solid %color:Border Color%;
+    border-right: 1px solid %color:Border Color%;
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: %number:Border Radius Big%;
+    border-top-right-radius: %number:Border Radius Big%;
+    margin-bottom: -1px;
+}
+
+ads--CDockWidgetTab QLabel {
+    color: %color:Widget Foreground%;
+}
+
+ads--CDockWidgetTab[activeTab="true"] QLabel {
+    color: %color:Widget Foreground%;
+}
+
+#tabCloseButton {
+    background: %color:Widget Background%;
+    color: %color:Widget Foreground%;
+    border: 1px solid transparent;
+    padding: 0px;
+}
+
+#tabCloseButton::hover::!pressed {
+    color: %color:Widget Hover Background%;
+}
+
+#tabCloseButton::pressed {
+    color: %color:Widget Selection Background%;
+}
+
+#tabCloseButton::disabled {
+    color: %color:Widget Disabled Background%;
+}

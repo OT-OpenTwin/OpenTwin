@@ -2173,3 +2173,65 @@ QAbstractView:selected {
 
 /* Qt Advanced Docking System */
 
+ads--CDockContainerWidget {
+    background: rgba(255,255,255,255);
+}
+
+ads--CDockContainerWidget > QSplitter {
+    padding: 1 0 1 0;
+}
+
+ads--CDockContainerWidget ads--CDockSplitter::handle {
+    background: rgba(168,168,168,255);
+}
+
+ads--CDockAreaWidget {
+    background: rgba(255,255,255,255);
+}
+
+#dockAreaTitleBar {
+    border-bottom: 1px solid rgba(0,0,0,255);
+    bottom: 1px;
+}
+
+ads--CDockWidgetTab {
+    border: 1px solid transparent;
+    padding: 0px;
+}
+
+ads--CDockWidgetTab[activeTab="true"] {
+    border-top: 1px solid rgba(0,0,0,255);
+    border-left: 1px solid rgba(0,0,0,255);
+    border-right: 1px solid rgba(0,0,0,255);
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: 10;
+    border-top-right-radius: 10;
+    margin-bottom: -1px;
+}
+
+ads--CDockWidgetTab QLabel {
+    color: rgba(0,0,0,255);
+}
+
+ads--CDockWidgetTab[activeTab="true"] QLabel {
+    color: rgba(0,0,0,255);
+}
+
+#tabCloseButton {
+    background: rgba(255,255,255,255);
+    color: rgba(0,0,0,255);
+    border: 1px solid transparent;
+    padding: 0px;
+}
+
+#tabCloseButton::hover::!pressed {
+    color: rgba(0,0,255,255);
+}
+
+#tabCloseButton::pressed {
+    color: rgba(0,255,0,255);
+}
+
+#tabCloseButton::disabled {
+    color: rgba(127,127,127,255);
+}
