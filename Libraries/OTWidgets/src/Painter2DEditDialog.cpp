@@ -142,7 +142,7 @@ ot::Painter2DEditDialogLinearGradientEntry::~Painter2DEditDialogLinearGradientEn
 
 ot::Painter2D* ot::Painter2DEditDialogLinearGradientEntry::createPainter(void) const {
 	ot::LinearGradientPainter2D* newPainter = new ot::LinearGradientPainter2D;
-	newPainter->setStart(ot::Point2DD(m_startX->value(), m_startY->value()));
+	newPainter->setStart(ot::Point2DD(m_startX->value() / 100., m_startY->value() / 100.));
 	newPainter->setFinalStop(ot::Point2DD(m_finalX->value() / 100., m_finalY->value() / 100.));
 	newPainter->setStops(m_gradientBase->stops());
 	newPainter->setSpread(m_gradientBase->gradientSpread());
