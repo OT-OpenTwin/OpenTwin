@@ -7,6 +7,7 @@ See here for more details:
    :maxdepth: 3
 
    coding_standards
+   opentwin_layers
    user_interface
    datamodel
    messaging
