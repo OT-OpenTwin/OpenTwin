@@ -64,7 +64,7 @@ QMainWindow {
 }
 
 QMainWindow::separator {
-    background-color: rgba(168,168,168,255);
+    background-color: rgba(211,211,211,255);
     spacing: 0px;
     padding: 2px;
 }
@@ -557,7 +557,7 @@ QScrollBar:vertical {
 }
 
 QScrollBar::handle:horizontal {
-    background-color: rgba(168,168,168,255);
+    background-color: rgba(211,211,211,255);
     border: 1px solid transparent;
     border-radius: 6;
     min-width: 8px;
@@ -572,7 +572,7 @@ QScrollBar::handle:horizontal:pressed {
 }
 
 QScrollBar::handle:vertical {
-    background-color: rgba(168,168,168,255);
+    background-color: rgba(211,211,211,255);
     min-height: 8px;
     border: 1px solid transparent;
     border-radius: 6;
@@ -982,7 +982,7 @@ QProgressBar::chunk:disabled {
 /* QPushButton */
 
 QPushButton {
-    background-color: rgba(168,168,168,255);
+    background-color: rgba(211,211,211,255);
     color: rgba(0,0,0,255);
     padding-top: 2px;
     padding-bottom: 2px;
@@ -995,7 +995,7 @@ QPushButton {
 }
 
 QPushButton:disabled {
-    background-color: rgba(168,168,168,255);
+    background-color: rgba(211,211,211,255);
     color: rgba(168,168,168,255);
     border-radius: 10;
 }
@@ -1325,7 +1325,7 @@ QSlider::sub-page:horizontal:disabled {
 }
 
 QSlider::handle:horizontal {
-    background: rgba(168,168,168,255);
+    background: rgba(211,211,211,255);
     border-color: rgba(0,0,0,255);
     width: 8px;
     height: 8px;
@@ -1343,7 +1343,7 @@ QSlider::handle:horizontal:focus {
 }
 
 QSlider::handle:vertical {
-    background: rgba(168,168,168,255);
+    background: rgba(211,211,211,255);
     border-color: rgba(0,0,0,255);
     width: 8px;
     height: 8px;
@@ -1952,7 +1952,7 @@ QSplitter {
 }
 
 QSplitter::handle {
-    background-color: rgba(168,168,168,255);
+    background-color: rgba(211,211,211,255);
     border: 1px solid rgba(0,0,0,255);
     border-radius: 2;
     border: none;
@@ -2176,7 +2176,7 @@ ads--CDockContainerWidget > QSplitter {
 }
 
 ads--CDockContainerWidget ads--CDockSplitter::handle {
-    background: rgba(168,168,168,255);
+    background: rgba(211,211,211,255);
 }
 
 ads--CDockAreaWidget {
