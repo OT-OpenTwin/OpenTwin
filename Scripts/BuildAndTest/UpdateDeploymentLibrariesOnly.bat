@@ -167,7 +167,7 @@ REM  Copy Color Styles
 REM ====================================================================
 
 ECHO Copy ColorStyles
-COPY "%OPENTWIN_DEV_ROOT%\Assets\ColorStyles\*.otcsf" "%OPENTWIN_DEPLOYMENT_DIR%\ColorStyles"
+COPY /Y "%OPENTWIN_DEV_ROOT%\Assets\ColorStyles\*.otcsf" "%OPENTWIN_DEPLOYMENT_DIR%\ColorStyles"
 
 REM ====================================================================
 REM  Copy Admin Panel

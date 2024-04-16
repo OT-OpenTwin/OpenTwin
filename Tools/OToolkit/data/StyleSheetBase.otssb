@@ -1406,6 +1406,15 @@ QTabWidget::pane {
     bottom: 1px;
 }
 
+QTabWidget[TTHidden="true"]::pane {
+    top: 0px;
+    border: none;
+}
+
+QTabWidget[TTHidden="true"]::pane:selected {
+    border: none;
+}
+
 QTabWidget::right-corner {
     margin-bottom: 1px;
 }
@@ -2235,7 +2244,9 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
     color: %color:Widget Disabled Background%;
 }
 
+/* ##################################################################################### */
 
+/* Special Properties */
 
 QWidget[OT_TransparentBackground="true"]:!hover:!pressed {
     background: transparent;
