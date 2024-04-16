@@ -63,7 +63,12 @@ void ot::Painter2DEditButton::setPainter(const Painter2D* _painter) {
 
 void ot::Painter2DEditButton::slotClicked(void) {
 	Painter2DEditDialog dia(m_painter);
-	if (dia.showDialog() == Dialog::Ok) {
+	
+	m_btn->setSelectedProperty();
+	Dialog::DialogResult result = dia.showDialog();
+	m_btn->unsetSelectedProperty();
+
+	if (result == Dialog::Ok) {
 		if (m_painter) delete m_painter;
 		m_painter = dia.createPainter();
 		m_preview->setFromPainter(m_painter);

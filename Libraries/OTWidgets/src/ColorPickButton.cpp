@@ -52,7 +52,9 @@ void ot::ColorPickButton::replaceButtonText(const QString& _text) {
 void ot::ColorPickButton::slotBrowse(void) {
 	QColorDialog dia(m_view->color(), m_btn);
 	dia.move(0, 0);
+	m_btn->setSelectedProperty();
 	dia.exec();
+	m_btn->unsetSelectedProperty();
 	if (dia.currentColor() != m_view->color()) {
 		m_view->setColor(dia.currentColor());
 		this->updateButtonText();
