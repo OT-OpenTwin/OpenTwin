@@ -7,12 +7,16 @@
 
 // OpenTwin header
 #include "OTGui/NavigationTreeItem.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtCore/qlist.h>
 #include <QtWidgets/qtreewidget.h>
+
+// std header
+#include <list>
 
 namespace ot {
 
@@ -55,6 +59,7 @@ namespace ot {
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	class OT_WIDGETS_API_EXPORT TreeWidget : public QTreeWidget, public ot::QWidgetInterface {
+		Q_OBJECT
 	public:
 		struct ItemInformation {
 			QString text;
@@ -79,7 +84,12 @@ namespace ot {
 
 		QTreeWidgetItem* addItem(const TreeWidgetItemInfo& _item);
 
+	private Q_SLOTS:
+		void slotColorStyleAboutToChange(void);
+		void slotColorStyleChanged(const ColorStyle& _style);
+
 	private:
+		std::list<int> m_columnWidths;
 
 		QTreeWidgetItem* findItem(QTreeWidgetItem* _item, const QStringList& _childPath) const;
 

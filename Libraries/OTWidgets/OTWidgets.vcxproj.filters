@@ -455,9 +455,6 @@
     <ClInclude Include="include\OTWidgets\SpinBox.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\TreeWidget.h">
-      <Filter>include\Widgets</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyInputPainter2D.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
@@ -569,6 +566,9 @@
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\Splitter.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\TreeWidget.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>

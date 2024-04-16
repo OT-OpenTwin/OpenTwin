@@ -26,7 +26,6 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GlobalColorStyle : public QObject {
 		Q_OBJECT
 		OT_DECL_NOCOPY(GlobalColorStyle)
-		OT_DECL_NOMOVE(GlobalColorStyle)
 	public:
 		static GlobalColorStyle& instance(void);
 
@@ -58,6 +57,7 @@ namespace ot {
 		void setApplication(QApplication* _application);
 
 	Q_SIGNALS:
+		void currentStyleAboutToChange(void);
 		void currentStyleChanged(const ColorStyle& _style);
 
 	private:

@@ -16,6 +16,13 @@
 #include <QtGui/qpainter.h>
 
 class ot::PropertyGrid::PropertyGridTree : public TreeWidget {
+public:
+	PropertyGridTree() 
+		: m_wasShown(false)
+	{
+		
+	}
+
 protected:
 	virtual void mousePressEvent(QMouseEvent* _event) override {
 		QModelIndex index = indexAt(_event->pos());
@@ -30,12 +37,14 @@ protected:
 	}
 
 	virtual void showEvent(QShowEvent* _event) {
-		this->setColumnWidth(0, this->width() / 2);
+		if (!m_wasShown) {
+			this->setColumnWidth(0, this->width() / 2);
+			m_wasShown = true;
+		}
 		TreeWidget::showEvent(_event);
 	}
 
 	virtual void resizeEvent(QResizeEvent* _event) {
-		this->setColumnWidth(0, this->width() / 2);
 		TreeWidget::resizeEvent(_event);
 	}
 
@@ -43,7 +52,8 @@ protected:
 		TreeWidget::drawRow(_painter, _options, _index);
 	}
 
-	
+private:
+	bool m_wasShown;
 };
 
 ot::PropertyGrid::PropertyGrid(QObject* _parentObject) : QObject(_parentObject) {

@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/GlobalColorStyle.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -57,7 +58,9 @@ void ot::TreeWidgetItemInfo::clearChildItems(void) {
 ot::TreeWidget::TreeWidget(QWidget * _parentWidget) 
 	: QTreeWidget(_parentWidget) 
 {
-	this->setObjectName("ot_tree");
+	this->setObjectName("OT_Tree");
+	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleAboutToChange, this, &TreeWidget::slotColorStyleAboutToChange);
+	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &TreeWidget::slotColorStyleChanged);
 }
 
 ot::TreeWidget::~TreeWidget() {
@@ -128,6 +131,23 @@ QTreeWidgetItem* ot::TreeWidget::addItem(QTreeWidgetItem* _parent, const TreeWid
 	TreeWidgetItem* newItem = new TreeWidgetItem(_item);
 	_parent->addChild(newItem);
 	return newItem;
+}
+
+void ot::TreeWidget::slotColorStyleAboutToChange(void) {
+	m_columnWidths.clear();
+	for (int i = 0; i < this->columnCount(); i++) {
+		m_columnWidths.push_back(this->columnWidth(i));
+	}
+	if (!m_columnWidths.empty()) {
+		m_columnWidths.pop_back();
+	}
+}
+
+void ot::TreeWidget::slotColorStyleChanged(const ColorStyle& _style) {
+	int i = 0;
+	for (int w : m_columnWidths) {
+		this->setColumnWidth(i++, w);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

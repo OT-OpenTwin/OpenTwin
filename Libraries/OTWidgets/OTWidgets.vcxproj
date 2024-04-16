@@ -216,7 +216,7 @@
     <QtMoc Include="include\OTWidgets\TabWidget.h" />
     <QtMoc Include="include\OTWidgets\ToolTipHandler.h" />
     <QtMoc Include="include\OTWidgets\TextEditor.h" />
-    <ClInclude Include="include\OTWidgets\TreeWidget.h" />
+    <QtMoc Include="include\OTWidgets\TreeWidget.h" />
     <ClInclude Include="include\OTWidgets\WidgetTypes.h" />
     <QtMoc Include="include\OTWidgets\TreeWidgetFilter.h" />
     <QtMoc Include="include\OTWidgets\GraphicsView.h" />

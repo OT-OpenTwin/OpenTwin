@@ -35,7 +35,8 @@ void ot::GlobalColorStyle::addStyle(const ColorStyle& _style, bool _replace) {
 	this->evaluateStyleSheetMacros(cs);
 
 	if (m_currentStyle == _style.colorStyleName()) {
-		Q_EMIT currentStyleChanged(cs);
+		m_currentStyle.append("#");
+		this->setCurrentStyle(_style.colorStyleName());
 	}
 }
 
@@ -68,6 +69,8 @@ bool ot::GlobalColorStyle::setCurrentStyle(const std::string& _styleName) {
 		OT_LOG_E("Color style does not exist (Name: \"" + _styleName + "\")");
 		return false;
 	}
+
+	Q_EMIT currentStyleAboutToChange();
 
 	m_currentStyle = _styleName;
 	if (m_app) {
