@@ -389,8 +389,6 @@ int AppBase::run() {
 
 		// Create UI
 		createUi();
-		m_timerRestoreStateAfterTabChange = uiAPI::createTimer(m_uid);
-		uiAPI::registerUidNotifier(m_timerRestoreStateAfterTabChange, this);
 		
 		{
 			UserManagement uM;
@@ -515,61 +513,11 @@ void AppBase::notify(
 	int						_info2
 ) {
 	try {
-		// Timer restore settings after tab change
-		if (_senderId == m_timerRestoreStateAfterTabChange && _eventType == etTimeout) {
-			OT_LOG_D("Restoring window state");
-
-			// Check restore state, if failed set minimum size for central widget to avoid size bug
-			if (m_currentStateWindow.window.empty()) {
-				
-			}
-			else {
-				// We want to maintain the size of the application window
-				uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow.window, false);
-				ot::WidgetViewManager::instance().restoreState(m_currentStateWindow.view);
-			}
-			saveState();
-
-		}
-		/*// Debug
-		else if (_senderId == m_ttb.pFile.gDebug_aDebug && _eventType == etClicked) {
-			if (m_isDebug) {
-				m_debugNotifier->disable(); m_isDebug = false;
-				uiAPI::toolButton::setText(m_ttb.pFile.gDebug_aDebug, TXT_EnDebug);
-				uiAPI::toolButton::setIcon(m_ttb.pFile.gDebug_aDebug, ICO_EnDebug, "Default");
-				uiAPI::dock::setVisible(m_docks.debug, false);
-				uiAPI::toolButton::setToolTip(m_ttb.pFile.gDebug_aDebug, TOOLTIP_DEBUG_ENABLE);
-			}
-			else {
-				m_debugNotifier->enable(); m_isDebug = true;
-				uiAPI::toolButton::setText(m_ttb.pFile.gDebug_aDebug, TXT_DisDebug);
-				uiAPI::toolButton::setIcon(m_ttb.pFile.gDebug_aDebug, ICO_DisDebug, "Default");
-				uiAPI::dock::setVisible(m_docks.debug, true);
-				uiAPI::toolButton::setToolTip(m_ttb.pFile.gDebug_aDebug, TOOLTIP_DEBUG_DISABLE);
-			}
-		}*/
-		// TabWidget
-		
-
-
-
-		//else if (_senderId == m_tabViewWidget && _eventType == etChanged) {
-			//m_currentTabIndex = uiAPI::tabWidget::getFocusedTab(_senderId);
-			//m_viewerComponent->viewerTabChanged(uiAPI::tabWidget::getTabText(m_tabViewWidget, _info1).toStdString());
-		//}
-		
-
-
-
-
-
-
 		// Main window
-		else if (_senderId == m_mainWindow) {
+		if (_senderId == m_mainWindow) {
 			if (_eventType == etTabToolbarChanged) {
 				// The clicked event occurs before the tabs are changed
 				if (_info1 == 0 && !m_widgetIsWelcome) {
-					saveState();
 					uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->widget());
 					m_widgetIsWelcome = true;
 					m_welcomeScreen->refreshProjectNames();
@@ -577,9 +525,7 @@ void AppBase::notify(
 				}
 				else if (m_widgetIsWelcome) {
 					// Changing from welcome screen to other tabView
-					//restoreState();
 					uiAPI::window::setCentralWidget(m_mainWindow, ot::WidgetViewManager::instance().getDockManager());
-					restoreState();
 					m_widgetIsWelcome = false;
 				}
 			}
@@ -1731,13 +1677,6 @@ void AppBase::clearSessionInformation(void) {
 // #################################################################################################################
 
 // Private functions
-
-void AppBase::saveState() {
-	m_currentStateWindow.window = uiAPI::window::saveState(m_mainWindow);
-	m_currentStateWindow.view = ot::WidgetViewManager::instance().saveState();
-}
-
-void AppBase::restoreState() { uiAPI::timer::shoot(m_timerRestoreStateAfterTabChange, 0); }
 
 bool AppBase::checkForContinue(
 	QString									_title

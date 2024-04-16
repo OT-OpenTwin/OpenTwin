@@ -494,9 +494,6 @@ private:
 	//! @brief Constructor
 	AppBase();
 
-	void saveState();
-
-	void restoreState();
 	void exportProjectWorker(std::string selectedProjectName, std::string exportFileName);
 	void importProjectWorker(std::string projectName, std::string currentUser, std::string importFileName);
 
@@ -564,7 +561,6 @@ private:
 	ak::UID						m_mainWindow;
 	ak::UID						m_viewerUid;					//! The UID of the viewer
 	ak::UID						m_modelUid;					//! The UID of the model
-	ak::UID						m_timerRestoreStateAfterTabChange;
 	
 	struct StateInformation {
 		std::string window;
