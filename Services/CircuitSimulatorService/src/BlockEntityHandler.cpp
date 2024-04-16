@@ -349,19 +349,18 @@ void BlockEntityHandler::createResultCurves(std::string simulationType,std::stri
 			if (it != resultVectors.end())
 			{
 				resultVectors.erase(it);
+				
 			}
 		}
 		else
 		{
-			for (auto it : resultVectors)
+			auto it = resultVectors.find("frequency");
+			xValues = resultVectors.at("frequency");
+			if (it != resultVectors.end())
 			{
-				auto it = resultVectors.find("frequency");
-				xValues = resultVectors.at("frequency");
-				if (it != resultVectors.end())
-				{
-					resultVectors.erase(it);
-				}
+				resultVectors.erase(it);
 			}
+			
 		}
 			
 		

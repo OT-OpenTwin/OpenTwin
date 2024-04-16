@@ -345,7 +345,7 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 //Callback Functions for NGSpice
 int NGSpice::MySendCharFunction(char* output, int ident, void* userData)
 {
-	Application::instance()->uiComponent()->displayMessage(std::string(output) + "\n");
+	/*Application::instance()->uiComponent()->displayMessage(std::string(output) + "\n");*/
 
 	return 0;
 }
