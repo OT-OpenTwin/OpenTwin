@@ -16,14 +16,17 @@
 
 #include <exception>
 
+#include <QtCore/qdir.h>
 #include <QtCore/qfile.h>
-#include <QtWidgets/qapplication.h>
 #include <QtWidgets/qmessagebox.h>
+#include <QtWidgets/qapplication.h>
 
 // Open Twin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCore/OTAssert.h"
+#include "OTWidgets/IconManager.h"
+#include "OTWidgets/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTCommunication/actionTypes.h"
 
@@ -64,26 +67,53 @@ void mainApplicationThread()
 		int argc = 0;
 		QApplication application(argc, nullptr);
 
-		// Set global text size
-		application.setStyleSheet("* { font-size: 9pt; }");
-
-		
-		ot::GlobalColorStyle::instance().setApplication(&application);
-
-		// Apply global stylesheet
-		//QFile styleFile(":/OToolkit.qss");
-		//if (styleFile.exists()) {
-			//if (styleFile.open(QIODevice::ReadOnly)) {
-//				application.setStyleSheet(styleFile.readAll());
-				//styleFile.close();
-			//}
-		//}
-
-		// Create application instance, the application instance will initialize the toolkit api
-		AppBase::instance();
-
 		// Initialize OpenTwin API
 		ot::LogDispatcher::instance().setLogFlags(ot::ALL_LOG_FLAGS);
+
+		// Set global text size
+		ot::GlobalColorStyle::instance().setApplication(&application);
+
+		// Setup icon manager
+		int iconPathCounter{ 0 };
+		int stylePathCounter{ 0 };
+#ifdef _DEBUG
+		if (ot::IconManager::instance().addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
+			iconPathCounter++;
+		}
+		if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/ColorStyles/"))) {
+			stylePathCounter++;
+		}
+#endif // _DEBUG
+		if (ot::IconManager::instance().addSearchPath(QDir::currentPath() + "/icons/")) {
+			iconPathCounter++;
+		}
+		if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QDir::currentPath() + "/ColorStyles/")) {
+			stylePathCounter++;
+		}
+
+		// Check if at least one icon directory was found
+		if (iconPathCounter == 0) {
+			OT_LOG_EA("No icon path found");
+			QMessageBox msg(QMessageBox::Critical, "Error", "No icon path was found. Try to reinstall the application", QMessageBox::Ok);
+			msg.exec();
+			exit(-1);
+		}
+
+		// Check if at least one style directory was found
+		if (stylePathCounter == 0) {
+			OT_LOG_EA("No color style path found");
+			QMessageBox msg(QMessageBox::Critical, "Error", "No color style path was found. Try to reinstall the application", QMessageBox::Ok);
+			msg.exec();
+			exit(-2);
+		}
+
+		// Initialize color style
+		ot::GlobalColorStyle::instance().scanForStyleFiles();
+		if (ot::GlobalColorStyle::instance().hasStyle(OT_COLORSTYLE_NAME_Bright)) {
+			ot::GlobalColorStyle::instance().setCurrentStyle(OT_COLORSTYLE_NAME_Bright);
+		}
+
+		// Create application instance, the application instance will initialize the toolkit api
 		ot::LogDispatcher::instance().addReceiver(AppBase::instance());
 
 		// Initialize OToolkit

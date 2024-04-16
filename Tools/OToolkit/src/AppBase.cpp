@@ -62,7 +62,7 @@ AppBase * AppBase::instance(QApplication* _app) {
 
 void AppBase::log(const ot::LogMessage& _message) {
 	otoolkit::APIInterface::InterfaceLogType typ = otoolkit::APIInterface::Information;
-	switch (_message.flags())
+	switch (_message.flags().data())
 	{
 	case ot::WARNING_LOG:
 		typ = otoolkit::APIInterface::Warning;

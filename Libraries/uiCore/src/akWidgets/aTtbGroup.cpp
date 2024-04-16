@@ -74,6 +74,7 @@ void ak::aTtbGroup::addChild(
 		w->setIconSize(QSize(iconSize, iconSize));
 		w->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 		w->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+		w->setToolTipDuration(3000);
 		// Place widget
 		m_group->AddWidget(w->widget());
 	} else {

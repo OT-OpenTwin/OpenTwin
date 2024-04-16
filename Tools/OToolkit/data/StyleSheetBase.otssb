@@ -2095,6 +2095,13 @@ QAbstractView:selected {
 
 /* ##################################################################################### */
 
+/* Special Buttons */
+
+#OT_TransparentPushButton {
+    background-color: transparent;
+    border: 1px solid transparent;
+}
+
 /* Combo Button */
 
 #OT_ComboButton {
