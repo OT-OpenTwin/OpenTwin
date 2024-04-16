@@ -165,6 +165,8 @@ AppBase::AppBase()
 {
 	m_contextMenus.output.clear = invalidID;
 
+	m_currentStateWindow.viewShown = false;
+
 	m_debugNotifier = new debugNotifier(invalidUID);
 	m_ExternalServicesComponent = new ExternalServicesComponent(this);
 	m_debugNotifier->disable();
@@ -420,17 +422,6 @@ int AppBase::run() {
 		OT_LOG_D("Executing main event loop");
 		int status = uiAPI::exec();
 
-		// Store last settings
-		assert(m_dataBaseURL.length() > 0 && m_currentUser.length() > 0);	// Something went wrong
-
-		{
-			UserManagement uM;
-			uM.setAuthServerURL(m_authorizationServiceURL);
-			uM.setDatabaseURL(m_dataBaseURL);
-
-			uM.storeSetting(STATE_NAME_WINDOW, m_currentStateWindow.window);
-			uM.storeSetting(STATE_NAME_VIEW, m_currentStateWindow.view);
-		}
 		return status;
 
 	}
@@ -526,6 +517,7 @@ void AppBase::notify(
 				else if (m_widgetIsWelcome) {
 					// Changing from welcome screen to other tabView
 					uiAPI::window::setCentralWidget(m_mainWindow, ot::WidgetViewManager::instance().getDockManager());
+					m_currentStateWindow.viewShown = true;
 					m_widgetIsWelcome = false;
 				}
 			}
@@ -554,7 +546,10 @@ bool AppBase::closeEvent() {
 		{
 			m_currentStateWindow.window = uiAPI::window::saveState(m_mainWindow, m_currentStateWindow.window);
 		}
-		m_currentStateWindow.view = ot::WidgetViewManager::instance().saveState();
+
+		if (m_currentStateWindow.viewShown) {
+			m_currentStateWindow.view = ot::WidgetViewManager::instance().saveState();
+		}
 	}
 
 	if (m_projectIsModified) {
@@ -564,6 +559,16 @@ bool AppBase::closeEvent() {
 		dialogResult result = uiAPI::promptDialog::show(msg, "Exit application", promptYesNoCancelIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
 		if (result == dialogResult::resultCancel) { return false; }
 		else if (result == dialogResult::resultYes) { m_ExternalServicesComponent->saveProject(); }
+	}
+
+	// Store current UI settings
+	{
+		UserManagement uM;
+		uM.setAuthServerURL(m_authorizationServiceURL);
+		uM.setDatabaseURL(m_dataBaseURL);
+
+		uM.storeSetting(STATE_NAME_WINDOW, m_currentStateWindow.window);
+		uM.storeSetting(STATE_NAME_VIEW, m_currentStateWindow.view);
 	}
 
 	m_ExternalServicesComponent->closeProject(false);

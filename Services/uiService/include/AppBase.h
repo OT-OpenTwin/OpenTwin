@@ -563,6 +563,7 @@ private:
 	ak::UID						m_modelUid;					//! The UID of the model
 	
 	struct StateInformation {
+		bool viewShown;
 		std::string window;
 		std::string view;
 	};
