@@ -90,8 +90,7 @@ QMainWindow::separator:vertical {
 QToolTip {
     background-color: %color:Widget Background%;
     color: %color:Widget Foreground%;
-    /* If you remove the border property, background stops working on Windows */
-    border: none;
+    border: 1px solid %color:Border Color%;
     /* Remove padding, for fix combo box tooltip */
     padding: 0px;
 }
@@ -109,18 +108,6 @@ QStatusBar {
 
 QStatusBar::item {
     border: none;
-}
-
-QToolTip {
-    background-color: %color:Window Background%;
-    border: 1px solid %color:Border Color%;
-    color: %color:Widget Foreground%;
-
-    /* Remove padding, for fix combo box tooltip */
-    padding: 0px;
-
-    /* Reducing transparency to read better */
-    opacity: %number:Opacity ToolTip%;
 }
 
 QStatusBar QLabel {
