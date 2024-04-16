@@ -153,6 +153,7 @@
     <QtMoc Include="include\OTWidgets\TextEditorSearchPopup.h" />
     <QtMoc Include="include\OTWidgets\Splitter.h" />
     <ClInclude Include="include\OTWidgets\TextEditorView.h" />
+    <ClInclude Include="include\OTWidgets\WidgetProperties.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewFactory.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewManager.h" />

@@ -2239,3 +2239,21 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
 #tabCloseButton::disabled {
     color: rgba(127,127,127,255);
 }
+
+
+
+QWidget[OT_TransparentBackground="true"]:!hover:!pressed {
+    background: transparent;
+}
+
+QWidget[OT_TransparentHoverBackground="true"]:hover:!pressed {
+    background: transparent;
+}
+
+QWidget[OT_TransparentPressedBackground="true"]:pressed {
+    background: transparent;
+}
+
+QWidget[OT_Borderless="true"] {
+    border: 1px solid transparent;
+}

@@ -14,6 +14,7 @@
 #include "AppBase.h"
 #include "ExternalServicesComponent.h"
 
+#include "OTWidgets/WidgetProperties.h"
 #include "OTCommunication/ActionTypes.h"
 
 // AK header
@@ -94,6 +95,8 @@ welcomeScreen::welcomeScreen(
 	// Create refresh button
 	my_buttonRefresh = new QPushButton("");
 	my_buttonRefresh->setIcon( ak::uiAPI::getIcon("Refresh", "Default"));
+	my_buttonRefresh->setProperty(OT_WIDGET_PROPERTY_TransparentBackground, true);
+	my_buttonRefresh->setProperty(OT_WIDGET_PROPERTY_Borderless, true);
 
 	// Create welcome label
 	my_labelWelcome = new QLabel("Manage Projects");
