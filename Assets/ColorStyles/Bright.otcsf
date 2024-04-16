@@ -1412,15 +1412,6 @@ QTabWidget::pane {
     bottom: 1px;
 }
 
-QTabWidget[TTHidden="true"]::pane {
-    top: 0px;
-    border: none;
-}
-
-QTabWidget[TTHidden="true"]::pane:selected {
-    border: none;
-}
-
 QTabWidget::right-corner {
     margin-bottom: 1px;
 }
