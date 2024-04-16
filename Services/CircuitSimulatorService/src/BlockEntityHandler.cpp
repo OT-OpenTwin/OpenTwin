@@ -14,6 +14,7 @@
 #include "EntityBlockConnection.h"
 #include "SimulationResults.h"
 #include "EntityBlockCircuitDiode.h"
+#include "EntityBlockCircuitVoltageMeter.h"
 // Third Party Header
 
 namespace NodeNumbers
@@ -200,7 +201,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		topologyEntityVersionList.push_back(connectionEntity->getEntityStorageVersion());
 
 
-		if (blockEntitiesByBlockID.find(connection.getOriginUid()) != blockEntitiesByBlockID.end())
+		/*if (blockEntitiesByBlockID.find(connection.getOriginUid()) != blockEntitiesByBlockID.end())
 		{
 			auto& blockEntity = blockEntitiesByBlockID[connection.getOriginUid()];
 
@@ -221,10 +222,10 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		{
 			OT_LOG_EAS("Could not create connection since block " + std::to_string(connection.getDestinationUid()) + " was not found.");
 			continue;
-		}
+		}*/
 
-		if (originConnectorIsTypeOut != destConnectorIsTypeOut)
-		{
+		/*if (originConnectorIsTypeOut != destConnectorIsTypeOut)
+		{*/
 			blockEntitiesByBlockID[connection.getOriginUid()]->AddConnection(connectionEntity->getEntityID());
 			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.getOriginUid()]);
 			blockEntitiesByBlockID[connection.getDestinationUid()]->AddConnection(connectionEntity->getEntityID());
@@ -238,11 +239,11 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 			it->second.addConnection(connection.originUid(),conn);
 			it->second.addConnection(connection.destUid(),conn);*/
 
-		}
+		/*}
 		else
 		{
 			_uiComponent->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
-		}
+		}*/
 	}
 
 	
@@ -307,11 +308,12 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	EntityBlockCircuitVoltageSource element(0, nullptr, nullptr, nullptr,nullptr, "");
 	EntityBlockCircuitResistor resistor(0, nullptr, nullptr, nullptr, nullptr, "");
 	EntityBlockCircuitDiode diode(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityBlockCircuitVoltageMeter voltMeter(0, nullptr, nullptr, nullptr, nullptr, "");
 
 	a1->addItem(element.getClassName(), element.CreateBlockHeadline(), "CircuitElementImages/VoltageSource.png");
 	a1->addItem(resistor.getClassName(), resistor.CreateBlockHeadline(), "CircuitElementImages/ResistorBG.png");
 	a1->addItem(diode.getClassName(), diode.CreateBlockHeadline(), "CircuitElementImages/Diod2.png");
-
+	a1->addItem(voltMeter.getClassName(), voltMeter.CreateBlockHeadline(), "CircuitElementImages/VoltMeter.png");
 	pckg->addCollection(a);
 
 	Circuit circuit;
