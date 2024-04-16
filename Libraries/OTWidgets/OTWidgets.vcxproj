@@ -212,7 +212,7 @@
     <QtMoc Include="include\OTWidgets\PropertyGridGroup.h" />
     <QtMoc Include="include\OTWidgets\PropertyInput.h" />
     <QtMoc Include="include\OTWidgets\PropertyInputInt.h" />
-    <ClInclude Include="include\OTWidgets\PushButton.h" />
+    <QtMoc Include="include\OTWidgets\PushButton.h" />
     <ClInclude Include="include\OTWidgets\QWidgetInterface.h" />
     <QtMoc Include="include\OTWidgets\TabWidget.h" />
     <QtMoc Include="include\OTWidgets\ToolTipHandler.h" />

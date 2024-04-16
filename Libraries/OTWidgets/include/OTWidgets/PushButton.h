@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTWidgets/QWidgetInterface.h"
+#include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtWidgets/qpushbutton.h>
@@ -14,6 +15,7 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PushButton : public QPushButton, public QWidgetInterface {
+		Q_OBJECT
 	public:
 		PushButton(QWidget* _parent = (QWidget*)nullptr);
 		PushButton(const QString& _text, QWidget* _parent = (QWidget*)nullptr);
@@ -23,8 +25,9 @@ namespace ot {
 		//! @brief Returns a pointer to the root widget of this object
 		virtual QWidget* getQWidget(void) override { return this; };
 
-	private:
-
+	public Q_SLOTS:
+		void setSelectedProperty(void);
+		void unsetSelectedProperty(void);
 	};
 
 }

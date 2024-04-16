@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTCore/Flags.h"
 #include "OTWidgets/WidgetTypes.h"
+#include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt widget
 class QWidget;

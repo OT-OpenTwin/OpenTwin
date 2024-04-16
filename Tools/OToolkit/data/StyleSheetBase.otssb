@@ -1006,12 +1006,7 @@ QPushButton:checked:disabled {
     outline: none;
 }
 
-QPushButton:checked:selected {
-    background: %color:Widget Selection Background%;
-    color: %color:Widget Selection Foreground%;
-}
-
-QPushButton:hover {
+QPushButton:hover:!pressed {
     background-color: %color:Widget Hover Background%;
     color: %color:Widget Hover Foreground%;
 }
@@ -1022,9 +1017,14 @@ QPushButton:pressed {
     border-style: inset;
 }
 
-QPushButton:selected {
-    background: %color:Widget Selection Background%;
+QPushButton[IsSelected="true"] {
+    background-color: %color:Widget Selection Background%;
     color: %color:Widget Selection Foreground%;
+}
+
+QPushButton[IsSelected="false"] {
+    background-color: %color:Input Background%;
+    color: %color:Input Foreground%;
 }
 
 QPushButton::menu-indicator {
@@ -1072,13 +1072,13 @@ QToolButton:checked:disabled {
     outline: none;
 }
 
-QToolButton:checked:hover {
-    background-color: %color:Widget Background%;
+QToolButton:checked:hover:!pressed {
+    background-color: %color:Widget Hover Background%;
     color: %color:Widget Foreground%;
 }
 
 QToolButton:checked:pressed {
-    background-color: %color:Widget Background%;
+    background-color: %color:Widget Selection Background%;
 }
 
 QToolButton:checked:selected {

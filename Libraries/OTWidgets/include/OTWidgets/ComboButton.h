@@ -7,11 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/QWidgetInterface.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
-
-// Qt header
-#include <QtWidgets/qpushbutton.h>
+#include "OTWidgets/PushButton.h"
 
 class QMenu;
 class QAction;
@@ -19,7 +15,7 @@ class QAction;
 namespace ot {
 
 
-	class OT_WIDGETS_API_EXPORT ComboButton : public QPushButton, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT ComboButton : public PushButton {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ComboButton)
 	public:
@@ -29,8 +25,6 @@ namespace ot {
 		virtual ~ComboButton();
 
 		virtual void mousePressEvent(QMouseEvent* _event) override;
-
-		virtual QWidget* getQWidget(void) override { return this; };
 
 		void setItems(const QStringList& _items);
 

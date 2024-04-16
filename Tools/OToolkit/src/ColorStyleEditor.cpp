@@ -132,6 +132,7 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	PropertyGroup* generalGroup = new PropertyGroup(CSE_GROUP_General);
 	m_nameProp = new PropertyString(CSE_Name, std::string());
 	generalGroup->addProperty(m_nameProp);
+	generalGroup->addProperty(new PropertyStringList("xxx", "Test", std::list<std::string>({ "Test", "Other" })));
 	m_styleFilesGroup = new PropertyGroup(CSE_GROUP_StyleFiles);
 	m_styleIntGroup = new PropertyGroup(CSE_GROUP_StyleInt);
 	m_styleDoubleGroup = new PropertyGroup(CSE_GROUP_StyleDouble);

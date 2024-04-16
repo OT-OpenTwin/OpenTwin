@@ -1012,12 +1012,7 @@ QPushButton:checked:disabled {
     outline: none;
 }
 
-QPushButton:checked:selected {
-    background: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
-}
-
-QPushButton:hover {
+QPushButton:hover:!pressed {
     background-color: rgba(0,215,255,255);
     color: rgba(0,0,0,255);
 }
@@ -1028,8 +1023,13 @@ QPushButton:pressed {
     border-style: inset;
 }
 
-QPushButton:selected {
-    background: rgba(0,255,0,255);
+QPushButton[IsSelected="true"] {
+    background-color: rgba(0,255,0,255);
+    color: rgba(0,0,0,255);
+}
+
+QPushButton[IsSelected="false"] {
+    background-color: rgba(211,211,211,255);
     color: rgba(0,0,0,255);
 }
 
@@ -1078,13 +1078,13 @@ QToolButton:checked:disabled {
     outline: none;
 }
 
-QToolButton:checked:hover {
-    background-color: rgba(255,255,255,255);
+QToolButton:checked:hover:!pressed {
+    background-color: rgba(0,215,255,255);
     color: rgba(0,0,0,255);
 }
 
 QToolButton:checked:pressed {
-    background-color: rgba(255,255,255,255);
+    background-color: rgba(0,255,0,255);
 }
 
 QToolButton:checked:selected {
@@ -2156,7 +2156,7 @@ QAbstractView:selected {
 
 #OT_TTB QTabBar::tab::first:selected,
 #OT_TTB QTabBar::tab::only-one:selected {
-    background-color: qlineargradient(x1: 0.5, y1: 0, x2: 0.5, y2: 1, stop: 0 rgba(0,215,255,255), stop: 0.5 rgba(0,215,255,255), stop: 1 rgba(255,255,255,255));
+    background-color: qlineargradient(x1: 0.5, y1: 0, x2: 0.5, y2: 1, stop: 0 rgba(0,215,255,255), stop: 0.3 rgba(0,215,255,255), stop: 1 rgba(255,255,255,255));
 }
 
 #OT_TTBGroup {
