@@ -681,6 +681,7 @@ QScrollBar::sub-page:vertical {
 QTextEdit {
     background-color: %color:Widget Background%;
     color: %color:Widget Foreground%;
+    border: 1px solid %color:Border Color%;
 }
 
 QTextEdit:hover {
@@ -698,6 +699,7 @@ QTextEdit:selected {
 QPlainTextEdit {
     background-color: %color:Widget Background%;
     color: %color:Widget Foreground%;
+    border: 1px solid %color:Border Color%;
 }
 
 QPlainTextEdit:focus {
