@@ -1593,7 +1593,7 @@ QDockWidget::float-button:pressed {
 QHeaderView {
     background-color: %color:Title Background%;
     color: %color:Title Foreground%;
-    border: 1px solid transparent;
+    border: none;
     padding: 0;
     margin: 0;
 }
@@ -1617,6 +1617,7 @@ QHeaderView::section::horizontal {
     padding-bottom: 0;
     padding-left: 4px;
     padding-right: 4px;
+    border-bottom: 1px solid %color:Light Border Color%;
 }
 
 QHeaderView::section::horizontal::!last {
