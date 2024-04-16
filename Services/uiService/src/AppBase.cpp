@@ -82,6 +82,7 @@
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/ColorStyleTypes.h"
 #include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/WidgetProperties.h"
 
 // C++ header
 #include <thread>

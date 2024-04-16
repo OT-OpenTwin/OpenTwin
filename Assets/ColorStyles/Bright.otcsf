@@ -2147,7 +2147,7 @@ QAbstractView:selected {
 
 #OT_TTB QTabBar::tab::first,
 #OT_TTB QTabBar::tab::only-one {
-    background-color: rgba(170,210,255,255);
+    background-color: rgba(0,215,255,255);
     color: rgba(0,0,0,255);
     border-bottom: 1px solid rgba(0,0,0,255);
     border-top-left-radius: 10;
@@ -2156,7 +2156,7 @@ QAbstractView:selected {
 
 #OT_TTB QTabBar::tab::first:selected,
 #OT_TTB QTabBar::tab::only-one:selected {
-    background-color: qlineargradient(x1: 0.5, y1: 0, x2: 0.5, y2: 1, stop: 0 rgba(170,210,255,255), stop: 0.5 rgba(170,210,255,255), stop: 1 rgba(255,255,255,255));
+    background-color: qlineargradient(x1: 0.5, y1: 0, x2: 0.5, y2: 1, stop: 0 rgba(0,215,255,255), stop: 0.5 rgba(0,215,255,255), stop: 1 rgba(255,255,255,255));
 }
 
 #OT_TTBGroup {
@@ -2182,6 +2182,7 @@ ads--CDockContainerWidget ads--CDockSplitter::handle {
 
 ads--CDockAreaWidget {
     background: rgba(255,255,255,255);
+    border: none;
 }
 
 #dockAreaTitleBar {

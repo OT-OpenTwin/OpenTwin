@@ -39,7 +39,7 @@ ToolBar::ToolBar(AppBase * _owner)
 	uiAPI::window::setTabToolBarVisible(m_owner->m_mainWindow);
 
 	// Create groups and pages
-	m_file.page = uiAPI::createTabToolBarSubContainer(m_owner->m_uid, m_owner->m_mainWindow, "File");
+	m_file.page = uiAPI::createTabToolBarSubContainer(m_owner->m_uid, m_owner->m_mainWindow, "Start");
 	m_file.gDefault = uiAPI::createTabToolBarSubContainer(m_owner->m_uid, m_file.page, "");
 
 	m_view.page = uiAPI::createTabToolBarSubContainer(m_owner->m_uid, m_owner->m_mainWindow, "View");

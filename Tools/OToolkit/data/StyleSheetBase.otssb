@@ -2150,7 +2150,7 @@ QAbstractView:selected {
 
 #OT_TTB QTabBar::tab::first:selected,
 #OT_TTB QTabBar::tab::only-one:selected {
-    background-color: qlineargradient(x1: 0.5, y1: 0, x2: 0.5, y2: 1, stop: 0 %color:TabToolBar First Tab Background%, stop: 0.5 %color:TabToolBar First Tab Background%, stop: 1 %color:Widget Background%);
+    background-color: qlineargradient(x1: 0.5, y1: 0, x2: 0.5, y2: 1, stop: 0 %color:TabToolBar First Tab Background%, stop: 0.3 %color:TabToolBar First Tab Background%, stop: 1 %color:Widget Background%);
 }
 
 #OT_TTBGroup {
@@ -2176,6 +2176,7 @@ ads--CDockContainerWidget ads--CDockSplitter::handle {
 
 ads--CDockAreaWidget {
     background: %color:Widget Background%;
+    border: none;
 }
 
 #dockAreaTitleBar {

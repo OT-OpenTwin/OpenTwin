@@ -453,7 +453,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_colors.insert_or_assign(CSE_COLOR_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
 	m_colors.insert_or_assign(CSE_COLOR_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
 	m_colors.insert_or_assign(CSE_COLOR_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabBackground, new PropertyPainter2D(new FillPainter2D(Color(170, 210, 255))));
+	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
 	m_colors.insert_or_assign("Test 1", new PropertyPainter2D(new FillPainter2D(Color::Red)));
 
