@@ -21,8 +21,9 @@
 #include "OTCore/PropertyString.h"
 #include "OTCore/PropertyDouble.h"
 #include "OTCore/PropertyGridCfg.h"
-#include "OTGui/PropertyPainter2D.h"
 #include "OTCore/PropertyStringList.h"
+#include "OTGui/PropertyPainter2D.h"
+#include "OTGui/LinearGradientPainter2D.h"
 #include "OTWidgets/SpinBox.h"
 #include "OTWidgets/Splitter.h"
 #include "OTWidgets/TabWidget.h"
@@ -75,7 +76,7 @@
 #define CSE_COLOR_HeaderSelectionBackground "Header Selection Background"
 #define CSE_COLOR_InputBackground "Input Background"
 #define CSE_COLOR_WidgetAlternateBackground "Widget Alternate Background"
-#define CSE_COLOR_WidgetForeground "Widget Foreground 1"
+#define CSE_COLOR_WidgetForeground "Widget Foreground"
 #define CSE_COLOR_WidgetBackground "Widget Background"
 #define CSE_COLOR_WidgetDisabledBackground "Widget Disabled Background"
 #define CSE_COLOR_WidgetDisabledForeground "Widget Disabled Foreground"
@@ -409,24 +410,35 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	// Initialize default style values
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverBackground, new PropertyPainter2D(new FillPainter2D(Color::Blue)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedBackground, new PropertyPainter2D(new FillPainter2D(Color::Lime)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBorderColor, new PropertyPainter2D(new FillPainter2D(Color::DarkGray)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color(215, 215, 215))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
+
+	LinearGradientPainter2D* tehb = new LinearGradientPainter2D;
+	tehb->setStart(Point2DD(0.5, 0.));
+	tehb->setFinalStop(Point2DD(0.5, 1.));
+	tehb->addStop(GradientPainterStop2D(0., Color(Color::Gray)));
+	tehb->addStop(GradientPainterStop2D(0.04, Color(Color::Gray)));
+	tehb->addStop(GradientPainterStop2D(0.05, Color(Color::White)));
+	tehb->addStop(GradientPainterStop2D(0.98, Color(Color::White)));
+	tehb->addStop(GradientPainterStop2D(0.99, Color(Color::Gray)));
+	tehb->addStop(GradientPainterStop2D(1., Color(Color::Gray)));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TextEditHighlightBorder, new PropertyPainter2D(tehb));
 
 	// Initialize default colors
 	m_colors.insert_or_assign(CSE_COLOR_BorderColor, new PropertyPainter2D(new FillPainter2D(Color::Black)));
 	m_colors.insert_or_assign(CSE_COLOR_LightBorderColor, new PropertyPainter2D(new FillPainter2D(Color::DarkGray)));
 	m_colors.insert_or_assign(CSE_COLOR_BorderDisabledColor, new PropertyPainter2D(new FillPainter2D(Color::Gray)));
-	m_colors.insert_or_assign(CSE_COLOR_BorderHoverColor, new PropertyPainter2D(new FillPainter2D(Color::Blue)));
+	m_colors.insert_or_assign(CSE_COLOR_BorderHoverColor, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_colors.insert_or_assign(CSE_COLOR_BorderSelectionColor, new PropertyPainter2D(new FillPainter2D(Color::Lime)));
 	m_colors.insert_or_assign(CSE_COLOR_HeaderBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderHoverForeground, new PropertyPainter2D(new FillPainter2D(Color::Blue)));
+	m_colors.insert_or_assign(CSE_COLOR_HeaderHoverForeground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_colors.insert_or_assign(CSE_COLOR_HeaderSelectionBackground, new PropertyPainter2D(new FillPainter2D(Color::Lime)));
 	m_colors.insert_or_assign(CSE_COLOR_InputBackground, new PropertyPainter2D(new FillPainter2D(Color::DarkGray)));
 	m_colors.insert_or_assign(CSE_COLOR_WidgetAlternateBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
@@ -434,8 +446,8 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_colors.insert_or_assign(CSE_COLOR_WidgetBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));
 	m_colors.insert_or_assign(CSE_COLOR_WidgetDisabledBackground, new PropertyPainter2D(new FillPainter2D(Color::Gray)));
 	m_colors.insert_or_assign(CSE_COLOR_WidgetDisabledForeground, new PropertyPainter2D(new FillPainter2D(Color::DarkGray)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverBackground, new PropertyPainter2D(new FillPainter2D(Color::Blue)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
+	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
 	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionBackground, new PropertyPainter2D(new FillPainter2D(Color::Lime)));
 	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
 	m_colors.insert_or_assign(CSE_COLOR_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color::White)));

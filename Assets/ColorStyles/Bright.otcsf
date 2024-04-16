@@ -2,7 +2,7 @@ name:Bright
 files:[{"Name":"Property Group Collapsed","Path":"/properties/ArrowBlueRight.png"},{"Name":"Property Group Expanded","Path":"/properties/ArrowGreenDown.png"},{"Name":"Property Item Delete","Path":"/properties/Delete.png"}]
 integers:[{"Name":"Splitter Handle Width","Value":2}]
 doubles:[]
-values:[{"Name":"Controls Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}},{"Name":"Controls Border Color","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.6600000262260437,"g":0.6600000262260437,"b":0.6600000262260437,"a":1.0}}},{"Name":"Controls Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Controls Hover Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":1.0,"a":1.0}}},{"Name":"Controls Hover Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}},{"Name":"Controls Selected Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":1.0,"b":0.0,"a":1.0}}},{"Name":"Controls Selected Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Title Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.8299999833106995,"g":0.8299999833106995,"b":0.8299999833106995,"a":1.0}}},{"Name":"Title Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Window Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.8299999833106995,"g":0.8299999833106995,"b":0.8299999833106995,"a":1.0}}},{"Name":"Window Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}}]
+values:[{"Name":"Controls Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}},{"Name":"Controls Border Color","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.6600000262260437,"g":0.6600000262260437,"b":0.6600000262260437,"a":1.0}}},{"Name":"Controls Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Controls Hover Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.843137264251709,"b":1.0,"a":1.0}}},{"Name":"Controls Hover Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Controls Selected Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":1.0,"b":0.0,"a":1.0}}},{"Name":"Controls Selected Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Text Editor Highlight Border","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCLGrad","Stops":[{"Pos":0.0,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}},{"Pos":0.04,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}},{"Pos":0.05,"Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}},{"Pos":0.98,"Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}},{"Pos":0.99,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}},{"Pos":1.0,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}}],"Spread":"Pad","Start":{"x":0.5,"y":0.0},"FinalStop":{"x":0.5,"y":1.0}}},{"Name":"Title Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.843137264251709,"g":0.843137264251709,"b":0.843137264251709,"a":1.0}}},{"Name":"Title Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Window Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}},{"Name":"Window Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}}]
 sheet:
 /* This file used the "QDarkStyleSheet/qdarkstyle/qss/_style.scss" as a template. */
 
@@ -52,7 +52,7 @@ QWidget::item:selected {
 }
 
 QWidget::item:hover {
-    background-color: rgba(0,0,255,255);
+    background-color: rgba(0,215,255,255);
 }
 
 /* ##################################################################################### */
@@ -70,7 +70,7 @@ QMainWindow::separator {
 }
 
 QMainWindow::separator:hover:!pressed {
-    background-color: rgba(0,0,255,255);
+    background-color: rgba(0,215,255,255);
 }
 
 QMainWindow::separator:pressed {
@@ -106,14 +106,12 @@ QToolTip {
 /* QStatusBar */
 
 QStatusBar {
-    border-color: rgba(0,0,0,255);
-
-    /* Fixes Spyder #9120, #9121 */
     background: rgba(255,255,255,255);
+    border-top: 1px solid rgba(0,0,0,255);
 }
 
 QStatusBar::item {
-    border: none;
+    border: 1px solid transparent;
 }
 
 QStatusBar QLabel {
@@ -346,7 +344,7 @@ QMenuBar {
 }
 
 QMenuBar:focus {
-    border-color: rgba(0,0,255,255);
+    border-color: rgba(0,215,255,255);
 }
 
 QMenuBar::item {
@@ -357,8 +355,8 @@ QMenuBar::item {
 QMenuBar::item:selected {
     padding: 4px;
     border: 0px solid rgba(0,0,0,255);
-    background-color: rgba(0,0,255,255);
-    color: rgba(255,255,255,255);
+    background-color: rgba(0,215,255,255);
+    color: rgba(0,0,0,255);
 }
 
 QMenuBar::item:pressed {
@@ -379,7 +377,7 @@ QMenu {
     color: rgba(0,0,0,255);
     margin: 0px;
     background-color: rgba(255,255,255,255);
-    selection-background-color: rgba(0,0,255,255);
+    selection-background-color: rgba(0,215,255,255);
 }
 
 QMenu::separator {
@@ -396,8 +394,8 @@ QMenu::item {
 }
 
 QMenu::item:selected {
-    background-color: rgba(0,0,255,255);
-    color: rgba(255,255,255,255);
+    background-color: rgba(0,215,255,255);
+    color: rgba(0,0,0,255);
 }
 
 QMenu::item:pressed {
@@ -566,7 +564,7 @@ QScrollBar::handle:horizontal {
 }
 
 QScrollBar::handle:horizontal:hover {
-    background-color: rgba(0,0,255,255);
+    background-color: rgba(0,215,255,255);
 }
 
 QScrollBar::handle:horizontal:pressed {
@@ -581,7 +579,7 @@ QScrollBar::handle:vertical {
 }
 
 QScrollBar::handle:vertical:hover {
-    background-color: rgba(0,0,255,255);
+    background-color: rgba(0,215,255,255);
 }
 
 QScrollBar::handle:vertical:pressed {
@@ -691,7 +689,7 @@ QTextEdit {
 }
 
 QTextEdit:hover {
-    border-color: rgba(0,0,255,255);
+    border-color: rgba(0,215,255,255);
 }
 
 QTextEdit:selected {
@@ -844,7 +842,7 @@ QAbstractSpinBox::down-arrow:hover {
 }
 
 QAbstractSpinBox:hover {
-    border-color: rgba(0,0,255,255);
+    border-color: rgba(0,215,255,255);
     color: rgba(0,0,0,255);
 }
 
@@ -890,7 +888,7 @@ QTextBrowser:disabled {
 }
 
 QTextBrowser:hover {
-    border-color: rgba(0,0,255,255);
+    border-color: rgba(0,215,255,255);
 }
 
 QTextBrowser:selected {
@@ -1020,8 +1018,8 @@ QPushButton:checked:selected {
 }
 
 QPushButton:hover {
-    background-color: rgba(0,0,255,255);
-    color: rgba(255,255,255,255);
+    background-color: rgba(0,215,255,255);
+    color: rgba(0,0,0,255);
 }
 
 QPushButton:pressed {
@@ -1095,8 +1093,8 @@ QToolButton:checked:selected {
 }
 
 QToolButton:hover {
-    background-color: rgba(0,0,255,255);
-    color: rgba(255,255,255,255);
+    background-color: rgba(0,215,255,255);
+    color: rgba(0,0,0,255);
 }
 
 QToolButton:pressed {
@@ -1144,11 +1142,11 @@ QToolButton::menu-button {
 }
 
 QToolButton::menu-button:hover {
-    border-color: rgba(0,0,255,255);
+    border-color: rgba(0,215,255,255);
 }
 
 QToolButton::menu-button:checked:hover {
-    border-color: rgba(0,0,255,255);
+    border-color: rgba(0,215,255,255);
 }
 
 QToolButton::menu-indicator {
@@ -1206,8 +1204,8 @@ QComboBox QAbstractItemView {
 }
 
 QComboBox QAbstractItemView:hover {
-    background-color: rgba(0,0,255,255);
-    color: rgba(255,255,255,255);
+    background-color: rgba(0,215,255,255);
+    color: rgba(0,0,0,255);
 }
 
 QComboBox QAbstractItemView:selected {
@@ -1225,7 +1223,7 @@ QComboBox:disabled {
 }
 
 QComboBox:hover {
-    border-color: rgba(0,0,255,255);
+    border-color: rgba(0,215,255,255);
 }
 
 QComboBox:focus {
@@ -1336,8 +1334,8 @@ QSlider::handle:horizontal {
 }
 
 QSlider::handle:horizontal:hover {
-    background: rgba(0,0,255,255);
-    border-color: rgba(0,0,255,255);
+    background: rgba(0,215,255,255);
+    border-color: rgba(0,215,255,255);
 }
 
 QSlider::handle:horizontal:focus {
@@ -1355,7 +1353,7 @@ QSlider::handle:vertical {
 
 QSlider::handle:vertical:hover {
     background: rgba(0,255,0,255);
-    border-color: rgba(0,0,255,255);
+    border-color: rgba(0,215,255,255);
 }
 
 QSlider::handle:vertical:focus {
@@ -1383,7 +1381,7 @@ QLineEdit:disabled {
 }
 
 QLineEdit:hover {
-    border-color: rgba(0,0,255,255);
+    border-color: rgba(0,215,255,255);
 }
 
 QLineEdit:focus {
@@ -1484,9 +1482,9 @@ QDockWidget QTabBar::tab::top:selected {
 
 QTabBar::tab::top:!selected:hover,
 QDockWidget QTabBar::tab::top:!selected:hover {
-    border-left: 1px solid rgba(0,0,255,255);
-    border-right: 1px solid rgba(0,0,255,255);
-    border-top: 1px solid rgba(0,0,255,255);
+    border-left: 1px solid rgba(0,215,255,255);
+    border-right: 1px solid rgba(0,215,255,255);
+    border-top: 1px solid rgba(0,215,255,255);
     border-bottom: 1px solid rgba(0,0,0,255);
     border-top-left-radius: 10;
     border-top-right-radius: 10;
@@ -1510,7 +1508,7 @@ QDockWidget QTabBar QToolButton:pressed {
 
 QTabBar QToolButton:pressed:hover, 
 QDockWidget QTabBar QToolButton:pressed:hover {
-    border-color: rgba(0,0,255,255);
+    border-color: rgba(0,215,255,255);
 }
 
 QTabBar QTabBar QToolButton::left-arrow:enabled, 
@@ -1845,8 +1843,8 @@ QListView::item:!selected:hover,
 QTableView::item:!selected:hover,
 QColumnView::item:!selected:hover {
     outline: 0;
-    color: rgba(255,255,255,255);
-    background-color: rgba(0,0,255,255);
+    color: rgba(0,0,0,255);
+    background-color: rgba(0,215,255,255);
 }
 
 QTableCornerButton::section {
@@ -1903,8 +1901,8 @@ QToolBox::tab:!selected:disabled {
 }
 
 QToolBox::tab:hover {
-    border-color: rgba(0,0,255,255);
-    border-bottom: 2px solid rgba(0,0,255,255);
+    border-color: rgba(0,215,255,255);
+    border-bottom: 2px solid rgba(0,215,255,255);
 }
 
 QToolBox QScrollArea {
@@ -1963,7 +1961,7 @@ QSplitter::handle {
 }
 
 QSplitter::handle:hover:!pressed {
-    background-color: rgba(0,0,255,255);
+    background-color: rgba(0,215,255,255);
     border: 1px solid rgba(0,0,0,255);
     border-radius: 2;
 }
@@ -2037,7 +2035,7 @@ QDateTimeEdit QAbstractItemView {
 /* QAbstractView */
 
 QAbstractView:hover {
-    border-color: rgba(0,0,255,255);
+    border-color: rgba(0,215,255,255);
 }
 
 QAbstractView:selected {
@@ -2195,6 +2193,16 @@ ads--CDockWidgetTab {
     padding: 0px;
 }
 
+ads--CDockWidgetTab[activeTab="false"]::hover {
+    border-top: 1px solid rgba(0,215,255,255);
+    border-left: 1px solid rgba(0,215,255,255);
+    border-right: 1px solid rgba(0,215,255,255);
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: 10;
+    border-top-right-radius: 10;
+    margin-bottom: -1px;
+}
+
 ads--CDockWidgetTab[activeTab="true"] {
     border-top: 1px solid rgba(0,0,0,255);
     border-left: 1px solid rgba(0,0,0,255);
@@ -2221,7 +2229,7 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
 }
 
 #tabCloseButton::hover::!pressed {
-    color: rgba(0,0,255,255);
+    color: rgba(0,215,255,255);
 }
 
 #tabCloseButton::pressed {

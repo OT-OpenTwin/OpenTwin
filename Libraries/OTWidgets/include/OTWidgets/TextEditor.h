@@ -6,8 +6,9 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/PlainTextEdit.h"
 #include "OTCore/CoreTypes.h"
+#include "OTWidgets/ColorStyle.h"
+#include "OTWidgets/PlainTextEdit.h"
 
 // Qt header
 #include <qstring.h>
@@ -95,6 +96,7 @@ namespace ot {
 		void slotFindRequested(void);
 		void slotFindClosing(void);
 		void slotDuplicateLine(void);
+		void slotCurrentColorStyleChanged(const ot::ColorStyle& _style);
 
 	private:
 		TextEditorSearchPopup* m_searchPopup;

@@ -100,14 +100,12 @@ QToolTip {
 /* QStatusBar */
 
 QStatusBar {
-    border-color: %color:Border Color%;
-
-    /* Fixes Spyder #9120, #9121 */
     background: %color:Widget Background%;
+    border-top: 1px solid %color:Border Color%;
 }
 
 QStatusBar::item {
-    border: none;
+    border: 1px solid transparent;
 }
 
 QStatusBar QLabel {
@@ -2187,6 +2185,16 @@ ads--CDockAreaWidget {
 ads--CDockWidgetTab {
     border: 1px solid transparent;
     padding: 0px;
+}
+
+ads--CDockWidgetTab[activeTab="false"]::hover {
+    border-top: 1px solid %color:Border Hover Color%;
+    border-left: 1px solid %color:Border Hover Color%;
+    border-right: 1px solid %color:Border Hover Color%;
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: %number:Border Radius Big%;
+    border-top-right-radius: %number:Border Radius Big%;
+    margin-bottom: -1px;
 }
 
 ads--CDockWidgetTab[activeTab="true"] {

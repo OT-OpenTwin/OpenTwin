@@ -8,6 +8,8 @@
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/PushButton.h"
+#include "OTWidgets/ColorStyleTypes.h"
+#include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/TextEditorSearchPopup.h"
 
 // Qt header
@@ -119,6 +121,8 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 	findShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 	duplicateShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
+	this->slotHighlightCurrentLine();
+
 	connect(this, &TextEditor::blockCountChanged, this, &TextEditor::slotUpdateLineNumberAreaWidth);
 	connect(this, &TextEditor::updateRequest, this, &TextEditor::slotUpdateLineNumberArea);
 	connect(this, &TextEditor::cursorPositionChanged, this, &TextEditor::slotHighlightCurrentLine);
@@ -126,6 +130,7 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 	connect(saveShortcut, &QShortcut::activated, this, &TextEditor::slotSaveRequested);
 	connect(findShortcut, &QShortcut::activated, this, &TextEditor::slotFindRequested);
 	connect(duplicateShortcut, &QShortcut::activated, this, &TextEditor::slotDuplicateLine);
+	connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &TextEditor::slotCurrentColorStyleChanged);
 }
 
 ot::TextEditor::~TextEditor() {
@@ -291,9 +296,10 @@ void ot::TextEditor::slotHighlightCurrentLine() {
 	if (!isReadOnly()) {
 		QTextEdit::ExtraSelection selection;
 
-		QColor lineColor = QColor(Qt::yellow).lighter(160);
+		const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 
-		selection.format.setBackground(lineColor);
+		selection.format.setProperty(QTextFormat::OutlinePen, QPen(cs.getValue(OT_COLORSTYLE_VALUE_TextEditHighlightBorder).brush(), 1.));
+		selection.format.setProperty(QTextFormat::CssFloat, QVariant());
 		selection.format.setProperty(QTextFormat::FullWidthSelection, true);
 		selection.cursor = textCursor();
 		selection.cursor.clearSelection();
@@ -349,4 +355,8 @@ void ot::TextEditor::slotDuplicateLine(void) {
 	cursor.movePosition(QTextCursor::EndOfLine);
 	this->setTextCursor(cursor);
 	this->insertPlainText("\n" + txt);
+}
+
+void ot::TextEditor::slotCurrentColorStyleChanged(const ot::ColorStyle& _style) {
+	this->slotHighlightCurrentLine();
 }
