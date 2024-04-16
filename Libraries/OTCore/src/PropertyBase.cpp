@@ -7,7 +7,7 @@
 #include "OTCore/Logger.h"
 #include "OTCore/PropertyBase.h"
 
-std::string ot::PropertyBase::toString(PropertyFlags _flag) {
+std::string ot::PropertyBase::toString(PropertyFlag _flag) {
 	switch (_flag)
 	{
 	case ot::PropertyBase::NoFlags: return "<null>";
@@ -25,7 +25,7 @@ std::string ot::PropertyBase::toString(PropertyFlags _flag) {
 	}
 }
 
-ot::PropertyBase::PropertyFlags ot::PropertyBase::stringToFlag(const std::string& _flag) {
+ot::PropertyBase::PropertyFlag ot::PropertyBase::stringToFlag(const std::string& _flag) {
 	if (_flag == PropertyBase::toString(PropertyBase::NoFlags)) { return PropertyBase::NoFlags; }
 	else if (_flag == PropertyBase::toString(PropertyBase::IsReadOnly)) { return PropertyBase::IsReadOnly; }
 	else if (_flag == PropertyBase::toString(PropertyBase::IsProtected)) { return PropertyBase::IsProtected; }

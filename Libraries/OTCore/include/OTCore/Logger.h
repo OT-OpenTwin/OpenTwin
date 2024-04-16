@@ -297,6 +297,8 @@ namespace ot {
 		ALL_MESSAGE_LOG_FLAGS           = 0x00F0, //! @brief Mask used to set all incoming and outgoing message log flags
 		ALL_LOG_FLAGS                   = 0xFFFF  //! @brief Mask used to set all log flags
 	};
+
+	typedef Flags<LogFlag> LogFlags;
 }
 OT_ADD_FLAG_FUNCTIONS(ot::LogFlag);
 
@@ -306,7 +308,7 @@ namespace ot {
 	class OT_CORE_API_EXPORT LogMessage : public Serializable {
 	public:
 		LogMessage();
-		LogMessage(const std::string& _serviceName, const std::string& _functionName, const std::string& _text, ot::LogFlag _flags = ot::INFORMATION_LOG);
+		LogMessage(const std::string& _serviceName, const std::string& _functionName, const std::string& _text, const LogFlags& _flags = LogFlags(ot::INFORMATION_LOG));
 		LogMessage(const LogMessage& _other);
 		virtual ~LogMessage();
 
@@ -322,7 +324,7 @@ namespace ot {
 		const std::string& text(void) const { return m_text; };
 
 		//! @brief Log flags that are set for this log message
-		LogFlag flags(void) const { return m_flags; };
+		LogFlags flags(void) const { return m_flags; };
 
 		//! @brief String representation of the system timestamp at message creation
 		//! OT_LOG_TIME_FORMAT_STDSTRING contains the string format
@@ -354,7 +356,7 @@ namespace ot {
 		std::string				m_serviceName;			//! @brief Name of the message creator
 		std::string				m_functionName;			//! @brief Name of the function that created the message
 		std::string				m_text;					//! @brief The message text
-		LogFlag     m_flags;				//! @brief Log flags tha describe the type of the message
+		LogFlags				m_flags;				//! @brief Log flags tha describe the type of the message
 		std::string				m_localSystemTime;		//! @brief Message creation timestamp
 		std::string				m_globalSystemTime;		//! @brief Message received by LoggerService timestamp
 	};
@@ -422,8 +424,9 @@ namespace ot {
 
 		// Setter/Getter
 
-		void setLogFlags(LogFlag _flags) { m_logFlags = _flags; };
-		LogFlag logFlags(void) const { return m_logFlags; };
+		void setLogFlag(LogFlag _flag, bool _active = true) { m_logFlags.setFlag(_flag, _active); };
+		void setLogFlags(LogFlags _flags) { m_logFlags = _flags; };
+		LogFlags logFlags(void) const { return m_logFlags; };
 
 		void setServiceName(const std::string& _name) { m_serviceName = _name; };
 		const std::string& serviceName(void) const { return m_serviceName; };
@@ -440,7 +443,7 @@ namespace ot {
 		//! @param _text The message thext
 		//! @param _functionName The name of the function
 		//! @param _logFlags The flags that should be set for the log message
-		void dispatch(const std::string& _text, const std::string& _functionName = std::string(), ot::LogFlag _logFlags = ot::INFORMATION_LOG);
+		void dispatch(const std::string& _text, const std::string& _functionName = std::string(), const LogFlags& _logFlags = LogFlags(ot::INFORMATION_LOG));
 
 		//! @brief Dispatch a log message with the provided params
 		//! Will set the current system time as message creation time
@@ -450,7 +453,7 @@ namespace ot {
 	private:
 		void applyEnvFlag(const std::string& _str);
 
-		LogFlag					m_logFlags;			//! @brief Allowed messages flags
+		LogFlags						m_logFlags;			//! @brief Allowed messages flags
 		std::string						m_serviceName;		//! @brief Service/Application name
 
 		std::list<AbstractLogNotifier*> m_messageReceiver;	//! @brief Receivers that will get notified about created log messages

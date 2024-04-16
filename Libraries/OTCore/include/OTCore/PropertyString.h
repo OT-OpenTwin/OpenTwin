@@ -20,9 +20,9 @@ namespace ot {
 	public:
 		PropertyString(const PropertyString* _other);
 		PropertyString(const PropertyBase& _base);
-		PropertyString(PropertyFlags _flags = PropertyFlags::NoFlags);
-		PropertyString(const std::string& _value, PropertyFlags _flags = PropertyFlags::NoFlags);
-		PropertyString(const std::string& _name, const std::string& _value, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyString(PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyString(const std::string& _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyString(const std::string& _name, const std::string& _value, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyString() {};
 
 		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_String; };

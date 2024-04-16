@@ -18,9 +18,9 @@ namespace ot {
 	public:
 		PropertyColor(const PropertyColor* _other);
 		PropertyColor(const PropertyBase& _base);
-		PropertyColor(PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags) {};
-		PropertyColor(ot::Color _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_value(_value) {};
-		PropertyColor(const std::string& _name, ot::Color _value, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_name, _flags), m_value(_value) {};
+		PropertyColor(PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_flags) {};
+		PropertyColor(ot::Color _value, PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_flags), m_value(_value) {};
+		PropertyColor(const std::string& _name, ot::Color _value, PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_name, _flags), m_value(_value) {};
 		virtual ~PropertyColor() {};
 
 		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Color; };

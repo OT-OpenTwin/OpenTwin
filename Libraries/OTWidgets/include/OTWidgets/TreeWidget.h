@@ -31,8 +31,9 @@ namespace ot {
 		void setIcon(const QIcon& _icon) { m_icon = _icon; };
 		const QIcon& icon(void) const { return m_icon; };
 
-		void setFlags(const NavigationTreeItemFlag _flags) { m_flags = _flags; };
-		NavigationTreeItemFlag flags(void) const { return m_flags; };
+		void setFlag(NavigationTreeItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setFlags(const NavigationTreeItemFlags _flags) { m_flags = _flags; };
+		NavigationTreeItemFlags flags(void) const { return m_flags; };
 
 		void addChildItem(const TreeWidgetItemInfo& _info);
 		void setChildItems(const std::list<TreeWidgetItemInfo>& _childs) { m_childs = _childs; };
@@ -42,7 +43,7 @@ namespace ot {
 	private:
 		QString m_text;
 		QIcon m_icon;
-		NavigationTreeItemFlag m_flags;
+		NavigationTreeItemFlags m_flags;
 		std::list<TreeWidgetItemInfo> m_childs;
 
 	};
@@ -97,8 +98,9 @@ namespace ot {
 		TreeWidgetItem(const TreeWidgetItemInfo& _itemInfo, int _type = 0);
 		virtual ~TreeWidgetItem();
 
-		void setNavigationItemFlags(NavigationTreeItemFlag _flags) { m_flags = _flags; };
-		NavigationTreeItemFlag navigationItemFlags(void) const { return m_flags; };
+		void setNavigationItemFlag(NavigationTreeItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setNavigationItemFlags(NavigationTreeItemFlags _flags) { m_flags = _flags; };
+		NavigationTreeItemFlags navigationItemFlags(void) const { return m_flags; };
 
 		//! @brief Returns the item info
 		//! The information returned only contains the path to this item (other childs of parent items are ignored)
@@ -107,6 +109,6 @@ namespace ot {
 		void expandAllParents(bool _expandThis = false);
 
 	private:
-		NavigationTreeItemFlag m_flags;
+		NavigationTreeItemFlags m_flags;
 	};
 }

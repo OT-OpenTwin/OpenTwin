@@ -321,7 +321,7 @@ void ot::GraphicsItem::handleSetItemGeometry(const QRectF& _geom) {
 
 // Getter / Setter
 
-void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlag _flags) {
+void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlags _flags) {
 	m_flags = _flags;
 	this->graphicsItemFlagsChanged(m_flags);
 }

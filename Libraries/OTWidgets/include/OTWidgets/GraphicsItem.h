@@ -45,6 +45,7 @@ namespace ot {
 			HoverState    = 0x01, //! @brief Item is hovered over by user
 			SelectedState = 0x02  //! @brief Item is selected
 		};
+		typedef Flags<GraphicsItemState> GraphicsItemStateFlags;
 
 		static QRectF calculateInnerRect(const QRectF& _outerRect, const QSizeF& _innerSize, ot::Alignment _alignment);
 
@@ -74,7 +75,7 @@ namespace ot {
 		//! @brief Will be called when this item was registered as an event handler and the child raised an event
 		virtual void graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {};
 
-		virtual void graphicsItemFlagsChanged(ot::GraphicsItemCfg::GraphicsItemFlag _flags) {};
+		virtual void graphicsItemFlagsChanged(ot::GraphicsItemCfg::GraphicsItemFlags _flags) {};
 
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName);
 
@@ -107,14 +108,16 @@ namespace ot {
 
 		// Getter / Setter
 
-		void setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlag _flags);
-		ot::GraphicsItemCfg::GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
+		void setGraphicsItemFlag(ot::GraphicsItemCfg::GraphicsItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlags _flags);
+		ot::GraphicsItemCfg::GraphicsItemFlags graphicsItemFlags(void) const { return m_flags; };
 
 		void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
 		GraphicsScene* graphicsScene(void);
 
-		void setStateFlags(GraphicsItemState _flags) { m_state = _flags; };
-		GraphicsItemState stateFlags(void) const { return m_state; };
+		void setStateFlag(GraphicsItemState _state, bool _active = true) { m_state.setFlag(_state, _active); };
+		void setStateFlags(GraphicsItemStateFlags _flags) { m_state = _flags; };
+		GraphicsItemStateFlags stateFlags(void) const { return m_state; };
 
 		bool isLayoutOrStack(void) const { return m_isLayoutOrStack; };
 
@@ -165,7 +168,7 @@ namespace ot {
 	private:
 		bool m_isLayoutOrStack;
 		
-		GraphicsItemState m_state;
+		GraphicsItemStateFlags m_state;
 
 		ot::UID m_uid;
 		std::string m_name;
@@ -173,7 +176,7 @@ namespace ot {
 		ot::Alignment m_alignment;
 		ot::SizePolicy m_sizePolicy;
 		ot::MarginsD m_margins;
-		GraphicsItemCfg::GraphicsItemFlag m_flags;
+		GraphicsItemCfg::GraphicsItemFlags m_flags;
 		ot::ConnectionDirection m_connectionDirection;
 		GraphicsHighlightItem* m_highlightItem;
 

@@ -37,6 +37,7 @@ namespace ot {
 			Reset           = 0x10000,
 			RestoreDefaults = 0x20000
 		};
+		typedef Flags<BasicButton> BasicButtons;
 
 		enum BasicIcon {
 			NoIcon,
@@ -46,10 +47,10 @@ namespace ot {
 			Critical
 		};
 
-		static std::string buttonToString(BasicButton _button);
+		static std::string toString(BasicButton _button);
 		static BasicButton stringToButton(const std::string& _button);
-		static std::list<std::string> buttonsToStringList(BasicButton _buttons);
-		static BasicButton stringListToButtons(const std::list<std::string>& _buttons);
+		static std::list<std::string> toStringList(const BasicButtons& _buttons);
+		static BasicButtons stringListToButtons(const std::list<std::string>& _buttons);
 
 		static std::string iconToString(BasicIcon _icon);
 		static BasicIcon stringToIcon(const std::string& _icon);
@@ -70,15 +71,16 @@ namespace ot {
 		void setText(const std::string& _text) { m_text = _text; };
 		const std::string& text(void) const { return m_text; };
 
-		void setButtons(BasicButton _buttons) { m_buttons = _buttons; };
-		BasicButton buttons(void) const { return m_buttons; };
+		void setButton(BasicButton _button, bool _active = true) { m_buttons.setFlag(_button, _active); };
+		void setButtons(BasicButtons _buttons) { m_buttons = _buttons; };
+		BasicButtons buttons(void) const { return m_buttons; };
 
 		void setIcon(BasicIcon _icon) { m_icon = _icon; };
 		BasicIcon icon(void) const { return m_icon; };
 
 	private:
 		std::string m_text;
-		BasicButton m_buttons;
+		BasicButtons m_buttons;
 		BasicIcon m_icon;
 	};
 

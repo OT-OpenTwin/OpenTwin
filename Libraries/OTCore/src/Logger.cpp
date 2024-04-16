@@ -29,7 +29,7 @@
 
 ot::LogMessage::LogMessage() : m_flags(ot::NO_LOG) {}
 
-ot::LogMessage::LogMessage(const std::string& _serviceName, const std::string& _functionName, const std::string& _text, LogFlag _flags)
+ot::LogMessage::LogMessage(const std::string& _serviceName, const std::string& _functionName, const std::string& _text, const LogFlags& _flags)
 	: m_serviceName(_serviceName), m_functionName(_functionName), m_text(_text), m_flags(_flags)
 {}
 
@@ -173,7 +173,7 @@ void ot::LogDispatcher::addReceiver(AbstractLogNotifier* _receiver) {
 	m_messageReceiver.push_back(_receiver);
 }
 
-void ot::LogDispatcher::dispatch(const std::string& _text, const std::string& _functionName, ot::LogFlag _logFlags) {
+void ot::LogDispatcher::dispatch(const std::string& _text, const std::string& _functionName, const LogFlags& _logFlags) {
 	this->dispatch(LogMessage(m_serviceName, _functionName, _text, _logFlags));
 }
 

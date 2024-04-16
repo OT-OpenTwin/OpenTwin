@@ -237,7 +237,7 @@ bool FARFile::exists(void) const {
 	return file.exists();
 }
 
-bool FARFile::findText(const QString& _text, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath) const {
+bool FARFile::findText(const QString& _text, FARFilter::FilterFlags _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath) const {
 	int lineCt = 1;
 	bool added = false;
 	for (const QString& line : m_textLines) {
@@ -281,7 +281,7 @@ bool FARFile::findText(const QString& _text, FARFilter::FilterFlag _textFilter, 
 	return true;
 }
 
-bool FARFile::replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath) {
+bool FARFile::replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlags _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath) {
 	int lineCt = 1;
 	bool dataChanged = false;
 	Qt::CaseSensitivity sense = Qt::CaseInsensitive;
@@ -420,7 +420,7 @@ bool FARDirectory::scanAll(const FARFilter& _filter, int& _fileCounter, int& _di
 	}
 }
 
-bool FARDirectory::findText(const QString& _text, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly) const {
+bool FARDirectory::findText(const QString& _text, FARFilter::FilterFlags _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly) const {
 	for (const FARFile& f : m_files) {
 		if (!f.findText(_text, _textFilter, _matches, _longestText, _longestPath)) return false;
 	}
@@ -434,7 +434,7 @@ bool FARDirectory::findText(const QString& _text, FARFilter::FilterFlag _textFil
 	return true;
 }
 
-bool FARDirectory::replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly) {
+bool FARDirectory::replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlags _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly) {
 	for (FARFile& f : m_files) {
 		if (!f.replaceText(_text, _newText, _textFilter, _matches, _longestText, _longestPath)) return false;
 	}
@@ -700,7 +700,7 @@ void FAR::setupFilter(FARFilter& _filter) const {
 	_filter.setBlacklistDirectoriesFlags(this->filterFlagsFromGroup(m_blacklistDirectories));
 }
 
-FARFilter::FilterFlag FAR::filterFlagsFromGroup(const FilterGroup& _group) const {
+FARFilter::FilterFlags FAR::filterFlagsFromGroup(const FilterGroup& _group) const {
 	FARFilter::FilterFlag flags = FARFilter::NoFlags;
 	if (_group.checkCase->isChecked()) flags |= FARFilter::CheckCase;
 	if (_group.starts->isChecked()) flags |= FARFilter::StartsWith;
@@ -761,12 +761,12 @@ void FAR::saveFilterGroup(const FilterGroup& _group, const QString& _settingsKey
 	_settings.setValue(_settingsKey + ".R", _group.regex->isChecked());
 }
 
-void FAR::workerFindText(QString _root, QString _text, FARFilter::FilterFlag _textFilter, FARFilter _filter) {
+void FAR::workerFindText(QString _root, QString _text, FARFilter::FilterFlags _textFilter, FARFilter _filter) {
 	this->workerFindTextLogic(_root, _text, _textFilter, _filter);
 	QMetaObject::invokeMethod(this, &FAR::slotUnlock, Qt::QueuedConnection);
 }
 
-void FAR::workerFindTextLogic(const QString& _root, const QString& _text, FARFilter::FilterFlag _textFilter, const FARFilter& _filter) {
+void FAR::workerFindTextLogic(const QString& _root, const QString& _text, FARFilter::FilterFlags _textFilter, const FARFilter& _filter) {
 	qint64 beginTime = QDateTime::currentMSecsSinceEpoch();
 
 	FAR_LOG("> Starting \"" FAR_SEARCHMODE_FindText "\"");
@@ -836,12 +836,12 @@ void FAR::workerFindTextLogic(const QString& _root, const QString& _text, FARFil
 
 }
 
-void FAR::workerReplaceText(QString _root, QString _text, QString _newText, FARFilter::FilterFlag _textFilter, FARFilter _filter) {
+void FAR::workerReplaceText(QString _root, QString _text, QString _newText, FARFilter::FilterFlags _textFilter, FARFilter _filter) {
 	this->workerReplaceTextLogic(_root, _text, _newText, _textFilter, _filter);
 	QMetaObject::invokeMethod(this, &FAR::slotUnlock, Qt::QueuedConnection);
 }
 
-void FAR::workerReplaceTextLogic(const QString& _root, const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, FARFilter _filter) {
+void FAR::workerReplaceTextLogic(const QString& _root, const QString& _text, const QString& _newText, FARFilter::FilterFlags _textFilter, FARFilter _filter) {
 	qint64 beginTime = QDateTime::currentMSecsSinceEpoch();
 
 	FAR_LOG("> Starting \"" FAR_SEARCHMODE_ReplaceText "\"");

@@ -157,9 +157,9 @@ namespace ot {
 
 		// Operators
 
-		ContextMenuItem& operator + (itemFlag _flag);
-		ContextMenuItem& operator - (itemFlag _flag);
-		ContextMenuItem& operator + (itemCheckedState _checkedState);
+		ContextMenuItem& operator + (ItemFlag _flag);
+		ContextMenuItem& operator - (ItemFlag _flag);
+		ContextMenuItem& operator + (ItemCheckedState _checkedState);
 
 	protected:
 		virtual void addInternalToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
@@ -170,8 +170,8 @@ namespace ot {
 		std::string						m_text;
 		std::string						m_icon;
 		ContextMenuItemRole				m_role;
-		itemFlags						m_flags;
-		itemCheckedStateFlags			m_checkState;
+		ItemFlags						m_flags;
+		ItemCheckedStateFlags			m_checkState;
 		ContextMenuItem() = delete;
 	};
 

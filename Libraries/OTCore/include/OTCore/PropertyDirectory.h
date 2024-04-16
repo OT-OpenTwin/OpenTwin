@@ -20,9 +20,9 @@ namespace ot {
 	public:
 		PropertyDirectory(const PropertyDirectory* _other);
 		PropertyDirectory(const PropertyBase& _base);
-		PropertyDirectory(PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags) {};
-		PropertyDirectory(const std::string& _path, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_flags), m_path(_path) {};
-		PropertyDirectory(const std::string& _name, const std::string& _path, PropertyFlags _flags = PropertyFlags::NoFlags) : Property(_name, _flags), m_path(_path) {};
+		PropertyDirectory(PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_flags) {};
+		PropertyDirectory(const std::string& _path, PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_flags), m_path(_path) {};
+		PropertyDirectory(const std::string& _name, const std::string& _path, PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_name, _flags), m_path(_path) {};
 		virtual ~PropertyDirectory() {};
 
 		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Directory; };

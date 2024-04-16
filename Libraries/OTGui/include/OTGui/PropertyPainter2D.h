@@ -23,23 +23,23 @@ namespace ot {
 
 		//! @brief Creates new instance.
 		//! Object creates and takes ownership of the painter.
-		PropertyPainter2D(PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyPainter2D(PropertyFlags _flags = PropertyFlags(NoFlags));
 
 		//! @brief Creates new instance.
 		//! Object takes ownership of the painter.
-		PropertyPainter2D(Painter2D* _painter, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyPainter2D(Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
 
 		//! @brief Creates new instance.
 		//! Object creates copy the painter.
-		PropertyPainter2D(const Painter2D* _painter, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyPainter2D(const Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
 
 		//! @brief Creates new instance.
 		//! Object takes ownership of the painter.
-		PropertyPainter2D(const std::string& _name, Painter2D* _painter, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyPainter2D(const std::string& _name, Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
 
 		//! @brief Creates new instance.
 		//! Object creates copy the painter.
-		PropertyPainter2D(const std::string& _name, const Painter2D* _painter, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyPainter2D(const std::string& _name, const Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyPainter2D();
 
 		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Painter2D; };

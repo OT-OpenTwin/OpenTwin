@@ -35,7 +35,7 @@ void ot::CustomGraphicsItem::callPaint(QPainter* _painter, const QStyleOptionGra
 	this->paint(_painter, _opt, _widget);
 }
 
-void ot::CustomGraphicsItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) {
+void ot::CustomGraphicsItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) {
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
 }

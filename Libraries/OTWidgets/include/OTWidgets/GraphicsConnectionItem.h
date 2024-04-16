@@ -28,6 +28,7 @@ namespace ot {
 			HoverState = 0x01, //! @brief Item is hovered over by user
 			SelectedState = 0x02  //! @brief Item is selected
 		};
+		typedef Flags<GraphicsItemState> GraphicsItemStateFlags;
 
 		GraphicsConnectionItem();
 		virtual ~GraphicsConnectionItem();
@@ -72,7 +73,7 @@ namespace ot {
 		void calculateSmoothLinePoints(QPointF& _origin, QPointF& _control1, QPointF& _control2, QPointF& _destination) const;
 		void calculateSmoothLineStep(const QPointF& _origin, const QPointF& _destination, double _halfdistX, double _halfdistY, QPointF& _control, ot::ConnectionDirection _direction) const;
 
-		GraphicsItemState m_state;
+		GraphicsItemStateFlags m_state;
 
 		GraphicsItem* m_origin;
 		GraphicsItem* m_dest;

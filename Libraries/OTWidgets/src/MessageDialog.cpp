@@ -53,7 +53,7 @@ QMessageBox::Icon ot::MessageDialog::convertIcon(MessageDialogCfg::BasicIcon _ic
 	}
 }
 
-QMessageBox::StandardButtons ot::MessageDialog::convertButtons(MessageDialogCfg::BasicButton _buttons) {
+QMessageBox::StandardButtons ot::MessageDialog::convertButtons(MessageDialogCfg::BasicButtons _buttons) {
 	QMessageBox::StandardButtons ret = QMessageBox::NoButton;
 
 	if (_buttons & MessageDialogCfg::Ok) ret |= QMessageBox::Ok;

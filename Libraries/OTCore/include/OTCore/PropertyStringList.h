@@ -22,12 +22,12 @@ namespace ot {
 	public:
 		PropertyStringList(const PropertyStringList* _other);
 		PropertyStringList(const PropertyBase& _base);
-		PropertyStringList(PropertyFlags _flags = PropertyFlags::NoFlags);
-		PropertyStringList(const std::string& _current, PropertyFlags _flags = PropertyFlags::NoFlags) ;
-		PropertyStringList(const std::string& _current, const std::list<std::string>& _list, PropertyFlags _flags = PropertyFlags::NoFlags);
-		PropertyStringList(const std::string& _current, const std::vector<std::string>& _list, PropertyFlags _flags = PropertyFlags::NoFlags);
-		PropertyStringList(const std::string& _name, const std::string& _current, const std::list<std::string>& _list, PropertyFlags _flags = PropertyFlags::NoFlags);
-		PropertyStringList(const std::string& _name, const std::string& _current, const std::vector<std::string>& _list, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyStringList(PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyStringList(const std::string& _current, PropertyFlags _flags = PropertyFlags(NoFlags)) ;
+		PropertyStringList(const std::string& _current, const std::list<std::string>& _list, PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyStringList(const std::string& _current, const std::vector<std::string>& _list, PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyStringList(const std::string& _name, const std::string& _current, const std::list<std::string>& _list, PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyStringList(const std::string& _name, const std::string& _current, const std::vector<std::string>& _list, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyStringList() {};
 
 		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_StringList; };

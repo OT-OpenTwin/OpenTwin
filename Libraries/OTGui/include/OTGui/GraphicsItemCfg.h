@@ -33,6 +33,7 @@ namespace ot {
 			ItemIsConnectable   = 0x02, //! @brief Item can be used as source or destination of a conncetion
 			ItemForwardsTooltip = 0x04  //! @brief If the user hovers over this item and no tooltip is set, the tooltip request will be forwarded to the parent item. If this flag is not set this item also wont forward tooltip requests from child items
 		};
+		typedef Flags<GraphicsItemFlag> GraphicsItemFlags;
 
 		GraphicsItemCfg();
 		virtual ~GraphicsItemCfg();
@@ -109,8 +110,9 @@ namespace ot {
 		//! @brief Item margins
 		const MarginsD& margins(void) const { return m_margins; };
 
-		void setGraphicsItemFlags(GraphicsItemFlag _flags) { m_flags = _flags; };
-		GraphicsItemFlag graphicsItemFlags(void) const { return m_flags; };
+		void setGraphicsItemFlag(GraphicsItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setGraphicsItemFlags(GraphicsItemFlags _flags) { m_flags = _flags; };
+		GraphicsItemFlags graphicsItemFlags(void) const { return m_flags; };
 
 		void setAlignment(ot::Alignment _align) { m_alignment = _align; };
 		ot::Alignment alignment(void) const { return m_alignment; };
@@ -135,7 +137,7 @@ namespace ot {
 		Size2DD m_maxSize;
 
 		MarginsD m_margins;
-		GraphicsItemFlag m_flags;
+		GraphicsItemFlags m_flags;
 		ot::Alignment m_alignment;
 		ot::SizePolicy m_sizePolicy;
 		ConnectionDirection m_connectionDirection;

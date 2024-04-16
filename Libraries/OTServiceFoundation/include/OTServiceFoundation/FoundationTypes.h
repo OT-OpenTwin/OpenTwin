@@ -3,15 +3,15 @@
 #include "OTCore/Flags.h"
 
 namespace ot {
-	enum itemFlag {
+	enum ItemFlag {
 		NoFlags =				0x0,
 		ItemIsCheckable =		0x1,
 		ItemIsVisible =			0x2,
 		itemFlagMask =			0x3
 	};
-	typedef Flags<itemFlag> itemFlags;
+	typedef Flags<ItemFlag> ItemFlags;
 
-	enum itemCheckedState {
+	enum ItemCheckedState {
 		NoCheckedState =		0x0,
 		Checked =				0x1,
 		Unchecked =				0x2,
@@ -19,9 +19,9 @@ namespace ot {
 		itemCheckedStateMask =	0x7
 	};
 
-	typedef Flags<itemCheckedState> itemCheckedStateFlags;
+	typedef Flags<ItemCheckedState> ItemCheckedStateFlags;
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::itemFlag)
-OT_ADD_FLAG_FUNCTIONS(ot::itemCheckedState)
+OT_ADD_FLAG_FUNCTIONS(ot::ItemFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::ItemCheckedState)
 

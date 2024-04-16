@@ -64,6 +64,7 @@ public:
 		AsRegex    = 0x08,
 		CheckCase  = 0x10
 	};
+	typedef ot::Flags<FilterFlag> FilterFlags;
 
 	FARFilter();
 	FARFilter(const FARFilter& _other);
@@ -74,36 +75,36 @@ public:
 	void setWhitelistFiles(const QStringList& _whitelist) { m_whitelistFiles = _whitelist; };
 	const QStringList& whitelistFiles(void) const { return m_whitelistFiles; };
 
-	void setWhitelistFilesFlags(FilterFlag _flags) { m_whitelistFilesFlags = _flags; };
-	FilterFlag whitelistFilesFlags(void) const { return m_whitelistFilesFlags; };
+	void setWhitelistFilesFlags(FilterFlags _flags) { m_whitelistFilesFlags = _flags; };
+	FilterFlags whitelistFilesFlags(void) const { return m_whitelistFilesFlags; };
 
 	void setBlacklistFiles(const QStringList& _blacklist) { m_blacklistFiles = _blacklist; };
 	const QStringList& blacklistFiles(void) const { return m_blacklistFiles; };
 
-	void setBlacklistFilesFlags(FilterFlag _flags) { m_whitelistFilesFlags = _flags; };
-	FilterFlag blacklistFilesFlags(void) const { return m_whitelistFilesFlags; };
+	void setBlacklistFilesFlags(FilterFlags _flags) { m_whitelistFilesFlags = _flags; };
+	FilterFlags blacklistFilesFlags(void) const { return m_whitelistFilesFlags; };
 
 	void setWhitelistDirectories(const QStringList& _whitelist) { m_whitelistDirectories = _whitelist; };
 	const QStringList& whitelistDirectories(void) const { return m_whitelistDirectories; };
 
-	void setWhitelistDirectoriesFlags(FilterFlag _flags) { m_whitelistFilesFlags = _flags; };
-	FilterFlag whitelistDirectoriesFlags(void) const { return m_whitelistFilesFlags; };
+	void setWhitelistDirectoriesFlags(FilterFlags _flags) { m_whitelistFilesFlags = _flags; };
+	FilterFlags whitelistDirectoriesFlags(void) const { return m_whitelistFilesFlags; };
 
 	void setBlacklistDirectories(const QStringList& _blacklist) { m_blacklistDirectories = _blacklist; };
 	const QStringList& blacklistDirectories(void) const { return m_blacklistDirectories; };
 
-	void setBlacklistDirectoriesFlags(FilterFlag _flags) { m_whitelistFilesFlags = _flags; };
-	FilterFlag blacklistDirectoriesFlags(void) const { return m_whitelistFilesFlags; };
+	void setBlacklistDirectoriesFlags(FilterFlags _flags) { m_whitelistFilesFlags = _flags; };
+	FilterFlags blacklistDirectoriesFlags(void) const { return m_whitelistFilesFlags; };
 
 private:
 	QStringList m_whitelistFiles;
-	FilterFlag m_whitelistFilesFlags;
+	FilterFlags m_whitelistFilesFlags;
 	QStringList m_blacklistFiles;
-	FilterFlag m_blacklistFilesFlags;
+	FilterFlags m_blacklistFilesFlags;
 	QStringList m_whitelistDirectories;
-	FilterFlag m_whitelistDirectoriesFlags;
+	FilterFlags m_whitelistDirectoriesFlags;
 	QStringList m_blacklistDirectories;
-	FilterFlag m_blacklistDirectoriesFlags;
+	FilterFlags m_blacklistDirectoriesFlags;
 };
 
 class FARFile {
@@ -118,9 +119,9 @@ public:
 
 	bool writeAll(void);
 
-	bool findText(const QString& _text, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath) const;
+	bool findText(const QString& _text, FARFilter::FilterFlags _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath) const;
 
-	bool replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath);
+	bool replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlags _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath);
 
 	void setFullPath(const QString& _fullPath) { m_fullPath = _fullPath; };
 	const QString& fullPath(void) const { return m_fullPath; };
@@ -171,9 +172,9 @@ public:
 	//! @param _readFiles If true the found files will read their text
 	bool scanAll(const FARFilter& _filter, int& _fileCounter, int& _directoryCounter, bool _topLevelOnly = true, bool _readFiles = false);
 
-	bool findText(const QString& _text, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly = true) const;
+	bool findText(const QString& _text, FARFilter::FilterFlags _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly = true) const;
 
-	bool replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly = true);
+	bool replaceText(const QString& _text, const QString& _newText, FARFilter::FilterFlags _textFilter, std::list<FARMatch>& _matches, int& _longestText, int& _longestPath, bool _topLevelOnly = true);
 
 	void setFullPath(const QString& _path) { m_fullPath = _path; };
 	const QString& fullPath(void) const { return m_fullPath; };
@@ -237,13 +238,13 @@ private:
 
 	//! @brief Setup the provided filter from the current configuration
 	void setupFilter(FARFilter& _filter) const;
-	FARFilter::FilterFlag filterFlagsFromGroup(const FilterGroup& _group) const;
+	FARFilter::FilterFlags filterFlagsFromGroup(const FilterGroup& _group) const;
 
-	void workerFindText(QString _root, QString _text, FARFilter::FilterFlag _textFilter, FARFilter _filter);
-	void workerFindTextLogic(const QString& _root, const QString& _text, FARFilter::FilterFlag _textFilter, const FARFilter& _filter);
+	void workerFindText(QString _root, QString _text, FARFilter::FilterFlags _textFilter, FARFilter _filter);
+	void workerFindTextLogic(const QString& _root, const QString& _text, FARFilter::FilterFlags _textFilter, const FARFilter& _filter);
 
-	void workerReplaceText(QString _root, QString _text, QString _newText, FARFilter::FilterFlag _textFilter, FARFilter _filter);
-	void workerReplaceTextLogic(const QString& _root, const QString& _text, const QString& _newText, FARFilter::FilterFlag _textFilter, FARFilter _filter);
+	void workerReplaceText(QString _root, QString _text, QString _newText, FARFilter::FilterFlags _textFilter, FARFilter _filter);
+	void workerReplaceTextLogic(const QString& _root, const QString& _text, const QString& _newText, FARFilter::FilterFlags _textFilter, FARFilter _filter);
 
 	FilterGroup createFilterGroup(const QString& _labelText, QGridLayout* _layout, int _row);
 	void restoreFilterGroupSettings(FilterGroup& _group, const QString& _settingsKey, QSettings& _settings);

@@ -7,7 +7,7 @@
 #include "OTCore/Logger.h"
 #include "OTGui/MessageDialogCfg.h"
 
-std::string ot::MessageDialogCfg::buttonToString(BasicButton _button) {
+std::string ot::MessageDialogCfg::toString(BasicButton _button) {
 	switch (_button)
 	{
 	case ot::MessageDialogCfg::NoButtons: return "<null>";
@@ -36,55 +36,55 @@ std::string ot::MessageDialogCfg::buttonToString(BasicButton _button) {
 }
 
 ot::MessageDialogCfg::BasicButton ot::MessageDialogCfg::stringToButton(const std::string& _button) {
-	if (_button == buttonToString(MessageDialogCfg::NoButtons)) { return MessageDialogCfg::NoButtons; }
-	else if (_button == buttonToString(MessageDialogCfg::Ok)) { return MessageDialogCfg::Ok; }
-	else if (_button == buttonToString(MessageDialogCfg::Save)) { return MessageDialogCfg::Save; }
-	else if (_button == buttonToString(MessageDialogCfg::SaveAll)) { return MessageDialogCfg::SaveAll; }
-	else if (_button == buttonToString(MessageDialogCfg::Open)) { return MessageDialogCfg::Open; }
-	else if (_button == buttonToString(MessageDialogCfg::Yes)) { return MessageDialogCfg::Yes; }
-	else if (_button == buttonToString(MessageDialogCfg::YesToAll)) { return MessageDialogCfg::YesToAll; }
-	else if (_button == buttonToString(MessageDialogCfg::No)) { return MessageDialogCfg::No; }
-	else if (_button == buttonToString(MessageDialogCfg::NoToAll)) { return MessageDialogCfg::NoToAll; }
-	else if (_button == buttonToString(MessageDialogCfg::Abort)) { return MessageDialogCfg::Abort; }
-	else if (_button == buttonToString(MessageDialogCfg::Retry)) { return MessageDialogCfg::Retry; }
-	else if (_button == buttonToString(MessageDialogCfg::Ignore)) { return MessageDialogCfg::Ignore; }
-	else if (_button == buttonToString(MessageDialogCfg::Close)) { return MessageDialogCfg::Close; }
-	else if (_button == buttonToString(MessageDialogCfg::Cancel)) { return MessageDialogCfg::Cancel; }
-	else if (_button == buttonToString(MessageDialogCfg::Discard)) { return MessageDialogCfg::Discard; }
-	else if (_button == buttonToString(MessageDialogCfg::Help)) { return MessageDialogCfg::Help; }
-	else if (_button == buttonToString(MessageDialogCfg::Apply)) { return MessageDialogCfg::Apply; }
-	else if (_button == buttonToString(MessageDialogCfg::Reset)) { return MessageDialogCfg::Reset; }
-	else if (_button == buttonToString(MessageDialogCfg::RestoreDefaults)) { return MessageDialogCfg::RestoreDefaults; }
+	if (_button == toString(MessageDialogCfg::NoButtons)) { return MessageDialogCfg::NoButtons; }
+	else if (_button == toString(MessageDialogCfg::Ok)) { return MessageDialogCfg::Ok; }
+	else if (_button == toString(MessageDialogCfg::Save)) { return MessageDialogCfg::Save; }
+	else if (_button == toString(MessageDialogCfg::SaveAll)) { return MessageDialogCfg::SaveAll; }
+	else if (_button == toString(MessageDialogCfg::Open)) { return MessageDialogCfg::Open; }
+	else if (_button == toString(MessageDialogCfg::Yes)) { return MessageDialogCfg::Yes; }
+	else if (_button == toString(MessageDialogCfg::YesToAll)) { return MessageDialogCfg::YesToAll; }
+	else if (_button == toString(MessageDialogCfg::No)) { return MessageDialogCfg::No; }
+	else if (_button == toString(MessageDialogCfg::NoToAll)) { return MessageDialogCfg::NoToAll; }
+	else if (_button == toString(MessageDialogCfg::Abort)) { return MessageDialogCfg::Abort; }
+	else if (_button == toString(MessageDialogCfg::Retry)) { return MessageDialogCfg::Retry; }
+	else if (_button == toString(MessageDialogCfg::Ignore)) { return MessageDialogCfg::Ignore; }
+	else if (_button == toString(MessageDialogCfg::Close)) { return MessageDialogCfg::Close; }
+	else if (_button == toString(MessageDialogCfg::Cancel)) { return MessageDialogCfg::Cancel; }
+	else if (_button == toString(MessageDialogCfg::Discard)) { return MessageDialogCfg::Discard; }
+	else if (_button == toString(MessageDialogCfg::Help)) { return MessageDialogCfg::Help; }
+	else if (_button == toString(MessageDialogCfg::Apply)) { return MessageDialogCfg::Apply; }
+	else if (_button == toString(MessageDialogCfg::Reset)) { return MessageDialogCfg::Reset; }
+	else if (_button == toString(MessageDialogCfg::RestoreDefaults)) { return MessageDialogCfg::RestoreDefaults; }
 	else {
 		OT_LOG_EAS("Unknown button \"" + _button + "\"");
 		return MessageDialogCfg::NoButtons;
 	}
 }
 
-std::list<std::string> ot::MessageDialogCfg::buttonsToStringList(BasicButton _buttons) {
+std::list<std::string> ot::MessageDialogCfg::toStringList(const BasicButtons& _buttons) {
 	std::list<std::string> ret;
-	if (_buttons & MessageDialogCfg::Ok) ret.push_back(buttonToString(MessageDialogCfg::Ok));
-	if (_buttons & MessageDialogCfg::Save) ret.push_back(buttonToString(MessageDialogCfg::Save));
-	if (_buttons & MessageDialogCfg::SaveAll) ret.push_back(buttonToString(MessageDialogCfg::SaveAll));
-	if (_buttons & MessageDialogCfg::Open) ret.push_back(buttonToString(MessageDialogCfg::Open));
-	if (_buttons & MessageDialogCfg::Yes) ret.push_back(buttonToString(MessageDialogCfg::Yes));
-	if (_buttons & MessageDialogCfg::YesToAll) ret.push_back(buttonToString(MessageDialogCfg::YesToAll));
-	if (_buttons & MessageDialogCfg::No) ret.push_back(buttonToString(MessageDialogCfg::No));
-	if (_buttons & MessageDialogCfg::NoToAll) ret.push_back(buttonToString(MessageDialogCfg::NoToAll));
-	if (_buttons & MessageDialogCfg::Abort) ret.push_back(buttonToString(MessageDialogCfg::Abort));
-	if (_buttons & MessageDialogCfg::Retry) ret.push_back(buttonToString(MessageDialogCfg::Retry));
-	if (_buttons & MessageDialogCfg::Ignore) ret.push_back(buttonToString(MessageDialogCfg::Ignore));
-	if (_buttons & MessageDialogCfg::Close) ret.push_back(buttonToString(MessageDialogCfg::Close));
-	if (_buttons & MessageDialogCfg::Cancel) ret.push_back(buttonToString(MessageDialogCfg::Cancel));
-	if (_buttons & MessageDialogCfg::Discard) ret.push_back(buttonToString(MessageDialogCfg::Discard));
-	if (_buttons & MessageDialogCfg::Help) ret.push_back(buttonToString(MessageDialogCfg::Help));
-	if (_buttons & MessageDialogCfg::Apply) ret.push_back(buttonToString(MessageDialogCfg::Apply));
-	if (_buttons & MessageDialogCfg::Reset) ret.push_back(buttonToString(MessageDialogCfg::Reset));
-	if (_buttons & MessageDialogCfg::RestoreDefaults) ret.push_back(buttonToString(MessageDialogCfg::RestoreDefaults));
+	if (_buttons & MessageDialogCfg::Ok) ret.push_back(toString(MessageDialogCfg::Ok));
+	if (_buttons & MessageDialogCfg::Save) ret.push_back(toString(MessageDialogCfg::Save));
+	if (_buttons & MessageDialogCfg::SaveAll) ret.push_back(toString(MessageDialogCfg::SaveAll));
+	if (_buttons & MessageDialogCfg::Open) ret.push_back(toString(MessageDialogCfg::Open));
+	if (_buttons & MessageDialogCfg::Yes) ret.push_back(toString(MessageDialogCfg::Yes));
+	if (_buttons & MessageDialogCfg::YesToAll) ret.push_back(toString(MessageDialogCfg::YesToAll));
+	if (_buttons & MessageDialogCfg::No) ret.push_back(toString(MessageDialogCfg::No));
+	if (_buttons & MessageDialogCfg::NoToAll) ret.push_back(toString(MessageDialogCfg::NoToAll));
+	if (_buttons & MessageDialogCfg::Abort) ret.push_back(toString(MessageDialogCfg::Abort));
+	if (_buttons & MessageDialogCfg::Retry) ret.push_back(toString(MessageDialogCfg::Retry));
+	if (_buttons & MessageDialogCfg::Ignore) ret.push_back(toString(MessageDialogCfg::Ignore));
+	if (_buttons & MessageDialogCfg::Close) ret.push_back(toString(MessageDialogCfg::Close));
+	if (_buttons & MessageDialogCfg::Cancel) ret.push_back(toString(MessageDialogCfg::Cancel));
+	if (_buttons & MessageDialogCfg::Discard) ret.push_back(toString(MessageDialogCfg::Discard));
+	if (_buttons & MessageDialogCfg::Help) ret.push_back(toString(MessageDialogCfg::Help));
+	if (_buttons & MessageDialogCfg::Apply) ret.push_back(toString(MessageDialogCfg::Apply));
+	if (_buttons & MessageDialogCfg::Reset) ret.push_back(toString(MessageDialogCfg::Reset));
+	if (_buttons & MessageDialogCfg::RestoreDefaults) ret.push_back(toString(MessageDialogCfg::RestoreDefaults));
 	return ret;
 }
 
-ot::MessageDialogCfg::BasicButton ot::MessageDialogCfg::stringListToButtons(const std::list<std::string>& _buttons) {
+ot::MessageDialogCfg::BasicButtons ot::MessageDialogCfg::stringListToButtons(const std::list<std::string>& _buttons) {
 	ot::MessageDialogCfg::BasicButton ret = NoButtons;
 	for (const std::string& b : _buttons) {
 		ret |= stringToButton(b);
@@ -130,7 +130,7 @@ void ot::MessageDialogCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloc
 	DialogCfg::addToJsonObject(_object, _allocator);
 	_object.AddMember("Text", JsonString(m_text, _allocator), _allocator);
 	_object.AddMember("Icon", JsonString(this->iconToString(m_icon), _allocator), _allocator);
-	_object.AddMember("Buttons", JsonArray(this->buttonsToStringList(m_buttons), _allocator), _allocator);
+	_object.AddMember("Buttons", JsonArray(this->toStringList(m_buttons), _allocator), _allocator);
 }
 
 void ot::MessageDialogCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {

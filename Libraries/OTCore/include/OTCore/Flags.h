@@ -50,8 +50,8 @@ namespace ot {
 
 	public:
 		constexpr inline Flags() : m_data{ static_cast<T>(0) } {};
-		constexpr inline Flags(const Flags<T>& _other) : m_data{ _other.data() } {};
 		constexpr inline Flags(T _initialData) : m_data{ _initialData } {}
+		constexpr inline Flags(const Flags<T>& _other) : m_data{ _other.data() } {};
 
 		//! @brief Returns a copy of the data
 		constexpr inline T data(void) const { return m_data; };

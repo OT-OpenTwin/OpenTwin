@@ -9,7 +9,7 @@
 #include "OTCore/Logger.h"
 #include "OTGui/WidgetViewCfg.h"
 
-std::string ot::WidgetViewCfg::viewFlagToString(ViewFlags _flag) {
+std::string ot::WidgetViewCfg::toString(ViewFlag _flag) {
 	switch (_flag)
 	{
 	case WidgetViewCfg::ViewIsCloseable: return "ViewIsCloseable";
@@ -19,17 +19,17 @@ std::string ot::WidgetViewCfg::viewFlagToString(ViewFlags _flag) {
 	}
 }
 
-ot::WidgetViewCfg::ViewFlags ot::WidgetViewCfg::stringToViewFlag(const std::string& _flag) {
-	if (_flag == WidgetViewCfg::viewFlagToString(WidgetViewCfg::ViewIsCloseable)) return WidgetViewCfg::ViewIsCloseable;
+ot::WidgetViewCfg::ViewFlag ot::WidgetViewCfg::stringToViewFlag(const std::string& _flag) {
+	if (_flag == WidgetViewCfg::toString(WidgetViewCfg::ViewIsCloseable)) return WidgetViewCfg::ViewIsCloseable;
 	else {
 		OT_LOG_EAS("Unknown view flag \"" + _flag + "\"");
 		return NoViewFlags;
 	}
 }
 
-std::list<std::string> ot::WidgetViewCfg::viewFlagsToStringList(ViewFlags _flags) {
+std::list<std::string> ot::WidgetViewCfg::toStringList(ViewFlags _flags) {
 	std::list<std::string> ret;
-	if (_flags & WidgetViewCfg::ViewIsCloseable) ret.push_back(viewFlagToString(WidgetViewCfg::ViewIsCloseable));
+	if (_flags & WidgetViewCfg::ViewIsCloseable) ret.push_back(toString(WidgetViewCfg::ViewIsCloseable));
 
 	return ret;
 }
@@ -89,7 +89,7 @@ void ot::WidgetViewCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 	_object.AddMember("Parent", JsonString(m_parentViewName, _allocator), _allocator);
 	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
-	_object.AddMember("Flags", JsonArray(this->viewFlagsToStringList(m_flags), _allocator), _allocator);
+	_object.AddMember("Flags", JsonArray(this->toStringList(m_flags), _allocator), _allocator);
 	_object.AddMember("DockLocation", JsonString(this->dockLocationToString(m_dockLocation), _allocator), _allocator);
 }
 

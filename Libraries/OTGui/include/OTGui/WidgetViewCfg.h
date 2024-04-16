@@ -24,10 +24,11 @@ namespace ot {
 	class OT_GUI_API_EXPORT WidgetViewCfg : public ot::Serializable {
 		OT_DECL_NOCOPY(WidgetViewCfg)
 	public:
-		enum ViewFlags {
+		enum ViewFlag {
 			NoViewFlags     = 0x00,
 			ViewIsCloseable = 0x01
 		};
+		typedef Flags<ViewFlag> ViewFlags;
 
 		enum ViewDockLocation {
 			Default,
@@ -37,9 +38,9 @@ namespace ot {
 			Bottom
 		};
 
-		static std::string viewFlagToString(ViewFlags _flag);
-		static ViewFlags stringToViewFlag(const std::string& _flag);
-		static std::list<std::string> viewFlagsToStringList(ViewFlags _flags);
+		static std::string toString(ViewFlag _flag);
+		static ViewFlag stringToViewFlag(const std::string& _flag);
+		static std::list<std::string> toStringList(ViewFlags _flags);
 		static ViewFlags stringListToViewFlags(const std::list<std::string>& _flags);
 
 		static std::string dockLocationToString(ViewDockLocation _dockLocation);
@@ -83,6 +84,7 @@ namespace ot {
 		void setTitle(const std::string& _title) { m_title = _title; };
 		const std::string& title(void) const { return (m_title.empty() ? m_name : m_title); };
 
+		void setFlag(ViewFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
 		void setFlags(ViewFlags _flags) { m_flags = _flags; };
 		ViewFlags flags(void) const { return m_flags; };
 
@@ -100,4 +102,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::WidgetViewCfg::ViewFlags)
+OT_ADD_FLAG_FUNCTIONS(ot::WidgetViewCfg::ViewFlag)

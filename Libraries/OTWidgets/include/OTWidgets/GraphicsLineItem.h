@@ -36,7 +36,7 @@ namespace ot {
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return nullptr; };
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
-		virtual void graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlag _flags) override;
+		virtual void graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) override;
 
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 	};

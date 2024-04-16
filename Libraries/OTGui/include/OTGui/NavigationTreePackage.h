@@ -18,13 +18,14 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT NavigationTreePackage : public ot::Serializable {
 	public:
-		enum NavigationTreePackageFlags {
+		enum NavigationTreePackageFlag {
 			NoFlags = 0x00,
 			ItemsDefaultExpanded = 0x01 //! @brief When opening the dialog the items are expanded
 		};
+		typedef Flags<NavigationTreePackageFlag> NavigationTreePackageFlags;
 
-		static std::string toString(NavigationTreePackageFlags _flag);
-		static NavigationTreePackageFlags stringToFlag(const std::string& _flag);
+		static std::string toString(NavigationTreePackageFlag _flag);
+		static NavigationTreePackageFlag stringToFlag(const std::string& _flag);
 
 		NavigationTreePackage();
 		virtual ~NavigationTreePackage();
@@ -39,6 +40,7 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		void setFlag(NavigationTreePackageFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
 		void setFlags(NavigationTreePackageFlags _flags) { m_flags = _flags; };
 		NavigationTreePackageFlags flags(void) const { return m_flags; };
 
@@ -57,4 +59,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::NavigationTreePackage::NavigationTreePackageFlags)
+OT_ADD_FLAG_FUNCTIONS(ot::NavigationTreePackage::NavigationTreePackageFlag)

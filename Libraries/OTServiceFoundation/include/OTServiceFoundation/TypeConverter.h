@@ -16,35 +16,35 @@ namespace ot {
 
 		//! @brief Will return a string representation of the provided flag
 		//! @param _flag The flag, must be only one flag
-		OT_SERVICEFOUNDATION_API_EXPORT std::string toString(ot::itemCheckedState _flag);
+		OT_SERVICEFOUNDATION_API_EXPORT std::string toString(ot::ItemCheckedState _flag);
 
 		//! @brief Will return a string representation of the provided flag
 		//! @param _flag The flag, must be only one flag
-		OT_SERVICEFOUNDATION_API_EXPORT std::string toString(ot::itemFlag _flag);
+		OT_SERVICEFOUNDATION_API_EXPORT std::string toString(ot::ItemFlag _flag);
 
 		//! @brief Will return a list with all flags that are set as a string
 		//! @param _flags The flags
-		OT_SERVICEFOUNDATION_API_EXPORT std::list<std::string> toString(const ot::Flags<ot::itemCheckedState>& _flags);
+		OT_SERVICEFOUNDATION_API_EXPORT std::list<std::string> toString(ItemCheckedStateFlags _flags);
 
 		//! @brief Will return a list with all flags that are set as a string
 		//! @param _flags The flags
-		OT_SERVICEFOUNDATION_API_EXPORT std::list<std::string> toString(const ot::Flags<ot::itemFlag>& _flags);
+		OT_SERVICEFOUNDATION_API_EXPORT std::list<std::string> toString(ItemFlags _flags);
 
 		//! @brief Will return a flags object containing all set flags that are provided in the list
 		//! @param _flags The list containing all flags that should be set
-		OT_SERVICEFOUNDATION_API_EXPORT ot::itemCheckedState toItemCheckedState(const std::string& _flags);
+		OT_SERVICEFOUNDATION_API_EXPORT ot::ItemCheckedState toItemCheckedState(const std::string& _flags);
 
 		//! @brief Will return a flags object containing all set flags that are provided in the list
 		//! @param _flags The list containing all flags that should be set
-		OT_SERVICEFOUNDATION_API_EXPORT ot::itemFlag toItemFlags(const std::string& _flags);
+		OT_SERVICEFOUNDATION_API_EXPORT ot::ItemFlag toItemFlag(const std::string& _flags);
 
 		//! @brief Will return a flags object containing all set flags that are provided in the list
 		//! @param _flags The list containing all flags that should be set
-		OT_SERVICEFOUNDATION_API_EXPORT ot::Flags<ot::itemCheckedState> toItemCheckedState(const std::list<std::string>& _flags);
+		OT_SERVICEFOUNDATION_API_EXPORT ItemCheckedStateFlags toItemCheckedStateFlags(const std::list<std::string>& _flags);
 
 		//! @brief Will return a flags object containing all set flags that are provided in the list
 		//! @param _flags The list containing all flags that should be set
-		OT_SERVICEFOUNDATION_API_EXPORT ot::Flags<ot::itemFlag> toItemFlags(const std::list<std::string>& _flags);
+		OT_SERVICEFOUNDATION_API_EXPORT ItemFlags toItemFlags(const std::list<std::string>& _flags);
 
 		//! @brief Will convert and return the number specified in the string
 		//! @param _string The string containing the number

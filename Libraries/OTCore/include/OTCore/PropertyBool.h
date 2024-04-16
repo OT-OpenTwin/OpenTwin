@@ -17,9 +17,9 @@ namespace ot {
 	public:
 		PropertyBool(const PropertyBool* _other);
 		PropertyBool(const PropertyBase& _base);
-		PropertyBool(PropertyFlags _flags = PropertyFlags::NoFlags);
-		PropertyBool(bool _value, PropertyFlags _flags = PropertyFlags::NoFlags);
-		PropertyBool(const std::string& _name, bool _value, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyBool(PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyBool(bool _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyBool(const std::string& _name, bool _value, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyBool() {};
 
 		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Bool; };

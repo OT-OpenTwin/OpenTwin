@@ -100,7 +100,7 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 		else if (f == OT_JSON_VALUE_Connectable) m_flags |= ItemIsConnectable;
 		else if (f == OT_JSON_VALUE_ForwardTooltip) m_flags |= ItemForwardsTooltip;
 		else {
-			OT_LOG_EAS("Unknown GraphicsItem flag \"" + f + "\"");
+			OT_LOG_EAS("Unknown GraphicsItemFlag \"" + f + "\"");
 		}
 	}
 }

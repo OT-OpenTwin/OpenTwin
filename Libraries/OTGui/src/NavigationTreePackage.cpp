@@ -8,7 +8,7 @@
 #include "OTCore/Logger.h"
 #include "OTGui/NavigationTreePackage.h"
 
-std::string ot::NavigationTreePackage::toString(NavigationTreePackageFlags _flag) {
+std::string ot::NavigationTreePackage::toString(NavigationTreePackageFlag _flag) {
 	switch (_flag)
 	{
 	case NoFlags: return "None";
@@ -19,7 +19,7 @@ std::string ot::NavigationTreePackage::toString(NavigationTreePackageFlags _flag
 	}
 }
 
-ot::NavigationTreePackage::NavigationTreePackageFlags ot::NavigationTreePackage::stringToFlag(const std::string& _flag) {
+ot::NavigationTreePackage::NavigationTreePackageFlag ot::NavigationTreePackage::stringToFlag(const std::string& _flag) {
 	if (_flag == toString(NoFlags)) return NoFlags;
 	else if (_flag == toString(ItemsDefaultExpanded)) return ItemsDefaultExpanded;
 	else {

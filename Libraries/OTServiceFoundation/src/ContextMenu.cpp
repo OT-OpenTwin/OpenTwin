@@ -225,17 +225,17 @@ void ot::ContextMenuItem::setCheckable(bool _isCheckable) {
 
 // Operators
 
-ot::ContextMenuItem& ot::ContextMenuItem::operator + (itemFlag _flag) {
+ot::ContextMenuItem& ot::ContextMenuItem::operator + (ItemFlag _flag) {
 	m_flags.setFlag(_flag);
 	return *this;
 }
 
-ot::ContextMenuItem& ot::ContextMenuItem::operator - (itemFlag _flag) {
+ot::ContextMenuItem& ot::ContextMenuItem::operator - (ItemFlag _flag) {
 	m_flags.removeFlag(_flag);
 	return *this;
 }
 
-ot::ContextMenuItem& ot::ContextMenuItem::operator + (itemCheckedState _checkedState) {
+ot::ContextMenuItem& ot::ContextMenuItem::operator + (ItemCheckedState _checkedState) {
 	m_checkState = _checkedState;
 	return *this;
 }

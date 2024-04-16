@@ -25,7 +25,7 @@ std::string ot::toString(NavigationTreeItemFlag _flag) {
 	}
 }
 
-std::list<std::string> ot::toStringList(NavigationTreeItemFlag _flags) {
+std::list<std::string> ot::toStringList(NavigationTreeItemFlags _flags) {
 	std::list<std::string> ret;
 	if (_flags & ot::RemoveItemWhenEmpty) ret.push_back(toString(ot::RemoveItemWhenEmpty));
 	if (_flags & ot::ItemMayBeAdded) ret.push_back(toString(ot::ItemMayBeAdded));
@@ -44,8 +44,8 @@ ot::NavigationTreeItemFlag ot::stringToNavigationItemFlag(const std::string& _fl
 	}
 }
 
-ot::NavigationTreeItemFlag ot::stringListToNavigationItemFlags(const std::list<std::string>& _flags) {
-	NavigationTreeItemFlag ret = ot::NoNavigationTreeItemFlags;
+ot::NavigationTreeItemFlags ot::stringListToNavigationItemFlags(const std::list<std::string>& _flags) {
+	NavigationTreeItemFlags ret = ot::NoNavigationTreeItemFlags;
 	for (const std::string& flag : _flags) {
 		ret |= stringToNavigationItemFlag(flag);
 	}
@@ -54,15 +54,15 @@ ot::NavigationTreeItemFlag ot::stringListToNavigationItemFlags(const std::list<s
 
 ot::NavigationTreeItem::NavigationTreeItem() : m_flags(ot::NoNavigationTreeItemFlags), m_parent(nullptr) {}
 
-ot::NavigationTreeItem::NavigationTreeItem(const std::string& _text, ot::NavigationTreeItemFlag _flags)
+ot::NavigationTreeItem::NavigationTreeItem(const std::string& _text, ot::NavigationTreeItemFlags _flags)
 	: m_text(_text), m_flags(_flags), m_parent(nullptr)
 {}
 
-ot::NavigationTreeItem::NavigationTreeItem(const std::string& _text, const std::string& _iconPath, ot::NavigationTreeItemFlag _flags)
+ot::NavigationTreeItem::NavigationTreeItem(const std::string& _text, const std::string& _iconPath, ot::NavigationTreeItemFlags _flags)
 	: m_text(_text), m_iconPath(_iconPath), m_flags(_flags), m_parent(nullptr)
 {}
 
-ot::NavigationTreeItem::NavigationTreeItem(const std::string& _text, const std::string& _iconPath, const std::list<NavigationTreeItem>& _childItems, ot::NavigationTreeItemFlag _flags)
+ot::NavigationTreeItem::NavigationTreeItem(const std::string& _text, const std::string& _iconPath, const std::list<NavigationTreeItem>& _childItems, ot::NavigationTreeItemFlags _flags)
 	: m_text(_text), m_iconPath(_iconPath), m_childs(_childItems), m_flags(_flags), m_parent(nullptr)
 {
 	for (NavigationTreeItem& c : m_childs) c.setParentNavigationTreeItem(this);
@@ -189,7 +189,7 @@ std::string ot::NavigationTreeItem::itemPath(char _delimiter, const std::string&
 	}
 }
 
-bool ot::NavigationTreeItem::filter(NavigationTreeItemFlag _flags) {
+bool ot::NavigationTreeItem::filter(NavigationTreeItemFlags _flags) {
 	std::list<NavigationTreeItem> bck = m_childs;
 	m_childs.clear();
 	for (NavigationTreeItem& itm : bck) {

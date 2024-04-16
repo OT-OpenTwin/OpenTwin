@@ -1,7 +1,7 @@
 #include "OTServiceFoundation/TypeConverter.h"
 #include "OTCore/OTAssert.h"
 
-std::string ot::convert::toString(itemCheckedState _flag) {
+std::string ot::convert::toString(ItemCheckedState _flag) {
 	switch (_flag)
 	{
 	case ot::NoCheckedState: return "NoCheckedState";
@@ -15,7 +15,7 @@ std::string ot::convert::toString(itemCheckedState _flag) {
 	}
 }
 
-std::string ot::convert::toString(itemFlag _flag) {
+std::string ot::convert::toString(ItemFlag _flag) {
 	switch (_flag)
 	{
 	case ot::NoFlags: return "NoFlag";
@@ -28,56 +28,56 @@ std::string ot::convert::toString(itemFlag _flag) {
 	}
 }
 
-std::list<std::string> ot::convert::toString(const ot::Flags<itemCheckedState>& _flags) {
+std::list<std::string> ot::convert::toString(ItemCheckedStateFlags _flags) {
 	unsigned long long check = 1;
 	std::list<std::string> ret;
 	while (check < itemCheckedStateMask) {
-		if (_flags.flagIsSet((itemCheckedState)check)) {
-			ret.push_back(toString((itemCheckedState)check));
+		if (_flags.flagIsSet((ItemCheckedState)check)) {
+			ret.push_back(toString((ItemCheckedState)check));
 		}
 		check *= 2;
 	}
 	return ret;
 }
 
-std::list<std::string> ot::convert::toString(const ot::Flags<itemFlag>& _flags) {
+std::list<std::string> ot::convert::toString(ItemFlags _flags) {
 	unsigned long long check = 1;
 	std::list<std::string> ret;
 	while (check < itemFlagMask) {
-		if (_flags.flagIsSet((itemFlag)check)) {
-			ret.push_back(toString((itemFlag)check));
+		if (_flags.flagIsSet((ItemFlag)check)) {
+			ret.push_back(toString((ItemFlag)check));
 		}
 		check *= 2;
 	}
 	return ret;
 }
 
-ot::itemCheckedState ot::convert::toItemCheckedState(const std::string& _flags) {
+ot::ItemCheckedState ot::convert::toItemCheckedState(const std::string& _flags) {
 	if (_flags == toString(NoCheckedState)) { return NoCheckedState; }
-	for (itemCheckedState s{ (itemCheckedState)1 }; s < itemCheckedStateMask; s = (itemCheckedState)(s * 2)) {
+	for (ItemCheckedState s{ (ItemCheckedState)1 }; s < itemCheckedStateMask; s = (ItemCheckedState)(s * 2)) {
 		if (_flags == toString(s)) { return s; }
 	}
 	OTAssert(0, "Unknown flag");
 	return NoCheckedState;
 }
 
-ot::itemFlag ot::convert::toItemFlags(const std::string& _flags) {
+ot::ItemFlag ot::convert::toItemFlag(const std::string& _flags) {
 	if (_flags == toString(NoFlags)) { return NoFlags; }
-	for (itemFlag s{ (itemFlag)1 }; s < itemFlagMask; s = (itemFlag)(s * 2)) {
+	for (ItemFlag s{ (ItemFlag)1 }; s < itemFlagMask; s = (ItemFlag)(s * 2)) {
 		if (_flags == toString(s)) { return s; }
 	}
 	OTAssert(0, "Unknown flag");
 	return NoFlags;
 }
 
-ot::Flags<ot::itemCheckedState> ot::convert::toItemCheckedState(const std::list<std::string>& _flags) {
-	ot::Flags<itemCheckedState> ret(NoCheckedState);
+ot::ItemCheckedStateFlags ot::convert::toItemCheckedStateFlags(const std::list<std::string>& _flags) {
+	ItemCheckedStateFlags ret(NoCheckedState);
 	for (auto f : _flags) { ret.setFlag(toItemCheckedState(f)); }
 	return ret;
 }
 
-ot::Flags<ot::itemFlag> ot::convert::toItemFlags(const std::list<std::string>& _flags) {
-	ot::Flags<itemFlag> ret(NoFlags);
-	for (auto f : _flags) { ret.setFlag(toItemFlags(f)); }
+ot::ItemFlags ot::convert::toItemFlags(const std::list<std::string>& _flags) {
+	ItemFlags ret(NoFlags);
+	for (const auto& f : _flags) { ret.setFlag(toItemFlag(f)); }
 	return ret;
 }

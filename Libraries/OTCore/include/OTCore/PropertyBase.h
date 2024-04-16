@@ -19,7 +19,7 @@ namespace ot {
 
 	class OT_CORE_API_EXPORT PropertyBase : public Serializable {
 	public:
-		enum PropertyFlags {
+		enum PropertyFlag {
 			NoFlags = 0x0000, //! @brief No property flags set
 			IsReadOnly = 0x0001, //! @brief Property is read only
 			IsProtected = 0x0002, //! @brief Property is protected
@@ -30,14 +30,15 @@ namespace ot {
 			AllowCustomValues = 0x1000, //! @brief User may set user values (e.g. in the StringListProperty)
 			AllowMultiselection = 0x2000  //! @brief User may select multiple values (e.g. in the StringListProperty)
 		};
+		typedef Flags<PropertyFlag> PropertyFlags;
 
-		static std::string toString(PropertyFlags _flag);
-		static PropertyFlags stringToFlag(const std::string& _flag);
+		static std::string toString(PropertyFlag _flag);
+		static PropertyFlag stringToFlag(const std::string& _flag);
 		static std::list<std::string> toStringList(PropertyFlags _flags);
 		static PropertyFlags stringListToFlags(const std::list<std::string>& _flags);
 
-		PropertyBase(PropertyFlags _flags = PropertyFlags::NoFlags);
-		PropertyBase(const std::string& _name, PropertyFlags _flags = PropertyFlags::NoFlags);
+		PropertyBase(PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyBase(const std::string& _name, PropertyFlags _flags = PropertyFlags(NoFlags));
 		PropertyBase(const PropertyBase& _other);
 		virtual ~PropertyBase() {};
 
@@ -76,9 +77,10 @@ namespace ot {
 		std::string& propertyTip(void) { return m_tip; };
 		const std::string& propertyTip(void) const { return m_tip; };
 
+		void setPropertyFlag(PropertyFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
 		void setPropertyFlags(PropertyFlags _flags) { m_flags = _flags; };
 		PropertyFlags& propertyFlags(void) { return m_flags; };
-		PropertyFlags propertyFlags(void) const { return m_flags; };
+		const PropertyFlags& propertyFlags(void) const { return m_flags; };
 
 		void setSpecialType(const std::string& _type) { m_specialType = _type; };
 		const std::string& specialType(void) const { return m_specialType; };
@@ -97,4 +99,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::PropertyBase::PropertyFlags)
+OT_ADD_FLAG_FUNCTIONS(ot::PropertyBase::PropertyFlag)

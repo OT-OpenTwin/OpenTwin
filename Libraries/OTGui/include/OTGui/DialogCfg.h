@@ -22,18 +22,19 @@ namespace ot {
 	class OT_GUI_API_EXPORT DialogCfg : public Serializable {
 		OT_DECL_NOCOPY(DialogCfg)
 	public:
-		enum DialogFlags {
+		enum DialogFlag {
 			NoFlags          = 0x00, //! @brief No dialog flags
 			CancelOnNoChange = 0x01 //! @brief If set the UI will silently close the dialog when pressing confim button and the initial data did not change
 		};
+		typedef Flags<DialogFlag> DialogFlags;
 
-		static std::string flagToString(DialogFlags _flag);
-		static DialogFlags stringToFlag(const std::string& _flag);
-		static std::list<std::string> flagsToStringList(DialogFlags _flags);
+		static std::string toString(DialogFlag _flag);
+		static DialogFlag stringToFlag(const std::string& _flag);
+		static std::list<std::string> toStringList(DialogFlags _flags);
 		static DialogFlags stringListToFlags(const std::list<std::string>& _flags);
 
-		DialogCfg(DialogFlags _flags = DialogFlags::NoFlags);
-		DialogCfg(const std::string& _title, DialogFlags _flags = DialogFlags::NoFlags);
+		DialogCfg(DialogFlags _flags = DialogFlags(NoFlags));
+		DialogCfg(const std::string& _title, DialogFlags _flags = DialogFlags(NoFlags));
 		virtual ~DialogCfg() {};
 
 		//! @brief Add the object contents to the provided JSON object
@@ -52,6 +53,7 @@ namespace ot {
 		void setTitle(const std::string& _title) { m_title = _title; };
 		const std::string title(void) const { return m_title; };
 
+		void setFlag(DialogFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
 		void setFlags(DialogFlags _flags) { m_flags = _flags; };
 		DialogFlags flags(void) const { return m_flags; };
 
@@ -73,4 +75,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::DialogCfg::DialogFlags)
+OT_ADD_FLAG_FUNCTIONS(ot::DialogCfg::DialogFlag)
