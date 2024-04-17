@@ -14,13 +14,13 @@
 #include <QtWidgets/qcolordialog.h>
 
 ot::ColorPickButton::ColorPickButton(const QColor& _color, QWidget* _parent)
-	: QFrame(_parent)
+	: QFrame(_parent), m_useAlpha(false), m_useCustomToolTip(false)
 {
 	this->ini(_color);
 }
 
 ot::ColorPickButton::ColorPickButton(const ot::Color& _color, QWidget* _parent) 
-	: QFrame(_parent)
+	: QFrame(_parent), m_useAlpha(false), m_useCustomToolTip(false)
 {
 	this->ini(OTQtConverter::toQt(_color));
 }
@@ -45,12 +45,24 @@ ot::Color ot::ColorPickButton::otColor(void) const {
 	return ot::Color(m_view->color().red(), m_view->color().green(), m_view->color().blue(), m_view->color().alpha());
 }
 
+void ot::ColorPickButton::useCustomToolTip(bool _use) {
+	m_useCustomToolTip = _use;
+	this->updateButtonText();
+}
+
+void ot::ColorPickButton::useAlpha(bool _use) {
+	m_useAlpha = _use;
+	this->updateButtonText();
+}
+
 void ot::ColorPickButton::replaceButtonText(const QString& _text) {
 	m_btn->setText(_text);
 }
 
 void ot::ColorPickButton::slotBrowse(void) {
 	QColorDialog dia(m_view->color(), m_btn);
+	dia.setOption(QColorDialog::ShowAlphaChannel, m_useAlpha);
+	
 	dia.move(0, 0);
 	m_btn->setSelectedProperty();
 	dia.exec();
@@ -63,9 +75,35 @@ void ot::ColorPickButton::slotBrowse(void) {
 }
 
 void ot::ColorPickButton::updateButtonText(void) {
-	m_btn->setText(QString::number(m_view->color().red())
-		+ "; " + QString::number(m_view->color().green())
-		+ "; " + QString::number(m_view->color().blue()));
+	if (m_useAlpha) {
+		m_btn->setText(QString::number(m_view->color().red())
+			+ "; " + QString::number(m_view->color().green())
+			+ "; " + QString::number(m_view->color().blue())
+			+ "; " + QString::number(m_view->color().alpha())
+		);
+		if (!m_useCustomToolTip) {
+			m_btn->setToolTip("Color {\n"
+				"    red: " + QString::number(m_view->color().red())
+				+ ",\n    green: " + QString::number(m_view->color().green())
+				+ ",\n    blue: " + QString::number(m_view->color().blue())
+				+ ",\n    alpha: " + QString::number(m_view->color().alpha()) + "\n}"
+			);
+		}
+	}
+	else {
+		m_btn->setText(QString::number(m_view->color().red())
+			+ "; " + QString::number(m_view->color().green())
+			+ "; " + QString::number(m_view->color().blue())
+		);
+		if (!m_useCustomToolTip) {
+			m_btn->setToolTip("Color {\n"
+				"    red: " + QString::number(m_view->color().red())
+				+ ",\n    green: " + QString::number(m_view->color().green())
+				+ ",\n    blue: " + QString::number(m_view->color().blue()) + "\n}"
+			);
+		}
+	}
+	
 }
 
 void ot::ColorPickButton::ini(const QColor& _color) {

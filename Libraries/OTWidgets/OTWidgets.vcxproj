@@ -145,7 +145,7 @@
     <QtMoc Include="include\OTWidgets\Painter2DEditDialog.h" />
     <QtMoc Include="include\OTWidgets\Painter2DPreview.h" />
     <QtMoc Include="include\OTWidgets\Label.h" />
-    <ClInclude Include="include\OTWidgets\ImagePreview.h" />
+    <QtMoc Include="include\OTWidgets\ImagePreview.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridView.h" />

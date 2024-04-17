@@ -16,6 +16,7 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT ImagePreview : public QFrame, public QWidgetInterface {
+		Q_OBJECT
 	public:
 		ImagePreview();
 		ImagePreview(const QImage& _image);
@@ -31,8 +32,13 @@ namespace ot {
 
 		virtual void keyPressEvent(QKeyEvent* _event) override;
 
+		virtual void mousePressEvent(QMouseEvent* _event) override;
+
 		void setImage(const QImage& _image);
 		const QImage& image(void) const { return m_image; };
+
+	Q_SIGNALS:
+		void imagePixedClicked(const QPoint& _px);
 
 	private:
 		QSize m_size;

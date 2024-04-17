@@ -18,17 +18,53 @@
 #include <map>
 
 class QLabel;
+class QTimer;
 class QWidget;
 class QHBoxLayout;
 class QVBoxLayout;
 
 namespace ot {
+	class SpinBox;
+	class CheckBox;
 	class ImagePreview;
+	class ColorPickButton;
 }
 
 class ImageEditorToolBar : public QToolBar {
+	Q_OBJECT
+public:
+	ImageEditorToolBar();
+	virtual ~ImageEditorToolBar();
+
+	void setFromColor(const QColor& _color);
+	QColor fromColor(void) const;
+	QColor toColor(void) const;
+	int tolerance(void) const;
+	bool useDifference(void) const;
+	bool checkAlpha(void) const;
+
+Q_SIGNALS:
+	void dataChanged(void);
+
+private Q_SLOTS:
+	void slotDataChanged(void);
+	void slotSpinChanged(void);
+
+private:
+	QTimer* m_spinDelayTimer;
+	ot::CheckBox* m_useDiff;
+	ot::CheckBox* m_checkAlpha;
+	ot::SpinBox* m_tolerance;
+	ot::ColorPickButton* m_fromColor;
+	ot::ColorPickButton* m_toColor;
 
 };
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
 
 class ImageEditor : public QObject, public otoolkit::Tool {
 	Q_OBJECT
@@ -59,11 +95,13 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 private Q_SLOTS:
+	void slotOriginClicked(const QPoint& _px);
 	void slotImport(void);
 	void slotCalculate(void);
 	void slotExport(void);
 
 private:
+	QString m_currentFileName;
 	QWidget* m_root;
 	ImageEditorToolBar* m_toolBar;
 	ot::ImagePreview* m_original;

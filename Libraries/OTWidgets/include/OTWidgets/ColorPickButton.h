@@ -19,7 +19,7 @@ namespace ot {
 	class PushButton;
 	class ColorPreviewBox;
 
-	class ColorPickButton : public QFrame, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT ColorPickButton : public QFrame, public QWidgetInterface {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ColorPickButton)
 	public:
@@ -33,6 +33,12 @@ namespace ot {
 		void setColor(const QColor& _color);
 		const QColor& color(void) const;
 		ot::Color otColor(void) const;
+
+		void useCustomToolTip(bool _use = true);
+		bool isUseCustomToolTip(void) const { return m_useCustomToolTip; };
+
+		void useAlpha(bool _use = true);
+		bool isUseAlpha(void) const { return m_useAlpha; };
 
 		void replaceButtonText(const QString& _text);
 
@@ -48,6 +54,8 @@ namespace ot {
 	private:
 		void ini(const QColor& _color);
 
+		bool m_useCustomToolTip;
+		bool m_useAlpha;
 		ColorPreviewBox* m_view;
 		PushButton* m_btn;
 	};

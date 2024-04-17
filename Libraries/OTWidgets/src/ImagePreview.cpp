@@ -52,6 +52,25 @@ void ot::ImagePreview::keyPressEvent(QKeyEvent* _event) {
 	QFrame::keyPressEvent(_event);
 }
 
+void ot::ImagePreview::mousePressEvent(QMouseEvent* _event) {
+	if (m_image.isNull() || _event->button() != Qt::MiddleButton) return;
+	QPoint pt = _event->pos() - this->pos();
+	QSize scaledSize = m_image.scaled(m_size, Qt::KeepAspectRatio).size();
+
+	// Calculate scale factors for X and Y axes
+	qreal scaleX = static_cast<qreal>(m_image.width()) / scaledSize.width();
+	qreal scaleY = static_cast<qreal>(m_image.height()) / scaledSize.height();
+
+	// Calculate the corresponding pixel in the original image
+	QPoint originalPt = QPoint(pt.x() * scaleX, pt.y() * scaleY);
+
+	// Ensure the point is within the bounds of the original image
+	originalPt.setX(qBound(0, originalPt.x(), m_image.width() - 1));
+	originalPt.setY(qBound(0, originalPt.y(), m_image.height() - 1));
+
+	Q_EMIT imagePixedClicked(originalPt);
+}
+
 void ot::ImagePreview::setImage(const QImage& _image) {
 	m_image = _image;
 	m_size = m_image.size();
