@@ -70,11 +70,11 @@ EntityPropertiesBase& EntityPropertiesBase::operator=(const EntityPropertiesBase
 
 void EntityPropertiesBase::setupPropertyData(ot::PropertyGridCfg& _configuration, ot::Property* _property)
 {
-	if (this->hasMultipleValues()) _property->setPropertyFlags(_property->propertyFlags() | ot::Property::HasMultipleValues);
-	if (this->getReadOnly()) _property->setPropertyFlags(_property->propertyFlags() | ot::Property::IsReadOnly);
-	if (!this->getProtected()) _property->setPropertyFlags(_property->propertyFlags() | ot::Property::IsDeletable);
-	if (!this->getVisible()) _property->setPropertyFlags(_property->propertyFlags() | ot::Property::IsHidden);
-	if (this->getErrorState()) _property->setPropertyFlags(_property->propertyFlags() | ot::Property::HasInputError);
+	if (this->hasMultipleValues()) _property->setPropertyFlag(ot::Property::HasMultipleValues);
+	if (this->getReadOnly()) _property->setPropertyFlag(ot::Property::IsReadOnly);
+	if (!this->getProtected()) _property->setPropertyFlag(ot::Property::IsDeletable);
+	if (!this->getVisible()) _property->setPropertyFlag(ot::Property::IsHidden);
+	if (this->getErrorState()) _property->setPropertyFlag(ot::Property::HasInputError);
 
 	ot::PropertyGroup* g = _configuration.findOrCreateGroup(this->getGroup());
 	OTAssertNullptr(g);
@@ -107,6 +107,7 @@ void EntityPropertiesDouble::createProperty(const std::string &group, const std:
 void EntityPropertiesDouble::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root)
 {
 	ot::PropertyDouble* newProp = new ot::PropertyDouble(this->getName(), value);
+	newProp->setPropertyFlag(ot::Property::AllowCustomValues);
 	this->setupPropertyData(_configuration, newProp);
 }
 

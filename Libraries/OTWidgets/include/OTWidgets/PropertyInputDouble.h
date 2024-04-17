@@ -10,6 +10,7 @@
 
 namespace ot {
 
+	class LineEdit;
 	class DoubleSpinBox;
 
 	class OT_WIDGETS_API_EXPORT PropertyInputDouble : public PropertyInput {
@@ -30,10 +31,15 @@ namespace ot {
 		void setValue(double _value);
 		double getValue(void) const;
 
+		bool hasInputError(void) const;
+
 	private Q_SLOTS:
 		void lclValueChanged(int);
+		void lclTextChanged(void);
+		void lclEditingFinishedChanged(void);
 
 	private:
+		LineEdit* m_lineEdit;
 		DoubleSpinBox* m_spinBox;
 	};
 

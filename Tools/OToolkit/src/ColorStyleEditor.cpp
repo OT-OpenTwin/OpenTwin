@@ -89,6 +89,7 @@
 #define CSE_COLOR_TitleForeground "Title Foreground"
 #define CSE_COLOR_TTBFirstTabBackground "TabToolBar First Tab Background"
 #define CSE_COLOR_TTBFirstTabForeground "TabToolBar First Tab Foreground"
+#define CSE_COLOR_ErrorForeground "Error Foreground"
 
 #define CSE_FILE_LogInBackgroundImage "Log In Background Image"
 
@@ -420,6 +421,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBorderColor, new PropertyPainter2D(new FillPainter2D(Color::DarkGray)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color(215, 215, 215))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ErrorForeground, new PropertyPainter2D(new FillPainter2D(Color::Red)));
 
 	LinearGradientPainter2D* tehb = new LinearGradientPainter2D;
 	tehb->setStart(Point2DD(0.5, 0.));
@@ -456,6 +458,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_colors.insert_or_assign(CSE_COLOR_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
 	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
+	m_colors.insert_or_assign(CSE_COLOR_ErrorForeground, new PropertyPainter2D(new FillPainter2D(Color::Red)));
 	m_colors.insert_or_assign("Test 1", new PropertyPainter2D(new FillPainter2D(Color::Red)));
 
 	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_Big, new PropertyDouble(10.));
@@ -819,7 +822,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;
 			}
-			replacementMap.insert_or_assign(k, QString::number(inp->getSpinBox()->value()));
+			replacementMap.insert_or_assign(k, QString::number(inp->getValue()));
 		}
 	}
 	{
@@ -836,7 +839,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;
 			}
-			replacementMap.insert_or_assign(k, QString::number(inp->getSpinBox()->value()));
+			replacementMap.insert_or_assign(k, QString::number(inp->getValue()));
 		}
 	}
 

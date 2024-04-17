@@ -1387,6 +1387,10 @@ QLineEdit:selected {
     color: %color:Widget Foreground%;
 }
 
+QLineEdit[HasInputError="true"] {
+    color: %color:Error Foreground%;
+}
+
 /* ##################################################################################### */
 
 /* QTabWidget */

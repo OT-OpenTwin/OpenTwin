@@ -446,9 +446,6 @@
     <ClInclude Include="include\OTWidgets\DoubleSpinBox.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\LineEdit.h">
-      <Filter>include\Widgets</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\SpinBox.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>
@@ -572,6 +569,9 @@
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\PushButton.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\LineEdit.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>

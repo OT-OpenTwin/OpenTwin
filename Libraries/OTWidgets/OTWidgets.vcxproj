@@ -191,7 +191,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsTriangleItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsVBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\IconManager.h" />
-    <ClInclude Include="include\OTWidgets\LineEdit.h" />
+    <QtMoc Include="include\OTWidgets\LineEdit.h" />
     <ClInclude Include="include\OTWidgets\MessageDialog.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputBool.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputColor.h" />

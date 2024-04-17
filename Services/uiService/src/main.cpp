@@ -29,6 +29,8 @@ int main(int argc, char *argv[])
 		app->setSiteID(0);
 		app->getExternalServicesComponent()->setRelayServiceIsRequired();
 		
+		QLocale::setDefault(QLocale(QLocale::English));
+
 		int status = app->run();
 		ExternalServicesComponent * extComp = app->getExternalServicesComponent();
 		if (extComp != nullptr) { extComp->shutdown(); }

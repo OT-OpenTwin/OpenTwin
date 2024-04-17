@@ -224,9 +224,10 @@ void AppBase::slotProcessMessage(const QString& _json) {
 
 void AppBase::slotLogMessage(const QString& _sender, const QString& _message) {
 	m_logMutex.lock();
-	m_output->moveCursor(QTextCursor::MoveOperation::End);
-
+	
 	QTextCursor cursor = m_output->textCursor();
+	cursor.movePosition(QTextCursor::End);
+
 	QTextCharFormat format = cursor.charFormat();
 	QTextCharFormat formatTime = format;
 	QTextCharFormat formatSender = format;
@@ -255,9 +256,10 @@ void AppBase::slotLogMessage(const QString& _sender, const QString& _message) {
 
 void AppBase::slotLogWarning(const QString& _sender, const QString& _message) {
 	m_logMutex.lock();
-	m_output->moveCursor(QTextCursor::MoveOperation::End);
-
+	
 	QTextCursor cursor = m_output->textCursor();
+	cursor.movePosition(QTextCursor::End);
+
 	QTextCharFormat format = cursor.charFormat();
 	QTextCharFormat formatTime = format;
 	QTextCharFormat formatSender = format;
@@ -294,9 +296,10 @@ void AppBase::slotLogWarning(const QString& _sender, const QString& _message) {
 
 void AppBase::slotLogError(const QString& _sender, const QString& _message) {
 	m_logMutex.lock();
-	m_output->moveCursor(QTextCursor::MoveOperation::End);
-
+	
 	QTextCursor cursor = m_output->textCursor();
+	cursor.movePosition(QTextCursor::End);
+
 	QTextCharFormat format = cursor.charFormat();
 	QTextCharFormat formatTime = format;
 	QTextCharFormat formatSender = format;

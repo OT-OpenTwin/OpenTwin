@@ -15,6 +15,7 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT LineEdit : public QLineEdit, public ot::QWidgetInterface {
+		Q_OBJECT
 	public:
 		LineEdit(QWidget* _parentWidget = (QWidget*)nullptr);
 		LineEdit(const QString& _initialText, QWidget* _parentWidget = (QWidget*)nullptr);
@@ -23,7 +24,8 @@ namespace ot {
 		//! @brief Returns a pointer to the root widget of this object
 		virtual QWidget* getQWidget(void) override { return this; };
 
-	private:
-
+	public Q_SLOTS:
+		void setInputErrorStateProperty(void);
+		void unsetInputErrorStateProperty(void);
 	};
 }
