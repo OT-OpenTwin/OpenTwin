@@ -27,10 +27,15 @@ namespace ot {
 
 		virtual QSize sizeHint(void) const override;
 
+		virtual void wheelEvent(QWheelEvent* _event) override;
+
+		virtual void keyPressEvent(QKeyEvent* _event) override;
+
 		void setImage(const QImage& _image);
 		const QImage& image(void) const { return m_image; };
 
 	private:
+		QSize m_size;
 		QImage m_image;
 	};
 
