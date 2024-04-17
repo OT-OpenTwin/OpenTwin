@@ -27,6 +27,8 @@ namespace ot {
 
 		virtual QWidget* getQWidget(void) override { return this; };
 
+		virtual QSize sizeHint(void) const override { return QSize(16, 16); };
+
 		void setColor(const ot::Color& _color);
 		void setColor(const QColor& _color);
 		const QColor& color(void) const { return m_color; };

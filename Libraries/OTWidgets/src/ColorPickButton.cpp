@@ -75,7 +75,6 @@ void ot::ColorPickButton::ini(const QColor& _color) {
 
 	m_btn = new PushButton;
 	m_view = new ColorPreviewBox(_color);
-	m_view->setFixedSize(18, 18);
 
 	// Setup layout
 	cLay->addWidget(m_view);
