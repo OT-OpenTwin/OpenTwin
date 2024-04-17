@@ -2243,6 +2243,28 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
     color: %color:Widget Disabled Background%;
 }
 
+#tabsMenuButton::menu-indicator {
+        image: none;
+}
+
+#tabsMenuButton {
+        qproperty-icon: url('%file:/icons/arrow_down.png%'),
+                url('%file:/icons/arrow_down_disabled.png%') disabled;
+        qproperty-iconSize: 10px;
+}
+
+#dockAreaCloseButton {
+        qproperty-icon: url('%file:/icons/window_close.png%'),
+                url('%file:/icons/window_close_disabled.png%') disabled;
+        qproperty-iconSize: 10px;
+}
+
+#detachGroupButton {
+        qproperty-icon: url('%file:/icons/window_undock.png%'),
+                url('%file:/icons/window_undock_disabled.png%') disabled;
+        qproperty-iconSize: 10px;
+}
+
 /* ##################################################################################### */
 
 /* Special Properties */

@@ -1682,6 +1682,7 @@ QHeaderView::up-arrow {
 /* QTreeView */
 
 QTreeView:branch:hover {
+
     background: url('%root%/icons/transparent.png');
 }
 
@@ -2246,6 +2247,28 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
 
 #tabCloseButton::disabled {
     color: rgba(127,127,127,255);
+}
+
+#tabsMenuButton::menu-indicator {
+        image: none;
+}
+
+#tabsMenuButton {
+        qproperty-icon: url('%root%/icons/arrow_down.png'),
+                url('%root%/icons/arrow_down_disabled.png') disabled;
+        qproperty-iconSize: 10px;
+}
+
+#dockAreaCloseButton {
+        qproperty-icon: url('%root%/icons/window_close.png'),
+                url('%root%/icons/window_close_disabled.png') disabled;
+        qproperty-iconSize: 10px;
+}
+
+#detachGroupButton {
+        qproperty-icon: url('%root%/icons/window_undock.png'),
+                url('%root%/icons/window_undock_disabled.png') disabled;
+        qproperty-iconSize: 10px;
 }
 
 /* ##################################################################################### */
