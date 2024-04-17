@@ -79,6 +79,9 @@ namespace ot {
 		void setDuplicateLineShortcutEnabled(bool _enabled) { m_enableDuplicateLineShortcut = _enabled; };
 		bool isDuplicateLineShortcutEnabled(void) const { return m_enableDuplicateLineShortcut; };
 
+		void setEnableSameTextHighlighting(bool _enabled) { m_enableSameTextHighlighting = _enabled; };
+		bool isSameTextHighlightingEnabled(void) const { return m_enableSameTextHighlighting; };
+
 	Q_SIGNALS:							
 		void saveRequested(void);
 
@@ -97,8 +100,14 @@ namespace ot {
 		void slotFindClosing(void);
 		void slotDuplicateLine(void);
 		void slotCurrentColorStyleChanged(const ot::ColorStyle& _style);
+		void slotSelectionChanged(void);
 
 	private:
+		friend class TextEditorSearchPopup;
+
+		void getCurrentLineSelection(QList<QTextEdit::ExtraSelection>& _selections);
+		void addAdditionalSelections(QList<QTextEdit::ExtraSelection>& _selections);
+
 		TextEditorSearchPopup* m_searchPopup;
 		
 		bool m_contentChanged;
@@ -106,6 +115,8 @@ namespace ot {
 		int m_tabSpaces;
 		bool m_newLineSamePrefix;
 		bool m_enableDuplicateLineShortcut;
+		bool m_enableSameTextHighlighting;
+		int m_sameTextHighlightingMinimum;
 
 		ot::UID								m_displayedTextEntityID = 0;
 		ot::UID								m_displayedTextEntityVersion = 0;

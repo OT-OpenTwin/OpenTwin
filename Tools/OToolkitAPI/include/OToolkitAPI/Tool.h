@@ -45,7 +45,7 @@ namespace otoolkit {
 		//! @param _content The tool contents must be set here
 		virtual bool runTool(QMenu* _rootMenu, ToolWidgets& _content) = 0;
 
-		virtual void restoreToolSettings(QSettings& _settings) = 0;
+		virtual void restoreToolSettings(QSettings& _settings) {};
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

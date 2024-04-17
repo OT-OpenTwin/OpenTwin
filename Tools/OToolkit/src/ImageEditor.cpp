@@ -31,6 +31,7 @@
 #include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qaction.h>
+#include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qscrollarea.h>
 #include <QtWidgets/qfiledialog.h>
 
@@ -39,9 +40,11 @@ ImageEditorToolBar::ImageEditorToolBar() {
 	Label* fromLabel = new Label("From:");
 	m_fromColor = new ColorPickButton(QColor(0, 0, 0));
 	m_fromColor->setMinimumWidth(100);
+	m_fromColor->useAlpha(true);
 
 	Label* toLabel = new Label("To:");
 	m_toColor = new ColorPickButton(QColor(0, 0, 0));
+	m_toColor->useAlpha(true);
 
 	Label* toleranceLabel = new Label("Tolerance:");
 	m_tolerance = new SpinBox;
@@ -51,6 +54,9 @@ ImageEditorToolBar::ImageEditorToolBar() {
 
 	Label* checkAlphaLabel = new Label("Check Alpha:");
 	m_checkAlpha = new CheckBox;
+
+	Label* useOriginAlphaLabel = new Label("Use Original Alpha:");
+	m_useOriginalAlpha = new CheckBox;
 
 	m_spinDelayTimer = new QTimer;
 	m_spinDelayTimer->setInterval(1000);
@@ -66,6 +72,8 @@ ImageEditorToolBar::ImageEditorToolBar() {
 	this->addWidget(m_useDiff);
 	this->addWidget(checkAlphaLabel);
 	this->addWidget(m_checkAlpha);
+	this->addWidget(useOriginAlphaLabel);
+	this->addWidget(m_useOriginalAlpha);
 	this->addSeparator();
 
 	this->connect(m_fromColor, &ColorPickButton::colorChanged, this, &ImageEditorToolBar::slotDataChanged);
@@ -73,6 +81,7 @@ ImageEditorToolBar::ImageEditorToolBar() {
 	this->connect(m_tolerance, &SpinBox::valueChanged, this, &ImageEditorToolBar::slotSpinChanged);
 	this->connect(m_useDiff, &CheckBox::stateChanged, this, &ImageEditorToolBar::slotDataChanged);
 	this->connect(m_checkAlpha, &CheckBox::stateChanged, this, &ImageEditorToolBar::slotDataChanged);
+	this->connect(m_useOriginalAlpha, &CheckBox::stateChanged, this, &ImageEditorToolBar::slotDataChanged);
 	this->connect(m_spinDelayTimer, &QTimer::timeout, this, &ImageEditorToolBar::slotDataChanged);
 }
 
@@ -103,6 +112,10 @@ bool ImageEditorToolBar::useDifference(void) const {
 
 bool ImageEditorToolBar::checkAlpha(void) const {
 	return m_checkAlpha->isChecked();
+}
+
+bool ImageEditorToolBar::useOriginalAlpha(void) const {
+	return m_useOriginalAlpha->isChecked();
 }
 
 void ImageEditorToolBar::slotDataChanged(void) {
@@ -182,10 +195,15 @@ bool ImageEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	QAction* actionExport = _rootMenu->addAction("Export Image");
 	
 	// Initialize data
+	QShortcut* shortcutOpen = new QShortcut(QKeySequence("Ctrl+O"), rootSplitter);
+	QShortcut* shortcutSave = new QShortcut(QKeySequence("Ctrl+S"), rootSplitter);
+	shortcutOpen->setContext(Qt::WidgetWithChildrenShortcut);
+	shortcutSave->setContext(Qt::WidgetWithChildrenShortcut);
 	
 	// Connect signals
 	this->connect(actionImport, &QAction::triggered, this, &ImageEditor::slotImport);
 	this->connect(btnImport, &QPushButton::clicked, this, &ImageEditor::slotImport);
+	this->connect(shortcutOpen, &QShortcut::activated, this, &ImageEditor::slotImport);
 
 	this->connect(actionCalculate, &QAction::triggered, this, &ImageEditor::slotCalculate);
 	this->connect(btnCalculate, &QPushButton::clicked, this, &ImageEditor::slotCalculate);
@@ -193,6 +211,7 @@ bool ImageEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 	this->connect(actionExport, &QAction::triggered, this, &ImageEditor::slotExport);
 	this->connect(btnExport, &QPushButton::clicked, this, &ImageEditor::slotExport);
+	this->connect(shortcutSave, &QShortcut::activated, this, &ImageEditor::slotExport);
 
 	this->connect(m_original, &ImagePreview::imagePixedClicked, this, &ImageEditor::slotOriginClicked);
 	
@@ -207,14 +226,6 @@ void ImageEditor::restoreToolSettings(QSettings& _settings) {
 
 bool ImageEditor::prepareToolShutdown(QSettings& _settings) {
 	return true;
-}
-
-void ImageEditor::toolWasShown(void) {
-	m_toolBar->setHidden(false);
-}
-
-void ImageEditor::toolWasHidden(void) {
-	m_toolBar->setHidden(true);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -239,6 +250,8 @@ void ImageEditor::slotImport(void) {
 	QImage img(m_currentFileName);
 	m_original->setImage(img);
 	m_original->setFocus();
+
+	this->slotCalculate();
 }
 
 void ImageEditor::slotCalculate(void) {
@@ -267,6 +280,7 @@ void ImageEditor::slotCalculate(void) {
 
 	bool checkAlpha = m_toolBar->checkAlpha();
 	bool useDiff = m_toolBar->useDifference();
+	bool useOriginAlpha = m_toolBar->useOriginalAlpha();
 
 	for (int y = 0; y < result.height(); y++) {
 		for (int x = 0; x < result.width(); x++) {
@@ -287,18 +301,24 @@ void ImageEditor::slotCalculate(void) {
 						int rr = tR + (r - fR);
 						int rg = tG + (g - fG);
 						int rb = tB + (b - fB);
-						int ra = tA + (a - fA);
 						if (rr < 0) rr = 0;
 						if (rg < 0) rg = 0;
 						if (rb < 0) rb = 0;
-						if (ra < 0) ra = 0;
 						if (rr > 255) rr = 0;
 						if (rg > 255) rg = 0;
 						if (rb > 255) rb = 0;
-						if (ra > 255) ra = 0;
-						result.setPixelColor(x, y, QColor(rr, rg, rb, ra));
+						if (useOriginAlpha) {
+							result.setPixelColor(x, y, QColor(rr, rg, rb, a));
+						}
+						else {
+							int ra = tA + (a - fA);
+							result.setPixelColor(x, y, QColor(rr, rg, rb, ra));
+						}
 					}
 					else {
+						if (useOriginAlpha) {
+							tc.setAlpha(a);
+						}
 						result.setPixelColor(x, y, tc);
 					}
 
@@ -316,7 +336,7 @@ void ImageEditor::slotExport(void) {
 		return;
 	}
 
-	QString fileName = QFileDialog::getOpenFileName(m_root, "Save Image", m_currentFileName, "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tiff)");
+	QString fileName = QFileDialog::getSaveFileName(m_root, "Save Image", m_currentFileName, "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tiff)");
 	if (fileName.isEmpty()) return;
 
 	m_converted->image().save(fileName);

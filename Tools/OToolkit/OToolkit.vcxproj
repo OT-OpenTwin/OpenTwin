@@ -37,8 +37,10 @@
     <ClCompile Include="src\ToolManager.cpp" />
     <ClCompile Include="src\ToolMenuManager.cpp" />
     <ClCompile Include="src\ToolRuntimeHandler.cpp" />
+    <ClCompile Include="src\WidgetTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\WidgetTest.h" />
     <QtMoc Include="include\ColorStyleEditor.h" />
     <ClInclude Include="include\DockManager.h" />
     <QtMoc Include="include\TabManager.h" />

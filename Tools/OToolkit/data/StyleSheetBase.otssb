@@ -1676,6 +1676,7 @@ QHeaderView::up-arrow {
 /* QTreeView */
 
 QTreeView:branch:hover {
+
     background: url('%file:/icons/transparent.png%');
 }
 
@@ -1705,11 +1706,13 @@ QTreeView:branch:open:has-children:has-siblings {
 
 QTreeView:branch:has-children:!has-siblings:closed:hover,
 QTreeView:branch:closed:has-children:has-siblings:hover {
+    background-color: %color:Widget Hover Background%;
     image: url('%file:/icons/branch_closed_focus.png%');
 }
 
 QTreeView:branch:open:has-children:!has-siblings:hover,
 QTreeView:branch:open:has-children:has-siblings:hover {
+    background-color: %color:Widget Hover Background%;
     image: url('%file:/icons/branch_open_focus.png%');
 }
 

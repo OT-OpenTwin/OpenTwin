@@ -17,6 +17,7 @@
 #include "ColorStyleEditor.h"
 #include "LogVisualization.h"
 #include "ToolBarManager.h"
+#include "WidgetTest.h"
 
 // OToolkitAPI header
 #include "OToolkitAPI/OToolkitAPI.h"
@@ -359,6 +360,11 @@ void AppBase::slotInitializeTools(void) {
 	m_toolManager->addTool(new Randomizer);
 	m_toolManager->addTool(new ColorStyleEditor);
 	m_toolManager->addTool(new ImageEditor);
+
+	QByteArray arr = qgetenv("OPENTWIN_DEV_ROOT");
+	if (!arr.isEmpty()) {
+		m_toolManager->addTool(new WidgetTest);
+	}
 
 	//m_tabWidget->addTab(m_logger->widget(), "Log Visualization");
 	//m_tabWidget->addTab(m_terminal->widget(), "OTerminal");

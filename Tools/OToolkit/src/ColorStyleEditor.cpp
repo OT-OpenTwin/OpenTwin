@@ -151,6 +151,7 @@ bool ColorStyleEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content
 	m_baseEditor->setReadOnly(false);
 	m_baseEditor->setNewLineWithSamePrefix(true);
 	m_baseEditor->setDuplicateLineShortcutEnabled(true);
+	m_baseEditor->setEnableSameTextHighlighting(true);
 
 	m_editorTab = new TabWidget;
 	m_editorTab->addTab(m_baseEditor, CSE_TAB_Base);
@@ -423,6 +424,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color(215, 215, 215))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ErrorForeground, new PropertyPainter2D(new FillPainter2D(Color::Red)));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TextEditHighlight, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
 
 	LinearGradientPainter2D* tehb = new LinearGradientPainter2D;
 	tehb->setStart(Point2DD(0.5, 0.));

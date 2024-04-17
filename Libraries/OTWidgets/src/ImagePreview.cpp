@@ -73,6 +73,6 @@ void ot::ImagePreview::mousePressEvent(QMouseEvent* _event) {
 
 void ot::ImagePreview::setImage(const QImage& _image) {
 	m_image = _image;
-	m_size = m_image.size();
-	this->resize(m_size);
+	m_size = m_size.expandedTo(m_image.size());
+	this->update();
 }

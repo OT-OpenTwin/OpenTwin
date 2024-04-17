@@ -44,5 +44,6 @@
 #define OT_COLORSTYLE_VALUE_WindowForeground "Window Foreground"
 #define OT_COLORSTYLE_VALUE_ErrorForeground "Error Foreground"
 #define OT_COLORSTYLE_VALUE_TextEditHighlightBorder "Text Editor Highlight Border"
+#define OT_COLORSTYLE_VALUE_TextEditHighlight "Text Editor Highlight"
 
 #define OT_COLORSTYLE_INT_SplitterHandleWidth "Splitter Handle Width"

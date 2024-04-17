@@ -1,6 +1,6 @@
-//! @file ColorStyleEditor.h
+//! @file ImageEditor.h
 //! @author Alexander Kuester (alexk95)
-//! @date March 2024
+//! @date April 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
@@ -42,6 +42,7 @@ public:
 	int tolerance(void) const;
 	bool useDifference(void) const;
 	bool checkAlpha(void) const;
+	bool useOriginalAlpha(void) const;
 
 Q_SIGNALS:
 	void dataChanged(void);
@@ -54,6 +55,7 @@ private:
 	QTimer* m_spinDelayTimer;
 	ot::CheckBox* m_useDiff;
 	ot::CheckBox* m_checkAlpha;
+	ot::CheckBox* m_useOriginalAlpha;
 	ot::SpinBox* m_tolerance;
 	ot::ColorPickButton* m_fromColor;
 	ot::ColorPickButton* m_toColor;
@@ -87,10 +89,6 @@ public:
 
 	//! @brief Stop all the logic of this tool
 	virtual bool prepareToolShutdown(QSettings& _settings) override;
-
-	virtual void toolWasShown(void) override;
-
-	virtual void toolWasHidden(void) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -99,7 +99,8 @@ void ot::TextEditorLineNumberArea::paintEvent(QPaintEvent * _event) {
 
 ot::TextEditor::TextEditor(QWidget* _parent)
 	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false), m_searchPopup(nullptr), 
-	m_tabSpaces(4), m_newLineSamePrefix(false), m_enableDuplicateLineShortcut(false)
+	m_tabSpaces(4), m_newLineSamePrefix(false), m_enableDuplicateLineShortcut(false), m_enableSameTextHighlighting(false),
+	m_sameTextHighlightingMinimum(2)
 {
 	this->setObjectName("OT_TextEditor");
 
@@ -127,6 +128,7 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 	connect(this, &TextEditor::updateRequest, this, &TextEditor::slotUpdateLineNumberArea);
 	connect(this, &TextEditor::cursorPositionChanged, this, &TextEditor::slotHighlightCurrentLine);
 	connect(this, &TextEditor::textChanged, this, &TextEditor::slotTextChanged);
+	connect(this, &TextEditor::selectionChanged, this, &TextEditor::slotSelectionChanged);
 	connect(saveShortcut, &QShortcut::activated, this, &TextEditor::slotSaveRequested);
 	connect(findShortcut, &QShortcut::activated, this, &TextEditor::slotFindRequested);
 	connect(duplicateShortcut, &QShortcut::activated, this, &TextEditor::slotDuplicateLine);
@@ -292,21 +294,8 @@ void ot::TextEditor::slotUpdateLineNumberAreaWidth(int _newBlockCount) {
 
 void ot::TextEditor::slotHighlightCurrentLine() {
 	QList<QTextEdit::ExtraSelection> extraSelections;
-
-	if (!isReadOnly()) {
-		QTextEdit::ExtraSelection selection;
-
-		const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
-
-		selection.format.setProperty(QTextFormat::OutlinePen, QPen(cs.getValue(OT_COLORSTYLE_VALUE_TextEditHighlightBorder).brush(), 1.));
-		selection.format.setProperty(QTextFormat::CssFloat, QVariant());
-		selection.format.setProperty(QTextFormat::FullWidthSelection, true);
-		selection.cursor = textCursor();
-		selection.cursor.clearSelection();
-		extraSelections.append(selection);
-	}
-
-	setExtraSelections(extraSelections);
+	this->getCurrentLineSelection(extraSelections);
+	this->addAdditionalSelections(extraSelections);
 }
 
 void ot::TextEditor::slotUpdateLineNumberArea(const QRect & _rect, int _dy) {
@@ -359,4 +348,64 @@ void ot::TextEditor::slotDuplicateLine(void) {
 
 void ot::TextEditor::slotCurrentColorStyleChanged(const ot::ColorStyle& _style) {
 	this->slotHighlightCurrentLine();
+}
+
+void ot::TextEditor::slotSelectionChanged(void) {
+	if (!m_enableSameTextHighlighting) return;
+	this->slotHighlightCurrentLine();
+}
+
+void ot::TextEditor::getCurrentLineSelection(QList<QTextEdit::ExtraSelection>& _selections) {
+	if (!isReadOnly()) {
+		QTextEdit::ExtraSelection selection;
+
+		const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
+
+		selection.format.setProperty(QTextFormat::OutlinePen, QPen(cs.getValue(OT_COLORSTYLE_VALUE_TextEditHighlightBorder).brush(), 1.));
+		selection.format.setProperty(QTextFormat::CssFloat, QVariant());
+		selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+		selection.cursor = textCursor();
+		selection.cursor.clearSelection();
+		_selections.append(selection);
+	}
+}
+
+void ot::TextEditor::addAdditionalSelections(QList<QTextEdit::ExtraSelection>& _selections) {
+	QTextCursor cursor = textCursor();
+	QString selectedText = cursor.selectedText();
+	if (!selectedText.isEmpty() && selectedText.length() >= m_sameTextHighlightingMinimum) {
+		QString emptyTest = selectedText;
+		emptyTest.remove(' ');
+		emptyTest.remove('\t');
+		emptyTest.remove('\n');
+		if (emptyTest.isEmpty()) return;
+
+		this->blockSignals(true);
+		int cursorPos = cursor.position();
+		QBrush hb = GlobalColorStyle::instance().getCurrentStyle().getValue(OT_COLORSTYLE_VALUE_TextEditHighlight).brush();
+
+		// Highlight the selected text
+		QRegularExpression regex(selectedText, QRegularExpression::PatternOption::CaseInsensitiveOption);
+		cursor.movePosition(QTextCursor::Start);
+		
+		while (!cursor.atEnd()) {
+			cursor = document()->find(regex, cursor);
+			if (!cursor.isNull()) {
+				QTextEdit::ExtraSelection selection;
+
+				selection.format.setBackground(hb);
+				selection.cursor = cursor;
+				//selection.cursor.clearSelection();
+				_selections.append(selection);
+
+				cursor.movePosition(QTextCursor::WordRight, QTextCursor::KeepAnchor);
+			}
+			else {
+				break;
+			}
+		}
+		cursor.setPosition(cursorPos);
+		this->blockSignals(false);
+	}
+	this->setExtraSelections(_selections);
 }
