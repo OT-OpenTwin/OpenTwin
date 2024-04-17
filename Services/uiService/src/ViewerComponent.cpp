@@ -214,7 +214,7 @@ void ViewerComponent::setDoublePropertyValue(const std::string& _groupName, cons
 		return;
 	}
 	
-	inp->getSpinBox()->setValue(value);
+	inp->setValue(value);
 }
 
 double ViewerComponent::getDoublePropertyValue(const std::string& _groupName, const std::string& _itemName) {
@@ -228,7 +228,7 @@ double ViewerComponent::getDoublePropertyValue(const std::string& _groupName, co
 		OT_LOG_E("PropertyInput cast failed");
 		return 0.;
 	}
-	return inp->getSpinBox()->value();
+	return inp->getValue();
 }
 
 void ViewerComponent::lockSelectionAndModification(bool flag) {

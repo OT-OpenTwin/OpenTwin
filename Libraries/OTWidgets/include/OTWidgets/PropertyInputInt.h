@@ -11,6 +11,7 @@
 namespace ot {
 
 	class SpinBox;
+	class LineEdit;
 
 	class OT_WIDGETS_API_EXPORT PropertyInputInt : public PropertyInput {
 		Q_OBJECT
@@ -25,16 +26,19 @@ namespace ot {
 		virtual Property* createPropertyConfiguration(void) const override;
 		virtual bool setupFromConfiguration(const Property* _configuration) override;
 
-		SpinBox* getSpinBox(void) const { return m_spinBox; };
-
 		void setValue(int _value);
 		int getValue(void) const;
 
+		bool hasInputError(void) const;
+
 	private Q_SLOTS:
 		void lclValueChanged(int);
+		void lclTextChanged(void);
+		void lclEditingFinishedChanged(void);
 
 	private:
 		SpinBox* m_spinBox;
+		LineEdit* m_lineEdit;
 	};
 
 }

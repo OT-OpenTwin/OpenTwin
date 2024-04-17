@@ -26,8 +26,6 @@ namespace ot {
 		virtual Property* createPropertyConfiguration(void) const override;
 		virtual bool setupFromConfiguration(const Property* _configuration) override;
 
-		DoubleSpinBox* getSpinBox(void) const { return m_spinBox; };
-
 		void setValue(double _value);
 		double getValue(void) const;
 

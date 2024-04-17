@@ -14,7 +14,7 @@
 
 static ot::PropertyInputFactoryRegistrar<ot::PropertyInputDouble> propertyInputDoubleRegistrar(OT_PROPERTY_TYPE_Double);
 
-#define OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR "?"
+#define OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR "."
 #define OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR
 
 ot::PropertyInputDouble::PropertyInputDouble()
@@ -25,7 +25,10 @@ ot::PropertyInputDouble::PropertyInputDouble()
 }
 
 ot::PropertyInputDouble::~PropertyInputDouble() {
-	delete m_spinBox;
+	if (m_spinBox) delete m_spinBox;
+	m_spinBox = nullptr;
+	if (m_lineEdit) delete m_lineEdit;
+	m_lineEdit = nullptr;
 }
 
 void ot::PropertyInputDouble::addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) {
@@ -120,8 +123,8 @@ void ot::PropertyInputDouble::lclTextChanged(void) {
 	OTAssertNullptr(m_lineEdit);
 	if (this->data().propertyFlags() & Property::HasMultipleValues) {
 		QString str = m_lineEdit->text();
-		str.remove("?");
-		if (str.isEmpty()) str = "?";
+		str.remove(OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR);
+		if (str.isEmpty()) str = OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR;
 		this->data().setPropertyFlag(Property::HasMultipleValues, false);
 
 		m_lineEdit->blockSignals(true);

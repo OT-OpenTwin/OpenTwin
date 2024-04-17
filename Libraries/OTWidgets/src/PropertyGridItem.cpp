@@ -40,7 +40,8 @@ ot::PropertyGridItem::PropertyGridItem()
 }
 
 ot::PropertyGridItem::~PropertyGridItem() {
-
+	if (m_input) delete m_input;
+	m_input = nullptr;
 }
 
 bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
