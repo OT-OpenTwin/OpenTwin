@@ -12,6 +12,7 @@
 #include "ToolManager.h"
 #include "DockManager.h"
 #include "MenuManager.h"
+#include "ImageEditor.h"
 #include "StatusManager.h"
 #include "ColorStyleEditor.h"
 #include "LogVisualization.h"
@@ -356,6 +357,7 @@ void AppBase::slotInitializeTools(void) {
 	m_toolManager->addTool(new FAR);
 	m_toolManager->addTool(new Randomizer);
 	m_toolManager->addTool(new ColorStyleEditor);
+	m_toolManager->addTool(new ImageEditor);
 
 	//m_tabWidget->addTab(m_logger->widget(), "Log Visualization");
 	//m_tabWidget->addTab(m_terminal->widget(), "OTerminal");
