@@ -2191,6 +2191,20 @@ ads--CDockAreaWidget {
     bottom: 1px;
 }
 
+ads--CDockWidget {
+    background: %color:Widget Background%;
+    border-top: 2px solid transparent;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+}
+
+
+QScrollArea#dockWidgetScrollArea {
+    padding: 0px;
+    border: none;
+}
+
 ads--CDockWidgetTab {
     border: 1px solid transparent;
     padding: 0px;
