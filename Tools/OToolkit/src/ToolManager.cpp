@@ -11,6 +11,7 @@
 #include "DockManager.h"
 #include "MenuManager.h"
 #include "StatusManager.h"
+#include "ToolBarManager.h"
 #include "ToolMenuManager.h"
 #include "ToolRuntimeHandler.h"
 
@@ -19,7 +20,7 @@
 #include "OToolkitAPI/Tool.h"
 
 // OpenTwin header
-#include "OTCore/OTAssert.h"
+#include "OTCore/Logger.h"
 
 #define TOOLMANAGER_LOG(___msg) OTOOLKIT_LOG("ToolManager", ___msg)
 #define TOOLMANAGER_LOGW(___msg) OTOOLKIT_LOGW("ToolManager", ___msg)
@@ -32,6 +33,7 @@ ToolManager::ToolManager(QMainWindow* _mainWindow)
 	m_menuManager = new MenuManager;
 	m_statusManager = new StatusManager;
 	m_dockManager = new DockManager(_mainWindow, m_menuManager);
+	m_toolBarManager = new ToolBarManager(_mainWindow);
 
 	this->connect(m_tabManager, &TabManager::currentToolChanged, this, &ToolManager::currentToolChanged);
 }
@@ -155,12 +157,24 @@ void ToolManager::runToolTriggered(void) {
 	}
 	else {
 		m_ignoreEvents = true;
-		std::list<QWidget*> status;
 		QSettings settings("OpenTwin", "OToolkit");
-		m_tabManager->addTool(it->first, it->second->tool()->runTool(tmm, status));
+		otoolkit::ToolWidgets data;
+		if (!it->second->tool()->runTool(tmm, data)) {
+			OT_LOG_W("Tool \"" + it->first.toStdString() + "\" statup failed");
+			return;
+		}
+		if (!data.rootWidget()) {
+			OT_LOG_E("Tool \"" + it->first.toStdString() + "\" did not create a root widget");
+			return;
+		}
+
+		m_tabManager->addTool(it->first, data.rootWidget());
 		it->second->setRunning();
-		m_statusManager->addTool(it->first, status);
+
+		m_statusManager->addTool(it->first, data.statusWidgets());
+		m_toolBarManager->addTool(it->first, data.toolBar());
 		it->second->tool()->restoreToolSettings(settings);
+		
 		m_ignoreEvents = false;
 	}
 }
@@ -168,6 +182,7 @@ void ToolManager::runToolTriggered(void) {
 void ToolManager::currentToolChanged(const QString& _toolName) {
 	if (m_ignoreEvents) return;
 	m_statusManager->setCurrentTool(_toolName);
+	m_toolBarManager->setCurrentTool(_toolName);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -177,4 +192,5 @@ void ToolManager::currentToolChanged(const QString& _toolName) {
 void ToolManager::fwdRemoveTool(const QString& _toolName) {
 	m_dockManager->removeTool(_toolName);
 	m_statusManager->removeTool(_toolName);
+	m_toolBarManager->removeTool(_toolName);
 }

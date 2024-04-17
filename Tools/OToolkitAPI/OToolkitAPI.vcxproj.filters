@@ -17,6 +17,9 @@
     <ClCompile Include="src\Tool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ToolWidgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OToolkitAPI\Tool.h">
@@ -29,6 +32,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OToolkitAPI\ToolActivityNotifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OToolkitAPI\ToolWidgets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

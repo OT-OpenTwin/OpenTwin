@@ -12,6 +12,7 @@
 
 // Qt header
 #include <QtCore/qobject.h>
+#include <QtWidgets/qtoolbar.h>
 
 // std header
 #include <map>
@@ -22,8 +23,12 @@ class QHBoxLayout;
 class QVBoxLayout;
 
 namespace ot {
-	
+	class ImagePreview;
 }
+
+class ImageEditorToolBar : public QToolBar {
+
+};
 
 class ImageEditor : public QObject, public otoolkit::Tool {
 	Q_OBJECT
@@ -40,12 +45,16 @@ public:
 	virtual QString toolName(void) const override { return QString("Image Editor"); };
 
 	//! @brief Create the central widget that will be displayed to the user in the main tab view
-	virtual QWidget* runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) override;
+	virtual bool runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) override;
 
 	virtual void restoreToolSettings(QSettings& _settings) override;
 
 	//! @brief Stop all the logic of this tool
 	virtual bool prepareToolShutdown(QSettings& _settings) override;
+
+	virtual void toolWasShown(void) override;
+
+	virtual void toolWasHidden(void) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -56,4 +65,7 @@ private Q_SLOTS:
 
 private:
 	QWidget* m_root;
+	ImageEditorToolBar* m_toolBar;
+	ot::ImagePreview* m_original;
+	ot::ImagePreview* m_converted;
 };

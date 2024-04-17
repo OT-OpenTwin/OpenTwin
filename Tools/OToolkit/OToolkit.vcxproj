@@ -33,6 +33,7 @@
     <ClCompile Include="src\StatusManager.cpp" />
     <ClCompile Include="src\TabManager.cpp" />
     <ClCompile Include="src\Terminal.cpp" />
+    <ClCompile Include="src\ToolBarManager.cpp" />
     <ClCompile Include="src\ToolManager.cpp" />
     <ClCompile Include="src\ToolMenuManager.cpp" />
     <ClCompile Include="src\ToolRuntimeHandler.cpp" />
@@ -45,6 +46,7 @@
     <QtMoc Include="include\FAR.h" />
     <QtMoc Include="include\Randomizer.h" />
     <QtMoc Include="include\ImageEditor.h" />
+    <ClInclude Include="include\ToolBarManager.h" />
     <ClInclude Include="include\ToolRuntimeHandler.h" />
     <QtMoc Include="include\MenuManager.h" />
     <QtMoc Include="include\ToolManager.h" />

@@ -53,9 +53,11 @@ Randomizer::~Randomizer() {
 
 // API base functions
 
-QWidget* Randomizer::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
+bool Randomizer::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	// Root
 	m_root = new QWidget;
+	_content.setRootWidget(m_root);
+
 	m_rootLayout = new QVBoxLayout(m_root);
 	m_leftTitle = new QLabel("Randomizer type");
 
@@ -141,7 +143,7 @@ QWidget* Randomizer::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidge
 	this->connect(m_addListBtn, &QPushButton::clicked, this, &Randomizer::slotAddList);
 	this->connect(m_runList, &QPushButton::clicked, this, &Randomizer::slotRunList);
 
-	return m_root;
+	return true;
 }
 
 void Randomizer::restoreToolSettings(QSettings& _settings) {

@@ -387,11 +387,13 @@ QString Terminal::toolName(void) const {
 	return "OTerminal";
 }
 
-QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
+bool Terminal::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	TERMINAL_LOG("Initializing OTerminal...");
 
 	// Create layouts
 	m_splitter = new ot::Splitter;
+	_content.setRootWidget(m_splitter);
+
 	m_splitter->setObjectName("OToolkit_Terminal_MainSplitter");
 
 	m_leftLayoutW = new QWidget;
@@ -529,7 +531,7 @@ QWidget* Terminal::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets
 	
 	TERMINAL_LOG("Terminal initialization completed");
 
-	return m_splitter;
+	return true;
 }
 
 void Terminal::restoreToolSettings(QSettings& _settings) {

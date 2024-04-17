@@ -98,7 +98,7 @@ QString LogVisualization::toolName(void) const {
 	return QString("Log Visualization");
 }
 
-QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
+bool LogVisualization::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	LOGVIS_LOG("Initializing LogVisualization...");
 
 	// Create layouts
@@ -114,6 +114,8 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 
 	// Create controls
 	ot::Splitter* splitter = new ot::Splitter;
+	_content.setRootWidget(splitter);
+
 	splitter->setOrientation(Qt::Orientation::Vertical);
 
 	QLabel* messageFilterL = new QLabel("Message contains:");
@@ -152,9 +154,9 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	m_errorCountLabel = new QLabel;
 	m_warningCountLabel = new QLabel;
 
-	_statusWidgets.push_back(m_errorCountLabel);
-	_statusWidgets.push_back(m_warningCountLabel);
-	_statusWidgets.push_back(m_messageCountLabel);
+	_content.addStatusWidget(m_errorCountLabel);
+	_content.addStatusWidget(m_warningCountLabel);
+	_content.addStatusWidget(m_messageCountLabel);
 
 	// Setup layouts
 	centralLayout->addLayout(filterLayout);
@@ -259,7 +261,7 @@ QWidget* LogVisualization::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 
 	LOGVIS_LOG("Initialization completed");
 
-	return splitter;
+	return true;
 }
 
 void LogVisualization::restoreToolSettings(QSettings& _settings) {

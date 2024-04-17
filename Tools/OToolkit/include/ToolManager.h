@@ -23,6 +23,7 @@ class TabManager;
 class DockManager;
 class MenuManager;
 class StatusManager;
+class ToolBarManager;
 
 class QMainWindow;
 
@@ -63,6 +64,7 @@ public:
 	DockManager* dockManager(void) { return m_dockManager; };
 	MenuManager* menuManager(void) { return m_menuManager; };
 	StatusManager* statusManager(void) { return m_statusManager; };
+	ToolBarManager* toolBarManager(void) { return m_toolBarManager; };
 
 private Q_SLOTS:
 	void runToolTriggered(void);
@@ -78,6 +80,7 @@ private:
 	DockManager* m_dockManager;
 	MenuManager* m_menuManager;
 	StatusManager* m_statusManager;
+	ToolBarManager* m_toolBarManager;
 
 	ToolManager() = delete;
 };

@@ -16,6 +16,7 @@
 #include "StatusManager.h"
 #include "ColorStyleEditor.h"
 #include "LogVisualization.h"
+#include "ToolBarManager.h"
 
 // OToolkitAPI header
 #include "OToolkitAPI/OToolkitAPI.h"
@@ -390,7 +391,7 @@ AppBase::AppBase(QApplication* _app) : m_mainThread(QThread::currentThreadId()),
 	m_toolManager = new ToolManager(this);
 	this->setMenuBar(m_toolManager->menuManager());
 	this->setStatusBar(m_toolManager->statusManager());
-
+	
 	// Create output
 	m_output = new QTextEdit;
 	QDockWidget* outputDock = new QDockWidget("Output");

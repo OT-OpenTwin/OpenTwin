@@ -24,13 +24,7 @@ StatusManager::StatusManager() : m_statusText("Ready"), m_statusIsError(false) {
 
 	this->addWidget(m_infoLabel);
 	this->addWidget(m_stretchLabel, 1);
-	
-	// Initialize color
-	setStyleSheet(
-		"QStatusBar{ color: white; background-color: #00A2E8; } "
-		"QLabel { color: white; }"
-	);
-	
+		
 	// Create timer
 	m_timerErrorStatusReset = new QTimer;
 	m_timerErrorStatusReset->setInterval(5000);

@@ -47,7 +47,7 @@ public:
 	virtual QString toolName(void) const override { return QString("Randomizer"); };
 
 	//! @brief Create the central widget that will be displayed to the user in the main tab view
-	virtual QWidget* runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) override;
+	virtual bool runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) override;
 
 	virtual void restoreToolSettings(QSettings& _settings) override;
 

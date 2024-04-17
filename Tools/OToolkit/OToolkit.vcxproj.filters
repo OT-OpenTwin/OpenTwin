@@ -99,6 +99,9 @@
     <ClCompile Include="src\ImageEditor.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="src\ToolBarManager.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -108,6 +111,9 @@
       <Filter>Header Files\General</Filter>
     </ClInclude>
     <ClInclude Include="include\ToolRuntimeHandler.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ToolBarManager.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
   </ItemGroup>

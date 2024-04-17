@@ -117,7 +117,7 @@ ColorStyleEditor::~ColorStyleEditor() {
 
 // API base functions
 
-QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
+bool ColorStyleEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	// Create layouts
 	ot::Splitter* rootSplitter = new ot::Splitter;
 	m_root = rootSplitter;
@@ -226,7 +226,8 @@ QWidget* ColorStyleEditor::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statu
 	this->connect(m_baseEditor, &TextEditor::saveRequested, this, &ColorStyleEditor::slotExportBase);
 	this->connect(m_baseEditor, &TextEditor::textChanged, this, &ColorStyleEditor::slotBaseChanged);
 	
-	return rootSplitter;
+	_content.setRootWidget(rootSplitter);
+	return true;
 }
 
 void ColorStyleEditor::restoreToolSettings(QSettings& _settings) {

@@ -470,7 +470,7 @@ QString FAR::toolName(void) const {
 	return "FAR";
 }
 
-QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
+bool FAR::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	m_centralSplitter = new ot::Splitter;
 	// Filter
 
@@ -602,7 +602,8 @@ QWidget* FAR::runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) {
 	this->connect(m_replaceTextBtn, &QPushButton::clicked, this, &FAR::slotReplaceText);
 	m_findModeTab->addTab(m_replaceTextLayoutW, FAR_SEARCHMODE_ReplaceText);
 
-	return m_centralSplitter;
+	_content.setRootWidget(m_centralSplitter);
+	return true;
 }
 
 void FAR::restoreToolSettings(QSettings& _settings) {

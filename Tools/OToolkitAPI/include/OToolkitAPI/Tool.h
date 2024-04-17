@@ -6,6 +6,7 @@
 #pragma once
 
 // Toolkit API
+#include "OToolkitAPI/ToolWidgets.h"
 #include "OToolkitAPI/otoolkitapi_global.h"
 
 // OpenTwin header
@@ -17,9 +18,6 @@
 #include <QtCore/qsettings.h>
 #include <QtGui/qicon.h>
 #include <QtWidgets/qmenu.h>
-
-// std header
-#include <list>
 
 class QWidget;
 
@@ -39,11 +37,13 @@ namespace otoolkit {
 		//! The name will be used to create all required menu entries
 		virtual QString toolName(void) const = 0;
 
-		//! @brief Create the central widget that will be displayed to the user in the main tab view and the tool menu
-		//! //! The menu already contains the following items:
+		//! @brief Create all widgets.
+		//! The menu already contains the following items:
 		//!   Run / Stop (Starts or stops the tool)
 		//!   [] Autorun (Autostart mode checkbox for the tool upon OToolkit start)
-		virtual QWidget* runTool(QMenu* _rootMenu, std::list<QWidget*>& _statusWidgets) = 0;
+		//! @param _rootMenu Menu where the menu controls should be added to.
+		//! @param _content The tool contents must be set here
+		virtual bool runTool(QMenu* _rootMenu, ToolWidgets& _content) = 0;
 
 		virtual void restoreToolSettings(QSettings& _settings) = 0;
 
