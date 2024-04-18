@@ -93,6 +93,7 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 			assert(blockEntity != nullptr);
 			blockEntitiesByBlockID[blockEntity->getEntityID()] = blockEntity;
 		}
+
 	}
 	return blockEntitiesByBlockID;
 }

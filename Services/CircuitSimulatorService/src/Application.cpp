@@ -251,24 +251,38 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document)
 // Trying to create more circuits
 void Application::createNewCircuit()
 {
+
 	std::string circuitName = "Circuit " + std::to_string(ottest::currentEditorID);
-	ot::GraphicsNewEditorPackage* editor = new ot::GraphicsNewEditorPackage(circuitName, circuitName);
-	ot::JsonDocument doc;
-	ot::JsonObject pckgObj;
-	editor->addToJsonObject(pckgObj, doc.GetAllocator());
+	
+		
 
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
+	if (ottest::currentEditorID == 1)
+	{
+		m_blockEntityHandler.setPackageName(circuitName);
+		m_blockEntityHandler.OrderUIToCreateBlockPicker();
+	}
+	else
+	{
+		ot::GraphicsNewEditorPackage* editor = new ot::GraphicsNewEditorPackage(circuitName, circuitName);
+		ot::JsonDocument doc;
+		ot::JsonObject pckgObj;
+		editor->addToJsonObject(pckgObj, doc.GetAllocator());
 
-	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
 
-	Circuit circuit;
-	circuit.setEditorName(editor->title());
-	circuit.setId(editor->name());
-	Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(editor->name(), circuit);
+		Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
 
-	// Message is queued, no response here
-	m_uiComponent->sendMessage(true, doc);
+		Circuit circuit;
+		circuit.setEditorName(editor->title());
+		circuit.setId(editor->name());
+		Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(editor->name(), circuit);
+
+		// Message is queued, no response here
+		m_uiComponent->sendMessage(true, doc);
+	}
+
+	
 
 	ottest::currentEditorID++;
 }
@@ -493,6 +507,7 @@ std::string Application::extractStringAfterDelimiter(const std::string& inputStr
 	else 
 	{
 		OT_LOG_E("Substring of FolderEntityName not Found!");
+		return "failed";
 	}
 }
 
@@ -737,8 +752,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton("Circuit Simulator", "Edit", "Add Circuit", "Add Circuit", ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add", "Default");
 
 	m_blockEntityHandler.setUIComponent(_ui);
-	m_blockEntityHandler.setPackageName("Circuit");
-	m_blockEntityHandler.OrderUIToCreateBlockPicker();
+	/*m_blockEntityHandler.setPackageName("Circuit");
+	m_blockEntityHandler.OrderUIToCreateBlockPicker();*/
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
