@@ -12,6 +12,7 @@
 namespace ot {
 
 	class LineEdit;
+	class PushButton;
 
 	class OT_WIDGETS_API_EXPORT PropertyInputFilePath : public PropertyInput {
 		Q_OBJECT
@@ -37,6 +38,7 @@ namespace ot {
 		PropertyFilePath::BrowseMode m_mode;
 		QWidget* m_root;
 		LineEdit* m_edit;
+		PushButton* m_find;
 		QString m_filter;
 		QString m_text;
 	};

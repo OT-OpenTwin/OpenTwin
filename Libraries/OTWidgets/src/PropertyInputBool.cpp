@@ -56,6 +56,7 @@ bool ot::PropertyInputBool::setupFromConfiguration(const Property* _configuratio
 	if (this->data().propertyFlags() & Property::HasMultipleValues) {
 		m_checkBox->setCheckState(Qt::PartiallyChecked);
 	}
+	m_checkBox->setEnabled(!(this->data().propertyFlags() & Property::IsReadOnly));
 
 	m_checkBox->blockSignals(false);
 

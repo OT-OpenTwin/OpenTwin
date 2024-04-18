@@ -184,6 +184,7 @@ bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration
 		if (this->data().propertyFlags() & Property::HasMultipleValues) {
 			m_spinBox->setSpecialValueText(OT_PROPERTY_INT_MULTIPLEVALUESTEXT);
 		}
+		m_spinBox->setReadOnly(this->data().propertyFlags() & Property::IsReadOnly);
 
 		m_spinBox->blockSignals(false);
 	}
@@ -196,6 +197,7 @@ bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration
 		if (this->data().propertyFlags() & Property::HasMultipleValues) {
 			m_lineEdit->setText(OT_PROPERTY_INT_MULTIPLEVALUESTEXT);
 		}
+		m_lineEdit->setReadOnly(this->data().propertyFlags() & Property::IsReadOnly);
 
 		m_lineEdit->blockSignals(false);
 	}

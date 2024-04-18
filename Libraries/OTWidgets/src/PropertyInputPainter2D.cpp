@@ -68,6 +68,7 @@ bool ot::PropertyInputPainter2D::setupFromConfiguration(const Property* _configu
 	if (this->data().propertyFlags() & Property::HasMultipleValues) {
 		m_button->getButton()->setText("...");
 	}
+	m_button->getButton()->setEnabled(!(this->data().propertyFlags() & Property::IsReadOnly));
 
 	m_button->blockSignals(false);
 

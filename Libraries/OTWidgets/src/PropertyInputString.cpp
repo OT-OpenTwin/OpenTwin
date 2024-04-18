@@ -69,6 +69,7 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 	else m_lineEdit->setText(m_text);
 
 	m_lineEdit->setToolTip(QString::fromStdString(this->data().propertyTip()));
+	m_lineEdit->setReadOnly(this->data().propertyFlags() & Property::IsReadOnly);
 
 	m_lineEdit->blockSignals(false);
 

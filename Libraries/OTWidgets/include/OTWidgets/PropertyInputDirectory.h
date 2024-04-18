@@ -11,6 +11,7 @@
 namespace ot {
 
 	class LineEdit;
+	class PushButton;
 
 	class OT_WIDGETS_API_EXPORT PropertyInputDirectory : public PropertyInput {
 		Q_OBJECT
@@ -35,6 +36,7 @@ namespace ot {
 	private:
 		QWidget* m_root;
 		LineEdit* m_edit;
+		PushButton* m_find;
 		QString m_text;
 	};
 

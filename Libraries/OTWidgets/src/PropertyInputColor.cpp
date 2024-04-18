@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCore/PropertyColor.h"
+#include "OTWidgets/PushButton.h"
 #include "OTWidgets/ColorPickButton.h"
 #include "OTWidgets/PropertyInputColor.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"
@@ -60,6 +61,7 @@ bool ot::PropertyInputColor::setupFromConfiguration(const Property* _configurati
 	if (this->data().propertyFlags() & Property::HasMultipleValues) {
 		m_colorBtn->replaceButtonText("...");
 	}
+	m_colorBtn->getPushButton()->setEnabled(!(this->data().propertyFlags() & Property::IsReadOnly));
 
 	m_colorBtn->blockSignals(false);
 

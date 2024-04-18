@@ -27,11 +27,11 @@ ot::PropertyInputFilePath::PropertyInputFilePath()
 	
 	rLay->addWidget(m_edit, 1);
 
-	QPushButton* btnFind = new QPushButton("Search");
-	rLay->addWidget(btnFind);
+	m_find = new PushButton("Search");
+	rLay->addWidget(m_find);
 
 	this->connect(m_edit, &QLineEdit::editingFinished, this, &PropertyInputFilePath::slotChanged);
-	this->connect(btnFind, &QPushButton::clicked, this, &PropertyInputFilePath::slotFind);
+	this->connect(m_find, &QPushButton::clicked, this, &PropertyInputFilePath::slotFind);
 }
 
 ot::PropertyInputFilePath::~PropertyInputFilePath() {
@@ -104,6 +104,8 @@ bool ot::PropertyInputFilePath::setupFromConfiguration(const Property* _configur
 		if (!m_filter.isEmpty()) m_filter.append(";;");
 		m_filter.append(QString::fromStdString(info.text) + " (" + QString::fromStdString(info.extension) + ")");
 	}
+	m_edit->setReadOnly(!(this->data().propertyFlags() & Property::IsReadOnly));
+	m_find->setEnabled(this->data().propertyFlags() & Property::IsReadOnly);
 
 	m_edit->blockSignals(false);
 

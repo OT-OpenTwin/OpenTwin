@@ -185,6 +185,7 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 		if (this->data().propertyFlags() & Property::HasMultipleValues) {
 			m_spinBox->setSpecialValueText(OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT);
 		}
+		m_spinBox->setReadOnly(this->data().propertyFlags() & Property::IsReadOnly);
 
 		m_spinBox->blockSignals(false);
 	}
@@ -197,10 +198,12 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 		if (this->data().propertyFlags() & Property::HasMultipleValues) {
 			m_lineEdit->setText(OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT);
 		}
+		m_lineEdit->setReadOnly(this->data().propertyFlags() & Property::IsReadOnly);
 
 		m_lineEdit->blockSignals(false);
 	}
 	
+
 
 	return true;
 }

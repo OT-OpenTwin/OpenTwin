@@ -69,6 +69,7 @@ bool ot::PropertyInputStringList::setupFromConfiguration(const Property* _config
 	m_comboButton->setItems(lst);
 	if (this->data().propertyFlags() & Property::HasMultipleValues) m_comboButton->setText("...");
 	else m_comboButton->setText(QString::fromStdString(actualProperty->current()));
+	m_comboButton->setEnabled(!(this->data().propertyFlags() & Property::IsReadOnly));
 
 	m_comboButton->blockSignals(false);
 

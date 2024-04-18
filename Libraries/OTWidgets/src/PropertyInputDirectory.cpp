@@ -25,11 +25,11 @@ ot::PropertyInputDirectory::PropertyInputDirectory()
 	m_edit = new LineEdit;
 	rLay->addWidget(m_edit, 1);
 
-	QPushButton* btnFind = new QPushButton("Search");
-	rLay->addWidget(btnFind);
+	m_find = new PushButton("Search");
+	rLay->addWidget(m_find);
 	
 	this->connect(m_edit, &QLineEdit::editingFinished, this, &PropertyInputDirectory::slotChanged);
-	this->connect(btnFind, &QPushButton::clicked, this, &PropertyInputDirectory::slotFind);
+	this->connect(m_find, &QPushButton::clicked, this, &PropertyInputDirectory::slotFind);
 }
 
 ot::PropertyInputDirectory::~PropertyInputDirectory() {
@@ -89,6 +89,8 @@ bool ot::PropertyInputDirectory::setupFromConfiguration(const Property* _configu
 	else {
 		m_edit->setText(m_text);
 	}
+	m_edit->setReadOnly(this->data().propertyFlags() & Property::IsReadOnly);
+	m_find->setEnabled(!(this->data().propertyFlags() & Property::IsReadOnly));
 
 	m_edit->blockSignals(false);
 

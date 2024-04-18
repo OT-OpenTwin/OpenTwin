@@ -42,6 +42,9 @@ namespace ot {
 
 		void replaceButtonText(const QString& _text);
 
+		ColorPreviewBox* getPreviewBox(void) const { return m_view; };
+		PushButton* getPushButton(void) const { return m_btn; };
+
 	Q_SIGNALS:
 		void colorChanged(void);
 
