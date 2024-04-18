@@ -225,3 +225,42 @@ const std::string& ot::components::ModelComponent::getThisServiceURL()
 {
 	return m_application->serviceURL();
 }
+
+void ot::components::ModelComponent::loadMaterialInformation()
+{
+	materialIDToNameMap.clear();
+	materialNameToIDMap.clear();
+
+	ot::UIDList materialIDList = getIDsOfFolderItemsOfType("Materials", "EntityMaterial", true);
+	
+	std::list<ot::EntityInformation> materialInformation;
+	getEntityInformation(materialIDList, materialInformation);
+
+	for (auto matItem : materialInformation)
+	{
+		materialIDToNameMap[matItem.getID()]   = matItem.getName();
+		materialNameToIDMap[matItem.getName()] = matItem.getID();
+	}
+}
+
+std::string ot::components::ModelComponent::getCurrentMaterialName(EntityPropertiesEntityList *material)
+{
+	// First, we search the material from the entityID
+	auto item = materialIDToNameMap.find(material->getValueID());
+
+	if (item != materialIDToNameMap.end())
+	{
+		// The material id still exists
+		return item->second;
+	}
+
+	// The material id does not exist, search it by name
+	if (materialNameToIDMap.count(material->getValueName()) != 0)
+	{
+		// The material does exist
+		return material->getValueName();
+	}
+
+	// The material could not be found
+	return "";
+}

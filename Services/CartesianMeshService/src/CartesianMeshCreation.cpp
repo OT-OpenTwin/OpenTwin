@@ -448,6 +448,7 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 	std::string error;
 
 	// First, we determine the materials which are assigned to the objects
+	application->modelComponent()->loadMaterialInformation();
 
 	std::map<EntityGeometry *, std::string> objectMaterialNames;
 	std::map<std::string, CartesianMeshMaterial *> materialMap;
@@ -469,17 +470,17 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 			return error;
 		}
 
-		std::string materialName = materialProperty->getValueName();
+		std::string materialName = application->modelComponent()->getCurrentMaterialName(materialProperty);
 
 		if (materialName.empty())
 		{
 			if (entity->getName().empty())
 			{
-				error = "ERROR: The background does not have a material assigned to it.\n\n";
+				error = "ERROR: The background does not have a valid material assigned to it.\n\n";
 			}
 			else
 			{
-				error = "ERROR: Object " + entity->getName() + " does not have a material assigned to it.\n\n";
+				error = "ERROR: Object " + entity->getName() + " does not have a valid material assigned to it.\n\n";
 			}
 			return error;
 		}

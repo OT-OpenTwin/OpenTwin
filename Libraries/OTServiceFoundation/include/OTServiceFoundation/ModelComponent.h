@@ -71,6 +71,9 @@ namespace ot {
 			void addNewDataEntity(UID entityID, UID entityVersion, UID entityParentID);
 			void storeNewEntities(const std::string &description, bool askForBranchCreation = true);
 
+			void loadMaterialInformation();
+			std::string getCurrentMaterialName(EntityPropertiesEntityList* material);
+
 		private:
 			
 			ApplicationBase * m_application = nullptr;
@@ -91,6 +94,9 @@ namespace ot {
 			std::list<UID> dataEntityIDList;
 			std::list<UID> dataEntityVersionList;
 			std::list<UID> dataEntityParentList;
+
+			std::map<ot::UID, std::string> materialIDToNameMap;
+			std::map<std::string, ot::UID> materialNameToIDMap;
 		};
 	} // namespace components
 } // namespace ot
