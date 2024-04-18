@@ -1480,8 +1480,6 @@ QDockWidget QTabBar::tab::top:selected {
     border-top: 1px solid rgba(0,0,0,255);
     border-top-left-radius: 10;
     border-top-right-radius: 10;
-    margin-bottom: -1px;
-    padding-bottom: 2px;
 }
 
 QTabBar::tab::top:!selected:hover,
@@ -1492,7 +1490,6 @@ QDockWidget QTabBar::tab::top:!selected:hover {
     border-bottom: 1px solid rgba(0,0,0,255);
     border-top-left-radius: 10;
     border-top-right-radius: 10;
-    padding-bottom: 2px;
 }
 
 /* TabBar ToolButton ------------------------------------------------------- */     
