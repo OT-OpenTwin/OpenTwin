@@ -1685,7 +1685,6 @@ QHeaderView::up-arrow {
 /* QTreeView */
 
 QTreeView:branch:hover {
-
     background: url('%root%/icons/transparent.png');
 }
 
@@ -1806,7 +1805,7 @@ QTreeView:disabled,
 QListView:disabled,
 QTableView:disabled,
 QColumnView:disabled {
-    background-color: rgba(255,255,255,255);
+    background-color: rgba(127,127,127,255);
     color: rgba(168,168,168,255);
 }
 
@@ -1814,8 +1813,7 @@ QTreeView:selected,
 QListView:selected,
 QTableView:selected,
 QColumnView:selected {
-    background-color: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    border-color: rgba(0,255,0,255);
 }
 
 QTreeView:focus,
@@ -1845,8 +1843,8 @@ QTreeView::item:selected:!active,
 QListView::item:selected:!active,
 QTableView::item:selected:!active,
 QColumnView::item:selected:!active {
+    background-color: rgba(0,255,0,255);
     color: rgba(0,0,0,255);
-    background-color: rgba(255,255,255,255);
 }
 
 QTreeView::item:!selected:hover,
@@ -1965,14 +1963,13 @@ QSplitter::handle {
     background-color: rgba(211,211,211,255);
     border: 1px solid rgba(168,168,168,255);
     border-radius: 2;
-    border: none;
     spacing: 1px;
     padding: 1px;
 }
 
 QSplitter::handle:hover:!pressed {
     background-color: rgba(0,215,255,255);
-    border: 1px solid rgba(0,0,0,255);
+    border: 1px solid rgba(168,168,168,255);
     border-radius: 2;
 }
 

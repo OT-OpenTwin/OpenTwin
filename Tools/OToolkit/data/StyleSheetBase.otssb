@@ -1679,7 +1679,6 @@ QHeaderView::up-arrow {
 /* QTreeView */
 
 QTreeView:branch:hover {
-
     background: url('%file:/icons/transparent.png%');
 }
 
@@ -1800,7 +1799,7 @@ QTreeView:disabled,
 QListView:disabled,
 QTableView:disabled,
 QColumnView:disabled {
-    background-color: %color:Widget Background%;
+    background-color: %color:Widget Disabled Background%;
     color: %color:Widget Disabled Foreground%;
 }
 
@@ -1808,8 +1807,7 @@ QTreeView:selected,
 QListView:selected,
 QTableView:selected,
 QColumnView:selected {
-    background-color: %color:Widget Selection Background%;
-    color: %color:Widget Selection Foreground%;
+    border-color: %color:Border Selection Color%;
 }
 
 QTreeView:focus,
@@ -1839,8 +1837,8 @@ QTreeView::item:selected:!active,
 QListView::item:selected:!active,
 QTableView::item:selected:!active,
 QColumnView::item:selected:!active {
-    color: %color:Widget Foreground%;
-    background-color: %color:Widget Background%;
+    background-color: %color:Widget Selection Background%;
+    color: %color:Widget Selection Foreground%;
 }
 
 QTreeView::item:!selected:hover,
