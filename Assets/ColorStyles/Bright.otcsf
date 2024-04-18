@@ -135,7 +135,7 @@ QCheckBox:focus {
     border: none;
 }
 
-QWidget:disabled {
+QCheckBox:disabled {
     background-color: transparent;
     color: rgba(168,168,168,255);
 }
