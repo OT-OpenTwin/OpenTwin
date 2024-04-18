@@ -1622,10 +1622,12 @@ QHeaderView::section::horizontal {
     padding-left: 4px;
     padding-right: 4px;
     border-bottom: 1px solid %color:Light Border Color%;
+    border-right: 1px solid %color:Light Border Color%;
 }
 
-QHeaderView::section::horizontal::!last {
-    border-right: 1px solid %color:Border Color%;
+QHeaderView::section::horizontal::first,
+QHeaderView::section::horizontal::only-one {
+    border-left: 1px solid %color:Light Border Color%;
 }
 
 QHeaderView::section::horizontal:disabled {
@@ -1637,12 +1639,13 @@ QHeaderView::section::vertical {
     padding-bottom: 0;
     padding-left: 4px;
     padding-right: 4px;
-    border-top: 1px solid %color:Border Color%;
+    border-bottom: 1px solid %color:Light Border Color%;
+    border-right: 1px solid %color:Light Border Color%;
 }
             
 QHeaderView::section::vertical::first,
 QHeaderView::section::vertical::only-one {
-    border-top: 1px solid %color:Border Color%;
+    border-top: 1px solid %color:Light Border Color%;
 }
 
 QHeaderView::section::vertical:disabled {
@@ -1850,8 +1853,7 @@ QColumnView::item:!selected:hover {
 }
 
 QTableCornerButton::section {
-    background-color: %color:Widget Background%;
-    color: %color:Widget Selection Foreground%;
+    background-color: %color:Title Background%;
     border: 1px solid transparent;
     border-radius: 0px;
 }
@@ -1955,16 +1957,15 @@ QSplitter {
 
 QSplitter::handle {
     background-color: %color:Input Background%;
-    border: 1px solid %color:Border Color%;
+    border: 1px solid %color:Light Border Color%;
     border-radius: %int:Splitter Border Radius%;
-    border: none;
     spacing: 1px;
     padding: 1px;
 }
 
 QSplitter::handle:hover:!pressed {
     background-color: %color:Widget Hover Background%;
-    border: 1px solid %color:Border Color%;
+    border: 1px solid %color:Light Border Color%;
     border-radius: %int:Splitter Border Radius%;
 }
 
@@ -2174,11 +2175,12 @@ ads--CDockContainerWidget {
 }
 
 ads--CDockContainerWidget > QSplitter {
-    padding: 1 0 1 0;
+    padding: 1 1 1 1;
 }
 
 ads--CDockContainerWidget ads--CDockSplitter::handle {
     background: %color:Input Background%;
+    border: 1px solid %color:Light Border Color%;
 }
 
 ads--CDockAreaWidget {

@@ -1628,10 +1628,12 @@ QHeaderView::section::horizontal {
     padding-left: 4px;
     padding-right: 4px;
     border-bottom: 1px solid rgba(168,168,168,255);
+    border-right: 1px solid rgba(168,168,168,255);
 }
 
-QHeaderView::section::horizontal::!last {
-    border-right: 1px solid rgba(0,0,0,255);
+QHeaderView::section::horizontal::first,
+QHeaderView::section::horizontal::only-one {
+    border-left: 1px solid rgba(168,168,168,255);
 }
 
 QHeaderView::section::horizontal:disabled {
@@ -1643,12 +1645,13 @@ QHeaderView::section::vertical {
     padding-bottom: 0;
     padding-left: 4px;
     padding-right: 4px;
-    border-top: 1px solid rgba(0,0,0,255);
+    border-bottom: 1px solid rgba(168,168,168,255);
+    border-right: 1px solid rgba(168,168,168,255);
 }
             
 QHeaderView::section::vertical::first,
 QHeaderView::section::vertical::only-one {
-    border-top: 1px solid rgba(0,0,0,255);
+    border-top: 1px solid rgba(168,168,168,255);
 }
 
 QHeaderView::section::vertical:disabled {
@@ -1856,8 +1859,7 @@ QColumnView::item:!selected:hover {
 }
 
 QTableCornerButton::section {
-    background-color: rgba(255,255,255,255);
-    color: rgba(0,0,0,255);
+    background-color: rgba(211,211,211,255);
     border: 1px solid transparent;
     border-radius: 0px;
 }
@@ -1961,7 +1963,7 @@ QSplitter {
 
 QSplitter::handle {
     background-color: rgba(211,211,211,255);
-    border: 1px solid rgba(0,0,0,255);
+    border: 1px solid rgba(168,168,168,255);
     border-radius: 2;
     border: none;
     spacing: 1px;
@@ -2180,11 +2182,12 @@ ads--CDockContainerWidget {
 }
 
 ads--CDockContainerWidget > QSplitter {
-    padding: 1 0 1 0;
+    padding: 1 1 1 1;
 }
 
 ads--CDockContainerWidget ads--CDockSplitter::handle {
     background: rgba(211,211,211,255);
+    border: 1px solid rgba(168,168,168,255);
 }
 
 ads--CDockAreaWidget {
