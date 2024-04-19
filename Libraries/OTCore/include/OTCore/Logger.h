@@ -418,7 +418,7 @@ namespace ot {
 	public:
 		static LogDispatcher& instance(void);
 		static LogDispatcher& initialize(const std::string& _serviceName, bool _addCoutReceiver = false);
-		static inline bool mayLog(LogFlag _flags) { return ((_flags & LogDispatcher::instance().m_logFlags) == _flags); };
+		static inline bool mayLog(LogFlag _flags) { return ((_flags & LogDispatcher::instance().m_logFlags.data()) == _flags); };
 
 		// #################################################################################
 
