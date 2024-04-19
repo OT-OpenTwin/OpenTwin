@@ -59,7 +59,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitResistor::CreateBlockCfg()
 	//Then I create a layout
 	ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
 
-	myLayout->setMinimumSize(ot::Size2DD(150.0, 150.0));
+	myLayout->setMinimumSize(ot::Size2DD(150.0, 50.0));
 	myStack->addItemTop(myLayout, true, false);
 
 

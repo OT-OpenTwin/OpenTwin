@@ -254,9 +254,9 @@ void Application::createNewCircuit()
 
 	std::string circuitName = "Circuit " + std::to_string(ottest::currentEditorID);
 	
-		
+	std::list<std::string> circuits= m_modelComponent->getListOfFolderItems("Circuits", false);
 
-	if (ottest::currentEditorID == 1)
+	if (circuits.empty() == true)
 	{
 		m_blockEntityHandler.setPackageName(circuitName);
 		m_blockEntityHandler.OrderUIToCreateBlockPicker();
