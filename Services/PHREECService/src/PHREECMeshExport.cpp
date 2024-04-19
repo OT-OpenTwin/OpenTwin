@@ -37,6 +37,8 @@ PHREECMeshExport::~PHREECMeshExport()
 std::string PHREECMeshExport::exportMeshData(const std::string &dataBaseURL, const std::string &projectName, unsigned long long meshEntityID, const std::string &outputFileBase, ot::components::ModelComponent *modelComponent)
 {
 //	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
+	// Load the material information
+	application->modelComponent()->loadMaterialInformation();
 
 	std::string error;
 
@@ -373,17 +375,13 @@ std::string PHREECMeshExport::prefetchTetList(const std::string &dataBaseURL, co
 	auto bsonObj = meshItemDocView["Properties"].get_document();
 	std::string propertiesJSON = bsoncxx::to_json(bsonObj);
 	EntityProperties properties;
-	ot::PropertyGridCfg cfg;
-	ot::JsonDocument cfgDoc;
-	cfgDoc.fromJson(propertiesJSON);
-	cfg.setFromJsonObject(cfgDoc.GetConstObject());
-	properties.buildFromConfiguration(cfg);
+	properties.buildFromJSON(propertiesJSON);
 
 	EntityPropertiesEntityList *materialProperty = dynamic_cast<EntityPropertiesEntityList*>(properties.getProperty("Material"));
 
 	if (materialProperty != nullptr)
 	{
-		std::string materialName = materialProperty->getValueName();
+		std::string materialName = application->modelComponent()->getCurrentMaterialName(materialProperty);
 
 		objectMaterialList.push_back(std::pair<std::string, std::string>(meshItemName, materialName));
 	}
