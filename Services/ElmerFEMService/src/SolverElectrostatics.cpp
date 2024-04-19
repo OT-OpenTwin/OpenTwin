@@ -12,11 +12,11 @@
 
 #include <cassert>
 
-void SolverElectrostatics::writeInputFile(std::ofstream& _controlFile)
+void SolverElectrostatics::writeInputFile(std::ofstream& _controlFile, Application *app)
 {
     // Get map of all materials and their corresponding objects
     std::map<std::string, std::list<std::string>> materialsToObjectsMap;
-    getMaterialsToObjectsMap(materialsToObjectsMap);
+    getMaterialsToObjectsMap(materialsToObjectsMap, app);
 
     // Get map of all shapes with potential definition
     std::map<std::string, double> potentialDefinitions;
@@ -80,7 +80,7 @@ void SolverElectrostatics::convertResults(const std::string& tempDirPath, Applic
     convertEfield(tempDirPath, app, solverEntity, globalVisualizationMeshID, globalVisualizationMeshVersion);
 }
 
-void SolverElectrostatics::getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap)
+void SolverElectrostatics::getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, Application *app)
 {
     // Here we need to loop through all mesh items and their properties and get their materials
     for (auto item : entityProperties)
@@ -91,7 +91,7 @@ void SolverElectrostatics::getMaterialsToObjectsMap(std::map<std::string, std::l
 
             if (materialProperty != nullptr)
             {
-                std::string materialName = materialProperty->getValueName();
+                std::string materialName = app->modelComponent()->getCurrentMaterialName(materialProperty);
                 materialsToObjectsMap[materialName].push_back(meshItemInfo[item.first].getName());
             }
         }

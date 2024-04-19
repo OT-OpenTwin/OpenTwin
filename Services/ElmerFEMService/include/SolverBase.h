@@ -30,7 +30,7 @@ public:
 				 std::map<ot::UID, EntityProperties>& _entityProperties, std::map<std::string, size_t>& _groupNameToIdMap,
 				 std::map<std::string, EntityProperties>& _materialProperties);
 
-	virtual void writeInputFile(std::ofstream& controlFile) = 0;
+	virtual void writeInputFile(std::ofstream& controlFile, Application *app) = 0;
 	virtual std::string runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent) = 0;
 	virtual void convertResults(const std::string& tempDirPath, Application* app, EntityBase *solverEntity) = 0;
 

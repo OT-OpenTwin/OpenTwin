@@ -9,12 +9,12 @@ public:
 	SolverElectrostatics() {}
 	virtual ~SolverElectrostatics() {}
 
-	virtual void writeInputFile(std::ofstream& controlFile) override;
+	virtual void writeInputFile(std::ofstream& controlFile, Application *app) override;
 	virtual std::string runSolver(const std::string& tempDirPath, ot::components::UiComponent* uiComponent) override;
 	virtual void convertResults(const std::string& tempDirPath, Application* app, EntityBase* solverEntity) override;
 
 private:
-	void getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap);
+	void getMaterialsToObjectsMap(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, Application *app);
 	void getPotentialDefinitions(std::map<std::string, double>& potentialDefinitions);
 	void buildMaterialAliases(std::map<std::string, std::list<std::string>>& materialsToObjectsMap, std::map<std::string, std::string>& materialNameToAliasMap);
 	void buildPotentialAliases(std::map<std::string, double>& potentialDefinitions, std::map<std::string, std::string>& potentialNameToAliasMap);

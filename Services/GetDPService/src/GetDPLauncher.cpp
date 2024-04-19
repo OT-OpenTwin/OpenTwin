@@ -95,7 +95,7 @@ std::string GetDPLauncher::startSolver(std::string &logFileText, const std::stri
 		std::ofstream controlFile(controlFileName);
 		
 		solver->setData(solverEntity, meshDataName, meshItemInfo, entityProperties, groupNameToIdMap, materialProperties);
-		solver->writeInputFile(controlFile);
+		solver->writeInputFile(controlFile, application);
 		controlFile.close();
 
 		// Run the solver
@@ -148,6 +148,8 @@ void GetDPLauncher::readMeshItemInfo(ot::UID meshDataID, std::map<ot::UID, ot::E
 
 void GetDPLauncher::readMaterialProperties(std::map<std::string, EntityProperties>& materialProperties)
 {
+	application->modelComponent()->loadMaterialInformation();
+
 	std::map<ot::UID, EntityProperties> entityProperties;
 	application->modelComponent()->getEntityProperties("Materials", true, "", entityProperties);
 
