@@ -68,7 +68,7 @@ std::string ModelBuilder::checkMaterialAssignmentForShapes(std::list<EntityGeome
 
 		if (!materialError)
 		{
-			if (material->getValueName().empty())
+			if (application->modelComponent()->getCurrentMaterialName(material).empty())
 			{
 				materialError = true;
 			}
@@ -98,7 +98,7 @@ std::string ModelBuilder::checkMaterialAssignmentForBoundingSphere(Properties &p
 
 		if (properties.getBoundingSphereMaterial() != nullptr)
 		{
-			material = properties.getBoundingSphereMaterial()->getValueName();
+			material = application->modelComponent()->getCurrentMaterialName(properties.getBoundingSphereMaterial());
 		}
 
 		if (material.empty())
@@ -266,7 +266,7 @@ double ModelBuilder::getMeshPriority(EntityBase *entity, MaterialManager &materi
 	EntityPropertiesEntityList *materialProperty = dynamic_cast<EntityPropertiesEntityList*>(entity->getProperties().getProperty("Material"));
 	if (materialProperty != nullptr)
 	{
-		EntityMaterial *material = materialManager.getMaterial(materialProperty->getValueName());
+		EntityMaterial *material = materialManager.getMaterial(application->modelComponent()->getCurrentMaterialName(materialProperty));
 		if (material != nullptr)
 		{
 			EntityPropertiesDouble *meshMaterialPriorityProperty = dynamic_cast<EntityPropertiesDouble*>(material->getProperties().getProperty("Mesh priority"));

@@ -12,6 +12,8 @@
 
 void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometryEntities, Properties &properties)
 {
+	application->modelComponent()->loadMaterialInformation();
+
 	std::list<std::string> materialNames;
 
 	// First, we determine a list of all materials which are used by the shapes considered for meshing
@@ -21,12 +23,12 @@ void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometr
 
 		if (materialProperty != nullptr)
 		{
-			if (materialProperty->getValueName().empty())
+			if (application->modelComponent()->getCurrentMaterialName(materialProperty).empty())
 			{
 				throw std::string("ERROR: No material defined for shape: " + entity->getName() + "\n\n");
 			}
 
-			materialNames.push_back(materialProperty->getValueName());
+			materialNames.push_back(application->modelComponent()->getCurrentMaterialName(materialProperty));
 		}
 	}
 
@@ -35,12 +37,12 @@ void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometr
 	{
 		if (properties.getBoundingSphereMaterial() != nullptr)
 		{
-			if (properties.getBoundingSphereMaterial()->getValueName().empty())
+			if (application->modelComponent()->getCurrentMaterialName(properties.getBoundingSphereMaterial()).empty())
 			{
 				throw std::string("ERROR: No material defined for background sphere\n\n");
 			}
 
-			materialNames.push_back(properties.getBoundingSphereMaterial()->getValueName());
+			materialNames.push_back(application->modelComponent()->getCurrentMaterialName(properties.getBoundingSphereMaterial()));
 		}
 	}
 
