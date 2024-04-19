@@ -5087,16 +5087,18 @@ void Model::updateModelStateForUndoRedo(void)
 
 void Model::showByMaterial(void)
 {
-	// Get a list of selected materials
-	std::list<std::string> selectedMaterials;
+	// Get a list of all selected materials
+	std::map<std::string, ot::UID> materialNameToIDMap;
+	std::map<ot::UID, std::string> materialIdToNameMap;
 
 	for (auto selEntityID : selectedModelEntityIDs)
 	{
-		EntityMaterial *entityMaterial = dynamic_cast<EntityMaterial*>(getEntity(selEntityID));
+		EntityMaterial* entityMaterial = dynamic_cast<EntityMaterial*>(getEntity(selEntityID));
 
 		if (entityMaterial != nullptr)
 		{
-			selectedMaterials.push_back(entityMaterial->getName());
+			materialNameToIDMap[entityMaterial->getName()] = entityMaterial->getEntityID();
+			materialIdToNameMap[entityMaterial->getEntityID()] = entityMaterial->getName();
 		}
 	}
 
@@ -5128,7 +5130,7 @@ void Model::showByMaterial(void)
 			if (material != nullptr)
 			{
 				// This entity has a material property assigned
-				if (selectedMaterials.empty())
+				if (materialNameToIDMap.empty())
 				{
 					// This entity will be visible, if the material is still undefined
 					if (material->getValueName().empty())
@@ -5143,17 +5145,21 @@ void Model::showByMaterial(void)
 				else
 				{
 					// This entity will be visible, if its material matches any one of the selected materials
-					bool materialFound = false;
-					for (auto selMat : selectedMaterials)
+					ot::UID materialID = 0;
+
+					if (materialIdToNameMap.count(material->getValueID()) != 0)
 					{
-						if (material->getValueName() == selMat)
+						materialID = material->getValueID();
+					}
+					else
+					{
+						if (materialNameToIDMap.count(material->getValueName()) != 0)
 						{
-							materialFound = true;
-							break;
+							materialID = materialNameToIDMap[material->getValueName()];
 						}
 					}
 
-					if (materialFound)
+					if (materialID != 0)
 					{
 						visible.push_back(geometryEntity->getEntityID());
 					}
@@ -5161,8 +5167,11 @@ void Model::showByMaterial(void)
 					{
 						hidden.push_back(geometryEntity->getEntityID());
 					}
-
 				}
+			}
+			else
+			{
+				hidden.push_back(geometryEntity->getEntityID());
 			}
 		}
 	}
@@ -5182,7 +5191,8 @@ void Model::setShapeVisibility(std::list<ot::UID> &visibleEntityIDs, std::list<o
 void Model::showMaterialMissing(void)
 {
 	// Get a list of all materials materials
-	std::map<std::string, bool> allMaterials;
+	std::map<std::string, ot::UID> materialNameToIDMap;
+	std::map<ot::UID, std::string> materialIdToNameMap;
 
 	for (auto entity : entityMap)
 	{
@@ -5190,7 +5200,8 @@ void Model::showMaterialMissing(void)
 
 		if (entityMaterial != nullptr)
 		{
-			allMaterials[entity.second->getName()] = true;
+			materialNameToIDMap[entity.second->getName()] = entity.second->getEntityID();
+			materialIdToNameMap[entity.second->getEntityID()] = entity.second->getName();
 		}
 	}
 
@@ -5221,7 +5232,21 @@ void Model::showMaterialMissing(void)
 
 			if (material != nullptr)
 			{
-				if (allMaterials.count(material->getValueName()) > 0)
+				bool materialExists = false;
+
+				if (materialIdToNameMap.count(material->getValueID()) != 0)
+				{
+					materialExists = true;
+				}
+				else
+				{
+					if (materialNameToIDMap.count(material->getValueName()) != 0)
+					{
+						materialExists = true;
+					}
+				}
+
+				if (materialExists)
 				{
 					hidden.push_back(geometryEntity->getEntityID());
 				}
@@ -5229,6 +5254,13 @@ void Model::showMaterialMissing(void)
 				{
 					visible.push_back(geometryEntity->getEntityID());
 				}
+			}
+		}
+		else
+		{
+			if (entity.second != nullptr)
+			{
+				hidden.push_back(entity.second->getEntityID());
 			}
 		}
 	}
