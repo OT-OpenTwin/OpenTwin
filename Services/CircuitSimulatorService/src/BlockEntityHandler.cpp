@@ -202,11 +202,10 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		topologyEntityVersionList.push_back(connectionEntity->getEntityStorageVersion());
 
 
-		/*if (blockEntitiesByBlockID.find(connection.getOriginUid()) != blockEntitiesByBlockID.end())
+		if (blockEntitiesByBlockID.find(connection.getOriginUid()) != blockEntitiesByBlockID.end())
 		{
-			auto& blockEntity = blockEntitiesByBlockID[connection.getOriginUid()];
-
-			originConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.originConnectable());
+			blockEntitiesByBlockID[connection.getOriginUid()]->AddConnection(connectionEntity->getEntityID());
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.getOriginUid()]);
 		}
 		else
 		{
@@ -216,39 +215,17 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 
 		if (blockEntitiesByBlockID.find(connection.getDestinationUid()) != blockEntitiesByBlockID.end())
 		{
-			auto& blockEntity = blockEntitiesByBlockID[connection.getDestinationUid()];
-			destConnectorIsTypeOut = connectorHasTypeOut(blockEntity, connection.destConnectable());
+			blockEntitiesByBlockID[connection.getDestinationUid()]->AddConnection(connectionEntity->getEntityID());
+			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.getDestinationUid()]);
 		}
 		else
 		{
 			OT_LOG_EAS("Could not create connection since block " + std::to_string(connection.getDestinationUid()) + " was not found.");
 			continue;
-		}*/
+		}
 
-		/*if (originConnectorIsTypeOut != destConnectorIsTypeOut)
-		{*/
-			blockEntitiesByBlockID[connection.getOriginUid()]->AddConnection(connectionEntity->getEntityID());
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.getOriginUid()]);
-			blockEntitiesByBlockID[connection.getDestinationUid()]->AddConnection(connectionEntity->getEntityID());
-			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.getDestinationUid()]);
 
-			/*auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(name);*/
-			/*Connection conn(connection);
-			
-			conn.setNodeNumber(std::to_string(NodeNumbers::nodeNumber++));
-
-			it->second.addConnection(connection.originUid(),conn);
-			it->second.addConnection(connection.destUid(),conn);*/
-
-		/*}
-		else
-		{
-			_uiComponent->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
-		}*/
 	}
-
-	
-
 
 	
 
@@ -325,7 +302,7 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	return pckg;
 }
 
-void BlockEntityHandler::createResultCurves(std::string simulationType,std::string circuitName)
+void BlockEntityHandler::createResultCurves(std::string solverName,std::string simulationType,std::string circuitName)
 {
 	
 		std::map<std::string, std::vector<double>> resultVectors = SimulationResults::getInstance()->getResultMap();
@@ -380,6 +357,7 @@ void BlockEntityHandler::createResultCurves(std::string simulationType,std::stri
 			resultVectors.erase(it);
 		}
 
+		std::string _curveFolderPath = solverName + "/" + circuitName + "/" + "1D/Curves";
 
 		// No i want to get the node vectors of voltage and for each of them i create a curve
 		for (auto it : resultVectors)
@@ -393,7 +371,7 @@ void BlockEntityHandler::createResultCurves(std::string simulationType,std::stri
 			if (simulationType == ".dc")
 			{
 				curveName = it.first + "-DC";
-				fullCurveName = _curveFolderPath + "/" + circuitName + "/" + curveName;
+				fullCurveName = _curveFolderPath + "/" + curveName;
 				xLabel = "sweep";
 				xUnit = "V";
 				yUnit = "V";
@@ -402,7 +380,7 @@ void BlockEntityHandler::createResultCurves(std::string simulationType,std::stri
 			else if (simulationType == ".TRAN")
 			{
 				curveName = it.first + "-TRAN";
-				fullCurveName = _curveFolderPath + "/" + circuitName + "/" + curveName;
+				fullCurveName = _curveFolderPath +  "/" + curveName;
 				xLabel = "time";
 				xUnit = "ms";
 				yUnit = "V";
@@ -410,7 +388,7 @@ void BlockEntityHandler::createResultCurves(std::string simulationType,std::stri
 			else
 			{
 				curveName = it.first + "-AC";
-				fullCurveName = _curveFolderPath + "/" + circuitName + "/" + curveName;
+				fullCurveName = _curveFolderPath +  "/" + curveName;
 				xLabel = "frequency";
 				xUnit = "hz";
 				yUnit = "V";
@@ -429,8 +407,8 @@ void BlockEntityHandler::createResultCurves(std::string simulationType,std::stri
 		}
 	
 		//Here i create the plot for all the curves
-		const std::string _plotName = simulationType + "-Simulation";
-		const std::string plotFolder = _resultFolder + "1D/Plots/" + circuitName + "/";
+		const std::string _plotName = "/" + simulationType + "-Simulation";
+		const std::string plotFolder = solverName + "/" + circuitName;
 		const std::string fullPlotName = plotFolder + _plotName;
 
 		//Creating the Plot Entity

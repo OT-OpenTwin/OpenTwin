@@ -28,7 +28,7 @@ public:
 	NGSpice m_ngSpice;
 
 	//Function for resultCurves of Simulation
-	void createResultCurves(std::string simulationType,std::string circuitName);
+	void createResultCurves(std::string solverName,std::string simulationType,std::string circuitName);
 
 	//Setter
 	void setPackageName(std::string name);
@@ -38,8 +38,7 @@ public:
 private:
 	const std::string _blockFolder = "Circuits";
 	std::string _packageName = "Circuit Simulator";
-	std::string _resultFolder = ot::FolderNames::ResultFolder + "/";
-	const std::string _curveFolderPath = _resultFolder + "1D/Curves";
+	
 
 	void InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity);
 	ot::GraphicsNewEditorPackage* BuildUpBlockPicker();
