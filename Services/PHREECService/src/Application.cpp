@@ -71,7 +71,7 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
-	enableMessageQueuing("uiService", true);
+	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
 	_ui->addMenuPage("PHREEC");
 	_ui->addMenuPage("Model");
@@ -88,7 +88,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	
 	modelSelectionChangedNotification();
 
-	enableMessageQueuing("uiService", false);
+	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)

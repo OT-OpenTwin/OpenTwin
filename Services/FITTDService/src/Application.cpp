@@ -105,7 +105,7 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
-	enableMessageQueuing("uiService", true);
+	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	const std::string pageName = "FIT-TD";
 	
 	_ui->addMenuPage(pageName);
@@ -136,7 +136,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	modelSelectionChanged();
 
-	enableMessageQueuing("uiService", false);
+	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
 // ##################################################################################################################################

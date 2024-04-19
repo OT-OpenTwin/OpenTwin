@@ -91,7 +91,7 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
-	//enableMessageQueuing("uiService", true);
+	//enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
 	//_ui->addMenuPage("Post Processing");
 
@@ -102,7 +102,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	//_ui->addMenuButton("Post Processing", "Visualization", "Add 2D Plot", "Add 2D Plot", modelWrite, "Add 2D Plot", "Default");
 	
-	//enableMessageQueuing("uiService", false);
+	//enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)

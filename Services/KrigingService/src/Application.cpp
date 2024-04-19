@@ -99,7 +99,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	OT_LOG_D("Called..."); // todo: remove debug code
 
-	enableMessageQueuing("uiService", true);
+	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
 
 	_ui->addMenuPage("Post Processing");
@@ -122,7 +122,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	modelSelectionChangedNotification();
 
-	enableMessageQueuing("uiService", false);
+	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)
