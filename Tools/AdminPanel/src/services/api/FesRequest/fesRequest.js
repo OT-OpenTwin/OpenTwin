@@ -8,7 +8,7 @@ const fesRequest = (props) => {
     axios({ method, mode, headers, data, url }).then(
       (response) => {
         const result =
-          response?.status === 200 && response.data ? response.data : response;
+          response?.status === 200 ? response.data : response;
         resolve(result);
       },
       (error) => {

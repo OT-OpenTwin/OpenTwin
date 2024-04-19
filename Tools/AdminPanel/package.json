@@ -4,33 +4,33 @@
   "private": true,
   "proxy": "https://127.0.0.1:8092/",
   "dependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5",
-    "@fontsource/roboto": "^4.5.8",
+    "@emotion/styled": "^11.11.5",
+    "@fontsource/roboto": "^5.0.12",
     "@material-ui/styles": "^4.11.5",
-    "@mui/icons-material": "^5.11.0",
-    "@mui/material": "^5.11.0",
-    "@mui/styled-engine-sc": "^5.11.0",
-    "@mui/x-data-grid": "^5.17.16",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "axios": "^1.2.1",
+    "@mui/icons-material": "^5.15.15",
+    "@mui/material": "^5.15.15",
+    "@mui/styled-engine-sc": "^6.0.0-alpha.18",
+    "@mui/x-data-grid": "^7.3.0",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^15.0.2",
+    "@testing-library/user-event": "^14.5.2",
+    "axios": "^1.6.8",
     "bootstrap": "^5.2.3",
     "formik": "^2.2.9",
-    "i18next": "^22.4.5",
-    "node-sass": "^8.0.0",
+    "i18next": "^23.11.2",
+    "node-sass": "^9.0.0",
     "react": "^18.2.0",
-    "react-bootstrap": "^2.7.0",
+    "react-bootstrap": "^2.10.2",
     "react-dom": "^18.2.0",
-    "react-i18next": "^12.1.1",
+    "react-i18next": "^14.1.0",
     "react-scripts": "5.0.1",
     "reactstrap": "^9.1.5",
-    "recharts": "^2.2.0",
-    "styled-components": "^5.3.6",
-    "web-vitals": "^2.1.4",
-    "yup": "^0.32.11",
-	"@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "recharts": "^2.12.5",
+    "styled-components": "^6.1.8",
+    "web-vitals": "^3.5.2",
+    "yup": "^1.4.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -57,6 +57,6 @@
     ]
   },
   "devDependencies": {
-    "react-router-dom": "^6.4.4"
+    "react-router-dom": "^6.22.3"
   }
 }
