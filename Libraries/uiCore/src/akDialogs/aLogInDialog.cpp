@@ -92,6 +92,7 @@ ak::aLogInDialog::aLogInDialog(
 	// Check if required to create save password
 	if (m_showSavePassword) {
 		m_savePassword = new aCheckBoxWidget("Save password");
+		m_savePassword->setObjectName("LogInDialogSavePassword");
 		m_savePassword->setChecked(true);
 		m_gridLayout->addWidget(m_savePassword, m_rowCounter++, 1);
 	}

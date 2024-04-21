@@ -145,10 +145,14 @@ QCheckBox::indicator:unchecked {
 }
 
 QCheckBox::indicator:unchecked:hover,
-QCheckBox::indicator:unchecked:focus,
-QCheckBox::indicator:unchecked:pressed {
+QCheckBox::indicator:unchecked:focus {
     border: none;
     image: url('%file:/icons/checkbox_unchecked_focus.png%');
+}
+
+QCheckBox::indicator:unchecked:pressed {
+    border: none;
+    image: url('%file:/icons/checkbox_unchecked_pressed.png%');
 }
 
 QCheckBox::indicator:unchecked:disabled {
@@ -160,10 +164,14 @@ QCheckBox::indicator:checked {
 }
 
 QCheckBox::indicator:checked:hover,
-QCheckBox::indicator:checked:focus,
-QCheckBox::indicator:checked:pressed {
+QCheckBox::indicator:checked:focus {
     border: none;
     image: url('%file:/icons/checkbox_checked_focus.png%');
+}
+
+QCheckBox::indicator:checked:pressed {
+    border: none;
+    image: url('%file:/icons/checkbox_checked_pressed.png%');
 }
 
 QCheckBox::indicator:checked:disabled {
@@ -179,9 +187,12 @@ QCheckBox::indicator:indeterminate:disabled {
 }
 
 QCheckBox::indicator:indeterminate:focus,
-QCheckBox::indicator:indeterminate:hover,
-QCheckBox::indicator:indeterminate:pressed {
+QCheckBox::indicator:indeterminate:hover {
     image: url('%file:/icons/checkbox_indeterminate_focus.png%');
+}
+
+QCheckBox::indicator:indeterminate:pressed {
+    image: url('%file:/icons/checkbox_indeterminate_pressed.png%');
 }
 
 /* ##################################################################################### */
@@ -2116,6 +2127,91 @@ QAbstractView:selected {
     border-radius: 0;
     text-align: left;
 }
+
+QCheckBox#LogInDialogSavePassword {
+    background-color: transparent;
+    color: white;
+    spacing: 4px;
+    outline: none;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+    
+QCheckBox#LogInDialogSavePassword:focus {
+    border: none;
+}
+
+QCheckBox#LogInDialogSavePassword:disabled {
+    background-color: transparent;
+    color: lightgray;
+}
+
+QCheckBox#LogInDialogSavePassword::indicator {
+    margin-left: 2px;
+    height: 14px;
+    width: 14px;
+}
+ 
+QCheckBox#LogInDialogSavePassword::indicator:unchecked {
+    image: url('%file:/icons/log_in_checkbox_unchecked.png%');
+}
+
+QCheckBox#LogInDialogSavePassword::indicator:unchecked:hover,
+QCheckBox#LogInDialogSavePassword::indicator:unchecked:focus {
+    border: none;
+    image: url('%file:/icons/log_in_checkbox_unchecked_focus.png%');
+}
+
+QCheckBox#LogInDialogSavePassword::indicator:unchecked:pressed {
+    border: none;
+    image: url('%file:/icons/log_in_checkbox_unchecked_pressed.png%');
+}
+
+QCheckBox#LogInDialogSavePassword::indicator:unchecked:disabled {
+    image: url('%file:/icons/log_in_checkbox_unchecked_disabled.png%');
+}
+
+QCheckBox#LogInDialogSavePassword::indicator:checked {
+    image: url('%file:/icons/log_in_checkbox_checked.png%');
+}
+
+QCheckBox#LogInDialogSavePassword::indicator:checked:hover,
+QCheckBox#LogInDialogSavePassword::indicator:checked:focus {
+    border: none;
+    image: url('%file:/icons/log_in_checkbox_checked_focus.png%');
+}
+
+QCheckBox#LogInDialogSavePassword::indicator:checked:pressed {
+    border: none;
+    image: url('%file:/icons/log_in_checkbox_checked_pressed.png%');
+}
+
+QCheckBox#LogInDialogSavePassword::indicator:checked:disabled {
+    border: none;
+    image: url('%file:/icons/log_in_checkbox_checked_disabled.png%');
+}
+
+QCheckBox#LogInDialogSavePassword::indicator:indeterminate {
+    border: none;
+    image: url('%file:/icons/log_in_checkbox_indeterminate.png%');
+}
+
+QCheckBox#LogInDialogSavePassword::indicator:indeterminate:disabled {
+    border: none;
+    image: url('%file:/icons/log_in_checkbox_indeterminate_disabled.png%');
+}
+
+QCheckBox#LogInDialogSavePassword::indicator:indeterminate:focus,
+QCheckBox#LogInDialogSavePassword::indicator:indeterminate:hover {
+    border: none;
+    image: url('%file:/icons/log_in_checkbox_indeterminate_focus.png%');
+}
+
+QCheckBox#LogInDialogSavePassword::indicator:indeterminate:pressed {
+    border: none;
+    image: url('%file:/icons/log_in_checkbox_indeterminate_pressed.png%');
+}
+
 
 /* ##################################################################################### */
 
