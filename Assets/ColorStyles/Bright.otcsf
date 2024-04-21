@@ -868,6 +868,7 @@ QLabel {
 }
 
 QLabel:disabled {
+    background-color: transparent;
     color: rgba(168,168,168,255);
 }
 

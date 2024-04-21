@@ -862,6 +862,7 @@ QLabel {
 }
 
 QLabel:disabled {
+    background-color: transparent;
     color: %color:Widget Disabled Foreground%;
 }
 
