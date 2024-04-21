@@ -10,6 +10,7 @@
 #include "EntityBlockCircuitResistor.h"
 #include "EntityBlockConnection.h"
 #include "EntityBlockCircuitDiode.h"
+#include "EntityBlockCircuitVoltageMeter.h"
 //Third Party Header
 #include <string>
 #include <algorithm>
@@ -26,6 +27,88 @@ void NGSpice::clearBufferStructure(std::string name)
 	this->getMapOfCircuits().find(name)->second.getMapOfElements().clear();
 	SimulationResults::getInstance()->getResultMap().clear();
 
+}
+
+std::string NGSpice::getNodeNumbersOfVoltageMeter(std::string editorName, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID)
+{
+	std::string nodeNumberString = "";
+	std::string nodes;
+	
+	//First i go through all Entities to find the Voltage Meter
+	for (auto& blockEntityByID : allEntitiesByBlockID)
+	{
+	
+		if (blockEntityByID.second->getBlockTitle() == "Voltage Meter")
+		{
+			//When found i go through its all connections 
+			std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
+			auto connections = blockEntity->getAllConnections();
+			for (auto connectionID : connections)
+			{
+				// now i want to find the connector and after it through this connection i would like to find the other connection with the node number
+				std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connectionID);
+				ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
+				std::string connectorName = connectionCfg.destConnectable();
+
+				std::shared_ptr<EntityBlock> block = allEntitiesByBlockID.at(connectionCfg.getDestinationUid());
+				auto connections2 = block->getAllConnections();
+				for (auto connectionID2 : connections2)
+				{
+
+					auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName);
+					auto element = it->second.getMapOfElements().find(connectionCfg.getDestinationUid());
+					
+					for (auto conn : element->second.getList())
+					{
+						
+						if (conn.originConnectable() == connectorName || conn.destConnectable() == connectorName)
+						{
+							if (conn.getNodeNumber() != "voltageMeterConnection")
+							{
+								size_t position = nodes.find(conn.getNodeNumber());
+								if (position != std::string::npos)
+								{
+									continue;
+								}
+								else
+								{
+									size_t pos = nodes.find(",");
+									if (pos == std::string::npos)
+									{
+										nodes += conn.getNodeNumber() + ",";
+									}
+									else
+									{
+										nodes += conn.getNodeNumber();
+									}
+									
+									
+								}
+								
+							}
+							else
+							{
+								continue;
+							}
+						}
+						
+					}
+					
+					
+					
+					
+				}
+
+			}
+
+			nodeNumberString = "v(";
+			nodeNumberString += nodes;
+			nodeNumberString += ")";
+
+			return nodeNumberString;
+
+		}
+	}
 }
 
 
@@ -65,6 +148,10 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto myElement = dynamic_cast<EntityBlockCircuitDiode*>(blockEntity.get());
 			element.setValue(myElement->getElementType());
 		}
+		else if (blockEntity->getBlockTitle() == "Voltage Meter")
+		{
+			auto myElement = dynamic_cast<EntityBlockCircuitVoltageMeter*>(blockEntity.get());
+		}
 
 		auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
 		it->second.addElement(element.getUID(), element);
@@ -83,13 +170,25 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
 
 			Connection conn(connectionCfg);
-			conn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
+
+			bool temp = false;
+			//If the connection is has the voltage Meter as origin or destination then we dont want to give it a nodeNumber
+			if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter"))
+			{
+				conn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
+				temp = true;
+			}
+			else
+			{
+				conn.setNodeNumber("voltageMeterConnection");
+			}
 
 			bool res1 = it->second.addConnection(connectionCfg.getOriginUid(), conn);
 			bool res2 = it->second.addConnection(connectionCfg.getDestinationUid(), conn);
-			if (res1 == false && res2 == false )
+			if (res1 == false && res2 == false && temp == true)
 			{
 				Numbers::nodeNumber--;
+				temp = false;
 			}			
 		}
 	}
@@ -125,6 +224,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	auto it =Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
 	 
+	std::string voltageMeterNodeNumbers = "";
 	for (auto mapOfElements : it->second.getMapOfElements())
 	{
 		auto element = mapOfElements.second;
@@ -135,7 +235,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		std::string netlistNodeNumbers;
 		std::string netlistVoltageSourceType="";
 		std::string modelNetlistLine = "circbyline ";
-
+		
 		if (element.getItemName() == "Voltage Source")
 		{
 			netlistElementName += "V" + std::to_string(++Numbers::voltageSourceNetlistNumber);
@@ -160,6 +260,13 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			netlistLine += netlistElementName + " ";
 			modelNetlistLine += ".MODEL D1N4148 D(IS=1e-15)";
 		}
+		else if (element.getItemName() == "Voltage Meter")
+		{
+			voltageMeterNodeNumbers =  getNodeNumbersOfVoltageMeter(editorname,allConnectionEntities, allEntitiesByBlockID);
+			continue;
+		}
+	
+		
 
 		//From begin
 		auto connections = element.getList();
@@ -204,11 +311,11 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationTypeProperty != nullptr);
 
-	EntityPropertiesString* printSettingsProperty = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Print Settings"));
-	assert(printSettingsProperty != nullptr);
+	/*EntityPropertiesString* printSettingsProperty = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Print Settings"));
+	assert(printSettingsProperty != nullptr);*/
 
 	std::string simulationType = simulationTypeProperty->getValue();
-	std::string printSettings = printSettingsProperty->getValue();
+	std::string printSettings = "print " + voltageMeterNodeNumbers;
 
 	
 	std::string simulationLine = "";
@@ -345,7 +452,7 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 //Callback Functions for NGSpice
 int NGSpice::MySendCharFunction(char* output, int ident, void* userData)
 {
-	/*Application::instance()->uiComponent()->displayMessage(std::string(output) + "\n");*/
+	Application::instance()->uiComponent()->displayMessage(std::string(output) + "\n");
 
 	return 0;
 }
