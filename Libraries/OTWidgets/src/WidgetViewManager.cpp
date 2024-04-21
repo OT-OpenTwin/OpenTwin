@@ -315,6 +315,7 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 }
 
 ads::CDockAreaWidget* ot::WidgetViewManager::determineBestParentArea(WidgetView* _newView) const {
+	return nullptr;
 	if (_newView->viewData().flags() & WidgetViewBase::ViewIsSide) {
 		if (m_focusInfo.lastCentral) {
 			return m_focusInfo.lastCentral->getViewDockWidget()->dockAreaWidget();
