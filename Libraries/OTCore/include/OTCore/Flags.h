@@ -13,14 +13,16 @@
 inline ___enumName & operator |= (___enumName & _lhv, ___enumName _rhv) { return (_lhv = (___enumName)((long long) _lhv | (long long)_rhv)); }; \
 inline ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return (___enumName)((long long) _lhv & (long long)_rhv); };  \
 inline ___enumName & operator &= (___enumName & _lhv, ___enumName _rhv) { return (_lhv = (___enumName)((long long) _lhv & (long long)_rhv)); };  \
-inline ___enumName operator ~ (___enumName _lhv) { return (___enumName)(~((long long) _lhv)); };
+inline ___enumName operator ~ (___enumName _lhv) { return (___enumName)(~((long long) _lhv)); }; \
+inline bool operator == (___enumName _lhv, const ot::Flags<___enumName>& _rhv) { return ((long long)_lhv == (long long)_rhv.data()); };
 #else
 //! @brief Will add the default bitwise operations for the provided bitfield
 #define OT_ADD_FLAG_FUNCTIONS(___enumName) inline ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return (___enumName)((long) _lhv | (long)_rhv); }; \
 inline ___enumName & operator |= (___enumName & _lhv, ___enumName _rhv) { return (_lhv = (___enumName)((long) _lhv | (long)_rhv)); }; \
 inline ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return (___enumName)((long) _lhv & (long)_rhv); };  \
 inline ___enumName & operator &= (___enumName & _lhv, ___enumName _rhv) { return (_lhv = (___enumName)((long) _lhv & (long)_rhv)); };  \
-inline ___enumName operator ~ (___enumName _lhv) { return (___enumName)(~((long) _lhv)); };
+inline ___enumName operator ~ (___enumName _lhv) { return (___enumName)(~((long) _lhv)); }; \
+inline bool operator == (___enumName _lhv, const ot::Flags<___enumName>& _rhv) { return ((long)_lhv == (long)_rhv.data()); };
 #endif
 
 namespace ot {
@@ -80,6 +82,7 @@ namespace ot {
 		//! @param _flag the flag that should be checked
 		constexpr inline bool flagIsSet(T _flag) const { return (m_data & _flag); };
 
+		constexpr inline operator T(void) const { return m_data; };
 		constexpr inline operator bool(void) const { return (bool)m_data; };
 
 		constexpr inline Flags<T>& operator = (T _data) { m_data = _data; return *this; };
