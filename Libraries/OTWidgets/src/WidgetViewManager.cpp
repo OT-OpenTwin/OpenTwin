@@ -241,7 +241,6 @@ bool ot::WidgetViewManager::viewTitleExists(const QString& _title) const {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus) {
-	return;
 	WidgetView* o = this->viewFromDockWidget(_oldFocus);
 	WidgetView* n = this->viewFromDockWidget(_newFocus);
 
@@ -315,7 +314,6 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 }
 
 ads::CDockAreaWidget* ot::WidgetViewManager::determineBestParentArea(WidgetView* _newView) const {
-	return nullptr;
 	if (_newView->viewData().flags() & WidgetViewBase::ViewIsSide) {
 		if (m_focusInfo.lastCentral) {
 			return m_focusInfo.lastCentral->getViewDockWidget()->dockAreaWidget();
@@ -324,7 +322,7 @@ ads::CDockAreaWidget* ot::WidgetViewManager::determineBestParentArea(WidgetView*
 			return m_focusInfo.lastSide->getViewDockWidget()->dockAreaWidget();
 		}
 	}
-	if (_newView->viewData().flags() & WidgetViewBase::ViewIsCentral && m_focusInfo.lastCentral) {
+	if ((_newView->viewData().flags() & WidgetViewBase::ViewIsCentral) && m_focusInfo.lastCentral) {
 		return m_focusInfo.lastCentral->getViewDockWidget()->dockAreaWidget();
 	}
 
