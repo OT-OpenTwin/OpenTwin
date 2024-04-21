@@ -542,7 +542,7 @@ void SessionSeviceEditDialogEntry::createControls(void) {
 	m_ip->setPlaceholderText("Service address (e.g.: 127.0.0.1)");
 	
 	m_port = new aLineEditWidget(m_data.port());
-	m_port->setPlaceholderText("Service port (e.g.: 8093)");
+	m_port->setPlaceholderText("Service port (e.g.: 8091)");
 
 	m_delete = new QTableWidgetItem(uiAPI::getIcon("Delete", "Table"), "");
 	m_delete->setFlags(m_delete->flags() ^ Qt::ItemIsEditable ^ Qt::ItemIsSelectable);
