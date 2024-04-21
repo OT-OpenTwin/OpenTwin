@@ -410,9 +410,6 @@
     <ClInclude Include="include\OTWidgets\WidgetViewFactory.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetViewManager.h">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\WidgetView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
@@ -579,6 +576,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ImagePreview.h">
       <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\WidgetViewManager.h">
+      <Filter>include\WidgetView</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

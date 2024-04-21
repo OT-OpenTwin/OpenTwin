@@ -13,15 +13,15 @@
 #include <ads/DockManager.h>
 
 ot::WidgetView::WidgetView()
-	: m_flags(WidgetViewCfg::NoViewFlags), m_dockLocation(WidgetViewCfg::Default), m_isProtected(false), m_isDeletedByManager(false),
-	m_isModified(false)
+	: m_isProtected(false), m_isDeletedByManager(false),
+	m_isModified(false), m_dockWidget(nullptr)
 {
 	m_dockWidget = new ads::CDockWidget("");
 	m_dockWidget->setFeature(ads::CDockWidget::CustomCloseHandling, true);
 	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, false);
 }
 
-ot::WidgetView::~WidgetView() {	
+ot::WidgetView::~WidgetView() {
 	m_dockWidget->takeWidget();
 
 	if (!m_isDeletedByManager) {
@@ -39,28 +39,20 @@ ot::WidgetView::~WidgetView() {
 // Setter/Getter
 
 bool ot::WidgetView::setupFromConfig(WidgetViewCfg* _config) {
-	this->setName(_config->name());
-	this->setViewTitle(QString::fromStdString(_config->title()));
-	m_flags = _config->flags();
-	m_dockLocation = _config->dockLocation();
-
+	this->setViewData(*_config);
 	return true;
+}
+
+void ot::WidgetView::setViewData(const WidgetViewBase& _data) {
+	m_data = _data;
+	m_dockWidget->setObjectName(QString::fromStdString(_data.name()));
+	m_dockWidget->toggleViewAction()->setText(QString::fromStdString(_data.title()));
+	this->setViewContentModified(m_isModified);
 }
 
 void ot::WidgetView::setViewContentModified(bool _isModified) {
 	m_isModified = _isModified;
-	m_dockWidget->setWindowTitle((m_isModified ? m_title + "*" : m_title));
-}
-
-void ot::WidgetView::setName(const std::string& _name) {
-	m_name = _name;
-	m_dockWidget->setObjectName(_name);
-}
-
-void ot::WidgetView::setViewTitle(const QString& _title) {
-	m_title = _title;
-	this->setViewContentModified(m_isModified);
-	m_dockWidget->toggleViewAction()->setText(m_title);
+	m_dockWidget->setWindowTitle((m_isModified ? QString::fromStdString(m_data.title()) + "*" : QString::fromStdString(m_data.title())));
 }
 
 QString ot::WidgetView::currentViewTitle(void) const {

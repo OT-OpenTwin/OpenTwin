@@ -11,6 +11,7 @@
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
+#include <QtCore/qobject.h>
 #include <QtCore/qbytearray.h>
 
 // std header
@@ -21,6 +22,7 @@ class QAction;
 
 namespace ads {
 	class CDockManager;
+	class CDockWidget;
 	class CDockAreaWidget;
 }
 
@@ -30,7 +32,8 @@ namespace ot {
 	class WidgetViewCfg;
 
 	//! @brief The widget view manager is used to manage widget views.
-	class OT_WIDGETS_API_EXPORT WidgetViewManager {
+	class OT_WIDGETS_API_EXPORT WidgetViewManager : public QObject {
+		Q_OBJECT
 		OT_DECL_NOCOPY(WidgetViewManager)
 	public:
 		//! @brief Return the clobal instance
@@ -67,6 +70,9 @@ namespace ot {
 		//! If the view does not exists return 0.
 		//! @param _viewName Widget view name.
 		WidgetView* findView(const std::string& _viewName) const;
+
+		//! @brief Returns the widget view that owns this dock
+		WidgetView* viewFromDockWidget(ads::CDockWidget* _dock);
 
 		//! @brief Close the widget view with the specified name.
 		//! Widget views that are protected will be ignored.
@@ -109,12 +115,6 @@ namespace ot {
 		//! @param _version State version. If the versions mismatch the restore state will cancel and return false.
 		bool restoreState(std::string _state, int _version = 0);
 
-		//! @brief Set the central view.
-		//! New views will be added to the views dock area if none is provided.
-		//! The central view will be set to 0 if the view is removed from this manager.
-		//! @param _centralView Widget view.
-		void setCentralView(WidgetView* _centralView) { m_centralView = _centralView; };
-
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Information gathering
@@ -130,18 +130,32 @@ namespace ot {
 		//! @brief Return the dock toggle action
 		QAction* getDockToggleAction(void) const { return m_dockToggleRoot; };
 
+	Q_SIGNALS:
+		void viewFocusLost(WidgetView* _view);
+		void viewFocused(WidgetView* _view);
+
+	private Q_SLOTS:
+		void slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus);
+
 	private:
 		WidgetViewManager();
 		~WidgetViewManager();
 
 		bool addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area);
 
+		ads::CDockAreaWidget* determineBestParentArea(WidgetView* _newView) const;
+
 		std::list<std::string>* findViewNameList(const BasicServiceInformation& _owner);
 		std::list<std::string>* findOrCreateViewNameList(const BasicServiceInformation& _owner);
 
 		ads::CDockManager* m_dockManager; //! @brief Dock manager managed by this manager
-		WidgetView*        m_centralView; //! @brief Central view to determine the central dock area
 		QAction*           m_dockToggleRoot; //! @brief Action containing the toggle dock visibility menu and actions
+		struct FocusInfo {
+			WidgetView* last;
+			WidgetView* lastCentral;
+			WidgetView* lastSide;
+		};
+		FocusInfo        m_focusInfo;
 
 		std::map<BasicServiceInformation, std::list<std::string>*> m_viewOwnerMap; //! @brief Maps owners to widget view names
 		std::map<std::string, std::pair<BasicServiceInformation, WidgetView*>> m_viewNameMap; //! @brief Maps Widget view names to widget views and their owners

@@ -61,6 +61,8 @@ void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
 	m_dockToggleRoot = new QAction("Windows");
 	QMenu* newMenu = new QMenu;
 	m_dockToggleRoot->setMenu(newMenu);
+
+	this->connect(m_dockManager, &ads::CDockManager::focusedDockWidgetChanged, this, &WidgetViewManager::slotViewFocused);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -68,12 +70,7 @@ void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
 // View Management
 
 bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view) {
-	if (m_centralView) {
-		return this->addViewImpl(_owner, _view, m_centralView->getViewDockWidget()->dockAreaWidget());
-	}
-	else {
-		return this->addViewImpl(_owner, _view, nullptr);
-	}
+	return this->addViewImpl(_owner, _view, nullptr);
 }
 
 bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area) {
@@ -102,6 +99,13 @@ ot::WidgetView* ot::WidgetViewManager::findView(const std::string& _viewName) co
 	const auto it = m_viewNameMap.find(_viewName);
 	if (it == m_viewNameMap.end()) return nullptr;
 	else return it->second.second;
+}
+
+ot::WidgetView* ot::WidgetViewManager::viewFromDockWidget(ads::CDockWidget* _dock) {
+	for (const auto& it : m_viewNameMap) {
+		if (it.second.second->getViewDockWidget() == _dock) return it.second.second;
+	}
+	return nullptr;
 }
 
 void ot::WidgetViewManager::closeView(const std::string& _viewName) {
@@ -143,7 +147,7 @@ void ot::WidgetViewManager::closeViews(void) {
 
 void ot::WidgetViewManager::forgetView(WidgetView* _view) {
 	OTAssertNullptr(_view);
-	this->forgetView(_view->name());
+	this->forgetView(_view->viewData().name());
 }
 
 ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _viewName) {
@@ -154,9 +158,9 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _viewName) 
 	ot::WidgetView* ret = nameIt->second.second;
 
 	// If the view is the current central, set current central to 0
-	if (nameIt->second.second == m_centralView) {
-		m_centralView = nullptr;
-	}
+	if (nameIt->second.second == m_focusInfo.last) m_focusInfo.last = nullptr;
+	if (nameIt->second.second == m_focusInfo.lastSide) m_focusInfo.lastSide = nullptr;
+	if (nameIt->second.second == m_focusInfo.lastCentral) m_focusInfo.lastCentral = nullptr;
 
 	// Find name list from owner and erase the view entry
 	std::list<std::string>* lst = this->findViewNameList(nameIt->second.first);
@@ -229,9 +233,28 @@ bool ot::WidgetViewManager::viewExists(const std::string& _viewName) const {
 
 bool ot::WidgetViewManager::viewTitleExists(const QString& _title) const {
 	for (const auto& it : m_viewNameMap) {
-		if (it.second.second->viewTitle() == _title || it.second.second->currentViewTitle() == _title) return true;
+		if (QString::fromStdString(it.second.second->viewData().title()) == _title || it.second.second->currentViewTitle() == _title) return true;
 	}
 	return false;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus) {
+	return;
+	WidgetView* o = this->viewFromDockWidget(_oldFocus);
+	WidgetView* n = this->viewFromDockWidget(_newFocus);
+
+	if (o) {
+		Q_EMIT viewFocusLost(o);
+	}
+
+	if (n) {
+		m_focusInfo.last = n;
+		if (n->viewData().flags() & WidgetViewBase::ViewIsCentral) m_focusInfo.lastCentral = n;
+		if (n->viewData().flags() & WidgetViewBase::ViewIsSide) m_focusInfo.lastSide = n;
+		Q_EMIT viewFocused(n);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -239,35 +262,41 @@ bool ot::WidgetViewManager::viewTitleExists(const QString& _title) const {
 // Private
 
 ot::WidgetViewManager::WidgetViewManager()
-	: m_dockManager(nullptr), m_centralView(nullptr), m_dockToggleRoot(nullptr)
-{}
+	: m_dockManager(nullptr), m_dockToggleRoot(nullptr)
+{
+	m_focusInfo.last = nullptr;
+	m_focusInfo.lastCentral = nullptr;
+	m_focusInfo.lastSide = nullptr;
+}
 
 ot::WidgetViewManager::~WidgetViewManager() {
-
+	this->deleteLater();
 }
 
 bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area) {
 	OTAssertNullptr(_view);
 	// Ensure view does not exist
-	if (this->viewExists(_view->name())) {
-		OT_LOG_W("A widget view with the name \"" + _view->name() + "\" already exists");
+	if (this->viewExists(_view->viewData().name())) {
+		OT_LOG_W("A widget view with the name \"" + _view->viewData().name() + "\" already exists");
 		return false;
 	}
 
 	// Get view name list for given owner
 	auto lst = this->findOrCreateViewNameList(_owner);
-	auto lstIt = std::find(lst->begin(), lst->end(), _view->name());
+	auto lstIt = std::find(lst->begin(), lst->end(), _view->viewData().name());
 	if (lstIt != lst->end()) {
 		OT_LOG_E("Invalid entry");
 		return false;
 	}
 
 	// Add view
+	if (!_area) _area = this->determineBestParentArea(_view);
+
 	if (_area) {
-		m_dockManager->addDockWidget(intern::convertDockArea(_view->initialDockLocation()), _view->getViewDockWidget(), _area);
+		m_dockManager->addDockWidget(intern::convertDockArea(_view->viewData().dockLocation()), _view->getViewDockWidget(), _area);
 	}
 	else {
-		m_dockManager->addDockWidgetTab(intern::convertDockArea(_view->initialDockLocation()), _view->getViewDockWidget());
+		m_dockManager->addDockWidgetTab(intern::convertDockArea(_view->viewData().dockLocation()), _view->getViewDockWidget());
 	}
 
 	// Add view toggle (if view is closeable)
@@ -276,10 +305,29 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	}
 
 	// Store information
-	lst->push_back(_view->name());
-	m_viewNameMap.insert_or_assign(_view->name(), std::pair<BasicServiceInformation, WidgetView*>(_owner, _view));
+	lst->push_back(_view->viewData().name());
+	m_viewNameMap.insert_or_assign(_view->viewData().name(), std::pair<BasicServiceInformation, WidgetView*>(_owner, _view));
+
+	// Update focus information
+	this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
 
 	return true;
+}
+
+ads::CDockAreaWidget* ot::WidgetViewManager::determineBestParentArea(WidgetView* _newView) const {
+	if (_newView->viewData().flags() & WidgetViewBase::ViewIsSide) {
+		if (m_focusInfo.lastCentral) {
+			return m_focusInfo.lastCentral->getViewDockWidget()->dockAreaWidget();
+		}
+		else if (m_focusInfo.lastSide) {
+			return m_focusInfo.lastSide->getViewDockWidget()->dockAreaWidget();
+		}
+	}
+	if (_newView->viewData().flags() & WidgetViewBase::ViewIsCentral && m_focusInfo.lastCentral) {
+		return m_focusInfo.lastCentral->getViewDockWidget()->dockAreaWidget();
+	}
+
+	return nullptr;
 }
 
 std::list<std::string>* ot::WidgetViewManager::findViewNameList(const BasicServiceInformation& _owner) {

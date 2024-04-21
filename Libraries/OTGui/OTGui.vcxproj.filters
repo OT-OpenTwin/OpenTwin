@@ -177,6 +177,9 @@
     <ClInclude Include="include\OTGui\KeySequence.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\WidgetViewBase.h">
+      <Filter>Header Files\WidgetView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -298,6 +301,9 @@
     </ClCompile>
     <ClCompile Include="src\KeySequence.cpp">
       <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WidgetViewBase.cpp">
+      <Filter>Source Files\WidgetView</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

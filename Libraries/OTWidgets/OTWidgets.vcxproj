@@ -158,7 +158,7 @@
     <ClInclude Include="include\OTWidgets\WidgetProperties.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewFactory.h" />
-    <ClInclude Include="include\OTWidgets\WidgetViewManager.h" />
+    <QtMoc Include="include\OTWidgets\WidgetViewManager.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewRegistrar.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewRegistrar.hpp" />
     <QtMoc Include="include\OTWidgets\DockWatcherAction.h" />

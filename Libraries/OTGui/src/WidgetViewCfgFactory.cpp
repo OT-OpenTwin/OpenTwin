@@ -8,7 +8,6 @@
 #include "OTGui/WidgetViewCfg.h"
 #include "OTGui/WidgetViewCfgFactory.h"
 
-
 ot::WidgetViewCfg* ot::WidgetViewCfgFactory::createView(const std::string& _configurationKey) {
 	auto it = WidgetViewCfgFactory::constructors().find(_configurationKey);
 	if (it == WidgetViewCfgFactory::constructors().end()) {

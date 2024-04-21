@@ -1289,36 +1289,28 @@ void AppBase::createUi(void) {
 			OT_LOG_D("Creating views");
 
 			m_debug = new ot::PlainTextEditView;
-			m_debug->setName("Debug");
-			m_debug->setViewTitle("OpenTwin");
+			m_debug->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::ViewIsCentral));
 			m_debug->setViewIsProtected(true);
 			m_debug->setPlainText(BUILD_INFO);
 			m_debug->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
 
 			m_output = new ot::PlainTextEditView;
-			m_output->setName(TITLE_DOCK_OUTPUT);
-			m_output->setViewTitle(TITLE_DOCK_OUTPUT);
+			m_output->setViewData(ot::WidgetViewBase(TITLE_DOCK_OUTPUT, TITLE_DOCK_OUTPUT, ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewIsSide));
 			m_output->setViewIsProtected(true);
-			m_output->setInitialiDockLocation(ot::WidgetViewCfg::Bottom);
 			m_output->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			
 			m_propertyGrid = new ot::PropertyGridView;
-			m_propertyGrid->setName(TITLE_DOCK_PROPERTIES);
-			m_propertyGrid->setViewTitle(TITLE_DOCK_PROPERTIES);
+			m_propertyGrid->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROPERTIES, TITLE_DOCK_PROPERTIES, ot::WidgetViewBase::Right, ot::WidgetViewBase::ViewIsSide));
 			m_propertyGrid->setViewIsProtected(true);
-			m_propertyGrid->setInitialiDockLocation(ot::WidgetViewCfg::Right);
 			m_propertyGrid->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			
 			m_projectNavigation = new ot::NavigationTreeView;
-			m_projectNavigation->setName(TITLE_DOCK_PROJECTNAVIGATION);
-			m_projectNavigation->setViewTitle(TITLE_DOCK_PROJECTNAVIGATION);
+			m_projectNavigation->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROJECTNAVIGATION, TITLE_DOCK_PROJECTNAVIGATION, ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewIsSide));
 			m_projectNavigation->setViewIsProtected(true);
-			m_projectNavigation->setInitialiDockLocation(ot::WidgetViewCfg::Left);
 			m_projectNavigation->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
 			m_graphicsPicker = new ot::GraphicsPickerView;
-			m_graphicsPicker->setName("Block Picker");
-			m_graphicsPicker->setViewTitle("Block Picker");
+			m_graphicsPicker->setViewData(ot::WidgetViewBase("Block Picker", "Block Picker", ot::WidgetViewBase::ViewIsSide));
 			m_graphicsPicker->setViewIsProtected(true);
 			//m_graphicsPicker->setInitialiDockLocation(ot::WidgetViewCfg::Left);
 			m_graphicsPicker->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
@@ -1381,8 +1373,6 @@ void AppBase::createUi(void) {
 			OT_LOG_D("Settings up dock window visibility");
 
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_debug);
-			ot::WidgetViewManager::instance().setCentralView(m_debug);
-
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output);
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid);
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation);
@@ -1527,8 +1517,7 @@ ViewerUIDtype AppBase::createView(
 	if (getVisible3D())
 	{
 		ot::WidgetView* wv = m_viewerComponent->getViewerWidget(viewID);
-		wv->setName(text3D.toStdString());
-		wv->setViewTitle(text3D);
+		wv->setViewData(ot::WidgetViewBase(text3D.toStdString(), text3D.toStdString(), ot::WidgetViewBase::ViewIsCentral));
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
 	}
 	else
@@ -1539,8 +1528,7 @@ ViewerUIDtype AppBase::createView(
 	if (getVisible1D())
 	{
 		ot::WidgetView* wv = m_viewerComponent->getPlotWidget(viewID);
-		wv->setName(text1D.toStdString());
-		wv->setViewTitle(text1D);
+		wv->setViewData(ot::WidgetViewBase(text1D.toStdString(), text1D.toStdString(), ot::WidgetViewBase::ViewIsCentral));
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
 	}
 	else
@@ -1550,16 +1538,14 @@ ViewerUIDtype AppBase::createView(
 
 	{
 		ot::WidgetView* wv = m_viewerComponent->getVersionGraphWidget(viewID);
-		wv->setName(textVersion.toStdString());
-		wv->setViewTitle(textVersion);
+		wv->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewIsCentral));
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
 	}
 	
 	if (getVisibleTable())
 	{	
 		ot::WidgetView* wv = m_viewerComponent->getTableWidget(viewID);
-		wv->setName(textTable.toStdString());
-		wv->setViewTitle(textTable);
+		wv->setViewData(ot::WidgetViewBase(textTable.toStdString(), textTable.toStdString(), ot::WidgetViewBase::ViewIsCentral));
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
 	}
 	else
@@ -2033,8 +2019,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name,
 	}
 
 	newEditor = new ot::GraphicsViewView;
-	newEditor->setName(_name);
-	newEditor->setViewTitle(_title);
+	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewIsCentral));
 	newEditor->setGraphicsViewName(_name);
 	newEditor->setDropsEnabled(true);
 	
@@ -2079,8 +2064,7 @@ ot::TextEditorView* AppBase::createNewTextEditor(const std::string& _name, const
 	}
 
 	newEditor = new ot::TextEditorView;
-	newEditor->setName(_name);
-	newEditor->setViewTitle(_title);
+	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewIsCentral));
 	newEditor->setTextEditorName(_name);
 	//newEditor->setTextEditorTitle(_title);
 
@@ -2139,7 +2123,7 @@ void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInf
 		std::list<ot::TextEditorView*>& lst = m_textEditors[_serviceInfo];
 
 		for (auto v : lst) {
-			std::string name = v->name();
+			std::string name = v->viewData().name();
 			ot::WidgetViewManager::instance().closeView(name);
 		}
 		lst.clear();
