@@ -282,6 +282,10 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 		for (auto conn : tempVector)
 		{
+			if (conn.getNodeNumber() == "voltageMeterConnection")
+			{
+				continue;
+			}
 			netlistNodeNumbers += conn.getNodeNumber() + " ";
 		}
 
@@ -315,7 +319,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	assert(printSettingsProperty != nullptr);*/
 
 	std::string simulationType = simulationTypeProperty->getValue();
-	std::string printSettings = "print " + voltageMeterNodeNumbers;
+	std::string printSettings = "print "  + voltageMeterNodeNumbers;
 
 	
 	std::string simulationLine = "";
@@ -338,19 +342,22 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	simulationLine = "circbyline " + simulationLine;
 	printSettings = "circbyline " + printSettings;
+	std::string sendData = "circbyline ";
+	sendData +=  "save " "[" + voltageMeterNodeNumbers + "]";
 	
 	//And now i send it to NGSpice in the right order
-	
+	//ngSpice_Command(const_cast<char*>("circbyline .probe vd (V1:1, V2:2)"));
 	ngSpice_Command(const_cast<char*>(simulationLine.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
 	ngSpice_Command(const_cast<char*>(printSettings.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .endc"));
+	//ngSpice_Command(const_cast<char*>(sendData.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .end"));
 
 
-
 	return "success";
+	
 }
 
 std::string NGSpice::generateNetlistDCSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string editorname)
@@ -495,7 +502,15 @@ int NGSpice::MySendInitDataFunction(pvecinfoall vectorInfoAll, int idNumNGSpiceS
 		std::string name = vectorInfoAll->vecs[i]->vecname;
 		std::vector<double> values;
 		SimulationResults::getInstance()->setVecAmount(vectorInfoAll->veccount);
-		SimulationResults::getInstance()->getResultMap().insert_or_assign(name, values);
+		if (name != "voltagemeterconnection")
+		{
+			SimulationResults::getInstance()->getResultMap().insert_or_assign(name, values);
+		}
+		else
+		{
+			continue;
+		}
+		
 
 
 	}
