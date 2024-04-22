@@ -199,16 +199,16 @@
       <PreprocessorDefinitions>_DEBUG;MODEL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC);$(BOOST_INCD)\;$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC);$(BOOST_INCD)\;$(OT_BLOCKENTITIES_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
       <ExceptionHandling>Sync</ExceptionHandling>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);CADModelEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBD);BlockEntities.lib;OTGui.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);CADModelEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBD);BlockEntities.lib</AdditionalDependencies>
       <AssemblyDebug>false</AssemblyDebug>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBD);$(OC_LIBPATHD);$(ZLIB_LIBPATHD);$(OT_GUI_ROOT)\$(OT_DLLD);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBD);$(OC_LIBPATHD);$(ZLIB_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -279,7 +279,7 @@
       <PreprocessorDefinitions>NDEBUG;MODEL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC);$(BOOST_INCR)\;$(OT_BLOCKENTITIES_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC);$(BOOST_INCR)\;$(OT_BLOCKENTITIES_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
       <ExceptionHandling>Sync</ExceptionHandling>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -288,8 +288,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBR);$(OC_LIBPATHR);$(ZLIB_LIBPATHR);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(OT_GUI_ROOT)\$(OT_DLLR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);CADModelEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBR);BlockEntities.lib;OTGui.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBR);$(OC_LIBPATHR);$(ZLIB_LIBPATHR);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);CADModelEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBR);BlockEntities.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
