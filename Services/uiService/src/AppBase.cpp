@@ -191,6 +191,7 @@ int AppBase::run() {
 		m_isInitialized = true;
 
 		QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+		QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
 		// Initialize uiCore
 		OT_LOG_I("Initializing UI Core Module");
