@@ -1,14 +1,25 @@
+/*
+ * RandomNumberGeneratorCryptoSecure.h
+ *
+ *  Created on: January 17, 2022
+ *      Author: Jan Wagner
+ */
+
+//OpenTwin header
+#include "OTSystem/ArchitectureInfo.h"
+#include "OTRandom/RandomNumberGeneratorCryptoSecure.h"
+
+#ifdef OT_OS_WINDOWS
 
 #define WIN32_NO_STATUS 
 
+// Windows header
 #include <Windows.h>
 #include <bcrypt.h>
 
 #undef WIN32_NO_STATUS 
 
 #include <ntstatus.h>
-
-#include "OTCommunication/RandomNumberGeneratorCryptoSecure.h"
 
 unsigned __int64 RandomNumberGeneratorCryptoSecure::GetPositiveRandomInt64(unsigned __int64 maxValue)
 {
@@ -104,3 +115,4 @@ unsigned __int64 RandomNumberGeneratorCryptoSecure::GetPositiveRandomInt64(unsig
 
 }
 
+#endif // OT_OS_WINDOWS

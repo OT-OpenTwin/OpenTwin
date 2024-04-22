@@ -1,10 +1,12 @@
 // KeyGenerator.cpp : This file contains the 'main' function. Program execution begins and ends there.
 
+// OpenTwin header
+#include "OTRandom/RandomNumberGeneratorCryptoSecure.h"
+
+// std header
 #include <iostream>
 #include <string>
 #include <fstream>
-
-#include "randomNumberGeneratorCryptoSecure.h"
 
 int main(int argc, char **argv)
 {
@@ -31,10 +33,10 @@ int main(int argc, char **argv)
 	keyFile << "namespace ot {" << std::endl << std::endl;
 
 	keyFile << "\t//! @brief The length of the encryption key" << std::endl;
-	keyFile << "\tconst int encryptionKeyLength = " << keyLength << ";" << std::endl << std::endl;
+	keyFile << "\tconst int EncryptionKeyLength = " << keyLength << ";" << std::endl << std::endl;
 
 	keyFile << "\t//! @brief OpenTwin encryption key" << std::endl;
-	keyFile << "\tconst int encryptionKey[] = {";
+	keyFile << "\tconst int EncryptionKey[] = {";
 	RandomNumberGeneratorCryptoSecure randomNumberGenerator; 
 	for (int i = 0; i < keyLength; i++) {
 		unsigned __int64 randomNumber = randomNumberGenerator.GetPositiveRandomInt64(255);

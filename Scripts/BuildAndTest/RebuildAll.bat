@@ -76,20 +76,6 @@ DEL AdminPanel_buildLog.txt
 DEL Documentation_buildLog.txt
 
 REM ====================================================================
-REM Build the key generator and the encryption key, if needed
-REM ====================================================================
-
-ECHO ===============================================================
-ECHO Build Key Generator 
-ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\build.bat" RELEASE REBUILD 
-
-IF NOT EXIST "%OT_ENCRYPTIONKEY_ROOT%\encryptionKey.h" (
-	ECHO Updating header file "%OT_ENCRYPTIONKEY_ROOT%\encryptionKey.h"
-	CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\KeyGenerator.exe" 2048 "%OT_ENCRYPTIONKEY_ROOT%\encryptionKey.h"
-)
-
-REM ====================================================================
 REM Build the libraries 
 REM ====================================================================
 
@@ -102,6 +88,41 @@ ECHO ===============================================================
 ECHO Build Library: OpenTwinCore
 ECHO ===============================================================
 CALL "%OT_CORE_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
+ECHO Build Library: OTRandom
+ECHO ===============================================================
+CALL "%OT_RANDOM_ROOT%\build.bat" %1 %2
+
+REM ====================================================================
+REM Build the key generator and the encryption key, if needed
+REM ====================================================================
+
+ECHO ===============================================================
+ECHO Build Key Generator 
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\build.bat" RELEASE REBUILD
+REM CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\GenerateKey.bat" "%OT_ENCRYPTIONKEY_ROOT%\OTEncryptionKey.h"
+
+IF NOT EXIST "%OT_ENCRYPTIONKEY_ROOT%\OTEncryptionKey.h" (
+	ECHO Updating header file "%OT_ENCRYPTIONKEY_ROOT%\OTEncryptionKey.h"
+	
+	REM Remove libraries
+	DEL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\OTSystem.dll"
+	DEL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\OTCore.dll"
+	DEL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\OTRandom.dll"
+	
+	REM Copy libraries
+	COPY "%OT_SYSTEM_ROOT%\%OT_DLLR%\OTSystem.dll" "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release"
+	COPY "%OT_CORE_ROOT%\%OT_DLLR%\OTCore.dll" "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release"
+	COPY "%OT_RANDOM_ROOT%\%OT_DLLR%\OTRandom.dll" "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release"
+
+	CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\KeyGenerator.exe" 2048 "%OT_ENCRYPTIONKEY_ROOT%\OTEncryptionKey.h"
+)
+
+REM ====================================================================
+REM Build the libraries 
+REM ====================================================================
 
 ECHO ===============================================================
 ECHO Build Library: OTGui

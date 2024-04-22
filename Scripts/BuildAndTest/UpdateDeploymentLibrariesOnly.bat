@@ -42,6 +42,7 @@ ECHO Delete libraries
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\BlockEditorService.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OTSystem.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OTCore.dll"
+DEL "%OPENTWIN_DEPLOYMENT_DIR%\OTRandom.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OTCommunication.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OTServiceFoundation.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\ModelEntities.dll"
@@ -102,6 +103,7 @@ REM ====================================================================
 ECHO Copy libraries
 
 COPY "%OT_CORE_ROOT%\%OT_DLLR%\OTCore.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_RANDOM_ROOT%\%OT_DLLR%\OTRandom.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_SYSTEM_ROOT%\%OT_DLLR%\OTSystem.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_COMMUNICATION_ROOT%\%OT_DLLR%\OTCommunication.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_FOUNDATION_ROOT%\%OT_DLLR%\OTServiceFoundation.dll" "%OPENTWIN_DEPLOYMENT_DIR%"

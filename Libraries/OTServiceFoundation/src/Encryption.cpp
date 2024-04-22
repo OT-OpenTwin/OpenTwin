@@ -4,7 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "encryptionKey.h"
+#include "OTEncryptionKey.h"
 #include "OTCore/OTAssert.h"
 #include "OTServiceFoundation/Encryption.h"
 
@@ -26,7 +26,7 @@ std::string ot::encryptString(const std::string& _str) {
 	randomDataEncrypted[encryptedDataLength] = '\0';
 
 	for (int i = sizeof(int); i < encryptedDataLength; i++) {
-		randomDataEncrypted[i] = randomDataEncrypted[i] ^ ot::encryptionKey[(i - sizeof(int)) % (sizeof(ot::encryptionKey) / sizeof(int))];
+		randomDataEncrypted[i] = randomDataEncrypted[i] ^ ot::EncryptionKey[(i - sizeof(int)) % (sizeof(ot::EncryptionKey) / sizeof(int))];
 	}
 
 	int encoded_data_length = Base64encode_len(encryptedDataLength + 1);
@@ -59,7 +59,7 @@ std::string ot::decryptString(const std::string& _str) {
 	}
 
 	for (unsigned int i = sizeof(int); i < originalLength * 2 + sizeof(int); i++) {
-		decoded_compressed_string[i] = decoded_compressed_string[i] ^ ot::encryptionKey[(i - sizeof(int)) % (sizeof(ot::encryptionKey) / sizeof(int))];
+		decoded_compressed_string[i] = decoded_compressed_string[i] ^ ot::EncryptionKey[(i - sizeof(int)) % (sizeof(ot::EncryptionKey) / sizeof(int))];
 	}
 
 	for (unsigned int i = 0; i < originalLength; i++) {
