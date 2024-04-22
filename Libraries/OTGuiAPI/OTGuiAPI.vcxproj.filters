@@ -16,15 +16,27 @@
     <Filter Include="Header Files\General">
       <UniqueIdentifier>{8f7c2e8d-6f4a-415e-beb2-c0e2a4be323b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\CommandBuilder">
+      <UniqueIdentifier>{2088b9f8-468b-4a40-89f1-d28ebdf535ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\General">
+      <UniqueIdentifier>{e648dd74-8c1f-4434-a6fe-80a9fe3ff64f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\OTGui\OTGuiAPIAPIExport.h">
+    <ClInclude Include="include\OTGuiAPI\GraphicsFlowItem.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGuiAPI\OTGuiAPIAPIExport.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsFlowItem.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
