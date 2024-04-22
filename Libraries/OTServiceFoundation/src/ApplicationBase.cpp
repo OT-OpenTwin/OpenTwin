@@ -8,6 +8,8 @@
 #include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
 
+#include "OTGuiAPI/GuiAPIManager.h"
+
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTCommunication/Msg.h"				// message sending
 #include "OTCommunication/IpConverter.h"
@@ -464,6 +466,8 @@ void ot::ApplicationBase::__serviceConnected(const std::string & _name, const st
 		this->uiConnected(m_uiComponent);
 		m_uiComponent->sendUpdatedControlState();
 		this->enableMessageQueuing(m_uiComponent->serviceName(), false);
+
+		GuiAPIManager::instance().frontendConnected(*m_uiComponent);
 	}
 	else if (_type == OT_INFO_SERVICE_TYPE_MODEL) {
 		// Store information
@@ -493,6 +497,7 @@ void ot::ApplicationBase::__serviceDisconnected(const std::string & _name, const
 		uiDisconnected(m_uiComponent);
 		delete m_uiComponent;
 		m_uiComponent = nullptr;
+		GuiAPIManager::instance().frontendDisconnected();
 	}
 	else if (_type == OT_INFO_SERVICE_TYPE_MODEL) {
 		assert(itm->second.service == (ServiceBase *)m_modelComponent);

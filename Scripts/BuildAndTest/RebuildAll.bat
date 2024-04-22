@@ -129,6 +129,11 @@ ECHO ===============================================================
 CALL "%OT_GUI_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
+ECHO Build Library: OpenTwinCommunications
+ECHO ===============================================================
+CALL "%OT_COMMUNICATION_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
 ECHO Build Library: OTGuiAPI
 ECHO ===============================================================
 CALL "%OT_GUIAPI_ROOT%\build.bat" %1 %2
@@ -137,11 +142,6 @@ ECHO ===============================================================
 ECHO Build Library: OTWidgets
 ECHO ===============================================================
 CALL "%OT_WIDGETS_ROOT%\build.bat" %1 %2
-
-ECHO ===============================================================
-ECHO Build Library: OpenTwinCommunications
-ECHO ===============================================================
-CALL "%OT_COMMUNICATION_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Library: DataStorage
