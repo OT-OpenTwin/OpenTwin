@@ -67,7 +67,7 @@ ot::app::RunResult Service::run(const SessionInformation& _sessionInformation, c
 
 	// Websocket: open_twin.exe "libraryName.dll" "LDS URL" "serviceURL" "websocketURL" "sessionServiceURL"
 	// Others:    open_twin.exe "libraryName.dll" "LDS URL" "serviceURL" "sessionServiceURL" "session ID"
-	std::string commandLine = launcherName + " \"" + path + "\" \"" + LDS_APP->serviceURL() + "\" \"" + m_url + "\" \"";
+	std::string commandLine = "\"" + launcherName + "\" \"" + path + "\" \"" + LDS_APP->serviceURL() + "\" \"" + m_url + "\" \"";
 	if (m_info.type() == OT_INFO_SERVICE_TYPE_RelayService) {
 		commandLine.append(m_websocketUrl).append("\" \"").append(_sessionInformation.sessionServiceURL()).append("\"");
 	}
