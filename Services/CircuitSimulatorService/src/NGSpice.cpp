@@ -342,13 +342,15 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	simulationLine = "circbyline " + simulationLine;
 	printSettings = "circbyline " + printSettings;
-	std::string sendData = "circbyline ";
-	sendData +=  "save " "[" + voltageMeterNodeNumbers + "]";
+
 	
 	//And now i send it to NGSpice in the right order
 	//ngSpice_Command(const_cast<char*>("circbyline .probe vd (V1:1, V2:2)"));
+	//ngSpice_Command(const_cast<char*>("circbyline V2 2 1 0"));
 	ngSpice_Command(const_cast<char*>(simulationLine.c_str()));
+	//ngSpice_Command(const_cast<char*>(" circybline E_diff 3 0 2 1 gain = 1"));
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
+	//ngSpice_Command(const_cast<char*>("circbyline probe v(1,2)"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
 	ngSpice_Command(const_cast<char*>(printSettings.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .endc"));
