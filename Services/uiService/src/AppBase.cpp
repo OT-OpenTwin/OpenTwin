@@ -1586,9 +1586,9 @@ void AppBase::setCurrentVisualizationTab(const std::string & _tabName) {
 }
 
 std::string AppBase::getCurrentVisualizationTab(void) {
-	OT_LOG_W("Not implemented yet");
-	return "";
-	//return ot::WidgetViewManager::instance().getCurrentViewTitle().toStdString();
+	ot::WidgetView* view = ot::WidgetViewManager::instance().lastFocusedCentralView();
+	if (view) return view->viewData().title();
+	else return "";
 }
 
 // #################################################################################################################
@@ -2455,6 +2455,17 @@ void AppBase::slotTextEditorSaveRequested(void) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Slots
+
+void AppBase::slotViewFocusLost(ot::WidgetView* _view) {
+
+}
+
+void AppBase::slotViewFocused(ot::WidgetView* _view) {
+	if (!_view) return;
+	if (_view->viewData().flags() & ot::WidgetViewBase::ViewIsCentral) {
+		m_viewerComponent->viewerTabChanged(_view->viewData().name());
+	}
+}
 
 void AppBase::slotOutputContextMenuItemClicked() {
 	m_output->setPlainText(BUILD_INFO);

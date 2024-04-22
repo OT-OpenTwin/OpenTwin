@@ -130,6 +130,10 @@ namespace ot {
 		//! @brief Return the dock toggle action
 		QAction* getDockToggleAction(void) const { return m_dockToggleRoot; };
 
+		WidgetView* lastFocusedView(void) const;
+		WidgetView* lastFocusedSideView(void) const;
+		WidgetView* lastFocusedCentralView(void) const;
+
 	Q_SIGNALS:
 		void viewFocusLost(WidgetView* _view);
 		void viewFocused(WidgetView* _view);

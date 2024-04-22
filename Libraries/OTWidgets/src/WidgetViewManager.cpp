@@ -238,6 +238,18 @@ bool ot::WidgetViewManager::viewTitleExists(const QString& _title) const {
 	return false;
 }
 
+ot::WidgetView* ot::WidgetViewManager::lastFocusedView(void) const {
+	return m_focusInfo.last;
+}
+
+ot::WidgetView* ot::WidgetViewManager::lastFocusedSideView(void) const {
+	return m_focusInfo.lastSide;
+}
+
+ot::WidgetView* ot::WidgetViewManager::lastFocusedCentralView(void) const {
+	return m_focusInfo.lastCentral;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus) {

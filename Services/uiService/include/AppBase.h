@@ -57,6 +57,7 @@ class UiPluginManager;
 class ToolBar;
 namespace ak { class aNotifier; class aWindow; }
 namespace ak { class aTreeWidget; }
+namespace ot { class WidgetView; }
 namespace ot { class AbstractSettingsItem; }
 namespace ot { class GraphicsPicker; }
 namespace ot { class GraphicsViewView; }
@@ -469,6 +470,8 @@ public Q_SLOTS:
 	// Private: Slots
 
 private Q_SLOTS:
+	void slotViewFocusLost(ot::WidgetView* _view);
+	void slotViewFocused(ot::WidgetView* _view);
 	void slotOutputContextMenuItemClicked();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
