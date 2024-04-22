@@ -61,7 +61,7 @@ std::string NGSpice::getNodeNumbersOfVoltageMeter(std::string editorName, std::m
 					for (auto conn : element->second.getList())
 					{
 						
-						if (conn.originConnectable() == connectorName || conn.destConnectable() == connectorName)
+						if (conn.originConnectable() == connectorName || conn.getReversedConnection().originConnectable() == connectorName)
 						{
 							if (conn.getNodeNumber() != "voltageMeterConnection")
 							{

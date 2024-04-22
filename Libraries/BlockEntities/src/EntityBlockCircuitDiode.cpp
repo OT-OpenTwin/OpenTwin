@@ -15,11 +15,11 @@ EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent,
 	_navigationTreeIconName = "Diod2";
 	_navigationTreeIconNameHidden = "Diod2";
 	_blockTitle = "Diode";
-	const std::string connectorNameLeft = "Left";
+	const std::string connectorNameLeft = "Left2";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
 	_connectorsByName[connectorNameLeft] = m_LeftConnector;
 
-	const std::string connectorNameRight = "Right";
+	const std::string connectorNameRight = "Right2";
 	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
 	_connectorsByName[connectorNameRight] = m_RightConnector;
 }
@@ -59,7 +59,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitDiode::CreateBlockCfg()
 	myStack->addItemTop(myLayout, true, false);
 
 	ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
-	connection1->setName("Left");
+	connection1->setName("Left2");
 	ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 	connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 	connection1->setBackgroundPainer(painter1);
@@ -67,7 +67,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitDiode::CreateBlockCfg()
 	connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
 
 	ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
-	connection2->setName("Right");
+	connection2->setName("Right2");
 	ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 	connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 	connection2->setBackgroundPainer(painter2);

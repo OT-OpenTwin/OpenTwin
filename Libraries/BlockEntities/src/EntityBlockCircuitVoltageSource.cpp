@@ -16,11 +16,11 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 	_navigationTreeIconNameHidden = "VoltageSource";
 	_blockTitle = "Voltage Source";
 
-	const std::string connectorNameLeft = "Left";
+	const std::string connectorNameLeft = "Left3";
 	m_LeftConnector = { ot::ConnectorType::In,connectorNameLeft,connectorNameLeft };
 	_connectorsByName[connectorNameLeft] = m_LeftConnector;
 
-	const std::string connectorNameRight = "Right";
+	const std::string connectorNameRight = "Right3";
 	m_RightConnector = { ot::ConnectorType::Out,connectorNameRight,connectorNameRight };
 	_connectorsByName[connectorNameRight] = m_RightConnector;
 
@@ -85,7 +85,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageSource::CreateBlockCfg()
 	myStack->addItemTop(myLayout, true, false);
 
 	ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
-	connection1->setName("Left");
+	connection1->setName("Left3");
 	ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 	connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 	connection1->setBackgroundPainer(painter1);
@@ -94,7 +94,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageSource::CreateBlockCfg()
 	//connection1->setMargins(10.0, 0.0, 0.0, 0.0);
 
 	ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
-	connection2->setName("Right");
+	connection2->setName("Right3");
 	ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
 	connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
 	connection2->setBackgroundPainer(painter2);
