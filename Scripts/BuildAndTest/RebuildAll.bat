@@ -102,7 +102,6 @@ ECHO ===============================================================
 ECHO Build Key Generator 
 ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\build.bat" RELEASE REBUILD
-REM CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\GenerateKey.bat" "%OT_ENCRYPTIONKEY_ROOT%\OTEncryptionKey.h"
 
 IF NOT EXIST "%OT_ENCRYPTIONKEY_ROOT%\OTEncryptionKey.h" (
 	ECHO Updating header file "%OT_ENCRYPTIONKEY_ROOT%\OTEncryptionKey.h"
