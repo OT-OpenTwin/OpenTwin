@@ -311,14 +311,13 @@ FunctionEnd
 		${If} $0 <> ${BST_UNCHECKED}
 			StrCpy $NetworkModeSelection "127.0.0.1"
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_SERVICES_ADDRESS" "$NetworkModeSelection"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
 			StrCpy $STANDARD_CERT_PATH "$INSTDIR\Certificates"
 			StrCpy $OPEN_TWIN_SERVICES_ADDRESS $NetworkModeSelection
 			
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_CERTS_PATH" "$STANDARD_CERT_PATH"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
+			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
 		${ElseIf} $1 <> ${BST_UNCHECKED}
 			${NSD_GetText} $public_ip_field $0
@@ -383,7 +382,8 @@ FunctionEnd
 		StrCpy $PublicCertPageChecker 1 
 
 		WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_CERTS_PATH" "$PUBLIC_CERT_PATH"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
+		
+		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
 	FunctionEnd
 
@@ -519,23 +519,11 @@ FunctionEnd
 		${NSD_GetText} $MongoDBCustomPortField $MongoDBCustomPortField_content
 
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_AUTH_PORT"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GSS_PORT"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000		
-
 
 		${NSD_GetState} $standardPortValuesRadioBtn $0
 		StrCmp $0 1 standardPortRadioBtnChecked		;assign standard values if standard values is ticked
@@ -553,22 +541,11 @@ FunctionEnd
 			StrCpy $MONGODB_CUSTOM_PORT "27017"
 
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_AUTH_PORT" "$auth_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GSS_PORT" "$gss_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT" "$lss_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT" "$gds_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT" "$lds_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS" "tls@$NetworkModeSelection:$MONGODB_CUSTOM_PORT"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000		
 		Goto EndCheck
 				
 		customPortRadioBtnChecked:
@@ -639,24 +616,15 @@ FunctionEnd
 
 				#set new custom env variable values and notify the system every time
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_AUTH_PORT" "$auth_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GSS_PORT" "$gss_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT" "$lss_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT" "$gds_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT" "$lds_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS" "tls@$NetworkModeSelection:$MONGODB_CUSTOM_PORT"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 		EndCheck:	
+		
+		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000		
+
 	FunctionEnd
 
 
@@ -983,7 +951,7 @@ SectionGroup /e "OpenTwin"
 		#try with refreshenv.cmd
 		${If} $PublicIpSet <> 0 #public IP was set
 			ExpandEnvStrings $0 %COMSPEC%
-				ExecWait '"$0" /c "START /MIN cmd.exe /c ""$TempToolChain\RefreshEnv.cmd" && cd "$INSTDIR\Certificates" && "$INSTDIR\Certificates\CreateServerCertificate.bat""" '
+				ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c ""$TempToolChain\RefreshEnv.cmd" && cd "$INSTDIR\Certificates" && "$INSTDIR\Certificates\CreateServerCertificate.bat""" '
 		${Else}
 			Goto +2
 		${EndIf}
@@ -1045,18 +1013,22 @@ SectionGroup /e "OpenTwin"
 
 		# call for js script to paste admin user creation
 		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" < "$TempToolChain\db_admin.js" " "'
+			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" < "$TempToolChain\db_admin.js" " "'
 
 		# mongoDB_storage_script_wauth.py
 		${If} $PublicIpSet <> 0
 			ExecWait '"$TempToolChain\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$PUBLIC_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
 			ExpandEnvStrings $0 %COMSPEC%
-				ExecWait '"$0" /c "START /MIN cmd.exe /c "certutil -addstore root "$PUBLIC_CERT_PATH\ca.pem"""" '	
+				ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$PUBLIC_CERT_PATH\ca.pem"""" '	
 		${Else}
 			ExecWait '"$TempToolChain\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$STANDARD_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
 			ExpandEnvStrings $0 %COMSPEC%
-				ExecWait '"$0" /c "START /MIN cmd.exe /c "certutil -addstore root "$STANDARD_CERT_PATH\ca.pem"""" '
+				ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$STANDARD_CERT_PATH\ca.pem"""" '
 		${EndIf}
+		
+		DetailPrint "Restart services..."
+		nsExec::ExecToLog 'net stop "MongoDB"'	
+		nsExec::ExecToLog 'net start "MongoDB"'	
 		
 	SectionEnd
 SectionGroupEnd
@@ -1087,7 +1059,7 @@ Section "Install Rust" SEC06_1
 
 	DetailPrint "Running Rust commands..."
 	ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c "rustup install stable latest" && "rustup default stable latest" && "rustup update" " '
+			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c "rustup install stable latest" && "rustup default stable latest" && "rustup update" " '
 SectionEnd
 
 
@@ -1111,7 +1083,7 @@ Section "Install Node.js and yarn" SEC08
 																					# use "INSTALLDIR="path\to\NodeJS" to install to a specific location 
 	DetailPrint "Installing yarn..."
 		ExpandEnvStrings $0 %COMSPEC%
-				ExecWait '"$0" /c "START /MIN cmd.exe /c " "$TempToolChain\RefreshEnv.cmd" && npm install --global yarn" " '
+				ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$TempToolChain\RefreshEnv.cmd" && npm install --global yarn" " '
 SectionEnd
 
 SectionGroup /e "Python & Sphinx"
@@ -1132,7 +1104,7 @@ SectionGroup /e "Python & Sphinx"
 		AddSize 22000
 		DetailPrint "Installing Sphinx..."
 			ExpandEnvStrings $0 %COMSPEC%
-			#ExecWait '"$0" /k "START /MIN cmd.exe /k " "$TempToolChain\RefreshEnv.cmd" && pip install sphinx && pip install sphinx_rtd_theme" " '
+			#ExecWait '"$0" /k "START /WAIT /MIN cmd.exe /k " "$TempToolChain\RefreshEnv.cmd" && pip install sphinx && pip install sphinx_rtd_theme" " '
 			ExecWait 'cmd.exe /c "title Installing Sphinx and ReadTheDocs Theme && "$TempToolChain\RefreshEnv.cmd" && pip install -U sphinx && pip install -U sphinx_rtd_theme " '
 	SectionEnd
 
@@ -1140,7 +1112,7 @@ SectionGroup /e "Python & Sphinx"
 		AddSize 106
 		DetailPrint "Installing Pyinstaller..."
 			ExpandEnvStrings $0 %COMSPEC%
-			#ExecWait '"$0" /k "START /MIN cmd.exe /k " "$TempToolChain\RefreshEnv.cmd" && pip install pyinstaller" " '
+			#ExecWait '"$0" /k "START /WAIT /MIN cmd.exe /k " "$TempToolChain\RefreshEnv.cmd" && pip install pyinstaller" " '
 			ExecWait 'cmd.exe /c "title Installing pyinstaller && "$TempToolChain\RefreshEnv.cmd" && pip install -U pyinstaller " '
 	SectionEnd
 SectionGroupEnd
@@ -1149,7 +1121,7 @@ Section "-CleanupTasks"
 	SectionIn RO
 	DetailPrint "Refreshing Environment..."
 	ExpandEnvStrings $0 %COMSPEC%
-		ExecWait '"$0" /c "START /MIN cmd.exe /c " "$TempToolChain\RefreshEnv.cmd"'
+		ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$TempToolChain\RefreshEnv.cmd"'
 	DetailPrint "Cleaning up..."
 	RMDir /r ${TEMP_TOOLCHAIN_DIR}
 	RMDir /r $GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION
@@ -1215,34 +1187,17 @@ FunctionEnd
 Section Uninstall
 #Delete ALL env variables set by the installer
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_AUTH_PORT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GSS_PORT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_CERTS_PATH"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-	
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_SERVICES_ADDRESS"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPENTWIN_DEV_ROOT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPENTWIN_THIRDPARTY_ROOT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000	
+		
+	SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000	
 
 #===============================================================================================================================	
 	

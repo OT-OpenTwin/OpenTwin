@@ -271,14 +271,13 @@ FunctionEnd
 		${If} $0 <> ${BST_UNCHECKED}
 			StrCpy $NetworkModeSelection "127.0.0.1"
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_SERVICES_ADDRESS" "$NetworkModeSelection"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
 			StrCpy $DEFAULT_CERT_PATH "$INSTDIR\Certificates"
 			StrCpy $OPEN_TWIN_SERVICES_ADDRESS $NetworkModeSelection
 			
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_CERTS_PATH" "$DEFAULT_CERT_PATH"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
+			
+			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
 		${ElseIf} $1 <> ${BST_UNCHECKED}
 			${NSD_GetText} $public_ip_field $0
@@ -343,7 +342,8 @@ FunctionEnd
 		StrCpy $PublicCertPageChecker 1 
 
 		WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_CERTS_PATH" "$PUBLIC_CERT_PATH"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
+		
+		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
 	FunctionEnd
 
@@ -479,23 +479,11 @@ FunctionEnd
 		${NSD_GetText} $MongoDBCustomPortField $MongoDBCustomPortField_content
 
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_AUTH_PORT"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GSS_PORT"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS"
-			SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000		
-
 
 		${NSD_GetState} $standardPortValuesRadioBtn $0
 		StrCmp $0 1 standardPortRadioBtnChecked		;assign standard values if standard values is ticked
@@ -513,22 +501,11 @@ FunctionEnd
 			StrCpy $MONGODB_CUSTOM_PORT "27017"
 
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_AUTH_PORT" "$auth_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GSS_PORT" "$gss_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT" "$lss_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT" "$gds_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT" "$lds_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS" "tls@$NetworkModeSelection:$MONGODB_CUSTOM_PORT"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000		
 		Goto EndCheck
 				
 		customPortRadioBtnChecked:
@@ -599,24 +576,16 @@ FunctionEnd
 
 				#set new custom env variable values and notify the system every time
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_AUTH_PORT" "$auth_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GSS_PORT" "$gss_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT" "$lss_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT" "$gds_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT" "$lds_entry"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS" "tls@$NetworkModeSelection:$MONGODB_CUSTOM_PORT"
-				SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
 		EndCheck:	
+
+		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
+
 	FunctionEnd
 
 
@@ -770,16 +739,15 @@ FunctionEnd
 	!insertmacro MUI_PAGE_COMPONENTS
 
 	; Page calls - order is relevant!
+	; Directory page
+	!insertmacro MUI_PAGE_DIRECTORY
+	Page custom DatabaseEntry
 	#page custom DatabaseInfo #MongoDB paths debug page
 	Page custom NetworkModePage OnNetworkLeave
 	Page custom PublicIPCertificate OnPublicCertficateLeave
 	#Page custom NetworkInfoPage
 	Page custom PortPage OnPortLeave
 	#Page custom PortInfoPage
-
-	; Directory page
-	!insertmacro MUI_PAGE_DIRECTORY
-	Page custom DatabaseEntry
 
 	; Start menu page
 	var ICONS_GROUP
@@ -843,7 +811,7 @@ Section "OpenTwin Main Files (Required)" SEC02
 
 	${If} $PublicIpSet <> 0 #public IP was set
 		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c ""$INSTDIR\Tools\ThirdParty\RefreshEnv.cmd" && cd "$INSTDIR\Certificates" && "$INSTDIR\Certificates\CreateServerCertificate.bat""" '
+			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c ""$INSTDIR\Tools\ThirdParty\RefreshEnv.cmd" && cd "$INSTDIR\Certificates" && "$INSTDIR\Certificates\CreateServerCertificate.bat""" '
 	${Else}
 		Goto +2
 	${EndIf}
@@ -893,18 +861,25 @@ Section "MongoDB Setup" SEC03
 
 	# call for js script to paste admin user creation
 	ExpandEnvStrings $0 %COMSPEC%
-		ExecWait '"$0" /c "START /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" < "$INSTDIR\Tools\javascript\db_admin.js" " "'
-
+		ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" < "$INSTDIR\Tools\javascript\db_admin.js" " "'
+	
 	# mongoDB_storage_script_wauth.py
 	${If} $PublicIpSet <> 0
 		ExecWait '"$INSTDIR\Tools\python\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$PUBLIC_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
 		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c "certutil -addstore root "$PUBLIC_CERT_PATH\ca.pem"""" '	
+			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$PUBLIC_CERT_PATH\ca.pem"""" '	
 	${Else}
 		ExecWait '"$INSTDIR\Tools\python\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$DEFAULT_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
 		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /MIN cmd.exe /c "certutil -addstore root "$DEFAULT_CERT_PATH\ca.pem"""" '
+			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$DEFAULT_CERT_PATH\ca.pem"""" '
 	${EndIf}
+		
+	DetailPrint "Restart services..."
+	nsExec::ExecToLog 'net stop "MongoDB"'	
+	nsExec::ExecToLog 'net start "MongoDB"'	
+	
+	#DetailPrint "Wait..."
+	#Sleep 10000
 	
 SectionEnd
 
@@ -954,28 +929,15 @@ FunctionEnd
 Section Uninstall
 #Delete ALL env variables set by the installer
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_AUTH_PORT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GSS_PORT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-
-	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_CERTS_PATH"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-	
+	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_CERTS_PATH"	
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_SERVICES_ADDRESS"
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
+	
+	SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 #===============================================================================================================================	
 	
 ${If} $UNINSTALL_MONGODB_FLAG != 0
