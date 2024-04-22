@@ -2042,6 +2042,15 @@ QDateTimeEdit QAbstractItemView {
 
 /* ##################################################################################### */
 
+/* QColorDialog */
+
+QColorDialog {
+    background-color: %color:Dialog Background%;
+    color: %color:Dialog Foreground%;
+}
+
+/* ##################################################################################### */
+
 /* QAbstractView */
 
 QAbstractView:hover {

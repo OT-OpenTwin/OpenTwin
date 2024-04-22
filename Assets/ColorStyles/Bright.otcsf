@@ -151,10 +151,14 @@ QCheckBox::indicator:unchecked {
 }
 
 QCheckBox::indicator:unchecked:hover,
-QCheckBox::indicator:unchecked:focus,
-QCheckBox::indicator:unchecked:pressed {
+QCheckBox::indicator:unchecked:focus {
     border: none;
     image: url('%root%/icons/checkbox_unchecked_focus.png');
+}
+
+QCheckBox::indicator:unchecked:pressed {
+    border: none;
+    image: url('%root%/icons/checkbox_unchecked_pressed.png');
 }
 
 QCheckBox::indicator:unchecked:disabled {
@@ -166,10 +170,14 @@ QCheckBox::indicator:checked {
 }
 
 QCheckBox::indicator:checked:hover,
-QCheckBox::indicator:checked:focus,
-QCheckBox::indicator:checked:pressed {
+QCheckBox::indicator:checked:focus {
     border: none;
     image: url('%root%/icons/checkbox_checked_focus.png');
+}
+
+QCheckBox::indicator:checked:pressed {
+    border: none;
+    image: url('%root%/icons/checkbox_checked_pressed.png');
 }
 
 QCheckBox::indicator:checked:disabled {
@@ -185,9 +193,12 @@ QCheckBox::indicator:indeterminate:disabled {
 }
 
 QCheckBox::indicator:indeterminate:focus,
-QCheckBox::indicator:indeterminate:hover,
-QCheckBox::indicator:indeterminate:pressed {
+QCheckBox::indicator:indeterminate:hover {
     image: url('%root%/icons/checkbox_indeterminate_focus.png');
+}
+
+QCheckBox::indicator:indeterminate:pressed {
+    image: url('%root%/icons/checkbox_indeterminate_pressed.png');
 }
 
 /* ##################################################################################### */
@@ -2034,6 +2045,15 @@ QDateTimeEdit QAbstractItemView {
     selection-background-color: rgba(0,255,0,255);
 }
 
+
+/* ##################################################################################### */
+
+/* QColorDialog */
+
+QColorDialog {
+    background-color: rgba(240,240,240,255);
+    color: rgba(0,0,0,255);
+}
 
 /* ##################################################################################### */
 
