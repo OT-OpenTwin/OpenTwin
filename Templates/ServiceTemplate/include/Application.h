@@ -103,7 +103,7 @@ public:
 	//! @brief This function will be called when the settings were synchronized with the database
 	//! At this point the values from the dataset should be stored since the dataset will be deleted after this function call
 	//! @param The dataset that contains all values
-	virtual void settingsSynchronized(ot::SettingsData * _dataset);
+	virtual void settingsSynchronized(ot::SettingsData * _dataset) override;
 
 	//! @brief This function will be called when the settings were changed in the uiService
 	//! The value of the provided item should be stored.
@@ -111,5 +111,5 @@ public:
 	//! otherwise false. When returning true, the function createSettings() will be called and the created dataset will be
 	//! send to the uiService to update the Settings in the dialog
 	//! @param The item that has been changed in the uiService (instance will be deleted after this function call)
-	virtual bool settingChanged(ot::AbstractSettingsItem * _item);
+	virtual bool settingChanged(ot::AbstractSettingsItem * _item) override;
 };

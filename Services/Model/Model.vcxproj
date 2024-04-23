@@ -329,6 +329,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\CheckGeometry.cpp" />
     <ClCompile Include="src\ClassFactoryModel.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
@@ -347,6 +348,7 @@
     <ClCompile Include="src\TableReader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\CheckGeometry.h" />
     <ClInclude Include="include\ClassFactoryModel.h" />
     <ClInclude Include="include\GeometryOperations.h" />

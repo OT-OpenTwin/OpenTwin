@@ -43,9 +43,6 @@ ot::ApplicationBase::ApplicationBase(const std::string & _serviceName, const std
 	m_sessionService.doc = nullptr;
 	m_sessionService.enabledCounter = 0;
 	m_sessionService.service = nullptr;
-
-	OTAssert(m_uiNotifier, "The provided ui notifier is null");
-	OTAssert(m_modelNotifier, "The provided model notifier is null");
 }
 
 ot::ApplicationBase::~ApplicationBase()
