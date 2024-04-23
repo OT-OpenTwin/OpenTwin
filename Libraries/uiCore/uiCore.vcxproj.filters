@@ -52,12 +52,6 @@
     <Filter Include="Header Files\ak\API">
       <UniqueIdentifier>{7b520511-d9c0-4030-9098-c061a6fb147d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\ak\DB">
-      <UniqueIdentifier>{dfecc335-7b02-4b5e-950a-d2fa2a3e584a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\ak\DB">
-      <UniqueIdentifier>{67885434-bfa7-45bb-8c7d-138b424fcf7d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\ak\Core">
       <UniqueIdentifier>{a879db62-2335-4cc1-a85d-2e547201489d}</UniqueIdentifier>
     </Filter>
@@ -246,9 +240,6 @@
     <ClCompile Include="src\akWidgets\aDockWatcherWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\akDB\aMSSQLWrapper.cpp">
-      <Filter>Source Files\ak\DB</Filter>
-    </ClCompile>
     <ClCompile Include="src\akCore\aDate.cpp">
       <Filter>Source Files\ak\Core</Filter>
     </ClCompile>
@@ -355,9 +346,6 @@
     </ClInclude>
     <ClInclude Include="include\akWidgets\aCalendarWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akDB\aMSSQLWrapper.h">
-      <Filter>Header Files\ak\DB</Filter>
     </ClInclude>
     <ClInclude Include="include\akCore\aDate.h">
       <Filter>Header Files\ak\Core</Filter>

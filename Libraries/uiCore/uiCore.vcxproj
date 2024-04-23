@@ -217,7 +217,6 @@
     <ClCompile Include="src\akCore\aTime.cpp" />
     <ClCompile Include="src\akCore\aUidManager.cpp" />
     <ClCompile Include="src\akCore\rJSON.cpp" />
-    <ClCompile Include="src\akDB\aMSSQLWrapper.cpp" />
     <ClCompile Include="src\akDialogs\aCustomizableInputDialog.cpp" />
     <ClCompile Include="src\akDialogs\aLogInDialog.cpp" />
     <ClCompile Include="src\akDialogs\aOptionsDialog.cpp">
@@ -304,7 +303,6 @@
     <ClInclude Include="include\akCore\aUidMangager.h" />
     <ClInclude Include="include\akCore\globalDataTypes.h" />
     <ClInclude Include="include\akCore\rJSON.h" />
-    <ClInclude Include="include\akDB\aMSSQLWrapper.h" />
     <QtMoc Include="include\akDialogs\aCustomizableInputDialog.h" />
     <QtMoc Include="include\akDialogs\aOptionsDialog.h" />
     <QtMoc Include="include\akGui\aApplication.h" />
