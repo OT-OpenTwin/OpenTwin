@@ -461,6 +461,9 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 		if (getEdges() != nullptr) shapeNode->removeChild(getEdges());
 		if (getEdgesHighlighted() != nullptr) shapeNode->removeChild(getEdgesHighlighted());
 		if (getFaceEdgesHighlight() != nullptr) shapeNode->removeChild(getFaceEdgesHighlight());
+
+		triangleToFaceId.clear();
+		faceEdgesHighlight.clear();
 	}
 
 	// Store the triangle / face information
