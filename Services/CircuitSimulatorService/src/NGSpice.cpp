@@ -14,6 +14,9 @@
 //Third Party Header
 #include <string>
 #include <algorithm>
+
+//C++ Header
+#include <sstream>
 namespace Numbers
 {
 	static unsigned long long nodeNumber = 0;
@@ -45,6 +48,10 @@ std::string NGSpice::getNodeNumbersOfVoltageMeter(std::string editorName, std::m
 			auto connections = blockEntity->getAllConnections();
 			for (auto connectionID : connections)
 			{
+				if (isValidNodeString(nodes))
+				{
+					break;
+				}
 				// now i want to find the connector and after it through this connection i would like to find the other connection with the node number
 				std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connectionID);
 				ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
@@ -54,12 +61,20 @@ std::string NGSpice::getNodeNumbersOfVoltageMeter(std::string editorName, std::m
 				auto connections2 = block->getAllConnections();
 				for (auto connectionID2 : connections2)
 				{
+					if (isValidNodeString(nodes))
+					{
+						break;
+					}
 
 					auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName);
 					auto element = it->second.getMapOfElements().find(connectionCfg.getDestinationUid());
 					
 					for (auto conn : element->second.getList())
 					{
+						if (isValidNodeString(nodes))
+						{
+							break;
+						}
 						
 						if (conn.originConnectable() == connectorName || conn.getReversedConnection().originConnectable() == connectorName)
 						{
@@ -109,6 +124,31 @@ std::string NGSpice::getNodeNumbersOfVoltageMeter(std::string editorName, std::m
 
 		}
 	}
+}
+
+bool NGSpice::isValidNodeString(const std::string& input)
+{
+	std::stringstream ss(input);
+	std::string token;
+	std::vector<std::string> tokens;
+
+	while (std::getline(ss, token, ',')) {
+		tokens.push_back(token);
+	}
+
+	if (tokens.size() != 2) {
+		return false;
+	}
+
+	for (const auto& tok : tokens) {
+		for (char c : tok) {
+			if (!isdigit(c)) {
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 
