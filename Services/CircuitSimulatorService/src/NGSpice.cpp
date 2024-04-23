@@ -40,7 +40,11 @@ std::string NGSpice::getNodeNumbersOfVoltageMeter(std::string editorName, std::m
 	//First i go through all Entities to find the Voltage Meter
 	for (auto& blockEntityByID : allEntitiesByBlockID)
 	{
-	
+		if (isValidNodeString(nodes))
+		{
+			break;
+		}
+
 		if (blockEntityByID.second->getBlockTitle() == "Voltage Meter")
 		{
 			//When found i go through its all connections 
@@ -98,25 +102,17 @@ std::string NGSpice::getNodeNumbersOfVoltageMeter(std::string editorName, std::m
 						{
 							continue;
 						}
-					}
-						
-				}
-					
-					
-					
-					
-				
-
+					}		
+				}		
 			}
-
-			nodeNumberString = "v(";
-			nodeNumberString += nodes;
-			nodeNumberString += ")";
-
-			return nodeNumberString;
-
 		}
 	}
+	nodeNumberString = "v(";
+	nodeNumberString += nodes;
+	nodeNumberString += ")";
+
+	return nodeNumberString;
+
 }
 
 bool NGSpice::isValidNodeString(const std::string& input)
