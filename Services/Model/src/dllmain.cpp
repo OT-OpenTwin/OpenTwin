@@ -22,7 +22,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     }
     return TRUE;
 }
-
+#include "OTCommunication/ActionDispatcher.h"
 #include "MicroserviceAPI.h"
 #include "OTCore/Logger.h"
 #include <chrono>
@@ -33,27 +33,23 @@ extern "C" {
 	{
 		//return ot::foundation::performAction(_json, _senderIP);
 
-		OT_LOG("From \"" + std::string(_senderIP) + "\" Received: \"" + std::string(_json) + "\"", ot::INBOUND_MESSAGE_LOG);
 
-		using namespace std::chrono_literals;
-		thread_local static bool lock = false;
-		while (lock) std::this_thread::sleep_for(1ms);
-		lock = true;
+		ot::JsonDocument actionDoc;
+		actionDoc.fromJson(_json);
 
-		// Parse json -> action + arguments
-		ot::JsonDocument doc;
-		doc.Parse(_json);
-		assert(doc.IsObject());
+		// Get the requested action (if the member is missing a exception will be thrown)
+		std::string action = ot::json::getString(actionDoc, OT_ACTION_MEMBER);
 
-		std::string result = MicroserviceAPI::dispatchAction(doc, _senderIP);
+		bool hasHandler{ false };
+		std::string result = ot::ActionDispatcher::instance().dispatch(action, actionDoc, hasHandler, ot::EXECUTE);
+
+		if (!hasHandler) {
+			result = MicroserviceAPI::dispatchAction(actionDoc, _senderIP);
+		}
 
 		// Create a copy of result... -> const char * (new to allocate the memory)
 		char* retVal = new char[result.size() + 1];
 		strcpy_s(retVal, result.size() + 1, result.c_str());
-
-		lock = false;
-
-		OT_LOG(".. Execute completed. Returning: \"" + result + "\"", ot::INBOUND_MESSAGE_LOG);
 
 		return retVal;
 	};

@@ -487,11 +487,7 @@ std::string MicroserviceAPI::dispatchAction(ot::JsonDocument &doc, const std::st
 				delete globalModel;
 				globalModel = nullptr;
 			}
-		}/*
-		else if (action == "projectOpen") {
-			assert(0); // Not in use anymore
-			
-		}*/
+		}
 		else if (action == OT_ACTION_CMD_ServicePreShutdown) {
 
 			if (globalModel == nullptr) throw std::exception("No model created yet");
