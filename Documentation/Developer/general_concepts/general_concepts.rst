@@ -8,6 +8,7 @@ See here for more details:
 
    coding_standards
    opentwin_layers
+   service_information
    user_interface
    datamodel
    messaging

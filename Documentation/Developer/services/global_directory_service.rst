@@ -1,3 +1,5 @@
+.. _global_directory_service:
+
 Global Directory Service
 ========================
 

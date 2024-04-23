@@ -1,3 +1,5 @@
+.. _local_session_service:
+
 Local Session Service
 =====================
 
