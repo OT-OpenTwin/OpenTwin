@@ -14,6 +14,9 @@ IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
 	goto END_FAIL
 )
 
+REM First, we need to shutdown the application in case that services are still Running
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\ShutdownAll.bat"
+
 set NSIS_REG_KEY=HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\NSIS
 set SEVENZIP_REG_KEY=HKEY_CURRENT_USER\SOFTWARE\7-Zip
 set SEVENZIP_VALUE=Path
