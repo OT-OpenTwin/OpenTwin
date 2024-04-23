@@ -45,74 +45,67 @@ std::string NGSpice::getNodeNumbersOfVoltageMeter(std::string editorName, std::m
 		{
 			//When found i go through its all connections 
 			std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
-			auto connections = blockEntity->getAllConnections();
-			for (auto connectionID : connections)
+			auto voltageMeterconnections = blockEntity->getAllConnections();
+			for (auto voltageMeterConnectionID : voltageMeterconnections)
 			{
 				if (isValidNodeString(nodes))
 				{
 					break;
 				}
 				// now i want to find the connector and after it through this connection i would like to find the other connection with the node number
-				std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connectionID);
+				std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(voltageMeterConnectionID);
 				ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
 				std::string connectorName = connectionCfg.destConnectable();
 
-				std::shared_ptr<EntityBlock> block = allEntitiesByBlockID.at(connectionCfg.getDestinationUid());
-				auto connections2 = block->getAllConnections();
-				for (auto connectionID2 : connections2)
+				//afte i got the connectorName to which the voltageMeterConnection is connected to i would like to get the element 
+				auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName);
+				auto netlistElement = it->second.getMapOfElements().find(connectionCfg.getDestinationUid());
+					
+				//Now i go through all connections of the Element and try to find the right one to get the nodeNumber
+				for (auto netlistConn : netlistElement->second.getList())
 				{
 					if (isValidNodeString(nodes))
 					{
 						break;
 					}
-
-					auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName);
-					auto element = it->second.getMapOfElements().find(connectionCfg.getDestinationUid());
-					
-					for (auto conn : element->second.getList())
-					{
-						if (isValidNodeString(nodes))
-						{
-							break;
-						}
 						
-						if (conn.originConnectable() == connectorName || conn.getReversedConnection().originConnectable() == connectorName)
+					if (netlistConn.originConnectable() == connectorName || netlistConn.getReversedConnection().originConnectable() == connectorName)
+					{
+						if (netlistConn.getNodeNumber() != "voltageMeterConnection")
 						{
-							if (conn.getNodeNumber() != "voltageMeterConnection")
-							{
-								size_t position = nodes.find(conn.getNodeNumber());
-								if (position != std::string::npos)
-								{
-									continue;
-								}
-								else
-								{
-									size_t pos = nodes.find(",");
-									if (pos == std::string::npos)
-									{
-										nodes += conn.getNodeNumber() + ",";
-									}
-									else
-									{
-										nodes += conn.getNodeNumber();
-									}
-									
-									
-								}
-								
-							}
-							else
+							size_t position = nodes.find(netlistConn.getNodeNumber());
+							if (position != std::string::npos)
 							{
 								continue;
 							}
+							else
+							{
+								size_t pos = nodes.find(",");
+								if (pos == std::string::npos)
+								{
+									nodes += netlistConn.getNodeNumber() + ",";
+								}
+								else
+								{
+									nodes += netlistConn.getNodeNumber();
+								}
+									
+									
+							}
+								
 						}
-						
+						else
+						{
+							continue;
+						}
 					}
-					
-					
-					
-					
+						
 				}
+					
+					
+					
+					
+				
 
 			}
 
