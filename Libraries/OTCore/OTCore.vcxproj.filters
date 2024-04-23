@@ -139,6 +139,9 @@
     <ClCompile Include="src\PropertyBase.cpp">
       <Filter>src\Properties</Filter>
     </ClCompile>
+    <ClCompile Include="src\ThisService.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -326,6 +329,9 @@
     </ClInclude>
     <ClInclude Include="include\OTCore\PropertyBase.h">
       <Filter>include\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ThisService.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
