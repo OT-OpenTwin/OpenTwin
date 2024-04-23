@@ -470,8 +470,8 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_colors.insert_or_assign(CSE_COLOR_ErrorForeground, new PropertyPainter2D(new FillPainter2D(Color::Red)));
 	m_colors.insert_or_assign("Test 1", new PropertyPainter2D(new FillPainter2D(Color::Red)));
 
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_Big, new PropertyDouble(10.));
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_Small, new PropertyDouble(6.));
+	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_Big, new PropertyDouble(4.));
+	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_Small, new PropertyDouble(4.));
 	m_double.insert_or_assign(CSE_NUMBER_OpacityTooltip, new PropertyDouble(10.));
 
 	m_integer.insert_or_assign(CSE_INT_SplitterHandleWidth, new PropertyInt(2));
