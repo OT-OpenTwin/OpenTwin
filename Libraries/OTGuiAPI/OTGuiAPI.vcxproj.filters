@@ -36,6 +36,9 @@
     <ClInclude Include="include\OTGuiAPI\GuiAPIManager.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGuiAPI\FrontendAPI.h">
+      <Filter>Header Files\CommunicationAPIs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -46,6 +49,9 @@
     </ClCompile>
     <ClCompile Include="src\GuiAPIManager.cpp">
       <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FrontendAPI.cpp">
+      <Filter>Source Files\CommunicationAPIs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

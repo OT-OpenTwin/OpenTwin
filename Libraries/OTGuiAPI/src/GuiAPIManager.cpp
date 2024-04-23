@@ -28,14 +28,14 @@ void ot::GuiAPIManager::frontendDisconnected(void) {
 	m_frontend.setServiceURL("");
 }
 
-bool ot::GuiAPIManager::sendQueuedRequestToFrontend(const std::string& _receiverUrl, const std::string& _message) {
+bool ot::GuiAPIManager::sendQueuedRequestToFrontend(const std::string& _message) {
 	if (!this->isFrontendConnected()) {
 		OT_LOG_W("User frontend is not connected");
 		return false;
 	}
 
 	std::string tmp;
-	return msg::send("", _receiverUrl, ot::QUEUE, _message, tmp);
+	return msg::send(m_url, m_frontend.serviceURL(), ot::QUEUE, _message, tmp);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

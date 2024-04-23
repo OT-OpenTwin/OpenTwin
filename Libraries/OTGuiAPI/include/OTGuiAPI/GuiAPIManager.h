@@ -22,10 +22,14 @@ namespace ot {
 		void frontendDisconnected(void);
 		bool isFrontendConnected(void) const { return !(m_frontend.serviceURL().empty()); };
 
-		bool sendQueuedRequestToFrontend(const std::string& _receiverUrl, const std::string& _message);
+		void setOwnUrl(const std::string& _url) { m_url = _url; };
+		const std::string& ownUrl(void) const { return m_url; };
+
+		bool sendQueuedRequestToFrontend(const std::string& _message);
 
 	private:
 		ServiceBase m_frontend;
+		std::string m_url;
 
 		GuiAPIManager();
 		~GuiAPIManager();

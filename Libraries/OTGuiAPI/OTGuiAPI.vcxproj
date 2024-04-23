@@ -19,12 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTGuiAPI\FrontendAPI.h" />
     <ClInclude Include="include\OTGuiAPI\GraphicsFlowItem.h" />
     <ClInclude Include="include\OTGuiAPI\GuiAPIManager.h" />
     <ClInclude Include="include\OTGuiAPI\OTGuiAPIAPIExport.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\FrontendAPI.cpp" />
     <ClCompile Include="src\GraphicsFlowItem.cpp" />
     <ClCompile Include="src\GuiAPIManager.cpp" />
   </ItemGroup>

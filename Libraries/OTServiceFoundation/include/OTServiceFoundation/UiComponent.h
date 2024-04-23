@@ -106,8 +106,9 @@ namespace ot {
 				const std::string &			_keySequence = std::string(""),
 				const ContextMenu&			_contextMenu = ContextMenu("")
 			);
+
 			void addMenuButton(
-				ot::MenuButtonDescription&		_menuButtonDescription,
+				ot::MenuButtonDescription&	_menuButtonDescription,
 				const LockTypeFlags&		_lockTypes,
 				const std::string &			_iconName,
 				const std::string &			_iconFolder = std::string("Default"),
