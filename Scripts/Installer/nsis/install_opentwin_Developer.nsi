@@ -907,6 +907,7 @@ Section "-Extract Installer Tools (Required)" SEC01
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\dev\*.*"
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\*.*"
 	File /r "..\python\dist\*.*"
+	File /r "..\helper\*.*"
 	File /r "..\javascript\*.*"
 
 SectionEnd
@@ -1003,7 +1004,7 @@ SectionGroup /e "OpenTwin"
 		ExecWait '"$TempToolChain\mongoDB_storage_script_noAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "disabled"'
 
 		#set directory permissions for the mongoDB service
-		ExecWait '"$TempToolChain\change_permissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
+		ExecWait '"$TempToolChain\SetPermissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
 
 		# restarting mongoDB service
 		nsExec::ExecToLog 'net stop "MongoDB"'	

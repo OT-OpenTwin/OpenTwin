@@ -789,6 +789,10 @@ Section "-Extract Installer Tools (Required)" SEC01
 	DetailPrint "Extracting python scripts..."
 	SetOutPath "$INSTDIR\Tools\python"
 	File /r "..\python\dist\*.*"
+	
+	DetailPrint "Extracting installation helper..."
+	SetOutPath "$INSTDIR\Tools\helper"
+	File /r "..\helper\*.*"
 
 	DetailPrint "Extracting javascript files..."
 	SetOutPath "$INSTDIR\Tools\javascript"
@@ -850,7 +854,7 @@ Section "MongoDB Setup" SEC03
 	ExecWait '"$INSTDIR\Tools\python\mongoDB_storage_script_noAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "disabled"'
 
 	#set directory permissions for the mongoDB service
-	ExecWait '"$INSTDIR\Tools\python\change_permissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
+	ExecWait '"$INSTDIR\Tools\helper\SetPermissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
 
 	# restarting mongoDB service
 	nsExec::ExecToLog 'net stop "MongoDB"'	

@@ -5,3 +5,4 @@ nsis/*.exe
 python/*.spec
 python/build/
 python/dist/
+helper

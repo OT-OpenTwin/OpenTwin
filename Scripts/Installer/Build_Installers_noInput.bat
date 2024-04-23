@@ -36,7 +36,7 @@ Set THIRDPARTY_UNZIP_PATH="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools"
 Set THIRDPARTY_ZIPFILE="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools\ThirdParty.zip"
 
 SET PYTHON_PATH="!OPENTWIN_DEV_ROOT!\Scripts\Installer\python"
-Set PY_PERMISSIONS="!OPENTWIN_DEV_ROOT!\Scripts\Installer\python\change_permissions.py"
+SET HELPER_PATH="!OPENTWIN_DEV_ROOT!\Scripts\Installer\helper"
 Set PY_MONGOD_NO_AUTH="!OPENTWIN_DEV_ROOT!\Scripts\Installer\python\mongoDB_storage_script_noAuth.py"
 Set PY_MONGOD_AUTH="!OPENTWIN_DEV_ROOT!\Scripts\Installer\python\mongoDB_storage_script_wAuth.py"
 
@@ -84,11 +84,19 @@ echo +++ COMPILE TIME +++
 	
 	echo Compiling Python Scripts...
 	cd !PYTHON_PATH!
-	pyinstaller --onefile --noconsole !PY_PERMISSIONS!
 	pyinstaller --onefile --noconsole !PY_MONGOD_NO_AUTH!
 	pyinstaller --onefile --noconsole !PY_MONGOD_AUTH!
 	cd %cd%
 	
+	echo Copying Installation helpers...
+	RMDIR /S /Q "!HELPER_PATH!"
+	mkdir !HELPER_PATH!
+	cd !HELPER_PATH!
+
+	copy %OPENTWIN_DEV_ROOT%\Tools\SetPermissions\x64\Release\SetPermissions.exe .
+	copy %OPENTWIN_DEV_ROOT%\Libraries\OTSystem\x64\Release\OTSystem.dll .
+	cd %cd%
+
 	echo COMPILING OPENTWIN INSTALLATION SCRIPTS
 	!MAKENSIS_PATH! /V3 !ENDUSER_NSI!
 	!MAKENSIS_PATH! /V3 !DEVELOPER_NSI!
