@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'OpenTwin'
-copyright = '2023, OpenTwin'
+copyright = '2024, OpenTwin'
 author = 'OpenTwin'
 
 # -- General configuration ---------------------------------------------------
