@@ -210,52 +210,12 @@ bool MicroserviceAPI::sendHttpRequest(RequestType operation, const std::string &
 	return success;
 }
 
-const char *MicroserviceAPI::queueAction(const char *json, const char *senderIP) 
-{ 
-	OT_LOG("Forwarding message to execute endpoint", ot::QUEUED_INBOUND_MESSAGE_LOG);
-	return performAction(json, senderIP);
-}
-
-const char *MicroserviceAPI::performAction(const char *json, const char *senderIP)
-{
-	OT_LOG("From \"" + std::string(senderIP) + "\" Received: \"" + std::string(json) + "\"", ot::INBOUND_MESSAGE_LOG);
-
-	using namespace std::chrono_literals;
-	thread_local static bool lock = false;
-	while (lock) std::this_thread::sleep_for(1ms);
-	lock = true;
-
-	// Parse json -> action + arguments
-	ot::JsonDocument doc;
-	doc.Parse(json);
-	assert(doc.IsObject());
-
-	std::string result = dispatchAction(doc, senderIP);
-
-	// Create a copy of result... -> const char * (new to allocate the memory)
-	char *retVal = new char[result.size() + 1];
-	strcpy_s(retVal, result.size() + 1, result.c_str());
-
-	lock = false;
-
-	OT_LOG(".. Execute completed. Returning: \"" + result + "\"", ot::INBOUND_MESSAGE_LOG);
-
-	return retVal;
-}
-
-const char *MicroserviceAPI::getServiceURL(void)
+const char *MicroserviceAPI::getServiceURLOld(void)
 {
 	char *retVal = new char[globalServiceURL.size() + 1];
 	strcpy_s(retVal, globalServiceURL.size() + 1, globalServiceURL.c_str());
 
 	return retVal;
-}
-
-void MicroserviceAPI::deallocateData(const char *str)
-{
-	if (str) {
-		delete[] str;
-	}
 }
 
 std::string initInternal() {
@@ -318,7 +278,7 @@ std::string initInternal() {
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-int MicroserviceAPI::init(const char * _localDirectoryServiceURL, const char * _serviceIP, const char * _sessionServiceURL, const char * _sessionID)
+int MicroserviceAPI::initOld(const char * _localDirectoryServiceURL, const char * _serviceIP, const char * _sessionServiceURL, const char * _sessionID)
 {
 	try {
 		// Initialize logging

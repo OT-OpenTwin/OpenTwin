@@ -12,11 +12,8 @@ extern std::string globalUIserviceURL;
 
 namespace MicroserviceAPI
 {
-	extern "C" _declspec(dllexport) const char *performAction(const char *json, const char *senderIP);
-	extern "C" _declspec(dllexport) const char *queueAction(const char *json, const char *senderIP);
-	extern "C" _declspec(dllexport) void deallocateData(const char *str);
-	extern "C" _declspec(dllexport) int init(const char *localDirectoryServiceURL, const char *serviceIP, const char *databaseIP, const char *directoryIP);
-	extern "C" _declspec(dllexport) const char *getServiceURL(void);
+	int initOld(const char* _localDirectoryServiceURL, const char* _serviceIP, const char* _sessionServiceURL, const char* _sessionID);
+	const char *getServiceURLOld(void);
 
 	enum RequestType {EXECUTE, QUEUE};
 	bool sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response);
