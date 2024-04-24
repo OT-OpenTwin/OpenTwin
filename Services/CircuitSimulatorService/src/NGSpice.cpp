@@ -45,25 +45,42 @@ std::string NGSpice::getNodeNumbersOfVoltageMeter(std::string editorName, std::m
 			break;
 		}
 
-		if (blockEntityByID.second->getBlockTitle() == "Voltage Meter")
+		if (blockEntityByID.second->getClassName() == "EntityBlockCircuitVoltageMeter")
 		{
 			//When found i go through its all connections 
 			std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
+			ot::UID voltageMeterUID = blockEntity->getEntityID();
 			auto voltageMeterconnections = blockEntity->getAllConnections();
+
 			for (auto voltageMeterConnectionID : voltageMeterconnections)
 			{
 				if (isValidNodeString(nodes))
 				{
 					break;
 				}
-				// now i want to find the connector and after it through this connection i would like to find the other connection with the node number
+
+				//Here i get the connectionCfg to earn all information about the connection
 				std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(voltageMeterConnectionID);
 				ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
-				std::string connectorName = connectionCfg.destConnectable();
 
-				//afte i got the connectorName to which the voltageMeterConnection is connected to i would like to get the element 
+				//Now i find out the UID of the other element and the connectorName
+				ot::UID connectedElementUID;
+				std::string connectorName = "";
+				if (connectionCfg.getOriginUid() != voltageMeterUID)
+				{
+					connectorName = connectionCfg.originConnectable();
+					connectedElementUID = connectionCfg.getOriginUid();
+				}
+				else if(connectionCfg.getDestinationUid() != voltageMeterUID)
+				{
+					connectorName = connectionCfg.destConnectable();
+					connectedElementUID = connectionCfg.getDestinationUid();
+				}
+				
+
+				// Here i get the connectedElement out of my BufferClass
 				auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName);
-				auto netlistElement = it->second.getMapOfElements().find(connectionCfg.getDestinationUid());
+				auto netlistElement = it->second.getMapOfElements().find(connectedElementUID);
 					
 				//Now i go through all connections of the Element and try to find the right one to get the nodeNumber
 				for (auto netlistConn : netlistElement->second.getList())
@@ -72,11 +89,13 @@ std::string NGSpice::getNodeNumbersOfVoltageMeter(std::string editorName, std::m
 					{
 						break;
 					}
-						
-					if (netlistConn.originConnectable() == connectorName || netlistConn.getReversedConnection().originConnectable() == connectorName)
+					
+					if (netlistConn.getNodeNumber() != "voltageMeterConnection")
 					{
-						if (netlistConn.getNodeNumber() != "voltageMeterConnection")
+						if (netlistConn.originConnectable() == connectorName && netlistConn.getOriginUid() == connectedElementUID ||
+							netlistConn.destConnectable() == connectorName && netlistConn.getDestinationUid() == connectedElementUID)
 						{
+						
 							size_t position = nodes.find(netlistConn.getNodeNumber());
 							if (position != std::string::npos)
 							{
@@ -94,15 +113,13 @@ std::string NGSpice::getNodeNumbersOfVoltageMeter(std::string editorName, std::m
 									nodes += netlistConn.getNodeNumber();
 								}
 									
-									
 							}
-								
 						}
-						else
-						{
-							continue;
-						}
-					}		
+					}
+					else
+					{
+						continue;
+					}
 				}		
 			}
 		}
@@ -112,6 +129,8 @@ std::string NGSpice::getNodeNumbersOfVoltageMeter(std::string editorName, std::m
 	nodeNumberString += ")";
 
 	return nodeNumberString;
+
+	//Build a map in which the value is a vector and put in their all elements to find easy the voltage Meter elements and not to go trough all with a for loop
 
 }
 
