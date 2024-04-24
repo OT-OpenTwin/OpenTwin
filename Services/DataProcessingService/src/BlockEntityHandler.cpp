@@ -130,7 +130,8 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
 
 	// Message is queued, no response here
-	_uiComponent->sendMessage(true, doc);
+	std::string tmp;
+	_uiComponent->sendMessage(true, doc, tmp);
 }
 
 void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, ot::Point2DD& position, ClassFactory* classFactory)

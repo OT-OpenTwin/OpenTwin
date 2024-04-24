@@ -267,7 +267,8 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("addFilesToModel", doc.GetAllocator()), doc.GetAllocator());
 
-				uiComponent()->sendMessage(true, doc);
+				std::string tmp;
+				uiComponent()->sendMessage(true, doc, tmp);
 			}
 			else if (action == _buttonImportTouchstone.GetFullDescription())
 			{
@@ -278,7 +279,9 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("importTouchstoneData", doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent,ot::JsonValue(true),doc.GetAllocator());
-				uiComponent()->sendMessage(true, doc);
+
+				std::string tmp;
+				uiComponent()->sendMessage(true, doc, tmp);
 			}
 			else if (action == _buttonImportPythonScript.GetFullDescription())
 			{
@@ -295,7 +298,8 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("addFilesToModel", doc.GetAllocator()), doc.GetAllocator());
 
-				uiComponent()->sendMessage(true, doc);
+				std::string tmp;
+				uiComponent()->sendMessage(true, doc, tmp);
 			}
 			else if (action == _buttonCreateTable.GetFullDescription())
 			{
@@ -354,7 +358,9 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, true, doc.GetAllocator());
-				uiComponent()->sendMessage(true, doc);
+
+				std::string tmp;
+				uiComponent()->sendMessage(true, doc, tmp);
 			}
 			else if (action == _buttonTableAddColumnRight.GetFullDescription())
 			{
@@ -367,7 +373,9 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, false, doc.GetAllocator());
-				uiComponent()->sendMessage(true, doc);
+
+				std::string tmp;
+				uiComponent()->sendMessage(true, doc, tmp);
 			}
 			else if (action == _buttonTableDeleteColumn.GetFullDescription())
 			{
@@ -379,7 +387,9 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn, doc.GetAllocator()), doc.GetAllocator());
-				uiComponent()->sendMessage(true, doc);
+
+				std::string tmp;
+				uiComponent()->sendMessage(true, doc, tmp);
 			}
 			else if (action == _buttonTableAddRowAbove.GetFullDescription())
 			{
@@ -392,7 +402,9 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, true, doc.GetAllocator());
-				uiComponent()->sendMessage(true, doc);
+
+				std::string tmp;
+				uiComponent()->sendMessage(true, doc, tmp);
 			}
 			else if (action == _buttonTableAddRowBelow.GetFullDescription())
 			{
@@ -405,7 +417,9 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, false, doc.GetAllocator());
-				uiComponent()->sendMessage(true, doc);
+
+				std::string tmp;
+				uiComponent()->sendMessage(true, doc, tmp);
 			}
 			else if (action == _buttonTableDeleteRow.GetFullDescription())
 			{
@@ -417,7 +431,9 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow, doc.GetAllocator()), doc.GetAllocator());
-				uiComponent()->sendMessage(true, doc);
+
+				std::string tmp;
+				uiComponent()->sendMessage(true, doc, tmp);
 			}
 			else
 			{
@@ -476,7 +492,9 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				ot::JsonObject jConfig;
 				dialogCfg.addToJsonObject(jConfig, requestNumberOfPortsDoc.GetAllocator());
 				requestNumberOfPortsDoc.AddMember(OT_ACTION_PARAM_Config, jConfig, requestNumberOfPortsDoc.GetAllocator());
-				m_uiComponent->sendMessage(true, requestNumberOfPortsDoc);
+
+				std::string tmp;
+				m_uiComponent->sendMessage(true, requestNumberOfPortsDoc, tmp);
 			}
 			else if (subsequentFunction == "SetNumberOfPorts")
 			{
@@ -534,7 +552,8 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)entityInfos.begin()->getID(), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("ColourRanges", doc.GetAllocator()), doc.GetAllocator());
 
-				uiComponent()->sendMessage(true, doc);
+				std::string tmp;
+				uiComponent()->sendMessage(true, doc, tmp);
 			}
 		}
 		else {
@@ -589,7 +608,8 @@ void Application::HandleSelectionChanged()
 				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)selectedEntityInfo.begin()->getID(), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("ColourRanges", doc.GetAllocator()), doc.GetAllocator());
 
-				uiComponent()->sendMessage(true, doc);
+				std::string tmp;
+				uiComponent()->sendMessage(true, doc, tmp);
 			}
 			else if (entityName.find(_previewTableNAme) != std::string::npos)
 			{
@@ -621,7 +641,8 @@ void Application::HandleSelectionChanged()
 				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, static_cast<uint64_t>(previewTable.first), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, "", doc.GetAllocator());
 
-				uiComponent()->sendMessage(true, doc);
+				std::string tmp;
+				uiComponent()->sendMessage(true, doc, tmp);
 			}
 			else if (entityName.find(ot::FolderNames::PythonScriptFolder) != std::string::npos)
 			{
@@ -635,7 +656,9 @@ void Application::HandleSelectionChanged()
 
 				uiRequest.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(selectedEntityInfo.begin()->getName(), uiRequest.GetAllocator()), uiRequest.GetAllocator());
 				uiRequest.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(fileContent, uiRequest.GetAllocator()), uiRequest.GetAllocator());
-				uiComponent()->sendMessage(true, uiRequest);
+
+				std::string tmp;
+				uiComponent()->sendMessage(true, uiRequest, tmp);
 			}
 			else if (entityName.find(ot::FolderNames::DatasetFolder) != std::string::npos)
 			{
@@ -650,7 +673,9 @@ void Application::HandleSelectionChanged()
 				doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_SetTable, doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_Value, dataObject, doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				uiComponent()->sendMessage(true, doc);
+
+				std::string tmp;
+				uiComponent()->sendMessage(true, doc, tmp);
 			}
 			else
 			{
@@ -716,8 +741,8 @@ void Application::RequestSelectedRanges()
 	_parametrizedDataHandler->GetSerializedColour().addToJsonObject(obj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_COLOUR_BACKGROUND, obj, doc.GetAllocator());
 
-
-	uiComponent()->sendMessage(true, doc);
+	std::string tmp;
+	uiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::SetControlstateTableFunctions(bool showTableBtns)

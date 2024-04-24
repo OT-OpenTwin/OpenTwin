@@ -467,7 +467,8 @@ void Application::importSTEP(void)
 	doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, true, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	uiComponent()->sendMessage(true, doc);
+	std::string tmp;
+	uiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::executeFunction(const std::string &function, const std::string &fileName, bool removeFile, const std::string &originalName)

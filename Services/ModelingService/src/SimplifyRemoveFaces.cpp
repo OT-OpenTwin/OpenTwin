@@ -262,7 +262,8 @@ bool SimplifyRemoveFaces::removeFacesFromEntity(EntityGeometry *geometryEntity, 
 
 		doc.AddMember(OT_ACTION_PARAM_MODEL_NewProperties, cfgObj, doc.GetAllocator());
 
-		modelComponent->sendMessage(false, doc);
+		std::string tmp;
+		modelComponent->sendMessage(false, doc, tmp);
 	}
 	else
 	{

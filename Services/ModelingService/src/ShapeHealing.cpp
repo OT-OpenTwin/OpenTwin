@@ -169,7 +169,8 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 
 		doc.AddMember(OT_ACTION_PARAM_MODEL_NewProperties, cfgObj, doc.GetAllocator());
 
-		application->modelComponent()->sendMessage(false, doc);
+		std::string tmp;
+		application->modelComponent()->sendMessage(false, doc, tmp);
 
 		delete geometryEntity;
 		geometryEntity = nullptr;

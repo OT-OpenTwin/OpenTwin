@@ -284,7 +284,8 @@ void Application::importProject(void)
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_IMPORT, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	uiComponent()->sendMessage(true, doc);
+	std::string tmp;
+	uiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::setCSTFile(void)
@@ -301,7 +302,8 @@ void Application::setCSTFile(void)
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_SETCSTFILE, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	uiComponent()->sendMessage(true, doc);
+	std::string tmp;
+	uiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::commitChanges(void)
@@ -320,7 +322,8 @@ void Application::commitChanges(void)
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_COMMIT, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	uiComponent()->sendMessage(true, doc);
+	std::string tmp;
+	uiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::showInformation(void)
@@ -340,7 +343,8 @@ void Application::showInformation(void)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(currentVersion, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	uiComponent()->sendMessage(true, doc);
+	std::string tmp;
+	uiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::getChanges(void)
@@ -363,7 +367,8 @@ void Application::getChanges(void)
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());
 
-	uiComponent()->sendMessage(true, doc);
+	std::string tmp;
+	uiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::uploadNeeded(ot::JsonDocument& _doc)
@@ -409,7 +414,8 @@ void Application::uploadNeeded(ot::JsonDocument& _doc)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, infoFileManager.getInfoEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, infoFileManager.getInfoEntityVersion(), doc.GetAllocator());
 
-	uiComponent()->sendMessage(true, doc);
+	std::string tmp;
+	uiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::downloadNeeded(ot::JsonDocument& _doc)
@@ -440,7 +446,8 @@ void Application::downloadNeeded(ot::JsonDocument& _doc)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(versionID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());
 
-	uiComponent()->sendMessage(true, doc);
+	std::string tmp;
+	uiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::filesUploaded(ot::JsonDocument& _doc)
@@ -483,7 +490,8 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_COPY, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(newVersion, doc.GetAllocator()), doc.GetAllocator());
 
-	uiComponent()->sendMessage(true, doc);
+	std::string tmp;
+	uiComponent()->sendMessage(true, doc, tmp);
 }
 
 void Application::changeUnits(const std::string &content)

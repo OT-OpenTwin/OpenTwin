@@ -1042,7 +1042,8 @@ void DataCategorizationHandler::RequestRangesSelection(std::vector<ot::TableRang
 	}
 	doc.AddMember("Ranges", vectOfRanges, doc.GetAllocator());
 
-	_uiComponent->sendMessage(true, doc);
+	std::string tmp;
+	_uiComponent->sendMessage(true, doc, tmp);
 }
 
 void DataCategorizationHandler::RequestColouringRanges(std::string colour)
@@ -1077,5 +1078,6 @@ void DataCategorizationHandler::RequestColouringRanges(ot::Color colour)
 	colour.addToJsonObject(obj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_COLOUR_BACKGROUND, obj, doc.GetAllocator());
 
-	_uiComponent->sendMessage(true, doc);
+	std::string tmp;
+	_uiComponent->sendMessage(true, doc, tmp);
 }

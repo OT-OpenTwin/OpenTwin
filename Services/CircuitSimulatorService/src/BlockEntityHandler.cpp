@@ -72,7 +72,8 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
 
 	// Message is queued, no response here
-	_uiComponent->sendMessage(true, doc);
+	std::string tmp;
+	_uiComponent->sendMessage(true, doc, tmp);
 }
 
 std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID()

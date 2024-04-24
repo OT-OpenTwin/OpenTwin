@@ -252,5 +252,6 @@ void Application::sendNewVisualizationDataToModeler(EntityVis2D3D *visEntity, ot
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataID, binaryDataItemID, requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_DataVersion, binaryDataItemVersion, requestDoc.GetAllocator());
 
-	sendMessage(false, "Model", requestDoc);
+	std::string tmp;
+	sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, requestDoc, tmp);
 }

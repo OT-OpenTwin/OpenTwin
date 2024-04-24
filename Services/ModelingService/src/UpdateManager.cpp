@@ -36,7 +36,8 @@ void UpdateManager::checkParentUpdates(std::list<ot::UID> modifiedEntities)
 		parentCheckDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_CheckParentUpdates, parentCheckDoc.GetAllocator()), parentCheckDoc.GetAllocator());
 		parentCheckDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(modifiedEntities, parentCheckDoc.GetAllocator()), parentCheckDoc.GetAllocator());
 		
-		std::string response = modelComponent->sendMessage(false, parentCheckDoc);
+		std::string response;
+		if (!modelComponent->sendMessage(false, parentCheckDoc, response)) return;
 
 		modifiedEntities.clear();
 
@@ -174,7 +175,8 @@ void UpdateManager::updateSingleParent(ot::UID entityID, ot::UID entityVersion, 
 		requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion, requestDoc.GetAllocator());
 		requestDoc.AddMember(OT_ACTION_PARAM_MODEL_OverrideGeometry, false, requestDoc.GetAllocator());
 
-		modelComponent->sendMessage(false, requestDoc);
+		std::string tmp;
+		modelComponent->sendMessage(false, requestDoc, tmp);
 
 		// Here the new geom entity will be stored in the model service, so we cannot cache it here.
 
@@ -415,7 +417,8 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 				requestDoc.AddMember(OT_ACTION_PARAM_MODEL_OverrideGeometry, true, requestDoc.GetAllocator());	// Here we can replace the geometry entity, since it was 
 																							// already written during this operation as a result to the 
 																							// parameter change. This means that we must not cache this geometry entity.
-				modelComponent->sendMessage(false, requestDoc);
+				std::string tmp;
+				modelComponent->sendMessage(false, requestDoc, tmp);
 
 				// This entity was modified
 				modifiedEntities.push_back(geomEntity->getEntityID());
@@ -501,7 +504,8 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_OverrideGeometry, true, requestDoc.GetAllocator());   // Here we can replace the geometry entity, since it was 
 																				// already written during this operation as a result to the 
 																				// parameter change
-	modelComponent->sendMessage(false, requestDoc);
+	std::string tmp;
+	modelComponent->sendMessage(false, requestDoc, tmp);
 
 	// This entity was modified
 	modifiedEntities.push_back(geomEntity->getEntityID());

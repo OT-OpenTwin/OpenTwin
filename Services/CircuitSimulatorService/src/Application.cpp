@@ -279,7 +279,8 @@ void Application::createNewCircuit()
 		Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(editor->name(), circuit);
 
 		// Message is queued, no response here
-		m_uiComponent->sendMessage(true, doc);
+		std::string tmp;
+		m_uiComponent->sendMessage(true, doc, tmp);
 	}
 
 	
@@ -713,12 +714,15 @@ std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _d
 	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(editorName, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 	
 	this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
-	m_uiComponent->sendMessage(true, reqDoc);
 
-	return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+	std::string tmp;
+	if (m_uiComponent->sendMessage(true, reqDoc, tmp)) {
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
+	}
+	else {
+		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed);
+	}
 }
-
-
 
 // ############################## ####################################################################################################################################################################################
 

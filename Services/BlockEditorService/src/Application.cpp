@@ -87,7 +87,9 @@ std::string Application::test(void) {
 	ot::JsonObject cfgObj;
 	cfg.addToJsonObject(cfgObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
-	m_uiComponent->sendMessage(true, doc);
+
+	std::string tmp;
+	m_uiComponent->sendMessage(true, doc, tmp);
 	return "";
 }
 

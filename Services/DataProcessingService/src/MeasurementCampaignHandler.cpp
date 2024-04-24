@@ -49,7 +49,8 @@ std::list<ot::EntityInformation> MeasurementCampaignHandler::getMSMDEntityInform
 	doc.AddMember(OT_ACTION_PARAM_Type, ot::JsonString(temp.getClassName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Recursive, true, doc.GetAllocator());
 
-	std::string response = Application::instance()->sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, doc);
+	std::string response;
+	Application::instance()->sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, doc, response);
 
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);

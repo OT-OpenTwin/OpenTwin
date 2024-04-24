@@ -586,7 +586,8 @@ std::list<ot::UID> CartesianMeshCreation::getAllGeometryEntitiesForMeshing(void)
 	ot::JsonDocument reqDoc;
 	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
-	std::string response = application->modelComponent()->sendMessage(false, reqDoc);
+	std::string response;
+	application->modelComponent()->sendMessage(false, reqDoc, response);
 
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
