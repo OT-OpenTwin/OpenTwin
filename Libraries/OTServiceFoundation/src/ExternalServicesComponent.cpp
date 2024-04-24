@@ -189,11 +189,13 @@ std::string ot::intern::ExternalServicesComponent::init(
 		auto handle = GetCurrentProcess();
 		if (handle != nullptr) {
 			unsigned long handleID = GetProcessId(handle);
-			assert(handleID != 0); // Failed to get process handle ID
+			if (handleID == 0) {
+				OT_LOG_EA("Failed to get current process id");
+			}
 			newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PROCESS_ID, JsonString(std::to_string(handleID), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 		}
 		else {
-			assert(0); // Failed to get current process handle
+			OT_LOG_EA("Failed to get current process handle");
 		}
 #endif // _DEBUG
 

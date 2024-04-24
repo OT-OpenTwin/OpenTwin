@@ -10,6 +10,8 @@
 #include "Application.h"
 #include "ProjectTypeManager.h"
 #include "MicroserviceNotifier.h"
+#include "UiNotifier.h"
+#include "ModelNotifier.h"
 #include "base64.h"
 #include "zlib.h"
 
@@ -17,6 +19,7 @@
 #include "DataBase.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/IpConverter.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/Encryption.h"
 
@@ -990,6 +993,8 @@ void Application::run(void) {
 	std::string projectName(this->sessionID().substr(0, index));
 	std::string collectionName(this->sessionID().substr(index + 1));
 
+	this->EnsureDataBaseConnection();
+
 	m_model = new Model(projectName, this->projectType(), collectionName);
 }
 
@@ -1004,11 +1009,23 @@ std::string Application::processMessage(ServiceBase* _sender, const std::string&
 }
 
 void Application::uiConnected(ot::components::UiComponent* _ui) {
+	ot::JsonDocument registerDoc;
+	registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RegisterForModelEvents, registerDoc.GetAllocator()), registerDoc.GetAllocator());
+	registerDoc.AddMember(OT_ACTION_PARAM_PORT, ot::JsonString(ot::IpConverter::portFromIp(this->serviceURL()), registerDoc.GetAllocator()), registerDoc.GetAllocator());
+	registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, this->serviceID(), registerDoc.GetAllocator());
+	registerDoc.AddMember(OT_ACTION_PARAM_RegisterForModelEvents, true, registerDoc.GetAllocator());
+
+	std::string response;
+	if (!this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, registerDoc, response)) {
+		OT_LOG_E("Failed to send request");
+		return;
+	}
+
 	ot::JsonDocument commandDoc;
 	commandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_MODEL_Create, commandDoc.GetAllocator()), commandDoc.GetAllocator());
 	commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, this->serviceID(), commandDoc.GetAllocator());
 
-	std::string response;
+	response.clear();
 	if (!this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, commandDoc, response)) {
 		OT_LOG_E("Failed to send request");
 		return;
@@ -1089,7 +1106,7 @@ bool Application::settingChanged(ot::AbstractSettingsItem* _item) {
 // Private functions
 
 Application::Application() 
-	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL, nullptr, nullptr),
+	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL, new UiNotifier, new ModelNotifier),
 	m_model(nullptr)
 {
 	m_notifier = new MicroserviceNotifier;
