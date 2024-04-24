@@ -1,15 +1,15 @@
+// Model header
 #include "stdafx.h"
 
 #include "MicroserviceNotifier.h"
 #include "MicroserviceAPI.h"
+#include "Application.h"
 
 #include "Model.h"
 #include "Types.h"
 
+// OpenTwin header
 #include "DataBase.h"
-#include <array>
-#include <fstream>
-#include <cstdio>
 
 #include "OTCore/CoreTypes.h"
 #include "OTCommunication/ActionTypes.h"
@@ -18,7 +18,10 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/UiTypes.h"
 
-extern ot::serviceID_t globalServiceID;
+// std header
+#include <array>
+#include <fstream>
+#include <cstdio>
 
 void MicroserviceNotifier::requestFileForReading(const std::string &dialogTitle, const std::string &fileMask, const std::string &subsequentFunction, int siteID)
 {
@@ -30,7 +33,7 @@ void MicroserviceNotifier::requestFileForReading(const std::string &dialogTitle,
 	inDoc.AddMember(OT_ACTION_PARAM_SITE_ID, siteID, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::fillPropertyGrid(const ot::PropertyGridCfg& _configuration)
@@ -41,17 +44,17 @@ void MicroserviceNotifier::fillPropertyGrid(const ot::PropertyGridCfg& _configur
 	inDoc.AddMember(OT_ACTION_PARAM_Config, cfgObj, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::addMenuPage(const std::string &pageName)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuPage);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, rapidjson::Value(pageName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::addMenuGroup(const std::string &pageName, const std::string &groupName)
@@ -59,10 +62,10 @@ void MicroserviceNotifier::addMenuGroup(const std::string &pageName, const std::
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_AddMenuGroup);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, rapidjson::Value(pageName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_GroupName, rapidjson::Value(groupName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::addMenuSubGroup(const std::string &pageName, const std::string &groupName, const std::string &subGroupName)
@@ -71,10 +74,10 @@ void MicroserviceNotifier::addMenuSubGroup(const std::string &pageName, const st
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, rapidjson::Value(pageName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_GroupName, rapidjson::Value(groupName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName, rapidjson::Value(subGroupName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::addMenuPushButton(const std::string &pageName, const std::string &groupName, const std::string &buttonName, const std::string &text, ot::LockTypeFlags &flags, const std::string &iconName, const std::string &iconFolder, const std::string &keySequence)
@@ -86,7 +89,7 @@ void MicroserviceNotifier::addMenuPushButton(const std::string &pageName, const 
 	ot::JsonDocument inDoc;
 
 	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_AddMenuButton, inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, ot::JsonString(pageName, inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_GroupName, ot::JsonString(groupName, inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName, ot::JsonString(subgroupName, inDoc.GetAllocator()), inDoc.GetAllocator());
@@ -100,7 +103,7 @@ void MicroserviceNotifier::addMenuPushButton(const std::string &pageName, const 
 	}
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::addMenuCheckBox(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &boxName, const std::string &boxText, bool checked, ot::LockTypeFlags &flags)
@@ -112,11 +115,11 @@ void MicroserviceNotifier::addMenuCheckBox(const std::string &pageName, const st
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, rapidjson::Value(boxName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, rapidjson::Value(boxText.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_CheckedState, checked, inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, ot::JsonArray(ot::toStringList(flags), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::addMenuLineEdit(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::LockTypeFlags &flags)
@@ -128,58 +131,58 @@ void MicroserviceNotifier::addMenuLineEdit(const std::string &pageName, const st
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, rapidjson::Value(editName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, rapidjson::Value(editText.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText, rapidjson::Value(editLabel.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, ot::JsonArray(ot::toStringList(flags), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::addShortcut(const std::string &keySequence) {
 	ot::JsonDocument inDoc;
 	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_AddShortcut, inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_KeySequence, ot::JsonString(keySequence, inDoc.GetAllocator()), inDoc.GetAllocator());
 	
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::setMenuCheckBox(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &boxName, bool checked)
 {
 	ot::JsonDocument inDoc;
 	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SetCheckboxValues, inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), inDoc.GetAllocator());
 
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(pageName + ":" + groupName + ":" + subGroupName + ":" + boxName, inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_CheckedState, checked, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::setMenuLineEdit(const std::string &pageName, const std::string &groupName, const std::string &subGroupName, const std::string &editName, const std::string &editText, bool error)
 {
 	ot::JsonDocument inDoc;
 	inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SetLineEditValues, inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), inDoc.GetAllocator());
 
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(pageName + ":" + groupName + ":" + subGroupName + ":" + editName, inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, ot::JsonString(editText, inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ErrorState, error, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::activateMenuTab(const std::string &pageName)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_SwitchMenuTab);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, rapidjson::Value(pageName.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::updatePlotEntities(ot::UIDList& entityIDs, ot::UIDList& entityVersions, ot::UID visModelID)
@@ -198,30 +201,35 @@ void MicroserviceNotifier::updatePlotEntities(ot::UIDList& entityIDs, ot::UIDLis
 		jEntityVersions.PushBack(ot::JsonValue(version), doc.GetAllocator());
 	}
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, jEntityVersions, doc.GetAllocator());
-	std::list<std::pair<ot::UID, ot::UID>> prefetchIds; // notwendig?
-	MicroserviceAPI::queuedHttpRequestToUI(doc,prefetchIds);
+	Application::instance()->queuedRequestToFrontend(doc);
 }
 
 void MicroserviceNotifier::removeUIElements(const std::string &type, std::list<std::string> &itemList)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_RemoveElements);
 	//inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectType, rapidjson::Value(type.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
-	MicroserviceAPI::AddStringListToJsonDoc(inDoc, OT_ACTION_PARAM_UI_CONTROL_ObjectNames, itemList);
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), inDoc.GetAllocator());
 
-	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	ot::JsonArray list(itemList, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectNames, list, inDoc.GetAllocator());
+
+	Application::instance()->queuedRequestToFrontend(inDoc);
 }
 
 void MicroserviceNotifier::enableDisableControls(std::list<std::string> &enabled, std::list<std::string> &disabled)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_EnableDisableControls);
-	MicroserviceAPI::AddStringListToJsonDoc(inDoc, OT_ACTION_PARAM_UI_EnabledControlsList, enabled);
-	MicroserviceAPI::AddStringListToJsonDoc(inDoc, OT_ACTION_PARAM_UI_DisabledControlsList, disabled);
-	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	
+	ot::JsonArray elist(enabled, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_EnabledControlsList, elist, inDoc.GetAllocator());
+	
+	ot::JsonArray dlist(disabled, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_UI_DisabledControlsList, dlist, inDoc.GetAllocator());
+
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::setToolTip(const std::string &item, const std::string &text)
@@ -229,10 +237,10 @@ void MicroserviceNotifier::setToolTip(const std::string &item, const std::string
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_OBJ_SetToolTip);
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, rapidjson::Value(item.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, rapidjson::Value(text.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::displayMessage(const std::string &message)
@@ -241,7 +249,7 @@ void MicroserviceNotifier::displayMessage(const std::string &message)
 	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::reportError(const std::string &message)
@@ -250,7 +258,7 @@ void MicroserviceNotifier::reportError(const std::string &message)
 	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::reportWarning(const std::string &message)
@@ -259,7 +267,7 @@ void MicroserviceNotifier::reportWarning(const std::string &message)
 	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::reportInformation(const std::string &message)
@@ -268,7 +276,7 @@ void MicroserviceNotifier::reportInformation(const std::string &message)
 	inDoc.AddMember(OT_ACTION_PARAM_MESSAGE, rapidjson::Value(message.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::promptChoice(const std::string &message, const std::string &icon, const std::string &options, const std::string &promptResponse, const std::string &parameter1)
@@ -282,7 +290,7 @@ void MicroserviceNotifier::promptChoice(const std::string &message, const std::s
 	inDoc.AddMember(OT_ACTION_PARAM_PARAMETER1, rapidjson::Value(parameter1.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::resetAllViews(ot::UID visualizationModelID)
@@ -291,7 +299,7 @@ void MicroserviceNotifier::resetAllViews(ot::UID visualizationModelID)
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::clearSelection(ot::UID visualizationModelID)
@@ -300,7 +308,7 @@ void MicroserviceNotifier::clearSelection(ot::UID visualizationModelID)
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::refreshSelection(ot::UID visualizationModelID)
@@ -309,7 +317,7 @@ void MicroserviceNotifier::refreshSelection(ot::UID visualizationModelID)
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::selectObject(ot::UID visualizationModelID, ot::UID entityID)
@@ -319,7 +327,7 @@ void MicroserviceNotifier::selectObject(ot::UID visualizationModelID, ot::UID en
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, rapidjson::Value(entityID), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::refreshAllViews(ot::UID visualizationModelID)
@@ -328,7 +336,7 @@ void MicroserviceNotifier::refreshAllViews(ot::UID visualizationModelID)
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::addVisualizationNodeFromFacetData(ot::UID visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
@@ -356,7 +364,7 @@ void MicroserviceNotifier::addVisualizationNodeFromFacetData(ot::UID visModelID,
 	MicroserviceAPI::addTreeIconsToJsonDoc(inDoc, treeIcons);
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::addVisualizationNodeFromFacetDataBase(ot::UID visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
@@ -389,7 +397,7 @@ void MicroserviceNotifier::addVisualizationNodeFromFacetDataBase(ot::UID visMode
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(entityID, entityVersion));
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::addVisualizationContainerNode(ot::UID visModelID, const std::string &treeName, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isEditable)
@@ -402,7 +410,7 @@ void MicroserviceNotifier::addVisualizationContainerNode(ot::UID visModelID, con
 	MicroserviceAPI::addTreeIconsToJsonDoc(inDoc, treeIcons);
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::addVisualizationAnnotationNode(ot::UID visModelID, const std::string &name, ot::UID uid, const TreeIcon &treeIcons, bool isHidden,
@@ -429,7 +437,7 @@ void MicroserviceNotifier::addVisualizationAnnotationNode(ot::UID visModelID, co
 	MicroserviceAPI::addTreeIconsToJsonDoc(inDoc, treeIcons);
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::updateObjectColor(ot::UID visModelID, ot::UID modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective)
@@ -444,7 +452,7 @@ void MicroserviceNotifier::updateObjectColor(ot::UID visModelID, ot::UID modelEn
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureReflective, rapidjson::Value(textureReflective), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::updateObjectFacetsFromDataBase(ot::UID visModelID, ot::UID modelEntityID, ot::UID entityID, ot::UID entityVersion)
@@ -457,17 +465,18 @@ void MicroserviceNotifier::updateObjectFacetsFromDataBase(ot::UID visModelID, ot
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(entityID, entityVersion));
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::removeShapesFromVisualization(ot::UID visualizationModelID, std::list<ot::UID> entityID)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_RemoveShapes);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
-	MicroserviceAPI::AddUIDListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_ID, entityID);
+	ot::JsonArray list(entityID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, list, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::setTreeStateRecording(ot::UID visualizationModelID, bool flag)
@@ -477,7 +486,7 @@ void MicroserviceNotifier::setTreeStateRecording(ot::UID visualizationModelID, b
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_State, rapidjson::Value(flag), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::enterEntitySelectionMode(ot::UID visualizationModelID, const std::string &selectionType, bool allowMultipleSelection,
@@ -487,7 +496,7 @@ void MicroserviceNotifier::enterEntitySelectionMode(ot::UID visualizationModelID
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_SelectionType, rapidjson::Value(selectionType.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-	inDoc.AddMember(OT_ACTION_PARAM_MODEL_REPLYTO, globalServiceID, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_REPLYTO, Application::instance()->serviceID(), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Selection_AllowMultipleSelection, allowMultipleSelection, inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Selection_Filter, rapidjson::Value(selectionFilter.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Selection_Action, rapidjson::Value(selectionAction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
@@ -500,32 +509,41 @@ void MicroserviceNotifier::enterEntitySelectionMode(ot::UID visualizationModelID
 		optionValues.push_back(item.second);
 	}
 
-	MicroserviceAPI::AddStringListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptNames, optionNames);
-	MicroserviceAPI::AddStringListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_Selection_OptValues, optionValues);
+	ot::JsonArray nlist(optionNames, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Selection_OptNames, nlist, inDoc.GetAllocator());
+
+	ot::JsonArray vlist(optionValues, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Selection_OptValues, vlist, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::setShapeVisibility(ot::UID visualizationModelID, std::list<ot::UID> &visibleEntityIDs, std::list<ot::UID> &hiddenEntityIDs)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_SetShapeVisibility);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
-	MicroserviceAPI::AddUIDListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_ID_Visible, visibleEntityIDs);
-	MicroserviceAPI::AddUIDListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_ID_Hidden, hiddenEntityIDs);
 
+	ot::JsonArray vlist(visibleEntityIDs, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID_Visible, vlist, inDoc.GetAllocator());
+
+	ot::JsonArray hlist(hiddenEntityIDs, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID_Hidden, hlist, inDoc.GetAllocator());
+	
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::hideEntities(ot::UID visualizationModelID, std::list<ot::UID> &hiddenEntityIDs)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_HideEntities);
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visualizationModelID), inDoc.GetAllocator());
-	MicroserviceAPI::AddUIDListToJsonDoc(inDoc, OT_ACTION_PARAM_MODEL_ITM_ID_Hidden, hiddenEntityIDs);
+
+	ot::JsonArray list(hiddenEntityIDs, inDoc.GetAllocator());
+	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID_Hidden, list, inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::isModified(ot::UID visualizationModelID, bool modifiedState)
@@ -535,32 +553,28 @@ void MicroserviceNotifier::isModified(ot::UID visualizationModelID, bool modifie
 	inDoc.AddMember(OT_ACTION_PARAM_MODEL_ModifiedState, rapidjson::Value(modifiedState), inDoc.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	MicroserviceAPI::queuedHttpRequestToUI(inDoc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
 void MicroserviceNotifier::enableQueuingHttpRequests(bool flag)
 {
-	MicroserviceAPI::enableQueuingHttpRequests(flag);
+	Application::instance()->enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, flag);
 }
 
 void MicroserviceNotifier::queuedHttpRequestToUI(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds)
 {
-	MicroserviceAPI::queuedHttpRequestToUI(doc, prefetchIds);
+	Application::instance()->queuedRequestToFrontend(doc, prefetchIds);
 }
 
 bool MicroserviceNotifier::isUIAvailable(void)
 {
-	return (!MicroserviceAPI::getUIURL().empty());
+	return Application::instance()->isUiConnected();
 }
 
 std::string MicroserviceNotifier::sendMessageToService(bool queue, const std::string &owner, ot::JsonDocument &doc)
 {
-	return MicroserviceAPI::sendMessageToService(queue ? MicroserviceAPI::QUEUE : MicroserviceAPI::EXECUTE, owner, doc);
+	std::string response;
+	Application::instance()->sendMessage(queue, owner, doc, response);
+	return response;
 }
 
-std::string MicroserviceNotifier::dispatchAction(ot::JsonDocument &doc)
-{
-	std::string senderIP;
-
-	return MicroserviceAPI::dispatchAction(doc, senderIP);
-}

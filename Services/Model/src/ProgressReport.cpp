@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "Application.h"
 #include "ProgressReport.h"
 
 #include "OTCore/CoreTypes.h"
@@ -8,10 +9,6 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/UiTypes.h"
-
-extern std::string globalUIserviceURL;
-extern std::string globalServiceURL;
-extern ot::serviceID_t globalServiceID;
 
 void ProgressReport::setProgressInformation(std::string message, bool continuous)
 {
@@ -22,7 +19,7 @@ void ProgressReport::setProgressInformation(std::string message, bool continuous
 	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContinuousState, continuous, doc.GetAllocator());
 
 	std::string response;
-	ot::msg::send(globalServiceURL, globalUIserviceURL, ot::QUEUE, doc.toJson(), response);
+	Application::instance()->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc, response);
 }
 
 void ProgressReport::setProgress(int percentage)
@@ -32,7 +29,7 @@ void ProgressReport::setProgress(int percentage)
 	doc.AddMember(OT_ACTION_PARAM_PERCENT, percentage, doc.GetAllocator());
 
 	std::string response;
-	ot::msg::send(globalServiceURL, globalUIserviceURL, ot::QUEUE, doc.toJson(), response);
+	Application::instance()->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc, response);
 }
 
 void ProgressReport::closeProgressInformation(void)
@@ -44,7 +41,7 @@ void ProgressReport::closeProgressInformation(void)
 	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContinuousState, false, doc.GetAllocator());
 
 	std::string response;
-	ot::msg::send(globalServiceURL, globalUIserviceURL, ot::QUEUE, doc.toJson(), response);
+	Application::instance()->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc, response);
 }
 
 void ProgressReport::setUILock(bool flag, lockType type)
@@ -57,7 +54,7 @@ void ProgressReport::setUILock(bool flag, lockType type)
 		{
 			ot::JsonDocument doc;
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_Lock, doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), doc.GetAllocator());
 			
 			ot::LockTypeFlags f;
 
@@ -81,7 +78,7 @@ void ProgressReport::setUILock(bool flag, lockType type)
 			doc.AddMember(OT_ACTION_PARAM_ElementLockTypes, ot::JsonArray(ot::toStringList(f), doc.GetAllocator()), doc.GetAllocator()); //see: MicroserviceNotifier->addMenuPushButton
 			
 			std::string response;
-			ot::msg::send(globalServiceURL, globalUIserviceURL, ot::QUEUE, doc.toJson(), response);
+			Application::instance()->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc, response);
 		}
 
 		count++;
@@ -97,7 +94,7 @@ void ProgressReport::setUILock(bool flag, lockType type)
 			{
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_Unlock, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, globalServiceID, doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), doc.GetAllocator());
 
 				ot::LockTypeFlags f;
 
@@ -121,7 +118,7 @@ void ProgressReport::setUILock(bool flag, lockType type)
 				doc.AddMember(OT_ACTION_PARAM_ElementLockTypes, ot::JsonArray(ot::toStringList(f), doc.GetAllocator()), doc.GetAllocator()); //see: MicroserviceNotifier->addMenuPushButton
 
 				std::string response;
-				ot::msg::send(globalServiceURL, globalUIserviceURL, ot::QUEUE, doc.toJson(), response);
+				Application::instance()->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc, response);
 			}
 		}
 	}

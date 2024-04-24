@@ -1,6 +1,6 @@
 //! @file Application.h
 //! 
-//! @author Alexander Kuester (alexk95)
+//! @author Alexander Kuester (alexk95), Peter Thoma
 //! @date April 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -9,10 +9,77 @@
 // OpenTwin header
 #include "OTServiceFoundation/ApplicationBase.h"
 
+class Model;
+class MicroserviceNotifier;
+
 class Application : public ot::ApplicationBase {
 public:
 	static Application* instance(void);
 	
+	OT_HANDLER(handleDeleteModel, Application, OT_ACTION_CMD_MODEL_Delete, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleProjectSave, Application, OT_ACTION_CMD_PROJ_Save, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleSelectionChanged, Application, OT_ACTION_CMD_MODEL_SelectionChanged, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleItemRenamed, Application, OT_ACTION_CMD_MODEL_ItemRenamed, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleSetVisualizationModel, Application, OT_ACTION_CMD_SetVisualizationModel, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetVisualizationModel, Application, OT_ACTION_CMD_GetVisualizationModel, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetIsModified, Application, OT_ACTION_CMD_MODEL_GetIsModified, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleSetPropertiesFromJSON, Application, OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGenerateEntityIDs, Application, OT_ACTION_CMD_MODEL_GenerateEntityIDs, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleImportTableFile, Application, OT_ACTION_CMD_MODEL_ImportTableFile, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleQueueMessages, Application, OT_ACTION_CMD_MODEL_QueueMessages, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetListOfFolderItems, Application, OT_ACTION_CMD_MODEL_GetListOfFolderItems, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetIDsOfFolderItemsByType, Application, OT_ACTION_CMD_MODEL_GetIDsOfFolderItemsOfType, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleDeleteCurvesFromPlots, Application, OT_ACTION_CMD_MODEL_DeleteCurvesFromPlots, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleUpdateCurvesOfPlot, Application, OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleUpdateVisualizationEntity, Application, OT_ACTION_CMD_MODEL_UpdateVisualizationEntity, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleUpdateGeometryEntity, Application, OT_ACTION_CMD_MODEL_UpdateGeometryEntity, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleModelChangeOperationCompleted, Application, OT_ACTION_CMD_MODEL_ModelChangeOperationCompleted, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleRequestUpdateVisualizationEntity, Application, OT_ACTION_CMD_MODEL_RequestUpdateVisualizationEntity, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleCheckParentUpdates, Application, OT_ACTION_CMD_MODEL_CheckParentUpdates, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleAddEntities, Application, OT_ACTION_CMD_MODEL_AddEntities, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleUpdateTopologyEntity, Application, OT_ACTION_CMD_MODEL_UpdateTopologyEntity, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleAddGeometryOperation, Application, OT_ACTION_CMD_MODEL_AddGeometryOperation, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleDeleteEntity, Application, OT_ACTION_CMD_MODEL_DeleteEntity, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleMeshingCompleted, Application, OT_ACTION_CMD_MODEL_MeshingCompleted, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetEntityInformationByID, Application, OT_ACTION_CMD_MODEL_GetEntityInformationFromID, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetEntityInformationByName, Application, OT_ACTION_CMD_MODEL_GetEntityInformationFromName, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetSelectedEntityInformation, Application, OT_ACTION_CMD_MODEL_GetSelectedEntityInformation, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetEntityChildInformationByName, Application, OT_ACTION_CMD_MODEL_GetEntityChildInformationFromName, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetEntityChildInformationByID, Application, OT_ACTION_CMD_MODEL_GetEntityChildInformationFromID, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetAllGeometryEntitiesForMeshing, Application, OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetEntityProperties, Application, OT_ACTION_CMD_MODEL_GetEntityProperties, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetEntityPropertiesByName, Application, OT_ACTION_CMD_MODEL_GetEntityPropertiesFromName, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleUpdatePropertyGrid, Application, OT_ACTION_CMD_MODEL_UpdatePropertyGrid, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetCurrentVersion, Application, OT_ACTION_CMD_MODEL_GetCurrentVersion, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleActivateVersion, Application, OT_ACTION_CMD_MODEL_ActivateVersion, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetCurrentVisualizationModelID, Application, OT_ACTION_CMD_MODEL_GetCurrentVisModelID, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleAddPropertiesToEntities, Application, OT_ACTION_CMD_MODEL_AddPropertiesToEntities, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleUpdatePropertiesOfEntities, Application, OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleDeleteProperty, Application, OT_ACTION_CMD_MODEL_DeleteProperty, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleExecuteAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleExecuteFunction, Application, OT_ACTION_CMD_MODEL_ExecuteFunction, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleEntitiesSelected, Application, OT_ACTION_CMD_MODEL_EntitiesSelected, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handlePromptResponse, Application, OT_ACTION_CMD_UI_PromptResponse, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetEntityIdentifier, Application, OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetEntitiesFromAnotherCollection, Application, OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleViewsFromProjectType, Application, OT_ACTION_PARAM_MODEL_ViewsForProjectType, ot::SECURE_MESSAGE_TYPES)
+
+	// ##################################################################################################################################################################################################################
+
+	// Setter / Getter
+
+	Model* getModel(void) const { return m_model; };
+	MicroserviceNotifier* getNotifier(void) const { return m_notifier; };
+
+	std::string getEntityInformation(std::list<ot::UID>& _entityIDList) const;
+
+	// ##################################################################################################################################################################################################################
+
+	// Communication
+
+	bool queuedRequestToFrontend(const ot::JsonDocument& _request);
+	bool queuedRequestToFrontend(const ot::JsonDocument& _request, const std::list<std::pair<ot::UID, ot::UID>>& _prefetchIDs);
+
 	// ##################################################################################################################################################################################################################
 
 	// Required functions
@@ -84,6 +151,9 @@ public:
 	virtual bool settingChanged(ot::AbstractSettingsItem* _item);
 
 private:
+	Model* m_model;
+	MicroserviceNotifier* m_notifier;
+
 	Application();
 	~Application();
 };

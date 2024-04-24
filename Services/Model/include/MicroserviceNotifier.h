@@ -95,8 +95,7 @@ public:
 	void queuedHttpRequestToUI(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds);
 
 	std::string sendMessageToService(bool queue, const std::string &owner, ot::JsonDocument &doc);
-	//Maybe available?
-	std::string dispatchAction(ot::JsonDocument &doc);
+	
 	//Not existing in uiComponent
 	bool isUIAvailable(void);
 };

@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "Model.h"
+#include "Application.h"
 #include "EntityBase.h"
 #include "EntityGeometry.h"
 #include "EntityAnnotation.h"
@@ -73,14 +74,6 @@
 #include "EntityBlock.h"
 #include "OTGui/KeySequence.h"
 #include "OTGui/NavigationTreeItem.h"
-
-extern MicroserviceNotifier *globalNotifier;
-
-extern std::string getServiceName(void);
-
-extern int globalSessionCount;
-
-extern ot::serviceID_t globalServiceID;
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 
@@ -173,7 +166,7 @@ void Model::resetToNew(void)
 
 	ProjectTypeManager typeManager(projectType);
 
-	entityRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+	entityRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 	entityMap[entityRoot->getEntityID()] = entityRoot;
 
 	GeometryOperations::EntityList allNewEntities;
@@ -181,42 +174,42 @@ void Model::resetToNew(void)
 	// Create the various root items
 	if (typeManager.hasGeometryRoot())
 	{
-		EntityBase* entityGeometryRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		EntityBase* entityGeometryRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 		entityGeometryRoot->setName(getGeometryRootName());
 		addEntityToModel(entityGeometryRoot->getName(), entityGeometryRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasMaterialRoot())
 	{
-		EntityBase* entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		EntityBase* entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 		entityMaterialRoot->setName(getMaterialRootName());
 		addEntityToModel(entityMaterialRoot->getName(), entityMaterialRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasMeshRoot())
 	{
-		EntityBase* entityMeshRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		EntityBase* entityMeshRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 		entityMeshRoot->setName(getMeshRootName());
 		addEntityToModel(entityMeshRoot->getName(), entityMeshRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasSolverRoot())
 	{
-		EntityContainer* entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		EntityContainer* entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 		entitySolverRoot->setName(getSolverRootName());
 		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasScriptsRoot())
 	{
-		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 		entityScriptRoot->setName(getScriptsRootName());
 		addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasUnitRoot())
 	{
-		auto entityUnits = new EntityUnits(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		auto entityUnits = new EntityUnits(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 		entityUnits->setName(getUnitRootName());
 		entityUnits->createProperties();
 		//entityUnits->StoreToDataBase();
@@ -225,7 +218,7 @@ void Model::resetToNew(void)
 
 	if (typeManager.hasDataCategorizationRoot())
 	{
-		EntityBase* entityRMDCategorizationRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		EntityBase* entityRMDCategorizationRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 		entityRMDCategorizationRoot->setName(typeManager.getDataCategorizationRootName());
 		addEntityToModel(entityRMDCategorizationRoot->getName(), entityRMDCategorizationRoot, entityRoot, true, allNewEntities);
 	}
@@ -248,7 +241,7 @@ void Model::resetToNew(void)
 
 	if (typeManager.hasDatasetRoot())
 	{
-		EntityBase* entityDatasetRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		EntityBase* entityDatasetRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 		entityDatasetRoot->setName(typeManager.getDatasetRootName());
 		addEntityToModel(entityDatasetRoot->getName(), entityDatasetRoot, entityRoot, true, allNewEntities);
 	}
@@ -296,11 +289,6 @@ Model::~Model()
 	}
 }
 
-MicroserviceNotifier *Model::getNotifier(void)
-{
-	return globalNotifier;
-}
-
 void Model::detachAllViewer(void)
 {
 	visualizationModelID = 0;
@@ -310,7 +298,7 @@ void Model::addMenuPage(const std::string &menu)
 {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuPageVisible(menu))
 	{
-		getNotifier()->addMenuPage(menu);
+		Application::instance()->getNotifier()->addMenuPage(menu);
 		uiMenuMap[menu] = true;
 	}
 }
@@ -319,7 +307,7 @@ void Model::addMenuGroup(const std::string &menu, const std::string &group)
 {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuGroupVisible(menu, group))
 	{
-		getNotifier()->addMenuGroup(menu, group);
+		Application::instance()->getNotifier()->addMenuGroup(menu, group);
 		uiGroupMap[menu + ":" + group] = true;
 	}
 }
@@ -328,7 +316,7 @@ void Model::addMenuSubgroup(const std::string &menu, const std::string &group, c
 {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuGroupVisible(menu, group))
 	{
-		getNotifier()->addMenuSubGroup(menu, group, subgroup);
+		Application::instance()->getNotifier()->addMenuSubGroup(menu, group, subgroup);
 		uiSubGroupMap[menu + ":" + group + ":" + subgroup] = true;
 	}
 }
@@ -337,7 +325,7 @@ void Model::addMenuAction(const std::string &menu, const std::string &group, con
 {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(menu, group, buttonName))
 	{
-		getNotifier()->addMenuPushButton(menu, group, buttonName, text, flags, iconName, iconFolder, keySequence);
+		Application::instance()->getNotifier()->addMenuPushButton(menu, group, buttonName, text, flags, iconName, iconFolder, keySequence);
 		uiActionMap[menu + ":" + group + ":" + buttonName] = true;
 	}
 }
@@ -346,7 +334,7 @@ void Model::addMenuAction(const std::string &menu, const std::string &group, con
 {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(menu, group, buttonName))
 	{
-		getNotifier()->addMenuPushButton(menu, group, subgroup, buttonName, text, flags, iconName, iconFolder, keySequence);
+		Application::instance()->getNotifier()->addMenuPushButton(menu, group, subgroup, buttonName, text, flags, iconName, iconFolder, keySequence);
 		uiActionMap[menu + ":" + group + ":" + subgroup + ":" + buttonName] = true;
 	}
 }
@@ -355,7 +343,7 @@ void Model::addMenuCheckBox(const std::string &menu, const std::string &group, c
 {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(menu, group, boxName))
 	{
-		getNotifier()->addMenuCheckBox(menu, group, subgroup, boxName, boxText, checked, flags);
+		Application::instance()->getNotifier()->addMenuCheckBox(menu, group, subgroup, boxName, boxText, checked, flags);
 		uiActionMap[menu + ":" + group + ":" + subgroup + ":" + boxName] = true;
 	}
 }
@@ -364,7 +352,7 @@ void Model::addMenuLineEdit(const std::string &menu, const std::string &group, c
 {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(menu, group, editName))
 	{
-		getNotifier()->addMenuLineEdit(menu, group, subgroup, editName, editText, editLabel, flags);
+		Application::instance()->getNotifier()->addMenuLineEdit(menu, group, subgroup, editName, editText, editLabel, flags);
 		uiActionMap[menu + ":" + group + ":" + subgroup + ":" + editName] = true;
 	}
 }
@@ -372,9 +360,6 @@ void Model::addMenuLineEdit(const std::string &menu, const std::string &group, c
 void Model::setupUIControls()
 {	
 	assert(!uiCreated);
-
-	assert(getNotifier() != nullptr);
-	if (getNotifier() == nullptr) return;
 
 	ot::LockTypeFlags modelRead;
 	modelRead.setFlag(ot::LockModelRead);
@@ -530,7 +515,7 @@ void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 		request.AddMember(OT_ACTION_PARAM_Config, jConfig,request.GetAllocator());
 		request.AddMember(OT_ACTION_PARAM_MODEL_EntityID, selectedPlot->getEntityID(),request.GetAllocator());
 		std::list<std::pair<ot::UID, ot::UID>> prefetchedIds;
-		getNotifier()->queuedHttpRequestToUI(request, prefetchedIds);
+		Application::instance()->getNotifier()->queuedHttpRequestToUI(request, prefetchedIds);
 	}
 	
 	else assert(0); // Unhandled button action
@@ -581,7 +566,7 @@ void Model::modelSelectionChangedNotification(std::list<ot::UID> &selectedEntity
 
 	enableQueuingHttpRequests(true);
 
-	getNotifier()->enableDisableControls(enabled, disabled);
+	Application::instance()->getNotifier()->enableDisableControls(enabled, disabled);
 
 	// Now get the common properties of all selected entities and send them to the property grid
 	updatePropertyGrid();
@@ -600,13 +585,13 @@ void Model::updateUndoRedoStatus(void)
 	std::string text = getStateManager()->getCurrentModelStateDescription();
 	if (text.empty()) text = "Undo";
 	text += " (Ctrl+Z)";
-	getNotifier()->setToolTip("Model:Edit:Undo", text);
+	Application::instance()->getNotifier()->setToolTip("Model:Edit:Undo", text);
 
 	// Update the text for the redo button
 	text = getStateManager()->getRedoModelStateDescription();
 	if (text.empty()) text = "Redo";
 	text += " (Ctrl+Y)";
-	getNotifier()->setToolTip("Model:Edit:Redo", text);
+	Application::instance()->getNotifier()->setToolTip("Model:Edit:Redo", text);
 
 	// Update the state for undo and redo button
 	std::list<std::string> enabled;
@@ -630,7 +615,7 @@ void Model::updateUndoRedoStatus(void)
 		disabled.push_back("Model:Edit:Redo");
 	}
 
-	getNotifier()->enableDisableControls(enabled, disabled);
+	Application::instance()->getNotifier()->enableDisableControls(enabled, disabled);
 
 	enableQueuingHttpRequests(false);
 }
@@ -645,7 +630,7 @@ void Model::removeUIControls()
 	for (auto item : uiSubGroupMap) objectNameList.push_back(item.first);
 	for (auto item : uiGroupMap) objectNameList.push_back(item.first);
 	for (auto item : uiMenuMap) objectNameList.push_back(item.first);
-	getNotifier()->removeUIElements("", objectNameList);
+	Application::instance()->getNotifier()->removeUIElements("", objectNameList);
 
 	/*
 
@@ -765,7 +750,7 @@ void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityB
 		if (container == nullptr)
 		{
 			// The container does not exist, create a new item
-			container = new EntityContainer(createEntityUID(), root, this, getStateManager(), &classFactory, getServiceName());
+			container = new EntityContainer(createEntityUID(), root, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 
 			container->setName(folderName);
 			container->setEditable(entity->getEditable() && entityRoot != containerRoot); // If the entity is editable, a newly created container 
@@ -974,7 +959,7 @@ void Model::setVisualizationModel(ot::UID visModelID)
 		}
 
 		// Request a view reset
-		getNotifier()->resetAllViews(visualizationModelID);
+		Application::instance()->getNotifier()->resetAllViews(visualizationModelID);
 
 		ot::UIDList empty, emptyVisible;
 		modelSelectionChangedNotification(empty, emptyVisible);
@@ -1016,7 +1001,7 @@ void Model::addVisualizationContainerNode(const std::string &name, ot::UID entit
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "ContainerVisible";
 	treeIcons.hiddenIcon = "ContainerHidden";
-	getNotifier()->addVisualizationContainerNode(visualizationModelID, name, entityID, treeIcons, isEditable);
+	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, name, entityID, treeIcons, isEditable);
 }
 
 void Model::addVisualizationMeshNode(const std::string &name, ot::UID entityID)
@@ -1025,7 +1010,7 @@ void Model::addVisualizationMeshNode(const std::string &name, ot::UID entityID)
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "MeshVisible";
 	treeIcons.hiddenIcon = "MeshHidden";
-	getNotifier()->addVisualizationContainerNode(visualizationModelID, name, entityID, treeIcons, false);
+	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, name, entityID, treeIcons, false);
 }
 
 ot::UID Model::getVisualizationModel(void)
@@ -1058,14 +1043,14 @@ void Model::importTableFile(std::string &itemName)
 	// Get a file name for the Table file from the UI
 
 	newTableItemName = itemName;
-	getNotifier()->requestFileForReading("Import Table File", "Table files (*.csv)", "importTableFile", DataBase::GetDataBase()->getSiteID());
+	Application::instance()->getNotifier()->requestFileForReading("Import Table File", "Table files (*.csv)", "importTableFile", DataBase::GetDataBase()->getSiteID());
 }
 
 void Model::importTableFile(const std::string &fileName, bool removeFile)
 {
 	TableReader reader;
 	reader.setModel(this);
-	std::string error = reader.readFromFile(fileName, newTableItemName, this, getStateManager(), &classFactory, getServiceName());
+	std::string error = reader.readFromFile(fileName, newTableItemName, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 
 	if (removeFile)
 	{
@@ -1074,7 +1059,7 @@ void Model::importTableFile(const std::string &fileName, bool removeFile)
 
 	if (!error.empty())
 	{
-		getNotifier()->reportError(error);
+		Application::instance()->getNotifier()->reportError(error);
 	}
 }
 
@@ -1101,7 +1086,7 @@ void Model::createNewMaterial()
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "MaterialVisible";
 	treeIcons.hiddenIcon = "MaterialHidden";
-	getNotifier()->addVisualizationContainerNode(visualizationModelID, materialName, materialItem->getEntityID(), treeIcons, materialItem->getEditable());
+	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, materialName, materialItem->getEntityID(), treeIcons, materialItem->getEditable());
 
 	setModified();
 
@@ -1135,7 +1120,7 @@ void Model::createNewParameter()
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "ParameterVisible";
 	treeIcons.hiddenIcon = "ParameterHidden";
-	getNotifier()->addVisualizationContainerNode(visualizationModelID, parameterName, parameterItem->getEntityID(), treeIcons, parameterItem->getEditable());
+	Application::instance()->getNotifier()->addVisualizationContainerNode(visualizationModelID, parameterName, parameterItem->getEntityID(), treeIcons, parameterItem->getEditable());
 
 	setModified();
 
@@ -1151,7 +1136,7 @@ EntityParameter* Model::createNewParameterItem(const std::string &parameterName)
 	EntityContainer *entityParameterRoot = dynamic_cast<EntityContainer*>(findEntityFromName(getParameterRootName()));
 	if (entityParameterRoot == nullptr)
 	{
-		entityParameterRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		entityParameterRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 		entityParameterRoot->setName(getParameterRootName());
 
 		GeometryOperations::EntityList allNewEntities;
@@ -1160,7 +1145,7 @@ EntityParameter* Model::createNewParameterItem(const std::string &parameterName)
 		addVisualizationContainerNode(entityParameterRoot->getName(), entityParameterRoot->getEntityID(), entityParameterRoot->getEditable());
 	}
 
-	EntityParameter *parameterItem = new EntityParameter(createEntityUID(), entityParameterRoot, this, getStateManager(), &classFactory, getServiceName());
+	EntityParameter *parameterItem = new EntityParameter(createEntityUID(), entityParameterRoot, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 	
 	parameterItem->setName(parameterName);
 	parameterItem->setEditable(true);
@@ -1256,7 +1241,7 @@ EntityMaterial* Model::createNewMaterial(const std::string &materialName)
 	EntityContainer *entityMaterialRoot = dynamic_cast<EntityContainer*>(findEntityFromName(getMaterialRootName()));
 	if (entityMaterialRoot == nullptr)
 	{
-		entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+		entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 		entityMaterialRoot->setName(getMaterialRootName());
 
 		GeometryOperations::EntityList allNewEntities;
@@ -1265,7 +1250,7 @@ EntityMaterial* Model::createNewMaterial(const std::string &materialName)
 		addVisualizationContainerNode(entityMaterialRoot->getName(), entityMaterialRoot->getEntityID(), entityMaterialRoot->getEditable());
 	}
 
-	EntityMaterial *materialItem = new EntityMaterial(createEntityUID(), entityMaterialRoot, this, getStateManager(), &classFactory, getServiceName());
+	EntityMaterial *materialItem = new EntityMaterial(createEntityUID(), entityMaterialRoot, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 
 	materialItem->setName(materialName);
 	materialItem->setEditable(true);
@@ -1354,7 +1339,7 @@ void Model::addVisualizationNodeFromFacetData(const std::string &treeName, doubl
 										      double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors,
 											  bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected)
 {
-	getNotifier()->addVisualizationNodeFromFacetData(visualizationModelID, treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling, offsetFactor, isEditable, nodes, triangles, edges, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
+	Application::instance()->getNotifier()->addVisualizationNodeFromFacetData(visualizationModelID, treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling, offsetFactor, isEditable, nodes, triangles, edges, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
 }
 
 void Model::addVisualizationNodeFromFacetDataBase(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
@@ -1362,13 +1347,13 @@ void Model::addVisualizationNodeFromFacetDataBase(const std::string &treeName, d
 )
 {
 	ot::UID entityVersion = getStateManager()->getCurrentEntityVersion(entityID);
-	getNotifier()->addVisualizationNodeFromFacetDataBase(visualizationModelID, treeName, surfaceColorRGB, edgeColorRGB, materialType, textureType, textureReflective, modelEntityID, treeIcons, backFaceCulling, offsetFactor, isHidden, isEditable, projectName, entityID, entityVersion, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected, transformation);
+	Application::instance()->getNotifier()->addVisualizationNodeFromFacetDataBase(visualizationModelID, treeName, surfaceColorRGB, edgeColorRGB, materialType, textureType, textureReflective, modelEntityID, treeIcons, backFaceCulling, offsetFactor, isHidden, isEditable, projectName, entityID, entityVersion, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected, transformation);
 }
 
 void Model::updateObjectFacetsFromDataBase(ot::UID modelEntityID, ot::UID entityID)
 {
 	ot::UID entityVersion = getStateManager()->getCurrentEntityVersion(entityID);
-	getNotifier()->updateObjectFacetsFromDataBase(getVisualizationModel(), modelEntityID, entityID, entityVersion);
+	Application::instance()->getNotifier()->updateObjectFacetsFromDataBase(getVisualizationModel(), modelEntityID, entityID, entityVersion);
 }
 
 double Model::calculateDeflectionFromAllEntities(void)
@@ -1570,7 +1555,7 @@ void Model::removeShapesFromVisualization(std::list<ot::UID> &removeFromDisplay)
 {
 	if (visualizationModelID != 0)
 	{
-		getNotifier()->removeShapesFromVisualization(visualizationModelID, removeFromDisplay);
+		Application::instance()->getNotifier()->removeShapesFromVisualization(visualizationModelID, removeFromDisplay);
 	}
 }
 
@@ -1672,7 +1657,7 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 		notify.AddMember(OT_ACTION_PARAM_MODEL_ITM_Name, ot::JsonString(entity->getName(), notify.GetAllocator()), notify.GetAllocator());
 
 		std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-		getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
+		Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 		return;
 	}
 
@@ -1720,7 +1705,7 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 	notify.AddMember(OT_ACTION_PARAM_PATH_To, ot::JsonString(toPath, notify.GetAllocator()), notify.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
+	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 }
 
 void Model::keySequenceActivated(const std::string &keySequence) {
@@ -1750,7 +1735,7 @@ void Model::updateCurvesInPlot(const std::list<std::string>& curveNames, const o
 	{
 		ot::UIDList plotIDs{ plotID };
 		ot::UIDList plotVersions{ plotEntity->getEntityStorageVersion() };
-		getNotifier()->updatePlotEntities(plotIDs,plotVersions, visualizationModelID);
+		Application::instance()->getNotifier()->updatePlotEntities(plotIDs,plotVersions, visualizationModelID);
 	}
 }
 
@@ -1767,7 +1752,7 @@ void Model::processSelectionsForOtherOwners(std::list<ot::UID> &selectedEntities
 	// Here we check which owners are part of the selection and assign their entities
 	for (auto entity : selectedEntities)
 	{
-		if (getEntity(entity)->getOwningService() != getServiceName())
+		if (getEntity(entity)->getOwningService() != Application::instance()->serviceName())
 		{
 			// This entity is owned by another service
 			ownerEntityListMap[getEntity(entity)->getOwningService()].push_back(entity);
@@ -1798,7 +1783,7 @@ void Model::otherOwnersNotification(std::map<std::string, std::list<ot::UID>> ow
 		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SelectionChanged, notify.GetAllocator()), notify.GetAllocator());
 		notify.AddMember(OT_ACTION_PARAM_MODEL_SelectedEntityIDs, ot::JsonArray(owner.second, notify.GetAllocator()), notify.GetAllocator());
 
-		getNotifier()->sendMessageToService(true, owner.first, notify);
+		Application::instance()->getNotifier()->sendMessageToService(true, owner.first, notify);
 	}
 
 	modelSelectionChangedNotificationInProgress = false;
@@ -1818,7 +1803,7 @@ void Model::updatePropertyGrid(void)
 		this->addCommonPropertiesToConfig(selectedModelEntityIDs, true, cfg);
 	}
 
-	getNotifier()->fillPropertyGrid(cfg);
+	Application::instance()->getNotifier()->fillPropertyGrid(cfg);
 }
 
 void Model::setEntityOutdated(EntityBase *entity)
@@ -1852,17 +1837,17 @@ void Model::addCommonPropertiesToConfig(const std::list<ot::UID> &entityIDList, 
 
 void Model::refreshAllViews(void)
 {
-	getNotifier()->refreshAllViews(getVisualizationModel());
+	Application::instance()->getNotifier()->refreshAllViews(getVisualizationModel());
 }
 
 void Model::clearSelection(void)
 {
-	getNotifier()->clearSelection(getVisualizationModel());
+	Application::instance()->getNotifier()->clearSelection(getVisualizationModel());
 }
 
 void Model::resetAllViews(void)
 {
-	getNotifier()->resetAllViews(visualizationModelID);
+	Application::instance()->getNotifier()->resetAllViews(visualizationModelID);
 }
 
 void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const ot::PropertyGridCfg& _configuration, bool update, bool itemsVisible)
@@ -2622,7 +2607,7 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 		notify.AddMember(OT_ACTION_PARAM_MODEL_BrepVersionList, ot::JsonArray(brepVersions, notify.GetAllocator()), notify.GetAllocator());
 		notify.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, notify.GetAllocator());
 
-		getNotifier()->sendMessageToService(false, serviceUpdate.first, notify);
+		Application::instance()->getNotifier()->sendMessageToService(false, serviceUpdate.first, notify);
 	}
 
 	// Now we need to notify the model service that the update operation is completed
@@ -3119,22 +3104,22 @@ void Model::getAllEntities(std::list<EntityBase *> &allEntities)
 
 void Model::displayMessage(const std::string &message)
 {
-	getNotifier()->displayMessage(message);
+	Application::instance()->getNotifier()->displayMessage(message);
 }
 
 void Model::reportError(const std::string &message)
 {
-	getNotifier()->reportError(message);
+	Application::instance()->getNotifier()->reportError(message);
 }
 
 void Model::reportWarning(const std::string &message)
 {
-	getNotifier()->reportWarning(message);
+	Application::instance()->getNotifier()->reportWarning(message);
 }
 
 void Model::reportInformation(const std::string &message)
 {
-	getNotifier()->reportInformation(message);
+	Application::instance()->getNotifier()->reportInformation(message);
 }
 
 void Model::updateMenuStates(void)
@@ -3379,7 +3364,7 @@ void Model::addResult1DEntity(const std::string &name, const std::vector<double>
 							  const std::string &curveLabel, const std::string &xlabel, const std::string &xunit,
 							  const std::string &ylabel, const std::string &yunit)
 {
-	EntityResult1DCurve *curve = new EntityResult1DCurve(createEntityUID(), nullptr, this, getStateManager(), &classFactory, getServiceName());
+	EntityResult1DCurve *curve = new EntityResult1DCurve(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
 
 	curve->setName(name);
 	curve->setEditable(true);
@@ -3428,7 +3413,7 @@ void Model::addVisualizationAnnotationNode(const std::string &name, ot::UID UID,
 										   const std::vector<std::array<double, 3>> &triangle_p3, 
 										   const std::vector<std::array<double, 3>> &triangle_rgb)
 {
-	getNotifier()->addVisualizationAnnotationNode(visualizationModelID, name, UID, treeIcons, isHidden, edgeColorRGB, points, points_rgb,
+	Application::instance()->getNotifier()->addVisualizationAnnotationNode(visualizationModelID, name, UID, treeIcons, isHidden, edgeColorRGB, points, points_rgb,
 												  triangle_p1, triangle_p2, triangle_p3, triangle_rgb);
 }
 
@@ -3510,7 +3495,7 @@ void Model::createFaceAnnotation(const std::list<EntityFaceAnnotationData> &anno
 
 	} while (entityNameToIDMap[annotationName]);
 
-	EntityFaceAnnotation *annotationEntity = new EntityFaceAnnotation(0, nullptr, nullptr, nullptr, &classFactory, getServiceName());
+	EntityFaceAnnotation *annotationEntity = new EntityFaceAnnotation(0, nullptr, nullptr, nullptr, &classFactory, Application::instance()->serviceName());
 
 	annotationEntity->setName(annotationName);
 	annotationEntity->setColor(r, g, b);
@@ -3924,7 +3909,7 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	// Check whether we have redo information
 	if (getStateManager()->canRedo() && !silentlyCreateBranch)
 	{
-		getNotifier()->promptChoice("There is redo information available which will be discarded if you change the model at this stage. \n\n"
+		Application::instance()->getNotifier()->promptChoice("There is redo information available which will be discarded if you change the model at this stage. \n\n"
 								    "Do you want to create a new version branch for these changes?", "Warning", "YesNo", "DiscardRedoInfoAndSave", comment);
 
 		return;
@@ -3971,7 +3956,7 @@ void Model::promptResponse(const std::string &type, const std::string &answer, c
 
 void Model::enableQueuingHttpRequests(bool flag)
 {
-	getNotifier()->enableQueuingHttpRequests(flag);
+	Application::instance()->getNotifier()->enableQueuingHttpRequests(flag);
 }
 
 void Model::prefetchDocumentsFromStorage(std::list<ot::UID> &prefetchIds)
@@ -3996,7 +3981,7 @@ void Model::setModified(void)
 
 	if (sendNotification && !shutdown)
 	{
-		getNotifier()->isModified(visualizationModelID, true);
+		Application::instance()->getNotifier()->isModified(visualizationModelID, true);
 	}
 }
 
@@ -4008,7 +3993,7 @@ void Model::resetModified(void)
 
 	if (sendNotification && !shutdown)
 	{
-		getNotifier()->isModified(visualizationModelID, false);
+		Application::instance()->getNotifier()->isModified(visualizationModelID, false);
 	}
 }
 
@@ -4019,7 +4004,7 @@ void Model::modelChangeOperationCompleted(const std::string &description, bool a
 
 bool Model::isUIAvailable(void)
 {
-	return getNotifier()->isUIAvailable();
+	return Application::instance()->getNotifier()->isUIAvailable();
 }
 
 void Model::uiIsAvailable(void)
@@ -4048,7 +4033,7 @@ void Model::uiIsAvailable(void)
 		}
 
 		// Request a view reset
-		getNotifier()->resetAllViews(visualizationModelID);
+		Application::instance()->getNotifier()->resetAllViews(visualizationModelID);
 	}
 
 	updateVersionGraph();
@@ -4083,7 +4068,7 @@ void Model::sendVersionGraphToUI(std::list<std::tuple<std::string, std::string, 
 		notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_BRANCH, ot::JsonString(activeBranch, notify.GetAllocator()), notify.GetAllocator());
 
 		std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-		getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
+		Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 
 		setActiveVersionTreeState();
 	}
@@ -4101,7 +4086,7 @@ void Model::setActiveVersionTreeState(void)
 	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_BRANCH, ot::JsonString(activeBranch, notify.GetAllocator()), notify.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
+	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 }
 
 void Model::removeVersionGraphVersions(const std::list<std::string> &versions)
@@ -4112,7 +4097,7 @@ void Model::removeVersionGraphVersions(const std::list<std::string> &versions)
 	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_VERSION, ot::JsonArray(versions, notify.GetAllocator()), notify.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
+	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 }
 
 void Model::addNewVersionTreeStateAndActivate(const std::string &parentVersion, const std::string &newVersion, const std::string &activeBranch, const std::string &description)
@@ -4126,7 +4111,7 @@ void Model::addNewVersionTreeStateAndActivate(const std::string &parentVersion, 
 	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_BRANCH, ot::JsonString(activeBranch, notify.GetAllocator()), notify.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
+	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 }
 
 void Model::sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds)
@@ -4135,7 +4120,7 @@ void Model::sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::U
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, doc.GetAllocator());
 
 	// And sent the message to the viewer
-	getNotifier()->queuedHttpRequestToUI(doc, prefetchIds);
+	Application::instance()->getNotifier()->queuedHttpRequestToUI(doc, prefetchIds);
 }
 
 EntityBase *Model::findEntityFromName(const std::string &name)
@@ -4511,7 +4496,7 @@ void Model::addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion
 	}
 
 	// refresh the view and save the model
-	getNotifier()->selectObject(visualizationModelID, geomEntityID);
+	Application::instance()->getNotifier()->selectObject(visualizationModelID, geomEntityID);
 	refreshAllViews();
 	enableQueuingHttpRequests(false);
 
@@ -4592,7 +4577,7 @@ void Model::deleteCurves(std::list<std::string>& entityNameList)
 	
 	if (visualizationModelID != 0)
 	{
-		getNotifier()->updatePlotEntities(plotIDs, plotVersions, visualizationModelID);
+		Application::instance()->getNotifier()->updatePlotEntities(plotIDs, plotVersions, visualizationModelID);
 	}
 
 	modelChangeOperationCompleted("Removed curves from plot");
@@ -4800,7 +4785,7 @@ void Model::performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::
 	notify.AddMember(OT_ACTION_PARAM_MODEL_BrepVersionList, ot::JsonArray(brepVersions, notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, true, notify.GetAllocator());
 
-	getNotifier()->sendMessageToService(false, owningService, notify);
+	Application::instance()->getNotifier()->sendMessageToService(false, owningService, notify);
 
 	// The model service has added new items -> store the model change.
 	modelChangeOperationCompleted("visualization item created / updated");
@@ -4983,7 +4968,7 @@ void Model::updateModelStateForUndoRedo(void)
 		}
 	}		
 	
-	getNotifier()->setTreeStateRecording(visualizationModelID, true);
+	Application::instance()->getNotifier()->setTreeStateRecording(visualizationModelID, true);
 
 	removeShapesFromVisualization(removeFromDisplay);
 
@@ -5082,7 +5067,7 @@ void Model::updateModelStateForUndoRedo(void)
 	updateUndoRedoStatus();
 	setActiveVersionTreeState();
 
-	getNotifier()->setTreeStateRecording(visualizationModelID, false);
+	Application::instance()->getNotifier()->setTreeStateRecording(visualizationModelID, false);
 }
 
 void Model::showByMaterial(void)
@@ -5184,7 +5169,7 @@ void Model::setShapeVisibility(std::list<ot::UID> &visibleEntityIDs, std::list<o
 {
 	if (visualizationModelID != 0)
 	{
-		getNotifier()->setShapeVisibility(visualizationModelID, visibleEntityIDs, hiddenEntityIDs);
+		Application::instance()->getNotifier()->setShapeVisibility(visualizationModelID, visibleEntityIDs, hiddenEntityIDs);
 	}
 }
 
@@ -5273,7 +5258,7 @@ void Model::hideEntities(std::list<ot::UID> &hiddenEntityIDs)
 {
 	if (visualizationModelID != 0)
 	{
-		getNotifier()->hideEntities(visualizationModelID, hiddenEntityIDs);
+		Application::instance()->getNotifier()->hideEntities(visualizationModelID, hiddenEntityIDs);
 	}
 }
 
@@ -5283,7 +5268,7 @@ void Model::loadDefaultMaterials(void)
 
 	if (!error.empty())
 	{
-		getNotifier()->displayMessage(error);
+		Application::instance()->getNotifier()->displayMessage(error);
 	}
 
 	for (auto material : TemplateDefaultManager::getTemplateDefaultManager()->getDefaultMaterials())
@@ -5301,7 +5286,7 @@ void Model::loadDefaultMaterials(void)
 
 			if (prop == nullptr)
 			{
-				getNotifier()->displayMessage("ERROR: Invalid property for material:" + materialName + ", property: " + propertyName + "\n");
+				Application::instance()->getNotifier()->displayMessage("ERROR: Invalid property for material:" + materialName + ", property: " + propertyName + "\n");
 				continue;
 			}
 		
@@ -5312,7 +5297,7 @@ void Model::loadDefaultMaterials(void)
 				EntityPropertiesBoolean *boolProp = dynamic_cast<EntityPropertiesBoolean *>(prop);
 				if (boolProp == nullptr)
 				{
-					getNotifier()->displayMessage("ERROR: Incorrect data type for material:" + materialName + ", property: " + propertyName + "\n");
+					Application::instance()->getNotifier()->displayMessage("ERROR: Incorrect data type for material:" + materialName + ", property: " + propertyName + "\n");
 				}
 				else
 				{
@@ -5325,7 +5310,7 @@ void Model::loadDefaultMaterials(void)
 				EntityPropertiesDouble *doubleProp = dynamic_cast<EntityPropertiesDouble *>(prop);
 				if (doubleProp == nullptr)
 				{
-					getNotifier()->displayMessage("ERROR: Incorrect data type for material:" + materialName + ", property: " + propertyName + "\n");
+					Application::instance()->getNotifier()->displayMessage("ERROR: Incorrect data type for material:" + materialName + ", property: " + propertyName + "\n");
 				}
 				else
 				{
@@ -5342,7 +5327,7 @@ void Model::loadDefaultMaterials(void)
 
 					if (selProp == nullptr)
 					{
-						getNotifier()->displayMessage("ERROR: Incorrect data type for material:" + materialName + ", property: " + propertyName + "\n");
+						Application::instance()->getNotifier()->displayMessage("ERROR: Incorrect data type for material:" + materialName + ", property: " + propertyName + "\n");
 					}
 					else
 					{
@@ -5360,7 +5345,7 @@ void Model::loadDefaultMaterials(void)
 				EntityPropertiesInteger *intProp = dynamic_cast<EntityPropertiesInteger *>(prop);
 				if (intProp == nullptr)
 				{
-					getNotifier()->displayMessage("ERROR: Incorrect data type for material:" + materialName + ", property: " + propertyName + "\n");
+					Application::instance()->getNotifier()->displayMessage("ERROR: Incorrect data type for material:" + materialName + ", property: " + propertyName + "\n");
 				}
 				else
 				{
@@ -5373,7 +5358,7 @@ void Model::loadDefaultMaterials(void)
 				EntityPropertiesColor *colorProp = dynamic_cast<EntityPropertiesColor *>(prop);
 				if (colorProp == nullptr)
 				{
-					getNotifier()->displayMessage("ERROR: Incorrect data type for material:" + materialName + ", property: " + propertyName + "\n");
+					Application::instance()->getNotifier()->displayMessage("ERROR: Incorrect data type for material:" + materialName + ", property: " + propertyName + "\n");
 				}
 				else
 				{
@@ -5442,7 +5427,7 @@ std::string Model::checkParentUpdates(std::list<ot::UID> &modifiedEntities)
 	if (affectedParentList.empty())
 	{
 		// No further update is required. Refresh selection
-		getNotifier()->refreshSelection(visualizationModelID);
+		Application::instance()->getNotifier()->refreshSelection(visualizationModelID);
 		return "";
 	}
 
@@ -5458,12 +5443,12 @@ std::string Model::checkParentUpdates(std::list<ot::UID> &modifiedEntities)
 
 int Model::getServiceIDAsInt(void)
 {
-	return globalServiceID;
+	return Application::instance()->serviceID();
 }
 
 int Model::getSessionCount(void)
 {
-	return globalSessionCount;
+	return Application::instance()->getSessionCount();
 }
 
 ModelState * Model::getStateManager(void)

@@ -154,8 +154,6 @@ public:
 
 	void uiIsAvailable(void);
 
-	MicroserviceNotifier *getNotifier(void);
-
 	std::string getCurrentModelVersion(void);
 	void activateVersion(const std::string &version);
 	void addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::list<ot::UID> &topologyEntityVersionList, std::list<bool> &topologyEntityForceVisible, std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList, const std::string &description, bool saveModel, bool askForCreationOfBranch);
