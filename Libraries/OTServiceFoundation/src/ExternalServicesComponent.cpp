@@ -468,6 +468,8 @@ std::string ot::intern::ExternalServicesComponent::handleRun(JsonDocument& _docu
 	std::string credentialsPassword = ot::json::getString(_document, OT_PARAM_AUTH_PASSWORD);
 	m_application->m_DBuserCollection = ot::json::getString(_document, OT_PARAM_SETTINGS_USERCOLLECTION);
 
+	m_application->setProjectType(ot::json::getString(_document, OT_ACTION_PARAM_SESSION_TYPE));
+
 	DataBase::GetDataBase()->setUserCredentials(credentialsUsername, credentialsPassword);
 
 	// Change the service to visible

@@ -25,7 +25,8 @@ void ot::components::UiPluginComponent::sendQueuedMessage(const std::string& _ac
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_NAME, JsonString(m_pluginName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
-	m_application->sendMessage(true, m_uiComponent->serviceName(), cmdDoc);
+	std::string response;
+	m_application->sendMessage(true, m_uiComponent->serviceName(), cmdDoc, response);
 }
 
 void ot::components::UiPluginComponent::sendQueuedMessage(const std::string& _action, JsonDocument& _jsonDocument) {

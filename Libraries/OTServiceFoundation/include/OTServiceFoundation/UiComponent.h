@@ -420,7 +420,7 @@ namespace ot {
 			void sendUpdatedControlState(void);
 			void setControlState(const std::string controlName, bool enabled);
 
-			std::string sendMessage(bool _queue, JsonDocument& _doc);
+			bool sendMessage(bool _queue, JsonDocument& _doc, std::string& _response);
 
 			// Plugin
 

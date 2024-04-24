@@ -180,9 +180,9 @@ void ot::components::ModelComponent::importTableFile(const std::string &itemName
 	}
 }
 
-std::string  ot::components::ModelComponent::sendMessage(bool _queue, JsonDocument & _doc)
+bool  ot::components::ModelComponent::sendMessage(bool _queue, JsonDocument & _doc, std::string& _response)
 {
-	return m_application->sendMessage(_queue, "Model", _doc);
+	return m_application->sendMessage(_queue, OT_INFO_SERVICE_TYPE_MODEL, _doc, _response);
 }
 
 void ot::components::ModelComponent::clearNewEntityList(void)

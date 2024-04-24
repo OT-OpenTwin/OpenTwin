@@ -47,7 +47,7 @@ namespace ot {
 	{
 		OT_DECL_NOCOPY(ApplicationBase)
 	public:
-		ApplicationBase(const std::string & _serviceName, const std::string & _serviceType, AbstractUiNotifier * _uiNotifier, AbstractModelNotifier * _modelNotifier);
+		ApplicationBase(const std::string & _serviceName, const std::string & _serviceType, AbstractUiNotifier * _uiNotifier = nullptr, AbstractModelNotifier * _modelNotifier = nullptr);
 		virtual ~ApplicationBase();
 
 		// ##########################################################################################################################################
@@ -156,6 +156,9 @@ namespace ot {
 		//! @param _id The session ID to set
 		void setSessionID(const std::string & _id);
 		
+		//! @brief Set the project type
+		void setProjectType(const std::string& _type) { m_projectType = _type; };
+
 		// ##########################################################################################################################################
 
 		// Getter
@@ -180,6 +183,9 @@ namespace ot {
 		//! @brief Will return the session ID this service is running in
 		std::string sessionID(void) { return m_sessionID; }
 		
+		//! @brief The current project type
+		const std::string& projectType(void) const { return m_projectType; };
+
 		//! @brief Will return true if a UI is running in the session
 		bool isUiConnected(void) const { return m_uiComponent != nullptr; }
 
@@ -250,31 +256,31 @@ namespace ot {
 		//! @param _queue If true, the message will be queued
 		//! @param _serviceName The name of the service
 		//! @param _doc The document containing the message
-		std::string sendMessage(bool _queue, const std::string & _serviceName, JsonDocument& _doc);
+		//! @param _response The reponse will be written here
+		bool sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::string& _response);
 
 		//! @brief Will send the message to the service with the specified name
 		//! @param _queue If true, the message will be queued
 		//! @param _serviceName The name of the service
 		//! @param _doc The document containing the message
 		//! @param _prefetchIds A list containing the prefetched IDs
-		std::string sendMessage(bool _queue, const std::string & _serviceName, JsonDocument& _doc, std::list<std::pair<UID, UID>> & _prefetchIds);
+		//! @param _response The reponse will be written here
+		bool sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>> & _prefetchIds, std::string& _response);
 
 		//! @brief Will send the message to all other services in this session
 		//! @param _queue If true, the message will be queued
 		//! @param _message The message to send
-		std::string broadcastMessage(bool _queue, const std::string& _message);
+		bool broadcastMessage(bool _queue, const std::string& _message);
 
 		//! @brief Will send the message to all other services in this session
 		//! @param _queue If true, the message will be queued
 		//! @param _doc The JSON Document to send
-		std::string broadcastMessage(bool _queue, JsonDocument& _doc);
+		bool broadcastMessage(bool _queue, const JsonDocument& _doc);
 
 		void prefetchDocumentsFromStorage(const std::list<UID> &entities);
 		void prefetchDocumentsFromStorage(const std::list<ot::EntityInformation> &entityInfo);
 		UID getPrefetchedEntityVersion(UID entityID);
 
-		bool sendHttpRequest(ot::MessageType _operation, const std::string& _url, JsonDocument& _doc, std::string& _response);
-		bool sendHttpRequest(ot::MessageType _operation, const std::string& _url, const std::string& _message, std::string& _response);
 		// ##########################################################################################################################################
 	protected:
 
@@ -313,6 +319,7 @@ namespace ot {
 		std::string										m_sessionID;
 		std::string										m_projectName;
 		std::string										m_collectionName;
+		std::string										m_projectType;
 
 		std::list<ot::ModalCommandBase *>				m_modalCommands;
 

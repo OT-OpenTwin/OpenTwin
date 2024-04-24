@@ -64,7 +64,7 @@ namespace ot {
 
 			void importTableFile(const std::string &itemName);
 		
-			std::string sendMessage(bool _queue, JsonDocument& _doc);
+			bool sendMessage(bool _queue, JsonDocument& _doc, std::string& _response);
 
 			void clearNewEntityList(void);
 			void addNewTopologyEntity(UID entityID, UID entityVersion, bool forceVisible);

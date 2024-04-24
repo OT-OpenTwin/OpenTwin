@@ -197,13 +197,13 @@ void ot::ApplicationBase::flushQueuedHttpRequests(const std::string & _service)
 	}
 }
 
-std::string ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, JsonDocument& _doc)
+bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::string& _response)
 {
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIds;
-	return sendMessage(_queue, _serviceName, _doc, prefetchIds);
+	return this->sendMessage(_queue, _serviceName, _doc, prefetchIds, _response);
 }
 
-std::string ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, JsonDocument& _doc, std::list<std::pair<UID, UID>> & _prefetchIds)
+bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>> & _prefetchIds, std::string& _response)
 {
 	auto destination = m_serviceNameMap.find(_serviceName);
 	if (destination == m_serviceNameMap.end()) {
@@ -238,7 +238,7 @@ std::string ot::ApplicationBase::sendMessage(bool _queue, const std::string & _s
 
 		JsonAllocator& allocator = queuedDoc->GetAllocator();
 
-		rapidjson::Value v(_doc, allocator);
+		ot::JsonValue v(_doc, allocator);
 		(*queuedDoc)[OT_ACTION_PARAM_PREFETCH_Documents].PushBack(v, allocator);
 
 		for (auto id : _prefetchIds)
@@ -246,17 +246,16 @@ std::string ot::ApplicationBase::sendMessage(bool _queue, const std::string & _s
 			(*queuedDoc)[OT_ACTION_PARAM_PREFETCH_ID].PushBack(id.first, allocator);
 			(*queuedDoc)[OT_ACTION_PARAM_PREFETCH_Version].PushBack(id.second, allocator);
 		}
-		return "";
+
+		return true;
 	}
 	else
 	{
-		std::string response;
-		sendHttpRequest(_queue ? QUEUE : EXECUTE, destination->second.service->serviceURL(), _doc, response);
-		return response;
+		return ot::msg::send(m_serviceURL, destination->second.service->serviceURL(), (_queue ? QUEUE : EXECUTE), _doc.toJson(), _response);
 	}
 }
 
-std::string ot::ApplicationBase::broadcastMessage(bool _queue, const std::string& _message) {
+bool ot::ApplicationBase::broadcastMessage(bool _queue, const std::string& _message) {
 	JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_SendBroadcastMessage, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_serviceID, doc.GetAllocator());
@@ -264,12 +263,11 @@ std::string ot::ApplicationBase::broadcastMessage(bool _queue, const std::string
 	doc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	sendHttpRequest(_queue ? QUEUE : EXECUTE, m_sessionService.service->serviceURL(), doc, response);
-	return response;
+	return ot::msg::send(m_serviceURL, m_sessionService.service->serviceURL(), (_queue ? QUEUE : EXECUTE), doc.toJson(), response);
 }
 
-std::string ot::ApplicationBase::broadcastMessage(bool _queue, JsonDocument& _doc) {
-	return broadcastMessage(_queue, _doc.toJson());
+bool ot::ApplicationBase::broadcastMessage(bool _queue, const JsonDocument& _doc) {
+	return this->broadcastMessage(_queue, _doc.toJson());
 }
 
 void ot::ApplicationBase::addModalCommand(ot::ModalCommandBase *command)
@@ -329,16 +327,6 @@ std::string ot::ApplicationBase::processActionWithModalCommands(const std::strin
 // ##########################################################################################################################################
 
 // Protected functions
-
-bool ot::ApplicationBase::sendHttpRequest(ot::MessageType _operation, const std::string& _url, JsonDocument& _doc, std::string& _response)
-{
-	return sendHttpRequest(_operation, _url, _doc.toJson(), _response);
-}
-
-bool ot::ApplicationBase::sendHttpRequest(ot::MessageType _operation, const std::string& _url, const std::string& _message, std::string& _response)
-{
-	return ot::msg::send(serviceURL(), _url, _operation, _message, _response);
-}
 
 bool ot::ApplicationBase::EnsureDataBaseConnection(void)
 {
