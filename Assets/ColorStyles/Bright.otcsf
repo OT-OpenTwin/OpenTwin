@@ -4,7 +4,14 @@ integers:[{"Name":"Splitter Handle Width","Value":2}]
 doubles:[]
 values:[{"Name":"Controls Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}},{"Name":"Controls Border Color","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.6600000262260437,"g":0.6600000262260437,"b":0.6600000262260437,"a":1.0}}},{"Name":"Controls Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Controls Hover Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.843137264251709,"b":1.0,"a":1.0}}},{"Name":"Controls Hover Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Controls Selected Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":1.0,"b":0.0,"a":1.0}}},{"Name":"Controls Selected Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Error Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Text Editor Highlight","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.8299999833106995,"g":0.8299999833106995,"b":0.8299999833106995,"a":1.0}}},{"Name":"Text Editor Highlight Border","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCLGrad","Stops":[{"Pos":0.0,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}},{"Pos":0.04,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}},{"Pos":0.05,"Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}},{"Pos":0.98,"Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}},{"Pos":0.99,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}},{"Pos":1.0,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}}],"Spread":"Pad","Start":{"x":0.5,"y":0.0},"FinalStop":{"x":0.5,"y":1.0}}},{"Name":"Title Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.843137264251709,"g":0.843137264251709,"b":0.843137264251709,"a":1.0}}},{"Name":"Title Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Window Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}},{"Name":"Window Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}}]
 sheet:
-/* This file used the "QDarkStyleSheet/qdarkstyle/qss/_style.scss" as a template. */
+/*    OpenTwin Notes                                                                     */
+/*                                                                                       */
+/*    Splitter Handle:                                                                   */
+/*       When changing the width the qt-ads (third party) library must be adjusted       */
+/*       (see notes file) and recompiled.                                                */
+/*                                                                                       */
+/* This file used the "QDarkStyleSheet/qdarkstyle/qss/_style.scss" as a template.        */
+/*                                                                                       */
 
 /* Reset */
 
@@ -2288,6 +2295,7 @@ ads--CDockContainerWidget > QSplitter {
 ads--CDockContainerWidget ads--CDockSplitter::handle {
     background: rgba(211,211,211,255);
     border: 1px solid rgba(168,168,168,255);
+    /* width: 2; Can't be changed by stylesheet (read notes) */
 }
 
 ads--CDockAreaWidget {

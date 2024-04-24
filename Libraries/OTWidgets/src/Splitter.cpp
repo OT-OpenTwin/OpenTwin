@@ -13,12 +13,14 @@
 ot::Splitter::Splitter(QWidget* _parent) 
 	: QSplitter(_parent)
 {
+	this->slotGlobalColorStyleChanged(GlobalColorStyle::instance().getCurrentStyle());
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &Splitter::slotGlobalColorStyleChanged);
 }
 
 ot::Splitter::Splitter(Qt::Orientation _orientation, QWidget* _parent)
 	: QSplitter(_orientation, _parent)
 {
+	this->slotGlobalColorStyleChanged(GlobalColorStyle::instance().getCurrentStyle());
 	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &Splitter::slotGlobalColorStyleChanged);
 }
 

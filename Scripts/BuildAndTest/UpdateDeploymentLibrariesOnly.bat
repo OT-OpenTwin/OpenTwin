@@ -89,7 +89,7 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\OToolkit.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\ResultDataAccess.dll"
 
 ECHO Delete color styles
-DEL "%OPENTWIN_DEPLOYMENT_DIR%\*.otcsf"
+DEL "%OPENTWIN_DEPLOYMENT_DIR%\Assets\ColorStyles\*.otcsf"
 
 ECHO Delete Admin Panel 
 

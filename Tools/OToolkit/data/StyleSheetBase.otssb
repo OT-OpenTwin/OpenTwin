@@ -1,4 +1,11 @@
-/* This file used the "QDarkStyleSheet/qdarkstyle/qss/_style.scss" as a template. */
+/*    OpenTwin Notes                                                                     */
+/*                                                                                       */
+/*    Splitter Handle:                                                                   */
+/*       When changing the width the qt-ads (third party) library must be adjusted       */
+/*       (see notes file) and recompiled.                                                */
+/*                                                                                       */
+/* This file used the "QDarkStyleSheet/qdarkstyle/qss/_style.scss" as a template.        */
+/*                                                                                       */
 
 /* Reset */
 
@@ -2282,6 +2289,7 @@ ads--CDockContainerWidget > QSplitter {
 ads--CDockContainerWidget ads--CDockSplitter::handle {
     background: %color:Input Background%;
     border: 1px solid %color:Light Border Color%;
+    /* width: %int:Splitter Handle Width%; Can't be changed by stylesheet (read notes) */
 }
 
 ads--CDockAreaWidget {
