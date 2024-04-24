@@ -123,6 +123,9 @@
     <ClCompile Include="src\LogInDialog.cpp">
       <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\ServiceDataUi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -166,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="include\NavigationTreeView.h">
       <Filter>Header Files\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ServiceDataUi.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

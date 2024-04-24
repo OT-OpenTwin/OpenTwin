@@ -8,10 +8,11 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/ServiceBase.h"
+#include "OTCore/CoreAPIExport.h"
 
 namespace ot {
 
-	class ThisService : public ServiceBase {
+	class OT_CORE_API_EXPORT ThisService : public ServiceBase {
 		OT_DECL_NOCOPY(ThisService)
 	public:
 		static ThisService& instance(void);

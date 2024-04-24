@@ -290,8 +290,12 @@ public:
 	//! @brief Will return the current project name
 	const std::string & getCurrentProjectName(void) const { return m_currentProjectName; }
 
+	const std::string& getCurrentProjectType(void) const { return m_currentProjectType; };
+
 	//! @brief Will set the name of the currently active project
 	void setCurrentProjectName(const std::string & _name) { m_currentProjectName = _name; }
+
+	void setCurrentProjectType(const std::string& _type) { m_currentProjectType = _type; };
 
 	std::string getCollectionName() const { return m_collectionName; }
 
@@ -303,6 +307,9 @@ public:
 
 	//! @brief Will clear the session information such as the project name, collection name and user name
 	void clearSessionInformation(void);
+
+	void restoreSessionState(void);
+	void storeSessionState(void);
 
 public Q_SLOTS:
 
@@ -513,6 +520,7 @@ private:
 	int							m_siteID;
 	std::string					m_relayURLs;
 	std::string					m_currentProjectName;
+	std::string					m_currentProjectType;
 	std::string					m_collectionName;
 
 	std::string					m_currentUser;

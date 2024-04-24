@@ -115,6 +115,7 @@
 #define OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot "Model.Plot.UpdateCurves"
 #define OT_ACTION_CMD_MODEL_DeleteCurvesFromPlots "Model.Plot.DeleteCurves"
 
+#define OT_ACTION_CMD_UI_ServiceSetupCompleted "UI.Service.SetupCompleted"
 #define OT_ACTION_CMD_UI_RegisterForModelEvents "UI.ModelView.Events.Register"
 #define OT_ACTION_CMD_UI_DeregisterForModelEvents "UI.ModelView.Events.Deregister"
 #define OT_ACTION_CMD_UI_DisplayMessage "UI.DisplayMessage"

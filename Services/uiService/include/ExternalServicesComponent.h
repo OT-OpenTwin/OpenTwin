@@ -47,12 +47,13 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 
+class AppBase;
+class LockManager;
+class ServiceDataUi;
 class WebsocketClient;
 class ControlsManager;
-class LockManager;
-class AppBase;
 class KeyboardCommandHandler;
-namespace ot { class ServiceBase; }
+namespace ot { class ServiceBase; };
 
 class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::OTObjectBase
 {
@@ -97,7 +98,7 @@ public:
 
 	// UI Element creation
 	
-	KeyboardCommandHandler * addShortcut(ot::ServiceBase * _sender, const std::string& _keySequence);
+	KeyboardCommandHandler * addShortcut(ServiceDataUi* _sender, const std::string& _keySequence);
 
 	// ###################################################################################################
 
@@ -134,9 +135,9 @@ public:
 	
 	void prefetchDataThread(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs);
 
-	void contextMenuItemClicked(ot::ServiceBase * _sender, const std::string& _menuName, const std::string& _itemName);
+	void contextMenuItemClicked(ot::ServiceBase* _sender, const std::string& _menuName, const std::string& _itemName);
 
-	void contextMenuItemCheckedChanged(ot::ServiceBase * _sender, const std::string& _menuName, const std::string& _itemName, bool _isChecked);
+	void contextMenuItemCheckedChanged(ot::ServiceBase* _sender, const std::string& _menuName, const std::string& _itemName, bool _isChecked);
 
 	// ###################################################################################################
 
@@ -181,7 +182,7 @@ public:
 	// General purpose communication
 	void InformSenderAboutFinishedAction(std::string URL, std::string subsequentFunction);
 
-	ot::ServiceBase* getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType);
+	ServiceDataUi* getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType);
 
 	//########################################################################################################
 
@@ -195,6 +196,7 @@ public:
 	OT_HANDLER(handleServiceConnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceConnected, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceDisconnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceDisconnected, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleShutdownRequestedByService, ExternalServicesComponent, OT_ACTION_CMD_ShutdownRequestedByService, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleServiceSetupCompleted, ExternalServicesComponent, OT_ACTION_CMD_UI_ServiceSetupCompleted, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleModelExecuteFunction, ExternalServicesComponent, OT_ACTION_CMD_MODEL_ExecuteFunction, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayDebugMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayDebugMessage, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -355,12 +357,12 @@ private:
 
 	void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 	
-	void removeServiceFromList(std::vector<ot::ServiceBase *> &list, ot::ServiceBase *service);
+	void removeServiceFromList(std::vector<ServiceDataUi *> &list, ServiceDataUi *service);
 
-	ak::UID getServiceUiUid(ot::ServiceBase * _service);
+	ak::UID getServiceUiUid(ServiceDataUi * _service);
 
-	ot::ServiceBase * getService(ot::serviceID_t _serviceID);
-	ot::ServiceBase * getService(const ot::BasicServiceInformation& _serviceInfo);
+	ServiceDataUi * getService(ot::serviceID_t _serviceID);
+	ServiceDataUi * getService(const ot::BasicServiceInformation& _serviceInfo);
 
 	void determineViews(const std::string& modelServiceURL);
 	std::string getStudioSuiteFileNameForCommit();
@@ -380,15 +382,16 @@ private:
 	std::string										m_modelServiceURL;
 
 	std::map<std::string, ak::UID>					m_serviceToUidMap;
-	std::map<ot::serviceID_t, ot::ServiceBase *>	m_serviceIdMap;
+	std::map<ot::serviceID_t, ServiceDataUi*>	m_serviceIdMap;
 
-	std::vector<ot::ServiceBase *>					m_modelViewNotifier;
+	std::vector<ServiceDataUi*>					m_modelViewNotifier;
 
 	std::string										m_uiRelayServiceHTTP;
 	std::string										m_uiRelayServiceWS;
 	WebsocketClient *								m_websocket;
 
 	bool											m_prefetchingDataCompleted;
+	bool                                            m_servicesUiSetupCompleted;
 
 	FileHandler										m_fileHandler;
 

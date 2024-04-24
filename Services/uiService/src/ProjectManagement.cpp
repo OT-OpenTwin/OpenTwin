@@ -262,12 +262,14 @@ std::string ProjectManagement::getProjectType(const std::string& projectName)
 	std::string response;
 	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
+		OT_LOG_E("Request failed");
 		return "";
 	}
 
 	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
 	if (responseMessage == ot::ReturnMessage::Failed)
 	{
+		OT_LOG_E(responseMessage.getWhat());
 		return "";
 	}
 
@@ -280,8 +282,9 @@ std::string ProjectManagement::getProjectType(const std::string& projectName)
 	{
 		projectType = ot::json::getString(responseDoc, OT_PARAM_AUTH_PROJECT_TYPE);
 	}
-	catch (std::exception)
+	catch (const std::exception& _e)
 	{
+		OT_LOG_E(_e.what());
 	}
 
 	return projectType;

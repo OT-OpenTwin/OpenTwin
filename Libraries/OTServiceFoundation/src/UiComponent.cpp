@@ -7,6 +7,7 @@
  */
 
 #include "OTCore/OTAssert.h"
+#include "OTCore/ThisService.h"
 
 #include "OTCommunication/actionTypes.h"
 
@@ -503,6 +504,15 @@ void ot::components::UiComponent::addIconSearchPath(const std::string& _iconPath
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
 #endif // _DEBUG
+}
+
+void ot::components::UiComponent::notifyUiSetupCompleted(void) {
+	JsonDocument cmdDoc;
+	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_ServiceSetupCompleted, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	ot::ThisService::addIdToJsonDocument(cmdDoc);
+
+	std::string response;
+	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
 }
 
 // #####################################################################################################################

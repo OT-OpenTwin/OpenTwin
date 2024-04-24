@@ -1664,7 +1664,41 @@ void AppBase::closeAllViewerTabs(void) {
 
 void AppBase::clearSessionInformation(void) {
 	m_currentProjectName = "";
+	m_currentProjectType = "";
 	uiAPI::window::setTitle(m_mainWindow, "Open Twin");
+}
+
+void AppBase::restoreSessionState(void) {
+	if (m_currentProjectType.empty()) {
+		OT_LOG_W("No project type set. Ignoring");
+		return;
+	}
+
+	UserManagement uM;
+	uM.setAuthServerURL(m_authorizationServiceURL);
+	uM.setDatabaseURL(m_dataBaseURL);
+
+	std::string s = uM.restoreSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType);
+	if (s.empty()) return;
+
+	m_currentStateWindow.view = s;
+	ot::WidgetViewManager::instance().restoreState(m_currentStateWindow.view);
+}
+
+void AppBase::storeSessionState(void) {
+	if (!m_currentStateWindow.viewShown) return;
+
+	if (m_currentProjectType.empty()) {
+		OT_LOG_W("No project type set. Ignoring");
+		return;
+	}
+
+	UserManagement uM;
+	uM.setAuthServerURL(m_authorizationServiceURL);
+	uM.setDatabaseURL(m_dataBaseURL);
+
+	m_currentStateWindow.view = ot::WidgetViewManager::instance().saveState();
+	uM.storeSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType, m_currentStateWindow.view);
 }
 
 // #################################################################################################################

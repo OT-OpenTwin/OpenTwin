@@ -43,6 +43,7 @@
     <ClCompile Include="src\ManageOwner.cpp" />
     <ClCompile Include="src\NavigationTreeView.cpp" />
     <ClCompile Include="src\SelectEntitiesDialog.cpp" />
+    <ClCompile Include="src\ServiceDataUi.cpp" />
     <ClCompile Include="src\ShortcutManager.cpp" />
     <ClCompile Include="src\ProjectManagement.cpp" />
     <ClCompile Include="src\ToolBar.cpp" />
@@ -72,6 +73,7 @@
     <ClInclude Include="include\NavigationTreeView.h" />
     <ClInclude Include="include\QtMetaTypes.h" />
     <QtMoc Include="include\SelectEntitiesDialog.h" />
+    <ClInclude Include="include\ServiceDataUi.h" />
     <ClInclude Include="include\ToolBar.h" />
     <QtMoc Include="include\welcomeScreen.h" />
     <ClInclude Include="include\ProjectManagement.h" />

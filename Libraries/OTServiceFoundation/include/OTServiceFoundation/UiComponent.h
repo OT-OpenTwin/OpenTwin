@@ -327,6 +327,9 @@ namespace ot {
 			//! This function has no effect when running in release mode
 			void addIconSearchPath(const std::string& _iconPath);
 
+			//! @brief Will notify the ui that this service completed its frontend setup
+			void notifyUiSetupCompleted(void);
+
 			// #####################################################################################################################
 
 			// Information IO

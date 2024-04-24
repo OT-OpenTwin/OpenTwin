@@ -17,6 +17,8 @@
 #include "ContextMenuManager.h"
 #include "UiPluginManager.h"
 #include "SelectEntitiesDialog.h"
+#include "ServiceDataUi.h"
+#include "UserManagement.h"
 
 // Qt header
 #include <QtCore/qdir.h>						// QDir
@@ -25,10 +27,10 @@
 #include <QtWidgets/qmessagebox.h>
 
 // OpenTwin header
-#include "OTCore/ServiceBase.h"
 #include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
 #include "OTCore/Color.h"
+#include "OTCore/ThisService.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTCore/OwnerManagerTemplate.h"
 #include "OTCore/OwnerService.h"
@@ -182,7 +184,8 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	m_controlsManager{ nullptr },
 	m_lockManager{ nullptr },
 	m_owner{ _owner },
-	m_prefetchingDataCompleted{ false }
+	m_prefetchingDataCompleted{ false },
+	m_servicesUiSetupCompleted(false)
 {
 	m_controlsManager = new ControlsManager;
 	m_lockManager = new LockManager(m_owner);
@@ -239,7 +242,7 @@ void ExternalServicesComponent::setMessagingRelay(const std::string &relayAddres
 
 // UI Element creation
 
-KeyboardCommandHandler* ExternalServicesComponent::addShortcut(ot::ServiceBase* _sender, const std::string& _keySequence) {
+KeyboardCommandHandler* ExternalServicesComponent::addShortcut(ServiceDataUi* _sender, const std::string& _keySequence) {
 	if (_keySequence.length() > 0) {
 		ShortcutManager* manager = AppBase::instance()->shortcutManager();
 		if (manager) {
@@ -682,7 +685,7 @@ void ExternalServicesComponent::entitiesSelected(ModelUIDtype modelID, ot::servi
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Selection_OptNames, ot::JsonArray(optionNames, inDoc.GetAllocator()), inDoc.GetAllocator());
 		inDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Selection_OptValues, ot::JsonArray(optionValues, inDoc.GetAllocator()), inDoc.GetAllocator());
 
-		ot::ServiceBase *receiver = getService(replyToServiceID);
+		ServiceDataUi *receiver = getService(replyToServiceID);
 
 		if (receiver != nullptr)
 		{
@@ -753,7 +756,7 @@ void ExternalServicesComponent::contextMenuItemClicked(ot::ServiceBase * _sender
 	}
 }
 
-void ExternalServicesComponent::contextMenuItemCheckedChanged(ot::ServiceBase * _sender, const std::string& _menuName, const std::string& _itemName, bool _isChecked) {
+void ExternalServicesComponent::contextMenuItemCheckedChanged(ot::ServiceBase* _sender, const std::string& _menuName, const std::string& _itemName, bool _isChecked) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenuName, ot::JsonString(_menuName, doc.GetAllocator()), doc.GetAllocator());
@@ -1087,7 +1090,6 @@ std::list<std::string> ExternalServicesComponent::getListOfProjectTypes(void)
 void ExternalServicesComponent::openProject(const std::string & projectName, const std::string& projectType, const std::string & collectionName) {
 
 	AppBase * app{ AppBase::instance() };
-
 	app->lockWelcomeScreen(true);
 
 	try {
@@ -1133,6 +1135,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 #endif
 
 		app->setCurrentProjectName(projectName);
+		app->setCurrentProjectType(projectType);
 
 		// ##################################################################
 
@@ -1213,6 +1216,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 
 		// Now we check whether the startup sequence is completed
 		bool startupReady = false;
+		m_servicesUiSetupCompleted = false;
 
 		ot::JsonDocument checkCommandDoc;
 		checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
@@ -1273,6 +1277,8 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 			std::string senderName = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_NAME);
 			std::string senderType = ot::json::getString(serviceJSON, OT_ACTION_PARAM_SERVICE_TYPE);
 			ot::serviceID_t senderID = ot::json::getUInt(serviceJSON, OT_ACTION_PARAM_SERVICE_ID);
+			// Dont store this services information
+			if (senderID == AppBase::instance()->serviceID()) continue;
 
 			if (senderType == OT_INFO_SERVICE_TYPE_MODEL)
 			{
@@ -1281,7 +1287,10 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 
 			auto oldService = m_serviceIdMap.find(senderID);
 			if (oldService == m_serviceIdMap.end()) {
-				m_serviceIdMap.insert_or_assign(senderID, new ot::ServiceBase{ senderName, senderType, senderURL, senderID });
+				m_serviceIdMap.insert_or_assign(senderID, new ServiceDataUi{ senderName, senderType, senderURL, senderID });
+			}
+			else {
+				OT_LOG_W("Duplicate service information provided by LSS { \"Name\": \"" + senderName + "\", \"Type\": \"" + senderType + "\" }");
 			}
 		}
 
@@ -1290,7 +1299,8 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		ot::startSessionServiceHealthCheck(m_sessionServiceURL);
 #endif // OT_USE_GSS
 
-		m_lockManager->unlock(AppBase::instance(), ot::LockAll);
+		// Unlock will be triggered by the finalize ui startup
+		//m_lockManager->unlock(AppBase::instance(), ot::LockAll);
 
 		OT_LOG_D("Open project completed");
 	}
@@ -1353,6 +1363,8 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		// Remove all notifiers
 		m_modelViewNotifier.clear();
+
+		app->storeSessionState();
 
 		// Notify the session service that the sesion should be closed now
 		ot::JsonDocument shutdownCommand;
@@ -1896,7 +1908,7 @@ void ExternalServicesComponent::getSelectedVisibleModelEntityIDs(std::list<Model
 
 // Private functions
 
-void ExternalServicesComponent::removeServiceFromList(std::vector<ot::ServiceBase *> &list, ot::ServiceBase *service)
+void ExternalServicesComponent::removeServiceFromList(std::vector<ServiceDataUi *> &list, ServiceDataUi *service)
 {
 	auto item = std::find(list.begin(), list.end(), service);
 
@@ -1907,7 +1919,7 @@ void ExternalServicesComponent::removeServiceFromList(std::vector<ot::ServiceBas
 	}
 }
 
-ak::UID ExternalServicesComponent::getServiceUiUid(ot::ServiceBase * _service) {
+ak::UID ExternalServicesComponent::getServiceUiUid(ServiceDataUi * _service) {
 	auto itm = m_serviceToUidMap.find(_service->serviceName());
 	if (itm == m_serviceToUidMap.end()) {
 		ak::UID newUID{ ak::uiAPI::createUid() };
@@ -1919,7 +1931,7 @@ ak::UID ExternalServicesComponent::getServiceUiUid(ot::ServiceBase * _service) {
 	}
 }
 
-ot::ServiceBase * ExternalServicesComponent::getService(ot::serviceID_t _serviceID) {
+ServiceDataUi * ExternalServicesComponent::getService(ot::serviceID_t _serviceID) {
 	auto service{ m_serviceIdMap.find(_serviceID) };
 	if (service == m_serviceIdMap.end()) {
 //		assert(0);
@@ -1932,7 +1944,7 @@ ot::ServiceBase * ExternalServicesComponent::getService(ot::serviceID_t _service
 	return service->second;
 }
 
-ot::ServiceBase * ExternalServicesComponent::getService(const ot::BasicServiceInformation& _serviceInfo) {
+ServiceDataUi * ExternalServicesComponent::getService(const ot::BasicServiceInformation& _serviceInfo) {
 
 	for (auto s : m_serviceIdMap) {
 		if (s.second->getBasicServiceInformation() == _serviceInfo) {
@@ -1943,7 +1955,7 @@ ot::ServiceBase * ExternalServicesComponent::getService(const ot::BasicServiceIn
 	return nullptr;
 }
 
-ot::ServiceBase* ExternalServicesComponent::getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType) {
+ServiceDataUi* ExternalServicesComponent::getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType) {
 	for (auto service : m_serviceIdMap)
 	{
 		if (service.second->serviceName() == _serviceName && service.second->serviceType() == _serviceType)
@@ -2066,7 +2078,7 @@ std::string ExternalServicesComponent::handleServiceConnected(ot::JsonDocument& 
 	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
 	std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string senderType = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
-	ot::ServiceBase* connectedService = new ot::ServiceBase(senderName, senderType, senderURL, senderID);
+	ServiceDataUi* connectedService = new ServiceDataUi(senderName, senderType, senderURL, senderID);
 	m_serviceIdMap.insert_or_assign(senderID, connectedService);
 
 	return "";
@@ -2080,7 +2092,7 @@ std::string ExternalServicesComponent::handleServiceDisconnected(ot::JsonDocumen
 
 	auto itm = m_serviceIdMap.find(senderID);
 	if (itm != m_serviceIdMap.end()) {
-		ot::ServiceBase* actualService = itm->second;
+		ServiceDataUi* actualService = itm->second;
 		assert(actualService != nullptr);
 
 		// Clean up elements
@@ -2102,6 +2114,33 @@ std::string ExternalServicesComponent::handleServiceDisconnected(ot::JsonDocumen
 
 std::string ExternalServicesComponent::handleShutdownRequestedByService(ot::JsonDocument& _document) {
 	OTAssert(0, "External shutdown not supported");	// Add external shutdown
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocument& _document) {
+	ot::serviceID_t id = ot::ThisService::getIdFromJsonDocument(_document);
+	auto it = m_serviceIdMap.find(id);
+	if (it == m_serviceIdMap.end()) {
+		OT_LOG_E("Unknown service (" + std::to_string(id) + ")");
+		return "";
+	}
+
+	it->second->setUiInitializationCompleted();
+
+	// Check if all services completed the startup
+	for (const auto it : m_serviceIdMap) {
+		if (!it.second->isUiInitializationCompleted()) return "";
+	}
+
+	// Here we know that all services completed the startup -> switch to main view and restore state
+	m_servicesUiSetupCompleted = true;
+
+	AppBase::instance()->switchToViewTab();
+	AppBase::instance()->lockWelcomeScreen(false);
+	m_lockManager->unlock(AppBase::instance(), ot::LockAll);
+
+	AppBase::instance()->restoreSessionState();
 
 	return "";
 }
@@ -2499,7 +2538,7 @@ std::string ExternalServicesComponent::handleAddMenuPage(ot::JsonDocument& _docu
 	std::string pageName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PageName);
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 
-	ot::ServiceBase* service = getService(serviceId);
+	ServiceDataUi* service = getService(serviceId);
 
 	ak::UID p = AppBase::instance()->getToolBar()->addPage(getServiceUiUid(service), pageName.c_str());
 	//NOTE, add corresponding functions in uiServiceAPI
@@ -2514,7 +2553,7 @@ std::string ExternalServicesComponent::handleAddMenuGroup(ot::JsonDocument& _doc
 	std::string groupName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_GroupName);
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 
-	ot::ServiceBase* service = getService(serviceId);
+	ServiceDataUi* service = getService(serviceId);
 
 	//NOTE, add corresponding functions in uiServiceAPI
 	ak::UID pageUID{ ak::uiAPI::object::getUidFromObjectUniqueName(pageName.c_str()) };
@@ -2535,7 +2574,7 @@ std::string ExternalServicesComponent::handleAddMenuSubgroup(ot::JsonDocument& _
 	std::string subgroupName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_SubgroupName);
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 	
-	ot::ServiceBase* service = getService(serviceId);
+	ServiceDataUi* service = getService(serviceId);
 
 	//NOTE, add corresponding functions in uiServiceAPI
 	ak::UID groupUID{ ak::uiAPI::object::getUidFromObjectUniqueName((pageName + ":" + groupName).c_str()) };
@@ -2568,7 +2607,7 @@ std::string ExternalServicesComponent::handleAddMenuButton(ot::JsonDocument& _do
 		ot::ConstJsonObject contextMenuData = ot::json::getObject(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenu);
 		contextMenu.setFromJsonObject(contextMenuData);
 	}
-	ot::ServiceBase* senderService = getService(serviceId);
+	ServiceDataUi* senderService = getService(serviceId);
 	
 	ot::LockTypeFlags flags = (ot::LockAll);
 
@@ -2636,7 +2675,7 @@ std::string ExternalServicesComponent::handleAddMenuCheckbox(ot::JsonDocument& _
 	ot::LockTypeFlags flags = ot::toLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
 	flags.setFlag(ot::LockAll);	// Add the all flag to all external checkboxes
 
-	ot::ServiceBase* service = getService(serviceId);
+	ServiceDataUi* service = getService(serviceId);
 
 	//NOTE, add corresponding functions in uiServiceAPI
 	ak::UID parentID;
@@ -2684,7 +2723,7 @@ std::string ExternalServicesComponent::handleAddMenuLineEdit(ot::JsonDocument& _
 	ot::LockTypeFlags flags = ot::toLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
 	flags.setFlag(ot::LockAll);	// Add the all flag to all external checkboxes
 
-	ot::ServiceBase* service = getService(serviceId);
+	ServiceDataUi* service = getService(serviceId);
 	
 	ak::UID parentID;
 	if (subgroupName.length() > 0) {
@@ -2727,7 +2766,7 @@ std::string ExternalServicesComponent::handleAddShortcut(ot::JsonDocument& _docu
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 	std::string keySequence = ot::json::getString(_document, OT_ACTION_PARAM_UI_KeySequence);
 
-	ot::ServiceBase* service = getService(serviceId);
+	ServiceDataUi* service = getService(serviceId);
 
 	this->addShortcut(service, keySequence);
 
@@ -2804,7 +2843,7 @@ std::string ExternalServicesComponent::handleSetControlsEnabledState(ot::JsonDoc
 	std::list<std::string> disabled = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_DisabledControlsList);
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 
-	ot::ServiceBase* service = getService(serviceId);
+	ServiceDataUi* service = getService(serviceId);
 	
 	for (auto controlName : enabled)
 	{
@@ -3586,9 +3625,6 @@ std::string ExternalServicesComponent::handleCreateModel(ot::JsonDocument& _docu
 		throw std::exception(ex.c_str());
 	}
 
-	app->switchToViewTab();
-	app->lockWelcomeScreen(false);
-
 	return "";
 }
 
@@ -3651,7 +3687,7 @@ std::string ExternalServicesComponent::handleUnlock(ot::JsonDocument& _document)
 
 std::string ExternalServicesComponent::handleAddSettingsData(ot::JsonDocument& _document) {
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	ot::ServiceBase* service = getService(serviceId);
+	ServiceDataUi* service = getService(serviceId);
 	if (service) {
 		UserSettings::instance()->addFromService(service, _document);
 	}
@@ -4083,7 +4119,7 @@ std::string ExternalServicesComponent::handleRequestPlugin(ot::JsonDocument& _do
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 	std::string pluginName = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_NAME);
 	std::string pluginPath = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_PATH);
-	ot::ServiceBase* service = getService(serviceId);
+	ServiceDataUi* service = getService(serviceId);
 	ak::UID pluginUid = m_owner->uiPluginManager()->loadPlugin(pluginName.c_str(), pluginPath.c_str(), service);
 
 	if (pluginUid) {
@@ -4115,7 +4151,7 @@ std::string ExternalServicesComponent::handlePluginMessage(ot::JsonDocument& _do
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
 	std::string pluginName = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_NAME);
 	unsigned long long pluginUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_UI_PLUGIN_UID);
-	ot::ServiceBase* service = getService(serviceId);
+	ServiceDataUi* service = getService(serviceId);
 	if (!AppBase::instance()->uiPluginManager()->forwardMessageToPlugin(pluginUID, pluginAction, message)) {
 		return OT_ACTION_RETURN_INDICATOR_Error "Failed to process message";
 	}

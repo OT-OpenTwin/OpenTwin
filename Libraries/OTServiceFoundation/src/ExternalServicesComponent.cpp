@@ -9,6 +9,7 @@
 // OpenTwin header
 #include "OTCore/otAssert.h"
 #include "OTCore/JSON.h"
+#include "OTCore/ThisService.h"
 #include "OTCore/Logger.h"
 #include "OTCore/OwnerServiceGlobal.h"
 
@@ -124,6 +125,10 @@ int ot::intern::ExternalServicesComponent::startup(ApplicationBase * _applicatio
 	m_application->setDirectoryServiceURL(_localDirectoryServiceURL);
 	m_application->setSiteID("1");
 
+	ThisService::instance().setServiceName(m_application->serviceName());
+	ThisService::instance().setServiceType(m_application->serviceType());
+	ThisService::instance().setServiceURL(m_application->serviceURL());
+
 	m_componentState = WaitForInit;
 
 	OT_LOG_D("Foundation startup completed { \"ServiceName\": \"" + m_application->serviceName() + "\"; \"ServiceType\": \"" + m_application->serviceType() + "\"; \"ServiceURL\": \"" + m_application->serviceURL() + "\"; \"LDS\": \"" + m_application->directoryServiceURL() + "\" }");
@@ -218,6 +223,7 @@ std::string ot::intern::ExternalServicesComponent::init(
 
 		m_application->setServiceID(json::getInt(reply, OT_ACTION_PARAM_SERVICE_ID));
 		ot::OwnerServiceGlobal::instance().setId(m_application->serviceID());
+		ot::ThisService::instance().setServiceID(m_application->serviceID());
 
 		OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->serviceID()) + "\"");
 

@@ -7,6 +7,7 @@
 // OpenTwin header
 #include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
+#include "OTCore/ThisService.h"
 
 #include "OTGuiAPI/GuiAPIManager.h"
 
@@ -450,6 +451,7 @@ void ot::ApplicationBase::__serviceConnected(const std::string & _name, const st
 		}
 		this->uiConnected(m_uiComponent);
 		m_uiComponent->sendUpdatedControlState();
+		m_uiComponent->notifyUiSetupCompleted();
 		this->enableMessageQueuing(m_uiComponent->serviceName(), false);
 
 		GuiAPIManager::instance().frontendConnected(*m_uiComponent);
