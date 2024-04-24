@@ -208,7 +208,7 @@ QCheckBox::indicator:indeterminate:pressed {
 QGroupBox {
     font-weight: bold;
     border: 1px solid rgba(0,0,0,255);
-    border-radius: 10;
+    border-radius: 4;
     padding: 2px;
     margin-top: 6px;
     margin-bottom: 4px;
@@ -555,7 +555,7 @@ QScrollBar:horizontal {
     height: 16px;
     margin: 2px 16px 2px 16px;
     border-color: rgba(0,0,0,255);
-    border-radius: 10;
+    border-radius: 4;
     background-color: rgba(255,255,255,255);
 }
 
@@ -564,13 +564,13 @@ QScrollBar:vertical {
     width: 16px;
     margin: 16px 2px 16px 2px;
     border-color: rgba(0,0,0,255);
-    border-radius: 10;
+    border-radius: 4;
 }
 
 QScrollBar::handle:horizontal {
     background-color: rgba(211,211,211,255);
     border: 1px solid transparent;
-    border-radius: 6;
+    border-radius: 4;
     min-width: 8px;
 }
 
@@ -586,7 +586,7 @@ QScrollBar::handle:vertical {
     background-color: rgba(211,211,211,255);
     min-height: 8px;
     border: 1px solid transparent;
-    border-radius: 6;
+    border-radius: 4;
 }
 
 QScrollBar::handle:vertical:hover {
@@ -965,7 +965,7 @@ QProgressBar {
     background-color: rgba(255,255,255,255);
     border-color: rgba(0,0,0,255);
     color: rgba(0,0,0,255);
-    border-radius: 10;
+    border-radius: 4;
     text-align: center;
 }
 
@@ -973,20 +973,20 @@ QProgressBar:disabled {
     background-color: rgba(255,255,255,255);
     border-color: rgba(0,0,0,255);
     color: rgba(168,168,168,255);
-    border-radius: 10;
+    border-radius: 4;
     text-align: center;
 }
 
 QProgressBar::chunk {
     background-color: rgba(0,255,0,255);
     color: rgba(0,0,0,255);
-    border-radius: 10;
+    border-radius: 4;
 }
 
 QProgressBar::chunk:disabled {
     background-color: rgba(127,127,127,255);
     color: rgba(168,168,168,255);
-    border-radius: 10;
+    border-radius: 4;
 }
 
 /* ##################################################################################### */
@@ -1003,13 +1003,13 @@ QPushButton {
     outline: none;
     border: 1px solid rgba(0,0,0,255);
     border-style: outset;
-    border-radius: 10;
+    border-radius: 4;
 }
 
 QPushButton:disabled {
     background-color: rgba(211,211,211,255);
     color: rgba(168,168,168,255);
-    border-radius: 10;
+    border-radius: 4;
 }
 
 QPushButton:checked {
@@ -1020,7 +1020,7 @@ QPushButton:checked {
 QPushButton:checked:disabled {
     background-color: rgba(255,255,255,255);
     color: rgba(168,168,168,255);
-    border-radius: 10;
+    border-radius: 4;
     outline: none;
 }
 
@@ -1062,7 +1062,7 @@ QDialogButtonBox QPushButton {
 QToolButton {
     background-color: rgba(255,255,255,255);
     color: rgba(0,0,0,255);
-    border-radius: 10;
+    border-radius: 4;
     padding: 2px;
     outline: none;
     border: none;
@@ -1071,13 +1071,13 @@ QToolButton {
 QToolButton:disabled {
     background-color: rgba(255,255,255,255);
     color: rgba(168,168,168,255);
-    border-radius: 10;
+    border-radius: 4;
     padding: 2px;
 }
 
 QToolButton:checked {
     background-color: rgba(255,255,255,255);
-    border-radius: 10;
+    border-radius: 4;
     padding: 2px;
     outline: none;
 }
@@ -1085,7 +1085,7 @@ QToolButton:checked {
 QToolButton:checked:disabled {
     background-color: rgba(255,255,255,255);
     color: rgba(168,168,168,255);
-    border-radius: 10;
+    border-radius: 4;
     padding: 2px;
     outline: none;
 }
@@ -1147,7 +1147,7 @@ QToolButton[popupMode="2"] {
 
 QToolButton::menu-button {
     padding: 2px;
-    border-radius: 10;
+    border-radius: 4;
     width: 12px;
     border: none;
     outline: none;
@@ -1301,7 +1301,7 @@ QSlider::groove:horizontal {
     border-color: rgba(0,0,0,255);
     height: 4px;
     margin: 0px;
-    border-radius: 10;
+    border-radius: 4;
 }
 
 QSlider::groove:vertical {
@@ -1309,7 +1309,7 @@ QSlider::groove:vertical {
     border-color: rgba(0,0,0,255);
     width: 4px;
     margin: 0px;
-    border-radius: 10;
+    border-radius: 4;
 }
 
 QSlider::add-page:vertical {
@@ -1317,7 +1317,7 @@ QSlider::add-page:vertical {
     border-color: rgba(0,0,0,255);
     width: 4px;
     margin: 0px;
-    border-radius: 10;
+    border-radius: 4;
 }
 
 QSlider::add-page:vertical:disabled {
@@ -1329,7 +1329,7 @@ QSlider::sub-page:horizontal {
     border-color: rgba(0,0,0,255);
     height: 4px;
     margin: 0px;
-    border-radius: 10;
+    border-radius: 4;
 }
 
 QSlider::sub-page:horizontal:disabled {
@@ -1342,7 +1342,7 @@ QSlider::handle:horizontal {
     width: 8px;
     height: 8px;
     margin: -8px 0px;
-    border-radius: 10;
+    border-radius: 4;
 }
 
 QSlider::handle:horizontal:hover {
@@ -1360,7 +1360,7 @@ QSlider::handle:vertical {
     width: 8px;
     height: 8px;
     margin: 0 -8px;
-    border-radius: 10;
+    border-radius: 4;
 }
 
 QSlider::handle:vertical:hover {
@@ -1490,8 +1490,8 @@ QDockWidget QTabBar::tab::top:selected {
     border-left: 1px solid rgba(0,0,0,255);
     border-right: 1px solid rgba(0,0,0,255);
     border-top: 1px solid rgba(0,0,0,255);
-    border-top-left-radius: 10;
-    border-top-right-radius: 10;
+    border-top-left-radius: 4;
+    border-top-right-radius: 4;
 }
 
 QTabBar::tab::top:!selected:hover,
@@ -1500,8 +1500,8 @@ QDockWidget QTabBar::tab::top:!selected:hover {
     border-right: 1px solid rgba(0,215,255,255);
     border-top: 1px solid rgba(0,215,255,255);
     border-bottom: 1px solid rgba(0,0,0,255);
-    border-top-left-radius: 10;
-    border-top-right-radius: 10;
+    border-top-left-radius: 4;
+    border-top-right-radius: 4;
 }
 
 /* TabBar ToolButton ------------------------------------------------------- */     
@@ -1890,8 +1890,8 @@ QToolBox::tab {
     background-color: rgba(255,255,255,255);
     border-color: rgba(0,0,0,255);
     color: rgba(0,0,0,255);
-    border-top-left-radius: 10;
-    border-top-right-radius: 10;
+    border-top-left-radius: 4;
+    border-top-right-radius: 4;
 }
 
 QToolBox::tab:disabled {
@@ -2039,7 +2039,7 @@ QDateTimeEdit::down-arrow:focus {
 QDateEdit QAbstractItemView,
 QDateTimeEdit QAbstractItemView {
     background-color: rgba(255,255,255,255);
-    border-radius: 10;
+    border-radius: 4;
     border-color: rgba(0,0,0,255);
     border-width: 0;
     selection-background-color: rgba(0,255,0,255);
@@ -2259,8 +2259,8 @@ QCheckBox#LogInDialogSavePassword::indicator:indeterminate:pressed {
     background-color: rgba(0,215,255,255);
     color: rgba(0,0,0,255);
     border-bottom: 1px solid rgba(0,0,0,255);
-    border-top-left-radius: 10;
-    border-top-right-radius: 10;
+    border-top-left-radius: 4;
+    border-top-right-radius: 4;
 }
 
 #OT_TTB QTabBar::tab::first:selected,
@@ -2324,8 +2324,8 @@ ads--CDockWidgetTab[activeTab="false"]::hover {
     border-left: 1px solid rgba(0,215,255,255);
     border-right: 1px solid rgba(0,215,255,255);
     border-bottom: 1px solid transparent;
-    border-top-left-radius: 10;
-    border-top-right-radius: 10;
+    border-top-left-radius: 4;
+    border-top-right-radius: 4;
     margin-bottom: -1px;
 }
 
@@ -2334,8 +2334,8 @@ ads--CDockWidgetTab[activeTab="true"] {
     border-left: 1px solid rgba(0,0,0,255);
     border-right: 1px solid rgba(0,0,0,255);
     border-bottom: 1px solid transparent;
-    border-top-left-radius: 10;
-    border-top-right-radius: 10;
+    border-top-left-radius: 4;
+    border-top-right-radius: 4;
     margin-bottom: -1px;
 }
 
