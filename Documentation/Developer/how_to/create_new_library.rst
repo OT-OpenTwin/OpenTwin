@@ -54,6 +54,7 @@ Connecting the project with OpenTwin
 OpenTwin uses a bunch of environment variables that point to the project directories. This ensures maximal flaxibility with the overall repo structure.
 For that reason, use the defined environment variables whenever possible.
 To fit the new library into the OpenTwin structure, perform the following steps:
- Create an environment variable in OpenTwin/Scripts/SetupEnvironment.bat that points to the library root (This variable is used in linker path of the test project)
+
+    #. Create an environment variable in OpenTwin/Scripts/SetupEnvironment.bat that points to the library root (This variable is used in linker path of the test project)
     #. Copy the build.bat, clean.bat, edit.bat and test.bat from any service or library into the new library folder
     #. Edit ALL the batch files to point to the new library 

@@ -45,6 +45,11 @@ Overview
 
    dev_tools/dev_tools
 
+.. toctree::
+   :maxdepth: 1
+
+   code_docs/code_docs
+
 
 Indices and tables
 ==================
@@ -54,4 +59,4 @@ Indices and tables
 * :ref:`search`
 
 
-
+`Go to code documentation <_static/code/code_index.html>`_

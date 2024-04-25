@@ -1,16 +1,19 @@
 Create a new service
 ====================
 
-The easiest way to create a new service for openTwin is to use the service template provided with the openTwin plattform. The template is located at “OpenTwin/Templates/ServiceTemplate”.
+The easiest way to create a new service for OpenTwin is to use the service template provided with the OpenTwin platform. The template is located at “OpenTwin/Templates/ServiceTemplate”.
 
     #. Copy the whole folder to a directory of your choice
     #. Rename the folder to your desired project name
     #. Rename the project files to the same name of the project folder
 
-       * *.sln
-       * *.vcxproj
-       * *.vcxproj.filter
-       * *.vcxproj.user
+       #. `*.sln`
+       
+       #. `*.vcxproj`
+       
+       #. `*.vcxproj.filter`
+       
+       #. `*.vcxproj.user`
 
     #. If the project folder contains the folder “.vs” and/or “x64”, delete them with all their contents
     #. Create a new environment variable for the service in the Scripts/SetupEnvironment.bat file

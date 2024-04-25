@@ -40,6 +40,10 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
+if "%1"=="--doc-only" (
+	goto DOCU_BUILD_ONLY
+)
+
 REM Get the current timestamp (capture echo call from the batch)
 for /f "delims=" %%a in ('call "%OPENTWIN_DEV_ROOT%\Scripts\Other\PrintCurrentTimestamp.bat" "Build started at: " ""') do set OT_LCL_BuildStart=%%a
 echo %OT_LCL_BuildStart%
@@ -74,6 +78,7 @@ DEL buildLog_Summary.txt
 DEL RUSTbuildLog.txt
 DEL AdminPanel_buildLog.txt
 DEL Documentation_buildLog.txt
+DEL DoxygenDocumentation_buildLog
 
 REM ====================================================================
 REM Build the libraries 
@@ -373,8 +378,22 @@ PUSHD "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel"
 CALL "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\build.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\AdminPanel_buildLog.txt"
 POPD
 
+:DOCU_BUILD_ONLY
+
 ECHO ====================================================================
-ECHO Build Documentation
+ECHO Build Doxygen Documentation
+ECHO ====================================================================
+CALL "%OPENTWIN_DEV_ROOT%\Documentation\Doxygen\Generate.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\DoxygenDocumentation_buildLog.txt"
+
+ECHO ====================================================================
+ECHO Copy Doxygen Documentation
+ECHO ====================================================================
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Documentation\Developer\_static\code"
+XCOPY "%OPENTWIN_DEV_ROOT%\Documentation\Doxygen\html\*" "%OPENTWIN_DEV_ROOT%\Documentation\Developer\_static\code" /E /I /Y
+RENAME "%OPENTWIN_DEV_ROOT%\Documentation\Developer\_static\code\index.html" "code_index.html"
+
+ECHO ====================================================================
+ECHO Build Sphinx Documentation
 ECHO ====================================================================
 PUSHD "%OT_DOCUMENTATION_ROOT%"
 CALL "%OT_DOCUMENTATION_ROOT%\build.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Documentation_buildLog.txt"
