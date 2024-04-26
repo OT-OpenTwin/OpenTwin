@@ -378,30 +378,15 @@ PUSHD "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel"
 CALL "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\build.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\AdminPanel_buildLog.txt"
 POPD
 
-IF "%2"=="BUILD" (
-	GOTO SKIP_DOC_BUILD
+IF "%2"=="BUILD"  (
+	IF "%OT_SKIP_DOC_ON_BUILD%"=="true" (
+		GOTO SKIP_DOC_BUILD
+	)
 )
 
 :DOC_BUILD_ONLY
 
-ECHO ====================================================================
-ECHO Build Doxygen Documentation
-ECHO ====================================================================
-CALL "%OPENTWIN_DEV_ROOT%\Documentation\Doxygen\Generate.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\DoxygenDocumentation_buildLog.txt"
-
-ECHO ====================================================================
-ECHO Copy Doxygen Documentation
-ECHO ====================================================================
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Documentation\Developer\_static\code"
-XCOPY "%OPENTWIN_DEV_ROOT%\Documentation\Doxygen\html\*" "%OPENTWIN_DEV_ROOT%\Documentation\Developer\_static\code" /E /I /Y
-RENAME "%OPENTWIN_DEV_ROOT%\Documentation\Developer\_static\code\index.html" "code_index.html"
-
-ECHO ====================================================================
-ECHO Build Sphinx Documentation
-ECHO ====================================================================
-PUSHD "%OT_DOCUMENTATION_ROOT%"
-CALL "%OT_DOCUMENTATION_ROOT%\build.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Documentation_buildLog.txt"
-POPD
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildDocumentation.bat"
 
 :SKIP_DOC_BUILD
 
