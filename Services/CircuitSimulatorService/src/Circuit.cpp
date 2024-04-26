@@ -45,10 +45,22 @@ std::map<ot::UID, CircuitElement>& Circuit::getMapOfElements()
 	return this->mapOfElements;
 }
 
+std::map<std::string,std::vector<std::shared_ptr<EntityBlock>>>& Circuit::getMapOfEntityBlcks()
+{
+	return this->mapOfEntityBlocks;
+}
+
 void Circuit::addElement(ot::UID key, const CircuitElement& obj)
 {
 	mapOfElements[key] = obj;
 }
+
+void Circuit::addBlockEntity(std::string block, const std::shared_ptr<EntityBlock> obj)
+{
+	mapOfEntityBlocks[block].push_back(obj);
+}
+
+
 
 void Circuit::setEditorName(const std::string name)
 {

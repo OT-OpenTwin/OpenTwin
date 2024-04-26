@@ -32,7 +32,7 @@ public:
 	std::string generateNetlistTRANSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string editorname);
 	std::string ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>,std::map<ot::UID, std::shared_ptr<EntityBlock>>&,std::string);
 	void clearBufferStructure(std::string name); 
-	std::string getNodeNumbersOfVoltageMeter(std::string ,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&);
+	std::vector<std::string> getNodeNumbersOfVoltageMeter(std::string ,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&);
 	bool isValidNodeString(const std::string& input);
 	//Result Curve Functions
 	
@@ -47,7 +47,6 @@ public:
 
 	//Getter
 	std::map<std::string, Circuit>& getMapOfCircuits() { return mapOfCircuits; }
-	
 
 private:
 	
