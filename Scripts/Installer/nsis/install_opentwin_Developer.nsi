@@ -906,7 +906,6 @@ Section "-Extract Installer Tools (Required)" SEC01
 	DetailPrint "Extracting toolchain..."
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\dev\*.*"
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\*.*"
-	File /r "..\python\dist\*.*"
 	File /r "..\helper\*.*"
 	File /r "..\javascript\*.*"
 

@@ -785,10 +785,6 @@ Section "-Extract Installer Tools (Required)" SEC01
 	SetOutPath "$INSTDIR\Tools\ThirdParty"
 	DetailPrint "Extracting toolchain..."
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\*.*"
-
-	DetailPrint "Extracting python scripts..."
-	SetOutPath "$INSTDIR\Tools\python"
-	File /r "..\python\dist\*.*"
 	
 	DetailPrint "Extracting installation helper..."
 	SetOutPath "$INSTDIR\Tools\helper"
