@@ -41,7 +41,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 )
 
 if "%1"=="--doc-only" (
-	goto DOCU_BUILD_ONLY
+	goto DOC_BUILD_ONLY
 )
 
 REM Get the current timestamp (capture echo call from the batch)
@@ -378,7 +378,11 @@ PUSHD "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel"
 CALL "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\build.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\AdminPanel_buildLog.txt"
 POPD
 
-:DOCU_BUILD_ONLY
+IF "%2"=="BUILD" (
+	GOTO SKIP_DOC_BUILD
+)
+
+:DOC_BUILD_ONLY
 
 ECHO ====================================================================
 ECHO Build Doxygen Documentation
@@ -398,6 +402,8 @@ ECHO ====================================================================
 PUSHD "%OT_DOCUMENTATION_ROOT%"
 CALL "%OT_DOCUMENTATION_ROOT%\build.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\Documentation_buildLog.txt"
 POPD
+
+:SKIP_DOC_BUILD
 
 REM ====================================================================
 REM Create the buildlog summary
