@@ -2977,11 +2977,12 @@ std::string ExternalServicesComponent::handleAddNodeFromDataBase(ot::JsonDocumen
 	ModelUIDtype entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
 	std::vector<double> transformation;
-	try
+
+	if (ot::json::exists(_document, OT_ACTION_PARAM_MODEL_ITM_Transformation))
 	{
 		transformation = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_MODEL_ITM_Transformation);
 	}
-	catch (std::exception)
+	else
 	{
 		// There is no transformation attached. Set up a unity transform
 		transformation.resize(16, 0.0);

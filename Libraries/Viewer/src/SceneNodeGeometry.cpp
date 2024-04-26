@@ -94,8 +94,11 @@ void SceneNodeGeometry::deleteShapeNode(void)
 
 void SceneNodeGeometry::setTransformation(std::vector<double> &transformation)
 {
-	transformationMatrix.set(transformation.data());
-	transformationMatrix.transpose(transformationMatrix);
+	if (!transformation.empty())
+	{
+		transformationMatrix.set(transformation.data());
+		transformationMatrix.transpose(transformationMatrix);
+	}
 }
 
 osg::Matrix SceneNodeGeometry::getParentTransformation(void) 
