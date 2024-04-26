@@ -821,7 +821,9 @@ Section "OpenTwin Main Files (Required)" SEC02
 	${EndIf}
 
 	DetailPrint "Installing VC Redistributable..."
-	ExecWait '"$INSTDIR\Tools\ThirdParty\VC_redist.x64" /silent'					
+	# The 32bit version is required for Apache
+	ExecWait '"$INSTDIR\Tools\ThirdParty\VC_redist.x86.exe" /silent'					
+	ExecWait '"$INSTDIR\Tools\ThirdParty\VC_redist.x64.exe" /silent'					
 
 	; Shortcuts
 	!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
@@ -845,19 +847,20 @@ Section "MongoDB Setup" SEC03
 
 	ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$INSTDIR\Tools\ThirdParty\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'		
 	
+	nsExec::ExecToLog 'net stop "MongoDB"'	
+	
 	##########################################
 	# call for python scripts via $INSTDIR
 	##########################################
 
 	DetailPrint "Running scripts..."
-	# mongoDB_storage_script_noAuth.py
-	ExecWait '"$INSTDIR\Tools\python\mongoDB_storage_script_noAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "disabled"'
+	# update the mongodB config file without authentication
+	ExecWait '"$INSTDIR\Tools\helper\ConfigMongoDBNoAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection'
 
 	#set directory permissions for the mongoDB service
 	ExecWait '"$INSTDIR\Tools\helper\SetPermissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
 
 	# restarting mongoDB service
-	nsExec::ExecToLog 'net stop "MongoDB"'	
 	nsExec::ExecToLog 'net start "MongoDB"'
 
 	# 'net' command waits for the service to be stopped/started automatically
@@ -867,19 +870,20 @@ Section "MongoDB Setup" SEC03
 	ExpandEnvStrings $0 %COMSPEC%
 		ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" < "$INSTDIR\Tools\javascript\db_admin.js" " "'
 	
+	nsExec::ExecToLog 'net stop "MongoDB"'	
+
 	# mongoDB_storage_script_wauth.py
 	${If} $PublicIpSet <> 0
-		ExecWait '"$INSTDIR\Tools\python\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$PUBLIC_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
+		ExecWait '"$INSTDIR\Tools\helper\ConfigMongoDBWithAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$PUBLIC_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
 		ExpandEnvStrings $0 %COMSPEC%
 			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$PUBLIC_CERT_PATH\ca.pem"""" '	
 	${Else}
-		ExecWait '"$INSTDIR\Tools\python\mongoDB_storage_script_wAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "enabled" "$DEFAULT_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
+		ExecWait '"$INSTDIR\Tools\helper\ConfigMongoDBWithAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$DEFAULT_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
 		ExpandEnvStrings $0 %COMSPEC%
 			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$DEFAULT_CERT_PATH\ca.pem"""" '
 	${EndIf}
 		
 	DetailPrint "Restart services..."
-	nsExec::ExecToLog 'net stop "MongoDB"'	
 	nsExec::ExecToLog 'net start "MongoDB"'	
 	
 	#DetailPrint "Wait..."

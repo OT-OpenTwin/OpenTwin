@@ -371,6 +371,16 @@ ECHO Build Executable: SetPermissions (Installation Helper)
 ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Tools\SetPermissions\build.bat" %1 %2
 
+ECHO ===============================================================
+ECHO Build Executable: ConfigMongoDBNoAuth (Installation Helper)
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBNoAuth\build.bat" %1 %2
+
+ECHO ===============================================================
+ECHO Build Executable: ConfigMongoDBWithAuth (Installation Helper)
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBWithAuth\build.bat" %1 %2
+
 ECHO ====================================================================
 ECHO Build Admin Panel
 ECHO ====================================================================

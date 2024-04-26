@@ -35,11 +35,7 @@ Set DEVELOPER_NSI="!OPENTWIN_DEV_ROOT!\Scripts\Installer\nsis\install_opentwin_D
 Set THIRDPARTY_UNZIP_PATH="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools"
 Set THIRDPARTY_ZIPFILE="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools\ThirdParty.zip"
 
-SET PYTHON_PATH="!OPENTWIN_DEV_ROOT!\Scripts\Installer\python"
 SET HELPER_PATH="!OPENTWIN_DEV_ROOT!\Scripts\Installer\helper"
-Set PY_MONGOD_NO_AUTH="!OPENTWIN_DEV_ROOT!\Scripts\Installer\python\mongoDB_storage_script_noAuth.py"
-Set PY_MONGOD_AUTH="!OPENTWIN_DEV_ROOT!\Scripts\Installer\python\mongoDB_storage_script_wAuth.py"
-
 
 REM Test for Python Installation
 	python -V | find /v "Python" >NUL 2>NUL && (goto :PYTHON_NOT_INSTALLED)
@@ -80,13 +76,6 @@ echo +++ COMPILE TIME +++
 
 	echo Extracting Third Party Toolchain using 7-Zip...
 	"!SEVENZIP_REG_DATA!\7z.exe" x !THIRDPARTY_ZIPFILE! -o!THIRDPARTY_UNZIP_PATH! -y
-
-	
-	echo Compiling Python Scripts...
-	cd !PYTHON_PATH!
-	pyinstaller --onefile --noconsole !PY_MONGOD_NO_AUTH!
-	pyinstaller --onefile --noconsole !PY_MONGOD_AUTH!
-	cd %cd%
 	
 	echo Copying Installation helpers...
 	RMDIR /S /Q "!HELPER_PATH!"
@@ -94,6 +83,8 @@ echo +++ COMPILE TIME +++
 	cd !HELPER_PATH!
 
 	copy %OPENTWIN_DEV_ROOT%\Tools\SetPermissions\x64\Release\SetPermissions.exe .
+	copy %OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBNoAuth\x64\Release\ConfigMongoDBNoAuth.exe .
+	copy %OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBWithAuth\x64\Release\ConfigMongoDBWithAuth.exe .
 	copy %OPENTWIN_DEV_ROOT%\Libraries\OTSystem\x64\Release\OTSystem.dll .
 	cd %cd%
 
