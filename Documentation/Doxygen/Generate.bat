@@ -28,8 +28,10 @@ doxygen "%OPENTWIN_DEV_ROOT%\Documentation\Doxygen\Doxyfile"
 
 POPD
 
+GOTO END
+
 :PAUSE_END
 pause
-GOTO END
+
 
 :END
