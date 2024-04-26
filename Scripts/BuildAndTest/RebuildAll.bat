@@ -78,7 +78,7 @@ DEL buildLog_Summary.txt
 DEL RUSTbuildLog.txt
 DEL AdminPanel_buildLog.txt
 DEL Documentation_buildLog.txt
-DEL DoxygenDocumentation_buildLog
+DEL DoxygenDocumentation_buildLog.txt
 
 REM ====================================================================
 REM Build the libraries 
