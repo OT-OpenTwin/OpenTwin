@@ -14,6 +14,10 @@
 //Third Party Header
 #include <string>
 #include <algorithm>
+#include <unordered_map>
+#include <tuple>
+#include <functional>
+#include <unordered_set>
 
 //C++ Header
 #include <sstream>
@@ -213,12 +217,19 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		
 		it->second.addElement(element.getUID(), element);
 	}
+
 	
+	std::map<std::pair<ot::UID, std::string>, std::string> connectionMap;
+	
+
 	for (auto& blockEntityByID : allEntitiesByBlockID)
 	{
 		std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
 		auto connections = blockEntity->getAllConnections();
-	
+
+		// Map used for parallel connections to identify if a connection already exists on the connector and then give the second or ... connection the same nodenumber
+		
+
 		for (auto connectionID : connections)
 		{
 			
@@ -228,12 +239,33 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 			Connection conn(connectionCfg);
 
+			ot::UID destUID;
+			if (conn.getOriginUid() == blockEntity->getEntityID())
+			{
+				destUID = conn.getOriginUid();
+			}
+			else if (conn.getDestinationUid() == blockEntity->getEntityID())
+			{
+				destUID = conn.getDestinationUid();
+			}
+
 			bool temp = false;
 			//If the connection is has the voltage Meter as origin or destination then we dont want to give it a nodeNumber
 			if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter"))
 			{
-				conn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
-				temp = true;
+				auto connectionKey = std::make_pair(destUID,connectionCfg.destConnectable());
+
+				if (connectionMap.find(connectionKey) != connectionMap.end())
+				{
+					connectionMap[connectionKey] = connectionMap.at(connectionKey);
+					conn.setNodeNumber(connectionMap[connectionKey]);
+				}
+				else
+				{
+					connectionMap[connectionKey] = std::to_string(Numbers::nodeNumber++);
+					conn.setNodeNumber(connectionMap[connectionKey]);
+					temp = true;
+				}
 			}
 			else
 			{
@@ -246,8 +278,12 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			{
 				Numbers::nodeNumber--;
 				temp = false;
-			}			
+			}
 		}
+
+		
+		
+		
 	}
 }
 
@@ -345,16 +381,22 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		//From behind
 		std::vector<Connection> tempVector(connections.begin(), connections.end());
 		std::reverse(tempVector.begin(), tempVector.end());
-
+		std::unordered_set<std::string> temp;
 		for (auto conn : tempVector)
 		{
 			if (conn.getNodeNumber() == "voltageMeterConnection")
 			{
 				continue;
 			}
+			else if (temp.find(conn.getNodeNumber()) != temp.end())
+			{
+				continue;
+			}
 			netlistNodeNumbers += conn.getNodeNumber() + " ";
+			temp.insert(conn.getNodeNumber());
 		}
 
+		temp.clear();
 
 		netlistLine += netlistNodeNumbers;
 
