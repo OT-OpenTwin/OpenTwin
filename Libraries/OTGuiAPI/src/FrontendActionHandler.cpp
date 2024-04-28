@@ -6,12 +6,12 @@
 
 // OpenTwin header
 #include "OTGuiAPI/FrontendActionHandler.h"
-#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/ActionDispatcher.h" 
 #include "OTCommunication/ActionDispatcher.h"
 
 std::string ot::FrontendActionHandler::handleKeySequenceActivated(JsonDocument& _document) {
 	std::string keySequence = json::getString(_document, OT_ACTION_PARAM_UI_KeySequence);
-	m_uiNotifier->shortcutActivated(keySequence);
+	this->keySequenceActivated(keySequence);
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
