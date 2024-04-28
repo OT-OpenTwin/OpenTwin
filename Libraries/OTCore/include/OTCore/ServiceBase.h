@@ -1,10 +1,8 @@
-/*
- *  Service.h
- *
- *  Created on: 08/02/2021
- *	Author: Alexander Kuester
- *  Copyright (c) 2021, OpenTwin
- */
+//! @file ServiceBase.h
+//! @author Alexander Kuester (alexk95)
+//! @date February 2021
+// ###########################################################################################################################################################################################################################################################################################################################
+
 
 #pragma once
 #pragma warning(disable : 4251)
@@ -19,9 +17,11 @@
 
 namespace ot {
 	
+	//! @class ServiceBase
+	//! @brief General service information.
+	//! The ServiceBase class is used to store the general service information.
 	class OT_CORE_API_EXPORT ServiceBase {
 	public:
-
 		//! @brief Constructor
 		ServiceBase();
 		
@@ -104,12 +104,12 @@ namespace ot {
 		BasicServiceInformation getBasicServiceInformation(void) const { return BasicServiceInformation(m_serviceName, m_serviceType); };
 
 	protected:
-		serviceID_t				m_serviceID;		//! @brief Service ID
-		std::string				m_serviceURL;		//! @brief Service URL
-		std::string				m_serviceName;		//! @brief Service name
-		std::string				m_serviceType;		//! @brief Service type
-		std::string				m_siteId;			//! @brief Site ID
-		int						m_sessionCount;		//! @brief The number of open sessions for the service
+		serviceID_t				m_serviceID;		//! @brief Service ID.
+		std::string				m_serviceURL;		//! @brief Service URL.
+		std::string				m_serviceName;		//! @brief Service name.
+		std::string				m_serviceType;		//! @brief Service type.
+		std::string				m_siteId;			//! @brief Site ID.
+		int						m_sessionCount;		//! @brief The number of open sessions for the service.
 	};
 
 }

@@ -5,6 +5,8 @@
 
 // OpenTwin header
 #include "OTCore/PropertyGroup.h"
+#include "OTWidgets/Splitter.h"
+#include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyDialog.h"
 #include "OTWidgets/PropertyGridItem.h"
@@ -14,30 +16,53 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qpushbutton.h>
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Property dialog tree
+
+namespace ot {
+
+		class PropertyDialog::PropertyDialogNavigation : public PropertyGrid {
+		public:
+
+		private:
+
+		}; // class PropertyDialogNavigation;
+
+} // namespace ot
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _parentWidget)
 	: Dialog(_config, _parentWidget), m_changed(false)
 {
 	// Create layouts
 	QVBoxLayout* cLay = new QVBoxLayout(this);
-	QVBoxLayout* inLay = new QVBoxLayout;
 	QHBoxLayout* btnLay = new QHBoxLayout;
 
 	// Create controls
+	Splitter* cSplitter = new Splitter;
 	m_grid = new PropertyGrid;
+	m_navigation = new PropertyDialogNavigation;
+
 	QPushButton* btnConfirm = new QPushButton("Confirm");
 	QPushButton* btnCancel = new QPushButton("Cancel");
 
 	// Setup layouts
-	cLay->addLayout(inLay, 1);
+	cLay->addWidget(cSplitter, 1);
 	cLay->addLayout(btnLay);
 
-	inLay->addWidget(m_grid->getQWidget());
+	cSplitter->addWidget(m_navigation->getQWidget());
+	cSplitter->addWidget(m_grid->getQWidget());
 	btnLay->addStretch(1);
 	btnLay->addWidget(btnConfirm);
 	btnLay->addWidget(btnCancel);
 
 	// Setup data
+	
 	m_grid->setupGridFromConfig(_config.gridConfig());
+	m_navigation->setupGridFromConfig(_config.gridConfig());
+	this->iniData();
 
 	// Connect signals
 	this->connect(btnConfirm, &QPushButton::clicked, this, &PropertyDialog::slotConfirm);
@@ -59,4 +84,8 @@ void ot::PropertyDialog::slotConfirm(void) {
 
 void ot::PropertyDialog::slotCancel(void) {
 	this->close(Dialog::Cancel);
+}
+
+void ot::PropertyDialog::iniData(void) {
+	m_navigation->getTreeWidget()->setColumnCount(1);
 }

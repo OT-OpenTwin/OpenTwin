@@ -39,6 +39,9 @@
     <ClInclude Include="include\OTGuiAPI\FrontendAPI.h">
       <Filter>Header Files\CommunicationAPIs</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGuiAPI\FrontendActionHandler.h">
+      <Filter>Header Files\CommunicationAPIs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -51,6 +54,9 @@
       <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="src\FrontendAPI.cpp">
+      <Filter>Source Files\CommunicationAPIs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FrontendActionHandler.cpp">
       <Filter>Source Files\CommunicationAPIs</Filter>
     </ClCompile>
   </ItemGroup>

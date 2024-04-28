@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTGuiAPI\FrontendActionHandler.h" />
     <ClInclude Include="include\OTGuiAPI\FrontendAPI.h" />
     <ClInclude Include="include\OTGuiAPI\GraphicsFlowItem.h" />
     <ClInclude Include="include\OTGuiAPI\GuiAPIManager.h" />
@@ -26,6 +27,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\FrontendActionHandler.cpp" />
     <ClCompile Include="src\FrontendAPI.cpp" />
     <ClCompile Include="src\GraphicsFlowItem.cpp" />
     <ClCompile Include="src\GuiAPIManager.cpp" />

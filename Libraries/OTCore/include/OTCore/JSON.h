@@ -46,6 +46,8 @@ namespace ot {
 	//! @brief Read only JSON Object iterator
 	typedef rapidjson::GenericMemberIterator<true, rapidjson::UTF8<>, rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>> JsonMemberIterator;
 
+	//! @class JsonNullValue
+	//! @addtogroup Libraries
 	//! @brief JSON NULL value
 	class JsonNullValue : public JsonValue {
 		OT_DECL_NOCOPY(JsonNullValue)
@@ -60,6 +62,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
+	//! @class JsonString
 	//! @brief JSON String value
 	class JsonString : public JsonValue {
 		OT_DECL_NOCOPY(JsonString)
@@ -76,6 +79,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
+	//! @class JsonObject
 	//! @brief JSON Object value
 	class JsonObject : public JsonValue {
 		OT_DECL_NOCOPY(JsonObject)
@@ -90,6 +94,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 	 
+	//! @class JsonArray
 	//! @brief JSON Array value
 	class JsonArray : public JsonValue {
 		OT_DECL_NOCOPY(JsonArray)
@@ -249,6 +254,7 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
+	//! @class JsonDocument
 	//! @brief JSON document
 	class JsonDocument : public rapidjson::Document {
 	private:

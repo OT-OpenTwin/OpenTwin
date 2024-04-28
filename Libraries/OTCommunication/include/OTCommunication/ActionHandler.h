@@ -28,6 +28,8 @@ namespace ot {
 
 	class OTObjectBase;
 
+	//! @class ActionHandler
+	//! @brief The ActionHandler is used as a connector between the [\ref ActionDispatcher] and a function in [\ref OTObjectBase] object.
 	template <class T> class __declspec(dllexport) ActionHandler : public ActionHandlerBase {
 	public:
 		typedef std::string(T::* ConnectorMessageRef)(JsonDocument&);

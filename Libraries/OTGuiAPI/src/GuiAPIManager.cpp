@@ -6,6 +6,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/ThisService.h"
 #include "OTCommunication/Msg.h"
 #include "OTGuiAPI/GuiAPIManager.h"
 
@@ -35,7 +36,7 @@ bool ot::GuiAPIManager::sendQueuedRequestToFrontend(const std::string& _message)
 	}
 
 	std::string tmp;
-	return msg::send(m_url, m_frontend.serviceURL(), ot::QUEUE, _message, tmp);
+	return msg::send(ThisService::instance().serviceURL(), m_frontend.serviceURL(), ot::QUEUE, _message, tmp);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

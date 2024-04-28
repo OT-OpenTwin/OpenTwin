@@ -19,6 +19,7 @@
 
 namespace ot {
 
+	//! @class OTObject
 	//! @brief Default OpenTwin object with a uid and a parent child relationship
 	//! If the item is destroyed it will destroy all child items where "deleteOtObjectLater" is false
 	class OT_CORE_API_EXPORTONLY OTObject : public OTObjectBase {

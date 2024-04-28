@@ -18,6 +18,9 @@
 
 namespace ot {
 
+	//! @class ActionHandlerBase
+	//! @brief Base class for action handlers.
+	//! A action handler has a set of actions.
 	class OT_COMMUNICATION_API_EXPORT ActionHandlerBase {
 	public:
 		ActionHandlerBase(const std::string& _actionName, ot::MessageType _messageFlags);

@@ -10,9 +10,14 @@
 #include "OTWidgets/Dialog.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
+// std header
+#include <map>
+class QTreeWidgetItem;
 namespace ot {
 
 	class PropertyGrid;
+	class PropertyGridItem;
+	class PropertyGridGroup;
 
 	class OT_WIDGETS_API_EXPORT PropertyDialog : public Dialog {
 		Q_OBJECT
@@ -26,6 +31,14 @@ namespace ot {
 		void slotCancel(void);
 
 	private:
+		void iniData(void);
+
+		std::map<QTreeWidgetItem*, PropertyGridItem*> m_navigationToItemMap;
+		std::map<QTreeWidgetItem*, PropertyGridGroup*> m_navigationToGroupMap;
+
+		class PropertyDialogNavigation;
+		friend class PropertyDialogNavigation;
+		PropertyDialogNavigation* m_navigation;
 		PropertyGrid* m_grid;
 		bool m_changed;
 	};
