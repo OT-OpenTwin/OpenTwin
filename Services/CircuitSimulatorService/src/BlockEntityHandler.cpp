@@ -66,7 +66,7 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 	ot::JsonObject pckgObj;
 	graphicsEditorPackage->addToJsonObject(pckgObj, doc.GetAllocator());
 
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
 
 	Application::instance()->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
@@ -277,9 +277,10 @@ void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<Ent
 
 
 
-ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
+ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker()
 {
-	ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage(_packageName, _packageName);
+	//ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage(_packageName, _packageName);
+	ot::GraphicsPickerCollectionPackage* pckg = new ot::GraphicsPickerCollectionPackage();
 	ot::GraphicsPickerCollectionCfg* a = new ot::GraphicsPickerCollectionCfg("CircuitElements", "Circuit Elements");
 	ot::GraphicsPickerCollectionCfg* a1 = new ot::GraphicsPickerCollectionCfg("PassiveElements", "Passive Elements");
 	a->addChildCollection(a1);
@@ -295,10 +296,7 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	a1->addItem(voltMeter.getClassName(), voltMeter.CreateBlockHeadline(), "CircuitElementImages/VoltMeter.png");
 	pckg->addCollection(a);
 
-	Circuit circuit;
-	circuit.setEditorName(pckg->title());
-	circuit.setId(pckg->name());
-	Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(pckg->name(), circuit);
+	
 
 	return pckg;
 }

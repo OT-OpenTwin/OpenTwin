@@ -41,7 +41,7 @@ private:
 	
 
 	void InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity);
-	ot::GraphicsNewEditorPackage* BuildUpBlockPicker();
+	ot::GraphicsPickerCollectionPackage* BuildUpBlockPicker();
 };
 
 
