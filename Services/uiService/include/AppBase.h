@@ -23,6 +23,7 @@
 #include "OTCore/OwnerManagerTemplate.h"
 #include "OTCore/Property.h"
 #include "OTCore/PropertyGridCfg.h"
+#include "OTWidgets/ColorStyle.h"
 #include "OTServiceFoundation/UserCredentials.h"
 
 #include <akGui/aWindowEventHandler.h>
@@ -317,7 +318,6 @@ public Q_SLOTS:
 	void refreshWelcomeScreen(void);
 	void lockSelectionAndModification(bool flag);
 
-
 	//! @brief Will turn on or off the progress bar visibility and set the progress message
 	void setProgressBarVisibility(const char *progressMessage, bool progressBaseVisible, bool continuous);
 
@@ -480,6 +480,7 @@ private Q_SLOTS:
 	void slotViewFocusLost(ot::WidgetView* _view);
 	void slotViewFocused(ot::WidgetView* _view);
 	void slotOutputContextMenuItemClicked();
+	void slotColorStyleChanged(const ot::ColorStyle& _style);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -498,6 +499,14 @@ private Q_SLOTS:
 
 private:
 
+	enum AppStateFlag {
+		NoState                = 0x00,
+		RestoringSettingsState = 0x01,
+		LoggedInState          = 0x10,
+		ProjectOpenState       = 0x20
+	};
+	typedef ot::Flags<AppStateFlag> AppStateFlags;
+
 	friend class ToolBar;
 	friend class KeyboardCommandHandler;
 
@@ -510,6 +519,8 @@ private:
 	bool checkForContinue(
 		QString									_title
 	);
+
+	AppStateFlags               m_state;
 
 	debugNotifier *				m_debugNotifier;
 	LogInManager *				m_logInManager;
@@ -591,4 +602,7 @@ private:
 	AppBase(AppBase&) = delete;
 	AppBase& operator = (AppBase&) = delete;
 
+	OT_FRIEND_FLAG_FUNCTIONS(AppStateFlag)
 };
+
+OT_ADD_FLAG_FUNCTIONS(AppBase::AppStateFlag)

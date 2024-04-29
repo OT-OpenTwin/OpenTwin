@@ -68,6 +68,8 @@ public:
 
 	void updateViewerSettings(ot::SettingsData * _data);
 
+	void initializeData(void);
+
 	// #######################################################################################
 
 private Q_SLOTS:

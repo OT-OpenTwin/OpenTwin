@@ -5,6 +5,7 @@
 
 // uiService header
 #include "AppBase.h"		// Corresponding header
+#include "UserSettings.h"
 #include "ViewerComponent.h"	// Viewer component
 #include "ExternalServicesComponent.h"		// ExternalServices component
 #include "debugNotifier.h"		// DebugNotifier
@@ -111,6 +112,7 @@ const QString c_promtIcoPath = "Default";
 
 #define STATE_NAME_WINDOW "UISettings"
 #define STATE_NAME_VIEW "ViewSettings"
+#define STATE_NAME_COLORSTYLE "ColorStyle"
 #define STATE_POS_X "WindowPosX"
 #define STATE_POS_Y "WindowPosY"
 
@@ -162,7 +164,8 @@ AppBase::AppBase()
 	m_propertyGrid(nullptr),
 	m_projectNavigation(nullptr),
 	m_output(nullptr),
-	m_debug(nullptr)
+	m_debug(nullptr),
+	m_state(NoState)
 {
 	m_contextMenus.output.clear = invalidID;
 
@@ -335,6 +338,8 @@ int AppBase::run() {
 			ot::GlobalColorStyle::instance().setCurrentStyle(OT_COLORSTYLE_NAME_Bright);
 		}
 
+		this->connect(&ot::GlobalColorStyle::instance(), &ot::GlobalColorStyle::currentStyleChanged, this, &AppBase::slotColorStyleChanged);
+
 		// Initialize Widget view manager
 		ot::WidgetViewManager::instance().initialize();
 		
@@ -344,6 +349,7 @@ int AppBase::run() {
 		m_logInManager = new LogInManager();
 		if (!m_logInManager->showDialog()) { return 0; }
 		m_currentUser = m_logInManager->username().toStdString();
+		m_state |= LoggedInState;
 
 		// Now retreive information about the user collection
 
@@ -399,13 +405,34 @@ int AppBase::run() {
 			uM.setAuthServerURL(m_authorizationServiceURL);
 			uM.setDatabaseURL(m_dataBaseURL);
 			uM.initializeNewSession();
+
+			m_state |= RestoringSettingsState;
+
 			m_currentStateWindow.window = uM.restoreSetting(STATE_NAME_WINDOW);
 			m_currentStateWindow.view = uM.restoreSetting(STATE_NAME_VIEW);
+
+			// Restore color style
+			std::string cs = uM.restoreSetting(STATE_NAME_COLORSTYLE);
+			
+			if (ot::GlobalColorStyle::instance().hasStyle(cs)) {
+				ot::GlobalColorStyle::instance().setCurrentStyle(cs);
+			}
+			else if (!cs.empty()) {
+				OT_LOG_W("ColorStyle \"" + cs + "\" does not exist");
+			}
+
+			// Restore window state
 			if (!uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow.window, true)) {
 				m_currentStateWindow.window = "";
 				uiAPI::window::showMaximized(m_mainWindow);
 			}
+
+			// Restore view state
 			ot::WidgetViewManager::instance().restoreState(m_currentStateWindow.view);
+
+			UserSettings::instance()->initializeData();
+
+			m_state &= (~RestoringSettingsState);
 		}
 
 		// Create shortcut manager
@@ -574,6 +601,7 @@ bool AppBase::closeEvent() {
 	}
 
 	m_ExternalServicesComponent->closeProject(false);
+	m_state &= (~ProjectOpenState);
 
 	return true;
 }
@@ -722,7 +750,10 @@ void AppBase::welcomeScreenEventCallback(
 			if (projectExists) 
 			{
 				// Check if the project it the same project as the currently open one
-				if (currentName == m_currentProjectName) { m_ExternalServicesComponent->closeProject(false); }
+				if (currentName == m_currentProjectName) { 
+					m_ExternalServicesComponent->closeProject(false);
+					m_state &= (~ProjectOpenState);
+				}
 
 				// Delete Project
 				pManager.deleteProject(currentName);
@@ -740,9 +771,11 @@ void AppBase::welcomeScreenEventCallback(
 			// Perform open project
 			if (m_currentProjectName.length() > 0) {
 				m_ExternalServicesComponent->closeProject(false);
+				m_state &= (~ProjectOpenState);
 			}
 
 			m_ExternalServicesComponent->openProject(currentName, projectType, pManager.getProjectCollection(currentName));
+			m_state |= ProjectOpenState;
 		}
 	}
 	break;
@@ -810,8 +843,10 @@ void AppBase::welcomeScreenEventCallback(
 					// Perform open project
 					if (m_currentProjectName.length() > 0) {
 						m_ExternalServicesComponent->closeProject(false);
+						m_state &= (~ProjectOpenState);
 					}
 					m_ExternalServicesComponent->openProject(selectedProjectName, projectType, projectCollection);
+					m_state |= ProjectOpenState;
 				}
 			}
 		}
@@ -882,6 +917,7 @@ void AppBase::welcomeScreenEventCallback(
 			bool reopenProject = false;
 			if (m_currentProjectName == selectedProjectName) {
 				m_ExternalServicesComponent->closeProject(false);
+				m_state &= (~ProjectOpenState);
 				reopenProject = true;
 			}
 
@@ -899,6 +935,7 @@ void AppBase::welcomeScreenEventCallback(
 			if (reopenProject)
 			{
 				m_ExternalServicesComponent->openProject(newProjectName, pManager.getProjectType(newProjectName), pManager.getProjectCollection(newProjectName));
+				m_state |= ProjectOpenState;
 			}
 
 			// And refresh the view
@@ -936,7 +973,10 @@ void AppBase::welcomeScreenEventCallback(
 			msg.append("\"? This operation can not be undone.");
 			if (uiAPI::promptDialog::show(msg, "Delete Project", promptOkCancelIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow()) == dialogResult::resultOk) {
 				// Check if the project it the same project as the currently open one
-				if (selectedProjectName.toStdString() == m_currentProjectName) { m_ExternalServicesComponent->closeProject(false); }
+				if (selectedProjectName.toStdString() == m_currentProjectName) { 
+					m_ExternalServicesComponent->closeProject(false);
+					m_state &= (~ProjectOpenState);
+				}
 
 				pManager.deleteProject(selectedProjectName.toStdString());
 
@@ -1055,8 +1095,10 @@ void AppBase::welcomeScreenEventCallback(
 					// Perform open project
 					if (m_currentProjectName.length() > 0) {
 						m_ExternalServicesComponent->closeProject(false);
+						m_state &= (~ProjectOpenState);
 					}
 					m_ExternalServicesComponent->openProject(selectedProjectName, projectType, projectCollection);
+					m_state |= ProjectOpenState;
 				}
 			}
 		}
@@ -2504,6 +2546,17 @@ void AppBase::slotViewFocused(ot::WidgetView* _view) {
 
 void AppBase::slotOutputContextMenuItemClicked() {
 	m_output->setPlainText(BUILD_INFO);
+}
+
+void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
+	if (m_state & RestoringSettingsState) return;
+	if (!(m_state & LoggedInState)) return;
+
+	UserManagement uM;
+	uM.setAuthServerURL(m_authorizationServiceURL);
+	uM.setDatabaseURL(m_dataBaseURL);
+
+	uM.storeSetting(STATE_NAME_COLORSTYLE, _style.colorStyleName());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

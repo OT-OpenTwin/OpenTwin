@@ -3,6 +3,8 @@
 
 #include "OTServiceFoundation/SettingsData.h"
 #include "OTCore/OTAssert.h"
+#include "OTWidgets/ColorStyleTypes.h"
+#include "OTWidgets/GlobalColorStyle.h"
 
 #include <akAPI/uiAPI.h>
 #include <akDialogs/aOptionsDialog.h>
@@ -166,6 +168,16 @@ void UserSettings::updateViewerSettings(ot::SettingsData * _data) {
 	}
 }
 
+void UserSettings::initializeData(void) {
+	ot::SettingsItemSelection* cs = dynamic_cast<ot::SettingsItemSelection*>(m_uiServiceSettings->findItemByLogicalName("General:Appearance:ColorStyle"));
+	if (!cs) {
+		OT_LOG_E("Item cast failed");
+		return;
+	}
+	cs->setPossibleSelection(ot::GlobalColorStyle::instance().getAvailableStyleNames());
+	cs->setSelectedValue(ot::GlobalColorStyle::instance().getCurrentStyleName());
+}
+
 // #######################################################################################
 
 // Slots
@@ -299,6 +311,27 @@ void UserSettings::slotItemChanged(ak::aAbstractOptionsItem * _item) {
 
 void UserSettings::uiServiceSettingsChanged(ot::AbstractSettingsItem * _item) {
 	std::string itemName = _item->logicalName();
+
+	// ColorStyle
+	if (itemName == "General:Appearance:ColorStyle") {
+		ot::SettingsItemSelection* actualItem = dynamic_cast<ot::SettingsItemSelection*>(_item);
+		if (!actualItem) {
+			OT_LOG_E("Item cast failed");
+			return;
+		}
+
+		if (ot::GlobalColorStyle::instance().getCurrentStyleName() == actualItem->selectedValue()) return;
+
+		if (!ot::GlobalColorStyle::instance().hasStyle(actualItem->selectedValue())) {
+			OT_LOG_E("ColorStyle \"" + actualItem->selectedValue() + "\" not found");
+			return;
+		}
+
+		ot::GlobalColorStyle::instance().setCurrentStyle(actualItem->selectedValue());
+		return;
+	}
+
+	// Handle viewer settings
 	AppBase::instance()->viewerSettingsChanged(_item);	
 }
 
@@ -482,4 +515,23 @@ UserSettings::UserSettings() : m_dialog(nullptr), m_uiServiceSettings(nullptr), 
 	m_uiServiceSettings = new ot::SettingsData("uiServiceSettings", "1.0");
 	ot::SettingsGroup * gGeneral        = m_uiServiceSettings->addGroup("General", "General");
 	ot::SettingsGroup * gAppearance     = gGeneral->addSubgroup("Appearance", "Appearance");
+
+	std::list<std::string> opt;
+	std::string c;
+
+	if (ot::GlobalColorStyle::instance().hasStyle(OT_COLORSTYLE_NAME_Bright)) {
+		opt.push_back(OT_COLORSTYLE_NAME_Bright);
+		c = OT_COLORSTYLE_NAME_Bright;
+	}
+	if (ot::GlobalColorStyle::instance().hasStyle(OT_COLORSTYLE_NAME_Dark)) {
+		opt.push_back(OT_COLORSTYLE_NAME_Dark);
+		if (c.empty()) c = OT_COLORSTYLE_NAME_Dark;
+	}
+	if (ot::GlobalColorStyle::instance().hasStyle(OT_COLORSTYLE_NAME_Blue)) {
+		opt.push_back(OT_COLORSTYLE_NAME_Blue);
+		if (c.empty()) c = OT_COLORSTYLE_NAME_Blue;
+	}
+
+	ot::AbstractSettingsItem* iColor = new ot::SettingsItemSelection("ColorStyle", "Color Style", opt, c);
+	gAppearance->addItem(iColor);
 }
