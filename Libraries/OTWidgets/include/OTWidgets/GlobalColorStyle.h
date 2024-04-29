@@ -17,6 +17,7 @@
 
 // std header
 #include <map>
+#include <list>
 #include <string>
 
 class QApplication;
@@ -55,6 +56,8 @@ namespace ot {
 		void evaluateStyleSheetMacros(ColorStyle& _style) const;
 
 		void setApplication(QApplication* _application);
+
+		std::list<std::string> getAvailableStyleNames(void) const;
 
 	Q_SIGNALS:
 		void currentStyleAboutToChange(void);

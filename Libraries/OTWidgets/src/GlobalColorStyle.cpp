@@ -172,6 +172,14 @@ void ot::GlobalColorStyle::setApplication(QApplication* _application) {
 	m_app = _application;
 }
 
+std::list<std::string> ot::GlobalColorStyle::getAvailableStyleNames(void) const {
+	std::list<std::string> ret;
+	for (const auto& it : m_styles) {
+		if (!it.first.empty()) ret.push_back(it.first);
+	}
+	return ret;
+}
+
 ot::GlobalColorStyle::GlobalColorStyle() : m_app(nullptr) {
 	m_emptyStyle.setColorStyleName("");
 	m_styles.insert_or_assign(m_emptyStyle.colorStyleName(), m_emptyStyle);
