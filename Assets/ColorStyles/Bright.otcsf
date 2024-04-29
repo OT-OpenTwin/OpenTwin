@@ -43,9 +43,9 @@ QWidget {
 }
 
 QWidget:disabled {
-    background-color: rgba(127,127,127,255);
+    background-color: rgba(230,230,230,255);
     color: rgba(168,168,168,255);
-    selection-background-color: rgba(127,127,127,255);
+    selection-background-color: rgba(230,230,230,255);
     selection-color: rgba(168,168,168,255);
 }
 
@@ -765,7 +765,7 @@ QToolBar {
 }
 
 QToolBar:disabled{
-    background-color: rgba(127,127,127,255);
+    background-color: rgba(230,230,230,255);
 }
 
 QToolBar::handle:horizontal {
@@ -946,7 +946,7 @@ QCalendarWidget {
 }
 
 QCalendarWidget:disabled {
-        background-color: rgba(127,127,127,255);
+        background-color: rgba(230,230,230,255);
         color: rgba(168,168,168,255);
 }
 
@@ -991,7 +991,7 @@ QProgressBar::chunk {
 }
 
 QProgressBar::chunk:disabled {
-    background-color: rgba(127,127,127,255);
+    background-color: rgba(230,230,230,255);
     color: rgba(168,168,168,255);
     border-radius: 4;
 }
@@ -1333,7 +1333,7 @@ QSlider::add-page:vertical {
 }
 
 QSlider::add-page:vertical:disabled {
-    background: rgba(127,127,127,255);
+    background: rgba(230,230,230,255);
 }
 
 QSlider::sub-page:horizontal {
@@ -1345,7 +1345,7 @@ QSlider::sub-page:horizontal {
 }
 
 QSlider::sub-page:horizontal:disabled {
-    background: rgba(127,127,127,255);
+    background: rgba(230,230,230,255);
 }
 
 QSlider::handle:horizontal {
@@ -1630,7 +1630,7 @@ QHeaderView {
 }
     
 QHeaderView:disabled {
-    background-color: rgba(127,127,127,255);
+    background-color: rgba(230,230,230,255);
     color: rgba(168,168,168,255);
     border: 1px solid transparent;
 }
@@ -1826,7 +1826,7 @@ QTreeView:disabled,
 QListView:disabled,
 QTableView:disabled,
 QColumnView:disabled {
-    background-color: rgba(127,127,127,255);
+    background-color: rgba(230,230,230,255);
     color: rgba(168,168,168,255);
 }
 
@@ -1926,7 +1926,7 @@ QToolBox::tab:!selected {
 }
 
 QToolBox::tab:!selected:disabled {
-    background-color: rgba(127,127,127,255);
+    background-color: rgba(230,230,230,255);
 }
 
 QToolBox::tab:hover {
@@ -2381,7 +2381,7 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
 }
 
 #tabCloseButton::disabled {
-    color: rgba(127,127,127,255);
+    color: rgba(230,230,230,255);
 }
 
 #tabsMenuButton::menu-indicator {
