@@ -290,21 +290,21 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtInstall>$(QTVER)</QtInstall>
+    <QtInstall>$(QTDIR)</QtInstall>
     <QtModules>
     </QtModules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
-    <QtInstall>$(QTVER)</QtInstall>
+    <QtInstall>$(QTDIR)</QtInstall>
     <QtModules />
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtInstall>$(QTVER)</QtInstall>
+    <QtInstall>$(QTDIR)</QtInstall>
     <QtModules>
     </QtModules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
-    <QtInstall>$(QTVER)</QtInstall>
+    <QtInstall>$(QTDIR)</QtInstall>
     <QtModules />
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">

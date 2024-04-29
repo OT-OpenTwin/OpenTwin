@@ -34,7 +34,7 @@ Features:
 2) Create an Environment variable (System settings or batch file) for the %QTDIR%,
 	which should result in something like this: ...\Qt\5.11.2\msvc2017_64
 3) Install the Qt VS Tool Add-on for Visual Studio
-4) In the Qt VS Tool options add a new Qt Version with the name: $(QTVER)
+4) In the Qt VS Tool options add a new Qt Version with the name: $(QTDIR)
 	This will disable the path selection and read the path from the environment variable.
 
 -------------
