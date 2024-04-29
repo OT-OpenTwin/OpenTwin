@@ -154,12 +154,13 @@ int ot::TextEditor::lineNumberAreaWidth(void) const {
 }
 
 void ot::TextEditor::lineNumberAreaPaintEvent(QPaintEvent * _event) {
+	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 	QPainter painter(m_lineNumberArea);
-	QColor colorBack(Qt::white);
-	QColor colorFront(Qt::black);
-	QColor colorSmooth(Qt::lightGray);
-	painter.fillRect(_event->rect(), colorBack);
-	painter.setPen(colorSmooth);
+	QBrush backBrush = cs.getValue(OT_COLORSTYLE_VALUE_TitleBackground).brush();
+	QBrush frontBrush = cs.getValue(OT_COLORSTYLE_VALUE_TitleForeground).brush();
+	QBrush borderBrush = cs.getValue(OT_COLORSTYLE_VALUE_ControlsBorderColor).brush();
+	painter.fillRect(_event->rect(), backBrush);
+	painter.setPen(QPen(borderBrush, 1.));
 	painter.drawLine(_event->rect().x() + _event->rect().width() - 1, _event->rect().y(),
 		_event->rect().x() + _event->rect().width() - 1, _event->rect().y() + _event->rect().height());
 
@@ -172,7 +173,7 @@ void ot::TextEditor::lineNumberAreaPaintEvent(QPaintEvent * _event) {
 	while (block.isValid() && top <= _event->rect().bottom()) {
 		if (block.isVisible() && bottom >= _event->rect().top()) {
 			QString number = QString::number(blockNumber + 1) + "  ";
-			painter.setPen(colorFront);
+			painter.setPen(QPen(frontBrush, 1.));
 			QFont f = painter.font();
 			f.setPointSize(ptSize);
 			painter.setFont(f);
