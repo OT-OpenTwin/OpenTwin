@@ -1056,6 +1056,11 @@ QDialogButtonBox QPushButton {
     min-width: 80px;
 }
 
+#OT_PushButton {
+    /* Fixes issue with ot::PushButton */
+    color: %color:Widget Foreground%;
+}
+
 /* ##################################################################################### */
 
 /* QToolButton */
@@ -2099,17 +2104,17 @@ QAbstractView:selected {
 
 #ot_property_grid::item {
     background-color: transparent;
-    color: black;
+    color: %color:Widget Foreground%;
 }
 
 #ot_property_grid::item:hover:!selected {
     background-color: transparent;
-    color: black;
+    color: %color:Widget Foreground%;
 }
 
 #ot_property_grid::item:selected {
     background-color: transparent;
-    color: black;
+    color: %color:Widget Foreground%;
 }
 
 /* ##################################################################################### */
@@ -2124,6 +2129,7 @@ QAbstractView:selected {
 /* Combo Button */
 
 #OT_ComboButton {
+    color: %color:Widget Foreground%;
     border-radius: 0;
 }
 
@@ -2236,6 +2242,10 @@ QCheckBox#LogInDialogSavePassword::indicator:indeterminate:pressed {
 #OT_LineEdit {
     border-radius: 0;
 }
+
+/* ##################################################################################### */
+
+/* Push Button */
 
 /* ##################################################################################### */
 
