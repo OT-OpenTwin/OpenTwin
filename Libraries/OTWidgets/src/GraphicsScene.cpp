@@ -8,6 +8,8 @@
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/ColorStyleTypes.h"
+#include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/GraphicsConnectionPreviewItem.h"
 
 // Qt header
@@ -16,7 +18,7 @@
 #include <QtWidgets/qgraphicssceneevent.h>
 
 ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
-	: m_gridSize(10), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
+	: m_gridSize(10), m_gridDoubleEvery(10), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewStyle(ot::GraphicsConnectionCfg::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
 {
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
@@ -24,23 +26,93 @@ ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 
 ot::GraphicsScene::~GraphicsScene() {}
 
+//! @todo Pen width configurable
 void ot::GraphicsScene::drawBackground(QPainter* _painter, const QRectF& _rect)
 {
+	// Use QGraphicsScene method if no grid is set
 	if (m_gridSize < 1) return QGraphicsScene::drawBackground(_painter, _rect);
 
+	// Setup pen
 	QPen pen;
-	pen.setColor(QColor(0, 0, 255));
-	_painter->setPen(pen);
+	pen.setBrush(GlobalColorStyle::instance().getCurrentStyle().getValue(OT_COLORSTYLE_VALUE_ControlsBorderColor).brush());
+	pen.setWidthF(1.);
 
-	qreal left = (qreal)(int(_rect.left()) - (int(_rect.left()) % m_gridSize));
-	qreal top = (qreal)(int(_rect.top()) - (int(_rect.top()) % m_gridSize));
-	QVector<QPointF> points;
-	for (qreal x = left; x < _rect.right(); x += m_gridSize) {
-		for (qreal y = top; y < _rect.bottom(); y += m_gridSize) {
-			points.append(QPointF(x, y));
+	QPen penWide = pen;
+	pen.setWidthF(2.);
+
+	QPen penCenter = penWide;
+	penCenter.setWidthF(4.);
+
+	_painter->setPen(pen);
+	
+	qreal newGridSize = m_gridSize;
+
+	// Calculate grid resolution
+	while ((_rect.height() / newGridSize) > 100) {
+		newGridSize *= 10.;
+	}
+	while ((_rect.height() / newGridSize) < 5) {
+		newGridSize /= 10.;
+	}
+	while ((_rect.width() / newGridSize) > 100) {
+		newGridSize *= 10.;
+	}
+	while ((_rect.width() / newGridSize) < 5) {
+		newGridSize /= 10.;
+	}
+	
+	int ct = 0;
+	for (qreal x = newGridSize; x >= _rect.left(); x -= newGridSize) {
+		if (m_gridDoubleEvery > 1 && (++ct % m_gridDoubleEvery) == 0) {
+			_painter->setPen(penWide);
+			_painter->drawLine(QPointF(x, _rect.top()), QPointF(x, _rect.bottom()));
+			_painter->setPen(pen);
+			ct = 0;
+		}
+		else {
+			_painter->drawLine(QPointF(x, _rect.top()), QPointF(x, _rect.bottom()));
 		}
 	}
-	_painter->drawPoints(points.data(), points.size());
+	ct = 0;
+	for (qreal x = newGridSize; x <= _rect.right(); x += newGridSize) {
+		if (m_gridDoubleEvery > 1 && (++ct % m_gridDoubleEvery) == 0) {
+			_painter->setPen(penWide);
+			_painter->drawLine(QPointF(x, _rect.top()), QPointF(x, _rect.bottom()));
+			_painter->setPen(pen);
+			ct = 0;
+		}
+		else {
+			_painter->drawLine(QPointF(x, _rect.top()), QPointF(x, _rect.bottom()));
+		}
+	}
+	ct = 0;
+	for (qreal y = newGridSize; y >= _rect.top(); y -= newGridSize) {
+		if (m_gridDoubleEvery > 1 && (++ct % m_gridDoubleEvery) == 0) {
+			_painter->setPen(penWide);
+			_painter->drawLine(QPointF(_rect.left(), y), QPointF(_rect.right(), y));
+			_painter->setPen(pen);
+			ct = 0;
+		}
+		else {
+			_painter->drawLine(QPointF(_rect.left(), y), QPointF(_rect.right(), y));
+		}
+	}
+	ct = 0;
+	for (qreal y = newGridSize; y <= _rect.bottom(); y += newGridSize) {
+		if (m_gridDoubleEvery > 1 && (++ct % m_gridDoubleEvery) == 0) {
+			_painter->setPen(penWide);
+			_painter->drawLine(QPointF(_rect.left(), y), QPointF(_rect.right(), y));
+			_painter->setPen(pen);
+			ct = 0;
+		}
+		else {
+			_painter->drawLine(QPointF(_rect.left(), y), QPointF(_rect.right(), y));
+		}
+	}
+	
+	_painter->setPen(penCenter);
+	_painter->drawLine(QPointF(0, _rect.top()), QPointF(0, _rect.top()));
+	_painter->drawLine(QPointF(0, _rect.top()), QPointF(0, _rect.top()));
 }
 
 void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) {

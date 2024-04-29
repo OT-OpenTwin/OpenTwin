@@ -65,6 +65,7 @@ namespace ot {
 	private:
 		bool m_ignoreEvents;
 		int m_gridSize;
+		int m_gridDoubleEvery;
 		GraphicsView* m_view;
 		GraphicsItem* m_connectionOrigin;
 		GraphicsConnectionPreviewItem* m_connectionPreview;
