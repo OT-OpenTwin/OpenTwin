@@ -18,7 +18,7 @@
 #include <tuple>
 #include <functional>
 #include <unordered_set>
-
+#include <boost/functional/hash.hpp>
 //C++ Header
 #include <sstream>
 namespace Numbers
@@ -170,6 +170,16 @@ bool NGSpice::isValidNodeString(const std::string& input)
 	return true;
 }
 
+// PairHash-Struktur für die Verwendung von std::pair als Schlüssel in der unordered_map
+struct PairHash {
+	template <class T1, class T2>
+	std::size_t operator () (const std::pair<T1, T2>& pair) const {
+		auto hash1 = std::hash<T1>{}(pair.first);
+		auto hash2 = std::hash<T2>{}(pair.second);
+		return hash1 ^ hash2;
+	}
+};
+
 
 
 void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
@@ -219,8 +229,12 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 	}
 
 	
-	std::map<std::pair<ot::UID, std::string>, std::string> connectionMap;
-	
+	//std::map<std::pair<ot::UID, std::string>, std::string> connectionMap; //3.Methode
+	//std::unordered_map<std::pair<ot::UID, ot::UID>, std::string,boost::hash<std::pair<ot::UID,ot::UID>>> connectionMapTest;
+	//std::map<Connection, std::string> connectionNodeNumbers; //2.Methode
+	std::unordered_map<std::pair<ot::UID, std::string>, std::string, PairHash> connectionNodeNumbers; // 1.Methode
+
+
 
 	for (auto& blockEntityByID : allEntitiesByBlockID)
 	{
@@ -228,7 +242,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		auto connections = blockEntity->getAllConnections();
 
 		// Map used for parallel connections to identify if a connection already exists on the connector and then give the second or ... connection the same nodenumber
-		
+		                                                                                                                                                         
 
 		for (auto connectionID : connections)
 		{
@@ -237,48 +251,128 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connectionID);
 			ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
 
-			Connection conn(connectionCfg);
-
-			ot::UID destUID;
-			if (conn.getOriginUid() == blockEntity->getEntityID())
-			{
-				destUID = conn.getOriginUid();
-			}
-			else if (conn.getDestinationUid() == blockEntity->getEntityID())
-			{
-				destUID = conn.getDestinationUid();
-			}
-
+			Connection myConn(connectionCfg);
 			bool temp = false;
-			//If the connection is has the voltage Meter as origin or destination then we dont want to give it a nodeNumber
+
+			//1.Methode
+
 			if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter"))
 			{
-				auto connectionKey = std::make_pair(destUID,connectionCfg.destConnectable());
-
-				if (connectionMap.find(connectionKey) != connectionMap.end())
+				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(),myConn.destConnectable() });
+				if (connectionWithNodeNumber != connectionNodeNumbers.end())
 				{
-					connectionMap[connectionKey] = connectionMap.at(connectionKey);
-					conn.setNodeNumber(connectionMap[connectionKey]);
+					myConn.setNodeNumber(connectionWithNodeNumber->second);
+
 				}
 				else
 				{
-					connectionMap[connectionKey] = std::to_string(Numbers::nodeNumber++);
-					conn.setNodeNumber(connectionMap[connectionKey]);
-					temp = true;
+					connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.originConnectable() });
+					if (connectionWithNodeNumber != connectionNodeNumbers.end())
+					{
+						myConn.setNodeNumber(connectionWithNodeNumber->second);
+
+					}
+					else
+					{
+						myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
+						connectionNodeNumbers.insert_or_assign({ myConn.getDestinationUid(), myConn.destConnectable() }, myConn.getNodeNumber());
+						connectionNodeNumbers.insert_or_assign({ myConn.getOriginUid(), myConn.originConnectable() }, myConn.getNodeNumber());
+						temp = true;
+
+					}
 				}
 			}
 			else
 			{
-				conn.setNodeNumber("voltageMeterConnection");
+				myConn.setNodeNumber("voltageMeterConnection");
 			}
 
-			bool res1 = it->second.addConnection(connectionCfg.getOriginUid(), conn);
-			bool res2 = it->second.addConnection(connectionCfg.getDestinationUid(), conn);
+			bool res1 = it->second.addConnection(connectionCfg.getOriginUid(), myConn);
+			bool res2 = it->second.addConnection(connectionCfg.getDestinationUid(), myConn);
 			if (res1 == false && res2 == false && temp == true)
 			{
 				Numbers::nodeNumber--;
 				temp = false;
 			}
+			// 2.Methode
+			
+			//for (auto connectionTemp : connectionNodeNumbers)
+			//{
+			//	if (myConn.getDestinationUid() == connectionTemp.first.getDestinationUid() && myConn.destConnectable() == connectionTemp.first.destConnectable())
+			//	{
+			//		myConn.setNodeNumber(connectionTemp.second);
+			//		found = true;
+			//		break; // Keine weitere Überprüfung notwendig, wir haben eine Übereinstimmung gefunden
+			//	}
+			//	else if (myConn.getDestinationUid() == connectionTemp.first.getOriginUid() && myConn.destConnectable() == connectionTemp.first.originConnectable())
+			//	{
+			//		myConn.setNodeNumber(connectionTemp.second);
+			//		found = true;
+			//		break;
+			//	}
+			//	else if (myConn.getOriginUid() == connectionTemp.first.getOriginUid() && myConn.originConnectable() == connectionTemp.first.originConnectable())
+			//	{
+			//		myConn.setNodeNumber(connectionTemp.second);
+			//		found = true;
+			//		break;
+			//	}
+			//	else if (myConn.getOriginUid() == connectionTemp.first.getDestinationUid() && myConn.originConnectable() == connectionTemp.first.destConnectable())
+			//	{
+			//		myConn.setNodeNumber(connectionTemp.second);
+			//		found = true;
+			//		break;
+			//	}
+			//}
+
+			//if (!found)
+			//{
+			//	myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
+			//	connectionNodeNumbers.insert_or_assign(myConn, myConn.getNodeNumber());
+			//}
+
+
+			//3.Methode
+
+			//ot::UID destUID;
+			//if (conn.getOriginUid() == blockEntity->getEntityID())
+			//{
+			//	destUID = conn.getOriginUid();
+			//}
+			//else if (conn.getDestinationUid() == blockEntity->getEntityID())
+			//{
+			//	destUID = conn.getDestinationUid();
+			//}
+
+			
+			////If the connection is has the voltage Meter as origin or destination then we dont want to give it a nodeNumber
+			//if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter"))
+			//{
+			//	auto connectionKey = std::make_pair(destUID,connectionCfg.destConnectable());
+
+			//	if (connectionMap.find(connectionKey) != connectionMap.end())
+			//	{
+			//		connectionMap[connectionKey] = connectionMap.at(connectionKey);
+			//		conn.setNodeNumber(connectionMap[connectionKey]);
+			//	}
+			//	else
+			//	{
+			//		connectionMap[connectionKey] = std::to_string(Numbers::nodeNumber++);
+			//		conn.setNodeNumber(connectionMap[connectionKey]);
+			//		temp = true;
+			//	}
+			//}
+			//else
+			//{
+			//	conn.setNodeNumber("voltageMeterConnection");
+			//}
+
+			/*if (connectionNodeNumbers.size() == 0)
+			{
+				myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
+				connectionNodeNumbers.insert_or_assign(myConn, myConn.getNodeNumber());
+			}*/
+
+			
 		}
 
 		
