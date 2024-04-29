@@ -118,14 +118,14 @@
 
 	!define CREATE_CERTIFICATE_BATCH '"$INSTDIR\Certificates\CreateServerCertificate_custom.cmd"'
 
-	!define DEFAULT_MONGODB_STORAGE_PATH '"$DEV_ROOT\OpenTwin\Deployment\DataStorage\data"'
-	!define DEFAULT_MONGODB_LOG_PATH '"$DEV_ROOT\OpenTwin\Deployment\DataStorage\log"'
+	!define DEFAULT_MONGODB_STORAGE_PATH '"$DEV_ROOT\DataStorage\data"'
+	!define DEFAULT_MONGODB_LOG_PATH '"$DEV_ROOT\DataStorage\log"'
 	!define DEFAULT_MONGODB_INSTALL_PATH '"$PROGRAMFILES64\MongoDB\Server\4.4"'
 	!define DEFAULT_MONGODB_COMPASS_PATH '"$PROGRAMFILES64\MongoDB Compass"'
 	!define MONGODB_DELETION_PATH '"$PROGRAMFILES64\MongoDB"'
 
-	!define OPENTWIN_REPO_GITADDRESS "git@github.com:OT-OpenTwin/OpenTwin.git"
-	!define THIRDPARTY_REPO_GITADDRESS "git@github.com:OT-OpenTwin/ThirdParty.git"
+	!define OPENTWIN_REPO_GITADDRESS "https://github.com/OT-OpenTwin/OpenTwin"
+	!define THIRDPARTY_REPO_GITADDRESS "https://github.com/OT-OpenTwin/ThirdParty"
 
 	!define TEMP_TOOLCHAIN_DIR '$DEV_ROOT\_temp'
 
@@ -1112,13 +1112,6 @@ SectionGroup /e "Python & Sphinx"
 			ExecWait 'cmd.exe /c "title Installing Sphinx and ReadTheDocs Theme && "$TempToolChain\RefreshEnv.cmd" && pip install -U sphinx && pip install -U sphinx_rtd_theme " '
 	SectionEnd
 
-	Section "Install Pyinstaller" SEC09_2
-		AddSize 106
-		DetailPrint "Installing Pyinstaller..."
-			ExpandEnvStrings $0 %COMSPEC%
-			#ExecWait '"$0" /k "START /WAIT /MIN cmd.exe /k " "$TempToolChain\RefreshEnv.cmd" && pip install pyinstaller" " '
-			ExecWait 'cmd.exe /c "title Installing pyinstaller && "$TempToolChain\RefreshEnv.cmd" && pip install -U pyinstaller " '
-	SectionEnd
 SectionGroupEnd
 
 Section "-CleanupTasks"
@@ -1166,7 +1159,6 @@ SectionEnd
 
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} "Install a standard installation of Python 3.9"
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09_1} "Install Sphinx via pip and the 'Read the docs' theme required for building the documentation"
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09_2} "Install Pyinstaller via pip required for building OpenTwin Installer scripts"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 
