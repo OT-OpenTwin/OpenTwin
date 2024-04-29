@@ -25,6 +25,14 @@ inline ___enumName operator ~ (___enumName _lhv) { return (___enumName)(~((long)
 inline bool operator == (___enumName _lhv, const ot::Flags<___enumName>& _rhv) { return ((long)_lhv == (long)_rhv.data()); };
 #endif
 
+//! @brief friend the flag functions in case the enum is private or protected
+#define OT_FRIEND_FLAG_FUNCTIONS(___enumName) friend inline ___enumName operator | (___enumName _lhv, ___enumName _rhv); \
+friend inline ___enumName & operator |= (___enumName & _lhv, ___enumName _rhv); \
+friend inline ___enumName operator & (___enumName _lhv, ___enumName _rhv);  \
+friend inline ___enumName & operator &= (___enumName & _lhv, ___enumName _rhv);  \
+friend inline ___enumName operator ~ (___enumName _lhv); \
+friend inline bool operator == (___enumName _lhv, const ot::Flags<___enumName>& _rhv);
+
 namespace ot {
 
 	//! @brief This class is used to manage flags.
