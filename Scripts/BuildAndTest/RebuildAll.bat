@@ -57,28 +57,28 @@ cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
 REM Clean up the build logs 
 
 if "%1"=="" (
-	DEL buildLog_Debug.txt
-	DEL buildLog_Release.txt
+	DEL buildLog_Debug.txt 2> nul
+	DEL buildLog_Release.txt 2> nul
 )
 	
 if "%1"=="BOTH" (
-	DEL buildLog_Debug.txt
-	DEL buildLog_Release.txt
+	DEL buildLog_Debug.txt 2> nul
+	DEL buildLog_Release.txt 2> nul
 )
 	
 if "%1"=="RELEASE" (
-	DEL buildLog_Release.txt
+	DEL buildLog_Release.txt 2> nul
 )
 	
 if "%1"=="DEBUG" (
-	DEL buildLog_Debug.txt
+	DEL buildLog_Debug.txt 2> nul
 )
 
-DEL buildLog_Summary.txt
-DEL RUSTbuildLog.txt
-DEL AdminPanel_buildLog.txt
-DEL Documentation_buildLog.txt
-DEL DoxygenDocumentation_buildLog.txt
+DEL buildLog_Summary.txt 2> nul
+DEL RUSTbuildLog.txt 2> nul
+DEL AdminPanel_buildLog.txt 2> nul
+DEL Documentation_buildLog.txt 2> nul
+DEL DoxygenDocumentation_buildLog.txt 2> nul
 
 REM ====================================================================
 REM Build the libraries 

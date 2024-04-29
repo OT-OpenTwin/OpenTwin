@@ -55,7 +55,7 @@ IF "%2"=="BUILD" (
 IF %DEBUG%==1 (
 	ECHO %TYPE_NAME% DEBUG
 	
-	DEL buildLog_Debug.txt
+	DEL buildLog_Debug.txt 2> nul
 	
 	if %REBUILD%==1 (
 		cargo clean -p open_twin
@@ -68,14 +68,14 @@ IF %DEBUG%==1 (
 	FOR /F %%I IN ('where /r target\debug\.fingerprint output-bin-open_twin') DO TYPE %%I >> buildLog_Debug.txt
 
 	REM Setup QT config
-	DEL "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\debug\qt.conf"
+	DEL "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\debug\qt.conf" 2> nul
 	COPY "%OPENTWIN_DEV_ROOT%\Assets\qt.conf" "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\debug\qt.conf"
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE_NAME% RELEASE
 	
-	DEL buildLog_Release.txt
+	DEL buildLog_Release.txt 2> nul
 
 	if %REBUILD%==1 (
 		cargo clean --release -p open_twin
@@ -88,7 +88,7 @@ IF %RELEASE%==1 (
 	FOR /F %%I IN ('where /r target\release\.fingerprint output-bin-open_twin') DO TYPE %%I >> buildLog_Release.txt
 
 	REM Setup QT config
-	DEL "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\release\qt.conf"
+	DEL "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\release\qt.conf" 2> nul
 	COPY "%OPENTWIN_DEV_ROOT%\Assets\qt.conf" "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\release\qt.conf"
 ) 
 

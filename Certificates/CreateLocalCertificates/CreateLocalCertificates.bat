@@ -32,11 +32,11 @@ REM Create the certificates if needed
 
 IF %REQUIRE_CERTIFICATE_GENERATION%==1 (
 
-	DEL "%OPENTWIN_DEV_ROOT%\Certificates\Generated\ca.pem"
-	DEL "%OPENTWIN_DEV_ROOT%\Certificates\Generated\ca-key.pem"
-	DEL "%OPENTWIN_DEV_ROOT%\Certificates\Generated\server.pem"
-	DEL "%OPENTWIN_DEV_ROOT%\Certificates\Generated\server-key.pem"
-	DEL "%OPENTWIN_DEV_ROOT%\Certificates\Generated\certificateKeyFile.pem"
+	DEL "%OPENTWIN_DEV_ROOT%\Certificates\Generated\ca.pem" 2> nul
+	DEL "%OPENTWIN_DEV_ROOT%\Certificates\Generated\ca-key.pem" 2> nul
+	DEL "%OPENTWIN_DEV_ROOT%\Certificates\Generated\server.pem" 2> nul
+	DEL "%OPENTWIN_DEV_ROOT%\Certificates\Generated\server-key.pem" 2> nul
+	DEL "%OPENTWIN_DEV_ROOT%\Certificates\Generated\certificateKeyFile.pem" 2> nul
 
 	"%CERT_CREATE_TOOLS%\cfssl.exe" gencert -initca ca-csr.json | "%CERT_CREATE_TOOLS%\cfssljson.exe" -bare ca
 
