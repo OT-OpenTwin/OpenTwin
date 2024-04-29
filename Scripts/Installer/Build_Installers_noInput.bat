@@ -37,21 +37,6 @@ Set THIRDPARTY_ZIPFILE="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools\ThirdParty.zi
 
 SET HELPER_PATH="!OPENTWIN_DEV_ROOT!\Scripts\Installer\helper"
 
-REM Test for Python Installation
-	python -V | find /v "Python" >NUL 2>NUL && (goto :PYTHON_NOT_INSTALLED)
-	python -V | find "Python"    >NUL 2>NUL && (goto :PYTHON_INSTALLED)
-
-:PYTHON_NOT_INSTALLED
-	echo ERROR: Python is not installed on your system.
-	GOTO END_FAIL
-
-	
-:PYTHON_INSTALLED
-	for /f "delims=" %%V in ('python -V') do @set ver=%%V
-	echo Python installation %ver% verified...
-	echo Running pyinstaller installation...
-		pip install -U pyinstaller
-
 if "!SEVENZIP_REG_DATA!"=="" (
 	echo ERROR: 7Zip is not installed on your system!
 	GOTO END_FAIL
