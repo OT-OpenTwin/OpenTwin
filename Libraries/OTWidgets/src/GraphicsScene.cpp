@@ -32,16 +32,32 @@ void ot::GraphicsScene::drawBackground(QPainter* _painter, const QRectF& _rect)
 	// Use QGraphicsScene method if no grid is set
 	if (m_gridSize < 1) return QGraphicsScene::drawBackground(_painter, _rect);
 
+	if (_rect != m_view->mapToScene(m_view->viewport()->rect()).boundingRect()) {
+		m_view->repaint();
+		return;
+	}
+
+	// Get the current transformation matrix of the painter
+	QTransform transform = _painter->transform();
+
+	// Calculate the scaling factor from the transformation matrix
+	qreal scaleX = qSqrt(transform.m11() * transform.m11() + transform.m21() * transform.m21());
+	qreal scaleY = qSqrt(transform.m22() * transform.m22() + transform.m12() * transform.m12());
+
+	qreal scale = qMax(scaleX, scaleY);
+
+	qreal scaledLineWidth = .5 / scale; // Adjust the line width based on the scale
+
 	// Setup pen
 	QPen pen;
 	pen.setBrush(GlobalColorStyle::instance().getCurrentStyle().getValue(OT_COLORSTYLE_VALUE_ControlsBorderColor).brush());
-	pen.setWidthF(1.);
+	pen.setWidthF(scaledLineWidth);
 
 	QPen penWide = pen;
-	pen.setWidthF(2.);
+	pen.setWidthF(scaledLineWidth * 3.);
 
 	QPen penCenter = penWide;
-	penCenter.setWidthF(4.);
+	penCenter.setWidthF(scaledLineWidth * 5.);
 
 	_painter->setPen(pen);
 	
@@ -63,7 +79,9 @@ void ot::GraphicsScene::drawBackground(QPainter* _painter, const QRectF& _rect)
 	
 	int ct = 0;
 	for (qreal x = newGridSize; x >= _rect.left(); x -= newGridSize) {
-		if (m_gridDoubleEvery > 1 && (++ct % m_gridDoubleEvery) == 0) {
+		ct++;
+		if (x > _rect.right()) continue;
+		if (m_gridDoubleEvery > 1 && (ct % m_gridDoubleEvery) == 0) {
 			_painter->setPen(penWide);
 			_painter->drawLine(QPointF(x, _rect.top()), QPointF(x, _rect.bottom()));
 			_painter->setPen(pen);
@@ -75,7 +93,9 @@ void ot::GraphicsScene::drawBackground(QPainter* _painter, const QRectF& _rect)
 	}
 	ct = 0;
 	for (qreal x = newGridSize; x <= _rect.right(); x += newGridSize) {
-		if (m_gridDoubleEvery > 1 && (++ct % m_gridDoubleEvery) == 0) {
+		ct++;
+		if (x < _rect.left()) continue;
+		if (m_gridDoubleEvery > 1 && (ct % m_gridDoubleEvery) == 0) {
 			_painter->setPen(penWide);
 			_painter->drawLine(QPointF(x, _rect.top()), QPointF(x, _rect.bottom()));
 			_painter->setPen(pen);
@@ -87,7 +107,9 @@ void ot::GraphicsScene::drawBackground(QPainter* _painter, const QRectF& _rect)
 	}
 	ct = 0;
 	for (qreal y = newGridSize; y >= _rect.top(); y -= newGridSize) {
-		if (m_gridDoubleEvery > 1 && (++ct % m_gridDoubleEvery) == 0) {
+		ct++;
+		if (y > _rect.bottom()) continue;
+		if (m_gridDoubleEvery > 1 && (ct % m_gridDoubleEvery) == 0) {
 			_painter->setPen(penWide);
 			_painter->drawLine(QPointF(_rect.left(), y), QPointF(_rect.right(), y));
 			_painter->setPen(pen);
@@ -99,7 +121,9 @@ void ot::GraphicsScene::drawBackground(QPainter* _painter, const QRectF& _rect)
 	}
 	ct = 0;
 	for (qreal y = newGridSize; y <= _rect.bottom(); y += newGridSize) {
-		if (m_gridDoubleEvery > 1 && (++ct % m_gridDoubleEvery) == 0) {
+		ct++;
+		if (y < _rect.top()) continue;
+		if (m_gridDoubleEvery > 1 && (ct % m_gridDoubleEvery) == 0) {
 			_painter->setPen(penWide);
 			_painter->drawLine(QPointF(_rect.left(), y), QPointF(_rect.right(), y));
 			_painter->setPen(pen);
