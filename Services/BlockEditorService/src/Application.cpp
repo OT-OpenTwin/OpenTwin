@@ -27,6 +27,7 @@ Application* g_instance{ nullptr };
 // -----
 #include "OTGui/PropertyDialogCfg.h"
 #include "OTGui/OnePropertyDialogCfg.h"
+#include "OTGui/PropertyPainter2D.h"
 #include "OTCore/PropertyGroup.h"
 #include "OTCore/PropertyBool.h"
 #include "OTCore/PropertyColor.h"
@@ -44,6 +45,8 @@ std::string Application::test(void) {
 	ot::PropertyDialogCfg cfg;
 	cfg.setTitle("Testing");
 	cfg.setName("Testing");
+
+	ot::PropertyGroup* r1 = new ot::PropertyGroup("R1", "Test Root 1");
 
 	ot::PropertyBool* tl1 = new ot::PropertyBool("Top Lvl", false);
 	cfg.defaultGroup()->addProperty(tl1);
@@ -80,10 +83,19 @@ std::string Application::test(void) {
 	ot::PropertyFilePath* dir1 = new ot::PropertyFilePath("Directory", "X:/YourPath");
 	g3->addProperty(dir1);
 
-	cfg.addRootGroup(g1);
-	cfg.addRootGroup(g2);
-	cfg.addRootGroup(g3);
+	r1->addChildGroup(g1);
+	r1->addChildGroup(g2);
+	r1->addChildGroup(g3);
 
+	cfg.addRootGroup(r1);
+
+	ot::PropertyGroup* r2 = new ot::PropertyGroup("R2", "Test Root 2");
+	ot::PropertyGroup* g4 = new ot::PropertyGroup("G4", "Test");
+	ot::PropertyPainter2D* pa1 = new ot::PropertyPainter2D(ot::PropertyBase("Painter2D"));
+	g4->addProperty(pa1);
+	r2->addChildGroup(g4);
+	cfg.addRootGroup(r2);
+	
 	ot::JsonObject cfgObj;
 	cfg.addToJsonObject(cfgObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());

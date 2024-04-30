@@ -11,7 +11,7 @@
 #include "OTGui/PropertyDialogCfg.h"
 
 ot::PropertyDialogCfg::PropertyDialogCfg() {
-	
+	this->setMinSize(800, 600);
 }
 
 ot::PropertyDialogCfg::~PropertyDialogCfg() {
