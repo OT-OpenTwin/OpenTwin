@@ -87,6 +87,8 @@
 	
 	Var GitInstallPath
 	Var TempToolChain
+	
+	Var DEVENV_ROOT
 
 #=================================================================
 #						END OF VARIABLES
@@ -222,9 +224,17 @@ Function .onInit
 
 	#reset regView to standard 32bit
 	SetRegView 32
+	
+	ReadEnvStr $DEVENV_ROOT "DEVENV_ROOT_2022"
+	
+	${If} $DEVENV_ROOT == ""
+		MessageBox MB_ICONSTOP|MB_OK 'The environment variable DEVENV_ROOT_2022 needs to be set to the tools directory of the Visual Studio 2022 installation, e.g., "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE". $\n$\nThis installer requires a fully set up Visual Studio 2022 C++ installation before proceeding!'
+		Abort
+	${EndIf}
 
 	MessageBox MB_ICONINFORMATION|MB_OK "Microsoft Visual Studio, C++ compilers and a full Git setup (including SSH) need to be installed for a full OpenTwin Development environment"
-    StrCpy $PortReturnChecker 0
+    
+	StrCpy $PortReturnChecker 0
 	StrCpy $PublicIpSet 0
 	StrCpy $PublicCertPageChecker 0
 	StrCpy $GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION "$PROGRAMFILES\GitHub Desktop Deployment"
@@ -232,7 +242,6 @@ Function .onInit
 
 	StrCpy "$ROOTDIR" "$WINDIR" 2
 	
-
 FunctionEnd
 
 
@@ -1114,6 +1123,15 @@ SectionGroup /e "Python & Sphinx"
 
 SectionGroupEnd
 
+Section "Install Qt Visual Studio Plugin" SEC10
+	AddSize 20000
+	DetailPrint "Installing Qt Visual Studio Plugin..."
+		#DetailPrint "$DEVENV_ROOT"
+		ExecWait '"$DEVENV_ROOT\VSIXInstaller.exe" /quiet "$TempToolChain\qt-vsaddin-msvc2022-3.0.2.vsix"'	#install the Qt visual studio plugin
+		DetailPrint "Done."
+		#Sleep 10000
+SectionEnd
+
 Section "-CleanupTasks"
 	SectionIn RO
 	DetailPrint "Refreshing Environment..."
@@ -1159,6 +1177,9 @@ SectionEnd
 
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} "Install a standard installation of Python 3.9"
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09_1} "Install Sphinx via pip and the 'Read the docs' theme required for building the documentation"
+
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC10} "Install the Qt Visual Studio 2022 plugin"
+
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 
