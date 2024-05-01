@@ -43,6 +43,11 @@ bool ot::WidgetView::setupFromConfig(WidgetViewCfg* _config) {
 	return true;
 }
 
+QAction* ot::WidgetView::getViewToggleAction(void) const {
+	if (!m_dockWidget) return nullptr;
+	else return m_dockWidget->toggleViewAction();
+}
+
 void ot::WidgetView::setViewData(const WidgetViewBase& _data) {
 	m_data = _data;
 	m_dockWidget->setObjectName(QString::fromStdString(_data.name()));

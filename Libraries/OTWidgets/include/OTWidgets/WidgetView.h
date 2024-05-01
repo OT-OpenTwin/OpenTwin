@@ -17,6 +17,7 @@
 #include <string>
 
 class QWidget;
+class QAction;
 
 namespace ads {
 	class CDockWidget;
@@ -26,6 +27,8 @@ namespace ot {
 
 	class WidgetViewManager;
 	
+	//! @class WidgetView
+	//! @brief The WidgetView class is used to integrate the Qt-ADS functionallity into open twin.
 	class OT_WIDGETS_API_EXPORT WidgetView {
 		OT_DECL_NOCOPY(WidgetView)
 	public:
@@ -41,16 +44,20 @@ namespace ot {
 
 		// Setter/Getter
 
-		//! @brief Apply settings from the provided configuration
-		//! @param _config Configuration
+		//! @brief Apply settings from the provided configuration.
+		//! @param _config Configuration.
 		virtual bool setupFromConfig(WidgetViewCfg* _config);
 
 		void setViewData(const WidgetViewBase& _data);
 		WidgetViewBase& viewData(void) { return m_data; };
 		const WidgetViewBase& viewData(void) const { return m_data; };
 
-		//! @brief Returns the dock widget that belongs to this widget view
+		//! @brief Returns the dock widget that belongs to this widget view.
 		ads::CDockWidget* getViewDockWidget(void) const { return m_dockWidget; };
+
+		//! @brief Returns the dock widget toggle visibility action.
+		//! Returns 0 if no widget view is set
+		QAction* getViewToggleAction(void) const;
 
 		//! @brief Protected views wont be removed from the widget view manager when calling remove view.
 		void setViewIsProtected(bool _protected = true) { m_isProtected = _protected; };
