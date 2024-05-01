@@ -5,10 +5,11 @@
 
 #pragma once
 
+// API header
+#include "OToolkitAPI/Tool.h"
+
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-
-namespace otoolkit { class Tool; };
 
 class ToolRuntimeHandler {
 	OT_DECL_NOCOPY(ToolRuntimeHandler)

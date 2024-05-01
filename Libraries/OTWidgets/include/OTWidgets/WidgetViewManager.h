@@ -10,6 +10,10 @@
 #include "OTCore/BasicServiceInformation.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
+// Qt ADS header
+#include <ads/DockWidget.h>
+#include <ads/DockManager.h>
+
 // Qt header
 #include <QtCore/qobject.h>
 #include <QtCore/qbytearray.h>
@@ -21,8 +25,6 @@
 class QAction;
 
 namespace ads {
-	class CDockManager;
-	class CDockWidget;
 	class CDockAreaWidget;
 }
 

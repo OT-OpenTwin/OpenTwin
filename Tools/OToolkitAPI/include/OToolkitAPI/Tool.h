@@ -11,6 +11,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
+#include "OTWidgets/WidgetView.h"
 
 // Qt header
 #include <QtCore/qlist.h>
@@ -60,6 +61,13 @@ namespace otoolkit {
 		virtual void toolWasShown(void) {};
 
 		virtual void toolWasHidden(void) {};
+
+	protected:
+		ot::WidgetView* createCentralWidgetView(QWidget* _widget, const QString& _widgetName) const;
+		ot::WidgetView* createSideWidgetView(QWidget* _widget, const QString& _widgetName) const;
+
+	private:
+		ot::WidgetView* createWidgetView(QWidget* _widget, const QString& _widgetName) const;
 	};
 
 }

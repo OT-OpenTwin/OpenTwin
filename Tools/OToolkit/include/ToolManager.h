@@ -19,8 +19,6 @@
 // std header
 #include <map>
 
-class TabManager;
-class DockManager;
 class MenuManager;
 class StatusManager;
 class ToolBarManager;
@@ -60,8 +58,6 @@ public:
 
 	void stopTool(const QString& _toolName);
 
-	TabManager* tabManager(void) { return m_tabManager; };
-	DockManager* dockManager(void) { return m_dockManager; };
 	MenuManager* menuManager(void) { return m_menuManager; };
 	StatusManager* statusManager(void) { return m_statusManager; };
 	ToolBarManager* toolBarManager(void) { return m_toolBarManager; };
@@ -76,8 +72,6 @@ private:
 	std::map<QString, ToolRuntimeHandler*> m_tools;
 	
 	bool m_ignoreEvents;
-	TabManager* m_tabManager;
-	DockManager* m_dockManager;
 	MenuManager* m_menuManager;
 	StatusManager* m_statusManager;
 	ToolBarManager* m_toolBarManager;

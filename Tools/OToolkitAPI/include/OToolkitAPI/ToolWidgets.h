@@ -17,6 +17,8 @@
 
 class QWidget;
 
+namespace ot { class WidgetView; };
+
 namespace otoolkit {
 
 	class OTOOLKITAPI_EXPORT ToolWidgets { 
@@ -27,8 +29,9 @@ namespace otoolkit {
 
 		ToolWidgets& operator = (const ToolWidgets& _other);
 
-		void setRootWidget(QWidget* _widget) { m_widget = _widget; };
-		QWidget* rootWidget(void) const { return m_widget; };
+		void addView(ot::WidgetView* _view) { m_views.push_back(_view); };
+		void setViews(const std::list<ot::WidgetView*>& _views) { m_views = _views; };
+		const std::list<ot::WidgetView*>& views(void) const { return m_views; };
 
 		void addStatusWidget(QWidget* _widget) { m_statusWidgets.push_back(_widget); };
 		void setStatusWidgets(const std::list<QWidget*>& _statusWidgets) { m_statusWidgets = _statusWidgets; };
@@ -38,8 +41,8 @@ namespace otoolkit {
 		QToolBar* toolBar(void) const { return m_toolBar; };
 		
 	private:
-		QWidget* m_widget;
 		QToolBar* m_toolBar;
+		std::list<ot::WidgetView*> m_views;
 		std::list<QWidget*> m_statusWidgets;
 	};
 

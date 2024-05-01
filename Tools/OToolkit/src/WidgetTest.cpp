@@ -45,7 +45,10 @@ private:
 
 bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	using namespace ot;
+	
 	Splitter* root = new Splitter;
+	ot::WidgetView* r = this->createCentralWidgetView(root, "Test");
+	_content.addView(r);
 
 	TreeWidgetFilter* tree = new TreeWidgetFilter;
 	tree->treeWidget()->setAlternatingRowColors(true);
@@ -65,14 +68,10 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		tree->treeWidget()->addItem(TreeWidgetItemInfo(itm2));
 	}
 
-	
-
 	QTableWidget* table = new QTableWidget(3, 2);
 	table->setVerticalHeaderLabels({"R1", "R2", "R3"});
 	table->setHorizontalHeaderLabels({"A", "B"});
 	root->addWidget(table);
-
-	_content.setRootWidget(root);
 
 	TestToolBar* test = new TestToolBar(this);
 	QAction* testAction = test->addAction("Test");

@@ -22,6 +22,7 @@
 #include "OTWidgets/ImagePreview.h"
 #include "OTWidgets/ColorStyleTypes.h"
 #include "OTWidgets/ColorPickButton.h"
+#include "OTWidgets/BasicWidgetView.h"
 #include "OTWidgets/GlobalColorStyle.h"
 
 // Qt header
@@ -150,7 +151,8 @@ bool ImageEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	
 	// Create layouts
 	Splitter* rootSplitter = new Splitter;
-	m_root = rootSplitter;
+	m_root = this->createCentralWidgetView(rootSplitter, "Image Editor");
+	_content.addView(m_root);
 
 	QWidget* lLayW = new QWidget;
 	QVBoxLayout* lLay = new QVBoxLayout(lLayW);
@@ -215,7 +217,6 @@ bool ImageEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 	this->connect(m_original, &ImagePreview::imagePixedClicked, this, &ImageEditor::slotOriginClicked);
 	
-	_content.setRootWidget(rootSplitter);
 	_content.setToolBar(m_toolBar);
 	return true;
 }
@@ -242,7 +243,7 @@ void ImageEditor::slotOriginClicked(const QPoint& _px) {
 void ImageEditor::slotImport(void) {
 	auto settings = otoolkit::api::getGlobalInterface()->createSettingsInstance();
 
-	m_currentFileName = QFileDialog::getOpenFileName(m_root, "Open Image", settings->value("ImageEditor.LastImportFile", QString()).toString(), "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tiff)");
+	m_currentFileName = QFileDialog::getOpenFileName(m_root->getViewWidget(), "Open Image", settings->value("ImageEditor.LastImportFile", QString()).toString(), "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tiff)");
 	if (m_currentFileName.isEmpty()) return;
 
 	settings->setValue("ImageEditor.LastImportFile", m_currentFileName);
@@ -336,7 +337,7 @@ void ImageEditor::slotExport(void) {
 		return;
 	}
 
-	QString fileName = QFileDialog::getSaveFileName(m_root, "Save Image", m_currentFileName, "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tiff)");
+	QString fileName = QFileDialog::getSaveFileName(m_root->getViewWidget(), "Save Image", m_currentFileName, "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tiff)");
 	if (fileName.isEmpty()) return;
 
 	m_converted->image().save(fileName);

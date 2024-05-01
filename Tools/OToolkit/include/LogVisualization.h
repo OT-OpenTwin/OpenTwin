@@ -102,7 +102,7 @@ private:
 	//bool                        m_isConnected;
 
 	QTimer *					m_filterTimer;
-
+	ot::WidgetView*             m_root;
 	QCheckBox *					m_msgTypeFilterDetailed;
 	QCheckBox *					m_msgTypeFilterInfo;
 	QCheckBox *					m_msgTypeFilterWarning;

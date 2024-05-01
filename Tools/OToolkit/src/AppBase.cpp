@@ -7,10 +7,8 @@
 #include "FAR.h"
 #include "AppBase.h"
 #include "Terminal.h"
-#include "TabManager.h"
 #include "Randomizer.h"
 #include "ToolManager.h"
-#include "DockManager.h"
 #include "MenuManager.h"
 #include "ImageEditor.h"
 #include "StatusManager.h"
@@ -26,6 +24,8 @@
 #include "OTCore/JSON.h"
 #include "OTCommunication/actionTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/PlainTextEditView.h"
 
 // Qt header
 #include <QtCore/qdatetime.h>
@@ -37,10 +37,6 @@
 #include <QtWidgets/qtextedit.h>
 #include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qmessagebox.h>
-
-#define APPBASE_LOG(___msg) OTOOLKIT_LOG("OToolkit", ___msg)
-#define APPBASE_LOGW(___msg) OTOOLKIT_LOGW("OToolkit", ___msg)
-#define APPBASE_LOGE(___msg) OTOOLKIT_LOGE("OToolkit", ___msg)
 
 enum InternLogType {
 	InternInfo,
@@ -168,6 +164,7 @@ void AppBase::closeEvent(QCloseEvent * _event) {
 	settings->setValue("PosX", pos().x());
 	settings->setValue("PosY", pos().y());
 	settings->setValue("WindowState", saveState());
+	settings->setValue("ViewState", QByteArray::fromStdString(ot::WidgetViewManager::instance().saveState()));
 
 	// Clear tools
 	m_toolManager->stopAll();
@@ -183,7 +180,7 @@ void AppBase::closeEvent(QCloseEvent * _event) {
 
 void AppBase::setUrl(const QString& _url) {
 	m_url = _url;
-	APPBASE_LOG("OToolkit url set to: " + m_url);
+	OT_LOG_D("OToolkit url set to: " + m_url.toStdString());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -253,7 +250,7 @@ void AppBase::slotLogMessage(const QString& _sender, const QString& _message) {
 
 	cursor.insertText(_message);
 	m_output->setTextCursor(cursor);
-	m_output->append("");
+	m_output->appendPlainText("");
 	m_logMutex.unlock();
 }
 
@@ -293,7 +290,7 @@ void AppBase::slotLogWarning(const QString& _sender, const QString& _message) {
 
 	cursor.insertText(_message);
 	m_output->setTextCursor(cursor);
-	m_output->append("");
+	m_output->appendPlainText("");
 	m_logMutex.unlock();
 }
 
@@ -333,7 +330,7 @@ void AppBase::slotLogError(const QString& _sender, const QString& _message) {
 
 	cursor.insertText(_message);
 	m_output->setTextCursor(cursor);
-	m_output->append("");
+	m_output->appendPlainText("");
 	m_logMutex.unlock();
 }
 
@@ -366,20 +363,19 @@ void AppBase::slotInitializeTools(void) {
 		m_toolManager->addTool(new WidgetTest);
 	}
 
-	//m_tabWidget->addTab(m_logger->widget(), "Log Visualization");
-	//m_tabWidget->addTab(m_terminal->widget(), "OTerminal");
-	//m_tabWidget->addTab(m_textFinder->widget(), "Text Finder");
+	OT_LOG_I("Welcome to OToolkit (Build: " __DATE__ " " __TIME__ ")");
 
-	// Setup menu
-	//m_logger->createMenuBarEntries(m_menuBar);
-	//m_terminal->createMenuBarEntries(m_menuBar);
-
-	APPBASE_LOG("Welcome to OToolkit (Build: " __DATE__ " " __TIME__ ")");
+	QMetaObject::invokeMethod(this, &AppBase::slotFinalizeInit, Qt::QueuedConnection);
 }
 
 void AppBase::slotRecenter(void) {
 	this->move(0, 0);
 	this->resize(800, 600);
+}
+
+void AppBase::slotFinalizeInit(void) {
+	ot::WidgetViewManager::instance().restoreState(this->createSettingsInstance()->value("ViewState", QByteArray()).toByteArray().toStdString());
+	this->setEnabled(true);
 }
 
 void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
@@ -393,16 +389,16 @@ AppBase::AppBase(QApplication* _app) : m_mainThread(QThread::currentThreadId()),
 	// Initialize Toolkit API
 	otoolkit::api::initialize(this);
 
+	ot::WidgetViewManager::instance().initialize();
+
 	// Create tool manager
 	m_toolManager = new ToolManager(this);
 	this->setMenuBar(m_toolManager->menuManager());
 	this->setStatusBar(m_toolManager->statusManager());
 	
 	// Create output
-	m_output = new QTextEdit;
-	QDockWidget* outputDock = new QDockWidget("Output");
-	
-	outputDock->setObjectName("OToolkit_Dock_Output");
+	m_output = new ot::PlainTextEditView;
+	m_output->setViewData(ot::WidgetViewBase("Output", "Output", ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewFlag::ViewIsSide));
 	m_output->setObjectName("OToolkit_Output");
 	m_output->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
@@ -411,18 +407,18 @@ AppBase::AppBase(QApplication* _app) : m_mainThread(QThread::currentThreadId()),
 	m_output->setFont(f);
 	m_output->setReadOnly(true);
 
-	this->setCentralWidget(m_toolManager->tabManager());
+	this->setCentralWidget(ot::WidgetViewManager::instance().getDockManager());
 	this->setWindowTitle("OToolkit");
 	this->setWindowIcon(QIcon(":/images/OToolkit.png"));
 
-	outputDock->setWidget(m_output);
-	m_toolManager->dockManager()->add("", outputDock, Qt::BottomDockWidgetArea);
+	ot::WidgetViewManager::instance().addView(ot::BasicServiceInformation(), m_output);
 
 	// Setup global shortcuts
 	m_recenterShortcut = new QShortcut(QKeySequence("F11"), this, nullptr, nullptr, Qt::WindowShortcut);
 
 	// Restore settings
 	this->setObjectName("OToolkit_MainWindow");
+	this->setEnabled(false);
 
 	otoolkit::SettingsRef settings = this->createSettingsInstance();
 	bool isMax = settings->value("IsMaximized", false).toBool();

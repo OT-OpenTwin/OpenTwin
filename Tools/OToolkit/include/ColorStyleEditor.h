@@ -72,7 +72,7 @@ private Q_SLOTS:
 
 private:
 	QString m_lastBaseFile;
-	QWidget* m_root;
+	ot::WidgetView* m_root;
 	ot::PropertyGrid* m_propertyGrid;
 	ot::TabWidget* m_editorTab;
 	ot::TextEditor* m_baseEditor;

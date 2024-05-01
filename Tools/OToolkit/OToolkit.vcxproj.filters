@@ -72,9 +72,6 @@
     <ClCompile Include="src\ToolManager.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\DockManager.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\MenuManager.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
@@ -82,9 +79,6 @@
       <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="src\ToolRuntimeHandler.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TabManager.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="src\FAR.cpp">
@@ -109,9 +103,6 @@
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
       <Filter>Header Files\MovingOut</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DockManager.h">
-      <Filter>Header Files\General</Filter>
     </ClInclude>
     <ClInclude Include="include\ToolRuntimeHandler.h">
       <Filter>Header Files\General</Filter>
@@ -146,9 +137,6 @@
       <Filter>Header Files\General</Filter>
     </QtMoc>
     <QtMoc Include="include\ToolMenuManager.h">
-      <Filter>Header Files\General</Filter>
-    </QtMoc>
-    <QtMoc Include="include\TabManager.h">
       <Filter>Header Files\General</Filter>
     </QtMoc>
     <QtMoc Include="include\FAR.h">

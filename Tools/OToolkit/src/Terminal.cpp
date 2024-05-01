@@ -391,10 +391,9 @@ bool Terminal::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	TERMINAL_LOG("Initializing OTerminal...");
 
 	// Create layouts
-	m_splitter = new ot::Splitter;
-	_content.setRootWidget(m_splitter);
-
-	m_splitter->setObjectName("OToolkit_Terminal_MainSplitter");
+	ot::Splitter* spl = new ot::Splitter;
+	m_root = this->createCentralWidgetView(spl, "Terminal");
+	_content.addView(m_root);
 
 	m_leftLayoutW = new QWidget;
 	m_leftLayout = new QVBoxLayout(m_leftLayoutW);
@@ -463,8 +462,8 @@ bool Terminal::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	m_btnSend->setMinimumWidth(50);
 
 	// Setup layouts
-	m_splitter->addWidget(m_leftLayoutW);
-	m_splitter->addWidget(m_rightLayoutW);
+	spl->addWidget(m_leftLayoutW);
+	spl->addWidget(m_rightLayoutW);
 
 	m_leftLayout->addLayout(m_buttonLayout);
 	m_leftLayout->addLayout(m_navigationLayout, 1);
@@ -502,11 +501,11 @@ bool Terminal::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	m_responseLayout->addWidget(m_responseLength, 0);
 
 	// Create shortcuts
-	m_shortcutSave = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Save), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
-	m_shortcutSend = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Send), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
-	m_shortcutRename = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Rename), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
-	m_shortcutDelete = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Delete), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
-	m_shortcutClone = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Clone), m_splitter, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
+	m_shortcutSave = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Save), spl, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
+	m_shortcutSend = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Send), spl, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
+	m_shortcutRename = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Rename), spl, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
+	m_shortcutDelete = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Delete), spl, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
+	m_shortcutClone = new QShortcut(QKeySequence(TERMINAL_KEYSEQ_Clone), spl, nullptr, nullptr, Qt::WidgetWithChildrenShortcut);
 
 	// Setup navigation
 	m_requestsRootFilter = new TerminalCollectionFilter(this, "Requests");
@@ -915,7 +914,7 @@ void Terminal::initializeDefaultServices(void) {
 
 void Terminal::setWaitingMode(bool _isWaiting) {
 	m_btnSend->setEnabled(!_isWaiting);
-	m_splitter->setEnabled(!_isWaiting);
+	m_root->getViewWidget()->setEnabled(!_isWaiting);
 	m_progressBar->setRange(0, (_isWaiting ? 0 : 1));
 }
 
@@ -1155,7 +1154,7 @@ void Terminal::exportToFile(TerminalCollectionFilter* _filter) {
 	docObj[OT_JSON_COLLECTION_Data] = rootObject;
 
 	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
-	QString fn = QFileDialog::getSaveFileName(m_splitter, "Export OTerminal Collection", settings->value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
+	QString fn = QFileDialog::getSaveFileName(m_root->getViewWidget(), "Export OTerminal Collection", settings->value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
 	if (fn.isEmpty()) {
 		return;
 	}
@@ -1175,7 +1174,7 @@ void Terminal::exportToFile(TerminalCollectionFilter* _filter) {
 
 void Terminal::importFromFile(TerminalCollectionFilter* _filter) {
 	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
-	QString fn = QFileDialog::getOpenFileName(m_splitter, "Import OTerminal Collection", settings->value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
+	QString fn = QFileDialog::getOpenFileName(m_root->getViewWidget(), "Import OTerminal Collection", settings->value("Terminal.LastCollection", "").toString(), "OTerminal Collection (*.oterm.json)");
 	if (fn.isEmpty()) return;
 
 	QFile f(fn);

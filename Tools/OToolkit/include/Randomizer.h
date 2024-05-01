@@ -32,6 +32,8 @@ class QPushButton;
 class QRadioButton;
 class QPlainTextEdit;
 
+namespace ot { class BasicWidgetView; };
+
 class Randomizer : public QObject, public otoolkit::Tool {
 	Q_OBJECT
 public:
@@ -64,7 +66,7 @@ private Q_SLOTS:
 
 private:
 	
-	QWidget* m_root;
+	ot::WidgetView* m_root;
 	QVBoxLayout* m_rootLayout;
 	QLabel* m_leftTitle;
 

@@ -7,8 +7,6 @@
 
 // OToolkit header
 #include "ToolManager.h"
-#include "TabManager.h"
-#include "DockManager.h"
 #include "MenuManager.h"
 #include "StatusManager.h"
 #include "ToolBarManager.h"
@@ -21,21 +19,16 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-
-#define TOOLMANAGER_LOG(___msg) OTOOLKIT_LOG("ToolManager", ___msg)
-#define TOOLMANAGER_LOGW(___msg) OTOOLKIT_LOGW("ToolManager", ___msg)
-#define TOOLMANAGER_LOGE(___msg) OTOOLKIT_LOGE("ToolManager", ___msg)
+#include "OTWidgets/WidgetViewManager.h"
 
 ToolManager::ToolManager(QMainWindow* _mainWindow)
 	: m_ignoreEvents(false)
 {
-	m_tabManager = new TabManager;
 	m_menuManager = new MenuManager;
 	m_statusManager = new StatusManager;
-	m_dockManager = new DockManager(_mainWindow, m_menuManager);
 	m_toolBarManager = new ToolBarManager(_mainWindow);
 
-	this->connect(m_tabManager, &TabManager::currentToolChanged, this, &ToolManager::currentToolChanged);
+	//this->connect(m_tabManager, &TabManager::currentToolChanged, this, &ToolManager::currentToolChanged);
 }
 
 ToolManager::~ToolManager() {
@@ -49,7 +42,7 @@ ToolManager::~ToolManager() {
 bool ToolManager::addTool(otoolkit::Tool* _tool) {
 	otoolkit::Tool* t = this->findTool(_tool->toolName());
 	if (t != nullptr) {
-		TOOLMANAGER_LOGW("Tool already exists");
+		OT_LOG_W("Tool already exists: \"" + _tool->toolName().toStdString() + "\"");
 		return false;
 	}
 	m_tools.insert_or_assign(_tool->toolName(), new ToolRuntimeHandler(_tool));
@@ -72,7 +65,7 @@ otoolkit::Tool* ToolManager::findTool(const QString& _toolName) {
 void ToolManager::removeTool(const QString& _toolName) {
 	otoolkit::Tool* tool = this->findTool(_toolName);
 	if (tool == nullptr) {
-		TOOLMANAGER_LOGE("Tool not found { \"Name\": \"" + _toolName + "\" }");
+		OT_LOG_E("Tool not found { \"Name\": \"" + _toolName.toStdString() + "\" }");
 		return;
 	}
 	this->removeTool(tool);
@@ -85,7 +78,7 @@ void ToolManager::removeTool(otoolkit::Tool* _tool) {
 	// Remove from list
 	auto it = m_tools.find(toolName);
 	if (it == m_tools.end()) {
-		TOOLMANAGER_LOGW("Tool not found { \"Name\": \"" + toolName + "\" }");
+		OT_LOG_W("Tool not found { \"Name\": \"" + toolName.toStdString() + "\" }");
 		return;
 	}
 	m_tools.erase(it);
@@ -117,7 +110,7 @@ void ToolManager::stopAll(void) {
 void ToolManager::stopTool(const QString& _toolName) {
 	auto it = m_tools.find(_toolName);
 	if (it == m_tools.end()) {
-		TOOLMANAGER_LOGW("Tool not found { \"Name\": \"" + _toolName + "\" }");
+		OT_LOG_W("Tool not found { \"Name\": \"" + _toolName.toStdString() + "\" }");
 		return;
 	}
 
@@ -135,13 +128,13 @@ void ToolManager::stopTool(const QString& _toolName) {
 void ToolManager::runToolTriggered(void) {
 	ToolMenuManager* tmm = dynamic_cast<ToolMenuManager*>(sender());
 	if (tmm == nullptr) {
-		TOOLMANAGER_LOGE("Invalid sender");
+		OT_LOG_E("Invalid sender");
 		return;
 	}
 
 	auto it = m_tools.find(tmm->toolName());
 	if (it == m_tools.end()) {
-		TOOLMANAGER_LOGE("Tool not found { \"ToolName\": \"" + tmm->toolName() + "\" }");
+		OT_LOG_E("Tool not found { \"ToolName\": \"" + tmm->toolName().toStdString() + "\" }");
 		return;
 	}
 
@@ -163,12 +156,11 @@ void ToolManager::runToolTriggered(void) {
 			OT_LOG_W("Tool \"" + it->first.toStdString() + "\" statup failed");
 			return;
 		}
-		if (!data.rootWidget()) {
-			OT_LOG_E("Tool \"" + it->first.toStdString() + "\" did not create a root widget");
-			return;
+		
+		for (ot::WidgetView* view : data.views()) {
+			ot::WidgetViewManager::instance().addView(ot::BasicServiceInformation(it->second->tool()->toolName().toStdString()), view);
 		}
 
-		m_tabManager->addTool(it->first, data.rootWidget());
 		it->second->setRunning();
 
 		m_statusManager->addTool(it->first, data.statusWidgets());
@@ -190,7 +182,8 @@ void ToolManager::currentToolChanged(const QString& _toolName) {
 // Private
 
 void ToolManager::fwdRemoveTool(const QString& _toolName) {
-	m_dockManager->removeTool(_toolName);
+	ot::WidgetViewManager::instance().closeViews(ot::BasicServiceInformation(_toolName.toStdString()));
+
 	m_statusManager->removeTool(_toolName);
 	m_toolBarManager->removeTool(_toolName);
 }

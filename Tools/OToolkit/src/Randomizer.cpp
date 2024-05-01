@@ -55,10 +55,11 @@ Randomizer::~Randomizer() {
 
 bool Randomizer::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	// Root
-	m_root = new QWidget;
-	_content.setRootWidget(m_root);
+	QWidget* rootW = new QWidget;
+	m_root = this->createCentralWidgetView(rootW, "Randomizer");
+	_content.addView(m_root);
 
-	m_rootLayout = new QVBoxLayout(m_root);
+	m_rootLayout = new QVBoxLayout(rootW);
 	m_leftTitle = new QLabel("Randomizer type");
 
 	m_rootLayout->addWidget(m_leftTitle);
@@ -298,7 +299,7 @@ void Randomizer::slotRunList(void) {
 }
 
 void Randomizer::slotAddList(void) {
-	RandomizerDialog dia(this, m_root);
+	RandomizerDialog dia(this, m_root->getViewWidget());
 	if (dia.exec() == 1) {
 		QPlainTextEdit* newEdit = new QPlainTextEdit;
 		m_listTabs->addTab(newEdit, dia.currentName());

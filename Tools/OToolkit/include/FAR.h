@@ -251,14 +251,12 @@ private:
 
 	void saveFilterGroup(const FilterGroup& _group, const QString& _settingsKey, QSettings& _settings);
 
-	ot::Splitter* m_centralSplitter;
+	ot::WidgetView* m_root;
 
 	QWidget* m_leftGridW;
 	QGridLayout* m_leftGrid;
 	
 	QLabel* m_leftTitle;
-
-	
 
 	FilterGroup m_whitelistFiles;
 	FilterGroup m_blacklistFiles;

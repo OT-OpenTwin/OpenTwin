@@ -224,7 +224,7 @@ private:
 
 	// Layouts
 
-	ot::Splitter*		m_splitter;
+	ot::WidgetView*     m_root;
 
 	QWidget *			m_leftLayoutW;
 	QVBoxLayout *		m_leftLayout;

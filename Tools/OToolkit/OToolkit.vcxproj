@@ -23,7 +23,6 @@
     <ClCompile Include="src\ColorStyleEditor.cpp" />
     <ClCompile Include="src\ConnectToLoggerDialog.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
-    <ClCompile Include="src\DockManager.cpp" />
     <ClCompile Include="src\FAR.cpp" />
     <ClCompile Include="src\ImageEditor.cpp" />
     <ClCompile Include="src\JSONEditor.cpp" />
@@ -31,7 +30,6 @@
     <ClCompile Include="src\MenuManager.cpp" />
     <ClCompile Include="src\Randomizer.cpp" />
     <ClCompile Include="src\StatusManager.cpp" />
-    <ClCompile Include="src\TabManager.cpp" />
     <ClCompile Include="src\Terminal.cpp" />
     <ClCompile Include="src\ToolBarManager.cpp" />
     <ClCompile Include="src\ToolManager.cpp" />
@@ -51,8 +49,6 @@
   <ItemGroup>
     <ClInclude Include="include\WidgetTest.h" />
     <QtMoc Include="include\ColorStyleEditor.h" />
-    <ClInclude Include="include\DockManager.h" />
-    <QtMoc Include="include\TabManager.h" />
     <QtMoc Include="include\ToolMenuManager.h" />
     <QtMoc Include="include\FAR.h" />
     <QtMoc Include="include\Randomizer.h" />

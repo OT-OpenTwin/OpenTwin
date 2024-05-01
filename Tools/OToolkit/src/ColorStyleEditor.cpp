@@ -27,11 +27,11 @@
 #include "OTWidgets/SpinBox.h"
 #include "OTWidgets/Splitter.h"
 #include "OTWidgets/TabWidget.h"
+#include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/DoubleSpinBox.h"
-#include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/ColorStyleTypes.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyInputInt.h"
@@ -123,7 +123,9 @@ ColorStyleEditor::~ColorStyleEditor() {
 bool ColorStyleEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	// Create layouts
 	ot::Splitter* rootSplitter = new ot::Splitter;
-	m_root = rootSplitter;
+	m_root = this->createCentralWidgetView(rootSplitter, "ColorStyle Editor");
+	_content.addView(m_root);
+
 	QWidget* rLayW = new QWidget;
 	QVBoxLayout* rLay = new QVBoxLayout(rLayW);
 
@@ -230,7 +232,6 @@ bool ColorStyleEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content
 	this->connect(m_baseEditor, &TextEditor::saveRequested, this, &ColorStyleEditor::slotExportBase);
 	this->connect(m_baseEditor, &TextEditor::textChanged, this, &ColorStyleEditor::slotBaseChanged);
 	
-	_content.setRootWidget(rootSplitter);
 	return true;
 }
 

@@ -9,6 +9,7 @@
 
 // OpenTwin header
 #include "OTWidgets/Splitter.h"
+#include "OTWidgets/BasicWidgetView.h"
 
 // Qt header
 #include <QtCore/qdir.h>
@@ -471,7 +472,9 @@ QString FAR::toolName(void) const {
 }
 
 bool FAR::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
-	m_centralSplitter = new ot::Splitter;
+	ot::Splitter* centralSplitter = new ot::Splitter;
+	m_root = this->createCentralWidgetView(centralSplitter, "FAR");
+	_content.addView(m_root);
 	// Filter
 
 	m_leftGridW = new QWidget;
@@ -515,7 +518,7 @@ bool FAR::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 	m_leftGrid->setColumnStretch(1, 1);
 
-	m_centralSplitter->addWidget(leftGridScrollArea);
+	centralSplitter->addWidget(leftGridScrollArea);
 
 	// Find mode
 	m_rightLayoutW = new QWidget;
@@ -536,7 +539,7 @@ bool FAR::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	m_rightLayout->addLayout(m_rightTopLayout);
 	m_rightLayout->addWidget(m_findModeTab, 1);
 
-	m_centralSplitter->addWidget(m_rightLayoutW);
+	centralSplitter->addWidget(m_rightLayoutW);
 
 	this->connect(m_browseRootDir, &QPushButton::clicked, this, &FAR::slotBrowseRoot);
 
@@ -602,7 +605,6 @@ bool FAR::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	this->connect(m_replaceTextBtn, &QPushButton::clicked, this, &FAR::slotReplaceText);
 	m_findModeTab->addTab(m_replaceTextLayoutW, FAR_SEARCHMODE_ReplaceText);
 
-	_content.setRootWidget(m_centralSplitter);
 	return true;
 }
 
@@ -649,7 +651,7 @@ bool FAR::prepareToolShutdown(QSettings& _settings) {
 }
 
 void FAR::slotBrowseRoot(void) {
-	m_rootDir->setText(QFileDialog::getExistingDirectory(m_centralSplitter, "Select root browse directory", m_rootDir->text(), QFileDialog::ShowDirsOnly));
+	m_rootDir->setText(QFileDialog::getExistingDirectory(m_root->getViewWidget(), "Select root browse directory", m_rootDir->text(), QFileDialog::ShowDirsOnly));
 }
 
 void FAR::slotFindText(void) {
@@ -683,11 +685,11 @@ void FAR::slotReplaceText(void) {
 }
 
 void FAR::slotLock(void) {
-	m_centralSplitter->setEnabled(false);
+	m_root->getViewWidget()->setEnabled(false);
 }
 
 void FAR::slotUnlock(void) {
-	m_centralSplitter->setEnabled(true);
+	m_root->getViewWidget()->setEnabled(true);
 }
 
 void FAR::setupFilter(FARFilter& _filter) const {

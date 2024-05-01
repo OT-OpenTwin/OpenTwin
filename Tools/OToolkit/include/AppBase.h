@@ -25,10 +25,11 @@ class LogVisualization;
 class Terminal;
 
 class QTabWidget;
-class QTextEdit;
 class QAction;
 class QApplication;
 class QShortcut;
+
+namespace ot { class PlainTextEditView; }
 
 class AppBase : public QMainWindow, public otoolkit::APIInterface, public ot::AbstractLogNotifier {
 	Q_OBJECT
@@ -91,21 +92,22 @@ private Q_SLOTS:
 	void slotInitialize(void);
 	void slotInitializeTools(void);
 	void slotRecenter(void);
+	void slotFinalizeInit(void);
 	void slotColorStyleChanged(const ot::ColorStyle& _style);
 
 private:
 	AppBase(QApplication* _app = (QApplication*)nullptr);
 	
-	Qt::HANDLE			m_mainThread;
+	Qt::HANDLE				m_mainThread;
 
-	QString				m_url;
+	QString					m_url;
 
-	ToolManager*        m_toolManager;
+	ToolManager*			m_toolManager;
 	
-	LogVisualization *	m_logger;
+	LogVisualization *		m_logger;
 	
-	QTextEdit *			m_output;
-	QApplication*		m_app;
+	ot::PlainTextEditView*	m_output;
+	QApplication*			m_app;
 
 	QShortcut* m_recenterShortcut;
 

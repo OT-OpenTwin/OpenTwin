@@ -112,9 +112,10 @@ bool LogVisualization::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content
 	QVBoxLayout* filterByServiceLayout = new QVBoxLayout(filterByServiceBox);
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
-	// Create controls
+	// Create controls	
 	ot::Splitter* splitter = new ot::Splitter;
-	_content.setRootWidget(splitter);
+	m_root = this->createCentralWidgetView(splitter, "Log Visualization");
+	_content.addView(m_root);
 
 	splitter->setOrientation(Qt::Orientation::Vertical);
 

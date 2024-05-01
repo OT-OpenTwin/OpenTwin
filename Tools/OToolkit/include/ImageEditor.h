@@ -100,7 +100,7 @@ private Q_SLOTS:
 
 private:
 	QString m_currentFileName;
-	QWidget* m_root;
+	ot::WidgetView* m_root;
 	ImageEditorToolBar* m_toolBar;
 	ot::ImagePreview* m_original;
 	ot::ImagePreview* m_converted;
