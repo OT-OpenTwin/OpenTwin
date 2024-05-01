@@ -54,7 +54,7 @@ void ot::GraphicsScene::drawBackground(QPainter* _painter, const QRectF& _rect)
 	pen.setWidthF(scaledLineWidth);
 
 	QPen penWide = pen;
-	pen.setWidthF(scaledLineWidth * 3.);
+	penWide.setWidthF(scaledLineWidth * 3.);
 
 	QPen penCenter = penWide;
 	penCenter.setWidthF(scaledLineWidth * 5.);
