@@ -132,16 +132,19 @@ namespace ot {
 		//! @brief Return the dock toggle action
 		QAction* getDockToggleAction(void) const { return m_dockToggleRoot; };
 
-		WidgetView* lastFocusedView(void) const;
-		WidgetView* lastFocusedSideView(void) const;
-		WidgetView* lastFocusedCentralView(void) const;
+		WidgetView* lastFocusedView(void) const { return m_focusInfo.last; };
+		WidgetView* lastFocusedSideView(void) const { return m_focusInfo.lastSide; };
+		WidgetView* lastFocusedToolView(void) const { return m_focusInfo.lastTool; };
+		WidgetView* lastFocusedCentralView(void) const { return m_focusInfo.lastCentral; };
 
 	Q_SIGNALS:
 		void viewFocusLost(WidgetView* _view);
 		void viewFocused(WidgetView* _view);
+		void viewCloseRequested(WidgetView* _view);
 
 	private Q_SLOTS:
 		void slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus);
+		void slotViewCloseRequested(void);
 
 	private:
 		WidgetViewManager();
@@ -160,6 +163,7 @@ namespace ot {
 			WidgetView* last;
 			WidgetView* lastCentral;
 			WidgetView* lastSide;
+			WidgetView* lastTool;
 		};
 		FocusInfo        m_focusInfo;
 

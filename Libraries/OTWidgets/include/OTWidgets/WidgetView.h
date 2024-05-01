@@ -49,7 +49,6 @@ namespace ot {
 		virtual bool setupFromConfig(WidgetViewCfg* _config);
 
 		void setViewData(const WidgetViewBase& _data);
-		WidgetViewBase& viewData(void) { return m_data; };
 		const WidgetViewBase& viewData(void) const { return m_data; };
 
 		//! @brief Returns the dock widget that belongs to this widget view.

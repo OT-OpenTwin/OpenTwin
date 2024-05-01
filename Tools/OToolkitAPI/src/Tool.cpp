@@ -22,8 +22,10 @@ ot::WidgetView* otoolkit::Tool::createCentralWidgetView(QWidget* _widget, const 
 	ot::WidgetView* view = this->createWidgetView(_widget, _widgetName);
 	if (!view) return nullptr;
 	
-	view->viewData().setFlag(ot::WidgetViewBase::ViewIsCentral);
-	
+	ot::WidgetViewBase vd = view->viewData();
+	vd.setFlag(ot::WidgetViewBase::ViewIsCentral);
+	view->setViewData(vd);
+
 	return view;
 }
 
@@ -31,8 +33,22 @@ ot::WidgetView* otoolkit::Tool::createSideWidgetView(QWidget* _widget, const QSt
 	ot::WidgetView* view = this->createWidgetView(_widget, _widgetName);
 	if (!view) return nullptr;
 
-	view->viewData().setFlag(ot::WidgetViewBase::ViewIsSide);
+	ot::WidgetViewBase vd = view->viewData();
+	vd.setFlag(ot::WidgetViewBase::ViewIsSide);
+	view->setViewData(vd);
 	
+	return view;
+}
+
+ot::WidgetView* otoolkit::Tool::createToolWidgetView(QWidget* _widget, const QString& _widgetName) const {
+	ot::WidgetView* view = this->createWidgetView(_widget, _widgetName);
+	if (!view) return nullptr;
+
+	ot::WidgetViewBase vd = view->viewData();
+	vd.setFlag(ot::WidgetViewBase::ViewIsTool);
+	vd.setFlag(ot::WidgetViewBase::ViewIsPinnable);
+	view->setViewData(vd);
+
 	return view;
 }
 

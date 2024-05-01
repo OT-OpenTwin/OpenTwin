@@ -155,11 +155,16 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _viewName) 
 	auto nameIt = m_viewNameMap.find(_viewName);
 	if (nameIt == m_viewNameMap.end()) return nullptr;
 
+	// Get view
 	ot::WidgetView* ret = nameIt->second.second;
+
+	// Disconnect signals
+	this->disconnect(ret->getViewDockWidget(), &ads::CDockWidget::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
 
 	// If the view is the current central, set current central to 0
 	if (nameIt->second.second == m_focusInfo.last) m_focusInfo.last = nullptr;
 	if (nameIt->second.second == m_focusInfo.lastSide) m_focusInfo.lastSide = nullptr;
+	if (nameIt->second.second == m_focusInfo.lastTool) m_focusInfo.lastTool = nullptr;
 	if (nameIt->second.second == m_focusInfo.lastCentral) m_focusInfo.lastCentral = nullptr;
 
 	// Find name list from owner and erase the view entry
@@ -238,18 +243,6 @@ bool ot::WidgetViewManager::viewTitleExists(const QString& _title) const {
 	return false;
 }
 
-ot::WidgetView* ot::WidgetViewManager::lastFocusedView(void) const {
-	return m_focusInfo.last;
-}
-
-ot::WidgetView* ot::WidgetViewManager::lastFocusedSideView(void) const {
-	return m_focusInfo.lastSide;
-}
-
-ot::WidgetView* ot::WidgetViewManager::lastFocusedCentralView(void) const {
-	return m_focusInfo.lastCentral;
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus) {
@@ -264,8 +257,19 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CD
 		m_focusInfo.last = n;
 		if (n->viewData().flags() & WidgetViewBase::ViewIsCentral) m_focusInfo.lastCentral = n;
 		if (n->viewData().flags() & WidgetViewBase::ViewIsSide) m_focusInfo.lastSide = n;
+		if (n->viewData().flags() & WidgetViewBase::ViewIsTool) m_focusInfo.lastTool = n;
 		Q_EMIT viewFocused(n);
 	}
+}
+
+void ot::WidgetViewManager::slotViewCloseRequested(void) {
+	WidgetView* view = this->viewFromDockWidget(dynamic_cast<ads::CDockWidget*>(sender()));
+	if (!view) {
+		OT_LOG_E("View not found");
+		return;
+	}
+
+	Q_EMIT viewCloseRequested(view);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -276,8 +280,9 @@ ot::WidgetViewManager::WidgetViewManager()
 	: m_dockManager(nullptr), m_dockToggleRoot(nullptr)
 {
 	m_focusInfo.last = nullptr;
-	m_focusInfo.lastCentral = nullptr;
 	m_focusInfo.lastSide = nullptr;
+	m_focusInfo.lastTool = nullptr;
+	m_focusInfo.lastCentral = nullptr;
 }
 
 ot::WidgetViewManager::~WidgetViewManager() {
@@ -322,6 +327,9 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	// Update focus information
 	this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
 
+	// Connect signals
+	this->connect(_view->getViewDockWidget(), &ads::CDockWidget::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+
 	return true;
 }
 
@@ -334,11 +342,18 @@ ads::CDockAreaWidget* ot::WidgetViewManager::determineBestParentArea(WidgetView*
 			return m_focusInfo.lastSide->getViewDockWidget()->dockAreaWidget();
 		}
 	}
-	if ((_newView->viewData().flags() & WidgetViewBase::ViewIsCentral) && m_focusInfo.lastCentral) {
+	if (m_focusInfo.lastCentral) {
 		return m_focusInfo.lastCentral->getViewDockWidget()->dockAreaWidget();
 	}
-
-	return nullptr;
+	else if (m_focusInfo.lastSide) {
+		return m_focusInfo.lastSide->getViewDockWidget()->dockAreaWidget();
+	}
+	else if (m_focusInfo.lastTool) {
+		return m_focusInfo.lastTool->getViewDockWidget()->dockAreaWidget();
+	}
+	else {
+		return nullptr;
+	}
 }
 
 std::list<std::string>* ot::WidgetViewManager::findViewNameList(const BasicServiceInformation& _owner) {

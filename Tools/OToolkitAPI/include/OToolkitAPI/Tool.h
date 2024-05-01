@@ -65,6 +65,7 @@ namespace otoolkit {
 	protected:
 		ot::WidgetView* createCentralWidgetView(QWidget* _widget, const QString& _widgetName) const;
 		ot::WidgetView* createSideWidgetView(QWidget* _widget, const QString& _widgetName) const;
+		ot::WidgetView* createToolWidgetView(QWidget* _widget, const QString& _widgetName) const;
 
 	private:
 		ot::WidgetView* createWidgetView(QWidget* _widget, const QString& _widgetName) const;

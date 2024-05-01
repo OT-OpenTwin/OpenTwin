@@ -52,6 +52,9 @@ void ot::WidgetView::setViewData(const WidgetViewBase& _data) {
 	m_data = _data;
 	m_dockWidget->setObjectName(QString::fromStdString(_data.name()));
 	m_dockWidget->toggleViewAction()->setText(QString::fromStdString(_data.title()));
+	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, _data.flags() & WidgetViewBase::ViewIsCloseable);
+	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetPinnable, _data.flags() & WidgetViewBase::ViewIsPinnable);
+
 	this->setViewContentModified(m_isModified);
 }
 

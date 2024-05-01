@@ -410,9 +410,6 @@
     <ClInclude Include="include\OTWidgets\WidgetViewFactory.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetView.h">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
@@ -469,6 +466,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\WidgetProperties.h">
       <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetView.h">
+      <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

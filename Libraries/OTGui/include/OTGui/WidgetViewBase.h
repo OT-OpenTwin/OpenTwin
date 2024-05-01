@@ -19,36 +19,60 @@
 
 namespace ot {
 
+	//! @class WidgetViewBase
+	//! @brief General widget view information class.
+	//! The WidgetViewBase holds the general information of a WidgetView.
 	class OT_GUI_API_EXPORT WidgetViewBase : public ot::Serializable {
 	public:
+		//! @brief ViewFlags are used to describe the view behaviour in the frontend.
 		enum ViewFlag {
-			NoViewFlags = 0x00,
-			ViewIsCloseable = 0x01,
-			ViewIsCentral = 0x10,
-			ViewIsSide = 0x20
+			NoViewFlags              = 0x00, //! @brief Default value (no flags set)
+			ViewIsCloseable          = 0x01, //! @brief If set the view may be closed
+			ViewDefaultCloseHandling = 0x02, //! @brief If set and 'ViewIsCloseable' is set the view will close with the default close behaviour, otherwise a closeRequested signal is emitted.
+			ViewIsPinnable           = 0x04, //! @brief If set the view may be pinned to the auto hide areas.
+			ViewIsCentral            = 0x10, //! @brief If set the view is assumed to be a main view and therefore rather be located in the middle of the screen (Should not be mixed with ViewIsSide or ViewIsTool).
+			ViewIsSide               = 0x20, //! @brief If set the view is assumed to be a main view and therefore rather be located in the middle of the screen (Should not be mixed with ViewIsCentral or ViewIsTool).
+			ViewIsTool               = 0x40  //! @brief If set the view is assumed to be a main view and therefore rather be located in the middle of the screen (Should not be mixed with ViewIsCentral or ViewIsSide).
 		};
-		typedef Flags<ViewFlag> ViewFlags;
+		typedef Flags<ViewFlag> ViewFlags; //! /ref ViewFlag "ViewFlag"
 
+		//! @brief The ViewDockLocation is used to determine the dock location when adding the view to the manager.
 		enum ViewDockLocation {
-			Default,
-			Left,
-			Top,
-			Right,
-			Bottom
+			Default, //! @brief Default (Central) dock location.
+			Left, //! @brief Left dock location.
+			Top, //! @brief Top dock location.
+			Right, //! @brief Right dock location.
+			Bottom //! @brief Bottom dock location.
 		};
 
+		//! @brief Returns a string representation of the provided view flag.
+		//! @param _flag The single view flag to be converted to a string.
 		static std::string toString(ViewFlag _flag);
+
+		//! @brief Returns The view flag represented by the provided string.
+		//! @param _flag The string representing the flag (/ref toString(ViewFlag _flag) "Flag to string").
 		static ViewFlag stringToViewFlag(const std::string& _flag);
+
+		//! @brief Returns a string list contaning a string representation of every set flag in the provided view flags.
+		//! @param _flags The flags to be converted to a string list.
 		static std::list<std::string> toStringList(ViewFlags _flags);
+
+		//! @brief Returns the view flags represented by the provided string list.
+		//! @param _flags The string representations of the set flags (/ref toStringList(ViewFlags _flags) "Flags to string list").
 		static ViewFlags stringListToViewFlags(const std::list<std::string>& _flags);
 
-		static std::string dockLocationToString(ViewDockLocation _dockLocation);
+		//! @brief Returns the string representation of the provided view dock location.
+		//! @param The view dock location to be converted to a string.
+		static std::string toString(ViewDockLocation _dockLocation);
+
+		//! @brief Returns the view dock location represented by the provided string.
+		//! @param _dockLocation The string representing the dock location (/ref toString(ViewDockLocation _dockLocation) "Dock location to string")
 		static ViewDockLocation stringToDockLocation(const std::string& _dockLocation);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		WidgetViewBase();
-		WidgetViewBase(const std::string& _name, ViewFlags _flags = ViewFlags());
+		WidgetViewBase(const std::string& _nameAndTitle, ViewFlags _flags = ViewFlags());
 		WidgetViewBase(const std::string& _name, const std::string& _title, ViewFlags _flags = ViewFlags());
 		WidgetViewBase(const std::string& _name, const std::string& _title, ViewDockLocation _dockLocation, ViewFlags _flags = ViewFlags());
 		WidgetViewBase(const WidgetViewBase& _other);
@@ -74,25 +98,45 @@ namespace ot {
 
 		// Setter/Getter
 
+		//! @brief Set the widget view name.
+		//! @param _name Name to set.
 		void setName(const std::string& _name) { m_name = _name; };
+
+		//! @brief Widget view name.
 		const std::string& name(void) const { return m_name; };
 
+		//! @brief Set the widget view title.
+		//! @note /ref title() "Note title()"
 		void setTitle(const std::string& _title) { m_title = _title; };
+
+		//! @brief Returns the WidgetView title.
+		//! @note Note that in case of an empty title the name will be returned instead.
 		const std::string& title(void) const { return (m_title.empty() ? m_name : m_title); };
 
+		//! @brief Set the widget view flag.
+		//! @param _flag Flag to set.
+		//! @param _active If false the flag will be unset instead.
 		void setFlag(ViewFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+
+		//! @brief Replace the current flags with the flags provided.
 		void setFlags(ViewFlags _flags) { m_flags = _flags; };
+
+		//! @brief Returns the current flags.
 		ViewFlags flags(void) const { return m_flags; };
 
+		//! @brief Set the dock location.
+		//! @param _dockLocation The dock location to set.
 		void setDockLocation(ViewDockLocation _dockLocation) { m_dockLocation = _dockLocation; };
+
+		//! @brief Returns the dock location.
 		ViewDockLocation dockLocation(void) const { return m_dockLocation; };
 
 	private:
-		std::string m_name;
-		std::string m_title;
+		std::string m_name; //! @brief WidgetView name.
+		std::string m_title; //! @brief WidgetView title (if empty the name will be used).
 
-		ViewFlags m_flags;
-		ViewDockLocation m_dockLocation;
+		ViewFlags m_flags; //! @brief WidgetView flags.
+		ViewDockLocation m_dockLocation; //! @brief WidgetView dock location.
 	};
 
 }
