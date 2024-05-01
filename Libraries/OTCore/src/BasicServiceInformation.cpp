@@ -8,6 +8,8 @@
 
 ot::BasicServiceInformation::BasicServiceInformation() {}
 
+ot::BasicServiceInformation::BasicServiceInformation(const std::string& _serviceNameAndType) : m_name(_serviceNameAndType), m_type(_serviceNameAndType) {}
+
 ot::BasicServiceInformation::BasicServiceInformation(const std::string& _serviceName, const std::string& _serviceType) : m_name(_serviceName), m_type(_serviceType) {}
 
 ot::BasicServiceInformation::BasicServiceInformation(const BasicServiceInformation& _other) : m_name(_other.m_name), m_type(_other.m_type) {}
