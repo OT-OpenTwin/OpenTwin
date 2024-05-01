@@ -88,6 +88,7 @@
 #define CSE_COLOR_WindowForeground "Window Foreground"
 #define CSE_COLOR_DialogBackground "Dialog Background"
 #define CSE_COLOR_DialogForeground "Dialog Foreground"
+#define CSE_COLOR_TitleBorderColor "Title Border Color"
 #define CSE_COLOR_TitleBackground "Title Background"
 #define CSE_COLOR_TitleForeground "Title Foreground"
 #define CSE_COLOR_TTBFirstTabBackground "TabToolBar First Tab Background"
@@ -464,6 +465,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_colors.insert_or_assign(CSE_COLOR_WindowForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
 	m_colors.insert_or_assign(CSE_COLOR_DialogBackground, new PropertyPainter2D(new FillPainter2D(Color(240, 240, 240))));
 	m_colors.insert_or_assign(CSE_COLOR_DialogForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
+	m_colors.insert_or_assign(CSE_COLOR_TitleBorderColor, new PropertyPainter2D(new FillPainter2D(Color:: Black)));
 	m_colors.insert_or_assign(CSE_COLOR_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color::LightGray)));
 	m_colors.insert_or_assign(CSE_COLOR_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color::Black)));
 	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
@@ -545,6 +547,7 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_colors.insert_or_assign(CSE_COLOR_WindowForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
 	m_colors.insert_or_assign(CSE_COLOR_DialogBackground, new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
 	m_colors.insert_or_assign(CSE_COLOR_DialogForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
+	m_colors.insert_or_assign(CSE_COLOR_TitleBorderColor, new PropertyPainter2D(new FillPainter2D(Color::White)));
 	m_colors.insert_or_assign(CSE_COLOR_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
 	m_colors.insert_or_assign(CSE_COLOR_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
 	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
@@ -626,6 +629,7 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_colors.insert_or_assign(CSE_COLOR_WindowForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
 	m_colors.insert_or_assign(CSE_COLOR_DialogBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));
 	m_colors.insert_or_assign(CSE_COLOR_DialogForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
+	m_colors.insert_or_assign(CSE_COLOR_TitleBorderColor, new PropertyPainter2D(new FillPainter2D(Color::White)));
 	m_colors.insert_or_assign(CSE_COLOR_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));
 	m_colors.insert_or_assign(CSE_COLOR_TitleForeground, new PropertyPainter2D(new FillPainter2D(Color::White)));
 	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));

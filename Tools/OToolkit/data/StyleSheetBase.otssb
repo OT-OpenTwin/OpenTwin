@@ -1427,7 +1427,7 @@ QTabWidget {
 }
 
 QTabWidget::pane {
-    border: 1px solid %color:Border Color%;
+    border-top: 1px solid %color:Title Border Color%;
     margin: 0px;
     padding: 0px;
     top: -1px;
@@ -1488,14 +1488,15 @@ QDockWidget QTabBar::tab::top {
     padding-bottom: 1px;
     padding-left: 6px;
     padding-right: 6px;
-    border-bottom: 1px solid %color:Border Color%;
+    border-bottom: 1px solid %color:Title Border Color%;
 }
 
 QTabBar::tab::top:selected,
 QDockWidget QTabBar::tab::top:selected {
-    border-left: 1px solid %color:Border Color%;
-    border-right: 1px solid %color:Border Color%;
-    border-top: 1px solid %color:Border Color%;
+    border-left: 1px solid %color:Title Border Color%;
+    border-right: 1px solid %color:Title Border Color%;
+    border-top: 1px solid %color:Title Border Color%;
+    border-bottom: 1px solid %color:Widget Background%;
     border-top-left-radius: %number:Border Radius Big%;
     border-top-right-radius: %number:Border Radius Big%;
 }
@@ -1505,7 +1506,7 @@ QDockWidget QTabBar::tab::top:!selected:hover {
     border-left: 1px solid %color:Border Hover Color%;
     border-right: 1px solid %color:Border Hover Color%;
     border-top: 1px solid %color:Border Hover Color%;
-    border-bottom: 1px solid %color:Border Color%;
+    border-bottom: 1px solid %color:Title Border Color%;
     border-top-left-radius: %number:Border Radius Big%;
     border-top-right-radius: %number:Border Radius Big%;
 }
@@ -2308,7 +2309,7 @@ ads--CDockAreaWidget {
 }
 
 #dockAreaTitleBar {
-    border-bottom: 1px solid %color:Border Color%;
+    border-bottom: 1px solid %color:Title Border Color%;
     bottom: 1px;
 }
 
@@ -2342,10 +2343,10 @@ ads--CDockWidgetTab[activeTab="false"]::hover {
 }
 
 ads--CDockWidgetTab[activeTab="true"] {
-    border-top: 1px solid %color:Border Color%;
-    border-left: 1px solid %color:Border Color%;
-    border-right: 1px solid %color:Border Color%;
-    border-bottom: 1px solid transparent;
+    border-top: 1px solid %color:Title Border Color%;
+    border-left: 1px solid %color:Title Border Color%;
+    border-right: 1px solid %color:Title Border Color%;
+    border-bottom: 1px solid %color:Widget Background%;
     border-top-left-radius: %number:Border Radius Big%;
     border-top-right-radius: %number:Border Radius Big%;
     margin-bottom: -1px;

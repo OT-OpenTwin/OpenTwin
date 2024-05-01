@@ -1433,7 +1433,7 @@ QTabWidget {
 }
 
 QTabWidget::pane {
-    border: 1px solid rgba(70,70,70,255);
+    border-top: 1px solid rgba(255,255,255,255);
     margin: 0px;
     padding: 0px;
     top: -1px;
@@ -1494,14 +1494,15 @@ QDockWidget QTabBar::tab::top {
     padding-bottom: 1px;
     padding-left: 6px;
     padding-right: 6px;
-    border-bottom: 1px solid rgba(70,70,70,255);
+    border-bottom: 1px solid rgba(255,255,255,255);
 }
 
 QTabBar::tab::top:selected,
 QDockWidget QTabBar::tab::top:selected {
-    border-left: 1px solid rgba(70,70,70,255);
-    border-right: 1px solid rgba(70,70,70,255);
-    border-top: 1px solid rgba(70,70,70,255);
+    border-left: 1px solid rgba(255,255,255,255);
+    border-right: 1px solid rgba(255,255,255,255);
+    border-top: 1px solid rgba(255,255,255,255);
+    border-bottom: 1px solid rgba(30,30,30,255);
     border-top-left-radius: 4;
     border-top-right-radius: 4;
 }
@@ -1511,7 +1512,7 @@ QDockWidget QTabBar::tab::top:!selected:hover {
     border-left: 1px solid rgba(0,215,255,255);
     border-right: 1px solid rgba(0,215,255,255);
     border-top: 1px solid rgba(0,215,255,255);
-    border-bottom: 1px solid rgba(70,70,70,255);
+    border-bottom: 1px solid rgba(255,255,255,255);
     border-top-left-radius: 4;
     border-top-right-radius: 4;
 }
@@ -2314,7 +2315,7 @@ ads--CDockAreaWidget {
 }
 
 #dockAreaTitleBar {
-    border-bottom: 1px solid rgba(70,70,70,255);
+    border-bottom: 1px solid rgba(255,255,255,255);
     bottom: 1px;
 }
 
@@ -2348,10 +2349,10 @@ ads--CDockWidgetTab[activeTab="false"]::hover {
 }
 
 ads--CDockWidgetTab[activeTab="true"] {
-    border-top: 1px solid rgba(70,70,70,255);
-    border-left: 1px solid rgba(70,70,70,255);
-    border-right: 1px solid rgba(70,70,70,255);
-    border-bottom: 1px solid transparent;
+    border-top: 1px solid rgba(255,255,255,255);
+    border-left: 1px solid rgba(255,255,255,255);
+    border-right: 1px solid rgba(255,255,255,255);
+    border-bottom: 1px solid rgba(30,30,30,255);
     border-top-left-radius: 4;
     border-top-right-radius: 4;
     margin-bottom: -1px;

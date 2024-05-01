@@ -1433,7 +1433,7 @@ QTabWidget {
 }
 
 QTabWidget::pane {
-    border: 1px solid rgba(0,0,0,255);
+    border-top: 1px solid rgba(0,0,0,255);
     margin: 0px;
     padding: 0px;
     top: -1px;
@@ -1502,6 +1502,7 @@ QDockWidget QTabBar::tab::top:selected {
     border-left: 1px solid rgba(0,0,0,255);
     border-right: 1px solid rgba(0,0,0,255);
     border-top: 1px solid rgba(0,0,0,255);
+    border-bottom: 1px solid rgba(255,255,255,255);
     border-top-left-radius: 4;
     border-top-right-radius: 4;
 }
@@ -2351,7 +2352,7 @@ ads--CDockWidgetTab[activeTab="true"] {
     border-top: 1px solid rgba(0,0,0,255);
     border-left: 1px solid rgba(0,0,0,255);
     border-right: 1px solid rgba(0,0,0,255);
-    border-bottom: 1px solid transparent;
+    border-bottom: 1px solid rgba(255,255,255,255);
     border-top-left-radius: 4;
     border-top-right-radius: 4;
     margin-bottom: -1px;
