@@ -1,24 +1,26 @@
-//! @file GraphicsTextItemCfg.h
+//! @file GraphicsPolygonItemCfg.h
 //! 
 //! @author Alexander Kuester (alexk95)
-//! @date August 2023
+//! @date May 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTCore/OTClassHelper.h"
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg "OT_GICText"
+#define OT_SimpleFactoryJsonKeyValue_GraphicsPolygonItemCfg "OT_GICPoly"
 
 namespace ot {
 
 	class Painter2D;
 
-	class OT_GUI_API_EXPORT GraphicsTextItemCfg : public ot::GraphicsItemCfg {
+	class OT_GUI_API_EXPORT GraphicsPolygonItemCfg : public ot::GraphicsItemCfg {
+		OT_DECL_NOCOPY(GraphicsPolygonItemCfg)
 	public:
-		GraphicsTextItemCfg(const std::string& _text = std::string(), const ot::Color& _textColor = ot::Color());
-		virtual ~GraphicsTextItemCfg();
+		GraphicsPolygonItemCfg();
+		virtual ~GraphicsPolygonItemCfg();
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -31,25 +33,10 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg); };
-
-		void setText(const std::string& _text) { m_text = _text; };
-		const std::string& text(void) const { return m_text; };
-
-		void setTextFont(const ot::Font& _font) { m_textFont = _font; };
-		const ot::Font& textFont(void) const { return m_textFont; };
-
-		void setTextColor(const ot::Color& _color);
-		void setTextPainter(ot::Painter2D* _painter);
-		Painter2D* textPainter(void) const { return m_textPainter; };
+		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsPolygonItemCfg); };
 
 	private:
-		std::string m_text;
-		ot::Font    m_textFont;
-		Painter2D* m_textPainter;
 
-		GraphicsTextItemCfg(GraphicsTextItemCfg&) = delete;
-		GraphicsTextItemCfg& operator = (GraphicsTextItemCfg&) = delete;
 	};
 
 }

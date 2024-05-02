@@ -16,7 +16,7 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORTONLY GraphicsLayoutItemCfg : public GraphicsItemCfg {
+	class OT_GUI_API_EXPORT GraphicsLayoutItemCfg : public GraphicsItemCfg {
 	public:
 		GraphicsLayoutItemCfg() {};
 		virtual ~GraphicsLayoutItemCfg();

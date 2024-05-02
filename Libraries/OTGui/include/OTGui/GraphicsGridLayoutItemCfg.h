@@ -13,7 +13,7 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORTONLY GraphicsGridLayoutItemCfg : public GraphicsLayoutItemCfg {
+	class OT_GUI_API_EXPORT GraphicsGridLayoutItemCfg : public GraphicsLayoutItemCfg {
 	public:
 		GraphicsGridLayoutItemCfg(int _rows = 0, int _columns = 0);
 		virtual ~GraphicsGridLayoutItemCfg();

@@ -13,7 +13,7 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORTONLY GraphicsHBoxLayoutItemCfg : public GraphicsBoxLayoutItemCfg {
+	class OT_GUI_API_EXPORT GraphicsHBoxLayoutItemCfg : public GraphicsBoxLayoutItemCfg {
 	public:
 		GraphicsHBoxLayoutItemCfg();
 		virtual ~GraphicsHBoxLayoutItemCfg() {};

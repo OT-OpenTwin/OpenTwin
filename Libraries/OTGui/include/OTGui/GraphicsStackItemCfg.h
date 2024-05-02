@@ -13,7 +13,7 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORTONLY GraphicsStackItemCfg : public ot::GraphicsItemCfg {
+	class OT_GUI_API_EXPORT GraphicsStackItemCfg : public ot::GraphicsItemCfg {
 	public:
 		struct GraphicsStackItemCfgEntry {
 			ot::GraphicsItemCfg* item;

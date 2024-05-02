@@ -15,7 +15,7 @@ namespace ot {
 
 	class Painter2D;
 
-	class OT_GUI_API_EXPORTONLY GraphicsEllipseItemCfg : public ot::GraphicsItemCfg {
+	class OT_GUI_API_EXPORT GraphicsEllipseItemCfg : public ot::GraphicsItemCfg {
 	public:
 		GraphicsEllipseItemCfg(double _radiusX = 5., double _radiusY = 5., ot::Painter2D* _backgroundPainter = (ot::Painter2D*)nullptr);
 		virtual ~GraphicsEllipseItemCfg();

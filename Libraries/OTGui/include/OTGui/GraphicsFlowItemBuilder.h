@@ -19,7 +19,7 @@ namespace ot {
 
 	class Painter2D;
 
-	class OT_GUI_API_EXPORTONLY GraphicsFlowItemConnector {
+	class OT_GUI_API_EXPORT GraphicsFlowItemConnector {
 	public:
 		enum ConnectorFigure {
 			Square,

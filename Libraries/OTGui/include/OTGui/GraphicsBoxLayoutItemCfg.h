@@ -11,7 +11,7 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORTONLY GraphicsBoxLayoutItemCfg : public GraphicsLayoutItemCfg {
+	class OT_GUI_API_EXPORT GraphicsBoxLayoutItemCfg : public GraphicsLayoutItemCfg {
 	public:
 		//! @brief Holds the item and its strech factor in the box
 		//! If no item is set then its a stretch only

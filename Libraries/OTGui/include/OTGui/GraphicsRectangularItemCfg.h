@@ -15,7 +15,7 @@ namespace ot {
 
 	class Painter2D;
 
-	class OT_GUI_API_EXPORTONLY GraphicsRectangularItemCfg : public ot::GraphicsItemCfg {
+	class OT_GUI_API_EXPORT GraphicsRectangularItemCfg : public ot::GraphicsItemCfg {
 	public:
 		GraphicsRectangularItemCfg(ot::Painter2D* _backgroundPainter = (ot::Painter2D*)nullptr, int _cornerRadius = 0);
 		virtual ~GraphicsRectangularItemCfg();

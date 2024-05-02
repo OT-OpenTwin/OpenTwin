@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\Border.h" />
+    <ClInclude Include="include\OTGui\GraphicsPolygonItemCfg.h" />
     <ClInclude Include="include\OTGui\KeySequence.h" />
     <ClInclude Include="include\OTGui\MessageDialogCfg.h" />
     <ClInclude Include="include\OTGui\DialogCfg.h" />
@@ -51,6 +52,7 @@
     <ClInclude Include="include\OTGui\OnePropertyDialogCfg.h" />
     <ClInclude Include="include\OTGui\OTGuiAPIExport.h" />
     <ClInclude Include="include\OTGui\Painter2D.h" />
+    <ClInclude Include="include\OTGui\Path2D.h" />
     <ClInclude Include="include\OTGui\PlainTextEditViewCfg.h" />
     <ClInclude Include="include\OTGui\PropertyDialogCfg.h" />
     <ClInclude Include="include\OTGui\PropertyPainter2D.h" />
@@ -65,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Border.cpp" />
+    <ClCompile Include="src\GraphicsPolygonItemCfg.cpp" />
     <ClCompile Include="src\KeySequence.cpp" />
     <ClCompile Include="src\MessageDialogCfg.cpp" />
     <ClCompile Include="src\DialogCfg.cpp" />

@@ -269,7 +269,12 @@ void ot::WidgetViewManager::slotViewCloseRequested(void) {
 		return;
 	}
 
-	Q_EMIT viewCloseRequested(view);
+	if (view->viewData().flags() & WidgetViewBase::ViewDefaultCloseHandling) {
+		view->getViewDockWidget()->toggleView(view->getViewDockWidget()->isClosed());
+	}
+	else {
+		Q_EMIT viewCloseRequested(view);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

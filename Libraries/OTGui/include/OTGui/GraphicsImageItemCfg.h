@@ -14,7 +14,7 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORTONLY GraphicsImageItemCfg : public ot::GraphicsItemCfg {
+	class OT_GUI_API_EXPORT GraphicsImageItemCfg : public ot::GraphicsItemCfg {
 	public:
 		GraphicsImageItemCfg(const std::string& _imageSubPath = std::string());
 		virtual ~GraphicsImageItemCfg();

@@ -16,7 +16,7 @@ namespace ot {
 
 	class Painter2D;
 
-	class OT_GUI_API_EXPORTONLY GraphicsTriangleItemCfg : public ot::GraphicsItemCfg {
+	class OT_GUI_API_EXPORT GraphicsTriangleItemCfg : public ot::GraphicsItemCfg {
 		OT_DECL_NOCOPY(GraphicsTriangleItemCfg)
 	public:
 		enum TriangleDirection {

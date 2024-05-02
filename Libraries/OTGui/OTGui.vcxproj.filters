@@ -180,6 +180,12 @@
     <ClInclude Include="include\OTGui\WidgetViewBase.h">
       <Filter>Header Files\WidgetView</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsPolygonItemCfg.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\Path2D.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -304,6 +310,9 @@
     </ClCompile>
     <ClCompile Include="src\WidgetViewBase.cpp">
       <Filter>Source Files\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsPolygonItemCfg.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

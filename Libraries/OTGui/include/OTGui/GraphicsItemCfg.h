@@ -25,7 +25,7 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORTONLY GraphicsItemCfg : public ot::Serializable, public ot::SimpleFactoryObject {
+	class OT_GUI_API_EXPORT GraphicsItemCfg : public ot::Serializable, public ot::SimpleFactoryObject {
 	public:
 		enum GraphicsItemFlag {
 			NoFlags             = 0x00, //! @brief No item flags
