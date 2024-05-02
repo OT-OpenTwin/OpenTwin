@@ -49,6 +49,12 @@
     <Filter Include="Source Files\WidgetView">
       <UniqueIdentifier>{f11f7ae7-5318-4898-94ac-6336851832a9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Path">
+      <UniqueIdentifier>{f6d50020-d975-4946-9727-05ce71c89dd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Path">
+      <UniqueIdentifier>{241e3b9c-0d74-4723-9705-cce4621376ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\GraphicsPickerCollectionCfg.h">
@@ -184,7 +190,7 @@
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\Path2D.h">
-      <Filter>Header Files\General</Filter>
+      <Filter>Header Files\Path</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -313,6 +319,9 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsPolygonItemCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Path2D.cpp">
+      <Filter>Source Files\Path</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -22,9 +22,13 @@ ot::GraphicsPolygonItemCfg::~GraphicsPolygonItemCfg() {
 void ot::GraphicsPolygonItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 
+	JsonObject pathObj;
+	m_path.addToJsonObject(pathObj, _allocator);
+	_object.AddMember("Path", pathObj, _allocator);
 }
 
 void ot::GraphicsPolygonItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	GraphicsItemCfg::setFromJsonObject(_object);
 
+	m_path.setFromJsonObject(json::getObject(_object, "Path"));
 }

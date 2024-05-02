@@ -1,10 +1,8 @@
-/*
- *  Serializable.h
- *
- *  Created on: 24/02/2023
- *	Author: Alexander Kuester
- *  Copyright (c) 2023, OpenTwin
- */
+//! @file Serializable.h
+//! 
+//! @author Alexander Kuester (alexk95)
+//! @date August 2023
+// ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
@@ -14,6 +12,8 @@
 
 namespace ot {
 
+	//! @class Serializable.
+	//! @brief The Serializable class is the default interface of serializable objects.
 	class OT_CORE_API_EXPORTONLY Serializable {
 	public:
 		Serializable() {};

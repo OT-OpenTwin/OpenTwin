@@ -23,6 +23,11 @@ namespace ot {
 		Point2D& operator = (const Point2D& _other) { m_x = _other.m_x; m_y = _other.m_y; return *this; };
 		bool operator == (const Point2D& _other) const { return m_x == _other.m_x && m_y == _other.m_y; };
 		bool operator != (const Point2D& _other) const { return m_x != _other.m_x || m_y != _other.m_y; };
+		
+		Point2D operator + (const Point2D& _other) const { return Point2D(m_x + _other.m_x, m_y + _other.m_y); };
+		Point2D& operator += (const Point2D& _other) { m_x += _other.m_x; m_y += _other.m_y; return *this; };
+		Point2D operator - (const Point2D& _other) const { return Point2D(m_x - _other.m_x, m_y -_other.m_y); };
+		Point2D& operator -= (const Point2D& _other) { m_x -= _other.m_x; m_y -= _other.m_y; return *this; };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -77,6 +82,11 @@ namespace ot {
 		bool operator == (const Point2DF& _other) const { return m_x == _other.m_x && m_y == _other.m_y; };
 		bool operator != (const Point2DF& _other) const { return m_x != _other.m_x || m_y != _other.m_y; };
 
+		Point2DF operator + (const Point2DF& _other) const { return Point2DF(m_x + _other.m_x, m_y + _other.m_y); };
+		Point2DF& operator += (const Point2DF& _other) { m_x += _other.m_x; m_y += _other.m_y; return *this; };
+		Point2DF operator - (const Point2DF& _other) const { return Point2DF(m_x - _other.m_x, m_y - _other.m_y); };
+		Point2DF& operator -= (const Point2DF& _other) { m_x -= _other.m_x; m_y -= _other.m_y; return *this; };
+
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
 		//! @param _object The JSON object to add the contents to
@@ -129,6 +139,11 @@ namespace ot {
 		Point2DD& operator = (const Point2DD& _other) { m_x = _other.m_x; m_y = _other.m_y; return *this; };
 		bool operator == (const Point2DD& _other) const { return m_x == _other.m_x && m_y == _other.m_y; };
 		bool operator != (const Point2DD& _other) const { return m_x != _other.m_x || m_y != _other.m_y; };
+
+		Point2DD operator + (const Point2DD& _other) const { return Point2DD(m_x + _other.m_x, m_y + _other.m_y); };
+		Point2DD& operator += (const Point2DD& _other) { m_x += _other.m_x; m_y += _other.m_y; return *this; };
+		Point2DD operator - (const Point2DD& _other) const { return Point2DD(m_x - _other.m_x, m_y - _other.m_y); };
+		Point2DD& operator -= (const Point2DD& _other) { m_x -= _other.m_x; m_y -= _other.m_y; return *this; };
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)

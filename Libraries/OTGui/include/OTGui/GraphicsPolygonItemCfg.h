@@ -7,14 +7,13 @@
 #pragma once
 
 // OpenTwin header
+#include "OTGui/Path2D.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTCore/OTClassHelper.h"
 
 #define OT_SimpleFactoryJsonKeyValue_GraphicsPolygonItemCfg "OT_GICPoly"
 
 namespace ot {
-
-	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsPolygonItemCfg : public ot::GraphicsItemCfg {
 		OT_DECL_NOCOPY(GraphicsPolygonItemCfg)
@@ -35,8 +34,12 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsPolygonItemCfg); };
 
-	private:
+		void setPath(const Path2D& _path) { m_path = _path; };
+		Path2D& path(void) { return m_path; };
+		const Path2D& path(void) const { return m_path; };
 
+	private:
+		Path2D m_path;
 	};
 
 }

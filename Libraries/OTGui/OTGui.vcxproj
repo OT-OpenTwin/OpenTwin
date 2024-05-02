@@ -99,6 +99,7 @@
     <ClCompile Include="src\NavigationTreePackage.cpp" />
     <ClCompile Include="src\OnePropertyDialogCfg.cpp" />
     <ClCompile Include="src\Painter2D.cpp" />
+    <ClCompile Include="src\Path2D.cpp" />
     <ClCompile Include="src\PlainTextEditViewCfg.cpp" />
     <ClCompile Include="src\PropertyDialogCfg.cpp" />
     <ClCompile Include="src\PropertyPainter2D.cpp" />
