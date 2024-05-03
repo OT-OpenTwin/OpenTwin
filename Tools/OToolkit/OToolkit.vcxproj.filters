@@ -99,6 +99,9 @@
     <ClCompile Include="src\WidgetTest.cpp">
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsItemDesigner.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -111,6 +114,9 @@
       <Filter>Header Files\General</Filter>
     </ClInclude>
     <ClInclude Include="include\WidgetTest.h">
+      <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsItemDesigner.h">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
   </ItemGroup>

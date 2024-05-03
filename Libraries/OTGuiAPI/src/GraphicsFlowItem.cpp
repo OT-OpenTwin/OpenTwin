@@ -78,8 +78,8 @@ void ot::GraphicsFlowItem::ini(void) {
 	m_builder.setBackgroundColor(Color(50, 50, 50));
 
 	// Title
-	m_builder.setTitleBackgroundGradientColor(Color(Color::Silver));
-	m_builder.setTitleForegroundColor(Color(Color::White));
+	m_builder.setTitleBackgroundGradientColor(Color(Silver));
+	m_builder.setTitleForegroundColor(Color(White));
 
 	// Background image
 	m_builder.setBackgroundImageAlignment(AlignCenter);
@@ -89,9 +89,9 @@ void ot::GraphicsFlowItem::ini(void) {
 
 	// Connector style
 	GraphicsFlowItemConnector connectorStyle;
-	connectorStyle.setTextColor(Color(Color::White));
-	connectorStyle.setPrimaryColor(Color(Color::White));
-	connectorStyle.setSecondaryColor(Color(Color::Black));
+	connectorStyle.setTextColor(Color(White));
+	connectorStyle.setPrimaryColor(Color(White));
+	connectorStyle.setSecondaryColor(Color(Black));
 
 	m_builder.setDefaultConnectorStyle(connectorStyle);
 }

@@ -985,17 +985,17 @@ void ot::SettingsItemColor::copyValuesFromOtherItem(AbstractSettingsItem * _othe
 
 void ot::SettingsItemColor::setValue(int _r, int _g, int _b, int _a) { m_color.set(_r, _g, _b, _a); }
 
-void ot::SettingsItemColor::setValue(float _r, float _g, float _b, float _a) { m_color.set(_r, _g, _b, _a); }
+void ot::SettingsItemColor::setValue(float _r, float _g, float _b, float _a) { m_color = ColorF(_r, _g, _b, _a).toColor(); };
 
 // ##############################################################
 
 // Getter
 
 void ot::SettingsItemColor::addItemDataToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
-	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueA, m_color.aInt(), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueR, m_color.rInt(), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueG, m_color.gInt(), _allocator);
-	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueB, m_color.bInt(), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueA, m_color.a(), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueR, m_color.r(), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueG, m_color.g(), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_SETTINGS_ValueB, m_color.b(), _allocator);
 }
 
 // ############################################################################################

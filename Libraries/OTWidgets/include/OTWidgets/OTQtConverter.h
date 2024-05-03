@@ -25,6 +25,7 @@ namespace ot {
 	public:
 		//! @brief Convert OpenTwin Color to Qt Color
 		static QColor toQt(const ot::Color& _color);
+		static QColor toQt(const ot::ColorF& _color);
 
 		static Qt::Alignment toQt(Alignment _alignment);
 

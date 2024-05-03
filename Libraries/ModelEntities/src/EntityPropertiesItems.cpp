@@ -499,10 +499,10 @@ void EntityPropertiesColor::setFromConfiguration(const ot::Property* _property)
 		OT_LOG_E("Property cast failed");
 		return;
 	}
-
-	setColorR(actualProperty->value().r());
-	setColorG(actualProperty->value().g());
-	setColorB(actualProperty->value().b());
+	ot::ColorF c(actualProperty->value());
+	setColorR(c.r());
+	setColorG(c.g());
+	setColorB(c.b());
 }
 
 void EntityPropertiesColor::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)

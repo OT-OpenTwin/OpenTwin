@@ -78,15 +78,13 @@ namespace ot {
 
 		void findPropertiesBySpecialType(const std::string& _specialType, std::list<Property*>& _list) const;
 
-		void setBackgroundColor(Color::DefaultColor _color) { this->setBackgroundColor(Color(_color)); };
+		void setBackgroundColor(DefaultColor _color) { this->setBackgroundColor(Color(_color)); };
 		void setBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setBackgroundColor(Color(_r, _g, _b, _a)); };
-		void setBackgroundColor(float _r, float _g, float _b, float _a = 1.f) { this->setBackgroundColor(Color(_r, _g, _b, _a)); };
 		void setBackgroundColor(const Color& _color) { m_backgroundColor = _color; };
 		const Color& backgroundColor(void) const { return m_backgroundColor; };
 
-		void setAlternateBackgroundColor(Color::DefaultColor _color) { this->setAlternateBackgroundColor(Color(_color)); };
+		void setAlternateBackgroundColor(DefaultColor _color) { this->setAlternateBackgroundColor(Color(_color)); };
 		void setAlternateBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setAlternateBackgroundColor(Color(_r, _g, _b, _a)); };
-		void setAlternateBackgroundColor(float _r, float _g, float _b, float _a = 1.f) { this->setAlternateBackgroundColor(Color(_r, _g, _b, _a)); };
 		void setAlternateBackgroundColor(const Color& _color) { m_alternateBackgroundColor = _color; };
 		const Color& alternateBackgroundColor(void) const { return m_alternateBackgroundColor; };
 

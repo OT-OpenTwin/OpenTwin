@@ -366,9 +366,9 @@ ot::GraphicsFlowItemBuilder::GraphicsFlowItemBuilder()
 	this->setTitleBackgroundColor(ot::Color(70, 70, 70));
 	this->setDefaultTitleForegroundGradient();
 
-	m_defaultConnectorStyle.setTextColor(ot::Color(ot::Color::White));
-	m_defaultConnectorStyle.setPrimaryColor(ot::Color(ot::Color::White));
-	m_defaultConnectorStyle.setSecondaryColor(ot::Color(ot::Color::Black));
+	m_defaultConnectorStyle.setTextColor(ot::Color(White));
+	m_defaultConnectorStyle.setPrimaryColor(ot::Color(ot::White));
+	m_defaultConnectorStyle.setSecondaryColor(ot::Color(ot::Black));
 }
 
 ot::GraphicsFlowItemBuilder::~GraphicsFlowItemBuilder() {}
@@ -382,7 +382,7 @@ void ot::GraphicsFlowItemBuilder::addLeft(const std::string& _name, const std::s
 	this->addLeft(cfg);
 }
 
-void ot::GraphicsFlowItemBuilder::addLeft(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, ot::Color::DefaultColor _color) {
+void ot::GraphicsFlowItemBuilder::addLeft(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, ot::DefaultColor _color) {
 	GraphicsFlowItemConnector cfg = m_defaultConnectorStyle;
 	cfg.setName(_name);
 	cfg.setText(_title);
@@ -415,7 +415,7 @@ void ot::GraphicsFlowItemBuilder::addRight(const std::string& _name, const std::
 	this->addRight(cfg);
 }
 
-void ot::GraphicsFlowItemBuilder::addRight(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, ot::Color::DefaultColor _color) {
+void ot::GraphicsFlowItemBuilder::addRight(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, ot::DefaultColor _color) {
 	GraphicsFlowItemConnector cfg = m_defaultConnectorStyle;
 	cfg.setName(_name);
 	cfg.setText(_title);

@@ -69,16 +69,16 @@ ot::GraphicsItemCfg* EntityBlockCircuitResistor::CreateBlockCfg()
 	//Now i want connections on the item for this i need rectangle items
 	ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
 	connection1->setName("Left1");
-	ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
-	connection1->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
+	ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Blue));
+	connection1->setBorder(ot::Border(ot::Color(ot::Black), 1));
 	connection1->setBackgroundPainer(painter1);
 	connection1->setAlignment(ot::AlignCenter);
 	connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
 
 	ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
 	connection2->setName("Right1");
-	ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Color::DefaultColor::Blue));
-	connection2->setBorder(ot::Border(ot::Color(ot::Color::Black), 1));
+	ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Blue));
+	connection2->setBorder(ot::Border(ot::Color(ot::Black), 1));
 	connection2->setBackgroundPainer(painter2);
 	connection2->setAlignment(ot::AlignCenter);
 	connection2->setMaximumSize(ot::Size2DD(10.0, 10.0));

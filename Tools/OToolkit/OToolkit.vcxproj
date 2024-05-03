@@ -24,6 +24,7 @@
     <ClCompile Include="src\ConnectToLoggerDialog.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FAR.cpp" />
+    <ClCompile Include="src\GraphicsItemDesigner.cpp" />
     <ClCompile Include="src\ImageEditor.cpp" />
     <ClCompile Include="src\JSONEditor.cpp" />
     <ClCompile Include="src\LogVisualization.cpp" />
@@ -47,6 +48,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\GraphicsItemDesigner.h" />
     <ClInclude Include="include\WidgetTest.h" />
     <QtMoc Include="include\ColorStyleEditor.h" />
     <QtMoc Include="include\ToolMenuManager.h" />

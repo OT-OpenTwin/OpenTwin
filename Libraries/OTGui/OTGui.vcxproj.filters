@@ -192,6 +192,9 @@
     <ClInclude Include="include\OTGui\Path2D.h">
       <Filter>Header Files\Path</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsShapeItemCfg.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -322,6 +325,9 @@
     </ClCompile>
     <ClCompile Include="src\Path2D.cpp">
       <Filter>Source Files\Path</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsShapeItemCfg.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

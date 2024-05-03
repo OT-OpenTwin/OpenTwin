@@ -52,6 +52,7 @@
     <ClCompile Include="src\GraphicsPicker.cpp" />
     <ClCompile Include="src\GraphicsPickerView.cpp" />
     <ClCompile Include="src\GraphicsPixmapItem.cpp" />
+    <ClCompile Include="src\GraphicsPolygonItem.cpp" />
     <ClCompile Include="src\GraphicsRectangularItem.cpp" />
     <ClCompile Include="src\GraphicsScene.cpp" />
     <ClCompile Include="src\GraphicsStackItem.cpp" />
@@ -140,6 +141,7 @@
     <QtMoc Include="include\OTWidgets\GlobalColorStyle.h" />
     <ClInclude Include="include\OTWidgets\ComboBox.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPickerView.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsPolygonItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsViewView.h" />
     <QtMoc Include="include\OTWidgets\Painter2DEditButton.h" />
     <QtMoc Include="include\OTWidgets\Painter2DEditDialog.h" />

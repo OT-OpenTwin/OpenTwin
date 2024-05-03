@@ -8,7 +8,11 @@
 #include "OTWidgets/OTQtConverter.h"
 
 QColor ot::OTQtConverter::toQt(const ot::Color& _color) {
-	return QColor(_color.rInt(), _color.gInt(), _color.bInt(), _color.aInt());
+	return QColor(_color.r(), _color.g(), _color.b(), _color.a());
+}
+
+QColor ot::OTQtConverter::toQt(const ot::ColorF& _color) {
+	return QColor((int)(_color.r() * 255.f), (int)(_color.g() * 255.f), (int)(_color.b() * 255.f), (int)(_color.a() * 255.f));
 }
 
 Qt::Alignment ot::OTQtConverter::toQt(ot::Alignment _alignment) {

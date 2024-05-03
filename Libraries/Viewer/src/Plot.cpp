@@ -433,7 +433,7 @@ void Plot::setFromDataBase(const std::string & _projectName, const std::list<Plo
 
 		newDataset->setCurvePointsVisible(false, false);
 		
-		newDataset->setCurveColor(QColor(colour.rInt(), colour.gInt(), colour.bInt()), false);
+		newDataset->setCurveColor(QColor(colour.r(), colour.g(), colour.b()), false);
 		newDataset->setCurveTitle(curveLabel.c_str());
 		newDataset->setAxisTitleX(axisTitleX);
 		newDataset->setAxisTitleY(axisTitleY);

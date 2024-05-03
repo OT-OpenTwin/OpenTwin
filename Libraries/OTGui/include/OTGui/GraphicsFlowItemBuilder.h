@@ -137,7 +137,7 @@ namespace ot {
 		//! @param _name Connector name
 		//! @param _title Connector title
 		//! @param _figure Conector figure
-		void addLeft(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, ot::Color::DefaultColor _color);
+		void addLeft(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, ot::DefaultColor _color);
 
 		//! @brief Add a connector on the left side of the FlowItem
 		//! The default connector style will be applied
@@ -162,7 +162,7 @@ namespace ot {
 		//! @param _name Connector name
 		//! @param _title Connector title
 		//! @param _figure Connector figure
-		void addRight(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, ot::Color::DefaultColor _color);
+		void addRight(const std::string& _name, const std::string& _title, GraphicsFlowItemConnector::ConnectorFigure _figure, ot::DefaultColor _color);
 
 		//! @brief Add a connector on the right side of the FlowItem
 		//! The default connector style will be applied

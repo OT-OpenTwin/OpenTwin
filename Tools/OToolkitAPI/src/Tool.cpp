@@ -47,6 +47,7 @@ ot::WidgetView* otoolkit::Tool::createToolWidgetView(QWidget* _widget, const QSt
 	ot::WidgetViewBase vd = view->viewData();
 	vd.setFlag(ot::WidgetViewBase::ViewIsTool);
 	vd.setFlag(ot::WidgetViewBase::ViewIsPinnable);
+	vd.setFlag(ot::WidgetViewBase::ViewIsCloseable);
 	view->setViewData(vd);
 
 	return view;

@@ -16,6 +16,7 @@
 #include "LogVisualization.h"
 #include "ToolBarManager.h"
 #include "WidgetTest.h"
+#include "GraphicsItemDesigner.h"
 
 // OToolkitAPI header
 #include "OToolkitAPI/OToolkitAPI.h"
@@ -357,6 +358,7 @@ void AppBase::slotInitializeTools(void) {
 	m_toolManager->addTool(new Randomizer);
 	m_toolManager->addTool(new ColorStyleEditor);
 	m_toolManager->addTool(new ImageEditor);
+	m_toolManager->addTool(new GraphicsItemDesigner);
 
 	QByteArray arr = qgetenv("OPENTWIN_DEV_ROOT");
 	if (!arr.isEmpty()) {
@@ -389,6 +391,10 @@ AppBase::AppBase(QApplication* _app) : m_mainThread(QThread::currentThreadId()),
 	// Initialize Toolkit API
 	otoolkit::api::initialize(this);
 
+	ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::AutoHideFeatureEnabled);
+	ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::AutoHideButtonTogglesArea);
+	ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::AutoHideShowOnMouseOver);
+	ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::DockAreaHasAutoHideButton);
 	ot::WidgetViewManager::instance().initialize();
 
 	// Create tool manager
@@ -406,7 +412,7 @@ AppBase::AppBase(QApplication* _app) : m_mainThread(QThread::currentThreadId()),
 	f.setFamily("Consolas");
 	m_output->setFont(f);
 	m_output->setReadOnly(true);
-
+	
 	this->setCentralWidget(ot::WidgetViewManager::instance().getDockManager());
 	this->setWindowTitle("OToolkit");
 	this->setWindowIcon(QIcon(":/images/OToolkit.png"));

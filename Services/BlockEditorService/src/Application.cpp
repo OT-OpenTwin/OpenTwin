@@ -219,7 +219,7 @@ std::string Application::handleOnePropertyDialogValue(ot::JsonDocument& _documen
 		ot::ConstJsonObject value = ot::json::getObject(_document, OT_ACTION_PARAM_Value);
 		ot::Color c;
 		c.setFromJsonObject(value);
-		m_uiComponent->displayMessage(std::string("Dialog test resulted with value: ") + std::to_string(c.rInt()) + ", " + std::to_string(c.gInt()) + ", " + std::to_string(c.bInt()) + ", " + std::to_string(c.aInt()) + "\n");
+		m_uiComponent->displayMessage(std::string("Dialog test resulted with value: ") + std::to_string(c.r()) + ", " + std::to_string(c.g()) + ", " + std::to_string(c.b()) + ", " + std::to_string(c.a()) + "\n");
 	}
 	else if (dialogName == "MyFileDialog") {
 

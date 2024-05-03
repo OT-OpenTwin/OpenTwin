@@ -8,7 +8,7 @@ ApplicationSettings * ApplicationSettings::instance(void) {
 }
 
 ApplicationSettings::ApplicationSettings()
-	: geometryDefaultColor(0.6f, 0.6f, 0.95f, 1.f), geometryDefaultName("New item")
+	: geometryDefaultColor(153, 153, 242), geometryDefaultName("New item")
 {
 	geometryNamingMode = geometryNamingModeGeometryBased;
 }

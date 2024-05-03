@@ -98,6 +98,6 @@ void ot::ColorStyleValue::setColor(Color _color) {
 	this->setPainter(new FillPainter2D(_color));
 }
 
-void ot::ColorStyleValue::setColor(Color::DefaultColor _color) {
+void ot::ColorStyleValue::setColor(DefaultColor _color) {
 	this->setPainter(new FillPainter2D(_color));
 }

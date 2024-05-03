@@ -132,7 +132,7 @@ ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 	block.setTitle(this->CreateBlockHeadline());
 	//block.setBackgroundImageInsertMode(ot::GraphicsFlowItemBuilder::OnStack);
 
-	const ot::Color colourTitle(ot::Color::Yellow);
+	const ot::Color colourTitle(ot::Yellow);
 	block.setTitleBackgroundGradientColor(colourTitle);
 	block.setBackgroundImagePath("Images/Graph.svg");
 	//block.setToolTip("Plots the X and Y values in a 1D plot");

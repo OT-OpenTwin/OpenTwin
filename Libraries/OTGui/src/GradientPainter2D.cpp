@@ -67,9 +67,9 @@ void ot::GradientPainter2D::addStopsAndSpreadToQss(std::string& _targetString) c
 	}
 	for (const GradientPainterStop2D& s : m_stops) {
 		_targetString.append(", stop: " + std::to_string(s.pos()) +
-			" rgba(" + std::to_string(s.color().rInt()) +
-			", " + std::to_string(s.color().gInt()) +
-			", " + std::to_string(s.color().bInt()) +
-			", " + std::to_string(s.color().aInt()) + ")");
+			" rgba(" + std::to_string(s.color().r()) +
+			", " + std::to_string(s.color().g()) +
+			", " + std::to_string(s.color().b()) +
+			", " + std::to_string(s.color().a()) + ")");
 	}
 }

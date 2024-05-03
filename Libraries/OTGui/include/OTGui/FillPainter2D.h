@@ -16,7 +16,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT FillPainter2D : public ot::Painter2D {
 	public:
 		FillPainter2D();
-		FillPainter2D(ot::Color::DefaultColor _color);
+		FillPainter2D(ot::DefaultColor _color);
 		FillPainter2D(const ot::Color& _color);
 		virtual ~FillPainter2D();
 

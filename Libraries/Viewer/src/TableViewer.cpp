@@ -48,7 +48,7 @@ bool TableViewer::CreateNewTable(std::shared_ptr<EntityResultTable<std::string>>
 void TableViewer::ChangeColorOfSelection(ot::Color & background)
 {
 	auto selectedRanges = _table->selectedRanges();
-	QBrush backgroundBrush(QColor(background.rInt(), background.gInt(), background.bInt(), background.aInt()));
+	QBrush backgroundBrush(QColor(background.r(), background.g(), background.b(), background.a()));
 
 	for (auto range : selectedRanges)
 	{

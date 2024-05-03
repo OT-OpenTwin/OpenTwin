@@ -458,7 +458,7 @@ ak::aAbstractOptionsItem * UserSettings::parseFromSettingsItem(ot::AbstractSetti
 			if (actualItem) {
 				
 				aOptionsItemColorEdit * newItem = new aOptionsItemColorEdit(actualItem->name().c_str(), actualItem->title().c_str(),
-					ak::aColor(actualItem->value().rInt(), actualItem->value().gInt(), actualItem->value().bInt(), actualItem->value().aInt()));
+					ak::aColor(actualItem->value().r(), actualItem->value().g(), actualItem->value().b(), actualItem->value().a()));
 				newItem->setEditAlphaChannel(true);
 				return newItem;
 			}

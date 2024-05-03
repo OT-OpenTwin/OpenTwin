@@ -295,8 +295,8 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 	block.setName(this->getClassName());
 	block.setTitle(this->CreateBlockHeadline());
 
-	const ot::Color colourTitle(ot::Color::Lime);
-	const ot::Color colourBackground(ot::Color::White);
+	const ot::Color colourTitle(ot::Lime);
+	const ot::Color colourBackground(ot::White);
 	block.setTitleBackgroundGradientColor(colourTitle);
 	block.setLeftTitleCornerImagePath("Images/Database.png");
 	block.setBackgroundImagePath("Images/Database.svg");

@@ -28,7 +28,7 @@ ot::GraphicsItemCfg* EntityBlockDisplay::CreateBlockCfg()
 	block.setName(this->getClassName());
 	block.setTitle(this->CreateBlockHeadline());
 	
-	const ot::Color colourTitle(ot::Color::Yellow);
+	const ot::Color colourTitle(ot::Yellow);
 	block.setTitleBackgroundGradientColor(colourTitle);
 	block.setLeftTitleCornerImagePath("Default/chardevice.png");
 	AddConnectors(block);

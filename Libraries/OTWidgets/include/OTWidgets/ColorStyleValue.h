@@ -61,8 +61,8 @@ namespace ot {
 		void setPainter(const Painter2D* _painter);
 		Painter2D* painter(void) const { return m_painter; };
 
+		void setColor(DefaultColor _color);
 		void setColor(Color _color);
-		void setColor(Color::DefaultColor _color);
 
 	private:
 		std::string m_name;

@@ -269,67 +269,67 @@ int AppBase::run() {
 		{
 			ot::ColorStyleValue val;
 			val.setName(OT_COLORSTYLE_VALUE_ControlsBackground);
-			val.setColor(ot::Color::White);
+			val.setColor(ot::White);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
 			val.setName(OT_COLORSTYLE_VALUE_ControlsBorderColor);
-			val.setColor(ot::Color::Black);
+			val.setColor(ot::Black);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
 			val.setName(OT_COLORSTYLE_VALUE_ControlsForeground);
-			val.setColor(ot::Color::Black);
+			val.setColor(ot::Black);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
 			val.setName(OT_COLORSTYLE_VALUE_ControlsHoverBackground);
-			val.setColor(ot::Color::Blue);
+			val.setColor(ot::Blue);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
 			val.setName(OT_COLORSTYLE_VALUE_ControlsHoverForeground);
-			val.setColor(ot::Color::White);
+			val.setColor(ot::White);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
 			val.setName(OT_COLORSTYLE_VALUE_ControlsSelectedBackground);
-			val.setColor(ot::Color::Lime);
+			val.setColor(ot::Lime);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
 			val.setName(OT_COLORSTYLE_VALUE_ControlsSelectedForeground);
-			val.setColor(ot::Color::Black);
+			val.setColor(ot::Black);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
 			val.setName(OT_COLORSTYLE_VALUE_TitleBackground);
-			val.setColor(ot::Color::Gray);
+			val.setColor(ot::Gray);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
 			val.setName(OT_COLORSTYLE_VALUE_TitleForeground);
-			val.setColor(ot::Color::Black);
+			val.setColor(ot::Black);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
 			val.setName(OT_COLORSTYLE_VALUE_WindowBackground);
-			val.setColor(ot::Color::LightGray);
+			val.setColor(ot::LightGray);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
 			val.setName(OT_COLORSTYLE_VALUE_WindowForeground);
-			val.setColor(ot::Color::Black);
+			val.setColor(ot::Black);
 			cs.addValue(val);
 		}
 		ot::GlobalColorStyle::instance().addStyle(cs, true);

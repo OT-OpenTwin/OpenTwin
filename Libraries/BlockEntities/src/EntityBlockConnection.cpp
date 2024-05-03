@@ -21,8 +21,8 @@ ot::GraphicsConnectionCfg EntityBlockConnection::getConnectionCfg()
 	double r = colorProperty->getColorR();
 	double g = colorProperty->getColorG();
 	double b = colorProperty->getColorB();
-	ot::Color color(static_cast<float>(r), static_cast<float>(g), static_cast<float>(b));
-	cfg.setColor(color);
+	ot::ColorF color(static_cast<float>(r), static_cast<float>(g), static_cast<float>(b));
+	cfg.setColor(color.toColor());
 	
 
 	auto lineWidthProperty = dynamic_cast<EntityPropertiesInteger*>(this->getProperties().getProperty("Line Width"));
@@ -41,7 +41,7 @@ ot::GraphicsConnectionCfg EntityBlockConnection::getConnectionCfg()
 void EntityBlockConnection::setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg)
 {
 	EntityPropertiesColor* color = dynamic_cast<EntityPropertiesColor*>(this->getProperties().getProperty("Color"));
-	color->setColorRGB(connectionCfg.color().rInt(), connectionCfg.color().gInt(), connectionCfg.color().bInt());
+	color->setColorRGB(connectionCfg.color().r(), connectionCfg.color().g(), connectionCfg.color().b());
 
 	EntityPropertiesInteger* lineWidth = dynamic_cast<EntityPropertiesInteger*>(this->getProperties().getProperty("Line Width"));
 	lineWidth->setValue(connectionCfg.lineWidth());
@@ -80,8 +80,8 @@ void EntityBlockConnection::CreateConnections()
 
 void EntityBlockConnection::createProperties()
 {
-	ot::Color* color = new ot::Color(ot::Color::DefaultColor::Black);
-	EntityPropertiesColor::createProperty("Settings", "Color", {color->aInt(),color->bInt(),color->gInt()}, "default", getProperties());
+	ot::Color* color = new ot::Color(ot::Black);
+	EntityPropertiesColor::createProperty("Settings", "Color", {color->r(),color->g(),color->b()}, "default", getProperties());
 	EntityPropertiesInteger::createProperty("Settings", "Line Width", 2, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Settings", "Line Style", { "SmoothLine","DirectLine" }, {}, "default", getProperties());
 }
