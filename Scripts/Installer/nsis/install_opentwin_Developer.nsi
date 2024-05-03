@@ -232,8 +232,10 @@ Function .onInit
 		Abort
 	${EndIf}
 
-	MessageBox MB_ICONINFORMATION|MB_OK "Microsoft Visual Studio, C++ compilers and a full Git setup (including SSH) need to be installed for a full OpenTwin Development environment"
-    
+	IfFileExists $DEVENV_ROOT\devenv.exe +3 0
+		MessageBox MB_OK 'Microsoft Visual Studio (with C++ compilers) needs to be installed before running the installation. $\n$\nThe environment variable DEVENV_ROOT_2022 needs to be set to the tools directory of the Visual Studio 2022 installation, e.g., "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE".'
+		Abort
+	    
 	StrCpy $PortReturnChecker 0
 	StrCpy $PublicIpSet 0
 	StrCpy $PublicCertPageChecker 0
@@ -897,7 +899,7 @@ FunctionEnd
 ; MUI end ------
 
 Name "${PRODUCT_NAME}"
-OutFile "Install_OpenTwin_dev.exe"
+;OutFile "Install_OpenTwin_dev.exe"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails hide
 ShowUnInstDetails hide
@@ -923,8 +925,6 @@ SectionEnd
 
 SectionGroup /e "OpenTwin"
 	Section "!Clone OpenTwin Repository" SEC02
-		MessageBox MB_ICONINFORMATION|MB_OK "This step of the installation will clone the OpenTwin repository on GitHub. Press OK to continue."
-
 		SetRegView 64
 		ReadRegStr $0 HKLM "SOFTWARE\GitForWindows" "InstallPath"
 		StrCpy $GitInstallPath $0
@@ -1123,7 +1123,26 @@ SectionGroup /e "Python & Sphinx"
 
 SectionGroupEnd
 
-Section "Install Qt Visual Studio Plugin" SEC10
+Section "Install MiKTeX" SEC10
+	AddSize 140000
+	DetailPrint "Installing MiKTeX..."
+		#DetailPrint "$DEVENV_ROOT"
+		ExecWait '"$TempToolChain\basic-miktex-24.1-x64.exe" --auto-install=yes --unattended --shared'	#install MiKTeX (required for Sphinx)
+		EnVar::AddValue "PATH" "$PROGRAMFILES\MiKTeX\miktex\bin\x64"
+		DetailPrint "Done."
+		#Sleep 10000
+SectionEnd
+
+Section "Install NSIS (Nullsoft Scriptable Install System)" SEC11
+	AddSize 7000
+	DetailPrint "Installing NSIS (Nullsoft Scriptable Install System)..."
+		#DetailPrint "$DEVENV_ROOT"
+		ExecWait '"$TempToolChain\nsis-3.10-setup" /S'	#install NSIS
+		DetailPrint "Done."
+		#Sleep 10000
+SectionEnd
+
+Section "Install Qt Visual Studio Plugin" SEC12
 	AddSize 20000
 	DetailPrint "Installing Qt Visual Studio Plugin..."
 		#DetailPrint "$DEVENV_ROOT"
@@ -1178,7 +1197,11 @@ SectionEnd
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09} "Install a standard installation of Python 3.9"
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC09_1} "Install Sphinx via pip and the 'Read the docs' theme required for building the documentation"
 
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC10} "Install the Qt Visual Studio 2022 plugin"
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC10} "Install MiKTeX"
+	
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC11} "Install NSIS (Nullsoft Scriptable Install System)"
+
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC12} "Install the Qt Visual Studio 2022 plugin"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
