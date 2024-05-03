@@ -2,7 +2,7 @@ name:Blue
 files:[{"Name":"Property Group Collapsed","Path":"/properties/ArrowBlueRight.png"},{"Name":"Property Group Expanded","Path":"/properties/ArrowGreenDown.png"},{"Name":"Property Item Delete","Path":"/properties/Delete.png"}]
 integers:[{"Name":"Splitter Handle Width","Value":2}]
 doubles:[]
-values:[{"Name":"Controls Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.250980406999588,"b":0.501960813999176,"a":1.0}}},{"Name":"Controls Border Color","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.3921568691730499,"b":0.7058823704719544,"a":1.0}}},{"Name":"Controls Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}},{"Name":"Controls Hover Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.843137264251709,"b":1.0,"a":1.0}}},{"Name":"Controls Hover Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Controls Selected Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":1.0,"b":0.0,"a":1.0}}},{"Name":"Controls Selected Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Error Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Text Editor Highlight","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.3921568691730499,"b":0.7058823704719544,"a":1.0}}},{"Name":"Text Editor Highlight Border","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCLGrad","Stops":[{"Pos":0.0,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}},{"Pos":0.04,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}},{"Pos":0.05,"Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}},{"Pos":0.98,"Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}},{"Pos":0.99,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}},{"Pos":1.0,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}}],"Spread":"Pad","Start":{"x":0.5,"y":0.0},"FinalStop":{"x":0.5,"y":1.0}}},{"Name":"Title Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.3529411852359772,"b":0.6117647290229797,"a":1.0}}},{"Name":"Title Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}},{"Name":"Window Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.250980406999588,"b":0.501960813999176,"a":1.0}}},{"Name":"Window Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}}]
+values:[{"Name":"Controls Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.250980406999588,"b":0.501960813999176,"a":1.0}}},{"Name":"Controls Border Color","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.3921568691730499,"b":0.7058823704719544,"a":1.0}}},{"Name":"Controls Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}},{"Name":"Controls Hover Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.843137264251709,"b":1.0,"a":1.0}}},{"Name":"Controls Hover Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Controls Selected Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.8235294222831726,"g":0.3529411852359772,"b":0.03921568766236305,"a":1.0}}},{"Name":"Controls Selected Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}},{"Name":"Error Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":0.0,"b":0.0,"a":1.0}}},{"Name":"Text Editor Highlight","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.3921568691730499,"b":0.7058823704719544,"a":1.0}}},{"Name":"Text Editor Highlight Border","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCLGrad","Stops":[{"Pos":0.0,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}},{"Pos":0.04,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}},{"Pos":0.05,"Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}},{"Pos":0.98,"Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}},{"Pos":0.99,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}},{"Pos":1.0,"Color":{"r":0.5,"g":0.5,"b":0.5,"a":1.0}}],"Spread":"Pad","Start":{"x":0.5,"y":0.0},"FinalStop":{"x":0.5,"y":1.0}}},{"Name":"Title Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.3529411852359772,"b":0.6117647290229797,"a":1.0}}},{"Name":"Title Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}},{"Name":"Window Background","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":0.0,"g":0.250980406999588,"b":0.501960813999176,"a":1.0}}},{"Name":"Window Foreground","Painter":{"OTSimpleFactoryObject.Key":"OT_P2DCFill","Color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0}}}]
 sheet:
 /*    OpenTwin Notes                                                                     */
 /*                                                                                       */
@@ -38,8 +38,8 @@ QWidget {
     border: none;
     padding: 0px;
     color: rgba(255,255,255,255);
-    selection-background-color: rgba(0,255,0,255);
-    selection-color: rgba(0,0,0,255);
+    selection-background-color: rgba(210,90,10,255);
+    selection-color: rgba(255,255,255,255);
 }
 
 QWidget:disabled {
@@ -54,8 +54,8 @@ QWidget::item {
 }
 
 QWidget::item:selected {
-    background-color: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    background-color: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
 }
 
 QWidget::item:hover {
@@ -81,7 +81,7 @@ QMainWindow::separator:hover:!pressed {
 }
 
 QMainWindow::separator:pressed {
-    background-color: rgba(0,255,0,255);
+    background-color: rgba(210,90,10,255);
 }
 
 QMainWindow::separator:horizontal {
@@ -357,8 +357,8 @@ QMenuBar {
     border-bottom: 1px solid rgba(0,100,180,255);
     margin-bottom: 2px;
     color: rgba(255,255,255,255);
-    selection-background-color: rgba(0,255,0,255);
-    selection-color: rgba(0,0,0,255);
+    selection-background-color: rgba(210,90,10,255);
+    selection-color: rgba(255,255,255,255);
 }
 
 QMenuBar:focus {
@@ -380,8 +380,8 @@ QMenuBar::item:selected {
 QMenuBar::item:pressed {
     padding: 4px;
     border: 0px solid rgba(0,64,128,255);
-    background-color: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    background-color: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
     margin-bottom: 0px;
     padding-bottom: 0px;
 }
@@ -417,8 +417,8 @@ QMenu::item:selected {
 }
 
 QMenu::item:pressed {
-    background-color: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    background-color: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
 }
 
 QMenu::icon {
@@ -586,7 +586,7 @@ QScrollBar::handle:horizontal:hover {
 }
 
 QScrollBar::handle:horizontal:pressed {
-    background-color: rgba(0,255,0,255);
+    background-color: rgba(210,90,10,255);
 }
 
 QScrollBar::handle:vertical {
@@ -601,7 +601,7 @@ QScrollBar::handle:vertical:hover {
 }
 
 QScrollBar::handle:vertical:pressed {
-    background-color: rgba(0,255,0,255);
+    background-color: rgba(210,90,10,255);
 }
 
 QScrollBar::add-line:horizontal {
@@ -711,7 +711,7 @@ QTextEdit:hover {
 }
 
 QTextEdit:selected {
-    border-color: rgba(0,255,0,255);
+    border-color: rgba(210,90,10,255);
 }
 
 /* ##################################################################################### */
@@ -725,12 +725,12 @@ QPlainTextEdit {
 }
 
 QPlainTextEdit:focus {
-    border-color: rgba(0,255,0,255);
+    border-color: rgba(210,90,10,255);
 }
 
 QPlainTextEdit:selected {
-    background: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    background: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
 }
 
 /* ##################################################################################### */
@@ -865,12 +865,12 @@ QAbstractSpinBox:hover {
 }
 
 QAbstractSpinBox:focus {
-    border-color: rgba(0,255,0,255);
+    border-color: rgba(210,90,10,255);
 }
 
 QAbstractSpinBox:selected {
-    background: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    background: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
 }
 
 /* ##################################################################################### */
@@ -911,7 +911,7 @@ QTextBrowser:hover {
 }
 
 QTextBrowser:selected {
-    border-color: rgba(0,255,0,255);
+    border-color: rgba(210,90,10,255);
 }
 
 /* ##################################################################################### */
@@ -985,7 +985,7 @@ QProgressBar:disabled {
 }
 
 QProgressBar::chunk {
-    background-color: rgba(0,255,0,255);
+    background-color: rgba(210,90,10,255);
     color: rgba(255,255,255,255);
     border-radius: 4;
 }
@@ -1037,14 +1037,14 @@ QPushButton:hover:!pressed {
 }
 
 QPushButton:pressed {
-    background-color: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    background-color: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
     border-style: inset;
 }
 
 QPushButton[IsSelected="true"] {
-    background-color: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    background-color: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
 }
 
 QPushButton[IsSelected="false"] {
@@ -1108,7 +1108,7 @@ QToolButton:checked:hover:!pressed {
 }
 
 QToolButton:checked:pressed {
-    background-color: rgba(0,255,0,255);
+    background-color: rgba(210,90,10,255);
 }
 
 QToolButton:checked:selected {
@@ -1126,8 +1126,8 @@ QToolButton:pressed {
 }
 
 QToolButton:selected {
-    background: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    background: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
 }
 
 QToolButton[popupMode="0"] {
@@ -1214,7 +1214,7 @@ QCommandLinkButton:disabled {
 
 QComboBox {
     border: 1px solid rgba(0,0,127,255);
-    selection-background-color: rgba(0,255,0,255);
+    selection-background-color: rgba(210,90,10,255);
     padding-left: 4px;
     padding-right: 4px;
     min-height: 1.5em;
@@ -1224,7 +1224,7 @@ QComboBox QAbstractItemView {
     border-color: rgba(0,100,180,255);
     border-radius: 0;
     background-color: rgba(0,64,128,255);
-    selection-background-color: rgba(0,255,0,255);
+    selection-background-color: rgba(210,90,10,255);
 }
 
 QComboBox QAbstractItemView:hover {
@@ -1233,8 +1233,8 @@ QComboBox QAbstractItemView:hover {
 }
 
 QComboBox QAbstractItemView:selected {
-    background: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    background: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
 }
 
 QComboBox QAbstractItemView:alternate {
@@ -1251,11 +1251,11 @@ QComboBox:hover {
 }
 
 QComboBox:focus {
-    border-color: rgba(0,255,0,255);
+    border-color: rgba(210,90,10,255);
 }
 
 QComboBox:on {
-    selection-background-color: rgba(0,255,0,255);
+    selection-background-color: rgba(210,90,10,255);
 }
 
 /* Needed to remove indicator - fix #132 */
@@ -1325,7 +1325,7 @@ QSlider::groove:vertical {
 }
 
 QSlider::add-page:vertical {
-    background: rgba(0,255,0,255);
+    background: rgba(210,90,10,255);
     border-color: rgba(0,100,180,255);
     width: 4px;
     margin: 0px;
@@ -1337,7 +1337,7 @@ QSlider::add-page:vertical:disabled {
 }
 
 QSlider::sub-page:horizontal {
-    background: rgba(0,255,0,255);
+    background: rgba(210,90,10,255);
     border-color: rgba(0,100,180,255);
     height: 4px;
     margin: 0px;
@@ -1363,7 +1363,7 @@ QSlider::handle:horizontal:hover {
 }
 
 QSlider::handle:horizontal:focus {
-    border-color: rgba(0,255,0,255);
+    border-color: rgba(210,90,10,255);
 }
 
 QSlider::handle:vertical {
@@ -1376,12 +1376,12 @@ QSlider::handle:vertical {
 }
 
 QSlider::handle:vertical:hover {
-    background: rgba(0,255,0,255);
+    background: rgba(210,90,10,255);
     border-color: rgba(0,215,255,255);
 }
 
 QSlider::handle:vertical:focus {
-    border-color: rgba(0,255,0,255);
+    border-color: rgba(210,90,10,255);
 }
 
 /* ##################################################################################### */
@@ -1409,11 +1409,11 @@ QLineEdit:hover {
 }
 
 QLineEdit:focus {
-    border-color: rgba(0,255,0,255);
+    border-color: rgba(210,90,10,255);
 }
 
 QLineEdit:selected {
-    background-color: rgba(0,255,0,255);
+    background-color: rgba(210,90,10,255);
     color: rgba(255,255,255,255);
 }
 
@@ -1528,8 +1528,8 @@ QDockWidget QTabBar QToolButton {
 
 QTabBar QToolButton:pressed, 
 QDockWidget QTabBar QToolButton:pressed {
-    background-color: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    background-color: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
 }
 
 QTabBar QToolButton:pressed:hover, 
@@ -1835,38 +1835,38 @@ QTreeView:selected,
 QListView:selected,
 QTableView:selected,
 QColumnView:selected {
-    border-color: rgba(0,255,0,255);
+    border-color: rgba(210,90,10,255);
 }
 
 QTreeView:focus,
 QListView:focus,
 QTableView:focus,
 QColumnView:focus {
-    border-color: rgba(0,255,0,255);
+    border-color: rgba(210,90,10,255);
 }
 
 QTreeView::item:pressed,
 QListView::item:pressed,
 QTableView::item:pressed,
 QColumnView::item:pressed {
-    background-color: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    background-color: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
 }
 
 QTreeView::item:selected:active,
 QListView::item:selected:active,
 QTableView::item:selected:active,
 QColumnView::item:selected:active {
-    background-color: rgba(0,255,0,255);   
-    color: rgba(0,0,0,255);
+    background-color: rgba(210,90,10,255);   
+    color: rgba(255,255,255,255);
 }
 
 QTreeView::item:selected:!active,
 QListView::item:selected:!active,
 QTableView::item:selected:!active,
 QColumnView::item:selected:!active {
-    background-color: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    background-color: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
 }
 
 QTreeView::item:!selected:hover,
@@ -1896,7 +1896,7 @@ QToolBox {
 
 QToolBox:selected {
     padding: 0px;
-    border: 2px solid rgba(0,255,0,255);
+    border: 2px solid rgba(210,90,10,255);
 }
 
 QToolBox::tab {
@@ -1984,7 +1984,7 @@ QSplitter {
 QSplitter::handle {
     background-color: rgba(0,90,156,255);
     border: 1px solid rgba(0,0,127,255);
-    border-radius: 2;
+    border-radius: -5;
     spacing: 1px;
     padding: 1px;
 }
@@ -1992,13 +1992,13 @@ QSplitter::handle {
 QSplitter::handle:hover:!pressed {
     background-color: rgba(0,215,255,255);
     border: 1px solid rgba(0,0,127,255);
-    border-radius: 2;
+    border-radius: -5;
 }
 
 QSplitter::handle:pressed {
     background-color: rgba(0,64,128,255);
-    border: 1px solid rgba(0,255,0,255);
-    border-radius: 2;
+    border: 1px solid rgba(210,90,10,255);
+    border-radius: -5;
 }
 
 /* ##################################################################################### */
@@ -2006,7 +2006,7 @@ QSplitter::handle:pressed {
 /* QDateEdit, QDateTimeEdit */
 
 QDateEdit, QDateTimeEdit {
-    selection-background-color: rgba(0,255,0,255);
+    selection-background-color: rgba(210,90,10,255);
     border-style: solid;
     border-color: rgba(0,100,180,255);
     border-width: 0;  
@@ -2023,7 +2023,7 @@ QDateEdit, QDateTimeEdit {
 
 QDateEdit:on,
 QDateTimeEdit:on {
-    selection-background-color: rgba(0,255,0,255);
+    selection-background-color: rgba(210,90,10,255);
 }
 
 QDateEdit::drop-down {
@@ -2055,7 +2055,7 @@ QDateTimeEdit QAbstractItemView {
     border-radius: 4;
     border-color: rgba(0,100,180,255);
     border-width: 0;
-    selection-background-color: rgba(0,255,0,255);
+    selection-background-color: rgba(210,90,10,255);
 }
 
 
@@ -2077,8 +2077,8 @@ QAbstractView:hover {
 }
 
 QAbstractView:selected {
-    background: rgba(0,255,0,255);
-    color: rgba(0,0,0,255);
+    background: rgba(210,90,10,255);
+    color: rgba(255,255,255,255);
 }
 
 /* ##################################################################################### */
@@ -2306,7 +2306,7 @@ ads--CDockContainerWidget > QSplitter {
 ads--CDockContainerWidget ads--CDockSplitter::handle {
     background: rgba(0,90,156,255);
     border: 1px solid rgba(0,0,127,255);
-    /* width: 2; Can't be changed by stylesheet (read notes) */
+    /* width: -9; Can't be changed by stylesheet (read notes) */
 }
 
 ads--CDockAreaWidget {
@@ -2378,7 +2378,7 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
 }
 
 #tabCloseButton::pressed {
-    color: rgba(0,255,0,255);
+    color: rgba(210,90,10,255);
 }
 
 #tabCloseButton::disabled {
