@@ -14,7 +14,7 @@
 static ot::SimpleFactoryRegistrar<ot::GraphicsImageItemCfg> imageItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg);
 
 ot::GraphicsImageItemCfg::GraphicsImageItemCfg(const std::string& _imageSubPath)
-	: m_imageSubPath(_imageSubPath), m_maintainAspectRatio(false), m_colorMask(-1.f, -1.f, -1.f, -1.f)
+	: m_imageSubPath(_imageSubPath), m_maintainAspectRatio(false), m_colorMask(-255, -255, -255, -255)
 {}
 
 ot::GraphicsImageItemCfg::~GraphicsImageItemCfg() {}
