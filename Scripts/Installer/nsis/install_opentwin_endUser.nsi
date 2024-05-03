@@ -774,7 +774,7 @@ FunctionEnd
 ; MUI end ------
 
 Name "${PRODUCT_NAME}"
-OutFile "Install OpenTwin.exe"
+;OutFile "Install OpenTwin.exe"
 InstallDir "$PROGRAMFILES\OpenTwin" ; = $INSTDIR
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails hide
