@@ -195,6 +195,9 @@
     <ClInclude Include="include\OTGui\GraphicsShapeItemCfg.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\LineStyle.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -328,6 +331,9 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsShapeItemCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LineStyle.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

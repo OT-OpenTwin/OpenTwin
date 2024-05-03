@@ -8,6 +8,7 @@
 
 // OpenTwin header
 #include "OTGui/Path2D.h"
+#include "OTGui/LineStyle.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTCore/OTClassHelper.h"
 
@@ -68,27 +69,22 @@ namespace ot {
 
 		//! @brief Set the outline painter.
 		//! The item takes ownership of the painter.
-		void setOutlinePainter(Painter2D* _painter);
+		void setOutlinePainter(Painter2D* _painter) { m_outline.setPainter(_painter); };
 
 		//! @brief Outline painter.
-		const Painter2D* outlinePainter(void) const { return m_outlinePainter; };
-
-		//! @brief Returns the current outline painter and replaces it with the default outline painter.
-		//! The caller takes ownership of the returned painter.
-		Painter2D* takeOutlinePainter(void);
+		const Painter2D* outlinePainter(void) const { return m_outline.painter(); };
 
 		//! @brief Set the outline width.
 		//! @param _w Width to set.
-		void setOutlineWidth(double _w) { m_outlineWidth = _w; };
+		void setOutlineWidth(double _w) { m_outline.setWidth(_w); };
 
 		//! @brief Outline width.
-		double outlineWidth(void) const { return m_outlineWidth; };
+		double outlineWidth(void) const { return m_outline.width(); };
 
 	private:
 		Path2D m_path; //! @brief Outline path.
 		Painter2D* m_backgroundPainter; //! @brief Background painter.
-		Painter2D* m_outlinePainter; //! @brief Outline painter.
-		double m_outlineWidth; //! @brief Outline width.
+		LineStyle m_outline;
 	};
 
 }
