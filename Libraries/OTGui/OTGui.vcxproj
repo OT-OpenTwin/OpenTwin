@@ -54,6 +54,7 @@
     <ClInclude Include="include\OTGui\OnePropertyDialogCfg.h" />
     <ClInclude Include="include\OTGui\OTGuiAPIExport.h" />
     <ClInclude Include="include\OTGui\Painter2D.h" />
+    <ClInclude Include="include\OTGui\Painter2DFactory.h" />
     <ClInclude Include="include\OTGui\Path2D.h" />
     <ClInclude Include="include\OTGui\PlainTextEditViewCfg.h" />
     <ClInclude Include="include\OTGui\PropertyDialogCfg.h" />
@@ -103,6 +104,7 @@
     <ClCompile Include="src\NavigationTreePackage.cpp" />
     <ClCompile Include="src\OnePropertyDialogCfg.cpp" />
     <ClCompile Include="src\Painter2D.cpp" />
+    <ClCompile Include="src\Painter2DFactory.cpp" />
     <ClCompile Include="src\Path2D.cpp" />
     <ClCompile Include="src\PlainTextEditViewCfg.cpp" />
     <ClCompile Include="src\PropertyDialogCfg.cpp" />
