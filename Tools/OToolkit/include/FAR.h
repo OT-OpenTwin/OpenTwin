@@ -81,20 +81,20 @@ public:
 	void setBlacklistFiles(const QStringList& _blacklist) { m_blacklistFiles = _blacklist; };
 	const QStringList& blacklistFiles(void) const { return m_blacklistFiles; };
 
-	void setBlacklistFilesFlags(FilterFlags _flags) { m_whitelistFilesFlags = _flags; };
-	FilterFlags blacklistFilesFlags(void) const { return m_whitelistFilesFlags; };
+	void setBlacklistFilesFlags(FilterFlags _flags) { m_blacklistFilesFlags = _flags; };
+	FilterFlags blacklistFilesFlags(void) const { return m_blacklistFilesFlags; };
 
 	void setWhitelistDirectories(const QStringList& _whitelist) { m_whitelistDirectories = _whitelist; };
 	const QStringList& whitelistDirectories(void) const { return m_whitelistDirectories; };
 
-	void setWhitelistDirectoriesFlags(FilterFlags _flags) { m_whitelistFilesFlags = _flags; };
-	FilterFlags whitelistDirectoriesFlags(void) const { return m_whitelistFilesFlags; };
+	void setWhitelistDirectoriesFlags(FilterFlags _flags) { m_whitelistDirectoriesFlags = _flags; };
+	FilterFlags whitelistDirectoriesFlags(void) const { return m_whitelistDirectoriesFlags; };
 
 	void setBlacklistDirectories(const QStringList& _blacklist) { m_blacklistDirectories = _blacklist; };
 	const QStringList& blacklistDirectories(void) const { return m_blacklistDirectories; };
 
-	void setBlacklistDirectoriesFlags(FilterFlags _flags) { m_whitelistFilesFlags = _flags; };
-	FilterFlags blacklistDirectoriesFlags(void) const { return m_whitelistFilesFlags; };
+	void setBlacklistDirectoriesFlags(FilterFlags _flags) { m_blacklistDirectoriesFlags = _flags; };
+	FilterFlags blacklistDirectoriesFlags(void) const { return m_blacklistDirectoriesFlags; };
 
 private:
 	QStringList m_whitelistFiles;
