@@ -333,6 +333,12 @@
     <ClInclude Include="include\OTCore\ThisService.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\FactoryTemplate.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\FactoryTemplate.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

@@ -75,6 +75,8 @@
     <ClInclude Include="include\OTCore\EncodingConverter_ISO88591ToUTF8.h" />
     <ClInclude Include="include\OTCore\EncodingConverter_UTF16ToUTF8.h" />
     <ClInclude Include="include\OTCore\EncodingGuesser.h" />
+    <ClInclude Include="include\OTCore\FactoryTemplate.h" />
+    <ClInclude Include="include\OTCore\FactoryTemplate.hpp" />
     <ClInclude Include="include\OTCore\Flags.h" />
     <ClInclude Include="include\OTCore\FolderNames.h" />
     <ClInclude Include="include\OTCore\GenericDataStruct.h" />
