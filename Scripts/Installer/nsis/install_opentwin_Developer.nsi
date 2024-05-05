@@ -1137,16 +1137,28 @@ Section "Install NSIS (Nullsoft Scriptable Install System)" SEC11
 	AddSize 7000
 	DetailPrint "Installing NSIS (Nullsoft Scriptable Install System)..."
 		#DetailPrint "$DEVENV_ROOT"
-		ExecWait '"$TempToolChain\nsis-3.10-setup" /S'	#install NSIS
+		ExecWait '"$TempToolChain\nsis-3.10-setup.exe" /S'	#install NSIS
 		DetailPrint "Done."
 		#Sleep 10000
 SectionEnd
 
-Section "Install Qt Visual Studio Plugin" SEC12
+Section "Install 7-Zip" SEC12
+	AddSize 2000
+	DetailPrint "Installing 7-Zip)..."
+		#DetailPrint "$DEVENV_ROOT"
+		ExecWait '"$TempToolChain\7z2301-x64.exe" /S'	#install 7-Zip
+		DetailPrint "Done."
+		#Sleep 10000
+SectionEnd
+
+Section "Install Qt Visual Studio Plugin" SEC13
 	AddSize 20000
 	DetailPrint "Installing Qt Visual Studio Plugin..."
 		#DetailPrint "$DEVENV_ROOT"
 		ExecWait '"$DEVENV_ROOT\VSIXInstaller.exe" /quiet "$TempToolChain\qt-vsaddin-msvc2022-3.0.2.vsix"'	#install the Qt visual studio plugin
+
+		MessageBox MB_ICONEXCLAMATION|MB_OK 'The Qt plugin for Visual Studio has been installed. $\n$\nYou need to configure the plugin by opening Visual Studio and choosing Extensions->Qt VS Tools->Qt Versions.$\n$\nIn this dialog box, you can add a new Qt version named "6.6.1" and specify the following path:$\n$DEV_ROOT\ThirdParty\Qt\6.6.1\msvc2019_64'
+
 		DetailPrint "Done."
 		#Sleep 10000
 SectionEnd
@@ -1201,7 +1213,9 @@ SectionEnd
 	
 	!insertmacro MUI_DESCRIPTION_TEXT ${SEC11} "Install NSIS (Nullsoft Scriptable Install System)"
 
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC12} "Install the Qt Visual Studio 2022 plugin"
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC12} "Install 7-Zip"
+	
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC13} "Install the Qt Visual Studio 2022 plugin"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 

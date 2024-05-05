@@ -41,6 +41,7 @@ Set DEVELOPER_NSI="!OPENTWIN_DEV_ROOT!\Scripts\Installer\nsis\install_opentwin_D
 
 Set THIRDPARTY_UNZIP_PATH="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools"
 Set THIRDPARTY_ZIPFILE="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools\ThirdParty.zip.001"
+Set PLUGIN_ZIPFILE="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools\ThirdParty\dev\EnVar_plugin.zip"
 
 SET HELPER_PATH="!OPENTWIN_DEV_ROOT!\Scripts\Installer\helper"
 
@@ -69,6 +70,9 @@ echo +++ COMPILE TIME +++
 	echo Extracting Third Party Toolchain using 7-Zip...
 	"!SEVENZIP_REG_DATA!\7z.exe" x !THIRDPARTY_ZIPFILE! -o!THIRDPARTY_UNZIP_PATH! -y
 	
+	echo Extracting EnVar plugin for NSIS using 7-Zip...
+	"!SEVENZIP_REG_DATA!\7z.exe" x !PLUGIN_ZIPFILE! -o!NSIS_REG_VALUE! -y -aos
+
 	echo Copying Installation helpers...
 	RMDIR /S /Q "!HELPER_PATH!"
 	mkdir !HELPER_PATH!
