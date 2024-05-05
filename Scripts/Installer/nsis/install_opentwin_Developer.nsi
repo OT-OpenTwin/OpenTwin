@@ -1129,6 +1129,7 @@ Section "Install MiKTeX" SEC10
 		#DetailPrint "$DEVENV_ROOT"
 		ExecWait '"$TempToolChain\basic-miktex-24.1-x64.exe" --auto-install=yes --unattended --shared'	#install MiKTeX (required for Sphinx)
 		EnVar::AddValue "PATH" "$PROGRAMFILES\MiKTeX\miktex\bin\x64"
+		Pop $0
 		DetailPrint "Done."
 		#Sleep 10000
 SectionEnd
