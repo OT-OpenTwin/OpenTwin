@@ -99,7 +99,7 @@ std::vector<std::string> NGSpice::getNodeNumbersOfVoltageMeter(std::string edito
 				if (isValidNodeString(nodes))
 				{
 					
-					nodeNumberString.push_back("v(" + nodes + ")");
+					nodeNumberString.push_back("(" + nodes + ")");
 					nodes = "";
 					continue;
 				}
@@ -137,11 +137,7 @@ std::vector<std::string> NGSpice::getNodeNumbersOfVoltageMeter(std::string edito
 			}		
 		}	
 	}
-
-	
 	return nodeNumberString;
-
-	//Build a map in which the value is a vector and put in their all elements to find easy the voltage Meter elements and not to go trough all with a for loop
 
 }
 
@@ -229,11 +225,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 	}
 
 	
-	//std::map<std::pair<ot::UID, std::string>, std::string> connectionMap; //3.Methode
-	//std::unordered_map<std::pair<ot::UID, ot::UID>, std::string,boost::hash<std::pair<ot::UID,ot::UID>>> connectionMapTest;
-	//std::map<Connection, std::string> connectionNodeNumbers; //2.Methode
-	std::unordered_map<std::pair<ot::UID, std::string>, std::string, PairHash> connectionNodeNumbers; // 1.Methode
 
+	std::unordered_map<std::pair<ot::UID, std::string>, std::string, PairHash> connectionNodeNumbers; 
+	//Lieber normale map nehmen 
 
 
 	for (auto& blockEntityByID : allEntitiesByBlockID)
@@ -294,84 +288,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 				Numbers::nodeNumber--;
 				temp = false;
 			}
-			// 2.Methode
 			
-			//for (auto connectionTemp : connectionNodeNumbers)
-			//{
-			//	if (myConn.getDestinationUid() == connectionTemp.first.getDestinationUid() && myConn.destConnectable() == connectionTemp.first.destConnectable())
-			//	{
-			//		myConn.setNodeNumber(connectionTemp.second);
-			//		found = true;
-			//		break; // Keine weitere Überprüfung notwendig, wir haben eine Übereinstimmung gefunden
-			//	}
-			//	else if (myConn.getDestinationUid() == connectionTemp.first.getOriginUid() && myConn.destConnectable() == connectionTemp.first.originConnectable())
-			//	{
-			//		myConn.setNodeNumber(connectionTemp.second);
-			//		found = true;
-			//		break;
-			//	}
-			//	else if (myConn.getOriginUid() == connectionTemp.first.getOriginUid() && myConn.originConnectable() == connectionTemp.first.originConnectable())
-			//	{
-			//		myConn.setNodeNumber(connectionTemp.second);
-			//		found = true;
-			//		break;
-			//	}
-			//	else if (myConn.getOriginUid() == connectionTemp.first.getDestinationUid() && myConn.originConnectable() == connectionTemp.first.destConnectable())
-			//	{
-			//		myConn.setNodeNumber(connectionTemp.second);
-			//		found = true;
-			//		break;
-			//	}
-			//}
-
-			//if (!found)
-			//{
-			//	myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
-			//	connectionNodeNumbers.insert_or_assign(myConn, myConn.getNodeNumber());
-			//}
-
-
-			//3.Methode
-
-			//ot::UID destUID;
-			//if (conn.getOriginUid() == blockEntity->getEntityID())
-			//{
-			//	destUID = conn.getOriginUid();
-			//}
-			//else if (conn.getDestinationUid() == blockEntity->getEntityID())
-			//{
-			//	destUID = conn.getDestinationUid();
-			//}
-
-			
-			////If the connection is has the voltage Meter as origin or destination then we dont want to give it a nodeNumber
-			//if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter"))
-			//{
-			//	auto connectionKey = std::make_pair(destUID,connectionCfg.destConnectable());
-
-			//	if (connectionMap.find(connectionKey) != connectionMap.end())
-			//	{
-			//		connectionMap[connectionKey] = connectionMap.at(connectionKey);
-			//		conn.setNodeNumber(connectionMap[connectionKey]);
-			//	}
-			//	else
-			//	{
-			//		connectionMap[connectionKey] = std::to_string(Numbers::nodeNumber++);
-			//		conn.setNodeNumber(connectionMap[connectionKey]);
-			//		temp = true;
-			//	}
-			//}
-			//else
-			//{
-			//	conn.setNodeNumber("voltageMeterConnection");
-			//}
-
-			/*if (connectionNodeNumbers.size() == 0)
-			{
-				myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
-				connectionNodeNumbers.insert_or_assign(myConn, myConn.getNodeNumber());
-			}*/
-
 			
 		}
 
@@ -392,19 +309,6 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	std::string TitleLine = "circbyline *Test";
 	ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
 	
-	
-	
-	//ngSpice_Command(const_cast<char*>("circbyline R1 0 1 200"));
-	//ngSpice_Command(const_cast<char*>("circbyline iin 0 1 AC 1"));
-	//ngSpice_Command(const_cast<char*>("circbyline V1 0 1 AC 10 sin(0 1 1k)"));
-	//ngSpice_Command(const_cast<char*>("circbyline .ac dec 10 .01 10"));
-	//ngSpice_Command(const_cast<char*>("circbyline .Control"));
-	//ngSpice_Command(const_cast<char*>("circbyline run"));
-	//ngSpice_Command(const_cast<char*>("circbyline asciiplot all"));
-	//ngSpice_Command(const_cast<char*>("circbyline .endc"));
-	//ngSpice_Command(const_cast<char*>("circbyline .end"));
-
-
 	
 
 	//As next i create the Circuit Element Netlist Lines by getting the information out of the BufferClasses 
@@ -461,18 +365,12 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			}
 			
 		}
-	
+		
 		
 
-		//From begin
+		//Form behind
+
 		auto connections = element.getList();
-
-		/*for (auto conn : connections)
-		{
-			netlistNodeNumbers += conn.getNodeNumber() + " ";
-		}*/
-
-		//From behind
 		std::vector<Connection> tempVector(connections.begin(), connections.end());
 		std::reverse(tempVector.begin(), tempVector.end());
 		std::unordered_set<std::string> temp;
@@ -517,17 +415,16 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationTypeProperty != nullptr);
 
-	/*EntityPropertiesString* printSettingsProperty = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Print Settings"));
-	assert(printSettingsProperty != nullptr);*/
 
 	std::string simulationType = simulationTypeProperty->getValue();
 
 	std::string printSettings = "print ";
 	for (auto nodes : nodesOfVoltageMeter)
 	{
-		printSettings += nodes + " ";
+		printSettings +="v" + nodes +" ";
 	}
 	
+
 
 	
 	std::string simulationLine = "";
@@ -553,17 +450,27 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	
 	//And now i send it to NGSpice in the right order
-	//ngSpice_Command(const_cast<char*>("circbyline .probe vd (V1:1, V2:2)"));
-	//ngSpice_Command(const_cast<char*>("circbyline V2 2 1 0"));
+	
+
+	
 	ngSpice_Command(const_cast<char*>(simulationLine.c_str()));
-	//ngSpice_Command(const_cast<char*>(" circybline E_diff 3 0 2 1 gain = 1"));
+	//Now i will do a loop through the nodes of the voltageMeter to get the potential diffirence with probe
+	for (auto nodes : nodesOfVoltageMeter)
+	{
+		std::string probeLine = "circbyline .probe vd" + nodes ; //That is the right syntax
+		ngSpice_Command(const_cast<char*>(probeLine.c_str()));
+	}
+
+	//ngSpice_Command(const_cast<char*>("circbyline .probe ix(3,2)"));
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
-	//ngSpice_Command(const_cast<char*>("circbyline probe v(1,2)"));
+	//ngSpice_Command(const_cast<char*>("circbyline let diff = v(2)-v(1)"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
+	//ngSpice_Command(const_cast<char*>("circbyline let vdiff = v(2)-v(1)"));
+	//ngSpice_Command(const_cast<char*>("circbyline meas tran vtest find vdiff at=0.04e-3"));
 	ngSpice_Command(const_cast<char*>(printSettings.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .endc"));
-	//ngSpice_Command(const_cast<char*>(sendData.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .end"));
+
 
 
 	return "success";
