@@ -5,12 +5,11 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/SimpleFactory.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
-#include "OTWidgets/OTQtConverter.h"
+#include "OTGui/Painter2DFactory.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/ColorStyleValue.h"
-#include "OTWidgets/Painter2DFactory.h"
 
 ot::ColorStyleValue::ColorStyleValue()
 	: m_painter(nullptr) 
@@ -51,7 +50,7 @@ void ot::ColorStyleValue::setFromJsonObject(const ot::ConstJsonObject& _object) 
 	m_name = json::getString(_object, "Name");
 
 	ConstJsonObject painterObj = json::getObject(_object, "Painter");
-	Painter2D* newPainter = ot::SimpleFactory::instance().createType<Painter2D>(painterObj);
+	Painter2D* newPainter = Painter2DFactory::instance().create(painterObj);
 	if (!newPainter) {
 		OT_LOG_E("Failed to create painter");
 		return;
@@ -72,14 +71,12 @@ QString ot::ColorStyleValue::qss(void) const {
 
 QColor ot::ColorStyleValue::color(void) const {
 	OTAssertNullptr(m_painter);
-	if (m_painter) return OTQtConverter::toQt(m_painter->getDefaultColor());
+	if (m_painter) return QtFactory::toQt(m_painter->getDefaultColor());
 	else return QColor();
 }
 
 QBrush ot::ColorStyleValue::brush(void) const {
-	OTAssertNullptr(m_painter);
-	if (m_painter) return Painter2DFactory::brushFromPainter2D(m_painter);
-	else return QBrush();
+	return QtFactory::toQt(m_painter);
 }
 
 void ot::ColorStyleValue::setPainter(Painter2D* _painter) {

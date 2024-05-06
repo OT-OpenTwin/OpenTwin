@@ -6,12 +6,13 @@
 
 // OpenTwin header
 #include "OTGui/GraphicsImageItemCfg.h"
+#include "OTGui/GraphicsItemCfgFactory.h"
 
 #define OT_JSON_MEMBER_ImagePath "ImagePath"
 #define OT_JSON_MEMBER_ColorMask "ColorMask"
 #define OT_JSON_MEMBER_MaintainAspectRatio "MaintainAspectRatio"
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsImageItemCfg> imageItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsImageItemCfg> imageItemCfg(OT_FactoryKey_GraphicsImageItem);
 
 ot::GraphicsImageItemCfg::GraphicsImageItemCfg(const std::string& _imageSubPath)
 	: m_imageSubPath(_imageSubPath), m_maintainAspectRatio(false), m_colorMask(-255, -255, -255, -255)

@@ -175,7 +175,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_DEFAULT_SERVICE_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/$(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_GUI_ROOT)/$(OT_INC);$(OT_WIDGETS_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(QWT_LIB_INCD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);$(BOOST_INCD);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_INC);$(QT_ADS_ROOT)\include;$(QT_TT_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -190,7 +190,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(BOOST_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/$(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_GUI_ROOT)/$(OT_INC);$(OT_WIDGETS_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(QWT_LIB_INCD);$(QWTPOLAR_LIB_INCD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_UICORE_ROOT)/$(OT_DLLD);$(OT_VIEWER_ROOT)/$(OT_DLLD);$(QWT_LIB_LIBPATHD);$(QWTPOLAR_LIB_LIBPATHD);$(Qt_LIBPATH_);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_DLLD);$(OT_BLOCKEDITOR_ROOT)/$(OT_DLLD);$(OT_UIPLUGINAPI_ROOT)/$(OT_DLLD);$(ZLIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLD);$(OT_RUBBERBAND_ROOT)/$(OT_DLLD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -204,7 +204,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_DEFAULT_SERVICE_INCR);$(BOOST_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/$(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_GUI_ROOT)/$(OT_INC);$(OT_WIDGETS_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(QWT_LIB_INCR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_INC);$(QT_ADS_ROOT)\include;$(QT_TT_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -219,7 +219,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(BOOST_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/$(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_GUI_ROOT)/$(OT_INC);$(OT_WIDGETS_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(QWT_LIB_INCR);$(QWTPOLAR_LIB_INCR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_UICORE_ROOT)/$(OT_DLLR);$(OT_VIEWER_ROOT)/$(OT_DLLR);$(QWT_LIB_LIBPATHR);$(QWTPOLAR_LIB_LIBPATHR);$(Qt_LIBPATH_);$(OT_BLOCKEDITORAPI_ROOT)/$(OT_DLLR);$(OT_BLOCKEDITOR_ROOT)/$(OT_DLLR);$(OT_UIPLUGINAPI_ROOT)/$(OT_DLLR);$(ZLIB_LIBPATHR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLR);$(OT_RUBBERBAND_ROOT)/$(OT_DLLR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

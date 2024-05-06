@@ -5,19 +5,17 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/KeyMap.h"
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsRectangularItemCfg.h"
+#include "OTWidgets/QtFactory.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 #include "OTWidgets/GraphicsRectangularItem.h"
-#include "OTWidgets/Painter2DFactory.h"
-#include "OTWidgets/OTQtConverter.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
 #include <QtGui/qevent.h>
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsRectangularItem> rectItem(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);
-static ot::GlobalKeyMapRegistrar rectItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsRectangularItem> rectItemRegistrar(OT_FactoryKey_GraphicsRectangularItem);
 
 ot::GraphicsRectangularItem::GraphicsRectangularItem() 
 	: ot::CustomGraphicsItem(false), m_size(10, 10), m_cornerRadius(0)
@@ -46,10 +44,10 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_size.setWidth(cfg->size().width());
 	m_size.setHeight(cfg->size().height());
 	m_cornerRadius = cfg->cornerRadius();
-	m_brush = ot::Painter2DFactory::brushFromPainter2D(cfg->backgroundPainter());
+	m_brush = QtFactory::toQt(cfg->backgroundPainter());
 	m_pen.setWidth(cfg->border().top()); // ToDo: Add seperate borders on all 4 sides
-	m_pen.setBrush(QBrush(ot::OTQtConverter::toQt(cfg->border().color())));
-	m_pen.setColor(ot::OTQtConverter::toQt(cfg->border().color()));
+	m_pen.setBrush(QBrush(QtFactory::toQt(cfg->border().color())));
+	m_pen.setColor(QtFactory::toQt(cfg->border().color()));
 
 	// We call set rectangle size which will call set geometry to finalize the item
 	this->setRectangleSize(m_size);

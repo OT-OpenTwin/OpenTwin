@@ -12,8 +12,6 @@
 #include <QtGui/qfont.h>
 #include <QtGui/qpen.h>
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsTextItem "OT_GIText"
-
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsTextItem : public ot::CustomGraphicsItem {
@@ -26,9 +24,6 @@ namespace ot {
 		// Base class functions: ot::GraphicsItem
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
-
-		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsTextItem); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

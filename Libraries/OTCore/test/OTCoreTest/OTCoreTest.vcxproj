@@ -42,7 +42,6 @@
     <ClCompile Include="src\TestPerformanceTest.cpp" />
     <ClCompile Include="src\TestReturnValues.cpp" />
     <ClCompile Include="src\TestrJSON.cpp" />
-    <ClCompile Include="src\TestSimpleFactory.cpp" />
     <ClCompile Include="src\TestTextEncoding.cpp" />
     <ClCompile Include="TestVariable.cpp" />
   </ItemGroup>

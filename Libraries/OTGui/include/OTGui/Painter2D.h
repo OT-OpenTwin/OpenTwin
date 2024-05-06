@@ -8,15 +8,19 @@
 // OpenTwin header
 #include "OTCore/Color.h"
 #include "OTCore/Serializable.h"
-#include "OTCore/SimpleFactory.h"
 #include "OTGui/OTGuiAPIExport.h"
+
+#define OT_JSON_MEMBER_Painter2DType "P2Type"
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT Painter2D : public ot::Serializable, public ot::SimpleFactoryObject {
+	class OT_GUI_API_EXPORT Painter2D : public ot::Serializable {
 	public:
 		Painter2D() {};
 		virtual ~Painter2D() {};
+
+		//! @brief Returns the unique Painter2D type name that is used in the Painter2DFactory.
+		virtual std::string getFactoryKey(void) const = 0;
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)

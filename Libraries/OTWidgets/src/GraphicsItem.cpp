@@ -5,7 +5,6 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/KeyMap.h"
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTWidgets/IconManager.h"
@@ -13,8 +12,6 @@
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/ToolTipHandler.h"
-#include "OTWidgets/GraphicsFactory.h"
-#include "OTWidgets/Painter2DFactory.h"
 #include "OTWidgets/GraphicsStackItem.h"
 #include "OTWidgets/GraphicsHighlightItem.h"
 #include "OTWidgets/GraphicsConnectionItem.h"

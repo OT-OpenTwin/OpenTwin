@@ -5,10 +5,10 @@
 
 
 // OpenTwin header
-#include "OTCore/SimpleFactory.h"
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTGui/GraphicsPickerCollectionCfg.h"
 
 #define OT_JSON_Member_Name "Name"
@@ -122,12 +122,9 @@ void ot::GraphicsScenePackage::setFromJsonObject(const ConstJsonObject& _object)
 
 	std::list<ConstJsonObject> itemsArr = json::getObjectList(_object, OT_JSON_Member_Items);
 	for (auto itmObj : itemsArr) {
-		ot::GraphicsItemCfg* itm = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(itmObj);
+		ot::GraphicsItemCfg* itm = GraphicsItemCfgFactory::instance().create(itmObj);
 		OTAssertNullptr(itm);
-		if (itm) {
-			itm->setFromJsonObject(itmObj);
-			if (itm) m_items.push_back(itm);
-		}
+		if (itm) m_items.push_back(itm);
 	}
 }
 

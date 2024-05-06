@@ -4,12 +4,11 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/KeyMap.h"
 #include "OTGui/GraphicsVBoxLayoutItemCfg.h"
 #include "OTWidgets/GraphicsVBoxLayoutItem.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsVBoxLayoutItem> vBoxItem(OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItem);
-static ot::GlobalKeyMapRegistrar vBoxItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsVBoxLayoutItem> vblayItemRegistrar(OT_FactoryKey_GraphicsVBoxLayoutItem);
 
 ot::GraphicsVBoxLayoutItem::GraphicsVBoxLayoutItem(QGraphicsLayoutItem* _parentItem)
 	: GraphicsBoxLayoutItem(Qt::Vertical, _parentItem)

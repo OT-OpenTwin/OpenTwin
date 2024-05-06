@@ -7,10 +7,10 @@
 #include "OTCore/Logger.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/Painter2D.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/Painter2DPreview.h"
-#include "OTWidgets/Painter2DFactory.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
@@ -31,7 +31,7 @@ ot::Painter2DPreview::~Painter2DPreview() {
 
 void ot::Painter2DPreview::setFromPainter(const Painter2D* _painter) {
 	OTAssertNullptr(_painter);
-	m_brush = Painter2DFactory::brushFromPainter2D(_painter);
+	m_brush = QtFactory::toQt(_painter);
 	this->update();
 }
 

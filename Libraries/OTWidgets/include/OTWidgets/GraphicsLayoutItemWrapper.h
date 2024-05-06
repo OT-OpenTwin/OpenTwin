@@ -11,8 +11,6 @@
 // Qt header
 #include <QtWidgets/qgraphicswidget.h>
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsLayoutWrapperItem "OT_GILayWrap"
-
 namespace ot {
 
 	class GraphicsLayoutItem;
@@ -43,9 +41,6 @@ namespace ot {
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
-
-		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsLayoutWrapperItem); };
 
 		virtual void removeAllConnections(void) override;
 

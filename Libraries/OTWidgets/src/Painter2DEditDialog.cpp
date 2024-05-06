@@ -18,7 +18,6 @@
 #include "OTWidgets/ColorPickButton.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/Painter2DPreview.h"
-#include "OTWidgets/Painter2DFactory.h"
 #include "OTWidgets/Painter2DEditDialog.h"
 
 // Qt header
@@ -392,9 +391,9 @@ void ot::Painter2DEditDialog::applyPainter(const Painter2D* _painter) {
 		delete m_currentEntry;
 		m_currentEntry = nullptr;
 	}
-	if (_painter->simpleFactoryObjectKey() == OT_SimpleFactoryJsonKeyValue_FillPainter2DCfg) m_currentEntry = new Painter2DEditDialogFillEntry(_painter);
-	else if (_painter->simpleFactoryObjectKey() == OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg) m_currentEntry = new Painter2DEditDialogLinearGradientEntry(_painter);
-	else if (_painter->simpleFactoryObjectKey() == OT_SimpleFactoryJsonKeyValue_RadialGradientPainter2DCfg) m_currentEntry = new Painter2DEditDialogRadialGradientEntry(_painter);
+	if (_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) m_currentEntry = new Painter2DEditDialogFillEntry(_painter);
+	else if (_painter->getFactoryKey() == OT_FactoryKey_LinearGradientPainter2D) m_currentEntry = new Painter2DEditDialogLinearGradientEntry(_painter);
+	else if (_painter->getFactoryKey() == OT_FactoryKey_RadialGradientPainter2D) m_currentEntry = new Painter2DEditDialogRadialGradientEntry(_painter);
 	else {
 		OT_LOG_E("Unknown painter type");
 	}

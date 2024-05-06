@@ -30,9 +30,6 @@
     <ClCompile Include="src\TestTextEncoding.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\TestSimpleFactory.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\FixtureVariable.cpp">
       <Filter>src</Filter>
     </ClCompile>

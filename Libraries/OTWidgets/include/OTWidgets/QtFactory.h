@@ -1,15 +1,15 @@
-//! @file OTQtConverter.h
+//! @file QtFactory.h
 //! @author Alexander Kuester (alexk95)
 //! @date August 2023
 // ###########################################################################################################################################################################################################################################################################################################################
 
-#ifndef OT_OTQTCONVERTER_H
-#define OT_OTQTCONVERTER_H
+#pragma once
 
 // OpenTwin header
+#include "OTCore/OTClassHelper.h"
+#include "OTCore/Size2D.h"
 #include "OTCore/Color.h"
 #include "OTCore/Point2D.h"
-#include "OTCore/Size2D.h"
 #include "OTGui/GuiTypes.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -20,8 +20,13 @@
 #include <QtGui/qbrush.h>
 
 namespace ot {
-	class OT_WIDGETS_API_EXPORT OTQtConverter {
-		OT_DECL_NOCOPY(OTQtConverter)
+
+	class Painter2D;
+
+	//! @class QtFactory
+	//! @brief The QtFactory is used to convert OpenTwin configuration objects to Qt objects.
+	class OT_WIDGETS_API_EXPORT QtFactory {
+		OT_DECL_NOCOPY(QtFactory)
 	public:
 		//! @brief Convert OpenTwin Color to Qt Color
 		static QColor toQt(const ot::Color& _color);
@@ -39,10 +44,12 @@ namespace ot {
 
 		static QGradient::Spread toQt(ot::GradientSpread _spread);
 
+		//! @brief Creates a QBrush equivalent to the provided painter.
+		//! Returns default if no painter provided.
+		static QBrush toQt(const ot::Painter2D* _painter);
+
 	private:
-		OTQtConverter() {};
-		~OTQtConverter() {};
+		QtFactory() {};
+		~QtFactory() {};
 	};
 }
-
-#endif

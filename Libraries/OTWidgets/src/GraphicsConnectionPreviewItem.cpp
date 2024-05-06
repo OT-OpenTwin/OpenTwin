@@ -7,7 +7,6 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/GraphicsConnectionPreviewItem.h"
 #include "OTWidgets/GraphicsItem.h"
-#include "OTWidgets/OTQtConverter.h"
 
 // Qt header
 #include <QtGui/qpainter.h>

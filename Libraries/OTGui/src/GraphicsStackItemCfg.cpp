@@ -7,13 +7,14 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsStackItemCfg.h"
+#include "OTGui/GraphicsItemCfgFactory.h"
 
 #define OT_JSON_MEMBER_Item "Item"
 #define OT_JSON_MEMBER_Items "Items"
 #define OT_JSON_MEMBER_IsSlave "IsSlave"
 #define OT_JSON_MEMBER_IsMaster "IsMaster"
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsStackItemCfg> stackItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsStackItemCfg> stackItemCfg(OT_FactoryKey_GraphicsStackItem);
 
 ot::GraphicsStackItemCfg::GraphicsStackItemCfg()
 {
@@ -65,18 +66,13 @@ void ot::GraphicsStackItemCfg::setFromJsonObject(const ConstJsonObject& _object)
 
 		ot::GraphicsItemCfg* itm = nullptr;
 		try {
-			itm = ot::SimpleFactory::instance().createType<ot::GraphicsItemCfg>(itemContObj);
+			itm = GraphicsItemCfgFactory::instance().create(itemContObj);
 			if (itm) {
-				itm->setFromJsonObject(itemContObj);
-
 				GraphicsStackItemCfgEntry e;
 				e.isMaster = json::getBool(itemObj, OT_JSON_MEMBER_IsMaster);
 				e.isSlave = json::getBool(itemObj, OT_JSON_MEMBER_IsSlave);
 				e.item = itm;
 				m_items.push_back(e);
-			}
-			else {
-				OT_LOG_EA("Failed to create child item from factory. Ignore");
 			}
 		}
 		catch (const std::exception& _e) {

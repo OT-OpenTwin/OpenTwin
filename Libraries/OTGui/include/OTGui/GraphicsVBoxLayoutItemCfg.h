@@ -9,7 +9,7 @@
 // OpenTwin header
 #include "OTGui/GraphicsBoxLayoutItemCfg.h"
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItemCfg "OT_GICLayV"
+#define OT_FactoryKey_GraphicsVBoxLayoutItem "OT_GILayV"
 
 namespace ot {
 
@@ -19,7 +19,7 @@ namespace ot {
 		virtual ~GraphicsVBoxLayoutItemCfg() {};
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItemCfg); };
+		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsVBoxLayoutItem); };
 
 	private:
 		GraphicsVBoxLayoutItemCfg(const GraphicsVBoxLayoutItemCfg&) = delete;

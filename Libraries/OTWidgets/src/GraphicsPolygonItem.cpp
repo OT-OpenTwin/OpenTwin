@@ -5,19 +5,16 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/KeyMap.h"
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsPolygonItemCfg.h"
 #include "OTWidgets/GraphicsPolygonItem.h"
-#include "OTWidgets/Painter2DFactory.h"
-#include "OTWidgets/OTQtConverter.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
 #include <QtGui/qevent.h>
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsPolygonItem> rectItem(OT_SimpleFactoryJsonKeyValue_GraphicsPolygonItem);
-static ot::GlobalKeyMapRegistrar rectItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsPolygonItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsPolygonItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsPolygonItem> polyItemRegistrar(OT_FactoryKey_GraphicsPolygonItem);
 
 ot::GraphicsPolygonItem::GraphicsPolygonItem()
 	: ot::CustomGraphicsItem(false)

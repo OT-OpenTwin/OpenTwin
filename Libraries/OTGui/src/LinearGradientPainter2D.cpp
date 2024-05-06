@@ -10,8 +10,7 @@
 #define OT_JSON_MEMBER_Start "Start"
 #define OT_JSON_MEMBER_FinalStop "FinalStop"
 
-static ot::SimpleFactoryRegistrar<ot::LinearGradientPainter2D> linGradCfg(OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg);
-static ot::Painter2DFactoryRegistrar<ot::LinearGradientPainter2D> linGradCfgRegistrar(OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg);
+static ot::Painter2DFactoryRegistrar<ot::LinearGradientPainter2D> linGradCfgRegistrar(OT_FactoryKey_LinearGradientPainter2D);
 
 ot::LinearGradientPainter2D::LinearGradientPainter2D()
 	: m_start(0., 0.), m_finalStop(1., 1.) 

@@ -8,8 +8,6 @@
 // OpenTwin header
 #include "OTWidgets/GraphicsGroupItem.h"
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsStackItem "OT_GIStack"
-
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsStackItem : public ot::GraphicsGroupItem {
@@ -26,9 +24,6 @@ namespace ot {
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
 		virtual void removeAllConnections(void) override;
-
-		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsStackItem); };
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 

@@ -4,15 +4,13 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/KeyMap.h"
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
+#include "OTWidgets/QtFactory.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 #include "OTWidgets/GraphicsGridLayoutItem.h"
-#include "OTWidgets/GraphicsFactory.h"
-#include "OTWidgets/OTQtConverter.h"
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsGridLayoutItem> gridItem(OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItem);
-static ot::GlobalKeyMapRegistrar gridItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsGridLayoutItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsGridLayoutItem> glayItemRegistrar(OT_FactoryKey_GraphicsGridLayoutItem);
 
 ot::GraphicsGridLayoutItem::GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem) : QGraphicsGridLayout(_parentItem)
 {
@@ -35,14 +33,14 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		int y = 0;
 		for (auto c : r) {
 			if (c) {
-				ot::GraphicsItem* i = ot::GraphicsFactory::itemFromConfig(c);
+				ot::GraphicsItem* i = ot::GraphicsItemFactory::instance().itemFromConfig(c);
 				if (i == nullptr) {
 					OT_LOG_EA("GraphicsFactory failed");
 					return false;
 				}
 				i->setParentGraphicsItem(this);
 				OTAssertNullptr(i->getQGraphicsLayoutItem());
-				this->addItem(i->getQGraphicsLayoutItem(), x, y, OTQtConverter::toQt(i->graphicsItemAlignment()));
+				this->addItem(i->getQGraphicsLayoutItem(), x, y, QtFactory::toQt(i->graphicsItemAlignment()));
 			}
 			y++;
 		}
@@ -57,8 +55,8 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		if (cfg->columnStretch()[c] > 0) this->setColumnStretchFactor(c, cfg->columnStretch()[c]);
 	}
 
-	this->setMinimumSize(ot::OTQtConverter::toQt(_cfg->minimumSize()));
-	this->setMaximumSize(ot::OTQtConverter::toQt(_cfg->maximumSize()));
+	this->setMinimumSize(QtFactory::toQt(_cfg->minimumSize()));
+	this->setMaximumSize(QtFactory::toQt(_cfg->maximumSize()));
 
 	return GraphicsLayoutItem::setupFromConfig(_cfg);
 }

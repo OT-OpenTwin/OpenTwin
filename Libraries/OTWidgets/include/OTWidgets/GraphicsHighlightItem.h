@@ -9,8 +9,6 @@
 // OpenTwin header
 #include "OTWidgets/GraphicsItem.h"
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsHighlightItem "OT_GIHighl"
-
 namespace ot {
 
 	class GraphicsHighlightItem : public QGraphicsItem, public QGraphicsLayoutItem, public ot::GraphicsItem {
@@ -20,9 +18,6 @@ namespace ot {
 		virtual ~GraphicsHighlightItem();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
-
-		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsHighlightItem); };
 
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 		virtual void prepareGraphicsItemGeometryChange(void) override;

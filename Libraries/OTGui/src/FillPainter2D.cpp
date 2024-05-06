@@ -7,8 +7,7 @@
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/Painter2DFactory.h"
 
-static ot::SimpleFactoryRegistrar<ot::FillPainter2D> fillCfg(OT_SimpleFactoryJsonKeyValue_FillPainter2DCfg);
-static ot::Painter2DFactoryRegistrar<ot::FillPainter2D> fillCfgRegistrar(OT_SimpleFactoryJsonKeyValue_FillPainter2DCfg);
+static ot::Painter2DFactoryRegistrar<ot::FillPainter2D> fillCfgRegistrar(OT_FactoryKey_FillPainter2D);
 
 ot::FillPainter2D::FillPainter2D() {}
 

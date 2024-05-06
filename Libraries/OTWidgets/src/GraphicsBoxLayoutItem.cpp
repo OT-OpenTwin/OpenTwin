@@ -6,9 +6,9 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsBoxLayoutItemCfg.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsBoxLayoutItem.h"
-#include "OTWidgets/GraphicsFactory.h"
-#include "OTWidgets/OTQtConverter.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 
 ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem(Qt::Orientation _orientation, QGraphicsLayoutItem* _parentItem) : QGraphicsLinearLayout(_orientation, _parentItem)
 {
@@ -27,7 +27,7 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 	for (auto itm : cfg->items()) {
 		if (itm.first) {
-			ot::GraphicsItem* i = ot::GraphicsFactory::itemFromConfig(itm.first);
+			ot::GraphicsItem* i = ot::GraphicsItemFactory::instance().itemFromConfig(itm.first);
 			if (i == nullptr) {
 				OT_LOG_EA("GraphicsFactory failed");
 				return false;
@@ -36,15 +36,15 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 			OTAssertNullptr(i->getQGraphicsLayoutItem());
 			this->addItem(i->getQGraphicsLayoutItem());
 			if (itm.second > 0) this->setStretchFactor(i->getQGraphicsLayoutItem(), itm.second);
-			this->setAlignment(i->getQGraphicsLayoutItem(), ot::OTQtConverter::toQt(i->graphicsItemAlignment()));
+			this->setAlignment(i->getQGraphicsLayoutItem(), QtFactory::toQt(i->graphicsItemAlignment()));
 		}
 		else {
 			this->addStretch(itm.second);
 		}
 	}
 
-	this->setMinimumSize(ot::OTQtConverter::toQt(_cfg->minimumSize()));
-	this->setMaximumSize(ot::OTQtConverter::toQt(_cfg->maximumSize()));
+	this->setMinimumSize(QtFactory::toQt(_cfg->minimumSize()));
+	this->setMaximumSize(QtFactory::toQt(_cfg->maximumSize()));
 	return GraphicsLayoutItem::setupFromConfig(_cfg);
 }
 

@@ -100,7 +100,7 @@ void ot::Painter2DEditButton::ini(void) {
 
 void ot::Painter2DEditButton::updateText(void) {
 	OTAssertNullptr(m_painter);
-	if (m_painter->simpleFactoryObjectKey() == OT_SimpleFactoryJsonKeyValue_FillPainter2DCfg) {
+	if (m_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) {
 		FillPainter2D* actualPainter = dynamic_cast<FillPainter2D*>(m_painter);
 		OTAssertNullptr(actualPainter);
 		m_btnTip = "Color { r: " + QString::number(actualPainter->color().r()) +
@@ -113,7 +113,7 @@ void ot::Painter2DEditButton::updateText(void) {
 		m_btn->setText(metrics.size(Qt::TextSingleLine, m_btnTip).width() < m_btn->width() ? m_btnTip : m_btnText);
 		m_btn->setToolTip(m_btnTip);
 	}
-	else if (m_painter->simpleFactoryObjectKey() == OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg) {
+	else if (m_painter->getFactoryKey() == OT_FactoryKey_LinearGradientPainter2D) {
 		LinearGradientPainter2D* actualPainter = dynamic_cast<LinearGradientPainter2D*>(m_painter);
 		OTAssertNullptr(actualPainter);
 		m_btn->setText("Linear");
@@ -136,7 +136,7 @@ void ot::Painter2DEditButton::updateText(void) {
 		m_btn->setText(metrics.size(0, m_btnTip).width() < m_btn->width() ? m_btnTip : m_btnText);
 		m_btn->setToolTip(m_btnTip);
 	}
-	else if (m_painter->simpleFactoryObjectKey() == OT_SimpleFactoryJsonKeyValue_RadialGradientPainter2DCfg) {
+	else if (m_painter->getFactoryKey() == OT_FactoryKey_RadialGradientPainter2D) {
 		RadialGradientPainter2D* actualPainter = dynamic_cast<RadialGradientPainter2D*>(m_painter);
 		OTAssertNullptr(actualPainter);
 		m_btnText = "Radial";
@@ -171,6 +171,6 @@ void ot::Painter2DEditButton::updateText(void) {
 		m_btn->setToolTip(m_btnTip);
 	}
 	else {
-		OT_LOG_EA("Unknown painter type");
+		OT_LOG_EAS("Unknown painter type \"" + m_painter->getFactoryKey() + "\"");
 	}
 }

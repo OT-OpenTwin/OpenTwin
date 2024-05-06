@@ -4,8 +4,9 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTGui/GraphicsHBoxLayoutItemCfg.h"
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsHBoxLayoutItemCfg> hboxCfg(OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItemCfg);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsHBoxLayoutItemCfg> ellipseItemRegistrar(OT_FactoryKey_GraphicsHBoxLayoutItem);
 
 ot::GraphicsHBoxLayoutItemCfg::GraphicsHBoxLayoutItemCfg() : GraphicsBoxLayoutItemCfg(ot::Horizontal) {};

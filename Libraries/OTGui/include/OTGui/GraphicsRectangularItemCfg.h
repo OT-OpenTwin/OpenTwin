@@ -9,7 +9,7 @@
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg "OT_GICRect"
+#define OT_FactoryKey_GraphicsRectangularItem "OT_GIRect"
 
 namespace ot {
 
@@ -31,7 +31,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg); };
+		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsRectangularItem); };
 
 		void setCornerRadius(int _px) { m_cornerRadius = _px; };
 		int cornerRadius(void) const { return m_cornerRadius; };

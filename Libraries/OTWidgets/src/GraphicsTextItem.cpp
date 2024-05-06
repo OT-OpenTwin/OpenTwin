@@ -5,20 +5,18 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/KeyMap.h"
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsTextItemCfg.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsTextItem.h"
-#include "OTWidgets/OTQtConverter.h"
-#include "OTWidgets/Painter2DFactory.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
 #include <QtGui/qfontmetrics.h>
 #include <QtGui/qtextdocument.h>
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsTextItem> textItem(OT_SimpleFactoryJsonKeyValue_GraphicsTextItem);
-static ot::GlobalKeyMapRegistrar textItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsTextItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsTextItem> textItemRegistrar(OT_FactoryKey_GraphicsTextItem);
 
 ot::GraphicsTextItem::GraphicsTextItem()
 	: ot::CustomGraphicsItem(false)
@@ -44,7 +42,7 @@ bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_font.setItalic(cfg->textFont().isItalic());
 	m_font.setBold(cfg->textFont().isBold());
 
-	m_pen.setBrush(ot::Painter2DFactory::brushFromPainter2D(cfg->textPainter()));
+	m_pen.setBrush(QtFactory::toQt(cfg->textPainter()));
 
 	m_text = QString::fromStdString(cfg->text());
 
@@ -63,5 +61,5 @@ QSizeF ot::GraphicsTextItem::getPreferredGraphicsItemSize(void) const {
 void ot::GraphicsTextItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	_painter->setFont(m_font);
 	_painter->setPen(m_pen);
-	_painter->drawText(_rect, ot::OTQtConverter::toQt(this->graphicsItemAlignment()), m_text);
+	_painter->drawText(_rect, QtFactory::toQt(this->graphicsItemAlignment()), m_text);
 }

@@ -36,7 +36,6 @@
 #include "OTCore/OwnerService.h"
 #include "OTCore/PropertyStringList.h"
 #include "OTCore/OwnerServiceGlobal.h"
-#include "OTCore/SimpleFactory.h"
 #include "OTCore/GenericDataStructMatrix.h"
 
 #include "OTCommunication/ActionTypes.h"
@@ -59,7 +58,7 @@
 
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
-#include "OTWidgets/GraphicsFactory.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 #include "OTWidgets/GraphicsPicker.h"
 #include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/GraphicsScene.h"
@@ -3809,7 +3808,7 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 	ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 
 	for (auto graphicsItemCfg : pckg.items()) {
-		ot::GraphicsItem* graphicsItem = ot::GraphicsFactory::itemFromConfig(graphicsItemCfg, true);
+		ot::GraphicsItem* graphicsItem = ot::GraphicsItemFactory::instance().itemFromConfig(graphicsItemCfg, true);
 		if (graphicsItem != nullptr) {
 			const double xCoordinate = graphicsItemCfg->position().x();
 			const double yCoordinate = graphicsItemCfg->position().y();

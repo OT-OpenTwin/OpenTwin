@@ -6,11 +6,13 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTGui/GraphicsPolygonItemCfg.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
+#include "OTGui/Painter2DFactory.h"
+#include "OTGui/GraphicsPolygonItemCfg.h"
+#include "OTGui/GraphicsItemCfgFactory.h"
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsPolygonItemCfg> polyItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsPolygonItemCfg);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsPolygonItemCfg> polyItemCfg(OT_FactoryKey_GraphicsPolygonItem);
 
 ot::GraphicsPolygonItemCfg::GraphicsPolygonItemCfg()
 {
@@ -54,9 +56,8 @@ void ot::GraphicsPolygonItemCfg::setFromJsonObject(const ConstJsonObject& _objec
 	}
 
 	ConstJsonObject backgroundObj = json::getObject(_object, "Background");
-	Painter2D* backPainter = SimpleFactory::instance().createType<Painter2D>(backgroundObj);
+	Painter2D* backPainter = Painter2DFactory::instance().create(backgroundObj);
 	if (backPainter) {
-		backPainter->setFromJsonObject(backgroundObj);
 		this->setBackgroundPainter(backPainter);
 	}
 

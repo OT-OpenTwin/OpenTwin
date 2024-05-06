@@ -17,6 +17,8 @@ namespace ot {
 	public:
 		static Painter2DFactory& instance(void);
 		
+		Painter2D* create(const ConstJsonObject& _jsonObject);
+
 	private:
 		Painter2DFactory() {};
 		virtual ~Painter2DFactory() {};

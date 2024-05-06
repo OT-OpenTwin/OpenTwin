@@ -9,7 +9,7 @@
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg "OT_GICStack"
+#define OT_FactoryKey_GraphicsStackItem "OT_GIStack"
 
 namespace ot {
 
@@ -35,7 +35,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg); };
+		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsStackItem); };
 
 		//! @brief Will add the provided item on the top of the stack (Zn)
 		//! If multiple master items are provided, the biggest size will be used

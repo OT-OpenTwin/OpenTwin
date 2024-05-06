@@ -73,7 +73,7 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 	_object.AddMember(OT_JSON_MEMBER_Name, JsonString(m_name, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Title, JsonString(m_tile, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_ToolTip, JsonString(m_tooltip, _allocator), _allocator);
-	_object.AddMember(OT_SimpleFactoryJsonKey, JsonString(this->simpleFactoryObjectKey(), _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_GraphicsItemCfgType, JsonString(this->getFactoryKey(), _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Alignment, JsonString(ot::toString(m_alignment), _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_SizePolicy, JsonString(ot::toString(m_sizePolicy), _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_ConnectionDirection, JsonString(ot::toString(m_connectionDirection), _allocator), _allocator);

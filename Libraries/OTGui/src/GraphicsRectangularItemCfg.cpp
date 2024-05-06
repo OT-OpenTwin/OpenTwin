@@ -6,16 +6,18 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
+#include "OTGui/Painter2DFactory.h"
+#include "OTGui/GraphicsItemCfgFactory.h"
+#include "OTGui/GraphicsRectangularItemCfg.h"
 
 #define OT_JSON_MEMBER_Size "Size"
 #define OT_JSON_MEMBER_Border "Border"
 #define OT_JSON_MEMBER_CornerRadius "CornerRadius"
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter"
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsRectangularItemCfg> rectItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsRectangularItemCfg);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsRectangularItemCfg> rectItemCfg(OT_FactoryKey_GraphicsRectangularItem);
 
 ot::GraphicsRectangularItemCfg::GraphicsRectangularItemCfg(ot::Painter2D* _backgroundPainter, int _cornerRadius)
 	: m_backgroundPainter(_backgroundPainter), m_cornerRadius(_cornerRadius)
@@ -56,9 +58,10 @@ void ot::GraphicsRectangularItemCfg::setFromJsonObject(const ConstJsonObject& _o
 	m_cornerRadius = json::getInt(_object, OT_JSON_MEMBER_CornerRadius);
 
 	ConstJsonObject backgroundPainterObj = json::getObject(_object, OT_JSON_MEMBER_BackgroundPainter);
-	ot::Painter2D* p = ot::SimpleFactory::instance().createType<ot::Painter2D>(backgroundPainterObj);
-	p->setFromJsonObject(backgroundPainterObj);
-	this->setBackgroundPainer(p);
+	ot::Painter2D* p = Painter2DFactory::instance().create(backgroundPainterObj);
+	if (p) {
+		this->setBackgroundPainer(p);
+	}
 
 	m_border.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Border));
 	m_size.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Size));

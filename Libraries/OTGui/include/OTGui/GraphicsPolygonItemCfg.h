@@ -15,7 +15,7 @@
 // std header
 #include <list>
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsPolygonItemCfg "OT_GICPoly"
+#define OT_FactoryKey_GraphicsPolygonItem "OT_GIPoly"
 
 namespace ot {
 
@@ -38,7 +38,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsPolygonItemCfg); };
+		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsPolygonItem); };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

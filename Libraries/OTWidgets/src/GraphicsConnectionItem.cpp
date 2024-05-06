@@ -8,9 +8,9 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/OTQtConverter.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
@@ -176,7 +176,7 @@ bool ot::GraphicsConnectionItem::setupFromConfig(const ot::GraphicsConnectionCfg
 	this->m_uid = _cfg.getUid();
 	this->m_style = _cfg.style();
 	m_pen.setWidth(_cfg.lineWidth());
-	m_pen.setColor(ot::OTQtConverter::toQt(_cfg.color()));
+	m_pen.setColor(QtFactory::toQt(_cfg.color()));
 
 	m_hoverPen.setWidth(m_pen.width() + 2);
 	m_selectedPen.setWidth(m_hoverPen.width());

@@ -9,7 +9,7 @@
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg "OT_GICText"
+#define OT_FactoryKey_GraphicsTextItem "OT_GIText"
 
 namespace ot {
 
@@ -31,7 +31,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsTextItemCfg); };
+		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsTextItem); };
 
 		void setText(const std::string& _text) { m_text = _text; };
 		const std::string& text(void) const { return m_text; };

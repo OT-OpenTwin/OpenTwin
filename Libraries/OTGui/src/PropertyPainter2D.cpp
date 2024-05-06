@@ -6,11 +6,11 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTCore/SimpleFactory.h"
 #include "OTCore/PropertyFactoryRegistrar.h"
-#include "OTGui/PropertyPainter2D.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
+#include "OTGui/Painter2DFactory.h"
+#include "OTGui/PropertyPainter2D.h"
 
 static ot::PropertyFactoryRegistrar<ot::PropertyPainter2D> propertyPainter2DRegistrar(OT_PROPERTY_TYPE_Painter2D);
 
@@ -78,7 +78,7 @@ void ot::PropertyPainter2D::getPropertyData(ot::JsonValue& _object, ot::JsonAllo
 
 void ot::PropertyPainter2D::setPropertyData(const ot::ConstJsonObject& _object) {
 	ConstJsonObject painterObj = json::getObject(_object, "Value");
-	Painter2D* newPainter = SimpleFactory::instance().createType<Painter2D>(painterObj);
+	Painter2D* newPainter = Painter2DFactory::instance().create(painterObj);
 	if (newPainter) {
 		this->setPainter(newPainter);
 	}

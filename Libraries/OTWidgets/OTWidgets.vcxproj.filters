@@ -16,7 +16,7 @@
     <ClCompile Include="src\GraphicsLayoutItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsFactory.cpp">
+    <ClCompile Include="src\GraphicsItemFactory.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsPicker.cpp">
@@ -25,10 +25,7 @@
     <ClCompile Include="src\IconManager.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\Painter2DFactory.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OTQtConverter.cpp">
+    <ClCompile Include="src\QtFactory.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsGroupItem.cpp">
@@ -317,16 +314,13 @@
     <ClInclude Include="include\OTWidgets\GraphicsLayoutItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\GraphicsFactory.h">
+    <ClInclude Include="include\OTWidgets\GraphicsItemFactory.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\IconManager.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\Painter2DFactory.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\OTQtConverter.h">
+    <ClInclude Include="include\OTWidgets\QtFactory.h">
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsGroupItem.h">

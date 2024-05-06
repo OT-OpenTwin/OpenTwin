@@ -4,12 +4,11 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/KeyMap.h"
 #include "OTGui/GraphicsHBoxLayoutItemCfg.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 #include "OTWidgets/GraphicsHBoxLayoutItem.h"
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsHBoxLayoutItem> hBoxItem(OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItem);
-static ot::GlobalKeyMapRegistrar hBoxItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsHBoxLayoutItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsHBoxLayoutItem> hblayItemRegistrar(OT_FactoryKey_GraphicsHBoxLayoutItem);
 
 ot::GraphicsHBoxLayoutItem::GraphicsHBoxLayoutItem(QGraphicsLayoutItem* _parentItem) : GraphicsBoxLayoutItem(Qt::Horizontal, _parentItem) {}
 

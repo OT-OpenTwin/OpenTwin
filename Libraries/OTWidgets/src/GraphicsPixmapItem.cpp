@@ -4,17 +4,16 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/KeyMap.h"
 #include "OTGui/GraphicsImageItemCfg.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsPixmapItem.h"
-#include "OTWidgets/OTQtConverter.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsPixmapItem> pixmapItem(OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem);
-static ot::GlobalKeyMapRegistrar pixmapItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsPixmapItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsPixmapItem> pixmItemRegistrar(OT_FactoryKey_GraphicsImageItem);
 
 ot::GraphicsPixmapItem::GraphicsPixmapItem()
 	: ot::CustomGraphicsItem(false), m_maintainAspectRatio(false), m_colorMask(-1.f, -1.f, -1.f, -1.f)
@@ -65,7 +64,7 @@ void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOpt
 		// Check if a color mask is set
 		if (m_colorMask.isValid()) {
 			QPixmap mask(scaled.size());
-			mask.fill(ot::OTQtConverter::toQt(m_colorMask));
+			mask.fill(QtFactory::toQt(m_colorMask));
 			_painter->setCompositionMode(QPainter::CompositionMode_SourceIn);
 
 			_painter->drawPixmap(adjustedRect.topLeft(), scaled);
@@ -80,7 +79,7 @@ void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOpt
 		// Check if a color mask is set
 		if (m_colorMask.isValid()) {
 			QPixmap mask(_rect.size().toSize());
-			mask.fill(ot::OTQtConverter::toQt(m_colorMask));
+			mask.fill(QtFactory::toQt(m_colorMask));
 			_painter->setCompositionMode(QPainter::CompositionMode_SourceIn);
 
 			_painter->drawPixmap(_rect.topLeft().x(), _rect.topLeft().y(), _rect.width(), _rect.height(), m_pixmap);

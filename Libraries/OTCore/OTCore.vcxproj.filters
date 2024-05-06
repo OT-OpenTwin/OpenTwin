@@ -7,9 +7,6 @@
     <ClCompile Include="src\dllmain.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\KeyMap.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Logger.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -20,9 +17,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ServiceBase.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SimpleFactory.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Size2D.cpp">
@@ -195,9 +189,6 @@
     <ClInclude Include="include\OTCore\FolderNames.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\KeyMap.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\Logger.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -226,9 +217,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\ServiceBase.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\SimpleFactory.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\Size2D.h">

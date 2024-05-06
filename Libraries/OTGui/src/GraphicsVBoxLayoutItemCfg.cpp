@@ -4,8 +4,9 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTGui/GraphicsVBoxLayoutItemCfg.h"
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsVBoxLayoutItemCfg> vboxCfg(OT_SimpleFactoryJsonKeyValue_GraphicsVBoxLayoutItemCfg);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsVBoxLayoutItemCfg> vboxCfg(OT_FactoryKey_GraphicsVBoxLayoutItem);
 
 ot::GraphicsVBoxLayoutItemCfg::GraphicsVBoxLayoutItemCfg() : GraphicsBoxLayoutItemCfg(ot::Vertical) {};

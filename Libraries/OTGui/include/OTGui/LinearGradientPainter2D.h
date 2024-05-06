@@ -13,7 +13,7 @@
 #include "OTGui/GradientPainter2D.h"
 #include "OTGui/GradientPainterStop2D.h"
 
-#define OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg "OT_P2DCLGrad"
+#define OT_FactoryKey_LinearGradientPainter2D "OT_P2DLGrad"
 
 namespace ot {
 
@@ -35,7 +35,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_LinearGradientPainter2DCfg); };
+		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_LinearGradientPainter2D); };
 		
 		virtual std::string generateQss(void) const override;
 

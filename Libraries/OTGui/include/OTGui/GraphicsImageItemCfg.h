@@ -10,7 +10,7 @@
 #include "OTCore/Color.h"
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg "OT_GICImage"
+#define OT_FactoryKey_GraphicsImageItem "OT_GIImage"
 
 namespace ot {
 
@@ -30,7 +30,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsImageItemCfg); };
+		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsImageItem); };
 
 		void setImagePath(const std::string& _path) { m_imageSubPath = _path; };
 		const std::string& imagePath(void) const { return m_imageSubPath; };

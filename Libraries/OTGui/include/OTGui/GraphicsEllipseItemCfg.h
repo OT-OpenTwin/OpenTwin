@@ -9,7 +9,7 @@
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItemCfg "OT_GICElli"
+#define OT_FactoryKey_GraphicsEllipseItem "OT_GIElli"
 
 namespace ot {
 
@@ -31,7 +31,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItemCfg); };
+		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsEllipseItem); };
 
 		void setRadiusX(double _radius) { m_radiusX = _radius; };
 		double radiusX(void) const { return m_radiusX; };

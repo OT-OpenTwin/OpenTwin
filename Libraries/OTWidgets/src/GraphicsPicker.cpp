@@ -15,7 +15,6 @@
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsPicker.h"
-#include "OTWidgets/GraphicsFactory.h"
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/GraphicsItemPreview.h"
 

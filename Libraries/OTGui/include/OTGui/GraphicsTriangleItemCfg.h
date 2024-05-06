@@ -10,7 +10,7 @@
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTCore/OTClassHelper.h"
 
-#define OT_SimpleFactoryJsonKeyValue_GraphicsTriangleItemCfg "OT_GICTria"
+#define OT_FactoryKey_GraphicsTriangleItem "OT_GITria"
 
 namespace ot {
 
@@ -52,7 +52,7 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string simpleFactoryObjectKey(void) const override { return std::string(OT_SimpleFactoryJsonKeyValue_GraphicsTriangleItemCfg); };
+		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsTriangleItem); };
 
 		void setOutline(const ot::Border& _outline) { m_outline = _outline; };
 		const ot::Border& outline(void) const { return m_outline; };

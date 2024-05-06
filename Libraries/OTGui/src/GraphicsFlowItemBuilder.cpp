@@ -22,6 +22,7 @@
 
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
+#include "OTGui/Painter2DFactory.h"
 #include "OTGui/LinearGradientPainter2D.h"
 #include "OTGui/RadialGradientPainter2D.h"
 
@@ -158,18 +159,15 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	try {
 		JsonDocument backDoc;
 		m_backgroundPainter->addToJsonObject(backDoc, backDoc.GetAllocator());
-		painterBack = ot::SimpleFactory::instance().createType<ot::Painter2D>(backDoc.constRef().GetObject());
-		painterBack->setFromJsonObject(backDoc.constRef().GetObject());
+		painterBack = Painter2DFactory::instance().create(backDoc.GetConstObject());
 
 		JsonDocument titleBackDoc;
 		m_titleBackgroundPainter->addToJsonObject(titleBackDoc, titleBackDoc.GetAllocator());
-		painterTitleBack = ot::SimpleFactory::instance().createType<ot::Painter2D>(titleBackDoc.constRef().GetObject());
-		painterTitleBack->setFromJsonObject(titleBackDoc.constRef().GetObject());
-
+		painterTitleBack = Painter2DFactory::instance().create(titleBackDoc.GetConstObject());
+		
 		JsonDocument titleFrontDoc;
 		m_titleForegroundPainter->addToJsonObject(titleFrontDoc, titleFrontDoc.GetAllocator());
-		painterTitleFront = ot::SimpleFactory::instance().createType<ot::Painter2D>(titleFrontDoc.constRef().GetObject());
-		painterTitleFront->setFromJsonObject(titleFrontDoc.constRef().GetObject());
+		painterTitleFront = Painter2DFactory::instance().create(titleFrontDoc.GetConstObject());
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
@@ -184,6 +182,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		if (painterTitleFront) delete painterTitleFront;
 		return nullptr;
 	}
+
 	OTAssertNullptr(painterBack);
 	OTAssertNullptr(painterTitleBack);
 	OTAssertNullptr(painterTitleFront);

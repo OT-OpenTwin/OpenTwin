@@ -4,10 +4,9 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTGui/GraphicsPickerCollectionCfg.h"
-#include "OTGui/GraphicsItemCfg.h"
-#include "OTCore/SimpleFactory.h"
 #include "OTCore/Logger.h"
+#include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/GraphicsPickerCollectionCfg.h"
 
 #define OT_JSON_Member_Name "Name"
 #define OT_JSON_Member_Icon "Icon"

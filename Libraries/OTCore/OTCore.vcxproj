@@ -34,7 +34,6 @@
     <ClCompile Include="src\OTObjectBase.cpp" />
     <ClCompile Include="src\OwnerServiceGlobal.cpp" />
     <ClCompile Include="src\JSONToVariableConverter.cpp" />
-    <ClCompile Include="src\KeyMap.cpp" />
     <ClCompile Include="src\Owner.cpp" />
     <ClCompile Include="src\Point2D.cpp" />
     <ClCompile Include="src\Property.cpp" />
@@ -56,7 +55,6 @@
     <ClCompile Include="src\ServiceBase.cpp" />
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\OwnerService.cpp" />
-    <ClCompile Include="src\SimpleFactory.cpp" />
     <ClCompile Include="src\Size2D.cpp" />
     <ClCompile Include="src\StringHelper.cpp" />
     <ClCompile Include="src\StringToVariableConverter.cpp" />
@@ -86,7 +84,6 @@
     <ClInclude Include="include\OTCore\GenericDataStructVector.h" />
     <ClInclude Include="include\OTCore\JSON.h" />
     <ClInclude Include="include\OTCore\JSONToVariableConverter.h" />
-    <ClInclude Include="include\OTCore\KeyMap.h" />
     <ClInclude Include="include\OTCore\Logger.h" />
     <ClInclude Include="include\OTCore\ObjectManagerTemplate.h" />
     <ClInclude Include="include\OTCore\OTAssert.h" />
@@ -120,7 +117,6 @@
     <ClInclude Include="include\OTCore\ReturnValues.h" />
     <ClInclude Include="include\OTCore\Serializable.h" />
     <ClInclude Include="include\OTCore\ServiceBase.h" />
-    <ClInclude Include="include\OTCore\SimpleFactory.h" />
     <ClInclude Include="include\OTCore\Size2D.h" />
     <ClInclude Include="include\OTCore\StringHelper.h" />
     <ClInclude Include="include\OTCore\StringToVariableConverter.h" />

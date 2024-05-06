@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTWidgets/PushButton.h"
-#include "OTWidgets/OTQtConverter.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/ColorPreviewBox.h"
 #include "OTWidgets/ColorPickButton.h"
 
@@ -22,7 +22,7 @@ ot::ColorPickButton::ColorPickButton(const QColor& _color, QWidget* _parent)
 ot::ColorPickButton::ColorPickButton(const ot::Color& _color, QWidget* _parent) 
 	: QFrame(_parent), m_useAlpha(false), m_useCustomToolTip(false)
 {
-	this->ini(OTQtConverter::toQt(_color));
+	this->ini(QtFactory::toQt(_color));
 }
 
 ot::ColorPickButton::~ColorPickButton() {}

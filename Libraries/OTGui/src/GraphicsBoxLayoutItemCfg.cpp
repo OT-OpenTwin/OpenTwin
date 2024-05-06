@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTGui/GraphicsBoxLayoutItemCfg.h"
 
 #define OT_JSON_MEMBER_Item "Item"
@@ -62,14 +63,11 @@ void ot::GraphicsBoxLayoutItemCfg::setFromJsonObject(const ConstJsonObject& _obj
 			GraphicsItemCfg* itm = nullptr;
 			try {
 				ConstJsonObject itemObj = json::getObject(pairObj, OT_JSON_MEMBER_Item);
-				itm = ot::SimpleFactory::instance().createType<GraphicsItemCfg>(itemObj);
-				if (itm) {
-					itm->setFromJsonObject(itemObj);
-					m_items.push_back(itemStrechPair_t(itm, json::getInt(pairObj, OT_JSON_MEMBER_Stretch)));
+				itm = GraphicsItemCfgFactory::instance().create(itemObj);
+				if (!itm) {
+					continue;
 				}
-				else {
-					OT_LOG_EA("Factory failed");
-				}
+				m_items.push_back(itemStrechPair_t(itm, json::getInt(pairObj, OT_JSON_MEMBER_Stretch)));
 			}
 			catch (const std::exception& _e) {
 				OT_LOG_E("Error occured");

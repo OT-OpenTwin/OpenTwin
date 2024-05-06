@@ -5,18 +5,16 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/KeyMap.h"
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsEllipseItem.h"
-#include "OTWidgets/Painter2DFactory.h"
-#include "OTWidgets/OTQtConverter.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsEllipseItem> elliItem(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItem);
-static ot::GlobalKeyMapRegistrar elliItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsEllipseItem> elliItemRegistrar(OT_FactoryKey_GraphicsEllipseItem);
 
 ot::GraphicsEllipseItem::GraphicsEllipseItem()
 	: ot::CustomGraphicsItem(false), m_radiusX(5.), m_radiusY(5.)
@@ -44,10 +42,10 @@ bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 	m_radiusX = cfg->radiusX();
 	m_radiusY = cfg->radiusY();
-	m_brush = ot::Painter2DFactory::brushFromPainter2D(cfg->backgroundPainter());
+	m_brush = QtFactory::toQt(cfg->backgroundPainter());
 	m_pen.setWidth(cfg->border().top()); // ToDo: Add seperate borders on all 4 sides
-	m_pen.setBrush(QBrush(ot::OTQtConverter::toQt(cfg->border().color())));
-	m_pen.setColor(ot::OTQtConverter::toQt(cfg->border().color()));
+	m_pen.setBrush(QBrush(QtFactory::toQt(cfg->border().color())));
+	m_pen.setColor(QtFactory::toQt(cfg->border().color()));
 
 	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }

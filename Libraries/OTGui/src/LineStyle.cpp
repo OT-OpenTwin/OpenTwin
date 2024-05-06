@@ -6,9 +6,9 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/SimpleFactory.h"
 #include "OTGui/LineStyle.h"
 #include "OTGui/FillPainter2D.h"
+#include "OTGui/Painter2DFactory.h"
 
 ot::LineStyle::LineStyle()
 	: m_width(1.), m_painter(nullptr)
@@ -66,9 +66,8 @@ void ot::LineStyle::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_width = json::getDouble(_object, "Width");
 	
 	ConstJsonObject painterObj = json::getObject(_object, "Painter");
-	Painter2D* p = SimpleFactory::instance().createType<Painter2D>(painterObj);
+	Painter2D* p = Painter2DFactory::instance().create(painterObj);
 	if (p) {
-		p->setFromJsonObject(painterObj);
 		this->setPainter(p);
 	}
 }

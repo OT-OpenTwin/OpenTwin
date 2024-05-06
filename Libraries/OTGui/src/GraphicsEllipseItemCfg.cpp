@@ -7,15 +7,17 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
+#include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
+#include "OTGui/Painter2DFactory.h"
 
 #define OT_JSON_MEMBER_Border "Border"
 #define OT_JSON_MEMBER_RadiusX "RadiusX"
 #define OT_JSON_MEMBER_RadiusY "RadiusY"
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter"
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsEllipseItemCfg> ellipseItemCfg(OT_SimpleFactoryJsonKeyValue_GraphicsEllipseItemCfg);
+static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsEllipseItemCfg> ellipseItemRegistrar(OT_FactoryKey_GraphicsEllipseItem);
 
 ot::GraphicsEllipseItemCfg::GraphicsEllipseItemCfg(double _radiusX, double _radiusY, ot::Painter2D* _backgroundPainter)
 	: m_backgroundPainter(_backgroundPainter), m_radiusX(_radiusX), m_radiusY(_radiusY)
@@ -55,7 +57,7 @@ void ot::GraphicsEllipseItemCfg::setFromJsonObject(const ConstJsonObject& _objec
 	m_border.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Border));
 	
 	ConstJsonObject backgroundPainterObj = json::getObject(_object, OT_JSON_MEMBER_BackgroundPainter);
-	ot::Painter2D* p = ot::SimpleFactory::instance().createType<ot::Painter2D>(backgroundPainterObj);
+	ot::Painter2D* p = Painter2DFactory::instance().create(backgroundPainterObj);
 	p->setFromJsonObject(backgroundPainterObj);
 	this->setBackgroundPainer(p);
 }

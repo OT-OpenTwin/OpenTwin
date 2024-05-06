@@ -6,10 +6,9 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Serializable.h"
 #include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/GraphicsConnectionCfg.h"
-#include "OTCore/Serializable.h"
-#include "OTCore/SimpleFactory.h"
 
 // std header
 #include <list>

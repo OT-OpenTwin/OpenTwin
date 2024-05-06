@@ -13,8 +13,7 @@
 #define OT_JSON_MEMBER_FocalRadius "Focal.Radius"
 #define OT_JSON_MEMBER_FocalIsSet "Focal.IsSet"
 
-static ot::SimpleFactoryRegistrar<ot::RadialGradientPainter2D> linGradCfg(OT_SimpleFactoryJsonKeyValue_RadialGradientPainter2DCfg);
-static ot::Painter2DFactoryRegistrar<ot::RadialGradientPainter2D> radGradCfgRegistrar(OT_SimpleFactoryJsonKeyValue_RadialGradientPainter2DCfg);
+static ot::Painter2DFactoryRegistrar<ot::RadialGradientPainter2D> radGradCfgRegistrar(OT_FactoryKey_RadialGradientPainter2D);
 
 ot::RadialGradientPainter2D::RadialGradientPainter2D()
 	: m_centerRadius(1.), m_focalRadius(1.), m_focalSet(false)

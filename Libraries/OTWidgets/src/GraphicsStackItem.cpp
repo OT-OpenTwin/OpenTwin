@@ -5,14 +5,12 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/KeyMap.h"
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsStackItemCfg.h"
-#include "OTWidgets/GraphicsFactory.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 #include "OTWidgets/GraphicsStackItem.h"
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsStackItem> stackItem(OT_SimpleFactoryJsonKeyValue_GraphicsStackItem);
-static ot::GlobalKeyMapRegistrar stackItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsStackItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsStackItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsStackItem> stackItemRegistrar(OT_FactoryKey_GraphicsStackItem);
 
 ot::GraphicsStackItem::GraphicsStackItem() 
 	: ot::GraphicsGroupItem(true), m_lastCalculatedSize(-1., -1.) 
@@ -39,7 +37,7 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 		ot::GraphicsItem* i = nullptr;
 		try {
-			i = ot::GraphicsFactory::itemFromConfig(itm.item);
+			i = ot::GraphicsItemFactory::instance().itemFromConfig(itm.item);
 			if (i) {
 				this->addItem(i, itm.isMaster, itm.isSlave);
 			}

@@ -10,7 +10,6 @@
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Margins.h"
 #include "OTGui/GraphicsItemCfg.h"
-#include "OTCore/SimpleFactory.h"
 #include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
 #include "OTGui/GraphicsConnectionCfg.h"
@@ -33,7 +32,7 @@ namespace ot {
 
 	//! @brief Base class for all OpenTwin GraphicsItems
 	//! GraphicsItems should be created by the GraphicsFactory and be setup from the corresponding configuration
-	class OT_WIDGETS_API_EXPORT GraphicsItem : public ot::SimpleFactoryObject {
+	class OT_WIDGETS_API_EXPORT GraphicsItem {
 	public:
 		enum GraphicsItemEvent {
 			ItemMoved,

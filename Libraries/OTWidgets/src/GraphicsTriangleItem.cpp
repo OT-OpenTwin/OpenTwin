@@ -5,19 +5,17 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/KeyMap.h"
 #include "OTCore/Logger.h"
 #include "OTWidgets/GraphicsTriangleItem.h"
-#include "OTWidgets/Painter2DFactory.h"
-#include "OTWidgets/OTQtConverter.h"
+#include "OTWidgets/QtFactory.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
 #include <QtGui/qevent.h>
 #include <QtGui/qpainterpath.h>
 
-static ot::SimpleFactoryRegistrar<ot::GraphicsTriangleItem> triaItem(OT_SimpleFactoryJsonKeyValue_GraphicsTriangleItem);
-static ot::GlobalKeyMapRegistrar triaItemKey(OT_SimpleFactoryJsonKeyValue_GraphicsTriangleItemCfg, OT_SimpleFactoryJsonKeyValue_GraphicsTriangleItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsTriangleItem> triaItemRegistrar(OT_FactoryKey_GraphicsTriangleItem);
 
 ot::GraphicsTriangleItem::GraphicsTriangleItem()
 	: ot::CustomGraphicsItem(false), m_size(10, 10), m_direction(GraphicsTriangleItemCfg::Right), m_shape(GraphicsTriangleItemCfg::Triangle)
@@ -47,10 +45,10 @@ bool ot::GraphicsTriangleItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_size.setHeight(cfg->size().height());
 	m_shape = cfg->triangleShape();
 	m_direction = cfg->triangleDirection();
-	m_brush = ot::Painter2DFactory::brushFromPainter2D(cfg->backgroundPainter());
+	m_brush = QtFactory::toQt(cfg->backgroundPainter());
 	m_pen.setWidth(cfg->outline().top()); // ToDo: Add seperate borders on all 4 sides
-	m_pen.setBrush(QBrush(ot::OTQtConverter::toQt(cfg->outline().color())));
-	m_pen.setColor(ot::OTQtConverter::toQt(cfg->outline().color()));
+	m_pen.setBrush(QBrush(QtFactory::toQt(cfg->outline().color())));
+	m_pen.setColor(QtFactory::toQt(cfg->outline().color()));
 
 	// We call set rectangle size which will call set geometry to finalize the item
 	this->setTriangleSize(m_size);

@@ -5,7 +5,6 @@
 
 // OpenTwin header
 #include "OTWidgets/Dialog.h"
-#include "OTWidgets/OTQtConverter.h"
 
 ot::Dialog::Dialog(QWidget* _parent)
 	: QDialog(_parent), m_flags(DialogCfg::NoFlags), m_result(DialogResult::Cancel) 
