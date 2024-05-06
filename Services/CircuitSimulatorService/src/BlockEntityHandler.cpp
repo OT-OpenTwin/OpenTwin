@@ -17,6 +17,9 @@
 #include "EntityBlockCircuitVoltageMeter.h"
 // Third Party Header
 
+//C++
+#include <algorithm>
+
 namespace NodeNumbers
 {
 	static unsigned long long nodeNumber = 0;
@@ -354,6 +357,24 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 		if (it != resultVectors.end())
 		{
 			resultVectors.erase(it);
+		}
+
+
+		//Here i want to delete the ediff vector from my Result beacuse i dont need it
+		while (true) {
+			
+			auto it2 = std::find_if(resultVectors.begin(), resultVectors.end(),
+				[&](const std::pair<const std::string, std::vector<double>>& element) {
+					return element.first.find("ediff") != std::string::npos;
+				});
+			if (it2 != resultVectors.end()) {
+				
+				resultVectors.erase(it2);
+			}
+			else {
+				
+				break;
+			}
 		}
 
 		std::string _curveFolderPath = solverName + "/" + circuitName + "/" + "1D/Curves";

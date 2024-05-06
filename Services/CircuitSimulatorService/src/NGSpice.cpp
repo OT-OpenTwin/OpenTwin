@@ -460,13 +460,10 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		std::string probeLine = "circbyline .probe vd" + nodes ; //That is the right syntax
 		ngSpice_Command(const_cast<char*>(probeLine.c_str()));
 	}
-
-	//ngSpice_Command(const_cast<char*>("circbyline .probe ix(3,2)"));
+	
+	//ngSpice_Command(const_cast<char*>("circbyline .probe I(R1,1)"));
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
-	//ngSpice_Command(const_cast<char*>("circbyline let diff = v(2)-v(1)"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
-	//ngSpice_Command(const_cast<char*>("circbyline let vdiff = v(2)-v(1)"));
-	//ngSpice_Command(const_cast<char*>("circbyline meas tran vtest find vdiff at=0.04e-3"));
 	ngSpice_Command(const_cast<char*>(printSettings.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .endc"));
 	ngSpice_Command(const_cast<char*>("circbyline .end"));
