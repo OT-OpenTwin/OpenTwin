@@ -1161,7 +1161,7 @@ Section "Install Qt Visual Studio Plugin" SEC13
 		#DetailPrint "$DEVENV_ROOT"
 		ExecWait '"$DEVENV_ROOT\VSIXInstaller.exe" /quiet "$TempToolChain\qt-vsaddin-msvc2022-3.0.2.vsix"'	#install the Qt visual studio plugin
 
-		MessageBox MB_ICONEXCLAMATION|MB_OK 'The Qt plugin for Visual Studio has been installed. $\n$\nYou need to configure the plugin by opening Visual Studio and choosing Extensions->Qt VS Tools->Qt Versions.$\n$\nIn this dialog box, you can add a new Qt version named "6.6.1" and specify the following path:$\n$DEV_ROOT\ThirdParty\Qt\6.6.1\msvc2019_64'
+		MessageBox MB_ICONEXCLAMATION|MB_OK 'The Qt plugin for Visual Studio has been installed. $\n$\nYou need to configure the plugin by opening Visual Studio and choosing Extensions->Qt VS Tools->Qt Versions.$\n$\nIn this dialog box, you can add a new Qt version named "6.6.1" and specify the following path:$\n$\n$DEV_ROOT\ThirdParty\Qt\6.6.1\msvc2019_64'
 
 		DetailPrint "Done."
 		#Sleep 10000
