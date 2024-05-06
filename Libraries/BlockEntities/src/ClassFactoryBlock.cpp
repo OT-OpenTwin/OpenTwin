@@ -13,6 +13,7 @@
 #include "EntityBlockDisplay.h"
 #include "EntityBlockCircuitDiode.h"
 #include "EntityBlockCircuitVoltageMeter.h"
+#include "EntityBlockCircuitCurrentMeter.h"
 
 EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 {
@@ -59,6 +60,10 @@ EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 	else if (entityType == "EntityBlockCircuitVoltageMeter")
 	{
 		return new EntityBlockCircuitVoltageMeter(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntityBlockCircuitCurrentMeter")
+	{
+		return new EntityBlockCircuitCurrentMeter(0, nullptr, nullptr, nullptr, this, "");
 	}
 
 	return ClassFactoryHandlerAbstract::CreateEntity(entityType);

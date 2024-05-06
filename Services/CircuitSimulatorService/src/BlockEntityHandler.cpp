@@ -15,6 +15,7 @@
 #include "SimulationResults.h"
 #include "EntityBlockCircuitDiode.h"
 #include "EntityBlockCircuitVoltageMeter.h"
+#include "EntityBlockCircuitCurrentMeter.h"
 // Third Party Header
 
 //C++
@@ -292,11 +293,13 @@ ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker()
 	EntityBlockCircuitResistor resistor(0, nullptr, nullptr, nullptr, nullptr, "");
 	EntityBlockCircuitDiode diode(0, nullptr, nullptr, nullptr, nullptr, "");
 	EntityBlockCircuitVoltageMeter voltMeter(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityBlockCircuitCurrentMeter currentMeter(0, nullptr, nullptr, nullptr, nullptr, "");
 
 	a1->addItem(element.getClassName(), element.CreateBlockHeadline(), "CircuitElementImages/VoltageSource.png");
 	a1->addItem(resistor.getClassName(), resistor.CreateBlockHeadline(), "CircuitElementImages/ResistorBG.png");
 	a1->addItem(diode.getClassName(), diode.CreateBlockHeadline(), "CircuitElementImages/Diod2.png");
 	a1->addItem(voltMeter.getClassName(), voltMeter.CreateBlockHeadline(), "CircuitElementImages/VoltMeter.png");
+	a1->addItem(currentMeter.getClassName(), currentMeter.CreateBlockHeadline(), "CircuitElementImages/CurrentMeter.png");
 	pckg->addCollection(a);
 
 	

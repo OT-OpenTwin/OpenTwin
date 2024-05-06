@@ -1,4 +1,4 @@
-#include "EntityBlockCircuitVoltageMeter.h"
+#include "EntityBlockCircuitCurrentMeter.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/GraphicsStackItemCfg.h"
 #include "OTGui/GraphicsImageItemCfg.h"
@@ -8,32 +8,32 @@
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
 
-EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
+EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-	_navigationTreeIconName = "VoltMeter";
-	_navigationTreeIconNameHidden = "VoltMeter";
-	_blockTitle = "Voltage Meter";
+	_navigationTreeIconName = "CurrentMeter";
+	_navigationTreeIconNameHidden = "CurrentMeter";
+	_blockTitle = "Curren Meter";
 
-	const std::string connectorNameLeft = "Left4";
+	const std::string connectorNameLeft = "Left6";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
 	_connectorsByName[connectorNameLeft] = m_LeftConnector;
 
-	const std::string connectorNameRight = "Right4";
+	const std::string connectorNameRight = "Right6";
 	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
 	_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
-ot::GraphicsItemCfg* EntityBlockCircuitVoltageMeter::CreateBlockCfg()
+ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg()
 {
 	ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
 	myStack->setName("EntityBlock");
-	myStack->setTitle("EntityBlockCircuitVoltageMeter");
+	myStack->setTitle("EntityBlockCircuitCurrentMeter");
 	myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
 
 	//Second I create an Image
 	ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
-	image->setImagePath("CircuitElementImages/VoltMeter.png");
+	image->setImagePath("CircuitElementImages/CurrentMeter.png");
 	image->setSizePolicy(ot::SizePolicy::Dynamic);
 	image->setMaintainAspectRatio(true);
 
@@ -47,7 +47,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageMeter::CreateBlockCfg()
 
 	// Now i want connections on the item for this i need rectangle items
 	ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
-	connection1->setName("Left4");
+	connection1->setName("Left6");
 	ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Blue));
 	connection1->setBorder(ot::Border(ot::Color(ot::Black), 1));
 	connection1->setBackgroundPainer(painter1);
@@ -55,7 +55,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageMeter::CreateBlockCfg()
 	connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
 
 	ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
-	connection2->setName("Right4");
+	connection2->setName("Right6");
 	ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Blue));
 	connection2->setBorder(ot::Border(ot::Color(ot::Black), 1));
 	connection2->setBackgroundPainer(painter2);
@@ -76,12 +76,12 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageMeter::CreateBlockCfg()
 	return myStack;
 }
 
-void EntityBlockCircuitVoltageMeter::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityBlockCircuitCurrentMeter::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBlock::AddStorageData(storage);
 }
 
-void EntityBlockCircuitVoltageMeter::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlockCircuitCurrentMeter::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }

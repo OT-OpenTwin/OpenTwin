@@ -163,6 +163,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\EntityBlockCircuitCurrentMeter.h" />
     <ClInclude Include="include\EntityBlockCircuitDiode.h" />
     <ClInclude Include="include\EntityBlockCircuitVoltageSource.h" />
     <ClInclude Include="include\ClassFactoryBlock.h" />
@@ -181,6 +182,7 @@
     <ClInclude Include="include\ValueComparisionDefinition.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\EntityBlockCircuitCurrentMeter.cpp" />
     <ClCompile Include="src\EntityBlockCircuitDiode.cpp" />
     <ClCompile Include="src\EntityBlockCircuitVoltageSource.cpp" />
     <ClCompile Include="src\ClassFactoryBlock.cpp" />
