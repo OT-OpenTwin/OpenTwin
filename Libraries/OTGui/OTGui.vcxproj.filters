@@ -201,6 +201,9 @@
     <ClInclude Include="include\OTGui\Painter2DFactory.h">
       <Filter>Header Files\Painter</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsItemCfgFactory.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -340,6 +343,9 @@
     </ClCompile>
     <ClCompile Include="src\Painter2DFactory.cpp">
       <Filter>Source Files\Painter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsItemCfgFactory.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
