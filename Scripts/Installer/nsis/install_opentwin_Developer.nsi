@@ -1128,8 +1128,10 @@ Section "Install MiKTeX" SEC10
 	DetailPrint "Installing MiKTeX..."
 		#DetailPrint "$DEVENV_ROOT"
 		ExecWait '"$TempToolChain\basic-miktex-24.1-x64.exe" --auto-install=yes --unattended --shared'	#install MiKTeX (required for Sphinx)
-		EnVar::AddValue "PATH" "$PROGRAMFILES\MiKTeX\miktex\bin\x64"
-		Pop $0
+		#Sleep 10000
+		#EnVar::AddValue "PATH" "$PROGRAMFILES\MiKTeX\miktex\bin\x64"
+		#Pop $0
+		#Sleep 10000
 		DetailPrint "Done."
 		#Sleep 10000
 SectionEnd
@@ -1137,6 +1139,7 @@ SectionEnd
 Section "Install NSIS (Nullsoft Scriptable Install System)" SEC11
 	AddSize 7000
 	DetailPrint "Installing NSIS (Nullsoft Scriptable Install System)..."
+		#Sleep 10000
 		#DetailPrint "$DEVENV_ROOT"
 		ExecWait '"$TempToolChain\nsis-3.10-setup.exe" /S'	#install NSIS
 		DetailPrint "Done."
@@ -1172,16 +1175,23 @@ Section "-CleanupTasks"
 	DetailPrint "Cleaning up..."
 	RMDir /r ${TEMP_TOOLCHAIN_DIR}
 	RMDir /r $GITHUB_DESKTOP_DEPLOYMENT_INSTALL_LOCATION
+	#Sleep 10000
 	
 SectionEnd
 
 Section -AdditionalIcons
+	DetailPrint "Add Icons..."
   	!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   		CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk" "$INSTDIR\Uninstall_OpenTwin.exe" "" ${OPENTWIN_UNAPP_ICON}
  	!insertmacro MUI_STARTMENU_WRITE_END
+	DetailPrint "Done."
+	#Sleep 10000
+
 SectionEnd
 
 Section -Post
+	DetailPrint "Post install actions..."
+
 	WriteUninstaller "$INSTDIR\Uninstall_OpenTwin.exe"
 	WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\OpenTwin.exe"
 	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
@@ -1190,7 +1200,9 @@ Section -Post
 	WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "UninstallString" '"$INSTDIR\Uninstall_OpenTwin.exe"'
 	WriteRegDWORD HKLM "${REGPATH_UNINSTSUBKEY}" "NoModify" 1
 	WriteRegDWORD HKLM "${REGPATH_UNINSTSUBKEY}" "NoRepair" 1
-
+	DetailPrint "Done."
+	#Sleep 10000
+	
 SectionEnd
 
 #Section descriptions

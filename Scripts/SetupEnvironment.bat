@@ -152,6 +152,9 @@ REM ############################################################################
 REM Add Deployment path to the path
 SET PATH=%OPENTWIN_DEV_ROOT%\Deployment;%PATH%
 
+REM Add MiKTex to the path (if installed in the standard directory)
+SET PATH=%ProgramFiles%\MiKTeX\miktex\bin\x64;%PATH%
+
 REM Set the env defined at the end to ensure everything else was completed successfully
 SET OPENTWIN_DEV_ENV_DEFINED=1
 ECHO OpenTwin Developer environment was set up successfully.
