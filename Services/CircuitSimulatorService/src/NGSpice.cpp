@@ -38,19 +38,35 @@ void NGSpice::clearBufferStructure(std::string name)
 
 }
 
-std::vector<std::string> NGSpice::getNodeNumbersOfVoltageMeter(std::string editorName, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID)
+void NGSpice::getNodeNumbersOfMeters(std::string editorName, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::vector<std::string>& nodesOfVoltageMeter,std::vector<std::string>& nodesOfCurrentMeter,std::string meter)
 {
-	std::vector<std::string> nodeNumberString;
+	
 	std::string nodes;
 	
 	//First i go through all Entities to find the Voltage Meter
 	auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName)->second.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageMeter");
 
+	if (meter == "voltageMeter")
+	{
+		it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName)->second.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageMeter");
+	}
+	else if (meter == "currentMeter")
+	{
+		it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName)->second.getMapOfEntityBlcks().find("EntityBlockCircuitCurrentMeter");
+	}
+	
+
 	for (auto& voltageMeter : it->second)
 	{
-		if (isValidNodeString(nodes))
+		if (isValidNodeString(nodes) && voltageMeter->getClassName() == "EntityBlockCircuitVoltageMeter")
 		{
-			nodeNumberString.push_back("v(" + nodes + ")");
+			nodesOfVoltageMeter.push_back("(" + nodes + ")");
+			nodes = "";
+			continue;
+		}
+		else if (isValidNodeString(nodes) && voltageMeter->getClassName() == "EntityBlockCircuitCurrentMeter")
+		{
+			nodesOfCurrentMeter.push_back("(" + nodes + ")");
 			nodes = "";
 			continue;
 		}
@@ -63,9 +79,15 @@ std::vector<std::string> NGSpice::getNodeNumbersOfVoltageMeter(std::string edito
 
 		for (auto voltageMeterConnectionID : voltageMeterconnections)
 		{
-			if (isValidNodeString(nodes))
+			if (isValidNodeString(nodes) && voltageMeter->getClassName() == "EntityBlockCircuitVoltageMeter")
 			{
-				nodeNumberString.push_back("v(" + nodes + ")");
+				nodesOfVoltageMeter.push_back("(" + nodes + ")");
+				nodes = "";
+				continue;
+			}
+			else if (isValidNodeString(nodes) && voltageMeter->getClassName() == "EntityBlockCircuitCurrentMeter")
+			{
+				nodesOfCurrentMeter.push_back("(" + nodes + ")");
 				nodes = "";
 				continue;
 			}
@@ -87,8 +109,6 @@ std::vector<std::string> NGSpice::getNodeNumbersOfVoltageMeter(std::string edito
 				connectorName = connectionCfg.destConnectable();
 				connectedElementUID = connectionCfg.getDestinationUid();
 			}
-				
-
 			// Here i get the connectedElement out of my BufferClass
 			auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName);
 			auto netlistElement = it->second.getMapOfElements().find(connectedElementUID);
@@ -96,10 +116,15 @@ std::vector<std::string> NGSpice::getNodeNumbersOfVoltageMeter(std::string edito
 			//Now i go through all connections of the Element and try to find the right one to get the nodeNumber
 			for (auto netlistConn : netlistElement->second.getList())
 			{
-				if (isValidNodeString(nodes))
+				if (isValidNodeString(nodes) && voltageMeter->getClassName() == "EntityBlockCircuitVoltageMeter")
 				{
-					
-					nodeNumberString.push_back("(" + nodes + ")");
+					nodesOfVoltageMeter.push_back("(" + nodes + ")");
+					nodes = "";
+					continue;
+				}
+				else if (isValidNodeString(nodes) && voltageMeter->getClassName() == "EntityBlockCircuitCurrentMeter")
+				{
+					nodesOfCurrentMeter.push_back("(" + nodes + ")");
 					nodes = "";
 					continue;
 				}
@@ -137,7 +162,7 @@ std::vector<std::string> NGSpice::getNodeNumbersOfVoltageMeter(std::string edito
 			}		
 		}	
 	}
-	return nodeNumberString;
+	
 
 }
 
@@ -250,7 +275,8 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 			//1.Methode
 
-			if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter"))
+			if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter") 
+				&& (allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Curren Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Curren Meter"))
 			{
 				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(),myConn.destConnectable() });
 				if (connectionWithNodeNumber != connectionNodeNumbers.end())
@@ -314,6 +340,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	//As next i create the Circuit Element Netlist Lines by getting the information out of the BufferClasses 
 
 	std::vector<std::string> nodesOfVoltageMeter;
+	std::vector<std::string> nodesOfCurrentMeter;
 
 	auto it =Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
 	 
@@ -356,7 +383,8 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		{
 			if (nodesOfVoltageMeter.size() == 0)
 			{
-				nodesOfVoltageMeter = getNodeNumbersOfVoltageMeter(editorname, allConnectionEntities, allEntitiesByBlockID);
+				std::string temp = "voltageMeter";
+				getNodeNumbersOfMeters(editorname, allConnectionEntities, allEntitiesByBlockID,nodesOfVoltageMeter,nodesOfCurrentMeter,temp);
 				continue;
 			}
 			else
@@ -364,6 +392,19 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 				continue;
 			}
 			
+		}
+		else if (element.getItemName() == "Curren Meter")
+		{
+			if (nodesOfCurrentMeter.size() == 0)
+			{
+				std::string temp = "currentMeter";
+				getNodeNumbersOfMeters(editorname, allConnectionEntities, allEntitiesByBlockID, nodesOfVoltageMeter, nodesOfCurrentMeter,temp);
+				continue;
+			}
+			else
+			{
+				continue;
+			}
 		}
 		
 		
@@ -468,7 +509,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	ngSpice_Command(const_cast<char*>("circbyline .endc"));
 	ngSpice_Command(const_cast<char*>("circbyline .end"));
 
-
+	
 
 	return "success";
 	
