@@ -425,13 +425,13 @@ void Viewer::setClearColorAutomatic(void)
 	if (ViewerSettings::instance()->viewBackgroundColorAutomatic)
 	{
 		setClearColor(viewColorAutoBackgroundR, viewColorAutoBackgroundG, viewColorAutoBackgroundB, 
-				      ViewerSettings::instance()->axisCenterColor.r() * 255, ViewerSettings::instance()->axisCenterColor.g() * 255, ViewerSettings::instance()->axisCenterColor.b() * 255);
+				      ViewerSettings::instance()->axisCenterColor.r(), ViewerSettings::instance()->axisCenterColor.g(), ViewerSettings::instance()->axisCenterColor.b());
 	}
 	else
 	{
 		// Set the view background color
-		setClearColor(ViewerSettings::instance()->viewBackgroundColor.r() * 255, ViewerSettings::instance()->viewBackgroundColor.g() * 255, ViewerSettings::instance()->viewBackgroundColor.b() * 255, 
-					  ViewerSettings::instance()->viewForegroundColor.r() * 255, ViewerSettings::instance()->viewForegroundColor.g() * 255, ViewerSettings::instance()->viewForegroundColor.b() * 255);
+		setClearColor(ViewerSettings::instance()->viewBackgroundColor.r(), ViewerSettings::instance()->viewBackgroundColor.g(), ViewerSettings::instance()->viewBackgroundColor.b(), 
+					  ViewerSettings::instance()->viewForegroundColor.r(), ViewerSettings::instance()->viewForegroundColor.g(), ViewerSettings::instance()->viewForegroundColor.b());
 	}
 
 	refresh();

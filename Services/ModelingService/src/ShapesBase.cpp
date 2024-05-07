@@ -45,9 +45,9 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 	// Here we set some defaults (the color should be taken from the settings)
 	ApplicationSettings * settings = ApplicationSettings::instance();
 
-	int colorR = (int) (settings->geometryDefaultColor.r() * 255.0 + 0.5);
-	int colorG = (int) (settings->geometryDefaultColor.g() * 255.0 + 0.5);
-	int colorB = (int) (settings->geometryDefaultColor.b() * 255.0 + 0.5);
+	int colorR = settings->geometryDefaultColor.r();
+	int colorG = settings->geometryDefaultColor.g();
+	int colorB = settings->geometryDefaultColor.b();
 
 	if (materialsFolder.empty())
 	{

@@ -208,7 +208,7 @@ void WorkingPlane::rebuildNode(void) {
 		osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array(4);
 		osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array(4);
 		for (int i{ 0 }; i < 4; i++) {
-			colors->at(i).set(planeCol.r(), planeCol.g(), planeCol.b(), planeCol.a());
+			colors->at(i).set(planeCol.r() / 255.0, planeCol.g() / 255.0, planeCol.b() / 255.0, planeCol.a() / 255.0);
 			normals->at(i).set(0.f, 0.f, 1.f);
 		}
 		vertices->at(0).set(m_centerX - (width / 2), m_centerY - (height / 2), m_centerZ);
@@ -365,8 +365,8 @@ void WorkingPlane::rebuildNode(void) {
 
 		osg::ref_ptr<osg::Vec4Array> gridColors = new osg::Vec4Array;
 		osg::ref_ptr<osg::Vec4Array> gridColorsWide = new osg::Vec4Array;
-		gridColors->push_back(osg::Vec4(gridCol.r(), gridCol.g(), gridCol.b(), gridCol.a()));
-		gridColorsWide->push_back(osg::Vec4(gridCol.r(), gridCol.g(), gridCol.b(), gridCol.a()));
+		gridColors->push_back(osg::Vec4(gridCol.r() / 255.0, gridCol.g() / 255.0, gridCol.b() / 255.0, gridCol.a() / 255.0));
+		gridColorsWide->push_back(osg::Vec4(gridCol.r() / 255.0, gridCol.g() / 255.0, gridCol.b() / 255.0, gridCol.a() / 255.0));
 
 		// Create the geometry object to store the data
 		osg::ref_ptr<osg::Geometry> gridGeometry = new osg::Geometry;

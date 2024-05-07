@@ -128,7 +128,7 @@ void AxisCenterCross::createArrow(osg::Geode * _geode, const ot::Color& _color, 
 
 	// Create colors
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(_color.r(), _color.g(), _color.b(), _color.a()));
+	colors->push_back(osg::Vec4(_color.r() / 255.0, _color.g() / 255.0, _color.b() / 255.0, _color.a() / 255.0));
 
 	// Create the geometry object to store the data
 	osg::ref_ptr<osg::Geometry> newGeometry = new osg::Geometry;
@@ -189,7 +189,7 @@ void AxisCenterCross::createDashedLine(osg::Geode * _geode, const ot::Color& _co
 
 	// Create colors
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(_color.r(), _color.g(), _color.b(), _color.a()));
+	colors->push_back(osg::Vec4(_color.r() / 255.0, _color.g() / 255.0, _color.b() / 255.0, _color.a() / 255.0));
 
 	// Create the geometry object to store the data
 	osg::ref_ptr<osg::Geometry> newGeometry = new osg::Geometry;

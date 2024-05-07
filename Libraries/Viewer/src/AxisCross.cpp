@@ -31,9 +31,9 @@ AxisCross::AxisCross(osg::Group * _parentGroup, osgText::Font *_font)
 
 	ViewerSettings * settings = ViewerSettings::instance();
 
-	textColor[0] = settings->axisCenterColor.r();
-	textColor[1] = settings->axisCenterColor.g();
-	textColor[2] = settings->axisCenterColor.b();
+	textColor[0] = settings->axisCenterColor.r() / 255.0;
+	textColor[1] = settings->axisCenterColor.g() / 255.0;
+	textColor[2] = settings->axisCenterColor.b() / 255.0;
 }
 
 AxisCross::~AxisCross() {
@@ -151,7 +151,7 @@ void AxisCross::rebuildNode(void) {
 
 	// Set color
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array(1);
-	colors->at(0).set(settings->axisCenterColor.r(), settings->axisCenterColor.g(), settings->axisCenterColor.b(), settings->axisCenterColor.a());
+	colors->at(0).set(settings->axisCenterColor.r() / 255.0, settings->axisCenterColor.g() / 255.0, settings->axisCenterColor.b() / 255.0, settings->axisCenterColor.a() / 255.0);
 	centerPoint->setColorArray(colors.get());
 	centerPoint->setColorBinding(osg::Geometry::BIND_OVERALL);
 
@@ -162,6 +162,20 @@ void AxisCross::rebuildNode(void) {
 	ssCenterGeode->setMode(GL_LIGHTING, osg::StateAttribute::ON);
 	ssCenterGeode->setMode(GL_BLEND, osg::StateAttribute::ON);
 	ssCenterGeode->setMode(GL_POINT_SMOOTH, osg::StateAttribute::ON);
+
+	osg::ref_ptr<osg::Material> material = new osg::Material;
+
+	material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(0.5f * settings->axisCenterColor.r() / 255.0, 0.5f * settings->axisCenterColor.g() / 255.0, 0.5f * settings->axisCenterColor.b() / 255.0, 1.0f));
+	material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(0.8f * settings->axisCenterColor.r() / 255.0, 0.8f * settings->axisCenterColor.g() / 255.0, 0.8f * settings->axisCenterColor.b() / 255.0, 1.0f));
+	material->setSpecular(osg::Material::FRONT_AND_BACK, osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
+	material->setColorMode(osg::Material::OFF);
+
+	material->setAlpha(osg::Material::FRONT_AND_BACK, settings->axisCenterColor.a() / 255.0);
+
+	material->setShininess(osg::Material::FRONT_AND_BACK, 0);
+
+	ssCenterGeode->setAttribute(material.get());
 
 	m_axisCrossNode->addChild(m_centerPoint);
 
@@ -228,7 +242,7 @@ void AxisCross::createArrow(osg::Geode * _geode, const ot::Color& _color) {
 
 	// Set color
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array(1);
-	colors->at(0).set(_color.r(), _color.g(), _color.b(), _color.a());
+	colors->at(0).set(_color.r() / 255.0, _color.g() / 255.0, _color.b() / 255.0, _color.a() / 255.0);
 	arrow->setColorArray(colors.get());
 	arrow->setColorBinding(osg::Geometry::BIND_OVERALL);
 
@@ -270,13 +284,13 @@ void AxisCross::createArrow(osg::Geode * _geode, const ot::Color& _color) {
 
 	osg::ref_ptr<osg::Material> material = new osg::Material;
 
-	material->setAmbient(osg::Material::FRONT_AND_BACK,  osg::Vec4(0.5f * _color.r(), 0.5f * _color.g(), 0.5f * _color.b(), 1.0f));
-	material->setDiffuse(osg::Material::FRONT_AND_BACK,  osg::Vec4(0.8f * _color.r(), 0.8f * _color.g(), 0.8f * _color.b(), 1.0f));
-	material->setSpecular(osg::Material::FRONT_AND_BACK, osg::Vec4(0.0f    , 0.0f    , 0.0f    , 1.0f));
+	material->setAmbient(osg::Material::FRONT_AND_BACK,  osg::Vec4(0.5f * _color.r() / 255.0, 0.5f * _color.g() / 255.0, 0.5f * _color.b() / 255.0, 1.0f));
+	material->setDiffuse(osg::Material::FRONT_AND_BACK,  osg::Vec4(0.8f * _color.r() / 255.0, 0.8f * _color.g() / 255.0, 0.8f * _color.b() / 255.0, 1.0f));
+	material->setSpecular(osg::Material::FRONT_AND_BACK, osg::Vec4(0.0f                     , 0.0f                     , 0.0f                     , 1.0f));
 
 	material->setColorMode(osg::Material::OFF);
 
-	material->setAlpha(osg::Material::FRONT_AND_BACK, _color.a());
+	material->setAlpha(osg::Material::FRONT_AND_BACK, _color.a() / 255.0);
 
 	material->setShininess(osg::Material::FRONT_AND_BACK, 0);
 
