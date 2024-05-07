@@ -151,7 +151,7 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool bufferConnection
 	if (bufferConnections)
 	{
 		m_itemRemovalConnectionBuffer = graphicsItem->getConnectionCfgs();
-		m_itemRemovalConnectionBuffer.unique();
+		//m_itemRemovalConnectionBuffer.unique();   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< This line produces a compilation error
 	}
 	graphicsItem->removeAllConnections();
 	m_scene->removeItem(graphicsItem->getQGraphicsItem());
