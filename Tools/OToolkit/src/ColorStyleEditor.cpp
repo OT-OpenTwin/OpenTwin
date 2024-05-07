@@ -585,8 +585,8 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedBackground, new PropertyPainter2D(new FillPainter2D(ot::Lime)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedBackground, new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBorderColor, new PropertyPainter2D(new FillPainter2D(Color(0, 100, 180))));
@@ -611,10 +611,10 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_colors.insert_or_assign(CSE_COLOR_LightBorderColor, new PropertyPainter2D(new FillPainter2D(ot::Navy)));
 	m_colors.insert_or_assign(CSE_COLOR_BorderDisabledColor, new PropertyPainter2D(new FillPainter2D(ot::Gray)));
 	m_colors.insert_or_assign(CSE_COLOR_BorderHoverColor, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_BorderSelectionColor, new PropertyPainter2D(new FillPainter2D(ot::Lime)));
+	m_colors.insert_or_assign(CSE_COLOR_BorderSelectionColor, new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
 	m_colors.insert_or_assign(CSE_COLOR_HeaderBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
 	m_colors.insert_or_assign(CSE_COLOR_HeaderHoverForeground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderSelectionBackground, new PropertyPainter2D(new FillPainter2D(ot::Lime)));
+	m_colors.insert_or_assign(CSE_COLOR_HeaderSelectionBackground, new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
 	m_colors.insert_or_assign(CSE_COLOR_InputBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));
 	m_colors.insert_or_assign(CSE_COLOR_WidgetAlternateBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 80, 140))));
 	m_colors.insert_or_assign(CSE_COLOR_WidgetForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
@@ -623,8 +623,8 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_colors.insert_or_assign(CSE_COLOR_WidgetDisabledForeground, new PropertyPainter2D(new FillPainter2D(ot::Gray)));
 	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionBackground, new PropertyPainter2D(new FillPainter2D(ot::Lime)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionBackground, new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
+	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_colors.insert_or_assign(CSE_COLOR_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
 	m_colors.insert_or_assign(CSE_COLOR_WindowForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_colors.insert_or_assign(CSE_COLOR_DialogBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));

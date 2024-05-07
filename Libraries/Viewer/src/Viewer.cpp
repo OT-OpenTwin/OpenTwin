@@ -18,6 +18,8 @@
 #include "OTServiceFoundation/SettingsData.h"
 #include "OTCore/OTAssert.h"
 
+#include "OTWidgets/GlobalColorStyle.h"
+
 #include <qobject.h>
 #include <qwindow.h>
 
@@ -238,6 +240,14 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	setLightSourceDistance(ViewerSettings::instance()->geometryLightSourceDistance);
 
 	reset();
+
+	this->connect(&ot::GlobalColorStyle::instance(), &ot::GlobalColorStyle::currentStyleChanged, this, &Viewer::slotColorStyleChanged);
+}
+
+void Viewer::slotColorStyleChanged(const ot::ColorStyle& _style) 
+{
+	setClearColorAutomatic();
+	refresh();
 }
 
 Viewer::~Viewer()
@@ -424,8 +434,15 @@ void Viewer::setClearColorAutomatic(void)
 {
 	if (ViewerSettings::instance()->viewBackgroundColorAutomatic)
 	{
+		ot::ColorStyleValue backColor = ot::GlobalColorStyle::instance().getCurrentStyle().getValue("Window Background");
+		ot::ColorStyleValue frontColor = ot::GlobalColorStyle::instance().getCurrentStyle().getValue("Window Foreground");
+
+		viewColorAutoBackgroundR = backColor.color().red();
+		viewColorAutoBackgroundG = backColor.color().green();
+		viewColorAutoBackgroundB = backColor.color().blue();
+
 		setClearColor(viewColorAutoBackgroundR, viewColorAutoBackgroundG, viewColorAutoBackgroundB, 
-				      ViewerSettings::instance()->axisCenterColor.r(), ViewerSettings::instance()->axisCenterColor.g(), ViewerSettings::instance()->axisCenterColor.b());
+			          frontColor.color().red(), frontColor.color().green(), frontColor.color().blue());
 	}
 	else
 	{

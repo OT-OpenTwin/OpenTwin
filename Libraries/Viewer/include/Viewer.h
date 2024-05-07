@@ -1,6 +1,7 @@
 #pragma once
 
 #include "OTCore/CoreTypes.h"
+#include "OTWidgets/ColorStyle.h"
 
 #include <QMainWindow>
 #include <QtOpenGLWidgets/qopenglwidget.h>
@@ -117,6 +118,9 @@ public:
 
 	void showClipPlaneHandles(void);
 	void hideClipPlaneHandles(void);
+
+private Q_SLOTS:
+	void slotColorStyleChanged(const ot::ColorStyle& _style);
 
 protected:
 	virtual void paintGL() override;
