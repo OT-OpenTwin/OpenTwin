@@ -73,7 +73,7 @@ ot::GraphicsConnectionCfg& ot::GraphicsConnectionCfg::operator = (const Graphics
 	return *this;
 }
 
-bool ot::GraphicsConnectionCfg::operator==(const GraphicsConnectionCfg& _other)
+bool ot::GraphicsConnectionCfg::operator==(const GraphicsConnectionCfg& _other) const
 {
 	return m_uid == _other.m_uid;
 }
