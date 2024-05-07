@@ -47,7 +47,6 @@ namespace ot {
 	typedef rapidjson::GenericMemberIterator<true, rapidjson::UTF8<>, rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>> JsonMemberIterator;
 
 	//! @class JsonNullValue
-	//! @addtogroup Libraries
 	//! @brief JSON NULL value
 	class JsonNullValue : public JsonValue {
 		OT_DECL_NOCOPY(JsonNullValue)
