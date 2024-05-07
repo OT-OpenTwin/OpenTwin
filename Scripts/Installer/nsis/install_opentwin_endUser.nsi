@@ -842,14 +842,16 @@ Section "MongoDB Setup" SEC03
 	DetailPrint "Running MongoDB installation scripts..."
 
 	ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$INSTDIR\Tools\ThirdParty\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'		
-	
+	Sleep 5000
+
 	nsExec::ExecToLog 'net stop "MongoDB"'	
-	
+
 	##########################################
 	# call for python scripts via $INSTDIR
 	##########################################
 
 	DetailPrint "Running scripts..."
+
 	# update the mongodB config file without authentication
 	ExecWait '"$INSTDIR\Tools\helper\ConfigMongoDBNoAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection'
 
