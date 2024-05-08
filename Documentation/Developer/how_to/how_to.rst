@@ -10,3 +10,4 @@ How To
    load_create_entities
    build_user_interface
    create_documentation
+   document_the_code

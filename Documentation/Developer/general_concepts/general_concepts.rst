@@ -7,6 +7,7 @@ See here for more details:
    :maxdepth: 3
 
    coding_standards
+   coding_standards_2
    opentwin_layers
    service_information
    user_interface
