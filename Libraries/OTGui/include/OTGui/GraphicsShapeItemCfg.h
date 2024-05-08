@@ -47,13 +47,13 @@ namespace ot {
 
 		//! @brief Set the outline path.
 		//! @param _path Outline path to set.
-		void setOutlinePath(const Path2D& _path) { m_path = _path; };
+		void setOutlinePath(const Path2DF& _path) { m_path = _path; };
 
 		//! @brief Outline path reference.
-		Path2D& outlinePath(void) { return m_path; };
+		Path2DF& outlinePath(void) { return m_path; };
 
 		//! @brief Outline path const reference.
-		const Path2D& outlinePath(void) const { return m_path; };
+		const Path2DF& outlinePath(void) const { return m_path; };
 
 		//! @brief Set the background painter.
 		//! The item takes ownership of the painter.
@@ -89,7 +89,7 @@ namespace ot {
 		double outlineWidth(void) const { return m_outline.width(); };
 
 	private:
-		Path2D m_path; //! @brief Outline path.
+		Path2DF m_path; //! @brief Outline path.
 		Painter2D* m_backgroundPainter; //! @brief Background painter.
 		OutlineF m_outline;
 	};

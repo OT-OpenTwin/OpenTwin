@@ -12,6 +12,7 @@
 #include "OTCore/Point2D.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Outline.h"
+#include "OTGui/Path2D.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -20,6 +21,7 @@
 #include <QtGui/qpen.h>
 #include <QtGui/qcolor.h>
 #include <QtGui/qbrush.h>
+#include <QtGui/qpainterpath.h>
 
 namespace ot {
 
@@ -56,6 +58,8 @@ namespace ot {
 
 		static QPen toPen(const Outline& _outline);
 		static QPen toPen(const OutlineF& _outline);
+
+		static QPainterPath toPainterPath(const Path2DF& _path);
 
 	private:
 		QtFactory() {};

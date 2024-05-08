@@ -256,6 +256,9 @@
     <ClCompile Include="src\GraphicsPolygonItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsShapeItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -468,6 +471,9 @@
       <Filter>include\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsPolygonItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsShapeItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

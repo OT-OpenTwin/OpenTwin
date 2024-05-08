@@ -173,3 +173,26 @@ QPen ot::QtFactory::toPen(const Outline& _outline) {
 QPen ot::QtFactory::toPen(const OutlineF& _outline) {
 	return QPen(toBrush(_outline.painter()), _outline.width(), toPenStyle(_outline.style()), toPenCapStyle(_outline.cap()), toPenJoinStyle(_outline.joinStyle()));
 }
+
+QPainterPath ot::QtFactory::toPainterPath(const Path2DF& _path) {
+	QPainterPath p;
+	for (const Path2DF::PathEntry& e : _path.getEntries()) {
+		p.moveTo(QtFactory::toPoint(e.start));
+
+		switch (e.type)
+		{
+		case Path2D::LineType:
+			p.lineTo(QtFactory::toPoint(e.stop));
+			break;
+
+		case Path2D::BerzierType:
+			p.cubicTo(QtFactory::toPoint(e.control1), QtFactory::toPoint(e.control1), QtFactory::toPoint(e.control1));
+			break;
+
+		default:
+			OT_LOG_E("Unknown path2D entry type");
+			break;
+		}
+	}
+	return p;
+}
