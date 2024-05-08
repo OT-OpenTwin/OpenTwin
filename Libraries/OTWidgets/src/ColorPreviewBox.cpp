@@ -13,7 +13,7 @@
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 
-ot::ColorPreviewBox::ColorPreviewBox(const ot::Color& _color, QWidget* _parent) : QFrame(_parent), m_color(QtFactory::toQt(_color)) {
+ot::ColorPreviewBox::ColorPreviewBox(const ot::Color& _color, QWidget* _parent) : QFrame(_parent), m_color(QtFactory::toColor(_color)) {
 	this->setObjectName("OT_ColorPreviewBox");
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
 }
@@ -28,7 +28,7 @@ ot::ColorPreviewBox::~ColorPreviewBox() {
 }
 
 void ot::ColorPreviewBox::setColor(const ot::Color& _color) {
-	this->setColor(QtFactory::toQt(_color));
+	this->setColor(QtFactory::toColor(_color));
 }
 
 void ot::ColorPreviewBox::setColor(const QColor& _color) {

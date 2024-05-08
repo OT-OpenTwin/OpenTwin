@@ -11,15 +11,15 @@
 #include "OTGui/RadialGradientPainter2D.h"
 #include "OTWidgets/QtFactory.h"
 
-QColor ot::QtFactory::toQt(const ot::Color& _color) {
+QColor ot::QtFactory::toColor(const ot::Color& _color) {
 	return QColor(_color.r(), _color.g(), _color.b(), _color.a());
 }
 
-QColor ot::QtFactory::toQt(const ot::ColorF& _color) {
+QColor ot::QtFactory::toColor(const ot::ColorF& _color) {
 	return QColor((int)(_color.r() * 255.f), (int)(_color.g() * 255.f), (int)(_color.b() * 255.f), (int)(_color.a() * 255.f));
 }
 
-Qt::Alignment ot::QtFactory::toQt(ot::Alignment _alignment) {
+Qt::Alignment ot::QtFactory::toAlignment(ot::Alignment _alignment) {
 	switch (_alignment)
 	{
 	case ot::AlignCenter: return Qt::AlignCenter;
@@ -37,31 +37,31 @@ Qt::Alignment ot::QtFactory::toQt(ot::Alignment _alignment) {
 	}
 }
 
-QPoint ot::QtFactory::toQt(const ot::Point2D& _pt) {
+QPoint ot::QtFactory::toPoint(const ot::Point2D& _pt) {
 	return QPoint(_pt.x(), _pt.y());
 }
 
-QPointF ot::QtFactory::toQt(const ot::Point2DF& _pt) {
+QPointF ot::QtFactory::toPoint(const ot::Point2DF& _pt) {
 	return QPointF(_pt.x(), _pt.y());
 }
 
-QPointF ot::QtFactory::toQt(const ot::Point2DD& _pt) {
+QPointF ot::QtFactory::toPoint(const ot::Point2DD& _pt) {
 	return QPointF(_pt.x(), _pt.y());
 }
 
-QSize ot::QtFactory::toQt(const ot::Size2D& _s) {
+QSize ot::QtFactory::toSize(const ot::Size2D& _s) {
 	return QSize(_s.width(), _s.height());
 }
 
-QSizeF ot::QtFactory::toQt(const ot::Size2DF& _s) {
+QSizeF ot::QtFactory::toSize(const ot::Size2DF& _s) {
 	return QSizeF(_s.width(), _s.height());
 }
 
-QSizeF ot::QtFactory::toQt(const ot::Size2DD& _s) {
+QSizeF ot::QtFactory::toSize(const ot::Size2DD& _s) {
 	return QSizeF(_s.width(), _s.height());
 }
 
-QGradient::Spread ot::QtFactory::toQt(ot::GradientSpread _spread) {
+QGradient::Spread ot::QtFactory::toGradientSpread(ot::GradientSpread _spread) {
 	switch (_spread)
 	{
 	case ot::PadSpread: return QGradient::PadSpread;
@@ -73,7 +73,7 @@ QGradient::Spread ot::QtFactory::toQt(ot::GradientSpread _spread) {
 	}
 }
 
-QBrush ot::QtFactory::toQt(const ot::Painter2D* _painter) {
+QBrush ot::QtFactory::toBrush(const ot::Painter2D* _painter) {
 	if (!_painter) {
 		OT_LOG_W("Painter is 0. Ignoring");
 		return QBrush();
@@ -82,7 +82,7 @@ QBrush ot::QtFactory::toQt(const ot::Painter2D* _painter) {
 	if (_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) {
 		const FillPainter2D* painter = dynamic_cast<const FillPainter2D*>(_painter);
 		OTAssertNullptr(painter);
-		return QBrush(QColor(QtFactory::toQt(painter->color())));
+		return QBrush(QColor(QtFactory::toColor(painter->color())));
 	}
 	else if (_painter->getFactoryKey() == OT_FactoryKey_LinearGradientPainter2D) {
 		const LinearGradientPainter2D* painter = dynamic_cast<const LinearGradientPainter2D*>(_painter);
@@ -90,11 +90,11 @@ QBrush ot::QtFactory::toQt(const ot::Painter2D* _painter) {
 		
 		QGradientStops stops;
 		for (auto s : painter->stops()) {
-			stops.append(QGradientStop(s.pos(), QtFactory::toQt(s.color())));
+			stops.append(QGradientStop(s.pos(), QtFactory::toColor(s.color())));
 		}
 
-		QLinearGradient grad(QtFactory::toQt(painter->start()), QtFactory::toQt(painter->finalStop()));
-		grad.setSpread(QtFactory::toQt(painter->spread()));
+		QLinearGradient grad(QtFactory::toPoint(painter->start()), QtFactory::toPoint(painter->finalStop()));
+		grad.setSpread(QtFactory::toGradientSpread(painter->spread()));
 		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
 		grad.setStops(stops);
 		
@@ -106,15 +106,15 @@ QBrush ot::QtFactory::toQt(const ot::Painter2D* _painter) {
 
 		QGradientStops stops;
 		for (auto s : painter->stops()) {
-			stops.append(QGradientStop(s.pos(), ot::QtFactory::toQt(s.color())));
+			stops.append(QGradientStop(s.pos(), ot::QtFactory::toColor(s.color())));
 		}
 
-		QRadialGradient grad(ot::QtFactory::toQt(painter->centerPoint()), painter->centerRadius());
+		QRadialGradient grad(ot::QtFactory::toPoint(painter->centerPoint()), painter->centerRadius());
 		if (painter->isFocalPointSet()) {
-			grad.setFocalPoint(ot::QtFactory::toQt(painter->focalPoint()));
+			grad.setFocalPoint(ot::QtFactory::toPoint(painter->focalPoint()));
 			grad.setFocalRadius(painter->focalRadius());
 		}
-		grad.setSpread(ot::QtFactory::toQt(painter->spread()));
+		grad.setSpread(ot::QtFactory::toGradientSpread(painter->spread()));
 		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
 		grad.setStops(stops);
 
@@ -124,4 +124,52 @@ QBrush ot::QtFactory::toQt(const ot::Painter2D* _painter) {
 		OT_LOG_EAS("Unknown Painter2D provided \"" + _painter->getFactoryKey() + "\"");
 		return QBrush();
 	}
+}
+
+Qt::PenStyle ot::QtFactory::toPenStyle(LineStyle _style) {
+	switch (_style)
+	{
+	case ot::NoLine: return Qt::NoPen;
+	case ot::SolidLine: return Qt::SolidLine;
+	case ot::DashLine: return Qt::DashLine;
+	case ot::DotLine: return Qt::DotLine;
+	case ot::DashDotLine: return Qt::DashDotLine;
+	case ot::DashDotDotLine: return Qt::DashDotDotLine;
+	default:
+		OT_LOG_E("Unknown line style (" + std::to_string((int)_style) + ")");
+		return Qt::NoPen;
+	}
+}
+
+Qt::PenCapStyle ot::QtFactory::toPenCapStyle(LineCapStyle _style) {
+	switch (_style)
+	{
+	case ot::FlatCap: return Qt::FlatCap;
+	case ot::SquareCap: return Qt::SquareCap;
+	case ot::RoundCap: return Qt::RoundCap;
+	default:
+		OT_LOG_E("Unknown cap style (" + std::to_string((int)_style) + ")");
+		return Qt::SquareCap;
+	}
+}
+
+Qt::PenJoinStyle ot::QtFactory::toPenJoinStyle(LineJoinStyle _style) {
+	switch (_style)
+	{
+	case ot::MiterJoin: return Qt::MiterJoin;
+	case ot::BevelJoin: return Qt::BevelJoin;
+	case ot::RoundJoin: return Qt::RoundJoin;
+	case ot::SvgMiterJoin: return Qt::SvgMiterJoin;
+	default:
+		OT_LOG_E("Unknown join style (" + std::to_string((int)_style) + ")");
+		return Qt::BevelJoin;
+	}
+}
+
+QPen ot::QtFactory::toPen(const Outline& _outline) {
+	return QPen(toBrush(_outline.painter()), (qreal)_outline.width(), toPenStyle(_outline.style()), toPenCapStyle(_outline.cap()), toPenJoinStyle(_outline.joinStyle()));
+}
+
+QPen ot::QtFactory::toPen(const OutlineF& _outline) {
+	return QPen(toBrush(_outline.painter()), _outline.width(), toPenStyle(_outline.style()), toPenCapStyle(_outline.cap()), toPenJoinStyle(_outline.joinStyle()));
 }

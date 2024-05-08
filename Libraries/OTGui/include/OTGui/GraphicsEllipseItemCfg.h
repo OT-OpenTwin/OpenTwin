@@ -7,6 +7,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTGui/Outline.h"
 #include "OTGui/GraphicsItemCfg.h"
 
 #define OT_FactoryKey_GraphicsEllipseItem "OT_GIElli"
@@ -38,8 +39,8 @@ namespace ot {
 		void setRadiusY(double _radius) { m_radiusY = _radius; };
 		double radiusY(void) const { return m_radiusY; };
 
-		void setBorder(const ot::Border& _border) { m_border = _border; };
-		const ot::Border& border(void) const { return m_border; };
+		void setOutline(const ot::OutlineF& _outline) { m_outline = _outline; };
+		const ot::OutlineF& outline(void) const { return m_outline; };
 
 		void setBackgroundPainer(ot::Painter2D* _painter);
 		ot::Painter2D* backgroundPainter(void) { return m_backgroundPainter; };
@@ -47,7 +48,7 @@ namespace ot {
 	private:
 		double m_radiusX;
 		double m_radiusY;
-		ot::Border m_border;
+		ot::OutlineF m_outline;
 		ot::Painter2D* m_backgroundPainter;
 
 		GraphicsEllipseItemCfg(GraphicsEllipseItemCfg&) = delete;

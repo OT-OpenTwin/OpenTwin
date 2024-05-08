@@ -45,10 +45,8 @@ bool ot::GraphicsTriangleItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_size.setHeight(cfg->size().height());
 	m_shape = cfg->triangleShape();
 	m_direction = cfg->triangleDirection();
-	m_brush = QtFactory::toQt(cfg->backgroundPainter());
-	m_pen.setWidth(cfg->outline().top()); // ToDo: Add seperate borders on all 4 sides
-	m_pen.setBrush(QBrush(QtFactory::toQt(cfg->outline().color())));
-	m_pen.setColor(QtFactory::toQt(cfg->outline().color()));
+	m_brush = QtFactory::toBrush(cfg->backgroundPainter());
+	m_pen = QtFactory::toPen(cfg->outline());
 
 	// We call set rectangle size which will call set geometry to finalize the item
 	this->setTriangleSize(m_size);

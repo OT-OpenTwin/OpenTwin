@@ -42,10 +42,8 @@ bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 	m_radiusX = cfg->radiusX();
 	m_radiusY = cfg->radiusY();
-	m_brush = QtFactory::toQt(cfg->backgroundPainter());
-	m_pen.setWidth(cfg->border().top()); // ToDo: Add seperate borders on all 4 sides
-	m_pen.setBrush(QBrush(QtFactory::toQt(cfg->border().color())));
-	m_pen.setColor(QtFactory::toQt(cfg->border().color()));
+	m_brush = QtFactory::toBrush(cfg->backgroundPainter());
+	m_pen = QtFactory::toPen(cfg->outline());
 
 	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }

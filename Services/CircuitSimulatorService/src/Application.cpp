@@ -99,7 +99,7 @@ namespace ottest
 		ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
 		connection1->setName("Input3");
 		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Blue));
-		connection1->setBorder(ot::Border(ot::Color(ot::Black), 1));
+		connection1->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
 		connection1->setBackgroundPainer(painter1);
 		connection1->setAlignment(ot::AlignCenter);
 		connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
@@ -107,7 +107,7 @@ namespace ottest
 		ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
 		connection2->setName("Ouput3");
 		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Blue));
-		connection2->setBorder(ot::Border(ot::Color(ot::Black), 1));
+		connection2->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
 		connection2->setBackgroundPainer(painter2);
 		connection2->setAlignment(ot::AlignCenter);
 		connection2->setMaximumSize(ot::Size2DD(10.0, 10.0));
@@ -144,7 +144,7 @@ namespace ottest
 		ot::GraphicsEllipseItemCfg* base = new ot::GraphicsEllipseItemCfg();
 		base->setName("base");
 		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Blue));
-		base->setBorder(ot::Border(ot::Color(ot::Black), 1));
+		base->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
 		base->setBackgroundPainer(painter1);
 		base->setAlignment(ot::AlignLeft);
 		base->setMaximumSize(ot::Size2DD(10.0, 10.0));
@@ -154,7 +154,7 @@ namespace ottest
 		ot::GraphicsEllipseItemCfg* collector = new ot::GraphicsEllipseItemCfg();
 		collector->setName("collector");
 		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Blue));
-		collector->setBorder(ot::Border(ot::Color(ot::Black), 1));
+		collector->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
 		collector->setBackgroundPainer(painter2);
 		collector->setAlignment(ot::AlignTop);
 		collector->setMaximumSize(ot::Size2DD(10.0, 10.0));
@@ -164,7 +164,7 @@ namespace ottest
 		ot::GraphicsEllipseItemCfg* emitter = new ot::GraphicsEllipseItemCfg();
 		emitter->setName("emitter");
 		ot::FillPainter2D* painter3 = new ot::FillPainter2D(ot::Color(ot::Blue));
-		emitter->setBorder(ot::Border(ot::Color(ot::Black), 1));
+		emitter->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
 		emitter->setBackgroundPainer(painter3);
 		emitter->setAlignment(ot::AlignBottom);
 		emitter->setMaximumSize(ot::Size2DD(10.0, 10.0));

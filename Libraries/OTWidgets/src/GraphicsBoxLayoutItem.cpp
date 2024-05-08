@@ -36,15 +36,15 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 			OTAssertNullptr(i->getQGraphicsLayoutItem());
 			this->addItem(i->getQGraphicsLayoutItem());
 			if (itm.second > 0) this->setStretchFactor(i->getQGraphicsLayoutItem(), itm.second);
-			this->setAlignment(i->getQGraphicsLayoutItem(), QtFactory::toQt(i->graphicsItemAlignment()));
+			this->setAlignment(i->getQGraphicsLayoutItem(), QtFactory::toAlignment(i->graphicsItemAlignment()));
 		}
 		else {
 			this->addStretch(itm.second);
 		}
 	}
 
-	this->setMinimumSize(QtFactory::toQt(_cfg->minimumSize()));
-	this->setMaximumSize(QtFactory::toQt(_cfg->maximumSize()));
+	this->setMinimumSize(QtFactory::toSize(_cfg->minimumSize()));
+	this->setMaximumSize(QtFactory::toSize(_cfg->maximumSize()));
 	return GraphicsLayoutItem::setupFromConfig(_cfg);
 }
 

@@ -44,11 +44,9 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	m_size.setWidth(cfg->size().width());
 	m_size.setHeight(cfg->size().height());
 	m_cornerRadius = cfg->cornerRadius();
-	m_brush = QtFactory::toQt(cfg->backgroundPainter());
-	m_pen.setWidth(cfg->border().top()); // ToDo: Add seperate borders on all 4 sides
-	m_pen.setBrush(QBrush(QtFactory::toQt(cfg->border().color())));
-	m_pen.setColor(QtFactory::toQt(cfg->border().color()));
-
+	m_brush = QtFactory::toBrush(cfg->backgroundPainter());
+	m_pen = QtFactory::toPen(cfg->outline());
+	
 	// We call set rectangle size which will call set geometry to finalize the item
 	this->setRectangleSize(m_size);
 
@@ -60,9 +58,11 @@ bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 // Base class functions: ot::CustomGraphicsItem
 
 void ot::GraphicsRectangularItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
-	_painter->setBrush(m_brush);
+	QPainterPath pth;
+	pth.addRoundedRect(_rect, m_cornerRadius, m_cornerRadius);
 	_painter->setPen(m_pen);
-	_painter->drawRoundedRect(_rect, m_cornerRadius, m_cornerRadius);
+	_painter->fillPath(pth, m_brush);
+	_painter->drawPath(pth);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

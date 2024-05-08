@@ -64,7 +64,7 @@ void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOpt
 		// Check if a color mask is set
 		if (m_colorMask.isValid()) {
 			QPixmap mask(scaled.size());
-			mask.fill(QtFactory::toQt(m_colorMask));
+			mask.fill(QtFactory::toColor(m_colorMask));
 			_painter->setCompositionMode(QPainter::CompositionMode_SourceIn);
 
 			_painter->drawPixmap(adjustedRect.topLeft(), scaled);
@@ -79,7 +79,7 @@ void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOpt
 		// Check if a color mask is set
 		if (m_colorMask.isValid()) {
 			QPixmap mask(_rect.size().toSize());
-			mask.fill(QtFactory::toQt(m_colorMask));
+			mask.fill(QtFactory::toColor(m_colorMask));
 			_painter->setCompositionMode(QPainter::CompositionMode_SourceIn);
 
 			_painter->drawPixmap(_rect.topLeft().x(), _rect.topLeft().y(), _rect.width(), _rect.height(), m_pixmap);

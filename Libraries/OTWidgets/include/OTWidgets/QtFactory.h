@@ -11,11 +11,13 @@
 #include "OTCore/Color.h"
 #include "OTCore/Point2D.h"
 #include "OTGui/GuiTypes.h"
+#include "OTGui/Outline.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtCore/qpoint.h>
 #include <QtCore/qsize.h>
+#include <QtGui/qpen.h>
 #include <QtGui/qcolor.h>
 #include <QtGui/qbrush.h>
 
@@ -29,24 +31,31 @@ namespace ot {
 		OT_DECL_NOCOPY(QtFactory)
 	public:
 		//! @brief Convert OpenTwin Color to Qt Color
-		static QColor toQt(const ot::Color& _color);
-		static QColor toQt(const ot::ColorF& _color);
+		static QColor toColor(const ot::Color& _color);
+		static QColor toColor(const ot::ColorF& _color);
 
-		static Qt::Alignment toQt(Alignment _alignment);
+		static Qt::Alignment toAlignment(Alignment _alignment);
 
-		static QPoint toQt(const Point2D& _pt);
-		static QPointF toQt(const Point2DF& _pt);
-		static QPointF toQt(const Point2DD& _pt);
+		static QPoint toPoint(const Point2D& _pt);
+		static QPointF toPoint(const Point2DF& _pt);
+		static QPointF toPoint(const Point2DD& _pt);
 
-		static QSize toQt(const Size2D& _s);
-		static QSizeF toQt(const Size2DF& _s);
-		static QSizeF toQt(const Size2DD& _s);
+		static QSize toSize(const Size2D& _s);
+		static QSizeF toSize(const Size2DF& _s);
+		static QSizeF toSize(const Size2DD& _s);
 
-		static QGradient::Spread toQt(ot::GradientSpread _spread);
+		static QGradient::Spread toGradientSpread(ot::GradientSpread _spread);
 
 		//! @brief Creates a QBrush equivalent to the provided painter.
 		//! Returns default if no painter provided.
-		static QBrush toQt(const ot::Painter2D* _painter);
+		static QBrush toBrush(const ot::Painter2D* _painter);
+
+		static Qt::PenStyle toPenStyle(LineStyle _style);
+		static Qt::PenCapStyle toPenCapStyle(LineCapStyle _style);
+		static Qt::PenJoinStyle toPenJoinStyle(LineJoinStyle _style);
+
+		static QPen toPen(const Outline& _outline);
+		static QPen toPen(const OutlineF& _outline);
 
 	private:
 		QtFactory() {};

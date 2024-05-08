@@ -20,11 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\Border.h" />
+    <ClInclude Include="include\OTGui\GraphicsGroupItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsItemCfgFactory.h" />
     <ClInclude Include="include\OTGui\GraphicsPolygonItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsShapeItemCfg.h" />
     <ClInclude Include="include\OTGui\KeySequence.h" />
-    <ClInclude Include="include\OTGui\LineStyle.h" />
+    <ClInclude Include="include\OTGui\Outline.h" />
     <ClInclude Include="include\OTGui\MessageDialogCfg.h" />
     <ClInclude Include="include\OTGui\DialogCfg.h" />
     <ClInclude Include="include\OTGui\FillPainter2D.h" />
@@ -71,11 +72,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Border.cpp" />
+    <ClCompile Include="src\GraphicsGroupItemCfg.cpp" />
     <ClCompile Include="src\GraphicsItemCfgFactory.cpp" />
     <ClCompile Include="src\GraphicsPolygonItemCfg.cpp" />
     <ClCompile Include="src\GraphicsShapeItemCfg.cpp" />
     <ClCompile Include="src\KeySequence.cpp" />
-    <ClCompile Include="src\LineStyle.cpp" />
+    <ClCompile Include="src\Outline.cpp" />
     <ClCompile Include="src\MessageDialogCfg.cpp" />
     <ClCompile Include="src\DialogCfg.cpp" />
     <ClCompile Include="src\dllmain.cpp" />

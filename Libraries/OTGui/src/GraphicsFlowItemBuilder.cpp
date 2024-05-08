@@ -113,7 +113,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createSquareItem(void) {
 	itm->setSize(ot::Size2DD(10., 10.));
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));
-	itm->setBorder(ot::Border(m_secondaryColor, 1));
+	itm->setOutline(ot::OutlineF(1., m_secondaryColor));
 
 	return itm;
 }
@@ -122,7 +122,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createCircleItem(void) {
 	ot::GraphicsEllipseItemCfg* itm = new ot::GraphicsEllipseItemCfg(5, 5, new ot::FillPainter2D(m_primaryColor));
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));
-	itm->setBorder(ot::Border(m_secondaryColor, 1));
+	itm->setOutline(ot::OutlineF(1., m_secondaryColor));
 
 	return itm;
 }
@@ -132,7 +132,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createTriangleItem(GraphicsT
 	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));
-	itm->setOutline(ot::Border(m_secondaryColor, 1));
+	itm->setOutline(ot::OutlineF(1., m_secondaryColor));
 
 	return itm;
 }
@@ -198,7 +198,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 
 	// Border
 	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg(painterBack);
-	bor->setBorder(ot::Border(ot::Color(0, 0, 0), 1));
+	bor->setOutline(ot::OutlineF(1., ot::Color(0, 0, 0)));
 	bor->setCornerRadius(5);
 	bor->setName(m_name + "_bor");
 	bor->setSizePolicy(ot::Dynamic);
@@ -220,7 +220,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 
 	// Title: Border
 	ot::GraphicsRectangularItemCfg* tBor = new ot::GraphicsRectangularItemCfg(painterTitleBack);
-	tBor->setBorder(ot::Border(ot::Color(0, 0, 0), 1));
+	tBor->setOutline(OutlineF(1., ot::Color(0, 0, 0)));
 	tBor->setName(m_name + "_tBor");
 	tBor->setCornerRadius(5);
 	//tBor->setSize(ot::Size2DD(200., 30.));

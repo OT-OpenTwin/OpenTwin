@@ -71,12 +71,12 @@ QString ot::ColorStyleValue::qss(void) const {
 
 QColor ot::ColorStyleValue::color(void) const {
 	OTAssertNullptr(m_painter);
-	if (m_painter) return QtFactory::toQt(m_painter->getDefaultColor());
+	if (m_painter) return QtFactory::toColor(m_painter->getDefaultColor());
 	else return QColor();
 }
 
 QBrush ot::ColorStyleValue::brush(void) const {
-	return QtFactory::toQt(m_painter);
+	return QtFactory::toBrush(m_painter);
 }
 
 void ot::ColorStyleValue::setPainter(Painter2D* _painter) {

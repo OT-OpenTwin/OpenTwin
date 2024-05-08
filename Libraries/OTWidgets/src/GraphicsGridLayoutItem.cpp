@@ -40,7 +40,7 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 				}
 				i->setParentGraphicsItem(this);
 				OTAssertNullptr(i->getQGraphicsLayoutItem());
-				this->addItem(i->getQGraphicsLayoutItem(), x, y, QtFactory::toQt(i->graphicsItemAlignment()));
+				this->addItem(i->getQGraphicsLayoutItem(), x, y, QtFactory::toAlignment(i->graphicsItemAlignment()));
 			}
 			y++;
 		}
@@ -55,8 +55,8 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		if (cfg->columnStretch()[c] > 0) this->setColumnStretchFactor(c, cfg->columnStretch()[c]);
 	}
 
-	this->setMinimumSize(QtFactory::toQt(_cfg->minimumSize()));
-	this->setMaximumSize(QtFactory::toQt(_cfg->maximumSize()));
+	this->setMinimumSize(QtFactory::toSize(_cfg->minimumSize()));
+	this->setMaximumSize(QtFactory::toSize(_cfg->maximumSize()));
 
 	return GraphicsLayoutItem::setupFromConfig(_cfg);
 }

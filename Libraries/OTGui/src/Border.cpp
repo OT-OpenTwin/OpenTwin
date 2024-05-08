@@ -6,18 +6,24 @@
 // OpenTwin header
 #include "OTGui/Border.h"
 
-ot::Border::Border() : m_color(0, 0, 0), m_top(0), m_left(0), m_right(0), m_bottom(0) {}
+ot::Border::Border(const ot::Color& _color, int _width) 
+	: m_top(_width, _color), m_left(_width, _color), m_right(_width, _color), m_bottom(_width, _color)
+{}
 
-ot::Border::Border(const ot::Color& _color, int _width) : m_color(_color), m_top(_width), m_left(_width), m_right(_width), m_bottom(_width) {}
+ot::Border::Border(const ot::Color& _color, int _leftWidth, int _topWidth, int _rightWidth, int _bottomWidth) 
+	: m_top(_topWidth, _color), m_left(_leftWidth, _color), m_right(_rightWidth, _color), m_bottom(_bottomWidth, _color) 
+{}
 
-ot::Border::Border(const ot::Color& _color, int _leftWidth, int _topWidth, int _rightWidth, int _bottomWidth) : m_color(_color), m_top(_topWidth), m_left(_leftWidth), m_right(_rightWidth), m_bottom(_bottomWidth) {}
+ot::Border::Border(const Outline& _left, const Outline& _top, const Outline& _right, const Outline& _bottom)
+	: m_top(_top), m_left(_left), m_right(_right), m_bottom(_bottom)
+{}
 
-ot::Border::Border(const Border& _other) : m_color(_other.m_color), m_top(_other.m_top), m_left(_other.m_left), m_right(_other.m_right), m_bottom(_other.m_bottom) {}
+ot::Border::Border(const Border& _other)
+	: m_top(_other.m_top), m_left(_other.m_left), m_right(_other.m_right), m_bottom(_other.m_bottom) {}
 
 ot::Border::~Border() {}
 
 ot::Border& ot::Border::operator = (const Border& _other) {
-	m_color = _other.m_color;
 	m_top = _other.m_top;
 	m_left = _other.m_left;
 	m_right = _other.m_right;
@@ -25,37 +31,109 @@ ot::Border& ot::Border::operator = (const Border& _other) {
 	return *this;
 }
 
-bool ot::Border::operator == (const Border& _other) const {
-	return m_color == _other.m_color && m_top == _other.m_top && m_left == _other.m_left && m_right == _other.m_right && m_bottom == _other.m_bottom;
-}
-
-bool ot::Border::operator != (const Border& _other) const {
-	return !(*this == _other);
-}
-
 void ot::Border::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
-	JsonObject colorObj;
-	m_color.addToJsonObject(colorObj, _allocator);
+	JsonObject t;
+	JsonObject l;
+	JsonObject r;
+	JsonObject b;
 
-	_object.AddMember("Color", colorObj, _allocator);
-	_object.AddMember("Left", m_left, _allocator);
-	_object.AddMember("Top", m_top, _allocator);
-	_object.AddMember("Right", m_right, _allocator);
-	_object.AddMember("Bottom", m_bottom, _allocator);
+	m_top.addToJsonObject(t, _allocator);
+	m_left.addToJsonObject(l, _allocator);
+	m_right.addToJsonObject(r, _allocator);
+	m_bottom.addToJsonObject(b, _allocator);
+
+	_object.AddMember("Top", t, _allocator);
+	_object.AddMember("Left", l, _allocator);
+	_object.AddMember("Right", r, _allocator);
+	_object.AddMember("Bottom", b, _allocator);
 }
 
 void ot::Border::setFromJsonObject(const ConstJsonObject& _object) {
-	m_color.setFromJsonObject(json::getObject(_object, "Color"));
-	
-	m_left = json::getInt(_object, "Left");
-	m_top = json::getInt(_object, "Top");
-	m_right = json::getInt(_object, "Right");
-	m_bottom = json::getInt(_object, "Bottom");
+	m_top.setFromJsonObject(json::getObject(_object, "Top"));
+	m_left.setFromJsonObject(json::getObject(_object, "Left"));
+	m_right.setFromJsonObject(json::getObject(_object, "Right"));
+	m_bottom.setFromJsonObject(json::getObject(_object, "Bottom"));
+}
+
+void ot::Border::setColor(const ot::Color& _color) {
+	m_top.setColor(_color);
+	m_left.setColor(_color);
+	m_right.setColor(_color);
+	m_bottom.setColor(_color);
 }
 
 void ot::Border::setWidth(int _width) {
-	m_top = _width;
-	m_left = _width;
-	m_right = _width;
-	m_bottom = _width;
+	m_top.setWidth(_width);
+	m_left.setWidth(_width);
+	m_right.setWidth(_width);
+	m_bottom.setWidth(_width);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+ot::BorderF::BorderF(const ot::Color& _color, double _width)
+	: m_top(_width, _color), m_left(_width, _color), m_right(_width, _color), m_bottom(_width, _color)
+{}
+
+ot::BorderF::BorderF(const ot::Color& _color, double _leftWidth, double _topWidth, double _rightWidth, double _bottomWidth)
+	: m_top(_topWidth, _color), m_left(_leftWidth, _color), m_right(_rightWidth, _color), m_bottom(_bottomWidth, _color)
+{}
+
+ot::BorderF::BorderF(const OutlineF& _left, const OutlineF& _top, const OutlineF& _right, const OutlineF& _bottom)
+	: m_top(_top), m_left(_left), m_right(_right), m_bottom(_bottom)
+{}
+
+ot::BorderF::BorderF(const BorderF& _other)
+	: m_top(_other.m_top), m_left(_other.m_left), m_right(_other.m_right), m_bottom(_other.m_bottom) {}
+
+ot::BorderF::~BorderF() {}
+
+ot::BorderF& ot::BorderF::operator = (const BorderF& _other) {
+	m_top = _other.m_top;
+	m_left = _other.m_left;
+	m_right = _other.m_right;
+	m_bottom = _other.m_bottom;
+	return *this;
+}
+
+void ot::BorderF::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+	JsonObject t;
+	JsonObject l;
+	JsonObject r;
+	JsonObject b;
+
+	m_top.addToJsonObject(t, _allocator);
+	m_left.addToJsonObject(l, _allocator);
+	m_right.addToJsonObject(r, _allocator);
+	m_bottom.addToJsonObject(b, _allocator);
+
+	_object.AddMember("Top", t, _allocator);
+	_object.AddMember("Left", l, _allocator);
+	_object.AddMember("Right", r, _allocator);
+	_object.AddMember("Bottom", b, _allocator);
+}
+
+void ot::BorderF::setFromJsonObject(const ConstJsonObject& _object) {
+	m_top.setFromJsonObject(json::getObject(_object, "Top"));
+	m_left.setFromJsonObject(json::getObject(_object, "Left"));
+	m_right.setFromJsonObject(json::getObject(_object, "Right"));
+	m_bottom.setFromJsonObject(json::getObject(_object, "Bottom"));
+}
+
+void ot::BorderF::setColor(const ot::Color& _color) {
+	m_top.setColor(_color);
+	m_left.setColor(_color);
+	m_right.setColor(_color);
+	m_bottom.setColor(_color);
+}
+
+void ot::BorderF::setWidth(double _width) {
+	m_top.setWidth(_width);
+	m_left.setWidth(_width);
+	m_right.setWidth(_width);
+	m_bottom.setWidth(_width);
 }

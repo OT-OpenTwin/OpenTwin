@@ -8,7 +8,7 @@
 
 // OpenTwin header
 #include "OTCore/Point2D.h"
-#include "OTGui/LineStyle.h"
+#include "OTGui/Outline.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTCore/OTClassHelper.h"
 
@@ -66,6 +66,13 @@ namespace ot {
 		//! The caller takes ownership of the returned painter.
 		Painter2D* takeBackgroundPainter(void);
 
+		//! @brief Set the outline.
+		//! @param _outline Outline to set.
+		void setOutline(const OutlineF& _outline) { m_outline = _outline; };
+
+		//! @brief Outlin.
+		const OutlineF& outline(void) const { return m_outline; };
+
 		//! @brief Set the outline painter.
 		//! The item takes ownership of the painter.
 		void setOutlinePainter(Painter2D* _painter) { m_outline.setPainter(_painter); };
@@ -83,6 +90,6 @@ namespace ot {
 	private:
 		std::list<Point2D> m_points; //! @brief Outline points.
 		Painter2D* m_backgroundPainter; //! @brief Background painter.
-		LineStyle m_outline; //! @brief Outline style.
+		OutlineF m_outline; //! @brief Outline style.
 	};
 }

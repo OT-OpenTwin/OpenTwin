@@ -1,25 +1,24 @@
-//! @file GraphicsTextItemCfg.h
+//! @file GraphicsGroupItem.h
 //! 
 //! @author Alexander Kuester (alexk95)
-//! @date August 2023
+//! @date May 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Color.h"
 #include "OTGui/GraphicsItemCfg.h"
 
-#define OT_FactoryKey_GraphicsTextItem "OT_GIText"
+#define OT_FactoryKey_GraphicsGroupItem "OT_GIGroup"
 
 namespace ot {
 
-	class Painter2D;
-
-	class OT_GUI_API_EXPORT GraphicsTextItemCfg : public ot::GraphicsItemCfg {
+	//! @class GraphicsGroupItem.
+	//! @brief The graphics group item is used to group multiple items into one item.
+	class OT_GUI_API_EXPORT GraphicsGroupItemCfg : public ot::GraphicsItemCfg {
 	public:
-		GraphicsTextItemCfg(const std::string& _text = std::string(), const ot::Color& _textColor = ot::Color());
-		virtual ~GraphicsTextItemCfg();
+		GraphicsGroupItemCfg();
+		virtual ~GraphicsGroupItemCfg();
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -32,25 +31,20 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsTextItem); };
+		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsGroupItem); };
 
-		void setText(const std::string& _text) { m_text = _text; };
-		const std::string& text(void) const { return m_text; };
+		//! @brief Will add the provided item to the group
+		//! @param _item Item to add
+		void addItem(ot::GraphicsItemCfg* _item) { m_items.push_back(_item); };
 
-		void setTextFont(const ot::Font& _font) { m_textFont = _font; };
-		const ot::Font& textFont(void) const { return m_textFont; };
-
-		void setTextColor(const ot::Color& _color);
-		void setTextPainter(ot::Painter2D* _painter);
-		Painter2D* textPainter(void) const { return m_textPainter; };
+		//! @brief Returns a list with all items in the group
+		const std::list<GraphicsItemCfg*>& items(void) const { return m_items; };
 
 	private:
-		std::string m_text;
-		ot::Font    m_textFont;
-		Painter2D* m_textPainter;
+		void memClear(void);
 
-		GraphicsTextItemCfg(GraphicsTextItemCfg&) = delete;
-		GraphicsTextItemCfg& operator = (GraphicsTextItemCfg&) = delete;
+		std::list<GraphicsItemCfg*> m_items;
+
 	};
 
 }

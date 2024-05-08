@@ -176,7 +176,7 @@ bool ot::GraphicsConnectionItem::setupFromConfig(const ot::GraphicsConnectionCfg
 	this->m_uid = _cfg.getUid();
 	this->m_style = _cfg.style();
 	m_pen.setWidth(_cfg.lineWidth());
-	m_pen.setColor(QtFactory::toQt(_cfg.color()));
+	m_pen.setColor(QtFactory::toColor(_cfg.color()));
 
 	m_hoverPen.setWidth(m_pen.width() + 2);
 	m_selectedPen.setWidth(m_hoverPen.width());

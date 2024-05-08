@@ -12,7 +12,6 @@
 #include "OTCore/Flags.h"
 #include "OTCore/Serializable.h"
 #include "OTGui/Font.h"
-#include "OTGui/Border.h"
 #include "OTGui/Margins.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/OTGuiAPIExport.h"

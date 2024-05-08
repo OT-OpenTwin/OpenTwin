@@ -13,7 +13,7 @@
 #include "OTGui/GraphicsRectangularItemCfg.h"
 
 #define OT_JSON_MEMBER_Size "Size"
-#define OT_JSON_MEMBER_Border "Border"
+#define OT_JSON_MEMBER_Outline "Outline"
 #define OT_JSON_MEMBER_CornerRadius "CornerRadius"
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter"
 
@@ -47,9 +47,9 @@ void ot::GraphicsRectangularItemCfg::addToJsonObject(JsonValue& _object, JsonAll
 	m_backgroundPainter->addToJsonObject(backgroundPainterObj, _allocator);
 	_object.AddMember(OT_JSON_MEMBER_BackgroundPainter, backgroundPainterObj, _allocator);
 
-	JsonObject borderObj;
-	m_border.addToJsonObject(borderObj, _allocator);
-	_object.AddMember(OT_JSON_MEMBER_Border, borderObj, _allocator);
+	JsonObject outlineObj;
+	m_outline.addToJsonObject(outlineObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Outline, outlineObj, _allocator);
 }
 
 void ot::GraphicsRectangularItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
@@ -63,7 +63,7 @@ void ot::GraphicsRectangularItemCfg::setFromJsonObject(const ConstJsonObject& _o
 		this->setBackgroundPainer(p);
 	}
 
-	m_border.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Border));
+	m_outline.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Outline));
 	m_size.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Size));
 }
 

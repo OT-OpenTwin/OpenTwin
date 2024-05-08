@@ -195,13 +195,16 @@
     <ClInclude Include="include\OTGui\GraphicsShapeItemCfg.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\LineStyle.h">
+    <ClInclude Include="include\OTGui\Outline.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\Painter2DFactory.h">
       <Filter>Header Files\Painter</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\GraphicsItemCfgFactory.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsGroupItemCfg.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -338,13 +341,16 @@
     <ClCompile Include="src\GraphicsShapeItemCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\LineStyle.cpp">
+    <ClCompile Include="src\Outline.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="src\Painter2DFactory.cpp">
       <Filter>Source Files\Painter</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsItemCfgFactory.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsGroupItemCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>

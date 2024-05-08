@@ -31,7 +31,7 @@ ot::Painter2DPreview::~Painter2DPreview() {
 
 void ot::Painter2DPreview::setFromPainter(const Painter2D* _painter) {
 	OTAssertNullptr(_painter);
-	m_brush = QtFactory::toQt(_painter);
+	m_brush = QtFactory::toBrush(_painter);
 	this->update();
 }
 

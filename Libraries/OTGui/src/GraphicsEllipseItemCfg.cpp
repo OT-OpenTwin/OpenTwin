@@ -12,7 +12,7 @@
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/Painter2DFactory.h"
 
-#define OT_JSON_MEMBER_Border "Border"
+#define OT_JSON_MEMBER_Outline "Outline"
 #define OT_JSON_MEMBER_RadiusX "RadiusX"
 #define OT_JSON_MEMBER_RadiusY "RadiusY"
 #define OT_JSON_MEMBER_BackgroundPainter "BackgroundPainter"
@@ -43,9 +43,9 @@ void ot::GraphicsEllipseItemCfg::addToJsonObject(JsonValue& _object, JsonAllocat
 	m_backgroundPainter->addToJsonObject(backgroundPainterObj, _allocator);
 	_object.AddMember(OT_JSON_MEMBER_BackgroundPainter, backgroundPainterObj, _allocator);
 
-	JsonObject borderObj;
-	m_border.addToJsonObject(borderObj, _allocator);
-	_object.AddMember(OT_JSON_MEMBER_Border, borderObj, _allocator);
+	JsonObject outlineObj;
+	m_outline.addToJsonObject(outlineObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Outline, outlineObj, _allocator);
 }
 
 void ot::GraphicsEllipseItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
@@ -54,7 +54,7 @@ void ot::GraphicsEllipseItemCfg::setFromJsonObject(const ConstJsonObject& _objec
 	m_radiusX = json::getDouble(_object, OT_JSON_MEMBER_RadiusX);
 	m_radiusY = json::getDouble(_object, OT_JSON_MEMBER_RadiusY);
 
-	m_border.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Border));
+	m_outline.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Outline));
 	
 	ConstJsonObject backgroundPainterObj = json::getObject(_object, OT_JSON_MEMBER_BackgroundPainter);
 	ot::Painter2D* p = Painter2DFactory::instance().create(backgroundPainterObj);
