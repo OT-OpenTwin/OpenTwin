@@ -27,7 +27,7 @@ void ot::GraphicsPolygonItemCfg::addToJsonObject(JsonValue& _object, JsonAllocat
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 
 	JsonArray ptArr;
-	for (const Point2D& pt : m_points) {
+	for (const Point2DD& pt : m_points) {
 		JsonObject ptObj;
 		pt.addToJsonObject(ptObj, _allocator);
 		ptArr.PushBack(ptObj, _allocator);
@@ -50,7 +50,7 @@ void ot::GraphicsPolygonItemCfg::setFromJsonObject(const ConstJsonObject& _objec
 	ConstJsonArray ptArr = json::getArray(_object, "Points");
 	for (JsonSizeType i = 0; i < ptArr.Size(); i++) {
 		ConstJsonObject ptObj = json::getObject(ptArr, i);
-		Point2D newPoint;
+		Point2DD newPoint;
 		newPoint.setFromJsonObject(ptObj);
 		m_points.push_back(newPoint);
 	}

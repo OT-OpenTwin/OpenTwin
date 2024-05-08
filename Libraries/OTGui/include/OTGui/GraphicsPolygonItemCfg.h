@@ -44,15 +44,19 @@ namespace ot {
 
 		// Setter / Getter
 
+		//! @brief Will append the provided point to the point list.
+		//! @param _pt Point to add.
+		void addPoint(const Point2DD& _pt) { m_points.push_back(_pt); };
+
 		//! @brief Set the outline points.
 		//! @param _points Outline points to set.
-		void setPoints(const std::list<Point2D>& _points) { m_points = _points; };
+		void setPoints(const std::list<Point2DD>& _points) { m_points = _points; };
 
 		//! @brief Outline points reference.
-		std::list<Point2D>& points(void) { return m_points; };
+		std::list<Point2DD>& points(void) { return m_points; };
 
 		//! @brief Outline points const reference.
-		const std::list<Point2D>& outlinePath(void) const { return m_points; };
+		const std::list<Point2DD>& points(void) const { return m_points; };
 
 		//! @brief Set the background painter.
 		//! The item takes ownership of the painter.
@@ -88,7 +92,7 @@ namespace ot {
 		double outlineWidth(void) const { return m_outline.width(); };
 
 	private:
-		std::list<Point2D> m_points; //! @brief Outline points.
+		std::list<Point2DD> m_points; //! @brief Outline points.
 		Painter2D* m_backgroundPainter; //! @brief Background painter.
 		OutlineF m_outline; //! @brief Outline style.
 	};
