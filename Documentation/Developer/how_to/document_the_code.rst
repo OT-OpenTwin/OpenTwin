@@ -87,7 +87,7 @@ Enums
 
 Enums should have a ``\enum`` and ``\brief`` set for the enum and every entry in the enum.
 
-.. code: c++
+.. code:: c++
 
     //! \enum MyEnum
     //! \brief Brief description.
@@ -448,7 +448,7 @@ Here is a little cheat sheet for the common doxygen keywords.
           //! \var m_var
           int m_var;
         };
-        
+
    * - **warning**
      - Documents a warning.
      - .. code:: c++
