@@ -6,7 +6,11 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTGui/GraphicsGroupItemCfg.h"
 #include "OTWidgets/GraphicsGroupItem.h"
+#include "OTWidgets/GraphicsItemFactory.h"
+
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsGroupItem> groupItemRegistrar(OT_FactoryKey_GraphicsGroupItem);
 
 ot::GraphicsGroupItem::GraphicsGroupItem(bool _isStackOrLayout)
 	: ot::GraphicsItem(_isStackOrLayout)
