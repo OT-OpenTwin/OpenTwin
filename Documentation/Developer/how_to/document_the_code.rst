@@ -8,34 +8,36 @@ There are many ways to document the code by following the Doxygen style guide.
 Here we have listed a guide that OpenTwin agreed on to use for all of the files in the OpenTwin projects.
 
 The '//!' prefix should be used to indicate a `Doxygen <https://www.doxygen.nl/manual/index.html>`_ comment.
-The advantage the '//!' prefix is that a code block containing multiple methods or blocks of `Doxygen <https://www.doxygen.nl/manual/index.html>`_ comments can be easily commented out by using `/* ... */`.
+The advantage the '//!' prefix is that a code block containing multiple methods or blocks of `Doxygen <https://www.doxygen.nl/manual/index.html>`_ comments can be easily commented out by using ``/* ... */``.
 
-To address a `Doxygen <https://www.doxygen.nl/manual/index.html>`_ keyword use the `@` prefix.
+To address a `Doxygen <https://www.doxygen.nl/manual/index.html>`_ keyword use the ``\`` prefix.
+
+Detailed descriptions can be added without a keyword in the lines after the ``\brief``.
 
 Files
 -----
 
-At the beginning of the file the file name, the creation date and the contributing author(s) should be listed.
+Provide ``\file``, ``\date`` aswell as ``\author`` or ``\authors`` at the beginning of every file.
 
 .. code:: c++
 
-    //! @file MyFile.h
-    //! @author Name
+    //! \file MyFile.h
+    //! \author Name
     //     or
-    //! @authors Name1, Name2
-    //! @date DD.MM.YYYY
+    //! \authors Name1, Name2
+    //! \date YYYY.MM.DD
 
 Classes
 -------
 
-Every class should contain the class and the brief keyword.
+Every class should have ``\class`` and ``\brief`` set.
 The class keyword is used to create references in the documentation.
-The brief should contain a short text description of the class.
+The brief should contain a short text description of the class which is a ``single`` line.
 
 .. code:: c++
 
-    //! @class MyClass
-    //! @brief The MyClass is used to store two integers.
+    //! \class MyClass
+    //! \brief The MyClass is used to store two integers.
     //! Here a more detailed description could be added
     //! which may span over multiple lines and also contain
     //! #Markdown
@@ -50,45 +52,414 @@ Functions
 Function comments should be added to the header file.
 Some IDEs support the `Doxygen <https://www.doxygen.nl/manual/index.html>`_ format and will display it in the ToolTips.
 
-Every function should have a `\brief`, and `\param` for every parameter.
+Every function should have a ``\fn`` and ``\brief`` set aswell as a ``\param`` for every parameter.
+If the return is not described in the ``\brief`` or detailed description add a ``\return``.
 
 .. code:: c++
 
-    //! @brief Switches the color to red.
-    //! Detailed description
-    //! @param _delay The delay in ms before the swich will happen
-    void switchToRed(bool _delay);
+    //! \fn bool switchToRed(bool _delay)
+    //! \brief Brief description.
+    //! Detailed description.
+    //! Detailed description.
+    //! \param _delay Parameter description.
+    //! \return Return value description.
+    bool switchToRed(bool _delay);
 
-Boxes
+Class Members
+-------------
+
+Class members should have a ``\brief`` set. Adding ``\var`` allows to reference that value.
+
+.. code:: c++
+
+    class A {
+        int m_int; //! \brief Brief description.
+
+        //! \var m_dbl
+        //! \brief Description.
+        //! Detailed description.
+        //! Detailed description.
+        double m_dbl;
+    };
+
+Enums
 -----
 
-To display a box around the text use either `\note`, `\question` or `\warning`.
+Enums should have a ``\enum`` and ``\brief`` set for the enum and every entry in the enum.
+
+.. code: c++
+
+    //! \enum MyEnum
+    //! \brief Brief description.
+    //! Detailed description.
+    //! Detailed description.
+    enum MyEnum {
+        MyValue, //! \brief Description
+
+        //! \brief Brief description
+        //! Detailed description.
+        //! Detailed description.
+        MySecondValue
+    };
+
+Macros
+------
+
+Macros or preprocessor definitions should have the ``\def`` and ``\brief`` set.
 
 .. code:: c++
 
-    //! @brief Shuts down the system.
-    //! A detailed description how the shutdown will be performed.
-    //! @warning After calling this function no more requests can be queued.
-    //! @param _force If true the shutdown will be forced even if a task requests to cancel the shutdown.
+    //! \def MY_MACRO
+    //! \brief Brief description.
+    //! Detailed description.
+    //! Detailed description.
+    #define MY_MACRO
+
+Namespaces
+----------
+
+Notes Questions and Warnings
+----------------------------
+
+To display a box around the text use either ``\note``, ``\question`` or ``\warning``.
+
+.. code:: c++
+
+    //! \brief Brief description.
+    //! Detailed description.
+    //! Detailed description.
+    //! \warning Warning box content.
+    //! Detailed description.
+    //! \note Note box content.
+    //! \param _force Parameter description.
+    //! \return Return value decription.
     bool shutdown(bool _force);
 
-ToDo
-----
+ToDo and Bugs
+-------------
 
-A todo can be added anywhere in the code (source and header).
+A ``\todo`` or ``\bug`` can be added anywhere in the code.
+The documentation will contain a bug and todo section where the code aswell as function/class of the bug or todo will be shown.
 
 .. code:: c++
 
     void foo(void) {
-        //! @todo Add functionality
+        //! \todo Add functionality
     }
 
+Doxygen Keywords
+----------------
+
+Here is a little cheat sheet for the common doxygen keywords.
+
+.. list-table:: Common Doxygen Commands and Keywords
+   :header-rows: 1
+
+   * - Command/Keyword
+     - Description
+     - Example
+   * - **a**
+     - Documents a parameter or return value as an argument.
+     - .. code:: c++
+       
+        //! Foo uses (\a _arg) to determine what to do.
+        void foo(int _arg);
+
+   * - **addtogroup**
+     - Creates a new group or adds entities to a group.
+     - .. code:: c++
+       
+        //! \addtogroup TestGroup @{
+        bool foo(void);
+        bool boo(void);
+        //! @}
+
+   * - **attention**
+     - Documents a note or additional information that requires special attention.
+     - .. code:: c++
+       
+        //! \attention Attention text
+
+   * - **brief**
+     - Provides a brief description of an entity.
+     - .. code:: c++
+       
+        //! \brief Brief description.
+        void foo(void);
+
+   * - **bug**
+     - Documents a known bug.
+     - .. code:: c++
+       
+        //! \bug This is doing nothing
+
+   * - **c**
+     - Marks text as code.
+     - .. code:: c++
+       
+        //! Foo uses an (\c int) as a argument.
+        void foo(int _arg);
+
+   * - **class**
+     - Documents a class.
+     - .. code:: c++
+       
+        //! \class MyClass
+        class MyClass {};
+
+   * - **code**
+     - Indicates the start of a code block.
+     - .. code:: c++
+       
+        //! \code
+        //! Code line
+        //! Code line
+        //! \endcode
+
+   * - **copybrief**
+     - Copies the brief description from another entity.
+     - .. code:: c++
+       
+        //! \brief Brief description that will also be copied to B.
+        class A {};
+        
+        //! \brief Brief description for B.
+        //! \copybrief A
+        class B : public A {};
+
+   * - **copydetails**
+     - Copies the detailed description from another entity.
+     - .. code:: c++
+       
+        //! \brief Brief description
+        //! Detailed description that will be copied to B.
+        class A {};
+        
+        //! \brief Brief description for B.
+        //! \copydetails A
+        class B : public A {};
+
+   * - **def**
+     - Documents a macro or preprocessor definition.
+     - .. code:: c++
+       
+        //! \def MY_MACRO
+        #define MY_MACRO
+
+   * - **defgroup**
+     - Defines a group.
+     - .. code:: c++
+       
+        //! \defgroup MyGroup Brief group description.
+
+   * - **deprecated**
+     - Marks an entity as deprecated.
+     - .. code:: c++
+       
+        //! \deprecated Use boo instead.
+        [[deprecated("Use boo instead")]]
+        void foo(void) {
+          ...
+
+   * - **enum**
+     - Documents an enumeration.
+     - .. code:: c++
+       
+        //! \enum MyEnum
+        enum MyEnum {};
+
+   * - **enumclass**
+     - Documents a scoped enumeration.
+     - .. code:: c++
+       
+        //! \enumclass MyEnumClass
+        enum class MyEnumClass {};
+
+   * - **file**
+     - Documents a file.
+     - .. code:: c++
+       
+        //! \file MyFile.h
+        
+   * - **fn**
+     - Documents a function.
+     - .. code:: c++
+       
+        //! \fn void foo(void)
+        void foo(void);
+
+   * - **ingroup**
+     - Assigns an entity to a group.
+     - .. code:: c++
+       
+        //! \ingroup TestGroup
+
+   * - **label**
+     - Creates a unique identifier to the specified entity allowing to reference it later.
+     - .. code:: c++
+       
+        //! \label label_name
+        void foo(void);
+
+   * - **link**
+     - Creates a hyperlink to another entity.
+     - .. code:: c++
+       
+        //! For more information check \link void boo(void) \endlink
+        void foo(void);
+
+   * - **mainpage**
+     - Documents the main page of the project.
+     - .. code:: c++
+       
+        //! \mainpage The Main Page Title
+
+   * - **namespace**
+     - Documents a namespace.
+     - .. code:: c++
+       
+        //! \namespace MyNamespace
+        namespace MyNamespace {}
+
+   * - **namespacealias**
+     - Documents a namespace alias.
+     - .. code:: c++
+       
+        //! \namespacealias MyAlias
+        namespace MyAlias = test;
+
+   * - **note**
+     - Documents a note or additional information.
+     - .. code:: c++
+       
+        //! \note Note text
+
+   * - **param**
+     - Documents a function parameter.
+     - .. code:: c++
+       
+        //! \param _myParam Brief parameter description.
+        void foo(int _myParam);
+
+   * - **page**
+     - Documents a page (e.g., overview, tutorial).
+     - .. code:: c++
+       
+        //! \page MyPageName Page Title
+        //! Brief page description
+
+   * - **pagebreak**
+     - Inserts a page break in the documentation.
+     - .. code:: c++
+       
+        //! \pagebreak
+
+   * - **ref**
+     - Creates a cross-reference to another entity.
+     - .. code:: c++
+       
+        //! For more information check out \ref label_name.
+
+   * - **relates**
+     - Indicates a related function or class. Is used to establish relationship between different entities if not done automatically.
+     - .. code:: c++
+       
+        class MyClass {};
+
+        //! \relates MyClass
+        void foo(MyClass _arg);
+
+   * - **return**
+     - Documents the return value of a function.
+     - .. code:: c++
+       
+        //! \return Brief return description.
+        bool foo(void);
+
+   * - **see**
+     - Provides a cross-reference to another entity.
+     - .. code:: c++
+       
+        void MyClass::foo(void);
+
+        //! \see MyClass, foo
+        void boo(void);
+
+   * - **since**
+     - Documents the version when an entity was introduced.
+     - .. code:: c++
+       
+        //! \since YYYY-MM-DD
+
+   * - **struct**
+     - Documents a struct.
+     - .. code:: c++
+       
+        //! \struct MyStruct
+        struct MyStruct {};
+
+   * - **tparam**
+     - Documents a template parameter.
+     - .. code:: c++
+       
+        //! \tparam T Brief template parameter description.
+        template <class T> void foo(T _arg) {}
+
+   * - **todo**
+     - Marks a to-do item in the documentation.
+     - .. code:: c++
+       
+        void foo(void) {
+          //! \todo Think of functionality
+        }
+
+   * - **typedef**
+     - Documents a type definition.
+     - .. code:: c++
+       
+        //! \typedef MyType
+        typedef int MyType;
+
+   * - **union**
+     - Documents a union.
+     - .. code:: c++
+       
+        //! \union MyUnion
+        union MyUnion {};
+
+   * - **unionclass**
+     - Documents a scoped union.
+     - .. code:: c++
+       
+        //! \unionclass MyUnionClass
+        union class MyUnionClass {};
+
+   * - **until**
+     - Documents the version until which an entity exists.
+     - .. code:: c++
+       
+        //! \until YYYY-MM-DD
+
+   * - **var**
+     - Documents a variable or member variable.
+     - .. code:: c++
+       
+        class A {
+          //! \var m_var
+          int m_var;
+        };
+        
+   * - **warning**
+     - Documents a warning.
+     - .. code:: c++
+       
+        //! \warning Warning text
 
 
-Markdown
---------
+Markdown Syntax
+---------------
 
-Here is a little cheat sheat for markdow comments.
+Here is a little cheat sheet for markdow comments.
 Note that the spaces after the prefixes are mandatory.
 Also note that markdown uses spaces for the indent (which should be used anyway).
 
@@ -96,7 +467,7 @@ Also note that markdown uses spaces for the indent (which should be used anyway)
 
     # Level 1 Header
     ## Level 2 Header
-        ...
+        ```
     ###### Level 6 Header
 
 

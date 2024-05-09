@@ -12,6 +12,10 @@
 
 namespace ot {
 
+	//! \class Border
+	//! \ingroup OTGui
+	//! \brief The Border class is used to describe a border with four sides.
+	//! The Border uses integer values.
 	class OT_GUI_API_EXPORT Border : public ot::Serializable {
 	public:
 		Border() {};
@@ -67,6 +71,10 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
+	//! \class BorderF
+	//! \ingroup OTGui
+	//! \brief The BorderF class is used to describe a border with four sides.
+	//! The BorderF uses floating point values.
 	class OT_GUI_API_EXPORT BorderF : public ot::Serializable {
 	public:
 		BorderF() {};

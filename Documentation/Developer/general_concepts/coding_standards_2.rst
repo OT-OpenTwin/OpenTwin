@@ -197,3 +197,9 @@ When working on Linux, it is preferable to configure git to checkout files with 
     git config --global core.autocrlf input
 
 For more details on this setting, see `[AirSim] <https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings>`_.
+
+Library namespace
+-----------------
+
+Every OpenTwin library (located at ``OpenTwin/Libraries``) should use the ``ot`` namespace for its classes and functions.
+By doing so every developer using a OpenTwin library can quickly find the class or function by typing ``ot::`` or going trough the ot namespace in the code documentation.
