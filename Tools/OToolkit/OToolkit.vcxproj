@@ -48,7 +48,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\GraphicsItemDesigner.h" />
+    <QtMoc Include="include\GraphicsItemDesigner.h" />
     <ClInclude Include="include\WidgetTest.h" />
     <QtMoc Include="include\ColorStyleEditor.h" />
     <QtMoc Include="include\ToolMenuManager.h" />

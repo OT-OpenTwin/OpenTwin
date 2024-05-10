@@ -5,15 +5,58 @@
 
 #pragma once
 
-// Toolkit API header
-#include "OTCore/OTClassHelper.h"
+// ToolkitAPI header
 #include "OToolkitAPI/Tool.h"
+
+// OpenTwin header
+#include "OTCore/OTClassHelper.h"
+#include "OTWidgets/QWidgetInterface.h"
 
 // Qt header
 #include <QtCore/qobject.h>
 
+class QWidget;
+class GraphicsItemDesigner;
 namespace ot { class PropertyGrid; };
 namespace ot { class GraphicsView; };
+
+class GraphicsItemDesignerToolBar : public QObject, public ot::QWidgetInterface {
+	Q_OBJECT
+public:
+	enum DesignerMode {
+		NoMode,
+		LineMode,
+		SquareMode,
+		RectMode,
+		TriangleMode,
+		PolygonMode,
+		ShapeMode
+	};
+
+	GraphicsItemDesignerToolBar(GraphicsItemDesigner* _designer);
+	virtual ~GraphicsItemDesignerToolBar();
+
+	virtual QWidget* getQWidget(void) override { return m_widget; };
+
+	DesignerMode getMode(void) const { return m_mode; };
+
+Q_SIGNALS:
+	void modeChanged(void);
+
+private Q_SLOTS:
+	void slotLine(void);
+	void slotSquare(void);
+	void slotRect(void);
+	void slotTriangle(void);
+	void slotPolygon(void);
+	void slotShape(void);
+
+private:
+	DesignerMode m_mode;
+	QWidget* m_widget;
+	GraphicsItemDesigner* m_designer;
+
+};
 
 class GraphicsItemDesigner : public QObject, public otoolkit::Tool {
 public:
@@ -36,4 +79,5 @@ public:
 private:
 	ot::GraphicsView* m_view;
 	ot::PropertyGrid* m_props;
+	GraphicsItemDesignerToolBar* m_toolBar;
 };

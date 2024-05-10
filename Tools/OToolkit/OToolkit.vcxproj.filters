@@ -116,9 +116,6 @@
     <ClInclude Include="include\WidgetTest.h">
       <Filter>Header Files\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="include\GraphicsItemDesigner.h">
-      <Filter>Header Files\Tools</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\AppBase.h">
@@ -155,6 +152,9 @@
       <Filter>Header Files\Tools</Filter>
     </QtMoc>
     <QtMoc Include="include\ImageEditor.h">
+      <Filter>Header Files\Tools</Filter>
+    </QtMoc>
+    <QtMoc Include="include\GraphicsItemDesigner.h">
       <Filter>Header Files\Tools</Filter>
     </QtMoc>
   </ItemGroup>
