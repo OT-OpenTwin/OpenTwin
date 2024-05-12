@@ -60,7 +60,7 @@ bool otoolkit::api::initialize(APIInterface* _interface) {
 	int iconPathCounter{ 0 };
 	int stylePathCounter{ 0 };
 #ifdef _DEBUG
-	if (ot::IconManager::instance().addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
+	if (ot::IconManager::addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
 		iconPathCounter++;
 	}
 	if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/ColorStyles/"))) {
@@ -68,7 +68,7 @@ bool otoolkit::api::initialize(APIInterface* _interface) {
 	}
 #endif // _DEBUG
 
-	if (ot::IconManager::instance().addSearchPath(QDir::currentPath() + "/icons/")) {
+	if (ot::IconManager::addSearchPath(QDir::currentPath() + "/icons/")) {
 		iconPathCounter++;
 	}
 	if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QDir::currentPath() + "/ColorStyles/")) {

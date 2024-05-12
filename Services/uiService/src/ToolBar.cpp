@@ -53,7 +53,7 @@ ToolBar::ToolBar(AppBase * _owner)
 
 	m_view.gUserInterface_aSettings = uiAPI::createToolButton(m_owner->m_uid, "Settings", c_icoSettings, c_icoPath);
 	QAction* toggleAction = ot::WidgetViewManager::instance().getDockToggleAction();
-	toggleAction->setIcon(ot::IconManager::instance().getIcon("Default/Docks.png"));
+	toggleAction->setIcon(ot::IconManager::getIcon("Default/Docks.png"));
 	toggleAction->setToolTip(c_tipDocks);
 
 	// Add actions to groups

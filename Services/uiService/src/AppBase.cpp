@@ -233,14 +233,14 @@ int AppBase::run() {
 		int iconPathCounter{ 0 };
 		int stylePathCounter{ 0 };
 #ifdef _DEBUG
-		if (ot::IconManager::instance().addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
+		if (ot::IconManager::addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
 			iconPathCounter++;
 		}
 		if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/ColorStyles/"))) {
 			stylePathCounter++;
 		}
 #endif // _DEBUG
-		if (ot::IconManager::instance().addSearchPath(QDir::currentPath() + "/icons/")) {
+		if (ot::IconManager::addSearchPath(QDir::currentPath() + "/icons/")) {
 			iconPathCounter++;
 		}
 		if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QDir::currentPath() + "/ColorStyles/")) {
@@ -1394,8 +1394,8 @@ void AppBase::createUi(void) {
 			m_debug->setReadOnly(true);
 			m_debug->setAutoScrollToBottomEnabled(true);
 
-			//m_propertyGrid->setGroupIcons(ot::IconManager::instance().getIcon("Default/ArrowBlueRight.png"), ot::IconManager::instance().getIcon("Default/ArrowGreenDown.png"));
-			//m_propertyGrid->setDeleteIcon(ot::IconManager::instance().getIcon("Default/DeleteProperty.png"));
+			//m_propertyGrid->setGroupIcons(ot::IconManager::getIcon("Default/ArrowBlueRight.png"), ot::IconManager::getIcon("Default/ArrowGreenDown.png"));
+			//m_propertyGrid->setDeleteIcon(ot::IconManager::getIcon("Default/DeleteProperty.png"));
 
 			//m_contextMenus.output.clear = uiAPI::contextMenu::addItem(m_widgets.output, "Clear", "Clear", "Default", cmrClear);
 			//uiAPI::contextMenu::addItem(m_widgets.debug, "Clear", "Clear", "Default", cmrClear);
@@ -1826,7 +1826,7 @@ ID AppBase::addNavigationTreeItem(const QString & _treePath, char _delimiter, bo
 }
 
 void AppBase::setNavigationTreeItemIcon(ID _itemID, const QString & _iconName, const QString & _iconPath) {
-	m_projectNavigation->setItemIcon(_itemID, ot::IconManager::instance().getIcon(_iconPath + "/" + _iconName + ".png"));
+	m_projectNavigation->setItemIcon(_itemID, ot::IconManager::getIcon(_iconPath + "/" + _iconName + ".png"));
 }
 
 void AppBase::setNavigationTreeItemText(ID _itemID, const QString & _itemName) {

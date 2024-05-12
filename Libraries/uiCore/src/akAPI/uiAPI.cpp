@@ -304,7 +304,7 @@ ak::UID ak::uiAPI::createAction(
 	const QString &										_iconSize
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createToolButton(_creatorUid, _text, ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName + ".png"));
+	return m_objManager->createToolButton(_creatorUid, _text, ot::IconManager::getIcon(_iconSize + "/" + _iconName + ".png"));
 }
 
 ak::UID ak::uiAPI::createAction(
@@ -394,7 +394,7 @@ ak::UID ak::uiAPI::createDockWatcher(
 	const QString &						_text
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createDockWatcher(_creatorUid, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"), _text);
+	return m_objManager->createDockWatcher(_creatorUid, ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"), _text);
 }
 
 ak::UID ak::uiAPI::createGlobalKeyListener(
@@ -436,7 +436,7 @@ ak::UID ak::uiAPI::createLogInDialog(
 	const QString &										_password
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createLogInDialog(_creatorUid, _showSavePassword, ot::IconManager::instance().getPixmap("Images/" + _imageName + ".png"), _username, _password);
+	return m_objManager->createLogInDialog(_creatorUid, _showSavePassword, ot::IconManager::getPixmap("Images/" + _imageName + ".png"), _username, _password);
 }
 
 ak::UID ak::uiAPI::createNiceLineEdit(
@@ -553,7 +553,7 @@ ak::UID ak::uiAPI::createToolButton(
 	const QString &										_iconFolder
 ) {
 	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createToolButton(_creatorUid, _text, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"));
+	return m_objManager->createToolButton(_creatorUid, _text, ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"));
 }
 
 ak::UID ak::uiAPI::createTabView(
@@ -596,7 +596,7 @@ void ak::uiAPI::action::setIcon(
 	const QString &										_iconName,
 	const QString &										_iconFolder
 ) {
-	object::get<aAction>(_actionUID)->setIcon(ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"));
+	object::get<aAction>(_actionUID)->setIcon(ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"));
 }
 
 QString ak::uiAPI::action::getText(
@@ -710,7 +710,7 @@ ak::ID ak::uiAPI::contextMenu::addItem(
 	assert(m_objManager != nullptr); // API not initialized
 	aObject * obj = m_objManager->object(_widgetUID);
 	assert(obj != nullptr); // Invalid UID
-	aContextMenuItem * newItem = new aContextMenuItem(ot::IconManager::instance().getIcon(_iconSize + "/" + _iconName + ".png"), _text, _role);
+	aContextMenuItem * newItem = new aContextMenuItem(ot::IconManager::getIcon(_iconSize + "/" + _iconName + ".png"), _text, _role);
 
 	switch (obj->type())
 	{
@@ -1260,7 +1260,7 @@ ak::dialogResult ak::uiAPI::promptDialog::show(
 	const QString &				_iconPath,
 	QWidget *					_parentWidget
 ) {
-	return show(_message, _title, _type, ot::IconManager::instance().getIcon(_iconPath + "/" + _iconName + ".png"), _parentWidget);
+	return show(_message, _title, _type, ot::IconManager::getIcon(_iconPath + "/" + _iconName + ".png"), _parentWidget);
 }
 
 ak::dialogResult ak::uiAPI::promptDialog::show(
@@ -1372,7 +1372,7 @@ ak::ID ak::uiAPI::tabWidget::addTab(
 	const QString &		_iconName,
 	const QString &		_iconFolder
 ) {
-	return object::get<aTabWidget>(_tabWidgetUID)->addTab(object::get<aWidget>(_widgetUID)->widget(), ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"), _title);
+	return object::get<aTabWidget>(_tabWidgetUID)->addTab(object::get<aWidget>(_widgetUID)->widget(), ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"), _title);
 }
 
 ak::ID ak::uiAPI::tabWidget::addTab(
@@ -1397,7 +1397,7 @@ ak::ID ak::uiAPI::tabWidget::addTab(
 	const QString &		_iconName,
 	const QString &		_iconFolder
 ) {
-	return object::get<aTabWidget>(_tabWidgetUID)->addTab(_widget, ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"), _title);
+	return object::get<aTabWidget>(_tabWidgetUID)->addTab(_widget, ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"), _title);
 }
 
 ak::ID ak::uiAPI::tabWidget::addTab(
@@ -1726,7 +1726,7 @@ void ak::uiAPI::toolButton::setIcon(
 	aToolButtonWidget * actualToolButton = nullptr;
 	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
 	assert(actualToolButton != nullptr); // Invalid object type
-	actualToolButton->getAction()->setIcon(ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"));
+	actualToolButton->getAction()->setIcon(ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"));
 }
 
 ak::ID ak::uiAPI::toolButton::addMenuItem(
@@ -1764,7 +1764,7 @@ ak::ID ak::uiAPI::toolButton::addMenuItem(
 	aToolButtonWidget * actualToolButton = nullptr;
 	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
 	assert(actualToolButton != nullptr); // Invalid object type
-	aContextMenuItem * itm = new aContextMenuItem(ot::IconManager::instance().getIcon(_iconFolder + "/" + _iconName + ".png"), _text, cmrNone);
+	aContextMenuItem * itm = new aContextMenuItem(ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"), _text, cmrNone);
 	return actualToolButton->addMenuItem(itm);
 }
 
@@ -1998,7 +1998,7 @@ void ak::uiAPI::window::setWaitingAnimation(
 	UID												_windowUID,
 	const QString &										_animationName
 ) {
-	object::get<aWindowManager>(_windowUID)->setWaitingAnimation(&ot::IconManager::instance().getMovie("Animations/" + _animationName + ".gif"));
+	object::get<aWindowManager>(_windowUID)->setWaitingAnimation(&ot::IconManager::getMovie("Animations/" + _animationName + ".gif"));
  }
 
 void ak::uiAPI::window::setCentralWidgetMinimumSize(
@@ -2072,25 +2072,25 @@ const QIcon & ak::uiAPI::getIcon(
 	const QString &											_iconName,
 	const QString &											_iconSubPath
 ) {
-	return ot::IconManager::instance().getIcon(_iconSubPath + "/" + _iconName + ".png");
+	return ot::IconManager::getIcon(_iconSubPath + "/" + _iconName + ".png");
 }
 
 const QIcon & ak::uiAPI::getApplicationIcon(
 	const QString &											_iconName
 ) {
-	return ot::IconManager::instance().getIcon("Application/" + _iconName + ".ico");
+	return ot::IconManager::getIcon("Application/" + _iconName + ".ico");
 }
 
 const QPixmap & ak::uiAPI::getPixmap(
 	const QString &											_name
 ) {
-	return ot::IconManager::instance().getPixmap("Images/" + _name + ".png");
+	return ot::IconManager::getPixmap("Images/" + _name + ".png");
 }
 
 QMovie * ak::uiAPI::getMovie(
 	const QString&											_name
 ) {
-	return &ot::IconManager::instance().getMovie("Animations/" + _name + ".gif");
+	return &ot::IconManager::getMovie("Animations/" + _name + ".gif");
 }
 
 // ###############################################################################################################################################

@@ -23,25 +23,33 @@ class QMovie;
 
 namespace ot {
 
+	//! \class IconManager
+	//! \brief The IconManager loads images or animations and caches them.
+	//! The IconManager has a search path list.
+	//! When requestiong a file only the subPath (suffix) needs to be provided.
+	//! When checking every search path and suffix combination the first existing file (FIFO) will be imported.
+	//! The imported files are stored internally and will returned when requesting the same file.
 	class OT_WIDGETS_API_EXPORT IconManager {
 	public:
+		//! @brief Returns the global instance.
 		static IconManager& instance(void);
 
-		bool addSearchPath(const QString& _path);
-		const QStringList& searchPaths(void) const { return m_searchPaths; };
+		static bool addSearchPath(const QString& _path);
+
+		static const QStringList& searchPaths(void);
 
 		//! @brief Create and return the icon
-		QIcon& getIcon(const QString& _subPath);
+		static QIcon& getIcon(const QString& _subPath);
 
 		//! @brief Create and return the pixmap
-		QPixmap& getPixmap(const QString& _subPath);
+		static QPixmap& getPixmap(const QString& _subPath);
 
 		//! @brief Create and return the movie
-		QMovie& getMovie(const QString& _subPath);
+		static QMovie& getMovie(const QString& _subPath);
 
 	private:
 		template <class T>
-		T& get(const QString& _subPath, std::map<QString, T*>& _dataMap);
+		T& getOrCreate(const QString& _subPath, std::map<QString, T*>& _dataMap);
 
 		QString findFullPath(const QString& _subPath);
 
@@ -59,11 +67,11 @@ namespace ot {
 }
 
 template <class T>
-T& ot::IconManager::get(const QString& _subPath, std::map<QString, T*>& _dataMap) {
+T& ot::IconManager::getOrCreate(const QString& _subPath, std::map<QString, T*>& _dataMap) {
 	this->m_mutex.lock();
 
 	// Find existing
-	auto it = _dataMap.find(_subPath);
+	const auto& it = _dataMap.find(_subPath);
 	if (it != _dataMap.end()) {
 		this->m_mutex.unlock();
 		return *it->second;

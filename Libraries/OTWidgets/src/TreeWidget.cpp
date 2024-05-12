@@ -17,7 +17,7 @@ ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const NavigationTreeItem& _config)
 	: m_text(QString::fromStdString(_config.text())), m_flags(_config.flags())
 {
 	if (!_config.iconPath().empty()) {
-		m_icon = IconManager::instance().getIcon(QString::fromStdString(_config.iconPath()));
+		m_icon = IconManager::getIcon(QString::fromStdString(_config.iconPath()));
 	}
 	
 	for (const NavigationTreeItem& child : _config.childItems()) {

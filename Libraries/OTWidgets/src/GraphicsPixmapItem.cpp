@@ -39,7 +39,7 @@ bool ot::GraphicsPixmapItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	try {
 		m_colorMask = cfg->colorMask();
 		m_maintainAspectRatio = cfg->isMaintainAspectRatio();
-		m_pixmap = ot::IconManager::instance().getPixmap(QString::fromStdString(cfg->imagePath()));
+		m_pixmap = ot::IconManager::getPixmap(QString::fromStdString(cfg->imagePath()));
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());

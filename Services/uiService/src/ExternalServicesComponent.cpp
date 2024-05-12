@@ -3703,7 +3703,7 @@ std::string ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument&
 #ifdef _DEBUG
 	std::string iconPath = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
 	try {
-		ot::IconManager::instance().addSearchPath(QString::fromStdString(iconPath));
+		ot::IconManager::addSearchPath(QString::fromStdString(iconPath));
 		AppBase::instance()->appendDebugMessage("[ERROR] Added icon search path: " + QString::fromStdString(iconPath));
 	}
 	catch (...) {

@@ -25,6 +25,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	QGridLayout* rootLay = new QGridLayout(m_widget);
 
 	QToolButton* btnLine = new QToolButton;
+
 	
 }
 

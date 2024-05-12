@@ -124,7 +124,7 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 				box.view = new GraphicsItemPreview;
 				box.view->setMaximumSize(m_previewSize);
 				box.view->setMinimumSize(m_previewSize);
-				box.view->setPixmap(IconManager::instance().getIcon(QString::fromStdString(info.previewIcon)).pixmap(m_previewSize));
+				box.view->setPixmap(IconManager::getIcon(QString::fromStdString(info.previewIcon)).pixmap(m_previewSize));
 				box.view->setItemName(info.itemName);
 				box.view->setAlignment(Qt::AlignCenter);
 

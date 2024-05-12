@@ -20,6 +20,7 @@ ot::IconManager& ot::IconManager::instance(void) {
 }
 
 bool ot::IconManager::addSearchPath(const QString& _path) {
+	IconManager& manager = IconManager::instance();
 	if (_path.isEmpty()) {
 		OT_LOG_WA("Empty search path provided. Ignoring");
 		return false;
@@ -29,13 +30,13 @@ bool ot::IconManager::addSearchPath(const QString& _path) {
 	path.replace("\\", "/");
 	if (!path.endsWith("/")) path.append("/");
 
-	for (const QString& pth : m_searchPaths) {
+	for (const QString& pth : manager.m_searchPaths) {
 		if (pth == path) return true;
 	}
 
 	QDir dir(path);
 	if (dir.exists(path)) {
-		m_searchPaths.append(path);
+		manager.m_searchPaths.append(path);
 		OT_LOG_D("Added icon search path: \"" + path.toStdString() + "\"");
 		return true;
 	}
@@ -45,16 +46,23 @@ bool ot::IconManager::addSearchPath(const QString& _path) {
 	}
 }
 
+const QStringList& ot::IconManager::searchPaths(void) {
+	return IconManager::instance().m_searchPaths;
+}
+
 QIcon& ot::IconManager::getIcon(const QString& _subPath) {
-	return this->get<QIcon>(_subPath, m_icons);
+	IconManager& manager = IconManager::instance();
+	return manager.getOrCreate<QIcon>(_subPath, manager.m_icons);
 }
 
 QPixmap& ot::IconManager::getPixmap(const QString& _subPath) {
-	return this->get<QPixmap>(_subPath, m_pixmaps);
+	IconManager& manager = IconManager::instance();
+	return manager.getOrCreate<QPixmap>(_subPath, manager.m_pixmaps);
 }
 
 QMovie& ot::IconManager::getMovie(const QString& _subPath) {
-	return this->get<QMovie>(_subPath, m_movies);
+	IconManager& manager = IconManager::instance();
+	return manager.getOrCreate<QMovie>(_subPath, manager.m_movies);
 }
 
 QString ot::IconManager::findFullPath(const QString& _subPath) {
