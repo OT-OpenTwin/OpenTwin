@@ -314,7 +314,6 @@ void ot::Painter2DEditDialog::slotUpdate(void) {
 		Painter2D* newPainter = this->createPainter();
 		if (newPainter) m_painter = newPainter;
 		m_preview->setFromPainter((const Painter2D*)m_painter);
-		m_preview->repaint();
 		m_changed = true;
 		Q_EMIT painterChanged();
 	}

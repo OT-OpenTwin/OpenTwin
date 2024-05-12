@@ -33,7 +33,7 @@ void ot::GraphicsScene::drawBackground(QPainter* _painter, const QRectF& _rect)
 	if (m_gridSize < 1) return QGraphicsScene::drawBackground(_painter, _rect);
 
 	if (_rect != m_view->mapToScene(m_view->viewport()->rect()).boundingRect()) {
-		m_view->repaint();
+		m_view->update();
 		return;
 	}
 
