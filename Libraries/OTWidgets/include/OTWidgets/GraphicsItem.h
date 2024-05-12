@@ -34,50 +34,76 @@ namespace ot {
 	//! GraphicsItems should be created by the GraphicsFactory and be setup from the corresponding configuration
 	class OT_WIDGETS_API_EXPORT GraphicsItem {
 	public:
+		//! \enum GraphicsItemEvent
+		//! \brief The GraphicsItemEvent is used to describe the type of an event that occured.
 		enum GraphicsItemEvent {
 			ItemMoved,
 			ItemResized
 		};
 
+		//! \enum GraphicsItemState
+		//! \brief The GraphicsItemState is used to describe the current state of a GraphicsItem.
 		enum GraphicsItemState {
 			NoState       = 0x00, //! @brief Default state
 			HoverState    = 0x01, //! @brief Item is hovered over by user
 			SelectedState = 0x02  //! @brief Item is selected
 		};
-		typedef Flags<GraphicsItemState> GraphicsItemStateFlags;
+		//! \typedef GraphicsItemStateFlags
+		//! \brief Flags used to manage GraphicsItemState.
+		//! \see GraphicsItem, GraphicsItemState
+		typedef Flags<GraphicsItemState> GraphicsItemStateFlags; //!
 
+		//! \brief Calculates the child rect by taking the arguments into account.
+		//! \param _outerRect Outer rectangle (allowed rect).
+		//! \param _innerSize Child item size.
+		//! \param _alignment Child item alignment.
 		static QRectF calculateInnerRect(const QRectF& _outerRect, const QSizeF& _innerSize, ot::Alignment _alignment);
 
+		//! \brief Constructor.
+		//! \param _isLayoutOrStack If true, the item is a layout or a stack item.
 		GraphicsItem(bool _isLayoutOrStack);
+
+		//! \brief Destructor.
 		virtual ~GraphicsItem();
 
 		// ###############################################################################################################################################
 
 		// Pure virtual functions
 
+		//! \brief Calls QGraphicsItem::paint().
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) = 0;
 
+		//! \brief Returns the QGraphicsLayoutItem.
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) = 0;
 
+		//! \brief Returns the QGraphicsItem.
 		virtual QGraphicsItem* getQGraphicsItem(void) = 0;
 
+		//! \brief Calls QGraphicsLayoutItem::prepareGeometryChange().
 		virtual void prepareGraphicsItemGeometryChange(void) = 0;
 
+		//! \brief Calls QGraphicsLayoutItem::sizeHint().
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const = 0;
 
 		// ###############################################################################################################################################
 
 		// Virtual functions
 
+		//! \brief Will setup the item from the provided configuration.
+		//! \param _cfg GraphicsItem configuration.
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg);
 
-		//! @brief Will be called when this item was registered as an event handler and the child raised an event
+		//! \brief Will be called when this item was registered as an event handler and the child raised an event
 		virtual void graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {};
 
+		//! \brief Will be called whenever the GraphicsItem flags have changed.
 		virtual void graphicsItemFlagsChanged(ot::GraphicsItemCfg::GraphicsItemFlags _flags) {};
 
+		//! \brief Will return any child item that matches the _itemName.
+		//! \param _itemName The name of the item to find.
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName);
 
+		//! \brief Removes all connections to or from this item.
 		virtual void removeAllConnections(void);
 
 		// ###############################################################################################################################################
@@ -107,19 +133,45 @@ namespace ot {
 
 		// Getter / Setter
 
+		//! \brief Sets the provided flag.
+		//! \see GraphicsItem, GraphicsItemFlag
+		//! \param _flag Flag to set.
+		//! \param _active If true will set the flag, otherwise unset it.
 		void setGraphicsItemFlag(ot::GraphicsItemCfg::GraphicsItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+
+		//! \brief Replaces the flags with the flags provided.
+		//! \param _flags Flags to set.
 		void setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlags _flags);
+
+		//! \brief Returns the current GraphicsItemFlags set.
+		//! \see GraphicsItem, GraphicsItemFlag
 		ot::GraphicsItemCfg::GraphicsItemFlags graphicsItemFlags(void) const { return m_flags; };
 
+		//! \brief Set the GraphicsScene this item is placed at.
 		void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
+
+		//! \brief Returns the GraphicsScene this item is placed at.
 		GraphicsScene* graphicsScene(void);
 
+		//! \brief Sets the provided state flag.
+		//! \see GraphicsItem, GraphicsItemState
+		//! \param _state The state to set.
+		//! \param _active If true the flag will be set, otherwise unset.
 		void setStateFlag(GraphicsItemState _state, bool _active = true) { m_state.setFlag(_state, _active); };
+
+		//! \brief Replaces the flags with the flags provided.
+		//! \param _flags Flags to set.
 		void setStateFlags(GraphicsItemStateFlags _flags) { m_state = _flags; };
+
+		//! \brief Returns the current GraphicsItemStateFlags set.
+		//! \see GraphicsItem, GraphicsItemStateFlags
 		GraphicsItemStateFlags stateFlags(void) const { return m_state; };
 
+		//! \brief Returns true if the item is a layout or a stack.
 		bool isLayoutOrStack(void) const { return m_isLayoutOrStack; };
 
+		//! \brief Sets the GraphicsItem UID.
+		//! \param _uid UID to set.
 		void setGraphicsItemUid(const ot::UID& _uid) { m_uid = _uid; };
 		const ot::UID& graphicsItemUid(void) const { return m_uid; };
 

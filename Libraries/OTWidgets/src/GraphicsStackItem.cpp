@@ -30,6 +30,8 @@ ot::GraphicsStackItem::~GraphicsStackItem() {
 
 bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
+	if (!ot::GraphicsItem::setupFromConfig(_cfg)) return false;
+
 	ot::GraphicsStackItemCfg* cfg = dynamic_cast<ot::GraphicsStackItemCfg*>(_cfg);
 	if (cfg == nullptr) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
@@ -63,7 +65,7 @@ bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		}
 	}
 
-	return ot::GraphicsItem::setupFromConfig(_cfg);
+	return true;
 }
 
 void ot::GraphicsStackItem::removeAllConnections(void) {
@@ -121,15 +123,15 @@ ot::GraphicsItem* ot::GraphicsStackItem::findItem(const std::string& _itemName) 
 // Base class functions: QGraphicsItem
 
 void ot::GraphicsStackItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->adjustChildItems();
+	if (this->adjustChildItems()) return;
 	this->paintStateBackground(_painter, _opt, _widget);
 	QGraphicsItemGroup::paint(_painter, _opt, _widget);
 }
 
 QRectF ot::GraphicsStackItem::boundingRect(void) const {
-	QRectF ret = QGraphicsItemGroup::boundingRect();
-	QPointF tl = ret.topLeft();
-	QSizeF s = ret.size();
+	QRectF rec = QGraphicsItemGroup::boundingRect();
+	QPointF tl = rec.topLeft();
+	QSizeF s = rec.size();
 
 	for (auto itm : m_items) {
 		QRectF r = itm.item->getQGraphicsItem()->boundingRect();
@@ -172,7 +174,7 @@ QSizeF ot::GraphicsStackItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constr
 			s = s.expandedTo(itm.item->graphicsItemSizeHint(Qt::MinimumSize, _constrains));
 		}
 	}
-	return s;
+	return this->handleGetGraphicsItemSizeHint(_hint, s);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -203,7 +205,7 @@ void ot::GraphicsStackItem::memClear(void) {
 	m_items.clear();
 }
 
-void ot::GraphicsStackItem::adjustChildItems(void) {
+bool ot::GraphicsStackItem::adjustChildItems(void) {
 	QSizeF masterSize(-1., -1.);
 	for (auto itm : m_items) {
 		if (itm.isMaster) {
@@ -214,19 +216,23 @@ void ot::GraphicsStackItem::adjustChildItems(void) {
 
 	if (masterSize.width() < 0. || masterSize.height() < 0.) {
 		OT_LOG_WA("It appears that no master item was provided to this stack item");
-		return;
+		return false;
 	}
 
-	if (masterSize == m_lastCalculatedSize) return;
+	if (masterSize == m_lastCalculatedSize) return false;
 
 	this->prepareGeometryChange();
 
 	m_lastCalculatedSize = masterSize;
 
-	for (GraphicsStackItemEntry itm : m_items) {
+	for (const GraphicsStackItemEntry& itm : m_items) {
 		if (itm.isSlave) {
 			//OT_LOG_D("< Handling ItemResized: SlaveDetected { \"Root.UID\": \"" + itm.item->getRootItem()->graphicsItemUid() + "\", \"Item.Name\": \"" + itm.item->graphicsItemName() + "\" }");
 			itm.item->setGraphicsItemRequestedSize(m_lastCalculatedSize);
 		}
 	}
+
+	this->update();
+
+	return true;
 }
