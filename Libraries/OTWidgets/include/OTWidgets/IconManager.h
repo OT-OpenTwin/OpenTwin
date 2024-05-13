@@ -10,16 +10,15 @@
 #include "OTCore/Logger.h"
 
 // Qt header
-#include <qstring.h>
-#include <qstringlist.h>
+#include <QtCore/qstring.h>
+#include <QtCore/qstringlist.h>
+#include <QtGui/qicon.h>
+#include <QtGui/qmovie.h>
+#include <QtGui/qpixmap.h>
 
 // std header
 #include <map>
 #include <mutex>
-
-class QIcon;
-class QPixmap;
-class QMovie;
 
 namespace ot {
 
@@ -49,7 +48,7 @@ namespace ot {
 
 	private:
 		template <class T>
-		T& getOrCreate(const QString& _subPath, std::map<QString, T*>& _dataMap);
+		T& getOrCreate(const QString& _subPath, std::map<QString, T*>& _dataMap, T& _default);
 
 		QString findFullPath(const QString& _subPath);
 
@@ -61,13 +60,15 @@ namespace ot {
 		std::map<QString, QIcon*> m_icons;
 		std::map<QString, QPixmap*> m_pixmaps;
 		std::map<QString, QMovie*> m_movies;
-
+		QIcon m_emptyIcon;
+		QPixmap m_emptyPixmap;
+		QMovie m_emptyMovie;
 	};
 
 }
 
 template <class T>
-T& ot::IconManager::getOrCreate(const QString& _subPath, std::map<QString, T*>& _dataMap) {
+T& ot::IconManager::getOrCreate(const QString& _subPath, std::map<QString, T*>& _dataMap, T& _default) {
 	this->m_mutex.lock();
 
 	// Find existing
@@ -82,7 +83,7 @@ T& ot::IconManager::getOrCreate(const QString& _subPath, std::map<QString, T*>& 
 	if (path.isEmpty()) {
 		this->m_mutex.unlock();
 		OT_LOG_EAS("Icon \"" + _subPath.toStdString() + "\" not found");
-		throw std::exception("File not found");
+		return _default;
 	}
 
 	// Create and store new

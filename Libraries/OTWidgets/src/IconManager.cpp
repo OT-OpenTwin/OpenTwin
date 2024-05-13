@@ -52,17 +52,17 @@ const QStringList& ot::IconManager::searchPaths(void) {
 
 QIcon& ot::IconManager::getIcon(const QString& _subPath) {
 	IconManager& manager = IconManager::instance();
-	return manager.getOrCreate<QIcon>(_subPath, manager.m_icons);
+	return manager.getOrCreate<QIcon>(_subPath, manager.m_icons, manager.m_emptyIcon);
 }
 
 QPixmap& ot::IconManager::getPixmap(const QString& _subPath) {
 	IconManager& manager = IconManager::instance();
-	return manager.getOrCreate<QPixmap>(_subPath, manager.m_pixmaps);
+	return manager.getOrCreate<QPixmap>(_subPath, manager.m_pixmaps, manager.m_emptyPixmap);
 }
 
 QMovie& ot::IconManager::getMovie(const QString& _subPath) {
 	IconManager& manager = IconManager::instance();
-	return manager.getOrCreate<QMovie>(_subPath, manager.m_movies);
+	return manager.getOrCreate<QMovie>(_subPath, manager.m_movies, manager.m_emptyMovie);
 }
 
 QString ot::IconManager::findFullPath(const QString& _subPath) {
