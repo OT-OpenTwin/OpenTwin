@@ -10,6 +10,7 @@
 
 //ThirdPartyHeader
 #include <ngspice/sharedspice.h>
+//#include <ngspice/ngspice.h>
 #include <iostream>
 #include <string>
 #include <fstream>

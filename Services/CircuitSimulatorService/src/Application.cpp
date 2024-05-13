@@ -232,7 +232,7 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document)
 	{
 		addSolver();
 	}
-	else if (action == "Circuit Simulator:Simulate:New Simulation")
+	else if (action == "Circuit Simulator:Simulate:Run Simulation")
 	{
 		runCircuitSimulation();
 		
@@ -294,11 +294,11 @@ void Application::modelSelectionChangedNotification(void)
 
 		if (selectedEntities.size() > 0)
 		{
-			enabled.push_back("Circuit Simulator:Simulate:New Simulation");
+			enabled.push_back("Circuit Simulator:Simulate:Run Simulation");
 		}
 		else
 		{
-			disabled.push_back("Circuit Simulator:Simulate:New Simulation");
+			disabled.push_back("Circuit Simulator:Simulate:Run Simulation");
 		}
 
 		m_uiComponent->setControlsEnabledState(enabled, disabled);
@@ -742,7 +742,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuGroup("Circuit Simulator", "Edit");
 	_ui->addMenuGroup("Circuit Simulator", "Simulate");
 	_ui->addMenuButton("Circuit Simulator", "Edit","Add Solver", "Add Solver", ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add","Default");
-	_ui->addMenuButton("Circuit Simulator","Simulate","New Simulation","New Simulation", ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Kriging", "Default");
+	_ui->addMenuButton("Circuit Simulator","Simulate","Run Simulation","Run Simulation", ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Kriging", "Default");
 	_ui->addMenuButton("Circuit Simulator", "Edit", "Add Circuit", "Add Circuit", ot::LockModelWrite | ot::LockViewRead | ot::LockViewWrite, "Add", "Default");
 
 	m_blockEntityHandler.setUIComponent(_ui);

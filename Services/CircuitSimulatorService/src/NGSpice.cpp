@@ -493,7 +493,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	//And now i send it to NGSpice in the right order
 	
 
-	
+	//ngSpice_Command(const_cast<char*>("circbyline Vmeas 2 1 "));
 	ngSpice_Command(const_cast<char*>(simulationLine.c_str()));
 	//Now i will do a loop through the nodes of the voltageMeter to get the potential diffirence with probe
 	for (auto nodes : nodesOfVoltageMeter)
@@ -502,7 +502,8 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		ngSpice_Command(const_cast<char*>(probeLine.c_str()));
 	}
 	
-	//ngSpice_Command(const_cast<char*>("circbyline .probe I(R1,1)"));
+	
+	
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
 	ngSpice_Command(const_cast<char*>(printSettings.c_str()));
