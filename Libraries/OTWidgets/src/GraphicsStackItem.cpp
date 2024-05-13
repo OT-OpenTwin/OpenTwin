@@ -209,7 +209,7 @@ bool ot::GraphicsStackItem::adjustChildItems(void) {
 	QSizeF masterSize(-1., -1.);
 	for (auto itm : m_items) {
 		if (itm.isMaster) {
-			//OT_LOG_D("< Handling ItemResized: MasterDetected { \"Root.UID\": \"" + itm.item->getRootItem()->graphicsItemUid() + "\", \"Item.Name\": \"" + itm.item->graphicsItemName() + "\" }");
+			//OT_LOG_D("< MasterDetected { \"Item.Name\": \"" + itm.item->graphicsItemName() + "\", \"Width\": " + std::to_string(m_lastCalculatedSize.width()) + ", \"Height\": " + std::to_string(m_lastCalculatedSize.height()) + " }");
 			masterSize = masterSize.expandedTo(itm.item->getQGraphicsItem()->boundingRect().size());
 		}
 	}
@@ -219,6 +219,8 @@ bool ot::GraphicsStackItem::adjustChildItems(void) {
 		return false;
 	}
 
+	//OT_LOG_W("< Calculated for item \"" + this->graphicsItemName() + "\" w: " + std::to_string(masterSize.width()) + ", h: " + std::to_string(masterSize.height()));
+
 	if (masterSize == m_lastCalculatedSize) return false;
 
 	this->prepareGeometryChange();
@@ -227,7 +229,7 @@ bool ot::GraphicsStackItem::adjustChildItems(void) {
 
 	for (const GraphicsStackItemEntry& itm : m_items) {
 		if (itm.isSlave) {
-			//OT_LOG_D("< Handling ItemResized: SlaveDetected { \"Root.UID\": \"" + itm.item->getRootItem()->graphicsItemUid() + "\", \"Item.Name\": \"" + itm.item->graphicsItemName() + "\" }");
+			//OT_LOG_D("< SlaveDetected { \"Item.Name\": \"" + itm.item->graphicsItemName() + "\", \"Width\": " + std::to_string(m_lastCalculatedSize.width()) + ", \"Height\": " + std::to_string(m_lastCalculatedSize.height()) + " }");
 			itm.item->setGraphicsItemRequestedSize(m_lastCalculatedSize);
 		}
 	}
