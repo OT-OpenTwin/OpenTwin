@@ -21,9 +21,17 @@ namespace ot {
 
 		virtual void prepareGraphicsItemGeometryChange(void) override;
 
-		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Base class functions: GraphicsItem
 
 		virtual QRectF boundingRect(void) const override;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Base class functions: GraphicsLayoutItem
+
+		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 
 		virtual void setGeometry(const QRectF& rect) override;
 

@@ -177,6 +177,13 @@ QSizeF ot::GraphicsStackItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constr
 	return this->handleGetGraphicsItemSizeHint(_hint, s);
 }
 
+void ot::GraphicsStackItem::setGeometry(const QRectF& _rect) {
+	this->prepareGeometryChange();
+	this->setPos(_rect.topLeft());
+	this->handleSetItemGeometry(_rect);
+	QGraphicsLayoutItem::setGeometry(_rect);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter / Getter
