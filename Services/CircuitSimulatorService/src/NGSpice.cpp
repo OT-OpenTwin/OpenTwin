@@ -359,6 +359,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			if (nodesOfVoltageMeter.size() == 0)
 			{
 				getNodeNumbersOfMeters(editorname, allConnectionEntities, allEntitiesByBlockID,nodesOfVoltageMeter);
+				// I am doing a continue here becaue i dont want to generate a netlisteLine for this element
 				continue;
 			}
 			else
@@ -371,31 +372,24 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		{
 			if (nodesOfCurrentMeter.size() == 0)
 			{
-				//std::string temp = "currentMeter";
-				//getNodeNumbersOfMeters(editorname, allConnectionEntities, allEntitiesByBlockID, nodesOfVoltageMeter, nodesOfCurrentMeter,temp);
-				auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname)->second.getMapOfElements();
 				
-				for (auto meter : it)
-				{
-					if (meter.second.getItemName() == "Curren Meter")
-					{
-						std::pair<std::string, std::string> nodeNumbers;
-						nodeNumbers.first = "a";
+				std::pair<std::string, std::string> nodeNumbers;
+				nodeNumbers.first = "a";
 					
-						for (auto conn : meter.second.getList())
-						{
-							if (nodeNumbers.first != "a")
-							{
-								nodeNumbers.second = conn.getNodeNumber();
-							}
-							else
-							{
-								nodeNumbers.first = conn.getNodeNumber();
-							}
-						}
-						nodesOfCurrentMeter.push_back(nodeNumbers);
+				for (auto conn : element.getList())
+				{
+					if (nodeNumbers.first != "a")
+					{
+						nodeNumbers.second = conn.getNodeNumber();
+					}
+					else
+					{
+						nodeNumbers.first = conn.getNodeNumber();
 					}
 				}
+				nodesOfCurrentMeter.push_back(nodeNumbers);
+				
+				// I am doing a continue here becaue i dont want to generate a netlisteLine for this element
 				continue;
 			}
 			else
@@ -519,7 +513,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		std::string probeLine = oss.str();
 		ngSpice_Command(const_cast<char*>(probeLine.c_str()));
 	}
-	ngSpice_Command(const_cast<char*>("circbyline .probe I(R2)"));
+
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
 	//ngSpice_Command(const_cast<char*>(printSettings.c_str()));
