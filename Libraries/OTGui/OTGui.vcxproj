@@ -63,6 +63,7 @@
     <ClInclude Include="include\OTGui\PropertyPainter2D.h" />
     <ClInclude Include="include\OTGui\RadialGradientPainter2D.h" />
     <ClInclude Include="include\OTGui\SelectEntitiesDialogCfg.h" />
+    <ClInclude Include="include\OTGui\StyleRefPainter2D.h" />
     <ClInclude Include="include\OTGui\StyleValue.h" />
     <ClInclude Include="include\OTGui\WidgetViewBase.h" />
     <ClInclude Include="include\OTGui\WidgetViewCfg.h" />
@@ -115,6 +116,7 @@
     <ClCompile Include="src\PropertyPainter2D.cpp" />
     <ClCompile Include="src\RadialGradientPainter2D.cpp" />
     <ClCompile Include="src\SelectEntitiesDialogCfg.cpp" />
+    <ClCompile Include="src\StyleRefPainter2D.cpp" />
     <ClCompile Include="src\StyleValue.cpp" />
     <ClCompile Include="src\WidgetViewBase.cpp" />
     <ClCompile Include="src\WidgetViewCfg.cpp" />

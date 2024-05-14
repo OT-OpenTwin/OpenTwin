@@ -1,24 +1,32 @@
-//! @file FillPainter2D.h
+//! @file StyleRefPainter2D.h
 //! @author Alexander Kuester (alexk95)
-//! @date March 2023
+//! @date May 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Color.h"
 #include "OTGui/Painter2D.h"
 
-#define OT_FactoryKey_FillPainter2D "OT_P2DFill"
+// std header
+#include <string>
+
+#define OT_FactoryKey_StyleRefPainter2D "OT_P2DStyR"
+
+#pragma warning(disable:4251)
 
 namespace ot {
-	
-	class OT_GUI_API_EXPORT FillPainter2D : public ot::Painter2D {
+
+	//! \class StyleRefPainter2D
+	//! \brief The StyleRefPainter2D can be used to reference a ColorStyleValue in the active ColorStyle.
+	//! \note Note that the reference is only evaluated in the frontend by the QtFactory.
+	//! *     When the active ColorStyle changes every GUI element working with Painter2D should reevaluate the Painter2D.
+	class OT_GUI_API_EXPORT StyleRefPainter2D : public ot::Painter2D {
+		OT_DECL_NOCOPY(StyleRefPainter2D)
 	public:
-		FillPainter2D();
-		FillPainter2D(ot::DefaultColor _color);
-		FillPainter2D(const ot::Color& _color);
-		virtual ~FillPainter2D();
+		StyleRefPainter2D();
+		StyleRefPainter2D(const std::string& _referenceKey);
+		virtual ~StyleRefPainter2D();
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -31,20 +39,21 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
-		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_FillPainter2D); };
+		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_StyleRefPainter2D); };
 
 		virtual std::string generateQss(void) const override;
 
 		virtual ot::Color getDefaultColor(void) const override;
 
-		void setColor(const ot::Color& _color) { m_color = _color; };
-		const ot::Color& color(void) const { return m_color; };
+		//! \brief Sets the key of the ColorStyleValue that should be referenced.
+		//! \param _referenceKey Key to set.
+		void setReferenceKey(const std::string& _referenceKey) { m_reference = _referenceKey; };
+
+		//! \brief Key of the ColorStyleValue that is referenced.
+		const std::string& referenceKey(void) const { return m_reference; };
 
 	private:
-		ot::Color m_color;
-
-		FillPainter2D(const FillPainter2D&) = delete;
-		FillPainter2D& operator = (const FillPainter2D&) = delete;
+		std::string m_reference; //! \brief ColorStyleValue key.
 	};
 
 }

@@ -7,9 +7,11 @@
 #include "OTCore/Logger.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/LinearGradientPainter2D.h"
 #include "OTGui/RadialGradientPainter2D.h"
 #include "OTWidgets/QtFactory.h"
+#include "OTWidgets/GlobalColorStyle.h"
 
 QColor ot::QtFactory::toColor(const ot::Color& _color) {
 	return QColor(_color.r(), _color.g(), _color.b(), _color.a());
@@ -119,6 +121,20 @@ QBrush ot::QtFactory::toBrush(const ot::Painter2D* _painter) {
 		grad.setStops(stops);
 
 		return grad;
+	}
+	else if (_painter->getFactoryKey() == OT_FactoryKey_StyleRefPainter2D) {
+		const StyleRefPainter2D* painter = dynamic_cast<const StyleRefPainter2D*>(_painter);
+		OTAssertNullptr(painter);
+
+		const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
+
+		if (!cs.hasValue(painter->referenceKey())) {
+			OT_LOG_W("Failed to create brush from ColorStyleValue reference. Value not found");
+			return QBrush();
+		}
+		else {
+			return cs.getValue(painter->referenceKey()).brush();
+		}
 	}
 	else {
 		OT_LOG_EAS("Unknown Painter2D provided \"" + _painter->getFactoryKey() + "\"");
