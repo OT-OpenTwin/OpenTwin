@@ -72,7 +72,7 @@
 	Var MONGODB_DB_PATH
 	Var MONGODB_LOG_PATH
 	Var UNINSTALL_MONGODB_FLAG
-
+	
 	Var OPEN_TWIN_SERVICES_ADDRESS
 
 #=================================================================
@@ -103,8 +103,8 @@
 	!define OPENTWIN_UNAPP_ICON '"$INSTDIR\icons\Application\opentwin_uninstall_icon_48x48.ico"'
 
 	!define CREATE_CERTIFICATE_BATCH '"$INSTDIR\Certificates\CreateServerCertificate_custom.cmd"'
-	!define DEFAULT_MONGODB_STORAGE_PATH '"$INSTDIR\DataStorage\data"'
-	!define DEFAULT_MONGODB_LOG_PATH '"$INSTDIR\DataStorage\log"'
+	!define DEFAULT_MONGODB_STORAGE_PATH '"C:\OT-DataStorage\data"'
+	!define DEFAULT_MONGODB_LOG_PATH '"C:\OT-DataStorage\log"'
 	!define DEFAULT_MONGODB_INSTALL_PATH '"$PROGRAMFILES64\MongoDB\Server\4.4"'
 	!define MONGODB_DELETION_PATH '"$PROGRAMFILES64\MongoDB"'
 	!define LICENSE_FILE_PATH '"..\..\..\LICENSE.md"'
@@ -135,6 +135,44 @@ RequestExecutionLevel admin
 	Call UninstallExisting
 	Pop ${exitcode}
 !macroend
+
+ ; GetParent
+ ; input, top of stack  (e.g. C:\Program Files\Foo)
+ ; output, top of stack (replaces, with e.g. C:\Program Files)
+ ; modifies no other variables.
+ ;
+ ; Usage:
+ ;   Push "C:\Program Files\Directory\Whatever"
+ ;   Call GetParent
+ ;   Pop $R0
+ ;   ; at this point $R0 will equal "C:\Program Files\Directory"
+ 
+Function GetParent
+ 
+  Exch $R0
+  Push $R1
+  Push $R2
+  Push $R3
+ 
+  StrCpy $R1 0
+  StrLen $R2 $R0
+ 
+  loop:
+    IntOp $R1 $R1 + 1
+    IntCmp $R1 $R2 get 0 get
+    StrCpy $R3 $R0 1 -$R1
+    StrCmp $R3 "\" get
+  Goto loop
+ 
+  get:
+    StrCpy $R0 $R0 -$R1
+ 
+    Pop $R3
+    Pop $R2
+    Pop $R1
+    Exch $R0
+ 
+FunctionEnd
 
 Function UninstallExisting
 	Exch $1 ; uninstcommand
@@ -173,28 +211,6 @@ Function UninstallExisting
 FunctionEnd
 # ===================================================================
 # ===================================================================
-
-#.onInit function to initialize any values that need initializing at the beginning of the script
-Function .onInit
-	#from front end installer
-	!insertmacro EnsureAdminRights
-	  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "UninstallString"
-	${If} $0 != ""
-	${AndIf} ${Cmd} `MessageBox MB_YESNO|MB_ICONQUESTION "Uninstall previous version?" /SD IDYES IDYES`
-	!insertmacro UninstallExisting $0 $0
-		${If} $0 <> 0
-			MessageBox MB_YESNO|MB_ICONSTOP "Failed to uninstall, continue anyway?" /SD IDYES IDYES +2
-				Abort
-		${EndIf}
-	${EndIf}
-
-    StrCpy $PortReturnChecker 0
-	StrCpy $PublicIpSet 0
-	StrCpy $PublicCertPageChecker 0
-
-	StrCpy "$ROOTDIR" "$WINDIR" 2
-
-FunctionEnd
 
 
 ########################################################################
@@ -616,112 +632,6 @@ FunctionEnd
 	FunctionEnd
 */
 
-# DATABASE DIRECTORY OPERATIONS (ACTIVE)
-	Function DatabaseEntry
-		!insertmacro MUI_HEADER_TEXT "MongoDB Directories" "MongoDB and its setup are required for OpenTwin to run. A location for the storage and log files are needed for the MongoDB installation"
-
-		nsDialogs::Create 1018
-		Pop $Dialog
-
-		${If} $Dialog == error
-			Abort
-		${EndIf}
-
-		${NSD_CreateLabel} 0 0 100% 30u "Please specify locations for the MongoDB installation, storage and log file dump. For the storage (databse) it is recommended to select directories on disks with a lot of space. These paths can later be changed in the mongod.cfg withing the MongoDB installation directory"
-		#get DB location
-		
-		#custom installation path has been disabled due to a bug in the MongoDB installer
-		${NSD_CreateLabel} 0 50 100% 10u "MongoDB Installation path:"
-		${NSD_CreateText} 0 70 100% 12u ${DEFAULT_MONGODB_INSTALL_PATH}
-			Pop $DirHandleMainInstall
-			#variable assign for later use
-			${NSD_GetText} $DirHandleMainInstall $MONGODB_INSTALL_PATH
-			SendMessage $DirHandleMainInstall ${EM_SETREADONLY} 1 0 #set DirHandleMainInstall to read only
-			
-		#uncomment these to re-enable the browse button
-		#check 'Function SelectDBDirectory' also
-
-		#${NSD_CreateBrowseButton} 350 68 65u 15u "Browse..."
-		#	Pop $BrowseButton
-		#${NSD_OnClick} $BrowseButton SelectMongoDBMainDirectory
-
-		${NSD_CreateHLine} 0 110 100% 10u ""
-		
-		
-		${NSD_CreateLabel} 0 125 100% 10u "MongoDB Database path:"
-		${NSD_CreateText} 0 145 75% 12u ${DEFAULT_MONGODB_STORAGE_PATH}
-			Pop $DirHandleDB
-			${NSD_GetText} $DirHandleDB $MONGODB_DB_PATH
-		${NSD_CreateBrowseButton} 350 143 65u 15u "Browse..."
-			Pop $BrowseButton
-		${NSD_OnClick} $BrowseButton SelectDBDirectory
-
-		#get log location
-		${NSD_CreateLabel} 0 180 100% 10u "MongoDB Log files path:"
-		${NSD_CreateText} 0 200 75% 12u ${DEFAULT_MONGODB_LOG_PATH}
-			Pop $DirHandleLog
-			${NSD_GetText} $DirHandleLog $MONGODB_LOG_PATH
-		${NSD_CreateBrowseButton} 350 198 65u 15u "Browse..."
-			Pop $BrowseButton
-		${NSD_OnClick} $BrowseButton SelectLogDirectory
-
-		nsDialogs::Show
-	FunctionEnd
-
-	/* #uncomment this to enable the functionality of the browse button	
-		Function SelectMongoDBMainDirectory
-			nsDialogs::SelectFolderDialog "Select a Directory" ""
-			Pop $0 	#Get selected directory
-			${If} $0 != error
-				SendMessage $DirHandleMainInstall ${WM_SETTEXT} 0 "STR:$0" #assign selected directory to DirHandle
-				StrCpy $MONGODB_INSTALL_PATH $0
-			${EndIf}
-			
-		FunctionEnd
-	*/
-
-		Function SelectDBDirectory
-			nsDialogs::SelectFolderDialog "Select a Directory" ""
-			Pop $0 	#Get selected directory
-			${If} $0 != error
-				SendMessage $DirHandleDB ${WM_SETTEXT} 0 "STR:$0" #assign selected directory to DirHandle
-				StrCpy $MONGODB_DB_PATH $0
-			${EndIf}
-			
-		FunctionEnd
-
-
-		Function SelectLogDirectory
-			nsDialogs::SelectFolderDialog "Select a Directory" ""
-			Pop $0 	#Get selected directory
-			${If} $0 != error
-				SendMessage $DirHandleLog ${WM_SETTEXT} 0 "STR:$0" #assign selected directory to DirHandle
-				StrCpy $MONGODB_LOG_PATH $0
-			${EndIf}
-		FunctionEnd
-
-
-/* DATABASE INFO PAGE (DISABLED)
-	Function DatabaseInfo
-		nsDialogs::Create 1018
-		Pop $Dialog
-
-		${If} $Dialog == error
-			Abort
-		${EndIf}
-
-		${NSD_CreateLabel} 0 0 100% 10u "MONGODB_INSTALL_PATH:"
-			${NSD_CreateLabel} 0 25 100% 30 $MONGODB_INSTALL_PATH
-
-		${NSD_CreateLabel} 0 100 100% 10u "MONGODB_DB_PATH:"
-			${NSD_CreateLabel} 0 125 100% 30 $MONGODB_DB_PATH
-
-		${NSD_CreateLabel} 0 175 100% 10u "MONGODB_LOG_PATH:"
-			${NSD_CreateLabel} 0 200 100% 30 $MONGODB_LOG_PATH
-		nsDialogs::Show
-	FunctionEnd
-*/
-
 
 ; MUI Settings
 	
@@ -742,6 +652,7 @@ FunctionEnd
 	; Directory page
 	!insertmacro MUI_PAGE_DIRECTORY
 	Page custom DatabaseEntry
+	
 	#page custom DatabaseInfo #MongoDB paths debug page
 	Page custom NetworkModePage OnNetworkLeave
 	Page custom PublicIPCertificate OnPublicCertficateLeave
@@ -913,6 +824,117 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "Install MongoDB and set up all configurations for OpenTwin"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
+# DATABASE DIRECTORY OPERATIONS (ACTIVE)
+	Function DatabaseEntry
+	
+		${IfNot} ${SectionIsSelected} ${SEC03}
+			Abort
+		${EndIf}
+	
+		!insertmacro MUI_HEADER_TEXT "MongoDB Directories" "MongoDB and its setup are required for OpenTwin to run. A location for the storage and log files are needed for the MongoDB installation"
+
+		nsDialogs::Create 1018
+		Pop $Dialog
+
+		${If} $Dialog == error
+			Abort
+		${EndIf}
+
+		${NSD_CreateLabel} 0 0 100% 30u "Please specify locations for the MongoDB installation, storage and log file dump. For the storage (databse) it is recommended to select directories on disks with a lot of space. These paths can later be changed in the mongod.cfg withing the MongoDB installation directory"
+		#get DB location
+		
+		#custom installation path has been disabled due to a bug in the MongoDB installer
+		${NSD_CreateLabel} 0 50 100% 10u "MongoDB Installation path:"
+		${NSD_CreateText} 0 70 100% 12u ${DEFAULT_MONGODB_INSTALL_PATH}
+			Pop $DirHandleMainInstall
+			#variable assign for later use
+			${NSD_GetText} $DirHandleMainInstall $MONGODB_INSTALL_PATH
+			SendMessage $DirHandleMainInstall ${EM_SETREADONLY} 1 0 #set DirHandleMainInstall to read only
+			
+		#uncomment these to re-enable the browse button
+		#check 'Function SelectDBDirectory' also
+
+		#${NSD_CreateBrowseButton} 350 68 65u 15u "Browse..."
+		#	Pop $BrowseButton
+		#${NSD_OnClick} $BrowseButton SelectMongoDBMainDirectory
+
+		${NSD_CreateHLine} 0 110 100% 10u ""
+		
+		
+		${NSD_CreateLabel} 0 125 100% 10u "MongoDB Database path:"
+		${NSD_CreateText} 0 145 75% 12u ${DEFAULT_MONGODB_STORAGE_PATH}
+			Pop $DirHandleDB
+			${NSD_GetText} $DirHandleDB $MONGODB_DB_PATH
+		${NSD_CreateBrowseButton} 350 143 65u 15u "Browse..."
+			Pop $BrowseButton
+		${NSD_OnClick} $BrowseButton SelectDBDirectory
+
+		#get log location
+		${NSD_CreateLabel} 0 180 100% 10u "MongoDB Log files path:"
+		${NSD_CreateText} 0 200 75% 12u ${DEFAULT_MONGODB_LOG_PATH}
+			Pop $DirHandleLog
+			${NSD_GetText} $DirHandleLog $MONGODB_LOG_PATH
+		${NSD_CreateBrowseButton} 350 198 65u 15u "Browse..."
+			Pop $BrowseButton
+		${NSD_OnClick} $BrowseButton SelectLogDirectory
+
+		nsDialogs::Show
+	FunctionEnd
+
+	/* #uncomment this to enable the functionality of the browse button	
+		Function SelectMongoDBMainDirectory
+			nsDialogs::SelectFolderDialog "Select a Directory" ""
+			Pop $0 	#Get selected directory
+			${If} $0 != error
+				SendMessage $DirHandleMainInstall ${WM_SETTEXT} 0 "STR:$0" #assign selected directory to DirHandle
+				StrCpy $MONGODB_INSTALL_PATH $0
+			${EndIf}
+			
+		FunctionEnd
+	*/
+
+		Function SelectDBDirectory
+			nsDialogs::SelectFolderDialog "Select a Directory" ""
+			Pop $0 	#Get selected directory
+			${If} $0 != error
+				SendMessage $DirHandleDB ${WM_SETTEXT} 0 "STR:$0" #assign selected directory to DirHandle
+				StrCpy $MONGODB_DB_PATH $0
+			${EndIf}
+			
+		FunctionEnd
+
+
+		Function SelectLogDirectory
+			nsDialogs::SelectFolderDialog "Select a Directory" ""
+			Pop $0 	#Get selected directory
+			${If} $0 != error
+				SendMessage $DirHandleLog ${WM_SETTEXT} 0 "STR:$0" #assign selected directory to DirHandle
+				StrCpy $MONGODB_LOG_PATH $0
+			${EndIf}
+		FunctionEnd
+
+
+/* DATABASE INFO PAGE (DISABLED)
+	Function DatabaseInfo
+		nsDialogs::Create 1018
+		Pop $Dialog
+
+		${If} $Dialog == error
+			Abort
+		${EndIf}
+
+		${NSD_CreateLabel} 0 0 100% 10u "MONGODB_INSTALL_PATH:"
+			${NSD_CreateLabel} 0 25 100% 30 $MONGODB_INSTALL_PATH
+
+		${NSD_CreateLabel} 0 100 100% 10u "MONGODB_DB_PATH:"
+			${NSD_CreateLabel} 0 125 100% 30 $MONGODB_DB_PATH
+
+		${NSD_CreateLabel} 0 175 100% 10u "MONGODB_LOG_PATH:"
+			${NSD_CreateLabel} 0 200 100% 30 $MONGODB_LOG_PATH
+		nsDialogs::Show
+	FunctionEnd
+*/
+
 
 
 #UNINSTALLER - non functional, unfinished
@@ -931,6 +953,49 @@ Function un.onInit
 AbortUninstall:
   Abort
 FunctionEnd
+
+#.onInit function to initialize any values that need initializing at the beginning of the script
+Function .onInit
+	#from front end installer
+	!insertmacro EnsureAdminRights
+		
+	ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "UninstallString"
+	
+	${If} $0 != ""
+	    MessageBox MB_YESNO|MB_ICONQUESTION "An OpenTwin installation was found. If you continue, the previous version will be removed.$\n$\nDo you really want to proceed?" /SD IDYES IDYES +2
+			Abort
+			
+		Push $0
+		Call GetParent
+		Pop $R0 ; this is the installation directory
+		
+		StrCpy $1 "$R0" "" 1
+
+		GetFullPathName $3 "$1\ShutdownAll.bat" 
+		SetOutPath "$1"
+						
+		ExecWait '"$3"'
+
+	    !insertmacro UninstallExisting $0 $0
+	    ${If} $0 <> 0
+			MessageBox MB_YESNO|MB_ICONSTOP "Failed to uninstall, continue anyway?" /SD IDYES IDYES +2
+				Abort
+		${EndIf}
+		
+		;$UNINSTALL_MONGODB_FLAG 1
+		!insertmacro UnSelectSection ${SEC03}
+		!insertmacro SetSectionFlag ${SEC03} ${SF_RO}
+
+	${EndIf}
+
+    StrCpy $PortReturnChecker 0
+	StrCpy $PublicIpSet 0
+	StrCpy $PublicCertPageChecker 0
+
+	StrCpy "$ROOTDIR" "$WINDIR" 2
+
+FunctionEnd
+
 
 Section Uninstall
 #Delete ALL env variables set by the installer

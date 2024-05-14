@@ -221,6 +221,9 @@ REM Documentation
 MKDIR "%OT_DEPLOYMENT_DIR%\Documentation"
 XCOPY /S "%OT_DOCUMENTATION_ROOT%\_build\html\*.*" "%OT_DEPLOYMENT_DIR%\Documentation"
 
+REM Shutdown Script
+COPY "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\ShutdownAll.bat" "%OT_DEPLOYMENT_DIR%"
+
 REM ===========================================================================
 REM Copy the build files
 REM ===========================================================================
