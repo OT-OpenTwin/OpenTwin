@@ -123,6 +123,10 @@ void ot::PropertyInputInt::lclTextChanged(void) {
 	OTAssertNullptr(m_lineEdit);
 	if (this->data().propertyFlags() & Property::HasMultipleValues) {
 		QString str = m_lineEdit->text();
+
+		// Check for no changes and still multiple values
+		if (str == OT_PROPERTY_INT_MULTIPLEVALUESTEXT) return;
+
 		str.remove(OT_PROPERTY_INT_MULTIPLEVALUESCHAR);
 		if (str.isEmpty()) str = OT_PROPERTY_INT_MULTIPLEVALUESCHAR;
 		this->data().setPropertyFlag(Property::HasMultipleValues, false);
@@ -130,6 +134,8 @@ void ot::PropertyInputInt::lclTextChanged(void) {
 		m_lineEdit->blockSignals(true);
 		m_lineEdit->setText(str);
 		m_lineEdit->blockSignals(false);
+
+		this->slotValueChanged();
 	}
 
 	if (this->hasInputError()) {

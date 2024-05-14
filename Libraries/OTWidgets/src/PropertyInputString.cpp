@@ -36,6 +36,9 @@ QWidget* ot::PropertyInputString::getQWidget(void) {
 }
 
 void ot::PropertyInputString::lclValueChanged(void) {
+	// Avoid input on multiple values
+	if (m_lineEdit->text() == "..." && (this->data().propertyFlags() & PropertyBase::HasMultipleValues)) return;
+
 	if (m_lineEdit->text() != m_text) {
 		m_text = m_lineEdit->text();
 		this->slotValueChanged();
