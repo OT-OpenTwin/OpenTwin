@@ -132,7 +132,6 @@ void ot::ReturnValues::setFromJsonObject(const ot::ConstJsonObject& _object)
 {
 	const std::list<std::string> names = ot::json::getStringList(_object, "NameList");
 	auto jValueLists = _object["ValueLists"].GetArray();
-	ot::JSONToVariableConverter converterJ2V;
 	auto name = names.begin();
 	
 	for (auto& jValues : jValueLists)

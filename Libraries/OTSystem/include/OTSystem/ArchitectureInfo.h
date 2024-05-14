@@ -64,3 +64,27 @@
 #define OT_OS_32Bit
 
 #endif
+
+// #########################################################################################################################################################################
+
+// Compiler Info
+
+#if defined(__GNUC__)
+
+//! \def OT_COMPILER_GNU
+//! \brief If define the current compiler is GNU.
+#define OT_COMPILER_GNU
+
+#elif defined(__clang__)
+
+//! \def OT_COMPILER_CLANG
+//! \brief If define the current compiler is CLANG.
+#define OT_COMPILER_CLANG
+
+#elif defined(_MSC_VER)
+
+//! \def OT_COMPILER_MSC
+//! \brief If define the current compiler is Microsoft Visual C++.
+#define OT_COMPILER_MSC
+
+#endif

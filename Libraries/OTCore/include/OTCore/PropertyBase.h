@@ -17,31 +17,58 @@
 
 namespace ot {
 
+	//! \class PropertyBase
+	//! \brief The PropertyBase class is used to hold general Property information.
 	class OT_CORE_API_EXPORT PropertyBase : public Serializable {
 	public:
+		//! \enum PropertyFlag
+		//! \brief The PropertyFlag enum contains different settings for properties.
 		enum PropertyFlag {
-			NoFlags = 0x0000, //! @brief No property flags set
-			IsReadOnly = 0x0001, //! @brief Property is read only
-			IsProtected = 0x0002, //! @brief Property is protected
-			IsHidden = 0x0004, //! @brief Property is hidden to the user
-			HasMultipleValues = 0x0008, //! @brief Property has multiple values
-			HasInputError = 0x0010, //! @brief The value is invalid
-			IsDeletable = 0x0020, //! @brief Property is deletable
-			AllowCustomValues = 0x1000, //! @brief User may set user values (e.g. in the StringListProperty)
-			AllowMultiselection = 0x2000  //! @brief User may select multiple values (e.g. in the StringListProperty)
+			NoFlags = 0x0000, //! \brief No property flags set
+			IsReadOnly = 0x0001, //! \brief Property is read only
+			IsProtected = 0x0002, //! \brief Property is protected
+			IsHidden = 0x0004, //! \brief Property is hidden to the user
+			HasMultipleValues = 0x0008, //! \brief Property has multiple values
+			HasInputError = 0x0010, //! \brief The value is invalid
+			IsDeletable = 0x0020, //! \brief Property is deletable
+			AllowCustomValues = 0x1000, //! \brief User may set user values (e.g. in the StringListProperty)
+			AllowMultiselection = 0x2000  //! \brief User may select multiple values (e.g. in the StringListProperty)
 		};
+
+		//! \typedef PropertyFlags
+		//! \copybrief PropertyBase::PropertyFlag
 		typedef Flags<PropertyFlag> PropertyFlags;
 
+		//! \brief Creates a string representation of the provided PropertyFlag.
 		static std::string toString(PropertyFlag _flag);
+
+		//! \brief Returns the PropertyFlag that is represented by the string.
 		static PropertyFlag stringToFlag(const std::string& _flag);
+
+		//! \brief Creates a list containing strings that represent the set PropertyFlags.
 		static std::list<std::string> toStringList(PropertyFlags _flags);
+
+		//! \brief Returns the PropertyFlags that are represented by the string list.
 		static PropertyFlags stringListToFlags(const std::list<std::string>& _flags);
 
+		//! \brief Default constructor.
+		//! \param _flags Intially set flags.
 		PropertyBase(PropertyFlags _flags = PropertyFlags(NoFlags));
+
+		//! \brief Assignment constructor.
+		//! \param _name Property name.
+		//! \param _flags Intially set flags.
 		PropertyBase(const std::string& _name, PropertyFlags _flags = PropertyFlags(NoFlags));
+		
+		//! \brief Copy constructor.
+		//! \param _other Other PropertyBase.
 		PropertyBase(const PropertyBase& _other);
+
+		//! \brief Destructor.
 		virtual ~PropertyBase() {};
 
+		//! \brief Assignment operator.
+		//! \param _other Other PropertyBase.
 		PropertyBase& operator = (const PropertyBase& _other);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -89,12 +116,12 @@ namespace ot {
 		const std::string& additionalPropertyData(void) const { return m_data; };
 
 	private:
-		std::string m_tip;
-		std::string m_name;
-		std::string m_title;
-		std::string m_specialType;
-		std::string m_data;
-		PropertyFlags m_flags;
+		std::string m_tip; //! \brief ToolTip.
+		std::string m_name; //! \brief Property name.
+		std::string m_title; //! \brief Property title.
+		std::string m_specialType; //! \brief Special type identifier.
+		std::string m_data; //! \brief Additional data.
+		PropertyFlags m_flags; //! \brief Flags.
 	};
 
 }
