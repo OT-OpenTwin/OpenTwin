@@ -15,13 +15,13 @@ void ViewerSettings::deleteInstance(void) {
 
 ViewerSettings::ViewerSettings()
 	: workingPlaneStyle_Grid("Grid only"), workingPlaneStyle_Plane("Plane only"), workingPlaneStyle_PlaneGrid("Plane and grid"), workingPlaneStyle("Grid only"),
-	workingPlanePlaneColor(0.6f, 0.6f, 0.6f, 0.12f), workingPlaneGridLineColor(0.65f, 0.65f, 0.65f, 1.0f), workingPlaneGridLineWidth(1), workingPlaneWideGridLineWidth(2), workingPlaneAutoSize(true),
+	workingPlanePlaneColor(153, 153, 153, 31), workingPlaneGridLineColor(166, 166, 166, 255), workingPlaneGridLineWidth(1), workingPlaneWideGridLineWidth(2), workingPlaneAutoSize(true),
 	workingPlaneSize(10), workingPlaneDefaultSize(10), workingPlaneGridResolution(1.f), workingPlaneHighlightEveryStep(5), workingPlaneAutoGridResolution(true),
-	axisXColor(1.f, 0.f, 0.f, 1.f), axisYColor(0.f, 1.f, 0.f, 1.f), axisZColor(0.f, 0.f, 1.f, 1.f), axisCenterColor(0.5f, 0.5f, 0.5f, 1.f), axisCenterCrossLineWidth(3),
+	axisXColor(255, 0, 0, 255), axisYColor(0, 255, 0, 255), axisZColor(0, 0, 255, 255), axisCenterColor(127, 127, 127, 255), axisCenterCrossLineWidth(3),
 	axisCenterCrossDashedLineVisible(true), axisCenterCrossLineAtFront(false),
-	geometryHighlightColor(1.f, 0.f, 0.f, 1.f), geometryEdgeColorMode("Same as geometry"), geometryEdgeColorMode_geom("Same as geometry"), geometryEdgeColorMode_custom("Custom"),
-	geometryEdgeColorMode_noColor("No Color"), geometryEdgeColor(1.f, 0.f, 0.f, 1.f), geometryLightSourceDistance("Medium"),
-	viewBackgroundColorAutomatic(true), viewBackgroundColor(1.0f, 1.0f, 1.0f, 1.0f), viewForegroundColor(0.0f, 0.0f, 0.0f, 0.0f), useDisplayLists(true), useVertexBufferObjects(false)
+	geometryHighlightColor(255, 0, 0, 255), geometryEdgeColorMode("Same as geometry"), geometryEdgeColorMode_geom("Same as geometry"), geometryEdgeColorMode_custom("Custom"),
+	geometryEdgeColorMode_noColor("No Color"), geometryEdgeColor(255, 0, 0, 255), geometryLightSourceDistance("Medium"),
+	viewBackgroundColorAutomatic(true), viewBackgroundColor(255, 255, 255, 255), viewForegroundColor(0, 0, 0, 255), useDisplayLists(true), useVertexBufferObjects(false)
 {}
 
 ViewerSettings::~ViewerSettings() {}
