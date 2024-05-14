@@ -44,7 +44,6 @@ namespace ot {
 		void memClear(void);
 
 		std::list<GraphicsItemCfg*> m_items;
-
 	};
 
 }

@@ -24,9 +24,30 @@ ot::GraphicsGroupItem::~GraphicsGroupItem() {
 
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions: GraphicsItem
+
 bool ot::GraphicsGroupItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
-	return ot::GraphicsItem::setupFromConfig(_cfg);
+	if (!ot::GraphicsItem::setupFromConfig(_cfg)) return false;
+
+	ot::GraphicsGroupItemCfg* cfg = dynamic_cast<ot::GraphicsGroupItemCfg*>(_cfg);
+	if (cfg == nullptr) {
+		OT_LOG_EA("Invalid configuration provided: Cast failed");
+		return false;
+	}
+
+	for (GraphicsItemCfg* i : cfg->items()) {
+		OTAssertNullptr(i);
+
+		ot::GraphicsItem* itm = ot::GraphicsItemFactory::instance().itemFromConfig(i);
+		if (itm) {
+			this->addItem(itm);
+		}
+	}
+
+	return true;
 }
 
 void ot::GraphicsGroupItem::removeAllConnections(void) {
@@ -37,20 +58,38 @@ void ot::GraphicsGroupItem::prepareGraphicsItemGeometryChange(void) {
 	this->prepareGeometryChange();
 }
 
-QSizeF ot::GraphicsGroupItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->handleGetGraphicsItemSizeHint(_hint, this->boundingRect().size());
+void ot::GraphicsGroupItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	this->paint(_painter, _opt, _widget);
 }
+
+void ot::GraphicsGroupItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) {
+	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
+	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
+}
+
+QSizeF ot::GraphicsGroupItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return this->sizeHint(_hint, _constrains);
+}
+
+ot::GraphicsItem* ot::GraphicsGroupItem::findItem(const std::string& _itemName) {
+	if (_itemName == this->graphicsItemName()) return this;
+
+	for (auto i : this->childItems()) {
+		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
+		if (itm) {
+			auto r = itm->findItem(_itemName);
+			if (r) return r;
+		}
+	}
+	return nullptr;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions: QGraphicsItem
 
 QRectF ot::GraphicsGroupItem::boundingRect(void) const {
-	//return QGraphicsItemGroup::boundingRect();
 	return this->handleGetGraphicsItemBoundingRect(QGraphicsItemGroup::boundingRect());
-}
-
-void ot::GraphicsGroupItem::setGeometry(const QRectF& _rect) {
-	this->prepareGeometryChange();
-	this->setPos(_rect.topLeft());
-	this->handleSetItemGeometry(_rect);
-	QGraphicsLayoutItem::setGeometry(_rect);
 }
 
 QVariant ot::GraphicsGroupItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
@@ -76,33 +115,34 @@ void ot::GraphicsGroupItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 	this->handleHoverLeaveEvent(_event);
 }
 
-void ot::GraphicsGroupItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->paint(_painter, _opt, _widget);
-}
-
 void ot::GraphicsGroupItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paintStateBackground(_painter, _opt, _widget);
 	QGraphicsItemGroup::paint(_painter, _opt, _widget);
 }
 
-void ot::GraphicsGroupItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) {
-	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
-	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions: QGraphicsLayoutItem
+
+QSizeF ot::GraphicsGroupItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
+	return this->handleGetGraphicsItemSizeHint(_hint, this->boundingRect().size());
 }
 
-ot::GraphicsItem* ot::GraphicsGroupItem::findItem(const std::string& _itemName) {
-	if (_itemName == this->graphicsItemName()) return this;
-
-	for (auto i : this->childItems()) {
-		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
-		if (itm) {
-			auto r = itm->findItem(_itemName);
-			if (r) return r;
-		}
-	}
-	return nullptr;
+void ot::GraphicsGroupItem::setGeometry(const QRectF& _rect) {
+	this->prepareGeometryChange();
+	this->setPos(_rect.topLeft());
+	this->handleSetItemGeometry(_rect);
+	QGraphicsLayoutItem::setGeometry(_rect);
 }
 
-QSizeF ot::GraphicsGroupItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->sizeHint(_hint, _constrains);
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter / Getter
+
+void ot::GraphicsGroupItem::addItem(GraphicsItem* _item) {
+	OTAssertNullptr(_item);
+
+	_item->setParentGraphicsItem(this);
+
+	this->addToGroup(_item->getQGraphicsItem());
 }
