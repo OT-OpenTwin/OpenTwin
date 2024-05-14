@@ -15,6 +15,7 @@
 #include "EntityBlockCircuitVoltageMeter.h"
 #include "EntityBlockCircuitCurrentMeter.h"
 #include "EntityBlockCircuitCapacitor.h"
+#include "EntityBlockCircuitInductor.h"
 
 EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 {
@@ -69,6 +70,10 @@ EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 	else if (entityType == "EntityBlockCircuitCapacitor")
 	{
 		return new EntityBlockCircuitCapacitor(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntityBlockCircuitInductor")
+	{
+		return new EntityBlockCircuitInductor(0, nullptr, nullptr, nullptr, this, "");
 	}
 
 	return ClassFactoryHandlerAbstract::CreateEntity(entityType);

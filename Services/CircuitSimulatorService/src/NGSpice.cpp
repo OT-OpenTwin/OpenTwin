@@ -12,6 +12,8 @@
 #include "EntityBlockCircuitDiode.h"
 #include "EntityBlockCircuitVoltageMeter.h"
 #include "EntityBlockCircuitCapacitor.h"
+#include "EntityBlockCircuitInductor.h"
+
 //Third Party Header
 #include <string>
 #include <algorithm>
@@ -20,6 +22,7 @@
 #include <functional>
 #include <unordered_set>
 #include <boost/functional/hash.hpp>
+
 //C++ Header
 #include <sstream>
 namespace Numbers
@@ -30,6 +33,7 @@ namespace Numbers
 	static unsigned long long diodeNetlistNumber = 0;
 	static unsigned long long RshunNumbers = 0;
 	static unsigned long long capacitorNetlistNumber = 0;
+	static unsigned long long inductorNetlistNumber = 0;
 
 }
 
@@ -225,6 +229,11 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto myElement = dynamic_cast<EntityBlockCircuitCapacitor*>(blockEntity.get());
 			element.setValue(myElement->getElementType());
 		}
+		else if (blockEntity->getBlockTitle() == "Inductor")
+		{
+			auto myElement = dynamic_cast<EntityBlockCircuitInductor*>(blockEntity.get());
+			element.setValue(myElement->getElementType());
+		}
 		
 
 		it->second.addElement(element.getUID(), element);
@@ -405,7 +414,12 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		}
 		else if (element.getItemName() == "Capacitor")
 		{
-			netlistElementName = "C" + std::to_string(++Numbers::resistorNetlistNumber);
+			netlistElementName = "C" + std::to_string(++Numbers::capacitorNetlistNumber);
+			netlistLine += netlistElementName + " ";
+		}
+		else if (element.getItemName() == "Inductor")
+		{
+			netlistElementName = "L" + std::to_string(++Numbers::inductorNetlistNumber);
 			netlistLine += netlistElementName + " ";
 		}
 		
@@ -527,7 +541,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
-	ngSpice_Command(const_cast<char*>("circbyline print all"));
+	//ngSpice_Command(const_cast<char*>("circbyline print all"));
 	//ngSpice_Command(const_cast<char*>(printSettings.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .endc"));
 	ngSpice_Command(const_cast<char*>("circbyline .end"));
@@ -620,7 +634,10 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 	 Numbers::nodeNumber = 0;
 	 Numbers::resistorNetlistNumber = 0;
 	 Numbers::voltageSourceNetlistNumber = 0;
-	 
+	 Numbers::diodeNetlistNumber = 0;
+	 Numbers::RshunNumbers = 0;
+	 Numbers::capacitorNetlistNumber = 0;
+	 Numbers::inductorNetlistNumber = 0;
 	/*char command[1000];
 	const char* netlist = "C:/Users/Sebastian/Desktop/NGSpice_Dateien_Test/Test.cir";
 	sprintf_s(command, sizeof(command), "source %s", netlist);
