@@ -1,3 +1,8 @@
+//! \file Application.h
+//! \author Alexander Kuester (alexk95)
+//! \date April 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
 #include "OTSystem/SystemAPIExport.h"
@@ -6,6 +11,9 @@
 #include <string>
 
 namespace ot {
+
+	//! \namespace app
+	//! \brief The app namespace contains several functions that may be used to start processes.
 	namespace app {
 		//! Describes the result of a run application request
 		enum RunResult {

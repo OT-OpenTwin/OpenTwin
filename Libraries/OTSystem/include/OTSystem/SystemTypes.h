@@ -1,10 +1,16 @@
+//! \file SystemTypes.h
+//! \author Alexander Kuester (alexk95)
+//! \date April 2023
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
 #include "OTSystem/ArchitectureInfo.h"
 
 namespace ot {
 
-	//! @brief Port number type (unsigned 16 bit Integer)
+	//! \typedef port_t
+	//! \brief Port number type.
 	typedef unsigned short int port_t;
 }
 
@@ -12,17 +18,22 @@ namespace ot {
 
 #include <Windows.h>
 
-//! @brief Process handle
+//! \def OT_PROCESS_HANDLE
+//! \brief Process handle
 #define OT_PROCESS_HANDLE HANDLE
 
-//! @brief Invalid process handle
+//! \def OT_INVALID_PROCESS_HANDLE
+//! \brief Invalid process handle
 #define OT_INVALID_PROCESS_HANDLE nullptr
 
-//! @brief Infinite timeout
+//! \def OT_INFINITE_TIMEOUT
+//! \brief Infinite timeout
 #define OT_INFINITE_TIMEOUT INFINITE
 
 namespace  ot {
-	//! @brief Instance to an loaded external library
+
+	//! \typedef ExternalLibraryInstance_t
+	//! \brief Instance type for a loaded external library.
 	typedef HINSTANCE ExternalLibraryInstance_t;
 }
 
