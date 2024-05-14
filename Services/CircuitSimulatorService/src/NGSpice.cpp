@@ -11,6 +11,7 @@
 #include "EntityBlockConnection.h"
 #include "EntityBlockCircuitDiode.h"
 #include "EntityBlockCircuitVoltageMeter.h"
+#include "EntityBlockCircuitCapacitor.h"
 //Third Party Header
 #include <string>
 #include <algorithm>
@@ -28,6 +29,7 @@ namespace Numbers
 	static unsigned long long resistorNetlistNumber = 0;
 	static unsigned long long diodeNetlistNumber = 0;
 	static unsigned long long RshunNumbers = 0;
+	static unsigned long long capacitorNetlistNumber = 0;
 
 }
 
@@ -218,9 +220,13 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto myElement = dynamic_cast<EntityBlockCircuitDiode*>(blockEntity.get());
 			element.setValue(myElement->getElementType());
 		}
+		else if (blockEntity->getBlockTitle() == "Capacitor")
+		{
+			auto myElement = dynamic_cast<EntityBlockCircuitCapacitor*>(blockEntity.get());
+			element.setValue(myElement->getElementType());
+		}
 		
 
-		
 		it->second.addElement(element.getUID(), element);
 	}
 
@@ -397,6 +403,11 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 				continue;
 			}
 		}
+		else if (element.getItemName() == "Capacitor")
+		{
+			netlistElementName = "C" + std::to_string(++Numbers::resistorNetlistNumber);
+			netlistLine += netlistElementName + " ";
+		}
 		
 		
 
@@ -516,6 +527,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
+	ngSpice_Command(const_cast<char*>("circbyline print all"));
 	//ngSpice_Command(const_cast<char*>(printSettings.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .endc"));
 	ngSpice_Command(const_cast<char*>("circbyline .end"));

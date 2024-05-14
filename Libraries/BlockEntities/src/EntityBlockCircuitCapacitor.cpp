@@ -1,4 +1,4 @@
-#include "EntityBlockCircuitCurrentMeter.h"
+#include "EntityBlockCircuitCapacitor.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/GraphicsStackItemCfg.h"
 #include "OTGui/GraphicsImageItemCfg.h"
@@ -8,33 +8,48 @@
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
 
-EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
+EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-	_navigationTreeIconName = "CurrentMeter";
-	_navigationTreeIconNameHidden = "CurrentMeter";
-	_blockTitle = "Curren Meter";
+	_navigationTreeIconName = "Capacitor";
+	_navigationTreeIconNameHidden = "Capacitor";
+	_blockTitle = "Capacitor";
 
-	const std::string connectorNameLeft = "Left6";
+	const std::string connectorNameLeft = "Left7";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };
 	_connectorsByName[connectorNameLeft] = m_LeftConnector;
 
-	const std::string connectorNameRight = "Right6";
+	const std::string connectorNameRight = "Right7";
 	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
 	_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
-ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg()
+void EntityBlockCircuitCapacitor::createProperties()
+{
+	EntityPropertiesString::createProperty("Element Property", "Capacity", "10uF", "default", getProperties());
+}
+
+
+std::string EntityBlockCircuitCapacitor::getElementType()
+{
+	auto propertyBase = getProperties().getProperty("Capacity");
+	auto elementType = dynamic_cast<EntityPropertiesString*>(propertyBase);
+	assert(elementType != nullptr);
+
+	return elementType->getValue();
+}
+
+ot::GraphicsItemCfg* EntityBlockCircuitCapacitor::CreateBlockCfg()
 {
 	ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
-	
+
 	myStack->setName("EntityBlock");
-	myStack->setTitle("EntityBlockCircuitCurrentMeter");
+	myStack->setTitle("EntityBlockCircuitCapacitor");
 	myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
 
 	//Second I create an Image
 	ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
-	image->setImagePath("CircuitElementImages/CurrentMeter.png");
+	image->setImagePath("CircuitElementImages/Capacitor.png");
 	image->setSizePolicy(ot::SizePolicy::Dynamic);
 	image->setMaintainAspectRatio(true);
 
@@ -48,7 +63,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg()
 
 	// Now i want connections on the item for this i need rectangle items
 	ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
-	connection1->setName("Left6");
+	connection1->setName("Left7");
 	ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Blue));
 	connection1->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
 	connection1->setBackgroundPainer(painter1);
@@ -56,7 +71,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg()
 	connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
 
 	ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
-	connection2->setName("Right6");
+	connection2->setName("Right7");
 	ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Blue));
 	connection2->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
 	connection2->setBackgroundPainer(painter2);
@@ -75,12 +90,12 @@ ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg()
 	return myStack;
 }
 
-void EntityBlockCircuitCurrentMeter::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityBlockCircuitCapacitor::AddStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBlock::AddStorageData(storage);
 }
 
-void EntityBlockCircuitCurrentMeter::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityBlockCircuitCapacitor::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }

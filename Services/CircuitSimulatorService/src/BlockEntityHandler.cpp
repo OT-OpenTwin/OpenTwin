@@ -16,6 +16,7 @@
 #include "EntityBlockCircuitDiode.h"
 #include "EntityBlockCircuitVoltageMeter.h"
 #include "EntityBlockCircuitCurrentMeter.h"
+#include "EntityBlockCircuitCapacitor.h"
 // Third Party Header
 
 //C++
@@ -276,6 +277,12 @@ void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<Ent
 	{
 		diode->createProperties();
 	}
+
+	EntityBlockCircuitCapacitor* capacitor = dynamic_cast<EntityBlockCircuitCapacitor*>(blockEntity.get());
+	if (capacitor != nullptr)
+	{
+		capacitor->createProperties();
+	}
 	
 }
 
@@ -294,7 +301,9 @@ ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker()
 	EntityBlockCircuitDiode diode(0, nullptr, nullptr, nullptr, nullptr, "");
 	EntityBlockCircuitVoltageMeter voltMeter(0, nullptr, nullptr, nullptr, nullptr, "");
 	EntityBlockCircuitCurrentMeter currentMeter(0, nullptr, nullptr, nullptr, nullptr, "");
+	EntityBlockCircuitCapacitor capacitor(0, nullptr, nullptr, nullptr, nullptr, "");
 
+	a1->addItem(capacitor.getClassName(), capacitor.CreateBlockHeadline(), "CircuitElementImages/Capacitor.png");
 	a1->addItem(element.getClassName(), element.CreateBlockHeadline(), "CircuitElementImages/VoltageSource.png");
 	a1->addItem(resistor.getClassName(), resistor.CreateBlockHeadline(), "CircuitElementImages/ResistorBG.png");
 	a1->addItem(diode.getClassName(), diode.CreateBlockHeadline(), "CircuitElementImages/Diod2.png");
