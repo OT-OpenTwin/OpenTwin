@@ -174,6 +174,33 @@ Function GetParent
  
 FunctionEnd
 
+Function un.GetParent
+ 
+  Exch $R0
+  Push $R1
+  Push $R2
+  Push $R3
+ 
+  StrCpy $R1 0
+  StrLen $R2 $R0
+ 
+  loop:
+    IntOp $R1 $R1 + 1
+    IntCmp $R1 $R2 get 0 get
+    StrCpy $R3 $R0 1 -$R1
+    StrCmp $R3 "\" get
+  Goto loop
+ 
+  get:
+    StrCpy $R0 $R0 -$R1
+ 
+    Pop $R3
+    Pop $R2
+    Pop $R1
+    Exch $R0
+ 
+FunctionEnd
+
 Function UninstallExisting
 	Exch $1 ; uninstcommand
 	Push $2 ; Uninstaller
@@ -811,7 +838,8 @@ Section -Post
 	WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\OpenTwin.exe"
 	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
 	WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayName" "${PRODUCT_NAME}"
-	WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$INSTDIR\OpenTwin.exe,0"
+	WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "Publisher" "http://www.opentwin.net"
+	WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" ${OPENTWIN_APP_ICON}
 	WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "UninstallString" '"$INSTDIR\Uninstall_OpenTwin.exe"'
 	WriteRegDWORD HKLM "${REGPATH_UNINSTSUBKEY}" "NoModify" 1
 	WriteRegDWORD HKLM "${REGPATH_UNINSTSUBKEY}" "NoRepair" 1
@@ -943,15 +971,29 @@ Function un.onUninstSuccess
   MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) was successfully removed from your computer."
 FunctionEnd
 
-Function un.onInit
+Function un.onInit	
   	MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +1 IDNO AbortUninstall
   	MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Do you also want to uninstall MongoDB and all of its components?" IDYES +1 IDNO +3
 	StrCpy $UNINSTALL_MONGODB_FLAG 1
-		Goto +5
+		Goto +4
 	StrCpy $UNINSTALL_MONGODB_FLAG 0
-		Goto +3
+		Goto +2
 AbortUninstall:
-  Abort
+    Abort
+ 			
+	SetRegView 32
+  	ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "UninstallString"
+	
+	Push $0
+	Call un.GetParent
+	Pop $R0 ; this is the installation directory
+	
+	StrCpy $1 "$R0" "" 1
+	
+	GetFullPathName $3 "$1\ShutdownAll.bat" 
+	SetOutPath "$1"
+						
+	ExecWait '"$3"'
 FunctionEnd
 
 #.onInit function to initialize any values that need initializing at the beginning of the script
