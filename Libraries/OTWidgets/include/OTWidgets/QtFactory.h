@@ -21,6 +21,7 @@
 #include <QtGui/qpen.h>
 #include <QtGui/qcolor.h>
 #include <QtGui/qbrush.h>
+#include <QtGui/qevent.h>
 #include <QtGui/qpainterpath.h>
 
 namespace ot {
@@ -60,6 +61,8 @@ namespace ot {
 		static QPen toPen(const OutlineF& _outline);
 
 		static QPainterPath toPainterPath(const Path2DF& _path);
+
+		static QString toString(QEvent::Type _type);
 
 	private:
 		QtFactory() {};
