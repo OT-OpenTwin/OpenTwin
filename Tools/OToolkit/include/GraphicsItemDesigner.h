@@ -10,56 +10,35 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/QWidgetInterface.h"
 
 // Qt header
 #include <QtCore/qobject.h>
 
 class QWidget;
-class GraphicsItemDesigner;
+class GraphicsItemDesignerView;
+class GraphicsItemDesignerToolBar;
+class GraphicsItemDesignerInfoOverlay;
 namespace ot { class PropertyGrid; };
-namespace ot { class GraphicsView; };
 
-class GraphicsItemDesignerToolBar : public QObject, public ot::QWidgetInterface {
+class GraphicsItemDesigner : public QObject, public otoolkit::Tool {
 	Q_OBJECT
 public:
 	enum DesignerMode {
 		NoMode,
-		LineMode,
-		SquareMode,
-		RectMode,
-		TriangleMode,
-		PolygonMode,
-		ShapeMode
+		LineStartMode,
+		LineEndMode,
+		SquareStartMode,
+		SquareEndMode,
+		RectStartMode,
+		RectEndMode,
+		TriangleStartMode,
+		TriangleEndMode,
+		PolygonStartMode,
+		PolygonStepMode,
+		ShapeStartMode,
+		ShapeStepMode
 	};
 
-	GraphicsItemDesignerToolBar(GraphicsItemDesigner* _designer);
-	virtual ~GraphicsItemDesignerToolBar();
-
-	virtual QWidget* getQWidget(void) override { return m_widget; };
-
-	DesignerMode getMode(void) const { return m_mode; };
-
-Q_SIGNALS:
-	void modeChanged(void);
-
-private Q_SLOTS:
-	void slotLine(void);
-	void slotSquare(void);
-	void slotRect(void);
-	void slotTriangle(void);
-	void slotPolygon(void);
-	void slotShape(void);
-
-private:
-	DesignerMode m_mode;
-	QWidget* m_widget;
-	GraphicsItemDesigner* m_designer;
-
-};
-
-class GraphicsItemDesigner : public QObject, public otoolkit::Tool {
-public:
 	GraphicsItemDesigner();
 	virtual ~GraphicsItemDesigner() {};
 
@@ -76,8 +55,24 @@ public:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
+	// Setter / Getter
+
+	GraphicsItemDesignerView* getView(void) const { return m_view; };
+	ot::PropertyGrid* getPropertyGrid(void) const { return m_props; };
+	GraphicsItemDesignerToolBar* getToolBar(void) const { return m_toolBar; };
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Slots
+
+private Q_SLOTS:
+	void slotModeRequested(DesignerMode _mode);
+	void slotPointSelected(const QPointF& _pt);
+	void cancelModeRequested(void);
+
 private:
-	ot::GraphicsView* m_view;
+	GraphicsItemDesignerView* m_view;
 	ot::PropertyGrid* m_props;
 	GraphicsItemDesignerToolBar* m_toolBar;
+	GraphicsItemDesignerInfoOverlay* m_overlay;
 };

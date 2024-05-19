@@ -31,7 +31,7 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsView : public QGraphicsView {
 		Q_OBJECT
 	public:
-		GraphicsView();
+		GraphicsView(GraphicsScene* _scene = (GraphicsScene*)nullptr);
 		virtual ~GraphicsView();
 
 		void resetView(void);

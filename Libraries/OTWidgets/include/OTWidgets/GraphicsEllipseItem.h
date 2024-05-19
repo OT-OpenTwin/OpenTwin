@@ -48,6 +48,9 @@ namespace ot {
 		double radiusX(void) const { return m_radiusX; };
 		double radiusY(void) const { return m_radiusY; };
 
+		void setBrush(const QBrush& _brush) { m_brush = _brush; };
+		void setPen(const QPen& _pen) { m_pen = _pen; };
+
 	private:
 		QBrush m_brush;
 		QPen m_pen;

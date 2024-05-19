@@ -18,8 +18,11 @@
 #include <QtWidgets/qscrollbar.h>
 #include <QtWidgets/qgraphicsproxywidget.h>
 
-ot::GraphicsView::GraphicsView() : m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false), m_stateChangeInProgress(false) {
-	m_scene = new GraphicsScene(this);
+ot::GraphicsView::GraphicsView(GraphicsScene* _scene) 
+	: m_scene(_scene), m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false), m_stateChangeInProgress(false) 
+{
+	if (!m_scene) m_scene = new GraphicsScene(this);
+
 	this->setScene(m_scene);
 	this->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
 	this->setAlignment(Qt::AlignAbsolute);

@@ -25,6 +25,10 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FAR.cpp" />
     <ClCompile Include="src\GraphicsItemDesigner.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerInfoOverlay.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerScene.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerToolBar.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerView.cpp" />
     <ClCompile Include="src\ImageEditor.cpp" />
     <ClCompile Include="src\JSONEditor.cpp" />
     <ClCompile Include="src\LogVisualization.cpp" />
@@ -49,6 +53,10 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\GraphicsItemDesigner.h" />
+    <QtMoc Include="include\GraphicsItemDesignerToolBar.h" />
+    <ClInclude Include="include\GraphicsItemDesignerInfoOverlay.h" />
+    <QtMoc Include="include\GraphicsItemDesignerView.h" />
+    <ClInclude Include="include\GraphicsItemDesignerScene.h" />
     <ClInclude Include="include\WidgetTest.h" />
     <QtMoc Include="include\ColorStyleEditor.h" />
     <QtMoc Include="include\ToolMenuManager.h" />

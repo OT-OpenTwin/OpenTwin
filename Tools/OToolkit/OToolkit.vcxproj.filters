@@ -46,6 +46,12 @@
     <Filter Include="Source Files\Dialog">
       <UniqueIdentifier>{5f240c6c-5923-407d-8a1f-86d8ed8b17a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\GraphicsItemDesigner">
+      <UniqueIdentifier>{b99be78f-a6d0-434b-aaa5-d6364ac416f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GraphicsItemDesigner">
+      <UniqueIdentifier>{f2ff8b39-260b-4903-886c-94492ba31963}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AppBase.cpp">
@@ -100,7 +106,19 @@
       <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsItemDesigner.cpp">
-      <Filter>Source Files\Tools</Filter>
+      <Filter>Source Files\GraphicsItemDesigner</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsItemDesignerToolBar.cpp">
+      <Filter>Source Files\GraphicsItemDesigner</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsItemDesignerInfoOverlay.cpp">
+      <Filter>Source Files\GraphicsItemDesigner</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsItemDesignerView.cpp">
+      <Filter>Source Files\GraphicsItemDesigner</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsItemDesignerScene.cpp">
+      <Filter>Source Files\GraphicsItemDesigner</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +133,12 @@
     </ClInclude>
     <ClInclude Include="include\WidgetTest.h">
       <Filter>Header Files\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsItemDesignerInfoOverlay.h">
+      <Filter>Header Files\GraphicsItemDesigner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsItemDesignerScene.h">
+      <Filter>Header Files\GraphicsItemDesigner</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -154,8 +178,14 @@
     <QtMoc Include="include\ImageEditor.h">
       <Filter>Header Files\Tools</Filter>
     </QtMoc>
+    <QtMoc Include="include\GraphicsItemDesignerToolBar.h">
+      <Filter>Header Files\GraphicsItemDesigner</Filter>
+    </QtMoc>
     <QtMoc Include="include\GraphicsItemDesigner.h">
-      <Filter>Header Files\Tools</Filter>
+      <Filter>Header Files\GraphicsItemDesigner</Filter>
+    </QtMoc>
+    <QtMoc Include="include\GraphicsItemDesignerView.h">
+      <Filter>Header Files\GraphicsItemDesigner</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

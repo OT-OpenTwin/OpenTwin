@@ -16,7 +16,7 @@
 namespace ot {
 
 	//! \class OverlayWidgetBase
-	class OverlayWidgetBase : public QFrame {
+	class OT_WIDGETS_API_EXPORT OverlayWidgetBase : public QFrame {
 		OT_DECL_NOCOPY(OverlayWidgetBase)
 		OT_DECL_NODEFAULT(OverlayWidgetBase)
 	public:
