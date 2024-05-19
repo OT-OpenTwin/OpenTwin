@@ -152,6 +152,10 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 
 void ot::GraphicsItem::handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 	this->handleToolTip(_event);
+	if (m_flags & GraphicsItemCfg::ItemHasNoFeedback) {
+		return;
+	}
+
 	this->m_state |= GraphicsItem::HoverState;
 	this->getQGraphicsItem()->update();
 	if (m_highlightItem) {

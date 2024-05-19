@@ -37,6 +37,7 @@ void GraphicsItemDesignerScene::enablePickingMode(void) {
 	m_cursorItem->setBrush(QBrush(QColor(200, 200, 0)));
 	m_cursorItem->setPen(QPen(Qt::NoPen));
 	m_cursorItem->setGraphicsScene(this);
+	m_cursorItem->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHasNoFeedback);
 	m_cursorItem->setFlag(QGraphicsItem::ItemIsSelectable, false);
 
 	this->addItem(m_cursorItem);
@@ -65,6 +66,8 @@ void GraphicsItemDesignerScene::mousePressEvent(QGraphicsSceneMouseEvent* _event
 
 void GraphicsItemDesignerScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 	ot::GraphicsScene::mouseMoveEvent(_event);
+
+	m_view->updateMousePositionInfo(_event->scenePos());
 
 	if (m_cursorItem) {
 		m_cursorItem->setPos(_event->scenePos() - QPointF(m_cursorItem->radiusX(), m_cursorItem->radiusY()));

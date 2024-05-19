@@ -4,18 +4,22 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OToolkit header
+#include "GraphicsItemDesigner.h"
 #include "GraphicsItemDesignerView.h"
 #include "GraphicsItemDesignerScene.h"
+#include "GraphicsItemDesignerViewStatusOverlay.h"
 
 // OpenTwin header
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsEllipseItem.h"
 
-GraphicsItemDesignerView::GraphicsItemDesignerView() 
+GraphicsItemDesignerView::GraphicsItemDesignerView()
 	: m_cursorItem(nullptr), m_mode(NoMode)
 {
 	m_scene = new GraphicsItemDesignerScene(this);
 	this->setScene(m_scene);
+
+	m_infoOverlay = new GraphicsItemDesignerViewStatusOverlay(this);
 }
 
 GraphicsItemDesignerView::~GraphicsItemDesignerView() {
@@ -42,4 +46,8 @@ void GraphicsItemDesignerView::emitPointSelected(const QPointF& _pt) {
 
 void GraphicsItemDesignerView::emitCancelRequest(void) {
 	Q_EMIT cancelRequested();
+}
+
+void GraphicsItemDesignerView::updateMousePositionInfo(const QPointF& _pt) {
+	m_infoOverlay->setMousePosition(_pt);
 }

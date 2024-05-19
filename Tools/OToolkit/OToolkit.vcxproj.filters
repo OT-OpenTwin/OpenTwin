@@ -120,6 +120,9 @@
     <ClCompile Include="src\GraphicsItemDesignerScene.cpp">
       <Filter>Source Files\GraphicsItemDesigner</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsItemDesignerViewStatusOverlay.cpp">
+      <Filter>Source Files\GraphicsItemDesigner</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -138,6 +141,9 @@
       <Filter>Header Files\GraphicsItemDesigner</Filter>
     </ClInclude>
     <ClInclude Include="include\GraphicsItemDesignerScene.h">
+      <Filter>Header Files\GraphicsItemDesigner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsItemDesignerViewStatusOverlay.h">
       <Filter>Header Files\GraphicsItemDesigner</Filter>
     </ClInclude>
   </ItemGroup>

@@ -12,7 +12,8 @@
 #include <QtGui/qevent.h>
 
 ot::OverlayWidgetBase::OverlayWidgetBase(QWidget* _parent, Alignment _overlayAlignment, const QMargins& _overlayMargins)
-    : QFrame(nullptr, Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint), m_parent(_parent), m_alignment(_overlayAlignment), m_margins(_overlayMargins)
+    : QFrame(nullptr, Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint), m_parent(_parent), 
+    m_alignment(_overlayAlignment), m_margins(_overlayMargins), m_hidden(false)
 {
     OTAssertNullptr(m_parent);
 
@@ -35,7 +36,7 @@ ot::OverlayWidgetBase::~OverlayWidgetBase() {
 bool ot::OverlayWidgetBase::eventFilter(QObject* _watched, QEvent* _event) {
     switch (_event->type()) {
     case QEvent::Show:
-        this->show();
+        if (!m_hidden) this->show();
         this->updateOverlayGeometry();
         break;
     case QEvent::Hide:
@@ -66,7 +67,7 @@ void ot::OverlayWidgetBase::updateOverlayGeometry(void) {
         this->hide();
         return;
     }
-    else if (!this->isVisible() && m_parent->isVisible()) {
+    else if (!this->isVisible() && m_parent->isVisible() && !m_hidden) {
         this->show();
     }
 

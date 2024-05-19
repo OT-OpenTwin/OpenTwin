@@ -116,7 +116,7 @@ void GraphicsItemDesigner::slotModeRequested(DesignerMode _mode) {
 	}
 
 	if (!m_overlay) {
-		m_overlay = new GraphicsItemDesignerInfoOverlay(txt, this);
+		m_overlay = new GraphicsItemDesignerInfoOverlay(txt, m_view);
 	}
 	else {
 

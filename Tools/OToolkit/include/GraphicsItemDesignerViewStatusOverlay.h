@@ -1,4 +1,4 @@
-//! @file GraphicsItemDesignerInfoOverlay.h
+//! @file GraphicsItemDesignerViewStatusOverlay.h
 //! @author Alexander Kuester (alexk95)
 //! @date May 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -14,13 +14,13 @@
 class QLabel;
 class GraphicsItemDesigner;
 
-class GraphicsItemDesignerInfoOverlay : public ot::OverlayWidgetBase {
+class GraphicsItemDesignerViewStatusOverlay : public ot::OverlayWidgetBase {
 public:
-	GraphicsItemDesignerInfoOverlay(const QString& _text, GraphicsItemDesignerView* _view);
+	GraphicsItemDesignerViewStatusOverlay(GraphicsItemDesignerView* _view);
 
-	void setText(const QString& _text);
+	void setMousePosition(const QPointF& _pt);
 
 private:
-	QLabel* m_label;
+	QLabel* m_posLabel;
 
 };

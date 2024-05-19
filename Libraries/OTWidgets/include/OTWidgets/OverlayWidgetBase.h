@@ -26,12 +26,15 @@ namespace ot {
 		void setOverlayMargins(const QMargins& _margins) { m_margins = _margins; this->updateOverlayGeometry(); };
 		const QMargins& overlayMargins(void) const { return m_margins; };
 
+		void setOverlayHidden(bool _hidden) { m_hidden = _hidden; this->updateOverlayGeometry(); };
+
 	protected:
 		virtual bool eventFilter(QObject* _watched, QEvent* _event) override;
 
 	private:
 		void updateOverlayGeometry(void);
 		
+		bool m_hidden;
 		QMargins m_margins;
 		Alignment m_alignment;
 		QWidget* m_parent;

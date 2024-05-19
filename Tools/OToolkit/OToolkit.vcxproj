@@ -29,6 +29,7 @@
     <ClCompile Include="src\GraphicsItemDesignerScene.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerToolBar.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerView.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerViewStatusOverlay.cpp" />
     <ClCompile Include="src\ImageEditor.cpp" />
     <ClCompile Include="src\JSONEditor.cpp" />
     <ClCompile Include="src\LogVisualization.cpp" />
@@ -57,6 +58,7 @@
     <ClInclude Include="include\GraphicsItemDesignerInfoOverlay.h" />
     <QtMoc Include="include\GraphicsItemDesignerView.h" />
     <ClInclude Include="include\GraphicsItemDesignerScene.h" />
+    <ClInclude Include="include\GraphicsItemDesignerViewStatusOverlay.h" />
     <ClInclude Include="include\WidgetTest.h" />
     <QtMoc Include="include\ColorStyleEditor.h" />
     <QtMoc Include="include\ToolMenuManager.h" />

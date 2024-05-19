@@ -8,7 +8,9 @@
 // OpenTwin header
 #include "OTWidgets/GraphicsView.h"
 
+class GraphicsItemDesigner;
 class GraphicsItemDesignerScene;
+class GraphicsItemDesignerViewStatusOverlay;
 namespace ot { class GraphicsEllipseItem; }
 
 class GraphicsItemDesignerView : public ot::GraphicsView {
@@ -40,7 +42,9 @@ private:
 
 	void emitPointSelected(const QPointF& _pt);
 	void emitCancelRequest(void);
+	void updateMousePositionInfo(const QPointF& _pt);
 
+	GraphicsItemDesignerViewStatusOverlay* m_infoOverlay;
 	GraphicsItemDesignerScene* m_scene;
 	ot::GraphicsEllipseItem* m_cursorItem;
 	Mode m_mode;
