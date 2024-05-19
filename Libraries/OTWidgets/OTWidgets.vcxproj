@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\OTWidgets\OverlayWidgetBase.cpp" />
     <ClCompile Include="src\BasicWidgetView.cpp" />
     <ClCompile Include="src\CheckBox.cpp" />
     <ClCompile Include="src\ColorPickButton.cpp" />
@@ -129,6 +130,7 @@
     <ClCompile Include="src\ToolTipHandler.cpp" />
     <ClCompile Include="src\TreeWidget.cpp" />
     <ClCompile Include="src\TreeWidgetFilter.cpp" />
+    <ClCompile Include="src\WidgetEventNotifier.cpp" />
     <ClCompile Include="src\WidgetView.cpp" />
     <ClCompile Include="src\WidgetViewFactory.cpp" />
     <ClCompile Include="src\WidgetViewManager.cpp" />
@@ -149,6 +151,7 @@
     <QtMoc Include="include\OTWidgets\Painter2DPreview.h" />
     <QtMoc Include="include\OTWidgets\Label.h" />
     <QtMoc Include="include\OTWidgets\ImagePreview.h" />
+    <ClInclude Include="include\OTWidgets\OverlayWidgetBase.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridView.h" />
@@ -158,6 +161,9 @@
     <QtMoc Include="include\OTWidgets\TextEditorSearchPopup.h" />
     <QtMoc Include="include\OTWidgets\Splitter.h" />
     <ClInclude Include="include\OTWidgets\TextEditorView.h" />
+    <ClInclude Include="include\OTWidgets\WidgetEventHandler.h" />
+    <ClInclude Include="include\OTWidgets\WidgetEventHandler.hpp" />
+    <ClInclude Include="include\OTWidgets\WidgetEventNotifier.h" />
     <ClInclude Include="include\OTWidgets\WidgetProperties.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewFactory.h" />
