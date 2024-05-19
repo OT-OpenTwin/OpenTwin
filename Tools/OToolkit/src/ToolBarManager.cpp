@@ -71,6 +71,10 @@ void ToolBarManager::addTool(const QString& _toolName, QToolBar* _toolBar) {
 	}
 
 	m_toolBars.insert_or_assign(_toolName, _toolBar);
+
+	if (m_currentTool.isEmpty()) {
+		this->setCurrentTool(_toolName);
+	}
 }
 
 void ToolBarManager::removeTool(const QString& _toolName) {

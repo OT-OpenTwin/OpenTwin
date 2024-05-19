@@ -10,25 +10,20 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTWidgets/QWidgetInterface.h"
 
 // Qt header
-#include <QtCore/qobject.h>
+#include <QtWidgets/qtoolbar.h>
 
 // std header
 #include <list>
 
 class QGridLayout;
 
-class GraphicsItemDesignerToolBar : public QObject, public ot::QWidgetInterface {
+class GraphicsItemDesignerToolBar : public QToolBar {
 	Q_OBJECT
 public:
 	GraphicsItemDesignerToolBar(GraphicsItemDesigner* _designer);
 	virtual ~GraphicsItemDesignerToolBar();
-
-	virtual QWidget* getQWidget(void) override { return m_widget; };
-
-	virtual bool eventFilter(QObject* _obj, QEvent* _event) override;
 
 Q_SIGNALS:
 	void modeRequested(GraphicsItemDesigner::DesignerMode _mode);
@@ -46,11 +41,5 @@ private Q_SLOTS:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 private:
-	void rearrangeWidgets(void);
-
-	QWidget* m_widget;
-	QGridLayout* m_optionsLayout;
 	GraphicsItemDesigner* m_designer;
-
-	std::list<QWidget* > m_options;
 };

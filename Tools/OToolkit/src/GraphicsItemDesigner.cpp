@@ -17,7 +17,7 @@
 #include "OTWidgets/PropertyGridGroup.h"
 
 GraphicsItemDesigner::GraphicsItemDesigner() 
-	: m_view(nullptr), m_props(nullptr), m_toolBar(nullptr), m_overlay(nullptr)
+	: m_view(nullptr), m_props(nullptr), m_toolBar(nullptr), m_overlay(nullptr), m_mode(NoMode)
 {
 
 }
@@ -36,8 +36,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	_content.addView(view);
 	
 	m_toolBar = new GraphicsItemDesignerToolBar(this);
-	view = this->createToolWidgetView(m_toolBar->getQWidget(), "GID Elements");
-	_content.addView(view);
+	_content.setToolBar(m_toolBar);
 
 	// Connect signals
 	this->connect(m_view, &GraphicsItemDesignerView::pointSelected, this, &GraphicsItemDesigner::slotPointSelected);
@@ -52,7 +51,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 void GraphicsItemDesigner::slotModeRequested(DesignerMode _mode) {
 	if (_mode == NoMode) return;
 
-	m_toolBar->getQWidget()->setEnabled(false);
+	m_toolBar->setEnabled(false);
 
 	QString txt;
 	bool selectPointRequired = false;
@@ -115,6 +114,8 @@ void GraphicsItemDesigner::slotModeRequested(DesignerMode _mode) {
 		break;
 	}
 
+	m_mode = _mode;
+
 	if (!m_overlay) {
 		m_overlay = new GraphicsItemDesignerInfoOverlay(txt, m_view);
 	}
@@ -132,5 +133,13 @@ void GraphicsItemDesigner::slotPointSelected(const QPointF& _pt) {
 }
 
 void GraphicsItemDesigner::cancelModeRequested(void) {
-	m_view->disablePickingMode();
+	if (m_mode != NoMode) {
+		m_view->disablePickingMode();
+		m_toolBar->setEnabled(true);
+
+		if (m_overlay) {
+			delete m_overlay;
+			m_overlay = nullptr;
+		}
+	}
 }

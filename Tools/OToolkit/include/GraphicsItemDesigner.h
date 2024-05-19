@@ -71,6 +71,7 @@ private Q_SLOTS:
 	void cancelModeRequested(void);
 
 private:
+	DesignerMode m_mode;
 	GraphicsItemDesignerView* m_view;
 	ot::PropertyGrid* m_props;
 	GraphicsItemDesignerToolBar* m_toolBar;
