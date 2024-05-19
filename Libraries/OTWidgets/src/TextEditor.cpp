@@ -320,8 +320,7 @@ void ot::TextEditor::slotFindRequested(void) {
 		m_searchPopup = new TextEditorSearchPopup(this);
 		m_searchPopup->updatePosition(true);
 		m_searchPopup->setVisible(true);
-		this->installEventFilter(m_searchPopup);
-
+		
 		this->connect(m_searchPopup, &TextEditorSearchPopup::popupClosing, this, &TextEditor::slotFindClosing);
 	}
 	
@@ -330,7 +329,6 @@ void ot::TextEditor::slotFindRequested(void) {
 }
 
 void ot::TextEditor::slotFindClosing(void) {
-	this->removeEventFilter(m_searchPopup);
 	m_searchPopup = nullptr;
 	this->setFocus();
 }

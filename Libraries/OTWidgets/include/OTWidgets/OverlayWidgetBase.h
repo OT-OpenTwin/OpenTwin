@@ -16,23 +16,25 @@
 namespace ot {
 
 	//! \class OverlayWidgetBase
-	class OT_WIDGETS_API_EXPORT OverlayWidgetBase : public QFrame {
+	class OverlayWidgetBase : public QFrame {
 		OT_DECL_NOCOPY(OverlayWidgetBase)
 		OT_DECL_NODEFAULT(OverlayWidgetBase)
 	public:
-		OverlayWidgetBase(QWidget* _parent, Alignment _overlayAlignment);
+		OverlayWidgetBase(QWidget* _parent, Alignment _overlayAlignment, const QMargins& _overlayMargins = QMargins());
 		virtual ~OverlayWidgetBase();
+
+		void setOverlayMargins(const QMargins& _margins) { m_margins = _margins; this->updateOverlayGeometry(); };
+		const QMargins& overlayMargins(void) const { return m_margins; };
 
 	protected:
 		virtual bool eventFilter(QObject* _watched, QEvent* _event) override;
 
 	private:
 		void updateOverlayGeometry(void);
-
+		
+		QMargins m_margins;
 		Alignment m_alignment;
 		QWidget* m_parent;
 	};
 
 }
-
-#include "OTWidgets/OverlayWidgetBase.hpp"

@@ -18,10 +18,10 @@
 #include <QtWidgets/qscrollbar.h>
 
 ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
-	: m_editor(_editor), m_search(nullptr), m_ix(0)
+	: OverlayWidgetBase(_editor, AlignTopRight, QMargins(5, 2, 25, 2)), m_editor(_editor), m_search(nullptr), m_ix(0)
 {
 	OTAssertNullptr(m_editor);
-
+	 
 	this->setObjectName("OT_TextEditSearchPopup");
 	this->setWindowFlag(Qt::FramelessWindowHint);
 	this->setWindowFlag(Qt::WindowStaysOnTopHint);
@@ -51,14 +51,9 @@ ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
 	btnFind->installEventFilter(this);
 	btnClose->installEventFilter(this);
 
-	QWidget* w = m_editor;
-	while (w) {
-		w->installEventFilter(this);
-		w = w->parentWidget();
-	}
-
 	// Setup view
-	this->setFixedWidth(350);
+	this->setMinimumSize(200, 30);
+	this->setMaximumSize(350, 30);
 
 	// Connect signals
 	this->connect(m_search, &LineEdit::textChanged, this, &TextEditorSearchPopup::slotTextChanged);
@@ -82,16 +77,7 @@ bool ot::TextEditorSearchPopup::eventFilter(QObject* _watched, QEvent* _event) {
 			}
 		}
 	}
-	else if (_event->type() == QEvent::Move) {
-		this->updatePosition();
-	}
-	else if (_event->type() == QEvent::Hide && _watched == m_editor) {
-		this->hide();
-	}
-	else if (_event->type() == QEvent::Show && _watched == m_editor) {
-		this->show();
-	}
-	return QFrame::eventFilter(_watched, _event);
+	return OverlayWidgetBase::eventFilter(_watched, _event);
 }
 
 void ot::TextEditorSearchPopup::closeEvent(QCloseEvent* _event) {
@@ -100,6 +86,7 @@ void ot::TextEditorSearchPopup::closeEvent(QCloseEvent* _event) {
 }
 
 void ot::TextEditorSearchPopup::updatePosition(bool _forceUpdate) {
+	return;
 	QPoint p = m_editor->mapToGlobal(m_editor->rect().topRight());
 	if (p == m_lastTR && !_forceUpdate) return;
 	m_lastTR = p;

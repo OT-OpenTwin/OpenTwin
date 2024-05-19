@@ -7,17 +7,15 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
+#include "OTWidgets/OverlayWidgetBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
-
-// Qt header
-#include <QtWidgets/qframe.h>
 
 namespace ot {
 
 	class LineEdit;
 	class TextEditor;
 
-	class OT_WIDGETS_API_EXPORT TextEditorSearchPopup : public QFrame {
+	class OT_WIDGETS_API_EXPORT TextEditorSearchPopup : public OverlayWidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(TextEditorSearchPopup)
 		OT_DECL_NODEFAULT(TextEditorSearchPopup)

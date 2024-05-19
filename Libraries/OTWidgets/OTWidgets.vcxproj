@@ -68,6 +68,7 @@
     <ClCompile Include="src\LineEdit.cpp" />
     <ClCompile Include="src\MessageDialog.cpp" />
     <ClCompile Include="src\OnePropertyDialog.cpp" />
+    <ClCompile Include="src\OverlayWidgetBase.cpp" />
     <ClCompile Include="src\Painter2DEditButton.cpp" />
     <ClCompile Include="src\Painter2DEditDialog.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
@@ -151,7 +152,6 @@
     <QtMoc Include="include\OTWidgets\Label.h" />
     <QtMoc Include="include\OTWidgets\ImagePreview.h" />
     <ClInclude Include="include\OTWidgets\OverlayWidgetBase.h" />
-    <ClInclude Include="include\OTWidgets\OverlayWidgetBase.hpp" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridView.h" />
