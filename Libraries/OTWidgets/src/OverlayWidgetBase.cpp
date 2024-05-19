@@ -17,7 +17,7 @@ ot::OverlayWidgetBase::OverlayWidgetBase(QWidget* _parent, Alignment _overlayAli
     OTAssertNullptr(m_parent);
 
     //this->setAttribute(Qt::WA_NoSystemBackground, true);
-    //this->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    this->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
     QObject* obj = m_parent;
     while (obj) {
@@ -40,6 +40,14 @@ bool ot::OverlayWidgetBase::eventFilter(QObject* _watched, QEvent* _event) {
         break;
     case QEvent::Hide:
         this->hide();
+        break;
+    case QEvent::WindowActivate:
+        this->setWindowFlag(Qt::WindowStaysOnTopHint, true);
+        this->updateOverlayGeometry();
+        break;
+    case QEvent::WindowDeactivate:
+        this->setWindowFlag(Qt::WindowStaysOnTopHint, false);
+        this->updateOverlayGeometry();
         break;
     case QEvent::Resize:
     case QEvent::Move:
