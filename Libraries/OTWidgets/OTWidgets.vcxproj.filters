@@ -259,11 +259,8 @@
     <ClCompile Include="src\GraphicsShapeItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="include\OTWidgets\OverlayWidgetBase.cpp">
-      <Filter>src\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WidgetEventNotifier.cpp">
-      <Filter>src\Widgets</Filter>
+    <ClCompile Include="src\Positioning.cpp">
+      <Filter>src\General</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -485,14 +482,11 @@
     <ClInclude Include="include\OTWidgets\OverlayWidgetBase.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetEventHandler.h">
+    <ClInclude Include="include\OTWidgets\OverlayWidgetBase.hpp">
       <Filter>include\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetEventHandler.hpp">
-      <Filter>include\Widgets</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetEventNotifier.h">
-      <Filter>include\Widgets</Filter>
+    <ClInclude Include="include\OTWidgets\Positioning.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

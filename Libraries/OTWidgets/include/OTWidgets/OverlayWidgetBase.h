@@ -6,28 +6,33 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/OTClassHelper.h"
+#include "OTGui/GuiTypes.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
-#include "OTWidgets/WidgetEventNotifier.h"
+
+// Qt header
+#include <QtWidgets/qframe.h>
 
 namespace ot {
 
 	//! \class OverlayWidgetBase
-	//! \brief The OverlayWidgetBase should be used as a base class for an overlay that will be displayed on top of a WidgetEventHandler.
-	class OT_WIDGETS_API_EXPORT OverlayWidgetBase : public WidgetEventNotifier {
+	class OT_WIDGETS_API_EXPORT OverlayWidgetBase : public QFrame {
+		OT_DECL_NOCOPY(OverlayWidgetBase)
+		OT_DECL_NODEFAULT(OverlayWidgetBase)
 	public:
-		OverlayWidgetBase() {};
-		virtual ~OverlayWidgetBase() {};
+		OverlayWidgetBase(QWidget* _parent, Alignment _overlayAlignment);
+		virtual ~OverlayWidgetBase();
 
-		virtual void parentWidgetEvent(QEvent* _event) override;
+	protected:
+		virtual bool eventFilter(QObject* _watched, QEvent* _event) override;
 
-		virtual void overlayParentCreated(void) {};
-		virtual void overlayParentDestroyed(void) {};
-		virtual void overlayParentMoved(void) {};
-		virtual void overlayParentResized(void) {};
-		virtual void overlayParentHidden(void) {};
-		virtual void overlayParentShown(void) {};
-		virtual void overlayParentClosed(void) {};
-		virtual void overlayParentQuitted(void) {};
+	private:
+		void updateOverlayGeometry(void);
+
+		Alignment m_alignment;
+		QWidget* m_parent;
 	};
 
 }
+
+#include "OTWidgets/OverlayWidgetBase.hpp"

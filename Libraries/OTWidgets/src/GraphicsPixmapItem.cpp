@@ -7,6 +7,7 @@
 #include "OTGui/GraphicsImageItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/Positioning.h"
 #include "OTWidgets/GraphicsPixmapItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
 
@@ -59,7 +60,7 @@ QSizeF ot::GraphicsPixmapItem::getPreferredGraphicsItemSize(void) const {
 void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	if (m_maintainAspectRatio) {
 		QPixmap scaled = m_pixmap.scaled(_rect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-		QRectF adjustedRect = this->calculateInnerRect(_rect, scaled.size(), this->graphicsItemAlignment());
+		QRectF adjustedRect = ot::calculateChildRect(_rect, scaled.size(), this->graphicsItemAlignment());
 
 		// Check if a color mask is set
 		if (m_colorMask.isValid()) {

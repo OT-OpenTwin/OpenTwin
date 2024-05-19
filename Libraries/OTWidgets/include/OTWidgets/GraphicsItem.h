@@ -53,12 +53,6 @@ namespace ot {
 		//! \see GraphicsItem, GraphicsItemState
 		typedef Flags<GraphicsItemState> GraphicsItemStateFlags; //!
 
-		//! \brief Calculates the child rect by taking the arguments into account.
-		//! \param _outerRect Outer rectangle (allowed rect).
-		//! \param _innerSize Child item size.
-		//! \param _alignment Child item alignment.
-		static QRectF calculateInnerRect(const QRectF& _outerRect, const QSizeF& _innerSize, ot::Alignment _alignment);
-
 		//! \brief Constructor.
 		//! \param _isLayoutOrStack If true, the item is a layout or a stack item.
 		GraphicsItem(bool _isLayoutOrStack);
