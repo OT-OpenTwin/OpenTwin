@@ -17,6 +17,7 @@
 class QWidget;
 class GraphicsItemDesignerView;
 class GraphicsItemDesignerToolBar;
+class GraphicsItemDesignerNavigation;
 class GraphicsItemDesignerInfoOverlay;
 namespace ot { class PropertyGrid; };
 
@@ -60,6 +61,7 @@ public:
 	GraphicsItemDesignerView* getView(void) const { return m_view; };
 	ot::PropertyGrid* getPropertyGrid(void) const { return m_props; };
 	GraphicsItemDesignerToolBar* getToolBar(void) const { return m_toolBar; };
+	GraphicsItemDesignerNavigation* getNavigation(void) const { return m_navigation; };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -75,5 +77,6 @@ private:
 	GraphicsItemDesignerView* m_view;
 	ot::PropertyGrid* m_props;
 	GraphicsItemDesignerToolBar* m_toolBar;
+	GraphicsItemDesignerNavigation* m_navigation;
 	GraphicsItemDesignerInfoOverlay* m_overlay;
 };

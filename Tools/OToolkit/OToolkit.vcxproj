@@ -26,6 +26,7 @@
     <ClCompile Include="src\FAR.cpp" />
     <ClCompile Include="src\GraphicsItemDesigner.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerInfoOverlay.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerNavigation.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerScene.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerToolBar.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerView.cpp" />
@@ -57,6 +58,7 @@
     <QtMoc Include="include\GraphicsItemDesignerToolBar.h" />
     <ClInclude Include="include\GraphicsItemDesignerInfoOverlay.h" />
     <QtMoc Include="include\GraphicsItemDesignerView.h" />
+    <ClInclude Include="include\GraphicsItemDesignerNavigation.h" />
     <ClInclude Include="include\GraphicsItemDesignerScene.h" />
     <ClInclude Include="include\GraphicsItemDesignerViewStatusOverlay.h" />
     <ClInclude Include="include\WidgetTest.h" />

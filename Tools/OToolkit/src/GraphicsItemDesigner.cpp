@@ -6,6 +6,7 @@
 #include "GraphicsItemDesigner.h"
 #include "GraphicsItemDesignerView.h"
 #include "GraphicsItemDesignerToolBar.h"
+#include "GraphicsItemDesignerNavigation.h"
 #include "GraphicsItemDesignerInfoOverlay.h"
 
 // OpenTwin header
@@ -17,7 +18,7 @@
 #include "OTWidgets/PropertyGridGroup.h"
 
 GraphicsItemDesigner::GraphicsItemDesigner() 
-	: m_view(nullptr), m_props(nullptr), m_toolBar(nullptr), m_overlay(nullptr), m_mode(NoMode)
+	: m_view(nullptr), m_props(nullptr), m_toolBar(nullptr), m_overlay(nullptr), m_navigation(nullptr), m_mode(NoMode)
 {
 
 }
@@ -35,6 +36,10 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	view = this->createToolWidgetView(m_props->getQWidget(), "GID Properties");
 	_content.addView(view);
 	
+	m_navigation = new GraphicsItemDesignerNavigation;
+	view = this->createToolWidgetView(m_navigation, "GID Explorer");
+	_content.addView(view);
+
 	m_toolBar = new GraphicsItemDesignerToolBar(this);
 	_content.setToolBar(m_toolBar);
 
