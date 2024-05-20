@@ -6,8 +6,9 @@
 // OToolkit header
 #include "GraphicsItemDesignerNavigation.h"
 
-GraphicsItemDesignerNavigation::GraphicsItemDesignerNavigation() {
-
+GraphicsItemDesignerNavigation::GraphicsItemDesignerNavigation() 
+{
+	this->setHeaderHidden(true);
 }
 
 GraphicsItemDesignerNavigation::~GraphicsItemDesignerNavigation() {

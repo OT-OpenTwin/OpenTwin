@@ -25,6 +25,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FAR.cpp" />
     <ClCompile Include="src\GraphicsItemDesigner.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerDrawHandler.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerInfoOverlay.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerNavigation.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerScene.cpp" />
@@ -56,6 +57,7 @@
   <ItemGroup>
     <QtMoc Include="include\GraphicsItemDesigner.h" />
     <QtMoc Include="include\GraphicsItemDesignerToolBar.h" />
+    <QtMoc Include="include\GraphicsItemDesignerDrawHandler.h" />
     <ClInclude Include="include\GraphicsItemDesignerInfoOverlay.h" />
     <QtMoc Include="include\GraphicsItemDesignerView.h" />
     <ClInclude Include="include\GraphicsItemDesignerNavigation.h" />

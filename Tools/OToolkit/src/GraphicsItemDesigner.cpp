@@ -8,6 +8,7 @@
 #include "GraphicsItemDesignerToolBar.h"
 #include "GraphicsItemDesignerNavigation.h"
 #include "GraphicsItemDesignerInfoOverlay.h"
+#include "GraphicsItemDesignerDrawHandler.h"
 
 // OpenTwin header
 #include "OTWidgets/TreeWidget.h"
@@ -18,7 +19,8 @@
 #include "OTWidgets/PropertyGridGroup.h"
 
 GraphicsItemDesigner::GraphicsItemDesigner() 
-	: m_view(nullptr), m_props(nullptr), m_toolBar(nullptr), m_overlay(nullptr), m_navigation(nullptr), m_mode(NoMode)
+	: m_view(nullptr), m_props(nullptr), m_toolBar(nullptr), 
+	m_navigation(nullptr), m_drawHandler(nullptr)
 {
 
 }
@@ -27,10 +29,12 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	using namespace ot;
 
 	// Create views
-
 	m_view = new GraphicsItemDesignerView;
 	ot::WidgetView* view = this->createCentralWidgetView(m_view, "GID");
 	_content.addView(view);
+
+	m_drawHandler = new GraphicsItemDesignerDrawHandler(m_view);
+	m_view->setDrawHandler(m_drawHandler);
 
 	m_props = new ot::PropertyGrid;
 	view = this->createToolWidgetView(m_props->getQWidget(), "GID Properties");
@@ -44,107 +48,26 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	_content.setToolBar(m_toolBar);
 
 	// Connect signals
-	this->connect(m_view, &GraphicsItemDesignerView::pointSelected, this, &GraphicsItemDesigner::slotPointSelected);
-	this->connect(m_view, &GraphicsItemDesignerView::cancelRequested, this, &GraphicsItemDesigner::cancelModeRequested);
-	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::modeRequested, this, &GraphicsItemDesigner::slotModeRequested);
+	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCompleted, this, &GraphicsItemDesigner::slotDrawFinished);
+	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCancelled, this, &GraphicsItemDesigner::slotDrawCancelled);
+	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::modeRequested, this, &GraphicsItemDesigner::slotDrawRequested);
 
 	return true;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-void GraphicsItemDesigner::slotModeRequested(DesignerMode _mode) {
-	if (_mode == NoMode) return;
+void GraphicsItemDesigner::slotDrawRequested(GraphicsItemDesignerDrawHandler::DrawMode _mode) {
+	if (_mode == GraphicsItemDesignerDrawHandler::NoMode) return;
 
 	m_toolBar->setEnabled(false);
-
-	QString txt;
-	bool selectPointRequired = false;
-
-	switch (_mode)
-	{
-	case GraphicsItemDesigner::NoMode:
-		return;
-		break;
-	case GraphicsItemDesigner::LineStartMode:
-		txt = "Select line start point";
-		selectPointRequired = true;
-		break;
-	case GraphicsItemDesigner::LineEndMode:
-		txt = "Select line end point";
-		selectPointRequired = true;
-		break;
-	case GraphicsItemDesigner::SquareStartMode:
-		txt = "Select square starting point";
-		selectPointRequired = true;
-		break;
-	case GraphicsItemDesigner::SquareEndMode:
-		txt = "Select square end point";
-		selectPointRequired = true;
-		break;
-	case GraphicsItemDesigner::RectStartMode:
-		txt = "Select rectangle starting point";
-		selectPointRequired = true;
-		break;
-	case GraphicsItemDesigner::RectEndMode:
-		txt = "Select rectangle end point";
-		selectPointRequired = true;
-		break;
-	case GraphicsItemDesigner::TriangleStartMode:
-		txt = "Select triangle starting point";
-		selectPointRequired = true;
-		break;
-	case GraphicsItemDesigner::TriangleEndMode:
-		txt = "Select triangle end point";
-		selectPointRequired = true;
-		break;
-	case GraphicsItemDesigner::PolygonStartMode:
-		txt = "Select polygon starting point";
-		selectPointRequired = true;
-		break;
-	case GraphicsItemDesigner::PolygonStepMode:
-		txt = "Select next polygon point";
-		selectPointRequired = true;
-		break;
-	case GraphicsItemDesigner::ShapeStartMode:
-		txt = "Select shape starting point";
-		selectPointRequired = true;
-		break;
-	case GraphicsItemDesigner::ShapeStepMode:
-		txt = "Select next shape point";
-		selectPointRequired = true;
-		break;
-	default:
-		OT_LOG_E("Unknown mode");
-		break;
-	}
-
-	m_mode = _mode;
-
-	if (!m_overlay) {
-		m_overlay = new GraphicsItemDesignerInfoOverlay(txt, m_view);
-	}
-	else {
-
-	}
-
-	if (selectPointRequired) {
-		m_view->enablePickingMode();
-	}
+	m_drawHandler->startDraw(_mode);
 }
 
-void GraphicsItemDesigner::slotPointSelected(const QPointF& _pt) {
+void GraphicsItemDesigner::slotDrawFinished(void) {
 
 }
 
-void GraphicsItemDesigner::cancelModeRequested(void) {
-	if (m_mode != NoMode) {
-		m_view->disablePickingMode();
-		m_toolBar->setEnabled(true);
-
-		if (m_overlay) {
-			delete m_overlay;
-			m_overlay = nullptr;
-		}
-	}
+void GraphicsItemDesigner::slotDrawCancelled(void) {
+	m_toolBar->setEnabled(true);
 }

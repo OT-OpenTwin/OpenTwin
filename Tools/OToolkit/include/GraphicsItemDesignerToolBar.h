@@ -6,7 +6,7 @@
 #pragma once
 
 // OToolkit header
-#include "GraphicsItemDesigner.h"
+#include "GraphicsItemDesignerDrawHandler.h"
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
@@ -18,6 +18,7 @@
 #include <list>
 
 class QGridLayout;
+class GraphicsItemDesigner;
 
 class GraphicsItemDesignerToolBar : public QToolBar {
 	Q_OBJECT
@@ -26,7 +27,7 @@ public:
 	virtual ~GraphicsItemDesignerToolBar();
 
 Q_SIGNALS:
-	void modeRequested(GraphicsItemDesigner::DesignerMode _mode);
+	void modeRequested(GraphicsItemDesignerDrawHandler::DrawMode _mode);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -34,6 +35,8 @@ private Q_SLOTS:
 	void slotLine(void);
 	void slotSquare(void);
 	void slotRect(void);
+	void slotCircle(void);
+	void slotEllipse(void);
 	void slotTriangle(void);
 	void slotPolygon(void);
 	void slotShape(void);

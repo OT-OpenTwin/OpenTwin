@@ -39,6 +39,20 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	}
 	{
 		QAction* btn = new QAction;
+		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Circle.png"));
+		btn->setText("Circle");
+		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotCircle);
+		this->addAction(btn);
+	}
+	{
+		QAction* btn = new QAction;
+		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Ellipse.png"));
+		btn->setText("Ellipse");
+		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotEllipse);
+		this->addAction(btn);
+	}
+	{
+		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Triangle.png"));
 		btn->setText("Triangle");
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotTriangle);
@@ -69,27 +83,35 @@ GraphicsItemDesignerToolBar::~GraphicsItemDesignerToolBar() {
 // Private: Slots
 
 void GraphicsItemDesignerToolBar::slotLine(void) {
-	emit modeRequested(GraphicsItemDesigner::LineStartMode);
+	emit modeRequested(GraphicsItemDesignerDrawHandler::Line);
 }
 
 void GraphicsItemDesignerToolBar::slotSquare(void) {
-	emit modeRequested(GraphicsItemDesigner::SquareStartMode);
+	emit modeRequested(GraphicsItemDesignerDrawHandler::Square);
 }
 
 void GraphicsItemDesignerToolBar::slotRect(void) {
-	emit modeRequested(GraphicsItemDesigner::RectStartMode);
+	emit modeRequested(GraphicsItemDesignerDrawHandler::Rect);
+}
+
+void GraphicsItemDesignerToolBar::slotCircle(void) {
+	emit modeRequested(GraphicsItemDesignerDrawHandler::Circle);
+}
+
+void GraphicsItemDesignerToolBar::slotEllipse(void) {
+	emit modeRequested(GraphicsItemDesignerDrawHandler::Ellipse);
 }
 
 void GraphicsItemDesignerToolBar::slotTriangle(void) {
-	emit modeRequested(GraphicsItemDesigner::TriangleStartMode);
+	emit modeRequested(GraphicsItemDesignerDrawHandler::Triangle);
 }
 
 void GraphicsItemDesignerToolBar::slotPolygon(void) {
-	emit modeRequested(GraphicsItemDesigner::PolygonStartMode);
+	emit modeRequested(GraphicsItemDesignerDrawHandler::Polygon);
 }
 
 void GraphicsItemDesignerToolBar::slotShape(void) {
-	emit modeRequested(GraphicsItemDesigner::ShapeStartMode);
+	emit modeRequested(GraphicsItemDesignerDrawHandler::Shape);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

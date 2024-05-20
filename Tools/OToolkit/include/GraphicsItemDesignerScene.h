@@ -34,8 +34,7 @@ public:
 protected:
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* _event) override;
-	virtual void keyPressEvent(QKeyEvent* _event) override;
-
+	
 private:
 	GraphicsItemDesignerView* m_view;
 	ot::GraphicsEllipseItem* m_cursorItem;

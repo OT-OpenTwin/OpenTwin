@@ -10,17 +10,13 @@
 
 class GraphicsItemDesigner;
 class GraphicsItemDesignerScene;
+class GraphicsItemDesignerDrawHandler;
 class GraphicsItemDesignerViewStatusOverlay;
 namespace ot { class GraphicsEllipseItem; }
 
 class GraphicsItemDesignerView : public ot::GraphicsView {
 	Q_OBJECT
 public:
-	enum Mode {
-		NoMode,
-		PointPickingMode
-	};
-
 	GraphicsItemDesignerView();
 	virtual ~GraphicsItemDesignerView();
 
@@ -31,21 +27,23 @@ public:
 	void enablePickingMode(void);
 	void disablePickingMode(void);
 
+	void setDrawHandler(GraphicsItemDesignerDrawHandler* _handler) { m_drawHandler = _handler; };
+	GraphicsItemDesignerDrawHandler* getDrawHandler(void) const { return m_drawHandler; };
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-Q_SIGNALS:
-	void pointSelected(const QPointF& _pt);
-	void cancelRequested(void);
+protected:
+	virtual void keyPressEvent(QKeyEvent* _event) override;
 
 private:
 	friend class GraphicsItemDesignerScene;
 
-	void emitPointSelected(const QPointF& _pt);
-	void emitCancelRequest(void);
-	void updateMousePositionInfo(const QPointF& _pt);
+	void fwdPointSelected(const QPointF& _pt);
+	void fwdCancelRequest(void);
+	void fwdPositionChanged(const QPointF& _pt);
 
 	GraphicsItemDesignerViewStatusOverlay* m_infoOverlay;
 	GraphicsItemDesignerScene* m_scene;
+	GraphicsItemDesignerDrawHandler* m_drawHandler;
 	ot::GraphicsEllipseItem* m_cursorItem;
-	Mode m_mode;
 };

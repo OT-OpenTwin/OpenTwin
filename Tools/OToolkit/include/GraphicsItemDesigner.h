@@ -5,6 +5,9 @@
 
 #pragma once
 
+// OToolkit header
+#include "GraphicsItemDesignerDrawHandler.h"
+
 // ToolkitAPI header
 #include "OToolkitAPI/Tool.h"
 
@@ -18,28 +21,12 @@ class QWidget;
 class GraphicsItemDesignerView;
 class GraphicsItemDesignerToolBar;
 class GraphicsItemDesignerNavigation;
-class GraphicsItemDesignerInfoOverlay;
+class GraphicsItemDesignerDrawHandler;
 namespace ot { class PropertyGrid; };
 
 class GraphicsItemDesigner : public QObject, public otoolkit::Tool {
 	Q_OBJECT
 public:
-	enum DesignerMode {
-		NoMode,
-		LineStartMode,
-		LineEndMode,
-		SquareStartMode,
-		SquareEndMode,
-		RectStartMode,
-		RectEndMode,
-		TriangleStartMode,
-		TriangleEndMode,
-		PolygonStartMode,
-		PolygonStepMode,
-		ShapeStartMode,
-		ShapeStepMode
-	};
-
 	GraphicsItemDesigner();
 	virtual ~GraphicsItemDesigner() {};
 
@@ -68,15 +55,14 @@ public:
 	// Private: Slots
 
 private Q_SLOTS:
-	void slotModeRequested(DesignerMode _mode);
-	void slotPointSelected(const QPointF& _pt);
-	void cancelModeRequested(void);
+	void slotDrawRequested(GraphicsItemDesignerDrawHandler::DrawMode _mode);
+	void slotDrawFinished(void);
+	void slotDrawCancelled(void);
 
 private:
-	DesignerMode m_mode;
 	GraphicsItemDesignerView* m_view;
 	ot::PropertyGrid* m_props;
 	GraphicsItemDesignerToolBar* m_toolBar;
 	GraphicsItemDesignerNavigation* m_navigation;
-	GraphicsItemDesignerInfoOverlay* m_overlay;
+	GraphicsItemDesignerDrawHandler* m_drawHandler;
 };

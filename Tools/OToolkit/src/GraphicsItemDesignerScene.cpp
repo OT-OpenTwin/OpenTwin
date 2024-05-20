@@ -41,6 +41,8 @@ void GraphicsItemDesignerScene::enablePickingMode(void) {
 	m_cursorItem->setFlag(QGraphicsItem::ItemIsSelectable, false);
 
 	this->addItem(m_cursorItem);
+
+	m_mode = PointPickingMode;
 }
 
 void GraphicsItemDesignerScene::disablePickingMode(void) {
@@ -60,24 +62,17 @@ void GraphicsItemDesignerScene::mousePressEvent(QGraphicsSceneMouseEvent* _event
 	ot::GraphicsScene::mousePressEvent(_event);
 
 	if (m_mode == PointPickingMode) {
-		m_view->emitPointSelected(_event->scenePos());
+		m_view->fwdPointSelected(_event->scenePos());
 	}
 }
 
 void GraphicsItemDesignerScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 	ot::GraphicsScene::mouseMoveEvent(_event);
 
-	m_view->updateMousePositionInfo(_event->scenePos());
+	m_view->fwdPositionChanged(_event->scenePos());
 
 	if (m_cursorItem) {
 		m_cursorItem->setPos(_event->scenePos() - QPointF(m_cursorItem->radiusX(), m_cursorItem->radiusY()));
 	}
 }
 
-void GraphicsItemDesignerScene::keyPressEvent(QKeyEvent* _event) {
-	ot::GraphicsScene::keyPressEvent(_event);
-
-	if (_event->key() == Qt::Key_Escape && m_mode == PointPickingMode) {
-		m_view->emitCancelRequest();
-	}
-}

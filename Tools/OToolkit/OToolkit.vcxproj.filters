@@ -126,6 +126,9 @@
     <ClCompile Include="src\GraphicsItemDesignerNavigation.cpp">
       <Filter>Source Files\GraphicsItemDesigner</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsItemDesignerDrawHandler.cpp">
+      <Filter>Source Files\GraphicsItemDesigner</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -197,6 +200,9 @@
       <Filter>Header Files\GraphicsItemDesigner</Filter>
     </QtMoc>
     <QtMoc Include="include\GraphicsItemDesignerView.h">
+      <Filter>Header Files\GraphicsItemDesigner</Filter>
+    </QtMoc>
+    <QtMoc Include="include\GraphicsItemDesignerDrawHandler.h">
       <Filter>Header Files\GraphicsItemDesigner</Filter>
     </QtMoc>
   </ItemGroup>
