@@ -251,8 +251,17 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document)
 // Trying to create more circuits
 void Application::createNewCircuit()
 {
+	std::list<std::string> circuits = m_modelComponent->getListOfFolderItems("Circuits");
 
-	std::string circuitName = "Circuit " + std::to_string(ottest::currentEditorID);
+	int count = 1;
+	std::string circuitName;
+	do
+	{
+		circuitName = "Circuits/Circuit " + std::to_string(count);
+		count++;
+	} while (std::find(circuits.begin(), circuits.end(), circuitName) != circuits.end());
+
+	//std::string circuitName = "Circuit " + std::to_string(ottest::currentEditorID);
 
 	
 	ot::GraphicsNewEditorPackage* editor = new ot::GraphicsNewEditorPackage(circuitName, circuitName);
