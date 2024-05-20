@@ -21,8 +21,15 @@ class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock
 		ot::Connector m_LeftConnector;
 		ot::Connector m_RightConnector;
 		void createACProperties();
-		bool SetVisibleACProperties(bool visible);
+		void createPULSEProperties();
+		void createSINProperties();
+		void createEXPProperties();
 
+
+		bool SetVisibleACProperties(bool visible);
+		bool SetVisiblePULSEProperties(bool visible);
+		bool SetVisibleSINProperties(bool visible);
+		bool SetVisibleEXPProperties(bool visible);
 		void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 		void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 

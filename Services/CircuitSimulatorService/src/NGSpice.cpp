@@ -425,7 +425,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		
 		
 
-		//Form behind
+		//From behind
 
 		auto connections = element.getList();
 		std::vector<Connection> tempVector(connections.begin(), connections.end());
