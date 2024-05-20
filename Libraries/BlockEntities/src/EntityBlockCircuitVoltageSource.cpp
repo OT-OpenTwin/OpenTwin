@@ -59,6 +59,7 @@ bool EntityBlockCircuitVoltageSource::SetVisibleACProperties(bool visible)
 	return refresh;
 }
 
+
 void EntityBlockCircuitVoltageSource::createPULSEProperties()
 {
 	EntityPropertiesInteger::createProperty("Pulse Properties", "Pulse Initial value", 0 , "default", getProperties());
@@ -69,6 +70,63 @@ void EntityBlockCircuitVoltageSource::createPULSEProperties()
 	EntityPropertiesDouble::createProperty("Pulse Properties", "Pulse width", 0.0, "default", getProperties());
 	EntityPropertiesDouble::createProperty("Pulse Properties", "Period", 0.0, "default", getProperties());
 	EntityPropertiesInteger::createProperty("Pulse Properties", "Number of Pulses", 0, "default", getProperties());
+}
+
+std::vector<std::string> EntityBlockCircuitVoltageSource::getPulseParameters()
+{
+
+	std::vector<std::string> parameters;
+
+	auto propertyBase = getProperties().getProperty("Pulse Initial value");
+	auto property1 = dynamic_cast<EntityPropertiesInteger*>(propertyBase);
+	assert(propertyBase != nullptr);
+	int val1 = property1->getValue();
+	parameters.push_back(std::to_string(val1));
+
+	propertyBase = getProperties().getProperty("Pulse Pulsed value");
+	auto property2 = dynamic_cast<EntityPropertiesInteger*>(propertyBase);
+	assert(propertyBase != nullptr);
+	int val2 = property2->getValue();
+	parameters.push_back(std::to_string(val2));
+
+	propertyBase = getProperties().getProperty("Delay time");
+	auto property3 = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double val3 = property3->getValue();
+	parameters.push_back(std::to_string(val3));
+
+	propertyBase = getProperties().getProperty("Rise time");
+	auto property4 = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double val4 = property4->getValue();
+	parameters.push_back(std::to_string(val4));
+
+	propertyBase = getProperties().getProperty("Fall time");
+	auto property5 = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double val5 = property5->getValue();
+	parameters.push_back(std::to_string(val5));
+
+	propertyBase = getProperties().getProperty("Pulse width");
+	auto property6 = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double val6 = property6->getValue();
+	parameters.push_back(std::to_string(val6));
+
+	propertyBase = getProperties().getProperty("Period");
+	auto property7 = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double val7 = property7->getValue();
+	parameters.push_back(std::to_string(val7));
+
+	propertyBase = getProperties().getProperty("Number of Pulses");
+	auto property8 = dynamic_cast<EntityPropertiesInteger*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double val8 = property8->getValue();
+	parameters.push_back(std::to_string(val8));
+
+	return parameters;
+
 }
 
 bool EntityBlockCircuitVoltageSource::SetVisiblePULSEProperties(bool visible)
@@ -101,6 +159,51 @@ void EntityBlockCircuitVoltageSource::createSINProperties()
 	EntityPropertiesDouble::createProperty("Sin Properties", "Phase", 0.0, "default", getProperties());
 }
 
+std::vector<std::string> EntityBlockCircuitVoltageSource::getSinParameters()
+{
+
+	std::vector<std::string> parameters;
+
+	auto propertyBase = getProperties().getProperty("Offset");
+	auto property1 = dynamic_cast<EntityPropertiesInteger*>(propertyBase);
+	assert(propertyBase != nullptr);
+	int val1 = property1->getValue();
+	parameters.push_back(std::to_string(val1));
+
+	propertyBase = getProperties().getProperty("Amplitude");
+	auto property2 = dynamic_cast<EntityPropertiesInteger*>(propertyBase);
+	assert(propertyBase != nullptr);
+	int val2 = property2->getValue();
+	parameters.push_back(std::to_string(val2));
+
+	propertyBase = getProperties().getProperty("Frequency");
+	auto property3 = dynamic_cast<EntityPropertiesInteger*>(propertyBase);
+	assert(propertyBase != nullptr);
+	int val3 = property3->getValue();
+	parameters.push_back(std::to_string(val3));
+
+	propertyBase = getProperties().getProperty("Delay");
+	auto property4 = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double val4 = property4->getValue();
+	parameters.push_back(std::to_string(val4));
+
+	propertyBase = getProperties().getProperty("Damping factor");
+	auto property5 = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double val5 = property5->getValue();
+	parameters.push_back(std::to_string(val5));
+
+	propertyBase = getProperties().getProperty("Phase");
+	auto property6 = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double val6 = property6->getValue();
+	parameters.push_back(std::to_string(val6));
+
+	return parameters;
+
+}
+
 
 bool EntityBlockCircuitVoltageSource::SetVisibleSINProperties(bool visible)
 {
@@ -129,6 +232,50 @@ void EntityBlockCircuitVoltageSource::createEXPProperties()
 	EntityPropertiesDouble::createProperty("Exponential Properties", "Fall time constant", 0.0, "default", getProperties());
 }
 
+std::vector<std::string> EntityBlockCircuitVoltageSource::getExpParameters()
+{
+	std::vector<std::string> parameters;
+
+	auto propertyBase = getProperties().getProperty("Exponential Initial Value");
+	auto property1 = dynamic_cast<EntityPropertiesInteger*>(propertyBase);
+	assert(propertyBase != nullptr);
+	int val1 = property1->getValue();
+	parameters.push_back(std::to_string(val1));
+
+	propertyBase = getProperties().getProperty("Exponential Pulsed Value");
+	auto property2 = dynamic_cast<EntityPropertiesInteger*>(propertyBase);
+	assert(propertyBase != nullptr);
+	int val2 = property2->getValue();
+	parameters.push_back(std::to_string(val2));
+
+	propertyBase = getProperties().getProperty("Rise delay time");
+	auto property3 = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double val3 = property3->getValue();
+	parameters.push_back(std::to_string(val3));
+
+	propertyBase = getProperties().getProperty("Rise time constant");
+	auto property4 = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double val4 = property4->getValue();
+	parameters.push_back(std::to_string(val4));
+
+	propertyBase = getProperties().getProperty("Fall delay time");
+	auto property5 = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double val5 = property5->getValue();
+	parameters.push_back(std::to_string(val5));
+
+	propertyBase = getProperties().getProperty("Fall time constant");
+	auto property6 = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double val6 = property6->getValue();
+	parameters.push_back(std::to_string(val6));
+
+	return parameters;
+
+}
+
 
 bool EntityBlockCircuitVoltageSource::SetVisibleEXPProperties(bool visible)
 {
@@ -146,10 +293,6 @@ bool EntityBlockCircuitVoltageSource::SetVisibleEXPProperties(bool visible)
 	}
 	return refresh;
 }
-
-
-
-
 
 
 
@@ -226,6 +369,7 @@ std::string EntityBlockCircuitVoltageSource::getFunction()
 
 	return function->getValue();
 }
+
 
 
 

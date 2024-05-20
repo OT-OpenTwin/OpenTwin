@@ -10,7 +10,11 @@ class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock
 		std::string getElementType();
 		std::string getType();
 		std::string getFunction();
-		
+
+		std::vector<std::string> getPulseParameters();
+		std::vector<std::string> getSinParameters();
+		std::vector<std::string> getExpParameters();
+
 		virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 		virtual bool updateFromProperties(void) override;
 		const ot::Connector getLeftConnector() const { return m_LeftConnector; }

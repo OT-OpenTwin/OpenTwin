@@ -213,6 +213,50 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			element.setValue(myElement->getElementType());
 			element.setType(myElement->getType());
 			element.setFunction(myElement->getFunction());
+			if (element.getFunction() == "PULSE")
+			{
+				std::string function = "PULSE(";
+				std::vector<std::string> parameters = myElement->getPulseParameters();
+
+				for (auto parameter : parameters)
+				{
+					function += parameter + " ";
+				}
+
+				function += ")";
+
+				element.setFunction(function);
+				
+			}
+			else if (element.getFunction() == "SIN")
+			{
+				std::string function = "SIN(";
+				std::vector<std::string> parameters = myElement->getSinParameters();
+				
+				for (auto parameter : parameters)
+				{
+					function += parameter + " ";
+				}
+
+				function += ")";
+
+				element.setFunction(function);
+			}
+			else if (element.getFunction() == "EXP")
+			{
+				std::string function = "EXP(";
+				std::vector<std::string> parameters = myElement->getExpParameters();
+
+				for (auto parameter : parameters)
+				{
+					function += parameter + " ";
+				}
+
+				function += ")";
+
+				element.setFunction(function);
+			}
+
 		}
 		else if (blockEntity->getBlockTitle() == "Resistor")
 		{
@@ -354,6 +398,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			if (netlistVoltageSourceType == "AC ")
 			{
 				netlistVoltageSourceType += element.getFunction();
+				
 			}
 			netlistLine += netlistElementName + " ";
 			
