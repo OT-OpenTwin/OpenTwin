@@ -1,39 +1,61 @@
 //! @file GraphicsLineItem.h
 //! @author Alexander Kuester (alexk95)
-//! @date August 2023
+//! @date May 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/CustomGraphicsItem.h"
+#include "OTCore/OTClassHelper.h"
+
+// Qt header
+#include <QtCore/qline.h>
+#include <QtGui/qpen.h>
+#include <QtGui/qbrush.h>
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT GraphicsLineItem : public QGraphicsLineItem, public QGraphicsLayoutItem, public ot::GraphicsItem {
+	class OT_WIDGETS_API_EXPORT GraphicsLineItem : public CustomGraphicsItem {
+		OT_DECL_NOCOPY(GraphicsLineItem)
 	public:
 		GraphicsLineItem();
 		virtual ~GraphicsLineItem();
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Base class functions: ot::GraphicsItem
+
 		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
 
-		virtual QSizeF sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
-		virtual void setGeometry(const QRectF& _rect) override;
+		// ###########################################################################################################################################################################################################################################################################################################################
 
-		virtual QRectF boundingRect(void) const override;
+		// Base class functions: ot::CustomGraphicsItem
 
-		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
+		virtual QSizeF getPreferredGraphicsItemSize(void) const override;
 
-		virtual void prepareGraphicsItemGeometryChange(void) override;
+	protected:
 
-		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+		//! @brief Paint the item inside the provided rect
+		virtual void paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) override;
 
-		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return nullptr; };
-		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
+		// ###########################################################################################################################################################################################################################################################################################################################
 
-		virtual void graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) override;
+		// Setter / Getter
 
-		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
+	public:
+
+		void setLine(const QPointF& _from, const QPointF& _to) { this->setLine(QLineF(_from, _to)); };
+		void setLine(const QLineF& _line);
+		const QLineF& getLine(void) const { return m_line; };
+
+		void setLinePen(const QPen& _pen) { m_pen = _pen; };
+		const QPen& linePen(void) const { return m_pen; };
+
+	private:
+		QPen m_pen;
+		QLineF m_line;
 	};
+
 
 }

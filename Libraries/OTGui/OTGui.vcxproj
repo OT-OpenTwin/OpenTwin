@@ -22,6 +22,7 @@
     <ClInclude Include="include\OTGui\Border.h" />
     <ClInclude Include="include\OTGui\GraphicsGroupItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsItemCfgFactory.h" />
+    <ClInclude Include="include\OTGui\GraphicsLineItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsPolygonItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsShapeItemCfg.h" />
     <ClInclude Include="include\OTGui\KeySequence.h" />
@@ -75,6 +76,7 @@
     <ClCompile Include="src\Border.cpp" />
     <ClCompile Include="src\GraphicsGroupItemCfg.cpp" />
     <ClCompile Include="src\GraphicsItemCfgFactory.cpp" />
+    <ClCompile Include="src\GraphicsLineItemCfg.cpp" />
     <ClCompile Include="src\GraphicsPolygonItemCfg.cpp" />
     <ClCompile Include="src\GraphicsShapeItemCfg.cpp" />
     <ClCompile Include="src\KeySequence.cpp" />

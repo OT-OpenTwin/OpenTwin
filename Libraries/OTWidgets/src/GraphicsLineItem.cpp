@@ -1,61 +1,76 @@
 //! @file GraphicsLineItem.cpp
 //! 
 //! @author Alexander Kuester (alexk95)
-//! @date August 2023
+//! @date May 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
+#include "OTGui/GraphicsLineItemCfg.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsLineItem.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 
-ot::GraphicsLineItem::GraphicsLineItem() 
-	: ot::GraphicsItem(false)
+// Qt header
+#include <QtGui/qpainter.h>
+#include <QtGui/qevent.h>
+
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsLineItem> rectItemRegistrar(OT_FactoryKey_GraphicsLineItem);
+
+ot::GraphicsLineItem::GraphicsLineItem()
+	: ot::CustomGraphicsItem(false)
 {
-	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
+
 }
 
 ot::GraphicsLineItem::~GraphicsLineItem() {
 
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions: ot::GraphicsItems
+
 bool ot::GraphicsLineItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
-	// Ignore, return false in case the setup is called to ensure this item wont be setup
-	return false;
-}
+	OTAssertNullptr(_cfg);
+	ot::GraphicsLineItemCfg* cfg = dynamic_cast<ot::GraphicsLineItemCfg*>(_cfg);
+	if (cfg == nullptr) {
+		OT_LOG_EA("Invalid configuration provided: Cast failed");
+		return false;
+	}
 
-void ot::GraphicsLineItem::prepareGraphicsItemGeometryChange(void) {
 	this->prepareGeometryChange();
+
+	m_pen = QtFactory::toPen(cfg->getLineStyle());
+	m_line = QLineF(QtFactory::toPoint(cfg->getFrom()), QtFactory::toPoint(cfg->getTo()));
+
+	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }
 
-QSizeF ot::GraphicsLineItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->handleGetGraphicsItemSizeHint(_hint, this->boundingRect().size());
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions: ot::CustomGraphicsItem
+
+QSizeF ot::GraphicsLineItem::getPreferredGraphicsItemSize(void) const {
+	return QSizeF(
+		std::max(m_line.p1().x(), m_line.p2().x()) - std::min(m_line.p1().x(), m_line.p2().x()),
+		std::max(m_line.p1().y(), m_line.p2().y()) - std::min(m_line.p1().y(), m_line.p2().y())
+	);
 }
 
-void ot::GraphicsLineItem::setGeometry(const QRectF& _rect) {
+void ot::GraphicsLineItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
+	_painter->setPen(m_pen);
+	_painter->drawLine(m_line);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter/Getter
+
+void ot::GraphicsLineItem::setLine(const QLineF& _line)
+{
 	this->prepareGeometryChange();
-	this->setPos(_rect.topLeft());
-	QGraphicsLayoutItem::setGeometry(_rect);
-
-	this->handleSetItemGeometry(_rect);
-}
-
-QRectF ot::GraphicsLineItem::boundingRect(void) const {
-	return this->handleGetGraphicsItemBoundingRect(QGraphicsLineItem::boundingRect());
-	//return QGraphicsLineItem::boundingRect();
-}
-
-QVariant ot::GraphicsLineItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
-	this->handleItemChange(_change, _value);
-	return QGraphicsLineItem::itemChange(_change, _value);
-}
-
-void ot::GraphicsLineItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->paint(_painter, _opt, _widget);
-}
-
-void ot::GraphicsLineItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) {
-	// Ignore
-}
-
-QSizeF ot::GraphicsLineItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
-	return this->sizeHint(_hint, _constrains);
+	m_line = _line;
+	this->setGeometry(QRectF(this->pos(), this->getPreferredGraphicsItemSize()));
+	this->raiseEvent(GraphicsItem::ItemResized);
 }

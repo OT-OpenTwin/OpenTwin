@@ -210,6 +210,9 @@
     <ClInclude Include="include\OTGui\StyleRefPainter2D.h">
       <Filter>Header Files\Painter</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsLineItemCfg.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -358,6 +361,9 @@
     </ClCompile>
     <ClCompile Include="src\StyleRefPainter2D.cpp">
       <Filter>Source Files\Painter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsLineItemCfg.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

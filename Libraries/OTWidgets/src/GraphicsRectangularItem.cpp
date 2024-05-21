@@ -73,6 +73,6 @@ void ot::GraphicsRectangularItem::setRectangleSize(const QSizeF& _size) {
 	// Avoid resizing if the size did not change
 	if (m_size == _size) return;
 	m_size = _size;
-	this->setGeometry(QRectF(this->pos(), m_size).toRect());
+	this->setGeometry(QRectF(this->pos(), m_size));
 	this->raiseEvent(GraphicsItem::ItemResized);
 }
