@@ -52,6 +52,12 @@
     <Filter Include="Source Files\GraphicsItemDesigner">
       <UniqueIdentifier>{f2ff8b39-260b-4903-886c-94492ba31963}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\GraphicsItemDesignerItems">
+      <UniqueIdentifier>{ffd0ce35-f6a6-458f-8abc-83e20d37fd14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GraphicsItemDesignerItems">
+      <UniqueIdentifier>{917b8a67-789c-4041-b6df-627e6bab4b92}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AppBase.cpp">
@@ -129,6 +135,12 @@
     <ClCompile Include="src\GraphicsItemDesignerDrawHandler.cpp">
       <Filter>Source Files\GraphicsItemDesigner</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsItemDesignerItemBase.cpp">
+      <Filter>Source Files\GraphicsItemDesignerItems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WrappedLineItem.cpp">
+      <Filter>Source Files\GraphicsItemDesignerItems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -154,6 +166,12 @@
     </ClInclude>
     <ClInclude Include="include\GraphicsItemDesignerNavigation.h">
       <Filter>Header Files\GraphicsItemDesigner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsItemDesignerItemBase.h">
+      <Filter>Header Files\GraphicsItemDesignerItems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WrappedLineItem.h">
+      <Filter>Header Files\GraphicsItemDesignerItems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

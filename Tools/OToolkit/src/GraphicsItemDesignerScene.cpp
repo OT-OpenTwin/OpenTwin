@@ -31,6 +31,10 @@ GraphicsItemDesignerScene::~GraphicsItemDesignerScene() {
 void GraphicsItemDesignerScene::enablePickingMode(void) {
 	if (m_mode == PointPickingMode) return;
 	if (m_cursorItem) delete m_cursorItem;
+	m_cursorItem = nullptr;
+
+	m_mode = PointPickingMode;
+	return;
 
 	m_cursorItem = new ot::GraphicsEllipseItem;
 	m_cursorItem->setRadius(1, 1);
@@ -41,16 +45,16 @@ void GraphicsItemDesignerScene::enablePickingMode(void) {
 	m_cursorItem->setFlag(QGraphicsItem::ItemIsSelectable, false);
 
 	this->addItem(m_cursorItem);
-
-	m_mode = PointPickingMode;
 }
 
 void GraphicsItemDesignerScene::disablePickingMode(void) {
 	if (m_mode != PointPickingMode) return;
-	this->removeItem(m_cursorItem);
-	delete m_cursorItem;
-	m_cursorItem = nullptr;
-
+	if (m_cursorItem) {
+		this->removeItem(m_cursorItem);
+		delete m_cursorItem;
+		m_cursorItem = nullptr;
+	}
+	
 	m_mode = NoMode;
 }
 
@@ -71,7 +75,8 @@ void GraphicsItemDesignerScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event)
 
 	m_view->fwdPositionChanged(_event->scenePos());
 
-	if (m_cursorItem) {
+	if (m_cursorItem) { 
+		m_cursorItem->prepareGraphicsItemGeometryChange();
 		m_cursorItem->setPos(_event->scenePos() - QPointF(m_cursorItem->radiusX(), m_cursorItem->radiusY()));
 	}
 }

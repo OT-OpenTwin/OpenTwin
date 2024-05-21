@@ -27,6 +27,7 @@
     <ClCompile Include="src\GraphicsItemDesigner.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerDrawHandler.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerInfoOverlay.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerItemBase.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerNavigation.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerScene.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerToolBar.cpp" />
@@ -53,13 +54,16 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="src\WrappedLineItem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\WrappedLineItem.h" />
     <QtMoc Include="include\GraphicsItemDesigner.h" />
     <QtMoc Include="include\GraphicsItemDesignerToolBar.h" />
     <QtMoc Include="include\GraphicsItemDesignerDrawHandler.h" />
     <ClInclude Include="include\GraphicsItemDesignerInfoOverlay.h" />
     <QtMoc Include="include\GraphicsItemDesignerView.h" />
+    <ClInclude Include="include\GraphicsItemDesignerItemBase.h" />
     <ClInclude Include="include\GraphicsItemDesignerNavigation.h" />
     <ClInclude Include="include\GraphicsItemDesignerScene.h" />
     <ClInclude Include="include\GraphicsItemDesignerViewStatusOverlay.h" />

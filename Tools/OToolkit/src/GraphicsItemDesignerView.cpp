@@ -18,7 +18,7 @@ GraphicsItemDesignerView::GraphicsItemDesignerView()
 	: m_cursorItem(nullptr), m_drawHandler(nullptr)
 {
 	m_scene = new GraphicsItemDesignerScene(this);
-	this->setScene(m_scene);
+	this->setGraphicsScene(m_scene);
 
 	m_infoOverlay = new GraphicsItemDesignerViewStatusOverlay(this);
 }

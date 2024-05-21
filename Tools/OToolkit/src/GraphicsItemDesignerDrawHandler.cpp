@@ -5,11 +5,18 @@
 
 // OToolkit header
 #include "GraphicsItemDesignerView.h"
+#include "GraphicsItemDesignerItemBase.h"
 #include "GraphicsItemDesignerDrawHandler.h"
 #include "GraphicsItemDesignerInfoOverlay.h"
 
+// OToolkit GraphicsItem wrapper
+#include "WrappedLineItem.h"
+
+// OpenTwin header
+#include "OTCore/Logger.h"
+
 GraphicsItemDesignerDrawHandler::GraphicsItemDesignerDrawHandler(GraphicsItemDesignerView* _view)
-	: m_mode(NoMode), m_view(_view), m_overlay(nullptr)
+	: m_mode(NoMode), m_view(_view), m_overlay(nullptr), m_previewItem(nullptr), m_currentUid(0)
 {
 
 }
@@ -26,6 +33,8 @@ void GraphicsItemDesignerDrawHandler::startDraw(DrawMode _mode) {
 	m_view->enablePickingMode();
 
 	m_overlay = new GraphicsItemDesignerInfoOverlay(this->modeString(), m_view);
+
+	this->createPreviewItem();
 }
 
 void GraphicsItemDesignerDrawHandler::cancelDraw(void) {
@@ -40,11 +49,32 @@ void GraphicsItemDesignerDrawHandler::cancelDraw(void) {
 }
 
 void GraphicsItemDesignerDrawHandler::updatePosition(const QPointF& _pos) {
+	if (m_previewItem) {
+		std::list<QPointF> lst = m_previewItem->controlPoints();
+		lst.pop_back();
+		if (lst.empty()) return;
 
+		lst.push_back(_pos);
+		m_previewItem->setControlPoints(lst);
+	}
 }
 
 void GraphicsItemDesignerDrawHandler::positionSelected(const QPointF& _pos) {
+	if (m_previewItem) {
+		std::list<QPointF> lst = m_previewItem->controlPoints();
+		lst.pop_back();
+		lst.push_back(_pos);
+		m_previewItem->setControlPoints(lst);
 
+		// Check if the draw is completed
+		if (m_previewItem->rebuildItem()) {
+			Q_EMIT drawCompleted();
+		}
+		else {
+			lst.push_back(_pos);
+			m_previewItem->setControlPoints(lst);
+		}
+	}
 }
 
 QString GraphicsItemDesignerDrawHandler::modeString(void) {
@@ -61,4 +91,49 @@ QString GraphicsItemDesignerDrawHandler::modeString(void) {
 	case GraphicsItemDesignerDrawHandler::Shape: return "Draw Shape";
 	default: return "<UNKNWON>";
 	}
+}
+
+void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
+	if (m_previewItem) {
+		OT_LOG_E("Preview item already created");
+		return;
+	}
+
+	switch (m_mode)
+	{
+	case GraphicsItemDesignerDrawHandler::NoMode: return;
+	case GraphicsItemDesignerDrawHandler::Line:
+		m_previewItem = this->createLineItem();
+		break;
+	case GraphicsItemDesignerDrawHandler::Square:
+		break;
+	case GraphicsItemDesignerDrawHandler::Rect:
+		break;
+	case GraphicsItemDesignerDrawHandler::Circle:
+		break;
+	case GraphicsItemDesignerDrawHandler::Ellipse:
+		break;
+	case GraphicsItemDesignerDrawHandler::Triangle:
+		break;
+	case GraphicsItemDesignerDrawHandler::Polygon:
+		break;
+	case GraphicsItemDesignerDrawHandler::Shape:
+		break;
+	default:
+		OT_LOG_E("Unknown mode (" + std::to_string((int)m_mode) + ")");
+		break;
+	}
+
+	if (m_previewItem) {
+		m_previewItem->addControlPoint(QPointF());
+		m_previewItem->getGraphicsItem()->setGraphicsItemUid(++m_currentUid);
+		m_view->addItem(m_previewItem->getGraphicsItem());
+	}
+}
+
+GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createLineItem(void) {
+	WrappedLineItem* newItem = new WrappedLineItem;
+	newItem->setLinePen(QPen(QBrush(QColor(0, 0, 0, 255)), 1.));
+
+	return newItem;
 }
