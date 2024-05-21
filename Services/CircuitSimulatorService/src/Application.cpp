@@ -262,7 +262,7 @@ void Application::createNewCircuit()
 	} while (std::find(circuits.begin(), circuits.end(), circuitName) != circuits.end());
 
 	//std::string circuitName = "Circuit " + std::to_string(ottest::currentEditorID);
-
+	circuitName = extractStringAfterDelimiter(circuitName, '/', 1);
 	
 	ot::GraphicsNewEditorPackage* editor = new ot::GraphicsNewEditorPackage(circuitName, circuitName);
 	ot::JsonDocument doc;

@@ -583,7 +583,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		std::string probeLine = oss.str();
 		ngSpice_Command(const_cast<char*>(probeLine.c_str()));
 	}
-
+	//ngSpice_Command(const_cast<char*>("circbyline .probe I(R1)"));
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
 	//ngSpice_Command(const_cast<char*>("circbyline print all"));
