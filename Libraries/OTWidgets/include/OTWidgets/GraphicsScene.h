@@ -24,6 +24,7 @@ namespace ot {
 		Q_OBJECT
 	public:
 		GraphicsScene(GraphicsView * _view);
+		GraphicsScene(const QRectF& _sceneRect, GraphicsView * _view);
 		virtual ~GraphicsScene();
 
 		//! @brief Set the grid size
