@@ -14,6 +14,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTWidgets/GraphicsScene.h"
 
 GraphicsItemDesignerDrawHandler::GraphicsItemDesignerDrawHandler(GraphicsItemDesignerView* _view)
 	: m_mode(NoMode), m_view(_view), m_overlay(nullptr), m_previewItem(nullptr), m_currentUid(0)
@@ -44,6 +45,11 @@ void GraphicsItemDesignerDrawHandler::cancelDraw(void) {
 
 	if (m_overlay) delete m_overlay;
 	m_overlay = nullptr;
+
+	if (m_previewItem) {
+		m_view->removeItem(m_previewItem->getGraphicsItem()->graphicsItemUid());
+		m_previewItem = nullptr;
+	}
 
 	Q_EMIT drawCancelled();
 }
