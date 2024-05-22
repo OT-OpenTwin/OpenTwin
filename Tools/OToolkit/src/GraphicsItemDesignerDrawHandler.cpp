@@ -126,6 +126,7 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 
 	if (m_previewItem) {
 		m_previewItem->addControlPoint(QPointF());
+		m_previewItem->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHasNoFeedback);
 		m_previewItem->getGraphicsItem()->setGraphicsItemUid(++m_currentUid);
 		m_view->addItem(m_previewItem->getGraphicsItem());
 	}

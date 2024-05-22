@@ -16,6 +16,6 @@ WrappedLineItem::~WrappedLineItem() {
 
 bool WrappedLineItem::rebuildItem(void) {
 	if (this->controlPoints().size() != 2) return false;
-	this->setLine(this->controlPoints().front(), this->controlPoints().back());
+		this->setLine(this->controlPoints().front(), this->controlPoints().back());
 	return true;
 }

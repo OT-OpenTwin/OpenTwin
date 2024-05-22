@@ -60,7 +60,10 @@ QSizeF ot::GraphicsLineItem::getPreferredGraphicsItemSize(void) const {
 
 void ot::GraphicsLineItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	_painter->setPen(m_pen);
-	_painter->drawLine(m_line);
+	
+	QPointF delta = _rect.topLeft() - QPointF(std::min(m_line.p1().x(), m_line.p2().x()), std::min(m_line.p1().y(), m_line.p2().y()));
+
+	_painter->drawLine(QLineF(m_line.p1() + delta, m_line.p2() + delta));
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -71,6 +74,8 @@ void ot::GraphicsLineItem::setLine(const QLineF& _line)
 {
 	this->prepareGeometryChange();
 	m_line = _line;
-	this->setGeometry(QRectF(this->pos(), this->getPreferredGraphicsItemSize()));
+	QRectF rec(QPointF(std::min(m_line.p1().x(), m_line.p2().x()), std::min(m_line.p1().y(), m_line.p2().y())), this->getPreferredGraphicsItemSize());
+	this->setPos(rec.topLeft());
+	this->setGeometry(rec);
 	this->raiseEvent(GraphicsItem::ItemResized);
 }

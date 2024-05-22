@@ -183,7 +183,8 @@ void ot::GraphicsItem::handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 }
 
 void ot::GraphicsItem::paintStateBackground(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	
+	if (m_flags & GraphicsItemCfg::ItemHasNoFeedback) return;
+
 	if (m_state & HoverState) {
 		QPen p(QColor(0, 0, 255));
 		_painter->setPen(p);
