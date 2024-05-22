@@ -36,7 +36,7 @@
 ot::GraphicsItem::GraphicsItem(bool _isLayoutOrStack)
 	: m_flags(GraphicsItemCfg::NoFlags), m_parent(nullptr), m_isLayoutOrStack(_isLayoutOrStack), 
 	m_state(NoState), m_scene(nullptr), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX),
-	m_sizePolicy(ot::Preferred), m_requestedSize(-1., -1.), m_connectionDirection(ot::ConnectAny), m_uid(0), m_highlightItem(nullptr)
+	m_sizePolicy(ot::Preferred), m_requestedSize(-1., -1.), m_connectionDirection(ot::ConnectAny), m_uid(0), m_highlightItem(nullptr), m_config(nullptr)
 {
 
 }
@@ -50,6 +50,14 @@ ot::GraphicsItem::~GraphicsItem() {
 // Virtual functions
 
 bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+	OTAssertNullptr(_cfg);
+	
+	if (m_config != _cfg) {
+		if (m_config) delete m_config;
+		m_config = nullptr;
+		m_config = _cfg->createCopy();
+	}
+
 	m_uid = _cfg->uid();
 	m_toolTip = _cfg->toolTip();	
 	m_alignment = _cfg->alignment();

@@ -127,6 +127,9 @@ namespace ot {
 
 		// Getter / Setter
 
+		//! \brief Returns the last set configuration
+		const GraphicsItemCfg* const getConfiguration(void) const { return m_config; };
+
 		//! \brief Sets the provided flag.
 		//! \see GraphicsItem, GraphicsItemFlag
 		//! \param _flag Flag to set.
@@ -224,6 +227,8 @@ namespace ot {
 		GraphicsItemCfg::GraphicsItemFlags m_flags;
 		ot::ConnectionDirection m_connectionDirection;
 		GraphicsHighlightItem* m_highlightItem;
+
+		GraphicsItemCfg* m_config;
 
 		QPointF m_moveStartPt; //! @brief Item move origin
 		GraphicsItem* m_parent; //! @brief Parent graphics item
