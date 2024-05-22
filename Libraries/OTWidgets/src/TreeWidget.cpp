@@ -78,6 +78,7 @@ QTreeWidgetItem* ot::TreeWidget::findItem(const QString& _itemPath, char _delimi
 
 bool ot::TreeWidget::itemTextExists(const QString& _itemText) const {
 	for (int i = 0; i < this->topLevelItemCount(); i++) {
+		if (this->topLevelItem(i)->text(0) == _itemText) return true;
 		if (this->itemTextExists(this->topLevelItem(i), _itemText)) return true;
 	}
 	return false;
@@ -116,33 +117,12 @@ void ot::TreeWidget::drawRow(QPainter* _painter, const QStyleOptionViewItem& _op
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Private: Slots
-
-void ot::TreeWidget::slotColorStyleAboutToChange(void) {
-	m_columnWidths.clear();
-	for (int i = 0; i < this->columnCount(); i++) {
-		m_columnWidths.push_back(this->columnWidth(i));
-	}
-	if (!m_columnWidths.empty()) {
-		m_columnWidths.pop_back();
-	}
-}
-
-void ot::TreeWidget::slotColorStyleChanged(const ColorStyle& _style) {
-	int i = 0;
-	for (int w : m_columnWidths) {
-		this->setColumnWidth(i++, w);
-	}
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Private: Helper
+// Protected: Helper
 
 bool ot::TreeWidget::itemTextExists(QTreeWidgetItem* _parent, const QString& _itemText) const {
 	OTAssertNullptr(_parent);
-	if (_parent->text(0) == _itemText) return true;
 	for (int i = 0; i < _parent->childCount(); i++) {
+		if (_parent->child(i)->text(0) == _itemText) return true;
 		if (this->itemTextExists(_parent->child(i), _itemText)) return true;
 	}
 	return false;
@@ -166,6 +146,42 @@ QTreeWidgetItem* ot::TreeWidget::findItem(QTreeWidgetItem* _item, const QStringL
 	}
 	return nullptr;
 }
+
+QTreeWidgetItem* ot::TreeWidget::findItemText(QTreeWidgetItem* _parent, const QString& _itemText) const {
+	OTAssertNullptr(_parent);
+	QTreeWidgetItem* ret = nullptr;
+	for (int i = 0; i < _parent->childCount(); i++) {
+		if (_parent->child(i)->text(0) == _itemText) return _parent->child(i);
+		ret = this->findItemText(_parent->child(i), _itemText);
+		if (ret) return ret;
+	}
+	return ret;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Slots
+
+void ot::TreeWidget::slotColorStyleAboutToChange(void) {
+	m_columnWidths.clear();
+	for (int i = 0; i < this->columnCount(); i++) {
+		m_columnWidths.push_back(this->columnWidth(i));
+	}
+	if (!m_columnWidths.empty()) {
+		m_columnWidths.pop_back();
+	}
+}
+
+void ot::TreeWidget::slotColorStyleChanged(const ColorStyle& _style) {
+	int i = 0;
+	for (int w : m_columnWidths) {
+		this->setColumnWidth(i++, w);
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper
 
 QTreeWidgetItem* ot::TreeWidget::addItem(QTreeWidgetItem* _parent, const TreeWidgetItemInfo& _item) {
 	for (int i = 0; i < _parent->childCount(); i++) {

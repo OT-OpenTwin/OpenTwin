@@ -104,6 +104,21 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
+		// Protected: Helper
+
+		//! \brief Checks if an item with the given text exists.
+		//! The item text is the text of the single item.
+		//! The item to check may be nested.
+		//! \param _parent The parent item to check the childs.
+		//! \param _itemText Text to check.
+		bool itemTextExists(QTreeWidgetItem* _parent, const QString& _itemText) const;
+
+		QTreeWidgetItem* findItem(QTreeWidgetItem* _item, const QStringList& _childPath) const;
+
+		QTreeWidgetItem* findItemText(QTreeWidgetItem* _parent, const QString& _itemText) const;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
 		// Private: Slots
 
 	private Q_SLOTS:
@@ -116,16 +131,6 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private: Helper
-
-		//! \brief Checks if an item with the given text exists.
-		//! The item text is the text of the single item.
-		//! The item to check may be nested.
-		//! If the provided parent matches the text true will be returned.
-		//! \param _parent The parent item to check the childs.
-		//! \param _itemText Text to check.
-		bool itemTextExists(QTreeWidgetItem* _parent, const QString& _itemText) const;
-
-		QTreeWidgetItem* findItem(QTreeWidgetItem* _item, const QStringList& _childPath) const;
 
 		QTreeWidgetItem* addItem(QTreeWidgetItem* _parent, const TreeWidgetItemInfo& _item);
 	};
