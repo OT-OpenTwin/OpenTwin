@@ -998,8 +998,8 @@ void EntityPropertiesEntityList::createProperty(const std::string &group, const 
 void EntityPropertiesProjectList::copySettings(EntityPropertiesBase* other, EntityBase* root)
 {
 	EntityPropertiesBase::copySettings(other, root);
-	EntityPropertiesSelection* selection = dynamic_cast<EntityPropertiesSelection*>(other);
-	_value = selection->getValue();
+	EntityPropertiesProjectList* otherProject = dynamic_cast<EntityPropertiesProjectList*>(other);
+	_value = otherProject->_value;
 	setNeedsUpdate();
 }
 
