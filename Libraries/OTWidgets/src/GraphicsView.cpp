@@ -71,6 +71,14 @@ void ot::GraphicsView::viewAll(void) {
 	}
 }
 
+void ot::GraphicsView::setGraphicsScene(GraphicsScene* _scene) {
+	if (_scene == m_scene) return;
+	if (!_scene) return;
+	if (m_scene) delete m_scene;
+	m_scene = _scene;
+	this->setScene(_scene);
+}
+
 ot::GraphicsItem* ot::GraphicsView::getItem(const ot::UID&  _itemUid) {
 	auto it = m_items.find(_itemUid);
 	if (it == m_items.end()) {

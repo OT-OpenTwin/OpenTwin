@@ -43,6 +43,7 @@ namespace ot {
 
 		const bool getStateChangeInProgress() const { return m_stateChangeInProgress; }
 
+		void setGraphicsScene(GraphicsScene* _scene);
 		GraphicsScene* getGraphicsScene(void) { return m_scene; };
 		
 		GraphicsItem* getItem(const ot::UID& _itemUid);
