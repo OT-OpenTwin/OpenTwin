@@ -44,10 +44,10 @@ void WrappedLineItem::fillPropertyGrid(void) {
 
 }
 
-void WrappedLineItem::propertyChanged(const std::string& _group, const std::string& _item) {
+void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
 
 }
 
-void WrappedLineItem::propertyDeleteRequested(const std::string& _group, const std::string& _item) {
+void WrappedLineItem::propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
 
 }

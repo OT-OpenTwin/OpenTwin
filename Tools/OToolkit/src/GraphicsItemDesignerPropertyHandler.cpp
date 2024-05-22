@@ -8,9 +8,10 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTWidgets/PropertyGridItem.h"
 
 GraphicsItemDesignerPropertyHandler::GraphicsItemDesignerPropertyHandler()
-	: m_propertyGrid(nullptr) 
+	: m_propertyGrid(nullptr), m_navigation(nullptr)
 {}
 
 void GraphicsItemDesignerPropertyHandler::setPropertyGrid(ot::PropertyGrid* _grid) {
@@ -32,9 +33,21 @@ void GraphicsItemDesignerPropertyHandler::unsetPropertyGrid(void) {
 }
 
 void GraphicsItemDesignerPropertyHandler::slotPropertyChanged(const std::string& _group, const std::string& _item) {
-	this->propertyChanged(_group, _item);
+	ot::PropertyGridItem* item = m_propertyGrid->findItem(_group, _item);
+	if (!item) {
+		OT_LOG_E("Invalid property { \"Group\": \"" + _group + "\", \"Item\": \"" + _item + "\" }");
+		return;
+	}
+
+	this->propertyChanged(item, item->getPropertyData());
 }
 
 void GraphicsItemDesignerPropertyHandler::slotPropertyDeleteRequested(const std::string& _group, const std::string& _item) {
-	this->propertyDeleteRequested(_group, _item);
+	ot::PropertyGridItem* item = m_propertyGrid->findItem(_group, _item);
+	if (!item) {
+		OT_LOG_E("Invalid property { \"Group\": \"" + _group + "\", \"Item\": \"" + _item + "\" }");
+		return;
+	}
+
+	this->propertyDeleteRequested(item, item->getPropertyData());
 }

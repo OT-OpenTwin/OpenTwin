@@ -20,9 +20,10 @@ GraphicsItemDesignerNavigation::GraphicsItemDesignerNavigation()
 	m_rootItem = new GraphicsItemDesignerNavigationRoot;
 	m_rootItem->setText(0, "New Item");
 	m_rootItem->setIcon(0, ot::IconManager::getIcon("GraphicsEditor/Root.png"));
+	m_rootItem->setNavigation(this);
 	this->addTopLevelItem(m_rootItem);
 
-	this->connect(this, &GraphicsItemDesignerNavigation::selectionChanged, this, &GraphicsItemDesignerNavigation::slotSelectionChanged);
+	this->connect(this, &GraphicsItemDesignerNavigation::itemSelectionChanged, this, &GraphicsItemDesignerNavigation::slotSelectionChanged);
 }
 
 GraphicsItemDesignerNavigation::~GraphicsItemDesignerNavigation() {
@@ -39,6 +40,7 @@ void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _
 		it = m_itemsMap.find(itemName);
 	}
 	_item->getGraphicsItem()->setGraphicsItemName(itemName.toStdString());
+	_item->setNavigation(this);
 
 	// Store new item
 	m_rootItems.push_back(_item);
@@ -51,7 +53,27 @@ void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _
 	this->addItem(info);
 }
 
-void GraphicsItemDesignerNavigation::slotSelectionChanged(const QItemSelection& _selected, const QItemSelection& _deselected) {
+bool GraphicsItemDesignerNavigation::isItemNameUnique(const QString& _item) const {
+	return m_itemsMap.find(_item) != m_itemsMap.end();
+}
+
+bool GraphicsItemDesignerNavigation::updateItemName(const QString& _oldName, const QString& _newName) {
+	auto it = m_itemsMap.find(_oldName);
+	if (it == m_itemsMap.end()) {
+		OT_LOG_W("Item does not exist \"" + _oldName.toStdString() + "\"");
+		return false;
+	}
+	if (!isItemNameUnique(_newName)) {
+		OT_LOG_E("Item already exists \"" + _newName.toStdString() + "\"");
+		return false;
+	}
+
+	GraphicsItemDesignerItemBase* itm = it->second;
+	m_itemsMap.erase(_oldName);
+	m_itemsMap.insert_or_assign(_newName, itm);
+}
+
+void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
 	m_propertyGrid->clear();
 	if (m_propertyHandler) {
 		m_propertyHandler->unsetPropertyGrid();

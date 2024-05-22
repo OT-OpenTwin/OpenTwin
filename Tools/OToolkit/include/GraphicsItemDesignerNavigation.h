@@ -31,8 +31,12 @@ public:
 
 	void addRootItem(GraphicsItemDesignerItemBase* _item);
 
+	bool isItemNameUnique(const QString& _itemName) const;
+
+	bool updateItemName(const QString& _oldName, const QString& _newName);
+
 private Q_SLOTS:
-	void slotSelectionChanged(const QItemSelection& _selected, const QItemSelection& _deselected);
+	void slotSelectionChanged(void);
 
 private:
 	std::list<GraphicsItemDesignerItemBase*> m_rootItems;

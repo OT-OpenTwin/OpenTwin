@@ -56,8 +56,8 @@ public:
 
 protected:
 	virtual void fillPropertyGrid(void) override = 0;
-	virtual void propertyChanged(const std::string& _group, const std::string& _item) override = 0;
-	virtual void propertyDeleteRequested(const std::string& _group, const std::string& _item) override = 0;
+	virtual void propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override = 0;
+	virtual void propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override = 0;
 
 private:
 	std::list<QPointF> m_controlPoints;
