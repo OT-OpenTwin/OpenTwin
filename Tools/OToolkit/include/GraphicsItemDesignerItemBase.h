@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
 #include "OTWidgets/TreeWidget.h"
+#include "OTWidgets/IconManager.h"
 
 // Qt header
 #include <QtCore/qpoint.h>

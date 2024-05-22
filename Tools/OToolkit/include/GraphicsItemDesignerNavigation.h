@@ -8,10 +8,16 @@
 // OpenTwin header
 #include "OTWidgets/TreeWidget.h"
 
+// Qt header
+#include <QtCore/qstring.h>
+
 // std header
+#include <map>
 #include <list>
 
 class GraphicsItemDesignerItemBase;
+
+class QTreeWidgetItem;
 
 class GraphicsItemDesignerNavigation : public ot::TreeWidget {
 public:
@@ -21,8 +27,7 @@ public:
 	void addRootItem(GraphicsItemDesignerItemBase* _item);
 
 private:
-	void rebuildNavigation(void);
-
 	std::list<GraphicsItemDesignerItemBase*> m_rootItems;
-
+	std::map<QString, GraphicsItemDesignerItemBase*> m_itemsMap;
+	QTreeWidgetItem* m_rootItem;
 };
