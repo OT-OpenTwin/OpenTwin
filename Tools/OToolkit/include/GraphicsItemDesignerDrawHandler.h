@@ -50,6 +50,7 @@ Q_SIGNALS:
 	void drawCancelled();
 
 private:
+	QPointF constainPosition(const QPointF& _pos) const;
 	QString modeString(void);
 	void createPreviewItem(void);
 	GraphicsItemDesignerItemBase* createLineItem(void);

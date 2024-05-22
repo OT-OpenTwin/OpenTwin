@@ -6,8 +6,11 @@
 // OToolkit header
 #include "GraphicsItemDesignerNavigation.h"
 #include "GraphicsItemDesignerNavigationRoot.h"
+#include "GraphicsItemDesignerView.h"
 
-GraphicsItemDesignerNavigationRoot::GraphicsItemDesignerNavigationRoot() {
+GraphicsItemDesignerNavigationRoot::GraphicsItemDesignerNavigationRoot() 
+	: m_view(nullptr)
+{
 
 }
 
@@ -17,6 +20,8 @@ void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
 	PropertyGridCfg cfg;
 	PropertyGroup* generalGroup = new PropertyGroup("General");
 	generalGroup->addProperty(new PropertyString("Name", this->text(0).toStdString()));
+	generalGroup->addProperty(new PropertyDouble("Width", m_view->sceneRect().width()));
+	generalGroup->addProperty(new PropertyDouble("Height", m_view->sceneRect().height()));
 
 	cfg.addRootGroup(generalGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);
@@ -33,6 +38,24 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 		}
 
 		this->setText(0, input->getCurrentText());
+	}
+	else if (_item->getGroupName() == "General" && _itemData.propertyName() == "Width") {
+		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		m_view->setItemSize(QSizeF(input->getValue(), m_view->getItemSize().height()));
+	}
+	else if (_item->getGroupName() == "General" && _itemData.propertyName() == "Height") {
+		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		m_view->setItemSize(QSizeF(m_view->getItemSize().width(), input->getValue()));
 	}
 	else {
 		OT_LOG_E("Unknown property { \"Group\": \"" + _item->getGroupName() + "\", \"Item\": \"" + _itemData.propertyName() + "\" }");

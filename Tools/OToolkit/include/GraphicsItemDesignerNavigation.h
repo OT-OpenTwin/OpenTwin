@@ -15,6 +15,7 @@
 #include <map>
 #include <list>
 
+class GraphicsItemDesignerView;
 class GraphicsItemDesignerItemBase;
 class GraphicsItemDesignerNavigationRoot;
 class GraphicsItemDesignerPropertyHandler;
@@ -26,6 +27,8 @@ class GraphicsItemDesignerNavigation : public ot::TreeWidget {
 public:
 	GraphicsItemDesignerNavigation();
 	virtual ~GraphicsItemDesignerNavigation();
+
+	void setDesignerView(GraphicsItemDesignerView* _view);
 
 	void setPropertyGrid(ot::PropertyGrid* _grid) { m_propertyGrid = _grid; };
 

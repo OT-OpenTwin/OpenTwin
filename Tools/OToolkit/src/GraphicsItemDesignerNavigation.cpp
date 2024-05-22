@@ -30,6 +30,10 @@ GraphicsItemDesignerNavigation::~GraphicsItemDesignerNavigation() {
 
 }
 
+void GraphicsItemDesignerNavigation::setDesignerView(GraphicsItemDesignerView* _view) {
+	m_rootItem->setDesignerView(_view);
+}
+
 void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _item) {
 	// Determine new item name
 	QString itemName = _item->getDefaultItemName();
@@ -71,6 +75,8 @@ bool GraphicsItemDesignerNavigation::updateItemName(const QString& _oldName, con
 	GraphicsItemDesignerItemBase* itm = it->second;
 	m_itemsMap.erase(_oldName);
 	m_itemsMap.insert_or_assign(_newName, itm);
+
+	return true;
 }
 
 void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {

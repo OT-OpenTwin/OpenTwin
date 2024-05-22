@@ -8,14 +8,17 @@
 #include "GraphicsItemDesignerScene.h"
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTWidgets/GraphicsScene.h"
+#include "OTWidgets/ColorStyleTypes.h"
+#include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/GraphicsEllipseItem.h"
 
 // Qt header
 #include <QtWidgets/qgraphicssceneevent.h>
 
 GraphicsItemDesignerScene::GraphicsItemDesignerScene(GraphicsItemDesignerView* _view)
-	: ot::GraphicsScene(_view), m_view(_view), m_cursorItem(nullptr), m_mode(NoMode)
+	: ot::GraphicsScene(QRectF(0., 0., 300., 200.), _view), m_view(_view), m_cursorItem(nullptr), m_mode(NoMode), m_itemSize(300, 200)
 {
 
 }
@@ -72,12 +75,62 @@ void GraphicsItemDesignerScene::mousePressEvent(QGraphicsSceneMouseEvent* _event
 
 void GraphicsItemDesignerScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 	ot::GraphicsScene::mouseMoveEvent(_event);
-
+	
 	m_view->fwdPositionChanged(_event->scenePos());
 
 	if (m_cursorItem) { 
 		m_cursorItem->prepareGraphicsItemGeometryChange();
 		m_cursorItem->setPos(_event->scenePos() - QPointF(m_cursorItem->radiusX(), m_cursorItem->radiusY()));
 	}
+
+	if (m_mode == PointPickingMode) {
+		QGraphicsItem* item = itemAt(_event->scenePos(), QTransform());
+		if (item) {
+			this->constrainItemToScene(item);
+		}
+	}
 }
 
+void GraphicsItemDesignerScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+	ot::GraphicsScene::mouseReleaseEvent(_event);
+
+	if (m_mode == PointPickingMode) {
+		QGraphicsItem* item = itemAt(_event->scenePos(), QTransform());
+		if (item) {
+			this->constrainItemToScene(item);
+		}
+	}
+}
+
+void GraphicsItemDesignerScene::drawBackground(QPainter* _painter, const QRectF& _rect) {
+	const ot::ColorStyle& cs = ot::GlobalColorStyle::instance().getCurrentStyle();
+	_painter->fillRect(_rect, cs.getValue(OT_COLORSTYLE_VALUE_ControlsDisabledBackground).brush());
+	_painter->fillRect(_rect.intersected(QRectF(QPointF(0., 0.), m_itemSize)), cs.getValue(OT_COLORSTYLE_VALUE_ControlsBackground).brush());
+}
+
+void GraphicsItemDesignerScene::constrainItemToScene(QGraphicsItem* _item)
+{
+	QRectF itemRect = _item->sceneBoundingRect();
+	QPointF newPos = _item->pos();
+
+	if (itemRect.left() < 0) {
+		newPos.setX(0);
+	}
+	else if (itemRect.right() > m_itemSize.width()) {
+		newPos.setX(newPos.x() - (newPos.x() - m_itemSize.height()));
+	}
+
+	if (itemRect.top() < 0) {
+		newPos.setY(0);
+	}
+	else if (itemRect.bottom() > m_itemSize.height()) {
+		newPos.setY(newPos.y() - (newPos.y() - m_itemSize.height()));
+	}
+	
+	_item->setPos(newPos);
+
+	itemRect = _item->sceneBoundingRect();
+	if (itemRect.left() < 0 || itemRect.top() < 0) {
+		OT_LOG_E("Item is too big");
+	}
+}

@@ -27,13 +27,19 @@ public:
 	void enablePickingMode(void);
 	void disablePickingMode(void);
 
+	void setItemSize(const QSizeF& _size);
+	const QSizeF& getItemSize(void) const;
+
 	void setDrawHandler(GraphicsItemDesignerDrawHandler* _handler) { m_drawHandler = _handler; };
 	GraphicsItemDesignerDrawHandler* getDrawHandler(void) const { return m_drawHandler; };
+
+	GraphicsItemDesignerScene* getDesignerScene(void) const { return m_scene; };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 protected:
 	virtual void keyPressEvent(QKeyEvent* _event) override;
+	virtual void showEvent(QShowEvent* _event) override;
 
 private:
 	friend class GraphicsItemDesignerScene;
@@ -46,4 +52,5 @@ private:
 	GraphicsItemDesignerScene* m_scene;
 	GraphicsItemDesignerDrawHandler* m_drawHandler;
 	ot::GraphicsEllipseItem* m_cursorItem;
+
 };

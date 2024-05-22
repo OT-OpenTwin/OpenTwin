@@ -99,6 +99,24 @@ void GraphicsItemDesignerDrawHandler::positionSelected(const QPointF& _pos) {
 	}
 }
 
+QPointF GraphicsItemDesignerDrawHandler::constainPosition(const QPointF& _pos) const {
+	QPointF pt = _pos;
+	if (pt.x() < 0) {
+		pt.setX(0);
+	}
+	if (pt.y() < 0) {
+		pt.setY(0);
+	}
+	if (pt.x() > m_view->getItemSize().width()) {
+		pt.setX(m_view->getItemSize().width());
+	}
+	if (pt.y() > m_view->getItemSize().height()) {
+		pt.setY(m_view->getItemSize().height());
+	}
+
+	return pt;
+}
+
 QString GraphicsItemDesignerDrawHandler::modeString(void) {
 	switch (m_mode)
 	{

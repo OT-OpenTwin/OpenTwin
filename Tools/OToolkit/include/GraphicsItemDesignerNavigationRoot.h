@@ -11,10 +11,14 @@
 // Qt header
 #include <QtWidgets/qtreewidget.h>
 
+class GraphicsItemDesignerView;
+
 class GraphicsItemDesignerNavigationRoot : public QTreeWidgetItem, public GraphicsItemDesignerPropertyHandler {
 public:
 	GraphicsItemDesignerNavigationRoot();
 	virtual ~GraphicsItemDesignerNavigationRoot() {};
+
+	void setDesignerView(GraphicsItemDesignerView* _view) { m_view = _view; };
 
 protected:
 	virtual void fillPropertyGrid(void) override;
@@ -22,5 +26,5 @@ protected:
 	virtual void propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override;
 
 private:
-
+	GraphicsItemDesignerView* m_view;
 };
