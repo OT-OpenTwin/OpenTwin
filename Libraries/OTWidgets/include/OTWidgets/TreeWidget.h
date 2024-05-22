@@ -70,19 +70,41 @@ namespace ot {
 		TreeWidget(QWidget * _parentWidget = (QWidget*)nullptr);
 		virtual ~TreeWidget();
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
+
 		//! @brief Returns a pointer to the root widget of this object
 		virtual QWidget* getQWidget(void) override { return this; };
+
+		QTreeWidgetItem* findItem(const QString& _itemPath, char _delimiter = '/') const;
+		
+		//! \brief Checks if the item at the given path exists.
+		//! \param _itemPath Path to the item (e.g. "Root/Child/Item" for a delimiter '/').
+		//! \param _delimiter Delimiter to separate the item path.
+		bool itemExists(const QString& _itemPath, char _delimiter = '/') const { return this->findItem(_itemPath, _delimiter); };
+
+		//! \brief Checks if an item with the given text exists.
+		//! The item text is the text of the single item.
+		//! The item to check may be nested.
+		//! \param _itemText Text to check.
+		bool itemTextExists(const QString& _itemText) const;
+
+		QString itemPath(QTreeWidgetItem* _item, char _delimiter = '/') const;
+
+		QTreeWidgetItem* addItem(const TreeWidgetItemInfo& _item);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Event handler
 
 		virtual void mousePressEvent(QMouseEvent* _event) override;
 
 		virtual void drawRow(QPainter* _painter, const QStyleOptionViewItem& _options, const QModelIndex& _index) const override;
 
-		QTreeWidgetItem* findItem(const QString& _itemPath, char _delimiter = '/') const;
-		bool itemExists(const QString& _itemPath, char _delimiter = '/') const { return this->findItem(_itemPath, _delimiter); };
+		// ###########################################################################################################################################################################################################################################################################################################################
 
-		QString itemPath(QTreeWidgetItem* _item, char _delimiter = '/') const;
-
-		QTreeWidgetItem* addItem(const TreeWidgetItemInfo& _item);
+		// Private: Slots
 
 	private Q_SLOTS:
 		void slotColorStyleAboutToChange(void);
@@ -90,6 +112,18 @@ namespace ot {
 
 	private:
 		std::list<int> m_columnWidths;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Private: Helper
+
+		//! \brief Checks if an item with the given text exists.
+		//! The item text is the text of the single item.
+		//! The item to check may be nested.
+		//! If the provided parent matches the text true will be returned.
+		//! \param _parent The parent item to check the childs.
+		//! \param _itemText Text to check.
+		bool itemTextExists(QTreeWidgetItem* _parent, const QString& _itemText) const;
 
 		QTreeWidgetItem* findItem(QTreeWidgetItem* _item, const QStringList& _childPath) const;
 
