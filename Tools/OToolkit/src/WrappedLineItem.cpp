@@ -16,6 +16,16 @@ WrappedLineItem::~WrappedLineItem() {
 
 bool WrappedLineItem::rebuildItem(void) {
 	if (this->controlPoints().size() != 2) return false;
-		this->setLine(this->controlPoints().front(), this->controlPoints().back());
+	
+	QPointF p1 = this->controlPoints().front();
+	QPointF p2 = this->controlPoints().back();
+
+	this->prepareGeometryChange();
+	
+	QPointF delta = QPointF(std::min(p1.x(), p2.x()), std::min(p1.y(), p2.y()));
+	this->setPos(delta);
+
+	this->setLine(p1 - delta, p2 - delta);
+	
 	return true;
 }
