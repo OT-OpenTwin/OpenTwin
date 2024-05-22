@@ -72,6 +72,13 @@ bool GraphicsItemDesignerNavigation::updateItemName(const QString& _oldName, con
 		return false;
 	}
 
+	QTreeWidgetItem* treeItem = this->findItemText(m_rootItem, _oldName);
+	if (!treeItem) {
+		OT_LOG_E("Tree item not found");
+		return false;
+	}
+	treeItem->setText(0, _newName);
+
 	GraphicsItemDesignerItemBase* itm = it->second;
 	m_itemsMap.erase(_oldName);
 	m_itemsMap.insert_or_assign(_newName, itm);

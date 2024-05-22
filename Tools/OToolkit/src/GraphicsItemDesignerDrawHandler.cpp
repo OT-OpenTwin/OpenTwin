@@ -76,7 +76,7 @@ void GraphicsItemDesignerDrawHandler::updatePosition(const QPointF& _pos) {
 		lst.pop_back();
 		if (lst.empty()) return;
 
-		lst.push_back(_pos);
+		lst.push_back(this->constainPosition(_pos));
 		m_previewItem->setControlPoints(lst);
 	}
 }
@@ -85,7 +85,7 @@ void GraphicsItemDesignerDrawHandler::positionSelected(const QPointF& _pos) {
 	if (m_previewItem) {
 		std::list<QPointF> lst = m_previewItem->controlPoints();
 		lst.pop_back();
-		lst.push_back(_pos);
+		lst.push_back(this->constainPosition(_pos));
 		m_previewItem->setControlPoints(lst);
 
 		// Check if the draw is completed

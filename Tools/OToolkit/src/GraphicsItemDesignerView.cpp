@@ -45,6 +45,7 @@ void GraphicsItemDesignerView::disablePickingMode(void) {
 void GraphicsItemDesignerView::setItemSize(const QSizeF& _size) {
 	m_scene->setItemSize(_size);
 	this->resetView();
+	this->update();
 }
 
 const QSizeF& GraphicsItemDesignerView::getItemSize(void) const {
