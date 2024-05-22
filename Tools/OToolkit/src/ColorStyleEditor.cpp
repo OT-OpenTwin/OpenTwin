@@ -418,6 +418,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 
 	// Initialize default style values
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsDisabledBackground, new PropertyPainter2D(new FillPainter2D(Color(230, 230, 230))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
@@ -500,6 +501,7 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 
 	// Initialize default style values
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsDisabledBackground, new PropertyPainter2D(new FillPainter2D(Color(20, 20, 20))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
@@ -582,6 +584,7 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 
 	// Initialize default style values
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
+	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsDisabledBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 44, 108))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));

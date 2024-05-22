@@ -32,6 +32,7 @@
 #define OT_COLORSTYLE_FILE_PropertyGroupCollapsed "Property Group Collapsed"
 
 #define OT_COLORSTYLE_VALUE_ControlsBackground "Controls Background"
+#define OT_COLORSTYLE_VALUE_ControlsDisabledBackground "Controls Disabled Background"
 #define OT_COLORSTYLE_VALUE_ControlsForeground "Controls Foreground"
 #define OT_COLORSTYLE_VALUE_ControlsHoverBackground "Controls Hover Background"
 #define OT_COLORSTYLE_VALUE_ControlsHoverForeground "Controls Hover Foreground"
