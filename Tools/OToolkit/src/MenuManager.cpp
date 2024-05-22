@@ -10,6 +10,9 @@
 // ToolkitAPI header
 #include "OToolkitAPI/OToolkitAPI.h"
 
+// OpenTwin header
+#include "OTWidgets/WidgetViewManager.h"
+
 // Qt header
 #include <QtWidgets/qmenu.h>
 #include <QtWidgets/qaction.h>
@@ -21,7 +24,7 @@
 MenuManager::MenuManager() {
 	// Create root menus
 	m_fileMenu = this->addMenu("File");
-	m_viewMenu = this->addMenu("View");
+	this->addAction(ot::WidgetViewManager::instance().getDockToggleAction());
 	m_toolsMenu = this->addMenu("Tools");
 
 	// Settings

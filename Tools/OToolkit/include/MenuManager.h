@@ -27,7 +27,6 @@ public:
 	virtual ~MenuManager();
 
 	QMenu* fileMenu(void) { return m_fileMenu; };
-	QMenu* viewMenu(void) { return m_viewMenu; };
 	QMenu* toolsMenu(void) { return m_toolsMenu; };
 
 	ToolMenuManager* addToolMenu(const QString& _toolName);
@@ -43,7 +42,6 @@ private Q_SLOTS:
 
 private:
 	QMenu* m_fileMenu;
-	QMenu* m_viewMenu;
 	QMenu* m_toolsMenu;
 
 	std::map<QString, ToolMenuManager*> m_toolMenus;
