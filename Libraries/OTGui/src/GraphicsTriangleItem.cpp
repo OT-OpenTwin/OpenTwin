@@ -76,6 +76,19 @@ ot::GraphicsTriangleItemCfg::~GraphicsTriangleItemCfg() {
 	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
+ot::GraphicsItemCfg* ot::GraphicsTriangleItemCfg::createCopy(void) const {
+	ot::GraphicsTriangleItemCfg* copy = new GraphicsTriangleItemCfg;
+	this->setupData(copy);
+
+	copy->m_outline = m_outline;
+	copy->m_size = m_size;
+	copy->setBackgroundPainer(m_backgroundPainter->createCopy());
+	copy->m_direction = m_direction;
+	copy->m_shape = m_shape;
+
+	return copy;
+}
+
 void ot::GraphicsTriangleItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	OTAssertNullptr(m_backgroundPainter);
 

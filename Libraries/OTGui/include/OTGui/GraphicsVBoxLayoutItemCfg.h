@@ -18,6 +18,9 @@ namespace ot {
 		GraphicsVBoxLayoutItemCfg();
 		virtual ~GraphicsVBoxLayoutItemCfg() {};
 
+		//! \brief Creates a copy of this item.
+		virtual GraphicsItemCfg* createCopy(void) const override;
+
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsVBoxLayoutItem); };
 

@@ -25,6 +25,17 @@ ot::GraphicsStackItemCfg::~GraphicsStackItemCfg() {
 	this->memClear();
 }
 
+ot::GraphicsItemCfg* ot::GraphicsStackItemCfg::createCopy(void) const {
+	ot::GraphicsStackItemCfg* copy = new GraphicsStackItemCfg;
+	this->setupData(copy);
+
+	for (const GraphicsStackItemCfgEntry& itm : m_items) {
+		copy->addItemTop(itm.item->createCopy(), itm.isMaster, itm.isSlave);
+	}
+
+	return copy;
+}
+
 void ot::GraphicsStackItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	ot::GraphicsItemCfg::addToJsonObject(_object, _allocator);
 

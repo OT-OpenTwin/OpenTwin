@@ -23,6 +23,17 @@ ot::GraphicsPolygonItemCfg::~GraphicsPolygonItemCfg() {
 	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
+ot::GraphicsItemCfg* ot::GraphicsPolygonItemCfg::createCopy(void) const {
+	ot::GraphicsPolygonItemCfg* copy = new GraphicsPolygonItemCfg;
+	this->setupData(copy);
+
+	copy->m_points = m_points;
+	copy->m_outline = m_outline;
+	copy->setBackgroundPainter(m_backgroundPainter->createCopy());
+
+	return copy;
+}
+
 void ot::GraphicsPolygonItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 

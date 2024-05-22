@@ -18,6 +18,9 @@ namespace ot {
 		GraphicsGridLayoutItemCfg(int _rows = 0, int _columns = 0);
 		virtual ~GraphicsGridLayoutItemCfg();
 
+		//! \brief Creates a copy of this item.
+		virtual GraphicsItemCfg* createCopy(void) const override;
+
 		//! @brief Add the object contents to the provided JSON object.
 		//! @param _document The JSON document (used to get the allocator).
 		//! @param _object The JSON object to add the contents to.

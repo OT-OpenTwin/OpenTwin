@@ -42,6 +42,9 @@ namespace ot {
 		GraphicsTriangleItemCfg(TriangleDirection _direction = Right, TriangleShape _shape = Triangle);
 		virtual ~GraphicsTriangleItemCfg();
 
+		//! \brief Creates a copy of this item.
+		virtual GraphicsItemCfg* createCopy(void) const override;
+
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
 		//! @param _object The JSON object to add the contents to

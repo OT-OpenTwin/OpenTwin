@@ -18,6 +18,17 @@ ot::GraphicsLineItemCfg::GraphicsLineItemCfg() {}
 
 ot::GraphicsLineItemCfg::~GraphicsLineItemCfg() {}
 
+ot::GraphicsItemCfg* ot::GraphicsLineItemCfg::createCopy(void) const {
+	ot::GraphicsLineItemCfg* copy = new GraphicsLineItemCfg;
+	this->setupData(copy);
+
+	copy->m_from = m_from;
+	copy->m_to = m_to;
+	copy->m_lineStyle = m_lineStyle;
+
+	return copy;
+}
+
 void ot::GraphicsLineItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 

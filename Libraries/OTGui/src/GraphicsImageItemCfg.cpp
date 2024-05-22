@@ -20,6 +20,17 @@ ot::GraphicsImageItemCfg::GraphicsImageItemCfg(const std::string& _imageSubPath)
 
 ot::GraphicsImageItemCfg::~GraphicsImageItemCfg() {}
 
+ot::GraphicsItemCfg* ot::GraphicsImageItemCfg::createCopy(void) const {
+	ot::GraphicsImageItemCfg* copy = new GraphicsImageItemCfg;
+	this->setupData(copy);
+
+	copy->m_imageSubPath = m_imageSubPath;
+	copy->m_maintainAspectRatio = m_maintainAspectRatio;
+	copy->m_colorMask = m_colorMask;
+
+	return copy;
+}
+
 void ot::GraphicsImageItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 

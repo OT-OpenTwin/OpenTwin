@@ -34,6 +34,13 @@ namespace ot {
 		void addChildItem(ot::GraphicsItemCfg* _item, int _stretch);
 		void addStrech(int _stretch = 1);
 		const std::list<itemStrechPair_t>& items(void) const { return m_items; };
+		
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Protected: Helper
+
+	protected:
+		virtual void setupData(GraphicsItemCfg* _config) const;
 
 	private:
 		void clearItems(void);

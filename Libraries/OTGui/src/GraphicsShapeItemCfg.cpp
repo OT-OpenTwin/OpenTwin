@@ -23,6 +23,17 @@ ot::GraphicsShapeItemCfg::~GraphicsShapeItemCfg() {
 	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
+ot::GraphicsItemCfg* ot::GraphicsShapeItemCfg::createCopy(void) const {
+	ot::GraphicsShapeItemCfg* copy = new GraphicsShapeItemCfg;
+	this->setupData(copy);
+
+	copy->m_path = m_path;
+	copy->m_outline = m_outline;
+	copy->setBackgroundPainter(m_backgroundPainter->createCopy());
+
+	return copy;
+}
+
 void ot::GraphicsShapeItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 

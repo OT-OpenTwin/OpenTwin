@@ -32,6 +32,18 @@ ot::GraphicsEllipseItemCfg::~GraphicsEllipseItemCfg() {
 	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
+ot::GraphicsItemCfg* ot::GraphicsEllipseItemCfg::createCopy(void) const {
+	ot::GraphicsEllipseItemCfg* copy = new GraphicsEllipseItemCfg;
+	this->setupData(copy);
+
+	copy->m_radiusX = m_radiusX;
+	copy->m_radiusY = m_radiusY;
+	copy->m_outline = m_outline;
+	copy->setBackgroundPainer(m_backgroundPainter->createCopy());
+
+	return copy;
+}
+
 void ot::GraphicsEllipseItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	OTAssertNullptr(m_backgroundPainter);
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);

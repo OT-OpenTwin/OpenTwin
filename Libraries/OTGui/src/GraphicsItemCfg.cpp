@@ -41,11 +41,15 @@
 #define OT_JSON_VALUE_NoFeedback "NoFeedback"
 
 ot::GraphicsItemCfg::GraphicsItemCfg()
-	: m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter), 
+	: m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter), m_uid(0),
 	m_minSize(0., 0.), m_margins(0., 0., 0., 0.), m_maxSize(DBL_MAX, DBL_MAX), m_sizePolicy(ot::Preferred), m_connectionDirection(ot::ConnectAny)
 {}
 
 ot::GraphicsItemCfg::~GraphicsItemCfg() {}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class methods
 
 void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	JsonObject posObj;
@@ -73,7 +77,7 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 
 	_object.AddMember(OT_JSON_MEMBER_Uid, static_cast<int64_t>(m_uid), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Name, JsonString(m_name, _allocator), _allocator);
-	_object.AddMember(OT_JSON_MEMBER_Title, JsonString(m_tile, _allocator), _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Title, JsonString(m_title, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_ToolTip, JsonString(m_tooltip, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_GraphicsItemCfgType, JsonString(this->getFactoryKey(), _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Alignment, JsonString(ot::toString(m_alignment), _allocator), _allocator);
@@ -84,7 +88,7 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	m_uid = static_cast<ot::UID>(json::getInt64(_object, OT_JSON_MEMBER_Uid));
 	m_name = json::getString(_object, OT_JSON_MEMBER_Name);
-	m_tile = json::getString(_object, OT_JSON_MEMBER_Title);
+	m_title = json::getString(_object, OT_JSON_MEMBER_Title);
 	m_tooltip = json::getString(_object, OT_JSON_MEMBER_ToolTip);
 	m_alignment = stringToAlignment(json::getString(_object, OT_JSON_MEMBER_Alignment));
 	m_sizePolicy = stringToSizePolicy(json::getString(_object, OT_JSON_MEMBER_SizePolicy));
@@ -106,4 +110,23 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 			OT_LOG_EAS("Unknown GraphicsItemFlag \"" + f + "\"");
 		}
 	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected: Helper
+
+void ot::GraphicsItemCfg::setupData(GraphicsItemCfg* _config) const {
+	_config->m_name = m_name;
+	_config->m_title = m_title;
+	_config->m_uid = m_uid;
+	_config->m_tooltip = m_tooltip;
+	_config->m_pos = m_pos;
+	_config->m_minSize = m_minSize;
+	_config->m_maxSize = m_maxSize;
+	_config->m_margins = m_margins;
+	_config->m_flags = m_flags;
+	_config->m_alignment = m_alignment;
+	_config->m_sizePolicy = m_sizePolicy;
+	_config->m_connectionDirection = m_connectionDirection;
 }

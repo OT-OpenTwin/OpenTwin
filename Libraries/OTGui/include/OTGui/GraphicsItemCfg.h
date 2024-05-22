@@ -43,8 +43,19 @@ namespace ot {
 		GraphicsItemCfg();
 		virtual ~GraphicsItemCfg();
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Pure virtual methods
+
 		//! @brief Returns the unique GraphicsItemCfg type name that is used in the GraphicsItemCfgFactory.
 		virtual std::string getFactoryKey(void) const = 0;
+
+		//! \brief Creates a copy of this item.
+		virtual GraphicsItemCfg* createCopy(void) const = 0;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Base class methods
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
@@ -56,6 +67,10 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
+
 		//! @brief Set item name
 		//! The item name must be unique for one item picker.
 		void setName(const std::string& _name) { m_name = _name; };
@@ -66,11 +81,11 @@ namespace ot {
 
 		//! @brief Set item title
 		//! The item title will be displayed to the user when needed.
-		void setTitle(const std::string& _title) { m_tile = _title; };
+		void setTitle(const std::string& _title) { m_title = _title; };
 
 		//! @brief Item title
 		//! The item title will be displayed to the user when needed.
-		const std::string& title(void) const { return m_tile; };
+		const std::string& title(void) const { return m_title; };
 
 		//! @brief Set ToolTip
 		//! ToolTips are displayed when the user hovers over an item.
@@ -134,9 +149,16 @@ namespace ot {
 		void setConnectionDirection(ConnectionDirection _direction) { m_connectionDirection = _direction; };
 		ConnectionDirection connectionDirection(void) const { return m_connectionDirection; };
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Protected: Helper
+
+	protected:
+		virtual void setupData(GraphicsItemCfg* _config) const;
+
 	private:
 		std::string m_name;
-		std::string m_tile;
+		std::string m_title;
 		ot::UID m_uid;
 		std::string m_tooltip;
 		Point2DD m_pos;

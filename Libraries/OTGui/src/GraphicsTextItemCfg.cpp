@@ -25,6 +25,17 @@ ot::GraphicsTextItemCfg::GraphicsTextItemCfg(const std::string& _text, const ot:
 
 ot::GraphicsTextItemCfg::~GraphicsTextItemCfg() {}
 
+ot::GraphicsItemCfg* ot::GraphicsTextItemCfg::createCopy(void) const {
+	ot::GraphicsTextItemCfg* copy = new GraphicsTextItemCfg;
+	this->setupData(copy);
+
+	copy->m_text = m_text;
+	copy->m_textFont = m_textFont;
+	copy->setTextPainter(m_textPainter->createCopy());
+
+	return copy;
+}
+
 void ot::GraphicsTextItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	GraphicsItemCfg::addToJsonObject(_object, _allocator);
 

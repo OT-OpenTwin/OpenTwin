@@ -20,6 +20,17 @@ ot::GraphicsGroupItemCfg::~GraphicsGroupItemCfg() {
 	this->memClear();
 }
 
+ot::GraphicsItemCfg* ot::GraphicsGroupItemCfg::createCopy(void) const {
+	ot::GraphicsGroupItemCfg* copy = new GraphicsGroupItemCfg;
+	this->setupData(copy);
+
+	for (GraphicsItemCfg* itm : m_items) {
+		copy->m_items.push_back(itm->createCopy());
+	}
+
+	return copy;
+}
+
 void ot::GraphicsGroupItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	ot::GraphicsItemCfg::addToJsonObject(_object, _allocator);
 

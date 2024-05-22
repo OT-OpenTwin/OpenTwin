@@ -100,6 +100,29 @@ void ot::GraphicsBoxLayoutItemCfg::addStrech(int _stretch) {
 	m_items.push_back(itemStrechPair_t(nullptr, _stretch));
 }
 
+void ot::GraphicsBoxLayoutItemCfg::setupData(GraphicsItemCfg* _config) const {
+	ot::GraphicsLayoutItemCfg::setupData(_config);
+
+	GraphicsBoxLayoutItemCfg* cfg = dynamic_cast<GraphicsBoxLayoutItemCfg*>(_config);
+	if (!cfg) {
+		OT_LOG_EA("Configuration cast failed");
+		return;
+	}
+
+	cfg->m_orientation = m_orientation;
+	for (const itemStrechPair_t& itm : m_items) {
+		itemStrechPair_t newEntry;
+		newEntry.second = itm.second;
+		if (itm.first) {
+			newEntry.first = itm.first->createCopy();
+		}
+		else {
+			newEntry.first = nullptr;
+		}
+		cfg->m_items.push_back(newEntry);
+	}
+}
+
 void ot::GraphicsBoxLayoutItemCfg::clearItems(void) {
 	for (auto i : m_items) {
 		if (i.first) delete i.first;

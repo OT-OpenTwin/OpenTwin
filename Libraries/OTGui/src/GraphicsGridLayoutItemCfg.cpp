@@ -31,6 +31,31 @@ ot::GraphicsGridLayoutItemCfg::~GraphicsGridLayoutItemCfg() {
 	m_items.clear();
 }
 
+ot::GraphicsItemCfg* ot::GraphicsGridLayoutItemCfg::createCopy(void) const {
+	ot::GraphicsGridLayoutItemCfg* copy = new GraphicsGridLayoutItemCfg;
+	this->setupData(copy);
+
+	copy->m_rows = m_rows;
+	copy->m_columns = m_columns;
+	copy->m_rowStretch = m_rowStretch;
+	copy->m_columnStretch = m_columnStretch;
+
+	for (const std::vector<GraphicsItemCfg*>& r : m_items) {
+		std::vector<GraphicsItemCfg*> row;
+		for (GraphicsItemCfg* itm : r) {
+			if (itm) {
+				row.push_back(itm->createCopy());
+			}
+			else {
+				row.push_back(nullptr);
+			}
+		}
+		copy->m_items.push_back(row);
+	}
+
+	return copy;
+}
+
 void ot::GraphicsGridLayoutItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	ot::GraphicsLayoutItemCfg::addToJsonObject(_object, _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Rows, m_rows, _allocator);
