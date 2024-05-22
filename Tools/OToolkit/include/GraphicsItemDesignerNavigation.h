@@ -8,12 +8,21 @@
 // OpenTwin header
 #include "OTWidgets/TreeWidget.h"
 
+// std header
+#include <list>
+
+class GraphicsItemDesignerItemBase;
+
 class GraphicsItemDesignerNavigation : public ot::TreeWidget {
 public:
 	GraphicsItemDesignerNavigation();
 	virtual ~GraphicsItemDesignerNavigation();
 
-private:
+	void addRootItem(GraphicsItemDesignerItemBase* _item);
 
+private:
+	void rebuildNavigation(void);
+
+	std::list<GraphicsItemDesignerItemBase*> m_rootItems;
 
 };

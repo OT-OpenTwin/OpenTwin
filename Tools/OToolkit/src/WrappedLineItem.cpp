@@ -29,3 +29,10 @@ bool WrappedLineItem::rebuildItem(void) {
 	
 	return true;
 }
+
+ot::TreeWidgetItemInfo WrappedLineItem::createNavigationInformation(void) const {
+	ot::TreeWidgetItemInfo info;
+	info.setText(QString::fromStdString(this->graphicsItemName()));
+
+	return info;
+}

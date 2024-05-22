@@ -36,6 +36,12 @@ public:
 	void startDraw(DrawMode _mode);
 	void cancelDraw(void);
 
+	//! \brief Stops the current draw and returns the drawn item if valid.
+	//! The current preview item will be returned and forgotten by the handler.
+	//! The caller takes ownership of the item.
+	//! The returned item is still placed in the scene.
+	GraphicsItemDesignerItemBase* stopDraw(void);
+
 	void updatePosition(const QPointF& _pos);
 	void positionSelected(const QPointF& _pos);
 

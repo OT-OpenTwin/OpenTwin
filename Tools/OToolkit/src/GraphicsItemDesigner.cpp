@@ -65,7 +65,11 @@ void GraphicsItemDesigner::slotDrawRequested(GraphicsItemDesignerDrawHandler::Dr
 }
 
 void GraphicsItemDesigner::slotDrawFinished(void) {
+	GraphicsItemDesignerItemBase* newItem = m_drawHandler->stopDraw();
+	if (!newItem) return;
 
+	m_navigation->addRootItem(newItem);
+	m_toolBar->setEnabled(true);
 }
 
 void GraphicsItemDesigner::slotDrawCancelled(void) {

@@ -41,17 +41,33 @@ void GraphicsItemDesignerDrawHandler::startDraw(DrawMode _mode) {
 void GraphicsItemDesignerDrawHandler::cancelDraw(void) {
 	if (m_mode == NoMode) return;
 
+	GraphicsItemDesignerItemBase* itm = this->stopDraw();
+
+	if (itm) {
+		m_view->removeItem(itm->getGraphicsItem()->graphicsItemUid());
+	}
+
+	Q_EMIT drawCancelled();
+}
+
+GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::stopDraw(void) {
+	if (m_mode == NoMode) return nullptr;
+
 	m_view->disablePickingMode();
 
 	if (m_overlay) delete m_overlay;
 	m_overlay = nullptr;
 
-	if (m_previewItem) {
-		m_view->removeItem(m_previewItem->getGraphicsItem()->graphicsItemUid());
-		m_previewItem = nullptr;
+	m_mode = NoMode;
+
+	GraphicsItemDesignerItemBase* ret = m_previewItem;
+	m_previewItem = nullptr;
+
+	if (ret) {
+		ret->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHasNoFeedback, false);
 	}
 
-	Q_EMIT drawCancelled();
+	return ret;
 }
 
 void GraphicsItemDesignerDrawHandler::updatePosition(const QPointF& _pos) {

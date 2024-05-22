@@ -22,6 +22,10 @@ public:
 
 	virtual ot::GraphicsItem* getGraphicsItem(void) override { return this; };
 
+	virtual QString getDefaultItemName(void) const override { return "Line"; };
+
+	virtual ot::TreeWidgetItemInfo createNavigationInformation(void) const override;
+
 private:
 
 };

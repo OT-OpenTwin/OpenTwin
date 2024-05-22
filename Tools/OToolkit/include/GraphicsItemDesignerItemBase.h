@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
+#include "OTWidgets/TreeWidget.h"
 
 // Qt header
 #include <QtCore/qpoint.h>
@@ -28,6 +29,10 @@ public:
 	void setControlPoints(const std::list<QPointF>& _points);
 	const std::list<QPointF>& controlPoints(void) const { return m_controlPoints; };
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Pure virtual methods
+
 	//! \brief Rebuilds the item.
 	//! The item will be rebuild according to currently set control points.
 	//! 
@@ -36,6 +41,10 @@ public:
 	virtual bool rebuildItem(void) = 0;
 
 	virtual ot::GraphicsItem* getGraphicsItem(void) = 0;
+
+	virtual QString getDefaultItemName(void) const = 0;
+
+	virtual ot::TreeWidgetItemInfo createNavigationInformation(void) const = 0;
 
 private:
 	std::list<QPointF> m_controlPoints;
