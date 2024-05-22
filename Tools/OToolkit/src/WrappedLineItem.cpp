@@ -14,6 +14,8 @@ WrappedLineItem::~WrappedLineItem() {
 
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
 bool WrappedLineItem::rebuildItem(void) {
 	if (this->controlPoints().size() != 2) return false;
 	
@@ -36,4 +38,16 @@ ot::TreeWidgetItemInfo WrappedLineItem::createNavigationInformation(void) const 
 	info.setIcon(ot::IconManager::getIcon("GraphicsEditor/Line.png"));
 
 	return info;
+}
+
+void WrappedLineItem::fillPropertyGrid(void) {
+
+}
+
+void WrappedLineItem::propertyChanged(const std::string& _group, const std::string& _item) {
+
+}
+
+void WrappedLineItem::propertyDeleteRequested(const std::string& _group, const std::string& _item) {
+
 }

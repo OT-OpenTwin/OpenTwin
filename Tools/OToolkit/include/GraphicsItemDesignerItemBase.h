@@ -5,6 +5,9 @@
 
 #pragma once
 
+// OToolkit header
+#include "GraphicsItemDesignerPropertyHandler.h"
+
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
 #include "OTWidgets/TreeWidget.h"
@@ -20,7 +23,7 @@ namespace ot {
 	class GraphicsItem;
 }
 
-class GraphicsItemDesignerItemBase {
+class GraphicsItemDesignerItemBase : public GraphicsItemDesignerPropertyHandler {
 	OT_DECL_NOCOPY(GraphicsItemDesignerItemBase)
 public:
 	GraphicsItemDesignerItemBase(); 
@@ -46,6 +49,15 @@ public:
 	virtual QString getDefaultItemName(void) const = 0;
 
 	virtual ot::TreeWidgetItemInfo createNavigationInformation(void) const = 0;
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Protected base class methods
+
+protected:
+	virtual void fillPropertyGrid(void) override = 0;
+	virtual void propertyChanged(const std::string& _group, const std::string& _item) override = 0;
+	virtual void propertyDeleteRequested(const std::string& _group, const std::string& _item) override = 0;
 
 private:
 	std::list<QPointF> m_controlPoints;

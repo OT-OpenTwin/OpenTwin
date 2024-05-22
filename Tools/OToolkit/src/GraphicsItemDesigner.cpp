@@ -41,6 +41,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	_content.addView(view);
 	
 	m_navigation = new GraphicsItemDesignerNavigation;
+	m_navigation->setPropertyGrid(m_props);
 	view = this->createToolWidgetView(m_navigation, "GID Explorer");
 	_content.addView(view);
 

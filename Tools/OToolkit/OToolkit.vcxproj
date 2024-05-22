@@ -29,6 +29,8 @@
     <ClCompile Include="src\GraphicsItemDesignerInfoOverlay.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerItemBase.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerNavigation.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerNavigationRoot.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerPropertyHandler.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerScene.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerToolBar.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerView.cpp" />
@@ -57,6 +59,8 @@
     <ClCompile Include="src\WrappedLineItem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="include\GraphicsItemDesignerPropertyHandler.h" />
+    <ClInclude Include="include\GraphicsItemDesignerNavigationRoot.h" />
     <ClInclude Include="include\WrappedLineItem.h" />
     <QtMoc Include="include\GraphicsItemDesigner.h" />
     <QtMoc Include="include\GraphicsItemDesignerToolBar.h" />
@@ -64,7 +68,7 @@
     <ClInclude Include="include\GraphicsItemDesignerInfoOverlay.h" />
     <QtMoc Include="include\GraphicsItemDesignerView.h" />
     <ClInclude Include="include\GraphicsItemDesignerItemBase.h" />
-    <ClInclude Include="include\GraphicsItemDesignerNavigation.h" />
+    <QtMoc Include="include\GraphicsItemDesignerNavigation.h" />
     <ClInclude Include="include\GraphicsItemDesignerScene.h" />
     <ClInclude Include="include\GraphicsItemDesignerViewStatusOverlay.h" />
     <ClInclude Include="include\WidgetTest.h" />
