@@ -59,7 +59,7 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/MessageDialogCfg.h"
-#include "OTCore/PropertyStringList.h"
+#include "OTGui/PropertyStringList.h"
 #include "OTCommunication/UiTypes.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/SettingsData.h"

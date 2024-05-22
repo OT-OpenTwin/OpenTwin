@@ -6,7 +6,7 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTCore/PropertyFactoryRegistrar.h"
+#include "OTGui/PropertyFactoryRegistrar.h"
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/Painter2DFactory.h"

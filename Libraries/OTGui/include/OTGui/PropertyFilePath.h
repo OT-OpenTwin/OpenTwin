@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Property.h"
+#include "OTGui/Property.h"
 
 // std header
 #include <string>
@@ -15,7 +15,7 @@
 
 namespace ot {
 
-	class OT_CORE_API_EXPORT PropertyFilePath : public Property {
+	class OT_GUI_API_EXPORT PropertyFilePath : public Property {
 		OT_DECL_NOCOPY(PropertyFilePath)
 	public:
 		enum BrowseMode {

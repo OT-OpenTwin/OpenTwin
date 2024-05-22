@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Property.h"
+#include "OTGui/Property.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 #define OT_PROPERTY_TYPE_Painter2D "Painter2D"

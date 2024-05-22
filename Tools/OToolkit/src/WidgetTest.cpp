@@ -8,8 +8,8 @@
 // OpenTwin header
 #include "OTGui/NavigationTreeItem.h"
 #include "OTGui/PropertyDialogCfg.h"
-#include "OTCore/PropertyStringList.h"
-#include "OTCore/PropertyGroup.h"
+#include "OTGui/PropertyStringList.h"
+#include "OTGui/PropertyGroup.h"
 #include "OTWidgets/Splitter.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/TreeWidgetFilter.h"

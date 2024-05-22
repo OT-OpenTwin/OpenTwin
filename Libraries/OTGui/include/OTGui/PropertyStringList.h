@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Property.h"
+#include "OTGui/Property.h"
 
 // std header
 #include <list>
@@ -17,7 +17,7 @@
 
 namespace ot {
 
-	class OT_CORE_API_EXPORT PropertyStringList : public Property {
+	class OT_GUI_API_EXPORT PropertyStringList : public Property {
 		OT_DECL_NOCOPY(PropertyStringList)
 	public:
 		PropertyStringList(const PropertyStringList* _other);

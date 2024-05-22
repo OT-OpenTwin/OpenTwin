@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/PropertyGridCfg.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OTGui/DialogCfg.h"
 
 // std header

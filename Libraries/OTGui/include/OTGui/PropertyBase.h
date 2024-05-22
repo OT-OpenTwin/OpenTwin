@@ -9,17 +9,19 @@
 #include "OTCore/Flags.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/CoreAPIExport.h"
+#include "OTGui/OTGuiAPIExport.h"
 
 // std header
 #include <list>
 #include <string>
 
+#pragma warning(disable:4251)
+
 namespace ot {
 
 	//! \class PropertyBase
 	//! \brief The PropertyBase class is used to hold general Property information.
-	class OT_CORE_API_EXPORT PropertyBase : public Serializable {
+	class OT_GUI_API_EXPORT PropertyBase : public Serializable {
 	public:
 		//! \enum PropertyFlag
 		//! \brief The PropertyFlag enum contains different settings for properties.

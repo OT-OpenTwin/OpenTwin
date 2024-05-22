@@ -9,7 +9,7 @@ class EntityBase;
 class EntityContainer;
 
 #include "Types.h"
-#include "OTCore/PropertyGridCfg.h"
+#include "OTGui/PropertyGridCfg.h"
 
 namespace ot { class Property; };
 

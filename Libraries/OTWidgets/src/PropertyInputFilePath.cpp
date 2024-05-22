@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/PropertyFilePath.h"
+#include "OTGui/PropertyFilePath.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/PropertyInputFilePath.h"

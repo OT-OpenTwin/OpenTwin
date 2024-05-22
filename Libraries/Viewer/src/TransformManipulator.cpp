@@ -10,9 +10,9 @@
 #include "Model.h"
 
 #include "OTCore/Logger.h"
-#include "OTCore/PropertyGridCfg.h"
-#include "OTCore/PropertyGroup.h"
-#include "OTCore/PropertyDouble.h"
+#include "OTGui/PropertyGridCfg.h"
+#include "OTGui/PropertyGroup.h"
+#include "OTGui/PropertyDouble.h"
 
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"

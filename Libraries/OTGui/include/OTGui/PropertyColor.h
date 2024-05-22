@@ -1,4 +1,4 @@
-//! @file PropertyDirectory.h
+//! @file PropertyColor.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,32 +6,29 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Property.h"
+#include "OTCore/Color.h"
+#include "OTGui/Property.h"
 
-// std header
-#include <string>
-
-#define OT_PROPERTY_TYPE_Directory "Directory"
+#define OT_PROPERTY_TYPE_Color "Color"
 
 namespace ot {
 
-	class OT_CORE_API_EXPORT PropertyDirectory : public Property {
-		OT_DECL_NOCOPY(PropertyDirectory)
+	class OT_GUI_API_EXPORT PropertyColor : public Property {
+		OT_DECL_NOCOPY(PropertyColor)
 	public:
-		PropertyDirectory(const PropertyDirectory* _other);
-		PropertyDirectory(const PropertyBase& _base);
-		PropertyDirectory(PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_flags) {};
-		PropertyDirectory(const std::string& _path, PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_flags), m_path(_path) {};
-		PropertyDirectory(const std::string& _name, const std::string& _path, PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_name, _flags), m_path(_path) {};
-		virtual ~PropertyDirectory() {};
+		PropertyColor(const PropertyColor* _other);
+		PropertyColor(const PropertyBase& _base);
+		PropertyColor(PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_flags) {};
+		PropertyColor(ot::Color _value, PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_flags), m_value(_value) {};
+		PropertyColor(const std::string& _name, ot::Color _value, PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_name, _flags), m_value(_value) {};
+		virtual ~PropertyColor() {};
 
-		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Directory; };
+		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Color; };
 
 		virtual Property* createCopy(void) const override;
 
-		void setPath(const std::string& _path) { m_path = _path; };
-		std::string& path(void) { return m_path; };
-		const std::string& path(void) const { return m_path; };
+		void setValue(ot::Color _value) { m_value = _value; };
+		ot::Color value(void) const { return m_value; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object
@@ -46,7 +43,7 @@ namespace ot {
 		virtual void setPropertyData(const ot::ConstJsonObject& _object) override;
 
 	private:
-		std::string m_path;
+		ot::Color m_value;
 	};
 
 }

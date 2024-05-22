@@ -5,8 +5,8 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/Property.h"
-#include "OTCore/PropertyFactory.h"
+#include "OTGui/Property.h"
+#include "OTGui/PropertyFactory.h"
 #include "OTGui/OnePropertyDialogCfg.h"
 
 ot::OnePropertyDialogCfg::OnePropertyDialogCfg(Property* _property) : m_property(_property) {}

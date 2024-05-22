@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/PropertyBase.h"
+#include "OTGui/PropertyBase.h"
 
 #pragma warning(disable:4251)
 
@@ -16,7 +16,7 @@ namespace ot {
 
 	//! \class Property
 	//! \brief The Property class is used as a base class for all Properties that can be displayed and modified in the frontend.
-	class OT_CORE_API_EXPORT Property : public PropertyBase {
+	class OT_GUI_API_EXPORT Property : public PropertyBase {
 		OT_DECL_NOCOPY(Property)
 	public:
 		Property(const Property* _other);

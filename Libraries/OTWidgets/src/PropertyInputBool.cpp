@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/PropertyBool.h"
+#include "OTGui/PropertyBool.h"
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/PropertyInputBool.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"

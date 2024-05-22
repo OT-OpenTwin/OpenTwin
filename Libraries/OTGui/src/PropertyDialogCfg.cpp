@@ -6,8 +6,8 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTCore/Property.h"
-#include "OTCore/PropertyGroup.h"
+#include "OTGui/Property.h"
+#include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyDialogCfg.h"
 
 ot::PropertyDialogCfg::PropertyDialogCfg() {

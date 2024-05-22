@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/Property.h"
+#include "OTGui/Property.h"
 
 ot::Property::Property(const Property* _other)
 	: PropertyBase(*_other)

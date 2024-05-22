@@ -8,7 +8,7 @@
 // Toolkit API header
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/Color.h"
-#include "OTCore/PropertyGridCfg.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OToolkitAPI/Tool.h"
 
 // Qt header

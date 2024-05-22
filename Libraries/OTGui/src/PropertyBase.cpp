@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/PropertyBase.h"
+#include "OTGui/PropertyBase.h"
 
 std::string ot::PropertyBase::toString(PropertyFlag _flag) {
 	switch (_flag)

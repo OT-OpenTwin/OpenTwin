@@ -34,7 +34,7 @@
 #include "OTCore/BasicServiceInformation.h"
 #include "OTCore/OwnerManagerTemplate.h"
 #include "OTCore/OwnerService.h"
-#include "OTCore/PropertyStringList.h"
+#include "OTGui/PropertyStringList.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "OTCore/GenericDataStructMatrix.h"
 

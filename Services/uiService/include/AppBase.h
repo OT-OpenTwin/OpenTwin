@@ -21,8 +21,8 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/OwnerManagerTemplate.h"
-#include "OTCore/Property.h"
-#include "OTCore/PropertyGridCfg.h"
+#include "OTGui/Property.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OTWidgets/ColorStyle.h"
 #include "OTServiceFoundation/UserCredentials.h"
 

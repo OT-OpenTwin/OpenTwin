@@ -16,7 +16,7 @@ class TopoDS_Shape;
 #include <vector>
 #include <map>
 
-#include "OTCore/PropertyGridCfg.h"
+#include "OTGui/PropertyGridCfg.h"
 
 class ModelBuilder
 {

@@ -6,13 +6,13 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Property.h"
+#include "OTGui/Property.h"
 
 #define OT_PROPERTY_TYPE_Double "Double"
 
 namespace ot {
 
-	class OT_CORE_API_EXPORT PropertyDouble : public Property {
+	class OT_GUI_API_EXPORT PropertyDouble : public Property {
 		OT_DECL_NOCOPY(PropertyDouble)
 	public:
 		PropertyDouble(const PropertyDouble* _other);

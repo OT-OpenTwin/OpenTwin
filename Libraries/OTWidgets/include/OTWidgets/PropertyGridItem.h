@@ -7,8 +7,8 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/Property.h"
-#include "OTCore/PropertyBase.h"
+#include "OTGui/Property.h"
+#include "OTGui/PropertyBase.h"
 #include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 

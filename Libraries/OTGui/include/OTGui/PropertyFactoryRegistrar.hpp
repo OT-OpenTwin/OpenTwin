@@ -4,8 +4,8 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/PropertyFactory.h"
-#include "OTCore/PropertyFactoryRegistrar.h"
+#include "OTGui/PropertyFactory.h"
+#include "OTGui/PropertyFactoryRegistrar.h"
 
 template <class T>
 ot::PropertyFactoryRegistrar<T>::PropertyFactoryRegistrar(const std::string& _key) {

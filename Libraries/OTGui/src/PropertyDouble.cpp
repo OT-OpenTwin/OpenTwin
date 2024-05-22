@@ -6,8 +6,8 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTCore/PropertyDouble.h"
-#include "OTCore/PropertyFactoryRegistrar.h"
+#include "OTGui/PropertyDouble.h"
+#include "OTGui/PropertyFactoryRegistrar.h"
 
 static ot::PropertyFactoryRegistrar<ot::PropertyDouble> propertyDoubleRegistrar(OT_PROPERTY_TYPE_Double);
 

@@ -6,7 +6,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCore/StringHelper.h"
-#include "OTCore/PropertyDouble.h"
+#include "OTGui/PropertyDouble.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/DoubleSpinBox.h"
 #include "OTWidgets/PropertyInputDouble.h"

@@ -1,4 +1,4 @@
-//! @file PropertyColor.h
+//! @file PropertyBool.h
 //! @author Alexander Kuester (alexk95)
 //! @date February 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,29 +6,28 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Color.h"
-#include "OTCore/Property.h"
+#include "OTGui/Property.h"
 
-#define OT_PROPERTY_TYPE_Color "Color"
+#define OT_PROPERTY_TYPE_Bool "Bool"
 
 namespace ot {
 
-	class OT_CORE_API_EXPORT PropertyColor : public Property {
-		OT_DECL_NOCOPY(PropertyColor)
+	class OT_GUI_API_EXPORT PropertyBool : public Property {
+		OT_DECL_NOCOPY(PropertyBool)
 	public:
-		PropertyColor(const PropertyColor* _other);
-		PropertyColor(const PropertyBase& _base);
-		PropertyColor(PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_flags) {};
-		PropertyColor(ot::Color _value, PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_flags), m_value(_value) {};
-		PropertyColor(const std::string& _name, ot::Color _value, PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_name, _flags), m_value(_value) {};
-		virtual ~PropertyColor() {};
+		PropertyBool(const PropertyBool* _other);
+		PropertyBool(const PropertyBase& _base);
+		PropertyBool(PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyBool(bool _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyBool(const std::string& _name, bool _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		virtual ~PropertyBool() {};
 
-		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Color; };
+		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Bool; };
 
 		virtual Property* createCopy(void) const override;
 
-		void setValue(ot::Color _value) { m_value = _value; };
-		ot::Color value(void) const { return m_value; };
+		void setValue(bool _value) { m_value = _value; };
+		bool value(void) const { return m_value; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object
@@ -43,7 +42,7 @@ namespace ot {
 		virtual void setPropertyData(const ot::ConstJsonObject& _object) override;
 
 	private:
-		ot::Color m_value;
+		bool m_value;
 	};
 
 }

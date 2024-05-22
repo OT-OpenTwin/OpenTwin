@@ -6,8 +6,8 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTCore/PropertyDirectory.h"
-#include "OTCore/PropertyFactoryRegistrar.h"
+#include "OTGui/PropertyDirectory.h"
+#include "OTGui/PropertyFactoryRegistrar.h"
 
 static ot::PropertyFactoryRegistrar<ot::PropertyDirectory> propertyDirectoryRegistrar(OT_PROPERTY_TYPE_Directory);
 

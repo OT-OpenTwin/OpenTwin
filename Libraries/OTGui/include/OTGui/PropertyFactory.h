@@ -8,8 +8,8 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/Property.h"
-#include "OTCore/CoreAPIExport.h"
+#include "OTGui/Property.h"
+#include "OTGui/OTGuiAPIExport.h"
 
 // std header
 #include <map>
@@ -19,7 +19,7 @@
 namespace ot {
 	class Property;
 
-	class OT_CORE_API_EXPORT PropertyFactory {
+	class OT_GUI_API_EXPORT PropertyFactory {
 		OT_DECL_NOCOPY(PropertyFactory)
 	public:
 		using PropertyConstructor = std::function<Property* ()>;

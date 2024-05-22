@@ -13,7 +13,7 @@
 #include "ClassFactoryModel.h"
 #include "EntityFaceAnnotation.h"
 
-#include "OTCore/PropertyGridCfg.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/UiTypes.h"
 
 class EntityMesh;

@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/PropertyFilePath.h"
+#include "OTGui/PropertyFilePath.h"
 #include "OTWidgets/PropertyInput.h"
 
 namespace ot {

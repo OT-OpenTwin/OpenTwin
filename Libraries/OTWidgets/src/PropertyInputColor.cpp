@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/PropertyColor.h"
+#include "OTGui/PropertyColor.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/ColorPickButton.h"
 #include "OTWidgets/PropertyInputColor.h"

@@ -6,8 +6,8 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTCore/PropertyFilePath.h"
-#include "OTCore/PropertyFactoryRegistrar.h"
+#include "OTGui/PropertyFilePath.h"
+#include "OTGui/PropertyFactoryRegistrar.h"
 
 static ot::PropertyFactoryRegistrar<ot::PropertyFilePath> propertyFilePathRegistrar(OT_PROPERTY_TYPE_FilePath);
 

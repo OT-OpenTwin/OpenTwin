@@ -6,8 +6,8 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTCore/PropertyColor.h"
-#include "OTCore/PropertyFactoryRegistrar.h"
+#include "OTGui/PropertyColor.h"
+#include "OTGui/PropertyFactoryRegistrar.h"
 
 static ot::PropertyFactoryRegistrar<ot::PropertyColor> propertyColorRegistrar(OT_PROPERTY_TYPE_Color);
 

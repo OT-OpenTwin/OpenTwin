@@ -24,4 +24,4 @@ namespace ot {
 
 }
 
-#include "OTCore/PropertyFactoryRegistrar.hpp"
+#include "OTGui/PropertyFactoryRegistrar.hpp"

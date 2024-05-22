@@ -9,7 +9,7 @@
 #include "OTCore/Flags.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/CoreAPIExport.h"
+#include "OTGui/OTGuiAPIExport.h"
 
 #pragma warning(disable:4251)
 
@@ -18,7 +18,7 @@ namespace ot {
 	class Property;
 	class PropertyGroup;
 
-	class OT_CORE_API_EXPORT PropertyGridCfg : public ot::Serializable {
+	class OT_GUI_API_EXPORT PropertyGridCfg : public ot::Serializable {
 	public:
 		PropertyGridCfg();
 		PropertyGridCfg(const PropertyGridCfg& _other);

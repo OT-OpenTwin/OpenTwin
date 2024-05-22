@@ -9,7 +9,7 @@
 #include "OTCore/Color.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
-#include "OTCore/CoreAPIExport.h"
+#include "OTGui/OTGuiAPIExport.h"
 
 // std header
 #include <list>
@@ -20,7 +20,7 @@ namespace ot {
 
 	class Property;
 
-	class OT_CORE_API_EXPORT PropertyGroup : public Serializable {
+	class OT_GUI_API_EXPORT PropertyGroup : public Serializable {
 	public:
 		//! @brief Create empty group
 		PropertyGroup();

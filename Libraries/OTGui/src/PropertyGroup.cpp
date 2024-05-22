@@ -4,9 +4,9 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/Property.h"
-#include "OTCore/PropertyGroup.h"
-#include "OTCore/PropertyFactory.h"
+#include "OTGui/Property.h"
+#include "OTGui/PropertyGroup.h"
+#include "OTGui/PropertyFactory.h"
 
 ot::PropertyGroup::PropertyGroup()
 	: m_backgroundColor(255, 255, 255), m_alternateBackgroundColor(235, 235, 235)
