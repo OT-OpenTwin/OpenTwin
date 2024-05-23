@@ -13,14 +13,6 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GlobalColorStyle.h"
 
-QColor ot::QtFactory::toColor(const ot::Color& _color) {
-	return QColor(_color.r(), _color.g(), _color.b(), _color.a());
-}
-
-QColor ot::QtFactory::toColor(const ot::ColorF& _color) {
-	return QColor((int)(_color.r() * 255.f), (int)(_color.g() * 255.f), (int)(_color.b() * 255.f), (int)(_color.a() * 255.f));
-}
-
 Qt::Alignment ot::QtFactory::toAlignment(ot::Alignment _alignment) {
 	switch (_alignment)
 	{
@@ -37,30 +29,6 @@ Qt::Alignment ot::QtFactory::toAlignment(ot::Alignment _alignment) {
 		OT_LOG_EA("Unknown alignment");
 		return Qt::AlignCenter;
 	}
-}
-
-QPoint ot::QtFactory::toPoint(const ot::Point2D& _pt) {
-	return QPoint(_pt.x(), _pt.y());
-}
-
-QPointF ot::QtFactory::toPoint(const ot::Point2DF& _pt) {
-	return QPointF(_pt.x(), _pt.y());
-}
-
-QPointF ot::QtFactory::toPoint(const ot::Point2DD& _pt) {
-	return QPointF(_pt.x(), _pt.y());
-}
-
-QSize ot::QtFactory::toSize(const ot::Size2D& _s) {
-	return QSize(_s.width(), _s.height());
-}
-
-QSizeF ot::QtFactory::toSize(const ot::Size2DF& _s) {
-	return QSizeF(_s.width(), _s.height());
-}
-
-QSizeF ot::QtFactory::toSize(const ot::Size2DD& _s) {
-	return QSizeF(_s.width(), _s.height());
 }
 
 QGradient::Spread ot::QtFactory::toGradientSpread(ot::GradientSpread _spread) {
@@ -180,14 +148,6 @@ Qt::PenJoinStyle ot::QtFactory::toPenJoinStyle(LineJoinStyle _style) {
 		OT_LOG_E("Unknown join style (" + std::to_string((int)_style) + ")");
 		return Qt::BevelJoin;
 	}
-}
-
-QPen ot::QtFactory::toPen(const Outline& _outline) {
-	return QPen(toBrush(_outline.painter()), (qreal)_outline.width(), toPenStyle(_outline.style()), toPenCapStyle(_outline.cap()), toPenJoinStyle(_outline.joinStyle()));
-}
-
-QPen ot::QtFactory::toPen(const OutlineF& _outline) {
-	return QPen(toBrush(_outline.painter()), _outline.width(), toPenStyle(_outline.style()), toPenCapStyle(_outline.cap()), toPenJoinStyle(_outline.joinStyle()));
 }
 
 QPainterPath ot::QtFactory::toPainterPath(const Path2DF& _path) {
