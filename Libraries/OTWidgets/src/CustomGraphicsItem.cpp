@@ -6,8 +6,8 @@
 // OpenTwin header
 #include "OTWidgets/CustomGraphicsItem.h"
 
-ot::CustomGraphicsItem::CustomGraphicsItem(bool _isLayoutOrStack) 
-	: ot::GraphicsItem(_isLayoutOrStack)
+ot::CustomGraphicsItem::CustomGraphicsItem(GraphicsItemCfg* _configuration, const ot::Flags<GraphicsItemState>& _stateFlags)
+	: ot::GraphicsItem(_configuration, _stateFlags)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
@@ -23,7 +23,7 @@ ot::CustomGraphicsItem::~CustomGraphicsItem() {
 
 // ot::GraphicsItem
 
-bool ot::CustomGraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+bool ot::CustomGraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
@@ -35,7 +35,7 @@ void ot::CustomGraphicsItem::callPaint(QPainter* _painter, const QStyleOptionGra
 	this->paint(_painter, _opt, _widget);
 }
 
-void ot::CustomGraphicsItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) {
+void ot::CustomGraphicsItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
 }

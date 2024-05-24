@@ -12,20 +12,21 @@
 
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsGridLayoutItem> glayItemRegistrar(OT_FactoryKey_GraphicsGridLayoutItem);
 
-ot::GraphicsGridLayoutItem::GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem) : QGraphicsGridLayout(_parentItem)
+ot::GraphicsGridLayoutItem::GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem) 
+	: QGraphicsGridLayout(_parentItem), GraphicsLayoutItem(new GraphicsGridLayoutItemCfg)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->createLayoutWrapper(this);
 }
 
-bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
-	ot::GraphicsGridLayoutItemCfg* cfg = dynamic_cast<ot::GraphicsGridLayoutItemCfg*>(_cfg);
+bool ot::GraphicsGridLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
+	const GraphicsGridLayoutItemCfg* cfg = dynamic_cast<const GraphicsGridLayoutItemCfg*>(_cfg);
 	if (cfg == nullptr) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
 	}
 
-	this->setContentsMargins(_cfg->margins().left(), _cfg->margins().top(), _cfg->margins().right(), _cfg->margins().bottom());
+	this->setContentsMargins(_cfg->getMargins().left(), _cfg->getMargins().top(), _cfg->getMargins().right(), _cfg->getMargins().bottom());
 
 	// Create items
 	int x = 0;
@@ -40,7 +41,7 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 				}
 				i->setParentGraphicsItem(this);
 				OTAssertNullptr(i->getQGraphicsLayoutItem());
-				this->addItem(i->getQGraphicsLayoutItem(), x, y, QtFactory::toAlignment(i->graphicsItemAlignment()));
+				this->addItem(i->getQGraphicsLayoutItem(), x, y, QtFactory::toAlignment(i->getGraphicsItemAlignment()));
 			}
 			y++;
 		}
@@ -55,8 +56,8 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		if (cfg->columnStretch()[c] > 0) this->setColumnStretchFactor(c, cfg->columnStretch()[c]);
 	}
 
-	this->setMinimumSize(QtFactory::toSize(_cfg->minimumSize()));
-	this->setMaximumSize(QtFactory::toSize(_cfg->maximumSize()));
+	this->setMinimumSize(QtFactory::toSize(_cfg->getMinimumSize()));
+	this->setMaximumSize(QtFactory::toSize(_cfg->getMaximumSize()));
 
 	return GraphicsLayoutItem::setupFromConfig(_cfg);
 }

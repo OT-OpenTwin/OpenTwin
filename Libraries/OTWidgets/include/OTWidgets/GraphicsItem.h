@@ -33,6 +33,8 @@ namespace ot {
 	//! @brief Base class for all OpenTwin GraphicsItems
 	//! GraphicsItems should be created by the GraphicsFactory and be setup from the corresponding configuration
 	class OT_WIDGETS_API_EXPORT GraphicsItem {
+		OT_DECL_NODEFAULT(GraphicsItem)
+		OT_DECL_NOCOPY(GraphicsItem)
 	public:
 		//! \enum GraphicsItemEvent
 		//! \brief The GraphicsItemEvent is used to describe the type of an event that occured.
@@ -44,9 +46,10 @@ namespace ot {
 		//! \enum GraphicsItemState
 		//! \brief The GraphicsItemState is used to describe the current state of a GraphicsItem.
 		enum GraphicsItemState {
-			NoState       = 0x00, //! @brief Default state
-			HoverState    = 0x01, //! @brief Item is hovered over by user
-			SelectedState = 0x02  //! @brief Item is selected
+			NoState           = 0x00, //! @brief Default state
+			HoverState        = 0x01, //! @brief Item is hovered over by user
+			SelectedState     = 0x02, //! @brief Item is selected
+			ForwardSizeState  = 0x08  //! \brief Item forwards requested size requests to child item (e.g. GraphicsLayoutItem).
 		};
 		//! \typedef GraphicsItemStateFlags
 		//! \brief Flags used to manage GraphicsItemState.
@@ -54,8 +57,9 @@ namespace ot {
 		typedef Flags<GraphicsItemState> GraphicsItemStateFlags; //!
 
 		//! \brief Constructor.
-		//! \param _isLayoutOrStack If true, the item is a layout or a stack item.
-		GraphicsItem(bool _isLayoutOrStack);
+		//! \param _configuration Initial configuration
+		//! \param _stateFlags Initial state flags.
+		GraphicsItem(GraphicsItemCfg* _configuration, const ot::Flags<GraphicsItemState>& _stateFlags = ot::Flags<GraphicsItemState>((NoState)));
 
 		//! \brief Destructor.
 		virtual ~GraphicsItem();
@@ -83,15 +87,17 @@ namespace ot {
 
 		// Virtual functions
 
-		//! \brief Will setup the item from the provided configuration.
-		//! \param _cfg GraphicsItem configuration.
-		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg);
+		//! \brief Will setup the item from the provided configuration and store a copy.
+		//! The previously stored configuration will be destroyed.
+		//! Default 0.
+		//! \param _cfg GraphicsItem configuration (Copy will be stored).
+		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg);
 
 		//! \brief Will be called when this item was registered as an event handler and the child raised an event
-		virtual void graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {};
+		virtual void graphicsItemEventHandler(GraphicsItem* _sender, GraphicsItemEvent _event) {};
 
 		//! \brief Will be called whenever the GraphicsItem flags have changed.
-		virtual void graphicsItemFlagsChanged(ot::GraphicsItemCfg::GraphicsItemFlags _flags) {};
+		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {};
 
 		//! \brief Will return any child item that matches the _itemName.
 		//! \param _itemName The name of the item to find.
@@ -99,6 +105,8 @@ namespace ot {
 
 		//! \brief Removes all connections to or from this item.
 		virtual void removeAllConnections(void);
+
+		virtual bool graphicsItemRequiresHover(void) const;
 
 		// ###############################################################################################################################################
 
@@ -119,36 +127,25 @@ namespace ot {
 		//! @param _rect The default item rect (the size should be the prefferred item size)
 		QRectF handleGetGraphicsItemBoundingRect(const QRectF& _rect) const;
 
+		//! \brief Handles general item updates.
+		//! The selected state will be forwarded to the GraphicsHighlightItem.
+		//! Position updates will update the connections and call GraphicsItem::graphicsItemEventHandler() with GraphicsItem::ItemMoved
 		void handleItemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value);
 
 		void handleSetItemGeometry(const QRectF& _geom);
+
+		void raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event);
+
+		//! @brief Calculates the draw rect for the item
+		//! The inner rect takes into account the item geometry, alignment, margins and the actual inner size
+		QRectF calculatePaintArea(const QSizeF& _innerSize);
 
 		// ###############################################################################################################################################
 
 		// Getter / Setter
 
-		//! \brief Returns the last set configuration
+		//! \brief Returns the current configuration.
 		const GraphicsItemCfg* const getConfiguration(void) const { return m_config; };
-
-		//! \brief Sets the provided flag.
-		//! \see GraphicsItem, GraphicsItemFlag
-		//! \param _flag Flag to set.
-		//! \param _active If true will set the flag, otherwise unset it.
-		void setGraphicsItemFlag(ot::GraphicsItemCfg::GraphicsItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
-
-		//! \brief Replaces the flags with the flags provided.
-		//! \param _flags Flags to set.
-		void setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlags _flags);
-
-		//! \brief Returns the current GraphicsItemFlags set.
-		//! \see GraphicsItem, GraphicsItemFlag
-		ot::GraphicsItemCfg::GraphicsItemFlags graphicsItemFlags(void) const { return m_flags; };
-
-		//! \brief Set the GraphicsScene this item is placed at.
-		void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
-
-		//! \brief Returns the GraphicsScene this item is placed at.
-		GraphicsScene* graphicsScene(void);
 
 		//! \brief Sets the provided state flag.
 		//! \see GraphicsItem, GraphicsItemState
@@ -162,50 +159,75 @@ namespace ot {
 
 		//! \brief Returns the current GraphicsItemStateFlags set.
 		//! \see GraphicsItem, GraphicsItemStateFlags
-		GraphicsItemStateFlags stateFlags(void) const { return m_state; };
+		const GraphicsItemStateFlags& getStateFlags(void) const { return m_state; };
 
-		//! \brief Returns true if the item is a layout or a stack.
-		bool isLayoutOrStack(void) const { return m_isLayoutOrStack; };
+		//! \brief Set the GraphicsScene this item is placed at.
+		void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
+
+		//! \brief Returns the GraphicsScene this item is placed at.
+		GraphicsScene* getGraphicsScene(void) const { return (m_parent ? m_parent->getGraphicsScene() : m_scene); };
+
+		virtual void setParentGraphicsItem(GraphicsItem* _itm) { m_parent = _itm; };
+		GraphicsItem* getParentGraphicsItem(void) const { return m_parent; };
+		
+		GraphicsItem* getRootItem(void);
+
+		//! \brief Sets the provided flag.
+		//! \see GraphicsItem, GraphicsItemFlag
+		//! \param _flag Flag to set.
+		//! \param _active If true will set the flag, otherwise unset it.
+		void setGraphicsItemFlag(ot::GraphicsItemCfg::GraphicsItemFlag _flag, bool _active = true);
+
+		//! \brief Replaces the flags with the flags provided.
+		//! \param _flags Flags to set.
+		void setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlags _flags);
+
+		//! \brief Returns the current GraphicsItemFlags set.
+		//! \see GraphicsItem, GraphicsItemFlag
+		const GraphicsItemCfg::GraphicsItemFlags& getGraphicsItemFlags(void) const;
 
 		//! \brief Sets the GraphicsItem UID.
 		//! \param _uid UID to set.
-		void setGraphicsItemUid(const ot::UID& _uid) { m_uid = _uid; };
-		const ot::UID& graphicsItemUid(void) const { return m_uid; };
+		void setGraphicsItemUid(const ot::UID& _uid);
+		const ot::UID& getGraphicsItemUid(void) const;
 
-		virtual void setGraphicsItemName(const std::string& _name) { m_name = _name; };
-		const std::string& graphicsItemName(void) const { return m_name; };
+		virtual void setGraphicsItemName(const std::string& _name);
+		const std::string& getGraphicsItemName(void) const;
 
-		virtual void setParentGraphicsItem(GraphicsItem* _itm) { m_parent = _itm; };
-		GraphicsItem* parentGraphicsItem(void) const { return m_parent; };
-		GraphicsItem* getRootItem(void);
+		void setGraphicsItemToolTip(const std::string& _toolTip);
+		const std::string& getGraphicsItemToolTip(void) const;
+
+		void setGraphicsItemMinimumSize(const QSizeF& _size);
+		QSizeF getGraphicsItemMinimumSize(void) const;
+
+		void setGraphicsItemMaximumSize(const QSizeF& _size);
+		QSizeF getGraphicsItemMaximumSize(void) const;
+
+		void setGraphicsItemSizePolicy(ot::SizePolicy _policy);
+		ot::SizePolicy getGraphicsItemSizePolicy(void) const;
+
+		void setGraphicsItemAlignment(ot::Alignment _align);
+		ot::Alignment getGraphicsItemAlignment(void) const;
+
+		void setGraphicsItemMargins(const ot::MarginsD& _margins);
+		const ot::MarginsD& getGraphicsItemMargins(void) const;
+
+		void setConnectionDirection(ot::ConnectionDirection _direction);
+		ot::ConnectionDirection getConnectionDirection(void) const;
 
 		void storeConnection(GraphicsConnectionItem* _connection);
 
 		//! @brief Removes the collection from the list (item will not be destroyed)
 		void forgetConnection(GraphicsConnectionItem* _connection);
 
-		void setGraphicsItemAlignment(ot::Alignment _align) { m_alignment = _align; };
-		ot::Alignment graphicsItemAlignment(void) const { return m_alignment; };
-
-		void setConnectionDirection(ot::ConnectionDirection _direction) { m_connectionDirection = _direction; };
-		ot::ConnectionDirection connectionDirection(void) const { return m_connectionDirection; };
-
 		void addGraphicsItemEventHandler(ot::GraphicsItem* _handler);
 		void removeGraphicsItemEventHandler(ot::GraphicsItem* _handler);
-
-		void raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event);
 
 		QSizeF applyGraphicsItemMargins(const QSizeF& _size) const;
 		QSizeF removeGraphicsItemMargins(const QSizeF& _size) const;
 
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size);
 		const QSizeF& graphicsItemRequestedSize(void) const { return m_requestedSize; };
-
-		//! @brief Calculates the draw rect for the item
-		//! The inner rect takes into account the item geometry, alignment, margins and the actual inner size
-		QRectF calculatePaintArea(const QSizeF& _innerSize);
-
-		virtual bool graphicsItemRequiresHover(void) const { return !m_toolTip.empty(); };
 
 		std::list<ot::GraphicsConnectionCfg> getConnectionCfgs();
 
@@ -214,36 +236,19 @@ namespace ot {
 		GraphicsHighlightItem* highlightItem(void) const { return m_highlightItem; };
 
 	private:
-		bool m_isLayoutOrStack;
+		GraphicsItemCfg* m_config; //! \brief Configuration used to setup this item. Default 0.
 		
-		GraphicsItemStateFlags m_state;
+		GraphicsItemStateFlags m_state; //! \brief Current item state flags.
+		GraphicsHighlightItem* m_highlightItem; //! \brief Highlight item.
 
-		ot::UID m_uid;
-		std::string m_name;
-		std::string m_toolTip;
-		ot::Alignment m_alignment;
-		ot::SizePolicy m_sizePolicy;
-		ot::MarginsD m_margins;
-		GraphicsItemCfg::GraphicsItemFlags m_flags;
-		ot::ConnectionDirection m_connectionDirection;
-		GraphicsHighlightItem* m_highlightItem;
+		QPointF m_moveStartPt; //! @brief Item move origin.
+		GraphicsItem* m_parent; //! @brief Parent graphics item.
+		GraphicsScene* m_scene; //! @brief Graphics scene.
 
-		GraphicsItemCfg* m_config;
-
-		QPointF m_moveStartPt; //! @brief Item move origin
-		GraphicsItem* m_parent; //! @brief Parent graphics item
-		GraphicsScene* m_scene; //! @brief Graphics scene
-
-		QSizeF m_requestedSize;
-		QSizeF m_minSize;
-		QSizeF m_maxSize;
+		QSizeF m_requestedSize; //! \brief Size requested by parent.
 
 		std::list<GraphicsItem*> m_eventHandler;
 		std::list<GraphicsConnectionItem*> m_connections;
-
-		GraphicsItem() = delete;
-		GraphicsItem(const GraphicsItem&) = delete;
-		GraphicsItem& operator = (const GraphicsItem&) = delete;
 	};
 
 }

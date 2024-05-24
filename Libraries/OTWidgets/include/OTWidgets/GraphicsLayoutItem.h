@@ -14,11 +14,12 @@ namespace ot {
 	class GraphicsLayoutItemWrapper;
 
 	class OT_WIDGETS_API_EXPORT GraphicsLayoutItem : public ot::GraphicsItem {
+		OT_DECL_NODEFAULT(GraphicsLayoutItem)
 	public:
-		GraphicsLayoutItem();
+		GraphicsLayoutItem(GraphicsItemCfg* _configuration);
 		virtual ~GraphicsLayoutItem();
 		
-		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 
 		virtual void setGraphicsItemName(const std::string& _name) override;
 
@@ -32,7 +33,7 @@ namespace ot {
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
-		virtual void graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) override;
+		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) override;
 
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override;
 		virtual QGraphicsItem* getQGraphicsItem(void) override;

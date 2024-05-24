@@ -2429,7 +2429,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		ot::GraphicsItem* selectedGraphicsItem = dynamic_cast<ot::GraphicsItem*>(selectedItem);
 		if (selectedGraphicsItem) 
 		{
-			selectedGraphicSceneItemIDs.push_back(selectedGraphicsItem->graphicsItemUid());
+			selectedGraphicSceneItemIDs.push_back(selectedGraphicsItem->getGraphicsItemUid());
 			continue;
 		}
 		

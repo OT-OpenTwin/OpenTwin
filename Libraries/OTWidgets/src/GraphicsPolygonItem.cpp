@@ -18,7 +18,7 @@
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsPolygonItem> polyItemRegistrar(OT_FactoryKey_GraphicsPolygonItem);
 
 ot::GraphicsPolygonItem::GraphicsPolygonItem()
-	: ot::CustomGraphicsItem(false)
+	: ot::CustomGraphicsItem(new GraphicsPolygonItemCfg)
 {
 
 }
@@ -31,9 +31,9 @@ ot::GraphicsPolygonItem::~GraphicsPolygonItem() {
 
 // Base class functions: ot::GraphicsItems
 
-bool ot::GraphicsPolygonItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+bool ot::GraphicsPolygonItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
-	ot::GraphicsPolygonItemCfg* cfg = dynamic_cast<ot::GraphicsPolygonItemCfg*>(_cfg);
+	const GraphicsPolygonItemCfg* cfg = dynamic_cast<const GraphicsPolygonItemCfg*>(_cfg);
 	if (cfg == nullptr) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;

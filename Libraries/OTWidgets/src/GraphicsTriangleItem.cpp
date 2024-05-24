@@ -18,7 +18,7 @@
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsTriangleItem> triaItemRegistrar(OT_FactoryKey_GraphicsTriangleItem);
 
 ot::GraphicsTriangleItem::GraphicsTriangleItem()
-	: ot::CustomGraphicsItem(false), m_size(10, 10), m_direction(GraphicsTriangleItemCfg::Right), m_shape(GraphicsTriangleItemCfg::Triangle)
+	: ot::CustomGraphicsItem(new GraphicsTriangleItemCfg), m_size(10, 10), m_direction(GraphicsTriangleItemCfg::Right), m_shape(GraphicsTriangleItemCfg::Triangle)
 {
 
 }
@@ -31,9 +31,9 @@ ot::GraphicsTriangleItem::~GraphicsTriangleItem() {
 
 // Base class functions: ot::GraphicsItems
 
-bool ot::GraphicsTriangleItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+bool ot::GraphicsTriangleItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
-	ot::GraphicsTriangleItemCfg* cfg = dynamic_cast<ot::GraphicsTriangleItemCfg*>(_cfg);
+	const GraphicsTriangleItemCfg* cfg = dynamic_cast<const GraphicsTriangleItemCfg*>(_cfg);
 	if (cfg == nullptr) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
@@ -41,12 +41,12 @@ bool ot::GraphicsTriangleItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 	this->prepareGeometryChange();
 
-	m_size.setWidth(cfg->size().width());
-	m_size.setHeight(cfg->size().height());
-	m_shape = cfg->triangleShape();
-	m_direction = cfg->triangleDirection();
-	m_brush = QtFactory::toBrush(cfg->backgroundPainter());
-	m_pen = QtFactory::toPen(cfg->outline());
+	m_size.setWidth(cfg->getSize().width());
+	m_size.setHeight(cfg->getSize().height());
+	m_shape = cfg->getTriangleShape();
+	m_direction = cfg->getTriangleDirection();
+	m_brush = QtFactory::toBrush(cfg->getBackgroundPainter());
+	m_pen = QtFactory::toPen(cfg->getOutline());
 
 	// We call set rectangle size which will call set geometry to finalize the item
 	this->setTriangleSize(m_size);

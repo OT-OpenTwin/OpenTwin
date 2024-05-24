@@ -12,14 +12,14 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsGroupItem : public QGraphicsItemGroup, public QGraphicsLayoutItem, public ot::GraphicsItem {
 	public:
-		GraphicsGroupItem(bool _isStackOrLayout = false);
+		GraphicsGroupItem();
 		virtual ~GraphicsGroupItem();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Base class functions: GraphicsItem
 
-		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 
 		virtual void removeAllConnections(void) override;
 
@@ -30,7 +30,7 @@ namespace ot {
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 
-		virtual void graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) override;
+		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) override;
 
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 

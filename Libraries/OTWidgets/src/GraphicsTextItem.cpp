@@ -19,7 +19,7 @@
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsTextItem> textItemRegistrar(OT_FactoryKey_GraphicsTextItem);
 
 ot::GraphicsTextItem::GraphicsTextItem()
-	: ot::CustomGraphicsItem(false)
+	: ot::CustomGraphicsItem(new GraphicsTextItemCfg)
 {
 
 }
@@ -28,9 +28,9 @@ ot::GraphicsTextItem::~GraphicsTextItem() {
 
 }
 
-bool ot::GraphicsTextItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+bool ot::GraphicsTextItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
-	ot::GraphicsTextItemCfg* cfg = dynamic_cast<ot::GraphicsTextItemCfg*>(_cfg);
+	const GraphicsTextItemCfg* cfg = dynamic_cast<const GraphicsTextItemCfg*>(_cfg);
 	if (cfg == nullptr) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
@@ -61,5 +61,5 @@ QSizeF ot::GraphicsTextItem::getPreferredGraphicsItemSize(void) const {
 void ot::GraphicsTextItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	_painter->setFont(m_font);
 	_painter->setPen(m_pen);
-	_painter->drawText(_rect, QtFactory::toAlignment(this->graphicsItemAlignment()), m_text);
+	_painter->drawText(_rect, QtFactory::toAlignment(this->getGraphicsItemAlignment()), m_text);
 }

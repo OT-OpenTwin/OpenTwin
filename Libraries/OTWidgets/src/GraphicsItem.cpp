@@ -7,6 +7,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/Positioning.h"
 #include "OTWidgets/GraphicsView.h"
@@ -33,10 +34,8 @@
 
 // Constructor / Destructor
 
-ot::GraphicsItem::GraphicsItem(bool _isLayoutOrStack)
-	: m_flags(GraphicsItemCfg::NoFlags), m_parent(nullptr), m_isLayoutOrStack(_isLayoutOrStack), 
-	m_state(NoState), m_scene(nullptr), m_alignment(ot::AlignCenter), m_minSize(0., 0.), m_maxSize(DBL_MAX, DBL_MAX),
-	m_sizePolicy(ot::Preferred), m_requestedSize(-1., -1.), m_connectionDirection(ot::ConnectAny), m_uid(0), m_highlightItem(nullptr), m_config(nullptr)
+ot::GraphicsItem::GraphicsItem(GraphicsItemCfg* _configuration, const ot::Flags<GraphicsItemState>& _stateFlags)
+	: m_config(_configuration), m_state(_stateFlags), m_highlightItem(nullptr), m_moveStartPt(0., 0.), m_parent(nullptr), m_scene(nullptr), m_requestedSize(-1., -1.)
 {
 
 }
@@ -49,7 +48,7 @@ ot::GraphicsItem::~GraphicsItem() {
 
 // Virtual functions
 
-bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
 	
 	if (m_config != _cfg) {
@@ -57,25 +56,18 @@ bool ot::GraphicsItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 		m_config = nullptr;
 		m_config = _cfg->createCopy();
 	}
-
-	m_uid = _cfg->uid();
-	m_toolTip = _cfg->toolTip();	
-	m_alignment = _cfg->alignment();
-	m_sizePolicy = _cfg->sizePolicy();
-	m_margins = _cfg->margins();
-	m_minSize = QSizeF(_cfg->minimumSize().width(), _cfg->minimumSize().height());
-	m_maxSize = QSizeF(_cfg->maximumSize().width(), _cfg->maximumSize().height());
-	m_moveStartPt = QPointF(_cfg->position().x(), _cfg->position().y());
-	m_connectionDirection = _cfg->connectionDirection();
-
-	this->setGraphicsItemName(_cfg->name());
-	this->setGraphicsItemFlags(_cfg->graphicsItemFlags());
-
+	
+	if (m_config) {
+		m_moveStartPt = QPointF(m_config->getPosition().x(), m_config->getPosition().y());
+		this->setGraphicsItemName(this->getGraphicsItemName());
+		this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());
+	}
+	
 	return true;
 }
 
 ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
-	if (_itemName == m_name) return this;
+	if (_itemName == this->getGraphicsItemName()) return this;
 	
 	OTAssertNullptr(this->getQGraphicsItem());
 	ot::GraphicsItem* ret = nullptr;
@@ -94,7 +86,7 @@ ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
 void ot::GraphicsItem::removeAllConnections(void) {
 	if (m_connections.empty()) return;
 
-	GraphicsScene* scene = this->graphicsScene();
+	GraphicsScene* scene = this->getGraphicsScene();
 	if (scene == nullptr) {
 		OT_LOG_EA("No graphics scene set");
 		return;
@@ -111,6 +103,11 @@ void ot::GraphicsItem::removeAllConnections(void) {
 	}
 }
 
+bool ot::GraphicsItem::graphicsItemRequiresHover(void) const {
+	OTAssertNullptr(m_config);
+	return !this->getGraphicsItemToolTip().empty();
+}
+
 // ###############################################################################################################################################
 
 // Event handler
@@ -119,7 +116,7 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_parent) {
 		m_parent->handleMousePressEvent(_event);
 	}
-	else if (m_flags & GraphicsItemCfg::ItemIsConnectable) {
+	else if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) {
 		OTAssertNullptr(m_scene);
 		m_scene->startConnection(this);
 	}
@@ -135,7 +132,7 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 
 		m_scene->handleSelectionChanged();
 
-		if ((m_flags & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
+		if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
 			auto qitm = this->getQGraphicsItem();
 			OTAssertNullptr(qitm);
 			m_moveStartPt = qitm->pos(); // The item is root item, so pos returns the scene pos
@@ -147,7 +144,7 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 	if (m_parent) {
 		m_parent->handleMousePressEvent(_event);
 	}
-	else if ((m_flags & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
+	else if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
 		auto qitm = this->getQGraphicsItem();
 		OTAssertNullptr(qitm);
 		// Check if the item has moved after the user released the mouse
@@ -160,7 +157,7 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 
 void ot::GraphicsItem::handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 	this->handleToolTip(_event);
-	if (m_flags & GraphicsItemCfg::ItemHasNoFeedback) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHasNoFeedback) {
 		return;
 	}
 
@@ -172,11 +169,11 @@ void ot::GraphicsItem::handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 }
 
 void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
-	if (!m_toolTip.empty())
+	if (!this->getGraphicsItemToolTip().empty())
 	{
-		ToolTipHandler::showToolTip(_event->screenPos(), QString::fromStdString(m_toolTip), 1500);
+		ToolTipHandler::showToolTip(_event->screenPos(), QString::fromStdString(this->getGraphicsItemToolTip()), 1500);
 	}
-	else if ((m_flags & GraphicsItemCfg::ItemForwardsTooltip) && m_parent) {
+	else if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemForwardsTooltip) && m_parent) {
 		m_parent->handleToolTip(_event);
 	}
 }
@@ -191,7 +188,7 @@ void ot::GraphicsItem::handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 }
 
 void ot::GraphicsItem::paintStateBackground(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	if (m_flags & GraphicsItemCfg::ItemHasNoFeedback) return;
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHasNoFeedback) return;
 
 	if (m_state & HoverState) {
 		QPen p(QColor(0, 0, 255));
@@ -207,35 +204,35 @@ void ot::GraphicsItem::paintStateBackground(QPainter* _painter, const QStyleOpti
 
 QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _sizeHint) const {
 	// The adjusted size is the size hint expanded to the minimum size, bound to maximum size and with margins applied
-	QSizeF adjustedSize = _sizeHint.expandedTo(m_minSize).boundedTo(m_maxSize);
+	QSizeF adjustedSize = _sizeHint.expandedTo(this->getGraphicsItemMinimumSize()).boundedTo(this->getGraphicsItemMaximumSize());
 
 	switch (_hint)
 	{
 	case Qt::MinimumSize:
-		return this->applyGraphicsItemMargins(m_minSize);
+		return this->applyGraphicsItemMargins(this->getGraphicsItemMinimumSize());
 	case Qt::PreferredSize:
 	case Qt::MinimumDescent:
 	case Qt::NSizeHints:
 		break;
 	case Qt::MaximumSize:
-		return m_maxSize;
+		return this->getGraphicsItemMaximumSize();
 	default:
 		OT_LOG_WA("Unknown Qt SizeHint");
 	}
-	return this->applyGraphicsItemMargins(adjustedSize.boundedTo(m_maxSize));
+	return this->applyGraphicsItemMargins(adjustedSize.boundedTo(this->getGraphicsItemMaximumSize()));
 }
 
 QRectF ot::GraphicsItem::handleGetGraphicsItemBoundingRect(const QRectF& _rect) const {
-	if (m_sizePolicy == ot::Dynamic) {
+	if (this->getGraphicsItemSizePolicy() == ot::Dynamic) {
 		return QRectF(
 			_rect.topLeft(),
-			this->applyGraphicsItemMargins(m_minSize.expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(m_maxSize))
+			this->applyGraphicsItemMargins(this->getGraphicsItemMinimumSize().expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(this->getGraphicsItemMaximumSize()))
 		);
 	}
 	else {
 		return QRectF(
 			_rect.topLeft(),
-			this->applyGraphicsItemMargins(_rect.size().expandedTo(m_minSize).expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(m_maxSize))
+			this->applyGraphicsItemMargins(_rect.size().expandedTo(this->getGraphicsItemMinimumSize()).expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(this->getGraphicsItemMaximumSize()))
 		);
 	}
 	
@@ -248,14 +245,14 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 		if (this->getQGraphicsItem()->isSelected() && !(m_state & SelectedState)) {
 			m_state |= SelectedState;
 			if (m_highlightItem) {
-				m_highlightItem->setStateFlags(m_highlightItem->stateFlags() | SelectedState);
+				m_highlightItem->setStateFlags(m_highlightItem->getStateFlags() | SelectedState);
 				m_highlightItem->update();
 			}
 		}
 		else if (!this->getQGraphicsItem()->isSelected() && (m_state & SelectedState)) {
 			m_state &= (~SelectedState);
 			if (m_highlightItem) {
-				m_highlightItem->setStateFlags(m_highlightItem->stateFlags() & (~SelectedState));
+				m_highlightItem->setStateFlags(m_highlightItem->getStateFlags() & (~SelectedState));
 				m_highlightItem->update();
 			}
 		}
@@ -273,29 +270,56 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 
 void ot::GraphicsItem::handleSetItemGeometry(const QRectF& _geom) {
 	if (m_parent) {
-		if (m_parent->isLayoutOrStack()) {
+		if (m_parent->getStateFlags() & GraphicsItem::ForwardSizeState) {
 			this->setGraphicsItemRequestedSize(_geom.size());
 		}
+	}
+}
+
+void ot::GraphicsItem::raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event) {
+	for (auto itm : m_eventHandler) {
+		itm->graphicsItemEventHandler(this, _event);
+	}
+}
+
+QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
+	auto qitm = this->getQGraphicsItem();
+	OTAssertNullptr(qitm);
+
+	// Get the bounding rect of the item
+	QRectF r(qitm->boundingRect());
+
+	// Adjust size
+	QSizeF inner;
+
+	switch (this->getGraphicsItemSizePolicy())
+	{
+	case ot::Preferred:
+		inner = _innerSize;
+		break;
+	case ot::Dynamic:
+		inner = this->getGraphicsItemMinimumSize();
+		break;
+	default:
+		break;
+	}
+
+	// Calculate the size of the inner rectangle
+	inner = inner.expandedTo(this->getGraphicsItemMinimumSize()).expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(this->getGraphicsItemMaximumSize());
+
+	if (inner.toSize() == r.size()) {
+		// No further adjustments needed
+		return r;
+	}
+	else {
+		// Calculate the inner rectangle
+		return ot::calculateChildRect(r, inner, this->getGraphicsItemAlignment());
 	}
 }
 
 // ###############################################################################################################################################
 
 // Getter / Setter
-
-void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlags _flags) {
-	m_flags = _flags;
-	this->graphicsItemFlagsChanged(m_flags);
-}
-
-ot::GraphicsScene* ot::GraphicsItem::graphicsScene(void) {
-	if (m_parent) {
-		return m_parent->graphicsScene();
-	}
-	else {
-		return m_scene;
-	}
-}
 
 ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
 	if (m_parent) {
@@ -304,6 +328,113 @@ ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
 	else {
 		return this;
 	}
+}
+
+void ot::GraphicsItem::setGraphicsItemFlag(ot::GraphicsItemCfg::GraphicsItemFlag _flag, bool _active) {
+	OTAssertNullptr(m_config);
+	m_config->setGraphicsItemFlag(_flag, _active);
+	this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());
+}
+
+void ot::GraphicsItem::setGraphicsItemFlags(ot::GraphicsItemCfg::GraphicsItemFlags _flags) {
+	OTAssertNullptr(m_config);
+	m_config->setGraphicsItemFlags(_flags);
+	this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());
+}
+
+const ot::GraphicsItemCfg::GraphicsItemFlags& ot::GraphicsItem::getGraphicsItemFlags(void) const {
+	OTAssertNullptr(m_config);
+	return m_config->getGraphicsItemFlags();
+}
+
+void ot::GraphicsItem::setGraphicsItemUid(const ot::UID& _uid) {
+	OTAssertNullptr(m_config);
+	m_config->setUid(_uid);
+}
+
+const ot::UID& ot::GraphicsItem::getGraphicsItemUid(void) const {
+	OTAssertNullptr(m_config);
+	return m_config->getUid();
+}
+
+void ot::GraphicsItem::setGraphicsItemName(const std::string& _name) {
+	OTAssertNullptr(m_config);
+	m_config->setName(_name);
+}
+
+const std::string& ot::GraphicsItem::getGraphicsItemName(void) const {
+	OTAssertNullptr(m_config);
+	return m_config->getName();
+}
+
+void ot::GraphicsItem::setGraphicsItemToolTip(const std::string& _toolTip) {
+	OTAssertNullptr(m_config);
+	m_config->setToolTip(_toolTip);
+}
+
+const std::string& ot::GraphicsItem::getGraphicsItemToolTip(void) const {
+	OTAssertNullptr(m_config);
+	return m_config->getToolTip();
+}
+
+void ot::GraphicsItem::setGraphicsItemMinimumSize(const QSizeF& _size) {
+	OTAssertNullptr(m_config);
+	m_config->setMinimumSize(Size2DD(_size.width(), _size.height()));
+}
+
+QSizeF ot::GraphicsItem::getGraphicsItemMinimumSize(void) const {
+	OTAssertNullptr(m_config);
+	return std::move(QtFactory::toSize(m_config->getMinimumSize()));
+}
+
+void ot::GraphicsItem::setGraphicsItemMaximumSize(const QSizeF& _size) {
+	OTAssertNullptr(m_config);
+	m_config->setMaximumSize(Size2DD(_size.width(), _size.height()));
+}
+
+QSizeF ot::GraphicsItem::getGraphicsItemMaximumSize(void) const {
+	OTAssertNullptr(m_config);
+	return std::move(QtFactory::toSize(m_config->getMaximumSize()));
+}
+
+void ot::GraphicsItem::setGraphicsItemSizePolicy(ot::SizePolicy _policy) {
+	OTAssertNullptr(m_config);
+	m_config->setSizePolicy(_policy);
+}
+
+ot::SizePolicy ot::GraphicsItem::getGraphicsItemSizePolicy(void) const {
+	OTAssertNullptr(m_config);
+	return m_config->getSizePolicy();
+}
+
+void ot::GraphicsItem::setGraphicsItemAlignment(ot::Alignment _align) {
+	OTAssertNullptr(m_config);
+	m_config->setAlignment(_align);
+}
+
+ot::Alignment ot::GraphicsItem::getGraphicsItemAlignment(void) const {
+	OTAssertNullptr(m_config);
+	return m_config->getAlignment();
+}
+
+void ot::GraphicsItem::setGraphicsItemMargins(const ot::MarginsD& _margins) {
+	OTAssertNullptr(m_config);
+	m_config->setMargins(_margins);
+}
+
+const ot::MarginsD& ot::GraphicsItem::getGraphicsItemMargins(void) const {
+	OTAssertNullptr(m_config);
+	return m_config->getMargins();
+}
+
+void ot::GraphicsItem::setConnectionDirection(ot::ConnectionDirection _direction) {
+	OTAssertNullptr(m_config);
+	m_config->setConnectionDirection(_direction);
+}
+
+ot::ConnectionDirection ot::GraphicsItem::getConnectionDirection(void) const {
+	OTAssertNullptr(m_config);
+	return m_config->getConnectionDirection();
 }
 
 void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
@@ -335,53 +466,18 @@ void ot::GraphicsItem::setGraphicsItemRequestedSize(const QSizeF& _size) {
 	this->prepareGraphicsItemGeometryChange();
 }
 
-void ot::GraphicsItem::raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event) {
-	for (auto itm : m_eventHandler) {
-		itm->graphicsItemEventHandler(this, _event);
-	}
-}
-
 QSizeF ot::GraphicsItem::applyGraphicsItemMargins(const QSizeF& _size) const {
-	return QSizeF(_size.width() + m_margins.left() + m_margins.right(), _size.height() + m_margins.top() + m_margins.bottom());
+	return QSizeF(
+		_size.width() + this->getGraphicsItemMargins().left() + this->getGraphicsItemMargins().right(), // w
+		_size.height() + this->getGraphicsItemMargins().top() + this->getGraphicsItemMargins().bottom() // h
+	);
 }
 
 QSizeF ot::GraphicsItem::removeGraphicsItemMargins(const QSizeF& _size) const {
-	return QSizeF((_size.width() - m_margins.left()) - m_margins.right(), (_size.height() - m_margins.top()) - m_margins.bottom());
-}
-
-QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
-	auto qitm = this->getQGraphicsItem();
-	OTAssertNullptr(qitm);
-	
-	// Get the bounding rect of the item
-	QRectF r(qitm->boundingRect());
-
-	// Adjust size
-	QSizeF inner;
-
-	switch (m_sizePolicy)
-	{
-	case ot::Preferred:
-		inner = _innerSize;
-		break;
-	case ot::Dynamic:
-		inner = m_minSize;
-		break;
-	default:
-		break;
-	}
-
-	// Calculate the size of the inner rectangle
-	inner = inner.expandedTo(m_minSize).expandedTo(this->removeGraphicsItemMargins(m_requestedSize)).boundedTo(m_maxSize);
-
-	if (inner.toSize() == r.size()) {
-		// No further adjustments needed
-		return r;
-	}
-	else {
-		// Calculate the inner rectangle
-		return ot::calculateChildRect(r, inner, m_alignment);
-	}
+	return QSizeF(
+		(_size.width() - this->getGraphicsItemMargins().left()) - this->getGraphicsItemMargins().right(), // w
+		(_size.height() - this->getGraphicsItemMargins().top()) - this->getGraphicsItemMargins().bottom() // h
+	);
 }
 
 std::list<ot::GraphicsConnectionCfg> ot::GraphicsItem::getConnectionCfgs() 

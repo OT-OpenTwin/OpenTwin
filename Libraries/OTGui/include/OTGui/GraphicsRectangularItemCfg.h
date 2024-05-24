@@ -38,16 +38,16 @@ namespace ot {
 		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsRectangularItem); };
 
 		void setCornerRadius(int _px) { m_cornerRadius = _px; };
-		int cornerRadius(void) const { return m_cornerRadius; };
+		int getCornerRadius(void) const { return m_cornerRadius; };
 
 		void setOutline(const ot::OutlineF& _outline) { m_outline = _outline; };
-		const ot::OutlineF& outline(void) const { return m_outline; };
+		const ot::OutlineF& getOutline(void) const { return m_outline; };
 
 		void setBackgroundPainer(ot::Painter2D* _painter);
-		ot::Painter2D* backgroundPainter(void) { return m_backgroundPainter; };
+		const ot::Painter2D* getBackgroundPainter(void) const { return m_backgroundPainter; };
 
 		void setSize(const ot::Size2DD& _size) { m_size = _size; };
-		const ot::Size2DD& size(void) const { return m_size; };
+		const ot::Size2DD& getSize(void) const { return m_size; };
 
 	private:
 		int m_cornerRadius;

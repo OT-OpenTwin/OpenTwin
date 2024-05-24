@@ -13,7 +13,7 @@
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsStackItem> stackItemRegistrar(OT_FactoryKey_GraphicsStackItem);
 
 ot::GraphicsStackItem::GraphicsStackItem() 
-	: ot::GraphicsItem(true), m_lastCalculatedSize(-1., -1.) 
+	: ot::GraphicsItem(new GraphicsStackItemCfg, GraphicsItem::ForwardSizeState), m_lastCalculatedSize(-1., -1.) 
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
@@ -28,11 +28,11 @@ ot::GraphicsStackItem::~GraphicsStackItem() {
 
 // Base class functions: GraphicsItem
 
-bool ot::GraphicsStackItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+bool ot::GraphicsStackItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
 	if (!ot::GraphicsItem::setupFromConfig(_cfg)) return false;
 
-	ot::GraphicsStackItemCfg* cfg = dynamic_cast<ot::GraphicsStackItemCfg*>(_cfg);
+	const GraphicsStackItemCfg* cfg = dynamic_cast<const GraphicsStackItemCfg*>(_cfg);
 	if (cfg == nullptr) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
@@ -83,7 +83,7 @@ void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGrap
 	this->paint(_painter, _opt, _widget);
 }
 
-void ot::GraphicsStackItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) {
+void ot::GraphicsStackItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
 }
@@ -106,7 +106,7 @@ QSizeF ot::GraphicsStackItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSi
 }
 
 ot::GraphicsItem* ot::GraphicsStackItem::findItem(const std::string& _itemName) {
-	if (_itemName == this->graphicsItemName()) return this;
+	if (_itemName == this->getGraphicsItemName()) return this;
 
 	for (QGraphicsItem* i : this->childItems()) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);

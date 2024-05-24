@@ -21,7 +21,7 @@ namespace ot {
 
 		// Base class functions: ot::GraphicsItem
 
-		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

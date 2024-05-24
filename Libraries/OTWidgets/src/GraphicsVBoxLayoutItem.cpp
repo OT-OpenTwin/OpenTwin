@@ -11,12 +11,12 @@
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsVBoxLayoutItem> vblayItemRegistrar(OT_FactoryKey_GraphicsVBoxLayoutItem);
 
 ot::GraphicsVBoxLayoutItem::GraphicsVBoxLayoutItem(QGraphicsLayoutItem* _parentItem)
-	: GraphicsBoxLayoutItem(Qt::Vertical, _parentItem)
+	: GraphicsBoxLayoutItem(Qt::Vertical, new GraphicsVBoxLayoutItemCfg, _parentItem)
 {
 
 }
 
-bool ot::GraphicsVBoxLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+bool ot::GraphicsVBoxLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	return ot::GraphicsBoxLayoutItem::setupFromConfig(_cfg);
 }
 

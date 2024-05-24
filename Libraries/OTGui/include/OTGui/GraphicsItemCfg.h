@@ -77,7 +77,7 @@ namespace ot {
 
 		//! @brief Item name
 		//! The item name must be unique for one item picker.
-		const std::string& name(void) const { return m_name; };
+		const std::string& getName(void) const { return m_name; };
 
 		//! @brief Set item title
 		//! The item title will be displayed to the user when needed.
@@ -85,7 +85,7 @@ namespace ot {
 
 		//! @brief Item title
 		//! The item title will be displayed to the user when needed.
-		const std::string& title(void) const { return m_title; };
+		const std::string& getTitle(void) const { return m_title; };
 
 		//! @brief Set ToolTip
 		//! ToolTips are displayed when the user hovers over an item.
@@ -93,7 +93,7 @@ namespace ot {
 		void setToolTip(const std::string& _toolTip) { m_tooltip = _toolTip; };
 
 		//! @brief ToolTip that will be displayed to the user when he hovers over the item
-		const std::string& toolTip(void) const { return m_tooltip; };
+		const std::string& getToolTip(void) const { return m_tooltip; };
 
 		//! @brief Set item position
 		//! If the item is the root item, the position is the scene position.
@@ -111,13 +111,13 @@ namespace ot {
 		//! @brief Item position
 		//! If the item is the root item, the position is the scene position.
 		//! If the item is a child item, the position is the local position (default: 0.0; 0.0).
-		const Point2DD& position(void) { return m_pos; };
+		const Point2DD& getPosition(void) { return m_pos; };
 
-		void setMinimumSize(const ot::Size2DD& _size) { m_minSize = _size; };
-		const ot::Size2DD& minimumSize(void) const { return m_minSize; };
+		void setMinimumSize(const Size2DD& _size) { m_minSize = _size; };
+		const Size2DD& getMinimumSize(void) const { return m_minSize; };
 
-		void setMaximumSize(const ot::Size2DD& _size) { m_maxSize = _size; };
-		const ot::Size2DD& maximumSize(void) const { return m_maxSize; };
+		void setMaximumSize(const Size2DD& _size) { m_maxSize = _size; };
+		const Size2DD& getMaximumSize(void) const { return m_maxSize; };
 
 		//! @brief Set item margins
 		//! @param _top Top margin
@@ -131,23 +131,23 @@ namespace ot {
 		void setMargins(const MarginsD& _margins) { m_margins = _margins; };
 
 		//! @brief Item margins
-		const MarginsD& margins(void) const { return m_margins; };
+		const MarginsD& getMargins(void) const { return m_margins; };
 
 		void setGraphicsItemFlag(GraphicsItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
-		void setGraphicsItemFlags(GraphicsItemFlags _flags) { m_flags = _flags; };
-		GraphicsItemFlags graphicsItemFlags(void) const { return m_flags; };
+		void setGraphicsItemFlags(const GraphicsItemFlags& _flags) { m_flags = _flags; };
+		const GraphicsItemFlags& getGraphicsItemFlags(void) const { return m_flags; };
 
-		void setAlignment(ot::Alignment _align) { m_alignment = _align; };
-		ot::Alignment alignment(void) const { return m_alignment; };
+		void setAlignment(Alignment _align) { m_alignment = _align; };
+		Alignment getAlignment(void) const { return m_alignment; };
 
-		void setUid(const ot::UID& _uid) { m_uid = _uid; };
-		const ot::UID& uid(void) const { return m_uid; };
+		void setUid(const UID& _uid) { m_uid = _uid; };
+		const ot::UID& getUid(void) const { return m_uid; };
 
-		void setSizePolicy(ot::SizePolicy _policy) { m_sizePolicy = _policy; };
-		ot::SizePolicy sizePolicy(void) const { return m_sizePolicy; };
+		void setSizePolicy(SizePolicy _policy) { m_sizePolicy = _policy; };
+		SizePolicy getSizePolicy(void) const { return m_sizePolicy; };
 
 		void setConnectionDirection(ConnectionDirection _direction) { m_connectionDirection = _direction; };
-		ConnectionDirection connectionDirection(void) const { return m_connectionDirection; };
+		ConnectionDirection getConnectionDirection(void) const { return m_connectionDirection; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

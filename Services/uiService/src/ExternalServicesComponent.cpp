@@ -3810,8 +3810,8 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 	for (auto graphicsItemCfg : pckg.items()) {
 		ot::GraphicsItem* graphicsItem = ot::GraphicsItemFactory::instance().itemFromConfig(graphicsItemCfg, true);
 		if (graphicsItem != nullptr) {
-			const double xCoordinate = graphicsItemCfg->position().x();
-			const double yCoordinate = graphicsItemCfg->position().y();
+			const double xCoordinate = graphicsItemCfg->getPosition().x();
+			const double yCoordinate = graphicsItemCfg->getPosition().y();
 			graphicsItem->getQGraphicsItem()->setPos(QPointF(xCoordinate, yCoordinate));
 			editor->addItem(graphicsItem);
 		}

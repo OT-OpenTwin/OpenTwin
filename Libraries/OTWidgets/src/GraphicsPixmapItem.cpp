@@ -17,7 +17,7 @@
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsPixmapItem> pixmItemRegistrar(OT_FactoryKey_GraphicsImageItem);
 
 ot::GraphicsPixmapItem::GraphicsPixmapItem()
-	: ot::CustomGraphicsItem(false), m_maintainAspectRatio(false), m_colorMask(-1.f, -1.f, -1.f, -1.f)
+	: ot::CustomGraphicsItem(new GraphicsImageItemCfg), m_maintainAspectRatio(false), m_colorMask(-1.f, -1.f, -1.f, -1.f)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
@@ -28,8 +28,8 @@ ot::GraphicsPixmapItem::~GraphicsPixmapItem() {
 
 }
 
-bool ot::GraphicsPixmapItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
-	ot::GraphicsImageItemCfg* cfg = dynamic_cast<ot::GraphicsImageItemCfg*>(_cfg);
+bool ot::GraphicsPixmapItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
+	const GraphicsImageItemCfg* cfg = dynamic_cast<const GraphicsImageItemCfg*>(_cfg);
 	if (cfg == nullptr) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
@@ -60,7 +60,7 @@ QSizeF ot::GraphicsPixmapItem::getPreferredGraphicsItemSize(void) const {
 void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	if (m_maintainAspectRatio) {
 		QPixmap scaled = m_pixmap.scaled(_rect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-		QRectF adjustedRect = ot::calculateChildRect(_rect, scaled.size(), this->graphicsItemAlignment());
+		QRectF adjustedRect = ot::calculateChildRect(_rect, scaled.size(), this->getGraphicsItemAlignment());
 
 		// Check if a color mask is set
 		if (m_colorMask.isValid()) {

@@ -18,7 +18,7 @@
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsRectangularItem> rectItemRegistrar(OT_FactoryKey_GraphicsRectangularItem);
 
 ot::GraphicsRectangularItem::GraphicsRectangularItem() 
-	: ot::CustomGraphicsItem(false), m_size(10, 10), m_cornerRadius(0)
+	: ot::CustomGraphicsItem(new GraphicsRectangularItemCfg), m_size(10, 10), m_cornerRadius(0)
 {
 
 }
@@ -31,22 +31,19 @@ ot::GraphicsRectangularItem::~GraphicsRectangularItem() {
 
 // Base class functions: ot::GraphicsItems
 
-bool ot::GraphicsRectangularItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+bool ot::GraphicsRectangularItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
-	ot::GraphicsRectangularItemCfg* cfg = dynamic_cast<ot::GraphicsRectangularItemCfg*>(_cfg);
+	const GraphicsRectangularItemCfg* cfg = dynamic_cast<const GraphicsRectangularItemCfg*>(_cfg);
 	if (cfg == nullptr) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
 	}
 
 	this->prepareGeometryChange();
+	m_cornerRadius = cfg->getCornerRadius();
+	m_brush = QtFactory::toBrush(cfg->getBackgroundPainter());
+	m_pen = QtFactory::toPen(cfg->getOutline());
 
-	m_size.setWidth(cfg->size().width());
-	m_size.setHeight(cfg->size().height());
-	m_cornerRadius = cfg->cornerRadius();
-	m_brush = QtFactory::toBrush(cfg->backgroundPainter());
-	m_pen = QtFactory::toPen(cfg->outline());
-	
 	// We call set rectangle size which will call set geometry to finalize the item
 	this->setRectangleSize(m_size);
 

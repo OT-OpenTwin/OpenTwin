@@ -34,7 +34,7 @@ namespace ot {
 
 		// Base class functions: GraphicsItem
 
-		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 
 		virtual void removeAllConnections(void) override;
 
@@ -42,7 +42,7 @@ namespace ot {
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
-		virtual void graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) override;
+		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) override;
 
 		//! @brief Will be called when this item was registered as an event handler and the child raised an event
 		virtual void graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) override;

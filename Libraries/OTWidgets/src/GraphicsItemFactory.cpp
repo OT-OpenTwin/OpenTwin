@@ -47,9 +47,9 @@ ot::GraphicsItem* ot::GraphicsItemFactory::itemFromConfig(ot::GraphicsItemCfg* _
 		}
 		else {
 			stck = new GraphicsStackItem;
-			stck->setGraphicsItemFlags(itm->graphicsItemFlags());
-			stck->setGraphicsItemName(itm->graphicsItemName() + "_oldRoot");
-			stck->setGraphicsItemUid(itm->graphicsItemUid());
+			stck->setGraphicsItemFlags(itm->getGraphicsItemFlags());
+			stck->setGraphicsItemName(itm->getGraphicsItemName() + "_oldRoot");
+			stck->setGraphicsItemUid(itm->getGraphicsItemUid());
 
 			stck->createHighlightItem();
 			stck->addItem(itm, true, false);

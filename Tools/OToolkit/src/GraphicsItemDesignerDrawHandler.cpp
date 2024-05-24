@@ -44,7 +44,7 @@ void GraphicsItemDesignerDrawHandler::cancelDraw(void) {
 	GraphicsItemDesignerItemBase* itm = this->stopDraw();
 
 	if (itm) {
-		m_view->removeItem(itm->getGraphicsItem()->graphicsItemUid());
+		m_view->removeItem(itm->getGraphicsItem()->getGraphicsItemUid());
 	}
 
 	Q_EMIT drawCancelled();

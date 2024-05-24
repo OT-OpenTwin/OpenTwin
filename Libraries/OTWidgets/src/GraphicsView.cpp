@@ -115,15 +115,15 @@ bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionCfg& 
 }
 
 void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
-	auto it = m_items.find(_item->graphicsItemUid());
+	auto it = m_items.find(_item->getGraphicsItemUid());
 	bool removeConnectionBufferApplied = false;
 	if (it != m_items.end()) {
-		OT_LOG_D("Overwriting item with the ID \"" + std::to_string(_item->graphicsItemUid()));
+		OT_LOG_D("Overwriting item with the ID \"" + std::to_string(_item->getGraphicsItemUid()));
 		removeConnectionBufferApplied = true;
-		this->removeItem(_item->graphicsItemUid(),removeConnectionBufferApplied);
+		this->removeItem(_item->getGraphicsItemUid(),removeConnectionBufferApplied);
 	}
 
-	m_items.insert_or_assign(_item->graphicsItemUid(), _item);
+	m_items.insert_or_assign(_item->getGraphicsItemUid(), _item);
 	m_scene->addItem(_item->getRootItem()->getQGraphicsItem());
 	_item->getRootItem()->getQGraphicsItem()->setZValue(1);
 	_item->setGraphicsScene(m_scene);
@@ -179,7 +179,7 @@ std::list<ot::UID> ot::GraphicsView::selectedItems(void) const {
 
 		if (itm) {
 			// Item selected
-			sel.push_back(itm->graphicsItemUid());
+			sel.push_back(itm->getGraphicsItemUid());
 		}
 	}
 	return sel;
@@ -283,7 +283,7 @@ void ot::GraphicsView::requestConnection(const ot::UID& _fromUid, const std::str
 }
 
 void ot::GraphicsView::notifyItemMoved(ot::GraphicsItem* _item) {
-	Q_EMIT itemMoved(_item->graphicsItemUid(), _item->getQGraphicsItem()->pos());
+	Q_EMIT itemMoved(_item->getGraphicsItemUid(), _item->getQGraphicsItem()->pos());
 }
 
 // ########################################################################################################

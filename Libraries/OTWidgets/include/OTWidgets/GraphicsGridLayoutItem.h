@@ -20,7 +20,7 @@ namespace ot {
 		GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
 		virtual ~GraphicsGridLayoutItem() {};
 
-		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const override;
 

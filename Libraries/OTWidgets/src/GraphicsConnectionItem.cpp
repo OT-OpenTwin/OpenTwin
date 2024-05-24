@@ -190,15 +190,15 @@ ot::GraphicsConnectionCfg ot::GraphicsConnectionItem::getConnectionInformation(v
 	info.setUid(m_uid);
 
 	if (m_origin) {
-		info.setOriginUid(m_origin->getRootItem()->graphicsItemUid());
-		info.setOriginConnectable(m_origin->graphicsItemName());
+		info.setOriginUid(m_origin->getRootItem()->getGraphicsItemUid());
+		info.setOriginConnectable(m_origin->getGraphicsItemName());
 	}
 	else {
 		OT_LOG_WA("No origin item set");
 	}
 	if (m_dest) {
-		info.setDestUid(m_dest->getRootItem()->graphicsItemUid());
-		info.setDestConnectable(m_dest->graphicsItemName());
+		info.setDestUid(m_dest->getRootItem()->getGraphicsItemUid());
+		info.setDestConnectable(m_dest->getGraphicsItemName());
 	}
 	else {
 		OT_LOG_WA("No dest item set");
@@ -269,8 +269,8 @@ void ot::GraphicsConnectionItem::calculateSmoothLinePoints(QPointF& _origin, QPo
 	double halfdistY = (std::max(_origin.y(), _destination.y()) - std::min(_origin.y(), _destination.y())) / 2.;
 
 	// Calculate control points
-	this->calculateSmoothLineStep(_origin, _destination, halfdistX, halfdistY, _control1, this->originItem()->connectionDirection());
-	this->calculateSmoothLineStep(_destination, _origin, halfdistX, halfdistY, _control2, this->destItem()->connectionDirection());
+	this->calculateSmoothLineStep(_origin, _destination, halfdistX, halfdistY, _control1, this->originItem()->getConnectionDirection());
+	this->calculateSmoothLineStep(_destination, _origin, halfdistX, halfdistY, _control2, this->destItem()->getConnectionDirection());
 }
 
 void ot::GraphicsConnectionItem::calculateSmoothLineStep(const QPointF& _origin, const QPointF& _destination, double _halfdistX, double _halfdistY, QPointF& _control, ot::ConnectionDirection _direction) const {	switch (_direction)

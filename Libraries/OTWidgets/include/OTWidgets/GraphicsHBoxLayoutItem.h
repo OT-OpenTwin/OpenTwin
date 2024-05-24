@@ -15,7 +15,7 @@ namespace ot {
 		GraphicsHBoxLayoutItem(QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
 		virtual ~GraphicsHBoxLayoutItem() {};
 
-		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 
 	private:
 		QSizeF m_size;

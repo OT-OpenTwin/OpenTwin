@@ -9,15 +9,15 @@
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsLayoutItemWrapper.h"
 
-ot::GraphicsLayoutItem::GraphicsLayoutItem()
-	: ot::GraphicsItem(true), m_layoutWrap(nullptr)
+ot::GraphicsLayoutItem::GraphicsLayoutItem(GraphicsItemCfg* _configuration)
+	: ot::GraphicsItem(_configuration, GraphicsItem::ForwardSizeState), m_layoutWrap(nullptr)
 {}
 
 ot::GraphicsLayoutItem::~GraphicsLayoutItem() {
 
 }
 
-bool ot::GraphicsLayoutItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+bool ot::GraphicsLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(m_layoutWrap);
 	m_layoutWrap->setAcceptHoverEvents(true);
 	return ot::GraphicsItem::setupFromConfig(_cfg);
@@ -57,7 +57,7 @@ void ot::GraphicsLayoutItem::setParentGraphicsItem(GraphicsItem* _itm) {
 	ot::GraphicsItem::setParentGraphicsItem(m_layoutWrap);
 }
 
-void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) {
+void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {
 	OTAssertNullptr(m_layoutWrap);
 	m_layoutWrap->setGraphicsItemFlags(_flags);
 }
@@ -74,7 +74,7 @@ QGraphicsLayoutItem* ot::GraphicsLayoutItem::getQGraphicsLayoutItem(void) {
 QGraphicsItem* ot::GraphicsLayoutItem::getQGraphicsItem(void) { return m_layoutWrap->getQGraphicsItem(); };
 
 ot::GraphicsItem* ot::GraphicsLayoutItem::findItem(const std::string& _itemName) {
-	if (_itemName == this->graphicsItemName()) return this;
+	if (_itemName == this->getGraphicsItemName()) return this;
 	std::list<QGraphicsLayoutItem*> lst;
 	this->getAllItems(lst);
 	for (auto i : lst) {

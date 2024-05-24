@@ -12,8 +12,8 @@
 
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsGroupItem> groupItemRegistrar(OT_FactoryKey_GraphicsGroupItem);
 
-ot::GraphicsGroupItem::GraphicsGroupItem(bool _isStackOrLayout)
-	: ot::GraphicsItem(_isStackOrLayout)
+ot::GraphicsGroupItem::GraphicsGroupItem()
+	: ot::GraphicsItem(new GraphicsGroupItemCfg)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
@@ -28,11 +28,11 @@ ot::GraphicsGroupItem::~GraphicsGroupItem() {
 
 // Base class functions: GraphicsItem
 
-bool ot::GraphicsGroupItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+bool ot::GraphicsGroupItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
 	if (!ot::GraphicsItem::setupFromConfig(_cfg)) return false;
 
-	ot::GraphicsGroupItemCfg* cfg = dynamic_cast<ot::GraphicsGroupItemCfg*>(_cfg);
+	const GraphicsGroupItemCfg* cfg = dynamic_cast<const GraphicsGroupItemCfg*>(_cfg);
 	if (cfg == nullptr) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
@@ -62,7 +62,7 @@ void ot::GraphicsGroupItem::callPaint(QPainter* _painter, const QStyleOptionGrap
 	this->paint(_painter, _opt, _widget);
 }
 
-void ot::GraphicsGroupItem::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) {
+void ot::GraphicsGroupItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
 }
@@ -72,7 +72,7 @@ QSizeF ot::GraphicsGroupItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSi
 }
 
 ot::GraphicsItem* ot::GraphicsGroupItem::findItem(const std::string& _itemName) {
-	if (_itemName == this->graphicsItemName()) return this;
+	if (_itemName == this->getGraphicsItemName()) return this;
 
 	for (auto i : this->childItems()) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);

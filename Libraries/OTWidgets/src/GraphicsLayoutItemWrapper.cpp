@@ -9,7 +9,7 @@
 #include "OTWidgets/GraphicsLayoutItemWrapper.h"
 
 ot::GraphicsLayoutItemWrapper::GraphicsLayoutItemWrapper(GraphicsLayoutItem* _owner) 
-	: ot::GraphicsItem(false), m_owner(_owner)
+	: ot::GraphicsItem(_owner->getConfiguration()->createCopy(), GraphicsItem::ForwardSizeState), m_owner(_owner)
 {
 	OTAssertNullptr(m_owner);
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
@@ -65,7 +65,7 @@ void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOption
 	QGraphicsWidget::paint(_painter, _opt, _widget);
 }
 
-void ot::GraphicsLayoutItemWrapper::graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) {
+void ot::GraphicsLayoutItemWrapper::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {
 	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
 }

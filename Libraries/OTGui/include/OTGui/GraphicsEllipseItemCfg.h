@@ -38,15 +38,15 @@ namespace ot {
 		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsEllipseItem); };
 
 		void setRadiusX(double _radius) { m_radiusX = _radius; };
-		double radiusX(void) const { return m_radiusX; };
+		double getRadiusX(void) const { return m_radiusX; };
 		void setRadiusY(double _radius) { m_radiusY = _radius; };
-		double radiusY(void) const { return m_radiusY; };
+		double getRadiusY(void) const { return m_radiusY; };
 
 		void setOutline(const ot::OutlineF& _outline) { m_outline = _outline; };
-		const ot::OutlineF& outline(void) const { return m_outline; };
+		const ot::OutlineF& getOutline(void) const { return m_outline; };
 
 		void setBackgroundPainer(ot::Painter2D* _painter);
-		ot::Painter2D* backgroundPainter(void) { return m_backgroundPainter; };
+		const ot::Painter2D* getBackgroundPainter(void) const { return m_backgroundPainter; };
 
 	private:
 		double m_radiusX;

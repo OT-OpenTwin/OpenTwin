@@ -17,10 +17,8 @@
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsEllipseItem> elliItemRegistrar(OT_FactoryKey_GraphicsEllipseItem);
 
 ot::GraphicsEllipseItem::GraphicsEllipseItem()
-	: ot::CustomGraphicsItem(false), m_radiusX(5.), m_radiusY(5.)
-{
-
-}
+	: ot::CustomGraphicsItem(new GraphicsEllipseItemCfg), m_radiusX(5.), m_radiusY(5.)
+{}
 
 ot::GraphicsEllipseItem::~GraphicsEllipseItem() {
 
@@ -30,9 +28,9 @@ ot::GraphicsEllipseItem::~GraphicsEllipseItem() {
 
 // Base class functions: ot::GraphicsItems
 
-bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
+bool ot::GraphicsEllipseItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
-	ot::GraphicsEllipseItemCfg* cfg = dynamic_cast<ot::GraphicsEllipseItemCfg*>(_cfg);
+	const GraphicsEllipseItemCfg* cfg = dynamic_cast<const GraphicsEllipseItemCfg*>(_cfg);
 	if (cfg == nullptr) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
 		return false;
@@ -40,10 +38,10 @@ bool ot::GraphicsEllipseItem::setupFromConfig(ot::GraphicsItemCfg* _cfg) {
 
 	this->prepareGeometryChange();
 
-	m_radiusX = cfg->radiusX();
-	m_radiusY = cfg->radiusY();
-	m_brush = QtFactory::toBrush(cfg->backgroundPainter());
-	m_pen = QtFactory::toPen(cfg->outline());
+	m_radiusX = cfg->getRadiusX();
+	m_radiusY = cfg->getRadiusY();
+	m_brush = QtFactory::toBrush(cfg->getBackgroundPainter());
+	m_pen = QtFactory::toPen(cfg->getOutline());
 
 	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }

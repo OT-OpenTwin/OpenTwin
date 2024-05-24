@@ -15,8 +15,9 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT CustomGraphicsItem : public QGraphicsItem, public QGraphicsLayoutItem, public ot::GraphicsItem {
+		OT_DECL_NODEFAULT(CustomGraphicsItem)
 	public:
-		CustomGraphicsItem(bool _isLayoutOrStack);
+		CustomGraphicsItem(GraphicsItemCfg* _configuration, const ot::Flags<GraphicsItemState>& _stateFlags = ot::Flags<GraphicsItemState>((NoState)));
 		virtual ~CustomGraphicsItem();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -36,10 +37,10 @@ namespace ot {
 
 	public:
 
-		virtual bool setupFromConfig(ot::GraphicsItemCfg* _cfg) override;
+		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 		virtual void prepareGraphicsItemGeometryChange(void) override;
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
-		virtual void graphicsItemFlagsChanged(GraphicsItemCfg::GraphicsItemFlags _flags) override;
+		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) override;
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
@@ -64,8 +65,7 @@ namespace ot {
 		virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) override;
 	private:
 		QSizeF m_customItemSize;
-
-		CustomGraphicsItem() = delete;
+	
 	};
 
 }

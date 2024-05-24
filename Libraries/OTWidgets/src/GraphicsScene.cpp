@@ -151,7 +151,7 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 	for (auto itm : lst) {
 		ot::GraphicsItem* actualItm = dynamic_cast<ot::GraphicsItem*>(itm);
 		if (actualItm) {
-			if (actualItm->graphicsItemFlags() & ot::GraphicsItemCfg::ItemIsConnectable) {
+			if (actualItm->getGraphicsItemFlags() & ot::GraphicsItemCfg::ItemIsConnectable) {
 				this->startConnection(actualItm);
 				QGraphicsScene::mouseDoubleClickEvent(_event);
 				return;
@@ -229,9 +229,9 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		m_connectionPreview->setPen(p);
 		m_connectionPreview->setConnectionStyle(m_connectionPreviewStyle);
 		m_connectionPreview->setOriginPos(m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center());
-		m_connectionPreview->setOriginDir(m_connectionOrigin->connectionDirection());
+		m_connectionPreview->setOriginDir(m_connectionOrigin->getConnectionDirection());
 		m_connectionPreview->setDestPos(m_connectionPreview->originPos());
-		m_connectionPreview->setDestDir(ot::inversedConnectionDirection(m_connectionOrigin->connectionDirection()));
+		m_connectionPreview->setDestDir(ot::inversedConnectionDirection(m_connectionOrigin->getConnectionDirection()));
 		this->addItem(m_connectionPreview);
 		
 		return;
@@ -242,7 +242,7 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 			return;
 		}
 		OT_LOG_D("New conncetion");
-		m_view->requestConnection(m_connectionOrigin->getRootItem()->graphicsItemUid(), m_connectionOrigin->graphicsItemName(), _item->getRootItem()->graphicsItemUid(), _item->graphicsItemName());
+		m_view->requestConnection(m_connectionOrigin->getRootItem()->getGraphicsItemUid(), m_connectionOrigin->getGraphicsItemName(), _item->getRootItem()->getGraphicsItemUid(), _item->getGraphicsItemName());
 		this->stopConnection();
 	}
 }
