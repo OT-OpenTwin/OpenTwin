@@ -21,6 +21,7 @@ GraphicsItemDesignerNavigation::GraphicsItemDesignerNavigation()
 	m_rootItem->setText(0, "New Item");
 	m_rootItem->setIcon(0, ot::IconManager::getIcon("GraphicsEditor/Root.png"));
 	m_rootItem->setNavigation(this);
+	m_rootItem->setExpanded(true);
 	this->addTopLevelItem(m_rootItem);
 
 	this->connect(this, &GraphicsItemDesignerNavigation::itemSelectionChanged, this, &GraphicsItemDesignerNavigation::slotSelectionChanged);
@@ -45,16 +46,24 @@ void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _
 	}
 	_item->getGraphicsItem()->setGraphicsItemName(itemName.toStdString());
 	_item->setNavigation(this);
+	
 
 	// Store new item
 	m_rootItems.push_back(_item);
 	m_itemsMap.insert_or_assign(itemName, _item);
 
 	// Add to explorer
-	ot::TreeWidgetItemInfo info;
-	info.setText(m_rootItem->text(0));
-	info.addChildItem(_item->createNavigationInformation());
-	this->addItem(info);
+	ot::TreeWidgetItemInfo rootInfo;
+	rootInfo.setText(m_rootItem->text(0));
+
+	ot::TreeWidgetItemInfo infoNew = _item->createNavigationInformation();
+	rootInfo.addChildItem(infoNew);
+	this->addItem(rootInfo);
+	
+	QTreeWidgetItem* newNavigationItem = this->findItem(m_rootItem, { infoNew.text() });
+	OTAssertNullptr(newNavigationItem);
+
+	_item->setNavigationItem(newNavigationItem);
 }
 
 bool GraphicsItemDesignerNavigation::isItemNameUnique(const QString& _item) const {

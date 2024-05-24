@@ -45,6 +45,7 @@ namespace ot {
 
 	public:
 
+		void setLine(qreal _x1, qreal _y1, qreal _x2, qreal _y2) { this->setLine(QLineF(_x1, _y1, _x2, _y2)); };
 		void setLine(const QPointF& _from, const QPointF& _to) { this->setLine(QLineF(_from, _to)); };
 		void setLine(const QLineF& _line);
 		const QLineF& getLine(void) const { return m_line; };

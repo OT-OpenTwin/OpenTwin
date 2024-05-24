@@ -30,6 +30,7 @@
 // Qt header
 #include <QtCore/qobject.h>
 
+class QTreeWidgetItem;
 class GraphicsItemDesignerNavigation;
 
 class GraphicsItemDesignerPropertyHandler : public QObject {
@@ -41,6 +42,9 @@ public:
 
 	void setNavigation(GraphicsItemDesignerNavigation* _navigation) { m_navigation = _navigation; };
 	GraphicsItemDesignerNavigation* getNavigation(void) const { return m_navigation; };
+
+	void setNavigationItem(QTreeWidgetItem* _item) { m_navigationItem = _item; };
+	QTreeWidgetItem* getNavigationItem(void) const { return m_navigationItem; };
 
 	void setPropertyGrid(ot::PropertyGrid* _grid);
 	void unsetPropertyGrid(void);
@@ -56,6 +60,7 @@ private Q_SLOTS:
 	void slotPropertyDeleteRequested(const std::string& _group, const std::string& _item);
 
 private:
+	QTreeWidgetItem* m_navigationItem;
 	ot::PropertyGrid* m_propertyGrid;
 	GraphicsItemDesignerNavigation* m_navigation;
 };

@@ -11,7 +11,7 @@
 #include "OTWidgets/PropertyGridItem.h"
 
 GraphicsItemDesignerPropertyHandler::GraphicsItemDesignerPropertyHandler()
-	: m_propertyGrid(nullptr), m_navigation(nullptr)
+	: m_propertyGrid(nullptr), m_navigation(nullptr), m_navigationItem(nullptr)
 {}
 
 void GraphicsItemDesignerPropertyHandler::setPropertyGrid(ot::PropertyGrid* _grid) {
