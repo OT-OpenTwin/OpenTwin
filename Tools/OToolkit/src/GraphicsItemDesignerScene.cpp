@@ -20,7 +20,7 @@
 GraphicsItemDesignerScene::GraphicsItemDesignerScene(GraphicsItemDesignerView* _view)
 	: ot::GraphicsScene(QRectF(0., 0., 300., 200.), _view), m_view(_view), m_cursorItem(nullptr), m_mode(NoMode), m_itemSize(300, 200)
 {
-
+	this->setGridMode(ot::GraphicsScene::AdvancedGridNomalCenter);
 }
 
 GraphicsItemDesignerScene::~GraphicsItemDesignerScene() {
@@ -103,9 +103,16 @@ void GraphicsItemDesignerScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* _eve
 }
 
 void GraphicsItemDesignerScene::drawBackground(QPainter* _painter, const QRectF& _rect) {
+	if (_rect != m_view->mapToScene(m_view->viewport()->rect()).boundingRect()) {
+		m_view->update();
+		return;
+	}
+
 	const ot::ColorStyle& cs = ot::GlobalColorStyle::instance().getCurrentStyle();
 	_painter->fillRect(_rect, cs.getValue(OT_COLORSTYLE_VALUE_ControlsDisabledBackground).brush());
 	_painter->fillRect(_rect.intersected(QRectF(QPointF(0., 0.), m_itemSize)), cs.getValue(OT_COLORSTYLE_VALUE_ControlsBackground).brush());
+
+	this->drawGrid(_painter, _rect.intersected(QRectF(QPointF(0., 0.), m_itemSize)));
 }
 
 void GraphicsItemDesignerScene::constrainItemToScene(QGraphicsItem* _item)
