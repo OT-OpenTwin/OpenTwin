@@ -46,7 +46,7 @@ void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _
 	}
 	_item->getGraphicsItem()->setGraphicsItemName(itemName.toStdString());
 	_item->setNavigation(this);
-	
+	_item->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemIsMoveable);
 
 	// Store new item
 	m_rootItems.push_back(_item);

@@ -63,6 +63,9 @@ namespace ot {
 		void setGridMode(GridMode _mode) { m_gridMode = _mode; };
 		GridMode getGridMode(void) const { return m_gridMode; };
 
+		void setGridSnapEnabled(bool _enabled) { m_gridSnapEnabled = _enabled; };
+		bool getGridSnapEnabled(void) const { return m_gridSnapEnabled; };
+
 		GraphicsView* getGraphicsView(void) { return m_view; };
 
 		void setConnectionPreviewStyle(GraphicsConnectionCfg::ConnectionStyle _style) { m_connectionPreviewStyle = _style; };
@@ -70,6 +73,8 @@ namespace ot {
 
 		void setIgnoreEvents(bool _ignore) { m_ignoreEvents = _ignore; };
 		bool ignoreEvents(void) const { return m_ignoreEvents; };
+
+		QPointF snapToGrid(const QPointF& _pos) const;
 
 	Q_SIGNALS:
 		void selectionChangeFinished(void);
@@ -108,6 +113,7 @@ namespace ot {
 		bool m_ignoreEvents;
 		int m_gridStepSize;
 		int m_gridWideEvery;
+		bool m_gridSnapEnabled;
 		GridMode m_gridMode;
 		GraphicsView* m_view;
 		GraphicsItem* m_connectionOrigin;

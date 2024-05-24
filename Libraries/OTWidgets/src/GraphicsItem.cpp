@@ -258,10 +258,20 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 		}
 		break;
 	case QGraphicsItem::ItemScenePositionHasChanged:
+	{
+		if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemSnapsToGrid) && !m_parent) {
+			QPointF pos = m_scene->snapToGrid(this->getQGraphicsItem()->pos());
+			if (pos != this->getQGraphicsItem()->pos()) {
+				this->getQGraphicsItem()->setPos(pos);
+				return;
+			}
+		}
+
 		for (auto c : m_connections) {
 			c->updateConnection();
 		}
 		this->raiseEvent(ot::GraphicsItem::ItemMoved);
+	}
 		break;
 	default:
 		break;

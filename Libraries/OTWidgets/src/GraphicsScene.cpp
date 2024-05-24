@@ -20,7 +20,7 @@
 ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 	: m_gridStepSize(10), m_gridWideEvery(10), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewStyle(ot::GraphicsConnectionCfg::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false),
-	m_penWidth(1.), m_gridMode(AdvancedGrid)
+	m_penWidth(1.), m_gridMode(AdvancedGrid), m_gridSnapEnabled(true)
 {
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
 }
@@ -28,7 +28,7 @@ ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 ot::GraphicsScene::GraphicsScene(const QRectF& _sceneRect, GraphicsView* _view)
 	: QGraphicsScene(_sceneRect), m_gridStepSize(10), m_gridWideEvery(10), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewStyle(ot::GraphicsConnectionCfg::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false),
-	m_penWidth(1.), m_gridMode(AdvancedGrid)
+	m_penWidth(1.), m_gridMode(AdvancedGrid), m_gridSnapEnabled(true)
 {
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
 }
@@ -76,6 +76,32 @@ void ot::GraphicsScene::stopConnection(void) {
 		delete m_connectionPreview;
 		m_connectionPreview = nullptr;
 		m_connectionOrigin = nullptr;
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter / Getter
+
+QPointF ot::GraphicsScene::snapToGrid(const QPointF& _pos) const {
+	if (m_gridSnapEnabled && (m_gridStepSize > 0)) {
+		QPointF pt = _pos;
+		if (pt.x() < 0.) {
+			pt.setX(pt.x() + (qreal)((((int)pt.x()) * (-1)) % m_gridStepSize));
+		}
+		else {
+			pt.setX(pt.x() - (qreal)(((int)pt.x()) % m_gridStepSize));
+		}
+		if (pt.y() < 0.) {
+			pt.setY(pt.y() + (qreal)((((int)pt.y()) * (-1)) % m_gridStepSize));
+		}
+		else {
+			pt.setY(pt.y() - (qreal)(((int)pt.y()) % m_gridStepSize));
+		}
+		return pt;
+	}
+	else {
+		return _pos;
 	}
 }
 

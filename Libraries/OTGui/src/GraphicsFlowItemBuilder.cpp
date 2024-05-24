@@ -194,7 +194,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	root->setName(m_name);
 	root->setTitle(m_title);
 	root->setToolTip(m_toolTip);
-	root->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
+	root->setGraphicsItemFlags(GraphicsItemCfg::ItemIsMoveable | GraphicsItemCfg::ItemSnapsToGrid);
 
 	// Border
 	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg(painterBack);

@@ -128,6 +128,11 @@ void ot::GraphicsStackItem::paint(QPainter* _painter, const QStyleOptionGraphics
 	QGraphicsItemGroup::paint(_painter, _opt, _widget);
 }
 
+QVariant ot::GraphicsStackItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
+	this->handleItemChange(_change, _value);
+	return QGraphicsItemGroup::itemChange(_change, _value);
+}
+
 QRectF ot::GraphicsStackItem::boundingRect(void) const {
 	QRectF rec = QGraphicsItemGroup::boundingRect();
 	QPointF tl = rec.topLeft();
