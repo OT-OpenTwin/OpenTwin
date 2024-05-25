@@ -5,6 +5,7 @@
 
 // OToolkit header
 #include "GraphicsItemDesignerView.h"
+#include "GraphicsItemDesignerScene.h"
 #include "GraphicsItemDesignerItemBase.h"
 #include "GraphicsItemDesignerDrawHandler.h"
 #include "GraphicsItemDesignerInfoOverlay.h"
@@ -113,8 +114,7 @@ QPointF GraphicsItemDesignerDrawHandler::constainPosition(const QPointF& _pos) c
 	if (pt.y() > m_view->getItemSize().height()) {
 		pt.setY(m_view->getItemSize().height());
 	}
-
-	return pt;
+	return m_view->getDesignerScene()->snapToGrid(pt);
 }
 
 QString GraphicsItemDesignerDrawHandler::modeString(void) {

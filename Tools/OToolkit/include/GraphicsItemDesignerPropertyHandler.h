@@ -20,6 +20,7 @@
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyInputInt.h"
 #include "OTWidgets/PropertyGridGroup.h"
+#include "OTWidgets/PropertyInputInt.h"
 #include "OTWidgets/PropertyInputBool.h"
 #include "OTWidgets/PropertyInputColor.h"
 #include "OTWidgets/PropertyInputDouble.h"

@@ -31,6 +31,10 @@ ot::PropertyInt::PropertyInt(const std::string& _name, int _value, PropertyFlags
 	: Property(_name, _flags), m_value(_value), m_min(INT_MIN), m_max(INT_MAX)
 {}
 
+ot::PropertyInt::PropertyInt(const std::string& _name, int _value, int _min, int _max, PropertyFlags _flags)
+	: Property(_name, _flags), m_value(_value), m_min(_min), m_max(_max)
+{}
+
 ot::Property* ot::PropertyInt::createCopy(void) const {
 	return new PropertyInt(this);
 }

@@ -20,6 +20,7 @@ namespace ot {
 		PropertyInt(PropertyFlags _flags = PropertyFlags(NoFlags));
 		PropertyInt(int _value, PropertyFlags _flags = PropertyFlags(NoFlags));
 		PropertyInt(const std::string& _name, int _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyInt(const std::string& _name, int _value, int _min, int _max, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyInt() {};
 
 		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Int; };

@@ -31,6 +31,10 @@ ot::PropertyDouble::PropertyDouble(const std::string& _name, double _value, Prop
 	: Property(_name, _flags), m_value(_value), m_min(DBL_MIN), m_max(DBL_MAX), m_precision(2)
 {}
 
+ot::PropertyDouble::PropertyDouble(const std::string& _name, double _value, double _min, double _max, PropertyFlags _flags)
+	: Property(_name, _flags), m_value(_value), m_min(_min), m_max(_max), m_precision(2)
+{}
+
 ot::Property* ot::PropertyDouble::createCopy(void) const {
 	return new PropertyDouble(this);
 }

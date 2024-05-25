@@ -20,6 +20,7 @@ namespace ot {
 		PropertyDouble(PropertyFlags _flags = PropertyFlags(NoFlags));
 		PropertyDouble(double _value, PropertyFlags _flags = PropertyFlags(NoFlags));
 		PropertyDouble(const std::string& _name, double _value, PropertyFlags _flags = PropertyFlags(NoFlags));
+		PropertyDouble(const std::string& _name, double _value, double _min, double _max, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyDouble() {};
 
 		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Double; };
