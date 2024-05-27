@@ -28,36 +28,25 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 
 void EntityBlockCircuitVoltageSource::createProperties()
 {
-	EntityPropertiesString::createProperty("Element Property", "ElementType", "100", "default", getProperties());
-	EntityPropertiesSelection::createProperty("Element Property", "Type", { "DC","AC" }, "DC", "default", getProperties());
-	createACProperties();
+	EntityPropertiesString::createProperty("Voltage Property", "Voltage", "100", "default", getProperties());
+	EntityPropertiesSelection::createProperty("Function-Properties", "Function", { "PULSE", "SIN", "EXP","Amplitude" }, "", "default", getProperties());
+
+
 	createPULSEProperties();
 	createSINProperties();
 	createEXPProperties();
+	createAmplitudeProperties();
 
 	SetVisiblePULSEProperties(false);
 	SetVisibleSINProperties(false);
 	SetVisibleEXPProperties(false);
-	SetVisibleACProperties(false);
+	SetVisibleAmplitude(false);
 	
 }
 
-void EntityBlockCircuitVoltageSource::createACProperties()
-{
-	EntityPropertiesSelection::createProperty("AC-Properties", "Function", { "PULSE", "SIN", "EXP", }, "", "default", getProperties());
-}
 
-bool EntityBlockCircuitVoltageSource::SetVisibleACProperties(bool visible)
-{
-	const bool isVisible = getProperties().getProperty("Function")->getVisible();
-	const bool refresh = isVisible != visible;
-	if (refresh)
-	{
-		getProperties().getProperty("Function")->setVisible(visible);
-		this->setModified();
-	}
-	return refresh;
-}
+
+
 
 
 void EntityBlockCircuitVoltageSource::createPULSEProperties()
@@ -295,44 +284,69 @@ bool EntityBlockCircuitVoltageSource::SetVisibleEXPProperties(bool visible)
 }
 
 
+void EntityBlockCircuitVoltageSource::createAmplitudeProperties()
+{
+	EntityPropertiesInteger::createProperty("Amplitude Properties", "Amplitude", 0, "default", getProperties());
+}
+
+std::string EntityBlockCircuitVoltageSource::getAmplitude()
+{
+	auto propertyBase = getProperties().getProperty("Amplitude");
+	auto property = dynamic_cast<EntityPropertiesInteger*>(propertyBase);
+	assert(propertyBase != nullptr);
+	return std::to_string(property->getValue());
+}
+
+bool EntityBlockCircuitVoltageSource::SetVisibleAmplitude(bool visible)
+{
+	const bool isVisible = getProperties().getProperty("Amplitude")->getVisible();
+	const bool refresh = isVisible != visible;
+	if (refresh)
+	{
+		getProperties().getProperty("Amplitude")->setVisible(visible);
+		this->setModified();
+	}
+	return refresh;
+}
+
 
 bool EntityBlockCircuitVoltageSource::updateFromProperties(void)
 {
 	bool refresh = false;
-	auto baseProperty = getProperties().getProperty("Type");
+
+	auto baseProperty = getProperties().getProperty("Function");
 	auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
 
-	if (selectionProperty->getValue() == "AC")
+	if (selectionProperty->getValue() == "PULSE")
 	{
-		refresh |= SetVisibleACProperties(true);
-		EntityPropertiesSelection* function = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Function"));
-		if (function->getValue() == "PULSE")
-		{
-			refresh |= SetVisiblePULSEProperties(true);
-			refresh |= SetVisibleSINProperties(false);
-			refresh |= SetVisibleEXPProperties(false);
-		}
-		else if (function->getValue() == "SIN")
-		{
-			refresh |= SetVisiblePULSEProperties(false);
-			refresh |= SetVisibleSINProperties(true);
-			refresh |= SetVisibleEXPProperties(false);
-		}
-		else if (function->getValue() == "EXP")
-		{
-			refresh |= SetVisiblePULSEProperties(false);
-			refresh |= SetVisibleSINProperties(false);
-			refresh |= SetVisibleEXPProperties(true);
-		}
+		refresh |= SetVisiblePULSEProperties(true);
+		refresh |= SetVisibleSINProperties(false);
+		refresh |= SetVisibleEXPProperties(false);
+		refresh |= SetVisibleAmplitude(false);
 	}
-	else
+	else if (selectionProperty->getValue() == "SIN")
 	{
-		refresh |= SetVisibleACProperties(false);
+		refresh |= SetVisiblePULSEProperties(false);
+		refresh |= SetVisibleSINProperties(true);
+		refresh |= SetVisibleEXPProperties(false);
+		refresh |= SetVisibleAmplitude(false);
+	}
+	else if (selectionProperty->getValue() == "EXP")
+	{
+		refresh |= SetVisiblePULSEProperties(false);
+		refresh |= SetVisibleSINProperties(false);
+		refresh |= SetVisibleEXPProperties(true);
+		refresh |= SetVisibleAmplitude(false);
+	}
+	else if (selectionProperty->getValue() == "Amplitude")
+	{
+		refresh |= SetVisibleAmplitude(true);
 		refresh |= SetVisiblePULSEProperties(false);
 		refresh |= SetVisibleSINProperties(false);
 		refresh |= SetVisibleEXPProperties(false);
 	}
-
+	
+	
 
 	if (refresh)
 	{
@@ -343,9 +357,9 @@ bool EntityBlockCircuitVoltageSource::updateFromProperties(void)
 }
 
 
-std::string EntityBlockCircuitVoltageSource::getElementType()
+std::string EntityBlockCircuitVoltageSource::getVoltage()
 {
-	auto propertyBase = getProperties().getProperty("ElementType");
+	auto propertyBase = getProperties().getProperty("Voltage");
 	auto elementType = dynamic_cast<EntityPropertiesString*>(propertyBase);
 	assert(elementType != nullptr);
 

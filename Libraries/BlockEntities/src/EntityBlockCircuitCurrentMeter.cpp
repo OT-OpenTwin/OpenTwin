@@ -13,7 +13,7 @@ EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, Entit
 {
 	_navigationTreeIconName = "CurrentMeter";
 	_navigationTreeIconNameHidden = "CurrentMeter";
-	_blockTitle = "Curren Meter";
+	_blockTitle = "Current Meter";
 
 	const std::string connectorNameLeft = "Left6";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };

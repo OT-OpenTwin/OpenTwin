@@ -210,8 +210,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		if (blockEntity->getBlockTitle() == "Voltage Source")
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
-			element.setValue(myElement->getElementType());
-			element.setType(myElement->getType());
+			element.setValue(myElement->getVoltage());
 			element.setFunction(myElement->getFunction());
 			if (element.getFunction() == "PULSE")
 			{
@@ -255,6 +254,12 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 				function += ")";
 
 				element.setFunction(function);
+			}
+			else if (element.getFunction() == "Amplitude")
+			{
+				std::string function = "AC " + myElement->getAmplitude();
+				element.setFunction(function);
+
 			}
 
 		}
@@ -368,13 +373,26 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	//Here i first create the Title of the Netlist and send it to NGSpice
 	std::string TitleLine = "circbyline *Test";
 	ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
-	
-	
+	/*ngSpice_Command(const_cast<char*>("circbyline V1 1 0 AC 1 0"));
+	ngSpice_Command(const_cast<char*>("circbyline R1 1 2 1k"));
+	ngSpice_Command(const_cast<char*>("circbyline L1 2 3 100mH"));
+	ngSpice_Command(const_cast<char*>("circbyline C1 3 0 1uF"));
+	ngSpice_Command(const_cast<char*>("circbyline .ac dec 10 10 100k"));
+	ngSpice_Command(const_cast<char*>("circbyline .Control"));
+	ngSpice_Command(const_cast<char*>("circbyline run"));
+	ngSpice_Command(const_cast<char*>("circbyline .endc"));
+	ngSpice_Command(const_cast<char*>("circbyline .end"));*/
 
 	//As next i create the Circuit Element Netlist Lines by getting the information out of the BufferClasses 
 
 	std::vector<std::string> nodesOfVoltageMeter;
 	std::vector<std::pair<std::string,std::string>> nodesOfCurrentMeter;
+
+	// I need to get the type of Simulation to set then the voltage source if its ac dc or tran
+	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
+	assert(simulationTypeProperty != nullptr);
+	std::string simulationType = simulationTypeProperty->getValue();
+	std::string voltageSourceType = "";
 
 	auto it =Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
 	 
@@ -392,14 +410,19 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		if (element.getItemName() == "Voltage Source")
 		{
 			netlistElementName += "V" + std::to_string(++Numbers::voltageSourceNetlistNumber);
-			netlistVoltageSourceType = element.getType() + " ";
-
-			//if the voltage source is an AC i need the function for it
-			if (netlistVoltageSourceType == "AC ")
+			if (simulationType == ".dc")
 			{
-				netlistVoltageSourceType += element.getFunction();
-				
+				element.setType("DC");
+				netlistVoltageSourceType = element.getType() + " ";
 			}
+			else if (simulationType == ".ac")
+			{
+				netlistVoltageSourceType = "DC 0" + element.getType() + " ";
+				netlistVoltageSourceType += element.getFunction();
+				voltageSourceType = "AC";
+			}
+			
+	
 			netlistLine += netlistElementName + " ";
 			
 		}
@@ -428,7 +451,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			}
 			
 		}
-		else if (element.getItemName() == "Curren Meter")
+		else if (element.getItemName() == "Current Meter")
 		{
 			if (nodesOfCurrentMeter.size() == 0)
 			{
@@ -449,7 +472,6 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 				}
 				nodesOfCurrentMeter.push_back(nodeNumbers);
 				
-				// I am doing a continue here becaue i dont want to generate a netlisteLine for this element
 				continue;
 			}
 			else
@@ -498,9 +520,15 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		{
 			netlistLine += netlistVoltageSourceType;
 		}
-		if (element.getType() != "AC")
+
+		
+		if (voltageSourceType != "AC")
 		{
 			netlistLine += netlistValue;
+		}
+		if (element.getItemName() == "Voltage Source")
+		{
+			voltageSourceType = "";
 		}
 
 
@@ -514,11 +542,10 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	//After i got the TitleLine and the elements which represent my circuit I check which simulation was chosen and create the simlationLine
 	
-	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
-	assert(simulationTypeProperty != nullptr);
 
 
-	std::string simulationType = simulationTypeProperty->getValue();
+
+	
 
 	std::string printSettings = "print ";
 	for (auto nodes : nodesOfVoltageMeter)
@@ -583,10 +610,8 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		std::string probeLine = oss.str();
 		ngSpice_Command(const_cast<char*>(probeLine.c_str()));
 	}
-	//ngSpice_Command(const_cast<char*>("circbyline .probe I(R1)"));
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
-	//ngSpice_Command(const_cast<char*>("circbyline print all"));
 	//ngSpice_Command(const_cast<char*>(printSettings.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .endc"));
 	ngSpice_Command(const_cast<char*>("circbyline .end"));
