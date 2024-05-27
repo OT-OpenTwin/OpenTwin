@@ -398,7 +398,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 			}
 		}
 
-		std::string _curveFolderPath = solverName + "/" + circuitName + "/" + "1D/Curves";
+		std::string _curveFolderPath = solverName + "/" + "Results" + "/" + "1D/Curves";
 
 		// No i want to get the node vectors of voltage and for each of them i create a curve
 		for (auto it : resultVectors)
@@ -449,7 +449,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 	
 		//Here i create the plot for all the curves
 		const std::string _plotName = "/" + simulationType + "-Simulation";
-		const std::string plotFolder = solverName + "/" + circuitName;
+		const std::string plotFolder = solverName + "/" + "Results";
 		const std::string fullPlotName = plotFolder + _plotName;
 
 		//Creating the Plot Entity
