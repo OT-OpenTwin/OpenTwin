@@ -259,7 +259,7 @@ namespace MongoUserFunctions
 			std::string error = err.what();
 		}
 
-		return std::move(user);
+		return user;
 	}
 
 	User getUserDataThroughId(bsoncxx::types::b_binary& id, mongocxx::client& adminClient)
@@ -285,7 +285,7 @@ namespace MongoUserFunctions
 
 		user.setDocumentValue(userDataOptional.get());
 
-		return std::move(user);
+		return user;
 	}
 
 
@@ -326,7 +326,7 @@ namespace MongoUserFunctions
 			}
 		}
 
-		return std::move(userList);
+		return userList;
 	}
 
 
