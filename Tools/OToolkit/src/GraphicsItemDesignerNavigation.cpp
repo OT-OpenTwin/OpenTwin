@@ -12,6 +12,7 @@
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/PropertyGrid.h"
+#include "OTWidgets/GraphicsScene.h"
 
 GraphicsItemDesignerNavigation::GraphicsItemDesignerNavigation()
 	: m_propertyGrid(nullptr), m_propertyHandler(nullptr)
@@ -99,6 +100,16 @@ bool GraphicsItemDesignerNavigation::updateItemName(const QString& _oldName, con
 	return true;
 }
 
+GraphicsItemDesignerItemBase* GraphicsItemDesignerNavigation::findDesignerItem(const QString& _itemName) const {
+	const auto& it = m_itemsMap.find(_itemName);
+	if (it != m_itemsMap.end()) {
+		return it->second;
+	}
+	else {
+		return nullptr;
+	}
+}
+
 void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
 	m_propertyGrid->clear();
 	if (m_propertyHandler) {
@@ -125,4 +136,49 @@ void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
 	if (m_propertyHandler) {
 		m_propertyHandler->setPropertyGrid(m_propertyGrid);
 	}
+}
+
+void GraphicsItemDesignerNavigation::keyPressEvent(QKeyEvent* _event) {
+	if (_event->key() == Qt::Key_Delete) {
+		bool itemDeleted = true;
+		while (itemDeleted) {
+			itemDeleted = false;
+			for (QTreeWidgetItem* itm : this->selectedItems()) {
+				GraphicsItemDesignerItemBase* actualItem = this->findDesignerItem(itm->text(0));
+				if (actualItem) {
+					actualItem->itemAboutToBeDestroyed();
+					itm->setHidden(true); 
+					this->forgetItem(actualItem);
+
+					OTAssertNullptr(actualItem->getGraphicsItem());
+					OTAssertNullptr(actualItem->getGraphicsItem()->getGraphicsScene());
+					actualItem->getGraphicsItem()->getGraphicsScene()->removeItem(actualItem->getGraphicsItem()->getQGraphicsItem());
+					delete actualItem->getGraphicsItem();
+
+					if ((unsigned long long)itm == (unsigned long long)actualItem) {
+						delete actualItem;
+						delete itm;
+					}
+					else {
+						delete itm;
+					}
+					itemDeleted = true;
+					break;
+				}
+			}
+		}
+	}
+}
+
+void GraphicsItemDesignerNavigation::forgetItem(GraphicsItemDesignerItemBase* _item) {
+	if (_item == m_propertyHandler) {
+		m_propertyHandler = nullptr;
+	}
+
+	auto it = std::find(m_rootItems.begin(), m_rootItems.end(), _item);
+	if (it != m_rootItems.end()) {
+		m_rootItems.erase(it);
+	}
+
+	m_itemsMap.erase(_item->getNavigationItem()->text(0));
 }

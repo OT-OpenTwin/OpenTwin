@@ -38,8 +38,15 @@ public:
 
 	bool updateItemName(const QString& _oldName, const QString& _newName);
 
+	GraphicsItemDesignerItemBase* findDesignerItem(const QString& _itemName) const;
+
 private Q_SLOTS:
 	void slotSelectionChanged(void);
+
+protected:
+	virtual void keyPressEvent(QKeyEvent* _event) override;
+
+	void forgetItem(GraphicsItemDesignerItemBase* _item);
 
 private:
 	std::list<GraphicsItemDesignerItemBase*> m_rootItems;

@@ -51,6 +51,8 @@ public:
 	void unsetPropertyGrid(void);
 	ot::PropertyGrid* getPropertyGrid(void) const { return m_propertyGrid; };
 
+	virtual void itemAboutToBeDestroyed(void) {};
+
 protected:
 	virtual void fillPropertyGrid(void) = 0;
 	virtual void propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) = 0;
