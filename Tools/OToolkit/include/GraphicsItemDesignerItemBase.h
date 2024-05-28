@@ -14,10 +14,8 @@
 #include "OTWidgets/IconManager.h"
 
 // Qt header
+#include <QtCore/qlist.h>
 #include <QtCore/qpoint.h>
-
-// std header
-#include <list>
 
 namespace ot {
 	class GraphicsItem;
@@ -30,36 +28,32 @@ public:
 	virtual ~GraphicsItemDesignerItemBase();
 
 	void addControlPoint(const QPointF& _pt);
-	void setControlPoints(const std::list<QPointF>& _points);
-	const std::list<QPointF>& controlPoints(void) const { return m_controlPoints; };
+	void setControlPoints(const QList<QPointF>& _points);
+	const QList<QPointF>& getControlPoints(void) const { return m_controlPoints; };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Pure virtual methods
 
-	//! \brief Rebuilds the item.
-	//! The item will be rebuild according to currently set control points.
-	//! 
-	//! If the function returns true if the item is valid (e.g. A WrappedShapeItem has more than one point set and the starting point is equal to the end point).
-	//! \return True if the item is valid.
-	virtual bool rebuildItem(void) = 0;
+	virtual bool isDesignedItemCompleted(void) const = 0;
 
 	virtual ot::GraphicsItem* getGraphicsItem(void) = 0;
 
 	virtual QString getDefaultItemName(void) const = 0;
 
-	virtual ot::TreeWidgetItemInfo createNavigationInformation(void) const = 0;
+	virtual ot::TreeWidgetItemInfo createNavigationInformation(void) = 0;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Protected base class methods
 
 protected:
+	virtual void controlPointsChanged(void) {};
 	virtual void fillPropertyGrid(void) override = 0;
 	virtual void propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override = 0;
 	virtual void propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override = 0;
 
 private:
-	std::list<QPointF> m_controlPoints;
+	QList<QPointF> m_controlPoints;
 
 };

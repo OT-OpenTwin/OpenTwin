@@ -16,10 +16,10 @@ GraphicsItemDesignerItemBase::~GraphicsItemDesignerItemBase() {
 
 void GraphicsItemDesignerItemBase::addControlPoint(const QPointF& _pt) {
 	m_controlPoints.push_back(_pt);
-	this->rebuildItem();
+	this->controlPointsChanged();
 }
 
-void GraphicsItemDesignerItemBase::setControlPoints(const std::list<QPointF>& _points) {
+void GraphicsItemDesignerItemBase::setControlPoints(const QList<QPointF>& _points) {
 	m_controlPoints = _points;
-	this->rebuildItem();
+	this->controlPointsChanged();
 }

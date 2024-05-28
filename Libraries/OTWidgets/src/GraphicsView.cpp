@@ -19,7 +19,8 @@
 #include <QtWidgets/qgraphicsproxywidget.h>
 
 ot::GraphicsView::GraphicsView(GraphicsScene* _scene) 
-	: m_scene(_scene), m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false), m_stateChangeInProgress(false) 
+	: m_scene(_scene), m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false), m_stateChangeInProgress(false),
+	m_viewFlags(NoViewFlags)
 {
 	if (!m_scene) m_scene = new GraphicsScene(this);
 
@@ -40,7 +41,9 @@ void ot::GraphicsView::resetView(void) {
 	QGraphicsScene* s = scene();
 	if (s == nullptr) return;
 	QRectF boundingRect = s->itemsBoundingRect();
-	this->setSceneRect(QRectF());
+	if (m_viewFlags & ViewManagesSceneRect) {
+		this->setSceneRect(QRectF());
+	}
 	int w = boundingRect.width();
 	int h = boundingRect.height();
 	QRectF viewRect = boundingRect.marginsAdded(QMarginsF(w, h, w, h));
@@ -52,7 +55,9 @@ void ot::GraphicsView::fitInCurrentView(void) {
 	QGraphicsScene* s = scene();
 	if (s == nullptr) return;
 	QRectF boundingRect = s->itemsBoundingRect();
-	this->setSceneRect(boundingRect);
+	if (m_viewFlags & ViewManagesSceneRect) {
+		this->setSceneRect(boundingRect);
+	}
 	this->fitInView(boundingRect, Qt::AspectRatioMode::KeepAspectRatio);
 	this->centerOn(boundingRect.center());
 }
@@ -67,7 +72,7 @@ void ot::GraphicsView::viewAll(void) {
 
 	if (viewPortRect.width() > boundingRect.width() && viewPortRect.height() > boundingRect.height())
 	{
-		resetView();
+		//resetView();
 	}
 }
 

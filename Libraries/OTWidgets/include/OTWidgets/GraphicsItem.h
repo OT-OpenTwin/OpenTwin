@@ -54,7 +54,7 @@ namespace ot {
 		//! \typedef GraphicsItemStateFlags
 		//! \brief Flags used to manage GraphicsItemState.
 		//! \see GraphicsItem, GraphicsItemState
-		typedef Flags<GraphicsItemState> GraphicsItemStateFlags; //!
+		typedef Flags<GraphicsItemState> GraphicsItemStateFlags;
 
 		//! \brief Constructor.
 		//! \param _configuration Initial configuration

@@ -31,6 +31,12 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsView : public QGraphicsView {
 		Q_OBJECT
 	public:
+		enum GraphicsViewFlag {
+			NoViewFlags          = 0x00, //! \brief No flags.
+			ViewManagesSceneRect = 0x01  //! \brief If set the view manages the scene rect when zooming or panning.
+		};
+		typedef Flags<GraphicsViewFlag> GraphicsViewFlags;
+
 		GraphicsView(GraphicsScene* _scene = (GraphicsScene*)nullptr);
 		virtual ~GraphicsView();
 
@@ -42,6 +48,10 @@ namespace ot {
 		bool mouseWheelEnabled(void) const { return m_wheelEnabled; };
 
 		const bool getStateChangeInProgress() const { return m_stateChangeInProgress; }
+
+		void setGraphicsViewFlag(GraphicsViewFlag _flag, bool _active = true) { m_viewFlags.setFlag(_flag, _active); };
+		void setGraphicsViewFlags(const GraphicsViewFlags& _flags) { m_viewFlags = _flags; };
+		const GraphicsViewFlags& getGraphicsViewFlags(void) const { return m_viewFlags; };
 
 		void setGraphicsScene(GraphicsScene* _scene);
 		GraphicsScene* getGraphicsScene(void) { return m_scene; };
@@ -102,6 +112,7 @@ namespace ot {
 	private:
 		std::atomic_bool m_stateChangeInProgress = false;
 		
+		GraphicsViewFlags m_viewFlags;
 		std::string m_viewName;
 		GraphicsScene* m_scene;
 		bool m_isPressed;
@@ -118,3 +129,5 @@ namespace ot {
 		bool connectedGraphicItemsExist(const GraphicsConnectionCfg& _config);
 	};
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::GraphicsView::GraphicsViewFlag)

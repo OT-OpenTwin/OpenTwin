@@ -86,6 +86,8 @@ void ot::GraphicsScene::stopConnection(void) {
 QPointF ot::GraphicsScene::snapToGrid(const QPointF& _pos) const {
 	if (m_gridSnapEnabled && (m_gridStepSize > 0)) {
 		QPointF pt = _pos;
+		pt.setX(round(pt.x()));
+		pt.setY(round(pt.y()));
 		if (pt.x() < 0.) {
 			pt.setX(pt.x() + (qreal)((((int)pt.x()) * (-1)) % m_gridStepSize));
 		}

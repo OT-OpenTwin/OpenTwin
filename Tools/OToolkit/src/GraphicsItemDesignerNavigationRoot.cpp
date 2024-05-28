@@ -12,7 +12,7 @@
 GraphicsItemDesignerNavigationRoot::GraphicsItemDesignerNavigationRoot() 
 	: m_view(nullptr)
 {
-
+	this->setExpanded(true);
 }
 
 void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {

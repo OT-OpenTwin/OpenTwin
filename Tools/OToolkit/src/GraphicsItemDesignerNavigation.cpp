@@ -46,7 +46,7 @@ void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _
 	}
 	_item->getGraphicsItem()->setGraphicsItemName(itemName.toStdString());
 	_item->setNavigation(this);
-	_item->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemIsMoveable);
+	_item->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid);
 
 	// Store new item
 	m_rootItems.push_back(_item);
@@ -60,6 +60,10 @@ void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _
 	rootInfo.addChildItem(infoNew);
 	this->addItem(rootInfo);
 	
+	if (m_rootItem->childCount() == 1) {
+		m_rootItem->setExpanded(true);
+	}
+
 	QTreeWidgetItem* newNavigationItem = this->findItem(m_rootItem, { infoNew.text() });
 	OTAssertNullptr(newNavigationItem);
 

@@ -263,6 +263,7 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 			QPointF pos = m_scene->snapToGrid(this->getQGraphicsItem()->pos());
 			if (pos != this->getQGraphicsItem()->pos()) {
 				this->getQGraphicsItem()->setPos(pos);
+				this->getGraphicsScene()->update();
 				return;
 			}
 		}

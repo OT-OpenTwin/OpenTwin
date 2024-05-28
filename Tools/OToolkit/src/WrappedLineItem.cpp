@@ -6,6 +6,9 @@
 // OToolkit header
 #include "WrappedLineItem.h"
 
+// OpenTwin header
+#include "OTWidgets/GraphicsScene.h"
+
 WrappedLineItem::WrappedLineItem() {
 
 }
@@ -16,28 +19,32 @@ WrappedLineItem::~WrappedLineItem() {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-bool WrappedLineItem::rebuildItem(void) {
-	if (this->controlPoints().size() != 2) return false;
-	
-	QPointF p1 = this->controlPoints().front();
-	QPointF p2 = this->controlPoints().back();
-
-	this->prepareGeometryChange();
-	
-	QPointF delta = QPointF(std::min(p1.x(), p2.x()), std::min(p1.y(), p2.y()));
-	this->setPos(delta);
-
-	this->setLine(p1 - delta, p2 - delta);
-	
-	return true;
-}
-
-ot::TreeWidgetItemInfo WrappedLineItem::createNavigationInformation(void) const {
+ot::TreeWidgetItemInfo WrappedLineItem::createNavigationInformation(void) {
 	ot::TreeWidgetItemInfo info;
 	info.setText(QString::fromStdString(this->getGraphicsItemName()));
 	info.setIcon(ot::IconManager::getIcon("GraphicsEditor/Line.png"));
 
 	return info;
+}
+
+void WrappedLineItem::controlPointsChanged(void) {
+	if (this->getControlPoints().size() != 2) return;
+
+	ot::GraphicsScene* gscene = this->getGraphicsScene();
+	if (!gscene) {
+		OT_LOG_E("Graphics scene not set");
+		return;
+	}
+
+	this->prepareGeometryChange();
+
+	QPointF p1 = this->getControlPoints().front();
+	QPointF p2 = this->getControlPoints().back();
+
+	QPointF delta = QPointF(std::min(p1.x(), p2.x()), std::min(p1.y(), p2.y()));
+	
+	this->setPos(delta);
+	this->setLine(p1 - delta, p2 - delta);
 }
 
 void WrappedLineItem::fillPropertyGrid(void) {

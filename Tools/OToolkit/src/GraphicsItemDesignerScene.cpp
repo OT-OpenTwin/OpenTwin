@@ -21,6 +21,7 @@ GraphicsItemDesignerScene::GraphicsItemDesignerScene(GraphicsItemDesignerView* _
 	: ot::GraphicsScene(QRectF(0., 0., 300., 200.), _view), m_view(_view), m_cursorItem(nullptr), m_mode(NoMode), m_itemSize(300, 200)
 {
 	this->setGridMode(ot::GraphicsScene::AdvancedGridNomalCenter);
+	this->setGridSnapEnabled(true);
 }
 
 GraphicsItemDesignerScene::~GraphicsItemDesignerScene() {
@@ -134,7 +135,7 @@ void GraphicsItemDesignerScene::constrainItemToScene(QGraphicsItem* _item)
 		newPos.setY(newPos.y() - (newPos.y() - m_itemSize.height()));
 	}
 	
-	_item->setPos(newPos);
+	if (newPos != _item->pos()) _item->setPos(newPos);
 
 	itemRect = _item->sceneBoundingRect();
 	if (itemRect.left() < 0 || itemRect.top() < 0) {

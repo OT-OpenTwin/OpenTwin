@@ -73,9 +73,9 @@ GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::stopDraw(void) {
 
 void GraphicsItemDesignerDrawHandler::updatePosition(const QPointF& _pos) {
 	if (m_previewItem) {
-		std::list<QPointF> lst = m_previewItem->controlPoints();
-		lst.pop_back();
+		QList<QPointF> lst = m_previewItem->getControlPoints();
 		if (lst.empty()) return;
+		lst.pop_back();
 
 		lst.push_back(this->constainPosition(_pos));
 		m_previewItem->setControlPoints(lst);
@@ -84,17 +84,18 @@ void GraphicsItemDesignerDrawHandler::updatePosition(const QPointF& _pos) {
 
 void GraphicsItemDesignerDrawHandler::positionSelected(const QPointF& _pos) {
 	if (m_previewItem) {
-		std::list<QPointF> lst = m_previewItem->controlPoints();
-		lst.pop_back();
-		lst.push_back(this->constainPosition(_pos));
+		QList<QPointF> lst = m_previewItem->getControlPoints();
+		if (!lst.empty()) lst.pop_back();
+		QPointF newPos = this->constainPosition(_pos);
+		lst.push_back(newPos);
 		m_previewItem->setControlPoints(lst);
 
 		// Check if the draw is completed
-		if (m_previewItem->rebuildItem()) {
+		if (m_previewItem->isDesignedItemCompleted()) {
 			Q_EMIT drawCompleted();
 		}
 		else {
-			lst.push_back(_pos);
+			lst.push_back(newPos);
 			m_previewItem->setControlPoints(lst);
 		}
 	}
@@ -165,7 +166,6 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 	}
 
 	if (m_previewItem) {
-		m_previewItem->addControlPoint(QPointF());
 		m_previewItem->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHasNoFeedback);
 		m_previewItem->getGraphicsItem()->setGraphicsItemUid(++m_currentUid);
 		m_view->addItem(m_previewItem->getGraphicsItem());
