@@ -8,6 +8,7 @@
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsLineItemCfg.h"
 #include "OTWidgets/QtFactory.h"
+#include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsLineItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
 

@@ -258,22 +258,23 @@ void ot::GraphicsScene::calculateGridLines(const QRectF& _painterRect, QList<QLi
 	}
 
 	// X: Center to Left
-	int startPos = std::min(0, (int)_painterRect.right() - ((_painterRect.right() < 0. ? ((int)_painterRect.right()) * (-1) : (int)_painterRect.right()) % m_gridStepSize));
+	qreal startPos;
+	if (_painterRect.right() < 0.) startPos = this->snapToGrid(QPointF(_painterRect.right(), 0.)).x();
+	else startPos = 0.;
 	int lineCounter = startPos / m_gridStepSize;
 	if (lineCounter < 0) lineCounter *= (-1);
 	if (m_gridWideEvery > 1) lineCounter = (lineCounter % m_gridWideEvery);
-	lineCounter--;
-	for (int x = startPos; x > _painterRect.left(); x -= m_gridStepSize) 
+	for (qreal x = startPos; x > _painterRect.left(); x -= (qreal)m_gridStepSize) 
 	{
 		if (m_gridMode == BasicGrid) {
 			// Small line only
-			_normalLines.push_back(QLineF((qreal)x, _painterRect.top(), (qreal)x, _painterRect.bottom()));
+			_normalLines.push_back(QLineF(x, _painterRect.top(), x, _painterRect.bottom()));
 		}
 		else if (m_gridMode == AdvancedGrid || m_gridMode == WideLinesOnly || m_gridMode == AdvancedGridNomalCenter) {
 			// Wide line
-			if (m_gridWideEvery > 1 && ++lineCounter >= m_gridWideEvery) {
+			if (m_gridWideEvery > 1 && lineCounter++ >= m_gridWideEvery) {
 				_wideLines.push_back(QLineF((qreal)x, _painterRect.top(), (qreal)x, _painterRect.bottom()));
-				lineCounter = 0;
+				lineCounter = 1;
 			}
 			// Small line
 			else if (m_gridMode != WideLinesOnly) {
@@ -283,22 +284,22 @@ void ot::GraphicsScene::calculateGridLines(const QRectF& _painterRect, QList<QLi
 	}
 
 	// X: Center to Right
-	startPos = std::max(0, (int)_painterRect.left() + ((_painterRect.left() < 0. ? ((int)_painterRect.left()) * (-1) : (int)_painterRect.left()) % m_gridStepSize));
+	if (_painterRect.left() > 0.) startPos = this->snapToGrid(QPointF(_painterRect.left(), 0.)).x();
+	else startPos = 0.;
 	lineCounter = startPos / m_gridStepSize;
 	if (lineCounter < 0) lineCounter *= (-1);
 	if (m_gridWideEvery > 1) lineCounter = (lineCounter % m_gridWideEvery);
-	lineCounter--;
-	for (int x = startPos; x < _painterRect.right(); x += m_gridStepSize)
+	for (qreal x = startPos; x < _painterRect.right(); x += (qreal)m_gridStepSize)
 	{
 		if (m_gridMode == BasicGrid) {
 			// Small line only
-			_normalLines.push_back(QLineF((qreal)x, _painterRect.top(), (qreal)x, _painterRect.bottom()));
+			_normalLines.push_back(QLineF(x, _painterRect.top(), x, _painterRect.bottom()));
 		}
 		else if (m_gridMode == AdvancedGrid || m_gridMode == WideLinesOnly || m_gridMode == AdvancedGridNomalCenter) {
 			// Wide line
-			if (m_gridWideEvery > 1 && ++lineCounter >= m_gridWideEvery) {
+			if (m_gridWideEvery > 1 && lineCounter++ >= m_gridWideEvery) {
 				_wideLines.push_back(QLineF((qreal)x, _painterRect.top(), (qreal)x, _painterRect.bottom()));
-				lineCounter = 0;
+				lineCounter = 1;
 			}
 			// Small line
 			else if (m_gridMode != WideLinesOnly) {
@@ -308,52 +309,53 @@ void ot::GraphicsScene::calculateGridLines(const QRectF& _painterRect, QList<QLi
 	}
 
 	// Y: Center to Top
-	startPos = std::min(0, (int)_painterRect.bottom() - ((_painterRect.bottom() < 0. ? ((int)_painterRect.bottom()) * (-1) : (int)_painterRect.bottom()) % m_gridStepSize));
+	if (_painterRect.bottom() < 0.) startPos = this->snapToGrid(QPointF(0., _painterRect.bottom())).y();
+	else startPos = 0.;
 	lineCounter = startPos / m_gridStepSize;
 	if (lineCounter < 0) lineCounter *= (-1);
 	if (m_gridWideEvery > 1) lineCounter = (lineCounter % m_gridWideEvery);
-	lineCounter--;
-	for (int y = startPos; y > _painterRect.top(); y -= m_gridStepSize)
+	for (qreal y = startPos; y > _painterRect.top(); y -= (qreal)m_gridStepSize)
 	{
 		if (m_gridMode == BasicGrid) {
 			// Small line only
-			_normalLines.push_back(QLineF(_painterRect.left(), (qreal)y, _painterRect.right(), (qreal)y));
+			_normalLines.push_back(QLineF(_painterRect.left(), y, _painterRect.right(), y));
 		}
 		else if (m_gridMode == AdvancedGrid || m_gridMode == WideLinesOnly || m_gridMode == AdvancedGridNomalCenter) {
 			// Wide line
-			if (m_gridWideEvery > 1 && ++lineCounter >= m_gridWideEvery) {
-				_wideLines.push_back(QLineF(_painterRect.left(), (qreal)y, _painterRect.right(), (qreal)y));
-				lineCounter = 0;
+			if (m_gridWideEvery > 1 && lineCounter++ >= m_gridWideEvery) {
+				_wideLines.push_back(QLineF(_painterRect.left(), y, _painterRect.right(), y));
+				lineCounter = 1;
 			}
 			// Small line
 			else if (m_gridMode != WideLinesOnly) {
-				_normalLines.push_back(QLineF(_painterRect.left(), (qreal)y, _painterRect.right(), (qreal)y));
+				_normalLines.push_back(QLineF(_painterRect.left(), y, _painterRect.right(), y));
 			}
 		}
 	}
 
 	// Y: Center to Bottom
-	startPos = std::max(0, (int)_painterRect.top() + ((_painterRect.top() < 0. ? ((int)_painterRect.top()) * (-1) : (int)_painterRect.top()) % m_gridStepSize));
+	if (_painterRect.top() < 0.) startPos = this->snapToGrid(QPointF(0., _painterRect.top())).y();
+	else startPos = 0.;
 	lineCounter = startPos / m_gridStepSize;
 	if (lineCounter < 0) lineCounter *= (-1);
 	if (m_gridWideEvery > 1) lineCounter = (lineCounter % m_gridWideEvery);
-	lineCounter--;
-	for (int y = startPos; y < _painterRect.bottom(); y += m_gridStepSize)
+	for (qreal y = startPos; y < _painterRect.bottom(); y += (qreal)m_gridStepSize)
 	{
 		if (m_gridMode == BasicGrid) {
 			// Small line only
-			_normalLines.push_back(QLineF(_painterRect.left(), (qreal)y, _painterRect.right(), (qreal)y));
+			_normalLines.push_back(QLineF(_painterRect.left(), y, _painterRect.right(), y));
 		}
 		else if (m_gridMode == AdvancedGrid || m_gridMode == WideLinesOnly || m_gridMode == AdvancedGridNomalCenter) {
 			// Wide line
-			if (m_gridWideEvery > 1 && ++lineCounter >= m_gridWideEvery) {
-				_wideLines.push_back(QLineF(_painterRect.left(), (qreal)y, _painterRect.right(), (qreal)y));
-				lineCounter = 0;
+			if (m_gridWideEvery > 1 && lineCounter++ >= m_gridWideEvery) {
+				_wideLines.push_back(QLineF(_painterRect.left(), y, _painterRect.right(), y));
+				lineCounter = 1;
 			}
 			// Small line
 			else if (m_gridMode != WideLinesOnly) {
-				_normalLines.push_back(QLineF(_painterRect.left(), (qreal)y, _painterRect.right(), (qreal)y));
+				_normalLines.push_back(QLineF(_painterRect.left(), y, _painterRect.right(), y));
 			}
 		}
 	}
+	
 }
