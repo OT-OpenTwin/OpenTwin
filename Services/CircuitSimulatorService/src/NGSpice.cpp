@@ -314,8 +314,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 			//1.Methode
 
-			if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter") 
-				/*&& (allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Curren Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Curren Meter")*/)
+			if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter"))
 			{
 				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(),myConn.destConnectable() });
 				if (connectionWithNodeNumber != connectionNodeNumbers.end())
@@ -421,6 +420,11 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 				netlistVoltageSourceType += element.getFunction();
 				voltageSourceType = "AC";
 			}
+			else
+			{
+				voltageSourceType = "TRAN";
+				netlistVoltageSourceType = element.getFunction();
+			}
 			
 	
 			netlistLine += netlistElementName + " ";
@@ -442,7 +446,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			if (nodesOfVoltageMeter.size() == 0)
 			{
 				getNodeNumbersOfMeters(editorname, allConnectionEntities, allEntitiesByBlockID,nodesOfVoltageMeter);
-				// I am doing a continue here becaue i dont want to generate a netlisteLine for this element
+				// I am doing a continue here becaue i dont want to generate an instance Line for this element
 				continue;
 			}
 			else
@@ -472,6 +476,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 				}
 				nodesOfCurrentMeter.push_back(nodeNumbers);
 				
+				// Here i do a continue because i dont want to generate an instance line for this element
 				continue;
 			}
 			else
@@ -522,7 +527,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		}
 
 		
-		if (voltageSourceType != "AC")
+		if (voltageSourceType != "AC" && voltageSourceType != "TRAN")
 		{
 			netlistLine += netlistValue;
 		}
@@ -532,7 +537,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		}
 
 
-		//Here i send the Lines to NGSpice dll
+		//Here i send the instance Lines to NGSpice dll
 		ngSpice_Command(const_cast<char*>(netlistLine.c_str()));
 		if (modelNetlistLine != "circbyline ")
 		{
@@ -541,20 +546,6 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	}
 
 	//After i got the TitleLine and the elements which represent my circuit I check which simulation was chosen and create the simlationLine
-	
-
-
-
-	
-
-	std::string printSettings = "print ";
-	for (auto nodes : nodesOfVoltageMeter)
-	{
-		printSettings +="v" + nodes +" ";
-	}
-	
-
-
 	
 	std::string simulationLine = "";
 
@@ -575,12 +566,11 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	}
 
 	simulationLine = "circbyline " + simulationLine;
-	printSettings = "circbyline " + printSettings;
 
-	
+
 	//And now i send it to NGSpice in the right order
 	
-	//Now i create for every Current Meter a resistor with Zero Ohm to measure the current through it#
+	//Now i create for every Current Meter a resistor with Zero Ohm to measure the current through it
 	std::vector<std::string> nameOfRShunts;
 	for (auto nodes : nodesOfCurrentMeter)
 	{
@@ -603,6 +593,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		ngSpice_Command(const_cast<char*>(probeLine.c_str()));
 	}
 	
+	// Here i create a probe for every Shunt resistor
 	for (auto name : nameOfRShunts)
 	{
 		std::ostringstream oss;
@@ -610,9 +601,9 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		std::string probeLine = oss.str();
 		ngSpice_Command(const_cast<char*>(probeLine.c_str()));
 	}
+
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
-	//ngSpice_Command(const_cast<char*>(printSettings.c_str()));
 	ngSpice_Command(const_cast<char*>("circbyline .endc"));
 	ngSpice_Command(const_cast<char*>("circbyline .end"));
 

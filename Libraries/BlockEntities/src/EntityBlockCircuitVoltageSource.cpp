@@ -29,7 +29,7 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 void EntityBlockCircuitVoltageSource::createProperties()
 {
 	EntityPropertiesString::createProperty("Voltage Property", "Voltage", "100", "default", getProperties());
-	EntityPropertiesSelection::createProperty("Function-Properties", "Function", { "PULSE", "SIN", "EXP","Amplitude" }, "", "default", getProperties());
+	EntityPropertiesSelection::createProperty("Function-Properties", "Function", { "PULSE", "SIN", "EXP","Amplitude Normal" }, "", "default", getProperties());
 
 
 	createPULSEProperties();
@@ -286,12 +286,12 @@ bool EntityBlockCircuitVoltageSource::SetVisibleEXPProperties(bool visible)
 
 void EntityBlockCircuitVoltageSource::createAmplitudeProperties()
 {
-	EntityPropertiesInteger::createProperty("Amplitude Properties", "Amplitude", 0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("Amplitude Properties", "Amplitude Normal", 0, "default", getProperties());
 }
 
 std::string EntityBlockCircuitVoltageSource::getAmplitude()
 {
-	auto propertyBase = getProperties().getProperty("Amplitude");
+	auto propertyBase = getProperties().getProperty("Amplitude Normal");
 	auto property = dynamic_cast<EntityPropertiesInteger*>(propertyBase);
 	assert(propertyBase != nullptr);
 	return std::to_string(property->getValue());
@@ -299,11 +299,11 @@ std::string EntityBlockCircuitVoltageSource::getAmplitude()
 
 bool EntityBlockCircuitVoltageSource::SetVisibleAmplitude(bool visible)
 {
-	const bool isVisible = getProperties().getProperty("Amplitude")->getVisible();
+	const bool isVisible = getProperties().getProperty("Amplitude Normal")->getVisible();
 	const bool refresh = isVisible != visible;
 	if (refresh)
 	{
-		getProperties().getProperty("Amplitude")->setVisible(visible);
+		getProperties().getProperty("Amplitude Normal")->setVisible(visible);
 		this->setModified();
 	}
 	return refresh;
@@ -338,7 +338,7 @@ bool EntityBlockCircuitVoltageSource::updateFromProperties(void)
 		refresh |= SetVisibleEXPProperties(true);
 		refresh |= SetVisibleAmplitude(false);
 	}
-	else if (selectionProperty->getValue() == "Amplitude")
+	else if (selectionProperty->getValue() == "Amplitude Normal")
 	{
 		refresh |= SetVisibleAmplitude(true);
 		refresh |= SetVisiblePULSEProperties(false);
