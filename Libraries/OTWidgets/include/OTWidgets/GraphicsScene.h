@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Flags.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -23,17 +24,22 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsScene : public QGraphicsScene {
 		Q_OBJECT
 	public:
-		enum GridMode {
-			NoGrid,
-			BasicGrid,
-			BasicGridWithCenter,
-			AdvancedGrid,
-			AdvancedGridNomalCenter,
-			WideLinesOnly
-		};
+		//! \enum GridFlag
+		enum GridFlag {
+			NoGridFlags = 0x0000, //! \brief No grid flags.
+			ShowNormalLines = 0x0001, //! \brief Basic lines should be drawn.
+			ShowWideLines = 0x0002, //! \brief Wide lines should be drawn.
+			ShowCenterCross = 0x0004, //! \brief Center cross should be drawn.
+			NoGridLineMask = 0xFFF0, //! \brief Mask used to check if no grid line flags are set.
 
-		GraphicsScene(GraphicsView * _view);
-		GraphicsScene(const QRectF& _sceneRect, GraphicsView * _view);
+			//! \brief Auto scaling is enabled.
+			AutoScaleGrid = 0x0010
+		};
+		//! \typedef GridFlags
+		typedef Flags<GridFlag> GridFlags;
+
+		GraphicsScene(GraphicsView* _view);
+		GraphicsScene(const QRectF& _sceneRect, GraphicsView* _view);
 		virtual ~GraphicsScene();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -49,6 +55,9 @@ namespace ot {
 
 		// Setter / Getter
 
+		void setDefaultGridPen(const QPen& _pen) { m_defaultGridPen = _pen; };
+		const QPen& getDefaultGridPen(void) const { return m_defaultGridPen; };
+
 		//! @brief Set the grid size
 		//! If the size is set to 0 or less, no grid will be drawn
 		//! @param _size The grid size to set
@@ -60,8 +69,9 @@ namespace ot {
 		void setGridWideLineEvery(int _count) { m_gridWideEvery = _count; };
 		int getGridWideLineEvery(void) const { return m_gridWideEvery; }
 
-		void setGridMode(GridMode _mode) { m_gridMode = _mode; };
-		GridMode getGridMode(void) const { return m_gridMode; };
+		void setGridFlag(GridFlag _flag, bool _active = true) { m_gridFlags.setFlag(_flag, _active); };
+		void setGridFlags(const GridFlags& _flags) { m_gridFlags = _flags; };
+		const GridFlags& getGridFlags(void) const { return m_gridFlags; };
 
 		void setGridSnapEnabled(bool _enabled) { m_gridSnapEnabled = _enabled; };
 		bool getGridSnapEnabled(void) const { return m_gridSnapEnabled; };
@@ -75,6 +85,7 @@ namespace ot {
 		bool ignoreEvents(void) const { return m_ignoreEvents; };
 
 		QPointF snapToGrid(const QPointF& _pos) const;
+		QPointF snapToGrid(const QPointF& _pos, int _gridStepSize) const;
 
 	Q_SIGNALS:
 		void selectionChangeFinished(void);
@@ -104,17 +115,19 @@ namespace ot {
 
 		void drawGrid(QPainter* _painter, const QRectF& _rect);
 
-		qreal calculateScaledLineWidth(QPainter* _painter) const;
+		qreal calculateScaledGridLineWidth(QPainter* _painter) const;
 
 		void calculateGridLines(const QRectF& _painterRect, QList<QLineF>& _normalLines, QList<QLineF>& _wideLines, QList<QLineF>& _centerLines) const;
 
+		qreal calculateScaledGridStepSize(const QRectF& _rect) const;
+
 	private:
-		qreal m_penWidth;
+		QPen m_defaultGridPen;
 		bool m_ignoreEvents;
 		int m_gridStepSize;
 		int m_gridWideEvery;
 		bool m_gridSnapEnabled;
-		GridMode m_gridMode;
+		GridFlags m_gridFlags;
 		GraphicsView* m_view;
 		GraphicsItem* m_connectionOrigin;
 		GraphicsConnectionPreviewItem* m_connectionPreview;
@@ -126,3 +139,5 @@ namespace ot {
 	};
 
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::GraphicsScene::GridFlag)

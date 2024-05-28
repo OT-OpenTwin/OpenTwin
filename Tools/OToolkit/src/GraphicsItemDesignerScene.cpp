@@ -20,7 +20,7 @@
 GraphicsItemDesignerScene::GraphicsItemDesignerScene(GraphicsItemDesignerView* _view)
 	: ot::GraphicsScene(QRectF(0., 0., 300., 200.), _view), m_view(_view), m_cursorItem(nullptr), m_mode(NoMode), m_itemSize(300, 200)
 {
-	this->setGridMode(ot::GraphicsScene::AdvancedGridNomalCenter);
+	this->setGridFlags(ot::GraphicsScene::ShowNormalLines | ot::GraphicsScene::ShowWideLines);
 	this->setGridSnapEnabled(true);
 }
 

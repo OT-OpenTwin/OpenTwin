@@ -12,6 +12,8 @@ class GraphicsItemDesignerView;
 namespace ot { class GraphicsEllipseItem; }
 
 class GraphicsItemDesignerScene : public ot::GraphicsScene {
+	OT_DECL_NOCOPY(GraphicsItemDesignerScene)
+	OT_DECL_NODEFAULT(GraphicsItemDesignerScene)
 public:
 	enum Mode {
 		NoMode,

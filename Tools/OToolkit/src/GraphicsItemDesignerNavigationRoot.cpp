@@ -20,7 +20,7 @@ void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
 	
 	PropertyGridCfg cfg;
 	PropertyGroup* editorGroup = new PropertyGroup("Editor");
-	editorGroup->addProperty(new PropertyBool("Show grid", m_view->getDesignerScene()->getGridMode() != GraphicsItemDesignerScene::NoGrid));
+	editorGroup->addProperty(new PropertyBool("Show grid", (m_view->getDesignerScene()->getGridFlags() | GraphicsItemDesignerScene::NoGridLineMask) == GraphicsItemDesignerScene::NoGridLineMask));
 	PropertyInt* gridStepSizeProp = new PropertyInt("Grid step size", std::max(m_view->getDesignerScene()->getGridStepSize(), 2), 2, 1000);
 	gridStepSizeProp->setPropertyTip("The distance between two grid lines.");
 	editorGroup->addProperty(gridStepSizeProp);
@@ -50,7 +50,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 			OT_LOG_E("Input cast failed");
 			return;
 		}
-		m_view->getDesignerScene()->setGridMode((input->isChecked() ? GraphicsScene::AdvancedGridNomalCenter : GraphicsScene::NoGrid));
+		m_view->getDesignerScene()->setGridFlags((input->isChecked() ? (GraphicsScene::ShowNormalLines | GraphicsScene::ShowWideLines) : GraphicsScene::NoGridFlags));
 		m_view->update();
 	}
 	else if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Grid step size") {
