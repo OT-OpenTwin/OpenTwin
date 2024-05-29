@@ -14,6 +14,8 @@
 #include "WrappedLineItem.h"
 #include "WrappedRectItem.h"
 #include "WrappedSquareItem.h"
+#include "WrappedCircleItem.h"
+#include "WrappedEllipseItem.h"
 
 // OpenTwin header
 #include "OTCore/Logger.h"
@@ -155,8 +157,10 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 		m_previewItem = this->createRectItem();
 		break;
 	case GraphicsItemDesignerDrawHandler::Circle:
+		m_previewItem = this->createCircleItem();
 		break;
 	case GraphicsItemDesignerDrawHandler::Ellipse:
+		m_previewItem = this->createEllipseItem();
 		break;
 	case GraphicsItemDesignerDrawHandler::Triangle:
 		break;
@@ -193,6 +197,20 @@ GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createSquareItem(
 GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createRectItem(void) {
 	WrappedRectItem* newItem = new WrappedRectItem;
 	newItem->setRectanglePen(QPen(QBrush(QColor(0, 0, 0, 255)), 1.));
+
+	return newItem;
+}
+
+GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createCircleItem(void) {
+	WrappedCircleItem* newItem = new WrappedCircleItem;
+	newItem->setPen(QPen(QBrush(QColor(0, 0, 0, 255)), 1.));
+
+	return newItem;
+}
+
+GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createEllipseItem(void) {
+	WrappedEllipseItem* newItem = new WrappedEllipseItem;
+	newItem->setPen(QPen(QBrush(QColor(0, 0, 0, 255)), 1.));
 
 	return newItem;
 }

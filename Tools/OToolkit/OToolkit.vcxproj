@@ -56,11 +56,15 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="src\WrappedCircleItem.cpp" />
+    <ClCompile Include="src\WrappedEllipseItem.cpp" />
     <ClCompile Include="src\WrappedLineItem.cpp" />
     <ClCompile Include="src\WrappedRectItem.cpp" />
     <ClCompile Include="src\WrappedSquareItem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\WrappedCircleItem.h" />
+    <ClInclude Include="include\WrappedEllipseItem.h" />
     <ClInclude Include="include\WrappedRectItem.h" />
     <ClInclude Include="include\WrappedSquareItem.h" />
     <QtMoc Include="include\GraphicsItemDesignerPropertyHandler.h" />
