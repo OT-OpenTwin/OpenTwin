@@ -15,10 +15,25 @@ class GraphicsItemDesignerView;
 
 class GraphicsItemDesignerNavigationRoot : public QTreeWidgetItem, public GraphicsItemDesignerPropertyHandler {
 public:
+	enum ExportConfigFlag {
+		NoFlags = 0x00,
+		AutoAlign = 0x01,
+		MoveableItem = 0x02
+	 };
+	typedef ot::Flags<ExportConfigFlag> ExportConfigFlags;
+
 	GraphicsItemDesignerNavigationRoot();
 	virtual ~GraphicsItemDesignerNavigationRoot() {};
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Setter / Getter
+
 	void setDesignerView(GraphicsItemDesignerView* _view) { m_view = _view; };
+
+	void setExportConfigFlag(ExportConfigFlag _flag, bool _active = true) { m_exportConfigFlags.setFlag(_flag, _active); };
+	void setExportConfigFlags(const ExportConfigFlags& _flags) { m_exportConfigFlags = _flags; };
+	const ExportConfigFlags& getExportConfigFlags(void) const { return m_exportConfigFlags; };
 
 protected:
 	virtual void fillPropertyGrid(void) override;
@@ -27,4 +42,7 @@ protected:
 
 private:
 	GraphicsItemDesignerView* m_view;
+	ExportConfigFlags m_exportConfigFlags;
 };
+
+OT_ADD_FLAG_FUNCTIONS(GraphicsItemDesignerNavigationRoot::ExportConfigFlag)

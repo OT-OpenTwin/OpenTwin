@@ -18,6 +18,21 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 {
 	{
 		QAction* btn = new QAction;
+		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Clear.png"));
+		btn->setText("Clear");
+		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotClear);
+		this->addAction(btn);
+	}
+	{
+		QAction* btn = new QAction;
+		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Export.png"));
+		btn->setText("Export");
+		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotExport);
+		this->addAction(btn);
+	}
+	this->addSeparator();
+	{
+		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Line.png"));
 		btn->setText("Line");
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotLine);
@@ -81,6 +96,15 @@ GraphicsItemDesignerToolBar::~GraphicsItemDesignerToolBar() {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Slots
+
+void GraphicsItemDesignerToolBar::slotClear(void) {
+
+}
+
+void GraphicsItemDesignerToolBar::slotExport(void) {
+	// Generate file and export to file
+
+}
 
 void GraphicsItemDesignerToolBar::slotLine(void) {
 	emit modeRequested(GraphicsItemDesignerDrawHandler::Line);

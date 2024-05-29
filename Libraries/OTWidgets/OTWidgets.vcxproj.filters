@@ -265,6 +265,9 @@
     <ClCompile Include="src\OverlayWidgetBase.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsItemLoader.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -487,6 +490,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\Positioning.h">
       <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsItemLoader.h">
+      <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

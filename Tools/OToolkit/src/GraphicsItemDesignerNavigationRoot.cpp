@@ -10,7 +10,7 @@
 #include "GraphicsItemDesignerView.h"
 
 GraphicsItemDesignerNavigationRoot::GraphicsItemDesignerNavigationRoot() 
-	: m_view(nullptr)
+	: m_view(nullptr), m_exportConfigFlags(AutoAlign | MoveableItem)
 {
 	this->setExpanded(true);
 }
@@ -20,7 +20,7 @@ void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
 	
 	PropertyGridCfg cfg;
 	PropertyGroup* editorGroup = new PropertyGroup("Editor");
-	editorGroup->addProperty(new PropertyBool("Show grid", (m_view->getDesignerScene()->getGridFlags() | GraphicsItemDesignerScene::NoGridLineMask) == GraphicsItemDesignerScene::NoGridLineMask));
+	editorGroup->addProperty(new PropertyBool("Show grid", (m_view->getDesignerScene()->getGridFlags() | GraphicsItemDesignerScene::NoGridLineMask) != GraphicsItemDesignerScene::NoGridLineMask));
 	PropertyInt* gridStepSizeProp = new PropertyInt("Grid step size", std::max(m_view->getDesignerScene()->getGridStepSize(), 2), 2, 1000);
 	gridStepSizeProp->setPropertyTip("The distance between two grid lines.");
 	editorGroup->addProperty(gridStepSizeProp);
@@ -36,8 +36,22 @@ void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
 	generalGroup->addProperty(new PropertyDouble("Width", m_view->sceneRect().width()));
 	generalGroup->addProperty(new PropertyDouble("Height", m_view->sceneRect().height()));
 	
+	PropertyGroup* exportGroup = new PropertyGroup("Export");
+	{
+		PropertyBool* newProp = new PropertyBool("Auto Align", m_exportConfigFlags & AutoAlign);
+		newProp->setPropertyTip("If enabled the generated graphics item will be moved to (0; 0).");
+		exportGroup->addProperty(newProp);
+	}
+	{
+		PropertyBool* newProp = new PropertyBool("Moveable Item", m_exportConfigFlags & MoveableItem);
+		newProp->setPropertyTip("If enabled the generated graphics item will be moveable by the user.");
+		exportGroup->addProperty(newProp);
+	}
+	
+
 	cfg.addRootGroup(editorGroup);
 	cfg.addRootGroup(generalGroup);
+	cfg.addRootGroup(exportGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);
 }
 	
@@ -105,6 +119,24 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 		}
 
 		m_view->setItemSize(QSizeF(m_view->getItemSize().width(), input->getValue()));
+	}
+	else if (_item->getGroupName() == "Export" && _itemData.propertyName() == "Auto Align") {
+		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		this->setExportConfigFlag(AutoAlign, input->isChecked());
+	}
+	else if (_item->getGroupName() == "Export" && _itemData.propertyName() == "Moveable Item") {
+		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		this->setExportConfigFlag(MoveableItem, input->isChecked());
 	}
 	else {
 		OT_LOG_E("Unknown property { \"Group\": \"" + _item->getGroupName() + "\", \"Item\": \"" + _itemData.propertyName() + "\" }");

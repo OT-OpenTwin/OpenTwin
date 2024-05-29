@@ -89,7 +89,10 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\OToolkit.dll"
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\ResultDataAccess.dll"
 
 ECHO Delete color styles
-DEL "%OPENTWIN_DEPLOYMENT_DIR%\Assets\ColorStyles\*.otcsf"
+DEL "%OPENTWIN_DEPLOYMENT_DIR%\ColorStyles\*.otcsf"
+
+ECHO Delete GraphicsItems
+RMDIR /S /Q "%OPENTWIN_DEPLOYMENT_DIR%\GraphicsItems"
 
 ECHO Delete Admin Panel 
 
@@ -172,6 +175,12 @@ REM ====================================================================
 
 ECHO Copy ColorStyles
 COPY /Y "%OPENTWIN_DEV_ROOT%\Assets\ColorStyles\*.otcsf" "%OPENTWIN_DEPLOYMENT_DIR%\ColorStyles"
+
+REM ====================================================================
+REM  Copy GraphicsItems
+REM ====================================================================
+MKDIR "%OPENTWIN_DEPLOYMENT_DIR%\GraphicsItems"
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\GraphicsItems\*.ot.json" "%OPENTWIN_DEPLOYMENT_DIR%\GraphicsItems"
 
 REM ====================================================================
 REM  Copy Admin Panel

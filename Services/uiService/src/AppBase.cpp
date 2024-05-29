@@ -82,6 +82,7 @@
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/ColorStyleTypes.h"
+#include "OTWidgets/GraphicsItemLoader.h"
 #include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/WidgetProperties.h"
 
@@ -232,6 +233,7 @@ int AppBase::run() {
 		// Setup icon manager
 		int iconPathCounter{ 0 };
 		int stylePathCounter{ 0 };
+		int graphicsPathCounter{ 0 };
 #ifdef _DEBUG
 		if (ot::IconManager::addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
 			iconPathCounter++;
@@ -239,12 +241,18 @@ int AppBase::run() {
 		if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/ColorStyles/"))) {
 			stylePathCounter++;
 		}
+		if (ot::GraphicsItemLoader::instance().addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/GraphicsItems/"))) {
+			graphicsPathCounter++;
+		}
 #endif // _DEBUG
 		if (ot::IconManager::addSearchPath(QDir::currentPath() + "/icons/")) {
 			iconPathCounter++;
 		}
 		if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QDir::currentPath() + "/ColorStyles/")) {
 			stylePathCounter++;
+		}
+		if (ot::GraphicsItemLoader::instance().addSearchPath(QDir::currentPath() + "/GraphicsItems/")) {
+			graphicsPathCounter++;
 		}
 	
 		// Check if at least one icon directory was found
@@ -260,6 +268,13 @@ int AppBase::run() {
 			OT_LOG_EA("No color style path found");
 			showErrorPrompt("No color style path was found. Try to reinstall the application", "Error");
 			return 4;
+		}
+
+		// Check if at least one graphics item directory was found
+		if (stylePathCounter == 0) {
+			OT_LOG_EA("No graphics item path found");
+			showErrorPrompt("No graphics item path was found. Try to reinstall the application", "Error");
+			return 5;
 		}
 
 		ot::GlobalColorStyle::instance().setApplication(uiAPI::getApplication());

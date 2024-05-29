@@ -44,6 +44,7 @@
     <ClCompile Include="src\GraphicsGroupItem.cpp" />
     <ClCompile Include="src\GraphicsHBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsItem.cpp" />
+    <ClCompile Include="src\GraphicsItemLoader.cpp" />
     <ClCompile Include="src\GraphicsItemPreviewDrag.cpp" />
     <ClCompile Include="src\GraphicsItemPreview.cpp" />
     <ClCompile Include="src\GraphicsLayoutItem.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="include\OTWidgets\ColorStyleValue.h" />
     <QtMoc Include="include\OTWidgets\GlobalColorStyle.h" />
     <ClInclude Include="include\OTWidgets\ComboBox.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsItemLoader.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPickerView.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPolygonItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsShapeItem.h" />
