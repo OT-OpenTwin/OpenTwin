@@ -14,23 +14,10 @@ To address a `Doxygen <https://www.doxygen.nl/manual/index.html>`_ keyword use t
 
 Detailed descriptions can be added without a keyword in the lines after the ``\brief``.
 
-Files
------
-
-Provide ``\file``, ``\date`` aswell as ``\author`` or ``\authors`` at the beginning of every file.
-
-.. code:: c++
-
-    //! \file MyFile.h
-    //! \author Name
-    //     or
-    //! \authors Name1, Name2
-    //! \date YYYY.MM.DD
-
 Classes
 -------
 
-Every class should have ``\class`` and ``\brief`` set.
+Every class should have a ``\brief`` set.
 The class keyword is used to create references in the documentation.
 The brief should contain a short text description of the class which is a ``single`` line.
 
@@ -52,7 +39,7 @@ Functions
 Function comments should be added to the header file.
 Some IDEs support the `Doxygen <https://www.doxygen.nl/manual/index.html>`_ format and will display it in the ToolTips.
 
-Every function should have a ``\fn`` and ``\brief`` set aswell as a ``\param`` for every parameter.
+Every function should have a ``\brief`` set aswell as a ``\param`` for every parameter unless the function/parameter name is self-explanatory (e.g. setter and getter methods).
 If the return is not described in the ``\brief`` or detailed description add a ``\return``.
 
 .. code:: c++
@@ -85,7 +72,7 @@ Class members should have a ``\brief`` set. Adding ``\var`` allows to reference 
 Enums
 -----
 
-Enums should have a ``\enum`` and ``\brief`` set for the enum and every entry in the enum.
+Enums should have a ``\brief`` set for the enum and every entry in the enum.
 
 .. code:: c++
 
@@ -105,7 +92,7 @@ Enums should have a ``\enum`` and ``\brief`` set for the enum and every entry in
 Macros
 ------
 
-Macros or preprocessor definitions should have the ``\def`` and ``\brief`` set.
+Macros or preprocessor definitions should have a ``\brief`` set.
 
 .. code:: c++
 
@@ -134,18 +121,6 @@ To display a box around the text use either ``\note``, ``\question`` or ``\warni
     //! \param _force Parameter description.
     //! \return Return value decription.
     bool shutdown(bool _force);
-
-ToDo and Bugs
--------------
-
-A ``\todo`` or ``\bug`` can be added anywhere in the code.
-The documentation will contain a bug and todo section where the code aswell as function/class of the bug or todo will be shown.
-
-.. code:: c++
-
-    void foo(void) {
-        //! \todo Add functionality
-    }
 
 Doxygen Keywords
 ----------------

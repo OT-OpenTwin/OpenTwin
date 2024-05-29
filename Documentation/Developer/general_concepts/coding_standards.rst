@@ -1,170 +1,264 @@
 Coding Standards
 ================
 
-.. warning::
-    This style guide has been copied from another project and should serve as a baseline for further discussions only.
+OpenTwin uses modern C++17. smart pointers, lambdas, and C++17 multithreading primitives.
+C++20 may be used in scoped code segments (be aware that compiler incompatibilities may occur).
 
-We are using Modern C++11. Smart pointers, Lambdas, and C++11 multithreading primitives are your friend.
-
-==========
 Quick Note
-==========
+----------
 
 The great thing about "standards" is that there are many to chose from: `ISO <https://isocpp.org/wiki/faq/coding-standards>`_, `[Sutter & Stroustrup] <https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md>`_, `[ROS] <http://wiki.ros.org/CppStyleGuide>`_, `[LINUX] <https://www.kernel.org/doc/Documentation/process/coding-style.rst>`_, `[Google's] <https://google.github.io/styleguide/cppguide.html>`_, `[Microsoft's] <https://msdn.microsoft.com/en-us/library/888a6zcz.aspx>`_, `[CERN's] <http://atlas-computing.web.cern.ch/atlas-computing/projects/qa/draft_guidelines.html>`_, `[GCC's] <https://gcc.gnu.org/wiki/CppConventions>`_, `[ARM's] <http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0475c/CJAJAJCJ.html>`_, `[LLVM's] <http://llvm.org/docs/CodingStandards.html>`_ and probably 
-thousands of others. Unfortunately most of these can't even agree on something as basic as how to name a class or a constant. This is probably due to the fact that these standards often carry lots of  legacy issues due to supporting existing code bases. The intention behind this document is to create guidance that remains as close to ISO, Sutter &amp; Stroustrup and ROS while resolving as many conflicts, disadvantages and inconsistencies as possible among them.
+thousands of others.
+Unfortunately most of these can't even agree on something as basic as how to name a class or a constant.
+This is probably due to the fact that these standards often carry lots of legacy issues due to supporting existing code bases.
+The intention behind this document is to create guidance that remains as close to ISO, Sutter &amp; Stroustrup and ROS while resolving as many conflicts, disadvantages and inconsistencies as possible among them.
 
-
-============
-clang-format
-============
-
-Formatting the syntax of C++ is normalized by the clang-format tool which has settings checked into
-this project in the file `.clang-format`. These settings are set to match the formatting guidelines
-listed below.  You can "format" a file using clang-format command line or by enabling Visual Studio
-automatic-clang formatting either during every edit or when you save the file.  All files have been
-formatted this way and the github workflow called `clang-format` will also ensure all pull requests
-are correctly formatted so it should stay clean.  Obviously this does not include external code like
-`Eigen` or `rpclib`.  
-
-If you find a bug in clang-format you can disable clang formatting of a specific block of code by
-using the following comments pair:
-
-.. code::
-
-    // clang-format off
-    ...
-    // clang-format on
-
-==================
 Naming Conventions
-==================
-
-Avoid using any sort of Hungarian notation on names and "_ptr" on pointers.
+------------------
 
 .. list-table:: 
     :header-rows: 1
 
     *   - Code Element
         - Style
-        - Comment
+        - Note
     *   - Namespace
-        - under\_scored 
-        - Differentiate from class names 
-    *   - Class name 
-        - CamelCase 
+        - under\_scored
+        - Differentiate from class names
+    *   - Class name
+        - CamelCase
         - To differentiate from STL types which ISO recommends (do not use "C" or "T" prefixes) 
     *   - Function name 
         - camelCase 
-        - Lower case start is almost universal except for .Net world 
-    *   - Parameters/Locals 
-        - under\_scored 
-        - Vast majority of standards recommends this because \_ is more readable to C++ crowd (although not much to Java/.Net crowd) 
+        - Lower case start is almost universal except for .Net world
+    *   - Parameters
+        - \_camelCase
+        - Vast majority of standards recommends this because \_ is more readable to (C++ crowd :)) ... (although not much to Java/.Net crowd) 
+    *   - Locals
+        - camelCase
+        - Vast majority of standards recommends this. 
     *   - Member variables 
-        - under\_scored\_with\_ 
-        - The prefix \_ is heavily discouraged as ISO has rules around reserving \_identifiers, so we recommend suffix instead 
-    *   - Enums and its members 
-        - CamelCase 
+        - m_camelCase
+        - It makes it very easy to differentiate between class members and everything else. We also use a second prefix for globals. These are the only two.
+    *   - Enums and its members
+        - CamelCase
         - Most except very old standards agree with this one 
-    *   - Globals 
-        - g\_under\_scored 
-        - You shouldn't have these in first place! 
-    *   - Constants 
-        - UPPER\_CASE 
+    *   - Globals
+        - g\_camelCase
+        - You shouldn't have these in first place!
+    *   - Defines
+        - UPPER\_CASE
         - Very contentious and we just have to pick one here, unless if is a private constant in class or method, then use naming for Members or Locals 
-    *   - File names 
+    *   - File names
         - Match case of class name in file 
-        - Lot of pro and cons either way but this removes inconsistency in auto generated code (important for ROS) 
+        - The file name should match the case of the class (e.g. MyClass -> MyClass.h. maclass.h would be wrong here). Lot of pro and cons either way but this removes inconsistency in auto generated code (important for ROS).
 
-============
 Header Files
-============
+------------
 
-Use a namespace qualified #ifdef to protect against multiple inclusion:
+Use a #pragma once at the beginning of all header files.
 
-.. code::
+.. code:: c++
 
-    #ifndef msr_airsim_MyHeader_hpp
-    #define msr_airsim_MyHeader_hpp
+    // MyHeader.h
+    #pragma once
 
-    //--your code
+    #include ...
 
-    #endif
-
-The reason we don't use #pragma once is because it's not supported if same header file exists at multiple places (which might be possible under ROS build system!).
-
-==========
 Bracketing
-==========
+----------
 
-Inside function or method body place curly bracket on same line. 
-Outside that the Namespace, Class and methods levels use separate line.
-This is called `[K&R style] <https://en.wikipedia.org/wiki/Indent_style#K.26R_style>`_ and its variants are widely used in C++ vs other styles which are more popular in other languages. 
+Inside function or method body place opening curly bracket on same line.
+Outside that the Namespace, Class and methods levels use separate line for the opening bracket. 
 Notice that curlies are not required if you have single statement, but complex statements are easier to keep correct with the braces.
+Try to use the curlies for single statements aswell to match the look.
 
-.. code::
+.. code:: c++
 
-    int main(int argc, char* argv[])
-    {
+    int main(int _argc, char* _argv[]) {
         while (x == y) {
             f0();
             if (cont()) {
                 f1();
-            } else {
+            }
+            else if (foo()) {
                 f2();
+            } 
+            else {
                 f3();
             }
-            if (x > 100)
+
+            if (x > 100) {
                 break;
+            }
         }
     }
 
+Class Basics
+------------
 
-====================
+Whenever a class has a pointer attribute the constructor, destructor, copy constructor and assignment operator must be declared or explicitly deleted.
+
+.. code:: c++
+
+    class A {
+        A();
+        A(const A& _other);
+        ~virtual A();
+        A& operator = (const A& _other);
+    private:
+        int* m_value;
+    };
+
+    class B {
+        B();
+        B(const A& _other) = delete; // If copy is not allowed explicitly delete the copy constructor
+        ~virtual B());
+        B& operator = (const B& _other) = delete; // If assignment is not allowed explicitly delete the assignment operator
+    private:
+        int* m_value;
+    };
+
+The `OTCore/OTClassHelper.h` header provides helpers that may be used to explicitly delete default methods.
+
+.. code:: c++
+
+    #include "OTCore/OTClassHelper.h"
+    class A {
+        OT_DECL_NOCOPY(A) // Deletes the copy constructor and assignment operator
+        A();
+        ~virtual A();
+    private:
+        int* m_value;
+    };
+
+Class Naming Convention
+-----------------------
+
+....
+
+Setter and Getter
+-----------------
+
+Setter must always have the "set" and getter always the "get" prefix.
+
+.. code:: c++
+
+    class A {
+        void setX(int _x);
+        int getX(void) const;
+    };
+
+Member Initialization
+---------------------
+
+Always initialize members and/or local variables as soon as they are added.
+
+.. code:: c++
+
+    class A {
+    private:
+        int m_value; // Here we added the m_value to our class.
+    public:
+        A() 
+        : m_value(0) // So we add a initialization to ALL constructors
+        {}
+    };
+
+    void foo(void) {
+        int lclValue; // wrong, ALWAYS initialize variables
+        int lvlValue = 0; // correct
+    }
+
+Const Functions
+---------------
+
+When adding functions which don't modify or dont allow to modify any content of the object make the functions const.
+
+.. code::c++
+    
+    class A {
+        int getX(void) { return m_x; };       // wrong: function should be const.
+        int getX(void) const { return m_x; }; // correct.
+    }
+
+Const variables
+---------------
+
+.. code::c++
+
+    class A {
+        const int m_ix; // Correct if the variable should only be initialized and not further modified.
+    };
+
 Const and References
-====================
+--------------------
 
-Religiously review all non-scalar parameters you declare to be candidate for const and references. If you are coming from languages such as C#/Java/Python,
-the most often mistake you would make is to pass parameters by value instead of `const T&;` Especially most of the strings, vectors and maps you want to 
-pass as `const T&;` (if they are readonly) or `T&` (if they are writable). Also add `const` suffix to methods as much as possible.
+Add the const suffix to a class function when returning a read only reference to an object.
 
-==========
+.. code:: c++
+
+    class A {
+    public:
+        const std::string& getName(void) { return m_name; };       // wrong, function should be const
+
+        std::string& getName(void) { return m_name; };             // correct (writeable reference so the function can't be const)
+        const std::string& getName(void) const { return m_name; }; // correct
+
+    private:
+        std::string m_string;
+
+Whenever passing an object as an argument to a method prefer passing a const reference instead of a copy.
+
+.. code::c++
+
+    void foo(const MyClass& _obj);  // We pass a const reference since we don't modify _obj
+
 Overriding
-==========
+----------
 
-When overriding virtual method, use override suffix.
+When overriding a virtual method, use the override suffix.
 
+.. code:: c++
 
-========
+    class A {
+    public:
+        virtual void foo(void) {};
+    };
+
+    class B : public A {
+    public:
+        virtual void foo(void) {};          // wrong, use the override suffix
+        virtual void foo(void) override {}; // correct
+    }
+
 Pointers
-========
+--------
 
 This is really about memory management.  A simulator has much performance critical code, so we try and avoid overloading the memory manager
 with lots of calls to new/delete.  We also want to avoid too much copying of things on the stack, so we pass things by reference when ever possible.
 But when the object really needs to live longer than the call stack you often need to allocate that object on
 the heap, and so you have a pointer.  Now, if management of the lifetime of that object is going to be tricky we recommend using 
 `[C++ 11 smart pointers] <https://cppstyle.wordpress.com/c11-smart-pointers/>`_. 
-But smart pointers do have a cost, so don’t use them blindly everywhere.  For private code 
+But smart pointers do have a cost, so don't use them blindly everywhere.  For private code 
 where performance is paramount, raw pointers can be used.  Raw pointers are also often needed when interfacing with legacy systems
 that only accept pointer types, for example, sockets API.  But we try to wrap those legacy interfaces as
 much as possible and avoid that style of programming from leaking into the larger code base.  
 
-Religiously check if you can use const everywhere, for example, `const float * const xP`. Avoid using prefix or suffix to indicate pointer types in variable names, i.e. use `my_obj` instead of `myobj_ptr` except in cases where it might make sense to differentiate variables better, for example, `int mynum = 5; int* mynum_ptr = mynum;`
+Check if you can use const everywhere, for example, `const float * const foo()`.
+Avoid using prefix or suffix to indicate pointer types in variable names, i.e. use `my_obj` instead of `myobj_ptr` except in cases where it might make sense to differentiate variables better, for example, `int mynum = 5; int* mynum_ptr = mynum;`
 
-=============
-Null Checking
-=============
+.. code:: c++
+    
+    class B {
+        const void* foo(void) const { return m_a; };       // wrong, you could add the const suffix to the pointer
+        const void* const foo(void) const { return m_a; }; // correct
 
-In Unreal C++ code, when checking if a pointer is null, it is preferable to use `IsValid(ptr)`. In addition to checking for a null pointer, this function will also return whether a UObject is properly initialized. This is useful in situations where a UObject is in the process of being garbage collected but still set to a non-null value.
+        std::unique_ptr<B> getPointer(void) { return std::make_unique<B>(); }; // Smart pointer example (creates new B)
+    };
 
-===========
-Indentation
-===========
-
-The C++ code base uses four spaces for indentation (not tabs).
-
-===========
 Line Breaks
-===========
+-----------
 
 Files should be committed with Unix line breaks. When working on Windows, git can be configured to checkout files with Windows line breaks and automatically convert from Windows to Unix line breaks when committing by running the following command:
 
@@ -180,11 +274,32 @@ When working on Linux, it is preferable to configure git to checkout files with 
 
 For more details on this setting, see `[AirSim] <https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings>`_.
 
-======================
-This is Too Short, ye?
-======================
+Library namespace
+-----------------
 
-Yes, and it's on purpose because no one likes to read 200 page coding guidelines. The goal here is to cover only most significant things which are 
-already not covered by `[strict mode compilation in GCC] <http://shitalshah.com/p/how-to-enable-and-use-gcc-strict-mode-compilation/>`_ and Level 4 
-warnings-as-errors in VC++. If you had like to know about how to write better code in C++, please see `[GotW] <https://herbsutter.com/gotw/>`_ 
-and `[Effective Modern C++] <http://shop.oreilly.com/product/0636920033707.do>`_ book.
+Every OpenTwin library (located at ``OpenTwin/Libraries``) should use the ``ot`` namespace for its classes and functions.
+By doing so every developer using a OpenTwin library can quickly find the class or function by typing ``ot::`` or going trough the ot namespace in the code documentation.
+
+Warnings and Errors
+-------------------
+
+The code compilation should not produce any warnings or any errors.
+Always compile your code locally (run at least a build all) and check for warnings and errors.
+
+Includes
+--------
+
+For own and OpenTwin header use the quotation marks `"` for includes.
+For others (e.g. std header) use the angle brackets.
+
+.. code:: c++
+
+    #include "MyHeader.h" // Own header, use "..."
+    #include "OTCore/Logger.h" // OpenTwin header, use "..."
+
+    #include <string> // std header, use <...>
+
+Comments
+--------
+
+Comment your code in the first place. We use the doxygen style for our comments (see :ref:`How to document the code?<document_the_code>`).
