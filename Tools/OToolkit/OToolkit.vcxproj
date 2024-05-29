@@ -57,8 +57,12 @@
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
     <ClCompile Include="src\WrappedLineItem.cpp" />
+    <ClCompile Include="src\WrappedRectItem.cpp" />
+    <ClCompile Include="src\WrappedSquareItem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\WrappedRectItem.h" />
+    <ClInclude Include="include\WrappedSquareItem.h" />
     <QtMoc Include="include\GraphicsItemDesignerPropertyHandler.h" />
     <ClInclude Include="include\GraphicsItemDesignerNavigationRoot.h" />
     <ClInclude Include="include\WrappedLineItem.h" />

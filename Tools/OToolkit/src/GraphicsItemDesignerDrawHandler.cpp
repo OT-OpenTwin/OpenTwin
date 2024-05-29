@@ -12,6 +12,8 @@
 
 // OToolkit GraphicsItem wrapper
 #include "WrappedLineItem.h"
+#include "WrappedRectItem.h"
+#include "WrappedSquareItem.h"
 
 // OpenTwin header
 #include "OTCore/Logger.h"
@@ -147,8 +149,10 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 		m_previewItem = this->createLineItem();
 		break;
 	case GraphicsItemDesignerDrawHandler::Square:
+		m_previewItem = this->createSquareItem();
 		break;
 	case GraphicsItemDesignerDrawHandler::Rect:
+		m_previewItem = this->createRectItem();
 		break;
 	case GraphicsItemDesignerDrawHandler::Circle:
 		break;
@@ -175,6 +179,20 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createLineItem(void) {
 	WrappedLineItem* newItem = new WrappedLineItem;
 	newItem->setLinePen(QPen(QBrush(QColor(0, 0, 0, 255)), 1.));
+
+	return newItem;
+}
+
+GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createSquareItem(void) {
+	WrappedSquareItem* newItem = new WrappedSquareItem;
+	newItem->setRectanglePen(QPen(QBrush(QColor(0, 0, 0, 255)), 1.));
+
+	return newItem;
+}
+
+GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createRectItem(void) {
+	WrappedRectItem* newItem = new WrappedRectItem;
+	newItem->setRectanglePen(QPen(QBrush(QColor(0, 0, 0, 255)), 1.));
 
 	return newItem;
 }

@@ -54,6 +54,8 @@ private:
 	QString modeString(void);
 	void createPreviewItem(void);
 	GraphicsItemDesignerItemBase* createLineItem(void);
+	GraphicsItemDesignerItemBase* createSquareItem(void);
+	GraphicsItemDesignerItemBase* createRectItem(void);
 
 	ot::UID m_currentUid;
 

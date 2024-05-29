@@ -69,6 +69,8 @@ void ot::GraphicsRectangularItem::paintCustomItem(QPainter* _painter, const QSty
 void ot::GraphicsRectangularItem::setRectangleSize(const QSizeF& _size) {
 	// Avoid resizing if the size did not change
 	if (m_size == _size) return;
+	this->prepareGeometryChange();
+
 	m_size = _size;
 	this->setGeometry(QRectF(this->pos(), m_size));
 	this->raiseEvent(GraphicsItem::ItemResized);

@@ -147,6 +147,12 @@
     <ClCompile Include="src\GraphicsItemDesignerNavigationRoot.cpp">
       <Filter>Source Files\GraphicsItemDesigner</Filter>
     </ClCompile>
+    <ClCompile Include="src\WrappedSquareItem.cpp">
+      <Filter>Source Files\GraphicsItemDesignerItems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WrappedRectItem.cpp">
+      <Filter>Source Files\GraphicsItemDesignerItems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -178,6 +184,12 @@
     </ClInclude>
     <ClInclude Include="include\GraphicsItemDesignerNavigationRoot.h">
       <Filter>Header Files\GraphicsItemDesigner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WrappedSquareItem.h">
+      <Filter>Header Files\GraphicsItemDesignerItems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WrappedRectItem.h">
+      <Filter>Header Files\GraphicsItemDesignerItems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

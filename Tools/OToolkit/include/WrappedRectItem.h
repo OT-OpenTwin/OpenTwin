@@ -1,4 +1,4 @@
-//! @file WrappedLineItem.h
+//! @file WrappedRectItem.h
 //! @author Alexander Kuester (alexk95)
 //! @date May 2023
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -9,13 +9,13 @@
 #include "GraphicsItemDesignerItemBase.h"
 
 // OpenTwin header
-#include "OTWidgets/GraphicsLineItem.h"
+#include "OTWidgets/GraphicsRectangularItem.h"
 
-class WrappedLineItem : public ot::GraphicsLineItem, public GraphicsItemDesignerItemBase {
-	OT_DECL_NOCOPY(WrappedLineItem)
+class WrappedRectItem : public ot::GraphicsRectangularItem, public GraphicsItemDesignerItemBase {
+	OT_DECL_NOCOPY(WrappedRectItem)
 public:
-	WrappedLineItem();
-	virtual ~WrappedLineItem();
+	WrappedRectItem();
+	virtual ~WrappedRectItem();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -25,7 +25,7 @@ public:
 
 	virtual ot::GraphicsItem* getGraphicsItem(void) override { return this; };
 
-	virtual QString getDefaultItemName(void) const override { return "Line"; };
+	virtual QString getDefaultItemName(void) const override { return "Rect"; };
 
 	virtual ot::TreeWidgetItemInfo createNavigationInformation(void) override;
 
