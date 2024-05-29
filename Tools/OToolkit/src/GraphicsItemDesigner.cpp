@@ -3,12 +3,16 @@
 //! @date May 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// OToolkit header
 #include "GraphicsItemDesigner.h"
 #include "GraphicsItemDesignerView.h"
 #include "GraphicsItemDesignerToolBar.h"
 #include "GraphicsItemDesignerNavigation.h"
 #include "GraphicsItemDesignerInfoOverlay.h"
 #include "GraphicsItemDesignerDrawHandler.h"
+
+// OToolkit API header
+#include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
 #include "OTWidgets/TreeWidget.h"
@@ -40,9 +44,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	view = this->createToolWidgetView(m_props->getQWidget(), "GID Properties");
 	_content.addView(view);
 	
-	m_navigation = new GraphicsItemDesignerNavigation;
-	m_navigation->setDesignerView(m_view);
-	m_navigation->setPropertyGrid(m_props);
+	m_navigation = new GraphicsItemDesignerNavigation(this);
 	view = this->createToolWidgetView(m_navigation, "GID Explorer");
 	_content.addView(view);
 
@@ -50,11 +52,21 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	_content.setToolBar(m_toolBar);
 
 	// Connect signals
+	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::modeRequested, this, &GraphicsItemDesigner::slotDrawRequested);
+	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::clearRequested, this, &GraphicsItemDesigner::slotClearRequested);
+	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::exportRequested, this, &GraphicsItemDesigner::slotExportRequested);
 	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCompleted, this, &GraphicsItemDesigner::slotDrawFinished);
 	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCancelled, this, &GraphicsItemDesigner::slotDrawCancelled);
-	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::modeRequested, this, &GraphicsItemDesigner::slotDrawRequested);
 
 	return true;
+}
+
+void GraphicsItemDesigner::restoreToolSettings(QSettings& _settings) {
+
+}
+
+bool GraphicsItemDesigner::prepareToolShutdown(QSettings& _settings) {
+
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -64,6 +76,22 @@ void GraphicsItemDesigner::slotDrawRequested(GraphicsItemDesignerDrawHandler::Dr
 
 	m_toolBar->setEnabled(false);
 	m_drawHandler->startDraw(_mode);
+}
+
+void GraphicsItemDesigner::slotClearRequested(void) {
+
+}
+
+void GraphicsItemDesigner::slotExportRequested(void) {
+	QStringList lst = m_lastExportFile.split('/', Qt::SkipEmptyParts);
+	lst.pop_back();
+
+	QString fileName;
+	for (const QString& str : lst) {
+		fileName.append(str + '/');
+	}
+
+
 }
 
 void GraphicsItemDesigner::slotDrawFinished(void) {

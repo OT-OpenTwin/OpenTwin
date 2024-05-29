@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OToolkit header
+#include "GraphicsItemDesigner.h"
 #include "GraphicsItemDesignerItemBase.h"
 #include "GraphicsItemDesignerNavigation.h"
 #include "GraphicsItemDesignerNavigationRoot.h"
@@ -14,11 +15,11 @@
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/GraphicsScene.h"
 
-GraphicsItemDesignerNavigation::GraphicsItemDesignerNavigation()
-	: m_propertyGrid(nullptr), m_propertyHandler(nullptr)
+GraphicsItemDesignerNavigation::GraphicsItemDesignerNavigation(GraphicsItemDesigner* _designer)
+	: m_designer(_designer), m_propertyHandler(nullptr)
 {
 	this->setHeaderHidden(true);
-	m_rootItem = new GraphicsItemDesignerNavigationRoot;
+	m_rootItem = new GraphicsItemDesignerNavigationRoot(_designer);
 	m_rootItem->setText(0, "New Item");
 	m_rootItem->setIcon(0, ot::IconManager::getIcon("GraphicsEditor/Root.png"));
 	m_rootItem->setNavigation(this);
@@ -30,10 +31,6 @@ GraphicsItemDesignerNavigation::GraphicsItemDesignerNavigation()
 
 GraphicsItemDesignerNavigation::~GraphicsItemDesignerNavigation() {
 
-}
-
-void GraphicsItemDesignerNavigation::setDesignerView(GraphicsItemDesignerView* _view) {
-	m_rootItem->setDesignerView(_view);
 }
 
 void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _item) {
@@ -111,7 +108,7 @@ GraphicsItemDesignerItemBase* GraphicsItemDesignerNavigation::findDesignerItem(c
 }
 
 void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
-	m_propertyGrid->clear();
+	m_designer->getPropertyGrid()->clear();
 	if (m_propertyHandler) {
 		m_propertyHandler->unsetPropertyGrid();
 	}
@@ -134,7 +131,7 @@ void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
 	}
 
 	if (m_propertyHandler) {
-		m_propertyHandler->setPropertyGrid(m_propertyGrid);
+		m_propertyHandler->setPropertyGrid(m_designer->getPropertyGrid());
 	}
 }
 

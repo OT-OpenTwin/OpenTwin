@@ -98,12 +98,11 @@ GraphicsItemDesignerToolBar::~GraphicsItemDesignerToolBar() {
 // Private: Slots
 
 void GraphicsItemDesignerToolBar::slotClear(void) {
-
+	Q_EMIT clearRequested();
 }
 
 void GraphicsItemDesignerToolBar::slotExport(void) {
-	// Generate file and export to file
-
+	Q_EMIT exportRequested();
 }
 
 void GraphicsItemDesignerToolBar::slotLine(void) {

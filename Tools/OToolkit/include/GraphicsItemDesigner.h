@@ -41,6 +41,10 @@ public:
 	//! @brief Create the central widget that will be displayed to the user in the main tab view
 	virtual bool runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) override;
 
+	virtual void restoreToolSettings(QSettings& _settings) override;
+
+	virtual bool prepareToolShutdown(QSettings& _settings) override;
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Setter / Getter
@@ -56,10 +60,14 @@ public:
 
 private Q_SLOTS:
 	void slotDrawRequested(GraphicsItemDesignerDrawHandler::DrawMode _mode);
+	void slotClearRequested(void);
+	void slotExportRequested(void);
 	void slotDrawFinished(void);
 	void slotDrawCancelled(void);
 
 private:
+	QString m_lastExportFile;
+
 	GraphicsItemDesignerView* m_view;
 	ot::PropertyGrid* m_props;
 	GraphicsItemDesignerToolBar* m_toolBar;

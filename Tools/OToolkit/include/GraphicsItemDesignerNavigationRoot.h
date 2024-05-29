@@ -11,6 +11,7 @@
 // Qt header
 #include <QtWidgets/qtreewidget.h>
 
+class GraphicsItemDesigner;
 class GraphicsItemDesignerView;
 
 class GraphicsItemDesignerNavigationRoot : public QTreeWidgetItem, public GraphicsItemDesignerPropertyHandler {
@@ -22,14 +23,12 @@ public:
 	 };
 	typedef ot::Flags<ExportConfigFlag> ExportConfigFlags;
 
-	GraphicsItemDesignerNavigationRoot();
+	GraphicsItemDesignerNavigationRoot(GraphicsItemDesigner* _designer);
 	virtual ~GraphicsItemDesignerNavigationRoot() {};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Setter / Getter
-
-	void setDesignerView(GraphicsItemDesignerView* _view) { m_view = _view; };
 
 	void setExportConfigFlag(ExportConfigFlag _flag, bool _active = true) { m_exportConfigFlags.setFlag(_flag, _active); };
 	void setExportConfigFlags(const ExportConfigFlags& _flags) { m_exportConfigFlags = _flags; };
@@ -41,7 +40,7 @@ protected:
 	virtual void propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override;
 
 private:
-	GraphicsItemDesignerView* m_view;
+	GraphicsItemDesigner* m_designer;
 	ExportConfigFlags m_exportConfigFlags;
 };
 

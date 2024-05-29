@@ -15,6 +15,7 @@
 #include <map>
 #include <list>
 
+class GraphicsItemDesigner;
 class GraphicsItemDesignerView;
 class GraphicsItemDesignerItemBase;
 class GraphicsItemDesignerNavigationRoot;
@@ -24,13 +25,11 @@ namespace ot { class PropertyGrid; }
 
 class GraphicsItemDesignerNavigation : public ot::TreeWidget {
 	Q_OBJECT
+	OT_DECL_NOCOPY(GraphicsItemDesignerNavigation)
+	OT_DECL_NODEFAULT(GraphicsItemDesignerNavigation)
 public:
-	GraphicsItemDesignerNavigation();
+	GraphicsItemDesignerNavigation(GraphicsItemDesigner* _designer);
 	virtual ~GraphicsItemDesignerNavigation();
-
-	void setDesignerView(GraphicsItemDesignerView* _view);
-
-	void setPropertyGrid(ot::PropertyGrid* _grid) { m_propertyGrid = _grid; };
 
 	void addRootItem(GraphicsItemDesignerItemBase* _item);
 
@@ -52,8 +51,7 @@ private:
 	std::list<GraphicsItemDesignerItemBase*> m_rootItems;
 	std::map<QString, GraphicsItemDesignerItemBase*> m_itemsMap;
 	
+	GraphicsItemDesigner* m_designer;
 	GraphicsItemDesignerNavigationRoot* m_rootItem;
-	
-	ot::PropertyGrid* m_propertyGrid;
 	GraphicsItemDesignerPropertyHandler* m_propertyHandler;
 };
