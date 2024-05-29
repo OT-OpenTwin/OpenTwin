@@ -6,15 +6,18 @@
 // OToolkit header
 #include "GraphicsItemDesigner.h"
 #include "GraphicsItemDesignerView.h"
+#include "GraphicsItemDesignerScene.h"
 #include "GraphicsItemDesignerToolBar.h"
 #include "GraphicsItemDesignerNavigation.h"
 #include "GraphicsItemDesignerInfoOverlay.h"
 #include "GraphicsItemDesignerDrawHandler.h"
+#include "GraphicsItemDesignerNavigationRoot.h"
 
 // OToolkit API header
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
+#include "OTGui/GraphicsItemCfg.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/PropertyGrid.h"
@@ -22,9 +25,12 @@
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
 
+// Qt header
+#include <QtWidgets/qfiledialog.h>
+
 GraphicsItemDesigner::GraphicsItemDesigner() 
 	: m_view(nullptr), m_props(nullptr), m_toolBar(nullptr), 
-	m_navigation(nullptr), m_drawHandler(nullptr)
+	m_navigation(nullptr), m_drawHandler(nullptr), m_exportConfigFlags(AutoAlign | MoveableItem)
 {
 
 }
@@ -62,10 +68,40 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 }
 
 void GraphicsItemDesigner::restoreToolSettings(QSettings& _settings) {
+	// Item
+	QSizeF itemSize;
+	itemSize.setWidth(_settings.value("GID.LastWidth", (qreal)300).toReal());
+	itemSize.setHeight(_settings.value("GID.LastHeight", (qreal)200).toReal());
+	m_view->getDesignerScene()->setItemSize(itemSize);
 
+	// Grid
+	m_view->getDesignerScene()->setGridFlags((_settings.value("GID.ShowGrid", true).toBool() ? (GraphicsItemDesignerScene::ShowNormalLines | GraphicsItemDesignerScene::ShowWideLines) : GraphicsItemDesignerScene::NoGridFlags));
+	m_view->getDesignerScene()->setGridStepSize(_settings.value("GID.GridStep", (int)10).toInt());
+	m_view->getDesignerScene()->setGridWideLineEvery(_settings.value("GID.GridWide", (int)10).toInt());
+	m_view->getDesignerScene()->setGridSnapEnabled(_settings.value("GID.GridSnap", true).toBool());
+
+	// Export
+	m_lastExportFile = _settings.value("GID.LastExportFile", QString()).toString();
+	m_exportConfigFlags.setFlag(GraphicsItemDesigner::AutoAlign, _settings.value("GID.ExportAutoAlign", true).toBool());
+	m_exportConfigFlags.setFlag(GraphicsItemDesigner::MoveableItem, _settings.value("GID.ExportMoveable", true).toBool());
 }
 
 bool GraphicsItemDesigner::prepareToolShutdown(QSettings& _settings) {
+	// Item
+	_settings.setValue("GID.LastWidth", m_view->getDesignerScene()->getItemSize().width());
+	_settings.setValue("GID.LastHeight", m_view->getDesignerScene()->getItemSize().height());
+
+	// Grid
+	_settings.setValue("GID.ShowGrid", m_view->getDesignerScene()->getGridFlags() != GraphicsItemDesignerScene::NoGridFlags);
+	_settings.setValue("GID.GridStep", m_view->getDesignerScene()->getGridStepSize());
+	_settings.setValue("GID.GridWide", m_view->getDesignerScene()->getGridWideLineEvery());
+	_settings.setValue("GID.GridSnap", m_view->getDesignerScene()->getGridSnapEnabled());
+
+	// Export
+	_settings.setValue("GID.LastExportFile", m_lastExportFile);
+	_settings.setValue("GID.ExportAutoAlign", (bool)(m_exportConfigFlags & GraphicsItemDesigner::AutoAlign));
+	_settings.setValue("GID.ExportMoveable", (bool)(m_exportConfigFlags & GraphicsItemDesigner::MoveableItem));
+
 	return true;
 }
 
@@ -83,15 +119,46 @@ void GraphicsItemDesigner::slotClearRequested(void) {
 }
 
 void GraphicsItemDesigner::slotExportRequested(void) {
+	// Generate config
+	ot::GraphicsItemCfg* config = m_navigation->generateConfig();
+	if (!config) {
+		return;
+	}
+
+	// Check initial filename
 	QStringList lst = m_lastExportFile.split('/', Qt::SkipEmptyParts);
-	lst.pop_back();
+	if (!lst.isEmpty()) {
+		lst.pop_back();
+	}
 
 	QString fileName;
 	for (const QString& str : lst) {
 		fileName.append(str + '/');
 	}
+	fileName.append(QString::fromStdString(config->getName()));
+	fileName.append(".ot.json");
 
+	// Select filename
+	fileName = QFileDialog::getSaveFileName(nullptr, "Export Graphics Item", fileName, "OpenTwin document (*.ot.json)");
+	if (fileName.isEmpty()) {
+		return;
+	}
 
+	// Export config
+	ot::JsonDocument configDoc;
+	config->addToJsonObject(configDoc, configDoc.GetAllocator());
+
+	QFile file(fileName);
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+		OT_LOG_E("Failed to open file for writing \"" + fileName.toStdString() + "\"");
+		return;
+	}
+
+	file.write(QByteArray::fromStdString(configDoc.toJson()));
+	file.close();
+
+	m_lastExportFile = fileName;
+	OT_LOG_D("Graphics Item exported \"" + fileName.toStdString() + "\"");
 }
 
 void GraphicsItemDesigner::slotDrawFinished(void) {

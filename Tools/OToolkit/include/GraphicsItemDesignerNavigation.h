@@ -22,6 +22,7 @@ class GraphicsItemDesignerNavigationRoot;
 class GraphicsItemDesignerPropertyHandler;
 
 namespace ot { class PropertyGrid; }
+namespace ot { class GraphicsItemCfg; }
 
 class GraphicsItemDesignerNavigation : public ot::TreeWidget {
 	Q_OBJECT
@@ -38,6 +39,10 @@ public:
 	bool updateItemName(const QString& _oldName, const QString& _newName);
 
 	GraphicsItemDesignerItemBase* findDesignerItem(const QString& _itemName) const;
+
+	ot::GraphicsItemCfg* generateConfig(void) const;
+
+	GraphicsItemDesignerNavigationRoot* getDesignerRootItem(void) const { return m_rootItem; };
 
 private Q_SLOTS:
 	void slotSelectionChanged(void);

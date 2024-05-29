@@ -30,7 +30,7 @@ public:
 	void enablePickingMode(void);
 	void disablePickingMode(void);
 
-	void setItemSize(const QSizeF& _size) { m_itemSize = _size; };
+	void setItemSize(const QSizeF& _size);
 	const QSizeF& getItemSize(void) const { return m_itemSize; };
 
 	// ###########################################################################################################################################################################################################################################################################################################################

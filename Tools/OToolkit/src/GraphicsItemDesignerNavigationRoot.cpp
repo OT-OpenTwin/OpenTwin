@@ -11,7 +11,7 @@
 #include "GraphicsItemDesignerNavigationRoot.h"
 
 GraphicsItemDesignerNavigationRoot::GraphicsItemDesignerNavigationRoot(GraphicsItemDesigner* _designer)
-	: m_exportConfigFlags(AutoAlign | MoveableItem), m_designer(_designer)
+	: m_designer(_designer)
 {
 	this->setExpanded(true);
 }
@@ -39,12 +39,12 @@ void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
 	
 	PropertyGroup* exportGroup = new PropertyGroup("Export");
 	{
-		PropertyBool* newProp = new PropertyBool("Auto Align", m_exportConfigFlags & AutoAlign);
+		PropertyBool* newProp = new PropertyBool("Auto Align", m_designer->getExportConfigFlags() & GraphicsItemDesigner::AutoAlign);
 		newProp->setPropertyTip("If enabled the generated graphics item will be moved to (0; 0).");
 		exportGroup->addProperty(newProp);
 	}
 	{
-		PropertyBool* newProp = new PropertyBool("Moveable Item", m_exportConfigFlags & MoveableItem);
+		PropertyBool* newProp = new PropertyBool("Moveable Item", m_designer->getExportConfigFlags() & GraphicsItemDesigner::MoveableItem);
 		newProp->setPropertyTip("If enabled the generated graphics item will be moveable by the user.");
 		exportGroup->addProperty(newProp);
 	}
@@ -128,7 +128,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 			return;
 		}
 
-		this->setExportConfigFlag(AutoAlign, input->isChecked());
+		m_designer->setExportConfigFlag(GraphicsItemDesigner::AutoAlign, input->isChecked());
 	}
 	else if (_item->getGroupName() == "Export" && _itemData.propertyName() == "Moveable Item") {
 		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
@@ -137,7 +137,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 			return;
 		}
 
-		this->setExportConfigFlag(MoveableItem, input->isChecked());
+		m_designer->setExportConfigFlag(GraphicsItemDesigner::MoveableItem, input->isChecked());
 	}
 	else {
 		OT_LOG_E("Unknown property { \"Group\": \"" + _item->getGroupName() + "\", \"Item\": \"" + _itemData.propertyName() + "\" }");

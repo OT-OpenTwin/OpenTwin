@@ -107,6 +107,27 @@ GraphicsItemDesignerItemBase* GraphicsItemDesignerNavigation::findDesignerItem(c
 	}
 }
 
+ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(void) const {
+	if (m_itemsMap.empty()) {
+		OT_LOG_W("No items to export");
+		return nullptr;
+	}
+
+	if (m_rootItems.size() == 1) {
+		// Single item
+		const ot::GraphicsItemCfg* oldConfig = m_rootItems.front()->getGraphicsItem()->getConfiguration();
+		if (!oldConfig) {
+			OT_LOG_E("Item has no config");
+			return nullptr;
+		}
+		return oldConfig->createCopy();
+	}
+	else {
+		// Multiple items (need to group)
+		return nullptr;
+	}
+}
+
 void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
 	m_designer->getPropertyGrid()->clear();
 	if (m_propertyHandler) {

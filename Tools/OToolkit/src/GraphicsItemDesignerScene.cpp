@@ -62,6 +62,11 @@ void GraphicsItemDesignerScene::disablePickingMode(void) {
 	m_mode = NoMode;
 }
 
+void GraphicsItemDesignerScene::setItemSize(const QSizeF& _size) {
+	m_itemSize = _size;
+	m_view->setSceneRect(QRect(0., 0., m_itemSize.width(), m_itemSize.height()));
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected: Event handler
