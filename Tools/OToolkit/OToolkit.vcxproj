@@ -46,6 +46,7 @@
     <ClCompile Include="src\ToolManager.cpp" />
     <ClCompile Include="src\ToolMenuManager.cpp" />
     <ClCompile Include="src\ToolRuntimeHandler.cpp" />
+    <ClCompile Include="src\ToolViewManager.cpp" />
     <ClCompile Include="src\WidgetTest.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
@@ -63,6 +64,7 @@
     <ClCompile Include="src\WrappedSquareItem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="include\ToolViewManager.h" />
     <ClInclude Include="include\WrappedCircleItem.h" />
     <ClInclude Include="include\WrappedEllipseItem.h" />
     <ClInclude Include="include\WrappedRectItem.h" />

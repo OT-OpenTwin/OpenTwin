@@ -12,6 +12,7 @@
 #include "MenuManager.h"
 #include "ImageEditor.h"
 #include "StatusManager.h"
+#include "ToolViewManager.h"
 #include "ColorStyleEditor.h"
 #include "LogVisualization.h"
 #include "ToolBarManager.h"
@@ -336,11 +337,11 @@ void AppBase::slotLogError(const QString& _sender, const QString& _message) {
 }
 
 void AppBase::slotSetStatus(const QString& _text) {
-	m_toolManager->statusManager()->setInfo(_text);
+	m_toolManager->getStatusManager()->setInfo(_text);
 }
 
 void AppBase::slotSetErrorStatus(const QString& _text) {
-	m_toolManager->statusManager()->setErrorInfo(_text);
+	m_toolManager->getStatusManager()->setErrorInfo(_text);
 }
 
 void AppBase::slotInitialize(void) {
@@ -399,14 +400,15 @@ AppBase::AppBase(QApplication* _app) : m_mainThread(QThread::currentThreadId()),
 
 	// Create tool manager
 	m_toolManager = new ToolManager(this);
-	this->setMenuBar(m_toolManager->menuManager());
-	this->setStatusBar(m_toolManager->statusManager());
+	this->setMenuBar(m_toolManager->getMenuManager());
+	this->setStatusBar(m_toolManager->getStatusManager());
 	
 	// Create output
 	m_output = new ot::PlainTextEditView;
 	m_output->setViewData(ot::WidgetViewBase("Output", "Output", ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewFlag::ViewIsSide));
 	m_output->setObjectName("OToolkit_Output");
 	m_output->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	m_toolManager->getToolViewManager()->addIgnoredView(m_output);
 
 	QFont f = m_output->font();
 	f.setFamily("Consolas");
@@ -446,7 +448,7 @@ AppBase::AppBase(QApplication* _app) : m_mainThread(QThread::currentThreadId()),
 	this->restoreState(settings->value("WindowState", "").toByteArray());
 
 	//connect(menuManager, &MenuManager::settingsRequested, this, &AppBase::slotSettings);
-	this->connect(m_toolManager->menuManager(), &MenuManager::exitRequested , this, &AppBase::close);
+	this->connect(m_toolManager->getMenuManager(), &MenuManager::exitRequested , this, &AppBase::close);
 	this->connect(m_recenterShortcut, &QShortcut::activated, this, &AppBase::slotRecenter);
 	this->connect(&ot::GlobalColorStyle::instance(), &ot::GlobalColorStyle::currentStyleChanged, this, &AppBase::slotColorStyleChanged);
 

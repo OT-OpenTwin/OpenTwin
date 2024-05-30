@@ -11,6 +11,7 @@
 #include "StatusManager.h"
 #include "ToolBarManager.h"
 #include "ToolMenuManager.h"
+#include "ToolViewManager.h"
 #include "ToolRuntimeHandler.h"
 
 // OToolkitAPI header
@@ -19,7 +20,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTWidgets/WidgetViewManager.h"
+#include "OTCore/BasicServiceInformation.h"
 
 ToolManager::ToolManager(QMainWindow* _mainWindow)
 	: m_ignoreEvents(false)
@@ -27,8 +28,11 @@ ToolManager::ToolManager(QMainWindow* _mainWindow)
 	m_menuManager = new MenuManager;
 	m_statusManager = new StatusManager;
 	m_toolBarManager = new ToolBarManager(_mainWindow);
+	m_toolViewManager = new ToolViewManager;
 
-	//this->connect(m_tabManager, &TabManager::currentToolChanged, this, &ToolManager::currentToolChanged);
+	this->connect(m_toolViewManager, &ToolViewManager::viewFocused, this, &ToolManager::slotViewFocused);
+	this->connect(m_toolViewManager, &ToolViewManager::viewFocusLost, this, &ToolManager::slotViewFocusLost);
+	this->connect(m_toolViewManager, &ToolViewManager::viewCloseRequested, this, &ToolManager::slotViewCloseRequested);
 }
 
 ToolManager::~ToolManager() {
@@ -45,11 +49,11 @@ bool ToolManager::addTool(otoolkit::Tool* _tool) {
 		OT_LOG_W("Tool already exists: \"" + _tool->toolName().toStdString() + "\"");
 		return false;
 	}
-	m_tools.insert_or_assign(_tool->toolName(), new ToolRuntimeHandler(_tool));
+	m_tools.insert_or_assign(_tool->toolName(), new ToolRuntimeHandler(_tool, this));
 
 	// Create menu and connect the run signal
 	ToolMenuManager* tmm = m_menuManager->addToolMenu(_tool->toolName());
-	this->connect(tmm, &ToolMenuManager::runRequested, this, &ToolManager::runToolTriggered);
+	this->connect(tmm, &ToolMenuManager::runRequested, this, &ToolManager::slotRunToolTriggered);
 
 	return true;
 }
@@ -59,7 +63,7 @@ otoolkit::Tool* ToolManager::findTool(const QString& _toolName) {
 	if (it == m_tools.end()) {
 		return nullptr;
 	}
-	return it->second->tool();
+	return it->second->getTool();
 }
 
 void ToolManager::removeTool(const QString& _toolName) {
@@ -99,6 +103,10 @@ void ToolManager::clear(void) {
 	m_tools.clear();
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Runtime handling
+
 void ToolManager::stopAll(void) {
 	std::map<QString, ToolRuntimeHandler*> bak = m_tools;
 	for (auto it : bak) {
@@ -121,11 +129,20 @@ void ToolManager::stopTool(const QString& _toolName) {
 	QSettings settings("OpenTwin", "OToolkit");
 
 	it->second->setStopped();
-	it->second->tool()->prepareToolShutdown(settings);
+	it->second->getTool()->prepareToolShutdown(settings);
 	this->fwdRemoveTool(_toolName);
 }
 
-void ToolManager::runToolTriggered(void) {
+void ToolManager::toolDataHasChanged(ToolRuntimeHandler* _handler) {
+	OTAssertNullptr(_handler->getTool());
+	m_toolViewManager->updateViews(_handler->getTool()->toolName());
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Slots
+
+void ToolManager::slotRunToolTriggered(void) {
 	ToolMenuManager* tmm = dynamic_cast<ToolMenuManager*>(sender());
 	if (tmm == nullptr) {
 		OT_LOG_E("Invalid sender");
@@ -139,6 +156,7 @@ void ToolManager::runToolTriggered(void) {
 	}
 
 	if (it->second->isRunning()) {
+		OT_LOG_W("Stop not implemented. Restart the application to restart the tool.");
 		// Stop the tool
 
 
@@ -151,30 +169,38 @@ void ToolManager::runToolTriggered(void) {
 	else {
 		m_ignoreEvents = true;
 		QSettings settings("OpenTwin", "OToolkit");
-		otoolkit::ToolWidgets data;
-		if (!it->second->tool()->runTool(tmm, data)) {
+		if (!it->second->getTool()->runTool(tmm, it->second->getToolWidgets())) {
 			OT_LOG_W("Tool \"" + it->first.toStdString() + "\" statup failed");
 			return;
-		}
-		
-		for (ot::WidgetView* view : data.views()) {
-			ot::WidgetViewManager::instance().addView(ot::BasicServiceInformation(it->second->tool()->toolName().toStdString()), view);
 		}
 
 		it->second->setRunning();
 
-		m_statusManager->addTool(it->first, data.statusWidgets());
-		m_toolBarManager->addTool(it->first, data.toolBar());
-		it->second->tool()->restoreToolSettings(settings);
-		
+		m_statusManager->addTool(it->first, it->second->getToolWidgets().getStatusWidgets());
+		m_toolBarManager->addTool(it->first, it->second->getToolWidgets().getToolBar());
+		m_toolViewManager->addTool(it->second);
+
+		it->second->getTool()->restoreToolSettings(settings);
+
 		m_ignoreEvents = false;
+
+		it->second->notifyDataChanged();
 	}
 }
 
-void ToolManager::currentToolChanged(const QString& _toolName) {
+void ToolManager::slotViewFocused(const QString& _viewName, const QString& _toolName) {
 	if (m_ignoreEvents) return;
+
 	m_statusManager->setCurrentTool(_toolName);
 	m_toolBarManager->setCurrentTool(_toolName);
+}
+
+void ToolManager::slotViewFocusLost(const QString& _viewName, const QString& _toolName) {
+
+}
+
+void ToolManager::slotViewCloseRequested(const QString& _viewName, const QString& _toolName) {
+
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -182,8 +208,7 @@ void ToolManager::currentToolChanged(const QString& _toolName) {
 // Private
 
 void ToolManager::fwdRemoveTool(const QString& _toolName) {
-	ot::WidgetViewManager::instance().closeViews(ot::BasicServiceInformation(_toolName.toStdString()));
-
+	m_toolViewManager->removeTool(_toolName);
 	m_statusManager->removeTool(_toolName);
 	m_toolBarManager->removeTool(_toolName);
 }

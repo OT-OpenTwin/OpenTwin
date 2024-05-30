@@ -52,9 +52,9 @@ void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
 	m_dockManager = _dockManager;
 
 	if (!m_dockManager) {
+		ads::CDockManager::setConfigFlag(ads::CDockManager::DisableTabTextEliding, true);
+		ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
 		m_dockManager = new ads::CDockManager;
-		m_dockManager->setConfigFlag(ads::CDockManager::AllTabsHaveCloseButton, false);
-		m_dockManager->setConfigFlag(ads::CDockManager::DisableTabTextEliding, true);
 		m_dockManager->setStyleSheet("");
 	}
 
@@ -250,6 +250,10 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CD
 	WidgetView* n = this->viewFromDockWidget(_newFocus);
 
 	if (o) {
+		if (o == m_focusInfo.last) m_focusInfo.last = nullptr;
+		if (o->viewData().flags() & WidgetViewBase::ViewIsCentral && o == m_focusInfo.lastCentral) m_focusInfo.lastCentral = nullptr;
+		if (o->viewData().flags() & WidgetViewBase::ViewIsSide && o == m_focusInfo.lastSide) m_focusInfo.lastSide = nullptr;
+		if (o->viewData().flags() & WidgetViewBase::ViewIsTool && o == m_focusInfo.lastTool) m_focusInfo.lastTool = nullptr;
 		Q_EMIT viewFocusLost(o);
 	}
 
@@ -330,6 +334,7 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	m_viewNameMap.insert_or_assign(_view->viewData().name(), std::pair<BasicServiceInformation, WidgetView*>(_owner, _view));
 
 	// Update focus information
+	//_view->getViewDockWidget()->setFocusPolicy(Qt::StrongFocus);
 	this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
 
 	// Connect signals

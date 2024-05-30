@@ -159,6 +159,9 @@
     <ClCompile Include="src\WrappedCircleItem.cpp">
       <Filter>Source Files\GraphicsItemDesignerItems</Filter>
     </ClCompile>
+    <ClCompile Include="src\ToolViewManager.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -258,6 +261,9 @@
     </QtMoc>
     <QtMoc Include="include\GraphicsItemDesignerPropertyHandler.h">
       <Filter>Header Files\GraphicsItemDesigner</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ToolViewManager.h">
+      <Filter>Header Files\General</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

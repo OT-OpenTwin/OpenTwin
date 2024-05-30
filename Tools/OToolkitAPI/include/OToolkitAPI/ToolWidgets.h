@@ -31,14 +31,14 @@ namespace otoolkit {
 
 		void addView(ot::WidgetView* _view) { m_views.push_back(_view); };
 		void setViews(const std::list<ot::WidgetView*>& _views) { m_views = _views; };
-		const std::list<ot::WidgetView*>& views(void) const { return m_views; };
+		const std::list<ot::WidgetView*>& getViews(void) const { return m_views; };
 
 		void addStatusWidget(QWidget* _widget) { m_statusWidgets.push_back(_widget); };
 		void setStatusWidgets(const std::list<QWidget*>& _statusWidgets) { m_statusWidgets = _statusWidgets; };
-		const std::list<QWidget*> statusWidgets(void) const { return m_statusWidgets; };
+		const std::list<QWidget*> getStatusWidgets(void) const { return m_statusWidgets; };
 
 		void setToolBar(QToolBar* _toolBar) { m_toolBar = _toolBar; };
-		QToolBar* toolBar(void) const { return m_toolBar; };
+		QToolBar* getToolBar(void) const { return m_toolBar; };
 		
 	private:
 		QToolBar* m_toolBar;

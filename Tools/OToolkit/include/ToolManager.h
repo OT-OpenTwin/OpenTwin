@@ -6,7 +6,6 @@
 #pragma once
 
 // Toolkit header
-#include "ToolRuntimeHandler.h"
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
@@ -22,6 +21,8 @@
 class MenuManager;
 class StatusManager;
 class ToolBarManager;
+class ToolViewManager;
+class ToolRuntimeHandler;
 
 class QMainWindow;
 
@@ -54,27 +55,42 @@ public:
 
 	void clear(void);
 
+	MenuManager* getMenuManager(void) { return m_menuManager; };
+	StatusManager* getStatusManager(void) { return m_statusManager; };
+	ToolBarManager* getToolBarManager(void) { return m_toolBarManager; };
+	ToolViewManager* getToolViewManager(void) { return m_toolViewManager; };
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Runtime handling
+
 	void stopAll(void);
 
 	void stopTool(const QString& _toolName);
 
-	MenuManager* menuManager(void) { return m_menuManager; };
-	StatusManager* statusManager(void) { return m_statusManager; };
-	ToolBarManager* toolBarManager(void) { return m_toolBarManager; };
+	void toolDataHasChanged(ToolRuntimeHandler* _handler);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Slots
 
 private Q_SLOTS:
-	void runToolTriggered(void);
-	void currentToolChanged(const QString& _toolName);
-
+	void slotRunToolTriggered(void);
+	void slotViewFocused(const QString& _viewName, const QString& _toolName);
+	void slotViewFocusLost(const QString& _viewName, const QString& _toolName);
+	void slotViewCloseRequested(const QString& _viewName, const QString& _toolName);
+	
 private:
 	void fwdRemoveTool(const QString& _toolName);
 
+
 	std::map<QString, ToolRuntimeHandler*> m_tools;
-	
+
 	bool m_ignoreEvents;
 	MenuManager* m_menuManager;
 	StatusManager* m_statusManager;
 	ToolBarManager* m_toolBarManager;
+	ToolViewManager* m_toolViewManager;
 
 	ToolManager() = delete;
 };
