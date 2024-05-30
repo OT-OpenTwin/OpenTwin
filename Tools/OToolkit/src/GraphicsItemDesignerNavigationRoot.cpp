@@ -21,14 +21,22 @@ void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
 	
 	PropertyGridCfg cfg;
 	PropertyGroup* editorGroup = new PropertyGroup("Editor");
-	editorGroup->addProperty(new PropertyBool("Show grid", (m_designer->getView()->getDesignerScene()->getGridFlags() | GraphicsItemDesignerScene::NoGridLineMask) != GraphicsItemDesignerScene::NoGridLineMask));
-	PropertyInt* gridStepSizeProp = new PropertyInt("Grid step size", std::max(m_designer->getView()->getDesignerScene()->getGridStepSize(), 2), 2, 1000);
+	editorGroup->addProperty(new PropertyBool("Show grid", (m_designer->getView()->getDesignerScene()->getGridFlags() | Grid::NoGridLineMask) != Grid::NoGridLineMask));
+	PropertyInt* gridStepSizeProp = new PropertyInt("Grid step size", std::max(m_designer->getView()->getDesignerScene()->getGridStep().x(), 2), 2, 1000);
 	gridStepSizeProp->setPropertyTip("The distance between two grid lines.");
 	editorGroup->addProperty(gridStepSizeProp);
-	PropertyInt* wideStepProp = new PropertyInt("Wide step every", std::max(m_designer->getView()->getDesignerScene()->getGridWideLineEvery(), 1), 1, 1000);
+	PropertyInt* wideStepProp = new PropertyInt("Wide step counter", std::max(m_designer->getView()->getDesignerScene()->getWideGridLineCounter().x(), 1), 1, 1000);
 	wideStepProp->setPropertyTip("Every 'x' gridline will be a wide line (e.g. every 10th line).")	;
 	editorGroup->addProperty(wideStepProp);
-	PropertyBool* gridSnapProp = new PropertyBool("Grid snap", m_designer->getView()->getDesignerScene()->getGridSnapEnabled());
+	PropertyStringList* gridSnapProp = new PropertyStringList(
+		"Grid snap mode", 
+		Grid::toString(m_designer->getView()->getDesignerScene()->getGridSnapMode()), 
+		std::list<std::string>({ 
+			Grid::toString(Grid::NoGridSnap),
+			Grid::toString(Grid::SnapTopLeft),
+			Grid::toString(Grid::SnapCenter)
+		})
+	);
 	gridSnapProp->setPropertyTip("If enabled items will snap to the grid. This also works if the grid is hidden.");
 	editorGroup->addProperty(gridSnapProp);
 
@@ -65,7 +73,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 			return;
 		}
 		
-		m_designer->getView()->getDesignerScene()->setGridFlags((input->isChecked() ? (GraphicsScene::ShowNormalLines | GraphicsScene::ShowWideLines) : GraphicsScene::NoGridFlags));
+		m_designer->getView()->getDesignerScene()->setGridFlags((input->isChecked() ? (Grid::ShowNormalLines | Grid::ShowWideLines) : Grid::NoGridFlags));
 		m_designer->getView()->update();
 	}
 	else if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Grid step size") {
@@ -74,25 +82,25 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 			OT_LOG_E("Input cast failed");
 			return;
 		}
-		m_designer->getView()->getDesignerScene()->setGridStepSize(input->getValue());
+		m_designer->getView()->getDesignerScene()->setGridStep(input->getValue());
 		m_designer->getView()->update();
 	}
-	else if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Wide step every") {
+	else if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Wide step counter") {
 		PropertyInputInt* input = dynamic_cast<PropertyInputInt*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
 			return;
 		}
-		m_designer->getView()->getDesignerScene()->setGridWideLineEvery(input->getValue());
+		m_designer->getView()->getDesignerScene()->setWideGridLineCounter(input->getValue());
 		m_designer->getView()->update();
 	}
-	else if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Grid snap") {
-		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
+	else if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Grid snap mode") {
+		PropertyInputStringList* input = dynamic_cast<PropertyInputStringList*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
 			return;
 		}
-		m_designer->getView()->getDesignerScene()->setGridSnapEnabled(input->isChecked());
+		m_designer->getView()->getDesignerScene()->setGridSnapMode(Grid::stringToGridSnapMode(input->getCurrentText().toStdString()));
 	}
 	else if (_item->getGroupName() == "Item" && _itemData.propertyName() == "Name") {
 		PropertyInputString* input = dynamic_cast<PropertyInputString*>(_item->getInput());

@@ -395,7 +395,7 @@ void ot::GraphicsItem::setGraphicsItemMinimumSize(const QSizeF& _size) {
 
 QSizeF ot::GraphicsItem::getGraphicsItemMinimumSize(void) const {
 	OTAssertNullptr(m_config);
-	return std::move(QtFactory::toSize(m_config->getMinimumSize()));
+	return std::move(QtFactory::toQSize(m_config->getMinimumSize()));
 }
 
 void ot::GraphicsItem::setGraphicsItemMaximumSize(const QSizeF& _size) {
@@ -405,7 +405,7 @@ void ot::GraphicsItem::setGraphicsItemMaximumSize(const QSizeF& _size) {
 
 QSizeF ot::GraphicsItem::getGraphicsItemMaximumSize(void) const {
 	OTAssertNullptr(m_config);
-	return std::move(QtFactory::toSize(m_config->getMaximumSize()));
+	return std::move(QtFactory::toQSize(m_config->getMaximumSize()));
 }
 
 void ot::GraphicsItem::setGraphicsItemSizePolicy(ot::SizePolicy _policy) {

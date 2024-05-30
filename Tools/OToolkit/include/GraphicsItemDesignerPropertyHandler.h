@@ -34,6 +34,8 @@
 class QTreeWidgetItem;
 class GraphicsItemDesignerNavigation;
 
+//! \class GraphicsItemDesignerPropertyHandler
+//! \brief The GraphicsItemDesignerPropertyHandler is used to receive property grid notifications and requests.
 class GraphicsItemDesignerPropertyHandler : public QObject {
 	Q_OBJECT
 	OT_DECL_NOCOPY(GraphicsItemDesignerPropertyHandler)
@@ -54,7 +56,10 @@ public:
 	virtual void itemAboutToBeDestroyed(void) {};
 
 protected:
+	//! \brief Is called when the property grid needs to be filled.
 	virtual void fillPropertyGrid(void) = 0;
+
+
 	virtual void propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) = 0;
 	virtual void propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) = 0;
 

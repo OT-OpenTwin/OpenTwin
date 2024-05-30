@@ -41,8 +41,8 @@ bool ot::GraphicsRectangularItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 	this->prepareGeometryChange();
 	m_cornerRadius = cfg->getCornerRadius();
-	m_brush = QtFactory::toBrush(cfg->getBackgroundPainter());
-	m_pen = QtFactory::toPen(cfg->getOutline());
+	m_brush = QtFactory::toQBrush(cfg->getBackgroundPainter());
+	m_pen = QtFactory::toQPen(cfg->getOutline());
 
 	// We call set rectangle size which will call set geometry to finalize the item
 	this->setRectangleSize(m_size);

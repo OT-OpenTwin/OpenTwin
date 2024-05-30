@@ -133,7 +133,7 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	_item->getRootItem()->getQGraphicsItem()->setZValue(1);
 	_item->setGraphicsScene(m_scene);
 
-	if (m_scene->getGridSnapEnabled() && (m_scene->getGridStepSize() > 0)) {
+	if (m_scene->getGrid().isGridSnapValid()) {
 		_item->getQGraphicsItem()->setPos(m_scene->snapToGrid(_item->getQGraphicsItem()->pos()));
 	}
 

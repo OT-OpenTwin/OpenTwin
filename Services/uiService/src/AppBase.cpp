@@ -57,6 +57,7 @@
 #include "OTCore/Point2D.h"
 #include "OTCore/OTObject.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTGui/FillPainter2D.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGui/PropertyStringList.h"
@@ -2115,8 +2116,12 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name,
 	newEditor->setGraphicsViewName(_name);
 	newEditor->setGraphicsViewFlag(ot::GraphicsView::ViewManagesSceneRect);
 	newEditor->setDropsEnabled(true);
-	newEditor->getGraphicsScene()->setGridFlags(ot::GraphicsScene::ShowNormalLines | ot::GraphicsScene::AutoScaleGrid);
-	newEditor->getGraphicsScene()->setDefaultGridPen(QPen(QBrush(), .8, Qt::DotLine, Qt::RoundCap));
+	newEditor->getGraphicsScene()->setGridFlags(ot::Grid::ShowNormalLines | ot::Grid::AutoScaleGrid);
+	ot::OutlineF newOutline;
+	newOutline.setWidth(.8);
+	newOutline.setCap(ot::RoundCap);
+	newOutline.setStyle(ot::DotLine);
+	newEditor->getGraphicsScene()->setGridLineStyle(newOutline);
 
 	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
 

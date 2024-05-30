@@ -42,8 +42,8 @@ bool ot::GraphicsLineItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 	this->prepareGeometryChange();
 
-	m_pen = QtFactory::toPen(cfg->getLineStyle());
-	m_line = QLineF(QtFactory::toPoint(cfg->getFrom()), QtFactory::toPoint(cfg->getTo()));
+	m_pen = QtFactory::toQPen(cfg->getLineStyle());
+	m_line = QLineF(QtFactory::toQPoint(cfg->getFrom()), QtFactory::toQPoint(cfg->getTo()));
 
 	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }

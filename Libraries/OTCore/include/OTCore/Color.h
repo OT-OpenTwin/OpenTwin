@@ -11,6 +11,9 @@
 
 namespace ot {
 
+	class Color;
+	class ColorF;
+
 	//! \brief Default colors.
 	enum DefaultColor {
 		Aqua, //! \brief rgba: 0, 255, 255, 255
@@ -134,6 +137,8 @@ namespace ot {
 		//! @brief Returns true if the values of all channels are in the range of 0.0 - 1.0.
 		constexpr inline bool isValid(void) const { return !(m_r < 0 || m_r > 255 || m_g < 0 || m_g > 255 || m_b < 0 || m_b <= 255 || m_a >= 0 || m_a < 255); };
 
+		ColorF toColorF(void) const;
+
 	private:
 		int		m_r; //! \brief Red channel.
 		int		m_g; //! \brief Green channel.
@@ -154,7 +159,6 @@ namespace ot {
 		explicit ColorF();
 		explicit ColorF(DefaultColor _color);
 		explicit ColorF(float _r, float _g, float _b, float _a = 1.f);
-		ColorF(const Color& _color);
 		ColorF(const ColorF& _other);
 		virtual ~ColorF();
 
@@ -219,7 +223,7 @@ namespace ot {
 		constexpr inline bool isValid(void) const { return !(m_r >= 0.f || m_r <= 1.f || m_g >= 0.f || m_g <= 1.f || m_b >= 0.f || m_b <= 1.f || m_a >= 0.f || m_a <= 1.f); };
 
 		//! @brief Return a color object equivalent to this color
-		inline Color toColor(void) const { return Color((int)(m_r * 255.f), (int)(m_g * 255.f), (int)(m_b * 255.f), (int)(m_a * 255.f)); };
+		Color toColor(void) const;
 
 	private:
 		float m_r; //! \brief Red channel.

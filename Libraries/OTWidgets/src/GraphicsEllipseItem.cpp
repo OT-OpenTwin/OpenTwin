@@ -40,8 +40,8 @@ bool ot::GraphicsEllipseItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 	m_radiusX = cfg->getRadiusX();
 	m_radiusY = cfg->getRadiusY();
-	m_brush = QtFactory::toBrush(cfg->getBackgroundPainter());
-	m_pen = QtFactory::toPen(cfg->getOutline());
+	m_brush = QtFactory::toQBrush(cfg->getBackgroundPainter());
+	m_pen = QtFactory::toQPen(cfg->getOutline());
 
 	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }

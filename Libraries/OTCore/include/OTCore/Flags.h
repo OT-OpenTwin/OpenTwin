@@ -2,6 +2,7 @@
 
 // OpenTwin header
 #include "OTSystem/ArchitectureInfo.h"
+#include "OTCore/CoreAPIExport.h"
 
 // std header
 #include <type_traits>
@@ -84,7 +85,7 @@ namespace ot {
 	//!			...
 	//!	};
 	//! \note Note that only enumration types are allowed.
-	template<typename T> class Flags {
+	template<typename T> class OT_CORE_API_EXPORTONLY Flags {
 	private:
 #ifdef OT_OS_64Bit
 		 //! \typedef FlagCastType

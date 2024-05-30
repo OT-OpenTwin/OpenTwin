@@ -13,7 +13,7 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GlobalColorStyle.h"
 
-Qt::Alignment ot::QtFactory::toAlignment(ot::Alignment _alignment) {
+Qt::Alignment ot::QtFactory::toQAlignment(ot::Alignment _alignment) {
 	switch (_alignment)
 	{
 	case ot::AlignCenter: return Qt::AlignCenter;
@@ -31,7 +31,7 @@ Qt::Alignment ot::QtFactory::toAlignment(ot::Alignment _alignment) {
 	}
 }
 
-QGradient::Spread ot::QtFactory::toGradientSpread(ot::GradientSpread _spread) {
+QGradient::Spread ot::QtFactory::toQGradientSpread(ot::GradientSpread _spread) {
 	switch (_spread)
 	{
 	case ot::PadSpread: return QGradient::PadSpread;
@@ -43,7 +43,7 @@ QGradient::Spread ot::QtFactory::toGradientSpread(ot::GradientSpread _spread) {
 	}
 }
 
-QBrush ot::QtFactory::toBrush(const ot::Painter2D* _painter) {
+QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
 	if (!_painter) {
 		OT_LOG_W("Painter is 0. Ignoring");
 		return QBrush();
@@ -52,7 +52,7 @@ QBrush ot::QtFactory::toBrush(const ot::Painter2D* _painter) {
 	if (_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) {
 		const FillPainter2D* painter = dynamic_cast<const FillPainter2D*>(_painter);
 		OTAssertNullptr(painter);
-		return QBrush(QColor(QtFactory::toColor(painter->color())));
+		return QBrush(QColor(QtFactory::toQColor(painter->color())));
 	}
 	else if (_painter->getFactoryKey() == OT_FactoryKey_LinearGradientPainter2D) {
 		const LinearGradientPainter2D* painter = dynamic_cast<const LinearGradientPainter2D*>(_painter);
@@ -60,11 +60,11 @@ QBrush ot::QtFactory::toBrush(const ot::Painter2D* _painter) {
 		
 		QGradientStops stops;
 		for (auto s : painter->stops()) {
-			stops.append(QGradientStop(s.pos(), QtFactory::toColor(s.color())));
+			stops.append(QGradientStop(s.pos(), QtFactory::toQColor(s.color())));
 		}
 
-		QLinearGradient grad(QtFactory::toPoint(painter->start()), QtFactory::toPoint(painter->finalStop()));
-		grad.setSpread(QtFactory::toGradientSpread(painter->spread()));
+		QLinearGradient grad(QtFactory::toQPoint(painter->start()), QtFactory::toQPoint(painter->finalStop()));
+		grad.setSpread(QtFactory::toQGradientSpread(painter->spread()));
 		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
 		grad.setStops(stops);
 		
@@ -76,15 +76,15 @@ QBrush ot::QtFactory::toBrush(const ot::Painter2D* _painter) {
 
 		QGradientStops stops;
 		for (auto s : painter->stops()) {
-			stops.append(QGradientStop(s.pos(), ot::QtFactory::toColor(s.color())));
+			stops.append(QGradientStop(s.pos(), ot::QtFactory::toQColor(s.color())));
 		}
 
-		QRadialGradient grad(ot::QtFactory::toPoint(painter->centerPoint()), painter->centerRadius());
+		QRadialGradient grad(ot::QtFactory::toQPoint(painter->centerPoint()), painter->centerRadius());
 		if (painter->isFocalPointSet()) {
-			grad.setFocalPoint(ot::QtFactory::toPoint(painter->focalPoint()));
+			grad.setFocalPoint(ot::QtFactory::toQPoint(painter->focalPoint()));
 			grad.setFocalRadius(painter->focalRadius());
 		}
-		grad.setSpread(ot::QtFactory::toGradientSpread(painter->spread()));
+		grad.setSpread(ot::QtFactory::toQGradientSpread(painter->spread()));
 		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
 		grad.setStops(stops);
 
@@ -110,7 +110,7 @@ QBrush ot::QtFactory::toBrush(const ot::Painter2D* _painter) {
 	}
 }
 
-Qt::PenStyle ot::QtFactory::toPenStyle(LineStyle _style) {
+Qt::PenStyle ot::QtFactory::toQPenStyle(LineStyle _style) {
 	switch (_style)
 	{
 	case ot::NoLine: return Qt::NoPen;
@@ -125,7 +125,7 @@ Qt::PenStyle ot::QtFactory::toPenStyle(LineStyle _style) {
 	}
 }
 
-Qt::PenCapStyle ot::QtFactory::toPenCapStyle(LineCapStyle _style) {
+Qt::PenCapStyle ot::QtFactory::toQPenCapStyle(LineCapStyle _style) {
 	switch (_style)
 	{
 	case ot::FlatCap: return Qt::FlatCap;
@@ -137,7 +137,7 @@ Qt::PenCapStyle ot::QtFactory::toPenCapStyle(LineCapStyle _style) {
 	}
 }
 
-Qt::PenJoinStyle ot::QtFactory::toPenJoinStyle(LineJoinStyle _style) {
+Qt::PenJoinStyle ot::QtFactory::toQPenJoinStyle(LineJoinStyle _style) {
 	switch (_style)
 	{
 	case ot::MiterJoin: return Qt::MiterJoin;
@@ -150,19 +150,19 @@ Qt::PenJoinStyle ot::QtFactory::toPenJoinStyle(LineJoinStyle _style) {
 	}
 }
 
-QPainterPath ot::QtFactory::toPainterPath(const Path2DF& _path) {
+QPainterPath ot::QtFactory::toQPainterPath(const Path2DF& _path) {
 	QPainterPath p;
 	for (const Path2DF::PathEntry& e : _path.getEntries()) {
-		p.moveTo(QtFactory::toPoint(e.start));
+		p.moveTo(QtFactory::toQPoint(e.start));
 
 		switch (e.type)
 		{
 		case Path2D::LineType:
-			p.lineTo(QtFactory::toPoint(e.stop));
+			p.lineTo(QtFactory::toQPoint(e.stop));
 			break;
 
 		case Path2D::BerzierType:
-			p.cubicTo(QtFactory::toPoint(e.control1), QtFactory::toPoint(e.control1), QtFactory::toPoint(e.control1));
+			p.cubicTo(QtFactory::toQPoint(e.control1), QtFactory::toQPoint(e.control1), QtFactory::toQPoint(e.control1));
 			break;
 
 		default:
@@ -173,7 +173,7 @@ QPainterPath ot::QtFactory::toPainterPath(const Path2DF& _path) {
 	return p;
 }
 
-QString ot::QtFactory::toString(QEvent::Type _type) {
+QString ot::QtFactory::toQString(QEvent::Type _type) {
     static const QMap<QEvent::Type, QString> eventTypeMap = {
         { QEvent::None, "None" },
         { QEvent::Timer, "Timer" },

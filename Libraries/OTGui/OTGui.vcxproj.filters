@@ -258,6 +258,9 @@
     <ClInclude Include="include\OTGui\PropertyStringList.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\Grid.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -448,6 +451,9 @@
     </ClCompile>
     <ClCompile Include="src\PropertyStringList.cpp">
       <Filter>Source Files\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Grid.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

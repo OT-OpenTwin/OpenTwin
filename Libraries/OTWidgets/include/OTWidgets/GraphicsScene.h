@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Flags.h"
+#include "OTGui/Grid.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -24,20 +25,6 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsScene : public QGraphicsScene {
 		Q_OBJECT
 	public:
-		//! \enum GridFlag
-		enum GridFlag {
-			NoGridFlags = 0x0000, //! \brief No grid flags.
-			ShowNormalLines = 0x0001, //! \brief Basic lines should be drawn.
-			ShowWideLines = 0x0002, //! \brief Wide lines should be drawn.
-			ShowCenterCross = 0x0004, //! \brief Center cross should be drawn.
-			NoGridLineMask = 0xFFF0, //! \brief Mask used to check if no grid line flags are set.
-
-			//! \brief Auto scaling is enabled.
-			AutoScaleGrid = 0x0010
-		};
-		//! \typedef GridFlags
-		typedef Flags<GridFlag> GridFlags;
-
 		GraphicsScene(GraphicsView* _view);
 		GraphicsScene(const QRectF& _sceneRect, GraphicsView* _view);
 		virtual ~GraphicsScene();
@@ -55,26 +42,26 @@ namespace ot {
 
 		// Setter / Getter
 
-		void setDefaultGridPen(const QPen& _pen) { m_defaultGridPen = _pen; };
-		const QPen& getDefaultGridPen(void) const { return m_defaultGridPen; };
+		void setGrid(const Grid& _grid) { m_grid = _grid; };
+		const Grid& getGrid(void) const { return m_grid; };
 
-		//! @brief Set the grid size
-		//! If the size is set to 0 or less, no grid will be drawn
-		//! @param _size The grid size to set
-		void setGridStepSize(int _size) { m_gridStepSize = _size; };
+		void setGridStep(int _step) { m_grid.setGridStep(_step); };
+		void setGridStep(const Point2D& _step) { m_grid.setGridStep(_step); };
+		Point2D getGridStep(void) const { return m_grid.getGridStep(); };
 
-		//! @brief Returns the currently set grid size
-		int getGridStepSize(void) const { return m_gridStepSize; };
+		void setWideGridLineCounter(int _counter) { m_grid.setWideGridLineCounter(_counter); };
+		void setWideGridLineCounter(const Point2D& _counter) { m_grid.setWideGridLineCounter(_counter); };
+		Point2D getWideGridLineCounter(void) const { return m_grid.getWideGridLineCounter(); };
 
-		void setGridWideLineEvery(int _count) { m_gridWideEvery = _count; };
-		int getGridWideLineEvery(void) const { return m_gridWideEvery; }
+		void setGridFlag(Grid::GridFlag _flag, bool _active = true) { m_grid.setGridFlag(_flag, _active); };
+		void setGridFlags(const Grid::GridFlags& _flags) { m_grid.setGridFlags(_flags); };
+		const Grid::GridFlags& getGridFlags(void) const { return m_grid.getGridFlags(); };
 
-		void setGridFlag(GridFlag _flag, bool _active = true) { m_gridFlags.setFlag(_flag, _active); };
-		void setGridFlags(const GridFlags& _flags) { m_gridFlags = _flags; };
-		const GridFlags& getGridFlags(void) const { return m_gridFlags; };
+		void setGridSnapMode(Grid::GridSnapMode _mode) { m_grid.setGridSnapMode(_mode); };
+		Grid::GridSnapMode getGridSnapMode(void) const { return m_grid.getGridSnapMode(); };
 
-		void setGridSnapEnabled(bool _enabled) { m_gridSnapEnabled = _enabled; };
-		bool getGridSnapEnabled(void) const { return m_gridSnapEnabled; };
+		void setGridLineStyle(const OutlineF& _outline) { m_grid.setGridLineStyle(_outline); };
+		const OutlineF& getGridLineStyle(void) const { return m_grid.getGridLineStyle(); };
 
 		GraphicsView* getGraphicsView(void) { return m_view; };
 
@@ -85,8 +72,7 @@ namespace ot {
 		bool ignoreEvents(void) const { return m_ignoreEvents; };
 
 		QPointF snapToGrid(const QPointF& _pos) const;
-		QPointF snapToGrid(const QPointF& _pos, int _gridStepSize) const;
-
+		
 	Q_SIGNALS:
 		void selectionChangeFinished(void);
 
@@ -115,19 +101,15 @@ namespace ot {
 
 		void drawGrid(QPainter* _painter, const QRectF& _rect);
 
-		qreal calculateScaledGridLineWidth(QPainter* _painter) const;
+		qreal calculateScaledGridLineWidth(QPainter* _painter, qreal _normalWidth) const;
 
 		void calculateGridLines(const QRectF& _painterRect, QList<QLineF>& _normalLines, QList<QLineF>& _wideLines, QList<QLineF>& _centerLines) const;
 
-		qreal calculateScaledGridStepSize(const QRectF& _rect) const;
+		Point2D calculateScaledGridStepSize(const QRectF& _rect) const;
 
 	private:
-		QPen m_defaultGridPen;
 		bool m_ignoreEvents;
-		int m_gridStepSize;
-		int m_gridWideEvery;
-		bool m_gridSnapEnabled;
-		GridFlags m_gridFlags;
+		Grid m_grid;
 		GraphicsView* m_view;
 		GraphicsItem* m_connectionOrigin;
 		GraphicsConnectionPreviewItem* m_connectionPreview;
@@ -139,5 +121,3 @@ namespace ot {
 	};
 
 }
-
-OT_ADD_FLAG_FUNCTIONS(ot::GraphicsScene::GridFlag)

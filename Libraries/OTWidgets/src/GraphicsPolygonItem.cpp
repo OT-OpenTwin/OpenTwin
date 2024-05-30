@@ -45,7 +45,7 @@ bool ot::GraphicsPolygonItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	m_polygon.clear();
 	QList<QPointF> pts;
 	for (const Point2DD& pt : cfg->points()) {
-		pts.append(QtFactory::toPoint(pt));
+		pts.append(QtFactory::toQPoint(pt));
 	}
 	m_polygon.append(pts);
 

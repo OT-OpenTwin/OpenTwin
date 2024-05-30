@@ -341,6 +341,10 @@ void ot::Color::set(ot::DefaultColor _color)
     }
 }
 
+ot::ColorF ot::Color::toColorF(void) const {
+    return ColorF(m_r / 255.f, m_g / 255.f, m_b / 255.f, m_a / 255.f);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -354,8 +358,6 @@ ot::ColorF::ColorF(DefaultColor _color) : m_r(0.f), m_g(0.f), m_b(0.f), m_a(1.f)
 }
 
 ot::ColorF::ColorF(float _r, float _g, float _b, float _a) : m_r(_r), m_g(_g), m_b(_b), m_a(_a) {}
-
-ot::ColorF::ColorF(const Color& _color) : m_r(_color.r() / 255.f), m_g(_color.g() / 255.f), m_b(_color.b() / 255.f), m_a(_color.a() / 255.f) {}
 
 ot::ColorF::ColorF(const ColorF& _other) : m_r(_other.m_r), m_g(_other.m_g), m_b(_other.m_b), m_a(_other.m_a) {}
 
@@ -686,4 +688,8 @@ void ot::ColorF::set(ot::DefaultColor _color)
         OT_LOG_EA("Unknown color provided");
         break;
     }
+}
+
+ot::Color ot::ColorF::toColor(void) const {
+    return Color((int)(m_r * 255.f), (int)(m_g * 255.f), (int)(m_b * 255.f), (int)(m_a * 255.f)); 
 }

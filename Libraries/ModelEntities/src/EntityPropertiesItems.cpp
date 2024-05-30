@@ -499,7 +499,7 @@ void EntityPropertiesColor::setFromConfiguration(const ot::Property* _property)
 		OT_LOG_E("Property cast failed");
 		return;
 	}
-	ot::ColorF c(actualProperty->value());
+	ot::ColorF c(actualProperty->value().toColorF());
 	setColorR(c.r());
 	setColorG(c.g());
 	setColorB(c.b());

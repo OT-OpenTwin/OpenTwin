@@ -68,6 +68,8 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 }
 
 void GraphicsItemDesigner::restoreToolSettings(QSettings& _settings) {
+	using namespace ot;
+
 	// Item
 	QSizeF itemSize;
 	itemSize.setWidth(_settings.value("GID.LastWidth", (qreal)300).toReal());
@@ -75,10 +77,17 @@ void GraphicsItemDesigner::restoreToolSettings(QSettings& _settings) {
 	m_view->getDesignerScene()->setItemSize(itemSize);
 
 	// Grid
-	m_view->getDesignerScene()->setGridFlags((_settings.value("GID.ShowGrid", true).toBool() ? (GraphicsItemDesignerScene::ShowNormalLines | GraphicsItemDesignerScene::ShowWideLines) : GraphicsItemDesignerScene::NoGridFlags));
-	m_view->getDesignerScene()->setGridStepSize(_settings.value("GID.GridStep", (int)10).toInt());
-	m_view->getDesignerScene()->setGridWideLineEvery(_settings.value("GID.GridWide", (int)10).toInt());
-	m_view->getDesignerScene()->setGridSnapEnabled(_settings.value("GID.GridSnap", true).toBool());
+	m_view->getDesignerScene()->setGridFlags((_settings.value("GID.ShowGrid", true).toBool() ? (Grid::ShowNormalLines | Grid::ShowWideLines) : Grid::NoGridFlags));
+	m_view->getDesignerScene()->setGridStep(_settings.value("GID.GridStep", (int)10).toInt());
+	m_view->getDesignerScene()->setWideGridLineCounter(_settings.value("GID.GridWide", (int)10).toInt());
+	m_view->getDesignerScene()->setGridSnapMode(
+		Grid::stringToGridSnapMode(
+			_settings.value(
+				"GID.GridSnap", 
+				QString::fromStdString(Grid::toString(Grid::SnapTopLeft))
+			).toString().toStdString()
+		)
+	);
 
 	// Export
 	m_lastExportFile = _settings.value("GID.LastExportFile", QString()).toString();
@@ -92,10 +101,10 @@ bool GraphicsItemDesigner::prepareToolShutdown(QSettings& _settings) {
 	_settings.setValue("GID.LastHeight", m_view->getDesignerScene()->getItemSize().height());
 
 	// Grid
-	_settings.setValue("GID.ShowGrid", m_view->getDesignerScene()->getGridFlags() != GraphicsItemDesignerScene::NoGridFlags);
-	_settings.setValue("GID.GridStep", m_view->getDesignerScene()->getGridStepSize());
-	_settings.setValue("GID.GridWide", m_view->getDesignerScene()->getGridWideLineEvery());
-	_settings.setValue("GID.GridSnap", m_view->getDesignerScene()->getGridSnapEnabled());
+	_settings.setValue("GID.ShowGrid", m_view->getDesignerScene()->getGrid().isGridLinesValid());
+	_settings.setValue("GID.GridStep", m_view->getDesignerScene()->getGridStep().x());
+	_settings.setValue("GID.GridWide", m_view->getDesignerScene()->getWideGridLineCounter().x());
+	_settings.setValue("GID.GridSnap", QString::fromStdString(ot::Grid::toString(m_view->getDesignerScene()->getGridSnapMode())));
 
 	// Export
 	_settings.setValue("GID.LastExportFile", m_lastExportFile);

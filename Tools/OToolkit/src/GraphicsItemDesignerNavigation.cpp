@@ -20,7 +20,7 @@
 #include "OTWidgets/GraphicsScene.h"
 
 GraphicsItemDesignerNavigation::GraphicsItemDesignerNavigation(GraphicsItemDesigner* _designer)
-	: m_designer(_designer), m_propertyHandler(nullptr)
+	: m_designer(_designer), m_currentPropertyHandler(nullptr)
 {
 	this->setHeaderHidden(true);
 	m_rootItem = new GraphicsItemDesignerNavigationRoot(_designer);
@@ -179,16 +179,16 @@ ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(void) {
 
 void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
 	m_designer->getPropertyGrid()->clear();
-	if (m_propertyHandler) {
-		m_propertyHandler->unsetPropertyGrid();
+	if (m_currentPropertyHandler) {
+		m_currentPropertyHandler->unsetPropertyGrid();
 	}
-	m_propertyHandler = nullptr;
+	m_currentPropertyHandler = nullptr;
 
 	QList<QTreeWidgetItem*> sel = this->selectedItems();
 	if (sel.size() != 1) return;
 
 	if (sel.front() == m_rootItem) {
-		m_propertyHandler = m_rootItem;
+		m_currentPropertyHandler = m_rootItem;
 	}
 	else {
 		auto it = m_itemsMap.find(sel.front()->text(0));
@@ -197,11 +197,11 @@ void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
 			return;
 		}
 
-		m_propertyHandler = it->second;
+		m_currentPropertyHandler = it->second;
 	}
 
-	if (m_propertyHandler) {
-		m_propertyHandler->setPropertyGrid(m_designer->getPropertyGrid());
+	if (m_currentPropertyHandler) {
+		m_currentPropertyHandler->setPropertyGrid(m_designer->getPropertyGrid());
 	}
 }
 
@@ -238,8 +238,8 @@ void GraphicsItemDesignerNavigation::keyPressEvent(QKeyEvent* _event) {
 }
 
 void GraphicsItemDesignerNavigation::forgetItem(GraphicsItemDesignerItemBase* _item) {
-	if (_item == m_propertyHandler) {
-		m_propertyHandler = nullptr;
+	if (_item == m_currentPropertyHandler) {
+		m_currentPropertyHandler = nullptr;
 	}
 
 	auto it = std::find(m_rootItems.begin(), m_rootItems.end(), _item);

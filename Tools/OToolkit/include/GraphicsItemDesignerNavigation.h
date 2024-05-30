@@ -60,5 +60,5 @@ private:
 	
 	GraphicsItemDesigner* m_designer;
 	GraphicsItemDesignerNavigationRoot* m_rootItem;
-	GraphicsItemDesignerPropertyHandler* m_propertyHandler;
+	GraphicsItemDesignerPropertyHandler* m_currentPropertyHandler;
 };

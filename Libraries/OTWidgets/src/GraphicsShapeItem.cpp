@@ -41,7 +41,7 @@ bool ot::GraphicsShapeItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	this->prepareGeometryChange();
 
 	// We call set rectangle size which will call set geometry to finalize the item
-	m_path = QtFactory::toPainterPath(cfg->outlinePath());
+	m_path = QtFactory::toQPainterPath(cfg->outlinePath());
 
 	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }
@@ -65,5 +65,5 @@ void ot::GraphicsShapeItem::paintCustomItem(QPainter* _painter, const QStyleOpti
 // Setter/Getter
 
 void ot::GraphicsShapeItem::setPath(const Path2DF& _path) {
-	m_path = QtFactory::toPainterPath(_path);
+	m_path = QtFactory::toQPainterPath(_path);
 }

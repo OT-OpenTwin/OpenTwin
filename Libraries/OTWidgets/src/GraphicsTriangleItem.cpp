@@ -45,8 +45,8 @@ bool ot::GraphicsTriangleItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	m_size.setHeight(cfg->getSize().height());
 	m_shape = cfg->getTriangleShape();
 	m_direction = cfg->getTriangleDirection();
-	m_brush = QtFactory::toBrush(cfg->getBackgroundPainter());
-	m_pen = QtFactory::toPen(cfg->getOutline());
+	m_brush = QtFactory::toQBrush(cfg->getBackgroundPainter());
+	m_pen = QtFactory::toQPen(cfg->getOutline());
 
 	// We call set rectangle size which will call set geometry to finalize the item
 	this->setTriangleSize(m_size);

@@ -22,7 +22,7 @@ ot::ColorPickButton::ColorPickButton(const QColor& _color, QWidget* _parent)
 ot::ColorPickButton::ColorPickButton(const ot::Color& _color, QWidget* _parent) 
 	: QFrame(_parent), m_useAlpha(false), m_useCustomToolTip(false)
 {
-	this->ini(QtFactory::toColor(_color));
+	this->ini(QtFactory::toQColor(_color));
 }
 
 ot::ColorPickButton::~ColorPickButton() {}

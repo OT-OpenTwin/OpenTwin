@@ -25,6 +25,7 @@
     <ClInclude Include="include\OTGui\GraphicsLineItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsPolygonItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsShapeItemCfg.h" />
+    <ClInclude Include="include\OTGui\Grid.h" />
     <ClInclude Include="include\OTGui\KeySequence.h" />
     <ClInclude Include="include\OTGui\Outline.h" />
     <ClInclude Include="include\OTGui\MessageDialogCfg.h" />
@@ -94,6 +95,7 @@
     <ClCompile Include="src\GraphicsLineItemCfg.cpp" />
     <ClCompile Include="src\GraphicsPolygonItemCfg.cpp" />
     <ClCompile Include="src\GraphicsShapeItemCfg.cpp" />
+    <ClCompile Include="src\Grid.cpp" />
     <ClCompile Include="src\KeySequence.cpp" />
     <ClCompile Include="src\Outline.cpp" />
     <ClCompile Include="src\MessageDialogCfg.cpp" />
