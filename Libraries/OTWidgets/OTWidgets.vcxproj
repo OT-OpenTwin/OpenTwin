@@ -139,7 +139,6 @@
   <ItemGroup>
     <ClInclude Include="include\OTWidgets\BasicWidgetView.h" />
     <ClInclude Include="include\OTWidgets\ColorStyle.h" />
-    <ClInclude Include="include\OTWidgets\ColorStyleTypes.h" />
     <ClInclude Include="include\OTWidgets\ColorStyleValue.h" />
     <QtMoc Include="include\OTWidgets\GlobalColorStyle.h" />
     <ClInclude Include="include\OTWidgets\ComboBox.h" />

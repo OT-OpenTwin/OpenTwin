@@ -14,7 +14,7 @@
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/DoubleSpinBox.h"
-#include "OTWidgets/ColorStyleTypes.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/ColorPickButton.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/Painter2DPreview.h"

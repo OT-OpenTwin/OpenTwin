@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTWidgets/Splitter.h"
-#include "OTWidgets/ColorStyleTypes.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 
 ot::Splitter::Splitter(QWidget* _parent) 

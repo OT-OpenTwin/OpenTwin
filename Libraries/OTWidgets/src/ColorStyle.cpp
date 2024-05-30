@@ -7,7 +7,7 @@
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTWidgets/ColorStyle.h"
-#include "OTWidgets/ColorStyleTypes.h"
+#include "OTGui/ColorStyleTypes.h"
 
 ot::ColorStyle::ColorStyle() {
 

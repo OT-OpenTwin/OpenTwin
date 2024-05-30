@@ -20,7 +20,7 @@
 #include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/ImagePreview.h"
-#include "OTWidgets/ColorStyleTypes.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/ColorPickButton.h"
 #include "OTWidgets/BasicWidgetView.h"
 #include "OTWidgets/GlobalColorStyle.h"

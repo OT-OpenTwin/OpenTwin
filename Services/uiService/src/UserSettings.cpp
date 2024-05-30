@@ -3,7 +3,7 @@
 
 #include "OTServiceFoundation/SettingsData.h"
 #include "OTCore/OTAssert.h"
-#include "OTWidgets/ColorStyleTypes.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 
 #include <akAPI/uiAPI.h>

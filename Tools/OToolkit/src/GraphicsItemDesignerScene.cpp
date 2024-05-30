@@ -10,7 +10,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTWidgets/GraphicsScene.h"
-#include "OTWidgets/ColorStyleTypes.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/GraphicsEllipseItem.h"
 

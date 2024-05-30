@@ -440,9 +440,6 @@
     <ClInclude Include="include\OTWidgets\ColorStyle.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\ColorStyleTypes.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\CheckBox.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>

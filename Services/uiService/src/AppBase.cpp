@@ -82,7 +82,7 @@
 #include "OTWidgets/MessageDialog.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/ColorStyleTypes.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GraphicsItemLoader.h"
 #include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/WidgetProperties.h"

@@ -6,7 +6,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTWidgets/GlobalColorStyle.h"
-#include "OTWidgets/ColorStyleTypes.h"
+#include "OTGui/ColorStyleTypes.h"
 
 // Qt header
 #include <QtCore/qdir.h>

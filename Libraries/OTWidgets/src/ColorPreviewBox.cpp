@@ -4,9 +4,9 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/ColorPreviewBox.h"
-#include "OTWidgets/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 
 // Qt header

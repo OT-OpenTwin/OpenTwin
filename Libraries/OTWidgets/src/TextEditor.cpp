@@ -8,7 +8,7 @@
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/PushButton.h"
-#include "OTWidgets/ColorStyleTypes.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/TextEditorSearchPopup.h"
 

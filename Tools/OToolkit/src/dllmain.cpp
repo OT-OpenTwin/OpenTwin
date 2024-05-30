@@ -26,7 +26,7 @@
 #include "OTCore/Logger.h"
 #include "OTCore/OTAssert.h"
 #include "OTWidgets/IconManager.h"
-#include "OTWidgets/ColorStyleTypes.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTCommunication/actionTypes.h"
 

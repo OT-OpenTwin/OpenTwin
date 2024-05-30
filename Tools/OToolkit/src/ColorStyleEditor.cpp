@@ -32,7 +32,7 @@
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/DoubleSpinBox.h"
-#include "OTWidgets/ColorStyleTypes.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyInputInt.h"
 #include "OTWidgets/GlobalColorStyle.h"

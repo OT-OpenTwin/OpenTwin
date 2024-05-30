@@ -9,7 +9,7 @@
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsItem.h"
-#include "OTWidgets/ColorStyleTypes.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/GraphicsConnectionPreviewItem.h"
 

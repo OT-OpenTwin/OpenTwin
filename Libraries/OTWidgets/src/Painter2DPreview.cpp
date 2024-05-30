@@ -8,7 +8,7 @@
 #include "OTGui/Painter2D.h"
 #include "OTGui/Painter2D.h"
 #include "OTWidgets/QtFactory.h"
-#include "OTWidgets/ColorStyleTypes.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/Painter2DPreview.h"
 
