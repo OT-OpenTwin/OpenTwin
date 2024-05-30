@@ -5,11 +5,15 @@
 
 // OToolkit header
 #include "GraphicsItemDesigner.h"
+#include "GraphicsItemDesignerView.h"
+#include "GraphicsItemDesignerScene.h"
 #include "GraphicsItemDesignerItemBase.h"
 #include "GraphicsItemDesignerNavigation.h"
 #include "GraphicsItemDesignerNavigationRoot.h"
 
 // OpenTwin header
+#include "OTCore/Rect.h"
+#include "OTGui/GraphicsGroupItemCfg.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/PropertyGrid.h"
@@ -51,16 +55,13 @@ void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _
 	m_itemsMap.insert_or_assign(itemName, _item);
 
 	// Add to explorer
-	ot::TreeWidgetItemInfo rootInfo;
-	rootInfo.setText(m_rootItem->text(0));
+	ot::TreeWidgetItemInfo rootInfo(m_rootItem->text(0));
 
 	ot::TreeWidgetItemInfo infoNew = _item->createNavigationInformation();
 	rootInfo.addChildItem(infoNew);
 	this->addItem(rootInfo);
 	
-	if (m_rootItem->childCount() == 1) {
-		m_rootItem->setExpanded(true);
-	}
+	if (!m_rootItem->isExpanded()) m_rootItem->setExpanded(true);
 
 	QTreeWidgetItem* newNavigationItem = this->findItem(m_rootItem, { infoNew.text() });
 	OTAssertNullptr(newNavigationItem);
@@ -107,25 +108,73 @@ GraphicsItemDesignerItemBase* GraphicsItemDesignerNavigation::findDesignerItem(c
 	}
 }
 
-ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(void) const {
+ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(void) {
+	using namespace ot;
+
+	const ot::GraphicsItemCfg* oldConfig = nullptr;
+
 	if (m_itemsMap.empty()) {
 		OT_LOG_W("No items to export");
 		return nullptr;
-	}
-
+	} 
+		
 	if (m_rootItems.size() == 1) {
 		// Single item
-		const ot::GraphicsItemCfg* oldConfig = m_rootItems.front()->getGraphicsItem()->getConfiguration();
-		if (!oldConfig) {
-			OT_LOG_E("Item has no config");
-			return nullptr;
-		}
-		return oldConfig->createCopy();
+		oldConfig = m_rootItems.front()->getGraphicsItem()->getConfiguration();
 	}
 	else {
-		// Multiple items (need to group)
+		ot::GraphicsGroupItemCfg* rootGroup = new ot::GraphicsGroupItemCfg;
+		rootGroup->setName(m_rootItem->text(0).toStdString());
+		rootGroup->setGraphicsItemFlags(GraphicsItemCfg::ItemSnapsToGrid | GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemIsMoveable);
+
+		for (GraphicsItemDesignerItemBase* itm : m_rootItems) {
+			const GraphicsItemCfg* oldCfg = itm->getGraphicsItem()->getConfiguration();
+			if (!oldCfg) {
+				OT_LOG_E("Item has no config { \"ItemName\": \"" + itm->getGraphicsItem()->getGraphicsItemName() + "\" }");
+				delete rootGroup;
+				rootGroup = nullptr;
+				return nullptr;
+			}
+			GraphicsItemCfg* newCfg = oldCfg->createCopy();
+			OTAssertNullptr(newCfg);
+			
+			rootGroup->addItem(newCfg);
+		}
+
+		// Check for auto align
+		if (m_designer->getExportConfigFlags() & GraphicsItemDesigner::AutoAlign) {
+			RectD newRect(Point2DD(DBL_MAX, DBL_MAX),Point2DD (DBL_MIN, DBL_MIN));
+			for (GraphicsItemCfg* cfg : rootGroup->getItems()) {
+				if (cfg->getPosition().x() < newRect.getLeft()) newRect.setLeft(cfg->getPosition().x());
+				if (cfg->getPosition().y() < newRect.getTop()) newRect.setTop(cfg->getPosition().y());
+				if (cfg->getPosition().x() > newRect.getRight()) newRect.setRight(cfg->getPosition().x());
+				if (cfg->getPosition().y() > newRect.getBottom()) newRect.setBottom(cfg->getPosition().y());
+			}
+
+			if (!newRect.isValid()) {
+				OT_LOG_E("Invalid item rect");
+				delete rootGroup;
+				rootGroup = nullptr;
+				return nullptr;
+			}
+
+			// Move items
+			for (GraphicsItemCfg* cfg : rootGroup->getItems()) {
+				cfg->setPosition(cfg->getPosition() - newRect.getTopLeft());
+			}
+		}
+
+		oldConfig = rootGroup;
+	}
+
+	if (!oldConfig) {
+		OT_LOG_E("Item has no config");
 		return nullptr;
 	}
+	ot::GraphicsItemCfg* newConfig = oldConfig->createCopy();
+	newConfig->setPosition(ot::Point2DD());
+
+	return newConfig;
 }
 
 void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
@@ -199,4 +248,20 @@ void GraphicsItemDesignerNavigation::forgetItem(GraphicsItemDesignerItemBase* _i
 	}
 
 	m_itemsMap.erase(_item->getNavigationItem()->text(0));
+}
+
+QRectF GraphicsItemDesignerNavigation::calculateDesignerItemRect(void) const {
+	QPointF topLeft(DBL_MIN, DBL_MIN);
+	QPointF bottomRight(DBL_MAX, DBL_MAX);
+	for (GraphicsItemDesignerItemBase* itm : m_rootItems) {
+		ot::GraphicsItem* graphicsItem = itm->getGraphicsItem();
+		OTAssertNullptr(graphicsItem);
+		QGraphicsItem* qGraphicsItem = graphicsItem->getQGraphicsItem();
+		OTAssertNullptr(qGraphicsItem);
+		if (qGraphicsItem->pos().x() > topLeft.x()) topLeft.setX(qGraphicsItem->pos().x());
+		if (qGraphicsItem->pos().y() > topLeft.y()) topLeft.setY(qGraphicsItem->pos().y());
+		if (qGraphicsItem->pos().x() < bottomRight.x()) bottomRight.setX(qGraphicsItem->pos().x());
+		if (qGraphicsItem->pos().y() < bottomRight.y()) bottomRight.setY(qGraphicsItem->pos().y());
+	}
+	return QRectF(topLeft, bottomRight);
 }

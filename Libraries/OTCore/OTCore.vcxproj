@@ -37,6 +37,7 @@
     <ClCompile Include="src\Owner.cpp" />
     <ClCompile Include="src\Point2D.cpp" />
     <ClCompile Include="src\Queue.cpp" />
+    <ClCompile Include="src\Rect.cpp" />
     <ClCompile Include="src\ReturnMessage.cpp" />
     <ClCompile Include="src\ReturnValues.cpp" />
     <ClCompile Include="src\ServiceBase.cpp" />
@@ -54,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\BasicServiceInformation.h" />
+    <ClInclude Include="include\OTCore\Rect.h" />
     <ClInclude Include="include\OTCore\Color.h" />
     <ClInclude Include="include\OTCore\CoreAPIExport.h" />
     <ClInclude Include="include\OTCore\CoreTypes.h" />

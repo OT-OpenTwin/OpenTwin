@@ -90,4 +90,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::NavigationTreeItemFlag);
+OT_ADD_FLAG_FUNCTIONS(ot::NavigationTreeItemFlag)

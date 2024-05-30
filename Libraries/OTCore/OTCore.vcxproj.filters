@@ -10,16 +10,10 @@
     <ClCompile Include="src\Logger.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Point2D.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Queue.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ServiceBase.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Size2D.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\StringHelper.cpp">
@@ -97,6 +91,15 @@
     <ClCompile Include="src\ThisService.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Point2D.cpp">
+      <Filter>src\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Size2D.cpp">
+      <Filter>src\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rect.cpp">
+      <Filter>src\Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -165,12 +168,6 @@
     <ClInclude Include="include\OTCore\PerformanceTests.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\Point2D.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\Point3D.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\Queue.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -178,9 +175,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\ServiceBase.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\Size2D.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\StringHelper.h">
@@ -243,6 +237,18 @@
     <ClInclude Include="include\OTCore\FactoryTemplate.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\Size2D.h">
+      <Filter>include\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Point2D.h">
+      <Filter>include\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Point3D.h">
+      <Filter>include\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Rect.h">
+      <Filter>include\Geometry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -280,6 +286,12 @@
     </Filter>
     <Filter Include="include\GenericDataStruct">
       <UniqueIdentifier>{b61015f7-1e41-4c69-9421-f427c5cc73bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Geometry">
+      <UniqueIdentifier>{56572e02-4cea-49a3-a758-fe0b594fdf3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Geometry">
+      <UniqueIdentifier>{5d7cb18f-7ed2-451e-9db2-d3da422a0bca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

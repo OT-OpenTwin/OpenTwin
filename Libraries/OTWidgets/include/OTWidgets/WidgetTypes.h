@@ -12,16 +12,11 @@
 namespace ot {
 
 	enum WidgetFlag {
+		NoWidgetFlags = 0x00,
 		ApplyFilterOnReturn = 0x01,
 		ApplyFilterOnTextChange = 0x02
 	};
-
-}
-
-namespace ot {
-
 	typedef Flags<WidgetFlag> WidgetFlags;
-
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::WidgetFlag);
+OT_ADD_FLAG_FUNCTIONS(ot::WidgetFlag)

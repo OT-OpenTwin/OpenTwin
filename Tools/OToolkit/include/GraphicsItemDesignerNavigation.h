@@ -40,7 +40,7 @@ public:
 
 	GraphicsItemDesignerItemBase* findDesignerItem(const QString& _itemName) const;
 
-	ot::GraphicsItemCfg* generateConfig(void) const;
+	ot::GraphicsItemCfg* generateConfig(void);
 
 	GraphicsItemDesignerNavigationRoot* getDesignerRootItem(void) const { return m_rootItem; };
 
@@ -53,6 +53,8 @@ protected:
 	void forgetItem(GraphicsItemDesignerItemBase* _item);
 
 private:
+	QRectF calculateDesignerItemRect(void) const;
+	
 	std::list<GraphicsItemDesignerItemBase*> m_rootItems;
 	std::map<QString, GraphicsItemDesignerItemBase*> m_itemsMap;
 	

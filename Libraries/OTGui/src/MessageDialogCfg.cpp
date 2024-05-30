@@ -85,7 +85,7 @@ std::list<std::string> ot::MessageDialogCfg::toStringList(const BasicButtons& _b
 }
 
 ot::MessageDialogCfg::BasicButtons ot::MessageDialogCfg::stringListToButtons(const std::list<std::string>& _buttons) {
-	ot::MessageDialogCfg::BasicButton ret = NoButtons;
+	ot::MessageDialogCfg::BasicButtons ret = NoButtons;
 	for (const std::string& b : _buttons) {
 		ret |= stringToButton(b);
 	}

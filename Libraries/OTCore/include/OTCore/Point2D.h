@@ -11,6 +11,10 @@
 
 namespace ot {
 
+	class Point2D;
+	class Point2DF;
+	class Point2DD;
+
 	//! @class Point2D
 	//! @brief 2D Point with integer values
 	class OT_CORE_API_EXPORT Point2D : public ot::Serializable {
@@ -57,6 +61,10 @@ namespace ot {
 		//! @param _x The X value to set
 		//! @param _y The y value to set
 		void set(int _x, int _y) { m_x = _x; m_y = _y; };
+
+		Point2DF toPoint2DF(void) const;
+
+		Point2DD toPoint2DD(void) const;
 
 	private:
 		int	m_x; //! The current X value
@@ -116,6 +124,10 @@ namespace ot {
 		//! @param _y The y value to set
 		void set(float _x, float _y) { m_x = _x; m_y = _y; };
 
+		Point2D toPoint2D(void) const;
+
+		Point2DD toPoint2DD(void) const;
+
 	private:
 		float m_x; //! The current X value
 		float m_y; //! The current Y value
@@ -173,6 +185,10 @@ namespace ot {
 		//! @param _x The X value to set
 		//! @param _y The y value to set
 		void set(double _x, double _y) { m_x = _x; m_y = _y; };
+
+		Point2D toPoint2D(void) const;
+
+		Point2DF toPoint2DF(void) const;
 
 	private:
 		double m_x; //! The current X value

@@ -41,7 +41,7 @@ void WrappedSquareItem::controlPointsChanged(void) {
 	QPointF p1 = this->getControlPoints().front();
 	QPointF p2 = this->getControlPoints().back();
 
-	QPointF delta = QPointF(std::min(p1.x(), p2.x()), std::min(p1.y(), p2.y()));
+	QPointF topLeft = QPointF(std::min(p1.x(), p2.x()), std::min(p1.y(), p2.y()));
 	QSizeF newSize = QSizeF(
 		std::max(p1.x(), p2.x()) - std::min(p1.x(), p2.x()),
 		std::max(p1.y(), p2.y()) - std::min(p1.y(), p2.y())
@@ -49,7 +49,7 @@ void WrappedSquareItem::controlPointsChanged(void) {
 	newSize.setWidth(std::min(newSize.width(), newSize.height()));
 	newSize.setHeight(newSize.width());
 
-	this->setPos(delta);
+	this->setPos(topLeft);
 	this->setRectangleSize(newSize);
 }
 

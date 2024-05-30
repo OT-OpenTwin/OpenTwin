@@ -300,7 +300,7 @@ namespace ot {
 
 	typedef Flags<LogFlag> LogFlags;
 }
-OT_ADD_FLAG_FUNCTIONS(ot::LogFlag);
+OT_ADD_FLAG_FUNCTIONS(ot::LogFlag)
 
 namespace ot {
 

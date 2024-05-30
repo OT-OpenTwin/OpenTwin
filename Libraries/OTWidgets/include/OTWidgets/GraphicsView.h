@@ -6,8 +6,9 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
+#include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtWidgets/qgraphicsview.h>
@@ -37,6 +38,15 @@ namespace ot {
 		};
 		typedef Flags<GraphicsViewFlag> GraphicsViewFlags;
 
+		enum ViewStateFlag {
+			DefaultState = 0x00,
+			//LeftMousePressedState = 0x0100,
+			MiddleMousePressedState = 0x0200,
+			//RightMousePressedState = 0x0400,
+
+		};
+		typedef ot::Flags<ViewStateFlag> ViewStateFlags;
+
 		GraphicsView(GraphicsScene* _scene = (GraphicsScene*)nullptr);
 		virtual ~GraphicsView();
 
@@ -47,7 +57,7 @@ namespace ot {
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };
 		bool mouseWheelEnabled(void) const { return m_wheelEnabled; };
 
-		const bool getStateChangeInProgress() const { return m_stateChangeInProgress; }
+		const bool getStateChangeInProgress(void) const { return m_stateChangeInProgress; };
 
 		void setGraphicsViewFlag(GraphicsViewFlag _flag, bool _active = true) { m_viewFlags.setFlag(_flag, _active); };
 		void setGraphicsViewFlags(const GraphicsViewFlags& _flags) { m_viewFlags = _flags; };
@@ -113,11 +123,15 @@ namespace ot {
 		std::atomic_bool m_stateChangeInProgress = false;
 		
 		GraphicsViewFlags m_viewFlags;
+		ViewStateFlags m_viewStateFlags;
+
 		std::string m_viewName;
 		GraphicsScene* m_scene;
-		bool m_isPressed;
+		QMargins m_sceneMargins;
+
 		bool m_wheelEnabled;
 		bool m_dropEnabled;
+		
 		QPoint m_lastPanPos;
 
 		std::map<ot::UID, ot::GraphicsItem*> m_items;
@@ -128,6 +142,8 @@ namespace ot {
 		void addConnection(const GraphicsConnectionCfg& _config);
 		bool connectedGraphicItemsExist(const GraphicsConnectionCfg& _config);
 	};
+
 }
 
+OT_ADD_FLAG_FUNCTIONS(ot::GraphicsView::ViewStateFlag)
 OT_ADD_FLAG_FUNCTIONS(ot::GraphicsView::GraphicsViewFlag)

@@ -180,7 +180,7 @@ void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
 
 void ot::GraphicsItem::handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 	ToolTipHandler::hideToolTip();
-	this->m_state &= (~GraphicsItem::HoverState);
+	m_state &= ~(GraphicsItem::HoverState);
 	this->getQGraphicsItem()->update();
 	if (m_highlightItem) {
 		m_highlightItem->handleHoverLeaveEvent(_event);

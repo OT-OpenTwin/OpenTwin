@@ -71,8 +71,9 @@ void ot::GraphicsEllipseItem::paintCustomItem(QPainter* _painter, const QStyleOp
 void ot::GraphicsEllipseItem::setRadius(double _x, double _y) {
 	// Avoid resizing if the size did not change
 	if (_x == m_radiusX && _y == m_radiusY) { return; }
+	this->prepareGeometryChange();
 	m_radiusX = _x;
 	m_radiusY = _y;
-	this->setGeometry(QRectF(this->pos(), QSizeF(m_radiusX * 2., m_radiusY * 2.)).toRect());
+	this->setGeometry(QRectF(this->pos(), QSizeF(m_radiusX * 2., m_radiusY * 2.)));
 	this->raiseEvent(GraphicsItem::ItemResized);
 }

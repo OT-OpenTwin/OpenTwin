@@ -2113,6 +2113,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name,
 	newEditor = new ot::GraphicsViewView;
 	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewIsCentral));
 	newEditor->setGraphicsViewName(_name);
+	newEditor->setGraphicsViewFlag(ot::GraphicsView::ViewManagesSceneRect);
 	newEditor->setDropsEnabled(true);
 	newEditor->getGraphicsScene()->setGridFlags(ot::GraphicsScene::ShowNormalLines | ot::GraphicsScene::AutoScaleGrid);
 	newEditor->getGraphicsScene()->setDefaultGridPen(QPen(QBrush(), .8, Qt::DotLine, Qt::RoundCap));

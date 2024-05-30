@@ -14,6 +14,10 @@ GraphicsItemDesignerPropertyHandler::GraphicsItemDesignerPropertyHandler()
 	: m_propertyGrid(nullptr), m_navigation(nullptr), m_navigationItem(nullptr)
 {}
 
+GraphicsItemDesignerPropertyHandler::~GraphicsItemDesignerPropertyHandler() {
+
+}
+
 void GraphicsItemDesignerPropertyHandler::setPropertyGrid(ot::PropertyGrid* _grid) {
 	OTAssertNullptr(_grid);
 

@@ -9,32 +9,66 @@
 #ifdef OT_OS_64Bit
 
 //! \def OT_ADD_FLAG_FUNCTIONS
-//! \brief Will add the default bitwise operations for the provided bitfield.
-#define OT_ADD_FLAG_FUNCTIONS(___enumName) inline ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return (___enumName)((long long) _lhv | (long long)_rhv); }; \
-inline ___enumName & operator |= (___enumName & _lhv, ___enumName _rhv) { return (_lhv = (___enumName)((long long) _lhv | (long long)_rhv)); }; \
-inline ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return (___enumName)((long long) _lhv & (long long)_rhv); };  \
-inline ___enumName & operator &= (___enumName & _lhv, ___enumName _rhv) { return (_lhv = (___enumName)((long long) _lhv & (long long)_rhv)); };  \
-inline ___enumName operator ~ (___enumName _lhv) { return (___enumName)(~((long long) _lhv)); }; \
-inline bool operator == (___enumName _lhv, const ot::Flags<___enumName>& _rhv) { return ((long long)_lhv == (long long)_rhv.data()); };
+//! \brief Will add the default bitwise operations for the provided 64 bit bitfield.
+//! Use this at the bottom of the file where the enum and flags are defined.
+//! 
+//!		class MyClass {
+//!		public:
+//!			enum MyEnum {
+//!				...
+//!			}
+//!			typedef ot::Flags<MyEnum> MyFlags;
+//!		};
+//! 
+//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum, MyClass::MyFlags)
+//!		
+//! \param ___enumName Full enum name (e.g. ot::EnumName).
+//! \param ___flagsName Full flags name (e.g. ot::FlagsName).
+#define OT_ADD_FLAG_FUNCTIONS(___enumName) inline ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<long long>(_lhv) | static_cast<long long>(_rhv)); }; \
+inline ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<long long>(_lhv) & static_cast<long long>(_rhv)); };  \
+inline ___enumName operator ~ (___enumName _lhv) { return static_cast<___enumName>(~(static_cast<long long>(_lhv))); };
 #else
 //! \def OT_ADD_FLAG_FUNCTIONS
-//! \brief Will add the default bitwise operations for the provided bitfield.
-#define OT_ADD_FLAG_FUNCTIONS(___enumName) inline ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return (___enumName)((long) _lhv | (long)_rhv); }; \
-inline ___enumName & operator |= (___enumName & _lhv, ___enumName _rhv) { return (_lhv = (___enumName)((long) _lhv | (long)_rhv)); }; \
-inline ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return (___enumName)((long) _lhv & (long)_rhv); };  \
-inline ___enumName & operator &= (___enumName & _lhv, ___enumName _rhv) { return (_lhv = (___enumName)((long) _lhv & (long)_rhv)); };  \
-inline ___enumName operator ~ (___enumName _lhv) { return (___enumName)(~((long) _lhv)); }; \
-inline bool operator == (___enumName _lhv, const ot::Flags<___enumName>& _rhv) { return ((long)_lhv == (long)_rhv.data()); };
+//! \brief Will add the default bitwise operations for the provided 32 bit bitfield.
+//! Use this at the bottom of the file where the enum and flags are defined.
+//! 
+//!		class MyClass {
+//!		public:
+//!			enum MyEnum {
+//!				...
+//!			}
+//!			typedef ot::Flags<MyEnum> MyFlags;
+//!		};
+//! 
+//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum, MyClass::MyFlags)
+//!		
+//! \param ___enumName Full enum name (e.g. ot::EnumName).
+//! \param ___flagsName Full flags name (e.g. ot::FlagsName).
+#define OT_ADD_FLAG_FUNCTIONS(___enumName, ___flagsName) inline ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<long>(_lhv) | static_cast<long>(_rhv)); }; \
+inline ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<long>(_lhv) & static_cast<long>(_rhv)); };  \
+inline ___enumName operator ~ (___enumName _lhv) { return static_cast<___enumName>(~(static_cast<long>(_lhv))); };
 #endif
 
 //! \def OT_FRIEND_FLAG_FUNCTIONS
-//! \brief friend the flag functions in case the enum is private or protected.
+//! Use this at the bottom of the file where the enum and flags are defined.
+//! 
+//!		class MyClass {
+//!		private:
+//!			enum MyEnum {
+//!				...
+//!			}
+//!			typedef ot::Flags<MyEnum> MyFlags;
+//! 
+//!			OT_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum, MyClass::MyFlags)
+//!		};
+//! 
+//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum, MyClass::MyFlags)
+//!		
+//! \param ___enumName Full enum name (e.g. ot::EnumName).
+//! \param ___flagsName Full flags name (e.g. ot::FlagsName).
 #define OT_FRIEND_FLAG_FUNCTIONS(___enumName) friend inline ___enumName operator | (___enumName _lhv, ___enumName _rhv); \
-friend inline ___enumName & operator |= (___enumName & _lhv, ___enumName _rhv); \
 friend inline ___enumName operator & (___enumName _lhv, ___enumName _rhv);  \
-friend inline ___enumName & operator &= (___enumName & _lhv, ___enumName _rhv);  \
-friend inline ___enumName operator ~ (___enumName _lhv); \
-friend inline bool operator == (___enumName _lhv, const ot::Flags<___enumName>& _rhv);
+friend inline ___enumName operator ~ (___enumName _lhv);
 
 namespace ot {
 
@@ -70,71 +104,71 @@ namespace ot {
 	public:
 		//! \brief Default constructor.
 		//! Initializes the data with 0.
-		constexpr inline Flags() : m_data{ static_cast<T>(0) } {};
+		inline Flags() : m_data{ static_cast<T>(0) } {};
 
 		//! \brief Assignment constructor.
 		//! \param _initialData Initial data.
-		constexpr inline Flags(T _initialData) : m_data{ _initialData } {}
+		inline Flags(T _initialData) : m_data{ _initialData } {}
 
 		//! \brief Copy constructor.
 		//! \param _other Other flags.
-		constexpr inline Flags(const Flags<T>& _other) : m_data{ _other.data() } {};
+		inline Flags(const Flags<T>& _other) : m_data{ _other.data() } {};
 
 		//! @brief Returns a copy of the data
-		constexpr inline T data(void) const { return m_data; };
+		inline T data(void) const { return m_data; };
 
 		//! @brief Replace the current data
 		//! @param _data The data that should be replaced with
-		constexpr inline void set(T _data) { m_data = _data; };
+		inline void set(T _data) { m_data = _data; };
 
 		//! @brief Set the provided flag
 		//! @param _flag The flag to set
-		constexpr inline void setFlag(T _flag) { m_data |= _flag; };
+		inline void setFlag(T _flag) { m_data = m_data | _flag; };
 
 		//! @brief Set or remove the provided flag
 		//! @param _flag The flag to set
 		//! @param _flagIsSet If true the flag will be set, otherwise removed
-		constexpr inline void setFlag(T _flag, bool _flagIsSet) {
-			if (_flagIsSet) { m_data |= _flag; }
-			else { m_data &= (~_flag); }
+		inline void setFlag(T _flag, bool _flagIsSet) {
+			if (_flagIsSet) { m_data = m_data | _flag; }
+			else { m_data = m_data & (~_flag); }
 		};
 
 		//! @brief Remove the provided flag
 		//! @param _flag The flag to remove
-		constexpr inline void removeFlag(T _flag) { m_data &= (~_flag); };
+		inline void removeFlag(T _flag) { m_data = m_data & (~_flag); };
 
 		//! @brief Returns true if the provided flag is set
 		//! @param _flag the flag that should be checked
-		constexpr inline bool flagIsSet(T _flag) const { return (m_data & _flag); };
+		inline bool flagIsSet(T _flag) const { return (m_data & _flag); };
 
 		//! \brief Operator T is used to assign the Flags to a enum variable with the same type that is managed by Flags.
-		constexpr inline operator T(void) const { return m_data; };
+		inline operator T(void) const { return m_data; };
 
 		//! \brief Returns true if at least one flag is set (assuming 0 = no flags).
-		constexpr inline operator bool(void) const { return (bool)m_data; };
+		inline operator bool(void) const { return (bool)m_data; };
 
-		constexpr inline Flags<T>& operator = (T _data) { m_data = _data; return *this; };
-		constexpr inline Flags<T>& operator = (const Flags<T>& _other) { m_data = _other.m_data; return *this; };
+		inline Flags<T>& operator = (T _flag) { m_data = _flag; return *this; };
+		inline Flags<T>& operator = (const Flags<T>& _other) { m_data = _other.m_data; return *this; };
 
-		constexpr inline Flags<T> operator | (T _data) const { return Flags<T>{ m_data | _data }; };
-		constexpr inline Flags<T> operator | (const Flags<T>& _other) const { return Flags<T>{ _other.m_data | m_data }; };
+		inline Flags<T> operator | (T _flag) const { return Flags<T>{ m_data | _flag }; };
+		inline Flags<T> operator | (const Flags<T>& _other) const { return Flags<T>{ _other.m_data | m_data }; };
 
-		constexpr inline Flags<T> operator & (T _data) const { return Flags<T>{ m_data & _data }; };
-		constexpr inline Flags<T> operator & (const Flags<T>& _other) const { return Flags<T>{ _other.m_data & m_data }; };
+		inline Flags<T> operator & (T _flag) const { return Flags<T>{ m_data & _flag }; };
+		inline Flags<T> operator & (const Flags<T>& _other) const { return Flags<T>{ _other.m_data & m_data }; };
 
-		constexpr inline Flags<T>& operator |= (T _data) { m_data |= _data; return *this; };
-		constexpr inline Flags<T>& operator |= (const Flags<T>& _other) { m_data |= _other.m_data; return *this; };
+		inline Flags<T>& operator |= (T _flag) { m_data = m_data | _flag; return *this; };
+		inline Flags<T>& operator |= (const Flags<T>& _other) { m_data = m_data | _other.m_data; return *this; };
 
-		constexpr inline Flags<T>& operator &= (T _data) { m_data &= _data; return *this; };
-		constexpr inline Flags<T>& operator &= (const Flags<T>& _other) { m_data &= _other.m_data; return *this; };
+		inline Flags<T>& operator &= (T _flag) { m_data = m_data & _flag; return *this; };
+		inline Flags<T>& operator &= (const Flags<T>& _other) { m_data = m_data & _other.m_data; return *this; };
 
-		constexpr inline Flags<T> operator ~(void) { return Flags<T>{ ~m_data }; };
+		inline Flags<T> operator ~(void) const { return Flags<T>{ ~m_data }; };
 
-		constexpr inline bool operator == (T _data) const { return m_data == _data; };
-		constexpr inline bool operator == (const Flags<T>& _other) const { return m_data == _other.m_data; };
+		inline bool operator == (T _flag) const { return m_data == _flag; };
+		inline bool operator == (const Flags<T>& _other) const { return m_data == _other.m_data; };
 
-		constexpr inline bool operator != (T _data) const { return m_data != _data; };
-		constexpr inline bool operator != (const Flags<T>& _other) const { return m_data != _other.m_data; };
+		inline bool operator != (T _flag) const { return m_data != _flag; };
+		inline bool operator != (const Flags<T>& _other) const { return m_data != _other.m_data; };
 	};
 
 }

@@ -39,7 +39,7 @@ class GraphicsItemDesignerPropertyHandler : public QObject {
 	OT_DECL_NOCOPY(GraphicsItemDesignerPropertyHandler)
 public:
 	GraphicsItemDesignerPropertyHandler();
-	virtual ~GraphicsItemDesignerPropertyHandler() {};
+	virtual ~GraphicsItemDesignerPropertyHandler();
 
 	void setNavigation(GraphicsItemDesignerNavigation* _navigation) { m_navigation = _navigation; };
 	GraphicsItemDesignerNavigation* getNavigation(void) const { return m_navigation; };

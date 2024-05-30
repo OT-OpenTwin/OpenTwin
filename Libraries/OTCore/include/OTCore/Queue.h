@@ -25,16 +25,18 @@ namespace ot {
 			NoDelete    = 0x03, //! @brief Creator keeps ownership. Data object won't be deleted when the queue will perform its garbage collection clear (overrides all)
 			Multiuse    = 0x04  //! @brief Must be set if the object is passed to the queue multilple times (a requeue does not count as multiuse)
 		};
+		typedef Flags<CleanupFlag> CleanupFlags;
 				
 		QueueDestroyableObject() : m_cleanupFlags(DeleteAtEnd) {};
 		QueueDestroyableObject(CleanupFlag _cleanupFlags) : m_cleanupFlags(_cleanupFlags) {};
 		virtual ~QueueDestroyableObject() {};
 
-		void setCleanupFlags(CleanupFlag _flags) { m_cleanupFlags = _flags; };
-		CleanupFlag cleanupFlags(void) const { return m_cleanupFlags; };
+		void setCleanupFlag(CleanupFlag _flag, bool _active = true) { m_cleanupFlags.setFlag(_flag, _active); };
+		void setCleanupFlags(const CleanupFlags& _flags) { m_cleanupFlags = _flags; };
+		const CleanupFlags& cleanupFlags(void) const { return m_cleanupFlags; };
 
 	private:
-		CleanupFlag m_cleanupFlags;
+		CleanupFlags m_cleanupFlags;
 
 		QueueDestroyableObject(const QueueDestroyableObject&) = delete;
 		QueueDestroyableObject& operator = (const QueueDestroyableObject&) = delete;
@@ -90,8 +92,8 @@ namespace ot {
 	};
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::QueueDestroyableObject::CleanupFlag);
-OT_ADD_FLAG_FUNCTIONS(ot::QueueObject::QueueResultFlag);
+OT_ADD_FLAG_FUNCTIONS(ot::QueueDestroyableObject::CleanupFlag)
+OT_ADD_FLAG_FUNCTIONS(ot::QueueObject::QueueResultFlag)
 
 namespace ot {	
 

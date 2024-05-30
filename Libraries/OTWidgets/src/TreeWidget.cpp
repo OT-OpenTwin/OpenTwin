@@ -13,6 +13,10 @@
 
 ot::TreeWidgetItemInfo::TreeWidgetItemInfo() : m_flags(ot::NoNavigationTreeItemFlags) {}
 
+ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const QString& _text, const QIcon& _icon, const NavigationTreeItemFlags& _flags)
+	: m_text(_text), m_icon(_icon), m_flags(_flags)
+{}
+
 ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const NavigationTreeItem& _config)
 	: m_text(QString::fromStdString(_config.text())), m_flags(_config.flags())
 {
@@ -39,6 +43,11 @@ ot::TreeWidgetItemInfo& ot::TreeWidgetItemInfo::operator = (const TreeWidgetItem
 	m_flags = _other.m_flags;
 	m_childs = _other.m_childs;
 	return *this;
+}
+
+ot::TreeWidgetItemInfo& ot::TreeWidgetItemInfo::addChildItem(const QString& _text, const QIcon& _icon, const NavigationTreeItemFlags& _flags) {
+	m_childs.push_back(TreeWidgetItemInfo(_text, _icon, _flags));
+	return m_childs.back();
 }
 
 void ot::TreeWidgetItemInfo::addChildItem(const TreeWidgetItemInfo& _info) {

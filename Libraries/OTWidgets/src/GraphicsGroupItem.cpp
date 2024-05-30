@@ -38,7 +38,7 @@ bool ot::GraphicsGroupItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		return false;
 	}
 
-	for (GraphicsItemCfg* i : cfg->items()) {
+	for (GraphicsItemCfg* i : cfg->getItems()) {
 		OTAssertNullptr(i);
 
 		ot::GraphicsItem* itm = ot::GraphicsItemFactory::instance().itemFromConfig(i);

@@ -41,7 +41,7 @@ namespace ot {
 		void addItem(ot::GraphicsItemCfg* _item) { m_items.push_back(_item); };
 
 		//! @brief Returns a list with all items in the group
-		const std::list<GraphicsItemCfg*>& items(void) const { return m_items; };
+		const std::list<GraphicsItemCfg*>& getItems(void) const { return m_items; };
 
 	private:
 		void memClear(void);

@@ -23,6 +23,7 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT TreeWidgetItemInfo {
 	public:
 		TreeWidgetItemInfo();
+		TreeWidgetItemInfo(const QString& _text, const QIcon& _icon = QIcon(), const NavigationTreeItemFlags& _flags = NavigationTreeItemFlags());
 		TreeWidgetItemInfo(const NavigationTreeItem& _config);
 		TreeWidgetItemInfo(const TreeWidgetItemInfo& _other);
 		virtual ~TreeWidgetItemInfo();
@@ -39,6 +40,7 @@ namespace ot {
 		void setFlags(const NavigationTreeItemFlags _flags) { m_flags = _flags; };
 		NavigationTreeItemFlags flags(void) const { return m_flags; };
 
+		ot::TreeWidgetItemInfo& addChildItem(const QString& _text, const QIcon& _icon = QIcon(), const NavigationTreeItemFlags& _flags = NavigationTreeItemFlags());
 		void addChildItem(const TreeWidgetItemInfo& _info);
 		void setChildItems(const std::list<TreeWidgetItemInfo>& _childs) { m_childs = _childs; };
 		const std::list<TreeWidgetItemInfo>& childItems(void) const { return m_childs; };

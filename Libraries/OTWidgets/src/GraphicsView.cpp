@@ -19,8 +19,8 @@
 #include <QtWidgets/qgraphicsproxywidget.h>
 
 ot::GraphicsView::GraphicsView(GraphicsScene* _scene) 
-	: m_scene(_scene), m_isPressed(false), m_wheelEnabled(true), m_dropEnabled(false), m_stateChangeInProgress(false),
-	m_viewFlags(NoViewFlags)
+	: m_scene(_scene), m_wheelEnabled(true), m_dropEnabled(false), m_stateChangeInProgress(false),
+	m_viewFlags(NoViewFlags), m_viewStateFlags(DefaultState)
 {
 	if (!m_scene) m_scene = new GraphicsScene(this);
 
@@ -42,7 +42,7 @@ void ot::GraphicsView::resetView(void) {
 	if (s == nullptr) return;
 	QRectF boundingRect = s->itemsBoundingRect();
 	if (m_viewFlags & ViewManagesSceneRect) {
-		this->setSceneRect(QRectF());
+		this->setSceneRect(m_scene->itemsBoundingRect().marginsAdded(QMargins(100, 100, 100, 100)));
 	}
 	int w = boundingRect.width();
 	int h = boundingRect.height();
@@ -56,7 +56,7 @@ void ot::GraphicsView::fitInCurrentView(void) {
 	if (s == nullptr) return;
 	QRectF boundingRect = s->itemsBoundingRect();
 	if (m_viewFlags & ViewManagesSceneRect) {
-		this->setSceneRect(boundingRect);
+		this->setSceneRect(m_scene->itemsBoundingRect().marginsAdded(QMargins(100, 100, 100, 100)));
 	}
 	this->fitInView(boundingRect, Qt::AspectRatioMode::KeepAspectRatio);
 	this->centerOn(boundingRect.center());
@@ -133,8 +133,11 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	_item->getRootItem()->getQGraphicsItem()->setZValue(1);
 	_item->setGraphicsScene(m_scene);
 
-	if (removeConnectionBufferApplied)
-	{
+	if (m_scene->getGridSnapEnabled() && (m_scene->getGridStepSize() > 0)) {
+		_item->getQGraphicsItem()->setPos(m_scene->snapToGrid(_item->getQGraphicsItem()->pos()));
+	}
+
+	if (removeConnectionBufferApplied) {
 		for (const GraphicsConnectionCfg& bufferedConnection : m_itemRemovalConnectionBuffer) {
 			addConnection(bufferedConnection);
 		}
@@ -142,15 +145,12 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	}
 
 	auto currentConnection = m_connectionCreationBuffer.begin();
-	while (currentConnection !=  m_connectionCreationBuffer.end())
-	{
+	while (currentConnection !=  m_connectionCreationBuffer.end()) {
 		const bool connectionCreated = addConnectionIfConnectedItemsExist(*currentConnection);
-		if (connectionCreated)
-		{
+		if (connectionCreated) {
 			currentConnection =	m_connectionCreationBuffer.erase(currentConnection);
 		}
-		else
-		{
+		else {
 			currentConnection++;
 		}
 	}
@@ -322,7 +322,7 @@ void ot::GraphicsView::mousePressEvent(QMouseEvent* _event)
 	if (_event->button() == Qt::MiddleButton) {
 		this->viewport()->setCursor(Qt::ClosedHandCursor);
 		m_lastPanPos = _event->pos();
-		m_isPressed = true;
+		m_viewStateFlags |= MiddleMousePressedState;
 	}
 }
 
@@ -331,14 +331,14 @@ void ot::GraphicsView::mouseReleaseEvent(QMouseEvent* _event)
 	QGraphicsView::mouseReleaseEvent(_event);
 
 	if (_event->button() == Qt::MiddleButton) {
-		m_isPressed = false;
+		m_viewStateFlags &= (~MiddleMousePressedState);
 		this->viewport()->setCursor(Qt::CrossCursor);
 	}
 }
 
 void ot::GraphicsView::mouseMoveEvent(QMouseEvent* _event)
 {
-	if (m_isPressed) {
+	if (m_viewStateFlags & MiddleMousePressedState) {
 		this->horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (_event->x() - m_lastPanPos.x()));
 		this->verticalScrollBar()->setValue(verticalScrollBar()->value() - (_event->y() - m_lastPanPos.y()));
 		m_lastPanPos = _event->pos();

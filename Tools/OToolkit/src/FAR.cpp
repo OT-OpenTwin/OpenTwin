@@ -660,7 +660,7 @@ void FAR::slotFindText(void) {
 
 	this->slotLock();
 
-	FARFilter::FilterFlag textFilter = FARFilter::NoFlags;
+	FARFilter::FilterFlags textFilter = FARFilter::NoFlags;
 	if (m_findTextCaseSensitive->isChecked()) textFilter |= FARFilter::CheckCase;
 	if (m_findTextStartsWith->isChecked()) textFilter |= FARFilter::StartsWith;
 	if (m_findTextContains->isChecked()) textFilter |= FARFilter::Contains;
@@ -677,7 +677,7 @@ void FAR::slotReplaceText(void) {
 
 	this->slotLock();
 
-	FARFilter::FilterFlag textFilter = FARFilter::Contains;
+	FARFilter::FilterFlags textFilter = FARFilter::Contains;
 	if (m_replaceTextCaseSensitive->isChecked()) textFilter |= FARFilter::CheckCase;
 
 	std::thread t(&FAR::workerReplaceText, this, m_rootDir->text(), m_replaceText->text(), m_replaceWithText->text(), textFilter, filter);
@@ -704,7 +704,7 @@ void FAR::setupFilter(FARFilter& _filter) const {
 }
 
 FARFilter::FilterFlags FAR::filterFlagsFromGroup(const FilterGroup& _group) const {
-	FARFilter::FilterFlag flags = FARFilter::NoFlags;
+	FARFilter::FilterFlags flags = FARFilter::NoFlags;
 	if (_group.checkCase->isChecked()) flags |= FARFilter::CheckCase;
 	if (_group.starts->isChecked()) flags |= FARFilter::StartsWith;
 	if (_group.contains->isChecked()) flags |= FARFilter::Contains;
