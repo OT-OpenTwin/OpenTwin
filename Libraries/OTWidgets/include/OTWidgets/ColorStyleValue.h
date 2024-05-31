@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTCore/Color.h"
 #include "OTCore/Serializable.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -48,8 +49,8 @@ namespace ot {
 
 		// Setter/Getter
 
-		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& name(void) const { return m_name; };
+		void setEntryKey(ColorStyleValueEntry _key) { m_entryKey = _key; };
+		ColorStyleValueEntry getEntryKey(void) const { return m_entryKey; };
 
 		QString qss(void) const;
 		QColor color(void) const;
@@ -65,7 +66,7 @@ namespace ot {
 		void setColor(Color _color);
 
 	private:
-		std::string m_name;
+		ColorStyleValueEntry m_entryKey;
 		Painter2D* m_painter;
 	};
 

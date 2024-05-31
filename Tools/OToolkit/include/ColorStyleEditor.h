@@ -9,6 +9,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/Color.h"
 #include "OTGui/PropertyGridCfg.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OToolkitAPI/Tool.h"
 
 // Qt header
@@ -80,22 +81,14 @@ private:
 	ot::PropertyGridCfg m_propertyGridConfig;
 
 	ot::PropertyString* m_nameProp;
-	ot::PropertyGroup* m_styleFilesGroup;
-	ot::PropertyGroup* m_styleIntGroup;
-	ot::PropertyGroup* m_styleDoubleGroup;
-	ot::PropertyGroup* m_styleValuesGroup;
+	ot::PropertyGroup* m_painterGroup;
 	ot::PropertyGroup* m_intGroup;
 	ot::PropertyGroup* m_doubleGroup;
-	ot::PropertyGroup* m_colorsGroup;
 	ot::PropertyGroup* m_fileGroup;
-	std::map<std::string, ot::PropertyString*> m_styleFiles;
-	std::map<std::string, ot::PropertyInt*> m_styleInts;
-	std::map<std::string, ot::PropertyDouble*> m_styleDoubles;
-	std::map<std::string, ot::PropertyPainter2D*> m_styleValues;
-	std::map<std::string, ot::PropertyPainter2D*> m_colors;
-	std::map<std::string, ot::PropertyString*> m_files;
+	std::map<std::string, ot::PropertyPainter2D*> m_painters;
 	std::map<std::string, ot::PropertyInt*> m_integer;
 	std::map<std::string, ot::PropertyDouble*> m_double;
+	std::map<std::string, ot::PropertyString*> m_files;
 
 	void selectStyleSheetBase(void);
 	void initializeStyleSheetBase(void);

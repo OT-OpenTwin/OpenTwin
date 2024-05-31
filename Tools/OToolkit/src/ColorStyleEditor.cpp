@@ -52,68 +52,32 @@
 #include <QtWidgets/qfiledialog.h>
 
 #define CSE_GROUP_General "General"
-#define CSE_GROUP_StyleFiles "Style Files"
-#define CSE_GROUP_StyleInt "Style Integer Numbers"
-#define CSE_GROUP_StyleDouble "Style Decimal Numbers"
-#define CSE_GROUP_StyleValues "Style Values"
+#define CSE_GROUP_Files "Files"
+#define CSE_GROUP_Painter "Painter"
 #define CSE_GROUP_Int "Integer Numbers"
 #define CSE_GROUP_Double "Decimal Numbers"
-#define CSE_GROUP_StyleSheetFiles "Style Sheet Files"
-#define CSE_GROUP_StyleSheetColors "Style Sheet Colors"
 
 #define CSE_Name "Name"
 
 #define CSE_TAB_Base "Base"
 #define CSE_TAB_Generated "Generated"
 
-#define CSE_COLOR_BorderColor "Border Color"
-#define CSE_COLOR_LightBorderColor "Light Border Color"
-#define CSE_COLOR_BorderDisabledColor "Border Disabled Color"
-#define CSE_COLOR_BorderHoverColor "Border Hover Color"
-#define CSE_COLOR_BorderSelectionColor "Border Selection Color"
-#define CSE_COLOR_HeaderBackground "Header Background"
-#define CSE_COLOR_HeaderHoverForeground "Header Hover Foreground"
-#define CSE_COLOR_HeaderSelectionBackground "Header Selection Background"
-#define CSE_COLOR_InputBackground "Input Background"
-#define CSE_COLOR_WidgetAlternateBackground "Widget Alternate Background"
-#define CSE_COLOR_WidgetForeground "Widget Foreground"
-#define CSE_COLOR_WidgetBackground "Widget Background"
-#define CSE_COLOR_WidgetDisabledBackground "Widget Disabled Background"
-#define CSE_COLOR_WidgetDisabledForeground "Widget Disabled Foreground"
-#define CSE_COLOR_WidgetHoverBackground "Widget Hover Background"
-#define CSE_COLOR_WidgetHoverForeground "Widget Hover Foreground"
-#define CSE_COLOR_WidgetSelectionBackground "Widget Selection Background"
-#define CSE_COLOR_WidgetSelectionForeground "Widget Selection Foreground"
-#define CSE_COLOR_WindowBackground "Window Background"
-#define CSE_COLOR_WindowForeground "Window Foreground"
-#define CSE_COLOR_DialogBackground "Dialog Background"
-#define CSE_COLOR_DialogForeground "Dialog Foreground"
-#define CSE_COLOR_TitleBorderColor "Title Border Color"
-#define CSE_COLOR_TitleBackground "Title Background"
-#define CSE_COLOR_TitleForeground "Title Foreground"
-#define CSE_COLOR_TTBFirstTabBackground "TabToolBar First Tab Background"
-#define CSE_COLOR_TTBFirstTabForeground "TabToolBar First Tab Foreground"
-#define CSE_COLOR_ErrorForeground "Error Foreground"
-
-#define CSE_FILE_LogInBackgroundImage "Log In Background Image"
-
-#define CSE_INT_SplitterHandleWidth "Splitter Handle Width"
-#define CSE_INT_SplitterBorderRadius "Splitter Border Radius"
-
-#define CSE_NUMBER_BorderRadius_Big "Border Radius Big"
-#define CSE_NUMBER_BorderRadius_Small "Border Radius Small"
-#define CSE_NUMBER_OpacityTooltip "Opacity ToolTip"
-
 ColorStyleEditor::ColorStyleEditor() {
 
 }
 
 ColorStyleEditor::~ColorStyleEditor() {
-	for (const auto& f : m_styleFiles) {
+	for (const auto& p : m_painters) {
+		delete p.second;
+	}
+	for (const auto& f : m_files) {
 		delete f.second;
 	}
-	for (const auto& p : m_styleValues) {
-		delete p.second;
+	for (const auto& i : m_integer) {
+		delete i.second;
+	}
+	for (const auto& d : m_double) {
+		delete d.second;
 	}
 }
 
@@ -140,16 +104,12 @@ bool ColorStyleEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content
 	m_nameProp = new PropertyString(CSE_Name, std::string());
 	generalGroup->addProperty(m_nameProp);
 	generalGroup->addProperty(new PropertyStringList("xxx", "Test", std::list<std::string>({ "Test", "Other" })));
-	m_styleFilesGroup = new PropertyGroup(CSE_GROUP_StyleFiles);
-	m_styleIntGroup = new PropertyGroup(CSE_GROUP_StyleInt);
-	m_styleDoubleGroup = new PropertyGroup(CSE_GROUP_StyleDouble);
-	m_styleValuesGroup = new PropertyGroup(CSE_GROUP_StyleValues);
+	m_painterGroup = new PropertyGroup(CSE_GROUP_Painter);
 	m_intGroup = new PropertyGroup(CSE_GROUP_Int);
 	m_doubleGroup = new PropertyGroup(CSE_GROUP_Double);
-	m_colorsGroup = new PropertyGroup(CSE_GROUP_StyleSheetColors);
-	m_fileGroup = new PropertyGroup(CSE_GROUP_StyleSheetFiles);
+	m_fileGroup = new PropertyGroup(CSE_GROUP_Files);
 
-	m_propertyGridConfig.setRootGroups({ generalGroup, m_styleFilesGroup, m_styleIntGroup, m_styleDoubleGroup, m_styleValuesGroup, m_intGroup, m_doubleGroup, m_colorsGroup, m_fileGroup });
+	m_propertyGridConfig.setRootGroups({ generalGroup, m_painterGroup, m_intGroup, m_doubleGroup, m_fileGroup });
 
 	m_editor = new ot::TextEditor;
 	m_editor->setReadOnly(true);
@@ -209,10 +169,10 @@ bool ColorStyleEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content
 		this->slotGenerate();
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_E(_e.what());
+		OT_LOG_EAS(_e.what());
 	}
 	catch (...) {
-		OT_LOG_E("Unknown error");
+		OT_LOG_EAS("Unknown error");
 	}
 	
 	QShortcut* generateAndApplyTree = new QShortcut(QKeySequence("Ctrl+Shift+B"), m_propertyGrid, this, &ColorStyleEditor::slotGenerateAndApply);
@@ -310,7 +270,7 @@ void ColorStyleEditor::slotExport(void) {
 
 	QFile file(fileName);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-		OT_LOG_E("Failed to open file for writing: \"" + fileName.toStdString() + "\"");
+		OT_LOG_EAS("Failed to open file for writing: \"" + fileName.toStdString() + "\"");
 		return;
 	}
 
@@ -336,7 +296,7 @@ bool ColorStyleEditor::slotExportBase(void) {
 
 	QFile file(m_lastBaseFile);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-		OT_LOG_E("Failed to open file for writing. File: \"" + m_lastBaseFile.toStdString() + "\"");
+		OT_LOG_EAS("Failed to open file for writing. File: \"" + m_lastBaseFile.toStdString() + "\"");
 		return false;
 	}
 
@@ -367,23 +327,23 @@ void ColorStyleEditor::selectStyleSheetBase(void) {
 
 void ColorStyleEditor::initializeStyleSheetBase(void) {
 	if (m_lastBaseFile.isEmpty()) {
-		OT_LOG_E("No style sheet base file selected");
+		OT_LOG_EAS("No style sheet base file selected");
 		return;
 	}
 	QFile templateFile(m_lastBaseFile);
 	if (!templateFile.exists()) {
-		OT_LOG_E("Style sheet base file does not exist");
+		OT_LOG_EAS("Style sheet base file does not exist");
 		return;
 	}
 	if (!templateFile.open(QIODevice::ReadOnly)) {
-		OT_LOG_E("Failed to open style sheet base file for reading");
+		OT_LOG_EAS("Failed to open style sheet base file for reading");
 		return;
 	}
 	QByteArray sheetBase = templateFile.readAll();
 	templateFile.close();
 
 	if (sheetBase.isEmpty()) {
-		OT_LOG_E("Style sheet base file is empty");
+		OT_LOG_EAS("Style sheet base file is empty");
 		return;
 	}
 
@@ -391,14 +351,10 @@ void ColorStyleEditor::initializeStyleSheetBase(void) {
 }
 
 void ColorStyleEditor::cleanUpData(void) {
-	m_styleFiles.clear();
-	m_styleInts.clear();
-	m_styleDoubles.clear();
-	m_styleValues.clear();
-	m_colors.clear();
-	m_files.clear();
+	m_painters.clear();
 	m_integer.clear();
 	m_double.clear();
+	m_files.clear();
 }
 
 void ColorStyleEditor::initializeBrightStyleValues(void) {
@@ -406,31 +362,51 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	// Clean up data
 	this->cleanUpData();
 
-	m_nameProp->setValue(OT_COLORSTYLE_NAME_Bright);
+	m_nameProp->setValue(ot::toString(ot::ColorStyleName::BrightStyle));
 
-	// Initialize default style files
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyItemDelete, new PropertyString("/properties/Delete.png"));
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupExpanded, new PropertyString("/properties/ArrowGreenDown.png"));
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupCollapsed, new PropertyString("/properties/ArrowBlueRight.png"));
+	// Initialize painters
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Border), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderLight), new PropertyPainter2D(new FillPainter2D(ot::DarkGray)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderDisabled), new PropertyPainter2D(new FillPainter2D(ot::Gray)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderHover), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderSelection), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
 
-	// Initialize default style integers
-	m_styleInts.insert_or_assign(OT_COLORSTYLE_INT_SplitterHandleWidth, new PropertyInt(2));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderBackground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderHoverBackground), new PropertyPainter2D(new FillPainter2D(Color(White))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderHoverForeground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderSelectionBackground), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderSelectionForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 
-	// Initialize default style values
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsDisabledBackground, new PropertyPainter2D(new FillPainter2D(Color(230, 230, 230))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedBackground, new PropertyPainter2D(new FillPainter2D(ot::Lime)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowBackground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBorderColor, new PropertyPainter2D(new FillPainter2D(ot::DarkGray)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color(215, 215, 215))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ErrorForeground, new PropertyPainter2D(new FillPainter2D(ot::Red)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TextEditHighlight, new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetAlternateBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetBackground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetDisabledBackground), new PropertyPainter2D(new FillPainter2D(Color(230, 230, 230))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetDisabledForeground), new PropertyPainter2D(new FillPainter2D(ot::DarkGray)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetHoverBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetHoverForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetSelectionBackground), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetSelectionForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WindowBackground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WindowForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::DialogBackground), new PropertyPainter2D(new FillPainter2D(Color(240, 240, 240))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::DialogForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleBorder), new PropertyPainter2D(new FillPainter2D(ot:: Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
 
 	LinearGradientPainter2D* tehb = new LinearGradientPainter2D;
 	tehb->setStart(Point2DD(0.5, 0.));
@@ -441,47 +417,95 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	tehb->addStop(GradientPainterStop2D(0.98, Color(ot::White)));
 	tehb->addStop(GradientPainterStop2D(0.99, Color(ot::Gray)));
 	tehb->addStop(GradientPainterStop2D(1., Color(ot::Gray)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TextEditHighlightBorder, new PropertyPainter2D(tehb));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorLineBorder), new PropertyPainter2D(tehb));
 
-	// Initialize default colors
-	m_colors.insert_or_assign(CSE_COLOR_BorderColor, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_LightBorderColor, new PropertyPainter2D(new FillPainter2D(ot::DarkGray)));
-	m_colors.insert_or_assign(CSE_COLOR_BorderDisabledColor, new PropertyPainter2D(new FillPainter2D(ot::Gray)));
-	m_colors.insert_or_assign(CSE_COLOR_BorderHoverColor, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_BorderSelectionColor, new PropertyPainter2D(new FillPainter2D(ot::Lime)));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderBackground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderHoverForeground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderSelectionBackground, new PropertyPainter2D(new FillPainter2D(ot::Lime)));
-	m_colors.insert_or_assign(CSE_COLOR_InputBackground, new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetAlternateBackground, new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetBackground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetDisabledBackground, new PropertyPainter2D(new FillPainter2D(Color(230, 230, 230))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetDisabledForeground, new PropertyPainter2D(new FillPainter2D(ot::DarkGray)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionBackground, new PropertyPainter2D(new FillPainter2D(ot::Lime)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_WindowBackground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_WindowForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_DialogBackground, new PropertyPainter2D(new FillPainter2D(Color(240, 240, 240))));
-	m_colors.insert_or_assign(CSE_COLOR_DialogForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_TitleBorderColor, new PropertyPainter2D(new FillPainter2D(ot:: Black)));
-	m_colors.insert_or_assign(CSE_COLOR_TitleBackground, new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
-	m_colors.insert_or_assign(CSE_COLOR_TitleForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_ErrorForeground, new PropertyPainter2D(new FillPainter2D(ot::Red)));
-	m_colors.insert_or_assign("Test 1", new PropertyPainter2D(new FillPainter2D(ot::Red)));
+	// Double
+	m_double.insert_or_assign(toString(ColorStyleDoubleEntry::BorderWidth), new PropertyDouble(1.));
+	m_double.insert_or_assign(toString(ColorStyleDoubleEntry::BorderRadiusBig), new PropertyDouble(4.));
+	m_double.insert_or_assign(toString(ColorStyleDoubleEntry::BorderRadiusSmall), new PropertyDouble(4.));
+	m_double.insert_or_assign(toString(ColorStyleDoubleEntry::ToolTipOpacity), new PropertyDouble(10.));
 
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_Big, new PropertyDouble(4.));
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_Small, new PropertyDouble(4.));
-	m_double.insert_or_assign(CSE_NUMBER_OpacityTooltip, new PropertyDouble(10.));
+	// Int
+	m_integer.insert_or_assign(toString(ColorStyleIntegerEntry::SplitterBorderRadius), new PropertyInt(2));
+	m_integer.insert_or_assign(toString(ColorStyleIntegerEntry::SplitterHandleWidth), new PropertyInt(2));
 
-	m_integer.insert_or_assign(CSE_INT_SplitterHandleWidth, new PropertyInt(2));
-	m_integer.insert_or_assign(CSE_INT_SplitterBorderRadius, new PropertyInt(2));
+	// File
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TransparentIcon), new PropertyString("/icons/transparent.png"));
+	
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpIcon), new PropertyString("/icons/arrow_up.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpDisabledIcon), new PropertyString("/icons/arrow_up_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpFocusIcon), new PropertyString("/icons/arrow_up_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownIcon), new PropertyString("/icons/arrow_down.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownDisabledIcon), new PropertyString("/icons/arrow_down_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownFocusIcon), new PropertyString("/icons/arrow_down_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftIcon), new PropertyString("/icons/arrow_left.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftDisabledIcon), new PropertyString("/icons/arrow_left_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftFocusIcon), new PropertyString("/icons/arrow_left_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightIcon), new PropertyString("/icons/arrow_right.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightDisabledIcon), new PropertyString("/icons/arrow_right_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightFocusIcon), new PropertyString("/icons/arrow_right_focus.png"));
 
-	m_files.insert_or_assign(CSE_FILE_LogInBackgroundImage, new PropertyString("/images/OpenTwin.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchClosedIcon), new PropertyString("/icons/branch_closed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchClosedFocusIcon), new PropertyString("/icons/branch_closed_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchEndIcon), new PropertyString("/icons/branch_end.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchLineIcon), new PropertyString("/icons/branch_line.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchMoreIcon), new PropertyString("/icons/branch_more.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchOpenIcon), new PropertyString("/icons/branch_open.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchOpenFocusIcon), new PropertyString("/icons/branch_open_focus.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxCheckedIcon), new PropertyString("/icons/checkbox_checked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxCheckedDisabledIcon), new PropertyString("/icons/checkbox_checked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxCheckedFocusIcon), new PropertyString("/icons/checkbox_checked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxCheckedPressedIcon), new PropertyString("/icons/checkbox_checked_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxIndeterminateIcon), new PropertyString("/icons/checkbox_indeterminate.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxIndeterminateDisabledIcon), new PropertyString("/icons/checkbox_indeterminate_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxIndeterminateFocusIcon), new PropertyString("/icons/checkbox_indeterminate_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxIndeterminatePressedIcon), new PropertyString("/icons/checkbox_indeterminate_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxUncheckedIcon), new PropertyString("/icons/checkbox_unchecked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxUncheckedDisabledIcon), new PropertyString("/icons/checkbox_unchecked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxUncheckedFocusIcon), new PropertyString("/icons/checkbox_unchecked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxUncheckedPressedIcon), new PropertyString("/icons/checkbox_unchecked_pressed.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxCheckedIcon), new PropertyString("/icons/log_in_checkbox_checked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxCheckedDisabledIcon), new PropertyString("/icons/log_in_checkbox_checked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxCheckedFocusIcon), new PropertyString("/icons/log_in_checkbox_checked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxCheckedPressedIcon), new PropertyString("/icons/log_in_checkbox_checked_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxIndeterminateIcon), new PropertyString("/icons/log_in_checkbox_indeterminate.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxIndeterminateDisabledIcon), new PropertyString("/icons/log_in_checkbox_indeterminate_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxIndeterminateFocusIcon), new PropertyString("/icons/log_in_checkbox_indeterminate_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxIndeterminatePressedIcon), new PropertyString("/icons/log_in_checkbox_indeterminate_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxUncheckedIcon), new PropertyString("/icons/log_in_checkbox_unchecked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxUncheckedDisabledIcon), new PropertyString("/icons/log_in_checkbox_unchecked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxUncheckedFocusIcon), new PropertyString("/icons/log_in_checkbox_unchecked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxUncheckedPressedIcon), new PropertyString("/icons/log_in_checkbox_unchecked_pressed.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonCheckedIcon), new PropertyString("/icons/radio_checked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonCheckedDisabledIcon), new PropertyString("/icons/radio_checked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonCheckedFocusIcon), new PropertyString("/icons/radio_checked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonUncheckedIcon), new PropertyString("/icons/radio_unchecked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonUncheckedDisabledIcon), new PropertyString("/icons/radio_unchecked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonUncheckedFocusIcon), new PropertyString("/icons/radio_unchecked_focus.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarMoveHorizontalIcon), new PropertyString("/icons/toolbar_move_horizontal.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarMoveVerticalIcon), new PropertyString("/icons/toolbar_move_vertical.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarSeparatorHorizontalIcon), new PropertyString("/icons/toolbar_separator_horizontal.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarSeparatorVerticalIcon), new PropertyString("/icons/toolbar_separator_vertical.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseIcon), new PropertyString("/icons/window_close.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseDisabledIcon), new PropertyString("/icons/window_close_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseFocusIcon), new PropertyString("/icons/window_close_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowClosePressedIcon), new PropertyString("/icons/window_close_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowGripIcon), new PropertyString("/icons/window_grip.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowUndockIcon), new PropertyString("/icons/window_undock.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowUndockDisabledIcon), new PropertyString("/icons/window_undock_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowUndockFocusIcon), new PropertyString("/icons/window_undock_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowUndockPressedIcon), new PropertyString("/icons/window_undock_pressed.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInBackgroundImage), new PropertyString("/images/OpenTwin.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::PropertyItemDeleteIcon), new PropertyString("/properties/Delete.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::PropertyGroupExpandedIcon), new PropertyString("/properties/ArrowGreenDown.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::PropertyGroupCollapsedIcon), new PropertyString("/properties/ArrowBlueRight.png"));
+	
 }
 
 void ColorStyleEditor::initializeDarkStyleValues(void) {
@@ -489,31 +513,51 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	// Clean up data
 	this->cleanUpData();
 
-	m_nameProp->setValue(OT_COLORSTYLE_NAME_Dark);
+	m_nameProp->setValue(ot::toString(ot::ColorStyleName::DarkStyle));
 
-	// Initialize default style files
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyItemDelete, new PropertyString("/properties/Delete.png"));
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupExpanded, new PropertyString("/properties/ArrowGreenDown.png"));
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupCollapsed, new PropertyString("/properties/ArrowBlueRight.png"));
+	// Initialize painters
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Border), new PropertyPainter2D(new FillPainter2D(Color(70, 70, 70))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderLight), new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderDisabled), new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderHover), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderSelection), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
 
-	// Initialize default style integers
-	m_styleInts.insert_or_assign(OT_COLORSTYLE_INT_SplitterHandleWidth, new PropertyInt(2));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderBackground), new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderForeground), new PropertyPainter2D(new FillPainter2D(Color(White))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderHoverBackground), new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderHoverForeground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderSelectionBackground), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderSelectionForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 
-	// Initialize default style values
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsDisabledBackground, new PropertyPainter2D(new FillPainter2D(Color(20, 20, 20))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedBackground, new PropertyPainter2D(new FillPainter2D(ot::Lime)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBorderColor, new PropertyPainter2D(new FillPainter2D(ot::DarkGray)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ErrorForeground, new PropertyPainter2D(new FillPainter2D(ot::Red)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TextEditHighlight, new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputBackground), new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputForeground), new PropertyPainter2D(new FillPainter2D(Color(White))));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetAlternateBackground), new PropertyPainter2D(new FillPainter2D(Color(40, 40, 40))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetBackground), new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetDisabledBackground), new PropertyPainter2D(new FillPainter2D(Color(20, 20, 20))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetDisabledForeground), new PropertyPainter2D(new FillPainter2D(Color(200, 200, 200))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetHoverBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetHoverForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetSelectionBackground), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetSelectionForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WindowBackground), new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WindowForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::DialogBackground), new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::DialogForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleBorder), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleBackground), new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
 
 	LinearGradientPainter2D* tehb = new LinearGradientPainter2D;
 	tehb->setStart(Point2DD(0.5, 0.));
@@ -524,47 +568,94 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	tehb->addStop(GradientPainterStop2D(0.98, Color(Color(30, 30, 30))));
 	tehb->addStop(GradientPainterStop2D(0.99, Color(ot::Gray)));
 	tehb->addStop(GradientPainterStop2D(1., Color(ot::Gray)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TextEditHighlightBorder, new PropertyPainter2D(tehb));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorLineBorder), new PropertyPainter2D(tehb));
 
-	// Initialize default colors
-	m_colors.insert_or_assign(CSE_COLOR_BorderColor, new PropertyPainter2D(new FillPainter2D(Color(70, 70, 70))));
-	m_colors.insert_or_assign(CSE_COLOR_LightBorderColor, new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
-	m_colors.insert_or_assign(CSE_COLOR_BorderDisabledColor, new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
-	m_colors.insert_or_assign(CSE_COLOR_BorderHoverColor, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_BorderSelectionColor, new PropertyPainter2D(new FillPainter2D(ot::Lime)));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderBackground, new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderHoverForeground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderSelectionBackground, new PropertyPainter2D(new FillPainter2D(ot::Lime)));
-	m_colors.insert_or_assign(CSE_COLOR_InputBackground, new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetAlternateBackground, new PropertyPainter2D(new FillPainter2D(Color(40, 40, 40))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetBackground, new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetDisabledBackground, new PropertyPainter2D(new FillPainter2D(Color(20, 20, 20))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetDisabledForeground, new PropertyPainter2D(new FillPainter2D(Color(200, 200, 200))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionBackground, new PropertyPainter2D(new FillPainter2D(ot::Lime)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
-	m_colors.insert_or_assign(CSE_COLOR_WindowForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_DialogBackground, new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
-	m_colors.insert_or_assign(CSE_COLOR_DialogForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_TitleBorderColor, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
-	m_colors.insert_or_assign(CSE_COLOR_TitleForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_ErrorForeground, new PropertyPainter2D(new FillPainter2D(ot::Red)));
-	m_colors.insert_or_assign("Test 1", new PropertyPainter2D(new FillPainter2D(ot::Red)));
+	// Double
+	m_double.insert_or_assign(toString(ColorStyleDoubleEntry::BorderWidth), new PropertyDouble(1.));
+	m_double.insert_or_assign(toString(ColorStyleDoubleEntry::BorderRadiusBig), new PropertyDouble(4.));
+	m_double.insert_or_assign(toString(ColorStyleDoubleEntry::BorderRadiusSmall), new PropertyDouble(4.));
+	m_double.insert_or_assign(toString(ColorStyleDoubleEntry::ToolTipOpacity), new PropertyDouble(10.));
 
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_Big, new PropertyDouble(4.));
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_Small, new PropertyDouble(4.));
-	m_double.insert_or_assign(CSE_NUMBER_OpacityTooltip, new PropertyDouble(10.));
+	// Int
+	m_integer.insert_or_assign(toString(ColorStyleIntegerEntry::SplitterBorderRadius), new PropertyInt(2));
+	m_integer.insert_or_assign(toString(ColorStyleIntegerEntry::SplitterHandleWidth), new PropertyInt(2));
 
-	m_integer.insert_or_assign(CSE_INT_SplitterHandleWidth, new PropertyInt(2));
-	m_integer.insert_or_assign(CSE_INT_SplitterBorderRadius, new PropertyInt(2));
+	// File
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TransparentIcon), new PropertyString("/icons/transparent.png"));
 
-	m_files.insert_or_assign(CSE_FILE_LogInBackgroundImage, new PropertyString("/images/OpenTwin.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpIcon), new PropertyString("/icons/arrow_up.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpDisabledIcon), new PropertyString("/icons/arrow_up_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpFocusIcon), new PropertyString("/icons/arrow_up_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownIcon), new PropertyString("/icons/arrow_down.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownDisabledIcon), new PropertyString("/icons/arrow_down_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownFocusIcon), new PropertyString("/icons/arrow_down_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftIcon), new PropertyString("/icons/arrow_left.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftDisabledIcon), new PropertyString("/icons/arrow_left_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftFocusIcon), new PropertyString("/icons/arrow_left_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightIcon), new PropertyString("/icons/arrow_right.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightDisabledIcon), new PropertyString("/icons/arrow_right_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightFocusIcon), new PropertyString("/icons/arrow_right_focus.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchClosedIcon), new PropertyString("/icons/branch_closed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchClosedFocusIcon), new PropertyString("/icons/branch_closed_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchEndIcon), new PropertyString("/icons/branch_end.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchLineIcon), new PropertyString("/icons/branch_line.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchMoreIcon), new PropertyString("/icons/branch_more.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchOpenIcon), new PropertyString("/icons/branch_open.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchOpenFocusIcon), new PropertyString("/icons/branch_open_focus.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxCheckedIcon), new PropertyString("/icons/checkbox_checked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxCheckedDisabledIcon), new PropertyString("/icons/checkbox_checked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxCheckedFocusIcon), new PropertyString("/icons/checkbox_checked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxCheckedPressedIcon), new PropertyString("/icons/checkbox_checked_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxIndeterminateIcon), new PropertyString("/icons/checkbox_indeterminate.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxIndeterminateDisabledIcon), new PropertyString("/icons/checkbox_indeterminate_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxIndeterminateFocusIcon), new PropertyString("/icons/checkbox_indeterminate_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxIndeterminatePressedIcon), new PropertyString("/icons/checkbox_indeterminate_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxUncheckedIcon), new PropertyString("/icons/checkbox_unchecked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxUncheckedDisabledIcon), new PropertyString("/icons/checkbox_unchecked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxUncheckedFocusIcon), new PropertyString("/icons/checkbox_unchecked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxUncheckedPressedIcon), new PropertyString("/icons/checkbox_unchecked_pressed.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxCheckedIcon), new PropertyString("/icons/log_in_checkbox_checked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxCheckedDisabledIcon), new PropertyString("/icons/log_in_checkbox_checked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxCheckedFocusIcon), new PropertyString("/icons/log_in_checkbox_checked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxCheckedPressedIcon), new PropertyString("/icons/log_in_checkbox_checked_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxIndeterminateIcon), new PropertyString("/icons/log_in_checkbox_indeterminate.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxIndeterminateDisabledIcon), new PropertyString("/icons/log_in_checkbox_indeterminate_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxIndeterminateFocusIcon), new PropertyString("/icons/log_in_checkbox_indeterminate_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxIndeterminatePressedIcon), new PropertyString("/icons/log_in_checkbox_indeterminate_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxUncheckedIcon), new PropertyString("/icons/log_in_checkbox_unchecked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxUncheckedDisabledIcon), new PropertyString("/icons/log_in_checkbox_unchecked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxUncheckedFocusIcon), new PropertyString("/icons/log_in_checkbox_unchecked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxUncheckedPressedIcon), new PropertyString("/icons/log_in_checkbox_unchecked_pressed.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonCheckedIcon), new PropertyString("/icons/radio_checked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonCheckedDisabledIcon), new PropertyString("/icons/radio_checked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonCheckedFocusIcon), new PropertyString("/icons/radio_checked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonUncheckedIcon), new PropertyString("/icons/radio_unchecked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonUncheckedDisabledIcon), new PropertyString("/icons/radio_unchecked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonUncheckedFocusIcon), new PropertyString("/icons/radio_unchecked_focus.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarMoveHorizontalIcon), new PropertyString("/icons/toolbar_move_horizontal.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarMoveVerticalIcon), new PropertyString("/icons/toolbar_move_vertical.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarSeparatorHorizontalIcon), new PropertyString("/icons/toolbar_separator_horizontal.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarSeparatorVerticalIcon), new PropertyString("/icons/toolbar_separator_vertical.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseIcon), new PropertyString("/icons/window_close.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseDisabledIcon), new PropertyString("/icons/window_close_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseFocusIcon), new PropertyString("/icons/window_close_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowClosePressedIcon), new PropertyString("/icons/window_close_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowGripIcon), new PropertyString("/icons/window_grip.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowUndockIcon), new PropertyString("/icons/window_undock.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowUndockDisabledIcon), new PropertyString("/icons/window_undock_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowUndockFocusIcon), new PropertyString("/icons/window_undock_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowUndockPressedIcon), new PropertyString("/icons/window_undock_pressed.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInBackgroundImage), new PropertyString("/images/OpenTwin.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::PropertyItemDeleteIcon), new PropertyString("/properties/Delete.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::PropertyGroupExpandedIcon), new PropertyString("/properties/ArrowGreenDown.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::PropertyGroupCollapsedIcon), new PropertyString("/properties/ArrowBlueRight.png"));
 }
 
 void ColorStyleEditor::initializeBlueStyleValues(void) {
@@ -572,31 +663,53 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	// Clean up data
 	this->cleanUpData();
 
-	m_nameProp->setValue(OT_COLORSTYLE_NAME_Blue);
-
-	// Initialize default style files
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyItemDelete, new PropertyString("/properties/Delete.png"));
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupExpanded, new PropertyString("/properties/ArrowGreenDown.png"));
-	m_styleFiles.insert_or_assign(OT_COLORSTYLE_FILE_PropertyGroupCollapsed, new PropertyString("/properties/ArrowBlueRight.png"));
+	m_nameProp->setValue(ot::toString(ot::ColorStyleName::BlueStyle));
 
 	// Initialize default style integers
-	m_styleInts.insert_or_assign(OT_COLORSTYLE_INT_SplitterHandleWidth, new PropertyInt(2));
 
-	// Initialize default style values
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsDisabledBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 44, 108))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsHoverForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedBackground, new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsSelectedForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_WindowForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ControlsBorderColor, new PropertyPainter2D(new FillPainter2D(Color(0, 100, 180))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TitleForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_ErrorForeground, new PropertyPainter2D(new FillPainter2D(ot::Red)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TextEditHighlight, new PropertyPainter2D(new FillPainter2D(Color(0, 100, 180))));
+	// Initialize painters
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Border), new PropertyPainter2D(new FillPainter2D(Color(0, 100, 180))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderLight), new PropertyPainter2D(new FillPainter2D(ot::Navy)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderDisabled), new PropertyPainter2D(new FillPainter2D(ot::Gray)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderHover), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderSelection), new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderForeground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderHoverBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderHoverForeground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderSelectionBackground), new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::HeaderSelectionForeground), new PropertyPainter2D(new FillPainter2D(Color(White))));
+	
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::InputForeground), new PropertyPainter2D(new FillPainter2D(Color(White))));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetAlternateBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 80, 140))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetDisabledBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 44, 108))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetDisabledForeground), new PropertyPainter2D(new FillPainter2D(ot::Gray)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetHoverBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetHoverForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetSelectionBackground), new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WidgetSelectionForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WindowBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::WindowForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::DialogBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::DialogForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleBorder), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 100, 180))));
 
 	LinearGradientPainter2D* tehb = new LinearGradientPainter2D;
 	tehb->setStart(Point2DD(0.5, 0.));
@@ -607,47 +720,94 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	tehb->addStop(GradientPainterStop2D(0.98, Color(ot::White)));
 	tehb->addStop(GradientPainterStop2D(0.99, Color(ot::Gray)));
 	tehb->addStop(GradientPainterStop2D(1., Color(ot::Gray)));
-	m_styleValues.insert_or_assign(OT_COLORSTYLE_VALUE_TextEditHighlightBorder, new PropertyPainter2D(tehb));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorLineBorder), new PropertyPainter2D(tehb));
 
-	// Initialize default colors
-	m_colors.insert_or_assign(CSE_COLOR_BorderColor, new PropertyPainter2D(new FillPainter2D(Color(0, 100, 180))));
-	m_colors.insert_or_assign(CSE_COLOR_LightBorderColor, new PropertyPainter2D(new FillPainter2D(ot::Navy)));
-	m_colors.insert_or_assign(CSE_COLOR_BorderDisabledColor, new PropertyPainter2D(new FillPainter2D(ot::Gray)));
-	m_colors.insert_or_assign(CSE_COLOR_BorderHoverColor, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_BorderSelectionColor, new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderHoverForeground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_HeaderSelectionBackground, new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
-	m_colors.insert_or_assign(CSE_COLOR_InputBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetAlternateBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 80, 140))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetDisabledBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 44, 108))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetDisabledForeground, new PropertyPainter2D(new FillPainter2D(ot::Gray)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetHoverForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionBackground, new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
-	m_colors.insert_or_assign(CSE_COLOR_WidgetSelectionForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_WindowBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 64, 128))));
-	m_colors.insert_or_assign(CSE_COLOR_WindowForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_DialogBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));
-	m_colors.insert_or_assign(CSE_COLOR_DialogForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_TitleBorderColor, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_TitleBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));
-	m_colors.insert_or_assign(CSE_COLOR_TitleForeground, new PropertyPainter2D(new FillPainter2D(ot::White)));
-	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabBackground, new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_colors.insert_or_assign(CSE_COLOR_TTBFirstTabForeground, new PropertyPainter2D(new FillPainter2D(ot::Black)));
-	m_colors.insert_or_assign(CSE_COLOR_ErrorForeground, new PropertyPainter2D(new FillPainter2D(ot::Red)));
-	m_colors.insert_or_assign("Test 1", new PropertyPainter2D(new FillPainter2D(ot::Red)));
+	// Double
+	m_double.insert_or_assign(toString(ColorStyleDoubleEntry::BorderWidth), new PropertyDouble(1.));
+	m_double.insert_or_assign(toString(ColorStyleDoubleEntry::BorderRadiusBig), new PropertyDouble(4.));
+	m_double.insert_or_assign(toString(ColorStyleDoubleEntry::BorderRadiusSmall), new PropertyDouble(4.));
+	m_double.insert_or_assign(toString(ColorStyleDoubleEntry::ToolTipOpacity), new PropertyDouble(10.));
 
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_Big, new PropertyDouble(4.));
-	m_double.insert_or_assign(CSE_NUMBER_BorderRadius_Small, new PropertyDouble(4.));
-	m_double.insert_or_assign(CSE_NUMBER_OpacityTooltip, new PropertyDouble(10.));
+	// Integer
+	m_integer.insert_or_assign(toString(ColorStyleIntegerEntry::SplitterHandleWidth), new PropertyInt(2));
+	m_integer.insert_or_assign(toString(ColorStyleIntegerEntry::SplitterBorderRadius), new PropertyInt(2));
 
-	m_integer.insert_or_assign(CSE_INT_SplitterHandleWidth, new PropertyInt(2));
-	m_integer.insert_or_assign(CSE_INT_SplitterBorderRadius, new PropertyInt(2));
+	// File
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TransparentIcon), new PropertyString("/icons/transparent.png"));
 
-	m_files.insert_or_assign(CSE_FILE_LogInBackgroundImage, new PropertyString("/images/OpenTwin.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpIcon), new PropertyString("/icons/arrow_up.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpDisabledIcon), new PropertyString("/icons/arrow_up_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowUpFocusIcon), new PropertyString("/icons/arrow_up_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownIcon), new PropertyString("/icons/arrow_down.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownDisabledIcon), new PropertyString("/icons/arrow_down_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowDownFocusIcon), new PropertyString("/icons/arrow_down_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftIcon), new PropertyString("/icons/arrow_left.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftDisabledIcon), new PropertyString("/icons/arrow_left_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowLeftFocusIcon), new PropertyString("/icons/arrow_left_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightIcon), new PropertyString("/icons/arrow_right.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightDisabledIcon), new PropertyString("/icons/arrow_right_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ArrowRightFocusIcon), new PropertyString("/icons/arrow_right_focus.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchClosedIcon), new PropertyString("/icons/branch_closed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchClosedFocusIcon), new PropertyString("/icons/branch_closed_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchEndIcon), new PropertyString("/icons/branch_end.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchLineIcon), new PropertyString("/icons/branch_line.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchMoreIcon), new PropertyString("/icons/branch_more.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchOpenIcon), new PropertyString("/icons/branch_open.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::TreeBranchOpenFocusIcon), new PropertyString("/icons/branch_open_focus.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxCheckedIcon), new PropertyString("/icons/checkbox_checked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxCheckedDisabledIcon), new PropertyString("/icons/checkbox_checked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxCheckedFocusIcon), new PropertyString("/icons/checkbox_checked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxCheckedPressedIcon), new PropertyString("/icons/checkbox_checked_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxIndeterminateIcon), new PropertyString("/icons/checkbox_indeterminate.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxIndeterminateDisabledIcon), new PropertyString("/icons/checkbox_indeterminate_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxIndeterminateFocusIcon), new PropertyString("/icons/checkbox_indeterminate_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxIndeterminatePressedIcon), new PropertyString("/icons/checkbox_indeterminate_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxUncheckedIcon), new PropertyString("/icons/checkbox_unchecked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxUncheckedDisabledIcon), new PropertyString("/icons/checkbox_unchecked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxUncheckedFocusIcon), new PropertyString("/icons/checkbox_unchecked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::CheckBoxUncheckedPressedIcon), new PropertyString("/icons/checkbox_unchecked_pressed.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxCheckedIcon), new PropertyString("/icons/log_in_checkbox_checked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxCheckedDisabledIcon), new PropertyString("/icons/log_in_checkbox_checked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxCheckedFocusIcon), new PropertyString("/icons/log_in_checkbox_checked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxCheckedPressedIcon), new PropertyString("/icons/log_in_checkbox_checked_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxIndeterminateIcon), new PropertyString("/icons/log_in_checkbox_indeterminate.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxIndeterminateDisabledIcon), new PropertyString("/icons/log_in_checkbox_indeterminate_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxIndeterminateFocusIcon), new PropertyString("/icons/log_in_checkbox_indeterminate_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxIndeterminatePressedIcon), new PropertyString("/icons/log_in_checkbox_indeterminate_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxUncheckedIcon), new PropertyString("/icons/log_in_checkbox_unchecked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxUncheckedDisabledIcon), new PropertyString("/icons/log_in_checkbox_unchecked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxUncheckedFocusIcon), new PropertyString("/icons/log_in_checkbox_unchecked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInCheckBoxUncheckedPressedIcon), new PropertyString("/icons/log_in_checkbox_unchecked_pressed.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonCheckedIcon), new PropertyString("/icons/radio_checked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonCheckedDisabledIcon), new PropertyString("/icons/radio_checked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonCheckedFocusIcon), new PropertyString("/icons/radio_checked_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonUncheckedIcon), new PropertyString("/icons/radio_unchecked.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonUncheckedDisabledIcon), new PropertyString("/icons/radio_unchecked_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::RadioButtonUncheckedFocusIcon), new PropertyString("/icons/radio_unchecked_focus.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarMoveHorizontalIcon), new PropertyString("/icons/toolbar_move_horizontal.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarMoveVerticalIcon), new PropertyString("/icons/toolbar_move_vertical.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarSeparatorHorizontalIcon), new PropertyString("/icons/toolbar_separator_horizontal.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::ToolBarSeparatorVerticalIcon), new PropertyString("/icons/toolbar_separator_vertical.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseIcon), new PropertyString("/icons/window_close.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseDisabledIcon), new PropertyString("/icons/window_close_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowCloseFocusIcon), new PropertyString("/icons/window_close_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowClosePressedIcon), new PropertyString("/icons/window_close_pressed.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowGripIcon), new PropertyString("/icons/window_grip.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowUndockIcon), new PropertyString("/icons/window_undock.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowUndockDisabledIcon), new PropertyString("/icons/window_undock_disabled.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowUndockFocusIcon), new PropertyString("/icons/window_undock_focus.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::WindowUndockPressedIcon), new PropertyString("/icons/window_undock_pressed.png"));
+
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::LogInBackgroundImage), new PropertyString("/images/OpenTwin.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::PropertyItemDeleteIcon), new PropertyString("/properties/Delete.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::PropertyGroupExpandedIcon), new PropertyString("/properties/ArrowGreenDown.png"));
+	m_files.insert_or_assign(toString(ColorStyleFileEntry::PropertyGroupCollapsedIcon), new PropertyString("/properties/ArrowBlueRight.png"));
 }
 
 void ColorStyleEditor::parseStyleSheetBaseFile(void) {
@@ -700,28 +860,28 @@ void ColorStyleEditor::parseStyleSheetBaseFile(void) {
 				continue;
 			}
 			// Check key
-			if (k == OT_COLORSTYLE_BASEFILE_MACRO_Color) {
+			if (k == ot::toString(ot::ColorStyleBaseFileMacro::PainterMacro)) {
 				// Create color entry if doesnt exist
-				const auto& it = m_colors.find(n);
-				if (it == m_colors.end()) {
-					m_colors.insert_or_assign(n, new ot::PropertyPainter2D(new ot::FillPainter2D));
+				const auto& it = m_painters.find(n);
+				if (it == m_painters.end()) {
+					m_painters.insert_or_assign(n, new ot::PropertyPainter2D(new ot::FillPainter2D));
 				}
 			}
-			else if (k == OT_COLORSTYLE_BASEFILE_MACRO_File) {
+			else if (k == ot::toString(ot::ColorStyleBaseFileMacro::FileMacro)) {
 				// Create file entry
 				const auto& it = m_files.find(n);
 				if (it == m_files.end()) {
 					m_files.insert_or_assign(n, new ot::PropertyString(n));
 				}
 			}
-			else if (k == OT_COLORSTYLE_BASEFILE_MACRO_Int) {
+			else if (k == ot::toString(ot::ColorStyleBaseFileMacro::IntMacro)) {
 				// Create file entry
 				const auto& it = m_integer.find(n);
 				if (it == m_integer.end()) {
 					m_integer.insert_or_assign(n, new ot::PropertyInt);
 				}
 			}
-			else if (k == OT_COLORSTYLE_BASEFILE_MACRO_Double) {
+			else if (k == ot::toString(ot::ColorStyleBaseFileMacro::DoubleMacro)) {
 				// Create file entry
 				const auto& it = m_double.find(n);
 				if (it == m_double.end()) {
@@ -743,47 +903,7 @@ void ColorStyleEditor::initializePropertyGrid(void) {
 
 	using namespace ot;
 	
-	// Style files
-	m_styleFilesGroup->clear();
-	for (const auto& it : m_styleFiles) {
-		it.second->setPropertyName(it.first);
-		it.second->setPropertyTitle(it.first);
-		m_styleFilesGroup->addProperty(it.second);
-	}
-
-	// Style integers
-	m_styleIntGroup->clear();
-	for (const auto& it : m_styleInts) {
-		it.second->setPropertyName(it.first);
-		it.second->setPropertyTitle(it.first);
-		m_styleIntGroup->addProperty(it.second);
-	}
-
-	// Style doubles
-	m_styleDoubleGroup->clear();
-	for (const auto& it : m_styleDoubles) {
-		it.second->setPropertyName(it.first);
-		it.second->setPropertyTitle(it.first);
-		m_styleDoubleGroup->addProperty(it.second);
-	}
-
-	// Style values
-	m_styleValuesGroup->clear();
-	for (const auto& it : m_styleValues) {
-		it.second->setPropertyName(it.first);
-		it.second->setPropertyTitle(it.first);
-		m_styleValuesGroup->addProperty(it.second);
-	}
-
-	// Stylesheet Colors
-	m_colorsGroup->clear();
-	for (const auto& it : m_colors) {
-		it.second->setPropertyName(it.first);
-		it.second->setPropertyTitle(it.first);
-		m_colorsGroup->addProperty(it.second);
-	}
-
-	// Stylesheet Files
+	// Files
 	m_fileGroup->clear();
 	for (const auto& it : m_files) {
 		it.second->setPropertyName(it.first);
@@ -791,7 +911,7 @@ void ColorStyleEditor::initializePropertyGrid(void) {
 		m_fileGroup->addProperty(it.second);
 	}
 
-	// Stylesheet Integers
+	// Integers
 	m_intGroup->clear();
 	for (const auto& it : m_integer) {
 		it.second->setPropertyName(it.first);
@@ -799,12 +919,20 @@ void ColorStyleEditor::initializePropertyGrid(void) {
 		m_intGroup->addProperty(it.second);
 	}
 
-	// Stylesheet Doubles
+	// Doubles
 	m_doubleGroup->clear();
 	for (const auto& it : m_double) {
 		it.second->setPropertyName(it.first);
 		it.second->setPropertyTitle(it.first);
 		m_doubleGroup->addProperty(it.second);
+	}
+
+	// Values
+	m_painterGroup->clear();
+	for (const auto& it : m_painters) {
+		it.second->setPropertyName(it.first);
+		it.second->setPropertyTitle(it.first);
+		m_painterGroup->addProperty(it.second);
 	}
 
 	m_propertyGrid->setupGridFromConfig(m_propertyGridConfig);
@@ -819,7 +947,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 	// Get name property
 	const PropertyGridItem* nameItm = m_propertyGrid->findItem(CSE_Name);
 	if (!nameItm) {
-		OT_LOG_E("Name property not found");
+		OT_LOG_EAS("Name property not found");
 		return false;
 	}
 
@@ -828,20 +956,20 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 	OTAssertNullptr(iName);
 	std::string cName = iName->getCurrentValue().toString().toStdString();
 
-	// Get style files
+	// Get files
 	JsonDocument styleFilesDoc(rapidjson::kArrayType);
-	const PropertyGridGroup* gStyleFiles = m_propertyGrid->findGroup(CSE_GROUP_StyleFiles);
+	const PropertyGridGroup* gStyleFiles = m_propertyGrid->findGroup(CSE_GROUP_Files);
 	OTAssertNullptr(gStyleFiles);
 	for (const PropertyGridItem* itm : gStyleFiles->childProperties()) {
 		const PropertyInputString* inp = dynamic_cast<const PropertyInputString*>(itm->getInput());
 		if (!inp) {
-			OT_LOG_E("Input cast failed");
+			OT_LOG_EAS("Input cast failed");
 			return false;
 		}
 
 		JsonObject fObj;
-		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Name, JsonString(itm->getPropertyData().propertyName(), styleFilesDoc.GetAllocator()), styleFilesDoc.GetAllocator());
-		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Path, JsonString(inp->getCurrentText().toStdString(), styleFilesDoc.GetAllocator()), styleFilesDoc.GetAllocator());
+		fObj.AddMember(JsonString(toString(ColorStyleFileValue::NameValue), styleFilesDoc.GetAllocator()), JsonString(itm->getPropertyData().propertyName(), styleFilesDoc.GetAllocator()), styleFilesDoc.GetAllocator());
+		fObj.AddMember(JsonString(toString(ColorStyleFileValue::PathValue), styleFilesDoc.GetAllocator()), JsonString(inp->getCurrentText().toStdString(), styleFilesDoc.GetAllocator()), styleFilesDoc.GetAllocator());
 		styleFilesDoc.PushBack(fObj, styleFilesDoc.GetAllocator());
 	}
 	std::string cStyleFiles = styleFilesDoc.toJson();
@@ -857,18 +985,18 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 
 	// Get style integers
 	JsonDocument styleIntDoc(rapidjson::kArrayType);
-	const PropertyGridGroup* gStyleInts = m_propertyGrid->findGroup(CSE_GROUP_StyleInt);
+	const PropertyGridGroup* gStyleInts = m_propertyGrid->findGroup(CSE_GROUP_Int);
 	OTAssertNullptr(gStyleInts);
 	for (const PropertyGridItem* itm : gStyleInts->childProperties()) {
 		const PropertyInputInt* inp = dynamic_cast<const PropertyInputInt*>(itm->getInput());
 		if (!inp) {
-			OT_LOG_E("Input cast failed");
+			OT_LOG_EAS("Input cast failed");
 			return false;
 		}
 
 		JsonObject fObj;
-		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Name, JsonString(itm->getPropertyData().propertyName(), styleIntDoc.GetAllocator()), styleIntDoc.GetAllocator());
-		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Value, inp->getValue(), styleIntDoc.GetAllocator());
+		fObj.AddMember(JsonString(toString(ColorStyleFileValue::NameValue), styleIntDoc.GetAllocator()), JsonString(itm->getPropertyData().propertyName(), styleIntDoc.GetAllocator()), styleIntDoc.GetAllocator());
+		fObj.AddMember(JsonString(toString(ColorStyleFileValue::ValueValue), styleIntDoc.GetAllocator()), JsonValue(inp->getValue()), styleIntDoc.GetAllocator());
 		styleIntDoc.PushBack(fObj, styleIntDoc.GetAllocator());
 	}
 	std::string cStyleInts = styleIntDoc.toJson();
@@ -884,18 +1012,18 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 
 	// Get style doubles
 	JsonDocument styleDoubleDoc(rapidjson::kArrayType);
-	const PropertyGridGroup* gStyleDoubles = m_propertyGrid->findGroup(CSE_GROUP_StyleDouble);
+	const PropertyGridGroup* gStyleDoubles = m_propertyGrid->findGroup(CSE_GROUP_Double);
 	OTAssertNullptr(gStyleDoubles);
 	for (const PropertyGridItem* itm : gStyleDoubles->childProperties()) {
 		const PropertyInputDouble* inp = dynamic_cast<const PropertyInputDouble*>(itm->getInput());
 		if (!inp) {
-			OT_LOG_E("Input cast failed");
+			OT_LOG_EAS("Input cast failed");
 			return false;
 		}
 
 		JsonObject fObj;
-		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Name, JsonString(itm->getPropertyData().propertyName(), styleDoubleDoc.GetAllocator()), styleDoubleDoc.GetAllocator());
-		fObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Value, inp->getValue(), styleDoubleDoc.GetAllocator());
+		fObj.AddMember(JsonString(toString(ColorStyleFileValue::NameValue), styleDoubleDoc.GetAllocator()), JsonString(itm->getPropertyData().propertyName(), styleDoubleDoc.GetAllocator()), styleDoubleDoc.GetAllocator());
+		fObj.AddMember(JsonString(toString(ColorStyleFileValue::ValueValue), styleDoubleDoc.GetAllocator()), JsonValue(inp->getValue()), styleDoubleDoc.GetAllocator());
 		styleDoubleDoc.PushBack(fObj, styleDoubleDoc.GetAllocator());
 	}
 	std::string cStyleDoubles = styleDoubleDoc.toJson();
@@ -911,21 +1039,21 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 
 	// Get style values
 	JsonDocument styleValuesDoc(rapidjson::kArrayType);
-	const PropertyGridGroup* gStyleValues = m_propertyGrid->findGroup(CSE_GROUP_StyleValues);
+	const PropertyGridGroup* gStyleValues = m_propertyGrid->findGroup(CSE_GROUP_Painter);
 	OTAssertNullptr(gStyleValues);
 	for (const PropertyGridItem* itm : gStyleValues->childProperties()) {
 		const PropertyInputPainter2D* inp = dynamic_cast<const PropertyInputPainter2D*>(itm->getInput());
 		if (!inp) {
-			OT_LOG_E("Input cast failed");
+			OT_LOG_EAS("Input cast failed");
 			return false;
 		}
 		if (!inp->getButton()->getPainter()) {
-			OT_LOG_E("No painter set");
+			OT_LOG_EAS("No painter set");
 			return false;
 		}
 
 		ColorStyleValue newValue;
-		newValue.setName(itm->getPropertyData().propertyName());
+		newValue.setEntryKey(stringToColorStyleValueEntry(itm->getPropertyData().propertyName()));
 		newValue.setPainter(inp->getButton()->getPainter()->createCopy());
 
 		JsonObject pObj;
@@ -946,15 +1074,15 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 	// Build up color replace map
 	std::map<QString, QString> replacementMap;
 	{
-		const PropertyGridGroup* gColors = m_propertyGrid->findGroup(CSE_GROUP_StyleSheetColors);
+		const PropertyGridGroup* gColors = m_propertyGrid->findGroup(CSE_GROUP_Painter);
 		OTAssertNullptr(gColors);
 		for (const PropertyGridItem* itm : gColors->childProperties()) {
 			const PropertyInputPainter2D* inp = dynamic_cast<const PropertyInputPainter2D*>(itm->getInput());
 			if (!inp) {
-				OT_LOG_E("Input cast failed");
+				OT_LOG_EAS("Input cast failed");
 				return false;
 			}
-			QString k = "%color:" + QString::fromStdString(inp->data().propertyName()) + "%";
+			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::PainterMacro)) + ":" + QString::fromStdString(inp->data().propertyName()) + "%";
 			if (replacementMap.count(k)) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;
@@ -963,15 +1091,15 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		}
 	}
 	{
-		const PropertyGridGroup* gFiles = m_propertyGrid->findGroup(CSE_GROUP_StyleSheetFiles);
+		const PropertyGridGroup* gFiles = m_propertyGrid->findGroup(CSE_GROUP_Files);
 		OTAssertNullptr(gFiles);
 		for (const PropertyGridItem* itm : gFiles->childProperties()) {
 			const PropertyInputString* inp = dynamic_cast<const PropertyInputString*>(itm->getInput());
 			if (!inp) {
-				OT_LOG_E("Input cast failed");
+				OT_LOG_EAS("Input cast failed");
 				return false;
 			}
-			QString k = "%file:" + QString::fromStdString(inp->data().propertyName()) + "%";
+			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::FileMacro)) + ":" + QString::fromStdString(inp->data().propertyName()) + "%";
 			if (replacementMap.count(k)) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;
@@ -985,10 +1113,10 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		for (const PropertyGridItem* itm : gInt->childProperties()) {
 			const PropertyInputInt* inp = dynamic_cast<const PropertyInputInt*>(itm->getInput());
 			if (!inp) {
-				OT_LOG_E("Input cast failed");
+				OT_LOG_EAS("Input cast failed");
 				return false;
 			}
-			QString k = "%int:" + QString::fromStdString(inp->data().propertyName()) + "%";
+			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::IntMacro)) + ":" + QString::fromStdString(inp->data().propertyName()) + "%";
 			if (replacementMap.count(k)) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;
@@ -1002,10 +1130,10 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		for (const PropertyGridItem* itm : gDouble->childProperties()) {
 			const PropertyInputDouble* inp = dynamic_cast<const PropertyInputDouble*>(itm->getInput());
 			if (!inp) {
-				OT_LOG_E("Input cast failed");
+				OT_LOG_EAS("Input cast failed");
 				return false;
 			}
-			QString k = "%number:" + QString::fromStdString(inp->data().propertyName()) + "%";
+			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::DoubleMacro)) + ":" + QString::fromStdString(inp->data().propertyName()) + "%";
 			if (replacementMap.count(k)) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;
@@ -1019,12 +1147,12 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		base.replace(it.first, it.second);
 	}
 
-	_result = OT_COLORSTYLE_FILE_KEY_Name + cName + "\n" +
-		OT_COLORSTYLE_FILE_KEY_Files + cStyleFiles + "\n" +
-		OT_COLORSTYLE_FILE_KEY_Integers + cStyleInts + "\n" +
-		OT_COLORSTYLE_FILE_KEY_Doubles + cStyleDoubles + "\n" +
-		OT_COLORSTYLE_FILE_KEY_Values + cStyleValue + "\n" +
-		OT_COLORSTYLE_FILE_KEY_StyleSheet "\n";
+	_result = toString(ColorStyleFileKey::NameKey) + cName + "\n" +
+		toString(ColorStyleFileKey::FileKey) + cStyleFiles + "\n" +
+		toString(ColorStyleFileKey::IntegerKey) + cStyleInts + "\n" +
+		toString(ColorStyleFileKey::DoubleKey) + cStyleDoubles + "\n" +
+		toString(ColorStyleFileKey::PainterKey) + cStyleValue + "\n" +
+		toString(ColorStyleFileKey::SheetKey) + "\n";
 	_result.append(base.toStdString());
 
 	return true;

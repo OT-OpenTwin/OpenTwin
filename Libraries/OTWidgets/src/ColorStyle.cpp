@@ -51,8 +51,8 @@ void ot::ColorStyle::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& 
 	JsonArray fileArr;
 	for (const auto& it : m_files) {
 		JsonObject valueObj;
-		valueObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Name, JsonString(it.first, _allocator), _allocator);
-		valueObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Path, JsonString(it.second.toStdString(), _allocator), _allocator);
+		valueObj.AddMember(JsonString(toString(ColorStyleFileValue::NameValue), _allocator), JsonString(toString(it.first), _allocator), _allocator);
+		valueObj.AddMember(JsonString(toString(ColorStyleFileValue::PathValue), _allocator), JsonString(it.second.toStdString(), _allocator), _allocator);
 		fileArr.PushBack(valueObj, _allocator);
 	}
 	_object.AddMember("Files", fileArr, _allocator);
@@ -60,8 +60,8 @@ void ot::ColorStyle::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& 
 	JsonArray intArr;
 	for (const auto& it : m_int) {
 		JsonObject valueObj;
-		valueObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Name, JsonString(it.first, _allocator), _allocator);
-		valueObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Value, it.second, _allocator);
+		valueObj.AddMember(JsonString(toString(ColorStyleFileValue::NameValue), _allocator), JsonString(toString(it.first), _allocator), _allocator);
+		valueObj.AddMember(JsonString(toString(ColorStyleFileValue::ValueValue), _allocator), JsonValue(it.second), _allocator);
 		intArr.PushBack(valueObj, _allocator);
 	}
 	_object.AddMember("Int", intArr, _allocator);
@@ -69,8 +69,8 @@ void ot::ColorStyle::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& 
 	JsonArray doubleArr;
 	for (const auto& it : m_double) {
 		JsonObject valueObj;
-		valueObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Name, JsonString(it.first, _allocator), _allocator);
-		valueObj.AddMember(OT_COLORSTYLE_FILE_VALUE_Value, it.second, _allocator);
+		valueObj.AddMember(JsonString(toString(ColorStyleFileValue::NameValue), _allocator), JsonString(toString(it.first), _allocator), _allocator);
+		valueObj.AddMember(JsonString(toString(ColorStyleFileValue::ValueValue), _allocator), JsonValue(it.second), _allocator);
 		intArr.PushBack(valueObj, _allocator);
 	}
 	_object.AddMember("Double", doubleArr, _allocator);
@@ -86,15 +86,15 @@ void ot::ColorStyle::setFromJsonObject(const ot::ConstJsonObject& _object) {
 		ConstJsonObject valueObj = json::getObject(valueArr, i);
 		ColorStyleValue newValue;
 		newValue.setFromJsonObject(valueObj);
-		m_values.insert_or_assign(newValue.name(), newValue);
+		m_values.insert_or_assign(newValue.getEntryKey(), newValue);
 	}
 
 	m_files.clear();
 	ConstJsonArray fileArr = json::getArray(_object, "Files");
 	for (JsonSizeType i = 0; i < fileArr.Size(); i++) {
 		ConstJsonObject valueObj = json::getObject(fileArr, i);
-		std::string n = json::getString(valueObj, OT_COLORSTYLE_FILE_VALUE_Name);
-		QString v = QString::fromStdString(json::getString(valueObj, OT_COLORSTYLE_FILE_VALUE_Path));
+		ColorStyleFileEntry n = stringToColorStyleFileEntry(json::getString(valueObj, toString(ColorStyleFileValue::NameValue)));
+		QString v = QString::fromStdString(json::getString(valueObj, toString(ColorStyleFileValue::PathValue)));
 		m_files.insert_or_assign(n, v);
 	}
 
@@ -102,8 +102,8 @@ void ot::ColorStyle::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	ConstJsonArray intArr = json::getArray(_object, "Int");
 	for (JsonSizeType i = 0; i < intArr.Size(); i++) {
 		ConstJsonObject valueObj = json::getObject(intArr, i);
-		std::string n = json::getString(valueObj, OT_COLORSTYLE_FILE_VALUE_Name);
-		int v = json::getInt(valueObj, OT_COLORSTYLE_FILE_VALUE_Value);
+		ColorStyleIntegerEntry n = stringToColorStyleIntegerEntry(json::getString(valueObj, toString(ColorStyleFileValue::NameValue)));
+		int v = json::getInt(valueObj, toString(ColorStyleFileValue::ValueValue));
 		m_int.insert_or_assign(n, v);
 	}
 
@@ -111,8 +111,8 @@ void ot::ColorStyle::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	ConstJsonArray doubleArr = json::getArray(_object, "Double");
 	for (JsonSizeType i = 0; i < doubleArr.Size(); i++) {
 		ConstJsonObject valueObj = json::getObject(doubleArr, i);
-		std::string n = json::getString(valueObj, OT_COLORSTYLE_FILE_VALUE_Name);
-		double v = json::getDouble(valueObj, OT_COLORSTYLE_FILE_VALUE_Value);
+		ColorStyleDoubleEntry n = stringToColorStyleDoubleEntry(json::getString(valueObj, toString(ColorStyleFileValue::NameValue)));
+		double v = json::getDouble(valueObj, toString(ColorStyleFileValue::ValueValue));
 		m_double.insert_or_assign(n, v);
 	}
 }
@@ -122,73 +122,73 @@ void ot::ColorStyle::setFromJsonObject(const ot::ConstJsonObject& _object) {
 // Setter/Getter
 
 void ot::ColorStyle::addValue(const ColorStyleValue& _value, bool _replace) {
-	if (this->hasValue(_value.name()) && !_replace) {
-		OT_LOG_W("A value with the name \"" + _value.name() + "\" already exists");
+	if (this->hasValue(_value.getEntryKey()) && !_replace) {
+		OT_LOG_W("Value for key  \"" + toString(_value.getEntryKey()) + "\" already exists");
 		return;
 	}
-	m_values.insert_or_assign(_value.name(), _value);
+	m_values.insert_or_assign(_value.getEntryKey(), _value);
 }
 
-bool ot::ColorStyle::hasValue(const std::string& _name) const {
-	return m_values.find(_name) != m_values.end();
+bool ot::ColorStyle::hasValue(ColorStyleValueEntry _type) const {
+	return m_values.find(_type) != m_values.end();
 }
 
-const ot::ColorStyleValue& ot::ColorStyle::getValue(const std::string& _name, const ColorStyleValue& _default) const {
-	const auto& it = m_values.find(_name);
+const ot::ColorStyleValue& ot::ColorStyle::getValue(ColorStyleValueEntry _type, const ColorStyleValue& _default) const {
+	const auto& it = m_values.find(_type);
 	if (it == m_values.end()) return _default;
 	else return it->second;
 }
 
-void ot::ColorStyle::addFile(const std::string& _name, const QString& _path, bool _replace) {
-	if (this->hasFile(_name) && !_replace) {
-		OT_LOG_W("A file with the name \"" + _name + "\" already exists");
+void ot::ColorStyle::addFile(ColorStyleFileEntry _type, const QString& _path, bool _replace) {
+	if (this->hasFile(_type) && !_replace) {
+		OT_LOG_W("File for key \"" + toString(_type) + "\" already exists");
 		return;
 	}
-	m_files.insert_or_assign(_name, _path);
+	m_files.insert_or_assign(_type, _path);
 }
 
-bool ot::ColorStyle::hasFile(const std::string& _name) const {
-	return m_files.find(_name) != m_files.end();
+bool ot::ColorStyle::hasFile(ColorStyleFileEntry _type) const {
+	return m_files.find(_type) != m_files.end();
 }
 
-QString ot::ColorStyle::getFile(const std::string& _name) const {
-	const auto& it = m_files.find(_name);
+QString ot::ColorStyle::getFile(ColorStyleFileEntry _type) const {
+	const auto& it = m_files.find(_type);
 	if (it == m_files.end()) return QString();
 	else return it->second;
 }
 
-void ot::ColorStyle::addInteger(const std::string& _name, int _value, bool _replace) {
-	if (this->hasInteger(_name) && !_replace) {
-		OT_LOG_W("A integer with the name \"" + _name + "\" already exists");
+void ot::ColorStyle::addInteger(ColorStyleIntegerEntry _type, int _value, bool _replace) {
+	if (this->hasInteger(_type) && !_replace) {
+		OT_LOG_W("Integer for key \"" + toString(_type) + "\" already exists");
 		return;
 	}
-	m_int.insert_or_assign(_name, _value);
+	m_int.insert_or_assign(_type, _value);
 }
 
-bool ot::ColorStyle::hasInteger(const std::string& _name) const {
-	return m_int.find(_name) != m_int.end();
+bool ot::ColorStyle::hasInteger(ColorStyleIntegerEntry _type) const {
+	return m_int.find(_type) != m_int.end();
 }
 
-int ot::ColorStyle::getInteger(const std::string& _name) const {
-	const auto& it = m_int.find(_name);
+int ot::ColorStyle::getInteger(ColorStyleIntegerEntry _type) const {
+	const auto& it = m_int.find(_type);
 	if (it == m_int.end()) return 0;
 	else return it->second;
 }
 
-void ot::ColorStyle::addDouble(const std::string& _name, double _value, bool _replace) {
-	if (this->hasDouble(_name) && !_replace) {
-		OT_LOG_W("A double with the name \"" + _name + "\" already exists");
+void ot::ColorStyle::addDouble(ColorStyleDoubleEntry _type, double _value, bool _replace) {
+	if (this->hasDouble(_type) && !_replace) {
+		OT_LOG_W("Double for key \"" + toString(_type) + "\" already exists");
 		return;
 	}
-	m_double.insert_or_assign(_name, _value);
+	m_double.insert_or_assign(_type, _value);
 }
 
-bool ot::ColorStyle::hasDouble(const std::string& _name) const {
-	return m_double.find(_name) != m_double.end();
+bool ot::ColorStyle::hasDouble(ColorStyleDoubleEntry _type) const {
+	return m_double.find(_type) != m_double.end();
 }
 
-double ot::ColorStyle::getDouble(const std::string& _name) const {
-	const auto& it = m_double.find(_name);
+double ot::ColorStyle::getDouble(ColorStyleDoubleEntry _type) const {
+	const auto& it = m_double.find(_type);
 	if (it == m_double.end()) return 0.;
 	else return it->second;
 }
@@ -212,14 +212,14 @@ bool ot::ColorStyle::setupFromFile(QByteArray _data) {
 		_data.remove(0, ix + 1);
 		ix = _data.indexOf('\n');
 
-		if (k == OT_COLORSTYLE_FILE_KEY_Name) {
+		if (k.toStdString() == toString(ColorStyleFileKey::NameKey)) {
 			std::string nam = n.toStdString();
 			while (nam.find('\r') != std::string::npos) {
 				nam.erase(nam.find('\r'));
 			}
 			this->setColorStyleName(nam);
 		}
-		else if (k == OT_COLORSTYLE_FILE_KEY_Integers) {
+		else if (k.toStdString() == toString(ColorStyleFileKey::IntegerKey)) {
 			JsonDocument doc;
 			if (!doc.fromJson(n.toStdString())) {
 				OT_LOG_E("Failed to parse integer document");
@@ -227,12 +227,12 @@ bool ot::ColorStyle::setupFromFile(QByteArray _data) {
 			}
 			for (JsonSizeType i = 0; i < doc.Size(); i++) {
 				ConstJsonObject vObj = json::getObject(doc, i);
-				std::string n = json::getString(vObj, OT_COLORSTYLE_FILE_VALUE_Name);
-				int v = json::getInt(vObj, OT_COLORSTYLE_FILE_VALUE_Value);
+				ColorStyleIntegerEntry n = stringToColorStyleIntegerEntry(json::getString(vObj, toString(ColorStyleFileValue::NameValue)));
+				int v = json::getInt(vObj, toString(ColorStyleFileValue::ValueValue));
 				this->addInteger(n, v, false);
 			}
 		}
-		else if (k == OT_COLORSTYLE_FILE_KEY_Doubles) {
+		else if (k.toStdString() == toString(ColorStyleFileKey::DoubleKey)) {
 			JsonDocument doc;
 			if (!doc.fromJson(n.toStdString())) {
 				OT_LOG_E("Failed to parse integer document");
@@ -240,12 +240,12 @@ bool ot::ColorStyle::setupFromFile(QByteArray _data) {
 			}
 			for (JsonSizeType i = 0; i < doc.Size(); i++) {
 				ConstJsonObject vObj = json::getObject(doc, i);
-				std::string n = json::getString(vObj, OT_COLORSTYLE_FILE_VALUE_Name);
-				int v = json::getDouble(vObj, OT_COLORSTYLE_FILE_VALUE_Value);
+				ColorStyleDoubleEntry n = stringToColorStyleDoubleEntry(json::getString(vObj, toString(ColorStyleFileValue::NameValue)));
+				int v = json::getDouble(vObj, toString(ColorStyleFileValue::ValueValue));
 				this->addDouble(n, v, false);
 			}
 		}
-		else if (k == OT_COLORSTYLE_FILE_KEY_Files) {
+		else if (k.toStdString() == toString(ColorStyleFileKey::FileKey)) {
 			JsonDocument doc;
 			if (!doc.fromJson(n.toStdString())) {
 				OT_LOG_E("Failed to parse files document");
@@ -253,12 +253,12 @@ bool ot::ColorStyle::setupFromFile(QByteArray _data) {
 			}
 			for (JsonSizeType i = 0; i < doc.Size(); i++) {
 				ConstJsonObject vObj = json::getObject(doc, i);
-				std::string n = json::getString(vObj, OT_COLORSTYLE_FILE_VALUE_Name);
-				QString p = QString::fromStdString(json::getString(vObj, OT_COLORSTYLE_FILE_VALUE_Path));
+				ColorStyleFileEntry n = stringToColorStyleFileEntry(json::getString(vObj, toString(ColorStyleFileValue::NameValue)));
+				QString p = QString::fromStdString(json::getString(vObj, toString(ColorStyleFileValue::PathValue)));
 				this->addFile(n, p, false);
 			}
 		}
-		else if (k == OT_COLORSTYLE_FILE_KEY_Values) {
+		else if (k.toStdString() == toString(ColorStyleFileKey::PainterKey)) {
 			JsonDocument doc;
 			if (!doc.fromJson(n.toStdString())) {
 				OT_LOG_E("Failed to parse values document");
@@ -271,7 +271,7 @@ bool ot::ColorStyle::setupFromFile(QByteArray _data) {
 				this->addValue(newValue);
 			}
 		}
-		else if (k == OT_COLORSTYLE_FILE_KEY_StyleSheet) {
+		else if (k.toStdString() == toString(ColorStyleFileKey::SheetKey)) {
 			std::string tmp = _data.toStdString();
 			this->setStyleSheet(QString::fromStdString(tmp));
 			return true;

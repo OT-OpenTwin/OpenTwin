@@ -284,74 +284,74 @@ int AppBase::run() {
 		ot::ColorStyle cs = ot::GlobalColorStyle::instance().getCurrentStyle();
 		{
 			ot::ColorStyleValue val;
-			val.setName(OT_COLORSTYLE_VALUE_ControlsBackground);
+			val.setEntryKey(ot::ColorStyleValueEntry::WidgetBackground);
 			val.setColor(ot::White);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
-			val.setName(OT_COLORSTYLE_VALUE_ControlsBorderColor);
+			val.setEntryKey(ot::ColorStyleValueEntry::Border);
 			val.setColor(ot::Black);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
-			val.setName(OT_COLORSTYLE_VALUE_ControlsForeground);
+			val.setEntryKey(ot::ColorStyleValueEntry::WidgetForeground);
 			val.setColor(ot::Black);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
-			val.setName(OT_COLORSTYLE_VALUE_ControlsHoverBackground);
+			val.setEntryKey(ot::ColorStyleValueEntry::WidgetHoverBackground);
 			val.setColor(ot::Blue);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
-			val.setName(OT_COLORSTYLE_VALUE_ControlsHoverForeground);
+			val.setEntryKey(ot::ColorStyleValueEntry::WidgetHoverForeground);
 			val.setColor(ot::White);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
-			val.setName(OT_COLORSTYLE_VALUE_ControlsSelectedBackground);
+			val.setEntryKey(ot::ColorStyleValueEntry::WidgetSelectionBackground);
 			val.setColor(ot::Lime);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
-			val.setName(OT_COLORSTYLE_VALUE_ControlsSelectedForeground);
+			val.setEntryKey(ot::ColorStyleValueEntry::WidgetSelectionForeground);
 			val.setColor(ot::Black);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
-			val.setName(OT_COLORSTYLE_VALUE_TitleBackground);
+			val.setEntryKey(ot::ColorStyleValueEntry::TitleBackground);
 			val.setColor(ot::Gray);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
-			val.setName(OT_COLORSTYLE_VALUE_TitleForeground);
+			val.setEntryKey(ot::ColorStyleValueEntry::TitleForeground);
 			val.setColor(ot::Black);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
-			val.setName(OT_COLORSTYLE_VALUE_WindowBackground);
+			val.setEntryKey(ot::ColorStyleValueEntry::WindowBackground);
 			val.setColor(ot::LightGray);
 			cs.addValue(val);
 		}
 		{
 			ot::ColorStyleValue val;
-			val.setName(OT_COLORSTYLE_VALUE_WindowForeground);
+			val.setEntryKey(ot::ColorStyleValueEntry::WindowForeground);
 			val.setColor(ot::Black);
 			cs.addValue(val);
 		}
 		ot::GlobalColorStyle::instance().addStyle(cs, true);
 
-		if (ot::GlobalColorStyle::instance().hasStyle(OT_COLORSTYLE_NAME_Bright)) {
-			ot::GlobalColorStyle::instance().setCurrentStyle(OT_COLORSTYLE_NAME_Bright);
+		if (ot::GlobalColorStyle::instance().hasStyle(ot::toString(ot::ColorStyleName::BrightStyle))) {
+			ot::GlobalColorStyle::instance().setCurrentStyle(ot::toString(ot::ColorStyleName::BrightStyle));
 		}
 
 		this->connect(&ot::GlobalColorStyle::instance(), &ot::GlobalColorStyle::currentStyleChanged, this, &AppBase::slotColorStyleChanged);

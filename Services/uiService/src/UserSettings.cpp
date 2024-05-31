@@ -519,17 +519,17 @@ UserSettings::UserSettings() : m_dialog(nullptr), m_uiServiceSettings(nullptr), 
 	std::list<std::string> opt;
 	std::string c;
 
-	if (ot::GlobalColorStyle::instance().hasStyle(OT_COLORSTYLE_NAME_Bright)) {
-		opt.push_back(OT_COLORSTYLE_NAME_Bright);
-		c = OT_COLORSTYLE_NAME_Bright;
+	if (ot::GlobalColorStyle::instance().hasStyle(ot::toString(ot::ColorStyleName::BrightStyle))) {
+		opt.push_back(ot::toString(ot::ColorStyleName::BrightStyle));
+		c = ot::toString(ot::ColorStyleName::BrightStyle);
 	}
-	if (ot::GlobalColorStyle::instance().hasStyle(OT_COLORSTYLE_NAME_Dark)) {
-		opt.push_back(OT_COLORSTYLE_NAME_Dark);
-		if (c.empty()) c = OT_COLORSTYLE_NAME_Dark;
+	if (ot::GlobalColorStyle::instance().hasStyle(ot::toString(ot::ColorStyleName::DarkStyle))) {
+		opt.push_back(ot::toString(ot::ColorStyleName::DarkStyle));
+		if (c.empty()) c = ot::toString(ot::ColorStyleName::DarkStyle);
 	}
-	if (ot::GlobalColorStyle::instance().hasStyle(OT_COLORSTYLE_NAME_Blue)) {
-		opt.push_back(OT_COLORSTYLE_NAME_Blue);
-		if (c.empty()) c = OT_COLORSTYLE_NAME_Blue;
+	if (ot::GlobalColorStyle::instance().hasStyle(ot::toString(ot::ColorStyleName::BlueStyle))) {
+		opt.push_back(ot::toString(ot::ColorStyleName::BlueStyle));
+		if (c.empty()) c = ot::toString(ot::ColorStyleName::BlueStyle);
 	}
 
 	ot::AbstractSettingsItem* iColor = new ot::SettingsItemSelection("ColorStyle", "Color Style", opt, c);

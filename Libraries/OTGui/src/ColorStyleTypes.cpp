@@ -124,123 +124,272 @@ ot::ColorStyleBaseFileMacro ot::stringToColorStyleBaseFileMacro(const std::strin
 std::string ot::toString(ColorStyleFileEntry _colorStyleFileEntry) {
 	switch (_colorStyleFileEntry)
 	{
+	case ot::ColorStyleFileEntry::TransparentIcon: return "Transparent Icon"; 
+
+	case ot::ColorStyleFileEntry::ArrowUpIcon: return "Arrow Up Icon";
+	case ot::ColorStyleFileEntry::ArrowUpDisabledIcon: return "Arrow Up Disabled Icon";
+	case ot::ColorStyleFileEntry::ArrowUpFocusIcon: return "Arrow Up Focus Icon";
+	case ot::ColorStyleFileEntry::ArrowDownIcon: return "Arrow Down Icon";
+	case ot::ColorStyleFileEntry::ArrowDownDisabledIcon: return "Arrow Down Disabled Icon";
+	case ot::ColorStyleFileEntry::ArrowDownFocusIcon: return "Arrow Down Focus Icon";
+	case ot::ColorStyleFileEntry::ArrowLeftIcon: return "Arrow Left Icon";
+	case ot::ColorStyleFileEntry::ArrowLeftDisabledIcon: return "Arrow Left Disabled Icon";
+	case ot::ColorStyleFileEntry::ArrowLeftFocusIcon: return "Arrow Left Focus Icon";
+	case ot::ColorStyleFileEntry::ArrowRightIcon: return "Arrow Right Icon";
+	case ot::ColorStyleFileEntry::ArrowRightDisabledIcon: return "Arrow Right Disabled Icon";
+	case ot::ColorStyleFileEntry::ArrowRightFocusIcon: return "Arrow Right Focus Icon";
+
+	case ot::ColorStyleFileEntry::TreeBranchClosedIcon: return "Tree Branch Closed Icon";
+	case ot::ColorStyleFileEntry::TreeBranchClosedFocusIcon: return "Tree Branch Closed Focus Icon";
+	case ot::ColorStyleFileEntry::TreeBranchEndIcon: return "Tree Branch End Icon";
+	case ot::ColorStyleFileEntry::TreeBranchLineIcon: return "Tree Branch Line Icon";
+	case ot::ColorStyleFileEntry::TreeBranchMoreIcon: return "Tree Branch More Icon";
+	case ot::ColorStyleFileEntry::TreeBranchOpenIcon: return "Tree Branch Open Icon";
+	case ot::ColorStyleFileEntry::TreeBranchOpenFocusIcon: return "Tree Branch Open Focus Icon";
+
+	case ot::ColorStyleFileEntry::CheckBoxCheckedIcon: return "CheckBox Checked Icon";
+	case ot::ColorStyleFileEntry::CheckBoxCheckedDisabledIcon: return "CheckBox Checked Disabled Icon";
+	case ot::ColorStyleFileEntry::CheckBoxCheckedFocusIcon: return "CheckBox Checked Focus Icon";
+	case ot::ColorStyleFileEntry::CheckBoxCheckedPressedIcon: return "CheckBox Checked Pressed Icon";
+	case ot::ColorStyleFileEntry::CheckBoxIndeterminateIcon: return "CheckBox Indeterminate Icon";
+	case ot::ColorStyleFileEntry::CheckBoxIndeterminateDisabledIcon: return "CheckBox Indeterminate Disabled Icon";
+	case ot::ColorStyleFileEntry::CheckBoxIndeterminateFocusIcon: return "CheckBox Indeterminate Focus Icon";
+	case ot::ColorStyleFileEntry::CheckBoxIndeterminatePressedIcon: return "CheckBox Indeterminate Pressed Icon";
+	case ot::ColorStyleFileEntry::CheckBoxUncheckedIcon: return "CheckBox Unchecked Icon";
+	case ot::ColorStyleFileEntry::CheckBoxUncheckedDisabledIcon: return "CheckBox Unchecked Disabled Icon";
+	case ot::ColorStyleFileEntry::CheckBoxUncheckedFocusIcon: return "CheckBox Unchecked Focus Icon";
+	case ot::ColorStyleFileEntry::CheckBoxUncheckedPressedIcon: return "CheckBox Unchecked Pressed Icon";
+
+	case ot::ColorStyleFileEntry::LogInCheckBoxCheckedIcon: return "LogIn CheckBox Checked Icon";
+	case ot::ColorStyleFileEntry::LogInCheckBoxCheckedDisabledIcon: return "LogIn CheckBox Checked Disabled Icon";
+	case ot::ColorStyleFileEntry::LogInCheckBoxCheckedFocusIcon: return "LogIn CheckBox Checked Focus Icon";
+	case ot::ColorStyleFileEntry::LogInCheckBoxCheckedPressedIcon: return "LogIn CheckBox Checked Pressed Icon";
+	case ot::ColorStyleFileEntry::LogInCheckBoxIndeterminateIcon: return "LogIn CheckBox Indeterminate Icon";
+	case ot::ColorStyleFileEntry::LogInCheckBoxIndeterminateDisabledIcon: return "LogIn CheckBox Indeterminate Disabled Icon";
+	case ot::ColorStyleFileEntry::LogInCheckBoxIndeterminateFocusIcon: return "LogIn CheckBox Indeterminate Focus Icon";
+	case ot::ColorStyleFileEntry::LogInCheckBoxIndeterminatePressedIcon: return "LogIn CheckBox Indeterminate Pressed Icon";
+	case ot::ColorStyleFileEntry::LogInCheckBoxUncheckedIcon: return "LogIn CheckBox Unchecked Icon";
+	case ot::ColorStyleFileEntry::LogInCheckBoxUncheckedDisabledIcon: return "LogIn CheckBox Unchecked Disabled Icon";
+	case ot::ColorStyleFileEntry::LogInCheckBoxUncheckedFocusIcon: return "LogIn CheckBox Unchecked Focus Icon";
+	case ot::ColorStyleFileEntry::LogInCheckBoxUncheckedPressedIcon: return "LogIn CheckBox Unchecked Pressed Icon";
+
+	case ot::ColorStyleFileEntry::RadioButtonCheckedIcon: return "RadioButton Checked Icon";
+	case ot::ColorStyleFileEntry::RadioButtonCheckedDisabledIcon: return "RadioButton Checked Disabled Icon";
+	case ot::ColorStyleFileEntry::RadioButtonCheckedFocusIcon: return "RadioButton Checked Focus Icon";
+	case ot::ColorStyleFileEntry::RadioButtonUncheckedIcon: return "RadioButton Unchecked Icon";
+	case ot::ColorStyleFileEntry::RadioButtonUncheckedDisabledIcon: return "RadioButton Unchecked Disabled Icon";
+	case ot::ColorStyleFileEntry::RadioButtonUncheckedFocusIcon: return "RadioButton Unchecked Focus Icon";
+
+	case ot::ColorStyleFileEntry::ToolBarMoveHorizontalIcon: return "ToolBar Move Horizontal Icon";
+	case ot::ColorStyleFileEntry::ToolBarMoveVerticalIcon: return "ToolBar Move Vertical Icon";
+	case ot::ColorStyleFileEntry::ToolBarSeparatorHorizontalIcon: return "ToolBar Separator Horizontal Icon";
+	case ot::ColorStyleFileEntry::ToolBarSeparatorVerticalIcon: return "ToolBar Separator Vertical Icon";
+
+	case ot::ColorStyleFileEntry::WindowCloseIcon: return "Window Close Icon";
+	case ot::ColorStyleFileEntry::WindowCloseDisabledIcon: return "Window Close Disabled Icon";
+	case ot::ColorStyleFileEntry::WindowCloseFocusIcon: return "Window Close Focus Icon";
+	case ot::ColorStyleFileEntry::WindowClosePressedIcon: return "Window Close Pressed Icon";
+	case ot::ColorStyleFileEntry::WindowGripIcon: return "Window Grip Icon";
+	case ot::ColorStyleFileEntry::WindowUndockIcon: return "Window Undock Icon";
+	case ot::ColorStyleFileEntry::WindowUndockDisabledIcon: return "Window Undock Disabled Icon";
+	case ot::ColorStyleFileEntry::WindowUndockFocusIcon: return "Window Undock Focus Icon";
+	case ot::ColorStyleFileEntry::WindowUndockPressedIcon: return "Window Undock Pressed Icon";
+
 	case ot::ColorStyleFileEntry::PropertyItemDeleteIcon: return "Property Item Delete Icon";
 	case ot::ColorStyleFileEntry::PropertyGroupExpandedIcon: return "Property Group Expanded Icon";
 	case ot::ColorStyleFileEntry::PropertyGroupCollapsedIcon: return "Property Group Collapsed Icon";
 	case ot::ColorStyleFileEntry::LogInBackgroundImage: return "Log In Background Image";
 	default:
 		OT_LOG_EAS("Unknown ColorStyleFileEntry (" + std::to_string((int)_colorStyleFileEntry) + ")");
-		return "Property Item Delete Icon";
+		return "Transparent Icon";
 	}
+
 }
 
 ot::ColorStyleFileEntry ot::stringToColorStyleFileEntry(const std::string& _colorStyleFileEntry) {
-	if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInBackgroundImage)) return ColorStyleFileEntry::LogInBackgroundImage;
+	if (_colorStyleFileEntry == toString(ColorStyleFileEntry::TransparentIcon)) return ColorStyleFileEntry::TransparentIcon;
+	
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowUpIcon)) return ColorStyleFileEntry::ArrowUpIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowUpDisabledIcon)) return ColorStyleFileEntry::ArrowUpDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowUpFocusIcon)) return ColorStyleFileEntry::ArrowUpFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowDownIcon)) return ColorStyleFileEntry::ArrowDownIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowDownDisabledIcon)) return ColorStyleFileEntry::ArrowDownDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowDownFocusIcon)) return ColorStyleFileEntry::ArrowDownFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowLeftIcon)) return ColorStyleFileEntry::ArrowLeftIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowLeftDisabledIcon)) return ColorStyleFileEntry::ArrowLeftDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowLeftFocusIcon)) return ColorStyleFileEntry::ArrowLeftFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowRightIcon)) return ColorStyleFileEntry::ArrowRightIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowRightDisabledIcon)) return ColorStyleFileEntry::ArrowRightDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ArrowRightFocusIcon)) return ColorStyleFileEntry::ArrowRightFocusIcon;
+
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::TreeBranchClosedIcon)) return ColorStyleFileEntry::TreeBranchClosedIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::TreeBranchClosedFocusIcon)) return ColorStyleFileEntry::TreeBranchClosedFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::TreeBranchEndIcon)) return ColorStyleFileEntry::TreeBranchEndIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::TreeBranchLineIcon)) return ColorStyleFileEntry::TreeBranchLineIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::TreeBranchMoreIcon)) return ColorStyleFileEntry::TreeBranchMoreIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::TreeBranchOpenIcon)) return ColorStyleFileEntry::TreeBranchOpenIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::TreeBranchOpenFocusIcon)) return ColorStyleFileEntry::TreeBranchOpenFocusIcon;
+
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::CheckBoxCheckedIcon)) return ColorStyleFileEntry::CheckBoxCheckedIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::CheckBoxCheckedDisabledIcon)) return ColorStyleFileEntry::CheckBoxCheckedDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::CheckBoxCheckedFocusIcon)) return ColorStyleFileEntry::CheckBoxCheckedFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::CheckBoxCheckedPressedIcon)) return ColorStyleFileEntry::CheckBoxCheckedPressedIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::CheckBoxIndeterminateIcon)) return ColorStyleFileEntry::CheckBoxIndeterminateIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::CheckBoxIndeterminateDisabledIcon)) return ColorStyleFileEntry::CheckBoxIndeterminateDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::CheckBoxIndeterminateFocusIcon)) return ColorStyleFileEntry::CheckBoxIndeterminateFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::CheckBoxIndeterminatePressedIcon)) return ColorStyleFileEntry::CheckBoxIndeterminatePressedIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::CheckBoxUncheckedIcon)) return ColorStyleFileEntry::CheckBoxUncheckedIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::CheckBoxUncheckedDisabledIcon)) return ColorStyleFileEntry::CheckBoxUncheckedDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::CheckBoxUncheckedFocusIcon)) return ColorStyleFileEntry::CheckBoxUncheckedFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::CheckBoxUncheckedPressedIcon)) return ColorStyleFileEntry::CheckBoxUncheckedPressedIcon;
+
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInCheckBoxCheckedIcon)) return ColorStyleFileEntry::LogInCheckBoxCheckedIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInCheckBoxCheckedDisabledIcon)) return ColorStyleFileEntry::LogInCheckBoxCheckedDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInCheckBoxCheckedFocusIcon)) return ColorStyleFileEntry::LogInCheckBoxCheckedFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInCheckBoxCheckedPressedIcon)) return ColorStyleFileEntry::LogInCheckBoxCheckedPressedIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInCheckBoxIndeterminateIcon)) return ColorStyleFileEntry::LogInCheckBoxIndeterminateIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInCheckBoxIndeterminateDisabledIcon)) return ColorStyleFileEntry::LogInCheckBoxIndeterminateDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInCheckBoxIndeterminateFocusIcon)) return ColorStyleFileEntry::LogInCheckBoxIndeterminateFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInCheckBoxIndeterminatePressedIcon)) return ColorStyleFileEntry::LogInCheckBoxIndeterminatePressedIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInCheckBoxUncheckedIcon)) return ColorStyleFileEntry::LogInCheckBoxUncheckedIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInCheckBoxUncheckedDisabledIcon)) return ColorStyleFileEntry::LogInCheckBoxUncheckedDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInCheckBoxUncheckedFocusIcon)) return ColorStyleFileEntry::LogInCheckBoxUncheckedFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInCheckBoxUncheckedPressedIcon)) return ColorStyleFileEntry::LogInCheckBoxUncheckedPressedIcon;
+
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::RadioButtonCheckedIcon)) return ColorStyleFileEntry::RadioButtonCheckedIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::RadioButtonCheckedDisabledIcon)) return ColorStyleFileEntry::RadioButtonCheckedDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::RadioButtonCheckedFocusIcon)) return ColorStyleFileEntry::RadioButtonCheckedFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::RadioButtonUncheckedIcon)) return ColorStyleFileEntry::RadioButtonUncheckedIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::RadioButtonUncheckedDisabledIcon)) return ColorStyleFileEntry::RadioButtonUncheckedDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::RadioButtonUncheckedFocusIcon)) return ColorStyleFileEntry::RadioButtonUncheckedFocusIcon;
+
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ToolBarMoveHorizontalIcon)) return ColorStyleFileEntry::ToolBarMoveHorizontalIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ToolBarMoveVerticalIcon)) return ColorStyleFileEntry::ToolBarMoveVerticalIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ToolBarSeparatorHorizontalIcon)) return ColorStyleFileEntry::ToolBarSeparatorHorizontalIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::ToolBarSeparatorVerticalIcon)) return ColorStyleFileEntry::ToolBarSeparatorVerticalIcon;
+
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::WindowCloseIcon)) return ColorStyleFileEntry::WindowCloseIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::WindowCloseDisabledIcon)) return ColorStyleFileEntry::WindowCloseDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::WindowCloseFocusIcon)) return ColorStyleFileEntry::WindowCloseFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::WindowClosePressedIcon)) return ColorStyleFileEntry::WindowClosePressedIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::WindowGripIcon)) return ColorStyleFileEntry::WindowGripIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::WindowUndockIcon)) return ColorStyleFileEntry::WindowUndockIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::WindowUndockDisabledIcon)) return ColorStyleFileEntry::WindowUndockDisabledIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::WindowUndockFocusIcon)) return ColorStyleFileEntry::WindowUndockFocusIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::WindowUndockPressedIcon)) return ColorStyleFileEntry::WindowUndockPressedIcon;
+
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::PropertyGroupCollapsedIcon)) return ColorStyleFileEntry::PropertyGroupCollapsedIcon;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::PropertyGroupExpandedIcon)) return ColorStyleFileEntry::PropertyGroupExpandedIcon;
 	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::PropertyItemDeleteIcon)) return ColorStyleFileEntry::PropertyItemDeleteIcon;
+	else if (_colorStyleFileEntry == toString(ColorStyleFileEntry::LogInBackgroundImage)) return ColorStyleFileEntry::LogInBackgroundImage;
 	else {
 		OT_LOG_EAS("Unknown ColorStyleFileEntry \"" + _colorStyleFileEntry + "\"");
 		return ColorStyleFileEntry::LogInBackgroundImage;
 	}
 }
 
-std::string ot::toString(ColorStylePainterEntry _colorStylePainterEntry) {
-	switch (_colorStylePainterEntry)
+std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
+	switch (_colorStyleValueEntry)
 	{
-	case ot::ColorStylePainterEntry::WidgetBackground: return "Widget Background";
-	case ot::ColorStylePainterEntry::WidgetAlternateBackground: return "Widget Alternate Background";
-	case ot::ColorStylePainterEntry::WidgetForeground: return "Widget Foreground";
-	case ot::ColorStylePainterEntry::WidgetDisabledBackground: return "Widget Disabled Background";
-	case ot::ColorStylePainterEntry::WidgetDisabledForeground: return "Widget Disabled Foreground";
+	case ot::ColorStyleValueEntry::WidgetBackground: return "Widget Background";
+	case ot::ColorStyleValueEntry::WidgetAlternateBackground: return "Widget Alternate Background";
+	case ot::ColorStyleValueEntry::WidgetForeground: return "Widget Foreground";
+	case ot::ColorStyleValueEntry::WidgetDisabledBackground: return "Widget Disabled Background";
+	case ot::ColorStyleValueEntry::WidgetDisabledForeground: return "Widget Disabled Foreground";
 
-	case ot::ColorStylePainterEntry::WidgetHoverBackground: return "Widget Hover Background";
-	case ot::ColorStylePainterEntry::WidgetHoverForeground: return "Widget Hover Foreground";
-	case ot::ColorStylePainterEntry::WidgetSelectionBackground: return "Widget Selection Background";
-	case ot::ColorStylePainterEntry::WidgetSelectionForeground: return "Widget Selection Foreground";
+	case ot::ColorStyleValueEntry::WidgetHoverBackground: return "Widget Hover Background";
+	case ot::ColorStyleValueEntry::WidgetHoverForeground: return "Widget Hover Foreground";
+	case ot::ColorStyleValueEntry::WidgetSelectionBackground: return "Widget Selection Background";
+	case ot::ColorStyleValueEntry::WidgetSelectionForeground: return "Widget Selection Foreground";
 
-	case ot::ColorStylePainterEntry::TitleBackground: return "Title Background";
-	case ot::ColorStylePainterEntry::TitleForeground: return "Title Foreground";
-	case ot::ColorStylePainterEntry::TitleBorder: return "Title Border";
+	case ot::ColorStyleValueEntry::TitleBackground: return "Title Background";
+	case ot::ColorStyleValueEntry::TitleForeground: return "Title Foreground";
+	case ot::ColorStyleValueEntry::TitleBorder: return "Title Border";
 
-	case ot::ColorStylePainterEntry::HeaderBackground: return "Header Background";
-	case ot::ColorStylePainterEntry::HeaderHoverBackground: return "Header Hover Background";
-	case ot::ColorStylePainterEntry::HeaderSelectionBackground: return "Header Selection Background";
+	case ot::ColorStyleValueEntry::HeaderBackground: return "Header Background";
+	case ot::ColorStyleValueEntry::HeaderForeground: return "Header Foregorund";
+	case ot::ColorStyleValueEntry::HeaderHoverBackground: return "Header Hover Background";
+	case ot::ColorStyleValueEntry::HeaderHoverForeground: return "Header Hover Foreground";
+	case ot::ColorStyleValueEntry::HeaderSelectionBackground: return "Header Selection Background";
+	case ot::ColorStyleValueEntry::HeaderSelectionForeground: return "Header Selection Foreground";
 
-	case ot::ColorStylePainterEntry::InputBackground: return "Input Background";
-	case ot::ColorStylePainterEntry::InputForeground: return "Input Foreground";
+	case ot::ColorStyleValueEntry::InputBackground: return "Input Background";
+	case ot::ColorStyleValueEntry::InputForeground: return "Input Foreground";
 
-	case ot::ColorStylePainterEntry::TextEditorLineBorder: return "TextEditor Line Border";
-	case ot::ColorStylePainterEntry::TextEditorHighlightBackground: return "TextEditor Highlight Background";
+	case ot::ColorStyleValueEntry::TextEditorLineBorder: return "TextEditor Line Border";
+	case ot::ColorStyleValueEntry::TextEditorHighlightBackground: return "TextEditor Highlight Background";
 
-	case ot::ColorStylePainterEntry::DialogBackground: return "Dialog Background";
-	case ot::ColorStylePainterEntry::DialogForeground: return "Dialog Foreground";
+	case ot::ColorStyleValueEntry::DialogBackground: return "Dialog Background";
+	case ot::ColorStyleValueEntry::DialogForeground: return "Dialog Foreground";
 
-	case ot::ColorStylePainterEntry::WindowBackground: return "Window Background";
-	case ot::ColorStylePainterEntry::WindowForeground: return "Window Foreground";
+	case ot::ColorStyleValueEntry::WindowBackground: return "Window Background";
+	case ot::ColorStyleValueEntry::WindowForeground: return "Window Foreground";
 
-	case ot::ColorStylePainterEntry::Border: return "Border Color";
-	case ot::ColorStylePainterEntry::BorderLight: return "Border Light Color";
-	case ot::ColorStylePainterEntry::BorderDisabled: return "Border Disabled Color";
-	case ot::ColorStylePainterEntry::BorderHover: return "Border Hover Color";
-	case ot::ColorStylePainterEntry::BorderSelection: return "Border Selection Color";
+	case ot::ColorStyleValueEntry::Border: return "Border Color";
+	case ot::ColorStyleValueEntry::BorderLight: return "Border Light Color";
+	case ot::ColorStyleValueEntry::BorderDisabled: return "Border Disabled Color";
+	case ot::ColorStyleValueEntry::BorderHover: return "Border Hover Color";
+	case ot::ColorStyleValueEntry::BorderSelection: return "Border Selection Color";
 
-	case ot::ColorStylePainterEntry::ToolBarFirstTabBackground: return "TabToolBar First Tab Background";
-	case ot::ColorStylePainterEntry::ToolBarFirstTabForeground: return "TabToolBar First Tab Foreground";
+	case ot::ColorStyleValueEntry::ToolBarFirstTabBackground: return "TabToolBar First Tab Background";
+	case ot::ColorStyleValueEntry::ToolBarFirstTabForeground: return "TabToolBar First Tab Foreground";
 
-	case ot::ColorStylePainterEntry::ErrorForeground: return "Error Foreground";
+	case ot::ColorStyleValueEntry::ErrorForeground: return "Error Foreground";
 
 	default:
-		OT_LOG_EAS("Unknown ColorStylePainterEntry (" + std::to_string((int)_colorStylePainterEntry) + ")");
+		OT_LOG_EAS("Unknown ColorStyleValueEntry (" + std::to_string((int)_colorStyleValueEntry) + ")");
 		return "Property Item Delete Icon";
 	}
 }
 
-ot::ColorStylePainterEntry ot::stringToColorStylePainterEntry(const std::string& _colorStylePainterEntry) {
-	if (_colorStylePainterEntry == toString(ColorStylePainterEntry::WidgetBackground)) return ColorStylePainterEntry::WidgetBackground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::WidgetAlternateBackground)) return ColorStylePainterEntry::WidgetAlternateBackground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::WidgetForeground)) return ColorStylePainterEntry::WidgetForeground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::WidgetDisabledBackground)) return ColorStylePainterEntry::WidgetDisabledBackground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::WidgetDisabledForeground)) return ColorStylePainterEntry::WidgetDisabledForeground;
+ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _colorStyleValueEntry) {
+	if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetBackground)) return ColorStyleValueEntry::WidgetBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetAlternateBackground)) return ColorStyleValueEntry::WidgetAlternateBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetForeground)) return ColorStyleValueEntry::WidgetForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetDisabledBackground)) return ColorStyleValueEntry::WidgetDisabledBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetDisabledForeground)) return ColorStyleValueEntry::WidgetDisabledForeground;
 
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::WidgetHoverBackground)) return ColorStylePainterEntry::WidgetHoverBackground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::WidgetHoverForeground)) return ColorStylePainterEntry::WidgetHoverForeground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::WidgetSelectionBackground)) return ColorStylePainterEntry::WidgetSelectionBackground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::WidgetSelectionForeground)) return ColorStylePainterEntry::WidgetSelectionForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetHoverBackground)) return ColorStyleValueEntry::WidgetHoverBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetHoverForeground)) return ColorStyleValueEntry::WidgetHoverForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetSelectionBackground)) return ColorStyleValueEntry::WidgetSelectionBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetSelectionForeground)) return ColorStyleValueEntry::WidgetSelectionForeground;
 
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::TitleBackground)) return ColorStylePainterEntry::TitleBackground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::TitleForeground)) return ColorStylePainterEntry::TitleForeground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::TitleBorder)) return ColorStylePainterEntry::TitleBorder;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::TitleBackground)) return ColorStyleValueEntry::TitleBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::TitleForeground)) return ColorStyleValueEntry::TitleForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::TitleBorder)) return ColorStyleValueEntry::TitleBorder;
 
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::HeaderBackground)) return ColorStylePainterEntry::HeaderBackground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::HeaderHoverBackground)) return ColorStylePainterEntry::HeaderHoverBackground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::HeaderSelectionBackground)) return ColorStylePainterEntry::HeaderSelectionBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::HeaderBackground)) return ColorStyleValueEntry::HeaderBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::HeaderForeground)) return ColorStyleValueEntry::HeaderForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::HeaderHoverBackground)) return ColorStyleValueEntry::HeaderHoverBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::HeaderHoverForeground)) return ColorStyleValueEntry::HeaderHoverForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::HeaderSelectionBackground)) return ColorStyleValueEntry::HeaderSelectionBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::HeaderSelectionForeground)) return ColorStyleValueEntry::HeaderSelectionForeground;
 
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::InputBackground)) return ColorStylePainterEntry::InputBackground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::InputForeground)) return ColorStylePainterEntry::InputForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::InputBackground)) return ColorStyleValueEntry::InputBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::InputForeground)) return ColorStyleValueEntry::InputForeground;
 
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::TextEditorLineBorder)) return ColorStylePainterEntry::TextEditorLineBorder;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::TextEditorHighlightBackground)) return ColorStylePainterEntry::TextEditorHighlightBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::TextEditorLineBorder)) return ColorStyleValueEntry::TextEditorLineBorder;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::TextEditorHighlightBackground)) return ColorStyleValueEntry::TextEditorHighlightBackground;
 
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::DialogBackground)) return ColorStylePainterEntry::DialogBackground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::DialogForeground)) return ColorStylePainterEntry::DialogForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::DialogBackground)) return ColorStyleValueEntry::DialogBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::DialogForeground)) return ColorStyleValueEntry::DialogForeground;
 
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::WindowBackground)) return ColorStylePainterEntry::WindowBackground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::WindowForeground)) return ColorStylePainterEntry::WindowForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WindowBackground)) return ColorStyleValueEntry::WindowBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WindowForeground)) return ColorStyleValueEntry::WindowForeground;
 
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::Border)) return ColorStylePainterEntry::Border;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::BorderLight)) return ColorStylePainterEntry::BorderLight;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::BorderDisabled)) return ColorStylePainterEntry::BorderDisabled;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::BorderHover)) return ColorStylePainterEntry::BorderHover;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::BorderSelection)) return ColorStylePainterEntry::BorderSelection;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::Border)) return ColorStyleValueEntry::Border;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::BorderLight)) return ColorStyleValueEntry::BorderLight;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::BorderDisabled)) return ColorStyleValueEntry::BorderDisabled;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::BorderHover)) return ColorStyleValueEntry::BorderHover;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::BorderSelection)) return ColorStyleValueEntry::BorderSelection;
 
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::ToolBarFirstTabBackground)) return ColorStylePainterEntry::ToolBarFirstTabBackground;
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::ToolBarFirstTabForeground)) return ColorStylePainterEntry::ToolBarFirstTabForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ToolBarFirstTabBackground)) return ColorStyleValueEntry::ToolBarFirstTabBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ToolBarFirstTabForeground)) return ColorStyleValueEntry::ToolBarFirstTabForeground;
 
-	else if (_colorStylePainterEntry == toString(ColorStylePainterEntry::ErrorForeground)) return ColorStylePainterEntry::ErrorForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ErrorForeground)) return ColorStyleValueEntry::ErrorForeground;
 	else {
-		OT_LOG_EAS("Unknown ColorStylePainterEntry \"" + _colorStylePainterEntry + "\"");
-		return ColorStylePainterEntry::WidgetBackground;
+		OT_LOG_EAS("Unknown ColorStyleValueEntry \"" + _colorStyleValueEntry + "\"");
+		return ColorStyleValueEntry::WidgetBackground;
 	}
 }
 
@@ -267,6 +416,7 @@ ot::ColorStyleIntegerEntry ot::stringToColorStyleIntegerEntry(const std::string&
 std::string ot::toString(ColorStyleDoubleEntry _colorStyleDoubleEntry) {
 	switch (_colorStyleDoubleEntry)
 	{
+	case ot::ColorStyleDoubleEntry::BorderWidth: return "Border Width";
 	case ot::ColorStyleDoubleEntry::BorderRadiusBig: return "Border Radius Big";
 	case ot::ColorStyleDoubleEntry::BorderRadiusSmall: return "Border Radius Small";
 	case ot::ColorStyleDoubleEntry::ToolTipOpacity: return "ToolTip Opacity";
@@ -277,7 +427,8 @@ std::string ot::toString(ColorStyleDoubleEntry _colorStyleDoubleEntry) {
 }
 
 ot::ColorStyleDoubleEntry ot::stringToColorStyleDoubleEntry(const std::string& _colorStyleDoubleEntry) {
-	if (_colorStyleDoubleEntry == toString(ColorStyleDoubleEntry::BorderRadiusBig)) return ColorStyleDoubleEntry::BorderRadiusBig;
+	if (_colorStyleDoubleEntry == toString(ColorStyleDoubleEntry::BorderWidth)) return ColorStyleDoubleEntry::BorderWidth;
+	else if (_colorStyleDoubleEntry == toString(ColorStyleDoubleEntry::BorderRadiusBig)) return ColorStyleDoubleEntry::BorderRadiusBig;
 	else if (_colorStyleDoubleEntry == toString(ColorStyleDoubleEntry::BorderRadiusSmall)) return ColorStyleDoubleEntry::BorderRadiusSmall;
 	else if (_colorStyleDoubleEntry == toString(ColorStyleDoubleEntry::ToolTipOpacity)) return ColorStyleDoubleEntry::ToolTipOpacity;
 	else {

@@ -109,8 +109,8 @@ void mainApplicationThread()
 
 		// Initialize color style
 		ot::GlobalColorStyle::instance().scanForStyleFiles();
-		if (ot::GlobalColorStyle::instance().hasStyle(OT_COLORSTYLE_NAME_Bright)) {
-			ot::GlobalColorStyle::instance().setCurrentStyle(OT_COLORSTYLE_NAME_Bright);
+		if (ot::GlobalColorStyle::instance().hasStyle(ot::toString(ot::ColorStyleName::BrightStyle))) {
+			ot::GlobalColorStyle::instance().setCurrentStyle(ot::toString(ot::ColorStyleName::BrightStyle));
 		}
 
 		// Create application instance, the application instance will initialize the toolkit api

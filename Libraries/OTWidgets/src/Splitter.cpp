@@ -29,6 +29,6 @@ ot::Splitter::~Splitter() {
 }
 
 void ot::Splitter::slotGlobalColorStyleChanged(const ColorStyle& _style) {
-	if (!_style.hasInteger(OT_COLORSTYLE_INT_SplitterHandleWidth)) return;
-	this->setHandleWidth(_style.getInteger(OT_COLORSTYLE_INT_SplitterHandleWidth));
+	if (!_style.hasInteger(ColorStyleIntegerEntry::SplitterHandleWidth)) return;
+	this->setHandleWidth(_style.getInteger(ColorStyleIntegerEntry::SplitterHandleWidth));
 }

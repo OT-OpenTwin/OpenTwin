@@ -61,7 +61,7 @@ void ot::Painter2DPreview::paintEvent(QPaintEvent* _event) {
 	painter.fillRect(QRect(QPoint(r.x() + 1, r.y() + 1), QSize(r.width() - 2, r.height() - 2)), m_brush);
 	
 	QPen pen;
-	pen.setBrush(GlobalColorStyle::instance().getCurrentStyle().getValue(OT_COLORSTYLE_VALUE_ControlsBorderColor).brush());
+	pen.setBrush(GlobalColorStyle::instance().getCurrentStyle().getValue(ColorStyleValueEntry::Border).brush());
 	pen.setWidth(1);
 	painter.setPen(pen);
 	painter.drawRect(r);

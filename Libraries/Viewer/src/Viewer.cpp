@@ -434,8 +434,8 @@ void Viewer::setClearColorAutomatic(void)
 {
 	if (ViewerSettings::instance()->viewBackgroundColorAutomatic)
 	{
-		ot::ColorStyleValue backColor = ot::GlobalColorStyle::instance().getCurrentStyle().getValue("Window Background");
-		ot::ColorStyleValue frontColor = ot::GlobalColorStyle::instance().getCurrentStyle().getValue("Window Foreground");
+		ot::ColorStyleValue backColor = ot::GlobalColorStyle::instance().getCurrentStyle().getValue(ot::ColorStyleValueEntry::WindowBackground);
+		ot::ColorStyleValue frontColor = ot::GlobalColorStyle::instance().getCurrentStyle().getValue(ot::ColorStyleValueEntry::WindowForeground);
 
 		viewColorAutoBackgroundR = backColor.color().red();
 		viewColorAutoBackgroundG = backColor.color().green();

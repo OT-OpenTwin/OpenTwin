@@ -196,13 +196,13 @@ void ot::PropertyGridGroup::updateStateIcon(void) {
 }
 
 void ot::PropertyGridGroup::slotColorStyleChanged(const ColorStyle& _style) {
-	this->setBackground(1, _style.getValue(OT_COLORSTYLE_VALUE_TitleBackground).brush());
-	this->setForeground(1, _style.getValue(OT_COLORSTYLE_VALUE_TitleForeground).brush());
+	this->setBackground(1, _style.getValue(ColorStyleValueEntry::TitleBackground).brush());
+	this->setForeground(1, _style.getValue(ColorStyleValueEntry::TitleForeground).brush());
 
-	QString sheet = "#PropertyGridGroupTitleLayoutW { background-color: " + _style.getValue(OT_COLORSTYLE_VALUE_TitleBackground).qss() +
-		"; color: " + _style.getValue(OT_COLORSTYLE_VALUE_TitleForeground).qss() + "; }" +
-		"#PropertyGridGroupTitleLabel { background-color: " + _style.getValue(OT_COLORSTYLE_VALUE_TitleBackground).qss() +
-		"; color: " + _style.getValue(OT_COLORSTYLE_VALUE_TitleForeground).qss() + "; }";
+	QString sheet = "#PropertyGridGroupTitleLayoutW { background-color: " + _style.getValue(ColorStyleValueEntry::TitleBackground).qss() +
+		"; color: " + _style.getValue(ColorStyleValueEntry::TitleForeground).qss() + "; }" +
+		"#PropertyGridGroupTitleLabel { background-color: " + _style.getValue(ColorStyleValueEntry::TitleBackground).qss() +
+		"; color: " + _style.getValue(ColorStyleValueEntry::TitleForeground).qss() + "; }";
 
 	m_titleLayoutW->setStyleSheet(sheet);
 	this->updateStateIcon(_style);
@@ -235,7 +235,7 @@ void ot::PropertyGridGroup::slotItemDeleteRequested(const std::string& _groupNam
 }
 
 void ot::PropertyGridGroup::updateStateIcon(const ColorStyle& _style) {
-	QString icoPath = _style.getFile((this->isExpanded() ? OT_COLORSTYLE_FILE_PropertyGroupExpanded : OT_COLORSTYLE_FILE_PropertyGroupCollapsed));
+	QString icoPath = _style.getFile((this->isExpanded() ? ColorStyleFileEntry::PropertyGroupExpandedIcon : ColorStyleFileEntry::PropertyGroupCollapsedIcon));
 	QIcon ico(icoPath);
 	m_titleIconLabel->setPixmap(ico.pixmap(16, 16));
 }

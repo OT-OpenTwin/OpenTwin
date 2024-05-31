@@ -151,7 +151,7 @@ void ot::GlobalColorStyle::scanForStyleFiles(void) {
 
 void ot::GlobalColorStyle::evaluateColorStyleFiles(ColorStyle& _style) const {
 	QString rootPath = this->styleRootPath(_style.colorStyleName());
-	std::map<std::string, QString> data = _style.getFiles();
+	std::map<ColorStyleFileEntry, QString> data = _style.getFiles();
 	for (auto& it : data) {
 		it.second = rootPath + it.second;
 	}
@@ -161,7 +161,7 @@ void ot::GlobalColorStyle::evaluateColorStyleFiles(ColorStyle& _style) const {
 void ot::GlobalColorStyle::evaluateStyleSheetMacros(ColorStyle& _style) const {
 	QString rootPath = this->styleRootPath(_style.colorStyleName());
 	QString evaluatedSheet = _style.styleSheet();
-	evaluatedSheet.replace(OT_COLORSTYLE_FILE_MACRO_Root, rootPath);
+	evaluatedSheet.replace(QString::fromStdString(toString(ColorStyleFileMacro::RootMacro)), rootPath);
 
 	_style.setStyleSheet(evaluatedSheet);
 }

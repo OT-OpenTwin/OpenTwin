@@ -33,7 +33,7 @@ void ot::PropertyGridItemDelegate::paint(QPainter* _painter, const QStyleOptionV
 		_painter->fillRect(_option.rect, QBrush(itm->propertyColor()));
 	}
 	else if (grp) {
-		_painter->fillRect(_option.rect, GlobalColorStyle::instance().getCurrentStyle().getValue(OT_COLORSTYLE_VALUE_TitleBackground).brush());
+		_painter->fillRect(_option.rect, GlobalColorStyle::instance().getCurrentStyle().getValue(ColorStyleValueEntry::TitleBackground).brush());
 	}
 	else {
 		OT_LOG_E("Unknown property grid entry");

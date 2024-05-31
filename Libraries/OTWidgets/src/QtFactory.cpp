@@ -95,13 +95,14 @@ QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
 		OTAssertNullptr(painter);
 
 		const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
+        ColorStyleValueEntry entryKey = stringToColorStyleValueEntry(painter->referenceKey());
 
-		if (!cs.hasValue(painter->referenceKey())) {
+		if (!cs.hasValue(entryKey)) {
 			OT_LOG_W("Failed to create brush from ColorStyleValue reference. Value not found");
 			return QBrush();
 		}
 		else {
-			return cs.getValue(painter->referenceKey()).brush();
+			return cs.getValue(entryKey).brush();
 		}
 	}
 	else {

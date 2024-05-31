@@ -117,7 +117,7 @@ void ot::PropertyGridItem::slotDeleteRequested(void) {
 }
 
 void ot::PropertyGridItem::slotGlobalStyleChanged(const ColorStyle& _style) {
-	QString pth = GlobalColorStyle::instance().getCurrentStyle().getFile(OT_COLORSTYLE_FILE_PropertyItemDelete);
+	QString pth = GlobalColorStyle::instance().getCurrentStyle().getFile(ColorStyleFileEntry::PropertyItemDeleteIcon);
 	QIcon ico(pth);
 	m_deleteLabel->setPixmap(ico.pixmap(16, 16));
 }

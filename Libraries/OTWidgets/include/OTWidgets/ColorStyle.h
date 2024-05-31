@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/ColorStyleValue.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -53,38 +54,38 @@ namespace ot {
 		const QString& styleSheet(void) const { return m_styleSheet; };
 
 		void addValue(const ColorStyleValue& _value, bool _replace = false);
-		bool hasValue(const std::string& _name) const;
-		const ColorStyleValue& getValue(const std::string& _name, const ColorStyleValue& _default = ColorStyleValue()) const;
-		void setValues(const std::map<std::string, ColorStyleValue>& _values) { m_values = _values; };
-		const std::map<std::string, ColorStyleValue>& getValues(void) const { return m_values; };
+		bool hasValue(ColorStyleValueEntry _type) const;
+		const ColorStyleValue& getValue(ColorStyleValueEntry _type, const ColorStyleValue& _default = ColorStyleValue()) const;
+		void setValues(const std::map<ColorStyleValueEntry, ColorStyleValue>& _values) { m_values = _values; };
+		const std::map<ColorStyleValueEntry, ColorStyleValue>& getValues(void) const { return m_values; };
 
-		void addFile(const std::string& _name, const QString& _path, bool _replace = false);
-		bool hasFile(const std::string& _name) const;
-		QString getFile(const std::string& _name) const;
-		void setFiles(const std::map<std::string, QString>& _files) { m_files = _files; };
-		const std::map<std::string, QString>& getFiles(void) const { return m_files; };
+		void addFile(ColorStyleFileEntry _type, const QString& _path, bool _replace = false);
+		bool hasFile(ColorStyleFileEntry _type) const;
+		QString getFile(ColorStyleFileEntry _type) const;
+		void setFiles(const std::map<ColorStyleFileEntry, QString>& _files) { m_files = _files; };
+		const std::map<ColorStyleFileEntry, QString>& getFiles(void) const { return m_files; };
 
-		void addInteger(const std::string& _name, int _value, bool _replace = false);
-		bool hasInteger(const std::string& _name) const;
-		int getInteger(const std::string& _name) const;
-		void setIntegers(const std::map<std::string, int>& _integers) { m_int = _integers; };
-		const std::map<std::string, int>& getIntegers(void) const { return m_int; };
+		void addInteger(ColorStyleIntegerEntry _type, int _value, bool _replace = false);
+		bool hasInteger(ColorStyleIntegerEntry _type) const;
+		int getInteger(ColorStyleIntegerEntry _type) const;
+		void setIntegers(const std::map<ColorStyleIntegerEntry, int>& _integers) { m_int = _integers; };
+		const std::map<ColorStyleIntegerEntry, int>& getIntegers(void) const { return m_int; };
 
-		void addDouble(const std::string& _name, double _value, bool _replace = false);
-		bool hasDouble(const std::string& _name) const;
-		double getDouble(const std::string& _name) const;
-		void setDoubles(const std::map<std::string, double>& _doubles) { m_double = _doubles; };
-		const std::map<std::string, double>& getDoubles(void) const { return m_double; };
+		void addDouble(ColorStyleDoubleEntry _type, double _value, bool _replace = false);
+		bool hasDouble(ColorStyleDoubleEntry _type) const;
+		double getDouble(ColorStyleDoubleEntry _type) const;
+		void setDoubles(const std::map<ColorStyleDoubleEntry, double>& _doubles) { m_double = _doubles; };
+		const std::map<ColorStyleDoubleEntry, double>& getDoubles(void) const { return m_double; };
 
 		bool setupFromFile(QByteArray _data);
 
 	private:
 		std::string m_name;
 		QString m_styleSheet;
-		std::map<std::string, ColorStyleValue> m_values;
-		std::map<std::string, QString> m_files;
-		std::map<std::string, int> m_int;
-		std::map<std::string, double> m_double;
+		std::map<ColorStyleValueEntry, ColorStyleValue> m_values;
+		std::map<ColorStyleFileEntry, QString> m_files;
+		std::map<ColorStyleIntegerEntry, int> m_int;
+		std::map<ColorStyleDoubleEntry, double> m_double;
 	};
 
 }
