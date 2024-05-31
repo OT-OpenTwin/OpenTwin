@@ -91,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Border.cpp" />
+    <ClCompile Include="src\ColorStyleTypes.cpp" />
     <ClCompile Include="src\GraphicsGroupItemCfg.cpp" />
     <ClCompile Include="src\GraphicsItemCfgFactory.cpp" />
     <ClCompile Include="src\GraphicsLineItemCfg.cpp" />
