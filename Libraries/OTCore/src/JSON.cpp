@@ -63,8 +63,16 @@ bool ot::json::exists(const JsonValue & _value, const char* _member) {
 	return _value.HasMember(_member);
 }
 
+bool ot::json::exists(const JsonValue& _value, const std::string& _member) {
+	return _value.HasMember(_member.c_str());
+}
+
 bool ot::json::exists(const ConstJsonObject & _value, const char* _member) {
 	return _value.HasMember(_member);
+}
+
+bool ot::json::exists(const ConstJsonObject& _value, const std::string& _member) {
+	return _value.HasMember(_member.c_str());
 }
 
 bool ot::json::isNull(const JsonValue& _value, const char* _member) {
@@ -72,9 +80,19 @@ bool ot::json::isNull(const JsonValue& _value, const char* _member) {
 	return _value[_member].IsNull();
 }
 
+bool ot::json::isNull(const JsonValue& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsNull();
+}
+
 bool ot::json::isNull(const ConstJsonObject& _value, const char* _member) {
 	if (!_value.HasMember(_member)) return false;
 	return _value[_member].IsNull();
+}
+
+bool ot::json::isNull(const ConstJsonObject& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsNull();
 }
 
 bool ot::json::isBool(const JsonValue & _value, const char* _member) {
@@ -82,9 +100,19 @@ bool ot::json::isBool(const JsonValue & _value, const char* _member) {
 	return _value[_member].IsBool();
 }
 
+bool ot::json::isBool(const JsonValue& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsBool();
+}
+
 bool ot::json::isBool(const ConstJsonObject& _value, const char* _member) {
 	if (!_value.HasMember(_member)) return false;
 	return _value[_member].IsBool();
+}
+
+bool ot::json::isBool(const ConstJsonObject& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsBool();
 }
 
 bool ot::json::isInt(const JsonValue& _value, const char* _member) {
@@ -92,9 +120,19 @@ bool ot::json::isInt(const JsonValue& _value, const char* _member) {
 	return _value[_member].IsInt();
 }
 
+bool ot::json::isInt(const JsonValue& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsInt();
+}
+
 bool ot::json::isInt(const ConstJsonObject& _value, const char* _member) {
 	if (!_value.HasMember(_member)) return false;
 	return _value[_member].IsInt();
+}
+
+bool ot::json::isInt(const ConstJsonObject& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsInt();
 }
 
 bool ot::json::isUInt(const JsonValue& _value, const char* _member) {
@@ -102,9 +140,19 @@ bool ot::json::isUInt(const JsonValue& _value, const char* _member) {
 	return _value[_member].IsUint();
 }
 
+bool ot::json::isUInt(const JsonValue& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsUint();
+}
+
 bool ot::json::isUInt(const ConstJsonObject& _value, const char* _member) {
 	if (!_value.HasMember(_member)) return false;
 	return _value[_member].IsUint();
+}
+
+bool ot::json::isUInt(const ConstJsonObject& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsUint();
 }
 
 bool ot::json::isInt64(const JsonValue& _value, const char* _member) {
@@ -112,9 +160,19 @@ bool ot::json::isInt64(const JsonValue& _value, const char* _member) {
 	return _value[_member].IsInt64();
 }
 
+bool ot::json::isInt64(const JsonValue& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsInt64();
+}
+
 bool ot::json::isInt64(const ConstJsonObject& _value, const char* _member) {
 	if (!_value.HasMember(_member)) return false;
 	return _value[_member].IsInt64();
+}
+
+bool ot::json::isInt64(const ConstJsonObject& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsInt64();
 }
 
 bool ot::json::isUInt64(const JsonValue& _value, const char* _member) {
@@ -122,9 +180,19 @@ bool ot::json::isUInt64(const JsonValue& _value, const char* _member) {
 	return _value[_member].IsUint64();
 }
 
+bool ot::json::isUInt64(const JsonValue& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsUint64();
+}
+
 bool ot::json::isUInt64(const ConstJsonObject& _value, const char* _member) {
 	if (!_value.HasMember(_member)) return false;
 	return _value[_member].IsUint64();
+}
+
+bool ot::json::isUInt64(const ConstJsonObject& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsUint64();
 }
 
 bool ot::json::isFloat(const JsonValue& _value, const char* _member) {
@@ -132,9 +200,19 @@ bool ot::json::isFloat(const JsonValue& _value, const char* _member) {
 	return _value[_member].IsFloat();
 }
 
+bool ot::json::isFloat(const JsonValue& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsFloat();
+}
+
 bool ot::json::isFloat(const ConstJsonObject& _value, const char* _member) {
 	if (!_value.HasMember(_member)) return false;
 	return _value[_member].IsFloat();
+}
+
+bool ot::json::isFloat(const ConstJsonObject& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsFloat();
 }
 
 bool ot::json::isDouble(const JsonValue& _value, const char* _member) {
@@ -142,9 +220,19 @@ bool ot::json::isDouble(const JsonValue& _value, const char* _member) {
 	return _value[_member].IsDouble();
 }
 
+bool ot::json::isDouble(const JsonValue& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsDouble();
+}
+
 bool ot::json::isDouble(const ConstJsonObject& _value, const char* _member) {
 	if (!_value.HasMember(_member)) return false;
 	return _value[_member].IsDouble();
+}
+
+bool ot::json::isDouble(const ConstJsonObject& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsDouble();
 }
 
 bool ot::json::isString(const JsonValue& _value, const char* _member) {
@@ -152,9 +240,19 @@ bool ot::json::isString(const JsonValue& _value, const char* _member) {
 	return _value[_member].IsString();
 }
 
+bool ot::json::isString(const JsonValue& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsString();
+}
+
 bool ot::json::isString(const ConstJsonObject& _value, const char* _member) {
 	if (!_value.HasMember(_member)) return false;
 	return _value[_member].IsString();
+}
+
+bool ot::json::isString(const ConstJsonObject& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsString();
 }
 
 bool ot::json::isObject(const JsonValue& _value, const char* _member) {
@@ -162,9 +260,19 @@ bool ot::json::isObject(const JsonValue& _value, const char* _member) {
 	return _value[_member].IsObject();
 }
 
+bool ot::json::isObject(const JsonValue& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsObject();
+}
+
 bool ot::json::isObject(const ConstJsonObject& _value, const char* _member) {
 	if (!_value.HasMember(_member)) return false;
 	return _value[_member].IsObject();
+}
+
+bool ot::json::isObject(const ConstJsonObject& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsObject();
 }
 
 bool ot::json::isArray(const JsonValue& _value, const char* _member) {
@@ -172,89 +280,179 @@ bool ot::json::isArray(const JsonValue& _value, const char* _member) {
 	return _value[_member].IsArray();
 }
 
+bool ot::json::isArray(const JsonValue& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsArray();
+}
+
 bool ot::json::isArray(const ConstJsonObject& _value, const char* _member) {
 	if (!_value.HasMember(_member)) return false;
 	return _value[_member].IsArray();
+}
+
+bool ot::json::isArray(const ConstJsonObject& _value, const std::string& _member) {
+	if (!_value.HasMember(_member.c_str())) return false;
+	return _value[_member.c_str()].IsArray();
 }
 
 bool ot::json::getBool(const JsonValue& _value, const char* _member, bool _default) {
 	OT_JSON_getFromObject(_value, _member, Bool, return _default);
 }
 
+bool ot::json::getBool(const JsonValue& _value, const std::string& _member, bool _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Bool, return _default);
+}
+
 bool ot::json::getBool(const ConstJsonObject& _value, const char* _member, bool _default) {
 	OT_JSON_getFromObject(_value, _member, Bool, return _default);
+}
+
+bool ot::json::getBool(const ConstJsonObject& _value, const std::string& _member, bool _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Bool, return _default);
 }
 
 int32_t ot::json::getInt(const JsonValue& _value, const char* _member, int32_t _default) {
 	OT_JSON_getFromObject(_value, _member, Int, return _default);
 }
 
+int32_t ot::json::getInt(const JsonValue& _value, const std::string& _member, int32_t _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Int, return _default);
+}
+
 int32_t ot::json::getInt(const ConstJsonObject& _value, const char* _member, int32_t _default) {
 	OT_JSON_getFromObject(_value, _member, Int, return _default);
+}
+
+int32_t ot::json::getInt(const ConstJsonObject& _value, const std::string& _member, int32_t _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Int, return _default);
 }
 
 uint32_t ot::json::getUInt(const JsonValue& _value, const char* _member, uint32_t _default) {
 	OT_JSON_getFromObject(_value, _member, Uint, return _default);
 }
 
+uint32_t ot::json::getUInt(const JsonValue& _value, const std::string& _member, uint32_t _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Uint, return _default);
+}
+
 uint32_t ot::json::getUInt(const ConstJsonObject& _value, const char* _member, uint32_t _default) {
 	OT_JSON_getFromObject(_value, _member, Uint, return _default);
+}
+
+uint32_t ot::json::getUInt(const ConstJsonObject& _value, const std::string& _member, uint32_t _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Uint, return _default);
 }
 
 int64_t ot::json::getInt64(const JsonValue& _value, const char* _member, int64_t _default) {
 	OT_JSON_getFromObject(_value, _member, Int64, return _default);
 }
 
+int64_t ot::json::getInt64(const JsonValue& _value, const std::string& _member, int64_t _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Int64, return _default);
+}
+
 int64_t ot::json::getInt64(const ConstJsonObject& _value, const char* _member, int64_t _default) {
 	OT_JSON_getFromObject(_value, _member, Int64, return _default);
+}
+
+int64_t ot::json::getInt64(const ConstJsonObject& _value, const std::string& _member, int64_t _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Int64, return _default);
 }
 
 uint64_t ot::json::getUInt64(const JsonValue& _value, const char* _member, uint64_t _default) {
 	OT_JSON_getFromObject(_value, _member, Uint64, return _default);
 }
 
+uint64_t ot::json::getUInt64(const JsonValue& _value, const std::string& _member, uint64_t _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Uint64, return _default);
+}
+
 uint64_t ot::json::getUInt64(const ConstJsonObject& _value, const char* _member, uint64_t _default) {
 	OT_JSON_getFromObject(_value, _member, Uint64, return _default);
+}
+
+uint64_t ot::json::getUInt64(const ConstJsonObject& _value, const std::string& _member, uint64_t _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Uint64, return _default);
 }
 
 float ot::json::getFloat(const JsonValue& _value, const char* _member, float _default) {
 	OT_JSON_getFromObject(_value, _member, Float, return _default);
 }
 
+float ot::json::getFloat(const JsonValue& _value, const std::string& _member, float _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Float, return _default);
+}
+
 float ot::json::getFloat(const ConstJsonObject& _value, const char* _member, float _default) {
 	OT_JSON_getFromObject(_value, _member, Float, return _default);
+}
+
+float ot::json::getFloat(const ConstJsonObject& _value, const std::string& _member, float _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Float, return _default);
 }
 
 double ot::json::getDouble(const JsonValue& _value, const char* _member, double _default) {
 	OT_JSON_getFromObject(_value, _member, Double, return _default);
 }
 
+double ot::json::getDouble(const JsonValue& _value, const std::string& _member, double _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Double, return _default);
+}
+
 double ot::json::getDouble(const ConstJsonObject& _value, const char* _member, double _default) {
 	OT_JSON_getFromObject(_value, _member, Double, return _default);
+}
+
+double ot::json::getDouble(const ConstJsonObject& _value, const std::string& _member, double _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Double, return _default);
 }
 
 std::string ot::json::getString(const JsonValue& _value, const char* _member, const std::string& _default) {
 	OT_JSON_getFromObject(_value, _member, String, return _default);
 }
 
+std::string ot::json::getString(const JsonValue& _value, const std::string& _member, const std::string& _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), String, return _default);
+}
+
 std::string ot::json::getString(const ConstJsonObject& _value, const char* _member, const std::string& _default) {
 	OT_JSON_getFromObject(_value, _member, String, return _default);
+}
+
+std::string ot::json::getString(const ConstJsonObject& _value, const std::string& _member, const std::string& _default) {
+	OT_JSON_getFromObject(_value, _member.c_str(), String, return _default);
 }
 
 ot::ConstJsonObject ot::json::getObject(const JsonValue& _value, const char* _member) {
 	OT_JSON_getFromObject(_value, _member, Object, throw std::exception("Invalid type"));
 }
 
+ot::ConstJsonObject ot::json::getObject(const JsonValue& _value, const std::string& _member) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Object, throw std::exception("Invalid type"));
+}
+
 ot::ConstJsonObject ot::json::getObject(const ConstJsonObject& _value, const char* _member) {
 	OT_JSON_getFromObject(_value, _member, Object, throw std::exception("Invalid type"));
+}
+
+ot::ConstJsonObject ot::json::getObject(const ConstJsonObject& _value, const std::string& _member) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Object, throw std::exception("Invalid type"));
 }
 
 ot::ConstJsonArray ot::json::getArray(const JsonValue& _value, const char* _member) {
 	OT_JSON_getFromObject(_value, _member, Array, throw std::exception("Invalid type"));
 }
 
+ot::ConstJsonArray ot::json::getArray(const JsonValue& _value, const std::string& _member) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Array, throw std::exception("Invalid type"));
+}
+
 ot::ConstJsonArray ot::json::getArray(const ConstJsonObject& _value, const char* _member) {
 	OT_JSON_getFromObject(_value, _member, Array, throw std::exception("Invalid type"));
+}
+
+ot::ConstJsonArray ot::json::getArray(const ConstJsonObject& _value, const std::string& _member) {
+	OT_JSON_getFromObject(_value, _member.c_str(), Array, throw std::exception("Invalid type"));
 }
 
 std::list<bool> ot::json::getBoolList(const JsonValue& _value, const char* _member, const std::list<bool>& _default) {
@@ -262,9 +460,19 @@ std::list<bool> ot::json::getBoolList(const JsonValue& _value, const char* _memb
 	OT_JSON_getListFromObject(_value, _member, Bool, ret, return _default);
 }
 
+std::list<bool> ot::json::getBoolList(const JsonValue& _value, const std::string& _member, const std::list<bool>& _default) {
+	std::list<bool> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Bool, ret, return _default);
+}
+
 std::list<bool> ot::json::getBoolList(const ConstJsonObject& _value, const char* _member, const std::list<bool>& _default) {
 	std::list<bool> ret;
 	OT_JSON_getListFromObject(_value, _member, Bool, ret, return _default);
+}
+
+std::list<bool> ot::json::getBoolList(const ConstJsonObject& _value, const std::string& _member, const std::list<bool>& _default) {
+	std::list<bool> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Bool, ret, return _default);
 }
 
 std::list<int32_t> ot::json::getIntList(const JsonValue& _value, const char* _member, const std::list<int32_t>& _default) {
@@ -272,9 +480,19 @@ std::list<int32_t> ot::json::getIntList(const JsonValue& _value, const char* _me
 	OT_JSON_getListFromObject(_value, _member, Int, ret, return _default);
 }
 
+std::list<int32_t> ot::json::getIntList(const JsonValue& _value, const std::string& _member, const std::list<int32_t>& _default) {
+	std::list<int32_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Int, ret, return _default);
+}
+
 std::list<int32_t> ot::json::getIntList(const ConstJsonObject& _value, const char* _member, const std::list<int32_t>& _default) {
 	std::list<int32_t> ret;
 	OT_JSON_getListFromObject(_value, _member, Int, ret, return _default);
+}
+
+std::list<int32_t> ot::json::getIntList(const ConstJsonObject& _value, const std::string& _member, const std::list<int32_t>& _default) {
+	std::list<int32_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Int, ret, return _default);
 }
 
 std::list<uint32_t> ot::json::getUIntList(const JsonValue& _value, const char* _member, const std::list<uint32_t>& _default) {
@@ -282,9 +500,19 @@ std::list<uint32_t> ot::json::getUIntList(const JsonValue& _value, const char* _
 	OT_JSON_getListFromObject(_value, _member, Uint, ret, return _default);
 }
 
+std::list<uint32_t> ot::json::getUIntList(const JsonValue& _value, const std::string& _member, const std::list<uint32_t>& _default) {
+	std::list<uint32_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Uint, ret, return _default);
+}
+
 std::list<uint32_t> ot::json::getUIntList(const ConstJsonObject& _value, const char* _member, const std::list<uint32_t>& _default) {
 	std::list<uint32_t> ret;
 	OT_JSON_getListFromObject(_value, _member, Uint, ret, return _default);
+}
+
+std::list<uint32_t> ot::json::getUIntList(const ConstJsonObject& _value, const std::string& _member, const std::list<uint32_t>& _default) {
+	std::list<uint32_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Uint, ret, return _default);
 }
 
 std::list<int64_t> ot::json::getInt64List(const JsonValue& _value, const char* _member, const std::list<int64_t>& _default) {
@@ -292,9 +520,19 @@ std::list<int64_t> ot::json::getInt64List(const JsonValue& _value, const char* _
 	OT_JSON_getListFromObject(_value, _member, Int64, ret, return _default);
 }
 
+std::list<int64_t> ot::json::getInt64List(const JsonValue& _value, const std::string& _member, const std::list<int64_t>& _default) {
+	std::list<int64_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Int64, ret, return _default);
+}
+
 std::list<int64_t> ot::json::getInt64List(const ConstJsonObject& _value, const char* _member, const std::list<int64_t>& _default) {
 	std::list<int64_t> ret;
 	OT_JSON_getListFromObject(_value, _member, Int64, ret, return _default);
+}
+
+std::list<int64_t> ot::json::getInt64List(const ConstJsonObject& _value, const std::string& _member, const std::list<int64_t>& _default) {
+	std::list<int64_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Int64, ret, return _default);
 }
 
 std::list<uint64_t> ot::json::getUInt64List(const JsonValue& _value, const char* _member, const std::list<uint64_t>& _default) {
@@ -302,9 +540,19 @@ std::list<uint64_t> ot::json::getUInt64List(const JsonValue& _value, const char*
 	OT_JSON_getListFromObject(_value, _member, Uint64, ret, return _default);
 }
 
+std::list<uint64_t> ot::json::getUInt64List(const JsonValue& _value, const std::string& _member, const std::list<uint64_t>& _default) {
+	std::list<uint64_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Uint64, ret, return _default);
+}
+
 std::list<uint64_t> ot::json::getUInt64List(const ConstJsonObject& _value, const char* _member, const std::list<uint64_t>& _default) {
 	std::list<uint64_t> ret;
 	OT_JSON_getListFromObject(_value, _member, Uint64, ret, return _default);
+}
+
+std::list<uint64_t> ot::json::getUInt64List(const ConstJsonObject& _value, const std::string& _member, const std::list<uint64_t>& _default) {
+	std::list<uint64_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Uint64, ret, return _default);
 }
 
 std::list<float> ot::json::getFloatList(const JsonValue& _value, const char* _member, const std::list<float>& _default) {
@@ -312,9 +560,19 @@ std::list<float> ot::json::getFloatList(const JsonValue& _value, const char* _me
 	OT_JSON_getListFromObject(_value, _member, Float, ret, return _default);
 }
 
+std::list<float> ot::json::getFloatList(const JsonValue& _value, const std::string& _member, const std::list<float>& _default) {
+	std::list<float> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Float, ret, return _default);
+}
+
 std::list<float> ot::json::getFloatList(const ConstJsonObject& _value, const char* _member, const std::list<float>& _default) {
 	std::list<float> ret;
 	OT_JSON_getListFromObject(_value, _member, Float, ret, return _default);
+}
+
+std::list<float> ot::json::getFloatList(const ConstJsonObject& _value, const std::string& _member, const std::list<float>& _default) {
+	std::list<float> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Float, ret, return _default);
 }
 
 std::list<double> ot::json::getDoubleList(const JsonValue& _value, const char* _member, const std::list<double>& _default) {
@@ -322,9 +580,19 @@ std::list<double> ot::json::getDoubleList(const JsonValue& _value, const char* _
 	OT_JSON_getListFromObject(_value, _member, Double, ret, return _default);
 }
 
+std::list<double> ot::json::getDoubleList(const JsonValue& _value, const std::string& _member, const std::list<double>& _default) {
+	std::list<double> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Double, ret, return _default);
+}
+
 std::list<double> ot::json::getDoubleList(const ConstJsonObject& _value, const char* _member, const std::list<double>& _default) {
 	std::list<double> ret;
 	OT_JSON_getListFromObject(_value, _member, Double, ret, return _default);
+}
+
+std::list<double> ot::json::getDoubleList(const ConstJsonObject& _value, const std::string& _member, const std::list<double>& _default) {
+	std::list<double> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Double, ret, return _default);
 }
 
 std::list<std::string> ot::json::getStringList(const JsonValue& _value, const char* _member, const std::list<std::string>& _default) {
@@ -332,9 +600,19 @@ std::list<std::string> ot::json::getStringList(const JsonValue& _value, const ch
 	OT_JSON_getListFromObject(_value, _member, String, ret, return _default);
 }
 
+std::list<std::string> ot::json::getStringList(const JsonValue& _value, const std::string& _member, const std::list<std::string>& _default) {
+	std::list<std::string> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), String, ret, return _default);
+}
+
 std::list<std::string> ot::json::getStringList(const ConstJsonObject& _value, const char* _member, const std::list<std::string>& _default) {
 	std::list<std::string> ret;
 	OT_JSON_getListFromObject(_value, _member, String, ret, return _default);
+}
+
+std::list<std::string> ot::json::getStringList(const ConstJsonObject& _value, const std::string& _member, const std::list<std::string>& _default) {
+	std::list<std::string> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), String, ret, return _default);
 }
 
 std::list<ot::ConstJsonObject> ot::json::getObjectList(const JsonValue& _value, const char* _member) {
@@ -342,9 +620,19 @@ std::list<ot::ConstJsonObject> ot::json::getObjectList(const JsonValue& _value, 
 	OT_JSON_getListFromObject(_value, _member, Object, ret, throw std::exception("Invalid type"));
 }
 
+std::list<ot::ConstJsonObject> ot::json::getObjectList(const JsonValue& _value, const std::string& _member) {
+	std::list<ot::ConstJsonObject> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Object, ret, throw std::exception("Invalid type"));
+}
+
 std::list<ot::ConstJsonObject> ot::json::getObjectList(const ConstJsonObject& _value, const char* _member) {
 	std::list<ot::ConstJsonObject> ret;
 	OT_JSON_getListFromObject(_value, _member, Object, ret, throw std::exception("Invalid type"));
+}
+
+std::list<ot::ConstJsonObject> ot::json::getObjectList(const ConstJsonObject& _value, const std::string& _member) {
+	std::list<ot::ConstJsonObject> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Object, ret, throw std::exception("Invalid type"));
 }
 
 std::list<ot::ConstJsonArray> ot::json::getArrayList(const JsonValue& _value, const char* _member) {
@@ -352,9 +640,19 @@ std::list<ot::ConstJsonArray> ot::json::getArrayList(const JsonValue& _value, co
 	OT_JSON_getListFromObject(_value, _member, Array, ret, throw std::exception("Invalid type"));
 }
 
+std::list<ot::ConstJsonArray> ot::json::getArrayList(const JsonValue& _value, const std::string& _member) {
+	std::list<ot::ConstJsonArray> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Array, ret, throw std::exception("Invalid type"));
+}
+
 std::list<ot::ConstJsonArray> ot::json::getArrayList(const ConstJsonObject& _value, const char* _member) {
 	std::list<ot::ConstJsonArray> ret;
 	OT_JSON_getListFromObject(_value, _member, Array, ret, throw std::exception("Invalid type"));
+}
+
+std::list<ot::ConstJsonArray> ot::json::getArrayList(const ConstJsonObject& _value, const std::string& _member) {
+	std::list<ot::ConstJsonArray> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Array, ret, throw std::exception("Invalid type"));
 }
 
 std::vector<bool> ot::json::getBoolVector(const JsonValue& _value, const char* _member, const std::vector<bool>& _default) {
@@ -362,9 +660,19 @@ std::vector<bool> ot::json::getBoolVector(const JsonValue& _value, const char* _
 	OT_JSON_getListFromObject(_value, _member, Bool, ret, return _default);
 }
 
+std::vector<bool> ot::json::getBoolVector(const JsonValue& _value, const std::string& _member, const std::vector<bool>& _default) {
+	std::vector<bool> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Bool, ret, return _default);
+}
+
 std::vector<bool> ot::json::getBoolVector(const ConstJsonObject& _value, const char* _member, const std::vector<bool>& _default) {
 	std::vector<bool> ret;
 	OT_JSON_getListFromObject(_value, _member, Bool, ret, return _default);
+}
+
+std::vector<bool> ot::json::getBoolVector(const ConstJsonObject& _value, const std::string& _member, const std::vector<bool>& _default) {
+	std::vector<bool> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Bool, ret, return _default);
 }
 
 std::vector<int32_t> ot::json::getIntVector(const JsonValue& _value, const char* _member, const std::vector<int32_t>& _default) {
@@ -372,9 +680,19 @@ std::vector<int32_t> ot::json::getIntVector(const JsonValue& _value, const char*
 	OT_JSON_getListFromObject(_value, _member, Int, ret, return _default);
 }
 
+std::vector<int32_t> ot::json::getIntVector(const JsonValue& _value, const std::string& _member, const std::vector<int32_t>& _default) {
+	std::vector<int32_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Int, ret, return _default);
+}
+
 std::vector<int32_t> ot::json::getIntVector(const ConstJsonObject& _value, const char* _member, const std::vector<int32_t>& _default) {
 	std::vector<int32_t> ret;
 	OT_JSON_getListFromObject(_value, _member, Int, ret, return _default);
+}
+
+std::vector<int32_t> ot::json::getIntVector(const ConstJsonObject& _value, const std::string& _member, const std::vector<int32_t>& _default) {
+	std::vector<int32_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Int, ret, return _default);
 }
 
 std::vector<uint32_t> ot::json::getUIntVector(const JsonValue& _value, const char* _member, const std::vector<uint32_t>& _default) {
@@ -382,9 +700,19 @@ std::vector<uint32_t> ot::json::getUIntVector(const JsonValue& _value, const cha
 	OT_JSON_getListFromObject(_value, _member, Uint, ret, return _default);
 }
 
+std::vector<uint32_t> ot::json::getUIntVector(const JsonValue& _value, const std::string& _member, const std::vector<uint32_t>& _default) {
+	std::vector<uint32_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Uint, ret, return _default);
+}
+
 std::vector<uint32_t> ot::json::getUIntVector(const ConstJsonObject& _value, const char* _member, const std::vector<uint32_t>& _default) {
 	std::vector<uint32_t> ret;
 	OT_JSON_getListFromObject(_value, _member, Uint, ret, return _default);
+}
+
+std::vector<uint32_t> ot::json::getUIntVector(const ConstJsonObject& _value, const std::string& _member, const std::vector<uint32_t>& _default) {
+	std::vector<uint32_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Uint, ret, return _default);
 }
 
 std::vector<int64_t> ot::json::getInt64Vector(const JsonValue& _value, const char* _member, const std::vector<int64_t>& _default) {
@@ -392,9 +720,19 @@ std::vector<int64_t> ot::json::getInt64Vector(const JsonValue& _value, const cha
 	OT_JSON_getListFromObject(_value, _member, Int64, ret, return _default);
 }
 
+std::vector<int64_t> ot::json::getInt64Vector(const JsonValue& _value, const std::string& _member, const std::vector<int64_t>& _default) {
+	std::vector<int64_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Int64, ret, return _default);
+}
+
 std::vector<int64_t> ot::json::getInt64Vector(const ConstJsonObject& _value, const char* _member, const std::vector<int64_t>& _default) {
 	std::vector<int64_t> ret;
 	OT_JSON_getListFromObject(_value, _member, Int64, ret, return _default);
+}
+
+std::vector<int64_t> ot::json::getInt64Vector(const ConstJsonObject& _value, const std::string& _member, const std::vector<int64_t>& _default) {
+	std::vector<int64_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Int64, ret, return _default);
 }
 
 std::vector<uint64_t> ot::json::getUInt64Vector(const JsonValue& _value, const char* _member, const std::vector<uint64_t>& _default) {
@@ -402,9 +740,19 @@ std::vector<uint64_t> ot::json::getUInt64Vector(const JsonValue& _value, const c
 	OT_JSON_getListFromObject(_value, _member, Uint64, ret, return _default);
 }
 
+std::vector<uint64_t> ot::json::getUInt64Vector(const JsonValue& _value, const std::string& _member, const std::vector<uint64_t>& _default) {
+	std::vector<uint64_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Uint64, ret, return _default);
+}
+
 std::vector<uint64_t> ot::json::getUInt64Vector(const ConstJsonObject& _value, const char* _member, const std::vector<uint64_t>& _default) {
 	std::vector<uint64_t> ret;
 	OT_JSON_getListFromObject(_value, _member, Uint64, ret, return _default);
+}
+
+std::vector<uint64_t> ot::json::getUInt64Vector(const ConstJsonObject& _value, const std::string& _member, const std::vector<uint64_t>& _default) {
+	std::vector<uint64_t> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Uint64, ret, return _default);
 }
 
 std::vector<float> ot::json::getFloatVector(const JsonValue& _value, const char* _member, const std::vector<float>& _default) {
@@ -412,9 +760,19 @@ std::vector<float> ot::json::getFloatVector(const JsonValue& _value, const char*
 	OT_JSON_getListFromObject(_value, _member, Float, ret, return _default);
 }
 
+std::vector<float> ot::json::getFloatVector(const JsonValue& _value, const std::string& _member, const std::vector<float>& _default) {
+	std::vector<float> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Float, ret, return _default);
+}
+
 std::vector<float> ot::json::getFloatVector(const ConstJsonObject& _value, const char* _member, const std::vector<float>& _default) {
 	std::vector<float> ret;
 	OT_JSON_getListFromObject(_value, _member, Float, ret, return _default);
+}
+
+std::vector<float> ot::json::getFloatVector(const ConstJsonObject& _value, const std::string& _member, const std::vector<float>& _default) {
+	std::vector<float> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Float, ret, return _default);
 }
 
 std::vector<double> ot::json::getDoubleVector(const JsonValue& _value, const char* _member, const std::vector<double>& _default) {
@@ -422,9 +780,19 @@ std::vector<double> ot::json::getDoubleVector(const JsonValue& _value, const cha
 	OT_JSON_getListFromObject(_value, _member, Double, ret, return _default);
 }
 
+std::vector<double> ot::json::getDoubleVector(const JsonValue& _value, const std::string& _member, const std::vector<double>& _default) {
+	std::vector<double> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Double, ret, return _default);
+}
+
 std::vector<double> ot::json::getDoubleVector(const ConstJsonObject& _value, const char* _member, const std::vector<double>& _default) {
 	std::vector<double> ret;
 	OT_JSON_getListFromObject(_value, _member, Double, ret, return _default);
+}
+
+std::vector<double> ot::json::getDoubleVector(const ConstJsonObject& _value, const std::string& _member, const std::vector<double>& _default) {
+	std::vector<double> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Double, ret, return _default);
 }
 
 std::vector<std::string> ot::json::getStringVector(const JsonValue& _value, const char* _member, const std::vector<std::string>& _default) {
@@ -432,9 +800,19 @@ std::vector<std::string> ot::json::getStringVector(const JsonValue& _value, cons
 	OT_JSON_getListFromObject(_value, _member, String, ret, return _default);
 }
 
+std::vector<std::string> ot::json::getStringVector(const JsonValue& _value, const std::string& _member, const std::vector<std::string>& _default) {
+	std::vector<std::string> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), String, ret, return _default);
+}
+
 std::vector<std::string> ot::json::getStringVector(const ConstJsonObject& _value, const char* _member, const std::vector<std::string>& _default) {
 	std::vector<std::string> ret;
 	OT_JSON_getListFromObject(_value, _member, String, ret, return _default);
+}
+
+std::vector<std::string> ot::json::getStringVector(const ConstJsonObject& _value, const std::string& _member, const std::vector<std::string>& _default) {
+	std::vector<std::string> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), String, ret, return _default);
 }
 
 std::vector<ot::ConstJsonObject> ot::json::getObjectVector(const JsonValue& _value, const char* _member) {
@@ -442,9 +820,19 @@ std::vector<ot::ConstJsonObject> ot::json::getObjectVector(const JsonValue& _val
 	OT_JSON_getListFromObject(_value, _member, Object, ret, throw std::exception("Invalid type"));
 }
 
+std::vector<ot::ConstJsonObject> ot::json::getObjectVector(const JsonValue& _value, const std::string& _member) {
+	std::vector<ot::ConstJsonObject> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Object, ret, throw std::exception("Invalid type"));
+}
+
 std::vector<ot::ConstJsonObject> ot::json::getObjectVector(const ConstJsonObject& _value, const char* _member) {
 	std::vector<ot::ConstJsonObject> ret;
 	OT_JSON_getListFromObject(_value, _member, Object, ret, throw std::exception("Invalid type"));
+}
+
+std::vector<ot::ConstJsonObject> ot::json::getObjectVector(const ConstJsonObject& _value, const std::string& _member) {
+	std::vector<ot::ConstJsonObject> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Object, ret, throw std::exception("Invalid type"));
 }
 
 std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const JsonValue& _value, const char* _member) {
@@ -452,66 +840,138 @@ std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const JsonValue& _value
 	OT_JSON_getListFromObject(_value, _member, Array, ret, throw std::exception("Invalid type"));
 }
 
+std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const JsonValue& _value, const std::string& _member) {
+	std::vector<ot::ConstJsonArray> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Array, ret, throw std::exception("Invalid type"));
+}
+
 std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const ConstJsonObject& _value, const char* _member) {
 	std::vector<ot::ConstJsonArray> ret;
 	OT_JSON_getListFromObject(_value, _member, Array, ret, throw std::exception("Invalid type"));
+}
+
+std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const ConstJsonObject& _value, const std::string& _member) {
+	std::vector<ot::ConstJsonArray> ret;
+	OT_JSON_getListFromObject(_value, _member.c_str(), Array, ret, throw std::exception("Invalid type"));
 }
 
 bool* ot::json::getBoolArray(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, bool, Bool, _size);
 }
 
+bool* ot::json::getBoolArray(const JsonValue& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), bool, Bool, _size);
+}
+
 bool* ot::json::getBoolArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, bool, Bool, _size);
+}
+
+bool* ot::json::getBoolArray(const ConstJsonObject& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), bool, Bool, _size);
 }
 
 int32_t* ot::json::getIntArray(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, int32_t, Int, _size);
 }
 
+int32_t* ot::json::getIntArray(const JsonValue& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), int32_t, Int, _size);
+}
+
 int32_t* ot::json::getIntArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, int32_t, Int, _size);
+}
+
+int32_t* ot::json::getIntArray(const ConstJsonObject& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), int32_t, Int, _size);
 }
 
 uint32_t* ot::json::getUIntArray(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, uint32_t, Uint, _size);
 }
 
+uint32_t* ot::json::getUIntArray(const JsonValue& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), uint32_t, Uint, _size);
+}
+
 uint32_t* ot::json::getUIntArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, uint32_t, Uint, _size);
+}
+
+uint32_t* ot::json::getUIntArray(const ConstJsonObject& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), uint32_t, Uint, _size);
 }
 
 int64_t* ot::json::getInt64Array(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, int64_t, Int64, _size);
 }
 
+int64_t* ot::json::getInt64Array(const JsonValue& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), int64_t, Int64, _size);
+}
+
 int64_t* ot::json::getInt64Array(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, int64_t, Int64, _size);
+}
+
+int64_t* ot::json::getInt64Array(const ConstJsonObject& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), int64_t, Int64, _size);
 }
 
 uint64_t* ot::json::getUInt64Array(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, uint64_t, Uint64, _size);
 }
 
+uint64_t* ot::json::getUInt64Array(const JsonValue& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), uint64_t, Uint64, _size);
+}
+
 uint64_t* ot::json::getUInt64Array(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, uint64_t, Uint64, _size);
+}
+
+uint64_t* ot::json::getUInt64Array(const ConstJsonObject& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), uint64_t, Uint64, _size);
 }
 
 float* ot::json::getFloatArray(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, float, Float, _size);
 }
 
+float* ot::json::getFloatArray(const JsonValue& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), float, Float, _size);
+}
+
 float* ot::json::getFloatArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, float, Float, _size);
+}
+
+float* ot::json::getFloatArray(const ConstJsonObject& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), float, Float, _size);
 }
 
 double* ot::json::getDoubleArray(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, double, Double, _size);
 }
 
+double* ot::json::getDoubleArray(const JsonValue& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), double, Double, _size);
+}
+
 double* ot::json::getDoubleArray(const ConstJsonObject& _value, const char* _member, JsonSizeType& _size) {
 	OT_JSON_getArrayFromObject(_value, _member, double, Double, _size);
 }
+
+double* ot::json::getDoubleArray(const ConstJsonObject& _value, const std::string& _member, JsonSizeType& _size) {
+	OT_JSON_getArrayFromObject(_value, _member.c_str(), double, Double, _size);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
 
 bool ot::json::isNull(const JsonValue& _value, unsigned int _ix) {
 	if (_ix >= _value.Size()) return false;
