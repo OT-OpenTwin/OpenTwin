@@ -10,6 +10,7 @@ export function AddNewProject(props) {
     LoggedInUsername: enteredUsername,
     LoggedInUserPassword: enteredPassword,
     ProjectName: props.enteredProjectName,
+    ProjectType: "Development"
   };
 
   return authRequest(data);

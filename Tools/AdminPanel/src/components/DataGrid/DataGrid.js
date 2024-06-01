@@ -172,7 +172,7 @@ const DataGrid = ({ list, columnHeader, ...props }) => {
         pageSize={50}
         rowsPerPageOptions={[50]}
         checkboxSelection
-        onSelectionModelChange={(ids) => {
+        onRowSelectionModelChange={(ids) => {
           setArrIds(ids);
         }}
       />
