@@ -36,6 +36,9 @@ private:
 		std::string credentialsUserName;
 		std::string credentialsUserPassword;
 		
+		std::string databaseUserName;
+		std::string databaseUserPassword;
+
 		std::string userCollection;
 		std::string sessionType;
 	};

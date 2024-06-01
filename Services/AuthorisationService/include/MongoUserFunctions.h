@@ -30,7 +30,7 @@ using bsoncxx::document::element;
 
 namespace MongoUserFunctions
 {
-	bool authenticateUser(std::string username, std::string password, std::string databaseUrl);
+	bool authenticateUser(std::string username, std::string password, std::string databaseUrl, mongocxx::client& adminClient);
 
 	bool registerUser(std::string username, std::string password, mongocxx::client& adminClient, std::string oldSettingsCollectionName = "");
 
@@ -38,21 +38,16 @@ namespace MongoUserFunctions
 
 	User getUserDataThroughUsername(std::string username, mongocxx::client& adminClient);
 
-	User getUserDataThroughId(bsoncxx::types::b_binary& id, mongocxx::client& adminClient);
+	User getUserDataThroughId(std::string userId, mongocxx::client& adminClient);
 
-
-	// TODO: CHECK THIS, THE IDS MUST BE IN 
 	std::vector<User> getAllUsers(mongocxx::client& adminClient);
 	size_t getAllUserCount(mongocxx::client& adminClient);
 
-
 	bool removeUser(User& userToBeDeleted, mongocxx::client& adminClient);
 
+	bool updateUserUsernameById(std::string userId, std::string newUsername, mongocxx::client& adminClient);
 
-	bool updateUserUsername(bsoncxx::types::b_binary userId, std::string oldPassword, std::string newUsername, mongocxx::client& adminClient);
-
-	bool updateUserUsername(std::string oldUsername, std::string oldPassword, std::string newUsername, mongocxx::client& adminClient);
-
+	bool updateUserUsernameByName(std::string oldUsername, std::string newUsername, mongocxx::client& adminClient);
 
 	bool changeUserPassword(std::string username, std::string newPassword, mongocxx::client& adminClient);
 
@@ -61,6 +56,10 @@ namespace MongoUserFunctions
 	std::string userToJson(User& user);
 	std::string usersToJson(std::vector<User>& users);
 
+	std::string hashPassword(const std::string &password);
+
 	bool doesUserExist(const std::string &userName, mongocxx::client& adminClient);
 
+	std::string createTmpUser(std::string userName, std::string userPWD, User& _loggedInUser, mongocxx::client& adminClient);
+	std::string removeTmpUser(std::string userName, mongocxx::client& adminClient);
 }

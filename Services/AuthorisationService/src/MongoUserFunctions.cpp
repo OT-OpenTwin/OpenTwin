@@ -1,8 +1,13 @@
 ﻿#include "MongoUserFunctions.h"
+#include "MongoRoleFunctions.h"
 #include "MongoGroupFunctions.h"
 #include "MongoProjectFunctions.h"
+#include "MongoConstants.h"
 #include "MongoURL.h"
 #include "OTCore/JSON.h"
+
+#include <boost/uuid/detail/md5.hpp>
+#include <boost/algorithm/hex.hpp>
 
 #include <set>
 
@@ -20,32 +25,29 @@ std::set<std::string> authenticatedUserTokens;
 
 namespace MongoUserFunctions
 {
-	bool authenticateUser(std::string username, std::string password, std::string databaseUrl)
+	bool authenticateUser(std::string username, std::string password, std::string databaseUrl, mongocxx::client& adminClient)
 	{
 		// This authentication may take some time. Therefore, we want to cache the credentials to speed up subsequent checks
 		std::string token = username + "\n" + password + "\n" + databaseUrl;
 		if (authenticatedUserTokens.find(token) != authenticatedUserTokens.end()) return true;
 
-		std::string uriStr = getMongoURL(databaseUrl, username, password);
+		auto userCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
 
-		mongocxx::uri uri(uriStr);
-		mongocxx::client currentUserClient = mongocxx::client(uri);
+		value userFilter = document{}
+			<< "user_name" << username
+			<< finalize;
 
-		mongocxx::database db = currentUserClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection PROJECT_CATALOG_COLLECTION = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
+		auto userDocument = userCollection.find_one(userFilter.view());
 
-		try
+		if (!userDocument)
 		{
-			// Querying one document to check the credentials
-			bsoncxx::stdx::optional<bsoncxx::document::value> maybe_result =
-				PROJECT_CATALOG_COLLECTION.find_one({});
+			return false; // User not found
 		}
-		catch (std::runtime_error err)
-		{
-			std::cout << err.what() << std::endl;
 
-			return false;
-		}
+		std::string storedPassword = userDocument->view()["user_pwd"].get_utf8().value.to_string();
+		std::string hashedPassword = hashPassword(password);
+
+		if (storedPassword != hashedPassword) return false;
 
 		authenticatedUserTokens.insert(token);
 		
@@ -105,80 +107,58 @@ namespace MongoUserFunctions
 
 		// Create a unique user id
 		std::string uniqueName = "user" + settingsCollectionName.substr(std::string("Settings").length());
+		std::string userRoleName = uniqueName + "_role";
 
-		value new_user_command = document{}
-			<< "createUser" << uniqueName
-			<< "pwd" << password
-
-			<< "customData" 
-			<< open_document
-			<< "settingsCollectionName" << settingsCollectionName
-			<< close_document
-
-			<< "roles"
-			<< open_array
-
-			<< open_document
-			<< "role" << MongoConstants::PROJECT_CATALOG_ROLE
-			<< "db" << "admin"
-			<< close_document
-
-			<< open_document
-			<< "role" << MongoConstants::PROJECT_DB_LIST_COLLECTIONS_ROLE
-			<< "db" << "admin"
-			<< close_document
-
-			<< open_document
-			<< "role" << MongoConstants::GROUP_ROLE
-			<< "db" << "admin"
-			<< close_document
-
-			<< open_document
-			<< "role" << MongoConstants::PROJECT_TEMPLATES_ROLE
-			<< "db" << "admin"
-			<< close_document
-
-			<< open_document
-			<< "role" << MongoConstants::PROJECTS_LARGE_DATA_ROLE
-			<< "db" << "admin"
-			<< close_document
-
-			<< open_document
-			<< "role" << MongoConstants::SYSTEM_DB_ROLE
-			<< "db" << "admin"
-			<< close_document
-
-			<< open_document
-			<< "role" << MongoConstants::SETTINGS_DB_ROLE
-			<< "db" << "admin"
-			<< close_document
-
-			<< close_array
-
+		value userDocument = document{}
+			<< "user_id" << uniqueName
+			<< "user_name" << username
+			<< "user_pwd" << hashPassword(password)
+			<< "user_role_name" << userRoleName
+			<< "settings_collection_name" << settingsCollectionName
 			<< finalize;
 
-		mongocxx::database db = adminClient.database(MongoConstants::ADMIN_DB); // The admin db must be used
+		mongocxx::database userDB = adminClient.database(MongoConstants::USER_DB); 
 
-		value command_result = db.run_command(new_user_command.view());
+		auto result = userDB.collection(MongoConstants::USER_CATALOG_COLLECTION).insert_one(userDocument.view());
 
-		// Getting elements from this document:
-		element el = command_result.view()["ok"];
-
-		if (el.get_double() == 1)
+		if (!result)
 		{
-			if (!updateUsername(uniqueName, username, adminClient))
-			{
-				auto user = getUserDataThroughUsername(uniqueName, adminClient);
-				removeUser(user, adminClient);
-				return false;
-			}
-
-			return true;
+			return false;
 		}
 
-		return false;
+		// Now we create a new role for this user without permissions
+		MongoRoleFunctions::createUserRole(userRoleName, adminClient);
+
+		// Now add the mandatory roles to this user role
+		MongoRoleFunctions::addRoleToUserRole(MongoConstants::PROJECT_CATALOG_ROLE, userRoleName, adminClient);
+		MongoRoleFunctions::addRoleToUserRole(MongoConstants::PROJECT_DB_LIST_COLLECTIONS_ROLE, userRoleName, adminClient);
+		MongoRoleFunctions::addRoleToUserRole(MongoConstants::GROUP_ROLE, userRoleName, adminClient);
+		MongoRoleFunctions::addRoleToUserRole(MongoConstants::PROJECT_TEMPLATES_ROLE, userRoleName, adminClient);
+		MongoRoleFunctions::addRoleToUserRole(MongoConstants::PROJECTS_LARGE_DATA_ROLE, userRoleName, adminClient);
+		MongoRoleFunctions::addRoleToUserRole(MongoConstants::SYSTEM_DB_ROLE, userRoleName, adminClient);
+		MongoRoleFunctions::addRoleToUserRole(MongoConstants::SETTINGS_DB_ROLE, userRoleName, adminClient);
+
+		return true;
 	}
 
+	std::string toString(const boost::uuids::detail::md5::digest_type& digest)
+	{
+		const auto intDigest = reinterpret_cast<const int*>(&digest);
+		std::string result;
+		boost::algorithm::hex(intDigest, intDigest + (sizeof(boost::uuids::detail::md5::digest_type) / sizeof(int)), std::back_inserter(result));
+		return result;
+	}
+
+	std::string hashPassword(const std::string& password)
+	{
+		boost::uuids::detail::md5 hash;
+		boost::uuids::detail::md5::digest_type digest;
+
+		hash.process_bytes(password.data(), password.size());
+		hash.get_digest(digest);
+
+		return toString(digest);
+	}
 
 	std::string generateUserSettingsCollectionName(mongocxx::client& adminClient)
 	{
@@ -218,105 +198,76 @@ namespace MongoUserFunctions
 		return collectionName.str();
 	}
 
-
-
-
 	User getUserDataThroughUsername(std::string username, mongocxx::client& adminClient)
 	{
-		mongocxx::database adminDb = adminClient.database(MongoConstants::ADMIN_DB);
+		auto userCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
 
 		value filter = document{}
-			<< "user" << username
+			<< "user_name" << username
 			<< finalize;
+
+		auto userData = userCollection.find_one(filter.view());
+
+		if (!userData)
+		{
+			throw std::runtime_error("User not found");
+
+		}
 
 		User user{};
 
-		try
-		{
-			auto userDataOptional = adminClient.database(MongoConstants::ADMIN_DB)
-				.collection(MongoConstants::SYSTEM_USERS_COLLECTION)
-				.find_one(filter.view());
-
-			if (!userDataOptional)
-			{
-				throw std::runtime_error("User not found");
-			}
-
-			user._id = userDataOptional.get().view()["_id"].get_utf8().value.to_string();
-			user.username = username;
-
-			auto settingsCollOpt = userDataOptional.get().view()["customData"]["settingsCollectionName"];
-
-			if (settingsCollOpt)
-			{
-				user.settingsCollectionName =settingsCollOpt.get_utf8().value.to_string();
-			}
-
-			user.setDocumentValue(userDataOptional.get());
-		}
-		catch (std::runtime_error err)
-		{
-			std::string error = err.what();
-		}
+		user.username = username;
+		user.userId = userData->view()["user_id"].get_utf8().value.to_string();
+		user.roleName = userData->view()["user_role_name"].get_utf8().value.to_string();
+		user.settingsCollectionName = userData->view()["settings_collection_name"].get_utf8().value.to_string();
 
 		return user;
 	}
 
-	User getUserDataThroughId(bsoncxx::types::b_binary& id, mongocxx::client& adminClient)
+	User getUserDataThroughId(std::string userId, mongocxx::client& adminClient)
 	{
+		auto userCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
+
 		value filter = document{}
-			<< "userId" << id
+			<< "user_id" << userId
 			<< finalize;
 
-		auto userDataOptional = adminClient.database(MongoConstants::ADMIN_DB)
-			.collection(MongoConstants::SYSTEM_USERS_COLLECTION)
-			.find_one(filter.view());
+		auto userData = userCollection.find_one(filter.view());
 
-		User user{};
-		user._id = userDataOptional.get().view()["_id"].get_utf8().value.to_string();
-		user.username = userDataOptional.get().view()["user"].get_utf8().value.to_string();
-
-		auto settingsCollOpt = userDataOptional.get().view()["customData"]["settingsCollectionName"];
-
-		if (settingsCollOpt)
+		if (!userData)
 		{
-			user.settingsCollectionName = settingsCollOpt.get_utf8().value.to_string();
+			throw std::runtime_error("User not found");
 		}
 
-		user.setDocumentValue(userDataOptional.get());
+		User user{};
+
+		user.userId = userId;
+		user.username = userData->view()["user_name"].get_utf8().value.to_string();
+		user.roleName = userData->view()["user_role_name"].get_utf8().value.to_string();
+		user.settingsCollectionName = userData->view()["settings_collection_name"].get_utf8().value.to_string();
 
 		return user;
 	}
-
 
 	std::vector<User> getAllUsers(mongocxx::client& adminClient)
 	{
-		value filter = document{} << finalize;
-
-
-		auto cursor = adminClient.database(MongoConstants::ADMIN_DB)
-			.collection(MongoConstants::SYSTEM_USERS_COLLECTION)
-			.find(filter.view());
+		auto cursor = adminClient.database(MongoConstants::USER_DB)
+			.collection(MongoConstants::USER_CATALOG_COLLECTION)
+			.find({});
 
 		std::vector<User> userList{};
 
-
 		for (view userData : cursor)
 		{
-			std::string userId = userData["_id"].get_utf8().value.to_string();
-
-			// Skip the Admin
-			if (userId == "admin.admin")
-			{
-				continue;
-			}
+			std::string userId = userData["user_id"].get_utf8().value.to_string();
 
 			try
 			{
 				User tmpUser;
-				tmpUser._id = userId;
-				tmpUser.username = userData["user"].get_utf8().value.to_string();
-				tmpUser.settingsCollectionName = userData["customData"]["settingsCollectionName"].get_utf8().value.to_string();
+				tmpUser.userId = userId;
+				tmpUser.username = userData["user_name"].get_utf8().value.to_string();
+				tmpUser.roleName = userData["user_role_name"].get_utf8().value.to_string();
+				tmpUser.settingsCollectionName = userData["settings_collection_name"].get_utf8().value.to_string();
 
 				userList.push_back(std::move(tmpUser));
 			}
@@ -332,11 +283,11 @@ namespace MongoUserFunctions
 
 	size_t getAllUserCount(mongocxx::client& adminClient)
 	{
-		size_t count = adminClient.database(MongoConstants::ADMIN_DB)
-								.collection(MongoConstants::SYSTEM_USERS_COLLECTION)
+		size_t count = adminClient.database(MongoConstants::USER_DB)
+								.collection(MongoConstants::USER_CATALOG_COLLECTION)
 								.count_documents({});
 
-		return count-1;  // We need to subtract the admin user since we only want to get the number of the "normal" users.
+		return count;
 	}
 
 
@@ -344,16 +295,15 @@ namespace MongoUserFunctions
 	{
 		std::string username = userToBeDeleted.username;
 
-
 		// 1 remove the user from each project 
 		value filter = document{} <<
-			"users" << userToBeDeleted.getUserId()
+			"users" << userToBeDeleted.userId
 			<< finalize;
 
 		value update = document{} <<
 			"$pull"
 			<< open_document
-			<< "users" << userToBeDeleted.getUserId()
+			<< "users" << userToBeDeleted.userId
 			<< close_document
 			<< finalize;
 
@@ -370,11 +320,11 @@ namespace MongoUserFunctions
 
 
 		// Delete the user completely
-		value drop_user_command = document{} <<
-			"dropUser" << username
+		auto userFilter = document{} <<
+			"user_id" << userToBeDeleted.userId
 			<< finalize;
 
-		auto command_result = adminClient[MongoConstants::ADMIN_DB].run_command(drop_user_command.view());
+		adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION).delete_one(userFilter.view());
 
 		// Dropping this user's settings collection.
 		adminClient[MongoConstants::SETTINGS_DB][userToBeDeleted.settingsCollectionName].drop();
@@ -387,9 +337,10 @@ namespace MongoUserFunctions
 	bool doesUserExist(const std::string &userName, mongocxx::client& adminClient)
 	{
 		value usernameFilter = document{}
-			<< "user" << userName
+			<< "user_name" << userName
 			<< finalize;
-		auto usersCollection = adminClient.database(MongoConstants::ADMIN_DB).collection(MongoConstants::SYSTEM_USERS_COLLECTION);
+
+		auto usersCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
 		auto userOptional = usersCollection.find_one(usernameFilter.view());
 
 		if (userOptional)
@@ -400,149 +351,96 @@ namespace MongoUserFunctions
 		return false;
 	}
 
-	bool updateUserUsername(bsoncxx::types::b_binary userId, std::string oldPassword, std::string newUsername, mongocxx::client& adminClient)
+	bool updateUserUsernameById(std::string userId, std::string newUsername, mongocxx::client& adminClient)
 	{
-		value usernameFilter = document{}
-			<< "user" << newUsername
-			<< finalize;
-		auto usersCollection = adminClient.database(MongoConstants::ADMIN_DB).collection(MongoConstants::SYSTEM_USERS_COLLECTION);
-		auto userOptional = usersCollection.find_one(usernameFilter.view());
-
-		if (userOptional)
-		{
-			throw std::runtime_error("This username is already taken! Please choose another.");
-		}
-
-		User oldUser = getUserDataThroughId(userId, adminClient);
-
-		bool registerSuccessful = registerUser(newUsername, oldPassword, adminClient, oldUser.settingsCollectionName);
-		if (!registerSuccessful)
+		if (doesUserExist(newUsername, adminClient))
 		{
 			return false;
 		}
 
-		User newUser = getUserDataThroughUsername(newUsername, adminClient);
+		value userFilter = document{}
+			<< "user_id" << userId
+			<< finalize;
 
-		// The new user is created, now the old user's data must be given to him.
-		// First we check every group where this user is part of, or is the owner of.
+		value userUpdate = document{}
+			<< "$set"
+			<< open_document
+			<< "user_name" << newUsername
+			<< close_document
+			<< finalize;
 
-		std::vector<Group> oldUserGroups = MongoGroupFunctions::getAllUserGroups(oldUser, adminClient);
-
-		for (auto gr : oldUserGroups)
-		{
-			if (gr.getOwnerId() == oldUser.getUserId()) // If the old User is the owner, make as owner the new one
-			{
-				MongoGroupFunctions::changeGroupOwner(gr, oldUser, newUser, adminClient);
-			}
-			else
-			{
-				MongoGroupFunctions::addUserToGroup(newUser, gr.name, adminClient); // If he's not the owner, then just add him to the group
-			}
-			MongoGroupFunctions::removeUserFromGroup(oldUser, gr.name, adminClient); // Remove the old one from the group since his ID will be completely deleted
-		}
-
-
-		// Now we deal with all the projects that this user has
-		std::vector<Project> oldUserProjects = MongoProjectFunctions::getAllUserProjects(oldUser,"", -1, adminClient);
-
-
-		for (auto pr : oldUserProjects)
-		{
-			if (pr.creatingUser.getUserId() == oldUser.getUserId())
-			{
-				MongoProjectFunctions::changeProjectCreator(pr._id, oldUser, newUser, adminClient);
-			}
-		}
-
-		removeUser(oldUser, adminClient);
+		auto usersCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
+		auto result = usersCollection.update_one(userFilter.view(), userUpdate.view());
 
 		authenticatedUserTokens.clear();
 
-		return true;
+		int32_t matchedCount = result.get().matched_count();
+		int32_t modifiedCount = result.get().modified_count();
+
+		if (matchedCount == 1 && modifiedCount == 1)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
-	bool updateUserUsername(std::string oldUsername, std::string oldPassword, std::string newUsername, mongocxx::client& adminClient)
+	bool updateUserUsernameByName(std::string oldUsername, std::string newUsername, mongocxx::client& adminClient)
 	{
-
-		value usernameFilter = document{}
-			<< "user" << newUsername
-			<< finalize;
-		auto usersCollection = adminClient.database(MongoConstants::ADMIN_DB).collection(MongoConstants::SYSTEM_USERS_COLLECTION);
-		auto userOptional = usersCollection.find_one(usernameFilter.view());
-
-		if (userOptional)
-		{
-			throw std::runtime_error("This username is already taken! Please choose another.");
-		}
-
-		User oldUser = getUserDataThroughUsername(oldUsername, adminClient);
-
-		bool registerSuccessful = registerUser(newUsername, oldPassword, adminClient, oldUser.settingsCollectionName);
-		if (!registerSuccessful)
+		if (doesUserExist(newUsername, adminClient))
 		{
 			return false;
 		}
 
-		User newUser = getUserDataThroughUsername(newUsername, adminClient);
+		value userFilter = document{}
+			<< "user_name" << oldUsername
+			<< finalize;
 
-		// The new user is created, now the old user's data must be given to him.
-		// First we check every group where this user is part of, or is the owner of.
+		value userUpdate = document{}
+			<< "$set"
+			<< open_document
+			<< "user_name" << newUsername
+			<< close_document
+			<< finalize;
 
-		std::vector<Group> oldUserGroups = MongoGroupFunctions::getAllUserGroups(oldUser, adminClient);
-
-		for (auto gr : oldUserGroups)
-		{
-			if (gr.getOwnerId() == oldUser.getUserId()) // If the old User is the owner, make as owner the new one
-			{
-				MongoGroupFunctions::changeGroupOwner(gr, oldUser, newUser, adminClient);
-			}
-			else
-			{
-				MongoGroupFunctions::addUserToGroup(newUser, gr.name, adminClient); // If he's not the owner, then just add him to the group
-			}
-			MongoGroupFunctions::removeUserFromGroup(oldUser, gr.name, adminClient); // Remove the old one from the group since his ID will be completely deleted
-		}
-
-
-		// Now we deal with all the projects that this user has
-		std::vector<Project> oldUserProjects = MongoProjectFunctions::getAllUserProjects(oldUser, "", -1, adminClient);
-
-
-		for (auto pr : oldUserProjects)
-		{
-			if (pr.creatingUser.getUserId() == oldUser.getUserId())
-			{
-				MongoProjectFunctions::changeProjectCreator(pr._id, oldUser, newUser, adminClient);
-			}
-		}
-
-		removeUser(oldUser, adminClient);
+		auto usersCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
+		auto result = usersCollection.update_one(userFilter.view(), userUpdate.view());
 
 		authenticatedUserTokens.clear();
 
-		return true;
+		int32_t matchedCount = result.get().matched_count();
+		int32_t modifiedCount = result.get().modified_count();
 
+		if (matchedCount == 1 && modifiedCount == 1)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	bool changeUserPassword(std::string username, std::string newPassword, mongocxx::client& adminClient)
 	{
-		// db.updateUser("root", { pwd: "NewRootAdmin" })
-
-		value changePasswordCommand = document{}
-			<< "updateUser" << username
-			<< "pwd" << newPassword
+		value userFilter = document{}
+			<< "user_name" << username
 			<< finalize;
 
-		mongocxx::database db = adminClient.database(MongoConstants::ADMIN_DB); // The admin db must be used
+		value userUpdate = document{}
+			<< "$set"
+			<< open_document
+			<< "user_pwd" << hashPassword(newPassword)
+			<< close_document
+			<< finalize;
 
-		value command_result = db.run_command(changePasswordCommand.view());
-
-		// Getting elements from this document:
-		element el = command_result.view()["ok"];
+		auto usersCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
+		auto result = usersCollection.update_one(userFilter.view(), userUpdate.view());
 
 		authenticatedUserTokens.clear();
 
-		if (el.get_double() == 1)
+		int32_t matchedCount = result.get().matched_count();
+		int32_t modifiedCount = result.get().modified_count();
+
+		if (matchedCount == 1 && modifiedCount == 1)
 		{
 			return true;
 		}
@@ -552,34 +450,29 @@ namespace MongoUserFunctions
 
 	bool updateUsername(std::string oldUsername, std::string newUsername, mongocxx::client& adminClient)
 	{
-		value usernameFilter = document{}
-			<< "user" << newUsername
-			<< finalize;
-		auto usersCollection = adminClient.database(MongoConstants::ADMIN_DB).collection(MongoConstants::SYSTEM_USERS_COLLECTION);
-		auto userOptional = usersCollection.find_one(usernameFilter.view());
-
-		if (userOptional)
+		if (doesUserExist(newUsername, adminClient))
 		{
-			throw std::runtime_error("This username is already taken! Please choose another.");
+			return false;
 		}
 
-		value filter = document{}
-			<< "user" << oldUsername
+		value userFilter = document{}
+			<< "user_name" << oldUsername
 			<< finalize;
 
-		value changes = document{}
+		value userUpdate = document{}
 			<< "$set"
 			<< open_document
-			<< "user" << newUsername
+			<< "user_name" << newUsername
 			<< close_document
 			<< finalize;
 
-		auto result = usersCollection.update_one(filter.view(), changes.view());
+		auto usersCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
+		auto result = usersCollection.update_one(userFilter.view(), userUpdate.view());
+
+		authenticatedUserTokens.clear();
 
 		int32_t matchedCount = result.get().matched_count();
 		int32_t modifiedCount = result.get().modified_count();
-
-		authenticatedUserTokens.clear();
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
@@ -611,4 +504,52 @@ namespace MongoUserFunctions
 		json.AddMember("users", ot::JsonArray(jsonUsers, json.GetAllocator()), json.GetAllocator());
 		return json.toJson();
 	}
+
+	std::string createTmpUser(std::string userName, std::string userPWD, User &_loggedInUser, mongocxx::client& adminClient)
+	{
+		value new_user_command = document{}
+			<< "createUser" << userName
+			<< "pwd" << userPWD
+
+			<< "roles"
+			<< open_array
+
+			<< open_document
+			<< "role" << _loggedInUser.roleName
+			<< "db" << "admin"
+			<< close_document
+
+			<< close_array
+			<< finalize;
+
+		mongocxx::database db = adminClient.database(MongoConstants::ADMIN_DB); // The admin db must be used
+
+		value command_result = db.run_command(new_user_command.view());
+
+		// Getting elements from this document:
+		element el = command_result.view()["ok"];
+
+		if (el.get_double() == 1)
+		{
+			ot::JsonDocument json;
+			json.AddMember("username", ot::JsonString(userName, json.GetAllocator()), json.GetAllocator());
+			json.AddMember("password", ot::JsonString(userPWD, json.GetAllocator()), json.GetAllocator());
+			return json.toJson();
+		}
+
+		return "";
+	}
+
+	std::string removeTmpUser(std::string userName, mongocxx::client & adminClient)
+	{
+		// Delete the user completely
+		value drop_user_command = document{} <<
+			"dropUser" << userName
+			<< finalize;
+
+		auto command_result = adminClient[MongoConstants::ADMIN_DB].run_command(drop_user_command.view());
+
+		return "";
+	}
 }
+

@@ -591,6 +591,36 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	try { shouldRunRelayService = ot::json::getBool(_commandDoc, OT_ACTION_PARAM_START_RELAY); }
 	catch (...) {}
 
+	// Request creation of temporary database user
+	ot::JsonDocument authDoc;
+	authDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CREATE_SESSION_USER, authDoc.GetAllocator()), authDoc.GetAllocator());
+	authDoc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(credentialsUserName, authDoc.GetAllocator()), authDoc.GetAllocator());
+	authDoc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(credentialsUserPassword, authDoc.GetAllocator()), authDoc.GetAllocator());
+	authDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(sessionID, authDoc.GetAllocator()), authDoc.GetAllocator());
+	
+	std::string authResponse;
+	if (!ot::msg::send(url(), serviceAuthorisationURL(), ot::EXECUTE, authDoc.toJson(), authResponse)) {
+		OT_LOG_E("Failed to send request to authorisation service");
+		return OT_ACTION_RETURN_INDICATOR_Error "Failed to send request to authorisation service";
+	}
+
+	std::string databaseUserName;
+	std::string databaseUserPassword;
+
+	try
+	{
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(authResponse);
+
+		databaseUserName = ot::json::getString(responseDoc, "username");
+		databaseUserPassword = ot::json::getString(responseDoc, "password");
+	}
+	catch (std::exception)
+	{
+		OT_LOG_E("Failed to create the temporary session user");
+		return OT_ACTION_RETURN_INDICATOR_Error "Failed to create the temporary session user";
+	}
+
 	// Create the session
 	m_masterLock.lock();
 	Session * theSession = createSession(sessionID, userName, projectName, collectionName, sessionType);
@@ -599,6 +629,10 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	theSession->setCredentialsUsername(credentialsUserName);
 	theSession->setCredentialsPassword(credentialsUserPassword);
 	theSession->setUserCollection(userCollection);
+
+	// Set the temp database user credentials
+	theSession->setDatabaseUsername(databaseUserName);
+	theSession->setDatabasePassword(databaseUserPassword);
 
 	// Create response document
 	ot::JsonDocument responseDoc;

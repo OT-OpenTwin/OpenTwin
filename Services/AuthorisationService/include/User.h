@@ -18,20 +18,8 @@ class User
 {
 
 public:
-	std::string _id;
-	bsoncxx::document::value document_value{ bsoncxx::builder::basic::document{}.extract() };
+	std::string userId;
 	std::string username;
 	std::string settingsCollectionName;
-
-	bsoncxx::types::b_binary getUserId()
-	{
-		auto val = document_value.view()["userId"].get_binary();
-		return std::move(val);
-	}
-
-	void setDocumentValue(bsoncxx::document::value& val)
-	{
-		document_value = val;
-	}
-
+	std::string roleName;
 };

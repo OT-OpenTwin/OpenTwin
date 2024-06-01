@@ -34,6 +34,9 @@ namespace MongoRoleFunctions
 	bool createInitialProjectRole(mongocxx::client& adminClient);
 	bool createInitialProjectDbListCollectionsRole(mongocxx::client& adminClient);
 
+	bool createInitialUserRole(mongocxx::client& adminClient);
+	bool createInitialUserDbListCollectionsRole(mongocxx::client& adminClient);
+
 	bool createInitialGroupRole(mongocxx::client& adminClient);
 
 	bool createInitialProjectTemplatesRole(mongocxx::client& adminClient);
@@ -47,10 +50,14 @@ namespace MongoRoleFunctions
 	// When a new project (Collection) is created, a role for it must be created, else, nobody can access it.
 	void createProjectRole(std::string roleName, std::string collectionName, mongocxx::client& adminClient);
 
+	// When a new user is created, a role for it must be created, else, nobody can access it.
+	void createUserRole(std::string roleName, mongocxx::client& adminClient);
+	void addRoleToUserRole(std::string roleName, User& user, mongocxx::client& adminClient);
+	void addRoleToUserRole(std::string roleName, std::string userRoleName, mongocxx::client& adminClient);
+	void removeRoleFromUserRole(std::string roleName, User& user, mongocxx::client& adminClient);
 
 	// Creates a group role which has no privileges at all
 	void createGroupRole(std::string roleName, mongocxx::client& adminClient);
-
 
 	// Adds a role to an already existing group role to inherit 
 	void addRoleToGroupRole(std::string roleName, Group& group, mongocxx::client& adminClient);

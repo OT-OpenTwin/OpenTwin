@@ -156,10 +156,16 @@ public:
 	void setCredentialsPassword(const std::string &password) { m_userCredentials.setEncryptedPassword(password); };
 	void setUserCollection(const std::string &collection)    { m_userCollection = collection; }
 
+	void setDatabaseUsername(const std::string& username) { m_dbCredentials.setUserName(username); };
+	void setDatabasePassword(const std::string& password) { m_dbCredentials.setEncryptedPassword(password); };
+
 	std::string getCredentialsUsername(void) { return m_userCredentials.getUserName(); }
 	std::string getCredentialsPassword(void) { return m_userCredentials.getEncryptedPassword(); }
 	std::string getUserCollection(void) { return m_userCollection; }
 	std::string getType(void) { return m_type; }
+
+	std::string getDatabaseUsername(void) { return m_dbCredentials.getUserName(); }
+	std::string getDatabasePassword(void) { return m_dbCredentials.getEncryptedPassword(); }
 
 	ot::serviceID_t generateNextServiceId(void);
 
@@ -175,6 +181,7 @@ private:
 	bool												m_sessionDebug;
 
 	ot::UserCredentials									m_userCredentials;
+	ot::UserCredentials									m_dbCredentials;
 	std::string											m_userCollection;
 
 	std::map<ot::serviceID_t, Service *>				m_serviceMap;

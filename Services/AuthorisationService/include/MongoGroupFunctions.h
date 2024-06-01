@@ -47,9 +47,9 @@ namespace MongoGroupFunctions
 	std::vector<Group> getAllGroups(User& loggedInUser, mongocxx::client& userClient);
 	size_t getAllGroupCount(User& loggedInUser, mongocxx::client& userClient);
 
-	Group getGroupData(std::string groupName, mongocxx::client& userClient);
+	Group getGroupDataByName(std::string groupName, mongocxx::client& userClient);
 
-	Group getGroupData(bsoncxx::oid& groupId, mongocxx::client& userClient);
+	Group getGroupDataById(std::string groupId, mongocxx::client& userClient);
 
 
 	bool changeGroupName(std::string oldName, std::string newName, mongocxx::client& adminClient);

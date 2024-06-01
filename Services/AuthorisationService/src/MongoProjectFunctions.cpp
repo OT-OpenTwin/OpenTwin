@@ -31,7 +31,7 @@ namespace MongoProjectFunctions
 			<< "project_name" << projectName
 			<< "project_type" << projectType
 			<< "created_on" << bsoncxx::types::b_date(std::chrono::system_clock::now())
-			<< "created_by" << creatingUser.getUserId()
+			<< "created_by" << creatingUser.userId
 			<< "collection_name" << collectionName
 			<< "project_role_name" << roleName
 			<< "groups" << open_array << close_array
@@ -126,8 +126,7 @@ namespace MongoProjectFunctions
 		tmpProject.lastAccessedOn = projectValue.view()["last_accessed_on"].get_date();
 		tmpProject.version = projectValue.view()["version"].get_int32().value;
 
-
-		bsoncxx::types::b_binary userId = projectValue.view()["created_by"].get_binary();
+		std::string userId = projectValue.view()["created_by"].get_utf8().value.to_string();
 
 		tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(userId, userClient);
 
@@ -135,9 +134,9 @@ namespace MongoProjectFunctions
 
 		for (auto groupId : groupsArr)
 		{
-			bsoncxx::oid id = groupId.get_oid().value;
+			std::string id = groupId.get_utf8().value.to_string();
 
-			Group currentGroup = MongoGroupFunctions::getGroupData(id, userClient);
+			Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
 
 			tmpProject.groups.push_back(currentGroup);
 		}
@@ -183,7 +182,7 @@ namespace MongoProjectFunctions
 		tmpProject.lastAccessedOn = projectValue.view()["last_accessed_on"].get_date();
 		tmpProject.version = projectValue.view()["version"].get_int32(); // TODO: CHECK THIS 
 
-		bsoncxx::types::b_binary userId = projectValue.view()["created_by"].get_binary();
+		std::string userId = projectValue.view()["created_by"].get_utf8().value.to_string();
 
 		tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(userId, userClient);
 
@@ -191,9 +190,9 @@ namespace MongoProjectFunctions
 
 		for (auto groupId : groupsArr)
 		{
-			bsoncxx::oid id = groupId.get_oid().value;
+			std::string id = groupId.get_utf8().value.to_string();
 
-			Group currentGroup = MongoGroupFunctions::getGroupData(id, userClient);
+			Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
 
 			tmpProject.groups.push_back(currentGroup);
 		}
@@ -232,14 +231,14 @@ namespace MongoProjectFunctions
 			tmpProject.collectionName = doc["collection_name"].get_utf8().value.to_string();
 			tmpProject.createdOn = doc["created_on"].get_date();
 
-			bsoncxx::types::b_binary creatingUserId = doc["created_by"].get_binary();
+			std::string creatingUserId = doc["created_by"].get_utf8().value.to_string();
+
 			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(creatingUserId, adminClient);
 
-			projects.push_back(std::move(tmpProject));
+			projects.push_back(tmpProject);
 		}
 
 		return projectsToJson(projects);
-
 	}
 
 	std::vector<Project> getAllUserProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient)
@@ -249,7 +248,7 @@ namespace MongoProjectFunctions
 		auto array_builder = bsoncxx::builder::basic::array{};
 
 		for (const auto& group : userGroups) {
-			array_builder.append(group._id);
+			array_builder.append(group.id);
 		}
 
 		auto inArr = document{} << "$in" << array_builder << finalize;
@@ -272,7 +271,7 @@ namespace MongoProjectFunctions
 			<< "$or"
 			<< open_array
 			<< open_document
-			<< "created_by" << loggedInUser.getUserId()
+			<< "created_by" << loggedInUser.userId
 			<< close_document
 
 			<< open_document
@@ -311,25 +310,24 @@ namespace MongoProjectFunctions
 			tmpProject.collectionName = doc["collection_name"].get_utf8().value.to_string();
 			tmpProject.createdOn = doc["created_on"].get_date();
 
-			auto creatingUserId = doc["created_by"].get_binary();
+			auto creatingUserId = doc["created_by"].get_utf8().value.to_string();
 			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient);
 
 			auto groupsArr = doc["groups"].get_array().value;
 
 			for (auto groupId : groupsArr)
 			{
+				std::string id = groupId.get_utf8().value.to_string();
 
-				bsoncxx::oid id = groupId.get_oid().value;
-
-				Group currentGroup = MongoGroupFunctions::getGroupData(id, userClient);
+				Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
 
 				tmpProject.groups.push_back(currentGroup);
 			}
 
-			projects.push_back(std::move(tmpProject));
+			projects.push_back(tmpProject);
 		}
 
-		return std::move(projects);
+		return projects;
 	}
 
 	std::vector<Project> getAllProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient)
@@ -351,7 +349,6 @@ namespace MongoProjectFunctions
 			p.limit(limit);
 		}
 
-
 		mongocxx::cursor cursor = projectsCollection.aggregate(p);
 
 		std::vector<Project> projects{};
@@ -366,22 +363,21 @@ namespace MongoProjectFunctions
 			tmpProject.collectionName = doc["collection_name"].get_utf8().value.to_string();
 			tmpProject.createdOn = doc["created_on"].get_date();
 
-			auto creatingUserId = doc["created_by"].get_binary();
+			std::string creatingUserId = doc["created_by"].get_utf8().value.to_string();
 			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient);
 
 			auto groupsArr = doc["groups"].get_array().value;
 
 			for (auto groupId : groupsArr)
 			{
+				std::string id = groupId.get_utf8().value.to_string();
 
-				bsoncxx::oid id = groupId.get_oid().value;
-
-				Group currentGroup = MongoGroupFunctions::getGroupData(id, userClient);
+				Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
 
 				tmpProject.groups.push_back(currentGroup);
 			}
 
-			projects.push_back(std::move(tmpProject));
+			projects.push_back(tmpProject);
 		}
 
 		return std::move(projects);
@@ -399,11 +395,9 @@ namespace MongoProjectFunctions
 
 	std::vector<Project> getAllGroupProjects(Group& group, mongocxx::client& userClient)
 	{
-
 		value filter = document{}
-			<< "groups" << group._id
+			<< "groups" << group.id
 			<< finalize;
-
 
 		mongocxx::database db = userClient.database(MongoConstants::PROJECTS_DB);
 		mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
@@ -421,7 +415,7 @@ namespace MongoProjectFunctions
 			tmpProject.collectionName = doc["collection_name"].get_utf8().value.to_string();
 			tmpProject.createdOn = doc["created_on"].get_date();
 
-			bsoncxx::types::b_binary userId = doc["created_by"].get_binary();
+			std::string userId = doc["created_by"].get_utf8().value.to_string();
 
 			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(userId, userClient);
 
@@ -429,13 +423,12 @@ namespace MongoProjectFunctions
 
 			for (auto groupId : groupsArr)
 			{
-				bsoncxx::oid currId = groupId.get_oid().value;
+				std::string currId = groupId.get_utf8().value.to_string();
 
-				Group currentGroup = MongoGroupFunctions::getGroupData(currId, userClient);
+				Group currentGroup = MongoGroupFunctions::getGroupDataById(currId, userClient);
 
 				tmpProject.groups.push_back(currentGroup);
 			}
-
 
 			projects.push_back(std::move(tmpProject));
 		}
@@ -463,7 +456,6 @@ namespace MongoProjectFunctions
 		int32_t matchedCount = result.get().matched_count();
 		int32_t modifiedCount = result.get().modified_count();
 
-
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
 			project.name = newName;
@@ -485,14 +477,13 @@ namespace MongoProjectFunctions
 		value update = document{}
 			<< "$set"
 			<< open_document
-			<< "created_by" << newOwner.getUserId()
+			<< "created_by" << newOwner.userId
 			<< close_document
 			<< finalize;
 
 		auto result = projectsCollection.update_one(filter.view(), update.view());
 		int32_t matchedCount = result.get().matched_count();
 		int32_t modifiedCount = result.get().modified_count();
-
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
@@ -515,7 +506,7 @@ namespace MongoProjectFunctions
 		// checking whether it is already contained
 		for (auto alreadyContainedGroup : project.groups)
 		{
-			if (alreadyContainedGroup._id == group._id)
+			if (alreadyContainedGroup.id == group.id)
 			{
 				return false;
 			}
@@ -533,7 +524,7 @@ namespace MongoProjectFunctions
 		value change = document{}
 			<< "$push"
 			<< open_document
-			<< "groups" << group._id
+			<< "groups" << group.id
 			<< close_document
 			<< finalize;
 
@@ -561,7 +552,7 @@ namespace MongoProjectFunctions
 		// checking whether it is already contained
 		for (auto alreadyContainedGroup : project.groups)
 		{
-			if (alreadyContainedGroup._id == group._id)
+			if (alreadyContainedGroup.id == group.id)
 			{
 				isContained = true;
 				break;
@@ -584,7 +575,7 @@ namespace MongoProjectFunctions
 		value change = document{}
 			<< "$pull"
 			<< open_document
-			<< "groups" << group._id
+			<< "groups" << group.id
 			<< close_document
 			<< finalize;
 
@@ -646,7 +637,7 @@ namespace MongoProjectFunctions
 
 		Project project = getProject(projectId, adminClient);
 
-		if (project.creatingUser.getUserId() != oldOwner.getUserId())
+		if (project.creatingUser.userId != oldOwner.userId)
 		{
 			throw std::runtime_error("The logged in user is not the creator of this project! He cannot make the requested changes!");
 		}
@@ -658,7 +649,7 @@ namespace MongoProjectFunctions
 		value update = document{}
 			<< "$set"
 			<< open_document
-			<< "created_by" << newOwner.getUserId()
+			<< "created_by" << newOwner.userId
 			<< close_document
 			<< finalize;
 

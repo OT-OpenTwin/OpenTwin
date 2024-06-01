@@ -692,6 +692,8 @@
 #define OT_PARAM_AUTH_PASSWORD "Password"
 #define OT_PARAM_AUTH_NEW_PASSWORD "NewPassword"
 #define OT_PARAM_AUTH_ENCRYPTED_PASSWORD "EncryptedPassword"
+#define OT_PARAM_DB_USERNAME "DB.Username"
+#define OT_PARAM_DB_PASSWORD "DB.Password"
 
 // Group Functionalities
 #define OT_ACTION_CREATE_GROUP "CreateGroup"
@@ -743,6 +745,10 @@
 #define OT_PARAM_AUTH_USER_NAME "username"
 #define OT_PARAM_AUTH_COLLECTION_NAME "CollectionName"
 #define OT_PARAM_AUTH_COLLECTION_EXISTS "Collection.Exists"
+
+// Session Functionalities
+#define OT_ACTION_CREATE_SESSION_USER "Session.CreateUser"
+#define OT_ACTION_REMOVE_SESSION_USER "Session.RemoveUser"
 
 
 

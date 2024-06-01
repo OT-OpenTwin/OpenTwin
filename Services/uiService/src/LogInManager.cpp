@@ -92,10 +92,10 @@ void threadConnectToDatabase(LogInManager * _notifier, ExternalServicesComponent
 	}
 	else {
 
-		if (!uManager.checkConnectionDataBase(_username, validPassword)) {
-			QMetaObject::invokeMethod(_notifier, "slotConnectToDatabaseFail", Qt::QueuedConnection, Q_ARG(const QString&, "Failed to connect to the data base."));
-			return;
-		}
+		//if (!uManager.checkConnectionDataBase(_username, validPassword)) {
+		//	QMetaObject::invokeMethod(_notifier, "slotConnectToDatabaseFail", Qt::QueuedConnection, Q_ARG(const QString&, "Failed to connect to the data base."));
+		//	return;
+		//}
 
 		QMetaObject::invokeMethod(_notifier, "slotConnectToDatabaseSuccess", Qt::QueuedConnection, 
 								  Q_ARG(const QString&, _databaseUrl.c_str()), Q_ARG(const QString&, _authUrl.c_str()), 

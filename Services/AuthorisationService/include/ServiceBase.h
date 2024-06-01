@@ -92,6 +92,16 @@ private:
 	std::string handleRemoveProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleCheckIfCollectionExists(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 
+	// authentication needed: session functions
+
+	std::string handleCreateSessionUser(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleRemoveSessionUser(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+
+	// helper functions
+
+	bool isAdminUser(User& _loggedInUser);
+	std::string getAdminUserName() { return "admin"; }
+	std::string createRandomPassword();
 
 	std::string serviceURL;
 	std::string databaseURL;
@@ -99,7 +109,6 @@ private:
 	mongocxx::client adminClient;
 	std::string dbUsername;
 	std::string dbPassword;
-	User adminUser;
 	std::mutex m_mutex;
 
 	ServiceBase() = default;

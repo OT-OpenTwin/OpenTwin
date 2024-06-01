@@ -54,19 +54,17 @@ namespace MongoGroupFunctions
 		auto builder = document{};
 
 		value group_value = builder
-			<< "group_name" << groupID
+			<< "group_id" << groupID
+			<< "group_name" << groupName
 			<< "group_role_name" << groupRoleName
 			<< "users"
 			<< open_array
-			<< creatingUser.getUserId()
+			<< creatingUser.userId
 			<< close_array
-			<< "owner_user_id" << creatingUser.getUserId()
+			<< "owner_user_id" << creatingUser.userId
 			<< finalize;
 
 		groupsCollection.insert_one(group_value.view());
-
-		// Finally, we rename the group to the requested name
-		changeGroupName(groupID, groupName, adminClient);
 	}
 
 	std::string generateUniqueGroupName(mongocxx::client& adminClient)
@@ -108,12 +106,11 @@ namespace MongoGroupFunctions
 
 	std::vector<Group> getAllUserGroups(User& loggedInUser, mongocxx::client& adminClient)
 	{
-
 		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
 		mongocxx::collection groupsCollection = secondaryDb.collection(MongoConstants::GROUPS_COLLECTION);
 
 		value filter = document{}
-			<< "users" << loggedInUser.getUserId()
+			<< "users" << loggedInUser.userId
 			<< finalize;
 
 		mongocxx::cursor cursor = groupsCollection.find(filter.view());
@@ -121,8 +118,8 @@ namespace MongoGroupFunctions
 		std::vector<Group> groups{};
 		for (auto doc : cursor)
 		{
-			Group tmpGroup = getGroupData(doc["group_name"].get_utf8().value.to_string(), adminClient);
-			groups.push_back(std::move(tmpGroup));
+			Group tmpGroup = getGroupDataByName(doc["group_name"].get_utf8().value.to_string(), adminClient);
+			groups.push_back(tmpGroup);
 		}
 
 		return groups;
@@ -140,8 +137,8 @@ namespace MongoGroupFunctions
 		std::vector<Group> groups{};
 		for (auto doc : cursor)
 		{
-			Group tmpGroup = getGroupData(doc["group_name"].get_utf8().value.to_string(), adminClient);
-			groups.push_back(std::move(tmpGroup));
+			Group tmpGroup = getGroupDataByName(doc["group_name"].get_utf8().value.to_string(), adminClient);
+			groups.push_back(tmpGroup);
 		}
 
 		return groups;
@@ -149,7 +146,6 @@ namespace MongoGroupFunctions
 
 	size_t getAllGroupCount(User& loggedInUser, mongocxx::client& adminClient)
 	{
-
 		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
 		mongocxx::collection groupsCollection = secondaryDb.collection(MongoConstants::GROUPS_COLLECTION);
 
@@ -159,7 +155,7 @@ namespace MongoGroupFunctions
 	}
 
 
-	Group getGroupData(std::string groupName, mongocxx::client& adminClient)
+	Group getGroupDataByName(std::string groupName, mongocxx::client& adminClient)
 	{
 		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
 		mongocxx::collection groupsCollection = secondaryDb.collection(MongoConstants::GROUPS_COLLECTION);
@@ -179,74 +175,66 @@ namespace MongoGroupFunctions
 
 		Group gr{};
 
-		gr.setDocumentValue(groupValue);
-
-		gr._id = groupValue.view()["_id"].get_oid().value;
+		gr.id = groupValue.view()["group_id"].get_utf8().value.to_string();
 		gr.name = groupValue.view()["group_name"].get_utf8().value.to_string();
 		gr.roleName = groupValue.view()["group_role_name"].get_utf8().value.to_string();
+		gr.ownerUserId = groupValue.view()["owner_user_id"].get_utf8().value.to_string();
 
-		bsoncxx::types::b_binary ownerUserId = gr.getOwnerId();
-
-		User ownerUser = MongoUserFunctions::getUserDataThroughId(ownerUserId, adminClient);
+		User ownerUser = MongoUserFunctions::getUserDataThroughId(gr.ownerUserId, adminClient);
 		gr.ownerUsername = ownerUser.username;
 
 		auto userIdArr = groupValue.view()["users"].get_array().value;
 
 		for (auto idEl : userIdArr)
 		{
-			bsoncxx::types::b_binary currentId = idEl.get_binary();
+			std::string currentId = idEl.get_utf8().value.to_string();
 
 			User currentUser = MongoUserFunctions::getUserDataThroughId(currentId, adminClient);
 			gr.users.push_back(currentUser);
 			gr.userNames.push_back(currentUser.username);
 		}
 
-
 		return gr;
 	}
 
-	Group getGroupData(bsoncxx::oid& groupId, mongocxx::client& adminClient)
+	Group getGroupDataById(std::string groupId, mongocxx::client& adminClient)
 	{
 		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
 		mongocxx::collection groupsCollection = secondaryDb.collection(MongoConstants::GROUPS_COLLECTION);
 
 		value find_group_query = document{}
-			<< "_id" << groupId
+			<< "group_id" << groupId
 			<< finalize;
 
 		auto groupOptional = groupsCollection.find_one(find_group_query.view());
 
 		if (!groupOptional)
 		{
-			return Group{};
+			throw std::runtime_error("Group not found");
 		}
 
 		auto groupValue = groupOptional.get();
 
 		Group gr{};
 
-		gr.setDocumentValue(groupValue);
-
-		gr._id = groupValue.view()["_id"].get_oid().value;
+		gr.id = groupValue.view()["group_id"].get_utf8().value.to_string();
 		gr.name = groupValue.view()["group_name"].get_utf8().value.to_string();
 		gr.roleName = groupValue.view()["group_role_name"].get_utf8().value.to_string();
+		gr.ownerUserId = groupValue.view()["owner_user_id"].get_utf8().value.to_string();
 
-		bsoncxx::types::b_binary ownerUserId = gr.getOwnerId();
-
-		User ownerUser = MongoUserFunctions::getUserDataThroughId(ownerUserId, adminClient);
+		User ownerUser = MongoUserFunctions::getUserDataThroughId(gr.ownerUserId, adminClient);
 		gr.ownerUsername = ownerUser.username;
 
 		auto userIdArr = groupValue.view()["users"].get_array().value;
 
 		for (auto idEl : userIdArr)
 		{
-			bsoncxx::types::b_binary currentId = idEl.get_binary();
+			std::string currentId = idEl.get_utf8().value.to_string();
 
 			User currentUser = MongoUserFunctions::getUserDataThroughId(currentId, adminClient);
 			gr.users.push_back(currentUser);
 			gr.userNames.push_back(currentUser.username);
 		}
-
 
 		return gr;
 	}
@@ -263,7 +251,6 @@ namespace MongoGroupFunctions
 			<< "group_name" << newName
 			<< close_document
 			<< finalize;
-
 
 		auto groupCollection = adminClient.database(MongoConstants::PROJECTS_DB)
 			.collection(MongoConstants::GROUPS_COLLECTION);
@@ -286,36 +273,32 @@ namespace MongoGroupFunctions
 		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
 		mongocxx::collection groupsCollection = secondaryDb.collection(MongoConstants::GROUPS_COLLECTION);
 
-		
-
 		value filter = document{}
-			<< "_id" << group._id
+			<< "group_id" << group.id
 			<< finalize;
 
 		value update = document{}
 			<< "$set"
 			<< open_document
-			<< "owner_user_id" << newOwner.getUserId()
+			<< "owner_user_id" << newOwner.userId
 			<< close_document
 			<< finalize;
-
-		value insertUserInArrayUpdate = document{}
-			<< "$push"
-			<< open_document
-			<< "users" << newOwner.getUserId()
-			<< close_document
-			<< finalize;
-
 
 		auto result = groupsCollection.update_one(filter.view(), update.view());
 		int32_t matchedCount = result.get().matched_count();
 		int32_t modifiedCount = result.get().modified_count();
 
-
 		bool isUserAlreadyInArray = (std::find(group.userNames.begin(), group.userNames.end(), newOwner.username) != group.userNames.end());
 
 		if (!isUserAlreadyInArray)
 		{
+			value insertUserInArrayUpdate = document{}
+				<< "$push"
+				<< open_document
+				<< "users" << newOwner.userId
+				<< close_document
+				<< finalize;
+
 			result = groupsCollection.update_one(filter.view(), insertUserInArrayUpdate.view());
 
 			matchedCount += result.get().matched_count();
@@ -341,8 +324,7 @@ namespace MongoGroupFunctions
 		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
 		mongocxx::collection groupsCollection = secondaryDb.collection(MongoConstants::GROUPS_COLLECTION);
 
-		auto group = getGroupData(groupName, adminClient);
-
+		auto group = getGroupDataByName(groupName, adminClient);
 
 		// Very important, we add the user to the Group document and we add the Group's Role to the user also !!
 
@@ -353,7 +335,7 @@ namespace MongoGroupFunctions
 		value add_user_to_group_query = document{}
 			<< "$push"
 			<< open_document
-			<< "users" << userToBeAdded.getUserId()
+			<< "users" << userToBeAdded.userId
 			<< close_document
 			<< finalize;
 
@@ -383,8 +365,7 @@ namespace MongoGroupFunctions
 		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
 		mongocxx::collection groupsCollection = secondaryDb.collection(MongoConstants::GROUPS_COLLECTION);
 
-		auto group = getGroupData(groupName, adminClient);
-
+		auto group = getGroupDataByName(groupName, adminClient);
 
 		// WHAT HAPPENS WHEN THE USER IS THE OWNER???
 
@@ -396,7 +377,7 @@ namespace MongoGroupFunctions
 		value remove_user_from_group_query = document{}
 			<< "$pull"
 			<< open_document
-			<< "users" << userToBeRemoved.getUserId()
+			<< "users" << userToBeRemoved.userId
 			<< close_document
 			<< finalize;
 
@@ -421,11 +402,11 @@ namespace MongoGroupFunctions
 		mongocxx::collection groupsCollection = secondaryDb.collection(MongoConstants::GROUPS_COLLECTION);
 
 		value query = document{}
-			<< "_id" << groupToBeRemoved._id
+			<< "group_id" << groupToBeRemoved.id
 			<< finalize;
 
-		
 		auto res = groupsCollection.delete_one(query.view());
+
 		std::string groupRoleName = groupToBeRemoved.roleName;
 		MongoRoleFunctions::removeRole(groupRoleName, adminClient);
 
