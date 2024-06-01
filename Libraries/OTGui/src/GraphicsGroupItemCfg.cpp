@@ -22,7 +22,7 @@ ot::GraphicsGroupItemCfg::~GraphicsGroupItemCfg() {
 
 ot::GraphicsItemCfg* ot::GraphicsGroupItemCfg::createCopy(void) const {
 	ot::GraphicsGroupItemCfg* copy = new GraphicsGroupItemCfg;
-	this->setupData(copy);
+	this->copyConfigDataToItem(copy);
 
 	for (GraphicsItemCfg* itm : m_items) {
 		copy->m_items.push_back(itm->createCopy());

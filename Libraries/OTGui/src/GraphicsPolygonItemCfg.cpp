@@ -25,7 +25,7 @@ ot::GraphicsPolygonItemCfg::~GraphicsPolygonItemCfg() {
 
 ot::GraphicsItemCfg* ot::GraphicsPolygonItemCfg::createCopy(void) const {
 	ot::GraphicsPolygonItemCfg* copy = new GraphicsPolygonItemCfg;
-	this->setupData(copy);
+	this->copyConfigDataToItem(copy);
 
 	copy->m_points = m_points;
 	copy->m_outline = m_outline;

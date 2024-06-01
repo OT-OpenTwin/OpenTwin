@@ -119,7 +119,7 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 
 // Protected: Helper
 
-void ot::GraphicsItemCfg::setupData(GraphicsItemCfg* _config) const {
+void ot::GraphicsItemCfg::copyConfigDataToItem(GraphicsItemCfg* _config) const {
 	_config->m_name = m_name;
 	_config->m_title = m_title;
 	_config->m_uid = m_uid;

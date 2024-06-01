@@ -27,7 +27,7 @@ ot::GraphicsTextItemCfg::~GraphicsTextItemCfg() {}
 
 ot::GraphicsItemCfg* ot::GraphicsTextItemCfg::createCopy(void) const {
 	ot::GraphicsTextItemCfg* copy = new GraphicsTextItemCfg;
-	this->setupData(copy);
+	this->copyConfigDataToItem(copy);
 
 	copy->m_text = m_text;
 	copy->m_textFont = m_textFont;

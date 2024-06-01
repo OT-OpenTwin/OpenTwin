@@ -27,7 +27,7 @@ ot::GraphicsStackItemCfg::~GraphicsStackItemCfg() {
 
 ot::GraphicsItemCfg* ot::GraphicsStackItemCfg::createCopy(void) const {
 	ot::GraphicsStackItemCfg* copy = new GraphicsStackItemCfg;
-	this->setupData(copy);
+	this->copyConfigDataToItem(copy);
 
 	for (const GraphicsStackItemCfgEntry& itm : m_items) {
 		copy->addItemTop(itm.item->createCopy(), itm.isMaster, itm.isSlave);

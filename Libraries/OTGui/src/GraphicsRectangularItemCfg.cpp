@@ -34,7 +34,7 @@ ot::GraphicsRectangularItemCfg::~GraphicsRectangularItemCfg() {
 
 ot::GraphicsItemCfg* ot::GraphicsRectangularItemCfg::createCopy(void) const {
 	ot::GraphicsRectangularItemCfg* copy = new GraphicsRectangularItemCfg;
-	this->setupData(copy);
+	this->copyConfigDataToItem(copy);
 
 	copy->m_cornerRadius = m_cornerRadius;
 	copy->m_outline = m_outline;

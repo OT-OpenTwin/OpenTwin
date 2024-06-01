@@ -266,7 +266,7 @@
       <Filter>src\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsItemLoader.cpp">
-      <Filter>src\Widgets</Filter>
+      <Filter>src\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

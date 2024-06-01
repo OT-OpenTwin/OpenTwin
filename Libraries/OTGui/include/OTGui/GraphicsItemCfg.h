@@ -152,10 +152,12 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-		// Protected: Helper
+		// Helper
 
-	protected:
-		virtual void setupData(GraphicsItemCfg* _config) const;
+		//! \brief Will copy the current config to the provided item configuration.
+		//! This method may be called when creating a graphics item copy.
+		//! \param _config Item to copy the data to.
+		virtual void copyConfigDataToItem(GraphicsItemCfg* _config) const;
 
 	private:
 		std::string m_name;

@@ -22,7 +22,7 @@ ot::GraphicsImageItemCfg::~GraphicsImageItemCfg() {}
 
 ot::GraphicsItemCfg* ot::GraphicsImageItemCfg::createCopy(void) const {
 	ot::GraphicsImageItemCfg* copy = new GraphicsImageItemCfg;
-	this->setupData(copy);
+	this->copyConfigDataToItem(copy);
 
 	copy->m_imageSubPath = m_imageSubPath;
 	copy->m_maintainAspectRatio = m_maintainAspectRatio;

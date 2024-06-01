@@ -20,7 +20,7 @@ ot::GraphicsLineItemCfg::~GraphicsLineItemCfg() {}
 
 ot::GraphicsItemCfg* ot::GraphicsLineItemCfg::createCopy(void) const {
 	ot::GraphicsLineItemCfg* copy = new GraphicsLineItemCfg;
-	this->setupData(copy);
+	this->copyConfigDataToItem(copy);
 
 	copy->m_from = m_from;
 	copy->m_to = m_to;

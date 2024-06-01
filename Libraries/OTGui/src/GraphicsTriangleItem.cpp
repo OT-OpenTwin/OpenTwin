@@ -78,7 +78,7 @@ ot::GraphicsTriangleItemCfg::~GraphicsTriangleItemCfg() {
 
 ot::GraphicsItemCfg* ot::GraphicsTriangleItemCfg::createCopy(void) const {
 	ot::GraphicsTriangleItemCfg* copy = new GraphicsTriangleItemCfg;
-	this->setupData(copy);
+	this->copyConfigDataToItem(copy);
 
 	copy->m_outline = m_outline;
 	copy->m_size = m_size;

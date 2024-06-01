@@ -19,5 +19,5 @@ void ot::GraphicsLayoutItemCfg::setFromJsonObject(const ConstJsonObject& _object
 }
 
 void ot::GraphicsLayoutItemCfg::setupData(GraphicsItemCfg* _config) const {
-	GraphicsItemCfg::setupData(_config);
+	GraphicsItemCfg::copyConfigDataToItem(_config);
 }

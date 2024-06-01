@@ -7,10 +7,12 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/GraphicsItemFileCfg.h"
 #include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
 #include "OTWidgets/GraphicsStackItem.h"
+#include "OTWidgets/GraphicsItemLoader.h"
 #include "OTWidgets/GraphicsHighlightItem.h"
 
 ot::GraphicsItemFactory& ot::GraphicsItemFactory::instance(void) {
@@ -29,6 +31,24 @@ ot::GraphicsItem* ot::GraphicsItemFactory::create(const ConstJsonObject& _config
 
 ot::GraphicsItem* ot::GraphicsItemFactory::itemFromConfig(ot::GraphicsItemCfg* _configuration, bool _isRoot) {
 	OTAssertNullptr(_configuration);
+
+	// If the configuration is a file we need to import the actual configuration for this item.
+	if (_configuration->getFactoryKey() == OT_FactoryKey_GraphicsFileItem) {
+		// Get config and file sub path
+		ot::GraphicsItemFileCfg* actualConfig = dynamic_cast<ot::GraphicsItemFileCfg*>(_configuration);
+		OTAssertNullptr(actualConfig);
+		std::string configSubPath = actualConfig->getFile();
+
+		// Import new config
+		_configuration = GraphicsItemLoader::instance().createConfiguration(QString::fromStdString(configSubPath));
+		if (!_configuration) {
+			return nullptr;
+		}
+
+		// Copy config data
+		actualConfig->copyConfigDataToItem(_configuration);
+	}
+
 	// Create item
 	GraphicsItem* itm = this->createFromKey(_configuration->getFactoryKey());
 	if (!itm) return nullptr;

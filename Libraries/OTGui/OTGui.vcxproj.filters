@@ -264,6 +264,9 @@
     <ClInclude Include="include\OTGui\ColorStyleTypes.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsItemFileCfg.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -460,6 +463,9 @@
     </ClCompile>
     <ClCompile Include="src\ColorStyleTypes.cpp">
       <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsItemFileCfg.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

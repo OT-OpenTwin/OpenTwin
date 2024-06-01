@@ -25,7 +25,7 @@ ot::GraphicsShapeItemCfg::~GraphicsShapeItemCfg() {
 
 ot::GraphicsItemCfg* ot::GraphicsShapeItemCfg::createCopy(void) const {
 	ot::GraphicsShapeItemCfg* copy = new GraphicsShapeItemCfg;
-	this->setupData(copy);
+	this->copyConfigDataToItem(copy);
 
 	copy->m_path = m_path;
 	copy->m_outline = m_outline;

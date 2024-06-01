@@ -34,7 +34,7 @@ ot::GraphicsEllipseItemCfg::~GraphicsEllipseItemCfg() {
 
 ot::GraphicsItemCfg* ot::GraphicsEllipseItemCfg::createCopy(void) const {
 	ot::GraphicsEllipseItemCfg* copy = new GraphicsEllipseItemCfg;
-	this->setupData(copy);
+	this->copyConfigDataToItem(copy);
 
 	copy->m_radiusX = m_radiusX;
 	copy->m_radiusY = m_radiusY;
