@@ -129,7 +129,7 @@ ot::Outline::Outline(int _width, Painter2D* _painter)
 ot::Outline::Outline(const Outline& _other)
 	: m_width(_other.m_width), m_painter(nullptr), m_style(_other.m_style), m_cap(_other.m_cap), m_join(_other.m_join)
 {
-	this->setPainter(_other.m_painter);
+	this->setPainter(_other.m_painter->createCopy());
 }
 
 ot::Outline::~Outline() {
@@ -248,7 +248,7 @@ ot::OutlineF::OutlineF(double _width, Painter2D* _painter)
 ot::OutlineF::OutlineF(const OutlineF& _other)
 	: m_width(_other.m_width), m_painter(nullptr), m_style(_other.m_style), m_cap(_other.m_cap), m_join(_other.m_join)
 {
-	this->setPainter(_other.m_painter);
+	this->setPainter(_other.m_painter->createCopy());
 }
 
 ot::OutlineF::~OutlineF() {

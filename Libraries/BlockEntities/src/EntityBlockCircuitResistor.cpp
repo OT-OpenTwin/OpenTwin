@@ -7,6 +7,7 @@
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
+#include "OTGui/GraphicsItemFileCfg.h"
 
 
 EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
@@ -39,9 +40,16 @@ std::string EntityBlockCircuitResistor::getElementType()
 
 	return elementType->getValue();
 }
-
+#define TEST_ITEM_LOADER true
 ot::GraphicsItemCfg* EntityBlockCircuitResistor::CreateBlockCfg()
 {
+#if TEST_ITEM_LOADER==true
+	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
+	newConfig->setName("EntityBlockCircuitResistor");
+	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid);
+	newConfig->setFile("Circuit/Resistor.ot.json");
+	return newConfig;
+#endif
 	ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
 	myStack->setName("EntityBlockCircuitResistor");
 	myStack->setTitle("EntityBlockCircuitResistor");

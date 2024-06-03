@@ -6,13 +6,12 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/CustomGraphicsItem.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/Outline.h"
+#include "OTWidgets/CustomGraphicsItem.h"
 
 // Qt header
 #include <QtCore/qline.h>
-#include <QtGui/qpen.h>
-#include <QtGui/qbrush.h>
 
 namespace ot {
 
@@ -45,17 +44,16 @@ namespace ot {
 
 	public:
 
-		void setLine(qreal _x1, qreal _y1, qreal _x2, qreal _y2) { this->setLine(QLineF(_x1, _y1, _x2, _y2)); };
-		void setLine(const QPointF& _from, const QPointF& _to) { this->setLine(QLineF(_from, _to)); };
+		void setLine(qreal _x1, qreal _y1, qreal _x2, qreal _y2) { this->setLine(Point2DD(_x1, _y1), Point2DD(_x2, _y2)); };
+		void setLine(const Point2DD& _from, const Point2DD& _to);
+		void setLine(const QPointF& _from, const QPointF& _to);
 		void setLine(const QLineF& _line);
-		const QLineF& getLine(void) const { return m_line; };
+		const Point2DD& getFrom(void) const;
+		const Point2DD& getTo(void) const;
+		QLineF getLine(void) const;
 
-		void setLinePen(const QPen& _pen) { m_pen = _pen; };
-		const QPen& linePen(void) const { return m_pen; };
-
-	private:
-		QPen m_pen;
-		QLineF m_line;
+		void setLineStyle(const OutlineF& _style);
+		const OutlineF& getLineStyle(void) const;
 	};
 
 

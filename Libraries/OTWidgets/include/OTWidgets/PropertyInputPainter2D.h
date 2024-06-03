@@ -10,6 +10,7 @@
 
 namespace ot {
 
+	class Painter2D;
 	class Painter2DEditButton;
 
 	class OT_WIDGETS_API_EXPORT PropertyInputPainter2D : public PropertyInput {
@@ -24,6 +25,7 @@ namespace ot {
 		virtual Property* createPropertyConfiguration(void) const override;
 		virtual bool setupFromConfiguration(const Property* _configuration) override;
 
+		const Painter2D* getPainter(void) const;
 		Painter2DEditButton* getButton(void) const { return m_button; };
 
 	private:

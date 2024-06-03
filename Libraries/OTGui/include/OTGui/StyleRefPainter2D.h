@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTGui/Painter2D.h"
+#include "OTGui/ColorStyleTypes.h"
 
 // std header
 #include <string>
@@ -24,8 +25,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT StyleRefPainter2D : public ot::Painter2D {
 		OT_DECL_NOCOPY(StyleRefPainter2D)
 	public:
-		StyleRefPainter2D();
-		StyleRefPainter2D(const std::string& _referenceKey);
+		StyleRefPainter2D(ColorStyleValueEntry _referenceKey = ColorStyleValueEntry::WidgetBackground);
 		virtual ~StyleRefPainter2D();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -47,13 +47,13 @@ namespace ot {
 
 		//! \brief Sets the key of the ColorStyleValue that should be referenced.
 		//! \param _referenceKey Key to set.
-		void setReferenceKey(const std::string& _referenceKey) { m_reference = _referenceKey; };
+		void setReferenceKey(ColorStyleValueEntry _referenceKey) { m_reference = _referenceKey; };
 
 		//! \brief Key of the ColorStyleValue that is referenced.
-		const std::string& referenceKey(void) const { return m_reference; };
+		ColorStyleValueEntry referenceKey(void) const { return m_reference; };
 
 	private:
-		std::string m_reference; //! \brief ColorStyleValue key.
+		ColorStyleValueEntry m_reference; //! \brief ColorStyleValue key.
 	};
 
 }

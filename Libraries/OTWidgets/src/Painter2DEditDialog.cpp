@@ -6,7 +6,9 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/Painter2D.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTGui/FillPainter2D.h"
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/LinearGradientPainter2D.h"
 #include "OTGui/RadialGradientPainter2D.h"
 #include "OTWidgets/SpinBox.h"
@@ -32,6 +34,7 @@
 #define P2DED_Fill "Fill"
 #define P2DED_Linear "Linear"
 #define P2DED_Radial "Radial"
+#define P2DED_StyleRef "Style Reference"
 
 ot::Painter2DEditDialogEntry::~Painter2DEditDialogEntry() {}
 
@@ -275,6 +278,52 @@ void ot::Painter2DEditDialogRadialGradientEntry::slotFocalEnabledChanged(void) {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+ot::Painter2DEditDialogReferenceEntry::Painter2DEditDialogReferenceEntry(const Painter2D* _painter) {
+	m_comboBox = new ComboBox;
+
+	const StyleRefPainter2D* actualPainter = dynamic_cast<const StyleRefPainter2D*>(_painter);
+
+	QStringList optionList;
+	for (const std::string& opt : ot::getAllColorStyleValueEntries()) {
+		optionList.append(QString::fromStdString(opt));
+	}
+	
+	QString txt;
+	if (actualPainter) {
+		txt = QString::fromStdString(toString(actualPainter->referenceKey()));
+	}
+	else {
+		txt = QString::fromStdString(toString(ColorStyleValueEntry::WidgetBackground));
+	}
+
+	m_comboBox->setEditable(false);
+	m_comboBox->addItems(optionList);
+	m_comboBox->setCurrentText(txt);
+
+	this->connect(m_comboBox, &ComboBox::currentTextChanged, this, &Painter2DEditDialogReferenceEntry::slotValueChanged);
+}
+
+ot::Painter2DEditDialogReferenceEntry::~Painter2DEditDialogReferenceEntry() {
+	delete m_comboBox;
+}
+
+QWidget* ot::Painter2DEditDialogReferenceEntry::getRootWidget(void) const {
+	return m_comboBox;
+}
+
+ot::Painter2D* ot::Painter2DEditDialogReferenceEntry::createPainter(void) const {
+	StyleRefPainter2D* newPainter = new StyleRefPainter2D;
+	newPainter->setReferenceKey(stringToColorStyleValueEntry(m_comboBox->currentText().toStdString()));
+
+	return newPainter;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 ot::Painter2DEditDialog::Painter2DEditDialog(const Painter2D* _painter) 
 	: m_currentEntry(nullptr), m_changed(false)
 {
@@ -299,6 +348,7 @@ void ot::Painter2DEditDialog::slotTypeChanged() {
 	if (m_typeSelectionBox->currentText() == P2DED_Fill) {}
 	else if (m_typeSelectionBox->currentText() == P2DED_Linear) newPainter = new LinearGradientPainter2D;
 	else if (m_typeSelectionBox->currentText() == P2DED_Radial) newPainter = new RadialGradientPainter2D;
+	else if (m_typeSelectionBox->currentText() == P2DED_StyleRef) newPainter = new StyleRefPainter2D;
 	else {
 		OT_LOG_EA("Unknown entry type");
 	}
@@ -360,8 +410,24 @@ void ot::Painter2DEditDialog::ini(void) {
 	cLay->addWidget(m_cancel);
 
 	// Setup controls
-	m_typeSelectionBox->addItems(QStringList({ P2DED_Fill, P2DED_Linear, P2DED_Radial }));
-	m_typeSelectionBox->setCurrentIndex(0);
+	m_typeSelectionBox->addItems(QStringList({ P2DED_Fill, P2DED_Linear, P2DED_Radial, P2DED_StyleRef }));
+
+	if (m_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) {
+		m_typeSelectionBox->setCurrentText(P2DED_Fill);
+	}
+	else if (m_painter->getFactoryKey() == OT_FactoryKey_LinearGradientPainter2D) {
+		m_typeSelectionBox->setCurrentText(P2DED_Linear);
+	}
+	else if (m_painter->getFactoryKey() == OT_FactoryKey_RadialGradientPainter2D) {
+		m_typeSelectionBox->setCurrentText(P2DED_Radial);
+	}
+	else if (m_painter->getFactoryKey() == OT_FactoryKey_StyleRefPainter2D) {
+		m_typeSelectionBox->setCurrentText(P2DED_StyleRef);
+	}
+	else {
+		OT_LOG_E("Unknown painter \"" + m_painter->getFactoryKey() + "\"");
+		m_typeSelectionBox->setCurrentIndex(0);
+	}
 
 	// Setup layouts
 	comboLay->addWidget(typeLabel);
@@ -393,6 +459,7 @@ void ot::Painter2DEditDialog::applyPainter(const Painter2D* _painter) {
 	if (_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) m_currentEntry = new Painter2DEditDialogFillEntry(_painter);
 	else if (_painter->getFactoryKey() == OT_FactoryKey_LinearGradientPainter2D) m_currentEntry = new Painter2DEditDialogLinearGradientEntry(_painter);
 	else if (_painter->getFactoryKey() == OT_FactoryKey_RadialGradientPainter2D) m_currentEntry = new Painter2DEditDialogRadialGradientEntry(_painter);
+	else if (_painter->getFactoryKey() == OT_FactoryKey_StyleRefPainter2D) m_currentEntry = new Painter2DEditDialogReferenceEntry(_painter);
 	else {
 		OT_LOG_E("Unknown painter type");
 	}

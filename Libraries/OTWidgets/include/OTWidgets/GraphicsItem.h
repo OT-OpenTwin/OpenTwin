@@ -245,6 +245,12 @@ namespace ot {
 		//! The method will return 0 if the cast failed.
 		template <class T> T* getItemConfiguration(void);
 
+		//! \brief Returns the configuration for the current item.
+		//! The configuration may be modified.
+		//! The function will cast the current configuration to the type provided.
+		//! The method will return 0 if the cast failed.
+		template <class T> const T* getItemConfiguration(void) const;
+
 	private:
 		GraphicsItemCfg* m_config; //! \brief Configuration used to setup this item. Default 0.
 		

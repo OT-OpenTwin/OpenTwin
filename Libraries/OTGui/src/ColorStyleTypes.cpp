@@ -334,6 +334,10 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	case ot::ColorStyleValueEntry::ToolBarFirstTabBackground: return "TabToolBar First Tab Background";
 	case ot::ColorStyleValueEntry::ToolBarFirstTabForeground: return "TabToolBar First Tab Foreground";
 
+	case ot::ColorStyleValueEntry::GraphicsItemBorder: return "GraphicsItem Border Color";
+	case ot::ColorStyleValueEntry::GraphicsItemBackground: return "GraphicsItem Background";
+	case ot::ColorStyleValueEntry::GraphicsItemForeground: return "GraphicsItem Foreground";
+
 	case ot::ColorStyleValueEntry::ErrorForeground: return "Error Foreground";
 
 	default:
@@ -386,11 +390,23 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ToolBarFirstTabBackground)) return ColorStyleValueEntry::ToolBarFirstTabBackground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ToolBarFirstTabForeground)) return ColorStyleValueEntry::ToolBarFirstTabForeground;
 
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemBorder)) return ColorStyleValueEntry::GraphicsItemBorder;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemBackground)) return ColorStyleValueEntry::GraphicsItemBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemForeground)) return ColorStyleValueEntry::GraphicsItemForeground;
+
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ErrorForeground)) return ColorStyleValueEntry::ErrorForeground;
 	else {
 		OT_LOG_EAS("Unknown ColorStyleValueEntry \"" + _colorStyleValueEntry + "\"");
 		return ColorStyleValueEntry::WidgetBackground;
 	}
+}
+
+std::list<std::string> ot::getAllColorStyleValueEntries(void) {
+	std::list<std::string> ret;
+	for (int i = 0; i < (int)ColorStyleValueEntry::ColorStyleValueEntry_End; i++) {
+		ret.push_back(toString((ColorStyleValueEntry)i));
+	}
+	return ret;
 }
 
 std::string ot::toString(ColorStyleIntegerEntry _colorStyleIntegerEntry) {

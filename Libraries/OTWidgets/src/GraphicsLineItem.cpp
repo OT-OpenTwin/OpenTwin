@@ -42,9 +42,6 @@ bool ot::GraphicsLineItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 	this->prepareGeometryChange();
 
-	m_pen = QtFactory::toQPen(cfg->getLineStyle());
-	m_line = QLineF(QtFactory::toQPoint(cfg->getFrom()), QtFactory::toQPoint(cfg->getTo()));
-
 	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }
 
@@ -53,29 +50,64 @@ bool ot::GraphicsLineItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 // Base class functions: ot::CustomGraphicsItem
 
 QSizeF ot::GraphicsLineItem::getPreferredGraphicsItemSize(void) const {
+	QLineF l = this->getLine();
 	return QSizeF(
-		std::max(m_line.p1().x(), m_line.p2().x()) - std::min(m_line.p1().x(), m_line.p2().x()),
-		std::max(m_line.p1().y(), m_line.p2().y()) - std::min(m_line.p1().y(), m_line.p2().y())
+		std::max(l.p1().x(), l.p2().x()) - std::min(l.p1().x(), l.p2().x()),
+		std::max(l.p1().y(), l.p2().y()) - std::min(l.p1().y(), l.p2().y())
 	);
 }
 
 void ot::GraphicsLineItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
-	_painter->setPen(m_pen);
-	_painter->drawLine(m_line);
+	const GraphicsLineItemCfg* cfg = this->getItemConfiguration<GraphicsLineItemCfg>();
+	if (!cfg) return;
+	_painter->setPen(QtFactory::toQPen(cfg->getLineStyle()));
+	_painter->drawLine(this->getLine());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter/Getter
 
-void ot::GraphicsLineItem::setLine(const QLineF& _line)
-{
+void ot::GraphicsLineItem::setLine(const Point2DD& _from, const Point2DD& _to) {
 	this->prepareGeometryChange();
-	
-	this->getItemConfiguration<GraphicsLineItemCfg>()->setFrom(QtFactory::toPoint2D(_line.p1()));
-	this->getItemConfiguration<GraphicsLineItemCfg>()->setTo(QtFactory::toPoint2D(_line.p2()));
-	m_line = _line;
 
+	this->getItemConfiguration<GraphicsLineItemCfg>()->setFrom(_from);
+	this->getItemConfiguration<GraphicsLineItemCfg>()->setTo(_to);
+	
 	this->setGeometry(QRectF(this->pos(), this->getPreferredGraphicsItemSize()));
 	this->raiseEvent(GraphicsItem::ItemResized);
+}
+
+void ot::GraphicsLineItem::setLine(const QPointF& _from, const QPointF& _to) {
+	this->setLine(QtFactory::toPoint2D(_from), QtFactory::toPoint2D(_to));
+}
+
+void ot::GraphicsLineItem::setLine(const QLineF& _line)
+{
+	this->setLine(QtFactory::toPoint2D(_line.p1()), QtFactory::toPoint2D(_line.p2()));
+}
+
+const ot::Point2DD& ot::GraphicsLineItem::getFrom(void) const {
+	const GraphicsLineItemCfg* cfg = this->getItemConfiguration<GraphicsLineItemCfg>();
+	return cfg->getFrom();
+}
+
+const ot::Point2DD& ot::GraphicsLineItem::getTo(void) const {
+	const GraphicsLineItemCfg* cfg = this->getItemConfiguration<GraphicsLineItemCfg>();
+	return cfg->getTo();
+}
+
+QLineF ot::GraphicsLineItem::getLine(void) const {
+	const GraphicsLineItemCfg* cfg = this->getItemConfiguration<GraphicsLineItemCfg>();
+	return QLineF(QtFactory::toQPoint(cfg->getFrom()), QtFactory::toQPoint(cfg->getTo()));
+}
+
+void ot::GraphicsLineItem::setLineStyle(const OutlineF& _style) {	
+	this->getItemConfiguration<GraphicsLineItemCfg>()->setLineStyle(_style);
+	this->update();
+}
+
+const ot::OutlineF& ot::GraphicsLineItem::getLineStyle(void) const {
+	const GraphicsLineItemCfg* cfg = this->getItemConfiguration<GraphicsLineItemCfg>();
+	return cfg->getLineStyle();
 }

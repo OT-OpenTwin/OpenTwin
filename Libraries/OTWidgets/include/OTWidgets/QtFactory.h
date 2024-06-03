@@ -18,6 +18,7 @@
 // Qt header
 #include <QtCore/qpoint.h>
 #include <QtCore/qsize.h>
+#include <QtCore/qstringlist.h>
 #include <QtGui/qpen.h>
 #include <QtGui/qcolor.h>
 #include <QtGui/qbrush.h>

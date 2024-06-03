@@ -74,3 +74,7 @@ bool ot::PropertyInputPainter2D::setupFromConfiguration(const Property* _configu
 
 	return true;
 }
+
+const ot::Painter2D* ot::PropertyInputPainter2D::getPainter(void) const {
+	return m_button->getPainter();
+}

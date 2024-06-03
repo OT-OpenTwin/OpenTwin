@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/FillPainter2D.h"
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/Painter2DPreview.h"
 #include "OTGui/LinearGradientPainter2D.h"
@@ -149,7 +150,7 @@ void ot::Painter2DEditButton::updateText(void) {
 				"; FY: " + QString::number(actualPainter->focalPoint().y()) +
 				"; FR: " + QString::number(actualPainter->focalRadius()) +
 				"; Spread: " + QString::fromStdString(toString(actualPainter->spread())) +
-				"; ";
+				" }";
 		}
 		else {
 			m_btnTip = "RadialGradient { CX: " + QString::number(actualPainter->centerPoint().x()) +
@@ -165,6 +166,17 @@ void ot::Painter2DEditButton::updateText(void) {
 				", " + QString::number(s.color().g()) + ", " + QString::number(s.color().b()) +
 				", " + QString::number(s.color().a()) + "); ");
 		}
+
+		QFontMetrics metrics(m_btn->font());
+		m_btn->setText(metrics.size(0, m_btnTip).width() < m_btn->width() ? m_btnTip : m_btnText);
+		m_btn->setToolTip(m_btnTip);
+	}
+	else if (m_painter->getFactoryKey() == OT_FactoryKey_StyleRefPainter2D) {
+		StyleRefPainter2D* actualPainter = dynamic_cast<StyleRefPainter2D*>(m_painter);
+		OTAssertNullptr(actualPainter);
+		m_btnText = "Style Reference";
+		
+		m_btnTip = "Style Reference { Style: " + QString::fromStdString(toString(actualPainter->referenceKey())) + " }";
 
 		QFontMetrics metrics(m_btn->font());
 		m_btn->setText(metrics.size(0, m_btnTip).width() < m_btn->width() ? m_btnTip : m_btnText);

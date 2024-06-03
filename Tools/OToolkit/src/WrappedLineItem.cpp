@@ -7,11 +7,10 @@
 #include "WrappedLineItem.h"
 
 // OpenTwin header
+#include "OTGui/FillPainter2D.h"
 #include "OTWidgets/GraphicsScene.h"
 
-WrappedLineItem::WrappedLineItem() {
-
-}
+WrappedLineItem::WrappedLineItem() {}
 
 WrappedLineItem::~WrappedLineItem() {
 
@@ -59,6 +58,8 @@ void WrappedLineItem::fillPropertyGrid(void) {
 	geometryGroup->addProperty(new PropertyDouble("Y1", this->getLine().y1()));
 	geometryGroup->addProperty(new PropertyDouble("X2", this->getLine().x2()));
 	geometryGroup->addProperty(new PropertyDouble("Y2", this->getLine().y2()));
+	geometryGroup->addProperty(new PropertyPainter2D("Line Painter", this->getLineStyle().painter()));
+	geometryGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().width()));
 
 	cfg.addRootGroup(generalGroup);
 	cfg.addRootGroup(geometryGroup);
@@ -115,6 +116,29 @@ void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->setLine(this->getLine().x1(), this->getLine().y1(), this->getLine().x2(), input->getValue());
 	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Line Painter") {
+		PropertyInputPainter2D* input = dynamic_cast<PropertyInputPainter2D*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		ot::OutlineF lineStyle = this->getLineStyle();
+		lineStyle.setPainter(input->getPainter()->createCopy());
+		this->setLineStyle(lineStyle);
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Line Width") {
+		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		ot::OutlineF lineStyle = this->getLineStyle();
+		lineStyle.setWidth(input->getValue());
+		this->setLineStyle(lineStyle);
+	}
+
 }
 
 void WrappedLineItem::propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {

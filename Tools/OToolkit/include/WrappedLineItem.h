@@ -11,6 +11,8 @@
 // OpenTwin header
 #include "OTWidgets/GraphicsLineItem.h"
 
+namespace ot { class Painter2D; }
+
 class WrappedLineItem : public ot::GraphicsLineItem, public GraphicsItemDesignerItemBase {
 	OT_DECL_NOCOPY(WrappedLineItem)
 public:
@@ -39,7 +41,4 @@ protected:
 	virtual void propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override;
 	virtual void propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override;
 	virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _constrains) override;
-
-private:
-
 };

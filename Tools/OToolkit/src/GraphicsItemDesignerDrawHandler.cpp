@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTWidgets/GraphicsScene.h"
 
 GraphicsItemDesignerDrawHandler::GraphicsItemDesignerDrawHandler(GraphicsItemDesignerView* _view)
@@ -183,8 +184,7 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 
 GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createLineItem(void) {
 	WrappedLineItem* newItem = new WrappedLineItem;
-	newItem->setLinePen(QPen(QBrush(QColor(0, 0, 0, 255)), 1.));
-
+	newItem->setLineStyle(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
 	return newItem;
 }
 

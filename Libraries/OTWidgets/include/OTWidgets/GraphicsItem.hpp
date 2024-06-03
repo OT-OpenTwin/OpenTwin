@@ -14,3 +14,10 @@ T* ot::GraphicsItem::getItemConfiguration(void) {
 	OTAssertNullptr(ret);
 	return ret;
 }
+
+template <class T>
+const T* ot::GraphicsItem::getItemConfiguration(void) const {
+	T* ret = dynamic_cast<T*>(m_config);
+	OTAssertNullptr(ret);
+	return ret;
+}
