@@ -576,6 +576,8 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	std::string credentialsUserName = ot::json::getString(_commandDoc, OT_PARAM_AUTH_USERNAME);
 	std::string credentialsUserPassword = ot::json::getString(_commandDoc, OT_PARAM_AUTH_PASSWORD);
 	std::string userCollection = ot::json::getString(_commandDoc, OT_PARAM_SETTINGS_USERCOLLECTION);
+	std::string databaseUserName = ot::json::getString(_commandDoc, OT_PARAM_DB_USERNAME);
+	std::string databaseUserPassword = ot::json::getString(_commandDoc, OT_PARAM_DB_PASSWORD);
 
 	// Required service params
 	std::string serviceName = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME);
@@ -590,36 +592,6 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 
 	try { shouldRunRelayService = ot::json::getBool(_commandDoc, OT_ACTION_PARAM_START_RELAY); }
 	catch (...) {}
-
-	// Request creation of temporary database user
-	ot::JsonDocument authDoc;
-	authDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CREATE_SESSION_USER, authDoc.GetAllocator()), authDoc.GetAllocator());
-	authDoc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(credentialsUserName, authDoc.GetAllocator()), authDoc.GetAllocator());
-	authDoc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(credentialsUserPassword, authDoc.GetAllocator()), authDoc.GetAllocator());
-	authDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(sessionID, authDoc.GetAllocator()), authDoc.GetAllocator());
-	
-	std::string authResponse;
-	if (!ot::msg::send(url(), serviceAuthorisationURL(), ot::EXECUTE, authDoc.toJson(), authResponse)) {
-		OT_LOG_E("Failed to send request to authorisation service");
-		return OT_ACTION_RETURN_INDICATOR_Error "Failed to send request to authorisation service";
-	}
-
-	std::string databaseUserName;
-	std::string databaseUserPassword;
-
-	try
-	{
-		ot::JsonDocument responseDoc;
-		responseDoc.fromJson(authResponse);
-
-		databaseUserName = ot::json::getString(responseDoc, "username");
-		databaseUserPassword = ot::json::getString(responseDoc, "password");
-	}
-	catch (std::exception)
-	{
-		OT_LOG_E("Failed to create the temporary session user");
-		return OT_ACTION_RETURN_INDICATOR_Error "Failed to create the temporary session user";
-	}
 
 	// Create the session
 	m_masterLock.lock();

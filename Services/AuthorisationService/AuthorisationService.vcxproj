@@ -197,6 +197,7 @@
     <ClCompile Include="src\MongoGroupFunctions.cpp" />
     <ClCompile Include="src\MongoProjectFunctions.cpp" />
     <ClCompile Include="src\MongoRoleFunctions.cpp" />
+    <ClCompile Include="src\MongoSessionFunctions.cpp" />
     <ClCompile Include="src\MongoURL.cpp" />
     <ClCompile Include="src\MongoUserFunctions.cpp" />
     <ClCompile Include="src\Project.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="include\MongoGroupFunctions.h" />
     <ClInclude Include="include\MongoProjectFunctions.h" />
     <ClInclude Include="include\MongoRoleFunctions.h" />
+    <ClInclude Include="include\MongoSessionFunctions.h" />
     <ClInclude Include="include\MongoURL.h" />
     <ClInclude Include="include\MongoUserFunctions.h" />
     <ClInclude Include="include\Project.h" />

@@ -180,15 +180,9 @@ bool ProjectManagement::hasError(const std::string &response)
 {
 	ot::JsonDocument doc;
 	doc.fromJson(response);
-	try
-	{
-		int error = ot::json::getInt(doc, OT_ACTION_AUTH_ERROR);
-		return (error == 1);
-	}
-	catch (std::exception)
-	{
-		return false; // The return document does not have an error flag
-	}
+
+	// Check whether the document has an error flag
+	return ot::json::exists(doc, OT_ACTION_AUTH_ERROR);
 }
 
 bool ProjectManagement::hasSuccessful(const std::string &response)
@@ -370,7 +364,7 @@ bool ProjectManagement::InitializeConnection(void)
 	try
 	{
 		AppBase * app{ AppBase::instance() };
-		DataStorageAPI::ConnectionAPI::establishConnection(databaseURL, "1", app->getCredentialUserName(), app->getCredentialUserPasswordClear());
+		DataStorageAPI::ConnectionAPI::establishConnection(databaseURL, "1", app->getSessionUserName(), app->getSessionUserPassword());
 
 		// Now we run a command on the server and check whether its is really responding to us (the following command throws an exception if not)
 		isConnected = DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(dataBaseName, projectCatalogCollectionName);

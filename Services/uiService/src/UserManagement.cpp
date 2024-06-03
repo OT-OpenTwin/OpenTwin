@@ -59,7 +59,7 @@ bool UserManagement::checkConnection(void)
 	AppBase * app{ AppBase::instance() };
 
 	if (!checkConnectionAuthorizationService()) return false;
-	if (!checkConnectionDataBase(app->getCredentialUserName(), app->getCredentialUserPasswordClear())) return false;
+	if (!checkConnectionDataBase(app->getSessionUserName(), app->getSessionUserPassword())) return false;
 
 	return true;
 }
@@ -166,40 +166,40 @@ bool UserManagement::deleteUser(const std::string &userName)
 	return true;
 }
 
-bool UserManagement::changePassword(const std::string &oldPassword, const std::string &newPassword)
-{
-	// We always expect the old and the new password to be unencrypted.
-
-	assert(!authServerURL.empty());
-
-	// Here we change a user password by sending a message to the authorization service
-	AppBase * app{ AppBase::instance() };
-
-	// First, we check whether the old password is correct
-	std::string validPassword, validEncryptedPassword;
-
-	if (!checkPassword(app->getCredentialUserName(), oldPassword, false, validPassword, validEncryptedPassword))
-	{
-		return false;
-	}	
-
-	// Now we try to change the password
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_USER_PASSWORD, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(newPassword, doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
-		return false;
-	}
-
-	// Now we check the response document
-	assert(0);
-	return true;
-}
+//bool UserManagement::changePassword(const std::string &oldPassword, const std::string &newPassword)
+//{
+//	// We always expect the old and the new password to be unencrypted.
+//
+//	assert(!authServerURL.empty());
+//
+//	// Here we change a user password by sending a message to the authorization service
+//	AppBase * app{ AppBase::instance() };
+//
+//	// First, we check whether the old password is correct
+//	std::string validPassword, validEncryptedPassword;
+//
+//	if (!checkPassword(app->getCredentialUserName(), oldPassword, false, validPassword, validEncryptedPassword))
+//	{
+//		return false;
+//	}	
+//
+//	// Now we try to change the password
+//	ot::JsonDocument doc;
+//	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_USER_PASSWORD, doc.GetAllocator()), doc.GetAllocator());
+//	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
+//	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+//	doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(newPassword, doc.GetAllocator()), doc.GetAllocator());
+//
+//	std::string response;
+//	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
+//	{
+//		return false;
+//	}
+//
+//	// Now we check the response document
+//	assert(0);
+//	return true;
+//}
 
 
 bool UserManagement::checkUserName(const std::string &userName)
@@ -226,7 +226,7 @@ bool UserManagement::checkUserName(const std::string &userName)
 	return hasSuccessful(response);
 }
 
-bool UserManagement::checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string &validPassword, std::string &validEncryptedPassword)
+bool UserManagement::checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string &sessionUser, std::string& sessionPassword, std::string &validPassword, std::string &validEncryptedPassword)
 {
 	assert(!authServerURL.empty());
 
@@ -251,6 +251,8 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 		responseDoc.fromJson(response);
 
 		// Login attempt successful -> get encrypted and unencrypted passwords
+		sessionUser            = ot::json::getString(responseDoc, OT_PARAM_DB_USERNAME);
+		sessionPassword        = ot::json::getString(responseDoc, OT_PARAM_DB_PASSWORD);
 		validPassword          = ot::json::getString(responseDoc, OT_PARAM_AUTH_PASSWORD);
 		validEncryptedPassword = ot::json::getString(responseDoc, OT_PARAM_AUTH_ENCRYPTED_PASSWORD);
 
@@ -265,15 +267,8 @@ bool UserManagement::hasError(const std::string &response)
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
 
-	try
-	{
-		int error = ot::json::getInt(responseDoc, OT_ACTION_AUTH_ERROR);
-		return (error == 1);
-	}
-	catch (std::exception)
-	{
-		return false; // The return document does not have an error flag
-	}
+	// Check whether the document has an error flag
+	return ot::json::exists(responseDoc, OT_ACTION_AUTH_ERROR);
 }
 
 bool UserManagement::hasSuccessful(const std::string &response)
@@ -299,7 +294,7 @@ bool UserManagement::initializeDatabaseConnection(void)
 	try
 	{
 		AppBase * app{ AppBase::instance() };
-		DataStorageAPI::ConnectionAPI::establishConnection(databaseURL, "1", app->getCredentialUserName(), app->getCredentialUserPasswordClear());
+		DataStorageAPI::ConnectionAPI::establishConnection(databaseURL, "1", app->getSessionUserName(), app->getSessionUserPassword());
 
 		isConnected = true;
 

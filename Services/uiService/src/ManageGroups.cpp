@@ -270,15 +270,8 @@ bool addGroupDialog::hasError(const std::string &response)
 	ot::JsonDocument doc;
 	doc.fromJson(response);
 
-	try
-	{
-		int error = ot::json::getInt(doc, OT_ACTION_AUTH_ERROR);
-		return (error == 1);
-	}
-	catch (std::exception)
-	{
-		return false; // The return document does not have an error flag
-	}
+	// Check whether the document has an error flag
+	return ot::json::exists(doc, OT_ACTION_AUTH_ERROR);
 }
 
 void addGroupDialog::slotButtonCancelPressed() 

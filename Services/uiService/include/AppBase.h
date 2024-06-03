@@ -244,7 +244,7 @@ public:
 	void setAuthorizationServiceURL(const std::string & _url);
 
 	//! @brief Will set the current user name and password
-	void setUserNamePassword(const std::string & _userName, const std::string & _password, const std::string & _encryptedPassword);
+	void setUserNamePassword(const std::string & _userName, const std::string & _password, const std::string & _encryptedPassword, const std::string& _sessionUser, const std::string& _sessionPassword);
 
 	//! @brief Will set the current site ID
 	void setSiteID(int _id);
@@ -463,6 +463,8 @@ public:
 	std::string getCredentialUserName(void) { return m_userName; }
 	std::string getCredentialUserPassword(void) { return m_userEncryptedPassword; }
 	std::string getCredentialUserPasswordClear(void) { return m_userPassword; }
+	std::string getSessionUserName(void) { return m_sessionUser; }
+	std::string getSessionUserPassword(void) { return m_sessionPassword; }
 
 public Q_SLOTS:
 	void slotGraphicsItemRequested(const QString& _name, const QPointF& _pos);
@@ -561,6 +563,8 @@ private:
 	std::string					m_userName;
 	std::string					m_userPassword;
 	std::string					m_userEncryptedPassword;
+	std::string					m_sessionUser;
+	std::string					m_sessionPassword;
 
 	// Default UI
 

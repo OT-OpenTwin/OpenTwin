@@ -1,7 +1,9 @@
 #include "ServiceBase.h"
 #include "MongoURL.h"
+#include "MongoSessionFunctions.h"
 
 #include <iostream>
+#include <random>
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
@@ -379,9 +381,6 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_REMOVE_GROUP_FROM_PROJECT) { return handleRemoveGroupFromProject(_actionDocument.GetObject(), loggedInUser); }
 	else if (_action == OT_ACTION_REMOVE_PROJECT) { return handleRemoveProject(_actionDocument.GetObject(), loggedInUser); }
 	else if (_action == OT_ACTION_CHECK_FOR_COLLECTION_EXISTENCE) { return handleCheckIfCollectionExists(_actionDocument.GetObject(), loggedInUser); }
-	//------------ Session FUNCTIONS ------------
-	else if (_action == OT_ACTION_CREATE_SESSION_USER) { return handleCreateSessionUser(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_REMOVE_SESSION_USER) { return handleRemoveSessionUser(_actionDocument.GetObject(), loggedInUser); }
 	else
 	{
 		// This action is unknown
@@ -432,6 +431,13 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	
 	if (successful)
 	{
+		std::string sessionName = MongoSessionFunctions::createSession(username, adminClient);
+		std::string sessionPWD  = createRandomPassword();
+
+		User user = MongoUserFunctions::getUserDataThroughUsername(username, adminClient);
+
+		MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, adminClient, json);
+
 		json.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, json.GetAllocator()), json.GetAllocator());
 		json.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), json.GetAllocator()), json.GetAllocator());
 	}
@@ -883,26 +889,27 @@ std::string ServiceBase::handleCheckIfCollectionExists(const ot::ConstJsonObject
 	return json.toJson();
 }
 
-// authentication needed: session functions
-
-std::string ServiceBase::handleCreateSessionUser(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
-	std::string sessionId = ot::json::getString(_actionDocument, OT_ACTION_PARAM_SESSION_ID);
-	std::string sessionTime = sessionId.substr(sessionId.find(':')+1);
-
-	std::string userName = _loggedInUser.username + "-" + sessionTime;
-	std::string userPWD  = createRandomPassword();
-
-	// Create the new user
-	return MongoUserFunctions::createTmpUser(userName, userPWD, _loggedInUser, adminClient);
-}
-
-std::string ServiceBase::handleRemoveSessionUser(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
-	std::string userName = ot::json::getString(_actionDocument, OT_PARAM_AUTH_NAME);
-
-	return MongoUserFunctions::removeTmpUser(userName, adminClient);
-}
-
 std::string ServiceBase::createRandomPassword()
 {
-	return "123";  /////// TODO
+	const int length = 30;
+
+	// Define the list of possible characters
+	const std::string CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	// Create a random number generator
+	std::random_device rd;
+	std::mt19937 generator(rd());
+
+	// Create a distribution to uniformly select from all
+	// characters
+	std::uniform_int_distribution<> distribution(0, CHARACTERS.size() - 1);
+
+	// Generate the random string
+	std::string random_string;
+
+	for (int i = 0; i < length; ++i) {
+		random_string += CHARACTERS[distribution(generator)];
+	}
+
+	return random_string;
 }

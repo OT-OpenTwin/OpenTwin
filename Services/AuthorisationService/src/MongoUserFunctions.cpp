@@ -4,7 +4,9 @@
 #include "MongoProjectFunctions.h"
 #include "MongoConstants.h"
 #include "MongoURL.h"
+
 #include "OTCore/JSON.h"
+#include "OTCommunication/ActionTypes.h"
 
 #include <boost/uuid/detail/md5.hpp>
 #include <boost/algorithm/hex.hpp>
@@ -505,7 +507,7 @@ namespace MongoUserFunctions
 		return json.toJson();
 	}
 
-	std::string createTmpUser(std::string userName, std::string userPWD, User &_loggedInUser, mongocxx::client& adminClient)
+	void createTmpUser(std::string userName, std::string userPWD, User &_loggedInUser, mongocxx::client& adminClient, ot::JsonDocument &json)
 	{
 		value new_user_command = document{}
 			<< "createUser" << userName
@@ -531,16 +533,12 @@ namespace MongoUserFunctions
 
 		if (el.get_double() == 1)
 		{
-			ot::JsonDocument json;
-			json.AddMember("username", ot::JsonString(userName, json.GetAllocator()), json.GetAllocator());
-			json.AddMember("password", ot::JsonString(userPWD, json.GetAllocator()), json.GetAllocator());
-			return json.toJson();
+			json.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(userName, json.GetAllocator()), json.GetAllocator());
+			json.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(userPWD, json.GetAllocator()), json.GetAllocator());
 		}
-
-		return "";
 	}
 
-	std::string removeTmpUser(std::string userName, mongocxx::client & adminClient)
+	void removeTmpUser(std::string userName, mongocxx::client & adminClient)
 	{
 		// Delete the user completely
 		value drop_user_command = document{} <<
@@ -548,8 +546,6 @@ namespace MongoUserFunctions
 			<< finalize;
 
 		auto command_result = adminClient[MongoConstants::ADMIN_DB].run_command(drop_user_command.view());
-
-		return "";
 	}
 }
 

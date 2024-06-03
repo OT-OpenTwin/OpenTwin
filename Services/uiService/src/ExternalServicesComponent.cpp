@@ -1161,6 +1161,8 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		// Add user credentials
 		sessionDoc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCredentialUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(app->getSessionUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(app->getSessionUserPassword(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 		response.clear();
 		if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, sessionDoc.toJson(), response)) {

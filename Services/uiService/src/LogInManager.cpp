@@ -77,9 +77,9 @@ void threadConnectToDatabase(LogInManager * _notifier, ExternalServicesComponent
 	}
 
 	// Check the username, password combination
-	std::string validPassword, validEncryptedPassword;
+	std::string sessionUser, sessionPassword, validPassword, validEncryptedPassword;
 
-	if (!uManager.checkPassword(_username, _password, _isEncryptedPassword, validPassword, validEncryptedPassword)) {
+	if (!uManager.checkPassword(_username, _password, _isEncryptedPassword, sessionUser, sessionPassword, validPassword, validEncryptedPassword)) {
 		*_logInAttempt = *_logInAttempt + 1;
 		if (*_logInAttempt > 5) {
 			QMetaObject::invokeMethod(_notifier, &LogInManager::slotCancelLogIn, Qt::QueuedConnection);
@@ -92,14 +92,15 @@ void threadConnectToDatabase(LogInManager * _notifier, ExternalServicesComponent
 	}
 	else {
 
-		//if (!uManager.checkConnectionDataBase(_username, validPassword)) {
-		//	QMetaObject::invokeMethod(_notifier, "slotConnectToDatabaseFail", Qt::QueuedConnection, Q_ARG(const QString&, "Failed to connect to the data base."));
-		//	return;
-		//}
+		if (!uManager.checkConnectionDataBase(sessionUser, sessionPassword)) {
+			QMetaObject::invokeMethod(_notifier, "slotConnectToDatabaseFail", Qt::QueuedConnection, Q_ARG(const QString&, "Failed to connect to the data base."));
+			return;
+		}
 
 		QMetaObject::invokeMethod(_notifier, "slotConnectToDatabaseSuccess", Qt::QueuedConnection, 
 								  Q_ARG(const QString&, _databaseUrl.c_str()), Q_ARG(const QString&, _authUrl.c_str()), 
-								  Q_ARG(const QString&, _username.c_str()), Q_ARG(const QString&, validPassword.c_str()), Q_ARG(const QString&, validEncryptedPassword.c_str()));
+								  Q_ARG(const QString&, _username.c_str()), Q_ARG(const QString&, validPassword.c_str()), Q_ARG(const QString&, validEncryptedPassword.c_str()),
+								  Q_ARG(const QString&, sessionUser.c_str()), Q_ARG(const QString&, sessionPassword.c_str()));
 	}
 }
 
@@ -387,12 +388,12 @@ void LogInManager::slotConnectToSessionServiceFail(const QString& _message) {
 	AppBase::instance()->showErrorPrompt(_message, "Connection error");
 }
 
-void LogInManager::slotConnectToDatabaseSuccess(const QString& _databaseUrl, const QString& _authURL, const QString& _userName, const QString& _password, const QString& _encryptedPassword) {
+void LogInManager::slotConnectToDatabaseSuccess(const QString& _databaseUrl, const QString& _authURL, const QString& _userName, const QString& _password, const QString& _encryptedPassword, const QString& _sessionUser, const QString& _sessionPassword) {
 	OT_LOG_I("Connected to Database");
 
 	AppBase::instance()->setDataBaseURL(_databaseUrl.toStdString());
 	AppBase::instance()->setAuthorizationServiceURL(_authURL.toStdString());
-	AppBase::instance()->setUserNamePassword(_userName.toStdString(), _password.toStdString(), _encryptedPassword.toStdString());
+	AppBase::instance()->setUserNamePassword(_userName.toStdString(), _password.toStdString(), _encryptedPassword.toStdString(), _sessionUser.toStdString(), _sessionPassword.toStdString());
 
 	// Store password
 	if (m_dialog->savePassword())

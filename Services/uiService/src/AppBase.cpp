@@ -1478,7 +1478,7 @@ void AppBase::createUi(void) {
 			m_viewerComponent = new ViewerComponent();
 			ViewerAPI::registerNotifier(m_viewerComponent);
 
-			m_viewerComponent->setDataBaseConnectionInformation(m_dataBaseURL, m_userName, m_userPassword);
+			m_viewerComponent->setDataBaseConnectionInformation(m_dataBaseURL, m_sessionUser, m_sessionPassword);
 			
 			OT_LOG_D("Reading fonts");
 			QString fontPath = QCoreApplication::applicationDirPath();
@@ -1630,7 +1630,7 @@ ViewerUIDtype AppBase::createView(
 	dataBase->setSiteIDString(std::to_string(siteID));
 	dataBase->setProjectName(projectName);
 	
-	dataBase->setUserCredentials(AppBase::instance()->getCredentialUserName(), AppBase::instance()->getCredentialUserPasswordClear());
+	dataBase->setUserCredentials(AppBase::instance()->getSessionUserName(), AppBase::instance()->getSessionUserPassword());
 	bool success = dataBase->InitializeConnection(m_dataBaseURL, std::to_string(siteID));
 
 	assert(success);
@@ -1664,11 +1664,14 @@ void AppBase::setAuthorizationServiceURL(const std::string & _url) {
 	OT_LOG_I("Authorization service IP set: " + m_authorizationServiceURL);
 }
 
-void AppBase::setUserNamePassword(const std::string & _userName, const std::string & _password, const std::string & _encryptedPassword)
+void AppBase::setUserNamePassword(const std::string & _userName, const std::string & _password, const std::string & _encryptedPassword, const std::string& _sessionUser, const std::string& _sessionPassword)
 {
 	m_userName = _userName;
 	m_userPassword = _password;
 	m_userEncryptedPassword = _encryptedPassword;
+
+	m_sessionUser = _sessionUser;
+	m_sessionPassword = _sessionPassword;
 
 	OT_LOG_I("Credentials set for user: " + _userName);
 }

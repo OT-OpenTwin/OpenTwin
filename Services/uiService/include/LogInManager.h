@@ -88,7 +88,7 @@ public Q_SLOTS:
 	void slotConnectToSessionServiceSuccess(const QString& _dbAndAuthUrl);
 	void slotConnectToSessionServiceRegisterSuccess(const QString& _dbAndAuthUrl);
 	void slotConnectToSessionServiceFail(const QString& _message);
-	void slotConnectToDatabaseSuccess(const QString& _databaseUrl, const QString& _authURL, const QString& _userName, const QString& _password, const QString& _encryptedPassword);
+	void slotConnectToDatabaseSuccess(const QString& _databaseUrl, const QString& _authURL, const QString& _userName, const QString& _password, const QString& _encryptedPassword, const QString& _sessionUser, const QString& _sessionPassword);
 	void slotConnectToDatabaseFail(const QString& _message);
 	void slotConnectToDatabaseNewUser(const QString& _databaseUrl, const QString& _authURL, const QString& _username, const QString& _hashedPassword);
 	void slotCancelLogIn(void);

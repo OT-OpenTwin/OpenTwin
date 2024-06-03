@@ -92,11 +92,6 @@ private:
 	std::string handleRemoveProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleCheckIfCollectionExists(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 
-	// authentication needed: session functions
-
-	std::string handleCreateSessionUser(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
-	std::string handleRemoveSessionUser(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
-
 	// helper functions
 
 	bool isAdminUser(User& _loggedInUser);

@@ -28,10 +28,10 @@ public:
 
 	bool addUser(const std::string &userName, const std::string &password);
 	bool deleteUser(const std::string &userName);
-	bool changePassword(const std::string &oldPassword, const std::string &newPassword);
+	//bool changePassword(const std::string &oldPassword, const std::string &newPassword);
 
 	bool checkUserName(const std::string &userName);
-	bool checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string &validPassword, std::string &validEncryptedPassword);
+	bool checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string& sessionUser, std::string& sessionPassword, std::string &validPassword, std::string &validEncryptedPassword);
 
 	bool storeSetting(const std::string &settingName, const std::string &settingString);
 	std::string restoreSetting(const std::string &settingName);

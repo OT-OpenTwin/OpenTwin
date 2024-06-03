@@ -32,4 +32,8 @@ namespace MongoConstants
 
 	std::string const GROUPS_COLLECTION = "Groups";
 	std::string const GROUP_ROLE = "groups_collection_role";
+
+	std::string const SESSIONS_COLLECTION = "Sessions";
+	std::string const SESSIONS_ROLE = "sessions_collection_role";
+
 }
