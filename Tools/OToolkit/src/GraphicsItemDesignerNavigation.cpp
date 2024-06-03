@@ -218,34 +218,30 @@ void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
 
 void GraphicsItemDesignerNavigation::keyPressEvent(QKeyEvent* _event) {
 	if (_event->key() == Qt::Key_Delete) {
-		bool itemDeleted = true;
-		while (itemDeleted) {
-			itemDeleted = false;
-			for (QTreeWidgetItem* itm : this->selectedItems()) {
-				GraphicsItemDesignerItemBase* actualItem = this->findDesignerItem(itm->text(0));
-				if (actualItem) {
-					actualItem->itemAboutToBeDestroyed();
-					itm->setHidden(true); 
-					this->forgetItem(actualItem);
+		QList<QTreeWidgetItem*> items = this->selectedItems();
+		for (QTreeWidgetItem* itm : items) {
+			GraphicsItemDesignerItemBase* actualItem = this->findDesignerItem(itm->text(0));
+			if (actualItem) {
+				actualItem->itemAboutToBeDestroyed();
+				itm->setHidden(true);
+				this->forgetItem(actualItem);
 
-					OTAssertNullptr(actualItem->getGraphicsItem());
-					OTAssertNullptr(actualItem->getGraphicsItem()->getGraphicsScene());
-					actualItem->getGraphicsItem()->getGraphicsScene()->removeItem(actualItem->getGraphicsItem()->getQGraphicsItem());
-					delete actualItem->getGraphicsItem();
+				OTAssertNullptr(actualItem->getGraphicsItem());
+				OTAssertNullptr(actualItem->getGraphicsItem()->getGraphicsScene());
+				actualItem->getGraphicsItem()->getGraphicsScene()->removeItem(actualItem->getGraphicsItem()->getQGraphicsItem());
+				delete actualItem->getGraphicsItem();
 
-					if ((unsigned long long)itm == (unsigned long long)actualItem) {
-						delete actualItem;
-						delete itm;
-					}
-					else {
-						delete itm;
-					}
-					itemDeleted = true;
-					break;
+				if ((unsigned long long)itm == (unsigned long long)actualItem) {
+					delete actualItem;
+					delete itm;
+				}
+				else {
+					delete itm;
 				}
 			}
 		}
 	}
+	ot::TreeWidget::keyPressEvent(_event);
 }
 
 void GraphicsItemDesignerNavigation::forgetItem(GraphicsItemDesignerItemBase* _item) {
