@@ -30,8 +30,6 @@ ot::GraphicsGroupItem::~GraphicsGroupItem() {
 
 bool ot::GraphicsGroupItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
-	if (!ot::GraphicsItem::setupFromConfig(_cfg)) return false;
-
 	const GraphicsGroupItemCfg* cfg = dynamic_cast<const GraphicsGroupItemCfg*>(_cfg);
 	if (cfg == nullptr) {
 		OT_LOG_EA("Invalid configuration provided: Cast failed");
@@ -47,7 +45,7 @@ bool ot::GraphicsGroupItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		}
 	}
 
-	return true;
+	return GraphicsItem::setupFromConfig(_cfg);
 }
 
 void ot::GraphicsGroupItem::removeAllConnections(void) {
@@ -130,7 +128,7 @@ QSizeF ot::GraphicsGroupItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constr
 
 void ot::GraphicsGroupItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
-	this->setPos(_rect.topLeft());
+	this->setGraphicsItemPos(_rect.topLeft());
 	this->handleSetItemGeometry(_rect);
 	QGraphicsLayoutItem::setGeometry(_rect);
 }

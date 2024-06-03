@@ -24,6 +24,12 @@ namespace ot {
 class GraphicsItemDesignerItemBase : public GraphicsItemDesignerPropertyHandler {
 	OT_DECL_NOCOPY(GraphicsItemDesignerItemBase)
 public:
+	enum class DesignerItemFlag {
+		NoDesignerItemFlags = 0x00,
+		DesignerItemIgnoreEvents = 0x01
+	};
+	typedef ot::Flags<DesignerItemFlag> DesignerItemFlags;
+
 	GraphicsItemDesignerItemBase();
 	virtual ~GraphicsItemDesignerItemBase();
 
@@ -39,6 +45,24 @@ public:
 
 	//! \brief Returns a list containing the currently set control points.
 	const QList<QPointF>& getControlPoints(void) const { return m_controlPoints; };
+
+	//! \brief Sets the last position.
+	//! \see getLastPos
+	void setLastPos(const QPointF& _pos) { m_lastPos = _pos; };
+
+	//! \brief Returns the last position.
+	//! The last position ist the last position of this graphics item.
+	//! The position is used to adjust the control points.
+	const QPointF& getLastPos(void) const { return m_lastPos; };
+
+	void setDesignerItemFlag(DesignerItemFlag _flag, bool _active = true) { m_designerItemFlags.setFlag(_flag, _active); };
+	void setDesignerItemFlags(const DesignerItemFlags& _flags) { m_designerItemFlags = _flags; };
+	const DesignerItemFlags& getDesignerItemFlags(void) const { return m_designerItemFlags; };
+
+	//! \brief Will move all control points by the move delta (lastPos - newPos).
+	//! The method will set the last pos after moving.
+	//! \param _newPos The position the item was moved to.
+	void graphicsItemWasMoved(const QPointF& _newPos);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -72,6 +96,10 @@ protected:
 	virtual void propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override = 0;
 
 private:
+	QPointF m_lastPos; //! \see getLastPos
 	QList<QPointF> m_controlPoints;
+	DesignerItemFlags m_designerItemFlags;
 
 };
+
+OT_ADD_FLAG_FUNCTIONS(GraphicsItemDesignerItemBase::DesignerItemFlag)

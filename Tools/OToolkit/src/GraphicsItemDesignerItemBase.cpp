@@ -6,7 +6,9 @@
 // OToolkit header
 #include "GraphicsItemDesignerItemBase.h"
 
-GraphicsItemDesignerItemBase::GraphicsItemDesignerItemBase() {
+GraphicsItemDesignerItemBase::GraphicsItemDesignerItemBase() 
+	: m_designerItemFlags(DesignerItemFlag::NoDesignerItemFlags)
+{
 
 }
 
@@ -22,4 +24,22 @@ void GraphicsItemDesignerItemBase::addControlPoint(const QPointF& _pt) {
 void GraphicsItemDesignerItemBase::setControlPoints(const QList<QPointF>& _points) {
 	m_controlPoints = _points;
 	this->controlPointsChanged();
+}
+
+void GraphicsItemDesignerItemBase::graphicsItemWasMoved(const QPointF& _newPos) {
+	if (m_designerItemFlags & DesignerItemFlag::DesignerItemIgnoreEvents) return;
+
+	// Calculate move delta
+	QPointF delta = _newPos - m_lastPos;
+	
+	// Check if the item was moved
+	if (delta.x() == 0 && delta.y() == 0) return;
+
+	// Move all control points
+	for (QPointF& pt : m_controlPoints) {
+		pt += delta;
+	}
+
+	// Set the last pos
+	m_lastPos = _newPos;
 }

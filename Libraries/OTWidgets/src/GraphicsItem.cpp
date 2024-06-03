@@ -50,6 +50,7 @@ ot::GraphicsItem::~GraphicsItem() {
 
 bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
+	OTAssertNullptr(this->getQGraphicsItem());
 	
 	if (m_config != _cfg) {
 		if (m_config) delete m_config;
@@ -262,7 +263,7 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 		if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemSnapsToGrid) && !m_parent) {
 			QPointF pos = m_scene->snapToGrid(this->getQGraphicsItem()->pos());
 			if (pos != this->getQGraphicsItem()->pos()) {
-				this->getQGraphicsItem()->setPos(pos);
+				this->setGraphicsItemPos(pos);
 				this->getGraphicsScene()->update();
 				return;
 			}
@@ -331,6 +332,13 @@ QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 // ###############################################################################################################################################
 
 // Getter / Setter
+
+void ot::GraphicsItem::setGraphicsItemPos(const QPointF& _pos) {
+	OTAssertNullptr(m_config);
+	OTAssertNullptr(this->getQGraphicsItem());
+	m_config->setPosition(QtFactory::toPoint2D(_pos));
+	this->getQGraphicsItem()->setPos(_pos);
+}
 
 ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
 	if (m_parent) {

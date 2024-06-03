@@ -71,7 +71,11 @@ void ot::GraphicsLineItem::paintCustomItem(QPainter* _painter, const QStyleOptio
 void ot::GraphicsLineItem::setLine(const QLineF& _line)
 {
 	this->prepareGeometryChange();
+	
+	this->getItemConfiguration<GraphicsLineItemCfg>()->setFrom(QtFactory::toPoint2D(_line.p1()));
+	this->getItemConfiguration<GraphicsLineItemCfg>()->setTo(QtFactory::toPoint2D(_line.p2()));
 	m_line = _line;
+
 	this->setGeometry(QRectF(this->pos(), this->getPreferredGraphicsItemSize()));
 	this->raiseEvent(GraphicsItem::ItemResized);
 }

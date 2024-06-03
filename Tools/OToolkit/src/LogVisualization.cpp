@@ -720,7 +720,7 @@ bool LogVisualization::disconnectFromLogger(void) {
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RemoveService, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(AppBase::instance()->url().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 	
-	if (!ot::msg::send("", m_loggerUrl, ot::EXECUTE, doc.toJson(), response)) {
+	if (!ot::msg::send("", m_loggerUrl, ot::EXECUTE, doc.toJson(), response, 3000, false, false)) {
 		LOGVIS_LOGE("Failed to send remove service request to logger service.");
 		return false;
 	}

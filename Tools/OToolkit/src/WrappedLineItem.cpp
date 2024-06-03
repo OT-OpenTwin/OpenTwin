@@ -120,3 +120,14 @@ void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 void WrappedLineItem::propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
 
 }
+
+QVariant WrappedLineItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _constrains) {
+	QVariant ret = ot::GraphicsLineItem::itemChange(_change, _constrains);
+
+	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
+		this->graphicsItemWasMoved(this->pos());
+	}
+
+	return ret;
+}
+

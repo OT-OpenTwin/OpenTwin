@@ -134,7 +134,7 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	_item->setGraphicsScene(m_scene);
 
 	if (m_scene->getGrid().isGridSnapValid()) {
-		_item->getQGraphicsItem()->setPos(m_scene->snapToGrid(_item->getQGraphicsItem()->pos()));
+		_item->setGraphicsItemPos(m_scene->snapToGrid(_item->getQGraphicsItem()->pos()));
 	}
 
 	if (removeConnectionBufferApplied) {

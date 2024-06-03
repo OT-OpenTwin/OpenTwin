@@ -142,6 +142,7 @@
     <ClInclude Include="include\OTWidgets\ColorStyleValue.h" />
     <QtMoc Include="include\OTWidgets\GlobalColorStyle.h" />
     <ClInclude Include="include\OTWidgets\ComboBox.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsItem.hpp" />
     <ClInclude Include="include\OTWidgets\GraphicsItemLoader.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPickerView.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPolygonItem.h" />

@@ -124,7 +124,7 @@ void ConnectToLoggerDialog::worker(QString _url) {
 	std::string response;
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, doc.GetAllocator()), doc.GetAllocator());
-	if (!ot::msg::send("", _url.toStdString(), ot::EXECUTE, doc.toJson(), response)) {
+	if (!ot::msg::send("", _url.toStdString(), ot::EXECUTE, doc.toJson(), response, 3000, false, false)) {
 		DIA_LOGE("Failed to send ping message to Logger Service at \"" + _url + "\"");
 		QMetaObject::invokeMethod(this, &ConnectToLoggerDialog::slotPingFail, Qt::QueuedConnection);
 		return;
@@ -143,7 +143,7 @@ void ConnectToLoggerDialog::worker(QString _url) {
 	registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewService, registerDoc.GetAllocator()), registerDoc.GetAllocator());
 	registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(AppBase::instance()->url().toStdString(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
 	
-	if (!ot::msg::send("", _url.toStdString(), ot::EXECUTE, registerDoc.toJson(), response)) {
+	if (!ot::msg::send("", _url.toStdString(), ot::EXECUTE, registerDoc.toJson(), response, 3000, false, false)) {
 		DIA_LOGE("Failed to send registration request to Logger Service at \"" + _url + "\"");
 		QMetaObject::invokeMethod(this, &ConnectToLoggerDialog::slotRegisterFail, Qt::QueuedConnection);
 		return;

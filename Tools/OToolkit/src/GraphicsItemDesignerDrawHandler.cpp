@@ -176,6 +176,7 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 	if (m_previewItem) {
 		m_previewItem->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHasNoFeedback);
 		m_previewItem->getGraphicsItem()->setGraphicsItemUid(++m_currentUid);
+		m_previewItem->setDesignerItemFlag(GraphicsItemDesignerItemBase::DesignerItemFlag::DesignerItemIgnoreEvents, true);
 		m_view->addItem(m_previewItem->getGraphicsItem());
 	}
 }

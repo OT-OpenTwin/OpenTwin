@@ -112,7 +112,7 @@ namespace ot {
 		//! @brief Item position
 		//! If the item is the root item, the position is the scene position.
 		//! If the item is a child item, the position is the local position (default: 0.0; 0.0).
-		const Point2DD& getPosition(void) { return m_pos; };
+		const Point2DD& getPosition(void) const { return m_pos; };
 
 		void setMinimumSize(const Size2DD& _size) { m_minSize = _size; };
 		const Size2DD& getMinimumSize(void) const { return m_minSize; };

@@ -120,3 +120,13 @@ void WrappedSquareItem::propertyChanged(ot::PropertyGridItem* _item, const ot::P
 void WrappedSquareItem::propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
 
 }
+
+QVariant WrappedSquareItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _constrains) {
+	QVariant ret = ot::GraphicsRectangularItem::itemChange(_change, _constrains);
+
+	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
+		this->graphicsItemWasMoved(this->pos());
+	}
+
+	return ret;
+}

@@ -120,3 +120,13 @@ void WrappedCircleItem::propertyChanged(ot::PropertyGridItem* _item, const ot::P
 void WrappedCircleItem::propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
 
 }
+
+QVariant WrappedCircleItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _constrains) {
+	QVariant ret = ot::GraphicsEllipseItem::itemChange(_change, _constrains);
+
+	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
+		this->graphicsItemWasMoved(this->pos());
+	}
+
+	return ret;
+}

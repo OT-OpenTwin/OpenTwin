@@ -36,7 +36,8 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsGroupItem); };
 
-		//! @brief Will add the provided item to the group
+		//! @brief Will add the provided item to the group.
+		//! The group takes ownership of the item.
 		//! @param _item Item to add
 		void addItem(ot::GraphicsItemCfg* _item) { m_items.push_back(_item); };
 

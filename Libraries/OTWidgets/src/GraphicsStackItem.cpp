@@ -30,7 +30,6 @@ ot::GraphicsStackItem::~GraphicsStackItem() {
 
 bool ot::GraphicsStackItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
-	if (!ot::GraphicsItem::setupFromConfig(_cfg)) return false;
 
 	const GraphicsStackItemCfg* cfg = dynamic_cast<const GraphicsStackItemCfg*>(_cfg);
 	if (cfg == nullptr) {
@@ -65,7 +64,7 @@ bool ot::GraphicsStackItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		}
 	}
 
-	return true;
+	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 
 void ot::GraphicsStackItem::removeAllConnections(void) {
@@ -184,7 +183,7 @@ QSizeF ot::GraphicsStackItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _constr
 
 void ot::GraphicsStackItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
-	this->setPos(_rect.topLeft());
+	this->setGraphicsItemPos(_rect.topLeft());
 	this->handleSetItemGeometry(_rect);
 	QGraphicsLayoutItem::setGeometry(_rect);
 }

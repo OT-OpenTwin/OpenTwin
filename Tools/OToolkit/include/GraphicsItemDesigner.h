@@ -28,9 +28,10 @@ class GraphicsItemDesigner : public QObject, public otoolkit::Tool {
 	Q_OBJECT
 public:
 	enum ExportConfigFlag {
-		NoFlags = 0x00,
-		AutoAlign = 0x01,
-		MoveableItem = 0x02
+		NoFlags      = 0x00,
+		AutoAlign    = 0x01,
+		MoveableItem = 0x02,
+		ItemGridSnap = 0x04
 	};
 	typedef ot::Flags<ExportConfigFlag> ExportConfigFlags;
 

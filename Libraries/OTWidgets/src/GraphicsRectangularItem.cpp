@@ -39,13 +39,12 @@ bool ot::GraphicsRectangularItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		return false;
 	}
 
-	this->prepareGeometryChange();
 	m_cornerRadius = cfg->getCornerRadius();
 	m_brush = QtFactory::toQBrush(cfg->getBackgroundPainter());
 	m_pen = QtFactory::toQPen(cfg->getOutline());
 
 	// We call set rectangle size which will call set geometry to finalize the item
-	this->setRectangleSize(m_size);
+	this->setRectangleSize(QtFactory::toQSize(cfg->getSize()));
 
 	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }
@@ -71,7 +70,9 @@ void ot::GraphicsRectangularItem::setRectangleSize(const QSizeF& _size) {
 	if (m_size == _size) return;
 	this->prepareGeometryChange();
 
+	this->getItemConfiguration<GraphicsRectangularItemCfg>()->setSize(QtFactory::toSize2D(_size));
 	m_size = _size;
+	
 	this->setGeometry(QRectF(this->pos(), m_size));
 	this->raiseEvent(GraphicsItem::ItemResized);
 }

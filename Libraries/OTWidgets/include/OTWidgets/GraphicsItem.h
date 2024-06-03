@@ -147,6 +147,9 @@ namespace ot {
 		//! \brief Returns the current configuration.
 		const GraphicsItemCfg* const getConfiguration(void) const { return m_config; };
 
+		//! \brief This function will update the position in the configuration and call QGraphicsItem::setPos
+		void setGraphicsItemPos(const QPointF& _pos);
+
 		//! \brief Sets the provided state flag.
 		//! \see GraphicsItem, GraphicsItemState
 		//! \param _state The state to set.
@@ -235,6 +238,13 @@ namespace ot {
 		void setHighlightItem(GraphicsHighlightItem* _item);
 		GraphicsHighlightItem* highlightItem(void) const { return m_highlightItem; };
 
+	protected:
+		//! \brief Returns the configuration for the current item.
+		//! The configuration may be modified.
+		//! The function will cast the current configuration to the type provided.
+		//! The method will return 0 if the cast failed.
+		template <class T> T* getItemConfiguration(void);
+
 	private:
 		GraphicsItemCfg* m_config; //! \brief Configuration used to setup this item. Default 0.
 		
@@ -254,3 +264,5 @@ namespace ot {
 }
 
 OT_ADD_FLAG_FUNCTIONS(ot::GraphicsItem::GraphicsItemState)
+
+#include "OTWidgets/GraphicsItem.hpp"

@@ -49,6 +49,11 @@ void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _
 	_item->getGraphicsItem()->setGraphicsItemName(itemName.toStdString());
 	_item->setNavigation(this);
 	_item->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid);
+	_item->setDesignerItemFlag(GraphicsItemDesignerItemBase::DesignerItemFlag::DesignerItemIgnoreEvents, false);
+
+	OTAssertNullptr(_item->getGraphicsItem());
+	OTAssertNullptr(_item->getGraphicsItem()->getQGraphicsItem());
+	_item->setLastPos(_item->getGraphicsItem()->getQGraphicsItem()->pos());
 
 	// Store new item
 	m_rootItems.push_back(_item);
@@ -125,7 +130,13 @@ ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(void) {
 	else {
 		ot::GraphicsGroupItemCfg* rootGroup = new ot::GraphicsGroupItemCfg;
 		rootGroup->setName(m_rootItem->text(0).toStdString());
-		rootGroup->setGraphicsItemFlags(GraphicsItemCfg::ItemSnapsToGrid | GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemIsMoveable);
+		rootGroup->setGraphicsItemFlags(GraphicsItemCfg::ItemSnapsToGrid | GraphicsItemCfg::ItemForwardsTooltip);
+		if (m_designer->getExportConfigFlags() & GraphicsItemDesigner::MoveableItem) {
+			rootGroup->setGraphicsItemFlag(GraphicsItemCfg::ItemIsMoveable);
+		}
+		if (m_designer->getExportConfigFlags() & GraphicsItemDesigner::ItemGridSnap) {
+			rootGroup->setGraphicsItemFlag(GraphicsItemCfg::ItemSnapsToGrid);
+		}
 
 		for (GraphicsItemDesignerItemBase* itm : m_rootItems) {
 			const GraphicsItemCfg* oldCfg = itm->getGraphicsItem()->getConfiguration();

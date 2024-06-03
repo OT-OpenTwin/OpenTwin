@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
 ot::CustomGraphicsItem::CustomGraphicsItem(GraphicsItemCfg* _configuration, const ot::Flags<GraphicsItemState>& _stateFlags)
@@ -24,7 +25,15 @@ ot::CustomGraphicsItem::~CustomGraphicsItem() {
 // ot::GraphicsItem
 
 bool ot::CustomGraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
-	return ot::GraphicsItem::setupFromConfig(_cfg);
+	if (!ot::GraphicsItem::setupFromConfig(_cfg)) return false;
+
+	this->prepareGeometryChange();
+	QRectF newRect = this->geometry();
+	newRect.moveTo(QtFactory::toQPoint(this->getConfiguration()->getPosition()));
+	this->setGeometry(newRect);
+
+	return true;
+	
 }
 
 void ot::CustomGraphicsItem::prepareGraphicsItemGeometryChange(void) {
@@ -55,7 +64,7 @@ QSizeF ot::CustomGraphicsItem::sizeHint(Qt::SizeHint _hint, const QSizeF& _const
 void ot::CustomGraphicsItem::setGeometry(const QRectF& _rect) {
 	this->prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(_rect);
-	this->setPos(_rect.topLeft());
+	this->setGraphicsItemPos(_rect.topLeft());
 	this->handleSetItemGeometry(_rect);
 }
 

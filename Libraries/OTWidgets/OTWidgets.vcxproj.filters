@@ -491,6 +491,9 @@
     <ClInclude Include="include\OTWidgets\GraphicsItemLoader.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsItem.hpp">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">

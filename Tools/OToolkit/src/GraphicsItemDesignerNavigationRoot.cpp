@@ -56,6 +56,11 @@ void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
 		newProp->setPropertyTip("If enabled the generated graphics item will be moveable by the user.");
 		exportGroup->addProperty(newProp);
 	}
+	{
+		PropertyBool* newProp = new PropertyBool("Item Grid Snap", m_designer->getExportConfigFlags() & GraphicsItemDesigner::ItemGridSnap);
+		newProp->setPropertyTip("If enabled the generated graphics item will snap to the grid if grid snapping is enabled.");
+		exportGroup->addProperty(newProp);
+	}
 	
 	cfg.addRootGroup(editorGroup);
 	cfg.addRootGroup(generalGroup);
@@ -146,6 +151,15 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 		}
 
 		m_designer->setExportConfigFlag(GraphicsItemDesigner::MoveableItem, input->isChecked());
+	}
+	else if (_item->getGroupName() == "Export" && _itemData.propertyName() == "Item Grid Snap") {
+		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		m_designer->setExportConfigFlag(GraphicsItemDesigner::ItemGridSnap, input->isChecked());
 	}
 	else {
 		OT_LOG_E("Unknown property { \"Group\": \"" + _item->getGroupName() + "\", \"Item\": \"" + _itemData.propertyName() + "\" }");
