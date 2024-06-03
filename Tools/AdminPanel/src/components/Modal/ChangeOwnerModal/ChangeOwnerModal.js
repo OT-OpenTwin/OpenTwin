@@ -33,7 +33,7 @@ const ChangeOwnerModal = ({ modal, handleToggle, ...props }) => {
             columns={ChangeOwnerModalHeader}
             pageSize={7}
             rowsPerPageOptions={[7]}
-            onSelectionModelChange={(id) => {
+            onRowSelectionModelChange={(id) => {
               props.onUserIdSelect(id);
             }}
           />

@@ -45,11 +45,7 @@ export const Sidebar = (props) => {
         <ul>
           <p className="title">{t("sidebar:groupTitle")}</p>
           <Link to="/groups/new" style={{ textDecoration: "none" }}>
-            <li>
-              <AddCircleIcon className="icon" />
-              <span> {t("sidebar:newGroup")}</span>
-            </li>
-          </Link>
+           </Link>
           <li onClick={props.openModal}>
             <ManageAccountsIcon className="icon" />
             <span> {t("sidebar:changeGroupOwner")}</span>
@@ -70,12 +66,6 @@ export const Sidebar = (props) => {
         <br />
         <ul>
           <p className="title"> {t("sidebar:projectTitle")}</p>
-          <Link to="/projects/new" style={{ textDecoration: "none" }}>
-            <li>
-              <AddCircleIcon className="icon" />
-              <span> {t("sidebar:newProject")}</span>
-            </li>
-          </Link>
           <li onClick={props.openModal}>
             <ManageAccountsIcon className="icon" />
             <span> {t("sidebar:changeProjectOwner")}</span>

@@ -12,11 +12,9 @@ import ChangeUserUsername from "./screens/UserPage/ChangeUsername";
 import ChangeUserPassword from "./screens/UserPage/ChangePassword";
 
 import GroupPage from "./screens/GroupPage/GroupPage";
-import CreateNewGroup from "./screens/GroupPage/CreateNewGroup";
 import ChangeGroupName from "./screens/GroupPage/ChangeGroupName";
 
 import ProjectPage from "./screens/ProjectPage/ProjectPage";
-import CreateNewProject from "./screens/ProjectPage/CreateNewProject";
 import ChangeProjectName from "./screens/ProjectPage/ChangeProjectName";
 
 import ErrorPage from "./screens/ErrorPage/ErrorPage";
@@ -72,20 +70,12 @@ function App() {
                 <Route path="groups">
                   <Route index element={<GroupPage />} />
                   <Route path=":groupId" element={<ChangeGroupName />} />
-                  <Route
-                    path="new"
-                    element={<CreateNewGroup title="Add New Group" />}
-                  />
                 </Route>
               )}
               {isLoggedIn && (
                 <Route path="projects">
                   <Route index element={<ProjectPage />} />
                   <Route path=":projectId" element={<ChangeProjectName />} />
-                  <Route
-                    path="new"
-                    element={<CreateNewProject title="Add New Project" />}
-                  />
                 </Route>
               )}
               {isLoggedIn && (
