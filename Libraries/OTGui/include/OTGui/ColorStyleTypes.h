@@ -9,6 +9,7 @@
 #include "OTGui/OTGuiAPIExport.h"
 
 // std header
+#include <list>
 #include <string>
 
 namespace ot {
@@ -52,7 +53,7 @@ namespace ot {
 
 	//! \brief Contains default file paths set in a color style.
 	enum class ColorStyleFileEntry {
-		TransparentIcon,
+		TransparentIcon = 0,
 
 		ArrowUpIcon,
 		ArrowUpDisabledIcon,
@@ -126,7 +127,11 @@ namespace ot {
 		PropertyItemDeleteIcon,
 		PropertyGroupExpandedIcon,
 		PropertyGroupCollapsedIcon,
-		LogInBackgroundImage
+		LogInBackgroundImage,
+
+		//! \brief Used to determine the last entry.
+		//! \warning This must always be the last entry in this enum.
+		ColorStyleFileEntry_End
 	};
 
 	//! \brief Contains default painters set in a color style.
@@ -173,7 +178,15 @@ namespace ot {
 		ToolBarFirstTabBackground,
 		ToolBarFirstTabForeground,
 
-		ErrorForeground
+		GraphicsItemBorder,
+		GraphicsItemBackground,
+		GraphicsItemForeground,
+
+		ErrorForeground,
+
+		//! \brief Used to determine the last entry.
+		//! \warning This must always be the last entry in this enum.
+		ColorStyleValueEntry_End
 	};
 
 	//! \brief Contains default integer values set in a color style.
@@ -210,6 +223,7 @@ namespace ot {
 
 	OT_GUI_API_EXPORT std::string toString(ColorStyleValueEntry _colorStyleValueEntry);
 	OT_GUI_API_EXPORT ColorStyleValueEntry stringToColorStyleValueEntry(const std::string& _colorStyleValueEntry);
+	OT_GUI_API_EXPORT std::list<std::string> getAllColorStyleValueEntries(void);
 
 	OT_GUI_API_EXPORT std::string toString(ColorStyleIntegerEntry _colorStyleIntegerEntry);
 	OT_GUI_API_EXPORT ColorStyleIntegerEntry stringToColorStyleIntegerEntry(const std::string& _colorStyleIntegerEntry);

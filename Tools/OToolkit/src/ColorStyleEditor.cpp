@@ -404,6 +404,10 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBorder), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBackground), new PropertyPainter2D(new FillPainter2D(Color(230, 230, 230))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
@@ -554,6 +558,10 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBorder), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBackground), new PropertyPainter2D(new FillPainter2D(Color(70, 70, 70))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
@@ -706,6 +714,10 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBorder), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 80, 140))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
