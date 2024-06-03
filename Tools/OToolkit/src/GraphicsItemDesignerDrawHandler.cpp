@@ -190,28 +190,32 @@ GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createLineItem(vo
 
 GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createSquareItem(void) {
 	WrappedSquareItem* newItem = new WrappedSquareItem;
-	newItem->setRectanglePen(QPen(QBrush(QColor(0, 0, 0, 255)), 1.));
+	newItem->setOutline(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
+	newItem->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBackground));
 
 	return newItem;
 }
 
 GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createRectItem(void) {
 	WrappedRectItem* newItem = new WrappedRectItem;
-	newItem->setRectanglePen(QPen(QBrush(QColor(0, 0, 0, 255)), 1.));
+	newItem->setOutline(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
+	newItem->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBackground));
 
 	return newItem;
 }
 
 GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createCircleItem(void) {
 	WrappedCircleItem* newItem = new WrappedCircleItem;
-	newItem->setPen(QPen(QBrush(QColor(0, 0, 0, 255)), 1.));
+	newItem->setOutline(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
+	newItem->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBackground));
 
 	return newItem;
 }
 
 GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createEllipseItem(void) {
 	WrappedEllipseItem* newItem = new WrappedEllipseItem;
-	newItem->setPen(QPen(QBrush(QColor(0, 0, 0, 255)), 1.));
+	newItem->setOutline(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
+	newItem->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBackground));
 
 	return newItem;
 }

@@ -9,7 +9,6 @@
 #include "OTWidgets/GraphicsScene.h"
 
 class GraphicsItemDesignerView;
-namespace ot { class GraphicsEllipseItem; }
 
 class GraphicsItemDesignerScene : public ot::GraphicsScene {
 	OT_DECL_NOCOPY(GraphicsItemDesignerScene)
@@ -46,7 +45,6 @@ private:
 	void constrainItemToScene(QGraphicsItem* _item);
 
 	GraphicsItemDesignerView* m_view;
-	ot::GraphicsEllipseItem* m_cursorItem;
 	Mode m_mode;
 	QSizeF m_itemSize;
 };

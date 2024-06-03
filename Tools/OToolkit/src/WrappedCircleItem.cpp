@@ -63,7 +63,7 @@ void WrappedCircleItem::fillPropertyGrid(void) {
 	PropertyGroup* geometryGroup = new PropertyGroup("Geometry");
 	geometryGroup->addProperty(new PropertyDouble("X", this->pos().x()));
 	geometryGroup->addProperty(new PropertyDouble("Y", this->pos().y()));
-	geometryGroup->addProperty(new PropertyDouble("Radius", this->radiusX()));
+	geometryGroup->addProperty(new PropertyDouble("Radius", this->getRadiusX()));
 
 	cfg.addRootGroup(generalGroup);
 	cfg.addRootGroup(geometryGroup);
@@ -93,7 +93,7 @@ void WrappedCircleItem::propertyChanged(ot::PropertyGridItem* _item, const ot::P
 
 		this->prepareGeometryChange();
 		this->setPos(input->getValue(), this->y());
-		this->setGeometry(QRectF(this->pos(), QSizeF(this->radiusX() * 2., this->radiusY() * 2.)));
+		this->setGeometry(QRectF(this->pos(), QSizeF(this->getRadiusX() * 2., this->getRadiusY() * 2.)));
 	}
 	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Y") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
@@ -104,7 +104,7 @@ void WrappedCircleItem::propertyChanged(ot::PropertyGridItem* _item, const ot::P
 
 		this->prepareGeometryChange();
 		this->setPos(this->x(), input->getValue());
-		this->setGeometry(QRectF(this->pos(), QSizeF(this->radiusX() * 2., this->radiusY() * 2.)));
+		this->setGeometry(QRectF(this->pos(), QSizeF(this->getRadiusX() * 2., this->getRadiusY() * 2.)));
 	}
 	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Radius") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());

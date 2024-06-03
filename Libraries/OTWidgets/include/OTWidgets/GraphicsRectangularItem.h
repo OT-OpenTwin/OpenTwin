@@ -6,14 +6,17 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/CustomGraphicsItem.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/Outline.h"
+#include "OTWidgets/CustomGraphicsItem.h"
 
 // Qt header
 #include <QtGui/qpen.h>
 #include <QtGui/qbrush.h>
 
 namespace ot {
+
+	class Painter2D;
 
 	class OT_WIDGETS_API_EXPORT GraphicsRectangularItem : public CustomGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsRectangularItem)
@@ -31,7 +34,7 @@ namespace ot {
 
 		// Base class functions: ot::CustomGraphicsItem
 
-		virtual QSizeF getPreferredGraphicsItemSize(void) const override { return m_size; };
+		virtual QSizeF getPreferredGraphicsItemSize(void) const override;
 
 	protected:
 
@@ -44,23 +47,20 @@ namespace ot {
 
 	public:
 
+		void setRectangleSize(const Size2DD& _size);
 		void setRectangleSize(const QSizeF& _size);
-		const QSizeF& rectangleSize(void) const { return m_size; };
+		const Size2DD& getRectangleSize(void) const;
 
-		void setRectangleBrush(const QBrush& _brush) { m_brush = _brush; };
-		const QBrush& rectangleBrush(void) const { return m_brush; };
+		//! \brief Sets the background painter.
+		//! The item takes ownership of the painter.
+		void setBackgroundPainter(ot::Painter2D* _painter);
+		const ot::Painter2D* getBackgroundPainter(void) const;
 
-		void setRectanglePen(const QPen& _pen) { m_pen = _pen; };
-		const QPen& rectanglePen(void) const { return m_pen; };
+		void setOutline(const OutlineF& _outline);
+		const OutlineF& getOutline(void) const;
 
-		void setCornerRadius(int _r) { m_cornerRadius = _r; };
-		int cornerRadius(void) const { return m_cornerRadius; };
-
-	private:
-		QSizeF m_size;
-		QBrush m_brush;
-		QPen m_pen;
-		int m_cornerRadius;
+		void setCornerRadius(int _r);
+		int getCornerRadius(void) const;
 	};
 
 

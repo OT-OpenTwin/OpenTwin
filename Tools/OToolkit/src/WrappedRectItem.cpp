@@ -7,6 +7,7 @@
 #include "WrappedRectItem.h"
 
 // OpenTwin header
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 
 WrappedRectItem::WrappedRectItem() {
@@ -60,8 +61,8 @@ void WrappedRectItem::fillPropertyGrid(void) {
 	PropertyGroup* geometryGroup = new PropertyGroup("Geometry");
 	geometryGroup->addProperty(new PropertyDouble("X", this->pos().x()));
 	geometryGroup->addProperty(new PropertyDouble("Y", this->pos().y()));
-	geometryGroup->addProperty(new PropertyDouble("Width", this->rectangleSize().width()));
-	geometryGroup->addProperty(new PropertyDouble("Height", this->rectangleSize().height()));
+	geometryGroup->addProperty(new PropertyDouble("Width", this->getRectangleSize().width()));
+	geometryGroup->addProperty(new PropertyDouble("Height", this->getRectangleSize().height()));
 
 	cfg.addRootGroup(generalGroup);
 	cfg.addRootGroup(geometryGroup);
@@ -91,7 +92,7 @@ void WrappedRectItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->prepareGeometryChange();
 		this->setPos(input->getValue(), this->y());
-		this->setGeometry(QRectF(this->pos(), this->rectangleSize()));
+		this->setGeometry(QRectF(this->pos(), QtFactory::toQSize(this->getRectangleSize())));
 	}
 	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Y") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
@@ -102,7 +103,7 @@ void WrappedRectItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->prepareGeometryChange();
 		this->setPos(this->x(), input->getValue());
-		this->setGeometry(QRectF(this->pos(), this->rectangleSize()));
+		this->setGeometry(QRectF(this->pos(), QtFactory::toQSize(this->getRectangleSize())));
 	}
 	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Width") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
@@ -111,7 +112,7 @@ void WrappedRectItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 			return;
 		}
 
-		this->setRectangleSize(QSizeF(input->getValue(), this->rectangleSize().height()));
+		this->setRectangleSize(QSizeF(input->getValue(), this->getRectangleSize().height()));
 	}
 	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Height") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
@@ -120,7 +121,7 @@ void WrappedRectItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 			return;
 		}
 
-		this->setRectangleSize(QSizeF(this->rectangleSize().width(), input->getValue()));
+		this->setRectangleSize(QSizeF(this->getRectangleSize().width(), input->getValue()));
 	}
 }
 

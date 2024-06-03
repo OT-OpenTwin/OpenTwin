@@ -6,8 +6,9 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/CustomGraphicsItem.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/Outline.h"
+#include "OTWidgets/CustomGraphicsItem.h"
 
 // Qt header
 #include <QtGui/qpen.h>
@@ -45,17 +46,18 @@ namespace ot {
 	public:
 
 		void setRadius(double _x, double _y);
-		double radiusX(void) const { return m_radiusX; };
-		double radiusY(void) const { return m_radiusY; };
+		void setRadiusX(double _x);
+		void setRadiusY(double _y);
+		double getRadiusX(void) const;
+		double getRadiusY(void) const;
 
-		void setBrush(const QBrush& _brush) { m_brush = _brush; };
-		void setPen(const QPen& _pen) { m_pen = _pen; };
+		//! \brief Sets the background painter.
+		//! The item takes ownership of the painter.
+		void setBackgroundPainter(ot::Painter2D* _painter);
+		const ot::Painter2D* getBackgroundPainter(void) const;
 
-	private:
-		QBrush m_brush;
-		QPen m_pen;
-		double m_radiusX;
-		double m_radiusY;
+		void setOutline(const OutlineF& _outline);
+		const OutlineF& getOutline(void) const;
 	};
 
 }

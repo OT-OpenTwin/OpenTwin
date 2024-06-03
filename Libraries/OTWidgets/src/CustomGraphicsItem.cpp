@@ -103,3 +103,8 @@ void ot::CustomGraphicsItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 void ot::CustomGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 	this->handleHoverLeaveEvent(_event);
 }
+
+void ot::CustomGraphicsItem::updateItemGeometry(void) {
+	this->prepareGeometryChange();
+	this->setGeometry(QRectF(this->pos(), this->getPreferredGraphicsItemSize()));
+}

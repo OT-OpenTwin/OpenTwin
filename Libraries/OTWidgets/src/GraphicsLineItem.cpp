@@ -33,6 +33,8 @@ ot::GraphicsLineItem::~GraphicsLineItem() {
 // Base class functions: ot::GraphicsItems
 
 bool ot::GraphicsLineItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
+	if (!ot::CustomGraphicsItem::setupFromConfig(_cfg)) return false;
+
 	OTAssertNullptr(_cfg);
 	const GraphicsLineItemCfg* cfg = dynamic_cast<const GraphicsLineItemCfg*>(_cfg);
 	if (cfg == nullptr) {
@@ -40,9 +42,9 @@ bool ot::GraphicsLineItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		return false;
 	}
 
-	this->prepareGeometryChange();
+	this->updateItemGeometry();
 
-	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
+	return true;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

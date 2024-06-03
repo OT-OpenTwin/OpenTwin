@@ -7,6 +7,7 @@
 #include "WrappedSquareItem.h"
 
 // OpenTwin header
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 
 WrappedSquareItem::WrappedSquareItem() {
@@ -63,7 +64,7 @@ void WrappedSquareItem::fillPropertyGrid(void) {
 	PropertyGroup* geometryGroup = new PropertyGroup("Geometry");
 	geometryGroup->addProperty(new PropertyDouble("X", this->pos().x()));
 	geometryGroup->addProperty(new PropertyDouble("Y", this->pos().y()));
-	geometryGroup->addProperty(new PropertyDouble("Width", this->rectangleSize().width()));
+	geometryGroup->addProperty(new PropertyDouble("Width", this->getRectangleSize().width()));
 
 	cfg.addRootGroup(generalGroup);
 	cfg.addRootGroup(geometryGroup);
@@ -93,7 +94,7 @@ void WrappedSquareItem::propertyChanged(ot::PropertyGridItem* _item, const ot::P
 
 		this->prepareGeometryChange();
 		this->setPos(input->getValue(), this->y());
-		this->setGeometry(QRectF(this->pos(), this->rectangleSize()));
+		this->setGeometry(QRectF(this->pos(), ot::QtFactory::toQSize(this->getRectangleSize())));
 	}
 	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Y") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
@@ -104,7 +105,7 @@ void WrappedSquareItem::propertyChanged(ot::PropertyGridItem* _item, const ot::P
 
 		this->prepareGeometryChange();
 		this->setPos(this->x(), input->getValue());
-		this->setGeometry(QRectF(this->pos(), this->rectangleSize()));
+		this->setGeometry(QRectF(this->pos(), ot::QtFactory::toQSize(this->getRectangleSize())));
 	}
 	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Width") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());

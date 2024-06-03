@@ -18,7 +18,7 @@
 #include <QtWidgets/qgraphicssceneevent.h>
 
 GraphicsItemDesignerScene::GraphicsItemDesignerScene(GraphicsItemDesignerView* _view)
-	: ot::GraphicsScene(QRectF(0., 0., 300., 200.), _view), m_view(_view), m_cursorItem(nullptr), m_mode(NoMode), m_itemSize(300, 200)
+	: ot::GraphicsScene(QRectF(0., 0., 300., 200.), _view), m_view(_view), m_mode(NoMode), m_itemSize(300, 200)
 {
 	this->setGridFlags(ot::Grid::ShowNormalLines | ot::Grid::ShowWideLines);
 	this->setGridSnapMode(ot::Grid::SnapTopLeft);
@@ -34,31 +34,13 @@ GraphicsItemDesignerScene::~GraphicsItemDesignerScene() {
 
 void GraphicsItemDesignerScene::enablePickingMode(void) {
 	if (m_mode == PointPickingMode) return;
-	if (m_cursorItem) delete m_cursorItem;
-	m_cursorItem = nullptr;
-
+	
 	m_mode = PointPickingMode;
-	return;
-
-	m_cursorItem = new ot::GraphicsEllipseItem;
-	m_cursorItem->setRadius(1, 1);
-	m_cursorItem->setBrush(QBrush(QColor(200, 200, 0)));
-	m_cursorItem->setPen(QPen(Qt::NoPen));
-	m_cursorItem->setGraphicsScene(this);
-	m_cursorItem->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHasNoFeedback);
-	m_cursorItem->setFlag(QGraphicsItem::ItemIsSelectable, false);
-
-	this->addItem(m_cursorItem);
 }
 
 void GraphicsItemDesignerScene::disablePickingMode(void) {
 	if (m_mode != PointPickingMode) return;
-	if (m_cursorItem) {
-		this->removeItem(m_cursorItem);
-		delete m_cursorItem;
-		m_cursorItem = nullptr;
-	}
-	
+		
 	m_mode = NoMode;
 }
 
@@ -83,11 +65,6 @@ void GraphicsItemDesignerScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event)
 	ot::GraphicsScene::mouseMoveEvent(_event);
 	
 	m_view->fwdPositionChanged(_event->scenePos());
-
-	if (m_cursorItem) { 
-		m_cursorItem->prepareGraphicsItemGeometryChange();
-		m_cursorItem->setPos(_event->scenePos() - QPointF(m_cursorItem->radiusX(), m_cursorItem->radiusY()));
-	}
 
 	if (m_mode == PointPickingMode) {
 		QGraphicsItem* item = itemAt(_event->scenePos(), QTransform());
