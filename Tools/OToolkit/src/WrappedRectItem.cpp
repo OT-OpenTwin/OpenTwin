@@ -63,6 +63,9 @@ void WrappedRectItem::fillPropertyGrid(void) {
 	geometryGroup->addProperty(new PropertyDouble("Y", this->pos().y()));
 	geometryGroup->addProperty(new PropertyDouble("Width", this->getRectangleSize().width()));
 	geometryGroup->addProperty(new PropertyDouble("Height", this->getRectangleSize().height()));
+	geometryGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().painter()));
+	geometryGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width()));
+	geometryGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
 
 	cfg.addRootGroup(generalGroup);
 	cfg.addRootGroup(geometryGroup);
@@ -122,6 +125,37 @@ void WrappedRectItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 		}
 
 		this->setRectangleSize(QSizeF(this->getRectangleSize().width(), input->getValue()));
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Border Painter") {
+		PropertyInputPainter2D* input = dynamic_cast<PropertyInputPainter2D*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		ot::OutlineF lineStyle = this->getOutline();
+		lineStyle.setPainter(input->getPainter()->createCopy());
+		this->setOutline(lineStyle);
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Border Width") {
+		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		ot::OutlineF lineStyle = this->getOutline();
+		lineStyle.setWidth(input->getValue());
+		this->setOutline(lineStyle);
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Background Painter") {
+		PropertyInputPainter2D* input = dynamic_cast<PropertyInputPainter2D*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		this->setBackgroundPainter(input->getPainter()->createCopy());
 	}
 }
 

@@ -61,7 +61,11 @@ void WrappedEllipseItem::fillPropertyGrid(void) {
 	PropertyGroup* geometryGroup = new PropertyGroup("Geometry");
 	geometryGroup->addProperty(new PropertyDouble("X", this->pos().x()));
 	geometryGroup->addProperty(new PropertyDouble("Y", this->pos().y()));
-	geometryGroup->addProperty(new PropertyDouble("Radius", this->getRadiusX()));
+	geometryGroup->addProperty(new PropertyDouble("Radius X", this->getRadiusX()));
+	geometryGroup->addProperty(new PropertyDouble("Radius Y", this->getRadiusY()));
+	geometryGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().painter()));
+	geometryGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width()));
+	geometryGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
 
 	cfg.addRootGroup(generalGroup);
 	cfg.addRootGroup(geometryGroup);
@@ -104,14 +108,54 @@ void WrappedEllipseItem::propertyChanged(ot::PropertyGridItem* _item, const ot::
 		this->setPos(this->x(), input->getValue());
 		this->setGeometry(QRectF(this->pos(), QSizeF(this->getRadiusX() * 2., this->getRadiusY() * 2.)));
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Radius") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Radius X") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
 			return;
 		}
 
-		this->setRadius(input->getValue(), input->getValue());
+		this->setRadiusX(input->getValue());
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Radius Y") {
+		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		this->setRadiusY(input->getValue());
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Border Painter") {
+		PropertyInputPainter2D* input = dynamic_cast<PropertyInputPainter2D*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		ot::OutlineF lineStyle = this->getOutline();
+		lineStyle.setPainter(input->getPainter()->createCopy());
+		this->setOutline(lineStyle);
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Border Width") {
+		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		ot::OutlineF lineStyle = this->getOutline();
+		lineStyle.setWidth(input->getValue());
+		this->setOutline(lineStyle);
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Background Painter") {
+		PropertyInputPainter2D* input = dynamic_cast<PropertyInputPainter2D*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		this->setBackgroundPainter(input->getPainter()->createCopy());
 	}
 }
 
