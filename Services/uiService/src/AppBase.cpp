@@ -2169,7 +2169,7 @@ ot::GraphicsViewView* AppBase::findGraphicsEditor(const std::string& _name, ot::
 		const std::list<ot::GraphicsViewView*>& lst = m_graphicsViews[_serviceInfo];
 
 		for (auto v : lst) {
-			if (v->graphicsViewName() == _name) return v;
+			if (v->getGraphicsViewName() == _name) return v;
 		}
 	}
 
@@ -2355,7 +2355,7 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 	try {
 		
 		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
-		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2395,7 +2395,7 @@ void AppBase::slotGraphicsItemMoved(const ot::UID& _uid, const QPointF& _newPos)
 
 	try {
 		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
-		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->graphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2427,7 +2427,7 @@ void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, doc.GetAllocator()), doc.GetAllocator());
 
-	ot::GraphicsConnectionPackage pckg(view->graphicsViewName());
+	ot::GraphicsConnectionPackage pckg(view->getGraphicsViewName());
 	pckg.addConnection(_fromUid, _fromConnector, _toUid, _toConnector);
 
 	ot::JsonObject pckgObj;

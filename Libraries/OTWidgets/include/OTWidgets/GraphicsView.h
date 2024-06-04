@@ -56,7 +56,7 @@ namespace ot {
 		void viewAll(void);
 
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };
-		bool mouseWheelEnabled(void) const { return m_wheelEnabled; };
+		bool getMouseWheelEnabled(void) const { return m_wheelEnabled; };
 
 		const bool getStateChangeInProgress(void) const { return m_stateChangeInProgress; };
 
@@ -75,17 +75,19 @@ namespace ot {
 		void setDropsEnabled(bool _enabled) { m_dropEnabled = _enabled; };
 
 		void setGraphicsViewName(const std::string& _name) { m_viewName = _name; };
-		const std::string& graphicsViewName(void) const { return m_viewName; };
+		const std::string& getGraphicsViewName(void) const { return m_viewName; };
 
 		void addItem(ot::GraphicsItem* _item);
 		void removeItem(const ot::UID& _itemUid, bool bufferConnections = false);
-		std::list<ot::UID> selectedItems(void) const;
+		std::list<ot::UID> getSelectedItemUIDs(void) const;
+		std::list<GraphicsItem*> getSelectedGraphicsItems(void) const;
 
 		bool addConnectionIfConnectedItemsExist(const GraphicsConnectionCfg& _config);
 
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
 		void removeConnection(const ot::UID& _connectionInformation);
-		ot::UIDList selectedConnections(void) const;
+		ot::UIDList getSelectedConnectionUIDs(void) const;
+		std::list<GraphicsConnectionItem*> getSelectedConnectionItems(void) const;
 
 		void requestConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 		void notifyItemMoved(ot::GraphicsItem* _item);

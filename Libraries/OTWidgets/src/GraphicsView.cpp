@@ -176,7 +176,7 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool bufferConnection
 	m_stateChangeInProgress = false;
 }
 
-std::list<ot::UID> ot::GraphicsView::selectedItems(void) const {
+std::list<ot::UID> ot::GraphicsView::getSelectedItemUIDs(void) const {
 	std::list<ot::UID> sel; // Selected items
 	for (auto s : m_scene->selectedItems()) {
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
@@ -185,6 +185,19 @@ std::list<ot::UID> ot::GraphicsView::selectedItems(void) const {
 		if (itm) {
 			// Item selected
 			sel.push_back(itm->getGraphicsItemUid());
+		}
+	}
+	return sel;
+}
+
+std::list<ot::GraphicsItem*> ot::GraphicsView::getSelectedGraphicsItems(void) const {
+	std::list<GraphicsItem*> sel; // Selected items
+	for (auto s : m_scene->selectedItems()) {
+		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
+
+		if (itm) {
+			// Item selected
+			sel.push_back(itm);
 		}
 	}
 	return sel;
@@ -265,7 +278,7 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
 	m_stateChangeInProgress = false;
 }
 
-ot::UIDList ot::GraphicsView::selectedConnections(void) const {
+ot::UIDList ot::GraphicsView::getSelectedConnectionUIDs(void) const {
 	ot::UIDList sel; // Selected items
 	for (auto s : m_scene->selectedItems()) {
 		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
@@ -273,6 +286,20 @@ ot::UIDList ot::GraphicsView::selectedConnections(void) const {
 		if (citm) {
 			// Connection selected
 			sel.push_back(citm->getConnectionInformation().getUid());
+		}
+	}
+
+	return sel;
+}
+
+std::list<ot::GraphicsConnectionItem*> ot::GraphicsView::getSelectedConnectionItems(void) const {
+	std::list<GraphicsConnectionItem*> sel; // Selected items
+	for (auto s : m_scene->selectedItems()) {
+		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
+
+		if (citm) {
+			// Connection selected
+			sel.push_back(citm);
 		}
 	}
 
@@ -357,8 +384,8 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 		this->resetView();
 	}
 	else if (_event->key() == Qt::Key_Delete) {
-		ot::UIDList itm = this->selectedItems();
-		ot::UIDList con = this->selectedConnections();
+		ot::UIDList itm = this->getSelectedItemUIDs();
+		ot::UIDList con = this->getSelectedConnectionUIDs();
 		Q_EMIT removeItemsRequested(itm, con);
 	}
 }
