@@ -179,9 +179,6 @@
     <ClInclude Include="include\GraphicsItemDesignerInfoOverlay.h">
       <Filter>Header Files\GraphicsItemDesigner</Filter>
     </ClInclude>
-    <ClInclude Include="include\GraphicsItemDesignerScene.h">
-      <Filter>Header Files\GraphicsItemDesigner</Filter>
-    </ClInclude>
     <ClInclude Include="include\GraphicsItemDesignerViewStatusOverlay.h">
       <Filter>Header Files\GraphicsItemDesigner</Filter>
     </ClInclude>
@@ -205,6 +202,9 @@
     </ClInclude>
     <ClInclude Include="include\WrappedEllipseItem.h">
       <Filter>Header Files\GraphicsItemDesignerItems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsItemDesignerScene.h">
+      <Filter>Header Files\GraphicsItemDesigner</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

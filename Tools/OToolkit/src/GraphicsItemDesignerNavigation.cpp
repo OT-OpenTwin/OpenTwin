@@ -75,7 +75,7 @@ void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _
 }
 
 bool GraphicsItemDesignerNavigation::isItemNameUnique(const QString& _item) const {
-	return m_itemsMap.find(_item) != m_itemsMap.end();
+	return m_itemsMap.find(_item) == m_itemsMap.end();
 }
 
 bool GraphicsItemDesignerNavigation::updateItemName(const QString& _oldName, const QString& _newName) {

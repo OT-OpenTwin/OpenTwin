@@ -22,6 +22,8 @@ GraphicsItemDesignerView::GraphicsItemDesignerView()
 	this->setGraphicsViewFlag(ot::GraphicsView::IgnoreConnectionByUser);
 	
 	m_infoOverlay = new GraphicsItemDesignerViewStatusOverlay(this);
+
+	this->connect(m_scene, &GraphicsItemDesignerScene::selectionChangeFinished, this, &GraphicsItemDesignerView::slotSceneSelectionChanged);
 }
 
 GraphicsItemDesignerView::~GraphicsItemDesignerView() {
@@ -72,6 +74,12 @@ void GraphicsItemDesignerView::showEvent(QShowEvent* _event) {
 
 	// Apply the scaling factor to the view
 	this->scale(scale, scale);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+void GraphicsItemDesignerView::slotSceneSelectionChanged(void) {
+	
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

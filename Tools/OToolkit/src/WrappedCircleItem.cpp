@@ -5,6 +5,7 @@
 
 // OToolkit header
 #include "WrappedCircleItem.h"
+#include "GraphicsItemDesignerNavigation.h"
 
 // OpenTwin header
 #include "OTGui/StyleRefPainter2D.h"
@@ -85,10 +86,12 @@ void WrappedCircleItem::propertyChanged(ot::PropertyGridItem* _item, const ot::P
 			OT_LOG_E("Input cast failed { \"Group\": \"" + _item->getGroupName() + "\", \"");
 			return;
 		}
+		OTAssertNullptr(this->getNavigation());
 
-		OTAssertNullptr(this->getNavigationItem());
+		if (input->getCurrentText().isEmpty()) return;
+		if (!this->getNavigation()->updateItemName(QString::fromStdString(this->getGraphicsItemName()), input->getCurrentText())) return;
+
 		this->setGraphicsItemName(input->getCurrentText().toStdString());
-		this->getNavigationItem()->setText(0, input->getCurrentText());
 	}
 	if (_item->getGroupName() == "General" && _itemData.propertyName() == "Connectable") {
 		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());

@@ -5,6 +5,7 @@
 
 // OToolkit header
 #include "WrappedLineItem.h"
+#include "GraphicsItemDesignerNavigation.h"
 
 // OpenTwin header
 #include "OTGui/FillPainter2D.h"
@@ -78,10 +79,12 @@ void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 			OT_LOG_E("Input cast failed { \"Group\": \"" + _item->getGroupName() + "\", \"");
 			return;
 		}
+		OTAssertNullptr(this->getNavigation());
 
-		OTAssertNullptr(this->getNavigationItem());
+		if (input->getCurrentText().isEmpty()) return;
+		if (!this->getNavigation()->updateItemName(QString::fromStdString(this->getGraphicsItemName()), input->getCurrentText())) return;
+
 		this->setGraphicsItemName(input->getCurrentText().toStdString());
-		this->getNavigationItem()->setText(0, input->getCurrentText());
 	}
 	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "X1") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());

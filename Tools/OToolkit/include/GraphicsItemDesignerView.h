@@ -41,6 +41,9 @@ protected:
 	virtual void keyPressEvent(QKeyEvent* _event) override;
 	virtual void showEvent(QShowEvent* _event) override;
 
+private Q_SLOTS:
+	void slotSceneSelectionChanged(void);
+
 private:
 	friend class GraphicsItemDesignerScene;
 
