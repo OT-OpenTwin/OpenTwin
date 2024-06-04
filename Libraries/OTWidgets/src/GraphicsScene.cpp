@@ -167,6 +167,7 @@ void ot::GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 
 	if (_event->button() == Qt::LeftButton) {
 		m_mouseIsPressed = false;
+		this->handleSelectionChanged();
 	}
 }
 

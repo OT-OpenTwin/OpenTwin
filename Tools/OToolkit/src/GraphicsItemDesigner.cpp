@@ -39,7 +39,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	using namespace ot;
 
 	// Create views
-	m_view = new GraphicsItemDesignerView;
+	m_view = new GraphicsItemDesignerView(this);
 	ot::WidgetView* view = this->createCentralWidgetView(m_view, "GID");
 	_content.addView(view);
 

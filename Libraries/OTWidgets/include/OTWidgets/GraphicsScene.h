@@ -69,7 +69,7 @@ namespace ot {
 		GraphicsConnectionCfg::ConnectionStyle connectionPreviewStyle(void) const { return m_connectionPreviewStyle; };
 
 		void setIgnoreEvents(bool _ignore) { m_ignoreEvents = _ignore; };
-		bool ignoreEvents(void) const { return m_ignoreEvents; };
+		bool getIgnoreEvents(void) const { return m_ignoreEvents; };
 
 		QPointF snapToGrid(const QPointF& _pos) const;
 		

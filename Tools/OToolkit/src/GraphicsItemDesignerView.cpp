@@ -7,6 +7,7 @@
 #include "GraphicsItemDesigner.h"
 #include "GraphicsItemDesignerView.h"
 #include "GraphicsItemDesignerScene.h"
+#include "GraphicsItemDesignerNavigation.h"
 #include "GraphicsItemDesignerDrawHandler.h"
 #include "GraphicsItemDesignerViewStatusOverlay.h"
 
@@ -14,9 +15,11 @@
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsEllipseItem.h"
 
-GraphicsItemDesignerView::GraphicsItemDesignerView()
-	: m_cursorItem(nullptr), m_drawHandler(nullptr)
+GraphicsItemDesignerView::GraphicsItemDesignerView(GraphicsItemDesigner* _designer)
+	: m_designer(_designer), m_cursorItem(nullptr), m_drawHandler(nullptr)
 {
+	OTAssertNullptr(m_designer);
+
 	m_scene = new GraphicsItemDesignerScene(this);
 	this->setGraphicsScene(m_scene);
 	this->setGraphicsViewFlag(ot::GraphicsView::IgnoreConnectionByUser);
@@ -79,6 +82,7 @@ void GraphicsItemDesignerView::showEvent(QShowEvent* _event) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 void GraphicsItemDesignerView::slotSceneSelectionChanged(void) {
+	std::list<std::string> newSelection;
 	
 }
 

@@ -16,8 +16,10 @@ namespace ot { class GraphicsEllipseItem; }
 
 class GraphicsItemDesignerView : public ot::GraphicsView {
 	Q_OBJECT
+	OT_DECL_NODEFAULT(GraphicsItemDesignerView)
+	OT_DECL_NOCOPY(GraphicsItemDesignerView)
 public:
-	GraphicsItemDesignerView();
+	GraphicsItemDesignerView(GraphicsItemDesigner* _designer);
 	virtual ~GraphicsItemDesignerView();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -51,6 +53,7 @@ private:
 	void fwdCancelRequest(void);
 	void fwdPositionChanged(const QPointF& _pt);
 
+	GraphicsItemDesigner* m_designer;
 	GraphicsItemDesignerViewStatusOverlay* m_infoOverlay;
 	GraphicsItemDesignerScene* m_scene;
 	GraphicsItemDesignerDrawHandler* m_drawHandler;
