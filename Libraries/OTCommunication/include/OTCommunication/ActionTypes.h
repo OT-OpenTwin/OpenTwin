@@ -670,6 +670,7 @@
 #define OT_ACTION_LOGIN "Login"
 #define OT_ACTION_LOGIN_ADMIN "LoginAdmin"
 #define OT_ACTION_REGISTER "Register"
+#define OT_ACTION_REFRESH_SESSION "RefreshSession"
 #define OT_ACTION_GET_USER_DATA "GetUserData"
 #define OT_ACTION_GET_ALL_USERS "GetAllUsers"
 #define OT_ACTION_GET_ALL_USER_COUNT "GetAllUserCount"

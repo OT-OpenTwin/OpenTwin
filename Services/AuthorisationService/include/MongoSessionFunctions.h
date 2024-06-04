@@ -30,8 +30,8 @@ using bsoncxx::document::element;
 namespace MongoSessionFunctions
 {
 	std::string createSession(std::string username, mongocxx::client& adminClient);
-
+	std::string refreshSession(std::string sessionName, mongocxx::client& adminClient);
+	void removeOldSessions(mongocxx::client& adminClient);
 
 	std::string generateUniqueSessionName(std::string username, mongocxx::client& adminClient);
-
 }

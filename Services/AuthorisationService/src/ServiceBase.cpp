@@ -247,7 +247,22 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 		OT_LOG_E("Error creating db index user_id_unique: " + std::string(err.what()));
 	}
 
+	// Remove outdated sessions and start time
+	std::thread workerThread(&ServiceBase::removeOldSessionsWorker, this);
+	workerThread.detach();
+
 	return 0;
+}
+
+bool ServiceBase::removeOldSessionsWorker()
+{
+	while (1)
+	{
+		MongoSessionFunctions::removeOldSessions(adminClient);
+
+		using namespace std::chrono_literals;
+		std::this_thread::sleep_for(3600s);  // Wait for one hour
+	}
 }
 
 bool ServiceBase::isAdminUser(User& _loggedInUser)
@@ -324,6 +339,8 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	if (_action == OT_ACTION_LOGIN_ADMIN) { return handleAdminLogIn(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_LOGIN) { return handleLogIn(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_REGISTER) { return handleRegister(_actionDocument.GetObject()); }
+	else if (_action == OT_ACTION_REFRESH_SESSION) { return handleRefreshSession(_actionDocument.GetObject()); }
+
 	//------------------------------------------------------------------------------------
 
 	// Checking whether the logged in user is the one that he claims to be. All the requests must include loggedInUsername and loggedInUserPassword
@@ -459,6 +476,12 @@ std::string ServiceBase::handleRegister(const ot::ConstJsonObject& _actionDocume
 	ot::JsonDocument json;
 	json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
 	return json.toJson();
+}
+
+std::string ServiceBase::handleRefreshSession(const ot::ConstJsonObject& _actionDocument) {
+	std::string session = ot::json::getString(_actionDocument, OT_PARAM_DB_USERNAME);
+
+	return MongoSessionFunctions::refreshSession(session, adminClient);
 }
 
 // authentication needed: user functions
@@ -902,7 +925,7 @@ std::string ServiceBase::createRandomPassword()
 
 	// Create a distribution to uniformly select from all
 	// characters
-	std::uniform_int_distribution<> distribution(0, CHARACTERS.size() - 1);
+	std::uniform_int_distribution<> distribution(0, (int) (CHARACTERS.size()) - 1);
 
 	// Generate the random string
 	std::string random_string;

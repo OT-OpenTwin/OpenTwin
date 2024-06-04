@@ -1676,6 +1676,30 @@ void AppBase::setUserNamePassword(const std::string & _userName, const std::stri
 	OT_LOG_I("Credentials set for user: " + _userName);
 }
 
+void AppBase::startSessionRefreshTimer(const std::string& _sessionName)
+{
+	std::thread workerThread(&AppBase::sessionRefreshTimer, this, _sessionName);
+	workerThread.detach();
+}
+
+void AppBase::sessionRefreshTimer(const std::string _sessionName)
+{
+	while (1)
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REFRESH_SESSION, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(_sessionName, doc.GetAllocator()), doc.GetAllocator());
+
+		std::string response;
+		m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, m_authorizationServiceURL, doc, response);
+
+		OT_LOG_I("Session refresh sent: " + _sessionName);
+
+		using namespace std::chrono_literals;
+		std::this_thread::sleep_for(3600s);  // Wait for one hour
+	}
+}
+
 void AppBase::setSiteID(int _id) { 
 	m_siteID = _id;
 }

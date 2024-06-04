@@ -51,6 +51,7 @@ private:
 	std::string handleAdminLogIn(const ot::ConstJsonObject& _actionDocument);
 	std::string handleLogIn(const ot::ConstJsonObject& _actionDocument);
 	std::string handleRegister(const ot::ConstJsonObject& _actionDocument);
+	std::string handleRefreshSession(const ot::ConstJsonObject& _actionDocument);
 
 	// authentication needed: user functions
 
@@ -97,6 +98,7 @@ private:
 	bool isAdminUser(User& _loggedInUser);
 	std::string getAdminUserName() { return "admin"; }
 	std::string createRandomPassword();
+	bool removeOldSessionsWorker();
 
 	std::string serviceURL;
 	std::string databaseURL;

@@ -258,6 +258,7 @@ public:
 	void setGlobalSessionServiceURL(const std::string & _url);
 
 	void SetCollectionName(const std::string _collectionName);
+	void startSessionRefreshTimer(const std::string &_sessionName);
 
 	// ############################################################################################
 
@@ -517,6 +518,8 @@ private:
 
 	void exportProjectWorker(std::string selectedProjectName, std::string exportFileName);
 	void importProjectWorker(std::string projectName, std::string currentUser, std::string importFileName);
+
+	void sessionRefreshTimer(const std::string _sessionName);
 
 	bool checkForContinue(
 		QString									_title

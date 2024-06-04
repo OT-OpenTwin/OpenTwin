@@ -394,6 +394,7 @@ void LogInManager::slotConnectToDatabaseSuccess(const QString& _databaseUrl, con
 	AppBase::instance()->setDataBaseURL(_databaseUrl.toStdString());
 	AppBase::instance()->setAuthorizationServiceURL(_authURL.toStdString());
 	AppBase::instance()->setUserNamePassword(_userName.toStdString(), _password.toStdString(), _encryptedPassword.toStdString(), _sessionUser.toStdString(), _sessionPassword.toStdString());
+	AppBase::instance()->startSessionRefreshTimer(_sessionUser.toStdString());
 
 	// Store password
 	if (m_dialog->savePassword())
@@ -404,6 +405,7 @@ void LogInManager::slotConnectToDatabaseSuccess(const QString& _databaseUrl, con
 
 	m_dialog->hideWaitingAnimation();
 	AppBase::instance()->logInSuccessfull();
+
 	m_dialog->Close(resultOk);
 }
 
