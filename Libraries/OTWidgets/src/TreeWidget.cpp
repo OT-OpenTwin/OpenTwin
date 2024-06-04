@@ -112,6 +112,16 @@ QTreeWidgetItem* ot::TreeWidget::addItem(const TreeWidgetItemInfo& _item) {
 	return this->addItem(this->invisibleRootItem(), _item);
 }
 
+void ot::TreeWidget::deselectAll(void) {
+	this->blockSignals(true);
+	QList<QTreeWidgetItem*> selection = this->selectedItems();
+	for (QTreeWidgetItem* itm : selection) {
+		itm->setSelected(false);
+	}
+	this->blockSignals(false);
+	Q_EMIT itemSelectionChanged();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Event handler

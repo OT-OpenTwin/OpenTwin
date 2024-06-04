@@ -528,3 +528,12 @@ void ot::GraphicsItem::setHighlightItem(GraphicsHighlightItem* _item) {
 	if (m_highlightItem) delete m_highlightItem;
 	m_highlightItem = _item;
 }
+
+void ot::GraphicsItem::setGraphicsItemSelected(bool _selected) {
+	m_state.setFlag(GraphicsItem::SelectedState, _selected);
+	this->getQGraphicsItem()->setSelected(_selected);
+}
+
+bool ot::GraphicsItem::getGraphicsItemSelected(void) const {
+	return m_state & GraphicsItem::SelectedState;
+}

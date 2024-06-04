@@ -37,6 +37,9 @@ public:
 
 	GraphicsItemDesignerScene* getDesignerScene(void) const { return m_scene; };
 
+	void setSelectionChangeInProgress(bool _active) { m_selectionChangeInProgress = _active; };
+	bool getSelectionChangeInProgress(void) const { return m_selectionChangeInProgress; };
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 protected:
@@ -53,6 +56,7 @@ private:
 	void fwdCancelRequest(void);
 	void fwdPositionChanged(const QPointF& _pt);
 
+	bool m_selectionChangeInProgress;
 	GraphicsItemDesigner* m_designer;
 	GraphicsItemDesignerViewStatusOverlay* m_infoOverlay;
 	GraphicsItemDesignerScene* m_scene;

@@ -44,6 +44,8 @@ public:
 
 	GraphicsItemDesignerNavigationRoot* getDesignerRootItem(void) const { return m_rootItem; };
 
+	void setCurrentSelection(const std::list<std::string>& _itemNames);
+
 private Q_SLOTS:
 	void slotSelectionChanged(void);
 
@@ -58,6 +60,7 @@ private:
 	std::list<GraphicsItemDesignerItemBase*> m_rootItems;
 	std::map<QString, GraphicsItemDesignerItemBase*> m_itemsMap;
 	
+	bool m_selectionChangeInProgress;
 	GraphicsItemDesigner* m_designer;
 	GraphicsItemDesignerNavigationRoot* m_rootItem;
 	GraphicsItemDesignerPropertyHandler* m_currentPropertyHandler;

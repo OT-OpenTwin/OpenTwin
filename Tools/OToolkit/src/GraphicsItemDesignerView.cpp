@@ -16,7 +16,7 @@
 #include "OTWidgets/GraphicsEllipseItem.h"
 
 GraphicsItemDesignerView::GraphicsItemDesignerView(GraphicsItemDesigner* _designer)
-	: m_designer(_designer), m_cursorItem(nullptr), m_drawHandler(nullptr)
+	: m_designer(_designer), m_cursorItem(nullptr), m_drawHandler(nullptr), m_selectionChangeInProgress(false)
 {
 	OTAssertNullptr(m_designer);
 
@@ -82,8 +82,14 @@ void GraphicsItemDesignerView::showEvent(QShowEvent* _event) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 void GraphicsItemDesignerView::slotSceneSelectionChanged(void) {
+	if (m_selectionChangeInProgress) return;
+
 	std::list<std::string> newSelection;
-	
+	for (ot::GraphicsItem* itm : this->getSelectedGraphicsItems()) {
+		newSelection.push_back(itm->getGraphicsItemName());
+	}
+
+	m_designer->getNavigation()->setCurrentSelection(newSelection);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

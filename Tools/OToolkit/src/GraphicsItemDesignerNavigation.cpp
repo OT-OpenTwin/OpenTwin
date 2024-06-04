@@ -20,7 +20,7 @@
 #include "OTWidgets/GraphicsScene.h"
 
 GraphicsItemDesignerNavigation::GraphicsItemDesignerNavigation(GraphicsItemDesigner* _designer)
-	: m_designer(_designer), m_currentPropertyHandler(nullptr)
+	: m_designer(_designer), m_currentPropertyHandler(nullptr), m_selectionChangeInProgress(false)
 {
 	this->setHeaderHidden(true);
 	m_rootItem = new GraphicsItemDesignerNavigationRoot(_designer);
@@ -188,7 +188,25 @@ ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(void) {
 	return newConfig;
 }
 
+void GraphicsItemDesignerNavigation::setCurrentSelection(const std::list<std::string>& _itemNames) {
+	m_selectionChangeInProgress = true;
+	this->deselectAll();
+	this->blockSignals(true);
+	for (const std::string& itemName : _itemNames) {
+		auto it = m_itemsMap.find(QString::fromStdString(itemName));
+		if (it == m_itemsMap.end()) {
+			OT_LOG_E("Invalid item \"" + itemName + "\"");
+			continue;
+		}
+
+		it->second->getNavigationItem()->setSelected(true);
+	}
+	this->blockSignals(false);
+}
+
 void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
+	if (m_selectionChangeInProgress) return;
+
 	m_designer->getPropertyGrid()->clear();
 	if (m_currentPropertyHandler) {
 		m_currentPropertyHandler->unsetPropertyGrid();
@@ -196,6 +214,25 @@ void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
 	m_currentPropertyHandler = nullptr;
 
 	QList<QTreeWidgetItem*> sel = this->selectedItems();
+
+	// Update item selection
+	m_designer->getView()->setSelectionChangeInProgress(true);
+
+	for (QTreeWidgetItem* itm : sel) {
+		if (itm == m_rootItem) continue;
+
+		auto it = m_itemsMap.find(itm->text(0));
+		if (it == m_itemsMap.end()) {
+			OT_LOG_E("Unknown item \"" + itm->text(0).toStdString() + "\"");
+			continue;
+		}
+
+		it->second->getGraphicsItem()->setGraphicsItemSelected(true);
+	}
+
+	m_designer->getView()->setSelectionChangeInProgress(false);
+
+	// Update property grid
 	if (sel.size() != 1) return;
 
 	if (sel.front() == m_rootItem) {

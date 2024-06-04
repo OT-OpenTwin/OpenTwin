@@ -238,6 +238,9 @@ namespace ot {
 		void setHighlightItem(GraphicsHighlightItem* _item);
 		GraphicsHighlightItem* highlightItem(void) const { return m_highlightItem; };
 
+		void setGraphicsItemSelected(bool _selected);
+		bool getGraphicsItemSelected(void) const;
+
 	protected:
 		//! \brief Returns the configuration for the current item.
 		//! The configuration may be modified.
