@@ -22,6 +22,7 @@ ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 	: m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewStyle(ot::GraphicsConnectionCfg::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
 {
+	OTAssertNullptr(m_view);
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
 }
 
@@ -29,6 +30,7 @@ ot::GraphicsScene::GraphicsScene(const QRectF& _sceneRect, GraphicsView* _view)
 	: QGraphicsScene(_sceneRect), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewStyle(ot::GraphicsConnectionCfg::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
 {
+	OTAssertNullptr(m_view);
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
 }
 
@@ -39,6 +41,9 @@ ot::GraphicsScene::~GraphicsScene() {}
 // Connection handling
 
 void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
+	OTAssertNullptr(m_view);
+	if (m_view->getGraphicsViewFlags() & GraphicsView::IgnoreConnectionByUser) return;
+
 	if (m_connectionOrigin == nullptr) {
 		// Start new connection
 		m_connectionOrigin = _item;

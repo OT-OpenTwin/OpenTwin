@@ -7,11 +7,13 @@
 #include "WrappedSquareItem.h"
 
 // OpenTwin header
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 
 WrappedSquareItem::WrappedSquareItem() {
-
+	this->setOutline(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
+	this->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBackground));
 }
 
 WrappedSquareItem::~WrappedSquareItem() {
@@ -60,6 +62,7 @@ void WrappedSquareItem::fillPropertyGrid(void) {
 	PropertyGridCfg cfg;
 	PropertyGroup* generalGroup = new PropertyGroup("General");
 	generalGroup->addProperty(new PropertyString("Name", this->getGraphicsItem()->getGraphicsItemName()));
+	generalGroup->addProperty(new PropertyBool("Connectable", this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable));
 
 	PropertyGroup* geometryGroup = new PropertyGroup("Geometry");
 	geometryGroup->addProperty(new PropertyDouble("X", this->pos().x()));
@@ -87,6 +90,16 @@ void WrappedSquareItem::propertyChanged(ot::PropertyGridItem* _item, const ot::P
 		OTAssertNullptr(this->getNavigationItem());
 		this->setGraphicsItemName(input->getCurrentText().toStdString());
 		this->getNavigationItem()->setText(0, input->getCurrentText());
+	}
+	if (_item->getGroupName() == "General" && _itemData.propertyName() == "Connectable") {
+		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed { \"Group\": \"" + _item->getGroupName() + "\", \"");
+			return;
+		}
+
+		this->setGraphicsItemFlag(GraphicsItemCfg::ItemIsConnectable, input->isChecked());
+		this->update();
 	}
 	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "X") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());

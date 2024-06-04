@@ -19,7 +19,6 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTGui/StyleRefPainter2D.h"
 #include "OTWidgets/GraphicsScene.h"
 
 GraphicsItemDesignerDrawHandler::GraphicsItemDesignerDrawHandler(GraphicsItemDesignerView* _view)
@@ -39,7 +38,7 @@ void GraphicsItemDesignerDrawHandler::startDraw(DrawMode _mode) {
 
 	m_view->enablePickingMode();
 
-	m_overlay = new GraphicsItemDesignerInfoOverlay(this->modeString(), m_view);
+	m_overlay = new GraphicsItemDesignerInfoOverlay(this->modeString() + " (Press ESC to cancel)", m_view);
 
 	this->createPreviewItem();
 }
@@ -148,27 +147,36 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 	switch (m_mode)
 	{
 	case GraphicsItemDesignerDrawHandler::NoMode: return;
+
 	case GraphicsItemDesignerDrawHandler::Line:
-		m_previewItem = this->createLineItem();
+		m_previewItem = new WrappedLineItem;
 		break;
+
 	case GraphicsItemDesignerDrawHandler::Square:
-		m_previewItem = this->createSquareItem();
+		m_previewItem = new WrappedSquareItem;
 		break;
+
 	case GraphicsItemDesignerDrawHandler::Rect:
-		m_previewItem = this->createRectItem();
+		m_previewItem = new WrappedRectItem;
 		break;
+
 	case GraphicsItemDesignerDrawHandler::Circle:
-		m_previewItem = this->createCircleItem();
+		m_previewItem = new WrappedCircleItem;
 		break;
+
 	case GraphicsItemDesignerDrawHandler::Ellipse:
-		m_previewItem = this->createEllipseItem();
+		m_previewItem = new WrappedEllipseItem;
 		break;
+
 	case GraphicsItemDesignerDrawHandler::Triangle:
 		break;
+
 	case GraphicsItemDesignerDrawHandler::Polygon:
 		break;
+
 	case GraphicsItemDesignerDrawHandler::Shape:
 		break;
+
 	default:
 		OT_LOG_E("Unknown mode (" + std::to_string((int)m_mode) + ")");
 		break;
@@ -180,42 +188,4 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 		m_previewItem->setDesignerItemFlag(GraphicsItemDesignerItemBase::DesignerItemFlag::DesignerItemIgnoreEvents, true);
 		m_view->addItem(m_previewItem->getGraphicsItem());
 	}
-}
-
-GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createLineItem(void) {
-	WrappedLineItem* newItem = new WrappedLineItem;
-	newItem->setLineStyle(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
-	return newItem;
-}
-
-GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createSquareItem(void) {
-	WrappedSquareItem* newItem = new WrappedSquareItem;
-	newItem->setOutline(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
-	newItem->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBackground));
-
-	return newItem;
-}
-
-GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createRectItem(void) {
-	WrappedRectItem* newItem = new WrappedRectItem;
-	newItem->setOutline(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
-	newItem->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBackground));
-
-	return newItem;
-}
-
-GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createCircleItem(void) {
-	WrappedCircleItem* newItem = new WrappedCircleItem;
-	newItem->setOutline(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
-	newItem->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBackground));
-
-	return newItem;
-}
-
-GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::createEllipseItem(void) {
-	WrappedEllipseItem* newItem = new WrappedEllipseItem;
-	newItem->setOutline(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
-	newItem->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBackground));
-
-	return newItem;
 }

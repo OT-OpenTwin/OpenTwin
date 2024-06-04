@@ -8,9 +8,12 @@
 
 // OpenTwin header
 #include "OTGui/FillPainter2D.h"
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTWidgets/GraphicsScene.h"
 
-WrappedLineItem::WrappedLineItem() {}
+WrappedLineItem::WrappedLineItem() {
+	this->setLineStyle(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
+}
 
 WrappedLineItem::~WrappedLineItem() {
 

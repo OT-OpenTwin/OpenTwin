@@ -33,8 +33,9 @@ namespace ot {
 		Q_OBJECT
 	public:
 		enum GraphicsViewFlag {
-			NoViewFlags          = 0x00, //! \brief No flags.
-			ViewManagesSceneRect = 0x01  //! \brief If set the view manages the scene rect when zooming or panning.
+			NoViewFlags            = 0x00, //! \brief No flags.
+			ViewManagesSceneRect   = 0x01, //! \brief If set the view manages the scene rect when zooming or panning.
+			IgnoreConnectionByUser = 0x02  //! \brief If set the user can not create connections.
 		};
 		typedef Flags<GraphicsViewFlag> GraphicsViewFlags;
 

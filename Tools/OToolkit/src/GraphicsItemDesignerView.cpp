@@ -19,6 +19,7 @@ GraphicsItemDesignerView::GraphicsItemDesignerView()
 {
 	m_scene = new GraphicsItemDesignerScene(this);
 	this->setGraphicsScene(m_scene);
+	this->setGraphicsViewFlag(ot::GraphicsView::IgnoreConnectionByUser);
 	
 	m_infoOverlay = new GraphicsItemDesignerViewStatusOverlay(this);
 }

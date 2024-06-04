@@ -53,11 +53,6 @@ private:
 	QPointF constainPosition(const QPointF& _pos) const;
 	QString modeString(void);
 	void createPreviewItem(void);
-	GraphicsItemDesignerItemBase* createLineItem(void);
-	GraphicsItemDesignerItemBase* createSquareItem(void);
-	GraphicsItemDesignerItemBase* createRectItem(void);
-	GraphicsItemDesignerItemBase* createCircleItem(void);
-	GraphicsItemDesignerItemBase* createEllipseItem(void);
 
 	ot::UID m_currentUid;
 
