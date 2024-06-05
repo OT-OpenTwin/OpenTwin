@@ -30,12 +30,14 @@ Q_SIGNALS:
 	void modeRequested(GraphicsItemDesignerDrawHandler::DrawMode _mode);
 	void clearRequested(void);
 	void exportRequested(void);
+	void makeTransparentRequested(void);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 private Q_SLOTS:
 	void slotClear(void);
 	void slotExport(void);
+
 	void slotLine(void);
 	void slotSquare(void);
 	void slotRect(void);
@@ -44,6 +46,8 @@ private Q_SLOTS:
 	void slotTriangle(void);
 	void slotPolygon(void);
 	void slotShape(void);
+
+	void slotMakeTransparent(void);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -76,6 +76,7 @@ private Q_SLOTS:
 	void slotExportRequested(void);
 	void slotDrawFinished(void);
 	void slotDrawCancelled(void);
+	void slotMakeTransparentRequested(void);
 
 private:
 	QString m_lastExportFile;

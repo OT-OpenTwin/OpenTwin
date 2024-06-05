@@ -20,6 +20,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Clear.png"));
 		btn->setText("Clear");
+		btn->setShortcut(QKeySequence("Ctrl+Del"));
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotClear);
 		this->addAction(btn);
 	}
@@ -27,14 +28,18 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Export.png"));
 		btn->setText("Export");
+		btn->setShortcut(QKeySequence("Ctrl+S"));
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotExport);
 		this->addAction(btn);
 	}
+
 	this->addSeparator();
+
 	{
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Line.png"));
 		btn->setText("Line");
+		btn->setShortcut(QKeySequence("Ctrl+1"));
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotLine);
 		this->addAction(btn);
 	}
@@ -42,6 +47,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Square.png"));
 		btn->setText("Square");
+		btn->setShortcut(QKeySequence("Ctrl+2"));
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotSquare);
 		this->addAction(btn);
 	}
@@ -49,6 +55,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Rect.png"));
 		btn->setText("Rectangle");
+		btn->setShortcut(QKeySequence("Ctrl+3"));
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotRect);
 		this->addAction(btn);
 	}
@@ -56,6 +63,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Circle.png"));
 		btn->setText("Circle");
+		btn->setShortcut(QKeySequence("Ctrl+4"));
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotCircle);
 		this->addAction(btn);
 	}
@@ -63,6 +71,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Ellipse.png"));
 		btn->setText("Ellipse");
+		btn->setShortcut(QKeySequence("Ctrl+5"));
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotEllipse);
 		this->addAction(btn);
 	}
@@ -70,6 +79,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Triangle.png"));
 		btn->setText("Triangle");
+		btn->setShortcut(QKeySequence("Ctrl+6"));
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotTriangle);
 		this->addAction(btn);
 	}
@@ -77,6 +87,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Polygon.png"));
 		btn->setText("Polygon");
+		btn->setShortcut(QKeySequence("Ctrl+7"));
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotPolygon);
 		this->addAction(btn);
 	}
@@ -84,7 +95,20 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Shape.png"));
 		btn->setText("Shape");
+		btn->setShortcut(QKeySequence("Ctrl+8"));
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotShape);
+		this->addAction(btn);
+	}
+
+	this->addSeparator();
+
+	{
+		QAction* btn = new QAction;
+		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/MakeTransparent.png"));
+		btn->setText("Make Transparent");
+		btn->setShortcut(QKeySequence("Ctrl+T"));
+		btn->setToolTip("Will make the currently selected items transparent");
+		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotMakeTransparent);
 		this->addAction(btn);
 	}
 }
@@ -135,6 +159,10 @@ void GraphicsItemDesignerToolBar::slotPolygon(void) {
 
 void GraphicsItemDesignerToolBar::slotShape(void) {
 	emit modeRequested(GraphicsItemDesignerDrawHandler::Shape);
+}
+
+void GraphicsItemDesignerToolBar::slotMakeTransparent(void) {
+	Q_EMIT makeTransparentRequested();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

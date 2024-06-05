@@ -46,6 +46,10 @@ public:
 
 	void setCurrentSelection(const std::list<std::string>& _itemNames);
 
+	std::list<GraphicsItemDesignerItemBase*> getCurrentDesignerSelection(void) const;
+
+	void updatePropertyGrid(void);
+
 private Q_SLOTS:
 	void slotSelectionChanged(void);
 

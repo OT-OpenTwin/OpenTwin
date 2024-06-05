@@ -23,6 +23,8 @@ WrappedSquareItem::~WrappedSquareItem() {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// Public base class methods
+
 ot::TreeWidgetItemInfo WrappedSquareItem::createNavigationInformation(void) {
 	ot::TreeWidgetItemInfo info;
 	info.setText(QString::fromStdString(this->getGraphicsItemName()));
@@ -30,6 +32,15 @@ ot::TreeWidgetItemInfo WrappedSquareItem::createNavigationInformation(void) {
 
 	return info;
 }
+
+void WrappedSquareItem::makeItemTransparent(void) {
+	this->setOutline(ot::OutlineF(0., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent)));
+	this->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent));
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected base class methods
 
 void WrappedSquareItem::controlPointsChanged(void) {
 	if (this->getControlPoints().size() != 2) return;

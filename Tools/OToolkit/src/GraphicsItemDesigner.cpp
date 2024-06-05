@@ -8,6 +8,7 @@
 #include "GraphicsItemDesignerView.h"
 #include "GraphicsItemDesignerScene.h"
 #include "GraphicsItemDesignerToolBar.h"
+#include "GraphicsItemDesignerItemBase.h"
 #include "GraphicsItemDesignerNavigation.h"
 #include "GraphicsItemDesignerInfoOverlay.h"
 #include "GraphicsItemDesignerDrawHandler.h"
@@ -61,6 +62,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::modeRequested, this, &GraphicsItemDesigner::slotDrawRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::clearRequested, this, &GraphicsItemDesigner::slotClearRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::exportRequested, this, &GraphicsItemDesigner::slotExportRequested);
+	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::makeTransparentRequested, this, &GraphicsItemDesigner::slotMakeTransparentRequested);
 	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCompleted, this, &GraphicsItemDesigner::slotDrawFinished);
 	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCancelled, this, &GraphicsItemDesigner::slotDrawCancelled);
 
@@ -182,4 +184,13 @@ void GraphicsItemDesigner::slotDrawFinished(void) {
 
 void GraphicsItemDesigner::slotDrawCancelled(void) {
 	m_toolBar->setEnabled(true);
+}
+
+void GraphicsItemDesigner::slotMakeTransparentRequested(void) {
+	std::list<GraphicsItemDesignerItemBase*> selectedItems = m_navigation->getCurrentDesignerSelection();
+	for (GraphicsItemDesignerItemBase* itm : selectedItems) {
+		itm->makeItemTransparent();
+	}
+
+	m_navigation->updatePropertyGrid();
 }

@@ -81,6 +81,9 @@ public:
 	//! \brief Creates the navigation information for this item and its childs.
 	virtual ot::TreeWidgetItemInfo createNavigationInformation(void) = 0;
 
+	//! \brief Will make the item transparent.
+	virtual void makeItemTransparent(void) {};
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Protected base class methods

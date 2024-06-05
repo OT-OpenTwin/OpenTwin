@@ -206,6 +206,26 @@ void GraphicsItemDesignerNavigation::setCurrentSelection(const std::list<std::st
 	this->slotSelectionChanged();
 }
 
+std::list<GraphicsItemDesignerItemBase*> GraphicsItemDesignerNavigation::getCurrentDesignerSelection(void) const {
+	std::list<GraphicsItemDesignerItemBase*> ret;
+	for (QTreeWidgetItem* itm : this->selectedItems()) {
+		if (itm == m_rootItem) continue;
+		auto it = m_itemsMap.find(itm->text(0));
+		if (it == m_itemsMap.end()) {
+			OT_LOG_E("Unknown item \"" + itm->text(0).toStdString() + "\"");
+			continue;
+		}
+
+		ret.push_back(it->second);
+	}
+
+	return ret;
+}
+
+void GraphicsItemDesignerNavigation::updatePropertyGrid(void) {
+	this->slotSelectionChanged();
+}
+
 void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
 	if (m_selectionChangeInProgress) return;
 

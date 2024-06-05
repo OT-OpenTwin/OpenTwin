@@ -22,6 +22,8 @@ WrappedCircleItem::~WrappedCircleItem() {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// Public base class methods
+
 ot::TreeWidgetItemInfo WrappedCircleItem::createNavigationInformation(void) {
 	ot::TreeWidgetItemInfo info;
 	info.setText(QString::fromStdString(this->getGraphicsItemName()));
@@ -29,6 +31,15 @@ ot::TreeWidgetItemInfo WrappedCircleItem::createNavigationInformation(void) {
 
 	return info;
 }
+
+void WrappedCircleItem::makeItemTransparent(void) {
+	this->setOutline(ot::OutlineF(0., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent)));
+	this->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent));
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected base class methods
 
 void WrappedCircleItem::controlPointsChanged(void) {
 	if (this->getControlPoints().size() != 2) return;
