@@ -136,6 +136,8 @@ namespace ot {
 
 	//! \brief Contains default painters set in a color style.
 	enum class ColorStyleValueEntry {
+		Transparent = 0,
+
 		WidgetBackground,
 		WidgetAlternateBackground,
 		WidgetForeground,

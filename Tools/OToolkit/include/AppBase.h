@@ -76,6 +76,10 @@ public:
 	void setApplicationInstance(QApplication* _app) { m_app = _app; };
 	QApplication* applicationInstance(void) { return m_app; };
 
+	void setUpdateTransparentColorStyleValueEnabled(bool _enabled);
+	bool getUpdateTransparentColorStyleValueEnabled(void) const { return m_replaceTransparentColorStyleValue; };
+	void updateTransparentColorStyleValue(void);
+
 public Q_SLOTS:
 	void slotProcessMessage(const QString& _json);
 
@@ -97,7 +101,7 @@ private Q_SLOTS:
 
 private:
 	AppBase(QApplication* _app = (QApplication*)nullptr);
-	
+
 	Qt::HANDLE				m_mainThread;
 
 	QString					m_url;
@@ -112,4 +116,6 @@ private:
 	QShortcut* m_recenterShortcut;
 
 	std::mutex m_logMutex;
+
+	bool m_replaceTransparentColorStyleValue;
 };

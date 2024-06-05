@@ -113,12 +113,14 @@ void mainApplicationThread()
 			ot::GlobalColorStyle::instance().setCurrentStyle(ot::toString(ot::ColorStyleName::BrightStyle));
 		}
 
-		// Create application instance, the application instance will initialize the toolkit api
+		// Create application instance, the application instance will initialize the toolkit api.
 		ot::LogDispatcher::instance().addReceiver(AppBase::instance());
-
+		
 		// Initialize OToolkit
 		AppBase::instance()->setApplicationInstance(&application);
 		AppBase::instance()->setUrl(QString::fromStdString(otoolkit::intern::g_serviceURL));
+
+		AppBase::instance()->setUpdateTransparentColorStyleValueEnabled(true);
 
 		otoolkit::intern::g_starting = false;
 

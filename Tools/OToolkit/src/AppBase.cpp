@@ -24,6 +24,9 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
+#include "OTGui/FillPainter2D.h"
+#include "OTGui/StyleRefPainter2D.h"
+#include "OTGui/CheckerboardPainter2D.h"
 #include "OTCommunication/actionTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/WidgetViewManager.h"
@@ -183,6 +186,33 @@ void AppBase::closeEvent(QCloseEvent * _event) {
 void AppBase::setUrl(const QString& _url) {
 	m_url = _url;
 	OT_LOG_D("OToolkit url set to: " + m_url.toStdString());
+}
+
+void AppBase::setUpdateTransparentColorStyleValueEnabled(bool _enabled) {
+	m_replaceTransparentColorStyleValue = _enabled;
+	this->updateTransparentColorStyleValue();
+}
+
+void AppBase::updateTransparentColorStyleValue(void) {
+	ot::ColorStyle newStyle = ot::GlobalColorStyle::instance().getCurrentStyle();
+	ot::ColorStyleValue newValue;
+	newValue.setEntryKey(ot::ColorStyleValueEntry::Transparent);
+
+	if (m_replaceTransparentColorStyleValue) {
+		newValue.setPainter(
+			new ot::CheckerboardPainter2D(
+				new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::WidgetAlternateBackground),
+				new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::WidgetBackground)
+			)
+		);
+	}
+	else {
+		newValue.setColor(ot::Transparent);
+	}
+	newStyle.addValue(newValue, true);
+	ot::GlobalColorStyle::instance().blockSignals(true);
+	ot::GlobalColorStyle::instance().addStyle(newStyle, true);
+	ot::GlobalColorStyle::instance().blockSignals(false);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -382,11 +412,14 @@ void AppBase::slotFinalizeInit(void) {
 }
 
 void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
+	this->updateTransparentColorStyleValue();
 	//this->hide();
 	//QMetaObject::invokeMethod(this, &AppBase::show, Qt::QueuedConnection);
 }
 
-AppBase::AppBase(QApplication* _app) : m_mainThread(QThread::currentThreadId()), m_app(_app), m_logger(nullptr) {
+AppBase::AppBase(QApplication* _app) 
+	: m_mainThread(QThread::currentThreadId()), m_app(_app), m_logger(nullptr), m_replaceTransparentColorStyleValue(true)
+{
 	this->deleteLogNotifierLater(true);
 
 	// Initialize Toolkit API

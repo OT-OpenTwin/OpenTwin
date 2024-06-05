@@ -267,6 +267,9 @@
     <ClInclude Include="include\OTGui\GraphicsItemFileCfg.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\CheckerboardPainter2D.h">
+      <Filter>Header Files\Painter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -466,6 +469,9 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsItemFileCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CheckerboardPainter2D.cpp">
+      <Filter>Source Files\Painter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

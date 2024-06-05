@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\Border.h" />
+    <ClInclude Include="include\OTGui\CheckerboardPainter2D.h" />
     <ClInclude Include="include\OTGui\ColorStyleTypes.h" />
     <ClInclude Include="include\OTGui\GraphicsGroupItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsItemCfgFactory.h" />
@@ -92,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Border.cpp" />
+    <ClCompile Include="src\CheckerboardPainter2D.cpp" />
     <ClCompile Include="src\ColorStyleTypes.cpp" />
     <ClCompile Include="src\GraphicsGroupItemCfg.cpp" />
     <ClCompile Include="src\GraphicsItemCfgFactory.cpp" />

@@ -202,6 +202,8 @@ void GraphicsItemDesignerNavigation::setCurrentSelection(const std::list<std::st
 		it->second->getNavigationItem()->setSelected(true);
 	}
 	this->blockSignals(false);
+	m_selectionChangeInProgress = false;
+	this->slotSelectionChanged();
 }
 
 void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {

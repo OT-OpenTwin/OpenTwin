@@ -291,6 +291,8 @@ ot::ColorStyleFileEntry ot::stringToColorStyleFileEntry(const std::string& _colo
 std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	switch (_colorStyleValueEntry)
 	{
+	case ot::ColorStyleValueEntry::Transparent: return "Transparent";
+
 	case ot::ColorStyleValueEntry::WidgetBackground: return "Widget Background";
 	case ot::ColorStyleValueEntry::WidgetAlternateBackground: return "Widget Alternate Background";
 	case ot::ColorStyleValueEntry::WidgetForeground: return "Widget Foreground";
@@ -347,7 +349,8 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 }
 
 ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _colorStyleValueEntry) {
-	if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetBackground)) return ColorStyleValueEntry::WidgetBackground;
+	if (_colorStyleValueEntry == toString(ColorStyleValueEntry::Transparent)) return ColorStyleValueEntry::Transparent;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetBackground)) return ColorStyleValueEntry::WidgetBackground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetAlternateBackground)) return ColorStyleValueEntry::WidgetAlternateBackground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetForeground)) return ColorStyleValueEntry::WidgetForeground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::WidgetDisabledBackground)) return ColorStyleValueEntry::WidgetDisabledBackground;

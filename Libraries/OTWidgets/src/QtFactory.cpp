@@ -8,10 +8,15 @@
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/StyleRefPainter2D.h"
+#include "OTGui/CheckerboardPainter2D.h"
 #include "OTGui/LinearGradientPainter2D.h"
 #include "OTGui/RadialGradientPainter2D.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GlobalColorStyle.h"
+
+// Qt header
+#include <QtGui/qpixmap.h>
+#include <QtGui/qpainter.h>
 
 Qt::Alignment ot::QtFactory::toQAlignment(ot::Alignment _alignment) {
 	switch (_alignment)
@@ -52,7 +57,7 @@ QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
 	if (_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) {
 		const FillPainter2D* painter = dynamic_cast<const FillPainter2D*>(_painter);
 		OTAssertNullptr(painter);
-		return QBrush(QColor(QtFactory::toQColor(painter->color())));
+		return QBrush(QtFactory::toQColor(painter->color()));
 	}
 	else if (_painter->getFactoryKey() == OT_FactoryKey_LinearGradientPainter2D) {
 		const LinearGradientPainter2D* painter = dynamic_cast<const LinearGradientPainter2D*>(_painter);
@@ -104,6 +109,32 @@ QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
 			return cs.getValue(painter->referenceKey()).brush();
 		}
 	}
+    else if (_painter->getFactoryKey() == OT_FactoryKey_CheckerboardPainter2D) {
+        const CheckerboardPainter2D* painter = dynamic_cast<const CheckerboardPainter2D*>(_painter);
+        OTAssertNullptr(painter);
+        OTAssert(painter->getCellSize().width() > 0, "Invalid cell width");
+        OTAssert(painter->getCellSize().height() > 0, "Invalid cell height");
+
+        QBrush primaryBrush = QtFactory::toQBrush(painter->getPrimaryPainter());
+        QBrush secondaryBrush = QtFactory::toQBrush(painter->getSecondaryPainter());
+
+        QPixmap checkerboard(painter->getCellSize().width() * 2, painter->getCellSize().height() * 2);
+        checkerboard.fill(Qt::transparent);
+
+        QPainter pixmapPainter(&checkerboard);
+        
+        pixmapPainter.setBrush(primaryBrush);
+        pixmapPainter.setPen(Qt::NoPen);
+        pixmapPainter.drawRect(0, 0, painter->getCellSize().width(), painter->getCellSize().height()); // TopLeft
+        pixmapPainter.drawRect(painter->getCellSize().width(), painter->getCellSize().height(), painter->getCellSize().width(), painter->getCellSize().height()); // BottomRight
+
+        pixmapPainter.setBrush(secondaryBrush);
+        pixmapPainter.drawRect(painter->getCellSize().width(), 0, painter->getCellSize().width(), painter->getCellSize().height()); // TopRight
+        pixmapPainter.drawRect(0, painter->getCellSize().height(), painter->getCellSize().width(), painter->getCellSize().height()); // BottomLeft
+        pixmapPainter.end();
+
+        return QBrush(checkerboard);
+    }
 	else {
 		OT_LOG_EAS("Unknown Painter2D provided \"" + _painter->getFactoryKey() + "\"");
 		return QBrush();
