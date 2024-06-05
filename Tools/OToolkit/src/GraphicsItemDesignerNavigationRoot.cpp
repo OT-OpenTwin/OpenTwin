@@ -22,12 +22,15 @@ void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
 	PropertyGridCfg cfg;
 	PropertyGroup* editorGroup = new PropertyGroup("Editor");
 	editorGroup->addProperty(new PropertyBool("Show grid", (m_designer->getView()->getDesignerScene()->getGridFlags() | Grid::NoGridLineMask) != Grid::NoGridLineMask));
+	
 	PropertyInt* gridStepSizeProp = new PropertyInt("Grid step size", std::max(m_designer->getView()->getDesignerScene()->getGridStep().x(), 2), 2, 1000);
 	gridStepSizeProp->setPropertyTip("The distance between two grid lines.");
 	editorGroup->addProperty(gridStepSizeProp);
+	
 	PropertyInt* wideStepProp = new PropertyInt("Wide step counter", std::max(m_designer->getView()->getDesignerScene()->getWideGridLineCounter().x(), 1), 1, 1000);
 	wideStepProp->setPropertyTip("Every 'x' gridline will be a wide line (e.g. every 10th line).")	;
 	editorGroup->addProperty(wideStepProp);
+	
 	PropertyStringList* gridSnapProp = new PropertyStringList(
 		"Grid snap mode", 
 		Grid::toString(m_designer->getView()->getDesignerScene()->getGridSnapMode()), 

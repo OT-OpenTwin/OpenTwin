@@ -162,6 +162,15 @@
     <ClCompile Include="src\ToolViewManager.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsItemDesignerImageExportDialog.cpp">
+      <Filter>Source Files\GraphicsItemDesigner</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsItemDesignerExportConfig.cpp">
+      <Filter>Source Files\GraphicsItemDesigner</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsItemDesignerImageExportConfig.cpp">
+      <Filter>Source Files\GraphicsItemDesigner</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -204,6 +213,12 @@
       <Filter>Header Files\GraphicsItemDesignerItems</Filter>
     </ClInclude>
     <ClInclude Include="include\GraphicsItemDesignerScene.h">
+      <Filter>Header Files\GraphicsItemDesigner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsItemDesignerImageExportConfig.h">
+      <Filter>Header Files\GraphicsItemDesigner</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsItemDesignerExportConfig.h">
       <Filter>Header Files\GraphicsItemDesigner</Filter>
     </ClInclude>
   </ItemGroup>
@@ -264,6 +279,9 @@
     </QtMoc>
     <QtMoc Include="include\ToolViewManager.h">
       <Filter>Header Files\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\GraphicsItemDesignerImageExportDialog.h">
+      <Filter>Header Files\GraphicsItemDesigner</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

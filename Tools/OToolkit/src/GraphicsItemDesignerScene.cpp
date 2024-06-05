@@ -15,6 +15,7 @@
 #include "OTWidgets/GraphicsEllipseItem.h"
 
 // Qt header
+#include <QtGui/qimage.h>
 #include <QtWidgets/qgraphicssceneevent.h>
 
 GraphicsItemDesignerScene::GraphicsItemDesignerScene(GraphicsItemDesignerView* _view)
@@ -47,6 +48,35 @@ void GraphicsItemDesignerScene::disablePickingMode(void) {
 void GraphicsItemDesignerScene::setItemSize(const QSizeF& _size) {
 	m_itemSize = _size;
 	m_view->setSceneRect(QRect(0., 0., m_itemSize.width(), m_itemSize.height()));
+}
+
+bool GraphicsItemDesignerScene::exportAsImage(const QString& _filePath) {
+	QRectF oldSceneRect = m_view->sceneRect();
+
+	QRectF itmRect = this->itemsBoundingRect();
+	if (itmRect.width() == 0 || itmRect.height() == 0) {
+		OT_LOG_W("Nothing to export");
+		return false;
+	}
+
+	m_view->setSceneRect(itmRect);
+
+	QImage image(itmRect.size().toSize(), QImage::Format_ARGB32);
+	image.fill(Qt::transparent);
+
+	QPainter painter(&image);
+	this->render(&painter, itmRect, itmRect);
+
+	m_view->setSceneRect(oldSceneRect);
+
+	if (!image.save(_filePath)) {
+		OT_LOG_E("Export failed");
+		return false;
+	}
+	else {
+		OT_LOG_I("Image exported to \"" + _filePath.toStdString() + "\"");
+		return true;
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

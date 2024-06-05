@@ -62,6 +62,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::modeRequested, this, &GraphicsItemDesigner::slotDrawRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::clearRequested, this, &GraphicsItemDesigner::slotClearRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::exportRequested, this, &GraphicsItemDesigner::slotExportRequested);
+	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::exportAsImageRequested, this, &GraphicsItemDesigner::slotExportAsImageRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::makeTransparentRequested, this, &GraphicsItemDesigner::slotMakeTransparentRequested);
 	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCompleted, this, &GraphicsItemDesigner::slotDrawFinished);
 	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCancelled, this, &GraphicsItemDesigner::slotDrawCancelled);
@@ -93,6 +94,7 @@ void GraphicsItemDesigner::restoreToolSettings(QSettings& _settings) {
 
 	// Export
 	m_lastExportFile = _settings.value("GID.LastExportFile", QString()).toString();
+	m_lastExportImageFile = _settings.value("GID.LastExportImageFile", QString()).toString();
 	m_exportConfigFlags.setFlag(GraphicsItemDesigner::AutoAlign, _settings.value("GID.ExportAutoAlign", true).toBool());
 	m_exportConfigFlags.setFlag(GraphicsItemDesigner::MoveableItem, _settings.value("GID.ExportMoveable", true).toBool());
 	m_exportConfigFlags.setFlag(GraphicsItemDesigner::ItemGridSnap, _settings.value("GID.ExportGridSnap", true).toBool());
@@ -111,6 +113,7 @@ bool GraphicsItemDesigner::prepareToolShutdown(QSettings& _settings) {
 
 	// Export
 	_settings.setValue("GID.LastExportFile", m_lastExportFile);
+	_settings.setValue("GID.LastExportImageFile", m_lastExportImageFile);
 	_settings.setValue("GID.ExportAutoAlign", (bool)(m_exportConfigFlags & GraphicsItemDesigner::AutoAlign));
 	_settings.setValue("GID.ExportMoveable", (bool)(m_exportConfigFlags & GraphicsItemDesigner::MoveableItem));
 	_settings.setValue("GID.ExportGridSnap", (bool)(m_exportConfigFlags & GraphicsItemDesigner::ItemGridSnap));
@@ -171,6 +174,35 @@ void GraphicsItemDesigner::slotExportRequested(void) {
 	file.close();
 
 	m_lastExportFile = fileName;
+	OT_LOG_D("Graphics Item exported \"" + fileName.toStdString() + "\"");
+}
+
+void GraphicsItemDesigner::slotExportAsImageRequested(void) {
+	// Check initial filename
+	QStringList lst = m_lastExportImageFile.split('/', Qt::SkipEmptyParts);
+	if (!lst.isEmpty()) {
+		lst.pop_back();
+	}
+
+	QString fileName;
+	for (const QString& str : lst) {
+		fileName.append(str + '/');
+	}
+	fileName.append(m_navigation->getDesignerRootItem()->text(0));
+	fileName.append(".png");
+
+	// Select filename
+	fileName = QFileDialog::getSaveFileName(nullptr, "Export Graphics Item", fileName, "Image (*.png)");
+	if (fileName.isEmpty()) {
+		return;
+	}
+
+	// Export config
+	if (!m_view->getDesignerScene()->exportAsImage(fileName)) {
+		return;
+	}
+
+	m_lastExportImageFile = fileName;
 	OT_LOG_D("Graphics Item exported \"" + fileName.toStdString() + "\"");
 }
 

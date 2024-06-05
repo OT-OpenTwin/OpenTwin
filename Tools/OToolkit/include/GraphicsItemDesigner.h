@@ -74,12 +74,14 @@ private Q_SLOTS:
 	void slotDrawRequested(GraphicsItemDesignerDrawHandler::DrawMode _mode);
 	void slotClearRequested(void);
 	void slotExportRequested(void);
+	void slotExportAsImageRequested(void);
 	void slotDrawFinished(void);
 	void slotDrawCancelled(void);
 	void slotMakeTransparentRequested(void);
 
 private:
 	QString m_lastExportFile;
+	QString m_lastExportImageFile;
 
 	GraphicsItemDesignerView* m_view;
 	ot::PropertyGrid* m_props;
