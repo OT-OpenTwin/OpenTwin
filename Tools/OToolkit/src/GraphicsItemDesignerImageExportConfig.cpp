@@ -21,5 +21,7 @@ GraphicsItemDesignerImageExportConfig::~GraphicsItemDesignerImageExportConfig() 
 GraphicsItemDesignerImageExportConfig& GraphicsItemDesignerImageExportConfig::operator = (const GraphicsItemDesignerImageExportConfig& _other) {
 	if (this == &_other) return *this;
 
+
+
 	return *this;
 }

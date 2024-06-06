@@ -13,6 +13,7 @@
 #include "GraphicsItemDesignerInfoOverlay.h"
 #include "GraphicsItemDesignerDrawHandler.h"
 #include "GraphicsItemDesignerNavigationRoot.h"
+#include "GraphicsItemDesignerExportConfig.h"
 
 // OToolkit API header
 #include "OToolkitAPI/OToolkitAPI.h"
@@ -31,7 +32,7 @@
 
 GraphicsItemDesigner::GraphicsItemDesigner() 
 	: m_view(nullptr), m_props(nullptr), m_toolBar(nullptr), 
-	m_navigation(nullptr), m_drawHandler(nullptr), m_exportConfigFlags(AutoAlign | MoveableItem | ItemGridSnap)
+	m_navigation(nullptr), m_drawHandler(nullptr)
 {
 
 }
@@ -93,11 +94,12 @@ void GraphicsItemDesigner::restoreToolSettings(QSettings& _settings) {
 	);
 
 	// Export
-	m_lastExportFile = _settings.value("GID.LastExportFile", QString()).toString();
+	m_exportConfig.setFileName(_settings.value("GID.LastExportFile", QString()).toString());
+	m_exportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::AutoAlign, _settings.value("GID.ExportAutoAlign", true).toBool());
+	m_exportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::MoveableItem, _settings.value("GID.ExportMoveable", true).toBool());
+	m_exportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::ItemGridSnap, _settings.value("GID.ExportGridSnap", true).toBool());
+
 	m_lastExportImageFile = _settings.value("GID.LastExportImageFile", QString()).toString();
-	m_exportConfigFlags.setFlag(GraphicsItemDesigner::AutoAlign, _settings.value("GID.ExportAutoAlign", true).toBool());
-	m_exportConfigFlags.setFlag(GraphicsItemDesigner::MoveableItem, _settings.value("GID.ExportMoveable", true).toBool());
-	m_exportConfigFlags.setFlag(GraphicsItemDesigner::ItemGridSnap, _settings.value("GID.ExportGridSnap", true).toBool());
 }
 
 bool GraphicsItemDesigner::prepareToolShutdown(QSettings& _settings) {
@@ -112,11 +114,12 @@ bool GraphicsItemDesigner::prepareToolShutdown(QSettings& _settings) {
 	_settings.setValue("GID.GridSnap", QString::fromStdString(ot::Grid::toString(m_view->getDesignerScene()->getGridSnapMode())));
 
 	// Export
-	_settings.setValue("GID.LastExportFile", m_lastExportFile);
+	_settings.setValue("GID.LastExportFile", m_exportConfig.getFileName());
+	_settings.setValue("GID.ExportAutoAlign", (bool)(m_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::AutoAlign));
+	_settings.setValue("GID.ExportMoveable", (bool)(m_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::MoveableItem));
+	_settings.setValue("GID.ExportGridSnap", (bool)(m_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::ItemGridSnap));
+
 	_settings.setValue("GID.LastExportImageFile", m_lastExportImageFile);
-	_settings.setValue("GID.ExportAutoAlign", (bool)(m_exportConfigFlags & GraphicsItemDesigner::AutoAlign));
-	_settings.setValue("GID.ExportMoveable", (bool)(m_exportConfigFlags & GraphicsItemDesigner::MoveableItem));
-	_settings.setValue("GID.ExportGridSnap", (bool)(m_exportConfigFlags & GraphicsItemDesigner::ItemGridSnap));
 
 	return true;
 }
@@ -142,7 +145,7 @@ void GraphicsItemDesigner::slotExportRequested(void) {
 	}
 
 	// Check initial filename
-	QStringList lst = m_lastExportFile.split('/', Qt::SkipEmptyParts);
+	QStringList lst = m_exportConfig.getFileName().split('/', Qt::SkipEmptyParts);
 	if (!lst.isEmpty()) {
 		lst.pop_back();
 	}
@@ -173,7 +176,7 @@ void GraphicsItemDesigner::slotExportRequested(void) {
 	file.write(QByteArray::fromStdString(configDoc.toJson()));
 	file.close();
 
-	m_lastExportFile = fileName;
+	m_exportConfig.setFileName(fileName);
 	OT_LOG_D("Graphics Item exported \"" + fileName.toStdString() + "\"");
 }
 

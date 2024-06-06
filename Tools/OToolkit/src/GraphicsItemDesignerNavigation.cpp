@@ -131,10 +131,10 @@ ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(void) {
 		ot::GraphicsGroupItemCfg* rootGroup = new ot::GraphicsGroupItemCfg;
 		rootGroup->setName(m_rootItem->text(0).toStdString());
 		rootGroup->setGraphicsItemFlags(GraphicsItemCfg::ItemSnapsToGrid | GraphicsItemCfg::ItemForwardsTooltip);
-		if (m_designer->getExportConfigFlags() & GraphicsItemDesigner::MoveableItem) {
+		if (m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::MoveableItem) {
 			rootGroup->setGraphicsItemFlag(GraphicsItemCfg::ItemIsMoveable);
 		}
-		if (m_designer->getExportConfigFlags() & GraphicsItemDesigner::ItemGridSnap) {
+		if (m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::ItemGridSnap) {
 			rootGroup->setGraphicsItemFlag(GraphicsItemCfg::ItemSnapsToGrid);
 		}
 
@@ -153,7 +153,7 @@ ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(void) {
 		}
 
 		// Check for auto align
-		if (m_designer->getExportConfigFlags() & GraphicsItemDesigner::AutoAlign) {
+		if (m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::AutoAlign) {
 			RectD newRect(Point2DD(DBL_MAX, DBL_MAX),Point2DD (DBL_MIN, DBL_MIN));
 			for (GraphicsItemCfg* cfg : rootGroup->getItems()) {
 				if (cfg->getPosition().x() < newRect.getLeft()) newRect.setLeft(cfg->getPosition().x());

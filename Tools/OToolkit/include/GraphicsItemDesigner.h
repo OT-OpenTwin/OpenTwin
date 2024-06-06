@@ -7,6 +7,7 @@
 
 // OToolkit header
 #include "GraphicsItemDesignerDrawHandler.h"
+#include "GraphicsItemDesignerExportConfig.h"
 
 // ToolkitAPI header
 #include "OToolkitAPI/Tool.h"
@@ -27,14 +28,6 @@ namespace ot { class PropertyGrid; };
 class GraphicsItemDesigner : public QObject, public otoolkit::Tool {
 	Q_OBJECT
 public:
-	enum ExportConfigFlag {
-		NoFlags      = 0x00,
-		AutoAlign    = 0x01,
-		MoveableItem = 0x02,
-		ItemGridSnap = 0x04
-	};
-	typedef ot::Flags<ExportConfigFlag> ExportConfigFlags;
-
 	GraphicsItemDesigner();
 	virtual ~GraphicsItemDesigner() {};
 
@@ -57,14 +50,13 @@ public:
 
 	// Setter / Getter
 
-	void setExportConfigFlag(ExportConfigFlag _flag, bool _active = true) { m_exportConfigFlags.setFlag(_flag, _active); };
-	void setExportConfigFlags(const ExportConfigFlags& _flags) { m_exportConfigFlags = _flags; };
-	const ExportConfigFlags& getExportConfigFlags(void) const { return m_exportConfigFlags; };
-
 	GraphicsItemDesignerView* getView(void) const { return m_view; };
 	ot::PropertyGrid* getPropertyGrid(void) const { return m_props; };
 	GraphicsItemDesignerToolBar* getToolBar(void) const { return m_toolBar; };
 	GraphicsItemDesignerNavigation* getNavigation(void) const { return m_navigation; };
+
+	void setExportConfig(const GraphicsItemDesignerExportConfig& _config) { m_exportConfig = _config; };
+	const GraphicsItemDesignerExportConfig& getExportConfig(void) const { return m_exportConfig; };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -80,15 +72,14 @@ private Q_SLOTS:
 	void slotMakeTransparentRequested(void);
 
 private:
-	QString m_lastExportFile;
 	QString m_lastExportImageFile;
+
+	GraphicsItemDesignerExportConfig m_exportConfig;
 
 	GraphicsItemDesignerView* m_view;
 	ot::PropertyGrid* m_props;
 	GraphicsItemDesignerToolBar* m_toolBar;
 	GraphicsItemDesignerNavigation* m_navigation;
 	GraphicsItemDesignerDrawHandler* m_drawHandler;
-	ExportConfigFlags m_exportConfigFlags;
 };
 
-OT_ADD_FLAG_FUNCTIONS(GraphicsItemDesigner::ExportConfigFlag)
