@@ -51,6 +51,8 @@ public:
 
 	std::list<GraphicsItemDesignerItemBase*> getCurrentDesignerSelection(void) const;
 
+	bool hasDesignerItems(void) const { return !m_itemsMap.empty(); };
+
 	void updatePropertyGrid(void);
 
 private Q_SLOTS:

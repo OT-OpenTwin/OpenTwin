@@ -15,6 +15,7 @@
 #include "GraphicsItemDesignerExportConfig.h"
 #include "GraphicsItemDesignerExportDialog.h"
 #include "GraphicsItemDesignerNavigationRoot.h"
+#include "GraphicsItemDesignerImageExportDialog.h"
 
 // OToolkit API header
 #include "OToolkitAPI/OToolkitAPI.h"
@@ -101,7 +102,14 @@ void GraphicsItemDesigner::restoreToolSettings(QSettings& _settings) {
 	m_exportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::MoveableItem, _settings.value("GID.ExportMoveable", true).toBool());
 	m_exportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::ItemGridSnap, _settings.value("GID.ExportGridSnap", true).toBool());
 
-	m_lastExportImageFile = _settings.value("GID.LastExportImageFile", QString()).toString();
+	m_imageExportConfig.setFileName(_settings.value("GID.LastExportImageFile", QString()).toString());
+	QMarginsF newImageMargins;
+	newImageMargins.setTop(_settings.value("GID.ImageExportMarginTop", 0.).toDouble());
+	newImageMargins.setLeft(_settings.value("GID.ImageExportMarginLeft", 0.).toDouble());
+	newImageMargins.setRight(_settings.value("GID.ImageExportMarginRight", 0.).toDouble());
+	newImageMargins.setBottom(_settings.value("GID.ImageExportMarginBottom", 0.).toDouble());
+	m_imageExportConfig.setMargins(newImageMargins);
+	m_imageExportConfig.setShowGrid(_settings.value("GID.ImageExportShowGrid", false).toBool());
 
 	m_navigation->getDesignerRootItem()->setText(0, m_exportConfig.getItemName());
 }
@@ -124,7 +132,13 @@ bool GraphicsItemDesigner::prepareToolShutdown(QSettings& _settings) {
 	_settings.setValue("GID.ExportMoveable", (bool)(m_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::MoveableItem));
 	_settings.setValue("GID.ExportGridSnap", (bool)(m_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::ItemGridSnap));
 
-	_settings.setValue("GID.LastExportImageFile", m_lastExportImageFile);
+	_settings.setValue("GID.LastExportImageFile", m_imageExportConfig.getFileName());
+	QMarginsF imageMargins = m_imageExportConfig.getMargins();
+	_settings.setValue("GID.ImageExportMarginTop", imageMargins.top());
+	_settings.setValue("GID.ImageExportMarginLeft", imageMargins.left());
+	_settings.setValue("GID.ImageExportMarginRight", imageMargins.right());
+	_settings.setValue("GID.ImageExportMarginBottom", imageMargins.bottom());
+	_settings.setValue("GID.ImageExportShowGrid", m_imageExportConfig.getShowGrid());
 
 	return true;
 }
@@ -143,6 +157,11 @@ void GraphicsItemDesigner::slotClearRequested(void) {
 }
 
 void GraphicsItemDesigner::slotExportRequested(void) {
+	if (!m_navigation->hasDesignerItems()) {
+		OT_LOG_W("Nothing to export");
+		return;
+	}
+
 	GraphicsItemDesignerExportDialog dia(this);
 	if (dia.showDialog() != ot::Dialog::Ok) {
 		return;
@@ -152,32 +171,17 @@ void GraphicsItemDesigner::slotExportRequested(void) {
 }
 
 void GraphicsItemDesigner::slotExportAsImageRequested(void) {
-	// Check initial filename
-	QStringList lst = m_lastExportImageFile.split('/', Qt::SkipEmptyParts);
-	if (!lst.isEmpty()) {
-		lst.pop_back();
-	}
-
-	QString fileName;
-	for (const QString& str : lst) {
-		fileName.append(str + '/');
-	}
-	fileName.append(m_navigation->getDesignerRootItem()->text(0));
-	fileName.append(".png");
-
-	// Select filename
-	fileName = QFileDialog::getSaveFileName(nullptr, "Export Graphics Item", fileName, "Image (*.png)");
-	if (fileName.isEmpty()) {
+	if (!m_navigation->hasDesignerItems()) {
+		OT_LOG_W("Nothing to export");
 		return;
 	}
 
-	// Export config
-	if (!m_view->getDesignerScene()->exportAsImage(fileName)) {
+	GraphicsItemDesignerImageExportDialog dia(this);
+	if (dia.showDialog() != ot::Dialog::Ok) {
 		return;
 	}
 
-	m_lastExportImageFile = fileName;
-	OT_LOG_D("Graphics Item exported \"" + fileName.toStdString() + "\"");
+	m_imageExportConfig = dia.createImageExportConfig();
 }
 
 void GraphicsItemDesigner::slotDrawFinished(void) {

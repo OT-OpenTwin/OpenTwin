@@ -8,6 +8,7 @@
 // OToolkit header
 #include "GraphicsItemDesignerDrawHandler.h"
 #include "GraphicsItemDesignerExportConfig.h"
+#include "GraphicsItemDesignerImageExportConfig.h"
 
 // ToolkitAPI header
 #include "OToolkitAPI/Tool.h"
@@ -58,6 +59,9 @@ public:
 	void setExportConfig(const GraphicsItemDesignerExportConfig& _config) { m_exportConfig = _config; };
 	const GraphicsItemDesignerExportConfig& getExportConfig(void) const { return m_exportConfig; };
 
+	void setImageExportConfig(const GraphicsItemDesignerImageExportConfig& _config) { m_imageExportConfig = _config; };
+	const GraphicsItemDesignerImageExportConfig& getImageExportConfig(void) const { return m_imageExportConfig; };
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Slots
@@ -72,9 +76,8 @@ private Q_SLOTS:
 	void slotMakeTransparentRequested(void);
 
 private:
-	QString m_lastExportImageFile;
-
 	GraphicsItemDesignerExportConfig m_exportConfig;
+	GraphicsItemDesignerImageExportConfig m_imageExportConfig;
 
 	GraphicsItemDesignerView* m_view;
 	ot::PropertyGrid* m_props;

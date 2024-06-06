@@ -15,7 +15,6 @@
 #include "OTWidgets/GraphicsEllipseItem.h"
 
 // Qt header
-#include <QtGui/qimage.h>
 #include <QtWidgets/qgraphicssceneevent.h>
 
 GraphicsItemDesignerScene::GraphicsItemDesignerScene(GraphicsItemDesignerView* _view)
@@ -50,13 +49,23 @@ void GraphicsItemDesignerScene::setItemSize(const QSizeF& _size) {
 	m_view->setSceneRect(QRect(0., 0., m_itemSize.width(), m_itemSize.height()));
 }
 
-bool GraphicsItemDesignerScene::exportAsImage(const QString& _filePath) {
+QImage GraphicsItemDesignerScene::exportAsImage(const GraphicsItemDesignerImageExportConfig& _exportConfig) {
 	QRectF oldSceneRect = m_view->sceneRect();
 
 	QRectF itmRect = this->itemsBoundingRect();
-	if (itmRect.width() == 0 || itmRect.height() == 0) {
+	itmRect = itmRect.marginsAdded(_exportConfig.getMargins());
+	if (itmRect.width() <= 0 || itmRect.height() <= 0) {
 		OT_LOG_W("Nothing to export");
-		return false;
+		return QImage();
+	}
+
+	ot::Grid::GridFlags oldGridFlags = this->getGridFlags();
+
+	if (_exportConfig.getShowGrid()) {
+		this->setGridFlags(ot::Grid::ShowNormalLines | ot::Grid::ShowWideLines);
+	}
+	else {
+		this->setGridFlags(ot::Grid::NoGridFlags);
 	}
 
 	m_view->setSceneRect(itmRect);
@@ -65,18 +74,13 @@ bool GraphicsItemDesignerScene::exportAsImage(const QString& _filePath) {
 	image.fill(Qt::transparent);
 
 	QPainter painter(&image);
-	this->render(&painter, itmRect, itmRect);
+	this->render(&painter, QRectF(), itmRect);
 
 	m_view->setSceneRect(oldSceneRect);
 
-	if (!image.save(_filePath)) {
-		OT_LOG_E("Export failed");
-		return false;
-	}
-	else {
-		OT_LOG_I("Image exported to \"" + _filePath.toStdString() + "\"");
-		return true;
-	}
+	this->setGridFlags(oldGridFlags);
+
+	return image;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

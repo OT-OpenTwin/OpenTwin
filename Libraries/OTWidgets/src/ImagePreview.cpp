@@ -31,7 +31,7 @@ void ot::ImagePreview::paintEvent(QPaintEvent* _event) {
 	r.setTopLeft(r.topLeft() + QPoint(1, 1));
 	r.setBottomRight(r.bottomRight() - QPoint(1, 1));
 	QPainter painter(this);
-	painter.drawImage(this->pos(), m_image.scaled(m_size, Qt::KeepAspectRatio));
+	painter.drawImage(r.topLeft(), m_image.scaled(m_size.boundedTo(r.size()), Qt::KeepAspectRatio));
 }
 
 QSize ot::ImagePreview::sizeHint(void) const {
@@ -73,6 +73,6 @@ void ot::ImagePreview::mousePressEvent(QMouseEvent* _event) {
 
 void ot::ImagePreview::setImage(const QImage& _image) {
 	m_image = _image;
-	m_size = m_size.expandedTo(m_image.size());
+	m_size = m_image.size();
 	this->update();
 }

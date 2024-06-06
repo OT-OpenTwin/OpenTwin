@@ -5,8 +5,14 @@
 
 #pragma once
 
+// OToolkit header
+#include "GraphicsItemDesignerImageExportConfig.h"
+
 // OpenTwin header
 #include "OTWidgets/GraphicsScene.h"
+
+// Qt header
+#include <QtGui/qimage.h>
 
 class GraphicsItemDesignerView;
 
@@ -32,7 +38,7 @@ public:
 	void setItemSize(const QSizeF& _size);
 	const QSizeF& getItemSize(void) const { return m_itemSize; };
 
-	bool exportAsImage(const QString& _filePath);
+	QImage exportAsImage(const GraphicsItemDesignerImageExportConfig& _exportConfig);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -40,6 +40,8 @@ GraphicsItemDesignerExportDialog::GraphicsItemDesignerExportDialog(GraphicsItemD
 
 	ot::Label* fileNameLabel = new ot::Label("File Name:");
 	m_fileInput = new ot::FilePathEdit(ot::FilePathEdit::SaveFileMode);
+	m_fileInput->setBrowseTitle("Select GraphicsItem Export");
+	m_fileInput->setFileFilter("GraphicsItem Files (*.ot.json)");
 	m_fileInput->getLineEdit()->setToolTip("File export location.");
 
 	ot::Label* autoAlignLabel = new ot::Label("Auto Align Item:");
