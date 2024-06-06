@@ -27,6 +27,7 @@
     <ClCompile Include="src\GraphicsItemDesigner.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerDrawHandler.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerExportConfig.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerExportDialog.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerImageExportConfig.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerImageExportDialog.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerInfoOverlay.cpp" />
@@ -70,6 +71,7 @@
     <QtMoc Include="include\ToolViewManager.h" />
     <QtMoc Include="include\GraphicsItemDesignerImageExportDialog.h" />
     <ClInclude Include="include\GraphicsItemDesignerExportConfig.h" />
+    <QtMoc Include="include\GraphicsItemDesignerExportDialog.h" />
     <ClInclude Include="include\GraphicsItemDesignerImageExportConfig.h" />
     <ClInclude Include="include\WrappedCircleItem.h" />
     <ClInclude Include="include\WrappedEllipseItem.h" />

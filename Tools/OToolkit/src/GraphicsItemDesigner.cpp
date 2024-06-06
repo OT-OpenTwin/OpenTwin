@@ -12,8 +12,9 @@
 #include "GraphicsItemDesignerNavigation.h"
 #include "GraphicsItemDesignerInfoOverlay.h"
 #include "GraphicsItemDesignerDrawHandler.h"
-#include "GraphicsItemDesignerNavigationRoot.h"
 #include "GraphicsItemDesignerExportConfig.h"
+#include "GraphicsItemDesignerExportDialog.h"
+#include "GraphicsItemDesignerNavigationRoot.h"
 
 // OToolkit API header
 #include "OToolkitAPI/OToolkitAPI.h"
@@ -94,12 +95,15 @@ void GraphicsItemDesigner::restoreToolSettings(QSettings& _settings) {
 	);
 
 	// Export
+	m_exportConfig.setItemName(_settings.value("GID.LastExportName", QString("New Item")).toString());
 	m_exportConfig.setFileName(_settings.value("GID.LastExportFile", QString()).toString());
 	m_exportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::AutoAlign, _settings.value("GID.ExportAutoAlign", true).toBool());
 	m_exportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::MoveableItem, _settings.value("GID.ExportMoveable", true).toBool());
 	m_exportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::ItemGridSnap, _settings.value("GID.ExportGridSnap", true).toBool());
 
 	m_lastExportImageFile = _settings.value("GID.LastExportImageFile", QString()).toString();
+
+	m_navigation->getDesignerRootItem()->setText(0, m_exportConfig.getItemName());
 }
 
 bool GraphicsItemDesigner::prepareToolShutdown(QSettings& _settings) {
@@ -114,6 +118,7 @@ bool GraphicsItemDesigner::prepareToolShutdown(QSettings& _settings) {
 	_settings.setValue("GID.GridSnap", QString::fromStdString(ot::Grid::toString(m_view->getDesignerScene()->getGridSnapMode())));
 
 	// Export
+	_settings.setValue("GID.LastExportName", m_exportConfig.getItemName());
 	_settings.setValue("GID.LastExportFile", m_exportConfig.getFileName());
 	_settings.setValue("GID.ExportAutoAlign", (bool)(m_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::AutoAlign));
 	_settings.setValue("GID.ExportMoveable", (bool)(m_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::MoveableItem));
@@ -138,46 +143,12 @@ void GraphicsItemDesigner::slotClearRequested(void) {
 }
 
 void GraphicsItemDesigner::slotExportRequested(void) {
-	// Generate config
-	ot::GraphicsItemCfg* config = m_navigation->generateConfig();
-	if (!config) {
+	GraphicsItemDesignerExportDialog dia(this);
+	if (dia.showDialog() != ot::Dialog::Ok) {
 		return;
 	}
 
-	// Check initial filename
-	QStringList lst = m_exportConfig.getFileName().split('/', Qt::SkipEmptyParts);
-	if (!lst.isEmpty()) {
-		lst.pop_back();
-	}
-
-	QString fileName;
-	for (const QString& str : lst) {
-		fileName.append(str + '/');
-	}
-	fileName.append(QString::fromStdString(config->getName()));
-	fileName.append(".ot.json");
-
-	// Select filename
-	fileName = QFileDialog::getSaveFileName(nullptr, "Export Graphics Item", fileName, "OpenTwin document (*.ot.json)");
-	if (fileName.isEmpty()) {
-		return;
-	}
-
-	// Export config
-	ot::JsonDocument configDoc;
-	config->addToJsonObject(configDoc, configDoc.GetAllocator());
-
-	QFile file(fileName);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-		OT_LOG_E("Failed to open file for writing \"" + fileName.toStdString() + "\"");
-		return;
-	}
-
-	file.write(QByteArray::fromStdString(configDoc.toJson()));
-	file.close();
-
-	m_exportConfig.setFileName(fileName);
-	OT_LOG_D("Graphics Item exported \"" + fileName.toStdString() + "\"");
+	m_exportConfig = dia.createExportConfig();
 }
 
 void GraphicsItemDesigner::slotExportAsImageRequested(void) {

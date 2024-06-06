@@ -5,6 +5,9 @@
 
 #pragma once
 
+// OToolkit header
+#include "GraphicsItemDesignerExportConfig.h"
+
 // OpenTwin header
 #include "OTWidgets/TreeWidget.h"
 
@@ -40,7 +43,7 @@ public:
 
 	GraphicsItemDesignerItemBase* findDesignerItem(const QString& _itemName) const;
 
-	ot::GraphicsItemCfg* generateConfig(void);
+	ot::GraphicsItemCfg* generateConfig(const GraphicsItemDesignerExportConfig& _exportConfig);
 
 	GraphicsItemDesignerNavigationRoot* getDesignerRootItem(void) const { return m_rootItem; };
 

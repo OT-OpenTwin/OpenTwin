@@ -113,7 +113,7 @@ GraphicsItemDesignerItemBase* GraphicsItemDesignerNavigation::findDesignerItem(c
 	}
 }
 
-ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(void) {
+ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(const GraphicsItemDesignerExportConfig& _exportConfig) {
 	using namespace ot;
 
 	const ot::GraphicsItemCfg* oldConfig = nullptr;
@@ -130,11 +130,12 @@ ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(void) {
 	else {
 		ot::GraphicsGroupItemCfg* rootGroup = new ot::GraphicsGroupItemCfg;
 		rootGroup->setName(m_rootItem->text(0).toStdString());
-		rootGroup->setGraphicsItemFlags(GraphicsItemCfg::ItemSnapsToGrid | GraphicsItemCfg::ItemForwardsTooltip);
-		if (m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::MoveableItem) {
+		rootGroup->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
+
+		if (_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::MoveableItem) {
 			rootGroup->setGraphicsItemFlag(GraphicsItemCfg::ItemIsMoveable);
 		}
-		if (m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::ItemGridSnap) {
+		if (_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::ItemGridSnap) {
 			rootGroup->setGraphicsItemFlag(GraphicsItemCfg::ItemSnapsToGrid);
 		}
 
@@ -153,7 +154,7 @@ ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(void) {
 		}
 
 		// Check for auto align
-		if (m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::AutoAlign) {
+		if (_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::AutoAlign) {
 			RectD newRect(Point2DD(DBL_MAX, DBL_MAX),Point2DD (DBL_MIN, DBL_MIN));
 			for (GraphicsItemCfg* cfg : rootGroup->getItems()) {
 				if (cfg->getPosition().x() < newRect.getLeft()) newRect.setLeft(cfg->getPosition().x());

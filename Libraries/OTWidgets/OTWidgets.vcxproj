@@ -33,6 +33,7 @@
     <ClCompile Include="src\DockWatcherAction.cpp" />
     <ClCompile Include="src\DoubleSpinBox.cpp" />
     <ClCompile Include="src\EventNotifier.cpp" />
+    <ClCompile Include="src\FilePathEdit.cpp" />
     <ClCompile Include="src\GlobalColorStyle.cpp" />
     <ClCompile Include="src\GraphicsBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsConnectionItem.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="include\OTWidgets\ColorStyleValue.h" />
     <QtMoc Include="include\OTWidgets\GlobalColorStyle.h" />
     <ClInclude Include="include\OTWidgets\ComboBox.h" />
+    <QtMoc Include="include\OTWidgets\FilePathEdit.h" />
     <ClInclude Include="include\OTWidgets\GraphicsItem.hpp" />
     <ClInclude Include="include\OTWidgets\GraphicsItemLoader.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPickerView.h" />

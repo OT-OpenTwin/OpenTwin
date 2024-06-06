@@ -171,6 +171,9 @@
     <ClCompile Include="src\GraphicsItemDesignerImageExportConfig.cpp">
       <Filter>Source Files\GraphicsItemDesigner</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsItemDesignerExportDialog.cpp">
+      <Filter>Source Files\GraphicsItemDesigner</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -281,6 +284,9 @@
       <Filter>Header Files\General</Filter>
     </QtMoc>
     <QtMoc Include="include\GraphicsItemDesignerImageExportDialog.h">
+      <Filter>Header Files\GraphicsItemDesigner</Filter>
+    </QtMoc>
+    <QtMoc Include="include\GraphicsItemDesignerExportDialog.h">
       <Filter>Header Files\GraphicsItemDesigner</Filter>
     </QtMoc>
   </ItemGroup>

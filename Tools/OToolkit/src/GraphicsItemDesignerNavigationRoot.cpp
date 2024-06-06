@@ -42,32 +42,14 @@ void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
 	);
 	gridSnapProp->setPropertyTip("If enabled items will snap to the grid. This also works if the grid is hidden.");
 	editorGroup->addProperty(gridSnapProp);
+	editorGroup->addProperty(new PropertyDouble("Width", m_designer->getView()->sceneRect().width()));
+	editorGroup->addProperty(new PropertyDouble("Height", m_designer->getView()->sceneRect().height()));
 
 	PropertyGroup* generalGroup = new PropertyGroup("Item");
 	generalGroup->addProperty(new PropertyString("Name", this->text(0).toStdString()));
-	generalGroup->addProperty(new PropertyDouble("Width", m_designer->getView()->sceneRect().width()));
-	generalGroup->addProperty(new PropertyDouble("Height", m_designer->getView()->sceneRect().height()));
-	
-	PropertyGroup* exportGroup = new PropertyGroup("Export");
-	{
-		PropertyBool* newProp = new PropertyBool("Auto Align", m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::AutoAlign);
-		newProp->setPropertyTip("If enabled the generated graphics item will be moved to (0; 0).");
-		exportGroup->addProperty(newProp);
-	}
-	{
-		PropertyBool* newProp = new PropertyBool("Moveable Item", m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::MoveableItem);
-		newProp->setPropertyTip("If enabled the generated graphics item will be moveable by the user.");
-		exportGroup->addProperty(newProp);
-	}
-	{
-		PropertyBool* newProp = new PropertyBool("Item Grid Snap", m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::ItemGridSnap);
-		newProp->setPropertyTip("If enabled the generated graphics item will snap to the grid if grid snapping is enabled.");
-		exportGroup->addProperty(newProp);
-	}
-	
+		
 	cfg.addRootGroup(editorGroup);
 	cfg.addRootGroup(generalGroup);
-	cfg.addRootGroup(exportGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);
 }
 	
@@ -110,16 +92,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 		}
 		m_designer->getView()->getDesignerScene()->setGridSnapMode(Grid::stringToGridSnapMode(input->getCurrentText().toStdString()));
 	}
-	else if (_item->getGroupName() == "Item" && _itemData.propertyName() == "Name") {
-		PropertyInputString* input = dynamic_cast<PropertyInputString*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
-			return;
-		}
-
-		this->setText(0, input->getCurrentText());
-	}
-	else if (_item->getGroupName() == "Item" && _itemData.propertyName() == "Width") {
+	else if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Width") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -128,7 +101,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 
 		m_designer->getView()->setItemSize(QSizeF(input->getValue(), m_designer->getView()->getItemSize().height()));
 	}
-	else if (_item->getGroupName() == "Item" && _itemData.propertyName() == "Height") {
+	else if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Height") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -137,37 +110,16 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 
 		m_designer->getView()->setItemSize(QSizeF(m_designer->getView()->getItemSize().width(), input->getValue()));
 	}
-	else if (_item->getGroupName() == "Export" && _itemData.propertyName() == "Auto Align") {
-		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
+	else if (_item->getGroupName() == "Item" && _itemData.propertyName() == "Name") {
+		PropertyInputString* input = dynamic_cast<PropertyInputString*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
 			return;
 		}
 
+		this->setText(0, input->getCurrentText());
 		GraphicsItemDesignerExportConfig cfg = m_designer->getExportConfig();
-		cfg.setExportConfigFlag(GraphicsItemDesignerExportConfig::AutoAlign, input->isChecked());
-		m_designer->setExportConfig(cfg);
-	}
-	else if (_item->getGroupName() == "Export" && _itemData.propertyName() == "Moveable Item") {
-		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
-			return;
-		}
-
-		GraphicsItemDesignerExportConfig cfg = m_designer->getExportConfig();
-		cfg.setExportConfigFlag(GraphicsItemDesignerExportConfig::MoveableItem, input->isChecked());
-		m_designer->setExportConfig(cfg);
-	}
-	else if (_item->getGroupName() == "Export" && _itemData.propertyName() == "Item Grid Snap") {
-		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
-			return;
-		}
-
-		GraphicsItemDesignerExportConfig cfg = m_designer->getExportConfig();
-		cfg.setExportConfigFlag(GraphicsItemDesignerExportConfig::ItemGridSnap, input->isChecked());
+		cfg.setItemName(input->getCurrentText());
 		m_designer->setExportConfig(cfg);
 	}
 	else {
