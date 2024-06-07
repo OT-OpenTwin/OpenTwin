@@ -23,6 +23,8 @@
 
 // OpenTwin header
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/GraphicsGroupItemCfg.h"
+#include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
@@ -32,6 +34,7 @@
 #include "OTWidgets/PropertyGridGroup.h"
 
 // Qt header
+#include <QtCore/qfile.h>
 #include <QtWidgets/qfiledialog.h>
 
 GraphicsItemDesigner::GraphicsItemDesigner() 
@@ -66,6 +69,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	// Connect signals
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::modeRequested, this, &GraphicsItemDesigner::slotDrawRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::clearRequested, this, &GraphicsItemDesigner::slotClearRequested);
+	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::importRequested, this, &GraphicsItemDesigner::slotImportRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::exportRequested, this, &GraphicsItemDesigner::slotExportRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::exportAsImageRequested, this, &GraphicsItemDesigner::slotExportAsImageRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::makeTransparentRequested, this, &GraphicsItemDesigner::slotMakeTransparentRequested);
@@ -156,13 +160,65 @@ void GraphicsItemDesigner::slotDrawRequested(GraphicsItemDesignerDrawHandler::Dr
 	m_drawHandler->startDraw(_mode);
 }
 
-void GraphicsItemDesigner::slotClearRequested(void) {
-	m_drawHandler->blockSignals(true);
-	m_drawHandler->cancelDraw();
-	m_drawHandler->resetUid();
-	m_drawHandler->blockSignals(false);
+void GraphicsItemDesigner::slotImportRequested(void) {
+	// Select file
+	QString fileName = QFileDialog::getOpenFileName(m_view, "Import GraphicsItem", m_exportConfig.getFileName(), "GraphicsItems (*.ot.json)");
+	if (fileName.isEmpty()) return;
 
-	m_navigation->clearDesignerItems();
+	// Read file
+	QFile file(fileName);
+	if (!file.open(QIODevice::ReadOnly)) {
+		OT_LOG_E("Failed to open file from reading \"" + fileName.toStdString() + "\"");
+		return;
+	}
+
+	QByteArray data = file.readAll();
+	file.close();
+
+	// Parse file
+	std::string dataString = data.toStdString();
+	if (dataString.empty()) {
+		OT_LOG_W("File is empty \"" + fileName.toStdString() + "\"");
+		return;
+	}
+
+	ot::JsonDocument dataDoc;
+	if (!dataDoc.fromJson(dataString)) {
+		OT_LOG_E("Failed to parse document");
+		return;
+	}
+
+	// Create config
+	ot::GraphicsItemCfg* newConfig = ot::GraphicsItemCfgFactory::instance().create(dataDoc.GetConstObject());
+	if (!newConfig) {
+		return;
+	}
+
+	if (newConfig->getFactoryKey() != OT_FactoryKey_GraphicsGroupItem) {
+		OT_LOG_E("Invalid GraphicsItem");
+		return;
+	}
+
+	// Get group
+	ot::GraphicsGroupItemCfg* groupItem = dynamic_cast<ot::GraphicsGroupItemCfg*>(newConfig);
+	if (!groupItem) {
+		OT_LOG_E("Item is not a group");
+		return;
+	}
+
+	// Clear current data
+	this->slotClearRequested();
+
+	// Create all items
+	for (ot::GraphicsItemCfg* newItem : groupItem->getItems()) {
+		this->createItemFromConfig(newItem);
+	}
+
+	// Delete group
+	delete groupItem;
+	groupItem = nullptr;
+
+	OT_LOG_I("Import successful");
 }
 
 void GraphicsItemDesigner::slotExportRequested(void) {
@@ -220,13 +276,17 @@ void GraphicsItemDesigner::slotDuplicateRequested(void) {
 	if (selectedItems.empty()) return;
 
 	for (GraphicsItemDesignerItemBase* itm : selectedItems) {
-		GraphicsItemDesignerItemBase* newItem = WrappedItemFactory::instance().createFromConfig(itm->getGraphicsItem()->getConfiguration());
-		if (newItem) {
-			newItem->getGraphicsItem()->setGraphicsItemUid(m_drawHandler->generateUid());
-			m_view->addItem(newItem->getGraphicsItem());
-			m_navigation->addRootItem(newItem);
-		}
+		this->createItemFromConfig(itm->getGraphicsItem()->getConfiguration());
 	}
+}
+
+void GraphicsItemDesigner::slotClearRequested(void) {
+	m_drawHandler->blockSignals(true);
+	m_drawHandler->cancelDraw();
+	m_drawHandler->resetUid();
+	m_drawHandler->blockSignals(false);
+
+	m_navigation->clearDesignerItems();
 }
 
 void GraphicsItemDesigner::slotDeleteItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections) {
@@ -241,4 +301,13 @@ void GraphicsItemDesigner::slotDeleteItemsRequested(const ot::UIDList& _items, c
 		itemNames.append(QString::fromStdString(itm->getGraphicsItemName()));
 	}
 	m_navigation->removeDesignerItems(itemNames);
+}
+
+void GraphicsItemDesigner::createItemFromConfig(const ot::GraphicsItemCfg* _config) {
+	GraphicsItemDesignerItemBase* newItem = WrappedItemFactory::instance().createFromConfig(_config);
+	if (newItem) {
+		newItem->getGraphicsItem()->setGraphicsItemUid(m_drawHandler->generateUid());
+		m_view->addItem(newItem->getGraphicsItem());
+		m_navigation->addRootItem(newItem);
+	}
 }

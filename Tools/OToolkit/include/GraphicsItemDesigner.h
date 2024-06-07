@@ -25,6 +25,7 @@ class GraphicsItemDesignerToolBar;
 class GraphicsItemDesignerNavigation;
 class GraphicsItemDesignerDrawHandler;
 namespace ot { class PropertyGrid; };
+namespace ot { class GraphicsItemCfg; };
 
 class GraphicsItemDesigner : public QObject, public otoolkit::Tool {
 	Q_OBJECT
@@ -68,16 +69,20 @@ public:
 
 private Q_SLOTS:
 	void slotDrawRequested(GraphicsItemDesignerDrawHandler::DrawMode _mode);
-	void slotClearRequested(void);
+	
+	void slotImportRequested(void);
 	void slotExportRequested(void);
 	void slotExportAsImageRequested(void);
 	void slotDrawFinished(void);
 	void slotDrawCancelled(void);
 	void slotMakeTransparentRequested(void);
 	void slotDuplicateRequested(void);
+	void slotClearRequested(void);
 	void slotDeleteItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 
 private:
+	void createItemFromConfig(const ot::GraphicsItemCfg* _config);
+
 	GraphicsItemDesignerExportConfig m_exportConfig;
 	GraphicsItemDesignerImageExportConfig m_imageExportConfig;
 

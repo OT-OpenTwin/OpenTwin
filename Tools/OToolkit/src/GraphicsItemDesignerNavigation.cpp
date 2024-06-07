@@ -271,12 +271,11 @@ void GraphicsItemDesignerNavigation::removeDesignerItems(const QStringList& _ite
 		actualItem->getNavigationItem()->setHidden(true);
 		this->forgetItem(actualItem);
 
+		OTAssertNullptr(actualItem->getNavigationItem());
 		OTAssertNullptr(actualItem->getGraphicsItem());
-		OTAssertNullptr(actualItem->getGraphicsItem()->getGraphicsScene());
 
-		actualItem->getGraphicsItem()->getGraphicsScene()->removeItem(actualItem->getGraphicsItem()->getQGraphicsItem());
 		delete actualItem->getNavigationItem();
-		delete actualItem;
+		m_designer->getView()->removeItem(actualItem->getGraphicsItem()->getGraphicsItemUid());
 	}
 }
 

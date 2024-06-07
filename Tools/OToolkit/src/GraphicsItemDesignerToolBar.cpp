@@ -18,6 +18,15 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 {
 	{
 		QAction* btn = new QAction;
+		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Import.png"));
+		btn->setText("Import (Ctrl + O)");
+		btn->setShortcut(QKeySequence("Ctrl+O"));
+		btn->setShortcutVisibleInContextMenu(true);
+		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotImport);
+		this->addAction(btn);
+	}
+	{
+		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Export.png"));
 		btn->setText("Export (Ctrl + S)");
 		btn->setShortcut(QKeySequence("Ctrl+S"));
@@ -163,8 +172,8 @@ GraphicsItemDesignerToolBar::~GraphicsItemDesignerToolBar() {
 
 // Private: Slots
 
-void GraphicsItemDesignerToolBar::slotClear(void) {
-	Q_EMIT clearRequested();
+void GraphicsItemDesignerToolBar::slotImport(void) {
+	Q_EMIT importRequested();
 }
 
 void GraphicsItemDesignerToolBar::slotExport(void) {
@@ -217,6 +226,10 @@ void GraphicsItemDesignerToolBar::slotMakeTransparent(void) {
 
 void GraphicsItemDesignerToolBar::slotDuplicate(void) {
 	Q_EMIT duplicateRequested();
+}
+
+void GraphicsItemDesignerToolBar::slotClear(void) {
+	Q_EMIT clearRequested();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
