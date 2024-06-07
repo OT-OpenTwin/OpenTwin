@@ -44,6 +44,8 @@ namespace ot {
 
 		virtual void removeAllConnections(void) override;
 
+		virtual void finalizeGraphicsItem(void) override;
+
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) override;
 
 	private:

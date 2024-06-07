@@ -40,6 +40,8 @@ namespace ot {
 
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName) override;
 
+		virtual void finalizeGraphicsItem(void) override;
+
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) override;
 
 	protected:

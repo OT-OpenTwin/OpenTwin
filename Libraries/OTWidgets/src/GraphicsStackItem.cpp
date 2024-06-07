@@ -117,6 +117,12 @@ ot::GraphicsItem* ot::GraphicsStackItem::findItem(const std::string& _itemName) 
 	return nullptr;
 }
 
+void ot::GraphicsStackItem::finalizeGraphicsItem(void) {
+	for (const GraphicsStackItemEntry& entry : m_items) {
+		entry.item->finalizeGraphicsItem();
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Base class functions: QGraphicsItem

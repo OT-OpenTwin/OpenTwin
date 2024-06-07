@@ -78,6 +78,11 @@ void WrappedTextItem::fillPropertyGrid(void) {
 	geometryGroup->addProperty(new PropertyDouble("Y", this->pos().y()));
 	geometryGroup->addProperty(new PropertyString("Text", this->getText()));
 	{
+		PropertyBool* isReferenceProp = new PropertyBool("Text As Reference", this->getTextIsReference());
+		isReferenceProp->setPropertyTip("If enabled the text will be evaluated from the string map when then item is created by the GraphicsItemFactory.");
+		geometryGroup->addProperty(isReferenceProp);
+	}
+	{
 		std::list<std::string> fontFamilies;
 		std::string newFontFamily = this->getFont().family();
 
@@ -95,6 +100,7 @@ void WrappedTextItem::fillPropertyGrid(void) {
 			geometryGroup->addProperty(new PropertyStringList("Font Family", newFontFamily, fontFamilies));
 		}
 	}
+
 	geometryGroup->addProperty(new PropertyInt("Text Size", this->getFont().size()));
 	geometryGroup->addProperty(new PropertyBool("Bold", this->getFont().isBold()));
 	geometryGroup->addProperty(new PropertyBool("Italic", this->getFont().isItalic()));
@@ -147,6 +153,15 @@ void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 		}
 
 		this->setText(input->getCurrentText());
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Text As Reference") {
+		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		this->setTextIsReference(input->isChecked());
 	}
 	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Font Family") {
 		PropertyInputStringList* input = dynamic_cast<PropertyInputStringList*>(_item->getInput());

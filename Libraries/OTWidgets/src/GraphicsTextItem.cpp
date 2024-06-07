@@ -49,6 +49,18 @@ QSizeF ot::GraphicsTextItem::getPreferredGraphicsItemSize(void) const {
 	return m.size(Qt::TextSingleLine, QString::fromStdString(cfg->getText()));
 }
 
+void ot::GraphicsTextItem::finalizeGraphicsItem(void) {
+	GraphicsTextItemCfg* cfg = this->getItemConfiguration<GraphicsTextItemCfg>();
+	if (cfg->getTextIsReference()) {
+		this->prepareGeometryChange();
+		GraphicsItem* rootItem = this->getRootItem();
+		OTAssertNullptr(rootItem);
+		cfg->setText(rootItem->getConfiguration()->getStringForKey(cfg->getText()));
+		cfg->setTextIsReference(false);
+		this->updateItemGeometry();
+	}
+}
+
 void ot::GraphicsTextItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	const GraphicsTextItemCfg* cfg = this->getItemConfiguration<GraphicsTextItemCfg>();
 
@@ -93,4 +105,13 @@ void ot::GraphicsTextItem::setTextPainter(Painter2D* _painter) {
 
 const ot::Painter2D* ot::GraphicsTextItem::getTextPainter(void) const {
 	return this->getItemConfiguration<GraphicsTextItemCfg>()->getTextPainter();
+}
+
+void ot::GraphicsTextItem::setTextIsReference(bool _isReference) {
+	this->getItemConfiguration<GraphicsTextItemCfg>()->setTextIsReference(_isReference);
+	this->update();
+}
+
+bool ot::GraphicsTextItem::getTextIsReference(void) const {
+	return this->getItemConfiguration<GraphicsTextItemCfg>()->getTextIsReference();
 }

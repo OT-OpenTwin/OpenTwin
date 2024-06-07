@@ -16,7 +16,9 @@
 #include "OTGui/GuiTypes.h"
 #include "OTGui/OTGuiAPIExport.h"
 #include "OTCore/CoreTypes.h"
+
 // std header
+#include <map>
 #include <string>
 
 #pragma warning(disable:4251)
@@ -150,14 +152,33 @@ namespace ot {
 		void setConnectionDirection(ConnectionDirection _direction) { m_connectionDirection = _direction; };
 		ConnectionDirection getConnectionDirection(void) const { return m_connectionDirection; };
 
+		//! \brief Adds the provided entry to the string map.
+		//! If an entry for the same key already exists it will be replaced.
+		//! \see getStringMap
+		void addStringMapEntry(const std::string& _key, const std::string& _value) { m_stringMap.insert_or_assign(_key, _value); };
+
+		//! \brief Sets the string map.
+		//! \see getStringMap
+		void setStringMap(const std::map<std::string, std::string>& _map) { m_stringMap = _map; };
+
+		//! \brief The string map may be used to reference a value via a key in a complex graphics item.
+		//! For example a text item with enabled reference mode will use the string map to set its text when created in the frontend.
+		//! \warning The string map must be set to the root item. Child items will be ignored.
+		const std::map<std::string, std::string>& getStringMap(void) const { return m_stringMap; };
+
+		//! \brief Returns the string set for the given key in the string map.
+		//! Returns the string "#<_key>" if the value was not found.
+		//! \see getStringMap
+		std::string getStringForKey(const std::string& _key) const;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Helper
 
 		//! \brief Will copy the current config to the provided item configuration.
 		//! This method may be called when creating a graphics item copy.
-		//! \param _config Item to copy the data to.
-		virtual void copyConfigDataToItem(GraphicsItemCfg* _config) const;
+		//! \param _target Item to copy the data to.
+		virtual void copyConfigDataToItem(GraphicsItemCfg* _target) const;
 
 	private:
 		std::string m_name;
@@ -174,6 +195,8 @@ namespace ot {
 		ot::Alignment m_alignment;
 		ot::SizePolicy m_sizePolicy;
 		ConnectionDirection m_connectionDirection;
+
+		std::map<std::string, std::string> m_stringMap;
 	};
 
 }

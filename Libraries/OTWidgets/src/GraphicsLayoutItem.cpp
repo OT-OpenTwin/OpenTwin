@@ -87,6 +87,21 @@ ot::GraphicsItem* ot::GraphicsLayoutItem::findItem(const std::string& _itemName)
 	return nullptr;
 }
 
+void ot::GraphicsLayoutItem::finalizeGraphicsItem(void) {
+	std::list<QGraphicsLayoutItem*> items;
+	this->getAllItems(items);
+
+	for (auto i : items) {
+		ot::GraphicsItem* item = dynamic_cast<ot::GraphicsItem*>(i);
+		if (item) {
+			item->finalizeGraphicsItem();
+		}
+		else {
+			OT_LOG_EA("GraphicsItem cast failed");
+		}
+	}
+}
+
 void ot::GraphicsLayoutItem::createLayoutWrapper(QGraphicsLayout* _layout) {
 	OTAssert(m_layoutWrap == nullptr, "Layout wrapper already created");
 	m_layoutWrap = new GraphicsLayoutItemWrapper(this);

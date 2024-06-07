@@ -70,6 +70,7 @@ ot::GraphicsItem* ot::GraphicsItemFactory::itemFromConfig(ot::GraphicsItemCfg* _
 			stck->setGraphicsItemFlags(itm->getGraphicsItemFlags());
 			stck->setGraphicsItemName(itm->getGraphicsItemName() + "_oldRoot");
 			stck->setGraphicsItemUid(itm->getGraphicsItemUid());
+			stck->setStringMap(itm->getStringMap());
 
 			stck->createHighlightItem();
 			stck->addItem(itm, true, false);
@@ -78,6 +79,8 @@ ot::GraphicsItem* ot::GraphicsItemFactory::itemFromConfig(ot::GraphicsItemCfg* _
 			itm = stck;
 		}
 	}
+
+	if (_isRoot) itm->finalizeGraphicsItem();
 
 	return itm;
 }

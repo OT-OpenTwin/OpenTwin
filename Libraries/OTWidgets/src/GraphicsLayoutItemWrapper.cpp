@@ -81,6 +81,11 @@ QSizeF ot::GraphicsLayoutItemWrapper::graphicsItemSizeHint(Qt::SizeHint _hint, c
 	return this->sizeHint(_hint, _constrains);
 }
 
+void ot::GraphicsLayoutItemWrapper::finalizeGraphicsItem(void) {
+	OTAssertNullptr(m_owner);
+	m_owner->finalizeGraphicsItem();
+}
+
 void ot::GraphicsLayoutItemWrapper::setGraphicsItemRequestedSize(const QSizeF& _size) {
 	ot::GraphicsItem::setGraphicsItemRequestedSize(_size);
 	this->setPreferredSize(_size);

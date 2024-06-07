@@ -24,6 +24,8 @@
 #define OT_JSON_MEMBER_Uid "UID"
 #define OT_JSON_MEMBER_Name "Name"
 
+#define OT_JSON_MEMBER_Key "Key"
+#define OT_JSON_MEMBER_Value "Value"
 #define OT_JSON_MEMBER_Title "Title"
 #define OT_JSON_MEMBER_Flags "Flags"
 #define OT_JSON_MEMBER_Margin "Margin"
@@ -32,6 +34,7 @@
 #define OT_JSON_MEMBER_ToolTip "ToolTip"
 #define OT_JSON_MEMBER_Position "Position"
 #define OT_JSON_MEMBER_Alignment "Alignment"
+#define OT_JSON_MEMBER_StringMap "StringMap"
 #define OT_JSON_MEMBER_SizePolicy "SizePolicy"
 #define OT_JSON_MEMBER_ConnectionDirection "ConnectionDirection"
 
@@ -77,6 +80,15 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 	if (m_flags & GraphicsItemCfg::ItemHasNoFeedback) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_NoFeedback, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Flags, flagArr, _allocator);
 
+	JsonArray stringMapArr;
+	for (const auto& it : m_stringMap) {
+		JsonObject stringMapObj;
+		stringMapObj.AddMember(OT_JSON_MEMBER_Key, JsonString(it.first, _allocator), _allocator);
+		stringMapObj.AddMember(OT_JSON_MEMBER_Value, JsonString(it.second, _allocator), _allocator);
+		stringMapArr.PushBack(stringMapObj, _allocator);
+	}
+	_object.AddMember(OT_JSON_MEMBER_StringMap, stringMapArr, _allocator);
+
 	_object.AddMember(OT_JSON_MEMBER_Uid, static_cast<int64_t>(m_uid), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Name, JsonString(m_name, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Title, JsonString(m_title, _allocator), _allocator);
@@ -113,23 +125,45 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 			OT_LOG_EAS("Unknown GraphicsItemFlag \"" + f + "\"");
 		}
 	}
+
+	m_stringMap.clear();
+	ConstJsonObjectList stringMapArr = json::getObjectList(_object, OT_JSON_MEMBER_StringMap);
+	for (const ConstJsonObject& stringMapObj : stringMapArr) {
+		std::string k = json::getString(stringMapObj, OT_JSON_MEMBER_Key);
+		std::string v = json::getString(stringMapObj, OT_JSON_MEMBER_Value);
+		m_stringMap.insert_or_assign(k, v);
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter / Getter
+
+std::string ot::GraphicsItemCfg::getStringForKey(const std::string& _key) const {
+	const auto& it = m_stringMap.find(_key);
+	if (it == m_stringMap.end()) return "#" + _key;
+	else return it->second;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected: Helper
 
-void ot::GraphicsItemCfg::copyConfigDataToItem(GraphicsItemCfg* _config) const {
-	_config->m_name = m_name;
-	_config->m_title = m_title;
-	_config->m_uid = m_uid;
-	_config->m_tooltip = m_tooltip;
-	_config->m_pos = m_pos;
-	_config->m_minSize = m_minSize;
-	_config->m_maxSize = m_maxSize;
-	_config->m_margins = m_margins;
-	_config->m_flags = m_flags;
-	_config->m_alignment = m_alignment;
-	_config->m_sizePolicy = m_sizePolicy;
-	_config->m_connectionDirection = m_connectionDirection;
+void ot::GraphicsItemCfg::copyConfigDataToItem(GraphicsItemCfg* _target) const {
+	_target->m_name = m_name;
+	_target->m_title = m_title;
+	_target->m_uid = m_uid;
+	_target->m_tooltip = m_tooltip;
+	_target->m_pos = m_pos;
+
+	_target->m_minSize = m_minSize;
+	_target->m_maxSize = m_maxSize;
+
+	_target->m_margins = m_margins;
+	_target->m_flags = m_flags;
+	_target->m_alignment = m_alignment;
+	_target->m_sizePolicy = m_sizePolicy;
+	_target->m_connectionDirection = m_connectionDirection;
+
+	_target->m_stringMap = m_stringMap;
 }

@@ -54,10 +54,19 @@ namespace ot {
 		void setTextStyle(const OutlineF& _style) { m_textStyle = _style; };
 		const OutlineF& getTextStyle(void) const { return m_textStyle; };
 
+		//! \brief Sets the text is reference mode.
+		//! \see getTextIsReference
+		void setTextIsReference(bool _isReference) { m_textIsReference = _isReference; };
+
+		//! \brief If enabled the set text will be used as a key for the string map.
+		//! \see GraphicsItemCfg::getStringMap
+		bool getTextIsReference(void) const { return m_textIsReference; };
+
 	private:
 		std::string m_text;
 		ot::Font    m_textFont;
 		OutlineF	m_textStyle;
+		bool m_textIsReference;
 
 		GraphicsTextItemCfg(GraphicsTextItemCfg&) = delete;
 		GraphicsTextItemCfg& operator = (GraphicsTextItemCfg&) = delete;

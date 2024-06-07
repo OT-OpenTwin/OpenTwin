@@ -456,6 +456,16 @@ ot::ConnectionDirection ot::GraphicsItem::getConnectionDirection(void) const {
 	return m_config->getConnectionDirection();
 }
 
+void ot::GraphicsItem::setStringMap(const std::map<std::string, std::string>& _map) {
+	OTAssertNullptr(m_config);
+	m_config->setStringMap(_map);
+}
+
+const std::map<std::string, std::string>& ot::GraphicsItem::getStringMap(void) const {
+	OTAssertNullptr(m_config);
+	return m_config->getStringMap();
+}
+
 void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
 	m_connections.push_back(_connection);
 }

@@ -78,8 +78,23 @@ ot::GraphicsItem* ot::GraphicsGroupItem::findItem(const std::string& _itemName) 
 			auto r = itm->findItem(_itemName);
 			if (r) return r;
 		}
+		else {
+			OT_LOG_EA("Item cast failed");
+		}
 	}
 	return nullptr;
+}
+
+void ot::GraphicsGroupItem::finalizeGraphicsItem(void) {
+	for (auto i : this->childItems()) {
+		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
+		if (itm) {
+			itm->finalizeGraphicsItem();
+		}
+		else {
+			OT_LOG_EA("Item cast failed");
+		}
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

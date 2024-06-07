@@ -108,6 +108,11 @@ namespace ot {
 
 		virtual bool graphicsItemRequiresHover(void) const;
 
+		//! \brief Will be called after setupFromConfig (i.e. if the item is completely created).
+		//! Here the item structure is complete and the item may adjust settings that depend on parent items (e.g. Text reference for GraphicsTextItem).
+		//! Container items must override this method to forward the call to their child items.
+		virtual void finalizeGraphicsItem(void) {};
+
 		// ###############################################################################################################################################
 
 		// Event handler
@@ -217,6 +222,9 @@ namespace ot {
 
 		void setConnectionDirection(ot::ConnectionDirection _direction);
 		ot::ConnectionDirection getConnectionDirection(void) const;
+
+		void setStringMap(const std::map<std::string, std::string>& _map);
+		const std::map<std::string, std::string>& getStringMap(void) const;
 
 		void storeConnection(GraphicsConnectionItem* _connection);
 

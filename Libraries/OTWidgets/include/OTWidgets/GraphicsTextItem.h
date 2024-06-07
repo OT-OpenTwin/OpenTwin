@@ -31,6 +31,8 @@ namespace ot {
 
 		virtual QSizeF getPreferredGraphicsItemSize(void) const override;
 
+		virtual void finalizeGraphicsItem(void) override;
+
 	protected:
 
 		//! @brief Paint the item inside the provided rect
@@ -55,6 +57,9 @@ namespace ot {
 		void setTextPainter(Painter2D* _painter);
 
 		const Painter2D* getTextPainter(void) const;
+
+		void setTextIsReference(bool _isReference);
+		bool getTextIsReference(void) const;
 
 	};
 
