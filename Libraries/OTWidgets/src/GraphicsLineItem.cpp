@@ -16,7 +16,7 @@
 #include <QtGui/qpainter.h>
 #include <QtGui/qevent.h>
 
-static ot::GraphicsItemFactoryRegistrar<ot::GraphicsLineItem> rectItemRegistrar(OT_FactoryKey_GraphicsLineItem);
+static ot::GraphicsItemFactoryRegistrar<ot::GraphicsLineItem> lineItemRegistrar(OT_FactoryKey_GraphicsLineItem);
 
 ot::GraphicsLineItem::GraphicsLineItem()
 	: ot::CustomGraphicsItem(new GraphicsLineItemCfg)
@@ -33,14 +33,9 @@ ot::GraphicsLineItem::~GraphicsLineItem() {
 // Base class functions: ot::GraphicsItems
 
 bool ot::GraphicsLineItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
-	if (!ot::CustomGraphicsItem::setupFromConfig(_cfg)) return false;
-
 	OTAssertNullptr(_cfg);
-	const GraphicsLineItemCfg* cfg = dynamic_cast<const GraphicsLineItemCfg*>(_cfg);
-	if (cfg == nullptr) {
-		OT_LOG_EA("Invalid configuration provided: Cast failed");
-		return false;
-	}
+
+	if (!ot::CustomGraphicsItem::setupFromConfig(_cfg)) return false;
 
 	this->updateItemGeometry();
 

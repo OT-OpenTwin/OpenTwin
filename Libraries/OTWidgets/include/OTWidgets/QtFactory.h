@@ -6,18 +6,20 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
-#include "OTCore/Size2D.h"
+#include "OTCore/Rect.h"
 #include "OTCore/Color.h"
+#include "OTCore/Size2D.h"
 #include "OTCore/Point2D.h"
-#include "OTGui/GuiTypes.h"
-#include "OTGui/Outline.h"
+#include "OTCore/OTClassHelper.h"
 #include "OTGui/Path2D.h"
+#include "OTGui/Outline.h"
+#include "OTGui/GuiTypes.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
-#include <QtCore/qpoint.h>
+#include <QtCore/qrect.h>
 #include <QtCore/qsize.h>
+#include <QtCore/qpoint.h>
 #include <QtCore/qstringlist.h>
 #include <QtGui/qpen.h>
 #include <QtGui/qcolor.h>
@@ -54,6 +56,13 @@ namespace ot {
 
 		static inline Size2D toSize2D(const QSize& _s) { return Size2D(_s.width(), _s.height()); };
 		static inline Size2DD toSize2D(const QSizeF& _s) { return Size2DD(_s.width(), _s.height()); };
+
+		static inline QRect toQRect(const Rect& _r) noexcept { return QRect(toQPoint(_r.getTopLeft()), toQPoint(_r.getBottomRight())); };
+		static inline QRectF toQRect(const RectF& _r) noexcept { return QRectF(toQPoint(_r.getTopLeft()), toQPoint(_r.getBottomRight())); };
+		static inline QRectF toQRect(const RectD& _r) noexcept { return QRectF(toQPoint(_r.getTopLeft()), toQPoint(_r.getBottomRight())); };
+
+		static inline Rect toRect(const QRect& _r) { return Rect(toPoint2D(_r.topLeft()), toPoint2D(_r.bottomRight())); };
+		static inline RectD toRect(const QRectF& _r) { return RectD(toPoint2D(_r.topLeft()), toPoint2D(_r.bottomRight())); };
 
 		static QPen toQPen(const Outline& _outline);
 		static QPen toQPen(const OutlineF& _outline);
