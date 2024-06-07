@@ -18,6 +18,26 @@
 #include <QtGui/qpixmap.h>
 #include <QtGui/qpainter.h>
 
+QFont ot::QtFactory::toQFont(const Font& _f) {
+    QFont font;
+    font.setPixelSize(_f.size());
+    font.setBold(_f.isBold());
+    font.setItalic(_f.isItalic());
+    font.setFamily(QString::fromStdString(_f.family()));
+
+    return font;
+}
+
+ot::Font ot::QtFactory::toFont(const QFont& _font) {
+    Font font;
+    font.setSize(_font.pixelSize());
+    font.setBold(_font.bold());
+    font.setItalic(_font.italic());
+    font.setFamily(_font.family().toStdString());
+
+    return font;
+}
+
 QPen ot::QtFactory::toQPen(const Outline& _outline) {
     if (_outline.width() <= 0) return QPen(Qt::NoPen);
     else return QPen(toQBrush(_outline.painter()), (qreal)_outline.width(), toQPenStyle(_outline.style()), toQPenCapStyle(_outline.cap()), toQPenJoinStyle(_outline.joinStyle())); 

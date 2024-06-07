@@ -69,12 +69,14 @@
     <ClCompile Include="src\WrappedPolygonItem.cpp" />
     <ClCompile Include="src\WrappedRectItem.cpp" />
     <ClCompile Include="src\WrappedSquareItem.cpp" />
+    <ClCompile Include="src\WrappedTextItem.cpp" />
     <ClCompile Include="src\WrappedTriangleItem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />
+    <ClInclude Include="include\WrappedTextItem.h" />
     <ClInclude Include="include\WrappedTriangleItem.h" />
     <QtMoc Include="include\ToolViewManager.h" />
     <QtMoc Include="include\GraphicsItemDesignerImageExportDialog.h" />

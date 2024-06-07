@@ -8,13 +8,12 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
+#include "OTGui/Outline.h"
 #include "OTGui/GraphicsItemCfg.h"
 
 #define OT_FactoryKey_GraphicsTextItem "OT_GIText"
 
 namespace ot {
-
-	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsTextItemCfg : public ot::GraphicsItemCfg {
 	public:
@@ -38,19 +37,27 @@ namespace ot {
 		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsTextItem); };
 
 		void setText(const std::string& _text) { m_text = _text; };
-		const std::string& text(void) const { return m_text; };
+		const std::string& getText(void) const { return m_text; };
 
-		void setTextFont(const ot::Font& _font) { m_textFont = _font; };
-		const ot::Font& textFont(void) const { return m_textFont; };
+		void setTextFont(const Font& _font) { m_textFont = _font; };
+		const Font& getTextFont(void) const { return m_textFont; };
 
-		void setTextColor(const ot::Color& _color);
-		void setTextPainter(ot::Painter2D* _painter);
-		Painter2D* textPainter(void) const { return m_textPainter; };
+		void setTextColor(const Color& _color) { m_textStyle.setColor(_color); };
+
+		//! \brief Sets the text painter.
+		//! The item takes ownership of the painter.
+		void setTextPainter(Painter2D* _painter) { m_textStyle.setPainter(_painter); };
+		const Painter2D* getTextPainter(void) const { return m_textStyle.painter(); };
+
+		void setTextLineWidth(double _width) { m_textStyle.setWidth(_width); };
+
+		void setTextStyle(const OutlineF& _style) { m_textStyle = _style; };
+		const OutlineF& getTextStyle(void) const { return m_textStyle; };
 
 	private:
 		std::string m_text;
 		ot::Font    m_textFont;
-		Painter2D* m_textPainter;
+		OutlineF	m_textStyle;
 
 		GraphicsTextItemCfg(GraphicsTextItemCfg&) = delete;
 		GraphicsTextItemCfg& operator = (GraphicsTextItemCfg&) = delete;

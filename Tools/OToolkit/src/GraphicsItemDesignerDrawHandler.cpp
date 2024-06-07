@@ -13,6 +13,7 @@
 // OToolkit GraphicsItem wrapper
 #include "WrappedArcItem.h"
 #include "WrappedLineItem.h"
+#include "WrappedTextItem.h"
 #include "WrappedRectItem.h"
 #include "WrappedSquareItem.h"
 #include "WrappedCircleItem.h"
@@ -161,6 +162,7 @@ QString GraphicsItemDesignerDrawHandler::modeString(void) {
 	case GraphicsItemDesignerDrawHandler::Triangle: return "Draw Triangle (Press ESC to cancel)";
 	case GraphicsItemDesignerDrawHandler::Polygon: return "Draw Polygon (Press ESC to finish)";
 	case GraphicsItemDesignerDrawHandler::Shape: return "Draw Shape (Press ESC to finish)";
+	case GraphicsItemDesignerDrawHandler::Text: return "Place Text (Press ESC to cancel)";
 	default: 
 		OT_LOG_E("Unknown draw mode (" + std::to_string((int)m_mode) + ")");
 		return "<UNKNWON>";
@@ -210,6 +212,10 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 		break;
 
 	case GraphicsItemDesignerDrawHandler::Shape:
+		break;
+
+	case GraphicsItemDesignerDrawHandler::Text:
+		m_previewItem = new WrappedTextItem;
 		break;
 
 	default:

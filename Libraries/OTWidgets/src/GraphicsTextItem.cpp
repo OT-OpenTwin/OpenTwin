@@ -30,23 +30,12 @@ ot::GraphicsTextItem::~GraphicsTextItem() {
 
 bool ot::GraphicsTextItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
-	const GraphicsTextItemCfg* cfg = dynamic_cast<const GraphicsTextItemCfg*>(_cfg);
-	if (cfg == nullptr) {
-		OT_LOG_EA("Invalid configuration provided: Cast failed");
-		return false;
-	}
+	
+	if (!ot::CustomGraphicsItem::setupFromConfig(_cfg)) return false;
 
-	this->prepareGeometryChange();
+	this->updateItemGeometry();
 
-	m_font.setPixelSize(cfg->textFont().size());
-	m_font.setItalic(cfg->textFont().isItalic());
-	m_font.setBold(cfg->textFont().isBold());
-
-	m_pen.setBrush(QtFactory::toQBrush(cfg->textPainter()));
-
-	m_text = QString::fromStdString(cfg->text());
-
-	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
+	return true;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -54,12 +43,54 @@ bool ot::GraphicsTextItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 // Base class functions: ot::CustomGraphicsItem
 
 QSizeF ot::GraphicsTextItem::getPreferredGraphicsItemSize(void) const {
-	QFontMetrics m(m_font);
-	return m.size(Qt::TextSingleLine, m_text);
+	const GraphicsTextItemCfg* cfg = this->getItemConfiguration<GraphicsTextItemCfg>();
+
+	QFontMetrics m(QtFactory::toQFont(cfg->getTextFont()));
+	return m.size(Qt::TextSingleLine, QString::fromStdString(cfg->getText()));
 }
 
 void ot::GraphicsTextItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
-	_painter->setFont(m_font);
-	_painter->setPen(m_pen);
-	_painter->drawText(_rect, QtFactory::toQAlignment(this->getGraphicsItemAlignment()), m_text);
+	const GraphicsTextItemCfg* cfg = this->getItemConfiguration<GraphicsTextItemCfg>();
+
+	_painter->setFont(QtFactory::toQFont(cfg->getTextFont()));
+	_painter->setPen(QtFactory::toQPen(cfg->getTextStyle()));
+	_painter->drawText(_rect, QtFactory::toQAlignment(this->getGraphicsItemAlignment()), QString::fromStdString(cfg->getText()));
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Setter / Getter
+
+void ot::GraphicsTextItem::setText(const std::string& _text) {
+	this->prepareGeometryChange();
+	this->getItemConfiguration<GraphicsTextItemCfg>()->setText(_text);
+	this->updateItemGeometry();
+}
+
+const std::string& ot::GraphicsTextItem::getText(void) const {
+	return this->getItemConfiguration<GraphicsTextItemCfg>()->getText();
+}
+
+void ot::GraphicsTextItem::setFont(const Font& _font) {
+	this->prepareGeometryChange();
+	this->getItemConfiguration<GraphicsTextItemCfg>()->setTextFont(_font);
+	this->updateItemGeometry();
+}
+
+const ot::Font& ot::GraphicsTextItem::getFont(void) const {
+	return this->getItemConfiguration<GraphicsTextItemCfg>()->getTextFont();
+}
+
+void ot::GraphicsTextItem::setTextColor(const Color& _color) {
+	this->getItemConfiguration<GraphicsTextItemCfg>()->setTextColor(_color);
+	this->update();
+}
+
+void ot::GraphicsTextItem::setTextPainter(Painter2D* _painter) {
+	this->getItemConfiguration<GraphicsTextItemCfg>()->setTextPainter(_painter);
+	this->update();
+}
+
+const ot::Painter2D* ot::GraphicsTextItem::getTextPainter(void) const {
+	return this->getItemConfiguration<GraphicsTextItemCfg>()->getTextPainter();
 }

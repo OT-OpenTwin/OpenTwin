@@ -51,6 +51,7 @@ private Q_SLOTS:
 	void slotTriangle(void);
 	void slotPolygon(void);
 	void slotShape(void);
+	void slotText(void);
 
 	void slotMakeTransparent(void);
 	void slotDuplicate(void);

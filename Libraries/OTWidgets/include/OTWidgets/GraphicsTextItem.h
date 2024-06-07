@@ -6,11 +6,11 @@
 #pragma once
 
 // OpenTwin header
+#include "OTGui/Outline.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
 // Qt header
-#include <QtGui/qfont.h>
-#include <QtGui/qpen.h>
+#include <QtCore/qstring.h>
 
 namespace ot {
 
@@ -40,10 +40,22 @@ namespace ot {
 
 		// Setter / Getter
 
-	private:
-		QString m_text;
-		QFont m_font;
-		QPen m_pen;
+		void setText(const char* _text) { this->setText(std::string(_text)); };
+		void setText(const std::string& _text);
+		void setText(const QString& _text) { this->setText(_text.toStdString()); };
+		const std::string& getText(void) const;
+
+		void setFont(const Font& _font);
+		const Font& getFont(void) const;
+
+		void setTextColor(const Color& _color);
+
+		//! \brief Sets the text painter.
+		//! The item takes ownership of the painter.
+		void setTextPainter(Painter2D* _painter);
+
+		const Painter2D* getTextPainter(void) const;
+
 	};
 
 }

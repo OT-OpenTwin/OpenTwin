@@ -11,6 +11,7 @@
 #include "OTCore/Size2D.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/Font.h"
 #include "OTGui/Path2D.h"
 #include "OTGui/Outline.h"
 #include "OTGui/GuiTypes.h"
@@ -22,6 +23,7 @@
 #include <QtCore/qpoint.h>
 #include <QtCore/qstringlist.h>
 #include <QtGui/qpen.h>
+#include <QtGui/qfont.h>
 #include <QtGui/qcolor.h>
 #include <QtGui/qbrush.h>
 #include <QtGui/qevent.h>
@@ -63,6 +65,9 @@ namespace ot {
 
 		static inline Rect toRect(const QRect& _r) { return Rect(toPoint2D(_r.topLeft()), toPoint2D(_r.bottomRight())); };
 		static inline RectD toRect(const QRectF& _r) { return RectD(toPoint2D(_r.topLeft()), toPoint2D(_r.bottomRight())); };
+
+		static QFont toQFont(const Font& _f);
+		static Font toFont(const QFont& _font);
 
 		static QPen toQPen(const Outline& _outline);
 		static QPen toQPen(const OutlineF& _outline);

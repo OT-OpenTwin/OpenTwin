@@ -28,7 +28,8 @@ public:
 		Arc,
 		Triangle,
 		Polygon,
-		Shape
+		Shape,
+		Text
 	};
 
 	GraphicsItemDesignerDrawHandler(GraphicsItemDesignerView* _view);

@@ -127,6 +127,15 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotShape);
 		this->addAction(btn);
 	}
+	{
+		QAction* btn = new QAction;
+		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Text.png"));
+		btn->setText("Text (Ctrl + 0)");
+		btn->setShortcut(QKeySequence("Ctrl+0"));
+		btn->setShortcutVisibleInContextMenu(true);
+		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotText);
+		this->addAction(btn);
+	}
 
 	this->addSeparator();
 
@@ -218,6 +227,10 @@ void GraphicsItemDesignerToolBar::slotPolygon(void) {
 
 void GraphicsItemDesignerToolBar::slotShape(void) {
 	emit modeRequested(GraphicsItemDesignerDrawHandler::Shape);
+}
+
+void GraphicsItemDesignerToolBar::slotText(void) {
+	emit modeRequested(GraphicsItemDesignerDrawHandler::Text);
 }
 
 void GraphicsItemDesignerToolBar::slotMakeTransparent(void) {
