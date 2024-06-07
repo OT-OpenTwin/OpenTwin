@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OToolkit header
+#include "WrappedItemFactory.h"
 #include "GraphicsItemDesigner.h"
 #include "GraphicsItemDesignerView.h"
 #include "GraphicsItemDesignerScene.h"
@@ -24,6 +25,7 @@
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/PropertyGridItem.h"
@@ -67,6 +69,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::exportRequested, this, &GraphicsItemDesigner::slotExportRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::exportAsImageRequested, this, &GraphicsItemDesigner::slotExportAsImageRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::makeTransparentRequested, this, &GraphicsItemDesigner::slotMakeTransparentRequested);
+	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::duplicateRequested, this, &GraphicsItemDesigner::slotDuplicateRequested);
 	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCompleted, this, &GraphicsItemDesigner::slotDrawFinished);
 	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCancelled, this, &GraphicsItemDesigner::slotDrawCancelled);
 
@@ -204,4 +207,18 @@ void GraphicsItemDesigner::slotMakeTransparentRequested(void) {
 	}
 
 	m_navigation->updatePropertyGrid();
+}
+
+void GraphicsItemDesigner::slotDuplicateRequested(void) {
+	std::list<GraphicsItemDesignerItemBase*> selectedItems = m_navigation->getCurrentDesignerSelection();
+	if (selectedItems.empty()) return;
+
+	for (GraphicsItemDesignerItemBase* itm : selectedItems) {
+		GraphicsItemDesignerItemBase* newItem = WrappedItemFactory::instance().createFromConfig(itm->getGraphicsItem()->getConfiguration());
+		if (newItem) {
+			newItem->getGraphicsItem()->setGraphicsItemUid(m_drawHandler->generateUid());
+			m_view->addItem(newItem->getGraphicsItem());
+			m_navigation->addRootItem(newItem);
+		}
+	}
 }

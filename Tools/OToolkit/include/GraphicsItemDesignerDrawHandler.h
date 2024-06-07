@@ -53,6 +53,8 @@ public:
 	void updatePosition(const QPointF& _pos);
 	void positionSelected(const QPointF& _pos);
 
+	ot::UID generateUid(void) { return ++m_currentUid; };
+
 Q_SIGNALS:
 	void drawCompleted();
 	void drawCancelled();

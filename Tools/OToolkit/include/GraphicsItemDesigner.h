@@ -74,6 +74,7 @@ private Q_SLOTS:
 	void slotDrawFinished(void);
 	void slotDrawCancelled(void);
 	void slotMakeTransparentRequested(void);
+	void slotDuplicateRequested(void);
 
 private:
 	GraphicsItemDesignerExportConfig m_exportConfig;

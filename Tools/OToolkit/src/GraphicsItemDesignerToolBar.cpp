@@ -18,17 +18,8 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 {
 	{
 		QAction* btn = new QAction;
-		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Clear.png"));
-		btn->setText("Clear");
-		btn->setShortcut(QKeySequence("Ctrl+Del"));
-		btn->setShortcutVisibleInContextMenu(true);
-		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotClear);
-		this->addAction(btn);
-	}
-	{
-		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Export.png"));
-		btn->setText("Export");
+		btn->setText("Export (Ctrl + S)");
 		btn->setShortcut(QKeySequence("Ctrl+S"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotExport);
@@ -37,7 +28,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	{
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/ExportAsImage.png"));
-		btn->setText("Export As Image");
+		btn->setText("Export As Image (Ctrl + Alt + S)");
 		btn->setShortcut(QKeySequence("Ctrl+Alt+S"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotExportAsImage);
@@ -49,7 +40,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	{
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Line.png"));
-		btn->setText("Line");
+		btn->setText("Line (Ctrl + 1)");
 		btn->setShortcut(QKeySequence("Ctrl+1"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotLine);
@@ -58,7 +49,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	{
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Square.png"));
-		btn->setText("Square");
+		btn->setText("Square (Ctrl + 2)");
 		btn->setShortcut(QKeySequence("Ctrl+2"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotSquare);
@@ -67,7 +58,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	{
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Rect.png"));
-		btn->setText("Rectangle");
+		btn->setText("Rectangle (Ctrl + 3)");
 		btn->setShortcut(QKeySequence("Ctrl+3"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotRect);
@@ -76,7 +67,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	{
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Circle.png"));
-		btn->setText("Circle");
+		btn->setText("Circle (Ctrl + 4)");
 		btn->setShortcut(QKeySequence("Ctrl+4"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotCircle);
@@ -85,7 +76,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	{
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Ellipse.png"));
-		btn->setText("Ellipse");
+		btn->setText("Ellipse (Ctrl + 5)");
 		btn->setShortcut(QKeySequence("Ctrl+5"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotEllipse);
@@ -94,7 +85,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	{
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Arc.png"));
-		btn->setText("Arc");
+		btn->setText("Arc (Ctrl + 6)");
 		btn->setShortcut(QKeySequence("Ctrl+6"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotArc);
@@ -103,7 +94,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	{
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Triangle.png"));
-		btn->setText("Triangle");
+		btn->setText("Triangle (Ctrl + 7)");
 		btn->setShortcut(QKeySequence("Ctrl+7"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotTriangle);
@@ -112,7 +103,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	{
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Polygon.png"));
-		btn->setText("Polygon");
+		btn->setText("Polygon (Ctrl + 8)");
 		btn->setShortcut(QKeySequence("Ctrl+8"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotPolygon);
@@ -121,7 +112,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	{
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Shape.png"));
-		btn->setText("Shape");
+		btn->setText("Shape (Ctrl + 9)");
 		btn->setShortcut(QKeySequence("Ctrl+9"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotShape);
@@ -136,8 +127,30 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		btn->setText("Make Transparent");
 		btn->setShortcut(QKeySequence("Ctrl+T"));
 		btn->setShortcutVisibleInContextMenu(true);
-		btn->setToolTip("Will make the currently selected items transparent");
+		btn->setToolTip("Will make the currently selected items transparent (Ctrl+T)");
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotMakeTransparent);
+		this->addAction(btn);
+	}
+	{
+		QAction* btn = new QAction;
+		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Duplicate.png"));
+		btn->setText("Duplicate");
+		btn->setShortcut(QKeySequence("Ctrl+D"));
+		btn->setShortcutVisibleInContextMenu(true);
+		btn->setToolTip("Will duplicated the currently selected items (Ctrl+D)");
+		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotDuplicate);
+		this->addAction(btn);
+	}
+
+	this->addSeparator();
+
+	{
+		QAction* btn = new QAction;
+		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Clear.png"));
+		btn->setText("Clear (Ctrl + Del)");
+		btn->setShortcut(QKeySequence("Ctrl+Del"));
+		btn->setShortcutVisibleInContextMenu(true);
+		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotClear);
 		this->addAction(btn);
 	}
 }
@@ -200,6 +213,10 @@ void GraphicsItemDesignerToolBar::slotShape(void) {
 
 void GraphicsItemDesignerToolBar::slotMakeTransparent(void) {
 	Q_EMIT makeTransparentRequested();
+}
+
+void GraphicsItemDesignerToolBar::slotDuplicate(void) {
+	Q_EMIT duplicateRequested();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
