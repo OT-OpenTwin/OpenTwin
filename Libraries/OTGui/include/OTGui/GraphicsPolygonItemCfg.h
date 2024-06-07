@@ -56,10 +56,10 @@ namespace ot {
 		void setPoints(const std::list<Point2DD>& _points) { m_points = _points; };
 
 		//! @brief Outline points reference.
-		std::list<Point2DD>& points(void) { return m_points; };
+		std::list<Point2DD>& getPoints(void) { return m_points; };
 
 		//! @brief Outline points const reference.
-		const std::list<Point2DD>& points(void) const { return m_points; };
+		const std::list<Point2DD>& getPoints(void) const { return m_points; };
 
 		//! @brief Set the background painter.
 		//! The item takes ownership of the painter.
@@ -67,7 +67,7 @@ namespace ot {
 		void setBackgroundPainter(Painter2D* _painter);
 
 		//! @brief Background painter.
-		const Painter2D* backgroundPainter(void) const { return m_backgroundPainter; };
+		const Painter2D* getBackgroundPainter(void) const { return m_backgroundPainter; };
 
 		//! @brief Returns the current background painter and replaces it with the default background painter.
 		//! The caller takes ownership of the returned painter.
@@ -78,23 +78,31 @@ namespace ot {
 		void setOutline(const OutlineF& _outline) { m_outline = _outline; };
 
 		//! @brief Outlin.
-		const OutlineF& outline(void) const { return m_outline; };
+		const OutlineF& getOutline(void) const { return m_outline; };
 
 		//! @brief Set the outline painter.
 		//! The item takes ownership of the painter.
 		void setOutlinePainter(Painter2D* _painter) { m_outline.setPainter(_painter); };
 
 		//! @brief Outline painter.
-		const Painter2D* outlinePainter(void) const { return m_outline.painter(); };
+		const Painter2D* getOutlinePainter(void) const { return m_outline.painter(); };
 
 		//! @brief Set the outline width.
 		//! @param _w Width to set.
 		void setOutlineWidth(double _w) { m_outline.setWidth(_w); };
 
 		//! @brief Outline width.
-		double outlineWidth(void) const { return m_outline.width(); };
+		double getOutlineWidth(void) const { return m_outline.width(); };
+
+		//! \brief Set the fill property.
+		//! \see getFillPolygon
+		void setFillPolygon(bool _fill) { m_fillPolygon = _fill; };
+
+		//! \brief If fill polygon is enabled the polygon will be filled if the polygon in a closed shape.
+		bool getFillPolygon(void) const { return m_fillPolygon; };
 
 	private:
+		bool m_fillPolygon; //! \brief Fill polygon.
 		std::list<Point2DD> m_points; //! @brief Outline points.
 		Painter2D* m_backgroundPainter; //! @brief Background painter.
 		OutlineF m_outline; //! @brief Outline style.

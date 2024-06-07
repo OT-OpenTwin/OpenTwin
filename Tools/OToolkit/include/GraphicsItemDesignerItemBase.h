@@ -68,9 +68,14 @@ public:
 
 	// Virtual methods
 
+	//! \brief Returns true if the current item is completed.
+	//! A completed item has all required control points set (e.g. Line start and Line end) and no more points may be set.
+	virtual bool isDesignedItemCompleted(void) const = 0;
+
 	//! \brief Returns true if the current item is valid.
 	//! A valid item has all required control points set (e.g. Line start and Line end).
-	virtual bool isDesignedItemCompleted(void) const = 0;
+	//! More points may be added (e.g. Polygon).
+	virtual bool isDesignedItemValid(void) const = 0;
 
 	//! \brief Returns the actual GraphicsItem.
 	virtual ot::GraphicsItem* getGraphicsItem(void) = 0;

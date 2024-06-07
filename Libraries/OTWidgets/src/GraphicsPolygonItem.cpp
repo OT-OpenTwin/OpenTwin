@@ -33,23 +33,12 @@ ot::GraphicsPolygonItem::~GraphicsPolygonItem() {
 
 bool ot::GraphicsPolygonItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
-	const GraphicsPolygonItemCfg* cfg = dynamic_cast<const GraphicsPolygonItemCfg*>(_cfg);
-	if (cfg == nullptr) {
-		OT_LOG_EA("Invalid configuration provided: Cast failed");
-		return false;
-	}
 
-	this->prepareGeometryChange();
+	if (!ot::CustomGraphicsItem::setupFromConfig(_cfg)) return false;
 
-	// We call set rectangle size which will call set geometry to finalize the item
-	m_polygon.clear();
-	QList<QPointF> pts;
-	for (const Point2DD& pt : cfg->points()) {
-		pts.append(QtFactory::toQPoint(pt));
-	}
-	m_polygon.append(pts);
+	this->updateItemGeometry();
 
-	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
+	return true;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -61,18 +50,71 @@ QSizeF ot::GraphicsPolygonItem::getPreferredGraphicsItemSize(void) const {
 }
 
 void ot::GraphicsPolygonItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
-	_painter->setBrush(m_brush);
-	_painter->setPen(m_pen);
+	const GraphicsPolygonItemCfg* cfg = this->getItemConfiguration<GraphicsPolygonItemCfg>();
 
-	//! @todo Check for fill polygon
-	_painter->drawPolygon(m_polygon);
+	_painter->setPen(QtFactory::toQPen(cfg->getOutline()));
+
+	QPolygonF poly;
+	for (const Point2DD& pt : cfg->getPoints()) {
+		poly.append(QtFactory::toQPoint(pt));
+	}
+
+	if (cfg->getFillPolygon()) {
+		QPainterPath painterPath;
+		painterPath.addPolygon(poly);
+		_painter->fillPath(painterPath, QtFactory::toQBrush(cfg->getBackgroundPainter()));
+		_painter->drawPath(painterPath);
+	}
+	else {
+		_painter->drawPolygon(poly);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter/Getter
 
-void ot::GraphicsPolygonItem::setPolygon(const QList<QPointF>& _pts) {
-	m_polygon.clear();
-	m_polygon.append(_pts);
+void ot::GraphicsPolygonItem::addPoint(const Point2DD& _pt) {
+	this->getItemConfiguration<GraphicsPolygonItemCfg>()->addPoint(_pt);
+	this->update();
+}
+
+void ot::GraphicsPolygonItem::addPoint(const QPointF& _pt) {
+	this->addPoint(QtFactory::toPoint2D(_pt));
+}
+
+void ot::GraphicsPolygonItem::setPoints(const std::list<Point2DD>& _points) {
+	this->getItemConfiguration<GraphicsPolygonItemCfg>()->setPoints(_points);
+	this->update();
+}
+
+const std::list<ot::Point2DD>& ot::GraphicsPolygonItem::getPoints(void) const {
+	return this->getItemConfiguration<GraphicsPolygonItemCfg>()->getPoints();
+}
+
+void ot::GraphicsPolygonItem::setBackgroundPainter(Painter2D* _painter) {
+	this->getItemConfiguration<GraphicsPolygonItemCfg>()->setBackgroundPainter(_painter);
+	this->update();
+}
+
+const ot::Painter2D* ot::GraphicsPolygonItem::getBackgroundPainter(void) const {
+	return this->getItemConfiguration<GraphicsPolygonItemCfg>()->getBackgroundPainter();
+}
+
+void ot::GraphicsPolygonItem::setOutline(const OutlineF& _outline) {
+	this->getItemConfiguration<GraphicsPolygonItemCfg>()->setOutline(_outline);
+	this->update();
+}
+
+const ot::OutlineF& ot::GraphicsPolygonItem::getOutline(void) const {
+	return this->getItemConfiguration<GraphicsPolygonItemCfg>()->getOutline();
+}
+
+void ot::GraphicsPolygonItem::setFillPolygon(bool _fill) {
+	this->getItemConfiguration<GraphicsPolygonItemCfg>()->setFillPolygon(_fill);
+	this->update();
+}
+
+bool ot::GraphicsPolygonItem::getFillPolygon(void) const {
+	return this->getItemConfiguration<GraphicsPolygonItemCfg>()->getFillPolygon();
 }

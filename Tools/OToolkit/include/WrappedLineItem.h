@@ -25,6 +25,8 @@ public:
 
 	virtual bool isDesignedItemCompleted(void) const override { return this->getControlPoints().size() == 2; };
 
+	virtual bool isDesignedItemValid(void) const override { return this->getControlPoints().size() == 2; };
+
 	virtual ot::GraphicsItem* getGraphicsItem(void) override { return this; };
 
 	virtual QString getDefaultItemName(void) const override { return "Line"; };

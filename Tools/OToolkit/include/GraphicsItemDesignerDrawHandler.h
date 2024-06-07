@@ -34,6 +34,9 @@ public:
 	virtual ~GraphicsItemDesignerDrawHandler();
 
 	void startDraw(DrawMode _mode);
+
+	//! \brief Cancels the current draw.
+	//! The item will be removed.
 	void cancelDraw(void);
 
 	//! \brief Stops the current draw and returns the drawn item if valid.
@@ -41,6 +44,10 @@ public:
 	//! The caller takes ownership of the item.
 	//! The returned item is still placed in the scene.
 	GraphicsItemDesignerItemBase* stopDraw(void);
+
+	//! \brief Will check if the current draw is valid and emits drawCompleted if valid otherwise removes the item.
+	//! The last control point of the item will be removed.
+	void checkStopDraw(void);
 
 	void updatePosition(const QPointF& _pos);
 	void positionSelected(const QPointF& _pos);

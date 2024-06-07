@@ -186,9 +186,10 @@ void GraphicsItemDesigner::slotExportAsImageRequested(void) {
 
 void GraphicsItemDesigner::slotDrawFinished(void) {
 	GraphicsItemDesignerItemBase* newItem = m_drawHandler->stopDraw();
-	if (!newItem) return;
+	if (newItem) {
+		m_navigation->addRootItem(newItem);
+	}
 
-	m_navigation->addRootItem(newItem);
 	m_toolBar->setEnabled(true);
 }
 

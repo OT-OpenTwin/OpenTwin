@@ -99,7 +99,9 @@ void GraphicsItemDesignerView::fwdPointSelected(const QPointF& _pt) {
 }
 
 void GraphicsItemDesignerView::fwdCancelRequest(void) {
-	if (m_drawHandler) m_drawHandler->cancelDraw();
+	if (m_drawHandler) {
+		m_drawHandler->checkStopDraw();
+	}
 }
 
 void GraphicsItemDesignerView::fwdPositionChanged(const QPointF& _pt) {

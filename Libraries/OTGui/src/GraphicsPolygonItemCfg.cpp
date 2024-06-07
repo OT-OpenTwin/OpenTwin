@@ -15,6 +15,7 @@
 static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsPolygonItemCfg> polyItemCfg(OT_FactoryKey_GraphicsPolygonItem);
 
 ot::GraphicsPolygonItemCfg::GraphicsPolygonItemCfg()
+	: m_fillPolygon(false)
 {
 	m_backgroundPainter = new FillPainter2D(Transparent);
 }
@@ -27,6 +28,7 @@ ot::GraphicsItemCfg* ot::GraphicsPolygonItemCfg::createCopy(void) const {
 	ot::GraphicsPolygonItemCfg* copy = new GraphicsPolygonItemCfg;
 	this->copyConfigDataToItem(copy);
 
+	copy->m_fillPolygon = m_fillPolygon;
 	copy->m_points = m_points;
 	copy->m_outline = m_outline;
 	copy->setBackgroundPainter(m_backgroundPainter->createCopy());
@@ -52,6 +54,7 @@ void ot::GraphicsPolygonItemCfg::addToJsonObject(JsonValue& _object, JsonAllocat
 	JsonObject outlineObj;
 	m_outline.addToJsonObject(outlineObj, _allocator);
 	_object.AddMember("Outline", outlineObj, _allocator);
+	_object.AddMember("Fill", m_fillPolygon, _allocator);
 }
 
 void ot::GraphicsPolygonItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
@@ -73,6 +76,7 @@ void ot::GraphicsPolygonItemCfg::setFromJsonObject(const ConstJsonObject& _objec
 	}
 
 	m_outline.setFromJsonObject(json::getObject(_object, "Outline"));
+	m_fillPolygon = json::getBool(_object, "Fill");
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

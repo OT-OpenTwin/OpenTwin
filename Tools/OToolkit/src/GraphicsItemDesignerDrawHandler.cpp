@@ -39,7 +39,7 @@ void GraphicsItemDesignerDrawHandler::startDraw(DrawMode _mode) {
 
 	m_view->enablePickingMode();
 
-	m_overlay = new GraphicsItemDesignerInfoOverlay(this->modeString() + " (Press ESC to cancel)", m_view);
+	m_overlay = new GraphicsItemDesignerInfoOverlay(this->modeString(), m_view);
 
 	this->createPreviewItem();
 }
@@ -71,9 +71,30 @@ GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::stopDraw(void) {
 
 	if (ret) {
 		ret->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHasNoFeedback, false);
+		
+		// If the item is invalid it should be removed.
+		if (!ret->isDesignedItemValid()) {
+			m_view->removeItem(ret->getGraphicsItem()->getGraphicsItemUid());
+			ret = nullptr;
+		}
 	}
 
 	return ret;
+}
+
+void GraphicsItemDesignerDrawHandler::checkStopDraw(void) {
+	if (!m_previewItem) return;
+
+	QList<QPointF> controlPoints = m_previewItem->getControlPoints();
+	if (!controlPoints.isEmpty()) controlPoints.removeLast();
+	m_previewItem->setControlPoints(controlPoints);
+
+	if (m_previewItem->isDesignedItemValid()) {
+		Q_EMIT drawCompleted();
+	}
+	else {
+		this->cancelDraw();
+	}
 }
 
 void GraphicsItemDesignerDrawHandler::updatePosition(const QPointF& _pos) {
@@ -126,16 +147,20 @@ QPointF GraphicsItemDesignerDrawHandler::constainPosition(const QPointF& _pos) c
 QString GraphicsItemDesignerDrawHandler::modeString(void) {
 	switch (m_mode)
 	{
-	case GraphicsItemDesignerDrawHandler::NoMode: return "<None>";
-	case GraphicsItemDesignerDrawHandler::Line: return "Draw Line";
-	case GraphicsItemDesignerDrawHandler::Square: return "Draw Square";
-	case GraphicsItemDesignerDrawHandler::Rect: return "Draw Rectangle";
-	case GraphicsItemDesignerDrawHandler::Circle: return "Draw Circle";
-	case GraphicsItemDesignerDrawHandler::Ellipse: return "Draw Ellipse";
-	case GraphicsItemDesignerDrawHandler::Triangle: return "Draw Triangle";
-	case GraphicsItemDesignerDrawHandler::Polygon: return "Draw Polygon";
-	case GraphicsItemDesignerDrawHandler::Shape: return "Draw Shape";
-	default: return "<UNKNWON>";
+	case GraphicsItemDesignerDrawHandler::NoMode: 
+		OT_LOG_W("No draw mode selected..");
+		return "<None>";
+	case GraphicsItemDesignerDrawHandler::Line: return "Draw Line (Press ESC to cancel)";
+	case GraphicsItemDesignerDrawHandler::Square: return "Draw Square (Press ESC to cancel)";
+	case GraphicsItemDesignerDrawHandler::Rect: return "Draw Rectangle (Press ESC to cancel)";
+	case GraphicsItemDesignerDrawHandler::Circle: return "Draw Circle (Press ESC to cancel)";
+	case GraphicsItemDesignerDrawHandler::Ellipse: return "Draw Ellipse (Press ESC to cancel)";
+	case GraphicsItemDesignerDrawHandler::Triangle: return "Draw Triangle (Press ESC to cancel)";
+	case GraphicsItemDesignerDrawHandler::Polygon: return "Draw Polygon (Press ESC to finish)";
+	case GraphicsItemDesignerDrawHandler::Shape: return "Draw Shape (Press ESC to finish)";
+	default: 
+		OT_LOG_E("Unknown draw mode (" + std::to_string((int)m_mode) + ")");
+		return "<UNKNWON>";
 	}
 }
 

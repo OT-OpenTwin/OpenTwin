@@ -44,27 +44,20 @@ namespace ot {
 		// Setter / Getter
 
 	public:
-		void setPlaneBrush(const QBrush& _brush) { m_brush = _brush; };
-		const QBrush& planeBrush(void) const { return m_brush; };
+		void addPoint(const Point2DD& _pt);
+		void addPoint(const QPointF& _pt);
+		void setPoints(const std::list<Point2DD>& _points);
+		const std::list<Point2DD>& getPoints(void) const;
 
-		void setOutlinePen(const QPen& _pen) { m_pen = _pen; };
-		const QPen& outlinePen(void) const { return m_pen; };
+		//! \brief Sets the background painter.
+		//! The item takes ownership of the painter.
+		void setBackgroundPainter(Painter2D* _painter);
+		const Painter2D* getBackgroundPainter(void) const;
 
-		//! @brief Will create a new polygon from the points provided.
-		//! @param _pts Polygon points.
-		void setPolygon(const QList<QPointF>& _pts);
+		void setOutline(const OutlineF& _outline);
+		const OutlineF& getOutline(void) const;
 
-		//! @brief Will set the current polygon.
-		//! @param _poly Polygon to set.
-		void setPolygon(const QPolygonF& _poly) { m_polygon = _poly; };
-
-		//! @brief Current polygon.
-		const QPolygonF& polygon(void) const { return m_polygon; };
-
-
-	private:
-		QBrush m_brush;
-		QPen m_pen;
-		QPolygonF m_polygon;
+		void setFillPolygon(bool _fill);
+		bool getFillPolygon(void) const;
 	};
 }
