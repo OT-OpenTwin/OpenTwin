@@ -6,13 +6,9 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/CustomGraphicsItem.h"
 #include "OTCore/OTClassHelper.h"
-
-// Qt header
-#include <QtGui/qpen.h>
-#include <QtGui/qbrush.h>
-#include <QtGui/qpolygon.h>
+#include "OTGui/Outline.h"
+#include "OTWidgets/CustomGraphicsItem.h"
 
 namespace ot {
 
@@ -59,5 +55,6 @@ namespace ot {
 
 		void setFillPolygon(bool _fill);
 		bool getFillPolygon(void) const;
+
 	};
 }

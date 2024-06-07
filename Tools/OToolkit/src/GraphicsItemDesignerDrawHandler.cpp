@@ -16,6 +16,7 @@
 #include "WrappedSquareItem.h"
 #include "WrappedCircleItem.h"
 #include "WrappedEllipseItem.h"
+#include "WrappedPolygonItem.h"
 #include "WrappedTriangleItem.h"
 
 // OpenTwin header
@@ -199,6 +200,7 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 		break;
 
 	case GraphicsItemDesignerDrawHandler::Polygon:
+		m_previewItem = new WrappedPolygonItem;
 		break;
 
 	case GraphicsItemDesignerDrawHandler::Shape:

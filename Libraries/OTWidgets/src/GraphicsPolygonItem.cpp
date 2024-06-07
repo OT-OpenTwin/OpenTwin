@@ -46,7 +46,27 @@ bool ot::GraphicsPolygonItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 // Base class functions: ot::CustomGraphicsItem
 
 QSizeF ot::GraphicsPolygonItem::getPreferredGraphicsItemSize(void) const {
-	return QSizeF();
+	const GraphicsPolygonItemCfg* cfg = this->getItemConfiguration<GraphicsPolygonItemCfg>();
+	QPointF topLeftPoint(DBL_MAX, DBL_MAX);
+	QPointF bottomRightPoint(DBL_MIN, DBL_MIN);
+
+	for (const Point2DD& pt : cfg->getPoints()) {
+		if (pt.x() < topLeftPoint.x()) topLeftPoint.setX(pt.x());
+		if (pt.y() < topLeftPoint.y()) topLeftPoint.setY(pt.y());
+		if (pt.x() > bottomRightPoint.x()) bottomRightPoint.setX(pt.x());
+		if (pt.y() > bottomRightPoint.y()) bottomRightPoint.setY(pt.y());
+	}
+
+	if (topLeftPoint.x() < 0.) {
+		bottomRightPoint.setX(bottomRightPoint.x() - topLeftPoint.x());
+		topLeftPoint.setX(0.);
+	}
+	if (topLeftPoint.y() < 0.) {
+		bottomRightPoint.setY(bottomRightPoint.y() - topLeftPoint.y());
+		topLeftPoint.setY(0.);
+	}
+
+	return QRectF(topLeftPoint, bottomRightPoint).size();
 }
 
 void ot::GraphicsPolygonItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
@@ -76,7 +96,7 @@ void ot::GraphicsPolygonItem::paintCustomItem(QPainter* _painter, const QStyleOp
 
 void ot::GraphicsPolygonItem::addPoint(const Point2DD& _pt) {
 	this->getItemConfiguration<GraphicsPolygonItemCfg>()->addPoint(_pt);
-	this->update();
+	this->updateItemGeometry();
 }
 
 void ot::GraphicsPolygonItem::addPoint(const QPointF& _pt) {
@@ -85,7 +105,7 @@ void ot::GraphicsPolygonItem::addPoint(const QPointF& _pt) {
 
 void ot::GraphicsPolygonItem::setPoints(const std::list<Point2DD>& _points) {
 	this->getItemConfiguration<GraphicsPolygonItemCfg>()->setPoints(_points);
-	this->update();
+	this->updateItemGeometry();
 }
 
 const std::list<ot::Point2DD>& ot::GraphicsPolygonItem::getPoints(void) const {

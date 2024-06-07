@@ -177,6 +177,9 @@
     <ClCompile Include="src\WrappedTriangleItem.cpp">
       <Filter>Source Files\GraphicsItemDesignerItems</Filter>
     </ClCompile>
+    <ClCompile Include="src\WrappedPolygonItem.cpp">
+      <Filter>Source Files\GraphicsItemDesignerItems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -228,6 +231,9 @@
       <Filter>Header Files\GraphicsItemDesigner</Filter>
     </ClInclude>
     <ClInclude Include="include\WrappedTriangleItem.h">
+      <Filter>Header Files\GraphicsItemDesignerItems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WrappedPolygonItem.h">
       <Filter>Header Files\GraphicsItemDesignerItems</Filter>
     </ClInclude>
   </ItemGroup>
