@@ -37,9 +37,15 @@ GraphicsItemDesignerNavigation::~GraphicsItemDesignerNavigation() {
 
 }
 
-void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _item) {
+void GraphicsItemDesignerNavigation::addRootItem(GraphicsItemDesignerItemBase* _item, bool _keepName) {
 	// Determine new item name
-	QString itemName = _item->getDefaultItemName();
+	QString itemName;
+	if (_keepName) {
+		itemName = QString::fromStdString(_item->getGraphicsItem()->getGraphicsItemName());
+	}
+	else {
+		itemName = _item->getDefaultItemName();
+	}
 	auto it = m_itemsMap.find(itemName);
 	int ct = 1;
 	while (it != m_itemsMap.end()) {

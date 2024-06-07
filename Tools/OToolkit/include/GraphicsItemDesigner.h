@@ -81,7 +81,7 @@ private Q_SLOTS:
 	void slotDeleteItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 
 private:
-	void createItemFromConfig(const ot::GraphicsItemCfg* _config);
+	void createItemFromConfig(const ot::GraphicsItemCfg* _config, bool _keepName);
 
 	GraphicsItemDesignerExportConfig m_exportConfig;
 	GraphicsItemDesignerImageExportConfig m_imageExportConfig;

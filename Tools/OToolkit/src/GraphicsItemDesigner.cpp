@@ -211,7 +211,7 @@ void GraphicsItemDesigner::slotImportRequested(void) {
 
 	// Create all items
 	for (ot::GraphicsItemCfg* newItem : groupItem->getItems()) {
-		this->createItemFromConfig(newItem);
+		this->createItemFromConfig(newItem, true);
 	}
 
 	// Delete group
@@ -252,7 +252,7 @@ void GraphicsItemDesigner::slotExportAsImageRequested(void) {
 void GraphicsItemDesigner::slotDrawFinished(void) {
 	GraphicsItemDesignerItemBase* newItem = m_drawHandler->stopDraw();
 	if (newItem) {
-		m_navigation->addRootItem(newItem);
+		m_navigation->addRootItem(newItem, false);
 	}
 
 	m_toolBar->setEnabled(true);
@@ -276,7 +276,7 @@ void GraphicsItemDesigner::slotDuplicateRequested(void) {
 	if (selectedItems.empty()) return;
 
 	for (GraphicsItemDesignerItemBase* itm : selectedItems) {
-		this->createItemFromConfig(itm->getGraphicsItem()->getConfiguration());
+		this->createItemFromConfig(itm->getGraphicsItem()->getConfiguration(), false);
 	}
 }
 
@@ -303,11 +303,11 @@ void GraphicsItemDesigner::slotDeleteItemsRequested(const ot::UIDList& _items, c
 	m_navigation->removeDesignerItems(itemNames);
 }
 
-void GraphicsItemDesigner::createItemFromConfig(const ot::GraphicsItemCfg* _config) {
+void GraphicsItemDesigner::createItemFromConfig(const ot::GraphicsItemCfg* _config, bool _keepName) {
 	GraphicsItemDesignerItemBase* newItem = WrappedItemFactory::instance().createFromConfig(_config);
 	if (newItem) {
 		newItem->getGraphicsItem()->setGraphicsItemUid(m_drawHandler->generateUid());
 		m_view->addItem(newItem->getGraphicsItem());
-		m_navigation->addRootItem(newItem);
+		m_navigation->addRootItem(newItem, _keepName);
 	}
 }

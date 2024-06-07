@@ -35,7 +35,7 @@ public:
 	GraphicsItemDesignerNavigation(GraphicsItemDesigner* _designer);
 	virtual ~GraphicsItemDesignerNavigation();
 
-	void addRootItem(GraphicsItemDesignerItemBase* _item);
+	void addRootItem(GraphicsItemDesignerItemBase* _item, bool _keepName);
 
 	bool isItemNameUnique(const QString& _itemName) const;
 
