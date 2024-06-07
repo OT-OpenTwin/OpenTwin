@@ -81,6 +81,7 @@ void WrappedRectItem::fillPropertyGrid(void) {
 	geometryGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().painter()));
 	geometryGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width()));
 	geometryGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
+	geometryGroup->addProperty(new PropertyInt("Corner Radius", this->getCornerRadius(), 0, 9999));
 
 	cfg.addRootGroup(generalGroup);
 	cfg.addRootGroup(geometryGroup);
@@ -183,6 +184,15 @@ void WrappedRectItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 		}
 
 		this->setBackgroundPainter(input->getPainter()->createCopy());
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Corner Radius") {
+		PropertyInputInt* input = dynamic_cast<PropertyInputInt*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		this->setCornerRadius(input->getValue());
 	}
 }
 

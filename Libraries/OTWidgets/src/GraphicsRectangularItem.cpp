@@ -80,7 +80,7 @@ void ot::GraphicsRectangularItem::setRectangleSize(const Size2DD& _size) {
 }
 
 void ot::GraphicsRectangularItem::setRectangleSize(const QSizeF& _size) {
-	this->setRectangleSize(QtFactory::toSize2D(_size));
+	this->setRectangleSize(QtFactory::toSize2D(_size));	
 }
 
 const ot::Size2DD& ot::GraphicsRectangularItem::getRectangleSize(void) const {
@@ -89,6 +89,7 @@ const ot::Size2DD& ot::GraphicsRectangularItem::getRectangleSize(void) const {
 
 void ot::GraphicsRectangularItem::setBackgroundPainter(ot::Painter2D* _painter) {
 	this->getItemConfiguration<GraphicsRectangularItemCfg>()->setBackgroundPainer(_painter);
+	this->update();
 }
 
 const ot::Painter2D* ot::GraphicsRectangularItem::getBackgroundPainter(void) const {
@@ -97,6 +98,7 @@ const ot::Painter2D* ot::GraphicsRectangularItem::getBackgroundPainter(void) con
 
 void ot::GraphicsRectangularItem::setOutline(const OutlineF& _outline) {
 	this->getItemConfiguration<GraphicsRectangularItemCfg>()->setOutline(_outline);
+	this->update();
 }
 
 const ot::OutlineF& ot::GraphicsRectangularItem::getOutline(void) const {
@@ -105,6 +107,7 @@ const ot::OutlineF& ot::GraphicsRectangularItem::getOutline(void) const {
 
 void ot::GraphicsRectangularItem::setCornerRadius(int _r) {
 	this->getItemConfiguration<GraphicsRectangularItemCfg>()->setCornerRadius(_r);
+	this->update();
 }
 
 int ot::GraphicsRectangularItem::getCornerRadius(void) const {
