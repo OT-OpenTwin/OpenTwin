@@ -53,10 +53,10 @@ namespace ot {
 		void setOutlinePath(const Path2DF& _path) { m_path = _path; };
 
 		//! @brief Outline path reference.
-		Path2DF& outlinePath(void) { return m_path; };
+		Path2DF& getOutlinePath(void) { return m_path; };
 
 		//! @brief Outline path const reference.
-		const Path2DF& outlinePath(void) const { return m_path; };
+		const Path2DF& getOutlinePath(void) const { return m_path; };
 
 		//! @brief Set the background painter.
 		//! The item takes ownership of the painter.
@@ -64,7 +64,7 @@ namespace ot {
 		void setBackgroundPainter(Painter2D* _painter);
 		
 		//! @brief Background painter.
-		const Painter2D* backgroundPainter(void) const { return m_backgroundPainter; };
+		const Painter2D* getBackgroundPainter(void) const { return m_backgroundPainter; };
 
 		//! @brief Returns the current background painter and replaces it with the default background painter.
 		//! The caller takes ownership of the returned painter.
@@ -75,26 +75,34 @@ namespace ot {
 		void setOutline(const OutlineF& _outline) { m_outline = _outline; };
 
 		//! @brief Outlin.
-		const OutlineF& outline(void) const { return m_outline; };
+		const OutlineF& getOutline(void) const { return m_outline; };
 
 		//! @brief Set the outline painter.
 		//! The item takes ownership of the painter.
 		void setOutlinePainter(Painter2D* _painter) { m_outline.setPainter(_painter); };
 
 		//! @brief Outline painter.
-		const Painter2D* outlinePainter(void) const { return m_outline.painter(); };
+		const Painter2D* getOutlinePainter(void) const { return m_outline.painter(); };
 
 		//! @brief Set the outline width.
 		//! @param _w Width to set.
 		void setOutlineWidth(double _w) { m_outline.setWidth(_w); };
 
 		//! @brief Outline width.
-		double outlineWidth(void) const { return m_outline.width(); };
+		double getOutlineWidth(void) const { return m_outline.width(); };
+		
+		//! \brief Sets the fill shape.
+		//! \see getFillShape
+		void setFillShape(bool _fill) { m_fillShape = _fill; };
+
+		//! \brief If fill shape is enabled the shape will be filled, otherwise only the outline will be drawn.
+		bool getFillShape(void) const { return m_fillShape; };
 
 	private:
 		Path2DF m_path; //! @brief Outline path.
 		Painter2D* m_backgroundPainter; //! @brief Background painter.
 		OutlineF m_outline;
+		bool m_fillShape;
 	};
 
 }

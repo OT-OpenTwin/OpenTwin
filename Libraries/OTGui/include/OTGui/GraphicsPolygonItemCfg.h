@@ -98,7 +98,7 @@ namespace ot {
 		//! \see getFillPolygon
 		void setFillPolygon(bool _fill) { m_fillPolygon = _fill; };
 
-		//! \brief If fill polygon is enabled the polygon will be filled if the polygon in a closed shape.
+		//! \brief If fill polygon is enabled the polygon will be filled, otherwise only the outline will be drawn.
 		bool getFillPolygon(void) const { return m_fillPolygon; };
 
 	private:

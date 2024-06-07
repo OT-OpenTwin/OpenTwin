@@ -48,6 +48,8 @@ void ot::GraphicsShapeItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator
 	JsonObject outlineObj;
 	m_outline.addToJsonObject(outlineObj, _allocator);
 	_object.AddMember("Outline", outlineObj, _allocator);
+
+	_object.AddMember("Fill", m_fillShape, _allocator);
 }
 
 void ot::GraphicsShapeItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
@@ -62,6 +64,8 @@ void ot::GraphicsShapeItemCfg::setFromJsonObject(const ConstJsonObject& _object)
 	}
 
 	m_outline.setFromJsonObject(json::getObject(_object, "Outline"));
+
+	m_fillShape = json::getBool(_object, "Fill");
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

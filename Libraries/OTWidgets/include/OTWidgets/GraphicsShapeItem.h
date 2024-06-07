@@ -8,12 +8,8 @@
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/Path2D.h"
+#include "OTGui/Outline.h"
 #include "OTWidgets/CustomGraphicsItem.h"
-
-// Qt header
-#include <QtGui/qpen.h>
-#include <QtGui/qbrush.h>
-#include <QtGui/qpainterpath.h>
 
 namespace ot {
 
@@ -45,26 +41,22 @@ namespace ot {
 		// Setter / Getter
 
 	public:
-		void setPlaneBrush(const QBrush& _brush) { m_brush = _brush; };
-		const QBrush& planeBrush(void) const { return m_brush; };
+		//! \brief Sets the background painter.
+		//! The item takes ownership of the painter.
+		void setBackgroundPainter(Painter2D* _painter);
+		const Painter2D* getBackgroundPainter(void) const;
 
-		void setOutlinePen(const QPen& _pen) { m_pen = _pen; };
-		const QPen& outlinePen(void) const { return m_pen; };
+		void setOutline(const OutlineF& _outline);
+		const OutlineF& getOutline(void) const;
+
+		void setFillShape(bool _fill);
+		bool getFillShape(void) const;
 
 		//! @brief Will set the current path.
 		//! @param _path Path to set.
-		void setPath(const Path2DF& _path);
-
-		//! @brief Will set the current path.
-		//! @param _path Path to set.
-		void setPath(const QPainterPath& _path) { m_path = _path; };
+		void setOutlinePath(const Path2DF& _path);
 
 		//! @brief Current path.
-		const QPainterPath& path(void) const { return m_path; };
-
-	private:
-		QBrush m_brush;
-		QPen m_pen;
-		QPainterPath m_path;
+		const Path2DF& getOutlinePath(void) const;
 	};
 }

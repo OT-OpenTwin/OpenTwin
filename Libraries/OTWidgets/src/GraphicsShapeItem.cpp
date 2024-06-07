@@ -38,10 +38,7 @@ bool ot::GraphicsShapeItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		return false;
 	}
 
-	this->prepareGeometryChange();
-
-	// We call set rectangle size which will call set geometry to finalize the item
-	m_path = QtFactory::toQPainterPath(cfg->outlinePath());
+	this->updateItemGeometry();
 
 	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }
@@ -51,19 +48,55 @@ bool ot::GraphicsShapeItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 // Base class functions: ot::CustomGraphicsItem
 
 QSizeF ot::GraphicsShapeItem::getPreferredGraphicsItemSize(void) const {
-	return QSizeF();
+	return QtFactory::toQPainterPath(this->getItemConfiguration<GraphicsShapeItemCfg>()->getOutlinePath()).boundingRect().size();
 }
 
 void ot::GraphicsShapeItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
-	_painter->setPen(m_pen);
-	_painter->fillPath(m_path, m_brush);
-	_painter->drawPath(m_path);
+	const GraphicsShapeItemCfg* cfg = this->getItemConfiguration<GraphicsShapeItemCfg>();
+
+	_painter->setPen(QtFactory::toQPen(cfg->getOutline()));
+
+	QPainterPath painterPath = QtFactory::toQPainterPath(cfg->getOutlinePath());
+
+	if (cfg->getFillShape()) {
+		_painter->fillPath(painterPath, QtFactory::toQBrush(cfg->getBackgroundPainter()));
+	}
+	
+	_painter->drawPath(painterPath);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter/Getter
 
-void ot::GraphicsShapeItem::setPath(const Path2DF& _path) {
-	m_path = QtFactory::toQPainterPath(_path);
+void ot::GraphicsShapeItem::setBackgroundPainter(Painter2D* _painter) {
+	this->getItemConfiguration<GraphicsShapeItemCfg>()->setBackgroundPainter(_painter);
+}
+
+const ot::Painter2D* ot::GraphicsShapeItem::getBackgroundPainter(void) const {
+	return this->getItemConfiguration<GraphicsShapeItemCfg>()->getBackgroundPainter();
+}
+
+void ot::GraphicsShapeItem::setOutline(const OutlineF& _outline) {
+	this->getItemConfiguration<GraphicsShapeItemCfg>()->setOutline(_outline);
+}
+
+const ot::OutlineF& ot::GraphicsShapeItem::getOutline(void) const {
+	return this->getItemConfiguration<GraphicsShapeItemCfg>()->getOutline();
+}
+
+void ot::GraphicsShapeItem::setFillShape(bool _fill) {
+	this->getItemConfiguration<GraphicsShapeItemCfg>()->setFillShape(_fill);
+}
+
+bool ot::GraphicsShapeItem::getFillShape(void) const {
+	return this->getItemConfiguration<GraphicsShapeItemCfg>()->getFillShape();
+}
+
+void ot::GraphicsShapeItem::setOutlinePath(const Path2DF& _path) {
+	this->getItemConfiguration<GraphicsShapeItemCfg>()->setOutlinePath(_path);
+}
+
+const ot::Path2DF& ot::GraphicsShapeItem::getOutlinePath(void) const {
+	return this->getItemConfiguration<GraphicsShapeItemCfg>()->getOutlinePath();
 }
