@@ -6,7 +6,7 @@
 // OpenTwin header
 #include "OTGui/Font.h"
 
-ot::Font::Font() : m_sizePx(12), m_isBold(false), m_isItalic(false) {}
+ot::Font::Font() : m_sizePx(12), m_isBold(false), m_isItalic(false), m_family("Consolas") {}
 
 ot::Font::Font(FontFamily _fontFamily, int _sizePx, bool _isBold, bool _isItalic) : m_sizePx(_sizePx), m_isBold(_isBold), m_isItalic(_isItalic) {
 	m_family = toString(_fontFamily);

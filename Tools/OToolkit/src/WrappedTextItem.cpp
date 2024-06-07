@@ -15,6 +15,9 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 
+// Qt header
+#include <QtGui/qfontdatabase.h>
+
 static WrappedItemFactoryRegistrar<WrappedTextItem> circleRegistrar(OT_FactoryKey_GraphicsTextItem);
 
 WrappedTextItem::WrappedTextItem() {
@@ -74,6 +77,24 @@ void WrappedTextItem::fillPropertyGrid(void) {
 	geometryGroup->addProperty(new PropertyDouble("X", this->pos().x()));
 	geometryGroup->addProperty(new PropertyDouble("Y", this->pos().y()));
 	geometryGroup->addProperty(new PropertyString("Text", this->getText()));
+	{
+		std::list<std::string> fontFamilies;
+		std::string newFontFamily = this->getFont().family();
+
+		bool found = false;
+		for (const QString& family : QFontDatabase::families()) {
+			std::string newFamily = family.toStdString();
+			if (newFamily == this->getFont().family()) found = true;
+			fontFamilies.push_back(newFamily);
+		}
+		if (fontFamilies.empty()) {
+			OT_LOG_E("No font families found");
+		}
+		else {
+			if (!found) newFontFamily = fontFamilies.front();
+			geometryGroup->addProperty(new PropertyStringList("Font Family", newFontFamily, fontFamilies));
+		}
+	}
 	geometryGroup->addProperty(new PropertyInt("Text Size", this->getFont().size()));
 	geometryGroup->addProperty(new PropertyBool("Bold", this->getFont().isBold()));
 	geometryGroup->addProperty(new PropertyBool("Italic", this->getFont().isItalic()));
@@ -126,6 +147,17 @@ void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 		}
 
 		this->setText(input->getCurrentText());
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Font Family") {
+		PropertyInputStringList* input = dynamic_cast<PropertyInputStringList*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		Font font = this->getFont();
+		font.setFamily(input->getCurrentText().toStdString());
+		this->setFont(font);
 	}
 	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Text Size") {
 		PropertyInputInt* input = dynamic_cast<PropertyInputInt*>(_item->getInput());
