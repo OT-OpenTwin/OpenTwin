@@ -34,15 +34,11 @@ ot::GraphicsRectangularItem::~GraphicsRectangularItem() {
 bool ot::GraphicsRectangularItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
 
-	const GraphicsRectangularItemCfg* cfg = dynamic_cast<const GraphicsRectangularItemCfg*>(_cfg);
-	if (cfg == nullptr) {
-		OT_LOG_EA("Invalid configuration provided: Cast failed");
-		return false;
-	}
+	if (!ot::CustomGraphicsItem::setupFromConfig(_cfg)) return false;
 
 	this->updateItemGeometry();
 
-	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
+	return true;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

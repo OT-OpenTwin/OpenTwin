@@ -66,8 +66,10 @@
     <ClCompile Include="src\WrappedLineItem.cpp" />
     <ClCompile Include="src\WrappedRectItem.cpp" />
     <ClCompile Include="src\WrappedSquareItem.cpp" />
+    <ClCompile Include="src\WrappedTriangleItem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\WrappedTriangleItem.h" />
     <QtMoc Include="include\ToolViewManager.h" />
     <QtMoc Include="include\GraphicsItemDesignerImageExportDialog.h" />
     <ClInclude Include="include\GraphicsItemDesignerExportConfig.h" />

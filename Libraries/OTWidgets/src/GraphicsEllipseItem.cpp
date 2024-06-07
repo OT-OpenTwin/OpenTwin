@@ -29,14 +29,9 @@ ot::GraphicsEllipseItem::~GraphicsEllipseItem() {
 // Base class functions: ot::GraphicsItems
 
 bool ot::GraphicsEllipseItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
-	if (!ot::CustomGraphicsItem::setupFromConfig(_cfg)) return false;
-
 	OTAssertNullptr(_cfg);
-	const GraphicsEllipseItemCfg* cfg = dynamic_cast<const GraphicsEllipseItemCfg*>(_cfg);
-	if (cfg == nullptr) {
-		OT_LOG_EA("Invalid configuration provided: Cast failed");
-		return false;
-	}
+
+	if (!ot::CustomGraphicsItem::setupFromConfig(_cfg)) return false;
 
 	this->updateItemGeometry();
 

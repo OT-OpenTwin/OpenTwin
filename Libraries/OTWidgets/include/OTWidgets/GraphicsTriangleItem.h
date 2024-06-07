@@ -32,7 +32,7 @@ namespace ot {
 
 		// Base class functions: ot::CustomGraphicsItem
 
-		virtual QSizeF getPreferredGraphicsItemSize(void) const override { return m_size; };
+		virtual QSizeF getPreferredGraphicsItemSize(void) const override;
 
 	protected:
 
@@ -40,9 +40,9 @@ namespace ot {
 		virtual void paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) override;
 
 	private:
-		void paintTriangle(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect);
-		void paintKite(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect);
-		void paintIceCone(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect);
+		void paintTriangle(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect, const GraphicsTriangleItemCfg* _triangleConfig);
+		void paintKite(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect, const GraphicsTriangleItemCfg* _triangleConfig);
+		void paintIceCone(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect, const GraphicsTriangleItemCfg* _triangleConfig);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -50,27 +50,24 @@ namespace ot {
 
 	public:
 
+		void setTriangleSize(const Size2DD& _size);
 		void setTriangleSize(const QSizeF& _size);
-		const QSizeF& triangleSize(void) const { return m_size; };
+		const Size2DD& getTriangleSize(void) const;
 
-		void setRectangleBrush(const QBrush& _brush) { m_brush = _brush; };
-		const QBrush& rectangleBrush(void) const { return m_brush; };
+		//! \brief Sets the background painter.
+		//! The item takes ownership of the painter.
+		void setBackgroundPainter(ot::Painter2D* _painter);
+		const ot::Painter2D* getBackgroundPainter(void) const;
 
-		void setRectanglePen(const QPen& _pen) { m_pen = _pen; };
-		const QPen& rectanglePen(void) const { return m_pen; };
+		void setOutline(const OutlineF& _outline);
+		const OutlineF& getOutline(void) const;
 
-		void setTriangleShape(ot::GraphicsTriangleItemCfg::TriangleShape _shape) { m_shape = _shape; };
-		ot::GraphicsTriangleItemCfg::TriangleShape triangleShape(void) const { return m_shape; };
+		void setTriangleShape(ot::GraphicsTriangleItemCfg::TriangleShape _shape);
+		ot::GraphicsTriangleItemCfg::TriangleShape getTriangleShape(void) const;
 
-		void setTriangleDirection(ot::GraphicsTriangleItemCfg::TriangleDirection _direction) { m_direction = _direction; };
-		ot::GraphicsTriangleItemCfg::TriangleDirection trianlgeDirection(void) const { return m_direction; };
+		void setTriangleDirection(ot::GraphicsTriangleItemCfg::TriangleDirection _direction);
+		ot::GraphicsTriangleItemCfg::TriangleDirection getTrianlgeDirection(void) const;
 
-	private:
-		QSizeF m_size;
-		QBrush m_brush;
-		QPen m_pen;
-		ot::GraphicsTriangleItemCfg::TriangleShape m_shape;
-		ot::GraphicsTriangleItemCfg::TriangleDirection m_direction;
 	};
 
 

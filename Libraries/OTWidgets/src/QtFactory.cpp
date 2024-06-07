@@ -18,6 +18,15 @@
 #include <QtGui/qpixmap.h>
 #include <QtGui/qpainter.h>
 
+QPen ot::QtFactory::toQPen(const Outline& _outline) {
+    if (_outline.width() <= 0) return QPen(Qt::NoPen);
+    else return QPen(toQBrush(_outline.painter()), (qreal)_outline.width(), toQPenStyle(_outline.style()), toQPenCapStyle(_outline.cap()), toQPenJoinStyle(_outline.joinStyle())); 
+};
+QPen ot::QtFactory::toQPen(const OutlineF& _outline) {
+    if (_outline.width() <= 0.) return QPen(Qt::NoPen);
+    else return QPen(toQBrush(_outline.painter()), _outline.width(), toQPenStyle(_outline.style()), toQPenCapStyle(_outline.cap()), toQPenJoinStyle(_outline.joinStyle())); 
+};
+
 Qt::Alignment ot::QtFactory::toQAlignment(ot::Alignment _alignment) {
 	switch (_alignment)
 	{

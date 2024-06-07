@@ -1,6 +1,6 @@
-//! @file WrappedCircleItem.h
+//! @file WrappedTriangleItem.h
 //! @author Alexander Kuester (alexk95)
-//! @date May 2024
+//! @date June 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
@@ -9,13 +9,13 @@
 #include "GraphicsItemDesignerItemBase.h"
 
 // OpenTwin header
-#include "OTWidgets/GraphicsEllipseItem.h"
+#include "OTWidgets/GraphicsTriangleItem.h"
 
-class WrappedCircleItem : public ot::GraphicsEllipseItem, public GraphicsItemDesignerItemBase {
-	OT_DECL_NOCOPY(WrappedCircleItem)
+class WrappedTriangleItem : public ot::GraphicsTriangleItem, public GraphicsItemDesignerItemBase {
+	OT_DECL_NOCOPY(WrappedTriangleItem)
 public:
-	WrappedCircleItem();
-	virtual ~WrappedCircleItem();
+	WrappedTriangleItem();
+	virtual ~WrappedTriangleItem();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -25,7 +25,7 @@ public:
 
 	virtual ot::GraphicsItem* getGraphicsItem(void) override { return this; };
 
-	virtual QString getDefaultItemName(void) const override { return "Circle"; };
+	virtual QString getDefaultItemName(void) const override { return "Triangle"; };
 
 	virtual ot::TreeWidgetItemInfo createNavigationInformation(void) override;
 

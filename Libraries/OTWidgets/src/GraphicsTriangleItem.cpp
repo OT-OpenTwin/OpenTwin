@@ -18,7 +18,7 @@
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsTriangleItem> triaItemRegistrar(OT_FactoryKey_GraphicsTriangleItem);
 
 ot::GraphicsTriangleItem::GraphicsTriangleItem()
-	: ot::CustomGraphicsItem(new GraphicsTriangleItemCfg), m_size(10, 10), m_direction(GraphicsTriangleItemCfg::Right), m_shape(GraphicsTriangleItemCfg::Triangle)
+	: ot::CustomGraphicsItem(new GraphicsTriangleItemCfg)
 {
 
 }
@@ -33,25 +33,20 @@ ot::GraphicsTriangleItem::~GraphicsTriangleItem() {
 
 bool ot::GraphicsTriangleItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
-	const GraphicsTriangleItemCfg* cfg = dynamic_cast<const GraphicsTriangleItemCfg*>(_cfg);
-	if (cfg == nullptr) {
-		OT_LOG_EA("Invalid configuration provided: Cast failed");
-		return false;
-	}
 
-	this->prepareGeometryChange();
+	if (!ot::CustomGraphicsItem::setupFromConfig(_cfg)) return false;
 
-	m_size.setWidth(cfg->getSize().width());
-	m_size.setHeight(cfg->getSize().height());
-	m_shape = cfg->getTriangleShape();
-	m_direction = cfg->getTriangleDirection();
-	m_brush = QtFactory::toQBrush(cfg->getBackgroundPainter());
-	m_pen = QtFactory::toQPen(cfg->getOutline());
+	this->updateItemGeometry();
 
-	// We call set rectangle size which will call set geometry to finalize the item
-	this->setTriangleSize(m_size);
+	return true;
+}
 
-	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions: ot::CustomGraphicsItem
+
+QSizeF ot::GraphicsTriangleItem::getPreferredGraphicsItemSize(void) const {
+	return QtFactory::toQSize(this->getItemConfiguration<GraphicsTriangleItemCfg>()->getSize());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -59,31 +54,33 @@ bool ot::GraphicsTriangleItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 // Base class functions: ot::CustomGraphicsItem
 
 void ot::GraphicsTriangleItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {	
-	_painter->setBrush(m_brush);
-	_painter->setPen(m_pen);
+	const GraphicsTriangleItemCfg* cfg = this->getItemConfiguration<GraphicsTriangleItemCfg>();
 
-	switch (m_shape)
+	_painter->setBrush(QtFactory::toQBrush(cfg->getBackgroundPainter()));
+	_painter->setPen(QtFactory::toQPen(cfg->getOutline()));
+
+	switch (cfg->getTriangleShape())
 	{
 	case ot::GraphicsTriangleItemCfg::Triangle: 
-		this->paintTriangle(_painter, _opt, _widget, _rect);
+		this->paintTriangle(_painter, _opt, _widget, _rect, cfg);
 		break;
 	case ot::GraphicsTriangleItemCfg::Kite:
-		this->paintKite(_painter, _opt, _widget, _rect);
+		this->paintKite(_painter, _opt, _widget, _rect, cfg);
 		break;
 	case ot::GraphicsTriangleItemCfg::IceCone:
-		this->paintIceCone(_painter, _opt, _widget, _rect);
+		this->paintIceCone(_painter, _opt, _widget, _rect, cfg);
 		break;
 	default:
-		OT_LOG_EAS("Unknown triangle shape (" + std::to_string((int)m_shape) + ")");
+		OT_LOG_EAS("Unknown triangle shape (" + std::to_string((int)cfg->getTriangleShape()) + ")");
 		break;
 	}
 }
 
-void ot::GraphicsTriangleItem::paintTriangle(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
+void ot::GraphicsTriangleItem::paintTriangle(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect, const GraphicsTriangleItemCfg* _triangleConfig) {
 	// Set path depending on the direction
 	QPainterPath path;
 
-	switch (m_direction)
+	switch (_triangleConfig->getTriangleDirection())
 	{
 	case ot::GraphicsTriangleItemCfg::Left:
 		path.moveTo(QPointF(_rect.topLeft().x(), _rect.center().y()));
@@ -110,19 +107,19 @@ void ot::GraphicsTriangleItem::paintTriangle(QPainter* _painter, const QStyleOpt
 		path.lineTo(QPointF(_rect.center().x(), _rect.bottomRight().y()));
 		break;
 	default:
-		OT_LOG_EAS("Unknown triangle direction (" + std::to_string(m_direction) + ")");
+		OT_LOG_EAS("Unknown triangle direction (" + std::to_string(_triangleConfig->getTriangleDirection()) + ")");
 		break;
 	}
 
-	_painter->fillPath(path, m_brush);
+	_painter->fillPath(path, _painter->brush());
 	_painter->drawPath(path);
 }
 
-void ot::GraphicsTriangleItem::paintKite(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
+void ot::GraphicsTriangleItem::paintKite(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect, const GraphicsTriangleItemCfg* _triangleConfig) {
 	// Set path depending on the direction
 	QPainterPath path;
 
-	switch (m_direction)
+	switch (_triangleConfig->getTriangleDirection())
 	{
 	case ot::GraphicsTriangleItemCfg::Left:
 		path.moveTo(QPointF(_rect.left(), _rect.center().y()));
@@ -153,19 +150,19 @@ void ot::GraphicsTriangleItem::paintKite(QPainter* _painter, const QStyleOptionG
 		path.lineTo(QPointF(_rect.center().x(), _rect.bottom()));
 		break;
 	default:
-		OT_LOG_EAS("Unknown triangle direction (" + std::to_string(m_direction) + ")");
+		OT_LOG_EAS("Unknown triangle direction (" + std::to_string(_triangleConfig->getTriangleDirection()) + ")");
 		break;
 	}
 
-	_painter->fillPath(path, m_brush);
+	_painter->fillPath(path, _painter->brush());
 	_painter->drawPath(path);
 }
 
-void ot::GraphicsTriangleItem::paintIceCone(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
+void ot::GraphicsTriangleItem::paintIceCone(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect, const GraphicsTriangleItemCfg* _triangleConfig) {
 	// Set path depending on the direction
 	QPainterPath path;
 
-	switch (m_direction)
+	switch (_triangleConfig->getTriangleDirection())
 	{
 	case ot::GraphicsTriangleItemCfg::Left:
 		path.moveTo(QPointF(_rect.left(), _rect.center().y()));
@@ -192,11 +189,11 @@ void ot::GraphicsTriangleItem::paintIceCone(QPainter* _painter, const QStyleOpti
 		path.lineTo(QPointF(_rect.center().x(), _rect.bottom()));
 		break;
 	default:
-		OT_LOG_EAS("Unknown triangle direction (" + std::to_string(m_direction) + ")");
+		OT_LOG_EAS("Unknown triangle direction (" + std::to_string(_triangleConfig->getTriangleDirection()) + ")");
 		break;
 	}
 
-	_painter->fillPath(path, m_brush);
+	_painter->fillPath(path, _painter->brush());
 	_painter->drawPath(path);
 }
 
@@ -204,11 +201,54 @@ void ot::GraphicsTriangleItem::paintIceCone(QPainter* _painter, const QStyleOpti
 
 // Setter/Getter
 
-void ot::GraphicsTriangleItem::setTriangleSize(const QSizeF& _size) {
-	// Avoid resizing if the size did not change
-	if (m_size == _size) return;
-	m_size = _size;
-	this->setGeometry(QRectF(this->pos(), m_size).toRect());
+void ot::GraphicsTriangleItem::setTriangleSize(const Size2DD& _size) {
+	GraphicsTriangleItemCfg* cfg = this->getItemConfiguration<GraphicsTriangleItemCfg>();
+	cfg->setSize(_size);
+
+	this->updateItemGeometry();
 	this->raiseEvent(GraphicsItem::ItemResized);
 }
 
+void ot::GraphicsTriangleItem::setTriangleSize(const QSizeF& _size) {
+	this->setTriangleSize(QtFactory::toSize2D(_size));
+}
+
+const ot::Size2DD& ot::GraphicsTriangleItem::getTriangleSize(void) const {
+	return this->getItemConfiguration<GraphicsTriangleItemCfg>()->getSize();
+}
+
+void ot::GraphicsTriangleItem::setBackgroundPainter(ot::Painter2D* _painter) {
+	this->getItemConfiguration<GraphicsTriangleItemCfg>()->setBackgroundPainer(_painter);
+	this->update();
+}
+
+const ot::Painter2D* ot::GraphicsTriangleItem::getBackgroundPainter(void) const {
+	return this->getItemConfiguration<GraphicsTriangleItemCfg>()->getBackgroundPainter();
+}
+
+void ot::GraphicsTriangleItem::setOutline(const OutlineF& _outline) {
+	this->getItemConfiguration<GraphicsTriangleItemCfg>()->setOutline(_outline);
+	this->update();
+}
+
+const ot::OutlineF& ot::GraphicsTriangleItem::getOutline(void) const {
+	return this->getItemConfiguration<GraphicsTriangleItemCfg>()->getOutline();
+}
+
+void ot::GraphicsTriangleItem::setTriangleShape(ot::GraphicsTriangleItemCfg::TriangleShape _shape) {
+	this->getItemConfiguration<GraphicsTriangleItemCfg>()->setTriangleShape(_shape);
+	this->update();
+}
+
+ot::GraphicsTriangleItemCfg::TriangleShape ot::GraphicsTriangleItem::getTriangleShape(void) const {
+	return this->getItemConfiguration<GraphicsTriangleItemCfg>()->getTriangleShape();
+}
+
+void ot::GraphicsTriangleItem::setTriangleDirection(ot::GraphicsTriangleItemCfg::TriangleDirection _direction) {
+	this->getItemConfiguration<GraphicsTriangleItemCfg>()->setTriangleDirection(_direction);
+	this->update();
+}
+
+ot::GraphicsTriangleItemCfg::TriangleDirection ot::GraphicsTriangleItem::getTrianlgeDirection(void) const {
+	return this->getItemConfiguration<GraphicsTriangleItemCfg>()->getTriangleDirection();
+}
