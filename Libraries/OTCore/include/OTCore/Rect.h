@@ -94,6 +94,20 @@ namespace ot {
 		//! If the left value is bigger than the right value or the bottom value bigger than the top value false is returned.
 		bool isValid(void) const { return (m_topLeft.x() <= m_bottomRight.x()) && (m_topLeft.y() <= m_bottomRight.y()); };
 
+		//! \see void moveTo(const Point2D& _topLeft)
+		void moveTo(int _ax, int _ay) { this->moveTo(Point2D(_ax, _ay)); };
+
+		//! \brief Moves the rect to the specified location.
+		//! The top left and bottom right will be moved.
+		void moveTo(const Point2D& _topLeft);
+
+		//! \see void moveBy(const Point2D& _distance)
+		void moveBy(int _dx, int _dy) { this->moveBy(Point2D(_dx, _dy)); };
+
+		//! \brief Moves the rect by the provided distance.
+		//! The top left and bottom right will be moved.
+		void moveBy(const Point2D& _distance);
+
 		RectF toRectF(void) const;
 		RectD toRectD(void) const;
 
@@ -187,6 +201,20 @@ namespace ot {
 		//! If the left value is bigger than the right value or the bottom value bigger than the top value false is returned.
 		bool isValid(void) const { return (m_topLeft.x() <= m_bottomRight.x()) && (m_topLeft.y() <= m_bottomRight.y()); };
 
+		//! \see void moveTo(const Point2DF& _topLeft)
+		void moveTo(float _ax, float _ay) { this->moveTo(Point2DF(_ax, _ay)); };
+
+		//! \brief Moves the rect to the specified location.
+		//! The top left and bottom right will be moved.
+		void moveTo(const Point2DF& _topLeft);
+
+		//! \see void moveBy(const Point2DF& _distance)
+		void moveBy(float _dx, float _dy) { this->moveBy(Point2DF(_dx, _dy)); };
+
+		//! \brief Moves the rect by the provided distance.
+		//! The top left and bottom right will be moved.
+		void moveBy(const Point2DF& _distance);
+
 		Rect toRect(void) const;
 		RectD toRectD(void) const;
 
@@ -279,6 +307,20 @@ namespace ot {
 		//! \brief Returns true if the top left and bottom right points are set correctly.
 		//! If the left value is bigger than the right value or the bottom value bigger than the top value false is returned.
 		bool isValid(void) const { return (m_topLeft.x() <= m_bottomRight.x()) && (m_topLeft.y() <= m_bottomRight.y()); };
+
+		//! \see void moveTo(const Point2DD& _topLeft)
+		void moveTo(double _ax, double _ay) { this->moveTo(Point2DD(_ax, _ay)); };
+
+		//! \brief Moves the rect to the specified location.
+		//! The top left and bottom right will be moved.
+		void moveTo(const Point2DD& _topLeft);
+
+		//! \see void moveBy(const Point2DD& _distance)
+		void moveBy(double _dx, double _dy) { this->moveBy(Point2DD(_dx, _dy)); };
+
+		//! \brief Moves the rect by the provided distance.
+		//! The top left and bottom right will be moved.
+		void moveBy(const Point2DD& _distance);
 
 		Rect toRect(void) const;
 		RectF toRectF(void) const;

@@ -1,53 +1,56 @@
-//! @file WrappedLineItem.cpp
+//! @file WrappedArcItem.cpp
 //! @author Alexander Kuester (alexk95)
-//! @date May 2024
+//! @date June 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OToolkit header
-#include "WrappedLineItem.h"
+#include "WrappedArcItem.h"
 #include "WrappedItemFactory.h"
 #include "GraphicsItemDesignerNavigation.h"
 
 // OpenTwin header
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/StyleRefPainter2D.h"
-#include "OTGui/GraphicsLineItemCfg.h"
+#include "OTGui/GraphicsArcItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
 
-static WrappedItemFactoryRegistrar<WrappedLineItem> circleRegistrar(OT_FactoryKey_GraphicsLineItem);
+static WrappedItemFactoryRegistrar<WrappedArcItem> arcRegistrar(OT_FactoryKey_GraphicsArcItem);
 
-WrappedLineItem::WrappedLineItem() {
+WrappedArcItem::WrappedArcItem() {
 	this->setLineStyle(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
 }
 
-WrappedLineItem::~WrappedLineItem() {
+WrappedArcItem::~WrappedArcItem() {
 
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::TreeWidgetItemInfo WrappedLineItem::createNavigationInformation(void) {
+ot::TreeWidgetItemInfo WrappedArcItem::createNavigationInformation(void) {
 	ot::TreeWidgetItemInfo info;
 	info.setText(QString::fromStdString(this->getGraphicsItemName()));
-	info.setIcon(ot::IconManager::getIcon("GraphicsEditor/Line.png"));
+	info.setIcon(ot::IconManager::getIcon("GraphicsEditor/Arc.png"));
 
 	return info;
 }
 
-void WrappedLineItem::setupDesignerItemFromConfig(const ot::GraphicsItemCfg* _config) {
+void WrappedArcItem::setupDesignerItemFromConfig(const ot::GraphicsItemCfg* _config) {
 	if (!this->setupFromConfig(_config)) return;
 
-	QList<QPointF> newControlPoints;
-	newControlPoints.append(ot::QtFactory::toQPoint(this->getFrom()) + this->pos());
-	newControlPoints.append(ot::QtFactory::toQPoint(this->getTo()) + this->pos());
+	QRectF newRect = ot::QtFactory::toQRect(this->getArcRect());
+	newRect.moveTo(this->pos());
 
-	this->initializeBaseData(newControlPoints, this->pos());
+	QList<QPointF> newControlPoints;
+	newControlPoints.append(newRect.topLeft());
+	newControlPoints.append(newRect.bottomRight());
+
+	this->initializeBaseData(newControlPoints, newRect.topLeft());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-void WrappedLineItem::controlPointsChanged(void) {
+void WrappedArcItem::controlPointsChanged(void) {
 	if (this->getControlPoints().size() != 2) return;
 
 	ot::GraphicsScene* gscene = this->getGraphicsScene();
@@ -58,16 +61,16 @@ void WrappedLineItem::controlPointsChanged(void) {
 
 	this->prepareGeometryChange();
 
-	QPointF p1 = this->getControlPoints().front();
-	QPointF p2 = this->getControlPoints().back();
+	QPointF topLeftPoint = QPointF(std::min(this->getControlPoints().front().x(), this->getControlPoints().back().x()), std::min(this->getControlPoints().front().y(), this->getControlPoints().back().y()));
+	QPointF bottomRightPoint = QPointF(std::max(this->getControlPoints().front().x(), this->getControlPoints().back().x()), std::max(this->getControlPoints().front().y(), this->getControlPoints().back().y()));
 
-	QPointF delta = QPointF(std::min(p1.x(), p2.x()), std::min(p1.y(), p2.y()));
-	
-	this->setPos(delta);
-	this->setLine(p1 - delta, p2 - delta);
+	this->setPos(topLeftPoint);
+	QRectF newArcRect(topLeftPoint, bottomRightPoint);
+	newArcRect.moveTo(0., 0.);
+	this->setArcRect(newArcRect);
 }
 
-void WrappedLineItem::fillPropertyGrid(void) {
+void WrappedArcItem::fillPropertyGrid(void) {
 	using namespace ot;
 
 	PropertyGridCfg cfg;
@@ -75,10 +78,12 @@ void WrappedLineItem::fillPropertyGrid(void) {
 	generalGroup->addProperty(new PropertyString("Name", this->getGraphicsItem()->getGraphicsItemName()));
 
 	PropertyGroup* geometryGroup = new PropertyGroup("Geometry");
-	geometryGroup->addProperty(new PropertyDouble("X1", this->getLine().x1()));
-	geometryGroup->addProperty(new PropertyDouble("Y1", this->getLine().y1()));
-	geometryGroup->addProperty(new PropertyDouble("X2", this->getLine().x2()));
-	geometryGroup->addProperty(new PropertyDouble("Y2", this->getLine().y2()));
+	geometryGroup->addProperty(new PropertyDouble("X", this->getArcRect().getTopLeft().x()));
+	geometryGroup->addProperty(new PropertyDouble("Y", this->getArcRect().getTopLeft().y()));
+	geometryGroup->addProperty(new PropertyDouble("Width", this->getArcRect().getWidth()));
+	geometryGroup->addProperty(new PropertyDouble("Height", this->getArcRect().getHeight()));
+	geometryGroup->addProperty(new PropertyDouble("Start Angle", this->getStartAngle() / 16.));
+	geometryGroup->addProperty(new PropertyDouble("Span Angle", this->getSpanAngle() / 16.));
 	geometryGroup->addProperty(new PropertyPainter2D("Line Painter", this->getLineStyle().painter()));
 	geometryGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().width()));
 
@@ -87,7 +92,7 @@ void WrappedLineItem::fillPropertyGrid(void) {
 	this->getPropertyGrid()->setupGridFromConfig(cfg);
 }
 
-void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
+void WrappedArcItem::propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
 	using namespace ot;
 
 	if (_item->getGroupName() == "General" && _itemData.propertyName() == "Name") {
@@ -103,41 +108,65 @@ void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->setGraphicsItemName(input->getCurrentText().toStdString());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "X1") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "X") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
 			return;
 		}
 
-		this->setLine(input->getValue(), this->getLine().y1(), this->getLine().x2(), this->getLine().y2());
+		RectD newRect = this->getArcRect();
+		newRect.moveBy(input->getValue() - newRect.getLeft(), 0.);
+		this->setArcRect(newRect);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Y1") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Y") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
 			return;
 		}
 
-		this->setLine(this->getLine().x1(), input->getValue(), this->getLine().x2(), this->getLine().y2());
+		RectD newRect = this->getArcRect();
+		newRect.moveBy(0., input->getValue() - newRect.getLeft());
+		this->setArcRect(newRect);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "X2") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Width") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
 			return;
 		}
 
-		this->setLine(this->getLine().x1(), this->getLine().y1(), input->getValue(), this->getLine().y2());
+		RectD newRect = this->getArcRect();
+		this->setArcRect(RectD(newRect.getTopLeft(), Size2DD(input->getValue(), newRect.getHeight())));
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Y2") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Height") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
 			return;
 		}
 
-		this->setLine(this->getLine().x1(), this->getLine().y1(), this->getLine().x2(), input->getValue());
+		RectD newRect = this->getArcRect();
+		this->setArcRect(RectD(newRect.getTopLeft(), Size2DD(newRect.getHeight(), input->getValue())));
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Start Angle") {
+		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		this->setStartAngle(input->getValue() * 16.);
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Span Angle") {
+		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		this->setSpanAngle(input->getValue() * 16.);
 	}
 	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Line Painter") {
 		PropertyInputPainter2D* input = dynamic_cast<PropertyInputPainter2D*>(_item->getInput());
@@ -164,12 +193,12 @@ void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 }
 
-void WrappedLineItem::propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
+void WrappedArcItem::propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
 
 }
 
-QVariant WrappedLineItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _constrains) {
-	QVariant ret = ot::GraphicsLineItem::itemChange(_change, _constrains);
+QVariant WrappedArcItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _constrains) {
+	QVariant ret = ot::GraphicsArcItem::itemChange(_change, _constrains);
 
 	if (_change == QGraphicsItem::ItemScenePositionHasChanged) {
 		this->graphicsItemWasMoved(this->pos());

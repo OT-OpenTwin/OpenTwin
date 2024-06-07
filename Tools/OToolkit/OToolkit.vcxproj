@@ -61,8 +61,10 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="src\WrappedArcItem.cpp" />
     <ClCompile Include="src\WrappedCircleItem.cpp" />
     <ClCompile Include="src\WrappedEllipseItem.cpp" />
+    <ClCompile Include="src\WrappedItemFactory.cpp" />
     <ClCompile Include="src\WrappedLineItem.cpp" />
     <ClCompile Include="src\WrappedPolygonItem.cpp" />
     <ClCompile Include="src\WrappedRectItem.cpp" />
@@ -70,6 +72,8 @@
     <ClCompile Include="src\WrappedTriangleItem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\WrappedArcItem.h" />
+    <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />
     <ClInclude Include="include\WrappedTriangleItem.h" />
     <QtMoc Include="include\ToolViewManager.h" />

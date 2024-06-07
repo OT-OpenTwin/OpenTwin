@@ -19,6 +19,7 @@
 
 namespace ot {
 	class GraphicsItem;
+	class GraphicsItemCfg;
 }
 
 class GraphicsItemDesignerItemBase : public GraphicsItemDesignerPropertyHandler {
@@ -89,6 +90,8 @@ public:
 	//! \brief Will make the item transparent.
 	virtual void makeItemTransparent(void) {};
 
+	virtual void setupDesignerItemFromConfig(const ot::GraphicsItemCfg* _config) = 0;
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Protected base class methods
@@ -102,6 +105,8 @@ protected:
 
 	virtual void propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override = 0;
 	virtual void propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override = 0;
+
+	void initializeBaseData(const QList<QPointF>& _controlPoints, const QPointF& _pos);
 
 private:
 	QPointF m_lastPos; //! \see getLastPos

@@ -11,6 +11,7 @@
 #include "GraphicsItemDesignerInfoOverlay.h"
 
 // OToolkit GraphicsItem wrapper
+#include "WrappedArcItem.h"
 #include "WrappedLineItem.h"
 #include "WrappedRectItem.h"
 #include "WrappedSquareItem.h"
@@ -156,6 +157,7 @@ QString GraphicsItemDesignerDrawHandler::modeString(void) {
 	case GraphicsItemDesignerDrawHandler::Rect: return "Draw Rectangle (Press ESC to cancel)";
 	case GraphicsItemDesignerDrawHandler::Circle: return "Draw Circle (Press ESC to cancel)";
 	case GraphicsItemDesignerDrawHandler::Ellipse: return "Draw Ellipse (Press ESC to cancel)";
+	case GraphicsItemDesignerDrawHandler::Arc: return "Draw Arc (Press ESC to cancel)";
 	case GraphicsItemDesignerDrawHandler::Triangle: return "Draw Triangle (Press ESC to cancel)";
 	case GraphicsItemDesignerDrawHandler::Polygon: return "Draw Polygon (Press ESC to finish)";
 	case GraphicsItemDesignerDrawHandler::Shape: return "Draw Shape (Press ESC to finish)";
@@ -193,6 +195,10 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 
 	case GraphicsItemDesignerDrawHandler::Ellipse:
 		m_previewItem = new WrappedEllipseItem;
+		break;
+
+	case GraphicsItemDesignerDrawHandler::Arc:
+		m_previewItem = new WrappedArcItem;
 		break;
 
 	case GraphicsItemDesignerDrawHandler::Triangle:

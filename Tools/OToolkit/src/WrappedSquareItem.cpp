@@ -5,6 +5,7 @@
 
 // OToolkit header
 #include "WrappedSquareItem.h"
+#include "WrappedItemFactory.h"
 #include "GraphicsItemDesignerNavigation.h"
 
 // OpenTwin header
@@ -36,6 +37,10 @@ ot::TreeWidgetItemInfo WrappedSquareItem::createNavigationInformation(void) {
 void WrappedSquareItem::makeItemTransparent(void) {
 	this->setOutline(ot::OutlineF(0., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent)));
 	this->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent));
+}
+
+void WrappedSquareItem::setupDesignerItemFromConfig(const ot::GraphicsItemCfg* _config) {
+	OT_LOG_E("Item can not be setup from config");
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -33,6 +33,8 @@ public:
 
 	virtual ot::TreeWidgetItemInfo createNavigationInformation(void) override;
 
+	virtual void setupDesignerItemFromConfig(const ot::GraphicsItemCfg* _config) override;
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Protected base class methods

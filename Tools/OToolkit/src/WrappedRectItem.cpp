@@ -5,12 +5,16 @@
 
 // OToolkit header
 #include "WrappedRectItem.h"
+#include "WrappedItemFactory.h"
 #include "GraphicsItemDesignerNavigation.h"
 
 // OpenTwin header
 #include "OTGui/StyleRefPainter2D.h"
+#include "OTGui/GraphicsRectangularItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
+
+static WrappedItemFactoryRegistrar<WrappedRectItem> circleRegistrar(OT_FactoryKey_GraphicsRectangularItem);
 
 WrappedRectItem::WrappedRectItem() {
 	this->setOutline(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
@@ -36,6 +40,18 @@ ot::TreeWidgetItemInfo WrappedRectItem::createNavigationInformation(void) {
 void WrappedRectItem::makeItemTransparent(void) {
 	this->setOutline(ot::OutlineF(0., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent)));
 	this->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent));
+}
+
+void WrappedRectItem::setupDesignerItemFromConfig(const ot::GraphicsItemCfg* _config) {
+	if (!this->setupFromConfig(_config)) return;
+
+	QRectF newRect(this->pos(), ot::QtFactory::toQSize(this->getRectangleSize()));
+
+	QList<QPointF> newControlPoints;
+	newControlPoints.append(newRect.topLeft());
+	newControlPoints.append(newRect.bottomRight());
+
+	this->initializeBaseData(newControlPoints, newRect.topLeft());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -93,9 +93,18 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	}
 	{
 		QAction* btn = new QAction;
+		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Arc.png"));
+		btn->setText("Arc");
+		btn->setShortcut(QKeySequence("Ctrl+6"));
+		btn->setShortcutVisibleInContextMenu(true);
+		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotArc);
+		this->addAction(btn);
+	}
+	{
+		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Triangle.png"));
 		btn->setText("Triangle");
-		btn->setShortcut(QKeySequence("Ctrl+6"));
+		btn->setShortcut(QKeySequence("Ctrl+7"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotTriangle);
 		this->addAction(btn);
@@ -104,7 +113,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Polygon.png"));
 		btn->setText("Polygon");
-		btn->setShortcut(QKeySequence("Ctrl+7"));
+		btn->setShortcut(QKeySequence("Ctrl+8"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotPolygon);
 		this->addAction(btn);
@@ -113,7 +122,7 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/Shape.png"));
 		btn->setText("Shape");
-		btn->setShortcut(QKeySequence("Ctrl+8"));
+		btn->setShortcut(QKeySequence("Ctrl+9"));
 		btn->setShortcutVisibleInContextMenu(true);
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotShape);
 		this->addAction(btn);
@@ -171,6 +180,10 @@ void GraphicsItemDesignerToolBar::slotCircle(void) {
 
 void GraphicsItemDesignerToolBar::slotEllipse(void) {
 	emit modeRequested(GraphicsItemDesignerDrawHandler::Ellipse);
+}
+
+void GraphicsItemDesignerToolBar::slotArc(void) {
+	emit modeRequested(GraphicsItemDesignerDrawHandler::Arc);
 }
 
 void GraphicsItemDesignerToolBar::slotTriangle(void) {

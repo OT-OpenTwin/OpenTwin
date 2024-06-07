@@ -15,7 +15,7 @@
 static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsArcItemCfg> arcItemCfg(OT_FactoryKey_GraphicsArcItem);
 
 ot::GraphicsArcItemCfg::GraphicsArcItemCfg()
-	: m_startAngle(0.), m_spanAngle(0.)
+	: m_startAngle(0.), m_spanAngle(180. * 16.)
 {}
 
 ot::GraphicsArcItemCfg::~GraphicsArcItemCfg() {}

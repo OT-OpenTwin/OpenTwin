@@ -45,6 +45,7 @@ private Q_SLOTS:
 	void slotRect(void);
 	void slotCircle(void);
 	void slotEllipse(void);
+	void slotArc(void);
 	void slotTriangle(void);
 	void slotPolygon(void);
 	void slotShape(void);

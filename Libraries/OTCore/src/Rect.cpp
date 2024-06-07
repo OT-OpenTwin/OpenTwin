@@ -71,6 +71,15 @@ ot::Rect ot::Rect::intersectsWith(const Rect& _other) const {
     return Rect(newTopLeft, newBottomRight);
 }
 
+void ot::Rect::moveTo(const Point2D& _topLeft) {
+    this->moveBy(_topLeft - m_topLeft);
+}
+
+void ot::Rect::moveBy(const Point2D& _distance) {
+    m_topLeft += _distance;
+    m_bottomRight += _distance;
+}
+
 ot::RectF ot::Rect::toRectF(void) const {
     return RectF(m_topLeft.toPoint2DF(), m_bottomRight.toPoint2DF());
 }
@@ -150,6 +159,15 @@ ot::RectF ot::RectF::intersectsWith(const RectF& _other) const {
     return RectF(newTopLeft, newBottomRight);
 }
 
+void ot::RectF::moveTo(const Point2DF& _topLeft) {
+    this->moveBy(_topLeft - m_topLeft);
+}
+
+void ot::RectF::moveBy(const Point2DF& _distance) {
+    m_topLeft += _distance;
+    m_bottomRight += _distance;
+}
+
 ot::Rect ot::RectF::toRect(void) const {
     return Rect(m_topLeft.toPoint2D(), m_bottomRight.toPoint2D());
 }
@@ -227,6 +245,15 @@ ot::RectD ot::RectD::intersectsWith(const RectD& _other) const {
         return RectD(Point2DD(0., 0.), Point2DD(0., 0.));
     }
     return RectD(newTopLeft, newBottomRight);
+}
+
+void ot::RectD::moveTo(const Point2DD& _topLeft) {
+    this->moveBy(_topLeft - m_topLeft);
+}
+
+void ot::RectD::moveBy(const Point2DD& _distance) {
+    m_topLeft += _distance;
+    m_bottomRight += _distance;
 }
 
 ot::Rect ot::RectD::toRect(void) const {

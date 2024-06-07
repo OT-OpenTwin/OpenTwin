@@ -43,3 +43,8 @@ void GraphicsItemDesignerItemBase::graphicsItemWasMoved(const QPointF& _newPos) 
 	// Set the last pos
 	m_lastPos = _newPos;
 }
+
+void GraphicsItemDesignerItemBase::initializeBaseData(const QList<QPointF>& _controlPoints, const QPointF& _pos) {
+	m_controlPoints = _controlPoints;
+	m_lastPos = _pos;
+}

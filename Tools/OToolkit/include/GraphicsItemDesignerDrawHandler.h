@@ -25,6 +25,7 @@ public:
 		Rect,
 		Circle,
 		Ellipse,
+		Arc,
 		Triangle,
 		Polygon,
 		Shape

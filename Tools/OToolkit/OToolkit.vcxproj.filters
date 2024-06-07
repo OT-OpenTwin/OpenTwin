@@ -180,6 +180,12 @@
     <ClCompile Include="src\WrappedPolygonItem.cpp">
       <Filter>Source Files\GraphicsItemDesignerItems</Filter>
     </ClCompile>
+    <ClCompile Include="src\WrappedArcItem.cpp">
+      <Filter>Source Files\GraphicsItemDesignerItems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WrappedItemFactory.cpp">
+      <Filter>Source Files\GraphicsItemDesignerItems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -234,6 +240,12 @@
       <Filter>Header Files\GraphicsItemDesignerItems</Filter>
     </ClInclude>
     <ClInclude Include="include\WrappedPolygonItem.h">
+      <Filter>Header Files\GraphicsItemDesignerItems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WrappedArcItem.h">
+      <Filter>Header Files\GraphicsItemDesignerItems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WrappedItemFactory.h">
       <Filter>Header Files\GraphicsItemDesignerItems</Filter>
     </ClInclude>
   </ItemGroup>

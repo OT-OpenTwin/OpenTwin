@@ -1,6 +1,6 @@
-//! @file WrappedEllipseItem.h
+//! @file WrappedArcItem.h
 //! @author Alexander Kuester (alexk95)
-//! @date May 2024
+//! @date June 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
@@ -9,13 +9,15 @@
 #include "GraphicsItemDesignerItemBase.h"
 
 // OpenTwin header
-#include "OTWidgets/GraphicsEllipseItem.h"
+#include "OTWidgets/GraphicsArcItem.h"
 
-class WrappedEllipseItem : public ot::GraphicsEllipseItem, public GraphicsItemDesignerItemBase {
-	OT_DECL_NOCOPY(WrappedEllipseItem)
+namespace ot { class Painter2D; }
+
+class WrappedArcItem : public ot::GraphicsArcItem, public GraphicsItemDesignerItemBase {
+	OT_DECL_NOCOPY(WrappedArcItem)
 public:
-	WrappedEllipseItem();
-	virtual ~WrappedEllipseItem();
+	WrappedArcItem();
+	virtual ~WrappedArcItem();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -27,11 +29,9 @@ public:
 
 	virtual ot::GraphicsItem* getGraphicsItem(void) override { return this; };
 
-	virtual QString getDefaultItemName(void) const override { return "Ellipse"; };
+	virtual QString getDefaultItemName(void) const override { return "Arc"; };
 
 	virtual ot::TreeWidgetItemInfo createNavigationInformation(void) override;
-
-	virtual void makeItemTransparent(void) override;
 
 	virtual void setupDesignerItemFromConfig(const ot::GraphicsItemCfg* _config) override;
 
@@ -45,7 +45,4 @@ protected:
 	virtual void propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override;
 	virtual void propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override;
 	virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _constrains) override;
-
-private:
-
 };

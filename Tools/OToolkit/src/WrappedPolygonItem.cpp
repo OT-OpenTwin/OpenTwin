@@ -5,12 +5,16 @@
 
 // OToolkit header
 #include "WrappedPolygonItem.h"
+#include "WrappedItemFactory.h"
 #include "GraphicsItemDesignerNavigation.h"
 
 // OpenTwin header
 #include "OTGui/StyleRefPainter2D.h"
+#include "OTGui/GraphicsPolygonItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsScene.h"
+
+static WrappedItemFactoryRegistrar<WrappedPolygonItem> circleRegistrar(OT_FactoryKey_GraphicsPolygonItem);
 
 WrappedPolygonItem::WrappedPolygonItem() {
 	this->setOutline(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
@@ -36,6 +40,18 @@ ot::TreeWidgetItemInfo WrappedPolygonItem::createNavigationInformation(void) {
 void WrappedPolygonItem::makeItemTransparent(void) {
 	this->setOutline(ot::OutlineF(0., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent)));
 	this->setBackgroundPainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::Transparent));
+}
+
+void WrappedPolygonItem::setupDesignerItemFromConfig(const ot::GraphicsItemCfg* _config) {
+	if (!this->setupFromConfig(_config)) return;
+
+	QList<QPointF> newControlPoints;
+
+	for (const ot::Point2DD& pt : this->getPoints()) {
+		newControlPoints.append(ot::QtFactory::toQPoint(pt) + this->pos());
+	}
+
+	this->initializeBaseData(newControlPoints, this->pos());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
