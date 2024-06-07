@@ -53,7 +53,11 @@ public:
 	void updatePosition(const QPointF& _pos);
 	void positionSelected(const QPointF& _pos);
 
+	//! \brief Generates the next available UID
 	ot::UID generateUid(void) { return ++m_currentUid; };
+
+	//! \brief Resets the UID to the initial state.
+	void resetUid(void) { m_currentUid = 0; };
 
 Q_SIGNALS:
 	void drawCompleted();

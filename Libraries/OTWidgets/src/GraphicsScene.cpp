@@ -91,6 +91,15 @@ QPointF ot::GraphicsScene::snapToGrid(const QPointF& _pos) const {
 	return QtFactory::toQPoint(m_grid.snapToGrid(QtFactory::toPoint2D(_pos)));
 }
 
+void ot::GraphicsScene::deselectAll(void) {
+	this->blockSignals(true);
+	for (QGraphicsItem* itm : this->selectedItems()) {
+		itm->setSelected(false);
+	}
+	this->blockSignals(false);
+	Q_EMIT selectionChanged();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Public: Slots

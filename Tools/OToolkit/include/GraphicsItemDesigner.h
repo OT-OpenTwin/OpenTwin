@@ -75,6 +75,7 @@ private Q_SLOTS:
 	void slotDrawCancelled(void);
 	void slotMakeTransparentRequested(void);
 	void slotDuplicateRequested(void);
+	void slotDeleteItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 
 private:
 	GraphicsItemDesignerExportConfig m_exportConfig;

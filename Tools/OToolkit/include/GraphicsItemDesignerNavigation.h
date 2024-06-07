@@ -55,9 +55,17 @@ public:
 
 	void updatePropertyGrid(void);
 
+	//! \brief Removes and destroys all designer items.
+	//! The items will be removed from the view aswell.
+	void clearDesignerItems(void);
+
+	void removeSelectedDesignerItems(void);
+
+	void removeDesignerItems(const QStringList& _itemNames);
+
 private Q_SLOTS:
 	void slotSelectionChanged(void);
-
+	
 protected:
 	virtual void keyPressEvent(QKeyEvent* _event) override;
 

@@ -227,6 +227,59 @@ void GraphicsItemDesignerNavigation::updatePropertyGrid(void) {
 	this->slotSelectionChanged();
 }
 
+void GraphicsItemDesignerNavigation::clearDesignerItems(void) {
+	std::map<QString, GraphicsItemDesignerItemBase*> itemsMap = m_itemsMap;
+	m_itemsMap.clear();
+	m_rootItems.clear();
+
+	m_selectionChangeInProgress = true;
+	this->deselectAll();
+
+	// Remove from view
+	for (const auto& it : itemsMap) {
+		m_designer->getView()->removeItem(it.second->getGraphicsItem()->getGraphicsItemUid());
+	}
+
+	// Remove from tree
+	while (m_rootItem->childCount() > 0) {
+		m_selectionChangeInProgress = true;
+		m_rootItem->removeChild(m_rootItem->child(0));
+	}
+
+	m_selectionChangeInProgress = false;
+	this->slotSelectionChanged();
+}
+
+void GraphicsItemDesignerNavigation::removeSelectedDesignerItems(void) {
+	QList<QTreeWidgetItem*> items = this->selectedItems();
+	QStringList itemNames;
+	for (QTreeWidgetItem* itm : items) {
+		if (itm != m_rootItem) {
+			itemNames.append(itm->text(0));
+		}
+	}
+	this->removeDesignerItems(itemNames);
+}
+
+void GraphicsItemDesignerNavigation::removeDesignerItems(const QStringList& _itemNames) {
+	for (const QString& itm : _itemNames) {
+		const auto& it = m_itemsMap.find(itm);
+		if (it == m_itemsMap.end()) continue;
+		GraphicsItemDesignerItemBase* actualItem = it->second;
+
+		actualItem->itemAboutToBeDestroyed();
+		actualItem->getNavigationItem()->setHidden(true);
+		this->forgetItem(actualItem);
+
+		OTAssertNullptr(actualItem->getGraphicsItem());
+		OTAssertNullptr(actualItem->getGraphicsItem()->getGraphicsScene());
+
+		actualItem->getGraphicsItem()->getGraphicsScene()->removeItem(actualItem->getGraphicsItem()->getQGraphicsItem());
+		delete actualItem->getNavigationItem();
+		delete actualItem;
+	}
+}
+
 void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
 	if (m_selectionChangeInProgress) return;
 
@@ -240,6 +293,7 @@ void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
 
 	// Update item selection
 	m_designer->getView()->setSelectionChangeInProgress(true);
+	m_designer->getView()->getDesignerScene()->deselectAll();
 
 	for (QTreeWidgetItem* itm : sel) {
 		if (itm == m_rootItem) continue;
@@ -278,28 +332,7 @@ void GraphicsItemDesignerNavigation::slotSelectionChanged(void) {
 
 void GraphicsItemDesignerNavigation::keyPressEvent(QKeyEvent* _event) {
 	if (_event->key() == Qt::Key_Delete) {
-		QList<QTreeWidgetItem*> items = this->selectedItems();
-		for (QTreeWidgetItem* itm : items) {
-			GraphicsItemDesignerItemBase* actualItem = this->findDesignerItem(itm->text(0));
-			if (actualItem) {
-				actualItem->itemAboutToBeDestroyed();
-				itm->setHidden(true);
-				this->forgetItem(actualItem);
-
-				OTAssertNullptr(actualItem->getGraphicsItem());
-				OTAssertNullptr(actualItem->getGraphicsItem()->getGraphicsScene());
-				actualItem->getGraphicsItem()->getGraphicsScene()->removeItem(actualItem->getGraphicsItem()->getQGraphicsItem());
-				delete actualItem->getGraphicsItem();
-
-				if ((unsigned long long)itm == (unsigned long long)actualItem) {
-					delete actualItem;
-					delete itm;
-				}
-				else {
-					delete itm;
-				}
-			}
-		}
+		this->removeSelectedDesignerItems();
 	}
 	ot::TreeWidget::keyPressEvent(_event);
 }

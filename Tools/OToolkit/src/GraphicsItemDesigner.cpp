@@ -72,6 +72,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::duplicateRequested, this, &GraphicsItemDesigner::slotDuplicateRequested);
 	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCompleted, this, &GraphicsItemDesigner::slotDrawFinished);
 	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCancelled, this, &GraphicsItemDesigner::slotDrawCancelled);
+	this->connect(m_view, &GraphicsItemDesignerView::removeItemsRequested, this, &GraphicsItemDesigner::slotDeleteItemsRequested);
 
 	return true;
 }
@@ -156,7 +157,12 @@ void GraphicsItemDesigner::slotDrawRequested(GraphicsItemDesignerDrawHandler::Dr
 }
 
 void GraphicsItemDesigner::slotClearRequested(void) {
+	m_drawHandler->blockSignals(true);
+	m_drawHandler->cancelDraw();
+	m_drawHandler->resetUid();
+	m_drawHandler->blockSignals(false);
 
+	m_navigation->clearDesignerItems();
 }
 
 void GraphicsItemDesigner::slotExportRequested(void) {
@@ -221,4 +227,18 @@ void GraphicsItemDesigner::slotDuplicateRequested(void) {
 			m_navigation->addRootItem(newItem);
 		}
 	}
+}
+
+void GraphicsItemDesigner::slotDeleteItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections) {
+	QStringList itemNames;
+	for (ot::UID uid : _items) {
+		ot::GraphicsItem* itm = m_view->getItem(uid);
+		if (!itm) {
+			OT_LOG_E("Unknown item");
+			continue;
+		}
+
+		itemNames.append(QString::fromStdString(itm->getGraphicsItemName()));
+	}
+	m_navigation->removeDesignerItems(itemNames);
 }

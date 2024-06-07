@@ -73,6 +73,8 @@ namespace ot {
 
 		QPointF snapToGrid(const QPointF& _pos) const;
 		
+		void deselectAll(void);
+
 	Q_SIGNALS:
 		void selectionChangeFinished(void);
 
