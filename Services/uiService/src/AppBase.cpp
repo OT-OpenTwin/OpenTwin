@@ -202,80 +202,6 @@ bool AppBase::initialize() {
 		// Connect color style change signal
 		this->connect(&ot::GlobalColorStyle::instance(), &ot::GlobalColorStyle::currentStyleChanged, this, &AppBase::slotColorStyleChanged);
 
-		//LogInDialog logInDia;
-		//if (logInDia.showDialog() != ot::Dialog::Ok) return 0;
-
-		m_logInManager = new LogInManager();
-		if (!m_logInManager->showDialog()) { 
-			return false;
-		}
-		m_currentUser = m_logInManager->username().toStdString();
-		m_state |= LoggedInState;
-
-		// Now retreive information about the user collection
-
-		UserManagement uM;
-		uM.setAuthServerURL(m_authorizationServiceURL);
-		uM.setDatabaseURL(m_dataBaseURL);
-
-		m_currentUserCollection = uM.getUserSettingsCollection();
-
-		// Create default UI
-		OT_LOG_D("Creating default GUI");
-		m_mainWindow = uiAPI::createWindow(m_uid);
-		uiAPI::window::setTitle(m_mainWindow, "Open Twin");
-		uiAPI::window::setWindowIcon(m_mainWindow, uiAPI::getApplicationIcon("OpenTwin"));
-
-		// Create UI
-		this->createUi();
-		
-		{
-			UserManagement uM;
-			uM.setAuthServerURL(m_authorizationServiceURL);
-			uM.setDatabaseURL(m_dataBaseURL);
-			uM.initializeNewSession();
-
-			m_state |= RestoringSettingsState;
-
-			m_currentStateWindow.window = uM.restoreSetting(STATE_NAME_WINDOW);
-			m_currentStateWindow.view = uM.restoreSetting(STATE_NAME_VIEW);
-
-			// Restore color style
-			std::string cs = uM.restoreSetting(STATE_NAME_COLORSTYLE);
-			
-			if (ot::GlobalColorStyle::instance().hasStyle(cs)) {
-				ot::GlobalColorStyle::instance().setCurrentStyle(cs);
-			}
-			else if (!cs.empty()) {
-				OT_LOG_W("ColorStyle \"" + cs + "\" does not exist");
-			}
-
-			// Restore window state
-			if (!uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow.window, true)) {
-				m_currentStateWindow.window = "";
-				uiAPI::window::showMaximized(m_mainWindow);
-			}
-
-			// Restore view state
-			ot::WidgetViewManager::instance().restoreState(m_currentStateWindow.view);
-
-			UserSettings::instance()->initializeData();
-
-			m_state &= (~RestoringSettingsState);
-		}
-
-		// Create shortcut manager
-		m_shortcutManager = new ShortcutManager;
-
-		// Create plugin manager
-		m_uiPluginManager = new UiPluginManager(this);
-#ifdef _DEBUG
-		m_uiPluginManager->addPluginSearchPath(qgetenv("OPENTWIN_DEV_ROOT") + "\\Deployment\\uiPlugins");
-		//new DispatchableItemExample;
-#else
-		m_uiPluginManager->addPluginSearchPath(QDir::currentPath() + "\\uiPlugins");
-#endif // _DEBUG
-
 		return true;
 
 	}
@@ -283,7 +209,91 @@ bool AppBase::initialize() {
 		OT_LOG_E(e.what());
 		return false;
 	}
-	catch (...) { return false; }
+	catch (...) { 
+		OT_LOG_E("[FATAL] Unknown error");
+		return false; 
+	}
+}
+
+bool AppBase::logIn(void) {
+	//LogInDialog logInDia;
+	//if (logInDia.showDialog() != ot::Dialog::Ok) return false;
+
+	m_logInManager = new LogInManager();
+	if (!m_logInManager->showDialog()) {
+		return false;
+	}
+	m_currentUser = m_logInManager->username().toStdString();
+	m_state |= LoggedInState;
+
+	// Now retreive information about the user collection
+
+	UserManagement uM;
+	uM.setAuthServerURL(m_authorizationServiceURL);
+	uM.setDatabaseURL(m_dataBaseURL);
+
+	m_currentUserCollection = uM.getUserSettingsCollection();
+
+	// Create default UI
+	OT_LOG_D("Creating default GUI");
+	m_mainWindow = uiAPI::createWindow(m_uid);
+	uiAPI::window::setTitle(m_mainWindow, "Open Twin");
+	uiAPI::window::setWindowIcon(m_mainWindow, uiAPI::getApplicationIcon("OpenTwin"));
+
+	// Create UI
+	this->createUi();
+
+	{
+		UserManagement uM;
+		uM.setAuthServerURL(m_authorizationServiceURL);
+		uM.setDatabaseURL(m_dataBaseURL);
+		uM.initializeNewSession();
+
+		m_state |= RestoringSettingsState;
+
+		m_currentStateWindow.window = uM.restoreSetting(STATE_NAME_WINDOW);
+		m_currentStateWindow.view = uM.restoreSetting(STATE_NAME_VIEW);
+
+		// Restore color style
+		std::string cs = uM.restoreSetting(STATE_NAME_COLORSTYLE);
+
+		if (ot::GlobalColorStyle::instance().hasStyle(cs)) {
+			ot::GlobalColorStyle::instance().setCurrentStyle(cs);
+		}
+		else if (!cs.empty()) {
+			OT_LOG_W("ColorStyle \"" + cs + "\" does not exist");
+		}
+
+		// Restore window state
+		if (!uiAPI::window::restoreState(m_mainWindow, m_currentStateWindow.window, true)) {
+			m_currentStateWindow.window = "";
+			uiAPI::window::showMaximized(m_mainWindow);
+		}
+
+		// Restore view state
+		ot::WidgetViewManager::instance().restoreState(m_currentStateWindow.view);
+
+		UserSettings::instance()->initializeData();
+
+		m_state &= (~RestoringSettingsState);
+	}
+
+	// Create shortcut manager
+	if (m_shortcutManager) delete m_shortcutManager;
+	m_shortcutManager = new ShortcutManager;
+
+	// Create plugin manager
+	if (m_uiPluginManager) delete m_uiPluginManager;
+	m_uiPluginManager = new UiPluginManager(this);
+
+#ifdef _DEBUG
+	m_uiPluginManager->addPluginSearchPath(qgetenv("OPENTWIN_DEV_ROOT") + "\\Deployment\\uiPlugins");
+	//new DispatchableItemExample;
+#else
+	m_uiPluginManager->addPluginSearchPath(QDir::currentPath() + "\\uiPlugins");
+#endif // _DEBUG
+
+	return true;
 }
 
 bool AppBase::isInitialized(void) const { return m_isInitialized; }

@@ -96,6 +96,8 @@ public:
 	//!		 3: Log-in failed
 	bool initialize();
 
+	bool logIn(void);
+
 	//! @brief Returns true if the API was initialized
 	bool isInitialized(void) const;
 

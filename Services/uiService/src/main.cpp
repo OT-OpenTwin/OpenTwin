@@ -189,6 +189,11 @@ int main(int _argc, char *_argv[])
 			return -4;
 		}
 
+		// LogIn
+		if (!AppBase::instance()->logIn()) {
+			return 0;
+		}
+
 		// Run Main Event Loop
 		int status = app->exec();
 
