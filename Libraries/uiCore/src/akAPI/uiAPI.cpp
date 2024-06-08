@@ -30,7 +30,6 @@
 
 // AK GUI
 #include <akGui/aAction.h>
-#include <akGui/aApplication.h>
 #include <akGui/aContextMenuItem.h>
 #include <akGui/aSpecialTabBar.h>
 #include <akGui/aTtbContainer.h>
@@ -71,6 +70,7 @@
 #include <qfiledialog.h>
 #include <qdatetime.h>
 #include <qsettings.h>
+#include <QtWidgets/qapplication.h>
 
 static ak::uiAPI::apiManager		m_apiManager;					//! The API manager
 static ak::aObjectManager *			m_objManager = nullptr;					//! The object manager used in this API
@@ -118,11 +118,12 @@ ak::uiAPI::apiManager::~apiManager() {
 }
 
 void ak::uiAPI::apiManager::ini(
+	QApplication* _applicationInstance,
 	const QString &			_organizationName,
 	const QString &			_applicationName
 ) {
 	assert(!m_isInitialized); // Is already initialized
-	m_app = new aApplication;
+	m_app = _applicationInstance;
 	m_screen = m_app->primaryScreen();
 	
 	m_companyName = _organizationName;
@@ -142,11 +143,6 @@ void ak::uiAPI::apiManager::ini(
 }
 
 bool ak::uiAPI::apiManager::isInitialized(void) const { return m_isInitialized; }
-
-int ak::uiAPI::apiManager::exec(void) {
-	assert(m_isInitialized);	// API not initialized
-	return m_app->exec();
-}
 
 QSurfaceFormat * ak::uiAPI::apiManager::getDefaultSurfaceFormat(void) {
 	if (m_defaultSurfaceFormat == nullptr) { m_defaultSurfaceFormat = new QSurfaceFormat(); }
@@ -199,9 +195,10 @@ void ak::uiAPI::apiManager::deleteAllFiles() {
 // ###############################################################################################################################################
 
 void ak::uiAPI::ini(
+	QApplication* _applicationInstance,
 	const QString &			_company,
 	const QString &			_applicationName
-) { m_apiManager.ini(_company, _applicationName); }
+) { m_apiManager.ini(_applicationInstance, _company, _applicationName); }
 
 void ak::uiAPI::destroy(void) {	if (m_objManager != nullptr) { m_objManager->destroyAll(); } }
 
@@ -244,10 +241,6 @@ ak::UID ak::uiAPI::getObjectCreator(
 ak::aObjectManager * ak::uiAPI::getObjectManager(void) {
 	assert(m_objManager != nullptr); // API not initialized
 	return m_objManager;
-}
-
-ak::aApplication * ak::uiAPI::getApplication(void) {
-	return m_apiManager.app();
 }
 
 // ###############################################################################################################################################
@@ -2184,8 +2177,6 @@ void ak::uiAPI::settings::setByteArray(
 // ###############################################################################################################################################
 
 // Special
-
-int ak::uiAPI::exec(void) { return m_apiManager.exec(); }
 
 QString ak::uiAPI::special::toString(
 	eventType									_type

@@ -94,7 +94,7 @@ public:
 	//!		 1: Exception catched
 	//!		 2: Non exception catched
 	//!		 3: Log-in failed
-	int run();
+	bool initialize();
 
 	//! @brief Returns true if the API was initialized
 	bool isInitialized(void) const;

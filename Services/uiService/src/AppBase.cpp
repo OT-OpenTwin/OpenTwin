@@ -44,9 +44,6 @@
 #include <qfile.h>				// QFile
 #include <qapplication.h>		// QApplication
 #include <QtGui/qscreen.h>
-#include <QOffscreenSurface>
-#include <QOpenGLContext>
-#include <QOpenGLFunctions>
 #include <qfiledialog.h>		// Open/Save file dialog
 
 // Open twin header
@@ -190,180 +187,28 @@ AppBase::~AppBase() {
 
 // Base functions
 
-int AppBase::run() {
+bool AppBase::initialize() {
 	try {
 		OTAssert(!m_isInitialized, "Application was already initialized");
 		m_isInitialized = true;
 
-		QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
-		QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
-
-		// Initialize uiCore
-		OT_LOG_I("Initializing UI Core Module");
-		uiAPI::ini("OpenTwin", "UserFrontend");
-
 		OT_UISERVICE_DEV_LOGGER_INIT;
-
-		// Check for a sufficient OpenGL version
-		QOffscreenSurface surf;
-		surf.create();
-
-		QOpenGLContext ctx;
-		ctx.create();
-		ctx.makeCurrent(&surf);
-
-		std::string version = (const char*)ctx.functions()->glGetString(GL_VERSION);
-		int major = std::atoi(version.c_str());
-		if (major < 2)
-		{
-			std::string error;
-			error = "The system supports OpenGL version " + version + " only.\n";
-			error.append("At least OpenGL version 2.0.0 is required.\n\n");
-			error.append("You may use software rendering by renaming the file opengl32sw.dll to opengl32.dll in the installation directory.");
-
-			OT_LOG_E(error);
-			dialogResult result = uiAPI::promptDialog::show(QString(error.c_str()), "FATAL ERROR", promptOkIconLeft);
-			return 2;
-		}
 
 		// Create UIDs for the main components
 		m_uid = uiAPI::createUid();
 		m_modelUid = uiAPI::createUid();
 		m_viewerUid = uiAPI::createUid();
 
-		// Setup icon manager
-		int iconPathCounter{ 0 };
-		int stylePathCounter{ 0 };
-		int graphicsPathCounter{ 0 };
-#ifdef _DEBUG
-		if (ot::IconManager::addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
-			iconPathCounter++;
-		}
-		if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/ColorStyles/"))) {
-			stylePathCounter++;
-		}
-		if (ot::GraphicsItemLoader::instance().addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/GraphicsItems/"))) {
-			graphicsPathCounter++;
-		}
-#endif // _DEBUG
-		if (ot::IconManager::addSearchPath(QDir::currentPath() + "/icons/")) {
-			iconPathCounter++;
-		}
-		if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QDir::currentPath() + "/ColorStyles/")) {
-			stylePathCounter++;
-		}
-		if (ot::GraphicsItemLoader::instance().addSearchPath(QDir::currentPath() + "/GraphicsItems/")) {
-			graphicsPathCounter++;
-		}
-	
-		// Check if at least one icon directory was found
-		if (iconPathCounter == 0) {
-			OTAssert(0, "No icon path was found!");
-			OT_LOG_E("No icon path found");
-			showErrorPrompt("No icon path was found. Try to reinstall the application", "Error");
-			return 3;
-		}
-
-		// Check if at least one style directory was found
-		if (stylePathCounter == 0) {
-			OT_LOG_EA("No color style path found");
-			showErrorPrompt("No color style path was found. Try to reinstall the application", "Error");
-			return 4;
-		}
-
-		// Check if at least one graphics item directory was found
-		if (stylePathCounter == 0) {
-			OT_LOG_EA("No graphics item path found");
-			showErrorPrompt("No graphics item path was found. Try to reinstall the application", "Error");
-			return 5;
-		}
-
-		ot::GlobalColorStyle::instance().setApplication(uiAPI::getApplication());
-		ot::GlobalColorStyle::instance().scanForStyleFiles();
-
-		ot::ColorStyle cs = ot::GlobalColorStyle::instance().getCurrentStyle();
-		{
-			ot::ColorStyleValue val;
-			val.setEntryKey(ot::ColorStyleValueEntry::WidgetBackground);
-			val.setColor(ot::White);
-			cs.addValue(val);
-		}
-		{
-			ot::ColorStyleValue val;
-			val.setEntryKey(ot::ColorStyleValueEntry::Border);
-			val.setColor(ot::Black);
-			cs.addValue(val);
-		}
-		{
-			ot::ColorStyleValue val;
-			val.setEntryKey(ot::ColorStyleValueEntry::WidgetForeground);
-			val.setColor(ot::Black);
-			cs.addValue(val);
-		}
-		{
-			ot::ColorStyleValue val;
-			val.setEntryKey(ot::ColorStyleValueEntry::WidgetHoverBackground);
-			val.setColor(ot::Blue);
-			cs.addValue(val);
-		}
-		{
-			ot::ColorStyleValue val;
-			val.setEntryKey(ot::ColorStyleValueEntry::WidgetHoverForeground);
-			val.setColor(ot::White);
-			cs.addValue(val);
-		}
-		{
-			ot::ColorStyleValue val;
-			val.setEntryKey(ot::ColorStyleValueEntry::WidgetSelectionBackground);
-			val.setColor(ot::Lime);
-			cs.addValue(val);
-		}
-		{
-			ot::ColorStyleValue val;
-			val.setEntryKey(ot::ColorStyleValueEntry::WidgetSelectionForeground);
-			val.setColor(ot::Black);
-			cs.addValue(val);
-		}
-		{
-			ot::ColorStyleValue val;
-			val.setEntryKey(ot::ColorStyleValueEntry::TitleBackground);
-			val.setColor(ot::Gray);
-			cs.addValue(val);
-		}
-		{
-			ot::ColorStyleValue val;
-			val.setEntryKey(ot::ColorStyleValueEntry::TitleForeground);
-			val.setColor(ot::Black);
-			cs.addValue(val);
-		}
-		{
-			ot::ColorStyleValue val;
-			val.setEntryKey(ot::ColorStyleValueEntry::WindowBackground);
-			val.setColor(ot::LightGray);
-			cs.addValue(val);
-		}
-		{
-			ot::ColorStyleValue val;
-			val.setEntryKey(ot::ColorStyleValueEntry::WindowForeground);
-			val.setColor(ot::Black);
-			cs.addValue(val);
-		}
-		ot::GlobalColorStyle::instance().addStyle(cs, true);
-
-		if (ot::GlobalColorStyle::instance().hasStyle(ot::toString(ot::ColorStyleName::BrightStyle))) {
-			ot::GlobalColorStyle::instance().setCurrentStyle(ot::toString(ot::ColorStyleName::BrightStyle));
-		}
-
+		// Connect color style change signal
 		this->connect(&ot::GlobalColorStyle::instance(), &ot::GlobalColorStyle::currentStyleChanged, this, &AppBase::slotColorStyleChanged);
 
-		// Initialize Widget view manager
-		ot::WidgetViewManager::instance().initialize();
-		
 		//LogInDialog logInDia;
 		//if (logInDia.showDialog() != ot::Dialog::Ok) return 0;
 
 		m_logInManager = new LogInManager();
-		if (!m_logInManager->showDialog()) { return 0; }
+		if (!m_logInManager->showDialog()) { 
+			return false;
+		}
 		m_currentUser = m_logInManager->username().toStdString();
 		m_state |= LoggedInState;
 
@@ -375,38 +220,6 @@ int AppBase::run() {
 
 		m_currentUserCollection = uM.getUserSettingsCollection();
 
-		/*
-		// Show dialog
-		OT_logInfo("show log in dialog");
-
-		dialogResult result = uiAPI::logInDialog::showDialog(m_logInDialog);
-
-		if (result != dialogResult::resultOk) {
-			uiAPI::object::destroy(m_logInDialog);
-			return 3;	// Log in failed
-		}
-
-		// Check if password should be saved
-		QString username = uiAPI::logInDialog::getUsername(m_logInDialog);
-		
-		if (uiAPI::logInDialog::getSavePassword(m_logInDialog)) {
-			uiAPI::settings::setString("LastUsername", username);
-			uiAPI::settings::setString("LastPassword", uiAPI::logInDialog::getPassword(m_logInDialog));
-			uiAPI::settings::setBool("LastSavePassword", true);
-		}
-		else {
-			uiAPI::settings::setString("LastUsername", "");
-			uiAPI::settings::setString("LastPassword", "");
-			uiAPI::settings::setBool("LastSavePassword", false);
-		}
-
-		m_currentUser = username.toStdString();
-		OT_logInfo("log in completed, user name: " << m_currentUser);
-
-		// Destroy dialog
-		uiAPI::object::destroy(m_logInDialog);
-		m_isInitialized = true;
-		*/
 		// Create default UI
 		OT_LOG_D("Creating default GUI");
 		m_mainWindow = uiAPI::createWindow(m_uid);
@@ -414,7 +227,7 @@ int AppBase::run() {
 		uiAPI::window::setWindowIcon(m_mainWindow, uiAPI::getApplicationIcon("OpenTwin"));
 
 		// Create UI
-		createUi();
+		this->createUi();
 		
 		{
 			UserManagement uM;
@@ -463,18 +276,14 @@ int AppBase::run() {
 		m_uiPluginManager->addPluginSearchPath(QDir::currentPath() + "\\uiPlugins");
 #endif // _DEBUG
 
-		// Run the application
-		OT_LOG_D("Executing main event loop");
-		int status = uiAPI::exec();
-
-		return status;
+		return true;
 
 	}
 	catch (const std::exception & e) {
 		OT_LOG_E(e.what());
-		return 15;
+		return false;
 	}
-	catch (...) { return 10; }
+	catch (...) { return false; }
 }
 
 bool AppBase::isInitialized(void) const { return m_isInitialized; }

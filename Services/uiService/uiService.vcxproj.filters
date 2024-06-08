@@ -43,6 +43,12 @@
     <Filter Include="Source Files\CustomWidgets">
       <UniqueIdentifier>{9e6a87d1-0d17-4a75-8d8f-d825e9c8fe35}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\LogIn">
+      <UniqueIdentifier>{a69a0e4c-85d0-4daa-9e91-9e67b9278d26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LogIn">
+      <UniqueIdentifier>{dcd98b09-6c9d-4000-9570-bd8df718c31c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ViewerComponent.cpp">
@@ -120,11 +126,11 @@
     <ClCompile Include="src\LogInManager.cpp">
       <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\LogInDialog.cpp">
-      <Filter>Source Files\CustomWidgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\ServiceDataUi.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LogInDialog.cpp">
+      <Filter>Source Files\LogIn</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -212,7 +218,7 @@
       <Filter>Header Files\CustomWidgets</Filter>
     </QtMoc>
     <QtMoc Include="include\LogInDialog.h">
-      <Filter>Header Files\CustomWidgets</Filter>
+      <Filter>Header Files\LogIn</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

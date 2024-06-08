@@ -18,7 +18,6 @@
 #include <akCore/globalDataTypes.h>
 
 #include <akGui/aColor.h>
-#include <akGui/aApplication.h>
 #include <akGui/aObjectManager.h>
 
 #include <akWidgets/aComboButtonWidgetItem.h>
@@ -44,11 +43,11 @@ class QTabBar;
 class QSettings;
 class QDockWidget;
 class QScreen;
+class QApplication;
 
 namespace ak {
 
 	// Forward declaration
-	class aApplication;
 	class aDockWidget;
 	class aMessenger;
 	class aNotifier;
@@ -75,15 +74,13 @@ namespace ak {
 			//! @param _iconManager The external icon manager. If nullptr a new one will be created
 			//! @param _objectManager The external object manager. If nullptr a new one will be created
 			void ini(
+				QApplication* _applicationInstance,
 				const QString &			_organizationName,
 				const QString &			_applicationName
 			);
 
 			//! @brief Returns true if the API was initialized
 			bool isInitialized(void) const;
-
-			//! @brief Will call the execute function of the QApplication
-			int exec(void);
 
 			//! @brief Will return the default surface format
 			QSurfaceFormat * getDefaultSurfaceFormat(void);
@@ -109,14 +106,14 @@ namespace ak {
 			//! @brief Will delete all files created
 			void deleteAllFiles();
 
-			aApplication * app() { return m_app; }
+			QApplication* app() { return m_app; }
 
 			QScreen* screen() { return m_screen; }
 
 			QSettings * settings(void) const { return m_settings; }
 
 		protected:
-			aApplication *				m_app;							//! The core application
+			QApplication*				m_app;							//! The core application
 			bool						m_appIsRunning;				//! True if the core application is already running
 			QSurfaceFormat *			m_defaultSurfaceFormat;
 			QScreen*					m_screen;
@@ -143,6 +140,7 @@ namespace ak {
 		//! @param _organizationName The name of the organization (required for settings set/get)
 		//! @param _applicationName The name of the application (required for settings set/get)
 		UICORE_API_EXPORT void ini(
+			QApplication* _applicationInstance,
 			const QString &		_organizationName,
 			const QString &		_applicationName
 		);
@@ -191,9 +189,6 @@ namespace ak {
 
 		//! @brief Will return the object manager used in this API
 		UICORE_API_EXPORT aObjectManager * getObjectManager(void);
-
-		//! @brief Will return the application that was created by this API
-		UICORE_API_EXPORT aApplication * getApplication(void);
 
 		// ###############################################################################################################################################
 		
@@ -2059,10 +2054,6 @@ namespace ak {
 		// ###############################################################################################################################################
 
 		// special
-
-		//! @brief Will run a QApplication to start the event callback routine
-		//! The return value will be returned as soon as the application is closing
-		UICORE_API_EXPORT int exec(void);
 
 		namespace special {
 

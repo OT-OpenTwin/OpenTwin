@@ -78,6 +78,8 @@ bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, Widge
 }
 
 ot::WidgetView* ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetViewCfg* _viewConfiguration) {
+	OTAssertNullptr(m_dockManager);
+
 	WidgetView* newView = WidgetViewFactory::createView(_viewConfiguration);
 	if (newView) {
 		ads::CDockAreaWidget* parentArea = nullptr;
@@ -96,12 +98,16 @@ ot::WidgetView* ot::WidgetViewManager::addView(const BasicServiceInformation& _o
 }
 
 ot::WidgetView* ot::WidgetViewManager::findView(const std::string& _viewName) const {
+	OTAssertNullptr(m_dockManager);
+
 	const auto it = m_viewNameMap.find(_viewName);
 	if (it == m_viewNameMap.end()) return nullptr;
 	else return it->second.second;
 }
 
 ot::WidgetView* ot::WidgetViewManager::viewFromDockWidget(ads::CDockWidget* _dock) {
+	OTAssertNullptr(m_dockManager);
+
 	for (const auto& it : m_viewNameMap) {
 		if (it.second.second->getViewDockWidget() == _dock) return it.second.second;
 	}
@@ -109,6 +115,8 @@ ot::WidgetView* ot::WidgetViewManager::viewFromDockWidget(ads::CDockWidget* _doc
 }
 
 void ot::WidgetViewManager::closeView(const std::string& _viewName) {
+	OTAssertNullptr(m_dockManager);
+
 	WidgetView* view = this->findView(_viewName);
 	if (view == nullptr) return;
 
@@ -126,6 +134,8 @@ void ot::WidgetViewManager::closeView(const std::string& _viewName) {
 }
 
 void ot::WidgetViewManager::closeViews(const BasicServiceInformation& _owner) {
+	OTAssertNullptr(m_dockManager);
+
 	std::list<std::string>* lst = this->findViewNameList(_owner);
 	if (lst) {
 		std::list<std::string> tmp = *lst;
@@ -136,6 +146,8 @@ void ot::WidgetViewManager::closeViews(const BasicServiceInformation& _owner) {
 }
 
 void ot::WidgetViewManager::closeViews(void) {
+	OTAssertNullptr(m_dockManager);
+
 	std::list<std::string> tmp;
 	for (const auto& it : m_viewNameMap) {
 		tmp.push_back(it.first);
@@ -146,11 +158,14 @@ void ot::WidgetViewManager::closeViews(void) {
 }
 
 void ot::WidgetViewManager::forgetView(WidgetView* _view) {
+	OTAssertNullptr(m_dockManager);
 	OTAssertNullptr(_view);
 	this->forgetView(_view->viewData().name());
 }
 
 ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _viewName) {
+	OTAssertNullptr(m_dockManager);
+
 	// Find view and owner
 	auto nameIt = m_viewNameMap.find(_viewName);
 	if (nameIt == m_viewNameMap.end()) return nullptr;
@@ -184,6 +199,8 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _viewName) 
 // View manipulation
 
 void ot::WidgetViewManager::setCurrentView(const std::string& _viewName) {
+	OTAssertNullptr(m_dockManager);
+
 	WidgetView* view = this->findView(_viewName);
 	if (!view) return;
 
@@ -191,6 +208,8 @@ void ot::WidgetViewManager::setCurrentView(const std::string& _viewName) {
 }
 
 std::string ot::WidgetViewManager::saveState(int _version) const {
+	OTAssertNullptr(m_dockManager);
+
 	QByteArray tmp = m_dockManager->saveState(_version);
 	if (tmp.isEmpty()) return std::string();
 
@@ -206,6 +225,8 @@ std::string ot::WidgetViewManager::saveState(int _version) const {
 }
 
 bool ot::WidgetViewManager::restoreState(std::string _state, int _version) {
+	OTAssertNullptr(m_dockManager);
+
 	if (_state.empty()) return false;
 	QByteArray tmp;
 
@@ -299,6 +320,7 @@ ot::WidgetViewManager::~WidgetViewManager() {
 }
 
 bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area) {
+	OTAssertNullptr(m_dockManager);
 	OTAssertNullptr(_view);
 	// Ensure view does not exist
 	if (this->viewExists(_view->viewData().name())) {

@@ -25,6 +25,7 @@
 #include <QtCore/qeventloop.h>
 #include <QtWidgets/qfiledialog.h>
 #include <QtWidgets/qmessagebox.h>
+#include <QtWidgets/qapplication.h>
 
 // OpenTwin header
 #include "OTCore/OTAssert.h"
