@@ -34,10 +34,6 @@ GraphicsItemDesignerExportDialog::GraphicsItemDesignerExportDialog(GraphicsItemD
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
 	// Create controls
-	ot::Label* itemNameLabel = new ot::Label("Item Name:");
-	m_itemNameInput = new ot::LineEdit;
-	m_itemNameInput->setToolTip("The name of the root item that will be exported.");
-
 	ot::Label* fileNameLabel = new ot::Label("File Name:");
 	m_fileInput = new ot::FilePathEdit(ot::FilePathEdit::SaveFileMode);
 	m_fileInput->setBrowseTitle("Select GraphicsItem Export");
@@ -46,75 +42,25 @@ GraphicsItemDesignerExportDialog::GraphicsItemDesignerExportDialog(GraphicsItemD
 
 	ot::Label* autoAlignLabel = new ot::Label("Auto Align Item:");
 	m_autoAlignInput = new ot::CheckBox;
-	m_autoAlignInput->setToolTip("If enabled the item will be moved to (x: 0; y: 0) during export.");
-
-	ot::Label* moveableItemLabel = new ot::Label("Item Moveable:");
-	m_moveableItemInput = new ot::CheckBox;
-	m_moveableItemInput->setToolTip("If enabled the exported item will be moveable.");
-
-	ot::Label* itemGridSnapLabel = new ot::Label("Item Grid Snap:");
-	m_itemGridSnapInput = new ot::CheckBox;
-	m_itemGridSnapInput->setToolTip("If enabled the exported item will snap to the grid when grid snapping is enabled.");
+	m_autoAlignInput->setToolTip("If enabled the item will be moved to (x: 0; y: 0) during export.\nThis should be enabled.");
 
 	ot::PushButton* buttonExport = new ot::PushButton("Export");
 	ot::PushButton* buttonCancel = new ot::PushButton("Cancel");
 
 	// Initialize data
 	m_autoAlignInput->setChecked(m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::AutoAlign);
-	m_moveableItemInput->setChecked(m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::MoveableItem);
-	m_itemGridSnapInput->setChecked(m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::ItemGridSnap);
 
 	// Initialize name and path
-	QString newItemName = m_designer->getExportConfig().getItemName();
-	if (newItemName.isEmpty()) newItemName = "New Item";
-	m_itemNameInput->setText(newItemName);
-
-	QString newItemPath = m_designer->getExportConfig().getFileName();
-	newItemPath.replace('\\', '/');
-
-	if (newItemPath.isEmpty()) {
-		QByteArray envPath = qgetenv("OPENTWIN_DEV_ROOT");
-		if (envPath.isEmpty()) {
-			OT_LOG_W("OpenTwin dev root is not set in the environment");
-			newItemPath = "C:/OpenTwin";
-		}
-		else {
-			newItemPath = QString::fromStdString(envPath.toStdString());
-		}
-
-		newItemPath.replace('\\', '/');
-
-		while (newItemPath.endsWith('/')) {
-			newItemPath.removeLast();
-		}
-
-		newItemPath.append("/Assets/GraphicsItems/New Item.ot.json");
-	}
-
-	QStringList newItemPathList = newItemPath.split('/', Qt::SkipEmptyParts);
-	newItemPathList.removeLast();
-
-	newItemPath.clear();
-	for (const QString& str : newItemPathList) {
-		newItemPath.append(str + "/");
-	}
-	newItemPath.append(newItemName + ".ot.json");
-	m_fileInput->setFilePath(newItemPath);
-
+	m_fileInput->setFilePath(m_designer->getExportConfig().getFileName());
+	
 	// Setup layouts
 	rootLayout->addLayout(inputLayout, 1);
 	rootLayout->addLayout(buttonLayout);
 
-	inputLayout->addWidget(itemNameLabel, 0, 0);
-	inputLayout->addWidget(m_itemNameInput, 0, 1);
-	inputLayout->addWidget(fileNameLabel, 1, 0);
-	inputLayout->addWidget(m_fileInput->getQWidget(), 1, 1);
-	inputLayout->addWidget(autoAlignLabel, 2, 0);
-	inputLayout->addWidget(m_autoAlignInput, 2, 1);
-	inputLayout->addWidget(moveableItemLabel, 3, 0);
-	inputLayout->addWidget(m_moveableItemInput, 3, 1);
-	inputLayout->addWidget(itemGridSnapLabel, 4, 0);
-	inputLayout->addWidget(m_itemGridSnapInput, 4, 1);
+	inputLayout->addWidget(fileNameLabel, 0, 0);
+	inputLayout->addWidget(m_fileInput->getQWidget(), 0, 1);
+	inputLayout->addWidget(autoAlignLabel, 1, 0);
+	inputLayout->addWidget(m_autoAlignInput, 1, 1);
 	inputLayout->setColumnStretch(1, 1);
 
 	buttonLayout->addStretch(1);
@@ -123,10 +69,9 @@ GraphicsItemDesignerExportDialog::GraphicsItemDesignerExportDialog(GraphicsItemD
 
 	// Initialize window
 	this->setWindowTitle("Export As GraphicsItem");
-	this->setMinimumSize(500, 250);
+	this->setMinimumSize(500, 100);
 
 	// Connect signals
-	this->connect(m_itemNameInput, &ot::LineEdit::textChanged, this, &GraphicsItemDesignerExportDialog::slotUpdateFilePath);
 	this->connect(buttonExport, &ot::PushButton::clicked, this, &GraphicsItemDesignerExportDialog::slotExport);
 	this->connect(buttonCancel, &ot::PushButton::clicked, this, &GraphicsItemDesignerExportDialog::slotCancel);
 }
@@ -136,13 +81,15 @@ GraphicsItemDesignerExportDialog::~GraphicsItemDesignerExportDialog() {}
 GraphicsItemDesignerExportConfig GraphicsItemDesignerExportDialog::createExportConfig(void) const {
 	GraphicsItemDesignerExportConfig newExportConfig;
 
-	newExportConfig.setItemName(m_itemNameInput->text());
 	newExportConfig.setFileName(m_fileInput->getFilePath());
 	newExportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::AutoAlign, m_autoAlignInput->isChecked());
-	newExportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::MoveableItem, m_moveableItemInput->isChecked());
-	newExportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::ItemGridSnap, m_itemGridSnapInput->isChecked());
 
 	return newExportConfig;
+}
+
+void GraphicsItemDesignerExportDialog::showEvent(QShowEvent* _event) {
+	ot::Dialog::showEvent(_event);
+	m_fileInput->getLineEdit()->setFocus();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -151,11 +98,6 @@ GraphicsItemDesignerExportConfig GraphicsItemDesignerExportDialog::createExportC
 
 void GraphicsItemDesignerExportDialog::slotExport(void) {
 	// Check user inputs
-	if (m_itemNameInput->text().isEmpty()) {
-		OT_LOG_E("No item name set");
-		return;
-	}
-
 	if (m_fileInput->getFilePath().isEmpty()) {
 		OT_LOG_E("No file path set");
 		return;
@@ -198,29 +140,4 @@ void GraphicsItemDesignerExportDialog::slotExport(void) {
 
 void GraphicsItemDesignerExportDialog::slotCancel(void) {
 	this->close(ot::Dialog::Cancel);
-}
-
-void GraphicsItemDesignerExportDialog::slotUpdateFilePath(void) {
-	QString newPath = m_fileInput->getFilePath();
-
-	if (!newPath.endsWith(".ot.json")) return;
-
-	newPath.replace('\\', '/');
-	QStringList newItemPathList = newPath.split('/', Qt::SkipEmptyParts);
-	newItemPathList.removeLast();
-
-	newPath.clear();
-	for (const QString& str : newItemPathList) {
-		newPath.append(str + "/");
-	}
-
-	if (m_itemNameInput->text().isEmpty()) {
-		newPath.append("New Item");
-	}
-	else {
-		newPath.append(m_itemNameInput->text());
-	}
-	newPath.append(".ot.json");
-
-	m_fileInput->setFilePath(newPath);
 }

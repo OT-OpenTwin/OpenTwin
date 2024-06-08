@@ -7,7 +7,7 @@
 #include "GraphicsItemDesignerExportConfig.h"
 
 GraphicsItemDesignerExportConfig::GraphicsItemDesignerExportConfig() 
-	: m_exportConfigFlags(AutoAlign | MoveableItem | ItemGridSnap)
+	: m_exportConfigFlags(AutoAlign)
 {
 
 }
@@ -23,7 +23,6 @@ GraphicsItemDesignerExportConfig::~GraphicsItemDesignerExportConfig() {
 GraphicsItemDesignerExportConfig& GraphicsItemDesignerExportConfig::operator = (const GraphicsItemDesignerExportConfig& _other) {
 	if (this == &_other) return *this;
 	
-	m_itemName = _other.m_itemName;
 	m_fileName = _other.m_fileName;
 	m_exportConfigFlags = _other.m_exportConfigFlags;
 

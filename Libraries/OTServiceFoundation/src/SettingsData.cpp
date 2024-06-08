@@ -746,7 +746,7 @@ void ot::SettingsItemDouble::setLimits(int _min, int _max) {
 }
 
 void ot::SettingsItemDouble::setMaxLimits(void) {
-	m_minValue = DBL_MIN;
+	m_minValue = -DBL_MAX;
 	m_maxValue = DBL_MAX;
 	checkLimits();
 }

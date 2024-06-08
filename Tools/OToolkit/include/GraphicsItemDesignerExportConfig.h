@@ -15,9 +15,7 @@ class GraphicsItemDesignerExportConfig {
 public:
 	enum ExportConfigFlag {
 		NoFlags = 0x00,
-		AutoAlign = 0x01,
-		MoveableItem = 0x02,
-		ItemGridSnap = 0x04
+		AutoAlign = 0x01
 	};
 	typedef ot::Flags<ExportConfigFlag> ExportConfigFlags;
 
@@ -35,14 +33,10 @@ public:
 	void setExportConfigFlags(const ExportConfigFlags& _flags) { m_exportConfigFlags = _flags; };
 	const ExportConfigFlags& getExportConfigFlags(void) const { return m_exportConfigFlags; };
 
-	void setItemName(const QString& _itemName) { m_itemName = _itemName; };
-	const QString& getItemName(void) const { return m_itemName; };
-
 	void setFileName(const QString& _fileName) { m_fileName = _fileName; };
 	const QString& getFileName(void) const { return m_fileName; };
 
 private:
-	QString m_itemName;
 	QString m_fileName;
 	ExportConfigFlags m_exportConfigFlags;
 };

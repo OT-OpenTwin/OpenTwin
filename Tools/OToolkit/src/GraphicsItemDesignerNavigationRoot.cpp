@@ -14,6 +14,7 @@ GraphicsItemDesignerNavigationRoot::GraphicsItemDesignerNavigationRoot(GraphicsI
 	: m_designer(_designer)
 {
 	this->setExpanded(true);
+	this->setText(0, "Container");
 }
 
 void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
@@ -45,11 +46,7 @@ void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
 	editorGroup->addProperty(new PropertyDouble("Width", m_designer->getView()->sceneRect().width()));
 	editorGroup->addProperty(new PropertyDouble("Height", m_designer->getView()->sceneRect().height()));
 
-	PropertyGroup* generalGroup = new PropertyGroup("Item");
-	generalGroup->addProperty(new PropertyString("Name", this->text(0).toStdString()));
-		
 	cfg.addRootGroup(editorGroup);
-	cfg.addRootGroup(generalGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);
 }
 	
@@ -109,18 +106,6 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 		}
 
 		m_designer->getView()->setItemSize(QSizeF(m_designer->getView()->getItemSize().width(), input->getValue()));
-	}
-	else if (_item->getGroupName() == "Item" && _itemData.propertyName() == "Name") {
-		PropertyInputString* input = dynamic_cast<PropertyInputString*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
-			return;
-		}
-
-		this->setText(0, input->getCurrentText());
-		GraphicsItemDesignerExportConfig cfg = m_designer->getExportConfig();
-		cfg.setItemName(input->getCurrentText());
-		m_designer->setExportConfig(cfg);
 	}
 	else {
 		OT_LOG_E("Unknown property { \"Group\": \"" + _item->getGroupName() + "\", \"Item\": \"" + _itemData.propertyName() + "\" }");

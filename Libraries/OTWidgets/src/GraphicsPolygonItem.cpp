@@ -48,7 +48,7 @@ bool ot::GraphicsPolygonItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 QSizeF ot::GraphicsPolygonItem::getPreferredGraphicsItemSize(void) const {
 	const GraphicsPolygonItemCfg* cfg = this->getItemConfiguration<GraphicsPolygonItemCfg>();
 	QPointF topLeftPoint(DBL_MAX, DBL_MAX);
-	QPointF bottomRightPoint(DBL_MIN, DBL_MIN);
+	QPointF bottomRightPoint(-DBL_MAX, -DBL_MAX);
 
 	for (const Point2DD& pt : cfg->getPoints()) {
 		if (pt.x() < topLeftPoint.x()) topLeftPoint.setX(pt.x());

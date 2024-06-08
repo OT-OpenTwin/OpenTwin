@@ -104,11 +104,8 @@ void GraphicsItemDesigner::restoreToolSettings(QSettings& _settings) {
 	);
 
 	// Export
-	m_exportConfig.setItemName(_settings.value("GID.LastExportName", QString("New Item")).toString());
 	m_exportConfig.setFileName(_settings.value("GID.LastExportFile", QString()).toString());
 	m_exportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::AutoAlign, _settings.value("GID.ExportAutoAlign", true).toBool());
-	m_exportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::MoveableItem, _settings.value("GID.ExportMoveable", true).toBool());
-	m_exportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::ItemGridSnap, _settings.value("GID.ExportGridSnap", true).toBool());
 
 	m_imageExportConfig.setFileName(_settings.value("GID.LastExportImageFile", QString()).toString());
 	QMarginsF newImageMargins;
@@ -118,8 +115,6 @@ void GraphicsItemDesigner::restoreToolSettings(QSettings& _settings) {
 	newImageMargins.setBottom(_settings.value("GID.ImageExportMarginBottom", 0.).toDouble());
 	m_imageExportConfig.setMargins(newImageMargins);
 	m_imageExportConfig.setShowGrid(_settings.value("GID.ImageExportShowGrid", false).toBool());
-
-	m_navigation->getDesignerRootItem()->setText(0, m_exportConfig.getItemName());
 }
 
 bool GraphicsItemDesigner::prepareToolShutdown(QSettings& _settings) {
@@ -134,11 +129,8 @@ bool GraphicsItemDesigner::prepareToolShutdown(QSettings& _settings) {
 	_settings.setValue("GID.GridSnap", QString::fromStdString(ot::Grid::toString(m_view->getDesignerScene()->getGridSnapMode())));
 
 	// Export
-	_settings.setValue("GID.LastExportName", m_exportConfig.getItemName());
 	_settings.setValue("GID.LastExportFile", m_exportConfig.getFileName());
 	_settings.setValue("GID.ExportAutoAlign", (bool)(m_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::AutoAlign));
-	_settings.setValue("GID.ExportMoveable", (bool)(m_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::MoveableItem));
-	_settings.setValue("GID.ExportGridSnap", (bool)(m_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::ItemGridSnap));
 
 	_settings.setValue("GID.LastExportImageFile", m_imageExportConfig.getFileName());
 	QMarginsF imageMargins = m_imageExportConfig.getMargins();

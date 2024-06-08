@@ -88,7 +88,7 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 
 	QLabel* startXLabel = new QLabel("Start X:");
 	m_startX = new DoubleSpinBox;
-	m_startX->setRange(DBL_MIN, DBL_MAX);
+	m_startX->setRange(-DBL_MAX, DBL_MAX);
 	m_startX->setDecimals(2);
 	m_startX->setSuffix("%");
 	m_startX->setToolTip("The start X position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the width and -1.0 the width in negative direction.");
@@ -98,7 +98,7 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 
 	QLabel* startYLabel = new QLabel("Start Y:");
 	m_startY = new DoubleSpinBox;
-	m_startY->setRange(DBL_MIN, DBL_MAX);
+	m_startY->setRange(-DBL_MAX, DBL_MAX);
 	m_startY->setDecimals(2);
 	m_startY->setSuffix("%");
 	m_startY->setToolTip("The start Y position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the height and -1.0 the height in negative direction.");
@@ -108,7 +108,7 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 
 	QLabel* endXLabel = new QLabel("End X:");
 	m_finalX = new DoubleSpinBox;
-	m_finalX->setRange(DBL_MIN, DBL_MAX);
+	m_finalX->setRange(-DBL_MAX, DBL_MAX);
 	m_finalX->setDecimals(2);
 	m_finalX->setValue(100.);
 	m_finalX->setSuffix("%");
@@ -119,7 +119,7 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 
 	QLabel* endYLabel = new QLabel("End Y:");
 	m_finalY = new DoubleSpinBox;
-	m_finalY->setRange(DBL_MIN, DBL_MAX);
+	m_finalY->setRange(-DBL_MAX, DBL_MAX);
 	m_finalY->setDecimals(2);
 	m_finalY->setValue(100.);
 	m_finalX->setSuffix("%");
@@ -168,7 +168,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 
 	QLabel* centerXLabel = new QLabel("Center X:");
 	m_centerX = new DoubleSpinBox;
-	m_centerX->setRange(DBL_MIN, DBL_MAX);
+	m_centerX->setRange(-DBL_MAX, DBL_MAX);
 	m_centerX->setDecimals(2);
 	m_centerX->setSuffix("%");
 	m_centerX->setToolTip("The center X position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");
@@ -178,7 +178,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 
 	QLabel* centerYLabel = new QLabel("Center Y:");
 	m_centerY = new DoubleSpinBox;
-	m_centerY->setRange(DBL_MIN, DBL_MAX);
+	m_centerY->setRange(-DBL_MAX, DBL_MAX);
 	m_centerY->setDecimals(2);
 	m_centerY->setSuffix("%");
 	m_centerY->setToolTip("The center Y position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");
@@ -205,7 +205,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 
 	QLabel* focalXLabel = new QLabel("Focal X:");
 	m_focalX = new DoubleSpinBox;
-	m_focalX->setRange(DBL_MIN, DBL_MAX);
+	m_focalX->setRange(-DBL_MAX, DBL_MAX);
 	m_focalX->setDecimals(2);
 	m_focalX->setSuffix("%");
 	m_focalX->setToolTip("The fianl stop X position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");
@@ -215,7 +215,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 
 	QLabel* focalYLabel = new QLabel("Focal Y:");
 	m_focalY = new DoubleSpinBox;
-	m_focalY->setRange(DBL_MIN, DBL_MAX);
+	m_focalY->setRange(-DBL_MAX, DBL_MAX);
 	m_focalY->setDecimals(2);
 	m_focalY->setSuffix("%");
 	m_focalY->setToolTip("The fianl stop Y position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");

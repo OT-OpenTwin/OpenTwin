@@ -29,17 +29,16 @@ public:
 
 	GraphicsItemDesignerExportConfig createExportConfig(void) const;
 
+protected:
+	virtual void showEvent(QShowEvent* _event) override;
+
 private Q_SLOTS:
 	void slotExport(void);
 	void slotCancel(void);
-	void slotUpdateFilePath(void);
-
+	
 private:
 	GraphicsItemDesigner* m_designer;
 
-	ot::LineEdit* m_itemNameInput;
 	ot::FilePathEdit* m_fileInput;
 	ot::CheckBox* m_autoAlignInput;
-	ot::CheckBox* m_moveableItemInput;
-	ot::CheckBox* m_itemGridSnapInput;
 };
