@@ -132,6 +132,9 @@
     <ClCompile Include="src\LogInDialog.cpp">
       <Filter>Source Files\LogIn</Filter>
     </ClCompile>
+    <ClCompile Include="src\LogInGSSEntry.cpp">
+      <Filter>Source Files\LogIn</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -178,6 +181,9 @@
     </ClInclude>
     <ClInclude Include="include\ServiceDataUi.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogInGSSEntry.h">
+      <Filter>Header Files\LogIn</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

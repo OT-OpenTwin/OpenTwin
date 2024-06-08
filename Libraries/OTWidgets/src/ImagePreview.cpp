@@ -10,11 +10,14 @@
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 
-ot::ImagePreview::ImagePreview() {
+ot::ImagePreview::ImagePreview()
+	: m_imageMargins(1, 1, 1, 1), m_enabledResizing(true)
+{
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
 }
 
-ot::ImagePreview::ImagePreview(const QImage& _image) 
+ot::ImagePreview::ImagePreview(const QImage& _image)
+	: m_imageMargins(1, 1, 1, 1), m_enabledResizing(true)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
 	this->setImage(_image);
@@ -27,9 +30,7 @@ ot::ImagePreview::~ImagePreview() {
 void ot::ImagePreview::paintEvent(QPaintEvent* _event) {
 	QFrame::paintEvent(_event);
 
-	QRect r = this->rect();
-	r.setTopLeft(r.topLeft() + QPoint(1, 1));
-	r.setBottomRight(r.bottomRight() - QPoint(1, 1));
+	QRect r = this->rect().marginsRemoved(m_imageMargins);
 	QPainter painter(this);
 	painter.drawImage(r.topLeft(), m_image.scaled(m_size.boundedTo(r.size()), Qt::KeepAspectRatio));
 }
@@ -39,13 +40,15 @@ QSize ot::ImagePreview::sizeHint(void) const {
 }
 
 void ot::ImagePreview::wheelEvent(QWheelEvent* _event) {
+	if (!m_enabledResizing) return;
+
 	int delta = _event->angleDelta().y();
 	m_size += QSize(delta / 10, delta / 10);
 	this->resize(m_size);
 }
 
 void ot::ImagePreview::keyPressEvent(QKeyEvent* _event) {
-	if (_event->key() == Qt::Key_Space) {
+	if ((_event->key() == Qt::Key_Space) && m_enabledResizing) {
 		m_size = m_image.size();
 		this->resize(m_size);
 	}
@@ -74,5 +77,10 @@ void ot::ImagePreview::mousePressEvent(QMouseEvent* _event) {
 void ot::ImagePreview::setImage(const QImage& _image) {
 	m_image = _image;
 	m_size = m_image.size();
+	this->update();
+}
+
+void ot::ImagePreview::setImageMargins(const QMargins& _margins) {
+	m_imageMargins = _margins;
 	this->update();
 }

@@ -37,12 +37,20 @@ namespace ot {
 		void setImage(const QImage& _image);
 		const QImage& image(void) const { return m_image; };
 
+		void setImageMargins(const QMargins& _margins);
+		const QMargins& getImageMargins(void) const { return m_imageMargins; };
+
+		void setEnableResizing(bool _enable) { m_enabledResizing = _enable; };
+		bool getEnableResizing(void) const { return m_enabledResizing; };
+
 	Q_SIGNALS:
 		void imagePixedClicked(const QPoint& _px);
 
 	private:
+		bool m_enabledResizing;
 		QSize m_size;
 		QImage m_image;
+		QMargins m_imageMargins;
 	};
 
 }

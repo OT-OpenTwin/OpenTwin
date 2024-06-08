@@ -2077,26 +2077,17 @@ QAbstractView:selected {
 
 /* ##################################################################################### */
 
-#LogInDialogCentralLayoutW {
-    background: url('%file:Log In Background Image%');
-    background-repeat: no-repeat;
+#LogInDialog {
+    background: rgb(2, 41, 92);
+    border: 1px solid white;
 }
 
-#LogInDialogGridLayoutW {
-    background: transparent;
+#LogInDialog QLabel {
+    color: white;
 }
 
-#LogInDialogMainLayoutW {
-    background-color:#90000000;
-	border-radius:10px;
-}
-
-#LogInDialogMainLayoutW QLabel {
-    color:#FFFFFF;
-}
-
-#LogInDialogMainLayoutW QCheckBox{
-    color:#FFFFFF;
+#LogInDialogRegisterLabel:hover {
+    color: %color:Widget Hover Background%;
 }
 
 /* ##################################################################################### */

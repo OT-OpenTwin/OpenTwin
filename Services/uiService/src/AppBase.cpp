@@ -217,7 +217,9 @@ bool AppBase::initialize() {
 
 bool AppBase::logIn(void) {
 	//LogInDialog logInDia;
-	//if (logInDia.showDialog() != ot::Dialog::Ok) return false;
+	//if (logInDia.showDialog() != ot::Dialog::Ok) {
+		//return false;
+	//}
 
 	m_logInManager = new LogInManager();
 	if (!m_logInManager->showDialog()) {

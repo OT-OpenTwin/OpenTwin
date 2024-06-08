@@ -34,6 +34,7 @@
     </ClCompile>
     <ClCompile Include="src\FileHandler.cpp" />
     <ClCompile Include="src\LogInDialog.cpp" />
+    <ClCompile Include="src\LogInGSSEntry.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ExternalServicesComponent.cpp" />
     <ClCompile Include="src\ControlsManager.cpp" />
@@ -70,6 +71,7 @@
     <QtMoc Include="include\DevLogger.h" />
     <ClInclude Include="include\FileHandler.h" />
     <QtMoc Include="include\LogInDialog.h" />
+    <ClInclude Include="include\LogInGSSEntry.h" />
     <ClInclude Include="include\NavigationTreeView.h" />
     <ClInclude Include="include\QtMetaTypes.h" />
     <QtMoc Include="include\SelectEntitiesDialog.h" />
