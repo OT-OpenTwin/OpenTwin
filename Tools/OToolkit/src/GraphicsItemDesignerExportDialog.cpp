@@ -10,11 +10,12 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTGui/GraphicsItemCfg.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/PushButton.h"
-#include "OTGui/GraphicsItemCfg.h"
+#include "OTWidgets/IconManager.h"
 #include "OTWidgets/FilePathEdit.h"
 #include "OTWidgets/PropertyInputFilePath.h"
 
@@ -69,6 +70,7 @@ GraphicsItemDesignerExportDialog::GraphicsItemDesignerExportDialog(GraphicsItemD
 
 	// Initialize window
 	this->setWindowTitle("Export As GraphicsItem");
+	this->setWindowIcon(ot::IconManager::getApplicationIcon());
 	this->setMinimumSize(500, 100);
 
 	// Connect signals

@@ -6,6 +6,7 @@
 #include "ConnectToLoggerDialog.h"
 #include "AppBase.h"
 
+#include "OTWidgets/IconManager.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 
@@ -53,7 +54,7 @@ ConnectToLoggerDialog::ConnectToLoggerDialog() {
 	// Setup window
 	setWindowFlags(windowFlags() & ~(Qt::WindowContextHelpButtonHint));
 	setWindowTitle("Connect to Logger");
-	setWindowIcon(AppBase::instance()->windowIcon());
+	setWindowIcon(ot::IconManager::getApplicationIcon());
 
 	// Connect signals
 	connect(m_btnConnect, &QPushButton::clicked, this, &ConnectToLoggerDialog::slotConnect);

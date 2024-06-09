@@ -237,6 +237,7 @@ LogInGSSEditDialog::LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entrie
 
 	// Setup window
 	this->setWindowTitle("Edit Global Session Services");
+	this->setWindowIcon(ot::IconManager::getApplicationIcon());
 	this->setMinimumSize(550, 300);
 
 	// Connect signals

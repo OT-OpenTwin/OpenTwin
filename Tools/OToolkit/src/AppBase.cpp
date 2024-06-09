@@ -28,6 +28,7 @@
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/CheckerboardPainter2D.h"
 #include "OTCommunication/actionTypes.h"
+#include "OTWidgets/IconManager.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/PlainTextEditView.h"
@@ -450,7 +451,7 @@ AppBase::AppBase(QApplication* _app)
 	
 	this->setCentralWidget(ot::WidgetViewManager::instance().getDockManager());
 	this->setWindowTitle("OToolkit");
-	this->setWindowIcon(QIcon(":/images/OToolkit.png"));
+	this->setWindowIcon(ot::IconManager::getApplicationIcon());
 
 	ot::WidgetViewManager::instance().addView(ot::BasicServiceInformation(), m_output);
 

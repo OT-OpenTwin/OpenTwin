@@ -233,7 +233,7 @@ bool AppBase::logIn(void) {
 	OT_LOG_D("Creating default GUI");
 	m_mainWindow = uiAPI::createWindow(m_uid);
 	uiAPI::window::setTitle(m_mainWindow, "Open Twin");
-	uiAPI::window::setWindowIcon(m_mainWindow, uiAPI::getApplicationIcon("OpenTwin"));
+	uiAPI::window::setWindowIcon(m_mainWindow, ot::IconManager::getApplicationIcon());
 
 	// Create UI
 	this->createUi();

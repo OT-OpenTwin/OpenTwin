@@ -46,6 +46,13 @@ namespace ot {
 		//! @brief Create and return the movie
 		static QMovie& getMovie(const QString& _subPath);
 
+		//! \brief Stores the application icon.
+		static void setApplicationIcon(const QIcon& _icon);
+
+		//! \brief Returns the main application icon.
+		//! This icon may be used for windows and dialogs to let them all have the same icon.
+		static const QIcon& getApplicationIcon(void);
+
 	private:
 		template <class T>
 		T& getOrCreate(const QString& _subPath, std::map<QString, T*>& _dataMap, T& _default);
@@ -63,6 +70,7 @@ namespace ot {
 		QIcon m_emptyIcon;
 		QPixmap m_emptyPixmap;
 		QMovie m_emptyMovie;
+		QIcon m_applicationIcon;
 	};
 
 }

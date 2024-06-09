@@ -15,6 +15,7 @@
 #include "OTWidgets/CheckBox.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/PushButton.h"
+#include "OTWidgets/IconManager.h"
 #include "OTWidgets/ImagePreview.h"
 #include "OTWidgets/FilePathEdit.h"
 #include "OTWidgets/DoubleSpinBox.h"
@@ -98,6 +99,10 @@ GraphicsItemDesignerImageExportDialog::GraphicsItemDesignerImageExportDialog(Gra
 
 	// Initialize file name
 	m_pathInput->setFilePath(m_designer->getImageExportConfig().getFileName());
+
+	// Initialize window
+	this->setWindowTitle("Export As Image");
+	this->setWindowIcon(ot::IconManager::getApplicationIcon());
 
 	// Connect signals
 	this->connect(buttonExport, &ot::PushButton::clicked, this, &GraphicsItemDesignerImageExportDialog::slotExport);

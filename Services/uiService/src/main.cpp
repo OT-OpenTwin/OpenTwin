@@ -139,6 +139,9 @@ bool initializeAssets(void) {
 		return false;
 	}
 
+	// Initialize application icon
+	ot::IconManager::setApplicationIcon(ot::IconManager::getIcon("Application/OpenTwin.ico"));
+
 	// Initialize color style
 	ot::GlobalColorStyle::instance().scanForStyleFiles();
 

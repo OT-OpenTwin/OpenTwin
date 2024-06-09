@@ -144,6 +144,7 @@ LogInDialog::LogInDialog()
 	this->setObjectName("LogInDialog");
 	this->setWindowTitle("OpenTwin Login");
 	this->setWindowFlags(Qt::Dialog | Qt::WindowType::FramelessWindowHint);
+	this->setWindowIcon(ot::IconManager::getApplicationIcon());
 	this->setFixedSize(350, 500);
 
 	// Connect signals

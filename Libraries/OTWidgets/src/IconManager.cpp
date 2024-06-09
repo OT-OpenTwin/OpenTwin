@@ -65,6 +65,14 @@ QMovie& ot::IconManager::getMovie(const QString& _subPath) {
 	return manager.getOrCreate<QMovie>(_subPath, manager.m_movies, manager.m_emptyMovie);
 }
 
+void ot::IconManager::setApplicationIcon(const QIcon& _icon) {
+	IconManager::instance().m_applicationIcon = _icon;
+}
+
+const QIcon& ot::IconManager::getApplicationIcon(void) {
+	return IconManager::instance().m_applicationIcon;
+}
+
 QString ot::IconManager::findFullPath(const QString& _subPath) {
 	for (auto p : m_searchPaths) {
 		if (QFile::exists(p + _subPath)) return p + _subPath;

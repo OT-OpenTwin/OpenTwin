@@ -107,6 +107,9 @@ void mainApplicationThread()
 			exit(-2);
 		}
 
+		// Initialize application icon
+		ot::IconManager::setApplicationIcon(QIcon(":/images/OToolkit.png"));
+
 		// Initialize color style
 		ot::GlobalColorStyle::instance().scanForStyleFiles();
 		if (ot::GlobalColorStyle::instance().hasStyle(ot::toString(ot::ColorStyleName::BrightStyle))) {

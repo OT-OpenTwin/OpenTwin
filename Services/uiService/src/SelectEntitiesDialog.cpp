@@ -7,6 +7,7 @@
 // OpenTwin header
 #include "SelectEntitiesDialog.h"
 #include "OTCore/Logger.h"
+#include "OTWidgets/IconManager.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/PushButton.h"
@@ -70,6 +71,7 @@ SelectEntitiesDialog::SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _c
 
 	// Setup window
 	this->setWindowTitle(QString::fromStdString(_config.title()));
+	this->setWindowIcon(ot::IconManager::getApplicationIcon());
 
 	// Connect signals
 	this->connect(m_available->treeWidget(), &QTreeWidget::itemDoubleClicked, this, &SelectEntitiesDialog::slotAdd);
