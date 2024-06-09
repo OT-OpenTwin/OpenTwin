@@ -56,8 +56,23 @@ QSizeF ot::GraphicsTriangleItem::getPreferredGraphicsItemSize(void) const {
 void ot::GraphicsTriangleItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {	
 	const GraphicsTriangleItemCfg* cfg = this->getItemConfiguration<GraphicsTriangleItemCfg>();
 
+	QPen borderPen = QtFactory::toQPen(cfg->getOutline());
+
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState && !this->getBlockStateNotifications()) {
+		if ((this->getGraphicsItemState() & GraphicsItemState::SelectedState) && !(this->getGraphicsItemState() & GraphicsItemState::HoverState)) {
+			Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
+			borderPen.setBrush(QtFactory::toQBrush(newPainter));
+			delete newPainter;
+		}
+		else if (this->getGraphicsItemState() & GraphicsItemState::HoverState) {
+			Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
+			borderPen.setBrush(QtFactory::toQBrush(newPainter));
+			delete newPainter;
+		}
+	}
+
 	_painter->setBrush(QtFactory::toQBrush(cfg->getBackgroundPainter()));
-	_painter->setPen(QtFactory::toQPen(cfg->getOutline()));
+	_painter->setPen(borderPen);
 
 	switch (cfg->getTriangleShape())
 	{

@@ -90,6 +90,16 @@ void ot::GraphicsStackItem::graphicsItemFlagsChanged(const GraphicsItemCfg::Grap
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
 }
 
+void ot::GraphicsStackItem::graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState) {
+		for (const GraphicsStackItemEntry& entry : m_items) {
+			entry.item->setGraphicsItemState(_state);
+		}
+	}
+
+	this->update();
+}
+
 void ot::GraphicsStackItem::graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {
 	if (_event == ot::GraphicsItem::ItemResized) {
 		this->adjustChildItems();

@@ -49,6 +49,10 @@ void ot::CustomGraphicsItem::graphicsItemFlagsChanged(const GraphicsItemCfg::Gra
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
 }
 
+void ot::CustomGraphicsItem::graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {
+	this->update();
+}
+
 QSizeF ot::CustomGraphicsItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
 	return this->sizeHint(_hint, _constrains);
 }

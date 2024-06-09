@@ -68,6 +68,22 @@ void ot::GraphicsGroupItem::graphicsItemFlagsChanged(const GraphicsItemCfg::Grap
 	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
 }
 
+void ot::GraphicsGroupItem::graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState) {
+		for (auto i : this->childItems()) {
+			ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
+			if (itm) {
+				itm->setGraphicsItemState(_state);
+			}
+			else {
+				OT_LOG_EA("Item cast failed");
+			}
+		}
+	}
+
+	this->update();
+}
+
 QSizeF ot::GraphicsGroupItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
 	return this->sizeHint(_hint, _constrains);
 }

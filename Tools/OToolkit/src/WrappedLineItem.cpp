@@ -81,6 +81,11 @@ void WrappedLineItem::fillPropertyGrid(void) {
 	geometryGroup->addProperty(new PropertyDouble("Y2", this->getLine().y2()));
 	geometryGroup->addProperty(new PropertyPainter2D("Line Painter", this->getLineStyle().painter()));
 	geometryGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().width()));
+	{
+		PropertyBool* newStateProperty = new PropertyBool("Handle State", this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState);
+		newStateProperty->setPropertyTip("If enabled the item will update its appearance according to the current item state (e.g. ItemSelected or ItemHover)");
+		geometryGroup->addProperty(newStateProperty);
+	}
 
 	cfg.addRootGroup(generalGroup);
 	cfg.addRootGroup(geometryGroup);
@@ -160,6 +165,15 @@ void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 		ot::OutlineF lineStyle = this->getLineStyle();
 		lineStyle.setWidth(input->getValue());
 		this->setLineStyle(lineStyle);
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Handle State") {
+		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		this->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, input->isChecked());
 	}
 
 }

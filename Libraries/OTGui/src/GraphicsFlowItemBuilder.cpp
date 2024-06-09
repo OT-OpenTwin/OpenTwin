@@ -209,13 +209,13 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	ot::GraphicsVBoxLayoutItemCfg* mLay = new ot::GraphicsVBoxLayoutItemCfg;
 	mLay->setName(m_name + "_mLay");
 	mLay->setMinimumSize(ot::Size2DD(50., 80.));
-	mLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
+	mLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
 	root->addItemTop(mLay, true, false);
 
 	// Title: Stack
 	ot::GraphicsStackItemCfg* tStack = new ot::GraphicsStackItemCfg;
 	tStack->setName(m_name + "_tStack");
-	tStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
+	tStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
 	mLay->addChildItem(tStack, 0);
 
 	// Title: Border
@@ -225,7 +225,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	tBor->setCornerRadius(5);
 	//tBor->setSize(ot::Size2DD(200., 30.));
 	tBor->setSizePolicy(ot::Dynamic);
-	tBor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
+	tBor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
 	tStack->addItemTop(tBor, false, true);
 
 	// Title: Layout

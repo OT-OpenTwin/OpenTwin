@@ -32,6 +32,8 @@ namespace ot {
 
 		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) override;
 
+		virtual void graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) override;
+
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName) override;

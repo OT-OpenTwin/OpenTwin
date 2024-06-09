@@ -25,6 +25,7 @@
 
 namespace ot {
 
+	class Painter2D;
 	class GraphicsScene;
 	class GraphicsItemCfg;
 	class GraphicsConnectionItem;
@@ -35,6 +36,11 @@ namespace ot {
 		OT_DECL_NODEFAULT(GraphicsItem)
 		OT_DECL_NOCOPY(GraphicsItem)
 	public:
+
+		// ###############################################################################################################################################
+
+		// Types
+
 		//! \enum GraphicsItemEvent
 		//! \brief The GraphicsItemEvent is used to describe the type of an event that occured.
 		enum GraphicsItemEvent {
@@ -45,15 +51,31 @@ namespace ot {
 		//! \enum GraphicsItemState
 		//! \brief The GraphicsItemState is used to describe the current state of a GraphicsItem.
 		enum GraphicsItemState {
-			NoState           = 0x00, //! @brief Default state
-			HoverState        = 0x01, //! @brief Item is hovered over by user
-			SelectedState     = 0x02, //! @brief Item is selected
+			NoState           = 0x00, //! \brief Default state
+			HoverState        = 0x01, //! \brief Item is hovered over by user
+			SelectedState     = 0x02, //! \brief Item is selected
 			ForwardSizeState  = 0x08  //! \brief Item forwards requested size requests to child item (e.g. GraphicsLayoutItem).
 		};
 		//! \typedef GraphicsItemStateFlags
 		//! \brief Flags used to manage GraphicsItemState.
 		//! \see GraphicsItem, GraphicsItemState
 		typedef Flags<GraphicsItemState> GraphicsItemStateFlags;
+
+		// ###############################################################################################################################################
+
+		// Public Static
+
+		//! \brief Creates a StyleRefPainter2D painter referencing ot::ColorStyleValueEntry::GraphicsItemSelectionBorder.
+		//! The caller takes ownership of the painter.
+		static Painter2D* createSelectionBorderPainter(void);
+
+		//! \brief Creates a StyleRefPainter2D painter referencing ot::ColorStyleValueEntry::GraphicsItemHoverBorder.
+		//! The caller takes ownership of the painter.
+		static Painter2D* createHoverBorderPainter(void);
+
+		// ###############################################################################################################################################
+
+		// Constructor / Destructor
 
 		//! \brief Constructor.
 		//! \param _configuration Initial configuration
@@ -172,11 +194,11 @@ namespace ot {
 
 		//! \brief Replaces the flags with the flags provided.
 		//! \param _flags Flags to set.
-		void setStateFlags(GraphicsItemStateFlags _flags);
+		void setGraphicsItemState(GraphicsItemStateFlags _flags);
 
 		//! \brief Returns the current GraphicsItemStateFlags set.
 		//! \see GraphicsItem, GraphicsItemStateFlags
-		const GraphicsItemStateFlags& getStateFlags(void) const { return m_state; };
+		const GraphicsItemStateFlags& getGraphicsItemState(void) const { return m_state; };
 
 		//! \brief Set the GraphicsScene this item is placed at.
 		virtual void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };

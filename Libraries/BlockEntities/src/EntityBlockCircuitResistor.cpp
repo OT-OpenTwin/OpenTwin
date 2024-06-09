@@ -46,7 +46,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitResistor::CreateBlockCfg()
 #if TEST_ITEM_LOADER==true
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
 	newConfig->setName("EntityBlockCircuitResistor");
-	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid);
+	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemForwardsState);
 	newConfig->setFile("Circuit/Resistor.ot.json");
 	newConfig->addStringMapEntry("Name", "R1");
 	return newConfig;

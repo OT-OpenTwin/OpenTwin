@@ -7,6 +7,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/Positioning.h"
@@ -28,6 +29,18 @@
 #include <QtWidgets/qstyleoption.h>
 #include <QtWidgets/qgraphicsscene.h>
 #include <QtWidgets/qgraphicssceneevent.h>
+
+// ###############################################################################################################################################
+
+// Public Static
+
+ot::Painter2D* ot::GraphicsItem::createSelectionBorderPainter(void) {
+	return new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemSelectionBorder);
+}
+
+ot::Painter2D* ot::GraphicsItem::createHoverBorderPainter(void) {
+	return new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemHoverBorder);
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -257,7 +270,7 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 
 void ot::GraphicsItem::handleSetItemGeometry(const QRectF& _geom) {
 	if (m_parent) {
-		if (m_parent->getStateFlags() & GraphicsItem::ForwardSizeState) {
+		if (m_parent->getGraphicsItemState() & GraphicsItem::ForwardSizeState) {
 			this->setGraphicsItemRequestedSize(_geom.size());
 		}
 	}
@@ -340,7 +353,7 @@ void ot::GraphicsItem::setStateFlag(GraphicsItemState _state, bool _active) {
 	if (!m_blockStateNotifications) this->graphicsItemStateChanged(m_state);
 }
 
-void ot::GraphicsItem::setStateFlags(GraphicsItemStateFlags _flags) {
+void ot::GraphicsItem::setGraphicsItemState(GraphicsItemStateFlags _flags) {
 	m_state = _flags;
 	if (!m_blockStateNotifications) this->graphicsItemStateChanged(m_state);
 }

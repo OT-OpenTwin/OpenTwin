@@ -64,8 +64,23 @@ void ot::GraphicsTextItem::finalizeGraphicsItem(void) {
 void ot::GraphicsTextItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	const GraphicsTextItemCfg* cfg = this->getItemConfiguration<GraphicsTextItemCfg>();
 
+	QPen textPen = QtFactory::toQPen(cfg->getTextStyle());
+
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState && !this->getBlockStateNotifications()) {
+		if ((this->getGraphicsItemState() & GraphicsItemState::SelectedState) && !(this->getGraphicsItemState() & GraphicsItemState::HoverState)) {
+			Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
+			textPen.setBrush(QtFactory::toQBrush(newPainter));
+			delete newPainter;
+		}
+		else if (this->getGraphicsItemState() & GraphicsItemState::HoverState) {
+			Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
+			textPen.setBrush(QtFactory::toQBrush(newPainter));
+			delete newPainter;
+		}
+	}
+
 	_painter->setFont(QtFactory::toQFont(cfg->getTextFont()));
-	_painter->setPen(QtFactory::toQPen(cfg->getTextStyle()));
+	_painter->setPen(textPen);
 	_painter->drawText(_rect, QtFactory::toQAlignment(this->getGraphicsItemAlignment()), QString::fromStdString(cfg->getText()));
 }
 

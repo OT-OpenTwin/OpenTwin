@@ -87,6 +87,12 @@ void WrappedCircleItem::fillPropertyGrid(void) {
 	geometryGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().painter()));
 	geometryGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width()));
 	geometryGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
+	{
+		PropertyBool* newStateProperty = new PropertyBool("Handle State", this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState);
+		newStateProperty->setPropertyTip("If enabled the item will update its appearance according to the current item state (e.g. ItemSelected or ItemHover)");
+		geometryGroup->addProperty(newStateProperty);
+	}
+
 
 	cfg.addRootGroup(generalGroup);
 	cfg.addRootGroup(geometryGroup);
@@ -180,6 +186,15 @@ void WrappedCircleItem::propertyChanged(ot::PropertyGridItem* _item, const ot::P
 		}
 
 		this->setBackgroundPainter(input->getPainter()->createCopy());
+	}
+	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Handle State") {
+		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
+		if (!input) {
+			OT_LOG_E("Input cast failed");
+			return;
+		}
+
+		this->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, input->isChecked());
 	}
 }
 

@@ -58,7 +58,23 @@ void ot::GraphicsRectangularItem::paintCustomItem(QPainter* _painter, const QSty
 
 	QPainterPath pth;
 	pth.addRoundedRect(_rect, cfg->getCornerRadius(), cfg->getCornerRadius());
-	_painter->setPen(QtFactory::toQPen(cfg->getOutline()));
+
+	QPen borderPen = QtFactory::toQPen(cfg->getOutline());
+
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState && !this->getBlockStateNotifications()) {
+		if ((this->getGraphicsItemState() & GraphicsItemState::SelectedState) && !(this->getGraphicsItemState() & GraphicsItemState::HoverState)) {
+			Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
+			borderPen.setBrush(QtFactory::toQBrush(newPainter));
+			delete newPainter;
+		}
+		else if (this->getGraphicsItemState() & GraphicsItemState::HoverState) {
+			Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
+			borderPen.setBrush(QtFactory::toQBrush(newPainter));
+			delete newPainter;
+		}
+	}
+
+	_painter->setPen(borderPen);
 	_painter->fillPath(pth, QtFactory::toQBrush(cfg->getBackgroundPainter()));
 	_painter->drawPath(pth);
 }

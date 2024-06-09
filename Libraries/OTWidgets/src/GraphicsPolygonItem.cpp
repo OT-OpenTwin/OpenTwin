@@ -72,7 +72,22 @@ QSizeF ot::GraphicsPolygonItem::getPreferredGraphicsItemSize(void) const {
 void ot::GraphicsPolygonItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	const GraphicsPolygonItemCfg* cfg = this->getItemConfiguration<GraphicsPolygonItemCfg>();
 
-	_painter->setPen(QtFactory::toQPen(cfg->getOutline()));
+	QPen borderPen = QtFactory::toQPen(cfg->getOutline());
+
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState && !this->getBlockStateNotifications()) {
+		if ((this->getGraphicsItemState() & GraphicsItemState::SelectedState) && !(this->getGraphicsItemState() & GraphicsItemState::HoverState)) {
+			Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
+			borderPen.setBrush(QtFactory::toQBrush(newPainter));
+			delete newPainter;
+		}
+		else if (this->getGraphicsItemState() & GraphicsItemState::HoverState) {
+			Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
+			borderPen.setBrush(QtFactory::toQBrush(newPainter));
+			delete newPainter;
+		}
+	}
+
+	_painter->setPen(borderPen);
 
 	QPolygonF poly;
 	for (const Point2DD& pt : cfg->getPoints()) {

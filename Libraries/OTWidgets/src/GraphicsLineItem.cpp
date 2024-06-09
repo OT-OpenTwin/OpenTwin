@@ -56,8 +56,22 @@ QSizeF ot::GraphicsLineItem::getPreferredGraphicsItemSize(void) const {
 
 void ot::GraphicsLineItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	const GraphicsLineItemCfg* cfg = this->getItemConfiguration<GraphicsLineItemCfg>();
-	if (!cfg) return;
-	_painter->setPen(QtFactory::toQPen(cfg->getLineStyle()));
+	
+	QPen linePen = QtFactory::toQPen(cfg->getLineStyle());
+
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState && !this->getBlockStateNotifications()) {
+		if ((this->getGraphicsItemState() & GraphicsItemState::SelectedState) && !(this->getGraphicsItemState() & GraphicsItemState::HoverState)) {
+			Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
+			linePen.setBrush(QtFactory::toQBrush(newPainter));
+			delete newPainter;
+		}
+		else if (this->getGraphicsItemState() & GraphicsItemState::HoverState) {
+			Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
+			linePen.setBrush(QtFactory::toQBrush(newPainter));
+			delete newPainter;
+		}
+	}
+	_painter->setPen(linePen);
 	_painter->drawLine(this->getLine());
 }
 

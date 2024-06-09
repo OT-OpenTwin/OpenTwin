@@ -70,6 +70,23 @@ void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(const GraphicsItemCfg::Gra
 	m_layoutWrap->setGraphicsItemFlags(_flags);
 }
 
+void ot::GraphicsLayoutItem::graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {
+	OTAssertNullptr(m_layoutWrap);
+
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState) {
+		std::list<QGraphicsLayoutItem*> lst;
+		this->getAllItems(lst);
+		for (auto i : lst) {
+			ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
+			if (itm) {
+				itm->setGraphicsItemState(_state);
+			}
+		}
+	}
+
+	m_layoutWrap->update();
+}
+
 void ot::GraphicsLayoutItem::graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) {
 	OTAssertNullptr(_config);
 	OTAssertNullptr(m_layoutWrap);
