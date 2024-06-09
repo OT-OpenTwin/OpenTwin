@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/BasicServiceInformation.h"
+#include "OTGui/WidgetViewBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt ADS header
@@ -74,7 +75,7 @@ namespace ot {
 		WidgetView* findView(const std::string& _viewName) const;
 
 		//! @brief Returns the widget view that owns this dock
-		WidgetView* viewFromDockWidget(ads::CDockWidget* _dock);
+		WidgetView* getViewFromDockWidget(ads::CDockWidget* _dock) const;
 
 		//! @brief Close the widget view with the specified name.
 		//! Widget views that are protected will be ignored.
@@ -123,19 +124,21 @@ namespace ot {
 
 		//! @brief Returns true if a view with the given name exists
 		//! @param _viewName Name to check
-		bool viewExists(const std::string& _viewName) const;
+		bool getViewExists(const std::string& _viewName) const;
 
 		//! @brief Returns true if a view with the given title (or current title) exists
 		//! @param _title Title to check
-		bool viewTitleExists(const QString& _title) const;
+		bool getViewTitleExists(const QString& _title) const;
 
 		//! @brief Return the dock toggle action
 		QAction* getDockToggleAction(void) const { return m_dockToggleRoot; };
 
-		WidgetView* lastFocusedView(void) const { return m_focusInfo.last; };
-		WidgetView* lastFocusedSideView(void) const { return m_focusInfo.lastSide; };
-		WidgetView* lastFocusedToolView(void) const { return m_focusInfo.lastTool; };
-		WidgetView* lastFocusedCentralView(void) const { return m_focusInfo.lastCentral; };
+		WidgetView* getCurrentlyFocusedView(void) const;
+
+		WidgetView* getLastFocusedView(void) const { return m_focusInfo.last; };
+		WidgetView* getLastFocusedSideView(void) const { return m_focusInfo.lastSide; };
+		WidgetView* getLastFocusedToolView(void) const { return m_focusInfo.lastTool; };
+		WidgetView* getLastFocusedCentralView(void) const { return m_focusInfo.lastCentral; };
 
 	Q_SIGNALS:
 		void viewFocusLost(WidgetView* _view);
@@ -145,14 +148,21 @@ namespace ot {
 	private Q_SLOTS:
 		void slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus);
 		void slotViewCloseRequested(void);
+		void slotUpdateViewVisibility(void);
 
 	private:
 		WidgetViewManager();
 		~WidgetViewManager();
 
+		//! \brief Adds the view and stores the information.
+		//! The view's dock widget will get the IconManager::getApplicationIcon() set.
 		bool addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area);
 
 		ads::CDockAreaWidget* determineBestParentArea(WidgetView* _newView) const;
+
+		ads::CDockAreaWidget* determineBestRestoreArea(WidgetView* _view) const;
+
+		ads::CDockAreaWidget* determineBestRestoreArea(WidgetView* _view, WidgetViewBase::ViewFlag _viewType) const;
 
 		std::list<std::string>* findViewNameList(const BasicServiceInformation& _owner);
 		std::list<std::string>* findOrCreateViewNameList(const BasicServiceInformation& _owner);

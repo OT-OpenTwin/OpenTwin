@@ -54,7 +54,7 @@ Q_SIGNALS:
 
 	// Slots
 
-private Q_SLOTS:
+public Q_SLOTS:
 	void slotViewFocused(ot::WidgetView* _view);
 	void slotViewFocusLost(ot::WidgetView* _view);
 	void slotViewCloseRequested(ot::WidgetView* _view);

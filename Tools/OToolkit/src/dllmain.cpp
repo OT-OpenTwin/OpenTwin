@@ -115,10 +115,7 @@ void mainApplicationThread()
 		if (ot::GlobalColorStyle::instance().hasStyle(ot::toString(ot::ColorStyleName::BrightStyle))) {
 			ot::GlobalColorStyle::instance().setCurrentStyle(ot::toString(ot::ColorStyleName::BrightStyle));
 		}
-
-		// Create application instance, the application instance will initialize the toolkit api.
-		ot::LogDispatcher::instance().addReceiver(AppBase::instance());
-		
+				
 		// Initialize OToolkit
 		AppBase::instance()->setApplicationInstance(&application);
 		AppBase::instance()->setUrl(QString::fromStdString(otoolkit::intern::g_serviceURL));

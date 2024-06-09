@@ -409,6 +409,13 @@ void AppBase::slotRecenter(void) {
 
 void AppBase::slotFinalizeInit(void) {
 	ot::WidgetViewManager::instance().restoreState(this->createSettingsInstance()->value("ViewState", QByteArray()).toByteArray().toStdString());
+	
+	// Check current view to correctly display toolbar, statusbar and so on
+	ot::WidgetView* currentView = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
+	if (currentView) {
+		//m_toolManager->getToolViewManager()->slotViewFocused(currentView);
+	}
+	
 	this->setEnabled(true);
 }
 
@@ -421,8 +428,12 @@ void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
 AppBase::AppBase(QApplication* _app) 
 	: m_mainThread(QThread::currentThreadId()), m_app(_app), m_logger(nullptr), m_replaceTransparentColorStyleValue(true)
 {
-	this->setDeleteLogNotifierLater(true);
+	// Create the output first so log messages can be created
+	m_output = new ot::PlainTextEditView;
 
+	this->setDeleteLogNotifierLater(true);
+	ot::LogDispatcher::instance().addReceiver(this);
+	
 	// Initialize Toolkit API
 	otoolkit::api::initialize(this);
 
@@ -438,7 +449,6 @@ AppBase::AppBase(QApplication* _app)
 	this->setStatusBar(m_toolManager->getStatusManager());
 	
 	// Create output
-	m_output = new ot::PlainTextEditView;
 	m_output->setViewData(ot::WidgetViewBase("Output", "Output", ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewFlag::ViewIsSide));
 	m_output->setObjectName("OToolkit_Output");
 	m_output->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -487,4 +497,6 @@ AppBase::AppBase(QApplication* _app)
 	this->connect(&ot::GlobalColorStyle::instance(), &ot::GlobalColorStyle::currentStyleChanged, this, &AppBase::slotColorStyleChanged);
 
 	QMetaObject::invokeMethod(this, &AppBase::slotInitialize, Qt::QueuedConnection);
+
+	OT_LOG_I("Initializing");
 }
