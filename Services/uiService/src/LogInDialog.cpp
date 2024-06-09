@@ -24,6 +24,7 @@
 #include <QtCore/qjsonarray.h>
 #include <QtCore/qjsonobject.h>
 #include <QtCore/qjsondocument.h>
+#include <QtGui/qevent.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qtooltip.h>
 #include <QtWidgets/qmessagebox.h>
@@ -37,8 +38,11 @@
 
 #define EDIT_GSS_TEXT "< Edit >"
 
+#define TOGGLE_MODE_LABEL_SwitchToLogIn "Switch to login"
+#define TOGGLE_MODE_LABEL_SwitchToRegister "Switch to registration"
+
 LogInDialog::LogInDialog() 
-	: m_state(LogInStateFlag::NoState), m_newUserLabel(nullptr), m_logInAttempt(0)
+	: m_state(LogInStateFlag::NoState), m_toggleModeLabel(nullptr), m_logInAttempt(0)
 {
 	using namespace ot;
 
@@ -67,6 +71,12 @@ LogInDialog::LogInDialog()
 	m_password = new LineEdit;
 	m_password->setEchoMode(QLineEdit::Password);
 	
+	m_confirmPasswordLabel = new Label("Confirm password:");
+	m_confirmPasswordLabel->setHidden(true);
+	m_confirmPassword = new LineEdit;
+	m_confirmPassword->setEchoMode(QLineEdit::Password);
+	m_confirmPassword->setHidden(true);
+
 	m_savePassword = new CheckBox("Save Password");
 	m_savePassword->setObjectName("LogInDialogSavePassword");
 
@@ -74,6 +84,8 @@ LogInDialog::LogInDialog()
 	Label* spacerLabel2 = new Label;
 
 	m_logInButton = new PushButton("Log In");
+	m_registerButton = new PushButton("Register");
+	m_registerButton->setHidden(true);
 	m_exitButton = new PushButton("Exit");
 
 	// Initialize data
@@ -102,10 +114,13 @@ LogInDialog::LogInDialog()
 	inputLayout->addWidget(m_username, 1, 1);
 	inputLayout->addWidget(passwordLabel, 2, 0);
 	inputLayout->addWidget(m_password, 2, 1);
-	inputLayout->addWidget(m_savePassword, 3, 1);
+	inputLayout->addWidget(m_confirmPasswordLabel, 3, 0);
+	inputLayout->addWidget(m_confirmPassword, 3, 1);
+	inputLayout->addWidget(m_savePassword, 4, 1);
 	
 	buttonLayout->addWidget(m_logInButton, 0, 0);
-	buttonLayout->addWidget(m_exitButton, 1, 0);
+	buttonLayout->addWidget(m_registerButton, 1, 0);
+	buttonLayout->addWidget(m_exitButton, 2, 0);
 
 	centralLayout->addWidget(spacerLabel1);
 	centralLayout->addLayout(imageViewLayout);
@@ -116,13 +131,13 @@ LogInDialog::LogInDialog()
 	centralLayout->addLayout(registerLayout);
 
 	// ... Setup optional inputs (this section may be disabled when a registration is not allowed)
-	m_newUserLabel = new Label("Create new account");
-	m_newUserLabel->setObjectName("LogInDialogRegisterLabel");
-	m_newUserLabel->setMargin(4);
+	m_toggleModeLabel = new Label(TOGGLE_MODE_LABEL_SwitchToRegister);
+	m_toggleModeLabel->setObjectName("LogInDialogRegisterLabel");
+	m_toggleModeLabel->setMargin(4);
 	registerLayout->addStretch(1);
-	registerLayout->addWidget(m_newUserLabel);
+	registerLayout->addWidget(m_toggleModeLabel);
 	registerLayout->addStretch(1);
-	this->connect(m_newUserLabel, &Label::mousePressed, this, &LogInDialog::slotNewUser);
+	this->connect(m_toggleModeLabel, &Label::mousePressed, this, &LogInDialog::slotToggleLogInMode);
 	// ...
 
 	// Setup window
@@ -133,6 +148,7 @@ LogInDialog::LogInDialog()
 
 	// Connect signals
 	this->connect(m_logInButton, &PushButton::clicked, this, &LogInDialog::slotLogIn);
+	this->connect(m_registerButton, &PushButton::clicked, this, &LogInDialog::slotRegister);
 	this->connect(m_exitButton, &PushButton::clicked, this, &LogInDialog::slotCancel);
 	this->connect(m_gss, &ComboBox::currentTextChanged, this, &LogInDialog::slotGSSChanged);
 	this->connect(m_password, &LineEdit::textChanged, this, &LogInDialog::slotPasswordChanged);
@@ -147,10 +163,21 @@ void LogInDialog::setControlsEnabled(bool _enabled) {
 	m_gss->setEnabled(_enabled);
 	m_username->setEnabled(_enabled);
 	m_password->setEnabled(_enabled);
+	m_confirmPassword->setEnabled(_enabled);
 	m_savePassword->setEnabled(_enabled);
-	m_newUserLabel->setEnabled(_enabled);
+	m_toggleModeLabel->setEnabled(_enabled);
 	m_logInButton->setEnabled(_enabled);
+	m_registerButton->setEnabled(_enabled);
 	m_exitButton->setEnabled(_enabled);
+}
+
+void LogInDialog::closeEvent(QCloseEvent* _event) {
+	if (m_state & LogInStateFlag::WorkerRunning) {
+		_event->ignore();
+	}
+	else {
+		ot::Dialog::closeEvent(_event);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -158,7 +185,7 @@ void LogInDialog::setControlsEnabled(bool _enabled) {
 // Private slots
 
 void LogInDialog::slotLogIn(void) {
-	m_logInAttempt++;
+	OTAssert(!(m_state & LogInStateFlag::WorkerRunning), "Worker already running");
 
 	m_loginData.clear();
 	
@@ -179,12 +206,60 @@ void LogInDialog::slotLogIn(void) {
 		return;
 	}
 
+	m_logInAttempt++;
+
 	// Run worker
 	this->setControlsEnabled(false);
 
 	m_loginData.setGss(gssData);
 
-	std::thread worker(&LogInDialog::workerStart, this);
+	m_state |= LogInStateFlag::WorkerRunning;
+
+	std::thread worker(&LogInDialog::loginWorkerStart, this);
+	worker.detach();
+}
+
+void LogInDialog::slotRegister(void) {
+	OTAssert(!(m_state & LogInStateFlag::WorkerRunning), "Worker already running");
+
+	m_loginData.clear();
+
+	LogInGSSEntry gssData = this->findCurrentGssEntry();
+	if (!gssData.isValid()) {
+		QToolTip::showText(this->mapToGlobal(m_gss->pos()), "Invalid Global Session Service", m_gss, QRect(), 3000);
+		return;
+	}
+
+	if (m_username->text().isEmpty()) {
+		QToolTip::showText(this->mapToGlobal(m_username->pos()), "No username provided", m_username, QRect(), 3000);
+		return;
+	}
+
+	if (m_password->text().isEmpty()) {
+		QToolTip::showText(this->mapToGlobal(m_password->pos()), "No password provided", m_password, QRect(), 3000);
+		return;
+	}
+
+	if (m_password->text().length() < 4) {
+		QToolTip::showText(this->mapToGlobal(m_password->pos()), "Password is too short", m_password, QRect(), 3000);
+		return;
+	}
+
+	if (m_password->text() != m_confirmPassword->text()) {
+		QToolTip::showText(this->mapToGlobal(m_confirmPassword->pos()), "Confirm password does not match the password", m_confirmPassword, QRect(), 3000);
+		return;
+	}
+
+	m_logInAttempt++;
+
+	// Run worker
+	this->setControlsEnabled(false);
+
+	m_loginData.setGss(gssData);
+
+	m_state |= LogInStateFlag::WorkerRunning;
+
+	std::thread worker(&LogInDialog::registerWorkerStart, this);
 	worker.detach();
 }
 
@@ -192,8 +267,33 @@ void LogInDialog::slotCancel(void) {
 	this->close(ot::Dialog::Cancel);
 }
 
-void LogInDialog::slotNewUser(void) {
+void LogInDialog::slotToggleLogInMode(void) {
+	OTAssert(!(m_state & LogInStateFlag::WorkerRunning), "Worker running");
 
+	if (m_state & LogInStateFlag::RegisterMode) {
+		m_logInButton->setHidden(false);
+		m_registerButton->setHidden(true);
+		m_confirmPassword->setHidden(true);
+		m_confirmPasswordLabel->setHidden(true);
+		m_toggleModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToRegister);
+		m_state &= (~LogInStateFlag::RegisterMode);
+	}
+	else {
+		m_logInButton->setHidden(true);
+		m_registerButton->setHidden(false);
+		m_confirmPassword->setHidden(false);
+		m_confirmPasswordLabel->setHidden(false);
+		m_toggleModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToLogIn);
+		m_state |= LogInStateFlag::RegisterMode;
+
+		if (m_state & LogInStateFlag::RestoredPassword) {
+			m_password->blockSignals(true);
+			m_password->setText(QString());
+			m_password->blockSignals(false);
+		}
+	}
+
+	this->update();
 }
 
 void LogInDialog::slotGSSChanged(void) {
@@ -248,11 +348,26 @@ void LogInDialog::slotPasswordChanged(void) {
 }
 
 void LogInDialog::slotLogInSuccess(void) {
+	m_state &= (~LogInStateFlag::WorkerRunning);
 	this->saveUserSettings();
 	this->close(ot::Dialog::Ok);
 }
 
+void LogInDialog::slotRegisterSuccess(void) {
+	m_state &= (~LogInStateFlag::WorkerRunning);
+
+	QMessageBox msgBox(QMessageBox::Information, "Registration", "The account was created successfully.", QMessageBox::Ok);
+	msgBox.exec();
+
+	m_confirmPassword->setText(QString());
+
+	this->slotToggleLogInMode();
+	this->setControlsEnabled(true);
+}
+
 void LogInDialog::slotWorkerError(WorkerError _error) {
+	m_state &= (~LogInStateFlag::WorkerRunning);
+
 	// Check for max login attempt
 	if (m_logInAttempt >= MAX_LOGIN_ATTEMPTS) {
 		this->close(ot::Dialog::Cancel);
@@ -260,7 +375,16 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 	}
 
 	// Create error message
-	QString msg = "Login failed.\n";
+	QString msg;
+
+	if (m_state & LogInStateFlag::RegisterMode) {
+		msg = "Registration failed:\n";
+	}
+	else {
+		msg = "Login failed:\n";
+	}
+
+
 	switch (_error)
 	{
 	case WorkerError::GSSConnectionFailed:
@@ -284,6 +408,11 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 	case WorkerError::InvalidData:
 		msg.append("[FATAL] Invalid data.");
 		break;
+
+	case WorkerError::FailedToRegister:
+		msg.append("Account could not be created (maybe the specified user name is already in use).");
+		break;
+
 	default:
 		msg.append("Unknown error");
 		OT_LOG_E("Unknown worker error (" + std::to_string((int)_error) + ")");
@@ -422,7 +551,7 @@ void LogInDialog::stopWorkerWithError(WorkerError _error) {
 	QMetaObject::invokeMethod(this, "slotWorkerError", Qt::QueuedConnection, Q_ARG(WorkerError, _error));
 }
 
-void LogInDialog::workerStart(void) {
+void LogInDialog::loginWorkerStart(void) {
 	WorkerError currentError = WorkerError::NoError;
 
 	// Get data from GSS
@@ -454,6 +583,36 @@ void LogInDialog::workerStart(void) {
 	}
 
 	QMetaObject::invokeMethod(this, &LogInDialog::slotLogInSuccess, Qt::QueuedConnection);
+}
+
+void LogInDialog::registerWorkerStart(void) {
+	WorkerError currentError = WorkerError::NoError;
+
+	// Get data from GSS
+	currentError = this->workerConnectToGSS();
+	if (currentError != WorkerError::NoError) {
+		this->stopWorkerWithError(currentError);
+		return;
+	}
+
+	// Ensure the authorization connection is valid
+	UserManagement userManager;
+	userManager.setAuthServerURL(m_loginData.getAuthorizationUrl());
+	userManager.setDatabaseURL(m_loginData.getDatabaseUrl());
+	if (!userManager.checkConnectionAuthorizationService()) {
+		this->stopWorkerWithError(WorkerError::AuthorizationConnetionFailed);
+		return;
+	}
+
+	currentError = workerRegister(userManager);
+	if (currentError != WorkerError::NoError) {
+		this->stopWorkerWithError(currentError);
+		return;
+	}
+
+	m_loginData.clear();
+
+	QMetaObject::invokeMethod(this, &LogInDialog::slotRegisterSuccess, Qt::QueuedConnection);
 }
 
 LogInDialog::WorkerError LogInDialog::workerConnectToGSS(void) {
@@ -498,7 +657,7 @@ LogInDialog::WorkerError LogInDialog::workerConnectToGSS(void) {
 	return WorkerError::NoError;
 }
 
-LogInDialog::WorkerError LogInDialog::workerLogin(UserManagement& _userManager) {
+LogInDialog::WorkerError LogInDialog::workerLogin(const UserManagement& _userManager) {
 	// Check the username, password combination
 	std::string sessionUser, sessionPassword, validPassword, validEncryptedPassword;
 
@@ -526,4 +685,15 @@ LogInDialog::WorkerError LogInDialog::workerLogin(UserManagement& _userManager) 
 	}
 
 	return WorkerError::NoError;
+}
+
+LogInDialog::WorkerError LogInDialog::workerRegister(const UserManagement& _userManager) {
+	if (!_userManager.addUser(m_username->text().toStdString(), m_password->text().toStdString()))
+	{
+		return WorkerError::FailedToRegister;
+	}
+	else
+	{
+		return WorkerError::NoError;
+	}
 }

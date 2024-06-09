@@ -32,8 +32,8 @@ public:
 	bool checkConnectionDataBase(const std::string &userName, const std::string &password) const;
 	void initializeNewSession(void);
 
-	bool addUser(const std::string &userName, const std::string &password);
-	bool deleteUser(const std::string &userName);
+	bool addUser(const std::string &userName, const std::string &password) const;
+	bool deleteUser(const std::string &userName) const;
 	//bool changePassword(const std::string &oldPassword, const std::string &newPassword);
 
 	bool checkUserName(const std::string &userName) const;
@@ -49,7 +49,7 @@ public:
 	std::string getUserSettingsCollection(void);
 
 private:
-	bool hasError(const std::string& _response);
+	bool hasError(const std::string& _response) const;
 	bool hasSuccessful(const std::string& _response) const;
 	bool initializeDatabaseConnection(void);
 	bool ensureSettingsCollectionCanBeAccessed(void);

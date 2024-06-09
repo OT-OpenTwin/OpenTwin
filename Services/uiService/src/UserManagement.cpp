@@ -118,8 +118,7 @@ void UserManagement::initializeNewSession(void)
 	userSettingsCollection.clear();
 }
 
-bool UserManagement::addUser(const std::string &userName, const std::string &password)
-{
+bool UserManagement::addUser(const std::string &userName, const std::string &password) const {
 	assert(!authServerURL.empty());
 
 	// Here we register a new user by sending a message to the authorization service
@@ -140,8 +139,7 @@ bool UserManagement::addUser(const std::string &userName, const std::string &pas
 	return !hasError(response);
 }
 
-bool UserManagement::deleteUser(const std::string &userName)
-{
+bool UserManagement::deleteUser(const std::string &userName) const {
 	assert(!authServerURL.empty());
 
 	// Here we delete a user by sending a message to the authorization service
@@ -267,8 +265,7 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 	return false; // Login attempt unsuccessful
 }
 
-bool UserManagement::hasError(const std::string &response)
-{
+bool UserManagement::hasError(const std::string &response) const {
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
 

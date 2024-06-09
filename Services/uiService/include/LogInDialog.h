@@ -33,7 +33,6 @@ namespace ot {
 class LogInDialog : public ot::Dialog {
 	Q_OBJECT
 public:
-	
 	LogInDialog();
 	virtual ~LogInDialog();
 
@@ -41,11 +40,16 @@ public:
 
 	const LoginData& getLoginData(void) const { return m_loginData; };
 
+protected:
+	virtual void closeEvent(QCloseEvent* _event) override;
+
 private:
 	enum class LogInStateFlag {
 		NoState = 0x00,
 		RestoredPassword = 0x01,
-		LogInSuccess = 0x04
+		WorkerRunning = 0x02,
+		LogInSuccess = 0x04,
+		RegisterMode = 0x08
 	};
 	typedef ot::Flags<LogInStateFlag> LogInState;
 
@@ -57,7 +61,8 @@ private:
 		AuthorizationConnetionFailed,
 		InvalidCreadentials,
 		DatabaseConnectionFailed,
-		InvalidData
+		InvalidData,
+		FailedToRegister
 	};
 
 	LogInState m_state;
@@ -68,9 +73,12 @@ private:
 	ot::ComboBox* m_gss;
 	ot::LineEdit* m_username;
 	ot::LineEdit* m_password;
+	ot::Label* m_confirmPasswordLabel;
+	ot::LineEdit* m_confirmPassword;
 	ot::CheckBox* m_savePassword;
-	ot::Label* m_newUserLabel;
+	ot::Label* m_toggleModeLabel;
 	ot::PushButton* m_logInButton;
+	ot::PushButton* m_registerButton;
 	ot::PushButton* m_exitButton;
 
 	QString m_restoredPassword;
@@ -87,12 +95,14 @@ private:
 
 private Q_SLOTS:
 	void slotLogIn(void);
+	void slotRegister(void);
 	void slotCancel(void);
-	void slotNewUser(void);
+	void slotToggleLogInMode(void);
 	void slotGSSChanged(void);
 	void slotPasswordChanged(void);
 	
 	void slotLogInSuccess(void);
+	void slotRegisterSuccess(void);
 	void slotWorkerError(WorkerError _error);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -112,9 +122,11 @@ private:
 
 	void stopWorkerWithError(WorkerError _error);
 
-	void workerStart(void);
+	void loginWorkerStart(void);
+	void registerWorkerStart(void);
 	WorkerError workerConnectToGSS(void);
-	WorkerError workerLogin(UserManagement& _userManager);
+	WorkerError workerLogin(const UserManagement& _userManager);
+	WorkerError workerRegister(const UserManagement& _userManager);
 
 	OT_FRIEND_FLAG_FUNCTIONS(LogInDialog::LogInStateFlag)
 };
