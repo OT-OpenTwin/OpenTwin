@@ -13,9 +13,6 @@
  // Corresponding header
 #include <akDialogs/aPromptDialog.h>
 
-// AK Core header
-#include <akCore/aAbstractDictionary.h>
-
 // AK Widgets header
 #include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aPushButtonWidget.h>
@@ -76,48 +73,48 @@ void ak::aPromptDialog::translateControls(aAbstractDictionary * _dictionary) {
 	switch (m_type)
 	{
 	case ak::promptOk: 
-		m_button1->setText(_dictionary->translate("PromptText_Ok")); 
+		m_button1->setText("OK"); 
 		break;
 	case ak::promptOkIconLeft: 
-		m_button1->setText(_dictionary->translate("PromptText_Ok")); 
+		m_button1->setText("OK"); 
 		break;
 	case ak::promptYesNo:
-		m_button1->setText(_dictionary->translate("PromptText_Yes"));
-		m_button2->setText(_dictionary->translate("PromptText_No"));
+		m_button1->setText("Yes");
+		m_button2->setText("No");
 		break;
 	case ak::promptYesNoCancel:
-		m_button1->setText(_dictionary->translate("PromptText_Yes"));
-		m_button2->setText(_dictionary->translate("PromptText_No"));
-		m_button3->setText(_dictionary->translate("PromptText_Cancel"));
+		m_button1->setText("Yes");
+		m_button2->setText("No");
+		m_button3->setText("Cancel");
 		break;
 	case ak::promptOkCancel:
-		m_button1->setText(_dictionary->translate("PromptText_Ok"));
-		m_button2->setText(_dictionary->translate("PromptText_Cancel"));
+		m_button1->setText("OK");
+		m_button2->setText("Cancel");
 		break;
 	case ak::promptRetryCancel:
-		m_button1->setText(_dictionary->translate("PromptText_Retry"));
-		m_button2->setText(_dictionary->translate("PromptText_Cancel"));
+		m_button1->setText("Retry");
+		m_button2->setText("Cancel");
 		break;
 	case ak::promptIgnoreRetryCancel:
-		m_button1->setText(_dictionary->translate("PromptText_Ignore"));
-		m_button2->setText(_dictionary->translate("PromptText_Retry"));
-		m_button3->setText(_dictionary->translate("PromptText_Cancel"));
+		m_button1->setText("Ignore");
+		m_button2->setText("Retry");
+		m_button3->setText("Cancel");
 		break;
 	case ak::promptIconLeft:
-		m_button1->setText(_dictionary->translate("PromptText_Ok"));
+		m_button1->setText("OK");
 		break;
 	case ak::promptOkCancelIconLeft:
-		m_button1->setText(_dictionary->translate("PromptText_Ok"));
-		m_button2->setText(_dictionary->translate("PromptText_Cancel"));
+		m_button1->setText("OK");
+		m_button2->setText("Cancel");
 		break;
 	case ak::promptYesNoIconLeft:
-		m_button1->setText(_dictionary->translate("PromptText_Yes"));
-		m_button2->setText(_dictionary->translate("PromptText_No"));
+		m_button1->setText("Yes");
+		m_button2->setText("No");
 		break;
 	case ak::promptYesNoCancelIconLeft:
-		m_button1->setText(_dictionary->translate("PromptText_Yes"));
-		m_button2->setText(_dictionary->translate("PromptText_No"));
-		m_button3->setText(_dictionary->translate("PromptText_Cancel"));
+		m_button1->setText("Yes");
+		m_button2->setText("No");
+		m_button3->setText("Cancel");
 		break;
 
 	default:

@@ -99,25 +99,13 @@
     <ClCompile Include="src\akCore\aUidManager.cpp">
       <Filter>Source Files\ak\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\akCore\rJSON.cpp">
-      <Filter>Source Files\ak\Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\akDialogs\aPromptDialog.cpp">
       <Filter>Source Files\ak\Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="src\akGui\aAction.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
-    <ClCompile Include="src\akGui\aApplication.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
     <ClCompile Include="src\akGui\aColor.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akGui\aColorStyleDefault.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akGui\aColorStyleDefaultDark.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
     <ClCompile Include="src\akGui\aDialog.cpp">
@@ -243,12 +231,6 @@
     <ClCompile Include="src\akCore\aTime.cpp">
       <Filter>Source Files\ak\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\akDialogs\aCustomizableInputDialog.cpp">
-      <Filter>Source Files\ak\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akCore\aBasicDictionary.cpp">
-      <Filter>Source Files\ak\Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\akGui\aGlobalKeyListener.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
@@ -261,17 +243,8 @@
     <ClCompile Include="src\akWidgets\aAnimationOverlayWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\akGui\aColorStyleDefaultBlue.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akTools\aFormula.cpp">
-      <Filter>Source Files\ak\Tools</Filter>
-    </ClCompile>
     <ClCompile Include="src\akTools\ClassHelper.cpp">
       <Filter>Source Files\ak\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aChecklistWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="src\akWidgets\aPlainTextEditWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
@@ -306,9 +279,6 @@
       <Filter>Header Files\ak\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\akCore\globalDataTypes.h">
-      <Filter>Header Files\ak\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akCore\rJSON.h">
       <Filter>Header Files\ak\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\akGui\aColor.h">
@@ -350,23 +320,11 @@
     <ClInclude Include="include\akCore\aTime.h">
       <Filter>Header Files\ak\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\akCore\aBasicDictionary.h">
-      <Filter>Header Files\ak\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akCore\aAbstractDictionary.h">
-      <Filter>Header Files\ak\Core</Filter>
-    </ClInclude>
     <ClInclude Include="include\akCore\aAssert.h">
       <Filter>Header Files\ak\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\akAPI\uiAPI.h">
       <Filter>Header Files\ak\API</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akTools\aFormula.h">
-      <Filter>Header Files\ak\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akCore\aJSONHelper.h">
-      <Filter>Header Files\ak\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\akTools\ClassHelper.h">
       <Filter>Header Files\ak\Tools</Filter>
@@ -466,9 +424,6 @@
     <QtMoc Include="include\akWidgets\aDockWatcherWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\akDialogs\aCustomizableInputDialog.h">
-      <Filter>Header Files\ak\Dialogs</Filter>
-    </QtMoc>
     <QtMoc Include="include\akGui\aGlobalKeyListener.h">
       <Filter>Header Files\ak\Gui</Filter>
     </QtMoc>
@@ -484,14 +439,8 @@
     <QtMoc Include="include\akWidgets\aAnimationOverlayWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\akWidgets\aChecklistWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
     <QtMoc Include="include\akWidgets\aPlainTextEditWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akGui\aApplication.h">
-      <Filter>Header Files\ak\Gui</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

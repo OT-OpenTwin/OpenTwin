@@ -19,7 +19,6 @@
 #include <akCore/aMessenger.h>
 #include <akCore/aNotifierObjectManager.h>
 #include <akCore/aObject.h>
-#include <akCore/rJSON.h>
 #include <akCore/aUidMangager.h>
 
 // AK Dialogs

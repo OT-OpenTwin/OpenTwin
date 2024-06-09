@@ -14,7 +14,6 @@
 #include <akCore/aException.h>
 #include <akCore/aMessenger.h>
 #include <akCore/aUidMangager.h>
-#include <akCore/rJSON.h>
 
 #include <akGui/aObjectManager.h>
 #include <akGui/aTtbContainer.h>
@@ -24,6 +23,9 @@
 #include <akWidgets/aWindow.h>
 #include <akWidgets/aWindowManager.h>
 #include <akWidgets/aWindowManagerTimerSignalLinker.h>
+
+// OpenTwin header
+#include "OTCore/JSON.h"
 
 // TabToolBar header
 #include <TabToolbar/TabToolbar.h>				// tt::TabToolbar
@@ -375,42 +377,40 @@ void ak::aWindowManager::resize(
 ) { m_window->resize(_width, _height); }
 
 std::string ak::aWindowManager::saveState(std::string currentState) {
-
-	AK_rJSON_createDOC(doc);
-
-	rJSON::add(doc, "ObjectName", m_window->objectName().toStdString());
-	rJSON::add(doc, "IsMaximized", m_window->isMaximized());
-	rJSON::add(doc, "IsMinimized", m_window->isMinimized());
-	rJSON::add(doc, "SizeWidth", m_window->size().width());
-	rJSON::add(doc, "SizeHeight", m_window->size().height());
-	rJSON::add(doc, "PositionX", m_window->pos().x());
-	rJSON::add(doc, "PositionY", m_window->pos().y());
+	ot::JsonDocument doc;
+	doc.AddMember("ObjectName", ot::JsonString(m_window->objectName().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember("IsMaximized", m_window->isMaximized(), doc.GetAllocator());
+	doc.AddMember("IsMinimized", m_window->isMinimized(), doc.GetAllocator());
+	doc.AddMember("SizeWidth", m_window->size().width(), doc.GetAllocator());
+	doc.AddMember("SizeHeight", m_window->size().height(), doc.GetAllocator());
+	doc.AddMember("PositionX", m_window->pos().x(), doc.GetAllocator());
+	doc.AddMember("PositionY", m_window->pos().y(), doc.GetAllocator());
 
 	if (!currentState.empty())
 	{
-		AK_rJSON_parseDOC(olddoc, currentState.c_str());
+		ot::JsonDocument olddoc;
+		olddoc.Parse(currentState.c_str());
 
 		auto state = olddoc["State"].GetArray();
 
-		AK_rJSON_createValueArray(stat);
-
+		ot::JsonArray stat;
 		for (auto itm = state.Begin(); itm != state.End(); itm++) {
 			stat.PushBack(itm->GetInt(), doc.GetAllocator());
 		}
 
-		rJSON::add(doc, "State", stat);
+		doc.AddMember("State", stat, doc.GetAllocator());
 	}
 	else
 	{
 		QByteArray lastConfig(m_window->saveState());
-		AK_rJSON_createValueArray(stat);
+		ot::JsonArray stat;
 		for (auto itm : lastConfig) {
 			stat.PushBack((int)itm, doc.GetAllocator());
 		}
-		rJSON::add(doc, "State", stat);
+		doc.AddMember("State", stat, doc.GetAllocator());
 	}
 
-	return rJSON::toJSON(doc);
+	return doc.toJson();
 }
 
 bool ak::aWindowManager::restoreState(
@@ -418,20 +418,22 @@ bool ak::aWindowManager::restoreState(
 	bool												_setPositionAndSize
 ) {
 	if (_state.length() == 0) { return false; }
-	AK_rJSON_parseDOC(doc, _state.c_str());
 
-	AK_rJSON_ifNoMember(doc, "ObjectName") { return false; }
-	AK_rJSON_ifNoMember(doc, "IsMaximized") { return false; }
-	AK_rJSON_ifNoMember(doc, "IsMinimized") { return false; }
-	AK_rJSON_ifNoMember(doc, "State") { return false; }
-	AK_rJSON_ifNoMember(doc, "SizeWidth") { return false; }
-	AK_rJSON_ifNoMember(doc, "SizeHeight") { return false; }
-	AK_rJSON_ifNoMember(doc, "PositionX") { return false; }
-	AK_rJSON_ifNoMember(doc, "PositionY") { return false; }
+	ot::JsonDocument doc;
+	doc.Parse(_state.c_str());
 
-	if (m_window->objectName() != rJSON::getString(doc, "ObjectName").c_str()) { assert(0); return false; }	// Invalid object name
-	bool isMax = rJSON::getBool(doc, "IsMaximized");
-	bool isMin = rJSON::getBool(doc, "IsMinimized");
+	if (!doc.HasMember("ObjectName")) { return false; }
+	if (!doc.HasMember("IsMaximized")) { return false; }
+	if (!doc.HasMember("IsMinimized")) { return false; }
+	if (!doc.HasMember("State")) { return false; }
+	if (!doc.HasMember("SizeWidth")) { return false; }
+	if (!doc.HasMember("SizeHeight")) { return false; }
+	if (!doc.HasMember("PositionX")) { return false; }
+	if (!doc.HasMember("PositionY")) { return false; }
+
+	if (m_window->objectName() != QString::fromStdString(doc["ObjectName"].GetString())) { assert(0); return false; }	// Invalid object name
+	bool isMax = doc["IsMaximized"].GetBool();
+	bool isMin = doc["IsMinimized"].GetBool();
 	auto state = doc["State"].GetArray();
 
 	// Create state string

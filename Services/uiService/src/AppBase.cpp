@@ -31,7 +31,6 @@
 #include <akWidgets/aDockWidget.h>
 #include <akWidgets/aTextEditWidget.h>
 #include <akWidgets/aTreeWidget.h>
-#include <akCore/rJSON.h>
 
 // ADS header
 #include <ads/DockManager.h>

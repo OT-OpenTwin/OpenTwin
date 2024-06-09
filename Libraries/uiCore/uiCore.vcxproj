@@ -203,7 +203,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\akAPI\uiAPI.cpp" />
-    <ClCompile Include="src\akCore\aBasicDictionary.cpp" />
     <ClCompile Include="src\akCore\aDate.cpp" />
     <ClCompile Include="src\akCore\aDateHelper.cpp" />
     <ClCompile Include="src\akCore\aException.cpp" />
@@ -216,8 +215,6 @@
     <ClCompile Include="src\akCore\aSingletonAllowedMessages.cpp" />
     <ClCompile Include="src\akCore\aTime.cpp" />
     <ClCompile Include="src\akCore\aUidManager.cpp" />
-    <ClCompile Include="src\akCore\rJSON.cpp" />
-    <ClCompile Include="src\akDialogs\aCustomizableInputDialog.cpp" />
     <ClCompile Include="src\akDialogs\aOptionsDialog.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">input</DynamicSource>
@@ -230,11 +227,7 @@
     </ClCompile>
     <ClCompile Include="src\akDialogs\aPromptDialog.cpp" />
     <ClCompile Include="src\akGui\aAction.cpp" />
-    <ClCompile Include="src\akGui\aApplication.cpp" />
     <ClCompile Include="src\akGui\aColor.cpp" />
-    <ClCompile Include="src\akGui\aColorStyleDefault.cpp" />
-    <ClCompile Include="src\akGui\aColorStyleDefaultBlue.cpp" />
-    <ClCompile Include="src\akGui\aColorStyleDefaultDark.cpp" />
     <ClCompile Include="src\akGui\aContextMenuItem.cpp" />
     <ClCompile Include="src\akGui\aDialog.cpp" />
     <ClCompile Include="src\akGui\aGlobalKeyListener.cpp" />
@@ -244,12 +237,10 @@
     <ClCompile Include="src\akGui\aTimer.cpp" />
     <ClCompile Include="src\akGui\aToolButtonCustomContextMenu.cpp" />
     <ClCompile Include="src\akGui\aTtbContainer.cpp" />
-    <ClCompile Include="src\akTools\aFormula.cpp" />
     <ClCompile Include="src\akTools\ClassHelper.cpp" />
     <ClCompile Include="src\akWidgets\aAnimationOverlayWidget.cpp" />
     <ClCompile Include="src\akWidgets\aCalendarWidget.cpp" />
     <ClCompile Include="src\akWidgets\aCheckBoxWidget.cpp" />
-    <ClCompile Include="src\akWidgets\aChecklistWidget.cpp" />
     <ClCompile Include="src\akWidgets\aColorEditButtonWidget.cpp" />
     <ClCompile Include="src\akWidgets\aComboBoxWidget.cpp" />
     <ClCompile Include="src\akWidgets\aComboButtonWidget.cpp" />
@@ -284,14 +275,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\akAPI\uiAPI.h" />
-    <ClInclude Include="include\akCore\aAbstractDictionary.h" />
     <ClInclude Include="include\akCore\aAssert.h" />
-    <ClInclude Include="include\akCore\aBasicDictionary.h" />
     <ClInclude Include="include\akCore\aDate.h" />
     <ClInclude Include="include\akCore\aDateHelper.h" />
     <ClInclude Include="include\akCore\aException.h" />
     <ClInclude Include="include\akCore\aFile.h" />
-    <ClInclude Include="include\akCore\aJSONHelper.h" />
     <ClInclude Include="include\akCore\akCore.h" />
     <ClInclude Include="include\akCore\aMessenger.h" />
     <ClInclude Include="include\akCore\aNotifier.h" />
@@ -301,10 +289,7 @@
     <ClInclude Include="include\akCore\aTime.h" />
     <ClInclude Include="include\akCore\aUidMangager.h" />
     <ClInclude Include="include\akCore\globalDataTypes.h" />
-    <ClInclude Include="include\akCore\rJSON.h" />
-    <QtMoc Include="include\akDialogs\aCustomizableInputDialog.h" />
     <QtMoc Include="include\akDialogs\aOptionsDialog.h" />
-    <QtMoc Include="include\akGui\aApplication.h" />
     <ClInclude Include="include\akGui\aColor.h" />
     <QtMoc Include="include\akGui\aContextMenuItem.h" />
     <QtMoc Include="include\akGui\aDialog.h" />
@@ -318,14 +303,12 @@
     <QtMoc Include="include\akWidgets\aGraphicsWidget.h" />
     <QtMoc Include="include\akWidgets\aDatePickWidget.h" />
     <QtMoc Include="include\akWidgets\aAnimationOverlayWidget.h" />
-    <ClInclude Include="include\akTools\aFormula.h" />
     <ClInclude Include="include\akTools\ClassHelper.h" />
     <ClInclude Include="include\akWidgets\aCalendarWidget.h" />
     <QtMoc Include="include\akWidgets\aTimePickWidget.h" />
     <QtMoc Include="include\akWidgets\aSpinBoxWidget.h" />
     <QtMoc Include="include\akWidgets\aDoubleSpinBoxWidget.h" />
     <QtMoc Include="include\akWidgets\aDockWatcherWidget.h" />
-    <QtMoc Include="include\akWidgets\aChecklistWidget.h" />
     <QtMoc Include="include\akWidgets\aPlainTextEditWidget.h" />
     <ClInclude Include="include\akWidgets\aTtbGroup.h" />
     <ClInclude Include="include\akWidgets\aTtbPage.h" />
