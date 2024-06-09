@@ -183,6 +183,8 @@ namespace ot {
 		GraphicsItemBorder,
 		GraphicsItemBackground,
 		GraphicsItemForeground,
+		GraphicsItemSelectionBorder,
+		GraphicsItemHoverBorder,
 
 		ErrorForeground,
 

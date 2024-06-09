@@ -26,7 +26,9 @@ bool ot::GraphicsLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 void ot::GraphicsLayoutItem::setGraphicsItemName(const std::string& _name) {
 	OTAssertNullptr(m_layoutWrap);
 	m_layoutWrap->setGraphicsItemName(_name);
+	this->setBlockConfigurationNotifications(true);
 	ot::GraphicsItem::setGraphicsItemName(_name + "_AL");
+	this->setBlockConfigurationNotifications(false);
 }
 
 void ot::GraphicsLayoutItem::removeAllConnections(void) {
@@ -57,9 +59,22 @@ void ot::GraphicsLayoutItem::setParentGraphicsItem(GraphicsItem* _itm) {
 	ot::GraphicsItem::setParentGraphicsItem(m_layoutWrap);
 }
 
+void ot::GraphicsLayoutItem::setGraphicsScene(GraphicsScene* _scene) {
+	OTAssertNullptr(m_layoutWrap);
+	GraphicsItem::setGraphicsScene(_scene);
+	m_layoutWrap->setGraphicsScene(_scene);
+}
+
 void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {
 	OTAssertNullptr(m_layoutWrap);
 	m_layoutWrap->setGraphicsItemFlags(_flags);
+}
+
+void ot::GraphicsLayoutItem::graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) {
+	OTAssertNullptr(_config);
+	OTAssertNullptr(m_layoutWrap);
+	m_layoutWrap->setConfiguration(_config->createCopy());
+	this->setGraphicsItemName(_config->getName()); // Wrap has a different name, therefore we update our name
 }
 
 void ot::GraphicsLayoutItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
@@ -106,6 +121,7 @@ void ot::GraphicsLayoutItem::createLayoutWrapper(QGraphicsLayout* _layout) {
 	OTAssert(m_layoutWrap == nullptr, "Layout wrapper already created");
 	m_layoutWrap = new GraphicsLayoutItemWrapper(this);
 	m_layoutWrap->setLayout(_layout);
+	
 
 	// Refresh the parent item
 	this->setParentGraphicsItem(nullptr);

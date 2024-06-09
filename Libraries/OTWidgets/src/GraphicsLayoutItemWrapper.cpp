@@ -61,7 +61,6 @@ void ot::GraphicsLayoutItemWrapper::callPaint(QPainter* _painter, const QStyleOp
 }
 
 void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->paintStateBackground(_painter, _opt, _widget);
 	QGraphicsWidget::paint(_painter, _opt, _widget);
 }
 

@@ -206,6 +206,7 @@ int main(int _argc, char *_argv[])
 		return status;
 	}
 	catch (const std::exception & e) {
+		std::string errorText = e.what();
 		assert(0); // Something went wrong
 		return -601;
 	}

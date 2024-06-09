@@ -9,6 +9,8 @@
 #include "OTWidgets/OTWidgetsAPIExport.h"
 #include "OTWidgets/GraphicsItem.h"
 
+class QGraphicsLayout;
+
 namespace ot {
 
 	class GraphicsLayoutItemWrapper;
@@ -29,11 +31,15 @@ namespace ot {
 
 		virtual void setParentGraphicsItem(GraphicsItem* _itm) override;
 
+		virtual void setGraphicsScene(GraphicsScene* _scene) override;
+
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const = 0;
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
 		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) override;
+
+		virtual void graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) override;
 
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override;
 		virtual QGraphicsItem* getQGraphicsItem(void) override;

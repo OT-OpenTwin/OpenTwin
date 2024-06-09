@@ -27,7 +27,6 @@ namespace ot {
 
 	class GraphicsScene;
 	class GraphicsItemCfg;
-	class GraphicsHighlightItem;
 	class GraphicsConnectionItem;
 
 	//! @brief Base class for all OpenTwin GraphicsItems
@@ -99,6 +98,12 @@ namespace ot {
 		//! \brief Will be called whenever the GraphicsItem flags have changed.
 		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {};
 
+		//! \brief Will be called whenever the GraphicsItem state flags have changed.
+		virtual void graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {};
+
+		//! \brief Will be called whenever the GraphicsItem configuration has changed.
+		virtual void graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) {};
+
 		//! \brief Will return any child item that matches the _itemName.
 		//! \param _itemName The name of the item to find.
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName);
@@ -122,8 +127,6 @@ namespace ot {
 		void handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event);
 		void handleToolTip(QGraphicsSceneHoverEvent* _event);
 		void handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event);
-		
-		void paintStateBackground(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget);
 		
 		//! @brief Will expand the size according to the margins
 		QSizeF handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _sizeHint) const;
@@ -149,6 +152,12 @@ namespace ot {
 
 		// Getter / Setter
 
+		GraphicsItem* getRootItem(void);
+
+		//! \brief Replaces the current configuration with the configuration prvided.
+		//! The item takes ownership of the configuration.
+		void setConfiguration(GraphicsItemCfg* _config);
+
 		//! \brief Returns the current configuration.
 		const GraphicsItemCfg* const getConfiguration(void) const { return m_config; };
 
@@ -159,18 +168,18 @@ namespace ot {
 		//! \see GraphicsItem, GraphicsItemState
 		//! \param _state The state to set.
 		//! \param _active If true the flag will be set, otherwise unset.
-		void setStateFlag(GraphicsItemState _state, bool _active = true) { m_state.setFlag(_state, _active); };
+		void setStateFlag(GraphicsItemState _state, bool _active = true);
 
 		//! \brief Replaces the flags with the flags provided.
 		//! \param _flags Flags to set.
-		void setStateFlags(GraphicsItemStateFlags _flags) { m_state = _flags; };
+		void setStateFlags(GraphicsItemStateFlags _flags);
 
 		//! \brief Returns the current GraphicsItemStateFlags set.
 		//! \see GraphicsItem, GraphicsItemStateFlags
 		const GraphicsItemStateFlags& getStateFlags(void) const { return m_state; };
 
 		//! \brief Set the GraphicsScene this item is placed at.
-		void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
+		virtual void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
 
 		//! \brief Returns the GraphicsScene this item is placed at.
 		GraphicsScene* getGraphicsScene(void) const { return (m_parent ? m_parent->getGraphicsScene() : m_scene); };
@@ -178,8 +187,6 @@ namespace ot {
 		virtual void setParentGraphicsItem(GraphicsItem* _itm) { m_parent = _itm; };
 		GraphicsItem* getParentGraphicsItem(void) const { return m_parent; };
 		
-		GraphicsItem* getRootItem(void);
-
 		//! \brief Sets the provided flag.
 		//! \see GraphicsItem, GraphicsItemFlag
 		//! \param _flag Flag to set.
@@ -242,12 +249,26 @@ namespace ot {
 
 		std::list<ot::GraphicsConnectionCfg> getConnectionCfgs();
 
-		void createHighlightItem(void);
-		void setHighlightItem(GraphicsHighlightItem* _item);
-		GraphicsHighlightItem* highlightItem(void) const { return m_highlightItem; };
-
 		void setGraphicsItemSelected(bool _selected);
 		bool getGraphicsItemSelected(void) const;
+
+		//! \see getBlockFlagNotifications
+		void setBlockFlagNotifications(bool _block) { m_blockFlagNotifications = _block; };
+
+		//! \brief If enabled the item will not call graphicsItemFlagsChanged() when the flags have changed.
+		bool getBlockFlagNotifications(void) const { return m_blockFlagNotifications; };
+
+		//! \see getBlockStateNotifications
+		void setBlockStateNotifications(bool _block) { m_blockStateNotifications = _block; };
+		
+		//! \brief If enabled the item will not call graphicsItemStateChanged() when the flags have changed.
+		bool getBlockStateNotifications(void) const { return m_blockStateNotifications; };
+
+		//! \see getBlockConfigurationNotifications
+		void setBlockConfigurationNotifications(bool _block) { m_blockConfigurationNotifications = _block; };
+		
+		//! \brief If enabled the item will not call graphicsItemConfigurationChanged() when the flags have changed.
+		bool getBlockConfigurationNotifications(void) const { return m_blockConfigurationNotifications; };
 
 	protected:
 		//! \brief Returns the configuration for the current item.
@@ -266,13 +287,16 @@ namespace ot {
 		GraphicsItemCfg* m_config; //! \brief Configuration used to setup this item. Default 0.
 		
 		GraphicsItemStateFlags m_state; //! \brief Current item state flags.
-		GraphicsHighlightItem* m_highlightItem; //! \brief Highlight item.
-
+		
 		QPointF m_moveStartPt; //! @brief Item move origin.
 		GraphicsItem* m_parent; //! @brief Parent graphics item.
 		GraphicsScene* m_scene; //! @brief Graphics scene.
 
 		QSizeF m_requestedSize; //! \brief Size requested by parent.
+
+		bool m_blockStateNotifications;
+		bool m_blockFlagNotifications;
+		bool m_blockConfigurationNotifications;
 
 		std::list<GraphicsItem*> m_eventHandler;
 		std::list<GraphicsConnectionItem*> m_connections;

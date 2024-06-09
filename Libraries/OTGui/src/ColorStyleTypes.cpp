@@ -339,6 +339,8 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	case ot::ColorStyleValueEntry::GraphicsItemBorder: return "GraphicsItem Border Color";
 	case ot::ColorStyleValueEntry::GraphicsItemBackground: return "GraphicsItem Background";
 	case ot::ColorStyleValueEntry::GraphicsItemForeground: return "GraphicsItem Foreground";
+	case ot::ColorStyleValueEntry::GraphicsItemSelectionBorder: return "GraphicsItem Selection Border";
+	case ot::ColorStyleValueEntry::GraphicsItemHoverBorder: return "GraphicsItem Hover Border";
 
 	case ot::ColorStyleValueEntry::ErrorForeground: return "Error Foreground";
 
@@ -396,6 +398,8 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemBorder)) return ColorStyleValueEntry::GraphicsItemBorder;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemBackground)) return ColorStyleValueEntry::GraphicsItemBackground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemForeground)) return ColorStyleValueEntry::GraphicsItemForeground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemSelectionBorder)) return ColorStyleValueEntry::GraphicsItemSelectionBorder;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemHoverBorder)) return ColorStyleValueEntry::GraphicsItemHoverBorder;
 
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ErrorForeground)) return ColorStyleValueEntry::ErrorForeground;
 	else {

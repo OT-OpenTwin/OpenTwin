@@ -136,9 +136,6 @@
     <ClCompile Include="src\MessageDialog.cpp">
       <Filter>src\Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsHighlightItem.cpp">
-      <Filter>src\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\GraphicsItemPreview.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
@@ -409,9 +406,6 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\MessageDialog.h">
       <Filter>include\Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\GraphicsHighlightItem.h">
-      <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsItemPreview.h">
       <Filter>include\Graphics</Filter>

@@ -13,7 +13,6 @@
 #include "OTWidgets/GraphicsItemFactory.h"
 #include "OTWidgets/GraphicsStackItem.h"
 #include "OTWidgets/GraphicsItemLoader.h"
-#include "OTWidgets/GraphicsHighlightItem.h"
 
 ot::GraphicsItemFactory& ot::GraphicsItemFactory::instance(void) {
 	static GraphicsItemFactory g_instance;
@@ -56,28 +55,6 @@ ot::GraphicsItem* ot::GraphicsItemFactory::itemFromConfig(ot::GraphicsItemCfg* _
 		OT_LOG_EA("Setup from configuration failed");
 		delete itm;
 		return nullptr;
-	}
-
-	// Create frame
-	if (_isRoot) {
-		ot::GraphicsStackItem* stck = dynamic_cast<ot::GraphicsStackItem*>(itm);
-		if (stck) {
-			stck->createHighlightItem();
-			stck->addItem(stck->highlightItem(), false, true);
-		}
-		else {
-			stck = new GraphicsStackItem;
-			stck->setGraphicsItemFlags(itm->getGraphicsItemFlags());
-			stck->setGraphicsItemName(itm->getGraphicsItemName() + "_oldRoot");
-			stck->setGraphicsItemUid(itm->getGraphicsItemUid());
-			stck->setStringMap(itm->getStringMap());
-
-			stck->createHighlightItem();
-			stck->addItem(itm, true, false);
-			stck->addItem(stck->highlightItem(), false, true);
-
-			itm = stck;
-		}
 	}
 
 	if (_isRoot) itm->finalizeGraphicsItem();

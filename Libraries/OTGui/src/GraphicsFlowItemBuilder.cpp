@@ -194,7 +194,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	root->setName(m_name);
 	root->setTitle(m_title);
 	root->setToolTip(m_toolTip);
-	root->setGraphicsItemFlags(GraphicsItemCfg::ItemIsMoveable | GraphicsItemCfg::ItemSnapsToGrid);
+	root->setGraphicsItemFlags(GraphicsItemCfg::ItemIsMoveable | GraphicsItemCfg::ItemSnapsToGrid | GraphicsItemCfg::ItemForwardsState);
 
 	// Border
 	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg(painterBack);
@@ -202,7 +202,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	bor->setCornerRadius(5);
 	bor->setName(m_name + "_bor");
 	bor->setSizePolicy(ot::Dynamic);
-	bor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
+	bor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
 	root->addItemTop(bor, false, true);
 
 	// Layout

@@ -10,6 +10,9 @@
 #include "OTWidgets/GraphicsItemFactory.h"
 #include "OTWidgets/GraphicsStackItem.h"
 
+// Qt header
+#include <QtGui/qpainter.h>
+
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsStackItem> stackItemRegistrar(OT_FactoryKey_GraphicsStackItem);
 
 ot::GraphicsStackItem::GraphicsStackItem() 
@@ -129,8 +132,15 @@ void ot::GraphicsStackItem::finalizeGraphicsItem(void) {
 
 void ot::GraphicsStackItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	if (this->adjustChildItems()) return;
-	this->paintStateBackground(_painter, _opt, _widget);
-	QGraphicsItemGroup::paint(_painter, _opt, _widget);
+
+	// Manually paint the grouped items and DON'T call the Qt paint implementation to avoid the selection border from being painted
+	for (QGraphicsItem* child : childItems()) {
+		QGraphicsItem* childItem = static_cast<QGraphicsItem*>(child);
+		_painter->save();
+		_painter->translate(childItem->pos());
+		childItem->paint(_painter, _opt, _widget);
+		_painter->restore();
+	}
 }
 
 QVariant ot::GraphicsStackItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {

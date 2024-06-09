@@ -42,7 +42,8 @@
 #define OT_JSON_VALUE_Connectable "Connectable"
 #define OT_JSON_VALUE_ForwardTooltip "ForwardTooltip"
 #define OT_JSON_VALUE_SnapsToGrid "SnapsToGrid" 
-#define OT_JSON_VALUE_NoFeedback "NoFeedback"
+#define OT_JSON_VALUE_HandleState "HandleState"
+#define OT_JSON_VALUE_ForwardState "ForwardState"
 
 ot::GraphicsItemCfg::GraphicsItemCfg()
 	: m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter), m_uid(0),
@@ -77,7 +78,8 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 	if (m_flags & GraphicsItemCfg::ItemIsConnectable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Connectable, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemForwardsTooltip) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_ForwardTooltip, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemSnapsToGrid) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_SnapsToGrid, _allocator), _allocator);
-	if (m_flags & GraphicsItemCfg::ItemHasNoFeedback) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_NoFeedback, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemHandlesState) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_HandleState, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemForwardsState) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_ForwardState, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Flags, flagArr, _allocator);
 
 	JsonArray stringMapArr;
@@ -120,7 +122,8 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 		else if (f == OT_JSON_VALUE_Connectable) m_flags |= ItemIsConnectable;
 		else if (f == OT_JSON_VALUE_ForwardTooltip) m_flags |= ItemForwardsTooltip;
 		else if (f == OT_JSON_VALUE_SnapsToGrid) m_flags |= ItemSnapsToGrid;
-		else if (f == OT_JSON_VALUE_NoFeedback) m_flags |= ItemHasNoFeedback;
+		else if (f == OT_JSON_VALUE_HandleState) m_flags |= ItemHandlesState;
+		else if (f == OT_JSON_VALUE_ForwardState) m_flags |= ItemForwardsState;
 		else {
 			OT_LOG_EAS("Unknown GraphicsItemFlag \"" + f + "\"");
 		}

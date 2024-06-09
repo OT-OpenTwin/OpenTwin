@@ -10,6 +10,9 @@
 #include "OTWidgets/GraphicsGroupItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
 
+// Qt header
+#include <QtGui/qpainter.h>
+
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsGroupItem> groupItemRegistrar(OT_FactoryKey_GraphicsGroupItem);
 
 ot::GraphicsGroupItem::GraphicsGroupItem()
@@ -129,8 +132,14 @@ void ot::GraphicsGroupItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 }
 
 void ot::GraphicsGroupItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	this->paintStateBackground(_painter, _opt, _widget);
-	QGraphicsItemGroup::paint(_painter, _opt, _widget);
+	// Manually paint the grouped items and DON'T call the Qt paint implementation to avoid the selection border from being painted
+	for (QGraphicsItem* child : childItems()) {
+		QGraphicsItem* childItem = static_cast<QGraphicsItem*>(child);
+		_painter->save();
+		_painter->translate(childItem->pos());
+		childItem->paint(_painter, _opt, _widget);
+		_painter->restore();
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -73,7 +73,7 @@ GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::stopDraw(void) {
 	m_previewItem = nullptr;
 
 	if (ret) {
-		ret->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHasNoFeedback, false);
+		ret->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, true);
 		
 		// If the item is invalid it should be removed.
 		if (!ret->isDesignedItemValid()) {
@@ -224,7 +224,7 @@ void GraphicsItemDesignerDrawHandler::createPreviewItem(void) {
 	}
 
 	if (m_previewItem) {
-		m_previewItem->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHasNoFeedback);
+		m_previewItem->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, false);
 		m_previewItem->getGraphicsItem()->setGraphicsItemUid(this->generateUid());
 		m_previewItem->setDesignerItemFlag(GraphicsItemDesignerItemBase::DesignerItemFlag::DesignerItemIgnoreEvents, true);
 		m_view->addItem(m_previewItem->getGraphicsItem());
