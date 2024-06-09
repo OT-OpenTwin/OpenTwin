@@ -66,7 +66,7 @@ AppBase * AppBase::instance(QApplication* _app) {
 
 void AppBase::log(const ot::LogMessage& _message) {
 	otoolkit::APIInterface::InterfaceLogType typ = otoolkit::APIInterface::Information;
-	switch (_message.flags().data())
+	switch (_message.getFlags().data())
 	{
 	case ot::WARNING_LOG:
 		typ = otoolkit::APIInterface::Warning;
@@ -77,7 +77,7 @@ void AppBase::log(const ot::LogMessage& _message) {
 	default:
 		break;
 	}
-	this->log(QString::fromStdString(_message.functionName()), typ, QString::fromStdString(_message.text()));
+	this->log(QString::fromStdString(_message.getFunctionName()), typ, QString::fromStdString(_message.getText()));
 }
 
 void AppBase::log(const QString& _sender, otoolkit::APIInterface::InterfaceLogType _type, const QString& _message) {
@@ -420,7 +420,7 @@ void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
 AppBase::AppBase(QApplication* _app) 
 	: m_mainThread(QThread::currentThreadId()), m_app(_app), m_logger(nullptr), m_replaceTransparentColorStyleValue(true)
 {
-	this->deleteLogNotifierLater(true);
+	this->setDeleteLogNotifierLater(true);
 
 	// Initialize Toolkit API
 	otoolkit::api::initialize(this);

@@ -1,7 +1,7 @@
 #include "AppBase.h"
 
-#include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
 
 #include <thread>
 
@@ -10,6 +10,43 @@
 #endif // _DEBUG
 
 #define OT_LOG_BUFFER_LIMIT 10000
+
+namespace intern {
+
+	void replacePasswords(std::string& _string) {
+		
+		size_t passwordIx = _string.find(OT_ACTION_PASSWORD_SUBTEXT);
+		size_t lastIx = 0; // Last index of previous match
+
+		while (passwordIx != std::string::npos) {
+			// Ensure the password is inside double quotes
+			size_t checkIx = _string.find('\"', lastIx);
+			if (checkIx > passwordIx) break;
+
+
+			// Closing quote
+			checkIx = _string.find('\"', passwordIx + 1);
+			if (checkIx == std::string::npos) break;
+
+			// Colon
+			checkIx = _string.find(':', checkIx + 1);
+			if (checkIx == std::string::npos) break;
+
+			// Value opening quote
+			checkIx = _string.find('\"', checkIx + 1);
+			if (checkIx == std::string::npos) break;
+
+			// Value closing quote
+			lastIx = _string.find('\"', checkIx + 1);
+			if (lastIx == std::string::npos) break;
+
+			_string.replace(checkIx + 1, (lastIx - checkIx) - 1, "****");
+			
+			lastIx = _string.find('\"', checkIx + 1) + 1; // Last index is now invalid after replacing
+			passwordIx = _string.find(OT_ACTION_PASSWORD_SUBTEXT, lastIx);
+		}
+	}
+}
 
 AppBase& AppBase::instance(void) {
 	static AppBase g_instance;
@@ -53,11 +90,12 @@ std::string AppBase::handleLog(ot::JsonDocument& _jsonDocument) {
 	ot::LogMessage msg;
 	msg.setFromJsonObject(obj);
 
-	// ToDo: Rework password logging
-	if (msg.text().find("password") != std::string::npos || msg.text().find("Password") != std::string::npos) {
-		return OT_ACTION_RETURN_VALUE_FAILED;
+	if (msg.getText().find(OT_ACTION_PASSWORD_SUBTEXT) != std::string::npos) {
+		std::string newText = msg.getText();
+		intern::replacePasswords(newText);
+		msg.setText(newText);
 	}
-
+	
 	msg.setCurrentTimeAsGlobalSystemTime();
 
 	m_messages.push_back(msg);

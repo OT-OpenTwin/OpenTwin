@@ -22,7 +22,7 @@ ot::ServiceLogNotifier& ot::ServiceLogNotifier::initialize(const std::string& _s
 	ot::LogDispatcher::initialize(_serviceName, _addCoutReceiver);
 
 	ot::ServiceLogNotifier& obj = ot::ServiceLogNotifier::instance();
-	obj.isDeleteLogNotifierLater();
+	obj.getDeleteLogNotifierLater();
 	ot::LogDispatcher::instance().addReceiver(&obj);
 	if (!_loggingServiceUrl.empty() && _loggingServiceUrl.find("//") != 0) obj.setLoggingServiceURL(_loggingServiceUrl);
 	return obj;
@@ -89,7 +89,7 @@ void ot::ServiceLogNotifier::log(const LogMessage& _message) {
 
 ot::ServiceLogNotifier::ServiceLogNotifier()
 {
-	this->deleteLogNotifierLater();
+	this->setDeleteLogNotifierLater(true);
 
 	char buffer[128];
 	size_t bufferLen;

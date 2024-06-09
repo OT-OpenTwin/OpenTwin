@@ -10,6 +10,10 @@
 
 #define OT_ACTION_MEMBER "action"
 
+//! \brief This should be used in every member key that holds a password.
+//! This is used to filter out log messages containing a password.
+#define OT_ACTION_PASSWORD_SUBTEXT "Password"
+
 #define OT_ACTION_CMD_ServiceConnected "Service.Connected"
 #define OT_ACTION_CMD_ServiceDisconnected "Service.Disconnected"
 #define OT_ACTION_CMD_ShutdownRequestedByService "Service.ShutdownRequested"
@@ -687,14 +691,14 @@
 #define OT_PARAM_AUTH_USERNAME "Username"
 #define OT_PARAM_USERNAME_TO_DELETE "UsernameToDelete"
 #define OT_PARAM_AUTH_LOGGED_IN_USERNAME "LoggedInUsername"
-#define OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD "LoggedInUserPassword"
+#define OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD "LoggedInUser" OT_ACTION_PASSWORD_SUBTEXT
 #define OT_PARAM_AUTH_OLD_USERNAME "OldUsername"
 #define OT_PARAM_AUTH_NEW_USERNAME "NewUsername"
-#define OT_PARAM_AUTH_PASSWORD "Password"
-#define OT_PARAM_AUTH_NEW_PASSWORD "NewPassword"
-#define OT_PARAM_AUTH_ENCRYPTED_PASSWORD "EncryptedPassword"
+#define OT_PARAM_AUTH_PASSWORD OT_ACTION_PASSWORD_SUBTEXT
+#define OT_PARAM_AUTH_NEW_PASSWORD "New" OT_ACTION_PASSWORD_SUBTEXT
+#define OT_PARAM_AUTH_ENCRYPTED_PASSWORD "Encrypted" OT_ACTION_PASSWORD_SUBTEXT
 #define OT_PARAM_DB_USERNAME "DB.Username"
-#define OT_PARAM_DB_PASSWORD "DB.Password"
+#define OT_PARAM_DB_PASSWORD "DB." OT_ACTION_PASSWORD_SUBTEXT
 
 // Group Functionalities
 #define OT_ACTION_CREATE_GROUP "CreateGroup"

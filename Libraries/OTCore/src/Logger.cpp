@@ -178,7 +178,7 @@ void ot::LogDispatcher::dispatch(const std::string& _text, const std::string& _f
 }
 
 void ot::LogDispatcher::dispatch(const LogMessage& _message) {
-	if ((_message.flags() & m_logFlags) != _message.flags()) return;
+	if ((_message.getFlags() & m_logFlags) != _message.getFlags()) return;
 
 	// Create Timestamp
 	LogMessage msg(_message);
@@ -249,7 +249,7 @@ ot::LogDispatcher::LogDispatcher() : m_serviceName("!! <NO SERVICE ATTACHED> !!"
 
 ot::LogDispatcher::~LogDispatcher() {
 	for (auto r : m_messageReceiver) {
-		if (!r->isDeleteLogNotifierLater()) { delete r; }
+		if (!r->getDeleteLogNotifierLater()) { delete r; }
 	}
 	m_messageReceiver.clear();
 }

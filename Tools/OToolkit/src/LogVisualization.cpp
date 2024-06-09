@@ -532,14 +532,14 @@ void LogVisualization::appendLogMessage(const ot::LogMessage& _msg) {
 	int r = m_table->rowCount();
 	m_table->insertRow(r);
 
-	QString serviceName = QString::fromStdString(_msg.serviceName());
+	QString serviceName = QString::fromStdString(_msg.getServiceName());
 
 	QTableWidgetItem * iconItm = new QTableWidgetItem("");
-	if (_msg.flags() & ot::WARNING_LOG) {
+	if (_msg.getFlags() & ot::WARNING_LOG) {
 		iconItm->setIcon(QIcon(":/images/Warning.png"));
 		m_warningCount++;
 	}
-	else if (_msg.flags() & ot::ERROR_LOG) {
+	else if (_msg.getFlags() & ot::ERROR_LOG) {
 		iconItm->setIcon(QIcon(":/images/Error.png"));
 		m_errorCount++;
 	}
@@ -550,11 +550,11 @@ void LogVisualization::appendLogMessage(const ot::LogMessage& _msg) {
 
 	
 	this->iniTableItem(r, tType, new QTableWidgetItem(logMessageTypeString(_msg)));
-	this->iniTableItem(r, tTimeGlobal, new QTableWidgetItem(QString::fromStdString(_msg.globalSystemTime())));
-	this->iniTableItem(r, tTimeLocal, new QTableWidgetItem(QString::fromStdString(_msg.localSystemTime())));
+	this->iniTableItem(r, tTimeGlobal, new QTableWidgetItem(QString::fromStdString(_msg.getGlobalSystemTime())));
+	this->iniTableItem(r, tTimeLocal, new QTableWidgetItem(QString::fromStdString(_msg.getLocalSystemTime())));
 	this->iniTableItem(r, tService, new QTableWidgetItem(serviceName));
-	this->iniTableItem(r, tFunction, new QTableWidgetItem(QString::fromStdString(_msg.functionName())));
-	this->iniTableItem(r, tMessage, new QTableWidgetItem(QString::fromStdString(_msg.text())));
+	this->iniTableItem(r, tFunction, new QTableWidgetItem(QString::fromStdString(_msg.getFunctionName())));
+	this->iniTableItem(r, tMessage, new QTableWidgetItem(QString::fromStdString(_msg.getText())));
 
 	// Store message
 	m_messages.push_back(_msg);
@@ -599,35 +599,35 @@ void LogVisualization::appendLogMessages(const QList<ot::LogMessage>& _messages)
 
 QString LogVisualization::logMessageTypeString(const ot::LogMessage& _msg) {
 	QString typeString;
-	if (_msg.flags() & ot::DETAILED_LOG) {
+	if (_msg.getFlags() & ot::DETAILED_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_DETAILED);
 	}
-	if (_msg.flags() & ot::INFORMATION_LOG) {
+	if (_msg.getFlags() & ot::INFORMATION_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_INFO);
 	}
-	if (_msg.flags() & ot::ERROR_LOG) {
+	if (_msg.getFlags() & ot::ERROR_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_ERROR);
 	}
-	if (_msg.flags() & ot::WARNING_LOG) {
+	if (_msg.getFlags() & ot::WARNING_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_WARNING);
 	}
-	if (_msg.flags() & ot::INBOUND_MESSAGE_LOG) {
+	if (_msg.getFlags() & ot::INBOUND_MESSAGE_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_MSG_IN);
 	}
-	if (_msg.flags() & ot::QUEUED_INBOUND_MESSAGE_LOG) {
+	if (_msg.getFlags() & ot::QUEUED_INBOUND_MESSAGE_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_MSG_QUEUE);
 	}
-	if (_msg.flags() & ot::ONEWAY_TLS_INBOUND_MESSAGE_LOG) {
+	if (_msg.getFlags() & ot::ONEWAY_TLS_INBOUND_MESSAGE_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_MSG_OW_TLS);
 	}
-	if (_msg.flags() & ot::OUTGOING_MESSAGE_LOG) {
+	if (_msg.getFlags() & ot::OUTGOING_MESSAGE_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_MSG_OUT);
 	}
@@ -752,15 +752,15 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 
 	// Create controls
 	m_timeL = new QLabel("Time (Global):");
-	m_time = new QLineEdit(QString::fromStdString(m_msg.globalSystemTime()));
+	m_time = new QLineEdit(QString::fromStdString(m_msg.getGlobalSystemTime()));
 	m_time->setReadOnly(true);
 
 	m_timeLocalL = new QLabel("Time (Local):");
-	m_timeLocal = new QLineEdit(QString::fromStdString(m_msg.localSystemTime()));
+	m_timeLocal = new QLineEdit(QString::fromStdString(m_msg.getLocalSystemTime()));
 	m_timeLocal->setReadOnly(true);
 
 	m_senderNameL = new QLabel("Sender:");
-	m_senderName = new QLineEdit(QString::fromStdString(m_msg.serviceName()));
+	m_senderName = new QLineEdit(QString::fromStdString(m_msg.getServiceName()));
 	m_senderName->setReadOnly(true);
 
 	m_messageTypeL = new QLabel("Type:");
@@ -768,7 +768,7 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 	m_messageType->setReadOnly(true);
 
 	m_functionL = new QLabel("Function:");
-	m_function = new QLineEdit(QString::fromStdString(m_msg.functionName()));
+	m_function = new QLineEdit(QString::fromStdString(m_msg.getFunctionName()));
 	m_function->setReadOnly(true);
 
 	m_findMessageSyntax = new QCheckBox("Syntax check");
@@ -777,7 +777,7 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 
 
 	m_messageL = new QLabel("Message text:");
-	m_message = new QPlainTextEdit(QString::fromStdString(m_msg.text()));
+	m_message = new QPlainTextEdit(QString::fromStdString(m_msg.getText()));
 	m_message->setReadOnly(true);
 
 	m_okButton = new QPushButton("Ok");
@@ -892,7 +892,7 @@ void LogVisualizationItemViewDialog::slotRecenter(void) {
 }
 
 void LogVisualizationItemViewDialog::slotDisplayMessageText(int _state) {
-	QString str = QString::fromStdString(m_msg.text());
+	QString str = QString::fromStdString(m_msg.getText());
 	if (m_findMessageSyntax->isChecked()) {
 		// JSON check
 		str = this->findJsonSyntax(str);
