@@ -1423,7 +1423,7 @@ void AppBase::setCurrentVisualizationTab(const std::string & _tabName) {
 }
 
 std::string AppBase::getCurrentVisualizationTab(void) {
-	ot::WidgetView* view = ot::WidgetViewManager::instance().lastFocusedCentralView();
+	ot::WidgetView* view = ot::WidgetViewManager::instance().getLastFocusedCentralView();
 	if (view) return view->viewData().title();
 	else return "";
 }
@@ -1572,13 +1572,13 @@ void AppBase::setProgressBarValue(int progressPercentage)
 QString AppBase::availableTabText(
 	const QString &				_initialTabText
 ) {
-	if (!ot::WidgetViewManager::instance().viewTitleExists(_initialTabText)) {
+	if (!ot::WidgetViewManager::instance().getViewTitleExists(_initialTabText)) {
 		return _initialTabText;
 	}
 
 	int v = 1;
 	QString nxt = _initialTabText + " [" + QString::number(v) + "]";
-	while (ot::WidgetViewManager::instance().viewTitleExists(nxt)) {
+	while (ot::WidgetViewManager::instance().getViewTitleExists(nxt)) {
 		nxt = _initialTabText + " [" + QString::number(++v) + "]";
 	}
 	return nxt;
