@@ -192,7 +192,7 @@ void ot::GraphicsScene::drawBackground(QPainter* _painter, const QRectF& _rect)
 	}
 
 	if (_rect != m_view->mapToScene(m_view->viewport()->rect()).boundingRect()) {
-		m_view->update();
+		m_view->repaint();
 		return;
 	}
 
