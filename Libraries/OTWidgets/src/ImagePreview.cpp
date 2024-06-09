@@ -30,7 +30,7 @@ ot::ImagePreview::~ImagePreview() {
 void ot::ImagePreview::paintEvent(QPaintEvent* _event) {
 	QFrame::paintEvent(_event);
 
-	QRect r = this->rect().marginsRemoved(m_imageMargins);
+	QRect r = _event->rect().marginsRemoved(m_imageMargins);
 	QPainter painter(this);
 	painter.drawImage(r.topLeft(), m_image.scaled(m_size.boundedTo(r.size()), Qt::KeepAspectRatio));
 }

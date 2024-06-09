@@ -214,6 +214,10 @@ Whenever passing an object as an argument to a method prefer passing a const ref
 
     void foo(const MyClass& _obj);  // We pass a const reference since we don't modify _obj
 
+.. note::
+   
+   Note that the reference symbol is located next to the type and not to the name.
+
 Overriding
 ----------
 

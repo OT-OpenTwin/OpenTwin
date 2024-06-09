@@ -405,14 +405,14 @@ void ViewerComponent::updateSettings(ot::SettingsData * _data)
 void ViewerComponent::loadSettings(ot::SettingsData * _data) 
 {
 
-	if (!_data->refreshValuesFromDatabase(AppBase::instance()->getDataBaseURL(), std::to_string(AppBase::instance()->getSiteID()), AppBase::instance()->getSessionUserName(), AppBase::instance()->getSessionUserPassword(), AppBase::instance()->getCurrentUserCollection())) {
+	if (!_data->refreshValuesFromDatabase(AppBase::instance()->getCurrentLoginData().getDatabaseUrl(), std::to_string(AppBase::instance()->getSiteID()), AppBase::instance()->getCurrentLoginData().getSessionUser(), AppBase::instance()->getCurrentLoginData().getSessionPassword(), AppBase::instance()->getCurrentUserCollection())) {
 		AppBase::instance()->appendInfoMessage("[ERROR] Failed to import viewer settings data from database\n");
 	}
 }
 
 void ViewerComponent::saveSettings(ot::SettingsData * _data) 
 {
-	if (!_data->saveToDatabase(AppBase::instance()->getDataBaseURL(), std::to_string(AppBase::instance()->getSiteID()), AppBase::instance()->getSessionUserName(), AppBase::instance()->getSessionUserPassword(), AppBase::instance()->getCurrentUserCollection())) {
+	if (!_data->saveToDatabase(AppBase::instance()->getCurrentLoginData().getDatabaseUrl(), std::to_string(AppBase::instance()->getSiteID()), AppBase::instance()->getCurrentLoginData().getSessionUser(), AppBase::instance()->getCurrentLoginData().getSessionPassword(), AppBase::instance()->getCurrentUserCollection())) {
 		AppBase::instance()->appendInfoMessage("[ERROR] Failed to export viewer settings data to database\n");
 	}
 }

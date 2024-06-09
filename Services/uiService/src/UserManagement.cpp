@@ -39,6 +39,16 @@ UserManagement::UserManagement() :
 
 }
 
+UserManagement::UserManagement(const LoginData& _loginData)
+	: maxNumberRecentProjects(10),
+	isConnected(false),
+	settingsDataBaseName("UserSettings"),
+	authServerURL(_loginData.getAuthorizationUrl()),
+	databaseURL(_loginData.getDatabaseUrl())
+{
+
+}
+
 UserManagement::~UserManagement()
 {
 
@@ -54,18 +64,16 @@ void UserManagement::setDatabaseURL(const std::string &url)
 	databaseURL = url;
 }
 
-bool UserManagement::checkConnection(void)
-{
+bool UserManagement::checkConnection(void) const {
 	AppBase * app{ AppBase::instance() };
 
 	if (!checkConnectionAuthorizationService()) return false;
-	if (!checkConnectionDataBase(app->getSessionUserName(), app->getSessionUserPassword())) return false;
+	if (!checkConnectionDataBase(app->getCurrentLoginData().getSessionUser(), app->getCurrentLoginData().getSessionPassword())) return false;
 
 	return true;
 }
 
-bool UserManagement::checkConnectionAuthorizationService(void)
-{
+bool UserManagement::checkConnectionAuthorizationService(void) const {
 	assert(!authServerURL.empty());
 
 	// Here send a ping to the authorization service to check whether the server is up and running
@@ -81,8 +89,7 @@ bool UserManagement::checkConnectionAuthorizationService(void)
 	return true;
 }
 
-bool UserManagement::checkConnectionDataBase(const std::string &userName, const std::string &password)
-{
+bool UserManagement::checkConnectionDataBase(const std::string &userName, const std::string &password) const {
 	assert(!databaseURL.empty());
 
 	if (!isConnected)
@@ -152,8 +159,8 @@ bool UserManagement::deleteUser(const std::string &userName)
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_DELETE_USER, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
@@ -202,8 +209,7 @@ bool UserManagement::deleteUser(const std::string &userName)
 //}
 
 
-bool UserManagement::checkUserName(const std::string &userName)
-{
+bool UserManagement::checkUserName(const std::string &userName) const {
 	assert(!authServerURL.empty());
 
 	// Here we check whether a user exists by getting its data from the authorization service
@@ -213,8 +219,8 @@ bool UserManagement::checkUserName(const std::string &userName)
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_USER_DATA, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
@@ -226,8 +232,7 @@ bool UserManagement::checkUserName(const std::string &userName)
 	return hasSuccessful(response);
 }
 
-bool UserManagement::checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string &sessionUser, std::string& sessionPassword, std::string &validPassword, std::string &validEncryptedPassword)
-{
+bool UserManagement::checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string &sessionUser, std::string& sessionPassword, std::string &validPassword, std::string &validEncryptedPassword) const {
 	assert(!authServerURL.empty());
 
 	// Here we check whether a user exists by getting its data from the authorization service
@@ -271,10 +276,9 @@ bool UserManagement::hasError(const std::string &response)
 	return ot::json::exists(responseDoc, OT_ACTION_AUTH_ERROR);
 }
 
-bool UserManagement::hasSuccessful(const std::string &response)
-{
+bool UserManagement::hasSuccessful(const std::string& _response) const {
 	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
+	responseDoc.fromJson(_response);
 
 	try
 	{
@@ -294,7 +298,7 @@ bool UserManagement::initializeDatabaseConnection(void)
 	try
 	{
 		AppBase * app{ AppBase::instance() };
-		DataStorageAPI::ConnectionAPI::establishConnection(databaseURL, "1", app->getSessionUserName(), app->getSessionUserPassword());
+		DataStorageAPI::ConnectionAPI::establishConnection(databaseURL, "1", app->getCurrentLoginData().getSessionUser(), app->getCurrentLoginData().getSessionPassword());
 
 		isConnected = true;
 
@@ -434,9 +438,9 @@ std::string UserManagement::getUserSettingsCollection(void)
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_USER_DATA, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))

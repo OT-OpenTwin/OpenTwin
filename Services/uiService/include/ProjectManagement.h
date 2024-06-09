@@ -7,11 +7,16 @@
 
 #pragma once
 
+// Frontend header
+#include "LoginData.h"
+
+// std header
 #include <string>
 #include <list>
 #include <map>
 #include <vector>
 
+// BSON header
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 
@@ -21,6 +26,7 @@ class ProjectManagement
 {
 public:
 	ProjectManagement();
+	ProjectManagement(const LoginData& _data);
 	~ProjectManagement();
 	
 	void setDataBaseURL(const std::string &url);

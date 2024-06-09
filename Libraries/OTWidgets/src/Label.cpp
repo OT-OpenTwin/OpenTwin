@@ -14,7 +14,7 @@ ot::Label::Label(QWidget* _parentWidget) : QLabel(_parentWidget) {}
 ot::Label::Label(const QString& _text, QWidget* _parentWidget) : QLabel(_text, _parentWidget) {}
 
 void ot::Label::mousePressEvent(QMouseEvent* _event) {
-	if (_event->button() == Qt::LeftButton) {
+	if ((_event->button() == Qt::LeftButton) && this->isEnabled()) {
 		Q_EMIT mousePressed();
 	}
 }

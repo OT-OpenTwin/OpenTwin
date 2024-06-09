@@ -7,9 +7,10 @@
 
 #include "QtMetaTypes.h"
 
-// Service header
+// Frontend header
 #include "uiServiceTypes.h"				// Model and View types
 #include "welcomeScreen.h"
+#include "LoginData.h"
 
 // AK header
 #include <akCore/aException.h>
@@ -50,7 +51,6 @@ class ProjectManagement;
 class ShortcutManager;
 class welcomeScreen;
 class ContextMenuManager;
-class LogInManager;
 class UiPluginComponent;
 class UiPluginManager;
 
@@ -146,13 +146,13 @@ public:
 	);
 
 	//! @brief Will get the current project as modified state
-	bool getCurrentProjectIsModified(void) const { return m_projectIsModified; }
+	bool getCurrentProjectIsModified(void) const { return m_projectIsModified; };
 
 	//! @brief Will return the current username
-	std::string getCurrentUserName(void) const { return m_currentUser; }
+	const LoginData& getCurrentLoginData(void) const { return m_loginData; };
 
 	//! @brief Will return the current username
-	std::string getCurrentUserCollection(void) const { return m_currentUserCollection; }
+	std::string getCurrentUserCollection(void) const { return m_currentUserCollection; };
 
 	ak::aWindow * mainWindow(void);
 
@@ -239,15 +239,6 @@ public:
 
 	// Information setter
 
-	//! @brief Will set the current data base URL
-	void setDataBaseURL(const std::string & _url);
-
-	//! @brief Will set the current authorization service URL
-	void setAuthorizationServiceURL(const std::string & _url);
-
-	//! @brief Will set the current user name and password
-	void setUserNamePassword(const std::string & _userName, const std::string & _password, const std::string & _encryptedPassword, const std::string& _sessionUser, const std::string& _sessionPassword);
-
 	//! @brief Will set the current site ID
 	void setSiteID(int _id);
 
@@ -257,20 +248,12 @@ public:
 	//! @brief Will set the session service URL
 	void setSessionServiceURL(const std::string & _url);
 
-	void setGlobalSessionServiceURL(const std::string & _url);
-
 	void SetCollectionName(const std::string _collectionName);
-	void startSessionRefreshTimer(const std::string &_sessionName);
+	void startSessionRefreshTimer(void);
 
 	// ############################################################################################
 
 	// Information gathering
-
-	//! @brief Will return the current data base URL
-	const std::string & getDataBaseURL(void) const { return m_dataBaseURL; }
-
-	//! @brief Will return the current authorization service URL
-	const std::string & getAuthorizationServiceURL(void) const { return m_authorizationServiceURL; }
 
 	//! @brief Will return the current site ID
 	int getSiteID(void) const { return m_siteID; }
@@ -288,8 +271,6 @@ public:
 
 	//! @brief Will return the session service URL
 	const std::string & getSessionServiceURL(void) const { return m_sessionServiceURL; }
-
-	const std::string & getGlobalSessionServiceURL(void) const { return m_globalSessionServiceURL; }
 
 	//! @brief Will return the current project name
 	const std::string & getCurrentProjectName(void) const { return m_currentProjectName; }
@@ -458,17 +439,6 @@ public:
 
 	// Asynchronous callbacks
 	
-	void logInSuccessfull(void);
-
-	void cancelLogIn(void);
-
-	// Get user information
-	std::string getCredentialUserName(void) { return m_userName; }
-	std::string getCredentialUserPassword(void) { return m_userEncryptedPassword; }
-	std::string getCredentialUserPasswordClear(void) { return m_userPassword; }
-	std::string getSessionUserName(void) { return m_sessionUser; }
-	std::string getSessionUserPassword(void) { return m_sessionPassword; }
-
 public Q_SLOTS:
 	void slotGraphicsItemRequested(const QString& _name, const QPointF& _pos);
 	void slotGraphicsItemMoved(const ot::UID& _uid, const QPointF& _newPos);
@@ -521,7 +491,7 @@ private:
 	void exportProjectWorker(std::string selectedProjectName, std::string exportFileName);
 	void importProjectWorker(std::string projectName, std::string currentUser, std::string importFileName);
 
-	void sessionRefreshTimer(const std::string _sessionName);
+	void sessionRefreshTimer(const std::string _sessionUserName, const std::string _authorizationUrl);
 
 	bool checkForContinue(
 		QString									_title
@@ -530,20 +500,15 @@ private:
 	AppStateFlags               m_state;
 
 	debugNotifier *				m_debugNotifier;
-	LogInManager *				m_logInManager;
-
+	
 	std::string					m_uiServiceURL;
-	std::string					m_dataBaseURL;
-	std::string					m_authorizationServiceURL;
 	int							m_siteID;
 	std::string					m_relayURLs;
 	std::string					m_currentProjectName;
 	std::string					m_currentProjectType;
 	std::string					m_collectionName;
 
-	std::string					m_currentUser;
 	std::string					m_currentUserCollection;
-	std::string					m_globalSessionServiceURL;
 	std::string					m_sessionServiceURL;
 
 	bool						m_appIsRunning;				//! If true, the application is already running
@@ -552,8 +517,6 @@ private:
 	bool						m_widgetIsWelcome;
 
 	bool						m_projectIsModified;
-
-	ak::ID						m_logInDialogCustomInputID;
 
 	ViewerComponent *			m_viewerComponent;
 	ExternalServicesComponent *	m_ExternalServicesComponent;
@@ -565,11 +528,7 @@ private:
 
 	UiPluginManager *			m_uiPluginManager;
 
-	std::string					m_userName;
-	std::string					m_userPassword;
-	std::string					m_userEncryptedPassword;
-	std::string					m_sessionUser;
-	std::string					m_sessionPassword;
+	LoginData m_loginData;
 
 	// Default UI
 

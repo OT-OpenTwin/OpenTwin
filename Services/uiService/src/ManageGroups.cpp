@@ -241,8 +241,8 @@ void addGroupDialog::slotButtonConfirmPressed()
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CREATE_GROUP, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
@@ -380,8 +380,8 @@ void renameGroupDialog::slotButtonConfirmPressed()
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_GROUP_NAME, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(my_groupToRename, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_NEW_GROUP_NAME, ot::JsonString(my_input->text().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 	
@@ -675,8 +675,8 @@ void ManageGroups::slotDeleteGroup(void)
 
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REMOVE_GROUP, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
 
 		std::string response;
@@ -744,8 +744,8 @@ void ManageGroups::slotMemberCheckBoxChanged(bool state, int row)
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REMOVE_USER_FROM_GROUP, doc.GetAllocator()), doc.GetAllocator());
 	}
 
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
 
@@ -789,8 +789,8 @@ void ManageGroups::fillGroupsList(void)
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_GROUPS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
@@ -896,7 +896,7 @@ void ManageGroups::fillMembersList(void)
 
 	AppBase * app{ AppBase::instance() };
 
-	if (app->getCredentialUserName() != groupOwner)
+	if (app->getCurrentLoginData().getUserName() != groupOwner)
 	{
 		m_btnRename->setEnabled(false);
 		m_btnOwner->setEnabled(false);
@@ -914,8 +914,8 @@ void ManageGroups::fillMembersList(void)
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_GROUP_DATA, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
@@ -1003,7 +1003,7 @@ void ManageGroups::fillMembersList(void)
 			pCheckBox->setEnabled(false);
 		}
 
-		if (app->getCredentialUserName() != groupOwner)
+		if (app->getCurrentLoginData().getUserName() != groupOwner)
 		{
 			pCheckBox->setEnabled(false);
 		}
@@ -1027,8 +1027,8 @@ void ManageGroups::readUserList(void)
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USERS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))

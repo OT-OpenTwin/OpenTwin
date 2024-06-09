@@ -60,9 +60,6 @@ public:
 	};
 
 	welcomeScreen(
-		const std::string &		_username,
-		const std::string &		_databaseUrl,
-		const std::string &		_authUrl,
 		const QIcon &			_iconOpen,
 		const QIcon &			_iconCopy,
 		const QIcon &			_iconRename,
@@ -151,9 +148,6 @@ private:
 	ProjectManagement *		my_projectManager;
 	UserManagement *		my_userManager;
 	AppBase *				my_app;
-	std::string				my_username;
-	std::string				my_authURL;
-	std::string				my_databaseUrl;
 
 	int						my_lockCount;
 

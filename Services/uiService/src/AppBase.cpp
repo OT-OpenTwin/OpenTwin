@@ -15,7 +15,6 @@
 #include "ToolBar.h"
 #include "ShortcutManager.h"
 #include "ContextMenuManager.h"
-#include "LogInManager.h"
 #include "ManageGroups.h"
 #include "ManageAccess.h"
 #include "UiPluginComponent.h"
@@ -39,12 +38,11 @@
 #include <ads/DockManager.h>
 
 // Qt header
-#include <qwidget.h>			// QWidget
-#include <qcoreapplication.h>	// QCoreApplication
-#include <qfile.h>				// QFile
-#include <qapplication.h>		// QApplication
+#include <QtCore/qfile.h>
 #include <QtGui/qscreen.h>
-#include <qfiledialog.h>		// Open/Save file dialog
+#include <QtWidgets/qfiledialog.h>
+#include <QtWidgets/qmessagebox.h>
+#include <QtWidgets/qapplication.h>
 
 // Open twin header
 #include "DataBase.h"
@@ -153,7 +151,6 @@ AppBase::AppBase()
 	m_isDebug(false),
 	m_shortcutManager(nullptr),
 	m_contextMenuManager(nullptr),
-	m_logInManager(nullptr),
 	m_uiPluginManager(nullptr),
 	m_graphicsPicker(nullptr),
 	m_visible3D(false),
@@ -216,24 +213,20 @@ bool AppBase::initialize() {
 }
 
 bool AppBase::logIn(void) {
-	//LogInDialog logInDia;
-	//if (logInDia.showDialog() != ot::Dialog::Ok) {
-		//return false;
-	//}
-
-	m_logInManager = new LogInManager();
-	if (!m_logInManager->showDialog()) {
+	LogInDialog loginDia;
+	if (loginDia.showDialog() != ot::Dialog::Ok) {
 		return false;
 	}
-	m_currentUser = m_logInManager->username().toStdString();
+	
+	OTAssert(loginDia.getLoginData().isValid(), "Invalid login data...");
+
+	m_loginData = loginDia.getLoginData();
+	this->startSessionRefreshTimer();
+
 	m_state |= LoggedInState;
 
 	// Now retreive information about the user collection
-
-	UserManagement uM;
-	uM.setAuthServerURL(m_authorizationServiceURL);
-	uM.setDatabaseURL(m_dataBaseURL);
-
+	UserManagement uM(m_loginData);
 	m_currentUserCollection = uM.getUserSettingsCollection();
 
 	// Create default UI
@@ -246,9 +239,6 @@ bool AppBase::logIn(void) {
 	this->createUi();
 
 	{
-		UserManagement uM;
-		uM.setAuthServerURL(m_authorizationServiceURL);
-		uM.setDatabaseURL(m_dataBaseURL);
 		uM.initializeNewSession();
 
 		m_state |= RestoringSettingsState;
@@ -429,10 +419,7 @@ bool AppBase::closeEvent() {
 
 	// Store current UI settings
 	{
-		UserManagement uM;
-		uM.setAuthServerURL(m_authorizationServiceURL);
-		uM.setDatabaseURL(m_dataBaseURL);
-
+		UserManagement uM(m_loginData);
 		uM.storeSetting(STATE_NAME_WINDOW, m_currentStateWindow.window);
 		uM.storeSetting(STATE_NAME_VIEW, m_currentStateWindow.view);
 	}
@@ -447,12 +434,10 @@ bool AppBase::createNewProjectInDatabase(
 	const QString& _projectName,
 	const QString& _projectType
 ) {
-	ProjectManagement pManager;
-	pManager.setDataBaseURL(m_dataBaseURL);
-	pManager.setAuthServerURL(m_authorizationServiceURL);
+	ProjectManagement pManager(m_loginData);
 
 	assert(pManager.InitializeConnection()); // Failed to connect
-	return pManager.createProject(_projectName.toStdString(), _projectType.toStdString(), m_currentUser, "");
+	return pManager.createProject(_projectName.toStdString(), _projectType.toStdString(), m_loginData.getUserName(), "");
 }
 
 void AppBase::lockSelectionAndModification(bool flag)
@@ -510,9 +495,7 @@ void AppBase::welcomeScreenEventCallback(
 	int								_row,
 	const QString &					_additionalInfo
 ) {
-	ProjectManagement pManager;
-	pManager.setDataBaseURL(m_dataBaseURL);
-	pManager.setAuthServerURL(m_authorizationServiceURL);
+	ProjectManagement pManager(m_loginData);
 
 	assert(pManager.InitializeConnection()); // Failed to connect
 	switch (_type)
@@ -597,11 +580,9 @@ void AppBase::welcomeScreenEventCallback(
 				m_welcomeScreen->refreshList();
 			}
 
-			pManager.createProject(currentName, projectType, m_currentUser, templateName);
+			pManager.createProject(currentName, projectType, m_loginData.getUserName(), templateName);
 
-			UserManagement manager;
-			manager.setAuthServerURL(m_authorizationServiceURL);
-			manager.setDatabaseURL(m_dataBaseURL);
+			UserManagement manager(m_loginData);
 			assert(manager.checkConnection()); // Failed to connect
 			manager.addRecentProject(currentName);
 
@@ -660,9 +641,7 @@ void AppBase::welcomeScreenEventCallback(
 				std::string projectCollection = pManager.getProjectCollection(selectedProjectName);
 				std::string projectType       = pManager.getProjectType(selectedProjectName);
 
-				UserManagement manager;
-				manager.setAuthServerURL(m_authorizationServiceURL);
-				manager.setDatabaseURL(m_dataBaseURL);
+				UserManagement manager(m_loginData);
 				assert(manager.checkConnection()); // Failed to connect
 
 				if (!pManager.canAccessProject(projectCollection))
@@ -689,9 +668,7 @@ void AppBase::welcomeScreenEventCallback(
 		}
 		else {
 
-			UserManagement manager;
-			manager.setAuthServerURL(m_authorizationServiceURL);
-			manager.setDatabaseURL(m_dataBaseURL);
+			UserManagement manager(m_loginData);
 			assert(manager.checkConnection()); // Failed to connect
 
 			uiAPI::promptDialog::show("Unable to access this project. The access permission might have been changed or the project has been deleted.", "Open Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
@@ -708,12 +685,10 @@ void AppBase::welcomeScreenEventCallback(
 		std::string selectedProjectName = m_welcomeScreen->getProjectName(_row).toStdString();
 		std::string newProjectName = _additionalInfo.toStdString();
 
-		pManager.copyProject(selectedProjectName, newProjectName, m_currentUser);
+		pManager.copyProject(selectedProjectName, newProjectName, m_loginData.getUserName());
 
 		// Now we add the copied project to the recently used projects list
-		UserManagement manager;
-		manager.setAuthServerURL(m_authorizationServiceURL);
-		manager.setDatabaseURL(m_dataBaseURL);
+		UserManagement manager(m_loginData);
 		assert(manager.checkConnection()); // Failed to connect
 		manager.addRecentProject(newProjectName);
 
@@ -761,9 +736,7 @@ void AppBase::welcomeScreenEventCallback(
 			pManager.renameProject(selectedProjectName, newProjectName);
 
 			// Now we add the copied project to the recently used projects list
-			UserManagement manager;
-			manager.setAuthServerURL(m_authorizationServiceURL);
-			manager.setDatabaseURL(m_dataBaseURL);
+			UserManagement manager(m_loginData);
 			assert(manager.checkConnection()); // Failed to connect
 			manager.addRecentProject(newProjectName);
 			manager.removeRecentProject(selectedProjectName);
@@ -817,9 +790,7 @@ void AppBase::welcomeScreenEventCallback(
 
 				pManager.deleteProject(selectedProjectName.toStdString());
 
-				UserManagement uManager;
-				uManager.setAuthServerURL(m_authorizationServiceURL);
-				uManager.setDatabaseURL(m_dataBaseURL);
+				UserManagement uManager(m_loginData);
 				bool checkConnection = uManager.checkConnection(); assert(checkConnection); // Connect and check
 				uManager.removeRecentProject(selectedProjectName.toStdString());
 				m_welcomeScreen->refreshList();
@@ -862,7 +833,7 @@ void AppBase::welcomeScreenEventCallback(
 		QString selectedProjectName = m_welcomeScreen->getProjectName(_row);
 
 		// Show the ManageAccess Dialog box
-		ManageAccess accessManager(m_authorizationServiceURL, selectedProjectName.toStdString());
+		ManageAccess accessManager(m_loginData.getAuthorizationUrl(), selectedProjectName.toStdString());
 
 		accessManager.showDialog();
 
@@ -913,9 +884,7 @@ void AppBase::welcomeScreenEventCallback(
 				std::string projectCollection = pManager.getProjectCollection(selectedProjectName);
 				std::string projectType       = pManager.getProjectType(selectedProjectName);
 
-				UserManagement manager;
-				manager.setAuthServerURL(m_authorizationServiceURL);
-				manager.setDatabaseURL(m_dataBaseURL);
+				UserManagement manager(m_loginData);
 				assert(manager.checkConnection()); // Failed to connect
 
 				if (!pManager.canAccessProject(projectCollection))
@@ -941,9 +910,7 @@ void AppBase::welcomeScreenEventCallback(
 		}
 		else {
 
-			UserManagement manager;
-			manager.setAuthServerURL(m_authorizationServiceURL);
-			manager.setDatabaseURL(m_dataBaseURL);
+			UserManagement manager(m_loginData);
 			assert(manager.checkConnection()); // Failed to connect
 
 			uiAPI::promptDialog::show("Unable to access this project. The access permission might have been changed or the project has been deleted.", "Open Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
@@ -961,9 +928,7 @@ void AppBase::welcomeScreenEventCallback(
 
 void AppBase::exportProjectWorker(std::string selectedProjectName, std::string exportFileName)
 {
-	ProjectManagement pManager;
-	pManager.setDataBaseURL(m_dataBaseURL);
-	pManager.setAuthServerURL(m_authorizationServiceURL);
+	ProjectManagement pManager(m_loginData);
 
 	assert(pManager.InitializeConnection()); // Failed to connect
 
@@ -1003,9 +968,7 @@ void AppBase::importProject(void)
 	{
 		// Now import the selected project from the file
 
-		ProjectManagement pManager;
-		pManager.setDataBaseURL(m_dataBaseURL);
-		pManager.setAuthServerURL(m_authorizationServiceURL);
+		ProjectManagement pManager(m_loginData);
 
 		assert(pManager.InitializeConnection()); // Failed to connect
 
@@ -1026,7 +989,7 @@ void AppBase::importProject(void)
 			} while (pManager.projectExists(projName, canBeDeleted));
 		}
 
-		std::thread workerThread(&AppBase::importProjectWorker, this, projName, m_currentUser, importFileName.toStdString());
+		std::thread workerThread(&AppBase::importProjectWorker, this, projName, m_loginData.getUserName(), importFileName.toStdString());
 		workerThread.detach();
 	}
 	else
@@ -1039,7 +1002,7 @@ void AppBase::manageGroups(void)
 {
 	lockUI(true);
 
-	ManageGroups groupManager(m_authorizationServiceURL);
+	ManageGroups groupManager(m_loginData.getAuthorizationUrl());
 
 	groupManager.showDialog();
 
@@ -1048,9 +1011,7 @@ void AppBase::manageGroups(void)
 
 void AppBase::importProjectWorker(std::string projectName, std::string currentUser, std::string importFileName)
 {
-	ProjectManagement pManager;
-	pManager.setDataBaseURL(m_dataBaseURL);
-	pManager.setAuthServerURL(m_authorizationServiceURL);
+	ProjectManagement pManager(m_loginData);
 
 	assert(pManager.InitializeConnection()); // Failed to connect
 
@@ -1071,9 +1032,7 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 	}
 	else
 	{
-		UserManagement manager;
-		manager.setAuthServerURL(m_authorizationServiceURL);
-		manager.setDatabaseURL(m_dataBaseURL);
+		UserManagement manager(m_loginData);
 		assert(manager.checkConnection()); // Failed to connect
 		manager.addRecentProject(projectName);
 
@@ -1213,8 +1172,8 @@ void AppBase::createUi(void) {
 				m_output->appendPlainText(BUILD_INFO);
 			}
 
-			m_welcomeScreen = new welcomeScreen(m_currentUser, m_dataBaseURL, m_authorizationServiceURL,
-				uiAPI::getIcon("OpenSlectedProject", "Default"), uiAPI::getIcon("CopyItem", "Default"), uiAPI::getIcon("RenameItem", "Default"), 
+			m_welcomeScreen = new welcomeScreen(uiAPI::getIcon("OpenSlectedProject", "Default"), uiAPI::getIcon("CopyItem", "Default"),
+				uiAPI::getIcon("RenameItem", "Default"), 
 				uiAPI::getIcon("Delete", "Default"), uiAPI::getIcon("Export", "Default"), uiAPI::getIcon("ManageAccess", "Default"), 
 				uiAPI::getIcon("ChangeOwner", "Default"), this);
 
@@ -1299,7 +1258,7 @@ void AppBase::createUi(void) {
 			m_viewerComponent = new ViewerComponent();
 			ViewerAPI::registerNotifier(m_viewerComponent);
 
-			m_viewerComponent->setDataBaseConnectionInformation(m_dataBaseURL, m_sessionUser, m_sessionPassword);
+			m_viewerComponent->setDataBaseConnectionInformation(m_loginData.getDatabaseUrl(), m_loginData.getSessionUser(), m_loginData.getSessionPassword());
 			
 			OT_LOG_D("Reading fonts");
 			QString fontPath = QCoreApplication::applicationDirPath();
@@ -1451,8 +1410,8 @@ ViewerUIDtype AppBase::createView(
 	dataBase->setSiteIDString(std::to_string(siteID));
 	dataBase->setProjectName(projectName);
 	
-	dataBase->setUserCredentials(AppBase::instance()->getSessionUserName(), AppBase::instance()->getSessionUserPassword());
-	bool success = dataBase->InitializeConnection(m_dataBaseURL, std::to_string(siteID));
+	dataBase->setUserCredentials(m_loginData.getSessionUser(), m_loginData.getSessionPassword());
+	bool success = dataBase->InitializeConnection(m_loginData.getDatabaseUrl(), std::to_string(siteID));
 
 	assert(success);
 
@@ -1475,46 +1434,24 @@ std::string AppBase::getCurrentVisualizationTab(void) {
 
 // Private functions
 
-void AppBase::setDataBaseURL(const std::string & _url) {
-	m_dataBaseURL = _url; 
-	OT_LOG_I("Database IP set: " + m_dataBaseURL);
-}
-
-void AppBase::setAuthorizationServiceURL(const std::string & _url) {
-	m_authorizationServiceURL = _url; 
-	OT_LOG_I("Authorization service IP set: " + m_authorizationServiceURL);
-}
-
-void AppBase::setUserNamePassword(const std::string & _userName, const std::string & _password, const std::string & _encryptedPassword, const std::string& _sessionUser, const std::string& _sessionPassword)
+void AppBase::startSessionRefreshTimer(void)
 {
-	m_userName = _userName;
-	m_userPassword = _password;
-	m_userEncryptedPassword = _encryptedPassword;
-
-	m_sessionUser = _sessionUser;
-	m_sessionPassword = _sessionPassword;
-
-	OT_LOG_I("Credentials set for user: " + _userName);
-}
-
-void AppBase::startSessionRefreshTimer(const std::string& _sessionName)
-{
-	std::thread workerThread(&AppBase::sessionRefreshTimer, this, _sessionName);
+	std::thread workerThread(&AppBase::sessionRefreshTimer, this, m_loginData.getSessionUser(), m_loginData.getAuthorizationUrl());
 	workerThread.detach();
 }
 
-void AppBase::sessionRefreshTimer(const std::string _sessionName)
+void AppBase::sessionRefreshTimer(const std::string _sessionUserName, const std::string _authorizationUrl)
 {
 	while (1)
 	{
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REFRESH_SESSION, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(_sessionName, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(_sessionUserName, doc.GetAllocator()), doc.GetAllocator());
 
 		std::string response;
-		m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, m_authorizationServiceURL, doc, response);
+		m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, _authorizationUrl, doc, response);
 
-		OT_LOG_I("Session refresh sent: " + _sessionName);
+		OT_LOG_I("Session refresh sent: " + _sessionUserName);
 
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(3600s);  // Wait for one hour
@@ -1534,11 +1471,6 @@ void AppBase::setServiceURL(const std::string & _url)
 void AppBase::setSessionServiceURL(const std::string & _url) {
 	m_sessionServiceURL = _url;
 	m_ExternalServicesComponent->setSessionServiceURL(m_sessionServiceURL);
-}
-
-void AppBase::setGlobalSessionServiceURL(const std::string & _url) {
-	m_globalSessionServiceURL = _url;
-	m_ExternalServicesComponent->setGlobalSessionServiceURL(m_globalSessionServiceURL);
 }
 
 void AppBase::SetCollectionName(const std::string _collectionName)
@@ -1580,9 +1512,7 @@ void AppBase::restoreSessionState(void) {
 		return;
 	}
 
-	UserManagement uM;
-	uM.setAuthServerURL(m_authorizationServiceURL);
-	uM.setDatabaseURL(m_dataBaseURL);
+	UserManagement uM(m_loginData);
 
 	std::string s = uM.restoreSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType);
 	if (s.empty()) return;
@@ -1599,9 +1529,7 @@ void AppBase::storeSessionState(void) {
 		return;
 	}
 
-	UserManagement uM;
-	uM.setAuthServerURL(m_authorizationServiceURL);
-	uM.setDatabaseURL(m_dataBaseURL);
+	UserManagement uM(m_loginData);
 
 	m_currentStateWindow.view = ot::WidgetViewManager::instance().saveState();
 	uM.storeSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType, m_currentStateWindow.view);
@@ -2095,9 +2023,6 @@ dialogResult AppBase::showPrompt(const QString _message, const QString & _title,
 		aWindow * window = uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
 		return uiAPI::promptDialog::show(_message, _title, _type, window);
 	}
-	else if (m_logInManager) {
-		return uiAPI::promptDialog::show(_message, _title, _type, m_logInManager->dialog());
-	}
 	else { return uiAPI::promptDialog::show(_message, _title, _type); }
 }
 
@@ -2105,9 +2030,6 @@ void AppBase::showInfoPrompt(const QString _message, const QString & _title) {
 	if (m_mainWindow != invalidUID) {
 		aWindow * window = uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
 		uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoInfo, c_promtIcoPath, window);
-	}
-	else if (m_logInManager) {
-		uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoInfo, c_promtIcoPath, m_logInManager->dialog());
 	}
 	else { uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoInfo, c_promtIcoPath); }
 }
@@ -2117,9 +2039,6 @@ void AppBase::showWarningPrompt(const QString _message, const QString & _title) 
 		aWindow * window = uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
 		uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoWarning, c_promtIcoPath, window);
 	}
-	else if (m_logInManager) {
-		uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoWarning, c_promtIcoPath, m_logInManager->dialog());
-	}
 	else { uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoWarning, c_promtIcoPath); }
 }
 
@@ -2127,9 +2046,6 @@ void AppBase::showErrorPrompt(const QString _message, const QString & _title) {
 	if (m_mainWindow != invalidUID) {
 		aWindow * window = uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
 		uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoError, c_promtIcoPath, window);
-	}
-	else if (m_logInManager) {
-		uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoError, c_promtIcoPath, m_logInManager->dialog());
 	}
 	else { uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoError, c_promtIcoPath); }
 }
@@ -2424,9 +2340,7 @@ void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
 	if (m_state & RestoringSettingsState) return;
 	if (!(m_state & LoggedInState)) return;
 
-	UserManagement uM;
-	uM.setAuthServerURL(m_authorizationServiceURL);
-	uM.setDatabaseURL(m_dataBaseURL);
+	UserManagement uM(m_loginData);
 
 	uM.storeSetting(STATE_NAME_COLORSTYLE, _style.colorStyleName());
 }
@@ -2483,12 +2397,3 @@ void AppBase::slotTreeItemFocused(QTreeWidgetItem* _item) {
 
 // Asynchronous callbacks
 
-void AppBase::logInSuccessfull(void) {
-#ifndef OT_USE_GSS
-	ot::startSessionServiceHealthCheck(m_sessionServiceURL);
-#endif
-}
-
-void AppBase::cancelLogIn(void) {
-	
-}

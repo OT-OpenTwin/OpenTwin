@@ -123,9 +123,6 @@
     <ClCompile Include="src\NavigationTreeView.cpp">
       <Filter>Source Files\WidgetView</Filter>
     </ClCompile>
-    <ClCompile Include="src\LogInManager.cpp">
-      <Filter>Source Files\CustomWidgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\ServiceDataUi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -133,6 +130,12 @@
       <Filter>Source Files\LogIn</Filter>
     </ClCompile>
     <ClCompile Include="src\LogInGSSEntry.cpp">
+      <Filter>Source Files\LogIn</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LoginData.cpp">
+      <Filter>Source Files\LogIn</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LogInGSSEditDialog.cpp">
       <Filter>Source Files\LogIn</Filter>
     </ClCompile>
   </ItemGroup>
@@ -185,6 +188,9 @@
     <ClInclude Include="include\LogInGSSEntry.h">
       <Filter>Header Files\LogIn</Filter>
     </ClInclude>
+    <ClInclude Include="include\LoginData.h">
+      <Filter>Header Files\LogIn</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\welcomeScreen.h">
@@ -220,10 +226,10 @@
     <QtMoc Include="include\SelectEntitiesDialog.h">
       <Filter>Header Files\CustomWidgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\LogInManager.h">
-      <Filter>Header Files\CustomWidgets</Filter>
-    </QtMoc>
     <QtMoc Include="include\LogInDialog.h">
+      <Filter>Header Files\LogIn</Filter>
+    </QtMoc>
+    <QtMoc Include="include\LogInGSSEditDialog.h">
       <Filter>Header Files\LogIn</Filter>
     </QtMoc>
   </ItemGroup>

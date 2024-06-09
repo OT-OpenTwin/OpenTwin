@@ -305,8 +305,8 @@ void ManageOwner::readUserList(void)
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USERS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
@@ -348,7 +348,7 @@ void ManageOwner::fillOwnerList(void)
 
 	// Fill the list (considering filter and show group members only flag)
 	AppBase * app{ AppBase::instance() };
-	bool currentUserIsOwner = (app->getCredentialUserName() == m_assetOwner);
+	bool currentUserIsOwner = (app->getCurrentLoginData().getUserName() == m_assetOwner);
 
 
 	std::string filterText = tolower(m_filterGroups->text().toStdString());
@@ -431,8 +431,8 @@ void ManageGroupOwner::slotGroupCheckBoxChanged(bool state, int row)
 	
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_GROUP_OWNER, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(m_assetName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_GROUP_OWNER_NEW_USER_USERNAME, ot::JsonString(newOwner, doc.GetAllocator()), doc.GetAllocator());
 
@@ -479,8 +479,8 @@ void ManageProjectOwner::slotGroupCheckBoxChanged(bool state, int row)
 	
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_PROJECT_OWNER, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(m_assetName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_NEW_PROJECT_OWNER, ot::JsonString(newOwner, doc.GetAllocator()), doc.GetAllocator());
 

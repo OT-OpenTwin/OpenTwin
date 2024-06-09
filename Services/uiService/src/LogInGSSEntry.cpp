@@ -25,3 +25,9 @@ LogInGSSEntry& LogInGSSEntry::operator = (const LogInGSSEntry& _other) {
 
 	return *this;
 }
+
+void LogInGSSEntry::clear(void) {
+	m_name.clear();
+	m_url.clear();
+	m_port.clear();
+}

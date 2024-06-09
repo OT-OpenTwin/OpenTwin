@@ -273,11 +273,11 @@ KeyboardCommandHandler* ExternalServicesComponent::addShortcut(ServiceDataUi* _s
 
 std::list<std::string> ExternalServicesComponent::GetAllUserProjects()
 {
-	std::string authorizationURL = AppBase::instance()->getAuthorizationServiceURL();
+	std::string authorizationURL = AppBase::instance()->getCurrentLoginData().getAuthorizationUrl();
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(AppBase::instance()->getCredentialUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(AppBase::instance()->getCredentialUserPasswordClear(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(AppBase::instance()->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(AppBase::instance()->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString("", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, 0, doc.GetAllocator());
 	std::string response;
@@ -784,7 +784,7 @@ bool ExternalServicesComponent::projectIsOpened(const std::string &projectName, 
 	AppBase * app{ AppBase::instance() };
 
 	std::string response;
-	sendHttpRequest(EXECUTE, m_globalSessionServiceURL, doc.toJson(), response);
+	sendHttpRequest(EXECUTE, app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), doc.toJson(), response);
 
 	// todo: add json return value containing true/false and username instead of empty string for more clarity
 	if (response.empty()) return false;
@@ -1025,9 +1025,9 @@ std::list<std::string> ExternalServicesComponent::getListOfProjectTypes(void)
 	ot::JsonDocument gssDoc;
 	gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CreateNewSession, gssDoc.GetAllocator()), gssDoc.GetAllocator());
 	gssDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, gssDoc.GetAllocator()), gssDoc.GetAllocator());
-	gssDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(app->getCurrentUserName(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
+	gssDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(app->getCurrentLoginData().getUserName(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
 
-	if (!sendHttpRequest(EXECUTE, m_globalSessionServiceURL, gssDoc.toJson(), response)) {
+	if (!sendHttpRequest(EXECUTE, app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), gssDoc.toJson(), response)) {
 		assert(0); // Failed to send
 		OT_LOG_E("Failed to send \"Create new session\" request to the global session service");
 		app->showErrorPrompt("Failed to send \"Create new session\" request to the global session service", "Error");
@@ -1054,8 +1054,8 @@ std::list<std::string> ExternalServicesComponent::getListOfProjectTypes(void)
 	sessionDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetListOfProjectTypes, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 	// Add user credentials
-	sessionDoc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCredentialUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
-	sessionDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+	sessionDoc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+	sessionDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 	response.clear();
 
@@ -1109,9 +1109,9 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		ot::JsonDocument gssDoc;
 		gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CreateNewSession, gssDoc.GetAllocator()), gssDoc.GetAllocator());
 		gssDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, gssDoc.GetAllocator()), gssDoc.GetAllocator());
-		gssDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(app->getCurrentUserName(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
+		gssDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(app->getCurrentLoginData().getUserName(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
 
-		if (!sendHttpRequest(EXECUTE, m_globalSessionServiceURL, gssDoc.toJson(), response)) {
+		if (!sendHttpRequest(EXECUTE, app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), gssDoc.toJson(), response)) {
 			assert(0); // Failed to send
 			OT_LOG_E("Failed to send \"Create new session\" request to the global session service");
 			app->showErrorPrompt("Failed to send \"Create new session\" request to the global session service", "Error");
@@ -1146,7 +1146,7 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		// Add project and user information
 		sessionDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(projectName, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
-		sessionDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(AppBase::instance()->getCurrentUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(AppBase::instance()->getCurrentLoginData().getUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_PARAM_SETTINGS_USERCOLLECTION, ot::JsonString(AppBase::instance()->getCurrentUserCollection(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 		// Add session information
@@ -1160,10 +1160,10 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		sessionDoc.AddMember(OT_ACTION_PARAM_START_RELAY, m_isRelayServiceRequired, sessionDoc.GetAllocator());
 
 		// Add user credentials
-		sessionDoc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCredentialUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
-		sessionDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(app->getCredentialUserPasswordClear(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
-		sessionDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(app->getSessionUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
-		sessionDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(app->getSessionUserPassword(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(app->getCurrentLoginData().getSessionUser(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(app->getCurrentLoginData().getSessionPassword(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 		response.clear();
 		if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, sessionDoc.toJson(), response)) {

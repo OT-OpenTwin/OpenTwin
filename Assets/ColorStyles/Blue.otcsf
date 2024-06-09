@@ -2083,21 +2083,6 @@ QAbstractView:selected {
 
 /* ##################################################################################### */
 
-#LogInDialog {
-    background: rgb(2, 41, 92);
-    border: 1px solid white;
-}
-
-#LogInDialog QLabel {
-    color: white;
-}
-
-#LogInDialogRegisterLabel:hover {
-    color: rgba(0,215,255,255);
-}
-
-/* ##################################################################################### */
-
 /* Property Grid */
 
 #ot_property_grid::item {
@@ -2141,7 +2126,24 @@ QAbstractView:selected {
 
 /* ##################################################################################### */
 
-/* Log In URL */
+/* Log In */
+
+#LogInDialog {
+    background: rgb(2, 41, 92);
+    border: 1px solid white;
+}
+
+#LogInDialog QLabel {
+    color: white;
+}
+
+#LogInDialogRegisterLabel:hover {
+    color: rgba(0,215,255,255);
+}
+
+#LogInDialogImageView {
+    background: rgb(2, 41, 92);
+}
 
 #LogInDialogSessionServiceUrl {
     border-radius: 0;

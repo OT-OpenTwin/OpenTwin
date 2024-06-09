@@ -55,9 +55,6 @@
 #define EDIT_PLACEHOLDER_ALL "[All projects] (Press Backspace to show recent projects)"
 
 welcomeScreen::welcomeScreen(
-	const std::string &			_username,
-	const std::string &			_databaseUrl,
-	const std::string &			_authUrl,
 	const QIcon &				_iconOpen,
 	const QIcon &				_iconCopy,
 	const QIcon &				_iconRename,
@@ -68,11 +65,10 @@ welcomeScreen::welcomeScreen(
 	AppBase *					_manager
 )
 	: ak::aWidget{ ak::otNone },
-	my_username{ _username }, my_iconCopy{ _iconCopy },  my_iconRename{ _iconRename }, my_iconDelete{ _iconDelete }, my_iconExport{ _iconExport }, 
+	my_iconCopy{ _iconCopy },  my_iconRename{ _iconRename }, my_iconDelete{ _iconDelete }, my_iconExport{ _iconExport }, 
 	my_iconAccess{ _iconAccess }, my_iconOpen{ _iconOpen }, my_iconOwner{ _iconOwner }, my_app{ _manager },
-	my_isShowingRecent{ false }, my_copyDialog{ nullptr }, my_renameDialog{ nullptr }, my_lockCount{ 0 }, my_authURL{_authUrl}, my_databaseUrl{_databaseUrl}
+	my_isShowingRecent{ false }, my_copyDialog{ nullptr }, my_renameDialog{ nullptr }, my_lockCount{ 0 }
 {
-	assert(my_username.length() != 0); // No username provided
 	assert(my_app != nullptr); // Nullptr provided
 
 	QOpenGLWidget* glDummy = new QOpenGLWidget;
@@ -169,16 +165,12 @@ welcomeScreen::welcomeScreen(
 	//my_comboRecentsMain.layout->addWidget(my_labelPlaceholder);
 	//my_comboRecentsMain.layout->addWidget(my_placeholderWidget);
 
-	my_projectManager = new ProjectManagement();
-	my_projectManager->setDataBaseURL(_databaseUrl);
-	my_projectManager->setAuthServerURL(_authUrl);
+	my_projectManager = new ProjectManagement(AppBase::instance()->getCurrentLoginData());
 
 	bool success = my_projectManager->InitializeConnection();
 	assert(success);	// Failed to create connection
 
-	my_userManager = new UserManagement();
-	my_userManager->setAuthServerURL(_authUrl);
-	my_userManager->setDatabaseURL(_databaseUrl);
+	my_userManager = new UserManagement(AppBase::instance()->getCurrentLoginData());
 	success = my_userManager->checkConnection();		
 	assert(success);	// Failed to create connection
 
@@ -217,7 +209,7 @@ void welcomeScreen::refreshRecent(void) {
 	my_tableOpenNew->Clear();
 
 	AppBase * app{ AppBase::instance() };
-	std::string currentUser = app->getCredentialUserName();
+	std::string currentUser = app->getCurrentLoginData().getUserName();
 
 	for (auto itm : recent) {
 		std::array<QTableWidgetItem *, TABLE_DATA_COLUMN_COUNT> entry;
@@ -269,7 +261,7 @@ void welcomeScreen::refreshProjectNames(void) {
 	my_projectManager->findProjectNames(my_editProjectName->text().toStdString(), 100, result, resultExceeded);
 
 	AppBase * app{ AppBase::instance() };
-	std::string currentUser = app->getCredentialUserName();
+	std::string currentUser = app->getCurrentLoginData().getUserName();
 
 	for (auto itm : result) {
 		std::array<QTableWidgetItem *, TABLE_DATA_COLUMN_COUNT> entry;
@@ -385,7 +377,7 @@ void welcomeScreen::slotDataTableCellClicked(QTableWidgetItem * _item) {
 	lock(true);
 
 	AppBase * app{ AppBase::instance() };
-	std::string currentUser = app->getCredentialUserName();
+	std::string currentUser = app->getCurrentLoginData().getUserName();
 	std::string owner = my_tableOpenNew->item(_item->row(), TABLE_DATA_INDEX_AUTHOR)->text().toStdString();
 
 	bool userIsOwner = (owner == currentUser);
@@ -424,7 +416,7 @@ void welcomeScreen::slotDataTableCellClicked(QTableWidgetItem * _item) {
 		if (userIsOwner)
 		{
 			std::string projectName = my_tableOpenNew->projectName(_item->row()).toStdString();
-			ManageProjectOwner ownerManager(my_authURL, projectName, currentUser);
+			ManageProjectOwner ownerManager(AppBase::instance()->getCurrentLoginData().getAuthorizationUrl(), projectName, currentUser);
 
 			ownerManager.showDialog();
 
@@ -441,9 +433,7 @@ void welcomeScreen::slotDataTableCellClicked(QTableWidgetItem * _item) {
 				}
 
 				// Remove the project from the recent project list
-				UserManagement uManager;
-				uManager.setAuthServerURL(my_authURL);
-				uManager.setDatabaseURL(my_databaseUrl);
+				UserManagement uManager(AppBase::instance()->getCurrentLoginData());
 				bool checkConnection = uManager.checkConnection(); assert(checkConnection); // Connect and check
 				uManager.removeRecentProject(projectName);
 			}

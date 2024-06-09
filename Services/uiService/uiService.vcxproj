@@ -33,12 +33,13 @@
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
     <ClCompile Include="src\FileHandler.cpp" />
+    <ClCompile Include="src\LoginData.cpp" />
     <ClCompile Include="src\LogInDialog.cpp" />
+    <ClCompile Include="src\LogInGSSEditDialog.cpp" />
     <ClCompile Include="src\LogInGSSEntry.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ExternalServicesComponent.cpp" />
     <ClCompile Include="src\ControlsManager.cpp" />
-    <ClCompile Include="src\LogInManager.cpp" />
     <ClCompile Include="src\ManageAccess.cpp" />
     <ClCompile Include="src\ManageGroups.cpp" />
     <ClCompile Include="src\ManageOwner.cpp" />
@@ -64,13 +65,14 @@
     <QtMoc Include="include\WebsocketClient.h" />
     <ClInclude Include="include\ControlsManager.h" />
     <QtMoc Include="include\ShortcutManager.h" />
-    <QtMoc Include="include\LogInManager.h" />
     <QtMoc Include="include\ManageGroups.h" />
     <QtMoc Include="include\ManageAccess.h" />
     <QtMoc Include="include\ManageOwner.h" />
     <QtMoc Include="include\DevLogger.h" />
     <ClInclude Include="include\FileHandler.h" />
     <QtMoc Include="include\LogInDialog.h" />
+    <ClInclude Include="include\LoginData.h" />
+    <QtMoc Include="include\LogInGSSEditDialog.h" />
     <ClInclude Include="include\LogInGSSEntry.h" />
     <ClInclude Include="include\NavigationTreeView.h" />
     <ClInclude Include="include\QtMetaTypes.h" />

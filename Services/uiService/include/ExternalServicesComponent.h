@@ -70,8 +70,6 @@ public:
 
 	// Getter
 
-	const std::string & gloablSessionServiceURL(void) const { return m_globalSessionServiceURL; }
-
 	const std::string & sessionServiceURL(void) const { return m_sessionServiceURL; }
 
 	const std::string & uiServiceURL(void) const { return m_uiServiceURL; }
@@ -83,8 +81,6 @@ public:
 	// ###################################################################################################
 
 	// Configuration
-
-	void setGlobalSessionServiceURL(const std::string& _url) { m_globalSessionServiceURL = _url; }
 
 	void setSessionServiceURL(const std::string& _url) { m_sessionServiceURL = _url; }
 
@@ -370,7 +366,6 @@ private:
 
 	// #################################################################
 
-	std::string										m_globalSessionServiceURL;
 	std::string										m_sessionServiceURL;
 	std::string										m_uiServiceURL;
 	std::string										m_currentSessionID;
