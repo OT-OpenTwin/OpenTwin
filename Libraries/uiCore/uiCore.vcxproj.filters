@@ -102,9 +102,6 @@
     <ClCompile Include="src\akCore\rJSON.cpp">
       <Filter>Source Files\ak\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\akDialogs\aLogInDialog.cpp">
-      <Filter>Source Files\ak\Dialogs</Filter>
-    </ClCompile>
     <ClCompile Include="src\akDialogs\aPromptDialog.cpp">
       <Filter>Source Files\ak\Dialogs</Filter>
     </ClCompile>
@@ -376,9 +373,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\akDialogs\aLogInDialog.h">
-      <Filter>Header Files\ak\Dialogs</Filter>
-    </QtMoc>
     <QtMoc Include="include\akDialogs\aPromptDialog.h">
       <Filter>Header Files\ak\Dialogs</Filter>
     </QtMoc>

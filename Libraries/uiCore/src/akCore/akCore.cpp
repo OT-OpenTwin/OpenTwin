@@ -218,7 +218,6 @@ QString ak::toQString(
 	case otLabel: return QString("Label");
 	case otLineEdit: return QString("LineEdit");
 	case otList: return QString("List");
-	case otLogInDialog: return QString("LogInDialog");
 	case otMainWindow: return QString("Window");
 	case otNiceLineEdit: return QString("NiceLineEdit");
 	case otOptionsDialog: return QString("OptionsDialog");

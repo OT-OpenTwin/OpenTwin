@@ -154,19 +154,6 @@ namespace ak {
 			const QString &											_initialText = QString("")
 		);
 
-		//! @brief Will create a log in dialog and return its UID
-		//! @param _creatorUid The UID of the creator
-		//! @param _showSavePassword if true the save password checkbox will be displayed
-		//! @param _username The initial username
-		//! @param _password The initial password
-		UID createLogInDialog(
-			UID												_creatorUid,
-			bool												_showSavePassword,
-			const QPixmap &										_backgroundImage,
-			const QString &										_username = QString(),
-			const QString &										_password = QString()
-		);
-
 		//! @brief Will create a nice line edit
 		//! @param _initialText The initial text of the edit field
 		//! @param _infoLabelText The initial text of the information label

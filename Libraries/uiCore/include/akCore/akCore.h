@@ -200,7 +200,6 @@ namespace ak {
 		otLabel,
 		otLineEdit,
 		otList,
-		otLogInDialog,
 		otMainWindow,
 		otMenu,
 		otNiceLineEdit,

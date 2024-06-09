@@ -22,9 +22,6 @@
 #include <akGui/aGlobalKeyListener.h>
 #include <akGui/aToolButtonCustomContextMenu.h>
 
-// AK dialogs header
-#include <akDialogs/aLogInDialog.h>
-
 // AK Widgets header
 #include <akWidgets/aCheckBoxWidget.h>
 #include <akWidgets/aColorEditButtonWidget.h>
@@ -287,18 +284,6 @@ ak::UID ak::aSignalLinker::addLink(
 	_object->connect(_object, &aLineEditWidget::editingFinished, this, &aSignalLinker::slotEditingFinished);
 	_object->connect(_object, &aLineEditWidget::keyPressed, this, &aSignalLinker::slotKeyPressed);
 	_object->connect(_object, &aLineEditWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aLogInDialog *										_object,
-	UID													_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otLogInDialog });
-	_object->connect(_object, &aLogInDialog::logInRequested, this, &aSignalLinker::slotClicked);
 	return _objectUid;
 }
 

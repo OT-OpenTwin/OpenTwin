@@ -32,7 +32,6 @@
 #include <akWidgets/aTextEditWidget.h>
 #include <akWidgets/aTreeWidget.h>
 #include <akCore/rJSON.h>
-#include <akDialogs/aLogInDialog.h>
 
 // ADS header
 #include <ads/DockManager.h>

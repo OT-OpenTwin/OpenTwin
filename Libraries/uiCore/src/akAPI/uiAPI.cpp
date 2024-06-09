@@ -24,7 +24,6 @@
 #include <akCore/aUidMangager.h>
 
 // AK dialogs
-#include <akDialogs/aLogInDialog.h>
 #include <akDialogs/aOptionsDialog.h>
 #include <akDialogs/aPromptDialog.h>
 
@@ -419,17 +418,6 @@ ak::UID ak::uiAPI::createLineEdit(
 ) {
 	assert(m_objManager != nullptr); // API not initialized
 	return m_objManager->createLineEdit(_creatorUid, _initialText);
-}
-
-ak::UID ak::uiAPI::createLogInDialog(
-	UID												_creatorUid,
-	bool												_showSavePassword,
-	const QString &										_imageName,
-	const QString &										_username,
-	const QString &										_password
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createLogInDialog(_creatorUid, _showSavePassword, ot::IconManager::getPixmap("Images/" + _imageName + ".png"), _username, _password);
 }
 
 ak::UID ak::uiAPI::createNiceLineEdit(
@@ -995,71 +983,6 @@ bool ak::uiAPI::lineEdit::isEnabled(
 
 // ###############################################################################################################################################
 
-// Log in dialog
-
-ak::dialogResult ak::uiAPI::logInDialog::showDialog(
-	UID												_dialogUID
-) { return object::get<aLogInDialog>(_dialogUID)->showDialog(); }
-
-void ak::uiAPI::logInDialog::close(
-	UID												_dialogUID,
-	dialogResult									_result
-) { object::get<aLogInDialog>(_dialogUID)->Close(_result); }
-
-QString ak::uiAPI::logInDialog::getUsername(
-	UID												_dialogUID
-) { return object::get<aLogInDialog>(_dialogUID)->username(); }
-
-QString ak::uiAPI::logInDialog::getPassword(
-	UID												_dialogUID
-) { return object::get<aLogInDialog>(_dialogUID)->password(); }
-
-bool ak::uiAPI::logInDialog::getSavePassword(
-	UID												_dialogUID
-) { return object::get<aLogInDialog>(_dialogUID)->savePassword(); }
-
-void ak::uiAPI::logInDialog::showToolTipAtUsername(
-	UID												_dialogUID,
-	const QString &										_text
-) { object::get<aLogInDialog>(_dialogUID)->showToolTipAtUsername(_text); }
-
-void ak::uiAPI::logInDialog::showToolTipAtPassword(
-	UID												_dialogUID,
-	const QString &										_text
-) { object::get<aLogInDialog>(_dialogUID)->showToolTipAtPassword(_text); }
-
-void ak::uiAPI::logInDialog::showToolTipAtCustomField(
-	UID												_dialogUID,
-	ID												_inputID,
-	const QString &										_text
-) { object::get<aLogInDialog>(_dialogUID)->showToolTipAtCustomInput(_inputID, _text); }
-
-ak::ID ak::uiAPI::logInDialog::addCustomInputField(
-	UID												_dialogUID,
-	const QString &										_labelText,
-	const QString &										_inputFieldInitialText
-) { return object::get<aLogInDialog>(_dialogUID)->addCustomInput(_labelText, _inputFieldInitialText); }
-
-QString ak::uiAPI::logInDialog::getCustomFieldText(
-	UID												_dialogUID,
-	ID												_fieldID
-) { return object::get<aLogInDialog>(_dialogUID)->customInputText(_fieldID); }
-
-void ak::uiAPI::logInDialog::move(
-	UID												_dialogUID,
-	int												_x,
-	int												_y
-) {	move(_dialogUID, QPoint(_x, _y)); }
-
-void ak::uiAPI::logInDialog::move(
-	UID												_dialogUID,
-	const QPoint&									_pos
-) { return object::get<aLogInDialog>(_dialogUID)->move(_pos); }
-
-// Log in dialog
-
-// ###############################################################################################################################################
-
 // Nice line edit
 
 void ak::uiAPI::niceLineEdit::setText(
@@ -1163,7 +1086,6 @@ void ak::uiAPI::object::setEnabled(
 	case otLabel: akCastObject<aLabelWidget>(obj)->setEnabled(_enabled); return;
 	case otLineEdit: akCastObject<aLineEditWidget>(obj)->setEnabled(_enabled); return;
 	case otList: akCastObject<aListWidget>(obj)->setEnabled(_enabled); return;
-	case otLogInDialog: akCastObject<aLogInDialog>(obj)->setEnabled(_enabled); return;
 	case otNiceLineEdit: akCastObject<aNiceLineEditWidget>(obj)->setEnabled(_enabled); return;
 	case otOptionsDialog: akCastObject<aOptionsDialog>(obj)->setEnabled(_enabled); return;
 	case otPrompt: akCastObject<aPromptDialog>(obj)->setEnabled(_enabled); return;
@@ -1200,7 +1122,6 @@ bool ak::uiAPI::object::getIsEnabled(
 	case otLabel: return akCastObject<aLabelWidget>(obj)->isEnabled();
 	case otLineEdit: return akCastObject<aLineEditWidget>(obj)->isEnabled();
 	case otList: return akCastObject<aListWidget>(obj)->isEnabled();
-	case otLogInDialog: return akCastObject<aLogInDialog>(obj)->isEnabled();
 	case otNiceLineEdit: return akCastObject<aNiceLineEditWidget>(obj)->isEnabled();
 	case otOptionsDialog: return akCastObject<aOptionsDialog>(obj)->isEnabled();
 	case otPrompt: return akCastObject<aPromptDialog>(obj)->isEnabled();

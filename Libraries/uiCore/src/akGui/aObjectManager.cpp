@@ -23,7 +23,6 @@
 #include <akCore/aUidMangager.h>
 
 // AK Dialogs
-#include <akDialogs/aLogInDialog.h>
 #include <akDialogs/aOptionsDialog.h>
 #include <akDialogs/aPromptDialog.h>
 
@@ -268,24 +267,6 @@ ak::UID ak::aObjectManager::createLineEdit(
 	aLineEditWidget * obj = new aLineEditWidget(_initialText);
 	// Connect to signal linker
 	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createLogInDialog(
-	UID												_creatorUid,
-	bool												_showSavePassword,
-	const QPixmap &										_backgroundImage,
-	const QString &										_username,
-	const QString &										_password
-) {
-	// Create object
-	aLogInDialog * obj = new aLogInDialog(_showSavePassword, _backgroundImage, _username, _password);
-	// Connect to signal linker
-	m_signalLinker->addLink(obj);
-
 	// Store data
 	m_mapObjects.insert_or_assign(obj->uid(), obj);
 	addCreatedUid(_creatorUid, obj->uid());

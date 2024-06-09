@@ -400,19 +400,6 @@ namespace ak {
 			const QString &						_initialText = QString("")
 		);
 
-		//! @brief Will create a log in dialog and return its UID
-		//! @param _creatorUid The UID of the creator
-		//! @param _showSavePassword if true the save password checkbox will be displayed
-		//! @param _username The initial username
-		//! @param _password The initial password
-		UICORE_API_EXPORT UID createLogInDialog(
-			UID									_creatorUid,
-			bool								_showSavePassword,
-			const QString &						_imageName,
-			const QString &						_username = QString(),
-			const QString &						_password = QString()
-		);
-
 		//! @brief Will create a nice line edit
 		//! @param _initialText The initial text of the edit field
 		//! @param _infoLabelText The initial text of the information label
@@ -966,77 +953,6 @@ namespace ak {
 				UID													_lineEditUid
 			);
 		}
-
-		// ###############################################################################################################################################
-
-		// Log in dialog
-
-		namespace logInDialog {
-
-			UICORE_API_EXPORT dialogResult showDialog(
-				UID												_dialogUID
-			);
-
-			UICORE_API_EXPORT void close(
-				UID												_dialogUID,
-				dialogResult									_result = resultNone
-			);
-
-			UICORE_API_EXPORT QString getUsername(
-				UID												_dialogUID
-			);
-
-			UICORE_API_EXPORT QString getPassword(
-				UID												_dialogUID
-			);
-
-			UICORE_API_EXPORT bool getSavePassword(
-				UID												_dialogUID
-			);
-
-			//! @brief Will display a invalid log in popup message at this dialogs username input
-			//! @param _text The text to set as a tooltip
-			UICORE_API_EXPORT void showToolTipAtUsername(
-				UID												_dialogUID,
-				const QString &										_text
-			);
-
-			//! @brief Will display a invalid log in popup message at this dialogs password input
-			//! @param _text The text to set as a tooltip
-			UICORE_API_EXPORT void showToolTipAtPassword(
-				UID												_dialogUID,
-				const QString &										_text
-			);
-
-			UICORE_API_EXPORT void showToolTipAtCustomField(
-				UID												_dialogUID,
-				ID												_inputID,
-				const QString &										_text
-			);
-
-			UICORE_API_EXPORT ID addCustomInputField(
-				UID												_dialogUID,
-				const QString &										_labelText,
-				const QString &										_inputFieldInitialText = QString("")
-			);
-
-			UICORE_API_EXPORT QString getCustomFieldText(
-				UID												_dialogUID,
-				ID												_fieldID
-			);
-
-			UICORE_API_EXPORT void move(
-				UID												_dialogUID,
-				int												_x,
-				int												_y
-			);
-
-			UICORE_API_EXPORT void move(
-				UID												_dialogUID,
-				const QPoint&									_pos
-			);
-
-		} // namespace logInDialog
 
 		// ###############################################################################################################################################
 

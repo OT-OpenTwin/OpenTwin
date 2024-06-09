@@ -218,7 +218,6 @@
     <ClCompile Include="src\akCore\aUidManager.cpp" />
     <ClCompile Include="src\akCore\rJSON.cpp" />
     <ClCompile Include="src\akDialogs\aCustomizableInputDialog.cpp" />
-    <ClCompile Include="src\akDialogs\aLogInDialog.cpp" />
     <ClCompile Include="src\akDialogs\aOptionsDialog.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">input</DynamicSource>
@@ -355,7 +354,6 @@
     <QtMoc Include="include\akGui\aSignalLinker.h" />
     <QtMoc Include="include\akGui\aAction.h" />
     <QtMoc Include="include\akDialogs\aPromptDialog.h" />
-    <QtMoc Include="include\akDialogs\aLogInDialog.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
