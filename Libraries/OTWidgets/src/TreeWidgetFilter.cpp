@@ -4,15 +4,18 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTWidgets/TreeWidgetFilter.h"
-#include "OTWidgets/TreeWidget.h"
+#include "OTCore/Logger.h"
 #include "OTWidgets/LineEdit.h"
+#include "OTWidgets/TreeWidget.h"
+#include "OTWidgets/TreeWidgetItem.h"
+#include "OTWidgets/TreeWidgetFilter.h"
 
 // Qt header
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qlayout.h>
 
-ot::TreeWidgetFilter::TreeWidgetFilter(ot::TreeWidget* _tree, int _filterColumn) : m_tree(_tree), m_filterColumn(_filterColumn) {
+ot::TreeWidgetFilter::TreeWidgetFilter(ot::TreeWidget* _tree, int _filterColumn) 
+	: m_tree(_tree), m_filterColumn(_filterColumn) {
 	m_layoutW = new QWidget;
 	m_layoutW->setObjectName("OT_W_TreeWidgetFilterTemplateLayoutW");
 	//m_layoutW->setContentsMargins(0, 0, 0, 0);
@@ -89,13 +92,24 @@ void ot::TreeWidgetFilter::dispatchFilter(const QString& _text) {
 }
 
 void ot::TreeWidgetFilter::setAllVisible(QTreeWidgetItem* _item) {
+	OTAssertNullptr(_item);
+	TreeWidgetItem* treeItem = dynamic_cast<TreeWidgetItem*>(_item);
+	if (treeItem) {
+		if (treeItem->flags() & NavigationTreeItemFlag::ItemIsInvisible) return;
+	}
 	for (int i = 0; i < _item->childCount(); i++) {
-		setAllVisible(_item->child(i));
+		this->setAllVisible(_item->child(i));
 	}
 	_item->setHidden(false);
 }
 
 bool ot::TreeWidgetFilter::filterChilds(QTreeWidgetItem* _item, const QString& _filter) {
+	OTAssertNullptr(_item);
+	TreeWidgetItem* treeItem = dynamic_cast<TreeWidgetItem*>(_item);
+	if (treeItem) {
+		if (treeItem->flags() & NavigationTreeItemFlag::ItemIsInvisible) return false;
+	}
+
 	bool vis = false;
 	
 	for (int i = 0; i < _item->childCount(); i++) {

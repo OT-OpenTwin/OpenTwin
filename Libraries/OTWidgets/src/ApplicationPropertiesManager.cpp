@@ -61,6 +61,14 @@ void ot::ApplicationPropertiesManager::add(const std::string& _owner, const Prop
 
 // Private
 
+void ot::ApplicationPropertiesManager::slotPropertyChanged(const std::string& _groupPath, const std::string& _propertyName) {
+	Q_EMIT propertyChanged(_groupPath, _propertyName);
+}
+
+void ot::ApplicationPropertiesManager::slotPropertyDeleteRequested(const std::string& _groupPath, const std::string& _propertyName) {
+	Q_EMIT propertyDeleteRequested(_groupPath, _propertyName);
+}
+
 ot::PropertyGridCfg& ot::ApplicationPropertiesManager::findOrCreateData(const std::string& _owner) {
 	auto it = m_data.find(_owner);
 	if (it == m_data.end()) {

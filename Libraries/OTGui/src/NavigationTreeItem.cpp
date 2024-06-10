@@ -19,6 +19,7 @@ std::string ot::toString(NavigationTreeItemFlag _flag) {
 	case ot::NavigationTreeItemFlag::RemoveItemWhenEmpty: return "RemoveItemWhenEmpty";
 	case ot::NavigationTreeItemFlag::ItemMayBeAdded: return "ItemMayBeAdded";
 	case ot::NavigationTreeItemFlag::ItemIsSelected: return "ItemIsSelected";
+	case ot::NavigationTreeItemFlag::ItemIsInvisible: return "ItemIsInvisible";
 	default:
 		OT_LOG_EA("Unknown navigation tree item flag");
 		return "<null>";
@@ -30,6 +31,7 @@ std::list<std::string> ot::toStringList(NavigationTreeItemFlags _flags) {
 	if (_flags & ot::RemoveItemWhenEmpty) ret.push_back(toString(ot::RemoveItemWhenEmpty));
 	if (_flags & ot::ItemMayBeAdded) ret.push_back(toString(ot::ItemMayBeAdded));
 	if (_flags & ot::ItemIsSelected) ret.push_back(toString(ot::ItemIsSelected));
+	if (_flags & ot::ItemIsInvisible) ret.push_back(toString(ot::ItemIsInvisible));
 
 	return ret;
 }
@@ -38,6 +40,7 @@ ot::NavigationTreeItemFlag ot::stringToNavigationItemFlag(const std::string& _fl
 	if (_flag == ot::toString(NavigationTreeItemFlag::RemoveItemWhenEmpty)) return NavigationTreeItemFlag::RemoveItemWhenEmpty;
 	else if (_flag == ot::toString(NavigationTreeItemFlag::ItemMayBeAdded)) return NavigationTreeItemFlag::ItemMayBeAdded;
 	else if (_flag == ot::toString(NavigationTreeItemFlag::ItemIsSelected)) return NavigationTreeItemFlag::ItemIsSelected;
+	else if (_flag == ot::toString(NavigationTreeItemFlag::ItemIsInvisible)) return NavigationTreeItemFlag::ItemIsInvisible;
 	else {
 		OT_LOG_EA("Unknown navigation tree item flag");
 		return NoNavigationTreeItemFlags;

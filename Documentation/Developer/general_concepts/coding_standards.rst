@@ -293,7 +293,21 @@ Always compile your code locally (run at least a build all) and check for warnin
 Includes
 --------
 
-For own and OpenTwin header use the quotation marks `"` for includes.
+Only include what you really need to include.
+If a pointer is needed in a header file use a forward declaration instead of an include.
+Adding more includes than needed will lead to increased compile times.
+
+.. code:: c++
+
+    #include <MyClass.h> // Wrong, a forward declaration is sufficient.
+
+    class MyClass;
+
+    class foo {
+        MyClass* m_obj;
+    };
+
+For own and OpenTwin header files use the quotation marks `"` for includes.
 For others (e.g. std header) use the angle brackets.
 
 .. code:: c++

@@ -8,7 +8,7 @@
 #include "OTWidgets/MessageDialog.h"
 
 ot::MessageDialogCfg::BasicButton ot::MessageDialog::showDialog(const MessageDialogCfg& _config, QWidget* _parent) {
-	QMessageBox msg(convertIcon(_config.icon()), QString::fromStdString(_config.title()), QString::fromStdString(_config.text()), convertButtons(_config.buttons()), _parent);
+	QMessageBox msg(convertIcon(_config.icon()), QString::fromStdString(_config.getTitle()), QString::fromStdString(_config.text()), convertButtons(_config.buttons()), _parent);
 	
 	QMessageBox::StandardButton btn = (QMessageBox::StandardButton)msg.exec();
 	

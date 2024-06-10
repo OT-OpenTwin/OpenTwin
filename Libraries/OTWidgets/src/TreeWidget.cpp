@@ -41,7 +41,7 @@ bool ot::TreeWidget::itemTextExists(const QString& _itemText) const {
 	return false;
 }
 
-QString ot::TreeWidget::itemPath(QTreeWidgetItem* _item, char _delimiter) const {
+QString ot::TreeWidget::getItemPath(QTreeWidgetItem* _item, char _delimiter) const {
 	QString pth;
 	QTreeWidgetItem* itm = _item;
 	while (itm && itm != this->invisibleRootItem()) {

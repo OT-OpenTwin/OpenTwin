@@ -52,7 +52,7 @@ namespace ot {
 		//! \param _itemText Text to check.
 		bool itemTextExists(const QString& _itemText) const;
 
-		QString itemPath(QTreeWidgetItem* _item, char _delimiter = '/') const;
+		QString getItemPath(QTreeWidgetItem* _item, char _delimiter = '/') const;
 
 		QTreeWidgetItem* addItem(const TreeWidgetItemInfo& _item);
 

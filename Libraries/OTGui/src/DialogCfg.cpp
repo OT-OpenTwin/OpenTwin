@@ -49,6 +49,22 @@ ot::DialogCfg::DialogCfg(const std::string& _title, DialogFlags _flags)
 	: m_flags(_flags), m_title(_title), m_minSize(-1, -1), m_maxSize(-1, -1)
 {}
 
+ot::DialogCfg::DialogCfg(const DialogCfg& _other) {
+	*this = _other;
+}
+
+ot::DialogCfg& ot::DialogCfg::operator = (const DialogCfg& _other) {
+	if (this == &_other) return *this;
+
+	m_name = _other.m_name;
+	m_title = _other.m_title;
+	m_flags = _other.m_flags;
+	m_minSize = _other.m_minSize;
+	m_maxSize = _other.m_maxSize;
+
+	return *this;
+}
+
 void ot::DialogCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);

@@ -13,14 +13,14 @@ ot::Dialog::Dialog(QWidget* _parent)
 }
 
 ot::Dialog::Dialog(const DialogCfg& _config, QWidget* _parent) 
-	: QDialog(_parent), m_flags(_config.flags()), m_dialogName(_config.name()), m_result(DialogResult::Cancel)
+	: QDialog(_parent), m_flags(_config.getFlags()), m_dialogName(_config.getName()), m_result(DialogResult::Cancel)
 {
 	this->setWindowFlags(this->windowFlags() & (~Qt::WindowContextHelpButtonHint));
-	this->setWindowTitle(QString::fromStdString(_config.title()));
-	if (_config.minSize().width() >= 0) { this->setMinimumWidth(_config.minSize().width()); };
-	if (_config.minSize().height() >= 0) { this->setMinimumHeight(_config.minSize().height()); };
-	if (_config.maxSize().width() >= 0) { this->setMaximumWidth(_config.maxSize().width()); };
-	if (_config.maxSize().height() >= 0) { this->setMaximumHeight(_config.maxSize().height()); };
+	this->setWindowTitle(QString::fromStdString(_config.getTitle()));
+	if (_config.getMinSize().width() >= 0) { this->setMinimumWidth(_config.getMinSize().width()); };
+	if (_config.getMinSize().height() >= 0) { this->setMinimumHeight(_config.getMinSize().height()); };
+	if (_config.getMaxSize().width() >= 0) { this->setMaximumWidth(_config.getMaxSize().width()); };
+	if (_config.getMaxSize().height() >= 0) { this->setMaximumHeight(_config.getMaxSize().height()); };
 }
 
 ot::Dialog::~Dialog() {}

@@ -20,7 +20,6 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT DialogCfg : public Serializable {
-		OT_DECL_NOCOPY(DialogCfg)
 	public:
 		enum DialogFlag {
 			NoFlags          = 0x00, //! @brief No dialog flags
@@ -35,7 +34,10 @@ namespace ot {
 
 		DialogCfg(DialogFlags _flags = DialogFlags(NoFlags));
 		DialogCfg(const std::string& _title, DialogFlags _flags = DialogFlags(NoFlags));
+		DialogCfg(const DialogCfg& _other);
 		virtual ~DialogCfg() {};
+
+		DialogCfg& operator = (const DialogCfg& _other);
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
@@ -48,22 +50,22 @@ namespace ot {
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& name(void) const { return m_name; };
+		const std::string& getName(void) const { return m_name; };
 
 		void setTitle(const std::string& _title) { m_title = _title; };
-		const std::string title(void) const { return m_title; };
+		const std::string& getTitle(void) const { return m_title; };
 
 		void setFlag(DialogFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
 		void setFlags(DialogFlags _flags) { m_flags = _flags; };
-		DialogFlags flags(void) const { return m_flags; };
+		DialogFlags getFlags(void) const { return m_flags; };
 
 		void setMinSize(int _width, int _height) { this->setMinSize(ot::Size2D(_width, _height)); };
 		void setMinSize(const ot::Size2D& _size) { m_minSize = _size; };
-		const ot::Size2D& minSize(void) const { return m_minSize; };
+		const ot::Size2D& getMinSize(void) const { return m_minSize; };
 
 		void setMaxSize(int _width, int _height) { this->setMaxSize(ot::Size2D(_width, _height)); };
 		void setMaxSize(const ot::Size2D& _size) { m_maxSize = _size; };
-		const ot::Size2D& maxSize(void) const { return m_maxSize; };
+		const ot::Size2D& getMaxSize(void) const { return m_maxSize; };
 
 	private:
 		std::string m_name;

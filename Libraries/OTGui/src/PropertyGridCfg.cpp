@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyGridCfg.h"
 
@@ -21,6 +22,8 @@ ot::PropertyGridCfg::~PropertyGridCfg() {
 }
 
 ot::PropertyGridCfg& ot::PropertyGridCfg::operator = (const PropertyGridCfg& _other) {
+	if (this == &_other) return *this;
+
 	m_defaultGroup->clear();
 	this->clear();
 
@@ -81,6 +84,13 @@ void ot::PropertyGridCfg::mergeWith(const PropertyGridCfg& _other, bool _replace
 			m_rootGroups.push_back(new PropertyGroup(*group));
 		}
 	}
+}
+
+void ot::PropertyGridCfg::setDefaultGroup(PropertyGroup* _group) {
+	OTAssertNullptr(_group);
+	if (_group == m_defaultGroup) return;
+	if (m_defaultGroup) delete m_defaultGroup;
+	m_defaultGroup = _group;
 }
 
 void ot::PropertyGridCfg::setRootGroups(const std::list<PropertyGroup*>& _groups) {

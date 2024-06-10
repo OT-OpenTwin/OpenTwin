@@ -18,10 +18,12 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyDialogCfg : public DialogCfg {
-		OT_DECL_NOCOPY(PropertyDialogCfg)
 	public:
 		PropertyDialogCfg();
+		PropertyDialogCfg(const PropertyDialogCfg& _other);
 		virtual ~PropertyDialogCfg();
+
+		PropertyDialogCfg& operator = (const PropertyDialogCfg& _other);
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference

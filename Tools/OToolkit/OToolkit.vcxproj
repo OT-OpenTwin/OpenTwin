@@ -44,6 +44,7 @@
     <ClCompile Include="src\LogVisualization.cpp" />
     <ClCompile Include="src\MenuManager.cpp" />
     <ClCompile Include="src\Randomizer.cpp" />
+    <ClCompile Include="src\SettingsManager.cpp" />
     <ClCompile Include="src\StatusManager.cpp" />
     <ClCompile Include="src\Terminal.cpp" />
     <ClCompile Include="src\ToolBarManager.cpp" />
@@ -73,6 +74,7 @@
     <ClCompile Include="src\WrappedTriangleItem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="include\SettingsManager.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />

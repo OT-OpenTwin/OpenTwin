@@ -41,6 +41,7 @@ namespace ot {
 		//! \param _replaceExistingProperties If enabled existing properties will be replaced with their corresponding property in the other group. Note that the property type may change if the other group contains a different property type.
 		void mergeWith(const PropertyGridCfg& _other, bool _replaceExistingProperties);
 
+		void setDefaultGroup(PropertyGroup* _group);
 		PropertyGroup* getDefaultGroup(void) const { return m_defaultGroup; };
 
 		void setRootGroups(const std::list<PropertyGroup*>& _groups);

@@ -12,7 +12,6 @@
 
 // OpenTwin header
 #include "OTWidgets/WidgetViewManager.h"
-#include "OTWidgets/ApplicationPropertiesManager.h"
 
 // Qt header
 #include <QtWidgets/qmenu.h>
@@ -74,9 +73,5 @@ void MenuManager::slotExit(void) {
 }
 
 void MenuManager::slotSettings(void) {
-	ot::ApplicationPropertiesManager::instance().showDialog();
-}
-
-void MenuManager::slotSettingChanged(void) {
-
+	Q_EMIT settingsRequested();
 }

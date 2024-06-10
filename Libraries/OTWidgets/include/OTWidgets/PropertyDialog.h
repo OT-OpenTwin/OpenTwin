@@ -6,18 +6,22 @@
 #pragma once
 
 // OpenTwin header
+#include "OTGui/PropertyGridCfg.h"
 #include "OTGui/PropertyDialogCfg.h"
 #include "OTWidgets/Dialog.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // std header
 #include <map>
+
 class QTreeWidgetItem;
+
 namespace ot {
 
 	class PropertyGrid;
 	class PropertyGridItem;
 	class PropertyGridGroup;
+	class TreeWidgetItem;
 
 	class OT_WIDGETS_API_EXPORT PropertyDialog : public Dialog {
 		Q_OBJECT
@@ -26,18 +30,37 @@ namespace ot {
 		PropertyDialog(const PropertyDialogCfg& _config, QWidget* _parentWidget = (QWidget*)nullptr);
 		virtual ~PropertyDialog();
 
+
+	Q_SIGNALS:
+		void propertyChanged(const std::string& _groupPath, const std::string& _propertyName);
+		void propertyDeleteRequested(const std::string& _groupPath, const std::string& _propertyName);
+		
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Private slots
+
 	private Q_SLOTS:
 		void slotConfirm(void);
 		void slotCancel(void);
+		void slotTreeSelectionChanged(void);
+		void slotPropertyChanged(const std::string& _groupName, const std::string& _propertyName);
+		void slotPropertyDeleteRequested(const std::string& _groupName, const std::string& _propertyName);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Private helper
 
 	private:
-		void iniData(void);
-
-		std::map<QTreeWidgetItem*, PropertyGridItem*> m_navigationToItemMap;
-		std::map<QTreeWidgetItem*, PropertyGridGroup*> m_navigationToGroupMap;
-
+		class PropertyDialogEntry;
 		class PropertyDialogNavigation;
-		friend class PropertyDialogNavigation;
+
+		void iniData(void);
+		void iniGroup(QTreeWidgetItem* _parentTreeItem, const PropertyGroup* _group);
+		bool childItemExists(QTreeWidgetItem* _item, const QString& _text);
+
+		PropertyDialogCfg m_config;
+		std::map<QTreeWidgetItem*, PropertyDialogEntry> m_treeMap;
+
 		PropertyDialogNavigation* m_navigation;
 		PropertyGrid* m_grid;
 		bool m_changed;

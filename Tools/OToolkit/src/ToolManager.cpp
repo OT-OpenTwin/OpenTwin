@@ -6,12 +6,14 @@
 #pragma once
 
 // OToolkit header
+#include "AppBase.h"
 #include "ToolManager.h"
 #include "MenuManager.h"
 #include "StatusManager.h"
 #include "ToolBarManager.h"
 #include "ToolMenuManager.h"
 #include "ToolViewManager.h"
+#include "SettingsManager.h"
 #include "ToolRuntimeHandler.h"
 
 // OToolkitAPI header
@@ -22,14 +24,16 @@
 #include "OTCore/Logger.h"
 #include "OTCore/BasicServiceInformation.h"
 
-ToolManager::ToolManager(QMainWindow* _mainWindow)
+ToolManager::ToolManager(AppBase* _app)
 	: m_ignoreEvents(false)
 {
 	m_menuManager = new MenuManager;
 	m_statusManager = new StatusManager;
-	m_toolBarManager = new ToolBarManager(_mainWindow);
+	m_toolBarManager = new ToolBarManager(_app);
 	m_toolViewManager = new ToolViewManager;
+	m_settingsManager = new SettingsManager(_app);
 
+	this->connect(m_menuManager, &MenuManager::settingsRequested, this, &ToolManager::slotSettingsRequested);
 	this->connect(m_toolViewManager, &ToolViewManager::viewFocused, this, &ToolManager::slotViewFocused);
 	this->connect(m_toolViewManager, &ToolViewManager::viewFocusLost, this, &ToolManager::slotViewFocusLost);
 	this->connect(m_toolViewManager, &ToolViewManager::viewCloseRequested, this, &ToolManager::slotViewCloseRequested);
@@ -201,6 +205,10 @@ void ToolManager::slotViewFocusLost(const QString& _viewName, const QString& _to
 
 void ToolManager::slotViewCloseRequested(const QString& _viewName, const QString& _toolName) {
 
+}
+
+void ToolManager::slotSettingsRequested(void) {
+	m_settingsManager->showDialog();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

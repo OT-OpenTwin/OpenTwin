@@ -4098,7 +4098,7 @@ std::string ExternalServicesComponent::handleMessageDialog(ot::JsonDocument& _do
 
 	ot::JsonDocument responseDoc;
 	responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_MessageDialogValue, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-	responseDoc.AddMember(OT_ACTION_PARAM_ObjectName, ot::JsonString(cfg.name(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_ObjectName, ot::JsonString(cfg.getName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	responseDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(ot::MessageDialogCfg::toString(result), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
 	std::string response;

@@ -51,8 +51,8 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	_content.addView(r);
 
 	TreeWidgetFilter* tree = new TreeWidgetFilter;
-	tree->treeWidget()->setAlternatingRowColors(true);
-	tree->treeWidget()->setSelectionMode(QAbstractItemView::MultiSelection);
+	tree->getTreeWidget()->setAlternatingRowColors(true);
+	tree->getTreeWidget()->setSelectionMode(QAbstractItemView::MultiSelection);
 	root->addWidget(tree->getQWidget());
 	{
 		NavigationTreeItem itm1("Test A");
@@ -64,8 +64,8 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		itm2.addChildItem(NavigationTreeItem("5"));
 		itm2.addChildItem(NavigationTreeItem("6"));
 
-		tree->treeWidget()->addItem(TreeWidgetItemInfo(itm1));
-		tree->treeWidget()->addItem(TreeWidgetItemInfo(itm2));
+		tree->getTreeWidget()->addItem(TreeWidgetItemInfo(itm1));
+		tree->getTreeWidget()->addItem(TreeWidgetItemInfo(itm2));
 	}
 
 	QTableWidget* table = new QTableWidget(3, 2);

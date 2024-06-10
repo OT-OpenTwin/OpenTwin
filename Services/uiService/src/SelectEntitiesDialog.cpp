@@ -30,11 +30,11 @@ SelectEntitiesDialog::SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _c
 	// Create controls
 	QLabel* lAvail = new QLabel("Available");
 	m_available = new ot::TreeWidgetFilter;
-	m_available->treeWidget()->setHeaderHidden(true);
+	m_available->getTreeWidget()->setHeaderHidden(true);
 
 	QLabel* lSelec = new QLabel("Selected");
 	m_selected = new ot::TreeWidgetFilter;
-	m_selected->treeWidget()->setHeaderHidden(true);
+	m_selected->getTreeWidget()->setHeaderHidden(true);
 
 	ot::PushButton* btnApply = new ot::PushButton("Apply");
 	ot::PushButton* btnCancel = new ot::PushButton("Cancel");
@@ -58,16 +58,16 @@ SelectEntitiesDialog::SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _c
 
 	// Fill data
 	for (const ot::NavigationTreeItem& itm : _config.rootItems()) {
-		this->addItem(m_available->treeWidget(), nullptr, itm);
+		this->addItem(m_available->getTreeWidget(), nullptr, itm);
 		ot::NavigationTreeItem cop(itm);
 		if (cop.filter(ot::ItemIsSelected)) {
-			this->addItem(m_selected->treeWidget(), nullptr, itm);
+			this->addItem(m_selected->getTreeWidget(), nullptr, itm);
 		}
 	}
 
 	if (m_flags && ot::NavigationTreePackage::ItemsDefaultExpanded) {
-		m_available->treeWidget()->expandAll();
-		m_selected->treeWidget()->expandAll();
+		m_available->getTreeWidget()->expandAll();
+		m_selected->getTreeWidget()->expandAll();
 	}
 
 	// Setup window
@@ -75,8 +75,8 @@ SelectEntitiesDialog::SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _c
 	this->setWindowIcon(ot::IconManager::getApplicationIcon());
 
 	// Connect signals
-	this->connect(m_available->treeWidget(), &QTreeWidget::itemDoubleClicked, this, &SelectEntitiesDialog::slotAdd);
-	this->connect(m_selected->treeWidget(), &QTreeWidget::itemDoubleClicked, this, &SelectEntitiesDialog::slotRemove);
+	this->connect(m_available->getTreeWidget(), &QTreeWidget::itemDoubleClicked, this, &SelectEntitiesDialog::slotAdd);
+	this->connect(m_selected->getTreeWidget(), &QTreeWidget::itemDoubleClicked, this, &SelectEntitiesDialog::slotRemove);
 	this->connect(btnApply, &QPushButton::clicked, this, &SelectEntitiesDialog::slotApply);
 	this->connect(btnCancel, &QPushButton::clicked, this, &SelectEntitiesDialog::slotCancel);
 }
@@ -96,7 +96,7 @@ bool SelectEntitiesDialog::selectionHasChanged(void) const {
 
 std::list<std::string> SelectEntitiesDialog::selectedItemPaths(char _pathDelimiter, bool _bottomLevelOnly) const {
 	std::list<std::string> ret;
-	this->addSelectedPaths(m_selected->treeWidget()->invisibleRootItem(), ret, _pathDelimiter, _bottomLevelOnly);
+	this->addSelectedPaths(m_selected->getTreeWidget()->invisibleRootItem(), ret, _pathDelimiter, _bottomLevelOnly);
 	return ret;
 }
 
@@ -109,8 +109,8 @@ void SelectEntitiesDialog::slotCancel(void) {
 }
 
 void SelectEntitiesDialog::addSelectedPaths(QTreeWidgetItem* _item, std::list<std::string>& _list, char _pathDelimiter, bool _bottomLevelOnly) const {
-	if ((_item->childCount() == 0 || !_bottomLevelOnly) && _item != m_selected->treeWidget()->invisibleRootItem()) {
-		_list.push_back(m_selected->treeWidget()->itemPath(_item, _pathDelimiter).toStdString());
+	if ((_item->childCount() == 0 || !_bottomLevelOnly) && _item != m_selected->getTreeWidget()->invisibleRootItem()) {
+		_list.push_back(m_selected->getTreeWidget()->getItemPath(_item, _pathDelimiter).toStdString());
 	}
 	for (int i = 0; i < _item->childCount(); i++) {
 		this->addSelectedPaths(_item->child(i), _list, _pathDelimiter, _bottomLevelOnly);
@@ -140,11 +140,11 @@ void SelectEntitiesDialog::slotAdd(QTreeWidgetItem* _item, int _col) {
 	if (!(itm->navigationItemFlags() & ot::ItemMayBeAdded)) {
 		return;
 	}
-	if (m_selected->treeWidget()->itemExists(m_available->treeWidget()->itemPath(_item))) {
+	if (m_selected->getTreeWidget()->itemExists(m_available->getTreeWidget()->getItemPath(_item))) {
 		return;
 	}
 
-	ot::TreeWidgetItem* newItem = dynamic_cast<ot::TreeWidgetItem*>(m_selected->treeWidget()->addItem(itm->getFullInfo()));
+	ot::TreeWidgetItem* newItem = dynamic_cast<ot::TreeWidgetItem*>(m_selected->getTreeWidget()->addItem(itm->getFullInfo()));
 	if (newItem) {
 		if (m_flags & ot::NavigationTreePackage::ItemsDefaultExpanded) {
 			newItem->expandAllParents(true);

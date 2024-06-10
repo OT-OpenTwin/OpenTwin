@@ -18,13 +18,14 @@
 // std header
 #include <map>
 
+class AppBase;
 class MenuManager;
 class StatusManager;
 class ToolBarManager;
+class ToolBarManager;
+class SettingsManager;
 class ToolViewManager;
 class ToolRuntimeHandler;
-
-class QMainWindow;
 
 namespace otoolkit { class Tool; };
 
@@ -32,7 +33,7 @@ class ToolManager : public QObject {
 	Q_OBJECT
 	OT_DECL_NOCOPY(ToolManager)
 public:
-	ToolManager(QMainWindow* _mainWindow);
+	ToolManager(AppBase* _app);
 	virtual ~ToolManager();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -59,6 +60,7 @@ public:
 	StatusManager* getStatusManager(void) { return m_statusManager; };
 	ToolBarManager* getToolBarManager(void) { return m_toolBarManager; };
 	ToolViewManager* getToolViewManager(void) { return m_toolViewManager; };
+	SettingsManager* getToolSettingsManager(void) { return m_settingsManager; };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -79,7 +81,8 @@ private Q_SLOTS:
 	void slotViewFocused(const QString& _viewName, const QString& _toolName);
 	void slotViewFocusLost(const QString& _viewName, const QString& _toolName);
 	void slotViewCloseRequested(const QString& _viewName, const QString& _toolName);
-	
+	void slotSettingsRequested(void);
+
 private:
 	void fwdRemoveTool(const QString& _toolName);
 
@@ -91,6 +94,7 @@ private:
 	StatusManager* m_statusManager;
 	ToolBarManager* m_toolBarManager;
 	ToolViewManager* m_toolViewManager;
+	SettingsManager* m_settingsManager;
 
 	ToolManager() = delete;
 };

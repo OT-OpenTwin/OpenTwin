@@ -33,8 +33,8 @@ namespace ot {
 
 		//! @brief Returns a pointer to the root widget of this object
 		virtual QWidget* getQWidget(void) override { return m_layoutW; };
-		ot::LineEdit* filterLineEdit(void) { return m_lineEdit; };
-		ot::TreeWidget* treeWidget(void) { return m_tree; };
+		ot::LineEdit* getFilterLineEdit(void) { return m_lineEdit; };
+		ot::TreeWidget* getTreeWidget(void) { return m_tree; };
 
 	Q_SIGNALS:
 		void filterChanged(const QString& _filterText);

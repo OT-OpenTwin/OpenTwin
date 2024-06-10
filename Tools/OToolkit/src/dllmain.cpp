@@ -113,9 +113,6 @@ void mainApplicationThread()
 
 		// Initialize color style
 		ot::GlobalColorStyle::instance().scanForStyleFiles();
-		if (ot::GlobalColorStyle::instance().hasStyle(ot::toString(ot::ColorStyleName::BrightStyle))) {
-			ot::GlobalColorStyle::instance().setCurrentStyle(ot::toString(ot::ColorStyleName::BrightStyle));
-		}
 		
 		// Initialize settings manager
 		ot::ApplicationPropertiesManager::instance().setReplaceExistingPropertiesOnMerge(true);

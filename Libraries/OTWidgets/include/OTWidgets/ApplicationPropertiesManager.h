@@ -28,6 +28,11 @@ namespace ot {
 
 		ot::Dialog::DialogResult showDialog(void);
 
+	Q_SIGNALS:
+		void propertyChanged(const std::string& _groupPath, const std::string& _propertyName);
+		void propertyDeleteRequested(const std::string& _groupPath, const std::string& _propertyName);
+
+	public:
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
@@ -45,6 +50,10 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private
+
+	private Q_SLOTS:
+		void slotPropertyChanged(const std::string& _groupPath, const std::string& _propertyName);
+		void slotPropertyDeleteRequested(const std::string& _groupPath, const std::string& _propertyName);
 
 	private:
 		bool m_propertyReplaceOnMerge;

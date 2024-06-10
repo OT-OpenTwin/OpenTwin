@@ -22,7 +22,8 @@ namespace ot {
 		NoNavigationTreeItemFlags = 0x00, //! @brief Empty mask, no flags set
 		RemoveItemWhenEmpty       = 0x01, //! @brief If set the item will be removed when all the child items are removed
 		ItemMayBeAdded            = 0x02, //! @brief If set the item may be added/dragged/dropped
-		ItemIsSelected            = 0x04  //! @brief If set this item is selected
+		ItemIsSelected            = 0x04, //! @brief If set this item is selected
+		ItemIsInvisible           = 0x08  //! \brief If set the item is invisible
 	};
 	typedef Flags<NavigationTreeItemFlag> NavigationTreeItemFlags;
 

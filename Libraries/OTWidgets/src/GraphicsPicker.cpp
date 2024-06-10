@@ -40,7 +40,7 @@ ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation)
 	m_splitter = new Splitter(_orientation);
 
 	m_navigation = new ot::TreeWidgetFilter;
-	m_navigation->treeWidget()->setHeaderHidden(true);
+	m_navigation->getTreeWidget()->setHeaderHidden(true);
 	m_navigation->setOTWidgetFlags(ot::ApplyFilterOnTextChange);
 
 	m_viewLayoutW = new QWidget;
@@ -49,7 +49,7 @@ ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation)
 	m_splitter->addWidget(m_navigation->getQWidget());
 	m_splitter->addWidget(m_viewLayoutW);
 
-	connect(m_navigation->treeWidget(), &QTreeWidget::itemSelectionChanged, this, &GraphicsPicker::slotSelectionChanged);
+	connect(m_navigation->getTreeWidget(), &QTreeWidget::itemSelectionChanged, this, &GraphicsPicker::slotSelectionChanged);
 }
 
 ot::GraphicsPicker::~GraphicsPicker() {
@@ -97,7 +97,7 @@ void ot::GraphicsPicker::clear(void) {
 		delete d.second;
 	}
 	m_previewData.clear();
-	m_navigation->treeWidget()->clear();
+	m_navigation->getTreeWidget()->clear();
 }
 
 // ##############################################################################################################################
@@ -115,7 +115,7 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 
 	std::list<GraphicsView *> previews;
 
-	for (auto itm : m_navigation->treeWidget()->selectedItems()) {
+	for (auto itm : m_navigation->getTreeWidget()->selectedItems()) {
 		auto it = m_previewData.find(itm);
 		if (it != m_previewData.end()) {
 			for (const GraphicsPickerCollectionCfg::ItemInformation& info : *it->second) {
@@ -164,9 +164,9 @@ void ot::GraphicsPicker::addCollection(ot::GraphicsPickerCollectionCfg* _categor
 	}
 	else {
 		// Check if parent has item
-		for (int i = 0; i < m_navigation->treeWidget()->topLevelItemCount(); i++) {
-			if (m_navigation->treeWidget()->topLevelItem(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_category->title()).toLower()) {
-				categoryItem = m_navigation->treeWidget()->topLevelItem(i);
+		for (int i = 0; i < m_navigation->getTreeWidget()->topLevelItemCount(); i++) {
+			if (m_navigation->getTreeWidget()->topLevelItem(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_category->title()).toLower()) {
+				categoryItem = m_navigation->getTreeWidget()->topLevelItem(i);
 				break;
 			}
 		}
@@ -183,7 +183,7 @@ void ot::GraphicsPicker::addCollection(ot::GraphicsPickerCollectionCfg* _categor
 		}
 		else {
 			// Add item as top level
-			m_navigation->treeWidget()->addTopLevelItem(categoryItem);
+			m_navigation->getTreeWidget()->addTopLevelItem(categoryItem);
 		}
 	}
 
