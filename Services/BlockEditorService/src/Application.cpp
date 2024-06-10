@@ -49,7 +49,7 @@ std::string Application::test(void) {
 	ot::PropertyGroup* r1 = new ot::PropertyGroup("R1", "Test Root 1");
 
 	ot::PropertyBool* tl1 = new ot::PropertyBool("Top Lvl", false);
-	cfg.defaultGroup()->addProperty(tl1);
+	cfg.getDefaultGroup()->addProperty(tl1);
 
 	ot::PropertyGroup* g1 = new ot::PropertyGroup("G1", "Base types");
 	ot::PropertyBool* cb1 = new ot::PropertyBool("Bool", false);

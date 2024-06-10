@@ -10,11 +10,11 @@
 #include "OTGui/Property.h"
 #include "OTGui/PropertyBase.h"
 #include "OTWidgets/ColorStyle.h"
+#include "OTWidgets/TreeWidgetItem.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtCore/qobject.h>
-#include <QtWidgets/qtreewidget.h>
 
 // std header
 #include <string>
@@ -27,7 +27,7 @@ namespace ot {
 	class Property;
 	class PropertyInput;
 
-	class OT_WIDGETS_API_EXPORT PropertyGridItem : public QObject, public QTreeWidgetItem {
+	class OT_WIDGETS_API_EXPORT PropertyGridItem : public QObject, public TreeWidgetItem {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyGridItem)
 	public:

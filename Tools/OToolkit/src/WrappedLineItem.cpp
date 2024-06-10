@@ -95,7 +95,7 @@ void WrappedLineItem::fillPropertyGrid(void) {
 void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
 	using namespace ot;
 
-	if (_item->getGroupName() == "General" && _itemData.propertyName() == "Name") {
+	if (_item->getGroupName() == "General" && _itemData.getPropertyName() == "Name") {
 		PropertyInputString* input = dynamic_cast<PropertyInputString*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed { \"Group\": \"" + _item->getGroupName() + "\", \"");
@@ -108,7 +108,7 @@ void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->setGraphicsItemName(input->getCurrentText().toStdString());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "X1") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "X1") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -117,7 +117,7 @@ void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->setLine(input->getValue(), this->getLine().y1(), this->getLine().x2(), this->getLine().y2());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Y1") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Y1") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -126,7 +126,7 @@ void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->setLine(this->getLine().x1(), input->getValue(), this->getLine().x2(), this->getLine().y2());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "X2") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "X2") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -135,7 +135,7 @@ void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->setLine(this->getLine().x1(), this->getLine().y1(), input->getValue(), this->getLine().y2());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Y2") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Y2") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -144,7 +144,7 @@ void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->setLine(this->getLine().x1(), this->getLine().y1(), this->getLine().x2(), input->getValue());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Line Painter") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Line Painter") {
 		PropertyInputPainter2D* input = dynamic_cast<PropertyInputPainter2D*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -155,7 +155,7 @@ void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 		lineStyle.setPainter(input->getPainter()->createCopy());
 		this->setLineStyle(lineStyle);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Line Width") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Line Width") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -166,7 +166,7 @@ void WrappedLineItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 		lineStyle.setWidth(input->getValue());
 		this->setLineStyle(lineStyle);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Handle State") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Handle State") {
 		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");

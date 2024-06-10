@@ -179,16 +179,16 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGridCfg& _config
 
 	deleteAllProperties();
 
-	this->buildFromConfiguration(_config.defaultGroup());
+	this->buildFromConfiguration(_config.getDefaultGroup());
 
-	for (const ot::PropertyGroup* g : _config.rootGroups()) {
+	for (const ot::PropertyGroup* g : _config.getRootGroups()) {
 		this->buildFromConfiguration(g);
 	}
 }
 
 void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupConfig)
 {
-	for (const ot::Property* p : _groupConfig->properties()) {
+	for (const ot::Property* p : _groupConfig->getProperties()) {
 		EntityPropertiesBase* newSetting(nullptr);
 
 		if (p->getPropertyType() == OT_PROPERTY_TYPE_Bool) newSetting = new EntityPropertiesBoolean;
@@ -197,11 +197,11 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 		else if (p->getPropertyType() == OT_PROPERTY_TYPE_Double) newSetting = new EntityPropertiesDouble;
 		else if (p->getPropertyType() == OT_PROPERTY_TYPE_String) newSetting = new EntityPropertiesString;
 		else if (p->getPropertyType() == OT_PROPERTY_TYPE_StringList) {
-			if (p->specialType() == "EntityList") newSetting = new EntityPropertiesEntityList;
-			else if (p->specialType() == "ProjectList") newSetting = new EntityPropertiesProjectList;
-			else if (p->specialType().empty()) newSetting = new EntityPropertiesSelection;
+			if (p->getSpecialType() == "EntityList") newSetting = new EntityPropertiesEntityList;
+			else if (p->getSpecialType() == "ProjectList") newSetting = new EntityPropertiesProjectList;
+			else if (p->getSpecialType().empty()) newSetting = new EntityPropertiesSelection;
 			else {
-				OT_LOG_E("Unknown string list property special type \"" + p->specialType() + "\"");
+				OT_LOG_E("Unknown string list property special type \"" + p->getSpecialType() + "\"");
 				return;
 			}
 		}
@@ -216,14 +216,14 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 		}
 
 		newSetting->setFromConfiguration(p);
-		newSetting->setName(p->propertyName());
-		newSetting->setHasMultipleValues(p->propertyFlags() & ot::Property::HasMultipleValues);
-		newSetting->setReadOnly(p->propertyFlags() & ot::Property::IsReadOnly);
-		newSetting->setProtected(!(p->propertyFlags() & ot::Property::IsDeletable));
-		newSetting->setVisible(!(p->propertyFlags() & ot::Property::IsHidden));
-		newSetting->setErrorState(p->propertyFlags() & ot::Property::HasInputError);
+		newSetting->setName(p->getPropertyName());
+		newSetting->setHasMultipleValues(p->getPropertyFlags() & ot::Property::HasMultipleValues);
+		newSetting->setReadOnly(p->getPropertyFlags() & ot::Property::IsReadOnly);
+		newSetting->setProtected(!(p->getPropertyFlags() & ot::Property::IsDeletable));
+		newSetting->setVisible(!(p->getPropertyFlags() & ot::Property::IsHidden));
+		newSetting->setErrorState(p->getPropertyFlags() & ot::Property::HasInputError);
 
-		this->createProperty(newSetting, _groupConfig->name());
+		this->createProperty(newSetting, _groupConfig->getName());
 	}
 }
 

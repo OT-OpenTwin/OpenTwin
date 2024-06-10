@@ -9,6 +9,7 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/TreeWidget.h"
+#include "OTWidgets/TreeWidgetItem.h"
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/PushButton.h"
 

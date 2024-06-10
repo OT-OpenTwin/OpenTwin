@@ -121,7 +121,7 @@ void ot::PropertyInputDouble::lclValueChanged(int) {
 
 void ot::PropertyInputDouble::lclTextChanged(void) {
 	OTAssertNullptr(m_lineEdit);
-	if (this->data().propertyFlags() & Property::HasMultipleValues) {
+	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 		QString str = m_lineEdit->text();
 
 		// Check for no changes and still multiple values
@@ -173,7 +173,7 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 		return false;
 	}
 
-	if (this->data().propertyFlags() & Property::AllowCustomValues) {
+	if (this->data().getPropertyFlags() & Property::AllowCustomValues) {
 		if (m_spinBox) delete m_spinBox;
 		m_spinBox = nullptr;
 		if (!m_lineEdit) m_lineEdit = new LineEdit;
@@ -185,13 +185,13 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 		m_spinBox->blockSignals(true);
 
 		m_spinBox->setDecimals(actualProperty->precision());
-		m_spinBox->setToolTip(QString::fromStdString(this->data().propertyTip()));
+		m_spinBox->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 		m_spinBox->setRange(actualProperty->min(), actualProperty->max());
 		m_spinBox->setValue(actualProperty->value());
-		if (this->data().propertyFlags() & Property::HasMultipleValues) {
+		if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 			m_spinBox->setSpecialValueText(OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT);
 		}
-		m_spinBox->setReadOnly(this->data().propertyFlags() & Property::IsReadOnly);
+		m_spinBox->setReadOnly(this->data().getPropertyFlags() & Property::IsReadOnly);
 
 		m_spinBox->blockSignals(false);
 	}
@@ -199,12 +199,12 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 		OTAssertNullptr(m_lineEdit);
 		m_lineEdit->blockSignals(true);
 
-		m_lineEdit->setToolTip(QString::fromStdString(this->data().propertyTip()));
+		m_lineEdit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 		m_lineEdit->setText(QString::number(actualProperty->value()));
-		if (this->data().propertyFlags() & Property::HasMultipleValues) {
+		if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 			m_lineEdit->setText(OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT);
 		}
-		m_lineEdit->setReadOnly(this->data().propertyFlags() & Property::IsReadOnly);
+		m_lineEdit->setReadOnly(this->data().getPropertyFlags() & Property::IsReadOnly);
 
 		m_lineEdit->blockSignals(false);
 	}

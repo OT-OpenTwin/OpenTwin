@@ -60,8 +60,8 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 
 	// Setup data
 	
-	m_grid->setupGridFromConfig(_config.gridConfig());
-	m_navigation->setupGridFromConfig(_config.gridConfig());
+	m_grid->setupGridFromConfig(_config.getGridConfig());
+	m_navigation->setupGridFromConfig(_config.getGridConfig());
 	this->iniData();
 
 	// Connect signals

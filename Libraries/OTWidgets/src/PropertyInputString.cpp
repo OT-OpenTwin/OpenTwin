@@ -37,7 +37,7 @@ QWidget* ot::PropertyInputString::getQWidget(void) {
 
 void ot::PropertyInputString::lclValueChanged(void) {
 	// Avoid input on multiple values
-	if (m_lineEdit->text() == "..." && (this->data().propertyFlags() & PropertyBase::HasMultipleValues)) return;
+	if (m_lineEdit->text() == "..." && (this->data().getPropertyFlags() & PropertyBase::HasMultipleValues)) return;
 
 	if (m_lineEdit->text() != m_text) {
 		m_text = m_lineEdit->text();
@@ -68,11 +68,11 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 
 	m_lineEdit->setPlaceholderText(QString::fromStdString(actualProperty->placeholderText()));
 
-	if (this->data().propertyFlags() & Property::HasMultipleValues) m_lineEdit->setText("...");
+	if (this->data().getPropertyFlags() & Property::HasMultipleValues) m_lineEdit->setText("...");
 	else m_lineEdit->setText(m_text);
 
-	m_lineEdit->setToolTip(QString::fromStdString(this->data().propertyTip()));
-	m_lineEdit->setReadOnly(this->data().propertyFlags() & Property::IsReadOnly);
+	m_lineEdit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
+	m_lineEdit->setReadOnly(this->data().getPropertyFlags() & Property::IsReadOnly);
 
 	m_lineEdit->blockSignals(false);
 

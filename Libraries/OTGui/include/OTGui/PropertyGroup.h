@@ -49,13 +49,22 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		//! \brief Adds the contents of the other configuration to this configuration.
+		//! If an improved merge is required just subclass and implement 
+		//! \param _other Other group to merge into this.
+		//! \param _replaceExistingProperties If enabled existing properties will be replaced with their corresponding property in the other group. Note that the property type may change if the other group contains a different property type.
+		virtual void mergeWith(const PropertyGroup& _other, bool _replaceExistingProperties);
+
+		void setParentGroup(PropertyGroup* _group) { m_parentGroup = _group; };
+		PropertyGroup* getParentGroup(void) const { return m_parentGroup; };
+
 		void setName(const std::string& _name) { m_name = _name; };
-		std::string& name(void) { return m_name; };
-		const std::string& name(void) const { return m_name; };
+		std::string& getName(void) { return m_name; };
+		const std::string& getName(void) const { return m_name; };
 
 		void setTitle(const std::string& _title) { m_title = _title; };
-		std::string& title(void) { return m_title; };
-		const std::string& title(void) const { return m_title; };
+		std::string& getTitle(void) { return m_title; };
+		const std::string& getTitle(void) const { return m_title; };
 
 		//! @brief Set the properties.
 		//! This group takes ownership of the properties.
@@ -64,11 +73,18 @@ namespace ot {
 		//! @brief Add the property.
 		//! This group takes ownership of the property.
 		void addProperty(Property* _property);
-		const std::list<Property*>& properties(void) const { return m_properties; };
+
+		//! \brief Removes the property with the given name.
+		void removeProperty(const std::string& _propertyName);
+
+		//! \brief Group properties.
+		const std::list<Property*>& getProperties(void) const { return m_properties; };
 
 		//! @brief Set the child groups.
 		//! This group takes ownership of the groups.
 		void setChildGroups(const std::list<PropertyGroup*>& _groups);
+
+		const std::list<PropertyGroup*>& getChildGroups(void) const { return m_childGroups; };
 
 		//! @brief Add the provided group as a child.
 		//! This group takes ownership of the child.
@@ -81,16 +97,25 @@ namespace ot {
 		void setBackgroundColor(DefaultColor _color) { this->setBackgroundColor(Color(_color)); };
 		void setBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setBackgroundColor(Color(_r, _g, _b, _a)); };
 		void setBackgroundColor(const Color& _color) { m_backgroundColor = _color; };
-		const Color& backgroundColor(void) const { return m_backgroundColor; };
+		const Color& getBackgroundColor(void) const { return m_backgroundColor; };
 
 		void setAlternateBackgroundColor(DefaultColor _color) { this->setAlternateBackgroundColor(Color(_color)); };
 		void setAlternateBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setAlternateBackgroundColor(Color(_r, _g, _b, _a)); };
 		void setAlternateBackgroundColor(const Color& _color) { m_alternateBackgroundColor = _color; };
-		const Color& alternateBackgroundColor(void) const { return m_alternateBackgroundColor; };
+		const Color& getAlternateBackgroundColor(void) const { return m_alternateBackgroundColor; };
 
 		void clear(bool _keepGroups = false);
 
+		//! \brief Returns false if at least one property exists in this group or any of the child groups.
+		bool isEmpty(void) const;
+
+		//! \brief Returns the group path.
+		//! The group path is a string containing all parent groups and this group name (e.g. "Root/Child/ThisGroup").
+		std::string getGroupPath(char _delimiter = '/') const;
+
 	private:
+		PropertyGroup* m_parentGroup;
+
 		std::string m_name;
 		std::string m_title;
 		Color m_backgroundColor;

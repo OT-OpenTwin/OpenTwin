@@ -1864,7 +1864,7 @@ bool AppBase::getPropertyIsDeletable(const std::string& _groupName, const std::s
 		OT_LOG_E("Property cast failed");
 		return false;
 	}
-	return itm->getPropertyData().propertyFlags() & ot::PropertyBase::IsDeletable;
+	return itm->getPropertyData().getPropertyFlags() & ot::PropertyBase::IsDeletable;
 }
 
 // Setter

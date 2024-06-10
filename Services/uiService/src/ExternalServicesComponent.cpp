@@ -572,10 +572,10 @@ void ExternalServicesComponent::propertyGridValueChanged(const std::string& _gro
 		ot::Property* prop = itm->createProperty();
 
 		// For the EntityList property we remove the value id since we dont know the id of the entity
-		if (prop->getPropertyType() == OT_PROPERTY_TYPE_StringList && prop->specialType() == "EntityList" && !prop->additionalPropertyData().empty()) {
+		if (prop->getPropertyType() == OT_PROPERTY_TYPE_StringList && prop->getSpecialType() == "EntityList" && !prop->getAdditionalPropertyData().empty()) {
 			ot::JsonDocument dataDoc;
 			ot::JsonDocument newDataDoc;
-			dataDoc.fromJson(prop->additionalPropertyData());
+			dataDoc.fromJson(prop->getAdditionalPropertyData());
 			newDataDoc.AddMember("ContainerName", ot::JsonString(ot::json::getString(dataDoc, "ContainerName"), newDataDoc.GetAllocator()), newDataDoc.GetAllocator());
 			newDataDoc.AddMember("ContainerID", ot::json::getUInt64(dataDoc, "ContainerID"), newDataDoc.GetAllocator());
 			newDataDoc.AddMember("ValueID", 0, newDataDoc.GetAllocator());

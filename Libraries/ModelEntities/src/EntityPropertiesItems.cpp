@@ -780,13 +780,13 @@ void EntityPropertiesEntityList::setFromConfiguration(const ot::Property* _prope
 		return;
 	}
 
-	if (actualProperty->additionalPropertyData().empty()) {
+	if (actualProperty->getAdditionalPropertyData().empty()) {
 		OT_LOG_E("Data missing");
 		return;
 	}
 
 	ot::JsonDocument dataDoc;
-	dataDoc.fromJson(actualProperty->additionalPropertyData());
+	dataDoc.fromJson(actualProperty->getAdditionalPropertyData());
 
 	//this->setValueName(ot::json::getString(dataDoc, "ValueName"));
 	this->setValueName(actualProperty->current());

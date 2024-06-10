@@ -119,7 +119,7 @@ void WrappedTextItem::fillPropertyGrid(void) {
 void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
 	using namespace ot;
 
-	if (_item->getGroupName() == "General" && _itemData.propertyName() == "Name") {
+	if (_item->getGroupName() == "General" && _itemData.getPropertyName() == "Name") {
 		PropertyInputString* input = dynamic_cast<PropertyInputString*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed { \"Group\": \"" + _item->getGroupName() + "\", \"");
@@ -132,7 +132,7 @@ void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->setGraphicsItemName(input->getCurrentText().toStdString());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "X") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "X") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -141,7 +141,7 @@ void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->setPos(input->getValue(), this->pos().y());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Y") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Y") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -150,7 +150,7 @@ void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->setPos(this->pos().x(), input->getValue());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Text") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Text") {
 		PropertyInputString* input = dynamic_cast<PropertyInputString*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -159,7 +159,7 @@ void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->setText(input->getCurrentText());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Text As Reference") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Text As Reference") {
 		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -168,7 +168,7 @@ void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->setTextIsReference(input->isChecked());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Font Family") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Font Family") {
 		PropertyInputStringList* input = dynamic_cast<PropertyInputStringList*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -179,7 +179,7 @@ void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 		font.setFamily(input->getCurrentText().toStdString());
 		this->setFont(font);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Text Size") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Text Size") {
 		PropertyInputInt* input = dynamic_cast<PropertyInputInt*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -190,7 +190,7 @@ void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 		font.setSize(input->getValue());
 		this->setFont(font);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Bold") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Bold") {
 		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -201,7 +201,7 @@ void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 		font.setBold(input->isChecked());
 		this->setFont(font);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Italic") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Italic") {
 		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -212,7 +212,7 @@ void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 		font.setItalic(input->isChecked());
 		this->setFont(font);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Text Painter") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Text Painter") {
 		PropertyInputPainter2D* input = dynamic_cast<PropertyInputPainter2D*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -221,7 +221,7 @@ void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::Pro
 
 		this->setTextPainter(input->getPainter()->createCopy());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.propertyName() == "Handle State") {
+	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Handle State") {
 		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");

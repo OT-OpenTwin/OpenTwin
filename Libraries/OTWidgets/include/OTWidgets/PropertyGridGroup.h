@@ -8,12 +8,12 @@
 // OpenTwin header
 #include "OTGui/PropertyGroup.h"
 #include "OTWidgets/ColorStyle.h"
+#include "OTWidgets/TreeWidgetItem.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtCore/qobject.h>
 #include <QtGui/qbrush.h>
-#include <QtWidgets/qtreewidget.h>
 
 class QLabel;
 class QWidget;
@@ -22,7 +22,7 @@ namespace ot {
 
 	class PropertyGridItem;
 
-	class OT_WIDGETS_API_EXPORT PropertyGridGroup : public QObject, public QTreeWidgetItem {
+	class OT_WIDGETS_API_EXPORT PropertyGridGroup : public QObject, public TreeWidgetItem {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyGridGroup)
 	public:

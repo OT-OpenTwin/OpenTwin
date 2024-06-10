@@ -28,7 +28,7 @@ ot::OnePropertyDialog::OnePropertyDialog(const OnePropertyDialogCfg& _config, QW
 	QHBoxLayout* btnLay = new QHBoxLayout;
 
 	// Create controls
-	QLabel* l = new QLabel(QString::fromStdString(_config.getProperty()->propertyTitle()));
+	QLabel* l = new QLabel(QString::fromStdString(_config.getProperty()->getPropertyTitle()));
 	QPushButton* btnConfirm = new QPushButton("Confirm");
 	QPushButton* btnCancel = new QPushButton("Cancel");
 

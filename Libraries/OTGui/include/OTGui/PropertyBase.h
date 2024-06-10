@@ -92,7 +92,7 @@ namespace ot {
 		// Setter / Getter
 
 		void setPropertyName(const std::string& _name) { m_name = _name; };
-		const std::string& propertyName(void) const { return m_name; };
+		const std::string& getPropertyName(void) const { return m_name; };
 
 		//! @brief Set the property title
 		//! If no title set the name will be used as title
@@ -100,22 +100,22 @@ namespace ot {
 
 		//! @brief Property title
 		//! If no title set the name will be used as title
-		const std::string& propertyTitle(void) const { return (m_title.empty() ? m_name : m_title); };
+		const std::string& getPropertyTitle(void) const { return (m_title.empty() ? m_name : m_title); };
 
 		void setPropertyTip(const std::string& _tip) { m_tip = _tip; };
-		std::string& propertyTip(void) { return m_tip; };
-		const std::string& propertyTip(void) const { return m_tip; };
+		std::string& getPropertyTip(void) { return m_tip; };
+		const std::string& getPropertyTip(void) const { return m_tip; };
 
 		void setPropertyFlag(PropertyFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
 		void setPropertyFlags(PropertyFlags _flags) { m_flags = _flags; };
-		PropertyFlags& propertyFlags(void) { return m_flags; };
-		const PropertyFlags& propertyFlags(void) const { return m_flags; };
+		PropertyFlags& getPropertyFlags(void) { return m_flags; };
+		const PropertyFlags& getPropertyFlags(void) const { return m_flags; };
 
 		void setSpecialType(const std::string& _type) { m_specialType = _type; };
-		const std::string& specialType(void) const { return m_specialType; };
+		const std::string& getSpecialType(void) const { return m_specialType; };
 
 		void setAdditionalPropertyData(const std::string& _data) { m_data = _data; };
-		const std::string& additionalPropertyData(void) const { return m_data; };
+		const std::string& getAdditionalPropertyData(void) const { return m_data; };
 
 	private:
 		std::string m_tip; //! \brief ToolTip.

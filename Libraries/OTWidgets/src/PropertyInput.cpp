@@ -18,19 +18,19 @@ bool ot::PropertyInput::setupFromConfiguration(const Property* _configuration) {
 }
 
 void ot::PropertyInput::slotValueChanged(void) {
-	m_data.propertyFlags() &= (~Property::HasMultipleValues);
+	m_data.getPropertyFlags() &= (~Property::HasMultipleValues);
 	m_dataChanged = true;
 	Q_EMIT inputValueChanged();
 }
 
 void ot::PropertyInput::slotValueChanged(bool) {
-	m_data.propertyFlags() &= (~Property::HasMultipleValues);
+	m_data.getPropertyFlags() &= (~Property::HasMultipleValues);
 	m_dataChanged = true;
 	Q_EMIT inputValueChanged();
 }
 
 void ot::PropertyInput::slotValueChanged(int) {
-	m_data.propertyFlags() &= (~Property::HasMultipleValues);
+	m_data.getPropertyFlags() &= (~Property::HasMultipleValues);
 	m_dataChanged = true;
 	Q_EMIT inputValueChanged();
 }

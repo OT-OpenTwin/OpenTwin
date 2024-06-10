@@ -25,9 +25,10 @@
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCore/OTAssert.h"
-#include "OTWidgets/IconManager.h"
 #include "OTGui/ColorStyleTypes.h"
+#include "OTWidgets/IconManager.h"
 #include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/ApplicationPropertiesManager.h"
 #include "OTCommunication/actionTypes.h"
 
 #define DLLMAIN_LOG(___msg) OTOOLKIT_LOG("main", ___msg)
@@ -115,7 +116,10 @@ void mainApplicationThread()
 		if (ot::GlobalColorStyle::instance().hasStyle(ot::toString(ot::ColorStyleName::BrightStyle))) {
 			ot::GlobalColorStyle::instance().setCurrentStyle(ot::toString(ot::ColorStyleName::BrightStyle));
 		}
-				
+		
+		// Initialize settings manager
+		ot::ApplicationPropertiesManager::instance().setReplaceExistingPropertiesOnMerge(true);
+
 		// Initialize OToolkit
 		AppBase::instance()->setApplicationInstance(&application);
 		AppBase::instance()->setUrl(QString::fromStdString(otoolkit::intern::g_serviceURL));

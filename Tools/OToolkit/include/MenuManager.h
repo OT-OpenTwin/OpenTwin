@@ -34,11 +34,11 @@ public:
 
 Q_SIGNALS:
 	void exitRequested(void);
-	void settingsRequested(void);
 
 private Q_SLOTS:
 	void slotExit(void);
 	void slotSettings(void);
+	void slotSettingChanged(void);
 
 private:
 	QMenu* m_fileMenu;

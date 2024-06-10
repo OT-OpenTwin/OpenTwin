@@ -36,15 +36,23 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		PropertyGroup* defaultGroup(void) const { return m_defaultGroup; };
+		//! \brief Adds the contents of the other configuration to this configuration.
+		//! \param _other Other configuration to merge into this.
+		//! \param _replaceExistingProperties If enabled existing properties will be replaced with their corresponding property in the other group. Note that the property type may change if the other group contains a different property type.
+		void mergeWith(const PropertyGridCfg& _other, bool _replaceExistingProperties);
+
+		PropertyGroup* getDefaultGroup(void) const { return m_defaultGroup; };
 
 		void setRootGroups(const std::list<PropertyGroup*>& _groups);
 		void addRootGroup(PropertyGroup* _group);
-		const std::list<PropertyGroup*>& rootGroups(void) const { return m_rootGroups; };
+		const std::list<PropertyGroup*>& getRootGroups(void) const { return m_rootGroups; };
 		PropertyGroup* findGroup(const std::string& _name, bool _searchChildGroups = false) const;
 		PropertyGroup* findOrCreateGroup(const std::string& _name, bool _searchChildGroups = false);
 
 		std::list<Property*> findPropertiesBySpecialType(const std::string& _specialType) const;
+
+		//! \brief Returns false if at least one property exists in any of the groups and its child groups.
+		bool isEmpty(void) const;
 
 	private:
 		void clear(void);

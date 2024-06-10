@@ -6,10 +6,10 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/NavigationTreeItem.h"
 #include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/QWidgetInterface.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/TreeWidgetItemInfo.h"
 
 // Qt header
 #include <QtCore/qlist.h>
@@ -19,46 +19,6 @@
 #include <list>
 
 namespace ot {
-
-	class OT_WIDGETS_API_EXPORT TreeWidgetItemInfo {
-	public:
-		TreeWidgetItemInfo();
-		TreeWidgetItemInfo(const QString& _text, const QIcon& _icon = QIcon(), const NavigationTreeItemFlags& _flags = NavigationTreeItemFlags());
-		TreeWidgetItemInfo(const NavigationTreeItem& _config);
-		TreeWidgetItemInfo(const TreeWidgetItemInfo& _other);
-		virtual ~TreeWidgetItemInfo();
-
-		TreeWidgetItemInfo& operator = (const TreeWidgetItemInfo& _other);
-
-		void setText(const QString& _text) { m_text = _text; };
-		const QString& text(void) const { return m_text; };
-
-		void setIcon(const QIcon& _icon) { m_icon = _icon; };
-		const QIcon& icon(void) const { return m_icon; };
-
-		void setFlag(NavigationTreeItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
-		void setFlags(const NavigationTreeItemFlags _flags) { m_flags = _flags; };
-		NavigationTreeItemFlags flags(void) const { return m_flags; };
-
-		ot::TreeWidgetItemInfo& addChildItem(const QString& _text, const QIcon& _icon = QIcon(), const NavigationTreeItemFlags& _flags = NavigationTreeItemFlags());
-		void addChildItem(const TreeWidgetItemInfo& _info);
-		void setChildItems(const std::list<TreeWidgetItemInfo>& _childs) { m_childs = _childs; };
-		const std::list<TreeWidgetItemInfo>& childItems(void) const { return m_childs; };
-		void clearChildItems(void);
-
-	private:
-		QString m_text;
-		QIcon m_icon;
-		NavigationTreeItemFlags m_flags;
-		std::list<TreeWidgetItemInfo> m_childs;
-
-	};
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// ###########################################################################################################################################################################################################################################################################################################################
 
 	class OT_WIDGETS_API_EXPORT TreeWidget : public QTreeWidget, public ot::QWidgetInterface {
 		Q_OBJECT
@@ -141,29 +101,4 @@ namespace ot {
 		QTreeWidgetItem* addItem(QTreeWidgetItem* _parent, const TreeWidgetItemInfo& _item);
 	};
 
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	class OT_WIDGETS_API_EXPORT TreeWidgetItem : public QTreeWidgetItem {
-	public:
-		TreeWidgetItem(int _type = 0);
-		TreeWidgetItem(const TreeWidgetItemInfo& _itemInfo, int _type = 0);
-		virtual ~TreeWidgetItem();
-
-		void setNavigationItemFlag(NavigationTreeItemFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
-		void setNavigationItemFlags(NavigationTreeItemFlags _flags) { m_flags = _flags; };
-		NavigationTreeItemFlags navigationItemFlags(void) const { return m_flags; };
-
-		//! @brief Returns the item info
-		//! The information returned only contains the path to this item (other childs of parent items are ignored)
-		TreeWidgetItemInfo getFullInfo(void) const;
-
-		void expandAllParents(bool _expandThis = false);
-
-	private:
-		NavigationTreeItemFlags m_flags;
-	};
 }

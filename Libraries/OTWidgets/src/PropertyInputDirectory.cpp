@@ -49,7 +49,7 @@ QWidget* ot::PropertyInputDirectory::getQWidget(void) {
 }
 
 void ot::PropertyInputDirectory::slotFind(void) {
-	QString pth = QFileDialog::getExistingDirectory(m_edit, QString::fromStdString(this->data().propertyTitle()), m_edit->text());
+	QString pth = QFileDialog::getExistingDirectory(m_edit, QString::fromStdString(this->data().getPropertyTitle()), m_edit->text());
 	if (!pth.isEmpty() && m_edit->text() != pth) {
 		m_text = pth;
 		m_edit->setText(pth);
@@ -82,15 +82,15 @@ bool ot::PropertyInputDirectory::setupFromConfiguration(const Property* _configu
 
 	m_edit->blockSignals(true);
 
-	m_edit->setToolTip(QString::fromStdString(this->data().propertyTip()));
-	if (this->data().propertyFlags() & Property::HasMultipleValues) {
+	m_edit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
+	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 		m_edit->setText("...");
 	}
 	else {
 		m_edit->setText(m_text);
 	}
-	m_edit->setReadOnly(this->data().propertyFlags() & Property::IsReadOnly);
-	m_find->setEnabled(!(this->data().propertyFlags() & Property::IsReadOnly));
+	m_edit->setReadOnly(this->data().getPropertyFlags() & Property::IsReadOnly);
+	m_find->setEnabled(!(this->data().getPropertyFlags() & Property::IsReadOnly));
 
 	m_edit->blockSignals(false);
 

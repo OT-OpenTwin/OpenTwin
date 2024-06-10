@@ -985,7 +985,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		}
 
 		JsonObject fObj;
-		fObj.AddMember(JsonString(toString(ColorStyleFileValue::NameValue), styleFilesDoc.GetAllocator()), JsonString(itm->getPropertyData().propertyName(), styleFilesDoc.GetAllocator()), styleFilesDoc.GetAllocator());
+		fObj.AddMember(JsonString(toString(ColorStyleFileValue::NameValue), styleFilesDoc.GetAllocator()), JsonString(itm->getPropertyData().getPropertyName(), styleFilesDoc.GetAllocator()), styleFilesDoc.GetAllocator());
 		fObj.AddMember(JsonString(toString(ColorStyleFileValue::PathValue), styleFilesDoc.GetAllocator()), JsonString(inp->getCurrentText().toStdString(), styleFilesDoc.GetAllocator()), styleFilesDoc.GetAllocator());
 		styleFilesDoc.PushBack(fObj, styleFilesDoc.GetAllocator());
 	}
@@ -1012,7 +1012,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		}
 
 		JsonObject fObj;
-		fObj.AddMember(JsonString(toString(ColorStyleFileValue::NameValue), styleIntDoc.GetAllocator()), JsonString(itm->getPropertyData().propertyName(), styleIntDoc.GetAllocator()), styleIntDoc.GetAllocator());
+		fObj.AddMember(JsonString(toString(ColorStyleFileValue::NameValue), styleIntDoc.GetAllocator()), JsonString(itm->getPropertyData().getPropertyName(), styleIntDoc.GetAllocator()), styleIntDoc.GetAllocator());
 		fObj.AddMember(JsonString(toString(ColorStyleFileValue::ValueValue), styleIntDoc.GetAllocator()), JsonValue(inp->getValue()), styleIntDoc.GetAllocator());
 		styleIntDoc.PushBack(fObj, styleIntDoc.GetAllocator());
 	}
@@ -1039,7 +1039,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		}
 
 		JsonObject fObj;
-		fObj.AddMember(JsonString(toString(ColorStyleFileValue::NameValue), styleDoubleDoc.GetAllocator()), JsonString(itm->getPropertyData().propertyName(), styleDoubleDoc.GetAllocator()), styleDoubleDoc.GetAllocator());
+		fObj.AddMember(JsonString(toString(ColorStyleFileValue::NameValue), styleDoubleDoc.GetAllocator()), JsonString(itm->getPropertyData().getPropertyName(), styleDoubleDoc.GetAllocator()), styleDoubleDoc.GetAllocator());
 		fObj.AddMember(JsonString(toString(ColorStyleFileValue::ValueValue), styleDoubleDoc.GetAllocator()), JsonValue(inp->getValue()), styleDoubleDoc.GetAllocator());
 		styleDoubleDoc.PushBack(fObj, styleDoubleDoc.GetAllocator());
 	}
@@ -1070,7 +1070,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		}
 
 		ColorStyleValue newValue;
-		newValue.setEntryKey(stringToColorStyleValueEntry(itm->getPropertyData().propertyName()));
+		newValue.setEntryKey(stringToColorStyleValueEntry(itm->getPropertyData().getPropertyName()));
 		newValue.setPainter(inp->getButton()->getPainter()->createCopy());
 
 		JsonObject pObj;
@@ -1099,7 +1099,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 				OT_LOG_EAS("Input cast failed");
 				return false;
 			}
-			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::PainterMacro)) + ":" + QString::fromStdString(inp->data().propertyName()) + "%";
+			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::PainterMacro)) + ":" + QString::fromStdString(inp->data().getPropertyName()) + "%";
 			if (replacementMap.count(k)) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;
@@ -1116,7 +1116,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 				OT_LOG_EAS("Input cast failed");
 				return false;
 			}
-			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::FileMacro)) + ":" + QString::fromStdString(inp->data().propertyName()) + "%";
+			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::FileMacro)) + ":" + QString::fromStdString(inp->data().getPropertyName()) + "%";
 			if (replacementMap.count(k)) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;
@@ -1133,7 +1133,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 				OT_LOG_EAS("Input cast failed");
 				return false;
 			}
-			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::IntMacro)) + ":" + QString::fromStdString(inp->data().propertyName()) + "%";
+			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::IntMacro)) + ":" + QString::fromStdString(inp->data().getPropertyName()) + "%";
 			if (replacementMap.count(k)) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;
@@ -1150,7 +1150,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 				OT_LOG_EAS("Input cast failed");
 				return false;
 			}
-			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::DoubleMacro)) + ":" + QString::fromStdString(inp->data().propertyName()) + "%";
+			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::DoubleMacro)) + ":" + QString::fromStdString(inp->data().getPropertyName()) + "%";
 			if (replacementMap.count(k)) {
 				OT_LOG_W("Duplicate key \"" + k.toStdString() + "\"");
 				return false;

@@ -6,63 +6,11 @@
 // OpenTwin header
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/TreeWidgetItem.h"
 #include "OTWidgets/GlobalColorStyle.h"
 
 // Qt header
 #include <QtGui/qevent.h>
-
-ot::TreeWidgetItemInfo::TreeWidgetItemInfo() : m_flags(ot::NoNavigationTreeItemFlags) {}
-
-ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const QString& _text, const QIcon& _icon, const NavigationTreeItemFlags& _flags)
-	: m_text(_text), m_icon(_icon), m_flags(_flags)
-{}
-
-ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const NavigationTreeItem& _config)
-	: m_text(QString::fromStdString(_config.text())), m_flags(_config.flags())
-{
-	if (!_config.iconPath().empty()) {
-		m_icon = IconManager::getIcon(QString::fromStdString(_config.iconPath()));
-	}
-	
-	for (const NavigationTreeItem& child : _config.childItems()) {
-		m_childs.push_back(TreeWidgetItemInfo(child));
-	}
-}
-
-ot::TreeWidgetItemInfo::TreeWidgetItemInfo(const TreeWidgetItemInfo& _other) 
-	: m_text(_other.m_text), m_icon(_other.m_icon), m_flags(_other.m_flags), m_childs(_other.m_childs)
-{}
-
-ot::TreeWidgetItemInfo::~TreeWidgetItemInfo() {
-
-}
-
-ot::TreeWidgetItemInfo& ot::TreeWidgetItemInfo::operator = (const TreeWidgetItemInfo& _other) {
-	m_text = _other.m_text;
-	m_icon = _other.m_icon;
-	m_flags = _other.m_flags;
-	m_childs = _other.m_childs;
-	return *this;
-}
-
-ot::TreeWidgetItemInfo& ot::TreeWidgetItemInfo::addChildItem(const QString& _text, const QIcon& _icon, const NavigationTreeItemFlags& _flags) {
-	m_childs.push_back(TreeWidgetItemInfo(_text, _icon, _flags));
-	return m_childs.back();
-}
-
-void ot::TreeWidgetItemInfo::addChildItem(const TreeWidgetItemInfo& _info) {
-	m_childs.push_back(_info);
-}
-
-void ot::TreeWidgetItemInfo::clearChildItems(void) {
-	m_childs.clear();
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
 
 ot::TreeWidget::TreeWidget(QWidget * _parentWidget) 
 	: QTreeWidget(_parentWidget) 
@@ -215,69 +163,4 @@ QTreeWidgetItem* ot::TreeWidget::addItem(QTreeWidgetItem* _parent, const TreeWid
 	TreeWidgetItem* newItem = new TreeWidgetItem(_item);
 	_parent->addChild(newItem);
 	return newItem;
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-ot::TreeWidgetItem::TreeWidgetItem(int _type)
-	: QTreeWidgetItem(_type), m_flags(ot::NoNavigationTreeItemFlags)
-{
-
-}
-
-ot::TreeWidgetItem::TreeWidgetItem(const TreeWidgetItemInfo& _item, int _type)
-	: QTreeWidgetItem(_type), m_flags(_item.flags())
-{
-	this->setText(0, _item.text());
-	this->setIcon(0, _item.icon());
-
-	for (const TreeWidgetItemInfo& c : _item.childItems()) {
-		this->addChild(new TreeWidgetItem(c));
-	}
-}
-
-ot::TreeWidgetItem::~TreeWidgetItem() {}
-
-ot::TreeWidgetItemInfo ot::TreeWidgetItem::getFullInfo(void) const {
-	ot::TreeWidgetItemInfo info;
-	info.setText(this->text(0));
-	info.setIcon(this->icon(0));
-	info.setFlags(this->navigationItemFlags());
-
-	const QTreeWidgetItem* itm = this->parent();
-
-	while (itm) {
-		// Mark info as child
-		ot::TreeWidgetItemInfo child = info;
-
-		info.clearChildItems();
-
-		info.setText(itm->text(0));
-		info.setIcon(itm->icon(0));
-		const ot::TreeWidgetItem* castItem = dynamic_cast<const ot::TreeWidgetItem*>(itm);
-		if (castItem) {
-			info.setFlags(castItem->navigationItemFlags());
-		}
-		else {
-			info.setFlags(ot::NoNavigationTreeItemFlags);
-		}
-
-		info.addChildItem(child);
-		itm = itm->parent();
-	}
-
-	return info;
-}
-
-void ot::TreeWidgetItem::expandAllParents(bool _expandThis) {
-	if (_expandThis) { this->setExpanded(true); }
-	QTreeWidgetItem* itm = parent();
-	while (itm) {
-		itm->setExpanded(true);
-		itm = itm->parent();
-	}
 }

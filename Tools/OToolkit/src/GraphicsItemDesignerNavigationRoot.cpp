@@ -53,7 +53,7 @@ void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
 void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
 	using namespace ot;
 
-	if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Show grid") {
+	if (_item->getGroupName() == "Editor" && _itemData.getPropertyName() == "Show grid") {
 		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -63,7 +63,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 		m_designer->getView()->getDesignerScene()->setGridFlags((input->isChecked() ? (Grid::ShowNormalLines | Grid::ShowWideLines) : Grid::NoGridFlags));
 		m_designer->getView()->update();
 	}
-	else if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Grid step size") {
+	else if (_item->getGroupName() == "Editor" && _itemData.getPropertyName() == "Grid step size") {
 		PropertyInputInt* input = dynamic_cast<PropertyInputInt*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -72,7 +72,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 		m_designer->getView()->getDesignerScene()->setGridStep(input->getValue());
 		m_designer->getView()->update();
 	}
-	else if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Wide step counter") {
+	else if (_item->getGroupName() == "Editor" && _itemData.getPropertyName() == "Wide step counter") {
 		PropertyInputInt* input = dynamic_cast<PropertyInputInt*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -81,7 +81,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 		m_designer->getView()->getDesignerScene()->setWideGridLineCounter(input->getValue());
 		m_designer->getView()->update();
 	}
-	else if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Grid snap mode") {
+	else if (_item->getGroupName() == "Editor" && _itemData.getPropertyName() == "Grid snap mode") {
 		PropertyInputStringList* input = dynamic_cast<PropertyInputStringList*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -89,7 +89,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 		}
 		m_designer->getView()->getDesignerScene()->setGridSnapMode(Grid::stringToGridSnapMode(input->getCurrentText().toStdString()));
 	}
-	else if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Width") {
+	else if (_item->getGroupName() == "Editor" && _itemData.getPropertyName() == "Width") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -98,7 +98,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 
 		m_designer->getView()->setItemSize(QSizeF(input->getValue(), m_designer->getView()->getItemSize().height()));
 	}
-	else if (_item->getGroupName() == "Editor" && _itemData.propertyName() == "Height") {
+	else if (_item->getGroupName() == "Editor" && _itemData.getPropertyName() == "Height") {
 		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
 		if (!input) {
 			OT_LOG_E("Input cast failed");
@@ -108,7 +108,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(ot::PropertyGridItem* _
 		m_designer->getView()->setItemSize(QSizeF(m_designer->getView()->getItemSize().width(), input->getValue()));
 	}
 	else {
-		OT_LOG_E("Unknown property { \"Group\": \"" + _item->getGroupName() + "\", \"Item\": \"" + _itemData.propertyName() + "\" }");
+		OT_LOG_E("Unknown property { \"Group\": \"" + _item->getGroupName() + "\", \"Item\": \"" + _itemData.getPropertyName() + "\" }");
 	}
 }
 

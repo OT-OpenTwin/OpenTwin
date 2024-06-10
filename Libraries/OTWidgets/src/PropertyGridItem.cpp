@@ -45,11 +45,11 @@ ot::PropertyGridItem::~PropertyGridItem() {
 }
 
 bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
-	m_titleLabel->setText(QString::fromStdString(_config->propertyTitle()));
+	m_titleLabel->setText(QString::fromStdString(_config->getPropertyTitle()));
 	if (m_input) delete m_input;
 	m_input = PropertyInputFactory::createInput(_config);
 
-	m_deleteLabel->setHidden(!(m_input->data().propertyFlags() & Property::IsDeletable));
+	m_deleteLabel->setHidden(!(m_input->data().getPropertyFlags() & Property::IsDeletable));
 
 	this->connect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::inputValueChanged);
 

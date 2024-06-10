@@ -271,6 +271,15 @@
     <ClCompile Include="src\GraphicsArcItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\ApplicationPropertiesManager.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TreeWidgetItem.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TreeWidgetItemInfo.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -497,6 +506,12 @@
     <ClInclude Include="include\OTWidgets\GraphicsArcItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\TreeWidgetItem.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\TreeWidgetItemInfo.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -609,6 +624,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\FilePathEdit.h">
       <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ApplicationPropertiesManager.h">
+      <Filter>include\Properties</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

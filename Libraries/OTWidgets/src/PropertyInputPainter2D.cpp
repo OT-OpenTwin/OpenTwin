@@ -64,11 +64,11 @@ bool ot::PropertyInputPainter2D::setupFromConfiguration(const Property* _configu
 	m_button->blockSignals(true);
 
 	m_button->setPainter(actualProperty->getPainter());
-	m_button->getButton()->setToolTip(QString::fromStdString(this->data().propertyTip()));
-	if (this->data().propertyFlags() & Property::HasMultipleValues) {
+	m_button->getButton()->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
+	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 		m_button->getButton()->setText("...");
 	}
-	m_button->getButton()->setEnabled(!(this->data().propertyFlags() & Property::IsReadOnly));
+	m_button->getButton()->setEnabled(!(this->data().getPropertyFlags() & Property::IsReadOnly));
 
 	m_button->blockSignals(false);
 
