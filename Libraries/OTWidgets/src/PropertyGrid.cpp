@@ -69,6 +69,7 @@ ot::PropertyGrid::PropertyGrid(QObject* _parentObject) : QObject(_parentObject) 
 }
 
 ot::PropertyGrid::~PropertyGrid() {
+	this->clear();
 	delete m_tree;
 }
 
@@ -152,7 +153,6 @@ ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _itemName) c
 				if (itm) return itm;
 			}
 		}
-		
 	}
 	return nullptr;
 }

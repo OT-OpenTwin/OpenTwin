@@ -46,7 +46,16 @@ ot::Dialog::DialogResult ot::ApplicationPropertiesManager::showDialog(void) {
 	dialogCfg.setGridConfig(gridCfg);	
 
 	PropertyDialog dialog(dialogCfg);
-	return dialog.showDialog();
+
+	this->connect(&dialog, &PropertyDialog::propertyChanged, this, &ApplicationPropertiesManager::slotPropertyChanged);
+	this->connect(&dialog, &PropertyDialog::propertyDeleteRequested, this, &ApplicationPropertiesManager::slotPropertyDeleteRequested);
+
+	Dialog::DialogResult result = dialog.showDialog();
+
+	this->disconnect(&dialog, &PropertyDialog::propertyChanged, this, &ApplicationPropertiesManager::slotPropertyChanged);
+	this->disconnect(&dialog, &PropertyDialog::propertyDeleteRequested, this, &ApplicationPropertiesManager::slotPropertyDeleteRequested);
+
+	return result;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

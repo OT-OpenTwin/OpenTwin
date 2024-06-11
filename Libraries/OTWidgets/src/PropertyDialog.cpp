@@ -220,7 +220,7 @@ void ot::PropertyDialog::iniGroup(QTreeWidgetItem* _parentTreeItem, const Proper
 	_parentTreeItem->addChild(newEntry.getTreeItem());
 
 	PropertyGridCfg newGridConfig;
-	newGridConfig.setDefaultGroup(new PropertyGroup(*_group));
+	newGridConfig.addRootGroup(new PropertyGroup(*_group));
 	newEntry.setGridConfig(newGridConfig);
 
 	for (PropertyGroup* childGroup : _group->getChildGroups()) {

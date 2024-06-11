@@ -21,7 +21,10 @@ ot::TreeWidget::TreeWidget(QWidget * _parentWidget)
 }
 
 ot::TreeWidget::~TreeWidget() {
-
+	this->blockSignals(true);
+	std::list<QTreeWidgetItem*> items;
+	for (int i = 0; i < this->topLevelItemCount(); i++) items.push_back(this->topLevelItem(i));
+	for (QTreeWidgetItem* item : items) this->destroyRecursive(item);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -163,4 +166,11 @@ QTreeWidgetItem* ot::TreeWidget::addItem(QTreeWidgetItem* _parent, const TreeWid
 	TreeWidgetItem* newItem = new TreeWidgetItem(_item);
 	_parent->addChild(newItem);
 	return newItem;
+}
+
+void ot::TreeWidget::destroyRecursive(QTreeWidgetItem* _item) {
+	std::list<QTreeWidgetItem*> items;
+	for (int i = 0; i < _item->childCount(); i++) items.push_back(_item->child(i));
+	for (QTreeWidgetItem* item : items) this->destroyRecursive(item);
+	delete _item;
 }
