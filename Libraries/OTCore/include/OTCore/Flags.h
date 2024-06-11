@@ -51,6 +51,7 @@ inline ___enumName operator ~ (___enumName _lhv) { return static_cast<___enumNam
 #endif
 
 //! \def OT_FRIEND_FLAG_FUNCTIONS
+//! \brief Adds a friend for the flag functions.
 //! Use this at the bottom of the file where the enum and flags are defined.
 //! 
 //!		class MyClass {
@@ -64,7 +65,8 @@ inline ___enumName operator ~ (___enumName _lhv) { return static_cast<___enumNam
 //!		};
 //! 
 //!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum, MyClass::MyFlags)
-//!		
+//!	
+//! \warning If the class is located in a namespace add the OT_ADD_FLAG_FUNCTIONS macro inside of the namespace.
 //! \param ___enumName Full enum name (e.g. ot::EnumName).
 //! \param ___flagsName Full flags name (e.g. ot::FlagsName).
 #define OT_FRIEND_FLAG_FUNCTIONS(___enumName) friend inline ___enumName operator | (___enumName _lhv, ___enumName _rhv); \

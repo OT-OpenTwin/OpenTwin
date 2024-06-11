@@ -59,6 +59,7 @@ LogInDialog::LogInDialog()
 	titleImageView->setEnableResizing(false);
 	titleImageView->setImageMargins(QMargins(0, 0, 0, 0));
 	titleImageView->setFixedSize(titleImageView->image().size());
+	titleImageView->setEnabled(false);
 
 	Label* gssLabel = new Label("Global Session Service:");
 	m_gss = new ComboBox;
@@ -146,6 +147,8 @@ LogInDialog::LogInDialog()
 	this->setWindowFlags(Qt::Dialog | Qt::WindowType::FramelessWindowHint);
 	this->setWindowIcon(ot::IconManager::getApplicationIcon());
 	this->setFixedSize(350, 500);
+	this->setDialogFlag(ot::DialogCfg::MoveGrabAnywhere);
+	this->setDialogFlag(ot::DialogCfg::RecenterOnF11);
 
 	// Connect signals
 	this->connect(m_logInButton, &PushButton::clicked, this, &LogInDialog::slotLogIn);

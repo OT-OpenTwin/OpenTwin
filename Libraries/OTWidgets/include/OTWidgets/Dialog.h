@@ -28,6 +28,12 @@ namespace ot {
 			Cancel
 		};
 
+		enum class DialogState {
+			NoState = 0x00,
+			MousePressed = 0x01
+		};
+		typedef Flags<DialogState> DialogStateFlags;
+
 		Dialog(QWidget* _parent = (QWidget*)nullptr);
 		Dialog(const DialogCfg& _config, QWidget* _parent = (QWidget*)nullptr);
 		virtual ~Dialog();
@@ -38,8 +44,15 @@ namespace ot {
 		//! @brief Center the dialog on parent and call exec
 		DialogResult showDialog(void);
 
-		void close(DialogResult _result);
+		//! \brief Centers this dialog on the parent.
+		//! If no parent is provided the dialog will center on the screen.
+		void centerOnParent(QWidget* _parent);
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
+
+		void setDialogFlag(DialogCfg::DialogFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
 		void setDialogFlags(DialogCfg::DialogFlags _flags) { m_flags = _flags; };
 		DialogCfg::DialogFlags dialogFlags(void) const { return m_flags; };
 
@@ -48,17 +61,35 @@ namespace ot {
 		void setDialogName(const std::string& _name) { m_dialogName = _name; };
 		const std::string& dialogName(void) const { return m_dialogName; };
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Public slots
+
 	public Q_SLOTS:
+		void close(DialogResult _result);
 		void closeOk(void);
 		void closeYes(void);
 		void closeNo(void);
 		void closeRetry(void);
 		void closeCancel(void);
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Protected
+
+	protected:
+		virtual void keyPressEvent(QKeyEvent* _event) override;
+		virtual void mousePressEvent(QMouseEvent* _event) override;
+		virtual void mouseMoveEvent(QMouseEvent* _event) override;
+		virtual void mouseReleaseEvent(QMouseEvent* _event) override;
+
 	private:
+		DialogStateFlags m_state;
+		QPoint m_lastMousePos;
 		DialogCfg::DialogFlags m_flags;
 		DialogResult m_result;
 		std::string m_dialogName;
 	};
-
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::Dialog::DialogState)

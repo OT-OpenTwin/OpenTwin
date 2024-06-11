@@ -4,10 +4,17 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTWidgets/Dialog.h"
+#include "OTWidgets/Positioning.h"
+
+// Qt header
+#include <QtGui/qevent.h>
+#include <QtGui/qscreen.h>
+#include <QtWidgets/qapplication.h>
 
 ot::Dialog::Dialog(QWidget* _parent)
-	: QDialog(_parent), m_flags(DialogCfg::NoFlags), m_result(DialogResult::Cancel) 
+	: QDialog(_parent), m_flags(DialogCfg::NoFlags), m_result(DialogResult::Cancel), m_state(DialogState::NoState)
 {
 	this->setWindowFlags(this->windowFlags() & (~Qt::WindowContextHelpButtonHint));
 }
@@ -33,6 +40,19 @@ ot::Dialog::DialogResult ot::Dialog::showDialog(void) {
 	return m_result;
 }
 
+void ot::Dialog::centerOnParent(QWidget* _parent) {
+	if (_parent) {
+		this->move(calculateChildRect(_parent->rect(), this->size(), ot::AlignCenter).topLeft());
+	}
+	else {
+		this->move(calculateChildRect(QApplication::primaryScreen()->geometry(), this->size(), ot::AlignCenter).topLeft());
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Public slots
+
 void ot::Dialog::close(DialogResult _result) {
 	m_result = _result;
 	this->QDialog::close();
@@ -56,4 +76,40 @@ void ot::Dialog::closeRetry(void) {
 
 void ot::Dialog::closeCancel(void) {
 	this->close(Dialog::Cancel);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected
+
+void ot::Dialog::keyPressEvent(QKeyEvent* _event) {
+	QDialog::keyPressEvent(_event);
+	if ((_event->key() == Qt::Key_F11) && (m_flags & DialogCfg::DialogFlag::RecenterOnF11)) {
+		this->centerOnParent(nullptr);
+	}
+}
+
+void ot::Dialog::mousePressEvent(QMouseEvent* _event) {
+	QDialog::mousePressEvent(_event);
+	if (_event->button() == Qt::LeftButton && m_flags & DialogCfg::MoveGrabAnywhere) {
+		m_lastMousePos = _event->globalPos();
+		m_state.setFlag(DialogState::MousePressed, true);
+	}
+}
+
+void ot::Dialog::mouseMoveEvent(QMouseEvent* _event) {
+	QDialog::mouseMoveEvent(_event);
+	if (m_flags & DialogCfg::MoveGrabAnywhere && m_state & DialogState::MousePressed) {
+		QPoint delta = _event->globalPos() - m_lastMousePos;
+		if (delta.isNull()) return;
+		this->move(this->pos() + delta);
+		m_lastMousePos = _event->globalPos();
+	}
+}
+
+void ot::Dialog::mouseReleaseEvent(QMouseEvent* _event) {
+	QDialog::mouseReleaseEvent(_event);
+	if (_event->button() == Qt::LeftButton) {
+		m_state.setFlag(DialogState::MousePressed, false);
+	}
 }

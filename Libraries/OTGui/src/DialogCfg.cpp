@@ -11,7 +11,9 @@ std::string ot::DialogCfg::toString(DialogFlag _flag) {
 	switch (_flag)
 	{
 	case DialogCfg::NoFlags: return "<null>";
-	case DialogCfg::CancelOnNoChange: return "CancelOnEqualValue";
+	case DialogCfg::CancelOnNoChange: return "CancelOnNoChange";
+	case DialogCfg::MoveGrabAnywhere: return "MoveGrabAnywhere";
+	case DialogCfg::RecenterOnF11: return "RecenterOnF11";
 	default:
 		OT_LOG_EAS("Unknown dialog flag (" + std::to_string((size_t)_flag) + ")");
 		return "<null>";
@@ -21,6 +23,8 @@ std::string ot::DialogCfg::toString(DialogFlag _flag) {
 ot::DialogCfg::DialogFlag ot::DialogCfg::stringToFlag(const std::string& _flag) {
 	if (_flag == DialogCfg::toString(DialogCfg::NoFlags)) return DialogCfg::NoFlags;
 	else if (_flag == DialogCfg::toString(DialogCfg::CancelOnNoChange)) return DialogCfg::CancelOnNoChange;
+	else if (_flag == DialogCfg::toString(DialogCfg::MoveGrabAnywhere)) return DialogCfg::MoveGrabAnywhere;
+	else if (_flag == DialogCfg::toString(DialogCfg::RecenterOnF11)) return DialogCfg::RecenterOnF11;
 	else {
 		OT_LOG_EAS("Unknown dialog flag \"" + _flag + "\"");
 		return DialogCfg::NoFlags;
@@ -30,6 +34,8 @@ ot::DialogCfg::DialogFlag ot::DialogCfg::stringToFlag(const std::string& _flag) 
 std::list<std::string> ot::DialogCfg::toStringList(DialogFlags _flags) {
 	std::list<std::string> ret;
 	if (_flags & DialogCfg::CancelOnNoChange) ret.push_back(DialogCfg::toString(DialogCfg::CancelOnNoChange));
+	if (_flags & DialogCfg::MoveGrabAnywhere) ret.push_back(DialogCfg::toString(DialogCfg::MoveGrabAnywhere));
+	if (_flags & DialogCfg::RecenterOnF11) ret.push_back(DialogCfg::toString(DialogCfg::RecenterOnF11));
 	return ret;
 }
 
