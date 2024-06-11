@@ -132,10 +132,15 @@ The `OTCore/OTClassHelper.h` header provides helpers that may be used to explici
         int* m_value;
     };
 
-Class Naming Convention
------------------------
+Class and Method Naming Convention
+----------------------------------
 
-....
+Names of classes and methods need to be well chosen. An optimal naming tells a reader the exact purpose of a class or method, so that additional comments are only sparesly needed.
+We don't want to give any strict rules, since the task of naming can be considered a creative one.
+So understand the following just as a typ for a naming structure that supports the usage of our code within the IDE:
+It can be very helpful to use the name of a base classes as the base for the derived classes, e.g.: BlockEntity (base) and BlockEntityDatabaseAccess (derived). 
+By building a name like this, it is possible to type BlockEntity and let the code support tools (e.g. intellisense) tell you what types of BlockEntities are available. 
+However, that can potentially lead to long names, so it should be used with care.
 
 Setter and Getter
 -----------------
