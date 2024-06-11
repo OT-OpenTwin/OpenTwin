@@ -30,6 +30,7 @@ namespace ot {
 		PropertyDialog(const PropertyDialogCfg& _config, QWidget* _parentWidget = (QWidget*)nullptr);
 		virtual ~PropertyDialog();
 
+		const PropertyGrid* const getPropertyGrid(void) const { return m_grid; };
 
 	Q_SIGNALS:
 		void propertyChanged(const std::string& _groupPath, const std::string& _propertyName);
@@ -56,7 +57,7 @@ namespace ot {
 		class PropertyDialogEntry;
 		class PropertyDialogNavigation;
 
-		void iniData(void);
+		void iniData(const PropertyDialogCfg& _config);
 		void iniGroup(QTreeWidgetItem* _parentTreeItem, const PropertyGroup* _group);
 		bool childItemExists(QTreeWidgetItem* _item, const QString& _text);
 
@@ -65,7 +66,6 @@ namespace ot {
 		//! Calls this function for all childs of _item.
 		QTreeWidgetItem* findMatchingItem(QTreeWidgetItem* _item, const QString& _text);
 
-		PropertyDialogCfg m_config;
 		std::map<QTreeWidgetItem*, PropertyDialogEntry> m_treeMap;
 
 		PropertyDialogNavigation* m_navigation;

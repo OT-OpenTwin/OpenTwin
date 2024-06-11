@@ -20,6 +20,8 @@
 
 namespace ot {
 
+	class PropertyDialog;
+
 	class OT_WIDGETS_API_EXPORT ApplicationPropertiesManager : public QObject {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ApplicationPropertiesManager)
@@ -47,6 +49,8 @@ namespace ot {
 		//! \see ot::PropertyGroup::mergeWith()
 		bool getReplaceExistingPropertiesOnMerge(void) const { return m_propertyReplaceOnMerge; };
 
+		const PropertyDialog* const getDialog(void) const { return m_dialog; };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private
@@ -58,6 +62,7 @@ namespace ot {
 	private:
 		bool m_propertyReplaceOnMerge;
 		std::map<std::string, PropertyGridCfg> m_data;
+		PropertyDialog* m_dialog;
 
 		PropertyGridCfg& findOrCreateData(const std::string& _owner);
 

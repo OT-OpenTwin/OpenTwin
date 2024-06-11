@@ -12,6 +12,9 @@
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTGui/PropertyStringList.h"
+#include "OTWidgets/PropertyGrid.h"
+#include "OTWidgets/PropertyDialog.h"
+#include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/ApplicationPropertiesManager.h"
 
@@ -67,6 +70,33 @@ bool SettingsManager::showDialog(void) {
 
 void SettingsManager::slotPropertyChanged(const std::string& _groupPath, const std::string& _propertyName) {
 	OT_LOG_I("Property change { \"Group\": \"" + _groupPath + "\", \"Property\": \"" + _propertyName + "\" }");
+
+	const ot::PropertyDialog*const dialog = ot::ApplicationPropertiesManager::instance().getDialog();
+	if (!dialog) {
+		OT_LOG_E("Dialog does not exist");
+		return;
+	}
+
+	// Check default application settings
+	if (_groupPath == "General/Appearance" && _propertyName == "Color Style") {
+		ot::PropertyGridItem* item = dialog->getPropertyGrid()->findItem(std::list<std::string>({ "General", "Appearance" }), "Color Style");
+		if (!item) {
+			OT_LOG_E("Item not found { \"Group\": \"" + _groupPath + "\", \"Property\": \"" + _propertyName + "\" }");
+			return;
+		}
+		ot::PropertyStringList* prop = dynamic_cast<ot::PropertyStringList*>(item->createProperty());
+		if (!prop) {
+			OT_LOG_E("Invalid property { \"Group\": \"" + _groupPath + "\", \"Property\": \"" + _propertyName + "\" }");
+			return;
+		}
+
+		QMetaObject::invokeMethod(this, &SettingsManager::slotDevb, Qt::QueuedConnection);
+	}
+
+}
+
+void SettingsManager::slotDevb() {
+	ot::GlobalColorStyle::instance().setCurrentStyle("Dark");
 }
 
 void SettingsManager::slotPropertyDeleteRequested(const std::string& _groupPath, const std::string& _propertyName) {

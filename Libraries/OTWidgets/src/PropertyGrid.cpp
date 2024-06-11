@@ -98,9 +98,6 @@ void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 		newGroup->setupFromConfig(group);
 		this->addGroup(newGroup);
 		newGroup->finishSetup();
-		if (newGroup->childCount() > 0) {
-			newGroup->setExpanded(true);
-		}
 		newGroup->updateStateIcon();
 	}
 
@@ -211,7 +208,7 @@ void ot::PropertyGrid::slotItemExpanded(QTreeWidgetItem* _item) {
 ot::PropertyGridGroup* ot::PropertyGrid::findGroup(QTreeWidgetItem* _parentTreeItem, const std::list<std::string>& _groupPath) const {
 	if (_groupPath.empty()) return nullptr;
 	for (int i = 0; i < _parentTreeItem->childCount(); i++) {
-		PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(m_tree->topLevelItem(i));
+		PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(_parentTreeItem->child(i));
 		if (g) {
 			if (g->getName() == _groupPath.front()) {
 				std::list<std::string> newPath = _groupPath;

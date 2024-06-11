@@ -66,7 +66,7 @@ namespace ot {
 		void slotValueChanged(void);
 		void slotDeleteRequested(void);
 		void slotGlobalStyleChanged(const ColorStyle& _style);
-
+		
 	private:
 		QWidget* m_titleLayoutW;
 		Label* m_deleteLabel;

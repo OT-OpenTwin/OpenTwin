@@ -45,15 +45,19 @@ ot::Dialog::DialogResult ot::ApplicationPropertiesManager::showDialog(void) {
 	PropertyDialogCfg dialogCfg;
 	dialogCfg.setGridConfig(gridCfg);	
 
-	PropertyDialog dialog(dialogCfg);
+	OTAssert(m_dialog == nullptr, "Dialog already exists");
+	m_dialog = new PropertyDialog(dialogCfg);
 
-	this->connect(&dialog, &PropertyDialog::propertyChanged, this, &ApplicationPropertiesManager::slotPropertyChanged);
-	this->connect(&dialog, &PropertyDialog::propertyDeleteRequested, this, &ApplicationPropertiesManager::slotPropertyDeleteRequested);
+	this->connect(m_dialog, &PropertyDialog::propertyChanged, this, &ApplicationPropertiesManager::slotPropertyChanged);
+	this->connect(m_dialog, &PropertyDialog::propertyDeleteRequested, this, &ApplicationPropertiesManager::slotPropertyDeleteRequested);
 
-	Dialog::DialogResult result = dialog.showDialog();
+	Dialog::DialogResult result = m_dialog->showDialog();
 
-	this->disconnect(&dialog, &PropertyDialog::propertyChanged, this, &ApplicationPropertiesManager::slotPropertyChanged);
-	this->disconnect(&dialog, &PropertyDialog::propertyDeleteRequested, this, &ApplicationPropertiesManager::slotPropertyDeleteRequested);
+	this->disconnect(m_dialog, &PropertyDialog::propertyChanged, this, &ApplicationPropertiesManager::slotPropertyChanged);
+	this->disconnect(m_dialog, &PropertyDialog::propertyDeleteRequested, this, &ApplicationPropertiesManager::slotPropertyDeleteRequested);
+
+	delete m_dialog;
+	m_dialog = nullptr;
 
 	return result;
 }
@@ -89,7 +93,7 @@ ot::PropertyGridCfg& ot::ApplicationPropertiesManager::findOrCreateData(const st
 }
 
 ot::ApplicationPropertiesManager::ApplicationPropertiesManager()
-	: m_propertyReplaceOnMerge(false) 
+	: m_propertyReplaceOnMerge(false), m_dialog(nullptr)
 {}
 
 ot::ApplicationPropertiesManager::~ApplicationPropertiesManager() {

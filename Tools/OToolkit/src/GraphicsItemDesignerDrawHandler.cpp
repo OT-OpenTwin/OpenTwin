@@ -73,7 +73,7 @@ GraphicsItemDesignerItemBase* GraphicsItemDesignerDrawHandler::stopDraw(void) {
 	m_previewItem = nullptr;
 
 	if (ret) {
-		m_previewItem->getGraphicsItem()->setBlockStateNotifications(false);
+		ret->getGraphicsItem()->setBlockStateNotifications(false);
 		
 		// If the item is invalid it should be removed.
 		if (!ret->isDesignedItemValid()) {

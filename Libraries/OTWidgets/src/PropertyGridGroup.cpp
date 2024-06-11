@@ -103,6 +103,8 @@ ot::PropertyGroup* ot::PropertyGridGroup::createConfiguration() const {
 void ot::PropertyGridGroup::finishSetup(void) {
 	this->setFirstColumnSpanned(false);
 
+	if (this->childCount() > 0) this->setExpanded(true);
+
 	TreeWidget* tree = dynamic_cast<TreeWidget*>(this->treeWidget());
 	if (!tree) {
 		OT_LOG_EA("Tree cast failed");

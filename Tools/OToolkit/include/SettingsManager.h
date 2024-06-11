@@ -27,6 +27,7 @@ public:
 private Q_SLOTS:
 	void slotPropertyChanged(const std::string& _groupPath, const std::string& _propertyName);
 	void slotPropertyDeleteRequested(const std::string& _groupPath, const std::string& _propertyName);
+	void slotDevb();
 
 private:
 	AppBase* m_app;

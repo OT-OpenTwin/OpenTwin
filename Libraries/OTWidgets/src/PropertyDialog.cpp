@@ -85,7 +85,7 @@ namespace ot {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _parentWidget)
-	: Dialog(_config, _parentWidget), m_changed(false), m_config(_config)
+	: Dialog(_config, _parentWidget), m_changed(false)
 {
 	// Create layouts
 	QVBoxLayout* cLay = new QVBoxLayout(this);
@@ -111,7 +111,7 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 
 	// Setup data
 	
-	this->iniData();
+	this->iniData(_config);
 
 	// Connect signals
 	this->connect(m_navigation->getTreeWidget(), &TreeWidget::itemSelectionChanged, this, &PropertyDialog::slotTreeSelectionChanged);
@@ -274,9 +274,9 @@ void ot::PropertyDialog::slotPropertyDeleteRequested(const std::list<std::string
 
 // Private helper
 
-void ot::PropertyDialog::iniData(void) {
-	this->iniGroup(m_navigation->getTreeWidget()->invisibleRootItem(), m_config.getDefaultGroup());
-	for (PropertyGroup* group : m_config.getRootGroups()) {
+void ot::PropertyDialog::iniData(const PropertyDialogCfg& _config) {
+	this->iniGroup(m_navigation->getTreeWidget()->invisibleRootItem(), _config.getDefaultGroup());
+	for (PropertyGroup* group : _config.getRootGroups()) {
 		this->iniGroup(m_navigation->getTreeWidget()->invisibleRootItem(), group);
 	}
 }
