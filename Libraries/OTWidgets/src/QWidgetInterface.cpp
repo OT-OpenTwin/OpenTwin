@@ -4,10 +4,14 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTWidgets/Positioning.h"
 #include "OTWidgets/QWidgetInterface.h"
 
 // Qt header
+#include <QtGui/qscreen.h>
 #include <QtWidgets/qwidget.h>
+#include <QtWidgets/qapplication.h>
+
 
 void ot::QWidgetInterface::setOTWidgetFlags(const WidgetFlags& _flags) {
 	if (m_widgetFlags == _flags) return;
@@ -16,8 +20,10 @@ void ot::QWidgetInterface::setOTWidgetFlags(const WidgetFlags& _flags) {
 }
 
 void ot::QWidgetInterface::centerOnParent(const QWidget* _parentWidget) {
-	const QSize parentSize = _parentWidget->size();
-	const QPoint parentCenter = _parentWidget->pos() + QPoint(parentSize.width() / 2, parentSize.height() / 2);
-	const QSize size = this->getQWidget()->size();
-	this->getQWidget()->move(QPoint(parentCenter.x() - (size.width() / 2), parentCenter.y() - (size.height() / 2)));
+	if (_parentWidget) {
+		this->getQWidget()->move(calculateChildRect(_parentWidget->rect(), this->getQWidget()->size(), ot::AlignCenter).topLeft());
+	}
+	else {
+		this->getQWidget()->move(calculateChildRect(QApplication::primaryScreen()->geometry(), this->getQWidget()->size(), ot::AlignCenter).topLeft());
+	}
 }

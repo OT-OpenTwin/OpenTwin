@@ -44,10 +44,6 @@ namespace ot {
 		//! @brief Center the dialog on parent and call exec
 		DialogResult showDialog(void);
 
-		//! \brief Centers this dialog on the parent.
-		//! If no parent is provided the dialog will center on the screen.
-		void centerOnParent(QWidget* _parent);
-
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter

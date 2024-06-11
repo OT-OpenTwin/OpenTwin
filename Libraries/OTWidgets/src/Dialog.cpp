@@ -6,12 +6,9 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTWidgets/Dialog.h"
-#include "OTWidgets/Positioning.h"
 
 // Qt header
 #include <QtGui/qevent.h>
-#include <QtGui/qscreen.h>
-#include <QtWidgets/qapplication.h>
 
 ot::Dialog::Dialog(QWidget* _parent)
 	: QDialog(_parent), m_flags(DialogCfg::NoFlags), m_result(DialogResult::Cancel), m_state(DialogState::NoState)
@@ -38,15 +35,6 @@ ot::Dialog::DialogResult ot::Dialog::showDialog(void) {
 	}
 	this->exec();
 	return m_result;
-}
-
-void ot::Dialog::centerOnParent(QWidget* _parent) {
-	if (_parent) {
-		this->move(calculateChildRect(_parent->rect(), this->size(), ot::AlignCenter).topLeft());
-	}
-	else {
-		this->move(calculateChildRect(QApplication::primaryScreen()->geometry(), this->size(), ot::AlignCenter).topLeft());
-	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

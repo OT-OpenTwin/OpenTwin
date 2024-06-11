@@ -27,6 +27,8 @@ namespace ot {
 		const WidgetFlags& otWidgetFlags(void) const { return m_widgetFlags; };
 		virtual void otWidgetFlagsChanged(const WidgetFlags& _flags) {};
 
+		//! \brief Centers this widget on the parent.
+		//! If no parent is provided the widget will center on the screen.
 		void centerOnParent(const QWidget* _parentWidget);
 
 	protected:
