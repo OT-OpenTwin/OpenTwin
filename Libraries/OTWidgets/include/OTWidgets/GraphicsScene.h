@@ -75,6 +75,8 @@ namespace ot {
 		
 		void deselectAll(void);
 
+		void moveAllSelectedItems(const QPointF& _delta);
+
 	Q_SIGNALS:
 		void selectionChangeFinished(void);
 

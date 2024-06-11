@@ -136,6 +136,13 @@ void ot::GraphicsScene::handleSelectionChanged(void) {
 
 // Protected: Event handling
 
+void ot::GraphicsScene::moveAllSelectedItems(const QPointF& _delta) {
+	if (_delta.x() == 0. && _delta.y() == 0.) return;
+	for (QGraphicsItem* item : this->selectedItems()) {
+		item->setPos(this->snapToGrid(item->pos() + _delta));
+	}
+}
+
 void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) {
 	QList<QGraphicsItem*> lst = items(_event->scenePos());
 	for (auto itm : lst) {

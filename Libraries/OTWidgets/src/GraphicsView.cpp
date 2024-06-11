@@ -388,6 +388,18 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 		ot::UIDList con = this->getSelectedConnectionUIDs();
 		Q_EMIT removeItemsRequested(itm, con);
 	}
+	else if (_event->key() == Qt::Key_Left) {
+		m_scene->moveAllSelectedItems(QPointF(-m_scene->getGrid().getGridStep().x(), 0.));
+	}
+	else if (_event->key() == Qt::Key_Right) {
+		m_scene->moveAllSelectedItems(QPointF(m_scene->getGrid().getGridStep().x(), 0.));
+	}
+	else if (_event->key() == Qt::Key_Up) {
+		m_scene->moveAllSelectedItems(QPointF(0., -m_scene->getGrid().getGridStep().y()));
+	}
+	else if (_event->key() == Qt::Key_Down) {
+		m_scene->moveAllSelectedItems(QPointF(0., m_scene->getGrid().getGridStep().y()));
+	}
 }
 
 void ot::GraphicsView::keyReleaseEvent(QKeyEvent* _event) {}
