@@ -65,7 +65,9 @@ protected:
 
 private Q_SLOTS:
 	void slotPropertyChanged(const std::string& _group, const std::string& _item);
+	void slotPropertyChanged(const std::list<std::string>& _groupPath, const std::string& _item);
 	void slotPropertyDeleteRequested(const std::string& _group, const std::string& _item);
+	void slotPropertyDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _item);
 
 private:
 	QTreeWidgetItem* m_navigationItem;

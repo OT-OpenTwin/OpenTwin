@@ -184,6 +184,7 @@ public:
 	void contextMenuItemCheckedChanged(const std::string& _menuName, const std::string& _itemName, bool _isChecked);
 
 	bool propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
+	bool propertyGridValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName);
 
 private:
 	std::vector<ViewerUIDtype>		m_viewers;

@@ -65,6 +65,15 @@ void ot::PropertyGridGroup::setupFromConfig(const PropertyGroup* _group) {
 		// Setup must be called after adding
 		newItem->setupFromConfig(p);
 	}
+
+	for (PropertyGroup* g : _group->getChildGroups()) {
+		if (g->isEmpty()) continue;
+		PropertyGridGroup* newGroup = new PropertyGridGroup;
+		this->addChildGroup(newGroup);
+
+		// Setup must be called after adding
+		newGroup->setupFromConfig(g);
+	}
 }
 
 ot::PropertyGroup* ot::PropertyGridGroup::createConfiguration() const {
@@ -136,6 +145,15 @@ void ot::PropertyGridGroup::addProperty(PropertyGridItem* _item) {
 
 	this->connect(_item, &PropertyGridItem::inputValueChanged, this, qOverload<>(&PropertyGridGroup::slotItemInputValueChanged));
 	this->connect(_item, &PropertyGridItem::deleteRequested, this, qOverload<>(&PropertyGridGroup::slotItemDeleteRequested));
+}
+
+void ot::PropertyGridGroup::addChildGroup(PropertyGridGroup* _group) {
+	this->addChild(_group);
+
+	this->connect(_group, qOverload<const std::string&, const std::string&>(& PropertyGridGroup::itemInputValueChanged), this, qOverload<const std::string&, const std::string&>(&PropertyGridGroup::slotItemInputValueChanged));
+	this->connect(_group, qOverload<const std::list<std::string>&, const std::string&>(& PropertyGridGroup::itemInputValueChanged), this, qOverload<const std::list<std::string>&, const std::string&>(&PropertyGridGroup::slotItemInputValueChanged));
+	this->connect(_group, qOverload<const std::string&, const std::string&>(&PropertyGridGroup::itemDeleteRequested), this, qOverload<const std::string&, const std::string&>(&PropertyGridGroup::slotItemDeleteRequested));
+	this->connect(_group, qOverload<const std::list<std::string>&, const std::string&>(&PropertyGridGroup::itemDeleteRequested), this, qOverload<const std::list<std::string>&, const std::string&>(&PropertyGridGroup::slotItemDeleteRequested));
 }
 
 ot::PropertyGridItem* ot::PropertyGridGroup::findChildProperty(const std::string& _propertyName, bool _searchChildGroups) const {
@@ -218,7 +236,16 @@ void ot::PropertyGridGroup::slotItemInputValueChanged(void) {
 }
 
 void ot::PropertyGridGroup::slotItemInputValueChanged(const std::string& _groupName, const std::string& _itemName) {
-	Q_EMIT itemInputValueChanged(_groupName, _itemName);
+	std::list<std::string> groupPath;
+	groupPath.push_back(m_name);
+	groupPath.push_back(_groupName);
+	Q_EMIT itemInputValueChanged(groupPath, _itemName);
+}
+
+void ot::PropertyGridGroup::slotItemInputValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName) {
+	std::list<std::string> groupPath = _groupPath;
+	groupPath.push_front(this->m_name);
+	Q_EMIT itemInputValueChanged(groupPath, _itemName);
 }
 
 void ot::PropertyGridGroup::slotItemDeleteRequested(void) {
@@ -231,7 +258,16 @@ void ot::PropertyGridGroup::slotItemDeleteRequested(void) {
 }
 
 void ot::PropertyGridGroup::slotItemDeleteRequested(const std::string& _groupName, const std::string& _itemName) {
-	Q_EMIT itemDeleteRequested(_groupName, _itemName);
+	std::list<std::string> groupPath;
+	groupPath.push_back(m_name);
+	groupPath.push_back(_groupName);
+	Q_EMIT itemDeleteRequested(groupPath, _itemName);
+}
+
+void ot::PropertyGridGroup::slotItemDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _itemName) {
+	std::list<std::string> groupPath = _groupPath;
+	groupPath.push_front(this->m_name);
+	Q_EMIT itemDeleteRequested(groupPath, _itemName);
 }
 
 void ot::PropertyGridGroup::updateStateIcon(const ColorStyle& _style) {

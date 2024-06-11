@@ -556,34 +556,67 @@ void ExternalServicesComponent::itemRenamed(ModelUIDtype modelID, const std::str
 	}
 }
 
+ot::Property* ExternalServicesComponent::createCleanedPropertyFromItem(const ot::PropertyGridItem* _item) {
+	ot::Property* prop = _item->createProperty();
+
+	// For the EntityList property we remove the value id since we dont know the id of the entity
+	if (prop->getPropertyType() == OT_PROPERTY_TYPE_StringList && prop->getSpecialType() == "EntityList" && !prop->getAdditionalPropertyData().empty()) {
+		ot::JsonDocument dataDoc;
+		ot::JsonDocument newDataDoc;
+		dataDoc.fromJson(prop->getAdditionalPropertyData());
+		newDataDoc.AddMember("ContainerName", ot::JsonString(ot::json::getString(dataDoc, "ContainerName"), newDataDoc.GetAllocator()), newDataDoc.GetAllocator());
+		newDataDoc.AddMember("ContainerID", ot::json::getUInt64(dataDoc, "ContainerID"), newDataDoc.GetAllocator());
+		newDataDoc.AddMember("ValueID", 0, newDataDoc.GetAllocator());
+		prop->setAdditionalPropertyData(newDataDoc.toJson());
+	}
+
+	return prop;
+}
+
 void ExternalServicesComponent::propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName)
 {
+	std::list<std::string> path;
+	path.push_back(_groupName);
+	this->propertyGridValueChanged(path, _itemName);
+}
+
+void ExternalServicesComponent::propertyGridValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName) {
+	if (_groupPath.empty()) {
+		OT_LOG_EA("Group path is empty");
+	}
+
+	ot::PropertyGridItem* itm = AppBase::instance()->findProperty(_groupPath, _itemName);
+	if (!itm) {
+		OT_LOG_E("Property not found");
+		return;
+	}
+
+	ot::PropertyGridCfg cfg;
+
+	std::list<std::string> groupPath = _groupPath;
+
+	ot::PropertyGroup* cfgGroup = new ot::PropertyGroup(groupPath.back());
+	groupPath.pop_back();
+
+	while (!groupPath.empty()) {
+		ot::PropertyGroup* newCfgGroup = new ot::PropertyGroup(groupPath.back());
+		groupPath.pop_back();
+		newCfgGroup->addChildGroup(cfgGroup);
+		cfgGroup = newCfgGroup;
+	}
+
+	cfgGroup->addProperty(this->createCleanedPropertyFromItem(itm));
+	cfg.addRootGroup(cfgGroup);
+
 	AppBase::instance()->lockPropertyGrid(true);
 
+	this->propertyGridValueChanged(cfg);
+
+	AppBase::instance()->lockPropertyGrid(false);
+}
+
+void ExternalServicesComponent::propertyGridValueChanged(const ot::PropertyGridCfg& _config) {
 	try {
-		ot::PropertyGridItem* itm = AppBase::instance()->findProperty(_groupName, _itemName);
-		if (!itm) {
-			OT_LOG_E("Property not found");
-			return;
-		}
-		
-		ot::PropertyGridCfg cfg;
-		ot::PropertyGroup* cfgGroup = new ot::PropertyGroup(_groupName);
-		ot::Property* prop = itm->createProperty();
-
-		// For the EntityList property we remove the value id since we dont know the id of the entity
-		if (prop->getPropertyType() == OT_PROPERTY_TYPE_StringList && prop->getSpecialType() == "EntityList" && !prop->getAdditionalPropertyData().empty()) {
-			ot::JsonDocument dataDoc;
-			ot::JsonDocument newDataDoc;
-			dataDoc.fromJson(prop->getAdditionalPropertyData());
-			newDataDoc.AddMember("ContainerName", ot::JsonString(ot::json::getString(dataDoc, "ContainerName"), newDataDoc.GetAllocator()), newDataDoc.GetAllocator());
-			newDataDoc.AddMember("ContainerID", ot::json::getUInt64(dataDoc, "ContainerID"), newDataDoc.GetAllocator());
-			newDataDoc.AddMember("ValueID", 0, newDataDoc.GetAllocator());
-			prop->setAdditionalPropertyData(newDataDoc.toJson());
-		}
-		cfgGroup->addProperty(prop);
-		cfg.addRootGroup(cfgGroup);
-
 		// Get the currently selected model entities. We first get all visible entities only.
 		std::list<ak::UID> selectedModelEntityIDs;
 		getSelectedVisibleModelEntityIDs(selectedModelEntityIDs);
@@ -598,10 +631,10 @@ void ExternalServicesComponent::propertyGridValueChanged(const std::string& _gro
 
 		// Finally send the string
 		ak::UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
-		
+
 		ot::JsonDocument doc;
 		ot::JsonObject cfgObj;
-		cfg.addToJsonObject(cfgObj, doc.GetAllocator());
+		_config.addToJsonObject(cfgObj, doc.GetAllocator());
 
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
@@ -609,7 +642,7 @@ void ExternalServicesComponent::propertyGridValueChanged(const std::string& _gro
 		doc.AddMember(OT_ACTION_PARAM_MODEL_Update, true, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
-		
+
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {
@@ -629,12 +662,16 @@ void ExternalServicesComponent::propertyGridValueChanged(const std::string& _gro
 	catch (...) {
 		OT_LOG_E("Unknown error occured");
 	}
-
-	AppBase::instance()->lockPropertyGrid(false);
 }
 
-void ExternalServicesComponent::propertyGridValueDeleted(const std::string& _groupName, const std::string& _itemName)
+void ExternalServicesComponent::propertyGridValueDeleteRequested(const std::string& _groupName, const std::string& _itemName)
 {
+	std::list<std::string> path;
+	path.push_back(_groupName);
+	this->propertyGridValueDeleteRequested(path, _itemName);
+}
+
+void ExternalServicesComponent::propertyGridValueDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _itemName) {
 	AppBase::instance()->lockPropertyGrid(true);
 
 	// Get the currently selected model entities. We first get all visible entities only.
@@ -660,15 +697,15 @@ void ExternalServicesComponent::propertyGridValueDeleted(const std::string& _gro
 			sendHttpRequest(EXECUTE, reciever->serviceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
+				OT_LOG_E(response);
 			}
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-				assert(0); // WARNING
+				OT_LOG_W(response);
 			}
 		}
 	}
 	catch (...) {
-		assert(0); // Error handling
+		OT_LOG_E("[FATAL] Unknown error occured");
 	}
 
 	AppBase::instance()->lockPropertyGrid(false);

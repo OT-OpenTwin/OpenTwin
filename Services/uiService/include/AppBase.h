@@ -381,6 +381,7 @@ public:
 	// Getter
 
 	ot::PropertyGridItem* findProperty(const std::string& _groupName, const std::string& _itemName);
+	ot::PropertyGridItem* findProperty(const std::list<std::string>& _groupPath, const std::string& _itemName);
 
 	std::string getPropertyType(const std::string& _groupName, const std::string& _itemName);
 
@@ -462,7 +463,9 @@ private Q_SLOTS:
 	// Private: Property grid slots
 
 	void slotPropertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
+	void slotPropertyGridValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName);
 	void slotPropertyGridValueDeleteRequested(const std::string& _groupName, const std::string& _itemName);
+	void slotPropertyGridValueDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _itemName);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

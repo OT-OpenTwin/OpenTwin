@@ -1038,3 +1038,14 @@ bool ViewerComponent::propertyGridValueChanged(const std::string& _groupName, co
 
 	return false;  // No viewer has handled the change
 }
+
+bool ViewerComponent::propertyGridValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName) {
+	for (auto vId : m_viewers) {
+		if (ViewerAPI::propertyGridValueChanged(vId, _groupPath, _itemName))
+		{
+			return true;  // The viewer has handled the property grid change
+		}
+	}
+
+	return false;  // No viewer has handled the change
+}

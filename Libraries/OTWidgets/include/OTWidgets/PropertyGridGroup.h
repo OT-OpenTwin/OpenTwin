@@ -44,6 +44,8 @@ namespace ot {
 
 		void addProperty(PropertyGridItem* _item);
 
+		void addChildGroup(PropertyGridGroup* _group);
+
 		const QColor& groupColor(void) const { return m_groupColor; };
 		const QColor& alternateGroupColor(void) const { return m_groupAlternateColor; };
 
@@ -57,14 +59,18 @@ namespace ot {
 
 	Q_SIGNALS:
 		void itemInputValueChanged(const std::string& _groupName, const std::string& _itemName);
+		void itemInputValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName);
 		void itemDeleteRequested(const std::string& _groupName, const std::string& _itemName);
+		void itemDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _itemName);
 
 	private Q_SLOTS:
 		void slotColorStyleChanged(const ColorStyle& _style);
 		void slotItemInputValueChanged(void);
 		void slotItemInputValueChanged(const std::string& _groupName, const std::string& _itemName);
+		void slotItemInputValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName);
 		void slotItemDeleteRequested(void);
 		void slotItemDeleteRequested(const std::string& _groupName, const std::string& _itemName);
+		void slotItemDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _itemName);
 
 	private:
 		void updateStateIcon(const ColorStyle& _style);

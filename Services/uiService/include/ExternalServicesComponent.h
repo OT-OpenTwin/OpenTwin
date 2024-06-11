@@ -54,6 +54,8 @@ class WebsocketClient;
 class ControlsManager;
 class KeyboardCommandHandler;
 namespace ot { class ServiceBase; };
+namespace ot { class Property; };
+namespace ot { class PropertyGridItem; };
 
 class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::OTObjectBase
 {
@@ -122,9 +124,14 @@ public:
 
 	void itemRenamed(ModelUIDtype modelID, const std::string &newName);
 
-	void propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
-	void propertyGridValueDeleted(const std::string& _groupName, const std::string& _itemName);
+	ot::Property* createCleanedPropertyFromItem(const ot::PropertyGridItem* _item);
 
+	void propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
+	void propertyGridValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName);
+	void propertyGridValueChanged(const ot::PropertyGridCfg& _config);
+	void propertyGridValueDeleteRequested(const std::string& _groupName, const std::string& _itemName);
+	void propertyGridValueDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _itemName);
+	
 	void executeAction(ModelUIDtype modelID, ModelUIDtype buttonID);
 
 	void entitiesSelected(ModelUIDtype modelID, ot::serviceID_t replyToServiceID, const std::string &selectionAction, const std::string &selectionInfo, std::list<std::string> &optionNames, std::list<std::string> &optionValues);

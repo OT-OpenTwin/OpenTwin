@@ -197,6 +197,19 @@ void ot::PropertyGroup::removeProperty(const std::string& _propertyName) {
 	}
 }
 
+std::list<ot::Property*> ot::PropertyGroup::getAllProperties(void) const {
+	std::list<Property*> ret;
+	for (Property* prop : m_properties) {
+		ret.push_back(prop);
+	}
+	for (PropertyGroup* group : m_childGroups) {
+		for (Property* prop : group->getAllProperties()) {
+			ret.push_back(prop);
+		}
+	}
+	return ret;
+}
+
 void ot::PropertyGroup::setChildGroups(const std::list<PropertyGroup*>& _groups) {
 	for (PropertyGroup* child : m_childGroups) {
 		delete child;

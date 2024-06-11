@@ -124,41 +124,30 @@ void ot::PropertyGrid::addGroup(PropertyGridGroup* _group) {
 	}
 	m_tree->addTopLevelItem(_group);
 
-	this->connect(_group, &PropertyGridGroup::itemInputValueChanged, this, qOverload<const std::string&, const std::string&>(&PropertyGrid::slotPropertyChanged));
-	this->connect(_group, &PropertyGridGroup::itemDeleteRequested, this, qOverload<const std::string&, const std::string&>(&PropertyGrid::slotPropertyDeleteRequested));
+	this->connect(_group, qOverload<const std::string&, const std::string&>(& PropertyGridGroup::itemInputValueChanged), this, qOverload<const std::string&, const std::string&>(&PropertyGrid::slotPropertyChanged));
+	this->connect(_group, qOverload<const std::list<std::string>&, const std::string&>(& PropertyGridGroup::itemInputValueChanged), this, qOverload<const std::list<std::string>&, const std::string&>(&PropertyGrid::slotPropertyChanged));
+	this->connect(_group, qOverload<const std::string&, const std::string&>(&PropertyGridGroup::itemDeleteRequested), this, qOverload<const std::string&, const std::string&>(&PropertyGrid::slotPropertyDeleteRequested));
+	this->connect(_group, qOverload<const std::list<std::string>&, const std::string&>(&PropertyGridGroup::itemDeleteRequested), this, qOverload<const std::list<std::string>&, const std::string&>(&PropertyGrid::slotPropertyDeleteRequested));
 }
 
 ot::PropertyGridGroup* ot::PropertyGrid::findGroup(const std::string& _groupName) const {
-	if (_groupName.empty()) return nullptr;
-	for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
-		PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(m_tree->topLevelItem(i));
-		if (g) {
-			if (g->getName() == _groupName) return g;
-		}
-	}
-	return nullptr;
+	std::list<std::string> newPath;
+	newPath.push_back(_groupName);
+	return this->findGroup(newPath);
 }
 
-ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _itemName) const {
-	if (_itemName.empty()) return nullptr;
-	for (int i = 0; i < m_tree->topLevelItemCount(); i++) {
-		PropertyGridItem* itm = dynamic_cast<PropertyGridItem*>(m_tree->topLevelItem(i));
-		if (itm) {
-			if (itm->getPropertyData().getPropertyName() == _itemName) return itm;
-		}
-		else {
-			const PropertyGridGroup* g = dynamic_cast<const PropertyGridGroup*>(m_tree->topLevelItem(i));
-			if (g) {
-				PropertyGridItem* itm = g->findChildProperty(_itemName, true);
-				if (itm) return itm;
-			}
-		}
-	}
-	return nullptr;
+ot::PropertyGridGroup* ot::PropertyGrid::findGroup(const std::list<std::string>& _groupPath) const {
+	return this->findGroup(this->getTreeWidget()->invisibleRootItem(), _groupPath);
 }
 
 ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::string& _groupName, const std::string& _itemName) const {
-	const PropertyGridGroup* g = this->findGroup(_groupName);
+	std::list<std::string> newPath;
+	newPath.push_back(_groupName);
+	return this->findItem(newPath, _itemName);
+}
+
+ot::PropertyGridItem* ot::PropertyGrid::findItem(const std::list<std::string>& _groupPath, const std::string& _itemName) const {
+	const PropertyGridGroup* g = this->findGroup(_groupPath);
 	if (g) return g->findChildProperty(_itemName, false);
 	else return nullptr;
 }
@@ -184,6 +173,10 @@ void ot::PropertyGrid::slotPropertyChanged(const std::string& _groupName, const 
 	Q_EMIT propertyChanged(_groupName, _itemName);
 }
 
+void ot::PropertyGrid::slotPropertyChanged(const std::list<std::string>& _groupPath, const std::string& _itemName) {
+	Q_EMIT propertyChanged(_groupPath, _itemName);
+}
+
 void ot::PropertyGrid::slotPropertyDeleteRequested(void) {
 	PropertyGridItem* itm = dynamic_cast<PropertyGridItem*>(sender());
 	if (!itm) {
@@ -195,6 +188,10 @@ void ot::PropertyGrid::slotPropertyDeleteRequested(void) {
 
 void ot::PropertyGrid::slotPropertyDeleteRequested(const std::string& _groupName, const std::string& _itemName) {
 	Q_EMIT propertyDeleteRequested(_groupName, _itemName);
+}
+
+void ot::PropertyGrid::slotPropertyDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _itemName) {
+	Q_EMIT propertyDeleteRequested(_groupPath, _itemName);
 }
 
 void ot::PropertyGrid::slotItemCollapsed(QTreeWidgetItem* _item) {
@@ -209,4 +206,20 @@ void ot::PropertyGrid::slotItemExpanded(QTreeWidgetItem* _item) {
 	if (g) {
 		g->updateStateIcon();
 	}
+}
+
+ot::PropertyGridGroup* ot::PropertyGrid::findGroup(QTreeWidgetItem* _parentTreeItem, const std::list<std::string>& _groupPath) const {
+	if (_groupPath.empty()) return nullptr;
+	for (int i = 0; i < _parentTreeItem->childCount(); i++) {
+		PropertyGridGroup* g = dynamic_cast<PropertyGridGroup*>(m_tree->topLevelItem(i));
+		if (g) {
+			if (g->getName() == _groupPath.front()) {
+				std::list<std::string> newPath = _groupPath;
+				newPath.pop_front();
+				if (newPath.empty()) return g;
+				else return this->findGroup(g, newPath);
+			}
+		}
+	}
+	return nullptr;
 }

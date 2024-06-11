@@ -50,6 +50,8 @@ namespace ot {
 		PropertyGroup* findGroup(const std::string& _name, bool _searchChildGroups = false) const;
 		PropertyGroup* findOrCreateGroup(const std::string& _name, bool _searchChildGroups = false);
 
+		//! \brief Returns all properties of all groups and nested groups.
+		std::list<Property*> getAllProperties(void) const;
 		std::list<Property*> findPropertiesBySpecialType(const std::string& _specialType) const;
 
 		//! \brief Returns false if at least one property exists in any of the groups and its child groups.

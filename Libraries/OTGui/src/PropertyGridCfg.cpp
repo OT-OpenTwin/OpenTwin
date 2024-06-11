@@ -135,6 +135,19 @@ std::list<ot::Property*> ot::PropertyGridCfg::findPropertiesBySpecialType(const 
 	return ret;
 }
 
+std::list<ot::Property*> ot::PropertyGridCfg::getAllProperties(void) const {
+	std::list<Property*> ret;
+	for (Property* prop : m_defaultGroup->getAllProperties()) {
+		ret.push_back(prop);
+	}
+	for (PropertyGroup* group : m_rootGroups) {
+		for (Property* prop : group->getAllProperties()) {
+			ret.push_back(prop);
+		}
+	}
+	return ret;
+}
+
 bool ot::PropertyGridCfg::isEmpty(void) const {
 	for (PropertyGroup* group : m_rootGroups) {
 		if (!group->isEmpty()) return false;

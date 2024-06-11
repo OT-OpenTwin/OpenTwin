@@ -231,6 +231,8 @@ namespace ViewerAPI
 
 	__declspec(dllexport) bool propertyGridValueChanged(ot::UID _viewerID, const std::string& _groupName, const std::string& _itemName);
 
+	__declspec(dllexport) bool propertyGridValueChanged(ot::UID _viewerID, const std::list<std::string>& _groupPath, const std::string& _itemName);
+
 	__declspec(dllexport) void freeze3DView(unsigned long long osgModelID, bool flag);
 
 	Model *getModelFromID(ot::UID osgModelID);

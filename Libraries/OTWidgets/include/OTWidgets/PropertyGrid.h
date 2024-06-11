@@ -48,24 +48,31 @@ namespace ot {
 		void addGroup(PropertyGridGroup* _group);
 
 		PropertyGridGroup* findGroup(const std::string& _groupName) const;
-		PropertyGridItem* findItem(const std::string& _itemName) const;
+		PropertyGridGroup* findGroup(const std::list<std::string>& _groupPath) const;
 		PropertyGridItem* findItem(const std::string& _groupName, const std::string& _itemName) const;
+		PropertyGridItem* findItem(const std::list<std::string>& _groupPath, const std::string& _itemName) const;
 
 		void clear(void);
 
 	Q_SIGNALS:
 		void propertyChanged(const std::string& _groupName, const std::string& _propertyName);
+		void propertyChanged(const std::list<std::string>& _groupPath, const std::string& _propertyName);
 		void propertyDeleteRequested(const std::string& _groupName, const std::string& _propertyName);
+		void propertyDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _propertyName);
 
 	private Q_SLOTS:
 		void slotPropertyChanged(void);
 		void slotPropertyChanged(const std::string& _groupName, const std::string& _itemName);
+		void slotPropertyChanged(const std::list<std::string>& _groupPath, const std::string& _itemName);
 		void slotPropertyDeleteRequested(void);
 		void slotPropertyDeleteRequested(const std::string& _groupName, const std::string& _itemName);
+		void slotPropertyDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _itemName);
 		void slotItemCollapsed(QTreeWidgetItem* _item);
 		void slotItemExpanded(QTreeWidgetItem* _item);
 
 	private:
+		PropertyGridGroup* findGroup(QTreeWidgetItem* _parentTreeItem, const std::list<std::string>& _groupPath) const;
+
 		class PropertyGridTree;
 		PropertyGridTree* m_tree;
 	};

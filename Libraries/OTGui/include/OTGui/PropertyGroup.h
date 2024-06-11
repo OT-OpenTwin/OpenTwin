@@ -80,6 +80,9 @@ namespace ot {
 		//! \brief Group properties.
 		const std::list<Property*>& getProperties(void) const { return m_properties; };
 
+		//! \brief Returns all properties of all groups and nested groups.
+		std::list<Property*> getAllProperties(void) const;
+
 		//! @brief Set the child groups.
 		//! This group takes ownership of the groups.
 		void setChildGroups(const std::list<PropertyGroup*>& _groups);

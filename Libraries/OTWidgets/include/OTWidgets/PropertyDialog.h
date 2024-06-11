@@ -44,7 +44,9 @@ namespace ot {
 		void slotCancel(void);
 		void slotTreeSelectionChanged(void);
 		void slotPropertyChanged(const std::string& _groupName, const std::string& _propertyName);
+		void slotPropertyChanged(const std::list<std::string>& _groupPath, const std::string& _propertyName);
 		void slotPropertyDeleteRequested(const std::string& _groupName, const std::string& _propertyName);
+		void slotPropertyDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _propertyName);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -57,6 +59,11 @@ namespace ot {
 		void iniData(void);
 		void iniGroup(QTreeWidgetItem* _parentTreeItem, const PropertyGroup* _group);
 		bool childItemExists(QTreeWidgetItem* _item, const QString& _text);
+
+		//! \brief Returns the first item matching the text.
+		//! Returns _item if it matches.
+		//! Calls this function for all childs of _item.
+		QTreeWidgetItem* findMatchingItem(QTreeWidgetItem* _item, const QString& _text);
 
 		PropertyDialogCfg m_config;
 		std::map<QTreeWidgetItem*, PropertyDialogEntry> m_treeMap;

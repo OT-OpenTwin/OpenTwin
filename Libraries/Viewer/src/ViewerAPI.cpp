@@ -1011,3 +1011,12 @@ bool ViewerAPI::propertyGridValueChanged(ot::UID _viewerID, const std::string& _
 	}
 	return viewer->second->propertyGridValueChanged(_groupName, _itemName);
 }
+
+bool ViewerAPI::propertyGridValueChanged(ot::UID _viewerID, const std::list<std::string>& _groupPath, const std::string& _itemName) {
+	std::string path;
+	for (const std::string& group : _groupPath) {
+		if (!path.empty()) path.append("/");
+		path.append(group);
+	}
+	return ViewerAPI::propertyGridValueChanged(_viewerID, path, _itemName);
+}

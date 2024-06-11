@@ -962,7 +962,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 	_result.clear();
 
 	// Get name property
-	const PropertyGridItem* nameItm = m_propertyGrid->findItem(CSE_Name);
+	const PropertyGridItem* nameItm = m_propertyGrid->findItem(CSE_GROUP_General, CSE_Name);
 	if (!nameItm) {
 		OT_LOG_EAS("Name property not found");
 		return false;

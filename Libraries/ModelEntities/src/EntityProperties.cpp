@@ -223,7 +223,11 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 		newSetting->setVisible(!(p->getPropertyFlags() & ot::Property::IsHidden));
 		newSetting->setErrorState(p->getPropertyFlags() & ot::Property::HasInputError);
 
-		this->createProperty(newSetting, _groupConfig->getName());
+		this->createProperty(newSetting, _groupConfig->getGroupPath());
+	}
+
+	for (const ot::PropertyGroup* childGroup : _groupConfig->getChildGroups()) {
+		this->buildFromConfiguration(childGroup);
 	}
 }
 
