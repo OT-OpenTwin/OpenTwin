@@ -183,7 +183,6 @@ void ot::PropertyDialog::slotPropertyChanged(const std::string& _groupName, cons
 }
 
 void ot::PropertyDialog::slotPropertyChanged(const std::list<std::string>& _groupPath, const std::string& _propertyName) {
-	OT_LOG_D("Pathing");
 	// Check selection
 	if (m_navigation->getTreeWidget()->selectedItems().count() != 1) {
 		OT_LOG_E("Invalid selection");

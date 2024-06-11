@@ -12,6 +12,9 @@
 // Qt header
 #include <QtCore/qobject.h>
 
+// std header
+#include <string>
+
 class AppBase;
 
 class SettingsManager : public QObject {
@@ -20,17 +23,18 @@ class SettingsManager : public QObject {
 	OT_DECL_NODEFAULT(SettingsManager)
 public:
 	SettingsManager(AppBase* _app);
-	~SettingsManager();
+	virtual ~SettingsManager();
 
 	bool showDialog(void);
 
 private Q_SLOTS:
 	void slotPropertyChanged(const std::string& _groupPath, const std::string& _propertyName);
 	void slotPropertyDeleteRequested(const std::string& _groupPath, const std::string& _propertyName);
-	void slotDevb();
 
 private:
-	AppBase* m_app;
+	void updateSettings(void);
+	void updateGeneralSettings(void);
 
+	AppBase* m_app;
 	ot::ColorStyleName m_currentColorStyle;
 };

@@ -63,7 +63,9 @@ const ot::ColorStyle& ot::GlobalColorStyle::getStyle(const std::string& _name, c
 	else return it->second;
 }
 
-bool ot::GlobalColorStyle::setCurrentStyle(const std::string& _styleName) {
+bool ot::GlobalColorStyle::setCurrentStyle(const std::string& _styleName, bool _force) {
+	if (_styleName == m_currentStyle && !_force) return true;
+
 	const auto& it = m_styles.find(_styleName);
 	if (it == m_styles.end()) {
 		OT_LOG_E("Color style does not exist (Name: \"" + _styleName + "\")");

@@ -13,6 +13,7 @@
 #include "ImageEditor.h"
 #include "StatusManager.h"
 #include "ToolViewManager.h"
+#include "SettingsManager.h"
 #include "ColorStyleEditor.h"
 #include "LogVisualization.h"
 #include "ToolBarManager.h"
@@ -380,7 +381,6 @@ void AppBase::slotInitialize(void) {
 }
 
 void AppBase::slotInitializeTools(void) {
-	
 	// Create tools
 	m_logger = new LogVisualization;
 	
@@ -413,7 +413,7 @@ void AppBase::slotFinalizeInit(void) {
 	// Check current view to correctly display toolbar, statusbar and so on
 	ot::WidgetView* currentView = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
 	if (currentView) {
-		//m_toolManager->getToolViewManager()->slotViewFocused(currentView);
+		m_toolManager->getToolViewManager()->slotViewFocused(currentView);
 	}
 	
 	this->setEnabled(true);

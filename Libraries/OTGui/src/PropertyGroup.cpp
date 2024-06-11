@@ -132,39 +132,42 @@ void ot::PropertyGroup::mergeWith(const PropertyGroup& _other, bool _replaceExis
 		}
 	}
 
+	std::list<ot::Property*> otherProperties = _other.getProperties();
+
 	bool replaced = true;
-	while (replaced) {
+	while (replaced && !otherProperties.empty()) {
 		replaced = false;
-		for (Property* prop : _other.getProperties()) {
-			bool found = false;
-			for (Property* ownProp : m_properties) {
-				if (prop->getPropertyName() == ownProp->getPropertyName()) {
-					if (_replaceExistingProperties) {
-						// Replace
-						auto it = std::find(m_properties.begin(), m_properties.end(), ownProp);
-						OTAssert(it != m_properties.end(), "Data mismatch");
-						Property* newProperty = prop->createCopy();
-						newProperty->setParentGroup(this);
-						*it = newProperty;
-						delete ownProp;
-						replaced = true;
-						found = true;
-						break;
-					}
-					else {
-						found = true;
-						break;
-					}
+		Property* prop = otherProperties.front();
+		otherProperties.pop_front();
+
+		bool found = false;
+		for (Property* ownProp : m_properties) {
+			if (prop->getPropertyName() == ownProp->getPropertyName()) {
+				if (_replaceExistingProperties) {
+					// Replace
+					auto it = std::find(m_properties.begin(), m_properties.end(), ownProp);
+					OTAssert(it != m_properties.end(), "Data mismatch");
+					Property* newProperty = prop->createCopy();
+					newProperty->setParentGroup(this);
+					*it = newProperty;
+					delete ownProp;
+					replaced = true;
+					found = true;
+					break;
+				}
+				else {
+					found = true;
+					break;
 				}
 			}
+		}
 
-			if (replaced) break;
+		if (replaced) break;
 
-			if (!found) {
-				Property* newProperty = prop->createCopy();
-				newProperty->setParentGroup(this);
-				m_properties.push_back(newProperty);
-			}
+		if (!found) {
+			Property* newProperty = prop->createCopy();
+			newProperty->setParentGroup(this);
+			m_properties.push_back(newProperty);
 		}
 	}
 }

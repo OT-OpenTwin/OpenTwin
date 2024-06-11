@@ -39,7 +39,7 @@ namespace ot {
 		bool hasStyle(const std::string& _name) const;
 		const ColorStyle& getStyle(const std::string& _name, const ColorStyle& _default = ColorStyle()) const;
 
-		bool setCurrentStyle(const std::string& _styleName);
+		bool setCurrentStyle(const std::string& _styleName, bool _force = false);
 		const std::string& getCurrentStyleName(void) const { return m_currentStyle; };
 		const ColorStyle& getCurrentStyle(void) const;
 
