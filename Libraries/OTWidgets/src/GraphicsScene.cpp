@@ -195,15 +195,11 @@ void ot::GraphicsScene::drawBackground(QPainter* _painter, const QRectF& _rect)
 {
 	// Use QGraphicsScene method if no grid is set
 	if (!m_grid.isGridLinesValid()) {
-		return QGraphicsScene::drawBackground(_painter, _rect);
+		QGraphicsScene::drawBackground(_painter, _rect);
 	}
-
-	if (_rect != m_view->mapToScene(m_view->viewport()->rect()).boundingRect()) {
-		m_view->update();
-		return;
+	else {
+		this->drawGrid(_painter, _rect);
 	}
-
-	this->drawGrid(_painter, _rect);
 }
 
 void ot::GraphicsScene::drawGrid(QPainter* _painter, const QRectF& _rect) {
@@ -268,7 +264,7 @@ void ot::GraphicsScene::calculateGridLines(const QRectF& _painterRect, QList<QLi
 	
 
 	// Get starting point
-	Point2D scaledStepSize = this->calculateScaledGridStepSize(_painterRect);
+	Point2D scaledStepSize = this->calculateScaledGridStepSize(m_view->mapToScene(m_view->viewport()->rect()).boundingRect());
 	QPointF startPos = QtFactory::toQPoint(Grid::snapToGrid(QtFactory::toPoint2D(_painterRect.topLeft()), scaledStepSize));
 
 	int lineCounterX = 0;
