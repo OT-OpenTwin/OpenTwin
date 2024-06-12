@@ -29,9 +29,9 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 
 ECHO Building Project
 
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Templates\ServiceTemplate\.vs"
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Templates\ServiceTemplate\x64"
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Templates\ServiceTemplate\packages"
+RMDIR /S /Q "%OT_DATA_PROCESSING_SERVICE_ROOT%\.vs"
+RMDIR /S /Q "%OT_DATA_PROCESSING_SERVICE_ROOT%\x64"
+RMDIR /S /Q "%OT_DATA_PROCESSING_SERVICE_ROOT%\packages"
 
 GOTO END
 
