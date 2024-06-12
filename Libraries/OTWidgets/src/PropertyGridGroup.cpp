@@ -29,7 +29,7 @@ namespace ot {
 }
 
 ot::PropertyGridGroup::PropertyGridGroup() 
-	: m_isAlternate(false), m_groupColor(Qt::white), m_groupAlternateColor(235, 235, 235)
+	: m_isAlternate(false), m_groupColor(Qt::white), m_groupAlternateColor(235, 235, 235), m_parentGroup(nullptr)
 {
 	m_titleLabel = new QLabel;
 	m_titleLabel->setObjectName("PropertyGridGroupTitleLabel");
@@ -141,7 +141,7 @@ void ot::PropertyGridGroup::addProperty(PropertyGridItem* _item) {
 	_item->setPropertyColor((m_isAlternate ? m_groupAlternateColor : m_groupColor));
 	m_isAlternate = !m_isAlternate;
 
-	_item->setGroupName(this->getName());
+	_item->setParentPropertyGroup(this);
 
 	this->addChild(_item);
 
@@ -150,6 +150,8 @@ void ot::PropertyGridGroup::addProperty(PropertyGridItem* _item) {
 }
 
 void ot::PropertyGridGroup::addChildGroup(PropertyGridGroup* _group) {
+	_group->setParentPropertyGroup(this);
+
 	this->addChild(_group);
 
 	this->connect(_group, qOverload<const std::string&, const std::string&>(& PropertyGridGroup::itemInputValueChanged), this, qOverload<const std::string&, const std::string&>(&PropertyGridGroup::slotItemInputValueChanged));
@@ -234,7 +236,12 @@ void ot::PropertyGridGroup::slotItemInputValueChanged(void) {
 		OT_LOG_E("Item cast failed");
 		return;
 	}
-	Q_EMIT itemInputValueChanged(itm->getGroupName(), itm->getPropertyData().getPropertyName());
+	PropertyGridGroup* itmGroup = itm->getParentPropertyGroup();
+	if (!itmGroup) {
+		OT_LOG_E("Group missing");
+		return;
+	}
+	Q_EMIT itemInputValueChanged(itmGroup->getName(), itm->getPropertyData().getPropertyName());
 }
 
 void ot::PropertyGridGroup::slotItemInputValueChanged(const std::string& _groupName, const std::string& _itemName) {
@@ -256,7 +263,12 @@ void ot::PropertyGridGroup::slotItemDeleteRequested(void) {
 		OT_LOG_E("Item cast failed");
 		return;
 	}
-	Q_EMIT itemDeleteRequested(itm->getGroupName(), itm->getPropertyData().getPropertyName());
+	PropertyGridGroup* itmGroup = itm->getParentPropertyGroup();
+	if (!itmGroup) {
+		OT_LOG_E("Group missing");
+		return;
+	}
+	Q_EMIT itemDeleteRequested(itmGroup->getName(), itm->getPropertyData().getPropertyName());
 }
 
 void ot::PropertyGridGroup::slotItemDeleteRequested(const std::string& _groupName, const std::string& _itemName) {

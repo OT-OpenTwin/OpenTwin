@@ -163,7 +163,12 @@ void ot::PropertyGrid::slotPropertyChanged() {
 		OT_LOG_E("Item cast failed");
 		return;
 	}
-	Q_EMIT propertyChanged(itm->getGroupName(), itm->getPropertyData().getPropertyName());
+	PropertyGridGroup* itmGroup = itm->getParentPropertyGroup();
+	if (!itmGroup) {
+		OT_LOG_E("Group missing");
+		return;
+	}
+	Q_EMIT propertyChanged(itmGroup->getName(), itm->getPropertyData().getPropertyName());
 }
 
 void ot::PropertyGrid::slotPropertyChanged(const std::string& _groupName, const std::string& _itemName) {
@@ -180,7 +185,12 @@ void ot::PropertyGrid::slotPropertyDeleteRequested(void) {
 		OT_LOG_E("Item cast failed");
 		return;
 	}
-	Q_EMIT propertyDeleteRequested(itm->getGroupName(), itm->getPropertyData().getPropertyName());
+	PropertyGridGroup* itmGroup = itm->getParentPropertyGroup();
+	if (!itmGroup) {
+		OT_LOG_E("Group missing");
+		return;
+	}
+	Q_EMIT propertyDeleteRequested(itmGroup->getName(), itm->getPropertyData().getPropertyName());
 }
 
 void ot::PropertyGrid::slotPropertyDeleteRequested(const std::string& _groupName, const std::string& _itemName) {

@@ -36,6 +36,9 @@ namespace ot {
 		//! @brief Finish the setup (should be called after the item is placed in a tree and after calling setup from config)
 		void finishSetup(void);
 
+		void setParentPropertyGroup(PropertyGridGroup* _group) { m_parentGroup = _group; };
+		PropertyGridGroup* getParentPropertyGroup(void) const { return m_parentGroup; };
+
 		void setName(const std::string& _name) { m_name = _name; };
 		const std::string& getName(void) const { return m_name; };
 
@@ -74,6 +77,8 @@ namespace ot {
 
 	private:
 		void updateStateIcon(const ColorStyle& _style);
+
+		PropertyGridGroup* m_parentGroup;
 
 		bool m_isAlternate;
 		std::string m_name;

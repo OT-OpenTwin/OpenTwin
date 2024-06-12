@@ -12,13 +12,14 @@
 #include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/PropertyGridGroup.h"
 #include "OTWidgets/PropertyInputFactory.h"
 
 // Qt header
 #include <QtWidgets/qlayout.h>
 
 ot::PropertyGridItem::PropertyGridItem()
-	: m_input(nullptr), m_propertyColor(Qt::white)
+	: m_input(nullptr), m_propertyColor(Qt::white), m_parentGroup(nullptr)
 {
 	m_titleLayoutW = new QWidget;
 	m_titleLayoutW->setObjectName("PropertyGridItemTitleLayout");
@@ -70,6 +71,14 @@ void ot::PropertyGridItem::finishSetup(void) {
 ot::Property* ot::PropertyGridItem::createProperty(void) const {
 	OTAssertNullptr(m_input);
 	return m_input->createPropertyConfiguration();
+}
+
+std::string ot::PropertyGridItem::getGroupName(void) const {
+	if (m_parentGroup) return m_parentGroup->getName();
+	else {
+		OT_LOG_EA("No parent group set");
+		return std::string();
+	}
 }
 
 void ot::PropertyGridItem::setTitle(const QString& _title) {
