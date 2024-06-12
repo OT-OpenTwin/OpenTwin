@@ -149,6 +149,10 @@ LogInDialog::LogInDialog()
 	this->setFixedSize(350, 500);
 	this->setDialogFlag(ot::DialogCfg::MoveGrabAnywhere);
 	this->setDialogFlag(ot::DialogCfg::RecenterOnF11);
+	QPoint topLeftPos = this->calculateCenterOnParentPos(nullptr);
+	topLeftPos.setX(settings->value("LogInPos.X", topLeftPos.x()).toInt());
+	topLeftPos.setY(settings->value("LogInPos.Y", topLeftPos.y()).toInt());
+	this->move(topLeftPos);
 
 	// Connect signals
 	this->connect(m_logInButton, &PushButton::clicked, this, &LogInDialog::slotLogIn);
@@ -461,6 +465,9 @@ void LogInDialog::saveUserSettings(void) const {
 
 	QJsonDocument gssOptionsDoc(gssOptionsArr);
 	settings->setValue("SessionServiceJSON", gssOptionsDoc.toJson(QJsonDocument::Compact));
+
+	settings->setValue("LogInPos.X", this->pos().x());
+	settings->setValue("LogInPos.Y", this->pos().y());
 
 }
 

@@ -9,9 +9,7 @@
 
 // Qt header
 #include <QtGui/qscreen.h>
-#include <QtWidgets/qwidget.h>
 #include <QtWidgets/qapplication.h>
-
 
 void ot::QWidgetInterface::setOTWidgetFlags(const WidgetFlags& _flags) {
 	if (m_widgetFlags == _flags) return;
@@ -19,11 +17,15 @@ void ot::QWidgetInterface::setOTWidgetFlags(const WidgetFlags& _flags) {
 	this->otWidgetFlagsChanged(m_widgetFlags);
 }
 
-void ot::QWidgetInterface::centerOnParent(const QWidget* _parentWidget) {
+void ot::QWidgetInterface::centerOnParent(const QWidget*const _parentWidget) {
+	this->getQWidget()->move(this->calculateCenterOnParentPos(_parentWidget));
+}
+
+QPoint ot::QWidgetInterface::calculateCenterOnParentPos(const QWidget* const _parentWidget) {
 	if (_parentWidget) {
-		this->getQWidget()->move(calculateChildRect(_parentWidget->rect(), this->getQWidget()->size(), ot::AlignCenter).topLeft());
+		return ot::calculateChildRect(_parentWidget->rect(), this->getQWidget()->size(), ot::AlignCenter).topLeft();
 	}
 	else {
-		this->getQWidget()->move(calculateChildRect(QApplication::primaryScreen()->geometry(), this->getQWidget()->size(), ot::AlignCenter).topLeft());
+		return ot::calculateChildRect(QApplication::primaryScreen()->geometry(), this->getQWidget()->size(), ot::AlignCenter).topLeft();
 	}
 }

@@ -10,8 +10,8 @@
 #include "OTWidgets/WidgetTypes.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
-// Qt widget
-class QWidget;
+// Qt header
+#include <QtWidgets/qwidget.h>
 
 namespace ot {
 
@@ -29,7 +29,11 @@ namespace ot {
 
 		//! \brief Centers this widget on the parent.
 		//! If no parent is provided the widget will center on the screen.
-		void centerOnParent(const QWidget* _parentWidget);
+		void centerOnParent(const QWidget* const _parentWidget);
+
+		//! \brief Calculates the top left corner of this widget centered on the parent widget.
+		//! If no parent is provided the widget will center on the screen.
+		QPoint calculateCenterOnParentPos(const QWidget* const _parentWidget);
 
 	protected:
 		WidgetFlags m_widgetFlags;
