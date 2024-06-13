@@ -27,7 +27,7 @@ namespace ot {
 		virtual Property* createCopy(void) const override;
 
 		void setValue(bool _value) { m_value = _value; };
-		bool value(void) const { return m_value; };
+		bool getValue(void) const { return m_value; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object

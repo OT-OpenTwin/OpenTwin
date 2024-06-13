@@ -42,8 +42,8 @@ public:
 protected:
 	virtual void controlPointsChanged(void) override;
 	virtual void fillPropertyGrid(void) override;
-	virtual void propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override;
-	virtual void propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override;
+	virtual void propertyChanged(const ot::Property* _property) override;
+	virtual void propertyDeleteRequested(const ot::Property* _property) override;
 	virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _constrains) override;
 
 private:

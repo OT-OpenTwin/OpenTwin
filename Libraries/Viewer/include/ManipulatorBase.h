@@ -5,6 +5,8 @@
 #include <string>
 #include <list>
 
+namespace ot { class Property; };
+
 class ManipulatorBase
 {
 public:
@@ -14,7 +16,7 @@ public:
 	virtual void cancelOperation(void) = 0;
 	virtual void performOperation(void) = 0;
 
-	virtual bool propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName) { return false; }
+	virtual bool propertyGridValueChanged(const ot::Property* _property) { return false; }
 
 	void setReplyTo(ot::serviceID_t replyTo) { messageReplyTo = replyTo; }
 	void setAction(const std::string &selectionAction) { messageSelectionAction = selectionAction; }

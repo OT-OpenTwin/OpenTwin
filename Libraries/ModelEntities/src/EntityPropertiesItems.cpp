@@ -119,7 +119,7 @@ void EntityPropertiesDouble::setFromConfiguration(const ot::Property* _property)
 		return;
 	}
 
-	setValue(actualProperty->value());
+	setValue(actualProperty->getValue());
 }
 
 void EntityPropertiesDouble::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
@@ -180,7 +180,7 @@ void EntityPropertiesInteger::setFromConfiguration(const ot::Property* _property
 		return;
 	}
 
-	setValue(actualProperty->value());
+	setValue(actualProperty->getValue());
 }
 
 void EntityPropertiesInteger::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
@@ -246,7 +246,7 @@ void EntityPropertiesBoolean::setFromConfiguration(const ot::Property* _property
 		return;
 	}
 
-	setValue(actualProperty->value());
+	setValue(actualProperty->getValue());
 }
 
 void EntityPropertiesBoolean::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
@@ -312,7 +312,7 @@ void EntityPropertiesString::setFromConfiguration(const ot::Property* _property)
 		return;
 	}
 
-	setValue(actualProperty->value());
+	setValue(actualProperty->getValue());
 }
 
 void EntityPropertiesString::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
@@ -403,11 +403,11 @@ void EntityPropertiesSelection::setFromConfiguration(const ot::Property* _proper
 		return;
 	}
 
-	if (value != actualProperty->current()) setNeedsUpdate();
-	value = actualProperty->current();
+	if (value != actualProperty->getCurrent()) setNeedsUpdate();
+	value = actualProperty->getCurrent();
 
 	options.clear();
-	for (const std::string& s : actualProperty->list())
+	for (const std::string& s : actualProperty->getList())
 	{
 		options.push_back(s);
 	}
@@ -499,7 +499,7 @@ void EntityPropertiesColor::setFromConfiguration(const ot::Property* _property)
 		OT_LOG_E("Property cast failed");
 		return;
 	}
-	ot::ColorF c(actualProperty->value().toColorF());
+	ot::ColorF c(actualProperty->getValue().toColorF());
 	setColorR(c.r());
 	setColorG(c.g());
 	setColorB(c.b());
@@ -768,7 +768,7 @@ void EntityPropertiesEntityList::addToConfiguration(ot::PropertyGridCfg& _config
 
 	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), this->getValueName(), opt);
 	newProp->setSpecialType("EntityList");
-	newProp->setAdditionalPropertyData(dataDoc.toJson());
+	newProp->addAdditionalPropertyData("EntityData", dataDoc.toJson());
 	this->setupPropertyData(_configuration, newProp);
 }
 
@@ -780,16 +780,17 @@ void EntityPropertiesEntityList::setFromConfiguration(const ot::Property* _prope
 		return;
 	}
 
-	if (actualProperty->getAdditionalPropertyData().empty()) {
+	std::string entityData = actualProperty->getAdditionalPropertyData("EntityData");
+	if (entityData.empty()) {
 		OT_LOG_E("Data missing");
 		return;
 	}
 
 	ot::JsonDocument dataDoc;
-	dataDoc.fromJson(actualProperty->getAdditionalPropertyData());
+	dataDoc.fromJson(entityData);
 
 	//this->setValueName(ot::json::getString(dataDoc, "ValueName"));
-	this->setValueName(actualProperty->current());
+	this->setValueName(actualProperty->getCurrent());
 	this->setEntityContainerName(ot::json::getString(dataDoc, "ContainerName"));
 	this->setEntityContainerID(ot::json::getUInt64(dataDoc, "ContainerID"));
 	this->setValueID(ot::json::getUInt64(dataDoc, "ValueID"));
@@ -1018,7 +1019,7 @@ void EntityPropertiesProjectList::setFromConfiguration(const ot::Property* _prop
 		return;
 	}
 
-	_value = actualProperty->current();
+	_value = actualProperty->getCurrent();
 }
 
 void EntityPropertiesProjectList::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)

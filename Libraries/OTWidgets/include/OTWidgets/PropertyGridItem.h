@@ -42,8 +42,6 @@ namespace ot {
 		//! @brief Finish the setup (should be called after the item is placed in a tree and after calling setup from config)
 		void finishSetup(void);
 
-		Property* createProperty(void) const;
-
 		void setParentPropertyGroup(PropertyGridGroup* _group) { m_parentGroup = _group; };
 		PropertyGridGroup* getParentPropertyGroup(void) const { return m_parentGroup; };
 
@@ -64,8 +62,8 @@ namespace ot {
 		std::string getPropertyType(void) const;
 
 	Q_SIGNALS:
-		void inputValueChanged(void);
-		void deleteRequested(void);
+		void inputValueChanged(const ot::Property* const _property);
+		void deleteRequested(const ot::Property* const _property);
 
 	private Q_SLOTS:
 		void slotValueChanged(void);
@@ -73,6 +71,9 @@ namespace ot {
 		void slotGlobalStyleChanged(const ColorStyle& _style);
 		
 	private:
+		void clear(void);
+		Property* createSignalProperty(void);
+
 		PropertyGridGroup* m_parentGroup;
 
 		QWidget* m_titleLayoutW;
@@ -81,6 +82,8 @@ namespace ot {
 
 		PropertyInput* m_input;
 		QColor m_propertyColor;
+
+		std::list<Property*> m_garbage;
 	};
 
 }

@@ -60,7 +60,7 @@ bool ot::PropertyInputStringList::setupFromConfiguration(const Property* _config
 	}
 
 	QStringList lst;
-	for (const std::string& itm : actualProperty->list()) {
+	for (const std::string& itm : actualProperty->getList()) {
 		lst.push_back(QString::fromStdString(itm));
 	}
 	
@@ -68,7 +68,7 @@ bool ot::PropertyInputStringList::setupFromConfiguration(const Property* _config
 
 	m_comboButton->setItems(lst);
 	if (this->data().getPropertyFlags() & Property::HasMultipleValues) m_comboButton->setText("...");
-	else m_comboButton->setText(QString::fromStdString(actualProperty->current()));
+	else m_comboButton->setText(QString::fromStdString(actualProperty->getCurrent()));
 	m_comboButton->setEnabled(!(this->data().getPropertyFlags() & Property::IsReadOnly));
 
 	m_comboButton->blockSignals(false);

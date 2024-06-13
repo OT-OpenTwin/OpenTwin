@@ -16,7 +16,7 @@ ot::Property::Property(const PropertyBase& _base)
 	: PropertyBase(_base), m_parentGroup(nullptr)
 {}
 
-ot::Property::Property(PropertyFlags _flags) 
+ot::Property::Property(PropertyFlags _flags)
 	: PropertyBase(_flags), m_parentGroup(nullptr)
 {}
 
@@ -33,6 +33,19 @@ void ot::Property::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _a
 void ot::Property::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	PropertyBase::setFromJsonObject(_object);
 	this->setPropertyData(_object); 
+}
+
+ot::Property::~Property() {
+	if (m_parentGroup) {
+		m_parentGroup->forgetProperty(this);
+		delete m_parentGroup;
+		m_parentGroup = nullptr;
+	}
+}
+
+ot::PropertyGroup* ot::Property::getRootGroup(void) const {
+	if (m_parentGroup) return m_parentGroup->getRootGroup();
+	else return nullptr;
 }
 
 std::string ot::Property::getPropertyPath(char _delimiter) const {

@@ -28,18 +28,18 @@ namespace ot {
 		virtual Property* createCopy(void) const override;
 
 		void setValue(double _value) { m_value = _value; };
-		double value(void) const { return m_value; };
+		double getValue(void) const { return m_value; };
 
 		void setRange(double _min, double _max) { m_min = _min; m_max = _max; };
 
 		void setMin(double _value) { m_min = _value; };
-		double min(void) const { return m_min; };
+		double getMin(void) const { return m_min; };
 
 		void setMax(double _value) { m_max = _value; };
-		double max(void) const { return m_max; };
+		double getMax(void) const { return m_max; };
 
 		void setPrecision(int _p) { m_precision = _p; };
-		int precision(void) const { return m_precision; };
+		int getPrecision(void) const { return m_precision; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object

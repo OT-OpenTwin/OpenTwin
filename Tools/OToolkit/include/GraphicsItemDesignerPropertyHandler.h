@@ -59,15 +59,12 @@ protected:
 	//! \brief Is called when the property grid needs to be filled.
 	virtual void fillPropertyGrid(void) = 0;
 
-
-	virtual void propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) = 0;
-	virtual void propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) = 0;
+	virtual void propertyChanged(const ot::Property* _property) = 0;
+	virtual void propertyDeleteRequested(const ot::Property* _property) = 0;
 
 private Q_SLOTS:
-	void slotPropertyChanged(const std::string& _group, const std::string& _item);
-	void slotPropertyChanged(const std::list<std::string>& _groupPath, const std::string& _item);
-	void slotPropertyDeleteRequested(const std::string& _group, const std::string& _item);
-	void slotPropertyDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _item);
+	void slotPropertyChanged(const ot::Property* _property);
+	void slotPropertyDeleteRequested(const ot::Property* _property);
 
 private:
 	QTreeWidgetItem* m_navigationItem;

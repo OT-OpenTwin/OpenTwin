@@ -82,6 +82,8 @@ bool ot::PropertyInputDirectory::setupFromConfiguration(const Property* _configu
 
 	m_edit->blockSignals(true);
 
+	m_text = QString::fromStdString(actualProperty->getPath());
+
 	m_edit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 		m_edit->setText("...");

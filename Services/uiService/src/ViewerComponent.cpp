@@ -1028,21 +1028,9 @@ void ViewerComponent::contextMenuItemCheckedChanged(const std::string& _menuName
 	}
 }
 
-bool ViewerComponent::propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName) {
+bool ViewerComponent::propertyGridValueChanged(const ot::Property* _property) {
 	for (auto vId : m_viewers) {
-		if (ViewerAPI::propertyGridValueChanged(vId, _groupName, _itemName))
-		{
-			return true;  // The viewer has handled the property grid change
-		}
-	}
-
-	return false;  // No viewer has handled the change
-}
-
-bool ViewerComponent::propertyGridValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName) {
-	for (auto vId : m_viewers) {
-		if (ViewerAPI::propertyGridValueChanged(vId, _groupPath, _itemName))
-		{
+		if (ViewerAPI::propertyGridValueChanged(vId, _property)) {
 			return true;  // The viewer has handled the property grid change
 		}
 	}

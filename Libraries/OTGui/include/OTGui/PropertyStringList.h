@@ -35,11 +35,11 @@ namespace ot {
 		virtual Property* createCopy(void) const override;
 
 		void setList(const std::list<std::string>& _values) { m_list = _values; };
-		std::list<std::string>& list(void) { return m_list; };
-		const std::list<std::string>& list(void) const { return m_list; };
+		std::list<std::string>& getList(void) { return m_list; };
+		const std::list<std::string>& getList(void) const { return m_list; };
 
 		void setCurrent(const std::string& _current) { m_current = _current; };
-		const std::string& current(void) const { return m_current; };
+		const std::string& getCurrent(void) const { return m_current; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object

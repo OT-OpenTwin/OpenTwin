@@ -479,43 +479,81 @@ void TransformManipulator::updateSetting(const std::string& _groupName, const st
 	viewer3D->getModel()->setDoublePropertyGridValue(_groupName, _itemName, value);
 }
 
-bool TransformManipulator::propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName)
+bool TransformManipulator::propertyGridValueChanged(const ot::Property* _property)
 {
 	osg::Vec3d offset = lastPropertyOffset;
 
-	if (_groupName == PROP_Group_Rotation) {
-		if (_itemName == PROP_Item_AxisX) {
-			lastPropertyAxis = osg::Vec3d(viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName), lastPropertyAxis.y(), lastPropertyAxis.z());
+	ot::PropertyGroup* propertyGroup = _property->getParentGroup();
+	OTAssertNullptr(propertyGroup);
+
+	if (propertyGroup->getName() == PROP_Group_Rotation) {
+		if (_property->getPropertyName() == PROP_Item_AxisX) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			lastPropertyAxis = osg::Vec3d(actualProperty->getValue(), lastPropertyAxis.y(), lastPropertyAxis.z());
 		}
-		else if (_itemName == PROP_Item_AxisY) {
-			lastPropertyAxis = osg::Vec3d(lastPropertyAxis.x(), viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName), lastPropertyAxis.z());
+		else if (_property->getPropertyName() == PROP_Item_AxisY) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			lastPropertyAxis = osg::Vec3d(lastPropertyAxis.x(), actualProperty->getValue(), lastPropertyAxis.z());
 		}
-		else if (_itemName == PROP_Item_AxisZ) {
-			lastPropertyAxis = osg::Vec3d(lastPropertyAxis.x(), lastPropertyAxis.y(), viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName));
+		else if (_property->getPropertyName() == PROP_Item_AxisZ) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			lastPropertyAxis = osg::Vec3d(lastPropertyAxis.x(), lastPropertyAxis.y(), actualProperty->getValue());
 		}
-		else if (_itemName == PROP_Item_Angle) {
-			lastPropertyAngle = viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName);
+		else if (_property->getPropertyName() == PROP_Item_Angle) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			lastPropertyAngle = actualProperty->getValue();
 		}
 		else {
-			OT_LOG_E("Unknown property \"" + _itemName + "\"");
+			OT_LOG_E("Unknown property \"" + _property->getPropertyName() + "\"");
 		}
 	}
-	else if (_groupName == PROP_Group_Translation) {
-		if (_itemName == PROP_Item_TranslateX) {
-			offset.set(viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName), offset.y(), offset.z());
+	else if (propertyGroup->getName() == PROP_Group_Translation) {
+		if (_property->getPropertyName() == PROP_Item_TranslateX) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			offset.set(actualProperty->getValue(), offset.y(), offset.z());
 		}
-		else if (_itemName == PROP_Item_TranslateY) {
-			offset.set(offset.x(), viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName), offset.z());
+		else if (_property->getPropertyName() == PROP_Item_TranslateY) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			offset.set(offset.x(), actualProperty->getValue(), offset.z());
 		}
-		else if (_itemName == PROP_Item_TranslateZ) {
-			offset.set(offset.x(), offset.y(), viewer3D->getModel()->getDoublePropertyGridValue(_groupName, _itemName));
+		else if (_property->getPropertyName() == PROP_Item_TranslateZ) {
+			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+			if (!actualProperty) {
+				OT_LOG_EA("Item cast failed");
+				return false;
+			}
+			offset.set(offset.x(), offset.y(), actualProperty->getValue());
 		}
 		else {
-			OT_LOG_E("Unknown property \"" + _itemName + "\"");
+			OT_LOG_E("Unknown property \"" + _property->getPropertyName() + "\"");
 		}
 	}
 	else {
-		OT_LOG_E("Unknown property group \"" + _groupName + "\"");
+		OT_LOG_E("Unknown property group \"" + propertyGroup->getName() + "\"");
 		return false;
 	}
 

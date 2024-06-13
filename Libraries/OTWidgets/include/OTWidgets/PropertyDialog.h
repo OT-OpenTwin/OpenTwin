@@ -33,8 +33,8 @@ namespace ot {
 		const PropertyGrid* const getPropertyGrid(void) const { return m_grid; };
 
 	Q_SIGNALS:
-		void propertyChanged(const std::string& _groupPath, const std::string& _propertyName);
-		void propertyDeleteRequested(const std::string& _groupPath, const std::string& _propertyName);
+		void propertyChanged(const Property* _property);
+		void propertyDeleteRequested(const Property* _property);
 		
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -44,10 +44,8 @@ namespace ot {
 		void slotConfirm(void);
 		void slotCancel(void);
 		void slotTreeSelectionChanged(void);
-		void slotPropertyChanged(const std::string& _groupName, const std::string& _propertyName);
-		void slotPropertyChanged(const std::list<std::string>& _groupPath, const std::string& _propertyName);
-		void slotPropertyDeleteRequested(const std::string& _groupName, const std::string& _propertyName);
-		void slotPropertyDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _propertyName);
+		void slotPropertyChanged(const Property* _property);
+		void slotPropertyDeleteRequested(const Property* _property);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -60,6 +58,11 @@ namespace ot {
 		void iniData(const PropertyDialogCfg& _config);
 		void iniGroup(QTreeWidgetItem* _parentTreeItem, const PropertyGroup* _group);
 		bool childItemExists(QTreeWidgetItem* _item, const QString& _text);
+
+		//! \brief Creates a configuration for the root group that contains the full group structure until the provided group.
+		//! Other groups and properties are ignored.
+		//! The resulted structure may look like this: "Root/Child/ActualGroup (the group provided)".
+		PropertyGroup* createRootGroupConfig(const PropertyGroup* _group);
 
 		//! \brief Returns the first item matching the text.
 		//! Returns _item if it matches.

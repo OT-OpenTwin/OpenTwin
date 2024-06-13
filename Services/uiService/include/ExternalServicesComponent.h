@@ -55,7 +55,6 @@ class ControlsManager;
 class KeyboardCommandHandler;
 namespace ot { class ServiceBase; };
 namespace ot { class Property; };
-namespace ot { class PropertyGridItem; };
 
 class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::OTObjectBase
 {
@@ -124,13 +123,10 @@ public:
 
 	void itemRenamed(ModelUIDtype modelID, const std::string &newName);
 
-	ot::Property* createCleanedPropertyFromItem(const ot::PropertyGridItem* _item);
+	ot::Property* createCleanedProperty(const ot::Property* const _item);
 
-	void propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
-	void propertyGridValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName);
-	void propertyGridValueChanged(const ot::PropertyGridCfg& _config);
-	void propertyGridValueDeleteRequested(const std::string& _groupName, const std::string& _itemName);
-	void propertyGridValueDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _itemName);
+	void propertyGridValueChanged(const ot::Property* _property);
+	void propertyGridValueDeleteRequested(const ot::Property* _property);
 	
 	void executeAction(ModelUIDtype modelID, ModelUIDtype buttonID);
 

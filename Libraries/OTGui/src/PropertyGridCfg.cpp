@@ -9,11 +9,10 @@
 #include "OTGui/PropertyGridCfg.h"
 
 ot::PropertyGridCfg::PropertyGridCfg() {
-	m_defaultGroup = new PropertyGroup;
+
 }
 
 ot::PropertyGridCfg::PropertyGridCfg(const PropertyGridCfg& _other) {
-	m_defaultGroup = new PropertyGroup;
 	*this = _other;
 }
 
@@ -24,12 +23,9 @@ ot::PropertyGridCfg::~PropertyGridCfg() {
 ot::PropertyGridCfg& ot::PropertyGridCfg::operator = (const PropertyGridCfg& _other) {
 	if (this == &_other) return *this;
 
-	m_defaultGroup->clear();
 	this->clear();
 
-	*m_defaultGroup = *_other.m_defaultGroup;
-
-	for (PropertyGroup* g : _other.m_rootGroups) {
+	for (const PropertyGroup* g : _other.getRootGroups()) {
 		PropertyGroup* ng = new PropertyGroup(*g);
 		this->addRootGroup(ng);
 	}
@@ -38,10 +34,6 @@ ot::PropertyGridCfg& ot::PropertyGridCfg::operator = (const PropertyGridCfg& _ot
 }
 
 void ot::PropertyGridCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	JsonObject defObj;
-	m_defaultGroup->addToJsonObject(defObj, _allocator);
-	_object.AddMember("DefaultGroup", defObj, _allocator);
-
 	JsonArray gArr;
 	for (PropertyGroup* g : m_rootGroups) {
 		JsonObject gObj;
@@ -53,9 +45,6 @@ void ot::PropertyGridCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloca
 
 void ot::PropertyGridCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	this->clear();
-
-	ConstJsonObject defObj = json::getObject(_object, "DefaultGroup");
-	m_defaultGroup->setFromJsonObject(defObj);
 
 	ConstJsonArray gArr = json::getArray(_object, "Groups");
 	for (JsonSizeType i = 0; i < gArr.Size(); i++) {
@@ -69,9 +58,7 @@ void ot::PropertyGridCfg::setFromJsonObject(const ot::ConstJsonObject& _object) 
 void ot::PropertyGridCfg::mergeWith(const PropertyGridCfg& _other, bool _replaceExistingProperties) {
 	if (this == &_other) return;
 
-	m_defaultGroup->mergeWith(*_other.getDefaultGroup(), _replaceExistingProperties);
-	
-	for (PropertyGroup* group : _other.getRootGroups()) {
+	for (const PropertyGroup* group : _other.getRootGroups()) {
 		bool found = false;
 		for (PropertyGroup* ownGroup : m_rootGroups) {
 			if (group->getName() == ownGroup->getName()) {
@@ -84,13 +71,6 @@ void ot::PropertyGridCfg::mergeWith(const PropertyGridCfg& _other, bool _replace
 			m_rootGroups.push_back(new PropertyGroup(*group));
 		}
 	}
-}
-
-void ot::PropertyGridCfg::setDefaultGroup(PropertyGroup* _group) {
-	OTAssertNullptr(_group);
-	if (_group == m_defaultGroup) return;
-	if (m_defaultGroup) delete m_defaultGroup;
-	m_defaultGroup = _group;
 }
 
 void ot::PropertyGridCfg::setRootGroups(const std::list<PropertyGroup*>& _groups) {
@@ -128,7 +108,6 @@ ot::PropertyGroup* ot::PropertyGridCfg::findOrCreateGroup(const std::string& _na
 
 std::list<ot::Property*> ot::PropertyGridCfg::findPropertiesBySpecialType(const std::string& _specialType) const {
 	std::list<ot::Property*> ret;
-	m_defaultGroup->findPropertiesBySpecialType(_specialType, ret);
 	for (PropertyGroup* g : m_rootGroups) {
 		g->findPropertiesBySpecialType(_specialType, ret);
 	}
@@ -137,9 +116,6 @@ std::list<ot::Property*> ot::PropertyGridCfg::findPropertiesBySpecialType(const 
 
 std::list<ot::Property*> ot::PropertyGridCfg::getAllProperties(void) const {
 	std::list<Property*> ret;
-	for (Property* prop : m_defaultGroup->getAllProperties()) {
-		ret.push_back(prop);
-	}
 	for (PropertyGroup* group : m_rootGroups) {
 		for (Property* prop : group->getAllProperties()) {
 			ret.push_back(prop);
@@ -153,12 +129,13 @@ bool ot::PropertyGridCfg::isEmpty(void) const {
 		if (!group->isEmpty()) return false;
 	}
 
-	return m_defaultGroup->isEmpty();
+	return true;
 }
 
 void ot::PropertyGridCfg::clear(void) {
-	for (PropertyGroup* g : m_rootGroups) {
+	std::list<PropertyGroup*> groups = m_rootGroups;
+	m_rootGroups.clear();
+	for (PropertyGroup* g : groups) {
 		delete g;
 	}
-	m_rootGroups.clear();
 }

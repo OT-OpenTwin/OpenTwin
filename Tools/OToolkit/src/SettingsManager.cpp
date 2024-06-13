@@ -37,36 +37,34 @@ bool SettingsManager::showDialog(void) {
 	return ok;
 }
 
-void SettingsManager::slotPropertyChanged(const std::string& _groupPath, const std::string& _propertyName) {
-	OT_LOG_I("Property change { \"Group\": \"" + _groupPath + "\", \"Property\": \"" + _propertyName + "\" }");
+void SettingsManager::slotPropertyChanged(const std::string& _owner, const ot::Property* const _property) {
+	std::string propertyPath = _property->getPropertyPath();
 
-	const ot::PropertyDialog*const dialog = ot::ApplicationPropertiesManager::instance().getDialog();
-	if (!dialog) {
-		OT_LOG_E("Dialog does not exist");
-		return;
-	}
+	OT_LOG_I("Property change { \"Owner\": \"" + _owner + "\", \"Property\": \"" + propertyPath + "\" }");
 
-	// Check default application settings
-	if (_groupPath == "General/Appearance" && _propertyName == "Color Style") {
-		ot::PropertyGridItem* item = dialog->getPropertyGrid()->findItem(std::list<std::string>({ "General", "Appearance" }), "Color Style");
-		if (!item) {
-			OT_LOG_E("Item not found { \"Group\": \"" + _groupPath + "\", \"Property\": \"" + _propertyName + "\" }");
-			return;
-		}
-		ot::PropertyStringList* prop = dynamic_cast<ot::PropertyStringList*>(item->createProperty());
-		if (!prop) {
-			OT_LOG_E("Invalid property { \"Group\": \"" + _groupPath + "\", \"Property\": \"" + _propertyName + "\" }");
-			return;
-		}
-
-		ot::GlobalColorStyle::instance().setCurrentStyle(prop->current());
-		m_app->createSettingsInstance()->setValue("ColorStyle", QString::fromStdString(prop->current()));
-	}
+	if (_owner == "General") {
+		this->generalSettingsChanged(propertyPath, _property);
+	}	
+	
 
 }
 
-void SettingsManager::slotPropertyDeleteRequested(const std::string& _groupPath, const std::string& _propertyName) {
+void SettingsManager::slotPropertyDeleteRequested(const std::string& _owner, const ot::Property* const _property) {
 
+}
+
+void SettingsManager::generalSettingsChanged(const std::string& _propertyPath, const ot::Property* const _property) {
+	// Check default application settings
+	if (_propertyPath == "Appearance/Color Style") {
+		const ot::PropertyStringList* actualProperty = dynamic_cast<const ot::PropertyStringList*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Invalid property { \"Property\": \"" + _propertyPath + "\" }");
+			return;
+		}
+
+		ot::GlobalColorStyle::instance().setCurrentStyle(actualProperty->getCurrent());
+		m_app->createSettingsInstance()->setValue("ColorStyle", QString::fromStdString(actualProperty->getCurrent()));
+	}
 }
 
 void SettingsManager::updateSettings(void) {

@@ -103,8 +103,8 @@ protected:
 	//! \brief Is called when the property grid needs to be filled.
 	virtual void fillPropertyGrid(void) override = 0;
 
-	virtual void propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override = 0;
-	virtual void propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) override = 0;
+	virtual void propertyChanged(const ot::Property* _property) override = 0;
+	virtual void propertyDeleteRequested(const ot::Property* _property) override = 0;
 
 	void initializeBaseData(const QList<QPointF>& _controlPoints, const QPointF& _pos);
 

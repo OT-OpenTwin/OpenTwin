@@ -184,10 +184,10 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 	if (m_spinBox) {
 		m_spinBox->blockSignals(true);
 
-		m_spinBox->setDecimals(actualProperty->precision());
+		m_spinBox->setDecimals(actualProperty->getPrecision());
 		m_spinBox->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
-		m_spinBox->setRange(actualProperty->min(), actualProperty->max());
-		m_spinBox->setValue(actualProperty->value());
+		m_spinBox->setRange(actualProperty->getMin(), actualProperty->getMax());
+		m_spinBox->setValue(actualProperty->getValue());
 		if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 			m_spinBox->setSpecialValueText(OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT);
 		}
@@ -200,7 +200,7 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 		m_lineEdit->blockSignals(true);
 
 		m_lineEdit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
-		m_lineEdit->setText(QString::number(actualProperty->value()));
+		m_lineEdit->setText(QString::number(actualProperty->getValue()));
 		if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 			m_lineEdit->setText(OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT);
 		}

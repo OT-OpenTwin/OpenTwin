@@ -38,8 +38,6 @@ namespace ot {
 		void setGridConfig(const PropertyGridCfg& _config) { m_gridConfig = _config; };
 		const PropertyGridCfg& getGridConfig(void) const { return m_gridConfig; };
 
-		PropertyGroup* getDefaultGroup(void) const { return m_gridConfig.getDefaultGroup(); };
-
 		void setRootGroups(const std::list<PropertyGroup*>& _groups) { m_gridConfig.setRootGroups(_groups); };
 		void addRootGroup(PropertyGroup* _group) { m_gridConfig.addRootGroup(_group); };
 		const std::list<PropertyGroup*>& getRootGroups(void) const { return m_gridConfig.getRootGroups(); };

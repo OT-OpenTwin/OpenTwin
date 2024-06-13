@@ -28,7 +28,7 @@ namespace ot {
 		virtual Property* createCopy(void) const override;
 
 		void setValue(ot::Color _value) { m_value = _value; };
-		ot::Color value(void) const { return m_value; };
+		ot::Color getValue(void) const { return m_value; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object

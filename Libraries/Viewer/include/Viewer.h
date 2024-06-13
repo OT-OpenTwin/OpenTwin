@@ -35,6 +35,7 @@ namespace osgGA		{ class ViewManipulator; };
 namespace osgText   { class Text; };
 namespace osg		{ class ShapeDrawable; };
 namespace osg		{ class Group; }
+namespace ot        { class Property; }
 namespace ot        { class SettingsData; }
 namespace ot        { class AbstractSettingsItem; }
 namespace ot        { class VersionGraphView; }
@@ -110,7 +111,7 @@ public:
 
 	Model *getModel(void) { return model; }
 
-	bool propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
+	bool propertyGridValueChanged(const ot::Property* _property);
 
 	void enableClipPlane(osg::Vec3d normal, osg::Vec3d point);
 	void updateClipPlane(osg::Vec3d normal, osg::Vec3d point);

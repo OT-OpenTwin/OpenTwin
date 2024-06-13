@@ -97,117 +97,123 @@ void WrappedArcItem::fillPropertyGrid(void) {
 	this->getPropertyGrid()->setupGridFromConfig(cfg);
 }
 
-void WrappedArcItem::propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
+void WrappedArcItem::propertyChanged(const ot::Property* _property) {
 	using namespace ot;
 
-	if (_item->getGroupName() == "General" && _itemData.getPropertyName() == "Name") {
-		PropertyInputString* input = dynamic_cast<PropertyInputString*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed { \"Group\": \"" + _item->getGroupName() + "\", \"");
+	const ot::PropertyGroup* group = _property->getParentGroup();
+	if (!group) {
+		OT_LOG_EA("Data mismatch");
+		return;
+	}
+
+	if (group->getName() == "General" && _property->getPropertyName() == "Name") {
+		const PropertyString* actualProperty = dynamic_cast<const PropertyString*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
+
 		OTAssertNullptr(this->getNavigation());
+		if (actualProperty->getValue().empty()) return;
+		if (!this->getNavigation()->updateItemName(QString::fromStdString(this->getGraphicsItemName()), QString::fromStdString(actualProperty->getValue()))) return;
 
-		if (input->getCurrentText().isEmpty()) return;
-		if (!this->getNavigation()->updateItemName(QString::fromStdString(this->getGraphicsItemName()), input->getCurrentText())) return;
-
-		this->setGraphicsItemName(input->getCurrentText().toStdString());
+		this->setGraphicsItemName(actualProperty->getValue());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "X") {
-		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "X") {
+		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
 		RectD newRect = this->getArcRect();
-		newRect.moveBy(input->getValue() - newRect.getLeft(), 0.);
+		newRect.moveBy(actualProperty->getValue() - newRect.getLeft(), 0.);
 		this->setArcRect(newRect);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Y") {
-		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Y") {
+		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
 		RectD newRect = this->getArcRect();
-		newRect.moveBy(0., input->getValue() - newRect.getLeft());
+		newRect.moveBy(0., actualProperty->getValue() - newRect.getLeft());
 		this->setArcRect(newRect);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Width") {
-		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Width") {
+		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
 		RectD newRect = this->getArcRect();
-		this->setArcRect(RectD(newRect.getTopLeft(), Size2DD(input->getValue(), newRect.getHeight())));
+		this->setArcRect(RectD(newRect.getTopLeft(), Size2DD(actualProperty->getValue(), newRect.getHeight())));
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Height") {
-		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Height") {
+		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
 		RectD newRect = this->getArcRect();
-		this->setArcRect(RectD(newRect.getTopLeft(), Size2DD(newRect.getHeight(), input->getValue())));
+		this->setArcRect(RectD(newRect.getTopLeft(), Size2DD(newRect.getHeight(), actualProperty->getValue())));
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Start Angle") {
-		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Start Angle") {
+		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
-		this->setStartAngle(input->getValue() * 16.);
+		this->setStartAngle(actualProperty->getValue() * 16.);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Span Angle") {
-		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Span Angle") {
+		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
-		this->setSpanAngle(input->getValue() * 16.);
+		this->setSpanAngle(actualProperty->getValue() * 16.);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Line Painter") {
-		PropertyInputPainter2D* input = dynamic_cast<PropertyInputPainter2D*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Line Painter") {
+		const PropertyPainter2D* actualProperty = dynamic_cast<const PropertyPainter2D*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
 		ot::OutlineF lineStyle = this->getLineStyle();
-		lineStyle.setPainter(input->getPainter()->createCopy());
+		lineStyle.setPainter(actualProperty->getPainter()->createCopy());
 		this->setLineStyle(lineStyle);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Line Width") {
-		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Line Width") {
+		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
 		ot::OutlineF lineStyle = this->getLineStyle();
-		lineStyle.setWidth(input->getValue());
+		lineStyle.setWidth(actualProperty->getValue());
 		this->setLineStyle(lineStyle);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Handle State") {
-		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Handle State") {
+		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
-		this->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, input->isChecked());
+		this->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, actualProperty->getValue());
 	}
 	
 }
 
-void WrappedArcItem::propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
+void WrappedArcItem::propertyDeleteRequested(const ot::Property* _property) {
 
 }
 

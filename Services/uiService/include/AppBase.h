@@ -64,6 +64,7 @@ namespace ot { class GraphicsPicker; }
 namespace ot { class GraphicsViewView; }
 namespace ot { class GraphicsItem; }
 namespace ot { class TextEditorView; }
+namespace ot { class Property; }
 namespace ot { class PropertyGridView; }
 namespace ot { class PropertyGridItem; }
 namespace ot { class NavigationTreeView; }
@@ -462,10 +463,8 @@ private Q_SLOTS:
 
 	// Private: Property grid slots
 
-	void slotPropertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
-	void slotPropertyGridValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName);
-	void slotPropertyGridValueDeleteRequested(const std::string& _groupName, const std::string& _itemName);
-	void slotPropertyGridValueDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _itemName);
+	void slotPropertyGridValueChanged(const ot::Property* _property);
+	void slotPropertyGridValueDeleteRequested(const ot::Property* _property);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

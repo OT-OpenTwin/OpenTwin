@@ -556,66 +556,39 @@ void ExternalServicesComponent::itemRenamed(ModelUIDtype modelID, const std::str
 	}
 }
 
-ot::Property* ExternalServicesComponent::createCleanedPropertyFromItem(const ot::PropertyGridItem* _item) {
-	ot::Property* prop = _item->createProperty();
+ot::Property* ExternalServicesComponent::createCleanedProperty(const ot::Property* const _item) {
+	ot::PropertyGroup* rootGroup = _item->getRootGroup();
+	if (!rootGroup) {
+		OT_LOG_E("No parent group set");
+		return nullptr;
+	}
+
+	rootGroup = rootGroup->createCopy(true);
+	OTAssertNullptr(rootGroup);
+
+	std::list<ot::Property*> propertyList = rootGroup->getAllProperties();
+	if (!propertyList.size() == 1) {
+		OT_LOG_E("Data mismatch");
+		delete rootGroup;
+		return nullptr;
+	}
 
 	// For the EntityList property we remove the value id since we dont know the id of the entity
-	if (prop->getPropertyType() == OT_PROPERTY_TYPE_StringList && prop->getSpecialType() == "EntityList" && !prop->getAdditionalPropertyData().empty()) {
+	if (propertyList.front()->getPropertyType() == OT_PROPERTY_TYPE_StringList && propertyList.front()->getSpecialType() == "EntityList") {
 		ot::JsonDocument dataDoc;
 		ot::JsonDocument newDataDoc;
-		dataDoc.fromJson(prop->getAdditionalPropertyData());
+		dataDoc.fromJson(propertyList.front()->getAdditionalPropertyData("EntityData"));
 		newDataDoc.AddMember("ContainerName", ot::JsonString(ot::json::getString(dataDoc, "ContainerName"), newDataDoc.GetAllocator()), newDataDoc.GetAllocator());
 		newDataDoc.AddMember("ContainerID", ot::json::getUInt64(dataDoc, "ContainerID"), newDataDoc.GetAllocator());
-		newDataDoc.AddMember("ValueID", 0, newDataDoc.GetAllocator());
-		prop->setAdditionalPropertyData(newDataDoc.toJson());
+		//newDataDoc.AddMember("ValueID", 0, newDataDoc.GetAllocator());
+		newDataDoc.AddMember("ValueID", ot::json::getUInt64(dataDoc, "ValueID"), newDataDoc.GetAllocator());
+		propertyList.front()->addAdditionalPropertyData("EntityData", newDataDoc.toJson());
 	}
 
-	return prop;
+	return propertyList.front();
 }
 
-void ExternalServicesComponent::propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName)
-{
-	std::list<std::string> path;
-	path.push_back(_groupName);
-	this->propertyGridValueChanged(path, _itemName);
-}
-
-void ExternalServicesComponent::propertyGridValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName) {
-	if (_groupPath.empty()) {
-		OT_LOG_EA("Group path is empty");
-	}
-
-	ot::PropertyGridItem* itm = AppBase::instance()->findProperty(_groupPath, _itemName);
-	if (!itm) {
-		OT_LOG_E("Property not found");
-		return;
-	}
-
-	ot::PropertyGridCfg cfg;
-
-	std::list<std::string> groupPath = _groupPath;
-
-	ot::PropertyGroup* cfgGroup = new ot::PropertyGroup(groupPath.back());
-	groupPath.pop_back();
-
-	while (!groupPath.empty()) {
-		ot::PropertyGroup* newCfgGroup = new ot::PropertyGroup(groupPath.back());
-		groupPath.pop_back();
-		newCfgGroup->addChildGroup(cfgGroup);
-		cfgGroup = newCfgGroup;
-	}
-
-	cfgGroup->addProperty(this->createCleanedPropertyFromItem(itm));
-	cfg.addRootGroup(cfgGroup);
-
-	AppBase::instance()->lockPropertyGrid(true);
-
-	this->propertyGridValueChanged(cfg);
-
-	AppBase::instance()->lockPropertyGrid(false);
-}
-
-void ExternalServicesComponent::propertyGridValueChanged(const ot::PropertyGridCfg& _config) {
+void ExternalServicesComponent::propertyGridValueChanged(const ot::Property* _property) {
 	try {
 		// Get the currently selected model entities. We first get all visible entities only.
 		std::list<ak::UID> selectedModelEntityIDs;
@@ -632,9 +605,15 @@ void ExternalServicesComponent::propertyGridValueChanged(const ot::PropertyGridC
 		// Finally send the string
 		ak::UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
 
+		ot::Property* cleanedProperty = this->createCleanedProperty(_property);
+		if (!cleanedProperty) return;
+
+		ot::PropertyGridCfg newConfig;
+		newConfig.addRootGroup(cleanedProperty->getRootGroup());
+
 		ot::JsonDocument doc;
 		ot::JsonObject cfgObj;
-		_config.addToJsonObject(cfgObj, doc.GetAllocator());
+		newConfig.addToJsonObject(cfgObj, doc.GetAllocator());
 
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SetPropertiesFromJSON, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ID, modelID, doc.GetAllocator());
@@ -664,14 +643,7 @@ void ExternalServicesComponent::propertyGridValueChanged(const ot::PropertyGridC
 	}
 }
 
-void ExternalServicesComponent::propertyGridValueDeleteRequested(const std::string& _groupName, const std::string& _itemName)
-{
-	std::list<std::string> path;
-	path.push_back(_groupName);
-	this->propertyGridValueDeleteRequested(path, _itemName);
-}
-
-void ExternalServicesComponent::propertyGridValueDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _itemName) {
+void ExternalServicesComponent::propertyGridValueDeleteRequested(const ot::Property* _property) {
 	AppBase::instance()->lockPropertyGrid(true);
 
 	// Get the currently selected model entities. We first get all visible entities only.
@@ -690,7 +662,7 @@ void ExternalServicesComponent::propertyGridValueDeleteRequested(const std::list
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_DeleteProperty, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(_itemName, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(_property->getPropertyName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {

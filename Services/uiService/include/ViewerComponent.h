@@ -26,6 +26,7 @@
 #include <QTableWidgetItem>
 
 namespace ak { class aTreeWidget; };
+namespace ot { class Property; }
 namespace ot { class WidgetView; }
 namespace ot { class SettingsData; }
 namespace ot { class AbstractSettingsItem; }
@@ -183,9 +184,8 @@ public:
 
 	void contextMenuItemCheckedChanged(const std::string& _menuName, const std::string& _itemName, bool _isChecked);
 
-	bool propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
-	bool propertyGridValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName);
-
+	bool propertyGridValueChanged(const ot::Property* _property);
+	
 private:
 	std::vector<ViewerUIDtype>		m_viewers;
 

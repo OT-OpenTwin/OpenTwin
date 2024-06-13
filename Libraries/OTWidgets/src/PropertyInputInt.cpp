@@ -185,8 +185,8 @@ bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration
 		m_spinBox->blockSignals(true);
 
 		m_spinBox->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
-		m_spinBox->setRange(actualProperty->min(), actualProperty->max());
-		m_spinBox->setValue(actualProperty->value());
+		m_spinBox->setRange(actualProperty->getMin(), actualProperty->getMax());
+		m_spinBox->setValue(actualProperty->getValue());
 		if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 			m_spinBox->setSpecialValueText(OT_PROPERTY_INT_MULTIPLEVALUESTEXT);
 		}
@@ -199,7 +199,7 @@ bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration
 		m_lineEdit->blockSignals(true);
 
 		m_lineEdit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
-		m_lineEdit->setText(QString::number(actualProperty->value()));
+		m_lineEdit->setText(QString::number(actualProperty->getValue()));
 		if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 			m_lineEdit->setText(OT_PROPERTY_INT_MULTIPLEVALUESTEXT);
 		}

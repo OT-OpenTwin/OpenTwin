@@ -51,7 +51,7 @@ bool ot::PropertyInputBool::setupFromConfiguration(const Property* _configuratio
 
 	m_checkBox->blockSignals(true);
 
-	m_checkBox->setChecked(actualProperty->value());
+	m_checkBox->setChecked(actualProperty->getValue());
 	m_checkBox->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 		m_checkBox->setCheckState(Qt::PartiallyChecked);

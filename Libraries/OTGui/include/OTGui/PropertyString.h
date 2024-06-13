@@ -30,13 +30,13 @@ namespace ot {
 		virtual Property* createCopy(void) const override;
 
 		void setValue(const std::string& _value) { m_value = _value; };
-		const std::string& value(void) const { return m_value; };
+		const std::string& getValue(void) const { return m_value; };
 
 		void setPlaceholderText(const std::string& _text) { m_placeholderText = _text; };
-		const std::string& placeholderText(void) const { return m_placeholderText; };
+		const std::string& getPlaceholderText(void) const { return m_placeholderText; };
 
 		void setMaxLength(int _length) { m_maxLength = _length; };
-		int maxLength(void) const { return m_maxLength; };
+		int getMaxLength(void) const { return m_maxLength; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object

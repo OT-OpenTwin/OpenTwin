@@ -87,12 +87,6 @@ void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 	this->blockSignals(true);
 	m_tree->blockSignals(true);
 
-	for (const Property* itm : _config.getDefaultGroup()->getProperties()) {
-		PropertyGridItem* newItm = new PropertyGridItem;
-		newItm->setupFromConfig(itm);
-		this->addRootItem(newItm);
-		newItm->finishSetup();
-	}
 	for (const PropertyGroup* group : _config.getRootGroups()) {
 		PropertyGridGroup* newGroup = new PropertyGridGroup;
 		newGroup->setupFromConfig(group);
@@ -105,26 +99,14 @@ void ot::PropertyGrid::setupGridFromConfig(const PropertyGridCfg& _config) {
 	this->blockSignals(false);
 }
 
-void ot::PropertyGrid::addRootItem(PropertyGridItem* _item) {
-	if (_item->getPropertyData().getPropertyName().empty()) {
-		OT_LOG_W("Item name is empty");
-	}
-	m_tree->addTopLevelItem(_item);
-
-	this->connect(_item, &PropertyGridItem::inputValueChanged, this, qOverload<>(&PropertyGrid::slotPropertyChanged));
-	this->connect(_item, &PropertyGridItem::deleteRequested, this, qOverload<>(&PropertyGrid::slotPropertyDeleteRequested));
-}
-
 void ot::PropertyGrid::addGroup(PropertyGridGroup* _group) {
 	if (_group->getName().empty()) {
 		OT_LOG_W("Group name is empty. Group wont be findable trough find group");
 	}
 	m_tree->addTopLevelItem(_group);
 
-	this->connect(_group, qOverload<const std::string&, const std::string&>(& PropertyGridGroup::itemInputValueChanged), this, qOverload<const std::string&, const std::string&>(&PropertyGrid::slotPropertyChanged));
-	this->connect(_group, qOverload<const std::list<std::string>&, const std::string&>(& PropertyGridGroup::itemInputValueChanged), this, qOverload<const std::list<std::string>&, const std::string&>(&PropertyGrid::slotPropertyChanged));
-	this->connect(_group, qOverload<const std::string&, const std::string&>(&PropertyGridGroup::itemDeleteRequested), this, qOverload<const std::string&, const std::string&>(&PropertyGrid::slotPropertyDeleteRequested));
-	this->connect(_group, qOverload<const std::list<std::string>&, const std::string&>(&PropertyGridGroup::itemDeleteRequested), this, qOverload<const std::list<std::string>&, const std::string&>(&PropertyGrid::slotPropertyDeleteRequested));
+	this->connect(_group, &PropertyGridGroup::itemInputValueChanged, this, &PropertyGrid::slotPropertyChanged);
+	this->connect(_group, &PropertyGridGroup::itemDeleteRequested, this, &PropertyGrid::slotPropertyDeleteRequested);
 }
 
 ot::PropertyGridGroup* ot::PropertyGrid::findGroup(const std::string& _groupName) const {
@@ -157,48 +139,12 @@ void ot::PropertyGrid::clear(void) {
 	this->blockSignals(false);
 }
 
-void ot::PropertyGrid::slotPropertyChanged() {
-	PropertyGridItem* itm = dynamic_cast<PropertyGridItem*>(sender());
-	if (!itm) {
-		OT_LOG_E("Item cast failed");
-		return;
-	}
-	PropertyGridGroup* itmGroup = itm->getParentPropertyGroup();
-	if (!itmGroup) {
-		OT_LOG_E("Group missing");
-		return;
-	}
-	Q_EMIT propertyChanged(itmGroup->getName(), itm->getPropertyData().getPropertyName());
+void ot::PropertyGrid::slotPropertyChanged(const Property* const _property) {
+	Q_EMIT propertyChanged(_property);
 }
 
-void ot::PropertyGrid::slotPropertyChanged(const std::string& _groupName, const std::string& _itemName) {
-	Q_EMIT propertyChanged(_groupName, _itemName);
-}
-
-void ot::PropertyGrid::slotPropertyChanged(const std::list<std::string>& _groupPath, const std::string& _itemName) {
-	Q_EMIT propertyChanged(_groupPath, _itemName);
-}
-
-void ot::PropertyGrid::slotPropertyDeleteRequested(void) {
-	PropertyGridItem* itm = dynamic_cast<PropertyGridItem*>(sender());
-	if (!itm) {
-		OT_LOG_E("Item cast failed");
-		return;
-	}
-	PropertyGridGroup* itmGroup = itm->getParentPropertyGroup();
-	if (!itmGroup) {
-		OT_LOG_E("Group missing");
-		return;
-	}
-	Q_EMIT propertyDeleteRequested(itmGroup->getName(), itm->getPropertyData().getPropertyName());
-}
-
-void ot::PropertyGrid::slotPropertyDeleteRequested(const std::string& _groupName, const std::string& _itemName) {
-	Q_EMIT propertyDeleteRequested(_groupName, _itemName);
-}
-
-void ot::PropertyGrid::slotPropertyDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _itemName) {
-	Q_EMIT propertyDeleteRequested(_groupPath, _itemName);
+void ot::PropertyGrid::slotPropertyDeleteRequested(const Property* const _property) {
+	Q_EMIT propertyDeleteRequested(_property);
 }
 
 void ot::PropertyGrid::slotItemCollapsed(QTreeWidgetItem* _item) {

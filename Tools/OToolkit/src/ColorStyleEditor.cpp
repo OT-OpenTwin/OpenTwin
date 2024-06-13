@@ -980,7 +980,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 	for (const PropertyGridItem* itm : gStyleFiles->childProperties()) {
 		const PropertyInputString* inp = dynamic_cast<const PropertyInputString*>(itm->getInput());
 		if (!inp) {
-			OT_LOG_EAS("Input cast failed");
+			OT_LOG_EAS("Property cast failed");
 			return false;
 		}
 
@@ -1007,7 +1007,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 	for (const PropertyGridItem* itm : gStyleInts->childProperties()) {
 		const PropertyInputInt* inp = dynamic_cast<const PropertyInputInt*>(itm->getInput());
 		if (!inp) {
-			OT_LOG_EAS("Input cast failed");
+			OT_LOG_EAS("Property cast failed");
 			return false;
 		}
 
@@ -1034,7 +1034,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 	for (const PropertyGridItem* itm : gStyleDoubles->childProperties()) {
 		const PropertyInputDouble* inp = dynamic_cast<const PropertyInputDouble*>(itm->getInput());
 		if (!inp) {
-			OT_LOG_EAS("Input cast failed");
+			OT_LOG_EAS("Property cast failed");
 			return false;
 		}
 
@@ -1061,7 +1061,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 	for (const PropertyGridItem* itm : gStyleValues->childProperties()) {
 		const PropertyInputPainter2D* inp = dynamic_cast<const PropertyInputPainter2D*>(itm->getInput());
 		if (!inp) {
-			OT_LOG_EAS("Input cast failed");
+			OT_LOG_EAS("Property cast failed");
 			return false;
 		}
 		if (!inp->getButton()->getPainter()) {
@@ -1096,7 +1096,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		for (const PropertyGridItem* itm : gColors->childProperties()) {
 			const PropertyInputPainter2D* inp = dynamic_cast<const PropertyInputPainter2D*>(itm->getInput());
 			if (!inp) {
-				OT_LOG_EAS("Input cast failed");
+				OT_LOG_EAS("Property cast failed");
 				return false;
 			}
 			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::PainterMacro)) + ":" + QString::fromStdString(inp->data().getPropertyName()) + "%";
@@ -1113,7 +1113,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		for (const PropertyGridItem* itm : gFiles->childProperties()) {
 			const PropertyInputString* inp = dynamic_cast<const PropertyInputString*>(itm->getInput());
 			if (!inp) {
-				OT_LOG_EAS("Input cast failed");
+				OT_LOG_EAS("Property cast failed");
 				return false;
 			}
 			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::FileMacro)) + ":" + QString::fromStdString(inp->data().getPropertyName()) + "%";
@@ -1130,7 +1130,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		for (const PropertyGridItem* itm : gInt->childProperties()) {
 			const PropertyInputInt* inp = dynamic_cast<const PropertyInputInt*>(itm->getInput());
 			if (!inp) {
-				OT_LOG_EAS("Input cast failed");
+				OT_LOG_EAS("Property cast failed");
 				return false;
 			}
 			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::IntMacro)) + ":" + QString::fromStdString(inp->data().getPropertyName()) + "%";
@@ -1147,7 +1147,7 @@ bool ColorStyleEditor::generateFile(std::string& _result) {
 		for (const PropertyGridItem* itm : gDouble->childProperties()) {
 			const PropertyInputDouble* inp = dynamic_cast<const PropertyInputDouble*>(itm->getInput());
 			if (!inp) {
-				OT_LOG_EAS("Input cast failed");
+				OT_LOG_EAS("Property cast failed");
 				return false;
 			}
 			QString k = "%" + QString::fromStdString(ot::toString(ot::ColorStyleBaseFileMacro::DoubleMacro)) + ":" + QString::fromStdString(inp->data().getPropertyName()) + "%";

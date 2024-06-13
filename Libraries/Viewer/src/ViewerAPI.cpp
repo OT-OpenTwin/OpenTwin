@@ -1002,21 +1002,12 @@ void ViewerAPI::contextMenuItemCheckedChanged(ot::UID _viewerID, const std::stri
 	viewer->second->contextMenuItemCheckedChanged(_menuName, _itemName, _isChecked);
 }
 
-bool ViewerAPI::propertyGridValueChanged(ot::UID _viewerID, const std::string& _groupName, const std::string& _itemName)
+bool ViewerAPI::propertyGridValueChanged(ot::UID _viewerID, const ot::Property* _property)
 {
 	auto viewer = viewerManager.find(_viewerID);
 	if (viewer == viewerManager.end()) {
 		assert(0);
 		return false;
 	}
-	return viewer->second->propertyGridValueChanged(_groupName, _itemName);
-}
-
-bool ViewerAPI::propertyGridValueChanged(ot::UID _viewerID, const std::list<std::string>& _groupPath, const std::string& _itemName) {
-	std::string path;
-	for (const std::string& group : _groupPath) {
-		if (!path.empty()) path.append("/");
-		path.append(group);
-	}
-	return ViewerAPI::propertyGridValueChanged(_viewerID, path, _itemName);
+	return viewer->second->propertyGridValueChanged(_property);
 }

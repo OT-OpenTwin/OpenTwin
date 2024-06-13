@@ -64,9 +64,9 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 	}
 
 	m_lineEdit->blockSignals(true);
-	m_text = QString::fromStdString(actualProperty->value());
+	m_text = QString::fromStdString(actualProperty->getValue());
 
-	m_lineEdit->setPlaceholderText(QString::fromStdString(actualProperty->placeholderText()));
+	m_lineEdit->setPlaceholderText(QString::fromStdString(actualProperty->getPlaceholderText()));
 
 	if (this->data().getPropertyFlags() & Property::HasMultipleValues) m_lineEdit->setText("...");
 	else m_lineEdit->setText(m_text);

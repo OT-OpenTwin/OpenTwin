@@ -30,8 +30,8 @@ namespace ot {
 		virtual Property* createCopy(void) const override;
 
 		void setPath(const std::string& _path) { m_path = _path; };
-		std::string& path(void) { return m_path; };
-		const std::string& path(void) const { return m_path; };
+	
+		const std::string& getPath(void) const { return m_path; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object

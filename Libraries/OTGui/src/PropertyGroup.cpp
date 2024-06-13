@@ -28,20 +28,19 @@ ot::PropertyGroup::PropertyGroup(const std::string& _name, const std::string& _t
 {}
 
 ot::PropertyGroup::~PropertyGroup() {
-	auto p = m_properties;
-	m_properties.clear();
-	for (auto itm : p) delete itm;
+	this->clear(false);
 }
 
 ot::PropertyGroup& ot::PropertyGroup::operator = (const PropertyGroup& _other) {
+	if (this == &_other) return *this;
+
 	this->clear();
 
 	m_name = _other.m_name;
 	m_title = _other.m_title;
 	m_backgroundColor = _other.m_backgroundColor;
 	m_alternateBackgroundColor = _other.m_alternateBackgroundColor;
-	m_parentGroup = _other.m_parentGroup;
-
+	
 	for (Property* p : _other.m_properties) {
 		this->addProperty(p->createCopy());
 	}
@@ -51,6 +50,18 @@ ot::PropertyGroup& ot::PropertyGroup::operator = (const PropertyGroup& _other) {
 	}
 
 	return *this;
+}
+
+ot::PropertyGroup* ot::PropertyGroup::createCopy(bool _includeChilds) const {
+	if (_includeChilds) return new PropertyGroup(*this);
+	
+	PropertyGroup* newGroup = new PropertyGroup;
+	newGroup->m_name = this->m_name;
+	newGroup->m_title = this->m_title;
+	newGroup->m_backgroundColor = this->m_backgroundColor;
+	newGroup->m_alternateBackgroundColor = this->m_alternateBackgroundColor;
+
+	return newGroup;
 }
 
 void ot::PropertyGroup::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
@@ -116,7 +127,7 @@ void ot::PropertyGroup::setFromJsonObject(const ot::ConstJsonObject& _object) {
 void ot::PropertyGroup::mergeWith(const PropertyGroup& _other, bool _replaceExistingProperties) {
 	if (this == &_other) return;
 
-	for (PropertyGroup* group : _other.getChildGroups()) {
+	for (const PropertyGroup* group : _other.getChildGroups()) {
 		bool found = false;
 		for (PropertyGroup* ownGroup : m_childGroups) {
 			if (group->getName() == ownGroup->getName()) {
@@ -126,9 +137,7 @@ void ot::PropertyGroup::mergeWith(const PropertyGroup& _other, bool _replaceExis
 			}
 		}
 		if (!found) {
-			PropertyGroup* newGroup = new PropertyGroup(*group);
-			newGroup->setParentGroup(this);
-			m_childGroups.push_back(newGroup);
+			this->addChildGroup(new PropertyGroup(*group));
 		}
 	}
 
@@ -137,7 +146,7 @@ void ot::PropertyGroup::mergeWith(const PropertyGroup& _other, bool _replaceExis
 	bool replaced = true;
 	while (replaced && !otherProperties.empty()) {
 		replaced = false;
-		Property* prop = otherProperties.front();
+		const Property* prop = otherProperties.front();
 		otherProperties.pop_front();
 
 		bool found = false;
@@ -150,6 +159,7 @@ void ot::PropertyGroup::mergeWith(const PropertyGroup& _other, bool _replaceExis
 					Property* newProperty = prop->createCopy();
 					newProperty->setParentGroup(this);
 					*it = newProperty;
+					ownProp->setParentGroup(nullptr);
 					delete ownProp;
 					replaced = true;
 					found = true;
@@ -170,6 +180,11 @@ void ot::PropertyGroup::mergeWith(const PropertyGroup& _other, bool _replaceExis
 			m_properties.push_back(newProperty);
 		}
 	}
+}
+
+ot::PropertyGroup* ot::PropertyGroup::getRootGroup(void) {
+	if (m_parentGroup) return m_parentGroup->getRootGroup();
+	else return this;
 }
 
 void ot::PropertyGroup::setProperties(const std::list<Property*>& _properties)
@@ -194,10 +209,16 @@ void ot::PropertyGroup::removeProperty(const std::string& _propertyName) {
 			auto it = std::find(m_properties.begin(), m_properties.end(), prop);
 			OTAssert(it != m_properties.end(), "Data mismatch");
 			m_properties.erase(it);
+			prop->setParentGroup(nullptr);
 			delete prop;
 			return;
 		}
 	}
+}
+
+void ot::PropertyGroup::forgetProperty(Property* _property) {
+	auto it = std::find(m_properties.begin(), m_properties.end(), _property);
+	if (it != m_properties.end()) m_properties.erase(it);
 }
 
 std::list<ot::Property*> ot::PropertyGroup::getAllProperties(void) const {
@@ -237,6 +258,11 @@ ot::PropertyGroup* ot::PropertyGroup::findGroup(const std::string& _name) const 
 	return nullptr;
 }
 
+void ot::PropertyGroup::forgetChildGroup(PropertyGroup* _propertyGroup) {
+	auto it = std::find(m_childGroups.begin(), m_childGroups.end(), _propertyGroup);
+	if (it != m_childGroups.end()) m_childGroups.erase(it);
+}
+
 void ot::PropertyGroup::findPropertiesBySpecialType(const std::string& _specialType, std::list<Property*>& _list) const {
 	for (Property* p : m_properties) {
 		if (p->getSpecialType() == _specialType) {
@@ -249,14 +275,22 @@ void ot::PropertyGroup::findPropertiesBySpecialType(const std::string& _specialT
 }
 
 void ot::PropertyGroup::clear(bool _keepGroups) {
+	if (m_parentGroup) {
+		m_parentGroup->forgetChildGroup(this);
+		delete m_parentGroup;
+		m_parentGroup = nullptr;
+	}
+
 	if (!_keepGroups) {
 		for (PropertyGroup* g : m_childGroups) {
+			g->setParentGroup(nullptr);
 			delete g;
 		}
 		m_childGroups.clear();
 	}
 	
 	for (Property* p : m_properties) {
+		p->setParentGroup(nullptr);
 		delete p;
 	}
 	m_properties.clear();

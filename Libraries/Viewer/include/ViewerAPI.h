@@ -18,6 +18,7 @@
 
 class Model;
 class QPen;
+namespace ot { class Property; }
 namespace ot { class SettingsData; }
 namespace ot { class WidgetView; }
 namespace ot { class AbstractSettingsItem; }
@@ -229,9 +230,7 @@ namespace ViewerAPI
 
 	__declspec(dllexport) void contextMenuItemCheckedChanged(ot::UID _viewerID, const std::string& _menuName, const std::string& _itemName, bool _isChecked);
 
-	__declspec(dllexport) bool propertyGridValueChanged(ot::UID _viewerID, const std::string& _groupName, const std::string& _itemName);
-
-	__declspec(dllexport) bool propertyGridValueChanged(ot::UID _viewerID, const std::list<std::string>& _groupPath, const std::string& _itemName);
+	__declspec(dllexport) bool propertyGridValueChanged(ot::UID _viewerID, const ot::Property* _property);
 
 	__declspec(dllexport) void freeze3DView(unsigned long long osgModelID, bool flag);
 

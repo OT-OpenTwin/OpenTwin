@@ -31,8 +31,8 @@ namespace ot {
 		ot::Dialog::DialogResult showDialog(void);
 
 	Q_SIGNALS:
-		void propertyChanged(const std::string& _groupPath, const std::string& _propertyName);
-		void propertyDeleteRequested(const std::string& _groupPath, const std::string& _propertyName);
+		void propertyChanged(const std::string& _owner, const Property* const _property);
+		void propertyDeleteRequested(const std::string& _owner, const Property* const _property);
 
 	public:
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -56,15 +56,23 @@ namespace ot {
 		// Private
 
 	private Q_SLOTS:
-		void slotPropertyChanged(const std::string& _groupPath, const std::string& _propertyName);
-		void slotPropertyDeleteRequested(const std::string& _groupPath, const std::string& _propertyName);
+		void slotPropertyChanged(const Property* _property);
+		void slotPropertyDeleteRequested(const Property* _property);
 
 	private:
 		bool m_propertyReplaceOnMerge;
 		std::map<std::string, PropertyGridCfg> m_data;
 		PropertyDialog* m_dialog;
+		std::list<Property*> m_garbage;
 
-		PropertyGridCfg& findOrCreateData(const std::string& _owner);
+		PropertyGridCfg findData(const std::string& _owner);
+
+		//! \brief Removes the root group and sets the owner.
+		//! The owner will be set to the root group name before the root is removed.
+		Property* createCleanedSlotProperty(const Property* _property, std::string& _owner);
+		std::list<const PropertyGroup*> getParentGroups(const Property* _property) const;
+
+		void clearGarbage(void);
 
 		ApplicationPropertiesManager();
 		~ApplicationPropertiesManager();

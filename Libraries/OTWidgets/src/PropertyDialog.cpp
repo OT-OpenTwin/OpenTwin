@@ -117,14 +117,12 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 	this->connect(m_navigation->getTreeWidget(), &TreeWidget::itemSelectionChanged, this, &PropertyDialog::slotTreeSelectionChanged);
 	this->connect(btnConfirm, &QPushButton::clicked, this, &PropertyDialog::slotConfirm);
 	this->connect(btnCancel, &QPushButton::clicked, this, &PropertyDialog::slotCancel);
-	this->connect(m_grid, qOverload<const std::string&, const std::string&>(&PropertyGrid::propertyChanged), this, qOverload<const std::string&, const std::string&>(&PropertyDialog::slotPropertyChanged));
-	this->connect(m_grid, qOverload<const std::list<std::string>&, const std::string&>(&PropertyGrid::propertyChanged), this, qOverload<const std::list<std::string>&, const std::string&>(&PropertyDialog::slotPropertyChanged));
-	this->connect(m_grid, qOverload<const std::string&, const std::string&>(&PropertyGrid::propertyDeleteRequested), this, qOverload<const std::string&, const std::string&>(&PropertyDialog::slotPropertyDeleteRequested));
-	this->connect(m_grid, qOverload<const std::list<std::string>&, const std::string&>(&PropertyGrid::propertyDeleteRequested), this, qOverload<const std::list<std::string>&, const std::string&>(&PropertyDialog::slotPropertyDeleteRequested));
+	this->connect(m_grid, &PropertyGrid::propertyChanged, this, &PropertyDialog::slotPropertyChanged);
+	this->connect(m_grid, &PropertyGrid::propertyDeleteRequested, this, &PropertyDialog::slotPropertyDeleteRequested);
 }
 
 ot::PropertyDialog::~PropertyDialog() {
-
+	m_treeMap.clear();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -157,116 +155,12 @@ void ot::PropertyDialog::slotTreeSelectionChanged(void) {
 	m_grid->setupGridFromConfig(it->second.getGridConfig());
 }
 
-void ot::PropertyDialog::slotPropertyChanged(const std::string& _groupName, const std::string& _propertyName) {
-	// Check selection
-	if (m_navigation->getTreeWidget()->selectedItems().count() != 1) {
-		OT_LOG_E("Invalid selection");
-		return;
-	}
-
-	// Check entry
-	const auto& it = m_treeMap.find(m_navigation->getTreeWidget()->selectedItems().front());
-	if (it == m_treeMap.end()) {
-		OT_LOG_E("Unknown item selected");
-		return;
-	}
-
-	// Find the actual tree item since the property group may be a child of the currently selected group
-	QTreeWidgetItem* actualTreeItem = this->findMatchingItem(it->first, QString::fromStdString(_groupName));
-
-	if (!actualTreeItem) {
-		OT_LOG_E("Invalid item selected { \"Group\": \"" + _groupName + "\", \"Property\": " + _propertyName + "\", \"Item\": \"" + it->first->text(0).toStdString() + "\" }");
-		return;
-	}
-
-	Q_EMIT propertyChanged(m_navigation->getTreeWidget()->getItemPath(actualTreeItem).toStdString(), _propertyName);
+void ot::PropertyDialog::slotPropertyChanged(const Property* const _property) {
+	Q_EMIT propertyChanged(_property);
 }
 
-void ot::PropertyDialog::slotPropertyChanged(const std::list<std::string>& _groupPath, const std::string& _propertyName) {
-	// Check selection
-	if (m_navigation->getTreeWidget()->selectedItems().count() != 1) {
-		OT_LOG_E("Invalid selection");
-		return;
-	}
-
-	// Check entry
-	const auto& it = m_treeMap.find(m_navigation->getTreeWidget()->selectedItems().front());
-	if (it == m_treeMap.end()) {
-		OT_LOG_E("Unknown item selected");
-		return;
-	}
-
-	// Check data
-	if (_groupPath.empty()) {
-		OT_LOG_E("Invalid path");
-		return;
-	}
-
-	// Find the actual tree item since the property group may be a child of the currently selected group
-	QTreeWidgetItem* actualTreeItem = this->findMatchingItem(it->first, QString::fromStdString(_groupPath.back()));
-
-	if (!actualTreeItem) {
-		OT_LOG_E("Invalid item selected { \"Group\": \"[PATH]\", \"Property\": " + _propertyName + "\", \"Item\": \"" + it->first->text(0).toStdString() + "\" }");
-		return;
-	}
-
-	Q_EMIT propertyChanged(m_navigation->getTreeWidget()->getItemPath(actualTreeItem).toStdString(), _propertyName);
-}
-
-void ot::PropertyDialog::slotPropertyDeleteRequested(const std::string& _groupName, const std::string& _propertyName) {
-	// Check selection
-	if (m_navigation->getTreeWidget()->selectedItems().count() != 1) {
-		OT_LOG_E("Invalid selection");
-		return;
-	}
-
-	// Check entry
-	const auto& it = m_treeMap.find(m_navigation->getTreeWidget()->selectedItems().front());
-	if (it == m_treeMap.end()) {
-		OT_LOG_E("Unknown item selected");
-		return;
-	}
-
-	// Find the actual tree item since the property group may be a child of the currently selected group
-	QTreeWidgetItem* actualTreeItem = this->findMatchingItem(it->first, QString::fromStdString(_groupName));
-
-	if (!actualTreeItem) {
-		OT_LOG_E("Invalid item selected { \"Group\": \"" + _groupName + "\", \"Property\": " + _propertyName + "\", \"Item\": \"" + it->first->text(0).toStdString() + "\" }");
-		return;
-	}
-
-	Q_EMIT propertyDeleteRequested(m_navigation->getTreeWidget()->getItemPath(actualTreeItem).toStdString(), _propertyName);
-}
-
-void ot::PropertyDialog::slotPropertyDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _propertyName) {
-	// Check selection
-	if (m_navigation->getTreeWidget()->selectedItems().count() != 1) {
-		OT_LOG_E("Invalid selection");
-		return;
-	}
-
-	// Check entry
-	const auto& it = m_treeMap.find(m_navigation->getTreeWidget()->selectedItems().front());
-	if (it == m_treeMap.end()) {
-		OT_LOG_E("Unknown item selected");
-		return;
-	}
-
-	// Check data
-	if (_groupPath.empty()) {
-		OT_LOG_E("Invalid path");
-		return;
-	}
-
-	// Find the actual tree item since the property group may be a child of the currently selected group
-	QTreeWidgetItem* actualTreeItem = this->findMatchingItem(it->first, QString::fromStdString(_groupPath.back()));
-
-	if (!actualTreeItem) {
-		OT_LOG_E("Invalid item selected { \"Group\": \"[PATH]\", \"Property\": " + _propertyName + "\", \"Item\": \"" + it->first->text(0).toStdString() + "\" }");
-		return;
-	}
-
-	Q_EMIT propertyDeleteRequested(m_navigation->getTreeWidget()->getItemPath(actualTreeItem).toStdString(), _propertyName);
+void ot::PropertyDialog::slotPropertyDeleteRequested(const Property* const _property) {
+	Q_EMIT propertyDeleteRequested(_property);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -274,7 +168,6 @@ void ot::PropertyDialog::slotPropertyDeleteRequested(const std::list<std::string
 // Private helper
 
 void ot::PropertyDialog::iniData(const PropertyDialogCfg& _config) {
-	this->iniGroup(m_navigation->getTreeWidget()->invisibleRootItem(), _config.getDefaultGroup());
 	for (PropertyGroup* group : _config.getRootGroups()) {
 		this->iniGroup(m_navigation->getTreeWidget()->invisibleRootItem(), group);
 	}
@@ -294,7 +187,8 @@ void ot::PropertyDialog::iniGroup(QTreeWidgetItem* _parentTreeItem, const Proper
 	_parentTreeItem->addChild(newEntry.getTreeItem());
 
 	PropertyGridCfg newGridConfig;
-	newGridConfig.addRootGroup(new PropertyGroup(*_group));
+	newGridConfig.addRootGroup(this->createRootGroupConfig(_group));
+
 	newEntry.setGridConfig(newGridConfig);
 
 	for (PropertyGroup* childGroup : _group->getChildGroups()) {
@@ -320,6 +214,18 @@ bool ot::PropertyDialog::childItemExists(QTreeWidgetItem* _item, const QString& 
 		if (_item->child(i)->text(0) == _text) return true;
 	}
 	return false;
+}
+
+ot::PropertyGroup* ot::PropertyDialog::createRootGroupConfig(const PropertyGroup* _group) {
+	PropertyGroup* result = _group->createCopy(true);
+	PropertyGroup* parentGroup = _group->getParentGroup();
+	while (parentGroup) {
+		PropertyGroup* newParent = parentGroup->createCopy(false);
+		newParent->addChildGroup(result);
+		result = newParent;
+		parentGroup = parentGroup->getParentGroup();
+	}
+	return result;
 }
 
 QTreeWidgetItem* ot::PropertyDialog::findMatchingItem(QTreeWidgetItem* _item, const QString& _text) {

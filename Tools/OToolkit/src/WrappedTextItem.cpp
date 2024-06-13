@@ -116,123 +116,129 @@ void WrappedTextItem::fillPropertyGrid(void) {
 	this->getPropertyGrid()->setupGridFromConfig(cfg);
 }
 
-void WrappedTextItem::propertyChanged(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
+void WrappedTextItem::propertyChanged(const ot::Property* _property) {
 	using namespace ot;
 
-	if (_item->getGroupName() == "General" && _itemData.getPropertyName() == "Name") {
-		PropertyInputString* input = dynamic_cast<PropertyInputString*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed { \"Group\": \"" + _item->getGroupName() + "\", \"");
+	const ot::PropertyGroup* group = _property->getParentGroup();
+	if (!group) {
+		OT_LOG_EA("Data mismatch");
+		return;
+	}
+
+	if (group->getName() == "General" && _property->getPropertyName() == "Name") {
+		const PropertyString* actualProperty = dynamic_cast<const PropertyString*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
+
 		OTAssertNullptr(this->getNavigation());
+		if (actualProperty->getValue().empty()) return;
+		if (!this->getNavigation()->updateItemName(QString::fromStdString(this->getGraphicsItemName()), QString::fromStdString(actualProperty->getValue()))) return;
 
-		if (input->getCurrentText().isEmpty()) return;
-		if (!this->getNavigation()->updateItemName(QString::fromStdString(this->getGraphicsItemName()), input->getCurrentText())) return;
-
-		this->setGraphicsItemName(input->getCurrentText().toStdString());
+		this->setGraphicsItemName(actualProperty->getValue());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "X") {
-		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "X") {
+		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
-		this->setPos(input->getValue(), this->pos().y());
+		this->setPos(actualProperty->getValue(), this->pos().y());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Y") {
-		PropertyInputDouble* input = dynamic_cast<PropertyInputDouble*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Y") {
+		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
-		this->setPos(this->pos().x(), input->getValue());
+		this->setPos(this->pos().x(), actualProperty->getValue());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Text") {
-		PropertyInputString* input = dynamic_cast<PropertyInputString*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Text") {
+		const PropertyString* actualProperty = dynamic_cast<const PropertyString*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
-		this->setText(input->getCurrentText());
+		this->setText(actualProperty->getValue());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Text As Reference") {
-		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Text As Reference") {
+		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
-		this->setTextIsReference(input->isChecked());
+		this->setTextIsReference(actualProperty->getValue());
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Font Family") {
-		PropertyInputStringList* input = dynamic_cast<PropertyInputStringList*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
-			return;
-		}
-
-		Font font = this->getFont();
-		font.setFamily(input->getCurrentText().toStdString());
-		this->setFont(font);
-	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Text Size") {
-		PropertyInputInt* input = dynamic_cast<PropertyInputInt*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Font Family") {
+		const PropertyStringList* actualProperty = dynamic_cast<const PropertyStringList*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
 		Font font = this->getFont();
-		font.setSize(input->getValue());
+		font.setFamily(actualProperty->getCurrent());
 		this->setFont(font);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Bold") {
-		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Text Size") {
+		const PropertyInt* actualProperty = dynamic_cast<const PropertyInt*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
 		Font font = this->getFont();
-		font.setBold(input->isChecked());
+		font.setSize(actualProperty->getValue());
 		this->setFont(font);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Italic") {
-		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Bold") {
+		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
 		Font font = this->getFont();
-		font.setItalic(input->isChecked());
+		font.setBold(actualProperty->getValue());
 		this->setFont(font);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Text Painter") {
-		PropertyInputPainter2D* input = dynamic_cast<PropertyInputPainter2D*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Italic") {
+		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
-		this->setTextPainter(input->getPainter()->createCopy());
+		Font font = this->getFont();
+		font.setItalic(actualProperty->getValue());
+		this->setFont(font);
 	}
-	else if (_item->getGroupName() == "Geometry" && _itemData.getPropertyName() == "Handle State") {
-		PropertyInputBool* input = dynamic_cast<PropertyInputBool*>(_item->getInput());
-		if (!input) {
-			OT_LOG_E("Input cast failed");
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Text Painter") {
+		const PropertyPainter2D* actualProperty = dynamic_cast<const PropertyPainter2D*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
 			return;
 		}
 
-		this->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, input->isChecked());
+		this->setTextPainter(actualProperty->getPainter()->createCopy());
+	}
+	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Handle State") {
+		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			return;
+		}
+
+		this->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, actualProperty->getValue());
 	}
 }
 
-void WrappedTextItem::propertyDeleteRequested(ot::PropertyGridItem* _item, const ot::PropertyBase& _itemData) {
+void WrappedTextItem::propertyDeleteRequested(const ot::Property* _property) {
 
 }
 

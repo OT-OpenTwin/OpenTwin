@@ -90,7 +90,7 @@ bool ot::PropertyInputFilePath::setupFromConfiguration(const Property* _configur
 
 	m_edit->blockSignals(true);
 
-	m_mode = actualProperty->browseMode();
+	m_mode = actualProperty->getBrowseMode();
 
 	m_edit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
@@ -100,7 +100,7 @@ bool ot::PropertyInputFilePath::setupFromConfiguration(const Property* _configur
 		m_edit->setText(m_text);
 	}
 
-	for (PropertyFilePath::FilterInfo info : actualProperty->filters()) {
+	for (PropertyFilePath::FilterInfo info : actualProperty->getFilters()) {
 		if (!m_filter.isEmpty()) m_filter.append(";;");
 		m_filter.append(QString::fromStdString(info.text) + " (" + QString::fromStdString(info.extension) + ")");
 	}

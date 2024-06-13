@@ -17,6 +17,8 @@
 
 class AppBase;
 
+namespace ot { class Property; }
+
 class SettingsManager : public QObject {
 	Q_OBJECT
 	OT_DECL_NOCOPY(SettingsManager)
@@ -28,10 +30,11 @@ public:
 	bool showDialog(void);
 
 private Q_SLOTS:
-	void slotPropertyChanged(const std::string& _groupPath, const std::string& _propertyName);
-	void slotPropertyDeleteRequested(const std::string& _groupPath, const std::string& _propertyName);
+	void slotPropertyChanged(const std::string& _owner, const ot::Property* const _property);
+	void slotPropertyDeleteRequested(const std::string& _owner, const ot::Property* const _property);
 
 private:
+	void generalSettingsChanged(const std::string& _propertyPath, const ot::Property* const _property);
 	void updateSettings(void);
 	void updateGeneralSettings(void);
 

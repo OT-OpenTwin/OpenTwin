@@ -139,11 +139,11 @@ double Model::getDoublePropertyGridValue(const std::string& _groupName, const st
 	return getNotifier()->getDoublePropertyValue(_groupName, _itemName);
 }
 
-bool Model::propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName)
+bool Model::propertyGridValueChanged(const ot::Property* _property)
 {
 	if (currentManipulator != nullptr)
 	{
-		return currentManipulator->propertyGridValueChanged(_groupName, _itemName);
+		return currentManipulator->propertyGridValueChanged(_property);
 	}
 
 	return false;

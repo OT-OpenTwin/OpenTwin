@@ -68,7 +68,16 @@ void ot::PropertyBase::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
 	_object.AddMember("SpecialType", JsonString(m_specialType, _allocator), _allocator);
-	_object.AddMember("Data", JsonString(m_data, _allocator), _allocator);
+
+	JsonArray dataArr;
+	for (const auto& it : m_data) {
+		JsonObject dataObj;
+		dataObj.AddMember("Key", JsonString(it.first, _allocator), _allocator);
+		dataObj.AddMember("Value", JsonString(it.second, _allocator), _allocator);
+		dataArr.PushBack(dataObj, _allocator);
+	}
+
+	_object.AddMember("Data", dataArr, _allocator);
 	_object.AddMember("Flags", JsonArray(this->toStringList(m_flags), _allocator), _allocator);
 }
 
@@ -77,7 +86,15 @@ void ot::PropertyBase::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_name = json::getString(_object, "Name");
 	m_title = json::getString(_object, "Title");
 	m_specialType = json::getString(_object, "SpecialType");
-	m_data = json::getString(_object, "Data");
+
+	m_data.clear();
+	ConstJsonObjectList dataArr = json::getObjectList(_object, "Data");
+	for (ConstJsonObject& dataObj : dataArr) {
+		std::string key = json::getString(dataObj, "Key");
+		std::string value = json::getString(dataObj, "Value");
+		m_data.insert_or_assign(key, value);
+	}
+
 	m_flags = this->stringListToFlags(json::getStringList(_object, "Flags"));
 }
 
@@ -100,6 +117,18 @@ ot::PropertyBase& ot::PropertyBase::operator = (const PropertyBase& _other) {
 	m_specialType = _other.m_specialType;
 	m_data = _other.m_data;
 	m_flags = _other.m_flags;
+	m_flags = _other.m_flags;
 
 	return *this;
+}
+
+std::string ot::PropertyBase::getAdditionalPropertyData(const std::string& _key) const {
+	const auto& it = m_data.find(_key);
+	if (it == m_data.end()) {
+		OT_LOG_EA("Data not found");
+		return std::string();
+	}
+	else {
+		return it->second;
+	}
 }

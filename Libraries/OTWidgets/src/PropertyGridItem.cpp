@@ -43,6 +43,8 @@ ot::PropertyGridItem::PropertyGridItem()
 ot::PropertyGridItem::~PropertyGridItem() {
 	if (m_input) delete m_input;
 	m_input = nullptr;
+
+	for (Property* prop : m_garbage) delete prop;
 }
 
 bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
@@ -52,7 +54,7 @@ bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
 
 	m_deleteLabel->setHidden(!(m_input->data().getPropertyFlags() & Property::IsDeletable));
 
-	this->connect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::inputValueChanged);
+	this->connect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::slotValueChanged);
 
 	return true;
 }
@@ -66,11 +68,6 @@ void ot::PropertyGridItem::finishSetup(void) {
 	tree->setItemWidget(this, 0, m_titleLayoutW);
 	tree->setItemWidget(this, 1, m_input->getQWidget());
 	this->setFirstColumnSpanned(false);
-}
-
-ot::Property* ot::PropertyGridItem::createProperty(void) const {
-	OTAssertNullptr(m_input);
-	return m_input->createPropertyConfiguration();
 }
 
 std::string ot::PropertyGridItem::getGroupName(void) const {
@@ -97,14 +94,14 @@ void ot::PropertyGridItem::setInput(PropertyInput* _input) {
 	}
 
 	if (m_input) {
-		this->disconnect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::inputValueChanged);
+		this->disconnect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::slotValueChanged);
 		tree->removeItemWidget(this, 1);
 		delete m_input;
 	}
 	m_input = _input;
 	
 	tree->setItemWidget(this, 1, m_input->getQWidget());
-	this->connect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::inputValueChanged);
+	this->connect(m_input, &PropertyInput::inputValueChanged, this, &PropertyGridItem::slotValueChanged);
 }
 
 ot::PropertyBase ot::PropertyGridItem::getPropertyData(void) const {
@@ -118,15 +115,46 @@ std::string ot::PropertyGridItem::getPropertyType(void) const {
 }
 
 void ot::PropertyGridItem::slotValueChanged(void) {
-	Q_EMIT inputValueChanged();
+	Q_EMIT inputValueChanged(this->createSignalProperty());
 }
 
 void ot::PropertyGridItem::slotDeleteRequested(void) {
-	Q_EMIT deleteRequested();
+	Q_EMIT deleteRequested(this->createSignalProperty());
 }
 
 void ot::PropertyGridItem::slotGlobalStyleChanged(const ColorStyle& _style) {
 	QString pth = GlobalColorStyle::instance().getCurrentStyle().getFile(ColorStyleFileEntry::PropertyItemDeleteIcon);
 	QIcon ico(pth);
 	m_deleteLabel->setPixmap(ico.pixmap(16, 16));
+}
+
+void ot::PropertyGridItem::clear(void) {
+
+}
+
+ot::Property* ot::PropertyGridItem::createSignalProperty(void) {
+	OTAssertNullptr(m_input);
+	
+	// Create property configuration
+	Property* prop = m_input->createPropertyConfiguration();
+	OTAssertNullptr(prop);
+
+	// Create group configuration(s)
+	PropertyGridGroup* group = m_parentGroup;
+	PropertyGroup* groupCfg = nullptr;
+	while (group) {
+		PropertyGroup* newGroup = group->createConfiguration(false);
+		if (groupCfg) {
+			newGroup->addChildGroup(groupCfg);
+		}
+		else {
+			newGroup->addProperty(prop);
+		}
+		groupCfg = newGroup;
+		group = group->getParentPropertyGroup();
+	}
+
+	m_garbage.push_back(prop);
+
+	return prop;
 }

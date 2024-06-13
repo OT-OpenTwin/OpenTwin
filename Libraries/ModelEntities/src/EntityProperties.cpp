@@ -179,8 +179,6 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGridCfg& _config
 
 	deleteAllProperties();
 
-	this->buildFromConfiguration(_config.getDefaultGroup());
-
 	for (const ot::PropertyGroup* g : _config.getRootGroups()) {
 		this->buildFromConfiguration(g);
 	}

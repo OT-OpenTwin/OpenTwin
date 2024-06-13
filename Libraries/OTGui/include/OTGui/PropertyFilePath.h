@@ -40,15 +40,15 @@ namespace ot {
 		virtual Property* createCopy(void) const override;
 
 		void setPath(const std::string& _path) { m_path = _path; };
-		const std::string& path(void) const { return m_path; };
+		const std::string& getPath(void) const { return m_path; };
 
 		void setBrowseMode(BrowseMode _mode) { m_browseMode = _mode; };
-		BrowseMode browseMode(void) const { return m_browseMode; };
+		BrowseMode getBrowseMode(void) const { return m_browseMode; };
 
 		void setFilters(const std::list<FilterInfo>& _filters) { m_filters = _filters; };
 		void addFilter(const std::string& _extension, const std::string& _text) { this->addFilter(FilterInfo{ _extension, _text }); };
 		void addFilter(const FilterInfo& _info);
-		const std::list<FilterInfo>& filters(void) const { return m_filters; }
+		const std::list<FilterInfo>& getFilters(void) const { return m_filters; }
 
 	protected:
 		//! @brief Add the property data to the provided JSON object

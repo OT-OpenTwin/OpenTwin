@@ -25,7 +25,7 @@ namespace ot {
 		Property(const PropertyBase& _base);
 		Property(PropertyFlags _flags = PropertyFlags(NoFlags));
 		Property(const std::string& _name, PropertyFlags _flags = PropertyFlags(NoFlags));
-		virtual ~Property() {};
+		virtual ~Property();
 
 		virtual std::string getPropertyType(void) const = 0;
 
@@ -43,6 +43,10 @@ namespace ot {
 
 		void setParentGroup(PropertyGroup* _group) { m_parentGroup = _group; };
 		PropertyGroup* getParentGroup(void) const { return m_parentGroup; };
+
+		//! \brief Returns the root group.
+		//! If this item has no parent group returns 0.
+		PropertyGroup* getRootGroup(void) const;
 
 		//! \brief Returns the property path.
 		//! The property path is a string containing all parent groups and the property name (e.g. "RootGroup/ChildGroup/ThisItem").

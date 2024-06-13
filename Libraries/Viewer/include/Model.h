@@ -222,7 +222,7 @@ public:
 	void   fillPropertyGrid(const ot::PropertyGridCfg& _configuration);
 	void   setDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName, double value);
 	double getDoublePropertyGridValue(const std::string& _groupName, const std::string& _itemName);
-	bool   propertyGridValueChanged(const std::string& _groupName, const std::string& _itemName);
+	bool   propertyGridValueChanged(const ot::Property* _property);
 
 	void lockSelectionAndModification(bool flag);
 

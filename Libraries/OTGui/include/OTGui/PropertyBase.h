@@ -12,6 +12,7 @@
 #include "OTGui/OTGuiAPIExport.h"
 
 // std header
+#include <map>
 #include <list>
 #include <string>
 
@@ -114,15 +115,17 @@ namespace ot {
 		void setSpecialType(const std::string& _type) { m_specialType = _type; };
 		const std::string& getSpecialType(void) const { return m_specialType; };
 
-		void setAdditionalPropertyData(const std::string& _data) { m_data = _data; };
-		const std::string& getAdditionalPropertyData(void) const { return m_data; };
+		void addAdditionalPropertyData(const std::string& _key, const std::string& _data) { m_data.insert_or_assign(_key, _data); };
+		void setAdditionalPropertyData(const std::map<std::string, std::string>& _data) { m_data = _data; };
+		const std::map<std::string, std::string>& getAllAdditionalPropertyData(void) const { return m_data; };
+		std::string getAdditionalPropertyData(const std::string& _key) const;
 
 	private:
 		std::string m_tip; //! \brief ToolTip.
 		std::string m_name; //! \brief Property name.
 		std::string m_title; //! \brief Property title.
 		std::string m_specialType; //! \brief Special type identifier.
-		std::string m_data; //! \brief Additional data.
+		std::map<std::string, std::string> m_data; //! \brief Additional data.
 		PropertyFlags m_flags; //! \brief Flags.
 	};
 

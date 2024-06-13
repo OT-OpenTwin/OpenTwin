@@ -1232,11 +1232,9 @@ void AppBase::createUi(void) {
 			// #######################################################################
 
 			// Register notifier
-			this->connect(m_propertyGrid, qOverload<const std::string&, const std::string&>(&ot::PropertyGrid::propertyChanged), this, qOverload<const std::string&, const std::string&>(&AppBase::slotPropertyGridValueChanged));
-			this->connect(m_propertyGrid, qOverload<const std::list<std::string>&, const std::string&>(&ot::PropertyGrid::propertyChanged), this, qOverload<const std::list<std::string>&, const std::string&>(&AppBase::slotPropertyGridValueChanged));
-			this->connect(m_propertyGrid, qOverload<const std::string&, const std::string&>(&ot::PropertyGrid::propertyDeleteRequested), this, qOverload<const std::string&, const std::string&>(&AppBase::slotPropertyGridValueDeleteRequested));
-			this->connect(m_propertyGrid, qOverload<const std::list<std::string>&, const std::string&>(&ot::PropertyGrid::propertyDeleteRequested), this, qOverload<const std::list<std::string>&, const std::string&>(&AppBase::slotPropertyGridValueDeleteRequested));
-
+			this->connect(m_propertyGrid, &ot::PropertyGrid::propertyChanged, this, &AppBase::slotPropertyGridValueChanged);
+			this->connect(m_propertyGrid, &ot::PropertyGrid::propertyDeleteRequested, this, &AppBase::slotPropertyGridValueDeleteRequested);
+			
 			this->connect(m_projectNavigation, &ak::aTreeWidget::selectionChanged, this, &AppBase::slotTreeItemSelectionChanged);
 			this->connect(m_projectNavigation, &ak::aTreeWidget::itemTextChanged, this, &AppBase::slotTreeItemTextChanged);
 			this->connect(m_projectNavigation, &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
@@ -2353,30 +2351,17 @@ void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
 
 // Private: Property grid slots
 
-void AppBase::slotPropertyGridValueChanged(const std::string& _groupName, const std::string& _itemName) {
+void AppBase::slotPropertyGridValueChanged(const ot::Property* _property) {
 	// We first ask the viewer whether it needs to handle the property grid change.
-	if (!m_viewerComponent->propertyGridValueChanged(_groupName, _itemName))
+	if (!m_viewerComponent->propertyGridValueChanged(_property))
 	{
 		// If not, we pass thic change on to the external services component
-		m_ExternalServicesComponent->propertyGridValueChanged(_groupName, _itemName);
+		m_ExternalServicesComponent->propertyGridValueChanged(_property);
 	}
 }
 
-void AppBase::slotPropertyGridValueChanged(const std::list<std::string>& _groupPath, const std::string& _itemName) {
-	// We first ask the viewer whether it needs to handle the property grid change.
-	if (!m_viewerComponent->propertyGridValueChanged(_groupPath, _itemName))
-	{
-		// If not, we pass thic change on to the external services component
-		m_ExternalServicesComponent->propertyGridValueChanged(_groupPath, _itemName);
-	}
-}
-
-void AppBase::slotPropertyGridValueDeleteRequested(const std::string& _groupName, const std::string& _itemName) {
-	m_ExternalServicesComponent->propertyGridValueDeleteRequested(_groupName, _itemName);
-}
-
-void AppBase::slotPropertyGridValueDeleteRequested(const std::list<std::string>& _groupPath, const std::string& _itemName) {
-	m_ExternalServicesComponent->propertyGridValueDeleteRequested(_groupPath, _itemName);
+void AppBase::slotPropertyGridValueDeleteRequested(const ot::Property* _property) {
+	m_ExternalServicesComponent->propertyGridValueDeleteRequested(_property);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

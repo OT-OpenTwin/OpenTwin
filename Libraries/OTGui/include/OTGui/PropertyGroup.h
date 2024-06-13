@@ -39,6 +39,8 @@ namespace ot {
 
 		PropertyGroup& operator = (const PropertyGroup& _other);
 
+		PropertyGroup* createCopy(bool _includeChilds) const;
+
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference
 		//! @param _allocator Allocator
@@ -57,6 +59,10 @@ namespace ot {
 
 		void setParentGroup(PropertyGroup* _group) { m_parentGroup = _group; };
 		PropertyGroup* getParentGroup(void) const { return m_parentGroup; };
+
+		//! \brief Returns the root group.
+		//! If this group has no parent returns this group.
+		PropertyGroup* getRootGroup(void);
 
 		void setName(const std::string& _name) { m_name = _name; };
 		std::string& getName(void) { return m_name; };
@@ -77,6 +83,9 @@ namespace ot {
 		//! \brief Removes the property with the given name.
 		void removeProperty(const std::string& _propertyName);
 
+		//! \brief Removes the property from the list without destroying it.
+		void forgetProperty(Property* _property);
+
 		//! \brief Group properties.
 		const std::list<Property*>& getProperties(void) const { return m_properties; };
 
@@ -94,6 +103,9 @@ namespace ot {
 		void addChildGroup(PropertyGroup* _group);
 
 		PropertyGroup* findGroup(const std::string& _name) const;
+
+		//! \brief Removes the property group from the list without destroying it.
+		void forgetChildGroup(PropertyGroup* _propertyGroup);
 
 		void findPropertiesBySpecialType(const std::string& _specialType, std::list<Property*>& _list) const;
 
