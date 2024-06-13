@@ -449,9 +449,6 @@
     <ClInclude Include="include\OTWidgets\ColorStyle.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\CheckBox.h">
-      <Filter>include\Widgets</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\ColorPreviewBox.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>
@@ -627,6 +624,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ApplicationPropertiesManager.h">
       <Filter>include\Properties</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\CheckBox.h">
+      <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

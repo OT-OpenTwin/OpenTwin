@@ -8,9 +8,10 @@
 #include "OTGui/PropertyGroup.h"
 #include "OTWidgets/Splitter.h"
 #include "OTWidgets/TreeWidget.h"
-#include "OTWidgets/TreeWidgetFilter.h"
+#include "OTWidgets/IconManager.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyDialog.h"
+#include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
 
@@ -110,8 +111,11 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 	btnLay->addWidget(btnCancel);
 
 	// Setup data
-	
 	this->iniData(_config);
+
+	// Setup window
+	this->setWindowTitle("Properties");
+	this->setWindowIcon(IconManager::getApplicationIcon());
 
 	// Connect signals
 	this->connect(m_navigation->getTreeWidget(), &TreeWidget::itemSelectionChanged, this, &PropertyDialog::slotTreeSelectionChanged);
@@ -123,6 +127,9 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 
 ot::PropertyDialog::~PropertyDialog() {
 	m_treeMap.clear();
+	for (const Property* prop : m_changedProperties) {
+		delete prop;
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -156,6 +163,9 @@ void ot::PropertyDialog::slotTreeSelectionChanged(void) {
 }
 
 void ot::PropertyDialog::slotPropertyChanged(const Property* const _property) {
+	// Store a copy if the signal is not used and the properties need to be accessed all at once after the dialog was confirmed.
+	m_changedProperties.push_back(_property->createCopyWithParents());
+
 	Q_EMIT propertyChanged(_property);
 }
 

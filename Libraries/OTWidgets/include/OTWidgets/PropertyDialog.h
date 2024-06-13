@@ -23,6 +23,12 @@ namespace ot {
 	class PropertyGridGroup;
 	class TreeWidgetItem;
 
+	//! \brief The PropertyDialog is used to edit many property groups.
+	//! When a property is changed a copy of the property is stored and the propertyChanged signal is emitted.
+	//! All changed properties can be accessed after the dialog closed.
+	//! The dialog result is "OK" only when the user pressed Confirm and at least one property has changed.
+	//! All stored changed properties will be destroyed when the dialog is destroyed.
+	//! \see PropertyDialogCfg
 	class OT_WIDGETS_API_EXPORT PropertyDialog : public Dialog {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyDialog)
@@ -31,6 +37,8 @@ namespace ot {
 		virtual ~PropertyDialog();
 
 		const PropertyGrid* const getPropertyGrid(void) const { return m_grid; };
+
+		const std::list<const Property*>& getChangedProperties(void) const { return m_changedProperties; };
 
 	Q_SIGNALS:
 		void propertyChanged(const Property* _property);
@@ -71,6 +79,7 @@ namespace ot {
 
 		std::map<QTreeWidgetItem*, PropertyDialogEntry> m_treeMap;
 
+		std::list<const Property*> m_changedProperties;
 		PropertyDialogNavigation* m_navigation;
 		PropertyGrid* m_grid;
 		bool m_changed;

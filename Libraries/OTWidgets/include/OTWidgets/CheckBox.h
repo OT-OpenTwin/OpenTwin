@@ -15,6 +15,7 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT CheckBox : public QCheckBox, public QWidgetInterface {
+		Q_OBJECT
 	public:
 		CheckBox(QWidget* _parent = (QWidget*)nullptr);
 		CheckBox(const QString& _text, QWidget* _parent = (QWidget*)nullptr);

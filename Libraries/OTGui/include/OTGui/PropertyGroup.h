@@ -35,6 +35,9 @@ namespace ot {
 		//! @param _name Group name
 		//! @param _title Group title
 		PropertyGroup(const std::string& _name, const std::string& _title);
+
+		//! \brief Destructor.
+		//! Destroys the parent group if set.
 		virtual ~PropertyGroup();
 
 		PropertyGroup& operator = (const PropertyGroup& _other);

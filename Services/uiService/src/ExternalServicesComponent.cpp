@@ -580,8 +580,8 @@ ot::Property* ExternalServicesComponent::createCleanedProperty(const ot::Propert
 		dataDoc.fromJson(propertyList.front()->getAdditionalPropertyData("EntityData"));
 		newDataDoc.AddMember("ContainerName", ot::JsonString(ot::json::getString(dataDoc, "ContainerName"), newDataDoc.GetAllocator()), newDataDoc.GetAllocator());
 		newDataDoc.AddMember("ContainerID", ot::json::getUInt64(dataDoc, "ContainerID"), newDataDoc.GetAllocator());
-		//newDataDoc.AddMember("ValueID", 0, newDataDoc.GetAllocator());
-		newDataDoc.AddMember("ValueID", ot::json::getUInt64(dataDoc, "ValueID"), newDataDoc.GetAllocator());
+		newDataDoc.AddMember("ValueID", 0, newDataDoc.GetAllocator());
+		//newDataDoc.AddMember("ValueID", ot::json::getUInt64(dataDoc, "ValueID"), newDataDoc.GetAllocator());
 		propertyList.front()->addAdditionalPropertyData("EntityData", newDataDoc.toJson());
 	}
 

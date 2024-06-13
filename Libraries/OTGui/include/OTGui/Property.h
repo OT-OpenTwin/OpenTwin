@@ -25,11 +25,37 @@ namespace ot {
 		Property(const PropertyBase& _base);
 		Property(PropertyFlags _flags = PropertyFlags(NoFlags));
 		Property(const std::string& _name, PropertyFlags _flags = PropertyFlags(NoFlags));
+
+		//! \brief Destructor.
+		//! Destroys the parent group if set.
 		virtual ~Property();
 
 		virtual std::string getPropertyType(void) const = 0;
 
+		//! \brief Creates a copy of this property.
 		virtual Property* createCopy(void) const = 0;
+
+		//! brief Creates a copy of this property and all parent groups excluding other properties and group paths.
+		//! The created property will have all the parent groups set up to the root group.
+		//!
+		//! \note Other child groups and properties are ignored.
+		//!
+		//! Assume you have the following structure:<br>
+		//! <pre>
+		//!   Root
+		//!   +--> ChildGroup1
+		//!        +--> Property1
+		//!   +--> ChildGroup2
+		//!        +--> <This Property>
+		//!   +--> ChildGroup3
+		//!        +--> Property3
+		//! 
+		//! Then the new structure will be:
+		//!   Root
+		//!   +--> ChildGroup2
+		//!        +--> <This Property>
+		//! </pre>
+		Property* createCopyWithParents(void) const;
 
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _object Json object reference

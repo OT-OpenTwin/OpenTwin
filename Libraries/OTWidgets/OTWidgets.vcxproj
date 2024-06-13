@@ -180,7 +180,7 @@
     <ClInclude Include="include\OTWidgets\WidgetViewRegistrar.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewRegistrar.hpp" />
     <QtMoc Include="include\OTWidgets\DockWatcherAction.h" />
-    <ClInclude Include="include\OTWidgets\CheckBox.h" />
+    <QtMoc Include="include\OTWidgets\CheckBox.h" />
     <QtMoc Include="include\OTWidgets\ColorPickButton.h" />
     <ClInclude Include="include\OTWidgets\ColorPreviewBox.h" />
     <QtMoc Include="include\OTWidgets\ComboButton.h" />

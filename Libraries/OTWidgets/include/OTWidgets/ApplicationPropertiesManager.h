@@ -51,6 +51,9 @@ namespace ot {
 
 		const PropertyDialog* const getDialog(void) const { return m_dialog; };
 
+		void setDialogTitle(const QString& _title);
+		const QString getDialogTitle(void) const { return m_dialogTitle; };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private
@@ -64,14 +67,14 @@ namespace ot {
 		std::map<std::string, PropertyGridCfg> m_data;
 		PropertyDialog* m_dialog;
 		std::list<Property*> m_garbage;
+		QString m_dialogTitle;
 
 		PropertyGridCfg findData(const std::string& _owner);
 
 		//! \brief Removes the root group and sets the owner.
 		//! The owner will be set to the root group name before the root is removed.
 		Property* createCleanedSlotProperty(const Property* _property, std::string& _owner);
-		std::list<const PropertyGroup*> getParentGroups(const Property* _property) const;
-
+		
 		void clearGarbage(void);
 
 		ApplicationPropertiesManager();

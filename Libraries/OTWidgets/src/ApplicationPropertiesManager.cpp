@@ -18,52 +18,50 @@ ot::ApplicationPropertiesManager& ot::ApplicationPropertiesManager::instance(voi
 ot::Dialog::DialogResult ot::ApplicationPropertiesManager::showDialog(void) {
 	this->clearGarbage();
 
-	Dialog::DialogResult result = Dialog::Cancel;
+	// Build configuration
+	PropertyGridCfg gridCfg;
 
-	{
-		// Build configuration
-		PropertyGridCfg gridCfg;
-
-		for (const auto& it : m_data) {
-			PropertyGroup* newGroup = new PropertyGroup(it.first);
-			for (PropertyGroup* newChild : it.second.getRootGroups()) {
-				if (!newChild->isEmpty()) {
-					newGroup->addChildGroup(new PropertyGroup(*newChild));
-				}
-			}
-
-			if (!newGroup->isEmpty()) {
-				gridCfg.addRootGroup(newGroup);
-			}
-			else {
-				// Skip empty groups
-				delete newGroup;
+	for (const auto& it : m_data) {
+		PropertyGroup* newGroup = new PropertyGroup(it.first);
+		for (PropertyGroup* newChild : it.second.getRootGroups()) {
+			if (!newChild->isEmpty()) {
+				newGroup->addChildGroup(new PropertyGroup(*newChild));
 			}
 		}
 
-		// If there are no properties skip showing the dialog.
-		if (gridCfg.isEmpty()) {
-			return ot::Dialog::Cancel;
+		if (!newGroup->isEmpty()) {
+			gridCfg.addRootGroup(newGroup);
 		}
-
-		// Show dialog
-		PropertyDialogCfg dialogCfg;
-		dialogCfg.setGridConfig(gridCfg);
-
-		OTAssert(m_dialog == nullptr, "Dialog already exists");
-		m_dialog = new PropertyDialog(dialogCfg);
-
-		this->connect(m_dialog, &PropertyDialog::propertyChanged, this, &ApplicationPropertiesManager::slotPropertyChanged);
-		this->connect(m_dialog, &PropertyDialog::propertyDeleteRequested, this, &ApplicationPropertiesManager::slotPropertyDeleteRequested);
-
-		result = m_dialog->showDialog();
-
-		this->disconnect(m_dialog, &PropertyDialog::propertyChanged, this, &ApplicationPropertiesManager::slotPropertyChanged);
-		this->disconnect(m_dialog, &PropertyDialog::propertyDeleteRequested, this, &ApplicationPropertiesManager::slotPropertyDeleteRequested);
-
-		delete m_dialog;
-		m_dialog = nullptr;
+		else {
+			// Skip empty groups
+			delete newGroup;
+		}
 	}
+
+	// If there are no properties skip showing the dialog.
+	if (gridCfg.isEmpty()) {
+		return ot::Dialog::Cancel;
+	}
+
+	// Show dialog
+	PropertyDialogCfg dialogCfg;
+	dialogCfg.setGridConfig(gridCfg);
+
+	OTAssert(m_dialog == nullptr, "Dialog already exists");
+	m_dialog = new PropertyDialog(dialogCfg);
+	m_dialog->setWindowTitle(m_dialogTitle);
+
+	this->connect(m_dialog, &PropertyDialog::propertyChanged, this, &ApplicationPropertiesManager::slotPropertyChanged);
+	this->connect(m_dialog, &PropertyDialog::propertyDeleteRequested, this, &ApplicationPropertiesManager::slotPropertyDeleteRequested);
+
+	Dialog::DialogResult result = m_dialog->showDialog();
+
+	this->disconnect(m_dialog, &PropertyDialog::propertyChanged, this, &ApplicationPropertiesManager::slotPropertyChanged);
+	this->disconnect(m_dialog, &PropertyDialog::propertyDeleteRequested, this, &ApplicationPropertiesManager::slotPropertyDeleteRequested);
+
+	delete m_dialog;
+	m_dialog = nullptr;
+
 	return result;
 }
 
@@ -75,6 +73,13 @@ void ot::ApplicationPropertiesManager::add(const std::string& _owner, const Prop
 	PropertyGridCfg oldConfig = this->findData(_owner);
 	oldConfig.mergeWith(_config, m_propertyReplaceOnMerge);
 	m_data.insert_or_assign(_owner, oldConfig);
+}
+
+void ot::ApplicationPropertiesManager::setDialogTitle(const QString& _title) {
+	m_dialogTitle = _title;
+	if (m_dialog) {
+		m_dialog->setWindowTitle(_title);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -105,42 +110,25 @@ ot::PropertyGridCfg ot::ApplicationPropertiesManager::findData(const std::string
 }
 
 ot::Property* ot::ApplicationPropertiesManager::createCleanedSlotProperty(const Property* _property, std::string& _owner) {
-	ot::Property* newProperty = _property->createCopy();
+	ot::Property* newProperty = _property->createCopyWithParents();
 	OTAssertNullptr(newProperty);
 
-	std::list<const ot::PropertyGroup*> parents = this->getParentGroups(_property);
-	if (parents.size() < 2) {
+	m_garbage.push_back(newProperty);
+
+	PropertyGroup* rootGroup = newProperty->getRootGroup();
+	if (rootGroup->getChildGroups().empty()) {
 		OT_LOG_EA("Data mismatch");
-		m_garbage.push_back(newProperty);
 		return newProperty;
 	}
 
-	_owner = parents.front()->getName();
-	parents.pop_front();
-	
-	ot::PropertyGroup* newGroup = parents.front()->createCopy(false);
-	parents.pop_front();
-	while (!parents.empty()) {
-		ot::PropertyGroup* tmp = parents.front()->createCopy(false);
-		newGroup->addChildGroup(tmp);
-		tmp = newGroup;
-	}
-
-	newGroup->addProperty(newProperty);
-
-	//m_garbage.push_back(newProperty);
+	PropertyGroup* newRoot = rootGroup->getChildGroups().front();
+	newRoot->setParentGroup(nullptr);
+	rootGroup->forgetChildGroup(newRoot);
+	_owner = rootGroup->getName();
+	delete rootGroup;
+	rootGroup = nullptr;
 
 	return newProperty;
-}
-
-std::list<const ot::PropertyGroup*> ot::ApplicationPropertiesManager::getParentGroups(const Property* _property) const {
-	std::list<const ot::PropertyGroup*> result;
-	ot::PropertyGroup* group = _property->getParentGroup();
-	while (group) {
-		result.push_front(group);
-		group = group->getParentGroup();
-	}
-	return result;
 }
 
 void ot::ApplicationPropertiesManager::clearGarbage(void) {

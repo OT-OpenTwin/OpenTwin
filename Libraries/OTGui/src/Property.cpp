@@ -43,6 +43,25 @@ ot::Property::~Property() {
 	}
 }
 
+ot::Property* ot::Property::createCopyWithParents(void) const {
+	Property* newProperty = this->createCopy();
+	const PropertyGroup* oldParent = m_parentGroup;
+	PropertyGroup* newParent = nullptr;
+	while (oldParent) {
+		PropertyGroup* tmp = oldParent->createCopy(false);
+		if (newParent) {
+			tmp->addChildGroup(newParent);
+		}
+		else {
+			tmp->addProperty(newProperty);
+		}
+		newParent = tmp;
+		oldParent = oldParent->getParentGroup();
+	}
+
+	return newProperty;
+}
+
 ot::PropertyGroup* ot::Property::getRootGroup(void) const {
 	if (m_parentGroup) return m_parentGroup->getRootGroup();
 	else return nullptr;
