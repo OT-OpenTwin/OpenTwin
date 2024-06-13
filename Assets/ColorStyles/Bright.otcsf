@@ -130,7 +130,7 @@ QStatusBar QLabel {
 /* QCheckBox */
 
 QCheckBox {
-    background-color: transparent;
+    background: rgba(255,255,255,255);
     color: rgba(0,0,0,255);
     spacing: 4px;
     outline: none;
@@ -143,11 +143,12 @@ QCheckBox:focus {
 }
 
 QCheckBox:disabled {
-    background-color: transparent;
+    background: transparent;
     color: rgba(168,168,168,255);
 }
 
 QCheckBox::indicator {
+    background: transparent;
     margin-left: 2px;
     height: 14px;
     width: 14px;
@@ -1843,6 +1844,14 @@ QListView:focus,
 QTableView:focus,
 QColumnView:focus {
     border-color: rgba(0,255,0,255);
+}
+
+QTreeView::item:pressed,
+QListView::item:pressed,
+QTableView::item:pressed,
+QColumnView::item:pressed {
+    background-color: rgba(255,255,255,255);
+    color: rgba(0,0,0,255);
 }
 
 QTreeView::item:pressed,
