@@ -25,9 +25,7 @@
 // Table Widget 
 
 ManageGroupsTable::ManageGroupsTable()
-	: QTableWidget(), my_selectedRow(-1),
-	my_colorBack(255, 255, 255), my_colorFocusBack(0, 0, 255), my_colorFocusFront(0, 0, 0),
-	my_colorFront(0, 0, 0), my_colorSelectedBack(0, 255, 0), my_colorSelectedFront(0, 0, 0)
+	: QTableWidget(), my_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
@@ -37,9 +35,7 @@ ManageGroupsTable::ManageGroupsTable()
 }
 
 ManageGroupsTable::ManageGroupsTable(int _rows, int _columns)
-	: QTableWidget(_rows, _columns), my_selectedRow(-1),
-	my_colorBack(255, 255, 255), my_colorFocusBack(0, 0, 255), my_colorFocusFront(0, 0, 0),
-	my_colorFront(0, 0, 0), my_colorSelectedBack(0, 255, 0), my_colorSelectedFront(0, 0, 0)
+	: QTableWidget(_rows, _columns), my_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
@@ -55,8 +51,6 @@ ManageGroupsTable::~ManageGroupsTable() {
 void ManageGroupsTable::addRow(const std::array<QTableWidgetItem *, 2> & _columns) {
 	insertRow(rowCount());
 	for (int c = 0; c < 2; c++) {
-		_columns[c]->setBackground(my_colorBack);
-		_columns[c]->setForeground(my_colorFront);
 		setItem(rowCount() - 1, c, _columns[c]);
 		Qt::ItemFlags f = _columns[c]->flags();
 		f.setFlag(Qt::ItemFlag::ItemIsEditable, false);
@@ -83,12 +77,8 @@ void ManageGroupsTable::mouseMoveEvent(QMouseEvent * _event) {
 		for (auto r : my_dataRowItems) {
 			for (auto c : r) {
 				if (c->row() == my_selectedRow) {
-					c->setBackground(my_colorSelectedBack);
-					c->setForeground(my_colorSelectedFront);
 				}
 				else {
-					c->setBackground(my_colorBack);
-					c->setForeground(my_colorFront);
 				}
 			}
 		}
@@ -97,16 +87,10 @@ void ManageGroupsTable::mouseMoveEvent(QMouseEvent * _event) {
 		for (auto r : my_dataRowItems) {
 			for (auto c : r) {
 				if (c->row() == itm->row()) {
-					c->setBackground(my_colorFocusBack);
-					c->setForeground(my_colorFocusFront);
 				}
 				else if (c->row() == my_selectedRow) {
-					c->setBackground(my_colorSelectedBack);
-					c->setForeground(my_colorSelectedFront);
 				}
 				else {
-					c->setBackground(my_colorBack);
-					c->setForeground(my_colorFront);
 				}
 			}
 		}
@@ -117,12 +101,8 @@ void ManageGroupsTable::leaveEvent(QEvent * _event) {
 	for (auto r : my_dataRowItems) {
 		for (auto c : r) {
 			if (c->row() == my_selectedRow) {
-				c->setBackground(my_colorSelectedBack);
-				c->setForeground(my_colorSelectedFront);
 			}
 			else {
-				c->setBackground(my_colorBack);
-				c->setForeground(my_colorFront);
 			}
 		}
 	}
@@ -135,16 +115,12 @@ void ManageGroupsTable::slotSelectionChanged() {
 	for (auto itm : selection) {
 		for (auto c : my_dataRowItems.at(itm->row())) {
 			c->setSelected(false);
-			c->setBackground(my_colorSelectedBack);
-			c->setForeground(my_colorSelectedFront);
 		}
 		my_selectedRow = itm->row();
 	}
 	for (int r = 0; r < my_dataRowItems.size(); r++) {
 		if (r != my_selectedRow) {
 			for (auto c : my_dataRowItems.at(r)) {
-				c->setBackground(my_colorBack);
-				c->setForeground(my_colorFront);
 			}
 		}
 	}

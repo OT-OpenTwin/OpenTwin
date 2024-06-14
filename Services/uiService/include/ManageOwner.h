@@ -2,23 +2,24 @@
 
 // uiCore header
 #include <akCore/akCore.h>
-#include <akGui/aDialog.h>
 #include <akGui/aColor.h>
+
+#include "OTWidgets/Dialog.h"
 
 #include <qobject.h>
 #include <qtablewidget.h>
 
 #include "welcomeScreen.h"
 
-namespace ak {
-	class aLogInDialog;
-	class aLabelWidget;
-	class aComboButtonWidget;
-	class aTableWidget;
-	class aPushButtonWidget;
-	class aLineEditWidget;
-	class aCheckBoxWidget;
-	class aPropertyGridWidget;
+
+class QVBoxLayout;
+class QHBoxLayout;
+
+namespace ot {
+	class Label;
+	class LineEdit;
+	class CheckBox;
+	class PushButton;
 }
 
 class ManageOwnerTable : public QTableWidget {
@@ -47,21 +48,10 @@ private Q_SLOTS:
 private:
 	std::vector<std::array<QTableWidgetItem *, 2>>	my_dataRowItems;
 
-	QColor			my_colorBack;
-	QColor			my_colorFront;
-	QColor			my_colorFocusBack;
-	QColor			my_colorFocusFront;
-	QColor			my_colorSelectedBack;
-	QColor			my_colorSelectedFront;
-
 	int				my_selectedRow;
 };
 
-class QVBoxLayout;
-class QHBoxLayout;
-class QCheckBox;
-
-class ManageOwner : public ak::aDialog {
+class ManageOwner : public ot::Dialog {
 	Q_OBJECT
 
 public:
@@ -89,16 +79,16 @@ protected:
 	QWidget *									m_groupLabelLayoutW;
 	QWidget *									m_buttonLabelLayoutW;
 
-	ak::aPushButtonWidget *						m_btnClose;
-	ak::aLabelWidget *							m_labelGroups;
-	ak::aLineEditWidget *						m_filterGroups;
+	ot::PushButton*								m_btnClose;
+	ot::Label *									m_labelGroups;
+	ot::LineEdit *								m_filterGroups;
 	ManageOwnerTable *							m_ownersList;
 
 	std::string									m_authServerURL;
 	std::string									m_assetType;
 	std::string									m_assetName;
 	std::string									m_assetOwner;
-	QCheckBox *									m_ownerCheckBox;
+	ot::CheckBox*								m_ownerCheckBox;
 
 	std::list<std::string>						m_userList;
 

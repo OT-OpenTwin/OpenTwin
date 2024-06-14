@@ -88,7 +88,7 @@ void ak::aColorEditButtonWidget::setColor(
 	const aColor &							_color
 ) {
 	m_color = _color;
-	m_view->setStyleSheet(m_color.toHexString(false, QString("background-color:#")));
+	//m_view->setStyleSheet(m_color.toHexString(false, QString("background-color:#")));
 	m_button->setText(m_color.toRGBString(","));
 	QString toolTip{"R "};
 	toolTip.append(QString::number(m_color.r())).append(" | G ");
@@ -121,7 +121,7 @@ void ak::aColorEditButtonWidget::fillBackground(
 void ak::aColorEditButtonWidget::setPushButtonStyleSheet(
 	const QString &				_sheet
 ) {
-	m_button->setStyleSheet(_sheet);
+	//m_button->setStyleSheet(_sheet);
 }
 
 // #############################################################################################################################

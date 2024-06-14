@@ -2,13 +2,13 @@
 #include "AppBase.h"
 
 #include <akAPI/uiAPI.h>
-#include <akWidgets/aPushButtonWidget.h>
-#include <akWidgets/aLabelWidget.h>
-#include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aTableWidget.h>
-#include <akWidgets/aCheckBoxWidget.h>
 
 #include "OTCore/JSON.h"
+#include "OTWidgets/Label.h"
+#include "OTWidgets/CheckBox.h"
+#include "OTWidgets/LineEdit.h"
+#include "OTWidgets/PushButton.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 
@@ -23,9 +23,7 @@
 // Table Widget 
 
 ManageOwnerTable::ManageOwnerTable()
-	: QTableWidget(), my_selectedRow(-1),
-	my_colorBack(255, 255, 255), my_colorFocusBack(0, 0, 255), my_colorFocusFront(0, 0, 0),
-	my_colorFront(0, 0, 0), my_colorSelectedBack(0, 255, 0), my_colorSelectedFront(0, 0, 0)
+	: QTableWidget(), my_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
@@ -35,9 +33,7 @@ ManageOwnerTable::ManageOwnerTable()
 }
 
 ManageOwnerTable::ManageOwnerTable(int _rows, int _columns)
-	: QTableWidget(_rows, _columns), my_selectedRow(-1),
-	my_colorBack(255, 255, 255), my_colorFocusBack(0, 0, 255), my_colorFocusFront(0, 0, 0),
-	my_colorFront(0, 0, 0), my_colorSelectedBack(0, 255, 0), my_colorSelectedFront(0, 0, 0)
+	: QTableWidget(_rows, _columns), my_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
@@ -53,8 +49,6 @@ ManageOwnerTable::~ManageOwnerTable() {
 void ManageOwnerTable::addRow(const std::array<QTableWidgetItem *, 2> & _columns) {
 	insertRow(rowCount());
 	for (int c = 0; c < 2; c++) {
-		_columns[c]->setBackground(my_colorBack);
-		_columns[c]->setForeground(my_colorFront);
 		setItem(rowCount() - 1, c, _columns[c]);
 		Qt::ItemFlags f = _columns[c]->flags();
 		f.setFlag(Qt::ItemFlag::ItemIsEditable, false);
@@ -81,12 +75,8 @@ void ManageOwnerTable::mouseMoveEvent(QMouseEvent * _event) {
 		for (auto r : my_dataRowItems) {
 			for (auto c : r) {
 				if (c->row() == my_selectedRow) {
-					c->setBackground(my_colorSelectedBack);
-					c->setForeground(my_colorSelectedFront);
 				}
 				else {
-					c->setBackground(my_colorBack);
-					c->setForeground(my_colorFront);
 				}
 			}
 		}
@@ -95,16 +85,10 @@ void ManageOwnerTable::mouseMoveEvent(QMouseEvent * _event) {
 		for (auto r : my_dataRowItems) {
 			for (auto c : r) {
 				if (c->row() == itm->row()) {
-					c->setBackground(my_colorFocusBack);
-					c->setForeground(my_colorFocusFront);
 				}
 				else if (c->row() == my_selectedRow) {
-					c->setBackground(my_colorSelectedBack);
-					c->setForeground(my_colorSelectedFront);
 				}
 				else {
-					c->setBackground(my_colorBack);
-					c->setForeground(my_colorFront);
 				}
 			}
 		}
@@ -115,12 +99,8 @@ void ManageOwnerTable::leaveEvent(QEvent * _event) {
 	for (auto r : my_dataRowItems) {
 		for (auto c : r) {
 			if (c->row() == my_selectedRow) {
-				c->setBackground(my_colorSelectedBack);
-				c->setForeground(my_colorSelectedFront);
 			}
 			else {
-				c->setBackground(my_colorBack);
-				c->setForeground(my_colorFront);
 			}
 		}
 	}
@@ -133,16 +113,12 @@ void ManageOwnerTable::slotSelectionChanged() {
 	for (auto itm : selection) {
 		for (auto c : my_dataRowItems.at(itm->row())) {
 			c->setSelected(false);
-			c->setBackground(my_colorSelectedBack);
-			c->setForeground(my_colorSelectedFront);
 		}
 		my_selectedRow = itm->row();
 	}
 	for (int r = 0; r < my_dataRowItems.size(); r++) {
 		if (r != my_selectedRow) {
 			for (auto c : my_dataRowItems.at(r)) {
-				c->setBackground(my_colorBack);
-				c->setForeground(my_colorFront);
 			}
 		}
 	}
@@ -173,7 +149,7 @@ ManageOwner::ManageOwner(const std::string &authServerURL, const std::string &as
 	m_ownerCheckBox = nullptr;
 
 	// Create controls
- 	m_btnClose = new ak::aPushButtonWidget("Close");
+ 	m_btnClose = new ot::PushButton("Close");
 
 	m_buttonLabelLayoutW = new QWidget;
 	m_buttonLabelLayout = new QHBoxLayout(m_buttonLabelLayoutW);
@@ -190,7 +166,7 @@ ManageOwner::ManageOwner(const std::string &authServerURL, const std::string &as
 	m_groupLabelLayout = new QHBoxLayout(m_groupLabelLayoutW);
 	m_groupLabelLayout->setContentsMargins(0, 0, 0, 0);
 
-	m_labelGroups = new ak::aLabelWidget;
+	m_labelGroups = new ot::Label;
 	m_labelGroups->setText(QString(assetType.c_str()) + " Owner");
 	QFont font = m_labelGroups->font();
 	font.setPointSize(font.pointSize() * 2);
@@ -198,7 +174,7 @@ ManageOwner::ManageOwner(const std::string &authServerURL, const std::string &as
 
 	m_groupLabelLayout->addWidget(m_labelGroups);
 
-	m_filterGroups = new ak::aLineEditWidget;
+	m_filterGroups = new ot::LineEdit;
 	m_filterGroups->setPlaceholderText("Filter...");
 
 	m_ownersList = new ManageOwnerTable(0, 2);
@@ -222,13 +198,12 @@ ManageOwner::ManageOwner(const std::string &authServerURL, const std::string &as
 	setWindowTitle("Manage Owner of " + QString(assetType.c_str()) + ": " + QString(assetName.c_str()));
 	setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
 
-	hideInfoButton();
 	setMinimumSize(minWidth * 4, minWidth * 4);
 
 	m_centralLayout->addWidget(m_buttonLabelLayoutW);
 
-	connect(m_btnClose, &ak::aPushButtonWidget::clicked, this, &ManageOwner::slotClose);
-	connect(m_filterGroups, &ak::aLineEditWidget::textChanged, this, &ManageOwner::slotGroupsFilter);
+	connect(m_btnClose, &ot::PushButton::clicked, this, &ManageOwner::slotClose);
+	connect(m_filterGroups, &ot::LineEdit::textChanged, this, &ManageOwner::slotGroupsFilter);
 	connect(m_ownersList, &ManageOwnerTable::selectionChanged, this, &ManageOwner::slotGroupsSelection);
 
 	readUserList();
@@ -246,7 +221,7 @@ ManageOwner::~ManageOwner()
 
 void ManageOwner::slotClose(void) 
 {
-	Close(ak::resultCancel);
+	this->close(ot::Dialog::Cancel);
 }
 
 void ManageOwner::slotShowGroupsWithAccessOnly(void)
@@ -381,7 +356,7 @@ void ManageOwner::fillOwnerList(void)
 		m_ownersList->addRow(dataRowItems);
 
 		QWidget *pWidget = new QWidget();
-		QCheckBox *pCheckBox = new QCheckBox();
+		ot::CheckBox* pCheckBox = new ot::CheckBox;
 		QHBoxLayout *pLayout = new QHBoxLayout(pWidget);
 		pLayout->addWidget(pCheckBox);
 		pLayout->setAlignment(Qt::AlignCenter);

@@ -108,19 +108,6 @@ QWidget * ak::aLineEditWidget::widget(void) { return this; }
 
 void ak::aLineEditWidget::setErrorState(bool _error) {
 	m_isError = _error;
-	if (m_isError)
-	{
-		if (m_errorIsForeground) {
-			setStyleSheet("color: #ff0000;");
-		}
-		else {
-			setStyleSheet("color: #000000; background-color: #ff0000;");
-		}
-
-	}
-	else {
-		setStyleSheet("");
-	}
 }
 
 void ak::aLineEditWidget::setErrorStateIsForeground(bool _isForeground) {

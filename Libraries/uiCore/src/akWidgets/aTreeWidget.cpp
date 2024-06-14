@@ -788,7 +788,6 @@ void ak::aTreeWidget::clearItem(
 ak::aTreeWidgetBase::aTreeWidgetBase(aTreeWidget * _ownerTree)
 	: QTreeWidget(), ak::aWidget(otTree), m_ownerTree(_ownerTree), m_moveNotifier(nullptr)
 {
-	setStyleSheet("");
 	setContextMenuPolicy(Qt::CustomContextMenu);
 }
 

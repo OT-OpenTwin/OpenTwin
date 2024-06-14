@@ -624,18 +624,14 @@ void lineEdit::keyReleaseEvent(QKeyEvent *_event) {
 // #############################################################################################################
 
 table::table()
-	: QTableWidget(), my_selectedRow(-1),
-	my_colorBack(255, 255, 255), my_colorFocusBack(0, 0, 255), my_colorFocusFront(0, 0, 0),
-	my_colorFront(0, 0, 0), my_colorSelectedBack(0, 255, 0), my_colorSelectedFront(0, 0, 0)
+	: QTableWidget(), my_selectedRow(-1)
 {
 	setMouseTracking(true);
 	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
 }
 
 table::table(int _rows, int _columns)
-	: QTableWidget(_rows, _columns), my_selectedRow(-1),
-	my_colorBack(255, 255, 255), my_colorFocusBack(0, 0, 255), my_colorFocusFront(0, 0, 0),
-	my_colorFront(0, 0, 0), my_colorSelectedBack(0, 255, 0), my_colorSelectedFront(0, 0, 0)
+	: QTableWidget(_rows, _columns), my_selectedRow(-1)
 {
 	setMouseTracking(true);
 	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));

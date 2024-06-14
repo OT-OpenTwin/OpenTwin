@@ -240,13 +240,6 @@ private:
 	std::vector<std::array<QTableWidgetItem *,
 		TABLE_DATA_COLUMN_COUNT>>	my_dataRowItems;
 
-	QColor			my_colorBack;
-	QColor			my_colorFront;
-	QColor			my_colorFocusBack;
-	QColor			my_colorFocusFront;
-	QColor			my_colorSelectedBack;
-	QColor			my_colorSelectedFront;
-
 	int				my_selectedRow;
 
 };
