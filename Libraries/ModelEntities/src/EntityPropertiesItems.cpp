@@ -92,6 +92,13 @@ void EntityPropertiesBase::addBaseDataToJsonDocument(ot::JsonValue& container, o
 	container.AddMember("Group", ot::JsonString(this->getGroup(), allocator), allocator);
 }
 
+bool EntityPropertiesBase::needsUpdate(void)
+{
+	return needsUpdateFlag;
+}
+
+// ################################################################################################################################################################
+
 void EntityPropertiesDouble::createProperty(const std::string &group, const std::string &name, double defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
 	// Load the template defaults if any
@@ -153,6 +160,17 @@ void EntityPropertiesDouble::copySettings(EntityPropertiesBase *other, EntityBas
 		setValue(entity->getValue());
 	}
 }
+
+bool EntityPropertiesDouble::hasSameValue(EntityPropertiesBase* other)
+{
+	EntityPropertiesDouble* entity = dynamic_cast<EntityPropertiesDouble*>(other);
+
+	if (entity == nullptr) return false;
+
+	return (getValue() == entity->getValue());
+}
+
+// ################################################################################################################################################################
 
 void EntityPropertiesInteger::createProperty(const std::string &group, const std::string &name, long defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
@@ -220,6 +238,17 @@ void EntityPropertiesInteger::copySettings(EntityPropertiesBase *other, EntityBa
 	}
 }
 
+bool EntityPropertiesInteger::hasSameValue(EntityPropertiesBase* other)
+{
+	EntityPropertiesInteger* entity = dynamic_cast<EntityPropertiesInteger*>(other);
+
+	if (entity == nullptr) return false;
+
+	return (getValue() == entity->getValue());
+}
+
+// ################################################################################################################################################################
+
 void EntityPropertiesBoolean::createProperty(const std::string &group, const std::string &name, bool defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
 	// Load the template defaults if any
@@ -286,6 +315,17 @@ void EntityPropertiesBoolean::copySettings(EntityPropertiesBase *other, EntityBa
 	}
 }
 
+bool EntityPropertiesBoolean::hasSameValue(EntityPropertiesBase* other)
+{
+	EntityPropertiesBoolean* entity = dynamic_cast<EntityPropertiesBoolean*>(other);
+
+	if (entity == nullptr) return false;
+
+	return (getValue() == entity->getValue());
+}
+
+// ################################################################################################################################################################
+
 void EntityPropertiesString::createProperty(const std::string &group, const std::string &name, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
 	// Load the template defaults if any
@@ -350,6 +390,17 @@ void EntityPropertiesString::copySettings(EntityPropertiesBase *other, EntityBas
 		setValue(entity->getValue());
 	}
 }
+
+bool EntityPropertiesString::hasSameValue(EntityPropertiesBase* other)
+{
+	EntityPropertiesString* entity = dynamic_cast<EntityPropertiesString*>(other);
+
+	if (entity == nullptr) return false;
+
+	return (getValue() == entity->getValue());
+}
+
+// ################################################################################################################################################################
 
 void EntityPropertiesSelection::createProperty(const std::string &group, const std::string &name, std::list<std::string>& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
@@ -469,6 +520,65 @@ void EntityPropertiesSelection::copySettings(EntityPropertiesBase *other, Entity
 	}
 }
 
+void EntityPropertiesSelection::resetOptions(std::list<std::string>& _options)
+{
+	options.clear();
+	options.reserve(_options.size());
+	for (auto& item : _options)
+	{
+		addOption(item);
+	}
+	if (options.size() == 0)
+	{
+		value = "";
+	}
+	else
+	{
+		value = options.front();
+	}
+}
+
+bool EntityPropertiesSelection::hasSameValue(EntityPropertiesBase* other)
+{
+	EntityPropertiesSelection* entity = dynamic_cast<EntityPropertiesSelection*>(other);
+
+	if (entity == nullptr) return false;
+
+	return (getValue() == entity->getValue());
+}
+
+bool EntityPropertiesSelection::setValue(const std::string& s)
+{
+	if (std::find(options.begin(), options.end(), s) == options.end()) return false; // This value is not a valid option
+
+	if (value != s) setNeedsUpdate();
+
+	value = s;
+	return true;
+}
+
+bool EntityPropertiesSelection::checkCompatibilityOfSettings(const EntityPropertiesSelection& other)
+{
+	if (options.size() != other.options.size()) return false;
+
+	for (int i = 0; i < options.size(); i++)
+	{
+		if (options[i] != other.options[i]) return false;
+	}
+
+	return true;
+}
+
+bool EntityPropertiesSelection::isCompatible(EntityPropertiesBase* other)
+{
+	EntityPropertiesSelection* otherItem = dynamic_cast<EntityPropertiesSelection*>(other);
+	if (otherItem == nullptr) return false;
+
+	return checkCompatibilityOfSettings(*otherItem);
+}
+
+// ################################################################################################################################################################
+
 void EntityPropertiesColor::createProperty(const std::string &group, const std::string &name, std::vector<int> defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
 	assert(defaultValue.size() == 3);
@@ -568,82 +678,16 @@ void EntityPropertiesColor::copySettings(EntityPropertiesBase *other, EntityBase
 	}
 }
 
-bool EntityPropertiesBase::needsUpdate(void) 
-{ 
-	return needsUpdateFlag; 
-};
-
-bool EntityPropertiesDouble::hasSameValue(EntityPropertiesBase *other)
+bool EntityPropertiesColor::hasSameValue(EntityPropertiesBase* other)
 {
-	EntityPropertiesDouble *entity = dynamic_cast<EntityPropertiesDouble *>(other);
+	EntityPropertiesColor* entity = dynamic_cast<EntityPropertiesColor*>(other);
 
 	if (entity == nullptr) return false;
 
-	return (getValue() == entity->getValue());
+	return (getColorR() == entity->getColorR() && getColorG() == entity->getColorG() && getColorB() == entity->getColorB());
 }
 
-bool EntityPropertiesInteger::hasSameValue(EntityPropertiesBase *other)
-{
-	EntityPropertiesInteger *entity = dynamic_cast<EntityPropertiesInteger *>(other);
-
-	if (entity == nullptr) return false;
-
-	return (getValue() == entity->getValue());
-}
-
-bool EntityPropertiesBoolean::hasSameValue(EntityPropertiesBase *other)
-{
-	EntityPropertiesBoolean *entity = dynamic_cast<EntityPropertiesBoolean *>(other);
-
-	if (entity == nullptr) return false;
-
-	return (getValue() == entity->getValue());
-}
-
-bool EntityPropertiesString::hasSameValue(EntityPropertiesBase *other)
-{
-	EntityPropertiesString *entity = dynamic_cast<EntityPropertiesString *>(other);
-
-	if (entity == nullptr) return false;
-
-	return (getValue() == entity->getValue());
-}
-
-void EntityPropertiesSelection::resetOptions(std::list<std::string>& _options)
-{
-	options.clear();
-	options.reserve(_options.size());
-	for (auto& item : _options) 
-	{
-		addOption(item);
-	}
-	if (options.size() == 0)
-	{
-		value = "";
-	}
-	else
-	{
-		value = options.front();
-	}
-}
-
-bool EntityPropertiesSelection::hasSameValue(EntityPropertiesBase *other)
-{
-	EntityPropertiesSelection *entity = dynamic_cast<EntityPropertiesSelection *>(other);
-
-	if (entity == nullptr) return false;
-
-	return (getValue() == entity->getValue());
-}
-
-bool EntityPropertiesColor::hasSameValue(EntityPropertiesBase *other)
-{
-	EntityPropertiesColor *entity = dynamic_cast<EntityPropertiesColor *>(other);
-
-	if (entity == nullptr) return false;
-
-	return (getColorR() == entity->getColorR() && getColorG() == entity->getColorG() && getColorB() == entity->getColorB() );
-}
+// ################################################################################################################################################################
 
 bool EntityPropertiesEntityList::hasSameValue(EntityPropertiesBase *other)
 {
@@ -652,36 +696,6 @@ bool EntityPropertiesEntityList::hasSameValue(EntityPropertiesBase *other)
 	if (entity == nullptr) return false;
 
 	return (getEntityContainerName() == entity->getEntityContainerName() && getEntityContainerID() == entity->getEntityContainerID() && getValueName() == entity->getValueName() && getValueID() == entity->getValueID());
-}
-
-bool EntityPropertiesSelection::setValue(const std::string &s)
-{
-	if (std::find(options.begin(), options.end(), s) == options.end()) return false; // This value is not a valid option
-
-	if (value != s) setNeedsUpdate();
-
-	value = s;
-	return true;
-}
-
-bool EntityPropertiesSelection::checkCompatibilityOfSettings(const EntityPropertiesSelection &other)
-{
-	if (options.size() != other.options.size()) return false;
-
-	for (int i = 0; i < options.size(); i++)
-	{
-		if (options[i] != other.options[i]) return false;
-	}
-
-	return true;
-}
-
-bool EntityPropertiesSelection::isCompatible(EntityPropertiesBase *other)
-{
-	EntityPropertiesSelection *otherItem = dynamic_cast<EntityPropertiesSelection *>(other);
-	if (otherItem == nullptr) return false;
-
-	return checkCompatibilityOfSettings(*otherItem);
 }
 
 EntityContainer *EntityPropertiesEntityList::findContainerFromID(EntityBase *root, ot::UID entityID)
@@ -995,6 +1009,8 @@ void EntityPropertiesEntityList::createProperty(const std::string &group, const 
 	// Finally create the new property
 	properties.createProperty(new EntityPropertiesEntityList(name, contName, contID, value, valID), group);
 }
+
+// ################################################################################################################################################################
 
 void EntityPropertiesProjectList::copySettings(EntityPropertiesBase* other, EntityBase* root)
 {

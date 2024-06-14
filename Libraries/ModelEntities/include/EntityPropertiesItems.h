@@ -84,6 +84,8 @@ private:
 	bool errorState;
 };
 
+// ################################################################################################################################################################
+
 class __declspec(dllexport) EntityPropertiesDouble : public EntityPropertiesBase
 {
 public:
@@ -118,6 +120,8 @@ public:
 private:
 	double value;
 };
+
+// ################################################################################################################################################################
 
 class __declspec(dllexport) EntityPropertiesInteger : public EntityPropertiesBase
 {
@@ -154,6 +158,8 @@ private:
 	long value;
 };
 
+// ################################################################################################################################################################
+
 class __declspec(dllexport) EntityPropertiesBoolean : public EntityPropertiesBase
 {
 public:
@@ -189,6 +195,8 @@ private:
 	bool value;
 };
 
+// ################################################################################################################################################################
+
 class __declspec(dllexport) EntityPropertiesString : public EntityPropertiesBase
 {
 public:
@@ -223,6 +231,8 @@ public:
 private:
 	std::string value;
 };
+
+// ################################################################################################################################################################
 
 class __declspec(dllexport) EntityPropertiesSelection : public EntityPropertiesBase
 {
@@ -268,6 +278,8 @@ private:
 	std::string value;
 };
 
+// ################################################################################################################################################################
+
 class __declspec(dllexport) EntityPropertiesColor : public EntityPropertiesBase
 {
 public:
@@ -309,6 +321,8 @@ public:
 private:
 	double color[3];
 };
+
+// ################################################################################################################################################################
 
 class __declspec(dllexport) EntityPropertiesEntityList : public EntityPropertiesBase
 {
@@ -363,6 +377,7 @@ private:
 	ot::UID valueID;
 };
 
+// ################################################################################################################################################################
 
 class __declspec(dllexport) EntityPropertiesProjectList : public EntityPropertiesBase
 {
