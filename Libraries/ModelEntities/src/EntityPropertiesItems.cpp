@@ -118,7 +118,7 @@ void EntityPropertiesDouble::addToConfiguration(ot::PropertyGridCfg& _configurat
 	this->setupPropertyData(_configuration, newProp);
 }
 
-void EntityPropertiesDouble::setFromConfiguration(const ot::Property* _property)
+void EntityPropertiesDouble::setFromConfiguration(const ot::Property* _property, EntityBase* root)
 {
 	const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble *>(_property);
 	if (!actualProperty) {
@@ -141,7 +141,7 @@ void EntityPropertiesDouble::addToJsonDocument(ot::JsonDocument& jsonDoc, Entity
 	jsonDoc.AddMember(ot::JsonString(this->getName(), jsonDoc.GetAllocator()), container, jsonDoc.GetAllocator());
 }
 
-void EntityPropertiesDouble::readFromJsonObject(const ot::ConstJsonObject& object)
+void EntityPropertiesDouble::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
 	const rapidjson::Value& val = object["Value"];
 
@@ -190,7 +190,7 @@ void EntityPropertiesInteger::addToConfiguration(ot::PropertyGridCfg& _configura
 	this->setupPropertyData(_configuration, newProp);
 }
 
-void EntityPropertiesInteger::setFromConfiguration(const ot::Property* _property)
+void EntityPropertiesInteger::setFromConfiguration(const ot::Property* _property, EntityBase* root)
 {
 	const ot::PropertyInt* actualProperty = dynamic_cast<const ot::PropertyInt*>(_property);
 	if (!actualProperty) {
@@ -218,7 +218,7 @@ void EntityPropertiesInteger::addToJsonDocument(ot::JsonDocument& jsonDoc, Entit
 	jsonDoc.AddMember(jsonName, container, allocator);
 }
 
-void EntityPropertiesInteger::readFromJsonObject(const ot::ConstJsonObject& object)
+void EntityPropertiesInteger::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
 	const rapidjson::Value& val = object["Value"];
 
@@ -267,7 +267,7 @@ void EntityPropertiesBoolean::addToConfiguration(ot::PropertyGridCfg& _configura
 	this->setupPropertyData(_configuration, newProp);
 }
 
-void EntityPropertiesBoolean::setFromConfiguration(const ot::Property* _property)
+void EntityPropertiesBoolean::setFromConfiguration(const ot::Property* _property, EntityBase* root)
 {
 	const ot::PropertyBool* actualProperty = dynamic_cast<const ot::PropertyBool*>(_property);
 	if (!actualProperty) {
@@ -295,7 +295,7 @@ void EntityPropertiesBoolean::addToJsonDocument(ot::JsonDocument& jsonDoc, Entit
 	jsonDoc.AddMember(jsonName, container, allocator);
 }
 
-void EntityPropertiesBoolean::readFromJsonObject(const ot::ConstJsonObject& object)
+void EntityPropertiesBoolean::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
 	const rapidjson::Value& val = object["Value"];
 
@@ -344,7 +344,7 @@ void EntityPropertiesString::addToConfiguration(ot::PropertyGridCfg& _configurat
 	this->setupPropertyData(_configuration, newProp);
 }
 
-void EntityPropertiesString::setFromConfiguration(const ot::Property* _property)
+void EntityPropertiesString::setFromConfiguration(const ot::Property* _property, EntityBase* root)
 {
 	const ot::PropertyString* actualProperty = dynamic_cast<const ot::PropertyString*>(_property);
 	if (!actualProperty) {
@@ -371,7 +371,7 @@ void EntityPropertiesString::addToJsonDocument(ot::JsonDocument& jsonDoc, Entity
 	jsonDoc.AddMember(jsonName, container, allocator);
 }
 
-void EntityPropertiesString::readFromJsonObject(const ot::ConstJsonObject& object)
+void EntityPropertiesString::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
 	const rapidjson::Value& val = object["Value"];
 
@@ -446,7 +446,7 @@ void EntityPropertiesSelection::addToConfiguration(ot::PropertyGridCfg& _configu
 	this->setupPropertyData(_configuration, newProp);
 }
 
-void EntityPropertiesSelection::setFromConfiguration(const ot::Property* _property)
+void EntityPropertiesSelection::setFromConfiguration(const ot::Property* _property, EntityBase* root)
 {
 	const ot::PropertyStringList* actualProperty = dynamic_cast<const ot::PropertyStringList*>(_property);
 	if (!actualProperty) {
@@ -489,7 +489,7 @@ void EntityPropertiesSelection::addToJsonDocument(ot::JsonDocument& jsonDoc, Ent
 	jsonDoc.AddMember(jsonName, container, allocator);
 }
 
-void EntityPropertiesSelection::readFromJsonObject(const ot::ConstJsonObject& object)
+void EntityPropertiesSelection::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
 	const rapidjson::Value& val = object["Value"];
 	const rapidjson::Value& opt = object["Options"];
@@ -602,7 +602,7 @@ void EntityPropertiesColor::addToConfiguration(ot::PropertyGridCfg& _configurati
 	this->setupPropertyData(_configuration, newProp);
 }
 
-void EntityPropertiesColor::setFromConfiguration(const ot::Property* _property)
+void EntityPropertiesColor::setFromConfiguration(const ot::Property* _property, EntityBase* root)
 {
 	const ot::PropertyColor* actualProperty = dynamic_cast<const ot::PropertyColor*>(_property);
 	if (!actualProperty) {
@@ -640,7 +640,7 @@ void EntityPropertiesColor::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityB
 	jsonDoc.AddMember(jsonName, container, allocator);
 }
 
-void EntityPropertiesColor::readFromJsonObject(const ot::ConstJsonObject& object)
+void EntityPropertiesColor::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
 	const rapidjson::Value& valR = object["ValueR"];
 	const rapidjson::Value& valG = object["ValueG"];
@@ -698,76 +698,13 @@ bool EntityPropertiesEntityList::hasSameValue(EntityPropertiesBase *other)
 	return (getEntityContainerName() == entity->getEntityContainerName() && getEntityContainerID() == entity->getEntityContainerID() && getValueName() == entity->getValueName() && getValueID() == entity->getValueID());
 }
 
-EntityContainer *EntityPropertiesEntityList::findContainerFromID(EntityBase *root, ot::UID entityID)
-{
-	EntityContainer *container = dynamic_cast<EntityContainer *>(root);
-
-	if (container != nullptr)
-	{
-		if (container->getEntityID() == entityID) return container;
-
-		for (auto child : container->getChildrenList())
-		{
-			EntityContainer *containerChild = findContainerFromID(child, entityID);
-			if (containerChild != nullptr) return containerChild;
-		}
-	}
-
-	return nullptr;
-}
-
-EntityContainer *EntityPropertiesEntityList::findContainerFromName(EntityBase *root, const std::string &entityName)
-{
-	EntityContainer *container = dynamic_cast<EntityContainer *>(root);
-
-	if (container != nullptr)
-	{
-		if (container->getName() == entityName) return container;
-
-		for (auto child : container->getChildrenList())
-		{
-			EntityContainer *containerChild = findContainerFromName(child, entityName);
-			if (containerChild != nullptr) return containerChild;
-		}
-	}
-
-	return nullptr;
-}
-
 void EntityPropertiesEntityList::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
 {
 	std::list<std::string> opt;
 
 	if (root != nullptr)
 	{
-		EntityContainer* container = findContainerFromID(root, getEntityContainerID());
-		if (container == nullptr)
-		{
-			container = findContainerFromName(root, getEntityContainerName());
-		}
-
-		if (container != nullptr)
-		{
-			for (auto child : container->getChildrenList())
-			{
-				opt.push_back(child->getName());
-			}
-		}
-
-		EntityBase* entity = findEntityFromID(root, getValueID());
-
-		if (entity != nullptr)
-		{
-			setValueName(entity->getName());
-		}
-		else
-		{
-			entity = findEntityFromName(root, getValueName());
-			if (entity != nullptr)
-			{
-				setValueID(entity->getEntityID());
-			}
-		}
+		this->updateValueAndContainer(root, opt);
 	}
 
 	if (!root)
@@ -786,7 +723,7 @@ void EntityPropertiesEntityList::addToConfiguration(ot::PropertyGridCfg& _config
 	this->setupPropertyData(_configuration, newProp);
 }
 
-void EntityPropertiesEntityList::setFromConfiguration(const ot::Property* _property)
+void EntityPropertiesEntityList::setFromConfiguration(const ot::Property* _property, EntityBase* root)
 {
 	const ot::PropertyStringList* actualProperty = dynamic_cast<const ot::PropertyStringList*>(_property);
 	if (!actualProperty) {
@@ -808,11 +745,17 @@ void EntityPropertiesEntityList::setFromConfiguration(const ot::Property* _prope
 	this->setEntityContainerName(ot::json::getString(dataDoc, "ContainerName"));
 	this->setEntityContainerID(ot::json::getUInt64(dataDoc, "ContainerID"));
 	this->setValueID(ot::json::getUInt64(dataDoc, "ValueID"));
+
+	if (root) {
+		std::list<std::string> opt;
+		this->updateValueAndContainer(root, opt);
+	}
+	
 }
 
 void EntityPropertiesEntityList::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
 {
-	rapidjson::Document::AllocatorType& allocator = jsonDoc.GetAllocator();
+	ot::JsonAllocator& allocator = jsonDoc.GetAllocator();
 
 	rapidjson::Value container(rapidjson::kObjectType);
 
@@ -822,45 +765,16 @@ void EntityPropertiesEntityList::addToJsonDocument(ot::JsonDocument& jsonDoc, En
 	rapidjson::Value jsonContainerID(rapidjson::kNumberType);
 	rapidjson::Value jsonValueName(rapidjson::kStringType);
 	rapidjson::Value jsonValueID(rapidjson::kNumberType);
-	rapidjson::Value jsonOptions(rapidjson::kArrayType);
+	std::list<std::string> opt;
 
-	if (root != nullptr)
-	{
-		EntityContainer* container = findContainerFromID(root, getEntityContainerID());
-		if (container == nullptr)
-		{
-			container = findContainerFromName(root, getEntityContainerName());
-		}
-
-		if (container != nullptr)
-		{
-			for (auto child : container->getChildrenList())
-			{
-				rapidjson::Value val(child->getName().c_str(), allocator);
-				jsonOptions.PushBack(val, allocator);
-			}
-		}
-
-		EntityBase* entity = findEntityFromID(root, getValueID());
-
-		if (entity != nullptr)
-		{
-			setValueName(entity->getName());
-		}
-		else
-		{
-			entity = findEntityFromName(root, getValueName());
-			if (entity != nullptr)
-			{
-				setValueID(entity->getEntityID());
-			}
-		}
+	if (root) {
+		this->updateValueAndContainer(root, opt);
 	}
 
-	jsonContainerName.SetString(getEntityContainerName().c_str(), allocator);
-	jsonContainerID.SetInt64(getEntityContainerID());
-	jsonValueName.SetString(getValueName().c_str(), allocator);
-	jsonValueID.SetInt64(getValueID());
+	jsonContainerName.SetString(this->getEntityContainerName().c_str(), allocator);
+	jsonContainerID.SetInt64(this->getEntityContainerID());
+	jsonValueName.SetString(this->getValueName().c_str(), allocator);
+	jsonValueID.SetInt64(this->getValueID());
 
 	container.AddMember("ContainerName", jsonContainerName, allocator);
 	container.AddMember("ContainerID", jsonContainerID, allocator);
@@ -869,7 +783,7 @@ void EntityPropertiesEntityList::addToJsonDocument(ot::JsonDocument& jsonDoc, En
 
 	if (root != nullptr)
 	{
-		container.AddMember("Options", jsonOptions, allocator);
+		container.AddMember("Options", ot::JsonArray(opt, allocator), allocator);
 	}
 
 	rapidjson::Value::StringRefType jsonName(getName().c_str());
@@ -877,17 +791,22 @@ void EntityPropertiesEntityList::addToJsonDocument(ot::JsonDocument& jsonDoc, En
 	jsonDoc.AddMember(jsonName, container, allocator);
 }
 
-void EntityPropertiesEntityList::readFromJsonObject(const ot::ConstJsonObject& object)
+void EntityPropertiesEntityList::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
 	const rapidjson::Value& containerName = object["ContainerName"];
 	const rapidjson::Value& containerID = object["ContainerID"];
 	const rapidjson::Value& valName = object["ValueName"];
 	const rapidjson::Value& valID = object["ValueID"];
 
-	setEntityContainerName(containerName.GetString());
-	setEntityContainerID(containerID.GetInt64());
-	setValueName(valName.GetString());
-	setValueID(valID.GetInt64());
+	this->setEntityContainerName(containerName.GetString());
+	this->setEntityContainerID(containerID.GetInt64());
+	this->setValueName(valName.GetString());
+	this->setValueID(valID.GetInt64());
+
+	if (root) {
+		std::list<std::string> opt;
+		this->updateValueAndContainer(root, opt);
+	}
 }
 
 EntityPropertiesEntityList& EntityPropertiesEntityList::operator=(const EntityPropertiesEntityList &other)
@@ -962,6 +881,94 @@ void EntityPropertiesEntityList::copySettings(EntityPropertiesBase *other, Entit
 	}
 }
 
+void EntityPropertiesEntityList::createProperty(const std::string& group, const std::string& name, const std::string& contName, ot::UID contID, const std::string& valName, ot::UID valID, const std::string& defaultCategory, EntityProperties& properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	std::string value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name, valName);
+
+	// Finally create the new property
+	properties.createProperty(new EntityPropertiesEntityList(name, contName, contID, value, valID), group);
+}
+
+void EntityPropertiesEntityList::updateValueAndContainer(EntityBase* _root, std::list<std::string>& _containerOptions) {
+	OT_LOG_D("DEBUG");
+	OTAssertNullptr(_root);
+
+	EntityContainer* container = this->findContainerFromID(_root, getEntityContainerID());
+	if (container) {
+		this->setEntityContainerName(container->getName());
+	}
+	else {
+		container = this->findContainerFromName(_root, getEntityContainerName());
+		if (container) {
+			this->setEntityContainerID(container->getEntityID());
+		}
+	}
+
+	if (container) {
+		for (auto child : container->getChildrenList()) {
+			_containerOptions.push_back(child->getName());
+		}
+	}
+	else {
+		OT_LOG_EA("Container not found");
+	}
+
+	EntityBase* entity = this->findEntityFromID(_root, this->getValueID());
+
+	if (entity != nullptr) {
+		this->setValueName(entity->getName());
+	}
+	else {
+		entity = this->findEntityFromName(_root, this->getValueName());
+		if (entity != nullptr) {
+			this->setValueID(entity->getEntityID());
+		}
+		else {
+			OT_LOG_EA("Value not found");
+		}
+	}
+}
+
+EntityContainer* EntityPropertiesEntityList::findContainerFromID(EntityBase* root, ot::UID entityID)
+{
+	EntityContainer* container = dynamic_cast<EntityContainer*>(root);
+
+	if (container != nullptr)
+	{
+		if (container->getEntityID() == entityID) return container;
+
+		for (auto child : container->getChildrenList())
+		{
+			EntityContainer* containerChild = findContainerFromID(child, entityID);
+			if (containerChild != nullptr) return containerChild;
+		}
+	}
+
+	return nullptr;
+}
+
+EntityContainer* EntityPropertiesEntityList::findContainerFromName(EntityBase* root, const std::string& entityName)
+{
+	EntityContainer* container = dynamic_cast<EntityContainer*>(root);
+
+	if (container != nullptr)
+	{
+		if (container->getName() == entityName) return container;
+
+		for (auto child : container->getChildrenList())
+		{
+			EntityContainer* containerChild = findContainerFromName(child, entityName);
+			if (containerChild != nullptr) return containerChild;
+		}
+	}
+
+	return nullptr;
+}
+
 EntityBase *EntityPropertiesEntityList::findEntityFromName(EntityBase *root, const std::string &entityName)
 {
 	if (root->getName() == entityName) return root;
@@ -998,18 +1005,6 @@ EntityBase *EntityPropertiesEntityList::findEntityFromID(EntityBase *root, ot::U
 	return nullptr;
 }
 
-void EntityPropertiesEntityList::createProperty(const std::string &group, const std::string &name, const std::string &contName, ot::UID contID, const std::string &valName, ot::UID valID, const std::string &defaultCategory, EntityProperties &properties)
-{
-	// Load the template defaults if any
-	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
-
-	// Now load the default value if available. Otherwise take the provided default
-	std::string value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name, valName);
-
-	// Finally create the new property
-	properties.createProperty(new EntityPropertiesEntityList(name, contName, contID, value, valID), group);
-}
-
 // ################################################################################################################################################################
 
 void EntityPropertiesProjectList::copySettings(EntityPropertiesBase* other, EntityBase* root)
@@ -1027,7 +1022,7 @@ void EntityPropertiesProjectList::addToConfiguration(ot::PropertyGridCfg& _confi
 	this->setupPropertyData(_configuration, newProp);
 }
 
-void EntityPropertiesProjectList::setFromConfiguration(const ot::Property* _property)
+void EntityPropertiesProjectList::setFromConfiguration(const ot::Property* _property, EntityBase* root)
 {
 	const ot::PropertyStringList* actualProperty = dynamic_cast<const ot::PropertyStringList*>(_property);
 	if (!actualProperty) {
@@ -1051,7 +1046,7 @@ void EntityPropertiesProjectList::addToJsonDocument(ot::JsonDocument& jsonDoc, E
 
 }
 
-void EntityPropertiesProjectList::readFromJsonObject(const ot::ConstJsonObject& object)
+void EntityPropertiesProjectList::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
 	_value = ot::json::getString(object, "Value");
 }

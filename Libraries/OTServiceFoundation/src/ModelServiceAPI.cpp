@@ -660,7 +660,7 @@ void ot::ModelServiceAPI::getEntityProperties(UID _entity, bool _recursive, cons
 		cfg.setFromJsonObject(*prop);
 
 		EntityProperties props;
-		props.buildFromConfiguration(cfg);
+		props.buildFromConfiguration(cfg, nullptr);
 
 		_entityProperties[id] = props;
 
@@ -710,7 +710,7 @@ void ot::ModelServiceAPI::getEntityProperties(const std::string& entityName, boo
 		cfg.setFromJsonObject(*prop);
 
 		EntityProperties props;
-		props.buildFromConfiguration(cfg);
+		props.buildFromConfiguration(cfg, nullptr);
 
 		_entityProperties[id] = props;
 

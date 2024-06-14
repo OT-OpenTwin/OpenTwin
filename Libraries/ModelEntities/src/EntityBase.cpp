@@ -5,6 +5,8 @@
 #include "Types.h"
 #include "ClassFactory.h"
 
+#include "OTCore/Logger.h"
+
 _declspec(dllexport) DataStorageAPI::UniqueUIDGenerator *globalUidGenerator = nullptr;
 
 EntityBase::EntityBase(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
@@ -192,14 +194,14 @@ void EntityBase::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view,
 		}
 
 		std::string propertiesJSON = bsoncxx::to_json(bsonObj);
-		properties.buildFromJSON(propertiesJSON);
+		properties.buildFromJSON(propertiesJSON, nullptr);
 		properties.forceResetUpdateForAllProperties();
 		
 		resetModified();
 	}
-	catch (std::exception)
+	catch (std::exception _e)
 	{
-		assert(0); // read failed
+		OT_LOG_EAS(_e.what()); // Read failed
 	}
 }
 

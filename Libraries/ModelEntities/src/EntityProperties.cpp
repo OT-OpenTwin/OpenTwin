@@ -173,18 +173,18 @@ void EntityProperties::addToConfiguration(EntityBase *root, bool visibleOnly, ot
 	}
 }
 
-void EntityProperties::buildFromConfiguration(const ot::PropertyGridCfg& _config)
+void EntityProperties::buildFromConfiguration(const ot::PropertyGridCfg& _config, EntityBase* root)
 {
 	// Here we re-build the current container with the settings in the JSON document. All previous settings will be overridden.
 
 	deleteAllProperties();
 
 	for (const ot::PropertyGroup* g : _config.getRootGroups()) {
-		this->buildFromConfiguration(g);
+		this->buildFromConfiguration(g, root);
 	}
 }
 
-void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupConfig)
+void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupConfig, EntityBase* root)
 {
 	for (const ot::Property* p : _groupConfig->getProperties()) {
 		EntityPropertiesBase* newSetting(nullptr);
@@ -213,7 +213,7 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 			return;
 		}
 
-		newSetting->setFromConfiguration(p);
+		newSetting->setFromConfiguration(p, root);
 		newSetting->setName(p->getPropertyName());
 		newSetting->setHasMultipleValues(p->getPropertyFlags() & ot::Property::HasMultipleValues);
 		newSetting->setReadOnly(p->getPropertyFlags() & ot::Property::IsReadOnly);
@@ -225,7 +225,7 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 	}
 
 	for (const ot::PropertyGroup* childGroup : _groupConfig->getChildGroups()) {
-		this->buildFromConfiguration(childGroup);
+		this->buildFromConfiguration(childGroup, root);
 	}
 }
 
@@ -247,7 +247,7 @@ std::string EntityProperties::createJSON(EntityBase* root, bool visibleOnly)
 	return jsonDoc.toJson();
 }
 
-void EntityProperties::buildFromJSON(const std::string& prop)
+void EntityProperties::buildFromJSON(const std::string& prop, EntityBase* root)
 {
 	// Here we re-build the current container with the settings in the JSON document. All previous settings will be overridden.
 
@@ -319,7 +319,7 @@ void EntityProperties::buildFromJSON(const std::string& prop)
 
 			if (newSetting != nullptr)
 			{
-				newSetting->readFromJsonObject(i->value.GetObject());
+				newSetting->readFromJsonObject(i->value.GetObject(), root);
 				newSetting->setName(propertyName);
 				newSetting->setHasMultipleValues(multipleValues);
 				newSetting->setReadOnly(readOnly);

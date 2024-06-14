@@ -34,11 +34,11 @@ public:
 	void forceResetUpdateForAllProperties();
 
 	void addToConfiguration(EntityBase *root, bool visibleOnly, ot::PropertyGridCfg& _config);
-	void buildFromConfiguration(const ot::PropertyGridCfg& _config);
-	void buildFromConfiguration(const ot::PropertyGroup* _groupConfig);
+	void buildFromConfiguration(const ot::PropertyGridCfg& _config, EntityBase* root);
+	void buildFromConfiguration(const ot::PropertyGroup* _groupConfig, EntityBase* root);
 
 	std::string createJSON(EntityBase* root, bool visibleOnly);
-	void buildFromJSON(const std::string& prop);
+	void buildFromJSON(const std::string& prop, EntityBase* root);
 
 	void checkMatchingProperties(EntityProperties &other);
 	void readFromProperties(const EntityProperties &other, EntityBase *root);

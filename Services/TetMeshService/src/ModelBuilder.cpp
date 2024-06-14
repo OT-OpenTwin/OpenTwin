@@ -339,7 +339,7 @@ EntityGeometry *ModelBuilder::createGeometryEntity(const std::string &name, Topo
 	entityGeom->setBrep(shape);
 	entityGeom->setInitiallyHidden(true);
 
-	entityGeom->getProperties().buildFromConfiguration(shapeProperties);
+	entityGeom->getProperties().buildFromConfiguration(shapeProperties, nullptr);
 	entityGeom->getProperties().forceResetUpdateForAllProperties();
 
 	entityGeom->getProperties().setAllPropertiesReadOnly();

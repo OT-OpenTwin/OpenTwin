@@ -1442,7 +1442,7 @@ std::list<EntityBase*> Model::getListOfSelectedEntities(const std::string& typeF
 void Model::addPropertiesToEntities(std::list<ot::UID>& entityIDList, const ot::PropertyGridCfg& _configuration)
 {
 	EntityProperties properties;
-	properties.buildFromConfiguration(_configuration);
+	properties.buildFromConfiguration(_configuration, getRootNode());
 
 	std::list<EntityPropertiesBase*> allProperties = properties.getListOfAllProperties();
 
@@ -1477,7 +1477,7 @@ void Model::addPropertiesToEntities(std::list<ot::UID>& entityIDList, const ot::
 void Model::updatePropertiesOfEntities(std::list<ot::UID>& entityIDList, const std::string& _entitiesJson)
 {
 	EntityProperties properties;
-	properties.buildFromJSON(_entitiesJson);
+	properties.buildFromJSON(_entitiesJson, getRootNode());
 
 	std::list<EntityPropertiesBase*> allProperties = properties.getListOfAllProperties();
 
@@ -1797,7 +1797,7 @@ void Model::updatePropertyGrid(void)
 	if (selectedVisibleModelEntityIDs.size() > 0)
 	{
 		this->addCommonPropertiesToConfig(selectedVisibleModelEntityIDs, true, cfg);
-	}
+	}	
 	else
 	{
 		this->addCommonPropertiesToConfig(selectedModelEntityIDs, true, cfg);
@@ -1856,7 +1856,7 @@ void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const 
 	for (auto entityID : entityIDList) entities.push_back(getEntity(entityID));
 
 	EntityProperties properties;
-	properties.buildFromConfiguration(_configuration);
+	properties.buildFromConfiguration(_configuration, getRootNode());
 
 	setProperties(entities, properties);
 
@@ -4654,7 +4654,7 @@ void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot:
 	// Update the properties, if requested
 	if (updateProperties)
 	{
-		geomEntity->getProperties().buildFromConfiguration(_configuration);
+		geomEntity->getProperties().buildFromConfiguration(_configuration, getRootNode());
 	}
 
 	// Release the brep and facets (if loaded)
