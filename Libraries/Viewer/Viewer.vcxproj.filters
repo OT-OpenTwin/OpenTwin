@@ -261,9 +261,6 @@
     <ClInclude Include="include\TableViewer.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Viewer.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\Factory.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -327,6 +324,9 @@
       <Filter>include</Filter>
     </QtMoc>
     <QtMoc Include="include\Table.h">
+      <Filter>include</Filter>
+    </QtMoc>
+    <QtMoc Include="include\Viewer.h">
       <Filter>include</Filter>
     </QtMoc>
   </ItemGroup>

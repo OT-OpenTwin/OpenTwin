@@ -256,6 +256,12 @@ void Viewer::slotColorStyleChanged(const ot::ColorStyle& _style)
 	refresh();
 }
 
+void Viewer::slotUpdateViewerSettings(void) {
+	ot::PropertyGridCfg settings = createSettings();
+	getNotifier()->updateSettings(settings);
+	getNotifier()->saveSettings(settings);
+}
+
 Viewer::~Viewer()
 {
 	if (model != nullptr)
@@ -929,9 +935,7 @@ void Viewer::settingsItemChanged(const ot::Property* _item) {
 		OTAssert(0, "Unknown logical name");
 	}
 	if (updateRequired) {
-		ot::PropertyGridCfg settings = createSettings();
-		getNotifier()->updateSettings(settings);
-		getNotifier()->saveSettings(settings);
+		QMetaObject::invokeMethod(this, &Viewer::slotUpdateViewerSettings, Qt::QueuedConnection);
 	}
 }
 
@@ -946,7 +950,7 @@ bool Viewer::workingPlaneSettingsItemChanged(const std::string& _logicalName, co
 		_settingsUpdateRequired = true;
 		return true;
 	}
-	else if (_logicalName == "Working Plane/DefaultSize") {
+	else if (_logicalName == "Working Plane/Default Size") {
 		const ot::PropertyInt * actualItem = dynamic_cast<const ot::PropertyInt *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
 		settings->workingPlaneDefaultSize = actualItem->getValue();

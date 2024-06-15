@@ -1044,10 +1044,6 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 }
 
 void AppBase::initializeDefaultUserSettings(void) {
-	if (m_viewerComponent) {
-		
-	}
-
 	ot::PropertyGridCfg frontendSettings;
 	ot::PropertyGroup* appearance = new ot::PropertyGroup("Appearance");
 	std::list<std::string> opt;
@@ -1087,9 +1083,12 @@ void AppBase::viewerSettingsChanged(const ot::Property* _property) {
 void AppBase::settingsChanged(const std::string& _owner, const ot::Property* _property) {
 	if (_owner == "General") {
 		this->frontendSettingsChanged(_property);
+		this->initializeDefaultUserSettings();
+		return;
 	}
 	else if (_owner == VIEWER_SETTINGS_NAME) {
 		this->viewerSettingsChanged(_property);
+		return;
 	}
 
 	ServiceDataUi* serviceInfo = m_ExternalServicesComponent->getServiceFromName(_owner);
@@ -1573,126 +1572,23 @@ void AppBase::storeSessionState(void) {
 }
 
 bool AppBase::storeSettingToDataBase(const ot::PropertyGridCfg& _config, const std::string& _subKey) {
-	std::string settingsKey = _subKey + "Settings";
-	/*
-	try
-	{
-		// Ensure that we are connected to the database server
-		DataStorageAPI::ConnectionAPI::establishConnection(m_loginData.getDatabaseUrl(), "1", m_loginData.getUserName(), m_loginData.getUserPassword());
+	ot::JsonDocument doc;
+	_config.addToJsonObject(doc, doc.GetAllocator());
 
-		// First, open a connection to the user's settings collection
-		DataStorageAPI::DocumentAccess docManager("UserSettings", this->getCurrentUserCollection());
-
-		// Now we search for the document with the given name
-		auto queryDoc = bsoncxx::builder::basic::document{};
-		queryDoc.append(bsoncxx::builder::basic::kvp("SettingName", settingsKey));
-
-		auto filterDoc = bsoncxx::builder::basic::document{};
-
-		auto result = docManager.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
-
-		ot::JsonDocument propertyDoc;
-		_config.addToJsonObject(propertyDoc, propertyDoc.GetAllocator());
-
-		if (!result.getSuccess())
-		{
-			// The setting does not yet exist -> write a new one
-			auto newDoc = bsoncxx::builder::basic::document{};
-			newDoc.append(bsoncxx::builder::basic::kvp("SettingName", settingsKey));
-			newDoc.append(bsoncxx::builder::basic::kvp("Data", propertyDoc.toJson()));
-
-			docManager.InsertDocumentToDatabase(newDoc.extract(), false);
-		}
-		else
-		{
-			// The setting already exists -> replace the settings
-			try
-			{
-				// Find the entry corresponding to the project in the collection
-				auto doc_find = bsoncxx::builder::stream::document{} << "SettingName" << settingsKey << bsoncxx::builder::stream::finalize;
-
-				auto doc_modify = bsoncxx::builder::stream::document{}
-					<< "$set" << bsoncxx::builder::stream::open_document
-					<< "Data" << propertyDoc.toJson()
-					<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-				mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("UserSettings", this->getCurrentUserCollection());
-
-				bsoncxx::stdx::optional<mongocxx::result::update> result = collection.update_many(doc_find.view(), doc_modify.view());
-			}
-			catch (std::exception _e)
-			{
-				OT_LOG_EAS(_e.what());
-				return false;
-			}
-		}
-	}
-	catch (std::exception _e)
-	{
-		OT_LOG_EAS(_e.what());
-		return false;
-	}
-	*/
-	return true;  // Successfully stored the settings
+	UserManagement settings(m_loginData);
+	return settings.storeSetting(_subKey + "Settings", doc.toJson());
 }
 
 ot::PropertyGridCfg AppBase::getSettingsFromDataBase(const std::string& _subKey) {
-	return ot::PropertyGridCfg();
-	/*std::string settingsKey = _subKey + "Settings";
+	ot::JsonDocument doc;
 
-	try
-	{
-		// Ensure that we are connected to the database server
-		DataStorageAPI::ConnectionAPI::establishConnection(m_loginData.getDatabaseUrl(), "1", m_loginData.getUserName(), m_loginData.getUserPassword());
+	UserManagement settings(m_loginData);
+	doc.fromJson(settings.restoreSetting(_subKey + "Settings"));
 
-		// First, open a connection to the user's settings collection
-		DataStorageAPI::DocumentAccess docManager("UserSettings", this->getCurrentUserCollection());
-
-		// Now we search for the document with the given name
-		auto queryDoc = bsoncxx::builder::basic::document{};
-		queryDoc.append(bsoncxx::builder::basic::kvp("SettingName", settingsKey));
-
-		auto filterDoc = bsoncxx::builder::basic::document{};
-
-		auto result = docManager.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
-
-		if (!result.getSuccess())
-		{
-			return ot::PropertyGridCfg();  // We could not find the document, but this is a standard case when the settings have not yet been stored
-		}
-
-		// Now we have found some settings, so retrieve the data
-		std::string settingsJSON;
-		try
-		{
-			bsoncxx::builder::basic::document doc;
-			doc.append(bsoncxx::builder::basic::kvp("Found", result.getBsonResult().value()));
-
-			auto doc_view = doc.view()["Found"].get_document().view();
-
-			settingsJSON = doc_view["Data"].get_utf8().value.data();
-		}
-		catch (std::exception _e)
-		{
-			// Something went wrong with accessing the settings data
-			OT_LOG_EAS(_e.what());
-			return ot::PropertyGridCfg();
-		}
-
-		// Create new settings from json string
-		ot::JsonDocument importedSettings;
-		importedSettings.fromJson(settingsJSON);
-
-		ot::PropertyGridCfg newConfig;
-		newConfig.setFromJsonObject(importedSettings.GetConstObject());
-
-		return newConfig;
-	}
-	catch (std::exception _e)
-	{
-		OT_LOG_EAS(_e.what());
-		return ot::PropertyGridCfg();
-	}*/
+	ot::PropertyGridCfg config;
+	config.setFromJsonObject(doc.GetConstObject());
+	return config;
+	
 }
 
 // #################################################################################################################

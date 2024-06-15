@@ -145,7 +145,7 @@ void ot::PropertyGroup::mergeWith(const PropertyGroup& _other, bool _replaceExis
 
 	bool replaced = true;
 	while (replaced && !otherProperties.empty()) {
-		replaced = false;
+		if (_replaceExistingProperties) replaced = false;
 		const Property* prop = otherProperties.front();
 		otherProperties.pop_front();
 

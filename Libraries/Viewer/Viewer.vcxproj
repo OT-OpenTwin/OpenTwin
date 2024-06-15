@@ -144,7 +144,7 @@
     <ClInclude Include="include\ViewerView.h" />
     <ClInclude Include="include\WorkingPlane.h" />
     <ClInclude Include="include\xyPlot.h" />
-    <ClInclude Include="include\Viewer.h" />
+    <QtMoc Include="include\Viewer.h" />
     <ClInclude Include="include\ViewerAPI.h" />
     <ClInclude Include="include\ViewerObjectSelectionHandler.h" />
     <ClInclude Include="include\ViewManipulator.h" />

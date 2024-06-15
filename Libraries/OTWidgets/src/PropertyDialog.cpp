@@ -17,6 +17,7 @@
 
 // Qt header
 #include <QtWidgets/qlayout.h>
+#include <QtWidgets/qscrollbar.h>
 #include <QtWidgets/qpushbutton.h>
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -146,6 +147,7 @@ void ot::PropertyDialog::setupFromConfiguration(const PropertyDialogCfg& _config
 			}
 		}
 	}
+	int currentSliderPos = m_grid->getTreeWidget()->verticalScrollBar()->sliderPosition();
 
 	// Clear data
 	m_treeMap.clear();
@@ -168,6 +170,7 @@ void ot::PropertyDialog::setupFromConfiguration(const PropertyDialogCfg& _config
 			newFocus = newFocus->parent();
 		}
 
+		m_grid->getTreeWidget()->verticalScrollBar()->setSliderPosition(currentSliderPos);
 	}
 }
 

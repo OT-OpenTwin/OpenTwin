@@ -43,6 +43,7 @@ namespace ot        { class PlotView; }
 
 class Viewer : public QOpenGLWidget
 {
+	Q_OBJECT
 public:
 	Viewer() = delete;
 	Viewer(ot::UID modelID, ot::UID viewerID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB);
@@ -121,6 +122,7 @@ public:
 
 private Q_SLOTS:
 	void slotColorStyleChanged(const ot::ColorStyle& _style);
+	void slotUpdateViewerSettings(void);
 
 protected:
 	virtual void paintGL() override;
