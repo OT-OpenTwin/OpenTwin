@@ -424,35 +424,35 @@ std::string ot::json::getString(const ConstJsonObject& _value, const std::string
 }
 
 ot::ConstJsonObject ot::json::getObject(const JsonValue& _value, const char* _member) {
-	OT_JSON_getFromObject(_value, _member, Object, throw std::exception("Invalid type"));
+	OT_JSON_getFromObject(_value, _member, Object, return JsonDocument().GetConstObject());
 }
 
 ot::ConstJsonObject ot::json::getObject(const JsonValue& _value, const std::string& _member) {
-	OT_JSON_getFromObject(_value, _member.c_str(), Object, throw std::exception("Invalid type"));
+	OT_JSON_getFromObject(_value, _member.c_str(), Object, return JsonDocument().GetConstObject());
 }
 
 ot::ConstJsonObject ot::json::getObject(const ConstJsonObject& _value, const char* _member) {
-	OT_JSON_getFromObject(_value, _member, Object, throw std::exception("Invalid type"));
+	OT_JSON_getFromObject(_value, _member, Object, return JsonDocument().GetConstObject());
 }
 
 ot::ConstJsonObject ot::json::getObject(const ConstJsonObject& _value, const std::string& _member) {
-	OT_JSON_getFromObject(_value, _member.c_str(), Object, throw std::exception("Invalid type"));
+	OT_JSON_getFromObject(_value, _member.c_str(), Object, return JsonDocument().GetConstObject());
 }
 
 ot::ConstJsonArray ot::json::getArray(const JsonValue& _value, const char* _member) {
-	OT_JSON_getFromObject(_value, _member, Array, throw std::exception("Invalid type"));
+	OT_JSON_getFromObject(_value, _member, Array, return JsonDocument(rapidjson::kArrayType).constRef().GetArray());
 }
 
 ot::ConstJsonArray ot::json::getArray(const JsonValue& _value, const std::string& _member) {
-	OT_JSON_getFromObject(_value, _member.c_str(), Array, throw std::exception("Invalid type"));
+	OT_JSON_getFromObject(_value, _member.c_str(), Array, return JsonDocument(rapidjson::kArrayType).constRef().GetArray());
 }
 
 ot::ConstJsonArray ot::json::getArray(const ConstJsonObject& _value, const char* _member) {
-	OT_JSON_getFromObject(_value, _member, Array, throw std::exception("Invalid type"));
+	OT_JSON_getFromObject(_value, _member, Array, return JsonDocument(rapidjson::kArrayType).constRef().GetArray());
 }
 
 ot::ConstJsonArray ot::json::getArray(const ConstJsonObject& _value, const std::string& _member) {
-	OT_JSON_getFromObject(_value, _member.c_str(), Array, throw std::exception("Invalid type"));
+	OT_JSON_getFromObject(_value, _member.c_str(), Array, return JsonDocument(rapidjson::kArrayType).constRef().GetArray());
 }
 
 std::list<bool> ot::json::getBoolList(const JsonValue& _value, const char* _member, const std::list<bool>& _default) {
@@ -617,42 +617,42 @@ std::list<std::string> ot::json::getStringList(const ConstJsonObject& _value, co
 
 std::list<ot::ConstJsonObject> ot::json::getObjectList(const JsonValue& _value, const char* _member) {
 	std::list<ot::ConstJsonObject> ret;
-	OT_JSON_getListFromObject(_value, _member, Object, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member, Object, ret, return ret);
 }
 
 std::list<ot::ConstJsonObject> ot::json::getObjectList(const JsonValue& _value, const std::string& _member) {
 	std::list<ot::ConstJsonObject> ret;
-	OT_JSON_getListFromObject(_value, _member.c_str(), Object, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member.c_str(), Object, ret, return ret);
 }
 
 std::list<ot::ConstJsonObject> ot::json::getObjectList(const ConstJsonObject& _value, const char* _member) {
 	std::list<ot::ConstJsonObject> ret;
-	OT_JSON_getListFromObject(_value, _member, Object, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member, Object, ret, return ret);
 }
 
 std::list<ot::ConstJsonObject> ot::json::getObjectList(const ConstJsonObject& _value, const std::string& _member) {
 	std::list<ot::ConstJsonObject> ret;
-	OT_JSON_getListFromObject(_value, _member.c_str(), Object, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member.c_str(), Object, ret, return ret);
 }
 
 std::list<ot::ConstJsonArray> ot::json::getArrayList(const JsonValue& _value, const char* _member) {
 	std::list<ot::ConstJsonArray> ret;
-	OT_JSON_getListFromObject(_value, _member, Array, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member, Array, ret, return ret);
 }
 
 std::list<ot::ConstJsonArray> ot::json::getArrayList(const JsonValue& _value, const std::string& _member) {
 	std::list<ot::ConstJsonArray> ret;
-	OT_JSON_getListFromObject(_value, _member.c_str(), Array, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member.c_str(), Array, ret, return ret);
 }
 
 std::list<ot::ConstJsonArray> ot::json::getArrayList(const ConstJsonObject& _value, const char* _member) {
 	std::list<ot::ConstJsonArray> ret;
-	OT_JSON_getListFromObject(_value, _member, Array, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member, Array, ret, return ret);
 }
 
 std::list<ot::ConstJsonArray> ot::json::getArrayList(const ConstJsonObject& _value, const std::string& _member) {
 	std::list<ot::ConstJsonArray> ret;
-	OT_JSON_getListFromObject(_value, _member.c_str(), Array, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member.c_str(), Array, ret, return ret);
 }
 
 std::vector<bool> ot::json::getBoolVector(const JsonValue& _value, const char* _member, const std::vector<bool>& _default) {
@@ -817,42 +817,42 @@ std::vector<std::string> ot::json::getStringVector(const ConstJsonObject& _value
 
 std::vector<ot::ConstJsonObject> ot::json::getObjectVector(const JsonValue& _value, const char* _member) {
 	std::vector<ot::ConstJsonObject> ret;
-	OT_JSON_getListFromObject(_value, _member, Object, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member, Object, ret, return ret);
 }
 
 std::vector<ot::ConstJsonObject> ot::json::getObjectVector(const JsonValue& _value, const std::string& _member) {
 	std::vector<ot::ConstJsonObject> ret;
-	OT_JSON_getListFromObject(_value, _member.c_str(), Object, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member.c_str(), Object, ret, return ret);
 }
 
 std::vector<ot::ConstJsonObject> ot::json::getObjectVector(const ConstJsonObject& _value, const char* _member) {
 	std::vector<ot::ConstJsonObject> ret;
-	OT_JSON_getListFromObject(_value, _member, Object, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member, Object, ret, return ret);
 }
 
 std::vector<ot::ConstJsonObject> ot::json::getObjectVector(const ConstJsonObject& _value, const std::string& _member) {
 	std::vector<ot::ConstJsonObject> ret;
-	OT_JSON_getListFromObject(_value, _member.c_str(), Object, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member.c_str(), Object, ret, return ret);
 }
 
 std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const JsonValue& _value, const char* _member) {
 	std::vector<ot::ConstJsonArray> ret;
-	OT_JSON_getListFromObject(_value, _member, Array, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member, Array, ret, return ret);
 }
 
 std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const JsonValue& _value, const std::string& _member) {
 	std::vector<ot::ConstJsonArray> ret;
-	OT_JSON_getListFromObject(_value, _member.c_str(), Array, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member.c_str(), Array, ret, return ret);
 }
 
 std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const ConstJsonObject& _value, const char* _member) {
 	std::vector<ot::ConstJsonArray> ret;
-	OT_JSON_getListFromObject(_value, _member, Array, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member, Array, ret, return ret);
 }
 
 std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const ConstJsonObject& _value, const std::string& _member) {
 	std::vector<ot::ConstJsonArray> ret;
-	OT_JSON_getListFromObject(_value, _member.c_str(), Array, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromObject(_value, _member.c_str(), Array, ret, return ret);
 }
 
 bool* ot::json::getBoolArray(const JsonValue& _value, const char* _member, JsonSizeType& _size) {
@@ -1148,19 +1148,19 @@ std::string ot::json::getString(const ConstJsonArray& _value, unsigned int _ix, 
 }
 
 ot::ConstJsonObject ot::json::getObject(const JsonValue& _value, unsigned int _ix) {
-	OT_JSON_getFromArray(_value, _ix, Object, throw std::exception("Invalid type"));
+	OT_JSON_getFromArray(_value, _ix, Object, return JsonDocument().GetConstObject());
 }
 
 ot::ConstJsonObject ot::json::getObject(const ConstJsonArray& _value, unsigned int _ix) {
-	OT_JSON_getFromArray(_value, _ix, Object, throw std::exception("Invalid type"));
+	OT_JSON_getFromArray(_value, _ix, Object, return JsonDocument().GetConstObject());
 }
 
 ot::ConstJsonArray ot::json::getArray(const JsonValue& _value, unsigned int _ix) {
-	OT_JSON_getFromArray(_value, _ix, Array, throw std::exception("Invalid type"));
+	OT_JSON_getFromArray(_value, _ix, Array, return JsonDocument(rapidjson::kArrayType).constRef().GetArray());
 }
 
 ot::ConstJsonArray ot::json::getArray(const ConstJsonArray& _value, unsigned int _ix) {
-	OT_JSON_getFromArray(_value, _ix, Array, throw std::exception("Invalid type"));
+	OT_JSON_getFromArray(_value, _ix, Array, return JsonDocument(rapidjson::kArrayType).constRef().GetArray());
 }
 
 std::list<int32_t> ot::json::getIntList(const JsonValue& _value, unsigned int _ix, const std::list<int32_t>& _default) {
@@ -1215,22 +1215,22 @@ std::list<std::string> ot::json::getStringList(const ConstJsonArray& _value, uns
 
 std::list<ot::ConstJsonObject> ot::json::getObjectList(const JsonValue& _value, unsigned int _ix) {
 	std::list<ot::ConstJsonObject> ret;
-	OT_JSON_getListFromArray(_value, _ix, Object, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromArray(_value, _ix, Object, ret, return ret);
 }
 
 std::list<ot::ConstJsonObject> ot::json::getObjectList(const ConstJsonArray& _value, unsigned int _ix) {
 	std::list<ot::ConstJsonObject> ret;
-	OT_JSON_getListFromArray(_value, _ix, Object, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromArray(_value, _ix, Object, ret, return ret);
 }
 
 std::list<ot::ConstJsonArray> ot::json::getArrayList(const JsonValue& _value, unsigned int _ix) {
 	std::list<ot::ConstJsonArray> ret;
-	OT_JSON_getListFromArray(_value, _ix, Array, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromArray(_value, _ix, Array, ret, return ret);
 }
 
 std::list<ot::ConstJsonArray> ot::json::getArrayList(const ConstJsonArray& _value, unsigned int _ix) {
 	std::list<ot::ConstJsonArray> ret;
-	OT_JSON_getListFromArray(_value, _ix, Array, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromArray(_value, _ix, Array, ret, return ret);
 }
 
 std::vector<int32_t> ot::json::getIntVector(const JsonValue& _value, unsigned int _ix, const std::vector<int32_t>& _default) {
@@ -1285,20 +1285,20 @@ std::vector<std::string> ot::json::getStringVector(const ConstJsonArray& _value,
 
 std::vector<ot::ConstJsonObject> ot::json::getObjectVector(const JsonValue& _value, unsigned int _ix) {
 	std::vector<ot::ConstJsonObject> ret;
-	OT_JSON_getListFromArray(_value, _ix, Object, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromArray(_value, _ix, Object, ret, return ret);
 }
 
 std::vector<ot::ConstJsonObject> ot::json::getObjectVector(const ConstJsonArray& _value, unsigned int _ix) {
 	std::vector<ot::ConstJsonObject> ret;
-	OT_JSON_getListFromArray(_value, _ix, Object, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromArray(_value, _ix, Object, ret, return ret);
 }
 
 std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const JsonValue& _value, unsigned int _ix) {
 	std::vector<ot::ConstJsonArray> ret;
-	OT_JSON_getListFromArray(_value, _ix, Array, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromArray(_value, _ix, Array, ret, return ret);
 }
 
 std::vector<ot::ConstJsonArray> ot::json::getArrayVector(const ConstJsonArray& _value, unsigned int _ix) {
 	std::vector<ot::ConstJsonArray> ret;
-	OT_JSON_getListFromArray(_value, _ix, Array, ret, throw std::exception("Invalid type"));
+	OT_JSON_getListFromArray(_value, _ix, Array, ret, return ret);
 }
