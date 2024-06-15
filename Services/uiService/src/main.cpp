@@ -15,6 +15,7 @@
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/GraphicsItemLoader.h"
+#include "OTWidgets/ApplicationPropertiesManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
@@ -159,6 +160,9 @@ bool initializeAssets(void) {
 }
 
 bool initializeComponents(void) {
+	// Initialize Application Settings
+	ot::ApplicationPropertiesManager::instance().setReplaceExistingPropertiesOnMerge(true);
+
 	// Initialize Widget view manager
 	ot::WidgetViewManager::instance().initialize();
 

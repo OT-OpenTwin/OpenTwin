@@ -67,6 +67,7 @@ void ot::PropertyGridItem::finishSetup(void) {
 	}
 	tree->setItemWidget(this, 0, m_titleLayoutW);
 	tree->setItemWidget(this, 1, m_input->getQWidget());
+	this->setHidden(this->getPropertyData().getPropertyFlags() & Property::IsHidden);
 	this->setFirstColumnSpanned(false);
 }
 

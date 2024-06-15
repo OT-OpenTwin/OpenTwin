@@ -110,8 +110,7 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 	btnLay->addWidget(btnConfirm);
 	btnLay->addWidget(btnCancel);
 
-	// Setup data
-	this->iniData(_config);
+	this->setupFromConfiguration(_config);
 
 	// Setup window
 	this->setWindowTitle("Properties");
@@ -129,6 +128,46 @@ ot::PropertyDialog::~PropertyDialog() {
 	m_treeMap.clear();
 	for (const Property* prop : m_changedProperties) {
 		delete prop;
+	}
+}
+
+void ot::PropertyDialog::setupFromConfiguration(const PropertyDialogCfg& _config) {
+	// Store currently selected navigation item
+	QStringList currentFocus;
+	if (!m_navigation->getTreeWidget()->selectedItems().isEmpty()) {
+		if (m_navigation->getTreeWidget()->selectedItems().count() > 1) {
+			OT_LOG_EA("Multiselection is not supported");
+		}
+		else {
+			QTreeWidgetItem* itm = m_navigation->getTreeWidget()->selectedItems().front();
+			while (itm) {
+				currentFocus.push_front(itm->text(0));
+				itm = itm->parent();
+			}
+		}
+	}
+
+	// Clear data
+	m_treeMap.clear();
+	m_navigation->getTreeWidget()->clear();
+
+	// Add data
+	this->iniData(_config);
+
+	// Restore selected item
+	if (currentFocus.empty()) return;
+
+	QTreeWidgetItem* newFocus = this->findTreeItem(m_navigation->getTreeWidget()->invisibleRootItem(), currentFocus);
+	if (newFocus) {
+		newFocus->setSelected(true);
+
+		newFocus = newFocus->parent();
+
+		while (newFocus) {
+			newFocus->setExpanded(true);
+			newFocus = newFocus->parent();
+		}
+
 	}
 }
 
@@ -238,12 +277,16 @@ ot::PropertyGroup* ot::PropertyDialog::createRootGroupConfig(const PropertyGroup
 	return result;
 }
 
-QTreeWidgetItem* ot::PropertyDialog::findMatchingItem(QTreeWidgetItem* _item, const QString& _text) {
-	if (_item->text(0) == _text) return _item;
-	QTreeWidgetItem* ret = nullptr;
-	for (int i = 0; i < _item->childCount(); i++) {
-		ret = this->findMatchingItem(_item->child(i), _text);
-		if (ret) return ret;
+QTreeWidgetItem* ot::PropertyDialog::findTreeItem(QTreeWidgetItem* _parent, QStringList _path) const {
+	if (_path.isEmpty()) return nullptr;
+	QString txt = _path.front();
+	_path.pop_front();
+
+	for (int i = 0; i < _parent->childCount(); i++) {
+		if (_parent->child(i)->text(0) == txt) {
+			if (_path.isEmpty()) return _parent->child(i);
+			else return this->findTreeItem(_parent->child(i), _path);
+		}
 	}
-	return ret;
+	return nullptr;
 }

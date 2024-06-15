@@ -18,25 +18,7 @@ ot::ApplicationPropertiesManager& ot::ApplicationPropertiesManager::instance(voi
 ot::Dialog::DialogResult ot::ApplicationPropertiesManager::showDialog(void) {
 	this->clearGarbage();
 
-	// Build configuration
-	PropertyGridCfg gridCfg;
-
-	for (const auto& it : m_data) {
-		PropertyGroup* newGroup = new PropertyGroup(it.first);
-		for (PropertyGroup* newChild : it.second.getRootGroups()) {
-			if (!newChild->isEmpty()) {
-				newGroup->addChildGroup(new PropertyGroup(*newChild));
-			}
-		}
-
-		if (!newGroup->isEmpty()) {
-			gridCfg.addRootGroup(newGroup);
-		}
-		else {
-			// Skip empty groups
-			delete newGroup;
-		}
-	}
+	PropertyGridCfg gridCfg = this->buildDialogConfiguration();
 
 	// If there are no properties skip showing the dialog.
 	if (gridCfg.isEmpty()) {
@@ -84,6 +66,11 @@ void ot::ApplicationPropertiesManager::add(const std::string& _owner, const Prop
 	PropertyGridCfg oldConfig = this->findData(_owner);
 	oldConfig.mergeWith(_config, m_propertyReplaceOnMerge);
 	m_data.insert_or_assign(_owner, oldConfig);
+
+	// If the dialog is visible we need to update the properties displayed there.
+	if (m_dialog) {
+		this->updateCurrentDialog();
+	}
 }
 
 void ot::ApplicationPropertiesManager::setDialogTitle(const QString& _title) {
@@ -140,6 +127,40 @@ ot::Property* ot::ApplicationPropertiesManager::createCleanedSlotProperty(const 
 	rootGroup = nullptr;
 
 	return newProperty;
+}
+
+void ot::ApplicationPropertiesManager::updateCurrentDialog(void) {
+	if (!m_dialog) return;
+
+	PropertyDialogCfg dialogCfg;
+	dialogCfg.setGridConfig(this->buildDialogConfiguration());
+
+	m_dialog->setupFromConfiguration(dialogCfg);
+	m_dialog->setWindowTitle(m_dialogTitle);
+}
+
+ot::PropertyGridCfg ot::ApplicationPropertiesManager::buildDialogConfiguration(void) {
+	// Build configuration
+	PropertyGridCfg gridCfg;
+
+	for (const auto& it : m_data) {
+		PropertyGroup* newGroup = new PropertyGroup(it.first);
+		for (PropertyGroup* newChild : it.second.getRootGroups()) {
+			if (!newChild->isEmpty()) {
+				newGroup->addChildGroup(new PropertyGroup(*newChild));
+			}
+		}
+
+		if (!newGroup->isEmpty()) {
+			gridCfg.addRootGroup(newGroup);
+		}
+		else {
+			// Skip empty groups
+			delete newGroup;
+		}
+	}
+
+	return gridCfg;
 }
 
 void ot::ApplicationPropertiesManager::clearGarbage(void) {

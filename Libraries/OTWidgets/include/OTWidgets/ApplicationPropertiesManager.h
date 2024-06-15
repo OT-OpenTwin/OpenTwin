@@ -81,6 +81,10 @@ namespace ot {
 		//! The owner will be set to the root group name before the root is removed.
 		Property* createCleanedSlotProperty(const Property* _property, std::string& _owner);
 		
+		void updateCurrentDialog(void);
+
+		PropertyGridCfg buildDialogConfiguration(void);
+
 		void clearGarbage(void);
 
 		ApplicationPropertiesManager();

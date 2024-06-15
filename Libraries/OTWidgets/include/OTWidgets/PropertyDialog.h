@@ -36,6 +36,10 @@ namespace ot {
 		PropertyDialog(const PropertyDialogCfg& _config, QWidget* _parentWidget = (QWidget*)nullptr);
 		virtual ~PropertyDialog();
 
+		//! \brief Sets up this dialog from the provided configuration.
+		//! Existing data will be removed.
+		void setupFromConfiguration(const PropertyDialogCfg& _config);
+
 		const PropertyGrid* const getPropertyGrid(void) const { return m_grid; };
 
 		const std::list<const Property*>& getChangedProperties(void) const { return m_changedProperties; };
@@ -72,10 +76,7 @@ namespace ot {
 		//! The resulted structure may look like this: "Root/Child/ActualGroup (the group provided)".
 		PropertyGroup* createRootGroupConfig(const PropertyGroup* _group);
 
-		//! \brief Returns the first item matching the text.
-		//! Returns _item if it matches.
-		//! Calls this function for all childs of _item.
-		QTreeWidgetItem* findMatchingItem(QTreeWidgetItem* _item, const QString& _text);
+		QTreeWidgetItem* findTreeItem(QTreeWidgetItem* _parent, QStringList _path) const;
 
 		std::map<QTreeWidgetItem*, PropertyDialogEntry> m_treeMap;
 

@@ -172,8 +172,6 @@ void ot::PropertyGroup::mergeWith(const PropertyGroup& _other, bool _replaceExis
 			}
 		}
 
-		if (replaced) break;
-
 		if (!found) {
 			Property* newProperty = prop->createCopy();
 			newProperty->setParentGroup(this);
