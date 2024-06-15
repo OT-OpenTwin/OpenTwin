@@ -181,13 +181,6 @@ namespace ak {
 			const QString &										_text = QString("")
 		);
 
-		//! @brief Will create a new options dialog and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		UID createOptionsDialog(
-			UID												_creatorUid,
-			const QString &										_title
-		);
-
 		//! @brief Will create a new special TabBar and return its UID
 		//! @param _creatorUid The UID of the creator who creates this object
 		UID createSpecialTabBar(

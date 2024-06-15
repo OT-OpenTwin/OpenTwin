@@ -975,7 +975,7 @@ void ViewerAPI::createRubberband(ot::UID _viewerID, ot::serviceID_t _senderId, s
 	viewer->second->createRubberband(_senderId, _note, _configurationJson);
 }
 
-void ViewerAPI::settingsItemChanged(ot::UID _viewerID, ot::AbstractSettingsItem * _item) {
+void ViewerAPI::settingsItemChanged(ot::UID _viewerID, const ot::Property* _item) {
 	auto viewer = viewerManager.find(_viewerID);
 	if (viewer == viewerManager.end()) {
 		assert(0);

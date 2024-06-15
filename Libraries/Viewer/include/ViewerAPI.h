@@ -19,9 +19,7 @@
 class Model;
 class QPen;
 namespace ot { class Property; }
-namespace ot { class SettingsData; }
 namespace ot { class WidgetView; }
-namespace ot { class AbstractSettingsItem; }
 
 namespace ViewerAPI
 {
@@ -71,11 +69,11 @@ namespace ViewerAPI
 
 		virtual void rubberbandFinished(ot::serviceID_t creatorId, const std::string &note, const std::string &pointJson, const std::vector<double> &transform) {}
 
-		virtual void updateSettings(ot::SettingsData * _data) {};
+		virtual void updateSettings(const ot::PropertyGridCfg& _config) {};
 
-		virtual void loadSettings(ot::SettingsData * _data) {};
+		virtual void loadSettings(ot::PropertyGridCfg& _config) {};
 
-		virtual void saveSettings(ot::SettingsData * _data) {};
+		virtual void saveSettings(const ot::PropertyGridCfg& _config) {};
 
 		virtual void updateVTKEntity(unsigned long long modelEntityID) {};
 
@@ -171,7 +169,6 @@ namespace ViewerAPI
 	__declspec(dllexport) ot::UID getModelEntityIDFromTreeID(ot::UID treeID);
 	__declspec(dllexport) ot::UID getTreeIDFromModelEntityID(ot::UID treeID);
 
-
 	__declspec(dllexport) void removeShapes(ot::UID osgModelID, std::list<unsigned long long> modelEntityID);
 	__declspec(dllexport) void setShapeVisibility(ot::UID osgModelID, std::list<unsigned long long> visibleID, std::list<unsigned long long> hiddenID);
 	__declspec(dllexport) void hideEntities(ot::UID osgModelID, std::list<unsigned long long> hiddenID);
@@ -224,7 +221,7 @@ namespace ViewerAPI
 
 	__declspec(dllexport) void createRubberband(ot::UID _viewerID, ot::serviceID_t _senderId, std::string & _note, const std::string & _configurationJson);
 
-	__declspec(dllexport) void settingsItemChanged(ot::UID _viewerID, ot::AbstractSettingsItem * _item);
+	__declspec(dllexport) void settingsItemChanged(ot::UID _viewerID, const ot::Property* _property);
 
 	__declspec(dllexport) void contextMenuItemClicked(ot::UID _viewerID, const std::string& _menuName, const std::string& _itemName);
 

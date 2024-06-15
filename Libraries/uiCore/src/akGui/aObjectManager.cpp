@@ -22,7 +22,6 @@
 #include <akCore/aUidMangager.h>
 
 // AK Dialogs
-#include <akDialogs/aOptionsDialog.h>
 #include <akDialogs/aPromptDialog.h>
 
 // AK GUI header
@@ -311,19 +310,6 @@ ak::UID ak::aObjectManager::createPushButton(
 	aPushButtonWidget * obj = new aPushButtonWidget(_icon, _text);
 	// Set parameter
 	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createOptionsDialog(
-	UID												_creatorUid,
-	const QString &										_title
-) {
-	// Create object
-	aOptionsDialog * obj = new aOptionsDialog(aOptionsDialog::optionsApplySaveCancel);
-	obj->setUid(m_uidManager->getId());
 	// Store data
 	m_mapObjects.insert_or_assign(obj->uid(), obj);
 	addCreatedUid(_creatorUid, obj->uid());

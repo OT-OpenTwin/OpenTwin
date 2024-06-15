@@ -215,16 +215,6 @@
     <ClCompile Include="src\akCore\aSingletonAllowedMessages.cpp" />
     <ClCompile Include="src\akCore\aTime.cpp" />
     <ClCompile Include="src\akCore\aUidManager.cpp" />
-    <ClCompile Include="src\akDialogs\aOptionsDialog.cpp">
-      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
-      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">input</DynamicSource>
-      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
-      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">%(Filename).moc</QtMocFileName>
-      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
-      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
-      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
-      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
-    </ClCompile>
     <ClCompile Include="src\akDialogs\aPromptDialog.cpp" />
     <ClCompile Include="src\akGui\aAction.cpp" />
     <ClCompile Include="src\akGui\aColor.cpp" />
@@ -289,7 +279,6 @@
     <ClInclude Include="include\akCore\aTime.h" />
     <ClInclude Include="include\akCore\aUidMangager.h" />
     <ClInclude Include="include\akCore\globalDataTypes.h" />
-    <QtMoc Include="include\akDialogs\aOptionsDialog.h" />
     <ClInclude Include="include\akGui\aColor.h" />
     <QtMoc Include="include\akGui\aContextMenuItem.h" />
     <QtMoc Include="include\akGui\aDialog.h" />

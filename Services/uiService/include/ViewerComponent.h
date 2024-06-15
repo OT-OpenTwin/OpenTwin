@@ -28,8 +28,8 @@
 namespace ak { class aTreeWidget; };
 namespace ot { class Property; }
 namespace ot { class WidgetView; }
-namespace ot { class SettingsData; }
-namespace ot { class AbstractSettingsItem; }
+
+#define VIEWER_SETTINGS_NAME "View"
 
 class ViewerComponent : public ViewerAPI::Notifier , public ak::aNotifier, public ot::ServiceBase
 {
@@ -82,11 +82,11 @@ public:
 
 	virtual void rubberbandFinished(ot::serviceID_t creatorId, const std::string &note, const std::string &pointJson, const std::vector<double> &transform) override;
 
-	virtual void updateSettings(ot::SettingsData * _data) override;
+	virtual void updateSettings(const ot::PropertyGridCfg& _config) override;
 
-	virtual void loadSettings(ot::SettingsData * _data) override;
+	virtual void loadSettings(ot::PropertyGridCfg& _config) override;
 
-	virtual void saveSettings(ot::SettingsData * _data) override;
+	virtual void saveSettings(const ot::PropertyGridCfg& _config) override;
 
 	virtual void updateVTKEntity(unsigned long long modelEntityID) override;
 
@@ -178,7 +178,7 @@ public:
 
 	void shortcutActivated(const std::string &keySequence);
 
-	void settingsItemChanged(ot::AbstractSettingsItem * _item);
+	void settingsItemChanged(const ot::Property* _property);
 
 	void contextMenuItemClicked(const std::string& _menuName, const std::string& _itemName);
 

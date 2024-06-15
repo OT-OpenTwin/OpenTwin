@@ -8,6 +8,7 @@
 
 // OpenTwin header
 #include "OTCore/OTObjectBase.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
 
 // std header
@@ -75,6 +76,8 @@ namespace ot {
 			ApplicationBase * application(void) const { return m_application; };
 
 			ComponentState componentState(void) const { return m_componentState; };
+
+			void updateSettingsFromDataBase(PropertyGridCfg& _config);
 
 		private:
 			// #####################################################################################################################################

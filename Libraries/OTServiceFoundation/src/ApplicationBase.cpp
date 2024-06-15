@@ -9,13 +9,14 @@
 #include "OTCore/Logger.h"
 #include "OTCore/ThisService.h"
 
+#include "OTGui/Property.h"
+#include "OTGui/PropertyGroup.h"
 #include "OTGuiAPI/GuiAPIManager.h"
 
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTCommunication/Msg.h"				// message sending
 #include "OTCommunication/IpConverter.h"
 
-#include "OTServiceFoundation/SettingsData.h"
 #include "OTServiceFoundation/ApplicationBase.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -24,7 +25,10 @@
 #include "OTServiceFoundation/AbstractModelNotifier.h"
 #include "OTServiceFoundation/ModalCommandBase.h"
 
-#include <DataBase.h>
+#include "DataBase.h"
+#include "Document\DocumentAccess.h"
+#include "Connection\ConnectionAPI.h"
+
 #include "TemplateDefaultManager.h"
 
 // Third party header
@@ -336,6 +340,162 @@ bool ot::ApplicationBase::EnsureDataBaseConnection(void)
 	return DataBase::GetDataBase()->InitializeConnection(m_databaseURL, m_siteID);;
 }
 
+bool ot::ApplicationBase::storeSettingToDataBase(const PropertyGridCfg& _config, const std::string& _databaseURL, const std::string& _siteID, const std::string& _userName, const std::string& _userPassword, const std::string& _userCollection) {
+	if (_databaseURL.empty()) {
+		OT_LOG_EA("DataBase URL not set");
+		return false;
+	}
+	if (_userName.empty()) {
+		OT_LOG_EA("User name not set");
+		return false;
+	}
+	if (_userPassword.empty()) {
+		OT_LOG_EA("User password not set");
+		return false;
+	}
+	if (_userCollection.empty()) {
+		OT_LOG_EA("User collection not set");
+		return false;
+	}
+
+	std::string settingsKey = this->getBasicServiceInformation().serviceName() + "Settings";
+
+	try
+	{
+		// Ensure that we are connected to the database server
+		DataStorageAPI::ConnectionAPI::establishConnection(_databaseURL, _siteID, _userName, _userPassword);
+
+		// First, open a connection to the user's settings collection
+		DataStorageAPI::DocumentAccess docManager("UserSettings", _userCollection);
+
+		// Now we search for the document with the given name
+		auto queryDoc = bsoncxx::builder::basic::document{};
+		queryDoc.append(bsoncxx::builder::basic::kvp("SettingName", settingsKey));
+
+		auto filterDoc = bsoncxx::builder::basic::document{};
+
+		auto result = docManager.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
+
+		JsonDocument propertyDoc;
+		_config.addToJsonObject(propertyDoc, propertyDoc.GetAllocator());
+
+		if (!result.getSuccess())
+		{
+			// The setting does not yet exist -> write a new one
+			auto newDoc = bsoncxx::builder::basic::document{};
+			newDoc.append(bsoncxx::builder::basic::kvp("SettingName", settingsKey));
+			newDoc.append(bsoncxx::builder::basic::kvp("Data", propertyDoc.toJson()));
+
+			docManager.InsertDocumentToDatabase(newDoc.extract(), false);
+		}
+		else
+		{
+			// The setting already exists -> replace the settings
+			try
+			{
+				// Find the entry corresponding to the project in the collection
+				auto doc_find = bsoncxx::builder::stream::document{} << "SettingName" << settingsKey << bsoncxx::builder::stream::finalize;
+
+				auto doc_modify = bsoncxx::builder::stream::document{}
+					<< "$set" << bsoncxx::builder::stream::open_document
+					<< "Data" << propertyDoc.toJson()
+					<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+				mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("UserSettings", _userCollection);
+
+				bsoncxx::stdx::optional<mongocxx::result::update> result = collection.update_many(doc_find.view(), doc_modify.view());
+			}
+			catch (std::exception _e)
+			{
+				OT_LOG_EAS(_e.what());
+				return false;
+			}
+		}
+	}
+	catch (std::exception _e)
+	{
+		OT_LOG_EAS(_e.what());
+		return false;
+	}
+
+	return true;  // Successfully stored the settings
+}
+
+ot::PropertyGridCfg ot::ApplicationBase::getSettingsFromDataBase(const std::string& _databaseURL, const std::string& _siteID, const std::string& _userName, const std::string& _userPassword, const std::string& _userCollection) {
+	if (_databaseURL.empty()) {
+		OT_LOG_EA("DataBase URL not set");
+		return PropertyGridCfg();
+	}
+	if (_userName.empty()) {
+		OT_LOG_EA("User name not set");
+		return PropertyGridCfg();
+	}
+	if (_userPassword.empty()) {
+		OT_LOG_EA("User password not set");
+		return PropertyGridCfg();
+	}
+	if (_userCollection.empty()) {
+		OT_LOG_EA("User collection not set");
+		return PropertyGridCfg();
+	}
+
+	std::string settingsKey = this->getBasicServiceInformation().serviceName() + "Settings";
+
+	try
+	{
+		// Ensure that we are connected to the database server
+		DataStorageAPI::ConnectionAPI::establishConnection(_databaseURL, _siteID, _userName, _userPassword);
+
+		// First, open a connection to the user's settings collection
+		DataStorageAPI::DocumentAccess docManager("UserSettings", _userCollection);
+
+		// Now we search for the document with the given name
+		auto queryDoc = bsoncxx::builder::basic::document{};
+		queryDoc.append(bsoncxx::builder::basic::kvp("SettingName", settingsKey));
+
+		auto filterDoc = bsoncxx::builder::basic::document{};
+
+		auto result = docManager.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
+
+		if (!result.getSuccess())
+		{
+			return PropertyGridCfg();  // We could not find the document, but this is a standard case when the settings have not yet been stored
+		}
+
+		// Now we have found some settings, so retrieve the data
+		std::string settingsJSON;
+		try
+		{
+			bsoncxx::builder::basic::document doc;
+			doc.append(bsoncxx::builder::basic::kvp("Found", result.getBsonResult().value()));
+
+			auto doc_view = doc.view()["Found"].get_document().view();
+
+			settingsJSON = doc_view["Data"].get_utf8().value.data();
+		}
+		catch (std::exception _e)
+		{
+			// Something went wrong with accessing the settings data
+			OT_LOG_EAS(_e.what());
+			return PropertyGridCfg();
+		}
+
+		// Create new settings from json string
+		JsonDocument importedSettings;
+		importedSettings.fromJson(settingsJSON);
+
+		PropertyGridCfg newConfig;
+		newConfig.setFromJsonObject(importedSettings.GetConstObject());
+
+		return newConfig;
+	}
+	catch (std::exception _e)
+	{
+		OT_LOG_EAS(_e.what());
+		return PropertyGridCfg();
+	}
+}
+
 // ##########################################################################################################################################
 
 // Private functions
@@ -353,43 +513,31 @@ std::string ot::ApplicationBase::handleKeySequenceActivated(JsonDocument& _docum
 }
 
 std::string ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _document) {
-	ot::SettingsData * data = ot::SettingsData::parseFromJsonDocument(_document);
-	if (data) {
-		std::list<ot::AbstractSettingsItem *> items = data->items();
-		if (items.empty()) {
-			delete data;
-			return OT_ACTION_RETURN_INDICATOR_Error "SettingsData does not contain any items";
+	PropertyGridCfg gridConfig;
+	gridConfig.setFromJsonObject(json::getObject(_document, OT_ACTION_PARAM_Config));
+
+	std::list<Property*> properties = gridConfig.getAllProperties();
+	if (properties.empty()) return std::string();
+
+	bool requireSettingsUpdate = false;
+	for (const Property* prop : properties) {
+		if (this->settingChanged(prop)) {
+			requireSettingsUpdate = true;
 		}
-		else if (items.size() > 1) {
-			delete data;
-			return OT_ACTION_RETURN_INDICATOR_Error "SettingsData does contain more than 1 item";
-		}
-		if (settingChanged(items.front())) {
-			ot::SettingsData * newData = createSettings();
-			newData->saveToDatabase(m_databaseURL, m_siteID, DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_DBuserCollection);
-			if (newData) {
-				if (m_uiComponent) {
-					m_uiComponent->sendSettingsData(newData);
-				}
-				else {
-					OTAssert(0, "Settings changed received but no UI is conencted");
-				}
-				delete newData;
-			}
-		}
-		else {
-			ot::SettingsData * newData = createSettings();
-			if (newData) {
-				newData->saveToDatabase(m_databaseURL, m_siteID, DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_DBuserCollection);
-				delete newData;
-			}
-		}
-		delete data;
-		return OT_ACTION_RETURN_VALUE_OK;
 	}
-	else {
-		return OT_ACTION_RETURN_INDICATOR_Error "Failed to parse SettingsData";
+
+	PropertyGridCfg newSettings = this->createSettings();
+	if (newSettings.isEmpty()) return "";
+
+	if (!this->storeSettingToDataBase(newSettings, m_databaseURL, m_siteID, DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_DBuserCollection)) {
+		return OT_ACTION_RETURN_INDICATOR_Error "Failed to store settings";
 	}
+
+	if (requireSettingsUpdate) {
+		m_uiComponent->sendSettingsData(newSettings);
+	}
+
+	return "";
 }
 
 std::string ot::ApplicationBase::handleContextMenuItemClicked(JsonDocument& _document) {
@@ -444,11 +592,8 @@ void ot::ApplicationBase::__serviceConnected(const std::string & _name, const st
 
 		this->enableMessageQueuing(m_uiComponent->serviceName(), true);
 
-		SettingsData * serviceSettings = createSettings();
-		if (serviceSettings) {
-			m_uiComponent->sendSettingsData(serviceSettings);
-			delete serviceSettings;
-		}
+		m_uiComponent->sendSettingsData(this->createSettings());
+		
 		this->uiConnected(m_uiComponent);
 		m_uiComponent->sendUpdatedControlState();
 		m_uiComponent->notifyUiSetupCompleted();

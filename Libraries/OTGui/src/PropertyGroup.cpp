@@ -234,6 +234,28 @@ std::list<ot::Property*> ot::PropertyGroup::getAllProperties(void) const {
 	return ret;
 }
 
+ot::Property* ot::PropertyGroup::findPropertyByPath(std::list<std::string> _path) const {
+	if (_path.empty()) return nullptr;
+	std::string rootName = _path.front();
+	_path.pop_front();
+
+	if (_path.empty()) {
+		for (Property* prop : m_properties) {
+			if (prop->getPropertyName() == rootName) {
+				return prop;
+			}
+		}
+	}
+	else {
+		for (const PropertyGroup* group : m_childGroups) {
+			if (group->getName() == rootName) {
+				return group->findPropertyByPath(_path);
+			}
+		}
+	}
+	return nullptr;
+}
+
 void ot::PropertyGroup::setChildGroups(const std::list<PropertyGroup*>& _groups) {
 	for (PropertyGroup* child : m_childGroups) {
 		delete child;

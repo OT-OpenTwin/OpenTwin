@@ -20,7 +20,6 @@
 #include "OTCommunication/ActionDispatcher.h"
 
 #include "OTServiceFoundation/ApplicationBase.h"
-#include "OTServiceFoundation/SettingsData.h"
 #include "OTServiceFoundation/UiPluginComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ExternalServicesComponent.h"	// Corresponding header
@@ -411,6 +410,20 @@ void ot::intern::ExternalServicesComponent::shutdown(bool _requestedAsCommand) {
 	t.detach();
 }
 
+void ot::intern::ExternalServicesComponent::updateSettingsFromDataBase(PropertyGridCfg& _config) {
+	if (_config.isEmpty()) return;
+
+	OTAssertNullptr(m_application);
+
+	PropertyGridCfg oldConfig = m_application->getSettingsFromDataBase(DataBase::GetDataBase()->getDataBaseServerURL(), DataBase::GetDataBase()->getSiteIDString(), DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword(), m_application->m_DBuserCollection);
+
+	if (!oldConfig.isEmpty()) {
+		_config.mergeWith(oldConfig, true);
+	}
+
+	m_application->settingsSynchronized(_config);
+}
+
 // #####################################################################################################################################
 
 // Private functions
@@ -507,18 +520,8 @@ std::string ot::intern::ExternalServicesComponent::handleRun(JsonDocument& _docu
 		responseDoc.fromJson(response);
 
 		{
-			SettingsData * serviceSettings = m_application->createSettings();
-			if (serviceSettings) {
-				if (serviceSettings->refreshValuesFromDatabase(DataBase::GetDataBase()->getDataBaseServerURL(), 
-															   DataBase::GetDataBase()->getSiteIDString(), 
-															   DataBase::GetDataBase()->getUserName(), 
-															   DataBase::GetDataBase()->getUserPassword(), 
-															   m_application->m_DBuserCollection)) 
-				{
-					m_application->settingsSynchronized(serviceSettings);
-				}
-				delete serviceSettings;
-			}
+			PropertyGridCfg settingsConfig = m_application->createSettings();
+			this->updateSettingsFromDataBase(settingsConfig);
 		}
 
 		auto serviceList = ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_SESSION_SERVICES);

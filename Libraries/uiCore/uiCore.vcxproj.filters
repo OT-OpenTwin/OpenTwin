@@ -234,9 +234,6 @@
     <ClCompile Include="src\akGui\aGlobalKeyListener.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
-    <ClCompile Include="src\akDialogs\aOptionsDialog.cpp">
-      <Filter>Source Files\ak\Dialogs</Filter>
-    </ClCompile>
     <ClCompile Include="src\akGui\aToolButtonCustomContextMenu.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
@@ -429,9 +426,6 @@
     </QtMoc>
     <QtMoc Include="include\akGui\aDialog.h">
       <Filter>Header Files\ak\Gui</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akDialogs\aOptionsDialog.h">
-      <Filter>Header Files\ak\Dialogs</Filter>
     </QtMoc>
     <QtMoc Include="include\akGui\aToolButtonCustomContextMenu.h">
       <Filter>Header Files\ak\Gui</Filter>

@@ -95,6 +95,11 @@ namespace ot {
 		//! \brief Returns all properties of all groups and nested groups.
 		std::list<Property*> getAllProperties(void) const;
 
+		//! \brief Returns the property at the given path.
+		//! The path contains the group names from root to the item.
+		//! The last path entry must be the property name.
+		Property* findPropertyByPath(std::list<std::string> _path) const;
+
 		//! @brief Set the child groups.
 		//! This group takes ownership of the groups.
 		void setChildGroups(const std::list<PropertyGroup*>& _groups);

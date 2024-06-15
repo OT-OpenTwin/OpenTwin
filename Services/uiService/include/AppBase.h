@@ -200,9 +200,13 @@ public:
 
 public:
 
-	void viewerSettingsChanged(ot::AbstractSettingsItem * _item);
+	void initializeDefaultUserSettings(void);
 
-	void settingsChanged(ot::ServiceBase * _owner, ot::AbstractSettingsItem * _item);
+	void frontendSettingsChanged(const ot::Property* _property);
+
+	void viewerSettingsChanged(const ot::Property* _property);
+
+	void settingsChanged(const std::string& _owner, const ot::Property* _property);
 
 	void setWaitingAnimationVisible(bool flag);
 
@@ -296,6 +300,10 @@ public:
 
 	void restoreSessionState(void);
 	void storeSessionState(void);
+
+	bool storeSettingToDataBase(const ot::PropertyGridCfg& _config, const std::string& _subKey);
+
+	ot::PropertyGridCfg getSettingsFromDataBase(const std::string& _subKey);
 
 public Q_SLOTS:
 

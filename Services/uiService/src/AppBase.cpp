@@ -6,6 +6,7 @@
 // uiService header
 #include "AppBase.h"		// Corresponding header
 #include "UserSettings.h"
+#include "ServiceDataUi.h"
 #include "ViewerComponent.h"	// Viewer component
 #include "ExternalServicesComponent.h"		// ExternalServices component
 #include "debugNotifier.h"		// DebugNotifier
@@ -44,6 +45,7 @@
 
 // Open twin header
 #include "DataBase.h"
+
 #include "OTCore/Logger.h"
 #include "OTCore/Flags.h"
 #include "OTCore/OTAssert.h"
@@ -56,7 +58,6 @@
 #include "OTGui/PropertyStringList.h"
 #include "OTCommunication/UiTypes.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTServiceFoundation/SettingsData.h"
 #include "OTWidgets/GraphicsPickerView.h"
 #include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/GraphicsScene.h"
@@ -263,7 +264,7 @@ bool AppBase::logIn(void) {
 		// Restore view state
 		ot::WidgetViewManager::instance().restoreState(m_currentStateWindow.view);
 
-		UserSettings::instance()->initializeData();
+		this->initializeDefaultUserSettings();
 
 		m_state &= (~RestoringSettingsState);
 	}
@@ -1042,44 +1043,82 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 	}
 }
 
-void AppBase::viewerSettingsChanged(ot::AbstractSettingsItem * _item) {
+void AppBase::initializeDefaultUserSettings(void) {
 	if (m_viewerComponent) {
-		m_viewerComponent->settingsItemChanged(_item);
+		
+	}
+
+	ot::PropertyGridCfg frontendSettings;
+	ot::PropertyGroup* appearance = new ot::PropertyGroup("Appearance");
+	std::list<std::string> opt;
+	opt.push_back(ot::toString(ot::ColorStyleName::BrightStyle));
+	opt.push_back(ot::toString(ot::ColorStyleName::DarkStyle));
+	opt.push_back(ot::toString(ot::ColorStyleName::BlueStyle));
+
+	ot::PropertyStringList* colorStyle = new ot::PropertyStringList("Color Style", ot::GlobalColorStyle::instance().getCurrentStyleName(), opt);
+	appearance->addProperty(colorStyle);
+
+	frontendSettings.addRootGroup(appearance);
+	UserSettings::instance().addSettings("General", frontendSettings);
+}
+
+void AppBase::frontendSettingsChanged(const ot::Property* _property) {
+	if (_property->getPropertyPath() == "Appearance/Color Style") {
+		const ot::PropertyStringList* actualProperty = dynamic_cast<const ot::PropertyStringList *>(_property);
+		if (!actualProperty) {
+			OT_LOG_EA("Property cast failed");
+			return;
+		}
+		if (ot::GlobalColorStyle::instance().hasStyle(actualProperty->getCurrent())) {
+			ot::GlobalColorStyle::instance().setCurrentStyle(actualProperty->getCurrent());
+		}
+	}
+}
+
+void AppBase::viewerSettingsChanged(const ot::Property* _property) {
+	if (m_viewerComponent) {
+		m_viewerComponent->settingsItemChanged(_property);
 	}
 	else {
 		OTAssert(0, "No viewer component found");
 	}
 }
 
-void AppBase::settingsChanged(ot::ServiceBase * _owner, ot::AbstractSettingsItem * _item) {
-	if (_item->parentGroup() == nullptr) { OTAssert(0, "Item is not attached to a group"); return; }
-	if (_owner == nullptr) { OTAssert(0, "No settings owner provided"); return; }
-	ot::SettingsData * data = new ot::SettingsData("DataChangedEvent", "1.0");
-	ot::SettingsGroup * group = new ot::SettingsGroup(_item->parentGroup()->name(), _item->parentGroup()->title());
-	ot::SettingsGroup * groupOrigin = _item->parentGroup();
-	group->addItem(_item->createCopy());
-	while (groupOrigin->parentGroup()) {
-		groupOrigin = groupOrigin->parentGroup();
-		ot::SettingsGroup * parentGroup = new ot::SettingsGroup(groupOrigin->name(), groupOrigin->title());
-		parentGroup->addSubgroup(group);
-		group = parentGroup;
+void AppBase::settingsChanged(const std::string& _owner, const ot::Property* _property) {
+	if (_owner == "General") {
+		this->frontendSettingsChanged(_property);
 	}
-	data->addGroup(group);
+	else if (_owner == VIEWER_SETTINGS_NAME) {
+		this->viewerSettingsChanged(_property);
+	}
+
+	ServiceDataUi* serviceInfo = m_ExternalServicesComponent->getServiceFromName(_owner);
+	if (!serviceInfo) {
+		OT_LOG_EAS("Service \"" + _owner + "\" not found");
+		return;
+	}
+
+	ot::Property* newProperty = _property->createCopyWithParents();
+	OTAssertNullptr(newProperty->getRootGroup());
+	ot::PropertyGridCfg newConfig;
+	newConfig.addRootGroup(newProperty->getRootGroup());
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SettingsItemChanged, doc.GetAllocator()), doc.GetAllocator());
-	data->addToJsonDocument(doc);
-	delete data;
+
+	ot::JsonObject configObj;
+	newConfig.addToJsonObject(configObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
 
 	std::string response;
-	m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::QUEUE, _owner->serviceURL(), doc, response);
+	m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::QUEUE, serviceInfo->serviceURL(), doc, response);
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		OTAssert(0, "Error from service");
-		appendInfoMessage(QString("[ERROR] Sending message resulted in error: ") + response.c_str() + "\n");
+		OT_LOG_E(response);
+		this->appendInfoMessage(QString("[ERROR] Sending message resulted in error: ") + response.c_str() + "\n");
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		OTAssert(0, "Warning from service");
-		appendInfoMessage(QString("[WARNING] Sending message resulted in error: ") + response.c_str() + "\n");
+		OT_LOG_W(response);
+		this->appendInfoMessage(QString("[WARNING] Sending message resulted in error: ") + response.c_str() + "\n");
 	}
 }
 
@@ -1531,6 +1570,129 @@ void AppBase::storeSessionState(void) {
 
 	m_currentStateWindow.view = ot::WidgetViewManager::instance().saveState();
 	uM.storeSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType, m_currentStateWindow.view);
+}
+
+bool AppBase::storeSettingToDataBase(const ot::PropertyGridCfg& _config, const std::string& _subKey) {
+	std::string settingsKey = _subKey + "Settings";
+	/*
+	try
+	{
+		// Ensure that we are connected to the database server
+		DataStorageAPI::ConnectionAPI::establishConnection(m_loginData.getDatabaseUrl(), "1", m_loginData.getUserName(), m_loginData.getUserPassword());
+
+		// First, open a connection to the user's settings collection
+		DataStorageAPI::DocumentAccess docManager("UserSettings", this->getCurrentUserCollection());
+
+		// Now we search for the document with the given name
+		auto queryDoc = bsoncxx::builder::basic::document{};
+		queryDoc.append(bsoncxx::builder::basic::kvp("SettingName", settingsKey));
+
+		auto filterDoc = bsoncxx::builder::basic::document{};
+
+		auto result = docManager.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
+
+		ot::JsonDocument propertyDoc;
+		_config.addToJsonObject(propertyDoc, propertyDoc.GetAllocator());
+
+		if (!result.getSuccess())
+		{
+			// The setting does not yet exist -> write a new one
+			auto newDoc = bsoncxx::builder::basic::document{};
+			newDoc.append(bsoncxx::builder::basic::kvp("SettingName", settingsKey));
+			newDoc.append(bsoncxx::builder::basic::kvp("Data", propertyDoc.toJson()));
+
+			docManager.InsertDocumentToDatabase(newDoc.extract(), false);
+		}
+		else
+		{
+			// The setting already exists -> replace the settings
+			try
+			{
+				// Find the entry corresponding to the project in the collection
+				auto doc_find = bsoncxx::builder::stream::document{} << "SettingName" << settingsKey << bsoncxx::builder::stream::finalize;
+
+				auto doc_modify = bsoncxx::builder::stream::document{}
+					<< "$set" << bsoncxx::builder::stream::open_document
+					<< "Data" << propertyDoc.toJson()
+					<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+				mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("UserSettings", this->getCurrentUserCollection());
+
+				bsoncxx::stdx::optional<mongocxx::result::update> result = collection.update_many(doc_find.view(), doc_modify.view());
+			}
+			catch (std::exception _e)
+			{
+				OT_LOG_EAS(_e.what());
+				return false;
+			}
+		}
+	}
+	catch (std::exception _e)
+	{
+		OT_LOG_EAS(_e.what());
+		return false;
+	}
+	*/
+	return true;  // Successfully stored the settings
+}
+
+ot::PropertyGridCfg AppBase::getSettingsFromDataBase(const std::string& _subKey) {
+	return ot::PropertyGridCfg();
+	/*std::string settingsKey = _subKey + "Settings";
+
+	try
+	{
+		// Ensure that we are connected to the database server
+		DataStorageAPI::ConnectionAPI::establishConnection(m_loginData.getDatabaseUrl(), "1", m_loginData.getUserName(), m_loginData.getUserPassword());
+
+		// First, open a connection to the user's settings collection
+		DataStorageAPI::DocumentAccess docManager("UserSettings", this->getCurrentUserCollection());
+
+		// Now we search for the document with the given name
+		auto queryDoc = bsoncxx::builder::basic::document{};
+		queryDoc.append(bsoncxx::builder::basic::kvp("SettingName", settingsKey));
+
+		auto filterDoc = bsoncxx::builder::basic::document{};
+
+		auto result = docManager.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
+
+		if (!result.getSuccess())
+		{
+			return ot::PropertyGridCfg();  // We could not find the document, but this is a standard case when the settings have not yet been stored
+		}
+
+		// Now we have found some settings, so retrieve the data
+		std::string settingsJSON;
+		try
+		{
+			bsoncxx::builder::basic::document doc;
+			doc.append(bsoncxx::builder::basic::kvp("Found", result.getBsonResult().value()));
+
+			auto doc_view = doc.view()["Found"].get_document().view();
+
+			settingsJSON = doc_view["Data"].get_utf8().value.data();
+		}
+		catch (std::exception _e)
+		{
+			// Something went wrong with accessing the settings data
+			OT_LOG_EAS(_e.what());
+			return ot::PropertyGridCfg();
+		}
+
+		// Create new settings from json string
+		ot::JsonDocument importedSettings;
+		importedSettings.fromJson(settingsJSON);
+
+		ot::PropertyGridCfg newConfig;
+		newConfig.setFromJsonObject(importedSettings.GetConstObject());
+
+		return newConfig;
+	}
+	catch (std::exception _e)
+	{
+		OT_LOG_EAS(_e.what());
+		return ot::PropertyGridCfg();
+	}*/
 }
 
 // #################################################################################################################

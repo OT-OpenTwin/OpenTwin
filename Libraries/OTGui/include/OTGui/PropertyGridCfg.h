@@ -51,6 +51,15 @@ namespace ot {
 		std::list<Property*> getAllProperties(void) const;
 		std::list<Property*> findPropertiesBySpecialType(const std::string& _specialType) const;
 
+		//! \brief Returns the property at the given path.
+		//! \see Property* findPropertyByPath(const std::list<std::string>& _path)
+		Property* findPropertyByPath(const std::string& _path, char _delimiter = '/') const;
+
+		//! \brief Returns the property at the given path.
+		//! The path contains the group names from root to the item.
+		//! The last path entry must be the property name.
+		Property* findPropertyByPath(std::list<std::string> _path) const;
+
 		//! \brief Returns false if at least one property exists in any of the groups and its child groups.
 		bool isEmpty(void) const;
 

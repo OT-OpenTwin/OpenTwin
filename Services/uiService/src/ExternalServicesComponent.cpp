@@ -45,7 +45,6 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/UiTypes.h"
 
-#include "OTServiceFoundation/SettingsData.h"
 #include "OTServiceFoundation/TableRange.h"
 #include "OTServiceFoundation/ContextMenu.h"
 
@@ -802,7 +801,6 @@ bool ExternalServicesComponent::projectIsOpened(const std::string &projectName, 
 	return true;
 }
 
-
 // ###################################################################################################
 
 // Messaging
@@ -1016,7 +1014,6 @@ void ExternalServicesComponent::activateVersion(const std::string &version)
 		assert(0); // Error handling
 	}
 }
-
 
 // ###################################################################################################
 
@@ -1363,7 +1360,7 @@ void ExternalServicesComponent::determineViews(const std::string &modelServiceUR
 
 void ExternalServicesComponent::closeProject(bool _saveChanges) {
 	try {
-		UserSettings::instance()->clear();
+		UserSettings::instance().clear();
 
 		AppBase * app{ AppBase::instance() };
 
@@ -1966,6 +1963,19 @@ ServiceDataUi * ExternalServicesComponent::getService(const ot::BasicServiceInfo
 	return nullptr;
 }
 
+ServiceDataUi* ExternalServicesComponent::getServiceFromName(const std::string& _serviceName) {
+	for (auto service : m_serviceIdMap)
+	{
+		if (service.second->serviceName() == _serviceName)
+		{
+			return service.second;
+		}
+	}
+
+	OT_LOG_WAS("Failed to find service { \"Service.Name\": \"" + _serviceName + "\" }");
+	return nullptr;
+}
+
 ServiceDataUi* ExternalServicesComponent::getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType) {
 	for (auto service : m_serviceIdMap)
 	{
@@ -2089,6 +2099,25 @@ std::string ExternalServicesComponent::handleServiceConnected(ot::JsonDocument& 
 	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
 	std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string senderType = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);
+
+	if (senderName.empty()) {
+		OT_LOG_EA("Service name is empty");
+		return "";
+	}
+
+	if (senderType.empty()) {
+		OT_LOG_EA("Service type is empty");
+		return "";
+	}
+
+	// Check for duplicate service names
+	for (const auto& it : m_serviceIdMap) {
+		if (it.second->getBasicServiceInformation().serviceName() == senderName) {
+			OT_LOG_EAS("Service with the name  \"" +  senderName + "\" already registered.");
+			return "";
+		}
+	}
+
 	ServiceDataUi* connectedService = new ServiceDataUi(senderName, senderType, senderURL, senderID);
 	m_serviceIdMap.insert_or_assign(senderID, connectedService);
 
@@ -3699,13 +3728,17 @@ std::string ExternalServicesComponent::handleUnlock(ot::JsonDocument& _document)
 
 std::string ExternalServicesComponent::handleAddSettingsData(ot::JsonDocument& _document) {
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
+
+	ot::PropertyGridCfg config;
+	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+
 	ServiceDataUi* service = getService(serviceId);
 	if (service) {
-		UserSettings::instance()->addFromService(service, _document);
+		UserSettings::instance().addSettings(service->getBasicServiceInformation().serviceName(), config);
 	}
 	else {
+		OT_LOG_EAS("Service with the ID (" + std::to_string(serviceId) + ") is not registered");
 		AppBase::instance()->appendInfoMessage("[ERROR] Dispatch: " OT_ACTION_CMD_UI_AddSettingsData ": Service not registered");
-
 	}
 
 	return "";

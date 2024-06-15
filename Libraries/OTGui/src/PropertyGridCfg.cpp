@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/StringHelper.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyGridCfg.h"
 
@@ -112,6 +113,23 @@ std::list<ot::Property*> ot::PropertyGridCfg::findPropertiesBySpecialType(const 
 		g->findPropertiesBySpecialType(_specialType, ret);
 	}
 	return ret;
+}
+
+ot::Property* ot::PropertyGridCfg::findPropertyByPath(const std::string& _path, char _delimiter) const {
+	return this->findPropertyByPath(ot::splitString(_path, _delimiter, true));
+}
+
+ot::Property* ot::PropertyGridCfg::findPropertyByPath(std::list<std::string> _path) const {
+	if (_path.empty()) return nullptr;
+	std::string rootName = _path.front();
+	_path.pop_front();
+
+	for (const PropertyGroup* group : m_rootGroups) {
+		if (group->getName() == rootName) {
+			return group->findPropertyByPath(_path);
+		}
+	}
+	return nullptr;
 }
 
 std::list<ot::Property*> ot::PropertyGridCfg::getAllProperties(void) const {

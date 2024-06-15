@@ -429,13 +429,6 @@ namespace ak {
 			const QString &						_text = QString("")
 		);
 
-		//! @brief Will create a new options dialog and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		UICORE_API_EXPORT UID createOptionsDialog(
-			UID									_creatorUid,
-			const QString &						_title = QString("Options")
-		);
-
 		//! @brief Will create a new special TabBar and return its UID
 		//! @param _creatorUid The UID of the creator who creates this object
 		UICORE_API_EXPORT UID createSpecialTabBar(
@@ -1107,10 +1100,6 @@ namespace ak {
 			}
 
 		}
-
-		// ###############################################################################################################################################
-
-		// Options dialog
 
 		// ###############################################################################################################################################
 

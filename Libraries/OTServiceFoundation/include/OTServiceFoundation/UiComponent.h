@@ -11,6 +11,7 @@
 // OpenTwin header
 #include "OTCore/ServiceBase.h"			// Base class
 #include "OTCore/Flags.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/UiTypes.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 #include "OTServiceFoundation/MenuButtonDescription.h"
@@ -24,8 +25,7 @@
 namespace ot {
 	
 	class ApplicationBase;
-	class SettingsData;
-
+	
 	namespace components {
 
 		class UiPluginComponent;
@@ -451,9 +451,7 @@ namespace ot {
 
 		private:
 			friend class ApplicationBase;
-			void sendSettingsData(
-				SettingsData *				_settingsData
-			);
+			void sendSettingsData(const PropertyGridCfg& _config);
 
 			UiComponent(const UiComponent &) = delete;
 			UiComponent & operator = (const UiComponent &) = delete;

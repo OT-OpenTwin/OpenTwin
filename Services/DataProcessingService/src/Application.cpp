@@ -226,15 +226,15 @@ bool Application::startAsRelayService(void) const
 	return false;	// Do not want the service to start a relay service. Otherwise change to true
 }
 
-ot::SettingsData * Application::createSettings(void) {
-	return nullptr;
+ot::PropertyGridCfg Application::createSettings(void) const {
+	return ot::PropertyGridCfg();
 }
 
-void Application::settingsSynchronized(ot::SettingsData * _dataset) {
+void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 
 }
 
-bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
+bool Application::settingChanged(const ot::Property * _item) {
 	return false;
 }
 

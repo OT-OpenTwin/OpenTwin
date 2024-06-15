@@ -1,6 +1,7 @@
 #pragma once
 
 #include "OTCore/CoreTypes.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OTWidgets/ColorStyle.h"
 
 #include <QMainWindow>
@@ -36,8 +37,6 @@ namespace osgText   { class Text; };
 namespace osg		{ class ShapeDrawable; };
 namespace osg		{ class Group; }
 namespace ot        { class Property; }
-namespace ot        { class SettingsData; }
-namespace ot        { class AbstractSettingsItem; }
 namespace ot        { class VersionGraphView; }
 namespace ot        { class TableViewerView; }
 namespace ot        { class PlotView; }
@@ -77,12 +76,12 @@ public:
 
 	void cancelRubberband(void);
 
-	void settingsItemChanged(ot::AbstractSettingsItem * _item);
+	void settingsItemChanged(const ot::Property* _property);
 
-	bool workingPlaneSettingsItemChanged(const std::string& _logicalName, ot::AbstractSettingsItem * _item, bool& _settingsUpdateRequired);
-	bool axisCrossSettingsItemChanged(const std::string& _logicalName, ot::AbstractSettingsItem * _item, bool& _settingsUpdateRequired);
-	bool geometrySettingsItemChanged(const std::string& _logicalName, ot::AbstractSettingsItem *_item, bool& _settingsUpdateRequired);
-	bool displaySettingsItemChanged(const std::string& _logicalName, ot::AbstractSettingsItem *_item, bool& _settingsUpdateRequired);
+	bool workingPlaneSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
+	bool axisCrossSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired);
+	bool geometrySettingsItemChanged(const std::string& _logicalName, const ot::Property*_item, bool& _settingsUpdateRequired);
+	bool displaySettingsItemChanged(const std::string& _logicalName, const ot::Property*_item, bool& _settingsUpdateRequired);
 
 	void contextMenuItemClicked(const std::string& _menuName, const std::string& _itemName);
 
@@ -149,13 +148,13 @@ private:
 	osg::Camera* createOverlayCamera(double xmin, double xmax, double ymin, double ymax);
 	osgText::Text *createText(const osg::Vec2 &pos, const std::string &text, float textSize);
 	void updateOverlaySize(int width, int height);
-	ot::SettingsData * createSettings(void);
+	ot::PropertyGridCfg createSettings(void);
 	void updateProjection(void);
 	void createClipPlane(osg::Vec3d normal, osg::Vec3d point);
 	void updateCapGeometry(osg::Vec3d normal, osg::Vec3d point);
 	void setClearColor(int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB);
 	void setClearColorAutomatic(void);
-	void settingsSynchronized(ot::SettingsData * _dataset);
+	void settingsSynchronized(const ot::PropertyGridCfg& _dataset);
 	void updateDisplaySettings(osg::Node *node);
 
 	// Attributes

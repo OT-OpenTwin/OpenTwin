@@ -181,6 +181,8 @@ public:
 	// General purpose communication
 	void InformSenderAboutFinishedAction(std::string URL, std::string subsequentFunction);
 
+	ServiceDataUi* getServiceFromName(const std::string& _serviceName);
+
 	ServiceDataUi* getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType);
 
 	//########################################################################################################

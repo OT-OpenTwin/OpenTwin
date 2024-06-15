@@ -59,10 +59,21 @@ ot::Dialog::DialogResult ot::ApplicationPropertiesManager::showDialog(void) {
 	this->disconnect(m_dialog, &PropertyDialog::propertyChanged, this, &ApplicationPropertiesManager::slotPropertyChanged);
 	this->disconnect(m_dialog, &PropertyDialog::propertyDeleteRequested, this, &ApplicationPropertiesManager::slotPropertyDeleteRequested);
 
+	if (result == Dialog::Ok) {
+		for (const Property* prop : m_dialog->getChangedProperties()) {
+			m_changedProperties.push_back(prop->createCopyWithParents());
+		}
+	}
+
 	delete m_dialog;
 	m_dialog = nullptr;
 
 	return result;
+}
+
+void ot::ApplicationPropertiesManager::clear(void) {
+	m_data.clear();
+	this->clearGarbage();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -136,6 +147,11 @@ void ot::ApplicationPropertiesManager::clearGarbage(void) {
 		delete prop;
 	}
 	m_garbage.clear();
+
+	for (const Property* prop : m_changedProperties) {
+		delete prop;
+	}
+	m_changedProperties.clear();
 }
 
 ot::ApplicationPropertiesManager::ApplicationPropertiesManager()

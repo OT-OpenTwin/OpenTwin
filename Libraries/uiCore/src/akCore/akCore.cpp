@@ -220,7 +220,6 @@ QString ak::toQString(
 	case otList: return QString("List");
 	case otMainWindow: return QString("Window");
 	case otNiceLineEdit: return QString("NiceLineEdit");
-	case otOptionsDialog: return QString("OptionsDialog");
 	case otPrompt: return QString("Prompt");
 	case otPropertyGrid: return QString("PropertyGrid");
 	case otPushButton: return QString("PushButton");

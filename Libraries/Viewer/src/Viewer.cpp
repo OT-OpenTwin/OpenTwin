@@ -15,9 +15,15 @@
 #include "HandleArrow.h"
 #include "TransformManipulator.h"
 
-#include "OTServiceFoundation/SettingsData.h"
 #include "OTCore/OTAssert.h"
-
+#include "OTGui/Property.h"
+#include "OTGui/PropertyInt.h"
+#include "OTGui/PropertyBool.h"
+#include "OTGui/PropertyColor.h"
+#include "OTGui/PropertyDouble.h"
+#include "OTGui/PropertyString.h"
+#include "OTGui/PropertyStringList.h"
+#include "OTGui/PropertyGroup.h"
 #include "OTWidgets/GlobalColorStyle.h"
 
 #include <qobject.h>
@@ -226,7 +232,7 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	m_tableViewer = new ot::TableViewerView(this);
 
 	// Create settings
-	ot::SettingsData * dataset = createSettings();
+	ot::PropertyGridCfg dataset = createSettings();
 
 	// Load
 	getNotifier()->loadSettings(dataset);
@@ -892,12 +898,12 @@ void Viewer::cancelRubberband(void) {
 	}
 }
 
-void Viewer::settingsItemChanged(ot::AbstractSettingsItem * _item) {
-	std::string logicalName = _item->logicalName();
+void Viewer::settingsItemChanged(const ot::Property* _item) {
+	std::string logicalName = _item->getPropertyPath();
 	bool updateRequired{ false };
 	
 	if (workingPlaneSettingsItemChanged(logicalName, _item, updateRequired)) {
-		if (workingPlane->refreshAfterSettingsChange() && logicalName != "Viewer:WorkingPlane:GridResolution") { 
+		if (workingPlane->refreshAfterSettingsChange() && logicalName != "Working Plane/Grid Resolution") { 
 			updateRequired = true; 
 		}
 		refresh(true);
@@ -923,217 +929,217 @@ void Viewer::settingsItemChanged(ot::AbstractSettingsItem * _item) {
 		OTAssert(0, "Unknown logical name");
 	}
 	if (updateRequired) {
-		ot::SettingsData *settings = createSettings();
+		ot::PropertyGridCfg settings = createSettings();
 		getNotifier()->updateSettings(settings);
 		getNotifier()->saveSettings(settings);
 	}
 }
 
-bool Viewer::workingPlaneSettingsItemChanged(const std::string& _logicalName, ot::AbstractSettingsItem * _item, bool& _settingsUpdateRequired) {
+bool Viewer::workingPlaneSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired) {
 	ViewerSettings * settings = ViewerSettings::instance();
 
 	// Check the name (Group:Subgroup:...:Item)
-	if (_logicalName == "Viewer:WorkingPlane:Style") {
-		ot::SettingsItemSelection * actualItem = dynamic_cast<ot::SettingsItemSelection *>(_item);
+	if (_logicalName == "Working Plane/Grid Style") {
+		const ot::PropertyStringList * actualItem = dynamic_cast<const ot::PropertyStringList *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->workingPlaneStyle = actualItem->selectedValue();
+		settings->workingPlaneStyle = actualItem->getCurrent();
 		_settingsUpdateRequired = true;
 		return true;
 	}
-	else if (_logicalName == "Viewer:WorkingPlane:DefaultSize") {
-		ot::SettingsItemInteger * actualItem = dynamic_cast<ot::SettingsItemInteger *>(_item);
+	else if (_logicalName == "Working Plane/DefaultSize") {
+		const ot::PropertyInt * actualItem = dynamic_cast<const ot::PropertyInt *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->workingPlaneDefaultSize = actualItem->value();
+		settings->workingPlaneDefaultSize = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:WorkingPlane:AutoSize") {
-		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
+	else if (_logicalName == "Working Plane/Automatic Size") {
+		const ot::PropertyBool * actualItem = dynamic_cast<const ot::PropertyBool *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->workingPlaneAutoSize = actualItem->value();
+		settings->workingPlaneAutoSize = actualItem->getValue();
 		_settingsUpdateRequired = true;
 		return true;
 	}
-	else if (_logicalName == "Viewer:WorkingPlane:Size") {
-		ot::SettingsItemInteger * actualItem = dynamic_cast<ot::SettingsItemInteger *>(_item);
+	else if (_logicalName == "Working Plane/Size") {
+		const ot::PropertyInt * actualItem = dynamic_cast<const ot::PropertyInt *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->workingPlaneSize = actualItem->value();
+		settings->workingPlaneSize = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:WorkingPlane:PlaneColor") {
-		ot::SettingsItemColor * actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
+	else if (_logicalName == "Working Plane/Plane Color") {
+		const ot::PropertyColor * actualItem = dynamic_cast<const ot::PropertyColor *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->workingPlanePlaneColor = actualItem->value();
+		settings->workingPlanePlaneColor = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:WorkingPlane:GridColor") {
-		ot::SettingsItemColor * actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
+	else if (_logicalName == "Working Plane/Grid Color") {
+		const ot::PropertyColor * actualItem = dynamic_cast<const ot::PropertyColor *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->workingPlaneGridLineColor = actualItem->value();
+		settings->workingPlaneGridLineColor = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:WorkingPlane:GridAutoResolution") {
-		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
+	else if (_logicalName == "Working Plane/Automatic Grid Resolution") {
+		const ot::PropertyBool * actualItem = dynamic_cast<const ot::PropertyBool *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->workingPlaneAutoGridResolution = actualItem->value();
+		settings->workingPlaneAutoGridResolution = actualItem->getValue();
 		_settingsUpdateRequired = true;
 		return true;
 	}
-	else if (_logicalName == "Viewer:WorkingPlane:GridResolution") {
-		ot::SettingsItemDouble * actualItem = dynamic_cast<ot::SettingsItemDouble *>(_item);
+	else if (_logicalName == "Working Plane/Grid Resolution") {
+		const ot::PropertyDouble * actualItem = dynamic_cast<const ot::PropertyDouble *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->workingPlaneGridResolution = actualItem->value();
+		settings->workingPlaneGridResolution = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:WorkingPlane:GridHighlightStep") {
-		ot::SettingsItemInteger * actualItem = dynamic_cast<ot::SettingsItemInteger *>(_item);
+	else if (_logicalName == "Working Plane/Highlight Grid Line") {
+		const ot::PropertyInt * actualItem = dynamic_cast<const ot::PropertyInt *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->workingPlaneHighlightEveryStep = actualItem->value();
+		settings->workingPlaneHighlightEveryStep = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:WorkingPlane:GridLineWidth") {
-		ot::SettingsItemInteger * actualItem = dynamic_cast<ot::SettingsItemInteger *>(_item);
+	else if (_logicalName == "Working Plane/Grid Line Width") {
+		const ot::PropertyInt * actualItem = dynamic_cast<const ot::PropertyInt *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->workingPlaneGridLineWidth = actualItem->value();
+		settings->workingPlaneGridLineWidth = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:WorkingPlane:GridWideLineWidth") {
-		ot::SettingsItemInteger * actualItem = dynamic_cast<ot::SettingsItemInteger *>(_item);
+	else if (_logicalName == "Working Plane/Wide Grid Line Width") {
+		const ot::PropertyInt * actualItem = dynamic_cast<const ot::PropertyInt *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->workingPlaneWideGridLineWidth = actualItem->value();
+		settings->workingPlaneWideGridLineWidth = actualItem->getValue();
 		return true;
 	}
 	return false;
 }
 
-bool Viewer::axisCrossSettingsItemChanged(const std::string& _logicalName, ot::AbstractSettingsItem * _item, bool& _settingsUpdateRequired) {
+bool Viewer::axisCrossSettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired) {
 	ViewerSettings * settings = ViewerSettings::instance();
 
 	// Check the name (Group:Subgroup:...:Item)
-	if (_logicalName == "Viewer:AxisCross:ColorX") {
-		ot::SettingsItemColor * actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
+	if (_logicalName == "Axis Cross/Color X-Axis") {
+		const ot::PropertyColor * actualItem = dynamic_cast<const ot::PropertyColor *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->axisXColor = actualItem->value();
+		settings->axisXColor = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:AxisCross:ColorY") {
-		ot::SettingsItemColor * actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
+	else if (_logicalName == "Axis Cross/Color Y-Axis") {
+		const ot::PropertyColor * actualItem = dynamic_cast<const ot::PropertyColor *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->axisYColor = actualItem->value();
+		settings->axisYColor = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:AxisCross:ColorZ") {
-		ot::SettingsItemColor * actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
+	else if (_logicalName == "Axis Cross/Color Z-Axis") {
+		const ot::PropertyColor * actualItem = dynamic_cast<const ot::PropertyColor *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->axisZColor = actualItem->value();
+		settings->axisZColor = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:AxisCross:ColorCenter") {
-		ot::SettingsItemColor * actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
+	else if (_logicalName == "Axis Cross/Center Point Color") {
+		const ot::PropertyColor * actualItem = dynamic_cast<const ot::PropertyColor *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->axisCenterColor = actualItem->value();
+		settings->axisCenterColor = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:AxisCross:CenterCrossLineWidth") {
-		ot::SettingsItemInteger * actualItem = dynamic_cast<ot::SettingsItemInteger *>(_item);
+	else if (_logicalName == "Axis Cross/Line Width") {
+		const ot::PropertyInt * actualItem = dynamic_cast<const ot::PropertyInt *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->axisCenterCrossLineWidth = actualItem->value();
+		settings->axisCenterCrossLineWidth = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:AxisCross:DashedLineVisible") {
-		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
+	else if (_logicalName == "Axis Cross/Negative Visible") {
+		const ot::PropertyBool * actualItem = dynamic_cast<const ot::PropertyBool *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->axisCenterCrossDashedLineVisible = actualItem->value();
+		settings->axisCenterCrossDashedLineVisible = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:AxisCross:CenterCrossAlswaysAtFront") {
-		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
+	else if (_logicalName == "Axis Cross/Keep At Front") {
+		const ot::PropertyBool * actualItem = dynamic_cast<const ot::PropertyBool *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->axisCenterCrossLineAtFront = actualItem->value();
+		settings->axisCenterCrossLineAtFront = actualItem->getValue();
 		return true;
 	}
 	return false;
 }
 
-bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, ot::AbstractSettingsItem *_item, bool& _settingsUpdateRequired) {
+bool Viewer::geometrySettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired) {
 	ViewerSettings *settings = ViewerSettings::instance();
 
 	// Check the item (Group:Subgroup:...:Item)
-	if (_logicalName == "Viewer:Geometry:HighlightColor") {
-		ot::SettingsItemColor *actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
+	if (_logicalName == "Geometry/Highlight Color") {
+		const ot::PropertyColor *actualItem = dynamic_cast<const ot::PropertyColor *>(_item);
 		if (actualItem == nullptr) {
 			OTAssert(0, "Cast item fialed");
 			return true;
 		}
-		settings->geometryHighlightColor = actualItem->value();
+		settings->geometryHighlightColor = actualItem->getValue();
 		return true;
 	}
-	else if (_logicalName == "Viewer:Geometry:EdgeColorMode") {
-		ot::SettingsItemSelection * actualItem = dynamic_cast<ot::SettingsItemSelection *>(_item);
+	else if (_logicalName == "Geometry/Edge Color Mode") {
+		const ot::PropertyStringList * actualItem = dynamic_cast<const ot::PropertyStringList *>(_item);
 		if (actualItem == nullptr) {
 			OTAssert(0, "Cast item failed");
 			return true;
 		}
-		settings->geometryEdgeColorMode = actualItem->selectedValue();
+		settings->geometryEdgeColorMode = actualItem->getCurrent();
 		_settingsUpdateRequired = true;
 		return true;
 	}
-	else if (_logicalName == "Viewer:Geometry:LightSourceDistance") {
-		ot::SettingsItemSelection * actualItem = dynamic_cast<ot::SettingsItemSelection *>(_item);
+	else if (_logicalName == "Geometry/Light Source Distance") {
+		const ot::PropertyStringList * actualItem = dynamic_cast<const ot::PropertyStringList *>(_item);
 		if (actualItem == nullptr) {
 			OTAssert(0, "Cast item failed");
 			return true;
 		}
-		settings->geometryLightSourceDistance = actualItem->selectedValue();
+		settings->geometryLightSourceDistance = actualItem->getCurrent();
 		setLightSourceDistance(settings->geometryLightSourceDistance);
 		return true;
 	}
-	else if (_logicalName == "Viewer:Geometry:ViewBackgroundColorAutomatic") {
-		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
+	else if (_logicalName == "Geometry/Automatic View Background Color") {
+		const ot::PropertyBool * actualItem = dynamic_cast<const ot::PropertyBool *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->viewBackgroundColorAutomatic = actualItem->value();
+		settings->viewBackgroundColorAutomatic = actualItem->getValue();
 		setClearColorAutomatic();
 		_settingsUpdateRequired = true;
 		return true;
 	}
-	else if (_logicalName == "Viewer:Geometry:ViewBackgroundColor") {
-		ot::SettingsItemColor *actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
+	else if (_logicalName == "Geometry/View Background Color") {
+		const ot::PropertyColor *actualItem = dynamic_cast<const ot::PropertyColor *>(_item);
 		if (actualItem == nullptr) {
 			OTAssert(0, "Cast item failed");
 			return true;
 		}
-		settings->viewBackgroundColor = actualItem->value();
+		settings->viewBackgroundColor = actualItem->getValue();
 		setClearColorAutomatic();
 		return true;
 	}
-	else if (_logicalName == "Viewer:Geometry:ViewForegroundColor") {
-		ot::SettingsItemColor *actualItem = dynamic_cast<ot::SettingsItemColor *>(_item);
+	else if (_logicalName == "Geometry/View Foreground Color") {
+		const ot::PropertyColor *actualItem = dynamic_cast<const ot::PropertyColor *>(_item);
 		if (actualItem == nullptr) {
 			OTAssert(0, "Cast item failed");
 			return true;
 		}
-		settings->viewForegroundColor = actualItem->value();
+		settings->viewForegroundColor = actualItem->getValue();
 		setClearColorAutomatic();
 		return true;
 	}
 	return false;
 }
 
-bool Viewer::displaySettingsItemChanged(const std::string& _logicalName, ot::AbstractSettingsItem *_item, bool& _settingsUpdateRequired) {
+bool Viewer::displaySettingsItemChanged(const std::string& _logicalName, const ot::Property* _item, bool& _settingsUpdateRequired) {
 	ViewerSettings *settings = ViewerSettings::instance();
 
 	// Check the item (Group:Subgroup:...:Item)
-	if (_logicalName == "Viewer:Display:UseDisplayList") {
-		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
+	if (_logicalName == "Display/Enable Display Lists") {
+		const ot::PropertyBool * actualItem = dynamic_cast<const ot::PropertyBool *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->useDisplayLists = actualItem->value();
+		settings->useDisplayLists = actualItem->getValue();
 		updateDisplaySettings(rootNode);
 		_settingsUpdateRequired = true;
 		return true;
 	}
-	else if (_logicalName == "Viewer:Display:UseVertexBuffers") {
-		ot::SettingsItemBoolean * actualItem = dynamic_cast<ot::SettingsItemBoolean *>(_item);
+	else if (_logicalName == "Display/Enable Vertex Buffer") {
+		const ot::PropertyBool * actualItem = dynamic_cast<const ot::PropertyBool *>(_item);
 		if (actualItem == nullptr) { OTAssert(0, "Cast item failed"); return true; }
-		settings->useVertexBufferObjects = actualItem->value();
+		settings->useVertexBufferObjects = actualItem->getValue();
 		updateDisplaySettings(rootNode);
 		_settingsUpdateRequired = true;
 		return true;
@@ -1142,68 +1148,70 @@ bool Viewer::displaySettingsItemChanged(const std::string& _logicalName, ot::Abs
 	return false;
 }
 
-void Viewer::settingsSynchronized(ot::SettingsData * _dataset) {
+void Viewer::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 	ViewerSettings * settings = ViewerSettings::instance();
 
-	ot::SettingsItemSelection * workingPlaneStyle = dynamic_cast<ot::SettingsItemSelection *>(_dataset->findItemByLogicalName("Viewer:WorkingPlane:Style"));
-	ot::SettingsItemInteger * workingPlaneDefaultSize = dynamic_cast<ot::SettingsItemInteger *>(_dataset->findItemByLogicalName("Viewer:WorkingPlane:DefaultSize"));
-	ot::SettingsItemBoolean * workingPlaneAutoSize = dynamic_cast<ot::SettingsItemBoolean *>(_dataset->findItemByLogicalName("Viewer:WorkingPlane:AutoSize"));
-	ot::SettingsItemInteger * workingPlaneSize = dynamic_cast<ot::SettingsItemInteger *>(_dataset->findItemByLogicalName("Viewer:WorkingPlane:Size"));
-	ot::SettingsItemColor * workingPlanePlaneColor = dynamic_cast<ot::SettingsItemColor *>(_dataset->findItemByLogicalName("Viewer:WorkingPlane:PlaneColor"));
-	ot::SettingsItemColor * workingPlaneGridColor = dynamic_cast<ot::SettingsItemColor *>(_dataset->findItemByLogicalName("Viewer:WorkingPlane:GridColor"));
-	ot::SettingsItemBoolean * workingPlaneGridAutoResolution = dynamic_cast<ot::SettingsItemBoolean *>(_dataset->findItemByLogicalName("Viewer:WorkingPlane:GridAutoResolution"));
-	ot::SettingsItemDouble * workingPlaneGridResolution = dynamic_cast<ot::SettingsItemDouble *>(_dataset->findItemByLogicalName("Viewer:WorkingPlane:GridResolution"));
-	ot::SettingsItemInteger * workingPlaneGridHighlightStep = dynamic_cast<ot::SettingsItemInteger *>(_dataset->findItemByLogicalName("Viewer:WorkingPlane:GridHighlightStep"));
-	ot::SettingsItemInteger * workingPlaneGridLineWidth = dynamic_cast<ot::SettingsItemInteger *>(_dataset->findItemByLogicalName("Viewer:WorkingPlane:GridLineWidth"));
-	ot::SettingsItemInteger * workingPlaneGridWideLineWidth = dynamic_cast<ot::SettingsItemInteger *>(_dataset->findItemByLogicalName("Viewer:WorkingPlane:GridWideLineWidth"));
+	using namespace ot;
 
-	ot::SettingsItemColor *axisCrossColorX = dynamic_cast<ot::SettingsItemColor *>(_dataset->findItemByLogicalName("Viewer:AxisCross:ColorX"));
-	ot::SettingsItemColor *axisCrossColorY = dynamic_cast<ot::SettingsItemColor *>(_dataset->findItemByLogicalName("Viewer:AxisCross:ColorY"));
-	ot::SettingsItemColor *axisCrossColorZ = dynamic_cast<ot::SettingsItemColor *>(_dataset->findItemByLogicalName("Viewer:AxisCross:ColorZ"));
-	ot::SettingsItemColor *axisCrossColorCenter = dynamic_cast<ot::SettingsItemColor *>(_dataset->findItemByLogicalName("Viewer:AxisCross:ColorCenter"));
-	ot::SettingsItemInteger *axisCrossCenterCrossLineWidth = dynamic_cast<ot::SettingsItemInteger *>(_dataset->findItemByLogicalName("Viewer:AxisCross:CenterCrossLineWidth"));
-	ot::SettingsItemBoolean *axisCrossDashedLineVisible = dynamic_cast<ot::SettingsItemBoolean *>(_dataset->findItemByLogicalName("Viewer:AxisCross:DashedLineVisible"));
-	ot::SettingsItemBoolean *axisCrossCenterCrossAlswaysAtFront = dynamic_cast<ot::SettingsItemBoolean *>(_dataset->findItemByLogicalName("Viewer:AxisCross:CenterCrossAlswaysAtFront"));
+	ot::PropertyStringList * workingPlaneStyle = dynamic_cast<ot::PropertyStringList *>(_dataset.findPropertyByPath("Working Plane/Grid Style"));
+	ot::PropertyInt * workingPlaneDefaultSize = dynamic_cast<ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Default Size"));
+	ot::PropertyBool * workingPlaneAutoSize = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Working Plane/Automatic Size"));
+	ot::PropertyInt * workingPlaneSize = dynamic_cast<ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Size"));
+	ot::PropertyColor * workingPlanePlaneColor = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Working Plane/Plane Color"));
+	ot::PropertyColor * workingPlaneGridColor = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Working Plane/Grid Color"));
+	ot::PropertyBool * workingPlaneGridAutoResolution = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Working Plane/Automatic Grid Resolution"));
+	ot::PropertyDouble * workingPlaneGridResolution = dynamic_cast<ot::PropertyDouble *>(_dataset.findPropertyByPath("Working Plane/Grid Resolution"));
+	ot::PropertyInt * workingPlaneGridHighlightStep = dynamic_cast<ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Highlight Grid Line"));
+	ot::PropertyInt * workingPlaneGridLineWidth = dynamic_cast<ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Grid Line Width"));
+	ot::PropertyInt * workingPlaneGridWideLineWidth = dynamic_cast<ot::PropertyInt *>(_dataset.findPropertyByPath("Working Plane/Wide Grid Line Width"));
 
-	ot::SettingsItemColor *geometryHighlightColor = dynamic_cast<ot::SettingsItemColor *>(_dataset->findItemByLogicalName("Viewer:Geometry:HighlightColor"));
-	ot::SettingsItemSelection *geometryEdgeColorMode = dynamic_cast<ot::SettingsItemSelection *>(_dataset->findItemByLogicalName("Viewer:Geometry:EdgeColorMode"));
-	ot::SettingsItemSelection *geometryLightSourceDistance = dynamic_cast<ot::SettingsItemSelection *>(_dataset->findItemByLogicalName("Viewer:Geometry:LightSourceDistance"));
-	ot::SettingsItemBoolean *geometryViewBackgroundColorAutomatic = dynamic_cast<ot::SettingsItemBoolean *>(_dataset->findItemByLogicalName("Viewer:Geometry:ViewBackgroundColorAutomatic"));
-	ot::SettingsItemColor *geometryViewBackgroundColor = dynamic_cast<ot::SettingsItemColor *>(_dataset->findItemByLogicalName("Viewer:Geometry:ViewBackgroundColor"));
-	ot::SettingsItemColor *geometryViewForegroundColor = dynamic_cast<ot::SettingsItemColor *>(_dataset->findItemByLogicalName("Viewer:Geometry:ViewForegroundColor"));
+	ot::PropertyColor *axisCrossColorX = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Color X-Axis"));
+	ot::PropertyColor *axisCrossColorY = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Color Y-Axis"));
+	ot::PropertyColor *axisCrossColorZ = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Color Z-Axis"));
+	ot::PropertyColor *axisCrossColorCenter = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Axis Cross/Center Point Color"));
+	ot::PropertyInt *axisCrossCenterCrossLineWidth = dynamic_cast<ot::PropertyInt *>(_dataset.findPropertyByPath("Axis Cross/Line Width"));
+	ot::PropertyBool *axisCrossDashedLineVisible = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Axis Cross/Negative Visible"));
+	ot::PropertyBool *axisCrossCenterCrossAlswaysAtFront = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Axis Cross/Keep At Front"));
 
-	ot::SettingsItemBoolean *useDisplayLists = dynamic_cast<ot::SettingsItemBoolean *>(_dataset->findItemByLogicalName("Viewer:Display:UseDisplayList"));
-	ot::SettingsItemBoolean *useVertexBuffers = dynamic_cast<ot::SettingsItemBoolean *>(_dataset->findItemByLogicalName("Viewer:Display:UseVertexBuffers"));
+	ot::PropertyColor *geometryHighlightColor = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/Highlight Color"));
+	ot::PropertyStringList *geometryEdgeColorMode = dynamic_cast<ot::PropertyStringList *>(_dataset.findPropertyByPath("Geometry/Edge Color Mode"));
+	ot::PropertyStringList *geometryLightSourceDistance = dynamic_cast<ot::PropertyStringList *>(_dataset.findPropertyByPath("Geometry/Light Source Distance"));
+	ot::PropertyBool *geometryViewBackgroundColorAutomatic = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Geometry/Automatic View Background Color"));
+	ot::PropertyColor *geometryViewBackgroundColor = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/View Background Color"));
+	ot::PropertyColor *geometryViewForegroundColor = dynamic_cast<ot::PropertyColor *>(_dataset.findPropertyByPath("Geometry/View Foreground Color"));
 
-	if (workingPlaneStyle) { settings->workingPlaneStyle = workingPlaneStyle->selectedValue(); } 
-	if (workingPlaneDefaultSize) { settings->workingPlaneDefaultSize = workingPlaneDefaultSize->value(); } 
-	if (workingPlaneAutoSize) { settings->workingPlaneAutoSize = workingPlaneAutoSize->value(); } 
-	if (workingPlaneSize) { settings->workingPlaneSize = workingPlaneSize->value(); } 
-	if (workingPlanePlaneColor) { settings->workingPlanePlaneColor = workingPlanePlaneColor->value(); } 
-	if (workingPlaneGridColor) { settings->workingPlaneGridLineColor = workingPlaneGridColor->value(); } 
-	if (workingPlaneGridAutoResolution) { settings->workingPlaneAutoGridResolution = workingPlaneGridAutoResolution->value(); } 
-	if (workingPlaneGridResolution) { settings->workingPlaneGridResolution = workingPlaneGridResolution->value(); } 
-	if (workingPlaneGridHighlightStep) { settings->workingPlaneHighlightEveryStep = workingPlaneGridHighlightStep->value(); } 
-	if (workingPlaneGridLineWidth) { settings->workingPlaneGridLineWidth = workingPlaneGridLineWidth->value(); } 
-	if (workingPlaneGridWideLineWidth) { settings->workingPlaneWideGridLineWidth = workingPlaneGridWideLineWidth->value(); } 
+	ot::PropertyBool *useDisplayLists = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Display/Enable Display Lists"));
+	ot::PropertyBool *useVertexBuffers = dynamic_cast<ot::PropertyBool *>(_dataset.findPropertyByPath("Display/Enable Vertex Buffer"));
 
-	if (axisCrossColorX) { settings->axisXColor = axisCrossColorX->value(); } 
-	if (axisCrossColorY) { settings->axisYColor = axisCrossColorY->value(); } 
-	if (axisCrossColorZ) { settings->axisZColor = axisCrossColorZ->value(); } 
-	if (axisCrossColorCenter) { settings->axisCenterColor = axisCrossColorCenter->value(); } 
-	if (axisCrossCenterCrossLineWidth) { settings->axisCenterCrossLineWidth = axisCrossCenterCrossLineWidth->value(); } 
-	if (axisCrossDashedLineVisible) { settings->axisCenterCrossDashedLineVisible = axisCrossDashedLineVisible->value(); } 
-	if (axisCrossCenterCrossAlswaysAtFront) { settings->axisCenterCrossLineAtFront = axisCrossCenterCrossAlswaysAtFront->value(); } 
+	if (workingPlaneStyle) { settings->workingPlaneStyle = workingPlaneStyle->getCurrent(); } 
+	if (workingPlaneDefaultSize) { settings->workingPlaneDefaultSize = workingPlaneDefaultSize->getValue(); } 
+	if (workingPlaneAutoSize) { settings->workingPlaneAutoSize = workingPlaneAutoSize->getValue(); }
+	if (workingPlaneSize) { settings->workingPlaneSize = workingPlaneSize->getValue(); }
+	if (workingPlanePlaneColor) { settings->workingPlanePlaneColor = workingPlanePlaneColor->getValue(); }
+	if (workingPlaneGridColor) { settings->workingPlaneGridLineColor = workingPlaneGridColor->getValue(); }
+	if (workingPlaneGridAutoResolution) { settings->workingPlaneAutoGridResolution = workingPlaneGridAutoResolution->getValue(); }
+	if (workingPlaneGridResolution) { settings->workingPlaneGridResolution = workingPlaneGridResolution->getValue(); }
+	if (workingPlaneGridHighlightStep) { settings->workingPlaneHighlightEveryStep = workingPlaneGridHighlightStep->getValue(); }
+	if (workingPlaneGridLineWidth) { settings->workingPlaneGridLineWidth = workingPlaneGridLineWidth->getValue(); }
+	if (workingPlaneGridWideLineWidth) { settings->workingPlaneWideGridLineWidth = workingPlaneGridWideLineWidth->getValue(); }
 
-	if (geometryHighlightColor) { settings->geometryHighlightColor = geometryHighlightColor->value(); } 
-	if (geometryEdgeColorMode) { settings->geometryEdgeColorMode = geometryEdgeColorMode->selectedValue(); } 
-	if (geometryLightSourceDistance) { settings->geometryLightSourceDistance = geometryLightSourceDistance->selectedValue(); } 
-	if (geometryViewBackgroundColorAutomatic) { settings->viewBackgroundColorAutomatic = geometryViewBackgroundColorAutomatic->value(); } 
-	if (geometryViewBackgroundColor) { settings->viewBackgroundColor = geometryViewBackgroundColor->value(); } 
-	if (geometryViewForegroundColor) { settings->viewForegroundColor = geometryViewForegroundColor->value(); } 
+	if (axisCrossColorX) { settings->axisXColor = axisCrossColorX->getValue(); }
+	if (axisCrossColorY) { settings->axisYColor = axisCrossColorY->getValue(); }
+	if (axisCrossColorZ) { settings->axisZColor = axisCrossColorZ->getValue(); }
+	if (axisCrossColorCenter) { settings->axisCenterColor = axisCrossColorCenter->getValue(); }
+	if (axisCrossCenterCrossLineWidth) { settings->axisCenterCrossLineWidth = axisCrossCenterCrossLineWidth->getValue(); }
+	if (axisCrossDashedLineVisible) { settings->axisCenterCrossDashedLineVisible = axisCrossDashedLineVisible->getValue(); }
+	if (axisCrossCenterCrossAlswaysAtFront) { settings->axisCenterCrossLineAtFront = axisCrossCenterCrossAlswaysAtFront->getValue(); }
 
-	if (useDisplayLists) { settings->useDisplayLists = useDisplayLists->value(); }
-	if (useVertexBuffers) { settings->useVertexBufferObjects = useVertexBuffers->value(); }
+	if (geometryHighlightColor) { settings->geometryHighlightColor = geometryHighlightColor->getValue(); }
+	if (geometryEdgeColorMode) { settings->geometryEdgeColorMode = geometryEdgeColorMode->getCurrent(); }
+	if (geometryLightSourceDistance) { settings->geometryLightSourceDistance = geometryLightSourceDistance->getCurrent(); }
+	if (geometryViewBackgroundColorAutomatic) { settings->viewBackgroundColorAutomatic = geometryViewBackgroundColorAutomatic->getValue(); }
+	if (geometryViewBackgroundColor) { settings->viewBackgroundColor = geometryViewBackgroundColor->getValue(); }
+	if (geometryViewForegroundColor) { settings->viewForegroundColor = geometryViewForegroundColor->getValue(); }
+
+	if (useDisplayLists) { settings->useDisplayLists = useDisplayLists->getValue(); }
+	if (useVertexBuffers) { settings->useVertexBufferObjects = useVertexBuffers->getValue(); }
 }
 
 void Viewer::contextMenuItemClicked(const std::string& _menuName, const std::string& _itemName) {
@@ -1272,106 +1280,118 @@ void Viewer::toggleCutplane(void) {
 	}
 }
 
-ot::SettingsData * Viewer::createSettings(void) {
+ot::PropertyGridCfg Viewer::createSettings(void) {
 	ViewerSettings * settings = ViewerSettings::instance();
 
-	// Create a new dataset
-	ot::SettingsData * dataset = new ot::SettingsData("ViewerSettings", "1.0");
-	ot::SettingsGroup * view = dataset->addGroup("Viewer", "Viewer");
+	using namespace ot;
+
+	PropertyGridCfg config;
 
 	// ## Working plane ##
 	{
 		// Data
-		ot::SettingsGroup * workingPlane = view->addSubgroup("WorkingPlane", "Working plane");
-		ot::SettingsItemSelection * workingPlaneGridStyle = new ot::SettingsItemSelection("Style", "Grid style", { settings->workingPlaneStyle_Grid, settings->workingPlaneStyle_Plane, settings->workingPlaneStyle_PlaneGrid }, settings->workingPlaneStyle);
-		ot::SettingsItemInteger	* workingPlaneDefaultSize = new ot::SettingsItemInteger("DefaultSize", "Default size", settings->workingPlaneDefaultSize, 1, 999999);
-		ot::SettingsItemBoolean	* workingPlaneAutoSize = new ot::SettingsItemBoolean("AutoSize", "Automatic size", settings->workingPlaneAutoSize, "If enabled, the working plane will automatically adjust its size according to the current geometry");
-		ot::SettingsItemInteger * workingPlaneSize = new ot::SettingsItemInteger("Size", "Size", settings->workingPlaneSize, 1, 999999);
-		ot::SettingsItemColor * workingPlaneColor = new ot::SettingsItemColor("PlaneColor", "Plane color", settings->workingPlanePlaneColor);
-		ot::SettingsItemColor * workingPlaneGridColor = new ot::SettingsItemColor("GridColor", "Grid color", settings->workingPlaneGridLineColor);
-		ot::SettingsItemBoolean * workingPlaneGridAutoResolution = new ot::SettingsItemBoolean("GridAutoResolution", "Grid automatic resolution", settings->workingPlaneAutoGridResolution);
-		ot::SettingsItemDouble * workingPlaneGridResolution = new ot::SettingsItemDouble("GridResolution", "Grid resolution", settings->workingPlaneGridResolution, 0.001, 999999, 3);
-		ot::SettingsItemInteger * workingPlaneGridHightlightStep = new ot::SettingsItemInteger("GridHighlightStep", "Hightlight grid line", settings->workingPlaneHighlightEveryStep, 0, 100);
-		ot::SettingsItemInteger * workingPlaneGridLineWidth = new ot::SettingsItemInteger("GridLineWidth", "Grid line width", settings->workingPlaneGridLineWidth, 1, 20);
-		ot::SettingsItemInteger * workingPlaneGridWideLineWidth = new ot::SettingsItemInteger("GridWideLineWidth", "Grid wide line width", settings->workingPlaneWideGridLineWidth, 1, 20);
+		PropertyGroup* workingPlane = new ot::PropertyGroup("Working Plane");
+		PropertyStringList* workingPlaneGridStyle = new PropertyStringList("Grid Style", settings->workingPlaneStyle, std::list<std::string>({ settings->workingPlaneStyle_Grid, settings->workingPlaneStyle_Plane, settings->workingPlaneStyle_PlaneGrid }));
+		PropertyInt* workingPlaneDefaultSize = new PropertyInt("Default Size", settings->workingPlaneDefaultSize, 1, 999999);
+		PropertyBool* workingPlaneAutoSize = new PropertyBool("Automatic Size", settings->workingPlaneAutoSize);
+		workingPlaneAutoSize->setPropertyTip("If enabled, the working plane will automatically adjust its size according to the current geometry");
+		PropertyInt* workingPlaneSize = new PropertyInt("Size", settings->workingPlaneDefaultSize, 1, 999999);
+		PropertyColor* workingPlaneColor = new PropertyColor("Plane Color", settings->workingPlanePlaneColor);
+		PropertyColor* workingPlaneGridColor = new PropertyColor("Grid Color", settings->workingPlaneGridLineColor);
+		PropertyBool* workingPlaneGridAutoResolution = new PropertyBool("Automatic Grid Resolution", settings->workingPlaneAutoGridResolution);
+		PropertyDouble* workingPlaneGridResolution = new PropertyDouble("Grid Resolution", settings->workingPlaneGridResolution, 0.001, 999999);
+		workingPlaneGridResolution->setPrecision(3);
+		PropertyInt* workingPlaneGridHightlightStep = new PropertyInt("Highlight Grid Line", settings->workingPlaneHighlightEveryStep, 0, 100);
+		PropertyInt* workingPlaneGridLineWidth = new PropertyInt("Grid Line Width", settings->workingPlaneGridLineWidth, 1, 20);
+		PropertyInt* workingPlaneGridWideLineWidth = new PropertyInt("Wide Grid Line Width", settings->workingPlaneWideGridLineWidth, 1, 20);
 
 		// Visibility
-		workingPlaneSize->setVisible(!settings->workingPlaneAutoSize);
-		workingPlaneColor->setVisible(settings->workingPlaneStyle != settings->workingPlaneStyle_Grid);
-		workingPlaneGridColor->setVisible(settings->workingPlaneStyle != settings->workingPlaneStyle_Plane);
-		workingPlaneGridResolution->setVisible(!settings->workingPlaneAutoGridResolution);
+		workingPlaneSize->setPropertyFlag(Property::IsHidden, settings->workingPlaneAutoSize);
+		workingPlaneColor->setPropertyFlag(Property::IsHidden, settings->workingPlaneStyle == settings->workingPlaneStyle_Grid);
+		workingPlaneGridColor->setPropertyFlag(Property::IsHidden, settings->workingPlaneStyle == settings->workingPlaneStyle_Plane);
+		workingPlaneGridResolution->setPropertyFlag(Property::IsHidden, settings->workingPlaneAutoGridResolution);
 
 		// Add items
-		workingPlane->addItem(workingPlaneGridStyle);
-		workingPlane->addItem(workingPlaneDefaultSize);
-		workingPlane->addItem(workingPlaneAutoSize);
-		workingPlane->addItem(workingPlaneSize);
-		workingPlane->addItem(workingPlaneColor);
-		workingPlane->addItem(workingPlaneGridColor);
-		workingPlane->addItem(workingPlaneGridAutoResolution);
-		workingPlane->addItem(workingPlaneGridResolution);
-		workingPlane->addItem(workingPlaneGridHightlightStep);
-		workingPlane->addItem(workingPlaneGridLineWidth);
-		workingPlane->addItem(workingPlaneGridWideLineWidth);
+		workingPlane->addProperty(workingPlaneGridStyle);
+		workingPlane->addProperty(workingPlaneDefaultSize);
+		workingPlane->addProperty(workingPlaneAutoSize);
+		workingPlane->addProperty(workingPlaneSize);
+		workingPlane->addProperty(workingPlaneColor);
+		workingPlane->addProperty(workingPlaneGridColor);
+		workingPlane->addProperty(workingPlaneGridAutoResolution);
+		workingPlane->addProperty(workingPlaneGridResolution);
+		workingPlane->addProperty(workingPlaneGridHightlightStep);
+		workingPlane->addProperty(workingPlaneGridLineWidth);
+		workingPlane->addProperty(workingPlaneGridWideLineWidth);
+
+		config.addRootGroup(workingPlane);
 	}
 	// Axis cross
 	{
-		ot::SettingsGroup * axisCross = view->addSubgroup("AxisCross", "Axis cross");
-		ot::SettingsItemColor * axisXColor = new ot::SettingsItemColor("ColorX", "Color X-Axis", settings->axisXColor);
-		ot::SettingsItemColor * axisYColor = new ot::SettingsItemColor("ColorY", "Color Y-Axis", settings->axisYColor);
-		ot::SettingsItemColor * axisZColor = new ot::SettingsItemColor("ColorZ", "Color Z-Axis", settings->axisZColor);
-		ot::SettingsItemColor * axisCenterColor = new ot::SettingsItemColor("ColorCenter", "Center point color", settings->axisCenterColor);
-		ot::SettingsItemInteger * axisCenterCrossLineWidth = new ot::SettingsItemInteger("CenterCrossLineWidth", "Line width", settings->axisCenterCrossLineWidth, 1, 50);
-		ot::SettingsItemBoolean * axisCenterCrossDashLineVisible = new ot::SettingsItemBoolean("DashedLineVisible", "Negative visible", settings->axisCenterCrossDashedLineVisible);
-		ot::SettingsItemBoolean * axisCenterCrossAlwaysFront = new ot::SettingsItemBoolean("CenterCrossAlswaysAtFront", "Keep always at front", settings->axisCenterCrossLineAtFront);
+		PropertyGroup* axisCross = new ot::PropertyGroup("Axis Cross");
+		PropertyColor* axisXColor = new PropertyColor("Color X-Axis", settings->axisXColor);
+		PropertyColor* axisYColor = new PropertyColor("Color Y-Axis", settings->axisYColor);
+		PropertyColor* axisZColor = new PropertyColor("Color Z-Axis", settings->axisZColor);
+		PropertyColor* axisCenterColor = new PropertyColor("Center Point Color", settings->axisCenterColor);
+		PropertyInt* axisCenterCrossLineWidth = new PropertyInt("Line Width", settings->axisCenterCrossLineWidth, 1, 50);
+		PropertyBool* axisCenterCrossDashLineVisible = new PropertyBool("Negative Visible", settings->axisCenterCrossDashedLineVisible);
+		PropertyBool* axisCenterCrossAlwaysFront = new PropertyBool("Keep At Front", settings->axisCenterCrossLineAtFront);
+		
+		axisCross->addProperty(axisXColor);
+		axisCross->addProperty(axisYColor);
+		axisCross->addProperty(axisZColor);
+		axisCross->addProperty(axisCenterColor);
+		axisCross->addProperty(axisCenterCrossLineWidth);
+		axisCross->addProperty(axisCenterCrossDashLineVisible);
+		axisCross->addProperty(axisCenterCrossAlwaysFront);
 
-		axisCross->addItem(axisXColor);
-		axisCross->addItem(axisYColor);
-		axisCross->addItem(axisZColor);
-		axisCross->addItem(axisCenterColor);
-		axisCross->addItem(axisCenterCrossLineWidth);
-		axisCross->addItem(axisCenterCrossDashLineVisible);
-		axisCross->addItem(axisCenterCrossAlwaysFront);
+		config.addRootGroup(axisCross);
 	}
 
 	// ## Geometry ##
 	{
-		// Data
-		ot::SettingsGroup *geometry = view->addSubgroup("Geometry", "Geometry");
-		ot::SettingsItemColor *geometryHightlightColor = new ot::SettingsItemColor("HighlightColor", "Highlight color", settings->geometryHighlightColor);
-		ot::SettingsItemSelection *geometryEdgeColorMode = new ot::SettingsItemSelection("EdgeColorMode", "Edge color mode", { settings->geometryEdgeColorMode_custom, settings->geometryEdgeColorMode_geom, settings->geometryEdgeColorMode_noColor }, settings->geometryEdgeColorMode);
-		ot::SettingsItemColor *geometryEdgeColor = new ot::SettingsItemColor("EdgeColor", "Edge color", settings->geometryEdgeColor);
-		ot::SettingsItemSelection *geometryLightSourceDistance = new ot::SettingsItemSelection("LightSourceDistance", "Light source distance", { "Low", "Medium", "High", "Infinite" }, settings->geometryLightSourceDistance);
-		ot::SettingsItemBoolean * viewBackgroundColorAutomatic = new ot::SettingsItemBoolean("ViewBackgroundColorAutomatic", "Automatic view background color", settings->viewBackgroundColorAutomatic);
-		ot::SettingsItemColor *viewBackgroundColor = new ot::SettingsItemColor("ViewBackgroundColor", "View background color", settings->viewBackgroundColor);
-		ot::SettingsItemColor *viewForegroundColor = new ot::SettingsItemColor("ViewForegroundColor", "View foreground color", settings->viewForegroundColor);
-
+		// Data#
+		PropertyGroup* geometry = new ot::PropertyGroup("Geometry");
+		PropertyColor* geometryHightlightColor = new PropertyColor("Highlight Color", settings->geometryHighlightColor);
+		PropertyStringList* geometryEdgeColorMode = new PropertyStringList("Edge Color Mode", settings->geometryEdgeColorMode, std::list<std::string>({ settings->geometryEdgeColorMode_custom, settings->geometryEdgeColorMode_geom, settings->geometryEdgeColorMode_noColor }));
+		PropertyColor* geometryEdgeColor = new PropertyColor("Edge Color", settings->geometryEdgeColor);
+		PropertyStringList* geometryLightSourceDistance = new PropertyStringList("Light Source Distance", settings->geometryLightSourceDistance, std::list<std::string>({ "Low", "Medium", "High", "Infinite" }));
+		PropertyBool* viewBackgroundColorAutomatic = new PropertyBool("Automatic View Background Color", settings->viewBackgroundColorAutomatic);
+		PropertyColor* viewBackgroundColor = new PropertyColor("View Background Color", settings->viewBackgroundColor);
+		PropertyColor* viewForegroundColor = new PropertyColor("View Foreground Color", settings->viewForegroundColor);
+	
 		// Visibility
-		viewBackgroundColor->setVisible(!settings->viewBackgroundColorAutomatic);
-		viewForegroundColor->setVisible(!settings->viewBackgroundColorAutomatic);
+		viewBackgroundColor->setPropertyFlag(Property::IsHidden, settings->viewBackgroundColorAutomatic);
+		viewForegroundColor->setPropertyFlag(Property::IsHidden, settings->viewBackgroundColorAutomatic);
 
 		// Add items
-		geometry->addItem(geometryHightlightColor);
-		geometry->addItem(geometryEdgeColorMode);
-		geometry->addItem(geometryLightSourceDistance);
-		geometry->addItem(viewBackgroundColorAutomatic);
-		geometry->addItem(viewBackgroundColor);
-		geometry->addItem(viewForegroundColor);
+		geometry->addProperty(geometryHightlightColor);
+		geometry->addProperty(geometryEdgeColorMode);
+		geometry->addProperty(geometryLightSourceDistance);
+		geometry->addProperty(viewBackgroundColorAutomatic);
+		geometry->addProperty(viewBackgroundColor);
+		geometry->addProperty(viewForegroundColor);
+
+		config.addRootGroup(geometry);
 	}
 
 	// ## Display settings ##
 	{
 		// Data
-		ot::SettingsGroup *display = view->addSubgroup("Display", "Display");
-		ot::SettingsItemBoolean * useDisplayList = new ot::SettingsItemBoolean("UseDisplayList", "Enable usage of display lists", settings->useDisplayLists);
-		ot::SettingsItemBoolean * useVertexBuffers = new ot::SettingsItemBoolean("UseVertexBuffers", "Enable usage of vertex buffer objects", settings->useVertexBufferObjects);
+		PropertyGroup* display = new ot::PropertyGroup("Display");
+		PropertyBool* useDisplayList = new PropertyBool("Enable Display Lists", settings->useDisplayLists);
+		useDisplayList->setPropertyTip("Enables the usage of display lists");
+		PropertyBool* useVertexBuffers = new PropertyBool("Enable Vertex Buffer", settings->useVertexBufferObjects);
+		useVertexBuffers->setPropertyTip("Enables the usage of vertex buffer objects");
 
 		// Add items
-		display->addItem(useDisplayList);
-		display->addItem(useVertexBuffers);
+		display->addProperty(useDisplayList);
+		display->addProperty(useVertexBuffers);
+
+		config.addRootGroup(display);
 	}
 
-	return dataset;
+	return config;
 }
 
 void Viewer::addHandler(HandlerBase *handler)

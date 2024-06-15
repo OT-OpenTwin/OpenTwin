@@ -203,7 +203,6 @@ namespace ak {
 		otMainWindow,
 		otMenu,
 		otNiceLineEdit,
-		otOptionsDialog,
 		otPrompt,
 		otPropertyGrid,
 		otPropertyGridItem,

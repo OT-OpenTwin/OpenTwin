@@ -24,7 +24,6 @@
 #include <akCore/aUidMangager.h>
 
 // AK dialogs
-#include <akDialogs/aOptionsDialog.h>
 #include <akDialogs/aPromptDialog.h>
 
 // AK GUI
@@ -435,14 +434,6 @@ ak::UID ak::uiAPI::createPushButton(
 ) {
 	assert(m_objManager != nullptr); // API not initialized
 	return m_objManager->createPushButton(_creatorUid, _text);
-}
-
-ak::UID ak::uiAPI::createOptionsDialog(
-	UID												_creatorUid,
-	const QString &										_title
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createOptionsDialog(_creatorUid, _title);
 }
 
 ak::UID ak::uiAPI::createPushButton(
@@ -1087,7 +1078,6 @@ void ak::uiAPI::object::setEnabled(
 	case otLineEdit: akCastObject<aLineEditWidget>(obj)->setEnabled(_enabled); return;
 	case otList: akCastObject<aListWidget>(obj)->setEnabled(_enabled); return;
 	case otNiceLineEdit: akCastObject<aNiceLineEditWidget>(obj)->setEnabled(_enabled); return;
-	case otOptionsDialog: akCastObject<aOptionsDialog>(obj)->setEnabled(_enabled); return;
 	case otPrompt: akCastObject<aPromptDialog>(obj)->setEnabled(_enabled); return;
 	case otPushButton: akCastObject<aPushButtonWidget>(obj)->setEnabled(_enabled); return;
 	case otSpecialTabBar: akCastObject<aSpecialTabBar>(obj)->setEnabled(_enabled); return;
@@ -1123,7 +1113,6 @@ bool ak::uiAPI::object::getIsEnabled(
 	case otLineEdit: return akCastObject<aLineEditWidget>(obj)->isEnabled();
 	case otList: return akCastObject<aListWidget>(obj)->isEnabled();
 	case otNiceLineEdit: return akCastObject<aNiceLineEditWidget>(obj)->isEnabled();
-	case otOptionsDialog: return akCastObject<aOptionsDialog>(obj)->isEnabled();
 	case otPrompt: return akCastObject<aPromptDialog>(obj)->isEnabled();
 	case otPushButton: return akCastObject<aPushButtonWidget>(obj)->isEnabled();
 	case otSpecialTabBar: return akCastObject<aSpecialTabBar>(obj)->isEnabled();
@@ -1155,12 +1144,6 @@ ak::objectType ak::uiAPI::object::type(
 }
 
 // Object
-
-// ###############################################################################################################################################
-
-// Options dialog
-
-// Options dialog
 
 // ###############################################################################################################################################
 

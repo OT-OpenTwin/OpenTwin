@@ -12,6 +12,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OTObjectBase.h"
+#include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTServiceFoundation/EntityInformation.h"
@@ -36,7 +37,6 @@ namespace ot {
 		class ExternalServicesComponent;
 	}
 
-	class SettingsData;
 	class AbstractUIPlugin;
 	class ModalCommandBase;
 	class AbstractUiNotifier;
@@ -103,24 +103,23 @@ namespace ot {
 		//! @brief Will return true if this application requires a relay service for a websocket connection
 		virtual bool startAsRelayService(void) const = 0;
 
-		//! @brief Create settings that your application uses that are editable in the uiService
+		//! @brief Create settings that your application uses that are editable in the uiService.
 		//! The created class will be deleted after used for sending or synchronizing with the database.
 		//! The created settings will be requested upon Service startup to synchronize with the database,
 		//! aswell as when the uiService is connected
-		virtual SettingsData * createSettings(void) = 0;
+		virtual PropertyGridCfg createSettings(void) const = 0;
 
-		//! @brief This function will be called when the settings were synchronized with the database
+		//! @brief This function will be called when the settings were synchronized with the database.
 		//! At this point the values from the dataset should be stored since the dataset will be deleted after this function call
 		//! @param The dataset that contains all values
-		virtual void settingsSynchronized(SettingsData * _dataset) = 0;
+		virtual void settingsSynchronized(const PropertyGridCfg& _config) = 0;
 
-		//! @brief This function will be called when the settings were changed in the uiService
+		//! @brief This function will be called when the settings were changed in the uiService.
 		//! The value of the provided item should be stored.
-		//! If the change of the item will change the item visibility of any settings item, this function should return true,
-		//! otherwise false. When returning true, the function createSettings() will be called and the created dataset will be
-		//! send to the uiService to update the Settings in the dialog
+		//! If the change of the item will change the item visibility of any settings item, this function should return true, otherwise false. 
+		//! When returning true, the function createSettings() will be called and the created dataset will be send to the uiService to update the Settings in the dialog.
 		//! @param The item that has been changed in the uiService (instance will be deleted after this function call)
-		virtual bool settingChanged(AbstractSettingsItem * _item) = 0;
+		virtual bool settingChanged(const Property* _property) = 0;
 
 		//! @brief Will return the path of the deployment folder
 		//! Returns an empty string in case of an error
@@ -285,6 +284,10 @@ namespace ot {
 	protected:
 
 		bool EnsureDataBaseConnection(void);
+
+		bool storeSettingToDataBase(const PropertyGridCfg& _config, const std::string& _databaseURL, const std::string& _siteID, const std::string& _userName, const std::string& _userPassword, const std::string& _userCollection);
+
+		PropertyGridCfg getSettingsFromDataBase(const std::string& _databaseURL, const std::string& _siteID, const std::string& _userName, const std::string& _userPassword, const std::string& _userCollection);
 
 		// ##########################################################################################################################################
 

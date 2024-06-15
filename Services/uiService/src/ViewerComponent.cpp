@@ -16,7 +16,6 @@
 #include "UserSettings.h"
 #include "ContextMenuManager.h"
 
-#include "OTServiceFoundation/SettingsData.h"
 #include "OTCore/OTAssert.h"
 #include "OTWidgets/DoubleSpinBox.h"
 #include "OTWidgets/PropertyGridItem.h"
@@ -397,24 +396,20 @@ void ViewerComponent::rubberbandFinished(ot::serviceID_t creatorId, const std::s
 	AppBase::instance()->getExternalServicesComponent()->sendRubberbandResultsToService(creatorId, note, pointJson, transform);
 }
 
-void ViewerComponent::updateSettings(ot::SettingsData * _data) 
+void ViewerComponent::updateSettings(const ot::PropertyGridCfg& _config)
 {
-	UserSettings::instance()->updateViewerSettings(_data);
+	UserSettings::instance().addSettings(VIEWER_SETTINGS_NAME, _config);
 }
 
-void ViewerComponent::loadSettings(ot::SettingsData * _data) 
+void ViewerComponent::loadSettings(ot::PropertyGridCfg& _config)
 {
-
-	if (!_data->refreshValuesFromDatabase(AppBase::instance()->getCurrentLoginData().getDatabaseUrl(), std::to_string(AppBase::instance()->getSiteID()), AppBase::instance()->getCurrentLoginData().getSessionUser(), AppBase::instance()->getCurrentLoginData().getSessionPassword(), AppBase::instance()->getCurrentUserCollection())) {
-		AppBase::instance()->appendInfoMessage("[ERROR] Failed to import viewer settings data from database\n");
-	}
+	ot::PropertyGridCfg oldConfig = AppBase::instance()->getSettingsFromDataBase(VIEWER_SETTINGS_NAME);
+	_config.mergeWith(oldConfig, true);
 }
 
-void ViewerComponent::saveSettings(ot::SettingsData * _data) 
+void ViewerComponent::saveSettings(const ot::PropertyGridCfg& _config)
 {
-	if (!_data->saveToDatabase(AppBase::instance()->getCurrentLoginData().getDatabaseUrl(), std::to_string(AppBase::instance()->getSiteID()), AppBase::instance()->getCurrentLoginData().getSessionUser(), AppBase::instance()->getCurrentLoginData().getSessionPassword(), AppBase::instance()->getCurrentUserCollection())) {
-		AppBase::instance()->appendInfoMessage("[ERROR] Failed to export viewer settings data to database\n");
-	}
+	AppBase::instance()->storeSettingToDataBase(_config, VIEWER_SETTINGS_NAME);
 }
 
 void ViewerComponent::updateVTKEntity(unsigned long long modelEntityID)
@@ -1010,9 +1005,9 @@ void ViewerComponent::shortcutActivated(const std::string &keySequence) {
 	ViewerAPI::shortcutActivated(keySequence);
 }
 
-void ViewerComponent::settingsItemChanged(ot::AbstractSettingsItem * _item) {
+void ViewerComponent::settingsItemChanged(const ot::Property* _property) {
 	for (auto vId : m_viewers) {
-		ViewerAPI::settingsItemChanged(vId, _item);
+		ViewerAPI::settingsItemChanged(vId, _property);
 	}
 }
 

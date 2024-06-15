@@ -111,7 +111,7 @@ void ToolBar::notify(
 	}
 	else if ((_sender == m_file.gDefault_aSettings && _event == etClicked) ||
 		(_sender == m_view.gUserInterface_aSettings && _event == etClicked)) {
-		UserSettings::instance()->showDialog();
+		UserSettings::instance().showDialog();
 	}
 	else if (_sender == m_file.gDefault_aImport && _event == etClicked) {
 		m_owner->importProject();

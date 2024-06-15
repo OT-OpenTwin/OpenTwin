@@ -228,7 +228,7 @@ void ContextMenuManager::notify(UID _sender, eventType _event, int _info1, int _
 				else {
 					if (entry->role() == CONTEXTMENUMANAGER_ROLE_ID_SettingsRef) {
 						QString group = entry->roleText().c_str();
-						UserSettings::instance()->showDialog(group);
+						UserSettings::instance().showDialog(group);
 					}
 					else if (entry->role() == CONTEXTMENUMANAGER_ROLE_ID_Custom) {
 
@@ -268,7 +268,7 @@ void ContextMenuManager::notify(UID _sender, eventType _event, int _info1, int _
 				else {
 					if (entry->role() == CONTEXTMENUMANAGER_ROLE_ID_SettingsRef) {
 						QString group = entry->roleText().c_str();
-						UserSettings::instance()->showDialog(group);
+						UserSettings::instance().showDialog(group);
 					}
 					else if (entry->role() == CONTEXTMENUMANAGER_ROLE_ID_Custom) {
 

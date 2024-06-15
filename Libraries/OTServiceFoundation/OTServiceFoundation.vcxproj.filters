@@ -31,9 +31,6 @@
     <ClCompile Include="src\PythonServiceInterface.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\SettingsData.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c">
       <Filter>ThirdParty</Filter>
     </ClCompile>
@@ -118,9 +115,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\PythonServiceInterface.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\SettingsData.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\TableRange.h">

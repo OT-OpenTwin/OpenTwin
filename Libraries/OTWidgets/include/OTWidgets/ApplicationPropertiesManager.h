@@ -30,6 +30,10 @@ namespace ot {
 
 		ot::Dialog::DialogResult showDialog(void);
 
+		void clear(void);
+
+		std::list<const Property*> getChangedProperties(void) const { return m_changedProperties; };
+
 	Q_SIGNALS:
 		void propertyChanged(const std::string& _owner, const Property* const _property);
 		void propertyDeleteRequested(const std::string& _owner, const Property* const _property);
@@ -64,6 +68,8 @@ namespace ot {
 
 	private:
 		bool m_propertyReplaceOnMerge;
+
+		std::list<const Property*> m_changedProperties;
 		std::map<std::string, PropertyGridCfg> m_data;
 		PropertyDialog* m_dialog;
 		std::list<Property*> m_garbage;

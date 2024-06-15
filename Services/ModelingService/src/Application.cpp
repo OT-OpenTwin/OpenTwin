@@ -35,8 +35,11 @@
 
 // Open twin header
 #include "OTCore/OTAssert.h"
+#include "OTGui/PropertyGroup.h"
+#include "OTGui/PropertyColor.h"
+#include "OTGui/PropertyString.h"
+#include "OTGui/PropertyStringList.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTServiceFoundation/SettingsData.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 
@@ -307,61 +310,66 @@ void Application::modelSelectionChanged(void)
 }
 
 
-ot::SettingsData * Application::createSettings(void) {
-	ApplicationSettings * settings = ApplicationSettings::instance();
-	ot::SettingsData * dataset = new ot::SettingsData("ModelingServiceSettings", "1.0");
-	ot::SettingsGroup * root = dataset->addGroup("Modeling", "Modeling");
+ot::PropertyGridCfg Application::createSettings(void) const {
+	ApplicationSettings* settings = ApplicationSettings::instance();
 
-	ot::SettingsGroup * geom = root->addSubgroup("Geom", "Geometry");
-	ot::SettingsItemColor * geomColor = new ot::SettingsItemColor("Color", "Geometry default color", settings->geometryDefaultColor);
-	ot::SettingsItemSelection * geomNamingMode = new ot::SettingsItemSelection("NamingMode", "New geometry naming mode", { settings->geometryNamingModeGeometryBased, settings->geometryNamingModeCustom }, settings->geometryNamingMode);
-	ot::SettingsItemString * geomCustomName = new ot::SettingsItemString("CustomName", "New geometry name", settings->geometryDefaultName, "Name of a new created geometry");
+	ot::PropertyGridCfg config;
+
+	ot::PropertyGroup* geom = new ot::PropertyGroup("Geometry");
+	ot::PropertyColor* geomColor = new ot::PropertyColor("Default Geometry Color", settings->geometryDefaultColor);
+	ot::PropertyStringList* geomNamingMode = new ot::PropertyStringList("Geometry Naming Mode", settings->geometryNamingMode, std::list<std::string>({ settings->geometryNamingModeGeometryBased, settings->geometryNamingModeCustom }));
+	geomNamingMode->setPropertyTip("Naming mode for new geometries");
+	ot::PropertyString* geomCustomName = new ot::PropertyString("New Geometry Name", settings->geometryDefaultName);
+
+	// Visibility
+	geomCustomName->setPropertyFlag(ot::Property::IsHidden, geomNamingMode->getCurrent() != settings->geometryNamingModeCustom);
 	
-	geomCustomName->setVisible(geomNamingMode->selectedValue() == settings->geometryNamingModeCustom);
+	// Add
+	geom->addProperty(geomColor);
+	geom->addProperty(geomNamingMode);
+	geom->addProperty(geomCustomName);
 	
-	geom->addItem(geomColor);
-	geom->addItem(geomNamingMode);
-	geom->addItem(geomCustomName);
-	
-	return dataset;
+	config.addRootGroup(geom);
+
+	return config;
 }
 
-void Application::settingsSynchronized(ot::SettingsData * _dataset) {
+void Application::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 	ApplicationSettings * settings = ApplicationSettings::instance();
 
-	ot::SettingsItemColor * geomColor = dynamic_cast<ot::SettingsItemColor *>(_dataset->findItemByLogicalName("Modeling:Geom:Color"));
-	ot::SettingsItemSelection * geomNamingMode = dynamic_cast<ot::SettingsItemSelection *>(_dataset->findItemByLogicalName("Modeling:Geom:NamingMode"));
-	ot::SettingsItemString * geomCustomName = dynamic_cast<ot::SettingsItemString *>(_dataset->findItemByLogicalName("Modeling:Geom:CustomName"));
+	ot::PropertyColor* geomColor = dynamic_cast<ot::PropertyColor*>(_dataset.findPropertyByPath("Geometry/Default Geometry Color"));
+	ot::PropertyStringList* geomNamingMode = dynamic_cast<ot::PropertyStringList*>(_dataset.findPropertyByPath("Geometry/Geometry Naming Mode"));
+	ot::PropertyString* geomCustomName = dynamic_cast<ot::PropertyString*>(_dataset.findPropertyByPath("Geometry/New Geometry Name"));
 	
-	if (geomColor) { settings->geometryDefaultColor = geomColor->value(); } else { OTAssert(0, "Item not found"); }
-	if (geomNamingMode) { settings->geometryNamingMode = geomNamingMode->selectedValue(); } else { OTAssert(0, "Item not found"); }
-	if (geomCustomName) { settings->geometryDefaultName = geomCustomName->value(); } else { OTAssert(0, "Item not found"); }
-	if (geomNamingMode && geomCustomName) { geomCustomName->setVisible(geomNamingMode->selectedValue() == settings->geometryNamingModeCustom); }
+	if (geomColor) { settings->geometryDefaultColor = geomColor->getValue(); } else { OTAssert(0, "Item not found"); }
+	if (geomNamingMode) { settings->geometryNamingMode = geomNamingMode->getCurrent(); } else { OTAssert(0, "Item not found"); }
+	if (geomCustomName) { settings->geometryDefaultName = geomCustomName->getValue(); } else { OTAssert(0, "Item not found"); }
 }
 
-bool Application::settingChanged(ot::AbstractSettingsItem * _item) {
-	std::string name = _item->logicalName();
-	if (name == "Modeling:Geom:Color") {
-		ot::SettingsItemColor * geomColor = dynamic_cast<ot::SettingsItemColor *>(_item);
+bool Application::settingChanged(const ot::Property * _item) {
+	std::string name = _item->getPropertyPath();
+
+	if (name == "Geometry/Default Geometry Color") {
+		const ot::PropertyColor * geomColor = dynamic_cast<const ot::PropertyColor*>(_item);
 		if (geomColor == nullptr) {
 			OTAssert(0, "Cast failed"); return false;
 		}
-		ApplicationSettings::instance()->geometryDefaultColor = geomColor->value();
+		ApplicationSettings::instance()->geometryDefaultColor = geomColor->getValue();
 	}
-	else if (name == "Modeling:Geom:NamingMode") {
-		ot::SettingsItemSelection * geomNamingMode = dynamic_cast<ot::SettingsItemSelection *>(_item);
+	else if (name == "Geometry/Geometry Naming Mode") {
+		const ot::PropertyStringList* geomNamingMode = dynamic_cast<const ot::PropertyStringList*>(_item);
 		if (geomNamingMode == nullptr) {
 			OTAssert(0, "Cast failed"); return false;
 		}
-		ApplicationSettings::instance()->geometryNamingMode = geomNamingMode->selectedValue();
+		ApplicationSettings::instance()->geometryNamingMode = geomNamingMode->getCurrent();
 		return true;
 	}
-	else if (name == "Modeling:Geom:CustomName") {
-		ot::SettingsItemString * geomCustomName = dynamic_cast<ot::SettingsItemString *>(_item);
+	else if (name == "Geometry/New Geometry Name") {
+		const ot::PropertyString* geomCustomName = dynamic_cast<const ot::PropertyString*>(_item);
 		if (geomCustomName == nullptr) {
 			OTAssert(0, "Cast failed"); return false;
 		}
-		ApplicationSettings::instance()->geometryDefaultName = geomCustomName->value();
+		ApplicationSettings::instance()->geometryDefaultName = geomCustomName->getValue();
 	}
 	else {
 		OTAssert(0, "Unknown item name");

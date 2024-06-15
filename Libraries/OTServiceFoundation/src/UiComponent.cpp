@@ -14,7 +14,6 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/UiPluginComponent.h"
 #include "OTServiceFoundation/ApplicationBase.h"
-#include "OTServiceFoundation/SettingsData.h"
 
 #include "TemplateDefaultManager.h"
 
@@ -866,18 +865,17 @@ bool ot::components::UiComponent::controlNameExists(const std::string & _name) c
 	return std::find(m_uiElements.begin(), m_uiElements.end(), _name) != m_uiElements.end();
 }
 
-void ot::components::UiComponent::sendSettingsData(
-	SettingsData *				_settingsData
-) {
-	if (_settingsData == nullptr) {
-		OTAssert(0, "Nullptr provided @addSettingsData");
-		return;
-	}
+void ot::components::UiComponent::sendSettingsData(const PropertyGridCfg& _config) {
+	// Ignore empty settings
+	if (_config.isEmpty()) return;
 
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_AddSettingsData, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
-	_settingsData->addToJsonDocument(cmdDoc);
+	
+	JsonObject configObj;
+	_config.addToJsonObject(configObj, cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_Config, configObj, cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
