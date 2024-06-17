@@ -1,7 +1,6 @@
 #pragma once
 #include "EntityBlock.h"
-class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock
-{
+class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock {
 	public:
 		EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 		virtual std::string getClassName(void) override { return "EntityBlockCircuitVoltageSource"; };
@@ -25,6 +24,11 @@ class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock
 	
 		ot::Connector m_LeftConnector;
 		ot::Connector m_RightConnector;
+
+		void createTRANProperties();
+		void createACProperties();
+		void createDCProperties();
+
 		void createPULSEProperties();
 		void createSINProperties();
 		void createEXPProperties();
@@ -33,7 +37,6 @@ class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock
 		bool SetVisiblePULSEProperties(bool visible);
 		bool SetVisibleSINProperties(bool visible);
 		bool SetVisibleEXPProperties(bool visible);
-		bool SetVisibleAmplitude(bool visible);
 
 		void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 		void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;

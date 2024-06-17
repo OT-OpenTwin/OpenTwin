@@ -28,37 +28,51 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 
 void EntityBlockCircuitVoltageSource::createProperties()
 {
-	EntityPropertiesString::createProperty("Voltage Property", "Voltage", "100", "default", getProperties());
-	EntityPropertiesSelection::createProperty("Function-Properties", "Function", { "PULSE", "SIN", "EXP","Amplitude Normal" }, "", "default", getProperties());
+	createDCProperties();
+	createTRANProperties();
+	createACProperties();
 
 
-	createPULSEProperties();
-	createSINProperties();
-	createEXPProperties();
-	createAmplitudeProperties();
+
 
 	SetVisiblePULSEProperties(false);
 	SetVisibleSINProperties(false);
 	SetVisibleEXPProperties(false);
-	SetVisibleAmplitude(false);
+	
 	
 }
 
 
+void EntityBlockCircuitVoltageSource::createTRANProperties() {
 
+	EntityPropertiesSelection::createProperty("TRAN-Properties", "TRAN", { "PULSE", "SIN", "EXP"}, "", "default", getProperties());
 
+	createPULSEProperties();
+	createSINProperties();
+	createEXPProperties();
 
+}
+
+void EntityBlockCircuitVoltageSource::createACProperties()
+{
+	createAmplitudeProperties();
+}
+
+void EntityBlockCircuitVoltageSource::createDCProperties()
+{
+	EntityPropertiesString::createProperty("DC-Properties", "DC-Voltage", "100", "default", getProperties());
+}
 
 void EntityBlockCircuitVoltageSource::createPULSEProperties()
 {
-	EntityPropertiesInteger::createProperty("Pulse Properties", "Pulse Initial value", 0 , "default", getProperties());
-	EntityPropertiesInteger::createProperty("Pulse Properties", "Pulse Pulsed value", 0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("Pulse Properties", "Delay time", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("Pulse Properties", "Rise time", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("Pulse Properties", "Fall time", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("Pulse Properties", "Pulse width", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("Pulse Properties", "Period", 0.0, "default", getProperties());
-	EntityPropertiesInteger::createProperty("Pulse Properties", "Number of Pulses", 0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("", "Pulse Initial value", 0 , "default", getProperties());
+	EntityPropertiesInteger::createProperty("", "Pulse Pulsed value", 0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("", "Delay time", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("", "Rise time", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("", "Fall time", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("", "Pulse width", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("", "Period", 0.0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("", "Number of Pulses", 0, "default", getProperties());
 }
 
 std::vector<std::string> EntityBlockCircuitVoltageSource::getPulseParameters()
@@ -140,12 +154,12 @@ bool EntityBlockCircuitVoltageSource::SetVisiblePULSEProperties(bool visible)
 
 void EntityBlockCircuitVoltageSource::createSINProperties()
 {
-	EntityPropertiesInteger::createProperty("Sin Properties", "Offset", 0, "default", getProperties());
-	EntityPropertiesInteger::createProperty("Sin Properties", "Amplitude", 0, "default", getProperties());
-	EntityPropertiesInteger::createProperty("Sin Properties", "Frequency", 0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("Sin Properties", "Delay", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("Sin Properties", "Damping factor", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("Sin Properties", "Phase", 0.0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("", "Offset", 0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("", "Amplitude", 0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("", "Frequency", 0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("", "Delay", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("", "Damping factor", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("", "Phase", 0.0, "default", getProperties());
 }
 
 std::vector<std::string> EntityBlockCircuitVoltageSource::getSinParameters()
@@ -213,12 +227,12 @@ bool EntityBlockCircuitVoltageSource::SetVisibleSINProperties(bool visible)
 
 void EntityBlockCircuitVoltageSource::createEXPProperties()
 {
-	EntityPropertiesInteger::createProperty("Exponential Properties", "Exponential Initial Value", 0, "default", getProperties());
-	EntityPropertiesInteger::createProperty("Exponential Properties", "Exponential Pulsed Value", 0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("Exponential Properties", "Rise delay time", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("Exponential Properties", "Rise time constant", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("Exponential Properties", "Fall delay time", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("Exponential Properties", "Fall time constant", 0.0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("", "Exponential Initial Value", 0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("", "Exponential Pulsed Value", 0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("", "Rise delay time", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("", "Rise time constant", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("", "Fall delay time", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("", "Fall time constant", 0.0, "default", getProperties());
 }
 
 std::vector<std::string> EntityBlockCircuitVoltageSource::getExpParameters()
@@ -286,70 +300,42 @@ bool EntityBlockCircuitVoltageSource::SetVisibleEXPProperties(bool visible)
 
 void EntityBlockCircuitVoltageSource::createAmplitudeProperties()
 {
-	EntityPropertiesInteger::createProperty("Amplitude Properties", "Amplitude Normal", 0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("AC-Properties", "AC-Amplitude", 0, "default", getProperties());
 }
 
 std::string EntityBlockCircuitVoltageSource::getAmplitude()
 {
-	auto propertyBase = getProperties().getProperty("Amplitude Normal");
+	auto propertyBase = getProperties().getProperty("AC-Amplitude");
 	auto property = dynamic_cast<EntityPropertiesInteger*>(propertyBase);
 	assert(propertyBase != nullptr);
 	return std::to_string(property->getValue());
 }
 
-bool EntityBlockCircuitVoltageSource::SetVisibleAmplitude(bool visible)
-{
-	const bool isVisible = getProperties().getProperty("Amplitude Normal")->getVisible();
-	const bool refresh = isVisible != visible;
-	if (refresh)
-	{
-		getProperties().getProperty("Amplitude Normal")->setVisible(visible);
-		this->setModified();
-	}
-	return refresh;
-}
-
-
 bool EntityBlockCircuitVoltageSource::updateFromProperties(void)
 {
 	bool refresh = false;
 
-	auto baseProperty = getProperties().getProperty("Function");
+	auto baseProperty = getProperties().getProperty("TRAN");
 	auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
 
-	if (selectionProperty->getValue() == "PULSE")
-	{
+	if (selectionProperty->getValue() == "PULSE") {
 		refresh |= SetVisiblePULSEProperties(true);
 		refresh |= SetVisibleSINProperties(false);
 		refresh |= SetVisibleEXPProperties(false);
-		refresh |= SetVisibleAmplitude(false);
 	}
-	else if (selectionProperty->getValue() == "SIN")
-	{
+	else if (selectionProperty->getValue() == "SIN") {
 		refresh |= SetVisiblePULSEProperties(false);
 		refresh |= SetVisibleSINProperties(true);
 		refresh |= SetVisibleEXPProperties(false);
-		refresh |= SetVisibleAmplitude(false);
 	}
-	else if (selectionProperty->getValue() == "EXP")
-	{
+	else if (selectionProperty->getValue() == "EXP") {
 		refresh |= SetVisiblePULSEProperties(false);
 		refresh |= SetVisibleSINProperties(false);
 		refresh |= SetVisibleEXPProperties(true);
-		refresh |= SetVisibleAmplitude(false);
 	}
-	else if (selectionProperty->getValue() == "Amplitude Normal")
-	{
-		refresh |= SetVisibleAmplitude(true);
-		refresh |= SetVisiblePULSEProperties(false);
-		refresh |= SetVisibleSINProperties(false);
-		refresh |= SetVisibleEXPProperties(false);
-	}
-	
 	
 
-	if (refresh)
-	{
+	if (refresh) {
 		getProperties().forceResetUpdateForAllProperties();
 	}
 
