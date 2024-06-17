@@ -35,6 +35,7 @@ public:
 	std::set<Connection>& getList();
 	std::string getType();
 	std::string getFunction();
+	std::string getAmplitude();
 
 	//Setter
 	void setItemName(std::string name);
@@ -43,6 +44,8 @@ public:
 	void setValue(std::string name);
 	void setType(std::string type);
 	void setFunction(std::string function);
+	void setAmplitude(std::string amplitude);
+
 	//Additional Functions
 	bool addConnection(const Connection& obj);
 	
@@ -59,6 +62,7 @@ private:
 	std::string value;
 	std::string type;
 	std::string function;
+	std::string m_Amplitude;
 	std::set<Connection> listOfConnections;
 	
 

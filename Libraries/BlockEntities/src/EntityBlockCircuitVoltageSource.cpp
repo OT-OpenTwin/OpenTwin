@@ -65,14 +65,14 @@ void EntityBlockCircuitVoltageSource::createDCProperties()
 
 void EntityBlockCircuitVoltageSource::createPULSEProperties()
 {
-	EntityPropertiesInteger::createProperty("", "Pulse Initial value", 0 , "default", getProperties());
-	EntityPropertiesInteger::createProperty("", "Pulse Pulsed value", 0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("", "Delay time", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("", "Rise time", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("", "Fall time", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("", "Pulse width", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("", "Period", 0.0, "default", getProperties());
-	EntityPropertiesInteger::createProperty("", "Number of Pulses", 0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("Pulse Properties", "Pulse Initial value", 0 , "default", getProperties());
+	EntityPropertiesInteger::createProperty("Pulse Properties", "Pulse Pulsed value", 0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("Pulse Properties", "Delay time", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("Pulse Properties", "Rise time", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("Pulse Properties", "Fall time", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("Pulse Properties", "Pulse width", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("Pulse Properties", "Period", 0.0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("Pulse Properties", "Number of Pulses", 0, "default", getProperties());
 }
 
 std::vector<std::string> EntityBlockCircuitVoltageSource::getPulseParameters()
@@ -154,12 +154,12 @@ bool EntityBlockCircuitVoltageSource::SetVisiblePULSEProperties(bool visible)
 
 void EntityBlockCircuitVoltageSource::createSINProperties()
 {
-	EntityPropertiesInteger::createProperty("", "Offset", 0, "default", getProperties());
-	EntityPropertiesInteger::createProperty("", "Amplitude", 0, "default", getProperties());
-	EntityPropertiesInteger::createProperty("", "Frequency", 0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("", "Delay", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("", "Damping factor", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("", "Phase", 0.0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("Sin Properties", "Offset", 0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("Sin Properties", "Amplitude", 0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("Sin Properties", "Frequency", 0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("Sin Properties", "Delay", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("Sin Properties", "Damping factor", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("Sin Properties", "Phase", 0.0, "default", getProperties());
 }
 
 std::vector<std::string> EntityBlockCircuitVoltageSource::getSinParameters()
@@ -227,12 +227,12 @@ bool EntityBlockCircuitVoltageSource::SetVisibleSINProperties(bool visible)
 
 void EntityBlockCircuitVoltageSource::createEXPProperties()
 {
-	EntityPropertiesInteger::createProperty("", "Exponential Initial Value", 0, "default", getProperties());
-	EntityPropertiesInteger::createProperty("", "Exponential Pulsed Value", 0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("", "Rise delay time", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("", "Rise time constant", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("", "Fall delay time", 0.0, "default", getProperties());
-	EntityPropertiesDouble::createProperty("", "Fall time constant", 0.0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("Exponential Properties", "Exponential Initial Value", 0, "default", getProperties());
+	EntityPropertiesInteger::createProperty("Exponential Properties", "Exponential Pulsed Value", 0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("Exponential Properties", "Rise delay time", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("Exponential Properties", "Rise time constant", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("Exponential Properties", "Fall delay time", 0.0, "default", getProperties());
+	EntityPropertiesDouble::createProperty("Exponential Properties", "Fall time constant", 0.0, "default", getProperties());
 }
 
 std::vector<std::string> EntityBlockCircuitVoltageSource::getExpParameters()
@@ -345,7 +345,7 @@ bool EntityBlockCircuitVoltageSource::updateFromProperties(void)
 
 std::string EntityBlockCircuitVoltageSource::getVoltage()
 {
-	auto propertyBase = getProperties().getProperty("Voltage");
+	auto propertyBase = getProperties().getProperty("DC-Voltage");
 	auto elementType = dynamic_cast<EntityPropertiesString*>(propertyBase);
 	assert(elementType != nullptr);
 
@@ -363,7 +363,7 @@ std::string EntityBlockCircuitVoltageSource::getType()
 
 std::string EntityBlockCircuitVoltageSource::getFunction()
 {
-	auto propertyBase = getProperties().getProperty("Function");
+	auto propertyBase = getProperties().getProperty("TRAN");
 	auto function = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
 	assert(function != nullptr);
 

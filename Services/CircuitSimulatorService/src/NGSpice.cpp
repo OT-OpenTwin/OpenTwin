@@ -212,6 +212,8 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto myElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
 			element.setValue(myElement->getVoltage());
 			element.setFunction(myElement->getFunction());
+			element.setAmplitude(myElement->getAmplitude());
+
 			if (element.getFunction() == "PULSE")
 			{
 				std::string function = "PULSE(";
@@ -254,12 +256,6 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 				function += ")";
 
 				element.setFunction(function);
-			}
-			else if (element.getFunction() == "Amplitude")
-			{
-				std::string function = "AC " + myElement->getAmplitude();
-				element.setFunction(function);
-
 			}
 
 		}
@@ -416,9 +412,9 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			}
 			else if (simulationType == ".ac")
 			{
-				netlistVoltageSourceType = "DC 0" + element.getType() + " ";
-				netlistVoltageSourceType += element.getFunction();
-				voltageSourceType = "AC";
+				voltageSourceType = "AC ";
+				netlistVoltageSourceType = "DC 0 " + voltageSourceType + element.getAmplitude();
+				
 			}
 			else
 			{
@@ -527,7 +523,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		}
 
 		
-		if (voltageSourceType != "AC" && voltageSourceType != "TRAN")
+		if (voltageSourceType != "AC " && voltageSourceType != "TRAN")
 		{
 			netlistLine += netlistValue;
 		}
