@@ -3,6 +3,8 @@
 
 #include "TemplateDefaultManager.h"
 #include "DataBase.h"
+#include "OTCore/OTAssert.h"
+#include "OTGui/FillPainter2D.h"
 
 #include "Document\DocumentAccessBase.h"
 #include "Document\DocumentAccess.h"
@@ -10,7 +12,14 @@
 
 TemplateDefaultManager globalTemplateDefaultManager;
 
-defaultValue::defaultValue(const defaultValue &other)
+DefaultValue::DefaultValue()
+	: type(UNDEFINED), d(0.0), l(0), b(false) 
+{ 
+	c[0] = c[1] = c[2] = 0;
+	m_painter = new ot::FillPainter2D;
+}
+
+DefaultValue::DefaultValue(const DefaultValue &other)
 {
 	type = other.type;
 
@@ -19,9 +28,15 @@ defaultValue::defaultValue(const defaultValue &other)
 	b = other.b; 
 	s = other.s; 
 	c[0] = other.c[0]; c[1] = other.c[1]; c[2] = other.c[2];
+	m_painter = other.m_painter->createCopy();
 }
 
-defaultValue& defaultValue::operator=(const defaultValue &other)
+DefaultValue::~DefaultValue() {
+	OTAssertNullptr(m_painter);
+	delete m_painter;
+}
+
+DefaultValue& DefaultValue::operator=(const DefaultValue &other)
 {
 	if (&other != this)
 	{
@@ -32,6 +47,8 @@ defaultValue& defaultValue::operator=(const defaultValue &other)
 		b = other.b;
 		s = other.s;
 		c[0] = other.c[0]; c[1] = other.c[1]; c[2] = other.c[2];
+		delete m_painter;
+		m_painter = other.m_painter->createCopy();
 	}
 
 	return *this;
@@ -106,41 +123,41 @@ void TemplateDefaultManager::loadDefaults(const std::string &category)
 	if (!result)
 	{
 		// The category was not found. We still create an empty entry such that we avoid trying to load the category in future
-		std::map<std::string, defaultValue> categoryDefaults;
+		std::map<std::string, DefaultValue> categoryDefaults;
 		defaultMap[category] = categoryDefaults;
 
 		return; 
 	}
 
 	// We found the object with the default settings for the specified category -> read it and store it in the map
-	std::map<std::string, defaultValue> categoryDefaults;
+	std::map<std::string, DefaultValue> categoryDefaults;
 
 	for (auto elem : result->view()) 
 	{
-		defaultValue value;
+		DefaultValue value;
 
 		try
 		{
 			switch (elem.type())
 			{
 			case bsoncxx::type::k_bool:
-				value.type = defaultValue::BOOL;
+				value.type = DefaultValue::BOOL;
 				value.b = elem.get_bool();
 				break;
 			case bsoncxx::type::k_double:
-				value.type = defaultValue::DOUBLE;
+				value.type = DefaultValue::DOUBLE;
 				value.d = elem.get_double();
 				break;
 			case bsoncxx::type::k_utf8:
-				value.type = defaultValue::STRING;
+				value.type = DefaultValue::STRING;
 				value.s = elem.get_utf8().value.data();
 				break;
 			case bsoncxx::type::k_int32:
-				value.type = defaultValue::LONG;
+				value.type = DefaultValue::LONG;
 				value.l = elem.get_int32();
 				break;
 			case bsoncxx::type::k_int64:
-				value.type = defaultValue::LONG;
+				value.type = DefaultValue::LONG;
 				value.l = elem.get_int64();
 				break;
 			case bsoncxx::type::k_array:
@@ -152,7 +169,7 @@ void TemplateDefaultManager::loadDefaults(const std::string &category)
 
 				if (numberValues == 3)
 				{
-					value.type = defaultValue::COLOR;  // We assume that this is a color entity
+					value.type = DefaultValue::COLOR;  // We assume that this is a color entity
 
 					for (unsigned long index = 0; index < numberValues; index++)
 					{
@@ -165,7 +182,7 @@ void TemplateDefaultManager::loadDefaults(const std::string &category)
 							value.c[index] = pv->get_int64();
 							break;
 						default:
-							value.type = defaultValue::UNDEFINED;  // The types do not match, so we don't have a color
+							value.type = DefaultValue::UNDEFINED;  // The types do not match, so we don't have a color
 						}
 
 						pv++;
@@ -181,7 +198,7 @@ void TemplateDefaultManager::loadDefaults(const std::string &category)
 				assert(0);  // Unknown type
 			}
 
-			if (value.type != defaultValue::UNDEFINED)
+			if (value.type != DefaultValue::UNDEFINED)
 			{
 				categoryDefaults[elem.key().to_string()] = value;
 			}
@@ -201,13 +218,13 @@ void TemplateDefaultManager::loadDefaults(const std::string &category)
 
 double TemplateDefaultManager::getDefaultDouble(const std::string &category, const std::string &value, double defVal)
 {
-	defaultValue result = getDefaultValue(category, value);
+	DefaultValue result = getDefaultValue(category, value);
 
 	switch (result.type)
 	{
-	case defaultValue::DOUBLE:
+	case DefaultValue::DOUBLE:
 		return result.d;
-	case defaultValue::LONG:
+	case DefaultValue::LONG:
 		return (double) result.l;
 	}	
 
@@ -216,27 +233,27 @@ double TemplateDefaultManager::getDefaultDouble(const std::string &category, con
 
 long TemplateDefaultManager::getDefaultLong(const std::string &category, const std::string &value, long defVal)
 {
-	defaultValue result = getDefaultValue(category, value);
+	DefaultValue result = getDefaultValue(category, value);
 
-	if (result.type == defaultValue::LONG) return result.l;
+	if (result.type == DefaultValue::LONG) return result.l;
 
 	return defVal;
 }
 
 bool TemplateDefaultManager::getDefaultBool(const std::string &category, const std::string &value, bool defVal)
 {
-	defaultValue result = getDefaultValue(category, value);
+	DefaultValue result = getDefaultValue(category, value);
 
-	if (result.type == defaultValue::BOOL) return result.b;
+	if (result.type == DefaultValue::BOOL) return result.b;
 
 	return defVal;
 }
 
 std::string TemplateDefaultManager::getDefaultString(const std::string &category, const std::string &value, const std::string &defVal)
 {
-	defaultValue result = getDefaultValue(category, value);
+	DefaultValue result = getDefaultValue(category, value);
 
-	if (result.type == defaultValue::STRING) return result.s;
+	if (result.type == DefaultValue::STRING) return result.s;
 
 	return defVal;
 }
@@ -245,11 +262,19 @@ int	TemplateDefaultManager::getDefaultColor(const std::string &category, const s
 {
 	assert(component >= 0 && component < 3);
 
-	defaultValue result = getDefaultValue(category, value);
+	DefaultValue result = getDefaultValue(category, value);
 
-	if (result.type == defaultValue::COLOR) return result.c[component];
+	if (result.type == DefaultValue::COLOR) return result.c[component];
 
 	return defVal;
+}
+
+const ot::Painter2D* TemplateDefaultManager::getDefaultGuiPainter(const std::string& category, const std::string& value) {
+	DefaultValue result = getDefaultValue(category, value);
+
+	if (result.type == DefaultValue::GUIPainter) return result.m_painter;
+
+	return nullptr;
 }
 
 void TemplateDefaultManager::clearSettings(void)
@@ -258,9 +283,9 @@ void TemplateDefaultManager::clearSettings(void)
 	defaultMaterialsMap.clear();
 }
 
-defaultValue TemplateDefaultManager::getDefaultValue(const std::string &category, const std::string &value)
+DefaultValue TemplateDefaultManager::getDefaultValue(const std::string &category, const std::string &value)
 {
-	defaultValue result;
+	DefaultValue result;
 
 	if (defaultMap.count(category) == 0) return result;
 	if (defaultMap[category].count(value) == 0) return result;
@@ -270,9 +295,9 @@ defaultValue TemplateDefaultManager::getDefaultValue(const std::string &category
 
 bool TemplateDefaultManager::isUIMenuPageVisible(const std::string &page)
 {
-	defaultValue result = getDefaultValue("UI Configuration", page);
+	DefaultValue result = getDefaultValue("UI Configuration", page);
 
-	if (result.type == defaultValue::BOOL) return result.b;
+	if (result.type == DefaultValue::BOOL) return result.b;
 
 	// If no setting is defined, the page shall be visible
 	return true; 
@@ -284,9 +309,9 @@ bool TemplateDefaultManager::isUIMenuGroupVisible(const std::string &page, const
 	if (!isUIMenuPageVisible(page)) return false;
 
 	// Now check whether the specified group is visible
-	defaultValue result = getDefaultValue("UI Configuration", page + ":" + group);
+	DefaultValue result = getDefaultValue("UI Configuration", page + ":" + group);
 
-	if (result.type == defaultValue::BOOL) return result.b;
+	if (result.type == DefaultValue::BOOL) return result.b;
 
 	// If no setting is defined, the group shall be visible
 	return true; 
@@ -301,9 +326,9 @@ bool TemplateDefaultManager::isUIMenuActionVisible(const std::string &page, cons
 	if (!isUIMenuGroupVisible(page, group)) return false;
 
 	// Now check whether the specified action is visible
-	defaultValue result = getDefaultValue("UI Configuration", page + ":" + group + ":" + action);
+	DefaultValue result = getDefaultValue("UI Configuration", page + ":" + group + ":" + action);
 
-	if (result.type == defaultValue::BOOL) return result.b;
+	if (result.type == DefaultValue::BOOL) return result.b;
 
 	// If no setting is defined, the action shall be visible
 	return true; 
@@ -334,37 +359,37 @@ std::string TemplateDefaultManager::loadDefaultMaterials(void)
 			// Now we iterate though the found documents where each document corresponds to a default material
 			materialName = result["Name"].get_utf8().value.data();
 
-			std::map<std::string, defaultValue> materialDefaults;
+			std::map<std::string, DefaultValue> materialDefaults;
 
 			for (auto elem : result)
 			{
 				if (elem.key() == "Category") continue;
 				if (elem.key() == "Name") continue;
 
-				defaultValue value;
+				DefaultValue value;
 
 				try
 				{
 					switch (elem.type())
 					{
 					case bsoncxx::type::k_bool:
-						value.type = defaultValue::BOOL;
+						value.type = DefaultValue::BOOL;
 						value.b = elem.get_bool();
 						break;
 					case bsoncxx::type::k_double:
-						value.type = defaultValue::DOUBLE;
+						value.type = DefaultValue::DOUBLE;
 						value.d = elem.get_double();
 						break;
 					case bsoncxx::type::k_utf8:
-						value.type = defaultValue::STRING;
+						value.type = DefaultValue::STRING;
 						value.s = elem.get_utf8().value.data();
 						break;
 					case bsoncxx::type::k_int32:
-						value.type = defaultValue::LONG;
+						value.type = DefaultValue::LONG;
 						value.l = elem.get_int32();
 						break;
 					case bsoncxx::type::k_int64:
-						value.type = defaultValue::LONG;
+						value.type = DefaultValue::LONG;
 						value.l = elem.get_int64();
 						break;
 					case bsoncxx::type::k_array:
@@ -376,7 +401,7 @@ std::string TemplateDefaultManager::loadDefaultMaterials(void)
 
 						if (numberValues == 3)
 						{
-							value.type = defaultValue::COLOR;  // We assume that this is a color entity
+							value.type = DefaultValue::COLOR;  // We assume that this is a color entity
 
 							for (unsigned long index = 0; index < numberValues; index++)
 							{
@@ -389,7 +414,7 @@ std::string TemplateDefaultManager::loadDefaultMaterials(void)
 									value.c[index] = pv->get_int64();
 									break;
 								default:
-									value.type = defaultValue::UNDEFINED;  // The types do not match, so we don't have a color
+									value.type = DefaultValue::UNDEFINED;  // The types do not match, so we don't have a color
 								}
 
 								pv++;
@@ -405,7 +430,7 @@ std::string TemplateDefaultManager::loadDefaultMaterials(void)
 						assert(0);  // Unknown type
 					}
 
-					if (value.type != defaultValue::UNDEFINED)
+					if (value.type != DefaultValue::UNDEFINED)
 					{
 						materialDefaults[elem.key().to_string()] = value;
 					}

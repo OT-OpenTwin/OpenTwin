@@ -83,12 +83,12 @@ void NGSpice::getNodeNumbersOfMeters(std::string editorName, std::map<ot::UID, s
 			std::string connectorName = "";
 			if (connectionCfg.getOriginUid() != voltageMeterUID)
 			{
-				connectorName = connectionCfg.originConnectable();
+				connectorName = connectionCfg.getOriginConnectable();
 				connectedElementUID = connectionCfg.getOriginUid();
 			}
 			else if (connectionCfg.getDestinationUid() != voltageMeterUID)
 			{
-				connectorName = connectionCfg.destConnectable();
+				connectorName = connectionCfg.getDestConnectable();
 				connectedElementUID = connectionCfg.getDestinationUid();
 			}
 			
@@ -109,8 +109,8 @@ void NGSpice::getNodeNumbersOfMeters(std::string editorName, std::map<ot::UID, s
 					
 				if (netlistConn.getNodeNumber() != "voltageMeterConnection")
 				{
-					if (netlistConn.originConnectable() == connectorName && netlistConn.getOriginUid() == connectedElementUID ||
-						netlistConn.destConnectable() == connectorName && netlistConn.getDestinationUid() == connectedElementUID)
+					if (netlistConn.getOriginConnectable() == connectorName && netlistConn.getOriginUid() == connectedElementUID ||
+						netlistConn.getDestConnectable() == connectorName && netlistConn.getDestinationUid() == connectedElementUID)
 					{
 						
 						size_t position = nodes.find(netlistConn.getNodeNumber());
@@ -378,7 +378,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 			if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter"))
 			{
-				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(),myConn.destConnectable() });
+				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(),myConn.getDestConnectable() });
 				if (connectionWithNodeNumber != connectionNodeNumbers.end())
 				{
 					myConn.setNodeNumber(connectionWithNodeNumber->second);
@@ -386,7 +386,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 				}
 				else
 				{
-					connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.originConnectable() });
+					connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
 					if (connectionWithNodeNumber != connectionNodeNumbers.end())
 					{
 						myConn.setNodeNumber(connectionWithNodeNumber->second);
@@ -395,8 +395,8 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 					else
 					{
 						myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
-						connectionNodeNumbers.insert_or_assign({ myConn.getDestinationUid(), myConn.destConnectable() }, myConn.getNodeNumber());
-						connectionNodeNumbers.insert_or_assign({ myConn.getOriginUid(), myConn.originConnectable() }, myConn.getNodeNumber());
+						connectionNodeNumbers.insert_or_assign({ myConn.getDestinationUid(), myConn.getDestConnectable() }, myConn.getNodeNumber());
+						connectionNodeNumbers.insert_or_assign({ myConn.getOriginUid(), myConn.getOriginConnectable() }, myConn.getNodeNumber());
 						temp = true;
 
 					}

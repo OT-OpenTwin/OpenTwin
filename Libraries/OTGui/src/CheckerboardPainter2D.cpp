@@ -74,6 +74,16 @@ ot::Color ot::CheckerboardPainter2D::getDefaultColor(void) const {
 	return m_primary->getDefaultColor();
 }
 
+bool ot::CheckerboardPainter2D::isEqualTo(const Painter2D* _other) const {
+	const CheckerboardPainter2D* otherPainter = dynamic_cast<const CheckerboardPainter2D*>(_other);
+	if (!otherPainter) return false;
+
+	if (!m_primary->isEqualTo(otherPainter->getPrimaryPainter())) return false;
+	if (!m_secondary->isEqualTo(otherPainter->getSecondaryPainter())) return false;
+	
+	return m_cellSize == otherPainter->getCellSize();
+}
+
 void ot::CheckerboardPainter2D::setPrimaryPainter(Painter2D* _painter) {
 	if (_painter == m_primary || _painter == m_secondary) return;
 	OTAssertNullptr(_painter);

@@ -108,7 +108,7 @@ void ot::GraphicsItem::removeAllConnections(void) {
 
 	std::list<ot::GraphicsConnectionCfg> graphicConnectionCfgList;
 	for (const auto& connection : m_connections) {
-		graphicConnectionCfgList.push_back(connection->getConnectionInformation());
+		graphicConnectionCfgList.push_back(connection->getConfiguration());
 	}
 	for (const auto& connection : graphicConnectionCfgList) {
 		view->removeConnection(connection);
@@ -535,7 +535,7 @@ std::list<ot::GraphicsConnectionCfg> ot::GraphicsItem::getConnectionCfgs()
 	std::list<ot::GraphicsConnectionCfg> graphicConnectionCfgList;
 	for (const auto& connection : m_connections) 
 	{
-		graphicConnectionCfgList.push_back(connection->getConnectionInformation());
+		graphicConnectionCfgList.push_back(connection->getConfiguration());
 	}
 
 	for (auto childQGraphicsItem : getQGraphicsItem()->childItems()) 

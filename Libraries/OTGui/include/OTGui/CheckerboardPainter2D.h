@@ -42,6 +42,8 @@ namespace ot {
 
 		virtual ot::Color getDefaultColor(void) const override;
 
+		virtual bool isEqualTo(const Painter2D* _other) const override;
+
 		//! \brief Sets the primary painter.
 		//! The object takes ownership of the provided painter.
 		//! The current painter will be destroyed.

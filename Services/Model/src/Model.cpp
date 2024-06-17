@@ -5280,7 +5280,7 @@ void Model::loadDefaultMaterials(void)
 		for (auto prop : material.second)
 		{
 			std::string propertyName = prop.first;
-			defaultValue propertyValue = prop.second;
+			DefaultValue propertyValue = prop.second;
 
 			EntityPropertiesBase *prop = materialItem->getProperties().getProperty(propertyName);
 
@@ -5292,7 +5292,7 @@ void Model::loadDefaultMaterials(void)
 		
 			switch (propertyValue.type)
 			{
-			case defaultValue::BOOL:
+			case DefaultValue::BOOL:
 			{
 				EntityPropertiesBoolean *boolProp = dynamic_cast<EntityPropertiesBoolean *>(prop);
 				if (boolProp == nullptr)
@@ -5305,7 +5305,7 @@ void Model::loadDefaultMaterials(void)
 				}
 			}
 			break;
-			case defaultValue::DOUBLE:
+			case DefaultValue::DOUBLE:
 			{
 				EntityPropertiesDouble *doubleProp = dynamic_cast<EntityPropertiesDouble *>(prop);
 				if (doubleProp == nullptr)
@@ -5318,7 +5318,7 @@ void Model::loadDefaultMaterials(void)
 				}
 			}
 			break;
-			case defaultValue::STRING:
+			case DefaultValue::STRING:
 			{
 				EntityPropertiesString *stringProp = dynamic_cast<EntityPropertiesString *>(prop);
 				if (stringProp == nullptr)
@@ -5340,7 +5340,7 @@ void Model::loadDefaultMaterials(void)
 				}
 			}
 			break;
-			case defaultValue::LONG:
+			case DefaultValue::LONG:
 			{
 				EntityPropertiesInteger *intProp = dynamic_cast<EntityPropertiesInteger *>(prop);
 				if (intProp == nullptr)
@@ -5353,7 +5353,7 @@ void Model::loadDefaultMaterials(void)
 				}
 			}
 			break;
-			case defaultValue::COLOR:
+			case DefaultValue::COLOR:
 			{
 				EntityPropertiesColor *colorProp = dynamic_cast<EntityPropertiesColor *>(prop);
 				if (colorProp == nullptr)

@@ -4,22 +4,25 @@
 #include <string>
 #include <map>
 
-class __declspec(dllexport) defaultValue
+namespace ot { class Painter2D; };
+
+class __declspec(dllexport) DefaultValue
 {
 public:
-	defaultValue() : type(UNDEFINED), d(0.0), l(0), b(false) {c[0] = c[1] = c[2] = 0; };
-	defaultValue(const defaultValue &other);
-	virtual ~defaultValue() {};
+	DefaultValue();
+	DefaultValue(const DefaultValue&other);
+	virtual ~DefaultValue();
 
-	defaultValue& operator=(const defaultValue &other);
+	DefaultValue& operator=(const DefaultValue&other);
 
-	enum {UNDEFINED, DOUBLE, LONG, BOOL, STRING, COLOR} type;
+	enum {UNDEFINED, DOUBLE, LONG, BOOL, STRING, COLOR, GUIPainter} type;
 
 	double		d;
 	long		l;
 	bool		b;
 	std::string s;
 	int			c[3];
+	ot::Painter2D* m_painter;
 };
 
 class __declspec(dllexport) TemplateDefaultManager
@@ -39,19 +42,23 @@ public:
 	std::string getDefaultString(const std::string &category, const std::string &value, const std::string &defVal);
 	int			getDefaultColor(const std::string &category, const std::string &value, int component, int defVal);
 
+	//! \brief Returns the default gui painter for the given category and value.
+	//! TemplateDefaultManager keeps ownership of the painter.
+	const ot::Painter2D* getDefaultGuiPainter(const std::string& category, const std::string& value);
+
 	static TemplateDefaultManager* getTemplateDefaultManager(void);
 
 	bool isUIMenuPageVisible(const std::string &page);
 	bool isUIMenuGroupVisible(const std::string &page, const std::string &group);
 	bool isUIMenuActionVisible(const std::string &page, const std::string &group, const std::string &action);
 
-	const std::map < std::string, std::map<std::string, defaultValue>> &getDefaultMaterials(void) { return defaultMaterialsMap; }
+	const std::map < std::string, std::map<std::string, DefaultValue>> &getDefaultMaterials(void) { return defaultMaterialsMap; }
 
 private:
 	void		 clearSettings(void);
-	defaultValue getDefaultValue(const std::string &category, const std::string &value);
+	DefaultValue getDefaultValue(const std::string &category, const std::string &value);
 
 	std::string defaultTemplateName;
-	std::map < std::string, std::map<std::string, defaultValue>> defaultMap;
-	std::map < std::string, std::map<std::string, defaultValue>> defaultMaterialsMap;
+	std::map < std::string, std::map<std::string, DefaultValue>> defaultMap;
+	std::map < std::string, std::map<std::string, DefaultValue>> defaultMaterialsMap;
 };

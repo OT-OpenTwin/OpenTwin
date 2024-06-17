@@ -31,3 +31,10 @@ std::string ot::StyleRefPainter2D::generateQss(void) const {
 ot::Color ot::StyleRefPainter2D::getDefaultColor(void) const {
 	return Color();
 }
+
+bool ot::StyleRefPainter2D::isEqualTo(const Painter2D* _other) const {
+	const StyleRefPainter2D* otherPainter = dynamic_cast<const StyleRefPainter2D*>(_other);
+	if (!otherPainter) return false;
+
+	return m_reference == otherPainter->getReferenceKey();
+}

@@ -11,8 +11,11 @@
 #include "OTGui/PropertyBool.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/PropertyColor.h"
+#include "OTGui/FillPainter2D.h"
 #include "OTGui/PropertyDouble.h"
 #include "OTGui/PropertyString.h"
+#include "OTGui/Painter2DFactory.h"
+#include "OTGui/PropertyPainter2D.h"
 #include "OTGui/PropertyStringList.h"
 
 void EntityPropertiesBase::setNeedsUpdate(void)
@@ -1049,4 +1052,121 @@ void EntityPropertiesProjectList::addToJsonDocument(ot::JsonDocument& jsonDoc, E
 void EntityPropertiesProjectList::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
 	_value = ot::json::getString(object, "Value");
+}
+
+// ################################################################################################################################################################
+
+EntityPropertiesGuiPainter::EntityPropertiesGuiPainter() {
+	m_painter = new ot::FillPainter2D;
+}
+
+EntityPropertiesGuiPainter::~EntityPropertiesGuiPainter() {
+	delete m_painter;
+	m_painter = nullptr;
+}
+
+EntityPropertiesGuiPainter::EntityPropertiesGuiPainter(const EntityPropertiesGuiPainter& other) 
+	: EntityPropertiesBase(other), m_painter(nullptr)
+{
+	m_painter = other.getValue()->createCopy();
+}
+
+EntityPropertiesGuiPainter& EntityPropertiesGuiPainter::operator=(const EntityPropertiesGuiPainter& other) {
+	if (&other != this)
+	{
+		EntityPropertiesBase::operator=(other);
+		setValue(other.getValue()->createCopy());
+	}
+
+	return *this;
+}
+
+void EntityPropertiesGuiPainter::setValue(ot::Painter2D* _painter) {
+	if (m_painter == _painter) return;
+	OTAssertNullptr(_painter);
+	OTAssertNullptr(m_painter);
+	if (m_painter->isEqualTo(_painter)) return;
+
+	delete m_painter;
+	m_painter = _painter->createCopy();
+	this->setNeedsUpdate();
+}
+
+void EntityPropertiesGuiPainter::createProperty(const std::string& group, const std::string& name, ot::Painter2D* _defaultPainter, const std::string& defaultCategory, EntityProperties& properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	const ot::Painter2D* newPainter = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultGuiPainter(defaultCategory, name);
+
+	if (newPainter) {
+		if (_defaultPainter) delete _defaultPainter;
+		_defaultPainter = newPainter->createCopy();
+	}
+
+	// Finally create the new property
+	properties.createProperty(new EntityPropertiesGuiPainter(name, _defaultPainter), group);
+}
+
+void EntityPropertiesGuiPainter::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
+{
+	OTAssertNullptr(m_painter);
+	ot::PropertyPainter2D* newProp = new ot::PropertyPainter2D(this->getName(), m_painter->createCopy());
+	this->setupPropertyData(_configuration, newProp);
+}
+
+void EntityPropertiesGuiPainter::setFromConfiguration(const ot::Property* _property, EntityBase* root)
+{
+	const ot::PropertyPainter2D* actualProperty = dynamic_cast<const ot::PropertyPainter2D*>(_property);
+	if (!actualProperty) {
+		OT_LOG_E("Property cast failed");
+		return;
+	}
+
+	this->setValue(actualProperty->getPainter()->createCopy());
+}
+
+void EntityPropertiesGuiPainter::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
+{
+	ot::JsonObject container;
+	EntityPropertiesBase::addBaseDataToJsonDocument(container, jsonDoc.GetAllocator(), "guipainter");
+
+	ot::JsonObject painterObj;
+	m_painter->addToJsonObject(painterObj, jsonDoc.GetAllocator());
+	container.AddMember("Value", painterObj, jsonDoc.GetAllocator());
+
+	rapidjson::Value::StringRefType jsonName(getName().c_str());
+
+	jsonDoc.AddMember(ot::JsonString(this->getName(), jsonDoc.GetAllocator()), container, jsonDoc.GetAllocator());
+}
+
+void EntityPropertiesGuiPainter::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
+{
+	ot::Painter2D* newPainter = ot::Painter2DFactory::instance().createFromJSON(ot::json::getObject(object, "Value"), OT_JSON_MEMBER_Painter2DType);
+	if (!newPainter) return;
+
+	setValue(newPainter);
+}
+
+void EntityPropertiesGuiPainter::copySettings(EntityPropertiesBase* other, EntityBase* root)
+{
+	EntityPropertiesBase::copySettings(other, root);
+
+	EntityPropertiesGuiPainter* entity = dynamic_cast<EntityPropertiesGuiPainter*>(other);
+	assert(entity != nullptr);
+
+	if (entity != nullptr)
+	{
+		setValue(entity->getValue()->createCopy());
+	}
+}
+
+bool EntityPropertiesGuiPainter::hasSameValue(EntityPropertiesBase* other)
+{
+	EntityPropertiesGuiPainter* entity = dynamic_cast<EntityPropertiesGuiPainter*>(other);
+
+	if (entity == nullptr) return false;
+
+	return (getValue()->isEqualTo(entity->getValue()));
 }

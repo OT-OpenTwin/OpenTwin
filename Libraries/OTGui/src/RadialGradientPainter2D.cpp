@@ -66,7 +66,15 @@ std::string ot::RadialGradientPainter2D::generateQss(void) const {
 	return ret;
 }
 
-ot::Color ot::RadialGradientPainter2D::getDefaultColor(void) const {
-	if (this->stops().empty()) return Color();
-	else return this->stops().front().color();
+bool ot::RadialGradientPainter2D::isEqualTo(const Painter2D* _other) const {
+	if (!GradientPainter2D::isEqualTo(_other)) return false;
+
+	const RadialGradientPainter2D* otherPainter = dynamic_cast<const RadialGradientPainter2D*>(_other);
+	if (!otherPainter) return false;
+
+	if (m_center != otherPainter->getCenterPoint()) return false;
+	if (m_centerRadius != otherPainter->getCenterRadius()) return false;
+	if (m_focal != otherPainter->getFocalPoint()) return false;
+	if (m_focalRadius != otherPainter->getFocalRadius()) return false;
+	return m_focalSet == otherPainter->isFocalPointSet();
 }

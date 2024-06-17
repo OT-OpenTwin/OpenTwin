@@ -900,7 +900,7 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 		auto doc = bsoncxx::builder::basic::document{};
 		if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(identifier.first, identifier.second, doc))
 		{
-			return nullptr;
+			return "";
 		}
 		auto doc_view = doc.view()["Found"].get_document().view();
 		std::string entityType = doc_view["SchemaType"].get_utf8().value.data();

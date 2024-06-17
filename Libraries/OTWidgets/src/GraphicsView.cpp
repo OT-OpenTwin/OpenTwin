@@ -110,7 +110,7 @@ bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionCfg& 
 	bool alreadyExisting = false;
 	for (auto& connection : m_connections)
 	{
-		if (connection.second->getConnectionKey() == _connection.createConnectionKey() || connection.second->getConnectionKey() == _connection.createConnectionKeyReverse())
+		if (connection.second->getConfiguration().createConnectionKey() == _connection.createConnectionKey() || connection.second->getConfiguration().createConnectionKey() == _connection.createConnectionKeyReverse())
 		{
 			alreadyExisting = true;
 			break;
@@ -224,8 +224,8 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 	this->removeConnection(_config.getUid());
 	ot::GraphicsItem* src = this->getItem(_config.getOriginUid());
 	ot::GraphicsItem* dest = this->getItem(_config.getDestinationUid());
-	ot::GraphicsItem* srcConn = src->findItem(_config.originConnectable());
-	ot::GraphicsItem* destConn = dest->findItem(_config.destConnectable());
+	ot::GraphicsItem* srcConn = src->findItem(_config.getOriginConnectable());
+	ot::GraphicsItem* destConn = dest->findItem(_config.getDestConnectable());
 
 	if (!srcConn || !destConn) {
 		OT_LOG_EA("Invalid connectable name");
@@ -234,7 +234,7 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 
 	// Create and add new connection
 	ot::GraphicsConnectionItem* newConnection = new ot::GraphicsConnectionItem;
-	newConnection->setupFromConfig(_config);
+	newConnection->setConfiguration(_config);
 	
 	m_scene->addItem(newConnection);
 	//newConnection->setGraphicsScene(m_scene);
@@ -285,7 +285,7 @@ ot::UIDList ot::GraphicsView::getSelectedConnectionUIDs(void) const {
 
 		if (citm) {
 			// Connection selected
-			sel.push_back(citm->getConnectionInformation().getUid());
+			sel.push_back(citm->getConfiguration().getUid());
 		}
 	}
 

@@ -52,7 +52,12 @@ std::string ot::LinearGradientPainter2D::generateQss(void) const {
 	return ret;
 }
 
-ot::Color ot::LinearGradientPainter2D::getDefaultColor(void) const {
-	if (this->stops().empty()) return Color();
-	else return this->stops().front().color();
+bool ot::LinearGradientPainter2D::isEqualTo(const Painter2D* _other) const {
+	if (!GradientPainter2D::isEqualTo(_other)) return false;
+
+	const LinearGradientPainter2D* otherPainter = dynamic_cast<const LinearGradientPainter2D*>(_other);
+	if (!otherPainter) return false;
+
+	if (m_start != otherPainter->getStart()) return false;
+	return m_finalStop == otherPainter->getFinalStop();
 }

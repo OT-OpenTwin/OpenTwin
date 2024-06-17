@@ -47,6 +47,22 @@ void ot::GradientPainter2D::setFromJsonObject(const ConstJsonObject& _object) {
 	m_spread = ot::stringToGradientSpread(json::getString(_object, OT_JSON_MEMBER_Spread));
 }
 
+ot::Color ot::GradientPainter2D::getDefaultColor(void) const {
+	if (this->getStops().empty()) return Color();
+	else return this->getStops().front().getColor();
+}
+
+bool ot::GradientPainter2D::isEqualTo(const Painter2D* _other) const {
+	const GradientPainter2D* otherPainter = dynamic_cast<const GradientPainter2D*>(_other);
+	if (!otherPainter) return false;
+
+	if (m_stops.size() != otherPainter->getStops().size()) return false;
+	for (size_t i = 0; i < m_stops.size(); i++) {
+		if (m_stops[i] != otherPainter->getStops()[i]) return false;
+	}
+	return m_spread == otherPainter->getSpread();
+}
+
 void ot::GradientPainter2D::addStop(const GradientPainterStop2D& _stop) {
 	m_stops.push_back(_stop);
 }
@@ -66,10 +82,10 @@ void ot::GradientPainter2D::addStopsAndSpreadToQss(std::string& _targetString) c
 		break;
 	}
 	for (const GradientPainterStop2D& s : m_stops) {
-		_targetString.append(", stop: " + std::to_string(s.pos()) +
-			" rgba(" + std::to_string(s.color().r()) +
-			", " + std::to_string(s.color().g()) +
-			", " + std::to_string(s.color().b()) +
-			", " + std::to_string(s.color().a()) + ")");
+		_targetString.append(", stop: " + std::to_string(s.getPos()) +
+			" rgba(" + std::to_string(s.getColor().r()) +
+			", " + std::to_string(s.getColor().g()) +
+			", " + std::to_string(s.getColor().b()) +
+			", " + std::to_string(s.getColor().a()) + ")");
 	}
 }

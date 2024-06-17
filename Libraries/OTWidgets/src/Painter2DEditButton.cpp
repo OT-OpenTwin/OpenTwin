@@ -104,10 +104,10 @@ void ot::Painter2DEditButton::updateText(void) {
 	if (m_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) {
 		FillPainter2D* actualPainter = dynamic_cast<FillPainter2D*>(m_painter);
 		OTAssertNullptr(actualPainter);
-		m_btnTip = "Color { r: " + QString::number(actualPainter->color().r()) +
-			"; g: " + QString::number(actualPainter->color().g()) +
-			"; b: " + QString::number(actualPainter->color().b()) +
-			"; a: " + QString::number(actualPainter->color().a()) + " }";
+		m_btnTip = "Color { r: " + QString::number(actualPainter->getColor().r()) +
+			"; g: " + QString::number(actualPainter->getColor().g()) +
+			"; b: " + QString::number(actualPainter->getColor().b()) +
+			"; a: " + QString::number(actualPainter->getColor().a()) + " }";
 
 		m_btnText = "Fill";
 		QFontMetrics metrics(m_btn->font());
@@ -120,18 +120,18 @@ void ot::Painter2DEditButton::updateText(void) {
 		m_btn->setText("Linear");
 		
 		m_btnText = "Linear";
-		m_btnTip = "LinearGradient { X1: " + QString::number(actualPainter->start().x()) +
-			"; Y1: " + QString::number(actualPainter->start().y()) +
-			"; X2: " + QString::number(actualPainter->finalStop().x()) +
-			"; Y2: " + QString::number(actualPainter->finalStop().y()) +
-			"; Spread: " + QString::fromStdString(toString(actualPainter->spread())) +
+		m_btnTip = "LinearGradient { X1: " + QString::number(actualPainter->getStart().x()) +
+			"; Y1: " + QString::number(actualPainter->getStart().y()) +
+			"; X2: " + QString::number(actualPainter->getFinalStop().x()) +
+			"; Y2: " + QString::number(actualPainter->getFinalStop().y()) +
+			"; Spread: " + QString::fromStdString(toString(actualPainter->getSpread())) +
 			"; ";
 
 		int ct = 0;
-		for (const GradientPainterStop2D& s : actualPainter->stops()) {
-			m_btnTip.append("Stop: " + QString::number(ct++) + " rgba(" + QString::number(s.color().r()) +
-				", " + QString::number(s.color().g()) + ", " + QString::number(s.color().b()) +
-				", " + QString::number(s.color().a()) + "); ");
+		for (const GradientPainterStop2D& s : actualPainter->getStops()) {
+			m_btnTip.append("Stop: " + QString::number(s.getPos()) + " rgba(" + QString::number(s.getColor().r()) +
+				", " + QString::number(s.getColor().g()) + ", " + QString::number(s.getColor().b()) +
+				", " + QString::number(s.getColor().a()) + "); ");
 		}
 		QFontMetrics metrics(m_btn->font());
 		m_btn->setText(metrics.size(0, m_btnTip).width() < m_btn->width() ? m_btnTip : m_btnText);
@@ -143,28 +143,28 @@ void ot::Painter2DEditButton::updateText(void) {
 		m_btnText = "Radial";
 		
 		if (actualPainter->isFocalPointSet()) {
-			m_btnTip = "RadialGradient { CX: " + QString::number(actualPainter->centerPoint().x()) +
-				"; CY: " + QString::number(actualPainter->centerPoint().y()) +
-				"; Radius: " + QString::number(actualPainter->centerRadius()) +
-				"; FX: " + QString::number(actualPainter->focalPoint().x()) +
-				"; FY: " + QString::number(actualPainter->focalPoint().y()) +
-				"; FR: " + QString::number(actualPainter->focalRadius()) +
-				"; Spread: " + QString::fromStdString(toString(actualPainter->spread())) +
+			m_btnTip = "RadialGradient { CX: " + QString::number(actualPainter->getCenterPoint().x()) +
+				"; CY: " + QString::number(actualPainter->getCenterPoint().y()) +
+				"; Radius: " + QString::number(actualPainter->getCenterRadius()) +
+				"; FX: " + QString::number(actualPainter->getFocalPoint().x()) +
+				"; FY: " + QString::number(actualPainter->getFocalPoint().y()) +
+				"; FR: " + QString::number(actualPainter->getFocalRadius()) +
+				"; Spread: " + QString::fromStdString(toString(actualPainter->getSpread())) +
 				" }";
 		}
 		else {
-			m_btnTip = "RadialGradient { CX: " + QString::number(actualPainter->centerPoint().x()) +
-				"; CY: " + QString::number(actualPainter->centerPoint().y()) +
-				"; Radius: " + QString::number(actualPainter->centerRadius()) +
-				"; Spread: " + QString::fromStdString(toString(actualPainter->spread())) +
+			m_btnTip = "RadialGradient { CX: " + QString::number(actualPainter->getCenterPoint().x()) +
+				"; CY: " + QString::number(actualPainter->getCenterPoint().y()) +
+				"; Radius: " + QString::number(actualPainter->getCenterRadius()) +
+				"; Spread: " + QString::fromStdString(toString(actualPainter->getSpread())) +
 				"; ";
 		}
 
 		int ct = 0;
-		for (const GradientPainterStop2D& s : actualPainter->stops()) {
-			m_btnTip.append("Stop: " + QString::number(ct++) + " rgba(" + QString::number(s.color().r()) +
-				", " + QString::number(s.color().g()) + ", " + QString::number(s.color().b()) +
-				", " + QString::number(s.color().a()) + "); ");
+		for (const GradientPainterStop2D& s : actualPainter->getStops()) {
+			m_btnTip.append("Stop: " + QString::number(ct++) + " rgba(" + QString::number(s.getColor().r()) +
+				", " + QString::number(s.getColor().g()) + ", " + QString::number(s.getColor().b()) +
+				", " + QString::number(s.getColor().a()) + "); ");
 		}
 
 		QFontMetrics metrics(m_btn->font());
@@ -176,7 +176,7 @@ void ot::Painter2DEditButton::updateText(void) {
 		OTAssertNullptr(actualPainter);
 		m_btnText = "Style Reference";
 		
-		m_btnTip = "Style Reference { Style: " + QString::fromStdString(toString(actualPainter->referenceKey())) + " }";
+		m_btnTip = "Style Reference { Style: " + QString::fromStdString(toString(actualPainter->getReferenceKey())) + " }";
 
 		QFontMetrics metrics(m_btn->font());
 		m_btn->setText(metrics.size(0, m_btnTip).width() < m_btn->width() ? m_btnTip : m_btnText);

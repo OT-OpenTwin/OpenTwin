@@ -54,7 +54,7 @@ ot::Painter2DEditDialogFillEntry::Painter2DEditDialogFillEntry(const Painter2D* 
 	if (_painter) {
 		const FillPainter2D* actualPainter = dynamic_cast<const FillPainter2D*>(_painter);
 		OTAssertNullptr(actualPainter);
-		m_btn->setColor(actualPainter->color());
+		m_btn->setColor(actualPainter->getColor());
 	}
 	this->connect(m_btn, &ColorPickButton::colorChanged, this, &Painter2DEditDialogEntry::slotValueChanged);
 }
@@ -92,7 +92,7 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 	m_startX->setDecimals(2);
 	m_startX->setSuffix("%");
 	m_startX->setToolTip("The start X position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the width and -1.0 the width in negative direction.");
-	if (actualPainter) m_startX->setValue(actualPainter->start().x() * 100.);
+	if (actualPainter) m_startX->setValue(actualPainter->getStart().x() * 100.);
 	positionLay->addWidget(startXLabel, 0, 0);
 	positionLay->addWidget(m_startX, 0, 1);
 
@@ -102,7 +102,7 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 	m_startY->setDecimals(2);
 	m_startY->setSuffix("%");
 	m_startY->setToolTip("The start Y position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the height and -1.0 the height in negative direction.");
-	if (actualPainter) m_startY->setValue(actualPainter->start().y() * 100.);
+	if (actualPainter) m_startY->setValue(actualPainter->getStart().y() * 100.);
 	positionLay->addWidget(startYLabel, 1, 0);
 	positionLay->addWidget(m_startY, 1, 1);
 
@@ -113,7 +113,7 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 	m_finalX->setValue(100.);
 	m_finalX->setSuffix("%");
 	m_finalX->setToolTip("The fianl stop X position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the width and -1.0 the width in negative direction.");
-	if (actualPainter) m_finalX->setValue(actualPainter->finalStop().x() * 100.);
+	if (actualPainter) m_finalX->setValue(actualPainter->getFinalStop().x() * 100.);
 	positionLay->addWidget(endXLabel, 2, 0);
 	positionLay->addWidget(m_finalX, 2, 1);
 
@@ -124,7 +124,7 @@ ot::Painter2DEditDialogLinearGradientEntry::Painter2DEditDialogLinearGradientEnt
 	m_finalY->setValue(100.);
 	m_finalX->setSuffix("%");
 	m_finalY->setToolTip("The fianl stop Y position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the height and -1.0 the height in negative direction.");
-	if (actualPainter) m_finalY->setValue(actualPainter->finalStop().y() * 100.);
+	if (actualPainter) m_finalY->setValue(actualPainter->getFinalStop().y() * 100.);
 	positionLay->addWidget(endYLabel, 3, 0);
 	positionLay->addWidget(m_finalY, 3, 1);
 
@@ -172,7 +172,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	m_centerX->setDecimals(2);
 	m_centerX->setSuffix("%");
 	m_centerX->setToolTip("The center X position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");
-	if (actualPainter) m_centerX->setValue(actualPainter->centerPoint().x() * 100.);
+	if (actualPainter) m_centerX->setValue(actualPainter->getCenterPoint().x() * 100.);
 	positionLay->addWidget(centerXLabel, 0, 0);
 	positionLay->addWidget(m_centerX, 0, 1);
 
@@ -182,7 +182,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	m_centerY->setDecimals(2);
 	m_centerY->setSuffix("%");
 	m_centerY->setToolTip("The center Y position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");
-	if (actualPainter) m_centerY->setValue(actualPainter->centerPoint().y() * 100.);
+	if (actualPainter) m_centerY->setValue(actualPainter->getCenterPoint().y() * 100.);
 	positionLay->addWidget(centerYLabel, 1, 0);
 	positionLay->addWidget(m_centerY, 1, 1);
 
@@ -193,7 +193,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	m_centerRadius->setValue(100.);
 	m_centerRadius->setSuffix("%");
 	m_centerRadius->setToolTip("The center radius for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");
-	if (actualPainter) m_centerRadius->setValue(actualPainter->centerRadius() * 100.);
+	if (actualPainter) m_centerRadius->setValue(actualPainter->getCenterRadius() * 100.);
 	positionLay->addWidget(centerRadiusLabel, 2, 0);
 	positionLay->addWidget(m_centerRadius, 2, 1);
 
@@ -209,7 +209,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	m_focalX->setDecimals(2);
 	m_focalX->setSuffix("%");
 	m_focalX->setToolTip("The fianl stop X position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");
-	if (actualPainter) m_focalX->setValue(actualPainter->focalPoint().x() * 100.);
+	if (actualPainter) m_focalX->setValue(actualPainter->getFocalPoint().x() * 100.);
 	positionLay->addWidget(focalXLabel, 4, 0);
 	positionLay->addWidget(m_focalX, 4, 1);
 
@@ -219,7 +219,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	m_focalY->setDecimals(2);
 	m_focalY->setSuffix("%");
 	m_focalY->setToolTip("The fianl stop Y position for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");
-	if (actualPainter) m_focalY->setValue(actualPainter->focalPoint().x() * 100.);
+	if (actualPainter) m_focalY->setValue(actualPainter->getFocalPoint().x() * 100.);
 	positionLay->addWidget(focalYLabel, 5, 0);
 	positionLay->addWidget(m_focalY, 5, 1);
 
@@ -229,7 +229,7 @@ ot::Painter2DEditDialogRadialGradientEntry::Painter2DEditDialogRadialGradientEnt
 	m_focalRadius->setDecimals(2);
 	m_focalRadius->setSuffix("%");
 	m_focalRadius->setToolTip("The focal radius for the gradient. The painted area is between 0.0 and 1.0. The value 2.0 is equal to double the radius.");
-	if (actualPainter) m_focalRadius->setValue(actualPainter->focalRadius() * 100.);
+	if (actualPainter) m_focalRadius->setValue(actualPainter->getFocalRadius() * 100.);
 	positionLay->addWidget(centerRadiusLabel, 6, 0);
 	positionLay->addWidget(m_focalRadius, 6, 1);
 
@@ -290,7 +290,7 @@ ot::Painter2DEditDialogReferenceEntry::Painter2DEditDialogReferenceEntry(const P
 	
 	QString txt;
 	if (actualPainter) {
-		txt = QString::fromStdString(toString(actualPainter->referenceKey()));
+		txt = QString::fromStdString(toString(actualPainter->getReferenceKey()));
 	}
 	else {
 		txt = QString::fromStdString(toString(ColorStyleValueEntry::WidgetBackground));
@@ -484,7 +484,7 @@ ot::intern::Painter2DEditDialogGradientBase::Painter2DEditDialogGradientBase(QVB
 {
 	std::vector<GradientPainterStop2D> tmp;
 	if (_painter) {
-		tmp = _painter->stops();
+		tmp = _painter->getStops();
 	}
 	if (tmp.empty()) {
 		tmp.push_back(GradientPainterStop2D());
@@ -506,7 +506,7 @@ ot::intern::Painter2DEditDialogGradientBase::Painter2DEditDialogGradientBase(QVB
 	QHBoxLayout* stopsLay = new QHBoxLayout;
 	QLabel* stopsLabel = new QLabel("Stops:");
 	
-	if (_painter) m_spreadBox->setCurrentText(QString::fromStdString(toString(_painter->spread())));
+	if (_painter) m_spreadBox->setCurrentText(QString::fromStdString(toString(_painter->getSpread())));
 	else m_spreadBox->setCurrentText(QString::fromStdString(toString(PadSpread)));
 	m_stopsBox = new SpinBox;
 	m_stopsBox->setValue(tmp.size());
@@ -602,10 +602,10 @@ ot::intern::Painter2DEditDialogGradientBase::StopEntry ot::intern::Painter2DEdit
 	newEntry.pos = new DoubleSpinBox;
 	newEntry.pos->setRange(0., 100.);
 	newEntry.pos->setDecimals(2);
-	newEntry.pos->setValue((_stop.pos() >= 0. && _stop.pos() <= 1.) ? (_stop.pos() *  100.) : 0.);
+	newEntry.pos->setValue((_stop.getPos() >= 0. && _stop.getPos() <= 1.) ? (_stop.getPos() *  100.) : 0.);
 	newEntry.pos->setSuffix("%");
 
-	newEntry.color = new ColorPickButton(_stop.color());
+	newEntry.color = new ColorPickButton(_stop.getColor());
 
 	lay->addWidget(positionLabel, 0, 0);
 	lay->addWidget(newEntry.pos, 0, 1);

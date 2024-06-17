@@ -193,8 +193,8 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		ot::GraphicsConnectionCfg connectionCfg;
 		connectionCfg.setOriginUid(connection.getOriginUid());
 		connectionCfg.setDestUid(connection.getDestinationUid());
-		connectionCfg.setOriginConnectable(connection.originConnectable());
-		connectionCfg.setDestConnectable(connection.destConnectable());
+		connectionCfg.setOriginConnectable(connection.getOriginConnectable());
+		connectionCfg.setDestConnectable(connection.getDestConnectable());
 
 		
 		//Now i set the attirbutes of connectionEntity

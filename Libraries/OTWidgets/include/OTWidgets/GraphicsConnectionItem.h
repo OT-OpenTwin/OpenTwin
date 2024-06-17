@@ -49,10 +49,10 @@ namespace ot {
 
 		//! @brief Will set the connection properties as provided in the configuration
 		//! The origin and destination item won't be set!
-		bool setupFromConfig(const ot::GraphicsConnectionCfg& _cfg);
+		bool setConfiguration(const ot::GraphicsConnectionCfg& _cfg);
 
 		//! @brief Creates a configuration object containing the items origin and destination information
-		GraphicsConnectionCfg getConnectionInformation(void) const;
+		const GraphicsConnectionCfg& getConfiguration(void) const { return m_config; };
 
 		void updateConnection(void);
 
@@ -62,32 +62,22 @@ namespace ot {
 		GraphicsItem* originItem(void) const { return m_origin; };
 		GraphicsItem* destItem(void) const { return m_dest; };
 
-		void setUid(const ot::UID& _uid) { m_uid = _uid; };
-		const ot::UID& uid(void) const { return m_uid; };
-
-		const std::string& getConnectionKey() const { return m_connectionKey; };
-
-
 	private:
+		void updateConnectionInformation(void);
+
 		void calculateDirectLinePoints(QPointF& _origin, QPointF& _destination) const;
 		void calculateSmoothLinePoints(QPointF& _origin, QPointF& _control1, QPointF& _control2, QPointF& _destination) const;
 		void calculateSmoothLineStep(const QPointF& _origin, const QPointF& _destination, double _halfdistX, double _halfdistY, QPointF& _control, ot::ConnectionDirection _direction) const;
+
+		GraphicsConnectionCfg m_config;
 
 		GraphicsItemStateFlags m_state;
 
 		GraphicsItem* m_origin;
 		GraphicsItem* m_dest;
 
-		std::string m_connectionKey;
-
-		ot::UID m_uid;
-
 		QRectF m_lastRect;
 
-		ot::GraphicsConnectionCfg::ConnectionStyle m_style;
-		QPen m_pen;
-		QPen m_hoverPen;
-		QPen m_selectedPen;
 	};
 
 }

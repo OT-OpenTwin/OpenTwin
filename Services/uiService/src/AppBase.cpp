@@ -55,6 +55,7 @@
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/MessageDialogCfg.h"
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTCommunication/UiTypes.h"
 #include "OTCommunication/ActionTypes.h"
@@ -2229,7 +2230,9 @@ void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::GraphicsConnectionPackage pckg(view->getGraphicsViewName());
-	pckg.addConnection(_fromUid, _fromConnector, _toUid, _toConnector);
+	ot::GraphicsConnectionCfg connectionConfig(_fromUid, _fromConnector, _toUid, _toConnector);
+	connectionConfig.setLineStyle(ot::OutlineF(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
+	pckg.addConnection(connectionConfig);
 
 	ot::JsonObject pckgObj;
 	pckg.addToJsonObject(pckgObj, doc.GetAllocator());
@@ -2288,7 +2291,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		ot::GraphicsConnectionItem* selectedConnection = dynamic_cast<ot::GraphicsConnectionItem*>(selectedItem);
 		if (selectedConnection) 
 		{
-			selectedGraphicSceneItemIDs.push_back(selectedConnection->uid());
+			selectedGraphicSceneItemIDs.push_back(selectedConnection->getConfiguration().getUid());
 			continue;
 		}
 

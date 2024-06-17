@@ -17,8 +17,7 @@
 #include <QtWidgets/qgraphicssceneevent.h>
 
 ot::GraphicsConnectionItem::GraphicsConnectionItem()
-	: m_dest(nullptr), m_origin(nullptr), m_style(ot::GraphicsConnectionCfg::DirectLine), m_state(NoState), m_uid(0),
-	m_hoverPen(QBrush(QColor(0, 0, 255)), 2.f), m_selectedPen(QBrush(QColor(0, 255, 0)), 2.f)
+	: m_dest(nullptr), m_origin(nullptr), m_state(NoState)
 {
 	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	this->setAcceptHoverEvents(true);
@@ -36,26 +35,26 @@ QRectF ot::GraphicsConnectionItem::boundingRect(void) const {
 		return m_lastRect;
 	}
 
-	switch (m_style)
+	switch (m_config.getLineShape())
 	{
-	case ot::GraphicsConnectionCfg::DirectLine:
+	case ot::GraphicsConnectionCfg::ConnectionShape::DirectLine:
 	{
 		QPointF orig;
 		QPointF dest;
 		this->calculateDirectLinePoints(orig, dest);
-		qreal marg = std::max(m_hoverPen.widthF(), m_selectedPen.widthF());
+		qreal marg = m_config.getLineStyle().width();
 		return QRectF(
 			QPointF(std::min(orig.x(), dest.x()), std::min(orig.y(), dest.y())), 
 			QPointF(std::max(orig.x(), dest.x()), std::max(orig.y(), dest.y()))).marginsAdded(QMarginsF(marg, marg, marg, marg));
 	}
-	case ot::GraphicsConnectionCfg::SmoothLine:
+	case ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine:
 	{
 		QPointF orig;
 		QPointF c1;
 		QPointF c2;
 		QPointF dest;
 		this->calculateSmoothLinePoints(orig, c1, c2, dest);
-		qreal marg = std::max(m_hoverPen.widthF(), m_selectedPen.widthF());
+		qreal marg = m_config.getLineStyle().width();
 		return QRectF(QPointF(std::min({ orig.x(), c1.x(), c2.x(), dest.x() }), std::min({ orig.y(), c1.y(), c2.y(), dest.y() })),
 			QPointF(std::max({ orig.x(), c1.x(), c2.x(), dest.x() }), std::max({ orig.y(), c1.y(), c2.y(), dest.y() }))).marginsAdded(QMarginsF(marg, marg, marg, marg));
 	}
@@ -68,28 +67,33 @@ QRectF ot::GraphicsConnectionItem::boundingRect(void) const {
 }
 
 void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	switch (m_style)
+
+	QPen linePen = QtFactory::toQPen(m_config.getLineStyle());
+
+	if (m_state & GraphicsConnectionItem::HoverState) {
+		Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
+		linePen.setBrush(QtFactory::toQBrush(newPainter));
+		delete newPainter;
+	}
+	else if (m_state & GraphicsConnectionItem::SelectedState) {
+		Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
+		linePen.setBrush(QtFactory::toQBrush(newPainter));
+		delete newPainter;
+	}
+
+	_painter->setPen(linePen);
+
+	switch (m_config.getLineShape())
 	{
-	case ot::GraphicsConnectionCfg::DirectLine:
+	case ot::GraphicsConnectionCfg::ConnectionShape::DirectLine:
 	{
 		QPointF orig;
 		QPointF dest;
 		this->calculateDirectLinePoints(orig, dest);
-
-		if (m_state & HoverState) {
-			_painter->setPen(m_hoverPen);
-			_painter->drawLine(orig, dest);
-		}
-		else if (m_state & SelectedState) {
-			_painter->setPen(m_selectedPen);
-			_painter->drawLine(orig, dest);
-		}
-
-		_painter->setPen(m_pen);
 		_painter->drawLine(orig, dest);
 	}
 		break;
-	case ot::GraphicsConnectionCfg::SmoothLine:
+	case ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine:
 	{
 		QPointF orig;
 		QPointF c1;
@@ -99,16 +103,6 @@ void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGra
 		QPainterPath path(orig);
 		path.cubicTo(c1, c2, dest);
 
-		if (m_state & HoverState) {
-			_painter->setPen(m_hoverPen);
-			_painter->drawPath(path);
-		}
-		else if (m_state & SelectedState) {
-			_painter->setPen(m_selectedPen);
-			_painter->drawPath(path);
-		}
-
-		_painter->setPen(m_pen);
 		_painter->drawPath(path);
 	}
 		break;
@@ -172,38 +166,10 @@ void ot::GraphicsConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _even
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-bool ot::GraphicsConnectionItem::setupFromConfig(const ot::GraphicsConnectionCfg& _cfg) {
-	this->m_uid = _cfg.getUid();
-	this->m_style = _cfg.style();
-	m_pen.setWidth(_cfg.lineWidth());
-	m_pen.setColor(QtFactory::toQColor(_cfg.color()));
+bool ot::GraphicsConnectionItem::setConfiguration(const ot::GraphicsConnectionCfg& _cfg) {
+	m_config = _cfg;
 
-	m_hoverPen.setWidth(m_pen.width() + 2);
-	m_selectedPen.setWidth(m_hoverPen.width());
-
-	m_connectionKey = _cfg.createConnectionKey();
 	return true;
-}
-
-ot::GraphicsConnectionCfg ot::GraphicsConnectionItem::getConnectionInformation(void) const {
-	ot::GraphicsConnectionCfg info;
-	info.setUid(m_uid);
-
-	if (m_origin) {
-		info.setOriginUid(m_origin->getRootItem()->getGraphicsItemUid());
-		info.setOriginConnectable(m_origin->getGraphicsItemName());
-	}
-	else {
-		OT_LOG_WA("No origin item set");
-	}
-	if (m_dest) {
-		info.setDestUid(m_dest->getRootItem()->getGraphicsItemUid());
-		info.setDestConnectable(m_dest->getGraphicsItemName());
-	}
-	else {
-		OT_LOG_WA("No dest item set");
-	}
-	return info;
 }
 
 void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsItem* _dest) {
@@ -211,14 +177,21 @@ void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsIte
 	OTAssertNullptr(_dest);
 	OTAssert(m_origin == nullptr, "Origin already set");
 	OTAssert(m_dest == nullptr, "Destination already set");
+
+	this->prepareGeometryChange();
+
 	m_origin = _origin;
 	m_dest = _dest;
 	m_origin->storeConnection(this);
 	m_dest->storeConnection(this);
+
+	this->updateConnectionInformation();
 	this->updateConnection();
 }
 
 void ot::GraphicsConnectionItem::disconnectItems(void) {
+	this->prepareGeometryChange();
+
 	m_lastRect = this->boundingRect();
 
 	if (m_origin) {
@@ -229,13 +202,12 @@ void ot::GraphicsConnectionItem::disconnectItems(void) {
 		m_dest->forgetConnection(this);
 		m_dest = nullptr;
 	}
+
+	this->updateConnectionInformation();
 }
 
 void ot::GraphicsConnectionItem::updateConnection(void) {
-	if (m_origin && m_dest) {
-		this->prepareGeometryChange();
-
-		//this->update(this->boundingRect());
+	if (m_origin && m_dest) {		
 		this->update();
 	}
 }
@@ -243,6 +215,26 @@ void ot::GraphicsConnectionItem::updateConnection(void) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private functions
+
+void ot::GraphicsConnectionItem::updateConnectionInformation(void) {
+	if (m_origin) {
+		m_config.setOriginConnectable(m_origin->getGraphicsItemName());
+		m_config.setOriginUid(m_origin->getRootItem()->getGraphicsItemUid());
+	}
+	else {
+		m_config.setOriginConnectable("");
+		m_config.setOriginUid(0);
+	}
+
+	if (m_dest) {
+		m_config.setDestConnectable(m_dest->getGraphicsItemName());
+		m_config.setDestUid(m_dest->getRootItem()->getGraphicsItemUid());
+	}
+	else {
+		m_config.setOriginConnectable("");
+		m_config.setOriginUid(0);
+	}
+}
 
 void ot::GraphicsConnectionItem::calculateDirectLinePoints(QPointF& _origin, QPointF& _destination) const {
 	if (this->originItem() == nullptr || this->destItem() == nullptr) {

@@ -87,19 +87,19 @@ QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
 	if (_painter->getFactoryKey() == OT_FactoryKey_FillPainter2D) {
 		const FillPainter2D* painter = dynamic_cast<const FillPainter2D*>(_painter);
 		OTAssertNullptr(painter);
-		return QBrush(QtFactory::toQColor(painter->color()));
+		return QBrush(QtFactory::toQColor(painter->getColor()));
 	}
 	else if (_painter->getFactoryKey() == OT_FactoryKey_LinearGradientPainter2D) {
 		const LinearGradientPainter2D* painter = dynamic_cast<const LinearGradientPainter2D*>(_painter);
 		OTAssertNullptr(painter);
 		
 		QGradientStops stops;
-		for (auto s : painter->stops()) {
-			stops.append(QGradientStop(s.pos(), QtFactory::toQColor(s.color())));
+		for (auto s : painter->getStops()) {
+			stops.append(QGradientStop(s.getPos(), QtFactory::toQColor(s.getColor())));
 		}
 
-		QLinearGradient grad(QtFactory::toQPoint(painter->start()), QtFactory::toQPoint(painter->finalStop()));
-		grad.setSpread(QtFactory::toQGradientSpread(painter->spread()));
+		QLinearGradient grad(QtFactory::toQPoint(painter->getStart()), QtFactory::toQPoint(painter->getFinalStop()));
+		grad.setSpread(QtFactory::toQGradientSpread(painter->getSpread()));
 		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
 		grad.setStops(stops);
 		
@@ -110,16 +110,16 @@ QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
 		OTAssertNullptr(painter);
 
 		QGradientStops stops;
-		for (auto s : painter->stops()) {
-			stops.append(QGradientStop(s.pos(), ot::QtFactory::toQColor(s.color())));
+		for (auto s : painter->getStops()) {
+			stops.append(QGradientStop(s.getPos(), ot::QtFactory::toQColor(s.getColor())));
 		}
 
-		QRadialGradient grad(ot::QtFactory::toQPoint(painter->centerPoint()), painter->centerRadius());
+		QRadialGradient grad(ot::QtFactory::toQPoint(painter->getCenterPoint()), painter->getCenterRadius());
 		if (painter->isFocalPointSet()) {
-			grad.setFocalPoint(ot::QtFactory::toQPoint(painter->focalPoint()));
-			grad.setFocalRadius(painter->focalRadius());
+			grad.setFocalPoint(ot::QtFactory::toQPoint(painter->getFocalPoint()));
+			grad.setFocalRadius(painter->getFocalRadius());
 		}
-		grad.setSpread(ot::QtFactory::toQGradientSpread(painter->spread()));
+		grad.setSpread(ot::QtFactory::toQGradientSpread(painter->getSpread()));
 		grad.setCoordinateMode(QGradient::ObjectBoundingMode);
 		grad.setStops(stops);
 
@@ -131,12 +131,12 @@ QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
 
 		const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 
-		if (!cs.hasValue(painter->referenceKey())) {
+		if (!cs.hasValue(painter->getReferenceKey())) {
 			OT_LOG_W("Failed to create brush from ColorStyleValue reference. Value not found");
 			return QBrush();
 		}
 		else {
-			return cs.getValue(painter->referenceKey()).brush();
+			return cs.getValue(painter->getReferenceKey()).brush();
 		}
 	}
     else if (_painter->getFactoryKey() == OT_FactoryKey_CheckerboardPainter2D) {

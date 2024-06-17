@@ -1,5 +1,6 @@
 #include "BlockEntityHandler.h"
 #include "EntityBlockDatabaseAccess.h"
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTCommunication/ActionTypes.h"
 #include "ExternalDependencies.h"
 
@@ -54,7 +55,8 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		connectionEntity.createProperties();
 		ot::GraphicsConnectionCfg newConnection(connection);
 		newConnection.setUid(connectionEntity.getEntityID());
-		newConnection.setStyle(ot::GraphicsConnectionCfg::SmoothLine);
+		newConnection.setLineShape(ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine);
+
 		const std::string connectionName = CreateNewUniqueTopologyName(connectionFolderName, "Connection", 1, false);
 		connectionEntity.setName(connectionName);
 		connectionEntity.setConnectionCfg(newConnection);
@@ -73,7 +75,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		{
 			auto& blockEntity = blockEntitiesByBlockID[newConnection.getOriginUid()];
 			
-			originConnectorIsTypeOut = connectorHasTypeOut(blockEntity, newConnection.originConnectable());
+			originConnectorIsTypeOut = connectorHasTypeOut(blockEntity, newConnection.getOriginConnectable());
 		}
 		else
 		{
@@ -84,7 +86,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		if (blockEntitiesByBlockID.find(newConnection.getDestinationUid()) != blockEntitiesByBlockID.end())
 		{
 			auto& blockEntity = blockEntitiesByBlockID[newConnection.getDestinationUid()];
-			destConnectorIsTypeOut = connectorHasTypeOut(blockEntity, newConnection.destConnectable());
+			destConnectorIsTypeOut = connectorHasTypeOut(blockEntity, newConnection.getDestConnectable());
 		}
 		else
 		{

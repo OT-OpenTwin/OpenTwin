@@ -1,9 +1,11 @@
 #include "EntityBlockConnection.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTGui/FillPainter2D.h"
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/GraphicsPackage.h"
 
 EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBase(ID, parent, obs, ms, factory, owner)
+	:EntityBase(ID, parent, obs, ms, factory, owner), m_lineStyle(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder))
 {
 	_navigationTreeIconName = "connection";
 	_navigationTreeIconNameHidden = "connection";
@@ -17,45 +19,44 @@ EntityBlockConnection::~EntityBlockConnection()
 ot::GraphicsConnectionCfg EntityBlockConnection::getConnectionCfg()
 {
 	ot::GraphicsConnectionCfg cfg(_blockIDOrigin, _connectorNameOrigin, _blockIDDestination, _connectorNameDestination);
-	auto colorProperty = dynamic_cast<EntityPropertiesColor*>(this->getProperties().getProperty("Color"));
-	double r = colorProperty->getColorR();
-	double g = colorProperty->getColorG();
-	double b = colorProperty->getColorB();
-	ot::ColorF color(static_cast<float>(r), static_cast<float>(g), static_cast<float>(b));
-	cfg.setColor(color.toColor());
-	
+	ot::OutlineF outlineCfg;
 
-	auto lineWidthProperty = dynamic_cast<EntityPropertiesInteger*>(this->getProperties().getProperty("Line Width"));
-	cfg.setLineWidth(lineWidthProperty->getValue());
+	EntityPropertiesGuiPainter* painterProperty = dynamic_cast<EntityPropertiesGuiPainter*>(this->getProperties().getProperty("Line Painter"));
+	outlineCfg.setPainter(painterProperty->getValue()->createCopy());
+	
+	auto lineWidthProperty = dynamic_cast<EntityPropertiesDouble*>(this->getProperties().getProperty("Line Width"));
+	outlineCfg.setWidth(lineWidthProperty->getValue());
 
 	auto lineStyleProperty = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Style"));
+	outlineCfg.setStyle(ot::stringToLineStyle(lineStyleProperty->getValue()));
 
-	cfg.setStyle(ot::GraphicsConnectionCfg::stringToStyle(lineStyleProperty->getValue()));
+	cfg.setLineStyle(outlineCfg);
+
+	auto lineShapeProperty = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
+	cfg.setLineShape(ot::GraphicsConnectionCfg::stringToShape(lineShapeProperty->getValue()));
 	
-
-
 	cfg.setUid(getEntityID());
 	return cfg;
 }
 
 void EntityBlockConnection::setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg)
 {
-	EntityPropertiesColor* color = dynamic_cast<EntityPropertiesColor*>(this->getProperties().getProperty("Color"));
-	color->setColorRGB(connectionCfg.color().r(), connectionCfg.color().g(), connectionCfg.color().b());
+	EntityPropertiesGuiPainter* color = dynamic_cast<EntityPropertiesGuiPainter*>(this->getProperties().getProperty("Line Painter"));
+	color->setValue(connectionCfg.getLineStyle().painter()->createCopy());
 
-	EntityPropertiesInteger* lineWidth = dynamic_cast<EntityPropertiesInteger*>(this->getProperties().getProperty("Line Width"));
-	lineWidth->setValue(connectionCfg.lineWidth());
+	EntityPropertiesDouble* lineWidth = dynamic_cast<EntityPropertiesDouble*>(this->getProperties().getProperty("Line Width"));
+	lineWidth->setValue(connectionCfg.getLineStyle().width());
 
 	EntityPropertiesSelection* lineStyle = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Style"));
-	lineStyle->setValue(ot::GraphicsConnectionCfg::styleToString(connectionCfg.style()));
-	/*_color = connectionCfg.color();
-	_lineWidth = connectionCfg.lineWidth();
-	_lineStyle = connectionCfg.style();*/
-
+	lineStyle->setValue(ot::toString(connectionCfg.getLineStyle().style()));
+	
+	EntityPropertiesSelection* lineShape = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
+	lineShape->setValue(ot::GraphicsConnectionCfg::shapeToString(connectionCfg.getLineShape()));
+	
 	_blockIDOrigin = connectionCfg.getOriginUid();
 	_blockIDDestination = connectionCfg.getDestinationUid();
-	_connectorNameDestination = connectionCfg.destConnectable();
-	_connectorNameOrigin = connectionCfg.originConnectable();
+	_connectorNameDestination = connectionCfg.getDestConnectable();
+	_connectorNameOrigin = connectionCfg.getOriginConnectable();
 }
 
 void EntityBlockConnection::CreateConnections()
@@ -81,9 +82,10 @@ void EntityBlockConnection::CreateConnections()
 void EntityBlockConnection::createProperties()
 {
 	ot::Color* color = new ot::Color(ot::Black);
-	EntityPropertiesColor::createProperty("Settings", "Color", {color->r(),color->g(),color->b()}, "default", getProperties());
-	EntityPropertiesInteger::createProperty("Settings", "Line Width", 2, "default", getProperties());
-	EntityPropertiesSelection::createProperty("Settings", "Line Style", { "SmoothLine","DirectLine" }, {}, "default", getProperties());
+	EntityPropertiesGuiPainter::createProperty("Settings", "Line Painter", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder), "default", getProperties());
+	EntityPropertiesDouble::createProperty("Settings", "Line Width", 2., "default", getProperties());
+	EntityPropertiesSelection::createProperty("Settings", "Line Style", { ot::toString(ot::LineStyle::NoLine), ot::toString(ot::LineStyle::SolidLine), ot::toString(ot::LineStyle::DotLine), ot::toString(ot::LineStyle::DashLine), ot::toString(ot::LineStyle::DashDotLine), ot::toString(ot::LineStyle::DashDotDotLine) }, ot::toString(ot::LineStyle::SolidLine), "default", getProperties());
+	EntityPropertiesSelection::createProperty("Settings", "Line Shape", { ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine) }, ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), "default", getProperties());
 }
 
 bool EntityBlockConnection::updateFromProperties()

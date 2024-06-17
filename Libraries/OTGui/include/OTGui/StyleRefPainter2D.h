@@ -45,12 +45,14 @@ namespace ot {
 
 		virtual ot::Color getDefaultColor(void) const override;
 
+		virtual bool isEqualTo(const Painter2D* _other) const override;
+
 		//! \brief Sets the key of the ColorStyleValue that should be referenced.
 		//! \param _referenceKey Key to set.
 		void setReferenceKey(ColorStyleValueEntry _referenceKey) { m_reference = _referenceKey; };
 
 		//! \brief Key of the ColorStyleValue that is referenced.
-		ColorStyleValueEntry referenceKey(void) const { return m_reference; };
+		ColorStyleValueEntry getReferenceKey(void) const { return m_reference; };
 
 	private:
 		ColorStyleValueEntry m_reference; //! \brief ColorStyleValue key.

@@ -38,23 +38,23 @@ namespace ot {
 
 		virtual std::string generateQss(void) const override;
 
-		virtual ot::Color getDefaultColor(void) const override;
+		virtual bool isEqualTo(const Painter2D* _other) const override;
 
 		//! @brief Set the center point for the gradient
 		void setCenterPoint(const ot::Point2DD& _center) { m_center = _center; };
-		const ot::Point2DD& centerPoint(void) const { return m_center; }
+		const ot::Point2DD& getCenterPoint(void) const { return m_center; }
 
 		void setCenterRadius(double _r) { m_centerRadius = _r; };
-		double centerRadius(void) const { return m_centerRadius; };
+		double getCenterRadius(void) const { return m_centerRadius; };
 
 		//! @brief Set the focal point for the gradient
 		void setFocalPoint(const ot::Point2DD& _focal);
-		const ot::Point2DD& focalPoint(void) const { return m_focal; };
+		const ot::Point2DD& getFocalPoint(void) const { return m_focal; };
 
 		//! @brief Set the focal radius
 		//! Note that the focal point needs to be set
 		void setFocalRadius(double _r) { m_focalRadius = _r; };
-		double focalRadius(void) const { return m_focalRadius; };
+		double getFocalRadius(void) const { return m_focalRadius; };
 
 		bool isFocalPointSet(void) const { return m_focalSet; };
 

@@ -39,17 +39,17 @@ namespace ot {
 		
 		virtual std::string generateQss(void) const override;
 
-		virtual ot::Color getDefaultColor(void) const override;
+		virtual bool isEqualTo(const Painter2D* _other) const override;
 
 		//! @brief Set the starting point for the gradient.
 		//! The painted area is between 0.0 and 1.0.
 		void setStart(const ot::Point2DD& _start) { m_start = _start; };
-		const ot::Point2DD& start(void) const { return m_start; }
+		const ot::Point2DD& getStart(void) const { return m_start; }
 
 		//! @brief Set the final stop point for the gradient.
 		//! The painted area is between 0.0 and 1.0.
 		void setFinalStop(const ot::Point2DD& _finalStop) { m_finalStop = _finalStop; };
-		const ot::Point2DD& finalStop(void) const { return m_finalStop; };
+		const ot::Point2DD& getFinalStop(void) const { return m_finalStop; };
 
 	private:
 		ot::Point2DD m_start;

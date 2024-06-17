@@ -9,6 +9,7 @@
 #include "OTGui/PropertyColor.h"
 #include "OTGui/PropertyDouble.h"
 #include "OTGui/PropertyString.h"
+#include "OTGui/PropertyPainter2D.h"
 #include "OTGui/PropertyStringList.h"
 
 #include <cassert>
@@ -203,6 +204,7 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 				return;
 			}
 		}
+		else if (p->getPropertyType() == OT_PROPERTY_TYPE_Painter2D) newSetting = new EntityPropertiesGuiPainter;
 		else {
 			OT_LOG_E("Unknown type \"" + p->getPropertyType() + "\"");
 			return;
@@ -310,6 +312,7 @@ void EntityProperties::buildFromJSON(const std::string& prop, EntityBase* root)
 			else if (type == "color") newSetting = new EntityPropertiesColor;
 			else if (type == "entitylist") newSetting = new EntityPropertiesEntityList;
 			else if (type == "projectlist") newSetting = new EntityPropertiesProjectList;
+			else if (type == "guipainter") newSetting = new EntityPropertiesGuiPainter;
 			else
 			{
 				assert(0); // Unknown type

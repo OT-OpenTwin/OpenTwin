@@ -37,8 +37,10 @@ namespace ot {
 
 		virtual ot::Color getDefaultColor(void) const override;
 
+		virtual bool isEqualTo(const Painter2D* _other) const override;
+
 		void setColor(const ot::Color& _color) { m_color = _color; };
-		const ot::Color& color(void) const { return m_color; };
+		const ot::Color& getColor(void) const { return m_color; };
 
 	private:
 		ot::Color m_color;

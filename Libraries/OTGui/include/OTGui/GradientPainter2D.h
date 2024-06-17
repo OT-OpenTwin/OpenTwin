@@ -30,14 +30,18 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
+		virtual ot::Color getDefaultColor(void) const override;
+
+		virtual bool isEqualTo(const Painter2D* _other) const override;
+
 		inline void addStop(double _pos, const ot::Color& _color) { this->addStop(GradientPainterStop2D(_pos, _color)); };
 		void addStop(const GradientPainterStop2D& _stop);
 		void addStops(const std::vector<GradientPainterStop2D>& _stops);
 		void setStops(const std::vector<GradientPainterStop2D>& _stops) { m_stops = _stops; };
-		const std::vector<GradientPainterStop2D>& stops(void) const { return m_stops; };
+		const std::vector<GradientPainterStop2D>& getStops(void) const { return m_stops; };
 
 		void setSpread(GradientSpread _spread) { m_spread = _spread; };
-		GradientSpread spread(void) const { return m_spread; };
+		GradientSpread getSpread(void) const { return m_spread; };
 
 	protected:
 		void addStopsAndSpreadToQss(std::string& _targetString) const;

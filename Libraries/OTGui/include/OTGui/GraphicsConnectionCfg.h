@@ -6,10 +6,12 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/OTGuiAPIExport.h"
 #include "OTCore/Color.h"
-#include "OTCore/Serializable.h"
 #include "OTCore/CoreTypes.h"
+#include "OTCore/Serializable.h"
+#include "OTGui/Outline.h"
+#include "OTGui/OTGuiAPIExport.h"
+
 // std header
 #include <string>
 
@@ -19,13 +21,13 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsConnectionCfg : public ot::Serializable {
 	public:
-		enum ConnectionStyle {
+		enum class ConnectionShape {
 			DirectLine,
 			SmoothLine
 		};
 
-		static std::string styleToString(ConnectionStyle _style);
-		static ConnectionStyle stringToStyle(const std::string _style);
+		static std::string shapeToString(ConnectionShape _shape);
+		static ConnectionShape stringToShape(const std::string _shape);
 
 		GraphicsConnectionCfg();
 		GraphicsConnectionCfg(const ot::UID& _originUid, const std::string& _originConnectableName, const ot::UID& _destinationUid, const std::string& _destinationName);
@@ -52,28 +54,28 @@ namespace ot {
 		const ot::UID& getOriginUid(void) const { return m_originUID; };
 
 		void setOriginConnectable(const std::string& _name) { m_originConnectable = _name; };
-		const std::string& originConnectable(void) const { return m_originConnectable; };
+		const std::string& getOriginConnectable(void) const { return m_originConnectable; };
 
 		void setDestUid(const ot::UID& _uid) { m_destUID = _uid; };
 		const ot::UID& getDestinationUid(void) const { return m_destUID; };
 
 		void setDestConnectable(const std::string& _name) { m_destConnectable = _name; };
-		const std::string& destConnectable(void) const { return m_destConnectable; };
+		const std::string& getDestConnectable(void) const { return m_destConnectable; };
 
 		void setUid(const ot::UID& _uid) { m_uid = _uid; };
 		const ot::UID& getUid(void) const { return m_uid; };
 
-		void setLineWidth(int _width) { m_width = _width; };
-		int lineWidth(void) const { return m_width; };
+		void setLineShape(ConnectionShape _shape) { m_lineShape = _shape; };
+		ConnectionShape getLineShape(void) const { return m_lineShape; };
 
-		void setColor(const ot::Color& _color) { m_color = _color; };
-		const ot::Color& color(void) const { return m_color; };
+		void setLineWidth(double _width) { m_lineStyle.setWidth(_width); };
+		void setLineColor(const ot::Color& _color) { m_lineStyle.setColor(_color); };
 
-		void setStyle(ConnectionStyle _style) { m_style = _style; };
-		ConnectionStyle style(void) const { return m_style; };
+		void setLineStyle(const OutlineF& _style) { m_lineStyle = _style; };
+		const OutlineF& getLineStyle(void) const { return m_lineStyle; };
 
-		std::string createConnectionKey() const;
-		std::string createConnectionKeyReverse() const;
+		std::string createConnectionKey(void) const;
+		std::string createConnectionKeyReverse(void) const;
 
 	private:
 		ot::UID m_originUID;
@@ -84,9 +86,7 @@ namespace ot {
 
 		ot::UID m_uid;
 
-		int m_width;
-		ot::Color m_color;
-
-		ConnectionStyle m_style;
+		ConnectionShape m_lineShape;
+		OutlineF m_lineStyle;
 	};
 }

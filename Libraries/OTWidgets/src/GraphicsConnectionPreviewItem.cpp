@@ -12,7 +12,7 @@
 #include <QtGui/qpainter.h>
 
 ot::GraphicsConnectionPreviewItem::GraphicsConnectionPreviewItem()
-	: m_style(ot::GraphicsConnectionCfg::DirectLine), m_originDir(ot::ConnectAny), m_destDir(ot::ConnectAny)
+	: m_style(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_originDir(ot::ConnectAny), m_destDir(ot::ConnectAny)
 {
 
 }
@@ -27,11 +27,11 @@ ot::GraphicsConnectionPreviewItem::~GraphicsConnectionPreviewItem() {
 QRectF ot::GraphicsConnectionPreviewItem::boundingRect(void) const {
 	switch (m_style)
 	{
-	case ot::GraphicsConnectionCfg::DirectLine:
+	case ot::GraphicsConnectionCfg::ConnectionShape::DirectLine:
 	{
 		return QRectF(QPointF(std::min(m_origin.x(), m_dest.x()), std::min(m_origin.y(), m_dest.y())), QPointF(std::max(m_origin.x(), m_dest.x()), std::max(m_origin.y(), m_dest.y())));
 	}
-	case ot::GraphicsConnectionCfg::SmoothLine:
+	case ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine:
 	{
 		QPointF c1;
 		QPointF c2;
@@ -52,12 +52,12 @@ void ot::GraphicsConnectionPreviewItem::paint(QPainter* _painter, const QStyleOp
 
 	switch (m_style)
 	{
-	case ot::GraphicsConnectionCfg::DirectLine:
+	case ot::GraphicsConnectionCfg::ConnectionShape::DirectLine:
 	{
 		_painter->drawLine(m_origin, m_dest);
 	}
 	break;
-	case ot::GraphicsConnectionCfg::SmoothLine:
+	case ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine:
 	{
 		QPointF c1;
 		QPointF c2;
@@ -82,7 +82,7 @@ void ot::GraphicsConnectionPreviewItem::setPen(const QPen& _pen) {
 	this->update();
 }
 
-void ot::GraphicsConnectionPreviewItem::setConnectionStyle(ot::GraphicsConnectionCfg::ConnectionStyle _style) {
+void ot::GraphicsConnectionPreviewItem::setConnectionShape(ot::GraphicsConnectionCfg::ConnectionShape _style) {
 	this->prepareGeometryChange();
 	m_style = _style;
 	this->update();

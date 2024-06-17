@@ -217,11 +217,11 @@ void EntityBlockDatabaseAccess::UpdateConnections(std::list<std::string>& connec
 
 		if (connection.getDestinationUid() == getEntityID())
 		{
-			connectorOfThisBlock = connection.destConnectable();
+			connectorOfThisBlock = connection.getDestConnectable();
 		}
 		else
 		{
-			connectorOfThisBlock = connection.originConnectable();
+			connectorOfThisBlock = connection.getOriginConnectable();
 		}
 		bool removeConnection = false;
 

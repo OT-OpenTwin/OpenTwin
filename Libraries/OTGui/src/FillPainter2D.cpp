@@ -36,3 +36,10 @@ std::string ot::FillPainter2D::generateQss(void) const {
 ot::Color ot::FillPainter2D::getDefaultColor(void) const {
 	return m_color;
 }
+
+bool ot::FillPainter2D::isEqualTo(const Painter2D* _other) const {
+	const FillPainter2D* otherPainter = dynamic_cast<const FillPainter2D*>(_other);
+	if (!otherPainter) return false;
+
+	return m_color == otherPainter->getColor();
+}

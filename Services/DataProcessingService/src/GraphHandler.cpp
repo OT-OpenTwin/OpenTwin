@@ -163,14 +163,14 @@ Graph GraphHandler::buildGraph(std::map<ot::UID, std::shared_ptr<EntityBlock>>& 
 
 			if (connection.getDestinationUid() == blockID)
 			{
-				thisConnectorName = &connection.destConnectable();
-				otherConnectorName = &connection.originConnectable();
+				thisConnectorName = &connection.getDestConnectable();
+				otherConnectorName = &connection.getOriginConnectable();
 				pairedBlockID = &connection.getOriginUid();
 			}
 			else
 			{
-				thisConnectorName = &connection.originConnectable();
-				otherConnectorName = &connection.destConnectable();
+				thisConnectorName = &connection.getOriginConnectable();
+				otherConnectorName = &connection.getDestConnectable();
 				pairedBlockID = &connection.getDestinationUid();
 			}
 

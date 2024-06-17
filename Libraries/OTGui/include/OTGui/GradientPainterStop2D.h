@@ -35,10 +35,10 @@ namespace ot {
 
 		//! @brief Set postion of the gradient stop (0.0 - 1.0)
 		void setPos(double _pos) { m_pos = _pos; };
-		double pos(void) const { return m_pos; };
+		double getPos(void) const { return m_pos; };
 
 		void setColor(const ot::Color& _color) { m_color = _color; };
-		const ot::Color& color(void) const { return m_color; };
+		const ot::Color& getColor(void) const { return m_color; };
 
 	private:
 		double    m_pos;
