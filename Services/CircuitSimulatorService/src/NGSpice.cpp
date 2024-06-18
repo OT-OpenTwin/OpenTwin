@@ -286,7 +286,8 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 	
 
-	std::unordered_map<std::pair<ot::UID, std::string>, std::string, PairHash> connectionNodeNumbers; 
+	//std::unordered_map<std::pair<ot::UID, std::string>, std::string, PairHash> connectionNodeNumbers; 
+	std::map<std::pair<ot::UID, std::string>, std::string> connectionNodeNumbers;
 	//Lieber normale map nehmen 
 
 
@@ -381,7 +382,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	//As next i create the Circuit Element Netlist Lines by getting the information out of the BufferClasses 
 
 	std::vector<std::string> nodesOfVoltageMeter;
-	std::vector<std::pair<std::string,std::string>> nodesOfCurrentMeter;
+	std::vector<std::vector<std::string>> nodesOfCurrentMeter;
 
 	// I need to get the type of Simulation to set then the voltage source if its ac dc or tran
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
@@ -459,19 +460,18 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			if (nodesOfCurrentMeter.size() == 0)
 			{
 				
-				std::pair<std::string, std::string> nodeNumbers;
-				nodeNumbers.first = "a";
-					
+				std::vector<std::string> nodeNumbers;
+				std::unordered_set<std::string> temp;
+
 				for (auto conn : element.getList())
 				{
-					if (nodeNumbers.first != "a")
+					if (temp.find(conn.getNodeNumber()) != temp.end())
 					{
-						nodeNumbers.second = conn.getNodeNumber();
+						continue;
 					}
-					else
-					{
-						nodeNumbers.first = conn.getNodeNumber();
-					}
+
+					temp.insert(conn.getNodeNumber());
+					nodeNumbers.push_back(conn.getNodeNumber());
 				}
 				nodesOfCurrentMeter.push_back(nodeNumbers);
 				
@@ -572,10 +572,15 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	std::vector<std::string> nameOfRShunts;
 	for (auto nodes : nodesOfCurrentMeter)
 	{
+		std::string nodeString = "";
+		for (auto m_node : nodes)
+		{
+			nodeString += m_node + " ";
+		}
 		std::ostringstream oss;
 		std::string name = "Rshunt" + Numbers::RshunNumbers++;
 		nameOfRShunts.push_back(name);
-		oss << "circbyline " << name << " " << nodes.first << " " << nodes.second << " " << "0";
+		oss << "circbyline " << name << " " << nodeString << "0";
 		std::string temp = oss.str();
 		ngSpice_Command(const_cast<char*>( temp.c_str()));
 	}
