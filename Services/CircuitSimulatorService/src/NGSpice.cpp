@@ -397,7 +397,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		
 		std::string netlistElementName = "";
 		std::string netlistLine="circbyline ";
-		std::string netlistValue = element.getValue();
+		std::string netlistValue = "";
 		std::string netlistNodeNumbers;
 		std::string netlistVoltageSourceType="";
 		std::string modelNetlistLine = "circbyline ";
@@ -409,6 +409,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			{
 				element.setType("DC");
 				netlistVoltageSourceType = element.getType() + " ";
+				netlistValue = element.getValue();
 			}
 			else if (simulationType == ".ac")
 			{
@@ -430,12 +431,14 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		{
 			netlistElementName = "R" + std::to_string(++Numbers::resistorNetlistNumber);
 			netlistLine += netlistElementName + " ";
+			netlistValue = element.getValue();
 		}
 		else if (element.getItemName() == "Diode")
 		{
 			netlistElementName = "D" + std::to_string(++Numbers::diodeNetlistNumber);
 			netlistLine += netlistElementName + " ";
 			modelNetlistLine += ".MODEL D1N4148 D(IS=1e-15)";
+			netlistValue = element.getValue();
 		}
 		else if (element.getItemName() == "Voltage Meter")
 		{
@@ -484,11 +487,13 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		{
 			netlistElementName = "C" + std::to_string(++Numbers::capacitorNetlistNumber);
 			netlistLine += netlistElementName + " ";
+			netlistValue = element.getValue();
 		}
 		else if (element.getItemName() == "Inductor")
 		{
 			netlistElementName = "L" + std::to_string(++Numbers::inductorNetlistNumber);
 			netlistLine += netlistElementName + " ";
+			netlistValue = element.getValue();
 		}
 		
 		
@@ -522,11 +527,8 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			netlistLine += netlistVoltageSourceType;
 		}
 
+		netlistLine += netlistValue;
 		
-		if (voltageSourceType != "AC " && voltageSourceType != "TRAN")
-		{
-			netlistLine += netlistValue;
-		}
 		if (element.getItemName() == "Voltage Source")
 		{
 			voltageSourceType = "";
