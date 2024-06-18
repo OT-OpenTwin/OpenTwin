@@ -2,9 +2,9 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "Ci" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "Ci" ]
 
 jobs:
   build:
@@ -14,3 +14,40 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Install Chocolatey
+      run: |
+        Set-ExecutionPolicy Bypass -Scope Process -Force; 
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; 
+        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+    - name: Install Visual Studio 2022 Build Tools
+      run: |
+        choco install -y visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Workload.NativeDesktop --add Microsoft.VisualStudio.Component.Windows10SDK --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest"
+      shell: cmd
+
+    - name: Install Rust 1.76.0
+      run: choco install rust --version=1.76.0 --confirm
+
+    - name: Verify Rust Installation
+      run: rustc --version
+
+    - name: Set environment variables
+      run: |
+        echo "OPENTWIN_DEV_ROOT=${{ github.workspace }}\OpenTwin" >> $GITHUB_ENV
+        echo "OPENTWIN_THIRDPARTY_ROOT=${{ github.workspace }}\ThirdParty" >> $GITHUB_ENV
+        echo "DEVENV_ROOT_2022=C:\Program Files\Microsoft Visual Studio\2022\BuildTools\Common7\IDE" >> $GITHUB_ENV
+        echo "QT_PLUGIN_PATH=${{ github.workspace }}\OpenTwin\Third_Party_Libraries\Qt\6.6.1\msvc2019_64" >> $GITHUB_ENV
+        echo "PATH=${{ github.workspace }}\OpenTwin\Third_Party_Libraries\Qt\6.6.1\msvc2019_64\bin;$PATH" >> $GITHUB_ENV
+
+    - name: Build OpenTwin using buildAll.bat
+      run: |
+        set OPENTWIN_DEV_ROOT=${{ github.workspace }}\OpenTwin
+        set OPENTWIN_THIRDPARTY_ROOT=${{ github.workspace }}\ThirdParty
+        set DEVENV_ROOT_2022=C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE
+        ${{ github.workspace }}\OpenTwin\Scripts\BuildAndTest\BuildAll.bat > build_log.txt 2>&1
+        type build_log.txt
+      shell: cmd
+
+    - name: List files for debugging
+      run: dir ${{ github.workspace }}\OpenTwin\Repo\Deployment
+      shell: cmd
