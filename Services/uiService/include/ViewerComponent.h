@@ -29,7 +29,7 @@ namespace ak { class aTreeWidget; };
 namespace ot { class Property; }
 namespace ot { class WidgetView; }
 
-#define VIEWER_SETTINGS_NAME "View"
+#define VIEWER_SETTINGS_NAME "Viewer"
 
 class ViewerComponent : public ViewerAPI::Notifier , public ak::aNotifier, public ot::ServiceBase
 {

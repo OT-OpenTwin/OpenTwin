@@ -1580,13 +1580,17 @@ bool AppBase::storeSettingToDataBase(const ot::PropertyGridCfg& _config, const s
 }
 
 ot::PropertyGridCfg AppBase::getSettingsFromDataBase(const std::string& _subKey) {
-	ot::JsonDocument doc;
-
-	UserManagement settings(m_loginData);
-	doc.fromJson(settings.restoreSetting(_subKey + "Settings"));
-
 	ot::PropertyGridCfg config;
-	config.setFromJsonObject(doc.GetConstObject());
+	
+	UserManagement settings(m_loginData);
+	std::string restoredSettings = settings.restoreSetting(_subKey + "Settings");
+
+	if (!restoredSettings.empty()) {
+		ot::JsonDocument doc;
+		doc.fromJson(restoredSettings);
+		config.setFromJsonObject(doc.GetConstObject());
+	}
+
 	return config;
 	
 }
