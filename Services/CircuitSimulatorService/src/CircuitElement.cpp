@@ -53,6 +53,11 @@ std::string CircuitElement::getAmplitude()
 	return this->m_Amplitude;
 }
 
+std::string CircuitElement::getNetlistName()
+{
+	return this->m_netlistName;
+}
+
 //Setter
 void CircuitElement::setItemName(std::string name)	{this->m_itemName = name;}
 
@@ -75,6 +80,11 @@ void CircuitElement::setFunction(std::string function)
 void CircuitElement::setAmplitude(std::string amplitude)
 {
 	this->m_Amplitude = amplitude;
+}
+
+void CircuitElement::setNetlistName(std::string name)
+{
+	this->m_netlistName = name;
 }
 
 //Additional Functions

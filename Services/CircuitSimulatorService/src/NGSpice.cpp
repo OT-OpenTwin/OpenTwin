@@ -28,13 +28,7 @@
 namespace Numbers
 {
 	static unsigned long long nodeNumber = 0;
-	static unsigned long long voltageSourceNetlistNumber = 0;
-	static unsigned long long resistorNetlistNumber = 0;
-	static unsigned long long diodeNetlistNumber = 0;
 	static unsigned long long RshunNumbers = 0;
-	static unsigned long long capacitorNetlistNumber = 0;
-	static unsigned long long inductorNetlistNumber = 0;
-
 }
 
 void NGSpice::clearBufferStructure(std::string name)
@@ -214,6 +208,21 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			element.setFunction(myElement->getFunction());
 			element.setAmplitude(myElement->getAmplitude());
 
+			
+			std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
+			if (counter == "first")
+			{
+				element.setNetlistName("V1");
+			}
+			else
+			{
+				int temp = std::stoi(counter);
+				temp += 1;
+				counter = std::to_string(temp);
+
+				element.setNetlistName("V" + counter);
+			}
+
 			if (element.getFunction() == "PULSE")
 			{
 				std::string function = "PULSE(";
@@ -263,21 +272,77 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
 			element.setValue(myElement->getElementType());
+
+			std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
+			if (counter == "first")
+			{
+				element.setNetlistName("R1");
+			}
+			else
+			{
+				int temp = std::stoi(counter);
+				temp += 1;
+				counter = std::to_string(temp);
+
+				element.setNetlistName("R" + counter);
+			}
 		}
 		else if (blockEntity->getBlockTitle() == "Diode")
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitDiode*>(blockEntity.get());
 			element.setValue(myElement->getElementType());
+
+			std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
+			if (counter == "first")
+			{
+				element.setNetlistName("D1");
+			}
+			else
+			{
+				int temp = std::stoi(counter);
+				temp += 1;
+				counter = std::to_string(temp);
+
+				element.setNetlistName("D" + counter);
+			}
 		}
 		else if (blockEntity->getBlockTitle() == "Capacitor")
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitCapacitor*>(blockEntity.get());
 			element.setValue(myElement->getElementType());
+			
+			std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
+			if (counter == "first")
+			{
+				element.setNetlistName("C1");
+			}
+			else
+			{
+				int temp = std::stoi(counter);
+				temp += 1;
+				counter = std::to_string(temp);
+
+				element.setNetlistName("C" + counter);
+			}
 		}
 		else if (blockEntity->getBlockTitle() == "Inductor")
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitInductor*>(blockEntity.get());
 			element.setValue(myElement->getElementType());
+			
+			std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
+			if (counter == "first")
+			{
+				element.setNetlistName("L1");
+			}
+			else
+			{
+				int temp = std::stoi(counter);
+				temp += 1;
+				counter = std::to_string(temp);
+
+				element.setNetlistName("L" + counter);
+			}
 		}
 		
 
@@ -405,7 +470,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		
 		if (element.getItemName() == "Voltage Source")
 		{
-			netlistElementName += "V" + std::to_string(++Numbers::voltageSourceNetlistNumber);
+			netlistElementName = element.getNetlistName();
 			if (simulationType == ".dc")
 			{
 				element.setType("DC");
@@ -430,13 +495,14 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		}
 		else if (element.getItemName() == "Resistor")
 		{
-			netlistElementName = "R" + std::to_string(++Numbers::resistorNetlistNumber);
+
+			netlistElementName = element.getNetlistName();
 			netlistLine += netlistElementName + " ";
 			netlistValue = element.getValue();
 		}
 		else if (element.getItemName() == "Diode")
 		{
-			netlistElementName = "D" + std::to_string(++Numbers::diodeNetlistNumber);
+			netlistElementName = element.getNetlistName();
 			netlistLine += netlistElementName + " ";
 			modelNetlistLine += ".MODEL D1N4148 D(IS=1e-15)";
 			netlistValue = element.getValue();
@@ -485,13 +551,13 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		}
 		else if (element.getItemName() == "Capacitor")
 		{
-			netlistElementName = "C" + std::to_string(++Numbers::capacitorNetlistNumber);
+			netlistElementName = element.getNetlistName();
 			netlistLine += netlistElementName + " ";
 			netlistValue = element.getValue();
 		}
 		else if (element.getItemName() == "Inductor")
 		{
-			netlistElementName = "L" + std::to_string(++Numbers::inductorNetlistNumber);
+			netlistElementName = element.getNetlistName();
 			netlistLine += netlistElementName + " ";
 			netlistValue = element.getValue();
 		}
@@ -696,12 +762,8 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 	 generateNetlist( solverEntity, allConnectionEntities,allEntitiesByBlockID, editorname);
 
 	 Numbers::nodeNumber = 0;
-	 Numbers::resistorNetlistNumber = 0;
-	 Numbers::voltageSourceNetlistNumber = 0;
-	 Numbers::diodeNetlistNumber = 0;
 	 Numbers::RshunNumbers = 0;
-	 Numbers::capacitorNetlistNumber = 0;
-	 Numbers::inductorNetlistNumber = 0;
+
 	/*char command[1000];
 	const char* netlist = "C:/Users/Sebastian/Desktop/NGSpice_Dateien_Test/Test.cir";
 	sprintf_s(command, sizeof(command), "source %s", netlist);

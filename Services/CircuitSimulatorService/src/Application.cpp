@@ -504,10 +504,14 @@ std::string Application::extractStringAfterDelimiter(const std::string& inputStr
 		
 		return inputString.substr(pos);
 	}
-	else 
+	else if(delimiter == '/')
 	{
 		OT_LOG_E("Substring of FolderEntityName not Found!");
 		return "failed";
+	}
+	else if(delimiter == '_')
+	{
+		return "first";
 	}
 }
 

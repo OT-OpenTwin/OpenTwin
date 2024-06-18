@@ -36,6 +36,7 @@ public:
 	std::string getType();
 	std::string getFunction();
 	std::string getAmplitude();
+	std::string getNetlistName();
 
 	//Setter
 	void setItemName(std::string name);
@@ -45,7 +46,7 @@ public:
 	void setType(std::string type);
 	void setFunction(std::string function);
 	void setAmplitude(std::string amplitude);
-
+	void setNetlistName(std::string name);
 	//Additional Functions
 	bool addConnection(const Connection& obj);
 	
@@ -63,6 +64,7 @@ private:
 	std::string type;
 	std::string function;
 	std::string m_Amplitude;
+	std::string m_netlistName;
 	std::set<Connection> listOfConnections;
 	
 

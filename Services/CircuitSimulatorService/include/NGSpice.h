@@ -35,7 +35,7 @@ public:
 	void clearBufferStructure(std::string name); 
 	void getNodeNumbersOfMeters(std::string ,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&,std::vector<std::string>&);
 	bool isValidNodeString(const std::string& input);
-	//Result Curve Functions
+	
 	
 
 	//Callback functions from NGSpice
