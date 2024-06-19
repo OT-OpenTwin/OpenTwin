@@ -85,7 +85,12 @@ void EntityBlockConnection::createProperties()
 	EntityPropertiesGuiPainter::createProperty("Settings", "Line Painter", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder), "default", getProperties());
 	EntityPropertiesDouble::createProperty("Settings", "Line Width", 2., "default", getProperties());
 	EntityPropertiesSelection::createProperty("Settings", "Line Style", { ot::toString(ot::LineStyle::NoLine), ot::toString(ot::LineStyle::SolidLine), ot::toString(ot::LineStyle::DotLine), ot::toString(ot::LineStyle::DashLine), ot::toString(ot::LineStyle::DashDotLine), ot::toString(ot::LineStyle::DashDotDotLine) }, ot::toString(ot::LineStyle::SolidLine), "default", getProperties());
-	EntityPropertiesSelection::createProperty("Settings", "Line Shape", { ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine) }, ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), "default", getProperties());
+	EntityPropertiesSelection::createProperty("Settings", "Line Shape", { 
+		ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine),
+		ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine),
+		ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::XYLine),
+		ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::YXLine)
+		}, ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), "default", getProperties());
 }
 
 bool EntityBlockConnection::updateFromProperties()

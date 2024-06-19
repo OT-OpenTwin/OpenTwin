@@ -2266,11 +2266,7 @@ void AppBase::slotGraphicsSelectionChanged(void) {
 		OT_LOG_E("GraphicsScene cast failed");
 		return;
 	}
-	ot::GraphicsView* graphicsView =scene->getGraphicsView();
-	if (graphicsView->getStateChangeInProgress())
-	{
-		return;
-	}
+	ot::GraphicsView* graphicsView = scene->getGraphicsView();
 
 	ot::UIDList selectedGraphicSceneItemIDs; 
 	auto selectedItems = scene->selectedItems();

@@ -19,7 +19,7 @@
 #include <QtWidgets/qgraphicsproxywidget.h>
 
 ot::GraphicsView::GraphicsView(GraphicsScene* _scene) 
-	: m_scene(_scene), m_wheelEnabled(true), m_dropEnabled(false), m_stateChangeInProgress(false),
+	: m_scene(_scene), m_wheelEnabled(true), m_dropEnabled(false),
 	m_viewFlags(NoViewFlags), m_viewStateFlags(DefaultState)
 {
 	if (!m_scene) m_scene = new GraphicsScene(this);
@@ -130,7 +130,7 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 
 	m_items.insert_or_assign(_item->getGraphicsItemUid(), _item);
 	m_scene->addItem(_item->getRootItem()->getQGraphicsItem());
-	_item->getRootItem()->getQGraphicsItem()->setZValue(1);
+	_item->getRootItem()->getQGraphicsItem()->setZValue(2);
 	_item->setGraphicsScene(m_scene);
 
 	if (m_scene->getGrid().isGridSnapValid()) {
@@ -162,7 +162,10 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool bufferConnection
 		//OT_LOG_EAS("Item with the ID \"" + _itemUid + "\" could not be found");
 		return;
 	}
-	m_stateChangeInProgress = true;
+	
+	this->blockSignals(true);
+	m_scene->blockSignals(true);
+
 	ot::GraphicsItem* graphicsItem =  graphicsItemByUID->second;
 	if (bufferConnections)
 	{
@@ -173,7 +176,9 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool bufferConnection
 	m_scene->removeItem(graphicsItem->getQGraphicsItem());
 	delete graphicsItem;
 	m_items.erase(_itemUid);
-	m_stateChangeInProgress = false;
+	
+	m_scene->blockSignals(false);
+	this->blockSignals(false);
 }
 
 std::list<ot::UID> ot::GraphicsView::getSelectedItemUIDs(void) const {
@@ -239,7 +244,7 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 	m_scene->addItem(newConnection);
 	//newConnection->setGraphicsScene(m_scene);
 	newConnection->connectItems(srcConn, destConn);
-	newConnection->setZValue(0);
+	newConnection->setZValue(1);
 
 	m_connections.insert_or_assign(_config.getUid(), newConnection);
 }
@@ -263,7 +268,9 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
 	if (connectionByUID == m_connections.end()) {
 		return;
 	}
-	m_stateChangeInProgress = true;
+
+	this->blockSignals(true);
+	m_scene->blockSignals(true);
 
 	// Remove connection from items
 	ot::GraphicsConnectionItem* connection = connectionByUID->second;
@@ -275,7 +282,9 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
 
 	// Erase connection from map
 	m_connections.erase(_connectionUID);
-	m_stateChangeInProgress = false;
+	
+	m_scene->blockSignals(false);
+	this->blockSignals(false);
 }
 
 ot::UIDList ot::GraphicsView::getSelectedConnectionUIDs(void) const {
@@ -337,7 +346,7 @@ void ot::GraphicsView::wheelEvent(QWheelEvent* _event)
 	}
 	this->scale(factor, factor);
 	this->update();
-
+		
 	this->setTransformationAnchor(anchor);
 
 	this->viewAll();

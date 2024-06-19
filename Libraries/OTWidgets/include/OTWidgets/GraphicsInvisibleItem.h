@@ -1,24 +1,23 @@
-//! @file GraphicsRectangularItem.h
+//! @file GraphicsInvisibleItem.h
 //! @author Alexander Kuester (alexk95)
-//! @date August 2023
+//! @date June 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
 #pragma once
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/Outline.h"
 #include "OTWidgets/CustomGraphicsItem.h"
+
+#pragma once
 
 namespace ot {
 
-	class Painter2D;
-
-	class OT_WIDGETS_API_EXPORT GraphicsRectangularItem : public CustomGraphicsItem {
-		OT_DECL_NOCOPY(GraphicsRectangularItem)
+	class GraphicsInvisibleItem : public CustomGraphicsItem {
+		OT_DECL_NOCOPY(GraphicsInvisibleItem)
 	public:
-		GraphicsRectangularItem();
-		virtual ~GraphicsRectangularItem();
+		GraphicsInvisibleItem();
+		virtual ~GraphicsInvisibleItem();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -39,25 +38,11 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-		// Setter / Getter
+		void setItemSize(double _width, double _height) { this->setItemSize(Size2DD(_width, _height)); };
+		void setItemSize(const QSizeF& _size) { this->setItemSize(Size2DD(_size.width(), _size.height())); };
+		void setItemSize(const Size2DD& _size);
+		const Size2DD& getItemSize(void) const;
 
-	public:
-
-		void setRectangleSize(const Size2DD& _size);
-		void setRectangleSize(const QSizeF& _size);
-		const Size2DD& getRectangleSize(void) const;
-
-		//! \brief Sets the background painter.
-		//! The item takes ownership of the painter.
-		void setBackgroundPainter(ot::Painter2D* _painter);
-		const ot::Painter2D* getBackgroundPainter(void) const;
-
-		void setOutline(const OutlineF& _outline);
-		const OutlineF& getOutline(void) const;
-
-		void setCornerRadius(int _r);
-		int getCornerRadius(void) const;
 	};
-
 
 }

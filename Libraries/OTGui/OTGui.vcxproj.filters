@@ -273,6 +273,9 @@
     <ClInclude Include="include\OTGui\GraphicsArcItemCfg.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsInvisibleItemCfg.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -477,6 +480,9 @@
       <Filter>Source Files\Painter</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsArcItemCfg.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsInvisibleItemCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>

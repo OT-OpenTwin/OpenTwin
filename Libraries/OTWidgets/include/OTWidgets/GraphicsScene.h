@@ -65,8 +65,8 @@ namespace ot {
 
 		GraphicsView* getGraphicsView(void) { return m_view; };
 
-		void setConnectionPreviewStyle(GraphicsConnectionCfg::ConnectionShape _style) { m_connectionPreviewStyle = _style; };
-		GraphicsConnectionCfg::ConnectionShape connectionPreviewStyle(void) const { return m_connectionPreviewStyle; };
+		void setConnectionPreviewShape(GraphicsConnectionCfg::ConnectionShape _shape) { m_connectionPreviewShape = _shape; };
+		GraphicsConnectionCfg::ConnectionShape getConnectionPreviewShape(void) const { return m_connectionPreviewShape; };
 
 		void setIgnoreEvents(bool _ignore) { m_ignoreEvents = _ignore; };
 		bool getIgnoreEvents(void) const { return m_ignoreEvents; };
@@ -117,7 +117,7 @@ namespace ot {
 		GraphicsView* m_view;
 		GraphicsItem* m_connectionOrigin;
 		GraphicsConnectionPreviewItem* m_connectionPreview;
-		ot::GraphicsConnectionCfg::ConnectionShape m_connectionPreviewStyle;
+		ot::GraphicsConnectionCfg::ConnectionShape m_connectionPreviewShape;
 		QList<QGraphicsItem*> m_lastSelection;
 		bool m_mouseIsPressed;
 

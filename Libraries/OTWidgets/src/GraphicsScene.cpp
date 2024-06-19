@@ -20,7 +20,7 @@
 
 ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 	: m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
-	m_connectionPreviewStyle(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
+	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
 {
 	OTAssertNullptr(m_view);
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
@@ -28,7 +28,7 @@ ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 
 ot::GraphicsScene::GraphicsScene(const QRectF& _sceneRect, GraphicsView* _view)
 	: QGraphicsScene(_sceneRect), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
-	m_connectionPreviewStyle(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
+	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
 {
 	OTAssertNullptr(m_view);
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
@@ -52,8 +52,7 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		QPen p;
 		p.setColor(QColor(64, 64, 255));
 		p.setWidth(1);
-		m_connectionPreview->setPen(p);
-		m_connectionPreview->setConnectionShape(m_connectionPreviewStyle);
+		m_connectionPreview->setConnectionShape(m_connectionPreviewShape);
 		m_connectionPreview->setOriginPos(m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center());
 		m_connectionPreview->setOriginDir(m_connectionOrigin->getConnectionDirection());
 		m_connectionPreview->setDestPos(m_connectionPreview->originPos());

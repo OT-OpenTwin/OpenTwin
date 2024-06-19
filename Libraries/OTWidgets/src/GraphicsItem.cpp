@@ -132,7 +132,7 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 		OTAssertNullptr(m_scene);
 		m_scene->startConnection(this);
 	}
-	else {
+	else if (this->getQGraphicsItem()->flags() & QGraphicsItem::ItemIsSelectable) {
 		OTAssertNullptr(m_scene);
 		if (_event->modifiers() != Qt::ControlModifier) {
 			m_scene->setIgnoreEvents(true);

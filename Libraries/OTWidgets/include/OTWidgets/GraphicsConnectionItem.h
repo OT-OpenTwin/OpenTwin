@@ -15,6 +15,7 @@
 // Qt header
 #include <QtCore/qrect.h>
 #include <QtGui/qpen.h>
+#include <QtGui/qpainterpath.h>
 
 namespace ot {
 	
@@ -54,6 +55,25 @@ namespace ot {
 		//! @brief Creates a configuration object containing the items origin and destination information
 		const GraphicsConnectionCfg& getConfiguration(void) const { return m_config; };
 
+		void setLineShape(GraphicsConnectionCfg::ConnectionShape _shape) { m_config.setLineShape(_shape); this->update(); };
+		GraphicsConnectionCfg::ConnectionShape getLineShape(void) const { return m_config.getLineShape(); };
+
+		void setLineWidth(double _width) { m_config.setLineWidth(_width); this->update(); };
+		double getLineWidth(void) const { return m_config.getLineWidth(); };
+
+		void setLineColor(const ot::Color& _color) { m_config.setLineColor(_color); this->update(); };
+
+		//! \brief Sets the line painter.
+		//! The item takes ownership of the painter.
+		void setLinePainter(ot::Painter2D* _painter) { m_config.setLinePainter(_painter); this->update(); };
+
+		//! \brief Returns the current line painter.
+		//! The item keeps ownership of the painter.
+		const ot::Painter2D* getLinePainter(void) const { return m_config.getLinePainter(); };
+
+		void setLineStyle(const OutlineF& _style) { m_config.setLineStyle(_style); this->update(); };
+		const OutlineF& getLineStyle(void) const { return m_config.getLineStyle(); };
+
 		void updateConnection(void);
 
 		void connectItems(GraphicsItem* _origin, GraphicsItem* _dest);
@@ -65,10 +85,13 @@ namespace ot {
 	private:
 		void updateConnectionInformation(void);
 
-		void calculateDirectLinePoints(QPointF& _origin, QPointF& _destination) const;
-		void calculateSmoothLinePoints(QPointF& _origin, QPointF& _control1, QPointF& _control2, QPointF& _destination) const;
+		void calculatePainterPath(QPainterPath& _path) const;
+		void calculateDirectLinePath(QPainterPath& _path) const;
+		void calculateSmoothLinePath(QPainterPath& _path) const;
 		void calculateSmoothLineStep(const QPointF& _origin, const QPointF& _destination, double _halfdistX, double _halfdistY, QPointF& _control, ot::ConnectionDirection _direction) const;
-
+		void calculateXYLinePath(QPainterPath& _path) const;
+		void calculateYXLinePath(QPainterPath& _path) const;
+		
 		GraphicsConnectionCfg m_config;
 
 		GraphicsItemStateFlags m_state;

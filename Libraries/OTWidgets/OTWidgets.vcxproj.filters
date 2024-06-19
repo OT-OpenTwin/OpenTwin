@@ -73,9 +73,6 @@
     <ClCompile Include="src\GraphicsLineItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsConnectionPreviewItem.cpp">
-      <Filter>src\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\ToolTipHandler.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
@@ -280,6 +277,12 @@
     <ClCompile Include="src\TreeWidgetItemInfo.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsInvisibleItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsConnectionPreviewItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -395,9 +398,6 @@
     <ClInclude Include="include\OTWidgets\GraphicsLineItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h">
-      <Filter>include\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\OnePropertyDialog.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
@@ -508,6 +508,12 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\TreeWidgetItemInfo.h">
       <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsInvisibleItem.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h">
+      <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

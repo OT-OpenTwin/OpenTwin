@@ -20,6 +20,8 @@ std::string ot::GraphicsConnectionCfg::shapeToString(ConnectionShape _shape) {
 	{
 	case ot::GraphicsConnectionCfg::ConnectionShape::DirectLine: return "DirectLine";
 	case ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine: return "SmoothLine";
+	case ot::GraphicsConnectionCfg::ConnectionShape::XYLine: return "XYLine";
+	case ot::GraphicsConnectionCfg::ConnectionShape::YXLine: return "YXLine";
 	default:
 		OT_LOG_EA("Unknown connection style");
 		return "DirectLine";
@@ -29,6 +31,8 @@ std::string ot::GraphicsConnectionCfg::shapeToString(ConnectionShape _shape) {
 ot::GraphicsConnectionCfg::ConnectionShape ot::GraphicsConnectionCfg::stringToShape(const std::string _shape) {
 	if (_shape == shapeToString(ConnectionShape::DirectLine)) return ConnectionShape::DirectLine;
 	else if (_shape == shapeToString(ConnectionShape::SmoothLine)) return ConnectionShape::SmoothLine;
+	else if (_shape == shapeToString(ConnectionShape::XYLine)) return ConnectionShape::XYLine;
+	else if (_shape == shapeToString(ConnectionShape::YXLine)) return ConnectionShape::YXLine;
 	else {
 		OT_LOG_EAS("Unknown connection style \"" + _shape + "\"");
 		return ConnectionShape::DirectLine;

@@ -5,14 +5,16 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTWidgets/GraphicsConnectionPreviewItem.h"
+#include "OTGui/StyleRefPainter2D.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsConnectionPreviewItem.h"
 
 // Qt header
 #include <QtGui/qpainter.h>
 
 ot::GraphicsConnectionPreviewItem::GraphicsConnectionPreviewItem()
-	: m_style(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_originDir(ot::ConnectAny), m_destDir(ot::ConnectAny)
+	: m_shape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_originDir(ot::ConnectAny), m_destDir(ot::ConnectAny)
 {
 
 }
@@ -25,11 +27,11 @@ ot::GraphicsConnectionPreviewItem::~GraphicsConnectionPreviewItem() {
 
 
 QRectF ot::GraphicsConnectionPreviewItem::boundingRect(void) const {
-	switch (m_style)
+	switch (m_shape)
 	{
 	case ot::GraphicsConnectionCfg::ConnectionShape::DirectLine:
 	{
-		return QRectF(QPointF(std::min(m_origin.x(), m_dest.x()), std::min(m_origin.y(), m_dest.y())), QPointF(std::max(m_origin.x(), m_dest.x()), std::max(m_origin.y(), m_dest.y())));
+		return QRectF(QPointF(std::min(m_origin.x(), m_dest.x()), std::min(m_origin.y(), m_dest.y())), QPointF(std::max(m_origin.x(), m_dest.x()), std::max(m_origin.y(), m_dest.y()))).marginsAdded(QMarginsF(1., 1., 1., 1.));
 	}
 	case ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine:
 	{
@@ -37,20 +39,22 @@ QRectF ot::GraphicsConnectionPreviewItem::boundingRect(void) const {
 		QPointF c2;
 		this->calculateSmoothLinePoints(c1, c2);
 		return QRectF(QPointF(std::min({ m_origin.x(), c1.x(), c2.x(), m_dest.x() }), std::min({ m_origin.y(), c1.y(), c2.y(), m_dest.y() })),
-			QPointF(std::max({ m_origin.x(), c1.x(), c2.x(), m_dest.x() }), std::max({ m_origin.y(), c1.y(), c2.y(), m_dest.y() })));
+			QPointF(std::max({ m_origin.x(), c1.x(), c2.x(), m_dest.x() }), std::max({ m_origin.y(), c1.y(), c2.y(), m_dest.y() }))).marginsAdded(QMarginsF(1., 1., 1., 1.));
 	}
 	break;
 	default:
 		OT_LOG_EA("Unknown connection style");
 	}
 
-	return m_lastRect;
+	return m_lastRect.marginsAdded(QMarginsF(1., 1., 1., 1.));
 }
 
 void ot::GraphicsConnectionPreviewItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	_painter->setPen(m_pen);
+	ot::StyleRefPainter2D newPainter(ColorStyleValueEntry::GraphicsItemBorder);
+	QPen newPen(ot::QtFactory::toQBrush(&newPainter), 2.);
+	_painter->setPen(newPen);
 
-	switch (m_style)
+	switch (m_shape)
 	{
 	case ot::GraphicsConnectionCfg::ConnectionShape::DirectLine:
 	{
@@ -76,15 +80,9 @@ void ot::GraphicsConnectionPreviewItem::paint(QPainter* _painter, const QStyleOp
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-void ot::GraphicsConnectionPreviewItem::setPen(const QPen& _pen) {
+void ot::GraphicsConnectionPreviewItem::setConnectionShape(ot::GraphicsConnectionCfg::ConnectionShape _shape) {
 	this->prepareGeometryChange();
-	m_pen = _pen;
-	this->update();
-}
-
-void ot::GraphicsConnectionPreviewItem::setConnectionShape(ot::GraphicsConnectionCfg::ConnectionShape _style) {
-	this->prepareGeometryChange();
-	m_style = _style;
+	m_shape = _shape;
 	this->update();
 }
 

@@ -58,8 +58,6 @@ namespace ot {
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };
 		bool getMouseWheelEnabled(void) const { return m_wheelEnabled; };
 
-		const bool getStateChangeInProgress(void) const { return m_stateChangeInProgress; };
-
 		void setGraphicsViewFlag(GraphicsViewFlag _flag, bool _active = true) { m_viewFlags.setFlag(_flag, _active); };
 		void setGraphicsViewFlags(const GraphicsViewFlags& _flags) { m_viewFlags = _flags; };
 		const GraphicsViewFlags& getGraphicsViewFlags(void) const { return m_viewFlags; };
@@ -122,9 +120,7 @@ namespace ot {
 		virtual void dropEvent(QDropEvent* _event) override;
 		virtual void dragMoveEvent(QDragMoveEvent* _event) override;
 
-	private:
-		std::atomic_bool m_stateChangeInProgress = false;
-		
+	private:		
 		GraphicsViewFlags m_viewFlags;
 		ViewStateFlags m_viewStateFlags;
 

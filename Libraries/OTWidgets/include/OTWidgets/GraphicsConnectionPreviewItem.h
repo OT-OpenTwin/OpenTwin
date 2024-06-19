@@ -35,11 +35,8 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-		void setPen(const QPen& _pen);
-		const QPen& pen(void) const { return m_pen; };
-
-		void setConnectionShape(ot::GraphicsConnectionCfg::ConnectionShape _style);
-		ot::GraphicsConnectionCfg::ConnectionShape connectionShape(void) const { return m_style; };
+		void setConnectionShape(ot::GraphicsConnectionCfg::ConnectionShape _shape);
+		ot::GraphicsConnectionCfg::ConnectionShape getConnectionShape(void) const { return m_shape; };
 
 		void setOriginPos(const QPointF& _origin);
 		QPointF originPos(void) const { return m_origin; };
@@ -64,8 +61,7 @@ namespace ot {
 
 		QRectF m_lastRect;
 
-		ot::GraphicsConnectionCfg::ConnectionShape m_style;
-		QPen m_pen;
+		ot::GraphicsConnectionCfg::ConnectionShape m_shape;
 	};
 
 }

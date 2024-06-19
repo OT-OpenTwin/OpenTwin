@@ -41,6 +41,7 @@
     <ClCompile Include="src\GraphicsConnectionItem.cpp" />
     <ClCompile Include="src\GraphicsConnectionPreviewItem.cpp" />
     <ClCompile Include="src\GraphicsEllipseItem.cpp" />
+    <ClCompile Include="src\GraphicsInvisibleItem.cpp" />
     <ClCompile Include="src\GraphicsItemFactory.cpp" />
     <ClCompile Include="src\GraphicsGridLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsGroupItem.cpp" />
@@ -149,6 +150,8 @@
     <ClInclude Include="include\OTWidgets\ComboBox.h" />
     <QtMoc Include="include\OTWidgets\FilePathEdit.h" />
     <ClInclude Include="include\OTWidgets\GraphicsArcItem.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsInvisibleItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsItem.hpp" />
     <ClInclude Include="include\OTWidgets\GraphicsItemLoader.h" />
     <ClInclude Include="include\OTWidgets\GraphicsPickerView.h" />
@@ -190,7 +193,6 @@
     <ClInclude Include="include\OTWidgets\DoubleSpinBox.h" />
     <ClInclude Include="include\OTWidgets\GraphicsBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionItem.h" />
-    <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsEllipseItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsItemFactory.h" />
     <ClInclude Include="include\OTWidgets\GraphicsGridLayoutItem.h" />

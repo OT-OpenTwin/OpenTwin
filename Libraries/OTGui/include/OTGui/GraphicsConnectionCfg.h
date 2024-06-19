@@ -23,7 +23,9 @@ namespace ot {
 	public:
 		enum class ConnectionShape {
 			DirectLine,
-			SmoothLine
+			SmoothLine,
+			XYLine,
+			YXLine
 		};
 
 		static std::string shapeToString(ConnectionShape _shape);
@@ -69,7 +71,17 @@ namespace ot {
 		ConnectionShape getLineShape(void) const { return m_lineShape; };
 
 		void setLineWidth(double _width) { m_lineStyle.setWidth(_width); };
+		double getLineWidth(void) const { return m_lineStyle.width(); };
+
 		void setLineColor(const ot::Color& _color) { m_lineStyle.setColor(_color); };
+
+		//! \brief Set the line painter.
+		//! The item takes ownership of the painter.
+		void setLinePainter(ot::Painter2D* _painter) { m_lineStyle.setPainter(_painter); };
+
+		//! \brief Returns the current painter.
+		//! The item keeps ownership of the painter.
+		const ot::Painter2D* getLinePainter(void) const { return m_lineStyle.painter(); };
 
 		void setLineStyle(const OutlineF& _style) { m_lineStyle = _style; };
 		const OutlineF& getLineStyle(void) const { return m_lineStyle; };
