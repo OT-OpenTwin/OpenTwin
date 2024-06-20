@@ -271,9 +271,6 @@ std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _
 		info.SetObject();
 
 		info.AddMember(OT_ACTION_PARAM_LSS_URL, ot::JsonString(it.second->url(), reply.GetAllocator()), reply.GetAllocator());
-		info.AddMember(OT_ACTION_PARAM_LSS_SessionCount, (int) it.second->sessionCount(), reply.GetAllocator());
-		info.AddMember(OT_ACTION_PARAM_LSS_GLOBAL_CPU, it.second->globalCpuLoad(), reply.GetAllocator());
-		info.AddMember(OT_ACTION_PARAM_LSS_GLOBAL_MEMORY, it.second->globalMemoryLoad(), reply.GetAllocator());
 
 		servicesInfo.PushBack(info, reply.GetAllocator());
 	}

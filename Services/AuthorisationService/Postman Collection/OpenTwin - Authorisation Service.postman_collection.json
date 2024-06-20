@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "83ff728c-5481-4b1b-8b24-f5ff29988d16",
+		"_postman_id": "53d43f5b-546a-4d3d-ac03-44b0255db4d9",
 		"name": "OpenTwin - Authorisation Service",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33298419"
 	},
 	"item": [
 		{
@@ -1005,6 +1006,37 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n    \"action\": \"ChangePassword\",\r\n    \"LoggedInUsername\": \"admin\",\r\n    \"LoggedInUserPassword\": \"admin\",\r\n    \"Username\": \"bob\",\r\n    \"NewPassword\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:8092/execute-one-way-tls",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8092",
+					"path": [
+						"execute-one-way-tls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "33) Get System Information",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"System.GetInformation\",\r\n    \"LoggedInUsername\": \"admin\",\r\n    \"LoggedInUserPassword\": \"admin\",\r\n    \"Service.URL\": \"127.0.0.1:8091\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

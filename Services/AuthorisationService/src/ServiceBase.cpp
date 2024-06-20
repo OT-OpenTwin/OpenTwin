@@ -372,6 +372,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_DELETE_USER) { return handleDeleteUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
 	else if (_action == OT_ACTION_CHANGE_USERNAME) { return handleChangeUserNameByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
 	else if (_action == OT_ACTION_CHANGE_PASSWORD) { return handleChangeUserPasswordByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
+	else if (_action == OT_ACTION_CMD_GetSystemInformation) { return handleGetSystemInformation(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
 	//------------ Group FUNCTIONS ------------
 	else if (_action == OT_ACTION_CREATE_GROUP) { return handleCreateGroup(_actionDocument.GetObject(), loggedInUser); }
 	else if (_action == OT_ACTION_GET_GROUP_DATA) { return handleGetGroupData(_actionDocument.GetObject()); }
@@ -569,6 +570,26 @@ std::string ServiceBase::handleChangeUserPasswordByAdmin(const ot::ConstJsonObje
 	ot::JsonDocument json;
 	json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
 	return json.toJson();
+}
+
+std::string ServiceBase::handleGetSystemInformation(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword) {
+	if (!isAdminUser(_loggedInUser))
+	{
+		throw std::runtime_error("The logged in user is not an admin user. Standard users can not request system information.");
+	}
+
+	std::string gssUrl = ot::json::getString(_actionDocument, OT_ACTION_PARAM_SERVICE_URL);
+
+	ot::JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetSystemInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+
+	std::string response;
+	if (!ot::msg::send(getServiceURL(), gssUrl, ot::EXECUTE, requestDoc.toJson(), response)) {
+		OT_LOG_E("Failed to retrieve information. Reason: Failed to send http request to GSS (URL = \"" + gssUrl + "\")");
+		return "";
+	}
+
+	return response;
 }
 
 // authentication needed: group functions
