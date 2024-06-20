@@ -41,9 +41,6 @@ public:
 	size_t sessionCount(void) const;
 	Session * getSessionById(const std::string& _sessionId);
 
-	double globalCpuLoad(void) const;
-	double globalMemoryLoad(void) const;
-
 	// ###################################################################
 
 	// Data manipulation
