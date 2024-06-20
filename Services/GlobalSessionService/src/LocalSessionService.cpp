@@ -59,6 +59,16 @@ Session * LocalSessionService::getSessionById(const std::string& _sessionId) {
 	return nullptr;
 }
 
+double LocalSessionService::globalCpuLoad(void) const
+{
+	return 11.0;
+}
+
+double LocalSessionService::globalMemoryLoad(void) const
+{
+	return 22.0;
+}
+
 // ###################################################################
 
 // Data manipulation

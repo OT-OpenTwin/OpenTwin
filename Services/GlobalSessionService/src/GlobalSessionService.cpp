@@ -91,10 +91,11 @@ std::string GlobalSessionService::handleGetDBUrl(ot::JsonDocument& _doc) {
 	return m_databaseUrl;
 }
 
-std::string GlobalSessionService::handleGetDBandAuthURL(ot::JsonDocument& _doc) {
+std::string GlobalSessionService::handleGetGlobalServicesURL(ot::JsonDocument& _doc) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, ot::JsonString(m_databaseUrl, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_globalDirectoryUrl, doc.GetAllocator()), doc.GetAllocator());
 	return doc.toJson();
 }
 
@@ -248,6 +249,41 @@ std::string GlobalSessionService::handleNewGlobalDirectoryService(ot::JsonDocume
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
+std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
+
+	double globalCpuLoad = 0, globalMemoryLoad = 0;
+	m_SystemLoadInformation.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);
+
+	double processCpuLoad = 0, processMemoryLoad = 0;
+	m_SystemLoadInformation.getCurrentProcessCPUAndMemoryLoad(processCpuLoad, processMemoryLoad);
+
+	ot::JsonDocument reply;
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_CPU_LOAD, globalCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD, globalMemoryLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_CPU_LOAD, processCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_MEMORY_LOAD, processMemoryLoad, reply.GetAllocator());
+
+	// Now we add information about the session services
+	ot::JsonArray servicesInfo;
+
+	for (auto it : m_sessionServiceIdMap) {
+		ot::JsonValue info;
+		info.SetObject();
+
+		info.AddMember(OT_ACTION_PARAM_LSS_URL, ot::JsonString(it.second->url(), reply.GetAllocator()), reply.GetAllocator());
+		info.AddMember(OT_ACTION_PARAM_LSS_SessionCount, (int) it.second->sessionCount(), reply.GetAllocator());
+		info.AddMember(OT_ACTION_PARAM_LSS_GLOBAL_CPU, it.second->globalCpuLoad(), reply.GetAllocator());
+		info.AddMember(OT_ACTION_PARAM_LSS_GLOBAL_MEMORY, it.second->globalMemoryLoad(), reply.GetAllocator());
+
+		servicesInfo.PushBack(info, reply.GetAllocator());
+	}
+
+	reply.AddMember(OT_ACTION_PARAM_LSS, servicesInfo, reply.GetAllocator());
+
+	return reply.toJson();
+}
+
+
 // ###################################################################################################
 
 // Private functions
@@ -351,7 +387,7 @@ GlobalSessionService::GlobalSessionService()
 	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalSessionService, OT_INFO_SERVICE_TYPE_GlobalSessionService),
 	m_healthCheckRunning(false), m_forceHealthCheck(false)
 {
-
+	m_SystemLoadInformation.initialize();
 }
 
 GlobalSessionService::~GlobalSessionService() {

@@ -7,7 +7,7 @@
 
 class SessionService;
 
-class GlobalDirectoryService : ot::ServiceBase {
+class GlobalDirectoryService : public ot::ServiceBase {
 public:
 	enum ConnectionStatus {
 		Connected,

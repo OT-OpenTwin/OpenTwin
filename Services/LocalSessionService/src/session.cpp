@@ -179,6 +179,20 @@ std::string Session::infoToJSON(void) const {
 	return infoDoc.toJson();
 }
 
+void Session::servicesInformation(ot::JsonArray &servicesInfo, ot::JsonAllocator& allocator) const
+{
+	for (auto s : m_serviceMap)
+	{
+		ot::JsonValue infoDoc;
+		infoDoc.SetObject();
+
+		infoDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(s.second->type(), allocator), allocator);
+		infoDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(s.second->url(), allocator), allocator);
+
+		servicesInfo.PushBack(infoDoc, allocator);
+	}
+}
+
 void Session::addServiceListToDocument(ot::JsonDocument& _doc) {
 	ot::JsonArray serviceList;
 	for (auto s : m_serviceMap)

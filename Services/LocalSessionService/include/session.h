@@ -118,6 +118,9 @@ public:
 	//! @brief Will add all services to the provided document
 	void addServiceListToDocument(ot::JsonDocument& _doc);
 
+	//! @brief Will return a list of JSON objects containing information about each service
+	void servicesInformation(ot::JsonArray& servicesInfo, ot::JsonAllocator &allocator) const;
+
 	//! @brief Will send a broadcast message to all services of this session
 	//! @param _sender The sender of this message
 	//! @param _message The message text

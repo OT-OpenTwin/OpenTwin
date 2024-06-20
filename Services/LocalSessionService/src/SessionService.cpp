@@ -94,7 +94,6 @@ SessionService::SessionService()
 	StudioSuiteSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
 	StudioSuiteSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_STUDIOSUITE, OT_INFO_SERVICE_TYPE_STUDIOSUITE));
 	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, StudioSuiteSessionServices);
-
 }
 
 bool SessionService::isServiceInDebugMode(const std::string& _serviceName) {
@@ -395,7 +394,7 @@ std::string SessionService::handleGetAuthURL(ot::JsonDocument& _commandDoc) {
 	return serviceAuthorisationURL();
 }
 
-std::string SessionService::handleGetDBAndAuthURL(ot::JsonDocument& _commandDoc) {
+std::string SessionService::handleGetGlobalServicesURL(ot::JsonDocument& _commandDoc) {
 #ifdef OT_USE_GSS
 	// The info message is only present if the request is done by the UI frontend upon startup
 	if (_commandDoc.HasMember(OT_ACTION_PARAM_MESSAGE)) {
@@ -407,6 +406,7 @@ std::string SessionService::handleGetDBAndAuthURL(ot::JsonDocument& _commandDoc)
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, ot::JsonString(m_dataBaseURL, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(serviceAuthorisationURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_globalDirectoryService->serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	return doc.toJson();
 }
@@ -555,6 +555,45 @@ std::string SessionService::handleRegisterNewService(ot::JsonDocument& _commandD
 	ServiceRunStarter::instance().addService(theSession, theService);
 
 	return response.toJson();
+}
+
+std::string SessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
+
+	double globalCpuLoad = 0, globalMemoryLoad = 0;
+	m_systemLoadInformation.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);
+
+	double processCpuLoad = 0, processMemoryLoad = 0;
+	m_systemLoadInformation.getCurrentProcessCPUAndMemoryLoad(processCpuLoad, processMemoryLoad);
+
+	ot::JsonDocument reply;
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_CPU_LOAD, globalCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD, globalMemoryLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_CPU_LOAD, processCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_MEMORY_LOAD, processMemoryLoad, reply.GetAllocator());
+
+	// Now we add information about the session services
+	ot::JsonArray sessionInfo;
+
+	for (auto session : sessions()) {
+		ot::JsonValue info;
+		info.SetObject();
+
+		info.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(session->id(), reply.GetAllocator()), reply.GetAllocator());
+		info.AddMember(OT_ACTION_PARAM_SESSION_PROJECT, ot::JsonString(session->projectName(), reply.GetAllocator()), reply.GetAllocator());
+		info.AddMember(OT_ACTION_PARAM_SESSION_USER, ot::JsonString(session->userName(), reply.GetAllocator()), reply.GetAllocator());
+		info.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(session->type(), reply.GetAllocator()), reply.GetAllocator());
+
+		ot::JsonArray servicesInformation;
+		session->servicesInformation(servicesInformation, reply.GetAllocator());
+
+		info.AddMember(OT_ACTION_PARAM_SESSION_SERVICES, servicesInformation, reply.GetAllocator());
+
+		sessionInfo.PushBack(info, reply.GetAllocator());
+	}
+
+	reply.AddMember(OT_ACTION_PARAM_SESSION_LIST, sessionInfo, reply.GetAllocator());
+
+	return reply.toJson();
 }
 
 std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc)
@@ -1044,4 +1083,9 @@ void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, std::stri
 	OT_LOG_D("The session with the ID \"" + _sessionId +
 		"\" was closed. Reason: Shutdown requested by service \"" + senderServiceName + "\"");
 	m_masterLock.unlock();
+}
+
+void SessionService::initializeSystemInformation() {
+
+	m_systemLoadInformation.initialize();
 }

@@ -24,6 +24,7 @@
     <ClCompile Include="src\Network.cpp" />
     <ClCompile Include="src\OperatingSystem.cpp" />
     <ClCompile Include="src\PortManager.cpp" />
+    <ClCompile Include="src\SystemLoadInformation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTSystem\Application.h" />
@@ -32,6 +33,7 @@
     <ClInclude Include="include\OTSystem\OperatingSystem.h" />
     <ClInclude Include="include\OTSystem\PortManager.h" />
     <ClInclude Include="include\OTSystem\SystemAPIExport.h" />
+    <ClInclude Include="include\OTSystem\SystemLoadInformation.h" />
     <ClInclude Include="include\OTSystem\SystemTypes.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -121,7 +123,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>Userenv.lib;wsock32.lib;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Userenv.lib;wsock32.lib;Advapi32.lib;pdh.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -159,7 +161,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>Userenv.lib;wsock32.lib;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Userenv.lib;wsock32.lib;Advapi32.lib;pdh.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">

@@ -41,16 +41,24 @@ namespace ot {
 		void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 			OT_LOG_D("Starting Local Session Service health check (URL = \"" + _sessionServiceURL + "\")");
 
-			// Create ping request
-			JsonDocument pingDoc;
-			pingDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_Ping, pingDoc.GetAllocator());
-			std::string ping = pingDoc.toJson();
-
 			bool alive = true;
 			while (alive) {
 				// Wait for 20s
 				using namespace std::chrono_literals;
 				std::this_thread::sleep_for(20s);
+
+				double globalCPULoad = 0.0, globalMemoryLoad = 0.0, processCPULoad = 0.0, processMemoryLoad = 0.0;
+				ot::intern::ExternalServicesComponent::instance().getCPUAndMemoryLoad(processCPULoad, processMemoryLoad, globalCPULoad, globalMemoryLoad);
+
+				// Create ping request
+				JsonDocument pingDoc;
+				pingDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_Ping, pingDoc.GetAllocator());
+				pingDoc.AddMember(OT_ACTION_PARAM_GLOBAL_CPU_LOAD, globalCPULoad, pingDoc.GetAllocator());
+				pingDoc.AddMember(OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD, globalMemoryLoad, pingDoc.GetAllocator());
+				pingDoc.AddMember(OT_ACTION_PARAM_PROCESS_CPU_LOAD, processCPULoad, pingDoc.GetAllocator());
+				pingDoc.AddMember(OT_ACTION_PARAM_PROCESS_MEMORY_LOAD, processMemoryLoad, pingDoc.GetAllocator());
+
+				std::string ping = pingDoc.toJson();
 
 				// Try to send message and check the response
 				std::string ret;
@@ -539,6 +547,9 @@ std::string ot::intern::ExternalServicesComponent::handleRun(JsonDocument& _docu
 	// Refresh the current service list and start application
 	m_application->run();
 
+	// Initialize the performance counters
+	m_systemLoad.initialize();
+
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
@@ -566,3 +577,12 @@ std::string ot::intern::ExternalServicesComponent::handleUIPluginConnected(JsonD
 	m_application->uiPluginConnected(component);
 	return std::string();
 }
+
+void ot::intern::ExternalServicesComponent::getCPUAndMemoryLoad(double& globalCPULoad, double& globalMemoryLoad, double& processCPULoad, double& processMemoryLoad)
+{
+	m_systemLoad.getGlobalCPUAndMemoryLoad(globalCPULoad, globalMemoryLoad);
+
+	m_systemLoad.getCurrentProcessCPUAndMemoryLoad(processCPULoad, processMemoryLoad);
+}
+
+

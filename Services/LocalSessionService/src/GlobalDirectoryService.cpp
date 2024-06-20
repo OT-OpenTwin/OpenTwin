@@ -27,6 +27,8 @@ void GlobalDirectoryService::connect(const std::string& _url) {
 
 	std::thread t(&GlobalDirectoryService::healthCheck, this);
 	t.detach();
+
+	m_sessionService->initializeSystemInformation();
 }
 
 bool GlobalDirectoryService::isConnected(void) const {

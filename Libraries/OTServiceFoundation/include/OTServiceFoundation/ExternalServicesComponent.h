@@ -10,6 +10,7 @@
 #include "OTCore/OTObjectBase.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTSystem/SystemLoadInformation.h"
 
 // std header
 #include <string> // string
@@ -79,6 +80,9 @@ namespace ot {
 
 			void updateSettingsFromDataBase(PropertyGridCfg& _config);
 
+			//! @brief Tell the current cpu and memory load in percent 
+			void getCPUAndMemoryLoad(double& globalCPULoad, double& globalMemoryLoad, double& processCPULoad, double& processMemoryLoad);
+
 		private:
 			// #####################################################################################################################################
 
@@ -101,6 +105,7 @@ namespace ot {
 
 			ApplicationBase * m_application;			// The application object
 			ComponentState    m_componentState;
+			SystemLoadInformation m_systemLoad;
 
 			ExternalServicesComponent();
 			virtual ~ExternalServicesComponent();

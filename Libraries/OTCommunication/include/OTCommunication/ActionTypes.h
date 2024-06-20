@@ -20,7 +20,7 @@
 
 #define OT_ACTION_CMD_GetDatabaseUrl "Get.DatabaseURL"
 #define OT_ACTION_CMD_GetAuthorisationServerUrl "Get.AuthURL"
-#define OT_ACTION_CMD_GetDBandAuthServerUrl "Get.DatabaseAuthURL"
+#define OT_ACTION_CMD_GetGlobalServicesUrl "Get.GlobalServicesURL"
 #define OT_ACTION_CMD_GetMandatoryServices "Get.MandatoryServices"
 
 #define OT_ACTION_CMD_Message "Message"
@@ -39,6 +39,7 @@
 #define OT_ACTION_CMD_RegisterNewGlobalDirecotoryService "GlobalDirectoryService.New"
 #define OT_ACTION_CMD_RegisterNewLocalDirecotoryService "LocalDirectoryService.New"
 #define OT_ACTION_CMD_UpdateSystemLoad "SystemLoad.Update"
+#define OT_ACTION_CMD_GetSystemInformation "System.GetInformation"
 
 #define OT_ACTION_CMD_GetSessionExists "Session.GetExists"
 #define OT_ACTION_CMD_GetSessionServices "Session.GetServices"
@@ -57,6 +58,12 @@
 #define OT_ACTION_CMD_GetVisualizationModel "VisualizationModel.Get"
 #define OT_ACTION_CMD_Log "Log"
 #define OT_ACTION_CMD_ForceHealthCheck "Healthcheck.Force"
+
+#define OT_ACTION_PARAM_LSS "LocalSessionServices"
+#define OT_ACTION_PARAM_LSS_URL "URL"
+#define OT_ACTION_PARAM_LSS_SessionCount "SessionCount"
+#define OT_ACTION_PARAM_LSS_GLOBAL_CPU "GlobalCPU"
+#define OT_ACTION_PARAM_LSS_GLOBAL_MEMORY "GlobalMemory"
 
 #define OT_ACTION_CMD_ServiceEnableDebug "Service.DebugEnable"
 #define OT_ACTION_CMD_ServiceDisableDebug "Service.DebugDisable"
@@ -362,6 +369,11 @@
 
 #define OT_ACTION_PARAM_LOG "LogMessage"
 
+#define OT_ACTION_PARAM_GLOBAL_CPU_LOAD "Global.CPU.Load"
+#define OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD "Global.Memory.Load"
+#define OT_ACTION_PARAM_PROCESS_CPU_LOAD "Process.CPU.Load"
+#define OT_ACTION_PARAM_PROCESS_MEMORY_LOAD "Process.Memory.Load"
+
 #define OT_ACTION_PARAM_PREFETCH_Documents "Prefetch.Documents"
 #define OT_ACTION_PARAM_PREFETCH_ID "Prefetch.ID"
 #define OT_ACTION_PARAM_PREFETCH_Version "Prefetch.Version"
@@ -372,12 +384,16 @@
 #define OT_ACTION_PARAM_SERVICE_ID "Service.ID"
 #define OT_ACTION_PARAM_SERVICE_DBURL "Service.DbUrl"
 #define OT_ACTION_PARAM_SERVICE_AUTHURL "Service.AuthUrl"
+#define OT_ACTION_PARAM_SERVICE_GDSURL "Service.GdsUrl"
 
 #define OT_ACTION_PARAM_SESSION_ID "Session.ID"
 #define OT_ACTION_PARAM_SESSION_TYPE "Session.Type"
+#define OT_ACTION_PARAM_SESSION_PROJECT "Session.Project"
+#define OT_ACTION_PARAM_SESSION_USER "Session.User"
 #define OT_ACTION_PARAM_SESSION_TYPE_LIST "Session.TypeList"
 #define OT_ACTION_PARAM_SESSION_SERVICES "Session.Services"
 #define OT_ACTION_PARAM_SESSION_EXISTS "Session.Exists"
+#define OT_ACTION_PARAM_SESSION_LIST "Session.List"
 
 #define OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT "Development"
 #define OT_ACTION_PARAM_SESSIONTYPE_3DSIM "3D Simulation"

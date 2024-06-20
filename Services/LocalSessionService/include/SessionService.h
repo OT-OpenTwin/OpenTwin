@@ -18,6 +18,7 @@
 #include "OTCore/OTObjectBase.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTSystem/SystemLoadInformation.h"
 
 // C++ header
 #include <string>
@@ -147,13 +148,17 @@ public:
 
 	Service * getServiceFromURL(const std::string& _url);
 
+	//! @brief Initialize the collection of system information (e.g. CPU time and memory).
+	void initializeSystemInformation();
+
 private:
 	// Message handling
 
 	OT_HANDLER(handleGetDBURL, SessionService, OT_ACTION_CMD_GetDatabaseUrl, ot::ALL_MESSAGE_TYPES);
 	OT_HANDLER(handleGetAuthURL, SessionService, OT_ACTION_CMD_GetAuthorisationServerUrl, ot::ALL_MESSAGE_TYPES);
-	OT_HANDLER(handleGetDBAndAuthURL, SessionService, OT_ACTION_CMD_GetDBandAuthServerUrl, ot::ALL_MESSAGE_TYPES);
+	OT_HANDLER(handleGetGlobalServicesURL, SessionService, OT_ACTION_CMD_GetGlobalServicesUrl, ot::ALL_MESSAGE_TYPES);
 	OT_HANDLER(handleGetProjectTypes, SessionService, OT_ACTION_CMD_GetListOfProjectTypes, ot::ALL_MESSAGE_TYPES);
+	OT_HANDLER(handleGetSystemInformation, SessionService, OT_ACTION_CMD_GetSystemInformation, ot::ALL_MESSAGE_TYPES);
 
 	OT_HANDLER(handleGetMandatoryServices, SessionService, OT_ACTION_CMD_GetMandatoryServices, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleSessionDebugLogOn, SessionService, OT_ACTION_CMD_SessionDebugLogOn, ot::SECURE_MESSAGE_TYPES);
@@ -192,6 +197,7 @@ private:
 	std::string									m_ip;
 	std::string									m_port;
 	ot::serviceID_t								m_id;
+	ot::SystemLoadInformation					m_systemLoadInformation;
 
 	//NOTE, debug only this variable contains the IP address that is used for the services 
 	
