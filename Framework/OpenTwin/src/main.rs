@@ -18,10 +18,12 @@ use std::ffi::{ CStr, CString };
 use std::net::SocketAddr;
 use tokio::net;
 use url::Url;
+use warp::{http::StatusCode, reply};
 
 use open_twin::handler;
 use crate::serve_mtls::serve_mtls_connection; // Our handler..
 
+static GLOBAL: state::Storage<String> = state::Storage::new();
 
 mod serve_mtls;
 mod mtls_config;
@@ -97,9 +99,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
         service_url = CStr::from_ptr(c_buf).to_str().unwrap();
     }
 
+    GLOBAL.set(lib_path.to_string());
+	
     // GET /any path
+		
+    let index = warp::path::end().map(move || {
 
-    let index = warp::path::end().map(|| "Endpoint, /execute /queue /shutdown");
+        let computed_string: String = "OpenTwin Microservice (".to_string() + GLOBAL.get().strip_suffix(".dll").expect("UNKNOWN") + ")";
+        return reply::with_status(
+            computed_string,
+            StatusCode::CREATED,
+        );
+	});
 
     let execute_route = warp::path("execute").and(
         warp::post()
