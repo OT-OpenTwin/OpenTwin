@@ -395,6 +395,7 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 	else if (_event->key() == Qt::Key_Delete) {
 		ot::UIDList itm = this->getSelectedItemUIDs();
 		ot::UIDList con = this->getSelectedConnectionUIDs();
+		if (itm.empty() && con.empty()) return;
 		Q_EMIT removeItemsRequested(itm, con);
 	}
 	else if (_event->key() == Qt::Key_Left) {
