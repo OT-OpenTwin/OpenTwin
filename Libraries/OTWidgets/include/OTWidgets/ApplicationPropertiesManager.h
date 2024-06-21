@@ -72,7 +72,6 @@ namespace ot {
 		std::list<const Property*> m_changedProperties;
 		std::map<std::string, PropertyGridCfg> m_data;
 		PropertyDialog* m_dialog;
-		std::list<Property*> m_garbage;
 		QString m_dialogTitle;
 
 		PropertyGridCfg findData(const std::string& _owner);
@@ -84,8 +83,6 @@ namespace ot {
 		void updateCurrentDialog(void);
 
 		PropertyGridCfg buildDialogConfiguration(void);
-
-		void clearGarbage(void);
 
 		ApplicationPropertiesManager();
 		~ApplicationPropertiesManager();

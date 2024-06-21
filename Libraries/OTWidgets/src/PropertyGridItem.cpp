@@ -19,7 +19,7 @@
 #include <QtWidgets/qlayout.h>
 
 ot::PropertyGridItem::PropertyGridItem()
-	: m_input(nullptr), m_propertyColor(Qt::white), m_parentGroup(nullptr)
+	: m_input(nullptr), m_parentGroup(nullptr)
 {
 	m_titleLayoutW = new QWidget;
 	m_titleLayoutW->setObjectName("PropertyGridItemTitleLayout");
@@ -43,8 +43,6 @@ ot::PropertyGridItem::PropertyGridItem()
 ot::PropertyGridItem::~PropertyGridItem() {
 	if (m_input) delete m_input;
 	m_input = nullptr;
-
-	for (Property* prop : m_garbage) delete prop;
 }
 
 bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
@@ -116,11 +114,15 @@ std::string ot::PropertyGridItem::getPropertyType(void) const {
 }
 
 void ot::PropertyGridItem::slotValueChanged(void) {
-	Q_EMIT inputValueChanged(this->createSignalProperty());
+	ot::Property* signalProperty = this->createSignalProperty();
+	Q_EMIT inputValueChanged(signalProperty);
+	if (signalProperty) delete signalProperty;
 }
 
 void ot::PropertyGridItem::slotDeleteRequested(void) {
-	Q_EMIT deleteRequested(this->createSignalProperty());
+	ot::Property* signalProperty = this->createSignalProperty();
+	Q_EMIT deleteRequested(signalProperty);
+	if (signalProperty) delete signalProperty;
 }
 
 void ot::PropertyGridItem::slotGlobalStyleChanged(const ColorStyle& _style) {
@@ -154,8 +156,6 @@ ot::Property* ot::PropertyGridItem::createSignalProperty(void) {
 		groupCfg = newGroup;
 		group = group->getParentPropertyGroup();
 	}
-
-	m_garbage.push_back(prop);
 
 	return prop;
 }

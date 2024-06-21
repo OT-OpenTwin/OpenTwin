@@ -30,7 +30,7 @@ void ot::PropertyGridItemDelegate::paint(QPainter* _painter, const QStyleOptionV
 	PropertyGridGroup* grp = dynamic_cast<PropertyGridGroup*>(m_tree->itemFromIndex(_index));
 
 	if (itm) {
-		_painter->fillRect(_option.rect, QBrush(itm->propertyColor()));
+		_painter->fillRect(_option.rect, GlobalColorStyle::instance().getCurrentStyle().getValue(ColorStyleValueEntry::WidgetBackground).brush());
 	}
 	else if (grp) {
 		_painter->fillRect(_option.rect, GlobalColorStyle::instance().getCurrentStyle().getValue(ColorStyleValueEntry::TitleBackground).brush());

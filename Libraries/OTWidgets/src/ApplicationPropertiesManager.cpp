@@ -16,8 +16,6 @@ ot::ApplicationPropertiesManager& ot::ApplicationPropertiesManager::instance(voi
 }
 
 ot::Dialog::DialogResult ot::ApplicationPropertiesManager::showDialog(void) {
-	this->clearGarbage();
-
 	PropertyGridCfg gridCfg = this->buildDialogConfiguration();
 
 	// If there are no properties skip showing the dialog.
@@ -55,7 +53,6 @@ ot::Dialog::DialogResult ot::ApplicationPropertiesManager::showDialog(void) {
 
 void ot::ApplicationPropertiesManager::clear(void) {
 	m_data.clear();
-	this->clearGarbage();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -89,6 +86,7 @@ void ot::ApplicationPropertiesManager::slotPropertyChanged(const Property* _prop
 	Property* cleanedProperty = this->createCleanedSlotProperty(_property, owner);
 	OTAssertNullptr(cleanedProperty);
 	Q_EMIT propertyChanged(owner, cleanedProperty);
+	if (cleanedProperty) delete cleanedProperty;
 }
 
 void ot::ApplicationPropertiesManager::slotPropertyDeleteRequested(const Property* _property) {
@@ -96,6 +94,7 @@ void ot::ApplicationPropertiesManager::slotPropertyDeleteRequested(const Propert
 	Property* cleanedProperty = this->createCleanedSlotProperty(_property, owner);
 	OTAssertNullptr(cleanedProperty);
 	Q_EMIT propertyDeleteRequested(owner, cleanedProperty);
+	if (cleanedProperty) delete cleanedProperty;
 }
 
 ot::PropertyGridCfg ot::ApplicationPropertiesManager::findData(const std::string& _owner) {
@@ -110,8 +109,6 @@ ot::PropertyGridCfg ot::ApplicationPropertiesManager::findData(const std::string
 ot::Property* ot::ApplicationPropertiesManager::createCleanedSlotProperty(const Property* _property, std::string& _owner) {
 	ot::Property* newProperty = _property->createCopyWithParents();
 	OTAssertNullptr(newProperty);
-
-	m_garbage.push_back(newProperty);
 
 	PropertyGroup* rootGroup = newProperty->getRootGroup();
 	if (rootGroup->getChildGroups().empty()) {
@@ -163,23 +160,10 @@ ot::PropertyGridCfg ot::ApplicationPropertiesManager::buildDialogConfiguration(v
 	return gridCfg;
 }
 
-void ot::ApplicationPropertiesManager::clearGarbage(void) {
-	for (Property* prop : m_garbage) {
-		delete prop;
-	}
-	m_garbage.clear();
-
-	for (const Property* prop : m_changedProperties) {
-		delete prop;
-	}
-	m_changedProperties.clear();
-}
-
 ot::ApplicationPropertiesManager::ApplicationPropertiesManager()
 	: m_propertyReplaceOnMerge(false), m_dialog(nullptr)
 {}
 
 ot::ApplicationPropertiesManager::~ApplicationPropertiesManager() {
-	this->clearGarbage();
 	m_data.clear();
 }

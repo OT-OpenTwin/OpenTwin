@@ -49,9 +49,6 @@ namespace ot {
 
 		void addChildGroup(PropertyGridGroup* _group);
 
-		const QColor& groupColor(void) const { return m_groupColor; };
-		const QColor& alternateGroupColor(void) const { return m_groupAlternateColor; };
-
 		PropertyGridItem* findChildProperty(const std::string& _propertyName, bool _searchChildGroups) const;
 		std::list<PropertyGridItem*> childProperties(void) const;
 
@@ -74,13 +71,10 @@ namespace ot {
 
 		PropertyGridGroup* m_parentGroup;
 
-		bool m_isAlternate;
 		std::string m_name;
 		QWidget* m_titleLayoutW;
 		QLabel* m_titleIconLabel;
 		QLabel* m_titleLabel;
-		QColor m_groupColor;
-		QColor m_groupAlternateColor;
 	};
 
 }

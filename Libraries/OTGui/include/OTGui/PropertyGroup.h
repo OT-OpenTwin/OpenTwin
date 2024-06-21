@@ -117,16 +117,6 @@ namespace ot {
 
 		void findPropertiesBySpecialType(const std::string& _specialType, std::list<Property*>& _list) const;
 
-		void setBackgroundColor(DefaultColor _color) { this->setBackgroundColor(Color(_color)); };
-		void setBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setBackgroundColor(Color(_r, _g, _b, _a)); };
-		void setBackgroundColor(const Color& _color) { m_backgroundColor = _color; };
-		const Color& getBackgroundColor(void) const { return m_backgroundColor; };
-
-		void setAlternateBackgroundColor(DefaultColor _color) { this->setAlternateBackgroundColor(Color(_color)); };
-		void setAlternateBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setAlternateBackgroundColor(Color(_r, _g, _b, _a)); };
-		void setAlternateBackgroundColor(const Color& _color) { m_alternateBackgroundColor = _color; };
-		const Color& getAlternateBackgroundColor(void) const { return m_alternateBackgroundColor; };
-
 		void clear(bool _keepGroups = false);
 
 		//! \brief Returns false if at least one property exists in this group or any of the child groups.
@@ -141,8 +131,6 @@ namespace ot {
 
 		std::string m_name;
 		std::string m_title;
-		Color m_backgroundColor;
-		Color m_alternateBackgroundColor;
 		std::list<Property*> m_properties;
 		std::list<PropertyGroup*> m_childGroups;
 	};

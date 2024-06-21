@@ -55,9 +55,6 @@ namespace ot {
 		void setInput(PropertyInput* _input);
 		PropertyInput* getInput(void) const { return m_input; };
 		
-		void setPropertyColor(const QColor& _color) { m_propertyColor = _color; };
-		const QColor& propertyColor(void) const { return m_propertyColor; };
-
 		PropertyBase getPropertyData(void) const;
 		std::string getPropertyType(void) const;
 
@@ -81,9 +78,6 @@ namespace ot {
 		Label* m_titleLabel;
 
 		PropertyInput* m_input;
-		QColor m_propertyColor;
-
-		std::list<Property*> m_garbage;
 	};
 
 }

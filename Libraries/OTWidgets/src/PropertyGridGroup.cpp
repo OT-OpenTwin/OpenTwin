@@ -29,7 +29,7 @@ namespace ot {
 }
 
 ot::PropertyGridGroup::PropertyGridGroup() 
-	: m_isAlternate(false), m_groupColor(Qt::white), m_groupAlternateColor(235, 235, 235), m_parentGroup(nullptr)
+	: m_parentGroup(nullptr)
 {
 	m_titleLabel = new QLabel;
 	m_titleLabel->setObjectName("PropertyGridGroupTitleLabel");
@@ -53,9 +53,7 @@ ot::PropertyGridGroup::~PropertyGridGroup() {
 
 void ot::PropertyGridGroup::setupFromConfig(const PropertyGroup* _group) {
 	m_name = _group->getName();
-	m_groupColor = QtFactory::toQColor(_group->getBackgroundColor());
-	m_groupAlternateColor = QtFactory::toQColor(_group->getAlternateBackgroundColor());
-
+	
 	m_titleLabel->setText(QString::fromStdString(_group->getTitle()));
 
 	for (Property* p : _group->getProperties()) {
@@ -80,9 +78,7 @@ ot::PropertyGroup* ot::PropertyGridGroup::createConfiguration(bool _includeChild
 	PropertyGroup* newGroup = new PropertyGroup;
 	newGroup->setName(this->getName());
 	newGroup->setTitle(this->getTitle().toStdString());
-	newGroup->setBackgroundColor(Color(m_groupColor.red(), m_groupColor.green(), m_groupColor.blue(), m_groupColor.alpha()));
-	newGroup->setAlternateBackgroundColor(Color(m_groupAlternateColor.red(), m_groupAlternateColor.green(), m_groupAlternateColor.blue(), m_groupAlternateColor.alpha()));
-
+	
 	if (_includeChildAndProperties) {
 		std::list<Property*> p;
 		for (const PropertyGridItem* i : this->childProperties()) {
@@ -140,9 +136,6 @@ QString ot::PropertyGridGroup::getTitle(void) const {
 }
 
 void ot::PropertyGridGroup::addProperty(PropertyGridItem* _item) {
-	_item->setPropertyColor((m_isAlternate ? m_groupAlternateColor : m_groupColor));
-	m_isAlternate = !m_isAlternate;
-
 	_item->setParentPropertyGroup(this);
 
 	this->addChild(_item);

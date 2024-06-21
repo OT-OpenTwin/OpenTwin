@@ -10,7 +10,7 @@
 #include "OTGui/PropertyFactory.h"
 
 ot::PropertyGroup::PropertyGroup()
-	: m_backgroundColor(255, 255, 255), m_alternateBackgroundColor(235, 235, 235), m_parentGroup(nullptr)
+	: m_parentGroup(nullptr)
 {}
 
 ot::PropertyGroup::PropertyGroup(const PropertyGroup& _other) 
@@ -20,11 +20,11 @@ ot::PropertyGroup::PropertyGroup(const PropertyGroup& _other)
 }
 
 ot::PropertyGroup::PropertyGroup(const std::string& _name)
-	: m_name(_name), m_title(_name), m_backgroundColor(255, 255, 255), m_alternateBackgroundColor(235, 235, 235), m_parentGroup(nullptr)
+	: m_name(_name), m_title(_name), m_parentGroup(nullptr)
 {}
 
 ot::PropertyGroup::PropertyGroup(const std::string& _name, const std::string& _title)
-	: m_name(_name), m_title(_title), m_backgroundColor(255, 255, 255), m_alternateBackgroundColor(235, 235, 235), m_parentGroup(nullptr)
+	: m_name(_name), m_title(_title), m_parentGroup(nullptr)
 {}
 
 ot::PropertyGroup::~PropertyGroup() {
@@ -38,8 +38,6 @@ ot::PropertyGroup& ot::PropertyGroup::operator = (const PropertyGroup& _other) {
 
 	m_name = _other.m_name;
 	m_title = _other.m_title;
-	m_backgroundColor = _other.m_backgroundColor;
-	m_alternateBackgroundColor = _other.m_alternateBackgroundColor;
 	
 	for (Property* p : _other.m_properties) {
 		this->addProperty(p->createCopy());
@@ -58,9 +56,7 @@ ot::PropertyGroup* ot::PropertyGroup::createCopy(bool _includeChilds) const {
 	PropertyGroup* newGroup = new PropertyGroup;
 	newGroup->m_name = this->m_name;
 	newGroup->m_title = this->m_title;
-	newGroup->m_backgroundColor = this->m_backgroundColor;
-	newGroup->m_alternateBackgroundColor = this->m_alternateBackgroundColor;
-
+	
 	return newGroup;
 }
 
@@ -84,14 +80,6 @@ void ot::PropertyGroup::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 		pArr.PushBack(pObj, _allocator);
 	}
 	_object.AddMember("Properties", pArr, _allocator);
-
-	JsonObject bObj;
-	m_backgroundColor.addToJsonObject(bObj, _allocator);
-	_object.AddMember("Color", bObj, _allocator);
-
-	JsonObject abObj;
-	m_alternateBackgroundColor.addToJsonObject(abObj, _allocator);
-	_object.AddMember("AlternateColor", abObj, _allocator);
 }
 
 void ot::PropertyGroup::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -116,12 +104,6 @@ void ot::PropertyGroup::setFromJsonObject(const ot::ConstJsonObject& _object) {
 			this->addChildGroup(g);
 		}
 	}
-
-	ConstJsonObject bObj = json::getObject(_object, "Color");
-	m_backgroundColor.setFromJsonObject(bObj);
-
-	ConstJsonObject abObj = json::getObject(_object, "AlternateColor");
-	m_alternateBackgroundColor.setFromJsonObject(abObj);
 }
 
 void ot::PropertyGroup::mergeWith(const PropertyGroup& _other, bool _replaceExistingProperties) {
