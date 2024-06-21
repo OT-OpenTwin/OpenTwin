@@ -82,6 +82,7 @@ namespace ot {
 
 			//! @brief Tell the current cpu and memory load in percent 
 			void getCPUAndMemoryLoad(double& globalCPULoad, double& globalMemoryLoad, double& processCPULoad, double& processMemoryLoad);
+			std::string handleGetSystemInformation();
 
 		private:
 			// #####################################################################################################################################

@@ -365,6 +365,15 @@ std::string ot::intern::ExternalServicesComponent::dispatchAction(
 		bool hasHandler{ false };
 		std::string result = ot::ActionDispatcher::instance().dispatch(action, actionDoc, hasHandler, _messageType);
 
+		// Prode the 
+		if (!hasHandler && action == OT_ACTION_CMD_GetSystemInformation)
+		{
+			// Provide the default implementation for getting the service information if the service does not have a more specific handler
+			result = handleGetSystemInformation();
+
+			hasHandler = true;
+		}
+
 		if (!hasHandler) {
 			result = m_application->processActionWithModalCommands(action, actionDoc);
 		}
@@ -383,6 +392,26 @@ std::string ot::intern::ExternalServicesComponent::dispatchAction(
 	}
 }
 
+std::string ot::intern::ExternalServicesComponent::handleGetSystemInformation() 
+{
+	double globalCpuLoad = 0, globalMemoryLoad = 0, processCpuLoad = 0, processMemoryLoad = 0;
+	getCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad, processCpuLoad, processMemoryLoad);
+
+	ot::JsonDocument reply;
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_CPU_LOAD, globalCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD, globalMemoryLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_CPU_LOAD, processCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_MEMORY_LOAD, processMemoryLoad, reply.GetAllocator());
+
+	if (m_application != nullptr)
+	{
+		reply.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(m_application->serviceType(), reply.GetAllocator()), reply.GetAllocator());
+		reply.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_application->sessionID(), reply.GetAllocator()), reply.GetAllocator());
+		reply.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(m_application->projectType(), reply.GetAllocator()), reply.GetAllocator());
+	}
+
+	return reply.toJson();
+}
 // #####################################################################################################################################
 
 void ot::intern::ExternalServicesComponent::shutdown(bool _requestedAsCommand) {
