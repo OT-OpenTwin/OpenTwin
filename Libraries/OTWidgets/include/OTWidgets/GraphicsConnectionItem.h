@@ -24,12 +24,12 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public QGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsConnectionItem)
 	public:
-		enum GraphicsItemState {
+		enum GraphicsConnectionState {
 			NoState = 0x00, //! @brief Default state
 			HoverState = 0x01, //! @brief Item is hovered over by user
 			SelectedState = 0x02  //! @brief Item is selected
 		};
-		typedef Flags<GraphicsItemState> GraphicsItemStateFlags;
+		typedef Flags<GraphicsConnectionState> GraphicsConnectionStateFlags;
 
 		GraphicsConnectionItem();
 		virtual ~GraphicsConnectionItem();
@@ -94,7 +94,7 @@ namespace ot {
 		
 		GraphicsConnectionCfg m_config;
 
-		GraphicsItemStateFlags m_state;
+		GraphicsConnectionStateFlags m_state;
 
 		GraphicsItem* m_origin;
 		GraphicsItem* m_dest;
@@ -105,4 +105,4 @@ namespace ot {
 
 }
 
-OT_ADD_FLAG_FUNCTIONS(ot::GraphicsConnectionItem::GraphicsItemState)
+OT_ADD_FLAG_FUNCTIONS(ot::GraphicsConnectionItem::GraphicsConnectionState)

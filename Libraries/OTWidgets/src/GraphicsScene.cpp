@@ -138,7 +138,12 @@ void ot::GraphicsScene::handleSelectionChanged(void) {
 void ot::GraphicsScene::moveAllSelectedItems(const QPointF& _delta) {
 	if (_delta.x() == 0. && _delta.y() == 0.) return;
 	for (QGraphicsItem* item : this->selectedItems()) {
-		item->setPos(this->snapToGrid(item->pos() + _delta));
+		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(item);
+		if (otItem) {
+			if (otItem->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) {
+				otItem->getQGraphicsItem()->setPos(this->snapToGrid(item->pos() + _delta));
+			}
+		}
 	}
 }
 
