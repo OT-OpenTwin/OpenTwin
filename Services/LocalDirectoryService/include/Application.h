@@ -16,6 +16,7 @@
 #include "OTCore/OTObjectBase.h"	// Base class
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTSystem/SystemLoadInformation.h"
 
 // C++ header
 #include <string>
@@ -50,10 +51,12 @@ private:
 	OT_HANDLER(handleSessionClosed, Application, OT_ACTION_CMD_ShutdownSessionCompleted, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleServiceClosed, Application, OT_ACTION_CMD_ServiceDisconnected, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleGetDebugInformation, Application, OT_ACTION_CMD_GetDebugInformation, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleGetSystemInformation, Application, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES);
 
 	ServiceManager				m_serviceManager;
 	GlobalDirectoryService		m_globalDirectoryService;
-	
+	ot::SystemLoadInformation	m_systemLoadInformation;
+
 	// ##################################################################################################################################
 public:
 	// Public functions

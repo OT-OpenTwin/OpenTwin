@@ -16,6 +16,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTServiceFoundation/IDManager.h"
+#include "OTSystem/SystemLoadInformation.h"
 
 // C++ header
 #include <string>
@@ -46,6 +47,7 @@ private:
 	ot::IDManager<ot::serviceID_t>			m_ldsIdManager;
 	std::mutex								m_mutex;
 	StartupDispatcher						m_startupDispatcher;
+	ot::SystemLoadInformation				m_systemLoadInformation;
 
 public:
 
@@ -59,6 +61,7 @@ public:
 	OT_HANDLER(handleServiceStopped, Application, OT_ACTION_CMD_ServiceDisconnected, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleSessionClosed, Application, OT_ACTION_CMD_ShutdownSessionCompleted, ot::SECURE_MESSAGE_TYPES);
 	OT_HANDLER(handleUpdateSystemLoad, Application, OT_ACTION_CMD_UpdateSystemLoad, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleGetSystemInformation, Application, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES);
 
 	bool requestToRunService(const ServiceStartupInformation& _info);
 

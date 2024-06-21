@@ -42,7 +42,9 @@ void Application::deleteInstance(void) {
 
 Application::Application()
 	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, OT_INFO_SERVICE_TYPE_GlobalDirectoryService)
-{}
+{
+	m_systemLoadInformation.initialize();
+}
 
 Application::~Application() {}
 
@@ -262,6 +264,38 @@ std::string Application::handleUpdateSystemLoad(ot::JsonDocument& _jsonDocument)
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
+
+std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
+
+	double globalCpuLoad = 0, globalMemoryLoad = 0;
+	m_systemLoadInformation.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);
+
+	double processCpuLoad = 0, processMemoryLoad = 0;
+	m_systemLoadInformation.getCurrentProcessCPUAndMemoryLoad(processCpuLoad, processMemoryLoad);
+
+	ot::JsonDocument reply;
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_CPU_LOAD, globalCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD, globalMemoryLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_CPU_LOAD, processCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_MEMORY_LOAD, processMemoryLoad, reply.GetAllocator());
+
+	// Now we add information about the session services
+	ot::JsonArray servicesInfo;
+
+	for (auto service : m_localDirectoryServices) {
+		ot::JsonValue info;
+		info.SetObject();
+
+		info.AddMember(OT_ACTION_PARAM_LDS_URL, ot::JsonString(service->serviceURL(), reply.GetAllocator()), reply.GetAllocator());
+
+		servicesInfo.PushBack(info, reply.GetAllocator());
+	}
+
+	reply.AddMember(OT_ACTION_PARAM_LDS, servicesInfo, reply.GetAllocator());
+
+	return reply.toJson();
+}
+
 
 bool Application::requestToRunService(const ServiceStartupInformation& _info) {
 	// Lock application mutex and determine lds

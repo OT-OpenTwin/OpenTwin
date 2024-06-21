@@ -52,6 +52,8 @@ public:
 
 	void serviceDisconnected(const std::string& _sessionID, const ServiceInformation& _info, const std::string& _serviceURL);
 
+	void GetSessionInformation(ot::JsonArray &sessionInfo, ot::JsonAllocator &allocator);
+
 private:
 
 	struct RequestedService {

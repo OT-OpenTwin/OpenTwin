@@ -572,6 +572,33 @@ void ServiceManager::workerServiceInitializer(void) {
 	}
 }
 
+void ServiceManager::GetSessionInformation(ot::JsonArray& sessionInfo, ot::JsonAllocator& allocator) {
+
+	for (auto session : m_services) {
+
+		ot::JsonArray servicesInfo;
+
+		for (auto service : *session.second)
+		{
+			ot::JsonValue serviceInfo;
+			serviceInfo.SetObject();
+
+			serviceInfo.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(service->url(), allocator), allocator);
+			serviceInfo.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(service->information().type(), allocator), allocator);
+
+			servicesInfo.PushBack(serviceInfo, allocator);
+		}
+
+		ot::JsonValue info;
+		info.SetObject();
+
+		info.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(session.first.id(), allocator), allocator);
+		info.AddMember(OT_ACTION_PARAM_SESSION_SERVICES, servicesInfo, allocator);
+
+		sessionInfo.PushBack(info, allocator);
+	}
+}
+
 void ServiceManager::workerHealthCheck(void) {
 	while (!m_isShuttingDown) {
 		// Lock mutex for entire health check

@@ -43,7 +43,7 @@ void Application::deleteInstance(void) {
 Application::Application()
 	: ot::ServiceBase(LocalDirectoryService, LocalDirectory_SERVICE_TYPE)
 {
-
+	m_systemLoadInformation.initialize();
 }
 
 Application::~Application()
@@ -163,6 +163,31 @@ std::string Application::handleGetDebugInformation(ot::JsonDocument& _jsonDocume
 	doc.AddMember("ServiceManager", serviceManagerObj, doc.GetAllocator());
 
 	return doc.toJson();
+}
+
+std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
+
+	double globalCpuLoad = 0, globalMemoryLoad = 0;
+	m_systemLoadInformation.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);
+
+	double processCpuLoad = 0, processMemoryLoad = 0;
+	m_systemLoadInformation.getCurrentProcessCPUAndMemoryLoad(processCpuLoad, processMemoryLoad);
+
+	ot::JsonDocument reply;
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_CPU_LOAD, globalCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD, globalMemoryLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_CPU_LOAD, processCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_MEMORY_LOAD, processMemoryLoad, reply.GetAllocator());
+
+	// Add information about the services which are supported on this node
+	reply.AddMember(OT_ACTION_PARAM_SUPPORTED_SERVICES, ot::JsonArray(supportedServices(), reply.GetAllocator()), reply.GetAllocator());
+
+	// Now we add information about the sessions and their services
+	ot::JsonArray sessionInfo;
+	m_serviceManager.GetSessionInformation(sessionInfo, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_SESSION_LIST, sessionInfo, reply.GetAllocator());
+
+	return reply.toJson();
 }
 
 void Application::globalDirectoryServiceCrashed(void) {

@@ -6,6 +6,8 @@
 
 #include <pdh.h>
 
+#undef GetObject
+
 #pragma warning (disable:4251)
 
 namespace ot {

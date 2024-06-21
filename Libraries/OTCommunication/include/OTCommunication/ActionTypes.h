@@ -64,6 +64,8 @@
 #define OT_ACTION_PARAM_LSS_SessionCount "SessionCount"
 #define OT_ACTION_PARAM_LSS_GLOBAL_CPU "GlobalCPU"
 #define OT_ACTION_PARAM_LSS_GLOBAL_MEMORY "GlobalMemory"
+#define OT_ACTION_PARAM_LDS "LocalDirectoryServices"
+#define OT_ACTION_PARAM_LDS_URL "URL"
 
 #define OT_ACTION_CMD_ServiceEnableDebug "Service.DebugEnable"
 #define OT_ACTION_CMD_ServiceDisableDebug "Service.DebugDisable"
