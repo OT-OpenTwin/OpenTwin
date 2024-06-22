@@ -577,29 +577,27 @@ bool ot::GraphicsItem::getGraphicsItemSelected(void) const {
 
 void ot::GraphicsItem::applyGraphicsItemTransform(const Transform& _transform) {
 	OTAssertNullptr(this->getQGraphicsItem());
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemTransformEnabled) {
-		QTransform newTransform;
-		QPointF itemCenter = this->getQGraphicsItem()->boundingRect().center();
-		
-		// Adjust transformation origin
-		this->getQGraphicsItem()->setTransformOriginPoint(itemCenter);
-		newTransform.translate(itemCenter.x(), itemCenter.y());
+	QTransform newTransform;
+	QPointF itemCenter = this->getQGraphicsItem()->boundingRect().center();
 
-		// Flip
-		if (this->getGraphicsItemTransform().getFlipStateFlags() & Transform::FlipHorizontally) {
-			newTransform.scale(-1, 1);
-		}
-		if (this->getGraphicsItemTransform().getFlipStateFlags() & Transform::FlipVertically) {
-			newTransform.scale(1, -1);
-		}
+	// Adjust transformation origin
+	this->getQGraphicsItem()->setTransformOriginPoint(itemCenter);
+	newTransform.translate(itemCenter.x(), itemCenter.y());
 
-		// Rotate
-		newTransform.rotate(_transform.getRotation());
-
-		// Translate back
-		newTransform.translate(-itemCenter.x(), -itemCenter.y());
-		
-		// Apply transform
-		this->getQGraphicsItem()->setTransform(newTransform);
+	// Flip
+	if (this->getGraphicsItemTransform().getFlipStateFlags() & Transform::FlipHorizontally) {
+		newTransform.scale(-1, 1);
 	}
+	if (this->getGraphicsItemTransform().getFlipStateFlags() & Transform::FlipVertically) {
+		newTransform.scale(1, -1);
+	}
+
+	// Rotate
+	newTransform.rotate(_transform.getRotation());
+
+	// Translate back
+	newTransform.translate(-itemCenter.x(), -itemCenter.y());
+
+	// Apply transform
+	this->getQGraphicsItem()->setTransform(newTransform);
 }

@@ -79,6 +79,8 @@ namespace ot {
 
 		void rotateAllSelectedItems(double _relativeAngle);
 
+		void flipAllSelectedItems(Qt::Orientation _flipAxis);
+
 	Q_SIGNALS:
 		void selectionChangeFinished(void);
 

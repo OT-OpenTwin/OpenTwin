@@ -399,16 +399,36 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 		Q_EMIT removeItemsRequested(itm, con);
 	}
 	else if (_event->key() == Qt::Key_Left) {
-		m_scene->moveAllSelectedItems(QPointF(-m_scene->getGrid().getGridStep().x(), 0.));
+		if (_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier)) {
+			m_scene->flipAllSelectedItems(Qt::Horizontal);
+		}
+		else {
+			m_scene->moveAllSelectedItems(QPointF(-m_scene->getGrid().getGridStep().x(), 0.));
+		}
 	}
 	else if (_event->key() == Qt::Key_Right) {
-		m_scene->moveAllSelectedItems(QPointF(m_scene->getGrid().getGridStep().x(), 0.));
+		if (_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier)) {
+			m_scene->flipAllSelectedItems(Qt::Horizontal);
+		}
+		else {
+			m_scene->moveAllSelectedItems(QPointF(m_scene->getGrid().getGridStep().x(), 0.));
+		}
 	}
 	else if (_event->key() == Qt::Key_Up) {
-		m_scene->moveAllSelectedItems(QPointF(0., -m_scene->getGrid().getGridStep().y()));
+		if (_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier)) {
+			m_scene->flipAllSelectedItems(Qt::Vertical);
+		}
+		else {
+			m_scene->moveAllSelectedItems(QPointF(0., -m_scene->getGrid().getGridStep().y()));
+		}
 	}
 	else if (_event->key() == Qt::Key_Down) {
-		m_scene->moveAllSelectedItems(QPointF(0., m_scene->getGrid().getGridStep().y()));
+		if (_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier)) {
+			m_scene->flipAllSelectedItems(Qt::Vertical);
+		}
+		else {
+			m_scene->moveAllSelectedItems(QPointF(0., m_scene->getGrid().getGridStep().y()));
+		}
 	}
 	else if (_event->key() == Qt::Key_R) {
 		if (_event->modifiers() & Qt::ControlModifier) {

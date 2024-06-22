@@ -153,7 +153,7 @@ void ot::GraphicsScene::rotateAllSelectedItems(double _relativeAngle) {
 	for (QGraphicsItem* item : this->selectedItems()) {
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(item);
 		if (otItem) {
-			if (otItem->getGraphicsItemFlags() & GraphicsItemCfg::ItemTransformEnabled) {
+			if (otItem->getGraphicsItemFlags() & GraphicsItemCfg::ItemUserTransformEnabled) {
 				Transform itemTransform = otItem->getGraphicsItemTransform();
 				double newAngle = itemTransform.getRotation();
 				newAngle += _relativeAngle;
@@ -164,6 +164,24 @@ void ot::GraphicsScene::rotateAllSelectedItems(double _relativeAngle) {
 					newAngle += 360.;
 				}
 				itemTransform.setRotation(newAngle);
+				otItem->setGraphicsItemTransform(itemTransform);
+			}
+		}
+	}
+}
+
+void ot::GraphicsScene::flipAllSelectedItems(Qt::Orientation _flipAxis) {
+	for (QGraphicsItem* item : this->selectedItems()) {
+		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(item);
+		if (otItem) {
+			if (otItem->getGraphicsItemFlags() & GraphicsItemCfg::ItemUserTransformEnabled) {
+				Transform itemTransform = otItem->getGraphicsItemTransform();
+				if (_flipAxis == Qt::Horizontal) {
+					itemTransform.setFlipState(Transform::FlipHorizontally, !(itemTransform.getFlipStateFlags() & Transform::FlipHorizontally));
+				}
+				else if (_flipAxis == Qt::Vertical) {
+					itemTransform.setFlipState(Transform::FlipVertically, !(itemTransform.getFlipStateFlags() & Transform::FlipVertically));
+				}
 				otItem->setGraphicsItemTransform(itemTransform);
 			}
 		}
