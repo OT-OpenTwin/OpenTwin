@@ -7,6 +7,9 @@
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/CustomGraphicsItem.h"
 
+// Qt header
+#include <QtGui/qpainter.h>
+
 ot::CustomGraphicsItem::CustomGraphicsItem(GraphicsItemCfg* _configuration, const ot::Flags<GraphicsItemState>& _stateFlags)
 	: ot::GraphicsItem(_configuration, _stateFlags)
 {

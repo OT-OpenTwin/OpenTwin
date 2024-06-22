@@ -222,8 +222,17 @@ void ot::GraphicsConnectionItem::calculateDirectLinePath(QPainterPath& _path) co
 		return;
 	}
 
-	_path.moveTo(this->originItem()->getQGraphicsItem()->scenePos() + this->originItem()->getQGraphicsItem()->boundingRect().center());
-	_path.lineTo(this->destItem()->getQGraphicsItem()->scenePos() + this->destItem()->getQGraphicsItem()->boundingRect().center());
+	//QPointF originPoint = this->originItem()->getQGraphicsItem()->mapToScene(this->originItem()->getQGraphicsItem()->pos() + this->originItem()->getQGraphicsItem()->boundingRect().center());
+	//QPointF destinationPoint = this->destItem()->getQGraphicsItem()->mapToScene(this->destItem()->getQGraphicsItem()->pos() + this->destItem()->getQGraphicsItem()->boundingRect().center());
+
+	QPointF originPoint = this->originItem()->getQGraphicsItem()->mapToScene(this->originItem()->getQGraphicsItem()->boundingRect().center());
+	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->mapToScene(this->destItem()->getQGraphicsItem()->boundingRect().center());
+
+	_path.moveTo(originPoint);
+	_path.lineTo(destinationPoint);
+
+	//_path.moveTo(this->originItem()->getQGraphicsItem()->scenePos() + this->originItem()->getQGraphicsItem()->boundingRect().center());
+	//_path.lineTo(this->destItem()->getQGraphicsItem()->scenePos() + this->destItem()->getQGraphicsItem()->boundingRect().center());
 }
 
 void ot::GraphicsConnectionItem::calculateSmoothLinePath(QPainterPath& _path) const {
@@ -233,8 +242,8 @@ void ot::GraphicsConnectionItem::calculateSmoothLinePath(QPainterPath& _path) co
 	}
 
 	// Get the center point of the connectable items
-	QPointF originPoint = this->originItem()->getQGraphicsItem()->scenePos() + this->originItem()->getQGraphicsItem()->boundingRect().center();
-	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->scenePos() + this->destItem()->getQGraphicsItem()->boundingRect().center();
+	QPointF originPoint = this->originItem()->getQGraphicsItem()->mapToScene(this->originItem()->getQGraphicsItem()->boundingRect().center());
+	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->mapToScene(this->destItem()->getQGraphicsItem()->boundingRect().center());
 
 	// Calculate distance between the items
 	double halfdistX = (std::max(originPoint.x(), destinationPoint.x()) - std::min(originPoint.x(), destinationPoint.x())) / 2.;
@@ -286,8 +295,8 @@ void ot::GraphicsConnectionItem::calculateXYLinePath(QPainterPath& _path) const 
 		return;
 	}
 
-	QPointF originPoint = this->originItem()->getQGraphicsItem()->scenePos() + this->originItem()->getQGraphicsItem()->boundingRect().center();
-	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->scenePos() + this->destItem()->getQGraphicsItem()->boundingRect().center();
+	QPointF originPoint = this->originItem()->getQGraphicsItem()->mapToScene(this->originItem()->getQGraphicsItem()->boundingRect().center());
+	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->mapToScene(this->destItem()->getQGraphicsItem()->boundingRect().center());
 	QPointF controlPoint(destinationPoint.x(), originPoint.y());
 
 	_path.moveTo(originPoint);
@@ -304,8 +313,8 @@ void ot::GraphicsConnectionItem::calculateYXLinePath(QPainterPath& _path) const 
 		return;
 	}
 
-	QPointF originPoint = this->originItem()->getQGraphicsItem()->scenePos() + this->originItem()->getQGraphicsItem()->boundingRect().center();
-	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->scenePos() + this->destItem()->getQGraphicsItem()->boundingRect().center();
+	QPointF originPoint = this->originItem()->getQGraphicsItem()->mapToScene(this->originItem()->getQGraphicsItem()->boundingRect().center());
+	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->mapToScene(this->destItem()->getQGraphicsItem()->boundingRect().center());
 	QPointF controlPoint(originPoint.x(), destinationPoint.y());
 
 	_path.moveTo(originPoint);

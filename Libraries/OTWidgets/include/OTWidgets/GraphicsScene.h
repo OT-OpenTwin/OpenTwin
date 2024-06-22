@@ -77,6 +77,8 @@ namespace ot {
 
 		void moveAllSelectedItems(const QPointF& _delta);
 
+		void rotateAllSelectedItems(double _relativeAngle);
+
 	Q_SIGNALS:
 		void selectionChangeFinished(void);
 

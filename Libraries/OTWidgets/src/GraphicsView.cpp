@@ -410,6 +410,14 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 	else if (_event->key() == Qt::Key_Down) {
 		m_scene->moveAllSelectedItems(QPointF(0., m_scene->getGrid().getGridStep().y()));
 	}
+	else if (_event->key() == Qt::Key_R) {
+		if (_event->modifiers() & Qt::ControlModifier) {
+			m_scene->rotateAllSelectedItems(-90.);
+		}
+		else {
+			m_scene->rotateAllSelectedItems(90.);
+		}
+	}
 }
 
 void ot::GraphicsView::keyReleaseEvent(QKeyEvent* _event) {}

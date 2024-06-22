@@ -87,6 +87,7 @@
     <ClInclude Include="include\OTGui\SelectEntitiesDialogCfg.h" />
     <ClInclude Include="include\OTGui\StyleRefPainter2D.h" />
     <ClInclude Include="include\OTGui\StyleValue.h" />
+    <ClInclude Include="include\OTGui\Transform.h" />
     <ClInclude Include="include\OTGui\WidgetViewBase.h" />
     <ClInclude Include="include\OTGui\WidgetViewCfg.h" />
     <ClInclude Include="include\OTGui\WidgetViewCfgFactory.h" />
@@ -160,6 +161,7 @@
     <ClCompile Include="src\SelectEntitiesDialogCfg.cpp" />
     <ClCompile Include="src\StyleRefPainter2D.cpp" />
     <ClCompile Include="src\StyleValue.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\WidgetViewBase.cpp" />
     <ClCompile Include="src\WidgetViewCfg.cpp" />
     <ClCompile Include="src\WidgetViewCfgFactory.cpp" />

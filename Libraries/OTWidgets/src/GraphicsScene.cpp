@@ -147,6 +147,29 @@ void ot::GraphicsScene::moveAllSelectedItems(const QPointF& _delta) {
 	}
 }
 
+void ot::GraphicsScene::rotateAllSelectedItems(double _relativeAngle) {
+	if (_relativeAngle == 0.) return;
+
+	for (QGraphicsItem* item : this->selectedItems()) {
+		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(item);
+		if (otItem) {
+			if (otItem->getGraphicsItemFlags() & GraphicsItemCfg::ItemTransformEnabled) {
+				Transform itemTransform = otItem->getGraphicsItemTransform();
+				double newAngle = itemTransform.getRotation();
+				newAngle += _relativeAngle;
+				while (newAngle >= 360.) {
+					newAngle -= 360.;
+				}
+				while (newAngle < 0.) {
+					newAngle += 360.;
+				}
+				itemTransform.setRotation(newAngle);
+				otItem->setGraphicsItemTransform(itemTransform);
+			}
+		}
+	}
+}
+
 void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) {
 	QList<QGraphicsItem*> lst = items(_event->scenePos());
 	for (auto itm : lst) {

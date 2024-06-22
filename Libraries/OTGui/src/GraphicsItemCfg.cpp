@@ -35,6 +35,7 @@
 #define OT_JSON_MEMBER_Position "Position"
 #define OT_JSON_MEMBER_Alignment "Alignment"
 #define OT_JSON_MEMBER_StringMap "StringMap"
+#define OT_JSON_MEMBER_Transform "Transform"
 #define OT_JSON_MEMBER_SizePolicy "SizePolicy"
 #define OT_JSON_MEMBER_ConnectionDirection "ConnectionDirection"
 
@@ -42,6 +43,7 @@
 #define OT_JSON_VALUE_Connectable "Connectable"
 #define OT_JSON_VALUE_ForwardTooltip "ForwardTooltip"
 #define OT_JSON_VALUE_SnapsToGrid "SnapsToGrid" 
+#define OT_JSON_VALUE_TransformEnabled "TransformEnabled" 
 #define OT_JSON_VALUE_HandleState "HandleState"
 #define OT_JSON_VALUE_ForwardState "ForwardState"
 
@@ -78,6 +80,7 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 	if (m_flags & GraphicsItemCfg::ItemIsConnectable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Connectable, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemForwardsTooltip) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_ForwardTooltip, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemSnapsToGrid) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_SnapsToGrid, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemTransformEnabled) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_TransformEnabled, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemHandlesState) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_HandleState, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemForwardsState) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_ForwardState, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Flags, flagArr, _allocator);
@@ -90,6 +93,10 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 		stringMapArr.PushBack(stringMapObj, _allocator);
 	}
 	_object.AddMember(OT_JSON_MEMBER_StringMap, stringMapArr, _allocator);
+
+	JsonObject transformObj;
+	m_transform.addToJsonObject(transformObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_Transform, transformObj, _allocator);
 
 	_object.AddMember(OT_JSON_MEMBER_Uid, static_cast<int64_t>(m_uid), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Name, JsonString(m_name, _allocator), _allocator);
@@ -122,6 +129,7 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 		else if (f == OT_JSON_VALUE_Connectable) m_flags |= ItemIsConnectable;
 		else if (f == OT_JSON_VALUE_ForwardTooltip) m_flags |= ItemForwardsTooltip;
 		else if (f == OT_JSON_VALUE_SnapsToGrid) m_flags |= ItemSnapsToGrid;
+		else if (f == OT_JSON_VALUE_TransformEnabled) m_flags |= ItemTransformEnabled;
 		else if (f == OT_JSON_VALUE_HandleState) m_flags |= ItemHandlesState;
 		else if (f == OT_JSON_VALUE_ForwardState) m_flags |= ItemForwardsState;
 		else {
@@ -136,6 +144,8 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 		std::string v = json::getString(stringMapObj, OT_JSON_MEMBER_Value);
 		m_stringMap.insert_or_assign(k, v);
 	}
+
+	m_transform.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Transform));
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -169,4 +179,5 @@ void ot::GraphicsItemCfg::copyConfigDataToItem(GraphicsItemCfg* _target) const {
 	_target->m_connectionDirection = m_connectionDirection;
 
 	_target->m_stringMap = m_stringMap;
+	_target->m_transform = m_transform;
 }

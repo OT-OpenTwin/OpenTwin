@@ -7,8 +7,9 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsStackItemCfg.h"
-#include "OTWidgets/GraphicsItemFactory.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsStackItem.h"
+#include "OTWidgets/GraphicsItemFactory.h"
 
 // Qt header
 #include <QtGui/qpainter.h>

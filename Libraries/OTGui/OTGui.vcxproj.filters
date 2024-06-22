@@ -276,6 +276,9 @@
     <ClInclude Include="include\OTGui\GraphicsInvisibleItemCfg.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\Transform.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -484,6 +487,9 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsInvisibleItemCfg.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Transform.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

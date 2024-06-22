@@ -255,6 +255,9 @@ namespace ot {
 		void setStringMap(const std::map<std::string, std::string>& _map);
 		const std::map<std::string, std::string>& getStringMap(void) const;
 
+		void setGraphicsItemTransform(const Transform& _transform);
+		const Transform& getGraphicsItemTransform(void) const;
+
 		void storeConnection(GraphicsConnectionItem* _connection);
 
 		//! @brief Removes the collection from the list (item will not be destroyed)
@@ -304,6 +307,8 @@ namespace ot {
 		//! The function will cast the current configuration to the type provided.
 		//! The method will return 0 if the cast failed.
 		template <class T> const T* getItemConfiguration(void) const;
+
+		virtual void applyGraphicsItemTransform(const Transform& _transform);
 
 	private:
 		GraphicsItemCfg* m_config; //! \brief Configuration used to setup this item. Default 0.
