@@ -342,12 +342,21 @@ void ot::GraphicsItem::setConfiguration(GraphicsItemCfg* _config) {
 }
 
 void ot::GraphicsItem::setGraphicsItemPos(const QPointF& _pos) {
+	this->setGraphicsItemPos(QtFactory::toPoint2D(_pos));
+}
+
+void ot::GraphicsItem::setGraphicsItemPos(const Point2DD& _pos) {
 	OTAssertNullptr(m_config);
 	OTAssertNullptr(this->getQGraphicsItem());
-	m_config->setPosition(QtFactory::toPoint2D(_pos));
-	this->getQGraphicsItem()->setPos(_pos);
+	m_config->setPosition(_pos);
+	this->getQGraphicsItem()->setPos(QtFactory::toQPoint(_pos));
 
 	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+}
+
+const ot::Point2DD& ot::GraphicsItem::getGraphicsItemPos(void) const {
+	OTAssertNullptr(m_config);
+	return m_config->getPosition();
 }
 
 void ot::GraphicsItem::setStateFlag(GraphicsItemState _state, bool _active) {

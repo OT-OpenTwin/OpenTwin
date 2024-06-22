@@ -72,10 +72,12 @@ namespace ot {
 		bool getIgnoreEvents(void) const { return m_ignoreEvents; };
 
 		QPointF snapToGrid(const QPointF& _pos) const;
+
+		Point2DD snapToGrid(const Point2DD& _pos) const;
 		
 		void deselectAll(void);
 
-		void moveAllSelectedItems(const QPointF& _delta);
+		void moveAllSelectedItems(const Point2DD& _delta);
 
 		void rotateAllSelectedItems(double _relativeAngle);
 

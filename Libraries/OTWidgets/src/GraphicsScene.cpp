@@ -90,6 +90,10 @@ QPointF ot::GraphicsScene::snapToGrid(const QPointF& _pos) const {
 	return QtFactory::toQPoint(m_grid.snapToGrid(QtFactory::toPoint2D(_pos)));
 }
 
+ot::Point2DD ot::GraphicsScene::snapToGrid(const Point2DD& _pos) const {
+	return m_grid.snapToGrid(_pos);
+}
+
 void ot::GraphicsScene::deselectAll(void) {
 	this->blockSignals(true);
 	for (QGraphicsItem* itm : this->selectedItems()) {
@@ -135,13 +139,13 @@ void ot::GraphicsScene::handleSelectionChanged(void) {
 
 // Protected: Event handling
 
-void ot::GraphicsScene::moveAllSelectedItems(const QPointF& _delta) {
+void ot::GraphicsScene::moveAllSelectedItems(const Point2DD& _delta) {
 	if (_delta.x() == 0. && _delta.y() == 0.) return;
 	for (QGraphicsItem* item : this->selectedItems()) {
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(item);
 		if (otItem) {
 			if (otItem->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) {
-				otItem->getQGraphicsItem()->setPos(this->snapToGrid(item->pos() + _delta));
+				otItem->setGraphicsItemPos(this->snapToGrid(otItem->getGraphicsItemPos() + _delta));
 			}
 		}
 	}

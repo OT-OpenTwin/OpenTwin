@@ -87,7 +87,7 @@ void WrappedPolygonItem::controlPointsChanged(void) {
 		pt -= topLeftPoint;
 	}
 
-	this->setPos(ot::QtFactory::toQPoint(topLeftPoint));
+	this->setGraphicsItemPos(topLeftPoint);
 	this->setPoints(newPoints);
 }
 
@@ -95,31 +95,22 @@ void WrappedPolygonItem::fillPropertyGrid(void) {
 	using namespace ot;
 
 	PropertyGridCfg cfg;
-	PropertyGroup* generalGroup = new PropertyGroup("General");
-	generalGroup->addProperty(new PropertyString("Name", this->getGraphicsItem()->getGraphicsItemName()));
-	generalGroup->addProperty(new PropertyBool("Connectable", this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable));
+	this->fillBasePropertyGrid(cfg);
 
-	PropertyGroup* geometryGroup = new PropertyGroup("Geometry");
-	geometryGroup->addProperty(new PropertyDouble("X", this->pos().x()));
-	geometryGroup->addProperty(new PropertyDouble("Y", this->pos().y()));
-	geometryGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().painter()));
-	geometryGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width()));
-	geometryGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
-	geometryGroup->addProperty(new PropertyBool("Fill Polygon", this->getFillPolygon()));
-	{
-		PropertyBool* newStateProperty = new PropertyBool("Handle State", this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState);
-		newStateProperty->setPropertyTip("If enabled the item will update its appearance according to the current item state (e.g. ItemSelected or ItemHover)");
-		geometryGroup->addProperty(newStateProperty);
-	}
+	PropertyGroup* polygonGroup = new PropertyGroup("Polygon");
+	polygonGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().painter()));
+	polygonGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width(), 0., DBL_MAX));
+	polygonGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
+	polygonGroup->addProperty(new PropertyBool("Fill Polygon", this->getFillPolygon()));
 
-
-	cfg.addRootGroup(generalGroup);
-	cfg.addRootGroup(geometryGroup);
+	cfg.addRootGroup(polygonGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);
 }
 
 void WrappedPolygonItem::propertyChanged(const ot::Property* _property) {
 	using namespace ot;
+
+	if (this->basePropertyChanged(_property)) return;
 
 	const ot::PropertyGroup* group = _property->getParentGroup();
 	if (!group) {
@@ -127,55 +118,10 @@ void WrappedPolygonItem::propertyChanged(const ot::Property* _property) {
 		return;
 	}
 
-	if (group->getName() == "General" && _property->getPropertyName() == "Name") {
-		const PropertyString* actualProperty = dynamic_cast<const PropertyString*>(_property);
-		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
-			return;
-		}
-
-		OTAssertNullptr(this->getNavigation());
-		if (actualProperty->getValue().empty()) return;
-		if (!this->getNavigation()->updateItemName(QString::fromStdString(this->getGraphicsItemName()), QString::fromStdString(actualProperty->getValue()))) return;
-
-		this->setGraphicsItemName(actualProperty->getValue());
-	}
-	if (group->getName() == "General" && _property->getPropertyName() == "Connectable") {
-		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
-		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
-			return;
-		}
-
-		this->setGraphicsItemFlag(GraphicsItemCfg::ItemIsConnectable, actualProperty->getValue());
-		this->update();
-	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "X") {
-		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
-		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
-			return;
-		}
-
-		this->prepareGeometryChange();
-		this->setPos(actualProperty->getValue(), this->y());
-		this->setGeometry(QRectF(this->pos(), this->getPreferredGraphicsItemSize()));
-	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Y") {
-		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
-		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
-			return;
-		}
-
-		this->prepareGeometryChange();
-		this->setPos(this->x(), actualProperty->getValue());
-		this->setGeometry(QRectF(this->pos(), this->getPreferredGraphicsItemSize()));
-	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Border Painter") {
+	if (group->getName() == "Polygon" && _property->getPropertyName() == "Border Painter") {
 		const PropertyPainter2D* actualProperty = dynamic_cast<const PropertyPainter2D*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -183,10 +129,10 @@ void WrappedPolygonItem::propertyChanged(const ot::Property* _property) {
 		lineStyle.setPainter(actualProperty->getPainter()->createCopy());
 		this->setOutline(lineStyle);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Border Width") {
+	else if (group->getName() == "Polygon" && _property->getPropertyName() == "Border Width") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -194,36 +140,31 @@ void WrappedPolygonItem::propertyChanged(const ot::Property* _property) {
 		lineStyle.setWidth(actualProperty->getValue());
 		this->setOutline(lineStyle);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Background Painter") {
+	else if (group->getName() == "Polygon" && _property->getPropertyName() == "Background Painter") {
 		const PropertyPainter2D* actualProperty = dynamic_cast<const PropertyPainter2D*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		this->setBackgroundPainter(actualProperty->getPainter()->createCopy());
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Fill Polygon") {
+	else if (group->getName() == "Polygon" && _property->getPropertyName() == "Fill Polygon") {
 		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		this->setFillPolygon(actualProperty->getValue());
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Handle State") {
-		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
-		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
-			return;
-		}
-
-		this->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, actualProperty->getValue());
+	else {
+		OT_LOG_E("Unknown property { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 	}
 }
 
 void WrappedPolygonItem::propertyDeleteRequested(const ot::Property* _property) {
+	if (this->basePropertyDeleteRequested(_property)) return;
 
 }
 

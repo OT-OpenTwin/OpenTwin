@@ -62,8 +62,8 @@ void WrappedLineItem::controlPointsChanged(void) {
 	QPointF p2 = this->getControlPoints().back();
 
 	QPointF delta = QPointF(std::min(p1.x(), p2.x()), std::min(p1.y(), p2.y()));
-	
-	this->setPos(delta);
+
+	this->setGraphicsItemPos(delta);
 	this->setLine(p1 - delta, p2 - delta);
 }
 
@@ -71,29 +71,32 @@ void WrappedLineItem::fillPropertyGrid(void) {
 	using namespace ot;
 
 	PropertyGridCfg cfg;
-	PropertyGroup* generalGroup = new PropertyGroup("General");
-	generalGroup->addProperty(new PropertyString("Name", this->getGraphicsItem()->getGraphicsItemName()));
-
-	PropertyGroup* geometryGroup = new PropertyGroup("Geometry");
-	geometryGroup->addProperty(new PropertyDouble("X1", this->getLine().x1()));
-	geometryGroup->addProperty(new PropertyDouble("Y1", this->getLine().y1()));
-	geometryGroup->addProperty(new PropertyDouble("X2", this->getLine().x2()));
-	geometryGroup->addProperty(new PropertyDouble("Y2", this->getLine().y2()));
-	geometryGroup->addProperty(new PropertyPainter2D("Line Painter", this->getLineStyle().painter()));
-	geometryGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().width()));
-	{
-		PropertyBool* newStateProperty = new PropertyBool("Handle State", this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState);
-		newStateProperty->setPropertyTip("If enabled the item will update its appearance according to the current item state (e.g. ItemSelected or ItemHover)");
-		geometryGroup->addProperty(newStateProperty);
-	}
-
-	cfg.addRootGroup(generalGroup);
-	cfg.addRootGroup(geometryGroup);
+	this->fillBasePropertyGrid(cfg);
+	
+	PropertyGroup* lineGroup = new PropertyGroup("Line");
+	PropertyDouble* x1Prop = new PropertyDouble("X1", this->getLine().x1(), 0., DBL_MAX);
+	x1Prop->setPropertyTip("The X1 line position relative to the item's X position.");
+	lineGroup->addProperty(x1Prop);
+	PropertyDouble* y1Prop = new PropertyDouble("Y1", this->getLine().y1(), 0., DBL_MAX);
+	y1Prop->setPropertyTip("The Y1 line position relative to the item's Y position.");
+	lineGroup->addProperty(y1Prop);
+	PropertyDouble* x2Prop = new PropertyDouble("X2", this->getLine().x2(), 0., DBL_MAX);
+	x2Prop->setPropertyTip("The X2 line position relative to the item's X position.");
+	lineGroup->addProperty(x2Prop);
+	PropertyDouble* y2Prop = new PropertyDouble("Y2", this->getLine().y2(), 0., DBL_MAX);
+	y2Prop->setPropertyTip("The Y2 line position relative to the item's Y position.");
+	lineGroup->addProperty(y2Prop);
+	lineGroup->addProperty(new PropertyPainter2D("Line Painter", this->getLineStyle().painter()));
+	lineGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().width(), 0., DBL_MAX));
+	
+	cfg.addRootGroup(lineGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);
 }
 
 void WrappedLineItem::propertyChanged(const ot::Property* _property) {
 	using namespace ot;
+
+	if (this->basePropertyChanged(_property)) return;
 
 	const ot::PropertyGroup* group = _property->getParentGroup();
 	if (!group) {
@@ -101,59 +104,46 @@ void WrappedLineItem::propertyChanged(const ot::Property* _property) {
 		return;
 	}
 
-	if (group->getName() == "General" && _property->getPropertyName() == "Name") {
-		const PropertyString* actualProperty = dynamic_cast<const PropertyString*>(_property);
-		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
-			return;
-		}
-
-		OTAssertNullptr(this->getNavigation());
-		if (actualProperty->getValue().empty()) return;
-		if (!this->getNavigation()->updateItemName(QString::fromStdString(this->getGraphicsItemName()), QString::fromStdString(actualProperty->getValue()))) return;
-
-		this->setGraphicsItemName(actualProperty->getValue());
-	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "X1") {
+	if (group->getName() == "Line" && _property->getPropertyName() == "X1") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		this->setLine(actualProperty->getValue(), this->getLine().y1(), this->getLine().x2(), this->getLine().y2());
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Y1") {
+	else if (group->getName() == "Line" && _property->getPropertyName() == "Y1") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		this->setLine(this->getLine().x1(), actualProperty->getValue(), this->getLine().x2(), this->getLine().y2());
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "X2") {
+	else if (group->getName() == "Line" && _property->getPropertyName() == "X2") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		this->setLine(this->getLine().x1(), this->getLine().y1(), actualProperty->getValue(), this->getLine().y2());
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Y2") {
+	else if (group->getName() == "Line" && _property->getPropertyName() == "Y2") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		this->setLine(this->getLine().x1(), this->getLine().y1(), this->getLine().x2(), actualProperty->getValue());
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Line Painter") {
+	else if (group->getName() == "Line" && _property->getPropertyName() == "Line Painter") {
 		const PropertyPainter2D* actualProperty = dynamic_cast<const PropertyPainter2D*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -161,10 +151,10 @@ void WrappedLineItem::propertyChanged(const ot::Property* _property) {
 		lineStyle.setPainter(actualProperty->getPainter()->createCopy());
 		this->setLineStyle(lineStyle);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Line Width") {
+	else if (group->getName() == "Line" && _property->getPropertyName() == "Line Width") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -172,19 +162,13 @@ void WrappedLineItem::propertyChanged(const ot::Property* _property) {
 		lineStyle.setWidth(actualProperty->getValue());
 		this->setLineStyle(lineStyle);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Handle State") {
-		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
-		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
-			return;
-		}
-
-		this->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, actualProperty->getValue());
+	else {
+		OT_LOG_E("Unknown property { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 	}
-
 }
 
 void WrappedLineItem::propertyDeleteRequested(const ot::Property* _property) {
+	if (this->basePropertyDeleteRequested(_property)) return;
 
 }
 

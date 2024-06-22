@@ -64,7 +64,7 @@ void WrappedArcItem::controlPointsChanged(void) {
 	QPointF topLeftPoint = QPointF(std::min(this->getControlPoints().front().x(), this->getControlPoints().back().x()), std::min(this->getControlPoints().front().y(), this->getControlPoints().back().y()));
 	QPointF bottomRightPoint = QPointF(std::max(this->getControlPoints().front().x(), this->getControlPoints().back().x()), std::max(this->getControlPoints().front().y(), this->getControlPoints().back().y()));
 
-	this->setPos(topLeftPoint);
+	this->setGraphicsItemPos(topLeftPoint);
 	QRectF newArcRect(topLeftPoint, bottomRightPoint);
 	newArcRect.moveTo(0., 0.);
 	this->setArcRect(newArcRect);
@@ -74,115 +74,103 @@ void WrappedArcItem::fillPropertyGrid(void) {
 	using namespace ot;
 
 	PropertyGridCfg cfg;
-	PropertyGroup* generalGroup = new PropertyGroup("General");
-	generalGroup->addProperty(new PropertyString("Name", this->getGraphicsItem()->getGraphicsItemName()));
+	this->fillBasePropertyGrid(cfg);
 
-	PropertyGroup* geometryGroup = new PropertyGroup("Geometry");
-	geometryGroup->addProperty(new PropertyDouble("X", this->getArcRect().getTopLeft().x()));
-	geometryGroup->addProperty(new PropertyDouble("Y", this->getArcRect().getTopLeft().y()));
-	geometryGroup->addProperty(new PropertyDouble("Width", this->getArcRect().getWidth()));
-	geometryGroup->addProperty(new PropertyDouble("Height", this->getArcRect().getHeight()));
-	geometryGroup->addProperty(new PropertyDouble("Start Angle", this->getStartAngle() / 16.));
-	geometryGroup->addProperty(new PropertyDouble("Span Angle", this->getSpanAngle() / 16.));
-	geometryGroup->addProperty(new PropertyPainter2D("Line Painter", this->getLineStyle().painter()));
-	geometryGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().width()));
-	{
-		PropertyBool* newStateProperty = new PropertyBool("Handle State", this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState);
-		newStateProperty->setPropertyTip("If enabled the item will update its appearance according to the current item state (e.g. ItemSelected or ItemHover)");
-		geometryGroup->addProperty(newStateProperty);
-	}
-
-	cfg.addRootGroup(generalGroup);
-	cfg.addRootGroup(geometryGroup);
+	PropertyGroup* arcGroup = new PropertyGroup("Arc");
+	PropertyDouble* arcXProp = new PropertyDouble("Arc X", this->getArcRect().getLeft(), 0., DBL_MAX);
+	arcXProp->setPropertyTip("X arc rect position relative to the item's X position.");
+	arcGroup->addProperty(arcXProp);
+	PropertyDouble* arcYProp = new PropertyDouble("Arc Y", this->getArcRect().getTop(), 0., DBL_MAX);
+	arcYProp->setPropertyTip("Y arc rect position relative to the item's Y position.");
+	arcGroup->addProperty(arcYProp);
+	arcGroup->addProperty(new PropertyDouble("Width", this->getArcRect().getWidth(), 0., DBL_MAX));
+	arcGroup->addProperty(new PropertyDouble("Height", this->getArcRect().getHeight(), 0., DBL_MAX));
+	arcGroup->addProperty(new PropertyDouble("Start Angle", this->getStartAngle() / 16., 0., DBL_MAX));
+	arcGroup->addProperty(new PropertyDouble("Span Angle", this->getSpanAngle() / 16., 0., DBL_MAX));
+	arcGroup->addProperty(new PropertyPainter2D("Line Painter", this->getLineStyle().painter()));
+	arcGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().width(), 0., DBL_MAX));
+	
+	cfg.addRootGroup(arcGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);
 }
 
 void WrappedArcItem::propertyChanged(const ot::Property* _property) {
 	using namespace ot;
 
+	if (this->basePropertyChanged(_property)) return;
+
 	const ot::PropertyGroup* group = _property->getParentGroup();
 	if (!group) {
 		OT_LOG_EA("Data mismatch");
 		return;
 	}
-
-	if (group->getName() == "General" && _property->getPropertyName() == "Name") {
-		const PropertyString* actualProperty = dynamic_cast<const PropertyString*>(_property);
-		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
-			return;
-		}
-
-		OTAssertNullptr(this->getNavigation());
-		if (actualProperty->getValue().empty()) return;
-		if (!this->getNavigation()->updateItemName(QString::fromStdString(this->getGraphicsItemName()), QString::fromStdString(actualProperty->getValue()))) return;
-
-		this->setGraphicsItemName(actualProperty->getValue());
-	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "X") {
+	
+	if (group->getName() == "Arc" && _property->getPropertyName() == "Arc X") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		RectD newRect = this->getArcRect();
-		newRect.moveBy(actualProperty->getValue() - newRect.getLeft(), 0.);
+		newRect.moveTo(Point2DD(actualProperty->getValue(), newRect.getTop()));
 		this->setArcRect(newRect);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Y") {
+	else if (group->getName() == "Arc" && _property->getPropertyName() == "Arc Y") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		RectD newRect = this->getArcRect();
-		newRect.moveBy(0., actualProperty->getValue() - newRect.getLeft());
+		newRect.moveTo(Point2DD(newRect.getLeft(), actualProperty->getValue()));
 		this->setArcRect(newRect);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Width") {
+	else if (group->getName() == "Arc" && _property->getPropertyName() == "Width") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		RectD newRect = this->getArcRect();
-		this->setArcRect(RectD(newRect.getTopLeft(), Size2DD(actualProperty->getValue(), newRect.getHeight())));
+		newRect.setWidth(actualProperty->getValue());
+		this->setArcRect(newRect);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Height") {
+	else if (group->getName() == "Arc" && _property->getPropertyName() == "Height") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		RectD newRect = this->getArcRect();
-		this->setArcRect(RectD(newRect.getTopLeft(), Size2DD(newRect.getHeight(), actualProperty->getValue())));
+		newRect.setHeight(actualProperty->getValue());
+		this->setArcRect(newRect);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Start Angle") {
+	else if (group->getName() == "Arc" && _property->getPropertyName() == "Start Angle") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		this->setStartAngle(actualProperty->getValue() * 16.);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Span Angle") {
+	else if (group->getName() == "Arc" && _property->getPropertyName() == "Span Angle") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		this->setSpanAngle(actualProperty->getValue() * 16.);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Line Painter") {
+	else if (group->getName() == "Arc" && _property->getPropertyName() == "Line Painter") {
 		const PropertyPainter2D* actualProperty = dynamic_cast<const PropertyPainter2D*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -190,10 +178,10 @@ void WrappedArcItem::propertyChanged(const ot::Property* _property) {
 		lineStyle.setPainter(actualProperty->getPainter()->createCopy());
 		this->setLineStyle(lineStyle);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Line Width") {
+	else if (group->getName() == "Arc" && _property->getPropertyName() == "Line Width") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -201,19 +189,13 @@ void WrappedArcItem::propertyChanged(const ot::Property* _property) {
 		lineStyle.setWidth(actualProperty->getValue());
 		this->setLineStyle(lineStyle);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Handle State") {
-		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
-		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
-			return;
-		}
-
-		this->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, actualProperty->getValue());
+	else {
+		OT_LOG_E("Unknown property { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 	}
-	
 }
 
 void WrappedArcItem::propertyDeleteRequested(const ot::Property* _property) {
+	if (this->basePropertyDeleteRequested(_property)) return;
 
 }
 

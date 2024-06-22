@@ -186,6 +186,12 @@ namespace ot {
 		//! \brief This function will update the position in the configuration and call QGraphicsItem::setPos
 		void setGraphicsItemPos(const QPointF& _pos);
 
+		//! \brief This function will update the position in the configuration and call QGraphicsItem::setPos
+		void setGraphicsItemPos(const Point2DD& _pos);
+
+		//! \brief Returns the current position set in the configuration.
+		const Point2DD& getGraphicsItemPos(void) const;
+
 		//! \brief Sets the provided state flag.
 		//! \see GraphicsItem, GraphicsItemState
 		//! \param _state The state to set.

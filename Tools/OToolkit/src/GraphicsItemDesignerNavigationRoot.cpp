@@ -43,8 +43,8 @@ void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
 	);
 	gridSnapProp->setPropertyTip("If enabled items will snap to the grid. This also works if the grid is hidden.");
 	editorGroup->addProperty(gridSnapProp);
-	editorGroup->addProperty(new PropertyDouble("Width", m_designer->getView()->sceneRect().width()));
-	editorGroup->addProperty(new PropertyDouble("Height", m_designer->getView()->sceneRect().height()));
+	editorGroup->addProperty(new PropertyDouble("Width", m_designer->getView()->sceneRect().width(), 0., DBL_MAX));
+	editorGroup->addProperty(new PropertyDouble("Height", m_designer->getView()->sceneRect().height(), 0., DBL_MAX));
 
 	cfg.addRootGroup(editorGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);
@@ -62,7 +62,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(const ot::Property* con
 	if (group->getName() == "Editor" && _property->getPropertyName() == "Show grid") {
 		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 		
@@ -72,7 +72,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(const ot::Property* con
 	else if (group->getName() == "Editor" && _property->getPropertyName() == "Grid step size") {
 		const PropertyInt* actualProperty = dynamic_cast<const PropertyInt*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -82,7 +82,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(const ot::Property* con
 	else if (group->getName() == "Editor" && _property->getPropertyName() == "Wide step counter") {
 		const PropertyInt* actualProperty = dynamic_cast<const PropertyInt*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -92,7 +92,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(const ot::Property* con
 	else if (group->getName() == "Editor" && _property->getPropertyName() == "Grid snap mode") {
 		const PropertyStringList* actualProperty = dynamic_cast<const PropertyStringList*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -101,7 +101,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(const ot::Property* con
 	else if (group->getName() == "Editor" && _property->getPropertyName() == "Width") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -110,7 +110,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(const ot::Property* con
 	else if (group->getName() == "Editor" && _property->getPropertyName() == "Height") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 

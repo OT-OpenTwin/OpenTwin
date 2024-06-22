@@ -63,24 +63,21 @@ void WrappedTextItem::controlPointsChanged(void) {
 
 	QPointF p1 = this->getControlPoints().front();
 
-	this->setPos(p1);
+	this->setGraphicsItemPos(p1);
 }
 
 void WrappedTextItem::fillPropertyGrid(void) {
 	using namespace ot;
 
 	PropertyGridCfg cfg;
-	PropertyGroup* generalGroup = new PropertyGroup("General");
-	generalGroup->addProperty(new PropertyString("Name", this->getGraphicsItem()->getGraphicsItemName()));
+	this->fillBasePropertyGrid(cfg);
 
-	PropertyGroup* geometryGroup = new PropertyGroup("Geometry");
-	geometryGroup->addProperty(new PropertyDouble("X", this->pos().x()));
-	geometryGroup->addProperty(new PropertyDouble("Y", this->pos().y()));
-	geometryGroup->addProperty(new PropertyString("Text", this->getText()));
+	PropertyGroup* textGroup = new PropertyGroup("Text");
+	textGroup->addProperty(new PropertyString("Text", this->getText()));
 	{
 		PropertyBool* isReferenceProp = new PropertyBool("Text As Reference", this->getTextIsReference());
 		isReferenceProp->setPropertyTip("If enabled the text will be evaluated from the string map when then item is created by the GraphicsItemFactory.");
-		geometryGroup->addProperty(isReferenceProp);
+		textGroup->addProperty(isReferenceProp);
 	}
 	{
 		std::list<std::string> fontFamilies;
@@ -97,27 +94,23 @@ void WrappedTextItem::fillPropertyGrid(void) {
 		}
 		else {
 			if (!found) newFontFamily = fontFamilies.front();
-			geometryGroup->addProperty(new PropertyStringList("Font Family", newFontFamily, fontFamilies));
+			textGroup->addProperty(new PropertyStringList("Font Family", newFontFamily, fontFamilies));
 		}
 	}
 
-	geometryGroup->addProperty(new PropertyInt("Text Size", this->getFont().size()));
-	geometryGroup->addProperty(new PropertyBool("Bold", this->getFont().isBold()));
-	geometryGroup->addProperty(new PropertyBool("Italic", this->getFont().isItalic()));
-	geometryGroup->addProperty(new PropertyPainter2D("Text Painter", this->getTextPainter()));
-	{
-		PropertyBool* newStateProperty = new PropertyBool("Handle State", this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState);
-		newStateProperty->setPropertyTip("If enabled the item will update its appearance according to the current item state (e.g. ItemSelected or ItemHover)");
-		geometryGroup->addProperty(newStateProperty);
-	}
+	textGroup->addProperty(new PropertyInt("Text Size", this->getFont().size()));
+	textGroup->addProperty(new PropertyBool("Bold", this->getFont().isBold()));
+	textGroup->addProperty(new PropertyBool("Italic", this->getFont().isItalic()));
+	textGroup->addProperty(new PropertyPainter2D("Text Painter", this->getTextPainter()));
 
-	cfg.addRootGroup(generalGroup);
-	cfg.addRootGroup(geometryGroup);
+	cfg.addRootGroup(textGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);
 }
 
 void WrappedTextItem::propertyChanged(const ot::Property* _property) {
 	using namespace ot;
+
+	if (this->basePropertyChanged(_property)) return;
 
 	const ot::PropertyGroup* group = _property->getParentGroup();
 	if (!group) {
@@ -125,59 +118,28 @@ void WrappedTextItem::propertyChanged(const ot::Property* _property) {
 		return;
 	}
 
-	if (group->getName() == "General" && _property->getPropertyName() == "Name") {
+	if (group->getName() == "Text" && _property->getPropertyName() == "Text") {
 		const PropertyString* actualProperty = dynamic_cast<const PropertyString*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
-			return;
-		}
-
-		OTAssertNullptr(this->getNavigation());
-		if (actualProperty->getValue().empty()) return;
-		if (!this->getNavigation()->updateItemName(QString::fromStdString(this->getGraphicsItemName()), QString::fromStdString(actualProperty->getValue()))) return;
-
-		this->setGraphicsItemName(actualProperty->getValue());
-	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "X") {
-		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
-		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
-			return;
-		}
-
-		this->setPos(actualProperty->getValue(), this->pos().y());
-	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Y") {
-		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
-		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
-			return;
-		}
-
-		this->setPos(this->pos().x(), actualProperty->getValue());
-	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Text") {
-		const PropertyString* actualProperty = dynamic_cast<const PropertyString*>(_property);
-		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		this->setText(actualProperty->getValue());
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Text As Reference") {
+	else if (group->getName() == "Text" && _property->getPropertyName() == "Text As Reference") {
 		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		this->setTextIsReference(actualProperty->getValue());
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Font Family") {
+	else if (group->getName() == "Text" && _property->getPropertyName() == "Font Family") {
 		const PropertyStringList* actualProperty = dynamic_cast<const PropertyStringList*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -185,10 +147,10 @@ void WrappedTextItem::propertyChanged(const ot::Property* _property) {
 		font.setFamily(actualProperty->getCurrent());
 		this->setFont(font);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Text Size") {
+	else if (group->getName() == "Text" && _property->getPropertyName() == "Text Size") {
 		const PropertyInt* actualProperty = dynamic_cast<const PropertyInt*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -196,10 +158,10 @@ void WrappedTextItem::propertyChanged(const ot::Property* _property) {
 		font.setSize(actualProperty->getValue());
 		this->setFont(font);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Bold") {
+	else if (group->getName() == "Text" && _property->getPropertyName() == "Bold") {
 		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -207,10 +169,10 @@ void WrappedTextItem::propertyChanged(const ot::Property* _property) {
 		font.setBold(actualProperty->getValue());
 		this->setFont(font);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Italic") {
+	else if (group->getName() == "Text" && _property->getPropertyName() == "Italic") {
 		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
@@ -218,27 +180,22 @@ void WrappedTextItem::propertyChanged(const ot::Property* _property) {
 		font.setItalic(actualProperty->getValue());
 		this->setFont(font);
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Text Painter") {
+	else if (group->getName() == "Text" && _property->getPropertyName() == "Text Painter") {
 		const PropertyPainter2D* actualProperty = dynamic_cast<const PropertyPainter2D*>(_property);
 		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return;
 		}
 
 		this->setTextPainter(actualProperty->getPainter()->createCopy());
 	}
-	else if (group->getName() == "Geometry" && _property->getPropertyName() == "Handle State") {
-		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
-		if (!actualProperty) {
-			OT_LOG_E("Property cast failed { \"Group\": \"" + group->getName() + "\", \"");
-			return;
-		}
-
-		this->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, actualProperty->getValue());
+	else {
+		OT_LOG_E("Unknown property { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 	}
 }
 
 void WrappedTextItem::propertyDeleteRequested(const ot::Property* _property) {
+	if (this->basePropertyDeleteRequested(_property)) return;
 
 }
 

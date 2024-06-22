@@ -108,6 +108,18 @@ protected:
 
 	void initializeBaseData(const QList<QPointF>& _controlPoints, const QPointF& _pos);
 
+	//! \brief Adds the default properties.
+	//! Creates the "General" and "Transform" groups.
+	void fillBasePropertyGrid(ot::PropertyGridCfg& _config);
+
+	//! \brief Handles base properties.
+	//! Returns true if the changed property was handled.
+	bool basePropertyChanged(const ot::Property* _property);
+
+	//! \brief Handles base properties.
+	//! Returns true if the requested property was handled.
+	bool basePropertyDeleteRequested(const ot::Property* _property);
+
 private:
 	QPointF m_lastPos; //! \see getLastPos
 	QList<QPointF> m_controlPoints;
