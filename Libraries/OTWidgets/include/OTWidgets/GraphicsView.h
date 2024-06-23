@@ -24,8 +24,9 @@
 namespace ot {
 
 	class GraphicsItem;
-	class GraphicsConnectionItem;
 	class GraphicsScene;
+	class GraphicsItemCfg;
+	class GraphicsConnectionItem;
 
 	//! @brief View widget used to display GraphicsItems
 	//! Note that the View creates its own scene.
@@ -88,7 +89,9 @@ namespace ot {
 		std::list<GraphicsConnectionItem*> getSelectedConnectionItems(void) const;
 
 		void requestConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
-		void notifyItemMoved(ot::GraphicsItem* _item);
+		void notifyItemMoved(const ot::GraphicsItem* _item);
+
+		void notifyItemConfigurationChanged(const ot::GraphicsItem* _item);
 
 	Q_SIGNALS:
 		//! @brief Will be emitted when an item was dropped into the scene by the user
@@ -104,6 +107,8 @@ namespace ot {
 		void connectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 		
 		void itemMoved(const ot::UID& _uid, const QPointF& _newPos);
+
+		void itemConfigurationChanged(const ot::GraphicsItemCfg* _newConfig);
 
 		void removeItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 

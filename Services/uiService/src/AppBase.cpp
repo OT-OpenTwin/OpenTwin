@@ -1971,6 +1971,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name,
 	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
 	connect(newEditor, &ot::GraphicsView::itemMoved, this, &AppBase::slotGraphicsItemMoved);
+	connect(newEditor, &ot::GraphicsView::itemConfigurationChanged, this, &AppBase::slotGraphicsItemChanged);
 	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChangeFinished, this, &AppBase::slotGraphicsSelectionChanged);
 
 	OT_LOG_D("GraphicsEditor created { \"Editor.Name\": \"" + _name  + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
@@ -2194,6 +2195,44 @@ void AppBase::slotGraphicsItemMoved(const ot::UID& _uid, const QPointF& _newPos)
 	ot::JsonObject itemPosObj;
 	itmPos.addToJsonObject(itemPosObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition, itemPosObj, doc.GetAllocator());
+
+	try {
+		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
+		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
+		std::string response;
+		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+			OT_LOG_E("Failed to send http request");
+			return;
+		}
+
+		ot::ReturnMessage responseObj = ot::ReturnMessage::fromJson(response);
+		if (responseObj != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Request failed: " + responseObj.getWhat());
+			return;
+		}
+
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+	catch (...) {
+		OT_LOG_E("[FATAL] Unknown error");
+	}
+}
+
+void AppBase::slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig) {
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
+	if (view == nullptr) {
+		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::JsonObject configObj;
+	_newConfig->addToJsonObject(configObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
 
 	try {
 		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());

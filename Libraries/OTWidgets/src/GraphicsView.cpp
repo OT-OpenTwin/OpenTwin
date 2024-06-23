@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItem.h"
@@ -128,14 +129,18 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 		this->removeItem(_item->getGraphicsItemUid(),removeConnectionBufferApplied);
 	}
 
+	_item->setBlockConfigurationNotifications(true);
+
 	m_items.insert_or_assign(_item->getGraphicsItemUid(), _item);
 	m_scene->addItem(_item->getRootItem()->getQGraphicsItem());
 	_item->getRootItem()->getQGraphicsItem()->setZValue(2);
 	_item->setGraphicsScene(m_scene);
 
 	if (m_scene->getGrid().isGridSnapValid()) {
-		_item->setGraphicsItemPos(m_scene->snapToGrid(_item->getQGraphicsItem()->pos()));
+		_item->setGraphicsItemPos(m_scene->snapToGrid(_item->getGraphicsItemPos()));
 	}
+
+	_item->setBlockConfigurationNotifications(false);
 
 	if (removeConnectionBufferApplied) {
 		for (const GraphicsConnectionCfg& bufferedConnection : m_itemRemovalConnectionBuffer) {
@@ -323,8 +328,15 @@ void ot::GraphicsView::requestConnection(const ot::UID& _fromUid, const std::str
 	Q_EMIT connectionRequested(_fromUid, _fromConnector, _toUid, _toConnector);
 }
 
-void ot::GraphicsView::notifyItemMoved(ot::GraphicsItem* _item) {
-	Q_EMIT itemMoved(_item->getGraphicsItemUid(), _item->getQGraphicsItem()->pos());
+void ot::GraphicsView::notifyItemMoved(const ot::GraphicsItem* _item) {
+	Q_EMIT itemMoved(_item->getGraphicsItemUid(), QtFactory::toQPoint(_item->getGraphicsItemPos()));
+}
+
+void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _item) {
+	// Avoid notification of child items
+	if (_item != _item->getRootItem()) return;
+
+	Q_EMIT itemConfigurationChanged(_item->getConfiguration());
 }
 
 // ########################################################################################################

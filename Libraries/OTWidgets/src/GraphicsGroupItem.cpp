@@ -40,6 +40,7 @@ bool ot::GraphicsGroupItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		return false;
 	}
 
+	this->setBlockConfigurationNotifications(true);
 	for (GraphicsItemCfg* i : cfg->getItems()) {
 		OTAssertNullptr(i);
 
@@ -48,6 +49,7 @@ bool ot::GraphicsGroupItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 			this->addItem(itm);
 		}
 	}
+	this->setBlockConfigurationNotifications(false);
 
 	return GraphicsItem::setupFromConfig(_cfg);
 }

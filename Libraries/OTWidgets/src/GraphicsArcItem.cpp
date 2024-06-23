@@ -37,7 +37,9 @@ bool ot::GraphicsArcItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 	if (!ot::CustomGraphicsItem::setupFromConfig(_cfg)) return false;
 
+	this->setBlockConfigurationNotifications(true);
 	this->updateItemGeometry();
+	this->setBlockConfigurationNotifications(false);
 
 	return true;
 }

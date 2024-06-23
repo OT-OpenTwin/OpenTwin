@@ -35,19 +35,23 @@ bool ot::GraphicsPixmapItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		return false;
 	}
 
+	this->setBlockConfigurationNotifications(true);
 	this->prepareGeometryChange();
 
 	try {
 		m_colorMask = cfg->colorMask();
 		m_maintainAspectRatio = cfg->isMaintainAspectRatio();
 		m_pixmap = ot::IconManager::getPixmap(QString::fromStdString(cfg->imagePath()));
+		this->setBlockConfigurationNotifications(false);
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());
+		this->setBlockConfigurationNotifications(false);
 		return false;
 	}
 	catch (...) {
 		OT_LOG_EA("[FATAL] Unknown error");
+		this->setBlockConfigurationNotifications(false);
 		return false;
 	}
 	return ot::CustomGraphicsItem::setupFromConfig(_cfg);

@@ -70,6 +70,7 @@ namespace ot { class PropertyGridItem; }
 namespace ot { class NavigationTreeView; }
 namespace ot { class PlainTextEditView; }
 namespace ot { class GraphicsPickerView; }
+namespace ot { class GraphicsItemCfg; }
 struct structModelViewInfo
 {
 	ViewerUIDtype	view;
@@ -452,6 +453,7 @@ public:
 public Q_SLOTS:
 	void slotGraphicsItemRequested(const QString& _name, const QPointF& _pos);
 	void slotGraphicsItemMoved(const ot::UID& _uid, const QPointF& _newPos);
+	void slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig);
 	void slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 	void slotGraphicsSelectionChanged(void);
 	void slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections);

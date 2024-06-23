@@ -20,7 +20,10 @@ ot::GraphicsLayoutItem::~GraphicsLayoutItem() {
 bool ot::GraphicsLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(m_layoutWrap);
 	m_layoutWrap->setAcceptHoverEvents(true);
-	return ot::GraphicsItem::setupFromConfig(_cfg);
+	m_layoutWrap->setBlockConfigurationNotifications(true);
+	bool ret = ot::GraphicsItem::setupFromConfig(_cfg);
+	m_layoutWrap->setBlockConfigurationNotifications(false);
+	return ret;
 }
 
 void ot::GraphicsLayoutItem::setGraphicsItemName(const std::string& _name) {
@@ -92,6 +95,8 @@ void ot::GraphicsLayoutItem::graphicsItemConfigurationChanged(const GraphicsItem
 	OTAssertNullptr(m_layoutWrap);
 	m_layoutWrap->setConfiguration(_config->createCopy());
 	this->setGraphicsItemName(_config->getName()); // Wrap has a different name, therefore we update our name
+
+	ot::GraphicsItem::graphicsItemConfigurationChanged(_config);
 }
 
 void ot::GraphicsLayoutItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {

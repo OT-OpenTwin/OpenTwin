@@ -38,7 +38,9 @@ bool ot::GraphicsShapeItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		return false;
 	}
 
+	this->setBlockConfigurationNotifications(true);
 	this->updateItemGeometry();
+	this->setBlockConfigurationNotifications(false);
 
 	return ot::CustomGraphicsItem::setupFromConfig(_cfg);
 }

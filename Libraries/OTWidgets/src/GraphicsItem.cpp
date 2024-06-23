@@ -65,6 +65,7 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
 	OTAssertNullptr(this->getQGraphicsItem());
 	
+	m_blockConfigurationNotifications = true;
 	this->setConfiguration(_cfg->createCopy());
 
 	OTAssertNullptr(m_config);
@@ -74,8 +75,15 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		this->setGraphicsItemName(this->getGraphicsItemName());
 		if (!m_blockFlagNotifications) this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());
 	}
-	
+	m_blockConfigurationNotifications = false;
+
 	return true;
+}
+
+void ot::GraphicsItem::graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) {
+	if (!m_scene) return;
+	OTAssertNullptr(m_scene->getGraphicsView());
+	m_scene->getGraphicsView()->notifyItemConfigurationChanged(this);
 }
 
 ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
@@ -143,20 +151,23 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 		this->handleItemChange(QGraphicsItem::ItemSelectedHasChanged, QVariant());
 
 		m_scene->handleSelectionChanged();
+	}
 
-		if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
-			auto qitm = this->getQGraphicsItem();
-			OTAssertNullptr(qitm);
-			m_moveStartPt = qitm->pos(); // The item is root item, so pos returns the scene pos
-		}
+	if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
+		this->setBlockConfigurationNotifications(true);
+		auto qitm = this->getQGraphicsItem();
+		OTAssertNullptr(qitm);
+		m_moveStartPt = qitm->pos(); // The item is root item, so pos returns the scene pos
 	}
 }
 
 void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_parent) {
-		m_parent->handleMousePressEvent(_event);
+		m_parent->handleMouseReleaseEvent(_event);
 	}
-	else if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
+	
+	if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
+		this->setBlockConfigurationNotifications(false);
 		auto qitm = this->getQGraphicsItem();
 		OTAssertNullptr(qitm);
 		// Check if the item has moved after the user released the mouse
@@ -256,6 +267,8 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 			}
 		}
 
+		m_config->setPosition(QtFactory::toPoint2D(this->getQGraphicsItem()->pos()));
+
 		for (auto c : m_connections) {
 			c->updateConnection();
 		}
@@ -330,12 +343,22 @@ ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
 	}
 }
 
+const ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) const {
+	if (m_parent) {
+		return m_parent->getRootItem();
+	}
+	else {
+		return this;
+	}
+}
+
 void ot::GraphicsItem::setConfiguration(GraphicsItemCfg* _config) {
 	OTAssertNullptr(_config);
 	if (m_config == _config) return;
 	if (m_config) delete m_config;
 	m_config = _config;
 
+	this->getQGraphicsItem()->setPos(QtFactory::toQPoint(m_config->getPosition()));
 	this->applyGraphicsItemTransform(m_config->getTransform());
 
 	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
@@ -506,6 +529,7 @@ void ot::GraphicsItem::setGraphicsItemTransform(const Transform& _transform) {
 	for (GraphicsConnectionItem* con : m_connections) {
 		con->update();
 	}
+	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
 }
 
 const ot::Transform& ot::GraphicsItem::getGraphicsItemTransform(void) const {

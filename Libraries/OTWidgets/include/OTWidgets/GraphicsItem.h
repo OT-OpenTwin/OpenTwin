@@ -124,7 +124,7 @@ namespace ot {
 		virtual void graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {};
 
 		//! \brief Will be called whenever the GraphicsItem configuration has changed.
-		virtual void graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) {};
+		virtual void graphicsItemConfigurationChanged(const GraphicsItemCfg* _config);
 
 		//! \brief Will return any child item that matches the _itemName.
 		//! \param _itemName The name of the item to find.
@@ -175,6 +175,8 @@ namespace ot {
 		// Getter / Setter
 
 		GraphicsItem* getRootItem(void);
+
+		const GraphicsItem* getRootItem(void) const;
 
 		//! \brief Replaces the current configuration with the configuration prvided.
 		//! The item takes ownership of the configuration.

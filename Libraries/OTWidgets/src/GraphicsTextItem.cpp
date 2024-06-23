@@ -33,7 +33,9 @@ bool ot::GraphicsTextItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	
 	if (!ot::CustomGraphicsItem::setupFromConfig(_cfg)) return false;
 
+	this->setBlockConfigurationNotifications(true);
 	this->updateItemGeometry();
+	this->setBlockConfigurationNotifications(false);
 
 	return true;
 }
@@ -57,7 +59,10 @@ void ot::GraphicsTextItem::finalizeGraphicsItem(void) {
 		OTAssertNullptr(rootItem);
 		cfg->setText(rootItem->getConfiguration()->getStringForKey(cfg->getText()));
 		cfg->setTextIsReference(false);
+
+		this->setBlockConfigurationNotifications(true);
 		this->updateItemGeometry();
+		this->setBlockConfigurationNotifications(false);
 	}
 }
 

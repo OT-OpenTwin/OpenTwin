@@ -30,11 +30,6 @@ ot::CustomGraphicsItem::~CustomGraphicsItem() {
 bool ot::CustomGraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	if (!ot::GraphicsItem::setupFromConfig(_cfg)) return false;
 
-	this->prepareGeometryChange();
-	QRectF newRect = this->geometry();
-	newRect.moveTo(QtFactory::toQPoint(this->getConfiguration()->getPosition()));
-	this->setGeometry(newRect);
-
 	return true;
 	
 }

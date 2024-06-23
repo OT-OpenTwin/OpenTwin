@@ -41,6 +41,7 @@ bool ot::GraphicsStackItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		return false;
 	}
 
+	this->setBlockConfigurationNotifications(true);
 	this->memClear();
 
 	for (auto itm : cfg->items()) {
@@ -59,15 +60,18 @@ bool ot::GraphicsStackItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		catch (const std::exception& _e) {
 			OT_LOG_EAS("Failed to create child item: " + std::string(_e.what()));
 			if (i) delete i;
+			this->setBlockConfigurationNotifications(false);
 			throw _e;
 		}
 		catch (...) {
 			OT_LOG_EA("[FATAL] Unknown error");
 			if (i) delete i;
+			this->setBlockConfigurationNotifications(false);
 			throw std::exception("[FATAL] Unknown error");
 		}
 	}
 
+	this->setBlockConfigurationNotifications(false);
 	return ot::GraphicsItem::setupFromConfig(_cfg);
 }
 

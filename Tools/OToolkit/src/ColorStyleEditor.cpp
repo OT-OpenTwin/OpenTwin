@@ -364,6 +364,8 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_nameProp->setValue(ot::toString(ot::ColorStyleName::BrightStyle));
 
 	// Initialize painters
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Transparent), new PropertyPainter2D(new FillPainter2D(ot::Transparent)));
+
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Border), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderLight), new PropertyPainter2D(new FillPainter2D(ot::DarkGray)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderDisabled), new PropertyPainter2D(new FillPainter2D(ot::Gray)));
@@ -521,6 +523,8 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_nameProp->setValue(ot::toString(ot::ColorStyleName::DarkStyle));
 
 	// Initialize painters
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Transparent), new PropertyPainter2D(new FillPainter2D(ot::Transparent)));
+
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Border), new PropertyPainter2D(new FillPainter2D(Color(70, 70, 70))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderLight), new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderDisabled), new PropertyPainter2D(new FillPainter2D(Color(30, 30, 30))));
@@ -679,6 +683,8 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	// Initialize default style integers
 
 	// Initialize painters
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Transparent), new PropertyPainter2D(new FillPainter2D(ot::Transparent)));
+
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Border), new PropertyPainter2D(new FillPainter2D(Color(0, 100, 180))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderLight), new PropertyPainter2D(new FillPainter2D(ot::Navy)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::BorderDisabled), new PropertyPainter2D(new FillPainter2D(ot::Gray)));

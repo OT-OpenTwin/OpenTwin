@@ -24,6 +24,7 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		return false;
 	}
 
+	this->setBlockConfigurationNotifications(true);
 	this->setContentsMargins(_cfg->getMargins().left(), _cfg->getMargins().top(), _cfg->getMargins().right(), _cfg->getMargins().bottom());
 
 	for (auto itm : cfg->items()) {
@@ -31,6 +32,7 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 			ot::GraphicsItem* i = ot::GraphicsItemFactory::instance().itemFromConfig(itm.first);
 			if (i == nullptr) {
 				OT_LOG_EA("GraphicsFactory failed");
+				this->setBlockConfigurationNotifications(false);
 				return false;
 			}
 			i->setParentGraphicsItem(this);
@@ -46,6 +48,9 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 	this->setMinimumSize(QtFactory::toQSize(_cfg->getMinimumSize()));
 	this->setMaximumSize(QtFactory::toQSize(_cfg->getMaximumSize()));
+
+	this->setBlockConfigurationNotifications(false);
+
 	return GraphicsLayoutItem::setupFromConfig(_cfg);
 }
 
