@@ -133,14 +133,17 @@ bool ot::GraphicsItem::graphicsItemRequiresHover(void) const {
 // Event handler
 
 void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	if (m_parent) {
-		m_parent->handleMousePressEvent(_event);
-	}
-	else if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) {
 		OTAssertNullptr(m_scene);
 		m_scene->startConnection(this);
+		return;
 	}
-	else if (this->getQGraphicsItem()->flags() & QGraphicsItem::ItemIsSelectable) {
+	else if (m_parent) {
+		m_parent->handleMousePressEvent(_event);
+		return;
+	}
+	
+	if ((this->getQGraphicsItem()->flags() & QGraphicsItem::ItemIsSelectable) && !this->getQGraphicsItem()->isSelected()) {
 		OTAssertNullptr(m_scene);
 		if (_event->modifiers() != Qt::ControlModifier) {
 			m_scene->setIgnoreEvents(true);
@@ -152,7 +155,7 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 
 		m_scene->handleSelectionChanged();
 	}
-	else if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
+	if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
 		this->setBlockConfigurationNotifications(true);
 		auto qitm = this->getQGraphicsItem();
 		OTAssertNullptr(qitm);
@@ -163,8 +166,10 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_parent) {
 		m_parent->handleMouseReleaseEvent(_event);
+		return;
 	}
-	else if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
+
+	if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable)) {
 		this->setBlockConfigurationNotifications(false);
 		auto qitm = this->getQGraphicsItem();
 		OTAssertNullptr(qitm);
