@@ -68,17 +68,6 @@ void GraphicsItemDesignerView::keyPressEvent(QKeyEvent* _event) {
 	}
 }
 
-void GraphicsItemDesignerView::showEvent(QShowEvent* _event) {
-	// Calculate the scaling factor to fit the scene to the view
-	QSize viewSize = this->viewport()->size();
-	qreal scaleX = viewSize.width() / m_scene->getItemSize().width();
-	qreal scaleY = viewSize.height() / m_scene->getItemSize().height();
-	qreal scale = qMin(scaleX, scaleY);
-
-	// Apply the scaling factor to the view
-	this->scale(scale, scale);
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 void GraphicsItemDesignerView::slotSceneSelectionChanged(void) {

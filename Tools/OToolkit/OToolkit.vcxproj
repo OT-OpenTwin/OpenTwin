@@ -34,6 +34,7 @@
     <ClCompile Include="src\GraphicsItemDesignerItemBase.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerNavigation.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerNavigationRoot.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerPreview.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerPropertyHandler.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerScene.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerToolBar.cpp" />
@@ -75,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\SettingsManager.h" />
+    <ClInclude Include="include\GraphicsItemDesignerPreview.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />

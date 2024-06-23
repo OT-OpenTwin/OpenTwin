@@ -22,6 +22,7 @@
 class QWidget;
 class GraphicsItemDesignerView;
 class GraphicsItemDesignerToolBar;
+class GraphicsItemDesignerPreview;
 class GraphicsItemDesignerNavigation;
 class GraphicsItemDesignerDrawHandler;
 namespace ot { class PropertyGrid; };
@@ -78,6 +79,7 @@ private Q_SLOTS:
 	void slotMakeTransparentRequested(void);
 	void slotDuplicateRequested(void);
 	void slotClearRequested(void);
+	void slotGeneratePreview(void);
 	void slotDeleteItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 
 private:
@@ -91,5 +93,6 @@ private:
 	GraphicsItemDesignerToolBar* m_toolBar;
 	GraphicsItemDesignerNavigation* m_navigation;
 	GraphicsItemDesignerDrawHandler* m_drawHandler;
+	GraphicsItemDesignerPreview* m_preview;
 };
 

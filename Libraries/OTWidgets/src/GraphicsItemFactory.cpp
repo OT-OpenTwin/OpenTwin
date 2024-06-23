@@ -28,24 +28,25 @@ ot::GraphicsItem* ot::GraphicsItemFactory::create(const ConstJsonObject& _config
 	return this->itemFromConfig(cfg, _isRoot);
 }
 
-ot::GraphicsItem* ot::GraphicsItemFactory::itemFromConfig(ot::GraphicsItemCfg* _configuration, bool _isRoot) {
+ot::GraphicsItem* ot::GraphicsItemFactory::itemFromConfig(const ot::GraphicsItemCfg* _configuration, bool _isRoot) {
 	OTAssertNullptr(_configuration);
 
 	// If the configuration is a file we need to import the actual configuration for this item.
 	if (_configuration->getFactoryKey() == OT_FactoryKey_GraphicsFileItem) {
 		// Get config and file sub path
-		ot::GraphicsItemFileCfg* actualConfig = dynamic_cast<ot::GraphicsItemFileCfg*>(_configuration);
+		const ot::GraphicsItemFileCfg* actualConfig = dynamic_cast<const ot::GraphicsItemFileCfg*>(_configuration);
 		OTAssertNullptr(actualConfig);
 		std::string configSubPath = actualConfig->getFile();
 
 		// Import new config
-		_configuration = GraphicsItemLoader::instance().createConfiguration(QString::fromStdString(configSubPath));
+		ot::GraphicsItemCfg* newConfiguration = GraphicsItemLoader::instance().createConfiguration(QString::fromStdString(configSubPath));
 		if (!_configuration) {
 			return nullptr;
 		}
 
 		// Copy config data
-		actualConfig->copyConfigDataToItem(_configuration);
+		actualConfig->copyConfigDataToItem(newConfiguration);
+		_configuration = newConfiguration;
 	}
 
 	// Create item

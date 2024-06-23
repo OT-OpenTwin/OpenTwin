@@ -8,6 +8,7 @@
 #include "GraphicsItemDesigner.h"
 #include "GraphicsItemDesignerView.h"
 #include "GraphicsItemDesignerScene.h"
+#include "GraphicsItemDesignerPreview.h"
 #include "GraphicsItemDesignerToolBar.h"
 #include "GraphicsItemDesignerItemBase.h"
 #include "GraphicsItemDesignerNavigation.h"
@@ -39,7 +40,7 @@
 
 GraphicsItemDesigner::GraphicsItemDesigner() 
 	: m_view(nullptr), m_props(nullptr), m_toolBar(nullptr), 
-	m_navigation(nullptr), m_drawHandler(nullptr)
+	m_navigation(nullptr), m_drawHandler(nullptr), m_preview(nullptr)
 {
 
 }
@@ -63,8 +64,13 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	view = this->createToolWidgetView(m_navigation, "GID Explorer");
 	_content.addView(view);
 
+	m_preview = new GraphicsItemDesignerPreview;
+	view = this->createToolWidgetView(m_preview, "GID Preview");
+	_content.addView(view);
+
 	m_toolBar = new GraphicsItemDesignerToolBar(this);
 	_content.setToolBar(m_toolBar);
+
 
 	// Connect signals
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::modeRequested, this, &GraphicsItemDesigner::slotDrawRequested);
@@ -74,6 +80,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::exportAsImageRequested, this, &GraphicsItemDesigner::slotExportAsImageRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::makeTransparentRequested, this, &GraphicsItemDesigner::slotMakeTransparentRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::duplicateRequested, this, &GraphicsItemDesigner::slotDuplicateRequested);
+	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::previewRequested, this, &GraphicsItemDesigner::slotGeneratePreview);
 	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCompleted, this, &GraphicsItemDesigner::slotDrawFinished);
 	this->connect(m_drawHandler, &GraphicsItemDesignerDrawHandler::drawCancelled, this, &GraphicsItemDesigner::slotDrawCancelled);
 	this->connect(m_view, &GraphicsItemDesignerView::removeItemsRequested, this, &GraphicsItemDesigner::slotDeleteItemsRequested);
@@ -89,6 +96,9 @@ void GraphicsItemDesigner::restoreToolSettings(QSettings& _settings) {
 	itemSize.setWidth(_settings.value("GID.LastWidth", (qreal)300).toReal());
 	itemSize.setHeight(_settings.value("GID.LastHeight", (qreal)200).toReal());
 	m_view->getDesignerScene()->setItemSize(itemSize);
+	m_view->setSceneRect(QRectF(QPointF(0., 0.), itemSize));
+	m_view->fitInView(m_view->sceneRect(), Qt::KeepAspectRatio);
+	m_view->scale(0.9, 0.9);
 
 	// Grid
 	m_view->getDesignerScene()->setGridFlags((_settings.value("GID.ShowGrid", true).toBool() ? (Grid::ShowNormalLines | Grid::ShowWideLines) : Grid::NoGridFlags));
@@ -279,6 +289,26 @@ void GraphicsItemDesigner::slotClearRequested(void) {
 	m_drawHandler->blockSignals(false);
 
 	m_navigation->clearDesignerItems();
+}
+
+void GraphicsItemDesigner::slotGeneratePreview(void) {
+	if (!m_navigation->hasDesignerItems()) {
+		return;
+	}
+
+	GraphicsItemDesignerExportConfig exportCfg;
+	exportCfg.setExportConfigFlag(GraphicsItemDesignerExportConfig::AutoAlign);
+	ot::GraphicsItemCfg* newConfig = m_navigation->generateConfig(exportCfg);
+	if (!newConfig) {
+		OT_LOG_W("Failed to generate config");
+		return;
+	}
+
+	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState);
+
+	m_preview->updateCurrentItem(newConfig);
+
+	delete newConfig;
 }
 
 void GraphicsItemDesigner::slotDeleteItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections) {

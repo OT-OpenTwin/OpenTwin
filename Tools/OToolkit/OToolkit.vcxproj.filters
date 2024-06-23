@@ -192,6 +192,9 @@
     <ClCompile Include="src\SettingsManager.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsItemDesignerPreview.cpp">
+      <Filter>Source Files\GraphicsItemDesigner</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -256,6 +259,9 @@
     </ClInclude>
     <ClInclude Include="include\WrappedTextItem.h">
       <Filter>Header Files\GraphicsItemDesignerItems</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsItemDesignerPreview.h">
+      <Filter>Header Files\GraphicsItemDesigner</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -34,6 +34,7 @@ Q_SIGNALS:
 	void exportAsImageRequested(void);
 	void makeTransparentRequested(void);
 	void duplicateRequested(void);
+	void previewRequested(void);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -41,6 +42,7 @@ private Q_SLOTS:
 	void slotImport(void);
 	void slotExport(void);
 	void slotExportAsImage(void);
+	void slotGeneratePreview(void);
 
 	void slotLine(void);
 	void slotSquare(void);

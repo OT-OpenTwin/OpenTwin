@@ -31,7 +31,7 @@ namespace ot {
 		//! If the created item is the root item finalizeGraphicsItem() will be called.
 		//! @param _config The graphics item configuration.
 		//! @param _isRoot If true, the item will be added to a stack with a highlight item on top. The highlight item will be set to the root item.
-		ot::GraphicsItem* itemFromConfig(ot::GraphicsItemCfg* _config, bool _isRoot = false);
+		ot::GraphicsItem* itemFromConfig(const ot::GraphicsItemCfg* _config, bool _isRoot = false);
 
 	private:
 		GraphicsItemFactory() {};

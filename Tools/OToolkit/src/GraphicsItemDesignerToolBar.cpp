@@ -43,6 +43,15 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotExportAsImage);
 		this->addAction(btn);
 	}
+	{
+		QAction* btn = new QAction;
+		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/GeneratePreview.png"));
+		btn->setText("Generate Item preview (Ctrl + Shift + B)");
+		btn->setShortcut(QKeySequence("Ctrl+Shift+B"));
+		btn->setShortcutVisibleInContextMenu(true);
+		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotGeneratePreview);
+		this->addAction(btn);
+	}
 
 	this->addSeparator();
 
@@ -191,6 +200,10 @@ void GraphicsItemDesignerToolBar::slotExport(void) {
 
 void GraphicsItemDesignerToolBar::slotExportAsImage(void) {
 	Q_EMIT exportAsImageRequested();
+}
+
+void GraphicsItemDesignerToolBar::slotGeneratePreview(void) {
+	Q_EMIT previewRequested();
 }
 
 void GraphicsItemDesignerToolBar::slotLine(void) {
