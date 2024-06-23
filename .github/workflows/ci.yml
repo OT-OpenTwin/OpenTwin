@@ -1,53 +1,92 @@
-name: C/C++ CI
+name: Pull from separate repo and run build script
 
 on:
   push:
-    branches: [ "Ci" ]
-  pull_request:
-    branches: [ "Ci" ]
+    branches:
+      - RunBuild
 
 jobs:
-  build:
+  pull-other-repo:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    # Step 1: Check out the main project repository
+    - name: Check out the main project repository
+      uses: actions/checkout@v2
+      with:
+        
+        ref: Ci
+        path: OpenTwin
 
-    - name: Install Chocolatey
-      run: |
-        Set-ExecutionPolicy Bypass -Scope Process -Force; 
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; 
-        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+    # Step 2: Check out the third-party repository
+    - name: Check out the third-party repository
+      uses: actions/checkout@v2
+      with:
+        repository: OT-OpenTwin/ThirdParty
+        path: ThirdParty
 
+    # Step 3: Install Visual Studio 2022 Build Tools
     - name: Install Visual Studio 2022 Build Tools
       run: |
-        choco install -y visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Workload.NativeDesktop --add Microsoft.VisualStudio.Component.Windows10SDK --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest"
+        choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --quiet --wait"
       shell: cmd
 
+    # Step 4: Install Rust 1.76.0
     - name: Install Rust 1.76.0
-      run: choco install rust --version=1.76.0 --confirm
-
-    - name: Verify Rust Installation
-      run: rustc --version
-
-    - name: Set environment variables
       run: |
-        echo "OPENTWIN_DEV_ROOT=${{ github.workspace }}\OpenTwin" >> $GITHUB_ENV
-        echo "OPENTWIN_THIRDPARTY_ROOT=${{ github.workspace }}\ThirdParty" >> $GITHUB_ENV
-        echo "DEVENV_ROOT_2022=C:\Program Files\Microsoft Visual Studio\2022\BuildTools\Common7\IDE" >> $GITHUB_ENV
-        echo "QT_PLUGIN_PATH=${{ github.workspace }}\OpenTwin\Third_Party_Libraries\Qt\6.6.1\msvc2019_64" >> $GITHUB_ENV
-        echo "PATH=${{ github.workspace }}\OpenTwin\Third_Party_Libraries\Qt\6.6.1\msvc2019_64\bin;$PATH" >> $GITHUB_ENV
-
-    - name: Build OpenTwin using buildAll.bat
-      run: |
-        set OPENTWIN_DEV_ROOT=${{ github.workspace }}\OpenTwin
-        set OPENTWIN_THIRDPARTY_ROOT=${{ github.workspace }}\ThirdParty
-        set DEVENV_ROOT_2022=C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE
-        ${{ github.workspace }}\OpenTwin\Scripts\BuildAndTest\BuildAll.bat > build_log.txt 2>&1
-        type build_log.txt
+        choco install rust --version=1.76.0 -y
       shell: cmd
 
-    - name: List files for debugging
-      run: dir ${{ github.workspace }}\OpenTwin\Repo\Deployment
+    # Step 5: Display the files in the main project repository
+    - name: List files in the main project repository
+      run: dir OpenTwin
+
+    # Step 7: Set environment variables and check paths
+    - name: Set environment variables and check paths
+      run: |
+        cd OpenTwin
+        echo "Current directory: %cd%"
+        set OPENTWIN_DEV_ROOT=%cd%
+        set DEVENV_ROOT_2022="C:\Program Files\Microsoft Visual Studio\2022\BuildTools\Common7\IDE"
+        set OPENTWIN_THIRDPARTY_ROOT=%cd%\..\ThirdParty
+        echo "OPENTWIN_DEV_ROOT=%OPENTWIN_DEV_ROOT%"
+        echo "DEVENV_ROOT_2022=%DEVENV_ROOT_2022%"
+        echo "OPENTWIN_THIRDPARTY_ROOT=%cd%\..\ThirdParty"
+        echo "Checking if BuildAll.bat exists..."
+        if exist .\Scripts\BuildAndTest\BuildAll.bat (
+          echo "BuildAll.bat exists."
+        ) else (
+          echo "BuildAll.bat does not exist."
+          exit /b 1
+        )
+        echo "Checking if RebuildAll.bat exists..."
+        if exist %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\RebuildAll.bat (
+          echo "RebuildAll.bat exists."
+        ) else (
+          echo "RebuildAll.bat does not exist."
+        )
+        echo "Checking if CheckForFailedBuilds.bat exists..."
+        if exist %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CheckForFailedBuilds.bat (
+          echo "CheckForFailedBuilds.bat exists."
+        ) else (
+          echo "CheckForFailedBuilds.bat does not exist."
+        )
+        echo "All checks passed."
       shell: cmd
+
+    # Step 8: Run the BuildAll.bat script and capture log
+    - name: Run BuildAll.bat and capture log
+      run: |
+        cd OpenTwin
+        echo "Starting BuildAll.bat..."
+        set OPENTWIN_DEV_ROOT=%cd% &&  set OPENTWIN_THIRDPARTY_ROOT=%cd%\..\ThirdParty && set DEVENV_ROOT_2022="C:\Program Files\Microsoft Visual Studio\2022\BuildTools\Common7\IDE" && call .\Scripts\BuildAndTest\BuildAll.bat > build.log 2>&1
+        echo "BuildAll.bat finished with exit code %ERRORLEVEL%"
+        type build.log
+      shell: cmd
+
+    # Step 9: Upload build log artifact
+    - name: Upload build log
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-log
+        path: OpenTwin\build.log
