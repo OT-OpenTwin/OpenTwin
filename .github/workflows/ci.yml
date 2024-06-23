@@ -13,8 +13,7 @@ jobs:
     # Step 1: Check out the main project repository
     - name: Check out the main project repository
       uses: actions/checkout@v2
-      with:
-        
+      with: 
         ref: Ci
         path: OpenTwin
 
