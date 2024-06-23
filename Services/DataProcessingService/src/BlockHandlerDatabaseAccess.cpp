@@ -35,7 +35,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	_dataStorageAccess = new DataStorageAPI::ResultDataStorageAPI(dbURL, resultCollectionAccess->getCollectionName());
 		
 	AdvancedQueryBuilder builder;
-	ot::StringToVariableConverter converter;
+	//ot::StringToVariableConverter converter;
 	_projectionNames.reserve(4);
 	_connectorNames.reserve(4);
 		

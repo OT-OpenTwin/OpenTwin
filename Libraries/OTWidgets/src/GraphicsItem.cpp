@@ -152,8 +152,7 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 
 		m_scene->handleSelectionChanged();
 	}
-
-	if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
+	else if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
 		this->setBlockConfigurationNotifications(true);
 		auto qitm = this->getQGraphicsItem();
 		OTAssertNullptr(qitm);
@@ -165,15 +164,16 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 	if (m_parent) {
 		m_parent->handleMouseReleaseEvent(_event);
 	}
-	
-	if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
+	else if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
 		this->setBlockConfigurationNotifications(false);
 		auto qitm = this->getQGraphicsItem();
 		OTAssertNullptr(qitm);
 		// Check if the item has moved after the user released the mouse
 		if (qitm->pos() != m_moveStartPt) {
 			OTAssertNullptr(m_scene);
+			OTAssertNullptr(m_scene->getGraphicsView());
 			m_scene->getGraphicsView()->notifyItemMoved(this);
+			m_scene->getGraphicsView()->notifyItemConfigurationChanged(this);
 		}
 	}
 }
@@ -606,6 +606,21 @@ void ot::GraphicsItem::setGraphicsItemSelected(bool _selected) {
 
 bool ot::GraphicsItem::getGraphicsItemSelected(void) const {
 	return m_state & GraphicsItem::SelectedState;
+}
+
+void ot::GraphicsItem::setCurrentPosAsMoveStart(void) {
+	OTAssertNullptr(this->getQGraphicsItem());
+	m_moveStartPt = this->getQGraphicsItem()->pos();
+}
+
+void ot::GraphicsItem::notifyMoveIfRequired(void) {
+	OTAssertNullptr(this->getQGraphicsItem());
+	OTAssertNullptr(m_scene);
+	OTAssertNullptr(m_scene->getGraphicsView());
+	if (m_moveStartPt != this->getQGraphicsItem()->pos()) {
+		m_scene->getGraphicsView()->notifyItemMoved(this);
+		m_scene->getGraphicsView()->notifyItemConfigurationChanged(this);
+	}
 }
 
 void ot::GraphicsItem::applyGraphicsItemTransform(const Transform& _transform) {

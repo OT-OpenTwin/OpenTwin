@@ -329,6 +329,7 @@ void ot::GraphicsView::requestConnection(const ot::UID& _fromUid, const std::str
 }
 
 void ot::GraphicsView::notifyItemMoved(const ot::GraphicsItem* _item) {
+	if (m_viewStateFlags & ItemMoveInProgress) return;
 	Q_EMIT itemMoved(_item->getGraphicsItemUid(), QtFactory::toQPoint(_item->getGraphicsItemPos()));
 }
 
@@ -336,6 +337,7 @@ void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _i
 	// Avoid notification of child items
 	if (_item != _item->getRootItem()) return;
 
+	if (m_viewStateFlags & ItemMoveInProgress) return;
 	Q_EMIT itemConfigurationChanged(_item->getConfiguration());
 }
 
@@ -415,6 +417,7 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 			m_scene->flipAllSelectedItems(Qt::Horizontal);
 		}
 		else {
+			this->beginItemMove();
 			m_scene->moveAllSelectedItems(Point2DD(-m_scene->getGrid().getGridStep().x(), 0.));
 		}
 	}
@@ -423,6 +426,7 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 			m_scene->flipAllSelectedItems(Qt::Horizontal);
 		}
 		else {
+			this->beginItemMove();
 			m_scene->moveAllSelectedItems(Point2DD(m_scene->getGrid().getGridStep().x(), 0.));
 		}
 	}
@@ -431,6 +435,7 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 			m_scene->flipAllSelectedItems(Qt::Vertical);
 		}
 		else {
+			this->beginItemMove();
 			m_scene->moveAllSelectedItems(Point2DD(0., -m_scene->getGrid().getGridStep().y()));
 		}
 	}
@@ -439,6 +444,7 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 			m_scene->flipAllSelectedItems(Qt::Vertical);
 		}
 		else {
+			this->beginItemMove();
 			m_scene->moveAllSelectedItems(Point2DD(0., m_scene->getGrid().getGridStep().y()));
 		}
 	}
@@ -452,7 +458,28 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 	}
 }
 
-void ot::GraphicsView::keyReleaseEvent(QKeyEvent* _event) {}
+void ot::GraphicsView::keyReleaseEvent(QKeyEvent* _event) {
+	if (_event->key() == Qt::Key_Left && !_event->isAutoRepeat()) {
+		if (!(_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier))) {
+			this->endItemMove();
+		}
+	}
+	else if (_event->key() == Qt::Key_Right && !_event->isAutoRepeat()) {
+		if (!(_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier))) {
+			this->endItemMove();
+		}
+	}
+	else if (_event->key() == Qt::Key_Up && !_event->isAutoRepeat()) {
+		if (!(_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier))) {
+			this->endItemMove();
+		}
+	}
+	else if (_event->key() == Qt::Key_Down && !_event->isAutoRepeat()) {
+		if (!(_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier))) {
+			this->endItemMove();
+		}
+	}
+}
 
 void ot::GraphicsView::resizeEvent(QResizeEvent* _event)
 {
@@ -492,5 +519,31 @@ void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 	}
 	else {
 		QGraphicsView::dragMoveEvent(_event);
+	}
+}
+
+void ot::GraphicsView::beginItemMove(void) {
+	if (m_viewStateFlags & ItemMoveInProgress) return;
+
+	m_viewStateFlags.setFlag(ItemMoveInProgress, true);
+
+	for (QGraphicsItem* qItm : m_scene->selectedItems()) {
+		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(qItm);
+		if (otItem) {
+			otItem->setCurrentPosAsMoveStart();
+		}
+	}
+}
+
+void ot::GraphicsView::endItemMove(void) {
+	if (!(m_viewStateFlags & ItemMoveInProgress)) return;
+
+	m_viewStateFlags.setFlag(ItemMoveInProgress, false);
+
+	for (QGraphicsItem* qItm : m_scene->selectedItems()) {
+		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(qItm);
+		if (otItem) {
+			otItem->notifyMoveIfRequired();
+		}
 	}
 }

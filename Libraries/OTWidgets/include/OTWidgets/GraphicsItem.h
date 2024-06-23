@@ -303,6 +303,12 @@ namespace ot {
 		//! \brief If enabled the item will not call graphicsItemConfigurationChanged() when the flags have changed.
 		bool getBlockConfigurationNotifications(void) const { return m_blockConfigurationNotifications; };
 
+		//! \brief Sets the current item position as move start point.
+		void setCurrentPosAsMoveStart(void);
+
+		//! \brief Notifies the view if the items current position changed relative to the move start point.
+		void notifyMoveIfRequired(void);
+
 	protected:
 		//! \brief Returns the configuration for the current item.
 		//! The configuration may be modified.

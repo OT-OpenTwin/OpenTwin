@@ -41,10 +41,11 @@ namespace ot {
 		typedef Flags<GraphicsViewFlag> GraphicsViewFlags;
 
 		enum ViewStateFlag {
-			DefaultState = 0x00,
-			//LeftMousePressedState = 0x0100,
+			DefaultState            = 0x0000,
+			ItemMoveInProgress      = 0x0001,
+			//LeftMousePressedState   = 0x0100,
 			MiddleMousePressedState = 0x0200,
-			//RightMousePressedState = 0x0400,
+			//RightMousePressedState  = 0x0400,
 
 		};
 		typedef ot::Flags<ViewStateFlag> ViewStateFlags;
@@ -125,7 +126,17 @@ namespace ot {
 		virtual void dropEvent(QDropEvent* _event) override;
 		virtual void dragMoveEvent(QDragMoveEvent* _event) override;
 
-	private:		
+	private:
+		//! \brief Begins the item move handling if needed.
+		//! If the ot::GraphicsView::ViewStateFlag::ItemMoveInProgress is set the function instantly returns.
+		//! All currently selected items will update their move start point.
+		void beginItemMove(void);
+
+		//! \brief Ends the item move handling if needed.
+		//! If the ot::GraphicsView::ViewStateFlag::ItemMoveInProgress is not set the function instantly returns.
+		//! All currently selected items will notify a move change and configuration change if their position has changed.
+		void endItemMove(void);
+
 		GraphicsViewFlags m_viewFlags;
 		ViewStateFlags m_viewStateFlags;
 

@@ -136,7 +136,7 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 	_uiComponent->sendMessage(true, doc, tmp);
 }
 
-void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, ot::Point2DD& position, ClassFactory* classFactory)
+void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::Point2DD& position, ClassFactory* classFactory)
 {
 	std::list<ot::EntityInformation> entityInfos;
 	ot::UIDList entityIDList{ blockID };

@@ -16,6 +16,7 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/OwnerServiceGlobal.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTCommunication/ActionTypes.h"
@@ -78,73 +79,74 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 {
 	try
 	{
-	if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
-	{
-		std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-		if (action == _buttonRunPipeline.GetFullDescription())
+		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
-			auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID();
-			const bool isValid = _graphHandler.blockDiagramIsValid(allBlockEntities);
-			if (isValid)
+			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+			if (action == _buttonRunPipeline.GetFullDescription())
 			{
-				const std::list<std::shared_ptr<GraphNode>>& rootNodes = _graphHandler.getRootNodes();
-				const std::map<ot::UID, std::shared_ptr<GraphNode>> graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
-				_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
+				auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID();
+				const bool isValid = _graphHandler.blockDiagramIsValid(allBlockEntities);
+				if (isValid)
+				{
+					const std::list<std::shared_ptr<GraphNode>>& rootNodes = _graphHandler.getRootNodes();
+					const std::map<ot::UID, std::shared_ptr<GraphNode>> graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
+					_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
+				}
 			}
 		}
-	}
-	else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
-	{
-		if (m_selectedEntities.size() == 1)
+		else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
 		{
-			std::list<ot::EntityInformation> entityInfos;
-			m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
-		
-			auto entBase = m_modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), getClassFactory());
-			auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
-			if (dbAccess != nullptr)
+			if (m_selectedEntities.size() == 1)
 			{
-				auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
-				PropertyHandlerDatabaseAccessBlock::instance().PerformUpdateIfRequired(dbAccess, instance()->sessionServiceURL(), modelService->serviceURL());
+				std::list<ot::EntityInformation> entityInfos;
+				m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
+
+				auto entBase = m_modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), getClassFactory());
+				auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
+				if (dbAccess != nullptr)
+				{
+					auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
+					PropertyHandlerDatabaseAccessBlock::instance().PerformUpdateIfRequired(dbAccess, instance()->sessionServiceURL(), modelService->serviceURL());
+				}
 			}
 		}
-	}
-	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
-	{
-		std::string itemName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
-		std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-
-		ot::Point2DD position;
-		position.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
-
-		//Needs to be set once but modelConnect event cannot be used currently, since the modelstate in that point in time is a dummy.
-		ExternalDependencies dependencies;
-		if (dependencies.getPythonScriptFolderID() == 0)
+		else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
 		{
-			ot::EntityInformation entityInfo;
-			m_modelComponent->getEntityInformation("Scripts", entityInfo);
+			std::string itemName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
+			std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+
+			ot::Point2DD position;
+			position.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
+
+			//Needs to be set once but modelConnect event cannot be used currently, since the modelstate in that point in time is a dummy.
 			ExternalDependencies dependencies;
-			dependencies.setPythonScriptFolderID(entityInfo.getID());
-		}
+			if (dependencies.getPythonScriptFolderID() == 0)
+			{
+				ot::EntityInformation entityInfo;
+				m_modelComponent->getEntityInformation("Scripts", entityInfo);
+				ExternalDependencies dependencies;
+				dependencies.setPythonScriptFolderID(entityInfo.getID());
+			}
 
-		_blockEntityHandler.CreateBlockEntity(editorName, itemName, position);
-	}
-	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection)
-	{
-		ot::GraphicsConnectionPackage pckg;
-		pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
-		const std::string editorName = pckg.name();
-		_blockEntityHandler.AddBlockConnection(pckg.connections(), editorName);
-	}
-	else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemMoved)
-	{
-		
-		const ot::UID blockID = ot::json::getUInt64(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId);
-		ot::Point2DD position;
-		position.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
-		_blockEntityHandler.UpdateBlockPosition(blockID, position, &getClassFactory());
-		
-	}
+			_blockEntityHandler.CreateBlockEntity(editorName, itemName, position);
+		}
+		else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection)
+		{
+			ot::GraphicsConnectionPackage pckg;
+			pckg.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
+			const std::string editorName = pckg.name();
+			_blockEntityHandler.AddBlockConnection(pckg.connections(), editorName);
+		}
+		else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged)
+		{
+			std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+			ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::instance().createFromJSON(ot::json::getObject(_doc, OT_ACTION_PARAM_Config), OT_JSON_MEMBER_GraphicsItemCfgType);
+			if (!itemConfig) return "";
+
+			const ot::UID blockID = itemConfig->getUid();
+			_blockEntityHandler.UpdateBlockPosition(blockID, itemConfig->getPosition(), &getClassFactory());
+
+		}
 	}
 	catch (const std::exception& e)
 	{

@@ -17,7 +17,7 @@ public:
 	void CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
 	void AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections, const std::string& editorName);
 	void OrderUIToCreateBlockPicker();
-	void UpdateBlockPosition(const ot::UID& blockID, ot::Point2DD& position, ClassFactory *classFactory);
+	void UpdateBlockPosition(const ot::UID& blockID, const ot::Point2DD& position, ClassFactory *classFactory);
 	std::map<ot::UID, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID();
 
 	static std::string getQueryForRangeSelection() { return "Range"; }
