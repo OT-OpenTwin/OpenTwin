@@ -19,15 +19,24 @@ IF "%DEVENV_ROOT_2022%" == "" (
 	goto PAUSE_END
 )
 
+echo OPENTWIN_DEV_ROOT=%OPENTWIN_DEV_ROOT%
+echo OPENTWIN_THIRDPARTY_ROOT=%OPENTWIN_THIRDPARTY_ROOT%
+echo DEVENV_ROOT_2022=%DEVENV_ROOT_2022%
+
 REM The first argument of the shell defines whether a release or debug build shall be performed. BOTH (default) , RELEASE, DEBUG 
 REM The second argument of hte shell defines whether a full rebuild or just a build is performed. BUILD, REBUILD (default)
 REM Please note that the commands are case-sensitive and that they must not be enclosed in quotes.
 
 REM Call build script
 
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\RebuildAll.bat" BOTH BUILD
+echo "Starting RebuildAll.bat..."
+call "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\RebuildAll.bat" BOTH BUILD
+echo "Finished RebuildAll.bat"
 
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CheckForFailedBuilds.bat"
+echo "Starting CheckForFailedBuilds.bat..."
+call "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CheckForFailedBuilds.bat"
+echo "Finished CheckForFailedBuilds.bat"
+
 
 GOTO END
 
