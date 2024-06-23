@@ -15,12 +15,13 @@ namespace ot {
 	//! \brief General item transformation.
 	class OT_GUI_API_EXPORT Transform : public Serializable {
 	public:
+		//! \brief Flip state.
 		enum FlipState {
-			NoFlip           = 0x00,
-			FlipVertically   = 0x01,
-			FlipHorizontally = 0x02
+			NoFlip           = 0x00, //! \brief Item is not flipped.
+			FlipVertically   = 0x01, //! \brief Item is flipped vertically.
+			FlipHorizontally = 0x02 //! \brief Item is flipped horizontally.
 		};
-		typedef Flags<FlipState> FlipStateFlags;
+		typedef Flags<FlipState> FlipStateFlags; //! \brief Flip state flags.
 
 		//! \brief Default constructor.
 		//! No rotation angle and no flip.
@@ -35,7 +36,12 @@ namespace ot {
 
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		//! \brief Set item rotation.
+		//! The angle must be between 0 and 359 degrees.
 		void setRotation(double _angle) { m_rotation = _angle; };
+
+		//! \brief Item rotation.
+		//! The angle must be between 0 and 359 degrees.
 		double getRotation(void) const { return m_rotation; };
 
 		void setFlipState(FlipState _state, bool _active = true) { m_flipState.setFlag(_state, _active); };
@@ -46,8 +52,8 @@ namespace ot {
 		bool hasTransform(void) const { return m_rotation != 0. || m_flipState != FlipState::NoFlip; };
 
 	private:
-		double m_rotation;
-		FlipStateFlags m_flipState;
+		double m_rotation; //! \brief Item rotation.
+		FlipStateFlags m_flipState; //! \brief Item flip state.
 	};
 }
 

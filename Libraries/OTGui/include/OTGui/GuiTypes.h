@@ -15,7 +15,8 @@
 
 namespace ot {
 
-	//! @brief Alignment
+	//! \enum Alignment
+	//! \brief Alignment.
 	enum Alignment {
 		AlignCenter,
 		AlignTop,
@@ -28,13 +29,15 @@ namespace ot {
 		AlignTopLeft
 	};
 
-	//! @brief Orientation
+	//! \enum Orientation
+	//! \brief Orientation.
 	enum Orientation {
 		Horizontal,
 		Vertical
 	};
 
-	//! @brief Generally available font families
+	//! \enum FontFamily
+	//! \brief Generally available font families.
 	enum FontFamily {
 		Arial,
 		ComicSansMS,
@@ -49,28 +52,31 @@ namespace ot {
 		Verdana
 	};
 
-	//! @brief Size policy for UI elements
+	//! \enum SizePolicy
+	//! \brief Size policy for UI elements.
 	enum SizePolicy {
-		Preferred, //! The item size is the ideal size, the item wont shrink but may expand
-		Dynamic //! The item size will be ignored and the requested size will be used instead (only use for nested items)
+		Preferred, //! \brief The item size is the ideal size, the item wont shrink but may expand.
+		Dynamic //! \brief The item size will be ignored and the requested size will be used instead (only use for nested items).
 	};
 
-	//! @brief Describes in which direction a connetion from an item may face
+	//! \enum ConnectionDirection
+	//! \brief Describes in which direction a connetion from an item is starting.
 	enum ConnectionDirection {
-		ConnectAny, //! A connection from this item may go in any direction
-		ConnectLeft, //! Connection starts towards left
-		ConnectUp, //! Connection starts upwards
-		ConnectRight, //! Connection starts towards right
-		ConnectDown //! Connection starts downwards
+		ConnectAny, //! \brief Connections may start in any direction.
+		ConnectLeft, //! \brief Connections start towards left.
+		ConnectUp, //! \brief Connections start upwards.
+		ConnectRight, //! \brief Connections start towards right.
+		ConnectDown //! \brief Connections start downwards.
 	};
 
-	//! @brief Describes how the painter will behave when painting outsite the gradient area
+	//! \brief Describes how the painter will behave when painting outsite the gradient area.
 	enum GradientSpread {
-		PadSpread, //! Pad the outside area with the color at the closest stop point
-		RepeatSpread, //! Repeat the gradient
-		ReflectSpread //! Reflect the gradient
+		PadSpread, //! Pad the outside area with the color at the closest stop point.
+		RepeatSpread, //! Repeat the gradient.
+		ReflectSpread //! Reflect the gradient.
 	};
 
+	//! \enum BasicKey
 	enum BasicKey {
 		Key_A,
 		Key_B,

@@ -2,111 +2,25 @@ Graphics Editor
 ===============
 
 Create Items
-^^^^^^^^^^^^
+------------
 
-.. code-block:: c++
-
-   #include "OTGui/GraphicsItemCfg.h"
-
-   void foo(void) {
-      
-      
-
-   }
-
-Create Flow Blocks
-^^^^^^^^^^^^^^^^^^
-
-.. code-block:: c++
-
-   #include "OTGui/GraphicsPackage.h"
-
-   void foo(void) {
-      
-      
-
-   }
-
-Create Categories
-^^^^^^^^^^^^^^^^^
-
-.. code-block:: c++
-
-   #include "OTGui/GraphicsCollectionCfg.h"
-
-   void foo(void) {
-      // Create root collection
-      ot::GraphicsCollectionCfg* root = new ot::GraphicsCollectionCfg("Root", "Root category");
-
-      // Create A
-      ot::GraphicsCollectionCfg* categoryA = new ot::GraphicsCollectionCfg("A", "Child category A");
-
-      ot::GraphicsCollectionCfg* categoryA1 = new ot::GraphicsCollectionCfg("A.1", "Child category A.1");
-      ot::GraphicsCollectionCfg* categoryA2 = new ot::GraphicsCollectionCfg("A.2", "Child category A.2");
-
-      categoryA->addChildCollection(categoryA1);
-      categoryA->addChildCollection(categoryA2);
-      root->addChildCollection(categoryA);
-
-      // Create B
-      ot::GraphicsCollectionCfg* categoryB = new ot::GraphicsCollectionCfg("B", "Child category B");
-      ot::GraphicsCollectionCfg* categoryB1 = new ot::GraphicsCollectionCfg("B.1", "Child category B.1");
-      ot::GraphicsCollectionCfg* categoryB2 = new ot::GraphicsCollectionCfg("B.2", "Child category B.2");
-
-      categoryB->addChildCollection(categoryB1);
-      categoryB->addChildCollection(categoryB2);
-      root->addChildCollection(categoryB);
-
-      // Create items
-      ...
-
-      // Add items
-      categoryA1->addItem(newItem); // newItem must be a ot::GraphicsItemCfg object
-      ...
-   }
+Graphics items are "created" via configurations.
+Every type of item has its own configuration implementation in the ``OTGui`` library.
+These configurations are then used in the Frontend by the ``OTWidgets`` library to create the actual item.
+For more information read the ``ot::GraphicsItemCfg`` code documentation.
 
 Fill item picker
-^^^^^^^^^^^^^^^^
+----------------
 
-First the item picker must be filled.
-The item picker displays the different items for the user where he can drag them into a graphics view.
-
-.. code-block:: c++
-
-   #include "OTCore/Owner.h"
-   #include "OTCore/rJSON.h"
-   #include "OTGui/GraphicsPackage.h"
-
-   void foo(void) {
-      // Create collections and their items
-      ...
-
-      // Add created collections to package
-      GraphicsCollectionPackage pckg;
-      pckg.addCollection(rootCollection1);
-      pckg.addCollection(rootCollection2);
-
-      // Create the request that will be send to the UI:
-
-         // (1) Create request document
-         OT_rJSON_createDOC(requestObj);  
-         ot::rJSON::add(requestObj, OT_ACTION_MEMBER, OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker);
-
-         // (2) Add package
-         OT_rJSON_createValueObject(pckgObj);
-         pckg.addToJsonObject(requestObj, pckgObj);
-         ot::rJSON::add(requestObj, OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj);
-
-         // (3) Add required service information
-         ot::GlobalOwner::instance().addToJsonObject(requestObj, requestObj);
-
-         // (4) Create request
-         std::string request = ot::rJSON::toJSON(requestObj);
-   }
-
+The item picker is a tree structure containing the item information sorted in collections.
+To fill the item picker a ``ot::GraphicsPickerCollectionPackage`` must be provided.
+The collection package contains a list of (potentially nested) ``ot::GraphicsPickerCollectionCfg`` where every collection may be seen as a "folder".
+The collection contains child collections and a list of ``ot::GraphicsPickerCollectionCfg::ItemInformation``.
+Every information entry represents an item that the user can pick.
+A item information consists of the item name (that is used in the :ref:`Add Item Callback<add_item_callback>`), the item title that is displayed to the user and the preview icon.
 
 Add Items to View
-^^^^^^^^^^^^^^^^^
+-----------------
 
 .. code-block:: c++
 
@@ -140,7 +54,7 @@ Add Items to View
    }
 
 Remove Items from View
-^^^^^^^^^^^^^^^^^^^^^^
+----------------------
 
 .. code-block:: c++
 
@@ -167,7 +81,7 @@ Remove Items from View
    }
 
 Add Connections
-^^^^^^^^^^^^^^^
+---------------
 
 .. code-block:: c++
 
@@ -199,7 +113,7 @@ Add Connections
    }
 
 Remove Connections
-^^^^^^^^^^^^^^^^^^
+------------------
 
 .. code-block:: c++
 
@@ -230,15 +144,81 @@ Remove Connections
       ...
    }
 
-=============
-Configuration
-=============
+Callbacks
+---------
 
-A configuration consists of an Array containing ``Block Category`` objects.
-Every provided ``Block Category`` object will be added to the Block Picker Navigation as a root item.
+The Graphics API provides the following actions as callbacks:
+
+- :ref:`OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem<add_item_callback>`
+- :ref:`OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection<add_connection_callback>`
+- :ref:`OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged<item_changed_callback>`
+
+The actions are defined in ``OTCommunication/ActionTypes.h``.
 
 .. note::
-   If providing a ``Block Category`` with an already existing name, the affected categories will be merged.
+   
+   Note that remove requests are handled via the ModelEntities and not via the Graphics API.
 
-.. warning::
-   If providing items with the same name, any duplicates will be ignored.
+
+.. _add_item_callback:
+
+Add Item Callback
+^^^^^^^^^^^^^^^^^
+
+.. list-table:: Action Parameters
+   :header-rows: 1
+
+   * - Action Parameter
+     - Type
+     - Description
+   * - OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName
+     - String
+     - The name of the requested item.
+   * - OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition
+     - ot::Point2DD
+     - The position the user dropped the item at.
+   * - OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName
+     - String
+     - Name of the Graphics Editor.
+
+The add item action is sent whenever the user dropped a Graphics Item on the View.
+
+.. _add_connection_callback:
+
+Add Connection Callback
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table:: Action Parameters
+   :header-rows: 1
+
+   * - Action Parameter
+     - Type
+     - Description
+   * - OT_ACTION_PARAM_GRAPHICSEDITOR_Package
+     - ot::GraphicsConnectionPackage
+     - Package containing all connections and the editor name.
+
+The add connection action is sent when the user has created a valid connection in the Graphics Editor.
+A valid connection is a connection that has a valid origin and destination item and the origin and destination are not equal.
+
+.. _item_changed_callback:
+
+Item Changed Callback
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table:: Action Parameters
+   :header-rows: 1
+
+   * - Action Parameter
+     - Type
+     - Description
+   * - OT_ACTION_PARAM_Config
+     - ot::GraphicsItemCfg
+     - The current item configuration.
+   * - OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName
+     - String
+     - Name of the Graphics Editor.
+
+The change action is sent whenever the current item configuration has changed.
+For example the item has been moved (after the move operation is finished), transformed, renamed, and so on.
+In general, whenever any member of the ``ot::GraphicsItemCfg`` has changed in the Frontend the item changed action is sent.

@@ -28,8 +28,8 @@
 
 namespace ot {
 
-	//! @class GraphicsItemCfg
-	//! @brief The GraphicsItemCfg is the base class for all graphics item configurations.
+	//! \class GraphicsItemCfg
+	//! \brief The GraphicsItemCfg is the base class for all graphics item configurations.
 	class OT_GUI_API_EXPORT GraphicsItemCfg : public ot::Serializable {
 	public:
 
@@ -92,11 +92,9 @@ namespace ot {
 		// Setter / Getter
 
 		//! @brief Set item name
-		//! The item name must be unique for one item picker.
 		void setName(const std::string& _name) { m_name = _name; };
 
 		//! @brief Item name
-		//! The item name must be unique for one item picker.
 		const std::string& getName(void) const { return m_name; };
 
 		//! @brief Set item title
@@ -108,11 +106,11 @@ namespace ot {
 		const std::string& getTitle(void) const { return m_title; };
 
 		//! @brief Set ToolTip
-		//! ToolTips are displayed when the user hovers over an item.
-		//! If the root item in a graphics item hierarchy has a tool tip set, child items may be enabled to forward the tooltip request (See GraphicsItemFlags)
+		//! \see getToolTip
 		void setToolTip(const std::string& _toolTip) { m_tooltip = _toolTip; };
 
-		//! @brief ToolTip that will be displayed to the user when he hovers over the item
+		//! @brief ToolTip that will be displayed to the user when he hovers over the item.
+		//! If the root item in a graphics item hierarchy has a tool tip set, child items may be enabled to forward the tooltip request (see GraphicsItemFlags)
 		const std::string& getToolTip(void) const { return m_tooltip; };
 
 		//! @brief Set item position
@@ -133,10 +131,20 @@ namespace ot {
 		//! If the item is a child item, the position is the local position (default: 0.0; 0.0).
 		const Point2DD& getPosition(void) const { return m_pos; };
 
+		//! \brief Sets the item minimum size.
+		//! \see getMinimumSize
 		void setMinimumSize(const Size2DD& _size) { m_minSize = _size; };
+
+		//! \brief Item minimum size.
+		//! If the graphics item is resized (e.g. via layout) then it may not shrink below the minimum size.
 		const Size2DD& getMinimumSize(void) const { return m_minSize; };
 
+		//! \brief Sets the item maximum size.
+		//! \see getMaximumSize
 		void setMaximumSize(const Size2DD& _size) { m_maxSize = _size; };
+
+		//! \brief Item maximum size.
+		//! If the graphics item is resized (e.g. via layout) then it may not brow above the maximum size.
 		const Size2DD& getMaximumSize(void) const { return m_maxSize; };
 
 		//! @brief Set item margins
@@ -157,16 +165,39 @@ namespace ot {
 		void setGraphicsItemFlags(const GraphicsItemFlags& _flags) { m_flags = _flags; };
 		const GraphicsItemFlags& getGraphicsItemFlags(void) const { return m_flags; };
 
+		//! \brief Set the item alignment.
+		//! \see getAlignment.
 		void setAlignment(Alignment _align) { m_alignment = _align; };
+
+		//! \brief Current item alignment.
+		//! The alignment only has an effect if the item is nested.
 		Alignment getAlignment(void) const { return m_alignment; };
 
+		//! \brief Set item UID.
+		//! \see getUid
 		void setUid(const UID& _uid) { m_uid = _uid; };
+
+		//! \brief Item UID.
+		//! The item UID is used to uniquely identify an item in a GraphicsScene.
+		//! The must never exist two items with the same UID.
 		const ot::UID& getUid(void) const { return m_uid; };
 
+		//! \brief Set item size policy.
+		//! \see getSizePolicy.
 		void setSizePolicy(SizePolicy _policy) { m_sizePolicy = _policy; };
+
+		//! \brief Current item size policy.
+		//! The item size policy is used for nested items.
+		//! \see ot::SizePolicy
 		SizePolicy getSizePolicy(void) const { return m_sizePolicy; };
 
+		//! \brief Set the item connection direction.
+		//! \see getConnectionDirection(void)
 		void setConnectionDirection(ConnectionDirection _direction) { m_connectionDirection = _direction; };
+
+		//! \brief Current item connection direction.
+		//! This has only an effect if GraphicsItemFlag::ItemIsConnectable is set.
+		//! \see ot::ConnectionDirection
 		ConnectionDirection getConnectionDirection(void) const { return m_connectionDirection; };
 
 		//! \brief Adds the provided entry to the string map.
@@ -180,7 +211,7 @@ namespace ot {
 
 		//! \brief The string map may be used to reference a value via a key in a complex graphics item.
 		//! For example a text item with enabled reference mode will use the string map to set its text when created in the frontend.
-		//! \warning The string map must be set to the root item. Child items will be ignored.
+		//! \warning The string map must be set for the root item only. Child items will be ignored.
 		const std::map<std::string, std::string>& getStringMap(void) const { return m_stringMap; };
 
 		//! \brief Returns the string set for the given key in the string map.
@@ -204,24 +235,24 @@ namespace ot {
 		virtual void copyConfigDataToItem(GraphicsItemCfg* _target) const;
 
 	private:
-		std::string m_name;
-		std::string m_title;
-		ot::UID m_uid;
-		std::string m_tooltip;
-		Point2DD m_pos;
+		std::string m_name; //! \brief Item name.
+		std::string m_title; //! \brief Item title.
+		ot::UID m_uid; //! \brief Item UID.
+		std::string m_tooltip; //! \brief Item tool tip.
+		Point2DD m_pos; //! \brief Item position.
 
-		Size2DD m_minSize;
-		Size2DD m_maxSize;
+		Size2DD m_minSize; //! \brief Minimum item size.
+		Size2DD m_maxSize; //! \brief Maximum item size.
 
-		MarginsD m_margins;
-		GraphicsItemFlags m_flags;
-		ot::Alignment m_alignment;
-		ot::SizePolicy m_sizePolicy;
-		ConnectionDirection m_connectionDirection;
+		MarginsD m_margins; //! \brief Item margins.
+		GraphicsItemFlags m_flags; //! \brief Item flags.
+		ot::Alignment m_alignment; //! \brief Item alignment.
+		ot::SizePolicy m_sizePolicy; //! \brief Item size policy.
+		ConnectionDirection m_connectionDirection; //! \brief Item connection direction.
 
-		Transform m_transform;
+		Transform m_transform; //! \brief Item transformation.
 
-		std::map<std::string, std::string> m_stringMap;
+		std::map<std::string, std::string> m_stringMap; //! \brief Item's string map.
 	};
 
 }

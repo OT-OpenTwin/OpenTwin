@@ -272,7 +272,6 @@
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem "UI.GraphicsEditor.Item.Remove"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection "UI.GraphicsEditor.Connection.Add"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection "UI.GraphicsEditor.Connection.Remove"
-#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_SelectionChanged "UI.GraphicsEditor.SelectionChanged"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged "UI.GraphicsEditor.ItemChanged"
 
 #define OT_ACTION_CMD_UI_TEXTEDITOR_SetText "UI.TextEditor.SetText"
