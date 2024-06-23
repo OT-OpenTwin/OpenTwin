@@ -2,8 +2,9 @@ name: Pull from separate repo and run build script
 
 on:
   push:
-    branches:
-      - RunBuild
+    branches: [Ci]
+  pull_request:
+    branches: [Ci]
 
 jobs:
   pull-other-repo:
