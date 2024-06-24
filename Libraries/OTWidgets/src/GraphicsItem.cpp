@@ -80,6 +80,11 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	return true;
 }
 
+void ot::GraphicsItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {
+	this->getQGraphicsItem()->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
+	this->getQGraphicsItem()->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
+}
+
 void ot::GraphicsItem::graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) {
 	if (!m_scene) return;
 	OTAssertNullptr(m_scene->getGraphicsView());
@@ -280,7 +285,7 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 		this->raiseEvent(ot::GraphicsItem::ItemMoved);
 	}
 		break;
-
+		
 	default:
 		break;
 	}
@@ -364,7 +369,7 @@ void ot::GraphicsItem::setConfiguration(GraphicsItemCfg* _config) {
 	m_config = _config;
 
 	this->getQGraphicsItem()->setPos(QtFactory::toQPoint(m_config->getPosition()));
-	this->applyGraphicsItemTransform(m_config->getTransform());
+	this->applyGraphicsItemTransform();
 
 	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
 }
@@ -529,7 +534,7 @@ const std::map<std::string, std::string>& ot::GraphicsItem::getStringMap(void) c
 void ot::GraphicsItem::setGraphicsItemTransform(const Transform& _transform) {
 	OTAssertNullptr(m_config);
 	m_config->setTransform(_transform);
-	this->applyGraphicsItemTransform(m_config->getTransform());
+	this->applyGraphicsItemTransform();
 	this->getQGraphicsItem()->update();
 	for (GraphicsConnectionItem* con : m_connections) {
 		con->update();
@@ -595,10 +600,10 @@ std::list<ot::GraphicsConnectionCfg> ot::GraphicsItem::getConnectionCfgs()
 
 	for (auto childQGraphicsItem : getQGraphicsItem()->childItems()) 
 	{
-		ot::GraphicsItem* graphicsItem= dynamic_cast<ot::GraphicsItem*>(childQGraphicsItem);
+		ot::GraphicsItem* graphicsItem = dynamic_cast<ot::GraphicsItem*>(childQGraphicsItem);
 		if (graphicsItem != nullptr)
 		{
-			graphicConnectionCfgList.splice(graphicConnectionCfgList.end(),graphicsItem->getConnectionCfgs());
+			graphicConnectionCfgList.splice(graphicConnectionCfgList.end(), graphicsItem->getConnectionCfgs());
 		}
 	}
 	return graphicConnectionCfgList;
@@ -628,14 +633,46 @@ void ot::GraphicsItem::notifyMoveIfRequired(void) {
 	}
 }
 
-void ot::GraphicsItem::applyGraphicsItemTransform(const Transform& _transform) {
+void ot::GraphicsItem::parentItemTransformChanged(const QTransform& _parentTransform) {
+	if (!(this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIgnoresParentTransform)) return;
+	return;
+
+	// Calculate inverse transform of parent
+	QPointF transformOrigin;
+	QTransform ownTransform = this->calculateGraphicsItemTransform(transformOrigin);
+
+	QTransform invertedParentTransform = _parentTransform.inverted();
+	
+	// Combine with the item's own transformation
+	QTransform newTransform = invertedParentTransform * ownTransform;
+
+	QTransform centeredTransform;
+	centeredTransform.translate(transformOrigin.x(), transformOrigin.y());
+	centeredTransform *= newTransform;
+	centeredTransform.translate(-transformOrigin.x(), -transformOrigin.y());
+
+	//this->getQGraphicsItem()->setTransformOriginPoint(transformOrigin);
+	this->getQGraphicsItem()->setTransform(centeredTransform);
+}
+
+void ot::GraphicsItem::applyGraphicsItemTransform(void) {
 	OTAssertNullptr(this->getQGraphicsItem());
+	
+	// Apply transform
+	QPointF transformOrigin;
+	QTransform newTransform = this->calculateGraphicsItemTransform(transformOrigin);
+	this->getQGraphicsItem()->setTransformOriginPoint(transformOrigin);
+	this->getQGraphicsItem()->setTransform(newTransform);
+
+	this->notifyChildsAboutTransformChange(newTransform);
+}
+
+QTransform ot::GraphicsItem::calculateGraphicsItemTransform(QPointF& _transformOrigin) const {
 	QTransform newTransform;
-	QPointF itemCenter = this->getQGraphicsItem()->boundingRect().center();
+	_transformOrigin = this->getQGraphicsItem()->boundingRect().center();
 
 	// Adjust transformation origin
-	this->getQGraphicsItem()->setTransformOriginPoint(itemCenter);
-	newTransform.translate(itemCenter.x(), itemCenter.y());
+	newTransform.translate(_transformOrigin.x(), _transformOrigin.y());
 
 	// Flip
 	if (this->getGraphicsItemTransform().getFlipStateFlags() & Transform::FlipHorizontally) {
@@ -646,11 +683,10 @@ void ot::GraphicsItem::applyGraphicsItemTransform(const Transform& _transform) {
 	}
 
 	// Rotate
-	newTransform.rotate(_transform.getRotation());
+	newTransform.rotate(this->getGraphicsItemTransform().getRotation());
 
 	// Translate back
-	newTransform.translate(-itemCenter.x(), -itemCenter.y());
+	newTransform.translate(-_transformOrigin.x(), -_transformOrigin.y());
 
-	// Apply transform
-	this->getQGraphicsItem()->setTransform(newTransform);
+	return newTransform;
 }

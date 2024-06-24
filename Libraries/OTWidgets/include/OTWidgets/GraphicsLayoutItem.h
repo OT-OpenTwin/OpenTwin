@@ -45,6 +45,7 @@ namespace ot {
 
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override;
 		virtual QGraphicsItem* getQGraphicsItem(void) override;
+		virtual const QGraphicsItem* getQGraphicsItem(void) const override;
 
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName) override;
 
@@ -52,7 +53,13 @@ namespace ot {
 
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) override;
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Protected
+
 	protected:
+		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) override;
+
 		//! @brief Call this function from the item constructor to create the layout wrapper instance
 		void createLayoutWrapper(QGraphicsLayout* _layout);
 

@@ -22,6 +22,7 @@ bool ot::GraphicsLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	m_layoutWrap->setAcceptHoverEvents(true);
 	m_layoutWrap->setBlockConfigurationNotifications(true);
 	bool ret = ot::GraphicsItem::setupFromConfig(_cfg);
+	m_layoutWrap->setupFromConfig(this->getConfiguration());
 	m_layoutWrap->setBlockConfigurationNotifications(false);
 	return ret;
 }
@@ -110,6 +111,8 @@ QGraphicsLayoutItem* ot::GraphicsLayoutItem::getQGraphicsLayoutItem(void) {
 
 QGraphicsItem* ot::GraphicsLayoutItem::getQGraphicsItem(void) { return m_layoutWrap->getQGraphicsItem(); };
 
+const QGraphicsItem* ot::GraphicsLayoutItem::getQGraphicsItem(void) const { return m_layoutWrap->getQGraphicsItem(); };
+
 ot::GraphicsItem* ot::GraphicsLayoutItem::findItem(const std::string& _itemName) {
 	if (_itemName == this->getGraphicsItemName()) return this;
 	std::list<QGraphicsLayoutItem*> lst;
@@ -135,6 +138,24 @@ void ot::GraphicsLayoutItem::finalizeGraphicsItem(void) {
 		}
 		else {
 			OT_LOG_EA("GraphicsItem cast failed");
+		}
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected
+
+void ot::GraphicsLayoutItem::notifyChildsAboutTransformChange(const QTransform& _newTransform) {
+	std::list<QGraphicsLayoutItem*> itemsList;
+	this->getAllItems(itemsList);
+	for (auto i : itemsList) {
+		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
+		if (itm) {
+			itm->parentItemTransformChanged(_newTransform);
+		}
+		else {
+			OT_LOG_EA("Item cast failed");
 		}
 	}
 }

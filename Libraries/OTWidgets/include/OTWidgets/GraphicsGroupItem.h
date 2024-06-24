@@ -29,8 +29,7 @@ namespace ot {
 
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
-
-		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) override;
+		virtual const QGraphicsItem* getQGraphicsItem(void) const override { return this; };
 
 		virtual void graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) override;
 
@@ -68,6 +67,13 @@ namespace ot {
 		// Setter / Getter
 
 		void addItem(GraphicsItem* _item);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Protected
+
+	protected:
+		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) override;
 
 	private:
 		GraphicsGroupItem(const GraphicsGroupItem&) = delete;

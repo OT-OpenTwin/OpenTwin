@@ -42,8 +42,6 @@ namespace ot {
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
-		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) override;
-
 		virtual void graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) override;
 
 		//! @brief Will be called when this item was registered as an event handler and the child raised an event
@@ -55,6 +53,7 @@ namespace ot {
 
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
+		virtual const QGraphicsItem* getQGraphicsItem(void) const override { return this; };
 
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName) override;
 
@@ -86,6 +85,13 @@ namespace ot {
 		// Setter / Getter
 
 		void addItem(ot::GraphicsItem* _item, bool _isMaster, bool _isSlave);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Protected
+
+	protected:
+		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) override;
 
 	private:
 		void memClear(void);

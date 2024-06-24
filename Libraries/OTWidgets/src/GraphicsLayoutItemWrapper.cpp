@@ -64,11 +64,6 @@ void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOption
 	QGraphicsWidget::paint(_painter, _opt, _widget);
 }
 
-void ot::GraphicsLayoutItemWrapper::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {
-	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
-	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
-}
-
 void ot::GraphicsLayoutItemWrapper::removeAllConnections(void) {
 	ot::GraphicsItem::removeAllConnections();
 

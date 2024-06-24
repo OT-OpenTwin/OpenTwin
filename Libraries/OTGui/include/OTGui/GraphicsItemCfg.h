@@ -35,28 +35,33 @@ namespace ot {
 
 		//! @brief GraphicsItemFlag
 		enum GraphicsItemFlag {
-			NoFlags                  = 0x0000, //! \brief No item flags
-			ItemIsMoveable           = 0x0001, //! \brief Item may be used by the user. If the item has a parent, the item may be moved inside of the parent item
-			ItemIsConnectable        = 0x0002, //! \brief Item can be used as source or destination of a conncetion
+			NoFlags                    = 0x0000, //! \brief No item flags
+			ItemIsMoveable             = 0x0001, //! \brief Item may be used by the user. If the item has a parent, the item may be moved inside of the parent item
+			ItemIsConnectable          = 0x0002, //! \brief Item can be used as source or destination of a conncetion
 
 			//! \brief If the user hovers over this item and no tooltip is set, the tooltip request will be forwarded to the parent item.
 			//! \note If this flag is not set this item also wont forward tooltip requests from child items.
-			ItemForwardsTooltip      = 0x0004,
-			ItemSnapsToGrid	         = 0x0008, //! \brief Item snaps to grid.
+			ItemForwardsTooltip        = 0x0004,
+			ItemSnapsToGrid	           = 0x0008, //! \brief Item snaps to grid.
 
 			//! \brief User transform and transform shortcuts are enabled for this item.
 			//! The user can rotate and flip the item by using the shortcuts or actions.
-			ItemUserTransformEnabled = 0x0010,
+			ItemUserTransformEnabled   = 0x0010,
+
+			//! \brief Item transformations to the parent item will not affect this item.
+			//! If the item is located in a group for example, any transformations to the group won't affect this item.
+			//! The item will apply the inverse transformation to keep its transformation.
+			ItemIgnoresParentTransform = 0x0020,
 
 			//! \brief Item receives state changes.
 			//! The item will paint its border and/or background differently if the item is selected or is hovered by the user.
 			//! A StyleRefPainter2D will be used for painting the state.
 			//! \see enum class ot::ColorStyleValueEntry
-			ItemHandlesState         = 0x0100,
+			ItemHandlesState           = 0x0100,
 
 			//! \brief Item forwards state changes to child items.
 			//! If the root item is a container item (e.g. GraphicsGroupItem) it have this flag set in order to forward the state change to its child items.
-			ItemForwardsState        = 0x0200
+			ItemForwardsState          = 0x0200
 		};
 		typedef Flags<GraphicsItemFlag> GraphicsItemFlags; //! @brief GraphicsItemFlags
 

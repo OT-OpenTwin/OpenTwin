@@ -15,9 +15,10 @@
 #include "OTGui/GraphicsConnectionCfg.h"
 
 // Qt header
+#include <QtCore/qpoint.h>
+#include <QtGui/qtransform.h>
 #include <QtWidgets/qgraphicsitem.h>
 #include <QtWidgets/qgraphicslayoutitem.h>
-#include <QtCore/qpoint.h>
 
 // std header
 #include <list>
@@ -98,6 +99,9 @@ namespace ot {
 		//! \brief Returns the QGraphicsItem.
 		virtual QGraphicsItem* getQGraphicsItem(void) = 0;
 
+		//! \brief Returns the const QGraphicsItem.
+		virtual const QGraphicsItem* getQGraphicsItem(void) const = 0;
+
 		//! \brief Calls QGraphicsLayoutItem::prepareGeometryChange().
 		virtual void prepareGraphicsItemGeometryChange(void) = 0;
 
@@ -118,7 +122,7 @@ namespace ot {
 		virtual void graphicsItemEventHandler(GraphicsItem* _sender, GraphicsItemEvent _event) {};
 
 		//! \brief Will be called whenever the GraphicsItem flags have changed.
-		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {};
+		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags);
 
 		//! \brief Will be called whenever the GraphicsItem state flags have changed.
 		virtual void graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {};
@@ -309,6 +313,8 @@ namespace ot {
 		//! \brief Notifies the view if the items current position changed relative to the move start point.
 		void notifyMoveIfRequired(void);
 
+		void parentItemTransformChanged(const QTransform& _parentTransform);
+
 	protected:
 		//! \brief Returns the configuration for the current item.
 		//! The configuration may be modified.
@@ -322,7 +328,11 @@ namespace ot {
 		//! The method will return 0 if the cast failed.
 		template <class T> const T* getItemConfiguration(void) const;
 
-		virtual void applyGraphicsItemTransform(const Transform& _transform);
+		virtual void applyGraphicsItemTransform(void);
+
+		QTransform calculateGraphicsItemTransform(QPointF& _transformOrigin) const;
+
+		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) {};
 
 	private:
 		GraphicsItemCfg* m_config; //! \brief Configuration used to setup this item. Default 0.
@@ -338,7 +348,7 @@ namespace ot {
 		bool m_blockStateNotifications;
 		bool m_blockFlagNotifications;
 		bool m_blockConfigurationNotifications;
-
+		
 		std::list<GraphicsItem*> m_eventHandler;
 		std::list<GraphicsConnectionItem*> m_connections;
 	};

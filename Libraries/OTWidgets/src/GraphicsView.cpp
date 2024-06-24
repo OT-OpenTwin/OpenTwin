@@ -126,7 +126,7 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	if (it != m_items.end()) {
 		OT_LOG_D("Overwriting item with the ID \"" + std::to_string(_item->getGraphicsItemUid()));
 		removeConnectionBufferApplied = true;
-		this->removeItem(_item->getGraphicsItemUid(),removeConnectionBufferApplied);
+		this->removeItem(_item->getGraphicsItemUid(), removeConnectionBufferApplied);
 	}
 
 	_item->setBlockConfigurationNotifications(true);
@@ -144,7 +144,7 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 
 	if (removeConnectionBufferApplied) {
 		for (const GraphicsConnectionCfg& bufferedConnection : m_itemRemovalConnectionBuffer) {
-			addConnection(bufferedConnection);
+			this->addConnection(bufferedConnection);
 		}
 		m_itemRemovalConnectionBuffer.clear();
 	}

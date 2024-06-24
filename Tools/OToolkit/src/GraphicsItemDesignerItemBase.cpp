@@ -78,6 +78,9 @@ void GraphicsItemDesignerItemBase::fillBasePropertyGrid(ot::PropertyGridCfg& _co
 	transformGroup->addProperty(new PropertyDouble("Rotation", this->getGraphicsItem()->getGraphicsItemTransform().getRotation(), 0., 359.99));
 	transformGroup->addProperty(new PropertyBool("Flip Horizontal", this->getGraphicsItem()->getGraphicsItemTransform().getFlipStateFlags() & Transform::FlipHorizontally));
 	transformGroup->addProperty(new PropertyBool("Flip Vertical", this->getGraphicsItem()->getGraphicsItemTransform().getFlipStateFlags() & Transform::FlipVertically));
+	PropertyBool* ignoreParentTransformProp = new PropertyBool("Ignore Parent Transform", this->getGraphicsItem()->getGraphicsItemFlags() & GraphicsItemCfg::ItemIgnoresParentTransform);
+	ignoreParentTransformProp->setPropertyTip("If enabled the item will remain in the provided orientation by inversing any parent item's transformation and applying its own.");
+	transformGroup->addProperty(ignoreParentTransformProp);
 
 	_config.addRootGroup(generalGroup);
 	_config.addRootGroup(transformGroup);
@@ -188,6 +191,16 @@ bool GraphicsItemDesignerItemBase::basePropertyChanged(const ot::Property* _prop
 		Transform newTransform = this->getGraphicsItem()->getGraphicsItemTransform();
 		newTransform.setFlipState(Transform::FlipVertically, actualProperty->getValue());
 		this->getGraphicsItem()->setGraphicsItemTransform(newTransform);
+		return true;
+	}
+	else if (group->getName() == "Transform" && _property->getPropertyName() == "Ignore Parent Transform") {
+		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
+			return false;
+		}
+
+		this->getGraphicsItem()->setGraphicsItemFlag(GraphicsItemCfg::ItemIgnoresParentTransform, actualProperty->getValue());
 		return true;
 	}
 

@@ -66,11 +66,6 @@ void ot::GraphicsGroupItem::callPaint(QPainter* _painter, const QStyleOptionGrap
 	this->paint(_painter, _opt, _widget);
 }
 
-void ot::GraphicsGroupItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {
-	this->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
-	this->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
-}
-
 void ot::GraphicsGroupItem::graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {
 	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState) {
 		for (auto i : this->childItems()) {
@@ -186,4 +181,20 @@ void ot::GraphicsGroupItem::addItem(GraphicsItem* _item) {
 	_item->setParentGraphicsItem(this);
 
 	this->addToGroup(_item->getQGraphicsItem());
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected
+
+void ot::GraphicsGroupItem::notifyChildsAboutTransformChange(const QTransform& _newTransform) {
+	for (auto i : this->childItems()) {
+		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
+		if (itm) {
+			itm->parentItemTransformChanged(_newTransform);
+		}
+		else {
+			OT_LOG_EA("Item cast failed");
+		}
+	}
 }
