@@ -214,7 +214,7 @@ namespace ot {
 
 		//! \brief Set the GraphicsScene this item is placed at.
 		virtual void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
-
+		
 		//! \brief Returns the GraphicsScene this item is placed at.
 		GraphicsScene* getGraphicsScene(void) const { return (m_parent ? m_parent->getGraphicsScene() : m_scene); };
 

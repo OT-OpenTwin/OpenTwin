@@ -86,9 +86,9 @@ void ot::GraphicsItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsI
 }
 
 void ot::GraphicsItem::graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) {
-	if (!m_scene) return;
-	OTAssertNullptr(m_scene->getGraphicsView());
-	m_scene->getGraphicsView()->notifyItemConfigurationChanged(this);
+	if (!this->getGraphicsScene()) return;
+	OTAssertNullptr(this->getGraphicsScene()->getGraphicsView());
+	this->getGraphicsScene()->getGraphicsView()->notifyItemConfigurationChanged(this);
 }
 
 ot::GraphicsItem* ot::GraphicsItem::findItem(const std::string& _itemName) {
@@ -139,8 +139,8 @@ bool ot::GraphicsItem::graphicsItemRequiresHover(void) const {
 
 void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) {
-		OTAssertNullptr(m_scene);
-		m_scene->startConnection(this);
+		OTAssertNullptr(this->getGraphicsScene());
+		this->getGraphicsScene()->startConnection(this);
 		return;
 	}
 	else if (m_parent) {
@@ -149,16 +149,16 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	}
 	
 	if ((this->getQGraphicsItem()->flags() & QGraphicsItem::ItemIsSelectable) && !this->getQGraphicsItem()->isSelected()) {
-		OTAssertNullptr(m_scene);
+		OTAssertNullptr(this->getGraphicsScene());
 		if (_event->modifiers() != Qt::ControlModifier) {
-			m_scene->setIgnoreEvents(true);
-			m_scene->clearSelection();
-			m_scene->setIgnoreEvents(false);
+			this->getGraphicsScene()->setIgnoreEvents(true);
+			this->getGraphicsScene()->clearSelection();
+			this->getGraphicsScene()->setIgnoreEvents(false);
 		}
 		this->getQGraphicsItem()->setSelected(true);
 		this->handleItemChange(QGraphicsItem::ItemSelectedHasChanged, QVariant());
 
-		m_scene->handleSelectionChanged();
+		this->getGraphicsScene()->handleSelectionChanged();
 	}
 	if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) && _event->modifiers() != Qt::ControlModifier) {
 		this->setBlockConfigurationNotifications(true);
@@ -180,10 +180,10 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 		OTAssertNullptr(qitm);
 		// Check if the item has moved after the user released the mouse
 		if (qitm->pos() != m_moveStartPt) {
-			OTAssertNullptr(m_scene);
-			OTAssertNullptr(m_scene->getGraphicsView());
-			m_scene->getGraphicsView()->notifyItemMoved(this);
-			m_scene->getGraphicsView()->notifyItemConfigurationChanged(this);
+			OTAssertNullptr(this->getGraphicsScene());
+			OTAssertNullptr(this->getGraphicsScene()->getGraphicsView());
+			this->getGraphicsScene()->getGraphicsView()->notifyItemMoved(this);
+			this->getGraphicsScene()->getGraphicsView()->notifyItemConfigurationChanged(this);
 		}
 	}
 }
@@ -269,7 +269,7 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 	case QGraphicsItem::ItemScenePositionHasChanged:
 	{
 		if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemSnapsToGrid) && !m_parent) {
-			QPointF pos = m_scene->snapToGrid(this->getQGraphicsItem()->pos());
+			QPointF pos = this->getGraphicsScene()->snapToGrid(this->getQGraphicsItem()->pos());
 			if (pos != this->getQGraphicsItem()->pos()) {
 				this->setGraphicsItemPos(pos);
 				this->getGraphicsScene()->update();
@@ -625,11 +625,11 @@ void ot::GraphicsItem::setCurrentPosAsMoveStart(void) {
 
 void ot::GraphicsItem::notifyMoveIfRequired(void) {
 	OTAssertNullptr(this->getQGraphicsItem());
-	OTAssertNullptr(m_scene);
-	OTAssertNullptr(m_scene->getGraphicsView());
+	OTAssertNullptr(this->getGraphicsScene());
+	OTAssertNullptr(this->getGraphicsScene()->getGraphicsView());
 	if (m_moveStartPt != this->getQGraphicsItem()->pos()) {
-		m_scene->getGraphicsView()->notifyItemMoved(this);
-		m_scene->getGraphicsView()->notifyItemConfigurationChanged(this);
+		this->getGraphicsScene()->getGraphicsView()->notifyItemMoved(this);
+		this->getGraphicsScene()->getGraphicsView()->notifyItemConfigurationChanged(this);
 	}
 }
 
