@@ -27,11 +27,13 @@
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
+#include "OTGui/GraphicsItemCfgFactory.h"
 #include "OTCommunication/ActionTypes.h"
 #include "EntitySolverCircuitSimulator.h"
 #include "EntityBlockConnection.h"
 #include "DataBase.h"
-
+#include "ClassFactoryBlock.h"
+#include "ClassFactory.h"
 
 // Third Party Header
 #include <ngspice/sharedspice.h>
@@ -211,7 +213,10 @@ void Application::deleteInstance(void) {
 Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService, new UiNotifier(), new ModelNotifier())
 {
-	
+	ClassFactory& classFactory = getClassFactory();
+	ClassFactoryBlock* classFactoryBlock = new ClassFactoryBlock();
+	classFactoryBlock->SetChainRoot(&classFactory);
+	classFactory.SetNextHandler(classFactoryBlock);
 }
 
 Application::~Application()
@@ -724,6 +729,18 @@ std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _d
 	else {
 		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed);
 	}
+}
+
+std::string Application::handleItemChanged(ot::JsonDocument& _document)
+{
+	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+	ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::instance().createFromJSON(ot::json::getObject(_document, OT_ACTION_PARAM_Config), OT_JSON_MEMBER_GraphicsItemCfgType);
+	if (!itemConfig) return "";
+
+	const ot::UID blockID = itemConfig->getUid();
+	m_blockEntityHandler.UpdateBlockPosition(blockID, itemConfig->getPosition(), &getClassFactory());
+
+	return "";
 }
 
 // ############################## ####################################################################################################################################################################################

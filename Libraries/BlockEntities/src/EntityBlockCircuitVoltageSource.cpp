@@ -7,7 +7,7 @@
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
-
+#include "OTGui/GraphicsItemFileCfg.h"
 
 EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
@@ -372,9 +372,19 @@ std::string EntityBlockCircuitVoltageSource::getFunction()
 
 
 
-
+#define TEST_ITEM_LOADER true
 ot::GraphicsItemCfg* EntityBlockCircuitVoltageSource::CreateBlockCfg()
 {
+#if TEST_ITEM_LOADER==true
+	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
+	newConfig->setName("EntityBlockCircuitVoltageSource");
+	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState);
+	newConfig->setFile("Circuit/VoltageSource.ot.json");
+	newConfig->addStringMapEntry("Name", "V1");
+	//newConfig->setTransform(ot::Transform(90., ot::Transform::FlipHorizontally));
+	return newConfig;
+#endif
+
 	ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
 	myStack->setName("EntityBlockCircuitVoltageSource");
 	myStack->setTitle("EntityBlockCircuitVoltageSource");

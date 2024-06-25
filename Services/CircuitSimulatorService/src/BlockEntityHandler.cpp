@@ -63,6 +63,29 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	_modelComponent->addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
 }
 
+void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::Point2DD& position, ClassFactory* classFactory)
+{
+	
+	
+	std::list<ot::EntityInformation> entityInfos;
+	ot::UIDList entityIDList{ blockID };
+	_modelComponent->getEntityInformation(entityIDList, entityInfos);
+	auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), *classFactory);
+	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
+
+	ot::UID positionID = blockEnt->getCoordinateEntityID();
+	entityInfos.clear();
+	entityIDList = { positionID };
+	_modelComponent->getEntityInformation(entityIDList, entityInfos);
+	entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), *classFactory);
+	std::unique_ptr<EntityCoordinates2D> coordinateEnt(dynamic_cast<EntityCoordinates2D*>(entBase));
+	coordinateEnt->setCoordinates(position);
+	coordinateEnt->StoreToDataBase();
+	_modelComponent->addEntitiesToModel({}, {}, {}, { coordinateEnt->getEntityID() }, { coordinateEnt->getEntityStorageVersion() }, { blockID }, "Update BlockItem position");
+
+}
+
+
 
 
 void BlockEntityHandler::OrderUIToCreateBlockPicker()
