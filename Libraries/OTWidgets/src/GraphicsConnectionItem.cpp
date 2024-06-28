@@ -113,12 +113,12 @@ void ot::GraphicsConnectionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _ev
 
 void ot::GraphicsConnectionItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 	m_state |= HoverState;
-	//this->update();
+	this->update();
 }
 
 void ot::GraphicsConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 	m_state &= (~HoverState);
-	//this->update();
+	this->update();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
