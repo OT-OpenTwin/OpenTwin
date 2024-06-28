@@ -172,6 +172,7 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool bufferConnection
 	m_scene->blockSignals(true);
 
 	ot::GraphicsItem* graphicsItem =  graphicsItemByUID->second;
+	OTAssertNullptr(graphicsItem);
 	if (bufferConnections)
 	{
 		m_itemRemovalConnectionBuffer = graphicsItem->getConnectionCfgs();
@@ -247,7 +248,6 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 	newConnection->setConfiguration(_config);
 	
 	m_scene->addItem(newConnection);
-	//newConnection->setGraphicsScene(m_scene);
 	newConnection->connectItems(srcConn, destConn);
 	newConnection->setZValue(1);
 
@@ -279,6 +279,7 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
 
 	// Remove connection from items
 	ot::GraphicsConnectionItem* connection = connectionByUID->second;
+	OTAssertNullptr(connection);
 	connection->disconnectItems();
 
 	// Destroy connection

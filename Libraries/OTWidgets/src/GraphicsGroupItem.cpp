@@ -55,6 +55,10 @@ bool ot::GraphicsGroupItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 }
 
 void ot::GraphicsGroupItem::removeAllConnections(void) {
+	for (QGraphicsItem* itm : this->childItems()) {
+		GraphicsItem* actualItem = dynamic_cast<GraphicsItem*>(itm);
+		if (actualItem) actualItem->removeAllConnections();
+	}
 	ot::GraphicsItem::removeAllConnections();
 }
 

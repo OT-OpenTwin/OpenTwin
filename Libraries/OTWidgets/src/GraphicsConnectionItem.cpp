@@ -113,12 +113,12 @@ void ot::GraphicsConnectionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _ev
 
 void ot::GraphicsConnectionItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 	m_state |= HoverState;
-	this->update();
+	//this->update();
 }
 
 void ot::GraphicsConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 	m_state &= (~HoverState);
-	this->update();
+	//this->update();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -147,10 +147,6 @@ void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsIte
 }
 
 void ot::GraphicsConnectionItem::disconnectItems(void) {
-	this->prepareGeometryChange();
-
-	//m_lastRect = this->boundingRect();
-
 	if (m_origin) {
 		m_origin->forgetConnection(this);
 		m_origin = nullptr;
