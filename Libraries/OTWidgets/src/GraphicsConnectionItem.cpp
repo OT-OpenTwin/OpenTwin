@@ -97,8 +97,7 @@ void ot::GraphicsConnectionItem::mousePressEvent(QGraphicsSceneMouseEvent* _even
 				sc->setIgnoreEvents(false);
 			}
 			this->setSelected(true);
-			this->update();
-
+	
 			sc->handleSelectionChanged();
 		}
 		else {
@@ -144,13 +143,13 @@ void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsIte
 	m_dest->storeConnection(this);
 
 	this->updateConnectionInformation();
-	this->updateConnection();
+	this->updateConnectionView();
 }
 
 void ot::GraphicsConnectionItem::disconnectItems(void) {
 	this->prepareGeometryChange();
 
-	m_lastRect = this->boundingRect();
+	//m_lastRect = this->boundingRect();
 
 	if (m_origin) {
 		m_origin->forgetConnection(this);
@@ -160,20 +159,23 @@ void ot::GraphicsConnectionItem::disconnectItems(void) {
 		m_dest->forgetConnection(this);
 		m_dest = nullptr;
 	}
-
-	this->updateConnectionInformation();
 }
 
-void ot::GraphicsConnectionItem::updateConnection(void) {
+void ot::GraphicsConnectionItem::forgetItem(const GraphicsItem* _item) {
+	if (m_origin == _item) {
+		m_origin = nullptr;
+	}
+	if (m_dest == _item) {
+		m_dest = nullptr;
+	}
+}
+
+void ot::GraphicsConnectionItem::updateConnectionView(void) {
 	if (m_origin && m_dest) {
 		this->prepareGeometryChange();
 		this->update();
 	}
 }
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Private functions
 
 void ot::GraphicsConnectionItem::updateConnectionInformation(void) {
 	if (m_origin) {
@@ -194,6 +196,10 @@ void ot::GraphicsConnectionItem::updateConnectionInformation(void) {
 		m_config.setDestUid(0);
 	}
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private functions
 
 void ot::GraphicsConnectionItem::calculatePainterPath(QPainterPath& _path) const {
 	switch (m_config.getLineShape())

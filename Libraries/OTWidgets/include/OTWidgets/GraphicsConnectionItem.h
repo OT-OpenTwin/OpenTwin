@@ -74,17 +74,33 @@ namespace ot {
 		void setLineStyle(const OutlineF& _style) { m_config.setLineStyle(_style); this->update(); };
 		const OutlineF& getLineStyle(void) const { return m_config.getLineStyle(); };
 
-		void updateConnection(void);
+		void updateConnectionView(void);
 
+		//! \brief Sets the origin and destination items.
+		//! Will call GraphicsItem::storeConnection for every connected item.
+		//! Calls GraphicsConnectionItem::updateConnectionInformation.
 		void connectItems(GraphicsItem* _origin, GraphicsItem* _dest);
+
+		//! \brief Unsets the origin and destination items.
+		//! Will call GraphicsItem::forgetConnection for every connected item.
+		//! Does not call GraphicsConnectionItem::updateConnectionInformation.
 		void disconnectItems(void);
+
+		//! \brief Sets the origin and/or destination to null.
+		//! If the item is the origin item, origin will be set to null.
+		//! If the item is the destination item, destination will be set to null.
+		//! Does not call GraphicsConnectionItem::updateConnectionInformation.
+		void forgetItem(const GraphicsItem* _item);
 
 		GraphicsItem* originItem(void) const { return m_origin; };
 		GraphicsItem* destItem(void) const { return m_dest; };
 
-	private:
+		//! \brief Updates the configuration according to the origin and/or destination item.
+		//! If no orgin is set the origin connectable name will be an empty string and the UID 0.
+		//! Same applies to the destination.
 		void updateConnectionInformation(void);
 
+	private:
 		void calculatePainterPath(QPainterPath& _path) const;
 		void calculateDirectLinePath(QPainterPath& _path) const;
 		void calculateSmoothLinePath(QPainterPath& _path) const;

@@ -54,7 +54,9 @@ ot::GraphicsItem::GraphicsItem(GraphicsItemCfg* _configuration, const ot::Flags<
 }
 
 ot::GraphicsItem::~GraphicsItem() {
-
+	for (GraphicsConnectionItem* connection : m_connections) {
+		connection->forgetItem(this);
+	}
 }
 
 // ###############################################################################################################################################
@@ -280,7 +282,7 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 		m_config->setPosition(QtFactory::toPoint2D(this->getQGraphicsItem()->pos()));
 
 		for (auto c : m_connections) {
-			c->updateConnection();
+			c->updateConnectionView();
 		}
 		this->raiseEvent(ot::GraphicsItem::ItemMoved);
 	}
