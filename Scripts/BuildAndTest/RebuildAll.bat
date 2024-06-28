@@ -1,4 +1,4 @@
-@ECHO OFF
+@ECHO ON
 
 REM The first argument of the shell defines whether a release or debug build shall be performed. BOTH (default) , RELEASE, DEBUG 
 REM The second argument of hte shell defines whether a full rebuild or just a build is performed. BUILD, REBUILD (default)
@@ -87,7 +87,7 @@ REM ====================================================================
 ECHO ===============================================================
 ECHO Build Library: OpenTwinSystem
 ECHO ===============================================================
-CALL "%OT_SYSTEM_ROOT%\build.bat" %1 %2
+CALL "%OT_SYSTEM_ROOT%\build.bat" %1 %2 /verbosity:detailed
 
 ECHO ===============================================================
 ECHO Build Library: OpenTwinCore
