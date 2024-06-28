@@ -23,6 +23,9 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/Encryption.h"
 
+// std header
+#include <thread>
+
 Application* Application::instance(void) {
 	static Application* g_instance{ nullptr };
 	if (g_instance == nullptr) { g_instance = new Application; }
@@ -56,15 +59,7 @@ std::string Application::handleProjectSave(ot::JsonDocument& _document) {
 }
 
 std::string Application::handleSelectionChanged(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::list<ot::UID> selectedEntityID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
-	std::list<ot::UID> selectedVisibleEntityID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedVisibleEntityIDs);
-	m_model->modelSelectionChangedNotification(selectedEntityID, selectedVisibleEntityID);
-
+	this->queueAction(ActionType::SelectionChanged, _document);
 	return "";
 }
 
@@ -1082,7 +1077,9 @@ void Application::preShutdown(void) {
 }
 
 void Application::shuttingDown(void) {
-
+	m_asyncActionMutex.lock();
+	m_continueAsyncActionWorker = false;
+	m_asyncActionMutex.unlock();
 }
 
 bool Application::startAsRelayService(void) const {
@@ -1105,11 +1102,76 @@ bool Application::settingChanged(const ot::Property* _item) {
 
 // Private functions
 
+void Application::queueAction(ActionType _type, const ot::JsonDocument& _document) {
+	ActionData newData;
+	newData.type = _type;
+	newData.document = _document.toJson();
+
+	m_asyncActionMutex.lock();
+	m_queuedActions.push_back(newData);
+	m_asyncActionMutex.unlock();
+}
+
+void Application::asyncActionWorker(void) {
+	while (this->getContinueAsyncActionWorker()) {
+		// Check if a action is present
+		m_asyncActionMutex.lock();
+		if (m_queuedActions.empty()) {
+			m_asyncActionMutex.unlock();
+
+			// No action, sleep for 10ms
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(10ms);
+			continue;
+		}
+
+		// Get next action
+		ActionData nextAction = m_queuedActions.front();
+		m_queuedActions.pop_front();
+		m_asyncActionMutex.unlock();
+
+		ot::JsonDocument actionDocument;
+		actionDocument.fromJson(nextAction.document);
+
+		// Dispatch
+		switch (nextAction.type)
+		{
+		case ActionType::SelectionChanged:
+			this->handleAsyncSelectionChanged(actionDocument);
+			break;
+		default:
+			OT_LOG_E("Unknown action type (" + std::to_string((int)nextAction.type) + ")");
+			break;
+		}
+	}
+}
+
+void Application::handleAsyncSelectionChanged(const ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_EA("No model created yet");
+	}
+
+	std::list<ot::UID> selectedEntityID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
+	std::list<ot::UID> selectedVisibleEntityID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedVisibleEntityIDs);
+	m_model->modelSelectionChangedNotification(selectedEntityID, selectedVisibleEntityID);
+}
+
+bool Application::getContinueAsyncActionWorker(void) {
+	bool ret = false;
+	m_asyncActionMutex.lock();
+	ret = m_continueAsyncActionWorker;
+	m_asyncActionMutex.unlock();
+	return ret;
+}
+
 Application::Application() 
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL, new UiNotifier, new ModelNotifier),
-	m_model(nullptr)
+	m_model(nullptr), m_continueAsyncActionWorker(true)
 {
 	m_notifier = new MicroserviceNotifier;
+
+	std::thread asyncActionThread(&Application::asyncActionWorker, this);
+	asyncActionThread.detach();
 }
 
 Application::~Application() {

@@ -9,11 +9,19 @@
 // OpenTwin header
 #include "OTServiceFoundation/ApplicationBase.h"
 
+// std header
+#include <list>
+#include <mutex>
+
 class Model;
 class MicroserviceNotifier;
 
 class Application : public ot::ApplicationBase {
 public:
+	enum class ActionType {
+		SelectionChanged
+	};
+
 	static Application* instance(void);
 	
 	OT_HANDLER(handleDeleteModel, Application, OT_ACTION_CMD_MODEL_Delete, ot::SECURE_MESSAGE_TYPES)
@@ -151,9 +159,26 @@ public:
 	virtual bool settingChanged(const ot::Property* _item) override;
 
 private:
+	void queueAction(ActionType _type, const ot::JsonDocument& _document);
+
+	void asyncActionWorker(void);
+
+	void handleAsyncSelectionChanged(const ot::JsonDocument& _document);
+
+	bool getContinueAsyncActionWorker(void);
+
+	struct ActionData {
+		ActionType type;
+		std::string document;
+	};
+
+	std::mutex m_asyncActionMutex;
+	std::list<ActionData> m_queuedActions;
+	bool m_continueAsyncActionWorker;
+
 	Model* m_model;
 	MicroserviceNotifier* m_notifier;
-
+	
 	Application();
 	~Application();
 };
