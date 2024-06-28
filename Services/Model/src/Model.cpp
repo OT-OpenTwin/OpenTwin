@@ -2192,10 +2192,11 @@ std::list<ot::UID> Model::RemoveBlockConnections(std::list<EntityBase*>& entitie
 	{
 		EntityBlock* entityBlock = dynamic_cast<EntityBlock*>(blockEntityBase);
 		assert(entityBlock != nullptr);
-		auto& allConnectionIDs = entityBlock->getAllConnections();
+		ot::UIDList allConnectionIDs = entityBlock->getAllConnections();
+		allConnectionIDs.unique();
 
 		//Now delete all connections from connected entities and delete the connection entities.
-		for (auto& connectionID : allConnectionIDs)
+		for (ot::UID connectionID : allConnectionIDs)
 		{
 			EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entityMap[connectionID]);
 			ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
@@ -2246,11 +2247,22 @@ std::list<ot::UID> Model::RemoveBlockConnections(std::list<EntityBase*>& entitie
 		EntityBlock* originBlock = dynamic_cast<EntityBlock*>(originBlockBase);
 		assert(originBlock != nullptr);
 		assert(destinationBlock != nullptr);
-		originBlock->RemoveConnection(connectionID);
-		destinationBlock->RemoveConnection(connectionID);
+		if (originBlock) {
+			originBlock->RemoveConnection(connectionID);
+			entitiesMarkedForStorage.insert(originBlock);
+		}
+		else {
+			OT_LOG_EA("Origin block was null");
+		}
+		if (destinationBlock) {
+			destinationBlock->RemoveConnection(connectionID);
+			entitiesMarkedForStorage.insert(destinationBlock);
+		}
+		else {
+			OT_LOG_EA("Destination block was null");
+		}
+
 		entitiesForRemoval.push_back(connectionID);
-		entitiesMarkedForStorage.insert(destinationBlock);
-		entitiesMarkedForStorage.insert(originBlock);
 	}
 
 	//Now check if the updated block entities are by themselve suppose to be deleted. In that case their change shall not be stored in the database.
