@@ -5,10 +5,11 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/StringHelper.h"
 #include "OTWidgets/QtFactory.h"
-#include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsScene.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/GraphicsConnectionPreviewItem.h"
@@ -22,6 +23,9 @@ ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 	: m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
 {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.scene creating 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	OTAssertNullptr(m_view);
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
 }
@@ -30,17 +34,28 @@ ot::GraphicsScene::GraphicsScene(const QRectF& _sceneRect, GraphicsView* _view)
 	: QGraphicsScene(_sceneRect), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
 {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.scene creating 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	OTAssertNullptr(m_view);
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
 }
 
-ot::GraphicsScene::~GraphicsScene() {}
+ot::GraphicsScene::~GraphicsScene() {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.scene destroying 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Connection handling
 
 void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
+	OT_LOG_D("debug.scene starting connection { "
+		"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) +
+		"\", \"item\": \"0x" + ot::numberToHexString<size_t>((size_t)_item) + "\" }"
+	);
 	OTAssertNullptr(m_view);
 	if (m_view->getGraphicsViewFlags() & GraphicsView::IgnoreConnectionByUser) return;
 
@@ -59,6 +74,7 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		m_connectionPreview->setDestDir(ot::inversedConnectionDirection(m_connectionOrigin->getConnectionDirection()));
 		this->addItem(m_connectionPreview);
 
+		this->blockSignals(true);
 		return;
 	}
 	else {
@@ -69,16 +85,23 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		OT_LOG_D("New conncetion");
 		m_view->requestConnection(m_connectionOrigin->getRootItem()->getGraphicsItemUid(), m_connectionOrigin->getGraphicsItemName(), _item->getRootItem()->getGraphicsItemUid(), _item->getGraphicsItemName());
 		this->stopConnection();
+		this->blockSignals(false);
 	}
 }
 
 void ot::GraphicsScene::stopConnection(void) {
 	// Stop connection
 	if (m_connectionPreview) {
+		OT_LOG_D("debug.scene stopping connection { "
+			"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) +
+			"\", \"item\": \"0x" + ot::numberToHexString<size_t>((size_t)m_connectionOrigin) + "\" }"
+		);
+		this->blockSignals(true);
 		this->removeItem(m_connectionPreview);
 		delete m_connectionPreview;
 		m_connectionPreview = nullptr;
 		m_connectionOrigin = nullptr;
+		this->blockSignals(false);
 	}
 }
 
@@ -113,6 +136,9 @@ void ot::GraphicsScene::slotSelectionChanged(void) {
 }
 
 void ot::GraphicsScene::handleSelectionChanged(void) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.scene handling selection changed 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	QList<QGraphicsItem*> tmp = m_lastSelection;
 	m_lastSelection = this->selectedItems();
 	if (tmp.size() != m_lastSelection.size()) {
@@ -193,6 +219,10 @@ void ot::GraphicsScene::flipAllSelectedItems(Qt::Orientation _flipAxis) {
 }
 
 void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.scene mouse double click 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
+
 	QList<QGraphicsItem*> lst = items(_event->scenePos());
 	for (auto itm : lst) {
 		ot::GraphicsItem* actualItm = dynamic_cast<ot::GraphicsItem*>(itm);

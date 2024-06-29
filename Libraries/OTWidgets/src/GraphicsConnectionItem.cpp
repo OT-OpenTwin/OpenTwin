@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/StringHelper.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsItem.h"
@@ -19,11 +20,19 @@
 ot::GraphicsConnectionItem::GraphicsConnectionItem()
 	: m_dest(nullptr), m_origin(nullptr), m_state(NoState)
 {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.connection creating 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
+
 	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	this->setAcceptHoverEvents(true);
 }
 
 ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.connection destroying 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
+
 	if (m_origin) {
 		m_origin->forgetConnection(this);
 		m_origin = nullptr;
@@ -113,11 +122,17 @@ void ot::GraphicsConnectionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _ev
 
 void ot::GraphicsConnectionItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 	m_state |= HoverState;
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.connection hover enter 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	this->update();
 }
 
 void ot::GraphicsConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 	m_state &= (~HoverState);
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.connection hover leave 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	this->update();
 }
 
@@ -125,6 +140,10 @@ void ot::GraphicsConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _even
 
 bool ot::GraphicsConnectionItem::setConfiguration(const ot::GraphicsConnectionCfg& _cfg) {
 	m_config = _cfg;
+
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.connection configuration set 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 
 	return true;
 }
@@ -135,6 +154,14 @@ void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsIte
 	OTAssert(m_origin == nullptr, "Origin already set");
 	OTAssert(m_dest == nullptr, "Destination already set");
 
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.connection connecting { "
+		"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) + 
+		"\", \"origin\": \"0x" + ot::numberToHexString<size_t>((size_t)_origin) +
+		"\", \"destination\": \"0x" + ot::numberToHexString<size_t>((size_t)_dest) + "\" }"
+	);
+#endif
+
 	this->prepareGeometryChange();
 
 	m_origin = _origin;
@@ -143,10 +170,12 @@ void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsIte
 	m_dest->storeConnection(this);
 
 	this->updateConnectionInformation();
-	this->updateConnectionView();
 }
 
 void ot::GraphicsConnectionItem::disconnectItems(void) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.connection disconnecting 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	if (m_origin) {
 		m_origin->forgetConnection(this);
 		m_origin = nullptr;
@@ -167,6 +196,9 @@ void ot::GraphicsConnectionItem::forgetItem(const GraphicsItem* _item) {
 }
 
 void ot::GraphicsConnectionItem::updateConnectionView(void) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.connection updating connection view 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	if (m_origin && m_dest) {
 		this->prepareGeometryChange();
 		this->update();
@@ -174,6 +206,9 @@ void ot::GraphicsConnectionItem::updateConnectionView(void) {
 }
 
 void ot::GraphicsConnectionItem::updateConnectionInformation(void) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.connection updating connection information 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	if (m_origin) {
 		m_config.setOriginConnectable(m_origin->getGraphicsItemName());
 		m_config.setOriginUid(m_origin->getRootItem()->getGraphicsItemUid());

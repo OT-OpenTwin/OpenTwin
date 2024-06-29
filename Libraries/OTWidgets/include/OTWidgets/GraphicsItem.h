@@ -24,6 +24,11 @@
 #include <list>
 #include <string>
 
+//! \brief If defined as true the widgets API related code will generate more detailed log messages.
+//! The messages will contain creation, deletion and other detailed informations about the objects lifetime.
+//! \warning Never use in deployment!
+#define OT_DBG_WIDGETS_GRAPHICS_API false
+
 namespace ot {
 
 	class Painter2D;
@@ -284,7 +289,7 @@ namespace ot {
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size);
 		const QSizeF& graphicsItemRequestedSize(void) const { return m_requestedSize; };
 
-		std::list<ot::GraphicsConnectionCfg> getConnectionCfgs();
+		std::list<ot::GraphicsConnectionCfg> getConnectionCfgs(void);
 
 		void setGraphicsItemSelected(bool _selected);
 		bool getGraphicsItemSelected(void) const;

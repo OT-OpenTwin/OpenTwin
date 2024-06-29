@@ -25,14 +25,14 @@ void ot::GraphicsLayoutItemWrapper::prepareGraphicsItemGeometryChange(void) {
 
 void ot::GraphicsLayoutItemWrapper::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	OTAssertNullptr(m_owner);
-	m_owner->handleMousePressEvent(_event);
 	QGraphicsWidget::mousePressEvent(_event);
+	m_owner->handleMousePressEvent(_event);
 }
 
 void ot::GraphicsLayoutItemWrapper::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 	OTAssertNullptr(m_owner);
-	m_owner->handleMouseReleaseEvent(_event);
 	QGraphicsWidget::mouseReleaseEvent(_event);
+	m_owner->handleMouseReleaseEvent(_event);
 }
 
 void ot::GraphicsLayoutItemWrapper::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
@@ -52,8 +52,9 @@ QRectF ot::GraphicsLayoutItemWrapper::boundingRect(void) const {
 
 QVariant ot::GraphicsLayoutItemWrapper::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
 	OTAssertNullptr(m_owner);
+	QVariant ret = QGraphicsWidget::itemChange(_change, _value);
 	m_owner->handleItemChange(_change, _value);
-	return QGraphicsWidget::itemChange(_change, _value);
+	return ret;
 }
 
 void ot::GraphicsLayoutItemWrapper::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {

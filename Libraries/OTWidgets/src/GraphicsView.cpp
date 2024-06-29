@@ -5,11 +5,12 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/StringHelper.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsView.h"
-#include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsItemPreviewDrag.h"
 
@@ -23,6 +24,9 @@ ot::GraphicsView::GraphicsView(GraphicsScene* _scene)
 	: m_scene(_scene), m_wheelEnabled(true), m_dropEnabled(false),
 	m_viewFlags(NoViewFlags), m_viewStateFlags(DefaultState)
 {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.graphicsview creating 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	if (!m_scene) m_scene = new GraphicsScene(this);
 
 	this->setScene(m_scene);
@@ -33,7 +37,9 @@ ot::GraphicsView::GraphicsView(GraphicsScene* _scene)
 }
 
 ot::GraphicsView::~GraphicsView() {
-
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.graphicsview destroying 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 }
 
 // ########################################################################################################
@@ -121,6 +127,13 @@ bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionCfg& 
 }
 
 void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.graphicsview adding item { "
+		"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) +
+		"\", \"item\": \"0x" + ot::numberToHexString<size_t>((size_t)_item) + "\" }"
+	);
+#endif
+
 	auto it = m_items.find(_item->getGraphicsItemUid());
 	bool removeConnectionBufferApplied = false;
 	if (it != m_items.end()) {
@@ -172,6 +185,14 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool bufferConnection
 	m_scene->blockSignals(true);
 
 	ot::GraphicsItem* graphicsItem =  graphicsItemByUID->second;
+
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.graphicsview removing item { "
+		"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) +
+		"\", \"item\": \"0x" + ot::numberToHexString<size_t>((size_t)graphicsItem) + "\" }"
+	);
+#endif
+
 	OTAssertNullptr(graphicsItem);
 	if (bufferConnections)
 	{
@@ -252,6 +273,13 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 	newConnection->setZValue(1);
 
 	m_connections.insert_or_assign(_config.getUid(), newConnection);
+
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.graphicsview added connection { "
+		"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) +
+		"\", \"connection\": \"0x" + ot::numberToHexString<size_t>((size_t)newConnection) + "\" }"
+	);
+#endif
 }
 
 bool ot::GraphicsView::connectedGraphicItemsExist(const GraphicsConnectionCfg& _config)
@@ -280,6 +308,13 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
 	// Remove connection from items
 	ot::GraphicsConnectionItem* connection = connectionByUID->second;
 	OTAssertNullptr(connection);
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.graphicsview removing connection { "
+		"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) +
+		"\", \"connection\": \"0x" + ot::numberToHexString<size_t>((size_t)connection) + "\" }"
+	);
+#endif
+
 	connection->disconnectItems();
 
 	// Destroy connection
@@ -524,6 +559,9 @@ void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 }
 
 void ot::GraphicsView::beginItemMove(void) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.graphicsview begin item move called 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	if (m_viewStateFlags & ItemMoveInProgress) return;
 
 	m_viewStateFlags.setFlag(ItemMoveInProgress, true);
@@ -534,9 +572,17 @@ void ot::GraphicsView::beginItemMove(void) {
 			otItem->setCurrentPosAsMoveStart();
 		}
 	}
+
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.graphicsview begin item move completed 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 }
 
 void ot::GraphicsView::endItemMove(void) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.graphicsview end item move called 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
+
 	if (!(m_viewStateFlags & ItemMoveInProgress)) return;
 
 	m_viewStateFlags.setFlag(ItemMoveInProgress, false);
@@ -547,4 +593,8 @@ void ot::GraphicsView::endItemMove(void) {
 			otItem->notifyMoveIfRequired();
 		}
 	}
+
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.graphicsview end item move completed 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 }

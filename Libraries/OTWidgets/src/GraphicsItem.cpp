@@ -6,6 +6,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/StringHelper.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTWidgets/QtFactory.h"
@@ -50,13 +51,19 @@ ot::GraphicsItem::GraphicsItem(GraphicsItemCfg* _configuration, const ot::Flags<
 	: m_config(_configuration), m_state(_stateFlags), m_moveStartPt(0., 0.), m_parent(nullptr), m_scene(nullptr), m_requestedSize(-1., -1.),
 	m_blockConfigurationNotifications(false), m_blockFlagNotifications(false), m_blockStateNotifications(false)
 {
-
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item creating 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 }
 
 ot::GraphicsItem::~GraphicsItem() {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item destroying 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	for (GraphicsConnectionItem* connection : m_connections) {
 		connection->forgetItem(this);
 	}
+	
 }
 
 // ###############################################################################################################################################
@@ -67,6 +74,10 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
 	OTAssertNullptr(this->getQGraphicsItem());
 	
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item setting up 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
+
 	m_blockConfigurationNotifications = true;
 	this->setConfiguration(_cfg->createCopy());
 
@@ -78,6 +89,10 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		if (!m_blockFlagNotifications) this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());
 	}
 	m_blockConfigurationNotifications = false;
+
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item config setup completed with name \"" + this->getGraphicsItemName() + "\" 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 
 	return true;
 }
@@ -140,6 +155,9 @@ bool ot::GraphicsItem::graphicsItemRequiresHover(void) const {
 // Event handler
 
 void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item mouse press 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) {
 		OTAssertNullptr(this->getGraphicsScene());
 		this->getGraphicsScene()->startConnection(this);
@@ -171,6 +189,9 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 }
 
 void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item mouse release 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	if (m_parent) {
 		m_parent->handleMouseReleaseEvent(_event);
 		return;
@@ -191,6 +212,9 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 }
 
 void ot::GraphicsItem::handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item hover enter 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	this->handleToolTip(_event);
 	
 	this->m_state |= GraphicsItem::HoverState;
@@ -210,6 +234,9 @@ void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
 }
 
 void ot::GraphicsItem::handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item hover leave 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	ToolTipHandler::hideToolTip();
 
 	m_state &= ~(GraphicsItem::HoverState);
@@ -255,6 +282,9 @@ QRectF ot::GraphicsItem::handleGetGraphicsItemBoundingRect(const QRectF& _rect) 
 }
 
 void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item handling item change 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	switch (_change)
 	{
 	case QGraphicsItem::ItemSelectedHasChanged:
@@ -302,12 +332,18 @@ void ot::GraphicsItem::handleSetItemGeometry(const QRectF& _geom) {
 }
 
 void ot::GraphicsItem::raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item rising event 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	for (auto itm : m_eventHandler) {
 		itm->graphicsItemEventHandler(this, _event);
 	}
 }
 
 QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item calculating paint area 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
 	auto qitm = this->getQGraphicsItem();
 	OTAssertNullptr(qitm);
 
@@ -365,6 +401,10 @@ const ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) const {
 }
 
 void ot::GraphicsItem::setConfiguration(GraphicsItemCfg* _config) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item setting config 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
+
 	OTAssertNullptr(_config);
 	if (m_config == _config) return;
 	if (m_config) delete m_config;
@@ -550,10 +590,23 @@ const ot::Transform& ot::GraphicsItem::getGraphicsItemTransform(void) const {
 }
 
 void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item storing connection { "
+		"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) +
+		"\", \"connection\": \"0x" + ot::numberToHexString<size_t>((size_t)_connection) + "\" }"
+	);
+#endif
 	m_connections.push_back(_connection);
 }
 
 void ot::GraphicsItem::forgetConnection(GraphicsConnectionItem* _connection) {
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+	OT_LOG_D("debug.item forgetting connection { "
+		"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) +
+		"\", \"connection\": \"0x" + ot::numberToHexString<size_t>((size_t)_connection) + "\" }"
+	);
+#endif
+
 	auto connection = std::find(m_connections.begin(), m_connections.end(), _connection);
 	while (connection != m_connections.end()) {
 		m_connections.erase(connection);
@@ -592,7 +645,7 @@ QSizeF ot::GraphicsItem::removeGraphicsItemMargins(const QSizeF& _size) const {
 	);
 }
 
-std::list<ot::GraphicsConnectionCfg> ot::GraphicsItem::getConnectionCfgs() 
+std::list<ot::GraphicsConnectionCfg> ot::GraphicsItem::getConnectionCfgs(void)
 {
 	std::list<ot::GraphicsConnectionCfg> graphicConnectionCfgList;
 	for (const auto& connection : m_connections) 
@@ -692,3 +745,12 @@ QTransform ot::GraphicsItem::calculateGraphicsItemTransform(QPointF& _transformO
 
 	return newTransform;
 }
+
+#if OT_DBG_WIDGETS_GRAPHICS_API==true
+
+#pragma message("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+#pragma message("ot: WidgetsAPI debug is enabled.")
+#pragma message("Do not use this build in a deployment.")
+#pragma message("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
+#endif

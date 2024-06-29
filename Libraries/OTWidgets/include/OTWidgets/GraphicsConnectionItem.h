@@ -55,23 +55,23 @@ namespace ot {
 		//! @brief Creates a configuration object containing the items origin and destination information
 		const GraphicsConnectionCfg& getConfiguration(void) const { return m_config; };
 
-		void setLineShape(GraphicsConnectionCfg::ConnectionShape _shape) { m_config.setLineShape(_shape); this->update(); };
+		void setLineShape(GraphicsConnectionCfg::ConnectionShape _shape) { m_config.setLineShape(_shape); };
 		GraphicsConnectionCfg::ConnectionShape getLineShape(void) const { return m_config.getLineShape(); };
 
-		void setLineWidth(double _width) { m_config.setLineWidth(_width); this->update(); };
+		void setLineWidth(double _width) { m_config.setLineWidth(_width); };
 		double getLineWidth(void) const { return m_config.getLineWidth(); };
 
-		void setLineColor(const ot::Color& _color) { m_config.setLineColor(_color); this->update(); };
+		void setLineColor(const ot::Color& _color) { m_config.setLineColor(_color); };
 
 		//! \brief Sets the line painter.
 		//! The item takes ownership of the painter.
-		void setLinePainter(ot::Painter2D* _painter) { m_config.setLinePainter(_painter); this->update(); };
+		void setLinePainter(ot::Painter2D* _painter) { m_config.setLinePainter(_painter); };
 
 		//! \brief Returns the current line painter.
 		//! The item keeps ownership of the painter.
 		const ot::Painter2D* getLinePainter(void) const { return m_config.getLinePainter(); };
 
-		void setLineStyle(const OutlineF& _style) { m_config.setLineStyle(_style); this->update(); };
+		void setLineStyle(const OutlineF& _style) { m_config.setLineStyle(_style); };
 		const OutlineF& getLineStyle(void) const { return m_config.getLineStyle(); };
 
 		void updateConnectionView(void);
