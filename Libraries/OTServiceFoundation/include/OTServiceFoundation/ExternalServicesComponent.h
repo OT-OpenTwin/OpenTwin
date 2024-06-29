@@ -84,6 +84,9 @@ namespace ot {
 			void getCPUAndMemoryLoad(double& globalCPULoad, double& globalMemoryLoad, double& processCPULoad, double& processMemoryLoad);
 			std::string handleGetSystemInformation();
 
+			std::string getLoggedInUserName(void) { return credentialsUsername; }
+			std::string getLoggedInUserPassword(void) { return credentialsPassword; }
+
 		private:
 			// #####################################################################################################################################
 
@@ -108,6 +111,9 @@ namespace ot {
 			ComponentState    m_componentState;
 			SystemLoadInformation m_systemLoad;
 
+			std::string credentialsUsername;
+			std::string credentialsPassword;
+			
 			ExternalServicesComponent();
 			virtual ~ExternalServicesComponent();
 		}; // Class external services component

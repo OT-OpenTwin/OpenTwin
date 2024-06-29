@@ -515,8 +515,8 @@ std::string ot::intern::ExternalServicesComponent::handleServiceShutdown(JsonDoc
 }
 
 std::string ot::intern::ExternalServicesComponent::handleRun(JsonDocument& _document) {
-	std::string credentialsUsername = ot::json::getString(_document, OT_PARAM_AUTH_USERNAME);
-	std::string credentialsPassword = ot::json::getString(_document, OT_PARAM_AUTH_PASSWORD);
+	credentialsUsername = ot::json::getString(_document, OT_PARAM_AUTH_USERNAME);
+	credentialsPassword = ot::json::getString(_document, OT_PARAM_AUTH_PASSWORD);
 	std::string databaseUsername = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
 	std::string databasePassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
 	m_application->m_DBuserCollection = ot::json::getString(_document, OT_PARAM_SETTINGS_USERCOLLECTION);
