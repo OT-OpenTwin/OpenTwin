@@ -10,6 +10,9 @@ class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock
 		std::string getType();
 		std::string getFunction();
 
+
+		double getRotation();
+		std::string getFlip();
 		std::vector<std::string> getPulseParameters();
 		std::vector<std::string> getSinParameters();
 		std::vector<std::string> getExpParameters();
@@ -25,9 +28,12 @@ class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock
 		ot::Connector m_LeftConnector;
 		ot::Connector m_RightConnector;
 
+
+		void createTransformProperties();
 		void createTRANProperties();
 		void createACProperties();
 		void createDCProperties();
+		
 
 		void createPULSEProperties();
 		void createSINProperties();

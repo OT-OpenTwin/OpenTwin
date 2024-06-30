@@ -63,16 +63,35 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	_modelComponent->addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
 }
 
-void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::Point2DD& position, ClassFactory* classFactory)
+void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::Point2DD& position, const ot::Transform transform, ClassFactory* classFactory)
 {
-	
 	
 	std::list<ot::EntityInformation> entityInfos;
 	ot::UIDList entityIDList{ blockID };
 	_modelComponent->getEntityInformation(entityIDList, entityInfos);
 	auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), *classFactory);
 	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
+	
+	//Here I will update the rotation
+	//auto propertyBase = blockEnt->getProperties().getProperty("Rotation");
+	//auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	//propertyRotation->setValue(transform.getRotation());
+	//const std::string group = "Transform-Properties";
+	//blockEnt->getProperties().updateProperty(propertyRotation, group);
 
+	//Here I update the Flip
+	//std::map<ot::Transform::FlipState, std::string > stringFlipMap;
+	//stringFlipMap.insert_or_assign(ot::Transform::NoFlip, "NoFlip");
+	//stringFlipMap.insert_or_assign(ot::Transform::FlipVertically,"FlipVertically" );
+	//stringFlipMap.insert_or_assign(ot::Transform::FlipHorizontally,"FlipHorizontally" );
+
+	//auto propertyBaseFlip = blockEnt->getProperties().getProperty("Flip");
+	//auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	//propertyFlip->setValue(stringFlipMap[transform.getFlipStateFlags()]);
+	//blockEnt->getProperties().updateProperty(propertyFlip, group);
+
+
+	
 	ot::UID positionID = blockEnt->getCoordinateEntityID();
 	entityInfos.clear();
 	entityIDList = { positionID };
@@ -81,9 +100,13 @@ void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::P
 	std::unique_ptr<EntityCoordinates2D> coordinateEnt(dynamic_cast<EntityCoordinates2D*>(entBase));
 	coordinateEnt->setCoordinates(position);
 	coordinateEnt->StoreToDataBase();
-	_modelComponent->addEntitiesToModel({}, {}, {}, { coordinateEnt->getEntityID() }, { coordinateEnt->getEntityStorageVersion() }, { blockID }, "Update BlockItem position");
+	//blockEnt->StoreToDataBase();
+
+	_modelComponent->addEntitiesToModel({}, {}, {}, {coordinateEnt->getEntityID()}, {coordinateEnt->getEntityStorageVersion()}, {blockID}, "Update BlockItem position");
 
 }
+
+
 
 
 

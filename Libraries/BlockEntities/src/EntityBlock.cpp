@@ -155,7 +155,6 @@ void EntityBlock::CreateBlockItem()
 	ot::GraphicsItemCfg* blockCfg = CreateBlockCfg();
 	blockCfg->setUid(getEntityID());
 	blockCfg->setPosition(entCoordinate->getCoordinates());
-
 	ot::GraphicsScenePackage pckg(_graphicsScenePackage);
 	pckg.addItem(blockCfg);
 

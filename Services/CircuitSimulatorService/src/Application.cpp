@@ -738,7 +738,8 @@ std::string Application::handleItemChanged(ot::JsonDocument& _document)
 	if (!itemConfig) return "";
 
 	const ot::UID blockID = itemConfig->getUid();
-	m_blockEntityHandler.UpdateBlockPosition(blockID, itemConfig->getPosition(), &getClassFactory());
+	const ot::Transform transform = itemConfig->getTransform();
+	m_blockEntityHandler.UpdateBlockPosition(blockID, itemConfig->getPosition(), transform, &getClassFactory());
 
 	return "";
 }
