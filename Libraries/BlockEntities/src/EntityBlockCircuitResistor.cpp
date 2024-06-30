@@ -41,7 +41,7 @@ std::string EntityBlockCircuitResistor::getElementType()
 
 	return elementType->getValue();
 }
-#define TEST_ITEM_LOADER false
+#define TEST_ITEM_LOADER true
 ot::GraphicsItemCfg* EntityBlockCircuitResistor::CreateBlockCfg()
 {
 #if TEST_ITEM_LOADER==true

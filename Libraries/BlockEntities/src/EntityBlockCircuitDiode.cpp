@@ -7,6 +7,7 @@
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
+#include "OTGui/GraphicsItemFileCfg.h"
 
 EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner) 
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
@@ -38,8 +39,19 @@ std::string EntityBlockCircuitDiode::getElementType()
 	return elementType->getValue();
 }
 
+#define TEST_ITEM_LOADER true
 ot::GraphicsItemCfg* EntityBlockCircuitDiode::CreateBlockCfg()
 {
+#if TEST_ITEM_LOADER==true
+	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
+	newConfig->setName("EntityBlockCircuitDiode");
+	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState);
+	newConfig->setFile("Circuit/Diode.ot.json");
+	newConfig->addStringMapEntry("Name", "D1");
+	//newConfig->setTransform(ot::Transform(90., ot::Transform::FlipHorizontally));
+	return newConfig;
+#endif
+
 	ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
 	myStack->setName("EntityBlockCircuitDiode");
 	myStack->setTitle("EntityBlockCircuitDiode");
