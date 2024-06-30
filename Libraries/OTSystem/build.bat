@@ -62,6 +62,7 @@ IF "%2"=="BUILD" (
 IF %DEBUG%==1 (
 	ECHO %TYPE_NAME% DEBUG
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
+   	TYPE buildLog_Debug.txt
  	IF ERRORLEVEL 1 (
         ECHO Debug build failed
         TYPE buildLog_Debug.txt
@@ -72,6 +73,7 @@ IF %DEBUG%==1 (
 IF %RELEASE%==1 (
 	ECHO %TYPE_NAME% RELEASE
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
+        TYPE buildLog_Release.txt
 	IF ERRORLEVEL 1 (
         ECHO Release build failed
         TYPE buildLog_Release.txt
