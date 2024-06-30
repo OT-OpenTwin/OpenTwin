@@ -62,9 +62,8 @@ IF "%2"=="BUILD" (
 REM Debug build
 IF %DEBUG%==1 (
     ECHO %TYPE_NAME% DEBUG
-    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt /Log devenv.log
-    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt /Log devenv.log
-    timeout /t 300 /nobreak
+    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt /Log devenv.log /m
+    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt /Log devenv.log /m > complete_output.txt 2>&1
     IF EXIST buildLog_Debug.txt (
         ECHO Build log content:
         TYPE buildLog_Debug.txt
@@ -77,6 +76,12 @@ IF %DEBUG%==1 (
     ) ELSE (
         ECHO devenv.log does not exist or is empty.
     )
+    IF EXIST complete_output.txt (
+        ECHO Complete output content:
+        TYPE complete_output.txt
+    ) ELSE (
+        ECHO complete_output.txt does not exist or is empty.
+    )
     IF ERRORLEVEL 1 (
         ECHO Debug build failed
         GOTO END
@@ -87,9 +92,8 @@ IF %DEBUG%==1 (
 REM Release build
 IF %RELEASE%==1 (
     ECHO %TYPE_NAME% RELEASE
-    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt /Log devenv.log
-    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt /Log devenv.log
-    timeout /t 300 /nobreak
+    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt /Log devenv.log /m
+    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt /Log devenv.log /m > complete_output.txt 2>&1
     IF EXIST buildLog_Release.txt (
         ECHO Build log content:
         TYPE buildLog_Release.txt
@@ -101,6 +105,12 @@ IF %RELEASE%==1 (
         TYPE devenv.log
     ) ELSE (
         ECHO devenv.log does not exist or is empty.
+    )
+    IF EXIST complete_output.txt (
+        ECHO Complete output content:
+        TYPE complete_output.txt
+    ) ELSE (
+        ECHO complete_output.txt does not exist or is empty.
     )
     IF ERRORLEVEL 1 (
         ECHO Release build failed
