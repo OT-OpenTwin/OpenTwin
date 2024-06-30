@@ -59,27 +59,33 @@ IF "%2"=="BUILD" (
 	SET TYPE_NAME=BUILD
 )
 
+REM Debug build
 IF %DEBUG%==1 (
-	ECHO %TYPE_NAME% DEBUG
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
-   	TYPE buildLog_Debug.txt
- 	IF ERRORLEVEL 1 (
+    ECHO %TYPE_NAME% DEBUG
+    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt /Log buildLog_Debug.log
+    start /wait "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt /Log buildLog_Debug.log
+    IF %ERRORLEVEL% NEQ 0 (
         ECHO Debug build failed
         TYPE buildLog_Debug.txt
         GOTO END
     )
+    ECHO Debug build completed successfully
+    TYPE buildLog_Debug.txt
 )
 
+REM Release build
 IF %RELEASE%==1 (
-	ECHO %TYPE_NAME% RELEASE
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
-        TYPE buildLog_Release.txt
-	IF ERRORLEVEL 1 (
+    ECHO %TYPE_NAME% RELEASE
+    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt /Log buildLog_Release.log
+    start /wait "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt /Log buildLog_Release.log
+    IF %ERRORLEVEL% NEQ 0 (
         ECHO Release build failed
         TYPE buildLog_Release.txt
         GOTO END
     )
-) 
+    ECHO Release build completed successfully
+    TYPE buildLog_Release.txt
+)
   
 GOTO END
 
