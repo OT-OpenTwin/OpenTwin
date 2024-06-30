@@ -91,35 +91,18 @@ IF %DEBUG%==1 (
 )
 
 REM Release build
+IF %DEBUG%==1 (
+    ECHO %TYPE_NAME% DEBUG
+    START powershell -Command "Get-Content buildLog_Debug.txt -Wait -Tail 10"
+    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
+)
+
 IF %RELEASE%==1 (
     ECHO %TYPE_NAME% RELEASE
-    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt /Log devenv.log /m
-    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt /Log devenv.log /m > complete_output.txt 2>&1
-    IF EXIST buildLog_Release.txt (
-        ECHO Build log content:
-        TYPE buildLog_Release.txt
-    ) ELSE (
-        ECHO buildLog_Release.txt does not exist or is empty.
-    )
-    IF EXIST devenv.log (
-        ECHO Devenv log content:
-        TYPE devenv.log
-    ) ELSE (
-        ECHO devenv.log does not exist or is empty.
-    )
-    IF EXIST complete_output.txt (
-        ECHO Complete output content:
-        TYPE complete_output.txt
-    ) ELSE (
-        ECHO complete_output.txt does not exist or is empty.
-    )
-    IF ERRORLEVEL 1 (
-        ECHO Release build failed
-        GOTO END
-    )
-    ECHO Release build completed successfully
-)
-  
+    START powershell -Command "Get-Content buildLog_Release.txt -Wait -Tail 10"
+    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
+) 
+
 GOTO END
 
 :PAUSE_END
