@@ -62,29 +62,39 @@ IF "%2"=="BUILD" (
 REM Debug build
 IF %DEBUG%==1 (
     ECHO %TYPE_NAME% DEBUG
-    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt /Log buildLog_Debug.log
-    start /wait "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt /Log buildLog_Debug.log
+    SET LOG_PATH=%cd%\buildLog_Debug.txt
+    SET DETAILED_LOG_PATH=%cd%\buildLog_Debug.log
+    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out "%LOG_PATH%" /Log "%DETAILED_LOG_PATH%"
+    start /wait "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out "%LOG_PATH%" /Log "%DETAILED_LOG_PATH%"
+    IF EXIST "%LOG_PATH%" (
+        ECHO Debug build completed successfully
+        TYPE "%LOG_PATH%"
+    ) ELSE (
+        ECHO Debug build log not found
+    )
     IF %ERRORLEVEL% NEQ 0 (
         ECHO Debug build failed
-        TYPE buildLog_Debug.txt
         GOTO END
     )
-    ECHO Debug build completed successfully
-    TYPE buildLog_Debug.txt
 )
 
 REM Release build
 IF %RELEASE%==1 (
     ECHO %TYPE_NAME% RELEASE
-    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt /Log buildLog_Release.log
-    start /wait "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt /Log buildLog_Release.log
+    SET LOG_PATH=%cd%\buildLog_Release.txt
+    SET DETAILED_LOG_PATH=%cd%\buildLog_Release.log
+    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out "%LOG_PATH%" /Log "%DETAILED_LOG_PATH%"
+    start /wait "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out "%LOG_PATH%" /Log "%DETAILED_LOG_PATH%"
+    IF EXIST "%LOG_PATH%" (
+        ECHO Release build completed successfully
+        TYPE "%LOG_PATH%"
+    ) ELSE (
+        ECHO Release build log not found
+    )
     IF %ERRORLEVEL% NEQ 0 (
         ECHO Release build failed
-        TYPE buildLog_Release.txt
         GOTO END
     )
-    ECHO Release build completed successfully
-    TYPE buildLog_Release.txt
 )
   
 GOTO END
