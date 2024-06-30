@@ -62,39 +62,51 @@ IF "%2"=="BUILD" (
 REM Debug build
 IF %DEBUG%==1 (
     ECHO %TYPE_NAME% DEBUG
-    SET LOG_PATH=%cd%\buildLog_Debug.txt
-    SET DETAILED_LOG_PATH=%cd%\buildLog_Debug.log
-    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out "%LOG_PATH%" /Log "%DETAILED_LOG_PATH%"
-    start /wait "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out "%LOG_PATH%" /Log "%DETAILED_LOG_PATH%"
-    IF EXIST "%LOG_PATH%" (
-        ECHO Debug build completed successfully
-        TYPE "%LOG_PATH%"
+    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt /Log devenv.log
+    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt /Log devenv.log
+    timeout /t 300 /nobreak
+    IF EXIST buildLog_Debug.txt (
+        ECHO Build log content:
+        TYPE buildLog_Debug.txt
     ) ELSE (
-        ECHO Debug build log not found
+        ECHO buildLog_Debug.txt does not exist or is empty.
     )
-    IF %ERRORLEVEL% NEQ 0 (
+    IF EXIST devenv.log (
+        ECHO Devenv log content:
+        TYPE devenv.log
+    ) ELSE (
+        ECHO devenv.log does not exist or is empty.
+    )
+    IF ERRORLEVEL 1 (
         ECHO Debug build failed
         GOTO END
     )
+    ECHO Debug build completed successfully
 )
 
 REM Release build
 IF %RELEASE%==1 (
     ECHO %TYPE_NAME% RELEASE
-    SET LOG_PATH=%cd%\buildLog_Release.txt
-    SET DETAILED_LOG_PATH=%cd%\buildLog_Release.log
-    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out "%LOG_PATH%" /Log "%DETAILED_LOG_PATH%"
-    start /wait "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out "%LOG_PATH%" /Log "%DETAILED_LOG_PATH%"
-    IF EXIST "%LOG_PATH%" (
-        ECHO Release build completed successfully
-        TYPE "%LOG_PATH%"
+    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt /Log devenv.log
+    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt /Log devenv.log
+    timeout /t 300 /nobreak
+    IF EXIST buildLog_Release.txt (
+        ECHO Build log content:
+        TYPE buildLog_Release.txt
     ) ELSE (
-        ECHO Release build log not found
+        ECHO buildLog_Release.txt does not exist or is empty.
     )
-    IF %ERRORLEVEL% NEQ 0 (
+    IF EXIST devenv.log (
+        ECHO Devenv log content:
+        TYPE devenv.log
+    ) ELSE (
+        ECHO devenv.log does not exist or is empty.
+    )
+    IF ERRORLEVEL 1 (
         ECHO Release build failed
         GOTO END
     )
+    ECHO Release build completed successfully
 )
   
 GOTO END
