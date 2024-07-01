@@ -65,45 +65,15 @@ DIR "%DEVENV_ROOT_2022%"
 ECHO Directory contents of OTSystem project path:
 DIR "%OT_SYSTEM_ROOT%"
 
-:RunCommandWithTimeout
-REM Function to run command with timeout
-SETLOCAL
-SET "CMD=%~1"
-SET "TIMEOUT=%~2"
-START "" /B %CMD%
-SET "PID=%!%"
-ECHO Running command with PID: %PID%
-TIMEOUT /T %TIMEOUT% /NOBREAK
-TASKLIST /FI "PID eq %PID%" | FIND "%PID%" >nul
-IF NOT ERRORLEVEL 1 (
-    ECHO Command timed out. Terminating process...
-    TASKKILL /F /PID %PID%
-    EXIT /B 1
-)
-EXIT /B 0
-ENDLOCAL
-
-IF "%DEBUG%"=="1" (
-    ECHO %TYPE_NAME% DEBUG
-    DIR "%DEVENV_ROOT_2022%"
-    ECHO Directory of devenv.exe: "%DEVENV_ROOT_2022%"
-    DIR "%OT_SYSTEM_ROOT%"
-    ECHO Directory of OTSystem root: %OT_SYSTEM_ROOT%
-    CALL :RunCommandWithTimeout "%DEVENV_ROOT_2022%\devenv.exe %OT_SYSTEM_ROOT%\OTSystem.vcxproj %TYPE% Debug|x64" 60
-    IF ERRORLEVEL 1 (
-        ECHO Error: Failed to build DEBUG configuration.
-        EXIT /B 1
-    )
+IF %DEBUG%==1 (
+	ECHO %TYPE_NAME% DEBUG
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
 )
 
-IF "%RELEASE%"=="1" (
-    ECHO %TYPE_NAME% RELEASE
-    CALL :RunCommandWithTimeout "%DEVENV_ROOT_2022%\devenv.exe %OT_SYSTEM_ROOT%\OTSystem.vcxproj %TYPE% Release|x64" 60
-    IF ERRORLEVEL 1 (
-        ECHO Error: Failed to build RELEASE configuration.
-        EXIT /B 1
-    )
-)
+IF %RELEASE%==1 (
+	ECHO %TYPE_NAME% RELEASE
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
+) 
 
 GOTO END
 
