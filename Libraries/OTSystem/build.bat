@@ -81,7 +81,7 @@ IF %DEBUG%==1 (
 IF %RELEASE%==1 (
     ECHO %TYPE_NAME% RELEASE
     ECHO Running command: "%DEVENV_ROOT_2022%\devenv.com" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64"
-    "%DEVENV_ROOT_2022%\devenv.com" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64"
+    "%DEVENV_ROOT_2022%\devenv.com" "%OT_SYSTEM_ROOT%\OTSystem.sln" %TYPE% "Release|x64"
     REM Check the exit status
     IF ERRORLEVEL 1 (
         ECHO Release build failed
