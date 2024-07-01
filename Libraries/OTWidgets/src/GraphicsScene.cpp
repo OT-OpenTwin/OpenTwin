@@ -64,10 +64,12 @@ ot::GraphicsScene::~GraphicsScene() {
 // Connection handling
 
 void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
+#if OT_DBG_WIDGETS_GRAPHICS_SCENE_API==true
 	OT_LOG_D("debug.scene starting connection { "
 		"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) +
 		"\", \"item\": \"0x" + ot::numberToHexString<size_t>((size_t)_item) + "\" }"
 	);
+#endif
 	OTAssertNullptr(m_view);
 	if (m_view->getGraphicsViewFlags() & GraphicsView::IgnoreConnectionByUser) return;
 
@@ -104,10 +106,12 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 void ot::GraphicsScene::stopConnection(void) {
 	// Stop connection
 	if (m_connectionPreview) {
+#if OT_DBG_WIDGETS_GRAPHICS_SCENE_API==true
 		OT_LOG_D("debug.scene stopping connection { "
 			"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) +
 			"\", \"item\": \"0x" + ot::numberToHexString<size_t>((size_t)m_connectionOrigin) + "\" }"
 		);
+#endif
 		this->blockSignals(true);
 		this->removeItem(m_connectionPreview);
 		delete m_connectionPreview;
