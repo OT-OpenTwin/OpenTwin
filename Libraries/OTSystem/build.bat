@@ -68,7 +68,7 @@ DIR "%OT_SYSTEM_ROOT%"
 IF %DEBUG%==1 (
     ECHO %TYPE_NAME% DEBUG
     ECHO Running command: "%DEVENV_ROOT_2022%\devenv.com" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64"
-    "%DEVENV_ROOT_2022%\devenv.com" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64"
+    "%DEVENV_ROOT_2022%\devenv.com" "%OT_SYSTEM_ROOT%\OTSystem.sln"  %TYPE% "Debug|x64"
     REM Check the exit status
     IF ERRORLEVEL 1 (
         ECHO Debug build failed
