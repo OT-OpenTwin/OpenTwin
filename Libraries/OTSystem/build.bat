@@ -62,8 +62,8 @@ IF "%2"=="BUILD" (
 REM Debug build
 IF %DEBUG%==1 (
     ECHO %TYPE_NAME% DEBUG
-    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt /Log devenv.log /NoLogo /UseEnv /m
-    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt /Log devenv.log /NoLogo /UseEnv /m
+    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" 
+    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" 
     echo Command completed
     IF EXIST buildLog_Debug.txt (
         ECHO Build log content:
