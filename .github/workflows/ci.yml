@@ -58,7 +58,7 @@ jobs:
     # Step 8: Set environment variables, check paths, and run BuildAll.bat
     - name: Setup and Execute Build
       run: |
-        cd OT-OpenTwin
+        cd OpenTwin
         echo "Current directory: %cd%"
         set OPENTWIN_DEV_ROOT=%cd%\OpenTwin
         set DEVENV_ROOT_2022=C:\VS2022\Common7\IDE
