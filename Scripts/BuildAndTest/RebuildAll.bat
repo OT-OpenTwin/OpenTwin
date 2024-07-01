@@ -87,7 +87,7 @@ REM ====================================================================
 ECHO ===============================================================
 ECHO Build Library: OpenTwinSystem
 ECHO ===============================================================
-CALL "%OT_SYSTEM_ROOT%\build.bat" %1 %2 /verbosity:detailed
+CALL "%OT_SYSTEM_ROOT%\build.bat" %1 %2 
 
 ECHO ===============================================================
 ECHO Build Library: OpenTwinCore
