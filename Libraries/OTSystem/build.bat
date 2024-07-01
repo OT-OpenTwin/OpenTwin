@@ -65,9 +65,13 @@ DIR "%DEVENV_ROOT_2022%"
 ECHO Directory contents of OTSystem project path:
 DIR "%OT_SYSTEM_ROOT%"
 
+REM Check for existing devenv.exe processes
+TASKLIST /FI "IMAGENAME eq devenv.exe"
+
 IF %DEBUG%==1 (
     ECHO %TYPE_NAME% DEBUG
-    start /wait cmd /c ""%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64""
+    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64"
+    start /wait "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" 2>&1
     timeout /t 60 /nobreak && taskkill /f /im devenv.exe
     REM Check if the process was killed due to timeout
     IF %ERRORLEVEL% EQU 1 (
@@ -85,7 +89,8 @@ IF %DEBUG%==1 (
 
 IF %RELEASE%==1 (
     ECHO %TYPE_NAME% RELEASE
-    start /wait cmd /c ""%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64""
+    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64"
+    start /wait "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" 2>&1
     timeout /t 60 /nobreak && taskkill /f /im devenv.exe
     REM Check if the process was killed due to timeout
     IF %ERRORLEVEL% EQU 1 (
@@ -100,6 +105,10 @@ IF %RELEASE%==1 (
         ECHO Release build succeeded
     )
 ) 
+
+REM Check for running devenv.exe processes after build
+TASKLIST /FI "IMAGENAME eq devenv.exe"
+ 
 
 GOTO END
 
