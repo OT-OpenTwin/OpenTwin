@@ -23,6 +23,7 @@ private:
 	const std::string _valuesField = "Values";
 	const std::string _dataRowsField = "Rows";
 	const std::string _dataColumnsField = "Columns";
+	const std::string _unitField = "Unit";
 
 
 	std::list<ot::UID> _newEntityIDs;

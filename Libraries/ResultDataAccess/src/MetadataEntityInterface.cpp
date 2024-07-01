@@ -55,13 +55,38 @@ MetadataSeries MetadataEntityInterface::CreateSeries(std::shared_ptr<EntityMetad
 			if (entry->getEntryName() == _nameField)
 			{
 				auto nameEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+				assert(nameEntry != nullptr);
+				assert(nameEntry->getValue().isConstCharPtr());
 				parameter.parameterName = nameEntry->getValue().getConstCharPtr();
 			}
 			else if (entry->getEntryName() == _valuesField)
 			{
-				auto valueEntry = dynamic_cast<MetadataEntryArray*>(entry.get());
-				parameter.values = valueEntry->getValues();
-				parameter.typeName = valueEntry->getValues().begin()->getTypeName();
+				auto valueEntryArr = dynamic_cast<MetadataEntryArray*>(entry.get());
+				if (valueEntryArr != nullptr)
+				{
+					parameter.values = valueEntryArr->getValues();
+				}
+				else
+				{
+					auto valueEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+					assert(valueEntry != nullptr);
+					parameter.values = { valueEntry->getValue() };
+				}
+				
+			}
+			else if (entry->getEntryName() == _datatypeField)
+			{
+				auto dataTypeEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+				assert(dataTypeEntry != nullptr);
+				assert(dataTypeEntry->getValue().isConstCharPtr());
+				parameter.typeName = dataTypeEntry->getValue().getConstCharPtr();
+			}
+			else if (entry->getEntryName() == _unitField)
+			{
+				auto unitEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+				assert(unitEntry != nullptr);
+				assert(unitEntry->getValue().isConstCharPtr());
+				parameter.typeName = unitEntry->getValue().getConstCharPtr();
 			}
 			else
 			{
@@ -92,22 +117,37 @@ MetadataSeries MetadataEntityInterface::CreateSeries(std::shared_ptr<EntityMetad
 			if (entry->getEntryName() == _datatypeField)
 			{
 				auto typeEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+				assert(typeEntry != nullptr);
+				assert(typeEntry->getValue().isConstCharPtr());
 				quantity.typeName = typeEntry->getValue().getConstCharPtr();
 			}
 			else if (entry->getEntryName() == _nameField)
 			{
 				auto nameEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+				assert(nameEntry != nullptr);
+				assert(nameEntry->getValue().isConstCharPtr());
 				quantity.quantityName = nameEntry->getValue().getConstCharPtr();
 			}
 			else if (entry->getEntryName() == _dataRowsField)
 			{
 				auto dataRowsEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+				assert(dataRowsEntry != nullptr);
+				assert(dataRowsEntry->getValue().isInt32());
 				quantity.dataRows = static_cast<uint32_t>(dataRowsEntry->getValue().getInt32());
 			}
 			else if (entry->getEntryName() == _dataColumnsField)
 			{
 				auto dataColumnEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+				assert(dataColumnEntry != nullptr);
+				assert(dataColumnEntry->getValue().isInt32());
 				quantity.dataColumns = static_cast<uint32_t>(dataColumnEntry->getValue().getInt32());
+			}
+			else if (entry->getEntryName() == _unitField)
+			{
+				auto unitEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
+				assert(unitEntry != nullptr);
+				assert(unitEntry->getValue().isConstCharPtr());
+				quantity.unit = unitEntry->getValue().getConstCharPtr();
 			}
 			else
 			{
@@ -157,6 +197,9 @@ void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& mode
 			MetadataParameter& parameterForChange = const_cast<MetadataParameter&>(parameter);
 			entitySeries.InsertToParameterField(_nameField, { ot::Variable(parameter.parameterName) }, parameter.parameterAbbreviation);
 			entitySeries.InsertToParameterField(_valuesField, std::move(parameterForChange.values), parameter.parameterAbbreviation);
+			entitySeries.InsertToParameterField(_unitField, { ot::Variable(parameterForChange.unit) }, parameter.parameterAbbreviation);
+			entitySeries.InsertToParameterField(_datatypeField, { ot::Variable(parameterForChange.typeName) }, parameter.parameterAbbreviation);
+
 			for (auto& metadata : parameter.metaData)
 			{
 				InsertMetadata(&entitySeries,metadata.second.get());
@@ -168,7 +211,8 @@ void MetadataEntityInterface::StoreCampaign(ot::components::ModelComponent& mode
 			entitySeries.InsertToQuantityField(_datatypeField, { ot::Variable(quantity.typeName) }, quantity.quantityAbbreviation);
 			entitySeries.InsertToQuantityField(_dataRowsField, { ot::Variable(static_cast<int32_t>(quantity.dataRows)) }, quantity.quantityAbbreviation);
 			entitySeries.InsertToQuantityField(_dataColumnsField, { ot::Variable(static_cast<int32_t>(quantity.dataColumns)) }, quantity.quantityAbbreviation);
-
+			entitySeries.InsertToQuantityField(_unitField, { ot::Variable(quantity.unit) }, quantity.quantityAbbreviation);
+			
 			for (auto& metadata : quantity.metaData)
 			{
 				InsertMetadata(&entitySeries, metadata.second.get());
