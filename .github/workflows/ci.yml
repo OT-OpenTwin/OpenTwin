@@ -60,9 +60,9 @@ jobs:
       run: |
         cd OpenTwin
         echo "Current directory: %cd%"
-        set OPENTWIN_DEV_ROOT=%cd%\OpenTwin
+        set OPENTWIN_DEV_ROOT=%cd%
         set DEVENV_ROOT_2022=C:\VS2022\Common7\IDE
-        set OPENTWIN_THIRDPARTY_ROOT=%cd%\ThirdParty
+        set OPENTWIN_THIRDPARTY_ROOT=%cd%\..\ThirdParty
         echo "OPENTWIN_DEV_ROOT=%OPENTWIN_DEV_ROOT%"
         echo "DEVENV_ROOT_2022=%DEVENV_ROOT_2022%"
         echo "OPENTWIN_THIRDPARTY_ROOT=%OPENTWIN_THIRDPARTY_ROOT%"
