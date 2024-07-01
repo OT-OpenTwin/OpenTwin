@@ -59,49 +59,22 @@ IF "%2"=="BUILD" (
 	SET TYPE_NAME=BUILD
 )
 
-REM Debug build
-IF %DEBUG%==1 (
+IF "%DEBUG%"=="1" (
     ECHO %TYPE_NAME% DEBUG
-    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" 
-    "%DEVENV_ROOT_2022%\devenv.exe"|| "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" 
-    echo Command completed
-    IF EXIST buildLog_Debug.txt (
-        ECHO Build log content:
-        TYPE buildLog_Debug.txt
-    ) ELSE (
-        ECHO buildLog_Debug.txt does not exist or is empty.
-    )
-    IF EXIST devenv.log (
-        ECHO Devenv log content:
-        TYPE devenv.log
-    ) ELSE (
-        ECHO devenv.log does not exist or is empty.
-    )
-    IF EXIST complete_output.txt (
-        ECHO Complete output content:
-        TYPE complete_output.txt
-    ) ELSE (
-        ECHO complete_output.txt does not exist or is empty.
-    )
+    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "DEBUG|x64" /Out buildLog_Debug.txt
     IF ERRORLEVEL 1 (
-        ECHO Debug build failed
-        GOTO END
+        ECHO Error: Failed to build DEBUG configuration.
+        EXIT /B 1
     )
-    ECHO Debug build completed successfully
 )
-
-REM Release build
-IF %DEBUG%==1 (
-    ECHO %TYPE_NAME% DEBUG
-    START powershell -Command "Get-Content buildLog_Debug.txt -Wait -Tail 10"
-    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
-)
-
-IF %RELEASE%==1 (
+IF "%RELEASE%"=="1" (
     ECHO %TYPE_NAME% RELEASE
-    START powershell -Command "Get-Content buildLog_Release.txt -Wait -Tail 10"
     "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
-) 
+    IF ERRORLEVEL 1 (
+        ECHO Error: Failed to build RELEASE configuration.
+        EXIT /B 1
+    )
+)
 
 GOTO END
 
