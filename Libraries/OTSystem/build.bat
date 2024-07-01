@@ -72,8 +72,8 @@ IF "%DEBUG%"=="1" (
     ECHO Directory of devenv.exe: "%DEVENV_ROOT_2022%"
     DIR "%OT_SYSTEM_ROOT%"
     ECHO Directory of OTSystem root: %OT_SYSTEM_ROOT%
- 
-    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "DEBUG|x64"
+    START powershell -Command "Get-Content buildLog_Debug.txt -Wait -Tail 10"
+    "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64"
     IF ERRORLEVEL 1 (
         ECHO Error: Failed to build DEBUG configuration.
         EXIT /B 1
@@ -81,6 +81,7 @@ IF "%DEBUG%"=="1" (
 )
 IF "%RELEASE%"=="1" (
     ECHO %TYPE_NAME% RELEASE
+    START powershell -Command "Get-Content buildLog_Release.txt -Wait -Tail 10"
     "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" 
     IF ERRORLEVEL 1 (
         ECHO Error: Failed to build RELEASE configuration.
