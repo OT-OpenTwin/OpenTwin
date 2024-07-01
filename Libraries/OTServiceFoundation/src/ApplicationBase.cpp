@@ -31,6 +31,7 @@
 
 #include "TemplateDefaultManager.h"
 
+#include "OTServiceFoundation/ExternalServicesComponent.h"
 // Third party header
 #include "curl/curl.h"
 
@@ -706,5 +707,15 @@ ot::UID ot::ApplicationBase::getPrefetchedEntityVersion(UID entityID)
 	OTAssert(m_prefetchedEntityVersions.count(entityID) > 0, "The entity was not prefetched");
 
 	return m_prefetchedEntityVersions[entityID];
+}
+
+std::string ot::ApplicationBase::getLogInUserName() const
+{
+	return ot::intern::ExternalServicesComponent::instance().getLoggedInUserName();
+}
+
+std::string ot::ApplicationBase::getLogInUserPsw() const
+{
+	return ot::intern::ExternalServicesComponent::instance().getLoggedInUserPassword(); 
 }
 

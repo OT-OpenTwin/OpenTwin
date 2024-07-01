@@ -8,6 +8,7 @@ void BufferResultCollectionAccess::setModelComponent(ot::components::ModelCompon
 	_modelComponent = modelComponent;
 }
 
+#include "OTServiceFoundation/ExternalServicesComponent.h"
 const std::shared_ptr<ResultMetadataAccess> BufferResultCollectionAccess::getResultCollectionAccessMetadata(EntityBlockDatabaseAccess* blockEntity)
 {
 	const std::string projectName = blockEntity->getSelectedProjectName();
@@ -17,7 +18,9 @@ const std::shared_ptr<ResultMetadataAccess> BufferResultCollectionAccess::getRes
 		auto& classFactory = Application::instance()->getClassFactory();
 		const std::string sessionServiceURL = Application::instance()->sessionServiceURL();
 		ProjectToCollectionConverter collectionFinder(sessionServiceURL);
-		std::string collectionName = collectionFinder.NameCorrespondingCollection(projectName, DataBase::GetDataBase()->getUserName(), DataBase::GetDataBase()->getUserPassword());
+		std::string loggedInUserName = Application::instance()->getLogInUserName();
+		std::string loggedInUserPsw = Application::instance()->getLogInUserPsw();
+		std::string collectionName = collectionFinder.NameCorrespondingCollection(projectName, loggedInUserName, loggedInUserPsw);
 
 		const std::string thisProjectsName = DataBase::GetDataBase()->getProjectName();
 		
