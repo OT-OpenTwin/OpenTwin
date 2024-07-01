@@ -545,7 +545,16 @@ namespace MongoUserFunctions
 			"dropUser" << userName
 			<< finalize;
 
-		auto command_result = adminClient[MongoConstants::ADMIN_DB].run_command(drop_user_command.view());
+		mongocxx::database db = adminClient.database(MongoConstants::ADMIN_DB); // The admin db must be used
+
+		try
+		{
+			value command_result = db.run_command(drop_user_command.view());
+		}
+		catch (std::exception)
+		{
+			assert(0);
+		}
 	}
 }
 
