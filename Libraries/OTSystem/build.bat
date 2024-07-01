@@ -59,10 +59,19 @@ IF "%2"=="BUILD" (
 	SET TYPE_NAME=BUILD
 )
 
+ECHO Directory contents of devenv.exe path:
+DIR "%DEVENV_ROOT_2022%"
+
+ECHO Directory contents of OTSystem project path:
+DIR "%OT_SYSTEM_ROOT%"
+
 IF "%DEBUG%"=="1" (
     ECHO %TYPE_NAME% DEBUG
-    ECHO Directory of devenv.exe: %DEVENV_ROOT_2022%
-    ECHO Directory of OTSystem root: %OT_SYSTEM_ROOT%
+    ECHO Directory of devenv.exe: 
+    DIR "%DEVENV_ROOT_2022%"
+    ECHO Directory of OTSystem root:
+    DIR "%OT_SYSTEM_ROOT%"
+
 	
     "%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "DEBUG|x64" /Out buildLog_Debug.txt
     IF ERRORLEVEL 1 (
