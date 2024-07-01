@@ -65,14 +65,44 @@ DIR "%DEVENV_ROOT_2022%"
 ECHO Directory contents of OTSystem project path:
 DIR "%OT_SYSTEM_ROOT%"
 
+REM Clear previous logs
+IF EXIST buildLog_Debug.txt DEL buildLog_Debug.txt
+IF EXIST buildLog_Debug_Error.txt DEL buildLog_Debug_Error.txt
+
 IF %DEBUG%==1 (
-	ECHO %TYPE_NAME% DEBUG
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
+    ECHO %TYPE_NAME% DEBUG
+    start /wait cmd /c ""%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" > buildLog_Debug.txt 2> buildLog_Debug_Error.txt" & timeout /t 60 /nobreak && taskkill /f /im devenv.exe
+    REM Check if the process was killed due to timeout
+    IF %ERRORLEVEL% EQU 1 (
+        ECHO Debug build process was terminated due to timeout
+        GOTO END
+    )
+    REM Check the exit status
+    IF ERRORLEVEL 1 (
+        ECHO Debug build failed
+        ECHO Check buildLog_Debug_Error.txt for more details
+        GOTO END
+    ) ELSE (
+        ECHO Debug build succeeded
+    )
 )
 
 IF %RELEASE%==1 (
-	ECHO %TYPE_NAME% RELEASE
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
+    ECHO %TYPE_NAME% RELEASE
+    start /wait cmd /c ""%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" > buildLog_Release.txt 2> buildLog_Release_Error.txt" & timeout /t 60 /nobreak && taskkill /f /im devenv.exe
+    REM Check if the process was killed due to timeout
+    IF %ERRORLEVEL% EQU 1 (
+        ECHO Release build process was terminated due to timeout
+        GOTO END
+    )
+    REM Check the exit status
+    IF ERRORLEVEL 1 (
+        ECHO Release build failed
+        ECHO Check buildLog_Release_Error.txt for more details
+        GOTO END
+    ) ELSE (
+        ECHO Release build succeeded
+    )
 ) 
 
 GOTO END
