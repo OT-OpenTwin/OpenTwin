@@ -19,6 +19,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT GraphicsEllipseItemCfg : public ot::GraphicsItemCfg {
 	public:
 		GraphicsEllipseItemCfg(double _radiusX = 5., double _radiusY = 5., ot::Painter2D* _backgroundPainter = (ot::Painter2D*)nullptr);
+		GraphicsEllipseItemCfg(const GraphicsEllipseItemCfg& _other);
 		virtual ~GraphicsEllipseItemCfg();
 
 		//! \brief Creates a copy of this item.
@@ -54,7 +55,6 @@ namespace ot {
 		ot::OutlineF m_outline;
 		ot::Painter2D* m_backgroundPainter;
 
-		GraphicsEllipseItemCfg(GraphicsEllipseItemCfg&) = delete;
 		GraphicsEllipseItemCfg& operator = (GraphicsEllipseItemCfg&) = delete;
 	};
 

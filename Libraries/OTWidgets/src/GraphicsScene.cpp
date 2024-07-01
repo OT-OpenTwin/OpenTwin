@@ -19,11 +19,23 @@
 #include <QtGui/qevent.h>
 #include <QtWidgets/qgraphicssceneevent.h>
 
+//! \brief If defined as true the graphics connection API related code will generate more detailed log messages.
+//! The messages will contain creation, deletion and other detailed informations about the objects lifetime.
+//! \warning Never use in deployment!
+#define OT_DBG_WIDGETS_GRAPHICS_SCENE_API false
+
+#if OT_DBG_WIDGETS_GRAPHICS_SCENE_API==true
+#pragma message("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+#pragma message("! ot: GraphicsScene debug is enabled.                 !")
+#pragma message("! ot:NoDeploy: Do not use this build in a deployment. !")
+#pragma message("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+#endif
+
 ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 	: m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
 {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_SCENE_API==true
 	OT_LOG_D("debug.scene creating 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 	OTAssertNullptr(m_view);
@@ -34,7 +46,7 @@ ot::GraphicsScene::GraphicsScene(const QRectF& _sceneRect, GraphicsView* _view)
 	: QGraphicsScene(_sceneRect), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
 {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_SCENE_API==true
 	OT_LOG_D("debug.scene creating 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 	OTAssertNullptr(m_view);
@@ -42,7 +54,7 @@ ot::GraphicsScene::GraphicsScene(const QRectF& _sceneRect, GraphicsView* _view)
 }
 
 ot::GraphicsScene::~GraphicsScene() {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_SCENE_API==true
 	OT_LOG_D("debug.scene destroying 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 }
@@ -136,7 +148,7 @@ void ot::GraphicsScene::slotSelectionChanged(void) {
 }
 
 void ot::GraphicsScene::handleSelectionChanged(void) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_SCENE_API==true
 	OT_LOG_D("debug.scene handling selection changed 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 	QList<QGraphicsItem*> tmp = m_lastSelection;
@@ -219,7 +231,7 @@ void ot::GraphicsScene::flipAllSelectedItems(Qt::Orientation _flipAxis) {
 }
 
 void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_SCENE_API==true
 	OT_LOG_D("debug.scene mouse double click 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 

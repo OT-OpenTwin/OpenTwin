@@ -23,6 +23,7 @@ namespace ot {
 		};
 
 		GraphicsStackItemCfg();
+		GraphicsStackItemCfg(const GraphicsStackItemCfg& _other);
 		virtual ~GraphicsStackItemCfg();
 
 		//! \brief Creates a copy of this item.
@@ -64,6 +65,7 @@ namespace ot {
 
 		std::list<GraphicsStackItemCfgEntry> m_items;
 
+		GraphicsStackItemCfg& operator = (const GraphicsStackItemCfg&) = delete;
 	};
 
 }

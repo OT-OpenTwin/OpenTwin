@@ -24,11 +24,15 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public QGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsConnectionItem)
 	public:
+		//! \enum GraphicsConnectionState
 		enum GraphicsConnectionState {
-			NoState = 0x00, //! @brief Default state
-			HoverState = 0x01, //! @brief Item is hovered over by user
-			SelectedState = 0x02  //! @brief Item is selected
+			NoState          = 0x00, //! \brief Default state.
+			HoverState       = 0x01, //! \brief Item is hovered over by user.
+			SelectedState    = 0x02, //! \brief Item is selected.
+			ToBeDeletedState = 0x10  //! \brief Iten is about to be deleted.
 		};
+
+		//! \typedef GraphicsConnectionStateFlags
 		typedef Flags<GraphicsConnectionState> GraphicsConnectionStateFlags;
 
 		GraphicsConnectionItem();
@@ -99,6 +103,10 @@ namespace ot {
 		//! If no orgin is set the origin connectable name will be an empty string and the UID 0.
 		//! Same applies to the destination.
 		void updateConnectionInformation(void);
+
+		void setStateFlag(GraphicsConnectionState _flag, bool _active = true);
+		void setStateFlags(const GraphicsConnectionStateFlags& _flags);
+		const GraphicsConnectionStateFlags& getStateFlags(void) const { return m_state; };
 
 	private:
 		void calculatePainterPath(QPainterPath& _path) const;

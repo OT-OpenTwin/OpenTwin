@@ -24,12 +24,25 @@
 #include <QtCore/qmimedata.h>
 #include <QtGui/qdrag.h>
 #include <QtGui/qfont.h>
+#include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qtooltip.h>
 #include <QtWidgets/qstyleoption.h>
 #include <QtWidgets/qgraphicsscene.h>
 #include <QtWidgets/qgraphicssceneevent.h>
+
+//! \brief If defined as true the graphics connection API related code will generate more detailed log messages.
+//! The messages will contain creation, deletion and other detailed informations about the objects lifetime.
+//! \warning Never use in deployment!
+#define OT_DBG_WIDGETS_GRAPHICS_ITEM_API false
+
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
+#pragma message("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+#pragma message("! ot: GraphicsItem debug is enabled.                  !")
+#pragma message("! ot:NoDeploy: Do not use this build in a deployment. !")
+#pragma message("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+#endif
 
 // ###############################################################################################################################################
 
@@ -51,15 +64,17 @@ ot::GraphicsItem::GraphicsItem(GraphicsItemCfg* _configuration, const ot::Flags<
 	: m_config(_configuration), m_state(_stateFlags), m_moveStartPt(0., 0.), m_parent(nullptr), m_scene(nullptr), m_requestedSize(-1., -1.),
 	m_blockConfigurationNotifications(false), m_blockFlagNotifications(false), m_blockStateNotifications(false)
 {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
 	OT_LOG_D("debug.item creating 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 }
 
 ot::GraphicsItem::~GraphicsItem() {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
 	OT_LOG_D("debug.item destroying 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
+	m_state |= ToBeDeletedState;
+
 	for (GraphicsConnectionItem* connection : m_connections) {
 		connection->forgetItem(this);
 	}
@@ -74,7 +89,7 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
 	OTAssertNullptr(this->getQGraphicsItem());
 	
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
 	OT_LOG_D("debug.item setting up 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 
@@ -90,8 +105,8 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	}
 	m_blockConfigurationNotifications = false;
 
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
-	OT_LOG_D("debug.item config setup completed with name \"" + this->getGraphicsItemName() + "\" 0x" + ot::numberToHexString<size_t>((size_t)this));
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
+	OT_LOG_D("debug.item config setup completed with { \"name\": \"" + this->getGraphicsItemName() + "\", \"UID\": " + std::to_string(this->getGraphicsItemUid()) + " } 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 
 	return true;
@@ -103,6 +118,10 @@ void ot::GraphicsItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsI
 }
 
 void ot::GraphicsItem::graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) {
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
+	OT_LOG_D("debug.item config changed with { \"name\": \"" + _config->getName() + "\", \"UID\": " + std::to_string(_config->getUid()) + " } 0x" + ot::numberToHexString<size_t>((size_t)this));
+#endif
+
 	if (!this->getGraphicsScene()) return;
 	OTAssertNullptr(this->getGraphicsScene()->getGraphicsView());
 	this->getGraphicsScene()->getGraphicsView()->notifyItemConfigurationChanged(this);
@@ -136,12 +155,11 @@ void ot::GraphicsItem::removeAllConnections(void) {
 	GraphicsView* view = scene->getGraphicsView();
 	OTAssertNullptr(view);
 
-	std::list<ot::GraphicsConnectionCfg> graphicConnectionCfgList;
-	for (const auto& connection : m_connections) {
-		graphicConnectionCfgList.push_back(connection->getConfiguration());
-	}
-	for (const auto& connection : graphicConnectionCfgList) {
+	std::list<ot::GraphicsConnectionItem*> graphicConnectionList = m_connections;
+	m_connections.clear();
+	for (GraphicsConnectionItem* connection : graphicConnectionList) {
 		view->removeConnection(connection);
+		delete connection;
 	}
 }
 
@@ -154,10 +172,22 @@ bool ot::GraphicsItem::graphicsItemRequiresHover(void) const {
 
 // Event handler
 
+bool ot::GraphicsItem::graphicsItemEventFilter(QEvent* _event) {
+	if (m_state & ToBeDeletedState) {
+		_event->setAccepted(true);
+		return true;
+	}
+	return false;
+}
+
 void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
 	OT_LOG_D("debug.item mouse press 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
+	if (this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState) {
+		return;
+	}
+
 	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) {
 		OTAssertNullptr(this->getGraphicsScene());
 		this->getGraphicsScene()->startConnection(this);
@@ -189,9 +219,12 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 }
 
 void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
 	OT_LOG_D("debug.item mouse release 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
+	if (this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState) {
+		return;
+	}
 	if (m_parent) {
 		m_parent->handleMouseReleaseEvent(_event);
 		return;
@@ -212,18 +245,24 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 }
 
 void ot::GraphicsItem::handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
 	OT_LOG_D("debug.item hover enter 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
+	if (this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState) {
+		return;
+	}
 	this->handleToolTip(_event);
 	
 	this->m_state |= GraphicsItem::HoverState;
-	if (!m_blockStateNotifications) this->graphicsItemStateChanged(m_state);
-
 	this->getQGraphicsItem()->update();
+
+	if (!m_blockStateNotifications) this->graphicsItemStateChanged(m_state);
 }
 
 void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
+	if (this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState) {
+		return;
+	}
 	if (!this->getGraphicsItemToolTip().empty())
 	{
 		ToolTipHandler::showToolTip(_event->screenPos(), QString::fromStdString(this->getGraphicsItemToolTip()), 1500);
@@ -234,18 +273,24 @@ void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
 }
 
 void ot::GraphicsItem::handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
 	OT_LOG_D("debug.item hover leave 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
+	if (this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState) {
+		return;
+	}
 	ToolTipHandler::hideToolTip();
 
 	m_state &= ~(GraphicsItem::HoverState);
-	if (!m_blockStateNotifications) this->graphicsItemStateChanged(m_state);
-
 	this->getQGraphicsItem()->update();
+
+	if (!m_blockStateNotifications) this->graphicsItemStateChanged(m_state);
 }
 
 QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _sizeHint) const {
+	if (this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState) {
+		return QSizeF();
+	}
 	// The adjusted size is the size hint expanded to the minimum size, bound to maximum size and with margins applied
 	QSizeF adjustedSize = _sizeHint.expandedTo(this->getGraphicsItemMinimumSize()).boundedTo(this->getGraphicsItemMaximumSize());
 
@@ -266,6 +311,9 @@ QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const
 }
 
 QRectF ot::GraphicsItem::handleGetGraphicsItemBoundingRect(const QRectF& _rect) const {
+	if (this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState) {
+		return QRectF();
+	}
 	if (this->getGraphicsItemSizePolicy() == ot::Dynamic) {
 		return QRectF(
 			_rect.topLeft(),
@@ -282,9 +330,12 @@ QRectF ot::GraphicsItem::handleGetGraphicsItemBoundingRect(const QRectF& _rect) 
 }
 
 void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
 	OT_LOG_D("debug.item handling item change 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
+	if (this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState) {
+		return;
+	}
 	switch (_change)
 	{
 	case QGraphicsItem::ItemSelectedHasChanged:
@@ -304,7 +355,7 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 			QPointF pos = this->getGraphicsScene()->snapToGrid(this->getQGraphicsItem()->pos());
 			if (pos != this->getQGraphicsItem()->pos()) {
 				this->setGraphicsItemPos(pos);
-				this->getGraphicsScene()->update();
+				//this->getGraphicsScene()->update();
 				return;
 			}
 		}
@@ -324,6 +375,9 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 }
 
 void ot::GraphicsItem::handleSetItemGeometry(const QRectF& _geom) {
+	if (this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState) {
+		return;
+	}
 	if (m_parent) {
 		if (m_parent->getGraphicsItemState() & GraphicsItem::ForwardSizeState) {
 			this->setGraphicsItemRequestedSize(_geom.size());
@@ -332,16 +386,19 @@ void ot::GraphicsItem::handleSetItemGeometry(const QRectF& _geom) {
 }
 
 void ot::GraphicsItem::raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
 	OT_LOG_D("debug.item rising event 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
+	if (this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState) {
+		return;
+	}
 	for (auto itm : m_eventHandler) {
 		itm->graphicsItemEventHandler(this, _event);
 	}
 }
 
 QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
 	OT_LOG_D("debug.item calculating paint area 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 	auto qitm = this->getQGraphicsItem();
@@ -401,7 +458,7 @@ const ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) const {
 }
 
 void ot::GraphicsItem::setConfiguration(GraphicsItemCfg* _config) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
 	OT_LOG_D("debug.item setting config 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 
@@ -436,11 +493,19 @@ const ot::Point2DD& ot::GraphicsItem::getGraphicsItemPos(void) const {
 
 void ot::GraphicsItem::setStateFlag(GraphicsItemState _state, bool _active) {
 	m_state.setFlag(_state, _active);
+	if (m_state & GraphicsItem::ToBeDeletedState) {
+		m_state = GraphicsItem::ToBeDeletedState;
+		this->getQGraphicsItem()->setFlags(QGraphicsItem::ItemHasNoContents);
+	}
 	if (!m_blockStateNotifications) this->graphicsItemStateChanged(m_state);
 }
 
 void ot::GraphicsItem::setGraphicsItemState(GraphicsItemStateFlags _flags) {
 	m_state = _flags;
+	if (m_state & GraphicsItem::ToBeDeletedState) {
+		m_state = GraphicsItem::ToBeDeletedState;
+		this->getQGraphicsItem()->setFlags(QGraphicsItem::ItemHasNoContents);
+	}
 	if (!m_blockStateNotifications) this->graphicsItemStateChanged(m_state);
 }
 
@@ -590,7 +655,7 @@ const ot::Transform& ot::GraphicsItem::getGraphicsItemTransform(void) const {
 }
 
 void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
 	OT_LOG_D("debug.item storing connection { "
 		"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) +
 		"\", \"connection\": \"0x" + ot::numberToHexString<size_t>((size_t)_connection) + "\" }"
@@ -600,7 +665,7 @@ void ot::GraphicsItem::storeConnection(GraphicsConnectionItem* _connection) {
 }
 
 void ot::GraphicsItem::forgetConnection(GraphicsConnectionItem* _connection) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_ITEM_API==true
 	OT_LOG_D("debug.item forgetting connection { "
 		"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) +
 		"\", \"connection\": \"0x" + ot::numberToHexString<size_t>((size_t)_connection) + "\" }"
@@ -745,12 +810,3 @@ QTransform ot::GraphicsItem::calculateGraphicsItemTransform(QPointF& _transformO
 
 	return newTransform;
 }
-
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
-
-#pragma message("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-#pragma message("ot: WidgetsAPI debug is enabled.")
-#pragma message("Do not use this build in a deployment.")
-#pragma message("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-
-#endif

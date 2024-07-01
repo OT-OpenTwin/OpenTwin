@@ -19,6 +19,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT GraphicsRectangularItemCfg : public ot::GraphicsItemCfg {
 	public:
 		GraphicsRectangularItemCfg(ot::Painter2D* _backgroundPainter = (ot::Painter2D*)nullptr, int _cornerRadius = 0);
+		GraphicsRectangularItemCfg(const GraphicsRectangularItemCfg& _other);
 		virtual ~GraphicsRectangularItemCfg();
 
 		//! \brief Creates a copy of this item.
@@ -55,7 +56,6 @@ namespace ot {
 		ot::Size2DD m_size;
 		ot::Painter2D* m_backgroundPainter;
 
-		GraphicsRectangularItemCfg(GraphicsRectangularItemCfg&) = delete;
 		GraphicsRectangularItemCfg& operator = (GraphicsRectangularItemCfg&) = delete;
 	};
 

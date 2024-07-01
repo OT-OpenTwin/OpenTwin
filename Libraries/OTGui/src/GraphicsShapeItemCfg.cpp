@@ -19,19 +19,19 @@ ot::GraphicsShapeItemCfg::GraphicsShapeItemCfg()
 	m_backgroundPainter = new FillPainter2D(Transparent);
 }
 
+ot::GraphicsShapeItemCfg::GraphicsShapeItemCfg(const GraphicsShapeItemCfg& _other) 
+	: GraphicsItemCfg(_other), m_path(_other.m_path), m_outline(_other.m_outline), m_fillShape(_other.m_fillShape), m_backgroundPainter(nullptr)
+{
+	OTAssertNullptr(_other.m_backgroundPainter);
+	m_backgroundPainter = _other.m_backgroundPainter->createCopy();
+}
+
 ot::GraphicsShapeItemCfg::~GraphicsShapeItemCfg() {
 	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
 ot::GraphicsItemCfg* ot::GraphicsShapeItemCfg::createCopy(void) const {
-	ot::GraphicsShapeItemCfg* copy = new GraphicsShapeItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_path = m_path;
-	copy->m_outline = m_outline;
-	copy->setBackgroundPainter(m_backgroundPainter->createCopy());
-
-	return copy;
+	return new GraphicsShapeItemCfg(*this);
 }
 
 void ot::GraphicsShapeItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

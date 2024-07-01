@@ -24,10 +24,7 @@
 #include <list>
 #include <string>
 
-//! \brief If defined as true the widgets API related code will generate more detailed log messages.
-//! The messages will contain creation, deletion and other detailed informations about the objects lifetime.
-//! \warning Never use in deployment!
-#define OT_DBG_WIDGETS_GRAPHICS_API false
+class QEvent;
 
 namespace ot {
 
@@ -57,10 +54,11 @@ namespace ot {
 		//! \enum GraphicsItemState
 		//! \brief The GraphicsItemState is used to describe the current state of a GraphicsItem.
 		enum GraphicsItemState {
-			NoState           = 0x00, //! \brief Default state
-			HoverState        = 0x01, //! \brief Item is hovered over by user
-			SelectedState     = 0x02, //! \brief Item is selected
-			ForwardSizeState  = 0x08  //! \brief Item forwards requested size requests to child item (e.g. GraphicsLayoutItem).
+			NoState           = 0x00, //! \brief Default state.
+			HoverState        = 0x01, //! \brief Item is hovered over by user.
+			SelectedState     = 0x02, //! \brief Item is selected.
+			ForwardSizeState  = 0x08, //! \brief Item forwards requested size requests to child item (e.g. GraphicsLayoutItem).
+			ToBeDeletedState  = 0x10  //! \brief Item will be deleted soon.
 		};
 		//! \typedef GraphicsItemStateFlags
 		//! \brief Flags used to manage GraphicsItemState.
@@ -152,6 +150,10 @@ namespace ot {
 		// ###############################################################################################################################################
 
 		// Event handler
+
+		//! \brief If true is returned the event must be skipped.
+		//! The event filter sets the event to ignored.
+		bool graphicsItemEventFilter(QEvent* _event);
 
 		void handleMousePressEvent(QGraphicsSceneMouseEvent* _event);
 		void handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event);

@@ -41,11 +41,19 @@ namespace ot {
 		typedef Flags<GraphicsViewFlag> GraphicsViewFlags;
 
 		enum ViewStateFlag {
-			DefaultState            = 0x0000,
-			ItemMoveInProgress      = 0x0001,
-			//LeftMousePressedState   = 0x0100,
-			MiddleMousePressedState = 0x0200,
-			//RightMousePressedState  = 0x0400,
+			DefaultState                    = 0x0000,
+			ItemMoveInProgress              = 0x0001,
+			ItemAddInProgress               = 0x0010, //! \brief Item adding in progress.
+			ItemRemoveInProgress            = 0x0020, //! \brief Item removing in progress.
+			ItemAddOrRemoveInProgress       = ItemAddInProgress | ItemRemoveInProgress, // \brief Mask used to check if an item is added or removed at the current time.
+			ConnectionAddInProgress         = 0x0040, //! \brief Connection adding in progress.
+			ConnectionRemoveInProgress      = 0x0080, //! \brief Connection removing in progress.
+			ConnectionAddOrRemoveInProgress = ConnectionAddInProgress | ConnectionRemoveInProgress, // \brief Mask used to check if a connection is added or removed at the current time.
+			AnyAddOrRemoveInProgress        = ItemAddOrRemoveInProgress | ConnectionAddOrRemoveInProgress, //! \brief Mask used to theck if an item or connection is added or removed at the current time.
+			AnyChangeInProgress             = ItemMoveInProgress | AnyAddOrRemoveInProgress, //! \brief Mask used to check if any change is happening.
+			//LeftMousePressedState           = 0x0100,
+			MiddleMousePressedState         = 0x0200,
+			//RightMousePressedState          = 0x0400,
 
 		};
 		typedef ot::Flags<ViewStateFlag> ViewStateFlags;
@@ -63,6 +71,10 @@ namespace ot {
 		void setGraphicsViewFlag(GraphicsViewFlag _flag, bool _active = true) { m_viewFlags.setFlag(_flag, _active); };
 		void setGraphicsViewFlags(const GraphicsViewFlags& _flags) { m_viewFlags = _flags; };
 		const GraphicsViewFlags& getGraphicsViewFlags(void) const { return m_viewFlags; };
+
+		void setGraphicsViewStateFlag(ViewStateFlag _flag, bool _active = true) { m_viewStateFlags.setFlag(_flag, _active); };
+		void setGraphicsViewStateFlags(const ViewStateFlags& _flags) { m_viewStateFlags = _flags; };
+		const ViewStateFlags& getGraphicsViewStateFlags(void) const { return m_viewStateFlags; };
 
 		void setGraphicsScene(GraphicsScene* _scene);
 		GraphicsScene* getGraphicsScene(void) { return m_scene; };
@@ -86,6 +98,7 @@ namespace ot {
 
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
 		void removeConnection(const ot::UID& _connectionInformation);
+		void removeConnection(GraphicsConnectionItem* _item);
 		ot::UIDList getSelectedConnectionUIDs(void) const;
 		std::list<GraphicsConnectionItem*> getSelectedConnectionItems(void) const;
 
@@ -114,6 +127,8 @@ namespace ot {
 		void removeItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 
 	protected:
+		virtual bool event(QEvent* _event) override;
+
 		virtual void wheelEvent(QWheelEvent* _event) override;
 		virtual void mousePressEvent(QMouseEvent* _event) override;
 		virtual void mouseReleaseEvent(QMouseEvent* _event) override;

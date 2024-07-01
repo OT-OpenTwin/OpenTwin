@@ -28,20 +28,19 @@ ot::GraphicsRectangularItemCfg::GraphicsRectangularItemCfg(ot::Painter2D* _backg
 	}
 }
 
+ot::GraphicsRectangularItemCfg::GraphicsRectangularItemCfg(const GraphicsRectangularItemCfg& _other) 
+	: GraphicsItemCfg(_other), m_cornerRadius(_other.m_cornerRadius), m_outline(_other.m_outline), m_size(_other.m_size), m_backgroundPainter(nullptr)
+{
+	OTAssertNullptr(_other.m_backgroundPainter);
+	m_backgroundPainter = _other.m_backgroundPainter->createCopy();
+}
+
 ot::GraphicsRectangularItemCfg::~GraphicsRectangularItemCfg() {
 	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
 ot::GraphicsItemCfg* ot::GraphicsRectangularItemCfg::createCopy(void) const {
-	ot::GraphicsRectangularItemCfg* copy = new GraphicsRectangularItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_cornerRadius = m_cornerRadius;
-	copy->m_outline = m_outline;
-	copy->m_size = m_size;
-	copy->setBackgroundPainer(m_backgroundPainter->createCopy());
-
-	return copy;
+	return new GraphicsRectangularItemCfg(*this);
 }
 
 void ot::GraphicsRectangularItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

@@ -17,10 +17,22 @@
 #include <QtGui/qpainter.h>
 #include <QtWidgets/qgraphicssceneevent.h>
 
+//! \brief If defined as true the graphics connection API related code will generate more detailed log messages.
+//! The messages will contain creation, deletion and other detailed informations about the objects lifetime.
+//! \warning Never use in deployment!
+#define OT_DBG_WIDGETS_GRAPHICS_CONNECTION_API false
+
+#if OT_DBG_WIDGETS_GRAPHICS_CONNECTION_API==true
+#pragma message("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+#pragma message("! ot: GraphicsConnectionItem debug is enabled.        !")
+#pragma message("! ot:NoDeploy: Do not use this build in a deployment. !")
+#pragma message("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+#endif
+
 ot::GraphicsConnectionItem::GraphicsConnectionItem()
 	: m_dest(nullptr), m_origin(nullptr), m_state(NoState)
 {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_CONNECTION_API==true
 	OT_LOG_D("debug.connection creating 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 
@@ -29,9 +41,10 @@ ot::GraphicsConnectionItem::GraphicsConnectionItem()
 }
 
 ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_CONNECTION_API==true
 	OT_LOG_D("debug.connection destroying 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
+	m_state |= ToBeDeletedState;
 
 	if (m_origin) {
 		m_origin->forgetConnection(this);
@@ -47,6 +60,7 @@ ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
 
 
 QRectF ot::GraphicsConnectionItem::boundingRect(void) const {
+	if (m_state & GraphicsConnectionState::ToBeDeletedState) return QRectF();
 	if (m_dest == nullptr || m_origin == nullptr) {
 		return m_lastRect;
 	}
@@ -57,7 +71,7 @@ QRectF ot::GraphicsConnectionItem::boundingRect(void) const {
 }
 
 void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-
+	if (m_state & GraphicsConnectionState::ToBeDeletedState) return;
 	QPen linePen = QtFactory::toQPen(m_config.getLineStyle());
 
 	if (m_state & GraphicsConnectionItem::HoverState) {
@@ -80,6 +94,7 @@ void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGra
 }
 
 QVariant ot::GraphicsConnectionItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
+	if (m_state & GraphicsConnectionState::ToBeDeletedState) return QVariant();
 	switch (_change)
 	{
 	case QGraphicsItem::ItemSelectedHasChanged:
@@ -97,6 +112,7 @@ QVariant ot::GraphicsConnectionItem::itemChange(QGraphicsItem::GraphicsItemChang
 }
 
 void ot::GraphicsConnectionItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
+	if (m_state & GraphicsConnectionState::ToBeDeletedState) return;
 	if (_event->button() == Qt::LeftButton && this->flags() & QGraphicsItem::ItemIsSelectable) {
 		GraphicsScene* sc = dynamic_cast<GraphicsScene*>(this->scene());
 		if (sc) {
@@ -117,20 +133,22 @@ void ot::GraphicsConnectionItem::mousePressEvent(QGraphicsSceneMouseEvent* _even
 }
 
 void ot::GraphicsConnectionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
-
+	if (m_state & GraphicsConnectionState::ToBeDeletedState) return;
 }
 
 void ot::GraphicsConnectionItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
+	if (m_state & GraphicsConnectionState::ToBeDeletedState) return;
 	m_state |= HoverState;
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_CONNECTION_API==true
 	OT_LOG_D("debug.connection hover enter 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 	this->update();
 }
 
 void ot::GraphicsConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
+	if (m_state & GraphicsConnectionState::ToBeDeletedState) return;
 	m_state &= (~HoverState);
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_CONNECTION_API==true
 	OT_LOG_D("debug.connection hover leave 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 	this->update();
@@ -141,8 +159,9 @@ void ot::GraphicsConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _even
 bool ot::GraphicsConnectionItem::setConfiguration(const ot::GraphicsConnectionCfg& _cfg) {
 	m_config = _cfg;
 
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_CONNECTION_API==true
 	OT_LOG_D("debug.connection configuration set 0x" + ot::numberToHexString<size_t>((size_t)this));
+	OT_LOG_D("debug.connection new uid is (" + std::to_string(m_config.getUid()) + ") set 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 
 	return true;
@@ -154,7 +173,7 @@ void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsIte
 	OTAssert(m_origin == nullptr, "Origin already set");
 	OTAssert(m_dest == nullptr, "Destination already set");
 
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_CONNECTION_API==true
 	OT_LOG_D("debug.connection connecting { "
 		"\"this\": \"0x" + ot::numberToHexString<size_t>((size_t)this) + 
 		"\", \"origin\": \"0x" + ot::numberToHexString<size_t>((size_t)_origin) +
@@ -173,7 +192,7 @@ void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsIte
 }
 
 void ot::GraphicsConnectionItem::disconnectItems(void) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_CONNECTION_API==true
 	OT_LOG_D("debug.connection disconnecting 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
 	if (m_origin) {
@@ -196,9 +215,10 @@ void ot::GraphicsConnectionItem::forgetItem(const GraphicsItem* _item) {
 }
 
 void ot::GraphicsConnectionItem::updateConnectionView(void) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_CONNECTION_API==true
 	OT_LOG_D("debug.connection updating connection view 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
+	if (m_state & GraphicsConnectionState::ToBeDeletedState) return;
 	if (m_origin && m_dest) {
 		this->prepareGeometryChange();
 		this->update();
@@ -206,9 +226,13 @@ void ot::GraphicsConnectionItem::updateConnectionView(void) {
 }
 
 void ot::GraphicsConnectionItem::updateConnectionInformation(void) {
-#if OT_DBG_WIDGETS_GRAPHICS_API==true
+#if OT_DBG_WIDGETS_GRAPHICS_CONNECTION_API==true
 	OT_LOG_D("debug.connection updating connection information 0x" + ot::numberToHexString<size_t>((size_t)this));
 #endif
+	if (m_state & GraphicsConnectionState::ToBeDeletedState) {
+		OT_LOG_EA("Item to is about to be deleted. Ignoring update...");
+		return;
+	}
 	if (m_origin) {
 		m_config.setOriginConnectable(m_origin->getGraphicsItemName());
 		m_config.setOriginUid(m_origin->getRootItem()->getGraphicsItemUid());
@@ -225,6 +249,22 @@ void ot::GraphicsConnectionItem::updateConnectionInformation(void) {
 	else {
 		m_config.setDestConnectable("");
 		m_config.setDestUid(0);
+	}
+}
+
+void ot::GraphicsConnectionItem::setStateFlag(GraphicsConnectionState _flag, bool _active) {
+	m_state.setFlag(_flag, _active);
+	if (m_state & GraphicsConnectionState::ToBeDeletedState) {
+		m_state = GraphicsConnectionState::ToBeDeletedState;
+		this->setFlags(QGraphicsItem::ItemHasNoContents);
+	}
+}
+
+void ot::GraphicsConnectionItem::setStateFlags(const GraphicsConnectionStateFlags& _flags) {
+	m_state = _flags;
+	if (m_state & GraphicsConnectionState::ToBeDeletedState) {
+		m_state = GraphicsConnectionState::ToBeDeletedState;
+		this->setFlags(QGraphicsItem::ItemHasNoContents);
 	}
 }
 

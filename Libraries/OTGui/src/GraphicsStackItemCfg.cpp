@@ -21,19 +21,21 @@ ot::GraphicsStackItemCfg::GraphicsStackItemCfg()
 
 }
 
+ot::GraphicsStackItemCfg::GraphicsStackItemCfg(const GraphicsStackItemCfg& _other) 
+	: GraphicsItemCfg(_other)
+{
+	for (const GraphicsStackItemCfgEntry& itm : _other.m_items) {
+		OTAssertNullptr(itm.item);
+		this->addItemTop(itm.item->createCopy(), itm.isMaster, itm.isSlave);
+	}
+}
+
 ot::GraphicsStackItemCfg::~GraphicsStackItemCfg() {
 	this->memClear();
 }
 
 ot::GraphicsItemCfg* ot::GraphicsStackItemCfg::createCopy(void) const {
-	ot::GraphicsStackItemCfg* copy = new GraphicsStackItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	for (const GraphicsStackItemCfgEntry& itm : m_items) {
-		copy->addItemTop(itm.item->createCopy(), itm.isMaster, itm.isSlave);
-	}
-
-	return copy;
+	return new GraphicsStackItemCfg(*this);
 }
 
 void ot::GraphicsStackItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

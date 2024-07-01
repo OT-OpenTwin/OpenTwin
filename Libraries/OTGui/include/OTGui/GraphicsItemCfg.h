@@ -66,7 +66,10 @@ namespace ot {
 		typedef Flags<GraphicsItemFlag> GraphicsItemFlags; //! @brief GraphicsItemFlags
 
 		GraphicsItemCfg();
+		GraphicsItemCfg(const GraphicsItemCfg& _other);
 		virtual ~GraphicsItemCfg();
+
+		GraphicsItemCfg& operator = (const GraphicsItemCfg& _other);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -229,15 +232,6 @@ namespace ot {
 
 		//! \brief Get the item transform.
 		const Transform& getTransform(void) const { return m_transform; };
-
-		// ###########################################################################################################################################################################################################################################################################################################################
-
-		// Helper
-
-		//! \brief Will copy the current config to the provided item configuration.
-		//! This method may be called when creating a graphics item copy.
-		//! \param _target Item to copy the data to.
-		virtual void copyConfigDataToItem(GraphicsItemCfg* _target) const;
 
 	private:
 		std::string m_name; //! \brief Item name.

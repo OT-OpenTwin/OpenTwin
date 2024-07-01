@@ -19,18 +19,16 @@ ot::GraphicsTextItemCfg::GraphicsTextItemCfg(const std::string& _text, const ot:
 	m_textStyle.setColor(_textColor);
 }
 
+ot::GraphicsTextItemCfg::GraphicsTextItemCfg(const GraphicsTextItemCfg& _other) 
+	: GraphicsItemCfg(_other), m_text(_other.m_text), m_textFont(_other.m_textFont), m_textStyle(_other.m_textStyle), m_textIsReference(_other.m_textIsReference)
+{
+
+}
+
 ot::GraphicsTextItemCfg::~GraphicsTextItemCfg() {}
 
 ot::GraphicsItemCfg* ot::GraphicsTextItemCfg::createCopy(void) const {
-	ot::GraphicsTextItemCfg* copy = new GraphicsTextItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_text = m_text;
-	copy->m_textFont = m_textFont;
-	copy->m_textStyle = m_textStyle;
-	copy->m_textIsReference = m_textIsReference;
-
-	return copy;
+	return new GraphicsTextItemCfg(*this);
 }
 
 void ot::GraphicsTextItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

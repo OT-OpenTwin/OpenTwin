@@ -19,9 +19,9 @@ namespace ot {
 	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsShapeItemCfg : public ot::GraphicsItemCfg {
-		OT_DECL_NOCOPY(GraphicsShapeItemCfg)
 	public:
 		GraphicsShapeItemCfg();
+		GraphicsShapeItemCfg(const GraphicsShapeItemCfg& _other);
 		virtual ~GraphicsShapeItemCfg();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -103,6 +103,8 @@ namespace ot {
 		Painter2D* m_backgroundPainter; //! @brief Background painter.
 		OutlineF m_outline;
 		bool m_fillShape;
+
+		GraphicsShapeItemCfg& operator = (const GraphicsShapeItemCfg&) = delete;
 	};
 
 }

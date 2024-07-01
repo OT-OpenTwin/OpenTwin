@@ -18,7 +18,6 @@ namespace ot {
 	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsTriangleItemCfg : public ot::GraphicsItemCfg {
-		OT_DECL_NOCOPY(GraphicsTriangleItemCfg)
 	public:
 		enum TriangleDirection {
 			Left,
@@ -40,6 +39,7 @@ namespace ot {
 		static TriangleShape stringToTriangleShape(const std::string& _shape);
 
 		GraphicsTriangleItemCfg(TriangleDirection _direction = Right, TriangleShape _shape = Triangle);
+		GraphicsTriangleItemCfg(const GraphicsTriangleItemCfg& _other);
 		virtual ~GraphicsTriangleItemCfg();
 
 		//! \brief Creates a copy of this item.
@@ -79,6 +79,8 @@ namespace ot {
 		ot::Painter2D* m_backgroundPainter;
 		TriangleDirection m_direction;
 		TriangleShape m_shape;
+
+		GraphicsTriangleItemCfg& operator = (const GraphicsTriangleItemCfg&) = delete;
 	};
 
 }

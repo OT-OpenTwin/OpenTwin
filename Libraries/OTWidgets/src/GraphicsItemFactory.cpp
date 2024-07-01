@@ -34,9 +34,9 @@ ot::GraphicsItem* ot::GraphicsItemFactory::itemFromConfig(const ot::GraphicsItem
 	// If the configuration is a file we need to import the actual configuration for this item.
 	if (_configuration->getFactoryKey() == OT_FactoryKey_GraphicsFileItem) {
 		// Get config and file sub path
-		const ot::GraphicsItemFileCfg* actualConfig = dynamic_cast<const ot::GraphicsItemFileCfg*>(_configuration);
-		OTAssertNullptr(actualConfig);
-		std::string configSubPath = actualConfig->getFile();
+		const ot::GraphicsItemFileCfg* actualFileConfig = dynamic_cast<const ot::GraphicsItemFileCfg*>(_configuration);
+		OTAssertNullptr(actualFileConfig);
+		std::string configSubPath = actualFileConfig->getFile();
 
 		// Import new config
 		ot::GraphicsItemCfg* newConfiguration = GraphicsItemLoader::instance().createConfiguration(QString::fromStdString(configSubPath));
@@ -45,7 +45,7 @@ ot::GraphicsItem* ot::GraphicsItemFactory::itemFromConfig(const ot::GraphicsItem
 		}
 
 		// Copy config data
-		actualConfig->copyConfigDataToItem(newConfiguration);
+		*newConfiguration = *actualFileConfig; // Copy the GraphicsItemCfg data
 		_configuration = newConfiguration;
 	}
 

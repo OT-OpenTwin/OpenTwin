@@ -16,6 +16,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsBoxLayoutItem : public QGraphicsLinearLayout, public ot::GraphicsLayoutItem {
 		OT_DECL_NOCOPY(GraphicsBoxLayoutItem)
+		OT_DECL_NODEFAULT(GraphicsBoxLayoutItem)
 	public:
 		GraphicsBoxLayoutItem(Qt::Orientation _orientation, GraphicsItemCfg* _configuration, QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
 		virtual ~GraphicsBoxLayoutItem() {};
@@ -25,9 +26,6 @@ namespace ot {
 		virtual void getAllItems(std::list<QGraphicsLayoutItem*>& _items) const override;
 
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
-
-	private:
-		GraphicsBoxLayoutItem() = delete;
 	};
 
 }

@@ -21,17 +21,19 @@ ot::GraphicsItemFileCfg::GraphicsItemFileCfg(const std::string& _subPath)
 	: m_file(_subPath)
 {}
 
+
+ot::GraphicsItemFileCfg::GraphicsItemFileCfg(const GraphicsItemFileCfg& _other) 
+	: GraphicsItemCfg(_other), m_file(_other.m_file)
+{
+
+}
+
 ot::GraphicsItemFileCfg::~GraphicsItemFileCfg() {
 	
 }
 
 ot::GraphicsItemCfg* ot::GraphicsItemFileCfg::createCopy(void) const {
-	ot::GraphicsItemFileCfg* copy = new GraphicsItemFileCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->setFile(m_file);
-
-	return copy;
+	return new GraphicsItemFileCfg;
 }
 
 void ot::GraphicsItemFileCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

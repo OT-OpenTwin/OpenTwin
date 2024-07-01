@@ -16,6 +16,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT GraphicsVBoxLayoutItemCfg : public GraphicsBoxLayoutItemCfg {
 	public:
 		GraphicsVBoxLayoutItemCfg();
+		GraphicsVBoxLayoutItemCfg(const GraphicsVBoxLayoutItemCfg& _other);
 		virtual ~GraphicsVBoxLayoutItemCfg() {};
 
 		//! \brief Creates a copy of this item.
@@ -25,7 +26,6 @@ namespace ot {
 		virtual std::string getFactoryKey(void) const override { return std::string(OT_FactoryKey_GraphicsVBoxLayoutItem); };
 
 	private:
-		GraphicsVBoxLayoutItemCfg(const GraphicsVBoxLayoutItemCfg&) = delete;
 		GraphicsVBoxLayoutItemCfg& operator = (const GraphicsVBoxLayoutItemCfg&) = delete;
 	};
 

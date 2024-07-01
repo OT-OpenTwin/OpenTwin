@@ -17,15 +17,16 @@ ot::GraphicsInvisibleItemCfg::GraphicsInvisibleItemCfg(const ot::Size2DD& _size)
 	: m_size(_size)
 {}
 
+ot::GraphicsInvisibleItemCfg::GraphicsInvisibleItemCfg(const GraphicsInvisibleItemCfg& _other) 
+	: GraphicsItemCfg(_other), m_size(_other.m_size)
+{
+
+}
+
 ot::GraphicsInvisibleItemCfg::~GraphicsInvisibleItemCfg() {}
 
 ot::GraphicsItemCfg* ot::GraphicsInvisibleItemCfg::createCopy(void) const {
-	ot::GraphicsInvisibleItemCfg* copy = new GraphicsInvisibleItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_size = m_size;
-
-	return copy;
+	return new GraphicsInvisibleItemCfg(*this);
 }
 
 void ot::GraphicsInvisibleItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

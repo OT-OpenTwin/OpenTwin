@@ -17,9 +17,9 @@ namespace ot {
 	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsInvisibleItemCfg : public ot::GraphicsItemCfg {
-		OT_DECL_NOCOPY(GraphicsInvisibleItemCfg)
 	public:
 		GraphicsInvisibleItemCfg(const ot::Size2DD& _size = ot::Size2DD());
+		GraphicsInvisibleItemCfg(const GraphicsInvisibleItemCfg& _other);
 		virtual ~GraphicsInvisibleItemCfg();
 
 		//! \brief Creates a copy of this item.
@@ -43,6 +43,8 @@ namespace ot {
 
 	private:
 		ot::Size2DD m_size;
+
+		GraphicsInvisibleItemCfg& operator = (const GraphicsInvisibleItemCfg&) = delete;
 	};
 
 }

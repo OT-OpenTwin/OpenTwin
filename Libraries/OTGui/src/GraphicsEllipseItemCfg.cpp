@@ -28,20 +28,18 @@ ot::GraphicsEllipseItemCfg::GraphicsEllipseItemCfg(double _radiusX, double _radi
 	}
 }
 
+ot::GraphicsEllipseItemCfg::GraphicsEllipseItemCfg(const GraphicsEllipseItemCfg& _other) 
+	: GraphicsItemCfg(_other), m_radiusX(_other.m_radiusX), m_radiusY(_other.m_radiusY), m_outline(_other.m_outline), m_backgroundPainter(nullptr)
+{
+	m_backgroundPainter = _other.m_backgroundPainter->createCopy();
+}
+
 ot::GraphicsEllipseItemCfg::~GraphicsEllipseItemCfg() {
 	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
 ot::GraphicsItemCfg* ot::GraphicsEllipseItemCfg::createCopy(void) const {
-	ot::GraphicsEllipseItemCfg* copy = new GraphicsEllipseItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_radiusX = m_radiusX;
-	copy->m_radiusY = m_radiusY;
-	copy->m_outline = m_outline;
-	copy->setBackgroundPainer(m_backgroundPainter->createCopy());
-
-	return copy;
+	return new GraphicsEllipseItemCfg(*this);
 }
 
 void ot::GraphicsEllipseItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

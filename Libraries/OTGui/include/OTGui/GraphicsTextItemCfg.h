@@ -18,6 +18,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT GraphicsTextItemCfg : public ot::GraphicsItemCfg {
 	public:
 		GraphicsTextItemCfg(const std::string& _text = std::string(), const ot::Color& _textColor = ot::Color());
+		GraphicsTextItemCfg(const GraphicsTextItemCfg& _other);
 		virtual ~GraphicsTextItemCfg();
 
 		//! \brief Creates a copy of this item.
@@ -68,7 +69,6 @@ namespace ot {
 		OutlineF	m_textStyle;
 		bool m_textIsReference;
 
-		GraphicsTextItemCfg(GraphicsTextItemCfg&) = delete;
 		GraphicsTextItemCfg& operator = (GraphicsTextItemCfg&) = delete;
 	};
 

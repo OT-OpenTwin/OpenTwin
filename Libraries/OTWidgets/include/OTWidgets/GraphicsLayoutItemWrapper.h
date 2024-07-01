@@ -11,13 +11,17 @@
 // Qt header
 #include <QtWidgets/qgraphicswidget.h>
 
+class QGraphicsLayout;
+
 namespace ot {
 
 	class GraphicsLayoutItem;
 
 	class OT_WIDGETS_API_EXPORT GraphicsLayoutItemWrapper : public QGraphicsWidget, public ot::GraphicsItem {
+		OT_DECL_NOCOPY(GraphicsLayoutItemWrapper)
+		OT_DECL_NODEFAULT(GraphicsLayoutItemWrapper)
 	public:
-		GraphicsLayoutItemWrapper(GraphicsLayoutItem* _owner);
+		GraphicsLayoutItemWrapper(GraphicsLayoutItem* _owner, QGraphicsLayout* _layout);
 		virtual ~GraphicsLayoutItemWrapper();
 
 		virtual void prepareGraphicsItemGeometryChange(void) override;
@@ -28,6 +32,8 @@ namespace ot {
 		virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) override;
 
 		virtual QRectF boundingRect(void) const override;
+
+		virtual bool event(QEvent* _event) override;
 
 		virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) override;
 
@@ -47,12 +53,11 @@ namespace ot {
 
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) override;
 
+		void setGraphicsLayoutItem(GraphicsLayoutItem* _newOwner) { m_owner = _newOwner; };
+		void unsetGraphicsLayoutItem(void);
+
 	private:
 		GraphicsLayoutItem* m_owner;
-
-		GraphicsLayoutItemWrapper() = delete;
-		GraphicsLayoutItemWrapper(const GraphicsLayoutItemWrapper&) = delete;
-		GraphicsLayoutItemWrapper& operator = (const GraphicsLayoutItemWrapper&) = delete;
 	};
 
 }

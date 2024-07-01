@@ -18,18 +18,14 @@ ot::GraphicsArcItemCfg::GraphicsArcItemCfg()
 	: m_startAngle(0.), m_spanAngle(180. * 16.)
 {}
 
+ot::GraphicsArcItemCfg::GraphicsArcItemCfg(const GraphicsArcItemCfg& _other)
+	: GraphicsItemCfg(_other), m_rect(_other.m_rect), m_startAngle(_other.m_startAngle), m_spanAngle(_other.m_spanAngle), m_lineStyle(_other.m_lineStyle)
+{}
+
 ot::GraphicsArcItemCfg::~GraphicsArcItemCfg() {}
 
 ot::GraphicsItemCfg* ot::GraphicsArcItemCfg::createCopy(void) const {
-	ot::GraphicsArcItemCfg* copy = new GraphicsArcItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_rect = m_rect;
-	copy->m_startAngle = m_startAngle;
-	copy->m_spanAngle = m_spanAngle;
-	copy->m_lineStyle = m_lineStyle;
-
-	return copy;
+	return new GraphicsArcItemCfg(*this);
 }
 
 void ot::GraphicsArcItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

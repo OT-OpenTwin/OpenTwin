@@ -16,17 +16,16 @@ static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsLineItemCfg> lineItemCfg(
 
 ot::GraphicsLineItemCfg::GraphicsLineItemCfg() {}
 
+ot::GraphicsLineItemCfg::GraphicsLineItemCfg(const GraphicsLineItemCfg& _other) 
+	: GraphicsItemCfg(_other), m_from(_other.m_from), m_to(_other.m_to), m_lineStyle(_other.m_lineStyle)
+{
+
+}
+
 ot::GraphicsLineItemCfg::~GraphicsLineItemCfg() {}
 
 ot::GraphicsItemCfg* ot::GraphicsLineItemCfg::createCopy(void) const {
-	ot::GraphicsLineItemCfg* copy = new GraphicsLineItemCfg;
-	this->copyConfigDataToItem(copy);
-
-	copy->m_from = m_from;
-	copy->m_to = m_to;
-	copy->m_lineStyle = m_lineStyle;
-
-	return copy;
+	return new GraphicsLineItemCfg(*this);
 }
 
 void ot::GraphicsLineItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
