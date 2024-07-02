@@ -24,6 +24,5 @@ COPY /Y certificateKeyFile.pem %OPEN_TWIN_CERTS_PATH%
 ECHO SUCCESS: The certificates have been created successfully.
 
 :END
-ECHO.
-PAUSE 0
+
 
