@@ -57,7 +57,8 @@ SocketServer::SocketServer(std::string socketIP, unsigned int socketPort) :
 	sslConfiguration.setPrivateKey(sslKey);
 	m_pWebSocketServer->setSslConfiguration(sslConfiguration);
 	
-
+	// Initialize the performance counters
+	m_systemLoad.initialize();
 
 	if (m_pWebSocketServer->listen(serverAddress, socketPort))
 	{
@@ -268,6 +269,11 @@ QString SocketServer::performAction(const char *json, const char *senderIP)
 
 		std::string action = ot::json::getString(doc, "action");
 
+		if (action == OT_ACTION_CMD_GetSystemInformation)
+		{
+			return getSystemInformation().c_str();
+		}
+
 		OT_LOG_E("Received HTTP execute message (not yet suported by relay service): " + action);
 
 		OT_LOG("Received HTTP execute message: " + action, ot::INBOUND_MESSAGE_LOG);
@@ -337,4 +343,24 @@ void SocketServer::deallocateData(const char *data)
 		delete[] data;
 	}
 	data = nullptr;
+}
+
+std::string SocketServer::getSystemInformation()
+{
+	double globalCpuLoad = 0, globalMemoryLoad = 0, processCpuLoad = 0, processMemoryLoad = 0;
+
+	m_systemLoad.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);
+	m_systemLoad.getCurrentProcessCPUAndMemoryLoad(processCpuLoad, processMemoryLoad);
+
+	ot::JsonDocument reply;
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_CPU_LOAD, globalCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD, globalMemoryLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_CPU_LOAD, processCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_MEMORY_LOAD, processMemoryLoad, reply.GetAllocator());
+
+	reply.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString("RelayService", reply.GetAllocator()), reply.GetAllocator());
+	//reply.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_application->sessionID(), reply.GetAllocator()), reply.GetAllocator());
+	//reply.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(m_application->projectType(), reply.GetAllocator()), reply.GetAllocator());
+
+	return reply.toJson();
 }

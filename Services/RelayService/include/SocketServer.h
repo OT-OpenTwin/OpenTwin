@@ -7,6 +7,8 @@
 #include <QtCore/QByteArray>
 #include <QtNetwork/QSslError>
 
+#include "OTSystem/SystemLoadInformation.h"
+
 class QWebSocketServer;
 class QWebSocket;
 
@@ -43,11 +45,13 @@ private:
 	void shutdown();
 	void sendQueueWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData);
 	std::string sendProcessWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData);
+	std::string getSystemInformation();
 
 	QWebSocketServer *m_pWebSocketServer;
 	QList<QWebSocket *> m_clients;
 	std::string responseText;
 	bool responseReceived;
+	ot::SystemLoadInformation m_systemLoad;
 };
 
 #endif //SOCKETSERVER_H
