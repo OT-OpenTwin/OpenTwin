@@ -161,6 +161,8 @@ void PrimitivePyramid::createFromRubberbandJson(const std::string& _json, std::v
 			double dy = ymax - ymin;
 			double dz = zmax - zmin;
 
+			std::list<std::string> faceNames = { "f1", "f2", "f3", "f4", "f5" };
+
 			gp_Ax2 axis;
 			if (zmin < zmax) { 
 				axis = gp_Ax2(gp_Pnt(xmin, ymin, zmin), gp_Dir(1, 0, 0), gp_Dir(0, 1, 0));
@@ -180,7 +182,7 @@ void PrimitivePyramid::createFromRubberbandJson(const std::string& _json, std::v
 			shapeParameters.push_back(std::pair<std::string, std::string>("ZMin", to_string(zmin)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("ZMax", to_string(zmax)));
 
-			storeShapeInModel(pyramid, _transform, "Geometry/Pyramid", "Pyramid", shapeParameters);
+			storeShapeInModel(pyramid, _transform, "Geometry/Pyramid", "Pyramid", shapeParameters, faceNames);
 		}
 		else {
 			if (uiComponent)

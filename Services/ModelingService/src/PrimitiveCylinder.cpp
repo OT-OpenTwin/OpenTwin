@@ -145,6 +145,9 @@ void PrimitiveCylinder::createFromRubberbandJson(const std::string& _json, std::
 			gp_Pnt centerPoint = gp_Pnt(xcenter, ycenter, zmin);
 			gp_Dir direction;
 			TopoDS_Shape body;
+
+			std::list<std::string> faceNames = { "f1", "f2", "f3" };
+
 			if (zmax > zmin) {		// if the z component is in positive z-axis direction
 				direction = gp_Dir(0, 0, 1);
 				body = BRepPrimAPI_MakeCylinder(gp_Ax2(centerPoint, direction), radius, zmax);
@@ -163,7 +166,7 @@ void PrimitiveCylinder::createFromRubberbandJson(const std::string& _json, std::
 			shapeParameters.push_back(std::pair<std::string, std::string>("ZMax",	 to_string(zmax)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("Radius",  to_string(radius)));
 
-			storeShapeInModel(body, _transform, "Geometry/Cylinder", "Cylinder", shapeParameters);
+			storeShapeInModel(body, _transform, "Geometry/Cylinder", "Cylinder", shapeParameters, faceNames);
 		}
 		else {
 			if (uiComponent) { uiComponent->displayWarningPrompt("Invalid number of points received for create cylinder from rubberband"); }

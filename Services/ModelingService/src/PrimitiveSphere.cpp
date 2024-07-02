@@ -158,7 +158,9 @@ void PrimitiveSphere::createFromRubberbandJson(const std::string& _json, std::ve
 			shapeParameters.push_back(std::pair<std::string, std::string>("ZCenter", to_string(zcenter)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("Radius", to_string(radius)));
 
-			storeShapeInModel(body, _transform, "Geometry/Sphere", "Sphere", shapeParameters);
+			std::list<std::string> faceNames = { "f1" };
+
+			storeShapeInModel(body, _transform, "Geometry/Sphere", "Sphere", shapeParameters, faceNames);
 		}
 		else {
 			if (uiComponent) 

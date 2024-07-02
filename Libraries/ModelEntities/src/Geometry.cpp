@@ -117,6 +117,30 @@ bsoncxx::document::value Geometry::getBSON(std::list<Geometry::Edge> &edges)
 	return doc.extract();
 }
 
+bsoncxx::document::value Geometry::getBSON(std::map<ot::UID, std::string> &faceNameMap)
+{
+	// In a first step, store all points in an array
+	auto faceID = bsoncxx::builder::basic::array();
+	auto faceName = bsoncxx::builder::basic::array();
+
+	long long index = 0;
+
+	for (auto face : faceNameMap)
+	{
+		faceID.append((long long) face.first);
+		faceName.append(face.second);
+	}
+
+	auto doc = bsoncxx::builder::basic::document{};
+
+	doc.append(
+		bsoncxx::builder::basic::kvp("FaceID", faceID),
+		bsoncxx::builder::basic::kvp("FaceName", faceName)
+	);
+
+	return doc.extract();
+}
+
 void Geometry::readBSON(bsoncxx::document::view &nodesObj, std::vector<Geometry::Node> &nodes)
 {
 	auto coordX = nodesObj["CoordX"].get_array().value;
@@ -246,5 +270,28 @@ void Geometry::readBSON(bsoncxx::document::view &edgesObj, std::list<Geometry::E
 		fID++;
 
 		edges.push_back(edge);
+	}
+}
+
+void Geometry::readBSON(bsoncxx::document::view& faceNamesObj, std::map<ot::UID, std::string>& faceNameMap)
+{
+	auto faceID = faceNamesObj["FaceID"].get_array().value;
+	auto faceName = faceNamesObj["FaceName"].get_array().value;
+
+	size_t numberIds = std::distance(faceID.begin(), faceID.end());
+	assert(numberIds == std::distance(faceName.begin(), faceName.end()));
+
+	auto pId = faceID.begin();
+	auto pName = faceName.begin();
+
+	for (unsigned long index = 0; index < numberIds; index++)
+	{
+		ot::UID id = DataBase::GetIntFromArrayViewIterator(pId);
+		std::string name = pName->get_utf8().value.to_string();
+
+		pId++;
+		pName++;
+
+		faceNameMap[id] = name;
 	}
 }

@@ -2987,8 +2987,10 @@ std::string ExternalServicesComponent::handleAddNodeFromFacetData(ot::JsonDocume
 	std::string errors = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_Errors);
 	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
 
+	std::map<ot::UID, std::string> faceNameMap;
+
 	AppBase::instance()->getViewerComponent()->addNodeFromFacetData(visModelID, treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling,
-		offsetFactor, editable, nodes, triangles, edges, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
+		offsetFactor, editable, nodes, triangles, edges, faceNameMap, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
 	
 	return "";
 }

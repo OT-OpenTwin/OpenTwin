@@ -239,6 +239,14 @@ void Model::refreshAllViews(void)
 	}
 }
 
+void Model::setCursorText(const std::string &text)
+{
+	for (auto viewer : viewerList)
+	{
+		viewer->setCursorText(text);
+	}
+}
+
 void Model::clearSelection(void)
 {
 	selectSceneNode(nullptr, false);
@@ -827,7 +835,7 @@ void Model::renameEntityPath(const std::string &oldPath, const std::string &newP
 	}
 }
 
-void Model::addNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], unsigned long long modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isHidden, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors,
+void Model::addNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], unsigned long long modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isHidden, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNameMap, std::string &errors,
 								 bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected)
 {
 	SceneNodeGeometry *geometryNode = createNewGeometryNode(treeName, modelEntityID, treeIcons, isHidden, isEditable, selectChildren, manageParentVisibility, manageChildVisibility);
@@ -844,7 +852,7 @@ void Model::addNodeFromFacetData(const std::string &treeName, double surfaceColo
 		geometryNode->setWireframe(wireFrameState);
 		geometryNode->setShowWhenSelected(showWhenSelected);
 
-		geometryNode->initializeFromFacetData(nodes, triangles, edges);
+		geometryNode->initializeFromFacetData(nodes, triangles, edges, faceNameMap);
 	}
 }
 
@@ -1931,6 +1939,7 @@ void Model::clearHoverView(void)
 
 		currentHoverItem = nullptr;
 
+		setCursorText("");
 		updateSelectedFacesHighlight();
 		refreshAllViews();
 	}
@@ -2525,6 +2534,10 @@ void Model::processHoverView(osgUtil::LineSegmentIntersector *intersector, doubl
 				clearHoverView();
 
 				unsigned long long faceId = selectedItem->getFaceIdFromTriangleIndex(hitIndex);
+				
+				std::string faceName = selectedItem->getFaceNameFromId(faceId);
+				setCursorText(faceName);
+
 				if (isFaceSelected(selectedItem, faceId))
 				{
 					selectedItem->setEdgeHighlight(faceId, true, 3.0);

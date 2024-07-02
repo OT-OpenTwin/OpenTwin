@@ -602,13 +602,13 @@ void ViewerComponent::selectObject(ModelUIDtype visualizationModelID, ot::UID en
 
 void ViewerComponent::addNodeFromFacetData(ViewerUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3],
 										   double edgeColorRGB[3], ViewerUIDtype modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes,
-										   std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors,
+										   std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNameMap, std::string &errors,
 										   bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected)
 {
 	try {
 		try {
 			ViewerAPI::addNodeFromFacetData(visModelID, treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons,
-				backFaceCulling, offsetFactor, isEditable, nodes, triangles, edges, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
+				backFaceCulling, offsetFactor, isEditable, nodes, triangles, edges, faceNameMap, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
 		}
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::addNodeFromFacetData()"); }
 		catch (const std::exception & e) { throw ak::aException(e.what(), "ViewerComponent::addNodeFromFacetData()"); }

@@ -9,6 +9,9 @@
 #include "BRepBndLib.hxx"
 #include "BRepTools_ShapeSet.hxx"
 #include "BRepTools.hxx"
+#include "TopExp_Explorer.hxx"
+#include "TopoDS_Face.hxx"
+#include "TopoDS.hxx"
 
 EntityBrep::EntityBrep(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
 	EntityBase(ID, parent, obs, ms, factory, owner)
@@ -56,6 +59,19 @@ void EntityBrep::AddStorageData(bsoncxx::builder::basic::document &storage)
 	}
 
 	storage.append(bsoncxx::builder::basic::kvp("Transform", matrix));
+
+	auto faceNames = bsoncxx::builder::basic::array();
+
+	TopExp_Explorer exp;
+
+	for (exp.Init(brep, TopAbs_FACE); exp.More(); exp.Next())
+	{
+		TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+		faceNames.append(getFaceName(aFace));
+	}
+
+	storage.append(bsoncxx::builder::basic::kvp("FaceNames", faceNames));
 }
 
 void EntityBrep::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
@@ -94,6 +110,36 @@ void EntityBrep::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view,
 	{
 	}
 
+	try
+	{
+		auto faceNames = doc_view["FaceNames"].get_array().value;
+		auto fname = faceNames.begin();
+
+		TopExp_Explorer exp;
+
+		// Count the number of faces
+		size_t count = 0;
+		for (exp.Init(brep, TopAbs_FACE); exp.More(); exp.Next()) count++;
+
+		if (std::distance(faceNames.begin(), faceNames.end()) != count)
+		{
+			assert(0); // Wrong number of face names
+		}
+		else
+		{
+			for (exp.Init(brep, TopAbs_FACE); exp.More(); exp.Next())
+			{
+				TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+				setFaceName(aFace, fname->get_utf8().value.to_string());
+				fname++;
+			}
+		}
+	}
+	catch (std::exception)
+	{
+	}
+
 	resetModified();
 }
 
@@ -106,3 +152,16 @@ void EntityBrep::setTransform(gp_Trsf transform)
 {
 	transformMatrix = transform;
 }
+
+void EntityBrep::setFaceName(const TopoDS_Face& face, const std::string &name)
+{
+	m_faceNames[face.TShape()] = name;
+}
+
+std::string EntityBrep::getFaceName(const TopoDS_Face& face)
+{
+	auto result = m_faceNames.find(face.TShape());
+	if (result == m_faceNames.end()) return "";
+	return result->second;
+}
+

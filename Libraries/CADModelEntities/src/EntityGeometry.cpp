@@ -910,8 +910,8 @@ void EntityGeometry::facetEntity(bool isHidden)
 	getFacets()->getTriangleList().clear();
 	getFacets()->getEdgeList().clear();
 
-	GeometryOperations::facetEntity(getBrep(), deflection, 
-									getFacets()->getNodeVector(), getFacets()->getTriangleList(), getFacets()->getEdgeList(), getFacets()->getErrorString());
+	GeometryOperations::facetEntity(getBrep(), brep, deflection, 
+									getFacets()->getNodeVector(), getFacets()->getTriangleList(), getFacets()->getEdgeList(), getFacets()->getFaceNameMap(), getFacets()->getErrorString());
 	getFacets()->setModified();
 
 	// If we don't have a model state, are are creating the facets temporarily. Otherwise we save them to the data base.

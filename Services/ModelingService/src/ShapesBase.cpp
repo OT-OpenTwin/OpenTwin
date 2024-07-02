@@ -13,6 +13,8 @@
 
 #include <BRepBuilderAPI_Transform.hxx>
 #include <STEPControl_Writer.hxx>
+#include "TopExp_Explorer.hxx"
+#include "TopoDS.hxx"
 
 #include <sstream>
 #include <cassert>
@@ -40,7 +42,7 @@ std::string ShapesBase::to_string(double value)
 }
 
 void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<double> &_transform, const std::string& _name, 
-									  const std::string &_type, std::list<std::pair<std::string, std::string>> &shapeParameters)
+									  const std::string &_type, std::list<std::pair<std::string, std::string>> &shapeParameters, std::list<std::string> &faceNames)
 {
 	// Here we set some defaults (the color should be taken from the settings)
 	ApplicationSettings * settings = ApplicationSettings::instance();
@@ -117,6 +119,25 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 	geometryEntity->setEditable(true);
 	geometryEntity->setBrep(shape);
 	geometryEntity->getBrepEntity()->setTransform(transform);
+
+	TopExp_Explorer exp;
+	size_t faceCount = 0;
+	for (exp.Init(shape, TopAbs_FACE); exp.More(); exp.Next()) faceCount++;
+	
+	if (faceNames.size() != faceCount)
+	{
+		assert(0); // Inconsistend face naming information
+	}
+	else
+	{
+		for (exp.Init(shape, TopAbs_FACE); exp.More(); exp.Next())
+		{
+			TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+			geometryEntity->getBrepEntity()->setFaceName(aFace, faceNames.front());
+			faceNames.pop_front();
+		}
+	}
 
 	EntityPropertiesString *typeProp = new EntityPropertiesString("shapeType", _type);
 	typeProp->setVisible(false);

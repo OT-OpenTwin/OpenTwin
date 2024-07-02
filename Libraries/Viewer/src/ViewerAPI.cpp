@@ -184,14 +184,14 @@ void ViewerAPI::freeze3DView(unsigned long long osgModelID, bool flag)
 }
 
 void ViewerAPI::addNodeFromFacetData(ot::UID osgModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], unsigned long long modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
-									 double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors,
+									 double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNameMap, std::string &errors,
 									 bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected)
 {
 	try
 	{
 		Model *model = osgModelManager.at(osgModelID);
 		
-		model->addNodeFromFacetData(treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling, offsetFactor, false, isEditable, nodes, triangles, edges, 
+		model->addNodeFromFacetData(treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling, offsetFactor, false, isEditable, nodes, triangles, edges, faceNameMap,
 								    errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
 	}
 	catch (std::out_of_range)

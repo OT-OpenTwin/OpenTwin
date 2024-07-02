@@ -3,9 +3,13 @@
 
 #include "EntityBase.h"
 #include "TopoDS_Shape.hxx"
+#include "TopoDS_TShape.hxx"
+#include "TopoDS_Face.hxx"
+#include "TopoDS_TFace.hxx"
 #include "Types.h"
 
 #include <list>
+#include <map>
 
 class __declspec(dllexport) EntityBrep : public EntityBase
 {
@@ -25,6 +29,9 @@ public:
 	gp_Trsf getTransform(void);
 	void    setTransform(gp_Trsf transform);
 
+	void setFaceName(const TopoDS_Face& face, const std::string &name);
+	std::string getFaceName(const TopoDS_Face& face);
+
 private:
 	virtual int getSchemaVersion(void) { return 1; };
 	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
@@ -33,6 +40,8 @@ private:
 	TopoDS_Shape brep;
 
 	gp_Trsf transformMatrix;
+
+	std::map< const opencascade::handle<TopoDS_TShape>, std::string> m_faceNames;
 };
 
 

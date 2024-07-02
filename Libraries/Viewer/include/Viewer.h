@@ -120,6 +120,8 @@ public:
 	void showClipPlaneHandles(void);
 	void hideClipPlaneHandles(void);
 
+	void setCursorText(const std::string& text);
+
 private Q_SLOTS:
 	void slotColorStyleChanged(const ot::ColorStyle& _style);
 	void slotUpdateViewerSettings(void);
@@ -185,7 +187,11 @@ private:
 	osg::ref_ptr<osgText::Font>		   overlayFont;
 	double							   overlayTextColor[3];
 	osgText::Text					  *overlayText;
-	osg::ShapeDrawable			      *overlayBox;
+	osgText::Text					  *mouseCursorText;
+	osg::Geode						  *overlayTextNode;
+	osg::Geode						  *cursorTextNode;
+	osg::ShapeDrawable				  *overlayBox;
+	osg::ShapeDrawable				  *mouseCursorBox;
 	double							   lightSourceDistance;
 	bool							   lightSourceDistanceInfinite;
 	osg::ref_ptr<osg::Switch>          handlerNode;
@@ -222,6 +228,11 @@ private:
 	ClipPlaneManipulator			   *clipPlaneManipulator;
 
 	std::list<HandlerBase *>			handlerList;
+
+	std::string							cursorText;
+
+	float								mouseCursorX;
+	float								mouseCursorY;
 
 	int viewColorAutoBackgroundR;
 	int viewColorAutoBackgroundG;

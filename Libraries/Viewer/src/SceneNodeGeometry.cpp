@@ -22,6 +22,7 @@
 #include <osg/LineWidth>
 #include <osg/LightModel>
 #include <osg/LightSource>
+#include <osgText/Text>
 
 #include <osg/Image>
 #include <osg/Texture2D>
@@ -83,7 +84,7 @@ void SceneNodeGeometry::deleteShapeNode(void)
 		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
 		shapeNode				= nullptr;
 		triangles				= nullptr;
-		edges					= nullptr;
+		edges                   = nullptr;
 		edgesHighlighted		= nullptr;
 		faceEdgesHighlightNode	= nullptr;
 
@@ -201,7 +202,6 @@ void SceneNodeGeometry::updateTransparentState(bool visible, bool transparent, b
 				getShapeNode()->setChildValue(getEdges(), true);
 			}
 		}
-
 
 		getShapeNode()->setNodeMask(getShapeNode()->getNodeMask() & ~1);  // Reset last bit of node mask
 	}
@@ -434,17 +434,17 @@ void SceneNodeGeometry::applyParentTransform(void)
 void SceneNodeGeometry::applyTransform(osg::Matrix matrix)
 {
 	osg::MatrixTransform *triangles = dynamic_cast<osg::MatrixTransform *>(getTriangles());
-	osg::MatrixTransform *edges = dynamic_cast<osg::MatrixTransform *>(getEdges());
+	osg::MatrixTransform* edges = dynamic_cast<osg::MatrixTransform*>(getEdges());
 	osg::MatrixTransform *edgesHighlighted = dynamic_cast<osg::MatrixTransform *>(getEdgesHighlighted());
 	osg::MatrixTransform *faceEdgesHighlightNode = dynamic_cast<osg::MatrixTransform *>(getFaceEdgesHighlight());
 
 	if (triangles != nullptr             ) triangles->setMatrix(matrix);
-	if (edges != nullptr                 ) edges->setMatrix(matrix);
+	if (edges != nullptr				 ) edges->setMatrix(matrix);
 	if (edgesHighlighted != nullptr      ) edgesHighlighted->setMatrix(matrix);
 	if (faceEdgesHighlightNode != nullptr) faceEdgesHighlightNode->setMatrix(matrix);
 }
 
-void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges)
+void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string> &faceNameMap)
 {
 	// Add a switch (group) node for the shape
 	if (shapeNode == nullptr)
@@ -476,8 +476,10 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 		triangleToFaceId.push_back(t.getFaceId());
 	}
 
+	faceIdToNameMap = faceNameMap;
+
 	// Create the triangle node
-	osg::Node *triangleNode = createOSGNodeFromTriangles(surfaceColorRGB, materialType, textureType, reflective, backFaceCulling, offsetFactor, nodes, triangles);
+	osg::Node* triangleNode = createOSGNodeFromTriangles(surfaceColorRGB, materialType, textureType, reflective, backFaceCulling, offsetFactor, nodes, triangles);
 
 	// Create the edges node
 	osg::Node *edgeNode(nullptr), *edgeHighlightedNode(nullptr);
@@ -871,6 +873,7 @@ void SceneNodeGeometry::initializeFromDataStorage(void)
 	std::vector<Geometry::Node> nodes;
 	std::list<Geometry::Triangle> triangles;
 	std::list<Geometry::Edge> edges;
+	std::map<ot::UID, std::string> faceNameMap;
 	std::string errors;
 
 	auto doc = bsoncxx::builder::basic::document{};
@@ -908,7 +911,18 @@ void SceneNodeGeometry::initializeFromDataStorage(void)
 	DataBase::readBSON(trianglesObj, triangles);
 	DataBase::readBSON(edgesObj, edges);
 
-	initializeFromFacetData(nodes, triangles, edges);
+	faceNameMap.clear();
+	try
+	{
+		bsoncxx::document::view  faceNamesObj = doc_view["FaceNames"].get_document().view();
+		Geometry::readBSON(faceNamesObj, faceNameMap);
+	}
+	catch (std::exception)
+	{
+
+	}
+
+	initializeFromFacetData(nodes, triangles, edges, faceNameMap);
 }
 
 void SceneNodeGeometry::setMaterialProperties(osg::ref_ptr<osg::Material>& mat, double r, double g, double b) 
@@ -972,4 +986,15 @@ void SceneNodeGeometry::assignTexture(osg::Geometry *geometry, const std::string
 	}
 }
 
+std::string SceneNodeGeometry::getFaceNameFromId(unsigned long long faceId)
+{
+	auto item = faceIdToNameMap.find(faceId);
+
+	if (item != faceIdToNameMap.end())
+	{
+		return item->second;
+	}
+
+	return "";
+}
 

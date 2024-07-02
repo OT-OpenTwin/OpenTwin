@@ -13,6 +13,7 @@ namespace osg
 #include <osg/TexGen>
 #include <osg/TexEnv>
 #include <osg/Matrix>
+#include <osgText/Text>
 
 #include <string>
 #include <osg/Array>
@@ -31,7 +32,7 @@ public:
 	virtual ~SceneNodeGeometry();
 
 	void setTriangles(osg::Node *t) { triangles = t; };
-	void setEdges(osg::Node *e) { edges = e; };
+	void setEdges(osg::Node* e) { edges = e; };
 	void setEdgesHighlighted(osg::Node *e) { edgesHighlighted = e; };
 	void setFaceEdgesHighlighted(osg::Switch *e) { faceEdgesHighlightNode = e; };
 	void setMaterialType(const std::string &material) { materialType = material; }
@@ -47,7 +48,7 @@ public:
 	void applyTransform(osg::Matrix matrix);
 
 	osg::Node *getTriangles(void) { return triangles; };
-	osg::Node *getEdges(void) { return edges; };
+	osg::Node* getEdges(void) { return edges; };
 	osg::Node *getEdgesHighlighted(void) { return edgesHighlighted; };
 	osg::Switch *getFaceEdgesHighlight(void) { return faceEdgesHighlightNode; };
 
@@ -59,13 +60,14 @@ public:
 
 	void setShowWhenSelected(bool flag) { showWhenSelected = flag; };
 
-	void initializeFromFacetData(std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges);
+	void initializeFromFacetData(std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string> &faceNameMap);
 	//void assignMaterial(const std::string & materialType);
 	void updateObjectColor(double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective);
 	void updateObjectFacetsFromDataBase(unsigned long long entityID, unsigned long long entityVersion);
 
 	void setEdgeHighlight(unsigned long long faceId, bool h, double thickness);
 	unsigned long long getFaceIdFromTriangleIndex(unsigned long long index) { return triangleToFaceId[index]; };
+	std::string getFaceNameFromId(unsigned long long faceId);
 
 	void setSurfaceColorRGB(double color[3]) { surfaceColorRGB[0] = color[0]; surfaceColorRGB[1] = color[1]; surfaceColorRGB[2] = color[2]; };
 	void setEdgeColorRGB(double color[3]) { edgeColorRGB[0] = color[0]; edgeColorRGB[1] = color[1]; edgeColorRGB[2] = color[2]; };
@@ -97,11 +99,12 @@ private:
 
 	osg::Node   *      triangles;
 	osg::Node   *      edges;
-	osg::Node   *      edgesHighlighted;
+	osg::Node	*	   edgesHighlighted;
 	osg::Switch *      faceEdgesHighlightNode;
 
 	std::map<unsigned long long, osg::Node *> faceEdgesHighlight;
 	std::vector<unsigned long long> triangleToFaceId;
+	std::map<ot::UID, std::string> faceIdToNameMap;
 
 	double surfaceColorRGB[3];
 	double edgeColorRGB[3];

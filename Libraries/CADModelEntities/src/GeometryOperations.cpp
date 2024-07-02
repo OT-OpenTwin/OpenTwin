@@ -25,7 +25,7 @@
 #include "Types.h"
 #include "TemplateDefaultManager.h"
 
-bool GeometryOperations::facetEntity(TopoDS_Shape &shape, double deflection, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors)
+bool GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep *brep, double deflection, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNames, std::string &errors)
 {
 	bool success = true;
 
@@ -215,6 +215,11 @@ bool GeometryOperations::facetEntity(TopoDS_Shape &shape, double deflection, std
 
 			errors += "ERROR: facetter unable to compute vertex normal, reason: " + error + "\n";
 			success = false;
+		}
+
+		if (brep != nullptr)
+		{
+			faceNames[faceId] = brep->getFaceName(aFace);
 		}
 
 		faceId++;

@@ -29,6 +29,7 @@ void EntityFacetData::AddStorageData(bsoncxx::builder::basic::document &storage)
 		bsoncxx::builder::basic::kvp("Nodes", Geometry::getBSON(nodes)),
 		bsoncxx::builder::basic::kvp("Triangles", Geometry::getBSON(triangles)),
 		bsoncxx::builder::basic::kvp("Edges", Geometry::getBSON(edges)),
+		bsoncxx::builder::basic::kvp("FaceNames", Geometry::getBSON(faceNameMap)),
 		bsoncxx::builder::basic::kvp("Errors", errors)
 	);
 }
@@ -42,13 +43,24 @@ void EntityFacetData::readSpecificDataFromDataBase(bsoncxx::document::view &doc_
 
 	bsoncxx::document::view nodesObj      = doc_view["Nodes"].get_document().view();
 	bsoncxx::document::view  trianglesObj = doc_view["Triangles"].get_document().view();
-	bsoncxx::document::view  edgesObj     = doc_view["Edges"].get_document().view();
-	
+	bsoncxx::document::view  edgesObj = doc_view["Edges"].get_document().view();
+
 	errors = doc_view["Errors"].get_utf8().value.data();
 
 	Geometry::readBSON(nodesObj,     nodes);
 	Geometry::readBSON(trianglesObj, triangles);
-	Geometry::readBSON(edgesObj,     edges);
+	Geometry::readBSON(edgesObj, edges);
+
+	faceNameMap.clear();
+	try 
+	{
+		bsoncxx::document::view  faceNamesObj = doc_view["FaceNames"].get_document().view();
+		Geometry::readBSON(faceNamesObj, faceNameMap);
+	}
+	catch (std::exception)
+	{
+
+	}
 
 	resetModified();
 }

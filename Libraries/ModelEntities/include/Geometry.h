@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <vector>
 #include <list>
+#include <map>
 
 #include <bsoncxx/builder/basic/document.hpp>
 
@@ -99,9 +100,11 @@ namespace Geometry {
 
 	_declspec(dllexport) bsoncxx::document::value getBSON(std::vector<Geometry::Node> &nodes);
 	_declspec(dllexport) bsoncxx::document::value getBSON(std::list<Geometry::Triangle> &triangles);
-	_declspec(dllexport) bsoncxx::document::value getBSON(std::list<Geometry::Edge> &edges);
+	_declspec(dllexport) bsoncxx::document::value getBSON(std::list<Geometry::Edge>& edges);
+	_declspec(dllexport) bsoncxx::document::value getBSON(std::map<ot::UID, std::string>& faceNameMap);
 
 	_declspec(dllexport) void readBSON(bsoncxx::document::view &nodesObj,     std::vector<Geometry::Node> &nodes);
 	_declspec(dllexport) void readBSON(bsoncxx::document::view &trianglesObj, std::list<Geometry::Triangle> &triangles);
-	_declspec(dllexport) void readBSON(bsoncxx::document::view &edgesObj,     std::list<Geometry::Edge> &edges);
+	_declspec(dllexport) void readBSON(bsoncxx::document::view& edgesObj, std::list<Geometry::Edge>& edges);
+	_declspec(dllexport) void readBSON(bsoncxx::document::view& faceNamesObj, std::map<ot::UID, std::string>& faceNameMap);
 }

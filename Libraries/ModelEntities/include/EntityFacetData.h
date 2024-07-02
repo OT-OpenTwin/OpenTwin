@@ -22,6 +22,8 @@ public:
 	std::list<Geometry::Triangle> &getTriangleList(void) { return triangles; };
 	std::list<Geometry::Edge>     &getEdgeList(void)     { return edges; };
 	std::string					  &getErrorString(void)  { return errors; };
+	std::map<ot::UID, std::string> &getFaceNameMap(void) { return faceNameMap; };
+
 
 	virtual std::string getClassName(void) override { return "EntityFacetData"; };
 
@@ -35,6 +37,7 @@ private:
 	std::vector<Geometry::Node> nodes;
 	std::list<Geometry::Triangle> triangles;
 	std::list<Geometry::Edge> edges;
+	std::map<ot::UID, std::string> faceNameMap;
 	std::string errors;
 };
 

@@ -1305,8 +1305,8 @@ void Model::facetEntity(EntityGeometry *entity, double deflection, bool isHidden
 	entity->getFacets()->getTriangleList().clear();
 	entity->getFacets()->getEdgeList().clear();
 
-	GeometryOperations::facetEntity(entity->getBrep(), deflection, 
-									entity->getFacets()->getNodeVector(), entity->getFacets()->getTriangleList(), entity->getFacets()->getEdgeList(), entity->getFacets()->getErrorString());
+	GeometryOperations::facetEntity(entity->getBrep(), entity->getBrepEntity(), deflection, 
+									entity->getFacets()->getNodeVector(), entity->getFacets()->getTriangleList(), entity->getFacets()->getEdgeList(), entity->getFacets()->getFaceNameMap(), entity->getFacets()->getErrorString());
 	entity->getFacets()->setModified();
 
 	entity->StoreToDataBase();
@@ -3571,7 +3571,7 @@ void Model::updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity)
 				double deflection = calculateDeflectionFromListOfEntities(entity);
 
 				std::string errors;
-				GeometryOperations::facetEntity(face, deflection, annotationEntity->getFacets()->getNodeVector(), annotationEntity->getFacets()->getTriangleList(), annotationEntity->getFacets()->getEdgeList(), errors);
+				GeometryOperations::facetEntity(face, nullptr, deflection, annotationEntity->getFacets()->getNodeVector(), annotationEntity->getFacets()->getTriangleList(), annotationEntity->getFacets()->getEdgeList(), annotationEntity->getFacets()->getFaceNameMap(), errors);
 			}
 		}
 	}

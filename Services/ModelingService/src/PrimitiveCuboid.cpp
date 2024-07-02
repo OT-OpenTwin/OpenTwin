@@ -147,7 +147,9 @@ void PrimitiveCuboid::createFromRubberbandJson(const std::string& _json, std::ve
 			shapeParameters.push_back(std::pair<std::string, std::string>("Zmin", to_string(zmin)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("Zmax", to_string(zmax)));
 
-			storeShapeInModel(box, _transform, "Geometry/Cuboid", "Cuboid", shapeParameters);
+			std::list<std::string> faceNames = { "xmin", "xmax", "ymin", "ymax", "zmin", "zmax" };
+
+			storeShapeInModel(box, _transform, "Geometry/Cuboid", "Cuboid", shapeParameters, faceNames);
 		}
 		else 
 		{
@@ -193,6 +195,7 @@ void PrimitiveCuboid::update(EntityGeometry *geomEntity, TopoDS_Shape &shape)
 	try
 	{
 		shape = BRepPrimAPI_MakeBox(gp_Pnt(xmin, ymin, zmin), gp_Pnt(xmax, ymax, zmax));
+		
 	}
 	catch (Standard_Failure)
 	{

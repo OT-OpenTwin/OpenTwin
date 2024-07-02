@@ -80,6 +80,7 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	selectionHandler(nullptr),
 	overlayBox(nullptr),
 	overlayText(nullptr),
+	mouseCursorText(nullptr),
 	rubberband(nullptr),
 	rubberbandGroup(nullptr),
 	workingPlane(nullptr),
@@ -94,7 +95,10 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	currentHandler(nullptr),
 	clipPlaneActive(false),
 	clipPlaneTransform(nullptr),
-	clipPlaneManipulator(nullptr)
+	clipPlaneManipulator(nullptr),
+	overlayTextNode(nullptr),
+	mouseCursorX(0.0),
+	mouseCursorY(0.0)
 {
 	model = ViewerAPI::getModelFromID(modelID);
 	assert(model != nullptr);
@@ -380,7 +384,7 @@ void Viewer::removeOverlay(void)
 {
 	if (osgOverlayCamera == nullptr) return;
 
-	while (osgOverlayCamera->removeChild((unsigned int)0));
+	while (osgOverlayCamera->removeChild(overlayTextNode));
 
 	overlayBox = nullptr;
 	overlayText = nullptr;
@@ -394,7 +398,7 @@ void Viewer::setOverlayText(const std::string &text)
 
 	removeOverlay();
 
-	osg::Geode *textNode = new osg::Geode;
+	overlayTextNode = new osg::Geode;
 
 	osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc;
 	blendFunc->setFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -407,12 +411,12 @@ void Viewer::setOverlayText(const std::string &text)
 
 	overlayText = createText(osg::Vec2(this->width() / 2, this->height() - textHeight), text, 1.0f * textHeight);
 
-	textNode->addDrawable(overlayBox);
-	textNode->addDrawable(overlayText);
-	textNode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-	textNode->getOrCreateStateSet()->setAttributeAndModes(blendFunc);
+	overlayTextNode->addDrawable(overlayBox);
+	overlayTextNode->addDrawable(overlayText);
+	overlayTextNode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	overlayTextNode->getOrCreateStateSet()->setAttributeAndModes(blendFunc);
 
-	osgOverlayCamera->addChild(textNode);
+	osgOverlayCamera->addChild(overlayTextNode);
 
 	refresh();
 }
@@ -637,6 +641,9 @@ void Viewer::mouseMoveEvent(QMouseEvent* event)
 	}
 
 	getEventQueue()->mouseMotion(event->x() * scaleWidth, event->y() * scaleHeight);
+
+	mouseCursorX = event->x() * scaleWidth;
+	mouseCursorY = event->y() * scaleHeight;
 }
 
 void Viewer::mouseDoubleClickEvent(QMouseEvent *event)
@@ -1646,5 +1653,48 @@ void Viewer::updateDisplaySettings(osg::Node *node)
 		{
 			updateDisplaySettings(groupNode->getChild(index));
 		}
+	}
+}
+
+void Viewer::setCursorText(const std::string& text)
+{
+	if (text == cursorText) return;
+	cursorText = text;
+
+	if (osgOverlayCamera == nullptr) return;
+
+	while (osgOverlayCamera->removeChild(cursorTextNode));
+
+	cursorTextNode = nullptr;
+	mouseCursorBox = nullptr;
+
+	if (!text.empty())
+	{
+		cursorTextNode = new osg::Geode;
+
+		osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc;
+		blendFunc->setFunction(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		const int textHeight = 15;
+
+		float centerX = mouseCursorX;
+		float centerY = this->height() - mouseCursorY - 1.3 * textHeight;
+
+		mouseCursorText = createText(osg::Vec2(centerX, centerY), text, 1.0f * textHeight);
+
+		osg::BoundingBox textBox = mouseCursorText->computeBoundingBox();
+
+		mouseCursorBox = new osg::ShapeDrawable;
+		mouseCursorBox->setShape(new osg::Box(osg::Vec3(centerX, centerY, -1.0), 1.2 * (textBox.xMax() - textBox.xMin()), 1.2 * textHeight, 0.0));
+		mouseCursorBox->setColor(osg::Vec4(1.0, 1.0, 1.0, 0.6));
+
+		cursorTextNode->addDrawable(mouseCursorBox);
+		cursorTextNode->addDrawable(mouseCursorText);
+		cursorTextNode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+		cursorTextNode->getOrCreateStateSet()->setAttributeAndModes(blendFunc);
+
+		osgOverlayCamera->addChild(cursorTextNode);
+
+		refresh();
 	}
 }

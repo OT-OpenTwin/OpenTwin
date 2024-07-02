@@ -113,7 +113,7 @@ public:
 
 	void setTreeStateRecording(bool flag);
 
-	void addNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], unsigned long long modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isHidden, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors,
+	void addNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], unsigned long long modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isHidden, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNameMap, std::string &errors,
 							  bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected);
 	void addNodeFromFacetDataBase(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, 
 								  bool reflective, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isHidden, 
@@ -229,6 +229,9 @@ public:
 	void updateCapGeometry(osg::Vec3d normal, osg::Vec3d point);
 	std::list<std::string> getSelectedCurves();
 	void removedSelectedCurveNodes();
+
+	void setCursorText(const std::string& text);
+
 private:
 	// Methods
 	void	   fillTree(void);
