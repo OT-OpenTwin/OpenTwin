@@ -4,12 +4,14 @@
 #include "EntityBlockPython.h"
 #include "EntityBlockDataDimensionReducer.h"
 #include "EntityBlockDisplay.h"
+#include "EntityBlockFileWriter.h"
 
 #include "BlockHandlerDatabaseAccess.h"
 #include "BlockHandlerPlot1D.h"
 #include "BlockHandlerPython.h"
 #include "BlockHandlerDataDimensionReducer.h"
 #include "BlockHandlerDisplay.h"
+#include "BlockHandlerFileWriter.h"
 
 void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNodes, const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID)
 {
@@ -71,6 +73,12 @@ std::shared_ptr<BlockHandler> PipelineHandler::createBlockHandler(std::shared_pt
 	if (display != nullptr)
 	{
 		return std::shared_ptr<BlockHandlerDisplay>(new BlockHandlerDisplay(display, _blockHandlerByGraphNode));
+	}
+	
+	EntityBlockFileWriter* fileWriter = dynamic_cast<EntityBlockFileWriter*>(blockEntity.get());
+	if (fileWriter != nullptr)
+	{
+		return std::shared_ptr<BlockHandlerFileWriter>(new BlockHandlerFileWriter(fileWriter, _blockHandlerByGraphNode));
 	}
 	else
 	{

@@ -15,6 +15,8 @@
 #include "EntityBlockStorage.h"
 #include "EntityBlockConnection.h"
 #include "EntityBlockDisplay.h"
+#include "EntityBlockFileWriter.h"
+
 
 void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
@@ -196,7 +198,14 @@ void BlockEntityHandler::InitSpecialisedBlockEntity(std::shared_ptr<EntityBlock>
 	{
 		display->createProperties();
 	}
+
+	EntityBlockFileWriter* fileWriter = dynamic_cast<EntityBlockFileWriter*>(blockEntity.get());
+	if(fileWriter)
+	{
+		fileWriter->createProperties();
+	}
 }
+
 
 ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 {
@@ -230,10 +239,13 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	EntityBlockStorage storage(0, nullptr, nullptr, nullptr, nullptr, "");
 	controlBlockDatabaseCollection->addItem(storage.getClassName(), storage.CreateBlockHeadline(), "Default/database.png");
 
+	EntityBlockFileWriter fileWriter(0, nullptr, nullptr, nullptr, nullptr, "");
+	controlBlockDatabaseCollection->addItem(fileWriter.getClassName(), fileWriter.CreateBlockHeadline(), "Default/RenameItem.png");
+
 	pckg->addCollection(controlBlockCollection);
 	pckg->addCollection(customizedBlockCollection);
 	//pckg->addCollection(mathBlockCollection);
-
+	
 	return pckg;
 }
 
