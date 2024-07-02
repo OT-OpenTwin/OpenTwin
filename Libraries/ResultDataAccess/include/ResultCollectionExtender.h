@@ -35,6 +35,7 @@ public:
 	void FlushQuantityContainer();
 
 	void AddQuantityContainer(uint64_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>&& parameterValues, uint64_t quantityIndex, const ot::Variable& quantityValue);
+	void AddQuantityContainer(uint64_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>& parameterValues, uint64_t quantityIndex, const ot::Variable& quantityValue);
 
 private:
 	friend class FixtureResultCollectionExtender;

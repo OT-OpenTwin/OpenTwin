@@ -9,12 +9,27 @@ QuantityContainer::QuantityContainer(int64_t seriesIndex, std::list<std::string>
 	_mongoDocument.append(bsoncxx::builder::basic::kvp("SchemaVersion", 1));
 	_mongoDocument.append(bsoncxx::builder::basic::kvp(MetadataSeries::getFieldName(), seriesIndex));
 	_mongoDocument.append(bsoncxx::builder::basic::kvp(MetadataQuantity::getFieldName(), quantityIndex));
-	
+
 	VariableToBSONConverter converter;
-	auto parameterValue =parameterValues.begin();
+	auto parameterValue = parameterValues.begin();
 	for (const auto& parameterAbbreviation : parameterAbbreviations)
 	{
-		converter(_mongoDocument,*parameterValue++,parameterAbbreviation);
+		converter(_mongoDocument, *parameterValue++, parameterAbbreviation);
+	}
+}
+
+QuantityContainer::QuantityContainer(int64_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>& parameterValues, int64_t quantityIndex)
+{
+	_mongoDocument.append(bsoncxx::builder::basic::kvp("SchemaType", "QuantityContainer"));
+	_mongoDocument.append(bsoncxx::builder::basic::kvp("SchemaVersion", 1));
+	_mongoDocument.append(bsoncxx::builder::basic::kvp(MetadataSeries::getFieldName(), seriesIndex));
+	_mongoDocument.append(bsoncxx::builder::basic::kvp(MetadataQuantity::getFieldName(), quantityIndex));
+
+	VariableToBSONConverter converter;
+	auto parameterValue = parameterValues.begin();
+	for (const auto& parameterAbbreviation : parameterAbbreviations)
+	{
+		converter(_mongoDocument, *parameterValue++, parameterAbbreviation);
 	}
 
 }

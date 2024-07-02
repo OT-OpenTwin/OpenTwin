@@ -163,6 +163,35 @@ void ResultCollectionExtender::AddQuantityContainer(uint64_t seriesIndex, std::l
 	}
 }
 
+void ResultCollectionExtender::AddQuantityContainer(uint64_t seriesIndex, std::list<std::string>& parameterAbbreviations, std::list<ot::Variable>& parameterValues, uint64_t quantityIndex, const ot::Variable& quantityValue)
+{
+	if (_quantityContainer.size() == 0)
+	{
+		QuantityContainer newContainer(seriesIndex, parameterAbbreviations, parameterValues, quantityIndex);
+		newContainer.AddValue(quantityValue);
+		_quantityContainer.push_back(std::move(newContainer));
+	}
+	else
+	{
+		QuantityContainer* lastAddedQuantityContainer = &_quantityContainer.back();
+		const uint64_t lastAddedQuantityContainerStoredValues = lastAddedQuantityContainer->GetValueArraySize();
+		if (lastAddedQuantityContainerStoredValues == _bucketSize)
+		{
+			if (_quantityContainer.size() == _bufferSize)
+			{
+				FlushQuantityContainer();
+			}
+			QuantityContainer newContainer(seriesIndex, parameterAbbreviations, parameterValues, quantityIndex);
+			newContainer.AddValue(quantityValue);
+			_quantityContainer.push_back(std::move(newContainer));
+		}
+		else
+		{
+			lastAddedQuantityContainer->AddValue(quantityValue);
+		}
+	}
+}
+
 const uint64_t ResultCollectionExtender::FindNextFreeSeriesIndex()
 {
 	return _modelComponent->createEntityUID();
