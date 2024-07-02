@@ -86,7 +86,7 @@ MetadataSeries MetadataEntityInterface::CreateSeries(std::shared_ptr<EntityMetad
 				auto unitEntry = dynamic_cast<MetadataEntrySingle*>(entry.get());
 				assert(unitEntry != nullptr);
 				assert(unitEntry->getValue().isConstCharPtr());
-				parameter.typeName = unitEntry->getValue().getConstCharPtr();
+				parameter.unit = unitEntry->getValue().getConstCharPtr();
 			}
 			else
 			{

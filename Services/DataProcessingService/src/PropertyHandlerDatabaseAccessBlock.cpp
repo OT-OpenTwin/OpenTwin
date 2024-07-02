@@ -43,15 +43,6 @@ void PropertyHandlerDatabaseAccessBlock::PerformUpdateIfRequired(std::shared_ptr
 				}
 			}
 		}
-
-		//if (buffer.SelectedParameter1 != parameter1Selection->getValue() || buffer.SelectedParameter2 != parameter2Selection->getValue() || buffer.SelectedParameter3 != parameter3Selection->getValue())
-		//{
-		//	return;
-		//}
-		//else if (buffer.SelectedMSMD != msmdSelection->getValue())
-		//{
-		//	//Update nothing yet (refresh Campaign metadata later on)
-		//}
 	}
 	else
 	{
