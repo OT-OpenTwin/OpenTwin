@@ -14,10 +14,7 @@ ot::GraphicsLayoutItem::GraphicsLayoutItem(GraphicsItemCfg* _configuration)
 {}
 
 ot::GraphicsLayoutItem::~GraphicsLayoutItem() {
-	if (m_layoutWrap) {
-		m_layoutWrap->unsetGraphicsLayoutItem();
-		m_layoutWrap->setStateFlag(GraphicsItem::ToBeDeletedState, true);
-	}
+
 }
 
 bool ot::GraphicsLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
@@ -53,12 +50,6 @@ void ot::GraphicsLayoutItem::removeAllConnections(void) {
 			OT_LOG_EA("GraphicsItem cast failed");
 		}
 	}
-
-	if (m_layoutWrap) {
-		m_layoutWrap->unsetGraphicsLayoutItem();
-		m_layoutWrap->removeAllConnections();
-		m_layoutWrap->setGraphicsLayoutItem(this);
-	}
 }
 
 void ot::GraphicsLayoutItem::prepareGraphicsItemGeometryChange(void) {
@@ -67,9 +58,8 @@ void ot::GraphicsLayoutItem::prepareGraphicsItemGeometryChange(void) {
 }
 
 void ot::GraphicsLayoutItem::setParentGraphicsItem(GraphicsItem* _itm) {
-	if (m_layoutWrap) {
-		m_layoutWrap->setParentGraphicsItem(_itm);
-	}
+	OTAssertNullptr(m_layoutWrap);
+	m_layoutWrap->setParentGraphicsItem(_itm);
 	ot::GraphicsItem::setParentGraphicsItem(m_layoutWrap);
 }
 
@@ -85,13 +75,9 @@ void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(const GraphicsItemCfg::Gra
 }
 
 void ot::GraphicsLayoutItem::graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {
-	if (m_layoutWrap) {
-		m_layoutWrap->setBlockStateNotifications(true);
-		m_layoutWrap->setGraphicsItemState(_state);
-		m_layoutWrap->setBlockStateNotifications(false);
-	}
+	OTAssertNullptr(m_layoutWrap);
 
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState || this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState) {
 		std::list<QGraphicsLayoutItem*> lst;
 		this->getAllItems(lst);
 		for (auto i : lst) {
@@ -102,9 +88,7 @@ void ot::GraphicsLayoutItem::graphicsItemStateChanged(const GraphicsItem::Graphi
 		}
 	}
 
-	if (!(this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState)) {
-		m_layoutWrap->update();
-	}
+	m_layoutWrap->update();
 }
 
 void ot::GraphicsLayoutItem::graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) {
@@ -125,9 +109,9 @@ QGraphicsLayoutItem* ot::GraphicsLayoutItem::getQGraphicsLayoutItem(void) {
 	return m_layoutWrap->getQGraphicsLayoutItem(); 
 };
 
-QGraphicsItem* ot::GraphicsLayoutItem::getQGraphicsItem(void) { return (m_layoutWrap ? m_layoutWrap->getQGraphicsItem() : nullptr); };
+QGraphicsItem* ot::GraphicsLayoutItem::getQGraphicsItem(void) { return m_layoutWrap->getQGraphicsItem(); };
 
-const QGraphicsItem* ot::GraphicsLayoutItem::getQGraphicsItem(void) const { return (m_layoutWrap ? m_layoutWrap->getQGraphicsItem() : nullptr); };
+const QGraphicsItem* ot::GraphicsLayoutItem::getQGraphicsItem(void) const { return m_layoutWrap->getQGraphicsItem(); };
 
 ot::GraphicsItem* ot::GraphicsLayoutItem::findItem(const std::string& _itemName) {
 	if (_itemName == this->getGraphicsItemName()) return this;
@@ -158,17 +142,6 @@ void ot::GraphicsLayoutItem::finalizeGraphicsItem(void) {
 	}
 }
 
-void ot::GraphicsLayoutItem::setGraphicsItemRequestedSize(const QSizeF& _size) {
-	OTAssertNullptr(m_layoutWrap);
-	ot::GraphicsItem::setGraphicsItemRequestedSize(_size);
-	m_layoutWrap->setGraphicsItemRequestedSize(_size);
-}
-
-void ot::GraphicsLayoutItem::unsetLayoutWrapper(void) {
-	m_layoutWrap = nullptr;
-	this->setParentGraphicsItem(nullptr);
-}
-
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected
@@ -189,8 +162,16 @@ void ot::GraphicsLayoutItem::notifyChildsAboutTransformChange(const QTransform& 
 
 void ot::GraphicsLayoutItem::createLayoutWrapper(QGraphicsLayout* _layout) {
 	OTAssert(m_layoutWrap == nullptr, "Layout wrapper already created");
-	m_layoutWrap = new GraphicsLayoutItemWrapper(this, _layout);	
+	m_layoutWrap = new GraphicsLayoutItemWrapper(this);
+	m_layoutWrap->setLayout(_layout);
+	
 
 	// Refresh the parent item
 	this->setParentGraphicsItem(nullptr);
+}
+
+void ot::GraphicsLayoutItem::setGraphicsItemRequestedSize(const QSizeF& _size) {
+	OTAssertNullptr(m_layoutWrap);
+	ot::GraphicsItem::setGraphicsItemRequestedSize(_size);
+	m_layoutWrap->setGraphicsItemRequestedSize(_size);
 }

@@ -18,16 +18,17 @@ ot::GraphicsImageItemCfg::GraphicsImageItemCfg(const std::string& _imageSubPath)
 	: m_imageSubPath(_imageSubPath), m_maintainAspectRatio(false), m_colorMask(-255, -255, -255, -255)
 {}
 
-ot::GraphicsImageItemCfg::GraphicsImageItemCfg(const GraphicsImageItemCfg& _other) 
-	: GraphicsItemCfg(_other), m_imageSubPath(_other.m_imageSubPath), m_maintainAspectRatio(_other.m_maintainAspectRatio), m_colorMask(_other.m_colorMask)
-{
-
-}
-
 ot::GraphicsImageItemCfg::~GraphicsImageItemCfg() {}
 
 ot::GraphicsItemCfg* ot::GraphicsImageItemCfg::createCopy(void) const {
-	return new GraphicsImageItemCfg(*this);
+	ot::GraphicsImageItemCfg* copy = new GraphicsImageItemCfg;
+	this->copyConfigDataToItem(copy);
+
+	copy->m_imageSubPath = m_imageSubPath;
+	copy->m_maintainAspectRatio = m_maintainAspectRatio;
+	copy->m_colorMask = m_colorMask;
+
+	return copy;
 }
 
 void ot::GraphicsImageItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

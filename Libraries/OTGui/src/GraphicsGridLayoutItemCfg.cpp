@@ -22,25 +22,6 @@ ot::GraphicsGridLayoutItemCfg::GraphicsGridLayoutItemCfg(int _rows, int _columns
 	this->clearAndResize();
 }
 
-ot::GraphicsGridLayoutItemCfg::GraphicsGridLayoutItemCfg(const GraphicsGridLayoutItemCfg& _other) 
-	: GraphicsLayoutItemCfg(_other), m_rows(_other.m_rows), m_columns(_other.m_columns), m_rowStretch(_other.m_rowStretch), m_columnStretch(_other.m_columnStretch)
-{
-	for (const std::vector<GraphicsItemCfg*>& r : _other.m_items) {
-		std::vector<GraphicsItemCfg*> row;
-		for (GraphicsItemCfg* itm : r) {
-			if (itm) {
-				row.push_back(itm->createCopy());
-			}
-			else {
-				row.push_back(nullptr);
-			}
-		}
-		m_items.push_back(row);
-		OTAssert(row.size() == m_columns, "Data mismatch");
-	}
-	OTAssert(m_items.size() == m_rows, "Data mismatch");
-}
-
 ot::GraphicsGridLayoutItemCfg::~GraphicsGridLayoutItemCfg() {
 	for (auto r : m_items) {
 		for (auto c : r) {
@@ -51,7 +32,28 @@ ot::GraphicsGridLayoutItemCfg::~GraphicsGridLayoutItemCfg() {
 }
 
 ot::GraphicsItemCfg* ot::GraphicsGridLayoutItemCfg::createCopy(void) const {
-	return new GraphicsGridLayoutItemCfg(*this);
+	ot::GraphicsGridLayoutItemCfg* copy = new GraphicsGridLayoutItemCfg;
+	this->setupData(copy);
+
+	copy->m_rows = m_rows;
+	copy->m_columns = m_columns;
+	copy->m_rowStretch = m_rowStretch;
+	copy->m_columnStretch = m_columnStretch;
+
+	for (const std::vector<GraphicsItemCfg*>& r : m_items) {
+		std::vector<GraphicsItemCfg*> row;
+		for (GraphicsItemCfg* itm : r) {
+			if (itm) {
+				row.push_back(itm->createCopy());
+			}
+			else {
+				row.push_back(nullptr);
+			}
+		}
+		copy->m_items.push_back(row);
+	}
+
+	return copy;
 }
 
 void ot::GraphicsGridLayoutItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

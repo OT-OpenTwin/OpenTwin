@@ -33,20 +33,6 @@
 // C++ header
 #include <exception>
 
-#define OT_DBG_FRONTEND_MEMORY false
-
-#if OT_DBG_FRONTEND_MEMORY==true
-
-#pragma message("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-#pragma message("OpenTwin Frontend memory debug is active!")
-#pragma message("Do not use this build in a deployment.")
-#pragma message("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-
-void operator delete(void* _ptr) noexcept {	
-	std::free(_ptr);
-}
-#endif
-
 void initializeLogging(void) {
 	// Get logging URL
 	QByteArray loggingenv = qgetenv("OPEN_TWIN_LOGGING_URL");

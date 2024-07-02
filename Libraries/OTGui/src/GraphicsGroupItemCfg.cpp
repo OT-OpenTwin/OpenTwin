@@ -16,21 +16,19 @@ ot::GraphicsGroupItemCfg::GraphicsGroupItemCfg()
 
 }
 
-ot::GraphicsGroupItemCfg::GraphicsGroupItemCfg(const GraphicsGroupItemCfg& _other) 
-	: GraphicsItemCfg(_other)
-{
-	for (GraphicsItemCfg* itm : _other.m_items) {
-		OTAssertNullptr(itm);
-		m_items.push_back(itm->createCopy());
-	}
-}
-
 ot::GraphicsGroupItemCfg::~GraphicsGroupItemCfg() {
 	this->memClear();
 }
 
 ot::GraphicsItemCfg* ot::GraphicsGroupItemCfg::createCopy(void) const {
-	return new GraphicsGroupItemCfg(*this);
+	ot::GraphicsGroupItemCfg* copy = new GraphicsGroupItemCfg;
+	this->copyConfigDataToItem(copy);
+
+	for (GraphicsItemCfg* itm : m_items) {
+		copy->m_items.push_back(itm->createCopy());
+	}
+
+	return copy;
 }
 
 void ot::GraphicsGroupItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

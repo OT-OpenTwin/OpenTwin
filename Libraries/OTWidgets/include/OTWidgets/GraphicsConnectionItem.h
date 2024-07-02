@@ -24,15 +24,11 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public QGraphicsItem {
 		OT_DECL_NOCOPY(GraphicsConnectionItem)
 	public:
-		//! \enum GraphicsConnectionState
 		enum GraphicsConnectionState {
-			NoState          = 0x00, //! \brief Default state.
-			HoverState       = 0x01, //! \brief Item is hovered over by user.
-			SelectedState    = 0x02, //! \brief Item is selected.
-			ToBeDeletedState = 0x10  //! \brief Iten is about to be deleted.
+			NoState = 0x00, //! @brief Default state
+			HoverState = 0x01, //! @brief Item is hovered over by user
+			SelectedState = 0x02  //! @brief Item is selected
 		};
-
-		//! \typedef GraphicsConnectionStateFlags
 		typedef Flags<GraphicsConnectionState> GraphicsConnectionStateFlags;
 
 		GraphicsConnectionItem();
@@ -59,23 +55,23 @@ namespace ot {
 		//! @brief Creates a configuration object containing the items origin and destination information
 		const GraphicsConnectionCfg& getConfiguration(void) const { return m_config; };
 
-		void setLineShape(GraphicsConnectionCfg::ConnectionShape _shape) { m_config.setLineShape(_shape); };
+		void setLineShape(GraphicsConnectionCfg::ConnectionShape _shape) { m_config.setLineShape(_shape); this->update(); };
 		GraphicsConnectionCfg::ConnectionShape getLineShape(void) const { return m_config.getLineShape(); };
 
-		void setLineWidth(double _width) { m_config.setLineWidth(_width); };
+		void setLineWidth(double _width) { m_config.setLineWidth(_width); this->update(); };
 		double getLineWidth(void) const { return m_config.getLineWidth(); };
 
-		void setLineColor(const ot::Color& _color) { m_config.setLineColor(_color); };
+		void setLineColor(const ot::Color& _color) { m_config.setLineColor(_color); this->update(); };
 
 		//! \brief Sets the line painter.
 		//! The item takes ownership of the painter.
-		void setLinePainter(ot::Painter2D* _painter) { m_config.setLinePainter(_painter); };
+		void setLinePainter(ot::Painter2D* _painter) { m_config.setLinePainter(_painter); this->update(); };
 
 		//! \brief Returns the current line painter.
 		//! The item keeps ownership of the painter.
 		const ot::Painter2D* getLinePainter(void) const { return m_config.getLinePainter(); };
 
-		void setLineStyle(const OutlineF& _style) { m_config.setLineStyle(_style); };
+		void setLineStyle(const OutlineF& _style) { m_config.setLineStyle(_style); this->update(); };
 		const OutlineF& getLineStyle(void) const { return m_config.getLineStyle(); };
 
 		void updateConnectionView(void);
@@ -103,10 +99,6 @@ namespace ot {
 		//! If no orgin is set the origin connectable name will be an empty string and the UID 0.
 		//! Same applies to the destination.
 		void updateConnectionInformation(void);
-
-		void setStateFlag(GraphicsConnectionState _flag, bool _active = true);
-		void setStateFlags(const GraphicsConnectionStateFlags& _flags);
-		const GraphicsConnectionStateFlags& getStateFlags(void) const { return m_state; };
 
 	private:
 		void calculatePainterPath(QPainterPath& _path) const;

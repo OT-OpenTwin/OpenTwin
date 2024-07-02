@@ -18,7 +18,6 @@ namespace ot {
 		typedef std::pair<GraphicsItemCfg*, int> itemStrechPair_t;
 
 		GraphicsBoxLayoutItemCfg(ot::Orientation _orientation = ot::Horizontal);
-		GraphicsBoxLayoutItemCfg(const GraphicsBoxLayoutItemCfg& _other);
 		virtual ~GraphicsBoxLayoutItemCfg();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -36,12 +35,20 @@ namespace ot {
 		void addStrech(int _stretch = 1);
 		const std::list<itemStrechPair_t>& items(void) const { return m_items; };
 		
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Protected: Helper
+
+	protected:
+		virtual void setupData(GraphicsItemCfg* _config) const;
+
 	private:
 		void clearItems(void);
 
 		ot::Orientation m_orientation;
 		std::list<itemStrechPair_t> m_items; //! @brief Items and their stretch in the box (nullptr = stretch only)
 
+		GraphicsBoxLayoutItemCfg(const GraphicsBoxLayoutItemCfg&) = delete;
 		GraphicsBoxLayoutItemCfg& operator = (const GraphicsBoxLayoutItemCfg&) = delete;
 	};
 

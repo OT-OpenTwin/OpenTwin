@@ -8,27 +8,16 @@
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsLayoutItemWrapper.h"
 
-// Qt header
-#include <QtWidgets/qgraphicslayout.h>
-
-ot::GraphicsLayoutItemWrapper::GraphicsLayoutItemWrapper(GraphicsLayoutItem* _owner, QGraphicsLayout* _layout)
+ot::GraphicsLayoutItemWrapper::GraphicsLayoutItemWrapper(GraphicsLayoutItem* _owner) 
 	: ot::GraphicsItem(_owner->getConfiguration()->createCopy(), GraphicsItem::ForwardSizeState), m_owner(_owner)
 {
 	OTAssertNullptr(m_owner);
-	OTAssertNullptr(_layout);
-
-	this->setLayout(_layout);
-	_layout->setParentLayoutItem(this);
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 	this->setAcceptHoverEvents(true);
 }
 
-ot::GraphicsLayoutItemWrapper::~GraphicsLayoutItemWrapper() {
-	if (m_owner) {
-		m_owner->unsetLayoutWrapper();
-	}
-}
+ot::GraphicsLayoutItemWrapper::~GraphicsLayoutItemWrapper() {}
 
 void ot::GraphicsLayoutItemWrapper::prepareGraphicsItemGeometryChange(void) {
 	this->prepareGeometryChange();
@@ -36,48 +25,35 @@ void ot::GraphicsLayoutItemWrapper::prepareGraphicsItemGeometryChange(void) {
 
 void ot::GraphicsLayoutItemWrapper::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	OTAssertNullptr(m_owner);
-	QGraphicsWidget::mousePressEvent(_event);
 	m_owner->handleMousePressEvent(_event);
+	QGraphicsWidget::mousePressEvent(_event);
 }
 
 void ot::GraphicsLayoutItemWrapper::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+	OTAssertNullptr(m_owner);
+	m_owner->handleMouseReleaseEvent(_event);
 	QGraphicsWidget::mouseReleaseEvent(_event);
-	if (m_owner) {
-		m_owner->handleMouseReleaseEvent(_event);
-	}
 }
 
 void ot::GraphicsLayoutItemWrapper::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
-	if (m_owner) {
-		m_owner->handleHoverEnterEvent(_event);
-	}
+	OTAssertNullptr(m_owner);
+	m_owner->handleHoverEnterEvent(_event);
 }
 
 void ot::GraphicsLayoutItemWrapper::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
-	if (m_owner) {
-		m_owner->handleHoverLeaveEvent(_event);
-	}
+	OTAssertNullptr(m_owner);
+	m_owner->handleHoverLeaveEvent(_event);
 }
 
 QRectF ot::GraphicsLayoutItemWrapper::boundingRect(void) const {
-	if (m_owner) {
-		return m_owner->handleGetGraphicsItemBoundingRect(QGraphicsWidget::boundingRect());
-	}
-	else {
-		return QRectF();
-	}
-}
-
-bool ot::GraphicsLayoutItemWrapper::event(QEvent* _event) {
-	if (this->graphicsItemEventFilter(_event)) return true;
-	else return QGraphicsWidget::event(_event);
+	OTAssertNullptr(m_owner);
+	return m_owner->handleGetGraphicsItemBoundingRect(QGraphicsWidget::boundingRect());
 }
 
 QVariant ot::GraphicsLayoutItemWrapper::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
 	OTAssertNullptr(m_owner);
-	QVariant ret = QGraphicsWidget::itemChange(_change, _value);
 	m_owner->handleItemChange(_change, _value);
-	return ret;
+	return QGraphicsWidget::itemChange(_change, _value);
 }
 
 void ot::GraphicsLayoutItemWrapper::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
@@ -90,7 +66,9 @@ void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOption
 
 void ot::GraphicsLayoutItemWrapper::removeAllConnections(void) {
 	ot::GraphicsItem::removeAllConnections();
-	if (m_owner) m_owner->removeAllConnections();
+
+	OTAssertNullptr(m_owner);
+	m_owner->removeAllConnections();
 }
 
 QSizeF ot::GraphicsLayoutItemWrapper::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
@@ -105,9 +83,4 @@ void ot::GraphicsLayoutItemWrapper::finalizeGraphicsItem(void) {
 void ot::GraphicsLayoutItemWrapper::setGraphicsItemRequestedSize(const QSizeF& _size) {
 	ot::GraphicsItem::setGraphicsItemRequestedSize(_size);
 	this->setPreferredSize(_size);
-}
-
-void ot::GraphicsLayoutItemWrapper::unsetGraphicsLayoutItem(void) {
-	m_owner = nullptr;
-	this->setParentGraphicsItem(nullptr);
 }

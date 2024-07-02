@@ -11,8 +11,9 @@ static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsHBoxLayoutItemCfg> ellips
 
 ot::GraphicsHBoxLayoutItemCfg::GraphicsHBoxLayoutItemCfg() : GraphicsBoxLayoutItemCfg(ot::Horizontal) {};
 
-ot::GraphicsHBoxLayoutItemCfg::GraphicsHBoxLayoutItemCfg(const GraphicsHBoxLayoutItemCfg& _other) : GraphicsBoxLayoutItemCfg(_other) {}
-
 ot::GraphicsItemCfg* ot::GraphicsHBoxLayoutItemCfg::createCopy(void) const {
-	return new GraphicsHBoxLayoutItemCfg(*this);
+	ot::GraphicsHBoxLayoutItemCfg* copy = new GraphicsHBoxLayoutItemCfg;
+	this->setupData(copy);
+
+	return copy;
 }

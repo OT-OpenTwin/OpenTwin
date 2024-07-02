@@ -24,8 +24,6 @@
 #include <list>
 #include <string>
 
-class QEvent;
-
 namespace ot {
 
 	class Painter2D;
@@ -54,11 +52,10 @@ namespace ot {
 		//! \enum GraphicsItemState
 		//! \brief The GraphicsItemState is used to describe the current state of a GraphicsItem.
 		enum GraphicsItemState {
-			NoState           = 0x00, //! \brief Default state.
-			HoverState        = 0x01, //! \brief Item is hovered over by user.
-			SelectedState     = 0x02, //! \brief Item is selected.
-			ForwardSizeState  = 0x08, //! \brief Item forwards requested size requests to child item (e.g. GraphicsLayoutItem).
-			ToBeDeletedState  = 0x10  //! \brief Item will be deleted soon.
+			NoState           = 0x00, //! \brief Default state
+			HoverState        = 0x01, //! \brief Item is hovered over by user
+			SelectedState     = 0x02, //! \brief Item is selected
+			ForwardSizeState  = 0x08  //! \brief Item forwards requested size requests to child item (e.g. GraphicsLayoutItem).
 		};
 		//! \typedef GraphicsItemStateFlags
 		//! \brief Flags used to manage GraphicsItemState.
@@ -150,10 +147,6 @@ namespace ot {
 		// ###############################################################################################################################################
 
 		// Event handler
-
-		//! \brief If true is returned the event must be skipped.
-		//! The event filter sets the event to ignored.
-		bool graphicsItemEventFilter(QEvent* _event);
 
 		void handleMousePressEvent(QGraphicsSceneMouseEvent* _event);
 		void handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event);
@@ -291,7 +284,7 @@ namespace ot {
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size);
 		const QSizeF& graphicsItemRequestedSize(void) const { return m_requestedSize; };
 
-		std::list<ot::GraphicsConnectionCfg> getConnectionCfgs(void);
+		std::list<ot::GraphicsConnectionCfg> getConnectionCfgs();
 
 		void setGraphicsItemSelected(bool _selected);
 		bool getGraphicsItemSelected(void) const;

@@ -11,8 +11,9 @@ static ot::GraphicsItemCfgFactoryRegistrar<ot::GraphicsVBoxLayoutItemCfg> vboxCf
 
 ot::GraphicsVBoxLayoutItemCfg::GraphicsVBoxLayoutItemCfg() : GraphicsBoxLayoutItemCfg(ot::Vertical) {};
 
-ot::GraphicsVBoxLayoutItemCfg::GraphicsVBoxLayoutItemCfg(const GraphicsVBoxLayoutItemCfg& _other) : GraphicsBoxLayoutItemCfg(_other) {}
-
 ot::GraphicsItemCfg* ot::GraphicsVBoxLayoutItemCfg::createCopy(void) const {
-	return new GraphicsVBoxLayoutItemCfg(*this);
+	ot::GraphicsVBoxLayoutItemCfg* copy = new GraphicsVBoxLayoutItemCfg;
+	this->setupData(copy);
+
+	return copy;
 }

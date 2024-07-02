@@ -49,13 +49,9 @@
 #define OT_JSON_VALUE_ForwardState "ForwardState"
 
 ot::GraphicsItemCfg::GraphicsItemCfg()
-	: m_uid(0), m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter),
+	: m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter), m_uid(0),
 	m_minSize(0., 0.), m_margins(0., 0., 0., 0.), m_maxSize(DBL_MAX, DBL_MAX), m_sizePolicy(ot::Preferred), m_connectionDirection(ot::ConnectAny)
 {}
-
-ot::GraphicsItemCfg::GraphicsItemCfg(const GraphicsItemCfg& _other) {
-	*this = _other;
-}
 
 ot::GraphicsItemCfg::~GraphicsItemCfg() {}
 
@@ -165,27 +161,26 @@ std::string ot::GraphicsItemCfg::getStringForKey(const std::string& _key) const 
 	else return it->second;
 }
 
-ot::GraphicsItemCfg& ot::GraphicsItemCfg::operator = (const GraphicsItemCfg& _other) {
-	if (this == &_other) return *this;
+// ###########################################################################################################################################################################################################################################################################################################################
 
-	m_name = _other.m_name;
-	m_title = _other.m_title;
-	m_uid = _other.m_uid;
-	m_tooltip = _other.m_tooltip;
-	m_pos = _other.m_pos;
+// Protected: Helper
 
-	m_minSize = _other.m_minSize;
-	m_maxSize = _other.m_maxSize;
+void ot::GraphicsItemCfg::copyConfigDataToItem(GraphicsItemCfg* _target) const {
+	_target->m_name = m_name;
+	_target->m_title = m_title;
+	_target->m_uid = m_uid;
+	_target->m_tooltip = m_tooltip;
+	_target->m_pos = m_pos;
 
-	m_margins = _other.m_margins;
-	m_flags = _other.m_flags;
-	m_alignment = _other.m_alignment;
-	m_sizePolicy = _other.m_sizePolicy;
-	m_connectionDirection = _other.m_connectionDirection;
+	_target->m_minSize = m_minSize;
+	_target->m_maxSize = m_maxSize;
 
-	m_transform = _other.m_transform;
+	_target->m_margins = m_margins;
+	_target->m_flags = m_flags;
+	_target->m_alignment = m_alignment;
+	_target->m_sizePolicy = m_sizePolicy;
+	_target->m_connectionDirection = m_connectionDirection;
 
-	m_stringMap = _other.m_stringMap;
-
-	return *this;
+	_target->m_stringMap = m_stringMap;
+	_target->m_transform = m_transform;
 }

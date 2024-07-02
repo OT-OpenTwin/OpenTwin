@@ -15,8 +15,8 @@ static ot::GraphicsItemFactoryRegistrar<ot::GraphicsGridLayoutItem> glayItemRegi
 ot::GraphicsGridLayoutItem::GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem) 
 	: QGraphicsGridLayout(_parentItem), GraphicsLayoutItem(new GraphicsGridLayoutItemCfg)
 {
-	this->createLayoutWrapper(this);
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
+	this->createLayoutWrapper(this);
 }
 
 bool ot::GraphicsGridLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {

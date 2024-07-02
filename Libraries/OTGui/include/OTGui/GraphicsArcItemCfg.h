@@ -19,9 +19,9 @@ namespace ot {
 	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsArcItemCfg : public ot::GraphicsItemCfg {
+		OT_DECL_NOCOPY(GraphicsArcItemCfg)
 	public:
 		GraphicsArcItemCfg();
-		GraphicsArcItemCfg(const GraphicsArcItemCfg& _other);
 		virtual ~GraphicsArcItemCfg();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -78,8 +78,6 @@ namespace ot {
 		double m_startAngle;
 		double m_spanAngle;
 		OutlineF m_lineStyle; //! \brief Line style.
-
-		GraphicsArcItemCfg& operator = (const GraphicsArcItemCfg&) = delete;
 	};
 
 }

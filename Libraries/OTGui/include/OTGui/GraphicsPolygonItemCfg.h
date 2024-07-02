@@ -22,9 +22,9 @@ namespace ot {
 	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsPolygonItemCfg : public ot::GraphicsItemCfg {
+		OT_DECL_NOCOPY(GraphicsPolygonItemCfg)
 	public:
 		GraphicsPolygonItemCfg();
-		GraphicsPolygonItemCfg(const GraphicsPolygonItemCfg& _other);
 		virtual ~GraphicsPolygonItemCfg();
 
 		//! \brief Creates a copy of this item.
@@ -106,7 +106,5 @@ namespace ot {
 		std::list<Point2DD> m_points; //! @brief Outline points.
 		Painter2D* m_backgroundPainter; //! @brief Background painter.
 		OutlineF m_outline; //! @brief Outline style.
-
-		GraphicsPolygonItemCfg& operator = (const GraphicsPolygonItemCfg& _other) = delete;
 	};
 }

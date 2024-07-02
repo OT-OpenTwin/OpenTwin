@@ -17,7 +17,6 @@ namespace ot {
 	class OT_GUI_API_EXPORT GraphicsImageItemCfg : public ot::GraphicsItemCfg {
 	public:
 		GraphicsImageItemCfg(const std::string& _imageSubPath = std::string());
-		GraphicsImageItemCfg(const GraphicsImageItemCfg& _other);
 		virtual ~GraphicsImageItemCfg();
 
 		//! \brief Creates a copy of this item.
@@ -50,7 +49,8 @@ namespace ot {
 		bool m_maintainAspectRatio;
 		ot::Color m_colorMask;
 
-		GraphicsImageItemCfg& operator = (const GraphicsImageItemCfg&) = delete;
+		GraphicsImageItemCfg(GraphicsImageItemCfg&) = delete;
+		GraphicsImageItemCfg& operator = (GraphicsImageItemCfg&) = delete;
 	};
 
 }

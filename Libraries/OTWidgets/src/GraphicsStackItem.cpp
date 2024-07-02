@@ -91,15 +91,13 @@ void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGrap
 }
 
 void ot::GraphicsStackItem::graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState || this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState) {
 		for (const GraphicsStackItemEntry& entry : m_items) {
 			entry.item->setGraphicsItemState(_state);
 		}
 	}
 
-	if (!(this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState)) {
-		this->update();
-	}
+	this->update();
 }
 
 void ot::GraphicsStackItem::graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {

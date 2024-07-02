@@ -18,7 +18,6 @@ namespace ot {
 	class OT_GUI_API_EXPORT GraphicsGroupItemCfg : public ot::GraphicsItemCfg {
 	public:
 		GraphicsGroupItemCfg();
-		GraphicsGroupItemCfg(const GraphicsGroupItemCfg& _other);
 		virtual ~GraphicsGroupItemCfg();
 
 		//! \brief Creates a copy of this item.
@@ -49,8 +48,6 @@ namespace ot {
 		void memClear(void);
 
 		std::list<GraphicsItemCfg*> m_items;
-
-		GraphicsGroupItemCfg& operator = (const GraphicsGroupItemCfg&) = delete;
 	};
 
 }

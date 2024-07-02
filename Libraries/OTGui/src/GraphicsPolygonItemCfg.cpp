@@ -20,19 +20,20 @@ ot::GraphicsPolygonItemCfg::GraphicsPolygonItemCfg()
 	m_backgroundPainter = new FillPainter2D(Transparent);
 }
 
-ot::GraphicsPolygonItemCfg::GraphicsPolygonItemCfg(const GraphicsPolygonItemCfg& _other)
-	: GraphicsItemCfg(_other), m_fillPolygon(_other.m_fillPolygon), m_points(_other.m_points), m_outline(_other.m_outline), m_backgroundPainter(nullptr)
-{
-	OTAssertNullptr(_other.m_backgroundPainter);
-	m_backgroundPainter = _other.m_backgroundPainter->createCopy();
-}
-
 ot::GraphicsPolygonItemCfg::~GraphicsPolygonItemCfg() {
 	if (m_backgroundPainter) delete m_backgroundPainter;
 }
 
 ot::GraphicsItemCfg* ot::GraphicsPolygonItemCfg::createCopy(void) const {
-	return new GraphicsPolygonItemCfg(*this);
+	ot::GraphicsPolygonItemCfg* copy = new GraphicsPolygonItemCfg;
+	this->copyConfigDataToItem(copy);
+
+	copy->m_fillPolygon = m_fillPolygon;
+	copy->m_points = m_points;
+	copy->m_outline = m_outline;
+	copy->setBackgroundPainter(m_backgroundPainter->createCopy());
+
+	return copy;
 }
 
 void ot::GraphicsPolygonItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {

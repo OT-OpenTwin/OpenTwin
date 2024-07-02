@@ -19,9 +19,9 @@ namespace ot {
 	class Painter2D;
 
 	class OT_GUI_API_EXPORT GraphicsLineItemCfg : public ot::GraphicsItemCfg {
+		OT_DECL_NOCOPY(GraphicsLineItemCfg)
 	public:
 		GraphicsLineItemCfg();
-		GraphicsLineItemCfg(const GraphicsLineItemCfg& _other);
 		virtual ~GraphicsLineItemCfg();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -90,8 +90,6 @@ namespace ot {
 		Point2DD m_from; //! \brief Starting point.
 		Point2DD m_to; //! \brief End point.
 		OutlineF m_lineStyle; //! \brief Line style.
-
-		GraphicsLineItemCfg& operator = (const GraphicsLineItemCfg&) = delete;
 	};
 
 }

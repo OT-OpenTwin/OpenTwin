@@ -17,23 +17,6 @@ ot::GraphicsBoxLayoutItemCfg::GraphicsBoxLayoutItemCfg(ot::Orientation _orientat
 	: m_orientation(_orientation)
 {}
 
-ot::GraphicsBoxLayoutItemCfg::GraphicsBoxLayoutItemCfg(const GraphicsBoxLayoutItemCfg& _other) 
-	: GraphicsLayoutItemCfg(_other)
-{
-	m_orientation = _other.m_orientation;
-	for (const itemStrechPair_t& itm : _other.m_items) {
-		itemStrechPair_t newEntry;
-		newEntry.second = itm.second;
-		if (itm.first) {
-			newEntry.first = itm.first->createCopy();
-		}
-		else {
-			newEntry.first = nullptr;
-		}
-		m_items.push_back(newEntry);
-	}
-}
-
 ot::GraphicsBoxLayoutItemCfg::~GraphicsBoxLayoutItemCfg() {
 	this->clearItems();
 }
@@ -115,6 +98,29 @@ void ot::GraphicsBoxLayoutItemCfg::addChildItem(ot::GraphicsItemCfg* _item, int 
 void ot::GraphicsBoxLayoutItemCfg::addStrech(int _stretch) {
 	OTAssert(_stretch > 0, "Stretch should be greater than 0");
 	m_items.push_back(itemStrechPair_t(nullptr, _stretch));
+}
+
+void ot::GraphicsBoxLayoutItemCfg::setupData(GraphicsItemCfg* _config) const {
+	ot::GraphicsLayoutItemCfg::setupData(_config);
+
+	GraphicsBoxLayoutItemCfg* cfg = dynamic_cast<GraphicsBoxLayoutItemCfg*>(_config);
+	if (!cfg) {
+		OT_LOG_EA("Configuration cast failed");
+		return;
+	}
+
+	cfg->m_orientation = m_orientation;
+	for (const itemStrechPair_t& itm : m_items) {
+		itemStrechPair_t newEntry;
+		newEntry.second = itm.second;
+		if (itm.first) {
+			newEntry.first = itm.first->createCopy();
+		}
+		else {
+			newEntry.first = nullptr;
+		}
+		cfg->m_items.push_back(newEntry);
+	}
 }
 
 void ot::GraphicsBoxLayoutItemCfg::clearItems(void) {

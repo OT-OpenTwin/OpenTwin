@@ -14,10 +14,10 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT GraphicsItemFileCfg : public GraphicsItemCfg {
+		OT_DECL_NOCOPY(GraphicsItemFileCfg)
 	public:
 		GraphicsItemFileCfg();
 		GraphicsItemFileCfg(const std::string& _subPath);
-		GraphicsItemFileCfg(const GraphicsItemFileCfg& _other);
 		virtual ~GraphicsItemFileCfg();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -49,9 +49,6 @@ namespace ot {
 
 	private:
 		std::string m_file; //! \brief Starting point.
-
-
-		GraphicsItemFileCfg& operator = (const GraphicsItemFileCfg&) = delete;
 	};
 
 }

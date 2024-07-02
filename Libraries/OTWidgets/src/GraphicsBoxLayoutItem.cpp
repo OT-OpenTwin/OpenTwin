@@ -13,8 +13,8 @@
 ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem(Qt::Orientation _orientation, GraphicsItemCfg* _configuration, QGraphicsLayoutItem* _parentItem) 
 	: QGraphicsLinearLayout(_orientation, _parentItem), GraphicsLayoutItem(_configuration)
 {
-	this->createLayoutWrapper(this);
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
+	this->createLayoutWrapper(this);
 }
 
 bool ot::GraphicsBoxLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {

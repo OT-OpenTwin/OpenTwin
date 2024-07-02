@@ -19,7 +19,6 @@ namespace ot {
 	class OT_GUI_API_EXPORT GraphicsLayoutItemCfg : public GraphicsItemCfg {
 	public:
 		GraphicsLayoutItemCfg() {};
-		GraphicsLayoutItemCfg(const GraphicsLayoutItemCfg& _other) : GraphicsItemCfg(_other) {};
 		virtual ~GraphicsLayoutItemCfg();
 
 		//! @brief Add the object contents to the provided JSON object
@@ -34,7 +33,15 @@ namespace ot {
 
 		virtual void addChildItem(ot::GraphicsItemCfg* _item) = 0;
 		
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Protected: Helper
+
+	protected:
+		virtual void setupData(GraphicsItemCfg* _config) const;
+
 	private:
+		GraphicsLayoutItemCfg(const GraphicsLayoutItemCfg&) = delete;
 		GraphicsLayoutItemCfg& operator = (const GraphicsLayoutItemCfg&) = delete;
 	};
 

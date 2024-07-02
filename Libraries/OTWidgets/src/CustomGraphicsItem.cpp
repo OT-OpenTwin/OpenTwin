@@ -43,9 +43,7 @@ void ot::CustomGraphicsItem::callPaint(QPainter* _painter, const QStyleOptionGra
 }
 
 void ot::CustomGraphicsItem::graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {
-	if (!(_state & GraphicsItem::ToBeDeletedState)) {
-		this->update();
-	}
+	this->update();
 }
 
 QSizeF ot::CustomGraphicsItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {

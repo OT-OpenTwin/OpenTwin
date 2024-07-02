@@ -16,7 +16,6 @@ namespace ot {
 	class OT_GUI_API_EXPORT GraphicsGridLayoutItemCfg : public GraphicsLayoutItemCfg {
 	public:
 		GraphicsGridLayoutItemCfg(int _rows = 0, int _columns = 0);
-		GraphicsGridLayoutItemCfg(const GraphicsGridLayoutItemCfg& _other);
 		virtual ~GraphicsGridLayoutItemCfg();
 
 		//! \brief Creates a copy of this item.
@@ -57,6 +56,7 @@ namespace ot {
 		std::vector<int> m_columnStretch;
 		std::vector<std::vector<GraphicsItemCfg*>> m_items;
 
+		GraphicsGridLayoutItemCfg(const GraphicsGridLayoutItemCfg&) = delete;
 		GraphicsGridLayoutItemCfg& operator = (const GraphicsGridLayoutItemCfg&) = delete;
 	};
 

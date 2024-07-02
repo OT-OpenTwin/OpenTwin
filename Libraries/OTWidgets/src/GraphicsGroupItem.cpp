@@ -71,7 +71,7 @@ void ot::GraphicsGroupItem::callPaint(QPainter* _painter, const QStyleOptionGrap
 }
 
 void ot::GraphicsGroupItem::graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState || this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState) {
 		for (auto i : this->childItems()) {
 			ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
 			if (itm) {
@@ -83,9 +83,7 @@ void ot::GraphicsGroupItem::graphicsItemStateChanged(const GraphicsItem::Graphic
 		}
 	}
 
-	if (!(this->getGraphicsItemState() & GraphicsItem::ToBeDeletedState)) {
-		this->update();
-	}
+	this->update();
 }
 
 QSizeF ot::GraphicsGroupItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
