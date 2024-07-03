@@ -104,7 +104,6 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	_connectorNames.shrink_to_fit();
 	_query = builder.ConnectWithAND(std::move(_comparisons));
 	_projection = builder.GenerateSelectQuery(_projectionNames, false);
-
 }
 
 BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
@@ -118,6 +117,8 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 
 bool BlockHandlerDatabaseAccess::executeSpecialized()
 {
+	const std::string debugQuery = bsoncxx::to_json(_query.view());
+	const std::string debugProjection = bsoncxx::to_json(_projection.view());
 	auto dbResponse = _dataStorageAccess->SearchInResultCollection(_query, _projection, 0);
 	ot::JSONToVariableConverter converter;
 

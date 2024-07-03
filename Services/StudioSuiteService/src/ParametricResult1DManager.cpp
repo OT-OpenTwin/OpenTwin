@@ -394,6 +394,7 @@ void ParametricResult1DManager::processDataPoints(DataDescription* dataDescripti
 		SParameterDescription* sParameterDescription = dynamic_cast<SParameterDescription*>(dataDescription);
 		assert(sParameterDescription != nullptr);
 		assert(xParameter->parameterValues.size() == sParameterDescription->quantityValues.size());
+		_resultCollectionExtender.FlushQuantityContainer();
 		_resultCollectionExtender.setBucketSize(sParameterDescription->quantityDataNumberOfColumns * sParameterDescription->quantityDataNumberOfRows);
 		for (auto& quantityValue : sParameterDescription->quantityValues)
 		{
