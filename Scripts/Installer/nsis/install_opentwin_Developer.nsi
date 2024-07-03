@@ -233,9 +233,11 @@ Function .onInit
 	${EndIf}
 
 	IfFileExists $DEVENV_ROOT\devenv.exe +3 0
-		MessageBox MB_OK 'Microsoft Visual Studio (with C++ compilers) needs to be installed before running the installation. $\n$\nThe environment variable DEVENV_ROOT_2022 needs to be set to the tools directory of the Visual Studio 2022 installation, e.g., "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE".'
+		MessageBox MB_ICONSTOP|MB_OK 'Microsoft Visual Studio (with C++ compilers) needs to be installed before running the installation. $\n$\nThe environment variable DEVENV_ROOT_2022 needs to be set to the tools directory of the Visual Studio 2022 installation, e.g., "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE".'
 		Abort
 	    
+	MessageBox MB_ICONEXCLAMATION|MB_OK 'OpenTwin requires the Qt plugin for Microsoft Visual Studio. $\n$\nThe latest version of the plugin has a regression which prevents the software from building reliably. Therefore, an earlier version of the plugin will be installed. $\n$\nPlease remove any currently installed Qt plugins and turn off the automatic updating for per user extensions: Tools->Options->Environment->Extensions->Automatically update extensions.'
+	
 	StrCpy $PortReturnChecker 0
 	StrCpy $PublicIpSet 0
 	StrCpy $PublicCertPageChecker 0
