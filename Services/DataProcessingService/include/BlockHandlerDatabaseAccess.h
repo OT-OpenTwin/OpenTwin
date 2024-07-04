@@ -22,6 +22,7 @@ private:
 	DataStorageAPI::ResultDataStorageAPI* _dataStorageAccess = nullptr;
 	std::list< BsonViewOrValue> _comparisons;
 	std::vector<std::string> _projectionNames;
+	std::map<std::string, std::string> _projectionNameToClearName;
 
 	BsonViewOrValue _query;
 	BsonViewOrValue _projection;

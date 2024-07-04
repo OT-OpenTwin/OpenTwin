@@ -57,6 +57,8 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	//Now we add a comparision for the searched quantity value.
 	quantityDef.setName(QuantityContainer::getFieldName());
 	_projectionNames.push_back(quantityDef.getName());
+	_projectionNameToClearName[quantityDef.getName()] = selectedQuantity->quantityName;
+	
 	AddComparision(quantityDef);
 
 	//Next are the parameter. A 2D plot requires two variables, thus at least one parameter has to be defined.
@@ -66,6 +68,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	const std::string parameterConnectorName = blockEntity->getConnectorParameter1().getConnectorName();
 	ValueComparisionDefinition param1Def = blockEntity->getSelectedParameter1Definition();
 	const auto parameter1 =	resultCollectionAccess->FindMetadataParameter(param1Def.getName());
+	_projectionNameToClearName[parameter1->parameterAbbreviation] = parameter1->parameterName;
 	if (parameter1 == nullptr)
 	{
 		throw std::exception("DatabaseAccessBlock has the parameter 1 not set.");
@@ -81,6 +84,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 		auto param2Def = blockEntity->getSelectedParameter2Definition();
 		const std::string param2ConnectorName =	blockEntity->getConnectorParameter2().getConnectorName();
 		const auto parameter = resultCollectionAccess->FindMetadataParameter(param2Def.getName());
+		_projectionNameToClearName[parameter->parameterAbbreviation] = parameter->parameterName;
 		if (parameter == nullptr)
 		{
 			throw std::exception("DatabaseAccessBlock has the parameter 2 not set.");
@@ -93,6 +97,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 		auto param3Def = blockEntity->getSelectedParameter3Definition();
 		const std::string param3ConnectorName = blockEntity->getConnectorParameter3().getConnectorName();
 		const auto parameter = resultCollectionAccess->FindMetadataParameter(param3Def.getName());
+		_projectionNameToClearName[parameter->parameterAbbreviation] = parameter->parameterName;
 		if (parameter == nullptr)
 		{
 			throw std::exception("DatabaseAccessBlock has the parameter 3 not set.");
@@ -138,7 +143,13 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 
 			for (std::string projectionName : _projectionNames)
 			{
-				assert(projectedValues.HasMember(projectionName.c_str()));
+				if (!projectedValues.HasMember(projectionName.c_str()))
+				{
+					auto clearNameByProjectionName = _projectionNameToClearName.find(projectionName);
+					assert(clearNameByProjectionName != _projectionNameToClearName.end());
+					const std::string message = "Database access failed. The selected quantity is not depending on the parameter: "+ clearNameByProjectionName->second;
+					throw std::exception(message.c_str());
+				}
 
 				if (projectionName == QuantityContainer::getFieldName() && (_dataRows != 1 || _dataColumns != 1))
 				{
