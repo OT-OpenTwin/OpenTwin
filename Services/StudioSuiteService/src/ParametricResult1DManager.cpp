@@ -35,7 +35,7 @@ void ParametricResult1DManager::clear()
 	m_application->modelComponent()->deleteEntitiesFromModel(resultEntity, false);
 }
 
-void ParametricResult1DManager::add(Result1DManager& result1DManager)
+void ParametricResult1DManager::extractData(Result1DManager& result1DManager)
 {
 	// We add the data in result1DManager to the parametric storage
 	std::list<int> runIDList = result1DManager.getRunIDList();
@@ -43,22 +43,10 @@ void ParametricResult1DManager::add(Result1DManager& result1DManager)
 
 	std::string runIDLabel = determineRunIDLabel(runIDList);
 
-	std::string collectionName = DataBase::GetDataBase()->getProjectName();
-
-	ResultCollectionExtender resultCollectionExtender(collectionName, *m_application->modelComponent(), &m_application->getClassFactory(), OT_INFO_SERVICE_TYPE_STUDIOSUITE);
-	resultCollectionExtender.setSaveModel(false);
-
-
-	ot::UID seriesID = m_application->modelComponent()->createEntityUID();
-	std::string seriesName = CreateNewUniqueTopologyName(m_resultFolderName, m_seriesNameBase);
-	MetadataSeries seriesMetadata(seriesName, seriesID);
-	
 	//First, we assemble all new metadata in a new series metadata entity
 	
 	// Now we process the different types of data entries
 	const std::vector<std::string> categories{ "1D Results/Balance", "1D Results/Energy", "1D Results/Port signals", "1D Results/Power","1D Results/Reference Impedance" };
-	
-	std::list<DataDescription1D> allDataDescriptions;
 
 	for (int runID : runIDList)
 	{
@@ -68,31 +56,49 @@ void ParametricResult1DManager::add(Result1DManager& result1DManager)
 		for (const std::string& category : categories)
 		{
 			std::list<DataDescription1D>	curveDescriptions = extractDataDescriptionCurve(category, runIDContainer,runID);
-			allDataDescriptions.splice(allDataDescriptions.end(), std::move(curveDescriptions));
+			m_allDataDescriptions.splice(m_allDataDescriptions.end(), std::move(curveDescriptions));
 		}
 		std::list<DataDescription1D> sparameterDescriptions = extractDataDescriptionSParameter("1D Results/S-Parameters", runIDContainer,runID);
-		allDataDescriptions.splice(allDataDescriptions.end(), std::move(sparameterDescriptions));
+		m_allDataDescriptions.splice(m_allDataDescriptions.end(), std::move(sparameterDescriptions));
 	}
+}
 
-	//Sort out the common parameter and Quanity definitions	
+void ParametricResult1DManager::storeDataInResultCollection()
+{
+
+	//First we access the result collection of the current project
+	std::string collectionName = DataBase::GetDataBase()->getProjectName();
+
+	ResultCollectionExtender resultCollectionExtender(collectionName, *m_application->modelComponent(), &m_application->getClassFactory(), OT_INFO_SERVICE_TYPE_STUDIOSUITE);
+	resultCollectionExtender.setSaveModel(false);
+
+	ot::UID seriesID = m_application->modelComponent()->createEntityUID();
+	std::string seriesName = CreateNewUniqueTopologyName(m_resultFolderName, m_seriesNameBase);
+	MetadataSeries seriesMetadata(seriesName, seriesID);
+
+	//From here on it could be moved into a library:
+	
+	//Sort out repeating parameter and Quanity definitions	
 	std::map<std::string, MetadataQuantity> quantitiesByName;
 	std::map<std::string, MetadataParameter> parametersByName;
-	
-	extractMetadataFromDescriptions(quantitiesByName, parametersByName, allDataDescriptions);
+
+	extractMetadataFromDescriptions(quantitiesByName, parametersByName, m_allDataDescriptions);
 	for (auto& quantityByName : quantitiesByName)
 	{
 		seriesMetadata.AddQuantity(std::move(quantityByName.second));
 	}
-	
+
 	for (auto& parameterByName : parametersByName)
 	{
 		seriesMetadata.AddParameter(std::move(parameterByName.second));
 	}
 
 	resultCollectionExtender.AddSeries(std::move(seriesMetadata));
-	for (DataDescription1D& dataDescription : allDataDescriptions)
+
+	//Now we store all data points in the result collection
+	for (DataDescription1D& dataDescription : m_allDataDescriptions)
 	{
-		processDataPoints(dataDescription, resultCollectionExtender,seriesName);
+		processDataPoints(dataDescription, resultCollectionExtender, seriesName);
 	}
 }
 

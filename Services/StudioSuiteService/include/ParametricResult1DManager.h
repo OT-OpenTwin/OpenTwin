@@ -25,8 +25,8 @@ public:
 	~ParametricResult1DManager();
 
 	void clear();
-	void add(Result1DManager& result1DManager);
-
+	void extractData(Result1DManager& result1DManager);
+	void storeDataInResultCollection();
 private:
 	std::string determineRunIDLabel(std::list<int>& runIDList);
 	
@@ -43,6 +43,8 @@ private:
 	int determineNumberOfPorts(const std::string& category, std::map<std::string, Result1DData*>& categoryResults, std::vector<Result1DData*>& sources);
 
 	void parseAxisLabel(const std::string& value, std::string& label, std::string& unit);
+
+	std::list<DataDescription1D> m_allDataDescriptions;
 
 	std::string m_resultFolderName;
 	std::string m_seriesNameBase = "CST Imported Results";

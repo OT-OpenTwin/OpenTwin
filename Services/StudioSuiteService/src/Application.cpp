@@ -767,19 +767,22 @@ void Application::result1D(bool appendData, std::string& data, size_t uncompress
 
 	try
 	{
-		// Now the data is in the dataBuffer with length uncompressedDataLength
-		// We need to process the buffer and read the data from it
-		Result1DManager resultManager(dataBuffer, uncompressedDataLength);
+		{
+			// Now the data is in the dataBuffer with length uncompressedDataLength
+			// We need to process the buffer and read the data from it
+			Result1DManager resultManager(dataBuffer, uncompressedDataLength);
 
-		// We can now delete the buffer
-		delete[] dataBuffer;
-		dataBuffer = nullptr;
+			// We can now delete the buffer
+			delete[] dataBuffer;
+			dataBuffer = nullptr;
 
-		// Now we need to store the new hash information in the infoFileManager
-		resultManager.addResult1DInformation(infoFileManager);
+			// Now we need to store the new hash information in the infoFileManager
+			resultManager.addResult1DInformation(infoFileManager);
 
-		// And finally store (add) the parametric data. In case that the data is not appended, the storage was already cleared above
-		parametricResultManager.add(resultManager);
+			// And finally store (add) the parametric data. In case that the data is not appended, the storage was already cleared above
+			parametricResultManager.extractData(resultManager);
+		}
+		parametricResultManager.storeDataInResultCollection();
 	}
 	catch (std::exception &e)
 	{
