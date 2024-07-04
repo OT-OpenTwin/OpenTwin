@@ -1027,7 +1027,7 @@ SectionGroup /e "OpenTwin"
 
 		# call for js script to paste admin user creation
 		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" < "$TempToolChain\db_admin.js" " "'
+			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" --host $NetworkModeSelection --port $MONGODB_CUSTOM_PORT < "$TempToolChain\db_admin.js" " "'
 
 		nsExec::ExecToLog 'net stop "MongoDB"'	
 
