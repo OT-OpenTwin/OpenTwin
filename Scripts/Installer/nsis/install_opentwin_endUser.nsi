@@ -781,13 +781,13 @@ Section "MongoDB Setup" SEC03
 
 	ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$INSTDIR\Tools\ThirdParty\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'		
 	Sleep 5000
-
+	
 	nsExec::ExecToLog 'net stop "MongoDB"'	
 
 	##########################################
 	# call for python scripts via $INSTDIR
 	##########################################
-
+	
 	DetailPrint "Running scripts..."
 
 	# update the mongodB config file without authentication
@@ -798,13 +798,14 @@ Section "MongoDB Setup" SEC03
 
 	# restarting mongoDB service
 	nsExec::ExecToLog 'net start "MongoDB"'
+	Sleep 5000
 
 	# 'net' command waits for the service to be stopped/started automatically
 	# no additional checks needed
 
 	# call for js script to paste admin user creation
 	ExpandEnvStrings $0 %COMSPEC%
-		ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" < "$INSTDIR\Tools\javascript\db_admin.js" " "'
+		ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" --host $NetworkModeSelection --port $MONGODB_CUSTOM_PORT < "$INSTDIR\Tools\javascript\db_admin.js" " "'
 	
 	nsExec::ExecToLog 'net stop "MongoDB"'	
 
