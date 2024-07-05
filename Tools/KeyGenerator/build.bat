@@ -54,6 +54,8 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE_NAME% DEBUG
+	ECHO "%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tool\KeyGenerator\KeyGenerator.vcxproj" %TYPE% debug
+
 	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tool\KeyGenerator\KeyGenerator.vcxproj" %TYPE% debug
 )
 
