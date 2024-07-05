@@ -58,6 +58,21 @@ jobs:
       run: |
         "C:\VS2022\Common7\Tools\VsDevCmd.bat"
 
+        
+    - name: Build project
+      shell: cmd
+      run: |
+        echo "Current directory: %cd%"
+        set OPENTWIN_DEV_ROOT=%cd%\OpenTwin
+        set DEVENV_ROOT_2022=C:\VS2022\Common7\IDE
+        set OPENTWIN_THIRDPARTY_ROOT=%cd%\ThirdParty
+        echo "OPENTWIN_DEV_ROOT=%OPENTWIN_DEV_ROOT%"
+        echo "DEVENV_ROOT_2022=%DEVENV_ROOT_2022%"
+        echo "OPENTWIN_THIRDPARTY_ROOT=%OPENTWIN_THIRDPARTY_ROOT%"
+        echo "C:\VS2022\Common7\IDE\devenv.com %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln /Build Debug"
+        C:\VS2022\Common7\IDE\devenv.com %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln /Build Debug
+
+
   
     # Step 8: Set environment variables, check paths, and run BuildAll.bat
     - name: Setup and Execute Build
