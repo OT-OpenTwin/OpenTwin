@@ -70,7 +70,8 @@ jobs:
         echo "DEVENV_ROOT_2022=%DEVENV_ROOT_2022%"
         echo "OPENTWIN_THIRDPARTY_ROOT=%OPENTWIN_THIRDPARTY_ROOT%"
         echo "C:\VS2022\Common7\IDE\devenv.com %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln /Build Debug"
-        C:\VS2022\Common7\IDE\devenv.com %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln /Build Debug
+        start C:\VS2022\Common7\IDE\devenv.com %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln /Build Debug
+        start "C:\VS2022\Common7\IDE\devenv.com %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln /Build Debug"
 
 
   
