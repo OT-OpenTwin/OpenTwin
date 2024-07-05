@@ -54,12 +54,12 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE_NAME% DEBUG
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tool\KeyGenerator\KeyGenerator.sln" %TYPE% "Debug|x64" 
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tool\KeyGenerator\KeyGenerator.vcxproj" %TYPE% debug
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE_NAME% RELEASE
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\KeyGenerator.sln" %TYPE% "Release|x64" 
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\KeyGenerator.vcxproj" %TYPE% Release
 ) 
   
 GOTO END
