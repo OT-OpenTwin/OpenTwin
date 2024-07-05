@@ -54,12 +54,12 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE_NAME% DEBUG
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_RANDOM_ROOT%\OTRandom.vcxproj" %TYPE% "debug" 
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_RANDOM_ROOT%\OTRandom.vcxproj" %TYPE% debug
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE_NAME% RELEASE
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_RANDOM_ROOT%\OTRandom.sln" %TYPE% "release" 
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_RANDOM_ROOT%\OTRandom.sln" %TYPE% release
 ) 
   
 GOTO END
