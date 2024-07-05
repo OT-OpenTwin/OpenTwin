@@ -12,6 +12,7 @@ use libloading::Symbol; // Loading of dynamic external libraries.
 use libc::c_char; // C char type to be used with external c++ libraries
 
 use std::env; // Used to get the program args
+use std::path::Path;
 
 use warp::Filter; // Warp filter/endpoint
 use std::ffi::{ CStr, CString };
@@ -104,8 +105,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
     // GET /any path
 		
     let index = warp::path::end().map(move || {
+		
+		let dll_file_name = Path::new(GLOBAL.get()).file_name().unwrap().to_str();
+		let service_name = Path::new(dll_file_name.unwrap()).file_stem().unwrap().to_str();
 
-        let computed_string: String = "OpenTwin Microservice (".to_string() + GLOBAL.get().strip_suffix(".dll").expect("UNKNOWN") + ")";
+        let computed_string: String = "OpenTwin Microservice (".to_string() + service_name.expect("UNKNOWN") + ")";
         return reply::with_status(
             computed_string,
             StatusCode::CREATED,
