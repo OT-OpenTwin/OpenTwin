@@ -16,4 +16,6 @@ private:
 	std::string m_fileName;
 	std::ios_base::openmode m_openMode;
 	std::ofstream m_fileStream;
+
+	void streamVariable(std::ofstream& stream, ot::Variable& value);
 };

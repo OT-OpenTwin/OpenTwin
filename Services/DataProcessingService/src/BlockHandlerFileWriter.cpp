@@ -1,5 +1,4 @@
 #include "BlockHandlerFileWriter.h"
-#include "OTCore/VariableToStringConverter.h"
 #include "OTCore/GenericDataStruct.h"
 #include "OTCore/GenericDataStructSingle.h"
 #include "OTCore/GenericDataStructVector.h"
@@ -32,7 +31,6 @@ BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntit
 bool BlockHandlerFileWriter::executeSpecialized()
 {
 	GenericDataList& dataList = _dataPerPort[m_input.getConnectorName()];
-	ot::VariableToStringConverter converter;
 	char lastCharacter = m_filePath[m_filePath.size()-1];
 	if (lastCharacter != '\\' && lastCharacter != '/')
 	{
@@ -62,8 +60,8 @@ bool BlockHandlerFileWriter::executeSpecialized()
 		ot::GenericDataStructSingle* single = dynamic_cast<ot::GenericDataStructSingle*>(data.get());
 		if (single != nullptr)
 		{
-			const std::string stringVal = converter(single->getValue());
-			m_fileStream << stringVal + "\n";
+			streamVariable(m_fileStream, single->getValue());
+			m_fileStream << "\n";
 		}
 
 		ot::GenericDataStructVector* vector = dynamic_cast<ot::GenericDataStructVector*>(data.get());
@@ -74,8 +72,7 @@ bool BlockHandlerFileWriter::executeSpecialized()
 			const uint32_t numberOfEntries = vector->getNumberOfEntries();
 			for (uint32_t index = 0; index < numberOfEntries; index++)
 			{
-				const std::string stringVal = converter(values[index]);
-				m_fileStream << stringVal;
+				streamVariable(m_fileStream, values[index]);
 				if (index != numberOfEntries - 1)
 				{
 					m_fileStream << ", ";
@@ -96,8 +93,7 @@ bool BlockHandlerFileWriter::executeSpecialized()
 				for (uint32_t column = 0; column < columns; column++)
 				{
 					const ot::Variable& var = matrix->getValue(column, row);
-					const std::string stringVal = converter(var);
-					m_fileStream << stringVal;
+					streamVariable(m_fileStream, var);
 					if (column != columns - 1)
 					{
 						m_fileStream << ", ";
@@ -114,4 +110,37 @@ bool BlockHandlerFileWriter::executeSpecialized()
 BlockHandlerFileWriter::~BlockHandlerFileWriter()
 {
 	m_fileStream.close();
+}
+
+void BlockHandlerFileWriter::streamVariable(std::ofstream& stream, const ot::Variable& value)
+{
+	if (value.isBool())
+	{
+		stream << value.getBool();
+	}
+	else if(value.isConstCharPtr())
+	{
+		stream << value.getConstCharPtr();
+	}
+	else if (value.isDouble()) 
+	{
+		stream << value.getDouble();
+	}
+	else if (value.isFloat()) 
+	{
+		stream << value.getFloat();
+	}
+	else if (value.isInt32()) 
+	{
+		stream << value.getInt32();
+	}
+	else if (value.isInt64()) 
+	{
+		stream << value.getInt64();
+	}
+	else
+	{
+		assert("Not supported type", 0);
+	}
+
 }
