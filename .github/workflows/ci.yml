@@ -58,20 +58,6 @@ jobs:
       run: |
         "C:\VS2022\Common7\Tools\VsDevCmd.bat"
 
-    - name: Build Test project
-      run: |
-        echo "Current directory: %cd%"
-        set OPENTWIN_DEV_ROOT=%cd%\OpenTwin
-        echo "OPENTWIN_DEV_ROOT=%OPENTWIN_DEV_ROOT%"
-
-        echo "Start"
-        "C:\VS2022\Common7\IDE\devenv.exe" "%OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.vcxproj" /Build Debug
-        echo "End"
-        C:\VS2022\Common7\IDE\devenv.com %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln /Build Debug
-
-        echo "Start"
-        C:\VS2022\Common7\IDE\devenv.exe %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.vcxproj /Build Debug
-        echo "End"
   
     # Step 8: Set environment variables, check paths, and run BuildAll.bat
     - name: Setup and Execute Build
@@ -94,6 +80,14 @@ jobs:
         echo "Checking if BuildAll.bat exists..."
         if exist %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat (
           echo "BuildAll.bat exists. Starting BuildAll.bat..."
+          echo "Start"
+          "C:\VS2022\Common7\IDE\devenv.exe" "%OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.vcxproj" /Build Debug
+          echo "End"
+          C:\VS2022\Common7\IDE\devenv.com %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln /Build Debug
+
+          echo "Start"
+          C:\VS2022\Common7\IDE\devenv.exe %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.vcxproj /Build Debug
+          echo "End"
           "C:\VS2022\Common7\IDE\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tool\KeyGenerator\KeyGenerator.vcxproj" /build debug
           echo ":"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.vcxproj" /build debug
           echo ".exe debug start"
