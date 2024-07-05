@@ -60,9 +60,10 @@ jobs:
 
     - name: Build Test project
       run: |
-        cd OT-OpenTwin
         echo "Current directory: %cd%"
         set OPENTWIN_DEV_ROOT=%cd%\OpenTwin
+        echo "OPENTWIN_DEV_ROOT=%OPENTWIN_DEV_ROOT%"
+
         echo "Start"
         "C:\VS2022\Common7\IDE\devenv.exe" "%OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.vcxproj" /Build Debug
         echo "End"
