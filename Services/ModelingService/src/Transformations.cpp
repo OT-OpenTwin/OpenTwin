@@ -240,6 +240,7 @@ void Transformations::transformEntities(const std::string &selectionInfo, std::m
 		geometryEntity->resetBrep();
 		geometryEntity->resetFacets();
 
+		geometryEntity->getBrepEntity()->copyFaceNames(brepEntity);
 		geometryEntity->getBrepEntity()->setEntityID(modelComponent->createEntityUID());
 		geometryEntity->getFacets()->setEntityID(modelComponent->createEntityUID());
 

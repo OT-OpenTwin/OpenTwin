@@ -32,6 +32,8 @@ public:
 	void setFaceName(const TopoDS_Face& face, const std::string &name);
 	std::string getFaceName(const TopoDS_Face& face);
 
+	void copyFaceNames(EntityBrep *other);
+
 private:
 	virtual int getSchemaVersion(void) { return 1; };
 	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);

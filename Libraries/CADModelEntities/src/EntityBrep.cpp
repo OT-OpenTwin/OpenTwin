@@ -165,3 +165,7 @@ std::string EntityBrep::getFaceName(const TopoDS_Face& face)
 	return result->second;
 }
 
+void EntityBrep::copyFaceNames(EntityBrep* other)
+{
+	m_faceNames = other->m_faceNames;
+}
