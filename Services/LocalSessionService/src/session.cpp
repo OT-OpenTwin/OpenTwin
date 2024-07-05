@@ -186,7 +186,10 @@ void Session::servicesInformation(ot::JsonArray &servicesInfo, ot::JsonAllocator
 		ot::JsonValue infoDoc;
 		infoDoc.SetObject();
 
-		infoDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(s.second->type(), allocator), allocator);
+		std::string serviceType = s.second->type();
+		if (serviceType == "UI") serviceType = "RelayService";
+
+		infoDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(serviceType, allocator), allocator);
 		infoDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(s.second->url(), allocator), allocator);
 
 		servicesInfo.PushBack(infoDoc, allocator);
