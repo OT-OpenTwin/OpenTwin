@@ -250,4 +250,8 @@ void PrimitivePyramid::update(EntityGeometry *geomEntity, TopoDS_Shape &shape)
 	catch (Standard_Failure) {
 		assert(0);
 	}
+
+	std::list<std::string> faceNames = { "f1", "f2", "f3", "f4", "f5" };
+
+	applyFaceNames(geomEntity, shape, faceNames);
 }

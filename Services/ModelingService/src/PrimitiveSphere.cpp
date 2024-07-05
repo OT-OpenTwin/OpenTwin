@@ -198,4 +198,8 @@ void PrimitiveSphere::update(EntityGeometry *geomEntity, TopoDS_Shape &shape)
 	catch (Standard_Failure) {
 		assert(0);
 	}
+
+	std::list<std::string> faceNames = { "f1" };
+
+	applyFaceNames(geomEntity, shape, faceNames);
 }

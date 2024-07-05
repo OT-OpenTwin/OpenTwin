@@ -147,7 +147,7 @@ void PrimitiveCuboid::createFromRubberbandJson(const std::string& _json, std::ve
 			shapeParameters.push_back(std::pair<std::string, std::string>("Zmin", to_string(zmin)));
 			shapeParameters.push_back(std::pair<std::string, std::string>("Zmax", to_string(zmax)));
 
-			std::list<std::string> faceNames = { "xmin", "xmax", "ymin", "ymax", "zmin", "zmax" };
+			std::list<std::string> faceNames = { "f1", "f2", "f3", "f4", "f5", "f6" };
 
 			storeShapeInModel(box, _transform, "Geometry/Cuboid", "Cuboid", shapeParameters, faceNames);
 		}
@@ -201,4 +201,8 @@ void PrimitiveCuboid::update(EntityGeometry *geomEntity, TopoDS_Shape &shape)
 	{
 		assert(0); // Invalid parameters, shape creation failed.
 	}
+
+	std::list<std::string> faceNames = { "f1", "f2", "f3", "f4", "f5", "f6" };
+
+	applyFaceNames(geomEntity, shape, faceNames);
 }

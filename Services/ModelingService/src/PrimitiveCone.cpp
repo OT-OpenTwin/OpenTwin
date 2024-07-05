@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include <BRepPrimAPI_MakeCone.hxx>
+#include "TopExp_Explorer.hxx"
 
 void PrimitiveCone::sendRubberbandData(void) 
 {
@@ -276,4 +277,23 @@ void PrimitiveCone::update(EntityGeometry *geomEntity, TopoDS_Shape &shape)
 	catch (Standard_Failure) {
 		assert(0);
 	}
+
+	TopExp_Explorer exp;
+	size_t faceCount = 0;
+	for (exp.Init(shape, TopAbs_FACE); exp.More(); exp.Next()) faceCount++;
+
+	std::list<std::string> faceNames;
+
+	if (faceCount == 2)
+	{
+		// Either top or bottom radii are zero, so we have a complete cone
+		faceNames = { "f1", "f2" };
+	}
+	else
+	{
+		// Both, top and bottom radii are non-zero, so we have a truncated cone
+		faceNames = { "f1", "f2", "f3" };
+	}
+
+	applyFaceNames(geomEntity, shape, faceNames);
 }

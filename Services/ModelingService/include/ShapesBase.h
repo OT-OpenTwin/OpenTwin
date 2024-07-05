@@ -27,6 +27,7 @@ protected:
 	std::string to_string(double value);
 	void storeShapeInModel(const TopoDS_Shape & _shape, std::vector<double> &_transform, const std::string& _name, 
 						   const std::string &_type, std::list<std::pair<std::string, std::string>> &shapeParameters, std::list<std::string> &faceNames);
+	void applyFaceNames(EntityGeometry *geomEntity, const TopoDS_Shape& _shape, std::list<std::string>& faceNames);
 
 	void writeShapeToStepFile(const TopoDS_Shape & _shape, const std::string& _filename);
 

@@ -120,24 +120,7 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 	geometryEntity->setBrep(shape);
 	geometryEntity->getBrepEntity()->setTransform(transform);
 
-	TopExp_Explorer exp;
-	size_t faceCount = 0;
-	for (exp.Init(shape, TopAbs_FACE); exp.More(); exp.Next()) faceCount++;
-	
-	if (faceNames.size() != faceCount)
-	{
-		assert(0); // Inconsistend face naming information
-	}
-	else
-	{
-		for (exp.Init(shape, TopAbs_FACE); exp.More(); exp.Next())
-		{
-			TopoDS_Face aFace = TopoDS::Face(exp.Current());
-
-			geometryEntity->getBrepEntity()->setFaceName(aFace, faceNames.front());
-			faceNames.pop_front();
-		}
-	}
+	applyFaceNames(geometryEntity, shape, faceNames);
 
 	EntityPropertiesString *typeProp = new EntityPropertiesString("shapeType", _type);
 	typeProp->setVisible(false);
@@ -190,6 +173,28 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 
 	modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
 		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create new object: " + itemName);
+}
+
+void ShapesBase::applyFaceNames(EntityGeometry* geomEntity, const TopoDS_Shape& _shape, std::list<std::string>& faceNames)
+{
+	TopExp_Explorer exp;
+	size_t faceCount = 0;
+	for (exp.Init(_shape, TopAbs_FACE); exp.More(); exp.Next()) faceCount++;
+
+	if (faceNames.size() != faceCount)
+	{
+		assert(0); // Inconsistent face naming information
+	}
+	else
+	{
+		for (exp.Init(_shape, TopAbs_FACE); exp.More(); exp.Next())
+		{
+			TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+			geomEntity->getBrepEntity()->setFaceName(aFace, faceNames.front());
+			faceNames.pop_front();
+		}
+	}
 }
 
 void ShapesBase::writeShapeToStepFile(const TopoDS_Shape & _shape, const std::string& _filename) 
