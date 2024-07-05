@@ -77,7 +77,9 @@ jobs:
         if exist %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat (
           echo "BuildAll.bat exists. Starting BuildAll.bat..."
           "C:\VS2022\Common7\IDE\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tool\KeyGenerator\KeyGenerator.vcxproj" /build debug
+          echo ".exe debug run"
           "C:\VS2022\Common7\IDE\devenv.com" "%OPENTWIN_DEV_ROOT%\Tool\KeyGenerator\KeyGenerator.sln" /build release
+          echo ".exe release run"
 
           call %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat 
         ) else (
