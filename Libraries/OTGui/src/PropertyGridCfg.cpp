@@ -47,12 +47,15 @@ void ot::PropertyGridCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloca
 void ot::PropertyGridCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	this->clear();
 
-	ConstJsonArray gArr = json::getArray(_object, "Groups");
-	for (JsonSizeType i = 0; i < gArr.Size(); i++) {
-		ConstJsonObject gObj = json::getObject(gArr, i);
-		PropertyGroup* newGroup = new PropertyGroup;
-		newGroup->setFromJsonObject(gObj);
-		m_rootGroups.push_back(newGroup);
+	if (json::exists(_object, "Groups"))
+	{
+		ConstJsonArray gArr = json::getArray(_object, "Groups");
+		for (JsonSizeType i = 0; i < gArr.Size(); i++) {
+			ConstJsonObject gObj = json::getObject(gArr, i);
+			PropertyGroup* newGroup = new PropertyGroup;
+			newGroup->setFromJsonObject(gObj);
+			m_rootGroups.push_back(newGroup);
+		}
 	}
 }
 
