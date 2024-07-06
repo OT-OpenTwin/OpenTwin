@@ -1,4 +1,4 @@
-@ECHO OFF
+@ECHO ON
 
 REM This script requires the following environment variables to be set:
 REM 1. OPENTWIN_DEV_ROOT
