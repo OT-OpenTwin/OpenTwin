@@ -1,4 +1,4 @@
-@ECHO OFF
+@ECHO ON
 
 REM This script requires the following environment variables to be set:
 REM 1. OPENTWIN_DEV_ROOT
@@ -54,14 +54,12 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE_NAME% DEBUG
-	ECHO "%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tool\KeyGenerator\KeyGenerator.vcxproj" %TYPE% debug
-
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tool\KeyGenerator\KeyGenerator.vcxproj" %TYPE% debug
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tool\KeyGenerator\KeyGenerator.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE_NAME% RELEASE
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\KeyGenerator.vcxproj" %TYPE% Release
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\KeyGenerator.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
 ) 
   
 GOTO END
