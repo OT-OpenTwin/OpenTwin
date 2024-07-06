@@ -65,7 +65,7 @@ jobs:
         echo "Checking if BuildAll.bat exists..."
         if exist %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat (
           echo "BuildAll.bat exists. Starting BuildAll.bat..."
-          call %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat BOTH REBUILD
+          call %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat
         ) else (
           echo "BuildAll.bat does not exist."
           exit /b 1
