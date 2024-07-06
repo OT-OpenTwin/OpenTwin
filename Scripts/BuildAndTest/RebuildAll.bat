@@ -91,6 +91,13 @@ ECHO ===============================================================
 CALL "%OT_SYSTEM_ROOT%\build.bat" %1 %2 
 
 ECHO ===============================================================
+ECHO Build Library: OpenTwinCore
+ECHO ===============================================================
+CALL "%OT_CORE_ROOT%\build.bat" %1 %2
+
+
+
+ECHO ===============================================================
 ECHO Build Library: OTRandom
 ECHO ===============================================================
 CALL "%OT_RANDOM_ROOT%\build.bat" %1 %2
@@ -121,11 +128,6 @@ IF NOT EXIST "%OT_ENCRYPTIONKEY_ROOT%\OTEncryptionKey.h" (
 	CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\KeyGenerator.exe" 2048 "%OT_ENCRYPTIONKEY_ROOT%\OTEncryptionKey.h"
 )
 
-
-ECHO ===============================================================
-ECHO Build Library: OpenTwinCore
-ECHO ===============================================================
-CALL "%OT_CORE_ROOT%\build.bat" %1 %2
 
 
 REM ====================================================================
