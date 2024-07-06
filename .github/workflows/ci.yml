@@ -1,7 +1,11 @@
 name: Setup and Build with Visual Studio 2022
 
-on: [push, pull_request]
-
+on:
+  push:
+    branches: [ "c" ]
+  pull_request:
+    branches: [ "c" ]
+    
 jobs:
   build:
     runs-on: windows-latest
