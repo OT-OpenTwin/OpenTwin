@@ -1,17 +1,24 @@
-name: Setup and Build with Visual Studio 2022
+name: MSBuild
 
 on:
   push:
-    branches: [ "c" ]
+    branches: [ "Ci" ]
   pull_request:
-    branches: [ "c" ]
-    
+    branches: [ "Ci" ]
+
+env:
+  DEVENV_PATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE
+  DEVENV_PATH2: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com
+  OPENTWIN_DEV_ROOT: ${{ github.workspace }}\OpenTwin  # Define the environment variable for the OpenTwin root
+
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    # Step 1: Check out the main project repository
     - name: Check out the main project repository
       uses: actions/checkout@v2
       with:
@@ -19,74 +26,32 @@ jobs:
         ref: Ci
         path: OpenTwin
 
-    # Step 2: Check out the third-party repository
     - name: Check out the third-party repository
       uses: actions/checkout@v2
       with:
         repository: OT-OpenTwin/ThirdParty
         path: ThirdParty
-        fetch-depth: 1  # Limit fetching to the last commit
+        fetch-depth: 1
 
-    # Step 3: Install Rust 1.76.0
     - name: Install Rust 1.76.0
       run: |
         choco install rust --version=1.76.0 -y
       shell: cmd
 
-    # Step 4: Install Visual Studio 2022 Community
-    - name: Install Visual Studio 2022 Community
-      run: |
-        choco install visualstudio2022community --package-parameters "--installPath C:\VS2022 --add Microsoft.VisualStudio.Workload.ManagedDesktop --add Microsoft.VisualStudio.Workload.NetWeb --includeRecommended" -y
-    
-    - name: Add MSBuild to PATH
-      run: |
-        echo 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin' | Out-File -Append -FilePath $env:GITHUB_PATH
-    # Step 5: Print PATH variable
-    - name: Print PATH variable
-      run: |
-        echo $env:Path
-    # Step 6: Check directory contents
-    - name: Check directory contents
-      run: |
-        $msbuildDir = 'C:\VS2022\Common7\IDE' 
-        if (Test-Path $msbuildDir) {
-          Get-ChildItem -Path $msbuildDir
-        } else {
-          Write-Output "MSBuild directory not found at $msbuildDir"
-          exit 1
-        }
-      shell: pwsh
+    - name: Add Visual Studio to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: Set up Visual Studio environment
+    - name: Debug - List repository files
+      run: dir /s
       shell: cmd
-      run: |
-        "C:\VS2022\Common7\Tools\VsDevCmd.bat"
 
-        
-    - name: Build project
-      shell: cmd
-      run: |
-        echo "Current directory: %cd%"
-        set OPENTWIN_DEV_ROOT=%cd%\OpenTwin
-        set DEVENV_ROOT_2022=C:\VS2022\Common7\IDE
-        set OPENTWIN_THIRDPARTY_ROOT=%cd%\ThirdParty
-        echo "OPENTWIN_DEV_ROOT=%OPENTWIN_DEV_ROOT%"
-        echo "DEVENV_ROOT_2022=%DEVENV_ROOT_2022%"
-        echo "OPENTWIN_THIRDPARTY_ROOT=%OPENTWIN_THIRDPARTY_ROOT%"
-        echo "C:\VS2022\Common7\IDE\devenv.com %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln /Build Debug"
-        start C:\VS2022\Common7\IDE\devenv.com %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln /Build Debug
-        start "C:\VS2022\Common7\IDE\devenv.com %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln /Build Debug"
-
-
-  
-    # Step 8: Set environment variables, check paths, and run BuildAll.bat
     - name: Setup and Execute Build
+      shell: cmd
       run: |
-        cd OT-OpenTwin
         echo "Current directory: %cd%"
-        set OPENTWIN_DEV_ROOT=%cd%\OpenTwin
-        set DEVENV_ROOT_2022=C:\VS2022\Common7\IDE
-        set OPENTWIN_THIRDPARTY_ROOT=%cd%\ThirdParty
+        set OPENTWIN_DEV_ROOT=${{ env.OPENTWIN_DEV_ROOT }}
+        set DEVENV_ROOT_2022=${{ env.DEVENV_PATH }}
+        set OPENTWIN_THIRDPARTY_ROOT=${{ github.workspace }}\ThirdParty
         echo "OPENTWIN_DEV_ROOT=%OPENTWIN_DEV_ROOT%"
         echo "DEVENV_ROOT_2022=%DEVENV_ROOT_2022%"
         echo "OPENTWIN_THIRDPARTY_ROOT=%OPENTWIN_THIRDPARTY_ROOT%"
@@ -100,26 +65,7 @@ jobs:
         echo "Checking if BuildAll.bat exists..."
         if exist %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat (
           echo "BuildAll.bat exists. Starting BuildAll.bat..."
-          echo "Start"
-          "C:\VS2022\Common7\IDE\devenv.exe" "%OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.vcxproj" /Build Debug
-          echo "End"
-          C:\VS2022\Common7\IDE\devenv.com %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln /Build Debug
-
-          echo "Start"
-          C:\VS2022\Common7\IDE\devenv.exe %OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.vcxproj /Build Debug
-          echo "End"
-          "C:\VS2022\Common7\IDE\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tool\KeyGenerator\KeyGenerator.vcxproj" /build debug
-          echo ":"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.vcxproj" /build debug
-          echo ".exe debug start"
-          "%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.vcxproj" /build debug
-          echo ".exe debug done"
-          echo ".exe release run"
-          "%DEVENV_ROOT_2022%\devenv.com" "%OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln" /build debug
-          echo "try2:"
-          "C:\VS2022\Common7\IDE\devenv.com" "%OPENTWIN_DEV_ROOT%\Libraries\OTRandom\OTRandom.sln" /build release
-          echo ".exe release done"
-
-          call %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat 
+          call %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat BOTH REBUILD
         ) else (
           echo "BuildAll.bat does not exist."
           exit /b 1
@@ -137,5 +83,24 @@ jobs:
           echo "CheckForFailedBuilds.bat does not exist."
         )
         echo "All checks passed."
+
+    - name: Upload build log summary
+      if: always()
+      run: |
+        echo "Uploading build log summary..."
+        buildLogPath=%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\buildLog_Summary.txt
+        if exist %buildLogPath% (
+          echo "buildLog_Summary.txt exists."
+          echo "##[set-output name=build_log_summary_path;]%buildLogPath%"
+        ) else (
+          echo "buildLog_Summary.txt does not exist."
+          exit /b 1
+        )
       shell: cmd
-      continue-on-error: true
+
+    - name: Upload build log summary artifact
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-log-summary
+        path: ${{ github.workspace }}\OpenTwin\Scripts\BuildAndTest\buildLog_Summary.txt
