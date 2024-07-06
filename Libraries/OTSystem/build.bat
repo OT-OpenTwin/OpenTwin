@@ -19,18 +19,11 @@ IF "%DEVENV_ROOT_2022%" == "" (
 	goto PAUSE_END
 )
 
-REM Echo environment variables for debugging
-ECHO OPENTWIN_DEV_ROOT=%OPENTWIN_DEV_ROOT%
-ECHO OPENTWIN_THIRDPARTY_ROOT=%OPENTWIN_THIRDPARTY_ROOT%
-ECHO DEVENV_ROOT_2022=%DEVENV_ROOT_2022%
-
 REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 REM Ensure that the script finished successfully
 IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
-    ECHO Environment setup failed
-
 	goto END
 )
 
@@ -59,39 +52,16 @@ IF "%2"=="BUILD" (
 	SET TYPE_NAME=BUILD
 )
 
-ECHO Directory contents of devenv.exe path:
-DIR "%DEVENV_ROOT_2022%"
-
-ECHO Directory contents of OTSystem project path:
-DIR "%OT_SYSTEM_ROOT%"
-
 IF %DEBUG%==1 (
-    ECHO %TYPE_NAME% DEBUG
-    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.com" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64"
-    "%DEVENV_ROOT_2022%\devenv.com" "%OT_SYSTEM_ROOT%\OTSystem.sln"  %TYPE% "Debug|x64"
-    REM Check the exit status
-    IF ERRORLEVEL 1 (
-        ECHO Debug build failed
-        GOTO END
-    ) ELSE (
-        ECHO Debug build succeeded
-    )
+	ECHO %TYPE_NAME% DEBUG
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
 )
 
 IF %RELEASE%==1 (
-    ECHO %TYPE_NAME% RELEASE
-    ECHO Running command: "%DEVENV_ROOT_2022%\devenv.com" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64"
-    "%DEVENV_ROOT_2022%\devenv.com" "%OT_SYSTEM_ROOT%\OTSystem.sln" %TYPE% "Release|x64"
-    REM Check the exit status
-    IF ERRORLEVEL 1 (
-        ECHO Release build failed
-        GOTO END
-    ) ELSE (
-        ECHO Release build succeeded
-    )
+	ECHO %TYPE_NAME% RELEASE
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_SYSTEM_ROOT%\OTSystem.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
 ) 
- 
-
+  
 GOTO END
 
 :PAUSE_END
