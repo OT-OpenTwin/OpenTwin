@@ -27,6 +27,15 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
+
+REM Navigate to the AdminPanel directory
+cd /D "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel"
+
+REM Install dependencies
+ECHO Installing dependencies...
+yarn install
+
+
 rem Build project
 ECHO Building Project
 
