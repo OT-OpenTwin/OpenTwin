@@ -1,4 +1,4 @@
-@ECHO OFF
+@ECHO ON
 
 REM The first argument of the shell defines whether a release or debug build shall be performed. BOTH (default) , RELEASE, DEBUG 
 REM The second argument of hte shell defines whether a full rebuild or just a build is performed. BUILD, REBUILD (default)
