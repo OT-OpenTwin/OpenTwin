@@ -10,6 +10,8 @@ env:
   DEVENV_PATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE
   DEVENV_PATH2: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com
   OPENTWIN_DEV_ROOT: ${{ github.workspace }}\OpenTwin  # Define the environment variable for the OpenTwin root
+  QT_PATH: ${{ github.workspace }}\ThirdParty\Qt\6.6.1\msvc2019_64
+  QT_VERSION: 6.6.1
 
 permissions:
   contents: read
@@ -45,6 +47,18 @@ jobs:
       run: dir /s
       shell: cmd
 
+    - name: Install Qt Visual Studio Tools extension
+      run: |
+        choco install qt-vs-tools -y
+      shell: cmd
+
+    - name: Set Qt Environment Variables
+      run: |
+        echo "Setting Qt Environment Variables"
+        echo "QTDIR=${{ env.QT_PATH }}" >> $GITHUB_ENV
+        echo "QtToolsPath=${{ env.QT_PATH }}/bin" >> $GITHUB_ENV
+      shell: bash
+      
     - name: Setup and Execute Build
       shell: cmd
       run: |
@@ -84,19 +98,6 @@ jobs:
         )
         echo "All checks passed."
 
-    - name: Upload build log summary
-      if: always()
-      run: |
-        echo "Uploading build log summary..."
-        buildLogPath=%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\buildLog_Summary.txt
-        if exist %buildLogPath% (
-          echo "buildLog_Summary.txt exists."
-          echo "##[set-output name=build_log_summary_path;]%buildLogPath%"
-        ) else (
-          echo "buildLog_Summary.txt does not exist."
-          exit /b 1
-        )
-      shell: cmd
 
     - name: Upload build log summary artifact
       if: always()
