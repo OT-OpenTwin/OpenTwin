@@ -47,17 +47,23 @@ jobs:
       run: dir /s
       shell: cmd
 
-    - name: Install Qt Visual Studio Tools extension
+    - name: Install Qt Visual Studio Tools Extension
       run: |
-        choco install qt-vs-tools -y
-      shell: cmd
-
-    - name: Set Qt Environment Variables
+        powershell -Command "& {Start-Process -Wait 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe' -ArgumentList 'modify', '--installPath', 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise', '--add', 'Component.ID', '--quiet'}"
+    
+    - name: Configure Qt Version
       run: |
-        echo "Setting Qt Environment Variables"
-        echo "QTDIR=${{ env.QT_PATH }}" >> $GITHUB_ENV
-        echo "QtToolsPath=${{ env.QT_PATH }}/bin" >> $GITHUB_ENV
-      shell: bash
+        $qtVersionName = "6.6.1"
+        $qtPath = "${{ github.workspace }}\ThirdParty\Qt\6.6.1\msvc2019_64"
+        $devenvPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com"
+        
+        Write-Output "Adding Qt version $qtVersionName at path $qtPath using $devenvPath"
+        
+        $addQtVersionCmd = "& `$devenvPath -Command `"Qt5VSAddin.QtVersionManager.AddQtVersion(`'$qtPath`', `'$qtVersionName`')`""
+        Write-Output "Running command: $addQtVersionCmd"
+        
+        Invoke-Expression $addQtVersionCmd | Out-File qt_add_output.log -Append
+        Get-Content qt_add_output.log
       
     - name: Setup and Execute Build
       shell: cmd
