@@ -38,7 +38,7 @@
 
 #include "DataBase.h"
 
-#include <gmsh_cwrap.h>
+#include <gmsh.h_cwrap>
 
 #include "BRepBuilderAPI_Copy.hxx"
 #include "BRepBuilderAPI_MakeSolid.hxx"

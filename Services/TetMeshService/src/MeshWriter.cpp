@@ -23,7 +23,7 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 
-#include <gmsh_cwrap.h>
+#include <gmsh.h_cwrap>
 
 #include <sstream>
 

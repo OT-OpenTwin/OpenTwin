@@ -33,6 +33,8 @@ public:
 	std::string getFaceName(const TopoDS_Face& face);
 
 	void copyFaceNames(EntityBrep *other);
+	void setFaceNameMap(std::map< const opencascade::handle<TopoDS_TShape>, std::string> &faceNames);
+	std::map< const opencascade::handle<TopoDS_TShape>, std::string> getFaceNameMap();
 
 private:
 	virtual int getSchemaVersion(void) { return 1; };

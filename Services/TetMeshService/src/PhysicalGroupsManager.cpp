@@ -18,7 +18,7 @@
 #include "TopoDS_Face.hxx"
 #include "TopoDS.hxx"
 
-#include <gmsh_cwrap.h>
+#include <gmsh.h_cwrap>
 
 void PhysicalGroupsManager::applyGroups(EntityMesh *entityMesh, ModelBuilder *meshModelBuilder, ObjectManager *objectManager, MaterialManager *materialManager, FaceAnnotationsManager *annotationsManager)
 {

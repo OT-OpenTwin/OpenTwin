@@ -19,7 +19,7 @@ class Application;
 #include <list>
 #include <map>
 #include <ctime>
-#include <gmsh_cwrap.h>
+#include <gmsh.h_cwrap>
 
 class GmshMeshCreation
 {

@@ -280,7 +280,9 @@ bool UpdateManager::updateParent(const std::string &type, EntityGeometry *geomEn
 
 	// Perform the operation to build the new shape
 	std::string treeIconVisible, treeIconHidden;
-	bool success = getBooleanOperations()->performOperation(type, baseBrep, toolBreps, shape, treeIconVisible, treeIconHidden);
+	std::map< const opencascade::handle<TopoDS_TShape>, std::string> resultFaceNames;
+
+	bool success = getBooleanOperations()->performOperation(type, baseBrep, toolBreps, shape, treeIconVisible, treeIconHidden, resultFaceNames);
 
 	if (success)
 	{

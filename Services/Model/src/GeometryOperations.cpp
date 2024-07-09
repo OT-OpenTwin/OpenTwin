@@ -92,7 +92,6 @@ bool GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep* brep, doub
 				Standard_Integer nEdgeNodes = edgeMesh->NbNodes();
 
 				const TColStd_Array1OfInteger& indices = edgeMesh->Nodes();
-				const TColgp_Array1OfPnt& Nodes = aTr->Nodes();
 
 				gp_Pnt V;
 				int pos = 0;
@@ -103,7 +102,7 @@ bool GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep* brep, doub
 				int index = 0;
 
 				for (Standard_Integer i = indices.Lower(); i <= indices.Upper(); i++) {
-					V = Nodes(indices(i));
+					V = aTr->Node(indices(i));
 					V.Transform(myTransf);
 
 					edge.setPoint(index, V.X(), V.Y(), V.Z());
@@ -120,14 +119,12 @@ bool GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep* brep, doub
 
 		if (!aTr.IsNull())
 		{
-			const TColgp_Array1OfPnt& aNodes = aTr->Nodes();
 			const Poly_Array1OfTriangle& facetriangles = aTr->Triangles();
-			const TColgp_Array1OfPnt2d & uvNodes = aTr->UVNodes();
 			
-			for (Standard_Integer i = 1; i <= aNodes.Length(); i++)
+			for (Standard_Integer i = 1; i <= aTr->NbNodes(); i++)
 			{
-				gp_Pnt   point = aNodes(i).Transformed(aLocation);
-				gp_Pnt2d uv = uvNodes(i);
+				gp_Pnt   point = aTr->Node(i).Transformed(aLocation);
+				gp_Pnt2d uv = aTr->UVNode(i);
 
 				gp_Vec   normal;
 				surfaceProps.SetParameters(uv.X(), uv.Y());
@@ -185,7 +182,7 @@ bool GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep* brep, doub
 				triangles.push_back(Geometry::Triangle(n1-1 + pointOffset, n2-1 + pointOffset, n3-1 + pointOffset, faceId));
 			}
 
-			pointOffset += aNodes.Length();
+			pointOffset += aTr->NbNodes();
 		}
 
 		if (!normalOk)

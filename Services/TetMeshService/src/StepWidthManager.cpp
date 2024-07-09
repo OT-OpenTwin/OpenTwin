@@ -18,7 +18,7 @@
 #include "TopoDS_Face.hxx"
 #include "TopoDS.hxx"
 
-#include <gmsh_cwrap.h>
+#include <gmsh.h_cwrap>
 
 StepWidthManager::StepWidthManager(Application *app) :
 	application(app),

@@ -169,3 +169,13 @@ void EntityBrep::copyFaceNames(EntityBrep* other)
 {
 	m_faceNames = other->m_faceNames;
 }
+
+void EntityBrep::setFaceNameMap(std::map< const opencascade::handle<TopoDS_TShape>, std::string>& faceNames)
+{
+	m_faceNames = faceNames;
+}
+
+std::map< const opencascade::handle<TopoDS_TShape>, std::string> EntityBrep::getFaceNameMap()
+{
+	return m_faceNames;
+}

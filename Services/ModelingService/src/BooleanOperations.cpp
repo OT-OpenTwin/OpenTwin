@@ -16,6 +16,7 @@
 
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
+#include "TopoDS_Face.hxx"
 
 #include <BRepAlgoAPI_Fuse.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
@@ -168,7 +169,9 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 	TopoDS_Shape shape;
 	std::string treeIconVisible, treeIconHidden;
 
-	bool success = performOperation(selectionAction, baseBrepEntity, brepEntities, shape, treeIconVisible, treeIconHidden);
+	std::map< const opencascade::handle<TopoDS_TShape>, std::string> resultFaceNames;
+
+	bool success = performOperation(selectionAction, baseBrepEntity, brepEntities, shape, treeIconVisible, treeIconHidden, resultFaceNames);
 
 	// Build a new geometry entity and store it 
 	if (success)
@@ -204,6 +207,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 		//geometryEntity->setManageParentVisibility(false);  // The new boolean entity should manage the parent visibility as usual
 		geometryEntity->setBrep(shape);
 		geometryEntity->setTreeIcons(treeIconVisible, treeIconHidden);
+		geometryEntity->getBrepEntity()->setFaceNameMap(resultFaceNames);
 
 		geometryEntity->getProperties() = baseEntity->getProperties();
 
@@ -307,14 +311,94 @@ void BooleanOperations::deletePropertyCategory(EntityGeometry *geometryEntity, c
 	}
 }
 
-bool BooleanOperations::add(EntityBrep *base, std::list<EntityBrep *> &tools, TopoDS_Shape &shape)
+void BooleanOperations::preOperation(TopoDS_Shape& shapeA, const std::map< const opencascade::handle<TopoDS_TShape>, std::string>& faceNamesA, 
+									 TopoDS_Shape& shapeB, const std::map< const opencascade::handle<TopoDS_TShape>, std::string>& faceNamesB)
+{
+	anArguments.Clear();
+	allFaceNames.clear();
+
+	anArguments.Append(shapeA);
+	anArguments.Append(shapeB);
+
+	TopExp_Explorer exp;
+	for (exp.Init(shapeA, TopAbs_FACE); exp.More(); exp.Next())
+	{
+		TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+		if (faceNamesA.count(aFace.TShape()) != 0)
+		{
+			allFaceNames[aFace.TShape()] = "A:" + faceNamesA.at(aFace.TShape());
+		}
+	}
+
+	for (exp.Init(shapeB, TopAbs_FACE); exp.More(); exp.Next())
+	{
+		TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+		if (faceNamesB.count(aFace.TShape()) != 0)
+		{
+			allFaceNames[aFace.TShape()] = "B:" + faceNamesB.at(aFace.TShape());
+		}
+	}
+}
+
+std::map< const opencascade::handle<TopoDS_TShape>, std::string> BooleanOperations::postOperation(BRepAlgoAPI_BuilderAlgo &theAlgo, TopoDS_Shape& resultShape, TopoDS_Shape& shapeA, TopoDS_Shape& shapeB)
+{
+	// Create the boolean history object
+	BRepTools_History aHistory(anArguments, theAlgo);
+	TopExp_Explorer exp;
+	std::map< const opencascade::handle<TopoDS_TShape>, std::string> resultFaceNames;
+
+	// First, we assign the names to all unchanged faces
+	for (exp.Init(resultShape, TopAbs_FACE); exp.More(); exp.Next())
+	{
+		TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+		if (allFaceNames.count(aFace.TShape()) != 0)
+		{
+			resultFaceNames[aFace.TShape()] = allFaceNames[aFace.TShape()];
+		}
+	}
+
+	// Now check for all modified faces
+	for (exp.Init(shapeA, TopAbs_FACE); exp.More(); exp.Next())
+	{
+		TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+		for (auto newFace : aHistory.Modified(aFace))
+		{
+			resultFaceNames[newFace.TShape()] = allFaceNames[aFace.TShape()];
+		}
+	}
+
+	// Now check for all modified faces
+	for (exp.Init(shapeB, TopAbs_FACE); exp.More(); exp.Next())
+	{
+		TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+		for (auto newFace : aHistory.Modified(aFace))
+		{
+			if (resultFaceNames.count(newFace.TShape()) == 0)
+			{
+				resultFaceNames[newFace.TShape()] = allFaceNames[aFace.TShape()];
+			}
+		}
+	}
+
+	return resultFaceNames;
+}
+
+bool BooleanOperations::add(EntityBrep *base, std::list<EntityBrep *> &tools, TopoDS_Shape &shape, std::map< const opencascade::handle<TopoDS_TShape>, std::string> &resultFaceNames)
 {
 	shape = base->getBrep();
+	resultFaceNames = base->getFaceNameMap();
 
 	for (auto tool : tools)
 	{
 		Standard_Boolean bRunParallel = Standard_True;
 		Standard_Real aFuzzyValue = 0.0;
+
+		preOperation(shape, resultFaceNames, tool->getBrep(), tool->getFaceNameMap());
 
 		BRepAlgoAPI_Fuse aBoolean(shape, tool->getBrep());
 
@@ -334,20 +418,27 @@ bool BooleanOperations::add(EntityBrep *base, std::list<EntityBrep *> &tools, To
 			return false;
 		}
 
-		shape = aBoolean.Shape();
+		TopoDS_Shape shape2 = aBoolean.Shape();
+
+		resultFaceNames = postOperation(aBoolean, shape2, shape, tool->getBrep());
+
+		shape = shape2;
 	}
 
 	return true;
 }
 
-bool BooleanOperations::subtract(EntityBrep *base, std::list<EntityBrep *> &tools, TopoDS_Shape &shape)
+bool BooleanOperations::subtract(EntityBrep *base, std::list<EntityBrep *> &tools, TopoDS_Shape &shape, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames)
 {
 	shape = base->getBrep();
+	resultFaceNames = base->getFaceNameMap();
 
 	for (auto tool : tools)
 	{
 		Standard_Boolean bRunParallel = Standard_True;
 		Standard_Real aFuzzyValue = 0.0;
+
+		preOperation(shape, resultFaceNames, tool->getBrep(), tool->getFaceNameMap());
 
 		BRepAlgoAPI_Cut aBoolean(shape, tool->getBrep());
 
@@ -362,25 +453,34 @@ bool BooleanOperations::subtract(EntityBrep *base, std::list<EntityBrep *> &tool
 
 		aBoolean.Build();
 
+		TopoDS_Shape& shape2 = shape;
+
 		// If the boolean operation succeeds, we take the result of the operation. Otherwise we keep the based shape and
 		// ignore this operation (might happen. e.g. if the tool shape is empty).
 		if (!aBoolean.HasErrors())
 		{
-			shape = aBoolean.Shape();
+			shape2 = aBoolean.Shape();
+
+			resultFaceNames = postOperation(aBoolean, shape2, shape, tool->getBrep());
+
+			shape = shape2;
 		}
 	}
 
 	return true;
 }
 
-bool BooleanOperations::intersect(EntityBrep *base, std::list<EntityBrep *> &tools, TopoDS_Shape &shape)
+bool BooleanOperations::intersect(EntityBrep *base, std::list<EntityBrep *> &tools, TopoDS_Shape &shape, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames)
 {
 	shape = base->getBrep();
+	resultFaceNames = base->getFaceNameMap();
 
 	for (auto tool : tools)
 	{
 		Standard_Boolean bRunParallel = Standard_True;
 		Standard_Real aFuzzyValue = 0.0;
+
+		preOperation(shape, resultFaceNames, tool->getBrep(), tool->getFaceNameMap());
 
 		BRepAlgoAPI_Common aBoolean(shape, tool->getBrep());
 
@@ -400,34 +500,38 @@ bool BooleanOperations::intersect(EntityBrep *base, std::list<EntityBrep *> &too
 			return false;
 		}
 
-		shape = aBoolean.Shape();
+		TopoDS_Shape shape2 = aBoolean.Shape();
+
+		resultFaceNames = postOperation(aBoolean, shape2, shape, tool->getBrep());
+
+		shape = shape2;
 	}
 
 	return true;
 }
 
-bool BooleanOperations::performOperation(const std::string &selectionAction, EntityBrep *baseBrepEntity, std::list<EntityBrep *> &brepEntities, TopoDS_Shape &shape, std::string &treeIconVisible, std::string &treeIconHidden)
+bool BooleanOperations::performOperation(const std::string &selectionAction, EntityBrep *baseBrepEntity, std::list<EntityBrep *> &brepEntities, TopoDS_Shape &shape, std::string &treeIconVisible, std::string &treeIconHidden, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames)
 {
 	bool success = true;
 
 	// Call the requested operation and build the resulting Brep
 	if (selectionAction == "BOOLEAN_ADD")
 	{
-		success = add(baseBrepEntity, brepEntities, shape);
+		success = add(baseBrepEntity, brepEntities, shape, resultFaceNames);
 
 		treeIconVisible = "BooleanAddVisible";
 		treeIconHidden  = "BooleanAddHidden";
 	}
 	else if (selectionAction == "BOOLEAN_SUBTRACT")
 	{
-		success = subtract(baseBrepEntity, brepEntities, shape);
+		success = subtract(baseBrepEntity, brepEntities, shape, resultFaceNames);
 
 		treeIconVisible = "BooleanSubtractVisible";
 		treeIconHidden  = "BooleanSubtractHidden";
 	}
 	else if (selectionAction == "BOOLEAN_INTERSECT")
 	{
-		success = intersect(baseBrepEntity, brepEntities, shape);
+		success = intersect(baseBrepEntity, brepEntities, shape, resultFaceNames);
 
 		treeIconVisible = "BooleanIntersectVisible";
 		treeIconHidden  = "BooleanIntersectHidden";

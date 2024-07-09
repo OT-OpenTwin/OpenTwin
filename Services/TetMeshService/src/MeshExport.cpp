@@ -8,7 +8,7 @@
 
 #include "OTServiceFoundation/ModelComponent.h"
 
-#include <gmsh_cwrap.h>
+#include <gmsh.h_cwrap>
 
 #include "base64.h"
 #include "zlib.h"
