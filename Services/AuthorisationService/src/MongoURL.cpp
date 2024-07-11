@@ -4,6 +4,8 @@
 
 #include <filesystem>
 
+#include "OTSystem/UrlEncoding.h"
+
 std::string getMongoURL(std::string databaseURL, std::string dbUsername, std::string dbPassword)
 {
 	static std::string mongoURL;
@@ -40,13 +42,13 @@ std::string getMongoURL(std::string databaseURL, std::string dbUsername, std::st
 			ca_cert_file = dev_root + "\\Deployment\\Certificates\\ca.pem";
 		}
 
-		databaseURL = databaseURL.substr(4) + "/?tls=true&tlsCAFile=" + ca_cert_file;
+		databaseURL = databaseURL.substr(4) + "/?tls=true&tlsCAFile=" + ot::url::urlEncode(ca_cert_file);
 		//databaseURL = databaseURL.substr(4) + "/?tls=true&tlsAllowInvalidCertificates=false&tlsCAFile=C:/ca.pem";
 		//databaseURL = databaseURL.substr(4) + "/?tls=true&tlsCAFile=C:/ca.pem";
 		//databaseURL = databaseURL.substr(4) + "/?tls=true";
 	}
 
-	std::string uriStr = "mongodb://" + dbUsername + ":" + dbPassword + "@" + databaseURL;
+	std::string uriStr = "mongodb://" + ot::url::urlEncode(dbUsername) + ":" + ot::url::urlEncode(dbPassword) + "@" + databaseURL;
 
 	mongoURL = uriStr;
 	return uriStr;

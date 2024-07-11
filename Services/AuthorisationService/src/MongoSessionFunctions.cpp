@@ -90,7 +90,7 @@ namespace MongoSessionFunctions
 	void removeOldSessions(mongocxx::client& adminClient)
 	{
 		// Remove the session if it has not been touched (refreshed) for 24 hours.
-		auto gracePeriod = std::chrono::hours(24);   
+		auto gracePeriod = std::chrono::hours(24);
 		auto currentTime = std::chrono::system_clock::now();
 		time_t validSessionTime = std::chrono::system_clock::to_time_t(currentTime - gracePeriod);
 
@@ -105,14 +105,20 @@ namespace MongoSessionFunctions
 
 		auto array_builder = bsoncxx::builder::basic::array{};
 
-		for (auto item : result)
+		try
 		{
-			std::string sessionName = item["session_name"].get_utf8().value.data();
+			for (auto item : result)
+			{
+				std::string sessionName = item["session_name"].get_utf8().value.data();
 
-			MongoUserFunctions::removeTmpUser(sessionName, adminClient);
-			array_builder.append(sessionName);
+				MongoUserFunctions::removeTmpUser(sessionName, adminClient);
+				array_builder.append(sessionName);
 
-			sessionCount++;
+				sessionCount++;
+			}
+		}
+		catch (std::exception)
+		{
 		}
 
 		if (sessionCount > 0)

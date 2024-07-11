@@ -25,6 +25,7 @@
     <ClCompile Include="src\OperatingSystem.cpp" />
     <ClCompile Include="src\PortManager.cpp" />
     <ClCompile Include="src\SystemLoadInformation.cpp" />
+    <ClCompile Include="src\UrlEncoding.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTSystem\Application.h" />
@@ -35,6 +36,7 @@
     <ClInclude Include="include\OTSystem\SystemAPIExport.h" />
     <ClInclude Include="include\OTSystem\SystemLoadInformation.h" />
     <ClInclude Include="include\OTSystem\SystemTypes.h" />
+    <ClInclude Include="include\OTSystem\UrlEncoding.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

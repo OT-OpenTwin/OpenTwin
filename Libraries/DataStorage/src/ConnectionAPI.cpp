@@ -3,6 +3,8 @@
 #include "..\include\Connection\ConnectionAPI.h"
 #include "..\include\DataStorageLogger.h"
 
+#include "OTSystem\UrlEncoding.h"
+
 #include <mongocxx/pool.hpp>
 #include <bsoncxx/stdx/make_unique.hpp>
 #include <mongocxx/exception/exception.hpp>
@@ -173,10 +175,10 @@ namespace DataStorageAPI
 				ca_cert_file = dev_root + "\\Deployment\\Certificates\\ca.pem";
 			}
 
-			databaseURL = databaseURL.substr(4) + "/?tls=true&tlsCAFile=" + ca_cert_file;
+			databaseURL = databaseURL.substr(4) + "/?tls=true&tlsCAFile=" + ot::url::urlEncode(ca_cert_file);
 		}
 
-		std::string uriStr = "mongodb://" + dbUsername + ":" + dbPassword + "@" + databaseURL;
+		std::string uriStr = "mongodb://" + ot::url::urlEncode(dbUsername) + ":" + ot::url::urlEncode(dbPassword) + "@" + databaseURL;
 
 		mongoURL = uriStr;
 		return uriStr;
