@@ -1135,6 +1135,9 @@ Section "Install MiKTeX" SEC10
 		#Pop $0
 		#Sleep 10000
 		DetailPrint "Done."
+		
+		MessageBox MB_ICONEXCLAMATION|MB_OK 'MiKTeX has been installed. $\n$\nYou need to open the MiKTeX console, switch to the administrator mode, and perform a check for updates now.'
+
 		#Sleep 10000
 SectionEnd
 

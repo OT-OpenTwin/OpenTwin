@@ -30,7 +30,14 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 rem Build project
 ECHO Building Project
 
-yarn build
+PUSHD %cd%
+
+CD /D "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel"
+
+cmd.exe /c "yarn install"
+cmd.exe /c "yarn build"
+
+POPD
 
 GOTO END
 
