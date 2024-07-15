@@ -23,10 +23,10 @@ IF "%DEVENV_ROOT_2022%"=="" (
 	goto END
 )
 
-REM IF "%QtMsBuild%"=="" (
-REM	ECHO Please install and set up the "Qt Visual Studio Tools" extension in Visual Studio, since it is required for build.
-REM	goto END
-REM )
+ IF "%QtMsBuild%"=="" (
+	ECHO Please install and set up the "Qt Visual Studio Tools" extension in Visual Studio, since it is required for build.
+	goto END
+ )
 
 REM ====================================================================
 REM Preparations for the build process 
