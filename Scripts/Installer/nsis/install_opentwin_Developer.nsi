@@ -1061,7 +1061,7 @@ SectionGroup /e "OpenTwin"
 		##########################################
 		DetailPrint "Running scripts..."
 		# update the mongodB config file without authentication
-		ExecWait '"$TempToolChain\ConfigMongoDBNoAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "$MONGODB_ADMIN_PASSWORD" "$INSTDIR\Tools\javascript\db_admin.js"'
+		ExecWait '"$TempToolChain\ConfigMongoDBNoAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "$MONGODB_ADMIN_PASSWORD" "$TempToolChain\db_admin.js"'
 
 		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
@@ -1077,7 +1077,7 @@ SectionGroup /e "OpenTwin"
 		ExpandEnvStrings $0 %COMSPEC%
 			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" --host $NetworkModeSelection --port $MONGODB_CUSTOM_PORT < "$TempToolChain\db_admin.js_tmp" " "'
 
-		Delete "$INSTDIR\Tools\javascript\db_admin.js_tmp"
+		Delete "$TempToolChain\db_admin.js_tmp"
 
 		nsExec::ExecToLog 'net stop "MongoDB"'	
 
