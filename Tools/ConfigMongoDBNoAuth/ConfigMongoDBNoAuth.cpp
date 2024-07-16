@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include "OTSystem/Application.h"
+#include "OTServiceFoundation/UserCredentials.h"
 
 void ensureFolderExist(const std::string& path)
 {
@@ -103,10 +104,74 @@ void modifyConfigFile(const std::string& configFile, const std::string& dbPath, 
 	outFile.close();
 }
 
+bool setPermanentEnvironmentVariable(const char *value, const char *data)
+{
+	HKEY hKey;
+	LPCTSTR keyPath = TEXT("System\\CurrentControlSet\\Control\\Session Manager\\Environment");
+	LSTATUS lOpenStatus = RegOpenKeyEx(HKEY_LOCAL_MACHINE, keyPath, 0, KEY_ALL_ACCESS, &hKey);
+	if (lOpenStatus == ERROR_SUCCESS)
+	{
+		LSTATUS lSetStatus = RegSetValueExA(hKey, value, 0, REG_SZ, (LPBYTE)data, (DWORD)(strlen(data) + 1));
+		RegCloseKey(hKey);
+
+		if (lSetStatus == ERROR_SUCCESS)
+		{
+			SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, (LPARAM)"Environment", SMTO_BLOCK, 100, NULL);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void setAdminPassword(const std::string& password, const std::string& jsFile)
+{
+	std::ifstream inFile(jsFile);
+	std::list<std::string> inputFileContent;
+
+	while (!inFile.eof())
+	{
+		std::string line;
+		std::getline(inFile, line);
+
+		inputFileContent.push_back(line);
+	}
+
+	inFile.close();
+
+	std::list<std::string> outputFileContent;
+
+	for (auto line : inputFileContent)
+	{
+		if (lineStartsWith(line, "pwd:"))
+		{
+			outputFileContent.push_back("    pwd: \"" + password + "\",");
+		}
+		else
+		{
+			outputFileContent.push_back(line);
+		}
+	}
+
+	std::ofstream outFile(jsFile + "_tmp");
+
+	for (auto line : outputFileContent)
+	{
+		outFile << line << std::endl;
+	}
+
+	outFile.close();
+
+	ot::UserCredentials userCredential;
+	userCredential.setPassword(password);
+
+	setPermanentEnvironmentVariable("OPEN_TWIN_MONGODB_PWD", userCredential.getEncryptedPassword().c_str());
+}
+
 int main(int argc, char **argv)
 {
-	if (argc < 5) {
-		std::cout << "Usage: ConfigMongoDBNoAuth.exe <config file path> <new db path> <new log path> <new bind IP>" << std::endl;
+	if (argc < 7) {
+		std::cout << "Usage: ConfigMongoDBNoAuth.exe <config file path> <new db path> <new log path> <new bind IP> <admin password> <server config script>" << std::endl;
 		return 1;
 	}
 
@@ -114,8 +179,12 @@ int main(int argc, char **argv)
 	std::string dbPath     = argv[2];
 	std::string logPath    = argv[3];
 	std::string bindIP     = argv[4];
+	std::string adminPWD   = argv[5];
+	std::string serverJS   = argv[6];
 
 	modifyConfigFile(configFile, dbPath, logPath, bindIP);
+
+	setAdminPassword(adminPWD, serverJS);
 
 	return 0;
 }

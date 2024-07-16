@@ -54,6 +54,8 @@
 	Var MongoDBCustomPortField
 	Var MongoDBCustomPortField_content
 	Var MONGODB_CUSTOM_PORT
+	Var mongodb_admin_pwd1
+	Var mongodb_admin_pwd2
 
 	Var PortReturnChecker
 
@@ -71,6 +73,7 @@
 	Var MONGODB_INSTALL_PATH
 	Var MONGODB_DB_PATH
 	Var MONGODB_LOG_PATH
+	Var MONGODB_ADMIN_PASSWORD
 	Var UNINSTALL_MONGODB_FLAG
 	
 	Var OPEN_TWIN_SERVICES_ADDRESS
@@ -108,6 +111,7 @@
 	!define DEFAULT_MONGODB_INSTALL_PATH '"$PROGRAMFILES64\MongoDB\Server\4.4"'
 	!define MONGODB_DELETION_PATH '"$PROGRAMFILES64\MongoDB"'
 	!define LICENSE_FILE_PATH '"..\..\..\LICENSE.md"'
+	!define DEFAULT_MONGODB_ADMIN_PASSWORD "admin"
 
 	!define MONGODB_STANDARD_PORT "27017"
 #=================================================================
@@ -679,6 +683,7 @@ FunctionEnd
 	; Directory page
 	!insertmacro MUI_PAGE_DIRECTORY
 	Page custom DatabaseEntry
+	Page custom DatabasePassword OnDatabasePasswordLeave
 	
 	#page custom DatabaseInfo #MongoDB paths debug page
 	Page custom NetworkModePage OnNetworkLeave
@@ -791,8 +796,10 @@ Section "MongoDB Setup" SEC03
 	DetailPrint "Running scripts..."
 
 	# update the mongodB config file without authentication
-	ExecWait '"$INSTDIR\Tools\helper\ConfigMongoDBNoAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection'
+	ExecWait '"$INSTDIR\Tools\helper\ConfigMongoDBNoAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "$MONGODB_ADMIN_PASSWORD" "$INSTDIR\Tools\javascript\db_admin.js"'
 
+	SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
+	
 	#set directory permissions for the mongoDB service
 	ExecWait '"$INSTDIR\Tools\helper\SetPermissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
 
@@ -805,7 +812,9 @@ Section "MongoDB Setup" SEC03
 
 	# call for js script to paste admin user creation
 	ExpandEnvStrings $0 %COMSPEC%
-		ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" --host $NetworkModeSelection --port $MONGODB_CUSTOM_PORT < "$INSTDIR\Tools\javascript\db_admin.js" " "'
+		ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" --host $NetworkModeSelection --port $MONGODB_CUSTOM_PORT < "$INSTDIR\Tools\javascript\db_admin.js_tmp" " "'
+
+	Delete "$INSTDIR\Tools\javascript\db_admin.js_tmp"
 	
 	nsExec::ExecToLog 'net stop "MongoDB"'	
 
@@ -942,7 +951,50 @@ SectionEnd
 			${EndIf}
 		FunctionEnd
 
+# DATABASE ADMIN PASSWORD (ACTIVE)
+	Function DatabasePassword
+	
+		${IfNot} ${SectionIsSelected} ${SEC03}
+			Abort
+		${EndIf}
+	
+		!insertmacro MUI_HEADER_TEXT "MongoDB Administrator Password" "An administrator password needs to be specified for protecting the database."
 
+		nsDialogs::Create 1018
+		Pop $Dialog
+
+		${If} $Dialog == error
+			Abort
+		${EndIf}
+		
+		#custom installation path has been disabled due to a bug in the MongoDB installer
+		${NSD_CreateLabel} 0 50 100% 10u "Specify administrator password:"
+		${NSD_CreatePassword} 0 70 100% 12u $MONGODB_ADMIN_PASSWORD
+		Pop $mongodb_admin_pwd1
+
+		${NSD_CreateLabel} 0 120 100% 10u "Retype administrator password:"
+		${NSD_CreatePassword} 0 140 100% 12u $MONGODB_ADMIN_PASSWORD
+		Pop $mongodb_admin_pwd2
+
+		nsDialogs::Show
+	FunctionEnd
+	
+	Function OnDatabasePasswordLeave
+	
+		${NSD_GetText} $mongodb_admin_pwd1 $0
+		${NSD_GetText} $mongodb_admin_pwd2 $1
+		
+		StrCmp $0 $1 0 jump_to_if_not_equal
+			StrCpy $MONGODB_ADMIN_PASSWORD $0
+			goto end
+		jump_to_if_not_equal:
+			MessageBox MB_ICONSTOP|MB_OK "The passwords do not match."
+			Abort
+		end:
+
+	FunctionEnd
+
+	
 /* DATABASE INFO PAGE (DISABLED)
 	Function DatabaseInfo
 		nsDialogs::Create 1018
@@ -1034,6 +1086,7 @@ Function .onInit
     StrCpy $PortReturnChecker 0
 	StrCpy $PublicIpSet 0
 	StrCpy $PublicCertPageChecker 0
+	StrCpy $MONGODB_ADMIN_PASSWORD ${DEFAULT_MONGODB_ADMIN_PASSWORD}
 
 	StrCpy "$ROOTDIR" "$WINDIR" 2
 
