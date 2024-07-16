@@ -273,6 +273,7 @@ Function NetworkModePage
 		${NSD_CreateLabel} 25 85u 100% 10% "Network Setup for OpenTwin (via Public IP)"
 		${NSD_CreateRadioButton} 25 100u 25% 10% "Public IP"
 		Pop $RadioButtonPublic
+		EnableWindow $RadioButtonPublic 0
 		
 		;NSD_CreateIPAddress creates a font bug in the UI
 		${NSD_CreateIPAddress} 150 100u 50% 10% ""
