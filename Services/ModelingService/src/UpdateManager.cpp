@@ -140,7 +140,9 @@ void UpdateManager::updateSingleParent(ot::UID entityID, ot::UID entityVersion, 
 
 	// Update the actual shape geometry
 	TopoDS_Shape shape;
-	bool success = updateParent(typeProperty->getValue(), geomEntity, shape, entityVersionMap);
+	std::map< const opencascade::handle<TopoDS_TShape>, std::string> resultFaceNames;
+
+	bool success = updateParent(typeProperty->getValue(), geomEntity, shape, entityVersionMap, resultFaceNames);
 
 	if (success)
 	{
@@ -148,6 +150,7 @@ void UpdateManager::updateSingleParent(ot::UID entityID, ot::UID entityVersion, 
 
 		geomEntity->setBrep(shape);
 		geomEntity->getBrepEntity()->setTransform(newTransform);
+		geomEntity->getBrepEntity()->setFaceNameMap(resultFaceNames);
 
 		// Now we facet the entity 
 		geomEntity->facetEntity(false);
@@ -189,7 +192,7 @@ void UpdateManager::updateSingleParent(ot::UID entityID, ot::UID entityVersion, 
 	geomEntity = nullptr;
 }
 
-bool UpdateManager::updateParent(const std::string &type, EntityGeometry *geomEntity, TopoDS_Shape &shape, std::map<ot::UID, ot::UID> &entityVersionMap)
+bool UpdateManager::updateParent(const std::string &type, EntityGeometry *geomEntity, TopoDS_Shape &shape, std::map<ot::UID, ot::UID> &entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string> &resultFaceNames)
 {
 	// First, get information about the base and tool properties
 	EntityPropertiesString *baseShapeProperty = dynamic_cast<EntityPropertiesString*>(geomEntity->getProperties().getProperty("baseShape"));
@@ -280,7 +283,6 @@ bool UpdateManager::updateParent(const std::string &type, EntityGeometry *geomEn
 
 	// Perform the operation to build the new shape
 	std::string treeIconVisible, treeIconHidden;
-	std::map< const opencascade::handle<TopoDS_TShape>, std::string> resultFaceNames;
 
 	bool success = getBooleanOperations()->performOperation(type, baseBrep, toolBreps, shape, treeIconVisible, treeIconHidden, resultFaceNames);
 
