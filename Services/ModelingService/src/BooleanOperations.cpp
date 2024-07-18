@@ -453,7 +453,7 @@ bool BooleanOperations::subtract(EntityBrep *base, std::list<EntityBrep *> &tool
 
 		aBoolean.Build();
 
-		TopoDS_Shape& shape2 = shape;
+		TopoDS_Shape shape2 = shape;
 
 		// If the boolean operation succeeds, we take the result of the operation. Otherwise we keep the based shape and
 		// ignore this operation (might happen. e.g. if the tool shape is empty).
