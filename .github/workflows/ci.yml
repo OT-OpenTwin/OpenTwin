@@ -9,9 +9,7 @@ on:
 env:
   DEVENV_PATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE
   DEVENV_PATH2: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com
-  OPENTWIN_DEV_ROOT: ${{ github.workspace }}\OpenTwin  # Define the environment variable for the OpenTwin root
-  QT_PATH: ${{ github.workspace }}\ThirdParty\Qt\6.6.1\msvc2019_64
-  QT_VERSION: 6.6.1
+  QTMSBUILD_PATH: ${{ github.workspace }}  # Path to the root of the repository
 
 permissions:
   contents: read
@@ -21,6 +19,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    
     - name: Check out the main project repository
       uses: actions/checkout@v2
       with:
@@ -35,6 +34,13 @@ jobs:
         path: ThirdParty
         fetch-depth: 1
 
+    - name: Check out QtMsBuild repository
+      uses: actions/checkout@v2
+      with:
+        repository: Reeva30/HelloWorld
+        ref: m
+        path: .
+
     - name: Install Rust 1.76.0
       run: |
         choco install rust --version=1.76.0 -y
@@ -47,34 +53,39 @@ jobs:
       run: dir /s
       shell: cmd
 
-    - name: Install Qt Visual Studio Tools Extension
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install Yarn
+      run: npm install -g yarn
+
+    - name: Install dependencies
+      run: yarn install
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install Sphinx and dependencies
       run: |
-        powershell -Command "& {Start-Process -Wait 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe' -ArgumentList 'modify', '--installPath', 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise', '--add', 'Component.ID', '--quiet'}"
-    
-    - name: Configure Qt Version
-      run: |
-        $qtVersionName = "6.6.1"
-        $qtPath = "${{ github.workspace }}\ThirdParty\Qt\6.6.1\msvc2019_64"
-        $devenvPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com"
-        
-        Write-Output "Adding Qt version $qtVersionName at path $qtPath using $devenvPath"
-        
-        $addQtVersionCmd = "& `$devenvPath -Command `"Qt5VSAddin.QtVersionManager.AddQtVersion(`'$qtPath`', `'$qtVersionName`')`""
-        Write-Output "Running command: $addQtVersionCmd"
-        
-        Invoke-Expression $addQtVersionCmd | Out-File qt_add_output.log -Append
-        Get-Content qt_add_output.log
-      
+        python -m pip install --upgrade pip
+        pip install sphinx sphinx-rtd-theme
+
     - name: Setup and Execute Build
       shell: cmd
       run: |
         echo "Current directory: %cd%"
-        set OPENTWIN_DEV_ROOT=${{ env.OPENTWIN_DEV_ROOT }}
-        set DEVENV_ROOT_2022=${{ env.DEVENV_PATH }}
-        set OPENTWIN_THIRDPARTY_ROOT=${{ github.workspace }}\ThirdParty
+        set OPENTWIN_DEV_ROOT=%cd%\OpenTwin
+        set DEVENV_ROOT_2022=%DEVENV_PATH%
+        set OPENTWIN_THIRDPARTY_ROOT=%cd%\ThirdParty
+        set QtMsBuild=%QTMSBUILD_PATH%\QtMsBuild
         echo "OPENTWIN_DEV_ROOT=%OPENTWIN_DEV_ROOT%"
         echo "DEVENV_ROOT_2022=%DEVENV_ROOT_2022%"
         echo "OPENTWIN_THIRDPARTY_ROOT=%OPENTWIN_THIRDPARTY_ROOT%"
+        echo "QtMsBuild=%QtMsBuild%"
         echo "Checking directories and necessary files..."
         echo "OpenTwin directory: %OPENTWIN_DEV_ROOT%"
         dir %OPENTWIN_DEV_ROOT%
@@ -82,28 +93,26 @@ jobs:
         dir %OPENTWIN_THIRDPARTY_ROOT%
         echo "Visual Studio 2022 directory: %DEVENV_ROOT_2022%"
         dir "%DEVENV_ROOT_2022%"
+        echo "QtMsBuild directory: %QtMsBuild%"
+        dir "%QtMsBuild%"
         echo "Checking if BuildAll.bat exists..."
-        if exist %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat (
-          echo "BuildAll.bat exists. Starting BuildAll.bat..."
-          call %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat
-        ) else (
-          echo "BuildAll.bat does not exist."
-          exit /b 1
-        )
-        echo "Checking if RebuildAll.bat exists..."
-        if exist %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\RebuildAll.bat (
-          echo "RebuildAll.bat exists."
-        ) else (
-          echo "RebuildAll.bat does not exist."
-        )
-        echo "Checking if CheckForFailedBuilds.bat exists..."
-        if exist %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CheckForFailedBuilds.bat (
-          echo "CheckForFailedBuilds.bat exists."
-        ) else (
-          echo "CheckForFailedBuilds.bat does not exist."
-        )
+        echo "Starting BuildAll.bat..."
+        call %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat 
         echo "All checks passed."
 
+    - name: Upload build log summary artifact
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-log-Debug
+        path: ${{ github.workspace }}\OpenTwin\Scripts\BuildAndTest\buildLog_Debug.txt
+
+    - name: Upload build log summary artifact
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-log-Release
+        path: ${{ github.workspace }}\OpenTwin\Scripts\BuildAndTest\buildLog_Release.txt
 
     - name: Upload build log summary artifact
       if: always()
