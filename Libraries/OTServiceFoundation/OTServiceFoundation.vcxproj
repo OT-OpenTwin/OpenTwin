@@ -22,6 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{36E113AE-6F93-42FC-AB88-97721543A1DF}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">%QTMSBUILD_PATH%\HelloWorld\QtMsBuild</QtMsBuild>
     <RootNamespace>SessionService</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
