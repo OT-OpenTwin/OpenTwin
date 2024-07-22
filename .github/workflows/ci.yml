@@ -39,7 +39,7 @@ jobs:
       with:
         repository: Reeva30/HelloWorld
         ref: m
-        path: .
+        path: HelloWorld
 
     - name: Install Rust 1.76.0
       run: |
@@ -81,7 +81,7 @@ jobs:
         set OPENTWIN_DEV_ROOT=%cd%\OpenTwin
         set DEVENV_ROOT_2022=%DEVENV_PATH%
         set OPENTWIN_THIRDPARTY_ROOT=%cd%\ThirdParty
-        set QtMsBuild=%QTMSBUILD_PATH%\QtMsBuild
+        set QtMsBuild=%QTMSBUILD_PATH%\HelloWorld\QtMsBuild
         echo "OPENTWIN_DEV_ROOT=%OPENTWIN_DEV_ROOT%"
         echo "DEVENV_ROOT_2022=%DEVENV_ROOT_2022%"
         echo "OPENTWIN_THIRDPARTY_ROOT=%OPENTWIN_THIRDPARTY_ROOT%"
