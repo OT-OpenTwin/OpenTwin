@@ -21,21 +21,21 @@ jobs:
     steps:
     
     - name: Check out the main project repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: OT-OpenTwin/OpenTwin
         ref: Ci
         path: OpenTwin
 
     - name: Check out the third-party repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: OT-OpenTwin/ThirdParty
         path: ThirdParty
         fetch-depth: 1
 
     - name: Check out QtMsBuild repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: Reeva30/HelloWorld
         ref: m
