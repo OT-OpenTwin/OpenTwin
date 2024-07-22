@@ -39,6 +39,7 @@ add_library(OTWidgets SHARED
     src/GraphicsItemLoader.cpp
     src/GraphicsItemPreviewDrag.cpp
     src/GraphicsItemPreview.cpp
+    src\GraphicsInvisibleItem.cpp
     src/GraphicsLayoutItem.cpp
     src/GraphicsLayoutItemWrapper.cpp
     src/GraphicsLineItem.cpp
