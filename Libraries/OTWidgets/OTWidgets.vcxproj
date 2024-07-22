@@ -41,7 +41,6 @@
     <ClCompile Include="src\GraphicsConnectionItem.cpp" />
     <ClCompile Include="src\GraphicsConnectionPreviewItem.cpp" />
     <ClCompile Include="src\GraphicsEllipseItem.cpp" />
-    <ClCompile Include="src\GraphicsInvisibleItem.cpp" />
     <ClCompile Include="src\GraphicsItemFactory.cpp" />
     <ClCompile Include="src\GraphicsGridLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsGroupItem.cpp" />
