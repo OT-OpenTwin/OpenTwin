@@ -18,23 +18,38 @@
 #include <rbeCore/Step.h>
 #include <rbeWrapper/RubberbandOsgWrapper.h>
 
+#include <osgUtil/IntersectionVisitor>
+
+
 int stepCount = 0;
 
-osgUtil::LineSegmentIntersector *ViewerObjectSelectionHandler::createIntersector(osgUtil::Intersector::CoordinateFrame cf, double x, double y)
+osgUtil::Intersector *ViewerObjectSelectionHandler::createIntersector(osgUtil::Intersector::CoordinateFrame cf, double x, double y)
 {
-	osgUtil::LineSegmentIntersector *intersector = nullptr;
+	osgUtil::Intersector *intersector = nullptr;
 
-	if (model->isWireFrameMode())
+	if (model->getCurrentSelectionMode() == Model::EDGE)
 	{
-		LineIntersector *lineIntersector = new LineIntersector(cf, x, y);
-		double size = model->getOSGRootNode()->computeBound().radius();
-		lineIntersector->setOffset(size * 0.01);
+		double delta = 5.0; // this is the selection tolerance in pixes (necessary since edges are infinitely thin)
 
-		intersector = lineIntersector;
+		osgUtil::PolytopeIntersector* polytopeIntersector = new osgUtil::PolytopeIntersector(cf, x - delta, y - delta, x + delta, y + delta);
+		//polytopeIntersector->setDimensionMask(osgUtil::PolytopeIntersector::DimOne);
+
+		intersector = polytopeIntersector;
 	}
 	else
 	{
-		intersector = new osgUtil::LineSegmentIntersector(cf, x, y);
+		if (model->isWireFrameMode())
+		{
+			LineIntersector* lineIntersector = new LineIntersector(cf, x, y);
+			double size = model->getOSGRootNode()->computeBound().radius();
+			lineIntersector->setOffset(size * 0.01);
+
+			intersector = lineIntersector;
+		}
+		else
+		{
+			intersector = new osgUtil::LineSegmentIntersector(cf, x, y);
+		}
 	}
 
 	return intersector;
@@ -68,7 +83,7 @@ bool ViewerObjectSelectionHandler::handle(const osgGA::GUIEventAdapter &ea, osgG
 		else {
 			bool bCtrlKeyPressed = ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_CTRL;
 
-			osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector = createIntersector(osgUtil::Intersector::WINDOW, ea.getX(), ea.getY());
+			osg::ref_ptr<osgUtil::Intersector> intersector = createIntersector(osgUtil::Intersector::WINDOW, ea.getX(), ea.getY());
 			
 			osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer*>(&aa);
 
@@ -92,7 +107,7 @@ bool ViewerObjectSelectionHandler::handle(const osgGA::GUIEventAdapter &ea, osgG
 	else if (ea.getEventType() == osgGA::GUIEventAdapter::DOUBLECLICK && ea.getButton() == osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON)
 	{
 		// Here we move the view center
-		osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector = createIntersector(osgUtil::Intersector::WINDOW, ea.getX(), ea.getY());
+		osg::ref_ptr<osgUtil::Intersector> intersector = createIntersector(osgUtil::Intersector::WINDOW, ea.getX(), ea.getY());
 
 		osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer*>(&aa);
 
@@ -110,9 +125,11 @@ bool ViewerObjectSelectionHandler::handle(const osgGA::GUIEventAdapter &ea, osgG
 			viewer->getCamera()->accept(iv);
 		}
 
-		if (intersector->containsIntersections())
+		osgUtil::LineSegmentIntersector* lineIntersector = dynamic_cast<osgUtil::LineSegmentIntersector*>(intersector.get());
+
+		if (intersector->containsIntersections() && lineIntersector != nullptr)
 		{
-			const osgUtil::LineSegmentIntersector::Intersection &firstHit = *(intersector->getIntersections().begin());
+			const osgUtil::LineSegmentIntersector::Intersection &firstHit = *(lineIntersector->getIntersections().begin());
 			osg::Vec3d intersectionPoint = firstHit.getWorldIntersectPoint();
 
 			manipulator->setCenter(intersectionPoint);
@@ -232,7 +249,7 @@ bool ViewerObjectSelectionHandler::handle(const osgGA::GUIEventAdapter &ea, osgG
 		}
 		else 
 		{
-			osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector = createIntersector(osgUtil::Intersector::WINDOW, ea.getX(), ea.getY());
+			osg::ref_ptr<osgUtil::Intersector> intersector = createIntersector(osgUtil::Intersector::WINDOW, ea.getX(), ea.getY());
 
 			osgViewer::Viewer *viewer = dynamic_cast<osgViewer::Viewer*>(&aa);
 

@@ -8,7 +8,7 @@
 
 #include <osg/ref_ptr>
 #include <osg/Group>
-#include <osgUtil/LineSegmentIntersector>
+#include <osgUtil/IntersectionVisitor>
 
 #include "Geometry.h"
 #include "SceneNodeBase.h"
@@ -180,12 +180,12 @@ public:
 
 	void enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string &selectionType, bool allowMultipleSelection, const std::string &selectionFilter, const std::string &selectionAction, const std::string &selectionMessage, std::list<std::string> &optionNames, std::list<std::string> &optionValues);
 
-	enum eSelectionMode { ENTITY, FACE, SHAPE };
+	enum eSelectionMode { ENTITY, FACE, SHAPE, EDGE };
 	eSelectionMode getCurrentSelectionMode(void) { return currentSelectionMode; };
 	void escapeKeyPressed(void);
 	void returnKeyPressed(void);
-	void processCurrentSelectionMode(osgUtil::LineSegmentIntersector *intersector, double sceneRadius, bool bCtrlKeyPressed);
-	void processHoverView(osgUtil::LineSegmentIntersector *intersector, double sceneRadius);
+	void processCurrentSelectionMode(osgUtil::Intersector *intersector, double sceneRadius, bool bCtrlKeyPressed);
+	void processHoverView(osgUtil::Intersector *intersector, double sceneRadius);
 
 	void addSceneNode(SceneNodeBase *node);
 	void setSceneNode(osg::Node *node, SceneNodeBase *sceneNode);
@@ -195,6 +195,7 @@ public:
 
 	unsigned int getCurrentTraversalMask(void);
 	unsigned int getFaceSelectionTraversalMask(void);
+	unsigned int getEdgeSelectionTraversalMask(void);
 
 	void viewerTabChanged(const std::string & _tabTitle);
 
@@ -260,7 +261,8 @@ private:
 	void	   addSelectedVisibleModelEntityIDToList(SceneNodeBase *root, std::list<unsigned long long> &selectedVisibleModelEntityID);
 	void	   addSelectedTreeItemIDToList(SceneNodeBase *root, std::list<ot::UID> &selectedTreeItemID);
 	void	   removeSceneNodeAndChildren(SceneNodeBase *node, std::list<ot::UID> &treeItemDeleteList);
-	SceneNodeBase* findSelectedItem(osgUtil::LineSegmentIntersector *intersector, double sceneRadius, osg::Vec3d &intersectionPoint, unsigned long long &hitIndex);
+	SceneNodeBase* findSelectedItemByLineSegment(osgUtil::Intersector* intersector, double sceneRadius, osg::Vec3d& intersectionPoint, unsigned long long& hitIndex);
+	SceneNodeBase* findSelectedItemByPolytope(osgUtil::Intersector* intersector, double sceneRadius, osg::Vec3d& intersectionPoint, ot::UID& faceId1, ot::UID& faceId2);
 	void	   selectSceneNode(SceneNodeBase *selectedItem, bool bCtrlKeyPressed);
 	void	   faceSelected(unsigned long long modelID, double x, double y, double z, SceneNodeGeometry *selectedItem, unsigned long long faceId);
 	SceneNodeBase *getParentNode(const std::string &treeName);
@@ -297,6 +299,7 @@ private:
 	bool       compareTransformations(osg::Matrix &matrix1, osg::Matrix &matrix2);
 	void       updateCapGeometryForSceneNodes(SceneNodeBase *root, const osg::Vec3d &normal, const osg::Vec3d &point);
 	void       updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg::Vec3d &normal, const osg::Vec3d &point);
+	bool	   isLineDrawable(osg::Drawable *drawable);
 
 	// Attributes
 	enum { ITEM_SELECTED = 1, ITEM_EXPANDED = 2 };

@@ -67,7 +67,11 @@ public:
 
 	void setEdgeHighlight(unsigned long long faceId, bool h, double thickness);
 	unsigned long long getFaceIdFromTriangleIndex(unsigned long long index) { return triangleToFaceId[index]; };
+	ot::UID getFaceIdFromEdgePrimitiveIndex(unsigned long long hitIndex);
+
 	std::string getFaceNameFromId(unsigned long long faceId);
+
+	std::string getEdgeNameFromFaceIds(unsigned long long faceId1, unsigned long long faceId2);
 
 	void setSurfaceColorRGB(double color[3]) { surfaceColorRGB[0] = color[0]; surfaceColorRGB[1] = color[1]; surfaceColorRGB[2] = color[2]; };
 	void setEdgeColorRGB(double color[3]) { edgeColorRGB[0] = color[0]; edgeColorRGB[1] = color[1]; edgeColorRGB[2] = color[2]; };
@@ -105,6 +109,8 @@ private:
 	std::map<unsigned long long, osg::Node *> faceEdgesHighlight;
 	std::vector<unsigned long long> triangleToFaceId;
 	std::map<ot::UID, std::string> faceIdToNameMap;
+	std::vector<unsigned long long> edgeStartIndex;
+	std::vector<ot::UID> edgeFaceId;
 
 	double surfaceColorRGB[3];
 	double edgeColorRGB[3];

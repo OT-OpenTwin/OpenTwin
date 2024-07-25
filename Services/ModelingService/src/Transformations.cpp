@@ -38,7 +38,7 @@ void Transformations::enterTransformMode(const std::list<ot::EntityInformation> 
 		count++;
 	}
 
-	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySlectionType::TRANSFORM, 
+	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::TRANSFORM, 
 		false, "", ot::components::UiComponent::entitySelectionAction::TRANSFORM_SHAPES, "transform", options, serviceID);
 }
 

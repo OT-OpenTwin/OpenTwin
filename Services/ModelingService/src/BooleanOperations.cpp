@@ -48,7 +48,7 @@ void BooleanOperations::enterAddMode(const std::list<ot::EntityInformation> &sel
 	std::map<std::string, std::string> options;
 	options["BaseShape"] = baseShapeName;
 
-	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySlectionType::SHAPE, 
+	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::SHAPE, 
 		true, "", ot::components::UiComponent::entitySelectionAction::BOOLEAN_ADD, "add", options, serviceID);
 }
 
@@ -67,7 +67,7 @@ void BooleanOperations::enterSubtractMode(const std::list<ot::EntityInformation>
 	std::map<std::string, std::string> options;
 	options["BaseShape"] = baseShapeName;
 
-	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySlectionType::SHAPE, 
+	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::SHAPE, 
 		true, "", ot::components::UiComponent::entitySelectionAction::BOOLEAN_SUBTRACT, "subtract", options, serviceID);
 }
 
@@ -86,7 +86,7 @@ void BooleanOperations::enterIntersectMode(const std::list<ot::EntityInformation
 	std::map<std::string, std::string> options;
 	options["BaseShape"] = baseShapeName;
 
-	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySlectionType::SHAPE, 
+	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::SHAPE, 
 		true, "", ot::components::UiComponent::entitySelectionAction::BOOLEAN_INTERSECT, "intersect", options, serviceID);
 }
 

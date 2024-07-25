@@ -33,7 +33,7 @@ namespace ot {
 		class OT_SERVICEFOUNDATION_API_EXPORT UiComponent : public ServiceBase {
 		public:
 
-			enum entitySlectionType {
+			enum entitySelectionType {
 				FACE,
 				EDGE,
 				SHAPE,
@@ -46,7 +46,8 @@ namespace ot {
 				BOOLEAN_ADD,
 				BOOLEAN_SUBTRACT,
 				BOOLEAN_INTERSECT,
-				TRANSFORM_SHAPES
+				TRANSFORM_SHAPES,
+				CHAMFER_EDGE
 			};
 
 			UiComponent(
@@ -406,7 +407,7 @@ namespace ot {
 
 			void enterEntitySelectionMode(
 				UID											_visualizationModelUID,
-				entitySlectionType							_selectionType,
+				entitySelectionType							_selectionType,
 				bool										_allowMultipleSelection,
 				const std::string &							_filter,
 				entitySelectionAction						_actionType,

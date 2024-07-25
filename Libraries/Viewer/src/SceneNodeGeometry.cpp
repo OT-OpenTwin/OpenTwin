@@ -644,8 +644,17 @@ void SceneNodeGeometry::createOSGNodeFromEdges(double colorRGB[3], std::list<Geo
 
 	std::map<unsigned long long, std::list<Geometry::Edge *>> faceIdToEdgesList;
 
+	edgeStartIndex.clear();
+	edgeFaceId.clear();
+
+	edgeStartIndex.reserve(edges.size());
+	edgeFaceId.reserve(edges.size());
+
 	for (auto &edge : edges)
 	{
+		edgeStartIndex.push_back(nEdges);
+		edgeFaceId.push_back(edge.getFaceId());
+
 		nEdges += edge.getNpoints() - 1;
 		faceIdToEdgesList[edge.getFaceId()].push_back(&edge);
 	}
@@ -714,6 +723,97 @@ void SceneNodeGeometry::createOSGNodeFromEdges(double colorRGB[3], std::list<Geo
 		faceEdgesHighlightNode->addChild(faceEdgesNode);
 	}
 }
+
+std::string SceneNodeGeometry::getEdgeNameFromFaceIds(unsigned long long faceId1, unsigned long long faceId2)
+{
+	std::string face1 = getFaceNameFromId(faceId1);
+	std::string face2 = getFaceNameFromId(faceId2);
+
+	if (face1 == face2) return "";
+
+	if (face1 <= face2)
+	{ 
+		return face1 + ";" + face2;
+	}
+	else
+	{
+		return face2 + ";" + face1;
+	}
+}
+
+ot::UID SceneNodeGeometry::getFaceIdFromEdgePrimitiveIndex(unsigned long long hitIndex)
+{
+	// First, we need to determine the correponding edge. Lets find the closes start index lower than the hitIndex
+	if (edgeStartIndex.size() == 0) return -1;
+
+	unsigned long long start = 0;
+	unsigned long long end = edgeStartIndex.size()-1;
+
+	long long center = -1;
+
+	while (1)
+	{
+		center = (start + end) / 2;
+
+		if (edgeStartIndex[start] == hitIndex)
+		{
+			center = start;
+			break;
+		}
+		else if (edgeStartIndex[end] == hitIndex)
+		{
+			center = end;
+			break;
+		}
+		else if (edgeStartIndex[center] < hitIndex)
+		{
+			start = center;
+		}
+		else if (edgeStartIndex[center] > hitIndex)
+		{
+			end = center;
+		}
+		else
+		{
+			// The center index is the hitIndex -> we found the corresponding edge
+			break;
+		}
+
+		if (end - start == 1 && edgeStartIndex[start] <= hitIndex && edgeStartIndex[end] > hitIndex)
+		{
+			center = start;
+			break;
+		}
+
+		if (end - start == 1 && edgeStartIndex[end] <= hitIndex)
+		{
+			center = end;
+			break;
+		}
+
+		if (end == start)
+		{
+			// The range is empty, but we did not find the hit index
+			center = -1;
+			break;
+		}
+	}
+
+	if (center >= 0 && center < edgeStartIndex.size())
+	{
+		// Now we have the edge index -> get the correponding faceId
+		ot::UID faceId = edgeFaceId[center];
+
+		return faceId;
+	}
+	else
+	{
+		assert(0);
+	}
+
+	return -1;
+}
+
 
 osg::Node *SceneNodeGeometry::buildEdgesOSGNode(unsigned long long nEdges, osg::Vec3Array *vertices, double r, double g, double b, double transp, bool depthTest)
 {

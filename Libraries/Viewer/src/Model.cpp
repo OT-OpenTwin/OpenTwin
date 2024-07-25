@@ -12,6 +12,8 @@
 #include <osg/PolygonOffset>
 #include <osg/PolygonMode>
 #include <osg/LineWidth>
+#include <osgUtil/IntersectionVisitor>
+#include <osgUtil/PolytopeIntersector>
 
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
@@ -1740,19 +1742,22 @@ void Model::hideUnselectedSceneNodesAction(void)
 	if (getNotifier() != nullptr) getNotifier()->refreshSelection();
 }
 
-SceneNodeBase *Model::findSelectedItem(osgUtil::LineSegmentIntersector *intersector, double sceneRadius, osg::Vec3d &intersectionPoint, unsigned long long &hitIndex)
+SceneNodeBase *Model::findSelectedItemByLineSegment(osgUtil::Intersector *intersector, double sceneRadius, osg::Vec3d &intersectionPoint, unsigned long long &hitIndex)
 {
+	osgUtil::LineSegmentIntersector *lineIntersector = dynamic_cast<osgUtil::LineSegmentIntersector*>(intersector);
+	if (lineIntersector == nullptr) return nullptr;
+
 	if (!intersector->containsIntersections()) return nullptr;
 
 	std::list<osg::NodePath> hitItemList;
 	std::vector<unsigned long long> hitIndexList;
 
-	const osgUtil::LineSegmentIntersector::Intersection &firstHit = *(intersector->getIntersections().begin());
+	const osgUtil::LineSegmentIntersector::Intersection &firstHit = *(lineIntersector->getIntersections().begin());
 	intersectionPoint = firstHit.getWorldIntersectPoint();
 
 	double tolerance = 1e-6 * sceneRadius;
 
-	for (auto i : intersector->getIntersections())
+	for (auto i : lineIntersector->getIntersections())
 	{
 		osg::Vec3d point = i.getWorldIntersectPoint();
 		osg::Vec3d delta = intersectionPoint - point;
@@ -1800,6 +1805,131 @@ SceneNodeBase *Model::findSelectedItem(osgUtil::LineSegmentIntersector *intersec
 	}
 
 	return closestItem;
+}
+
+SceneNodeBase* Model::findSelectedItemByPolytope(osgUtil::Intersector* intersector, double sceneRadius, osg::Vec3d& intersectionPoint, ot::UID& faceId1, ot::UID& faceId2)
+{
+	osgUtil::PolytopeIntersector* polyIntersector = dynamic_cast<osgUtil::PolytopeIntersector*>(intersector);
+	if (polyIntersector == nullptr) return nullptr;
+
+	if (!intersector->containsIntersections()) return nullptr;
+
+	std::list<osg::NodePath> hitItemList;
+	std::vector<unsigned long long> hitIndexList;
+
+	const osgUtil::PolytopeIntersector::Intersection& firstHit = *(polyIntersector->getIntersections().begin());
+
+	intersectionPoint = firstHit.localIntersectionPoint;
+	double maxDist = firstHit.maxDistance + (firstHit.maxDistance - firstHit.distance); // Add some tolerance to the max. distance
+
+	double tolerance = 1e-6 * sceneRadius;
+
+	for (auto i : polyIntersector->getIntersections())
+	{
+		if (isLineDrawable(i.drawable.get()))
+		{
+			osg::Vec3d point = i.localIntersectionPoint;
+			osg::Vec3d delta = intersectionPoint - point;
+
+			if (i.distance <= maxDist)
+			{
+				hitItemList.push_back(i.nodePath);
+				hitIndexList.push_back(i.primitiveIndex);
+			}
+		}
+	}
+
+	// Since we are picking an edge of a solid here, we can have multiple edge hots at the same location.
+	// These hits should belong to the edges of two adjacent faces.
+	// We need to determine both edge indices and the corresponding geometry scene node item.
+
+	SceneNodeBase* item = nullptr;
+
+	bool faceId1Set = false;
+	bool faceId2Set = false;
+
+	auto hitIndex = hitIndexList.begin();
+
+	for (auto hitItem : hitItemList)
+	{
+		int nNodes = hitItem.size();
+
+		if (nNodes > 0)
+		{
+			for (int i = nNodes - 1; i >= 0; i--)
+			{
+				osg::Node* node = hitItemList.front()[i];
+				if (osgNodetoSceneNodesMap.count(node) > 0)
+				{
+					if (item == nullptr)
+					{
+						item = osgNodetoSceneNodesMap[node];
+					}
+					else if (item != osgNodetoSceneNodesMap[node])
+					{
+						// The found items belong to two different shapes
+						return nullptr;
+					}
+
+					ot::UID faceId = -1;
+					
+					SceneNodeGeometry* geomItem = dynamic_cast<SceneNodeGeometry*>(item);
+
+					if (geomItem != nullptr)
+					{
+						faceId = geomItem->getFaceIdFromEdgePrimitiveIndex(*hitIndex);
+
+						if (!faceId1Set)
+						{
+							faceId1 = faceId;
+							faceId1Set = true;
+						}
+						else
+						{
+							if (faceId != faceId1)
+							{
+								if (!faceId2Set)
+								{
+									faceId2 = faceId;
+									faceId2Set = true;
+								}
+								else
+								{
+									if (faceId != faceId2)
+									{
+										// This is a different item
+										return nullptr;
+									}
+								}
+							}
+						}
+					}
+
+					break;
+				}
+			}
+		}
+
+		hitIndex++;
+	}
+
+	return item;
+}
+
+bool Model::isLineDrawable(osg::Drawable *drawable)
+{
+	osg::Geometry* geom = dynamic_cast<osg::Geometry*>(drawable);
+	if (geom == nullptr) return false;
+
+	for (auto prim : geom->getPrimitiveSetList())
+	{
+		if (prim->getMode() != osg::PrimitiveSet::LINES)
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void Model::selectSceneNode(SceneNodeBase *selectedItem, bool bCtrlKeyPressed)
@@ -2134,6 +2264,30 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 		currentSelectionOptionNames  = optionNames;
 		currentSelectionOptionValues = optionValues;
 	}
+	else if (selectionType == "EDGE")
+	{
+		ensure3DView();
+
+		for (auto viewer : viewerList)
+		{
+			std::string firstText = allowMultipleSelection ? "Double-click to select edges to " : "Double-click to select an edge to ";
+			std::string secondText = allowMultipleSelection ? " (press RETURN to complete or ESC to cancel)" : " (press ESC to cancel)";
+
+			viewer->setOverlayText(firstText + selectionMessage + secondText);
+		}
+
+		if (!viewerList.empty())
+		{
+			viewerList.front()->setFocus();
+		}
+
+		currentSelectionMode = EDGE;
+		currentSelectionReplyTo = replyTo;
+		currentSelectionAction = selectionAction;
+		currentSelectionMultiple = allowMultipleSelection;
+		currentSelectionOptionNames = optionNames;
+		currentSelectionOptionValues = optionValues;
+	}
 	else if (selectionType == "SHAPE")
 	{
 		ensure3DView();
@@ -2207,7 +2361,7 @@ void Model::freeze3DView(bool flag)
 	}
 }
 
-void Model::processCurrentSelectionMode(osgUtil::LineSegmentIntersector *intersector, double sceneRadius, bool bCtrlKeyPressed)
+void Model::processCurrentSelectionMode(osgUtil::Intersector *intersector, double sceneRadius, bool bCtrlKeyPressed)
 {
 	switch (currentSelectionMode)
 	{
@@ -2215,7 +2369,7 @@ void Model::processCurrentSelectionMode(osgUtil::LineSegmentIntersector *interse
 	{
 		osg::Vec3d intersectionPoint;
 		unsigned long long hitIndex = 0;
-		SceneNodeBase *selectedItem = findSelectedItem(intersector, sceneRadius, intersectionPoint, hitIndex);
+		SceneNodeBase *selectedItem = findSelectedItemByLineSegment(intersector, sceneRadius, intersectionPoint, hitIndex);
 		selectSceneNode(selectedItem, bCtrlKeyPressed);
 		break;
 	}
@@ -2225,7 +2379,7 @@ void Model::processCurrentSelectionMode(osgUtil::LineSegmentIntersector *interse
 
 		osg::Vec3d intersectionPoint;
 		unsigned long long hitIndex = 0;
-		SceneNodeGeometry *selectedItem = dynamic_cast<SceneNodeGeometry *>(findSelectedItem(intersector, sceneRadius, intersectionPoint, hitIndex));
+		SceneNodeGeometry *selectedItem = dynamic_cast<SceneNodeGeometry *>(findSelectedItemByLineSegment(intersector, sceneRadius, intersectionPoint, hitIndex));
 		if (selectedItem != nullptr)
 		{
 			unsigned long long faceId = selectedItem->getFaceIdFromTriangleIndex(hitIndex);
@@ -2238,7 +2392,7 @@ void Model::processCurrentSelectionMode(osgUtil::LineSegmentIntersector *interse
 	{
 		osg::Vec3d intersectionPoint;
 		unsigned long long hitIndex = 0;
-		SceneNodeBase *selectedItem = findSelectedItem(intersector, sceneRadius, intersectionPoint, hitIndex);
+		SceneNodeBase *selectedItem = findSelectedItemByLineSegment(intersector, sceneRadius, intersectionPoint, hitIndex);
 		selectSceneNode(selectedItem, bCtrlKeyPressed);
 		break;
 	}
@@ -2484,6 +2638,12 @@ unsigned int Model::getFaceSelectionTraversalMask(void)
 				// The transparent flag is also not set for helper geometry, so this one will not be picked as well.
 }
 
+unsigned int Model::getEdgeSelectionTraversalMask(void)
+{
+	return 1;   // The last bit is not set if the shape is transparent. Therefore, we can use the last bit mask to exclude transparent objects
+				// The transparent flag is also not set for helper geometry, so this one will not be picked as well.
+}
+
 unsigned int Model::getCurrentTraversalMask(void)
 {
 	// The second bit is set if the shape shall be excluded from selection
@@ -2496,6 +2656,9 @@ unsigned int Model::getCurrentTraversalMask(void)
 		case FACE:
 			return getFaceSelectionTraversalMask();
 			break;
+		case EDGE:
+			return getEdgeSelectionTraversalMask();
+			break;
 		case SHAPE:
 			return 2;   // We do not pick objects for which the second bit is not set.
 			break;
@@ -2506,7 +2669,7 @@ unsigned int Model::getCurrentTraversalMask(void)
 	return ~0;
 }
 
-void Model::processHoverView(osgUtil::LineSegmentIntersector *intersector, double sceneRadius)
+void Model::processHoverView(osgUtil::Intersector *intersector, double sceneRadius)
 {
 	switch (currentSelectionMode)
 	{
@@ -2515,7 +2678,7 @@ void Model::processHoverView(osgUtil::LineSegmentIntersector *intersector, doubl
 		{
 			osg::Vec3d intersectionPoint;
 			unsigned long long hitIndex = 0;
-			SceneNodeBase *selectedItem = findSelectedItem(intersector, sceneRadius, intersectionPoint, hitIndex);
+			SceneNodeBase *selectedItem = findSelectedItemByLineSegment(intersector, sceneRadius, intersectionPoint, hitIndex);
 			setHoverView(selectedItem);
 		}
 		else
@@ -2528,7 +2691,7 @@ void Model::processHoverView(osgUtil::LineSegmentIntersector *intersector, doubl
 		{
 			osg::Vec3d intersectionPoint;
 			unsigned long long hitIndex = 0;
-			SceneNodeGeometry *selectedItem = dynamic_cast<SceneNodeGeometry *> (findSelectedItem(intersector, sceneRadius, intersectionPoint, hitIndex));
+			SceneNodeGeometry *selectedItem = dynamic_cast<SceneNodeGeometry *> (findSelectedItemByLineSegment(intersector, sceneRadius, intersectionPoint, hitIndex));
 			if (selectedItem != nullptr)
 			{
 				clearHoverView();
@@ -2558,12 +2721,53 @@ void Model::processHoverView(osgUtil::LineSegmentIntersector *intersector, doubl
 			clearHoverView();
 		}
 		break;
+	case EDGE:
+		if (intersector->containsIntersections())
+		{
+			osg::Vec3d intersectionPoint;
+			unsigned long long faceId1 = 0, faceId2 = 0;
+			SceneNodeGeometry* selectedItem = dynamic_cast<SceneNodeGeometry*> (findSelectedItemByPolytope(intersector, sceneRadius, intersectionPoint, faceId1, faceId2));
+			if (selectedItem != nullptr)
+			{
+				clearHoverView();
+
+				std::string edgeName = selectedItem->getEdgeNameFromFaceIds(faceId1, faceId2);
+				setCursorText(edgeName);
+
+				/*
+				unsigned long long faceId = selectedItem->getFaceIdFromTriangleIndex(hitIndex);
+
+				std::string faceName = selectedItem->getFaceNameFromId(faceId);
+				setCursorText(faceName);
+
+				if (isFaceSelected(selectedItem, faceId))
+				{
+					selectedItem->setEdgeHighlight(faceId, true, 3.0);
+				}
+				else
+				{
+					selectedItem->setEdgeHighlight(faceId, true, 1.0);
+				}
+				*/
+
+				currentHoverItem = selectedItem;
+			}
+			else
+			{
+				clearHoverView();
+			}
+		}
+		else
+		{
+			clearHoverView();
+		}
+		break;
 	case SHAPE:
 		if (intersector->containsIntersections())
 		{
 			osg::Vec3d intersectionPoint;
 			unsigned long long hitIndex = 0;
-			SceneNodeBase *selectedItem = findSelectedItem(intersector, sceneRadius, intersectionPoint, hitIndex);
+			SceneNodeBase *selectedItem = findSelectedItemByLineSegment(intersector, sceneRadius, intersectionPoint, hitIndex);
 			setHoverView(selectedItem);
 		}
 		else

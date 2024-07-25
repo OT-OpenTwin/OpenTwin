@@ -185,6 +185,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\ApplicationSettings.cpp" />
     <ClCompile Include="src\BooleanOperations.cpp" />
+    <ClCompile Include="src\ChamferEdges.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\EntityCache.cpp" />
     <ClCompile Include="src\ModalCommandHealing.cpp" />
@@ -208,6 +209,7 @@
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\ApplicationSettings.h" />
     <ClInclude Include="include\BooleanOperations.h" />
+    <ClInclude Include="include\ChamferEdges.h" />
     <ClInclude Include="include\EntityCache.h" />
     <ClInclude Include="include\ModalCommandHealing.h" />
     <ClInclude Include="include\ModelNotifier.h" />

@@ -24,6 +24,7 @@
 #include "BooleanOperations.h"
 #include "Transformations.h"
 #include "UpdateManager.h"
+#include "ChamferEdges.h"
 #include "SimplifyRemoveFaces.h"
 #include "ModalCommandHealing.h"
 
@@ -132,6 +133,7 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		else if (action == "Modeling:Modify:Boolean Subtract")  { getBooleanOperations()->enterSubtractMode(getSelectedGeometryEntities()); }
 		else if (action == "Modeling:Modify:Boolean Intersect") { getBooleanOperations()->enterIntersectMode(getSelectedGeometryEntities()); }
 		else if (action == "Modeling:Modify:Transform")         { getTransformationManager()->enterTransformMode(getSelectedGeometryEntities()); }
+		else if (action == "Modeling:Modify:Chamfer Edges")     { getChamferEdgesManager()->enterChamferEdgesMode(); }
 		else if (action == "Modeling:Repair:Remove Faces")      { getRemoveFacesOperation()->enterRemoveFacesMode(); }
 		else if (action == "Modeling:Repair:Heal")			    { new ModalCommandHealing(this, "Modeling", "Modeling:Repair:Heal"); }
 		else if (action == "Modeling:Import:STEP")			    { importSTEP(); }
@@ -252,6 +254,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton("Modeling", "Modify", "Boolean Intersect", "Boolean Intersect", lockTypes, "BooleanIntersect", "Default", "");
 
 	_ui->addMenuButton("Modeling", "Modify", "Transform", "Transform", lockTypes, "Transform", "Default", "");
+	_ui->addMenuButton("Modeling", "Modify", "Chamfer Edges", "Chamfer Edges", lockTypes, "Icon", "Default", "");
 
 	_ui->addMenuButton("Modeling", "Repair", "Remove Faces", "Remove Faces", lockTypes, "RemoveFace", "Default", "");
 	_ui->addMenuButton("Modeling", "Repair", "Heal", "Heal", lockTypes, "Healing", "Default", "");
@@ -440,6 +443,17 @@ Transformations *Application::getTransformationManager(void)
 	}
 
 	return transformationManager; 
+}
+
+ChamferEdges* Application::getChamferEdgesManager(void)
+{
+	if (chamferEdges == nullptr)
+	{
+		chamferEdges = new ChamferEdges(m_uiComponent, m_modelComponent, serviceID(), serviceName(), &entityCache, &getClassFactory());
+		chamferEdges->setUpdateManager(getUpdateManager());
+	}
+
+	return chamferEdges;
 }
 
 SimplifyRemoveFaces *Application::getRemoveFacesOperation(void)

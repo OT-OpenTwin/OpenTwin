@@ -1,4 +1,4 @@
-#include "SimplifyRemoveFaces.h"
+#include "ChamferEdges.h"
 #include "EntityGeometry.h"
 #include "EntityFaceAnnotation.h"
 #include "DataBase.h"
@@ -21,15 +21,15 @@
 #include <map>
 #include <set>
 
-void SimplifyRemoveFaces::enterRemoveFacesMode(void)
+void ChamferEdges::enterChamferEdgesMode(void)
 {
 	std::map<std::string, std::string> options;
 
-	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::FACE, 
-									      true, "", ot::components::UiComponent::entitySelectionAction::REMOVE_FACE, "remove", options, serviceID);
+	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::EDGE, 
+									      true, "", ot::components::UiComponent::entitySelectionAction::CHAMFER_EDGE, "remove", options, serviceID);
 }
 
-void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
+void ChamferEdges::performOperation(const std::string &selectionInfo)
 {
 	ot::LockTypeFlags lockFlags;
 	lockFlags.setFlag(ot::LockModelWrite);
@@ -49,7 +49,7 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 
 	// Get a list of all shapes which are involved in this operation for prefetching
 	std::set<ot::UID> affectedEntitiesSet;
-	std::list<SimplifyRemoveFaceData> faceList;
+	std::list<ChamferEdgesData> faceList;
 
 	for (unsigned int i = 0; i < modelID.Size(); i++)
 	{
@@ -57,7 +57,7 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 
 		affectedEntitiesSet.insert(entityID);
 
-		SimplifyRemoveFaceData faceData;
+		ChamferEdgesData faceData;
 		faceData.setEntityID(entityID);
 		faceData.setPosition(posX[i].GetDouble(), posY[i].GetDouble(), posZ[i].GetDouble());
 		faceList.push_back(faceData);
@@ -102,7 +102,7 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 	}
 
 	// Here, we sort the picked faces by entity 
-	std::map<ot::UID, std::list<SimplifyRemoveFaceData>> facesMap;
+	std::map<ot::UID, std::list<ChamferEdgesData>> facesMap;
 
 	for (auto face : faceList)
 	{
@@ -166,7 +166,7 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 	}
 }
 
-bool SimplifyRemoveFaces::removeFacesFromEntity(EntityGeometry *geometryEntity, ot::UID brepID, ot::UID brepVersion, std::list<SimplifyRemoveFaceData> &faces, std::list<ot::UID> &modifiedEntities)
+bool ChamferEdges::removeFacesFromEntity(EntityGeometry *geometryEntity, ot::UID brepID, ot::UID brepVersion, std::list<ChamferEdgesData> &faces, std::list<ot::UID> &modifiedEntities)
 {
 	assert(geometryEntity != nullptr);
 
@@ -273,7 +273,7 @@ bool SimplifyRemoveFaces::removeFacesFromEntity(EntityGeometry *geometryEntity, 
 	return true;
 }
 
-bool SimplifyRemoveFaces::findFaceFromPosition(TopoDS_Shape &shape, double x, double y, double z, TopoDS_Shape &face)
+bool ChamferEdges::findFaceFromPosition(TopoDS_Shape &shape, double x, double y, double z, TopoDS_Shape &face)
 {
 	BRepBuilderAPI_MakeVertex vertex(gp_Pnt(x, y, z));
 

@@ -102,6 +102,9 @@
     <ClCompile Include="$(BASE64_ROOT)\base64.c">
       <Filter>Third Party Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ChamferEdges.cpp">
+      <Filter>Source Files\Operations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -162,6 +165,9 @@
       <Filter>Header Files\Commands</Filter>
     </ClInclude>
     <ClInclude Include="include\STEPReader.h">
+      <Filter>Header Files\Operations</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ChamferEdges.h">
       <Filter>Header Files\Operations</Filter>
     </ClInclude>
   </ItemGroup>
