@@ -39,6 +39,7 @@ public:
 	void setTextureType(const std::string &texture, bool reflect) { textureType = texture; reflective = reflect; }
 	void setMaterialProperties(osg::ref_ptr<osg::Material>& mat,double r , double g, double b);
 	void setTransformation(std::vector<double> &transformation);
+	void setHighlightNode(osg::Node* highlight);
 
 	osg::Matrix getTransformation(void);
 	osg::Matrix getParentTransformation(void);
@@ -51,6 +52,8 @@ public:
 	osg::Node* getEdges(void) { return edges; };
 	osg::Node *getEdgesHighlighted(void) { return edgesHighlighted; };
 	osg::Switch *getFaceEdgesHighlight(void) { return faceEdgesHighlightNode; };
+
+	void setEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2);
 
 	virtual void setTransparent(bool t) override;
 	virtual void setWireframe(bool w) override;
@@ -100,11 +103,13 @@ private:
 	void setVisibleState(bool visible, bool transparent, bool wireframe);
 	void updateTransparentState(bool visible, bool transparent, bool wireframe);
 	void applyParentTransform(void);
+	osg::Node* getEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2);
 
 	osg::Node   *      triangles;
 	osg::Node   *      edges;
 	osg::Node	*	   edgesHighlighted;
 	osg::Switch *      faceEdgesHighlightNode;
+	osg::Node   *      highlightNode;
 
 	std::map<unsigned long long, osg::Node *> faceEdgesHighlight;
 	std::vector<unsigned long long> triangleToFaceId;

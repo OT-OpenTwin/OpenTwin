@@ -2061,6 +2061,8 @@ void Model::clearHoverView(void)
 
 		if (dynamic_cast<SceneNodeGeometry*>(currentHoverItem))
 		{ 
+			dynamic_cast<SceneNodeGeometry*>(currentHoverItem)->setHighlightNode(nullptr);
+
 			if (dynamic_cast<SceneNodeGeometry*>(currentHoverItem)->getShapeNode() != nullptr)
 			{
 				dynamic_cast<SceneNodeGeometry*>(currentHoverItem)->getFaceEdgesHighlight()->setAllChildrenOff();
@@ -2729,26 +2731,15 @@ void Model::processHoverView(osgUtil::Intersector *intersector, double sceneRadi
 			SceneNodeGeometry* selectedItem = dynamic_cast<SceneNodeGeometry*> (findSelectedItemByPolytope(intersector, sceneRadius, intersectionPoint, faceId1, faceId2));
 			if (selectedItem != nullptr)
 			{
-				clearHoverView();
+				if (currentHoverItem != selectedItem)
+				{
+					clearHoverView();
+				}
+
+				selectedItem->setEdgeHighlightNode(faceId1, faceId2);
 
 				std::string edgeName = selectedItem->getEdgeNameFromFaceIds(faceId1, faceId2);
 				setCursorText(edgeName);
-
-				/*
-				unsigned long long faceId = selectedItem->getFaceIdFromTriangleIndex(hitIndex);
-
-				std::string faceName = selectedItem->getFaceNameFromId(faceId);
-				setCursorText(faceName);
-
-				if (isFaceSelected(selectedItem, faceId))
-				{
-					selectedItem->setEdgeHighlight(faceId, true, 3.0);
-				}
-				else
-				{
-					selectedItem->setEdgeHighlight(faceId, true, 1.0);
-				}
-				*/
 
 				currentHoverItem = selectedItem;
 			}

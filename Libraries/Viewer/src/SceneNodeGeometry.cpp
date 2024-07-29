@@ -39,6 +39,7 @@ SceneNodeGeometry::SceneNodeGeometry() :
 	edges(nullptr), 
 	edgesHighlighted(nullptr), 
 	faceEdgesHighlightNode(nullptr),
+	highlightNode(nullptr),
 	surfaceColorRGB{ 0.0, 0.0, 0.0 },
 	edgeColorRGB{ 0.0, 0.0, 0.0 },
 	backFaceCulling(false),
@@ -877,6 +878,128 @@ osg::Node *SceneNodeGeometry::buildEdgesOSGNode(unsigned long long nEdges, osg::
 	return transformNode;
 }
 
+void SceneNodeGeometry::setEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2)
+{
+	osg::Node* highlightNode = getEdgeHighlightNode(faceId1, faceId2);
+	setHighlightNode(highlightNode);
+}
+
+osg::Node* SceneNodeGeometry::getEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2)
+{
+	if (edges == nullptr) return nullptr;
+
+	// First, we get the geometry drawable of the edges
+	osg::MatrixTransform* transformNode = dynamic_cast<osg::MatrixTransform*>(edges);
+	if (transformNode == nullptr) return nullptr;
+
+	osg::Geode* edgesNode = dynamic_cast<osg::Geode*>(transformNode->getChild(0));
+	if (edgesNode == nullptr) return nullptr;
+
+	osg::Geometry *geometry = dynamic_cast<osg::Geometry*>(edgesNode->getDrawable(0));
+	if (geometry == nullptr) return nullptr;
+
+	// Now we get the vertices from this drawable which belong to the two faces
+	osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(geometry->getVertexArray());
+	if (vertices == nullptr) return nullptr;
+
+	unsigned int numberVertices = vertices->getNumElements();
+	unsigned int numberEdges = numberVertices / 2;
+
+	unsigned long long edgeIndex = 0;
+	unsigned long long edgeCount = 0;
+
+	std::list<osg::Vec3> faceEdges1, faceEdges2;
+
+	for (unsigned int i = 0; i < vertices->size()-1; i+=2)
+	{
+		if (edgeIndex + 1 < edgeStartIndex.size())
+		{
+			if (edgeStartIndex[edgeIndex + 1] == edgeCount)
+			{
+				edgeIndex++;
+			}
+		}
+		edgeCount++;
+
+		osg::Vec3& v1 = (*vertices)[i];
+		osg::Vec3& v2 = (*vertices)[i+1];
+
+		if (edgeFaceId[edgeIndex] == faceId1)
+		{
+			faceEdges1.push_back(v1);
+			faceEdges1.push_back(v2);
+		}
+		else if (edgeFaceId[edgeIndex] == faceId2)
+		{
+			faceEdges2.push_back(v1);
+			faceEdges2.push_back(v2);
+		}
+	}
+
+	std::vector<osg::Vec3> edgeVector1{ std::begin(faceEdges1), std::end(faceEdges1) };
+	std::vector<osg::Vec3> edgeVector2{ std::begin(faceEdges2), std::end(faceEdges2) };
+
+	// Now we loop through all edges of the first face and check whether it is contained in the second face as well
+
+	std::list<osg::Vec3> commonEdges;
+
+	for (unsigned int i = 0; i < edgeVector1.size() / 2; i++)
+	{
+		osg::Vec3& v1 = edgeVector1[2*i];
+		osg::Vec3& v2 = edgeVector1[2*i + 1];
+
+		bool found = false;
+
+		for (unsigned int j = 0; j < edgeVector2.size() / 2; j++)
+		{
+			osg::Vec3& w1 = edgeVector2[2 * j];
+			osg::Vec3& w2 = edgeVector2[2 * j + 1];
+
+			if (v1 == w1 && v2 == w2)
+			{
+				found = true;
+				break;
+			}
+		}
+
+		if (found)
+		{
+			commonEdges.push_back(v1);
+			commonEdges.push_back(v2);
+		}
+	}
+
+	if (commonEdges.empty()) return nullptr;
+
+	// Now we create an edge
+	unsigned long long nEdges = commonEdges.size() / 2;
+
+	double r = 1.0;
+	double g = 0.0;
+	double b = 0.0;
+
+	osg::ref_ptr<osg::Vec3Array> points = new osg::Vec3Array(nEdges * 2);
+
+	// Now store the edge vertices in the array
+
+	unsigned long long nVertex = 0;
+
+	for (auto point : commonEdges)
+	{
+		points->at(nVertex).set(point.x(), point.y(), point.z());
+		nVertex += 1;
+	}
+
+	osg::Node* edgeNode = buildEdgesOSGNode(nEdges, points.get(), r, g, b, 1.0, false);
+
+	if (edgeNode != nullptr)
+	{
+		edgeNode->setNodeMask(getShapeNode()->getNodeMask() & ~1);  // Reset last bit of node mask
+	}
+
+	return edgeNode;
+}
+
 void SceneNodeGeometry::updateObjectColor(double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective)
 {
 	// First, update the color of the triangles
@@ -1098,3 +1221,19 @@ std::string SceneNodeGeometry::getFaceNameFromId(unsigned long long faceId)
 	return "";
 }
 
+void SceneNodeGeometry::setHighlightNode(osg::Node* highlight)
+{
+	if (getShapeNode() == nullptr) return;
+
+	if (highlightNode != nullptr)
+	{
+		getShapeNode()->removeChild(highlightNode);
+		highlightNode = nullptr;
+	}
+
+	if (highlight != nullptr)
+	{
+		getShapeNode()->addChild(highlight);
+		highlightNode = highlight;
+	}
+}
