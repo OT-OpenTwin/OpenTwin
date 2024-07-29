@@ -2252,6 +2252,7 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 			std::string secondText = allowMultipleSelection ? " (press RETURN to complete or ESC to cancel)" : " (press ESC to cancel)";
 
 			viewer->setOverlayText(firstText + selectionMessage + secondText);
+			viewer->setFreezeWorkingPlane(true);
 		}
 
 		if (!viewerList.empty())
@@ -2276,6 +2277,7 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 			std::string secondText = allowMultipleSelection ? " (press RETURN to complete or ESC to cancel)" : " (press ESC to cancel)";
 
 			viewer->setOverlayText(firstText + selectionMessage + secondText);
+			viewer->setFreezeWorkingPlane(true);
 		}
 
 		if (!viewerList.empty())
@@ -2300,6 +2302,7 @@ void Model::enterEntitySelectionMode(ot::serviceID_t replyTo, const std::string 
 			std::string secondText = allowMultipleSelection ? " (press RETURN to complete or ESC to cancel)" : " (press ESC to cancel)";
 
 			viewer->setOverlayText(firstText + selectionMessage + secondText);
+			viewer->setFreezeWorkingPlane(true);
 		}
 
 		if (!viewerList.empty())
@@ -2450,6 +2453,7 @@ void Model::endCurrentSelectionMode(bool cancelled)
 		for (auto viewer : viewerList)
 		{
 			viewer->removeOverlay();
+			viewer->setFreezeWorkingPlane(false);
 		}
 	}
 

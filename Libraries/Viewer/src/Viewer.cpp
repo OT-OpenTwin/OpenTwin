@@ -98,7 +98,8 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	clipPlaneManipulator(nullptr),
 	overlayTextNode(nullptr),
 	mouseCursorX(0.0),
-	mouseCursorY(0.0)
+	mouseCursorY(0.0),
+	freezeWorkingPlane(false)
 {
 	model = ViewerAPI::getModelFromID(modelID);
 	assert(model != nullptr);
@@ -330,12 +331,15 @@ void Viewer::refresh(bool _ignoreUpdateSettingsRequest)
 	}
 	busy = true;
 	
-	if (workingPlane) { 
-		if (workingPlane->refreshAfterModelChange() && !_ignoreUpdateSettingsRequest) {
-			getNotifier()->updateSettings(createSettings());
+	if (!getFreezeWorkingPlane())
+	{
+		if (workingPlane) {
+			if (workingPlane->refreshAfterModelChange() && !_ignoreUpdateSettingsRequest) {
+				getNotifier()->updateSettings(createSettings());
+			}
 		}
+		if (axisCenterCross) { axisCenterCross->refreshAfterGeometryChange(); }
 	}
-	if (axisCenterCross) { axisCenterCross->refreshAfterGeometryChange(); }
 
 	if (lastPlotEmpty)
 	{

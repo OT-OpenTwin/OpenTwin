@@ -679,8 +679,8 @@ void SceneNodeGeometry::createOSGNodeFromEdges(double colorRGB[3], std::list<Geo
 	}
 
 	// Now build the osg nodes for the edge and the selected edge
-	edgesNode = buildEdgesOSGNode(nEdges, vertices.get(), colorRGB[0], colorRGB[1], colorRGB[2], edgeTranspacency, true);
-	edgesHighlightedNode = buildEdgesOSGNode(nEdges, vertices.get(), 1.0, 0.0, 0.0, 1.0, false);
+	edgesNode = buildEdgesOSGNode(nEdges, vertices.get(), colorRGB[0], colorRGB[1], colorRGB[2], edgeTranspacency, true, 1.0);
+	edgesHighlightedNode = buildEdgesOSGNode(nEdges, vertices.get(), 1.0, 0.0, 0.0, 1.0, false, 1.0);
 
 	if (!backFaceCulling)
 	{
@@ -718,7 +718,7 @@ void SceneNodeGeometry::createOSGNodeFromEdges(double colorRGB[3], std::list<Geo
 			}
 		}
 
-		osg::Node *faceEdgesNode = buildEdgesOSGNode(nEdges, vertices.get(), 1.0, 0.0, 0.0, 1.0, false);
+		osg::Node *faceEdgesNode = buildEdgesOSGNode(nEdges, vertices.get(), 1.0, 0.0, 0.0, 1.0, false, 1.0);
 
 		faceEdgesHighlight[faceEdges.first] = faceEdgesNode;
 		faceEdgesHighlightNode->addChild(faceEdgesNode);
@@ -816,7 +816,7 @@ ot::UID SceneNodeGeometry::getFaceIdFromEdgePrimitiveIndex(unsigned long long hi
 }
 
 
-osg::Node *SceneNodeGeometry::buildEdgesOSGNode(unsigned long long nEdges, osg::Vec3Array *vertices, double r, double g, double b, double transp, bool depthTest)
+osg::Node *SceneNodeGeometry::buildEdgesOSGNode(unsigned long long nEdges, osg::Vec3Array *vertices, double r, double g, double b, double transp, bool depthTest, double width)
 {
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
 	colors->push_back(osg::Vec4(r, g, b, transp));
@@ -863,7 +863,7 @@ osg::Node *SceneNodeGeometry::buildEdgesOSGNode(unsigned long long nEdges, osg::
 	ss->setMode(GL_BLEND, osg::StateAttribute::OFF);
 	ss->setAttributeAndModes(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE));
 	ss->setMode(GL_LINE_SMOOTH, osg::StateAttribute::ON);
-	ss->setAttribute(new osg::LineWidth(1.0), osg::StateAttribute::ON);
+	ss->setAttribute(new osg::LineWidth(width), osg::StateAttribute::ON);
 
 	if (!depthTest)
 	{
@@ -990,7 +990,7 @@ osg::Node* SceneNodeGeometry::getEdgeHighlightNode(unsigned long long faceId1, u
 		nVertex += 1;
 	}
 
-	osg::Node* edgeNode = buildEdgesOSGNode(nEdges, points.get(), r, g, b, 1.0, false);
+	osg::Node* edgeNode = buildEdgesOSGNode(nEdges, points.get(), r, g, b, 1.0, false, 1.0);
 
 	if (edgeNode != nullptr)
 	{

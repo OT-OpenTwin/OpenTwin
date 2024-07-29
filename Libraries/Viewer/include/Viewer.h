@@ -122,6 +122,9 @@ public:
 
 	void setCursorText(const std::string& text);
 
+	void setFreezeWorkingPlane(bool flag) { freezeWorkingPlane = flag; }
+	bool getFreezeWorkingPlane() { return freezeWorkingPlane; }
+
 private Q_SLOTS:
 	void slotColorStyleChanged(const ot::ColorStyle& _style);
 	void slotUpdateViewerSettings(void);
@@ -237,4 +240,6 @@ private:
 	int viewColorAutoBackgroundR;
 	int viewColorAutoBackgroundG;
 	int viewColorAutoBackgroundB;
+
+	bool freezeWorkingPlane;
 };

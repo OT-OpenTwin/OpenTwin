@@ -97,7 +97,7 @@ private:
 	void deleteShapeNode(void);
 	osg::Node *createOSGNodeFromTriangles(double colorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, bool backFaceCulling, double offsetFactor, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles);
 	void       createOSGNodeFromEdges(double colorRGB[3], std::list<Geometry::Edge> &edges, osg::Node *&edgesNode, osg::Node *&edgesHighlightedNode, osg::Switch *&faceEdgesHighlightNode);
-	osg::Node *buildEdgesOSGNode(unsigned long long nEdges, osg::Vec3Array *vertices, double r, double g, double b, double transp, bool depthTest);
+	osg::Node *buildEdgesOSGNode(unsigned long long nEdges, osg::Vec3Array *vertices, double r, double g, double b, double transp, bool depthTest, double width);
 	void assignTexture(osg::Geometry *geometry, const std::string &textureType, bool reflective, double r, double g, double b);
 	void updateWireframeState(bool visible, bool wireframe, bool transparent);
 	void setVisibleState(bool visible, bool transparent, bool wireframe);
