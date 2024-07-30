@@ -93,6 +93,9 @@ public:
 	virtual bool isItem1D(void) { return false; };
 	virtual bool isItem3D(void) { return true; };
 
+	osg::Node* addSelectedEdge(unsigned long long faceId1, unsigned long long faceId2);
+	void removeSelectedEdge(osg::Node* selected);
+
 private:
 	void deleteShapeNode(void);
 	osg::Node *createOSGNodeFromTriangles(double colorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, bool backFaceCulling, double offsetFactor, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles);
@@ -103,7 +106,7 @@ private:
 	void setVisibleState(bool visible, bool transparent, bool wireframe);
 	void updateTransparentState(bool visible, bool transparent, bool wireframe);
 	void applyParentTransform(void);
-	osg::Node* getEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2);
+	osg::Node* getEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2, double lineWidth);
 
 	osg::Node   *      triangles;
 	osg::Node   *      edges;

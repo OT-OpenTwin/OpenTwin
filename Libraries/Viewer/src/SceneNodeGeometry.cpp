@@ -880,11 +880,11 @@ osg::Node *SceneNodeGeometry::buildEdgesOSGNode(unsigned long long nEdges, osg::
 
 void SceneNodeGeometry::setEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2)
 {
-	osg::Node* highlightNode = getEdgeHighlightNode(faceId1, faceId2);
+	osg::Node* highlightNode = getEdgeHighlightNode(faceId1, faceId2, 1.0);
 	setHighlightNode(highlightNode);
 }
 
-osg::Node* SceneNodeGeometry::getEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2)
+osg::Node* SceneNodeGeometry::getEdgeHighlightNode(unsigned long long faceId1, unsigned long long faceId2, double lineWidth)
 {
 	if (edges == nullptr) return nullptr;
 
@@ -990,7 +990,7 @@ osg::Node* SceneNodeGeometry::getEdgeHighlightNode(unsigned long long faceId1, u
 		nVertex += 1;
 	}
 
-	osg::Node* edgeNode = buildEdgesOSGNode(nEdges, points.get(), r, g, b, 1.0, false, 1.0);
+	osg::Node* edgeNode = buildEdgesOSGNode(nEdges, points.get(), r, g, b, 1.0, false, lineWidth);
 
 	if (edgeNode != nullptr)
 	{
@@ -1236,4 +1236,22 @@ void SceneNodeGeometry::setHighlightNode(osg::Node* highlight)
 		getShapeNode()->addChild(highlight);
 		highlightNode = highlight;
 	}
+}
+
+void SceneNodeGeometry::removeSelectedEdge(osg::Node* selected)
+{
+	if (getShapeNode() == nullptr) return;
+
+	getShapeNode()->removeChild(selected);
+}
+
+osg::Node* SceneNodeGeometry::addSelectedEdge(unsigned long long faceId1, unsigned long long faceId2)
+{
+	if (getShapeNode() == nullptr) return nullptr;
+
+	osg::Node* selected = getEdgeHighlightNode(faceId1, faceId2, 3.0);
+
+	getShapeNode()->addChild(selected);
+
+	return selected;
 }

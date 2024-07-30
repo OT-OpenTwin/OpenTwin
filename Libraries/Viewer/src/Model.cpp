@@ -2393,6 +2393,19 @@ void Model::processCurrentSelectionMode(osgUtil::Intersector *intersector, doubl
 		}
 		break;
 	}
+	case EDGE:
+	{
+		clearHoverView();
+
+		osg::Vec3d intersectionPoint;
+		unsigned long long faceId1 = 0, faceId2 = 0;
+		SceneNodeGeometry* selectedItem = dynamic_cast<SceneNodeGeometry*> (findSelectedItemByPolytope(intersector, sceneRadius, intersectionPoint, faceId1, faceId2));
+		if (selectedItem != nullptr)
+		{
+			edgeSelected(selectedItem->getModelEntityID(), intersectionPoint.x(), intersectionPoint.y(), intersectionPoint.z(), selectedItem, faceId1, faceId2);
+		}
+		break;
+	}
 	case SHAPE:
 	{
 		osg::Vec3d intersectionPoint;
@@ -2409,6 +2422,12 @@ void Model::processCurrentSelectionMode(osgUtil::Intersector *intersector, doubl
 void Model::escapeKeyPressed(void)
 {
 	currentFaceSelection.clear();
+
+	for (auto edge : currentEdgeSelection)
+	{
+		edge.getSelectedItem()->removeSelectedEdge(edge.getNode());
+	}
+	currentEdgeSelection.clear();
 
 	endCurrentSelectionMode(true);
 
@@ -2583,6 +2602,45 @@ void Model::faceSelected(unsigned long long modelID, double x, double y, double 
 		setSelectedFacesHighlight(selectedItem, faceId, true);
 	}
 
+	// If multiselection is not active, we end the selection mode now
+	if (!currentSelectionMultiple) endCurrentSelectionMode(false);
+}
+
+void Model::edgeSelected(unsigned long long modelID, double x, double y, double z, SceneNodeGeometry* selectedItem, unsigned long long faceId1, unsigned long long faceId2)
+{
+	if (selectedItem == nullptr) return;
+
+	// Check whether the face is already in the selected list
+	bool addEdge = true;
+	for (auto edge : currentEdgeSelection)
+	{
+		if (edge.getSelectedItem() == selectedItem && (   faceId1 == edge.getFaceId1() && faceId2 == edge.getFaceId2()
+													   || faceId1 == edge.getFaceId2() && faceId2 == edge.getFaceId1()))
+		{
+			addEdge = false;
+			edge.getSelectedItem()->removeSelectedEdge(edge.getNode());
+
+			currentEdgeSelection.remove(edge);
+
+			refreshAllViews();
+			break;
+		}
+	}
+
+	if (addEdge)
+	{
+		// Store face selection in list
+		EdgeSelection selection;
+		selection.setData(modelID, x, y, z);
+		selection.setSelectedItem(selectedItem);
+		selection.setFaceIds(faceId1, faceId2);
+		selection.setNode(selectedItem->addSelectedEdge(faceId1, faceId2));
+
+		currentEdgeSelection.push_back(selection);
+
+		refreshAllViews();
+	}
+	
 	// If multiselection is not active, we end the selection mode now
 	if (!currentSelectionMultiple) endCurrentSelectionMode(false);
 }
