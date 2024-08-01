@@ -72,23 +72,25 @@ void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::P
 	auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), *classFactory);
 	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
 	
+	
+
 	//Here I will update the rotation
-	//auto propertyBase = blockEnt->getProperties().getProperty("Rotation");
-	//auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
-	//propertyRotation->setValue(transform.getRotation());
-	//const std::string group = "Transform-Properties";
-	//blockEnt->getProperties().updateProperty(propertyRotation, group);
+	
+	auto propertyBase = blockEnt->getProperties().getProperty("Rotation");
+	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	propertyRotation->setValue(transform.getRotation());
+	
 
 	//Here I update the Flip
-	//std::map<ot::Transform::FlipState, std::string > stringFlipMap;
-	//stringFlipMap.insert_or_assign(ot::Transform::NoFlip, "NoFlip");
-	//stringFlipMap.insert_or_assign(ot::Transform::FlipVertically,"FlipVertically" );
-	//stringFlipMap.insert_or_assign(ot::Transform::FlipHorizontally,"FlipHorizontally" );
+	std::map<ot::Transform::FlipState, std::string > stringFlipMap;
+	stringFlipMap.insert_or_assign(ot::Transform::NoFlip, "NoFlip");
+	stringFlipMap.insert_or_assign(ot::Transform::FlipVertically,"FlipVertically" );
+	stringFlipMap.insert_or_assign(ot::Transform::FlipHorizontally,"FlipHorizontally" );
 
-	//auto propertyBaseFlip = blockEnt->getProperties().getProperty("Flip");
-	//auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
-	//propertyFlip->setValue(stringFlipMap[transform.getFlipStateFlags()]);
-	//blockEnt->getProperties().updateProperty(propertyFlip, group);
+	auto propertyBaseFlip = blockEnt->getProperties().getProperty("Flip");
+	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBaseFlip);
+	propertyFlip->setValue(stringFlipMap[transform.getFlipStateFlags()]);
+	
 
 
 	
@@ -100,10 +102,13 @@ void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::P
 	std::unique_ptr<EntityCoordinates2D> coordinateEnt(dynamic_cast<EntityCoordinates2D*>(entBase));
 	coordinateEnt->setCoordinates(position);
 	coordinateEnt->StoreToDataBase();
-	//blockEnt->StoreToDataBase();
-
+	blockEnt->StoreToDataBase();
+	
 	_modelComponent->addEntitiesToModel({}, {}, {}, {coordinateEnt->getEntityID()}, {coordinateEnt->getEntityStorageVersion()}, {blockID}, "Update BlockItem position");
-
+	const std::string comment = "Property Updated";
+	ot::UIDList topoList{blockEnt->getEntityID()};
+	ot::UIDList versionList{blockEnt->getEntityStorageVersion()};
+	_modelComponent->updateTopologyEntities(topoList, versionList, comment);
 }
 
 
