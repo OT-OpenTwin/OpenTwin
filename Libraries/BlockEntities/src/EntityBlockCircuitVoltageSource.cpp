@@ -10,7 +10,7 @@
 #include "OTGui/GraphicsItemFileCfg.h"
 
 EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlock(ID, parent, obs, ms, factory, owner)
+	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
 {
 	_navigationTreeIconName = "VoltageSource";
 	_navigationTreeIconNameHidden = "VoltageSource";
@@ -31,7 +31,7 @@ void EntityBlockCircuitVoltageSource::createProperties()
 	createDCProperties();
 	createTRANProperties();
 	createACProperties();
-	createTransformProperties();
+	//createTransformProperties();
 
 
 
@@ -44,12 +44,12 @@ void EntityBlockCircuitVoltageSource::createProperties()
 
 
 
-void EntityBlockCircuitVoltageSource::createTransformProperties() {
-
-	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0,"default", getProperties());
-	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
-	
-}
+//void EntityBlockCircuitVoltageSource::createTransformProperties() {
+//
+//	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0,"default", getProperties());
+//	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
+//	
+//}
 
 void EntityBlockCircuitVoltageSource::createTRANProperties() {
 

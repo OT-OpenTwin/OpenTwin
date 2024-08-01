@@ -1,18 +1,20 @@
-#include "EntityBlock.h"
-class __declspec(dllexport) EntityBlockCircuitDiode : public EntityBlock
+#include "EntityBlockCircuitElement.h"
+class __declspec(dllexport) EntityBlockCircuitDiode : public EntityBlockCircuitElement
 {
 public:
 	EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockCircuitDiode"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
-	void createProperties();
+	virtual void createProperties() override;
 	std::string getElementType();
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 
+	double getRotation();
+	std::string getFlip();
 	const ot::Connector getLeftConnector() const { return m_LeftConnector; }
 	const ot::Connector getRightConnector() const { return m_RightConnector; }
-
+	virtual bool updateFromProperties(void) override;
 private:
 
 	ot::Connector m_LeftConnector;

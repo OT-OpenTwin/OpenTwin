@@ -18,6 +18,7 @@
 #include "EntityBlockCircuitCurrentMeter.h"
 #include "EntityBlockCircuitCapacitor.h"
 #include "EntityBlockCircuitInductor.h"
+#include "EntityBlockCircuitElement.h"
 // Third Party Header
 
 //C++

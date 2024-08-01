@@ -1,19 +1,21 @@
 #pragma once
-#include "EntityBlock.h"
-class __declspec(dllexport) EntityBlockCircuitCapacitor : public EntityBlock
+#include "EntityBlockCircuitElement.h"
+class __declspec(dllexport) EntityBlockCircuitCapacitor : public EntityBlockCircuitElement
 {
 public:
 	EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockCircuitCapacitor"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
-	void createProperties();
+	virtual void createProperties() override;
 	std::string getElementType();
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 
+	double getRotation();
+	std::string getFlip();
 	const ot::Connector getLeftConnector() const { return m_LeftConnector; }
 	const ot::Connector getRightConnector() const { return m_RightConnector; }
-
+	virtual bool updateFromProperties(void) override;
 private:
 
 	ot::Connector m_LeftConnector;

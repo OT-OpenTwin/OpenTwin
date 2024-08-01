@@ -9,7 +9,7 @@
 #include "OTGui/GraphicsEllipseItemCfg.h"
 
 EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlock(ID, parent, obs, ms, factory, owner)
+	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
 {
 	_navigationTreeIconName = "CurrentMeter";
 	_navigationTreeIconNameHidden = "CurrentMeter";
@@ -22,6 +22,12 @@ EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, Entit
 	const std::string connectorNameRight = "Right6";
 	m_RightConnector = { ot::ConnectorType::In,connectorNameRight,connectorNameRight };
 	_connectorsByName[connectorNameRight] = m_RightConnector;
+}
+
+void EntityBlockCircuitCurrentMeter::createProperties()
+{
+	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
+	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
 }
 
 ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg()

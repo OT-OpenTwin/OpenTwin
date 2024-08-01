@@ -10,7 +10,7 @@
 #include "OTGui/GraphicsItemFileCfg.h"
 
 EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner) 
-	:EntityBlock(ID, parent, obs, ms, factory, owner)
+	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
 {
 
 	_navigationTreeIconName = "Diod2";
@@ -29,6 +29,37 @@ void EntityBlockCircuitDiode::createProperties()
 {
 	EntityPropertiesString::createProperty("Element Property", "Model", "D1N4148", "default", getProperties());
 }
+
+double EntityBlockCircuitDiode::getRotation()
+{
+	auto propertyBase = getProperties().getProperty("Rotation");
+	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double value = propertyRotation->getValue();
+	return value;
+}
+
+std::string EntityBlockCircuitDiode::getFlip()
+{
+	auto propertyBase = getProperties().getProperty("Flip");
+	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	assert(propertyBase != nullptr);
+	std::string value = propertyFlip->getValue();
+	return value;
+}
+
+bool EntityBlockCircuitDiode::updateFromProperties(void)
+{
+	bool refresh = false;
+
+	if (refresh) {
+		getProperties().forceResetUpdateForAllProperties();
+
+	}
+	CreateBlockItem();
+	return refresh;
+}
+
 
 std::string EntityBlockCircuitDiode::getElementType()
 {
@@ -49,6 +80,26 @@ ot::GraphicsItemCfg* EntityBlockCircuitDiode::CreateBlockCfg()
 	newConfig->setFile("Circuit/Diode.ot.json");
 	newConfig->addStringMapEntry("Name", "D1");
 	//newConfig->setTransform(ot::Transform(90., ot::Transform::FlipHorizontally));
+
+	//Map of String to Enum
+	std::map<std::string, ot::Transform::FlipState> stringFlipMap;
+	stringFlipMap.insert_or_assign("NoFlip", ot::Transform::NoFlip);
+	stringFlipMap.insert_or_assign("FlipVertically", ot::Transform::FlipVertically);
+	stringFlipMap.insert_or_assign("FlipHorizontally", ot::Transform::FlipHorizontally);
+
+
+
+	double rotation = getRotation();
+	std::string flip = getFlip();
+	ot::Transform::FlipState flipState(stringFlipMap[flip]);
+
+
+	ot::Transform transform;
+	transform.setRotation(rotation);
+	transform.setFlipState(flipState);
+	newConfig->setTransform(transform);
+
+	
 	return newConfig;
 #endif
 

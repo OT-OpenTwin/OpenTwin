@@ -1,11 +1,11 @@
 #pragma once
-#include "EntityBlock.h"
-class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock {
+#include "EntityBlockCircuitElement.h"
+class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlockCircuitElement {
 	public:
 		EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 		virtual std::string getClassName(void) override { return "EntityBlockCircuitVoltageSource"; };
 		virtual entityType getEntityType(void) override { return TOPOLOGY; };
-		void createProperties();
+		virtual void createProperties() override;
 		std::string getVoltage();
 		std::string getType();
 		std::string getFunction();
@@ -29,7 +29,7 @@ class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock
 		ot::Connector m_RightConnector;
 
 
-		void createTransformProperties();
+		/*void createTransformProperties();*/
 		void createTRANProperties();
 		void createACProperties();
 		void createDCProperties();

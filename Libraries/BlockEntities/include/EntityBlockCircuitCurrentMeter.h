@@ -1,12 +1,12 @@
 #pragma once
-#include "EntityBlock.h"
-class __declspec(dllexport) EntityBlockCircuitCurrentMeter : public EntityBlock
+#include "EntityBlockCircuitElement.h"
+class __declspec(dllexport) EntityBlockCircuitCurrentMeter : public EntityBlockCircuitElement
 {
 public:
 	EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockCircuitCurrentMeter"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
-	//void createProperties();
+	void createProperties() override;
 	//std::string getElementType();
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;

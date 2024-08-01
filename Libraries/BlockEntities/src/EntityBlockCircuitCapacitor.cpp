@@ -10,7 +10,7 @@
 #include "OTGui/GraphicsItemFileCfg.h"
 
 EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlock(ID, parent, obs, ms, factory, owner)
+	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
 {
 	_navigationTreeIconName = "Capacitor";
 	_navigationTreeIconNameHidden = "Capacitor";
@@ -30,6 +30,35 @@ void EntityBlockCircuitCapacitor::createProperties()
 	EntityPropertiesString::createProperty("Element Property", "Capacity", "10uF", "default", getProperties());
 }
 
+double EntityBlockCircuitCapacitor::getRotation()
+{
+	auto propertyBase = getProperties().getProperty("Rotation");
+	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double value = propertyRotation->getValue();
+	return value;
+}
+
+std::string EntityBlockCircuitCapacitor::getFlip()
+{
+	auto propertyBase = getProperties().getProperty("Flip");
+	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	assert(propertyBase != nullptr);
+	std::string value = propertyFlip->getValue();
+	return value;
+}
+
+bool EntityBlockCircuitCapacitor::updateFromProperties(void)
+{
+	bool refresh = false;
+
+	if (refresh) {
+		getProperties().forceResetUpdateForAllProperties();
+
+	}
+	CreateBlockItem();
+	return refresh;
+}
 
 std::string EntityBlockCircuitCapacitor::getElementType()
 {
@@ -49,7 +78,26 @@ ot::GraphicsItemCfg* EntityBlockCircuitCapacitor::CreateBlockCfg()
 	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState);
 	newConfig->setFile("Circuit/Capacitor.ot.json");
 	newConfig->addStringMapEntry("Name", "C1");
-	//newConfig->setTransform(ot::Transform(90., ot::Transform::FlipHorizontally));
+	
+
+	//Map of String to Enum
+	std::map<std::string, ot::Transform::FlipState> stringFlipMap;
+	stringFlipMap.insert_or_assign("NoFlip", ot::Transform::NoFlip);
+	stringFlipMap.insert_or_assign("FlipVertically", ot::Transform::FlipVertically);
+	stringFlipMap.insert_or_assign("FlipHorizontally", ot::Transform::FlipHorizontally);
+
+
+
+	double rotation = getRotation();
+	std::string flip = getFlip();
+	ot::Transform::FlipState flipState(stringFlipMap[flip]);
+
+
+	ot::Transform transform;
+	transform.setRotation(rotation);
+	transform.setFlipState(flipState);
+	newConfig->setTransform(transform);
+
 	return newConfig;
 #endif
 	ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
