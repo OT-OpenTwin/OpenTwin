@@ -7,6 +7,7 @@
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/GraphicsGridLayoutItemCfg.h"
 #include "OTGui/GraphicsEllipseItemCfg.h"
+#include "OTGui/GraphicsItemFileCfg.h"
 
 EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
@@ -30,8 +31,57 @@ void EntityBlockCircuitCurrentMeter::createProperties()
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
 }
 
+double EntityBlockCircuitCurrentMeter::getRotation()
+{
+	auto propertyBase = getProperties().getProperty("Rotation");
+	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+	assert(propertyBase != nullptr);
+	double value = propertyRotation->getValue();
+	return value;
+}
+
+std::string EntityBlockCircuitCurrentMeter::getFlip()
+{
+	auto propertyBase = getProperties().getProperty("Flip");
+	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
+	assert(propertyBase != nullptr);
+	std::string value = propertyFlip->getValue();
+	return value;
+}
+
+#define TEST_ITEM_LOADER true
 ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg()
 {
+#if TEST_ITEM_LOADER==true
+	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
+	newConfig->setName("EntityBlockCircuitInductor");
+	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState);
+	newConfig->setFile("Circuit/AmpereMeter.ot.json");
+	newConfig->addStringMapEntry("Name", "AM1");
+	//newConfig->setTransform(ot::Transform(90., ot::Transform::FlipHorizontally));
+
+	//Map of String to Enum
+	std::map<std::string, ot::Transform::FlipState> stringFlipMap;
+	stringFlipMap.insert_or_assign("NoFlip", ot::Transform::NoFlip);
+	stringFlipMap.insert_or_assign("FlipVertically", ot::Transform::FlipVertically);
+	stringFlipMap.insert_or_assign("FlipHorizontally", ot::Transform::FlipHorizontally);
+
+
+
+	double rotation = getRotation();
+	std::string flip = getFlip();
+	ot::Transform::FlipState flipState(stringFlipMap[flip]);
+
+
+	ot::Transform transform;
+	transform.setRotation(rotation);
+	transform.setFlipState(flipState);
+	newConfig->setTransform(transform);
+
+
+	return newConfig;
+
+#endif
 	ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
 	
 	myStack->setName("EntityBlock");
@@ -79,6 +129,18 @@ ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg()
 	myLayout->addChildItem(connection2);
 
 	return myStack;
+}
+
+bool EntityBlockCircuitCurrentMeter::updateFromProperties(void)
+{
+	bool refresh = false;
+
+	if (refresh) {
+		getProperties().forceResetUpdateForAllProperties();
+
+	}
+	CreateBlockItem();
+	return refresh;
 }
 
 void EntityBlockCircuitCurrentMeter::AddStorageData(bsoncxx::builder::basic::document& storage)
