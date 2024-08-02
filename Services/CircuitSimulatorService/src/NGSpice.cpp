@@ -565,26 +565,44 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		
 
 		//From behind
+		if (element.getItemName() == "Voltage Source") {
+			auto connections = element.getList();
+			std::vector<Connection> tempVector(connections.begin(), connections.end());
+			std::reverse(tempVector.begin(), tempVector.end());
+			std::unordered_set<std::string> temp;
+			for (auto conn : tempVector)
+			{
+				if (conn.getNodeNumber() == "voltageMeterConnection")
+				{
+					continue;
+				}
+				else if (temp.find(conn.getNodeNumber()) != temp.end())
+				{
+					continue;
+				}
+				netlistNodeNumbers += conn.getNodeNumber() + " ";
+				temp.insert(conn.getNodeNumber());
+			}
 
-		auto connections = element.getList();
-		std::vector<Connection> tempVector(connections.begin(), connections.end());
-		std::reverse(tempVector.begin(), tempVector.end());
-		std::unordered_set<std::string> temp;
-		for (auto conn : tempVector)
-		{
-			if (conn.getNodeNumber() == "voltageMeterConnection")
-			{
-				continue;
-			}
-			else if (temp.find(conn.getNodeNumber()) != temp.end())
-			{
-				continue;
-			}
-			netlistNodeNumbers += conn.getNodeNumber() + " ";
-			temp.insert(conn.getNodeNumber());
+			temp.clear();
 		}
+		else {
+			std::unordered_set<std::string> temp;
+			for (auto conn : element.getList())	{
+				if (conn.getNodeNumber() == "voltageMeterConnection") {
+					continue;
+				}
+				else if (temp.find(conn.getNodeNumber()) != temp.end()) {
+					continue;
+				}
+				netlistNodeNumbers += conn.getNodeNumber() + " ";
+				temp.insert(conn.getNodeNumber());
 
-		temp.clear();
+			}
+			temp.clear();
+		}
+		
+	
 
 		netlistLine += netlistNodeNumbers;
 
