@@ -12,8 +12,7 @@
 #include "OTGui/StyleRefPainter2D.h"
 
 EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
-{
+	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner) {
 	_navigationTreeIconName = "ResistorBG";
 	_navigationTreeIconNameHidden = "ResistorBG";
 	_blockTitle = "Resistor";
@@ -28,13 +27,11 @@ EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* p
 
 }
 
-void EntityBlockCircuitResistor::createProperties()
-{
+void EntityBlockCircuitResistor::createProperties() {
 	EntityPropertiesString::createProperty("Element Property", "ElementType", "200", "default", getProperties());
 }
 
-double EntityBlockCircuitResistor::getRotation()
-{
+double EntityBlockCircuitResistor::getRotation() {
 	auto propertyBase = getProperties().getProperty("Rotation");
 	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
 	assert(propertyBase != nullptr);
@@ -42,8 +39,7 @@ double EntityBlockCircuitResistor::getRotation()
 	return value;
 }
 
-std::string EntityBlockCircuitResistor::getFlip()
-{
+std::string EntityBlockCircuitResistor::getFlip() {
 	auto propertyBase = getProperties().getProperty("Flip");
 	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
 	assert(propertyBase != nullptr);
@@ -51,8 +47,7 @@ std::string EntityBlockCircuitResistor::getFlip()
 	return value;
 }
 
-std::string EntityBlockCircuitResistor::getElementType()
-{
+std::string EntityBlockCircuitResistor::getElementType() {
 	auto propertyBase = getProperties().getProperty("ElementType");
 	auto elementType = dynamic_cast<EntityPropertiesString*>(propertyBase);
 	assert(elementType != nullptr);
@@ -60,8 +55,7 @@ std::string EntityBlockCircuitResistor::getElementType()
 	return elementType->getValue();
 }
 #define TEST_ITEM_LOADER true
-ot::GraphicsItemCfg* EntityBlockCircuitResistor::CreateBlockCfg()
-{
+ot::GraphicsItemCfg* EntityBlockCircuitResistor::CreateBlockCfg() {
 #if TEST_ITEM_LOADER==true
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
 	newConfig->setName("EntityBlockCircuitResistor");

@@ -30,8 +30,7 @@ void EntityBlockCircuitDiode::createProperties()
 	EntityPropertiesString::createProperty("Element Property", "Model", "D1N4148", "default", getProperties());
 }
 
-double EntityBlockCircuitDiode::getRotation()
-{
+const double EntityBlockCircuitDiode::getRotation() {
 	auto propertyBase = getProperties().getProperty("Rotation");
 	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
 	assert(propertyBase != nullptr);
@@ -39,8 +38,7 @@ double EntityBlockCircuitDiode::getRotation()
 	return value;
 }
 
-std::string EntityBlockCircuitDiode::getFlip()
-{
+const std::string EntityBlockCircuitDiode::getFlip() {
 	auto propertyBase = getProperties().getProperty("Flip");
 	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
 	assert(propertyBase != nullptr);

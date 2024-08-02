@@ -25,14 +25,12 @@ EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, Entit
 	_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
-void EntityBlockCircuitVoltageMeter::createProperties()
-{
+void EntityBlockCircuitVoltageMeter::createProperties() {
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
 }
 
-double EntityBlockCircuitVoltageMeter::getRotation()
-{
+double EntityBlockCircuitVoltageMeter::getRotation() {
 	auto propertyBase = getProperties().getProperty("Rotation");
 	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
 	assert(propertyBase != nullptr);
@@ -40,8 +38,7 @@ double EntityBlockCircuitVoltageMeter::getRotation()
 	return value;
 }
 
-std::string EntityBlockCircuitVoltageMeter::getFlip()
-{
+std::string EntityBlockCircuitVoltageMeter::getFlip() {
 	auto propertyBase = getProperties().getProperty("Flip");
 	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
 	assert(propertyBase != nullptr);
@@ -50,8 +47,7 @@ std::string EntityBlockCircuitVoltageMeter::getFlip()
 }
 
 #define TEST_ITEM_LOADER true
-ot::GraphicsItemCfg* EntityBlockCircuitVoltageMeter::CreateBlockCfg()
-{
+ot::GraphicsItemCfg* EntityBlockCircuitVoltageMeter::CreateBlockCfg() {
 #if TEST_ITEM_LOADER==true
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
 	newConfig->setName("EntityBlockCircuitInductor");

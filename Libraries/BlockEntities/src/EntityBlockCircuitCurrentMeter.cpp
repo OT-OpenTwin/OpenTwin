@@ -10,8 +10,7 @@
 #include "OTGui/GraphicsItemFileCfg.h"
 
 EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
-{
+	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner) {
 	_navigationTreeIconName = "CurrentMeter";
 	_navigationTreeIconNameHidden = "CurrentMeter";
 	_blockTitle = "Current Meter";
@@ -25,14 +24,12 @@ EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, Entit
 	_connectorsByName[connectorNameRight] = m_RightConnector;
 }
 
-void EntityBlockCircuitCurrentMeter::createProperties()
-{
+void EntityBlockCircuitCurrentMeter::createProperties() {
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
 }
 
-double EntityBlockCircuitCurrentMeter::getRotation()
-{
+const double EntityBlockCircuitCurrentMeter::getRotation() {
 	auto propertyBase = getProperties().getProperty("Rotation");
 	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
 	assert(propertyBase != nullptr);
@@ -40,8 +37,7 @@ double EntityBlockCircuitCurrentMeter::getRotation()
 	return value;
 }
 
-std::string EntityBlockCircuitCurrentMeter::getFlip()
-{
+ const std::string EntityBlockCircuitCurrentMeter::getFlip() {
 	auto propertyBase = getProperties().getProperty("Flip");
 	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
 	assert(propertyBase != nullptr);
@@ -50,8 +46,7 @@ std::string EntityBlockCircuitCurrentMeter::getFlip()
 }
 
 #define TEST_ITEM_LOADER true
-ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg()
-{
+ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg() {
 #if TEST_ITEM_LOADER==true
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
 	newConfig->setName("EntityBlockCircuitInductor");
@@ -131,8 +126,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitCurrentMeter::CreateBlockCfg()
 	return myStack;
 }
 
-bool EntityBlockCircuitCurrentMeter::updateFromProperties(void)
-{
+bool EntityBlockCircuitCurrentMeter::updateFromProperties(void) {
 	bool refresh = false;
 
 	if (refresh) {
@@ -143,12 +137,10 @@ bool EntityBlockCircuitCurrentMeter::updateFromProperties(void)
 	return refresh;
 }
 
-void EntityBlockCircuitCurrentMeter::AddStorageData(bsoncxx::builder::basic::document& storage)
-{
+void EntityBlockCircuitCurrentMeter::AddStorageData(bsoncxx::builder::basic::document& storage) {
 	EntityBlock::AddStorageData(storage);
 }
 
-void EntityBlockCircuitCurrentMeter::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
-{
+void EntityBlockCircuitCurrentMeter::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }

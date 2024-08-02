@@ -9,8 +9,8 @@ public:
 	void createProperties() override;
 	//std::string getElementType();
 
-	double getRotation();
-	std::string getFlip();
+	const double getRotation();
+	const std::string getFlip();
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 	virtual bool updateFromProperties(void) override;
 	const ot::Connector getLeftConnector() const { return m_LeftConnector; }

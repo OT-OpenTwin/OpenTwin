@@ -10,8 +10,7 @@
 #include "OTGui/GraphicsItemFileCfg.h"
 
 EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
-{
+	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner) {
 	_navigationTreeIconName = "VoltageSource";
 	_navigationTreeIconNameHidden = "VoltageSource";
 	_blockTitle = "Voltage Source";
@@ -26,8 +25,7 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 
 }
 
-void EntityBlockCircuitVoltageSource::createProperties()
-{
+void EntityBlockCircuitVoltageSource::createProperties() {
 	createDCProperties();
 	createTRANProperties();
 	createACProperties();
@@ -61,18 +59,15 @@ void EntityBlockCircuitVoltageSource::createTRANProperties() {
 
 }
 
-void EntityBlockCircuitVoltageSource::createACProperties()
-{
+void EntityBlockCircuitVoltageSource::createACProperties() {
 	createAmplitudeProperties();
 }
 
-void EntityBlockCircuitVoltageSource::createDCProperties()
-{
+void EntityBlockCircuitVoltageSource::createDCProperties() {
 	EntityPropertiesString::createProperty("DC-Properties", "DC-Voltage", "100", "default", getProperties());
 }
 
-void EntityBlockCircuitVoltageSource::createPULSEProperties()
-{
+void EntityBlockCircuitVoltageSource::createPULSEProperties() {
 	EntityPropertiesInteger::createProperty("Pulse Properties", "Pulse Initial value", 0 , "default", getProperties());
 	EntityPropertiesInteger::createProperty("Pulse Properties", "Pulse Pulsed value", 0, "default", getProperties());
 	EntityPropertiesDouble::createProperty("Pulse Properties", "Delay time", 0.0, "default", getProperties());
@@ -83,8 +78,7 @@ void EntityBlockCircuitVoltageSource::createPULSEProperties()
 	EntityPropertiesInteger::createProperty("Pulse Properties", "Number of Pulses", 0, "default", getProperties());
 }
 
-double EntityBlockCircuitVoltageSource::getRotation()
-{
+double EntityBlockCircuitVoltageSource::getRotation() {
 	auto propertyBase = getProperties().getProperty("Rotation");
 	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
 	assert(propertyBase != nullptr);
@@ -92,8 +86,7 @@ double EntityBlockCircuitVoltageSource::getRotation()
 	return value;
 }
 
-std::string EntityBlockCircuitVoltageSource::getFlip()
-{
+std::string EntityBlockCircuitVoltageSource::getFlip() {
 	auto propertyBase = getProperties().getProperty("Flip");
 	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
 	assert(propertyBase != nullptr);
@@ -101,8 +94,7 @@ std::string EntityBlockCircuitVoltageSource::getFlip()
 	return value;
 }
 
-std::vector<std::string> EntityBlockCircuitVoltageSource::getPulseParameters()
-{
+std::vector<std::string> EntityBlockCircuitVoltageSource::getPulseParameters() {
 
 	std::vector<std::string> parameters;
 

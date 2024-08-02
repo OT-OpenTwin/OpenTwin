@@ -30,8 +30,7 @@ void EntityBlockCircuitCapacitor::createProperties()
 	EntityPropertiesString::createProperty("Element Property", "Capacity", "10uF", "default", getProperties());
 }
 
-double EntityBlockCircuitCapacitor::getRotation()
-{
+const double EntityBlockCircuitCapacitor::getRotation() {
 	auto propertyBase = getProperties().getProperty("Rotation");
 	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
 	assert(propertyBase != nullptr);
@@ -39,8 +38,7 @@ double EntityBlockCircuitCapacitor::getRotation()
 	return value;
 }
 
-std::string EntityBlockCircuitCapacitor::getFlip()
-{
+const std::string EntityBlockCircuitCapacitor::getFlip() {
 	auto propertyBase = getProperties().getProperty("Flip");
 	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBase);
 	assert(propertyBase != nullptr);
