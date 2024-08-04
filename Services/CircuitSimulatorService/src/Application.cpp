@@ -357,6 +357,10 @@ std::string Application::extractStringAfterDelimiter(const std::string& inputStr
 	else if(delimiter == '_') {
 		return "first";
 	}
+	else
+	{
+		return "failed";
+	}
 }
 
 std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document) {
