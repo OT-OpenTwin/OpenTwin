@@ -35,7 +35,7 @@ public:
 	void setPackageName(std::string name);
 
 	//Getter
-	std::string getPackageName();
+	const std::string getPackageName() const;
 private:
 	const std::string _blockFolder = "Circuits";
 	std::string _packageName = "Circuit Simulator";

@@ -52,8 +52,7 @@ Application * g_instance{ nullptr };
 #define EXAMPLE_NAME_BLOCK5 "Connector"
 #undef GetObject
 
-namespace ottest
-{
+namespace ottest {
 	static unsigned long long currentBlockUid = 0;
 
 	static unsigned long long currentResistorUid = 1;
@@ -67,136 +66,7 @@ namespace ottest
 	static unsigned long long currenConnectorID = 1;
 
 	static unsigned long long currentEditorID = 1;
-
-	ot::GraphicsFlowItemConnector getDefaultConnectorStyle(void) {
-		ot::GraphicsFlowItemConnector cfg;
-
-		cfg.setTextColor(ot::Color(0,0,0,0));
-
-		return cfg;
-	}
-
 	
-
-	ot::GraphicsItemCfg* createDiode(const std::string _name)
-	{
-		ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
-		myStack->setName(_name);
-		myStack->setTitle(_name);
-		myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
-		
-
-		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
-		image->setImagePath("CircuitElementImages/Diod2.png");
-		image->setSizePolicy(ot::SizePolicy::Dynamic);
-		image->setMaintainAspectRatio(true);
-
-		myStack->addItemBottom(image,false,true);
-
-		ot::GraphicsHBoxLayoutItemCfg* myLayout = new ot::GraphicsHBoxLayoutItemCfg();
-		myLayout->setMinimumSize(ot::Size2DD(150.0, 150.0));
-
-		myStack->addItemTop(myLayout,true,false);
-
-		ot::GraphicsEllipseItemCfg* connection1 = new ot::GraphicsEllipseItemCfg();
-		connection1->setName("Input3");
-		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Blue));
-		connection1->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
-		connection1->setBackgroundPainer(painter1);
-		connection1->setAlignment(ot::AlignCenter);
-		connection1->setMaximumSize(ot::Size2DD(10.0, 10.0));
-
-		ot::GraphicsEllipseItemCfg* connection2 = new ot::GraphicsEllipseItemCfg();
-		connection2->setName("Ouput3");
-		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Blue));
-		connection2->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
-		connection2->setBackgroundPainer(painter2);
-		connection2->setAlignment(ot::AlignCenter);
-		connection2->setMaximumSize(ot::Size2DD(10.0, 10.0));
-		
-		connection1->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-		connection2->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-
-		myLayout->addChildItem(connection1);
-		myLayout->addStrech(1);
-		myLayout->addChildItem(connection2);
-		
-		
-		return myStack;
-	}
-
-	ot::GraphicsItemCfg* createTransistor(const std::string _name)
-	{
-		ot::GraphicsStackItemCfg* myStack = new ot::GraphicsStackItemCfg();
-		myStack->setName(_name);
-		myStack->setTitle(_name);
-		myStack->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
-
-		ot::GraphicsImageItemCfg* image = new ot::GraphicsImageItemCfg();
-		image->setImagePath("CircuitElementImages/Transistor.png");
-		image->setSizePolicy(ot::SizePolicy::Dynamic);
-		image->setMaintainAspectRatio(true);
-
-		myStack->addItemBottom(image, false, true);
-
-		ot::GraphicsGridLayoutItemCfg* myLayout = new ot::GraphicsGridLayoutItemCfg(5,5);
-		myLayout->setMinimumSize(ot::Size2DD(100.0, 100.0));
-		myStack->addItemTop(myLayout,true,false);
-
-		ot::GraphicsEllipseItemCfg* base = new ot::GraphicsEllipseItemCfg();
-		base->setName("base");
-		ot::FillPainter2D* painter1 = new ot::FillPainter2D(ot::Color(ot::Blue));
-		base->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
-		base->setBackgroundPainer(painter1);
-		base->setAlignment(ot::AlignLeft);
-		base->setMaximumSize(ot::Size2DD(10.0, 10.0));
-		base->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-		base->setMargins(2.9, 0.0, 0.0, 0.0);
-
-		ot::GraphicsEllipseItemCfg* collector = new ot::GraphicsEllipseItemCfg();
-		collector->setName("collector");
-		ot::FillPainter2D* painter2 = new ot::FillPainter2D(ot::Color(ot::Blue));
-		collector->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
-		collector->setBackgroundPainer(painter2);
-		collector->setAlignment(ot::AlignTop);
-		collector->setMaximumSize(ot::Size2DD(10.0, 10.0));
-		collector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-		collector->setMargins(0.0, 0.0, 0.0, 30.0);
-
-		ot::GraphicsEllipseItemCfg* emitter = new ot::GraphicsEllipseItemCfg();
-		emitter->setName("emitter");
-		ot::FillPainter2D* painter3 = new ot::FillPainter2D(ot::Color(ot::Blue));
-		emitter->setOutline(ot::OutlineF(1., ot::Color(ot::Black)));
-		emitter->setBackgroundPainer(painter3);
-		emitter->setAlignment(ot::AlignBottom);
-		emitter->setMaximumSize(ot::Size2DD(10.0, 10.0));
-		emitter->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-		emitter->setMargins(0.0, 0.0, 0.0, 30.0);
-
-		myLayout->addChildItem(2,0,base);
-		myLayout->addChildItem(0, 4, collector);
-		myLayout->addChildItem(4, 4, emitter);
-
-		myLayout->setColumnStretch(4, 1);
-		
-		
-
-		return myStack;
-
-	}
-
-	ot::GraphicsItemCfg* createConnector(const std::string _name)
-	{
-		ot::GraphicsEllipseItemCfg* connector = new ot::GraphicsEllipseItemCfg();
-		connector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable);
-		connector->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
-
-		connector->setName("Connector");
-		connector->setMinimumSize(ot::Size2DD(50.0, 50.0));
-		connector->setAlignment(ot::AlignCenter);
-
-		return connector;
-	}
 }
 
 
@@ -211,39 +81,33 @@ void Application::deleteInstance(void) {
 }
 
 Application::Application()
-	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService, new UiNotifier(), new ModelNotifier())
-{
+	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, OT_INFO_SERVICE_TYPE_CircuitSimulatorService, new UiNotifier(), new ModelNotifier()) {
 	ClassFactory& classFactory = getClassFactory();
 	ClassFactoryBlock* classFactoryBlock = new ClassFactoryBlock();
 	classFactoryBlock->SetChainRoot(&classFactory);
 	classFactory.SetNextHandler(classFactoryBlock);
 }
 
-Application::~Application()
-{
+Application::~Application() {
 
 }
 
 // ##################################################################################################################################################################################################################
 
 // Custom functions
-std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) 
-{
+std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	
 
 
-	if (action == "Circuit Simulator:Edit:Add Solver")
-	{
+	if (action == "Circuit Simulator:Edit:Add Solver") {
 		addSolver();
 	}
-	else if (action == "Circuit Simulator:Simulate:Run Simulation")
-	{
+	else if (action == "Circuit Simulator:Simulate:Run Simulation") {
 		runCircuitSimulation();
 		
 	}
-	else if (action == "Circuit Simulator:Edit:Add Circuit")
-	{
+	else if (action == "Circuit Simulator:Edit:Add Circuit") {
 		createNewCircuit();
 	}
 	else {
@@ -254,14 +118,12 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document)
 }
 
 // Trying to create more circuits
-void Application::createNewCircuit()
-{
+void Application::createNewCircuit() {
 	std::list<std::string> circuits = m_modelComponent->getListOfFolderItems("Circuits");
 
 	int count = 1;
 	std::string circuitName;
-	do
-	{
+	do {
 		circuitName = "Circuits/Circuit " + std::to_string(count);
 		count++;
 	} while (std::find(circuits.begin(), circuits.end(), circuitName) != circuits.end());
@@ -300,18 +162,15 @@ std::string Application::handleModelSelectionChanged(ot::JsonDocument& _document
 	return std::string();
 }
 
-void Application::modelSelectionChangedNotification(void)
-{
+void Application::modelSelectionChangedNotification(void) {
 	if (isUiConnected()) {
 		std::list<std::string> enabled;
 		std::list<std::string> disabled;
 
-		if (selectedEntities.size() > 0)
-		{
+		if (selectedEntities.size() > 0) {
 			enabled.push_back("Circuit Simulator:Simulate:Run Simulation");
 		}
-		else
-		{
+		else {
 			disabled.push_back("Circuit Simulator:Simulate:Run Simulation");
 		}
 
@@ -321,14 +180,12 @@ void Application::modelSelectionChangedNotification(void)
 
 void Application::addSolver()
 {
-	if (!EnsureDataBaseConnection())
-	{
+	if (!EnsureDataBaseConnection()) {
 		assert(0); // Data base connection failed
 		return;
 	}
 
-	if (m_uiComponent == nullptr)
-	{
+	if (m_uiComponent == nullptr) {
 		assert(0); throw std::exception("Model not connected");
 	}
 
@@ -341,8 +198,7 @@ void Application::addSolver()
 	// Create a unique na,e for the new solver item
 	int count = 1;
 	std::string solverName;
-	do
-	{
+	do {
 		solverName = "Solvers/CircuitSimulator" + std::to_string(count);
 		count++;
 	} while (std::find(solverItems.begin(), solverItems.end(), solverName) != solverItems.end());
@@ -378,17 +234,14 @@ void Application::addSolver()
 	
 }
 
-void Application::runCircuitSimulation()
-{
-	if (!EnsureDataBaseConnection())
-	{
+void Application::runCircuitSimulation() {
+	if (!EnsureDataBaseConnection()) {
 		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
 		m_uiComponent->displayMessage("\nERROR: Unable to connect to data base. \n");
 		return;
 	}
 
-	if (selectedEntities.empty())
-	{
+	if (selectedEntities.empty()) {
 		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
 		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
@@ -401,19 +254,14 @@ void Application::runCircuitSimulation()
 
 	//Here we first need to check which solvers are selected and then run them one by on
 	std::map<std::string, bool> solverRunMap;
-	for (auto entity : selectedEntityInfo)
-	{
-		if (entity.getType() == "EntitySolverCircuitSimulator" || entity.getType() == "EntitySolver")
-		{
-			if (entity.getName().substr(0, 8) == "Solvers/")
-			{
+	for (auto entity : selectedEntityInfo) {
+		if (entity.getType() == "EntitySolverCircuitSimulator" || entity.getType() == "EntitySolver") {
+			if (entity.getName().substr(0, 8) == "Solvers/") {
 				size_t index = entity.getName().find('/', 8);
-				if (index != std::string::npos)
-				{
+				if (index != std::string::npos) {
 					solverRunMap[entity.getName().substr(0, index - 1)] = true;
 				}
-				else
-				{
+				else {
 					solverRunMap[entity.getName()] = true;
 				}
 			}
@@ -421,13 +269,11 @@ void Application::runCircuitSimulation()
 	}
 
 	std::list<std::string> solverRunList;
-	for (auto solver : solverRunMap)
-	{
+	for (auto solver : solverRunMap) {
 		solverRunList.push_back(solver.first);
 	}
 
-	if (solverRunList.empty())
-	{
+	if (solverRunList.empty()) {
 		if (m_uiComponent == nullptr) { assert(0); throw std::exception("UI is not connected"); }
 		m_uiComponent->displayMessage("\nERROR: No solver item has been selected.\n");
 		return;
@@ -440,8 +286,7 @@ void Application::runCircuitSimulation()
 	// Prefetch the solver information
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIdsSolver;
 
-	for (auto info : solverInfo)
-	{
+	for (auto info : solverInfo) {
 		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getID(), info.getVersion()));
 	}
 
@@ -449,8 +294,7 @@ void Application::runCircuitSimulation()
 
 	//Now read the solver objects for each solver
 	std::map<std::string, EntityBase*> solverMap;
-	for (auto info : solverInfo)
-	{
+	for (auto info : solverInfo) {
 		EntityBase* entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), getClassFactory());
 		solverMap[info.getName()] = entity;
 	}
@@ -464,14 +308,12 @@ void Application::runCircuitSimulation()
 }
 
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::string modelVersion, std::map<std::string, EntityBase*> solverMap) {
-	for (auto solver : solverInfo)
-	{
+	for (auto solver : solverInfo) {
 		runSingleSolver(solver, modelVersion, solverMap[solver.getName()]);
 	}
 }
 
-void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity)
-{
+void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity) {
 	EntityPropertiesEntityList* circuitName = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Circuit"));
 	assert(circuitName != nullptr);
 
@@ -494,8 +336,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	m_ngSpice.clearBufferStructure(name);
 }
 
-std::string Application::extractStringAfterDelimiter(const std::string& inputString, char delimiter, size_t occurrence)
-{
+std::string Application::extractStringAfterDelimiter(const std::string& inputString, char delimiter, size_t occurrence) {
 	size_t pos = 0;
 	size_t count = 0;
 
@@ -509,19 +350,16 @@ std::string Application::extractStringAfterDelimiter(const std::string& inputStr
 		
 		return inputString.substr(pos);
 	}
-	else if(delimiter == '/')
-	{
+	else if(delimiter == '/') {
 		OT_LOG_E("Substring of FolderEntityName not Found!");
 		return "failed";
 	}
-	else if(delimiter == '_')
-	{
+	else if(delimiter == '_') {
 		return "first";
 	}
 }
 
-std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
-{
+std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document) {
 	//Here we get the Item Information
 	std::string itemName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
@@ -623,8 +461,7 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document)
 }
 
 
-std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document)
-{	
+std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document) {	
 	ot::UIDList items;
 
 	// Add Item UIDs to the list above (Items to be removed)
@@ -636,8 +473,7 @@ std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document)
 
 
 
-std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _document)
-{
+std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _document) {
 	//std::string itemName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
 	//ot::Point2DD pos;
 	//pos.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
@@ -702,8 +538,7 @@ std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _docu
 	
 }
 
-std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _document)
-{
+std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _document) {
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
@@ -731,8 +566,7 @@ std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _d
 	}
 }
 
-std::string Application::handleItemChanged(ot::JsonDocument& _document)
-{
+std::string Application::handleItemChanged(ot::JsonDocument& _document) {
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
 	ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::instance().createFromJSON(ot::json::getObject(_document, OT_ACTION_PARAM_Config), OT_JSON_MEMBER_GraphicsItemCfgType);
 	if (!itemConfig) return "";
@@ -748,26 +582,22 @@ std::string Application::handleItemChanged(ot::JsonDocument& _document)
 
 // Required functions
 
-void Application::run(void)
-{
+void Application::run(void) {
 	if (!EnsureDataBaseConnection())
 	{
 		assert(0);
 	}
 }
 
-std::string Application::processAction(const std::string & _action, ot::JsonDocument & _doc)
-{
+std::string Application::processAction(const std::string & _action, ot::JsonDocument & _doc) {
 	return ""; // Return empty string if the request does not expect a return
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument & _doc)
-{
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument & _doc) {
 	return ""; // Return empty string if the request does not expect a return
 }
 
-void Application::uiConnected(ot::components::UiComponent * _ui)
-{
+void Application::uiConnected(ot::components::UiComponent * _ui) {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	_ui->addMenuPage("Circuit Simulator");
 	_ui->addMenuGroup("Circuit Simulator", "Edit");
@@ -784,8 +614,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 }
 
-void Application::uiDisconnected(const ot::components::UiComponent * _ui)
-{
+void Application::uiDisconnected(const ot::components::UiComponent * _ui) {
 
 }
 
@@ -793,24 +622,20 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 
 }
 
-void Application::modelConnected(ot::components::ModelComponent * _model)
-{
+void Application::modelConnected(ot::components::ModelComponent * _model) {
 	m_blockEntityHandler.setModelComponent(_model);
 	
 }
 
-void Application::modelDisconnected(const ot::components::ModelComponent * _model)
-{
+void Application::modelDisconnected(const ot::components::ModelComponent * _model) {
 
 }
 
-void Application::serviceConnected(ot::ServiceBase * _service)
-{
+void Application::serviceConnected(ot::ServiceBase * _service) {
 
 }
 
-void Application::serviceDisconnected(const ot::ServiceBase * _service)
-{
+void Application::serviceDisconnected(const ot::ServiceBase * _service) {
 
 }
 
@@ -818,13 +643,11 @@ void Application::preShutdown(void) {
 
 }
 
-void Application::shuttingDown(void)
-{
+void Application::shuttingDown(void) {
 
 }
 
-bool Application::startAsRelayService(void) const
-{
+bool Application::startAsRelayService(void) const {
 	return false;	// Do not want the service to start a relay service. Otherwise change to true
 }
 

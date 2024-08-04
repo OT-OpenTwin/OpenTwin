@@ -28,60 +28,49 @@ Circuit::~Circuit() {}
 
 
 
-std::string Circuit::getEditorName()
-{
+std::string Circuit::getEditorName() {
 	return this->editorName;
 }
 
 
 
-std::string Circuit::getId()
-{
+ std::string Circuit::getId() {
 	return this->id;
 }
 
-std::map<ot::UID, CircuitElement>& Circuit::getMapOfElements()
-{
+std::map<ot::UID, CircuitElement>& Circuit::getMapOfElements() {
 	return this->mapOfElements;
 }
 
-std::map<std::string,std::vector<std::shared_ptr<EntityBlock>>>& Circuit::getMapOfEntityBlcks()
-{
+std::map<std::string,std::vector<std::shared_ptr<EntityBlock>>>& Circuit::getMapOfEntityBlcks() {
 	return this->mapOfEntityBlocks;
 }
 
-void Circuit::addElement(ot::UID key, const CircuitElement& obj)
-{
+void Circuit::addElement(ot::UID key, const CircuitElement& obj) {
 	mapOfElements[key] = obj;
 }
 
-void Circuit::addBlockEntity(std::string block, const std::shared_ptr<EntityBlock> obj)
-{
+void Circuit::addBlockEntity(std::string block, const std::shared_ptr<EntityBlock> obj) {
 	mapOfEntityBlocks[block].push_back(obj);
 }
 
 
 
-void Circuit::setEditorName(const std::string name)
-{
+void Circuit::setEditorName(const std::string name) {
 	this->editorName = name;
 }
 
-void Circuit::setId(std::string id)
-{
+void Circuit::setId(std::string id) {
 	this->id = id;
 }
 
-bool Circuit::addConnection(const ot::UID& key, const Connection& obj)
-{
-	if (mapOfElements.find(key) != mapOfElements.end())
-	{
+bool Circuit::addConnection(const ot::UID& key, const Connection& obj) {
+	if (mapOfElements.find(key) != mapOfElements.end()) {
 		bool result = mapOfElements[key].addConnection(obj);
 		return result;
 
 	}
-	else
-	{
+	else {
 		Application::instance()->uiComponent()->displayMessage("Element not found"); // Auf OtLog umändern
 		return false;
 
@@ -89,14 +78,11 @@ bool Circuit::addConnection(const ot::UID& key, const Connection& obj)
 
 }
 
-std::string Circuit::findElement(const ot::UID& key)
-{
-	if (mapOfElements.find(key) != mapOfElements.end())
-	{
+std::string Circuit::findElement(const ot::UID& key) {
+	if (mapOfElements.find(key) != mapOfElements.end()) {
 		return mapOfElements[key].getItemName();
 	}
-	else
-	{
+	else {
 		return "Not Found!";
 	}
 }

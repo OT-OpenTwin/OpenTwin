@@ -24,15 +24,12 @@
 //C++
 #include <algorithm>
 
-namespace NodeNumbers
-{
+namespace NodeNumbers {
 	static unsigned long long nodeNumber = 0;
-	static unsigned long long connectionNumber = 1;
-	
+	static unsigned long long connectionNumber = 1;	
 }
 
-void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position)
-{
+void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position) {
 	ClassFactoryBlock factory;
 	EntityBase* baseEntity = factory.CreateEntity(blockName);
 	assert(baseEntity != nullptr);
@@ -62,10 +59,11 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 
 	blockEntity->StoreToDataBase();
 	_modelComponent->addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
+
+	
 }
 
-void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::Point2DD& position, const ot::Transform transform, ClassFactory* classFactory)
-{
+void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::Point2DD& position, const ot::Transform transform, ClassFactory* classFactory) {
 	
 	std::list<ot::EntityInformation> entityInfos;
 	ot::UIDList entityIDList{ blockID };
@@ -117,8 +115,7 @@ void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::P
 
 
 
-void BlockEntityHandler::OrderUIToCreateBlockPicker()
-{
+void BlockEntityHandler::OrderUIToCreateBlockPicker() {
 	auto graphicsEditorPackage = BuildUpBlockPicker();
 	ot::JsonDocument doc;
 	ot::JsonObject pckgObj;
@@ -134,8 +131,7 @@ void BlockEntityHandler::OrderUIToCreateBlockPicker()
 	_uiComponent->sendMessage(true, doc, tmp);
 }
 
-std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID()
-{
+std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID() {
 	std::list<std::string> blockItemNames = _modelComponent->getListOfFolderItems(_blockFolder + "/" + _packageName, true);
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(blockItemNames, entityInfos);
@@ -143,11 +139,9 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 	ClassFactoryBlock classFactory;
 
 	std::map<ot::UID, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
-	for (auto& entityInfo : entityInfos)
-	{
+	for (auto& entityInfo : entityInfos) {
 		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
-		if (baseEntity != nullptr && baseEntity->getClassName() != "EntityBlockConnection") //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others
-		{
+		if (baseEntity != nullptr && baseEntity->getClassName() != "EntityBlockConnection") { //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others 
 			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
 			assert(blockEntity != nullptr);
 			blockEntitiesByBlockID[blockEntity->getEntityID()] = blockEntity;
@@ -157,8 +151,7 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 	return blockEntitiesByBlockID;
 }
 
-std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::findAllEntityBlockConnections()
-{
+std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::findAllEntityBlockConnections() {
 	std::list<std::string> connectionItemNames = _modelComponent->getListOfFolderItems("Circuits/" + _packageName + "/Connections");
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(connectionItemNames, entityInfos);
@@ -166,11 +159,9 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::fi
 	ClassFactoryBlock classFactory;
 
 	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> entityBlockConnectionsByBlockID;
-	for (auto& entityInfo : entityInfos)
-	{
+	for (auto& entityInfo : entityInfos) {
 		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
-		if (baseEntity != nullptr && baseEntity->getClassName() == "EntityBlockConnection")
-		{
+		if (baseEntity != nullptr && baseEntity->getClassName() == "EntityBlockConnection") {
 			std::shared_ptr<EntityBlockConnection> blockEntityConnection(dynamic_cast<EntityBlockConnection*>(baseEntity));
 			assert(blockEntityConnection != nullptr);
 			entityBlockConnectionsByBlockID[blockEntityConnection->getEntityID()] = blockEntityConnection;
@@ -182,25 +173,21 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::fi
 	
 }
 
-bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName)
-{
+bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName) {
 	auto allConnectors = blockEntity->getAllConnectorsByName();
 	const ot::ConnectorType connectorType = allConnectors[connectorName].getConnectorType();
 	if (connectorType == ot::ConnectorType::UNKNOWN) { OT_LOG_EAS("Unset connectortype of connector: " + allConnectors[connectorName].getConnectorName()); }
-	if (connectorType == ot::ConnectorType::In || connectorType == ot::ConnectorType::InOptional)
-	{
+	if (connectorType == ot::ConnectorType::In || connectorType == ot::ConnectorType::InOptional) {
 		return false;
 	}
-	else
-	{
+	else {
 		return true;
 	}
 }
 
 
 
-void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name)
-{
+void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name) {
 	
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
 	//auto entityBlockConnectionsByBlockID = findAllEntityBlockConnections();
@@ -215,8 +202,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 	std::string blockName = "EntityBlockConnection";
 
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
-	for (auto& connection : connections)
-	{
+	for (auto& connection : connections) {
 		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
 
 		std::list<std::string> connectionItems = _modelComponent->getListOfFolderItems("Circuits/" + name + "/Connections");
@@ -228,8 +214,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		
 		int count = 1;
 		std::string connectionName;
-		do
-		{
+		do {
 			connectionName = "Circuits/" + name + "/Connections/" + "Connection" + std::to_string(count);
 			count++;
 		} while (std::find(connectionItems.begin(), connectionItems.end(), connectionName) != connectionItems.end());
@@ -261,24 +246,20 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		topologyEntityVersionList.push_back(connectionEntity->getEntityStorageVersion());
 
 
-		if (blockEntitiesByBlockID.find(connection.getOriginUid()) != blockEntitiesByBlockID.end())
-		{
+		if (blockEntitiesByBlockID.find(connection.getOriginUid()) != blockEntitiesByBlockID.end()) {
 			blockEntitiesByBlockID[connection.getOriginUid()]->AddConnection(connectionEntity->getEntityID());
 			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.getOriginUid()]);
 		}
-		else
-		{
+		else {
 			OT_LOG_EAS("Could not create connection since block " + std::to_string(connection.getOriginUid()) + " was not found");
 			continue;
 		}
 
-		if (blockEntitiesByBlockID.find(connection.getDestinationUid()) != blockEntitiesByBlockID.end())
-		{
+		if (blockEntitiesByBlockID.find(connection.getDestinationUid()) != blockEntitiesByBlockID.end()) {
 			blockEntitiesByBlockID[connection.getDestinationUid()]->AddConnection(connectionEntity->getEntityID());
 			entitiesForUpdate.push_back(blockEntitiesByBlockID[connection.getDestinationUid()]);
 		}
-		else
-		{
+		else {
 			OT_LOG_EAS("Could not create connection since block " + std::to_string(connection.getDestinationUid()) + " was not found.");
 			continue;
 		}
@@ -288,11 +269,9 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 
 	
 
-	if (entitiesForUpdate.size() != 0)
-	{
+	if (entitiesForUpdate.size() != 0) {
 
-		for (auto entityForUpdate : entitiesForUpdate)
-		{
+		for (auto entityForUpdate : entitiesForUpdate) {
 			entityForUpdate->StoreToDataBase();
 			topologyEntityIDList.push_back(entityForUpdate->getEntityID());
 			topologyEntityVersionList.push_back(entityForUpdate->getEntityStorageVersion());
@@ -311,35 +290,29 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 
 }
 
-void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity)
-{
+void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity) {
 	EntityBlockCircuitVoltageSource* CircuitElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
-	if (CircuitElement != nullptr)
-	{
+	if (CircuitElement != nullptr) {
 		CircuitElement->createProperties();
 	}
 
 	EntityBlockCircuitResistor* resistor = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
-	if (resistor != nullptr)
-	{
+	if (resistor != nullptr) {
 		resistor->createProperties();
 	}
 
 	EntityBlockCircuitDiode* diode = dynamic_cast<EntityBlockCircuitDiode*>(blockEntity.get());
-	if (diode != nullptr)
-	{
+	if (diode != nullptr) {
 		diode->createProperties();
 	}
 
 	EntityBlockCircuitCapacitor* capacitor = dynamic_cast<EntityBlockCircuitCapacitor*>(blockEntity.get());
-	if (capacitor != nullptr)
-	{
+	if (capacitor != nullptr) {
 		capacitor->createProperties();
 	}
 
 	EntityBlockCircuitInductor* inductor = dynamic_cast<EntityBlockCircuitInductor*>(blockEntity.get());
-	if (inductor != nullptr)
-	{
+	if (inductor != nullptr) {
 		inductor->createProperties();
 	}
 	
@@ -347,8 +320,7 @@ void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<Ent
 
 
 
-ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker()
-{
+ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker() {
 	//ot::GraphicsNewEditorPackage* pckg = new ot::GraphicsNewEditorPackage(_packageName, _packageName);
 	ot::GraphicsPickerCollectionPackage* pckg = new ot::GraphicsPickerCollectionPackage();
 	ot::GraphicsPickerCollectionCfg* a = new ot::GraphicsPickerCollectionCfg("CircuitElements", "Circuit Elements");
@@ -381,8 +353,7 @@ ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker()
 	return pckg;
 }
 
-void BlockEntityHandler::createResultCurves(std::string solverName,std::string simulationType,std::string circuitName)
-{
+void BlockEntityHandler::createResultCurves(std::string solverName,std::string simulationType,std::string circuitName) {
 	
 		std::map<std::string, std::vector<double>> resultVectors = SimulationResults::getInstance()->getResultMap();
 		std::list<std::pair<ot::UID, std::string>> curves;
@@ -392,31 +363,25 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 
 		std::vector<double> xValues;
 	
-		if (simulationType == ".dc")
-		{
+		if (simulationType == ".dc") {
 			auto it = resultVectors.find("v-sweep");
 			xValues = resultVectors.at("v-sweep");
-			if (it != resultVectors.end())
-			{
+			if (it != resultVectors.end()) {
 				resultVectors.erase(it);
 			}
 		}
-		else if (simulationType == ".TRAN")
-		{
+		else if (simulationType == ".TRAN") {
 			auto it = resultVectors.find("time");
 			xValues = resultVectors.at("time");
-			if (it != resultVectors.end())
-			{
+			if (it != resultVectors.end()) {
 				resultVectors.erase(it);
 				
 			}
 		}
-		else
-		{
+		else {
 			auto it = resultVectors.find("frequency");
 			xValues = resultVectors.at("frequency");
-			if (it != resultVectors.end())
-			{
+			if (it != resultVectors.end()) {
 				resultVectors.erase(it);
 			}
 			
@@ -431,8 +396,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 
 		//Now i try to find the branch and erase it too
 		auto it = resultVectors.find("v1#branch");
-		if (it != resultVectors.end())
-		{
+		if (it != resultVectors.end()) {
 			resultVectors.erase(it);
 		}
 
@@ -457,16 +421,14 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 		std::string _curveFolderPath = solverName + "/" + "Results" + "/" + "1D/Curves";
 
 		// No i want to get the node vectors of voltage and for each of them i create a curve
-		for (auto it : resultVectors)
-		{
+		for (auto it : resultVectors) {
 			std::string curveName;
 			std::string fullCurveName;
 			std::string xLabel;
 			std::string xUnit;
 			std::string yUnit;
 	
-			if (simulationType == ".dc")
-			{
+			if (simulationType == ".dc") {
 				curveName = it.first + "-DC";
 				fullCurveName = _curveFolderPath + "/" + curveName;
 				xLabel = "sweep";
@@ -474,16 +436,14 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 				yUnit = "V";
 				
 			}
-			else if (simulationType == ".TRAN")
-			{
+			else if (simulationType == ".TRAN") {
 				curveName = it.first + "-TRAN";
 				fullCurveName = _curveFolderPath +  "/" + curveName;
 				xLabel = "time";
 				xUnit = "ms";
 				yUnit = "V";
 			}
-			else
-			{
+			else {
 				curveName = it.first + "-AC";
 				fullCurveName = _curveFolderPath +  "/" + curveName;
 				xLabel = "frequency";
@@ -518,13 +478,11 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 }
 
 //Setter
-void BlockEntityHandler::setPackageName(std::string name)
-{
+void BlockEntityHandler::setPackageName(std::string name) {
 	this->_packageName = name;
 }
 
 //Getter
-std::string BlockEntityHandler::getPackageName()
-{
+const std::string BlockEntityHandler::getPackageName() const {
 	return this->_packageName;
 }
