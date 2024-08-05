@@ -14,17 +14,13 @@
 #include <algorithm>
 #include <vector>
 
-//Constructor
-CircuitElement::CircuitElement()
-{
-	
-}
-
-//Destructor
-CircuitElement::~CircuitElement()
+//Construtor
+CircuitElement::CircuitElement( std::string itemName,  std::string editorName, ot::UID Uid,  std::string netlistName)
+	: m_itemName(itemName), m_editorName(editorName), m_Uid(Uid), m_netlistName(netlistName)
 {
 
 }
+
 
 //Getter
 
@@ -32,66 +28,26 @@ std::string CircuitElement::getItemName()	{return this->m_itemName;}
 
 std::string CircuitElement::getEditorName()   {return this->m_editorName;}
 
-ot::UID CircuitElement::getUID() { return this->Uid; }
+ot::UID CircuitElement::getUID() { return this->m_Uid; }
 
-std::string CircuitElement::getValue() { return this->value; }
+std::set<Connection>& CircuitElement::getList() { return m_listOfConnections; }
 
-std::set<Connection>& CircuitElement::getList() { return listOfConnections; }
-
-std::string CircuitElement::getType()
-{
-	return this->type;
-}
-
-std::string CircuitElement::getFunction()
-{
-	return this->function;
-}
-
-std::string CircuitElement::getAmplitude()
-{
-	return this->m_Amplitude;
-}
-
-std::string CircuitElement::getNetlistName()
-{
-	return this->m_netlistName;
-}
+std::string CircuitElement::getNetlistName() { return this->m_netlistName; }
 
 //Setter
 void CircuitElement::setItemName(std::string name)	{this->m_itemName = name;}
 
 void CircuitElement::setEditorName(std::string name)	{this->m_editorName = name;}
 
-void CircuitElement::setUID(ot::UID id) { this->Uid = id; }
+void CircuitElement::setUID(ot::UID id) { this->m_Uid = id; }
 
-void CircuitElement::setValue(std::string name) { this->value = name; }
 
-void CircuitElement::setType(std::string type)
-{
-	this->type = type;
-}
-
-void CircuitElement::setFunction(std::string function)
-{
-	this->function = function;
-}
-
-void CircuitElement::setAmplitude(std::string amplitude)
-{
-	this->m_Amplitude = amplitude;
-}
-
-void CircuitElement::setNetlistName(std::string name)
-{
-	this->m_netlistName = name;
-}
+void CircuitElement::setNetlistName(std::string name) { this->m_netlistName = name; }
 
 //Additional Functions
 
-bool CircuitElement::addConnection(const Connection& obj) 
-{
-	auto result = listOfConnections.insert(obj);
+bool CircuitElement::addConnection(const Connection& obj)  {
+	auto result = m_listOfConnections.insert(obj);
 	return result.second;
 }
 

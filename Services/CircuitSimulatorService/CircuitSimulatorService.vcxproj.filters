@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\CircuitElements">
+      <UniqueIdentifier>{cc0bdd65-39c1-4212-a723-0dbb41def02f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CircuitElements">
+      <UniqueIdentifier>{7a1b0ff1-129a-420d-a1d5-8f3002f27d42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -45,6 +51,21 @@
     <ClCompile Include="src\SimulationResults.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\CircuitElements\Resistor.cpp">
+      <Filter>Source Files\CircuitElements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CircuitElements\VoltageSource.cpp">
+      <Filter>Source Files\CircuitElements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CircuitElements\Diode.cpp">
+      <Filter>Source Files\CircuitElements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CircuitElements\Capacitor.cpp">
+      <Filter>Source Files\CircuitElements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CircuitElements\Inductor.cpp">
+      <Filter>Source Files\CircuitElements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -54,9 +75,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ModelNotifier.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\CircuitElement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Connection.h">
@@ -73,6 +91,24 @@
     </ClInclude>
     <ClInclude Include="include\SimulationResults.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CircuitElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CircuitElements\Resistor.h">
+      <Filter>Header Files\CircuitElements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CircuitElements\VoltageSource.h">
+      <Filter>Header Files\CircuitElements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CircuitElements\Diode.h">
+      <Filter>Header Files\CircuitElements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CircuitElements\Capacitor.h">
+      <Filter>Header Files\CircuitElements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CircuitElements\Inductor.h">
+      <Filter>Header Files\CircuitElements</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -24,7 +24,13 @@ Circuit::Circuit()
 	
 }
 
-Circuit::~Circuit() {}
+Circuit::~Circuit() 
+{
+	for (auto elements : mapOfElements) {
+		delete elements.second;
+		elements.second = nullptr;
+	}
+}
 
 
 
@@ -38,7 +44,7 @@ std::string Circuit::getEditorName() {
 	return this->id;
 }
 
-std::map<ot::UID, CircuitElement>& Circuit::getMapOfElements() {
+std::map<ot::UID, CircuitElement*>& Circuit::getMapOfElements() {
 	return this->mapOfElements;
 }
 
@@ -46,8 +52,8 @@ std::map<std::string,std::vector<std::shared_ptr<EntityBlock>>>& Circuit::getMap
 	return this->mapOfEntityBlocks;
 }
 
-void Circuit::addElement(ot::UID key, const CircuitElement& obj) {
-	mapOfElements[key] = obj;
+void Circuit::addElement(ot::UID key, CircuitElement* obj) {
+	mapOfElements.emplace(key,obj);
 }
 
 void Circuit::addBlockEntity(std::string block, const std::shared_ptr<EntityBlock> obj) {
@@ -66,7 +72,7 @@ void Circuit::setId(std::string id) {
 
 bool Circuit::addConnection(const ot::UID& key, const Connection& obj) {
 	if (mapOfElements.find(key) != mapOfElements.end()) {
-		bool result = mapOfElements[key].addConnection(obj);
+		bool result = mapOfElements[key]->addConnection(obj);
 		return result;
 
 	}
@@ -80,7 +86,7 @@ bool Circuit::addConnection(const ot::UID& key, const Connection& obj) {
 
 std::string Circuit::findElement(const ot::UID& key) {
 	if (mapOfElements.find(key) != mapOfElements.end()) {
-		return mapOfElements[key].getItemName();
+		return mapOfElements[key]->getItemName();
 	}
 	else {
 		return "Not Found!";
