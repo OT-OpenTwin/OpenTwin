@@ -5,37 +5,53 @@
 #include "OTServiceFoundation/ModelComponent.h"
 #include "MetadataEntry.h"
 
+#include <stdint.h>
+
 class __declspec(dllexport) MetadataEntityInterface
 {
 public:
-	MetadataEntityInterface(const std::string& ownerServiceName);
+	MetadataEntityInterface(const std::string& _ownerServiceName);
 	MetadataEntityInterface();
-	MetadataCampaign CreateCampaign(std::shared_ptr<EntityMetadataCampaign> rmd, std::list<std::shared_ptr<EntityMetadataSeries>> msmds);
-	MetadataSeries CreateSeries(std::shared_ptr<EntityMetadataSeries> seriesMetadataEntity);
-	void StoreCampaign(ot::components::ModelComponent& modelComponent, MetadataCampaign& metaDataCampaign);
-	void StoreCampaign(ot::components::ModelComponent& modelComponent, std::list<const MetadataSeries*>& seriesMetadata, bool saveModel);
-	void StoreCampaign(ot::components::ModelComponent& modelComponent,  MetadataCampaign& metaDataCampaign, std::list<const MetadataSeries*>& seriesMetadata, bool saveModel);
+	MetadataCampaign createCampaign(std::shared_ptr<EntityMetadataCampaign> _rmd, std::list<std::shared_ptr<EntityMetadataSeries>> _msmds);
+	MetadataSeries createSeries(std::shared_ptr<EntityMetadataSeries> _seriesMetadataEntity);
+	void storeCampaign(ot::components::ModelComponent& _modelComponent, MetadataCampaign& _metaDataCampaign);
+	void storeCampaign(ot::components::ModelComponent& _modelComponent, std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel);
+	void storeCampaign(ot::components::ModelComponent& _modelComponent,  MetadataCampaign& _metaDataCampaign, std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel);
 
 private:
-	const std::string& _ownerServiceName;
-	const std::string _nameField = "Name";
-	const std::string _datatypeField = "Datatype";
-	const std::string _valuesField = "Values";
-	const std::string _dataRowsField = "Rows";
-	const std::string _dataColumnsField = "Columns";
-	const std::string _unitField = "Unit";
-
-
-	std::list<ot::UID> _newEntityIDs;
-	std::list<ot::UID> _newEntityVersions;
-
-	void ExtractCampaignMetadata(MetadataCampaign& measurementCampaign, std::shared_ptr<EntityMetadataCampaign> rmd);
-	void ExtractSeriesMetadata(MetadataCampaign& measurementCampaign, std::list<std::shared_ptr<EntityMetadataSeries>> msmds);
+	const std::string& m_ownerServiceName;
 	
-	void InsertMetadata(EntityWithDynamicFields* entity, MetadataEntry* metadata, const std::string documentName = "");
+	const std::string m_dataDimensionsField = "DataDimensions";
+	const std::string m_dependingParameterField = "ParameterDependencies";
+	const std::string m_valueDescriptionsField = "ValueDescriptions";
 
+	const std::string m_nameField = "Name";
+	const std::string m_labelField = "Label";
+	const std::string m_unitField = "Unit";
+	const std::string m_dataTypeNameField = "DataTypeName";
+		
+	const std::string m_valuesField = "Values";
 
-	std::list<std::shared_ptr<MetadataEntry>> ExtractMetadataObjects(const GenericDocument& document);
-	std::list<std::shared_ptr<MetadataEntry>> ExtractMetadataFields(const GenericDocument& document);
+	std::list<ot::UID> m_newEntityIDs;
+	std::list<ot::UID> m_newEntityVersions;
+
+	void extractCampaignMetadata(MetadataCampaign& _measurementCampaign, std::shared_ptr<EntityMetadataCampaign> _rmd);
+	void extractSeriesMetadata(MetadataCampaign& _measurementCampaign, std::list<std::shared_ptr<EntityMetadataSeries>> _msmds);
+	
+	void insertMetadata(EntityWithDynamicFields* _entity, MetadataEntry* _metadata, const std::string _documentName = "");
+
+	std::vector<std::string> convertToStringVector(const MetadataEntry* _metaData)const;
+	std::vector<uint32_t> convertToUInt32Vector(const MetadataEntry* _metaData) const;
+	std::vector<uint64_t> convertToUInt64Vector(const MetadataEntry* _metaData) const;
+	std::string convertToString(const MetadataEntry* _metaData) const;
+	std::list<ot::Variable> convertToVariableList(const MetadataEntry* _metaData)const;
+
+	std::list<ot::Variable> convertFromStringVector(const std::vector<std::string> _values) const;
+	std::list<ot::Variable> convertFromUInt32Vector(const std::vector<uint32_t> _values) const;
+	std::list<ot::Variable> convertFromUInt64Vector(const std::vector<uint64_t> _values) const;
+	
+
+	std::list<std::shared_ptr<MetadataEntry>> extractMetadataObjects(const GenericDocument& _document);
+	std::list<std::shared_ptr<MetadataEntry>> extractMetadataFields(const GenericDocument& document);
 };
 

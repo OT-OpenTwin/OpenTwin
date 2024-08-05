@@ -43,13 +43,13 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	//First the quantity is selected. Its value is not projected.
 	ValueComparisionDefinition quantityDef = blockEntity->getSelectedQuantityDefinition();
 	//The entity selection contains the names of the quantity/parameter. In the mongodb documents only the abbreviations are used.
-	const auto selectedQuantity = resultCollectionAccess->FindMetadataQuantity(quantityDef.getName());
+	const auto selectedQuantity = resultCollectionAccess->findMetadataQuantity(quantityDef.getName());
 	if (selectedQuantity == nullptr) 
 	{
 		throw std::exception("DatabaseAccessBlock has no quantity set.");
 	}
-	_dataRows= selectedQuantity->dataRows;
-	_dataColumns = selectedQuantity->dataColumns;
+	//_dataRows= selectedQuantity->dataRows;
+	//_dataColumns = selectedQuantity->dataColumns;
 
 	ValueComparisionDefinition selectedQuantityDef(MetadataQuantity::getFieldName(),"=",std::to_string(selectedQuantity->quantityIndex),ot::TypeNames::getInt64TypeName());
 	AddComparision(selectedQuantityDef);
@@ -67,8 +67,8 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 		
 	const std::string parameterConnectorName = blockEntity->getConnectorParameter1().getConnectorName();
 	ValueComparisionDefinition param1Def = blockEntity->getSelectedParameter1Definition();
-	const auto parameter1 =	resultCollectionAccess->FindMetadataParameter(param1Def.getName());
-	_projectionNameToClearName[parameter1->parameterAbbreviation] = parameter1->parameterName;
+	const auto parameter1 =	resultCollectionAccess->findMetadataParameter(param1Def.getName());
+	//_projectionNameToClearName[parameter1->parameterAbbreviation] = parameter1->parameterName;
 	if (parameter1 == nullptr)
 	{
 		throw std::exception("DatabaseAccessBlock has the parameter 1 not set.");
@@ -83,8 +83,8 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	{
 		auto param2Def = blockEntity->getSelectedParameter2Definition();
 		const std::string param2ConnectorName =	blockEntity->getConnectorParameter2().getConnectorName();
-		const auto parameter = resultCollectionAccess->FindMetadataParameter(param2Def.getName());
-		_projectionNameToClearName[parameter->parameterAbbreviation] = parameter->parameterName;
+		const auto parameter = resultCollectionAccess->findMetadataParameter(param2Def.getName());
+		//_projectionNameToClearName[parameter->parameterAbbreviation] = parameter->parameterName;
 		if (parameter == nullptr)
 		{
 			throw std::exception("DatabaseAccessBlock has the parameter 2 not set.");
@@ -96,8 +96,8 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	{	
 		auto param3Def = blockEntity->getSelectedParameter3Definition();
 		const std::string param3ConnectorName = blockEntity->getConnectorParameter3().getConnectorName();
-		const auto parameter = resultCollectionAccess->FindMetadataParameter(param3Def.getName());
-		_projectionNameToClearName[parameter->parameterAbbreviation] = parameter->parameterName;
+		const auto parameter = resultCollectionAccess->findMetadataParameter(param3Def.getName());
+		//_projectionNameToClearName[parameter->parameterAbbreviation] = parameter->parameterName;
 		if (parameter == nullptr)
 		{
 			throw std::exception("DatabaseAccessBlock has the parameter 3 not set.");
@@ -322,7 +322,7 @@ void BlockHandlerDatabaseAccess::AddComparision(const ValueComparisionDefinition
 
 void BlockHandlerDatabaseAccess::AddParameter(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName)
 {
-	definition.setName(parameter.parameterAbbreviation);
+	definition.setName(std::to_string( parameter.parameterUID));
 	_projectionNames.push_back(definition.getName());
 	_connectorNames.push_back(connectorName);
 }

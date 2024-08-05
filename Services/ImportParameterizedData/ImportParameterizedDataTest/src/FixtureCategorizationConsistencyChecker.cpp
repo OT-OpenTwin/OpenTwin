@@ -55,9 +55,9 @@ std::map<std::string, MetadataAssemblyData> FixtureCategorizationConsistencyChec
 	std::map<std::string, MetadataAssemblyData> collection = GetCorrectCollection_AllLinksCorrect();
 	
 	std::shared_ptr<EntityTableSelectedRanges> range1(new EntityTableSelectedRanges(-1, nullptr, nullptr, nullptr, nullptr, ""));
-	range1->SetTableProperties("Table1", -1, -1, "");
+	range1->SetTableProperties("Table1", -1, "");
 	std::shared_ptr<EntityTableSelectedRanges> range2(new EntityTableSelectedRanges(-1, nullptr, nullptr, nullptr, nullptr, ""));
-	range2->SetTableProperties("Table2", -1, -1, "");
+	range2->SetTableProperties("Table2", -1, "");
 
 	collection["b"].allSelectionRanges = { range1, range1 };
 	collection["c"].allSelectionRanges = { range1 , range1};
@@ -96,9 +96,9 @@ std::map<std::string, MetadataAssemblyData> FixtureCategorizationConsistencyChec
 {
 	std::map<std::string, MetadataAssemblyData> collection = GetCorrectCollection_AllLinksCorrect();
 	std::shared_ptr<EntityTableSelectedRanges> range1(new EntityTableSelectedRanges(-1, nullptr, nullptr, nullptr, nullptr, ""));
-	range1->SetTableProperties("Table1", -1, -1, "");
+	range1->SetTableProperties("Table1", -1, "");
 	std::shared_ptr<EntityTableSelectedRanges> range2(new EntityTableSelectedRanges(-1, nullptr, nullptr, nullptr, nullptr, ""));
-	range2->SetTableProperties("Table2", -1, -1, "");
+	range2->SetTableProperties("Table2", -1, "");
 
 	collection["b"].allSelectionRanges = { range1, range1 };
 	collection["c"].allSelectionRanges = { range1, range1 };

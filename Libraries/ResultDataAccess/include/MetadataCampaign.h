@@ -7,41 +7,49 @@
 #include "MetadataQuantity.h"
 #include "MetadataParameter.h"
 #include "MetadataEntry.h"
-
+#include "OTCore/CoreTypes.h"
 
 class __declspec(dllexport) MetadataCampaign
 {
 public:
 	MetadataCampaign(){}
-	MetadataCampaign(const MetadataCampaign& other);
-	MetadataCampaign& operator=(const MetadataCampaign& other) = delete;
-	MetadataCampaign(MetadataCampaign&& other);
-	MetadataCampaign& operator=(MetadataCampaign&& other);
+	MetadataCampaign(const MetadataCampaign& _other);
+	MetadataCampaign& operator=(const MetadataCampaign& _other) = delete;
+	MetadataCampaign(MetadataCampaign&& other) noexcept;
+	MetadataCampaign& operator=(MetadataCampaign&& other) noexcept;
 	~MetadataCampaign() {};
-	void AddSeriesMetadata(MetadataSeries&& seriesMetadata) { _seriesMetadata.push_back(seriesMetadata); }
-	void AddMetaInformation(const std::string& key, std::shared_ptr<MetadataEntry> metadata) { _metaData[key] = metadata; }
-	const std::list<MetadataSeries>& getSeriesMetadata() const { return _seriesMetadata; };
 
-	const std::map <std::string, MetadataQuantity>& getMetadataQuantitiesByName() const { return _quantityOverviewByName; }
-	const std::map <std::string, MetadataParameter>& getMetadataParameterByName() const { return _parameterOverviewByName; }
-	const std::map <std::string, std::shared_ptr<MetadataEntry>>&	getMetaData() const { return _metaData; }
+	void addMetaInformation(const std::string& key, std::shared_ptr<MetadataEntry> _metadata) { m_metaData[key] = _metadata; }
+	const std::map <std::string, std::shared_ptr<MetadataEntry>>&	getMetaData() const { return m_metaData; }
 	
-	void UpdateMetadataOverview();
-	void UpdateMetadataOverviewFromLastAddedSeries();
-	void setCampaignName(const std::string name) { _campaignName = name; }
-	const std::string& getCampaignName()const { return _campaignName; }
+	void addSeriesMetadata(MetadataSeries&& seriesMetadata) { m_seriesMetadata.push_back(seriesMetadata); }
+	const std::list<MetadataSeries>& getSeriesMetadata() const { return m_seriesMetadata; };
+
+	void setCampaignName(const std::string _name) { m_campaignName = _name; }
+	const std::string& getCampaignName()const { return m_campaignName; }
+	
+	const std::map <std::string, MetadataQuantity*>& getMetadataQuantitiesByLabel() const { return m_quantityOverviewByLabel; }
+	const std::map <std::string, MetadataParameter*>& getMetadataParameterByLabel() const { return m_parameterOverviewByLabel; }
+	const std::map <ot::UID, MetadataParameter>& getMetadataParameterByUID() const { return m_parameterOverviewByUID; }
+	const std::map <ot::UID, MetadataQuantity>& getMetadataQuantitiesByUID() const { return m_quantityOverviewByUID; }
+	
+	void updateMetadataOverview();
+	void updateMetadataOverviewFromLastAddedSeries();
+	
 	void reset();
 private:
-	std::list<MetadataSeries> _seriesMetadata;
+	std::list<MetadataSeries> m_seriesMetadata;
 	
-	std::map < std::string, MetadataQuantity > _quantityOverviewByName;
-	std::map < std::string, MetadataParameter > _parameterOverviewByName;
-	
-	std::string _campaignName;
-	
-	std::map <std::string, std::shared_ptr<MetadataEntry>> _metaData;
+	std::map<ot::UID,MetadataQuantity> m_quantityOverviewByUID;
+	std::map<ot::UID, MetadataParameter> m_parameterOverviewByUID;
+	std::map<std::string, MetadataQuantity*> m_quantityOverviewByLabel;
+	std::map<std::string, MetadataParameter*> m_parameterOverviewByLabel;
 
-	void UpdateMetadataOverview(MetadataSeries& series);
+	std::string m_campaignName;
+	
+	std::map <std::string, std::shared_ptr<MetadataEntry>> m_metaData;
+
+	void updateMetadataOverview(MetadataSeries& _series);
 
 };
 

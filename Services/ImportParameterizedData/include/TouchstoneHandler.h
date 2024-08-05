@@ -2,41 +2,56 @@
 #include <string>
 #include <list>
 #include "OptionSettings.h"
-#include "PortData.h"
+#include "QuantityDescriptionSParameter.h"
+#include "DatasetDescription1D.h"
+#include "MetadataParameter.h"
 
 class TouchstoneHandler
 {
 public:
-	TouchstoneHandler(const std::string& fileName);
-	TouchstoneHandler(const TouchstoneHandler& other) = delete;
-	TouchstoneHandler(TouchstoneHandler&& other) noexcept;
-	TouchstoneHandler& operator=(const TouchstoneHandler& other) = delete;
-	TouchstoneHandler& operator=(TouchstoneHandler&& other) noexcept;
+	TouchstoneHandler(const std::string& _fileName);
+	TouchstoneHandler(const TouchstoneHandler& _other) = delete;
+	TouchstoneHandler(TouchstoneHandler&& _other) noexcept;
+	TouchstoneHandler& operator=(const TouchstoneHandler& _other) = delete;
+	TouchstoneHandler& operator=(TouchstoneHandler&& _other) noexcept;
 
-	static int32_t deriveNumberOfPorts(const std::string& fileName);
+	static int32_t deriveNumberOfPorts(const std::string& _fileName);
 	
-	void AnalyseFile(const std::string& fileContent, int32_t numberOfPorts);
-	const ts::OptionSettings& getOptionSettings() const { return _optionSettings; }
-	const std::string& getComments() const { return _comments; }
-	const std::list<ts::PortData>& getPortData() const { return _portData; }
+	void analyseFile(const std::string& _fileContent, int32_t _numberOfPorts);
+	const ts::OptionSettings& getOptionSettings() const { return m_optionSettings; }
+	const std::string& getComments() const { return m_comments; }
+	QuantityDescriptionSParameter& getQuantityDescription() { return m_quantityDescription; }
+	MetadataParameter& getMetadataFrequencyParameter() { return m_frequencyParameter; }
 
 private:
 	friend class FixtureTouchstoneHandler;
-	std::string _comments = "";
-	ts::OptionSettings _optionSettings;
-	std::list<ts::PortData> _portData;
 
-	uint32_t _touchstoneVersion = 1;
-	uint32_t _portNumber = 0;
+	std::string m_comments = "";
+	ts::OptionSettings m_optionSettings;
+	
+	uint32_t m_touchstoneVersion = 1;
+	uint32_t m_portNumber = 0;
+	
+	QuantityDescriptionSParameter m_quantityDescription;
+	MetadataParameter m_frequencyParameter;
 
-	void AnalyseLine(std::string& content);
-	void AnalyseDataLine(std::string& content);
-	void AnalyseOptionsLine(std::string& line);
-	void AnalyseVersionTwoLine(std::string& content);
+	uint32_t m_columnIndex = 0;
+	uint32_t m_rowIndex = 0;
 
-	void CleansOfComments(std::string& content);
-	void CleansOfSpecialCharacter(std::string& content);
+	SParameterMatrixHelper* m_firstValues = nullptr;
+	SParameterMatrixHelper* m_secondValues = nullptr;
 
+	bool m_firstValueOfTuple = true;
 
+	void analyseLine(std::string& _content);
+	void analyseDataLine(std::string& _content);
+	void analyseOptionsLine(std::string& _line);
+	void analyseVersionTwoLine(std::string& _content);
+
+	void cleansOfComments(std::string& _content);
+	void cleansOfSpecialCharacter(std::string& _content);
+
+	//! @brief Currently all segments are turned into double values.
+	ot::Variable turnLineSegmentToVariable(const std::string& _segment);
 };
 

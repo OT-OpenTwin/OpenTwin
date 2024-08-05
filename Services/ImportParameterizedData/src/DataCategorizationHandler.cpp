@@ -438,12 +438,12 @@ ot::GenericDataStruct* DataCategorizationHandler::getDatasetTableView(ot::Entity
 				baseEntity = nullptr;
 			}
 		}
-		MetadataCampaign campaign =	metadataFactory.CreateCampaign(campaignEntity, seriesMetadataEntities);
+		MetadataCampaign campaign =	metadataFactory.createCampaign(campaignEntity, seriesMetadataEntities);
 
-		auto& parametersByName = campaign.getMetadataParameterByName();
-		auto& quantitiesByName = campaign.getMetadataQuantitiesByName();
+		auto& parametersByLabel = campaign.getMetadataParameterByLabel();
+		auto& quantitiesByLabel = campaign.getMetadataQuantitiesByLabel();
 		auto& metadataByName = campaign.getMetaData();
-		const uint32_t numberOfRows = 4 + static_cast<uint32_t>(parametersByName.size()) * 5 + static_cast<uint32_t>(quantitiesByName.size()) * 2 + static_cast<uint32_t>(metadataByName.size()); //Campaing Name + Parameter Header + Quantity Header + Series Header = 4
+		const uint32_t numberOfRows = 4 + static_cast<uint32_t>(parametersByLabel.size()) * 5 + static_cast<uint32_t>(quantitiesByLabel.size()) * 2 + static_cast<uint32_t>(metadataByName.size()); //Campaing Name + Parameter Header + Quantity Header + Series Header = 4
 		const uint32_t numberOfColumns = 4;
 		ot::GenericDataStructMatrix* data = new ot::GenericDataStructMatrix(numberOfColumns, numberOfRows);
 		std::vector<ot::Variable> defaultValues;
@@ -478,13 +478,13 @@ ot::GenericDataStruct* DataCategorizationHandler::getDatasetTableView(ot::Entity
 		data->setValue(0, rowPointer, ot::Variable("Parameter"));
 		rowPointer++;
 
-		for (const auto& parameterByName : parametersByName)
+		for (const auto& parameterByLabel : parametersByLabel)
 		{
-			ot::Variable key(parameterByName.second.parameterName);
+			ot::Variable key(parameterByLabel.second->parameterName);
 			data->setValue(1, rowPointer, key);
 			rowPointer++;
 			
-			std::list<ot::Variable> values = parameterByName.second.values;
+			std::list<ot::Variable> values = parameterByLabel.second->values;
 			
 			ot::Variable numberOfEntries (static_cast<int64_t>(values.size()));
 			data->setValue(2, rowPointer, ot::Variable("Number of values"));
@@ -506,12 +506,12 @@ ot::GenericDataStruct* DataCategorizationHandler::getDatasetTableView(ot::Entity
 		data->setValue(0, rowPointer, ot::Variable("Quantities"));
 		rowPointer++;
 		
-		for (const auto& quantityByName : quantitiesByName)
+		for (const auto& quantityByLabel : quantitiesByLabel)
 		{
-			data->setValue(1, rowPointer, ot::Variable(quantityByName.second.quantityName));
+			data->setValue(1, rowPointer, ot::Variable(quantityByLabel.second->quantityName));
 			rowPointer++;
-			data->setValue(2, rowPointer, ot::Variable("Type"));
-			data->setValue(3, rowPointer, ot::Variable(quantityByName.second.typeName));
+			//data->setValue(2, rowPointer, ot::Variable("Type"));
+			//data->setValue(3, rowPointer, ot::Variable(quantityByLabel.second->typeName));
 			rowPointer++;
 		}
 		return data;
@@ -519,7 +519,7 @@ ot::GenericDataStruct* DataCategorizationHandler::getDatasetTableView(ot::Entity
 	else
 	{
 		std::shared_ptr<EntityMetadataSeries> seriesEntity(dynamic_cast<EntityMetadataSeries*>(baseEntity));
-		MetadataSeries series =	metadataFactory.CreateSeries(seriesEntity);
+		MetadataSeries series =	metadataFactory.createSeries(seriesEntity);
 
 		const std::list<MetadataParameter>& parameter = series.getParameter();
 		const std::list<MetadataQuantity>& quantities= series.getQuantities();
@@ -592,8 +592,8 @@ ot::GenericDataStruct* DataCategorizationHandler::getDatasetTableView(ot::Entity
 		{
 			data->setValue(1, rowPointer, ot::Variable(quantityByName.quantityName));
 			rowPointer++;
-			data->setValue(2, rowPointer, ot::Variable("Type"));
-			data->setValue(3, rowPointer, ot::Variable(quantityByName.typeName));
+			//data->setValue(2, rowPointer, ot::Variable("Type"));
+			//data->setValue(3, rowPointer, ot::Variable(quantityByName.typeName)); Stinkt nach Wiederholung
 			rowPointer++;
 		}
 		return data;

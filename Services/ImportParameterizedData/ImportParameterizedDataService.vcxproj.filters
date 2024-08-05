@@ -52,9 +52,6 @@
     <ClCompile Include="src\OptionSettings.cpp">
       <Filter>src\Touchstone</Filter>
     </ClCompile>
-    <ClCompile Include="src\PortData.cpp">
-      <Filter>src\Touchstone</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c">
       <Filter>include\ThirdParty</Filter>
     </ClCompile>
@@ -160,9 +157,6 @@
       <Filter>include\Touchstone</Filter>
     </ClInclude>
     <ClInclude Include="include\OptionSettings.h">
-      <Filter>include\Touchstone</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PortData.h">
       <Filter>include\Touchstone</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\ThirdParty\base64\base64.h">

@@ -4,7 +4,7 @@
 
 #include "OTCore/Variable.h"
 
-class SParameterMatrixHelper
+class __declspec(dllexport) SParameterMatrixHelper
 {
 public:
 	SParameterMatrixHelper(uint32_t portNumber);

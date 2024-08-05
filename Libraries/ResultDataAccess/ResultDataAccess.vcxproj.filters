@@ -21,6 +21,9 @@
     <Filter Include="include\MetadataEntityInterface">
       <UniqueIdentifier>{7865cabd-cd12-42f8-9eaa-902da4f15303}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Creation Helper">
+      <UniqueIdentifier>{7f810ec7-9d8f-43e7-a184-5a57945c757a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\QuantityContainer.h">
@@ -71,6 +74,27 @@
     <ClInclude Include="include\ProjectToCollectionConverter.h">
       <Filter>include\CollectionAccess</Filter>
     </ClInclude>
+    <ClInclude Include="include\QuantityDescription.h">
+      <Filter>include\Creation Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SParameterMatrixHelper.h">
+      <Filter>include\Creation Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QuantityDescriptionSParameter.h">
+      <Filter>include\Creation Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QuantityDescriptionCurve.h">
+      <Filter>include\Creation Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ParameterDescription.h">
+      <Filter>include\Creation Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DatasetDescription.h">
+      <Filter>include\Creation Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DatasetDescription1D.h">
+      <Filter>include\Creation Helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\QuantityContainer.cpp">
@@ -107,6 +131,15 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ProjectToCollectionConverter.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SParameterMatrixHelper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DatasetDescription.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DatasetDescription1D.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

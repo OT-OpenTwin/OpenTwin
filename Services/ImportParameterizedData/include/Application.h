@@ -162,7 +162,7 @@ private:
 	TableHandler* _tableHandler = nullptr;
 	DataCategorizationHandler* _parametrizedDataHandler = nullptr;
 	TabledataToResultdataHandler* _tabledataToResultdataHandler = nullptr;
-	TouchstoneToResultdata* _touchstoneToResultdata = nullptr;
+	//TouchstoneToResultdata* _touchstoneToResultdata = nullptr;
 
 
 	void HandleSelectionChanged();

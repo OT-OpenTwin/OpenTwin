@@ -19,12 +19,12 @@
 #include "MetadataEntryObject.h"
 #include "MetadataEntrySingle.h"
 
-TabledataToResultdataHandler::TabledataToResultdataHandler(const std::string& baseFolder, const std::string& datasetFolder, const std::string& parameterFolder, const std::string& quantityFolder, const std::string& tableFolder)
-	: _baseFolder(baseFolder), _datasetFolder(datasetFolder), _parameterFolder(parameterFolder), _quantityFolder(quantityFolder), _tableFolder(tableFolder)
+TabledataToResultdataHandler::TabledataToResultdataHandler(const std::string& _baseFolder, const std::string& _datasetFolder, const std::string& _parameterFolder, const std::string& _quantityFolder, const std::string& _tableFolder)
+	: m_baseFolder(_baseFolder), m_datasetFolder(_datasetFolder), m_parameterFolder(_parameterFolder), m_quantityFolder(_quantityFolder), m_tableFolder(_tableFolder)
 {
 }
 
-void TabledataToResultdataHandler::CreateDataCollection(const std::string& dbURL, const std::string& projectName)
+void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL, const std::string& projectName)
 {
 	//To guarantee the uniqueness of parameter and quantity indices, a branch overreaching mutual exclusion has to be realized. 
 	//So far branching is not realized yet, thus this implementation is a place holder. Ultimately, a client-server mutual exclusion with (maybe) the modelservice needs to be implemented.
@@ -35,7 +35,7 @@ void TabledataToResultdataHandler::CreateDataCollection(const std::string& dbURL
 
 	//All sorted ranges by the metadata they belong to. MSMD has a pointer to the parameter metadata, parameter has a pointer to the quantity metadata
 	Documentation::INSTANCE()->ClearDocumentation();
-	auto allMetadataAssembliesByNames = GetAllMetadataAssemblies();
+	auto allMetadataAssembliesByNames = getAllMetadataAssemblies();
 	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 	Documentation::INSTANCE()->ClearDocumentation();
 
@@ -85,7 +85,7 @@ void TabledataToResultdataHandler::CreateDataCollection(const std::string& dbURL
 	_uiComponent->displayMessage("Updating Campaign metadata\n");
 	std::list<std::string> requiredTables;
 	std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>> loadedTables;
-	AddRequiredTables(*rmdAssemblyData, requiredTables);
+	addRequiredTables(*rmdAssemblyData, requiredTables);
 	requiredTables.unique();
 	if (requiredTables.size() == 0)
 	{
@@ -100,21 +100,21 @@ void TabledataToResultdataHandler::CreateDataCollection(const std::string& dbURL
 		}
 		_uiComponent->displayMessage(tableNames);
 
-		LoadRequiredTables(requiredTables, loadedTables);
+		loadRequiredTables(requiredTables, loadedTables);
 		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 		Documentation::INSTANCE()->ClearDocumentation();
 		
 		//Filling a new EntityMetadataSeries object with its fields.
 		MetadataAssemblyRangeData rmdData;
 		rmdData.LoadAllRangeSelectionInformation(rmdAssemblyData->allSelectionRanges, loadedTables);
-		std::list<std::shared_ptr<MetadataEntry>> allMetadataEntries = RangeData2MetadataEntries(std::move(rmdData));
+		std::list<std::shared_ptr<MetadataEntry>> allMetadataEntries = rangeData2MetadataEntries(std::move(rmdData));
 		for (std::shared_ptr<MetadataEntry> metadataEntry : allMetadataEntries)
 		{
-			const bool fieldExists = resultCollectionExtender.CampaignMetadataWithSameNameExists(metadataEntry) && resultCollectionExtender.CampaignMetadataWithSameValueExists(metadataEntry);
+			const bool fieldExists = resultCollectionExtender.campaignMetadataWithSameNameExists(metadataEntry) && resultCollectionExtender.campaignMetadataWithSameValueExists(metadataEntry);
 			if (fieldExists)
 			{
 				Documentation::INSTANCE()->AddToDocumentation("Update of campaign metadata field: " + metadataEntry->getEntryName() + "\n");
-				resultCollectionExtender.AddCampaignMetadata(metadataEntry);
+				resultCollectionExtender.addCampaignMetadata(metadataEntry);
 			}
 		}
 	}
@@ -134,7 +134,7 @@ void TabledataToResultdataHandler::CreateDataCollection(const std::string& dbURL
 		const MetadataAssemblyData* metadataAssembly = &metadataAssemblyByName->second;
 		std::string msmdName = metadataAssemblyByName->first;
 		msmdName = msmdName.substr(msmdName.find_last_of('/') + 1, msmdName.size());
-		auto seriesMetadata = resultCollectionExtender.FindMetadataSeries(msmdName);
+		auto seriesMetadata = resultCollectionExtender.findMetadataSeries(msmdName);
 		if (seriesMetadata != nullptr)
 		{
 			_uiComponent->displayMessage("Skipped " + msmdName + "\n");
@@ -143,9 +143,9 @@ void TabledataToResultdataHandler::CreateDataCollection(const std::string& dbURL
 		_uiComponent->displayMessage("Create " + msmdName + ":\n");
 
 		//Load all required tables that are not loaded yet.
-		AddRequiredTables(*metadataAssembly, requiredTables); //for msmd
-		AddRequiredTables(*(metadataAssembly->next), requiredTables); //for parameter
-		AddRequiredTables(*(metadataAssembly->next->next), requiredTables); //for quantities
+		addRequiredTables(*metadataAssembly, requiredTables); //for msmd
+		addRequiredTables(*(metadataAssembly->next), requiredTables); //for parameter
+		addRequiredTables(*(metadataAssembly->next->next), requiredTables); //for quantities
 		requiredTables.unique();
 		
 		std::string tableNames = "\nRequired tables:\n";
@@ -155,23 +155,16 @@ void TabledataToResultdataHandler::CreateDataCollection(const std::string& dbURL
 		}
 		_uiComponent->displayMessage(tableNames);
 
-		LoadRequiredTables(requiredTables, loadedTables);
+		loadRequiredTables(requiredTables, loadedTables);
 		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 		Documentation::INSTANCE()->ClearDocumentation();
 
 		//Filling a new EntityMetadataSeries object with its fields.
 		MetadataAssemblyRangeData rangeData;
 		rangeData.LoadAllRangeSelectionInformation(metadataAssembly->allSelectionRanges, loadedTables);
-		msmdName = _datasetFolder + "/" + msmdName;
-		MetadataSeries metadataSeries(msmdName);
-
-		auto allSeriesMetadataEntries = RangeData2MetadataEntries(std::move(rangeData));
-		for (auto seriesMetadata : allSeriesMetadataEntries)
-		{
-			metadataSeries.AddMetadata(seriesMetadata);
-		}
-
-		//Todo: MetadataAssemblyRangeData not needed anymore! Delete in process!
+		msmdName = m_datasetFolder + "/" + msmdName;
+		
+		DatasetDescription datasetDescription;
 
 		//Loading parameter information
 		auto parameterAssembly = metadataAssembly->next;
@@ -192,58 +185,51 @@ void TabledataToResultdataHandler::CreateDataCollection(const std::string& dbURL
 			continue;
 		}
 
+
 		for (auto& parameterEntry : *parameterData.getFields())
 		{
-			MetadataParameter parameter;
-			parameter.parameterName = parameterEntry.first;
-			parameter.values = parameterEntry.second;
-			parameter.values.sort();
-			parameter.values.unique();
-			parameter.typeName = parameter.values.begin()->getTypeName();
-
-			metadataSeries.AddParameter(std::move(parameter));
+			auto parameter(std::make_shared<MetadataParameter>());
+			parameter->parameterName = parameterEntry.first;
+			parameter->unit = extractUnitFromName(parameter->parameterName);
+			parameter->values = parameterEntry.second;
+			parameter->values.sort();
+			parameter->values.unique();
+			parameter->typeName = parameter->values.begin()->getTypeName();
 		}
 
 		for (const auto& quantityEntry : *quantityData.getFields())
 		{
 			MetadataQuantity quantity;
-			quantity.quantityName = quantityEntry.first;
-			quantity.typeName = quantityEntry.second.begin()->getTypeName();
+			quantity.quantityName = quantityEntry.first;	//Wo wird die Namensproblematik behandelt?
+			quantity.quantityLabel = quantity.quantityName;
+			std::string unit = extractUnitFromName(quantity.quantityLabel);
+			quantity.dataDimensions = {1};
+			
+			MetadataQuantityValueDescription valueDescription;
+			valueDescription.dataTypeName = quantityEntry.second.begin()->getTypeName();
+			valueDescription.unit = unit;
+			
+			quantity.valueDescriptions.push_back(valueDescription);
 
-			metadataSeries.AddQuantity(std::move(quantity));
+			//datasetDescription.setQuantityDescription()
 		}
+
+		//uint64_t seriesMetadataIndex = resultCollectionExtender.addSeries(std::move(metadataSeries));
 
 		_uiComponent->displayMessage("Storing quantity container\n");
 		uint64_t totalNumberOfFields = quantityData.getNumberOfFields();
 		ProgressUpdater updater(_uiComponent, "Storing quantity container");
 
-		resultCollectionExtender.AddSeries(std::move(metadataSeries));
-
-		std::list<std::string> parameterNames;
-
+		ot::UIDList parameterIDs;
 		const auto& firstParameter = *parameterData.getFields()->begin();
 		const uint32_t numberOfFields = static_cast<uint32_t>(firstParameter.second.size());
-		
-		uint64_t seriesMetadataIndex = resultCollectionExtender.FindMetadataSeries(msmdName)->getSeriesIndex();
-		
-		//preparing storage of quantity container
-		std::list<uint64_t> quantityIndices;
-		std::list<std::list<ot::Variable>::const_iterator> allQuantityValueIt;
-		for (const auto& quantityEntry : *quantityData.getFields())
-		{
-			allQuantityValueIt.push_back(quantityEntry.second.begin());
-			quantityIndices.push_back(resultCollectionExtender.FindMetadataQuantity(quantityEntry.first)->quantityIndex);
-		}
-
-		updater.SetTotalNumberOfUpdates(8, quantityData.getFields()->size());
-		auto quantityIndex = quantityIndices.begin();
-		
+				
 		//Create sets of parameter values per field
 		std::list<std::list<ot::Variable>::const_iterator> allParameterValueIt;
 		for (const auto& parameterEntry : *parameterData.getFields())
 		{
-			const std::string parameterAbbrev = resultCollectionExtender.FindMetadataParameter(parameterEntry.first)->parameterAbbreviation;
-			parameterNames.push_back(parameterAbbrev);
+			const ot::UID parameterID = resultCollectionExtender.findMetadataParameter(parameterEntry.first)->parameterUID;
+			parameterIDs.push_back(parameterID);
 			allParameterValueIt.push_back(parameterEntry.second.begin());
 		}
 		std::vector<std::list<ot::Variable>> parameterValuesPerField(numberOfFields);
@@ -257,8 +243,23 @@ void TabledataToResultdataHandler::CreateDataCollection(const std::string& dbURL
 			}
 			parameterValuesPerField[i] = std::move(parameterValues);
 		}
-		
 
+		auto allSeriesMetadataEntries = rangeData2MetadataEntries(std::move(rangeData));
+
+		//preparing storage of quantity container
+		std::list<uint64_t> quantityIndices;
+		std::list<std::list<ot::Variable>::const_iterator> allQuantityValueIt;
+		for (const auto& quantityEntry : *quantityData.getFields())
+		{
+			allQuantityValueIt.push_back(quantityEntry.second.begin());
+			auto quantity = resultCollectionExtender.findMetadataQuantity(quantityEntry.first);
+			//resultCollectionExtender.addParameterDependencyOfQuantity(quantity->quantityIndex, parameterIDs);
+			quantityIndices.push_back(quantity->quantityIndex);
+		}
+
+		updater.SetTotalNumberOfUpdates(8, quantityData.getFields()->size());
+		auto quantityIndex = quantityIndices.begin();
+		
 		int counter(0);
 		//Handle each quantity after another
 		for (auto quantityValueIt : allQuantityValueIt)
@@ -267,7 +268,7 @@ void TabledataToResultdataHandler::CreateDataCollection(const std::string& dbURL
 			for (uint32_t i = 0; i < numberOfFields; i++)
 			{				
 				//push data set into buffer
-				resultCollectionExtender.AddQuantityContainer(seriesMetadataIndex, parameterNames, std::move(parameterValuesPerField[i]), *quantityIndex, *quantityValueIt);
+				//resultCollectionExtender.addQuantityContainer(seriesMetadataIndex, parameterIDs, std::move(parameterValuesPerField[i]), *quantityIndex, *quantityValueIt);
 				quantityValueIt++;
 			}
 
@@ -279,11 +280,11 @@ void TabledataToResultdataHandler::CreateDataCollection(const std::string& dbURL
 }
 
 
-std::map<std::string, MetadataAssemblyData> TabledataToResultdataHandler::GetAllMetadataAssemblies()
+std::map<std::string, MetadataAssemblyData> TabledataToResultdataHandler::getAllMetadataAssemblies()
 {
 	//Load all selection ranges
 	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
-	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(_baseFolder, tempEntity.getClassName(), true);
+	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(m_baseFolder, tempEntity.getClassName(), true);
 	Application::instance()->prefetchDocumentsFromStorage(selectionRangeIDs);
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRangeEntities;
@@ -300,24 +301,28 @@ std::map<std::string, MetadataAssemblyData> TabledataToResultdataHandler::GetAll
 
 	//Sort the range selection entities as rmd, msmd, parameter or quantity, depending on the topology level in their name
 	std::map<std::string, MetadataAssemblyData> allMetadataAssembliesByName;
-	ExtractRMDAndAllMSMD(allMetadataAssembliesByName, allRangeEntities);
-	ExtractAllParameter(allMetadataAssembliesByName, allRangeEntities);
-	ExtractAllQuantities(allMetadataAssembliesByName, allRangeEntities);
+	extractRMDAndAllMSMD(allMetadataAssembliesByName, allRangeEntities);
+	extractAllParameter(allMetadataAssembliesByName, allRangeEntities);
+	extractAllQuantities(allMetadataAssembliesByName, allRangeEntities);
 	assert(allRangeEntities.size() == 0);
 
 	return allMetadataAssembliesByName;
 }
 
-void TabledataToResultdataHandler::ExtractRMDAndAllMSMD(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities)
+//! @brief Determines if a selection range belongs to a metadata series or campaign, depending on the name topology. Selection ranges of the campaign are laying one level above the series.
+//! @param _allMetadataAssembliesByName All series categorisations and the campaign are added.
+//! @param _allRangeEntities A list of all selection range entities contained in this model.
+void TabledataToResultdataHandler::extractRMDAndAllMSMD(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities)
 {
-	auto it = allRangeEntities.begin();
+	auto it = _allRangeEntities.begin();
 	bool rmdHasSelections = false;
-	while (it != allRangeEntities.end())
+	while (it != _allRangeEntities.end())
 	{
 		std::string rangeName = (*it)->getName();
 		std::string containerName = rangeName.substr(0, rangeName.find_last_of("/"));
 		std::string::difference_type n = std::count(containerName.begin(), containerName.end(), '/');
-
+		
+		//The selection is a parameter or quantity. No need to create a new MetadataAssemblyData object.
 		if (n == 3)
 		{
 			it++;
@@ -325,57 +330,61 @@ void TabledataToResultdataHandler::ExtractRMDAndAllMSMD(std::map<std::string, Me
 		}
 		else if (n == 1)
 		{
-			if (allMetadataAssembliesByName.find(containerName) == allMetadataAssembliesByName.end())
+			if (_allMetadataAssembliesByName.find(containerName) == _allMetadataAssembliesByName.end())
 			{
-				allMetadataAssembliesByName[containerName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::researchMetadata;
+				_allMetadataAssembliesByName[containerName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::researchMetadata;
 				rmdHasSelections = true;
 			}
 		}
 		else if (n == 2)
 		{
-			if (allMetadataAssembliesByName.find(containerName) == allMetadataAssembliesByName.end())
+			if (_allMetadataAssembliesByName.find(containerName) == _allMetadataAssembliesByName.end())
 			{
-				allMetadataAssembliesByName[containerName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata;
+				_allMetadataAssembliesByName[containerName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata;
 			}
 		}
-		allMetadataAssembliesByName[containerName].allSelectionRanges.push_back(*it);
-		it = allRangeEntities.erase(it);
+		_allMetadataAssembliesByName[containerName].allSelectionRanges.push_back(*it);
+		it = _allRangeEntities.erase(it);
 	}
-
+	
+	//If the rmd has no selection, we still require a corresponding entry in the output.
 	if(!rmdHasSelections)
 	{
-		auto firstSelectionRange = *allRangeEntities.begin();
+		auto firstSelectionRange = *_allRangeEntities.begin();
 		const std::string fullName = firstSelectionRange->getName();
 		size_t secondDelimiter = fullName.find("/", fullName.find_first_of("/") + 1);
 		std::string rmdAssemblyName = fullName.substr(0,secondDelimiter);
 
-		allMetadataAssembliesByName[rmdAssemblyName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::researchMetadata;
+		_allMetadataAssembliesByName[rmdAssemblyName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::researchMetadata;
 	}
 }
 
-void TabledataToResultdataHandler::ExtractAllParameter(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities)
+//! @brief Assigns all parameter selection ranges to their metadata series descriptions.
+//! @param _allMetadataAssembliesByName All parameter categorisations are added
+//! @param _allRangeEntities A list of all selection range entities contained in this model.
+void TabledataToResultdataHandler::extractAllParameter(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities)
 {
-	auto it = allRangeEntities.begin();
-	while (it != allRangeEntities.end())
+	auto it = _allRangeEntities.begin();
+	while (it != _allRangeEntities.end())
 	{
 		std::string rangeName = (*it)->getName();
 		std::string containerName = rangeName.substr(0, rangeName.find_last_of("/"));
 
-		if (containerName.find(_parameterFolder) != std::string::npos)
+		if (containerName.find(m_parameterFolder) != std::string::npos)
 		{
-			if (allMetadataAssembliesByName.find(containerName) == allMetadataAssembliesByName.end())
+			if (_allMetadataAssembliesByName.find(containerName) == _allMetadataAssembliesByName.end())
 			{
-				allMetadataAssembliesByName[containerName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::parameter;
+				_allMetadataAssembliesByName[containerName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::parameter;
 			}
-			allMetadataAssembliesByName[containerName].allSelectionRanges.push_back(*it);
-			it = allRangeEntities.erase(it);
+			_allMetadataAssembliesByName[containerName].allSelectionRanges.push_back(*it);
+			it = _allRangeEntities.erase(it);
 
 			std::string msmdName = containerName.substr(0, containerName.find_last_of("/"));
-			if (allMetadataAssembliesByName.find(msmdName) == allMetadataAssembliesByName.end())
+			if (_allMetadataAssembliesByName.find(msmdName) == _allMetadataAssembliesByName.end())
 			{
-				allMetadataAssembliesByName[msmdName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata;
+				_allMetadataAssembliesByName[msmdName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata;
 			}
-			allMetadataAssembliesByName[msmdName].next = &allMetadataAssembliesByName[containerName];
+			_allMetadataAssembliesByName[msmdName].next = &_allMetadataAssembliesByName[containerName];
 		}
 		else
 		{
@@ -384,48 +393,52 @@ void TabledataToResultdataHandler::ExtractAllParameter(std::map<std::string, Met
 	}
 }
 
-void TabledataToResultdataHandler::ExtractAllQuantities(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities)
+//! @brief Assigns all quantity selection ranges to their metadata series descriptions.
+//! @param _allMetadataAssembliesByName All quantity categorisations are added
+//! @param _allRangeEntities A list of all selection range entities contained in this model.
+void TabledataToResultdataHandler::extractAllQuantities(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities)
 {
-	auto it = allRangeEntities.begin();
-	while (it != allRangeEntities.end())
+	auto it = _allRangeEntities.begin();
+	while (it != _allRangeEntities.end())
 	{
 		std::string rangeName = (*it)->getName();
 		std::string containerName = rangeName.substr(0, rangeName.find_last_of("/"));
 
-		assert(containerName.find(_quantityFolder) != std::string::npos);
+		assert(containerName.find(m_quantityFolder) != std::string::npos);
 
-		if (allMetadataAssembliesByName.find(containerName) == allMetadataAssembliesByName.end())
+		if (_allMetadataAssembliesByName.find(containerName) == _allMetadataAssembliesByName.end())
 		{
-			allMetadataAssembliesByName[containerName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::quantity;
+			_allMetadataAssembliesByName[containerName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::quantity;
 		}
 
-		allMetadataAssembliesByName[containerName].allSelectionRanges.push_back(*it);
-		it = allRangeEntities.erase(it);
+		_allMetadataAssembliesByName[containerName].allSelectionRanges.push_back(*it);
+		it = _allRangeEntities.erase(it);
 
 		std::string msmdName = containerName.substr(0, containerName.find_last_of("/"));
-		std::string parameterName = msmdName + "/" + _parameterFolder;
+		std::string parameterName = msmdName + "/" + m_parameterFolder;
 		//In case that the corresponding msmd had no range
-		if (allMetadataAssembliesByName.find(msmdName) == allMetadataAssembliesByName.end())
+		if (_allMetadataAssembliesByName.find(msmdName) == _allMetadataAssembliesByName.end())
 		{
-			allMetadataAssembliesByName[msmdName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata;
-			allMetadataAssembliesByName[parameterName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::parameter;
-			allMetadataAssembliesByName[msmdName].next = &allMetadataAssembliesByName[parameterName];
+			_allMetadataAssembliesByName[msmdName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata;
+			_allMetadataAssembliesByName[parameterName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::parameter;
+			_allMetadataAssembliesByName[msmdName].next = &_allMetadataAssembliesByName[parameterName];
 		}
-		else if (allMetadataAssembliesByName.find(parameterName) == allMetadataAssembliesByName.end())
+		else if (_allMetadataAssembliesByName.find(parameterName) == _allMetadataAssembliesByName.end())
 		{
-			allMetadataAssembliesByName[parameterName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::parameter;
-			allMetadataAssembliesByName[msmdName].next = &allMetadataAssembliesByName[parameterName];
+			_allMetadataAssembliesByName[parameterName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::parameter;
+			_allMetadataAssembliesByName[msmdName].next = &_allMetadataAssembliesByName[parameterName];
 		}
-		allMetadataAssembliesByName[parameterName].next = &allMetadataAssembliesByName[containerName];
+		_allMetadataAssembliesByName[parameterName].next = &_allMetadataAssembliesByName[containerName];
 	}
 }
 
-std::list<std::shared_ptr<MetadataEntry>> TabledataToResultdataHandler::RangeData2MetadataEntries(MetadataAssemblyRangeData&& assembyRangeData)
+//! @brief Turning the selection ranges in a generic format, holding different options of data structures
+std::list<std::shared_ptr<MetadataEntry>> TabledataToResultdataHandler::rangeData2MetadataEntries(MetadataAssemblyRangeData&& _assembyRangeData)
 {
 	std::list<std::shared_ptr<MetadataEntry>> allMetadataEntries;
-	auto field = assembyRangeData.getFields()->begin();
+	auto field = _assembyRangeData.getFields()->begin();
 
-	for (field; field != assembyRangeData.getFields()->end(); field++)
+	for (field; field != _assembyRangeData.getFields()->end(); field++)
 	{
 		const std::string& fieldName = field->first;
 		const std::list<ot::Variable>& values = field->second;
@@ -443,22 +456,39 @@ std::list<std::shared_ptr<MetadataEntry>> TabledataToResultdataHandler::RangeDat
 	return allMetadataEntries;	
 }
 
-void TabledataToResultdataHandler::AddRequiredTables(const MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables)
+std::string TabledataToResultdataHandler::extractUnitFromName(std::string& _name)
 {
-	for (auto range : dataAssembly.allSelectionRanges)
+	std::string unit = "";
+	auto unitOpeningBracketPos = _name.find('[');
+	if (unitOpeningBracketPos != std::string::npos)
 	{
-		requiredTables.push_back(range->getTableName());
+		auto unitClosingBracketPos = _name.find(']');
+		if (unitClosingBracketPos != std::string::npos)
+		{
+			_name = _name.substr(0, unitOpeningBracketPos - 1);
+			unit = _name.substr(unitOpeningBracketPos +1, unitClosingBracketPos -1);
+		}
+	}
+	return unit;
+}
+
+//! @brief Adds the table names of the tables referenced by the selection ranges of the _dataAssembly.
+void TabledataToResultdataHandler::addRequiredTables(const MetadataAssemblyData& _dataAssembly, std::list<string>& _requiredTables)
+{
+	for (auto range : _dataAssembly.allSelectionRanges)
+	{
+		_requiredTables.push_back(range->getTableName());
 	}
 }
 
-void TabledataToResultdataHandler::LoadRequiredTables(std::list<string>& requiredTables, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& loadedTables)
+void TabledataToResultdataHandler::loadRequiredTables(std::list<string>& _requiredTables, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& _loadedTables)
 {
 	//Deleting all loaded tables that are not needed anymore
-	auto it = loadedTables.begin();
-	while (it != loadedTables.end())
+	auto it = _loadedTables.begin();
+	while (it != _loadedTables.end())
 	{
 		bool tableIsStillRequired = false;
-		for (std::string requestedTableName : requiredTables)
+		for (std::string requestedTableName : _requiredTables)
 		{
 			if (requestedTableName == (*it).first)
 			{
@@ -468,7 +498,7 @@ void TabledataToResultdataHandler::LoadRequiredTables(std::list<string>& require
 		}
 		if (!tableIsStillRequired)
 		{
-			it = loadedTables.erase(it);
+			it = _loadedTables.erase(it);
 		}
 		else
 		{
@@ -477,15 +507,15 @@ void TabledataToResultdataHandler::LoadRequiredTables(std::list<string>& require
 	}
 
 	//Find all tables that need to be loaded
-	auto itTableNames = requiredTables.begin();
-	while (itTableNames != requiredTables.end())
+	auto itTableNames = _requiredTables.begin();
+	while (itTableNames != _requiredTables.end())
 	{
 		bool alreadyLoaded = false;
-		for (auto loadedTable : loadedTables)
+		for (auto loadedTable : _loadedTables)
 		{
 			if (loadedTable.first == (*itTableNames))
 			{
-				itTableNames = requiredTables.erase(itTableNames);
+				itTableNames = _requiredTables.erase(itTableNames);
 				alreadyLoaded = true;
 				break;
 			}
@@ -497,13 +527,13 @@ void TabledataToResultdataHandler::LoadRequiredTables(std::list<string>& require
 	}
 
 	//Load all missing tables
-	if (requiredTables.size() != 0)
+	if (_requiredTables.size() != 0)
 	{
-		auto allTables = _modelComponent->getListOfFolderItems(_tableFolder);
+		auto allTables = _modelComponent->getListOfFolderItems(m_tableFolder);
 		std::list<ot::EntityInformation> entityInfos;
 		_modelComponent->getEntityInformation(allTables, entityInfos);
 		ot::UIDList tableToLoadIDs;
-		for (std::string requiredTable : requiredTables)
+		for (std::string requiredTable : _requiredTables)
 		{
 			for (auto entityInfo : entityInfos)
 			{
@@ -520,7 +550,7 @@ void TabledataToResultdataHandler::LoadRequiredTables(std::list<string>& require
 			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(tableID, Application::instance()->getPrefetchedEntityVersion(tableID), Application::instance()->getClassFactory());
 			auto tableEntity = std::shared_ptr<EntityParameterizedDataTable>(dynamic_cast<EntityParameterizedDataTable*>(baseEnt));
 			tableEntity->getTableData();
-			loadedTables.insert({ tableEntity->getName(), tableEntity });
+			_loadedTables.insert({ tableEntity->getName(), tableEntity });
 		}
 	}
 }

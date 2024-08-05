@@ -60,7 +60,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)$(OT_INC);$(ProjectDir)$(OT_INC);$(GOOGLE_TEST_INC);$(OT_DEFAULT_SERVICE_INCD);$(MONGO_C_INCD);$(BOOST_INCD)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)$(OT_INC);$(ProjectDir)$(OT_INC);$(GOOGLE_TEST_INC);$(OT_DEFAULT_SERVICE_INCD);$(MONGO_C_INCD);$(BOOST_INCD);C:\OpenTwin\Libraries\ModelEntities\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -68,7 +68,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);$(OT_RESULT_DATA_ACCESS_ROOT)$(OT_LIBTESTD);$(BOOST_LIBPATHD);$(MONGO_CXX_LIBPATHD)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(GOOGLE_TEST_LIBPATHD);$(OT_RESULT_DATA_ACCESS_ROOT)$(OT_LIBTESTD);$(BOOST_LIBPATHD);$(MONGO_CXX_LIBPATHD);$(OT_MODELENTITIES_ROOT)\$(OT_DLLD)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(GOOGLE_TEST_LIB);ResultDataAccess.lib;$(MONGO_CXX_LIBD);$(OT_DEFAULT_SERVICE_LIBD)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

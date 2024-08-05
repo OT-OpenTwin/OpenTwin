@@ -54,12 +54,12 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE_NAME% DEBUG
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\PythonExecution\PythonExecution.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_PYTHON_EXECUTION_ROOT%\PythonExecution.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE_NAME% RELEASE
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\PythonExecution\PythonExecution.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_PYTHON_EXECUTION_ROOT%\PythonExecution.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
 ) 
 
 GOTO END

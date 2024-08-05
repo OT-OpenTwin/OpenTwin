@@ -2,12 +2,15 @@
 
 #include "OTCore/FolderNames.h"
 #include "Application.h"
-#include "ResultCollectionExtender.h"
 
 #include "DataBase.h"
 
+#include "ResultCollectionExtender.h"
 #include "MetadataCampaign.h"
 #include "MetadataEntrySingle.h"
+#include "QuantityDescription.h"
+#include "QuantityDescriptionSParameter.h"
+
 
 #include "OptionsParameterHandlerFormat.h"
 #include "OptionsParameterHandlerFrequency.h"
@@ -29,83 +32,65 @@ int TouchstoneToResultdata::getAssumptionOfPortNumber(const std::string& fileNam
 	return TouchstoneHandler::deriveNumberOfPorts(fileName);
 }
 
-void TouchstoneToResultdata::SetResultdata(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength)
+void TouchstoneToResultdata::setResultdata(const std::string& _fileName, const std::string& _fileContent, uint64_t _uncompressedLength)
 {
-	_fileName = fileName;
-	_fileContent = fileContent;
-	_uncompressedLength = uncompressedLength;
+	m_fileName = _fileName;
+	m_fileContent = _fileContent;
+	m_uncompressedLength = _uncompressedLength;
 }
 
-void TouchstoneToResultdata::CreateResultdata(int numberOfPorts)
+void TouchstoneToResultdata::createResultdata(int _numberOfPorts)
 {	
-	if (_collectionName == "")
+	if (m_collectionName == "")
 	{
-		_collectionName = DataBase::GetDataBase()->getProjectName();
+		m_collectionName = DataBase::GetDataBase()->getProjectName();
 	}
-	const std::string seriesName = CreateSeriesName(_fileName);
-	const bool seriesAlreadyExists = SeriesAlreadyExists(seriesName);
-	if (!seriesAlreadyExists)
+	const std::string seriesName = createSeriesName(m_fileName);
+	const bool seriesExists = seriesAlreadyExists(seriesName);
+	if (!seriesExists)
 	{
-		TouchstoneHandler handler = std::move(ImportTouchstoneFile(_fileName, _fileContent, _uncompressedLength, numberOfPorts));
-		ot::UID seriesID = _modelComponent->createEntityUID();
-		MetadataSeries newSeriesMetadata(seriesName, seriesID);
-		BuildSeriesMetadataFromTouchstone(handler, newSeriesMetadata, numberOfPorts);
-		ResultCollectionExtender resultCollectionExtender(_collectionName, *_modelComponent, &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
-		resultCollectionExtender.AddSeries(std::move(newSeriesMetadata));
-
-		resultCollectionExtender.setBucketSize(numberOfPorts * numberOfPorts);
-		const std::list<ts::PortData>& allPortData = handler.getPortData();
-
-		const auto seriesMetadata = resultCollectionExtender.FindMetadataSeries(seriesName);
-		const auto& allParameter = seriesMetadata->getParameter();
-		assert(allParameter.size() == 1);
-		std::list<std::string> parameterAbbrev{ allParameter.front().parameterAbbreviation };
-
-		const auto allQuantities = seriesMetadata->getQuantities();
-		assert(allQuantities.size() == 2);
-
-		for (const ts::PortData& portData : allPortData)
+		ResultCollectionExtender resultCollectionExtender(m_collectionName, *_modelComponent, &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+		DatasetDescription1D dataset;
+		std::list< std::shared_ptr<MetadataEntry>> seriesMetadata;
 		{
-			auto currentQuantity = allQuantities.begin();
-			const ot::Variable& frequency = portData.getFrequency();
-
-			for (auto& portDataEntry : portData.getPortDataEntries())
-			{
-				resultCollectionExtender.AddQuantityContainer(seriesID, parameterAbbrev, { frequency }, currentQuantity->quantityIndex,std::get<0>(portDataEntry));
-			}
-
-			currentQuantity++;
-			for (auto& portDataEntry : portData.getPortDataEntries())
-			{
-				resultCollectionExtender.AddQuantityContainer(seriesID, parameterAbbrev, { frequency }, currentQuantity->quantityIndex, std::get<1>(portDataEntry));
-			}
+			TouchstoneHandler handler = std::move(importTouchstoneFile(m_fileName, m_fileContent, m_uncompressedLength, _numberOfPorts));
+			dataset = std::move(extractDatasetDescription(handler));
+			
+			auto& optionSettings = handler.getOptionSettings();
+			std::string tsParameter = OptionsParameterHandlerParameter::ToString(optionSettings.getParameter());
+			seriesMetadata.push_back(std::make_shared<MetadataEntrySingle>("Touchstone Parameter", tsParameter));
+			seriesMetadata.push_back(std::make_shared<MetadataEntrySingle>("Reference Resistance", optionSettings.getReferenceResistance()));
 		}
+		std::list<DatasetDescription*>datasets{ &dataset };
+		const ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, seriesMetadata);
+			
+		resultCollectionExtender.processDataPoints(dataset,seriesID);
 	}
 	else
 	{
 		_uiComponent->displayMessage("Series metadata with the name: " + seriesName + " already exists.");
 	}
 	
-	_fileContent = "";
-	_fileName = "";
-	_uncompressedLength = 0;
-	_collectionName = "";
+	m_fileContent = "";
+	m_fileName = "";
+	m_uncompressedLength = 0;
+	m_collectionName = "";
 }
 
-const std::string TouchstoneToResultdata::CreateSeriesName(const std::string& fileName)
+const std::string TouchstoneToResultdata::createSeriesName(const std::string& _fileName)
 {
-	auto start = fileName.find_last_of("/")+1;
-	auto end = fileName.find_last_of(".")-1;
-	const std::string seriesName = ot::FolderNames::DatasetFolder + "/" + fileName.substr(start, end - start);
+	auto start = _fileName.find_last_of("/")+1;
+	auto end = _fileName.find_last_of(".")-1;
+	const std::string seriesName = ot::FolderNames::DatasetFolder + "/" + _fileName.substr(start, end - start);
 	return seriesName;
 }
 
-bool TouchstoneToResultdata::SeriesAlreadyExists(const std::string& seriesName)
+bool TouchstoneToResultdata::seriesAlreadyExists(const std::string& _seriesName)
 {
 	std::list<std::string> folderContent =	_modelComponent->getListOfFolderItems(ot::FolderNames::DatasetFolder,true);
 	for (const std::string& entityName : folderContent)
 	{
-		if (entityName == seriesName)
+		if (entityName == _seriesName)
 		{
 			return true;
 		}
@@ -113,28 +98,28 @@ bool TouchstoneToResultdata::SeriesAlreadyExists(const std::string& seriesName)
 	return false;
 }
 
-TouchstoneHandler TouchstoneToResultdata::ImportTouchstoneFile(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength, int numberOfPorts)
+TouchstoneHandler TouchstoneToResultdata::importTouchstoneFile(const std::string& _fileName, const std::string& _fileContent, uint64_t _uncompressedLength, int _numberOfPorts)
 {
 	// Decode the encoded string into binary data
-	int decoded_compressed_data_length = Base64decode_len(fileContent.c_str());
+	int decoded_compressed_data_length = Base64decode_len(_fileContent.c_str());
 	char* decodedCompressedString = new char[decoded_compressed_data_length];
 
-	Base64decode(decodedCompressedString, fileContent.c_str());
+	Base64decode(decodedCompressedString, _fileContent.c_str());
 
 	// Decompress the data
-	char* decodedString = new char[uncompressedLength];
-	uLongf destLen = (uLongf)uncompressedLength;
+	char* decodedString = new char[_uncompressedLength];
+	uLongf destLen = (uLongf)_uncompressedLength;
 	uLong  sourceLen = decoded_compressed_data_length;
 	uncompress((Bytef*)decodedString, &destLen, (Bytef*)decodedCompressedString, sourceLen);
 
 	delete[] decodedCompressedString;
 	decodedCompressedString = nullptr;
 
-	std::string unpackedFileContent(decodedString, uncompressedLength);
-	TouchstoneHandler handler(fileName);
+	std::string unpackedFileContent(decodedString, _uncompressedLength);
+	TouchstoneHandler handler(_fileName);
 	try
 	{
-		handler.AnalyseFile(unpackedFileContent, numberOfPorts);
+		handler.analyseFile(unpackedFileContent, _numberOfPorts);
 	}
 	catch (const std::exception& e)
 	{
@@ -144,89 +129,35 @@ TouchstoneHandler TouchstoneToResultdata::ImportTouchstoneFile(const std::string
 	return handler;
 }
 
-void TouchstoneToResultdata::BuildSeriesMetadataFromTouchstone(TouchstoneHandler& touchstoneHandler, MetadataSeries& series, int numberOfPorts)
+DatasetDescription1D TouchstoneToResultdata::extractDatasetDescription(TouchstoneHandler& _touchstoneHandler)
 {
-	ts::OptionSettings optionSettings =	touchstoneHandler.getOptionSettings();
-	
-	std::string tsParameter = OptionsParameterHandlerParameter::ToString(optionSettings.getParameter());
-	std::shared_ptr<MetadataEntry>mdParameter(new MetadataEntrySingle("Touchstone Parameter",tsParameter));
-	series.AddMetadata(mdParameter);
-	
-	std::shared_ptr<MetadataEntry>mdResistance(new MetadataEntrySingle("Reference Resistance", optionSettings.getReferenceResistance()));
-	series.AddMetadata(mdResistance);
+	DatasetDescription1D datasetDescription;
 
-	MetadataParameter parameter;
-	std::string frequencySetting = OptionsParameterHandlerFrequency::ToString(optionSettings.getFrequency());
-	std::shared_ptr<MetadataEntry> mdFrequencySetting(new MetadataEntrySingle("Unit", frequencySetting));
-	parameter.metaData.insert(std::make_pair<>("Unit",mdFrequencySetting));
-	parameter.parameterName = "Frequency";
+	MetadataParameter& metadataParameter = _touchstoneHandler.getMetadataFrequencyParameter();
+	auto frequencyParameter(std::make_shared<MetadataParameter>(metadataParameter));
 
-	MetadataQuantity quantity1;
-	MetadataQuantity quantity2;
+	////Maybe it is necessary to guarantee that all values have the same type ? !
+	ts::OptionSettings optionSettings = _touchstoneHandler.getOptionSettings();
+	frequencyParameter->unit = OptionsParameterHandlerFrequency::ToString(optionSettings.getFrequency());
+	frequencyParameter->parameterName = "Frequency";
+	frequencyParameter->typeName = ot::TypeNames::getDoubleTypeName();
+	datasetDescription.setXAxisParameterDescription(frequencyParameter);
 
+	auto& quantityDescription = _touchstoneHandler.getQuantityDescription();
 	const ts::option::Format& selectedFormat = optionSettings.getFormat();
 	if (selectedFormat == ts::option::Format::Decibel_angle)
 	{
-		quantity1.quantityName = "Decibel";
-		quantity2.quantityName = "Angle";
+		quantityDescription.setValueFormatDecibelPhase();
 
 	}
 	else if (selectedFormat == ts::option::Format::magnitude_angle)
 	{
-		quantity1.quantityName = "Magnitude";
-		quantity2.quantityName = "Angle";
+		quantityDescription.setValueFormatMagnitudePhase();
 	}
 	else
 	{
-		quantity1.quantityName = "Real";
-		quantity2.quantityName = "Imaginary";
+		quantityDescription.setValueFormatRealImaginary("");
 	}
-
-	const auto& allPortData = touchstoneHandler.getPortData();
-	std::list<ot::Variable> allFrequencies;
-	
-	//std::list<std::string> allTypeNamesFrequencies;
-
-	for (const auto& portData : allPortData)
-	{
-		allFrequencies.push_back(portData.getFrequency());
-	/*	
-	* Maybe it is necessary to guarantee that all values have the same type ?!
-	* 
-		allTypeNamesFrequencies.push_back(portData.getFrequency().getTypeName());
-		const auto& allEntries = portData.getPortDataEntries();
-		std::list<std::string> typeNames1;
-		std::list<std::string> typeNames2;
-		
-		for(const auto& entry : allEntries)
-		{
-			typeNames1.push_back(std::get<0>(entry).getTypeName());
-			typeNames1.push_back(std::get<1>(entry).getTypeName());
-		}
-		typeNames1.unique();
-		if (typeNames1.size() != 1)
-		{
-			std::string typeName = DetermineDominantType();
-		}
-		typeNames2.unique();
-		if (typeNames2.size() != 1)
-		{
-
-		}*/
-	}
-	allFrequencies.unique();
-	parameter.values = allFrequencies;
-	
-	parameter.typeName = "Numerical";
-	quantity1.typeName = "Numerical";
-	quantity1.dataRows = numberOfPorts;
-	quantity1.dataColumns = numberOfPorts;
-
-	quantity2.typeName = "Numerical";
-	quantity2.dataRows = numberOfPorts;
-	quantity2.dataColumns = numberOfPorts;
-
-	series.AddParameter(std::move(parameter));
-	series.AddQuantity(std::move(quantity1));
-	series.AddQuantity(std::move(quantity2));
+	datasetDescription.setQuantityDescription(&quantityDescription);
+	return datasetDescription;
 }

@@ -1,8 +1,10 @@
 #pragma once
 #include "BusinessLogicHandler.h"
+#include "ResultCollectionExtender.h"
 
 #include "TouchstoneHandler.h"
 #include "MetadataSeries.h"
+#include "DatasetDescription1D.h"
 
 class TouchstoneToResultdata : public BusinessLogicHandler
 {
@@ -10,20 +12,19 @@ public:
 	TouchstoneToResultdata();
 	~TouchstoneToResultdata();
 	int getAssumptionOfPortNumber(const std::string& fileName);
-	void SetResultdata(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength);
-	void CreateResultdata(int numberOfPorts);
+	void setResultdata(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength);
+	void createResultdata(int numberOfPorts);
 
 private:
-	std::string _collectionName = "";
-	std::string _fileName = "";
-	std::string _fileContent = "";
-	uint64_t _uncompressedLength = 0;
+	std::string m_collectionName = "";
+	std::string m_fileName = "";
+	std::string m_fileContent = "";
+	uint64_t m_uncompressedLength = 0;
 
-	const std::string CreateSeriesName(const std::string& fileName);
-	bool SeriesAlreadyExists(const std::string& seriesName);
+	const std::string createSeriesName(const std::string& fileName);
+	bool seriesAlreadyExists(const std::string& seriesName);
 
-	TouchstoneHandler ImportTouchstoneFile(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength, int numberOfPorts);
-	void BuildSeriesMetadataFromTouchstone(TouchstoneHandler& touchstoneHandler, MetadataSeries& series, int numberOfPorts);
-	//std::string DetermineDominantType(const std::list<std::string>& typeNames);
+	TouchstoneHandler importTouchstoneFile(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength, int numberOfPorts);
+	DatasetDescription1D extractDatasetDescription(TouchstoneHandler& _handler);
 };
 

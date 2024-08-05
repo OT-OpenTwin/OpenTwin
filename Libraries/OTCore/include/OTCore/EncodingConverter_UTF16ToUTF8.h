@@ -21,8 +21,8 @@ namespace ot
 
 	private:
 		using byte = unsigned char;
-		ot::TextEncoding::EncodingStandard _utf16Flavour;
-		byte* _currentByte;
+		ot::TextEncoding::EncodingStandard _utf16Flavour = ot::TextEncoding::EncodingStandard::UNKNOWN;
+		byte* _currentByte = nullptr;
 		std::string _out;
 
 		char16_t getNextUFT16();

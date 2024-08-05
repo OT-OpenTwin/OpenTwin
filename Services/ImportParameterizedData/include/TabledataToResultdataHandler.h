@@ -20,26 +20,28 @@
 class TabledataToResultdataHandler : public BusinessLogicHandler
 {
 public:
-	TabledataToResultdataHandler(const std::string& baseFolder, const std::string& datasetFolder, const std::string& parameterFolder, const std::string& quantityFolder, const std::string& tableFolder);
-	void CreateDataCollection(const std::string& dbURL, const std::string& projectName);
+	TabledataToResultdataHandler(const std::string& _baseFolder, const std::string& _datasetFolder, const std::string& _parameterFolder, const std::string& _quantityFolder, const std::string& _tableFolder);
+	void createDataCollection(const std::string& _dbURL, const std::string& _projectName);
 
 private:
-	const std::string _baseFolder;
-	const std::string _datasetFolder;
-	const std::string _parameterFolder;
-	const std::string _quantityFolder;
-	const std::string _tableFolder;
-	const std::string _dbURL;
+	const std::string m_baseFolder;
+	const std::string m_datasetFolder;
+	const std::string m_parameterFolder;
+	const std::string m_quantityFolder;
+	const std::string m_tableFolder;
+	const std::string m_dbURL;
 	
-	const std::string _rmdEntityName = "Campaign Metadata";
+	const std::string m_rmdEntityName = "Campaign Metadata";
 
-	std::map<std::string, MetadataAssemblyData> GetAllMetadataAssemblies();
-	void AddRequiredTables(const MetadataAssemblyData& dataAssembly, std::list<string>& requiredTables);
-	void LoadRequiredTables(std::list<string>& requiredTables, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& loadedTables);
+	std::map<std::string, MetadataAssemblyData> getAllMetadataAssemblies();
+	void addRequiredTables(const MetadataAssemblyData& _dataAssembly, std::list<string>& _requiredTables);
+	void loadRequiredTables(std::list<string>& _requiredTables, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& _loadedTables);
 
-	void ExtractRMDAndAllMSMD(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities);
-	void ExtractAllParameter(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities);
-	void ExtractAllQuantities(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& allRangeEntities);
+	void extractRMDAndAllMSMD(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities);
+	void extractAllParameter(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities);
+	void extractAllQuantities(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities);
 
-	std::list<std::shared_ptr<MetadataEntry>> RangeData2MetadataEntries(MetadataAssemblyRangeData&& assembyRangeData);
+	std::list<std::shared_ptr<MetadataEntry>> rangeData2MetadataEntries(MetadataAssemblyRangeData&& _assembyRangeData);
+
+	std::string extractUnitFromName(std::string& _name);
 };

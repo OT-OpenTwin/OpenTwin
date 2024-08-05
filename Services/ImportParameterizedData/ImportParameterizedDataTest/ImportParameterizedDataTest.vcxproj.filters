@@ -51,9 +51,6 @@
     <ClCompile Include="src\TestTouchstoneOptionSettings.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\TestPortData.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

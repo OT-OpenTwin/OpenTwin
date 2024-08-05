@@ -16,12 +16,6 @@
     <Filter Include="Third Party Files">
       <UniqueIdentifier>{3923beac-319d-4562-8a8c-f3e321a3d358}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Data1D">
-      <UniqueIdentifier>{a9d1e4c4-f66e-40a2-9801-63277bb57eee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Data1D">
-      <UniqueIdentifier>{e8bc6772-e5e1-4af3-b2fe-2be8bc323453}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -54,12 +48,6 @@
     <ClCompile Include="src\ParametricResult1DManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DataDescription1D.cpp">
-      <Filter>Source Files\Data1D</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SParameterMatrixHelper.cpp">
-      <Filter>Source Files\Data1D</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -85,18 +73,6 @@
     </ClInclude>
     <ClInclude Include="include\Result1DData.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DataDescription1D.h">
-      <Filter>Header Files\Data1D</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ParameterDescription.h">
-      <Filter>Header Files\Data1D</Filter>
-    </ClInclude>
-    <ClInclude Include="include\QuantityDescription.h">
-      <Filter>Header Files\Data1D</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SParameterMatrixHelper.h">
-      <Filter>Header Files\Data1D</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

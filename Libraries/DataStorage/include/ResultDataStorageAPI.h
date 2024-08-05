@@ -1,4 +1,11 @@
 #pragma once
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
+#endif
+
 #include <string>
 
 #include "Response/DataStorageResponse.h"

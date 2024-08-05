@@ -2,61 +2,74 @@
 #include <gtest/gtest.h>
 
 #include "TouchstoneHandler.h"
+#include "QuantityDescriptionSParameter.h"
 
 class FixtureTouchstoneHandler : public testing::Test
 {
 public:
 	FixtureTouchstoneHandler()
-		:_handler("testFile.s2p")
+		:m_handler("testFile.s2p")
 	{
 
 	}
-	const ts::OptionSettings& AnalyseOptionSettings(std::string& text) 
+	const ts::OptionSettings& analyseOptionSettings(std::string& text) 
 	{ 
-		_handler.AnalyseLine(text);
-		return _handler.getOptionSettings(); 
+		m_handler.analyseLine(text);
+		return m_handler.getOptionSettings(); 
 	}
 	
-	void AnalyseLine(std::string& text)
+	void analyseLine(std::string& text)
 	{
-		_handler.AnalyseLine(text);
+		m_handler.analyseLine(text);
 	}
 	
-	void AnalyseFile(const std::string& fileContent)
+	void analyseFile(const std::string& fileContent)
 	{
-		_handler.AnalyseFile(fileContent);
+		m_handler.analyseFile(fileContent,m_handler.m_portNumber);
 	}
 
-	const std::string& GetComments()
+	const std::string& getComments()
 	{
-		return _handler.getComments();
+		return m_handler.getComments();
 	}
 
-	void CleansLineOfComments(std::string& line)
+	void cleansLineOfComments(std::string& line)
 	{
-		_handler.CleansOfComments(line);
+		m_handler.cleansOfComments(line);
 	}
 
-	void SetNumberOfPorts(uint32_t portNumber)
+	void setNumberOfPorts(uint32_t portNumber)
 	{
-		_handler._portNumber = portNumber;
+		m_handler.m_portNumber = portNumber;
 	}
 
-	const std::list<ts::PortData>& GetPortData()
+	const QuantityDescriptionSParameter& getQuantityDescriptionData()
 	{
-		return _handler.getPortData();
+		return m_handler.getQuantityDescription();
 	}
 
-	const ts::OptionSettings& GetOptionSettings()
+	const ts::OptionSettings& getOptionSettings()
 	{
-		return _handler.getOptionSettings();
+		return m_handler.getOptionSettings();
 	}
 
-	const std::string& GetFullExampleFourPorts() const { return _exampleFourPorts; };
+	const MetadataParameter& getFrequencyParameter()
+	{
+		return m_handler.getMetadataFrequencyParameter();
+	}
+
+	void setup1PortTest()
+	{
+		std::string line = "2.000 0.894 -12.136\n";
+		setNumberOfPorts(1);
+		analyseLine(line);
+	}
+
+	const std::string& getFullExampleFourPorts() const { return m_exampleFourPorts; };
 private:
-	TouchstoneHandler _handler;
+	TouchstoneHandler m_handler;
 
-	const std::string _exampleFourPorts =
+	const std::string m_exampleFourPorts =
 		"!4 - port S - parameter data, taken at three frequency points\n"
 		"!note that data points need not be aligned\n"
 		"# Hz Y RI R 90\n"

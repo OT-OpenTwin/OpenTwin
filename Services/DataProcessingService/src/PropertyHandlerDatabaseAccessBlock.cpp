@@ -126,8 +126,8 @@ void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBloc
 	buffer.SelectedProject = dbAccessEntity->getSelectedProjectName();
 	buffer.selectedDimension = dbAccessEntity->getQueryDimension();
 
-	buffer.parameterByName = campaignMetadata.getMetadataParameterByName();
-	buffer.quantitiesByName = campaignMetadata.getMetadataQuantitiesByName();
+	//buffer.parameterByName = campaignMetadata.getMetadataParameterByLabel();
+	//buffer.quantitiesByName = campaignMetadata.getMetadataQuantitiesByLabel();
 	std::list<MetadataSeries> seriesMetadata = campaignMetadata.getSeriesMetadata();
 
 	std::string selectedQuantity, selectedParameter1, selectedParameter2, selectedParameter3;
@@ -143,9 +143,9 @@ void PropertyHandlerDatabaseAccessBlock::UpdateBuffer(std::shared_ptr<EntityBloc
 		if (quantityName == selectedQuantity)
 		{
 			buffer.SelectedQuantity = quantityName;
-			buffer.dataTypeQuantity = quantity.second.typeName;
+			//buffer.dataTypeQuantity = quantity.second.typeName;
 		}
-		buffer.dataTypesByName[quantityName] = quantity.second.typeName;
+		//buffer.dataTypesByName[quantityName] = quantity.second.typeName;
 		buffer.QuantityNames.push_back(quantityName);
 	}
 	for (auto parameter : buffer.parameterByName)

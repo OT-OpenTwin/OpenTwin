@@ -388,18 +388,6 @@ PUSHD "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel"
 CALL "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\build.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\AdminPanel_buildLog.txt"
 POPD
 
-IF "%2"=="BUILD"  (
-	IF "%OT_SKIP_DOC_ON_BUILD%"=="true" (
-		GOTO SKIP_DOC_BUILD
-	)
-)
-
-:DOC_BUILD_ONLY
-
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildDocumentation.bat"
-
-:SKIP_DOC_BUILD
-
 REM ====================================================================
 REM Create the buildlog summary
 REM ====================================================================
@@ -431,3 +419,16 @@ pause
 GOTO END
 
 :END
+
+
+IF "%2"=="BUILD"  (
+	IF "%OT_SKIP_DOC_ON_BUILD%"=="true" (
+		GOTO SKIP_DOC_BUILD
+	)
+)
+
+:DOC_BUILD_ONLY
+
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildDocumentation.bat"
+
+:SKIP_DOC_BUILD

@@ -3,9 +3,8 @@
 #include <list>
 
 #include "OTServiceFoundation/ModelComponent.h"
-#include "Document/DocumentAccess.h"
+
 #include "EntityBase.h"
-#include "ResultDataStorageAPI.h"
 
 #include "MetadataCampaign.h"
 #include "MetadataQuantity.h"
@@ -20,31 +19,40 @@ class __declspec(dllexport) ResultMetadataAccess
 public:
 	ResultMetadataAccess(const std::string& collectionName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory);
 	ResultMetadataAccess(const std::string& crossCollectionName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL);
-	ResultMetadataAccess(ResultMetadataAccess&& other);
+	ResultMetadataAccess(ResultMetadataAccess&& other) noexcept;
 	ResultMetadataAccess& operator=(ResultMetadataAccess&& other) noexcept;
 
 	virtual ~ResultMetadataAccess() {};
 
-	const std::list<std::string> ListAllSeriesNames() const;
-	const std::list<std::string> ListAllParameterNames() const;
-	const std::list<std::string> ListAllQuantityNames() const;
+	const std::list<std::string> listAllSeriesNames() const;
+	const std::list<std::string> listAllParameterLabels() const;
+	const std::list<std::string> listAllQuantityLabels() const;
 
-	const MetadataSeries* FindMetadataSeries(const std::string& name);
-	const MetadataParameter* FindMetadataParameter(const std::string& name);
-	const MetadataQuantity* FindMetadataQuantity(const std::string& name);
+	//! <returns>nullptr if not found</returns>
+	const MetadataSeries* findMetadataSeries(const std::string& _label);
+	//! <returns>nullptr if not found</returns>
+	const MetadataSeries* findMetadataSeries(ot::UID _index);
+	//! <returns>nullptr if not found</returns>
+	const MetadataParameter* findMetadataParameter(const std::string& _label);
+	//! <returns>nullptr if not found</returns>
+	const MetadataParameter* findMetadataParameter(ot::UID _index);
+	//! <returns>nullptr if not found</returns>
+	const MetadataQuantity* findMetadataQuantity(const std::string& _label);
+	//! <returns>nullptr if not found</returns>
+	const MetadataQuantity* findMetadataQuantity(ot::UID _index); //Needs to look through the value descriptions!
 
-	const MetadataCampaign& getMetadataCampaign() const { return _metadataCampaign; }
+	const MetadataCampaign& getMetadataCampaign() const { return m_metadataCampaign; }
 
-	const std::string& getCollectionName() const { return _collectionName; }
+	const std::string& getCollectionName() const { return m_collectionName; }
 
-	bool collectionHasMetadata() const { return _metadataExistInProject; }
+	bool collectionHasMetadata() const { return m_metadataExistInProject; }
 protected:
-	bool _metadataExistInProject = false;
-	std::string _collectionName;
-	ot::components::ModelComponent* _modelComponent;
-	MetadataCampaign _metadataCampaign;
+	bool m_metadataExistInProject = false;
+	std::string m_collectionName;
+	ot::components::ModelComponent* m_modelComponent;
+	MetadataCampaign m_metadataCampaign;
 
 private:
-	void LoadExistingCampaignData(ClassFactory* classFactory);
-	std::vector<EntityBase*> FindAllExistingMetadata(ClassFactory* classFactory);
+	void loadExistingCampaignData(ClassFactory* classFactory);
+	std::vector<EntityBase*> findAllExistingMetadata(ClassFactory* classFactory);
 };

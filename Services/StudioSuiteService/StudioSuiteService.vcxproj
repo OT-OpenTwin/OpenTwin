@@ -194,7 +194,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c" />
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\DataDescription1D.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\InfoFileManager.cpp" />
@@ -202,21 +201,16 @@
     <ClCompile Include="src\Result1DData.cpp" />
     <ClCompile Include="src\Result1DManager.cpp" />
     <ClCompile Include="src\RunIDContainer.cpp" />
-    <ClCompile Include="src\SParameterMatrixHelper.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
-    <ClInclude Include="include\DataDescription1D.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\InfoFileManager.h" />
-    <ClInclude Include="include\ParameterDescription.h" />
     <ClInclude Include="include\ParametricResult1DManager.h" />
-    <ClInclude Include="include\QuantityDescription.h" />
     <ClInclude Include="include\Result1DData.h" />
     <ClInclude Include="include\Result1DManager.h" />
     <ClInclude Include="include\RunIDContainer.h" />
-    <ClInclude Include="include\SParameterMatrixHelper.h" />
     <ClInclude Include="include\UiNotifier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

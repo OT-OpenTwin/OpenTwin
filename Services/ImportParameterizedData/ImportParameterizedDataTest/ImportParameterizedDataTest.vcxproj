@@ -38,7 +38,6 @@
     <ClCompile Include="src\FixtureTableExtractorCSV.cpp" />
     <ClCompile Include="src\FixtureTableStatisticAnalyser.cpp" />
     <ClCompile Include="src\TestCategorizationConsistencyChecker.cpp" />
-    <ClCompile Include="src\TestPortData.cpp" />
     <ClCompile Include="src\TestTouchstoneOptionHandling.cpp" />
     <ClCompile Include="src\TestTouchstoneOptionSettings.cpp" />
     <ClCompile Include="src\TestTableStatisticAnalyser.cpp" />
@@ -92,7 +91,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\$(OT_INC);$(SolutionDir)\$(OT_INC);$(GOOGLE_TEST_INC);$(OT_MODELENTITIES_ROOT)\$(OT_INC);$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
       <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
       <ExternalTemplatesDiagnostics>false</ExternalTemplatesDiagnostics>
@@ -103,8 +102,8 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);%(AdditionalIncludeDirectories);$(OT_MODELENTITIES_ROOT)\$(OT_DLLD);$(OT_DEFAULT_SERVICE_LIBPATHD)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ImportParameterizedDataService.lib;$(GOOGLE_TEST_LIB);ModelEntities.lib;$(OT_DEFAULT_SERVICE_LIBD)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);%(AdditionalIncludeDirectories);$(OT_MODELENTITIES_ROOT)\$(OT_DLLD);$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLD)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ImportParameterizedDataService.lib;$(GOOGLE_TEST_LIB);ModelEntities.lib;$(OT_DEFAULT_SERVICE_LIBD);ResultDataAccess.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

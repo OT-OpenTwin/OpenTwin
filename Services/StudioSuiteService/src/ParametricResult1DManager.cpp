@@ -12,6 +12,10 @@
 #include "MetadataParameter.h"
 #include "MetadataEntrySingle.h"
 
+#include "QuantityDescription.h"
+#include "QuantityDescriptionCurve.h"
+#include "QuantityDescriptionSParameter.h"
+
 #include <boost/algorithm/string.hpp>
 
 ParametricResult1DManager::ParametricResult1DManager(Application *app) :
@@ -55,11 +59,11 @@ void ParametricResult1DManager::extractData(Result1DManager& result1DManager)
 
 		for (const std::string& category : categories)
 		{
-			std::list<DataDescription1D>	curveDescriptions = extractDataDescriptionCurve(category, runIDContainer,runID);
+			std::list<DatasetDescription1D>	curveDescriptions = extractDataDescriptionCurve(category, runIDContainer,runID);
 			m_allDataDescriptions.splice(m_allDataDescriptions.end(), std::move(curveDescriptions));
 		}
-		std::list<DataDescription1D> sparameterDescriptions = extractDataDescriptionSParameter("1D Results/S-Parameters", runIDContainer,runID);
-		m_allDataDescriptions.splice(m_allDataDescriptions.end(), std::move(sparameterDescriptions));
+		DatasetDescription1D sparameterDescriptions = extractDataDescriptionSParameter("1D Results/S-Parameters", runIDContainer,runID);
+		m_allDataDescriptions.push_back(std::move(sparameterDescriptions));
 	}
 }
 
@@ -72,33 +76,22 @@ void ParametricResult1DManager::storeDataInResultCollection()
 	ResultCollectionExtender resultCollectionExtender(collectionName, *m_application->modelComponent(), &m_application->getClassFactory(), OT_INFO_SERVICE_TYPE_STUDIOSUITE);
 	resultCollectionExtender.setSaveModel(false);
 
-	ot::UID seriesID = m_application->modelComponent()->createEntityUID();
 	std::string seriesName = CreateNewUniqueTopologyName(m_resultFolderName, m_seriesNameBase);
-	MetadataSeries seriesMetadata(seriesName, seriesID);
-
-	//From here on it could be moved into a library:
 	
-	//Sort out repeating parameter and Quanity definitions	
-	std::map<std::string, MetadataQuantity> quantitiesByName;
-	std::map<std::string, MetadataParameter> parametersByName;
-
-	extractMetadataFromDescriptions(quantitiesByName, parametersByName, m_allDataDescriptions);
-	for (auto& quantityByName : quantitiesByName)
+	//From here on it could be moved into a library:
+	std::list<DatasetDescription*> allDataDescriptions;
+	for (auto& dataDescription1D : m_allDataDescriptions)
 	{
-		seriesMetadata.AddQuantity(std::move(quantityByName.second));
+		allDataDescriptions.push_back(&dataDescription1D);
 	}
 
-	for (auto& parameterByName : parametersByName)
-	{
-		seriesMetadata.AddParameter(std::move(parameterByName.second));
-	}
-
-	resultCollectionExtender.AddSeries(std::move(seriesMetadata));
+	std::list<std::shared_ptr<MetadataEntry>> seriesMetadata;
+	uint64_t seriesMetadataIndex = resultCollectionExtender.buildSeriesMetadata(allDataDescriptions, seriesName, seriesMetadata);
 
 	//Now we store all data points in the result collection
-	for (DataDescription1D& dataDescription : m_allDataDescriptions)
+	for (DatasetDescription1D& dataDescription : m_allDataDescriptions)
 	{
-		processDataPoints(dataDescription, resultCollectionExtender, seriesName);
+		resultCollectionExtender.processDataPoints(dataDescription, seriesMetadataIndex);
 	}
 }
 
@@ -117,115 +110,104 @@ std::string ParametricResult1DManager::determineRunIDLabel(std::list<int> &runID
 	return "Run " + std::to_string(minRunID) + "-" + std::to_string(maxRunID);
 }
 
-std::list<DataDescription1D>  ParametricResult1DManager::extractDataDescriptionCurve(const std::string& _category, RunIDContainer* _runIDContainer, int _runID)
+std::list<DatasetDescription1D>  ParametricResult1DManager::extractDataDescriptionCurve(const std::string& _category, RunIDContainer* _runIDContainer, int _runID)
 {
-	std::list<DataDescription1D> allCurveDescriptions;
+	std::list<DatasetDescription1D> allCurveDescriptions;
 	std::map<std::string, Result1DData*> categoryResults = _runIDContainer->getResultsForCategory(_category);
 	if (!categoryResults.empty())
 	{
-	
 		//We determine the parameter, which are shared by all curves.
 		auto allParameter = extractParameterDescription(_category, _runIDContainer, _runID);
 
 		//Now we create the individual curve descriptions
 		for (auto& curve : categoryResults)
 		{
-			DataDescription1D newCurveDescription;
+			DatasetDescription1D newCurveDescription;
 			auto parameter = allParameter.begin();
 			newCurveDescription.setXAxisParameterDescription(*parameter);
 			parameter++;
 			newCurveDescription.addParameterDescriptions(parameter, allParameter.end());
 
 			Result1DData* curveData = curve.second;
+			
+			std::string quantityUnit, quantityLabel;
+			parseAxisLabel(curveData->getXLabel(), quantityLabel, quantityUnit);
+			
 			std::unique_ptr<QuantityDescriptionCurve> quantityDescription(std::make_unique<QuantityDescriptionCurve>());
-			std::string prefix = curve.first.substr(_category.size() + 1);
+			//std::string prefix = curve.first.substr(_category.size() + 1);
+			//quantityDescription->setName(prefix);
+			quantityDescription->setName(quantityLabel);
+
 			const bool hasRealValues = !curveData->getYreValues().empty();
-			if (hasRealValues)
-			{
-				quantityDescription->quantityName = prefix + " (Re)";
-				quantityDescription->quantityValues.reserve(curveData->getYreValues().size());
-				for (auto realValue : curveData->getYreValues())
-				{
-					quantityDescription->quantityValues.push_back(ot::Variable(realValue));
-				}
-				newCurveDescription.setQuantityDescription(quantityDescription.release());
-				allCurveDescriptions.push_back(std::move(newCurveDescription));
-			}
 			const bool hasImValue = !curveData->getYimValues().empty();
+			
 			if (hasImValue)
 			{
-				std::unique_ptr<QuantityDescriptionCurve> quantityDescription(std::make_unique<QuantityDescriptionCurve>());
-				quantityDescription->quantityName = prefix + " (Im)";
-				quantityDescription->quantityValues.reserve(curveData->getYimValues().size());
-				for (auto imValue : curveData->getYimValues())
-				{
-					quantityDescription->quantityValues.push_back(ot::Variable(imValue));
-				}
+				quantityDescription->setValueFormatRealImaginary(quantityUnit);
+			}
+			else
+			{
+				quantityDescription->setValueFormatRealOnly(quantityUnit);
+			}
 
-				//In case that we already created a curve description for the real component
-				if (hasRealValues)
+			if (hasRealValues)
+			{
+				quantityDescription->reserveSizeRealValues(curveData->getYreValues().size());
+				
+				for (auto realValue : curveData->getYreValues())
 				{
-					DataDescription1D secondCurveDescription;
-					auto parameter = allParameter.begin();
-					secondCurveDescription.setXAxisParameterDescription(*parameter);
-					parameter++;
-					secondCurveDescription.addParameterDescriptions(parameter, allParameter.end());
-					
-					secondCurveDescription.setQuantityDescription(quantityDescription.release());
-					allCurveDescriptions.push_back(std::move(secondCurveDescription));
-				}
-				else
-				{
-					newCurveDescription.setQuantityDescription(quantityDescription.release());
-					allCurveDescriptions.push_back(std::move(newCurveDescription));
+					quantityDescription->addValueReal(ot::Variable(realValue));
 				}
 			}
+			if (hasImValue)
+			{
+				quantityDescription->reserveSizeImagValues(curveData->getYimValues().size());
+				
+				for (auto imValue : curveData->getYimValues())
+				{
+					quantityDescription->addValueImag(ot::Variable(imValue));
+				}
+			}
+
+			newCurveDescription.setQuantityDescription(quantityDescription.release());
+			allCurveDescriptions.push_back(std::move(newCurveDescription));
 		}
 	}
 	return allCurveDescriptions;
 }
 
-std::list<DataDescription1D> ParametricResult1DManager::extractDataDescriptionSParameter(const std::string& _category, RunIDContainer* _runIDContainer, int _runID)
+DatasetDescription1D ParametricResult1DManager::extractDataDescriptionSParameter(const std::string& _category, RunIDContainer* _runIDContainer, int _runID)
 {
-	std::list<DataDescription1D> newSParameterDescriptions;
-
 	std::map<std::string, Result1DData*> categoryResults = _runIDContainer->getResultsForCategory(_category);
 	if (!categoryResults.empty())
 	{
 		//We determine the characteristics that are shared by all curves.
 		auto allParameter = extractParameterDescription(_category, _runIDContainer, _runID);
-		DataDescription1D realValuesDescription, imValuesDescription;
+		DatasetDescription1D dataDescription;
 
 		auto parameter = allParameter.begin();
-		realValuesDescription.setXAxisParameterDescription(*parameter);
-		imValuesDescription.setXAxisParameterDescription(*parameter);
+		dataDescription.setXAxisParameterDescription(*parameter);
 
 		parameter++;
-		realValuesDescription.addParameterDescriptions(parameter, allParameter.end());
-		imValuesDescription.addParameterDescriptions(parameter, allParameter.end());
+		dataDescription.addParameterDescriptions(parameter, allParameter.end());
 
 		//Now we set the s-parameter matrices
 		std::vector<Result1DData*> sParameterValues;
-		std::unique_ptr<QuantityDescriptionSParameter> realQuantityValues(std::make_unique<QuantityDescriptionSParameter>()), imQuantityValues(std::make_unique<QuantityDescriptionSParameter>());
-		int numberOfPorts =	determineNumberOfPorts(_category, categoryResults, sParameterValues);
-		realQuantityValues->quantityDataNumberOfColumns= static_cast<uint32_t>(numberOfPorts);
-		realQuantityValues->quantityDataNumberOfRows= static_cast<uint32_t>(numberOfPorts);
-		
-		//Dangerous?
+		uint32_t numberOfPorts = static_cast<uint32_t>(determineNumberOfPorts(_category, categoryResults, sParameterValues));
+		std::string quantityUnit(""), quantityLabel("");
+		//parseAxisLabel(curveData->getXLabel(), quantityLabel, quantityUnit);
+		std::unique_ptr<QuantityDescriptionSParameter> quantityDescription(std::make_unique<QuantityDescriptionSParameter>(numberOfPorts)); //How to get this information ?
+				
+		//Dangerous? Do all curves guaranteed have the same number of frequency points ? Are real values always existing ?
 		size_t numberOfFrequencyPoints = sParameterValues[0]->getYreValues().size();
-		realQuantityValues->quantityValues.reserve(numberOfFrequencyPoints);
-		for (size_t i = 0; i < numberOfFrequencyPoints; i++)
-		{
-			realQuantityValues->quantityValues.push_back(SParameterMatrixHelper(realQuantityValues->quantityDataNumberOfRows));
-		}
+		quantityDescription->initiateZeroFilledValueMatrices(numberOfFrequencyPoints);
 		
-		*imQuantityValues = *realQuantityValues;
-		realQuantityValues->quantityName = "S-Parameter (Re)";
-		imQuantityValues->quantityName = "S-Parameter (Im)";
-		for (uint32_t row = 0; row < realQuantityValues->quantityDataNumberOfRows; row++)
+		quantityDescription->setName("S-Parameter");
+		quantityDescription->setValueFormatRealImaginary(quantityUnit);
+		for (uint32_t row = 0; row < numberOfPorts; row++)
 		{
-			uint32_t index = row * realQuantityValues->quantityDataNumberOfColumns;
-			for (uint32_t column = 0; column < realQuantityValues->quantityDataNumberOfColumns; column++)
+			uint32_t index = row * numberOfPorts;
+			for (uint32_t column = 0; column < numberOfPorts; column++)
 			{
 				if (sParameterValues[index] != nullptr)
 				{
@@ -234,263 +216,178 @@ std::list<DataDescription1D> ParametricResult1DManager::extractDataDescriptionSP
 					for (size_t frequencyIndex = 0; frequencyIndex < numberOfFrequencyPoints; frequencyIndex++)
 					{
 						ot::Variable realValue = ot::Variable(realValuesOverAllFrequencies[frequencyIndex]);
+						quantityDescription->setFirstValue(frequencyIndex,row,column,std::move(realValue));
 						ot::Variable imagValue = ot::Variable(imValuesOverAllFrequencies[frequencyIndex]);
-
-						realQuantityValues->quantityValues[frequencyIndex].setValue(row, column, std::move(realValue));
-						imQuantityValues->quantityValues[frequencyIndex].setValue(row, column, std::move(imagValue));
+						quantityDescription->setSecondValue(frequencyIndex,row,column,std::move(imagValue));
 					}
 				}
 				index++;
 			}
 		}
-		realValuesDescription.setQuantityDescription(realQuantityValues.release());
-		imValuesDescription.setQuantityDescription(imQuantityValues.release());
-		newSParameterDescriptions.push_back(std::move(realValuesDescription));
-		newSParameterDescriptions.push_back(std::move(imValuesDescription));
+		dataDescription.setQuantityDescription(quantityDescription.release());
+		return dataDescription;
 	}
-	return newSParameterDescriptions;
+	else
+	{
+		return DatasetDescription1D();
+	}
 }
 
-std::list<std::shared_ptr<ParameterDescription>> ParametricResult1DManager::extractParameterDescription(const std::string& _category, RunIDContainer* _runIDContainer, int _runID)
+std::list<std::shared_ptr<MetadataParameter>> ParametricResult1DManager::extractParameterDescription(const std::string& _category, RunIDContainer* _runIDContainer, int _runID)
 {
-	std::list<std::shared_ptr<ParameterDescription>> allParameter;
+	std::list<std::shared_ptr<MetadataParameter>> allParameter;
 	std::map<std::string, Result1DData*> categoryResults = _runIDContainer->getResultsForCategory(_category);
 
 	//First is the parameter of the X-Axis. Important to stay like this!
 	auto firstCurveData = categoryResults.begin()->second;
 	std::string xLabel, xUnit;
 	parseAxisLabel(firstCurveData->getXLabel(), xLabel, xUnit);
-	std::vector<ot::Variable> parameterValuesXAxis;
-	parameterValuesXAxis.reserve(firstCurveData->getXValues().size());
+	std::list<ot::Variable> parameterValuesXAxis;
+	//parameterValuesXAxis.reserve(firstCurveData->getXValues().size());
 	for (const double& xValue : firstCurveData->getXValues())
 	{
 		parameterValuesXAxis.push_back(ot::Variable(xValue));
 	}
-	std::shared_ptr<ParameterDescription> parameterXAxis(std::make_shared<ParameterDescription>());
+	std::shared_ptr<MetadataParameter> parameterXAxis(std::make_shared<MetadataParameter>());
 	parameterXAxis->parameterName = xLabel;
-	parameterXAxis->parameterValues = std::move(parameterValuesXAxis);
-	parameterXAxis->unitName = xUnit;
-	parameterXAxis->valueDataType = ot::TypeNames::getDoubleTypeName();
+	parameterXAxis->values= std::move(parameterValuesXAxis);
+	parameterXAxis->unit = xUnit;
+	parameterXAxis->typeName = ot::TypeNames::getDoubleTypeName();
 	allParameter.push_back(std::move(parameterXAxis));
 
 	//Second the run ID
-	std::shared_ptr<ParameterDescription> parameterRunID(std::make_shared<ParameterDescription>());
-	parameterRunID->parameterValues.push_back(ot::Variable(_runID));
+	std::shared_ptr<MetadataParameter> parameterRunID(std::make_shared<MetadataParameter>());
+	parameterRunID->values.push_back(ot::Variable(_runID));
 	parameterRunID->parameterName = m_parameterNameRunID;
-	parameterRunID->valueDataType = ot::TypeNames::getInt32TypeName();
+	parameterRunID->typeName = ot::TypeNames::getInt32TypeName();
 	allParameter.push_back(std::move(parameterRunID));
 
 	// Third all structure parameters
 	for (auto param : _runIDContainer->getParameters())
 	{
-		std::shared_ptr<ParameterDescription> parameterStructure(std::make_shared<ParameterDescription>());
+		std::shared_ptr<MetadataParameter> parameterStructure(std::make_shared<MetadataParameter>());
 		parameterStructure->parameterName = param.first;
-		parameterStructure->parameterValues = { ot::Variable(param.second) };
-		parameterStructure->valueDataType = ot::TypeNames::getDoubleTypeName();
+		parameterStructure->values= { ot::Variable(param.second) };
+		parameterStructure->typeName = ot::TypeNames::getDoubleTypeName();
 		allParameter.push_back(std::move(parameterStructure));
 	}
 
 	return allParameter;
 }
 
-void ParametricResult1DManager::extractMetadataFromDescriptions(std::map<std::string, MetadataQuantity>& _quantitiesByName, std::map<std::string, MetadataParameter>& _parametersByName, std::list<DataDescription1D>& _allDataDescriptions)
-{
+//void ParametricResult1DManager::extractMetadataFromDescriptions(std::map<std::string, MetadataQuantity>& _quantitiesByName, std::map<std::string, MetadataParameter>& _parametersByName, std::list<DataDescription1D>& _allDataDescriptions)
+//{
+//
+//	for (auto& dataDescription : _allDataDescriptions)
+//	{
+//		First, we create a corresponding Quantity 
+//		QuantityDescription* quantityDescription = dataDescription.getQuantityDescription();
+//		MetadataQuantity&	newMetadataQuantity = quantityDescription->getMetadataQuantity();
+//
+//		auto quantityMetadataByName = _quantitiesByName.find(newMetadataQuantity.quantityName);
+//		if (quantityMetadataByName != _quantitiesByName.end())
+//		{
+//			The Quantity was already added. So we need to check if the information about this quantity are consistent.
+//			MetadataQuantity& existingQuantityMetadata = quantityMetadataByName->second;
+//			if (newMetadataQuantity == existingQuantityMetadata)
+//			{
+//				Quantity exists already by name, but holds different characteristics
+//				Display: Warning regarding changed name.
+//				newMetadataQuantity.quantityLabel = newMetadataQuantity.quantityName;
+//				int i = 0;
+//				do
+//				{
+//					i++;
+//					newMetadataQuantity.quantityName = newMetadataQuantity.quantityName + "_" + std::to_string(i);
+//					quantityMetadataByName = _quantitiesByName.find(newMetadataQuantity.quantityName);
+//				} while (quantityMetadataByName != _quantitiesByName.end());
+//
+//				Name eventuell mit _ erweitern
+//				Originalen Namen behalten, ansonsten 
+//				dataDescription.quantityName = newInternalName
+//				Einmal einen UniqueName und dann ein Label. UniqueName = Label, außer UniqueName existiert bereits. Dann wird nämlich hochgezählt
+//				Das löst aber nicht das Problem bei Verteilung. Es kann sein, dass zwei Datensätze parallel hinzugefügt werden. Die UID unterscheidet sich. Der Unique Name ist aber identisch.
+//				_quantitiesByName[newMetadataQuantity.quantityName] = newMetadataQuantity;
+//			}
+//		}
+//		else
+//		{
+//			_quantitiesByName[newMetadataQuantity.quantityName] = newMetadataQuantity;
+//		}
+//
+//		Now we create the parameter
+//		addParameterMetadata(_parametersByName, dataDescription.getXAxisParameter());
+//
+//		for (auto& parameter : dataDescription.getParameters())
+//		{
+//			addParameterMetadata(_parametersByName, parameter);
+//		}
+//
+//	}
+//}
+//
+//void ParametricResult1DManager::addParameterMetadata(std::map<std::string, MetadataParameter>& _parametersByName, std::shared_ptr<MetadataParameter> _parameter)
+//{
+//	auto parameterByName = _parametersByName.find(_parameter->parameterName);
+//	if (parameterByName != _parametersByName.end())
+//	{
+//		auto existingParameter = parameterByName->second;
+//		if (existingParameter == *_parameter.get())
+//		{
+//
+//			Needs a notification
+//			There is already a parameter with the same name but differences in its other criterias.
+//			_parameter->parameterLabel = _parameter->parameterName;
+//			int i = 0;
+//			do
+//			{
+//				i++;
+//				_parameter->parameterName = _parameter->parameterName + "_" + std::to_string(i);
+//				parameterByName = _parametersByName.find(_parameter->parameterName);
+//			} while (parameterByName != _parametersByName.end());
+//
+//			_parametersByName[_parameter->parameterName] = *_parameter.get();
+//		}
+//		else
+//		{
+//
+//			std::list<ot::Variable>* existingValues = &(existingParameter.values);
+//			std::list<ot::Variable> newValues = { _parameter->values.begin(), _parameter->values.end() };
+//			existingValues->insert(existingValues->end(), newValues.begin(), newValues.end());
+//			existingValues->sort();
+//			existingValues->unique();
+//		}
+//	}
+//	else
+//	{
+//		_parametersByName[_parameter->parameterName] = *_parameter.get();
+//	}
+//}
 
-	for (auto& dataDescription : _allDataDescriptions)
-	{
-		//First, we create a corresponding Quantity 
-		QuantityDescription* quantityDescription = dataDescription.getQuantity();
-		auto quantityMetadataByName = _quantitiesByName.find(quantityDescription->quantityName);
-		if (quantityMetadataByName != _quantitiesByName.end())
-		{
-			//The Quantity was already added. So we need to check if the information about this quantity are consistent.
-			MetadataQuantity& quantityMetadata = quantityMetadataByName->second;
-			if (quantityMetadata.dataColumns != quantityDescription->quantityDataNumberOfColumns ||
-				quantityMetadata.dataRows != quantityDescription->quantityDataNumberOfRows ||
-				quantityMetadata.typeName != ot::TypeNames::getDoubleTypeName())
-			{
-				//Quantity exists already by name, but holds different characteristics
-				//Display: Warning regarding changed name.
-				quantityDescription->quantityLabel = quantityDescription->quantityName;
-				int i = 0;
-				do
-				{
-					i++;
-					quantityDescription->quantityName = quantityDescription->quantityName + "_" + std::to_string(i);
-					quantityMetadataByName = _quantitiesByName.find(quantityDescription->quantityName);
-				} while (quantityMetadataByName != _quantitiesByName.end());
-
-				//Name eventuell mit _ erweitern
-				//Originalen Namen behalten, ansonsten 
-				//dataDescription.quantityName = newInternalName
-				//Einmal einen UniqueName und dann ein Label. UniqueName = Label, außer UniqueName existiert bereits. Dann wird nämlich hochgezählt
-				//Das löst aber nicht das Problem bei Verteilung. Es kann sein, dass zwei Datensätze parallel hinzugefügt werden. Die UID unterscheidet sich. Der Unique Name ist aber identisch.
-				_quantitiesByName[quantityDescription->quantityName] = createNewQuantity(quantityDescription);
-			}
-		}
-		else
-		{
-			_quantitiesByName[quantityDescription->quantityName] = createNewQuantity(quantityDescription);
-		}
-
-		//Now we create the parameter
-		addParameterMetadata(_parametersByName, dataDescription.getXAxisParameter());
-
-		for (auto& parameter : dataDescription.getParameters())
-		{
-			addParameterMetadata(_parametersByName, parameter);
-		}
-
-	}
-}
-
-void ParametricResult1DManager::addParameterMetadata(std::map<std::string, MetadataParameter>& _parametersByName, std::shared_ptr<ParameterDescription> _parameter)
-{
-	auto parameterByName = _parametersByName.find(_parameter->parameterName);
-	if (parameterByName != _parametersByName.end())
-	{
-
-		if (parameterByName->second.unit != _parameter->unitName ||
-			parameterByName->second.typeName != _parameter->valueDataType)
-		{
-
-			//Needs a notification
-			//There is already a parameter with the same name but differences in its other criterias.
-			_parameter->parameterLabel = _parameter->parameterName;
-			int i = 0;
-			do
-			{
-				i++;
-				_parameter->parameterName = _parameter->parameterName + "_" + std::to_string(i);
-				parameterByName = _parametersByName.find(_parameter->parameterName);
-			} while (parameterByName != _parametersByName.end());
-
-			_parametersByName[_parameter->parameterName] = createNewParameter(_parameter.get());
-		}
-		else
-		{
-
-			std::list<ot::Variable>* existingValues = &(parameterByName->second.values);
-			std::list<ot::Variable> newValues = { _parameter->parameterValues.begin(), _parameter->parameterValues.end() };
-			existingValues->insert(existingValues->end(), newValues.begin(), newValues.end());
-			existingValues->sort();
-			existingValues->unique();
-		}
-	}
-	else
-	{
-		_parametersByName[_parameter->parameterName] = createNewParameter(_parameter.get());
-	}
-}
-
-void ParametricResult1DManager::processDataPoints(DataDescription1D& dataDescription, ResultCollectionExtender& _resultCollectionExtender, std::string& seriesName)
-{
-	const auto seriesMetadata = _resultCollectionExtender.FindMetadataSeries(seriesName);
-	std::list<std::string> parameterAbbreviations;
-	std::list<ot::Variable> sharedParameterValues;
-	
-	//In the extraction of parameters, the first is the x-axis. This is the only varying parameter for a curve
-	assert(dataDescription.getXAxisParameter()->parameterValues.size()>1);
-
-	//Add the first parameter abbreviation, which is corresponding to the x-axis parameter
-	const std::string xAxisParameterName = dataDescription.getXAxisParameter()->parameterName;
-	const MetadataParameter* metadataXAxisParameter = _resultCollectionExtender.FindMetadataParameter(xAxisParameterName);
-	parameterAbbreviations.push_back(metadataXAxisParameter->parameterAbbreviation);
-
-	//Add all the other parameters
-	for (auto& parameter : dataDescription.getParameters())
-	{
-		const MetadataParameter* metadataParameter = _resultCollectionExtender.FindMetadataParameter(parameter->parameterName);
-		
-		//Those parameter which are fixed for one curve, so they are suppose to have only one entry.
-		if (parameter->parameterValues.size() != 1)
-		{
-			//Too strickt ?
-			std::string message = "Cannot import data. Appart from the x-axis parameter, there is the parameter " + parameter->parameterName + ", which has more then one value within a single curve.";
-			throw std::exception(message.c_str());
-		}
-		else
-		{
-			parameterAbbreviations.push_back(metadataParameter->parameterAbbreviation);
-			sharedParameterValues.push_back(parameter->parameterValues.front());
-		}
-	}
-	QuantityDescription* currentQuantityDescription = dataDescription.getQuantity();
-	const MetadataQuantity* quantityMetadata = _resultCollectionExtender.FindMetadataQuantity(currentQuantityDescription->quantityName);
-
-	auto xParameter =	dataDescription.getXAxisParameter();
-	auto xParameterValue = xParameter->parameterValues.begin();
-	 dataDescription.getQuantity();
-	QuantityDescriptionCurve* curveDescription = dynamic_cast<QuantityDescriptionCurve*>(currentQuantityDescription);
-
-	if (curveDescription != nullptr)
-	{
-		assert(xParameter->parameterValues.size() == curveDescription->quantityValues.size());
-		for (auto& quantityValue : curveDescription->quantityValues)
-		{
-			std::list<ot::Variable> currentParameterValues{ *xParameterValue };
-			currentParameterValues.insert(currentParameterValues.end(), sharedParameterValues.begin(), sharedParameterValues.end());
-			_resultCollectionExtender.AddQuantityContainer(seriesMetadata->getSeriesIndex(), parameterAbbreviations, currentParameterValues, quantityMetadata->quantityIndex,quantityValue);
-			if (xParameterValue != xParameter->parameterValues.end())
-			{
-				xParameterValue++;
-			}
-		}
-	}
-	else
-	{
-		QuantityDescriptionSParameter* sParameterDescription = dynamic_cast<QuantityDescriptionSParameter*>(currentQuantityDescription);
-		assert(sParameterDescription != nullptr);
-		assert(xParameter->parameterValues.size() == sParameterDescription->quantityValues.size());
-		_resultCollectionExtender.FlushQuantityContainer();
-		_resultCollectionExtender.setBucketSize(sParameterDescription->quantityDataNumberOfColumns * sParameterDescription->quantityDataNumberOfRows);
-		for (auto& quantityValue : sParameterDescription->quantityValues)
-		{
-			std::list<ot::Variable> currentParameterValues{ *xParameterValue };
-			currentParameterValues.insert(currentParameterValues.end(), sharedParameterValues.begin(), sharedParameterValues.end());
-			for (uint32_t row = 0; row < quantityValue.getPortNumber(); row++)
-			{
-				for (uint32_t column = 0; column < quantityValue.getPortNumber(); column++)
-				{
-					const ot::Variable& quantityValueEntry = quantityValue.getValue(row,column);
-					_resultCollectionExtender.AddQuantityContainer(seriesMetadata->getSeriesIndex(), parameterAbbreviations, currentParameterValues, quantityMetadata->quantityIndex, quantityValueEntry);
-				}
-			}
-
-			if (xParameterValue != xParameter->parameterValues.end())
-			{
-				xParameterValue++;
-			}
-		}
-	}
-
-	
-}
-
-MetadataQuantity ParametricResult1DManager::createNewQuantity(const QuantityDescription* const _quantityDescription)
-{
-	MetadataQuantity newQuantity;
-	newQuantity.dataColumns = _quantityDescription->quantityDataNumberOfColumns;
-	newQuantity.dataRows = _quantityDescription->quantityDataNumberOfRows;
-	newQuantity.quantityName = _quantityDescription->quantityName;
-	newQuantity.quantityLabel = _quantityDescription->quantityLabel;
-	newQuantity.unit = _quantityDescription->quantityUnit;
-	newQuantity.typeName = ot::TypeNames::getDoubleTypeName();
-	return newQuantity;
-}
-
-MetadataParameter ParametricResult1DManager::createNewParameter(const ParameterDescription* const _paramParameter)
-{
-	MetadataParameter newParameterMetadata;
-	newParameterMetadata.parameterName = _paramParameter->parameterName;
-	newParameterMetadata.parameterLabel = _paramParameter->parameterLabel;
-	newParameterMetadata.unit = _paramParameter->unitName;
-	newParameterMetadata.typeName = _paramParameter->valueDataType;
-	newParameterMetadata.values = { _paramParameter->parameterValues.begin(),_paramParameter->parameterValues.end() };
-	newParameterMetadata.values.sort();
-	newParameterMetadata.values.unique();
-	return newParameterMetadata;
-}
+//MetadataQuantity ParametricResult1DManager::createNewQuantity(const QuantityDescription* const _quantityDescription)
+//{
+//	MetadataQuantity newQuantity;
+//	newQuantity.dataColumns = _quantityDescription->quantityDataNumberOfColumns;
+//	newQuantity.dataRows = _quantityDescription->quantityDataNumberOfRows;
+//	newQuantity.quantityName = _quantityDescription->quantityName;
+//	newQuantity.quantityLabel = _quantityDescription->quantityLabel;
+//	newQuantity.unit = _quantityDescription->quantityUnit;
+//	newQuantity.typeName = ot::TypeNames::getDoubleTypeName();
+//	return newQuantity;
+//}
+//
+//MetadataParameter ParametricResult1DManager::createNewParameter(const ParameterDescription* const _paramParameter)
+//{
+//	MetadataParameter newParameterMetadata;
+//	newParameterMetadata.parameterName = _paramParameter->parameterName;
+//	newParameterMetadata.parameterLabel = _paramParameter->parameterLabel;
+//	newParameterMetadata.unit = _paramParameter->unitName;
+//	newParameterMetadata.typeName = _paramParameter->valueDataType;
+//	newParameterMetadata.values = { _paramParameter->parameterValues.begin(),_paramParameter->parameterValues.end() };
+//	newParameterMetadata.values.sort();
+//	newParameterMetadata.values.unique();
+//	return newParameterMetadata;
+//}
 
 int ParametricResult1DManager::determineNumberOfPorts(const std::string& category, std::map<std::string, Result1DData*>& categoryResults, std::vector<Result1DData*>& sources)
 {

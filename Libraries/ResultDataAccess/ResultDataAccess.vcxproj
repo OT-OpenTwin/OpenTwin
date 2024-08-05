@@ -21,7 +21,12 @@
   <ItemGroup>
     <ClInclude Include="include\CrossCollectionAccess.h" />
     <ClInclude Include="include\AdvancedQueryBuilder.h" />
+    <ClInclude Include="include\DatasetDescription1D.h" />
+    <ClInclude Include="include\ParameterDescription.h" />
     <ClInclude Include="include\ProjectToCollectionConverter.h" />
+    <ClInclude Include="include\QuantityDescription.h" />
+    <ClInclude Include="include\QuantityDescriptionCurve.h" />
+    <ClInclude Include="include\QuantityDescriptionSParameter.h" />
     <ClInclude Include="include\ResultCollectionExtender.h" />
     <ClInclude Include="include\MetadataCampaign.h" />
     <ClInclude Include="include\MetadataEntityInterface.h" />
@@ -35,10 +40,14 @@
     <ClInclude Include="include\QuantityContainer.h" />
     <ClInclude Include="include\MetadataSeries.h" />
     <ClInclude Include="include\ResultMetadataAccess.h" />
+    <ClInclude Include="include\DatasetDescription.h" />
+    <ClInclude Include="include\SParameterMatrixHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CrossCollectionAccess.cpp" />
     <ClCompile Include="src\AdvancedQueryBuilder.cpp" />
+    <ClCompile Include="src\DatasetDescription.cpp" />
+    <ClCompile Include="src\DatasetDescription1D.cpp" />
     <ClCompile Include="src\ProjectToCollectionConverter.cpp" />
     <ClCompile Include="src\ResultCollectionExtender.cpp" />
     <ClCompile Include="src\MetadataCampaign.cpp" />
@@ -49,6 +58,7 @@
     <ClCompile Include="src\MetadataEntrySingle.cpp" />
     <ClCompile Include="src\QuantityContainer.cpp" />
     <ClCompile Include="src\ResultMetadataAccess.cpp" />
+    <ClCompile Include="src\SParameterMatrixHelper.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -9,41 +9,41 @@
 #include "EntityMetadataCampaign.h"
 #include "EntityMetadataSeries.h"
 
-ResultMetadataAccess::ResultMetadataAccess(const std::string& collectionName, ot::components::ModelComponent* modelComponent, ClassFactory *classFactory)
-	:_modelComponent(modelComponent), _collectionName(collectionName)
+ResultMetadataAccess::ResultMetadataAccess(const std::string& _collectionName, ot::components::ModelComponent* _modelComponent, ClassFactory *_classFactory)
+	:m_modelComponent(_modelComponent), m_collectionName(_collectionName)
 {
-	LoadExistingCampaignData(classFactory);
+	loadExistingCampaignData(_classFactory);
 }
 
-ResultMetadataAccess::ResultMetadataAccess(const std::string& crossCollectionName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL)
-	:_modelComponent(modelComponent), _collectionName(crossCollectionName)
+ResultMetadataAccess::ResultMetadataAccess(const std::string& _crossCollectionName, ot::components::ModelComponent* _modelComponent, ClassFactory* _classFactory, const std::string& _sessionServiceURL)
+	:m_modelComponent(_modelComponent), m_collectionName(_crossCollectionName)
 {
-	CrossCollectionAccess crossCollectionAccess(crossCollectionName, sessionServiceURL, modelComponent->serviceURL());
-	std::shared_ptr<EntityMetadataCampaign> campaignMetadataEntity =	crossCollectionAccess.getMeasurementCampaignMetadata(*_modelComponent, classFactory);
+	CrossCollectionAccess crossCollectionAccess(_crossCollectionName, _sessionServiceURL, _modelComponent->serviceURL());
+	std::shared_ptr<EntityMetadataCampaign> campaignMetadataEntity =	crossCollectionAccess.getMeasurementCampaignMetadata(*_modelComponent, _classFactory);
 	if (campaignMetadataEntity != nullptr)
 	{
-		_metadataExistInProject = true;
-		std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities = crossCollectionAccess.getMeasurementMetadata(*_modelComponent, classFactory);
+		m_metadataExistInProject = true;
+		std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities = crossCollectionAccess.getMeasurementMetadata(*_modelComponent, _classFactory);
 		MetadataEntityInterface campaignFactory;
-		_metadataCampaign = campaignFactory.CreateCampaign(campaignMetadataEntity, seriesMetadataEntities);
+		m_metadataCampaign = campaignFactory.createCampaign(campaignMetadataEntity, seriesMetadataEntities);
 	}
 }
 
-ResultMetadataAccess::ResultMetadataAccess(ResultMetadataAccess&& other)
-	:_modelComponent(other._modelComponent), _metadataCampaign(std::move(other._metadataCampaign)), _collectionName(other._collectionName)
+ResultMetadataAccess::ResultMetadataAccess(ResultMetadataAccess&& other) noexcept
+	:m_modelComponent(other.m_modelComponent), m_metadataCampaign(std::move(other.m_metadataCampaign)), m_collectionName(other.m_collectionName)
 {}
 
 ResultMetadataAccess& ResultMetadataAccess::operator=(ResultMetadataAccess&& other) noexcept
 {
-	_collectionName = std::move(other._collectionName);
-	_modelComponent = std::move(other._modelComponent);
-	_metadataCampaign = (std::move(other._metadataCampaign));
+	m_collectionName = std::move(other.m_collectionName);
+	m_modelComponent = std::move(other.m_modelComponent);
+	m_metadataCampaign = (std::move(other.m_metadataCampaign));
 	return *this;
 }
 
-const std::list<std::string> ResultMetadataAccess::ListAllSeriesNames() const
+const std::list<std::string> ResultMetadataAccess::listAllSeriesNames() const
 {
-	auto& seriesMetadataEntries= _metadataCampaign.getSeriesMetadata();
+	auto& seriesMetadataEntries= m_metadataCampaign.getSeriesMetadata();
 	std::list<std::string> seriesMetadataNames;
 	for (auto& seriesMetadata: seriesMetadataEntries)
 	{
@@ -52,9 +52,9 @@ const std::list<std::string> ResultMetadataAccess::ListAllSeriesNames() const
 	return seriesMetadataNames;
 }
 
-const std::list<std::string> ResultMetadataAccess::ListAllParameterNames() const
+const std::list<std::string> ResultMetadataAccess::listAllParameterLabels() const
 {
-	auto& parametersByName = _metadataCampaign.getMetadataParameterByName();
+	auto& parametersByName = m_metadataCampaign.getMetadataParameterByLabel();
 	std::list<std::string> parameterNames;
 	for (auto& parameterByName : parametersByName)
 	{
@@ -63,9 +63,9 @@ const std::list<std::string> ResultMetadataAccess::ListAllParameterNames() const
 	return parameterNames;
 }
 
-const std::list<std::string> ResultMetadataAccess::ListAllQuantityNames() const
+const std::list<std::string> ResultMetadataAccess::listAllQuantityLabels() const
 {
-	auto& quantitiesByName = _metadataCampaign.getMetadataQuantitiesByName();
+	auto& quantitiesByName = m_metadataCampaign.getMetadataQuantitiesByLabel();
 	std::list<std::string> quantityNames;
 	for (auto& quantityByName : quantitiesByName)
 	{
@@ -74,14 +74,14 @@ const std::list<std::string> ResultMetadataAccess::ListAllQuantityNames() const
 	return quantityNames;
 }
 
-const MetadataSeries* ResultMetadataAccess::FindMetadataSeries(const std::string& name)
+const MetadataSeries* ResultMetadataAccess::findMetadataSeries(const std::string& _name)
 {
-	const std::list<MetadataSeries>& allSeriesMetadata = _metadataCampaign.getSeriesMetadata();
+	const std::list<MetadataSeries>& allSeriesMetadata = m_metadataCampaign.getSeriesMetadata();
 
 	const MetadataSeries* selectedMetadataSeries = nullptr;
 	for (auto& metadataSeries : allSeriesMetadata)
 	{
-		if (metadataSeries.getName() == name)
+		if (metadataSeries.getName() == _name)
 		{
 			selectedMetadataSeries = &metadataSeries;
 			break;
@@ -90,11 +90,41 @@ const MetadataSeries* ResultMetadataAccess::FindMetadataSeries(const std::string
 	return selectedMetadataSeries;
 }
 
-const MetadataParameter* ResultMetadataAccess::FindMetadataParameter(const std::string& name)
+const MetadataSeries* ResultMetadataAccess::findMetadataSeries(ot::UID _index)
 {
-	auto& parameterByName = _metadataCampaign.getMetadataParameterByName();
-	auto parameter = parameterByName.find(name);
+	const std::list<MetadataSeries>& allSeriesMetadata = m_metadataCampaign.getSeriesMetadata();
+
+	const MetadataSeries* selectedMetadataSeries = nullptr;
+	for (auto& metadataSeries : allSeriesMetadata)
+	{
+		if (metadataSeries.getSeriesIndex() == _index)
+		{
+			selectedMetadataSeries = &metadataSeries;
+			break;
+		}
+	}
+	return selectedMetadataSeries;
+}
+
+const MetadataParameter* ResultMetadataAccess::findMetadataParameter(const std::string& _name)
+{
+	auto& parameterByName = m_metadataCampaign.getMetadataParameterByLabel();
+	auto parameter = parameterByName.find(_name);
 	if (parameter == parameterByName.end())
+	{
+		return nullptr;
+	}
+	else
+	{
+		return parameter->second;
+	}
+}
+
+const MetadataParameter* ResultMetadataAccess::findMetadataParameter(ot::UID _index)
+{
+	auto& parameterByUID = m_metadataCampaign.getMetadataParameterByUID();
+	auto parameter = parameterByUID.find(_index);
+	if (parameter == parameterByUID.end())
 	{
 		return nullptr;
 	}
@@ -104,9 +134,9 @@ const MetadataParameter* ResultMetadataAccess::FindMetadataParameter(const std::
 	}
 }
 
-const MetadataQuantity* ResultMetadataAccess::FindMetadataQuantity(const std::string& name)
+const MetadataQuantity* ResultMetadataAccess::findMetadataQuantity(const std::string& name)
 {
-	auto& quantitiesByName = _metadataCampaign.getMetadataQuantitiesByName();
+	auto& quantitiesByName = m_metadataCampaign.getMetadataQuantitiesByLabel();
 	auto quantity = quantitiesByName.find(name);
 	if (quantity == quantitiesByName.end())
 	{
@@ -114,14 +144,28 @@ const MetadataQuantity* ResultMetadataAccess::FindMetadataQuantity(const std::st
 	}
 	else
 	{
-		return &(quantity->second);
+		return quantity->second;
 
 	}
 }
 
-void ResultMetadataAccess::LoadExistingCampaignData(ClassFactory* classFactory)
+const MetadataQuantity* ResultMetadataAccess::findMetadataQuantity(ot::UID _index)
 {
-	std::vector<EntityBase*> allExistingMetadata = FindAllExistingMetadata(classFactory);
+	auto& quantityByUID = m_metadataCampaign.getMetadataQuantitiesByUID();
+	auto quantity= quantityByUID.find(_index);
+	if (quantity == quantityByUID.end())
+	{
+		return nullptr;
+	}
+	else
+	{
+		return &(quantity->second);
+	}
+}
+
+void ResultMetadataAccess::loadExistingCampaignData(ClassFactory* _classFactory)
+{
+	std::vector<EntityBase*> allExistingMetadata = findAllExistingMetadata(_classFactory);
 
 
 	EntityMetadataCampaign temp(-1, nullptr, nullptr, nullptr, nullptr, "");
@@ -141,14 +185,14 @@ void ResultMetadataAccess::LoadExistingCampaignData(ClassFactory* classFactory)
 	}
 	
 	MetadataEntityInterface campaignFactory;
-	_metadataCampaign =	campaignFactory.CreateCampaign(metadataCampaignEntity, metadataSeriesEntities);
+	m_metadataCampaign =	campaignFactory.createCampaign(metadataCampaignEntity, metadataSeriesEntities);
 }
 
-std::vector<EntityBase*> ResultMetadataAccess::FindAllExistingMetadata(ClassFactory *classFactory)
+std::vector<EntityBase*> ResultMetadataAccess::findAllExistingMetadata(ClassFactory *_classFactory)
 {
-	std::list<ot::UID> allExistingMetadataNames = _modelComponent->getIDsOfFolderItemsOfType(ot::FolderNames::DatasetFolder, "EntityMetadataCampaign", false);
+	std::list<ot::UID> allExistingMetadataNames = m_modelComponent->getIDsOfFolderItemsOfType(ot::FolderNames::DatasetFolder, "EntityMetadataCampaign", false);
 	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent->getEntityInformation(allExistingMetadataNames, entityInfos);
+	m_modelComponent->getEntityInformation(allExistingMetadataNames, entityInfos);
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIdandVersion;
 	for (auto& entityInfo : entityInfos)
 	{
@@ -160,7 +204,7 @@ std::vector<EntityBase*> ResultMetadataAccess::FindAllExistingMetadata(ClassFact
 	allExistingMetadata.reserve(entityInfos.size());
 	for (auto& entityInfo : entityInfos)
 	{
-		allExistingMetadata.push_back(_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), *classFactory));
+		allExistingMetadata.push_back(m_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), *_classFactory));
 	}
 	
 	return allExistingMetadata;

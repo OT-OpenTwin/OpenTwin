@@ -14,64 +14,69 @@
 #include <cassert>
 #include <vector>
 
-TouchstoneHandler::TouchstoneHandler(const std::string& fileName)
+TouchstoneHandler::TouchstoneHandler(const std::string& _fileName)
 {
-	auto posOfFileExtension = fileName.find_last_of(".") +1;
-	const std::string extension = fileName.substr(posOfFileExtension, fileName.size());
+	auto posOfFileExtension = _fileName.find_last_of(".") +1;
+	const std::string extension = _fileName.substr(posOfFileExtension, _fileName.size());
 }
 
-TouchstoneHandler::TouchstoneHandler(TouchstoneHandler&& other) noexcept
-	:_comments(std::move(other._comments)), _optionSettings(std::move(other._optionSettings)), _portData(std::move(other._portData)), _touchstoneVersion(std::move(other._touchstoneVersion)), _portNumber(std::move(other._portNumber))
+TouchstoneHandler::TouchstoneHandler(TouchstoneHandler&& _other) noexcept
+	:m_comments(std::move(_other.m_comments)), m_optionSettings(std::move(_other.m_optionSettings))/*, m_quantityDescription(std::move(_other.m_quantityDescription))*/, m_touchstoneVersion(std::move(_other.m_touchstoneVersion)), m_portNumber(std::move(_other.m_portNumber))
 {
 }
 
-TouchstoneHandler& TouchstoneHandler::operator=(TouchstoneHandler&& other) noexcept
+TouchstoneHandler& TouchstoneHandler::operator=(TouchstoneHandler&& _other) noexcept
 {
-	_comments = (std::move(other._comments));
-	_optionSettings = (std::move(other._optionSettings));
-	_portData = (std::move(other._portData));
-	_touchstoneVersion = (std::move(other._touchstoneVersion));
-	_portNumber = (std::move(other._portNumber));
+	m_comments = (std::move(_other.m_comments));
+	m_optionSettings = (std::move(_other.m_optionSettings));
+	//m_quantityDescription = (std::move(_other.m_quantityDescription));
+	m_touchstoneVersion = (std::move(_other.m_touchstoneVersion));
+	m_portNumber = (std::move(_other.m_portNumber));
 	return *this;
 }
 
-int32_t TouchstoneHandler::deriveNumberOfPorts(const std::string& fileName)
+int32_t TouchstoneHandler::deriveNumberOfPorts(const std::string& _fileName)
 {
-	auto posOfFileExtension = fileName.find_last_of(".") + 1;
-	const std::string extension = fileName.substr(posOfFileExtension, fileName.size());
+	auto posOfFileExtension = _fileName.find_last_of(".") + 1;
+	const std::string extension = _fileName.substr(posOfFileExtension, _fileName.size());
 	const std::string numberOfPortsAsString = extension.substr(1, extension.size() - 2);
 	return std::stoi(numberOfPortsAsString);
 }
 
-void TouchstoneHandler::AnalyseFile(const std::string& fileContent, int32_t numberOfPorts)
+void TouchstoneHandler::analyseFile(const std::string& _fileContent, int32_t _numberOfPorts)
 {
-	_portNumber = numberOfPorts;
+	m_portNumber = _numberOfPorts;
+	m_quantityDescription.setNumberOfPorts(m_portNumber);
+	std::string::difference_type numberOfRows = std::count(_fileContent.begin(), _fileContent.end(), '\n');
+	m_quantityDescription.reserve(numberOfRows);
+
 	std::stringstream stream;
 	ot::EncodingGuesser encodingGuesser;
-	ot::TextEncoding::EncodingStandard encodingStandard =	encodingGuesser(fileContent.c_str(), fileContent.size());
+	ot::TextEncoding::EncodingStandard encodingStandard =	encodingGuesser(_fileContent.c_str(), _fileContent.size());
 	if (encodingStandard == ot::TextEncoding::EncodingStandard::ANSI)
 	{
 		ot::EncodingConverter_ISO88591ToUTF8 converter;
-		stream.str(converter(fileContent));
+		stream.str(converter(_fileContent));
 	}
 	else if (encodingStandard == ot::TextEncoding::EncodingStandard::UTF16_BEBOM || encodingStandard == ot::TextEncoding::EncodingStandard::UTF16_LEBOM)
 	{
 		ot::EncodingConverter_UTF16ToUTF8 converter;
-		stream.str(converter(encodingStandard,fileContent));
+		stream.str(converter(encodingStandard,_fileContent));
 	}
 	else
 	{
-		stream.str(fileContent);
+		stream.str(_fileContent);
 	}
 	
 	std::string line;
 	while (getline(stream, line))
 	{
-		AnalyseLine(line);
+		analyseLine(line);
 	}
+	m_quantityDescription.optimiseMemory();
 }
 
-void TouchstoneHandler::AnalyseLine(std::string& content)
+void TouchstoneHandler::analyseLine(std::string& content)
 {
 	std::string lineWithoutWhitespaces = content;
 	lineWithoutWhitespaces.erase(std::remove_if(lineWithoutWhitespaces.begin(), lineWithoutWhitespaces.end(), isspace), lineWithoutWhitespaces.end());
@@ -81,34 +86,34 @@ void TouchstoneHandler::AnalyseLine(std::string& content)
 	}
 	if (content[0] == '!')
 	{
-		_comments += content.substr(1, content.size()) + "\n";
+		m_comments += content.substr(1, content.size()) + "\n";
 	}
 	else if (content[0] == '#')
 	{
-		AnalyseOptionsLine(content);
+		analyseOptionsLine(content);
 	}
 	else if (content[0] == '[')
 	{
 		//Version 2.0 not supported yet
-		AnalyseVersionTwoLine(content);
+		analyseVersionTwoLine(content);
 	}
 	else //Data section
 	{
-		AnalyseDataLine(content);
+		analyseDataLine(content);
 	}
 		
 }
 
-void TouchstoneHandler::AnalyseDataLine(std::string& content)
+void TouchstoneHandler::analyseDataLine(std::string& content)
 {
-	CleansOfComments(content);
-	CleansOfSpecialCharacter(content);
+	cleansOfComments(content);
+	cleansOfSpecialCharacter(content);
 
-	if (_touchstoneVersion == 1)
+	if (m_touchstoneVersion == 1)
 	{
 		std::stringstream stream(content);
 		std::string segment;
-		
+
 		while (getline(stream, segment, ' '))
 		{
 			if (segment == "")
@@ -117,21 +122,54 @@ void TouchstoneHandler::AnalyseDataLine(std::string& content)
 			}
 			else
 			{
-				if (_portData.size() == 0 || _portData.back().isFilled())
+				if (m_firstValues == nullptr)
 				{
-					_portData.push_back(ts::PortData(_portNumber));
+					m_firstValues = new SParameterMatrixHelper(m_portNumber);
+					m_secondValues = new SParameterMatrixHelper(m_portNumber);
+					m_frequencyParameter.values.push_back(turnLineSegmentToVariable(segment));
 				}
-				_portData.back().AddValue(segment);
+				else
+				{
+					if (m_firstValueOfTuple)
+					{
+						m_firstValues->setValue(m_rowIndex, m_columnIndex, turnLineSegmentToVariable(segment));
+					}
+					else
+					{
+						m_secondValues->setValue(m_rowIndex, m_columnIndex, turnLineSegmentToVariable(segment));
+						if (m_columnIndex == m_portNumber - 1)
+						{
+							m_columnIndex = 0;
+							if (m_rowIndex == m_portNumber - 1)
+							{
+								m_rowIndex = 0;
+								m_quantityDescription.pushBackFirstValue(std::move(*m_firstValues));
+								m_firstValues = nullptr;
+								m_quantityDescription.pushBackSecondValue(std::move(*m_secondValues));
+								m_secondValues = nullptr;
+							}
+							else
+							{
+								m_rowIndex++;
+							}
+						}
+						else
+						{
+							m_columnIndex++;
+						}
+					}
+					m_firstValueOfTuple ^= true; //flip
+				}
 			}
 		}
 	}
 	else
 	{
-
+		assert(false);//not supported yet
 	}
 }
 
-void TouchstoneHandler::CleansOfComments(std::string& content)
+void TouchstoneHandler::cleansOfComments(std::string& content)
 {
 	auto commentCharacterPos = content.find('!');
 	if (commentCharacterPos != std::string::npos)
@@ -140,7 +178,7 @@ void TouchstoneHandler::CleansOfComments(std::string& content)
 	}
 }
 
-void TouchstoneHandler::CleansOfSpecialCharacter(std::string& content)
+void TouchstoneHandler::cleansOfSpecialCharacter(std::string& content)
 {
 	content.erase(std::remove(content.begin(), content.end(), '\n'), content.end());
 	content.erase(std::remove(content.begin(), content.end(), '\t'), content.end());
@@ -150,7 +188,12 @@ void TouchstoneHandler::CleansOfSpecialCharacter(std::string& content)
 	content.erase(std::remove(content.begin(), content.end(), '\f'), content.end());
 }
 
-void TouchstoneHandler::AnalyseVersionTwoLine(std::string& content)
+ot::Variable TouchstoneHandler::turnLineSegmentToVariable(const std::string& _segment)
+{
+	return ot::Variable(std::stoll(_segment));
+}
+
+void TouchstoneHandler::analyseVersionTwoLine(std::string& content)
 {
 	const std::string version = "[Version]";
 	const std::string numberOfPorts = "[Number of Ports]";
@@ -168,9 +211,9 @@ void TouchstoneHandler::AnalyseVersionTwoLine(std::string& content)
 
 }
 
-void TouchstoneHandler::AnalyseOptionsLine(std::string& line)
+void TouchstoneHandler::analyseOptionsLine(std::string& _line)
 {
-	assert(line[0] == '#');
+	assert(_line[0] == '#');
 	OptionsParameterHandlerFormat handlerFormat;
 	OptionsParameterHandlerFrequency handlerFrequency;
 	OptionsParameterHandlerParameter handlerParameter;
@@ -178,10 +221,10 @@ void TouchstoneHandler::AnalyseOptionsLine(std::string& line)
 
 	handlerFormat.SetNextHandler(handlerFrequency.SetNextHandler(handlerParameter.SetNextHandler(&handlerReference)));
 
-	CleansOfComments(line);
-	CleansOfSpecialCharacter(line);
+	cleansOfComments(_line);
+	cleansOfSpecialCharacter(_line);
 
-	std::stringstream ss(line.substr(1,line.size()));
+	std::stringstream ss(_line.substr(1,_line.size()));
 	std::string segment;
 	std::string buffered = "";
 	while (getline(ss, segment, ' '))
@@ -197,13 +240,13 @@ void TouchstoneHandler::AnalyseOptionsLine(std::string& line)
 		else if (buffered != "")
 		{
 			buffered += " " + segment;
-			handlerFormat.InterpreteOptionsParameter(buffered, _optionSettings);
+			handlerFormat.InterpreteOptionsParameter(buffered, m_optionSettings);
 		}
 		else
 		{
 			std::transform(segment.begin(), segment.end(), segment.begin(),
 				[](unsigned char c) { return std::tolower(c); });
-			handlerFormat.InterpreteOptionsParameter(segment, _optionSettings);
+			handlerFormat.InterpreteOptionsParameter(segment, m_optionSettings);
 		}
 	}
 }

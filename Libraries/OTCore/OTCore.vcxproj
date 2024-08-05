@@ -49,12 +49,14 @@
     <ClCompile Include="src\TextEncoding.cpp" />
     <ClCompile Include="src\ThisService.cpp" />
     <ClCompile Include="src\Variable.cpp" />
+    <ClCompile Include="src\VariableListToStringListConverter.cpp" />
     <ClCompile Include="src\VariableToBSONStringConverter.cpp" />
     <ClCompile Include="src\VariableToJSONConverter.cpp" />
     <ClCompile Include="src\VariableToStringConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\BasicServiceInformation.h" />
+    <ClInclude Include="include\OTCore\DefensiveProgramming.h" />
     <ClInclude Include="include\OTCore\Rect.h" />
     <ClInclude Include="include\OTCore\Color.h" />
     <ClInclude Include="include\OTCore\CoreAPIExport.h" />
@@ -100,6 +102,7 @@
     <ClInclude Include="include\OTCore\ThisService.h" />
     <ClInclude Include="include\OTCore\TypeNames.h" />
     <ClInclude Include="include\OTCore\Variable.h" />
+    <ClInclude Include="include\OTCore\VariableListToStringListConverter.h" />
     <ClInclude Include="include\OTCore\VariableToBSONStringConverter.h" />
     <ClInclude Include="include\OTCore\VariableToJSONConverter.h" />
     <ClInclude Include="include\OTCore\VariableToStringConverter.h" />
