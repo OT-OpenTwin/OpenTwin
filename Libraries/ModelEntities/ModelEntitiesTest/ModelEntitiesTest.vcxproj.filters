@@ -15,15 +15,21 @@
     <ClCompile Include="src\BsonArrayTypeGetterWrapperTest.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityParamerterizedDataMetadataTest.cpp">
+    <ClCompile Include="src\ClassfactoryTest.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\ClassfactoryTest.cpp">
+    <ClCompile Include="src\TestEntityWithDynamicFields.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FixtureEntityWithDynamicFields.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixtureBsonArrayTypeGetterWrapper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixtureEntityWithDynamicFields.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

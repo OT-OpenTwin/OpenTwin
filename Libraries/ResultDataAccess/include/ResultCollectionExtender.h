@@ -22,7 +22,7 @@ public:
 	ResultCollectionExtender(const std::string& _collectionName, ot::components::ModelComponent& _modelComponent, ClassFactory* _classFactory, const std::string& _ownerServiceName);
 	ResultCollectionExtender(const ResultCollectionExtender& _other) = delete;
 	ResultCollectionExtender& operator=(const ResultCollectionExtender& _other) = delete;
-	~ResultCollectionExtender();
+	~ResultCollectionExtender() = default;
 	
 	void setBucketSize(const uint64_t _bucketSize) { m_bucketSize = _bucketSize; }
 	void setSaveModel(bool _saveModel) { m_saveModel = _saveModel; }
@@ -41,6 +41,12 @@ public:
 	/// <param name="metadata"></param>
 	void addCampaignMetadata(std::shared_ptr<MetadataEntry> _metadata);
 	
+	void storeMetadata()
+	{
+		storeCampaignChanges();
+		flushQuantityContainer();
+	}
+
 	void storeCampaignChanges();
 	void flushQuantityContainer();
 

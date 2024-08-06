@@ -213,9 +213,10 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 		for (const MetadataQuantity& quantity : newSeriesMetadata->getQuantities())
 		{
 			assert(quantity.valueDescriptions.size() >= 1);
-			auto valueDesciption =	quantity.valueDescriptions.begin();
+			const std::string quantityName = quantity.quantityLabel;
 
-			uint64_t firstValueIndex = valueDesciption->quantityIndex;
+			//Fields of the quantity itself
+			uint64_t firstValueIndex = quantity.quantityIndex;
 			const std::string quantityFieldKey = std::to_string(firstValueIndex);
 			entitySeries.InsertToQuantityField(m_nameField, { ot::Variable(quantity.quantityName) }, quantityFieldKey);
 			entitySeries.InsertToQuantityField(m_labelField, { ot::Variable(quantity.quantityLabel) }, quantityFieldKey);
@@ -228,15 +229,16 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 			entitySeries.InsertToQuantityField(m_dependingParameterField, std::move(dependingParameter), quantityFieldKey);
 
 			const std::string valueDocumentsFieldName = quantityFieldKey + "/" + m_valueDescriptionsField;
-			while (valueDesciption != quantity.valueDescriptions.end())
+
+			for (auto& valueDesciption : quantity.valueDescriptions)
 			{
-				const std::string valueFieldKey = std::to_string(valueDesciption->quantityIndex);
+				const std::string valueFieldKey = std::to_string(valueDesciption.quantityIndex);
 				const std::string valueDocumentFieldName = valueDocumentsFieldName + "/" + valueFieldKey;
 
-				entitySeries.InsertToQuantityField(m_nameField, {ot::Variable(valueDesciption->quantityValueName)}, valueFieldKey);
-				entitySeries.InsertToQuantityField(m_labelField, {ot::Variable(valueDesciption->quantityValueLabel)}, valueFieldKey);
-				entitySeries.InsertToQuantityField(m_dataTypeNameField, {ot::Variable(valueDesciption->dataTypeName)}, valueFieldKey);
-				entitySeries.InsertToQuantityField(m_unitField, {ot::Variable(valueDesciption->unit)}, valueFieldKey);
+				entitySeries.InsertToQuantityField(m_nameField, {ot::Variable(valueDesciption.quantityValueName)}, valueDocumentFieldName);
+				entitySeries.InsertToQuantityField(m_labelField, {ot::Variable(valueDesciption.quantityValueLabel)}, valueDocumentFieldName);
+				entitySeries.InsertToQuantityField(m_dataTypeNameField, {ot::Variable(valueDesciption.dataTypeName)}, valueDocumentFieldName);
+				entitySeries.InsertToQuantityField(m_unitField, {ot::Variable(valueDesciption.unit)}, valueDocumentFieldName);
 			}
 
 			

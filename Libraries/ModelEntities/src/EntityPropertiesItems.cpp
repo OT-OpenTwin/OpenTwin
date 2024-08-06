@@ -79,9 +79,9 @@ void EntityPropertiesBase::setupPropertyData(ot::PropertyGridCfg& _configuration
 	if (!this->getVisible()) _property->setPropertyFlag(ot::Property::IsHidden);
 	if (this->getErrorState()) _property->setPropertyFlag(ot::Property::HasInputError);
 
-	ot::PropertyGroup* g = _configuration.findOrCreateGroup(this->getGroup());
-	OTAssertNullptr(g);
-	g->addProperty(_property);
+	ot::PropertyGroup* group = _configuration.findOrCreateGroup(this->getGroup());
+	OTAssertNullptr(group);
+	group->addProperty(_property);
 }
 
 void EntityPropertiesBase::addBaseDataToJsonDocument(ot::JsonValue& container, ot::JsonAllocator& allocator, const std::string& type)

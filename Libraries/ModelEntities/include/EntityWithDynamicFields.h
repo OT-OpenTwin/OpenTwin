@@ -18,6 +18,7 @@
 
 class __declspec(dllexport) EntityWithDynamicFields : public EntityContainer
 {
+	friend class FixtureEntityWithDynamicFields;
 public:
 	EntityWithDynamicFields(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 

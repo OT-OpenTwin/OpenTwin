@@ -37,6 +37,7 @@
     <ClCompile Include="src\FixtureCategorizationConsistencyChecker.cpp" />
     <ClCompile Include="src\FixtureTableExtractorCSV.cpp" />
     <ClCompile Include="src\FixtureTableStatisticAnalyser.cpp" />
+    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\TestCategorizationConsistencyChecker.cpp" />
     <ClCompile Include="src\TestTouchstoneOptionHandling.cpp" />
     <ClCompile Include="src\TestTouchstoneOptionSettings.cpp" />
@@ -103,7 +104,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(SolutionDir)$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);%(AdditionalIncludeDirectories);$(OT_MODELENTITIES_ROOT)\$(OT_DLLD);$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLD)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ImportParameterizedDataService.lib;$(GOOGLE_TEST_LIB);ModelEntities.lib;$(OT_DEFAULT_SERVICE_LIBD);ResultDataAccess.lib</AdditionalDependencies>
+      <AdditionalDependencies>ImportParameterizedDataService.lib;gtest.lib;ModelEntities.lib;$(OT_DEFAULT_SERVICE_LIBD);ResultDataAccess.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

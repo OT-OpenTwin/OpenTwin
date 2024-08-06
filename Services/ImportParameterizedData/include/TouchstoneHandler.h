@@ -11,9 +11,9 @@ class TouchstoneHandler
 public:
 	TouchstoneHandler(const std::string& _fileName);
 	TouchstoneHandler(const TouchstoneHandler& _other) = delete;
-	TouchstoneHandler(TouchstoneHandler&& _other) noexcept;
+	TouchstoneHandler(TouchstoneHandler&& _other) noexcept = default;
 	TouchstoneHandler& operator=(const TouchstoneHandler& _other) = delete;
-	TouchstoneHandler& operator=(TouchstoneHandler&& _other) noexcept;
+	TouchstoneHandler& operator=(TouchstoneHandler&& _other) noexcept = default;
 
 	static int32_t deriveNumberOfPorts(const std::string& _fileName);
 	

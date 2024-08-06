@@ -51,7 +51,7 @@ Application::Application()
 	_tableHandler = new TableHandler( _tableFolder);
 	_parametrizedDataHandler = new DataCategorizationHandler( _dataCategorizationFolder, _parameterFolder, _quantityFolder, _tableFolder, _previewTableNAme);
 	_tabledataToResultdataHandler = new TabledataToResultdataHandler(_dataCategorizationFolder,_datasetFolder, _parameterFolder, _quantityFolder, _tableFolder);
-	//_touchstoneToResultdata = new TouchstoneToResultdata();
+	_touchstoneToResultdata = new TouchstoneToResultdata();
 }
 
 Application::~Application()
@@ -95,7 +95,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_tableHandler->setUIComponent(_ui);
 	_parametrizedDataHandler->setUIComponent(_ui);
 	_tabledataToResultdataHandler->setUIComponent(_ui);
-	//_touchstoneToResultdata->setUIComponent(_ui);
+	_touchstoneToResultdata->setUIComponent(_ui);
 
 	_ui->addMenuPage(pageName);
 
@@ -190,7 +190,7 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 	_tableHandler->setModelComponent(_model);
 	_parametrizedDataHandler->setModelComponent(_model);
 	_tabledataToResultdataHandler->setModelComponent(_model);
-	//_touchstoneToResultdata->setModelComponent(_model);
+	_touchstoneToResultdata->setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)
@@ -476,8 +476,8 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 
 				std::string fileContent = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
 				ot::UID uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
-				int32_t numberOfPorts = 0;// = _touchstoneToResultdata->getAssumptionOfPortNumber(originalName);
-				//_touchstoneToResultdata->setResultdata(originalName, fileContent, uncompressedDataLength);
+				int32_t numberOfPorts =  _touchstoneToResultdata->getAssumptionOfPortNumber(originalName);
+				_touchstoneToResultdata->setResultdata(originalName, fileContent, uncompressedDataLength);
 				
 				ot::JsonDocument requestNumberOfPortsDoc;
 				requestNumberOfPortsDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_OnePropertyDialog, requestNumberOfPortsDoc.GetAllocator());
@@ -500,14 +500,14 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			else if (subsequentFunction == "SetNumberOfPorts")
 			{
 				auto value = ot::json::getInt( _doc,OT_ACTION_PARAM_Value);
-				/*ot::OnePropertyDialogCfg onePropertyDialogCfg;
-				onePropertyDialogCfg.setFromJsonObject(jOnePropertyDialog);
-				
-				ot::Property* dialogProperty = onePropertyDialogCfg.getProperty();
-				ot::PropertyInt* dialogPropertyInt = dynamic_cast<ot::PropertyInt*>(dialogProperty);
-				dialogPropertyInt->setFromJsonObject
-				_touchstoneToResultdata->CreateResultdata(dialogPropertyInt->value());*/
-				//_touchstoneToResultdata->createResultdata(value);
+				//ot::OnePropertyDialogCfg onePropertyDialogCfg;
+				//onePropertyDialogCfg.setFromJsonObject(jOnePropertyDialog);
+				//
+				//ot::Property* dialogProperty = onePropertyDialogCfg.getProperty();
+				//ot::PropertyInt* dialogPropertyInt = dynamic_cast<ot::PropertyInt*>(dialogProperty);
+				//dialogPropertyInt->setFromJsonObject
+				//_touchstoneToResultdata->CreateResultdata(dialogPropertyInt->value());
+				_touchstoneToResultdata->createResultdata(value);
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
 			{

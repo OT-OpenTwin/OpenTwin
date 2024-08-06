@@ -3,11 +3,11 @@
 
 DatasetDescription::~DatasetDescription()
 {
-	if (m_quantityDescription != nullptr)
+	/*if (m_quantityDescription != nullptr)
 	{
 		delete m_quantityDescription;
 		m_quantityDescription = nullptr;
-	}
+	}*/
 }
 
 DatasetDescription::DatasetDescription()

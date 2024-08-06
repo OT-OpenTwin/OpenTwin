@@ -15,15 +15,6 @@ ResultCollectionExtender::ResultCollectionExtender(const std::string& _collectio
 	m_quantityContainer.reserve(m_bufferSize);
 }
 
-ResultCollectionExtender::~ResultCollectionExtender()
-{
-	if (m_quantityContainer.size() != 0)
-	{
-		flushQuantityContainer();
-	}
-	storeCampaignChanges();
-}
-
 ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription*>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata)
 {
 	for (DatasetDescription* datasetDescription : _datasetDescriptions)
@@ -82,21 +73,28 @@ void ResultCollectionExtender::processDataPoints(DatasetDescription1D& _dataDesc
 	parameterIndices.push_back(xParameter->parameterUID);
 
 	//Add all the other parameters
-	for (auto& parameter : _dataDescription.getParameters())
+	auto allParameter = _dataDescription.getParameters();
+	if (allParameter.size() > 1)
 	{
-		//Those parameter which are fixed for one curve, so they are suppose to have only one entry.
-		if (parameter->values.size() != 1)
+		//The first parameter is the x-axis parameter
+		auto parameter = allParameter.begin()++;
+		for (; parameter != allParameter.end(); parameter++)
 		{
-			//Too harsh ?
-			std::string message = "Cannot import data. Appart from the x-axis parameter, there is the parameter " + parameter->parameterName + ", which has more then one value within a single curve.";
-			throw std::exception(message.c_str());
-		}
-		else
-		{
-			parameterIndices.push_back(parameter->parameterUID);
-			sharedParameterValues.push_back(parameter->values.front());
+			//Those parameter which are fixed for one curve, so they are suppose to have only one entry.
+			if ((*parameter)->values.size() != 1)
+			{
+				//Too harsh ?
+				std::string message = "Cannot import data. Appart from the x-axis parameter, there is the parameter " + (*parameter)->parameterName + ", which has more then one value within a single curve.";
+				throw std::exception(message.c_str());
+			}
+			else
+			{
+				parameterIndices.push_back((*parameter)->parameterUID);
+				sharedParameterValues.push_back((*parameter)->values.front());
+			}
 		}
 	}
+	
 
 	QuantityDescription* currentQuantityDescription = _dataDescription.getQuantityDescription();
 	MetadataQuantity& quantityMetadata = currentQuantityDescription->getMetadataQuantity();
@@ -237,7 +235,7 @@ ot::UIDList ResultCollectionExtender::addCampaignContextDataToParameters(Dataset
 	for (auto& parameter : allParameters)
 	{
 		//Parameter was not dealed with.
-		if (parameter->parameterUID != 0)
+		if (parameter->parameterUID == 0)
 		{
 			const std::string parameterLabel = parameter->parameterName;
 			const MetadataParameter* existingParameter = findMetadataParameter(parameterLabel);
@@ -348,13 +346,13 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 	{
 
 		quantity.quantityLabel = quantity.quantityName;
-		for (auto quantityValueDescription : quantity.valueDescriptions)
+		for (auto& quantityValueDescription : quantity.valueDescriptions)
 		{
 			quantityValueDescription.quantityIndex = findNextFreeQuantityIndex();
 			quantityValueDescription.quantityValueLabel = quantityValueDescription.quantityValueName;
 		}
 	}
-	if (quantity.quantityIndex != 0)
+	if (quantity.quantityIndex == 0)
 	{
 		quantity.quantityIndex = quantity.valueDescriptions.begin()->quantityIndex; //The entire quantity holds the index of the first value description.
 	}
@@ -403,13 +401,15 @@ void ResultCollectionExtender::AddMetadataToSeries(std::list<DatasetDescription*
 		MetadataQuantity& quantity = quantityDescription->getMetadataQuantity();
 		_newSeries.addQuantity(quantity);
 
+
 		auto& allParameters = dataDescription->getParameters();
-		
 		for (auto parameter : allParameters)
 		{
+			//By know all parameter have UIDs, but still some parameter may be shared between different datasets.
+			//Thus, before we add a parameter to the series, we check if that already happened.
 			const std::list<MetadataParameter>& alreadyAddedParameters = _newSeries.getParameter();
 			bool found = false;
-			for (auto alreadyAddedParameter : alreadyAddedParameters)
+			for (auto& alreadyAddedParameter : alreadyAddedParameters)
 			{
 				if (alreadyAddedParameter.parameterUID == parameter->parameterUID)
 				{
@@ -417,6 +417,7 @@ void ResultCollectionExtender::AddMetadataToSeries(std::list<DatasetDescription*
 					break;
 				}
 			}
+
 			if (!found)
 			{
 				_newSeries.addParameter(*parameter);

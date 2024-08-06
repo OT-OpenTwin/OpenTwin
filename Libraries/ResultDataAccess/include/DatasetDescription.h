@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <memory>
 
 #include "QuantityDescription.h"
 #include "ParameterDescription.h"

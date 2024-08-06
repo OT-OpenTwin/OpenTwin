@@ -52,19 +52,20 @@ void TouchstoneToResultdata::createResultdata(int _numberOfPorts)
 		ResultCollectionExtender resultCollectionExtender(m_collectionName, *_modelComponent, &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 		DatasetDescription1D dataset;
 		std::list< std::shared_ptr<MetadataEntry>> seriesMetadata;
-		{
-			TouchstoneHandler handler = std::move(importTouchstoneFile(m_fileName, m_fileContent, m_uncompressedLength, _numberOfPorts));
-			dataset = std::move(extractDatasetDescription(handler));
+		
+		TouchstoneHandler handler = std::move(importTouchstoneFile(m_fileName, m_fileContent, m_uncompressedLength, _numberOfPorts));
+		dataset = std::move(extractDatasetDescription(handler));
 			
-			auto& optionSettings = handler.getOptionSettings();
-			std::string tsParameter = OptionsParameterHandlerParameter::ToString(optionSettings.getParameter());
-			seriesMetadata.push_back(std::make_shared<MetadataEntrySingle>("Touchstone Parameter", tsParameter));
-			seriesMetadata.push_back(std::make_shared<MetadataEntrySingle>("Reference Resistance", optionSettings.getReferenceResistance()));
-		}
+		auto& optionSettings = handler.getOptionSettings();
+		std::string tsParameter = OptionsParameterHandlerParameter::ToString(optionSettings.getParameter());
+		seriesMetadata.push_back(std::make_shared<MetadataEntrySingle>("Touchstone Parameter", tsParameter));
+		seriesMetadata.push_back(std::make_shared<MetadataEntrySingle>("Reference Resistance", optionSettings.getReferenceResistance()));
+		
 		std::list<DatasetDescription*>datasets{ &dataset };
 		const ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, seriesMetadata);
 			
 		resultCollectionExtender.processDataPoints(dataset,seriesID);
+		resultCollectionExtender.storeMetadata();
 	}
 	else
 	{
@@ -144,6 +145,7 @@ DatasetDescription1D TouchstoneToResultdata::extractDatasetDescription(Touchston
 	datasetDescription.setXAxisParameterDescription(frequencyParameter);
 
 	auto& quantityDescription = _touchstoneHandler.getQuantityDescription();
+	quantityDescription.setName("S-Parameter");
 	const ts::option::Format& selectedFormat = optionSettings.getFormat();
 	if (selectedFormat == ts::option::Format::Decibel_angle)
 	{

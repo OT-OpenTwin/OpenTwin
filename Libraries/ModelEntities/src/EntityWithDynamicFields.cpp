@@ -128,34 +128,55 @@ void EntityWithDynamicFields::OrderGenericDocumentsHierarchical()
 	}
 
 	auto it = documentNames.begin();
+	
+	//Go through all document names and link them to their parent.
 	while (it != documentNames.end())
 	{
-		std::string::difference_type hierarchyLevel = std::count((*it).begin(), (*it).end(), '/');
-
-		if ((*it) == "/")
+		const std::string& currentDocumentName = *it;
+		
+		//Root document
+		if ((currentDocumentName) == "/")
 		{
 			_bsonDocumentsByName[(*it)].setDocumentName("DynamicFields");
 		}
 		else
 		{
-			std::string subDocumentBase;
+			std::string::difference_type hierarchyLevel = std::count((currentDocumentName).begin(), (currentDocumentName).end(), '/');
+
+			std::string parentName;
+			
+			//Determine parent name
 			if (hierarchyLevel == 1)
 			{
-				subDocumentBase = "/";
+				parentName = "/";
 			}
 			else
 			{
-				subDocumentBase = (*it).substr(0, (*it).find_last_of('/'));
-
+				parentName = (*it).substr(0, (currentDocumentName).find_last_of('/'));
 			}
-			if (_bsonDocumentsByName.find(subDocumentBase) == _bsonDocumentsByName.end())
+			
+			//Add all non existing ancestors
+			std::string ancestorName =parentName;
+			while(_bsonDocumentsByName.find(ancestorName) == _bsonDocumentsByName.end())
 			{
-				throw std::exception(("Subdocument requires a parent document, which was not found: " + subDocumentBase).c_str());
+				CreatePlainDocument(ancestorName);
+				documentNames.push_back(ancestorName);
+				if ((ancestorName).find_last_of('/') == 0)
+				{
+					ancestorName = "/";
+				}
+				else
+				{
+					ancestorName = (ancestorName).substr(0, (ancestorName).find_last_of('/'));
+				}
 			}
-			std::string trimmedDocumentName = (*it).substr((*it).find_last_of('/') + 1, (*it).size());
-			_bsonDocumentsByName[(*it)].setDocumentName(trimmedDocumentName);
-			_bsonDocumentsByName[subDocumentBase].AddSubDocument(&_bsonDocumentsByName[(*it)]);
+			
+			//Add 
+			std::string trimmedDocumentName = (currentDocumentName).substr((currentDocumentName).find_last_of('/') + 1, (currentDocumentName).size());
+			_bsonDocumentsByName[(currentDocumentName)].setDocumentName(trimmedDocumentName);
+			_bsonDocumentsByName[parentName].AddSubDocument(&_bsonDocumentsByName[(currentDocumentName)]);
 		}
+
 		it++;
 	}
 }
