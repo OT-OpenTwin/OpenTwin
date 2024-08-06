@@ -430,13 +430,13 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			}
 
 
-			bool res1 = it->second.addConnection(connectionCfg.getOriginUid(), myConn);
-			bool res2 = it->second.addConnection(connectionCfg.getDestinationUid(), myConn);
-			if (res1 == false && res2 == false && temp == true)
+			/*bool res1 =*/ it->second.addConnection(connectionCfg.getOriginUid(), myConn);
+			/*bool res2 = */it->second.addConnection(connectionCfg.getDestinationUid(), myConn);
+			/*if (res1 == false && res2 == false && temp == true)
 			{
 				Numbers::nodeNumber--;
 				temp = false;
-			}
+			}*/
 		}
 
 		

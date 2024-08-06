@@ -19,6 +19,8 @@
 #include <list>
 #include <map>
 #include <set>
+#include <unordered_set>
+#include <list>
 
 class CircuitElement
 {
@@ -32,7 +34,7 @@ protected:
 	std::string m_editorName;
 	ot::UID m_Uid;
 	std::string m_netlistName;
-	std::set<Connection> m_listOfConnections;
+	std::list<Connection> m_listOfConnections;
 
 public:
 
@@ -49,7 +51,7 @@ public:
 	std::string getItemName();
 	std::string getEditorName();
 	ot::UID getUID();
-	std::set<Connection>& getList();
+	std::list<Connection>& getList();
 	std::string getNetlistName();
 
 
@@ -60,7 +62,7 @@ public:
 	void setNetlistName(std::string name);
 
 	//Additional Functions
-	bool addConnection(const Connection& obj);
+	/*bool*/ void addConnection(const Connection& obj);
 	
 	
 	

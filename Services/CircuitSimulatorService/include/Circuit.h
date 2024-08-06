@@ -41,7 +41,7 @@ public:
 	void setId(const std::string id);
 	
 	//additionalFunctions
-	bool addConnection(const ot::UID& key, const Connection& obj);
+/*	bool*/ void addConnection(const ot::UID& key, const Connection& obj);
 	std::string findElement(const ot::UID& key);
 		
 private:

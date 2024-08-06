@@ -70,15 +70,15 @@ void Circuit::setId(std::string id) {
 	this->id = id;
 }
 
-bool Circuit::addConnection(const ot::UID& key, const Connection& obj) {
+/*bool*/  void Circuit::addConnection(const ot::UID& key, const Connection& obj) {
 	if (mapOfElements.find(key) != mapOfElements.end()) {
-		bool result = mapOfElements[key]->addConnection(obj);
-		return result;
+		/*bool result =*/ mapOfElements[key]->addConnection(obj);
+		/*return result;*/
 
 	}
 	else {
 		Application::instance()->uiComponent()->displayMessage("Element not found"); // Auf OtLog umändern
-		return false;
+		/*return false;*/
 
 	}
 
