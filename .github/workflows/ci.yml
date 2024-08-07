@@ -8,8 +8,6 @@ on:
 
 env:
   DEVENV_PATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE
-  DEVENV_PATH2: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com
-  QTMSBUILD_PATH: ${{ github.workspace }}  # Path to the root of the repository
 
 permissions:
   contents: read
@@ -42,9 +40,6 @@ jobs:
     - name: Add Visual Studio to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: Debug - List repository files
-      run: dir /s
-      shell: cmd
 
     - name: Set up Node.js
       uses: actions/setup-node@v2
@@ -75,20 +70,6 @@ jobs:
         set DEVENV_ROOT_2022=%DEVENV_PATH%
         set OPENTWIN_THIRDPARTY_ROOT=%cd%\ThirdParty
         set QtMsBuild=%cd%\OpenTwin\QtMsBuild
-        echo "OPENTWIN_DEV_ROOT=%OPENTWIN_DEV_ROOT%"
-        echo "DEVENV_ROOT_2022=%DEVENV_ROOT_2022%"
-        echo "OPENTWIN_THIRDPARTY_ROOT=%OPENTWIN_THIRDPARTY_ROOT%"
-        echo "QtMsBuild=%QtMsBuild%"
-        echo "Checking directories and necessary files..."
-        echo "OpenTwin directory: %OPENTWIN_DEV_ROOT%"
-        dir %OPENTWIN_DEV_ROOT%
-        echo "ThirdParty directory: %OPENTWIN_THIRDPARTY_ROOT%"
-        dir %OPENTWIN_THIRDPARTY_ROOT%
-        echo "Visual Studio 2022 directory: %DEVENV_ROOT_2022%"
-        dir "%DEVENV_ROOT_2022%"
-        echo "QtMsBuild directory: %QtMsBuild%"
-        dir "%QtMsBuild%"
-        echo "Checking if BuildAll.bat exists..."
         echo "Starting BuildAll.bat..."
         call %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat 
         echo "All checks passed."
