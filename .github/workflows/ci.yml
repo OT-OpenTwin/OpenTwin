@@ -97,7 +97,7 @@ jobs:
         echo "Current directory: %cd%"
         set OPENTWIN_DEV_ROOT=%cd%\OpenTwin
         set DEVENV_ROOT_2022=C:\VS2022\Common7\IDE
-        set OPENTWIN_THIRDPARTY_ROOT=%cd%
+        set OPENTWIN_THIRDPARTY_ROOT=%cd%\OpenTwin
         set QtMsBuild=%cd%\OpenTwin\QtMsBuild
         echo "Starting BuildAll.bat..."
         call %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat 
