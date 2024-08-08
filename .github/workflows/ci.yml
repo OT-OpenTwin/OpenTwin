@@ -26,7 +26,13 @@ jobs:
         repository: OT-OpenTwin/OpenTwin
         ref: Test
         path: OpenTwin
-
+        
+    - name: Check out the third-party repository
+      uses: actions/checkout@v2
+      with:
+        repository: OT-OpenTwin/ThirdParty
+        path: ThirdParty
+        fetch-depth: 1  # Limit fetching to the last commit
 
 
     - name: Install Rust 1.76.0
@@ -97,7 +103,7 @@ jobs:
         echo "Current directory: %cd%"
         set OPENTWIN_DEV_ROOT=%cd%\OpenTwin
         set DEVENV_ROOT_2022=C:\VS2022\Common7\IDE
-        set OPENTWIN_THIRDPARTY_ROOT=%cd%\OpenTwin
+        set OPENTWIN_THIRDPARTY_ROOT=%cd%\ThirdParty
         set QtMsBuild=%cd%\OpenTwin\QtMsBuild
         echo "Starting BuildAll.bat..."
         call %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat 
