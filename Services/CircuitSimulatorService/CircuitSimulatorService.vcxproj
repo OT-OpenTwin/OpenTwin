@@ -190,9 +190,11 @@
     <ClCompile Include="src\Circuit.cpp" />
     <ClCompile Include="src\CircuitElement.cpp" />
     <ClCompile Include="src\CircuitElements\Capacitor.cpp" />
+    <ClCompile Include="src\CircuitElements\CurrentMeter.cpp" />
     <ClCompile Include="src\CircuitElements\Diode.cpp" />
     <ClCompile Include="src\CircuitElements\Inductor.cpp" />
     <ClCompile Include="src\CircuitElements\Resistor.cpp" />
+    <ClCompile Include="src\CircuitElements\VoltageMeter.cpp" />
     <ClCompile Include="src\CircuitElements\VoltageSource.cpp" />
     <ClCompile Include="src\Connection.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
@@ -207,9 +209,11 @@
     <ClInclude Include="include\Circuit.h" />
     <ClInclude Include="include\CircuitElement.h" />
     <ClInclude Include="include\CircuitElements\Capacitor.h" />
+    <ClInclude Include="include\CircuitElements\CurrentMeter.h" />
     <ClInclude Include="include\CircuitElements\Diode.h" />
     <ClInclude Include="include\CircuitElements\Inductor.h" />
     <ClInclude Include="include\CircuitElements\Resistor.h" />
+    <ClInclude Include="include\CircuitElements\VoltageMeter.h" />
     <ClInclude Include="include\CircuitElements\VoltageSource.h" />
     <ClInclude Include="include\Connection.h" />
     <ClInclude Include="include\ModelNotifier.h" />

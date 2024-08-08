@@ -66,6 +66,12 @@
     <ClCompile Include="src\CircuitElements\Inductor.cpp">
       <Filter>Source Files\CircuitElements</Filter>
     </ClCompile>
+    <ClCompile Include="src\CircuitElements\VoltageMeter.cpp">
+      <Filter>Source Files\CircuitElements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CircuitElements\CurrentMeter.cpp">
+      <Filter>Source Files\CircuitElements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -108,6 +114,12 @@
       <Filter>Header Files\CircuitElements</Filter>
     </ClInclude>
     <ClInclude Include="include\CircuitElements\Inductor.h">
+      <Filter>Header Files\CircuitElements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CircuitElements\VoltageMeter.h">
+      <Filter>Header Files\CircuitElements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CircuitElements\CurrentMeter.h">
       <Filter>Header Files\CircuitElements</Filter>
     </ClInclude>
   </ItemGroup>

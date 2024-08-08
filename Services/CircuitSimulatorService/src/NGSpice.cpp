@@ -7,7 +7,10 @@
 #include "CircuitElements/Diode.h"
 #include "CircuitElements/Inductor.h"
 #include "CircuitElements/Capacitor.h"
+#include "CircuitElements/VoltageMeter.h"
+#include "CircuitElements/CurrentMeter.h"
 #include "SimulationResults.h"
+
 
 //Open Twin Header
 #include "EntityBlockCircuitVoltageSource.h"
@@ -17,6 +20,7 @@
 #include "EntityBlockCircuitVoltageMeter.h"
 #include "EntityBlockCircuitCapacitor.h"
 #include "EntityBlockCircuitInductor.h"
+#include "EntityBlockCircuitCurrentMeter.h"
 
 //Third Party Header
 #include <string>
@@ -172,17 +176,6 @@ bool NGSpice::isValidNodeString(const std::string& input)
 
 	return true;
 }
-
-// PairHash-Struktur für die Verwendung von std::pair als Schlüssel in der unordered_map
-struct PairHash {
-	template <class T1, class T2>
-	std::size_t operator () (const std::pair<T1, T2>& pair) const {
-		auto hash1 = std::hash<T1>{}(pair.first);
-		auto hash2 = std::hash<T2>{}(pair.second);
-		return hash1 ^ hash2;
-	}
-};
-
 
 
 void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
@@ -371,6 +364,51 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto inductor_p = inductor.release();
 			it->second.addElement(uid, inductor_p);
 		}
+		else if (blockEntity->getBlockTitle() == "Voltage Meter") {
+			auto myElement = dynamic_cast<EntityBlockCircuitVoltageMeter*>(blockEntity.get());
+			auto voltMeter = std::make_unique<VoltageMeter>( myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
+
+			std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
+			if (counter == "first")
+			{
+				voltMeter->setNetlistName("VM1");
+			}
+			else
+			{
+				int temp = std::stoi(counter);
+				temp += 1;
+				counter = std::to_string(temp);
+
+				voltMeter->setNetlistName("VM" + counter);
+			}
+
+			ot::UID uid = voltMeter->getUID();
+			auto voltMeter_p = voltMeter.release();
+			it->second.addElement(uid, voltMeter_p);
+		}
+		else if (blockEntity->getBlockTitle() == "Current Meter") {
+			auto myElement = dynamic_cast<EntityBlockCircuitCurrentMeter*>(blockEntity.get());
+			auto currentMeter = std::make_unique<CurrentMeter>(myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
+
+			std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
+			if (counter == "first")
+			{
+				currentMeter->setNetlistName("VM1");
+			}
+			else
+			{
+				int temp = std::stoi(counter);
+				temp += 1;
+				counter = std::to_string(temp);
+
+				currentMeter->setNetlistName("VM" + counter);
+			}
+
+			ot::UID uid = currentMeter->getUID();
+			auto currentMeter_p = currentMeter.release();
+			it->second.addElement(uid, currentMeter_p);
+		}
+	
 	}
 
 	//std::unordered_map<std::pair<ot::UID, std::string>, std::string, PairHash> connectionNodeNumbers; 
@@ -532,49 +570,49 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			modelNetlistLine += ".MODEL D1N4148 D(IS=1e-15)";
 			netlistValue = diode->getValue();
 		}
-		//else if (circuitElement->type() == "Voltage Meter")
-		//{
-		//	if (nodesOfVoltageMeter.size() == 0)
-		//	{
-		//		getNodeNumbersOfMeters(editorname, allConnectionEntities, allEntitiesByBlockID,nodesOfVoltageMeter);
-		//		// I am doing a continue here becaue i dont want to generate an instance Line for this element
-		//		continue;
-		//	}
-		//	else
-		//	{
-		//		continue;
-		//	}
-		//	
-		//}
-		//else if (circuitElement->type() == "Current Meter")
-		//{
+		else if (circuitElement->type() == "VoltageMeter")
+		{
+			if (nodesOfVoltageMeter.size() == 0)
+			{
+				getNodeNumbersOfMeters(editorname, allConnectionEntities, allEntitiesByBlockID,nodesOfVoltageMeter);
+				// I am doing a continue here becaue i dont want to generate an instance Line for this element
+				continue;
+			}
+			else
+			{
+				continue;
+			}
+			
+		}
+		else if (circuitElement->type() == "CurrentMeter")
+		{
 
-		//	if (nodesOfCurrentMeter.size() == 0)
-		//	{
-		//		
-		//		std::vector<std::string> nodeNumbers;
-		//		std::unordered_set<std::string> temp;
+			if (nodesOfCurrentMeter.size() == 0)
+			{
+				
+				std::vector<std::string> nodeNumbers;
+				std::unordered_set<std::string> temp;
 
-		//		for (auto conn : element.getList())
-		//		{
-		//			if (temp.find(conn.getNodeNumber()) != temp.end())
-		//			{
-		//				continue;
-		//			}
+				for (auto conn : circuitElement->getList())
+				{
+					if (temp.find(conn.getNodeNumber()) != temp.end())
+					{
+						continue;
+					}
 
-		//			temp.insert(conn.getNodeNumber());
-		//			nodeNumbers.push_back(conn.getNodeNumber());
-		//		}
-		//		nodesOfCurrentMeter.push_back(nodeNumbers);
-		//		
-		//		// Here i do a continue because i dont want to generate an instance line for this element
-		//		continue;
-		//	}
-		//	else
-		//	{
-		//		continue;
-		//	}
-		//}
+					temp.insert(conn.getNodeNumber());
+					nodeNumbers.push_back(conn.getNodeNumber());
+				}
+				nodesOfCurrentMeter.push_back(nodeNumbers);
+				
+				// Here i do a continue because i dont want to generate an instance line for this element
+				continue;
+			}
+			else
+			{
+				continue;
+			}
+		}
 		else if (circuitElement->type() == "Capacitor")
 		{
 			Capacitor* capacitor = dynamic_cast<Capacitor*>(circuitElement);
