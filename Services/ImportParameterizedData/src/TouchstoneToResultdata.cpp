@@ -8,9 +8,10 @@
 #include "ResultCollectionExtender.h"
 #include "MetadataCampaign.h"
 #include "MetadataEntrySingle.h"
+#include "ParameterDescription.h"
 #include "QuantityDescription.h"
 #include "QuantityDescriptionSParameter.h"
-
+#include "ValueFormatSetter.h"
 
 #include "OptionsParameterHandlerFormat.h"
 #include "OptionsParameterHandlerFrequency.h"
@@ -19,13 +20,6 @@
 #include <base64.h>
 #include <zlib.h>
 
-TouchstoneToResultdata::TouchstoneToResultdata()
-{
-}
-
-TouchstoneToResultdata::~TouchstoneToResultdata()
-{
-}
 
 int TouchstoneToResultdata::getAssumptionOfPortNumber(const std::string& fileName)
 {
@@ -50,7 +44,7 @@ void TouchstoneToResultdata::createResultdata(int _numberOfPorts)
 	if (!seriesExists)
 	{
 		ResultCollectionExtender resultCollectionExtender(m_collectionName, *_modelComponent, &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
-		DatasetDescription1D dataset;
+		DatasetDescription dataset;
 		std::list< std::shared_ptr<MetadataEntry>> seriesMetadata;
 		
 		TouchstoneHandler handler = std::move(importTouchstoneFile(m_fileName, m_fileContent, m_uncompressedLength, _numberOfPorts));
@@ -64,7 +58,7 @@ void TouchstoneToResultdata::createResultdata(int _numberOfPorts)
 		std::list<DatasetDescription*>datasets{ &dataset };
 		const ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, seriesMetadata);
 			
-		resultCollectionExtender.processDataPoints(dataset,seriesID);
+		resultCollectionExtender.processDataPoints(&dataset,seriesID);
 		resultCollectionExtender.storeMetadata();
 	}
 	else
@@ -130,36 +124,37 @@ TouchstoneHandler TouchstoneToResultdata::importTouchstoneFile(const std::string
 	return handler;
 }
 
-DatasetDescription1D TouchstoneToResultdata::extractDatasetDescription(TouchstoneHandler& _touchstoneHandler)
+DatasetDescription TouchstoneToResultdata::extractDatasetDescription(TouchstoneHandler& _touchstoneHandler)
 {
-	DatasetDescription1D datasetDescription;
+	DatasetDescription datasetDescription;
 
 	MetadataParameter& metadataParameter = _touchstoneHandler.getMetadataFrequencyParameter();
-	auto frequencyParameter(std::make_shared<MetadataParameter>(metadataParameter));
+	auto frequencyParameterDescription(std::make_shared<ParameterDescription>(metadataParameter, false));
+	auto frequencyParameter = frequencyParameterDescription->getMetadataParameter();
 
 	////Maybe it is necessary to guarantee that all values have the same type ? !
 	ts::OptionSettings optionSettings = _touchstoneHandler.getOptionSettings();
-	frequencyParameter->unit = OptionsParameterHandlerFrequency::ToString(optionSettings.getFrequency());
-	frequencyParameter->parameterName = "Frequency";
-	frequencyParameter->typeName = ot::TypeNames::getDoubleTypeName();
-	datasetDescription.setXAxisParameterDescription(frequencyParameter);
+	frequencyParameter.unit = OptionsParameterHandlerFrequency::ToString(optionSettings.getFrequency());
+	frequencyParameter.parameterName = "Frequency";
+	frequencyParameter.typeName = ot::TypeNames::getDoubleTypeName();
+	datasetDescription.addParameterDescription(frequencyParameterDescription);
 
-	auto& quantityDescription = _touchstoneHandler.getQuantityDescription();
-	quantityDescription.setName("S-Parameter");
+	auto quantityDescription = _touchstoneHandler.handOverQuantityDescription();
+	quantityDescription->setName("S-Parameter");
 	const ts::option::Format& selectedFormat = optionSettings.getFormat();
+	ValueFormatSetter valueFormatSetter;
 	if (selectedFormat == ts::option::Format::Decibel_angle)
 	{
-		quantityDescription.setValueFormatDecibelPhase();
-
+		valueFormatSetter.setValueFormatDecibelPhase(*quantityDescription);
 	}
 	else if (selectedFormat == ts::option::Format::magnitude_angle)
 	{
-		quantityDescription.setValueFormatMagnitudePhase();
+		valueFormatSetter.setValueFormatMagnitudePhase(*quantityDescription);
 	}
 	else
 	{
-		quantityDescription.setValueFormatRealImaginary("");
+		valueFormatSetter.setValueFormatRealImaginary(*quantityDescription,"");
 	}
-	datasetDescription.setQuantityDescription(&quantityDescription);
+	datasetDescription.setQuantityDescription(quantityDescription);
 	return datasetDescription;
 }

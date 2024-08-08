@@ -200,7 +200,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c" />
-    <ClCompile Include="include\ProgressUpdater.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
     <ClCompile Include="src\DataCategorizationConsistencyChecker.cpp" />
@@ -252,7 +251,6 @@
     <ClInclude Include="include\OptionsParameterHandlerReference.h" />
     <ClInclude Include="include\PreviewAssembler.h" />
     <ClInclude Include="include\PreviewAssemblerRMD.h" />
-    <ClInclude Include="include\ProgressUpdater.h" />
     <ClInclude Include="include\TouchstoneHandler.h" />
     <ClInclude Include="include\TableExtractor.h" />
     <ClInclude Include="include\TableExtractorCSV.h" />

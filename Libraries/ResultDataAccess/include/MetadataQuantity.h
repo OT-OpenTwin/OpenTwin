@@ -13,12 +13,13 @@ struct __declspec(dllexport) MetadataQuantityValueDescription
 {
 	/****************** Are set by the campaign handling class *********************/
 	ot::UID quantityIndex = 0;
+	
+	//Label which is unique in a series. In case that the unique name is already taken, the name is extended with a number.
+	std::string quantityValueLabel = "";
 	/******************************************************************************/
 
 	std::string quantityValueName = "";
 
-	//Label which is unique in a series. In case that the unique name is already taken, the name is extended with a number.
-	std::string quantityValueLabel = "";
 
 	std::string dataTypeName = "";
 
@@ -37,12 +38,15 @@ struct __declspec(dllexport) MetadataQuantity
 {
 	std::string quantityName = "";
 
-	/****************** Is set by the campaign handling class (Identical with the first value description ID) *********************/
+	/****************** Is set by the campaign handling class *********************/
+	
+	//Identical with the first value description ID
 	ot::UID quantityIndex = 0;
-	/******************************************************************************/
-
+	
 	//Label which is unique in a series. In case that the unique name is already taken, the name is extended with a number.
 	std::string quantityLabel = "";
+	/******************************************************************************/
+
 	
 	//E.g. {3,3} for a 3x3 Matrix
 	std::vector<uint32_t> dataDimensions;

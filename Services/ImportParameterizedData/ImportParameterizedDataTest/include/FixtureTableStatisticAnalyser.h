@@ -8,14 +8,14 @@ class FixtureTableStatisticAnalyser : public testing::TestWithParam<int>
 public:
 	FixtureTableStatisticAnalyser();
 	~FixtureTableStatisticAnalyser();
-	uint64_t CountRows();
-	uint64_t CountColumns();
-	int CountUniquesInColumn(int column);
-	std::vector<size_t> CountUniquesInAllColumns();
+	uint64_t countRows();
+	uint64_t countColumns();
+	int countUniquesInColumn(int column);
+	std::vector<size_t> countUniquesInAllColumns();
 	
 private:
-	TableExtractor * _extractor = nullptr;
-	TableStatisticAnalyser * _analyser = nullptr;
-	const std::string filePath = "C:\\SimulationPlatform\\Libraries\\ImportParameterizedData\\test\\ImportParameterizedDataTest\\Files\\";
-	void LoadFileContent(std::string fullPath);
+	TableExtractor * m_extractor = nullptr;
+	TableStatisticAnalyser * m_analyser = nullptr;
+	const std::string m_filePath;
+	void loadFileContent(std::string _fullPath);
 };

@@ -11,6 +11,7 @@ public:
 	MetadataSeries(const std::string& name):m_name(name){};
 	
 	void addParameter(MetadataParameter& parameter) { m_parameter.push_back(parameter); }
+	void addParameter(MetadataParameter&& parameter) { m_parameter.push_back(std::move(parameter)); }
 	void addParameterReference(ot::UID _parameterUID) { m_parameterReferences.push_back(_parameterUID); m_parameterReferences.unique(); };
 	
 	void addQuantity(MetadataQuantity& quantity) { m_quantity.push_back(quantity); }

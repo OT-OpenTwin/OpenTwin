@@ -198,6 +198,7 @@
     <ClCompile Include="src\Encryption.cpp" />
     <ClCompile Include="src\Foundation.cpp" />
     <ClCompile Include="src\ModelServiceAPI.cpp" />
+    <ClCompile Include="src\ProgressUpdater.cpp" />
     <ClCompile Include="src\PythonServiceInterface.cpp" />
     <ClCompile Include="src\UserCredentials.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="include\OTServiceFoundation\ModalCommandBase.h" />
     <ClInclude Include="include\OTServiceFoundation\ModelComponent.h" />
     <ClInclude Include="include\OTServiceFoundation\ModelServiceAPI.h" />
+    <ClInclude Include="include\OTServiceFoundation\ProgressUpdater.h" />
     <ClInclude Include="include\OTServiceFoundation\PythonServiceInterface.h" />
     <ClInclude Include="include\OTServiceFoundation\TableRange.h" />
     <ClInclude Include="include\OTServiceFoundation\TypeConverter.h" />

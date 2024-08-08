@@ -8,12 +8,11 @@
 #include "QuantityDescriptionCurve.h"
 #include "QuantityDescriptionSParameter.h"
 #include "OTCore/DefensiveProgramming.h"
-//#include "Document/DocumentAccess.h"
+#include "QuantityContainerSerialiser.h"
+
 ResultCollectionExtender::ResultCollectionExtender(const std::string& _collectionName, ot::components::ModelComponent& _modelComponent, ClassFactory* _classFactory, const std::string& _ownerServiceName)
-	:ResultMetadataAccess(_collectionName,&_modelComponent,_classFactory), m_requiresUpdateMetadataCampaign(false), m_ownerServiceName(_ownerServiceName), m_dataStorageAccess("Projects", _collectionName)
-{
-	m_quantityContainer.reserve(m_bufferSize);
-}
+	:ResultMetadataAccess(_collectionName,&_modelComponent,_classFactory), m_requiresUpdateMetadataCampaign(false), m_ownerServiceName(_ownerServiceName)
+{}
 
 ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription*>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata)
 {
@@ -59,147 +58,64 @@ bool ResultCollectionExtender::campaignMetadataWithSameValueExists(std::shared_p
 	}
 }
 
-void ResultCollectionExtender::processDataPoints(DatasetDescription1D& _dataDescription, uint64_t _seriesMetadataIndex)
+void ResultCollectionExtender::processDataPoints(DatasetDescription* _dataDescription, uint64_t _seriesMetadataIndex)
 {
-	std::list<ot::UID> parameterIndices;
 	std::list<ot::Variable> sharedParameterValues;
+	std::list<ot::UID> parameterIndicesConstant, parameterIndicesNonConstant;
+	std::list<std::list<ot::Variable>::const_iterator> allParameterValueIt;
 
-	//In the extraction of parameters, the first is the x-axis. This is the only varying parameter for a curve
-	auto xParameter = _dataDescription.getXAxisParameter();
-	assert(xParameter->values.size() > 1);
+	auto parameterDescriptions = _dataDescription->getParameters();
 
-	//Add the first parameter abbreviation, which is corresponding to the x-axis parameter
-	const std::string xAxisParameterName = xParameter->parameterName;
-	parameterIndices.push_back(xParameter->parameterUID);
+	std::map < uint64_t, std::list<std::string>> parameterNamesByNumberOfParameterValues;
+
+	for (const auto& parameterDescription : parameterDescriptions)
+	{
+		auto& parameterMetadata = parameterDescription->getMetadataParameter();
+		const ot::UID parameterID = parameterMetadata.parameterUID;
+
+		bool parameterIsConstantForDataset = parameterDescription->getParameterConstantForDataset();
+		if (parameterIsConstantForDataset)
+		{
+			parameterIndicesConstant.push_back(parameterID);
+			auto parameterValues = parameterDescription->getMetadataParameter().values;
+			assert(parameterValues.size() == 1);
+			sharedParameterValues.push_back(*parameterValues.begin());
+		}
+		else
+		{
+			parameterIndicesNonConstant.push_back(parameterID);
+			auto parameterValueIt = parameterMetadata.values.begin();
+			parameterNamesByNumberOfParameterValues[parameterMetadata.values.size()].push_back(parameterMetadata.parameterName);
+			allParameterValueIt.push_back(parameterValueIt);
+		}
+	}
+
+	//The non-constant parameter are all iterated together with the quantity values. Thus, all non-const parameter are required to have the same number of values.
+	if (parameterNamesByNumberOfParameterValues.size() > 1)
+	{
+		std::string exceptionMessage("An unequal number of parameter values was detected:\n");
+		for (auto& parameterNamesByNumberOfParameterValue : parameterNamesByNumberOfParameterValues)
+		{
+			uint64_t numberOfParameterEntries = parameterNamesByNumberOfParameterValue.first;
+			exceptionMessage += std::to_string(numberOfParameterEntries) + " entries: ";
+			const std::list<std::string>& parameterNames = parameterNamesByNumberOfParameterValue.second;
+			for (const std::string& parameterName : parameterNames)
+			{
+				exceptionMessage += parameterName;
+			}
+			exceptionMessage += "\n";
+		}
+		throw std::exception(exceptionMessage.c_str());
+	}
+	uint64_t numberOfParameter = parameterNamesByNumberOfParameterValues.begin()->first;
 
 	//Add all the other parameters
-	auto allParameter = _dataDescription.getParameters();
-	if (allParameter.size() > 1)
-	{
-		//The first parameter is the x-axis parameter
-		auto parameter = allParameter.begin()++;
-		for (; parameter != allParameter.end(); parameter++)
-		{
-			//Those parameter which are fixed for one curve, so they are suppose to have only one entry.
-			if ((*parameter)->values.size() != 1)
-			{
-				//Too harsh ?
-				std::string message = "Cannot import data. Appart from the x-axis parameter, there is the parameter " + (*parameter)->parameterName + ", which has more then one value within a single curve.";
-				throw std::exception(message.c_str());
-			}
-			else
-			{
-				parameterIndices.push_back((*parameter)->parameterUID);
-				sharedParameterValues.push_back((*parameter)->values.front());
-			}
-		}
-	}
-	
+	QuantityDescription* currentQuantityDescription = _dataDescription->getQuantityDescription();
+	QuantityContainerSerialiser quantityContainerSerialiser(m_collectionName);
 
-	QuantityDescription* currentQuantityDescription = _dataDescription.getQuantityDescription();
-	MetadataQuantity& quantityMetadata = currentQuantityDescription->getMetadataQuantity();
-	auto xParameterValue = xParameter->values.begin();
-	size_t numberOfParameter = xParameter->values.size();
-
-	flushQuantityContainer();
-	QuantityDescriptionCurve* curveDescription = dynamic_cast<QuantityDescriptionCurve*>(currentQuantityDescription);
-	if (curveDescription != nullptr)
-	{
-		const std::vector<ot::Variable>& realValues = curveDescription->getQuantityValuesReal();
-		const std::vector<ot::Variable>& imagValues = curveDescription->getQuantityValuesImag();
-		std::vector<ot::Variable>::const_iterator realValueItt, imagValueItt;
-
-		bool hasImagValues(false), hasRealValues(false);
-		ot::UID imagQuantityID(0), realQuantityID(0);
-
-		if (!imagValues.empty())
-		{
-			assert(numberOfParameter == imagValues.size());
-			hasImagValues = true;
-			imagValueItt = imagValues.begin();
-			auto imagValueDescription = quantityMetadata.valueDescriptions.begin()++;
-			imagQuantityID = imagValueDescription->quantityIndex;
-		}
-		if (!realValues.empty())
-		{
-			assert(numberOfParameter == realValues.size());
-			hasRealValues = true;
-			realValueItt = realValues.begin();
-			auto realValueDescription = quantityMetadata.valueDescriptions.begin();
-			realQuantityID = realValueDescription->quantityIndex;
-		}
-		if (!hasRealValues && !hasImagValues)
-		{
-			return;
-		}
-
-		setBucketSize(1);
-
-		for (size_t i = 0; i < numberOfParameter; i++)
-		{
-			std::list<ot::Variable> currentParameterValues{ *xParameterValue };
-			currentParameterValues.insert(currentParameterValues.end(), sharedParameterValues.begin(), sharedParameterValues.end());
-			if (hasRealValues)
-			{
-				addQuantityContainer(_seriesMetadataIndex, parameterIndices, currentParameterValues, realQuantityID, *realValueItt);
-				if (realValueItt != realValues.end())
-				{
-					realValueItt++;
-				}
-			}
-
-			if (hasImagValues)
-			{
-				addQuantityContainer(_seriesMetadataIndex, parameterIndices, currentParameterValues, imagQuantityID, *imagValueItt);
-				if (imagValueItt != imagValues.end())
-				{
-					imagValueItt++;
-				}
-			}
-		}
-	}
-	else
-	{
-		QuantityDescriptionSParameter* sParameterDescription = dynamic_cast<QuantityDescriptionSParameter*>(currentQuantityDescription);
-		assert(sParameterDescription != nullptr);
-		PRE(sParameterDescription->getNumberOfFirstValues() == sParameterDescription->getNumberOfSecondValues());
-
-		const uint32_t numberOfPorts = sParameterDescription->getMetadataQuantity().dataDimensions.front();
-		setBucketSize(numberOfPorts * numberOfPorts);
-		auto firstValueDescription = quantityMetadata.valueDescriptions.begin();
-		auto secondValueDescription = quantityMetadata.valueDescriptions.begin()++;
-
-		for (size_t i = 0; i < numberOfParameter; i++)
-		{
-			std::list<ot::Variable> currentParameterValues{ *xParameterValue };
-			currentParameterValues.insert(currentParameterValues.end(), sharedParameterValues.begin(), sharedParameterValues.end());
-
-			for (uint32_t row = 0; row < numberOfPorts; row++)
-			{
-				for (uint32_t column = 0; column < numberOfPorts; column++)
-				{
-					const ot::Variable& quantityValueEntry = sParameterDescription->getFirstValue(i, row, column);
-					addQuantityContainer(_seriesMetadataIndex, parameterIndices, currentParameterValues, firstValueDescription->quantityIndex, quantityValueEntry);
-				}
-			}
-
-
-			for (uint32_t row = 0; row < numberOfPorts; row++)
-			{
-				for (uint32_t column = 0; column < numberOfPorts; column++)
-				{
-					const ot::Variable& quantityValueEntry = sParameterDescription->getSecondValue(i, row, column);
-					addQuantityContainer(_seriesMetadataIndex, parameterIndices, currentParameterValues, secondValueDescription->quantityIndex, quantityValueEntry);
-				}
-			}
-
-
-			if (xParameterValue != xParameter->values.end())
-			{
-				xParameterValue++;
-			}
-		}
-	}
+	std::list<ot::UID> parameterIndices = parameterIndicesConstant;
+	parameterIndices.insert(parameterIndices.end(), parameterIndicesNonConstant.begin(), parameterIndicesNonConstant.end());
+	quantityContainerSerialiser.storeDataPoints(_seriesMetadataIndex, parameterIndices, sharedParameterValues, allParameterValueIt, numberOfParameter, currentQuantityDescription);
 }
 
 void ResultCollectionExtender::addCampaignMetadata(std::shared_ptr<MetadataEntry> _metadata)
@@ -225,53 +141,70 @@ void ResultCollectionExtender::storeCampaignChanges()
 	}
 }
 
+bool ResultCollectionExtender::removeSeries(ot::UID _uid)
+{
+	bool removed = false;
+	for (auto series : m_seriesMetadataForStorage)
+	{
+		if (series->getSeriesIndex() == _uid)
+		{
+			m_seriesMetadataForStorage.remove(series);
+			removed = true;
+			m_metadataCampaign.updateMetadataOverview();
+			break;
+		}
+	}
+	return removed;
+}
+
 ot::UIDList ResultCollectionExtender::addCampaignContextDataToParameters(DatasetDescription& _dataDescription)
 {
 
 	//Muss die bereits behandelten aus der dataset liste berücksichtigen, ansonsten könnte labeluneindeutig werden
 	ot::UIDList dependingParameterIDs;
-	auto& allParameters = _dataDescription.getParameters();
+	auto& allParameterDescriptions = _dataDescription.getParameters();
 
-	for (auto& parameter : allParameters)
+	for (auto& parameterDescription : allParameterDescriptions)
 	{
+		MetadataParameter& parameter = parameterDescription->getMetadataParameter();
 		//Parameter was not dealed with.
-		if (parameter->parameterUID == 0)
+		if (parameter.parameterUID == 0)
 		{
-			const std::string parameterLabel = parameter->parameterName;
+			const std::string parameterLabel = parameter.parameterName;
 			const MetadataParameter* existingParameter = findMetadataParameter(parameterLabel);
 
 			//Parameter exists in the campaign.
 			if (existingParameter != nullptr)
 			{
-				if (!(*existingParameter == *parameter))
+				if (!(*existingParameter == parameter))
 				{
 					//Parameter have the same name, but are in fact different. We need to set a new label and ID
 					int counter = 1;
 					std::string newParameterLabel = "";
 					do
 					{
-						newParameterLabel = parameter->parameterName + "_" + std::to_string(counter);
+						newParameterLabel = parameter.parameterName + "_" + std::to_string(counter);
 						counter++;
 						existingParameter = findMetadataParameter(newParameterLabel);
 					} while (existingParameter != nullptr);
-					parameter->parameterLabel = newParameterLabel;
-					parameter->parameterUID = findNextFreeParameterIndex();
+					parameter.parameterLabel = newParameterLabel;
+					parameter.parameterUID = findNextFreeParameterIndex();
 				}
 				else
 				{
 					//Parameter are identically
-					parameter->parameterLabel = existingParameter->parameterLabel;
-					parameter->parameterUID = existingParameter->parameterUID;
+					parameter.parameterLabel = existingParameter->parameterLabel;
+					parameter.parameterUID = existingParameter->parameterUID;
 				}
 			}
 			else
 			{
-				parameter->parameterLabel = parameter->parameterName;
-				parameter->parameterUID = findNextFreeParameterIndex();
+				parameter.parameterLabel = parameter.parameterName;
+				parameter.parameterUID = findNextFreeParameterIndex();
 			}
 		}
 
-		dependingParameterIDs.push_back(parameter->parameterUID);
+		dependingParameterIDs.push_back(parameter.parameterUID);
 	}
 	return dependingParameterIDs;
 }
@@ -403,15 +336,16 @@ void ResultCollectionExtender::AddMetadataToSeries(std::list<DatasetDescription*
 
 
 		auto& allParameters = dataDescription->getParameters();
-		for (auto parameter : allParameters)
+		for (auto parameterDescription : allParameters)
 		{
+			MetadataParameter& parameter =	parameterDescription->getMetadataParameter();
 			//By know all parameter have UIDs, but still some parameter may be shared between different datasets.
 			//Thus, before we add a parameter to the series, we check if that already happened.
 			const std::list<MetadataParameter>& alreadyAddedParameters = _newSeries.getParameter();
 			bool found = false;
 			for (auto& alreadyAddedParameter : alreadyAddedParameters)
 			{
-				if (alreadyAddedParameter.parameterUID == parameter->parameterUID)
+				if (alreadyAddedParameter.parameterUID == parameter.parameterUID)
 				{
 					found = true;
 					break;
@@ -420,7 +354,10 @@ void ResultCollectionExtender::AddMetadataToSeries(std::list<DatasetDescription*
 
 			if (!found)
 			{
-				_newSeries.addParameter(*parameter);
+				MetadataParameter newParameter(parameter);
+				newParameter.values.sort();
+				newParameter.values.unique();
+				_newSeries.addParameter(std::move(newParameter));
 			}
 		}
 	}
@@ -441,74 +378,3 @@ const uint64_t ResultCollectionExtender::findNextFreeParameterIndex()
 	return m_modelComponent->createEntityUID();
 }
 
-void ResultCollectionExtender::flushQuantityContainer()
-{
-	for (auto& qc : m_quantityContainer)
-	{
-		DataStorageAPI::DataStorageResponse response = m_dataStorageAccess.InsertDocumentToResultStorage(qc.getMongoDocument(), false, true);
-		if (!response.getSuccess())
-		{
-			throw std::exception("Insertion of quantity container failed.");
-		}
-	}
-	m_dataStorageAccess.FlushQueuedData();
-	m_quantityContainer.clear();
-}
-
-void ResultCollectionExtender::addQuantityContainer(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>&& _parameterValues, uint64_t _quantityIndex, const ot::Variable& _quantityValue)
-{
-	if (m_quantityContainer.size() == 0)
-	{
-		QuantityContainer newContainer(_seriesIndex, _parameterIDs, std::move(_parameterValues), _quantityIndex);
-		newContainer.addValue(_quantityValue);
-		m_quantityContainer.push_back(std::move(newContainer));
-	}
-	else
-	{
-		QuantityContainer* lastAddedQuantityContainer = &m_quantityContainer.back();
-		const uint64_t lastAddedQuantityContainerStoredValues = lastAddedQuantityContainer->getValueArraySize();
-		if (lastAddedQuantityContainerStoredValues == m_bucketSize)
-		{
-			if (m_quantityContainer.size() == m_bufferSize)
-			{
-				flushQuantityContainer();
-			}
-			QuantityContainer newContainer(_seriesIndex, _parameterIDs, std::move(_parameterValues), _quantityIndex);
-			newContainer.addValue(_quantityValue);
-			m_quantityContainer.push_back(std::move(newContainer));
-		}
-		else
-		{
-			lastAddedQuantityContainer->addValue(_quantityValue);
-		}
-	}
-}
-
-void ResultCollectionExtender::addQuantityContainer(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _parameterValues, uint64_t _quantityIndex, const ot::Variable& _quantityValue)
-{
-	if (m_quantityContainer.size() == 0)
-	{
-		QuantityContainer newContainer(_seriesIndex, _parameterIDs, _parameterValues, _quantityIndex);
-		newContainer.addValue(_quantityValue);
-		m_quantityContainer.push_back(std::move(newContainer));
-	}
-	else
-	{
-		QuantityContainer* lastAddedQuantityContainer = &m_quantityContainer.back();
-		const uint64_t lastAddedQuantityContainerStoredValues = lastAddedQuantityContainer->getValueArraySize();
-		if (lastAddedQuantityContainerStoredValues == m_bucketSize)
-		{
-			if (m_quantityContainer.size() == m_bufferSize)
-			{
-				flushQuantityContainer();
-			}
-			QuantityContainer newContainer(_seriesIndex, _parameterIDs, _parameterValues, _quantityIndex);
-			newContainer.addValue(_quantityValue);
-			m_quantityContainer.push_back(std::move(newContainer));
-		}
-		else
-		{
-			lastAddedQuantityContainer->addValue(_quantityValue);
-		}
-	}
-}

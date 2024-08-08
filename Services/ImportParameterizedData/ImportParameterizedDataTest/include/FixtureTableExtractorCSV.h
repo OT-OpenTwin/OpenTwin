@@ -5,24 +5,26 @@
 class FixtureTableExtractorCSV : public testing::TestWithParam<int>
 {
 public:
+	FixtureTableExtractorCSV();
+
 	~FixtureTableExtractorCSV() 
 	{ 
-		if (_extractor != nullptr)
+		if (m_extractor != nullptr)
 		{
-			delete _extractor;
-			_extractor = nullptr;
+			delete m_extractor;
+			m_extractor = nullptr;
 		}
 	}
 	
-	const std::string GetFilePath() { return filePath; }
-	void LoadFileContent(std::string fullPath);
-	void LoadFileWithSemicolonRowDelimiter(std::string name);
-	void LoadFileWithCommaColumnDelimiter(std::string name);
-	void LoadFileWithTabColumnDelimiter(std::string name);
-	std::vector<std::string> GetAllRows(void);
-	std::vector<std::string> GetAllColumns(void);
+	const std::string getFilePath() { return m_filePath; }
+	void loadFileContent(std::string fullPath);
+	void loadFileWithSemicolonRowDelimiter(std::string name);
+	void loadFileWithCommaColumnDelimiter(std::string name);
+	void loadFileWithTabColumnDelimiter(std::string name);
+	std::vector<std::string> getAllRows(void);
+	std::vector<std::string> getAllColumns(void);
 
 private:
-	TableExtractorCSV* _extractor = nullptr;
-	const std::string filePath = "C:\\SimulationPlatform\\Libraries\\ImportParameterizedData\\test\\ImportParameterizedDataTest\\Files\\";
+	TableExtractorCSV* m_extractor = nullptr;
+	const std::string m_filePath;
 };

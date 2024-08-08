@@ -258,6 +258,7 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 	}
 
 	std::list<bool> visibillity(false);
+	
 	_modelComponent.addEntitiesToModel(std::move(m_newEntityIDs), std::move(m_newEntityVersions), std::move(visibillity), {}, {}, {}, "Updated result data collection", true, _saveModel);
 }
 

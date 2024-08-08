@@ -3,7 +3,7 @@
 #include <list>
 #include "OptionSettings.h"
 #include "QuantityDescriptionSParameter.h"
-#include "DatasetDescription1D.h"
+#include "DatasetDescription.h"
 #include "MetadataParameter.h"
 
 class TouchstoneHandler
@@ -20,7 +20,12 @@ public:
 	void analyseFile(const std::string& _fileContent, int32_t _numberOfPorts);
 	const ts::OptionSettings& getOptionSettings() const { return m_optionSettings; }
 	const std::string& getComments() const { return m_comments; }
-	QuantityDescriptionSParameter& getQuantityDescription() { return m_quantityDescription; }
+	QuantityDescriptionSParameter* handOverQuantityDescription() 
+	{
+		QuantityDescriptionSParameter* temp = m_quantityDescription;
+		m_quantityDescription = nullptr;
+		return m_quantityDescription; 
+	}
 	MetadataParameter& getMetadataFrequencyParameter() { return m_frequencyParameter; }
 
 private:
@@ -32,7 +37,7 @@ private:
 	uint32_t m_touchstoneVersion = 1;
 	uint32_t m_portNumber = 0;
 	
-	QuantityDescriptionSParameter m_quantityDescription;
+	QuantityDescriptionSParameter* m_quantityDescription = nullptr;
 	MetadataParameter m_frequencyParameter;
 
 	uint32_t m_columnIndex = 0;

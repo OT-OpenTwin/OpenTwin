@@ -4,6 +4,8 @@
 class FileHelper
 {
 public:
-	static std::vector<char> ExtractFileContentAsBinary(const std::string& fileName);
+	static std::vector<char> extractFileContentAsBinary(const std::string& fileName);
+
+	static std::string getFilePath();
 };
 

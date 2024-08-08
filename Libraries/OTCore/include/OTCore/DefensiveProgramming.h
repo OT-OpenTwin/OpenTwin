@@ -25,4 +25,4 @@
 #define PRE(condition){			\
 	INVARIANT;					\
 	ASSERT(condition);			\
-}								
+}

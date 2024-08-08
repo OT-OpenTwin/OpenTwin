@@ -1,7 +1,10 @@
 #include "FileHelper.h"
+#include "OTSystem/OperatingSystem.h"
+
 #include <fstream>
 
-std::vector<char> FileHelper::ExtractFileContentAsBinary(const std::string& fileName)
+
+std::vector<char> FileHelper::extractFileContentAsBinary(const std::string& fileName)
 {
 	std::ifstream file(fileName, std::ios::binary | std::ios::ate);
 
@@ -22,3 +25,11 @@ std::vector<char> FileHelper::ExtractFileContentAsBinary(const std::string& file
 	}
 }
 
+std::string FileHelper::getFilePath()
+{
+	std::string executablePath = ot::os::getExecutablePath();
+	executablePath = executablePath.substr(0, executablePath.find_last_of("\\")); //One level up
+	executablePath = executablePath.substr(0, executablePath.find_last_of("\\")); // Other level up
+	const std::string filePath = executablePath + "\\ImportParameterizedDataTest\\Files\\";
+	return filePath;
+}

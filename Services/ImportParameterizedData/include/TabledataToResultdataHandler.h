@@ -9,6 +9,7 @@
 #include <map>
 #include <string>
 #include <list>
+#include <memory>
 
 #include "BusinessLogicHandler.h"
 #include "MetadataAssemblyData.h"
@@ -16,9 +17,13 @@
 #include "EntityParameterizedDataTable.h"
 #include "EntityMetadataCampaign.h"
 #include "MetadataEntry.h"
+#include "DatasetDescription.h"
+
 
 class TabledataToResultdataHandler : public BusinessLogicHandler
 {
+	friend class FixtureTabledataToResultdataHandler;
+
 public:
 	TabledataToResultdataHandler(const std::string& _baseFolder, const std::string& _datasetFolder, const std::string& _parameterFolder, const std::string& _quantityFolder, const std::string& _tableFolder);
 	void createDataCollection(const std::string& _dbURL, const std::string& _projectName);
@@ -43,5 +48,6 @@ private:
 
 	std::list<std::shared_ptr<MetadataEntry>> rangeData2MetadataEntries(MetadataAssemblyRangeData&& _assembyRangeData);
 
+	std::list<DatasetDescription*> extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>> loadedTables);
 	std::string extractUnitFromName(std::string& _name);
 };

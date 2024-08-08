@@ -1,44 +1,23 @@
 #pragma once
 #include "QuantityDescription.h"
 
-class __declspec(dllexport) QuantityDescriptionCurve :public QuantityDescription
+class __declspec(dllexport) QuantityDescriptionCurve : public QuantityDescription
 {
 public:
 	QuantityDescriptionCurve()
 	{
 		m_metadataQuantity.dataDimensions.push_back(1);
 	}
-	void reserveSizeRealValues(uint64_t _size)
+
+	void setDataPoints(std::list<ot::Variable> _dataPoints)
 	{
-		m_quantityValuesReal.reserve(_size);
+		m_dataPoints = std::vector<ot::Variable>{ _dataPoints.begin(), _dataPoints.end() };
 	}
-	void reserveSizeImagValues(uint64_t _size)
+	const std::vector<ot::Variable>& getDataPoints() const
 	{
-		m_quantityValuesImag.reserve(_size);
-	}
-	void addValueReal(ot::Variable&& _value)
-	{
-		PRE(m_metadataQuantity.valueDescriptions.size() >= 1);
-		m_quantityValuesReal.push_back(_value);
-	}
-	void addValueImag(ot::Variable&& _value)
-	{
-		PRE(m_metadataQuantity.valueDescriptions.size() >= 2);
-		m_quantityValuesImag.push_back(_value);
-	}
-	const std::vector<ot::Variable>& getQuantityValuesReal() const
-	{
-		PRE(m_metadataQuantity.valueDescriptions.size() >= 1);
-		return m_quantityValuesReal;
-	}
-	const std::vector<ot::Variable>& getQuantityValuesImag() const
-	{
-		PRE(m_metadataQuantity.valueDescriptions.size() >= 2);
-		return m_quantityValuesImag;
+		return m_dataPoints;
 	}
 
 private:
-	std::vector<ot::Variable> m_quantityValuesReal;
-	std::vector<ot::Variable> m_quantityValuesImag;
-	MetadataQuantity m_metadataQuantity;
+	std::vector<ot::Variable> m_dataPoints;
 };

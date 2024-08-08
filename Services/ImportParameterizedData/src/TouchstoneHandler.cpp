@@ -54,9 +54,8 @@ int32_t TouchstoneHandler::deriveNumberOfPorts(const std::string& _fileName)
 void TouchstoneHandler::analyseFile(const std::string& _fileContent, int32_t _numberOfPorts)
 {
 	m_portNumber = _numberOfPorts;
-	m_quantityDescription.setNumberOfPorts(m_portNumber);
 	std::string::difference_type numberOfRows = std::count(_fileContent.begin(), _fileContent.end(), '\n');
-	m_quantityDescription.reserve(numberOfRows);
+	m_quantityDescription = new QuantityDescriptionSParameter(m_portNumber, numberOfRows);
 
 	std::stringstream stream;
 	ot::EncodingGuesser encodingGuesser;
@@ -84,17 +83,17 @@ void TouchstoneHandler::analyseFile(const std::string& _fileContent, int32_t _nu
 	
 	if (m_firstValues != nullptr)
 	{
-		m_quantityDescription.pushBackFirstValue(std::move(*m_firstValues));
+		m_quantityDescription->pushBackFirstValue(std::move(*m_firstValues));
 		m_firstValues = nullptr;
 	}
 	
 	if (m_secondValues != nullptr)
 	{
-		m_quantityDescription.pushBackSecondValue(std::move(*m_secondValues));
+		m_quantityDescription->pushBackSecondValue(std::move(*m_secondValues));
 		m_secondValues = nullptr;
 	}
 
-	m_quantityDescription.optimiseMemory();
+	m_quantityDescription->optimiseMemory();
 }
 
 void TouchstoneHandler::analyseLine(std::string& content)
@@ -164,9 +163,9 @@ void TouchstoneHandler::analyseDataLine(std::string& content)
 							if (m_rowIndex == m_portNumber - 1)
 							{
 								m_rowIndex = 0;
-								m_quantityDescription.pushBackFirstValue(std::move(*m_firstValues));
+								m_quantityDescription->pushBackFirstValue(std::move(*m_firstValues));
 								m_firstValues = nullptr;
-								m_quantityDescription.pushBackSecondValue(std::move(*m_secondValues));
+								m_quantityDescription->pushBackSecondValue(std::move(*m_secondValues));
 								m_secondValues = nullptr;
 							}
 							else

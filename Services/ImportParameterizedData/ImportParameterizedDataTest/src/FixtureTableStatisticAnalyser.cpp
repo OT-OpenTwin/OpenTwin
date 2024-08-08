@@ -3,46 +3,47 @@
 #include "FileHelper.h"
 
 FixtureTableStatisticAnalyser::FixtureTableStatisticAnalyser()
+	:m_filePath(FileHelper::getFilePath())
 {
-	std::string fullPath = filePath + "WorkingTestTableForAnalytics.csv";
-	LoadFileContent(fullPath);
+	std::string fullPath = m_filePath + "WorkingTestTableForAnalytics.csv";
+	loadFileContent(fullPath);
 }
 FixtureTableStatisticAnalyser::~FixtureTableStatisticAnalyser()
 {
-	delete _analyser;
-	_analyser = nullptr;
-	delete _extractor;
-	_extractor = nullptr;
+	delete m_analyser;
+	m_analyser = nullptr;
+	delete m_extractor;
+	m_extractor = nullptr;
 }
 
 
-uint64_t FixtureTableStatisticAnalyser::CountRows()
+uint64_t FixtureTableStatisticAnalyser::countRows()
 {
-	return _analyser->CountRows();
+	return m_analyser->CountRows();
 }
 
-uint64_t FixtureTableStatisticAnalyser::CountColumns()
+uint64_t FixtureTableStatisticAnalyser::countColumns()
 {
-	return _analyser->CountColumns();
+	return m_analyser->CountColumns();
 }
 
-int FixtureTableStatisticAnalyser::CountUniquesInColumn(int column)
+int FixtureTableStatisticAnalyser::countUniquesInColumn(int _column)
 {
-	return _analyser->CountUniquesInColumn(column);
+	return m_analyser->CountUniquesInColumn(_column);
 }
 
 
-std::vector<size_t> FixtureTableStatisticAnalyser::CountUniquesInAllColumns()
+std::vector<size_t> FixtureTableStatisticAnalyser::countUniquesInAllColumns()
 {
-	return _analyser->CountUniquesInColumns();
+	return m_analyser->CountUniquesInColumns();
 }
 
-void FixtureTableStatisticAnalyser::LoadFileContent(std::string fullPath)
+void FixtureTableStatisticAnalyser::loadFileContent(std::string _fullPath)
 {
 	
-	auto fileContent = FileHelper::ExtractFileContentAsBinary(fullPath);
+	auto fileContent = FileHelper::extractFileContentAsBinary(_fullPath);
 	auto extractorCSV = new TableExtractorCSV();
 	extractorCSV->SetFileContent(fileContent);
-	_extractor = extractorCSV;
-	_analyser = new TableStatisticAnalyser(_extractor);
+	m_extractor = extractorCSV;
+	m_analyser = new TableStatisticAnalyser(m_extractor);
 }

@@ -52,6 +52,9 @@
     <ClCompile Include="src\Foundation.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProgressUpdater.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTServiceFoundation\AbstractModelNotifier.h">
@@ -133,6 +136,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\Foundation.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTServiceFoundation\ProgressUpdater.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

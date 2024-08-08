@@ -12,12 +12,16 @@
 #include "DataCategorizationConsistencyChecker.h"
 
 #include "ResultDataStorageAPI.h"
-#include "ProgressUpdater.h"
+#include "OTServiceFoundation/ProgressUpdater.h"
 
 #include "ResultCollectionExtender.h"
 #include "MetadataEntryArray.h"
 #include "MetadataEntryObject.h"
 #include "MetadataEntrySingle.h"
+
+#include "QuantityDescription.h"
+#include "QuantityDescriptionCurve.h"
+#include "ParameterDescription.h"
 
 TabledataToResultdataHandler::TabledataToResultdataHandler(const std::string& _baseFolder, const std::string& _datasetFolder, const std::string& _parameterFolder, const std::string& _quantityFolder, const std::string& _tableFolder)
 	: m_baseFolder(_baseFolder), m_datasetFolder(_datasetFolder), m_parameterFolder(_parameterFolder), m_quantityFolder(_quantityFolder), m_tableFolder(_tableFolder)
@@ -51,7 +55,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	}
 
 	//Load all existing metadata. They are henceforth neglected in selections.
-	ResultCollectionExtender resultCollectionExtender(projectName, *_modelComponent, &Application::instance()->getClassFactory(),OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultCollectionExtender resultCollectionExtender(projectName, *_modelComponent, &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 	/*_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 	Documentation::INSTANCE()->ClearDocumentation();*/
 
@@ -93,7 +97,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	}
 	else
 	{
-		std::string tableNames= "\nRequired tables:\n";
+		std::string tableNames = "\nRequired tables:\n";
 		for (const std::string& tableName : requiredTables)
 		{
 			tableNames += tableName + "\n";
@@ -103,7 +107,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		loadRequiredTables(requiredTables, loadedTables);
 		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 		Documentation::INSTANCE()->ClearDocumentation();
-		
+
 		//Filling a new EntityMetadataSeries object with its fields.
 		MetadataAssemblyRangeData rmdData;
 		rmdData.LoadAllRangeSelectionInformation(rmdAssemblyData->allSelectionRanges, loadedTables);
@@ -131,150 +135,54 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	}
 	for (auto& metadataAssemblyByName : allMSMDMetadataAssembliesByNames)
 	{
-		const MetadataAssemblyData* metadataAssembly = &metadataAssemblyByName->second;
-		std::string msmdName = metadataAssemblyByName->first;
-		msmdName = msmdName.substr(msmdName.find_last_of('/') + 1, msmdName.size());
-		auto seriesMetadata = resultCollectionExtender.findMetadataSeries(msmdName);
+
+		std::string seriesName = metadataAssemblyByName->first;
+		seriesName = seriesName.substr(seriesName.find_last_of('/') + 1, seriesName.size());
+		auto seriesMetadata = resultCollectionExtender.findMetadataSeries(seriesName);
 		if (seriesMetadata != nullptr)
 		{
-			_uiComponent->displayMessage("Skipped " + msmdName + "\n");
-			continue;
+			_uiComponent->displayMessage("Skipped " + seriesName + "\n");
 		}
-		_uiComponent->displayMessage("Create " + msmdName + ":\n");
-
-		//Load all required tables that are not loaded yet.
-		addRequiredTables(*metadataAssembly, requiredTables); //for msmd
-		addRequiredTables(*(metadataAssembly->next), requiredTables); //for parameter
-		addRequiredTables(*(metadataAssembly->next->next), requiredTables); //for quantities
-		requiredTables.unique();
-		
-		std::string tableNames = "\nRequired tables:\n";
-		for (const std::string& tableName : requiredTables)
+		else
 		{
-			tableNames += tableName +"\n";
-		}
-		_uiComponent->displayMessage(tableNames);
+			seriesName = m_datasetFolder + "/" + seriesName;
+			std::list<DatasetDescription*> datasets = extractDataset(metadataAssemblyByName->second, loadedTables);
 
-		loadRequiredTables(requiredTables, loadedTables);
-		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
-		Documentation::INSTANCE()->ClearDocumentation();
-
-		//Filling a new EntityMetadataSeries object with its fields.
-		MetadataAssemblyRangeData rangeData;
-		rangeData.LoadAllRangeSelectionInformation(metadataAssembly->allSelectionRanges, loadedTables);
-		msmdName = m_datasetFolder + "/" + msmdName;
-		
-		DatasetDescription datasetDescription;
-
-		//Loading parameter information
-		auto parameterAssembly = metadataAssembly->next;
-		MetadataAssemblyRangeData parameterData;
-		parameterData.LoadAllRangeSelectionInformation(parameterAssembly->allSelectionRanges, loadedTables);
-
-		//Loading quantity information
-		auto quantityAssembly = parameterAssembly->next;
-		MetadataAssemblyRangeData quantityData;
-		quantityData.LoadAllRangeSelectionInformation(quantityAssembly->allSelectionRanges, loadedTables);
-
-		bool isValid = checker.isValidQuantityAndParameterNumberMatches(parameterData, quantityData);
-		if (!isValid)
-		{
-			_uiComponent->displayMessage("Skipped creation of msmd " + msmdName + " due to this issue:\n");
-			_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
-			Documentation::INSTANCE()->ClearDocumentation();
-			continue;
-		}
-
-
-		for (auto& parameterEntry : *parameterData.getFields())
-		{
-			auto parameter(std::make_shared<MetadataParameter>());
-			parameter->parameterName = parameterEntry.first;
-			parameter->unit = extractUnitFromName(parameter->parameterName);
-			parameter->values = parameterEntry.second;
-			parameter->values.sort();
-			parameter->values.unique();
-			parameter->typeName = parameter->values.begin()->getTypeName();
-		}
-
-		for (const auto& quantityEntry : *quantityData.getFields())
-		{
-			MetadataQuantity quantity;
-			quantity.quantityName = quantityEntry.first;	//Wo wird die Namensproblematik behandelt?
-			quantity.quantityLabel = quantity.quantityName;
-			std::string unit = extractUnitFromName(quantity.quantityLabel);
-			quantity.dataDimensions = {1};
-			
-			MetadataQuantityValueDescription valueDescription;
-			valueDescription.dataTypeName = quantityEntry.second.begin()->getTypeName();
-			valueDescription.unit = unit;
-			
-			quantity.valueDescriptions.push_back(valueDescription);
-
-			//datasetDescription.setQuantityDescription()
-		}
-
-		//uint64_t seriesMetadataIndex = resultCollectionExtender.addSeries(std::move(metadataSeries));
-
-		_uiComponent->displayMessage("Storing quantity container\n");
-		uint64_t totalNumberOfFields = quantityData.getNumberOfFields();
-		ProgressUpdater updater(_uiComponent, "Storing quantity container");
-
-		ot::UIDList parameterIDs;
-		const auto& firstParameter = *parameterData.getFields()->begin();
-		const uint32_t numberOfFields = static_cast<uint32_t>(firstParameter.second.size());
-				
-		//Create sets of parameter values per field
-		std::list<std::list<ot::Variable>::const_iterator> allParameterValueIt;
-		for (const auto& parameterEntry : *parameterData.getFields())
-		{
-			const ot::UID parameterID = resultCollectionExtender.findMetadataParameter(parameterEntry.first)->parameterUID;
-			parameterIDs.push_back(parameterID);
-			allParameterValueIt.push_back(parameterEntry.second.begin());
-		}
-		std::vector<std::list<ot::Variable>> parameterValuesPerField(numberOfFields);
-		for (uint32_t i = 0; i < numberOfFields; i++)
-		{
-			std::list<ot::Variable> parameterValues;
-			for (std::list<ot::Variable>::const_iterator& parameterValueIt : allParameterValueIt)
+			if (datasets.empty())
 			{
-				parameterValues.push_back(*parameterValueIt); //Potential for improvement. Move is not supported due to const iterator, but possible to avoid memory peak.
-				parameterValueIt++;
+				_uiComponent->displayMessage("Skipped creation of series \"" + seriesName + "\" due to this issue:\n");
+				_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+				Documentation::INSTANCE()->ClearDocumentation();
 			}
-			parameterValuesPerField[i] = std::move(parameterValues);
-		}
+			else
+			{
+				_uiComponent->displayMessage("Create " + seriesName + ":\n");
+				ot::UID seriesUID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, {});
+				_uiComponent->displayMessage("Storing quantity container\n");
 
-		auto allSeriesMetadataEntries = rangeData2MetadataEntries(std::move(rangeData));
-
-		//preparing storage of quantity container
-		std::list<uint64_t> quantityIndices;
-		std::list<std::list<ot::Variable>::const_iterator> allQuantityValueIt;
-		for (const auto& quantityEntry : *quantityData.getFields())
-		{
-			allQuantityValueIt.push_back(quantityEntry.second.begin());
-			auto quantity = resultCollectionExtender.findMetadataQuantity(quantityEntry.first);
-			//resultCollectionExtender.addParameterDependencyOfQuantity(quantity->quantityIndex, parameterIDs);
-			quantityIndices.push_back(quantity->quantityIndex);
-		}
-
-		updater.SetTotalNumberOfUpdates(8, quantityData.getFields()->size());
-		auto quantityIndex = quantityIndices.begin();
-		
-		int counter(0);
-		//Handle each quantity after another
-		for (auto quantityValueIt : allQuantityValueIt)
-		{
-			//For current quantity store all values
-			for (uint32_t i = 0; i < numberOfFields; i++)
-			{				
-				//push data set into buffer
-				//resultCollectionExtender.addQuantityContainer(seriesMetadataIndex, parameterIDs, std::move(parameterValuesPerField[i]), *quantityIndex, *quantityValueIt);
-				quantityValueIt++;
+				//Now we store the datapoints
+				size_t numberOfDatasets = datasets.size();
+				uint32_t counter(0);
+				ProgressUpdater updater(_uiComponent, "Storing quantity container");
+				updater.SetTotalNumberOfUpdates(8, static_cast<uint32_t>(numberOfDatasets));
+				try
+				{
+					for (DatasetDescription* dataset : datasets)
+					{
+						resultCollectionExtender.processDataPoints(dataset, seriesUID);
+						//updater.TriggerUpdate(counter);
+					}
+				}
+				catch (std::exception& e)
+				{
+					std::string exceptionMessage = "Failed to store data points, because of following error: " + std::string(e.what()) + "\n"
+					"Creation of series \"" + seriesName +"\" failed.";
+					_uiComponent->displayMessage(exceptionMessage);
+					bool seriesRemoved = resultCollectionExtender.removeSeries(seriesUID);
+					assert(seriesRemoved); //Otherwise panic!
+				}
 			}
-
-			counter++;
-			updater.TriggerUpdate(counter);
-			quantityIndex++;
+			resultCollectionExtender.storeMetadata();
 		}
 	}
 }
@@ -456,6 +364,92 @@ std::list<std::shared_ptr<MetadataEntry>> TabledataToResultdataHandler::rangeDat
 	return allMetadataEntries;	
 }
 
+std::list<DatasetDescription*> TabledataToResultdataHandler::extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>> _loadedTables)
+{
+	std::list<std::string> requiredTables;
+	
+	//Load all required tables that are not loaded yet.
+	addRequiredTables(_metadataAssembly, requiredTables); //for msmd
+	
+	auto parameterAssembly = _metadataAssembly.next;
+	addRequiredTables(*(parameterAssembly), requiredTables); //for parameter
+	
+	auto quantityAssembly = parameterAssembly->next;
+	addRequiredTables(*(_metadataAssembly.next->next), requiredTables); //for quantities
+	
+	requiredTables.unique();
+
+	std::string tableNames = "\nRequired tables:\n";
+	for (const std::string& tableName : requiredTables)
+	{
+		tableNames += tableName + "\n";
+	}
+	_uiComponent->displayMessage(tableNames);
+
+	loadRequiredTables(requiredTables, _loadedTables);
+	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+	Documentation::INSTANCE()->ClearDocumentation();
+
+	//Filling a new EntityMetadataSeries object with its fields.
+	MetadataAssemblyRangeData rangeData;
+	rangeData.LoadAllRangeSelectionInformation(_metadataAssembly.allSelectionRanges, _loadedTables);
+
+	
+
+	//Loading parameter information
+
+	MetadataAssemblyRangeData parameterData;
+	parameterData.LoadAllRangeSelectionInformation(parameterAssembly->allSelectionRanges, _loadedTables);
+
+	//Loading quantity information
+	MetadataAssemblyRangeData quantityData;
+	quantityData.LoadAllRangeSelectionInformation(quantityAssembly->allSelectionRanges, _loadedTables);
+	DataCategorizationConsistencyChecker checker;
+
+	bool isValid = checker.isValidQuantityAndParameterNumberMatches(parameterData, quantityData);
+	
+	std::list<DatasetDescription*> datasetDescriptions;
+
+	if (isValid)
+	{
+		std::list<std::shared_ptr<ParameterDescription>> sharedParameter;
+
+		for (auto& parameterEntry : *parameterData.getFields())
+		{
+			MetadataParameter parameter;
+			bool isConstant = false;
+			parameter.parameterName = parameterEntry.first;
+			parameter.unit = extractUnitFromName(parameter.parameterName);
+			parameter.values = parameterEntry.second;
+			parameter.typeName = parameter.values.begin()->getTypeName();
+			
+			if (parameter.values.size() == 1)
+			{
+				isConstant = true;
+			}
+			auto parameterDescription(std::make_shared<ParameterDescription>(parameter,isConstant));
+			sharedParameter.push_back(parameterDescription);
+		}
+
+		for (const auto& quantityEntry : *quantityData.getFields())
+		{
+			auto datasetDescription(std::make_unique<DatasetDescription>());
+			std::string quantityName = quantityEntry.first;
+			std::string unit = extractUnitFromName(quantityName);
+
+			auto quantityDescription(std::make_unique<QuantityDescriptionCurve>());
+			quantityDescription->setName(quantityName);
+			const std::string valueTypeName = quantityEntry.second.begin()->getTypeName();
+			quantityDescription->addValueDescription("", valueTypeName, unit);
+			quantityDescription->setDataPoints(quantityEntry.second);
+			datasetDescription->setQuantityDescription(quantityDescription.release());
+			datasetDescription->addParameterDescriptions(sharedParameter);
+			datasetDescriptions.push_back(datasetDescription.release());
+		}
+	}
+	return datasetDescriptions;
+}
+
 std::string TabledataToResultdataHandler::extractUnitFromName(std::string& _name)
 {
 	std::string unit = "";
@@ -465,8 +459,8 @@ std::string TabledataToResultdataHandler::extractUnitFromName(std::string& _name
 		auto unitClosingBracketPos = _name.find(']');
 		if (unitClosingBracketPos != std::string::npos)
 		{
+			unit = std::string(_name.begin() + unitOpeningBracketPos +1, _name.begin() + unitClosingBracketPos);
 			_name = _name.substr(0, unitOpeningBracketPos - 1);
-			unit = _name.substr(unitOpeningBracketPos +1, unitClosingBracketPos -1);
 		}
 	}
 	return unit;

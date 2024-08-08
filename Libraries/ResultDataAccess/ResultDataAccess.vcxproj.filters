@@ -24,6 +24,12 @@
     <Filter Include="include\Creation Helper">
       <UniqueIdentifier>{7f810ec7-9d8f-43e7-a184-5a57945c757a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Creation Helper\Container for quantity metadata and datapoints">
+      <UniqueIdentifier>{cc08a927-fce6-4df4-a08a-86e919a1c0f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Creation Helper\Container for complete datasets">
+      <UniqueIdentifier>{874e995a-5fea-4ef7-9d16-737b9c290e0f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\QuantityContainer.h">
@@ -74,26 +80,32 @@
     <ClInclude Include="include\ProjectToCollectionConverter.h">
       <Filter>include\CollectionAccess</Filter>
     </ClInclude>
-    <ClInclude Include="include\QuantityDescription.h">
-      <Filter>include\Creation Helper</Filter>
-    </ClInclude>
     <ClInclude Include="include\SParameterMatrixHelper.h">
-      <Filter>include\Creation Helper</Filter>
-    </ClInclude>
-    <ClInclude Include="include\QuantityDescriptionSParameter.h">
-      <Filter>include\Creation Helper</Filter>
-    </ClInclude>
-    <ClInclude Include="include\QuantityDescriptionCurve.h">
       <Filter>include\Creation Helper</Filter>
     </ClInclude>
     <ClInclude Include="include\ParameterDescription.h">
       <Filter>include\Creation Helper</Filter>
     </ClInclude>
-    <ClInclude Include="include\DatasetDescription.h">
+    <ClInclude Include="include\ValueFormatSetter.h">
       <Filter>include\Creation Helper</Filter>
     </ClInclude>
-    <ClInclude Include="include\DatasetDescription1D.h">
-      <Filter>include\Creation Helper</Filter>
+    <ClInclude Include="include\QuantityDescription.h">
+      <Filter>include\Creation Helper\Container for quantity metadata and datapoints</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QuantityDescriptionCurve.h">
+      <Filter>include\Creation Helper\Container for quantity metadata and datapoints</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QuantityDescriptionCurveComplex.h">
+      <Filter>include\Creation Helper\Container for quantity metadata and datapoints</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QuantityDescriptionSParameter.h">
+      <Filter>include\Creation Helper\Container for quantity metadata and datapoints</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DatasetDescription.h">
+      <Filter>include\Creation Helper\Container for complete datasets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QuantityContainerSerialiser.h">
+      <Filter>include\CollectionAccess</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -139,7 +151,10 @@
     <ClCompile Include="src\DatasetDescription.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\DatasetDescription1D.cpp">
+    <ClCompile Include="src\QuantityDescription.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QuantityContainerSerialiser.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

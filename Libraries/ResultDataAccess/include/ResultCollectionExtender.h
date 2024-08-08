@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "ResultMetadataAccess.h"
 #include "MetadataCampaign.h"
 #include "MetadataQuantity.h"
@@ -8,9 +7,8 @@
 #include "MetadataSeries.h"
 #include "MetadataEntry.h"
 #include "QuantityContainer.h"
-#include "OTCore/CoreTypes.h"
+
 #include "DatasetDescription.h"
-#include "DatasetDescription1D.h"
 #include "ResultDataStorageAPI.h"
 #include <string>
 
@@ -24,7 +22,6 @@ public:
 	ResultCollectionExtender& operator=(const ResultCollectionExtender& _other) = delete;
 	~ResultCollectionExtender() = default;
 	
-	void setBucketSize(const uint64_t _bucketSize) { m_bucketSize = _bucketSize; }
 	void setSaveModel(bool _saveModel) { m_saveModel = _saveModel; }
 
 	ot::UID buildSeriesMetadata(std::list<DatasetDescription*>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata);
@@ -33,7 +30,8 @@ public:
 	bool campaignMetadataWithSameNameExists(std::shared_ptr<MetadataEntry> _metadata);
 	bool campaignMetadataWithSameValueExists(std::shared_ptr<MetadataEntry> _metadata);
 	
-	void processDataPoints(DatasetDescription1D& dataDescription, uint64_t seriesMetadataIndex);
+	//! @brief Throws exception if any parameter/quantity constellation is unvalid.
+	void processDataPoints(DatasetDescription* dataDescription, uint64_t seriesMetadataIndex);
 
 	/// <summary>
 	/// Potentially overrides an entry with the same field name. Use existence checks beforehand to look into that matter.
@@ -44,29 +42,20 @@ public:
 	void storeMetadata()
 	{
 		storeCampaignChanges();
-		flushQuantityContainer();
 	}
 
 	void storeCampaignChanges();
-	void flushQuantityContainer();
-
-	void addQuantityContainer(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>&& _parameterValues, uint64_t _quantityIndex, const ot::Variable& _quantityValue);
-	void addQuantityContainer(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _parameterValues, uint64_t _quantityIndex, const ot::Variable& _quantityValue);
-
+	bool removeSeries(ot::UID _uid);
 protected:
 	inline bool invariant() { return true; }
 
 private:
 	friend class FixtureResultCollectionExtender;
-	DataStorageAPI::ResultDataStorageAPI m_dataStorageAccess;
-
+	
 	bool m_requiresUpdateMetadataCampaign;
 	std::list<const MetadataSeries*> m_seriesMetadataForStorage;
-	std::vector<QuantityContainer> m_quantityContainer;
-
+	
 	std::map<std::string,uint32_t> m_parameterBuckets;
-	uint64_t m_bucketSize = 1;
-	const uint32_t m_bufferSize = 50;
 	const std::string m_ownerServiceName;
 
 	ot::UIDList addCampaignContextDataToParameters(DatasetDescription& _dataDescription);

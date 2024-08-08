@@ -16,15 +16,15 @@ public:
 	DatasetDescription& operator=(const DatasetDescription& other) = delete;
 	DatasetDescription(const DatasetDescription& other) = delete;
 
-	const std::list<std::shared_ptr<MetadataParameter>>& getParameters() const { return m_parameters; }
+	const std::list<std::shared_ptr<ParameterDescription>>& getParameters() const { return m_parameters; }
 	QuantityDescription* getQuantityDescription() { return m_quantityDescription; }
 
 	void setQuantityDescription(QuantityDescription* _quantityDescription);
 	
-	void addParameterDescription(std::shared_ptr<MetadataParameter> _parameterDescription);
-	void addParameterDescriptions(std::list<std::shared_ptr<MetadataParameter>>::iterator _parameterDescriptionFirst, std::list<std::shared_ptr<MetadataParameter>>::iterator _parameterDescriptionEnd);
+	void addParameterDescription(std::shared_ptr<ParameterDescription> _parameterDescription);
+	void addParameterDescriptions(std::list<std::shared_ptr<ParameterDescription>>_parameterDescriptions);
 protected:
 
-	std::list<std::shared_ptr<MetadataParameter>> m_parameters;
+	std::list<std::shared_ptr<ParameterDescription>> m_parameters;
 	QuantityDescription* m_quantityDescription = nullptr;
 };

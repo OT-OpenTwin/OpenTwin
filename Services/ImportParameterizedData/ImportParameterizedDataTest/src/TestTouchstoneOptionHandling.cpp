@@ -252,24 +252,3 @@
 //	//}
 //	EXPECT_TRUE(true);
 //}
-
-#include <gtest/gtest.h>
-#include "EntityContainer.h"
-#include "OTServiceFoundation/ModelComponent.h"
-#include "MetadataParameter.h"
-#include "OTCore/TypeNames.h"
-
-#include "ResultCollectionExtender.h"
-
-
-TEST(SomeDLLTest, modelEntities)
-{
-	ot::components::ModelComponent modelComponent("", "", "", 1, nullptr);
-	DataStorageAPI::ResultDataStorageAPI st("", "");
-	ot::TypeNames::getBoolTypeName();
-	ResultCollectionExtender extender("", modelComponent, nullptr, "");
-	EntityContainer cont(0, nullptr, nullptr, nullptr, nullptr, "");
-	ASSERT_TRUE(true);
-}
-
-

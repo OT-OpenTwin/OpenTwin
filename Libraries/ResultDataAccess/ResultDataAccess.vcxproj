@@ -21,11 +21,12 @@
   <ItemGroup>
     <ClInclude Include="include\CrossCollectionAccess.h" />
     <ClInclude Include="include\AdvancedQueryBuilder.h" />
-    <ClInclude Include="include\DatasetDescription1D.h" />
     <ClInclude Include="include\ParameterDescription.h" />
     <ClInclude Include="include\ProjectToCollectionConverter.h" />
+    <ClInclude Include="include\QuantityContainerSerialiser.h" />
     <ClInclude Include="include\QuantityDescription.h" />
     <ClInclude Include="include\QuantityDescriptionCurve.h" />
+    <ClInclude Include="include\QuantityDescriptionCurveComplex.h" />
     <ClInclude Include="include\QuantityDescriptionSParameter.h" />
     <ClInclude Include="include\ResultCollectionExtender.h" />
     <ClInclude Include="include\MetadataCampaign.h" />
@@ -42,13 +43,15 @@
     <ClInclude Include="include\ResultMetadataAccess.h" />
     <ClInclude Include="include\DatasetDescription.h" />
     <ClInclude Include="include\SParameterMatrixHelper.h" />
+    <ClInclude Include="include\ValueFormatSetter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CrossCollectionAccess.cpp" />
     <ClCompile Include="src\AdvancedQueryBuilder.cpp" />
     <ClCompile Include="src\DatasetDescription.cpp" />
-    <ClCompile Include="src\DatasetDescription1D.cpp" />
     <ClCompile Include="src\ProjectToCollectionConverter.cpp" />
+    <ClCompile Include="src\QuantityContainerSerialiser.cpp" />
+    <ClCompile Include="src\QuantityDescription.cpp" />
     <ClCompile Include="src\ResultCollectionExtender.cpp" />
     <ClCompile Include="src\MetadataCampaign.cpp" />
     <ClCompile Include="src\MetadataEntityInterface.cpp" />

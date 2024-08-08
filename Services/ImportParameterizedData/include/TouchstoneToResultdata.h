@@ -4,13 +4,18 @@
 
 #include "TouchstoneHandler.h"
 #include "MetadataSeries.h"
-#include "DatasetDescription1D.h"
+#include "DatasetDescription.h"
 
 class TouchstoneToResultdata : public BusinessLogicHandler
 {
 public:
-	TouchstoneToResultdata();
-	~TouchstoneToResultdata();
+	TouchstoneToResultdata() = default;
+	TouchstoneToResultdata(const TouchstoneToResultdata& _other) = delete;
+	TouchstoneToResultdata(TouchstoneToResultdata&& _other) = delete;
+	TouchstoneToResultdata& operator=(const TouchstoneToResultdata& _other) = delete;
+	TouchstoneToResultdata& operator=(TouchstoneToResultdata&& _other) = delete;
+	~TouchstoneToResultdata() = default;
+
 	int getAssumptionOfPortNumber(const std::string& fileName);
 	void setResultdata(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength);
 	void createResultdata(int numberOfPorts);
@@ -25,6 +30,6 @@ private:
 	bool seriesAlreadyExists(const std::string& seriesName);
 
 	TouchstoneHandler importTouchstoneFile(const std::string& fileName, const std::string& fileContent, uint64_t uncompressedLength, int numberOfPorts);
-	DatasetDescription1D extractDatasetDescription(TouchstoneHandler& _handler);
+	DatasetDescription extractDatasetDescription(TouchstoneHandler& _handler);
 };
 

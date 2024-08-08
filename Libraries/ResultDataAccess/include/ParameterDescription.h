@@ -8,20 +8,24 @@
 class __declspec(dllexport) ParameterDescription
 {
 public:
-	ParameterDescription(const MetadataParameter& _metadataParameter)
-		:m_metadataParameter(_metadataParameter){}
-	ParameterDescription(MetadataParameter&& _metadataParameter)
-		: m_metadataParameter(std::move(_metadataParameter)){}
+	ParameterDescription(const MetadataParameter& _metadataParameter, bool _constantForDataset)
+		:m_metadataParameter(_metadataParameter), m_constantForDataset(_constantForDataset){}
+	~ParameterDescription() = default;
+
+	ParameterDescription(ParameterDescription&& _other) noexcept = default;
+	ParameterDescription& operator=(ParameterDescription&& _other) = default;
+
+	ParameterDescription(const ParameterDescription& _other) =delete;
+	ParameterDescription& operator=(const ParameterDescription& _other) = delete;
 
 	MetadataParameter& getMetadataParameter() 
 	{ 
-		if (m_parameterValues.size() != m_metadataParameter.values.size())
-		{
-			m_parameterValues = m_metadataParameter.values;
-		}
 		return m_metadataParameter; 
 	}
+
+	void setParameterConstantForDataset(bool _constantForDataset) { m_constantForDataset = _constantForDataset; };
+	bool getParameterConstantForDataset() const { return m_constantForDataset; }
 private:
 	MetadataParameter m_metadataParameter;
-	std::list<ot::Variable> m_parameterValues; //Nicht nötig, wenn die Parameter Value Liste nicht optimiert wird.
+	bool m_constantForDataset = false;
 };

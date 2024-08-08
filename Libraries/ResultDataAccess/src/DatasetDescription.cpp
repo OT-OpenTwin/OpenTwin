@@ -3,11 +3,11 @@
 
 DatasetDescription::~DatasetDescription()
 {
-	/*if (m_quantityDescription != nullptr)
+	if (m_quantityDescription != nullptr)
 	{
 		delete m_quantityDescription;
 		m_quantityDescription = nullptr;
-	}*/
+	}
 }
 
 DatasetDescription::DatasetDescription()
@@ -34,14 +34,14 @@ void DatasetDescription::setQuantityDescription(QuantityDescription* _quantityDe
 	m_quantityDescription = _quantityDescription;
 }
 
-void DatasetDescription::addParameterDescription(std::shared_ptr<MetadataParameter> _parameterDescription)
+void DatasetDescription::addParameterDescription(std::shared_ptr<ParameterDescription> _parameterDescription)
 {
 	assert(_parameterDescription != nullptr);
 	m_parameters.push_back(_parameterDescription);
 }
 
-void DatasetDescription::addParameterDescriptions(std::list<std::shared_ptr<MetadataParameter>>::iterator _parameterDescriptionFirst, std::list<std::shared_ptr<MetadataParameter>>::iterator _parameterDescriptionEnd)
+void DatasetDescription::addParameterDescriptions(std::list<std::shared_ptr<ParameterDescription>>_parameterDescriptions)
 {
-	m_parameters.insert(m_parameters.end(), _parameterDescriptionFirst, _parameterDescriptionEnd);
+	m_parameters.insert(m_parameters.end(), _parameterDescriptions.begin(), _parameterDescriptions.end());
 }
 

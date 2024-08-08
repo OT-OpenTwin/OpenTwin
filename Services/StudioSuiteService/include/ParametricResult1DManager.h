@@ -9,7 +9,7 @@ class ResultCollectionExtender;
 
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "MetadataSeries.h"
-#include "DatasetDescription1D.h"
+#include "DatasetDescription.h"
 #include "OTCore/DefensiveProgramming.h"
 
 #include <string>
@@ -35,9 +35,9 @@ protected:
 private:
 	std::string determineRunIDLabel(std::list<int>& runIDList);
 	
-	std::list<DatasetDescription1D> extractDataDescriptionCurve(const std::string& _category, RunIDContainer* _runIDContainer, int _runID);
-	DatasetDescription1D extractDataDescriptionSParameter(const std::string& _category, RunIDContainer* _runIDContainer, int _runID);
-	std::list<std::shared_ptr<MetadataParameter>> extractParameterDescription(const std::string& _category, RunIDContainer* _runIDContainer, int _runID);
+	std::list<DatasetDescription> extractDataDescriptionCurve(const std::string& _category, RunIDContainer* _runIDContainer, int _runID);
+	DatasetDescription extractDataDescriptionSParameter(const std::string& _category, RunIDContainer* _runIDContainer, int _runID);
+	std::list<std::shared_ptr<ParameterDescription>> extractParameterDescription(const std::string& _category, RunIDContainer* _runIDContainer, int _runID);
 	//void extractMetadataFromDescriptions(std::map<std::string, MetadataQuantity>& _quantitiesByName, std::map<std::string, MetadataParameter>& _parametersByName, std::list<DatasetDescription1D>& _allDataDescriptions);
 	//void addParameterMetadata(std::map<std::string, MetadataParameter>& _parametersByName, std::shared_ptr<MetadataParameter> _parameter);
 
@@ -45,7 +45,7 @@ private:
 
 	void parseAxisLabel(const std::string& value, std::string& label, std::string& unit);
 
-	std::list<DatasetDescription1D> m_allDataDescriptions;
+	std::list<DatasetDescription> m_allDataDescriptions;
 
 	std::string m_resultFolderName;
 	std::string m_seriesNameBase = "CST Imported Results";

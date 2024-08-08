@@ -1,7 +1,7 @@
-#include "ProgressUpdater.h"
+#include "OTServiceFoundation/ProgressUpdater.h"
 
 ProgressUpdater::ProgressUpdater(ot::components::UiComponent* uiComponent, const std::string& progressbarMessage)
-	: _uiComponent(uiComponent) 
+	: _uiComponent(uiComponent)
 {
 	_uiComponent->setProgressInformation(progressbarMessage, false);
 	_uiComponent->setProgress(0);
@@ -35,6 +35,6 @@ void ProgressUpdater::TriggerUpdate(int32_t currentStep)
 {
 	if (currentStep != 0 && currentStep != _totalNumberOfSteps && _triggerFrequency != 0 && currentStep % _triggerFrequency == 0)
 	{
-		_uiComponent->setProgress( static_cast<int>(static_cast<float>(currentStep) / _totalNumberOfSteps * 100));
+		_uiComponent->setProgress(static_cast<int>(static_cast<float>(currentStep) / _totalNumberOfSteps * 100));
 	}
 }
