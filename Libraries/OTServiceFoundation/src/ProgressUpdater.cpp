@@ -1,40 +1,55 @@
 #include "OTServiceFoundation/ProgressUpdater.h"
 
-ProgressUpdater::ProgressUpdater(ot::components::UiComponent* uiComponent, const std::string& progressbarMessage)
-	: _uiComponent(uiComponent)
+ProgressUpdater::ProgressUpdater(ot::components::UiComponent* _uiComponent, const std::string& _progressbarMessage)
+	: m_uiComponent(_uiComponent)
 {
-	_uiComponent->setProgressInformation(progressbarMessage, false);
-	_uiComponent->setProgress(0);
+	INVARIANT;
+	m_uiComponent->setProgressInformation(_progressbarMessage, false);
+	m_uiComponent->setProgress(0);
 }
 
 ProgressUpdater::~ProgressUpdater()
 {
-	if (_uiComponent != nullptr)
+	if (m_uiComponent != nullptr)
 	{
-		_uiComponent->closeProgressInformation();
+		m_uiComponent->closeProgressInformation();
 	}
 }
 
-void ProgressUpdater::SetTriggerFrequency(uint64_t triggerFrequency)
+void ProgressUpdater::setTriggerFrequency(uint64_t _triggerFrequency)
 {
-	_triggerFrequency = triggerFrequency;
+	m_triggerFrequency = _triggerFrequency;
+	POST(m_triggerFrequency > 0);
 }
 
-void ProgressUpdater::SetTotalNumberOfSteps(uint64_t totalNumberofSteps)
+void ProgressUpdater::setTotalNumberOfSteps(uint64_t _totalNumberofSteps)
 {
-	_totalNumberOfSteps = totalNumberofSteps;
+	m_totalNumberOfSteps = _totalNumberofSteps;
+	POST(m_totalNumberOfSteps > 0);
 }
 
-void ProgressUpdater::SetTotalNumberOfUpdates(uint32_t numberOfUpdates, uint64_t totalNumberofSteps)
+void ProgressUpdater::setTotalNumberOfUpdates(uint32_t _numberOfUpdates, uint64_t _totalNumberofSteps)
 {
-	_totalNumberOfSteps = totalNumberofSteps;
-	_triggerFrequency = _totalNumberOfSteps / numberOfUpdates;
-}
-
-void ProgressUpdater::TriggerUpdate(int32_t currentStep)
-{
-	if (currentStep != 0 && currentStep != _totalNumberOfSteps && _triggerFrequency != 0 && currentStep % _triggerFrequency == 0)
+	m_totalNumberOfSteps = _totalNumberofSteps;
+	m_triggerFrequency = static_cast<uint64_t>(std::floor(m_totalNumberOfSteps / _numberOfUpdates));
+	if (m_triggerFrequency == 0)
 	{
-		_uiComponent->setProgress(static_cast<int>(static_cast<float>(currentStep) / _totalNumberOfSteps * 100));
+		m_triggerFrequency = 1;
+	}
+	POST(m_totalNumberOfSteps > 0 && m_triggerFrequency > 0);
+}
+
+void ProgressUpdater::triggerUpdate(int32_t _currentStep)
+{
+	PRE(m_totalNumberOfSteps > 0 && m_triggerFrequency > 0);
+
+	const bool isFirstStep = _currentStep == 0;
+	const bool isLastStep = _currentStep == m_totalNumberOfSteps;
+	const bool currentStepShouldTrigger = _currentStep% m_triggerFrequency == 0;
+
+	if (!isFirstStep && !isLastStep && currentStepShouldTrigger)
+	{
+		const uint32_t percentage =  static_cast<uint32_t>(_currentStep / m_totalNumberOfSteps * 100);
+		m_uiComponent->setProgress(percentage);
 	}
 }

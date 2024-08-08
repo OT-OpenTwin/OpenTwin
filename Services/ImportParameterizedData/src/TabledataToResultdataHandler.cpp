@@ -164,13 +164,13 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 				size_t numberOfDatasets = datasets.size();
 				uint32_t counter(0);
 				ProgressUpdater updater(_uiComponent, "Storing quantity container");
-				updater.SetTotalNumberOfUpdates(8, static_cast<uint32_t>(numberOfDatasets));
+				updater.setTotalNumberOfUpdates(8, static_cast<uint32_t>(numberOfDatasets));
 				try
 				{
 					for (DatasetDescription* dataset : datasets)
 					{
 						resultCollectionExtender.processDataPoints(dataset, seriesUID);
-						//updater.TriggerUpdate(counter);
+						updater.triggerUpdate(counter);
 					}
 				}
 				catch (std::exception& e)

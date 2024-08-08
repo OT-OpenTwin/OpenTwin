@@ -40,13 +40,17 @@
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="src\FixtureMatrix.cpp" />
+    <ClCompile Include="src\FixtureProgressUpdater.cpp" />
     <ClCompile Include="src\MatrixTest.cpp" />
     <ClCompile Include="src\TestBusinessLagicHandler.cpp" />
+    <ClCompile Include="src\TestFixtureProgressUpdater.cpp" />
     <ClCompile Include="src\TypeNameTemplateTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FixtureBusinessLogicHandler.h" />
     <ClInclude Include="include\FixtureMatrix.h" />
+    <ClInclude Include="include\FixtureProgressUpdater.h" />
+    <ClInclude Include="include\MockupUIComponent.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
@@ -82,8 +86,8 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);$(OT_DEFAULT_SERVICE_LIBPATHD);%(AdditionalIncludeDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>OpenTwinServiceFoundation.lib;$(OT_DEFAULT_SERVICE_LIBD);$(GOOGLE_TEST_LIB)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\$(OT_LIBTESTD);$(GOOGLE_TEST_LIBPATHD);$(OT_DEFAULT_SERVICE_LIBPATHD);%(AdditionalIncludeDirectories);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBD);$(OC_LIBPATHD)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTServiceFoundation.lib;$(OT_DEFAULT_SERVICE_LIBD);$(GOOGLE_TEST_LIB);CADModelEntities.lib;$(CFG_OC_LIBS)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

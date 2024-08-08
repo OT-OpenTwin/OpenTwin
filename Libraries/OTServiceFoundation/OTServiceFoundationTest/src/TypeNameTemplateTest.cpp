@@ -1,8 +1,8 @@
 #include <iostream>
 #include "gtest/gtest.h"
 #include "FixtureMatrix.h"
-#include "OpenTwinCore/TypeNames.h"
-#include "OpenTwinCore/TemplateTypeName.h"
+#include "OTCore/TypeNames.h"
+#include "OTCore/TemplateTypeName.h"
 
 #include <string>
 #include <stdint.h>

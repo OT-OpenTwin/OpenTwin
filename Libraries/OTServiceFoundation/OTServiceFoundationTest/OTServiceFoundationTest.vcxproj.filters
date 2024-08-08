@@ -21,6 +21,12 @@
     <ClInclude Include="include\FixtureBusinessLogicHandler.h">
       <Filter>src\Fixture</Filter>
     </ClInclude>
+    <ClInclude Include="include\FixtureProgressUpdater.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MockupUIComponent.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\FixtureMatrix.cpp">
@@ -33,6 +39,12 @@
       <Filter>src\Test</Filter>
     </ClCompile>
     <ClCompile Include="src\TestBusinessLagicHandler.cpp">
+      <Filter>src\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FixtureProgressUpdater.cpp">
+      <Filter>src\Fixture</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestFixtureProgressUpdater.cpp">
       <Filter>src\Test</Filter>
     </ClCompile>
   </ItemGroup>

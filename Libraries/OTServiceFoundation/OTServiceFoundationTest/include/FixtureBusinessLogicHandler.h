@@ -1,6 +1,6 @@
 #pragma once
 #include <gtest/gtest.h>
-#include "OpenTwinFoundation/BusinessLogicHandler.h"
+#include "OTServiceFoundation/BusinessLogicHandler.h"
 
 class FixtureBusinessLogicHandler : public testing::Test
 {
