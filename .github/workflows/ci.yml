@@ -16,7 +16,7 @@ jobs:
 
     steps:
     
-    - name: Check out the main project repository
+    - name: Check out the project repository
       uses: actions/checkout@v4
       with:
         repository: OT-OpenTwin/OpenTwin
@@ -35,7 +35,7 @@ jobs:
         choco install rust --version=1.76.0 -y
       shell: cmd
 
-    - name: Add Visual Studio to PATH
+    - name: Add Visual Studio 2022
       uses: microsoft/setup-msbuild@v1.0.2
 
     - name: Set up Python
@@ -58,16 +58,15 @@ jobs:
         set QtMsBuild=%cd%\OpenTwin\QtMsBuild
         echo "Starting BuildAll.bat..."
         call %OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildAll.bat 
-        echo "All checks passed."
 
-    - name: Upload build log summary artifact
+    - name: Upload build log Debug artifact
       if: always()
       uses: actions/upload-artifact@v2
       with:
         name: build-log-Debug
         path: ${{ github.workspace }}\OpenTwin\Scripts\BuildAndTest\buildLog_Debug.txt
 
-    - name: Upload build log summary artifact
+    - name: Upload build log Release artifact
       if: always()
       uses: actions/upload-artifact@v2
       with:
