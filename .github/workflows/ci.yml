@@ -61,21 +61,21 @@ jobs:
 
     - name: Upload build log Debug artifact
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: build-log-Debug
         path: ${{ github.workspace }}\OpenTwin\Scripts\BuildAndTest\buildLog_Debug.txt
 
     - name: Upload build log Release artifact
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: build-log-Release
         path: ${{ github.workspace }}\OpenTwin\Scripts\BuildAndTest\buildLog_Release.txt
 
     - name: Upload build log summary artifact
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: build-log-summary
         path: ${{ github.workspace }}\OpenTwin\Scripts\BuildAndTest\buildLog_Summary.txt
