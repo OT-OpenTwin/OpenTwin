@@ -2,9 +2,7 @@ name: MSBuild
 
 on:
   push:
-    branches: [ "Test" ]
   pull_request:
-    branches: [ "Test" ]
 
 env:
   DEVENV_PATH: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE
