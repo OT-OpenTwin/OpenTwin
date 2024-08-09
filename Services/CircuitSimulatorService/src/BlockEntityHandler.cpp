@@ -40,7 +40,7 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
-
+	
 	// Here i want to add the items to the corresponding editor
 
 

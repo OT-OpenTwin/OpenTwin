@@ -35,7 +35,7 @@
 #include <sstream>
 namespace Numbers
 {
-	static unsigned long long nodeNumber = 0;
+	static unsigned long long nodeNumber = 1;
 	static unsigned long long RshunNumbers = 0;
 }
 
@@ -415,9 +415,22 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 	std::map<std::pair<ot::UID, std::string>, std::string> connectionNodeNumbers;
 	//Lieber normale map nehmen 
 
+	// I want to be able to have always the same structure and naming of nodeNumbers in the circuit in all cases the user might build the circuit.
+	// Means that the user can start with every element to drop in the scene and start with any connection he want and this will not influence the results of the simulation
+	// and the coordination and of the nodenumbers and elements
+	// I want always a flow from positive node to negative node 
+	// I first start with the voltageSource and give it the connection id = 0 then i will go to the next element at the connection and to the opposite connetor and give it the 
+	// next nodenumber. I will take use of traversing graphs with my code of checking parallel connections. I just need a good understandable structure
+	/*if (it->second.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource") != it->second.getMapOfEntityBlcks().end())
+	{
+
+	}*/
+	
+
 
 	for (auto& blockEntityByID : allEntitiesByBlockID)
 	{
+		
 		std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
 		auto connections = blockEntity->getAllConnections();
 
@@ -432,7 +445,6 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
 
 			Connection myConn(connectionCfg);
-			bool temp = false;
 
 			//1.Methode
 
@@ -453,12 +465,11 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 					}
 					else
-					{
+					{	
+
 						myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
 						connectionNodeNumbers.insert_or_assign({ myConn.getDestinationUid(), myConn.getDestConnectable() }, myConn.getNodeNumber());
 						connectionNodeNumbers.insert_or_assign({ myConn.getOriginUid(), myConn.getOriginConnectable() }, myConn.getNodeNumber());
-						temp = true;
-
 					}
 				}
 			}
@@ -468,13 +479,9 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			}
 
 
-			/*bool res1 =*/ it->second.addConnection(connectionCfg.getOriginUid(), myConn);
-			/*bool res2 = */it->second.addConnection(connectionCfg.getDestinationUid(), myConn);
-			/*if (res1 == false && res2 == false && temp == true)
-			{
-				Numbers::nodeNumber--;
-				temp = false;
-			}*/
+			it->second.addConnection(connectionCfg.getOriginUid(), myConn);
+			it->second.addConnection(connectionCfg.getDestinationUid(), myConn);
+			
 		}
 
 		
