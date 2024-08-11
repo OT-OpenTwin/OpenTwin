@@ -15,13 +15,13 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 	_navigationTreeIconNameHidden = "VoltageSource";
 	_blockTitle = "Voltage Source";
 
-	const std::string connectorNameLeft = "Left3";
-	m_LeftConnector = { ot::ConnectorType::In,connectorNameLeft,connectorNameLeft };
-	_connectorsByName[connectorNameLeft] = m_LeftConnector;
+	const std::string connectorPositive = "positivePole";
+	m_positiveConnector = { ot::ConnectorType::In,connectorPositive,connectorPositive };
+	_connectorsByName[connectorPositive] = m_positiveConnector;
 
-	const std::string connectorNameRight = "Right3";
-	m_RightConnector = { ot::ConnectorType::Out,connectorNameRight,connectorNameRight };
-	_connectorsByName[connectorNameRight] = m_RightConnector;
+	const std::string connectorNegative = "negativePole";
+	m_negativeConnector = { ot::ConnectorType::Out,connectorNegative,connectorNegative };
+	_connectorsByName[connectorNegative] = m_negativeConnector;
 
 }
 
@@ -400,7 +400,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageSource::CreateBlockCfg()
 	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState);
 	newConfig->setFile("Circuit/VoltageSource.ot.json");
 	newConfig->addStringMapEntry("Name", "V1");
-
+	
 
 	//Map of String to Enum
 	std::map<std::string, ot::Transform::FlipState> stringFlipMap;

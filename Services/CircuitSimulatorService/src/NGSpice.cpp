@@ -421,10 +421,71 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 	// I want always a flow from positive node to negative node 
 	// I first start with the voltageSource and give it the connection id = 0 then i will go to the next element at the connection and to the opposite connetor and give it the 
 	// next nodenumber. I will take use of traversing graphs with my code of checking parallel connections. I just need a good understandable structure
-	/*if (it->second.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource") != it->second.getMapOfEntityBlcks().end())
-	{
 
-	}*/
+	// First I get alle the VoltageSources of the Circuit
+	//auto vectorVoltageSources = it->second.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource");
+	//if ( vectorVoltageSources != it->second.getMapOfEntityBlcks().end()) {
+	//	
+	//	// Now i go through every VoltageSource and get its connections
+	//	for (auto voltageSource : vectorVoltageSources->second) {
+	//		auto connections = voltageSource->getAllConnections();
+
+	//		for (auto connectionID : connections)
+	//		{
+
+	//			std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connectionID);
+	//			ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
+
+	//			//After i got a connection i check if the connection is at the positivePole of my VoltageSource
+	//			if (connectionCfg.getDestConnectable() == "positivePole" || connectionCfg.getOriginConnectable() == "positivePole")
+	//			{
+	//				// If its at positivePole no matter if destination or origin i add it to the map if it does not exist and give it a nodeNumber
+	//				// Also i check if its a VoltageMeter connection, when it is one then i ignore it and go on
+	//				Connection myConn(connectionCfg);
+
+	//				if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter")) {
+
+	//					auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(),myConn.getDestConnectable() });
+	//					if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+	//						myConn.setNodeNumber(connectionWithNodeNumber->second);
+
+	//					}
+	//					else {
+	//						connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
+	//						if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+	//							myConn.setNodeNumber(connectionWithNodeNumber->second);
+
+	//						}
+	//						else {
+
+	//							myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
+	//							connectionNodeNumbers.insert_or_assign({ myConn.getDestinationUid(), myConn.getDestConnectable() }, myConn.getNodeNumber());
+	//							connectionNodeNumbers.insert_or_assign({ myConn.getOriginUid(), myConn.getOriginConnectable() }, myConn.getNodeNumber());
+	//						}
+	//					}
+	//				}
+
+	//				else {
+	//					myConn.setNodeNumber("voltageMeterConnection");
+	//				}
+
+
+	//				it->second.addConnection(connectionCfg.getOriginUid(), myConn);
+	//				it->second.addConnection(connectionCfg.getDestinationUid(), myConn);
+	//			}
+	//			else {
+	//				continue;
+	//			}
+
+	//			// After i added the connection i go to the next Element of this connection and check its connections
+	//			 
+	//			
+
+
+	//		}
+	//	}
+
+	//}
 	
 
 

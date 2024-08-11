@@ -20,13 +20,13 @@ class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock
 
 		virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 		virtual bool updateFromProperties(void) override;
-		const ot::Connector getLeftConnector() const { return m_LeftConnector; }
-		const ot::Connector getRightConnector() const { return m_RightConnector; }
+		const ot::Connector getPositiveConnector() const { return m_positiveConnector; }
+		const ot::Connector getNegativeConnector() const { return m_negativeConnector; }
 
 	private:
 	
-		ot::Connector m_LeftConnector;
-		ot::Connector m_RightConnector;
+		ot::Connector m_positiveConnector;
+		ot::Connector m_negativeConnector;
 
 
 		/*void createTransformProperties();*/
