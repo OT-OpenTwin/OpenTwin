@@ -78,14 +78,14 @@ namespace ot {
 		const std::string& getGraphicsViewName(void) const { return m_viewName; };
 
 		void addItem(ot::GraphicsItem* _item);
-		void removeItem(const ot::UID& _itemUid, bool bufferConnections = false);
+		void removeItem(const ot::UID& _itemUid, bool _handleQueue = false, bool bufferConnections = false);
 		std::list<ot::UID> getSelectedItemUIDs(void) const;
 		std::list<GraphicsItem*> getSelectedGraphicsItems(void) const;
 
 		bool addConnectionIfConnectedItemsExist(const GraphicsConnectionCfg& _config);
 
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
-		void removeConnection(const ot::UID& _connectionInformation);
+		void removeConnection(const ot::UID& _connectionInformation, bool _handleQueue = false);
 		ot::UIDList getSelectedConnectionUIDs(void) const;
 		std::list<GraphicsConnectionItem*> getSelectedConnectionItems(void) const;
 
@@ -94,6 +94,7 @@ namespace ot {
 
 		void notifyItemConfigurationChanged(const ot::GraphicsItem* _item);
 
+		void blockSceneAndView(bool _block);
 	Q_SIGNALS:
 		//! @brief Will be emitted when an item was dropped into the scene by the user
 		//! @param _name Item name
