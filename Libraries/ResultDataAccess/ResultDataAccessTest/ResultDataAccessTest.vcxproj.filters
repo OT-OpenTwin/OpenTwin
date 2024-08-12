@@ -35,5 +35,8 @@
     <ClInclude Include="include\FixtureAdvancedQueryBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ResultCollectionExtenderMockUp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

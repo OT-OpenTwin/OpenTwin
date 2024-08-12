@@ -146,7 +146,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		else
 		{
 			seriesName = m_datasetFolder + "/" + seriesName;
-			std::list<DatasetDescription*> datasets = extractDataset(metadataAssemblyByName->second, loadedTables);
+			std::list<DatasetDescription> datasets = extractDataset(metadataAssemblyByName->second, loadedTables);
 
 			if (datasets.empty())
 			{
@@ -167,9 +167,9 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 				updater.setTotalNumberOfUpdates(8, static_cast<uint32_t>(numberOfDatasets));
 				try
 				{
-					for (DatasetDescription* dataset : datasets)
+					for (DatasetDescription& dataset : datasets)
 					{
-						resultCollectionExtender.processDataPoints(dataset, seriesUID);
+						resultCollectionExtender.processDataPoints(&dataset, seriesUID);
 						updater.triggerUpdate(counter);
 					}
 				}
@@ -364,7 +364,7 @@ std::list<std::shared_ptr<MetadataEntry>> TabledataToResultdataHandler::rangeDat
 	return allMetadataEntries;	
 }
 
-std::list<DatasetDescription*> TabledataToResultdataHandler::extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>> _loadedTables)
+std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>> _loadedTables)
 {
 	std::list<std::string> requiredTables;
 	
@@ -408,7 +408,7 @@ std::list<DatasetDescription*> TabledataToResultdataHandler::extractDataset(cons
 
 	bool isValid = checker.isValidQuantityAndParameterNumberMatches(parameterData, quantityData);
 	
-	std::list<DatasetDescription*> datasetDescriptions;
+	std::list<DatasetDescription> datasetDescriptions;
 
 	if (isValid)
 	{
@@ -433,7 +433,7 @@ std::list<DatasetDescription*> TabledataToResultdataHandler::extractDataset(cons
 
 		for (const auto& quantityEntry : *quantityData.getFields())
 		{
-			auto datasetDescription(std::make_unique<DatasetDescription>());
+			DatasetDescription datasetDescription;
 			std::string quantityName = quantityEntry.first;
 			std::string unit = extractUnitFromName(quantityName);
 
@@ -442,9 +442,9 @@ std::list<DatasetDescription*> TabledataToResultdataHandler::extractDataset(cons
 			const std::string valueTypeName = quantityEntry.second.begin()->getTypeName();
 			quantityDescription->addValueDescription("", valueTypeName, unit);
 			quantityDescription->setDataPoints(quantityEntry.second);
-			datasetDescription->setQuantityDescription(quantityDescription.release());
-			datasetDescription->addParameterDescriptions(sharedParameter);
-			datasetDescriptions.push_back(datasetDescription.release());
+			datasetDescription.setQuantityDescription(quantityDescription.release());
+			datasetDescription.addParameterDescriptions(sharedParameter);
+			datasetDescriptions.push_back(std::move(datasetDescription));
 		}
 	}
 	return datasetDescriptions;

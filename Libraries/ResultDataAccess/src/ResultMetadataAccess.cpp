@@ -136,9 +136,9 @@ const MetadataParameter* ResultMetadataAccess::findMetadataParameter(ot::UID _in
 
 const MetadataQuantity* ResultMetadataAccess::findMetadataQuantity(const std::string& name)
 {
-	auto& quantitiesByName = m_metadataCampaign.getMetadataQuantitiesByLabel();
-	auto quantity = quantitiesByName.find(name);
-	if (quantity == quantitiesByName.end())
+	auto& quantitiesByLabel = m_metadataCampaign.getMetadataQuantitiesByLabel();
+	auto quantity = quantitiesByLabel.find(name);
+	if (quantity == quantitiesByLabel.end())
 	{
 		return nullptr;
 	}
@@ -161,6 +161,39 @@ const MetadataQuantity* ResultMetadataAccess::findMetadataQuantity(ot::UID _inde
 	{
 		return &(quantity->second);
 	}
+}
+
+std::list<MetadataQuantity*> ResultMetadataAccess::findQuantityWithSameName(const std::string& _name)
+{
+	std::list<MetadataQuantity*> matchingQuantities;
+	auto& quantitiesByLabel = m_metadataCampaign.getMetadataQuantitiesByLabel();
+	
+	for (auto quantityByLabel : quantitiesByLabel)
+	{
+		MetadataQuantity* quantity = 	quantityByLabel.second;
+		if (quantity->quantityName == _name)
+		{
+			matchingQuantities.push_back(quantity);
+		}
+	}
+
+	return matchingQuantities;
+}
+
+std::list<MetadataParameter*> ResultMetadataAccess::findParameterWithSameName(const std::string& _name)
+{
+	std::list<MetadataParameter*> matchingParameter;
+	auto& parametersByLabel = m_metadataCampaign.getMetadataParameterByLabel();
+
+	for (auto parameterByLabel : parametersByLabel)
+	{
+		MetadataParameter* parameter = parameterByLabel.second;
+		if (parameter->parameterName == _name)
+		{
+			matchingParameter.push_back(parameter);
+		}
+	}
+	return matchingParameter;
 }
 
 void ResultMetadataAccess::loadExistingCampaignData(ClassFactory* _classFactory)

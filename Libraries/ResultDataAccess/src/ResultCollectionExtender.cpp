@@ -14,23 +14,23 @@ ResultCollectionExtender::ResultCollectionExtender(const std::string& _collectio
 	:ResultMetadataAccess(_collectionName,&_modelComponent,_classFactory), m_requiresUpdateMetadataCampaign(false), m_ownerServiceName(_ownerServiceName)
 {}
 
-ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription*>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata)
+ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata)
 {
-	for (DatasetDescription* datasetDescription : _datasetDescriptions)
+	for (DatasetDescription& datasetDescription : _datasetDescriptions)
 	{
-		ot::UIDList parameterIDs = addCampaignContextDataToParameters(*datasetDescription);
-		addCampaignContextDataToQuantities(*datasetDescription, parameterIDs);
+		ot::UIDList parameterIDs = addCampaignContextDataToParameters(datasetDescription);
+		addCampaignContextDataToQuantities(datasetDescription, parameterIDs);
 	}
 	const ot::UID newSeriesID = createNewSeries(_datasetDescriptions, _seriesName, _seriesMetadata);
 	return newSeriesID;
 }
 
-ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription*>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>&& _seriesMetadata)
+ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>&& _seriesMetadata)
 {
-	for (DatasetDescription* datasetDescription : _datasetDescriptions)
+	for (DatasetDescription& datasetDescription : _datasetDescriptions)
 	{
-		ot::UIDList parameterIDs = addCampaignContextDataToParameters(*datasetDescription);
-		addCampaignContextDataToQuantities(*datasetDescription, parameterIDs);
+		ot::UIDList parameterIDs = addCampaignContextDataToParameters(datasetDescription);
+		addCampaignContextDataToQuantities(datasetDescription, parameterIDs);
 	}
 	const ot::UID newSeriesID = createNewSeries(_datasetDescriptions, _seriesName, _seriesMetadata);
 	return newSeriesID;
@@ -163,48 +163,81 @@ ot::UIDList ResultCollectionExtender::addCampaignContextDataToParameters(Dataset
 	//Muss die bereits behandelten aus der dataset liste berücksichtigen, ansonsten könnte labeluneindeutig werden
 	ot::UIDList dependingParameterIDs;
 	auto& allParameterDescriptions = _dataDescription.getParameters();
-
+	assert(allParameterDescriptions.size() > 0);
 	for (auto& parameterDescription : allParameterDescriptions)
 	{
-		MetadataParameter& parameter = parameterDescription->getMetadataParameter();
+		MetadataParameter& newParameter = parameterDescription->getMetadataParameter();
 		//Parameter was not dealed with.
-		if (parameter.parameterUID == 0)
+		if (newParameter.parameterUID == 0)
 		{
-			const std::string parameterLabel = parameter.parameterName;
-			const MetadataParameter* existingParameter = findMetadataParameter(parameterLabel);
+			const std::string parameterName = newParameter.parameterName;
+			std::list<MetadataParameter*> existingParameterInSeries = findParameterWithSameName(parameterName);
+			//Since multiple dataset descriptions are considered, it may be that duplicates exists amongst them
+			std::list<MetadataParameter*> existingParameters;
+			existingParameters.splice(existingParameters.end(), existingParameterInSeries);
+			auto parameterUpForStorageByName = m_parameterUpForStorageByName.find(parameterName);
+			if (parameterUpForStorageByName != m_parameterUpForStorageByName.end())
+			{
+				std::list<MetadataParameter*> existingParameterUpForStorage = parameterUpForStorageByName->second;
+				existingParameters.splice(existingParameters.end(), existingParameterUpForStorage);
+			}
 
 			//Parameter exists in the campaign.
-			if (existingParameter != nullptr)
+			if (existingParameters.size()>0)
 			{
-				if (!(*existingParameter == parameter))
+				MetadataParameter* identicalParameter = nullptr;
+				for (auto parameter : existingParameters)
+				{
+					if (newParameter == *parameter)
+					{
+						assert(identicalParameter == nullptr);
+						identicalParameter = parameter;
+					}
+				}
+
+				if (identicalParameter == nullptr)
 				{
 					//Parameter have the same name, but are in fact different. We need to set a new label and ID
 					int counter = 1;
+					bool newLabelFound = true;
 					std::string newParameterLabel = "";
 					do
 					{
-						newParameterLabel = parameter.parameterName + "_" + std::to_string(counter);
+						newParameterLabel = newParameter.parameterName+ "_" + std::to_string(counter);
 						counter++;
-						existingParameter = findMetadataParameter(newParameterLabel);
-					} while (existingParameter != nullptr);
-					parameter.parameterLabel = newParameterLabel;
-					parameter.parameterUID = findNextFreeParameterIndex();
+						newLabelFound = true;
+						for (MetadataParameter* existingParameter: existingParameters)
+						{
+							if (existingParameter->parameterLabel == newParameterLabel)
+							{
+								newLabelFound = false;
+								break;
+							}
+						}
+
+					} while (!newLabelFound);
+					newParameter.parameterLabel = newParameterLabel;
+
 				}
 				else
 				{
 					//Parameter are identically
-					parameter.parameterLabel = existingParameter->parameterLabel;
-					parameter.parameterUID = existingParameter->parameterUID;
+					newParameter.parameterLabel = identicalParameter->parameterLabel;
+					newParameter.parameterUID = identicalParameter->parameterUID;
 				}
 			}
 			else
 			{
-				parameter.parameterLabel = parameter.parameterName;
-				parameter.parameterUID = findNextFreeParameterIndex();
+				newParameter.parameterLabel = newParameter.parameterName;
+			}
+			if (newParameter.parameterUID == 0)
+			{
+				newParameter.parameterUID = findNextFreeParameterIndex();
+				m_parameterUpForStorageByName[newParameter.parameterName].push_back(&newParameter);
 			}
 		}
-
-		dependingParameterIDs.push_back(parameter.parameterUID);
+		
+		dependingParameterIDs.push_back(newParameter.parameterUID);
 	}
 	return dependingParameterIDs;
 }
@@ -212,87 +245,137 @@ ot::UIDList ResultCollectionExtender::addCampaignContextDataToParameters(Dataset
 void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescription& _dataDescription, ot::UIDList& _dependingParameterIDs)
 {
 	QuantityDescription* quantityDescription = _dataDescription.getQuantityDescription();
-	MetadataQuantity& quantity = quantityDescription->getMetadataQuantity();
+	assert(quantityDescription != nullptr);
+	MetadataQuantity& newQuantity = quantityDescription->getMetadataQuantity();
 
-	std::string quantityLabel = quantity.quantityName;
-	const MetadataQuantity* existingQuantity = findMetadataQuantity(quantityLabel);
-
-	if (existingQuantity != nullptr)
+	std::string quantityName = newQuantity.quantityName;
+	std::list<MetadataQuantity*> existingQuantitiesInSeries = findQuantityWithSameName(quantityName);
+	//Since multiple dataset descriptions are considered, it may be that duplicates exists amongst them
+	std::list<MetadataQuantity*> existingQuantities;
+	existingQuantities.splice(existingQuantities.end(),existingQuantitiesInSeries);
+	auto quantityUpForStorageByName =	m_quantitiesUpForStorageByName.find(quantityName);
+	if (quantityUpForStorageByName != m_quantitiesUpForStorageByName.end())
 	{
-		//Quantity exists already by name in campaign and is in fact identically with the existing one.
-		if (*existingQuantity == quantity)
+		std::list<MetadataQuantity*> existingQuantityUpForStorage = quantityUpForStorageByName->second;
+		existingQuantities.splice(existingQuantities.end(), existingQuantityUpForStorage);
+	}
+		
+	if (existingQuantities.size() >0)
+	{
+		MetadataQuantity* identicalQuantity =  nullptr;
+		for (MetadataQuantity* existingQuantity : existingQuantities)
 		{
-			quantityLabel = existingQuantity->quantityLabel; //value descriptions are identical and the first one is later used to set the quantityUID.
+			if (newQuantity == *existingQuantity)
+			{
+				assert(identicalQuantity == nullptr); //Quantities are supposed to be unique.
+				identicalQuantity = existingQuantity;
+			}
+		}
+
+		if (identicalQuantity != nullptr)
+		{
+			//Quantity exists already by name in campaign and is in fact identically with the existing one.
+			newQuantity.quantityLabel =  identicalQuantity->quantityLabel;
+			newQuantity.quantityIndex=  identicalQuantity->quantityIndex;
+			newQuantity.valueDescriptions = identicalQuantity->valueDescriptions;
 		}
 		else
 		{
 			//Quantities have the same name, but are in fact different. We need to set a new label and ID
 			int counter = 1;
-			const MetadataQuantity* stillExisting = nullptr;
+			bool newLabelFound = true;
+			std::string newQuantityLabel = "";
 			do
 			{
-				quantityLabel = quantity.quantityName + "_" + std::to_string(counter);
+				newQuantityLabel = newQuantity.quantityName + "_" + std::to_string(counter);
 				counter++;
-				stillExisting= findMetadataQuantity(quantityLabel);
-			} while (stillExisting != nullptr);
-			quantity.quantityLabel = quantityLabel;
-
-			ot::UID newQuantityIndex = 0;
-			
-			//First possible difference: The quantities are the same, except of a difference in the value descriptions:
-			//We need to figure out which of the value descriptions is different or newly added.
-			for (auto& newValueDescription : quantity.valueDescriptions)
-			{
-				//Check if this valuedescription is the same in both quanities and 
-				for (auto& existingValueDescription : existingQuantity->valueDescriptions)
+				newLabelFound = true;
+				for (MetadataQuantity* existingQuantity : existingQuantities)
 				{
-					if (newValueDescription == existingValueDescription)
+					if (existingQuantity->quantityLabel == newQuantityLabel)
 					{
-						newValueDescription.quantityIndex = existingValueDescription.quantityIndex;
-						newValueDescription.quantityValueLabel = existingValueDescription.quantityValueLabel;
+						newLabelFound = false;
 						break;
 					}
 				}
-				
-				//This value description is indeed new
-				if (newValueDescription.quantityIndex == 0)
-				{
-					newValueDescription.quantityIndex = findNextFreeQuantityIndex();
-					//The first new value description ID is also used for the quantity.
-					if (newQuantityIndex == 0)
-					{
-						newQuantityIndex = newValueDescription.quantityIndex;
-					}
-					newValueDescription.quantityValueLabel = newValueDescription.quantityValueName;
-				}
-			}
 
-			//Second possible difference: The quantities differ in the data dimensionality
-			if (newQuantityIndex == 0)
-			{
-				newQuantityIndex = findNextFreeQuantityIndex();
-			}
-			quantity.quantityIndex = newQuantityIndex;
+			} while (!newLabelFound);
+			newQuantity.quantityLabel = newQuantityLabel;
+
+			//Discarded aproach, which copies the shared value descriptions
+			// ot::UID newQuantityIndex = 0;
+			////First possible difference: The quantities are the same, except of a difference in the value descriptions:
+			////We need to figure out which of the value descriptions is different or newly added.
+			////for (auto& newValueDescription : quantity.valueDescriptions)
+			////{
+			////	Check if this valuedescription is the same in both quanities and 
+			////	for (auto& existingValueDescription : existingQuantity->valueDescriptions)
+			////	{
+			////		if (newValueDescription == existingValueDescription)
+			////		{
+			////			newValueDescription.quantityIndex = existingValueDescription.quantityIndex;
+			////			newValueDescription.quantityValueLabel = existingValueDescription.quantityValueLabel;
+			////			break;
+			////		}
+			////	}
+			////	
+			////	This value description is indeed new
+			////	if (newValueDescription.quantityIndex == 0)
+			////	{
+			////		newValueDescription.quantityIndex = findNextFreeQuantityIndex();
+			////		The first new value description ID is also used for the quantity.
+			////		if (newQuantityIndex == 0)
+			////		{
+			////			newQuantityIndex = newValueDescription.quantityIndex;
+			////		}
+			////		newValueDescription.quantityValueLabel = newValueDescription.quantityValueName;
+			////	}
+			////}
+
+			////Second possible difference: The quantities differ in the data dimensionality
+			////if (newQuantityIndex == 0)
+			////{
+			////	newQuantityIndex = findNextFreeQuantityIndex();
+			////}
+			////quantity.quantityIndex = newQuantityIndex;
 		}
 	}
 	else
 	{
-
-		quantity.quantityLabel = quantity.quantityName;
-		for (auto& quantityValueDescription : quantity.valueDescriptions)
+		newQuantity.quantityLabel = newQuantity.quantityName;
+		for (auto& quantityValueDescription : newQuantity.valueDescriptions)
 		{
 			quantityValueDescription.quantityIndex = findNextFreeQuantityIndex();
-			quantityValueDescription.quantityValueLabel = quantityValueDescription.quantityValueName;
 		}
+		newQuantity.dependingParameterIds = std::vector<ot::UID>(_dependingParameterIDs.begin(), _dependingParameterIDs.end());
 	}
-	if (quantity.quantityIndex == 0)
+
+	if (newQuantity.quantityIndex == 0)
 	{
-		quantity.quantityIndex = quantity.valueDescriptions.begin()->quantityIndex; //The entire quantity holds the index of the first value description.
+		std::set<std::string> valueDescriptionLabels;
+		for (MetadataQuantityValueDescription& valueDescription : newQuantity.valueDescriptions)
+		{
+			std::string valueDescriptionLabel = valueDescription.quantityValueName;
+			int count(0);
+			bool labelExists = false;
+			do
+			{
+				labelExists = valueDescriptionLabels.find(valueDescriptionLabel) != valueDescriptionLabels.end();
+				if (labelExists)
+				{
+					valueDescriptionLabel = valueDescription.quantityValueName + "_" + std::to_string(count);
+					count++;
+				}
+			} while (labelExists);
+			valueDescription.quantityValueLabel = valueDescriptionLabel;
+			valueDescriptionLabels.insert(valueDescription.quantityValueLabel);
+		}
+		newQuantity.quantityIndex = newQuantity.valueDescriptions.begin()->quantityIndex;
+		m_quantitiesUpForStorageByName[newQuantity.quantityName].push_back(&newQuantity);
 	}
-	quantity.dependingParameterIds = std::vector<ot::UID>(_dependingParameterIDs.begin(), _dependingParameterIDs.end());
 }
 
-ot::UID ResultCollectionExtender::createNewSeries(std::list<DatasetDescription*>& _dataDescription, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata)
+ot::UID ResultCollectionExtender::createNewSeries(std::list<DatasetDescription>& _dataDescription, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata)
 {
 	uint64_t seriesIndex;
 	const MetadataSeries* existingSeries = findMetadataSeries(_seriesName);
@@ -313,7 +396,7 @@ ot::UID ResultCollectionExtender::createNewSeries(std::list<DatasetDescription*>
 	ot::UID seriesID = findNextFreeSeriesIndex();
 	newSeries.setIndex(seriesID);
 	
-	AddMetadataToSeries(_dataDescription,newSeries);
+	addMetadataToSeries(_dataDescription,newSeries);
 	for (auto metadata : _seriesMetadata)
 	{
 		newSeries.addMetadata(metadata);
@@ -326,40 +409,49 @@ ot::UID ResultCollectionExtender::createNewSeries(std::list<DatasetDescription*>
 	return seriesID;
 }
 
-void ResultCollectionExtender::AddMetadataToSeries(std::list<DatasetDescription*>& _dataDescription, MetadataSeries& _newSeries)
+void ResultCollectionExtender::addMetadataToSeries(std::list<DatasetDescription>& _dataDescription, MetadataSeries& _newSeries)
 {
-	for (DatasetDescription* dataDescription : _dataDescription)
+	std::map<ot::UID,MetadataQuantity*> uniqueQuantities;
+	std::map<ot::UID,MetadataParameter> uniqueParameters;
+	for (DatasetDescription& dataDescription : _dataDescription)
 	{
-		QuantityDescription* quantityDescription = dataDescription->getQuantityDescription();
+		QuantityDescription* quantityDescription = dataDescription.getQuantityDescription();
 		MetadataQuantity& quantity = quantityDescription->getMetadataQuantity();
-		_newSeries.addQuantity(quantity);
 
+		auto uniqueQuantity = uniqueQuantities.find(quantity.quantityIndex);
+		if (uniqueQuantity == uniqueQuantities.end())
+		{
+			uniqueQuantities[quantity.quantityIndex] = &quantity;
+		}
 
-		auto& allParameters = dataDescription->getParameters();
+		auto& allParameters = dataDescription.getParameters();
 		for (auto parameterDescription : allParameters)
 		{
-			MetadataParameter& parameter =	parameterDescription->getMetadataParameter();
-			//By know all parameter have UIDs, but still some parameter may be shared between different datasets.
-			//Thus, before we add a parameter to the series, we check if that already happened.
-			const std::list<MetadataParameter>& alreadyAddedParameters = _newSeries.getParameter();
-			bool found = false;
-			for (auto& alreadyAddedParameter : alreadyAddedParameters)
-			{
-				if (alreadyAddedParameter.parameterUID == parameter.parameterUID)
-				{
-					found = true;
-					break;
-				}
-			}
+			MetadataParameter& parameter = parameterDescription->getMetadataParameter();
 
-			if (!found)
+			auto uniqueParameter = uniqueParameters.find(parameter.parameterUID);
+			if (uniqueParameter == uniqueParameters.end())
 			{
 				MetadataParameter newParameter(parameter);
 				newParameter.values.sort();
 				newParameter.values.unique();
-				_newSeries.addParameter(std::move(newParameter));
+				uniqueParameters[parameter.parameterUID] = std::move(newParameter);
+			}
+			else
+			{
+				uniqueParameter->second.values.insert(uniqueParameter->second.values.end(), parameter.values.begin(), parameter.values.end());
+				uniqueParameter->second.values.sort();
+				uniqueParameter->second.values.unique();
 			}
 		}
+	}
+	for (auto& uniqueQuantity : uniqueQuantities)
+	{
+		_newSeries.addQuantity(*uniqueQuantity.second);
+	}
+	for (auto& uniqueParameter : uniqueParameters)
+	{
+		_newSeries.addParameter(std::move(uniqueParameter.second));
 	}
 }
 

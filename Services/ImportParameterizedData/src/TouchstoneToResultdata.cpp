@@ -55,7 +55,8 @@ void TouchstoneToResultdata::createResultdata(int _numberOfPorts)
 		seriesMetadata.push_back(std::make_shared<MetadataEntrySingle>("Touchstone Parameter", tsParameter));
 		seriesMetadata.push_back(std::make_shared<MetadataEntrySingle>("Reference Resistance", optionSettings.getReferenceResistance()));
 		
-		std::list<DatasetDescription*>datasets{ &dataset };
+		std::list<DatasetDescription>datasets;
+		datasets.push_back(std::move(dataset));
 		const ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, seriesMetadata);
 			
 		resultCollectionExtender.processDataPoints(&dataset,seriesID);

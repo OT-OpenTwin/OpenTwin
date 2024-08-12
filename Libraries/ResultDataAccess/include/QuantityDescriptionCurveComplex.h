@@ -15,22 +15,18 @@ public:
 	}
 	void addValueReal(ot::Variable&& _value)
 	{
-		PRE(m_metadataQuantity.valueDescriptions.size() >= 1);
 		m_quantityValuesReal.push_back(_value);
 	}
 	void addValueImag(ot::Variable&& _value)
 	{
-		PRE(m_metadataQuantity.valueDescriptions.size() >= 2);
 		m_quantityValuesImag.push_back(_value);
 	}
 	const std::vector<ot::Variable>& getQuantityValuesReal() const
 	{
-		PRE(m_metadataQuantity.valueDescriptions.size() >= 1);
 		return m_quantityValuesReal;
 	}
 	const std::vector<ot::Variable>& getQuantityValuesImag() const
 	{
-		PRE(m_metadataQuantity.valueDescriptions.size() >= 2);
 		return m_quantityValuesImag;
 	}
 

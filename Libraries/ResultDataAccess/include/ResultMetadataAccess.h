@@ -41,15 +41,19 @@ public:
 	//! <returns>nullptr if not found</returns>
 	const MetadataQuantity* findMetadataQuantity(ot::UID _index); //Needs to look through the value descriptions!
 
+	std::list< MetadataQuantity*>findQuantityWithSameName(const std::string& _name);
+	std::list< MetadataParameter*>findParameterWithSameName(const std::string& _name);
+
 	const MetadataCampaign& getMetadataCampaign() const { return m_metadataCampaign; }
 
 	const std::string& getCollectionName() const { return m_collectionName; }
 
 	bool collectionHasMetadata() const { return m_metadataExistInProject; }
 protected:
+	ResultMetadataAccess() {};
 	bool m_metadataExistInProject = false;
 	std::string m_collectionName;
-	ot::components::ModelComponent* m_modelComponent;
+	ot::components::ModelComponent* m_modelComponent = nullptr;
 	MetadataCampaign m_metadataCampaign;
 
 private:

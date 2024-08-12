@@ -14,6 +14,13 @@ public:
 		POST(quantityDescription.getMetadataQuantity().valueDescriptions.size() == 1);
 	}
 
+	void setValueFormatImaginaryOnly(QuantityDescription& quantityDescription, std::string _unit)
+	{
+		quantityDescription.clearValueDescriptions();
+		quantityDescription.addValueDescription(m_imagValueName, ot::TypeNames::getDoubleTypeName(), _unit);
+		POST(quantityDescription.getMetadataQuantity().valueDescriptions.size() == 1);
+	}
+
 	void setValueFormatRealImaginary(QuantityDescription& quantityDescription, std::string _unit)
 	{
 		quantityDescription.clearValueDescriptions();

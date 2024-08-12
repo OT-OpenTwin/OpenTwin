@@ -80,16 +80,9 @@ void ParametricResult1DManager::storeDataInResultCollection()
 
 	std::string seriesName = CreateNewUniqueTopologyName(m_resultFolderName, m_seriesNameBase);
 	
-	//From here on it could be moved into a library:
-	std::list<DatasetDescription*> allDataDescriptions;
-	for (auto& dataDescription1D : m_allDataDescriptions)
-	{
-		allDataDescriptions.push_back(&dataDescription1D);
-	}
-
 	std::list<std::shared_ptr<MetadataEntry>> seriesMetadata;
-	uint64_t seriesMetadataIndex = resultCollectionExtender.buildSeriesMetadata(allDataDescriptions, seriesName, seriesMetadata);
-
+	uint64_t seriesMetadataIndex = resultCollectionExtender.buildSeriesMetadata(m_allDataDescriptions, seriesName, seriesMetadata);
+	resultCollectionExtender.storeMetadata();
 	//Now we store all data points in the result collection
 	for (DatasetDescription& dataDescription : m_allDataDescriptions)
 	{
@@ -130,46 +123,69 @@ std::list<DatasetDescription>  ParametricResult1DManager::extractDataDescription
 
 			Result1DData* curveData = curve.second;
 			
-			std::string quantityUnit, quantityLabel;
-			parseAxisLabel(curveData->getXLabel(), quantityLabel, quantityUnit);
-			
-			std::unique_ptr<QuantityDescriptionCurveComplex> quantityDescription(std::make_unique<QuantityDescriptionCurveComplex>());
-			//std::string prefix = curve.first.substr(_category.size() + 1);
+			std::string quantityUnit, quantityName;
+			//parseAxisLabel(curveData->getYLabel(), quantityName, quantityUnit);
+			//quantityName= quantityName;
+
+			std::string prefix = curve.first.substr(_category.size() + 1);
+			quantityUnit = "";
+			quantityName = prefix;
+			QuantityDescription* quantityDescription = nullptr;
 			//quantityDescription->setName(prefix);
-			quantityDescription->setName(quantityLabel);
 
 			const bool hasRealValues = !curveData->getYreValues().empty();
 			const bool hasImValue = !curveData->getYimValues().empty();
 			ValueFormatSetter valueFormatSetter;
-			if (hasImValue)
+			
+			//Values are either complex or real ? Plain imaginary values?
+			if (hasImValue && hasRealValues)
 			{
-				valueFormatSetter.setValueFormatRealImaginary(*quantityDescription, quantityUnit);
+				auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurveComplex>());
+				valueFormatSetter.setValueFormatRealImaginary(*quantityDescriptionComplex, quantityUnit);
+
+				quantityDescriptionComplex->reserveSizeRealValues(curveData->getYreValues().size());
+				for (auto realValue : curveData->getYreValues())
+				{
+					quantityDescriptionComplex->addValueReal(ot::Variable(realValue));
+				}
+
+				quantityDescriptionComplex->reserveSizeImagValues(curveData->getYimValues().size());
+				for (auto imValue : curveData->getYimValues())
+				{
+					quantityDescriptionComplex->addValueImag(ot::Variable(imValue));
+				}
+				
+				quantityDescription = quantityDescriptionComplex.release();
 			}
 			else
 			{
-				valueFormatSetter.setValueFormatRealOnly(*quantityDescription, quantityUnit);
-			}
-
-			if (hasRealValues)
-			{
-				quantityDescription->reserveSizeRealValues(curveData->getYreValues().size());
-				
-				for (auto realValue : curveData->getYreValues())
+				auto quantityDescriptionCurve(std::make_unique<QuantityDescriptionCurve>());
+				if (hasImValue)
 				{
-					quantityDescription->addValueReal(ot::Variable(realValue));
-				}
-			}
-			if (hasImValue)
-			{
-				quantityDescription->reserveSizeImagValues(curveData->getYimValues().size());
-				
-				for (auto imValue : curveData->getYimValues())
-				{
-					quantityDescription->addValueImag(ot::Variable(imValue));
-				}
-			}
+					valueFormatSetter.setValueFormatImaginaryOnly(*quantityDescriptionCurve, quantityUnit);
 
-			newCurveDescription.setQuantityDescription(quantityDescription.release());
+					quantityDescriptionCurve->reserveDatapointSize(curveData->getYimValues().size());
+					for (auto imValue : curveData->getYimValues())
+					{
+						quantityDescriptionCurve->addDatapoint(ot::Variable(imValue));
+					}
+				}
+				else
+				{
+					valueFormatSetter.setValueFormatRealOnly(*quantityDescriptionCurve, quantityUnit);
+
+					quantityDescriptionCurve->reserveDatapointSize(curveData->getYreValues().size());
+					for (auto reValue : curveData->getYreValues())
+					{
+						quantityDescriptionCurve->addDatapoint(ot::Variable(reValue));
+					}
+				}
+				quantityDescription = quantityDescriptionCurve.release();
+			}
+			
+			quantityDescription->setName(quantityName);
+			assert(quantityDescription != nullptr);
+			newCurveDescription.setQuantityDescription(quantityDescription);
 			allCurveDescriptions.push_back(std::move(newCurveDescription));
 		}
 	}
