@@ -22,7 +22,7 @@ class NGSpice
 {
 public:
 	std::map<std::string, Circuit> mapOfCircuits;
-
+	std::map<std::pair<ot::UID, std::string>, std::string> connectionNodeNumbers;
 	
 
 
@@ -35,7 +35,7 @@ public:
 	void clearBufferStructure(std::string name); 
 	void getNodeNumbersOfMeters(std::string ,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&,std::vector<std::string>&);
 	bool isValidNodeString(const std::string& input);
-	
+	void connectionAlgorithm(ot::UID voltageSource,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
 	
 
 	//Callback functions from NGSpice

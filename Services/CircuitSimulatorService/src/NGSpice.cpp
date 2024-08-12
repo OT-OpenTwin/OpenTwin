@@ -41,8 +41,15 @@ namespace Numbers
 
 void NGSpice::clearBufferStructure(std::string name)
 {
-	this->getMapOfCircuits().find(name)->second.getMapOfElements().clear();
+	auto elements = this->getMapOfCircuits().find(name)->second.getMapOfElements();
+	for (auto element : elements) 
+	{
+		delete element.second;
+		element.second = nullptr;
+	}
+	elements.clear();
 	this->getMapOfCircuits().find(name)->second.getMapOfEntityBlcks().clear();
+	this->connectionNodeNumbers.clear();
 	SimulationResults::getInstance()->getResultMap().clear();
 	
 
@@ -175,6 +182,97 @@ bool NGSpice::isValidNodeString(const std::string& input)
 	}
 
 	return true;
+}
+
+void NGSpice::connectionAlgorithm(ot::UID voltageSource,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
+{
+	auto element = allEntitiesByBlockID.at(elementUID);
+	auto connections = element->getAllConnections();
+	
+	if (visitedElements.find(elementUID) != visitedElements.end()) {
+		return; // Already visited this element, avoid infinite loop
+	}
+	visitedElements.insert(elementUID); // Mark this element as visited
+	
+
+	for (auto connection : connections)
+	{
+		if (visitedElements.find(connection) != visitedElements.end()) {
+			continue;
+		}
+		visitedElements.insert(connection);
+
+
+
+		auto circuitMap = Application::instance()->getNGSpice().getMapOfCircuits();
+		auto it =  circuitMap.find(editorname);
+
+		std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connection);
+		ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
+		Connection myConn(connectionCfg);
+
+		//First i check if the connection is connected to GND If yes then i state it with node number 0 
+		if (connectionCfg.getOriginUid() == voltageSource && connectionCfg.getOriginConnectable() == "negativePole" ||
+			connectionCfg.getDestinationUid() == voltageSource && connectionCfg.getDestConnectable() == "negativePole") {
+
+			
+
+			if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") &&
+				(allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter")) {
+
+				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
+				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+					myConn.setNodeNumber(connectionWithNodeNumber->second);
+				}
+				else {
+					connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
+					if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+						myConn.setNodeNumber(connectionWithNodeNumber->second);
+					}
+					else {
+						myConn.setNodeNumber("0");
+						connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+						connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+					}
+				}
+			}	
+		}
+		else {
+
+			if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") &&
+				(allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter")) {
+
+				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
+				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+					myConn.setNodeNumber(connectionWithNodeNumber->second);
+				}
+				else {
+					connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
+					if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+						myConn.setNodeNumber(connectionWithNodeNumber->second);
+					}
+					else {
+						myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
+						connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+						connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+					}
+				}
+			}
+			else {
+				myConn.setNodeNumber("voltageMeterConnection");
+			}
+		}
+		
+		it->second.addConnection(myConn.getOriginUid(), myConn);
+		it->second.addConnection(myConn.getDestinationUid(), myConn);
+
+		// Recursive call to explore the next element
+		ot::UID nextElementUID = (myConn.getOriginUid() == elementUID) ? myConn.getDestinationUid() : myConn.getOriginUid();
+		connectionAlgorithm(voltageSource, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+		
+	}
+
+	
 }
 
 
@@ -412,7 +510,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 	}
 
 	//std::unordered_map<std::pair<ot::UID, std::string>, std::string, PairHash> connectionNodeNumbers; 
-	std::map<std::pair<ot::UID, std::string>, std::string> connectionNodeNumbers;
+	
 	//Lieber normale map nehmen 
 
 	// I want to be able to have always the same structure and naming of nodeNumbers in the circuit in all cases the user might build the circuit.
@@ -422,134 +520,81 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 	// I first start with the voltageSource and give it the connection id = 0 then i will go to the next element at the connection and to the opposite connetor and give it the 
 	// next nodenumber. I will take use of traversing graphs with my code of checking parallel connections. I just need a good understandable structure
 
-	// First I get alle the VoltageSources of the Circuit
-	//auto vectorVoltageSources = it->second.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource");
-	//if ( vectorVoltageSources != it->second.getMapOfEntityBlcks().end()) {
-	//	
-	//	// Now i go through every VoltageSource and get its connections
-	//	for (auto voltageSource : vectorVoltageSources->second) {
-	//		auto connections = voltageSource->getAllConnections();
+	// First I get all the VoltageSources of the Circuit
 
-	//		for (auto connectionID : connections)
-	//		{
+	auto vectorVoltageSources = it->second.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource");
+	if (vectorVoltageSources != it->second.getMapOfEntityBlcks().end()) {
+		std::set<ot::UID> visitedElements; // Initialize visited set
 
-	//			std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connectionID);
-	//			ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
-
-	//			//After i got a connection i check if the connection is at the positivePole of my VoltageSource
-	//			if (connectionCfg.getDestConnectable() == "positivePole" || connectionCfg.getOriginConnectable() == "positivePole")
-	//			{
-	//				// If its at positivePole no matter if destination or origin i add it to the map if it does not exist and give it a nodeNumber
-	//				// Also i check if its a VoltageMeter connection, when it is one then i ignore it and go on
-	//				Connection myConn(connectionCfg);
-
-	//				if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter")) {
-
-	//					auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(),myConn.getDestConnectable() });
-	//					if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-	//						myConn.setNodeNumber(connectionWithNodeNumber->second);
-
-	//					}
-	//					else {
-	//						connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
-	//						if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-	//							myConn.setNodeNumber(connectionWithNodeNumber->second);
-
-	//						}
-	//						else {
-
-	//							myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
-	//							connectionNodeNumbers.insert_or_assign({ myConn.getDestinationUid(), myConn.getDestConnectable() }, myConn.getNodeNumber());
-	//							connectionNodeNumbers.insert_or_assign({ myConn.getOriginUid(), myConn.getOriginConnectable() }, myConn.getNodeNumber());
-	//						}
-	//					}
-	//				}
-
-	//				else {
-	//					myConn.setNodeNumber("voltageMeterConnection");
-	//				}
-
-
-	//				it->second.addConnection(connectionCfg.getOriginUid(), myConn);
-	//				it->second.addConnection(connectionCfg.getDestinationUid(), myConn);
-	//			}
-	//			else {
-	//				continue;
-	//			}
-
-	//			// After i added the connection i go to the next Element of this connection and check its connections
-	//			 
-	//			
-
-
-	//		}
-	//	}
-
-	//}
-	
-
-
-	for (auto& blockEntityByID : allEntitiesByBlockID)
-	{
-		
-		std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
-		auto connections = blockEntity->getAllConnections();
-
-		// Map used for parallel connections to identify if a connection already exists on the connector and then give the second or ... connection the same nodenumber
-		                                                                                                                                                         
-
-		for (auto connectionID : connections)
-		{
-			
-			auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
-			std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connectionID);
-			ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
-
-			Connection myConn(connectionCfg);
-
-			//1.Methode
-
-			if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter"))
-			{
-				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(),myConn.getDestConnectable() });
-				if (connectionWithNodeNumber != connectionNodeNumbers.end())
-				{
-					myConn.setNodeNumber(connectionWithNodeNumber->second);
-
-				}
-				else
-				{
-					connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
-					if (connectionWithNodeNumber != connectionNodeNumbers.end())
-					{
-						myConn.setNodeNumber(connectionWithNodeNumber->second);
-
-					}
-					else
-					{	
-
-						myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
-						connectionNodeNumbers.insert_or_assign({ myConn.getDestinationUid(), myConn.getDestConnectable() }, myConn.getNodeNumber());
-						connectionNodeNumbers.insert_or_assign({ myConn.getOriginUid(), myConn.getOriginConnectable() }, myConn.getNodeNumber());
-					}
-				}
-			}
-			else
-			{
-				myConn.setNodeNumber("voltageMeterConnection");
-			}
-
-
-			it->second.addConnection(connectionCfg.getOriginUid(), myConn);
-			it->second.addConnection(connectionCfg.getDestinationUid(), myConn);
+		for (auto voltageSource : vectorVoltageSources->second) {
+			ot::UID elementUID = voltageSource->getEntityID();
+			connectionAlgorithm(elementUID,elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 			
 		}
 
-		
-		
-		
+
+
+		//for (auto& blockEntityByID : allEntitiesByBlockID)
+		//{
+		//	
+		//	std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
+		//	auto connections = blockEntity->getAllConnections();
+
+		//	// Map used for parallel connections to identify if a connection already exists on the connector and then give the second or ... connection the same nodenumber
+		//	                                                                                                                                                         
+
+		//	for (auto connectionID : connections)
+		//	{
+		//		
+		//		auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
+		//		std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connectionID);
+		//		ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
+
+		//		Connection myConn(connectionCfg);
+
+		//		//1.Methode
+
+		//		if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter"))
+		//		{
+		//			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(),myConn.getDestConnectable() });
+		//			if (connectionWithNodeNumber != connectionNodeNumbers.end())
+		//			{
+		//				myConn.setNodeNumber(connectionWithNodeNumber->second);
+
+		//			}
+		//			else
+		//			{
+		//				connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
+		//				if (connectionWithNodeNumber != connectionNodeNumbers.end())
+		//				{
+		//					myConn.setNodeNumber(connectionWithNodeNumber->second);
+
+		//				}
+		//				else
+		//				{	
+
+		//					myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
+		//					connectionNodeNumbers.insert_or_assign({ myConn.getDestinationUid(), myConn.getDestConnectable() }, myConn.getNodeNumber());
+		//					connectionNodeNumbers.insert_or_assign({ myConn.getOriginUid(), myConn.getOriginConnectable() }, myConn.getNodeNumber());
+		//				}
+		//			}
+		//		}
+		//		else
+		//		{
+		//			myConn.setNodeNumber("voltageMeterConnection");
+		//		}
+
+
+		//		it->second.addConnection(connectionCfg.getOriginUid(), myConn);
+		//		it->second.addConnection(connectionCfg.getDestinationUid(), myConn);
+		//		
+		//	}
+
+
 	}
+		
 }
+
 
 
 std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
@@ -684,7 +729,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		else if (circuitElement->type() == "Capacitor")
 		{
 			Capacitor* capacitor = dynamic_cast<Capacitor*>(circuitElement);
-
+			
 			netlistElementName = capacitor->getNetlistName();
 			netlistLine += netlistElementName + " ";
 			netlistValue = capacitor->getCapacity();
@@ -737,6 +782,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 			}
 			temp.clear();
 		}
+		
 		
 	
 
