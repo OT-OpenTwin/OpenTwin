@@ -15,6 +15,8 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 	_navigationTreeIconNameHidden = "VoltageSource";
 	_blockTitle = "Voltage Source";
 
+	
+
 	const std::string connectorPositive = "positivePole";
 	m_positiveConnector = { ot::ConnectorType::In,connectorPositive,connectorPositive };
 	_connectorsByName[connectorPositive] = m_positiveConnector;
@@ -22,6 +24,7 @@ EntityBlockCircuitVoltageSource::EntityBlockCircuitVoltageSource(ot::UID ID, Ent
 	const std::string connectorNegative = "negativePole";
 	m_negativeConnector = { ot::ConnectorType::Out,connectorNegative,connectorNegative };
 	_connectorsByName[connectorNegative] = m_negativeConnector;
+	
 
 }
 

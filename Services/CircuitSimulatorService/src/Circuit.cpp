@@ -26,10 +26,10 @@ Circuit::Circuit()
 
 Circuit::~Circuit() 
 {
-	for (auto elements : mapOfElements) {
+	/*for (auto elements : mapOfElements) {
 		delete elements.second;
 		elements.second = nullptr;
-	}
+	}*/
 }
 
 
