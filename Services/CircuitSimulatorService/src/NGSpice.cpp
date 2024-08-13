@@ -47,9 +47,12 @@ void NGSpice::clearBufferStructure(std::string name)
 		delete element.second;
 		element.second = nullptr;
 	}
+
 	elements.clear();
 	this->getMapOfCircuits().find(name)->second.getMapOfEntityBlcks().clear();
 	this->connectionNodeNumbers.clear();
+	Numbers::nodeNumber = 1;
+	
 	SimulationResults::getInstance()->getResultMap().clear();
 	
 
@@ -184,8 +187,14 @@ bool NGSpice::isValidNodeString(const std::string& input)
 	return true;
 }
 
-void NGSpice::connectionAlgorithm(ot::UID voltageSource,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
+void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
 {
+	counter++;
+
+
+	auto circuitMap = Application::instance()->getNGSpice().getMapOfCircuits();
+	auto it = circuitMap.find(editorname);
+
 	auto element = allEntitiesByBlockID.at(elementUID);
 	auto connections = element->getAllConnections();
 	
@@ -197,19 +206,26 @@ void NGSpice::connectionAlgorithm(ot::UID voltageSource,ot::UID elementUID, std:
 
 	for (auto connection : connections)
 	{
+		
+
+		std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connection);
+		ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
+		Connection myConn(connectionCfg);
+
+		// As i always start with the voltageSource i want to start at the positivePole first so i skip the connection on the negativePole for the voltageSource 
+		// And i dont want to execute the above if Condition so i contructed a counter for this that only for the voltageSource it is relevant
+
+		if (counter == 1 && elementUID == voltageSource) {
+			if (connectionCfg.getDestConnectable() != "positivePole" && connectionCfg.getOriginConnectable() != "positivePole") {
+				continue;
+			}
+		}
+		
 		if (visitedElements.find(connection) != visitedElements.end()) {
 			continue;
 		}
 		visitedElements.insert(connection);
 
-
-
-		auto circuitMap = Application::instance()->getNGSpice().getMapOfCircuits();
-		auto it =  circuitMap.find(editorname);
-
-		std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connection);
-		ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
-		Connection myConn(connectionCfg);
 
 		//First i check if the connection is connected to GND If yes then i state it with node number 0 
 		if (connectionCfg.getOriginUid() == voltageSource && connectionCfg.getOriginConnectable() == "negativePole" ||
@@ -267,8 +283,14 @@ void NGSpice::connectionAlgorithm(ot::UID voltageSource,ot::UID elementUID, std:
 		it->second.addConnection(myConn.getDestinationUid(), myConn);
 
 		// Recursive call to explore the next element
-		ot::UID nextElementUID = (myConn.getOriginUid() == elementUID) ? myConn.getDestinationUid() : myConn.getOriginUid();
-		connectionAlgorithm(voltageSource, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+		ot::UID nextElementUID;
+		if (myConn.getOriginUid() == elementUID) {
+			nextElementUID = myConn.getDestinationUid();
+		}
+		else {
+			nextElementUID = myConn.getOriginUid();
+		}
+		connectionAlgorithm(counter,voltageSource, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 		
 	}
 
@@ -522,13 +544,16 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 	// First I get all the VoltageSources of the Circuit
 
+	
+
 	auto vectorVoltageSources = it->second.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource");
 	if (vectorVoltageSources != it->second.getMapOfEntityBlcks().end()) {
 		std::set<ot::UID> visitedElements; // Initialize visited set
 
 		for (auto voltageSource : vectorVoltageSources->second) {
 			ot::UID elementUID = voltageSource->getEntityID();
-			connectionAlgorithm(elementUID,elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+			int counter = 0;
+			connectionAlgorithm(counter,elementUID,elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 			
 		}
 
@@ -745,43 +770,22 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		
 		
 
-		//From behind
-		if (circuitElement->type() == "VoltageSource") {
-			auto connections = circuitElement->getList();
-			std::vector<Connection> tempVector(connections.begin(), connections.end());
-			std::reverse(tempVector.begin(), tempVector.end());
-			std::unordered_set<std::string> temp;
-			for (auto conn : tempVector)
-			{
-				if (conn.getNodeNumber() == "voltageMeterConnection")
-				{
-					continue;
-				}
-				else if (temp.find(conn.getNodeNumber()) != temp.end())
-				{
-					continue;
-				}
-				netlistNodeNumbers += conn.getNodeNumber() + " ";
-				temp.insert(conn.getNodeNumber());
+		//insert connectionNodeNumbers into string
+		
+		std::unordered_set<std::string> temp;
+		for (auto conn : circuitElement->getList())	{
+			if (conn.getNodeNumber() == "voltageMeterConnection") {
+				continue;
 			}
-
-			temp.clear();
-		}
-		else {
-			std::unordered_set<std::string> temp;
-			for (auto conn : circuitElement->getList())	{
-				if (conn.getNodeNumber() == "voltageMeterConnection") {
-					continue;
-				}
-				else if (temp.find(conn.getNodeNumber()) != temp.end()) {
-					continue;
-				}
-				netlistNodeNumbers += conn.getNodeNumber() + " ";
-				temp.insert(conn.getNodeNumber());
-
+			else if (temp.find(conn.getNodeNumber()) != temp.end()) {
+				continue;
 			}
-			temp.clear();
+			netlistNodeNumbers += conn.getNodeNumber() + " ";
+			temp.insert(conn.getNodeNumber());
+
 		}
+		temp.clear();
+		
 		
 		
 	
@@ -961,7 +965,6 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 	 updateBufferClasses(allConnectionEntities,allEntitiesByBlockID,editorname);
 	 generateNetlist( solverEntity, allConnectionEntities,allEntitiesByBlockID, editorname);
 
-	 Numbers::nodeNumber = 0;
 	 Numbers::RshunNumbers = 0;
 
 	/*char command[1000];
