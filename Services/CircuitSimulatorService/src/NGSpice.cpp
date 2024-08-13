@@ -43,13 +43,13 @@ void NGSpice::clearBufferStructure(std::string name)
 {
 	auto elements = this->getMapOfCircuits().find(name)->second.getMapOfElements();
 	for (auto element : elements) 
-	{
+	{	
 		delete element.second;
 		element.second = nullptr;
 	}
 
-	elements.clear();
 	this->getMapOfCircuits().find(name)->second.getMapOfEntityBlcks().clear();
+	this->getMapOfCircuits().clear();
 	this->connectionNodeNumbers.clear();
 	Numbers::nodeNumber = 1;
 	
