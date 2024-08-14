@@ -83,6 +83,8 @@ namespace ot {
 
 		void flipAllSelectedItems(Qt::Orientation _flipAxis);
 
+		void itemAboutToBeRemoved(GraphicsItem* _item);
+
 	Q_SIGNALS:
 		void selectionChangeFinished(void);
 

@@ -192,6 +192,13 @@ void ot::GraphicsScene::flipAllSelectedItems(Qt::Orientation _flipAxis) {
 	}
 }
 
+void ot::GraphicsScene::itemAboutToBeRemoved(GraphicsItem* _item) {
+	if (_item == m_connectionOrigin) {
+		m_connectionOrigin = nullptr;
+		this->stopConnection();
+	}
+}
+
 void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) {
 	QList<QGraphicsItem*> lst = items(_event->scenePos());
 	for (auto itm : lst) {
@@ -199,7 +206,7 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 		if (actualItm) {
 			if (actualItm->getGraphicsItemFlags() & ot::GraphicsItemCfg::ItemIsConnectable) {
 				this->startConnection(actualItm);
-				QGraphicsScene::mouseDoubleClickEvent(_event);
+				//QGraphicsScene::mouseDoubleClickEvent(_event);
 				return;
 			}
 		}
@@ -207,7 +214,7 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 
 	this->stopConnection();
 
-	QGraphicsScene::mouseDoubleClickEvent(_event);
+	//QGraphicsScene::mouseDoubleClickEvent(_event);
 }
 
 void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
