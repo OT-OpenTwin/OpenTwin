@@ -70,9 +70,9 @@ void Circuit::setId(std::string id) {
 	this->id = id;
 }
 
-/*bool*/  void Circuit::addConnection(const ot::UID& key, const Connection& obj) {
+/*bool*/  void Circuit::addConnection(std::string connactable,const ot::UID& key, const Connection& obj) {
 	if (mapOfElements.find(key) != mapOfElements.end()) {
-		/*bool result =*/ mapOfElements[key]->addConnection(obj);
+		/*bool result =*/ mapOfElements[key]->addConnection(connactable,obj);
 		/*return result;*/
 
 	}

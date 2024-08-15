@@ -30,7 +30,7 @@ std::string CircuitElement::getEditorName()   {return this->m_editorName;}
 
 ot::UID CircuitElement::getUID() { return this->m_Uid; }
 
-std::list<Connection>& CircuitElement::getList() { return m_listOfConnections; }
+std::map<std::string,Connection>& CircuitElement::getList() { return m_listOfConnections; }
 
 std::string CircuitElement::getNetlistName() { return this->m_netlistName; }
 
@@ -46,9 +46,9 @@ void CircuitElement::setNetlistName(std::string name) { this->m_netlistName = na
 
 //Additional Functions
 
-/*bool */void  CircuitElement::addConnection(const Connection& obj)  {
-	/*auto result =*/ m_listOfConnections.push_back(obj);
-	/*return result.second;*/
+void  CircuitElement::addConnection(std::string connactable,const Connection& obj)  {
+	 m_listOfConnections.insert_or_assign(connactable,obj);
+	
 }
 
 

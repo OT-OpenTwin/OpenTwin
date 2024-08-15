@@ -39,6 +39,7 @@ namespace Numbers
 	static unsigned long long RshunNumbers = 0;
 }
 
+
 void NGSpice::clearBufferStructure(std::string name)
 {
 	auto elements = this->getMapOfCircuits().find(name)->second.getMapOfElements();
@@ -47,12 +48,10 @@ void NGSpice::clearBufferStructure(std::string name)
 		delete element.second;
 		element.second = nullptr;
 	}
-
 	this->getMapOfCircuits().find(name)->second.getMapOfEntityBlcks().clear();
 	this->getMapOfCircuits().clear();
 	this->connectionNodeNumbers.clear();
 	Numbers::nodeNumber = 1;
-	
 	SimulationResults::getInstance()->getResultMap().clear();
 	
 
@@ -125,13 +124,13 @@ void NGSpice::getNodeNumbersOfMeters(std::string editorName, std::map<ot::UID, s
 				}
 				
 					
-				if (netlistConn.getNodeNumber() != "voltageMeterConnection")
+				if (netlistConn.second.getNodeNumber() != "voltageMeterConnection")
 				{
-					if (netlistConn.getOriginConnectable() == connectorName && netlistConn.getOriginUid() == connectedElementUID ||
-						netlistConn.getDestConnectable() == connectorName && netlistConn.getDestinationUid() == connectedElementUID)
+					if (netlistConn.second.getOriginConnectable() == connectorName && netlistConn.second.getOriginUid() == connectedElementUID ||
+						netlistConn.second.getDestConnectable() == connectorName && netlistConn.second.getDestinationUid() == connectedElementUID)
 					{
 						
-						size_t position = nodes.find(netlistConn.getNodeNumber());
+						size_t position = nodes.find(netlistConn.second.getNodeNumber());
 						if (position != std::string::npos)
 						{
 							continue;
@@ -141,11 +140,11 @@ void NGSpice::getNodeNumbersOfMeters(std::string editorName, std::map<ot::UID, s
 							size_t pos = nodes.find(",");
 							if (pos == std::string::npos)
 							{
-								nodes += netlistConn.getNodeNumber() + ",";
+								nodes += netlistConn.second.getNodeNumber() + ",";
 							}
 							else
 							{
-								nodes += netlistConn.getNodeNumber();
+								nodes += netlistConn.second.getNodeNumber();
 							}
 									
 						}
@@ -191,50 +190,46 @@ void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elem
 {
 	counter++;
 
-
+	// First get all informations that needed
 	auto circuitMap = Application::instance()->getNGSpice().getMapOfCircuits();
 	auto it = circuitMap.find(editorname);
-
 	auto element = allEntitiesByBlockID.at(elementUID);
 	auto connections = element->getAllConnections();
 	
-	if (visitedElements.find(elementUID) != visitedElements.end()) {
-		return; // Already visited this element, avoid infinite loop
+	//Check if Element already exists
+	if (checkIfElementOrConnectionVisited(visitedElements,elementUID))
+	{
+		return;
 	}
-	visitedElements.insert(elementUID); // Mark this element as visited
 	
-
 	for (auto connection : connections)
 	{
-		
-
-		std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connection);
-		ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
-		Connection myConn(connectionCfg);
+		Connection myConn = createConnection(allConnectionEntities, connection);
 
 		// As i always start with the voltageSource i want to start at the positivePole first so i skip the connection on the negativePole for the voltageSource 
 		// And i dont want to execute the above if Condition so i contructed a counter for this that only for the voltageSource it is relevant
-
+		
 		if (counter == 1 && elementUID == voltageSource) {
-			if (connectionCfg.getDestConnectable() != "positivePole" && connectionCfg.getOriginConnectable() != "positivePole") {
+			if (myConn.getDestConnectable() != "positivePole" && myConn.getOriginConnectable() != "positivePole") {
 				continue;
 			}
 		}
 		
-		if (visitedElements.find(connection) != visitedElements.end()) {
+		// Here i check if connection already exists
+		if (checkIfElementOrConnectionVisited(visitedElements, connection))
+		{
 			continue;
 		}
-		visitedElements.insert(connection);
 
 
 		//First i check if the connection is connected to GND If yes then i state it with node number 0 
-		if (connectionCfg.getOriginUid() == voltageSource && connectionCfg.getOriginConnectable() == "negativePole" ||
-			connectionCfg.getDestinationUid() == voltageSource && connectionCfg.getDestConnectable() == "negativePole") {
+		if (myConn.getOriginUid() == voltageSource && myConn.getOriginConnectable() == "negativePole" ||
+			myConn.getDestinationUid() == voltageSource && myConn.getDestConnectable() == "negativePole") {
 
 			
 
-			if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") &&
-				(allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter")) {
+			if ((allEntitiesByBlockID.at(myConn.getOriginUid())->getBlockTitle() != "Voltage Meter") &&
+				(allEntitiesByBlockID.at(myConn.getDestinationUid())->getBlockTitle() != "Voltage Meter")) {
 
 				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
 				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
@@ -254,9 +249,8 @@ void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elem
 			}	
 		}
 		else {
-
-			if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") &&
-				(allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter")) {
+			if ((allEntitiesByBlockID.at(myConn.getOriginUid())->getBlockTitle() != "Voltage Meter") &&
+				(allEntitiesByBlockID.at(myConn.getDestinationUid())->getBlockTitle() != "Voltage Meter")) {
 
 				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
 				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
@@ -275,12 +269,12 @@ void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elem
 				}
 			}
 			else {
-				myConn.setNodeNumber("voltageMeterConnection");
+				myConn.setNodeNumber(getVoltMeterConnectionName());
 			}
 		}
 		
-		it->second.addConnection(myConn.getOriginUid(), myConn);
-		it->second.addConnection(myConn.getDestinationUid(), myConn);
+		it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
+		it->second.addConnection(myConn.getDestConnectable(), myConn.getDestinationUid(), myConn);
 
 		// Recursive call to explore the next element
 		ot::UID nextElementUID;
@@ -291,11 +285,37 @@ void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elem
 			nextElementUID = myConn.getOriginUid();
 		}
 		connectionAlgorithm(counter,voltageSource, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
-		
 	}
+}
 
+bool NGSpice::checkIfElementOrConnectionVisited(std::set<ot::UID>& visitedElements, ot::UID elementOrConnectionUID)
+{
+	if (visitedElements.find(elementOrConnectionUID) != visitedElements.end()) {
+		return true; // Already visited this element, avoid infinite loop
+	}
+	else
+	{
+		visitedElements.insert(elementOrConnectionUID); // Mark this element as visited
+		return false;
+	}
 	
 }
+
+Connection NGSpice::createConnection(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,ot::UID connection)
+{
+	std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connection);
+	ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
+	Connection myConn(connectionCfg);
+	return myConn;
+}
+
+bool NGSpice::checkIfConnectionIsConnectedToPole(std::string pole)
+{
+	
+	return false;
+}
+
+
 
 
 void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
@@ -724,26 +744,39 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		}
 		else if (circuitElement->type() == "CurrentMeter")
 		{
-
 			if (nodesOfCurrentMeter.size() == 0)
 			{
-				
 				std::vector<std::string> nodeNumbers;
 				std::unordered_set<std::string> temp;
+				auto connections = circuitElement->getList();
 
-				for (auto conn : circuitElement->getList())
+				// Verarbeite zuerst die positivePole Verbindung
+				if (connections.find("positivePole") != connections.end())
 				{
-					if (temp.find(conn.getNodeNumber()) != temp.end())
-					{
-						continue;
-					}
+					auto& positiveConn = connections.at("positivePole");
 
-					temp.insert(conn.getNodeNumber());
-					nodeNumbers.push_back(conn.getNodeNumber());
+					if (temp.find(positiveConn.getNodeNumber()) == temp.end())
+					{
+						temp.insert(positiveConn.getNodeNumber());
+						nodeNumbers.push_back(positiveConn.getNodeNumber());
+					}
 				}
+
+				// Verarbeite danach die negativePole Verbindung
+				if (connections.find("negativePole") != connections.end())
+				{
+					auto& negativeConn = connections.at("negativePole");
+
+					if (temp.find(negativeConn.getNodeNumber()) == temp.end())
+					{
+						temp.insert(negativeConn.getNodeNumber());
+						nodeNumbers.push_back(negativeConn.getNodeNumber());
+					}
+				}
+
 				nodesOfCurrentMeter.push_back(nodeNumbers);
-				
-				// Here i do a continue because i dont want to generate an instance line for this element
+
+				// Hier überspringen wir die Instanzlinien-Generierung für dieses Element
 				continue;
 			}
 			else
@@ -773,17 +806,28 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		//insert connectionNodeNumbers into string
 		
 		std::unordered_set<std::string> temp;
-		for (auto conn : circuitElement->getList())	{
-			if (conn.getNodeNumber() == "voltageMeterConnection") {
-				continue;
-			}
-			else if (temp.find(conn.getNodeNumber()) != temp.end()) {
-				continue;
-			}
-			netlistNodeNumbers += conn.getNodeNumber() + " ";
-			temp.insert(conn.getNodeNumber());
+		auto connections = circuitElement->getList();
+			
+			if (connections.find("positivePole") != connections.end()) {
+				auto& positiveConn = connections.at("positivePole");
 
-		}
+				if (positiveConn.getNodeNumber() != "voltageMeterConnection" && temp.find(positiveConn.getNodeNumber()) == temp.end()) {
+					netlistNodeNumbers += positiveConn.getNodeNumber() + " ";
+					temp.insert(positiveConn.getNodeNumber());
+				}
+			}
+
+			if (connections.find("negativePole") != connections.end()) {
+				auto& negativeConn = connections.at("negativePole");
+
+				if (negativeConn.getNodeNumber() != "voltageMeterConnection" && temp.find(negativeConn.getNodeNumber()) == temp.end()) {
+					netlistNodeNumbers += negativeConn.getNodeNumber() + " ";
+					temp.insert(negativeConn.getNodeNumber());
+				}
+			}
+
+
+		
 		temp.clear();
 		
 		

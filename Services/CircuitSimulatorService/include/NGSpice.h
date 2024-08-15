@@ -35,8 +35,12 @@ public:
 	void clearBufferStructure(std::string name); 
 	void getNodeNumbersOfMeters(std::string ,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&,std::vector<std::string>&);
 	bool isValidNodeString(const std::string& input);
+
+	//Connection Algorithm functions
 	void connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
-	
+	bool checkIfElementOrConnectionVisited(std::set<ot::UID>& visitedElements, ot::UID elementUID);
+	Connection createConnection(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,ot::UID connection);
+	bool checkIfConnectionIsConnectedToPole(std::string pole);
 
 	//Callback functions from NGSpice
 	static int MySendCharFunction(char*, int, void*);
@@ -45,11 +49,13 @@ public:
 	static int MySendDataFunction(pvecvaluesall, int, int, void*);
 	static int MySendInitDataFunction(pvecinfoall, int, void*);
 	
+	
 
 	//Getter
 	std::map<std::string, Circuit>& getMapOfCircuits() { return mapOfCircuits; }
+	std::string const getVoltMeterConnectionName() const { return m_voltMeterConnection; }
 
 private:
-	
+	const std::string m_voltMeterConnection = "voltageMeterConnection";
 	
 };
