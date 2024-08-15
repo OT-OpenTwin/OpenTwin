@@ -672,7 +672,6 @@ void Application::HandleSelectionChanged()
 					m_resultAccess = new ResultCollectionMetadataAccess(m_collectionName, m_modelComponent, &getClassFactory());
 				}
 				std::string selectedEntityName =	selectedEntityInfo.begin()->getName();
-				selectedEntityName = selectedEntityName.substr(selectedEntityName.find_first_of("/")+1, selectedEntityName.size());
 				DatasetOverviewVisualiser visualiser;
 				std::unique_ptr<ot::GenericDataStruct>data = nullptr;
 				const MetadataCampaign&	campaign = m_resultAccess->getMetadataCampaign();

@@ -28,14 +28,19 @@ MetadataCampaign MetadataEntityInterface::createCampaign(std::shared_ptr<EntityM
 MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetadataSeries> _seriesMetadataEntity)
 {
 	std::string entityName = _seriesMetadataEntity->getName();
-	const std::string name = entityName.substr(entityName.find_last_of("/") + 1);
-	MetadataSeries seriesMetadata(name);
+	//const std::string name = entityName.substr(entityName.find_last_of("/") + 1);
+	//MetadataSeries seriesMetadata(name);
+	MetadataSeries seriesMetadata(entityName);
+	seriesMetadata.setIndex(_seriesMetadataEntity->getEntityID());
 	std::vector<std::string> allTopLevelDocumentNames = _seriesMetadataEntity->getDocumentsNames();
 	
 	//First we extract the series meta data
 	for (const std::string& documentName : allTopLevelDocumentNames)
 	{
-		if (documentName != _seriesMetadataEntity->getParameterDocumentName() && documentName != _seriesMetadataEntity->getQuantityDocumentName())
+		bool isParameterDocument =	documentName.find(_seriesMetadataEntity->getParameterDocumentName()) != std::string::npos;
+		bool isQuantityDocument =	documentName.find(_seriesMetadataEntity->getQuantityDocumentName()) != std::string::npos;
+		bool isRootDocument = documentName == "/";
+		if (!(isParameterDocument || isQuantityDocument || isRootDocument))
 		{
 			const GenericDocument* document = _seriesMetadataEntity->getDocument(documentName);
 			const auto listOfMetadata = extractMetadataFields(*document);
@@ -125,6 +130,7 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 			}
 			else
 			{
+
 				quantity.metaData[entry->getEntryName()] = entry;
 			}
 		}
@@ -133,7 +139,8 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 		for (auto& object : objectList)
 		{
 			const std::string entryName = object->getEntryName();
-			if (entryName == m_valueDescriptionsField)
+			bool isValueDescriptionObject = entryName.find(m_valueDescriptionsField) != std::string::npos;
+			if (isValueDescriptionObject)
 			{
 				MetadataEntry* entry =	object.get();
 				auto objectEntry = dynamic_cast<MetadataEntryObject*>(entry);
@@ -396,7 +403,7 @@ std::list<ot::Variable> MetadataEntityInterface::convertToVariableList(const Met
 		assert(valueEntry != nullptr);
 		output = { valueEntry->getValue() };
 	}
-	return std::list<ot::Variable>();
+	return output;
 }
 
 std::list<ot::Variable> MetadataEntityInterface::convertFromStringVector(const std::vector<std::string> _values) const

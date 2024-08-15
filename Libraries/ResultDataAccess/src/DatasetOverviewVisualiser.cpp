@@ -19,8 +19,8 @@ void DatasetOverviewVisualiser::addSeriesToOverview(const MetadataSeries& _metad
 	std::string label = _metadataSeries.getLabel();
 	addKeyValuePair("Label", ot::Variable(label));
 
-	ot::UID seriesID = _metadataSeries.getSeriesIndex();
-	addKeyValuePair("UID", ot::Variable(static_cast<int64_t>(seriesID)));
+	/*ot::UID seriesID = _metadataSeries.getSeriesIndex();
+	addKeyValuePair("UID", ot::Variable(static_cast<int64_t>(seriesID)));*/
 
 	addHeading("Metadata");
 	auto allMetadataByName = _metadataSeries.getMetadata();
@@ -96,12 +96,12 @@ DatasetOverviewVisualiser::~DatasetOverviewVisualiser()
 TableDimension DatasetOverviewVisualiser::calculateNeededTableSize(const MetadataSeries& _metadataSeries)
 {	
 	const uint32_t numberOfSeriesHeading = 4;
-	const uint32_t numberOfSeriesKeyValues = 2;
+	const uint32_t numberOfSeriesKeyValues = 1;
 	const uint32_t numberOfSeriesMetadata = static_cast<uint32_t>(_metadataSeries.getMetadata().size());
 	
 	const uint32_t numberOfParameter = static_cast<uint32_t>(_metadataSeries.getParameter().size());
-	const uint32_t numberOfParmaterKeyValues = 6;
-	const uint32_t numberOfParmaterHeading = 1;
+	const uint32_t numberOfParmaterKeyValues = 4;
+	const uint32_t numberOfParmaterHeading = 3;
 	uint32_t numberOfParmaterMetadata(0);
 	for (const MetadataParameter& parameter : _metadataSeries.getParameter())
 	{
@@ -109,9 +109,9 @@ TableDimension DatasetOverviewVisualiser::calculateNeededTableSize(const Metadat
 	}
 	
 	const uint32_t numberOfQuantity = static_cast<uint32_t>(_metadataSeries.getQuantities().size());
-	const uint32_t numberOfQuantityKeyValues = 3;
-	const uint32_t numberOfQuantityHeading = 2;
-	const uint32_t numberOfQuantityValueDescriptionKeyValues = 4;
+	const uint32_t numberOfQuantityKeyValues = 2;
+	const uint32_t numberOfQuantityHeading = 3;
+	const uint32_t numberOfQuantityValueDescriptionKeyValues = 3;
 	const uint32_t numberOfQuantityValueDescriptionHeading = 1;
 	uint32_t numberOfQuantityDescriptions(0);
 	uint32_t numberOfQuantityMetadata(0);
@@ -137,15 +137,14 @@ TableDimension DatasetOverviewVisualiser::calculateNeededTableSize(const Metadat
 
 void DatasetOverviewVisualiser::addParameterToOverview(const MetadataParameter& _parameter)
 {
-
+	const std::string& label =	_parameter.parameterLabel;
+	addHeading(label);
+	
 	const ot::Variable name = ot::Variable(_parameter.parameterLabel);
 	addKeyValuePair("Name", name);
 	
-	const ot::Variable label =	ot::Variable(_parameter.parameterLabel);
-	addKeyValuePair("Label", label);
-
-	const ot::Variable uid = ot::Variable(static_cast<int64_t>( _parameter.parameterUID));
-	addKeyValuePair("UID", uid);
+	/*const ot::Variable uid = ot::Variable(static_cast<int64_t>( _parameter.parameterUID));
+	addKeyValuePair("UID", uid);*/
 
 	const ot::Variable typeName = ot::Variable(_parameter.typeName);
 	addKeyValuePair("Data type", typeName);
@@ -163,28 +162,29 @@ void DatasetOverviewVisualiser::addParameterToOverview(const MetadataParameter& 
 		addMetadataToOverview(metadataByName.second);
 	}
 	m_tablePointer.moveLeft();
+	m_tablePointer.moveLeft();
 }
 
 void DatasetOverviewVisualiser::addQuantityToOverview(const MetadataQuantity& _quantity)
 {
+	const std::string& label = _quantity.quantityLabel;
+	addHeading(label);
+
 	const ot::Variable name = ot::Variable(ot::Variable(_quantity.quantityName));
 	addKeyValuePair("Name", name);
-	
-	const ot::Variable label = ot::Variable(ot::Variable(_quantity.quantityLabel));
-	addKeyValuePair("Label", label);
-	
+		
 	std::string dataDimension ("<");
 	for (uint32_t dimension : _quantity.dataDimensions)
 	{
 		dataDimension += std::to_string(dimension) + ", ";
 	}
-	dataDimension =	dataDimension.substr(0, dataDimension.size() - 1) + ">";
+	dataDimension =	dataDimension.substr(0, dataDimension.size() - 2) + ">";
 	addKeyValuePair("Data dimensions", ot::Variable(dataDimension));
 
 	addHeading("Value descriptions");
 	for (const MetadataQuantityValueDescription& valueDescription : _quantity.valueDescriptions)
 	{
-		addHeading(valueDescription.quantityValueLabel);
+		addHeading("Label: " +  valueDescription.quantityValueLabel);
 		
 		const ot::Variable name (valueDescription.quantityValueName);
 		addKeyValuePair("Name", name);
@@ -195,19 +195,21 @@ void DatasetOverviewVisualiser::addQuantityToOverview(const MetadataQuantity& _q
 		const ot::Variable datatype (valueDescription.dataTypeName);
 		addKeyValuePair("Datatype", datatype);
 
-		const ot::Variable index(static_cast<int64_t>(valueDescription.quantityIndex));
-		addKeyValuePair("UID", index);
+		/*const ot::Variable index(static_cast<int64_t>(valueDescription.quantityIndex));
+		addKeyValuePair("UID", index);*/
 		
 		m_tablePointer.moveLeft();
 	}
 	m_tablePointer.moveLeft();
-
+	
 	addHeading("Metadata");
 	auto allMetadataByName =_quantity.metaData;
 	for (auto metadataByName : allMetadataByName)
 	{
 		addMetadataToOverview(metadataByName.second);
 	}
+	m_tablePointer.moveLeft();
+	m_tablePointer.moveLeft();
 }
 
 void DatasetOverviewVisualiser::addMetadataToOverview(std::shared_ptr<MetadataEntry> _metadataEntries)
@@ -247,13 +249,19 @@ std::string DatasetOverviewVisualiser::concatinateMaxNbOfVariablesInString(const
 	{
 		if (count == m_maxNbOfValues)
 		{
+			concatinated += "; ...  ";
 			break;
 		}
 		else
 		{
-			concatinated += converter(value);
+			concatinated += converter(value) + "; ";
 		}
 		count++;
+	}
+	if (_values.size() != 0)
+	{
+
+		concatinated = concatinated.substr(0, concatinated.size()-2);
 	}
 	return concatinated;
 }
