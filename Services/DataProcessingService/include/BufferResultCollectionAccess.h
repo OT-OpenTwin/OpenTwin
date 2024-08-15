@@ -1,5 +1,5 @@
 #pragma once
-#include "ResultMetadataAccess.h"
+#include "ResultCollectionMetadataAccess.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include <map>
@@ -13,10 +13,10 @@ public:
 		return instance;
 	}
 	void setModelComponent(ot::components::ModelComponent* modelComponent);
-	const std::shared_ptr<ResultMetadataAccess> getResultCollectionAccessMetadata(EntityBlockDatabaseAccess* blockEntity);
+	const std::shared_ptr<ResultCollectionMetadataAccess> getResultCollectionAccessMetadata(EntityBlockDatabaseAccess* blockEntity);
 
 private:
 	BufferResultCollectionAccess() {};
-	std::map<std::string,std::shared_ptr<ResultMetadataAccess>> _resultCollectionAccessByProjectName;
+	std::map<std::string,std::shared_ptr<ResultCollectionMetadataAccess>> _resultCollectionAccessByProjectName;
 	ot::components::ModelComponent* _modelComponent = nullptr;
 };

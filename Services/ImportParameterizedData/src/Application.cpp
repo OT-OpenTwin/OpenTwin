@@ -29,8 +29,8 @@
 #include "ClassFactory.h"
 #include <rapidjson/document.h>
 #include <rapidjson/rapidjson.h>
-
-
+#include "DatasetOverviewVisualiser.h"
+#include "EntityMetadataSeries.h"
 
 Application * g_instance{ nullptr };
 
@@ -667,16 +667,37 @@ void Application::HandleSelectionChanged()
 				{
 					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
 				}
-				ot::GenericDataStruct* data =	_parametrizedDataHandler->getDatasetTableView(*selectedEntityInfo.begin());
+				if (m_resultAccess == nullptr)
+				{
+					m_resultAccess = new ResultCollectionMetadataAccess(m_collectionName, m_modelComponent, &getClassFactory());
+				}
+				std::string selectedEntityName =	selectedEntityInfo.begin()->getName();
+				selectedEntityName = selectedEntityName.substr(selectedEntityName.find_first_of("/")+1, selectedEntityName.size());
+				DatasetOverviewVisualiser visualiser;
+				std::unique_ptr<ot::GenericDataStruct>data = nullptr;
+				const MetadataCampaign&	campaign = m_resultAccess->getMetadataCampaign();
+				if (campaign.getCampaignName() == selectedEntityName)
+				{
+					data.reset(visualiser.buildTableOverview(campaign));
+				}
+				else
+				{
+					const MetadataSeries* seriesMetadata =	m_resultAccess->findMetadataSeries(selectedEntityName);
+					assert(seriesMetadata != nullptr);
+					data.reset(visualiser.buildTableOverview(*seriesMetadata));
+				}
+
+				assert(data != nullptr);
+
 				ot::JsonDocument doc;
 				ot::JsonObject dataObject;
 				data->addToJsonObject(dataObject, doc.GetAllocator());
 				doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_SetTable, doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_Value, dataObject, doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-
-				std::string tmp;
-				uiComponent()->sendMessage(true, doc, tmp);
+				
+				std::string response;
+				bool success = m_uiComponent->sendMessage(true, doc, response);
 			}
 			else
 			{

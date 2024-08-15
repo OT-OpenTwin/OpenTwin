@@ -11,31 +11,31 @@ namespace ot
 
 	public:
 		GenericDataStructVector();
-		GenericDataStructVector(const GenericDataStructVector& other);
-		GenericDataStructVector(GenericDataStructVector&& other);
+		GenericDataStructVector(const GenericDataStructVector& _other);
+		GenericDataStructVector(GenericDataStructVector&& _other) noexcept;
 		
-		GenericDataStructVector(const std::vector<ot::Variable>& values);
-		GenericDataStructVector(std::vector<ot::Variable>&& values);
-		GenericDataStructVector(uint32_t numberOfEntries);
+		GenericDataStructVector(const std::vector<ot::Variable>& _values);
+		GenericDataStructVector(std::vector<ot::Variable>&& _values) noexcept;
+		GenericDataStructVector(uint32_t _numberOfEntries);
 
-		GenericDataStructVector& operator=(const GenericDataStructVector& other);
-		GenericDataStructVector& operator=(GenericDataStructVector&& other);
+		GenericDataStructVector& operator=(const GenericDataStructVector& _other);
+		GenericDataStructVector& operator=(GenericDataStructVector&& _other) noexcept;
 
-		ot::Variable getValue(uint32_t index) { assert(index < _numberOfEntries); return _values[index]; };
-		const std::vector<ot::Variable>& getValues() const { return _values; }
+		ot::Variable getValue(uint32_t _index) { assert(_index < m_numberOfEntries); return m_values[_index]; };
+		const std::vector<ot::Variable>& getValues() const { return m_values; }
 		
-		void setValue(uint32_t index, const ot::Variable& value);
-		void setValue(uint32_t index, ot::Variable&& value);
-		void setValues(const std::vector<ot::Variable>& values);
-		void setValues(std::vector<ot::Variable>&& values);
+		void setValue(uint32_t _index, const ot::Variable& _value);
+		void setValue(uint32_t _index, ot::Variable&& _value);
+		void setValues(const std::vector<ot::Variable>& _values);
+		void setValues(std::vector<ot::Variable>&& _values);
 
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		static std::string getClassName() { return "GenericDataStructVector"; }
 	private:
-		std::vector<ot::Variable> _values;
+		std::vector<ot::Variable> m_values;
 
-		void AllocateValueMemory();
+		void allocateValueMemory();
 	};
 }

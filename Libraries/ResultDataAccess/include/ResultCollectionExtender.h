@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ResultMetadataAccess.h"
+#include "ResultCollectionMetadataAccess.h"
 #include "MetadataCampaign.h"
 #include "MetadataQuantity.h"
 #include "MetadataParameter.h"
@@ -14,7 +14,7 @@
 
 class ClassFactory;
 
-class __declspec(dllexport) ResultCollectionExtender : public ResultMetadataAccess
+class __declspec(dllexport) ResultCollectionExtender : public ResultCollectionMetadataAccess
 {
 public:
 	ResultCollectionExtender(const std::string& _collectionName, ot::components::ModelComponent& _modelComponent, ClassFactory* _classFactory, const std::string& _ownerServiceName);

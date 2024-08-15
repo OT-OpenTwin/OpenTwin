@@ -62,7 +62,7 @@
     <ClInclude Include="include\MetadataEntrySingle.h">
       <Filter>include\MetadataEntries</Filter>
     </ClInclude>
-    <ClInclude Include="include\ResultMetadataAccess.h">
+    <ClInclude Include="include\ResultCollectionMetadataAccess.h">
       <Filter>include\CollectionAccess</Filter>
     </ClInclude>
     <ClInclude Include="include\CrossCollectionAccess.h">
@@ -107,6 +107,9 @@
     <ClInclude Include="include\QuantityContainerSerialiser.h">
       <Filter>include\CollectionAccess</Filter>
     </ClInclude>
+    <ClInclude Include="include\DatasetOverviewVisualiser.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\QuantityContainer.cpp">
@@ -121,7 +124,7 @@
     <ClCompile Include="src\CrossCollectionAccess.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\ResultMetadataAccess.cpp">
+    <ClCompile Include="src\ResultCollectionMetadataAccess.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ResultCollectionExtender.cpp">
@@ -155,6 +158,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\QuantityContainerSerialiser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DatasetOverviewVisualiser.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

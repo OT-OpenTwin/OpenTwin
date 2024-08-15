@@ -43,7 +43,6 @@ public:
 	void CreateNewScriptDescribedMSMD();
 
 	std::pair<ot::UID, ot::UID> GetPreview(ot::EntityInformation selectedPreviewTable);
-	ot::GenericDataStruct* getDatasetTableView(ot::EntityInformation& entityInfo);
 
 	void SetColourOfRanges(std::string tableName);
 

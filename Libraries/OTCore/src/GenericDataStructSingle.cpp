@@ -7,29 +7,29 @@ ot::GenericDataStructSingle::GenericDataStructSingle()
 {
 }
 
-ot::GenericDataStructSingle::GenericDataStructSingle(const GenericDataStructSingle& other)
-	:GenericDataStruct(getClassName(), other._numberOfEntries), _value(other._value)
+ot::GenericDataStructSingle::GenericDataStructSingle(const GenericDataStructSingle& _other)
+	:GenericDataStruct(getClassName(), _other.m_numberOfEntries), m_value(_other.m_value)
 {
 }
 
-ot::GenericDataStructSingle::GenericDataStructSingle(GenericDataStructSingle&& other)
-	:GenericDataStruct(getClassName(), other._numberOfEntries), _value(std::move(other._value))
+ot::GenericDataStructSingle::GenericDataStructSingle(GenericDataStructSingle&& _other) noexcept
+	:GenericDataStruct(getClassName(), _other.m_numberOfEntries), m_value(std::move(_other.m_value))
 {
-	other._numberOfEntries = 0;
+	_other.m_numberOfEntries = 0;
 }
 
-ot::GenericDataStructSingle& ot::GenericDataStructSingle::operator=(const GenericDataStructSingle& other)
+ot::GenericDataStructSingle& ot::GenericDataStructSingle::operator=(const GenericDataStructSingle& _other)
 {
-	_value = other._value;
-	_numberOfEntries = other._numberOfEntries;
+	m_value = _other.m_value;
+	m_numberOfEntries = _other.m_numberOfEntries;
 	return *this;
 }
 
-ot::GenericDataStructSingle& ot::GenericDataStructSingle::operator=(GenericDataStructSingle&& other)
+ot::GenericDataStructSingle& ot::GenericDataStructSingle::operator=(GenericDataStructSingle&& _other) noexcept
 {
-	_value = std::move(other._value);
-	_numberOfEntries = other._numberOfEntries;
-	other._numberOfEntries = 0;
+	m_value = std::move(_other.m_value);
+	m_numberOfEntries = _other.m_numberOfEntries;
+	_other.m_numberOfEntries = 0;
 	return *this;
 }
 
@@ -37,32 +37,32 @@ ot::GenericDataStructSingle::~GenericDataStructSingle()
 {
 }
 
-void ot::GenericDataStructSingle::setValue(const ot::Variable& value)
+void ot::GenericDataStructSingle::setValue(const ot::Variable& _value)
 {
-	_value = value;
+	m_value = _value;
 }
 
-void ot::GenericDataStructSingle::setValue(ot::Variable&& value)
+void ot::GenericDataStructSingle::setValue(ot::Variable&& _value)
 {
-	_value = std::move(value);
+	m_value = std::move(_value);
 }
 
 const ot::Variable& ot::GenericDataStructSingle::getValue() const
 {
-	return _value;
+	return m_value;
 }
 
 void ot::GenericDataStructSingle::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 {
 	GenericDataStruct::addToJsonObject(_object, _allocator);
 	VariableToJSONConverter converter;
-	_object.AddMember("Value", converter(_value, _allocator), _allocator);
+	_object.AddMember("Value", converter(m_value, _allocator), _allocator);
 }
 
 void ot::GenericDataStructSingle::setFromJsonObject(const ot::ConstJsonObject& _object)
 {
 	GenericDataStruct::setFromJsonObject(_object);
 	JSONToVariableConverter converter;
-	_value = converter(_object["Value"]);
+	m_value = converter(_object["Value"]);
 }
 

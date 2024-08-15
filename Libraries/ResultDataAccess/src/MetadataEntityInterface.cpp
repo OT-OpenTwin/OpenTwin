@@ -115,35 +115,6 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 			{
 				quantity.quantityLabel = convertToString(entry.get());
 			}
-			else if (entryName == m_valueDescriptionsField)
-			{
-				auto allValueDescriptionDocuments =_seriesMetadataEntity->getDocument(entryName)->getSubDocuments();
-				for (auto valueDescriptionDocument : allValueDescriptionDocuments)
-				{
-					MetadataQuantityValueDescription valueDescription;
-					const std::string indexAsString = valueDescriptionDocument->getDocumentName();
-					valueDescription.quantityIndex = static_cast<ot::UID>(std::stoll(indexAsString));
-					auto fieldsByFieldNames = valueDescriptionDocument->getFields();
-					
-					auto valueDescriptionName =	fieldsByFieldNames->find(m_nameField);
-					assert(valueDescriptionName != fieldsByFieldNames->end());
-					valueDescription.quantityValueName = valueDescriptionName->second.begin()->getConstCharPtr();
-					
-					auto valueDescriptionLabel = fieldsByFieldNames->find(m_labelField);
-					assert(valueDescriptionLabel != fieldsByFieldNames->end());
-					valueDescription.quantityValueLabel = valueDescriptionLabel->second.begin()->getConstCharPtr();
-
-					auto valueDescriptionUnit = fieldsByFieldNames->find(m_unitField);
-					assert(valueDescriptionUnit != fieldsByFieldNames->end());
-					valueDescription.unit= valueDescriptionUnit->second.begin()->getConstCharPtr();
-
-					auto valueDescriptionType = fieldsByFieldNames->find(m_dataTypeNameField);
-					assert(valueDescriptionType != fieldsByFieldNames->end());
-					valueDescription.dataTypeName = valueDescriptionType->second.begin()->getConstCharPtr();
-
-					quantity.valueDescriptions.push_back(valueDescription);
-				}
-			}
 			else if (entry->getEntryName() == m_dataDimensionsField)
 			{
 				quantity.dataDimensions = convertToUInt32Vector(entry.get());
@@ -161,7 +132,56 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 		auto objectList = extractMetadataObjects(*quantityDocument);
 		for (auto& object : objectList)
 		{
-			quantity.metaData[object->getEntryName()] = object;
+			const std::string entryName = object->getEntryName();
+			if (entryName == m_valueDescriptionsField)
+			{
+				MetadataEntry* entry =	object.get();
+				auto objectEntry = dynamic_cast<MetadataEntryObject*>(entry);
+				assert(objectEntry != nullptr);
+
+				auto allValueDescriptionEntries= objectEntry->getEntries();
+				for (const auto valueDescriptionEntry : allValueDescriptionEntries)
+				{
+					auto valueDescriptionObjectEntry =	dynamic_cast<MetadataEntryObject*>(valueDescriptionEntry.get());
+					assert(valueDescriptionObjectEntry != nullptr);
+
+					MetadataQuantityValueDescription valueDescription;
+					const std::string indexAsString = valueDescriptionObjectEntry->getEntryName();
+					valueDescription.quantityIndex = static_cast<ot::UID>(std::stoll(indexAsString));
+
+					auto allFields = valueDescriptionObjectEntry->getEntries();
+					for (auto field : allFields)
+					{
+						auto fieldEntry	= dynamic_cast<MetadataEntrySingle*>(field.get());
+						assert(fieldEntry != nullptr);
+						if (fieldEntry->getEntryName() == m_nameField)
+						{
+							assert(fieldEntry->getValue().isConstCharPtr());
+							valueDescription.quantityValueName = fieldEntry->getValue().getConstCharPtr();
+						}
+						else if (fieldEntry->getEntryName() == m_labelField)
+						{
+							assert(fieldEntry->getValue().isConstCharPtr());
+							valueDescription.quantityValueLabel = fieldEntry->getValue().getConstCharPtr();
+						}
+						else if (fieldEntry->getEntryName() == m_unitField)
+						{
+							assert(fieldEntry->getValue().isConstCharPtr());
+							valueDescription.unit = fieldEntry->getValue().getConstCharPtr();
+						}
+						else if (fieldEntry->getEntryName() == m_dataTypeNameField)
+						{
+							assert(fieldEntry->getValue().isConstCharPtr());
+							valueDescription.dataTypeName = fieldEntry->getValue().getConstCharPtr();
+						}
+					}
+					quantity.valueDescriptions.push_back(valueDescription);
+				}
+			}
+			else
+			{
+				quantity.metaData[object->getEntryName()] = object;
+			}
 		}
 		seriesMetadata.addQuantity(quantity);
 	}

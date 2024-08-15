@@ -40,15 +40,17 @@
     <ClInclude Include="include\MetadataQuantity.h" />
     <ClInclude Include="include\QuantityContainer.h" />
     <ClInclude Include="include\MetadataSeries.h" />
-    <ClInclude Include="include\ResultMetadataAccess.h" />
+    <ClInclude Include="include\ResultCollectionMetadataAccess.h" />
     <ClInclude Include="include\DatasetDescription.h" />
     <ClInclude Include="include\SParameterMatrixHelper.h" />
     <ClInclude Include="include\ValueFormatSetter.h" />
+    <ClInclude Include="include\DatasetOverviewVisualiser.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CrossCollectionAccess.cpp" />
     <ClCompile Include="src\AdvancedQueryBuilder.cpp" />
     <ClCompile Include="src\DatasetDescription.cpp" />
+    <ClCompile Include="src\DatasetOverviewVisualiser.cpp" />
     <ClCompile Include="src\ProjectToCollectionConverter.cpp" />
     <ClCompile Include="src\QuantityContainerSerialiser.cpp" />
     <ClCompile Include="src\QuantityDescription.cpp" />
@@ -60,7 +62,7 @@
     <ClCompile Include="src\MetadataEntryObject.cpp" />
     <ClCompile Include="src\MetadataEntrySingle.cpp" />
     <ClCompile Include="src\QuantityContainer.cpp" />
-    <ClCompile Include="src\ResultMetadataAccess.cpp" />
+    <ClCompile Include="src\ResultCollectionMetadataAccess.cpp" />
     <ClCompile Include="src\SParameterMatrixHelper.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

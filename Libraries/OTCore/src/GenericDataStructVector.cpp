@@ -2,36 +2,36 @@
 #include "OTCore/VariableToJSONConverter.h"
 #include "OTCore/JSONToVariableConverter.h"
 
-ot::GenericDataStructVector::GenericDataStructVector(const std::vector<ot::Variable>& values)
-	:GenericDataStruct(getClassName(),static_cast<int32_t>(values.size()))
+ot::GenericDataStructVector::GenericDataStructVector(const std::vector<ot::Variable>& _values)
+	:GenericDataStruct(getClassName(),static_cast<int32_t>(_values.size()))
 {
-	_values = values;
+	m_values = _values;
 }
 
-ot::GenericDataStructVector::GenericDataStructVector(std::vector<ot::Variable>&& values)
-	:GenericDataStruct(getClassName(), static_cast<int32_t>(values.size()))
+ot::GenericDataStructVector::GenericDataStructVector(std::vector<ot::Variable>&& _values) noexcept
+	:GenericDataStruct(getClassName(), static_cast<int32_t>(_values.size()))
 {
-	_values = std::move(values);
+	m_values = std::move(_values);
 }
 
-ot::GenericDataStructVector::GenericDataStructVector(uint32_t numberOfEntries)
-	:GenericDataStruct(getClassName(), numberOfEntries)
+ot::GenericDataStructVector::GenericDataStructVector(uint32_t _numberOfEntries)
+	:GenericDataStruct(getClassName(), _numberOfEntries)
 {
-	AllocateValueMemory();
+	allocateValueMemory();
 }
 
-ot::GenericDataStructVector& ot::GenericDataStructVector::operator=(const GenericDataStructVector& other)
+ot::GenericDataStructVector& ot::GenericDataStructVector::operator=(const GenericDataStructVector& _other)
 {
-	_values = other._values;
-	_numberOfEntries = other._numberOfEntries;
+	m_values = _other.m_values;
+	m_numberOfEntries = _other.m_numberOfEntries;
 	return *this;
 }
 
-ot::GenericDataStructVector& ot::GenericDataStructVector::operator=(GenericDataStructVector&& other)
+ot::GenericDataStructVector& ot::GenericDataStructVector::operator=(GenericDataStructVector&& _other) noexcept
 {
-	_values = std::move(other._values);
-	_numberOfEntries = other._numberOfEntries;
-	other._numberOfEntries = 0;
+	m_values = std::move(_other.m_values);
+	m_numberOfEntries = _other.m_numberOfEntries;
+	_other.m_numberOfEntries = 0;
 	return *this;
 }
 
@@ -40,39 +40,39 @@ ot::GenericDataStructVector::GenericDataStructVector()
 {
 }
 
-ot::GenericDataStructVector::GenericDataStructVector(const GenericDataStructVector& other)
-	:GenericDataStruct(getClassName(),other._numberOfEntries), _values(other._values)
+ot::GenericDataStructVector::GenericDataStructVector(const GenericDataStructVector& _other)
+	:GenericDataStruct(getClassName(),_other.m_numberOfEntries), m_values(_other.m_values)
 {
 }
 
-ot::GenericDataStructVector::GenericDataStructVector(GenericDataStructVector&& other)
-	:GenericDataStruct(getClassName(), other._numberOfEntries), _values(std::move(other._values))
+ot::GenericDataStructVector::GenericDataStructVector(GenericDataStructVector&& _other) noexcept
+	:GenericDataStruct(getClassName(), _other.m_numberOfEntries), m_values(std::move(_other.m_values))
 {
-	other._numberOfEntries = 0;
+	_other.m_numberOfEntries = 0;
 }
 
-void ot::GenericDataStructVector::setValue(uint32_t index, const ot::Variable& value)
+void ot::GenericDataStructVector::setValue(uint32_t _index, const ot::Variable& _value)
 {
-	 _values[index] = value; 
-	 _numberOfEntries = static_cast<uint32_t>(_values.size()); 
+	 m_values[_index] = _value; 
+	 m_numberOfEntries = static_cast<uint32_t>(m_values.size()); 
 }
 
-void ot::GenericDataStructVector::setValue(uint32_t index, ot::Variable&& value)
+void ot::GenericDataStructVector::setValue(uint32_t _index, ot::Variable&& _value)
 {
-	_values[index] = std::move(value); 
-	_numberOfEntries = static_cast<uint32_t>(_values.size());
+	m_values[_index] = std::move(_value); 
+	m_numberOfEntries = static_cast<uint32_t>(m_values.size());
 }
 
-void ot::GenericDataStructVector::setValues(const std::vector<ot::Variable>& values)
+void ot::GenericDataStructVector::setValues(const std::vector<ot::Variable>& _values)
 {
-	_values = values;
-	_numberOfEntries = static_cast<uint32_t>(_values.size());
+	m_values = _values;
+	m_numberOfEntries = static_cast<uint32_t>(m_values.size());
 }
 
-void ot::GenericDataStructVector::setValues(std::vector<ot::Variable>&& values)
+void ot::GenericDataStructVector::setValues(std::vector<ot::Variable>&& _values)
 {
-	_values = std::move(values);
-	_numberOfEntries = static_cast<uint32_t>(_values.size());
+	m_values = std::move(_values);
+	m_numberOfEntries = static_cast<uint32_t>(m_values.size());
 }
 
 void ot::GenericDataStructVector::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
@@ -80,7 +80,7 @@ void ot::GenericDataStructVector::addToJsonObject(ot::JsonValue& _object, ot::Js
 	VariableToJSONConverter converter;
 	GenericDataStruct::addToJsonObject(_object, _allocator);
 	ot::JsonArray arr;
-	for (auto& value: _values)
+	for (auto& value: m_values)
 	{
 		arr.PushBack(converter(value, _allocator), _allocator);
 	}
@@ -90,16 +90,16 @@ void ot::GenericDataStructVector::addToJsonObject(ot::JsonValue& _object, ot::Js
 void ot::GenericDataStructVector::setFromJsonObject(const ot::ConstJsonObject& _object)
 {
 	GenericDataStruct::setFromJsonObject(_object);
-	AllocateValueMemory();
+	allocateValueMemory();
 	JSONToVariableConverter converter;
 	auto array = ot::json::getArray(_object, "values");;
 	for (uint32_t j = 0; j < array.Size(); j++)
 	{
-		_values[j] = converter(array[j]);
+		m_values[j] = converter(array[j]);
 	}
 }
 
-void ot::GenericDataStructVector::AllocateValueMemory()
+void ot::GenericDataStructVector::allocateValueMemory()
 {
-	_values.resize(_numberOfEntries);
+	m_values.resize(m_numberOfEntries);
 }

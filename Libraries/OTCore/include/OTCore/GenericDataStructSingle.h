@@ -9,14 +9,14 @@ namespace ot
 	
 	public:
 		GenericDataStructSingle();
-		GenericDataStructSingle(const GenericDataStructSingle& other);
-		GenericDataStructSingle(GenericDataStructSingle&& other);
-		GenericDataStructSingle& operator=(const GenericDataStructSingle& other);
-		GenericDataStructSingle& operator=(GenericDataStructSingle&& other);
+		GenericDataStructSingle(const GenericDataStructSingle& _other);
+		GenericDataStructSingle(GenericDataStructSingle&& _other) noexcept;
+		GenericDataStructSingle& operator=(const GenericDataStructSingle& _other);
+		GenericDataStructSingle& operator=(GenericDataStructSingle&& _other) noexcept;
 		~GenericDataStructSingle();
 
-		void setValue(const ot::Variable& value);
-		void setValue(ot::Variable&& value);
+		void setValue(const ot::Variable& _value);
+		void setValue(ot::Variable&& _value);
 
 		const ot::Variable& getValue() const;
 
@@ -26,7 +26,7 @@ namespace ot
 		static std::string getClassName() { return "GenericDataStructSingle"; }
 	
 	private:
-		ot::Variable _value;
+		ot::Variable m_value;
 	};
 
 }

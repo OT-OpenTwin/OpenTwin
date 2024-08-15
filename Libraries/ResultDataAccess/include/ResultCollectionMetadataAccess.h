@@ -14,15 +14,15 @@
 class ClassFactory;
 
 
-class __declspec(dllexport) ResultMetadataAccess
+class __declspec(dllexport) ResultCollectionMetadataAccess
 {
 public:
-	ResultMetadataAccess(const std::string& collectionName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory);
-	ResultMetadataAccess(const std::string& crossCollectionName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL);
-	ResultMetadataAccess(ResultMetadataAccess&& other) noexcept;
-	ResultMetadataAccess& operator=(ResultMetadataAccess&& other) noexcept;
+	ResultCollectionMetadataAccess(const std::string& collectionName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory);
+	ResultCollectionMetadataAccess(const std::string& crossCollectionName, ot::components::ModelComponent* modelComponent, ClassFactory* classFactory, const std::string& sessionServiceURL);
+	ResultCollectionMetadataAccess(ResultCollectionMetadataAccess&& other) noexcept;
+	ResultCollectionMetadataAccess& operator=(ResultCollectionMetadataAccess&& other) noexcept;
 
-	virtual ~ResultMetadataAccess() {};
+	virtual ~ResultCollectionMetadataAccess() {};
 
 	const std::list<std::string> listAllSeriesNames() const;
 	const std::list<std::string> listAllParameterLabels() const;
@@ -50,7 +50,7 @@ public:
 
 	bool collectionHasMetadata() const { return m_metadataExistInProject; }
 protected:
-	ResultMetadataAccess() {};
+	ResultCollectionMetadataAccess() {};
 	bool m_metadataExistInProject = false;
 	std::string m_collectionName;
 	ot::components::ModelComponent* m_modelComponent = nullptr;

@@ -9,7 +9,7 @@ void BufferResultCollectionAccess::setModelComponent(ot::components::ModelCompon
 }
 
 #include "OTServiceFoundation/ExternalServicesComponent.h"
-const std::shared_ptr<ResultMetadataAccess> BufferResultCollectionAccess::getResultCollectionAccessMetadata(EntityBlockDatabaseAccess* blockEntity)
+const std::shared_ptr<ResultCollectionMetadataAccess> BufferResultCollectionAccess::getResultCollectionAccessMetadata(EntityBlockDatabaseAccess* blockEntity)
 {
 	const std::string projectName = blockEntity->getSelectedProjectName();
 	auto existingCampaignData = _resultCollectionAccessByProjectName.find(projectName);
@@ -24,14 +24,14 @@ const std::shared_ptr<ResultMetadataAccess> BufferResultCollectionAccess::getRes
 
 		const std::string thisProjectsName = DataBase::GetDataBase()->getProjectName();
 		
-		std::shared_ptr<ResultMetadataAccess> newResultCollectionAccess;
+		std::shared_ptr<ResultCollectionMetadataAccess> newResultCollectionAccess;
 		if (thisProjectsName == projectName)
 		{
-			newResultCollectionAccess.reset(new ResultMetadataAccess(collectionName, _modelComponent, &classFactory));
+			newResultCollectionAccess.reset(new ResultCollectionMetadataAccess(collectionName, _modelComponent, &classFactory));
 		}
 		else //Crosscollection access
 		{
-			newResultCollectionAccess.reset(new ResultMetadataAccess(collectionName, _modelComponent, &classFactory, sessionServiceURL));
+			newResultCollectionAccess.reset(new ResultCollectionMetadataAccess(collectionName, _modelComponent, &classFactory, sessionServiceURL));
 		}
 		const auto temp = std::make_pair<>(projectName,newResultCollectionAccess);
 		_resultCollectionAccessByProjectName.insert(temp);

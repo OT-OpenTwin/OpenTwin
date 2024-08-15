@@ -23,6 +23,7 @@ public:
 	const std::map <std::string, std::shared_ptr<MetadataEntry>> getMetadata()const { return m_metaData; }
 
 	const std::string getName()const { return m_name; }
+	const std::string getLabel()const { return m_label; }
 	const uint64_t getSeriesIndex() const { return m_index; }
 	
 	//! @brief Is done by the Extender when a series is added to a campaign

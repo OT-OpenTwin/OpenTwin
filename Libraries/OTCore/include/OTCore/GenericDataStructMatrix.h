@@ -14,24 +14,25 @@ namespace ot
 	public:
 		GenericDataStructMatrix();
 		~GenericDataStructMatrix();
-		GenericDataStructMatrix(const GenericDataStructMatrix& other);
-		GenericDataStructMatrix(GenericDataStructMatrix&& other)noexcept;
-		GenericDataStructMatrix& operator=(const GenericDataStructMatrix& other);
-		GenericDataStructMatrix& operator=(GenericDataStructMatrix&& other) noexcept;
+		GenericDataStructMatrix(const GenericDataStructMatrix& _other);
+		GenericDataStructMatrix(GenericDataStructMatrix&& _other)noexcept;
+		GenericDataStructMatrix& operator=(const GenericDataStructMatrix& _other);
+		GenericDataStructMatrix& operator=(GenericDataStructMatrix&& _other) noexcept;
 
 
-		GenericDataStructMatrix(uint32_t numberofColumns, uint32_t numberofRows);
+		GenericDataStructMatrix(uint32_t _numberofColumns, uint32_t _numberofRows);
+		GenericDataStructMatrix(uint32_t _numberofColumns, uint32_t _numberofRows, ot::Variable _defaultValue);
 		
-		void setValue(uint32_t columnIndex, uint32_t rowIndex, ot::Variable&& value);
-		void setValue(uint32_t columnIndex, uint32_t rowIndex, const ot::Variable& value);
-		void setValues(const ot::Variable* values, uint32_t size);
+		void setValue(uint32_t _columnIndex, uint32_t _rowIndex, ot::Variable&& _value);
+		void setValue(uint32_t _columnIndex, uint32_t _rowIndex, const ot::Variable& _value);
+		void setValues(const ot::Variable* _values, uint32_t _size);
 		/// <summary>
 		/// column-major access
 		/// </summary>
-		const ot::Variable& getValue(uint32_t columnIndex, uint32_t rowIndex)const;
+		const ot::Variable& getValue(uint32_t _columnIndex, uint32_t _rowIndex)const;
 		const ot::Variable* getValues()const;
-		const uint32_t getNumberOfColumns() const { return _numberOfColumns; }
-		const uint32_t getNumberOfRows() const { return _numberOfRows; }
+		const uint32_t getNumberOfColumns() const { return m_numberOfColumns; }
+		const uint32_t getNumberOfRows() const { return m_numberOfRows; }
 
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
@@ -39,17 +40,14 @@ namespace ot
 		static std::string getClassName() { return "GenericDataStructMatrix"; }
 
 	private:
-		uint32_t _numberOfColumns = 0;
-		uint32_t _numberOfRows = 0;
-		//void* _values = nullptr;
-		std::vector<ot::Variable> _values;
-		//std::string _typeName;
-		/*std::function<void(int32_t index, const ot::Variable&)> _setter;
-		std::function<void(int32_t index, ot::Variable&&)> _setterMove;
-		std::function<ot::Variable(int32_t index)> _getter;*/
-
-		void AllocateValueMemory(/*const std::string& typeName*/);
+		uint32_t m_numberOfColumns = 0;
+		uint32_t m_numberOfRows = 0;
 		
-		inline uint32_t getIndex(const uint32_t& columnIndex, const uint32_t& rowIndex) const { return _numberOfColumns * rowIndex + columnIndex; }
+		std::vector<ot::Variable> m_values;
+		void allocateValueMemory();
+		void allocateValueMemory( const ot::Variable& _defaultValue);
+		void allocateValueMemory( ot::Variable&& _defaultValue);
+		
+		inline uint32_t getIndex(const uint32_t& _columnIndex, const uint32_t& _rowIndex) const { return m_numberOfColumns * _rowIndex + _columnIndex; }
 	};
 }

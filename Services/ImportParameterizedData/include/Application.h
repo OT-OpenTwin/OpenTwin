@@ -19,6 +19,7 @@
 #include "DataCategorizationHandler.h"
 #include "TabledataToResultdataHandler.h"
 #include "TouchstoneToResultdata.h"
+#include "ResultCollectionMetadataAccess.h"
 
 #include "OTCore/FolderNames.h"
 
@@ -163,8 +164,8 @@ private:
 	DataCategorizationHandler* _parametrizedDataHandler = nullptr;
 	TabledataToResultdataHandler* _tabledataToResultdataHandler = nullptr;
 	TouchstoneToResultdata* _touchstoneToResultdata = nullptr;
-
-
+	ResultCollectionMetadataAccess* m_resultAccess = nullptr;
+		
 	void HandleSelectionChanged();
 	void ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc);
 	void RequestSelectedRanges();
