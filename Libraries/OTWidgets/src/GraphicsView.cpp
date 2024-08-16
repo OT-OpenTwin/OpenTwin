@@ -161,18 +161,16 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	}
 }
 
-void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool _handleQueue, bool bufferConnections) {
+void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool bufferConnections) {
 	auto graphicsItemByUID = m_items.find(_itemUid);
 	if (graphicsItemByUID == m_items.end()) {
 		//OT_LOG_EAS("Item with the ID \"" + _itemUid + "\" could not be found");
 		return;
 	}
 	
-	if (!_handleQueue)
-	{
-		this->blockSignals(true);
-		m_scene->blockSignals(true);
-	}
+	this->blockSignals(true);
+	m_scene->blockSignals(true);
+
 	ot::GraphicsItem* graphicsItem =  graphicsItemByUID->second;
 	OTAssertNullptr(graphicsItem);
 	if (bufferConnections)
@@ -187,12 +185,8 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool _handleQueue, bo
 	delete graphicsItem;
 	m_items.erase(_itemUid);
 	
-
-	if (!_handleQueue)
-	{
-		m_scene->blockSignals(false);
-		this->blockSignals(false);
-	}
+	m_scene->blockSignals(false);
+	this->blockSignals(false);
 }
 
 std::list<ot::UID> ot::GraphicsView::getSelectedItemUIDs(void) const {
@@ -274,7 +268,7 @@ void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connection
 	this->removeConnection(_connectionInformation.getUid());
 }
 
-void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID, bool _handleQueue)
+void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
 {
 	// Ensure connection exists
 	auto connectionByUID = m_connections.find(_connectionUID);
@@ -282,11 +276,8 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID, bool _han
 		return;
 	}
 
-	if (!_handleQueue)
-	{
-		this->blockSignals(true);
-		m_scene->blockSignals(true);
-	}
+	this->blockSignals(true);
+	m_scene->blockSignals(true);
 
 	// Remove connection from items
 	ot::GraphicsConnectionItem* connection = connectionByUID->second;
@@ -294,17 +285,14 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID, bool _han
 	connection->disconnectItems();
 
 	// Destroy connection
-	m_scene->removeItem(connection);
 	delete connection;
 	connection = nullptr;
 
 	// Erase connection from map
 	m_connections.erase(_connectionUID);
-	if (!_handleQueue)
-	{
-		m_scene->blockSignals(false);
-		this->blockSignals(false);
-	}
+	
+	m_scene->blockSignals(false);
+	this->blockSignals(false);
 }
 
 ot::UIDList ot::GraphicsView::getSelectedConnectionUIDs(void) const {
@@ -354,12 +342,6 @@ void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _i
 
 	if (m_viewStateFlags & ItemMoveInProgress) return;
 	Q_EMIT itemConfigurationChanged(_item->getConfiguration());
-}
-
-void ot::GraphicsView::blockSceneAndView(bool _block)
-{
-	this->blockSignals(true);
-	m_scene->blockSignals(true);
 }
 
 // ########################################################################################################
