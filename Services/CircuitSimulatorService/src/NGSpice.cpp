@@ -210,7 +210,7 @@ void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elem
 		// And i dont want to execute the above if Condition so i contructed a counter for this that only for the voltageSource it is relevant
 		
 		if (counter == 1 && elementUID == voltageSource) {
-			if (myConn.getDestConnectable() != "positivePole" && myConn.getOriginConnectable() != "positivePole") {
+			if (myConn.getDestConnectable() != m_positivePole && myConn.getOriginConnectable() != m_positivePole) {
 				continue;
 			}
 		}
@@ -223,13 +223,13 @@ void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elem
 
 
 		//First i check if the connection is connected to GND If yes then i state it with node number 0 
-		if (myConn.getOriginUid() == voltageSource && myConn.getOriginConnectable() == "negativePole" ||
-			myConn.getDestinationUid() == voltageSource && myConn.getDestConnectable() == "negativePole") {
+		if (checkIfConnectionIsConnectedToGND(myConn.getOriginUid(),myConn.getOriginConnectable(),voltageSource) ||
+			checkIfConnectionIsConnectedToGND(myConn.getDestinationUid(), myConn.getDestConnectable(), voltageSource)) {
 
 			
-
-			if ((allEntitiesByBlockID.at(myConn.getOriginUid())->getBlockTitle() != "Voltage Meter") &&
-				(allEntitiesByBlockID.at(myConn.getDestinationUid())->getBlockTitle() != "Voltage Meter")) {
+			// Then i check the connection is connected to a Voltage Meter
+			if (checkIfConnectionIsConnectedToVoltageMeter(allEntitiesByBlockID.at(myConn.getOriginUid())->getBlockTitle()) &&
+				checkIfConnectionIsConnectedToVoltageMeter(allEntitiesByBlockID.at(myConn.getDestinationUid())->getBlockTitle())) {
 
 				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
 				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
@@ -249,8 +249,8 @@ void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elem
 			}	
 		}
 		else {
-			if ((allEntitiesByBlockID.at(myConn.getOriginUid())->getBlockTitle() != "Voltage Meter") &&
-				(allEntitiesByBlockID.at(myConn.getDestinationUid())->getBlockTitle() != "Voltage Meter")) {
+			if (checkIfConnectionIsConnectedToVoltageMeter(allEntitiesByBlockID.at(myConn.getOriginUid())->getBlockTitle()) &&
+				checkIfConnectionIsConnectedToVoltageMeter(allEntitiesByBlockID.at(myConn.getDestinationUid())->getBlockTitle())) {
 
 				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
 				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
@@ -309,10 +309,26 @@ Connection NGSpice::createConnection(std::map<ot::UID, std::shared_ptr<EntityBlo
 	return myConn;
 }
 
-bool NGSpice::checkIfConnectionIsConnectedToPole(std::string pole)
+bool NGSpice::checkIfConnectionIsConnectedToGND(ot::UID elementUID,std::string pole, ot::UID voltageSource)
 {
+	if (elementUID == voltageSource && pole == m_negativePole)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 	
-	return false;
+}
+
+bool NGSpice::checkIfConnectionIsConnectedToVoltageMeter(std::string blockTitle)
+{
+	if (blockTitle != m_voltageMeterTitle)
+	{
+		return true;
+	}
+	
 }
 
 
@@ -573,8 +589,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		for (auto voltageSource : vectorVoltageSources->second) {
 			ot::UID elementUID = voltageSource->getEntityID();
 			int counter = 0;
-			connectionAlgorithm(counter,elementUID,elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
-			
+			connectionAlgorithm(counter,elementUID,elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);	
 		}
 
 
