@@ -32,29 +32,21 @@
 #include "OTCore/Logger.h"
 #include "OTCore/Color.h"
 #include "OTCore/ThisService.h"
-#include "OTCore/BasicServiceInformation.h"
-#include "OTCore/OwnerManagerTemplate.h"
 #include "OTCore/OwnerService.h"
-#include "OTGui/PropertyStringList.h"
 #include "OTCore/OwnerServiceGlobal.h"
+#include "OTCore/OwnerManagerTemplate.h"
+#include "OTCore/BasicServiceInformation.h"
 #include "OTCore/GenericDataStructMatrix.h"
 
-#include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ActionDispatcher.h"
-#include "OTCommunication/IpConverter.h"
-#include "OTCommunication/Msg.h"
-#include "OTCommunication/UiTypes.h"
-
-#include "OTServiceFoundation/TableRange.h"
-#include "OTServiceFoundation/ContextMenu.h"
-
+#include "OTGui/GuiTypes.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGui/PropertyDialogCfg.h"
+#include "OTGui/PropertyStringList.h"
 #include "OTGui/OnePropertyDialogCfg.h"
-#include "OTGui/SelectEntitiesDialogCfg.h"
 #include "OTGui/GraphicsLayoutItemCfg.h"
+#include "OTGui/SelectEntitiesDialogCfg.h"
 
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
@@ -71,6 +63,14 @@
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
 #include "OTWidgets/IconManager.h"
+
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ActionDispatcher.h"
+#include "OTCommunication/IpConverter.h"
+#include "OTCommunication/Msg.h"
+
+#include "OTServiceFoundation/TableRange.h"
+#include "OTServiceFoundation/ContextMenu.h"
 
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 

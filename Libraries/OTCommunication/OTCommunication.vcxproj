@@ -26,7 +26,6 @@
     <ClCompile Include="src\IpConverter.cpp" />
     <ClCompile Include="src\Msg.cpp" />
     <ClCompile Include="src\ServiceLogNotifier.cpp" />
-    <ClCompile Include="src\UiTypes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCommunication\ActionDispatcher.h" />
@@ -38,7 +37,6 @@
     <ClInclude Include="include\OTCommunication\IpConverter.h" />
     <ClInclude Include="include\OTCommunication\Msg.h" />
     <ClInclude Include="include\OTCommunication\ServiceLogNotifier.h" />
-    <ClInclude Include="include\OTCommunication\UiTypes.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

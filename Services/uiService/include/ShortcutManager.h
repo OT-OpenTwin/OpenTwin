@@ -2,7 +2,6 @@
 
 // openTwin header
 #include "OTGui/GuiTypes.h"
-#include "OTCommunication/UiTypes.h"
 
 // uiCore header
 #include <akCore/aObject.h>

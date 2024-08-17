@@ -23,13 +23,7 @@
     <ClCompile Include="src\Msg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RandomNumberGeneratorCryptoSecureWindows.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ServiceLogNotifier.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UiTypes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ActionDispatcher.cpp">
@@ -55,16 +49,7 @@
     <ClInclude Include="include\OTCommunication\Msg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCommunication\RandomNumberGenerator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCommunication\RandomNumberGeneratorCryptoSecure.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCommunication\ServiceLogNotifier.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCommunication\UiTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCommunication\ActionDispatcher.h">

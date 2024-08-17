@@ -12,6 +12,7 @@
 // std header
 #include <list>
 #include <string>
+#include <vector>
 
 namespace ot {
 
@@ -141,6 +142,28 @@ namespace ot {
 		Key_F12
 	};
 
+	//! \brief Describes the object type to lock in the UI.
+	//! \warning When adding new flags, add the corresponding flag to ot::getAllLockTypeFlags().
+	enum LockTypeFlag {
+		NoLockFlags         = 0x0000, //! \brief No lock flags are set.
+		LockViewWrite       = 0x0001, //! \brief Lock view write operations.
+		LockViewRead        = 0x0002, //! \brief Lock view read operations.
+		//! \brief Lock model write operations.
+		//! Any control should be disabled and any event supressed which would lead to modifying the model.
+		LockModelWrite      = 0x0004,
+		//! \brief Lock model write operations.
+		//! Any control should be disabled and any event supressed which would lead to any model reading access.
+		LockModelRead       = 0x0008,
+		LockProperties      = 0x0010, //! \brief Lock properties.
+		LockNavigationWrite = 0x0020, //! \brief Lock navigation write.
+		LockNavigationAll   = 0x0040, //! \brief Lock navigation.
+		LockAll             = 0x1000 //! \brief Lock all.
+	};
+
+	typedef ot::Flags<LockTypeFlag> LockTypeFlags;
+
+	OT_GUI_API_EXPORT std::list<LockTypeFlag> getAllLockTypeFlags(void);
+
 	OT_GUI_API_EXPORT std::string toString(Alignment _alignment);
 	OT_GUI_API_EXPORT Alignment stringToAlignment(const std::string& _string);
 
@@ -166,4 +189,16 @@ namespace ot {
 
 	OT_GUI_API_EXPORT std::string toString(BasicKey _key);
 
+	OT_GUI_API_EXPORT LockTypeFlags toLockTypeFlags(const std::vector<std::string>& _flags);
+
+	OT_GUI_API_EXPORT LockTypeFlags toLockTypeFlags(const std::list<std::string>& _flags);
+
+	OT_GUI_API_EXPORT LockTypeFlag toLockTypeFlag(const std::string& _flag);
+
+	OT_GUI_API_EXPORT std::list<std::string> toStringList(const LockTypeFlags& _flags);
+
+	OT_GUI_API_EXPORT std::string toString(LockTypeFlag _type);
+
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::LockTypeFlag);

@@ -12,7 +12,7 @@ public:
 	virtual void modelSelectionChanged(std::list< ot::UID> &selectedEntityID);
 
 protected:
-	virtual std::string initializeAndCreateUI(ot::LockTypeFlags& modelRead, ot::LockTypeFlags& modelWrite) override;
+	virtual std::string initializeAndCreateUI(const ot::LockTypeFlags& modelRead, const ot::LockTypeFlags& modelWrite) override;
 
 private:
 	void processToleranceSetting(rapidjson::Document &doc);

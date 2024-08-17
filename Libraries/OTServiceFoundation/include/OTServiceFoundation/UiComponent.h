@@ -12,7 +12,7 @@
 #include "OTCore/ServiceBase.h"			// Base class
 #include "OTCore/Flags.h"
 #include "OTGui/PropertyGridCfg.h"
-#include "OTCommunication/UiTypes.h"
+#include "OTGui/GuiTypes.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 #include "OTServiceFoundation/MenuButtonDescription.h"
 #include "OTServiceFoundation/ContextMenu.h"

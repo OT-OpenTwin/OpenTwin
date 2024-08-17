@@ -10,13 +10,11 @@
 
 // OpenTwin header
 #include "DataBase.h"
-
 #include "OTCore/CoreTypes.h"
+#include "OTGui/GuiTypes.h"
 #include "OTCommunication/ActionTypes.h"
-
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/Msg.h"
-#include "OTCommunication/UiTypes.h"
 
 // std header
 #include <array>

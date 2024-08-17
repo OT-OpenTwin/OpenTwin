@@ -42,8 +42,8 @@
 #include "OTCore/OwnerService.h"
 #include "OTCore/OTObjectBase.h"
 #include "OTCore/BasicServiceInformation.h"
+#include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
-#include "OTCommunication/UiTypes.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 

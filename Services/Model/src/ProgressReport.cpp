@@ -3,12 +3,12 @@
 #include "Application.h"
 #include "ProgressReport.h"
 
-#include "OTCore/CoreTypes.h"
 #include "OTCore/JSON.h"
 #include "OTCore/Flags.h"
+#include "OTCore/CoreTypes.h"
+#include "OTGui/GuiTypes.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/UiTypes.h"
 
 void ProgressReport::setProgressInformation(std::string message, bool continuous)
 {

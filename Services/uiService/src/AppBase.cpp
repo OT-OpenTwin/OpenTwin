@@ -43,44 +43,46 @@
 #include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qapplication.h>
 
-// Open twin header
+// OpenTwin header
 #include "DataBase.h"
 
-#include "OTCore/Logger.h"
 #include "OTCore/Flags.h"
-#include "OTCore/OTAssert.h"
+#include "OTCore/Logger.h"
 #include "OTCore/Point2D.h"
+#include "OTCore/OTAssert.h"
 #include "OTCore/OTObject.h"
 #include "OTCore/ReturnMessage.h"
+
 #include "OTGui/FillPainter2D.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/PropertyStringList.h"
-#include "OTCommunication/UiTypes.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTWidgets/GraphicsPickerView.h"
-#include "OTWidgets/GraphicsViewView.h"
+
+#include "OTWidgets/TreeWidget.h"
+#include "OTWidgets/WidgetView.h"
+#include "OTWidgets/IconManager.h"
+#include "OTWidgets/GraphicsItem.h"
+#include "OTWidgets/MessageDialog.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/PropertyInput.h"
-#include "OTWidgets/PropertyInputDouble.h"
-#include "OTWidgets/PropertyInputStringList.h"
+#include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/PropertyGridView.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
-#include "OTWidgets/GraphicsItem.h"
-#include "OTWidgets/GraphicsConnectionItem.h"
-#include "OTWidgets/TextEditorView.h"
-#include "OTWidgets/TreeWidget.h"
-#include "OTWidgets/PlainTextEditView.h"
-#include "OTWidgets/IconManager.h"
-#include "OTWidgets/MessageDialog.h"
-#include "OTWidgets/WidgetView.h"
-#include "OTWidgets/GlobalColorStyle.h"
-#include "OTGui/ColorStyleTypes.h"
-#include "OTWidgets/GraphicsItemLoader.h"
-#include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/WidgetProperties.h"
+#include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/PlainTextEditView.h"
+#include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/GraphicsItemLoader.h"
+#include "OTWidgets/GraphicsPickerView.h"
+#include "OTWidgets/PropertyInputDouble.h"
+#include "OTWidgets/GraphicsConnectionItem.h"
+#include "OTWidgets/PropertyInputStringList.h"
+
+#include "OTCommunication/ActionTypes.h"
 
 // C++ header
 #include <thread>

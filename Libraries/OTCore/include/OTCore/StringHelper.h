@@ -9,9 +9,10 @@
 #include "OTCore/CoreAPIExport.h"
 
 // std header
+#include <list>
 #include <string>
 #include <sstream>
-#include <list>
+#include <iomanip>
 
 namespace ot {
 
@@ -52,6 +53,16 @@ namespace ot {
 		ss >> rest;
 		if (!rest.empty()) { _failed = true; }
 		return v;
+	}
+
+	//! \brief Returns a hex string representing the provided number.
+	//! \param _number Number to convert.
+	//! \param _fill Fill character.
+	//! \param _length Output string length.
+	template <class T> inline std::string numberToHexString(T _number, char _fill = '0', int _length = 16) {
+		std::stringstream ss;
+		ss << std::hex << std::setw(_length) << std::setfill(_fill) << _number;
+		return std::move(ss.str());
 	}
 
 }

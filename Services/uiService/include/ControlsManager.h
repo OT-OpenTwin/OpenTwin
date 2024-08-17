@@ -12,8 +12,8 @@
 #include <akCore/globalDataTypes.h>
 
 // Open twin header
-#include "OTCommunication/UiTypes.h"
 #include "OTCore/Flags.h"
+#include "OTGui/GuiTypes.h"
 
 // C++ header
 #include <string>

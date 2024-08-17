@@ -6,7 +6,6 @@
 #include "akAPI/uiAPI.h"
 
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/UiTypes.h"
 
 #include <QFileDialog>					// QFileDialog
 #include <QHostInfo>					

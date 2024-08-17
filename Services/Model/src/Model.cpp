@@ -37,7 +37,7 @@
 #include "rapidjson/writer.h"
 
 #include "OTCore/CoreTypes.h"
-#include "OTCommunication/UiTypes.h"
+#include "OTGui/GuiTypes.h"
 #include "OTCommunication/ActionTypes.h"
 
 #include "TopExp_Explorer.hxx"
