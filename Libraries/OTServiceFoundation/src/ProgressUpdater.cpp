@@ -1,4 +1,5 @@
 #include "OTServiceFoundation/ProgressUpdater.h"
+#include <cmath>
 
 ProgressUpdater::ProgressUpdater(ot::components::UiComponent* _uiComponent, const std::string& _progressbarMessage)
 	: m_uiComponent(_uiComponent)
