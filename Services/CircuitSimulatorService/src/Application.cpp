@@ -374,94 +374,11 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document) {
 	//check and store information
 	OT_LOG_D("Handling new graphics item request ( name = \"" + itemName + "\"; editor = \"" + editorName + "\"; x = " + std::to_string(pos.x()) + "; y = " + std::to_string(pos.y()) + " )");
 
-	/*CircuitElement element;
-	element.setItemName(itemName);
-	element.setEditorName(editorName);
-	element.setUID(std::to_string(++ottest::currentBlockUid));
-	if (element.getItemName() == "EntityBlockCircuitElement")
-	{
-		std::string voltageSource = "V1";
-		element.setNetlistElementName(voltageSource);
-	}
-	else if (element.getItemName() == "Diode")
-	{
-		std::string temp = std::to_string(ottest::currentDiodeID++);
-		std::string diode = "D";
-		element.setNetlistElementName(diode + temp);
-	}
-
-	else if (element.getItemName() == "Transistor")
-	{
-		std::string temp = std::to_string(ottest::currentTransistoriD++);
-		std::string tran = "Q";
-		element.setNetlistElementName(tran + temp);
-	}
-	else if (element.getItemName() == "Connector")
-	{
-		std::string temp = std::to_string(ottest::currenConnectorID++);
-		std::string conn = "C";
-		element.setNetlistElementName(conn + temp);
-	}
-	else
-	{
-		std::string temp = std::to_string(ottest::currentTransistoriD++);
-		std::string transistor = "Q";
-		element.setNetlistElementName(transistor + temp);
-	}
-
-	auto it = m_ngSpice.mapOfCircuits.find(editorName);
-	if (it == m_ngSpice.mapOfCircuits.end())
-	{
-		Application::instance()->uiComponent()->displayMessage("No Circuit found");
-	}
-	else
-	{
-		it->second.addElement(element.getUID(), element);
-	}*/
+	
 	m_blockEntityHandler.setPackageName(editorName);
 	m_blockEntityHandler.CreateBlockEntity(editorName, itemName, pos);
 	return "";
 	
-
-	//// Create the Package
-	//ot::GraphicsScenePackage pckg("Circuit");
-
-	//// Create item configuration for the item to add
-	//ot::GraphicsItemCfg* itm = nullptr;
-	//if (itemName == EXAMPLE_NAME_BLOCK1) { itm = ottest::createResistor(EXAMPLE_NAME_BLOCK1); }
-	//else if (itemName == EXAMPLE_NAME_Block2) { itm = ottest::createVoltageSource(EXAMPLE_NAME_Block2); }
-	//else if (itemName == EXAMPLE_NAME_Block3) { itm = ottest::createDiode(EXAMPLE_NAME_Block3); }
-	//else if (itemName == EXAMPLE_NAME_BLOCK4) { itm = ottest::createTransistor(EXAMPLE_NAME_BLOCK4); }
-	//else if (itemName == EXAMPLE_NAME_BLOCK5) { itm = ottest::createConnector(EXAMPLE_NAME_BLOCK5); }
-	//else
-	//{
-	//	m_uiComponent->displayMessage("[ERROR] Unknown item: " + itemName + "\n");
-	//	return OT_ACTION_RETURN_VALUE_FAILED;
-	//}
-	//
-	//itm->setPosition(pos);
-	//itm->setUid(std::to_string(++ottest::currentBlockUid));
-	//pckg.addItem(itm);
-
-	//
-
-	//// Here i Create a buffer Object for generating netlist
-	//
-	
-
-
-	//ot::JsonDocument reqDoc;
-	//reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-
-	//ot::JsonObject pckgObj;
-	//pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
-	//reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
-	//
-	//this->getBasicServiceInformation().addToJsonObject(reqDoc, reqDoc.GetAllocator());
-
-	//m_uiComponent->sendMessage(true, reqDoc);
-
-	//return ot::ReturnMessage::toJson(ot::ReturnMessage::Ok);
 }
 
 
@@ -478,66 +395,12 @@ std::string Application::handleRemoveGraphicsItem(ot::JsonDocument& _document) {
 
 
 std::string Application::handleNewGraphicsItemConnection(ot::JsonDocument& _document) {
-	//std::string itemName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemName);
-	//ot::Point2DD pos;
-	//pos.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemPosition));
-
+	
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 	m_blockEntityHandler.setPackageName(pckg.name());
 	m_blockEntityHandler.AddBlockConnection(pckg.connections(),pckg.name());
 	
-	
-	
-	//for (auto c : pckg.connections())
-	//{
-	//	Connection connection(c);
-
-
-	//	auto it = m_ngSpice.mapOfCircuits.find(pckg.name());
-
-	//	//This i do because i have a connection item which is used as a bridge between two items and these connections need to have
-	//	//the same nodeNumber
-
-	//	if (it->second.findElement(connection.destUid()) == "Connector")
-	//	{
-	//		connection.setNodeNumber(std::to_string(0));
-	//	}
-	//	else if (it->second.findElement(connection.originUid()) == "Connector")
-	//	{
-	//		connection.setNodeNumber(std::to_string(0));
-	//	}
-	//	else
-	//	{
-	//		connection.setNodeNumber(std::to_string(ottest::currentNodeNumber++));
-	//	}
-
-	//	if (it == m_ngSpice.mapOfCircuits.end())
-	//	{
-	//		OT_LOG_E("Circuit not found { \"CircuitName\": \"" + pckg.name() + "\" }");
-	//	}
-
-	//	else
-	//	{
-	//		//Here I add the connection to the Origin Element
-	//		it->second.addConnection(connection.originUid(), connection);
-
-
-
-
-	//		//Some Tests
-	//		//std::cout << "Size: " << it->second.getElement(connection.originUid()).getList().size() << std::endl;
-
-	//		//Here I add the connection to the Destination Element
-	//		it->second.addConnection(connection.destUid(), connection);
-
-	//		//test of print
-
-
-
-	//	}
-
-	//}
 	return "";
 	
 }
