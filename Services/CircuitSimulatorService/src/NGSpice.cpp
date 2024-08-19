@@ -57,134 +57,8 @@ void NGSpice::clearBufferStructure(std::string name)
 
 }
 
-void NGSpice::getNodeNumbersOfMeters(std::string editorName, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::vector<std::string>& nodesOfVoltageMeter)
-{
-	
-	std::string nodes;
-	
-	//First i go through all Entities to find the Voltage Meter
-	auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName)->second.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageMeter");
 
 
-	for (auto& voltageMeter : it->second)
-	{
-		if (isValidNodeString(nodes) && voltageMeter->getClassName() == "EntityBlockCircuitVoltageMeter")
-		{
-			nodesOfVoltageMeter.push_back("(" + nodes + ")");
-			nodes = "";
-			continue;
-		}
-		
-		
-		//When found i go through its all connections 
-			
-		ot::UID voltageMeterUID = voltageMeter->getEntityID();
-		auto voltageMeterconnections = voltageMeter->getAllConnections();
-
-		for (auto voltageMeterConnectionID : voltageMeterconnections)
-		{
-			if (isValidNodeString(nodes) && voltageMeter->getClassName() == "EntityBlockCircuitVoltageMeter")
-			{
-				nodesOfVoltageMeter.push_back("(" + nodes + ")");
-				nodes = "";
-				continue;
-			}
-			
-
-			//Here i get the connectionCfg to earn all information about the connection
-			std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(voltageMeterConnectionID);
-			ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
-
-			//Now i find out the UID of the other element and the connectorName
-			ot::UID connectedElementUID;
-			std::string connectorName = "";
-			if (connectionCfg.getOriginUid() != voltageMeterUID)
-			{
-				connectorName = connectionCfg.getOriginConnectable();
-				connectedElementUID = connectionCfg.getOriginUid();
-			}
-			else if (connectionCfg.getDestinationUid() != voltageMeterUID)
-			{
-				connectorName = connectionCfg.getDestConnectable();
-				connectedElementUID = connectionCfg.getDestinationUid();
-			}
-			
-			// Here i get the connectedElement out of my BufferClass
-			auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorName);
-			auto netlistElement = it->second.getMapOfElements().find(connectedElementUID);
-					
-			//Now i go through all connections of the Element and try to find the right one to get the nodeNumber
-			for (auto netlistConn : netlistElement->second->getList())
-			{
-				if (isValidNodeString(nodes) && voltageMeter->getClassName() == "EntityBlockCircuitVoltageMeter")
-				{
-					nodesOfVoltageMeter.push_back("(" + nodes + ")");
-					nodes = "";
-					continue;
-				}
-				
-					
-				if (netlistConn.second.getNodeNumber() != "voltageMeterConnection")
-				{
-					if (netlistConn.second.getOriginConnectable() == connectorName && netlistConn.second.getOriginUid() == connectedElementUID ||
-						netlistConn.second.getDestConnectable() == connectorName && netlistConn.second.getDestinationUid() == connectedElementUID)
-					{
-						
-						size_t position = nodes.find(netlistConn.second.getNodeNumber());
-						if (position != std::string::npos)
-						{
-							continue;
-						}
-						else
-						{
-							size_t pos = nodes.find(",");
-							if (pos == std::string::npos)
-							{
-								nodes += netlistConn.second.getNodeNumber() + ",";
-							}
-							else
-							{
-								nodes += netlistConn.second.getNodeNumber();
-							}
-									
-						}
-					}
-				}
-				else
-				{
-					continue;
-				}
-			}		
-		}	
-	}
-	
-
-}
-
-bool NGSpice::isValidNodeString(const std::string& input)
-{
-	std::stringstream ss(input);
-	std::string token;
-	std::vector<std::string> tokens;
-
-	while (std::getline(ss, token, ',')) {
-		tokens.push_back(token);
-	}
-
-	if (tokens.size() != 2) {
-		return false;
-	}
-
-	for (const auto& tok : tokens) {
-		for (char c : tok) {
-			if (!isdigit(c)) {
-				return false;
-			}
-		}
-	}
-
-	return true;
-}
 
 void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
 {
@@ -210,7 +84,8 @@ void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elem
 		// And i dont want to execute the above if Condition so i contructed a counter for this that only for the voltageSource it is relevant
 		
 		if (counter == 1 && elementUID == voltageSource) {
-			if (myConn.getDestConnectable() != m_positivePole && myConn.getOriginConnectable() != m_positivePole) {
+			if (checkIfConnectionIsConnectedToGND(myConn.getOriginUid(),myConn.getOriginConnectable(),voltageSource) ||
+				checkIfConnectionIsConnectedToGND(myConn.getDestinationUid(), myConn.getDestConnectable(), voltageSource)) {
 				continue;
 			}
 		}
@@ -226,31 +101,24 @@ void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elem
 		if (checkIfConnectionIsConnectedToGND(myConn.getOriginUid(),myConn.getOriginConnectable(),voltageSource) ||
 			checkIfConnectionIsConnectedToGND(myConn.getDestinationUid(), myConn.getDestConnectable(), voltageSource)) {
 
-			
-			// Then i check the connection is connected to a Voltage Meter
-			if (checkIfConnectionIsConnectedToVoltageMeter(allEntitiesByBlockID.at(myConn.getOriginUid())->getBlockTitle()) &&
-				checkIfConnectionIsConnectedToVoltageMeter(allEntitiesByBlockID.at(myConn.getDestinationUid())->getBlockTitle())) {
-
-				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
+			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
+			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+				myConn.setNodeNumber(connectionWithNodeNumber->second);
+			}
+			else {
+				connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
 				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
 					myConn.setNodeNumber(connectionWithNodeNumber->second);
 				}
 				else {
-					connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
-					if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-						myConn.setNodeNumber(connectionWithNodeNumber->second);
-					}
-					else {
-						myConn.setNodeNumber("0");
-						connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
-						connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
-					}
+					myConn.setNodeNumber("0");
+					connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+					connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
 				}
-			}	
+			}
+				
 		}
 		else {
-			if (checkIfConnectionIsConnectedToVoltageMeter(allEntitiesByBlockID.at(myConn.getOriginUid())->getBlockTitle()) &&
-				checkIfConnectionIsConnectedToVoltageMeter(allEntitiesByBlockID.at(myConn.getDestinationUid())->getBlockTitle())) {
 
 				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
 				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
@@ -267,10 +135,6 @@ void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elem
 						connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
 					}
 				}
-			}
-			else {
-				myConn.setNodeNumber(getVoltMeterConnectionName());
-			}
 		}
 		
 		it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
@@ -327,6 +191,10 @@ bool NGSpice::checkIfConnectionIsConnectedToVoltageMeter(std::string blockTitle)
 	if (blockTitle != m_voltageMeterTitle)
 	{
 		return true;
+	}
+	else
+	{
+		return false;
 	}
 	
 }
@@ -580,8 +448,6 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 	// First I get all the VoltageSources of the Circuit
 
-	
-
 	auto vectorVoltageSources = it->second.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource");
 	if (vectorVoltageSources != it->second.getMapOfEntityBlcks().end()) {
 		std::set<ot::UID> visitedElements; // Initialize visited set
@@ -591,65 +457,6 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			int counter = 0;
 			connectionAlgorithm(counter,elementUID,elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);	
 		}
-
-
-
-		//for (auto& blockEntityByID : allEntitiesByBlockID)
-		//{
-		//	
-		//	std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
-		//	auto connections = blockEntity->getAllConnections();
-
-		//	// Map used for parallel connections to identify if a connection already exists on the connector and then give the second or ... connection the same nodenumber
-		//	                                                                                                                                                         
-
-		//	for (auto connectionID : connections)
-		//	{
-		//		
-		//		auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
-		//		std::shared_ptr<EntityBlockConnection> connectionEntity = allConnectionEntities.at(connectionID);
-		//		ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
-
-		//		Connection myConn(connectionCfg);
-
-		//		//1.Methode
-
-		//		if ((allEntitiesByBlockID.at(connectionCfg.getOriginUid())->getBlockTitle() != "Voltage Meter") && (allEntitiesByBlockID.at(connectionCfg.getDestinationUid())->getBlockTitle() != "Voltage Meter"))
-		//		{
-		//			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(),myConn.getDestConnectable() });
-		//			if (connectionWithNodeNumber != connectionNodeNumbers.end())
-		//			{
-		//				myConn.setNodeNumber(connectionWithNodeNumber->second);
-
-		//			}
-		//			else
-		//			{
-		//				connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
-		//				if (connectionWithNodeNumber != connectionNodeNumbers.end())
-		//				{
-		//					myConn.setNodeNumber(connectionWithNodeNumber->second);
-
-		//				}
-		//				else
-		//				{	
-
-		//					myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
-		//					connectionNodeNumbers.insert_or_assign({ myConn.getDestinationUid(), myConn.getDestConnectable() }, myConn.getNodeNumber());
-		//					connectionNodeNumbers.insert_or_assign({ myConn.getOriginUid(), myConn.getOriginConnectable() }, myConn.getNodeNumber());
-		//				}
-		//			}
-		//		}
-		//		else
-		//		{
-		//			myConn.setNodeNumber("voltageMeterConnection");
-		//		}
-
-
-		//		it->second.addConnection(connectionCfg.getOriginUid(), myConn);
-		//		it->second.addConnection(connectionCfg.getDestinationUid(), myConn);
-		//		
-		//	}
-
 
 	}
 		
@@ -678,7 +485,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	//As next i create the Circuit Element Netlist Lines by getting the information out of the BufferClasses 
 
-	std::vector<std::string> nodesOfVoltageMeter;
+	std::vector<std::vector<std::string>> nodesOfVoltageMeter;
 	std::vector<std::vector<std::string>> nodesOfCurrentMeter;
 
 	// I need to get the type of Simulation to set then the voltage source if its ac dc or tran
@@ -745,22 +552,43 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		}
 		else if (circuitElement->type() == "VoltageMeter")
 		{
-			if (nodesOfVoltageMeter.size() == 0)
-			{
-				getNodeNumbersOfMeters(editorname, allConnectionEntities, allEntitiesByBlockID,nodesOfVoltageMeter);
+				
+				/*getNodeNumbersOfMeters(editorname, allConnectionEntities, allEntitiesByBlockID,nodesOfVoltageMeter);*/
+
+				std::vector<std::string> nodeNumbers;
+				std::unordered_set<std::string> temp;
+				auto connections = circuitElement->getList();
+
+				// Verarbeite zuerst die positivePole Verbindung
+				if (connections.find("positivePole") != connections.end())
+				{
+					auto& positiveConn = connections.at("positivePole");
+
+					if (temp.find(positiveConn.getNodeNumber()) == temp.end())
+					{
+						temp.insert(positiveConn.getNodeNumber());
+						nodeNumbers.push_back(positiveConn.getNodeNumber());
+					}
+				}
+
+				// Verarbeite danach die negativePole Verbindung
+				if (connections.find("negativePole") != connections.end())
+				{
+					auto& negativeConn = connections.at("negativePole");
+
+					if (temp.find(negativeConn.getNodeNumber()) == temp.end())
+					{
+						temp.insert(negativeConn.getNodeNumber());
+						nodeNumbers.push_back(negativeConn.getNodeNumber());
+					}
+				}
+				nodesOfVoltageMeter.push_back(nodeNumbers);
 				// I am doing a continue here becaue i dont want to generate an instance Line for this element
-				continue;
-			}
-			else
-			{
-				continue;
-			}
-			
+				continue;		
 		}
 		else if (circuitElement->type() == "CurrentMeter")
 		{
-			if (nodesOfCurrentMeter.size() == 0)
-			{
+			
 				std::vector<std::string> nodeNumbers;
 				std::unordered_set<std::string> temp;
 				auto connections = circuitElement->getList();
@@ -793,11 +621,6 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 				// Hier überspringen wir die Instanzlinien-Generierung für dieses Element
 				continue;
-			}
-			else
-			{
-				continue;
-			}
 		}
 		else if (circuitElement->type() == "Capacitor")
 		{
@@ -899,6 +722,8 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	
 	//Now i create for every Current Meter a resistor with Zero Ohm to measure the current through it
 	std::vector<std::string> nameOfRShunts;
+	int rshuntCounter = 1; // Initialisiere den Zähler
+
 	for (auto nodes : nodesOfCurrentMeter)
 	{
 		std::string nodeString = "";
@@ -906,12 +731,14 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		{
 			nodeString += m_node + " ";
 		}
+
 		std::ostringstream oss;
-		std::string name = "Rshunt" + Numbers::RshunNumbers++;
+		std::string name = "Rshunt" + std::to_string(rshuntCounter++); // Erhöhe den Zähler nach jedem Schritt
 		nameOfRShunts.push_back(name);
+
 		oss << "circbyline " << name << " " << nodeString << "0";
 		std::string temp = oss.str();
-		ngSpice_Command(const_cast<char*>( temp.c_str()));
+		ngSpice_Command(const_cast<char*>(temp.c_str()));
 	}
 	
 
@@ -921,9 +748,23 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	//Now i will do a loop through the nodes of the voltageMeter to get the potential diffirence with probe
 	for (auto nodes : nodesOfVoltageMeter)
 	{
-		std::string probeLine = "circbyline .probe vd" + nodes ; //That is the right syntax
+		std::string nodeString = "("; // Beginne den String mit einer öffnenden Klammer
+		for (size_t i = 0; i < nodes.size(); ++i)
+		{
+			nodeString += nodes[i];
+			if (i < nodes.size() - 1)
+			{
+				nodeString += ","; // Füge ein Komma und ein Leerzeichen zwischen den Nodes hinzu
+			}
+		}
+		nodeString += ")"; // Schließe den String mit einer schließenden Klammer ab
+
+		std::ostringstream oss;
+		oss << "circbyline .probe vd" << nodeString;
+		std::string probeLine = oss.str();
 		ngSpice_Command(const_cast<char*>(probeLine.c_str()));
 	}
+
 	
 	// Here i create a probe for every Shunt resistor
 	for (auto name : nameOfRShunts)
