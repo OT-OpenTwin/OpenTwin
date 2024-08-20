@@ -38,11 +38,12 @@
 
 #define EDIT_GSS_TEXT "< Edit >"
 
-#define TOGGLE_MODE_LABEL_SwitchToLogIn "Switch to login"
-#define TOGGLE_MODE_LABEL_SwitchToRegister "Switch to registration"
+#define TOGGLE_MODE_LABEL_SwitchToLogIn "Switch to Login"
+#define TOGGLE_MODE_LABEL_SwitchToRegister "Switch to Registration"
+#define TOGGLE_MODE_LABEL_SwitchToChangePassword "Change Password"
 
 LogInDialog::LogInDialog() 
-	: m_state(LogInStateFlag::NoState), m_toggleModeLabel(nullptr), m_logInAttempt(0)
+	: m_state(LogInStateFlag::NoState), m_logInAttempt(0)
 {
 	using namespace ot;
 
@@ -51,6 +52,7 @@ LogInDialog::LogInDialog()
 	QHBoxLayout* imageViewLayout = new QHBoxLayout;
 	QGridLayout* inputLayout = new QGridLayout;
 	QGridLayout* buttonLayout = new QGridLayout;
+	QHBoxLayout* changePasswordLayout = new QHBoxLayout;
 	QHBoxLayout* registerLayout = new QHBoxLayout;
 	
 	// Create controls
@@ -68,15 +70,21 @@ LogInDialog::LogInDialog()
 	Label* usernameLabel = new Label("Username:");
 	m_username = new LineEdit;
 	
-	Label* passwordLabel = new Label("Password:");
+	m_passwordLabel = new Label("Password:");
 	m_password = new LineEdit;
 	m_password->setEchoMode(QLineEdit::Password);
 	
-	m_confirmPasswordLabel = new Label("Confirm password:");
-	m_confirmPasswordLabel->setHidden(true);
-	m_confirmPassword = new LineEdit;
-	m_confirmPassword->setEchoMode(QLineEdit::Password);
-	m_confirmPassword->setHidden(true);
+	m_passwordNewLabel = new Label("New Password:");
+	m_passwordNewLabel->setHidden(true);
+	m_passwordNew = new LineEdit;
+	m_passwordNew->setEchoMode(QLineEdit::Password);
+	m_passwordNew->setHidden(true);
+
+	m_passwordConfirmLabel = new Label("Confirm Password:");
+	m_passwordConfirmLabel->setHidden(true);
+	m_passwordConfirm = new LineEdit;
+	m_passwordConfirm->setEchoMode(QLineEdit::Password);
+	m_passwordConfirm->setHidden(true);
 
 	m_savePassword = new CheckBox("Save Password");
 	m_savePassword->setObjectName("LogInDialogSavePassword");
@@ -87,6 +95,8 @@ LogInDialog::LogInDialog()
 	m_logInButton = new PushButton("Log In");
 	m_registerButton = new PushButton("Register");
 	m_registerButton->setHidden(true);
+	m_changePasswordButton = new PushButton("Change Password");
+	m_changePasswordButton->setHidden(true);
 	m_exitButton = new PushButton("Exit");
 
 	// Initialize data
@@ -113,15 +123,18 @@ LogInDialog::LogInDialog()
 	inputLayout->addWidget(m_gss, 0, 1);
 	inputLayout->addWidget(usernameLabel, 1, 0);
 	inputLayout->addWidget(m_username, 1, 1);
-	inputLayout->addWidget(passwordLabel, 2, 0);
+	inputLayout->addWidget(m_passwordLabel, 2, 0);
 	inputLayout->addWidget(m_password, 2, 1);
-	inputLayout->addWidget(m_confirmPasswordLabel, 3, 0);
-	inputLayout->addWidget(m_confirmPassword, 3, 1);
-	inputLayout->addWidget(m_savePassword, 4, 1);
+	inputLayout->addWidget(m_passwordNewLabel, 3, 0);
+	inputLayout->addWidget(m_passwordNew, 3, 1);
+	inputLayout->addWidget(m_passwordConfirmLabel, 4, 0);
+	inputLayout->addWidget(m_passwordConfirm, 4, 1);
+	inputLayout->addWidget(m_savePassword, 5, 1);
 	
 	buttonLayout->addWidget(m_logInButton, 0, 0);
 	buttonLayout->addWidget(m_registerButton, 1, 0);
-	buttonLayout->addWidget(m_exitButton, 2, 0);
+	buttonLayout->addWidget(m_changePasswordButton, 2, 0);
+	buttonLayout->addWidget(m_exitButton, 3, 0);
 
 	centralLayout->addWidget(spacerLabel1);
 	centralLayout->addLayout(imageViewLayout);
@@ -129,17 +142,26 @@ LogInDialog::LogInDialog()
 	centralLayout->addLayout(inputLayout);
 	centralLayout->addWidget(spacerLabel2);
 	centralLayout->addLayout(buttonLayout);
+	centralLayout->addLayout(changePasswordLayout);
 	centralLayout->addLayout(registerLayout);
 
+
 	// ... Setup optional inputs (this section may be disabled when a registration is not allowed)
-	m_toggleModeLabel = new Label(TOGGLE_MODE_LABEL_SwitchToRegister);
-	m_toggleModeLabel->setObjectName("LogInDialogRegisterLabel");
-	m_toggleModeLabel->setMargin(4);
+	m_toggleRegisterModeLabel = new Label(TOGGLE_MODE_LABEL_SwitchToRegister);
+	m_toggleRegisterModeLabel->setObjectName("LogInDialogRegisterLabel");
+	m_toggleRegisterModeLabel->setMargin(4);
 	registerLayout->addStretch(1);
-	registerLayout->addWidget(m_toggleModeLabel);
+	registerLayout->addWidget(m_toggleRegisterModeLabel);
 	registerLayout->addStretch(1);
-	this->connect(m_toggleModeLabel, &Label::mousePressed, this, &LogInDialog::slotToggleLogInMode);
-	// ...
+	this->connect(m_toggleRegisterModeLabel, &Label::mousePressed, this, &LogInDialog::slotToggleLogInAndRegisterMode);
+
+	m_toggleChangePasswordModeLabel = new Label(TOGGLE_MODE_LABEL_SwitchToChangePassword);
+	m_toggleChangePasswordModeLabel->setObjectName("LogInDialogChangePasswordLabel");
+	m_toggleChangePasswordModeLabel->setMargin(4);
+	changePasswordLayout->addStretch(1);
+	changePasswordLayout->addWidget(m_toggleChangePasswordModeLabel);
+	changePasswordLayout->addStretch(1);
+	this->connect(m_toggleChangePasswordModeLabel, &Label::mousePressed, this, &LogInDialog::slotToggleChangePasswordMode);
 
 	// Setup window
 	this->setObjectName("LogInDialog");
@@ -157,6 +179,7 @@ LogInDialog::LogInDialog()
 	// Connect signals
 	this->connect(m_logInButton, &PushButton::clicked, this, &LogInDialog::slotLogIn);
 	this->connect(m_registerButton, &PushButton::clicked, this, &LogInDialog::slotRegister);
+	this->connect(m_changePasswordButton, &PushButton::clicked, this, &LogInDialog::slotChangePassword);
 	this->connect(m_exitButton, &PushButton::clicked, this, &LogInDialog::slotCancel);
 	this->connect(m_gss, &ComboBox::currentTextChanged, this, &LogInDialog::slotGSSChanged);
 	this->connect(m_password, &LineEdit::textChanged, this, &LogInDialog::slotPasswordChanged);
@@ -171,11 +194,14 @@ void LogInDialog::setControlsEnabled(bool _enabled) {
 	m_gss->setEnabled(_enabled);
 	m_username->setEnabled(_enabled);
 	m_password->setEnabled(_enabled);
-	m_confirmPassword->setEnabled(_enabled);
+	m_passwordNew->setEnabled(_enabled);
+	m_passwordConfirm->setEnabled(_enabled);
 	m_savePassword->setEnabled(_enabled);
-	m_toggleModeLabel->setEnabled(_enabled);
+	m_toggleChangePasswordModeLabel->setEnabled(_enabled);
+	m_toggleRegisterModeLabel->setEnabled(_enabled);
 	m_logInButton->setEnabled(_enabled);
 	m_registerButton->setEnabled(_enabled);
+	m_changePasswordButton->setEnabled(_enabled);
 	m_exitButton->setEnabled(_enabled);
 }
 
@@ -253,8 +279,8 @@ void LogInDialog::slotRegister(void) {
 		return;
 	}
 
-	if (m_password->text() != m_confirmPassword->text()) {
-		QToolTip::showText(this->mapToGlobal(m_confirmPassword->pos()), "Confirm password does not match the password", m_confirmPassword, QRect(), 3000);
+	if (m_password->text() != m_passwordConfirm->text()) {
+		QToolTip::showText(this->mapToGlobal(m_passwordConfirm->pos()), "Confirm password does not match the password", m_passwordConfirm, QRect(), 3000);
 		return;
 	}
 
@@ -271,28 +297,109 @@ void LogInDialog::slotRegister(void) {
 	worker.detach();
 }
 
+void LogInDialog::slotChangePassword(void) {
+	OTAssert(!(m_state & LogInStateFlag::WorkerRunning), "Worker already running");
+
+	m_loginData.clear();
+
+	LogInGSSEntry gssData = this->findCurrentGssEntry();
+	if (!gssData.isValid()) {
+		QToolTip::showText(this->mapToGlobal(m_gss->pos()), "Invalid Global Session Service", m_gss, QRect(), 3000);
+		return;
+	}
+
+	if (m_username->text().isEmpty()) {
+		QToolTip::showText(this->mapToGlobal(m_username->pos()), "No username provided", m_username, QRect(), 3000);
+		return;
+	}
+
+	if (m_passwordNew->text().isEmpty()) {
+		QToolTip::showText(this->mapToGlobal(m_passwordNew->pos()), "No password provided", m_passwordNew, QRect(), 3000);
+		return;
+	}
+
+	if (m_passwordNew->text().length() < 4) {
+		QToolTip::showText(this->mapToGlobal(m_passwordNew->pos()), "Password is too short", m_passwordNew, QRect(), 3000);
+		return;
+	}
+
+	if (m_passwordNew->text() != m_passwordConfirm->text()) {
+		QToolTip::showText(this->mapToGlobal(m_passwordConfirm->pos()), "Confirm password does not match the new password", m_passwordConfirm, QRect(), 3000);
+		return;
+	}
+
+	m_logInAttempt++;
+
+	// Run worker
+	this->setControlsEnabled(false);
+
+	m_loginData.setGss(gssData);
+
+	m_state |= LogInStateFlag::WorkerRunning;
+
+	std::thread worker(&LogInDialog::changePasswordWorkerStart, this);
+	worker.detach();
+}
+
 void LogInDialog::slotCancel(void) {
 	this->close(ot::Dialog::Cancel);
 }
 
-void LogInDialog::slotToggleLogInMode(void) {
+void LogInDialog::slotToggleLogInAndRegisterMode(void) {
 	OTAssert(!(m_state & LogInStateFlag::WorkerRunning), "Worker running");
 
 	if (m_state & LogInStateFlag::RegisterMode) {
 		m_logInButton->setHidden(false);
 		m_registerButton->setHidden(true);
-		m_confirmPassword->setHidden(true);
-		m_confirmPasswordLabel->setHidden(true);
-		m_toggleModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToRegister);
+		m_passwordConfirmLabel->setHidden(true);
+		m_passwordConfirm->setHidden(true);
+		m_toggleRegisterModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToRegister);
+		m_toggleChangePasswordModeLabel->setHidden(false);
 		m_state &= (~LogInStateFlag::RegisterMode);
 	}
 	else {
 		m_logInButton->setHidden(true);
 		m_registerButton->setHidden(false);
-		m_confirmPassword->setHidden(false);
-		m_confirmPasswordLabel->setHidden(false);
-		m_toggleModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToLogIn);
+		m_passwordConfirm->setHidden(false);
+		m_passwordConfirmLabel->setHidden(false);
+		m_toggleRegisterModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToLogIn);
+		m_toggleChangePasswordModeLabel->setHidden(true);
 		m_state |= LogInStateFlag::RegisterMode;
+
+		if (m_state & LogInStateFlag::RestoredPassword) {
+			m_password->blockSignals(true);
+			m_password->setText(QString());
+			m_password->blockSignals(false);
+		}
+	}
+
+	this->update();
+}
+
+void LogInDialog::slotToggleChangePasswordMode(void) {
+	OTAssert(!(m_state & LogInStateFlag::WorkerRunning), "Worker running");
+
+	if (m_state & LogInStateFlag::ChangePasswordMode) {
+		m_logInButton->setHidden(false);
+		m_changePasswordButton->setHidden(true);
+		m_passwordNew->setHidden(true);
+		m_passwordNewLabel->setHidden(true);
+		m_passwordConfirm->setHidden(true);
+		m_passwordConfirmLabel->setHidden(true);
+		m_toggleChangePasswordModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToChangePassword);
+		m_toggleRegisterModeLabel->setHidden(false);
+		m_state &= (~LogInStateFlag::ChangePasswordMode);
+	}
+	else {
+		m_logInButton->setHidden(true);
+		m_changePasswordButton->setHidden(false);
+		m_passwordNew->setHidden(false);
+		m_passwordNewLabel->setHidden(false);
+		m_passwordConfirm->setHidden(false);
+		m_passwordConfirmLabel->setHidden(false);
+		m_toggleChangePasswordModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToLogIn);
+		m_toggleRegisterModeLabel->setHidden(true);
+		m_state |= LogInStateFlag::ChangePasswordMode;
 
 		if (m_state & LogInStateFlag::RestoredPassword) {
 			m_password->blockSignals(true);
@@ -367,9 +474,22 @@ void LogInDialog::slotRegisterSuccess(void) {
 	QMessageBox msgBox(QMessageBox::Information, "Registration", "The account was created successfully.", QMessageBox::Ok);
 	msgBox.exec();
 
-	m_confirmPassword->setText(QString());
+	m_passwordConfirm->setText(QString());
 
-	this->slotToggleLogInMode();
+	this->slotToggleLogInAndRegisterMode();
+	this->setControlsEnabled(true);
+}
+
+void LogInDialog::slotChangePasswordSuccess(void) {
+	m_state &= (~LogInStateFlag::WorkerRunning);
+
+	QMessageBox msgBox(QMessageBox::Information, "Change Password", "The password was updated successfully.", QMessageBox::Ok);
+	msgBox.exec();
+
+	m_passwordNew->setText(QString());
+	m_passwordConfirm->setText(QString());
+	
+	this->slotToggleChangePasswordMode();
 	this->setControlsEnabled(true);
 }
 
@@ -419,6 +539,10 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 
 	case WorkerError::FailedToRegister:
 		msg.append("Account could not be created (maybe the specified user name is already in use).");
+		break;
+
+	case WorkerError::FailedToChangePassword:
+		msg.append("Password update failed (invalid password provided).");
 		break;
 
 	default:
@@ -626,6 +750,36 @@ void LogInDialog::registerWorkerStart(void) {
 	QMetaObject::invokeMethod(this, &LogInDialog::slotRegisterSuccess, Qt::QueuedConnection);
 }
 
+void LogInDialog::changePasswordWorkerStart(void) {
+	WorkerError currentError = WorkerError::NoError;
+
+	// Get data from GSS
+	currentError = this->workerConnectToGSS();
+	if (currentError != WorkerError::NoError) {
+		this->stopWorkerWithError(currentError);
+		return;
+	}
+
+	// Ensure the authorization connection is valid
+	UserManagement userManager;
+	userManager.setAuthServerURL(m_loginData.getAuthorizationUrl());
+	userManager.setDatabaseURL(m_loginData.getDatabaseUrl());
+	if (!userManager.checkConnectionAuthorizationService()) {
+		this->stopWorkerWithError(WorkerError::AuthorizationConnetionFailed);
+		return;
+	}
+
+	currentError = workerChangePassword(userManager);
+	if (currentError != WorkerError::NoError) {
+		this->stopWorkerWithError(currentError);
+		return;
+	}
+
+	m_loginData.clear();
+
+	QMetaObject::invokeMethod(this, &LogInDialog::slotChangePasswordSuccess, Qt::QueuedConnection);
+}
+
 LogInDialog::WorkerError LogInDialog::workerConnectToGSS(void) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetGlobalServicesUrl, doc.GetAllocator()), doc.GetAllocator());
@@ -702,6 +856,17 @@ LogInDialog::WorkerError LogInDialog::workerRegister(const UserManagement& _user
 	if (!_userManager.addUser(m_username->text().toStdString(), m_password->text().toStdString()))
 	{
 		return WorkerError::FailedToRegister;
+	}
+	else
+	{
+		return WorkerError::NoError;
+	}
+}
+
+LogInDialog::WorkerError LogInDialog::workerChangePassword(const UserManagement& _userManager) {
+	if (true) //!_userManager.addUser(m_username->text().toStdString(), m_password->text().toStdString()))
+	{
+		return WorkerError::FailedToChangePassword;
 	}
 	else
 	{

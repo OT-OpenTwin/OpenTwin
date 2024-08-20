@@ -2150,6 +2150,10 @@ QAbstractView:selected {
     color: rgba(0,215,255,255);
 }
 
+#LogInDialogChangePasswordLabel:hover {
+    color: rgba(0,215,255,255);
+}
+
 #LogInDialogImageView {
     background: rgb(2, 41, 92);
 }
