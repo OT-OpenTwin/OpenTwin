@@ -63,9 +63,9 @@ namespace DataStorageAPI
 			try
 			{
 				auto result = mongoCollection.insert_one(jsonInsertValue);
-				if (result)
+				if (result.has_value())
 				{
-					auto id = result.get().inserted_id();
+					auto id = result.value().inserted_id();
 					return id.get_oid().value.to_string();
 				}
 

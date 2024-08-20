@@ -14,6 +14,7 @@
 
 // std header
 #include <fstream>
+#include <algorithm>
 
 namespace ot {
 	namespace intern {

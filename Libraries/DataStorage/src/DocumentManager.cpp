@@ -11,6 +11,7 @@
 #include "../include/GridFSFeature.h"
 //#include <FTPClient.h>
 #include <map>
+#include <cassert>
 #include <filesystem>
 #include "bsoncxx/json.hpp"
 
@@ -367,8 +368,8 @@ namespace DataStorageAPI
 			{
 				auto docValue = *systemResult.getBsonResult();
 				auto docView = docValue.view();
-
-				fs::path filePath(docView["NetworkPath"].get_utf8().value.to_string());
+				const std::string path (docView["NetworkPath"].get_utf8().value.data());
+				fs::path filePath(path);
 				filePath /= relativePath;
 				return filePath.string();
 			}
@@ -410,8 +411,8 @@ namespace DataStorageAPI
 		{
 			auto docValue = *result.getBsonResult();
 			auto docView = docValue.view();			
-			auto docStoragePath = docView["DocStoragePath"].get_utf8().value.to_string();
-			auto networkPath = docView["NetworkPath"].get_utf8().value.to_string();
+			const std::string docStoragePath(docView["DocStoragePath"].get_utf8().value.data());
+			const std::string networkPath(docView["NetworkPath"].get_utf8().value.data());
 
 			UniqueFileName unique;
 			path = unique.GetUniqueFilePathUsingDirectory(docStoragePath);
@@ -444,8 +445,8 @@ namespace DataStorageAPI
 		{
 			auto docValue = *result.getBsonResult();
 			auto docView = docValue.view();
-			auto docStoragePath = docView["DocStoragePath"].get_utf8().value.to_string();
-			auto networkPath = docView["NetworkPath"].get_utf8().value.to_string();
+			const std::string docStoragePath(docView["DocStoragePath"].get_utf8().value.data());
+			const std::string networkPath(docView["NetworkPath"].get_utf8().value.data());
 
 			UniqueFileName unique;
 			path = unique.GetUniqueFilePathUsingDirectory(docStoragePath, fileExtension);

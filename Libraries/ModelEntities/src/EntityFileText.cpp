@@ -71,7 +71,7 @@ void EntityFileText::readSpecificDataFromDataBase(bsoncxx::document::view& doc_v
 {
 	EntityFile::readSpecificDataFromDataBase(doc_view,entityMap);
 	
-	std::string encodingStr = doc_view["TextEncoding"].get_utf8().value.to_string();
+	const std::string encodingStr(doc_view["TextEncoding"].get_utf8().value.data());
 	ot::TextEncoding encoding;
 	_encoding =	encoding.getType(encodingStr);
 }

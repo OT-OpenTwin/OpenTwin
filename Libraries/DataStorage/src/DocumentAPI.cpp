@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cassert>
 
 #include "..\include\DocumentAPI.h"
 #include "..\include\Document\DocumentManager.h"
@@ -123,7 +124,7 @@ namespace DataStorageAPI
 			mongocxx::options::gridfs::upload options{};
 
 			//LOGIC TO FIT THE ELEMENTS IN METADATA DOCUMENT IN ASCENDING ORDER
-			std::vector<boost::string_view> insertedKeys = this->insertElementsToMetadata(docView, metaDoc);
+			std::vector<std::string_view> insertedKeys = this->insertElementsToMetadata(docView, metaDoc);
 
 			const uint8_t *buffer = reinterpret_cast<const uint8_t *>(docView.data());
 			size_t size = docView.length();
@@ -177,17 +178,17 @@ namespace DataStorageAPI
 			throw e;
 		}
 	}
-	std::vector<boost::string_view> DocumentAPI::insertElementsToMetadata(bsoncxx::document::view docView, Document & metaDoc)
+	std::vector<std::string_view> DocumentAPI::insertElementsToMetadata(bsoncxx::document::view docView, Document & metaDoc)
 	{
-		std::set<std::pair<size_t, boost::string_view>> elemKeyValues;
-		std::vector<boost::string_view> insertedKeys;
+		std::set<std::pair<size_t, std::string_view>> elemKeyValues;
+		std::vector<std::string_view> insertedKeys;
 		size_t sizeOfMetadata = 0;
 		for (bsoncxx::document::element element : docView) {
 				sizeOfMetadata += (element.keylen() + 16 + 7);
 				elemKeyValues.emplace(this->getSizeOfElement(element), element.key());
 		}
 
-		boost::string_view lastInsertedKey;
+		std::string_view lastInsertedKey;
 		for (auto const &keyValue : elemKeyValues) {
 			bsoncxx::document::element tempElem = docView.find(keyValue.second).operator*();
 			if ((metaDoc.view().length() + keyValue.first - 16 + sizeOfMetadata) < DocumentManager::MaxDocumentLength) {

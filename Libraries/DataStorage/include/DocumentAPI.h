@@ -6,6 +6,7 @@
 #include <set>
 #include <bsoncxx/types/value.hpp>
 #include "bsoncxx/builder/basic/document.hpp"
+#include "bsoncxx/stdx/string_view.hpp"
 #include <string>
 
 using bsoncxx::types::value;
@@ -34,7 +35,7 @@ namespace DataStorageAPI
 		__declspec(dllexport) value InsertDocumentPathToDatabase(std::string filePath, std::string fileName);
 		__declspec(dllexport) std::string GetDocumentPathFromDatabase(value id);*/
 	private:
-		__declspec(dllexport) std::vector<boost::string_view> insertElementsToMetadata(bsoncxx::document::view docView, Document &metaDoc);
+		__declspec(dllexport) std::vector<std::string_view> insertElementsToMetadata(bsoncxx::document::view docView, Document &metaDoc);
 		__declspec(dllexport) size_t getSizeOfElement(bsoncxx::document::element element);
 	};
 };

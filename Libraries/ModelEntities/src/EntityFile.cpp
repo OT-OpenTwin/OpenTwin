@@ -117,9 +117,9 @@ void EntityFile::AddStorageData(bsoncxx::builder::basic::document & storage)
 void EntityFile::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
-	_fileName = doc_view["FileName"].get_utf8().value.to_string();
-	_path = doc_view["FilePath"].get_utf8().value.to_string();
-	_fileType = doc_view["FileType"].get_utf8().value.to_string();
+	_fileName = std::string(doc_view["FileName"].get_utf8().value.data());
+	_path = std::string(doc_view["FilePath"].get_utf8().value.data());
+	_fileType = std::string(doc_view["FileType"].get_utf8().value.data());
 	_dataUID = doc_view["DataUID"].get_int64();
 	_dataVersion = doc_view["DataVersionID"].get_int64();
 }

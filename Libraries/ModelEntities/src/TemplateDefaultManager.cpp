@@ -200,7 +200,7 @@ void TemplateDefaultManager::loadDefaults(const std::string &category)
 
 			if (value.type != DefaultValue::UNDEFINED)
 			{
-				categoryDefaults[elem.key().to_string()] = value;
+				categoryDefaults[std::string(elem.key().data())] = value;
 			}
 		}
 		catch (std::exception)
@@ -432,7 +432,7 @@ std::string TemplateDefaultManager::loadDefaultMaterials(void)
 
 					if (value.type != DefaultValue::UNDEFINED)
 					{
-						materialDefaults[elem.key().to_string()] = value;
+						materialDefaults[std::string(elem.key().data())] = value;
 					}
 				}
 				catch (std::exception)

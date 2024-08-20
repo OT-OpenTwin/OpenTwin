@@ -99,42 +99,41 @@ namespace MongoProjectFunctions
 
 		auto optional = projectDataCollection.find_one(filter.view());
 
-		Project tmpProject{};
-
-		if (!optional)
+		
+		if (!optional.has_value())
 		{
-			return tmpProject;
+			return Project();
 		}
 
-		value projectValue = optional.get();
-
+		value projectValue = optional.value();
+		Project tmpProject(projectValue.view(), userClient);
 		tmpProject._id = projectValue.view()["_id"].get_oid().value;
-		tmpProject.name = projectValue.view()["project_name"].get_utf8().value.to_string();
+		tmpProject.name = std::string(projectValue.view()["project_name"].get_utf8().value.data());
 
 		try
 		{
-			tmpProject.type = projectValue.view()["project_type"].get_utf8().value.to_string();
+			tmpProject.type = std::string(projectValue.view()["project_type"].get_utf8().value.data());
 		}
 		catch (std::exception)
 		{
 			tmpProject.type = "Development"; // Earlier projects do not have a project type
 		}
 
-		tmpProject.roleName = projectValue.view()["project_role_name"].get_utf8().value.to_string();
-		tmpProject.collectionName = projectValue.view()["collection_name"].get_utf8().value.to_string();
+		tmpProject.roleName = std::string(projectValue.view()["project_role_name"].get_utf8().value.data());
+		tmpProject.collectionName = std::string(projectValue.view()["collection_name"].get_utf8().value.data());
 		tmpProject.createdOn = projectValue.view()["created_on"].get_date();
 		tmpProject.lastAccessedOn = projectValue.view()["last_accessed_on"].get_date();
 		tmpProject.version = projectValue.view()["version"].get_int32().value;
 
-		std::string userId = projectValue.view()["created_by"].get_utf8().value.to_string();
+		std::string userId(projectValue.view()["created_by"].get_utf8().value.data());
 
 		tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(userId, userClient);
 
 		auto groupsArr = projectValue.view()["groups"].get_array().value;
 
-		for (auto groupId : groupsArr)
+		for (const auto& groupId : groupsArr)
 		{
-			std::string id = groupId.get_utf8().value.to_string();
+			const std::string id = std::string(groupId.get_utf8().value.data());
 
 			Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
 
@@ -160,37 +159,37 @@ namespace MongoProjectFunctions
 			throw std::runtime_error("Project was not found");
 		}
 
-		value projectValue = optional.get();
+		value projectValue = optional.value();
 
 		Project tmpProject{};
 
 		tmpProject._id = projectValue.view()["_id"].get_oid().value;
-		tmpProject.name = projectValue.view()["project_name"].get_utf8().value.to_string();
+		tmpProject.name = std::string(projectValue.view()["project_name"].get_utf8().value.data());
 
 		try
 		{
-			tmpProject.type = projectValue.view()["project_type"].get_utf8().value.to_string();
+			tmpProject.type = std::string(projectValue.view()["project_type"].get_utf8().value.data());
 		}
 		catch (std::exception)
 		{
 			tmpProject.type = "Development"; // Earlier projects do not have a project type
 		}
 
-		tmpProject.roleName = projectValue.view()["project_role_name"].get_utf8().value.to_string();
-		tmpProject.collectionName = projectValue.view()["collection_name"].get_utf8().value.to_string();
+		tmpProject.roleName = std::string(projectValue.view()["project_role_name"].get_utf8().value.data());
+		tmpProject.collectionName = std::string(projectValue.view()["collection_name"].get_utf8().value.data());
 		tmpProject.createdOn = projectValue.view()["created_on"].get_date();
 		tmpProject.lastAccessedOn = projectValue.view()["last_accessed_on"].get_date();
 		tmpProject.version = projectValue.view()["version"].get_int32(); // TODO: CHECK THIS 
 
-		std::string userId = projectValue.view()["created_by"].get_utf8().value.to_string();
+		std::string userId = std::string(projectValue.view()["created_by"].get_utf8().value.data());
 
 		tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(userId, userClient);
 
 		auto groupsArr = projectValue.view()["groups"].get_array().value;
 
-		for (auto groupId : groupsArr)
+		for (const auto& groupId : groupsArr)
 		{
-			std::string id = groupId.get_utf8().value.to_string();
+			std::string id = std::string(groupId.get_utf8().value.data());
 
 			Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
 
@@ -226,12 +225,12 @@ namespace MongoProjectFunctions
 
 			Project tmpProject{};
 			tmpProject._id = doc["_id"].get_oid().value;
-			tmpProject.name = doc["project_name"].get_utf8().value.to_string();
-			tmpProject.roleName = doc["project_role_name"].get_utf8().value.to_string();
-			tmpProject.collectionName = doc["collection_name"].get_utf8().value.to_string();
+			tmpProject.name = std::string(doc["project_name"].get_utf8().value.data());
+			tmpProject.roleName = std::string(doc["project_role_name"].get_utf8().value.data());
+			tmpProject.collectionName = std::string(doc["collection_name"].get_utf8().value.data());
 			tmpProject.createdOn = doc["created_on"].get_date();
 
-			std::string creatingUserId = doc["created_by"].get_utf8().value.to_string();
+			std::string creatingUserId(doc["created_by"].get_utf8().value.data());
 
 			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(creatingUserId, adminClient);
 
@@ -305,19 +304,19 @@ namespace MongoProjectFunctions
 
 			Project tmpProject{};
 			tmpProject._id = doc["_id"].get_oid().value;
-			tmpProject.name = doc["project_name"].get_utf8().value.to_string();
-			tmpProject.roleName = doc["project_role_name"].get_utf8().value.to_string();
-			tmpProject.collectionName = doc["collection_name"].get_utf8().value.to_string();
+			tmpProject.name = std::string(doc["project_name"].get_utf8().value.data());
+			tmpProject.roleName = std::string(doc["project_role_name"].get_utf8().value.data());
+			tmpProject.collectionName = std::string(doc["collection_name"].get_utf8().value.data());
 			tmpProject.createdOn = doc["created_on"].get_date();
 
-			auto creatingUserId = doc["created_by"].get_utf8().value.to_string();
+			const std::string creatingUserId = std::string(doc["created_by"].get_utf8().value.data());
 			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient);
 
 			auto groupsArr = doc["groups"].get_array().value;
 
-			for (auto groupId : groupsArr)
+			for (const auto& groupId : groupsArr)
 			{
-				std::string id = groupId.get_utf8().value.to_string();
+				std::string id = std::string(groupId.get_utf8().value.data());
 
 				Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
 
@@ -358,19 +357,19 @@ namespace MongoProjectFunctions
 
 			Project tmpProject{};
 			tmpProject._id = doc["_id"].get_oid().value;
-			tmpProject.name = doc["project_name"].get_utf8().value.to_string();
-			tmpProject.roleName = doc["project_role_name"].get_utf8().value.to_string();
-			tmpProject.collectionName = doc["collection_name"].get_utf8().value.to_string();
+			tmpProject.name = std::string(doc["project_name"].get_utf8().value.data());
+			tmpProject.roleName = std::string(doc["project_role_name"].get_utf8().value.data());
+			tmpProject.collectionName = std::string(doc["collection_name"].get_utf8().value.data());
 			tmpProject.createdOn = doc["created_on"].get_date();
 
-			std::string creatingUserId = doc["created_by"].get_utf8().value.to_string();
+			std::string creatingUserId = std::string(doc["created_by"].get_utf8().value.data());
 			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient);
 
 			auto groupsArr = doc["groups"].get_array().value;
 
-			for (auto groupId : groupsArr)
+			for (const auto& groupId : groupsArr)
 			{
-				std::string id = groupId.get_utf8().value.to_string();
+				std::string id (groupId.get_utf8().value.data());
 
 				Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
 
@@ -380,7 +379,7 @@ namespace MongoProjectFunctions
 			projects.push_back(tmpProject);
 		}
 
-		return std::move(projects);
+		return projects;
 	}
 
 	size_t getAllProjectCount(User& loggedInUser, mongocxx::client& userClient)
@@ -407,33 +406,11 @@ namespace MongoProjectFunctions
 		std::vector<Project> projects{};
 		for (auto doc : cursor)
 		{
-
-			Project tmpProject{};
-			tmpProject._id = doc["_id"].get_oid().value;
-			tmpProject.name = doc["project_name"].get_utf8().value.to_string();
-			tmpProject.roleName = doc["project_role_name"].get_utf8().value.to_string();
-			tmpProject.collectionName = doc["collection_name"].get_utf8().value.to_string();
-			tmpProject.createdOn = doc["created_on"].get_date();
-
-			std::string userId = doc["created_by"].get_utf8().value.to_string();
-
-			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(userId, userClient);
-
-			auto groupsArr = doc["groups"].get_array().value;
-
-			for (auto groupId : groupsArr)
-			{
-				std::string currId = groupId.get_utf8().value.to_string();
-
-				Group currentGroup = MongoGroupFunctions::getGroupDataById(currId, userClient);
-
-				tmpProject.groups.push_back(currentGroup);
-			}
-
-			projects.push_back(std::move(tmpProject));
+			Project newProject(doc, userClient);
+			projects.push_back(std::move(newProject));
 		}
 
-		return std::move(projects);
+		return projects;
 	}
 
 	Project changeProjectName(Project& project, std::string newName, mongocxx::client& adminClient)
@@ -453,8 +430,13 @@ namespace MongoProjectFunctions
 			<< finalize;
 
 		auto result = projectsCollection.update_one(filter.view(), update.view());
-		int32_t matchedCount = result.get().matched_count();
-		int32_t modifiedCount = result.get().modified_count();
+
+		if (!result.has_value())
+		{
+			throw std::exception("Change project name failed.");
+		}
+		int32_t matchedCount = result.value().matched_count();
+		int32_t modifiedCount = result.value().modified_count();
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
@@ -482,8 +464,13 @@ namespace MongoProjectFunctions
 			<< finalize;
 
 		auto result = projectsCollection.update_one(filter.view(), update.view());
-		int32_t matchedCount = result.get().matched_count();
-		int32_t modifiedCount = result.get().modified_count();
+		if (!result.has_value())
+		{
+			throw std::exception("Change project owner failed.");
+		}
+
+		int32_t matchedCount = result.value().matched_count();
+		int32_t modifiedCount = result.value().modified_count();
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
@@ -530,8 +517,13 @@ namespace MongoProjectFunctions
 
 		auto result = projectCollection.update_one(filter.view(), change.view());
 
-		int32_t matchedCount = result.get().matched_count();
-		int32_t modifiedCount = result.get().modified_count();
+		if (!result.has_value())
+		{
+			throw std::exception("Add group to project failed.");
+		}
+
+		int32_t matchedCount = result.value().matched_count();
+		int32_t modifiedCount = result.value().modified_count();
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
@@ -581,8 +573,13 @@ namespace MongoProjectFunctions
 
 		auto result = projectCollection.update_one(filter.view(), change.view());
 
-		int32_t matchedCount = result.get().matched_count();
-		int32_t modifiedCount = result.get().modified_count();
+		if (!result.has_value())
+		{
+			throw std::exception("Remove role from group role failed.");
+		}
+
+		int32_t matchedCount = result.value().matched_count();
+		int32_t modifiedCount = result.value().modified_count();
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
@@ -619,8 +616,11 @@ namespace MongoProjectFunctions
 
 		auto result = projectsCollection.delete_one(filter.view());
 
-
-		if (result.get().deleted_count() == 1)
+		if (!result.has_value())
+		{
+			throw std::exception("Remove project failed.");
+		}
+		if (result.value().deleted_count() == 1)
 		{
 			return true;
 		}
@@ -655,8 +655,14 @@ namespace MongoProjectFunctions
 
 
 		auto result = projectsCollection.update_one(filter.view(), update.view());
-		int32_t matchedCount = result.get().matched_count();
-		int32_t modifiedCount = result.get().modified_count();
+
+		if (!result.has_value())
+		{
+			throw std::exception("Change project creator failed.");
+		}
+
+		int32_t matchedCount = result.value().matched_count();
+		int32_t modifiedCount = result.value().modified_count();
 
 
 		if (matchedCount == 1 && modifiedCount == 1)

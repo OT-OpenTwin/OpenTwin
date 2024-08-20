@@ -33,7 +33,7 @@ namespace DataStorageAPI
 
 	std::string BsonValuesHelper::getStringFromBsonValue(value value)
 	{
-		return value.get_utf8().value.to_string();
+		return std::string(value.get_utf8().value.data());
 	}
 
 	value BsonValuesHelper::getBoolValue(bool value)

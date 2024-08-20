@@ -118,7 +118,8 @@ namespace MongoGroupFunctions
 		std::vector<Group> groups{};
 		for (auto doc : cursor)
 		{
-			Group tmpGroup = getGroupDataByName(doc["group_name"].get_utf8().value.to_string(), adminClient);
+			const std::string groupName(doc["group_name"].get_utf8().value.data());
+			Group tmpGroup = getGroupDataByName(groupName, adminClient);
 			groups.push_back(tmpGroup);
 		}
 
@@ -137,7 +138,8 @@ namespace MongoGroupFunctions
 		std::vector<Group> groups{};
 		for (auto doc : cursor)
 		{
-			Group tmpGroup = getGroupDataByName(doc["group_name"].get_utf8().value.to_string(), adminClient);
+			const std::string groupName(doc["group_name"].get_utf8().value.data());
+			Group tmpGroup = getGroupDataByName(groupName, adminClient);
 			groups.push_back(tmpGroup);
 		}
 
@@ -166,28 +168,28 @@ namespace MongoGroupFunctions
 
 		auto groupOptional = groupsCollection.find_one(find_group_query.view());
 
-		if (!groupOptional)
+		if (!groupOptional.has_value())
 		{
 			throw std::runtime_error("Group not found");
 		}
 
-		auto groupValue = groupOptional.get();
+		auto groupValue = groupOptional.value();
 
 		Group gr{};
 
-		gr.id = groupValue.view()["group_id"].get_utf8().value.to_string();
-		gr.name = groupValue.view()["group_name"].get_utf8().value.to_string();
-		gr.roleName = groupValue.view()["group_role_name"].get_utf8().value.to_string();
-		gr.ownerUserId = groupValue.view()["owner_user_id"].get_utf8().value.to_string();
+		gr.id = std::string(groupValue.view()["group_id"].get_utf8().value.data());
+		gr.name = std::string(groupValue.view()["group_name"].get_utf8().value.data());
+		gr.roleName = std::string(groupValue.view()["group_role_name"].get_utf8().value.data());
+		gr.ownerUserId = std::string(groupValue.view()["owner_user_id"].get_utf8().value.data());
 
 		User ownerUser = MongoUserFunctions::getUserDataThroughId(gr.ownerUserId, adminClient);
 		gr.ownerUsername = ownerUser.username;
 
 		auto userIdArr = groupValue.view()["users"].get_array().value;
 
-		for (auto idEl : userIdArr)
+		for (const auto& idEl : userIdArr)
 		{
-			std::string currentId = idEl.get_utf8().value.to_string();
+			std::string currentId(idEl.get_utf8().value.data());
 
 			User currentUser = MongoUserFunctions::getUserDataThroughId(currentId, adminClient);
 			gr.users.push_back(currentUser);
@@ -208,28 +210,28 @@ namespace MongoGroupFunctions
 
 		auto groupOptional = groupsCollection.find_one(find_group_query.view());
 
-		if (!groupOptional)
+		if (!groupOptional.has_value())
 		{
 			throw std::runtime_error("Group not found");
 		}
 
-		auto groupValue = groupOptional.get();
+		auto groupValue = groupOptional.value();
 
 		Group gr{};
 
-		gr.id = groupValue.view()["group_id"].get_utf8().value.to_string();
-		gr.name = groupValue.view()["group_name"].get_utf8().value.to_string();
-		gr.roleName = groupValue.view()["group_role_name"].get_utf8().value.to_string();
-		gr.ownerUserId = groupValue.view()["owner_user_id"].get_utf8().value.to_string();
+		gr.id = std::string(groupValue.view()["group_id"].get_utf8().value.data());
+		gr.name = std::string(groupValue.view()["group_name"].get_utf8().value.data());
+		gr.roleName = std::string(groupValue.view()["group_role_name"].get_utf8().value.data());
+		gr.ownerUserId = std::string(groupValue.view()["owner_user_id"].get_utf8().value.data());
 
 		User ownerUser = MongoUserFunctions::getUserDataThroughId(gr.ownerUserId, adminClient);
 		gr.ownerUsername = ownerUser.username;
 
 		auto userIdArr = groupValue.view()["users"].get_array().value;
 
-		for (auto idEl : userIdArr)
+		for (const auto& idEl : userIdArr)
 		{
-			std::string currentId = idEl.get_utf8().value.to_string();
+			std::string currentId(idEl.get_utf8().value.data());
 
 			User currentUser = MongoUserFunctions::getUserDataThroughId(currentId, adminClient);
 			gr.users.push_back(currentUser);
@@ -256,9 +258,12 @@ namespace MongoGroupFunctions
 			.collection(MongoConstants::GROUPS_COLLECTION);
 
 		auto result = groupCollection.update_one(filter.view(), changes.view());
-
-		int32_t matchedCount = result.get().matched_count();
-		int32_t modifiedCount = result.get().modified_count();
+		if (!result.has_value())
+		{
+			throw std::exception("Group change failed.");
+		}
+		int32_t matchedCount = result.value().matched_count();
+		int32_t modifiedCount = result.value().modified_count();
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
@@ -285,8 +290,12 @@ namespace MongoGroupFunctions
 			<< finalize;
 
 		auto result = groupsCollection.update_one(filter.view(), update.view());
-		int32_t matchedCount = result.get().matched_count();
-		int32_t modifiedCount = result.get().modified_count();
+		if (!result.has_value())
+		{
+			throw std::exception("Changing group owner failed.");
+		}
+		int32_t matchedCount = result.value().matched_count();
+		int32_t modifiedCount = result.value().modified_count();
 
 		bool isUserAlreadyInArray = (std::find(group.userNames.begin(), group.userNames.end(), newOwner.username) != group.userNames.end());
 
@@ -300,9 +309,12 @@ namespace MongoGroupFunctions
 				<< finalize;
 
 			result = groupsCollection.update_one(filter.view(), insertUserInArrayUpdate.view());
-
-			matchedCount += result.get().matched_count();
-			modifiedCount += result.get().modified_count();
+			if (!result.has_value())
+			{
+				throw std::exception("Changing group owner failed.");
+			}
+			matchedCount += result.value().matched_count();
+			modifiedCount += result.value().modified_count();
 		}
 		else
 		{
@@ -350,7 +362,12 @@ namespace MongoGroupFunctions
 		{
 			auto result = groupsCollection.update_one(find_group_query.view(), add_user_to_group_query.view());
 
-			if (result.get().matched_count() == 1 && result.get().modified_count() == 1)
+			if (!result.has_value())
+			{
+				throw std::exception("Add usergroup failed.");
+			}
+
+			if (result.value().matched_count() == 1 && result.value().modified_count() == 1)
 			{
 				return true;
 			}
@@ -387,7 +404,12 @@ namespace MongoGroupFunctions
 
 		auto result = groupsCollection.update_one(find_group_query.view(), remove_user_from_group_query.view());
 
-		if (result.get().matched_count() == 1 && result.get().modified_count() == 1)
+		if (!result.has_value())
+		{
+			throw std::exception("Remove user from group failed.");
+		}
+
+		if (result.value().matched_count() == 1 && result.value().modified_count() == 1)
 		{
 			return true;
 		}
@@ -407,10 +429,14 @@ namespace MongoGroupFunctions
 
 		auto res = groupsCollection.delete_one(query.view());
 
+		if (!res.has_value())
+		{
+			throw std::exception("Remove group failed.");
+		}
 		std::string groupRoleName = groupToBeRemoved.roleName;
 		MongoRoleFunctions::removeRole(groupRoleName, adminClient);
 
-		return res.get().deleted_count() == 1;
+		return res.value().deleted_count() == 1;
 	}
 
 	std::string groupToJson(Group& gr)

@@ -70,7 +70,7 @@ void EntityParameter::readSpecificDataFromDataBase(bsoncxx::document::view &doc_
 
 		for (unsigned long index = 0; index < nDependencies; index++)
 		{
-			addDependency(iUID->get_int64(), iProperty->get_utf8().value.to_string());
+			addDependency(iUID->get_int64(), std::string(iProperty->get_utf8().value.data()));
 
 			iUID++;
 			iProperty++;
