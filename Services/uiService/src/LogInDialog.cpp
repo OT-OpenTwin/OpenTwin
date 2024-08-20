@@ -164,17 +164,20 @@ LogInDialog::LogInDialog()
 	this->connect(m_toggleChangePasswordModeLabel, &Label::mousePressed, this, &LogInDialog::slotToggleChangePasswordMode);
 
 	// Setup window
+	QRect newTargetRect(this->calculateCenterOnParentPos(nullptr), QSize(350, 500));
+
 	this->setObjectName("LogInDialog");
 	this->setWindowTitle("OpenTwin Login");
 	this->setWindowFlags(Qt::Dialog | Qt::WindowType::FramelessWindowHint);
 	this->setWindowIcon(ot::IconManager::getApplicationIcon());
-	this->setFixedSize(350, 500);
+	this->setFixedSize(newTargetRect.size());
 	this->setDialogFlag(ot::DialogCfg::MoveGrabAnywhere);
 	this->setDialogFlag(ot::DialogCfg::RecenterOnF11);
-	QPoint topLeftPos = this->calculateCenterOnParentPos(nullptr);
+	QPoint topLeftPos = newTargetRect.topLeft();
 	topLeftPos.setX(settings->value("LogInPos.X", topLeftPos.x()).toInt());
 	topLeftPos.setY(settings->value("LogInPos.Y", topLeftPos.y()).toInt());
-	this->move(topLeftPos);
+	newTargetRect.moveTo(topLeftPos);
+	this->move(ot::fitOnScreen(newTargetRect).topLeft());
 
 	// Connect signals
 	this->connect(m_logInButton, &PushButton::clicked, this, &LogInDialog::slotLogIn);

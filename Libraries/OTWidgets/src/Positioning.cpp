@@ -7,6 +7,10 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/Positioning.h"
 
+// Qt header
+#include <QtGui/qscreen.h>
+#include <QtGui/qguiapplication.h>
+
 QRect ot::calculateChildRect(const QRect& _parentRect, const QSize& _childSize, ot::Alignment _childAlignment) {
 	// Get the top left point of the outer rectangle
 	QPoint pt(_parentRect.topLeft());
@@ -95,4 +99,65 @@ QRectF ot::calculateChildRect(const QRectF& _parentRect, const QSizeF& _childSiz
 	}
 
 	return QRectF(pt, _childSize);
+}
+
+QRect ot::fitOnScreen(const QRect& _sourceRect, bool _primaryScreenOnly) {
+	// Get the screen at the initial position of the rect
+	QScreen* screen = nullptr;
+
+	if (_primaryScreenOnly) {
+		screen = QGuiApplication::primaryScreen();
+	}
+	else {
+		double closestDistance = DBL_MAX;
+		for (QScreen* s : QGuiApplication::screens()) {
+			double distanceLeft = _sourceRect.left() - s->geometry().right();
+			double distanceRight = _sourceRect.right() - s->geometry().left();
+			double distanceTop = _sourceRect.top() - s->geometry().bottom();
+			double distanceBottom = _sourceRect.bottom() - s->geometry().top();
+
+			if (distanceLeft < 0.) distanceLeft *= (-1);
+			if (distanceRight < 0.) distanceRight *= (-1);
+			if (distanceTop < 0.) distanceTop *= (-1);
+			if (distanceBottom < 0.) distanceBottom *= (-1);
+
+			double distance = std::min({ distanceLeft, distanceRight, distanceTop, distanceBottom });
+			if (distance < closestDistance) {
+				closestDistance = distance;
+				screen = s;
+			}
+		}
+	}
+
+	if (!screen) {
+		OT_LOG_E("No target screen found");
+		return _sourceRect;
+	}
+
+	QRect screenGeometry = screen->availableGeometry();
+
+	// Adjust the rectangle to fit within the screen geometry
+	QRect fittedRect = _sourceRect;
+
+	if (fittedRect.width() > screenGeometry.width() || fittedRect.height() > screenGeometry.height()) {
+		// Fitted rect is bigger than screen
+		return fittedRect;
+	}
+
+	// Ensure the rectangle fits within the screen horizontally
+	if (fittedRect.left() < screenGeometry.left()) {
+		fittedRect.moveLeft(screenGeometry.left());
+	}
+	if (fittedRect.right() > screenGeometry.right()) {
+		fittedRect.moveRight(screenGeometry.right());
+	}
+
+	// Ensure the rectangle fits within the screen vertically
+	if (fittedRect.top() < screenGeometry.top()) {
+		fittedRect.moveTop(screenGeometry.top());
+	}
+	if (fittedRect.bottom() > screenGeometry.bottom()) {
+		fittedRect.moveBottom(screenGeometry.bottom());
+	}
+	return fittedRect;
 }

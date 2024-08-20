@@ -26,4 +26,10 @@ namespace ot {
 	//! \param _childAlignment Child alignment.
 	OT_WIDGETS_API_EXPORT QRectF calculateChildRect(const QRectF& _parentRect, const QSizeF& _childSize, ot::Alignment _childAlignment);
 
+	//! \brief Fits the provided rect on the screen.
+	//! If the source rect is bigger than the screen size the source rect will be returned.
+	//! \param _sourceRect Initial rect.
+	//! \param _primaryScreenOnly If true the source rect will be fitted onto the primary screen only, otherwise on any screen.
+	OT_WIDGETS_API_EXPORT QRect fitOnScreen(const QRect& _sourceRect, bool _primaryScreenOnly = false);
+
 }
