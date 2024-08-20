@@ -40,7 +40,6 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
-	
 	// Here i want to add the items to the corresponding editor
 
 
@@ -294,6 +293,25 @@ void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<Ent
 	EntityBlockCircuitVoltageSource* CircuitElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
 	if (CircuitElement != nullptr) {
 		CircuitElement->createProperties();
+		//std::string element = Application::instance()->extractStringAfterDelimiter(CircuitElement->, '/', 2);
+
+		//if (element.find("Voltage Source") == 0) // Überprüfen, ob der String mit "Voltage Source" beginnt
+		//{
+		//	if (element == "Voltage Source")
+		//	{
+		//		element = "V1";
+		//	}
+		//	else
+		//	{
+
+		//		std::string suffix = element.substr(15);
+		//		int number = std::stoi(suffix);
+		//		element = "V" + std::to_string(number + 1);
+		//	}
+		//}
+		//auto propertyBase = blockEntity->getProperties().getProperty("Name");
+		//auto propertyName = dynamic_cast<EntityPropertiesString*>(propertyBase);
+		//propertyName->setValue(element);
 	}
 
 	EntityBlockCircuitResistor* resistor = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());

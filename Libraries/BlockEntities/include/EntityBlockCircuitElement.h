@@ -8,7 +8,7 @@ public:
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
 	virtual void createProperties() = 0;
 
-
+	const std::string& getName();
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() = 0;
 
 

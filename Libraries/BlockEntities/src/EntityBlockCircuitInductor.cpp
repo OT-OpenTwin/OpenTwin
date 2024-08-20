@@ -76,8 +76,9 @@ ot::GraphicsItemCfg* EntityBlockCircuitInductor::CreateBlockCfg()
 	newConfig->setName("EntityBlockCircuitInductor");
 	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState);
 	newConfig->setFile("Circuit/Inductor.ot.json");
-	newConfig->addStringMapEntry("Name", "I1");
-	//newConfig->setTransform(ot::Transform(90., ot::Transform::FlipHorizontally));
+
+	std::string name = getName();
+	newConfig->addStringMapEntry("Name", name);
 
 	//Map of String to Enum
 	std::map<std::string, ot::Transform::FlipState> stringFlipMap;

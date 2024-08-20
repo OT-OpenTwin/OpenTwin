@@ -402,9 +402,10 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageSource::CreateBlockCfg()
 	newConfig->setName("EntityBlockCircuitVoltageSource");
 	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState);
 	newConfig->setFile("Circuit/VoltageSource.ot.json");
-	newConfig->addStringMapEntry("Name", "V1");
-	
 
+	std::string name = getName();
+	newConfig->addStringMapEntry("Name", name);
+	
 	//Map of String to Enum
 	std::map<std::string, ot::Transform::FlipState> stringFlipMap;
 	stringFlipMap.insert_or_assign("NoFlip", ot::Transform::NoFlip);
@@ -412,7 +413,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageSource::CreateBlockCfg()
 	stringFlipMap.insert_or_assign("FlipHorizontally", ot::Transform::FlipHorizontally);
 	
 
-
+	
 	double rotation = getRotation();
 	std::string flip = getFlip();
 	ot::Transform::FlipState flipState(stringFlipMap[flip]);

@@ -75,7 +75,10 @@ ot::GraphicsItemCfg* EntityBlockCircuitCapacitor::CreateBlockCfg()
 	newConfig->setName("EntityBlockCircuitCapacitor");
 	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState);
 	newConfig->setFile("Circuit/Capacitor.ot.json");
-	newConfig->addStringMapEntry("Name", "C1");
+
+	std::string name = getName();
+	newConfig->addStringMapEntry("Name", name);
+	
 	
 
 	//Map of String to Enum

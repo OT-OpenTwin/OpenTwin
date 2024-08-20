@@ -76,8 +76,9 @@ ot::GraphicsItemCfg* EntityBlockCircuitDiode::CreateBlockCfg()
 	newConfig->setName("EntityBlockCircuitDiode");
 	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState);
 	newConfig->setFile("Circuit/Diode.ot.json");
-	newConfig->addStringMapEntry("Name", "D1");
-	//newConfig->setTransform(ot::Transform(90., ot::Transform::FlipHorizontally));
+	
+	std::string name = getName();
+	newConfig->addStringMapEntry("Name", name);
 
 	//Map of String to Enum
 	std::map<std::string, ot::Transform::FlipState> stringFlipMap;
