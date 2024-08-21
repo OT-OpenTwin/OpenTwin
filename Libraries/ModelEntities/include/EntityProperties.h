@@ -23,10 +23,10 @@ public:
 
 	bool createProperty(EntityPropertiesBase *property, const std::string &group);
 	bool updateProperty(EntityPropertiesBase *property, const std::string &group);
-	bool deleteProperty(const std::string &name);
-	bool propertyExists(const std::string &name);
+	bool deleteProperty(const std::string &_name, const std::string& _groupName = "");
+	bool propertyExists(const std::string &_name, const std::string& _groupName = "");
 
-	EntityPropertiesBase *getProperty(const std::string &name);
+	EntityPropertiesBase *getProperty(const std::string &_name, const std::string& _groupName = "");
 
 	void setNeedsUpdate(void) { needsUpdate = true; };
 	bool anyPropertyNeedsUpdate(void) {return needsUpdate; };
@@ -55,6 +55,8 @@ public:
 
 	std::list<std::string> getListOfPropertiesForGroup(const std::string &group);
 
+	const std::string createKey(const std::string& _name, const std::string& _group);
+	const std::string extractNameFromKey(const std::string& _key);
 private:
 	void deleteAllProperties(void);
 

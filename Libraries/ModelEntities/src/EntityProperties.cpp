@@ -24,10 +24,11 @@ void EntityProperties::merge(EntityProperties& other)
 {
 	for (auto prop : other.propertiesList)
 	{
-		EntityPropertiesBase* property = getProperty(prop->getName());
+		EntityPropertiesBase* property = getProperty(prop->getName(), prop->getGroup());
 		if (property == nullptr)
 		{
-			properties[prop->getName()] = prop;
+			const std::string key = createKey(prop->getName(), prop->getGroup());
+			properties[key] = prop;
 			propertiesList.push_back(prop);
 		}
 	}
@@ -50,13 +51,14 @@ void EntityProperties::deleteAllProperties(void)
 
 bool EntityProperties::createProperty(EntityPropertiesBase *prop, const std::string &group)
 {
-	EntityPropertiesBase *property = getProperty(prop->getName());
+	EntityPropertiesBase *property = getProperty(prop->getName(),group);
 
 	if (property != nullptr) return false; // Creation failed, because item already exits
 
 	prop->setGroup(group);
 	prop->setContainer(this);
-	properties[prop->getName()] = prop;
+	const std::string key = createKey(prop->getName(), group);
+	properties[key] = prop;
 
 	propertiesList.push_back(prop);
 
@@ -65,32 +67,36 @@ bool EntityProperties::createProperty(EntityPropertiesBase *prop, const std::str
 
 bool EntityProperties::updateProperty(EntityPropertiesBase* prop, const std::string& group)
 {
-	EntityPropertiesBase* property = getProperty(prop->getName());
+	EntityPropertiesBase* property = getProperty(prop->getName(), group);
 
 	if (property != nullptr)
 	{
 		propertiesList.remove(property);
-		properties.erase(prop->getName());
+		const std::string key = createKey(prop->getName(), group);
+		properties.erase(key);
 		delete property;
 		property = nullptr;
 	}
 
 	prop->setGroup(group);
 	prop->setContainer(this);
-	properties[prop->getName()] = prop;
+
+	const std::string key = createKey(prop->getName(), group);
+	properties[key] = prop;
 
 	propertiesList.push_back(prop);
 
 	return true;
 }
 
-bool EntityProperties::deleteProperty(const std::string &name)
+bool EntityProperties::deleteProperty(const std::string &_name, const std::string& _groupName)
 {
-	EntityPropertiesBase *property = getProperty(name);
+	EntityPropertiesBase *property = getProperty(_name, _groupName);
 
 	if (property == nullptr) return false; // Delete failed, because item does not exist
 
-	properties.erase(name);
+	const std::string key = createKey(_name, _groupName);
+	properties.erase(key);
 	propertiesList.remove(property);
 
 	delete property;
@@ -99,16 +105,40 @@ bool EntityProperties::deleteProperty(const std::string &name)
 	return true;
 }
 
-EntityPropertiesBase *EntityProperties::getProperty(const std::string &name)
+EntityPropertiesBase *EntityProperties::getProperty(const std::string& _name, const std::string& _groupName)
 {
-	if (properties.count(name) == 0) return nullptr;
-
-	return properties[name];
+	if (_groupName == "")
+	{
+		//Find first of name
+		for (auto property : properties)
+		{
+			const std::string& keyOfCurrentProperty = property.first;
+			const std::string name = extractNameFromKey(keyOfCurrentProperty);
+			if (name == _name)
+			{
+				return properties[keyOfCurrentProperty];
+			}
+		}
+		return nullptr;
+	}
+	else
+	{
+		const std::string key =	createKey(_name, _groupName);
+		if (properties.count(key) == 0)
+		{
+			return nullptr;
+		}
+		else
+		{
+			return properties[key];
+		}
+	}
 }
 
-bool EntityProperties::propertyExists(const std::string &name)
+bool EntityProperties::propertyExists(const std::string &_name, const std::string& _groupName)
 {
-	return (properties.count(name) != 0);
+	EntityPropertiesBase* base =	getProperty(_name, _groupName);
+	return (base != nullptr);
 }
 
 void EntityProperties::checkWhetherUpdateNecessary(void)
@@ -345,13 +375,13 @@ void EntityProperties::checkMatchingProperties(EntityProperties &other)
 	// Here we check whether we have compatible properties to the collection handed over in the argument list.
 	// If a property is not compatible, we remove it from the collection
 
-	std::list<std::string> removeProperties;
+	std::list<std::pair<std::string, std::string>> removeProperties;
 
 	for (std::map<std::string, EntityPropertiesBase *>::const_iterator it = other.properties.begin(); it != other.properties.end(); it++)
 	{
 		EntityPropertiesBase *otherProp = it->second;
 
-		EntityPropertiesBase *myProp = getProperty(otherProp->getName());
+		EntityPropertiesBase *myProp = getProperty(otherProp->getName(), otherProp->getGroup());
 
 		bool compatible = false;
 
@@ -384,13 +414,13 @@ void EntityProperties::checkMatchingProperties(EntityProperties &other)
 			}
 		}
 
-		if (!compatible) removeProperties.push_back(otherProp->getName());
+		if (!compatible) removeProperties.push_back({ otherProp->getName(), otherProp->getGroup() });
 	}
 
 	// Now finally remove the incompatible properties from the other container
 	for (auto prop : removeProperties)
 	{
-		other.deleteProperty(prop);
+		other.deleteProperty(prop.first,prop.second);
 	}
 }
 
@@ -512,5 +542,17 @@ std::list<std::string> EntityProperties::getListOfPropertiesForGroup(const std::
 	}
 
 	return propertyList;
+}
+
+const std::string EntityProperties::createKey(const std::string& _name, const std::string& _group)
+{
+	return _group + "/" + _name;
+}
+
+const std::string EntityProperties::extractNameFromKey(const std::string& _key)
+{
+	size_t posGroupSeperator = _key.find('/');
+	const std::string nameOfKey = _key.substr(posGroupSeperator + 1, _key.size());
+	return nameOfKey;
 }
 
