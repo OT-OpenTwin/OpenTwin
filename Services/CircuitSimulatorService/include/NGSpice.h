@@ -39,7 +39,7 @@ public:
 	void connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
 	bool checkIfElementOrConnectionVisited(std::set<ot::UID>& visitedElements, ot::UID elementUID);
 	Connection createConnection(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,ot::UID connection);
-	bool checkIfConnectionIsConnectedToGND(ot::UID elementUID,std::string pole, ot::UID voltageSource);
+	bool checkIfConnectionIsConnectedToGND(std::string pole);
 	bool checkIfConnectionIsConnectedToVoltageMeter( std::string blockTitle);
 
 	//Callback functions from NGSpice
@@ -59,6 +59,6 @@ private:
 	const std::string m_voltMeterConnection = "voltageMeterConnection";
 	const std::string m_voltageMeterTitle = "Voltage Meter";
 	const std::string m_positivePole = "positivePole";
-	const std::string m_negativePole = "negativePole"; 
+	const std::string m_gndPole = "GNDPole"; 
 
 };

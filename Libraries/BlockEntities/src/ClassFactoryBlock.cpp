@@ -17,7 +17,7 @@
 #include "EntityBlockCircuitCapacitor.h"
 #include "EntityBlockCircuitInductor.h"
 #include "EntityBlockFileWriter.h"
-
+#include "EntityBlockCircuitGND.h"
 
 EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 {
@@ -80,6 +80,10 @@ EntityBase* ClassFactoryBlock::CreateEntity(const std::string& entityType)
 	else if (entityType == "EntityBlockFileWriter")
 	{
 		return new EntityBlockFileWriter(0, nullptr, nullptr, nullptr, this, "");
+	}
+	else if (entityType == "EntityBlockCircuitGND")
+	{
+		return new EntityBlockCircuitGND(0, nullptr, nullptr, nullptr, this, "");
 	}
 
 	return ClassFactoryHandlerAbstract::CreateEntity(entityType);

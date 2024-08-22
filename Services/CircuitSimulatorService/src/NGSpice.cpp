@@ -84,8 +84,8 @@ void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elem
 		// And i dont want to execute the above if Condition so i contructed a counter for this that only for the voltageSource it is relevant
 		
 		if (counter == 1 && elementUID == voltageSource) {
-			if (checkIfConnectionIsConnectedToGND(myConn.getOriginUid(),myConn.getOriginConnectable(),voltageSource) ||
-				checkIfConnectionIsConnectedToGND(myConn.getDestinationUid(), myConn.getDestConnectable(), voltageSource)) {
+			if (checkIfConnectionIsConnectedToGND(myConn.getOriginConnectable()) ||
+				checkIfConnectionIsConnectedToGND(myConn.getDestConnectable())) {
 				continue;
 			}
 		}
@@ -97,8 +97,8 @@ void NGSpice::connectionAlgorithm(int counter,ot::UID voltageSource,ot::UID elem
 		}
 
 		//First i check if the connection is connected to GND If yes then i state it with node number 0 
-		if (checkIfConnectionIsConnectedToGND(myConn.getOriginUid(),myConn.getOriginConnectable(),voltageSource) ||
-			checkIfConnectionIsConnectedToGND(myConn.getDestinationUid(), myConn.getDestConnectable(), voltageSource)) {
+		if (checkIfConnectionIsConnectedToGND(myConn.getOriginConnectable()) ||
+			checkIfConnectionIsConnectedToGND(myConn.getDestConnectable())) {
 
 			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
 			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
@@ -172,9 +172,9 @@ Connection NGSpice::createConnection(std::map<ot::UID, std::shared_ptr<EntityBlo
 	return myConn;
 }
 
-bool NGSpice::checkIfConnectionIsConnectedToGND(ot::UID elementUID,std::string pole, ot::UID voltageSource)
+bool NGSpice::checkIfConnectionIsConnectedToGND(std::string pole)
 {
-	if (elementUID == voltageSource && pole == m_negativePole)
+	if ( pole == m_gndPole)
 	{
 		return true;
 	}

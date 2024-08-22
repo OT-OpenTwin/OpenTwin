@@ -15,8 +15,7 @@ public:
 
 private:
 
-	ot::Connector m_LeftConnector;
-	ot::Connector m_RightConnector;
+
 
 
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;

@@ -50,7 +50,7 @@ std::string EntityBlockCircuitVoltageMeter::getFlip() {
 ot::GraphicsItemCfg* EntityBlockCircuitVoltageMeter::CreateBlockCfg() {
 #if TEST_ITEM_LOADER==true
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
-	newConfig->setName("EntityBlockCircuitInductor");
+	newConfig->setName("EntityBlockCircuitVoltageMeter");
 	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState);
 	newConfig->setFile("Circuit/VoltageMeter.ot.json");
 
