@@ -193,7 +193,6 @@
     <ClCompile Include="src\BlockHandlerDisplay.cpp" />
     <ClCompile Include="src\BlockHandlerFileWriter.cpp" />
     <ClCompile Include="src\BlockHandlerPython.cpp" />
-    <ClCompile Include="src\BufferResultCollectionAccess.cpp" />
     <ClCompile Include="src\Graph.cpp" />
     <ClCompile Include="src\GraphNode.cpp" />
     <ClCompile Include="src\BlockEntityHandler.cpp" />
@@ -218,8 +217,6 @@
     <ClInclude Include="include\BlockHandlerFileWriter.h" />
     <ClInclude Include="include\BlockHandlerPlot1D.h" />
     <ClInclude Include="include\BlockHandlerPython.h" />
-    <ClInclude Include="include\BufferBlockDatabaseAccess.h" />
-    <ClInclude Include="include\BufferResultCollectionAccess.h" />
     <ClInclude Include="include\ExternalDependencies.h" />
     <ClInclude Include="include\Graph.h" />
     <ClInclude Include="include\MeasurementCampaignHandler.h" />

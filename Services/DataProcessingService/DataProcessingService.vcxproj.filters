@@ -22,9 +22,6 @@
     <Filter Include="Source Files\GraphHandling">
       <UniqueIdentifier>{c098a613-e070-4648-b5cf-0856a45e3436}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Buffer">
-      <UniqueIdentifier>{6f7eba01-17fb-4ea8-9fc6-58a19a1fbb3a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\BlockFunctionality">
       <UniqueIdentifier>{031a1c64-1cf3-426f-b9f8-0022d3323f52}</UniqueIdentifier>
     </Filter>
@@ -76,9 +73,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockHandlerPython.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BufferResultCollectionAccess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\BlockHandlerDataDimensionReducer.cpp">
@@ -136,12 +130,6 @@
     </ClInclude>
     <ClInclude Include="include\BlockHandlerPython.h">
       <Filter>Header Files\BlockFunctionality</Filter>
-    </ClInclude>
-    <ClInclude Include="include\BufferBlockDatabaseAccess.h">
-      <Filter>Header Files\Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="include\BufferResultCollectionAccess.h">
-      <Filter>Header Files\Buffer</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockHandlerDataDimensionReducer.h">
       <Filter>Header Files\BlockFunctionality</Filter>

@@ -715,8 +715,12 @@ std::string Application::handleDeleteProperty(ot::JsonDocument& _document) {
 
 	std::list<ot::UID> entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
 	std::string propertyName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityName);
-
-	m_model->deleteProperty(entityIDList, propertyName);
+	std::string groupName = "";
+	if (ot::json::exists(_document, OT_PARAM_GROUP))
+	{
+		groupName = ot::json::getString(_document, OT_PARAM_GROUP);
+	}
+	m_model->deleteProperty(entityIDList, propertyName,groupName);
 
 	return "";
 }

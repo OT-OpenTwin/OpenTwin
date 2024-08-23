@@ -64,7 +64,7 @@ public:
 
 	void addCommonPropertiesToConfig(const std::list<ot::UID> &entityIDList, bool visibleOnly, ot::PropertyGridCfg& _config);
 	void        setPropertiesFromJson(const std::list<ot::UID>& entityIDList, const ot::PropertyGridCfg& _configuration, bool updateEntities, bool itemsVisible);
-	void        deleteProperty(const std::list<ot::UID>& entityIDList, const std::string &propertyName);
+	void        deleteProperty(const std::list<ot::UID>& entityIDList, const std::string &propertyName, const std::string& propertyGroup);
 
 	bool entitiesNeedUpdate(void);
 	void updateEntities(bool itemsVisible);
@@ -263,10 +263,10 @@ private:
 	void otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UID, ot::UID>>> otherServicesUpdate, bool itemsVisible);
 	void performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::list<ot::UID> entityVersions, std::list<ot::UID> brepVersions, std::string owningService);
 	bool updateNumericalValues(EntityBase *entity);
-	bool evaluateExpressionDouble(const std::string &expression, double &value, ot::UID entityID, const std::string &propertyName);
+	bool evaluateExpressionDouble(const std::string &expression, double &value, ot::UID entityID, const std::string &propertyName, const std::string& propertyGroup);
 	void setParameter(const std::string &name, double value, EntityParameter *parameter);
 	void removeParameter(const std::string &name);
-	void setParameterDependency(std::list<std::string> &parameters, ot::UID entityID, const std::string &propertyName);
+	void setParameterDependency(std::list<std::string> &parameters, ot::UID entityID, const std::string &propertyName, const std::string& propertyGroup);
 	void removeParameterDependency(ot::UID entityID);
 	bool checkCircularParameterDependency(EntityParameter *parameter, std::list<std::string> &dependingOnParameters);
 	bool checkWhetherParameterDependsOnGivenParameter(EntityParameter *parameter, ot::UID dependingEntityID);

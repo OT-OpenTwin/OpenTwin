@@ -21,6 +21,7 @@ public:
 
 	void merge(EntityProperties& other);
 
+	//! @brief Takes ownership of the property pointer.
 	bool createProperty(EntityPropertiesBase *property, const std::string &group);
 	bool updateProperty(EntityPropertiesBase *property, const std::string &group);
 	bool deleteProperty(const std::string &_name, const std::string& _groupName = "");
@@ -55,7 +56,7 @@ public:
 
 	std::list<std::string> getListOfPropertiesForGroup(const std::string &group);
 
-	const std::string createKey(const std::string& _name, const std::string& _group);
+	static const std::string createKey(const std::string& _name, const std::string& _group);
 	const std::string extractNameFromKey(const std::string& _key);
 private:
 	void deleteAllProperties(void);

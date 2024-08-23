@@ -1,38 +1,30 @@
 #pragma once
-#include "BufferBlockDatabaseAccess.h"
+
 #include "OTCore/CoreTypes.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "MetadataCampaign.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
-
+#include "ResultCollectionMetadataAccess.h"
 #include <map>
 #include <memory>
 
 class PropertyHandlerDatabaseAccessBlock : public BusinessLogicHandler
 {
 public:
-	static PropertyHandlerDatabaseAccessBlock& instance()
-	{
-		static PropertyHandlerDatabaseAccessBlock INSTANCE;
-		return INSTANCE;
-	}
+	PropertyHandlerDatabaseAccessBlock() =default;
 
-	BufferBlockDatabaseAccess& getBuffer(ot::UID blockEntityID) { return _bufferedInformation[blockEntityID];}
-	void PerformUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity,const std::string& sessionServiceURL, const std::string& modelServiceURL);
-	
+	void performEntityUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> _dbAccessEntity);
+	static ResultCollectionMetadataAccess* getResultCollectionMetadataAccess(EntityBlockDatabaseAccess* _dbAccessEntity, std::string& _collectionName);
 
 private:
-	std::map<ot::UID, BufferBlockDatabaseAccess> _bufferedInformation;
-	
+	using parameterUpdate = void (EntityBlockDatabaseAccess::*)(const std::string& _unit, const std::string& _type, EntityProperties& _properties);
+	const std::string m_selectedValueNone = "";
 
-	EntityProperties UpdateAllCampaignDependencies(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const std::string& sessionServiceURL, const std::string& modelServiceURL);
-	EntityProperties UpdateSelectionProperties(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity);
 
-	void RequestPropertyUpdate(const std::string& modelServiceURL, ot::UIDList entityIDs, const std::string& propertiesAsJSON);
-	
-	void UpdateBuffer(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, const MetadataCampaign& campaignMetadata);
-	void getSelectedValues(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::string& outQuantityValue, std::string& outParameter1Value, std::string& outParameter2Value, std::string& outParameter3Value);
-	void getDataTypes(std::shared_ptr<EntityBlockDatabaseAccess> dbAccessEntity, std::string& outQuantityType, std::string& outParameter1Type, std::string& outParameter2Type, std::string& outParameter3Type);
-	void CreateUpdatedTypeProperty(EntityPropertiesBase* oldEntity, const std::string& value, EntityProperties& properties);
-	PropertyHandlerDatabaseAccessBlock() {};
+	void updateSelectionIfNecessary(std::list<std::string>& _valuesInProject, EntityPropertiesSelection* _selection, EntityProperties& _properties);
+	std::list<std::string> updateQuantityIfNecessary(std::shared_ptr<EntityBlockDatabaseAccess> _dbAccessEntity, ResultCollectionMetadataAccess* _resultAccess, EntityProperties& _properties);
+	void updateParameterIfNecessary(const ResultCollectionMetadataAccess& _resultAccess, const ValueCharacteristicProperties& _selectedProperties, EntityProperties& _properties);
+	void resetValueCharacteristicLabelsIfNecessary(const ValueCharacteristicProperties& _selectedProperties, EntityProperties& _properties);
+
+	void requestPropertyUpdate(ot::UIDList entityIDs, const std::string& propertiesAsJSON);
 };

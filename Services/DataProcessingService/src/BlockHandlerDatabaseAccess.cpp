@@ -13,9 +13,11 @@
 #include "ResultCollectionMetadataAccess.h"
 #include "ProjectToCollectionConverter.h"
 #include "DataBase.h"
-#include "BufferResultCollectionAccess.h"
+
 #include "ResultDataStorageAPI.h"
 #include "QuantityContainer.h"
+#include "PropertyHandlerDatabaseAccessBlock.h"
+
 #include <cctype>
 #include <algorithm>
 
@@ -23,17 +25,17 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	:BlockHandler(blockEntity,handlerMap)
 {
 	//First get a handle of the selected project.
-	std::shared_ptr<ResultCollectionMetadataAccess> resultCollectionAccess = BufferResultCollectionAccess::INSTANCE().getResultCollectionAccessMetadata(blockEntity);
-
+	std::string collectionName;
+	m_resultCollectionMetadataAccess = (PropertyHandlerDatabaseAccessBlock::getResultCollectionMetadataAccess(blockEntity,collectionName));
+	const std::string dataBaseURL = Application::instance()->dataBaseURL();
+	m_resultCollectionAccess = new DataStorageAPI::ResultDataStorageAPI(dataBaseURL,collectionName);
 	
-	if (!resultCollectionAccess->collectionHasMetadata())
+	if (!m_resultCollectionMetadataAccess->collectionHasMetadata())
 	{
 		const std::string errorMessage = "Database Access not possible. The selected collection has no meta data.";
 		throw std::exception(errorMessage.c_str());
 	}
-	const std::string dbURL = "Projects";
-	_dataStorageAccess = new DataStorageAPI::ResultDataStorageAPI(dbURL, resultCollectionAccess->getCollectionName());
-		
+			
 	AdvancedQueryBuilder builder;
 	//ot::StringToVariableConverter converter;
 	_projectionNames.reserve(4);
@@ -43,15 +45,24 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	//First the quantity is selected. Its value is not projected.
 	ValueComparisionDefinition quantityDef = blockEntity->getSelectedQuantityDefinition();
 	//The entity selection contains the names of the quantity/parameter. In the mongodb documents only the abbreviations are used.
-	const auto selectedQuantity = resultCollectionAccess->findMetadataQuantity(quantityDef.getName());
+	const auto selectedQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(quantityDef.getName());
 	if (selectedQuantity == nullptr) 
 	{
 		throw std::exception("DatabaseAccessBlock has no quantity set.");
 	}
-	//_dataRows= selectedQuantity->dataRows;
-	//_dataColumns = selectedQuantity->dataColumns;
+	const std::string valueDescriptionLabel = blockEntity->getValueDescription();
+	auto& valueDescriptions = selectedQuantity->valueDescriptions;
+	ot::UID valueUID = 0;
+	for (auto& valueDescription : valueDescriptions)
+	{
+		if (valueDescription.quantityValueLabel == valueDescriptionLabel)
+		{
+			valueUID = valueDescription.quantityIndex;
+		}
+	}
+	assert(valueUID != 0);
 
-	ValueComparisionDefinition selectedQuantityDef(MetadataQuantity::getFieldName(),"=",std::to_string(selectedQuantity->quantityIndex),ot::TypeNames::getInt64TypeName());
+	ValueComparisionDefinition selectedQuantityDef(MetadataQuantity::getFieldName(),"=",std::to_string(valueUID),ot::TypeNames::getInt64TypeName(),"");
 	AddComparision(selectedQuantityDef);
 	
 	//Now we add a comparision for the searched quantity value.
@@ -67,7 +78,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 		
 	const std::string parameterConnectorName = blockEntity->getConnectorParameter1().getConnectorName();
 	ValueComparisionDefinition param1Def = blockEntity->getSelectedParameter1Definition();
-	const auto parameter1 =	resultCollectionAccess->findMetadataParameter(param1Def.getName());
+	const auto parameter1 = m_resultCollectionMetadataAccess->findMetadataParameter(param1Def.getName());
 	//_projectionNameToClearName[parameter1->parameterAbbreviation] = parameter1->parameterName;
 	if (parameter1 == nullptr)
 	{
@@ -83,7 +94,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	{
 		auto param2Def = blockEntity->getSelectedParameter2Definition();
 		const std::string param2ConnectorName =	blockEntity->getConnectorParameter2().getConnectorName();
-		const auto parameter = resultCollectionAccess->findMetadataParameter(param2Def.getName());
+		const auto parameter = m_resultCollectionMetadataAccess->findMetadataParameter(param2Def.getName());
 		//_projectionNameToClearName[parameter->parameterAbbreviation] = parameter->parameterName;
 		if (parameter == nullptr)
 		{
@@ -96,7 +107,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	{	
 		auto param3Def = blockEntity->getSelectedParameter3Definition();
 		const std::string param3ConnectorName = blockEntity->getConnectorParameter3().getConnectorName();
-		const auto parameter = resultCollectionAccess->findMetadataParameter(param3Def.getName());
+		const auto parameter = m_resultCollectionMetadataAccess->findMetadataParameter(param3Def.getName());
 		//_projectionNameToClearName[parameter->parameterAbbreviation] = parameter->parameterName;
 		if (parameter == nullptr)
 		{
@@ -113,10 +124,15 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 
 BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 {
-	if (_dataStorageAccess != nullptr)
+	if (m_resultCollectionAccess != nullptr)
 	{
-		delete _dataStorageAccess;
-		_dataStorageAccess = nullptr;
+		delete m_resultCollectionAccess;
+		m_resultCollectionAccess = nullptr;
+	}
+	if (m_resultCollectionMetadataAccess != nullptr)
+	{
+		delete m_resultCollectionMetadataAccess;
+		m_resultCollectionMetadataAccess = nullptr;
 	}
 }
 
@@ -124,7 +140,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 {
 	const std::string debugQuery = bsoncxx::to_json(_query.view());
 	const std::string debugProjection = bsoncxx::to_json(_projection.view());
-	auto dbResponse = _dataStorageAccess->SearchInResultCollection(_query, _projection, 0);
+	auto dbResponse = m_resultCollectionAccess->SearchInResultCollection(_query, _projection, 0);
 	ot::JSONToVariableConverter converter;
 
 	if (dbResponse.getSuccess())

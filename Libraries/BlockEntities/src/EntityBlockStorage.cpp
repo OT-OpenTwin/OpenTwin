@@ -34,5 +34,36 @@ ot::GraphicsItemCfg* EntityBlockStorage::CreateBlockCfg()
 void EntityBlockStorage::createProperties()
 {
 	EntityPropertiesString::createProperty("Series Metadata", "Name", "Series", "default", getProperties());
+	EntityPropertiesInteger::createProperty("General", "Number of parameters", 1, "default", getProperties());
+	EntityPropertiesInteger::createProperty("General", "Number of quantities", 1, "default", getProperties());
+	EntityPropertiesInteger::createProperty("General", "Number of meta data", 0, "default", getProperties());
+}
 
+bool EntityBlockStorage::updateFromProperties()
+{
+	bool refresh = false;
+	EntityPropertiesBase* base = getProperties().getProperty("Number of parameters", "General");
+	EntityPropertiesInteger* integerProperty = dynamic_cast<EntityPropertiesInteger*>(base);
+	if (integerProperty->getValue() < 1)
+	{
+		integerProperty->setValue(1);
+		refresh = true;
+	}
+
+	base = getProperties().getProperty("Number of quantities", "General");
+	dynamic_cast<EntityPropertiesInteger*>(base);
+	if (integerProperty->getValue() < 1)
+	{
+		integerProperty->setValue(1);
+		refresh = true;
+	}
+
+	base = getProperties().getProperty("Number of meta data", "General");
+	dynamic_cast<EntityPropertiesInteger*>(base);
+	if (integerProperty->getValue() < 0)
+	{
+		integerProperty->setValue(0);
+		refresh = true;
+	}
+	return refresh;
 }

@@ -8,7 +8,7 @@ public:
 	virtual std::string getClassName(void) override { return "EntityBlockStorage"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; }
 	void createProperties();
-
+	virtual bool updateFromProperties() override;
 private:
 	ot::Connector _dataInput;
 };

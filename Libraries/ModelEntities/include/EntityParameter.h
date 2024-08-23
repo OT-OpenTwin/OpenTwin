@@ -31,8 +31,9 @@ public:
 
 	virtual bool updateFromProperties(void) override;
 
-	void addDependency(ot::UID entityID, const std::string &propertyName);
-	void removeDependency(ot::UID entityID, const std::string &propertyName);
+	void addDependency(ot::UID entityID, const std::string &propertyName, const std::string& propertyGroup);
+	void addDependencyByIndex(ot::UID entityID, const std::string& propertyIndex);
+	void removeDependency(ot::UID entityID, const std::string &propertyName, const std::string& propertyGroup);
 	void removeDependency(ot::UID entityID);
 	bool hasDependency(ot::UID entityID);
 	void removeAllDependencies(void);

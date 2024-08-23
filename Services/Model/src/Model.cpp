@@ -1170,7 +1170,7 @@ void Model::removeParameter(const std::string &name)
 	parameterMap.erase(baseName);
 }
 
-void Model::setParameterDependency(std::list<std::string> &parameters, ot::UID entityID, const std::string &propertyName)
+void Model::setParameterDependency(std::list<std::string> &parameters, ot::UID entityID, const std::string &propertyName, const std::string& propertyGroup)
 {
 	std::set<std::string> parameterSet;
 	for (auto param : parameters) parameterSet.insert(param);
@@ -1181,14 +1181,14 @@ void Model::setParameterDependency(std::list<std::string> &parameters, ot::UID e
 		// Make sure that we don't want to add the dependency for this parameter again
 		if (parameterSet.count(parameter.first) == 0)
 		{
-			parameter.second.second->removeDependency(entityID, propertyName);
+			parameter.second.second->removeDependency(entityID, propertyName, propertyGroup);
 		}
 	}
 
 	// Now we add the dependency to the affected paramters
 	for (auto &parameter : parameters)
 	{
-		parameterMap[parameter].second->addDependency(entityID, propertyName);
+		parameterMap[parameter].second->addDependency(entityID, propertyName,propertyGroup);
 	}
 }
 
@@ -1214,7 +1214,7 @@ void Model::removeParameterDependency(ot::UID entityID)
 				{
 					for (auto &propertyDependency : entityDependency.second)
 					{
-						parameter.second.second->addDependency(entityDependency.first, propertyDependency.first);
+						parameter.second.second->addDependencyByIndex(entityDependency.first, propertyDependency.first);
 					}
 				}
 			}
@@ -1866,7 +1866,7 @@ void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const 
 	}
 }
 
-void Model::deleteProperty(const std::list<ot::UID> &entityIDList, const std::string& propertyName)
+void Model::deleteProperty(const std::list<ot::UID> &entityIDList, const std::string& propertyName, const std::string& propertyGroup)
 {
 	std::list<EntityBase*> entities;
 	for (auto entityID : entityIDList) entities.push_back(getEntity(entityID));
@@ -1877,16 +1877,16 @@ void Model::deleteProperty(const std::list<ot::UID> &entityIDList, const std::st
 
 	for (auto entity : entitiesToSet)
 	{
-		if (entity->getProperties().propertyExists(propertyName))
+		if (entity->getProperties().propertyExists(propertyName, propertyGroup))
 		{
 			// Check whether the property is deletable
-			if (entity->getProperties().getProperty(propertyName)->getProtected())
+			if (entity->getProperties().getProperty(propertyName, propertyGroup)->getProtected())
 			{
 				assert(0); // The property is protected, so we should not attempt to delete it
 			}
 			else
 			{
-				entity->getProperties().deleteProperty(propertyName);
+				entity->getProperties().deleteProperty(propertyName, propertyGroup);
 				entity->setModified();
 
 				needsUpdate = true;
@@ -1896,7 +1896,7 @@ void Model::deleteProperty(const std::list<ot::UID> &entityIDList, const std::st
 
 	if (needsUpdate)
 	{
-		modelChangeOperationCompleted("Deleted property: " + propertyName);
+		modelChangeOperationCompleted("Deleted property: " + propertyGroup + "/" + propertyName);
 		updatePropertyGrid();
 	}
 }
@@ -2670,7 +2670,7 @@ bool Model::updateNumericalValues(EntityBase *entity)
 			{
 				double value = 0.0;
 
-				if (evaluateExpressionDouble(expressionProperty->getValue(), value, entity->getEntityID(), expressionProperty->getName()))
+				if (evaluateExpressionDouble(expressionProperty->getValue(), value, entity->getEntityID(), expressionProperty->getName(), expressionProperty->getGroup()))
 				{
 					property->setValue(value);  // This will also set the needsUpdate flag for the property if the value is different
 
@@ -2814,7 +2814,7 @@ std::string Model::replaceParameterInExpression(std::string expression, const st
 	return "";
 }
 
-bool Model::evaluateExpressionDouble(const std::string &expression, double &value, ot::UID entityID, const std::string &propertyName)
+bool Model::evaluateExpressionDouble(const std::string &expression, double &value, ot::UID entityID, const std::string &propertyName, const std::string& propertyGroup)
 {
 	int nParameter = (int)parameterMap.size();
 	te_variable *parameter = nullptr;
@@ -2870,7 +2870,7 @@ bool Model::evaluateExpressionDouble(const std::string &expression, double &valu
 			}
 		}
 
-		setParameterDependency(parameters, entityID, propertyName);
+		setParameterDependency(parameters, entityID, propertyName, propertyGroup);
 
 		te_free(expr);
 

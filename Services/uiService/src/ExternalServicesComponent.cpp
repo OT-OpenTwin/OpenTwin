@@ -662,6 +662,11 @@ void ExternalServicesComponent::propertyGridValueDeleteRequested(const ot::Prope
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_DeleteProperty, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(selectedModelEntityIDs, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(_property->getPropertyName(), doc.GetAllocator()), doc.GetAllocator());
+		auto parentGroup = _property->getParentGroup();
+		if (parentGroup != nullptr)
+		{
+			doc.AddMember(OT_PARAM_GROUP, ot::JsonString(parentGroup->getName(), doc.GetAllocator()), doc.GetAllocator());
+		}
 		std::string response;
 
 		for (auto reciever : m_modelViewNotifier) {

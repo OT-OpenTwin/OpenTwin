@@ -12,11 +12,11 @@
 class __declspec(dllexport) MetadataCampaign
 {
 public:
-	MetadataCampaign(){}
-	MetadataCampaign(const MetadataCampaign& _other);
+	MetadataCampaign() = default;
+	MetadataCampaign(const MetadataCampaign& _other) = default;
 	MetadataCampaign& operator=(const MetadataCampaign& _other) = delete;
-	MetadataCampaign(MetadataCampaign&& other) noexcept;
-	MetadataCampaign& operator=(MetadataCampaign&& other) noexcept;
+	MetadataCampaign(MetadataCampaign&& other) noexcept =default;
+	MetadataCampaign& operator=(MetadataCampaign&& other) noexcept = default;
 	~MetadataCampaign() {};
 
 	void addMetaInformation(const std::string& key, std::shared_ptr<MetadataEntry> _metadata) { m_metaData[key] = _metadata; }

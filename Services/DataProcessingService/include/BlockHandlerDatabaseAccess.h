@@ -5,6 +5,7 @@
 #include "MetadataCampaign.h"
 #include "MetadataParameter.h"
 #include "AdvancedQueryBuilder.h"
+#include "ResultCollectionMetadataAccess.h"
 #include "ResultDataStorageAPI.h"
 
 class BlockHandlerDatabaseAccess : public BlockHandler
@@ -19,7 +20,8 @@ private:
 	uint32_t _dataColumns;
 	uint32_t _dataRows;
 	
-	DataStorageAPI::ResultDataStorageAPI* _dataStorageAccess = nullptr;
+	ResultCollectionMetadataAccess* m_resultCollectionMetadataAccess = nullptr;
+	DataStorageAPI::ResultDataStorageAPI* m_resultCollectionAccess = nullptr;
 	std::list< BsonViewOrValue> _comparisons;
 	std::vector<std::string> _projectionNames;
 	std::map<std::string, std::string> _projectionNameToClearName;

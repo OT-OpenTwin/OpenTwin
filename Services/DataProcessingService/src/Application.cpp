@@ -22,7 +22,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 #include "TemplateDefaultManager.h"
-#include "BufferResultCollectionAccess.h"
+
 #include "ClassFactory.h"
 #include "ExternalDependencies.h"
 #include "ClassFactoryBlock.h"
@@ -105,8 +105,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 				auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
 				if (dbAccess != nullptr)
 				{
-					auto modelService = instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_MODEL);
-					PropertyHandlerDatabaseAccessBlock::instance().PerformUpdateIfRequired(dbAccess, instance()->sessionServiceURL(), modelService->serviceURL());
+					m_propertyHandlerDatabaseAccessBlock.performEntityUpdateIfRequired(dbAccess);
 				}
 			}
 		}
@@ -179,7 +178,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_graphHandler.setUIComponent(_ui);
 	_pipelineHandler.setUIComponent(_ui);
-	PropertyHandlerDatabaseAccessBlock::instance().setUIComponent(_ui);
+	m_propertyHandlerDatabaseAccessBlock.setUIComponent(_ui);
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)
@@ -196,7 +195,7 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 	_blockEntityHandler.setModelComponent(_model);
 	_graphHandler.setModelComponent(_model);
 	_pipelineHandler.setModelComponent(_model);
-	BufferResultCollectionAccess::INSTANCE().setModelComponent(_model);
+	m_propertyHandlerDatabaseAccessBlock.setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)

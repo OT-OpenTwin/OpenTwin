@@ -2,6 +2,13 @@
 #include "EntityBlock.h"
 #include "ValueComparisionDefinition.h"
 
+struct __declspec(dllexport) ValueCharacteristicProperties
+{
+	EntityPropertiesString* m_unit;
+	EntityPropertiesString* m_dataType;
+	EntityPropertiesSelection* m_label;
+};
+
 class __declspec(dllexport)  EntityBlockDatabaseAccess : public EntityBlock
 {
 public:
@@ -10,44 +17,48 @@ public:
 	virtual entityType getEntityType(void) override { return TOPOLOGY; }
 
 	void createProperties(std::list<std::string>& comparators);
+	void setSelectionSeries(std::list<std::string>& _options, const std::string& _selectedValue);
+
 	std::string getSelectedProjectName();
 	std::string getQueryDimension();
+	std::string getValueDescription();
 
 	const bool isQueryDimension1D();
 	const bool isQueryDimension2D();
 	const bool isQueryDimension3D();
 
-	const std::string& getPropertyNameMeasurementSeries() { return _msmdPropertyName; }
-	const std::string& getPropertyValueDimension1() { return _propertyValueDimension1; }
-	const std::string& getPropertyValueDimension2() { return _propertyValueDimension2; }
-	const std::string& getPropertyValueDimension3() { return _propertyValueDimension3; }
+	//const std::string& getPropertyNameMeasurementSeries() { return m_propertyNameSeriesMetadata; }
+	//const std::string& getPropertyValueDimension1() { return m_propertyValueDimension1; }
+	//const std::string& getPropertyValueDimension2() { return m_propertyValueDimension2; }
+	//const std::string& getPropertyValueDimension3() { return m_propertyValueDimension3; }
 
-	const std::string& getPropertyNameQuantity() { return _propertyNameQuantity; }
-	const std::string& getPropertyNameParameter1() { return _propertyNameP1; }
-	const std::string& getPropertyNameParameter2() { return _propertyNameP2; }
-	const std::string& getPropertyNameParameter3() { return _propertyNameP3; }
+	//const std::string& getGroupQuerySettings() { return m_groupQuerySettings; }
+	//const std::string& getGroupQuantity() { return m_groupQuantitySetttings; }
+	//const std::string& getGroupParameter1() { return m_groupParamSettings1; }
+	//const std::string& getGroupParameter2() { return m_groupParamSettings2; }
+	//const std::string& getGroupParameter3() { return m_groupParamSettings3; }
 
-	const std::string& getPropertyDataTypeQuantity() { return _propertyDataTypeQuantity; }
-	const std::string& getPropertyDataTypeParameter1() { return _propertyDataTypeP1; }
-	const std::string& getPropertyDataTypeParameter2() { return _propertyDataTypeP2; }
-	const std::string& getPropertyDataTypeParameter3() { return _propertyDataTypeP3; }
+	/*const std::string& getPropertyName() { return m_propertyName; }
+	const std::string& getPropertyDataType() { return m_propertyDataType; }*/
 
-	const std::string& getGroupQuantity() { return _groupQuantitySetttings; }
-	const std::string& getGroupParameter1() { return _groupParamSettings1; }
-	const std::string& getGroupParameter2() { return _groupParamSettings2; }
-	const std::string& getGroupParameter3() { return _groupParamSettings3; }
-
-
+	EntityPropertiesSelection* getSeriesSelection();
+	EntityPropertiesSelection* getQuantityValueDescriptionSelection();
+	
+	ValueCharacteristicProperties getParameterValueCharacteristic1();
+	ValueCharacteristicProperties getParameterValueCharacteristic2();
+	ValueCharacteristicProperties getParameterValueCharacteristic3();
+	ValueCharacteristicProperties getQuantityValueCharacteristic();
+	ValueCharacteristicProperties getValueCharacteristics(const std::string& _groupName);
+	
 	const ValueComparisionDefinition getSelectedQuantityDefinition();
 	const ValueComparisionDefinition getSelectedParameter1Definition();
 	const ValueComparisionDefinition getSelectedParameter2Definition();
 	const ValueComparisionDefinition getSelectedParameter3Definition();
 
-
-	const ot::Connector getConnectorQuantity() const { return _connectorQuantity; }
-	const ot::Connector getConnectorParameter1() const { return _connectorParameter1; }
-	const ot::Connector getConnectorParameter2() const { return _connectorParameter2; }
-	const ot::Connector getConnectorParameter3() const { return _connectorParameter3; }
+	const ot::Connector getConnectorQuantity() const { return m_connectorQuantity; }
+	const ot::Connector getConnectorParameter1() const { return m_connectorParameter1; }
+	const ot::Connector getConnectorParameter2() const { return m_connectorParameter2; }
+	const ot::Connector getConnectorParameter3() const { return m_connectorParameter3; }
 
 	virtual bool updateFromProperties() override;
 
@@ -57,50 +68,42 @@ protected:
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 private:
-	const std::string _propertyNameProjectName = "Projectname";
+	const std::string m_propertyNameProjectName = "Projectname";
 
-	const std::string _propertyNameDimension = "Outcome dimension";
-	const std::string _propertyValueDimension1 = "1D";
-	const std::string _propertyValueDimension2 = "2D";
-	const std::string _propertyValueDimension3 = "3D";
-	const std::string _propertyValueDimensionCustom = "custom";
+	const std::string m_propertyNameDimension = "Outcome dimension";
+	const std::string m_propertyValueDimension1 = "1D";
+	const std::string m_propertyValueDimension2 = "2D";
+	const std::string m_propertyValueDimension3 = "3D";
+	const std::string m_propertyValueDimensionCustom = "custom";
 
-	const std::string _msmdPropertyName = "Measurement series";
+	const std::string m_propertyNameSeriesMetadata = "Measurement series";
 
-	const std::string _groupQuerySettings = "Query settings";
+	const std::string m_groupQuerySettings = "Query settings";
+	const std::string m_groupQuantitySetttings = "Quantity settings";
+	const std::string m_groupParamSettings1 = "Parameter 1";
+	const std::string m_groupParamSettings2 = "Parameter 2";
+	const std::string m_groupParamSettings3 = "Parameter 3";
 
-	const std::string _groupQuantitySetttings = "Quantity settings";
-	const std::string _propertyNameQuantity = "Name";
-	const std::string _propertyDataTypeQuantity = "Data type";
-	const std::string _propertyComparator = "Comparator";
-	const std::string _propertyValueQuantity = "Value";
+	const std::string m_propertyName = "Name";
+	const std::string m_propertyValueDescription = "Type";
+	const std::string m_propertyDataType = "Data type";
+	const std::string m_propertyComparator = "Comparator";
+	const std::string m_propertyValue = "Value";
+	const std::string m_propertyUnit = "Unit";
 
-	const std::string _groupParamSettings1 = "Parameter 1";
-	const std::string _propertyNameP1 = "P1 name";
-	const std::string _propertyDataTypeP1 = "P1 data type";
-	const std::string _propertyComparatorP1 = "P1 comparator";
-	const std::string _propertyValueP1 = "P1 query value";
+	ot::Connector m_connectorQuantity;
+	ot::Connector m_connectorParameter1;
+	ot::Connector m_connectorParameter2;
+	ot::Connector m_connectorParameter3;
+	
+	void createUpdatedProperty(const std::string& _propName, const std::string& _propGroup, const std::string& _labelValue, EntityProperties& properties);
 
-	const std::string _groupParamSettings2 = "Parameter 2";
-	const std::string _propertyNameP2 = "P2 name";
-	const std::string _propertyDataTypeP2 = "P2 data type";
-	const std::string _propertyComparatorP2 = "P2 comparator";
-	const std::string _propertyValueP2 = "P2 query value";
+	const ValueComparisionDefinition getSelectedValueComparisionDefinition(const std::string& _groupName);
+	bool setVisibleParameter2(bool _visible);
+	bool setVisibleParameter3(bool _visible);
+	bool setVisibleParameter(const std::string& _groupName,bool _visible);
+	void updateBlockConfig();
+	void updateConnections(std::list<std::string>& connectorsForRemoval);
+	void removeConnectionsAtConnectedEntities(std::list<ot::UID>& connectionsForRemoval);
 
-	const std::string _groupParamSettings3 = "Parameter 3";
-	const std::string _propertyNameP3 = "P3 name";
-	const std::string _propertyDataTypeP3 = "P3 data type";
-	const std::string _propertyComparatorP3 = "P3 comparator";
-	const std::string _propertyValueP3 = "P3 query value";
-
-	ot::Connector _connectorQuantity;
-	ot::Connector _connectorParameter1;
-	ot::Connector _connectorParameter2;
-	ot::Connector _connectorParameter3;
-
-	bool SetVisibleParameter2(bool visible);
-	bool SetVisibleParameter3(bool visible);
-	void UpdateBlockConfig();
-	void UpdateConnections(std::list<std::string>& connectorsForRemoval);
-	void RemoveConnectionsAtConnectedEntities(std::list<ot::UID>& connectionsForRemoval);
 };

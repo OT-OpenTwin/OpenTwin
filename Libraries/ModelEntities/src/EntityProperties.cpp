@@ -432,7 +432,7 @@ void EntityProperties::readFromProperties(const EntityProperties &other, EntityB
 	{
 		EntityPropertiesBase *modified = it->second;
 
-		EntityPropertiesBase *current = getProperty(modified->getName());
+		EntityPropertiesBase *current = getProperty(modified->getName(), modified->getGroup());
 		assert(current != nullptr); // We need to have the same property localls
 
 		if (current != nullptr)

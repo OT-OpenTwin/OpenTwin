@@ -123,4 +123,5 @@ private:
 	PipelineHandler _pipelineHandler;
 	BlockEntityHandler _blockEntityHandler;
 	GraphHandler _graphHandler;
+	PropertyHandlerDatabaseAccessBlock m_propertyHandlerDatabaseAccessBlock;
 };

@@ -74,7 +74,33 @@ const std::list<std::string> ResultCollectionMetadataAccess::listAllQuantityLabe
 	return quantityNames;
 }
 
-const MetadataSeries* ResultCollectionMetadataAccess::findMetadataSeries(const std::string& _name)
+const std::list<std::string> ResultCollectionMetadataAccess::listAllParameterLabelsFromSeries(const std::string& _label) const
+{
+	const MetadataSeries* series = findMetadataSeries(_label);
+	assert(series != nullptr);
+	auto allParameter = series->getParameter();
+	std::list<std::string> allParameterLabel;
+	for (const auto& parameter : allParameter)
+	{
+		allParameterLabel.push_back(parameter.parameterLabel);
+	}
+	return allParameterLabel;
+}
+
+const std::list<std::string> ResultCollectionMetadataAccess::listAllQuantityLabelsFromSeries(const std::string& _label) const
+{
+	const MetadataSeries* series = findMetadataSeries(_label);
+	assert(series != nullptr);
+	auto allQuantities = series->getQuantities();
+	std::list<std::string> allQuantityLabel;
+	for (const auto& quantity : allQuantities)
+	{
+		allQuantityLabel.push_back(quantity.quantityLabel);
+	}
+	return allQuantityLabel;
+}
+
+const MetadataSeries* ResultCollectionMetadataAccess::findMetadataSeries(const std::string& _name) const
 {
 	const std::list<MetadataSeries>& allSeriesMetadata = m_metadataCampaign.getSeriesMetadata();
 
@@ -90,7 +116,7 @@ const MetadataSeries* ResultCollectionMetadataAccess::findMetadataSeries(const s
 	return selectedMetadataSeries;
 }
 
-const MetadataSeries* ResultCollectionMetadataAccess::findMetadataSeries(ot::UID _index)
+const MetadataSeries* ResultCollectionMetadataAccess::findMetadataSeries(ot::UID _index) const
 {
 	const std::list<MetadataSeries>& allSeriesMetadata = m_metadataCampaign.getSeriesMetadata();
 
@@ -106,7 +132,7 @@ const MetadataSeries* ResultCollectionMetadataAccess::findMetadataSeries(ot::UID
 	return selectedMetadataSeries;
 }
 
-const MetadataParameter* ResultCollectionMetadataAccess::findMetadataParameter(const std::string& _name)
+const MetadataParameter* ResultCollectionMetadataAccess::findMetadataParameter(const std::string& _name) const
 {
 	auto& parameterByName = m_metadataCampaign.getMetadataParameterByLabel();
 	auto parameter = parameterByName.find(_name);
@@ -120,7 +146,7 @@ const MetadataParameter* ResultCollectionMetadataAccess::findMetadataParameter(c
 	}
 }
 
-const MetadataParameter* ResultCollectionMetadataAccess::findMetadataParameter(ot::UID _index)
+const MetadataParameter* ResultCollectionMetadataAccess::findMetadataParameter(ot::UID _index) const
 {
 	auto& parameterByUID = m_metadataCampaign.getMetadataParameterByUID();
 	auto parameter = parameterByUID.find(_index);
@@ -134,7 +160,7 @@ const MetadataParameter* ResultCollectionMetadataAccess::findMetadataParameter(o
 	}
 }
 
-const MetadataQuantity* ResultCollectionMetadataAccess::findMetadataQuantity(const std::string& name)
+const MetadataQuantity* ResultCollectionMetadataAccess::findMetadataQuantity(const std::string& name) const
 {
 	auto& quantitiesByLabel = m_metadataCampaign.getMetadataQuantitiesByLabel();
 	auto quantity = quantitiesByLabel.find(name);
@@ -149,7 +175,7 @@ const MetadataQuantity* ResultCollectionMetadataAccess::findMetadataQuantity(con
 	}
 }
 
-const MetadataQuantity* ResultCollectionMetadataAccess::findMetadataQuantity(ot::UID _index)
+const MetadataQuantity* ResultCollectionMetadataAccess::findMetadataQuantity(ot::UID _index) const 
 {
 	auto& quantityByUID = m_metadataCampaign.getMetadataQuantitiesByUID();
 	auto quantity= quantityByUID.find(_index);

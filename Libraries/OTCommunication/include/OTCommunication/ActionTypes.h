@@ -767,6 +767,7 @@
 #define OT_PARAM_AUTH_USER_NAME "username"
 #define OT_PARAM_AUTH_COLLECTION_NAME "CollectionName"
 #define OT_PARAM_AUTH_COLLECTION_EXISTS "Collection.Exists"
+#define OT_PARAM_GROUP "groupName"
 
 
 

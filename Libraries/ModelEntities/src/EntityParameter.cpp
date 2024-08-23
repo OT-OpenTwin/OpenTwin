@@ -70,7 +70,7 @@ void EntityParameter::readSpecificDataFromDataBase(bsoncxx::document::view &doc_
 
 		for (unsigned long index = 0; index < nDependencies; index++)
 		{
-			addDependency(iUID->get_int64(), iProperty->get_utf8().value.to_string());
+			addDependencyByIndex(iUID->get_int64(), iProperty->get_utf8().value.to_string());
 
 			iUID++;
 			iProperty++;
@@ -81,6 +81,22 @@ void EntityParameter::readSpecificDataFromDataBase(bsoncxx::document::view &doc_
 	}
 
 	resetModified();
+}
+
+void EntityParameter::addDependencyByIndex(ot::UID entityID, const std::string& propertyIndex)
+{
+	if (dependencyMap.count(entityID) > 0)
+	{
+
+		if (dependencyMap[entityID].count(propertyIndex) > 0)
+		{
+			// This dependency already exists -> nothing to change
+			return;
+		}
+	}
+
+	dependencyMap[entityID][propertyIndex] = true;
+	setModified();
 }
 
 void EntityParameter::addVisualizationNodes(void)
@@ -169,28 +185,21 @@ bool EntityParameter::updateFromProperties(void)
 	return false;
 }
 
-void EntityParameter::addDependency(ot::UID entityID, const std::string &propertyName)
+void EntityParameter::addDependency(ot::UID entityID, const std::string &propertyName, const std::string& propertyGroup)
 {
-	if (dependencyMap.count(entityID) > 0)
-	{
-		if (dependencyMap[entityID].count(propertyName) > 0)
-		{
-			// This dependency already exists -> nothing to change
-			return;
-		}
-	}
-
-	dependencyMap[entityID][propertyName] = true;
-	setModified();
+	const std::string key =	EntityProperties::createKey(propertyName, propertyGroup);
+	addDependencyByIndex(entityID, key);
 }
 
-void EntityParameter::removeDependency(ot::UID entityID, const std::string &propertyName)
+void EntityParameter::removeDependency(ot::UID entityID, const std::string &propertyName, const std::string& propertyGroup)
 {
 	if (dependencyMap.count(entityID) > 0)
 	{
-		if (dependencyMap[entityID].count(propertyName) > 0)
+		const std::string key = EntityProperties::createKey(propertyName, propertyGroup);
+
+		if (dependencyMap[entityID].count(key) > 0)
 		{
-			dependencyMap[entityID].erase(propertyName);
+			dependencyMap[entityID].erase(key);
 
 			if (dependencyMap[entityID].empty())
 			{
