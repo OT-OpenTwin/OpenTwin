@@ -198,6 +198,9 @@ std::list<std::string> PropertyHandlerDatabaseAccessBlock::updateQuantityIfNeces
 	{
 		//If no quantity is selected, we need to check if the type and unit labels need to be reset.
 		resetValueCharacteristicLabelsIfNecessary(quantityValueCharacteristic, _properties);
+		EntityPropertiesSelection* selectionQuantityValDescr = _dbAccessEntity->getQuantityValueDescriptionSelection();
+		std::list<std::string> emptyList { m_selectedValueNone };
+		updateSelectionIfNecessary(emptyList, selectionQuantityValDescr, _properties);
 		return std::list<std::string>();
 	}
 }
