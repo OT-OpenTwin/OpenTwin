@@ -6,13 +6,14 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/OTWidgetsAPIExport.h"
-#include "OTGui/GuiTypes.h"
-#include "OTGui/Margins.h"
-#include "OTGui/GraphicsItemCfg.h"
 #include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
+#include "OTGui/Margins.h"
+#include "OTGui/GuiTypes.h"
+#include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsConnectionCfg.h"
+#include "OTWidgets/GraphicsBase.h"
+#include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtCore/qpoint.h>
@@ -33,7 +34,7 @@ namespace ot {
 
 	//! @brief Base class for all OpenTwin GraphicsItems
 	//! GraphicsItems should be created by the GraphicsFactory and be setup from the corresponding configuration
-	class OT_WIDGETS_API_EXPORT GraphicsItem {
+	class OT_WIDGETS_API_EXPORT GraphicsItem : public GraphicsBase {
 		OT_DECL_NODEFAULT(GraphicsItem)
 		OT_DECL_NOCOPY(GraphicsItem)
 	public:

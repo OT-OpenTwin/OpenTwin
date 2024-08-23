@@ -6,22 +6,23 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTClassHelper.h"
 #include "OTCore/CoreTypes.h"
+#include "OTCore/OTClassHelper.h"
+#include "OTGui/GuiTypes.h"
 #include "OTGui/GraphicsConnectionCfg.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
-#include "OTWidgets/CustomGraphicsItem.h"
+#include "OTWidgets/GraphicsBase.h"
 
 // Qt header
 #include <QtCore/qrect.h>
 #include <QtGui/qpen.h>
 #include <QtGui/qpainterpath.h>
+#include <QtWidgets/qgraphicsitem.h>
 
 namespace ot {
 	
 	class GraphicsItem;
 
-	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public QGraphicsItem {
+	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public QGraphicsItem, public GraphicsBase {
 		OT_DECL_NOCOPY(GraphicsConnectionItem)
 	public:
 		enum GraphicsConnectionState {
