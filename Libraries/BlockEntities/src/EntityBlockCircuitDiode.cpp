@@ -77,7 +77,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitDiode::CreateBlockCfg()
 	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState);
 	newConfig->setFile("Circuit/Diode.ot.json");
 	
-	std::string name = getName();
+	std::string name = getShowName();
 	newConfig->addStringMapEntry("Name", name);
 
 	//Map of String to Enum

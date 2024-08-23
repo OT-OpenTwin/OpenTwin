@@ -13,11 +13,14 @@ void EntityBlockCircuitElement::createProperties()
 	EntityPropertiesString::createProperty("General", "Name", "Element", "default", getProperties());
 }
 
-const std::string&  EntityBlockCircuitElement::getName()
+const std::string&  EntityBlockCircuitElement::getShowName()
 {
 	auto propertyBase = getProperties().getProperty("Name");
 	auto propertyFlip = dynamic_cast<EntityPropertiesString*>(propertyBase);
-	assert(propertyBase != nullptr);
+	if (propertyBase == nullptr)
+	{
+		return "";
+	}
 	std::string value = propertyFlip->getValue();
 	return value;
 }
