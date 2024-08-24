@@ -279,6 +279,9 @@
     <ClInclude Include="include\OTGui\Transform.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\BasicGraphicsIntersectionItem.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -490,6 +493,9 @@
     </ClCompile>
     <ClCompile Include="src\Transform.cpp">
       <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BasicGraphicsIntersectionItem.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
