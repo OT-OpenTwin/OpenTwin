@@ -370,9 +370,23 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointSmooth(const Q
 }
 
 qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointXY(const QPointF& _pt) const {
-	return this->calculateShortestDistanceToPointDirect(_pt);
+	QPointF originPoint = this->originItem()->getQGraphicsItem()->mapToScene(this->originItem()->getQGraphicsItem()->boundingRect().center());
+	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->mapToScene(this->destItem()->getQGraphicsItem()->boundingRect().center());
+	QPointF controlPoint(destinationPoint.x(), originPoint.y());
+
+	qreal d1 = Math::calculateShortestDistanceFromPointToLine(_pt.x(), _pt.y(), originPoint.x(), originPoint.y(), controlPoint.x(), controlPoint.y());
+	qreal d2 = Math::calculateShortestDistanceFromPointToLine(_pt.x(), _pt.y(), controlPoint.x(), controlPoint.y(), destinationPoint.x(), destinationPoint.y());
+
+	return std::min(d1, d2);
 }
 
 qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointYX(const QPointF& _pt) const {
-	return this->calculateShortestDistanceToPointDirect(_pt);
+	QPointF originPoint = this->originItem()->getQGraphicsItem()->mapToScene(this->originItem()->getQGraphicsItem()->boundingRect().center());
+	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->mapToScene(this->destItem()->getQGraphicsItem()->boundingRect().center());
+	QPointF controlPoint(originPoint.x(), destinationPoint.y());
+
+	qreal d1 = Math::calculateShortestDistanceFromPointToLine(_pt.x(), _pt.y(), originPoint.x(), originPoint.y(), controlPoint.x(), controlPoint.y());
+	qreal d2 = Math::calculateShortestDistanceFromPointToLine(_pt.x(), _pt.y(), controlPoint.x(), controlPoint.y(), destinationPoint.x(), destinationPoint.y());
+
+	return std::min(d1, d2);
 }
