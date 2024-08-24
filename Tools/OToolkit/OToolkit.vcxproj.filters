@@ -58,6 +58,12 @@
     <Filter Include="Source Files\GraphicsItemDesignerItems">
       <UniqueIdentifier>{917b8a67-789c-4041-b6df-627e6bab4b92}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\NetworkTools">
+      <UniqueIdentifier>{e93ec1b6-7fb4-4223-bcea-87214705b2ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NetworkTools">
+      <UniqueIdentifier>{2142f0bf-9484-41f4-bfca-43210e9d3e3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AppBase.cpp">
@@ -195,6 +201,9 @@
     <ClCompile Include="src\GraphicsItemDesignerPreview.cpp">
       <Filter>Source Files\GraphicsItemDesigner</Filter>
     </ClCompile>
+    <ClCompile Include="src\NetworkTools.cpp">
+      <Filter>Source Files\NetworkTools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -330,6 +339,9 @@
     </QtMoc>
     <QtMoc Include="include\SettingsManager.h">
       <Filter>Header Files\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\NetworkTools.h">
+      <Filter>Header Files\NetworkTools</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

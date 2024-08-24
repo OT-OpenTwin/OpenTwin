@@ -44,6 +44,7 @@
     <ClCompile Include="src\JSONEditor.cpp" />
     <ClCompile Include="src\LogVisualization.cpp" />
     <ClCompile Include="src\MenuManager.cpp" />
+    <ClCompile Include="src\NetworkTools.cpp" />
     <ClCompile Include="src\Randomizer.cpp" />
     <ClCompile Include="src\SettingsManager.cpp" />
     <ClCompile Include="src\StatusManager.cpp" />
@@ -77,6 +78,7 @@
   <ItemGroup>
     <QtMoc Include="include\SettingsManager.h" />
     <ClInclude Include="include\GraphicsItemDesignerPreview.h" />
+    <QtMoc Include="include\NetworkTools.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />
@@ -264,22 +266,22 @@
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;widgets;websockets</QtModules>
+    <QtModules>core;gui;network;widgets;websockets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;widgets;websockets</QtModules>
+    <QtModules>core;gui;network;widgets;websockets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;websockets;widgets</QtModules>
+    <QtModules>core;gui;network;widgets;websockets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;websockets;widgets</QtModules>
+    <QtModules>core;gui;network;widgets;websockets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">

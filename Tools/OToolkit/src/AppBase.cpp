@@ -19,6 +19,7 @@
 #include "ToolBarManager.h"
 #include "WidgetTest.h"
 #include "GraphicsItemDesigner.h"
+#include "NetworkTools.h"
 
 // OToolkitAPI header
 #include "OToolkitAPI/OToolkitAPI.h"
@@ -391,6 +392,7 @@ void AppBase::slotInitializeTools(void) {
 	m_toolManager->addTool(new ColorStyleEditor);
 	m_toolManager->addTool(new ImageEditor);
 	m_toolManager->addTool(new GraphicsItemDesigner);
+	m_toolManager->addTool(new NetworkTools);
 
 	QByteArray arr = qgetenv("OPENTWIN_DEV_ROOT");
 	if (!arr.isEmpty()) {
