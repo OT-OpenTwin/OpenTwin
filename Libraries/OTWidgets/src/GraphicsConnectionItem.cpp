@@ -359,6 +359,11 @@ void ot::GraphicsConnectionItem::calculateYXLinePath(QPainterPath& _path) const 
 }
 
 qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointDirect(const QPointF& _pt) const {
+	if (this->originItem() == nullptr || this->destItem() == nullptr) {
+		OT_LOG_EA("Origin and/or destination not set");
+		return -1.;
+	}
+
 	QPointF originPoint = this->originItem()->getQGraphicsItem()->mapToScene(this->originItem()->getQGraphicsItem()->boundingRect().center());
 	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->mapToScene(this->destItem()->getQGraphicsItem()->boundingRect().center());
 
@@ -366,10 +371,34 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointDirect(const Q
 }
 
 qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointSmooth(const QPointF& _pt) const {
-	return this->calculateShortestDistanceToPointDirect(_pt);
+	if (this->originItem() == nullptr || this->destItem() == nullptr) {
+		OT_LOG_EA("Origin and/or destination not set");
+		return -1.;
+	}
+
+	// Get the center point of the connectable items
+	QPointF originPoint = this->originItem()->getQGraphicsItem()->mapToScene(this->originItem()->getQGraphicsItem()->boundingRect().center());
+	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->mapToScene(this->destItem()->getQGraphicsItem()->boundingRect().center());
+
+	// Calculate distance between the items
+	double halfdistX = (std::max(originPoint.x(), destinationPoint.x()) - std::min(originPoint.x(), destinationPoint.x())) / 2.;
+	double halfdistY = (std::max(originPoint.y(), destinationPoint.y()) - std::min(originPoint.y(), destinationPoint.y())) / 2.;
+
+	// Calculate control points
+	QPointF controlPoint1;
+	QPointF controlPoint2;
+	this->calculateSmoothLineStep(originPoint, destinationPoint, halfdistX, halfdistY, controlPoint1, this->originItem()->getConnectionDirection());
+	this->calculateSmoothLineStep(destinationPoint, originPoint, halfdistX, halfdistY, controlPoint2, this->destItem()->getConnectionDirection());
+
+	return Math::calculateShortestDistanceFromPointToBezierCurve(_pt.x(), _pt.y(), originPoint.x(), originPoint.y(), controlPoint1.x(), controlPoint1.y(), controlPoint2.x(), controlPoint2.y(), destinationPoint.x(), destinationPoint.y());
 }
 
 qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointXY(const QPointF& _pt) const {
+	if (this->originItem() == nullptr || this->destItem() == nullptr) {
+		OT_LOG_EA("Origin and/or destination not set");
+		return -1.;
+	}
+
 	QPointF originPoint = this->originItem()->getQGraphicsItem()->mapToScene(this->originItem()->getQGraphicsItem()->boundingRect().center());
 	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->mapToScene(this->destItem()->getQGraphicsItem()->boundingRect().center());
 	QPointF controlPoint(destinationPoint.x(), originPoint.y());
@@ -381,6 +410,11 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointXY(const QPoin
 }
 
 qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointYX(const QPointF& _pt) const {
+	if (this->originItem() == nullptr || this->destItem() == nullptr) {
+		OT_LOG_EA("Origin and/or destination not set");
+		return -1.;
+	}
+
 	QPointF originPoint = this->originItem()->getQGraphicsItem()->mapToScene(this->originItem()->getQGraphicsItem()->boundingRect().center());
 	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->mapToScene(this->destItem()->getQGraphicsItem()->boundingRect().center());
 	QPointF controlPoint(originPoint.x(), destinationPoint.y());
