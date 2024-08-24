@@ -218,7 +218,7 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 	// Check for a new connection
 	QList<QGraphicsItem*> lst = items(_event->scenePos());
 	
-	qreal minDistance = DBL_MAX;
+	qreal minDistance = std::numeric_limits<double>::max();
 	GraphicsBase* targetedBase = nullptr;
 
 	for (auto itm : lst) {

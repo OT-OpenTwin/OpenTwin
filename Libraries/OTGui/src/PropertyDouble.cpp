@@ -16,19 +16,19 @@ ot::PropertyDouble::PropertyDouble(const PropertyDouble* _other)
 {}
 
 ot::PropertyDouble::PropertyDouble(const PropertyBase & _base)
-	: Property(_base), m_value(0.), m_min(-DBL_MAX), m_max(DBL_MAX), m_precision(2)
+	: Property(_base), m_value(0.), m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max()), m_precision(2)
 {}
 
 ot::PropertyDouble::PropertyDouble(PropertyFlags _flags)
-	: Property(_flags), m_value(0.), m_min(-DBL_MAX), m_max(DBL_MAX), m_precision(2)
+	: Property(_flags), m_value(0.), m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max()), m_precision(2)
 {}
 
 ot::PropertyDouble::PropertyDouble(double _value, PropertyFlags _flags )
-	: Property(_flags), m_value(_value), m_min(-DBL_MAX), m_max(DBL_MAX), m_precision(2)
+	: Property(_flags), m_value(_value), m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max()), m_precision(2)
 {}
 
 ot::PropertyDouble::PropertyDouble(const std::string& _name, double _value, PropertyFlags _flags)
-	: Property(_name, _flags), m_value(_value), m_min(-DBL_MAX), m_max(DBL_MAX), m_precision(2)
+	: Property(_name, _flags), m_value(_value), m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max()), m_precision(2)
 {}
 
 ot::PropertyDouble::PropertyDouble(const std::string& _name, double _value, double _min, double _max, PropertyFlags _flags)

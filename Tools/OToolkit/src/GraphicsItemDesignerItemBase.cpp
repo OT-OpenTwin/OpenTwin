@@ -59,10 +59,10 @@ void GraphicsItemDesignerItemBase::fillBasePropertyGrid(ot::PropertyGridCfg& _co
 	PropertyString* nameProp = new PropertyString("Name", this->getGraphicsItem()->getGraphicsItemName());
 	nameProp->setPropertyTip("Item name. The name can be used to find it in a group of items.");
 	generalGroup->addProperty(nameProp);
-	PropertyDouble* posXProp = new PropertyDouble("Position X", this->getGraphicsItem()->getGraphicsItemPos().x(), 0., DBL_MAX);
+	PropertyDouble* posXProp = new PropertyDouble("Position X", this->getGraphicsItem()->getGraphicsItemPos().x(), 0., std::numeric_limits<double>::max());
 	posXProp->setPropertyTip("Item top left X position.");
 	generalGroup->addProperty(posXProp);
-	PropertyDouble* posYProp = new PropertyDouble("Position Y", this->getGraphicsItem()->getGraphicsItemPos().y(), 0., DBL_MAX);
+	PropertyDouble* posYProp = new PropertyDouble("Position Y", this->getGraphicsItem()->getGraphicsItemPos().y(), 0., std::numeric_limits<double>::max());
 	posYProp->setPropertyTip("Item top left Y position.");
 	generalGroup->addProperty(posYProp);
 

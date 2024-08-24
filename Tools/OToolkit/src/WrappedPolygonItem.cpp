@@ -69,7 +69,7 @@ void WrappedPolygonItem::controlPointsChanged(void) {
 
 	this->prepareGeometryChange();
 
-	ot::Point2DD topLeftPoint(DBL_MAX, DBL_MAX);
+	ot::Point2DD topLeftPoint(std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
 	std::list<ot::Point2DD> newPoints;
 
 	for (const QPointF& pt : this->getControlPoints()) {
@@ -78,7 +78,7 @@ void WrappedPolygonItem::controlPointsChanged(void) {
 		newPoints.push_back(ot::QtFactory::toPoint2D(pt));
 	}
 
-	if (topLeftPoint.x() == DBL_MAX || topLeftPoint.y() == DBL_MAX) {
+	if (topLeftPoint.x() == std::numeric_limits<double>::max() || topLeftPoint.y() == std::numeric_limits<double>::max()) {
 		OT_LOG_E("Invalid points");
 		return;
 	}
@@ -99,7 +99,7 @@ void WrappedPolygonItem::fillPropertyGrid(void) {
 
 	PropertyGroup* polygonGroup = new PropertyGroup("Polygon");
 	polygonGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().painter()));
-	polygonGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width(), 0., DBL_MAX));
+	polygonGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width(), 0., std::numeric_limits<double>::max()));
 	polygonGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
 	polygonGroup->addProperty(new PropertyBool("Fill Polygon", this->getFillPolygon()));
 

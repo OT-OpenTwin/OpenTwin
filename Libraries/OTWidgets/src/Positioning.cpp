@@ -109,7 +109,7 @@ QRect ot::fitOnScreen(const QRect& _sourceRect, bool _primaryScreenOnly) {
 		screen = QGuiApplication::primaryScreen();
 	}
 	else {
-		double closestDistance = DBL_MAX;
+		double closestDistance = std::numeric_limits<double>::max();
 		for (QScreen* s : QGuiApplication::screens()) {
 			double distanceLeft = _sourceRect.left() - s->geometry().right();
 			double distanceRight = _sourceRect.right() - s->geometry().left();

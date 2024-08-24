@@ -77,18 +77,18 @@ void WrappedArcItem::fillPropertyGrid(void) {
 	this->fillBasePropertyGrid(cfg);
 
 	PropertyGroup* arcGroup = new PropertyGroup("Arc");
-	PropertyDouble* arcXProp = new PropertyDouble("Arc X", this->getArcRect().getLeft(), 0., DBL_MAX);
+	PropertyDouble* arcXProp = new PropertyDouble("Arc X", this->getArcRect().getLeft(), 0., std::numeric_limits<double>::max());
 	arcXProp->setPropertyTip("X arc rect position relative to the item's X position.");
 	arcGroup->addProperty(arcXProp);
-	PropertyDouble* arcYProp = new PropertyDouble("Arc Y", this->getArcRect().getTop(), 0., DBL_MAX);
+	PropertyDouble* arcYProp = new PropertyDouble("Arc Y", this->getArcRect().getTop(), 0., std::numeric_limits<double>::max());
 	arcYProp->setPropertyTip("Y arc rect position relative to the item's Y position.");
 	arcGroup->addProperty(arcYProp);
-	arcGroup->addProperty(new PropertyDouble("Width", this->getArcRect().getWidth(), 0., DBL_MAX));
-	arcGroup->addProperty(new PropertyDouble("Height", this->getArcRect().getHeight(), 0., DBL_MAX));
-	arcGroup->addProperty(new PropertyDouble("Start Angle", this->getStartAngle() / 16., 0., DBL_MAX));
-	arcGroup->addProperty(new PropertyDouble("Span Angle", this->getSpanAngle() / 16., 0., DBL_MAX));
+	arcGroup->addProperty(new PropertyDouble("Width", this->getArcRect().getWidth(), 0., std::numeric_limits<double>::max()));
+	arcGroup->addProperty(new PropertyDouble("Height", this->getArcRect().getHeight(), 0., std::numeric_limits<double>::max()));
+	arcGroup->addProperty(new PropertyDouble("Start Angle", this->getStartAngle() / 16., 0., std::numeric_limits<double>::max()));
+	arcGroup->addProperty(new PropertyDouble("Span Angle", this->getSpanAngle() / 16., 0., std::numeric_limits<double>::max()));
 	arcGroup->addProperty(new PropertyPainter2D("Line Painter", this->getLineStyle().painter()));
-	arcGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().width(), 0., DBL_MAX));
+	arcGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().width(), 0., std::numeric_limits<double>::max()));
 	
 	cfg.addRootGroup(arcGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);

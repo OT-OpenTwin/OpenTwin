@@ -79,9 +79,9 @@ void WrappedCircleItem::fillPropertyGrid(void) {
 	this->fillBasePropertyGrid(cfg);
 	
 	PropertyGroup* circleGroup = new PropertyGroup("Circle");
-	circleGroup->addProperty(new PropertyDouble("Radius", this->getRadiusX(), 0., DBL_MAX));
+	circleGroup->addProperty(new PropertyDouble("Radius", this->getRadiusX(), 0., std::numeric_limits<double>::max()));
 	circleGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().painter()));
-	circleGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width(), 0., DBL_MAX));
+	circleGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width(), 0., std::numeric_limits<double>::max()));
 	circleGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
 
 	cfg.addRootGroup(circleGroup);

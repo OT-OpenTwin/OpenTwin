@@ -82,7 +82,7 @@ void xyPlot::RepaintGrid(void) {
 // Getter
 
 QwtPlotCurve * xyPlot::findNearestCurve(const QPoint & _pos, int & _pointID) {
-	double dist{ DBL_MAX };
+	double dist{ std::numeric_limits<double>::max() };
 
 	QwtPlotCurve * curve = nullptr;
 

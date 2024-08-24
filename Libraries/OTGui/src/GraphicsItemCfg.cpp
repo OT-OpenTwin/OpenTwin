@@ -50,7 +50,7 @@
 
 ot::GraphicsItemCfg::GraphicsItemCfg()
 	: m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(ot::AlignCenter), m_uid(0),
-	m_minSize(0., 0.), m_margins(0., 0., 0., 0.), m_maxSize(DBL_MAX, DBL_MAX), m_sizePolicy(ot::Preferred), m_connectionDirection(ot::ConnectAny)
+	m_minSize(0., 0.), m_margins(0., 0., 0., 0.), m_maxSize(std::numeric_limits<double>::max(), std::numeric_limits<double>::max()), m_sizePolicy(ot::Preferred), m_connectionDirection(ot::ConnectAny)
 {}
 
 ot::GraphicsItemCfg::~GraphicsItemCfg() {}

@@ -74,20 +74,20 @@ void WrappedLineItem::fillPropertyGrid(void) {
 	this->fillBasePropertyGrid(cfg);
 	
 	PropertyGroup* lineGroup = new PropertyGroup("Line");
-	PropertyDouble* x1Prop = new PropertyDouble("X1", this->getLine().x1(), 0., DBL_MAX);
+	PropertyDouble* x1Prop = new PropertyDouble("X1", this->getLine().x1(), 0., std::numeric_limits<double>::max());
 	x1Prop->setPropertyTip("The X1 line position relative to the item's X position.");
 	lineGroup->addProperty(x1Prop);
-	PropertyDouble* y1Prop = new PropertyDouble("Y1", this->getLine().y1(), 0., DBL_MAX);
+	PropertyDouble* y1Prop = new PropertyDouble("Y1", this->getLine().y1(), 0., std::numeric_limits<double>::max());
 	y1Prop->setPropertyTip("The Y1 line position relative to the item's Y position.");
 	lineGroup->addProperty(y1Prop);
-	PropertyDouble* x2Prop = new PropertyDouble("X2", this->getLine().x2(), 0., DBL_MAX);
+	PropertyDouble* x2Prop = new PropertyDouble("X2", this->getLine().x2(), 0., std::numeric_limits<double>::max());
 	x2Prop->setPropertyTip("The X2 line position relative to the item's X position.");
 	lineGroup->addProperty(x2Prop);
-	PropertyDouble* y2Prop = new PropertyDouble("Y2", this->getLine().y2(), 0., DBL_MAX);
+	PropertyDouble* y2Prop = new PropertyDouble("Y2", this->getLine().y2(), 0., std::numeric_limits<double>::max());
 	y2Prop->setPropertyTip("The Y2 line position relative to the item's Y position.");
 	lineGroup->addProperty(y2Prop);
 	lineGroup->addProperty(new PropertyPainter2D("Line Painter", this->getLineStyle().painter()));
-	lineGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().width(), 0., DBL_MAX));
+	lineGroup->addProperty(new PropertyDouble("Line Width", this->getLineStyle().width(), 0., std::numeric_limits<double>::max()));
 	
 	cfg.addRootGroup(lineGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);

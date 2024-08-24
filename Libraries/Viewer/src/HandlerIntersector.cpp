@@ -120,7 +120,7 @@ void HandlerIntersector::intersect(osgUtil::IntersectionVisitor &iv, osg::Drawab
 		osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(geometry->getVertexArray());
 		if (!vertices) return;
 
-		double minDist = DBL_MAX;
+		double minDist = std::numeric_limits<double>::max();
 		double intersectionRatio = 0.0;
 		int    intersectionIndex = 0;
 		double prevSegmentLength = 0.0;
@@ -142,7 +142,7 @@ void HandlerIntersector::intersect(osgUtil::IntersectionVisitor &iv, osg::Drawab
 			prevSegmentLength += segmentVector.length();
 		}
 
-		if (minDist < DBL_MAX)
+		if (minDist < std::numeric_limits<double>::max())
 		{
 			Intersection hit;
 			hit.ratio = intersectionRatio;

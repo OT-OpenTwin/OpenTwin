@@ -88,8 +88,8 @@ void WrappedTriangleItem::fillPropertyGrid(void) {
 	this->fillBasePropertyGrid(cfg);
 
 	PropertyGroup* triangleGroup = new PropertyGroup("Triangle");
-	triangleGroup->addProperty(new PropertyDouble("Width", this->getTriangleSize().width(), 0., DBL_MAX));
-	triangleGroup->addProperty(new PropertyDouble("Height", this->getTriangleSize().height(), 0., DBL_MAX));
+	triangleGroup->addProperty(new PropertyDouble("Width", this->getTriangleSize().width(), 0., std::numeric_limits<double>::max()));
+	triangleGroup->addProperty(new PropertyDouble("Height", this->getTriangleSize().height(), 0., std::numeric_limits<double>::max()));
 	{
 		std::list<std::string> possibleSelection;
 		possibleSelection.push_back(GraphicsTriangleItemCfg::triangleShapeToString(GraphicsTriangleItemCfg::Triangle));
@@ -109,7 +109,7 @@ void WrappedTriangleItem::fillPropertyGrid(void) {
 	}
 
 	triangleGroup->addProperty(new PropertyPainter2D("Border Painter", this->getOutline().painter()));
-	triangleGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width(), 0., DBL_MAX));
+	triangleGroup->addProperty(new PropertyDouble("Border Width", this->getOutline().width(), 0., std::numeric_limits<double>::max()));
 	triangleGroup->addProperty(new PropertyPainter2D("Background Painter", this->getBackgroundPainter()));
 
 	cfg.addRootGroup(triangleGroup);

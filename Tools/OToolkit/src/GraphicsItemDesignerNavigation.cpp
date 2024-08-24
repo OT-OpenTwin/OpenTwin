@@ -151,7 +151,7 @@ ot::GraphicsItemCfg* GraphicsItemDesignerNavigation::generateConfig(const Graphi
 		
 		// Check for auto align
 		if (_exportConfig.getExportConfigFlags() & GraphicsItemDesignerExportConfig::AutoAlign) {
-			RectD newRect(Point2DD(DBL_MAX, DBL_MAX),Point2DD (-DBL_MAX, -DBL_MAX));
+			RectD newRect(Point2DD(std::numeric_limits<double>::max(), std::numeric_limits<double>::max()),Point2DD (std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest()));
 			for (GraphicsItemCfg* cfg : rootGroup->getItems()) {
 				if (cfg->getPosition().x() < newRect.getLeft()) newRect.setLeft(cfg->getPosition().x());
 				if (cfg->getPosition().y() < newRect.getTop()) newRect.setTop(cfg->getPosition().y());
@@ -346,8 +346,8 @@ void GraphicsItemDesignerNavigation::forgetItem(GraphicsItemDesignerItemBase* _i
 }
 
 QRectF GraphicsItemDesignerNavigation::calculateDesignerItemRect(void) const {
-	QPointF topLeft(DBL_MAX, DBL_MAX);
-	QPointF bottomRight(-DBL_MAX, -DBL_MAX);
+	QPointF topLeft(std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
+	QPointF bottomRight(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest());
 	for (GraphicsItemDesignerItemBase* itm : m_rootItems) {
 		ot::GraphicsItem* graphicsItem = itm->getGraphicsItem();
 		OTAssertNullptr(graphicsItem);

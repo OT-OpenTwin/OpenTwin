@@ -43,8 +43,8 @@ void GraphicsItemDesignerNavigationRoot::fillPropertyGrid(void) {
 	);
 	gridSnapProp->setPropertyTip("If enabled items will snap to the grid. This also works if the grid is hidden.");
 	editorGroup->addProperty(gridSnapProp);
-	editorGroup->addProperty(new PropertyDouble("Width", m_designer->getView()->sceneRect().width(), 0., DBL_MAX));
-	editorGroup->addProperty(new PropertyDouble("Height", m_designer->getView()->sceneRect().height(), 0., DBL_MAX));
+	editorGroup->addProperty(new PropertyDouble("Width", m_designer->getView()->sceneRect().width(), 0., std::numeric_limits<double>::max()));
+	editorGroup->addProperty(new PropertyDouble("Height", m_designer->getView()->sceneRect().height(), 0., std::numeric_limits<double>::max()));
 
 	cfg.addRootGroup(editorGroup);
 	this->getPropertyGrid()->setupGridFromConfig(cfg);
