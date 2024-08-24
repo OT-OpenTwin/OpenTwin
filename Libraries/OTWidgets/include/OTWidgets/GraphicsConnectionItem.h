@@ -49,6 +49,14 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
+		// Graphics Base
+
+		//! \brief Calculates and returns the closest distance to the given point.
+		//! Returns -1 if the distance is invalid (e.g. maximum distance exceeded).
+		virtual qreal calculateShortestDistanceToPoint(const QPointF& _pt) const override;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
 		//! @brief Will set the connection properties as provided in the configuration
 		//! The origin and destination item won't be set!
 		bool setConfiguration(const ot::GraphicsConnectionCfg& _cfg);
@@ -108,7 +116,11 @@ namespace ot {
 		void calculateSmoothLineStep(const QPointF& _origin, const QPointF& _destination, double _halfdistX, double _halfdistY, QPointF& _control, ot::ConnectionDirection _direction) const;
 		void calculateXYLinePath(QPainterPath& _path) const;
 		void calculateYXLinePath(QPainterPath& _path) const;
-		
+		qreal calculateShortestDistanceToPointDirect(const QPointF& _pt) const;
+		qreal calculateShortestDistanceToPointSmooth(const QPointF& _pt) const;
+		qreal calculateShortestDistanceToPointXY(const QPointF& _pt) const;
+		qreal calculateShortestDistanceToPointYX(const QPointF& _pt) const;
+
 		GraphicsConnectionCfg m_config;
 
 		GraphicsConnectionStateFlags m_state;

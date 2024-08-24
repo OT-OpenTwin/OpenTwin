@@ -103,6 +103,9 @@
     <ClCompile Include="src\VariableListToStringListConverter.cpp">
       <Filter>src\Variable</Filter>
     </ClCompile>
+    <ClCompile Include="src\Math.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -256,6 +259,9 @@
       <Filter>include\VariableType</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\DefensiveProgramming.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\Math.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

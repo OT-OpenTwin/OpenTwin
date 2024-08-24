@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Math.h"
 #include "OTCore/Logger.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/QtFactory.h"
@@ -36,6 +37,7 @@ ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
+// QGraphicsItem
 
 QRectF ot::GraphicsConnectionItem::boundingRect(void) const {
 	if (m_dest == nullptr || m_origin == nullptr) {
@@ -119,6 +121,35 @@ void ot::GraphicsConnectionItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _even
 void ot::GraphicsConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 	m_state &= (~HoverState);
 	this->update();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Graphics Base
+
+qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPoint(const QPointF& _pt) const {
+	qreal distance = -1.;
+
+	switch (m_config.getLineShape())
+	{
+	case GraphicsConnectionCfg::ConnectionShape::DirectLine:
+		distance = this->calculateShortestDistanceToPointDirect(_pt);
+		break;
+	case GraphicsConnectionCfg::ConnectionShape::SmoothLine:
+		distance = this->calculateShortestDistanceToPointSmooth(_pt);
+		break;
+	case GraphicsConnectionCfg::ConnectionShape::XYLine:
+		distance = this->calculateShortestDistanceToPointXY(_pt);
+		break;
+	case GraphicsConnectionCfg::ConnectionShape::YXLine:
+		distance = this->calculateShortestDistanceToPointYX(_pt);
+		break;
+	default:
+		OT_LOG_EA("Unknown line shape");
+		break;
+	}
+
+	return distance;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -325,4 +356,23 @@ void ot::GraphicsConnectionItem::calculateYXLinePath(QPainterPath& _path) const 
 		_path.lineTo(controlPoint);
 	}
 	_path.lineTo(destinationPoint);
+}
+
+qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointDirect(const QPointF& _pt) const {
+	QPointF originPoint = this->originItem()->getQGraphicsItem()->mapToScene(this->originItem()->getQGraphicsItem()->boundingRect().center());
+	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->mapToScene(this->destItem()->getQGraphicsItem()->boundingRect().center());
+
+	return Math::calculateShortestDistanceFromPointToLine(_pt.x(), _pt.y(), originPoint.x(), originPoint.y(), destinationPoint.x(), destinationPoint.y());
+}
+
+qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointSmooth(const QPointF& _pt) const {
+	return this->calculateShortestDistanceToPointDirect(_pt);
+}
+
+qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointXY(const QPointF& _pt) const {
+	return this->calculateShortestDistanceToPointDirect(_pt);
+}
+
+qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointYX(const QPointF& _pt) const {
+	return this->calculateShortestDistanceToPointDirect(_pt);
 }

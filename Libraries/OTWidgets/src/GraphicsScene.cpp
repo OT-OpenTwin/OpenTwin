@@ -232,16 +232,8 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 			}
 		}
 		else if (actualBase) {
-			qreal dist = actualBase->calculateClosestDistanceToPoint(_event->scenePos());
+			qreal dist = actualBase->calculateShortestDistanceToPoint(_event->scenePos());
 			
-			// If a grid is set we will check that the distance does not exceed two times the grid step width
-			qreal gridStepLength = std::max(m_grid.getGridStep().x(), m_grid.getGridStep().y());
-			if (gridStepLength > 0.) {
-				if (dist > (gridStepLength * 2.)) {
-					dist = -1.;
-				}
-			}
-
 			// Check if the new distance is lower than the previously found one
 			if (dist >= 0. && dist < minDistance) {
 				minDistance = dist;

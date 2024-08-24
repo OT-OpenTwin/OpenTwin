@@ -19,9 +19,9 @@ namespace ot {
 		GraphicsBase() {};
 		virtual ~GraphicsBase() {};
 
-		//! \brief Calculates and returns the closest distance to the given point.
+		//! \brief Calculates and returns the shortest distance to the given point.
 		//! Returns -1 if the distance is invalid (e.g. maximum distance exceeded).
-		virtual qreal calculateClosestDistanceToPoint(const QPointF& _pt) const { return -1.; };
+		virtual qreal calculateShortestDistanceToPoint(const QPointF& _pt) const { return -1.; };
 
 	};
 
