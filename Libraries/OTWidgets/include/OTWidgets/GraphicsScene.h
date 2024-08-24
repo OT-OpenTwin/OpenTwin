@@ -16,8 +16,10 @@
 
 namespace ot {
 
+	class GraphicsBase;
 	class GraphicsView;
 	class GraphicsItem;
+	class GraphicsConnectionItem;
 	class GraphicsConnectionPreviewItem;
 
 	//! @brief Graphics Scene for ot::GraphicsItem
@@ -36,6 +38,13 @@ namespace ot {
 		//! @brief A connection line according to the current configuration will be drawn with the provided item as origin
 		//! @param _item Origin item
 		void startConnection(ot::GraphicsItem* _item);
+
+		//! \brief Will request a connection from the currently set origin to the provided target connection.
+		//! The new control point is pos and should be the mouse press position.
+		//! \param _targetConnection The destination for the connection request.
+		//! \param _pos The new control point position.
+		void startConnectionToConnection(ot::GraphicsConnectionItem* _targetedConnection, const Point2DD& _pos);
+
 		void stopConnection(void);
 
 		// ###########################################################################################################################################################################################################################################################################################################################

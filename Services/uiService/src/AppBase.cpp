@@ -2260,6 +2260,51 @@ void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std
 	}
 }
 
+void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint) {
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
+	if (view == nullptr) {
+		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::GraphicsConnectionPackage pckg(view->getGraphicsViewName());
+	ot::GraphicsConnectionCfg connectionConfig(_fromItemUid, _fromItemConnector, _toConnectionUid, std::string());
+	connectionConfig.setLineStyle(ot::OutlineF(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
+	pckg.addConnection(connectionConfig);
+
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
+
+	ot::JsonObject controlPosObj;
+	_newControlPoint.addToJsonObject(controlPosObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_POSITION, controlPosObj, doc.GetAllocator());
+
+	try {
+		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
+		std::string response;
+		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+			OT_LOG_E("Failed to send http request");
+			return;
+		}
+
+		ot::ReturnMessage responseObj = ot::ReturnMessage::fromJson(response);
+		if (responseObj != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Request failed: " + responseObj.getWhat());
+			return;
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
+	}
+	catch (...) {
+		OT_LOG_E("[FATAL] Unknown error");
+	}
+}
+
 void AppBase::slotGraphicsSelectionChanged(void) {
 	ot::GraphicsScene* scene = dynamic_cast<ot::GraphicsScene*>(sender());
 	if (scene == nullptr) {

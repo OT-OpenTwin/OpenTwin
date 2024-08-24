@@ -331,6 +331,10 @@ void ot::GraphicsView::requestConnection(const ot::UID& _fromUid, const std::str
 	Q_EMIT connectionRequested(_fromUid, _fromConnector, _toUid, _toConnector);
 }
 
+void ot::GraphicsView::requestConnectionToConnection(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint) {
+	Q_EMIT connectionToConnectionRequested(_fromItemUid, _fromItemConnector, _toConnectionUid, _newControlPoint);
+}
+
 void ot::GraphicsView::notifyItemMoved(const ot::GraphicsItem* _item) {
 	if (m_viewStateFlags & ItemMoveInProgress) return;
 	Q_EMIT itemMoved(_item->getGraphicsItemUid(), QtFactory::toQPoint(_item->getGraphicsItemPos()));

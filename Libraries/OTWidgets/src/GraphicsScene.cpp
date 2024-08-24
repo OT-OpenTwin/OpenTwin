@@ -5,12 +5,13 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/QtFactory.h"
-#include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsItem.h"
-#include "OTGui/ColorStyleTypes.h"
+#include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsConnectionPreviewItem.h"
 
 // Qt header
@@ -39,6 +40,20 @@ ot::GraphicsScene::~GraphicsScene() {}
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Connection handling
+
+void ot::GraphicsScene::startConnectionToConnection(ot::GraphicsConnectionItem* _targetedConnection, const Point2DD& _pos) {
+	OTAssertNullptr(m_view);
+	if (m_view->getGraphicsViewFlags() & GraphicsView::IgnoreConnectionByUser) return;
+
+	// Currently a connection may be used as a destiantion only for other connections
+	if (!m_connectionOrigin) {
+		return;
+	}
+
+	OT_LOG_D("New conncetion to connection");
+	m_view->requestConnectionToConnection(m_connectionOrigin->getRootItem()->getGraphicsItemUid(), m_connectionOrigin->getGraphicsItemName(), _targetedConnection->getConfiguration().getUid(), _pos);
+	this->stopConnection();
+}
 
 void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 	OTAssertNullptr(m_view);
@@ -200,8 +215,14 @@ void ot::GraphicsScene::itemAboutToBeRemoved(GraphicsItem* _item) {
 }
 
 void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) {
+	// Check for a new connection
 	QList<QGraphicsItem*> lst = items(_event->scenePos());
+	
+	qreal minDistance = DBL_MAX;
+	GraphicsBase* targetedBase = nullptr;
+
 	for (auto itm : lst) {
+		ot::GraphicsBase* actualBase = dynamic_cast<ot::GraphicsBase*>(itm);
 		ot::GraphicsItem* actualItm = dynamic_cast<ot::GraphicsItem*>(itm);
 		if (actualItm) {
 			if (actualItm->getGraphicsItemFlags() & ot::GraphicsItemCfg::ItemIsConnectable) {
@@ -210,9 +231,36 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 				return;
 			}
 		}
+		else if (actualBase) {
+			qreal dist = actualBase->calculateClosestDistanceToPoint(_event->scenePos());
+			
+			// If a grid is set we will check that the distance does not exceed two times the grid step width
+			qreal gridStepLength = std::max(m_grid.getGridStep().x(), m_grid.getGridStep().y());
+			if (gridStepLength > 0.) {
+				if (dist > (gridStepLength * 2.)) {
+					dist = -1.;
+				}
+			}
+
+			// Check if the new distance is lower than the previously found one
+			if (dist >= 0. && dist < minDistance) {
+				minDistance = dist;
+				targetedBase = actualBase;
+			}
+		}
 	}
 
-	this->stopConnection();
+	// Check if a base item was found next to the click position.
+	if (targetedBase) {
+		GraphicsConnectionItem* connectionItem = dynamic_cast<GraphicsConnectionItem*>(targetedBase);
+		if (connectionItem) {
+			this->startConnectionToConnection(connectionItem, QtFactory::toPoint2D(_event->scenePos()));
+		}
+	}
+	else {
+		this->stopConnection();
+	}
+	
 
 	//QGraphicsScene::mouseDoubleClickEvent(_event);
 }

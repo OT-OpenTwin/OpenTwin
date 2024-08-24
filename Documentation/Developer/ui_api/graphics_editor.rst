@@ -151,6 +151,7 @@ The Graphics API provides the following actions as callbacks:
 
 - :ref:`OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem<add_item_callback>`
 - :ref:`OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection<add_connection_callback>`
+- :ref:`OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection<add_connection_to_connection_callback>`
 - :ref:`OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged<item_changed_callback>`
 
 The actions are defined in ``OTCommunication/ActionTypes.h``.
@@ -200,6 +201,27 @@ Add Connection Callback
 
 The add connection action is sent when the user has created a valid connection in the Graphics Editor.
 A valid connection is a connection that has a valid origin and destination item and the origin and destination are not equal.
+
+.. _add_connection_to_connection_callback:
+
+Add Connection To Connection Callback
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table:: Action Parameters
+   :header-rows: 1
+
+   * - Action Parameter
+     - Type
+     - Description
+   * - OT_ACTION_PARAM_GRAPHICSEDITOR_Package
+     - ot::GraphicsConnectionPackage
+     - Package containing all connections and the editor name. Note that the connection destination UID is the targeted connection and the destination connectable name is always empty.
+   * - OT_ACTION_PARAM_POSITION
+     - ot::Point2DD
+     - The new control point. This is the location the user pressed with the mouse at. Here the new intersection item should be placed at when needed.
+
+The add connection to connection action is sent when the user has created a valid connection in the Graphics Editor.
+A valid connection is a connection that has a valid origin item and valid connection item as destination.
 
 .. _item_changed_callback:
 

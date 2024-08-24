@@ -271,6 +271,7 @@
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem "UI.GraphicsEditor.Item.Add"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem "UI.GraphicsEditor.Item.Remove"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection "UI.GraphicsEditor.Connection.Add"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection "UI.GraphicsEditor.Connection.AddToConnection"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection "UI.GraphicsEditor.Connection.Remove"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged "UI.GraphicsEditor.ItemChanged"
 
@@ -607,6 +608,7 @@
 #define OT_ACTION_PARAM_ANSWER "Answer"
 #define OT_ACTION_PARAM_PARAMETER1 "Parameter1"
 #define OT_ACTION_PARAM_PORT "Port"
+#define OT_ACTION_PARAM_POSITION "Position"
 
 #define OT_ACTION_PARAM_COUNT "Count"
 #define OT_ACTION_PARAM_PERCENT "Percentage"

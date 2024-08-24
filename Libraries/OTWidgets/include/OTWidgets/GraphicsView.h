@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Flags.h"
+#include "OTCore/Point2D.h"
 #include "OTCore/CoreTypes.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -90,6 +91,9 @@ namespace ot {
 		std::list<GraphicsConnectionItem*> getSelectedConnectionItems(void) const;
 
 		void requestConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
+
+		void requestConnectionToConnection(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
+
 		void notifyItemMoved(const ot::GraphicsItem* _item);
 
 		void notifyItemConfigurationChanged(const ot::GraphicsItem* _item);
@@ -107,6 +111,8 @@ namespace ot {
 		//! @param _toConnector Destination connector (child of destination item)
 		void connectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 		
+		void connectionToConnectionRequested(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
+
 		void itemMoved(const ot::UID& _uid, const QPointF& _newPos);
 
 		void itemConfigurationChanged(const ot::GraphicsItemCfg* _newConfig);

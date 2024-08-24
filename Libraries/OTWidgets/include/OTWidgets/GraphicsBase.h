@@ -19,7 +19,10 @@ namespace ot {
 		GraphicsBase() {};
 		virtual ~GraphicsBase() {};
 
-		virtual qreal calculateClosestDistanceToPoint(const QPointF& _pt) const { return DBL_MAX; };
+		//! \brief Calculates and returns the closest distance to the given point.
+		//! Returns -1 if the distance is invalid (e.g. maximum distance exceeded).
+		virtual qreal calculateClosestDistanceToPoint(const QPointF& _pt) const { return -1.; };
+
 	};
 
 }
