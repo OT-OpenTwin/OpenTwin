@@ -5,6 +5,7 @@
 
 // OToolkit header
 #include "NetworkTools.h"
+#include "PortBlockerServer.h"
 
 // OpenTwin header
 #include "OTCore/Logger.h"
@@ -17,7 +18,6 @@
 // Qt header
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qlayout.h>
-#include <QtNetwork/qtcpserver.h>
 
 #define NETWORKTOOLS_PORTTYPE_ANY "Any"
 #define NETWORKTOOLS_PORTTYPE_IPv4 "IPv4"
@@ -83,10 +83,10 @@ bool NetworkTools::prepareToolShutdown(QSettings& _settings) {
 
 void NetworkTools::slotRunPortBlocker(void) {
 	if (m_status.flagIsSet(NetworkToolStatus::PortBlockerRunning)) {
-		std::list<QTcpServer*> servers = m_servers;
+		std::list<PortBlockerServer*> servers = m_servers;
 		m_servers.clear();
 
-		for (QTcpServer* server : servers) {
+		for (PortBlockerServer* server : servers) {
 			server->close();
 			delete server;
 		}
@@ -157,7 +157,7 @@ void NetworkTools::slotRunPortBlocker(void) {
 		// Start a tcp server for every port that needs to be blocked
 		bool anyBlocked = false;
 		for (quint16 port : portsToBlock) {
-			QTcpServer* newServer = new QTcpServer;
+			PortBlockerServer* newServer = new PortBlockerServer;
 			if (!newServer->listen(listeningAdress, port)) {
 				delete newServer;
 				newServer = nullptr;

@@ -204,6 +204,9 @@
     <ClCompile Include="src\NetworkTools.cpp">
       <Filter>Source Files\NetworkTools</Filter>
     </ClCompile>
+    <ClCompile Include="src\PortBlockerServer.cpp">
+      <Filter>Source Files\NetworkTools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -341,6 +344,9 @@
       <Filter>Header Files\General</Filter>
     </QtMoc>
     <QtMoc Include="include\NetworkTools.h">
+      <Filter>Header Files\NetworkTools</Filter>
+    </QtMoc>
+    <QtMoc Include="include\PortBlockerServer.h">
       <Filter>Header Files\NetworkTools</Filter>
     </QtMoc>
   </ItemGroup>

@@ -45,6 +45,7 @@
     <ClCompile Include="src\LogVisualization.cpp" />
     <ClCompile Include="src\MenuManager.cpp" />
     <ClCompile Include="src\NetworkTools.cpp" />
+    <ClCompile Include="src\PortBlockerServer.cpp" />
     <ClCompile Include="src\Randomizer.cpp" />
     <ClCompile Include="src\SettingsManager.cpp" />
     <ClCompile Include="src\StatusManager.cpp" />
@@ -79,6 +80,7 @@
     <QtMoc Include="include\SettingsManager.h" />
     <ClInclude Include="include\GraphicsItemDesignerPreview.h" />
     <QtMoc Include="include\NetworkTools.h" />
+    <QtMoc Include="include\PortBlockerServer.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />

@@ -15,7 +15,7 @@
 // std header
 #include <list>
 
-class QTcpServer;
+class PortBlockerServer;
 namespace ot { class ComboBox; }
 namespace ot { class PushButton; }
 namespace ot { class PlainTextEdit; }
@@ -56,7 +56,7 @@ private Q_SLOTS:
 private:
 	NetworkToolStatusFlags m_status;
 
-	std::list<QTcpServer*> m_servers;
+	std::list<PortBlockerServer*> m_servers;
 	ot::ComboBox* m_portBlockerType;
 	ot::PushButton* m_runPortBlockerButton;
 	ot::PlainTextEdit* m_portBlockerPorts;
