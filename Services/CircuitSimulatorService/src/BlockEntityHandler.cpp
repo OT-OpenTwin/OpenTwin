@@ -38,12 +38,13 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 
 	std::string entName = CreateNewUniqueTopologyName(_blockFolder + "/" + editorName, blockEntity->getBlockTitle());
 	blockEntity->setName(entName);
+	blockEntity->setEditable(true);
 	blockEntity->SetServiceInformation(Application::instance()->getBasicServiceInformation());
 	blockEntity->setOwningService(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 	blockEntity->setEntityID(_modelComponent->createEntityUID());
 	// Here i want to add the items to the corresponding editor
 
-
+	
 	blockEntity->SetGraphicsScenePackageName(_packageName);
 	
 
