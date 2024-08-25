@@ -14,6 +14,7 @@
 #include "OTGui/Font.h"
 #include "OTGui/Path2D.h"
 #include "OTGui/Outline.h"
+#include "OTGui/Margins.h"
 #include "OTGui/GuiTypes.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -21,6 +22,7 @@
 #include <QtCore/qrect.h>
 #include <QtCore/qsize.h>
 #include <QtCore/qpoint.h>
+#include <QtCore/qmargins.h>
 #include <QtCore/qstringlist.h>
 #include <QtGui/qpen.h>
 #include <QtGui/qfont.h>
@@ -65,6 +67,13 @@ namespace ot {
 
 		static inline Rect toRect(const QRect& _r) { return Rect(toPoint2D(_r.topLeft()), toPoint2D(_r.bottomRight())); };
 		static inline RectD toRect(const QRectF& _r) { return RectD(toPoint2D(_r.topLeft()), toPoint2D(_r.bottomRight())); };
+
+		static inline QMargins toQMargins(const Margins& _m) noexcept { return QMargins(_m.left(), _m.top(), _m.right(), _m.bottom()); };
+		static inline QMarginsF toQMargins(const MarginsF& _m) noexcept { return QMarginsF(_m.left(), _m.top(), _m.right(), _m.bottom()); };
+		static inline QMarginsF toQMargins(const MarginsD& _m) noexcept { return QMarginsF(_m.left(), _m.top(), _m.right(), _m.bottom()); };
+
+		static inline Margins toMargins(const QMargins& _m) { return Margins(_m.left(), _m.top(), _m.right(), _m.bottom()); };
+		static inline MarginsD toMargins(const QMarginsF& _m) { return MarginsD(_m.left(), _m.top(), _m.right(), _m.bottom()); };
 
 		static QFont toQFont(const Font& _f);
 		static Font toFont(const QFont& _font);
