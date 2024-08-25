@@ -3,6 +3,7 @@
 EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner) 
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
+	
 	createProperties();
 }
 
@@ -13,17 +14,6 @@ void EntityBlockCircuitElement::createProperties()
 	EntityPropertiesString::createProperty("General", "Name", "Element", "default", getProperties());
 }
 
-const std::string&  EntityBlockCircuitElement::getShowName()
-{
-	auto propertyBase = getProperties().getProperty("Name");
-	auto propertyFlip = dynamic_cast<EntityPropertiesString*>(propertyBase);
-	if (propertyBase == nullptr)
-	{
-		return "";
-	}
-	std::string value = propertyFlip->getValue();
-	return value;
-}
 
 
 void EntityBlockCircuitElement::AddStorageData(bsoncxx::builder::basic::document& storage)

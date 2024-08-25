@@ -403,7 +403,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageSource::CreateBlockCfg()
 	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGrid | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState);
 	newConfig->setFile("Circuit/VoltageSource.ot.json");
 
-	std::string name = getShowName();
+	std::string name = getNameOnly();
 	newConfig->addStringMapEntry("Name", name);
 	
 	//Map of String to Enum
