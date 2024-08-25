@@ -5,32 +5,31 @@
  *  Copyright (c) 2020 openTwin
  */
 
-// C++ header
-#include <Windows.h>			// windows types
-#include <thread>				// thread
-
-// uiService header
-#include <exception>
-#include <fstream>
-
-#include <QtCore/QCoreApplication>
-#include <QtWebSockets/QtWebSockets>
+// Relay Service header
+#include "SocketServer.h"
 
 // Open Twin header
 #include "OTCore/JSON.h"					// rapidjson wrapper
 #include "OTCore/Logger.h"				// Logger
 #include "OTCore/ServiceBase.h"			// Logger initialization
+#include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"	// action member and types definition
 #include "OTCommunication/ServiceLogNotifier.h"
 
-#include "SocketServer.h"
+// Qt header
+#include <QtCore/qcoreapplication.h>
+#include <QtWebSockets/QtWebSockets>
 
-SocketServer *globalSocketServer = nullptr;
-unsigned int globalWebsocketPort = 0;
-std::string globalWebsocketIP;
-std::string globalServiceIP;
-std::string globalSessionServiceIP;
-std::string globalDirectoryServiceIP;
+// std header
+#include <mutex>
+#include <thread>
+#include <fstream>
+#include <Windows.h>
+#include <exception>
+
+bool g_appStartFailed{ false };
+bool g_appStartCompleted{ false };
+std::mutex g_appStartMutex;
 
 BOOL APIENTRY DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
@@ -54,6 +53,8 @@ void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
 	std::string ping = pingDoc.toJson();
 
+	OT_LOG_D("Starting LSS health check at \"" + _sessionServiceURL + "\"");
+
 	bool alive = true;
 	while (alive) {
 		// Wait for 20s
@@ -63,7 +64,7 @@ void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 		// Try to send message and check the response
 		std::string ret;
 		try {
-			if (!SocketServer::sendHttpRequest("execute", _sessionServiceURL, ping, ret)) { alive = false; }
+			if (!ot::msg::send("", _sessionServiceURL, ot::EXECUTE, ping, ret)) { alive = false; }
 			else OT_ACTION_IF_RESPONSE_ERROR(ret) { alive = false; }
 			else OT_ACTION_IF_RESPONSE_WARNING(ret) { alive = false; }
 			else if (ret != OT_ACTION_CMD_Ping) { alive = false; }
@@ -71,38 +72,47 @@ void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 		catch (...) { alive = false; }
 	}
 
-	OT_LOG_E("Session service has died unexpectedly. Shutting donw...");
+	OT_LOG_E("Session service \"" + _sessionServiceURL + "\" has died unexpectedly. Shutting down...");
 	exit(0);
 }
 
-void mainApplicationThread()
+void mainApplicationThread(std::string _websocketIp, unsigned int _websocketPort, std::string _relayUrl)
 {
 	try {
-		OT_LOG_I("Main application thread started");
-
 		// Launch the Websocket Server
 		int argc = 0;
 		QCoreApplication application(argc, nullptr);
 
-		globalSocketServer = new SocketServer(globalWebsocketIP, globalWebsocketPort);
-		QObject::connect(globalSocketServer, &SocketServer::closed, &application, &QCoreApplication::quit);
+		SocketServer::instance().setRelayUrl(_relayUrl);
+		SocketServer::instance().setWebsocketIp(_websocketIp);
+		SocketServer::instance().setWebsocketPort(_websocketPort);
 
-		OT_LOG_D("Setup completed");
+		OT_LOG_D("Relay url set to: " + SocketServer::instance().getRelayUrl());
+		OT_LOG_D("Websocket set to: " + SocketServer::instance().getWebsocketIp() + ":" + std::to_string(SocketServer::instance().getWebsocketPort()));
 
-		application.exec();
+		if (SocketServer::instance().startServer()) {
+			g_appStartMutex.lock();
+			g_appStartCompleted = true;
+			g_appStartMutex.unlock();
 
+			OT_LOG_D("Starting main event loop");
+			application.exec();
+		}
+		else {
+			g_appStartMutex.lock();
+			g_appStartFailed = true;
+			g_appStartMutex.unlock();
+
+			OT_LOG_E("Server start failed");
+		}
+		
 		OT_LOG_D("Closing realay service");
-
-		delete globalSocketServer;
-		globalSocketServer = nullptr;
 	}
 	catch (const std::exception & e) {
-		OT_LOG_E(std::string(e.what()));
-		assert(0); // Something went wrong
+		OT_LOG_EAS(std::string(e.what()));
 	}
 	catch (...) {
-		OT_LOG_E("Unknown error");
-		assert(0);	// Something went horribly wrong
+		OT_LOG_EA("Unknown error");
 	}
 }
 
@@ -119,10 +129,11 @@ extern "C"
 			ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_RelayService, logUrl, false);
 #endif // _DEBUG
 
-			OT_LOG_I("Initializing application");
-
-			globalSessionServiceIP = _sessionServiceIP;
-
+			std::string relayUrl;
+			std::string websocketIp;
+			unsigned int websocketPort = 0;
+			std::string lssUlr = _sessionServiceIP;
+			
 #ifdef _DEBUG
 			{
 				// Get file path
@@ -148,40 +159,44 @@ extern "C"
 				params.fromJson(info);
 
 				// Apply data
-				globalServiceIP = ot::json::getString(params, OT_ACTION_PARAM_SERVICE_URL);
+				relayUrl = ot::json::getString(params, OT_ACTION_PARAM_SERVICE_URL);
 				std::string websocketUrl = ot::json::getString(params, OT_ACTION_PARAM_WebsocketURL);
-				globalWebsocketPort = std::stoi(websocketUrl.substr(websocketUrl.rfind(":") + 1));
-				globalWebsocketIP = websocketUrl.substr(0, websocketUrl.rfind(":"));
-				globalSessionServiceIP = ot::json::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
-				globalDirectoryServiceIP = ot::json::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
-
-				OT_LOG_I("Application parameters were overwritten by configuration file: " + path);
+				websocketPort = std::stoi(websocketUrl.substr(websocketUrl.rfind(":") + 1));
+				websocketIp = websocketUrl.substr(0, websocketUrl.rfind(":"));
+				lssUlr = ot::json::getString(params, OT_ACTION_PARAM_SESSION_SERVICE_URL);
+				//globalDirectoryServiceIP = ot::json::getString(params, OT_ACTION_PARAM_LOCALDIRECTORY_SERVICE_URL);
 			}
 #else
 			std::string websocketUrl(_websocketIP);
-			globalWebsocketPort = std::stoi(websocketUrl.substr(websocketUrl.rfind(":") + 1));
-			globalWebsocketIP = websocketUrl.substr(0, websocketUrl.rfind(":"));
-			globalServiceIP = _ownIP;
+			websocketPort = std::stoi(websocketUrl.substr(websocketUrl.rfind(":") + 1));
+			websocketIp = websocketUrl.substr(0, websocketUrl.rfind(":"));
+			relayUrl = _ownIP;
 #endif
 
-			
-
-			OT_LOG_I("Initializing relay service");
-			OT_LOG_I("Session service HTTP address: " + globalSessionServiceIP);
-			OT_LOG_I("Relay service HTTP address: " + globalServiceIP);
-			OT_LOG_I("Relay service Websocket address: " + globalWebsocketIP + ":" + std::to_string(globalWebsocketPort));
-
 			// Start session service health check
-			std::thread t{ sessionServiceHealthChecker, globalSessionServiceIP.c_str() };
+			std::thread mainThread(mainApplicationThread, websocketIp, websocketPort, relayUrl);
+			mainThread.detach();
+
+			// The following while loop ensures that the main application thread started and the QApplication was created and the websocket started.
+			bool needWait = true;
+			while (needWait) {
+				g_appStartMutex.lock();
+				needWait = !g_appStartCompleted;
+				if (g_appStartFailed) {
+					exit(0);
+				}
+				g_appStartMutex.unlock();
+			}
+
+			std::thread t(sessionServiceHealthChecker, lssUlr);
 			t.detach();
 
-			std::thread *app = new std::thread(mainApplicationThread);
 		}
 		catch (const std::exception & e) {
-			assert(0); // Something went wrong
+			OT_LOG_EAS(e.what());
 		}
 		catch (...) {
-			assert(0);	// Something went horribly wrong
+			OT_LOG_EA("[FATAL] Unknown error");
 		}
 		return 0;
 	}
@@ -192,18 +207,16 @@ extern "C"
 		try {
 
 			//std::cout << "performAction: " << json << std::endl;
-			QMetaObject::invokeMethod(globalSocketServer, "performAction", /*Qt::BlockingQueuedConnection*/
+			QMetaObject::invokeMethod(&SocketServer::instance(), "performAction", /*Qt::BlockingQueuedConnection*/
 				Qt::DirectConnection, Q_RETURN_ARG(QString, retVal), Q_ARG(const char*, json), Q_ARG(const char*, senderIP));
 
 			// std::cout << "performAction completed: " << retval << std::endl;
 		}
 		catch (const std::exception & e) {
-			int x = 1;
-			assert(0); // Error
+			OT_LOG_EAS(e.what());
 		}
 		catch (...) {
-			int x = 1;
-			assert(0); // Error
+			OT_LOG_EA("[FATAL] Unknown error");
 		}
 
 		char *retval = new char[retVal.length() + 1];
@@ -226,23 +239,21 @@ extern "C"
 
 			// std::cout << "queueAction: " << dataCopy << std::endl;
 
-			QMetaObject::invokeMethod(globalSocketServer, "queueAction", Qt::QueuedConnection, Q_ARG(const char*, dataCopy), Q_ARG(const char*, senderIPCopy));
+			QMetaObject::invokeMethod(&SocketServer::instance(), "queueAction", Qt::QueuedConnection, Q_ARG(const char*, dataCopy), Q_ARG(const char*, senderIPCopy));
 		}
 		catch (const std::exception & e) {
-			int x = 1;
-			assert(0); // Error
+			OT_LOG_EAS(e.what());
 		}
 		catch (...) {
-			int x = 1;
-			assert(0); // Error
+			OT_LOG_EA("[FATAL] Unknown error");
 		}
 		return retval;
 	}
 
 	_declspec(dllexport) const char *getServiceURL(void)
 	{
-		char *retVal = new char[globalServiceIP.size() + 1];
-		strcpy(retVal, globalServiceIP.c_str());
+		char *retVal = new char[SocketServer::instance().getRelayUrl().size() + 1];
+		strcpy(retVal, SocketServer::instance().getRelayUrl().c_str());
 
 		return retVal;
 	}
@@ -253,7 +264,7 @@ extern "C"
 			// std::cout << "deallocateData: ";
 			if (data != nullptr)
 			{
-				QMetaObject::invokeMethod(globalSocketServer, "deallocateData", Qt::QueuedConnection, Q_ARG(const char*, data));
+				QMetaObject::invokeMethod(&SocketServer::instance(), "deallocateData", Qt::QueuedConnection, Q_ARG(const char*, data));
 			}
 		}
 		catch (const std::exception & e) {

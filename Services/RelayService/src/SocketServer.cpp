@@ -1,5 +1,4 @@
-
-
+// Relay Service header
 #include "SocketServer.h"
 
 // OpenTwin header
@@ -8,34 +7,30 @@
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTCommunication/Msg.h"				// message sending
 
-#include <QtWebSockets/qwebsocketserver.h>
+// Qt header
+#include <QtCore/qfile.h>
+#include <QtCore/qdebug.h>
+#include <QtCore/qeventloop.h>
+#include <QtCore/qcoreapplication.h>
+#include <QtNetwork/qsslkey.h>
+#include <QtNetwork/qsslcertificate.h>
 #include <QtWebSockets/qwebsocket.h>
-#include <QEventLoop>
-
-#include <iostream>
-
-// Curl
-#include "curl/curl.h"
-
-extern std::string globalServiceIP;
-
-// SSL
-#include <QtCore/QDebug>
-#include <QtCore/QFile>
-#include <QtNetwork/QSslCertificate>
-#include <QtNetwork/QSslKey>
+#include <QtWebSockets/qwebsocketserver.h>
 #include <QProcessEnvironment>
 
+// std header
+#include <iostream>
 
+SocketServer& SocketServer::instance(void) {
+	static SocketServer g_instance;
+	return g_instance;
+}
 
+bool SocketServer::startServer(void) {
+	OT_LOG_D("Setting up websocket");
 
-SocketServer::SocketServer(std::string socketIP, unsigned int socketPort) :
-	QObject(nullptr),
-	m_pWebSocketServer(new QWebSocketServer(QStringLiteral("SSL Websocket Server"), QWebSocketServer::SecureMode, this)),
-	responseReceived(false)
-{
 	QHostAddress serverAddress;
-	serverAddress.setAddress(socketIP.c_str());
+	serverAddress.setAddress(m_websocketIp.c_str());
 
 	// TLS/SSL Config
 	QSslConfiguration sslConfiguration;
@@ -55,38 +50,158 @@ SocketServer::SocketServer(std::string socketIP, unsigned int socketPort) :
 	sslConfiguration.setPeerVerifyMode(QSslSocket::VerifyNone);
 	sslConfiguration.setLocalCertificate(certificate);
 	sslConfiguration.setPrivateKey(sslKey);
+
+	m_pWebSocketServer = new QWebSocketServer(QStringLiteral("SSL Websocket Server"), QWebSocketServer::SecureMode, this);
 	m_pWebSocketServer->setSslConfiguration(sslConfiguration);
-	
+
 	// Initialize the performance counters
 	m_systemLoad.initialize();
 
-	if (m_pWebSocketServer->listen(serverAddress, socketPort))
+	OT_LOG_D("Starting websocket");
+	if (m_pWebSocketServer->listen(serverAddress, m_websocketPort))
 	{
-		OT_LOG_I("Websocket server listening on: " + socketIP + ":" + std::to_string(socketPort));
-        connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, &SocketServer::onNewConnection);
-        connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &SocketServer::closed);
-		connect(m_pWebSocketServer, &QWebSocketServer::sslErrors,
-			this, &SocketServer::onSslErrors);
-    }
-}
-
-void SocketServer::onSslErrors(const QList<QSslError> & _errors)
-{
-	// TODO: HANDLE SSL ERRORS?
-	for (auto e : _errors) {
-		OT_LOG_E("SSL error occurred: " + e.errorString().toStdString());
+		OT_LOG_I("Websocket server listening on: " + m_websocketIp + ":" + std::to_string(m_websocketPort));
+		connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, &SocketServer::onNewConnection);
+		connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &SocketServer::slotSocketClosed);
+		connect(m_pWebSocketServer, &QWebSocketServer::sslErrors, this, &SocketServer::onSslErrors);
+		return true;
+	}
+	else {
+		return false;
 	}
 }
 
-SocketServer::~SocketServer()
+bool SocketServer::sendHttpRequest(const std::string& operation, const std::string& url, const std::string& jsonData, std::string& response)
 {
-    m_pWebSocketServer->close();
-    qDeleteAll(m_clients.begin(), m_clients.end());
+	try {
+
+		OT_LOG_D("Sending http request (" + operation + ") to " + url + ": " + jsonData);
+
+		bool success = false;
+
+		if (operation == "execute")
+		{
+			success = ot::msg::send(m_relayUrl, url, ot::EXECUTE, jsonData, response);
+		}
+		else if (operation == "queue")
+		{
+			success = ot::msg::send(m_relayUrl, url, ot::QUEUE, jsonData, response);
+		}
+		else
+		{
+			assert(0);
+		}
+
+		return success;
+	}
+	catch (...) {
+		assert(0); // Error handling
+		return false;
+	}
+
+	return false;
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Public: Slots
+
+QString SocketServer::performAction(const char* json, const char* senderIP)
+{
+	try {
+		ot::JsonDocument doc;
+		doc.fromJson(json);
+
+		std::string action = ot::json::getString(doc, "action");
+
+		OT_LOG("Received HTTP execute message \"" + action + "\"", ot::INBOUND_MESSAGE_LOG);
+
+		if (action == OT_ACTION_CMD_GetSystemInformation)
+		{
+			return getSystemInformation().c_str();
+		}
+		else if (action == OT_ACTION_CMD_CheckRelayStartupCompleted) {
+			if (!m_pWebSocketServer) {
+				return OT_ACTION_RETURN_VALUE_FALSE;
+			}
+			else if (m_pWebSocketServer->isListening()) {
+				return OT_ACTION_RETURN_VALUE_TRUE;
+			}
+			else {
+				return OT_ACTION_RETURN_VALUE_FALSE;
+			}
+		}
+
+		OT_LOG_E("Received HTTP execute message (not yet suported by relay service): " + action);
+
+		if (action == OT_ACTION_CMD_ShutdownRequestedByService) {
+			shutdown();
+		}
+
+		std::string response = sendProcessWSMessage("execute", senderIP, json);
+
+		QString retVal = response.c_str();
+
+		OT_LOG_I("Returning received websocket answer to HTTP sender");
+
+		return retVal;
+	}
+	catch (const std::exception& e) {
+		OT_LOG_E(std::string(e.what()));
+		return OT_ACTION_RETURN_INDICATOR_Error + QString(e.what());
+	}
+	catch (...) {
+		OT_LOG_E("Unknown error");
+		return OT_ACTION_RETURN_INDICATOR_Error "[FATAL] Unknown error";
+	}
+}
+
+void SocketServer::queueAction(const char* json, const char* senderIP)
+{
+	try {
+		ot::JsonDocument doc;
+		doc.fromJson(json);
+
+		std::string action = ot::json::getString(doc, "action");
+
+		OT_LOG_I("Received HTTP queue message: " + action);
+
+		if (action == OT_ACTION_CMD_ShutdownRequestedByService) {
+			shutdown();
+		}
+
+		sendQueueWSMessage("queue", senderIP, json);
+
+		delete[] json;
+		json = nullptr;
+
+		delete[] senderIP;
+		senderIP = nullptr;
+	}
+	catch (const std::exception& e) {
+		OT_LOG_E(std::string(e.what()));
+	}
+	catch (...) {
+		OT_LOG_E("Unknown error");
+	}
+}
+
+void SocketServer::deallocateData(const char* data)
+{
+	if (data != nullptr)
+	{
+		delete[] data;
+	}
+	data = nullptr;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Slots
 
 void SocketServer::onNewConnection()
 {
-	OT_LOG_I("New client connected on websocket");
+	OT_LOG_D("New client connected on websocket");
 
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
 
@@ -110,26 +225,26 @@ void SocketServer::processMessage(QString message)
 
 		if (operation == "response")
 		{
-			OT_LOG_I("Response to previous message received on websocket");
+			OT_LOG_D("Response to previous message received on websocket");
 
 			responseText = stdMessage.substr(index1 + 1);
 			responseReceived = true;
 		}
 		else if (operation == "execute" || operation == "queue")
 		{
-			OT_LOG_I("New execute or queue message received on websocket");
+			OT_LOG_D("New execute or queue message received on websocket");
 
 			std::string url = stdMessage.substr(index1 + 1, index2 - index1 - 1);
 			std::string jsonData = stdMessage.substr(index2 + 1);
 
 			std::string response;
 
-			OT_LOG_I("Relaying received message to HTTP");
+			OT_LOG_D("Relaying received message to HTTP");
 			sendHttpRequest(operation, url, jsonData, response);
 
 			response = "response\n" + url + "\n" + response;
 
-			OT_LOG_I("Sending reponse of HTTP message through websocket");
+			OT_LOG_D("Sending reponse of HTTP message through websocket");
 
 			for (auto pClient : m_clients)
 			{
@@ -151,15 +266,92 @@ void SocketServer::processMessage(QString message)
 	}
 }
 
-std::string SocketServer::sendProcessWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData)
+void SocketServer::socketDisconnected(void) {
+	OT_LOG_D("Client disconnected on websocket");
+
+	QWebSocket* pClient = qobject_cast<QWebSocket*>(sender());
+
+	if (pClient) {
+		m_clients.removeAll(pClient);
+		pClient->deleteLater();
+	}
+
+	if (m_clients.empty())
+	{
+		OT_LOG_D("No more clients, shutting down relay service");
+
+		exit(0);
+	}
+}
+
+void SocketServer::onSslErrors(const QList<QSslError>& _errors)
 {
+	// TODO: HANDLE SSL ERRORS?
+	for (auto e : _errors) {
+		OT_LOG_E("SSL error occurred: " + e.errorString().toStdString());
+	}
+}
+
+void SocketServer::slotSocketClosed(void) {
+	OT_LOG_D("Socket closed");
+	if (m_pWebSocketServer) delete m_pWebSocketServer;
+	m_pWebSocketServer = nullptr;
+
+	QCoreApplication::quit();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper
+
+SocketServer::SocketServer()
+	: QObject(nullptr), m_pWebSocketServer(nullptr), responseReceived(false), m_websocketPort(0)
+{
+
+}
+
+SocketServer::~SocketServer() {
+	if (m_pWebSocketServer) {
+		m_pWebSocketServer->close();
+		delete m_pWebSocketServer;
+		m_pWebSocketServer = nullptr;
+	}
+	qDeleteAll(m_clients.begin(), m_clients.end());
+}
+
+void SocketServer::processMessages(void) {
+	QEventLoop eventLoop;
+	// We have to process all messages to make sure we are connected
+	eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
+}
+
+void SocketServer::shutdown(void) {
+	// Exit the application
+	exit(0);
+}
+
+void SocketServer::sendQueueWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData) {
+	// Build and send the message through the websocket connection
+
+	std::string message = operation + "\n" + senderIP + "\n" + jsonData;
+
+	OT_LOG_D("Relaying received message to websocket");
+
+	for (auto pClient : m_clients)
+	{
+		pClient->sendTextMessage(message.c_str());
+		pClient->flush();
+	}
+}
+
+std::string SocketServer::sendProcessWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData) {
 	responseReceived = false;
 
 	// Build and send the message through the websocket connection
 
 	std::string message = operation + "\n" + senderIP + "\n" + jsonData;
 
-	OT_LOG_I("Relaying received message to websocket");
+	OT_LOG_D("Relaying received message to websocket");
 
 	for (auto pClient : m_clients)
 	{
@@ -178,175 +370,7 @@ std::string SocketServer::sendProcessWSMessage(const std::string operation, cons
 	return responseText;
 }
 
-void SocketServer::sendQueueWSMessage(const std::string operation, const std::string senderIP, const std::string jsonData)
-{
-	// Build and send the message through the websocket connection
-
-	std::string message = operation + "\n" + senderIP + "\n" + jsonData;
-
-	OT_LOG_I("Relaying received message to websocket");
-
-	for (auto pClient : m_clients)
-	{
-		pClient->sendTextMessage(message.c_str());
-		pClient->flush();
-	}
-}
-
-void SocketServer::processMessages(void)
-{
-	QEventLoop eventLoop;
-	// We have to process all messages to make sure we are connected
-	eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
-}
-
-void SocketServer::socketDisconnected()
-{
-	OT_LOG_I("Client disconnected on websocket");
-
-    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-
-    if (pClient) {
-        m_clients.removeAll(pClient);
-        pClient->deleteLater();
-    }
-
-	if (m_clients.empty())
-	{
-		OT_LOG_I("No more clients, shutting down relay service");
-
-		exit(0);
-	}
-}
-
-size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
-	try {
-		data->append((char*)ptr, size * nmemb);
-		return size * nmemb;
-	}
-	catch (...) {
-		assert(0); // Error handling
-	}
-	return 0;
-}
-
-bool SocketServer::sendHttpRequest(const std::string &operation, const std::string &url, const std::string &jsonData, std::string &response)
-{
-	try {
-
-		OT_LOG_I("Sending http request (" + operation + ") to " + url + ": " + jsonData);
-
-		bool success = false;
-
-		if (operation == "execute")
-		{
-			success = ot::msg::send(globalServiceIP, url, ot::EXECUTE, jsonData, response);
-		}
-		else if (operation == "queue")
-		{
-			success = ot::msg::send(globalServiceIP, url, ot::QUEUE, jsonData, response);
-		}
-		else
-		{
-			assert(0);
-		}
-
-		return success;
-	}
-	catch (...) {
-		assert(0); // Error handling
-		return false;
-	}
-
-	return false;
-}
-
-QString SocketServer::performAction(const char *json, const char *senderIP)
-{
-	try {
-		ot::JsonDocument doc;
-		doc.fromJson(json);
-
-		std::string action = ot::json::getString(doc, "action");
-
-		if (action == OT_ACTION_CMD_GetSystemInformation)
-		{
-			return getSystemInformation().c_str();
-		}
-
-		OT_LOG_E("Received HTTP execute message (not yet suported by relay service): " + action);
-
-		OT_LOG("Received HTTP execute message: " + action, ot::INBOUND_MESSAGE_LOG);
-
-		if (action == OT_ACTION_CMD_ShutdownRequestedByService) {
-			shutdown();
-		}
-
-		std::string response = sendProcessWSMessage("execute", senderIP, json);
-
-		QString retVal = response.c_str();
-
-		OT_LOG_I("Returning received websocket answer to HTTP sender");
-
-		return retVal;
-	}
-	catch (const std::exception & e) {
-		OT_LOG_E(std::string(e.what()));
-		return "";
-	}
-	catch (...) {
-		OT_LOG_E("Unknown error");
-		return "";
-	}
-}
-
-void SocketServer::queueAction(const char *json, const char *senderIP)
-{
-	try {
-		ot::JsonDocument doc;
-		doc.fromJson(json);
-
-		std::string action = ot::json::getString(doc, "action");
-
-		OT_LOG_I("Received HTTP queue message: " + action);
-
-		if (action == OT_ACTION_CMD_ShutdownRequestedByService) {
-			shutdown();
-		}
-		
-		sendQueueWSMessage("queue", senderIP, json);
-
-		delete[] json;
-		json = nullptr;
-
-		delete[] senderIP;
-		senderIP = nullptr;
-	}
-	catch (const std::exception & e) {
-		OT_LOG_E(std::string(e.what()));
-	}
-	catch (...) {
-		OT_LOG_E("Unknown error");
-	}
-}
-
-void SocketServer::shutdown() 
-{
-	// Exit the application
-	exit(0);
-}
-
-void SocketServer::deallocateData(const char *data)
-{
-	if (data != nullptr)
-	{
-		delete[] data;
-	}
-	data = nullptr;
-}
-
-std::string SocketServer::getSystemInformation()
-{
+std::string SocketServer::getSystemInformation(void) {
 	double globalCpuLoad = 0, globalMemoryLoad = 0, processCpuLoad = 0, processMemoryLoad = 0;
 
 	m_systemLoad.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);

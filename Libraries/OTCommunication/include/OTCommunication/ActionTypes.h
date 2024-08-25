@@ -72,6 +72,7 @@
 #define OT_ACTION_CMD_ServiceHide "Service.Hide"
 #define OT_ACTION_CMD_ServiceShow "Service.Show"
 #define OT_ACTION_CMD_CheckStartupCompleted "Service.CheckStartupCompleted"
+#define OT_ACTION_CMD_CheckRelayStartupCompleted "Relay.CheckStartupCompleted"
 #define OT_ACTION_CMD_ServiceShutdown "Shutdown"
 #define OT_ACTION_CMD_ServicePreShutdown "Service.PreShutdown"
 #define OT_ACTION_CMD_ServiceEmergencyShutdown "Service.EmergencyShutdown"

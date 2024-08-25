@@ -38,11 +38,13 @@ extern "C" {
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderURL)
 	{
+		OT_LOG("Execute called from \"" + std::string(_senderURL) + "\": \"" + _json + "\"", ot::INBOUND_MESSAGE_LOG);
 		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderURL, ot::EXECUTE);
 	};
 
 	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderURL)
 	{
+		OT_LOG("Queue called from \"" + std::string(_senderURL) + "\": \"" + _json + "\"", ot::QUEUED_INBOUND_MESSAGE_LOG);
 		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderURL, ot::QUEUE);
 	};
 

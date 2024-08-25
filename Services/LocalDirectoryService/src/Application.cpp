@@ -119,19 +119,24 @@ std::string Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocum
 
 	std::string relayServiceURL;
 	std::string websocketUrl;
-	if (!m_serviceManager.requestStartRelayService(sessionInfo, websocketUrl, relayServiceURL)) {
-		OT_LOG_E("Failed to start relay service: " + m_serviceManager.lastError());
-		return OT_ACTION_RETURN_INDICATOR_Error + m_serviceManager.lastError();
-	}
-	else {
-		OT_LOG_I("Relay service started at \"" + relayServiceURL + "\" with websocket at \"" + websocketUrl + "\"");
+	
+	for (unsigned int attempt = 0; attempt < Configuration::instance().defaultMaxStartupRestarts(); attempt++) {
+		if (m_serviceManager.requestStartRelayService(sessionInfo, websocketUrl, relayServiceURL)) {
+			OT_LOG_I("Relay service started at \"" + relayServiceURL + "\" with websocket at \"" + websocketUrl + "\"");
 
-		ot::JsonDocument responseDoc;
-		responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(relayServiceURL, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-		responseDoc.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(websocketUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+			ot::JsonDocument responseDoc;
+			responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(relayServiceURL, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+			responseDoc.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(websocketUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
-		return responseDoc.toJson();
+			return responseDoc.toJson();
+		}
+		else {
+			OT_LOG_W("Relay start failed on attempt " + std::to_string(attempt + 1) + "/" + std::to_string(Configuration::instance().defaultMaxStartupRestarts()));
+		}
 	}
+
+	OT_LOG_E("Failed to start relay service: Maximum number of start attempts reached");
+	return OT_ACTION_RETURN_INDICATOR_Error "Maximum number of start attempts reached";
 }
 
 std::string Application::handleSessionClosed(ot::JsonDocument& _jsonDocument) {

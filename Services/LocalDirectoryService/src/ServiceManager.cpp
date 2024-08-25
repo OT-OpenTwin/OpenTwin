@@ -156,6 +156,45 @@ bool ServiceManager::requestStartRelayService(const SessionInformation& _session
 		result = newService->run(_sessionInformation, m_servicesIpAddress, ot::PortManager::instance().determineAndBlockAvailablePort(), ot::PortManager::instance().determineAndBlockAvailablePort());
 
 		if (result == ot::app::OK) {
+			// The relay could be started, now ensure its alive
+			ot::JsonDocument checkCommandDoc;
+			checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckRelayStartupCompleted, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
+			std::string checkCommandString = checkCommandDoc.toJson();
+			
+			int attempt = 0;
+			bool checkOk = false;
+
+			OT_LOG_D("Checking relay startup completed for relay service at \"" + newService->url() + "\"");
+
+			for (int attempt = 0; attempt < 3; attempt++) {
+				std::string response;
+				if (ot::msg::send("", newService->url(), ot::EXECUTE, checkCommandString, response)) {
+					if (response == OT_ACTION_RETURN_VALUE_TRUE) {
+						checkOk = true;
+						break;
+					}
+					else if (response == OT_ACTION_RETURN_VALUE_FALSE) {
+						using namespace std::chrono_literals;
+						std::this_thread::sleep_for(500ms);
+					}
+					else {
+						OT_LOG_E("Invalid response \"" + response + "\"");
+						using namespace std::chrono_literals;
+						std::this_thread::sleep_for(500ms);
+					}
+				}
+			}
+
+			if (!checkOk) {
+				m_mutexRequestedServices.unlock();
+
+				// Service start failed
+				delete newService;
+
+				OT_LOG_E("Service start failed");
+				return false;
+			}
+
 			_relayServiceURL = newService->url();
 			_websocketUrl = newService->websocketUrl();
 		}
