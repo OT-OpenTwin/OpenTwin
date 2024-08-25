@@ -4,6 +4,7 @@
 #include "DataBase.h"
 #include "Types.h"
 #include "ClassFactory.h"
+#include "OTCore/StringHelper.h"
 
 #include "OTCore/Logger.h"
 
@@ -56,6 +57,14 @@ DataStorageAPI::UniqueUIDGenerator *EntityBase::getUidGenerator(void)
 {	
 	return globalUidGenerator;
 }
+
+std::string EntityBase::getNameOnly() const
+{
+	std::list<std::string> tmp = ot::splitString(this->getName(), '/', true);
+	if (tmp.empty()) { return this->getName(); }
+	else { return tmp.back(); }
+}
+
 
 void EntityBase::setModified(void)
 { 

@@ -40,7 +40,10 @@ public:
 	static DataStorageAPI::UniqueUIDGenerator *getUidGenerator(void);
 
 	void		setName(std::string n) { name = n; setModified(); };
-	std::string getName(void) { return name; };
+	std::string getName(void)  const { return name; };
+	//! \brief Returns the name of the entity without the parent entity names.
+	//! If the name is "root/entity" then the function will return "entity".
+	std::string getNameOnly() const; 
 
 	void         setEntityID(ot::UID id) { entityID = id;  setModified(); };
 	ot::UID getEntityID(void) const { return entityID; };
