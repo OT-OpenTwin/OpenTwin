@@ -316,6 +316,10 @@ namespace ot {
 
 		void parentItemTransformChanged(const QTransform& _parentTransform);
 
+		//! \brief Returns the bounding rect which was expanded by the additional trigger distance according to the config.
+		//! \see GraphicsItemCfg::setAdditionalTriggerDistance(const MarginsD& _d)
+		QRectF getTriggerBoundingRect(void) const;
+
 	protected:
 		//! \brief Returns the configuration for the current item.
 		//! The configuration may be modified.

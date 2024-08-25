@@ -136,6 +136,20 @@ namespace ot {
 		//! If the item is a child item, the position is the local position (default: 0.0; 0.0).
 		const Point2DD& getPosition(void) const { return m_pos; };
 
+		//! \see setAdditionalTriggerDistance(const MarginsD& _d)
+		//! \param _d Distance in all directions.
+		void setAdditionalTriggerDistance(double _d) { this->setAdditionalTriggerDistance(MarginsD(_d, _d, _d, _d)); };
+
+		//! \see setAdditionalTriggerDistance(const MarginsD& _d)
+		void setAdditionalTriggerDistance(double _left, double _top, double _right, double _bottom) { this->setAdditionalTriggerDistance(MarginsD(_left, _top, _right, _bottom)); };
+
+		//! \brief Sets the additional trigger distance.
+		//! The additional trigger distance will expand/shrink the imaginary bounding rect of the item when checking for mouse press, mouse hover, and other events.
+		void setAdditionalTriggerDistance(const MarginsD& _d) { m_additionalTriggerDistance = _d; };
+
+		//! \see setAdditionalTriggerDistance(const MarginsD& _d)
+		const MarginsD& getAdditionalTriggerDistance(void) const { return m_additionalTriggerDistance; };
+
 		//! \brief Sets the item minimum size.
 		//! \see getMinimumSize
 		void setMinimumSize(const Size2DD& _size) { m_minSize = _size; };
@@ -245,6 +259,7 @@ namespace ot {
 		ot::UID m_uid; //! \brief Item UID.
 		std::string m_tooltip; //! \brief Item tool tip.
 		Point2DD m_pos; //! \brief Item position.
+		MarginsD m_additionalTriggerDistance; //! \see setAdditionalTriggerDistance
 
 		Size2DD m_minSize; //! \brief Minimum item size.
 		Size2DD m_maxSize; //! \brief Maximum item size.

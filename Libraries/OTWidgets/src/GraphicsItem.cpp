@@ -657,6 +657,12 @@ void ot::GraphicsItem::parentItemTransformChanged(const QTransform& _parentTrans
 	this->getQGraphicsItem()->setTransform(centeredTransform);
 }
 
+QRectF ot::GraphicsItem::getTriggerBoundingRect(void) const {
+	OTAssertNullptr(this->getQGraphicsItem());
+	OTAssertNullptr(this->getConfiguration());
+	return this->getQGraphicsItem()->boundingRect().marginsAdded(QtFactory::toQMargins(this->getConfiguration()->getAdditionalTriggerDistance()));
+}
+
 void ot::GraphicsItem::applyGraphicsItemTransform(void) {
 	OTAssertNullptr(this->getQGraphicsItem());
 	

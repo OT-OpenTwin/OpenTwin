@@ -38,6 +38,7 @@
 #define OT_JSON_MEMBER_Transform "Transform"
 #define OT_JSON_MEMBER_SizePolicy "SizePolicy"
 #define OT_JSON_MEMBER_ConnectionDirection "ConnectionDirection"
+#define OT_JSON_MEMBER_AdditionalTriggerDistance "AddTrigDist"
 
 #define OT_JSON_VALUE_Moveable "Moveable"
 #define OT_JSON_VALUE_Connectable "Connectable"
@@ -75,6 +76,10 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 	JsonObject marginObj;
 	m_margins.addToJsonObject(marginObj, _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Margin, marginObj, _allocator);
+
+	JsonObject addTrigDistObj;
+	m_additionalTriggerDistance.addToJsonObject(addTrigDistObj, _allocator);
+	_object.AddMember(OT_JSON_MEMBER_AdditionalTriggerDistance, addTrigDistObj, _allocator);
 
 	JsonArray flagArr;
 	if (m_flags & GraphicsItemCfg::ItemIsMoveable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Moveable, _allocator), _allocator);
@@ -123,6 +128,7 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	m_margins.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Margin));
 	m_minSize.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_MinSize));
 	m_maxSize.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_MaxSize));
+	m_additionalTriggerDistance.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_AdditionalTriggerDistance));
 
 	m_flags = NoFlags;
 	std::list<std::string> flagsArr = json::getStringList(_object, OT_JSON_MEMBER_Flags);
