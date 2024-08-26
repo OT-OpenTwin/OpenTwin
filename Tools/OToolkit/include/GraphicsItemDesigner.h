@@ -74,6 +74,7 @@ private Q_SLOTS:
 	void slotImportRequested(void);
 	void slotExportRequested(void);
 	void slotExportAsImageRequested(void);
+	void slotUpdateConfigRequested(void);
 	void slotDrawFinished(void);
 	void slotDrawCancelled(void);
 	void slotMakeTransparentRequested(void);

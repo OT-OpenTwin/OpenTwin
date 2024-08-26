@@ -78,6 +78,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::importRequested, this, &GraphicsItemDesigner::slotImportRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::exportRequested, this, &GraphicsItemDesigner::slotExportRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::exportAsImageRequested, this, &GraphicsItemDesigner::slotExportAsImageRequested);
+	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::itemUpdateRequested, this, &GraphicsItemDesigner::slotUpdateConfigRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::makeTransparentRequested, this, &GraphicsItemDesigner::slotMakeTransparentRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::duplicateRequested, this, &GraphicsItemDesigner::slotDuplicateRequested);
 	this->connect(m_toolBar, &GraphicsItemDesignerToolBar::previewRequested, this, &GraphicsItemDesigner::slotGeneratePreview);
@@ -249,6 +250,100 @@ void GraphicsItemDesigner::slotExportAsImageRequested(void) {
 	}
 
 	m_imageExportConfig = dia.createImageExportConfig();
+}
+
+void GraphicsItemDesigner::slotUpdateConfigRequested(void) {
+	// Select file
+	QString fileName = QFileDialog::getOpenFileName(m_view, "Update GraphicsItem", m_exportConfig.getFileName(), "GraphicsItems (*.ot.json)");
+	if (fileName.isEmpty()) return;
+
+	// Read file
+	QFile importFile(fileName);
+	if (!importFile.open(QIODevice::ReadOnly)) {
+		OT_LOG_E("Failed to open file from reading \"" + fileName.toStdString() + "\"");
+		return;
+	}
+
+	QByteArray data = importFile.readAll();
+	importFile.close();
+
+	// Parse file
+	std::string dataString = data.toStdString();
+	if (dataString.empty()) {
+		OT_LOG_W("File is empty \"" + fileName.toStdString() + "\"");
+		return;
+	}
+
+	ot::JsonDocument dataDoc;
+	if (!dataDoc.fromJson(dataString)) {
+		OT_LOG_E("Failed to parse document");
+		return;
+	}
+
+	// Create config
+	ot::GraphicsItemCfg* newConfig = ot::GraphicsItemCfgFactory::instance().create(dataDoc.GetConstObject());
+	if (!newConfig) {
+		return;
+	}
+
+	if (newConfig->getFactoryKey() != OT_FactoryKey_GraphicsGroupItem) {
+		OT_LOG_E("Invalid GraphicsItem");
+		return;
+	}
+
+	// Get group
+	ot::GraphicsGroupItemCfg* groupItem = dynamic_cast<ot::GraphicsGroupItemCfg*>(newConfig);
+	if (!groupItem) {
+		OT_LOG_E("Item is not a group");
+		return;
+	}
+
+	// Clear current data
+	this->slotClearRequested();
+
+	// Create all items
+	for (ot::GraphicsItemCfg* newItem : groupItem->getItems()) {
+		this->createItemFromConfig(newItem, true);
+	}
+
+	// Delete group
+	delete groupItem;
+	groupItem = nullptr;
+
+	// Check for data
+	if (!m_navigation->hasDesignerItems()) {
+		OT_LOG_W("Nothing to update");
+		return;
+	}
+
+	GraphicsItemDesignerExportConfig exportConfig = m_exportConfig;
+	exportConfig.setFileName(fileName);
+	exportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::AutoAlign);
+
+	// Generate config
+	ot::GraphicsItemCfg* config = this->getNavigation()->generateConfig(exportConfig);
+	if (!config) {
+		OT_LOG_E("Update failed. Config for export not created.");
+		return;
+	}
+
+	// Export config
+	ot::JsonDocument configDoc;
+	config->addToJsonObject(configDoc, configDoc.GetAllocator());
+	delete config;
+	config = nullptr;
+
+	QFile exportFile(exportConfig.getFileName());
+
+	if (!exportFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+		OT_LOG_E("Failed to open file for writing \"" + exportConfig.getFileName().toStdString() + "\"");
+		return;
+	}
+
+	exportFile.write(QByteArray::fromStdString(configDoc.toJson()));
+	exportFile.close();
+
+	OT_LOG_I("Graphics Item updated \"" + exportConfig.getFileName().toStdString() + "\"");
 }
 
 void GraphicsItemDesigner::slotDrawFinished(void) {

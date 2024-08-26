@@ -45,6 +45,15 @@ GraphicsItemDesignerToolBar::GraphicsItemDesignerToolBar(GraphicsItemDesigner* _
 	}
 	{
 		QAction* btn = new QAction;
+		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/UpdateItem.png"));
+		btn->setText("Update Item");
+		btn->setShortcutVisibleInContextMenu(true);
+		btn->setToolTip("Will import the selected config and export it to the same file. May be used to avoid missing members in the config.");
+		this->connect(btn, &QAction::triggered, this, &GraphicsItemDesignerToolBar::slotItemUpdateRequested);
+		this->addAction(btn);
+	}
+	{
+		QAction* btn = new QAction;
 		btn->setIcon(ot::IconManager::getIcon("GraphicsEditor/GeneratePreview.png"));
 		btn->setText("Generate Item preview (Ctrl + Shift + B)");
 		btn->setShortcut(QKeySequence("Ctrl+Shift+B"));
@@ -204,6 +213,10 @@ void GraphicsItemDesignerToolBar::slotExportAsImage(void) {
 
 void GraphicsItemDesignerToolBar::slotGeneratePreview(void) {
 	Q_EMIT previewRequested();
+}
+
+void GraphicsItemDesignerToolBar::slotItemUpdateRequested(void) {
+	Q_EMIT itemUpdateRequested();
 }
 
 void GraphicsItemDesignerToolBar::slotLine(void) {
