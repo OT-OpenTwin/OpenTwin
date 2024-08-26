@@ -13,6 +13,7 @@ class __declspec(dllexport) EntityBlockCircuitVoltageSource : public EntityBlock
 
 		double getRotation();
 		std::string getFlip();
+		bool getGND();
 		std::vector<std::string> getPulseParameters();
 		std::vector<std::string> getSinParameters();
 		std::vector<std::string> getExpParameters();
