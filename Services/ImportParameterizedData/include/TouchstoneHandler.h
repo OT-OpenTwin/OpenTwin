@@ -24,7 +24,7 @@ public:
 	{
 		QuantityDescriptionSParameter* temp = m_quantityDescription;
 		m_quantityDescription = nullptr;
-		return m_quantityDescription; 
+		return temp;
 	}
 	MetadataParameter& getMetadataFrequencyParameter() { return m_frequencyParameter; }
 

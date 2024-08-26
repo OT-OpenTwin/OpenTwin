@@ -44,11 +44,11 @@ void TouchstoneToResultdata::createResultdata(int _numberOfPorts)
 	if (!seriesExists)
 	{
 		ResultCollectionExtender resultCollectionExtender(m_collectionName, *_modelComponent, &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
-		DatasetDescription dataset;
+		
 		std::list< std::shared_ptr<MetadataEntry>> seriesMetadata;
 		
 		TouchstoneHandler handler = std::move(importTouchstoneFile(m_fileName, m_fileContent, m_uncompressedLength, _numberOfPorts));
-		dataset = std::move(extractDatasetDescription(handler));
+		DatasetDescription dataset = std::move(extractDatasetDescription(handler));
 			
 		auto& optionSettings = handler.getOptionSettings();
 		std::string tsParameter = OptionsParameterHandlerParameter::ToString(optionSettings.getParameter());
@@ -59,7 +59,7 @@ void TouchstoneToResultdata::createResultdata(int _numberOfPorts)
 		datasets.push_back(std::move(dataset));
 		const ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, seriesMetadata);
 			
-		resultCollectionExtender.processDataPoints(&dataset,seriesID);
+		resultCollectionExtender.processDataPoints(&(*datasets.begin()), seriesID);
 		resultCollectionExtender.storeMetadata();
 	}
 	else
@@ -131,7 +131,7 @@ DatasetDescription TouchstoneToResultdata::extractDatasetDescription(TouchstoneH
 
 	MetadataParameter& metadataParameter = _touchstoneHandler.getMetadataFrequencyParameter();
 	auto frequencyParameterDescription(std::make_shared<ParameterDescription>(metadataParameter, false));
-	auto frequencyParameter = frequencyParameterDescription->getMetadataParameter();
+	auto& frequencyParameter = frequencyParameterDescription->getMetadataParameter();
 
 	////Maybe it is necessary to guarantee that all values have the same type ? !
 	ts::OptionSettings optionSettings = _touchstoneHandler.getOptionSettings();
