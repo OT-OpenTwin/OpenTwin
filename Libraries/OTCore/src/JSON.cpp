@@ -58,6 +58,33 @@ for (rapidjson::SizeType i = 0; i < it.Size(); i++) { \
 } \
 return ___list;
 
+namespace ot {
+	namespace intern {
+		class JSONManager {
+		public:
+			static JSONManager& instance(void) {
+				static JSONManager g_instance;
+				return g_instance;
+			}
+
+			static ConstJsonObject getObject(void) {
+				return JSONManager::instance().m_obj.GetConstObject();
+			}
+
+			static ConstJsonArray getArray(void) {
+				return JSONManager::instance().m_arr.constRef().GetArray();
+			}
+
+		private:
+			JSONManager() 
+				: m_arr(rapidjson::kArrayType)
+			{}
+
+			JsonDocument m_obj;
+			JsonDocument m_arr;
+		};
+	}
+}
 
 bool ot::json::exists(const JsonValue & _value, const char* _member) {
 	return _value.HasMember(_member);
@@ -424,35 +451,35 @@ std::string ot::json::getString(const ConstJsonObject& _value, const std::string
 }
 
 ot::ConstJsonObject ot::json::getObject(const JsonValue& _value, const char* _member) {
-	OT_JSON_getFromObject(_value, _member, Object, return JsonDocument().GetConstObject());
+	OT_JSON_getFromObject(_value, _member, Object, return intern::JSONManager::getObject());
 }
 
 ot::ConstJsonObject ot::json::getObject(const JsonValue& _value, const std::string& _member) {
-	OT_JSON_getFromObject(_value, _member.c_str(), Object, return JsonDocument().GetConstObject());
+	OT_JSON_getFromObject(_value, _member.c_str(), Object, return intern::JSONManager::getObject());
 }
 
 ot::ConstJsonObject ot::json::getObject(const ConstJsonObject& _value, const char* _member) {
-	OT_JSON_getFromObject(_value, _member, Object, return JsonDocument().GetConstObject());
+	OT_JSON_getFromObject(_value, _member, Object, return intern::JSONManager::getObject());
 }
 
 ot::ConstJsonObject ot::json::getObject(const ConstJsonObject& _value, const std::string& _member) {
-	OT_JSON_getFromObject(_value, _member.c_str(), Object, return JsonDocument().GetConstObject());
+	OT_JSON_getFromObject(_value, _member.c_str(), Object, return intern::JSONManager::getObject());
 }
 
 ot::ConstJsonArray ot::json::getArray(const JsonValue& _value, const char* _member) {
-	OT_JSON_getFromObject(_value, _member, Array, return JsonDocument(rapidjson::kArrayType).constRef().GetArray());
+	OT_JSON_getFromObject(_value, _member, Array, return intern::JSONManager::getArray());
 }
 
 ot::ConstJsonArray ot::json::getArray(const JsonValue& _value, const std::string& _member) {
-	OT_JSON_getFromObject(_value, _member.c_str(), Array, return JsonDocument(rapidjson::kArrayType).constRef().GetArray());
+	OT_JSON_getFromObject(_value, _member.c_str(), Array, return intern::JSONManager::getArray());
 }
 
 ot::ConstJsonArray ot::json::getArray(const ConstJsonObject& _value, const char* _member) {
-	OT_JSON_getFromObject(_value, _member, Array, return JsonDocument(rapidjson::kArrayType).constRef().GetArray());
+	OT_JSON_getFromObject(_value, _member, Array, return intern::JSONManager::getArray());
 }
 
 ot::ConstJsonArray ot::json::getArray(const ConstJsonObject& _value, const std::string& _member) {
-	OT_JSON_getFromObject(_value, _member.c_str(), Array, return JsonDocument(rapidjson::kArrayType).constRef().GetArray());
+	OT_JSON_getFromObject(_value, _member.c_str(), Array, return intern::JSONManager::getArray());
 }
 
 std::list<bool> ot::json::getBoolList(const JsonValue& _value, const char* _member, const std::list<bool>& _default) {
@@ -1148,19 +1175,19 @@ std::string ot::json::getString(const ConstJsonArray& _value, unsigned int _ix, 
 }
 
 ot::ConstJsonObject ot::json::getObject(const JsonValue& _value, unsigned int _ix) {
-	OT_JSON_getFromArray(_value, _ix, Object, return JsonDocument().GetConstObject());
+	OT_JSON_getFromArray(_value, _ix, Object, return intern::JSONManager::getObject());
 }
 
 ot::ConstJsonObject ot::json::getObject(const ConstJsonArray& _value, unsigned int _ix) {
-	OT_JSON_getFromArray(_value, _ix, Object, return JsonDocument().GetConstObject());
+	OT_JSON_getFromArray(_value, _ix, Object, return intern::JSONManager::getObject());
 }
 
 ot::ConstJsonArray ot::json::getArray(const JsonValue& _value, unsigned int _ix) {
-	OT_JSON_getFromArray(_value, _ix, Array, return JsonDocument(rapidjson::kArrayType).constRef().GetArray());
+	OT_JSON_getFromArray(_value, _ix, Array, return intern::JSONManager::getArray());
 }
 
 ot::ConstJsonArray ot::json::getArray(const ConstJsonArray& _value, unsigned int _ix) {
-	OT_JSON_getFromArray(_value, _ix, Array, return JsonDocument(rapidjson::kArrayType).constRef().GetArray());
+	OT_JSON_getFromArray(_value, _ix, Array, return intern::JSONManager::getArray());
 }
 
 std::list<int32_t> ot::json::getIntList(const JsonValue& _value, unsigned int _ix, const std::list<int32_t>& _default) {
