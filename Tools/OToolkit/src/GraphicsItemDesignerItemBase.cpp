@@ -69,10 +69,26 @@ void GraphicsItemDesignerItemBase::fillBasePropertyGrid(ot::PropertyGridCfg& _co
 	PropertyBool* newConnectableProperty = new PropertyBool("Connectable", this->getGraphicsItem()->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable);
 	newConnectableProperty->setPropertyTip("If enabled the item can be used as origin/destination for connections. The name of the item must be set.");
 	generalGroup->addProperty(newConnectableProperty);
-	
+
 	PropertyBool* newStateProperty = new PropertyBool("Handle State", this->getGraphicsItem()->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState);
 	newStateProperty->setPropertyTip("If enabled the item will update its appearance according to the current item state (e.g. ItemSelected or ItemHover)");
 	generalGroup->addProperty(newStateProperty);
+
+	PropertyDouble* addTrigLeft = new PropertyDouble("Trigger Left", this->getGraphicsItem()->getAdditionalTriggerDistance().left(), 0., std::numeric_limits<double>::max());
+	addTrigLeft->setPropertyTip("The additional trigger distance will be added to the virtual bounding rect when handling state or click operations.");
+	generalGroup->addProperty(addTrigLeft);
+
+	PropertyDouble* addTrigTop = new PropertyDouble("Trigger Top", this->getGraphicsItem()->getAdditionalTriggerDistance().top(), 0., std::numeric_limits<double>::max());
+	addTrigTop->setPropertyTip("The additional trigger distance will be added to the virtual bounding rect when handling state or click operations.");
+	generalGroup->addProperty(addTrigTop);
+
+	PropertyDouble* addTrigRight = new PropertyDouble("Trigger Right", this->getGraphicsItem()->getAdditionalTriggerDistance().right(), 0., std::numeric_limits<double>::max());
+	addTrigRight->setPropertyTip("The additional trigger distance will be added to the virtual bounding rect when handling state or click operations.");
+	generalGroup->addProperty(addTrigRight);
+
+	PropertyDouble* addTrigBottom = new PropertyDouble("Trigger Bottom", this->getGraphicsItem()->getAdditionalTriggerDistance().bottom(), 0., std::numeric_limits<double>::max());
+	addTrigBottom->setPropertyTip("The additional trigger distance will be added to the virtual bounding rect when handling state or click operations.");
+	generalGroup->addProperty(addTrigBottom);
 
 	PropertyGroup* transformGroup = new PropertyGroup("Transform");
 	transformGroup->addProperty(new PropertyDouble("Rotation", this->getGraphicsItem()->getGraphicsItemTransform().getRotation(), 0., 359.99));
@@ -155,7 +171,54 @@ bool GraphicsItemDesignerItemBase::basePropertyChanged(const ot::Property* _prop
 		this->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, actualProperty->getValue());
 		return true;
 	}
+	else if (group->getName() == "General" && _property->getPropertyName() == "Trigger Left") {
+		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
+			return false;
+		}
 
+		MarginsD newPos = this->getGraphicsItem()->getAdditionalTriggerDistance();
+		newPos.setLeft(actualProperty->getValue());
+		this->getGraphicsItem()->setAdditionalTriggerDistance(newPos);
+		return true;
+	}
+	else if (group->getName() == "General" && _property->getPropertyName() == "Trigger Top") {
+		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
+			return false;
+		}
+
+		MarginsD newPos = this->getGraphicsItem()->getAdditionalTriggerDistance();
+		newPos.setTop(actualProperty->getValue());
+		this->getGraphicsItem()->setAdditionalTriggerDistance(newPos);
+		return true;
+	}
+	else if (group->getName() == "General" && _property->getPropertyName() == "Trigger Right") {
+		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
+			return false;
+		}
+
+		MarginsD newPos = this->getGraphicsItem()->getAdditionalTriggerDistance();
+		newPos.setRight(actualProperty->getValue());
+		this->getGraphicsItem()->setAdditionalTriggerDistance(newPos);
+		return true;
+	}
+	else if (group->getName() == "General" && _property->getPropertyName() == "Trigger Bottom") {
+		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
+			return false;
+		}
+
+		MarginsD newPos = this->getGraphicsItem()->getAdditionalTriggerDistance();
+		newPos.setBottom(actualProperty->getValue());
+		this->getGraphicsItem()->setAdditionalTriggerDistance(newPos);
+		return true;
+	}
 	// TRANSFORM ##########################################################################
 	else if (group->getName() == "Transform" && _property->getPropertyName() == "Rotation") {
 		const PropertyDouble* actualProperty = dynamic_cast<const PropertyDouble*>(_property);
