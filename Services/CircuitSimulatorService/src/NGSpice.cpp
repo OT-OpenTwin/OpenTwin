@@ -58,8 +58,6 @@ void NGSpice::clearBufferStructure(std::string name)
 }
 
 
-
-
 void NGSpice::connectionAlgorithm(bool gnd,std::string startingElement,int counter,ot::UID startingElementUID,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
 {
 	counter++;
