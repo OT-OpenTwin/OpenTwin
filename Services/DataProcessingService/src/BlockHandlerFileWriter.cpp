@@ -30,7 +30,8 @@ BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntit
 
 bool BlockHandlerFileWriter::executeSpecialized()
 {
-	GenericDataList& dataList = _dataPerPort[m_input.getConnectorName()];
+	PipelineData& incommingPortData	= _dataPerPort[m_input.getConnectorName()];
+	GenericDataList& dataList = incommingPortData.m_data;
 	char lastCharacter = m_filePath[m_filePath.size()-1];
 	if (lastCharacter != '\\' && lastCharacter != '/')
 	{

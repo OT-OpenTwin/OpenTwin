@@ -24,6 +24,9 @@ private:
 	std::string _ylabel;
 	std::string _yunit;
 
+	void setLabel(PipelineData& _pipelineData, std::string& _label);
+	void setUnit(PipelineData& _pipelineData, std::string& _unit);
+
 	std::vector<double> transformDataToDouble(GenericDataList& data);
 	double VariableToDouble(const ot::Variable& var);
 };

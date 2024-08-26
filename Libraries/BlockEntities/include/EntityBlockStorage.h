@@ -9,6 +9,24 @@ public:
 	virtual entityType getEntityType(void) override { return TOPOLOGY; }
 	void createProperties();
 	virtual bool updateFromProperties() override;
-private:
-	ot::Connector _dataInput;
+
+	int32_t getNumberOfQuantities();
+	int32_t getNumberOfParameters();
+	int32_t getNumberOfMetaData();
+private:	
+	std::list<ot::Connector*> m_quantityInputs;
+	const std::string m_quantityInputNameBase = "Quantity";
+	std::list<ot::Connector*> m_parameterInputs;
+	const std::string m_parameterInputNameBase = "Parameter";
+	std::list<ot::Connector*> m_metaDataInputs;
+	const std::string m_metaDataInputNameBase = "Meta data";
+
+	const std::string m_propertyNbOfQuantities = "Number of quantities";
+	const std::string m_propertyNbOfParameter = "Number of parameters";
+	const std::string m_propertyNbOfMetaData = "Number of meta data";
+	const std::string m_groupGeneral = "General";
+
+
+	void createConnectors();
+	void clearConnectors();
 };

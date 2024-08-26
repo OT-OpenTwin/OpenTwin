@@ -84,6 +84,12 @@
     <ClCompile Include="src\BlockHandlerFileWriter.cpp">
       <Filter>Source Files\BlockFunctionality</Filter>
     </ClCompile>
+    <ClCompile Include="src\BlockHandlerStorage.cpp">
+      <Filter>Source Files\BlockFunctionality</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PipelineData.cpp">
+      <Filter>Source Files\BlockFunctionality</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -138,6 +144,12 @@
       <Filter>Header Files\BlockFunctionality</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockHandlerFileWriter.h">
+      <Filter>Header Files\BlockFunctionality</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockHandlerStorage.h">
+      <Filter>Header Files\BlockFunctionality</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PipelineData.h">
       <Filter>Header Files\BlockFunctionality</Filter>
     </ClInclude>
   </ItemGroup>

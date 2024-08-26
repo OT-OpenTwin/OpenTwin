@@ -51,7 +51,17 @@ bool BlockHandlerPlot1D::executeSpecialized()
 	
 	if (allSet)
 	{
-		GenericDataList& genericXValues(_dataPerPort[_xDataConnector]);
+		PipelineData& xAxisData = _dataPerPort[_xDataConnector];
+		if (_xunit == "")
+		{
+			setUnit(xAxisData, _xunit);
+		}
+		if (_xlabel == "")
+		{
+			setLabel(xAxisData, _xlabel);
+		}
+		
+		GenericDataList& genericXValues = xAxisData.m_data;
 		if (genericXValues.size() == 0)
 		{
 			throw std::exception("X axis values are empty. Nothing to plot.");
@@ -67,9 +77,43 @@ bool BlockHandlerPlot1D::executeSpecialized()
 		const std::string plotFolder = _resultFolder + "1D/Plots/";
 		const std::string fullPlotName = plotFolder + _plotName;
 
-		for (std::string& yAxisData : _yDataConnectors)
+		bool noUnitWasSet(_yunit == ""), noLabelWasSet(_ylabel == "");
+		for (std::string& yAxisPortName : _yDataConnectors)
 		{
-			GenericDataList& genericYValues(_dataPerPort[yAxisData]);
+			PipelineData& yAxisData = _dataPerPort[yAxisPortName];
+
+			if (_ylabel == "")
+			{
+				setLabel(yAxisData, _ylabel);
+			}
+			else
+			{
+				if (noLabelWasSet)
+				{
+					//Here we deal with multiple parameter with different units and labels
+				}
+				else
+				{
+					//Here we ignore the transported labels, since a label was set explicitly
+				}
+			}
+
+			if (_yunit == "")
+			{
+				setUnit(yAxisData, _yunit);
+			}
+			else
+			{
+				if (noUnitWasSet)
+				{
+					//Here we deal with multiple parameter with different units and labels
+				}
+				else
+				{
+					//Here we ignore the transported labels, since a label was set explicitly
+				}
+			}
+			GenericDataList& genericYValues = yAxisData.m_data;
 			if (genericYValues.size() == 0)
 			{
 				throw std::exception("Y axis values are empty. Nothing to plot.");
@@ -82,7 +126,6 @@ bool BlockHandlerPlot1D::executeSpecialized()
 			const std::string fullCurveName = _curveFolderPath + "/" + curveName;
 			EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, yValues, {}, _xlabel, _xunit, _ylabel, _yunit, colorID, true);
 			
-			//const std::string curveReferencePath =  fullPlotName + "/" + curveName;
 			curves.push_back(std::pair<ot::UID, std::string>(curve->getEntityID(),curveName));
 			
 			topoEntID.push_back(curve->getEntityID());
@@ -100,6 +143,33 @@ bool BlockHandlerPlot1D::executeSpecialized()
 		_modelComponent->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Created plot");
 	}
 	return allSet;
+}
+
+void BlockHandlerPlot1D::setLabel(PipelineData& _pipelineData, std::string& _label)
+{
+	if (_pipelineData.m_quantityDescription != nullptr)
+	{
+		assert(_pipelineData.m_quantity != nullptr);
+		_label = _pipelineData.m_quantity->quantityLabel + " " + _pipelineData.m_quantityDescription->quantityValueLabel;
+	}
+	else
+	{
+		assert(_pipelineData.m_parameter != nullptr);
+		_label = _pipelineData.m_parameter->parameterLabel;
+	}
+}
+
+void BlockHandlerPlot1D::setUnit(PipelineData& _pipelineData, std::string& _unit)
+{
+	if (_pipelineData.m_quantityDescription != nullptr)
+	{
+		_unit = _pipelineData.m_quantityDescription->unit;
+	}
+	else
+	{
+		assert(_pipelineData.m_parameter != nullptr);
+		_unit = _pipelineData.m_parameter->unit;
+	}
 }
 
 std::vector<double> BlockHandlerPlot1D::transformDataToDouble(GenericDataList& genericDataBlocks)

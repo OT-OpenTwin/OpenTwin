@@ -17,20 +17,22 @@ public:
 	bool executeSpecialized() override;	
 
 private:
-	uint32_t _dataColumns;
-	uint32_t _dataRows;
+	struct QueryDescription
+	{
+		std::string m_connectorName;
+		std::string m_projectionName;
+		PipelineData m_outputData;
+	};
 	
-	ResultCollectionMetadataAccess* m_resultCollectionMetadataAccess = nullptr;
 	DataStorageAPI::ResultDataStorageAPI* m_resultCollectionAccess = nullptr;
 	std::list< BsonViewOrValue> _comparisons;
-	std::vector<std::string> _projectionNames;
-	std::map<std::string, std::string> _projectionNameToClearName;
+	
+	std::list< QueryDescription> m_queryDescriptions;
 
 	BsonViewOrValue _query;
 	BsonViewOrValue _projection;
 
 	bool _isValid = true;
-	std::vector<std::string> _connectorNames;
 
 	void AddComparision(const ValueComparisionDefinition& definition);
 	void AddParameter(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName);

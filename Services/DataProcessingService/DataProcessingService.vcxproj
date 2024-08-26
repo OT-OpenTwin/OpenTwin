@@ -193,6 +193,7 @@
     <ClCompile Include="src\BlockHandlerDisplay.cpp" />
     <ClCompile Include="src\BlockHandlerFileWriter.cpp" />
     <ClCompile Include="src\BlockHandlerPython.cpp" />
+    <ClCompile Include="src\BlockHandlerStorage.cpp" />
     <ClCompile Include="src\Graph.cpp" />
     <ClCompile Include="src\GraphNode.cpp" />
     <ClCompile Include="src\BlockEntityHandler.cpp" />
@@ -202,6 +203,7 @@
     <ClCompile Include="src\ExternalDependencies.cpp" />
     <ClCompile Include="src\MeasurementCampaignHandler.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
+    <ClCompile Include="src\PipelineData.cpp" />
     <ClCompile Include="src\PipelineHandler.cpp" />
     <ClCompile Include="src\PropertyHandlerDatabaseAccessBlock.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
@@ -217,11 +219,13 @@
     <ClInclude Include="include\BlockHandlerFileWriter.h" />
     <ClInclude Include="include\BlockHandlerPlot1D.h" />
     <ClInclude Include="include\BlockHandlerPython.h" />
+    <ClInclude Include="include\BlockHandlerStorage.h" />
     <ClInclude Include="include\ExternalDependencies.h" />
     <ClInclude Include="include\Graph.h" />
     <ClInclude Include="include\MeasurementCampaignHandler.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\GraphNode.h" />
+    <ClInclude Include="include\PipelineData.h" />
     <ClInclude Include="include\PipelineHandler.h" />
     <ClInclude Include="include\PropertyHandlerDatabaseAccessBlock.h" />
     <ClInclude Include="include\UiNotifier.h" />

@@ -13,7 +13,8 @@ BlockHandlerDataDimensionReducer::BlockHandlerDataDimensionReducer(EntityBlockDa
 
 bool BlockHandlerDataDimensionReducer::executeSpecialized()
 {
-	GenericDataList& genericDataBlocks = _dataPerPort[_inputConnectorName];
+	PipelineData& incommingPortData = _dataPerPort[_inputConnectorName];
+	auto& genericDataBlocks = incommingPortData.m_data;
 
 	std::shared_ptr<ot::GenericDataStructVector> filteredData (new ot::GenericDataStructVector(static_cast<uint32_t>(genericDataBlocks.size())));
 	uint32_t count(0);
@@ -31,6 +32,10 @@ bool BlockHandlerDataDimensionReducer::executeSpecialized()
 		count++;
 	}
 
-	_dataPerPort[_outputConnectorName] = { filteredData };
+	PipelineData outputData;
+	incommingPortData.copyMetaDataReferences(outputData);
+	outputData.m_data = { filteredData };
+
+	_dataPerPort[_outputConnectorName] = outputData;
 	return true;
 }

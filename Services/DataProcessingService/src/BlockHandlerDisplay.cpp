@@ -13,7 +13,8 @@ BlockHandlerDisplay::BlockHandlerDisplay(EntityBlockDisplay* blockEntity, const 
 
 bool BlockHandlerDisplay::executeSpecialized()
 {
-	GenericDataList& dataList =	_dataPerPort[_input.getConnectorName()];
+	PipelineData& incommingPortData = _dataPerPort[_input.getConnectorName()];
+	GenericDataList& dataList = incommingPortData.m_data;
 	std::string displayMessage = _description + "\n";
 	ot::VariableToStringConverter converter;
 	for (auto data : dataList)

@@ -185,6 +185,8 @@ namespace ot {
 		//! @brief The current project type
 		const std::string& projectType(void) const { return m_projectType; };
 
+		const std::string& getCollectionName() const { return m_collectionName; }
+
 		//! @brief Will return true if a UI is running in the session
 		bool isUiConnected(void) const { return m_uiComponent != nullptr; }
 

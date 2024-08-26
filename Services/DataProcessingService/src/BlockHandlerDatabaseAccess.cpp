@@ -24,40 +24,53 @@
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntity,handlerMap)
 {
-	//First get a handle of the selected project.
+	//First get handler of the selected project result data.
 	std::string collectionName;
-	m_resultCollectionMetadataAccess = (PropertyHandlerDatabaseAccessBlock::getResultCollectionMetadataAccess(blockEntity,collectionName));
+	std::unique_ptr<ResultCollectionMetadataAccess> resultCollectionMetadataAccess(PropertyHandlerDatabaseAccessBlock::getResultCollectionMetadataAccess(blockEntity,collectionName));
+	const MetadataCampaign* campaign = &resultCollectionMetadataAccess->getMetadataCampaign();
+	
 	const std::string dataBaseURL = Application::instance()->dataBaseURL();
 	m_resultCollectionAccess = new DataStorageAPI::ResultDataStorageAPI(dataBaseURL,collectionName);
 	
-	if (!m_resultCollectionMetadataAccess->collectionHasMetadata())
+	if (!resultCollectionMetadataAccess->collectionHasMetadata())
 	{
 		const std::string errorMessage = "Database Access not possible. The selected collection has no meta data.";
 		throw std::exception(errorMessage.c_str());
 	}
-			
+	
 	AdvancedQueryBuilder builder;
-	//ot::StringToVariableConverter converter;
-	_projectionNames.reserve(4);
-	_connectorNames.reserve(4);
-		
-	//Now build a query depending on the selections made in the BlockEntity
-	//First the quantity is selected. Its value is not projected.
+
+	//If a series is selected, we need to add a corresponding query.
+	const MetadataSeries* series = nullptr;
+	const std::string seriesLabel =	blockEntity->getSeriesSelection()->getValue();
+	if (seriesLabel != "")
+	{
+		series = resultCollectionMetadataAccess->findMetadataSeries(seriesLabel);
+		assert(series != nullptr);
+		ot::UID valueUID = series->getSeriesIndex();
+		ValueComparisionDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
+		AddComparision(seriesComparision);
+	}
+
+	//Next we add a query corresponding to the selected quantity. Its value is not projected.
 	ValueComparisionDefinition quantityDef = blockEntity->getSelectedQuantityDefinition();
+	const std::string& valueDescriptionLabel = blockEntity->getQuantityValueDescriptionSelection()->getValue();
 	//The entity selection contains the names of the quantity/parameter. In the mongodb documents only the abbreviations are used.
-	const auto selectedQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(quantityDef.getName());
+	const auto selectedQuantity = resultCollectionMetadataAccess->findMetadataQuantity(quantityDef.getName());
 	if (selectedQuantity == nullptr) 
 	{
 		throw std::exception("DatabaseAccessBlock has no quantity set.");
 	}
-	const std::string valueDescriptionLabel = blockEntity->getValueDescription();
+		
 	auto& valueDescriptions = selectedQuantity->valueDescriptions;
 	ot::UID valueUID = 0;
+	QueryDescription quantityQueryDescr;
 	for (auto& valueDescription : valueDescriptions)
 	{
 		if (valueDescription.quantityValueLabel == valueDescriptionLabel)
 		{
 			valueUID = valueDescription.quantityIndex;
+			quantityQueryDescr.m_outputData.m_quantityDescription = &valueDescription;
 		}
 	}
 	assert(valueUID != 0);
@@ -67,59 +80,73 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	
 	//Now we add a comparision for the searched quantity value.
 	quantityDef.setName(QuantityContainer::getFieldName());
-	_projectionNames.push_back(quantityDef.getName());
-	_projectionNameToClearName[quantityDef.getName()] = selectedQuantity->quantityName;
-	
+	quantityQueryDescr.m_projectionName = quantityDef.getName();
+	quantityQueryDescr.m_outputData.m_quantity = selectedQuantity;
+	quantityQueryDescr.m_outputData.m_series = series;
+	quantityQueryDescr.m_outputData.m_campaign = campaign;
+	m_queryDescriptions.push_back(quantityQueryDescr);
+	const std::string quantityConnectorName = blockEntity->getConnectorQuantity().getConnectorName();
+	quantityQueryDescr.m_connectorName = quantityConnectorName;
+
 	AddComparision(quantityDef);
 
 	//Next are the parameter. A 2D plot requires two variables, thus at least one parameter has to be defined.
-	const std::string quantityConnectorName = blockEntity->getConnectorQuantity().getConnectorName();
-	_connectorNames.push_back(quantityConnectorName);
-		
 	const std::string parameterConnectorName = blockEntity->getConnectorParameter1().getConnectorName();
 	ValueComparisionDefinition param1Def = blockEntity->getSelectedParameter1Definition();
-	const auto parameter1 = m_resultCollectionMetadataAccess->findMetadataParameter(param1Def.getName());
-	//_projectionNameToClearName[parameter1->parameterAbbreviation] = parameter1->parameterName;
+	const auto parameter1 = resultCollectionMetadataAccess->findMetadataParameter(param1Def.getName());
 	if (parameter1 == nullptr)
 	{
 		throw std::exception("DatabaseAccessBlock has the parameter 1 not set.");
 	}
 	AddParameter(param1Def, *parameter1, parameterConnectorName);
+	m_queryDescriptions.back().m_outputData.m_campaign = campaign;
+	m_queryDescriptions.back().m_outputData.m_series = series;
 	AddComparision(param1Def);
 
+
+	//Depending on the entity setting, we are now adding additional parameter queries.
 	const bool queryDimensionIs3D = blockEntity->isQueryDimension3D();
 	const bool queryDimensionIs2D = blockEntity->isQueryDimension2D();
 
-	if (queryDimensionIs2D|| queryDimensionIs3D)
+	if (queryDimensionIs2D || queryDimensionIs3D)
 	{
 		auto param2Def = blockEntity->getSelectedParameter2Definition();
 		const std::string param2ConnectorName =	blockEntity->getConnectorParameter2().getConnectorName();
-		const auto parameter = m_resultCollectionMetadataAccess->findMetadataParameter(param2Def.getName());
-		//_projectionNameToClearName[parameter->parameterAbbreviation] = parameter->parameterName;
+		const auto parameter = resultCollectionMetadataAccess->findMetadataParameter(param2Def.getName());
 		if (parameter == nullptr)
 		{
 			throw std::exception("DatabaseAccessBlock has the parameter 2 not set.");
 		}
 		AddParameter(param2Def, *parameter, param2ConnectorName);
+		m_queryDescriptions.back().m_outputData.m_campaign = campaign;
+		m_queryDescriptions.back().m_outputData.m_series = series;
 		AddComparision(param2Def);
 	}
 	if (queryDimensionIs3D)
 	{	
 		auto param3Def = blockEntity->getSelectedParameter3Definition();
 		const std::string param3ConnectorName = blockEntity->getConnectorParameter3().getConnectorName();
-		const auto parameter = m_resultCollectionMetadataAccess->findMetadataParameter(param3Def.getName());
-		//_projectionNameToClearName[parameter->parameterAbbreviation] = parameter->parameterName;
+		const auto parameter = resultCollectionMetadataAccess->findMetadataParameter(param3Def.getName());
 		if (parameter == nullptr)
 		{
 			throw std::exception("DatabaseAccessBlock has the parameter 3 not set.");
 		}
 		AddParameter(param3Def, *parameter, param3ConnectorName);
+		m_queryDescriptions.back().m_outputData.m_campaign = campaign;
+		m_queryDescriptions.back().m_outputData.m_series = series;
 		AddComparision(param3Def);
 	}
-	_projectionNames.shrink_to_fit();
-	_connectorNames.shrink_to_fit();
+
 	_query = builder.ConnectWithAND(std::move(_comparisons));
-	_projection = builder.GenerateSelectQuery(_projectionNames, false);
+
+	std::vector<std::string> projectionNames;
+	for (QueryDescription& queryDescription : m_queryDescriptions)
+	{
+		projectionNames.push_back(queryDescription.m_projectionName);
+		queryDescription.m_outputData.m_campaign;
+		queryDescription.m_outputData.m_series;
+	}
+	_projection = builder.GenerateSelectQuery(projectionNames, false);
 }
 
 BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
@@ -128,11 +155,6 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 	{
 		delete m_resultCollectionAccess;
 		m_resultCollectionAccess = nullptr;
-	}
-	if (m_resultCollectionMetadataAccess != nullptr)
-	{
-		delete m_resultCollectionMetadataAccess;
-		m_resultCollectionMetadataAccess = nullptr;
 	}
 }
 
@@ -149,65 +171,122 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		ot::JsonDocument doc;
 		doc.fromJson(queryResponse);
 		auto allEntries = ot::json::getArray(doc, "Documents");
-
-
+		
+		//We look through the returned documents
 		const uint32_t numberOfDocuments = allEntries.Size();
 		for (uint32_t i = 0; i < numberOfDocuments; i++)
 		{
 			auto projectedValues = ot::json::getObject(allEntries, i);
-			uint32_t count(0);
-
-			for (std::string projectionName : _projectionNames)
+			
+			//Now we extract each of the projected value
+			for (QueryDescription& queryDescription : m_queryDescriptions)
 			{
+				const std::string& projectionName = queryDescription.m_projectionName;
+				PipelineData& pipelineData = queryDescription.m_outputData;
+				
+				//The query does not contain one of the projected values.
 				if (!projectedValues.HasMember(projectionName.c_str()))
 				{
-					auto clearNameByProjectionName = _projectionNameToClearName.find(projectionName);
-					assert(clearNameByProjectionName != _projectionNameToClearName.end());
-					const std::string message = "Database access failed. The selected quantity is not depending on the parameter: "+ clearNameByProjectionName->second;
+					std::string searchedField;
+					if (pipelineData.m_parameter != nullptr)
+					{
+						searchedField = pipelineData.m_parameter->parameterLabel;
+					}
+					else
+					{
+						assert(pipelineData.m_quantity != nullptr);
+						searchedField = pipelineData.m_quantity->quantityLabel;
+					}
+
+					const std::string message = "Database access failed. The searched field: "+ searchedField + " was not found in the result of the defined query";
 					throw std::exception(message.c_str());
 				}
+				const MetadataParameter* parameter = pipelineData.m_parameter;
+				const bool projectedValueIsQuantityValue = projectionName == QuantityContainer::getFieldName();
+				
 
-				if (projectionName == QuantityContainer::getFieldName() && (_dataRows != 1 || _dataColumns != 1))
+				if (projectedValueIsQuantityValue)
 				{
-					const std::string connectorName = _connectorNames[count];
-
-					count++;
-					uint32_t rowCounter(0), columnCounter(0);
-					//Could be that the value array is smaller then the data array because of the query.
-					auto jsValues = ot::json::getArray(projectedValues, projectionName.c_str());
-					std::list<ot::Variable> values = converter(jsValues);
-					auto currentValue = values.begin();
-					const uint32_t numberOfEntries = _dataColumns * _dataRows;
-					ot::GenericDataStructMatrix* dataBlock(new ot::GenericDataStructMatrix(_dataColumns, _dataRows));
-					for (uint32_t j = 0; j < numberOfEntries; j++)
+					const MetadataQuantity* quantity = pipelineData.m_quantity;
+					const auto& dimensions = quantity->dataDimensions;
+					
+					//Value is stored as a tensor
+					if (dimensions.size() != 1)
 					{
-						dataBlock->setValue(columnCounter, rowCounter, *currentValue);
-						currentValue++;
-						if (columnCounter < _dataColumns - 1)
+						if (dimensions.size() != 2)
 						{
-							columnCounter++;
+							const std::string errorMessage = "Extracted values of quantity " + quantity->quantityLabel + " have " + std::to_string(dimensions.size()) + " dimensions. Currently a maximum of 2 dimensions (matrices) are supported.";
+							throw std::exception(errorMessage.c_str());
+						}
+						
+						if (dimensions[0] != dimensions[1])
+						{
+							const std::string errorMessage = "Extracted values of quantity " + quantity->quantityLabel + " are of a matrix structure but of unequal dimensions, which is currently not supported.";
+							throw std::exception(errorMessage.c_str());
+						}
+
+						uint32_t rowCounter(0), columnCounter(0);
+						uint32_t rows(dimensions[0]), columns(dimensions[0]);
+						//Could be that the value array is smaller then the data array because of the query.
+						auto jsValues = ot::json::getArray(projectedValues, projectionName.c_str());
+						std::list<ot::Variable> values = converter(jsValues);
+						auto currentValue = values.begin();
+						const uint32_t numberOfEntries = rows * columns;
+						ot::GenericDataStructMatrix* dataBlock(new ot::GenericDataStructMatrix(columns, rows));
+						for (uint32_t j = 0; j < numberOfEntries; j++)
+						{
+							dataBlock->setValue(columnCounter, rowCounter, *currentValue);
+							currentValue++;
+							if (columnCounter < columns - 1)
+							{
+								columnCounter++;
+							}
+							else
+							{
+								columnCounter = 0;
+								rowCounter++;
+							}
+						}
+
+						_dataPerPort[queryDescription.m_connectorName].m_data.push_back(std::shared_ptr<ot::GenericDataStruct>(dataBlock));
+					}
+					else
+					{
+						uint32_t vectorDimension =	dimensions[0];
+						
+						//Value is stored as a single point
+						if (vectorDimension == 1)
+						{
+							ot::Variable value = converter(projectedValues[projectionName.c_str()]);
+							ot::GenericDataStructSingle* dataBlock(new ot::GenericDataStructSingle());
+							dataBlock->setValue(value);
+							_dataPerPort[queryDescription.m_connectorName].m_data.push_back(std::shared_ptr<ot::GenericDataStruct>(dataBlock));
 						}
 						else
 						{
-							columnCounter = 0;
-							rowCounter++;
+							//Value is stored as a vector
+							const std::string errorMessage = "Extracted values of quantity " + quantity->quantityLabel + " are of a vector structure, which is currently not supported.";
+							throw std::exception(errorMessage.c_str());
 						}
 					}
-					_dataPerPort[connectorName].push_back(std::shared_ptr<ot::GenericDataStruct>(dataBlock));
+
 				}
 				else
 				{
+					//Projected value is a parameter value
 					ot::Variable value = converter(projectedValues[projectionName.c_str()]);
 					ot::GenericDataStructSingle* dataBlock(new ot::GenericDataStructSingle());
 					dataBlock->setValue(value);
-					const std::string connectorName = _connectorNames[count];
-					_dataPerPort[connectorName].push_back(std::shared_ptr<ot::GenericDataStruct>(dataBlock));
-					count++;
+					_dataPerPort[queryDescription.m_connectorName].m_data.push_back(std::shared_ptr<ot::GenericDataStruct>(dataBlock));
 				}
 			}
 		}
 	}
-
+	else
+	{
+		const std::string message = "Data base query with this response: " + dbResponse.getMessage();
+		throw std::exception(message.c_str());
+	}
 	return true;
 
 }
@@ -338,7 +417,12 @@ void BlockHandlerDatabaseAccess::AddComparision(const ValueComparisionDefinition
 
 void BlockHandlerDatabaseAccess::AddParameter(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName)
 {
-	definition.setName(std::to_string( parameter.parameterUID));
-	_projectionNames.push_back(definition.getName());
-	_connectorNames.push_back(connectorName);
+	definition.setName(std::to_string(parameter.parameterUID));
+	
+	QueryDescription parameterQueryDesc;
+	parameterQueryDesc.m_connectorName = connectorName;
+	parameterQueryDesc.m_projectionName = definition.getName();
+	parameterQueryDesc.m_outputData.m_parameter = &parameter;
+	
+	m_queryDescriptions.push_back(parameterQueryDesc);
 }

@@ -47,7 +47,8 @@ bool BlockHandlerPython::executeSpecialized()
         for (auto& dataPortEntry : _dataPerPort)
         {
             const std::string portName = dataPortEntry.first;
-            const GenericDataList& portData = dataPortEntry.second;
+            PipelineData& incommingPortData  = dataPortEntry.second;
+            const GenericDataList& portData = incommingPortData.m_data;
             
             std::list<ot::GenericDataStruct*> portDataPtr;
             for (auto portDataEntry : portData)
@@ -77,8 +78,9 @@ bool BlockHandlerPython::executeSpecialized()
                     {
                         returnValuesListSPtr.push_back(std::shared_ptr<ot::GenericDataStruct>(returnValue));
                     }
-
-                    _dataPerPort[outputName] = std::move(returnValuesListSPtr);
+                    PipelineData outputData;
+                    outputData.m_data = std::move(returnValuesListSPtr);
+                    _dataPerPort[outputName] = outputData;
                     valuesByName.erase(valuesPointer->first);
                 }
             }

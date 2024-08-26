@@ -21,7 +21,6 @@ public:
 
 	std::string getSelectedProjectName();
 	std::string getQueryDimension();
-	std::string getValueDescription();
 
 	const bool isQueryDimension1D();
 	const bool isQueryDimension2D();

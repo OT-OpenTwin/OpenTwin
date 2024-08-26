@@ -50,7 +50,7 @@ void BlockHandler::executeOwnNode(std::shared_ptr<GraphNode> ownNode)
 	}
 }
 
-void BlockHandler::setData(GenericDataList& data, const std::string& targetPort)
+void BlockHandler::setData(PipelineData& data, const std::string& targetPort)
 {
 	_dataPerPort[targetPort] = data;
 }

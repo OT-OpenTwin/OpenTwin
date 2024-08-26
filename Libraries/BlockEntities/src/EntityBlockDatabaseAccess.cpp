@@ -48,6 +48,11 @@ void EntityBlockDatabaseAccess::createProperties(std::list<std::string>& compara
 	{
 		EntityPropertiesSelection::createProperty(*groupName, m_propertyName, {""}, "", "default", getProperties());
 
+		if (*groupName == m_groupQuantitySetttings)
+		{
+			EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyValueDescription, { "" }, "", "default", getProperties());
+		}
+
 		EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
 		typeLabelProperty->setReadOnly(true);
 		typeLabelProperty->setName(m_propertyDataType);
@@ -66,8 +71,6 @@ void EntityBlockDatabaseAccess::createProperties(std::list<std::string>& compara
 		EntityPropertiesString::createProperty(*groupName, m_propertyValue, "", "default", getProperties());
 		EntityPropertiesSelection::createProperty(*groupName, m_propertyComparator, comparators, comparators.back(), "default", getProperties());
 	}
-	EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyValueDescription, {""}, "", "default", getProperties());
-
 	setVisibleParameter2(false);
 	setVisibleParameter3(false);
 }
@@ -99,15 +102,6 @@ std::string EntityBlockDatabaseAccess::getQueryDimension()
 	assert(outcome != nullptr);
 
 	return outcome->getValue();
-}
-
-std::string EntityBlockDatabaseAccess::getValueDescription()
-{
-	auto propertyBase = getProperties().getProperty(m_propertyValueDescription);
-	auto selectedProjectName = dynamic_cast<EntityPropertiesProjectList*>(propertyBase);
-	assert(selectedProjectName != nullptr);
-
-	return  selectedProjectName->getValue();
 }
 
 const bool EntityBlockDatabaseAccess::isQueryDimension1D()
