@@ -187,6 +187,17 @@ void ot::GraphicsGroupItem::addItem(GraphicsItem* _item) {
 	this->addToGroup(_item->getQGraphicsItem());
 }
 
+double ot::GraphicsGroupItem::getMaxAdditionalTriggerDistance(void) const {
+	double maxDist = ot::GraphicsItem::getMaxAdditionalTriggerDistance();
+	for (auto itm : this->childItems()) {
+		const GraphicsItem* actualItem = dynamic_cast<const GraphicsItem*>(itm);
+		if (actualItem) {
+			maxDist = std::max(maxDist, actualItem->getMaxAdditionalTriggerDistance());
+		}
+	}
+	return maxDist;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected

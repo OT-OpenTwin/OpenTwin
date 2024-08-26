@@ -21,7 +21,8 @@
 
 ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 	: m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
-	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
+	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false),
+	m_maxTriggerDistance(0.)
 {
 	OTAssertNullptr(m_view);
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
@@ -29,7 +30,8 @@ ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 
 ot::GraphicsScene::GraphicsScene(const QRectF& _sceneRect, GraphicsView* _view)
 	: QGraphicsScene(_sceneRect), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
-	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false)
+	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false),
+	m_maxTriggerDistance(0.)
 {
 	OTAssertNullptr(m_view);
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
@@ -100,6 +102,16 @@ void ot::GraphicsScene::stopConnection(void) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter / Getter
+
+void ot::GraphicsScene::checkMaxTriggerDistance(double _triggerDistance) {
+	if (_triggerDistance > m_maxTriggerDistance) {
+		m_maxTriggerDistance = _triggerDistance;
+	}
+}
+
+void ot::GraphicsScene::checkMaxTriggerDistance(const MarginsD& _triggerDistance) {
+	this->checkMaxTriggerDistance(std::max({ _triggerDistance.left(), _triggerDistance.top(), _triggerDistance.right(), _triggerDistance.bottom() }));
+}	
 
 QPointF ot::GraphicsScene::snapToGrid(const QPointF& _pos) const {
 	return QtFactory::toQPoint(m_grid.snapToGrid(QtFactory::toPoint2D(_pos)));
@@ -216,26 +228,50 @@ void ot::GraphicsScene::itemAboutToBeRemoved(GraphicsItem* _item) {
 
 void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) {
 	// Check for a new connection
-	QList<QGraphicsItem*> lst = items(_event->scenePos());
+	QList<QGraphicsItem*> lst;
+	if (m_maxTriggerDistance > 0.) {
+		QRectF hitRect(
+			_event->scenePos().x() - m_maxTriggerDistance,
+			_event->scenePos().y() - m_maxTriggerDistance,
+			m_maxTriggerDistance * 2.,
+			m_maxTriggerDistance * 2.
+		);
+
+		lst = items(hitRect);
+	}
+	else {
+		lst = items(_event->scenePos());
+	}
 	
 	qreal minDistance = std::numeric_limits<double>::max();
 	GraphicsBase* targetedBase = nullptr;
+	bool targetedIsItem = false;
 
 	for (auto itm : lst) {
 		ot::GraphicsBase* actualBase = dynamic_cast<ot::GraphicsBase*>(itm);
-		ot::GraphicsItem* actualItm = dynamic_cast<ot::GraphicsItem*>(itm);
-		if (actualItm) {
+		/*if (actualItm) {
 			if (actualItm->getGraphicsItemFlags() & ot::GraphicsItemCfg::ItemIsConnectable) {
 				this->startConnection(actualItm);
 				//QGraphicsScene::mouseDoubleClickEvent(_event);
 				return;
 			}
 		}
-		else if (actualBase) {
+		*/
+		if (actualBase) {
+			ot::GraphicsItem* actualItm = dynamic_cast<ot::GraphicsItem*>(itm);
+
 			qreal dist = actualBase->calculateShortestDistanceToPoint(_event->scenePos());
 			
-			// Check if the new distance is lower than the previously found one
-			if (dist >= 0. && dist < minDistance) {
+			// Item
+			if (actualItm) {
+				if ((actualItm->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) && dist >= 0. && ((dist < minDistance && targetedIsItem) || !targetedIsItem)) {
+					minDistance = dist;
+					targetedBase = actualBase;
+					targetedIsItem = true;
+				}
+			}
+			// Connection
+			else if (dist >= 0. && dist < minDistance && !targetedIsItem) {
 				minDistance = dist;
 				targetedBase = actualBase;
 			}
@@ -244,17 +280,19 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 
 	// Check if a base item was found next to the click position.
 	if (targetedBase) {
+		GraphicsItem* graphicsItem = dynamic_cast<ot::GraphicsItem*>(targetedBase);
 		GraphicsConnectionItem* connectionItem = dynamic_cast<GraphicsConnectionItem*>(targetedBase);
-		if (connectionItem) {
+
+		if (graphicsItem) {
+			this->startConnection(graphicsItem);
+		}
+		else if (connectionItem) {
 			this->startConnectionToConnection(connectionItem, QtFactory::toPoint2D(_event->scenePos()));
 		}
 	}
 	else {
 		this->stopConnection();
 	}
-	
-
-	//QGraphicsScene::mouseDoubleClickEvent(_event);
 }
 
 void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {

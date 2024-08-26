@@ -80,6 +80,14 @@ void ot::GraphicsLayoutItemWrapper::finalizeGraphicsItem(void) {
 	m_owner->finalizeGraphicsItem();
 }
 
+double ot::GraphicsLayoutItemWrapper::getMaxAdditionalTriggerDistance(void) const {
+	double maxDist = ot::GraphicsItem::getMaxAdditionalTriggerDistance();
+	if (m_owner) {
+		maxDist = std::max(maxDist, m_owner->getMaxAdditionalTriggerDistance());
+	}
+	return maxDist;
+}
+
 void ot::GraphicsLayoutItemWrapper::setGraphicsItemRequestedSize(const QSizeF& _size) {
 	ot::GraphicsItem::setGraphicsItemRequestedSize(_size);
 	this->setPreferredSize(_size);

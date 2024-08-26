@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTCore/Flags.h"
 #include "OTGui/Grid.h"
+#include "OTGui/Margins.h"
 #include "OTGui/GraphicsConnectionCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -71,6 +72,9 @@ namespace ot {
 
 		void setGridLineStyle(const OutlineF& _outline) { m_grid.setGridLineStyle(_outline); };
 		const OutlineF& getGridLineStyle(void) const { return m_grid.getGridLineStyle(); };
+		
+		void checkMaxTriggerDistance(double _triggerDistance);
+		void checkMaxTriggerDistance(const MarginsD& _triggerDistance);
 
 		GraphicsView* getGraphicsView(void) { return m_view; };
 
@@ -130,6 +134,7 @@ namespace ot {
 
 	private:
 		bool m_ignoreEvents;
+		double m_maxTriggerDistance;
 		Grid m_grid;
 		GraphicsView* m_view;
 		GraphicsItem* m_connectionOrigin;

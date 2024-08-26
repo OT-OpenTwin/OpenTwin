@@ -54,6 +54,7 @@ void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCf
 	itm->setName(m_name);
 	itm->setMargins(ot::MarginsD(0., 0., 0., 0));
 	itm->setToolTip(m_toolTip);
+	itm->setAdditionalTriggerDistance(15.);
 
 	// Title item
 	ot::GraphicsTextItemCfg* itmTxt = new ot::GraphicsTextItemCfg;

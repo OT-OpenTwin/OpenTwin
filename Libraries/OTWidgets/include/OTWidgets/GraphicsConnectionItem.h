@@ -53,6 +53,7 @@ namespace ot {
 
 		//! \brief Calculates and returns the closest distance to the given point.
 		//! Returns -1 if the distance is invalid (e.g. maximum distance exceeded).
+		//! \param _pt Point in scene coordinates.
 		virtual qreal calculateShortestDistanceToPoint(const QPointF& _pt) const override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################

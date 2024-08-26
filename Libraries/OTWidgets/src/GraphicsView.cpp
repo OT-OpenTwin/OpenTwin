@@ -140,6 +140,9 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 		_item->setGraphicsItemPos(m_scene->snapToGrid(_item->getGraphicsItemPos()));
 	}
 
+	// Check for max trigger distance
+	m_scene->checkMaxTriggerDistance(_item->getMaxAdditionalTriggerDistance());
+
 	_item->setBlockConfigurationNotifications(false);
 
 	if (removeConnectionBufferApplied) {

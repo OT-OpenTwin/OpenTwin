@@ -47,6 +47,9 @@ namespace ot {
 
 		virtual void setGraphicsItemRequestedSize(const QSizeF& _size) override;
 
+		//! \brief Returns the maximum trigger distance in any direction of this item and its childs.
+		virtual double getMaxAdditionalTriggerDistance(void) const override;
+
 	private:
 		GraphicsLayoutItem* m_owner;
 

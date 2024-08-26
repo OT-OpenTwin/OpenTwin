@@ -86,6 +86,9 @@ namespace ot {
 
 		void addItem(ot::GraphicsItem* _item, bool _isMaster, bool _isSlave);
 
+		//! \brief Returns the maximum trigger distance in any direction of this item and its childs.
+		virtual double getMaxAdditionalTriggerDistance(void) const override;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Protected

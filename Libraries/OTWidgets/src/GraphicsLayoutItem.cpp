@@ -142,6 +142,21 @@ void ot::GraphicsLayoutItem::finalizeGraphicsItem(void) {
 	}
 }
 
+double ot::GraphicsLayoutItem::getMaxAdditionalTriggerDistance(void) const {
+	double maxDist = ot::GraphicsItem::getMaxAdditionalTriggerDistance();
+
+	std::list<QGraphicsLayoutItem*> childs;
+	this->getAllItems(childs);
+
+	for (auto itm : childs) {
+		const GraphicsItem* actualItem = dynamic_cast<const GraphicsItem*>(itm);
+		if (actualItem) {
+			maxDist = std::max(maxDist, actualItem->getMaxAdditionalTriggerDistance());
+		}
+	}
+	return maxDist;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected

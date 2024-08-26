@@ -171,6 +171,11 @@ namespace ot {
 
 		void raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event);
 
+		//! \brief Calculates and returns the shortest distance to the given point.
+		//! Returns -1 if the distance is invalid (e.g. maximum distance exceeded).
+		//! \param _pt Point in scene coordinates.
+		virtual qreal calculateShortestDistanceToPoint(const QPointF& _pt) const override;
+
 		//! @brief Calculates the draw rect for the item
 		//! The inner rect takes into account the item geometry, alignment, margins and the actual inner size
 		QRectF calculatePaintArea(const QSizeF& _innerSize);
@@ -247,6 +252,12 @@ namespace ot {
 		void setGraphicsItemToolTip(const std::string& _toolTip);
 		const std::string& getGraphicsItemToolTip(void) const;
 
+		void setAdditionalTriggerDistance(const ot::MarginsD& _distance);
+		const ot::MarginsD& getAdditionalTriggerDistance(void) const;
+		
+		//! \brief Returns the maximum trigger distance in any direction of this item and its childs.
+		virtual double getMaxAdditionalTriggerDistance(void) const;
+		
 		void setGraphicsItemMinimumSize(const QSizeF& _size);
 		QSizeF getGraphicsItemMinimumSize(void) const;
 
@@ -316,7 +327,7 @@ namespace ot {
 
 		void parentItemTransformChanged(const QTransform& _parentTransform);
 
-		//! \brief Returns the bounding rect which was expanded by the additional trigger distance according to the config.
+		//! \brief Returns the bounding rect in scene coordinates which was expanded by the additional trigger distance according to the config.
 		//! \see GraphicsItemCfg::setAdditionalTriggerDistance(const MarginsD& _d)
 		QRectF getTriggerBoundingRect(void) const;
 

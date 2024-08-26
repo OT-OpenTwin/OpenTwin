@@ -61,6 +61,9 @@ ot::GraphicsItemCfg::~GraphicsItemCfg() {}
 // Base class methods
 
 void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+
+	// !!!!!     DON'T FORGET copyConfigDataToItem WHEN ADDING MEMBER ;-)     !!!!!
+
 	JsonObject posObj;
 	m_pos.addToJsonObject(posObj, _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Position, posObj, _allocator);
@@ -116,6 +119,9 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 }
 
 void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
+
+	// !!!!!     DON'T FORGET copyConfigDataToItem WHEN ADDING MEMBER ;-)     !!!!!
+
 	m_uid = static_cast<ot::UID>(json::getInt64(_object, OT_JSON_MEMBER_Uid));
 	m_name = json::getString(_object, OT_JSON_MEMBER_Name);
 	m_title = json::getString(_object, OT_JSON_MEMBER_Title);
@@ -177,6 +183,7 @@ void ot::GraphicsItemCfg::copyConfigDataToItem(GraphicsItemCfg* _target) const {
 	_target->m_uid = m_uid;
 	_target->m_tooltip = m_tooltip;
 	_target->m_pos = m_pos;
+	_target->m_additionalTriggerDistance = m_additionalTriggerDistance;
 
 	_target->m_minSize = m_minSize;
 	_target->m_maxSize = m_maxSize;

@@ -5,6 +5,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Math.h"
 #include "OTCore/Logger.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/StyleRefPainter2D.h"
@@ -142,7 +143,7 @@ bool ot::GraphicsItem::graphicsItemRequiresHover(void) const {
 void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) {
 		OTAssertNullptr(this->getGraphicsScene());
-		this->getGraphicsScene()->startConnection(this);
+		//this->getGraphicsScene()->startConnection(this);
 		return;
 	}
 	else if (m_parent) {
@@ -307,6 +308,12 @@ void ot::GraphicsItem::raiseEvent(ot::GraphicsItem::GraphicsItemEvent _event) {
 	}
 }
 
+qreal ot::GraphicsItem::calculateShortestDistanceToPoint(const QPointF& _pt) const {
+	QRectF virtualRect = this->getTriggerBoundingRect();
+	if (virtualRect.contains(_pt)) return Math::euclideanDistance(virtualRect.center().x(), virtualRect.center().y(), _pt.x(), _pt.y());
+	else return -1.;
+}
+
 QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 	auto qitm = this->getQGraphicsItem();
 	OTAssertNullptr(qitm);
@@ -454,6 +461,22 @@ void ot::GraphicsItem::setGraphicsItemToolTip(const std::string& _toolTip) {
 const std::string& ot::GraphicsItem::getGraphicsItemToolTip(void) const {
 	OTAssertNullptr(m_config);
 	return m_config->getToolTip();
+}
+
+void ot::GraphicsItem::setAdditionalTriggerDistance(const ot::MarginsD& _distance) {
+	OTAssertNullptr(m_config);
+	m_config->setAdditionalTriggerDistance(_distance);
+	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
+}
+
+const ot::MarginsD& ot::GraphicsItem::getAdditionalTriggerDistance(void) const {
+	OTAssertNullptr(m_config);
+	return m_config->getAdditionalTriggerDistance();
+}
+
+double ot::GraphicsItem::getMaxAdditionalTriggerDistance(void) const {
+	const ot::MarginsD& td = this->getAdditionalTriggerDistance();
+	return std::max({ td.left(), td.top(), td.right(), td.bottom() });
 }
 
 void ot::GraphicsItem::setGraphicsItemMinimumSize(const QSizeF& _size) {
@@ -660,7 +683,9 @@ void ot::GraphicsItem::parentItemTransformChanged(const QTransform& _parentTrans
 QRectF ot::GraphicsItem::getTriggerBoundingRect(void) const {
 	OTAssertNullptr(this->getQGraphicsItem());
 	OTAssertNullptr(this->getConfiguration());
-	return this->getQGraphicsItem()->boundingRect().marginsAdded(QtFactory::toQMargins(this->getConfiguration()->getAdditionalTriggerDistance()));
+	QRectF rec = this->getQGraphicsItem()->boundingRect();
+	rec.moveTo(this->getQGraphicsItem()->scenePos());
+	return rec.marginsAdded(QtFactory::toQMargins(this->getConfiguration()->getAdditionalTriggerDistance()));
 }
 
 void ot::GraphicsItem::applyGraphicsItemTransform(void) {
