@@ -118,17 +118,17 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 	for (auto itm : m_navigation->getTreeWidget()->selectedItems()) {
 		auto it = m_previewData.find(itm);
 		if (it != m_previewData.end()) {
-			for (const GraphicsPickerCollectionCfg::ItemInformation& info : *it->second) {
+			for (const GraphicsPickerItemInformation& info : *it->second) {
 				PreviewBox box;
 
 				box.view = new GraphicsItemPreview;
 				box.view->setMaximumSize(m_previewSize);
 				box.view->setMinimumSize(m_previewSize);
-				box.view->setPixmap(IconManager::getIcon(QString::fromStdString(info.previewIcon)).pixmap(m_previewSize));
-				box.view->setItemName(info.itemName);
+				box.view->setPixmap(IconManager::getIcon(QString::fromStdString(info.getPreviewIcon())).pixmap(m_previewSize));
+				box.view->setItemName(info.getName());
 				box.view->setAlignment(Qt::AlignCenter);
 
-				box.label = new QLabel(QString::fromStdString(info.itemTitle));
+				box.label = new QLabel(QString::fromStdString(info.getTitle()));
 				box.label->setAlignment(Qt::AlignCenter);
 
 				box.layoutWidget = new QWidget;
@@ -156,7 +156,7 @@ void ot::GraphicsPicker::addCollection(ot::GraphicsPickerCollectionCfg* _categor
 	if (_parentNavigationItem) {
 		// Check if parent has item
 		for (int i = 0; i < _parentNavigationItem->childCount(); i++) {
-			if (_parentNavigationItem->child(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_category->title()).toLower()) {
+			if (_parentNavigationItem->child(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_category->getTitle()).toLower()) {
 				categoryItem = _parentNavigationItem->child(i);
 				break;
 			}
@@ -165,7 +165,7 @@ void ot::GraphicsPicker::addCollection(ot::GraphicsPickerCollectionCfg* _categor
 	else {
 		// Check if parent has item
 		for (int i = 0; i < m_navigation->getTreeWidget()->topLevelItemCount(); i++) {
-			if (m_navigation->getTreeWidget()->topLevelItem(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_category->title()).toLower()) {
+			if (m_navigation->getTreeWidget()->topLevelItem(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_category->getTitle()).toLower()) {
 				categoryItem = m_navigation->getTreeWidget()->topLevelItem(i);
 				break;
 			}
@@ -175,7 +175,7 @@ void ot::GraphicsPicker::addCollection(ot::GraphicsPickerCollectionCfg* _categor
 	// Item does not exist, create
 	if (categoryItem == nullptr) {
 		categoryItem = new QTreeWidgetItem;
-		categoryItem->setText(intern::ntTitle, QString::fromStdString(_category->title()));
+		categoryItem->setText(intern::ntTitle, QString::fromStdString(_category->getTitle()));
 
 		if (_parentNavigationItem) {
 			// Add item as child
@@ -187,8 +187,8 @@ void ot::GraphicsPicker::addCollection(ot::GraphicsPickerCollectionCfg* _categor
 		}
 	}
 
-	this->addCollections(_category->childCollections(), categoryItem);
-	this->addItems(_category->items(), categoryItem);
+	this->addCollections(_category->getChildCollections(), categoryItem);
+	this->addItems(_category->getItems(), categoryItem);
 }
 
 void ot::GraphicsPicker::addCollections(const std::list<ot::GraphicsPickerCollectionCfg*>& _categories, QTreeWidgetItem* _parentNavigationItem) {
@@ -198,13 +198,13 @@ void ot::GraphicsPicker::addCollections(const std::list<ot::GraphicsPickerCollec
 	}
 }
 
-void ot::GraphicsPicker::addItem(const GraphicsPickerCollectionCfg::ItemInformation& _info, QTreeWidgetItem* _parentNavigationItem) {
+void ot::GraphicsPicker::addItem(const GraphicsPickerItemInformation& _info, QTreeWidgetItem* _parentNavigationItem) {
 	OTAssert(_parentNavigationItem, "nullptr provided");
 
 	QTreeWidgetItem* treeItem = nullptr;
 	for (int i = 0; i < _parentNavigationItem->childCount(); i++) {
-		if (_parentNavigationItem->child(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_info.itemTitle).toLower()) {
-			OT_LOG_W("A graphics item with the name \"" + _info.itemTitle + "\" is already a child of the collection \"" + _parentNavigationItem->text(intern::ntTitle).toStdString() + "\"");
+		if (_parentNavigationItem->child(i)->text(intern::ntTitle).toLower() == QString::fromStdString(_info.getTitle()).toLower()) {
+			OT_LOG_W("A graphics item with the name \"" + _info.getTitle() + "\" is already a child of the collection \"" + _parentNavigationItem->text(intern::ntTitle).toStdString() + "\"");
 			treeItem = _parentNavigationItem->child(i);
 			break;
 		}
@@ -212,7 +212,7 @@ void ot::GraphicsPicker::addItem(const GraphicsPickerCollectionCfg::ItemInformat
 
 	if (treeItem == nullptr) {
 		treeItem = new QTreeWidgetItem;
-		treeItem->setText(intern::ntTitle, QString::fromStdString(_info.itemTitle));
+		treeItem->setText(intern::ntTitle, QString::fromStdString(_info.getTitle()));
 
 		_parentNavigationItem->addChild(treeItem);
 
@@ -222,19 +222,19 @@ void ot::GraphicsPicker::addItem(const GraphicsPickerCollectionCfg::ItemInformat
 	}
 }
 
-void ot::GraphicsPicker::addItems(const std::list<GraphicsPickerCollectionCfg::ItemInformation>& _items, QTreeWidgetItem* _parentNavigationItem) {
+void ot::GraphicsPicker::addItems(const std::list<GraphicsPickerItemInformation>& _items, QTreeWidgetItem* _parentNavigationItem) {
 	for (auto b : _items) {
 		this->addItem(b, _parentNavigationItem);
 	}
 }
 
-void ot::GraphicsPicker::storePreviewData(QTreeWidgetItem* _item, const GraphicsPickerCollectionCfg::ItemInformation& _info) {
+void ot::GraphicsPicker::storePreviewData(QTreeWidgetItem* _item, const GraphicsPickerItemInformation& _info) {
 	auto it = m_previewData.find(_item);
 	if (it != m_previewData.end()) {
 		it->second->push_back(_info);
 	}
 	else {
-		auto lst = new std::list<GraphicsPickerCollectionCfg::ItemInformation>;
+		auto lst = new std::list<GraphicsPickerItemInformation>;
 		lst->push_back(_info);
 		m_previewData.insert_or_assign(_item, lst);
 	}

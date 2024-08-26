@@ -58,10 +58,10 @@ namespace ot {
 		void addCollection(ot::GraphicsPickerCollectionCfg* _category, QTreeWidgetItem* _parentNavigationItem);
 		void addCollections(const std::list<ot::GraphicsPickerCollectionCfg*>& _categories, QTreeWidgetItem* _parentNavigationItem);
 
-		void addItem(const GraphicsPickerCollectionCfg::ItemInformation& _info, QTreeWidgetItem* _parentNavigationItem);
-		void addItems(const std::list<GraphicsPickerCollectionCfg::ItemInformation>& _info, QTreeWidgetItem* _parentNavigationItem);
+		void addItem(const GraphicsPickerItemInformation& _info, QTreeWidgetItem* _parentNavigationItem);
+		void addItems(const std::list<GraphicsPickerItemInformation>& _info, QTreeWidgetItem* _parentNavigationItem);
 
-		void storePreviewData(QTreeWidgetItem* _item, const GraphicsPickerCollectionCfg::ItemInformation& _info);
+		void storePreviewData(QTreeWidgetItem* _item, const GraphicsPickerItemInformation& _info);
 
 		struct PreviewBox {
 			QWidget* layoutWidget;
@@ -80,7 +80,7 @@ namespace ot {
 		QWidget* m_viewLayoutW;
 		QGridLayout* m_viewLayout;
 
-		std::map<QTreeWidgetItem*, std::list<GraphicsPickerCollectionCfg::ItemInformation>*> m_previewData;
+		std::map<QTreeWidgetItem*, std::list<GraphicsPickerItemInformation>*> m_previewData;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -115,7 +115,6 @@ namespace ot {
 		void clear(void);
 
 		ot::GraphicsPicker* pickerWidget(void) { return m_widget; };
-
 
 	private:
 		inline Qt::Orientation calcWidgetOrientation(void) const { return (this->width() > this->height() ? Qt::Horizontal : Qt::Vertical); };
