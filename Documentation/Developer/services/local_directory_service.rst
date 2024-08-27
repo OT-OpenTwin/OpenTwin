@@ -1,3 +1,5 @@
+.. _lds-head:
+
 Local Directory Service
 =======================
 

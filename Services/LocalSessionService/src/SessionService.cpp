@@ -453,34 +453,6 @@ std::string SessionService::handleGetMandatoryServices(ot::JsonDocument& _comman
 	return doc.toJson();
 }
 
-std::string SessionService::handleSessionDebugLogOn(ot::JsonDocument& _commandDoc) {
-	std::string sessionID = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID);
-	Session * theSession = getSession(sessionID);
-	Service * theService = nullptr;
-	try { theService = theSession->getService(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID)); }
-	catch (...) {}
-
-	ot::JsonDocument debugCmd;
-	// todo: rework session debug commands
-	//ot::json::add(debugCommand, OT_ACTION_MEMBER, OT_ACTION_CMD_LogOn);
-	theSession->setIsDebug(true);
-	//theSession->broadcast(theService, debugCommand, false);
-
-	return OT_ACTION_RETURN_VALUE_OK;
-}
-
-std::string SessionService::handleSessionDebugLogOff(ot::JsonDocument& _commandDoc) {
-	std::string sessionID = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID);
-	Session * theSession = getSession(sessionID);
-	Service * theService = nullptr;
-	try { theService = theSession->getService(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID)); }
-	catch (...) {}
-
-	theSession->setIsDebug(false);
-
-	return OT_ACTION_RETURN_VALUE_OK;
-}
-
 std::string SessionService::handleRegisterNewService(ot::JsonDocument& _commandDoc) {
 	static bool deb = false;
 	if (deb) {

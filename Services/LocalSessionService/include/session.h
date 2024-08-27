@@ -60,12 +60,6 @@ public:
 	//! @brief Will return the count of the services registered in this session
 	size_t serviceCount() const { return m_serviceMap.size(); }
 
-	//! @brief Will return true if the session is in debug mode
-	bool isDebug(void) const { return m_sessionDebug; }
-
-	//! @brief Will set the session debug mode
-	void setIsDebug(bool _debug = true) { m_sessionDebug = _debug; }
-
 	// ####################################################################################################
 
 	// Service management
@@ -181,8 +175,7 @@ private:
 	std::string											m_projectName;
 	std::string											m_collectionName;
 	std::string											m_type;
-	bool												m_sessionDebug;
-
+	
 	ot::UserCredentials									m_userCredentials;
 	ot::UserCredentials									m_dbCredentials;
 	std::string											m_userCollection;

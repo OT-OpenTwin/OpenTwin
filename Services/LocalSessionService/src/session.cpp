@@ -28,7 +28,7 @@ Session::Session(
 	const std::string &						_collectionName,
 	const std::string &						_type
 ) : m_id(_ID), m_userName(_userName), m_projectName(_projectName), m_collectionName(_collectionName),
-	m_type(_type), m_sessionDebug(false)
+	m_type(_type)
 {
 	OT_LOG_D("New session created with (ID = \"" + m_id + "\", User.Name = \"" + m_userName + "\", Project.Name = \"" + 
 		m_projectName + "\", Collection.Name = \"" + m_collectionName + "\", Session.Type = \"" + m_type + "\")");

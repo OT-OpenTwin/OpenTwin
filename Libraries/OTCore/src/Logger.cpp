@@ -26,6 +26,39 @@
 #define OT_ACTION_PARAM_LOG_DataVersion "Log.Data.Version"
 #define OT_ACTION_PARAM_LOG_Time_Local "Log.Time.Local"
 #define OT_ACTION_PARAM_LOG_Time_Global "Log.Time.Global"
+#define OT_ACTION_PARAM_LOG_User "Log.User"
+#define OT_ACTION_PARAM_LOG_Project "Log.Project"
+
+void ot::addLogFlagsToJsonArray(const LogFlags& _flags, JsonArray& _flagsArray, JsonAllocator& _allocator) {
+	if (_flags & INFORMATION_LOG) _flagsArray.PushBack(JsonString("Information", _allocator), _allocator);
+	if (_flags & DETAILED_LOG) _flagsArray.PushBack(JsonString("Detailed", _allocator), _allocator);
+	if (_flags & WARNING_LOG) _flagsArray.PushBack(JsonString("Warning", _allocator), _allocator);
+	if (_flags & ERROR_LOG) _flagsArray.PushBack(JsonString("Error", _allocator), _allocator);
+	if (_flags & INBOUND_MESSAGE_LOG) _flagsArray.PushBack(JsonString("InboundMessage", _allocator), _allocator);
+	if (_flags & QUEUED_INBOUND_MESSAGE_LOG) _flagsArray.PushBack(JsonString("QueuedMessage", _allocator), _allocator);
+	if (_flags & ONEWAY_TLS_INBOUND_MESSAGE_LOG) _flagsArray.PushBack(JsonString("OneWayTLSMessage", _allocator), _allocator);
+	if (_flags & OUTGOING_MESSAGE_LOG) _flagsArray.PushBack(JsonString("OutgoingMessage", _allocator), _allocator);
+}
+
+ot::LogFlags ot::logFlagsFromJsonArray(const ConstJsonArray& _flagsArray) {
+	LogFlags result(NO_LOG);
+	for (rapidjson::SizeType i = 0; i < _flagsArray.Size(); i++) {
+		std::string f = json::getString(_flagsArray, i);
+
+		if (f == "Information") result |= INFORMATION_LOG;
+		else if (f == "Detailed") result |= DETAILED_LOG;
+		else if (f == "Warning") result |= WARNING_LOG;
+		else if (f == "Error") result |= ERROR_LOG;
+		else if (f == "InboundMessage") result |= INBOUND_MESSAGE_LOG;
+		else if (f == "QueuedMessage") result |= QUEUED_INBOUND_MESSAGE_LOG;
+		else if (f == "OneWayTLSMessage") result |= ONEWAY_TLS_INBOUND_MESSAGE_LOG;
+		else if (f == "OutgoingMessage") result |= OUTGOING_MESSAGE_LOG;
+		else {
+			OT_LOG_EAS("Unknown log flag \"" + f + "\"");
+		}
+	}
+	return result;
+}
 
 ot::LogMessage::LogMessage() : m_flags(ot::NO_LOG) {}
 
@@ -79,16 +112,11 @@ void ot::LogMessage::addToJsonObject(JsonValue& _object, JsonAllocator& _allocat
 	_object.AddMember(OT_ACTION_PARAM_LOG_Time_Local, JsonString(m_localSystemTime, _allocator), _allocator);
 	_object.AddMember(OT_ACTION_PARAM_LOG_Time_Global, JsonString(m_globalSystemTime, _allocator), _allocator);
 	_object.AddMember(OT_ACTION_PARAM_LOG_DataVersion, JsonString("1.0", _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_LOG_User, JsonString(m_userName, _allocator), _allocator);
+	_object.AddMember(OT_ACTION_PARAM_LOG_Project, JsonString(m_projectName, _allocator), _allocator);
 
 	JsonArray flagArr;
-	if (m_flags & INFORMATION_LOG) flagArr.PushBack(JsonString("Information", _allocator), _allocator);
-	if (m_flags & DETAILED_LOG) flagArr.PushBack(JsonString("Detailed", _allocator), _allocator);
-	if (m_flags & WARNING_LOG) flagArr.PushBack(JsonString("Warning", _allocator), _allocator);
-	if (m_flags & ERROR_LOG) flagArr.PushBack(JsonString("Error", _allocator), _allocator);
-	if (m_flags & INBOUND_MESSAGE_LOG) flagArr.PushBack(JsonString("InboundMessage", _allocator), _allocator);
-	if (m_flags & QUEUED_INBOUND_MESSAGE_LOG) flagArr.PushBack(JsonString("QueuedMessage", _allocator), _allocator);
-	if (m_flags & ONEWAY_TLS_INBOUND_MESSAGE_LOG) flagArr.PushBack(JsonString("OneWayTLSMessage", _allocator), _allocator);
-	if (m_flags & OUTGOING_MESSAGE_LOG) flagArr.PushBack(JsonString("OutgoingMessage", _allocator), _allocator);
+	addLogFlagsToJsonArray(m_flags, flagArr, _allocator);
 	_object.AddMember(OT_ACTION_PARAM_LOG_Flags, flagArr, _allocator);
 }
 
@@ -104,22 +132,11 @@ void ot::LogMessage::setFromJsonObject(const ConstJsonObject& _object) {
 	m_text = json::getString(_object, OT_ACTION_PARAM_LOG_Message);
 	m_localSystemTime = json::getString(_object, OT_ACTION_PARAM_LOG_Time_Local);
 	m_globalSystemTime = json::getString(_object, OT_ACTION_PARAM_LOG_Time_Global);
+	m_userName = json::getString(_object, OT_ACTION_PARAM_LOG_User);
+	m_projectName = json::getString(_object, OT_ACTION_PARAM_LOG_Project);
 
 	ConstJsonArray flagsArr = json::getArray(_object, OT_ACTION_PARAM_LOG_Flags);
-	for (rapidjson::SizeType i = 0; i < flagsArr.Size(); i++) {
-		std::string f = json::getString(flagsArr, i);
-		if (f == "Information") m_flags |= INFORMATION_LOG;
-		else if (f == "Detailed") m_flags |= DETAILED_LOG;
-		else if (f == "Warning") m_flags |= WARNING_LOG;
-		else if (f == "Error") m_flags |= ERROR_LOG;
-		else if (f == "InboundMessage") m_flags |= INBOUND_MESSAGE_LOG;
-		else if (f == "QueuedMessage") m_flags |= QUEUED_INBOUND_MESSAGE_LOG;
-		else if (f == "OneWayTLSMessage") m_flags |= ONEWAY_TLS_INBOUND_MESSAGE_LOG;
-		else if (f == "OutgoingMessage") m_flags |= OUTGOING_MESSAGE_LOG;
-		else {
-			OT_LOG_EAS("Unknown log flag \"" + f + "\"");
-		}
-	}
+	m_flags = logFlagsFromJsonArray(flagsArr);
 }
 
 std::ostream& ot::operator << (std::ostream& _stream, const LogMessage& _msg) {
@@ -183,16 +200,25 @@ void ot::LogDispatcher::dispatch(const LogMessage& _message) {
 	// Create Timestamp
 	LogMessage msg(_message);
 	msg.setCurrentTimeAsLocalSystemTime();
+	msg.setUserName(m_userName);
+	msg.setProjectName(m_projectName);
 
 	for (auto r : m_messageReceiver) {
 		try {
 			r->log(msg);
 		}
-		catch (const std::exception&) {
+		catch (const std::exception& _e) {
 			OTAssert(0, "Error occured while dispatching log message");
+#ifdef _DEBUG
+			std::cerr << "Dispatch error: " << _e.what() << std::endl;
+#endif // _DEBUG
+
 		}
 		catch (...) {
 			OTAssert(0, "Unknown error while dispatching log message");
+#ifdef _DEBUG
+			std::cerr << "Dispatch error: [FATAL] Unknown error" << std::endl;
+#endif // _DEBUG
 		}
 	}
 }

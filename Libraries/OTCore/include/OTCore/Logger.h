@@ -299,6 +299,11 @@ namespace ot {
 	};
 
 	typedef Flags<LogFlag> LogFlags;
+
+	OT_CORE_API_EXPORT void addLogFlagsToJsonArray(const LogFlags& _flags, JsonArray& _flagsArray, JsonAllocator& _allocator);
+
+	OT_CORE_API_EXPORT LogFlags logFlagsFromJsonArray(const ConstJsonArray& _flagsArray);
+
 }
 OT_ADD_FLAG_FUNCTIONS(ot::LogFlag)
 
@@ -346,6 +351,12 @@ namespace ot {
 		//! @brief Set the current system time as message received by logger service timestamp.
 		void setCurrentTimeAsGlobalSystemTime(void);
 
+		void setUserName(const std::string& _userName) { m_userName = _userName; };
+		const std::string& getUserName(void) const { return m_userName; };
+
+		void setProjectName(const std::string& _projectName) { m_projectName = _projectName; };
+		const std::string& getProjectName(void) const { return m_projectName; };
+
 		//! @brief Add the object contents to the provided JSON object.
 		//! @param _document The JSON document (used to get the allocator).
 		//! @param _object The JSON object to add the contents to.
@@ -359,12 +370,14 @@ namespace ot {
 	private:
 		friend OT_CORE_API_EXPORT std::ostream& operator << (std::ostream& _stream, const LogMessage& _msg);
 
-		std::string				m_serviceName;			//! @brief Name of the message creator.
-		std::string				m_functionName;			//! @brief Name of the function that created the message.
-		std::string				m_text;					//! @brief The message text.
-		LogFlags				m_flags;				//! @brief Log flags tha describe the type of the message.
-		std::string				m_localSystemTime;		//! @brief Message creation timestamp.
-		std::string				m_globalSystemTime;		//! @brief Message received by LoggerService timestamp.
+		std::string m_serviceName;			//! @brief Name of the message creator.
+		std::string m_functionName;			//! @brief Name of the function that created the message.
+		std::string m_text;					//! @brief The message text.
+		LogFlags    m_flags;				//! @brief Log flags tha describe the type of the message.
+		std::string m_localSystemTime;		//! @brief Message creation timestamp.
+		std::string m_globalSystemTime;		//! @brief Message received by LoggerService timestamp.
+		std::string m_userName;             //! \brief Current user when this message was generated.
+		std::string m_projectName;          //! \brief Project in which this message was generated.
 	};
 
 	//! @brief Writes the log message in a typical "log line" format to the provided output stream.
@@ -438,6 +451,12 @@ namespace ot {
 		void setServiceName(const std::string& _name) { m_serviceName = _name; };
 		const std::string& serviceName(void) const { return m_serviceName; };
 
+		void setUserName(const std::string& _name) { m_userName = _name; };
+		const std::string& getUserName(void) const { return m_userName; };
+
+		void setProjectName(const std::string& _name) { m_projectName = _name; };
+		const std::string& getProjectName(void) const { return m_projectName; };
+
 		//! @brief Adds the provided receiver to the message receiver list.
 		//! Every registered receiver will be notified about every log message that was created.
 		//! @param _receiver The receiver to add
@@ -447,6 +466,7 @@ namespace ot {
 
 		//! @brief Dispatch a log message with the provided params.
 		//! Will forward the created log message object to the dispatch(LogMessage) function.
+		//! Will apply the current user and project names to the log message before dispatching.
 		//! @param _text The message text.
 		//! @param _functionName The name of the function.
 		//! @param _logFlags The flags that should be set for the log message.
@@ -454,6 +474,7 @@ namespace ot {
 
 		//! @brief Dispatch a log message with the provided params.
 		//! Will set the current system time as message creation time (local system time).
+		//! //! Will apply the current user and project names to the log message before dispatching.
 		//! @param _message The message to dispatch.
 		void dispatch(const LogMessage& _message);
 
@@ -464,6 +485,9 @@ namespace ot {
 		std::string						m_serviceName;		//! @brief Service/Application name.
 
 		std::list<AbstractLogNotifier*> m_messageReceiver;	//! @brief Receivers that will get notified about created log messages.
+
+		std::string                     m_userName;
+		std::string                     m_projectName;
 
 		LogDispatcher();
 		virtual ~LogDispatcher();

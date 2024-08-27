@@ -48,7 +48,7 @@
 #define OT_ACTION_CMD_ServiceFailure "Session.ServiceFailure"
 #define OT_ACTION_CMD_ServiceStartupFailed "Service.Startup.Failed"
 #define OT_ACTION_CMD_AddMandatoryService "Session.AddMandatory"
-#define OT_ACTION_CMD_SetLoggingOptions "Logger.Set"
+#define OT_ACTION_CMD_SetLogFlags "Logger.SetFlags"
 #define OT_ACTION_CMD_Ping "Ping"
 #define OT_ACTION_CMD_Init "Initialize"
 #define OT_ACTION_CMD_Run "Run"
@@ -76,9 +76,6 @@
 #define OT_ACTION_CMD_ServiceShutdown "Shutdown"
 #define OT_ACTION_CMD_ServicePreShutdown "Service.PreShutdown"
 #define OT_ACTION_CMD_ServiceEmergencyShutdown "Service.EmergencyShutdown"
-
-#define OT_ACTION_CMD_SessionDebugLogOn "SessionDebug.On"
-#define OT_ACTION_CMD_SessionDebugLogOff "SessionDebug.Off"
 
 #define OT_ACTION_CMD_PROJ_Save "Project.Save"
 #define OT_ACTION_CMD_KeySequenceActivated "KeySequence.Activated"
@@ -299,6 +296,7 @@
 #define OT_ACTION_PARAM_PROCESS_ID "PROCESS.ID"
 
 #define OT_ACTION_PARAM_JSON "JSON"
+#define OT_ACTION_PARAM_Flags "Flags"
 #define OT_ACTION_PARAM_Value "Value"
 #define OT_ACTION_PARAM_Config "Config"
 #define OT_ACTION_PARAM_Package "Package"
