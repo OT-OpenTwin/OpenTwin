@@ -41,13 +41,9 @@ namespace ot {
 		void setMaintainAspectRatio(bool _active) { m_maintainAspectRatio = _active; };
 		bool isMaintainAspectRatio(void) const { return m_maintainAspectRatio; };
 
-		void setColorMask(const ot::Color& _color) { m_colorMask = _color; };
-		const ot::Color& colorMask(void) const { return m_colorMask; };
-
 	private:
 		std::string m_imageSubPath;
 		bool m_maintainAspectRatio;
-		ot::Color m_colorMask;
 
 		GraphicsImageItemCfg(GraphicsImageItemCfg&) = delete;
 		GraphicsImageItemCfg& operator = (GraphicsImageItemCfg&) = delete;

@@ -88,38 +88,4 @@ void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOpt
 
 	QRectF adjustedRect = ot::calculateChildRect(_rect, adjustedSize, this->getGraphicsItemAlignment());
 	painter->paintImage(_painter, adjustedRect);
-
-	/*if (m_maintainAspectRatio) {
-		QPixmap scaled = m_pixmap.scaled(_rect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-		
-
-		// Check if a color mask is set
-		if (m_colorMask.isValid()) {
-			QPixmap mask(scaled.size());
-			mask.fill(QtFactory::toQColor(m_colorMask));
-			_painter->setCompositionMode(QPainter::CompositionMode_SourceIn);
-
-			_painter->drawPixmap(adjustedRect.topLeft(), scaled);
-			_painter->drawPixmap(adjustedRect.topLeft(), mask);
-		}
-		else {
-			_painter->drawPixmap(adjustedRect.topLeft(), scaled);
-		}
-	}
-	else {
-
-		// Check if a color mask is set
-		if (m_colorMask.isValid()) {
-			QPixmap mask(_rect.size().toSize());
-			mask.fill(QtFactory::toQColor(m_colorMask));
-			_painter->setCompositionMode(QPainter::CompositionMode_SourceIn);
-
-			_painter->drawPixmap(_rect.topLeft().x(), _rect.topLeft().y(), _rect.width(), _rect.height(), m_pixmap);
-			_painter->drawPixmap(_rect.topLeft().x(), _rect.topLeft().y(), _rect.width(), _rect.height(), mask);
-		}
-		else {
-			_painter->drawPixmap(_rect.topLeft().x(), _rect.topLeft().y(), _rect.width(), _rect.height(), m_pixmap);
-		}
-	}
-	*/
 }
