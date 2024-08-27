@@ -107,6 +107,13 @@ void GlobalSessionService::healthCheck(void) {
 				m_owner->setId(ssID);
 				m_owner->setDataBaseURL(databaseURL);
 				
+				ot::LogModeManager logManager;
+				if (registrationResponseDoc.HasMember(OT_ACTION_PARAM_GlobalLogFlags)) {
+					ot::ConstJsonArray logFlags = ot::json::getArray(registrationResponseDoc, OT_ACTION_PARAM_GlobalLogFlags);
+					logManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(logFlags));
+				}
+				m_owner->updateLogMode(logManager);
+
 				m_connectionStatus = Connected;
 			}
 		}

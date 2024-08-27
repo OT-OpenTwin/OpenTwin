@@ -522,6 +522,11 @@ std::string SessionService::handleRegisterNewService(ot::JsonDocument& _commandD
 	if (serviceType == OT_INFO_SERVICE_TYPE_UI) {
 		response.AddMember(OT_ACTION_PARAM_UI_ToolBarTabOrder, ot::JsonArray(theSession->toolBarTabOrder(), response.GetAllocator()), response.GetAllocator());
 	}
+	if (m_logModeManager.getGlobalLogFlagsSet()) {
+		ot::JsonArray logArr;
+		ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), logArr, response.GetAllocator());
+		response.AddMember(OT_ACTION_PARAM_LogFlags, logArr, response.GetAllocator());
+	}
 
 	// Add service to run starter (will send run command later)
 	ServiceRunStarter::instance().addService(theSession, theService);
@@ -1016,6 +1021,16 @@ std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _comman
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
+std::string SessionService::handleSetGlobalLogFlags(ot::JsonDocument& _commandDoc) {
+	ot::ConstJsonArray flags = ot::json::getArray(_commandDoc, OT_ACTION_PARAM_Flags);
+	m_logModeManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(flags));
+
+	// Update existing session services
+	this->updateLogMode(m_logModeManager);
+
+	return OT_ACTION_RETURN_VALUE_OK;
+}
+
 void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, std::string _sessionId) {
 	m_masterLock.lock();
 	// Get service info
@@ -1060,4 +1075,18 @@ void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, std::stri
 void SessionService::initializeSystemInformation() {
 
 	m_systemLoadInformation.initialize();
+}
+
+void SessionService::updateLogMode(const ot::LogModeManager& _newData) {
+	m_logModeManager = _newData;
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_SetLogFlags, doc.GetAllocator());
+	ot::JsonArray flagsArr;
+	ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Flags, flagsArr, doc.GetAllocator());
+
+	for (const auto& it : m_sessionMap) {
+		it.second->broadcast(nullptr, doc, false, false);
+	}
 }

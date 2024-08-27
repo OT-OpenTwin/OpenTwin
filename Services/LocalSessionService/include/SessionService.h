@@ -16,6 +16,7 @@
 
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OTObjectBase.h"
+#include "OTCore/LogModeManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTSystem/SystemLoadInformation.h"
@@ -151,6 +152,8 @@ public:
 	//! @brief Initialize the collection of system information (e.g. CPU time and memory).
 	void initializeSystemInformation();
 
+	void updateLogMode(const ot::LogModeManager& _newData);
+
 private:
 	// Message handling
 
@@ -184,6 +187,8 @@ private:
 	OT_HANDLER(handleRegisterNewGlobalDirectoryService, SessionService, OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceStartupFailed, SessionService, OT_ACTION_CMD_ServiceStartupFailed, ot::SECURE_MESSAGE_TYPES)
 
+	OT_HANDLER(handleSetGlobalLogFlags, SessionService, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
+
 	void workerShutdownSession(ot::serviceID_t _serviceId, std::string _sessionId);
 
 	std::string									m_dataBaseURL;						//! The database IP address
@@ -206,6 +211,8 @@ private:
 
 	GlobalSessionService *						m_globalSessionService;
 	GlobalDirectoryService *					m_globalDirectoryService;
+
+	ot::LogModeManager m_logModeManager;
 
 	SessionService(const SessionService&) = delete;
 	SessionService & operator =(const SessionService&) = delete;

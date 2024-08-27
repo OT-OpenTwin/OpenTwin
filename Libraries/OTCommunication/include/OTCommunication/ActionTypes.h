@@ -59,6 +59,9 @@
 #define OT_ACTION_CMD_Log "Log"
 #define OT_ACTION_CMD_ForceHealthCheck "Healthcheck.Force"
 
+#define OT_ACTION_CMD_SetGlobalLogFlags "Logger.SetGlobal"
+#define OT_ACTION_CMD_SetSpecificLogFlags "Logger.SetSpecific"
+
 #define OT_ACTION_PARAM_LSS "LocalSessionServices"
 #define OT_ACTION_PARAM_LSS_URL "URL"
 #define OT_ACTION_PARAM_LSS_SessionCount "SessionCount"
@@ -300,6 +303,7 @@
 #define OT_ACTION_PARAM_Value "Value"
 #define OT_ACTION_PARAM_Config "Config"
 #define OT_ACTION_PARAM_Package "Package"
+#define OT_ACTION_PARAM_LogFlags "LogFlags"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 
 #define OT_ACTION_PARAM_UI_ToolBarTabOrder "UI.TTB.TabOrder"
@@ -369,6 +373,7 @@
 #define OT_ACTION_PARAM_HOSTNAME "Host.Name"
 
 #define OT_ACTION_PARAM_LOG "LogMessage"
+#define OT_ACTION_PARAM_GlobalLogFlags "Global.LogFlags"
 
 #define OT_ACTION_PARAM_GLOBAL_CPU_LOAD "Global.CPU.Load"
 #define OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD "Global.Memory.Load"

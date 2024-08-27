@@ -122,7 +122,12 @@ extern "C"
 			if (gssResponseDoc.HasMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL)) {
 				gdsURL = ot::json::getString(gssResponseDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL);
 			}
-
+			ot::LogModeManager logManager;
+			if (gssResponseDoc.HasMember(OT_ACTION_PARAM_GlobalLogFlags)) {
+				ot::ConstJsonArray logFlags = ot::json::getArray(gssResponseDoc, OT_ACTION_PARAM_GlobalLogFlags);
+				logManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(logFlags));
+			}
+			
 			// Create session service and add data to session service
 			SessionService * sessionService = SessionService::instance();
 			sessionService->setDataBaseURL(databaseURL);
@@ -130,6 +135,7 @@ extern "C"
 			sessionService->setPort(port);
 			sessionService->setId(ssID);
 			sessionService->setAuthorisationServiceURL(authURL);
+			sessionService->updateLogMode(logManager);
 
 			// Initialize GSS
 			OT_LOG_D("Initializing GlobalSessionService...");

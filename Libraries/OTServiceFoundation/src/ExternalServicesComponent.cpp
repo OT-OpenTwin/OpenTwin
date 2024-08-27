@@ -225,6 +225,10 @@ std::string ot::intern::ExternalServicesComponent::init(
 		ot::OwnerServiceGlobal::instance().setId(m_application->serviceID());
 		ot::ThisService::instance().setServiceID(m_application->serviceID());
 
+		if (reply.HasMember(OT_ACTION_PARAM_LogFlags)) {
+			ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(ot::json::getArray(reply, OT_ACTION_PARAM_LogFlags)));
+		}
+
 		OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->serviceID()) + "\"");
 
 		if (m_application->startAsRelayService()) {
@@ -232,7 +236,6 @@ std::string ot::intern::ExternalServicesComponent::init(
 
 			OT_LOG_D("Websocket URL set to: \"" + m_application->webSocketURL() + "\"");
 		}
-
 	}
 
 	m_componentState = Ready;
@@ -325,6 +328,10 @@ std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::
 		m_application->setServiceID(ot::json::getInt(reply, OT_ACTION_PARAM_SERVICE_ID));
 		ot::OwnerServiceGlobal::instance().setId(m_application->serviceID());
 
+		if (reply.HasMember(OT_ACTION_PARAM_LogFlags)) {
+			ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(ot::json::getArray(reply, OT_ACTION_PARAM_LogFlags)));
+		}
+
 		OT_LOG_D("Service ID set to: \"" + std::to_string(m_application->serviceID()) + "\"");
 
 		if (m_application->startAsRelayService()) {
@@ -332,7 +339,6 @@ std::string ot::intern::ExternalServicesComponent::initDebugExplicit(const std::
 
 			OT_LOG_D("Websocket URL set to: \"" + m_application->webSocketURL() + "\"");
 		}
-
 	}
 
 	m_componentState = Ready;

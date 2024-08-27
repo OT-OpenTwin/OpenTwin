@@ -142,6 +142,54 @@ std::string GlobalSessionService::handleCreateSession(ot::JsonDocument& _doc) {
 	}
 }
 
+std::string GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument& _doc) {
+	std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
+
+	m_mapMutex.lock();
+
+	//todo: replace response by a document
+	auto it = m_sessionToServiceMap.find(projectName);
+	if (it == m_sessionToServiceMap.end()) {
+		m_mapMutex.unlock();
+		return std::string();
+	}
+	else {
+		m_mapMutex.unlock();
+		return it->second->getSessionById(projectName)->userName();
+	}
+}
+
+std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
+
+	double globalCpuLoad = 0, globalMemoryLoad = 0;
+	m_SystemLoadInformation.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);
+
+	double processCpuLoad = 0, processMemoryLoad = 0;
+	m_SystemLoadInformation.getCurrentProcessCPUAndMemoryLoad(processCpuLoad, processMemoryLoad);
+
+	ot::JsonDocument reply;
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_CPU_LOAD, globalCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD, globalMemoryLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_CPU_LOAD, processCpuLoad, reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_PROCESS_MEMORY_LOAD, processMemoryLoad, reply.GetAllocator());
+
+	// Now we add information about the session services
+	ot::JsonArray servicesInfo;
+
+	for (auto it : m_sessionServiceIdMap) {
+		ot::JsonValue info;
+		info.SetObject();
+
+		info.AddMember(OT_ACTION_PARAM_LSS_URL, ot::JsonString(it.second->url(), reply.GetAllocator()), reply.GetAllocator());
+
+		servicesInfo.PushBack(info, reply.GetAllocator());
+	}
+
+	reply.AddMember(OT_ACTION_PARAM_LSS, servicesInfo, reply.GetAllocator());
+
+	return reply.toJson();
+}
+
 std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument& _doc) {
 	LocalSessionService nService;
 	// Gather information from document
@@ -156,6 +204,12 @@ std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument&
 	reply.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, reply.GetAllocator()), reply.GetAllocator());
 	if (!m_globalDirectoryUrl.empty()) {
 		reply.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_globalDirectoryUrl, reply.GetAllocator()), reply.GetAllocator());
+	}
+
+	if (m_logModeManager.getGlobalLogFlagsSet()) {
+		ot::JsonArray flagsArr;
+		ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, reply.GetAllocator());
+		reply.AddMember(OT_ACTION_PARAM_GlobalLogFlags, flagsArr, reply.GetAllocator());
 	}
 
 	return reply.toJson();
@@ -178,23 +232,6 @@ std::string GlobalSessionService::handleShutdownSession(ot::JsonDocument& _doc) 
 	OT_LOG_D("Session was closed (ID = \"" + sessionID + "\")");
 
 	return OT_ACTION_RETURN_VALUE_OK;
-}
-
-std::string GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument& _doc) {
-	std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
-
-	m_mapMutex.lock();
-
-	//todo: replace response by a document
-	auto it = m_sessionToServiceMap.find(projectName);
-	if (it == m_sessionToServiceMap.end()) {
-		m_mapMutex.unlock();
-		return std::string();
-	}
-	else {
-		m_mapMutex.unlock();
-		return it->second->getSessionById(projectName)->userName();
-	}
 }
 
 std::string GlobalSessionService::handleForceHealthcheck(ot::JsonDocument& _doc) {
@@ -249,37 +286,25 @@ std::string GlobalSessionService::handleNewGlobalDirectoryService(ot::JsonDocume
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
+std::string GlobalSessionService::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
+	ot::ConstJsonArray flags = ot::json::getArray(_doc, OT_ACTION_PARAM_Flags);
+	m_logModeManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(flags));
 
-	double globalCpuLoad = 0, globalMemoryLoad = 0;
-	m_SystemLoadInformation.getGlobalCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad);
-
-	double processCpuLoad = 0, processMemoryLoad = 0;
-	m_SystemLoadInformation.getCurrentProcessCPUAndMemoryLoad(processCpuLoad, processMemoryLoad);
-
-	ot::JsonDocument reply;
-	reply.AddMember(OT_ACTION_PARAM_GLOBAL_CPU_LOAD, globalCpuLoad, reply.GetAllocator());
-	reply.AddMember(OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD, globalMemoryLoad, reply.GetAllocator());
-	reply.AddMember(OT_ACTION_PARAM_PROCESS_CPU_LOAD, processCpuLoad, reply.GetAllocator());
-	reply.AddMember(OT_ACTION_PARAM_PROCESS_MEMORY_LOAD, processMemoryLoad, reply.GetAllocator());
-
-	// Now we add information about the session services
-	ot::JsonArray servicesInfo;
-
-	for (auto it : m_sessionServiceIdMap) {
-		ot::JsonValue info;
-		info.SetObject();
-
-		info.AddMember(OT_ACTION_PARAM_LSS_URL, ot::JsonString(it.second->url(), reply.GetAllocator()), reply.GetAllocator());
-
-		servicesInfo.PushBack(info, reply.GetAllocator());
+	// Update existing session services
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_SetGlobalLogFlags, doc.GetAllocator());
+	ot::JsonArray flagsArr;
+	ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Flags, flagsArr, doc.GetAllocator());
+	
+	std::string json = doc.toJson();
+	for (const auto& it : m_sessionServiceIdMap) {
+		std::string response;
+		ot::msg::send("", it.second->url(), ot::EXECUTE, json, response);
 	}
 
-	reply.AddMember(OT_ACTION_PARAM_LSS, servicesInfo, reply.GetAllocator());
-
-	return reply.toJson();
+	return OT_ACTION_RETURN_VALUE_OK;
 }
-
 
 // ###################################################################################################
 
