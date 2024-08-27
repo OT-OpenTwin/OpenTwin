@@ -11,6 +11,7 @@
 
 // Qt header
 #include <QtCore/qstring.h>
+#include <QtCore/qbytearray.h>
 #include <QtCore/qstringlist.h>
 #include <QtGui/qicon.h>
 #include <QtGui/qmovie.h>
@@ -46,6 +47,9 @@ namespace ot {
 		//! @brief Create and return the movie
 		static QMovie& getMovie(const QString& _subPath);
 
+		//! \brief Create and return the svg data.
+		static QByteArray& getSvgData(const QString& _subPath);
+
 		//! \brief Stores the application icon.
 		static void setApplicationIcon(const QIcon& _icon);
 
@@ -67,9 +71,11 @@ namespace ot {
 		std::map<QString, QIcon*> m_icons;
 		std::map<QString, QPixmap*> m_pixmaps;
 		std::map<QString, QMovie*> m_movies;
+		std::map<QString, QByteArray> m_svgData;
 		QIcon m_emptyIcon;
 		QPixmap m_emptyPixmap;
 		QMovie m_emptyMovie;
+		QByteArray m_emptySvgData;
 		QIcon m_applicationIcon;
 	};
 

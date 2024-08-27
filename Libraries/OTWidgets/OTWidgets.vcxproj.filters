@@ -22,9 +22,6 @@
     <ClCompile Include="src\GraphicsPicker.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\IconManager.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\QtFactory.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
@@ -286,6 +283,18 @@
     <ClCompile Include="src\GraphicsBase.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\ImagePainterManager.cpp">
+      <Filter>src\ImagePainter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IconManager.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SvgImagePainter.cpp">
+      <Filter>src\ImagePainter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PixmapImagePainter.cpp">
+      <Filter>src\ImagePainter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -330,6 +339,12 @@
     <Filter Include="src\Widgets">
       <UniqueIdentifier>{ac4730ce-4c49-4235-b8ad-8a0bf52928e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\ImagePainter">
+      <UniqueIdentifier>{1160bc00-7cd3-4f2c-a27e-7edb5473e2bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ImagePainter">
+      <UniqueIdentifier>{0e9b2589-bc0a-4599-b9fa-8d27745cf007}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTWidgets\QWidgetInterface.h">
@@ -346,9 +361,6 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsItemFactory.h">
       <Filter>include\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\IconManager.h">
-      <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\QtFactory.h">
       <Filter>include\General</Filter>
@@ -521,6 +533,21 @@
     <ClInclude Include="include\OTWidgets\GraphicsBase.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\ImagePainterManager.h">
+      <Filter>include\ImagePainter</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\IconManager.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\ImagePainter.h">
+      <Filter>include\ImagePainter</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PixmapImagePainter.h">
+      <Filter>include\ImagePainter</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\SvgImagePainter.h">
+      <Filter>include\ImagePainter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -564,9 +591,6 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\GraphicsItemPreviewDrag.h">
       <Filter>include\Graphics</Filter>
-    </QtMoc>
-    <QtMoc Include="include\OTWidgets\PlainTextEdit.h">
-      <Filter>include\General</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\GlobalColorStyle.h">
       <Filter>include\General</Filter>
@@ -638,6 +662,9 @@
       <Filter>include\Properties</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\CheckBox.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PlainTextEdit.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>

@@ -68,6 +68,7 @@
     <ClCompile Include="src\GraphicsView.cpp" />
     <ClCompile Include="src\GraphicsViewView.cpp" />
     <ClCompile Include="src\IconManager.cpp" />
+    <ClCompile Include="src\ImagePainterManager.cpp" />
     <ClCompile Include="src\ImagePreview.cpp" />
     <ClCompile Include="src\Label.cpp" />
     <ClCompile Include="src\LineEdit.cpp" />
@@ -86,6 +87,7 @@
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
     <ClCompile Include="src\Painter2DPreview.cpp" />
+    <ClCompile Include="src\PixmapImagePainter.cpp" />
     <ClCompile Include="src\PlainTextEditView.cpp" />
     <ClCompile Include="src\Positioning.cpp" />
     <ClCompile Include="src\QtFactory.cpp" />
@@ -111,6 +113,7 @@
     <ClCompile Include="src\QWidgetInterface.cpp" />
     <ClCompile Include="src\SpinBox.cpp" />
     <ClCompile Include="src\Splitter.cpp" />
+    <ClCompile Include="src\SvgImagePainter.cpp" />
     <ClCompile Include="src\TabWidget.cpp" />
     <ClCompile Include="src\TextEditor.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
@@ -165,7 +168,10 @@
     <QtMoc Include="include\OTWidgets\Painter2DPreview.h" />
     <QtMoc Include="include\OTWidgets\Label.h" />
     <QtMoc Include="include\OTWidgets\ImagePreview.h" />
+    <ClInclude Include="include\OTWidgets\ImagePainter.h" />
+    <ClInclude Include="include\OTWidgets\ImagePainterManager.h" />
     <ClInclude Include="include\OTWidgets\OverlayWidgetBase.h" />
+    <ClInclude Include="include\OTWidgets\PixmapImagePainter.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridView.h" />
@@ -174,6 +180,7 @@
     <ClInclude Include="include\OTWidgets\PropertyInputPainter2D.h" />
     <QtMoc Include="include\OTWidgets\TextEditorSearchPopup.h" />
     <QtMoc Include="include\OTWidgets\Splitter.h" />
+    <ClInclude Include="include\OTWidgets\SvgImagePainter.h" />
     <ClInclude Include="include\OTWidgets\TextEditorView.h" />
     <ClInclude Include="include\OTWidgets\TreeWidgetItem.h" />
     <ClInclude Include="include\OTWidgets\TreeWidgetItemInfo.h" />
@@ -320,20 +327,20 @@
   </ImportGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;widgets;svg</QtModules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;widgets;svg</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;widgets;svg</QtModules>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
     <QtInstall>$(QTDIR)</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;widgets;svg</QtModules>
   </PropertyGroup>
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
     <Import Project="$(QtMsBuild)\qt.props" />

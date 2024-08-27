@@ -38,8 +38,5 @@ namespace ot {
 
 		// Setter / Getter
 	private:
-		QPixmap m_pixmap;
-		bool m_maintainAspectRatio;
-		ot::Color m_colorMask;
 	};
 }

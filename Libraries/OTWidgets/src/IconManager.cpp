@@ -65,6 +65,38 @@ QMovie& ot::IconManager::getMovie(const QString& _subPath) {
 	return manager.getOrCreate<QMovie>(_subPath, manager.m_movies, manager.m_emptyMovie);
 }
 
+QByteArray& ot::IconManager::getSvgData(const QString& _subPath) {
+	IconManager& manager = IconManager::instance();
+	manager.m_mutex.lock();
+
+	// Find existing
+	const auto& it = manager.m_svgData.find(_subPath);
+	if (it != manager.m_svgData.end()) {
+		manager.m_mutex.unlock();
+		return it->second;
+	}
+
+	// Find new
+	QString path = manager.findFullPath(_subPath);
+	if (path.isEmpty()) {
+		manager.m_mutex.unlock();
+		OT_LOG_EAS("Icon \"" + _subPath.toStdString() + "\" not found");
+		return manager.m_emptySvgData;
+	}
+
+	// Create and store new
+	QFile file(path);
+	if (!file.open(QIODevice::ReadOnly)) {
+		OT_LOG_EAS("Failed to open file for reading: \"" + path.toStdString() + "\"");
+		return manager.m_emptySvgData;
+	}
+	manager.m_svgData.insert_or_assign(_subPath, file.readAll());
+	file.close();
+	manager.m_mutex.unlock();
+
+	return IconManager::getSvgData(_subPath);
+}
+
 void ot::IconManager::setApplicationIcon(const QIcon& _icon) {
 	IconManager::instance().m_applicationIcon = _icon;
 }

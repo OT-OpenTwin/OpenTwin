@@ -6,9 +6,10 @@
 // OpenTwin header
 #include "OTGui/GraphicsImageItemCfg.h"
 #include "OTWidgets/QtFactory.h"
-#include "OTWidgets/IconManager.h"
 #include "OTWidgets/Positioning.h"
+#include "OTWidgets/ImagePainter.h"
 #include "OTWidgets/GraphicsPixmapItem.h"
+#include "OTWidgets/ImagePainterManager.h"
 #include "OTWidgets/GraphicsItemFactory.h"
 
 // Qt header
@@ -17,7 +18,7 @@
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsPixmapItem> pixmItemRegistrar(OT_FactoryKey_GraphicsImageItem);
 
 ot::GraphicsPixmapItem::GraphicsPixmapItem()
-	: ot::CustomGraphicsItem(new GraphicsImageItemCfg), m_maintainAspectRatio(false), m_colorMask(-1.f, -1.f, -1.f, -1.f)
+	: ot::CustomGraphicsItem(new GraphicsImageItemCfg)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
@@ -39,9 +40,7 @@ bool ot::GraphicsPixmapItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	this->prepareGeometryChange();
 
 	try {
-		m_colorMask = cfg->colorMask();
-		m_maintainAspectRatio = cfg->isMaintainAspectRatio();
-		m_pixmap = ot::IconManager::getPixmap(QString::fromStdString(cfg->imagePath()));
+		ImagePainterManager::instance().importFromFile(cfg->imagePath());
 		this->setBlockConfigurationNotifications(false);
 	}
 	catch (const std::exception& _e) {
@@ -58,13 +57,41 @@ bool ot::GraphicsPixmapItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 }
 
 QSizeF ot::GraphicsPixmapItem::getPreferredGraphicsItemSize(void) const {
-	return m_pixmap.size();
+	const GraphicsImageItemCfg* config = dynamic_cast<const GraphicsImageItemCfg*>(this->getConfiguration());
+	if (!config) {
+		OT_LOG_EA("Config not set");
+		return QSizeF();
+	}
+	ImagePainter* painter = ImagePainterManager::instance().getPainter(config->imagePath());
+	if (painter) return painter->getDefaultImageSize();
+	else return QSizeF();
 }
 
 void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
-	if (m_maintainAspectRatio) {
+	const GraphicsImageItemCfg* config = dynamic_cast<const GraphicsImageItemCfg*>(this->getConfiguration());
+	if (!config) {
+		OT_LOG_EA("Config not set");
+		return;
+	}
+	ImagePainter* painter = ImagePainterManager::instance().getPainter(config->imagePath());
+	if (!painter) {
+		return;
+	}
+
+	QSizeF adjustedSize = painter->getDefaultImageSize();
+	if (config->isMaintainAspectRatio()) {
+		adjustedSize.scale(_rect.size(), Qt::KeepAspectRatio);
+	}
+	else {
+		adjustedSize = _rect.size();
+	}
+
+	QRectF adjustedRect = ot::calculateChildRect(_rect, adjustedSize, this->getGraphicsItemAlignment());
+	painter->paintImage(_painter, adjustedRect);
+
+	/*if (m_maintainAspectRatio) {
 		QPixmap scaled = m_pixmap.scaled(_rect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-		QRectF adjustedRect = ot::calculateChildRect(_rect, scaled.size(), this->getGraphicsItemAlignment());
+		
 
 		// Check if a color mask is set
 		if (m_colorMask.isValid()) {
@@ -94,4 +121,5 @@ void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOpt
 			_painter->drawPixmap(_rect.topLeft().x(), _rect.topLeft().y(), _rect.width(), _rect.height(), m_pixmap);
 		}
 	}
+	*/
 }
