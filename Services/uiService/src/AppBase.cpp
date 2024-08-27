@@ -1280,6 +1280,9 @@ void AppBase::createUi(void) {
 			this->connect(m_projectNavigation, &ak::aTreeWidget::itemTextChanged, this, &AppBase::slotTreeItemTextChanged);
 			this->connect(m_projectNavigation, &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
 
+			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusLost, this, &AppBase::slotViewFocusLost);
+			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocused, this, &AppBase::slotViewFocused);
+
 			uiAPI::registerUidNotifier(m_mainWindow, this);
 						
 			uiAPI::registerAllMessagesNotifier(m_debugNotifier);
@@ -1621,6 +1624,12 @@ bool AppBase::checkForContinue(
 	return true;
 }
 
+void AppBase::fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo) {
+	m_graphicsPicker->clear();
+	m_graphicsPicker->add(m_graphicsPickerManager.getCollections(_serviceInfo));
+	m_graphicsPickerManager.setCurrentOwner(_serviceInfo);
+}
+
 void AppBase::setProgressBarVisibility(const char *progressMessage, bool progressBaseVisible, bool continuous)
 {
 	uiAPI::window::setStatusLabelText(m_mainWindow, progressMessage);
@@ -1908,6 +1917,14 @@ void AppBase::lockPropertyGrid(bool flag)
 	m_propertyGrid->getTreeWidget()->setEnabled(!flag);
 }
 
+void AppBase::addGraphicsPickerPackage(const ot::GraphicsPickerCollectionPackage& _pckg, const ot::BasicServiceInformation& _serviceInfo) {
+	m_graphicsPickerManager.addCollections(_pckg.collections(), _serviceInfo);
+	if (_serviceInfo == m_graphicsPickerManager.getCurrentOwner()) {
+		// Update picker since its active
+		this->fillGraphicsPicker(_serviceInfo);
+	}
+}
+
 ot::PropertyGridItem* AppBase::findProperty(const std::string& _groupName, const std::string& _itemName) {
 	return m_propertyGrid->findItem(_groupName, _itemName);
 }
@@ -1942,9 +1959,10 @@ void AppBase::clearPropertyGrid(void) {
 	m_propertyGrid->clear();
 }
 
-ot::GraphicsPicker* AppBase::globalGraphicsPicker(void) {
-	OTAssertNullptr(m_graphicsPicker);
-	return m_graphicsPicker;
+void AppBase::clearGraphicsPickerData(void) {
+	m_graphicsPicker->clear();
+	m_graphicsPickerManager.clear();
+	m_graphicsPickerManager.setCurrentOwner(ot::BasicServiceInformation());
 }
 
 ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo) {
@@ -1967,9 +1985,9 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name,
 	newOutline.setStyle(ot::DotLine);
 	newEditor->getGraphicsScene()->setGridLineStyle(newOutline);
 
+	m_graphicsViews.store(_serviceInfo, newEditor);
 	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
 
-	m_graphicsViews.store(_serviceInfo, newEditor);
 	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
 	connect(newEditor, &ot::GraphicsView::connectionToConnectionRequested, this, &AppBase::slotGraphicsConnectionToConnectionRequested);
@@ -2438,6 +2456,14 @@ void AppBase::slotViewFocused(ot::WidgetView* _view) {
 	if (!_view) return;
 	if (_view->viewData().flags() & ot::WidgetViewBase::ViewIsCentral) {
 		m_viewerComponent->viewerTabChanged(_view->viewData().name());
+	}
+
+	ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_view);
+	if (graphicsView) {
+		ot::BasicServiceInformation owner = m_graphicsViews.findOwner(graphicsView).getId();
+		if (owner != m_graphicsPickerManager.getCurrentOwner()) {
+			this->fillGraphicsPicker(owner);
+		}
 	}
 }
 

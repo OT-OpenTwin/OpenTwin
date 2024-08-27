@@ -11,6 +11,8 @@
 // std header
 #include <string>
 
+#pragma warning(disable:4251)
+
 namespace ot {
 
 	//! \class BasicServiceInformation

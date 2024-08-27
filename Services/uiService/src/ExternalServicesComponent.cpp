@@ -1451,7 +1451,7 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		app->clearNavigationTree();
 		app->clearPropertyGrid();
 		app->contextMenuManager()->serviceDisconnected(nullptr);
-		app->globalGraphicsPicker()->clear();
+		app->clearGraphicsPickerData();
 
 		// Clear all maps
 		m_serviceToUidMap.clear();
@@ -3831,7 +3831,7 @@ std::string ExternalServicesComponent::handleFillGraphicsPicker(ot::JsonDocument
 	ot::GraphicsPickerCollectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	AppBase::instance()->globalGraphicsPicker()->add(pckg);
+	AppBase::instance()->addGraphicsPickerPackage(pckg, info);
 
 	return "";
 }
@@ -3843,9 +3843,9 @@ std::string ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocume
 	ot::GraphicsNewEditorPackage pckg("", "");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info);
+	AppBase::instance()->addGraphicsPickerPackage(pckg, info);
 
-	AppBase::instance()->globalGraphicsPicker()->add(pckg);
+	AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info);
 
 	return "";
 }

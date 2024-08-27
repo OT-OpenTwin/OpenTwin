@@ -29,6 +29,7 @@
     <ClInclude Include="include\OTGui\GraphicsItemCfgFactory.h" />
     <ClInclude Include="include\OTGui\GraphicsItemFileCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsLineItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsPickerCollectionManager.h" />
     <ClInclude Include="include\OTGui\GraphicsPickerItemInformation.h" />
     <ClInclude Include="include\OTGui\GraphicsPolygonItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsShapeItemCfg.h" />
@@ -107,6 +108,7 @@
     <ClCompile Include="src\GraphicsItemCfgFactory.cpp" />
     <ClCompile Include="src\GraphicsItemFileCfg.cpp" />
     <ClCompile Include="src\GraphicsLineItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsPickerCollectionManager.cpp" />
     <ClCompile Include="src\GraphicsPickerItemInformation.cpp" />
     <ClCompile Include="src\GraphicsPolygonItemCfg.cpp" />
     <ClCompile Include="src\GraphicsShapeItemCfg.cpp" />

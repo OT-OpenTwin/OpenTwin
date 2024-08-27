@@ -24,7 +24,9 @@
 #include "OTCore/OwnerService.h"
 #include "OTCore/OwnerManagerTemplate.h"
 #include "OTGui/Property.h"
+#include "OTGui/GraphicsPackage.h"
 #include "OTGui/PropertyGridCfg.h"
+#include "OTGui/GraphicsPickerCollectionManager.h"
 #include "OTWidgets/ColorStyle.h"
 #include "OTServiceFoundation/UserCredentials.h"
 
@@ -406,7 +408,10 @@ public:
 
 	void lockPropertyGrid(bool flag);
 
-	ot::GraphicsPicker* globalGraphicsPicker(void);
+	void addGraphicsPickerPackage(const ot::GraphicsPickerCollectionPackage& _pckg, const ot::BasicServiceInformation& _serviceInfo);
+
+	//! \brief Clears the graphics picker and stored service picker data.
+	void clearGraphicsPickerData(void);
 
 	ot::GraphicsViewView* createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo);
 
@@ -486,7 +491,6 @@ private Q_SLOTS:
 	void slotTreeItemFocused(QTreeWidgetItem* _item);
 
 private:
-
 	enum AppStateFlag {
 		NoState                = 0x00,
 		RestoringSettingsState = 0x01,
@@ -506,9 +510,9 @@ private:
 
 	void sessionRefreshTimer(const std::string _sessionUserName, const std::string _authorizationUrl);
 
-	bool checkForContinue(
-		QString									_title
-	);
+	bool checkForContinue(QString _title);
+
+	void fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo);
 
 	AppStateFlags               m_state;
 
@@ -559,6 +563,7 @@ private:
 	ot::PlainTextEditView* m_output;
 	ot::PlainTextEditView* m_debug;
 	ot::GraphicsPickerView* m_graphicsPicker;
+	ot::GraphicsPickerCollectionManager m_graphicsPickerManager;
 	contextMenus				m_contextMenus;
 	ak::UID						m_uid;							//! The UID of the wrapper
 	ak::UID						m_mainWindow;
