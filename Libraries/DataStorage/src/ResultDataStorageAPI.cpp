@@ -1,11 +1,14 @@
 #include "stdafx.h"
 #include "../include/ResultDataStorageAPI.h"
+#include "Connection/ConnectionAPI.h"
 
 namespace DataStorageAPI
 {
-	ResultDataStorageAPI::ResultDataStorageAPI(const std::string& dataBaseURL, const std::string& collectionName)
-		:documentAccess(dataBaseURL, collectionName + ".results"), docBase(dataBaseURL, collectionName + ".results")
-	{	}
+	ResultDataStorageAPI::ResultDataStorageAPI(const std::string& collectionName)
+		:documentAccess("Projects", collectionName + ".results"), docBase("Projects", collectionName + ".results")
+	{	
+
+	}
 
 	DataStorageResponse ResultDataStorageAPI::InsertDocumentToResultStorage(Document& jsonData, bool checkForExistence, bool allowQueueing)
 	{

@@ -25,6 +25,7 @@ private:
 	};
 	
 	DataStorageAPI::ResultDataStorageAPI* m_resultCollectionAccess = nullptr;
+	ResultCollectionMetadataAccess* m_resultCollectionMetadataAccess = nullptr;
 	std::list< BsonViewOrValue> _comparisons;
 	
 	std::list< QueryDescription> m_queryDescriptions;

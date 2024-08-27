@@ -26,13 +26,12 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 {
 	//First get handler of the selected project result data.
 	std::string collectionName;
-	std::unique_ptr<ResultCollectionMetadataAccess> resultCollectionMetadataAccess(PropertyHandlerDatabaseAccessBlock::getResultCollectionMetadataAccess(blockEntity,collectionName));
-	const MetadataCampaign* campaign = &resultCollectionMetadataAccess->getMetadataCampaign();
+	m_resultCollectionMetadataAccess = (PropertyHandlerDatabaseAccessBlock::getResultCollectionMetadataAccess(blockEntity,collectionName));
+	const MetadataCampaign* campaign = &m_resultCollectionMetadataAccess->getMetadataCampaign();
 	
-	const std::string dataBaseURL = Application::instance()->dataBaseURL();
-	m_resultCollectionAccess = new DataStorageAPI::ResultDataStorageAPI(dataBaseURL,collectionName);
+	m_resultCollectionAccess = new DataStorageAPI::ResultDataStorageAPI(collectionName);
 	
-	if (!resultCollectionMetadataAccess->collectionHasMetadata())
+	if (!m_resultCollectionMetadataAccess->collectionHasMetadata())
 	{
 		const std::string errorMessage = "Database Access not possible. The selected collection has no meta data.";
 		throw std::exception(errorMessage.c_str());
@@ -45,7 +44,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	const std::string seriesLabel =	blockEntity->getSeriesSelection()->getValue();
 	if (seriesLabel != "")
 	{
-		series = resultCollectionMetadataAccess->findMetadataSeries(seriesLabel);
+		series = m_resultCollectionMetadataAccess->findMetadataSeries(seriesLabel);
 		assert(series != nullptr);
 		ot::UID valueUID = series->getSeriesIndex();
 		ValueComparisionDefinition seriesComparision(MetadataSeries::getFieldName(), "=", std::to_string(valueUID), ot::TypeNames::getInt64TypeName(), "");
@@ -56,7 +55,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	ValueComparisionDefinition quantityDef = blockEntity->getSelectedQuantityDefinition();
 	const std::string& valueDescriptionLabel = blockEntity->getQuantityValueDescriptionSelection()->getValue();
 	//The entity selection contains the names of the quantity/parameter. In the mongodb documents only the abbreviations are used.
-	const auto selectedQuantity = resultCollectionMetadataAccess->findMetadataQuantity(quantityDef.getName());
+	const auto selectedQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(quantityDef.getName());
 	if (selectedQuantity == nullptr) 
 	{
 		throw std::exception("DatabaseAccessBlock has no quantity set.");
@@ -84,16 +83,16 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	quantityQueryDescr.m_outputData.m_quantity = selectedQuantity;
 	quantityQueryDescr.m_outputData.m_series = series;
 	quantityQueryDescr.m_outputData.m_campaign = campaign;
-	m_queryDescriptions.push_back(quantityQueryDescr);
 	const std::string quantityConnectorName = blockEntity->getConnectorQuantity().getConnectorName();
 	quantityQueryDescr.m_connectorName = quantityConnectorName;
+	m_queryDescriptions.push_back(quantityQueryDescr);
 
 	AddComparision(quantityDef);
 
 	//Next are the parameter. A 2D plot requires two variables, thus at least one parameter has to be defined.
 	const std::string parameterConnectorName = blockEntity->getConnectorParameter1().getConnectorName();
 	ValueComparisionDefinition param1Def = blockEntity->getSelectedParameter1Definition();
-	const auto parameter1 = resultCollectionMetadataAccess->findMetadataParameter(param1Def.getName());
+	const auto parameter1 = m_resultCollectionMetadataAccess->findMetadataParameter(param1Def.getName());
 	if (parameter1 == nullptr)
 	{
 		throw std::exception("DatabaseAccessBlock has the parameter 1 not set.");
@@ -112,7 +111,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	{
 		auto param2Def = blockEntity->getSelectedParameter2Definition();
 		const std::string param2ConnectorName =	blockEntity->getConnectorParameter2().getConnectorName();
-		const auto parameter = resultCollectionMetadataAccess->findMetadataParameter(param2Def.getName());
+		const auto parameter = m_resultCollectionMetadataAccess->findMetadataParameter(param2Def.getName());
 		if (parameter == nullptr)
 		{
 			throw std::exception("DatabaseAccessBlock has the parameter 2 not set.");
@@ -126,7 +125,7 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 	{	
 		auto param3Def = blockEntity->getSelectedParameter3Definition();
 		const std::string param3ConnectorName = blockEntity->getConnectorParameter3().getConnectorName();
-		const auto parameter = resultCollectionMetadataAccess->findMetadataParameter(param3Def.getName());
+		const auto parameter = m_resultCollectionMetadataAccess->findMetadataParameter(param3Def.getName());
 		if (parameter == nullptr)
 		{
 			throw std::exception("DatabaseAccessBlock has the parameter 3 not set.");
@@ -156,6 +155,11 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 		delete m_resultCollectionAccess;
 		m_resultCollectionAccess = nullptr;
 	}
+	if (m_resultCollectionMetadataAccess != nullptr)
+	{
+		delete m_resultCollectionMetadataAccess;
+		m_resultCollectionMetadataAccess = nullptr;
+	}
 }
 
 bool BlockHandlerDatabaseAccess::executeSpecialized()
@@ -177,7 +181,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		for (uint32_t i = 0; i < numberOfDocuments; i++)
 		{
 			auto projectedValues = ot::json::getObject(allEntries, i);
-			
+
 			//Now we extract each of the projected value
 			for (QueryDescription& queryDescription : m_queryDescriptions)
 			{
@@ -281,7 +285,19 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 				}
 			}
 		}
-	}
+	
+		//Now we set the meta data pointer of the port pipeline data
+		for (QueryDescription& queryDescription : m_queryDescriptions)
+		{
+			auto dataPortData =	_dataPerPort.find(queryDescription.m_connectorName);
+			assert(dataPortData != _dataPerPort.end());
+			dataPortData->second.m_campaign = queryDescription.m_outputData.m_campaign;
+			dataPortData->second.m_series = queryDescription.m_outputData.m_series;
+			dataPortData->second.m_parameter = queryDescription.m_outputData.m_parameter;
+			dataPortData->second.m_quantity = queryDescription.m_outputData.m_quantity;
+			dataPortData->second.m_quantityDescription = queryDescription.m_outputData.m_quantityDescription;
+		}
+}
 	else
 	{
 		const std::string message = "Data base query with this response: " + dbResponse.getMessage();

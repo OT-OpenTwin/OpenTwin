@@ -2,7 +2,7 @@
 
 
 QuantityContainerSerialiser::QuantityContainerSerialiser(const std::string& _collectionName)
-	:m_dataStorageAccess("Projects", _collectionName)
+	:m_dataStorageAccess(_collectionName)
 {
 	m_quantityContainer.reserve(m_bufferSize);
 }

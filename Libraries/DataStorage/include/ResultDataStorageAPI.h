@@ -27,7 +27,7 @@ namespace DataStorageAPI
 	class __declspec(dllexport)  ResultDataStorageAPI
 	{
 	public:
-		ResultDataStorageAPI(const std::string& dataBaseURL, const std::string& collectionName);
+		ResultDataStorageAPI(const std::string& collectionName);
 		ResultDataStorageAPI(const ResultDataStorageAPI& other) = default;
 		ResultDataStorageAPI(ResultDataStorageAPI&& other) = default;
 		ResultDataStorageAPI& operator=(const ResultDataStorageAPI& other) = default;
