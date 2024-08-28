@@ -18,8 +18,8 @@ ot::OverlayWidgetBase::OverlayWidgetBase(QWidget* _parent, Alignment _overlayAli
     OTAssertNullptr(m_parent);
 
     //this->setAttribute(Qt::WA_NoSystemBackground, true);
-    this->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-
+    //this->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    
     QObject* obj = m_parent;
     while (obj) {
         obj->installEventFilter(this);
@@ -43,12 +43,12 @@ bool ot::OverlayWidgetBase::eventFilter(QObject* _watched, QEvent* _event) {
         this->hide();
         break;
     case QEvent::WindowActivate:
-        this->setWindowFlag(Qt::WindowStaysOnTopHint, true);
-        this->updateOverlayGeometry();
+        //this->setWindowFlag(Qt::WindowStaysOnTopHint, true);
+        //this->updateOverlayGeometry();
         break;
     case QEvent::WindowDeactivate:
-        this->setWindowFlag(Qt::WindowStaysOnTopHint, false);
-        this->updateOverlayGeometry();
+        //this->setWindowFlag(Qt::WindowStaysOnTopHint, false);
+        //this->updateOverlayGeometry();
         break;
     case QEvent::Resize:
     case QEvent::Move:
@@ -70,14 +70,11 @@ void ot::OverlayWidgetBase::updateOverlayGeometry(void) {
     else if (!this->isVisible() && m_parent->isVisible() && !m_hidden) {
         this->show();
     }
+    rec.moveTo(m_parent->mapToGlobal(m_parent->pos()));
 
-    QSize siz = rec.size();
-    rec.setTopLeft(m_parent->mapToGlobal(rec.topLeft()));
-    rec.setSize(siz);
+    QSize newSize = this->minimumSize().expandedTo(rec.size()).boundedTo(this->maximumSize());
 
-    siz = this->minimumSize().expandedTo(rec.size()).boundedTo(this->maximumSize());
+    rec = ot::calculateChildRect(rec, newSize, m_alignment);
 
-    rec = ot::calculateChildRect(rec, siz, m_alignment);
-    
     this->setGeometry(rec);
 }

@@ -325,6 +325,7 @@ void ot::TextEditor::slotFindRequested(void) {
 	}
 	
 	m_searchPopup->setIndex(this->textCursor().position());
+	this->clearFocus();
 	m_searchPopup->focusInput();
 }
 

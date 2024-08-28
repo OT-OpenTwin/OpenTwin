@@ -24,7 +24,6 @@ ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
 	 
 	this->setObjectName("OT_TextEditSearchPopup");
 	this->setWindowFlag(Qt::FramelessWindowHint);
-	this->setWindowFlag(Qt::WindowStaysOnTopHint);
 	this->setWindowFlag(Qt::Tool);
 	this->setFrameShape(QFrame::StyledPanel);
 	this->setAttribute(Qt::WA_DeleteOnClose);
@@ -35,7 +34,7 @@ ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
 	centralLayout->setContentsMargins(1, 1, 1, 1);
 
 	m_search = new ot::LineEdit(this);
-	m_search->setFocusPolicy(Qt::ClickFocus);
+	m_search->setFocusPolicy(Qt::StrongFocus);
 	m_search->setObjectName("OT_TextEditSearchPopupSearchInput");
 	PushButton* btnFind = new PushButton("Find", this);
 	btnFind->setObjectName("OT_TextEditSearchPopupFindButton");
@@ -54,6 +53,7 @@ ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
 	// Setup view
 	this->setMinimumSize(200, 30);
 	this->setMaximumSize(350, 30);
+	this->setFocusProxy(m_search);
 
 	// Connect signals
 	this->connect(m_search, &LineEdit::textChanged, this, &TextEditorSearchPopup::slotTextChanged);
@@ -63,8 +63,8 @@ ot::TextEditorSearchPopup::TextEditorSearchPopup(ot::TextEditor* _editor)
 }
 
 void ot::TextEditorSearchPopup::focusInput(void) {
+	m_search->setFocus();
 	m_search->activateWindow();
-	m_search->setFocus(Qt::OtherFocusReason);
 }
 
 bool ot::TextEditorSearchPopup::eventFilter(QObject* _watched, QEvent* _event) {

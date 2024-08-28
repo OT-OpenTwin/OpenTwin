@@ -11,6 +11,7 @@
 #include "OTGui/PropertyStringList.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTWidgets/Splitter.h"
+#include "OTWidgets/TextEditor.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/PropertyDialog.h"
@@ -68,10 +69,8 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		tree->getTreeWidget()->addItem(TreeWidgetItemInfo(itm2));
 	}
 
-	QTableWidget* table = new QTableWidget(3, 2);
-	table->setVerticalHeaderLabels({"R1", "R2", "R3"});
-	table->setHorizontalHeaderLabels({"A", "B"});
-	root->addWidget(table);
+	ot::TextEditor* text = new ot::TextEditor;
+	root->addWidget(text);
 
 	TestToolBar* test = new TestToolBar(this);
 	QAction* testAction = test->addAction("Test");
