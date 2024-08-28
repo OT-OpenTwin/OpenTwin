@@ -13,11 +13,14 @@
 #include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qlineedit.h>
+#include <QtWidgets/qcombobox.h>
 #include <QtWidgets/qcheckbox.h>
 #include <QtWidgets/qgroupbox.h>
 #include <QtWidgets/qlistwidget.h>
 #include <QtWidgets/qpushbutton.h>
 #include <QtWidgets/qscrollarea.h>
+
+#define LFV_Filter_AllNames "< All >"
 
 LoggingFilterView::LoggingFilterView() 
 	: m_filterTimer(nullptr), m_filterLock(true)
@@ -37,6 +40,12 @@ LoggingFilterView::LoggingFilterView()
 	QGroupBox* filterByMessageTypeBox = new QGroupBox("Message Type");
 	QVBoxLayout* filterByMessageTypeLayout = new QVBoxLayout(filterByMessageTypeBox);
 
+	QGroupBox* filterByUserBox = new QGroupBox("User");
+	QVBoxLayout* filterByUserLayout = new QVBoxLayout(filterByUserBox);
+
+	QGroupBox* filterByProjectBox = new QGroupBox("Project");
+	QVBoxLayout* filterByProjectLayout = new QVBoxLayout(filterByProjectBox);
+
 	QGroupBox* filterByServiceBox = new QGroupBox("Service Type");
 	QVBoxLayout* filterByServiceLayout = new QVBoxLayout(filterByServiceBox);
 
@@ -45,6 +54,14 @@ LoggingFilterView::LoggingFilterView()
 	m_messageFilter = new QLineEdit;
 	m_messageFilter->setPlaceholderText("<Confirm by pressing return>");
 	m_messageFilter->setMinimumWidth(250);
+
+	m_userFilter = new QComboBox;
+	m_userFilter->addItem(LFV_Filter_AllNames);
+	filterByUserLayout->addWidget(m_userFilter);
+
+	m_sessionFilter = new QComboBox;
+	m_sessionFilter->addItem(LFV_Filter_AllNames);
+	filterByProjectLayout->addWidget(m_sessionFilter);
 
 	m_msgTypeFilterDetailed = new QCheckBox("Detailed");
 	m_msgTypeFilterInfo = new QCheckBox("Info");
@@ -67,6 +84,8 @@ LoggingFilterView::LoggingFilterView()
 	// Setup layouts
 	centralLayout->addLayout(messageContainsLayout);
 	centralLayout->addWidget(filterByMessageTypeBox, 0);
+	centralLayout->addWidget(filterByUserBox, 0);
+	centralLayout->addWidget(filterByProjectBox, 0);
 	centralLayout->addWidget(filterByServiceBox, 1);
 
 	messageContainsLayout->addWidget(messageFilterL);
@@ -91,16 +110,19 @@ LoggingFilterView::LoggingFilterView()
 	this->connect(m_msgTypeFilterMsgIn, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
 	this->connect(m_msgTypeFilterMsgOut, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
 
-	connect(m_messageFilter, &QLineEdit::returnPressed, this, &LoggingFilterView::slotFilterChanged);
+	this->connect(m_messageFilter, &QLineEdit::returnPressed, this, &LoggingFilterView::slotFilterChanged);
 
-	connect(m_msgTypeFilterDetailed, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	connect(m_msgTypeFilterInfo, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	connect(m_msgTypeFilterWarning, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	connect(m_msgTypeFilterError, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	connect(m_msgTypeFilterMsgIn, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
-	connect(m_msgTypeFilterMsgOut, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+	this->connect(m_msgTypeFilterDetailed, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+	this->connect(m_msgTypeFilterInfo, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+	this->connect(m_msgTypeFilterWarning, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+	this->connect(m_msgTypeFilterError, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+	this->connect(m_msgTypeFilterMsgIn, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+	this->connect(m_msgTypeFilterMsgOut, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
 
-	connect(m_serviceFilter, &QListWidget::itemChanged, this, &LoggingFilterView::slotFilterChanged);
+	this->connect(m_userFilter, &QComboBox::currentTextChanged, this, &LoggingFilterView::slotFilterChanged);
+	this->connect(m_sessionFilter, &QComboBox::currentTextChanged, this, &LoggingFilterView::slotFilterChanged);
+
+	this->connect(m_serviceFilter, &QListWidget::itemChanged, this, &LoggingFilterView::slotFilterChanged);
 
 	this->connect(btnSelectAllServices, &QPushButton::clicked, this, &LoggingFilterView::slotSelectAllServices);
 	this->connect(btnDeselectAllServices, &QPushButton::clicked, this, &LoggingFilterView::slotDeselectAllServices);
@@ -118,6 +140,7 @@ bool LoggingFilterView::filterMessage(const ot::LogMessage& _msg) {
 	bool found = false;
 	QString serviceName = QString::fromStdString(_msg.getServiceName());
 
+	// Check Service Name exists
 	for (int i = 0; i < m_serviceFilter->count(); i++) {
 		if (m_serviceFilter->item(i)->text() == serviceName) {
 			found = true;
@@ -136,6 +159,42 @@ bool LoggingFilterView::filterMessage(const ot::LogMessage& _msg) {
 		m_filterLock = tmp;
 	}
 
+	// Check User Name exists
+	QString userName = QString::fromStdString(_msg.getUserName());
+	if (!userName.isEmpty()) {
+		found = false;
+		for (int i = 0; i < m_userFilter->count(); i++) {
+			if (m_userFilter->itemText(i) == userName) {
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			m_filterLock = true;
+			m_userFilter->addItem(userName);
+			m_filterLock = false;
+		}
+	}
+
+	// Check Project Name exists
+	QString projectName = QString::fromStdString(_msg.getProjectName());
+	if (!projectName.isEmpty()) {
+		found = false;
+		for (int i = 0; i < m_sessionFilter->count(); i++) {
+			if (m_sessionFilter->itemText(i) == projectName) {
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			m_filterLock = true;
+			m_sessionFilter->addItem(projectName);
+			m_filterLock = false;
+		}
+	}
+
 	// Type
 
 	bool typePass = false;
@@ -145,7 +204,21 @@ bool LoggingFilterView::filterMessage(const ot::LogMessage& _msg) {
 	else if (m_msgTypeFilterError->isChecked() && (_msg.getFlags() & ot::ERROR_LOG)) typePass = true;
 	else if (m_msgTypeFilterMsgIn->isChecked() && (_msg.getFlags() & ot::ALL_INCOMING_MESSAGE_LOG_FLAGS)) typePass = true;
 	else if (m_msgTypeFilterMsgOut->isChecked() && (_msg.getFlags() & ot::ALL_OUTGOING_MESSAGE_LOG_FLAGS)) typePass = true;
-	
+
+	// User
+
+	bool userPass = true;
+	if (m_userFilter->currentText() != LFV_Filter_AllNames) {
+		userPass = m_userFilter->currentText() == userName;
+	}
+
+	// Project
+
+	bool projectPass = true;
+	if (m_sessionFilter->currentText() != LFV_Filter_AllNames) {
+		projectPass = m_sessionFilter->currentText() == projectName;
+	}
+
 	// Service
 
 	bool servicePass = false;
@@ -157,13 +230,14 @@ bool LoggingFilterView::filterMessage(const ot::LogMessage& _msg) {
 	}
 
 	// Message
+
 	bool messagePass = true;
 	QString txt = QString::fromStdString(_msg.getText());
 	if (!m_messageFilter->text().isEmpty()) {
 		messagePass = txt.contains(m_messageFilter->text(), Qt::CaseInsensitive);
 	}
 
-	return typePass && servicePass && messagePass;
+	return typePass && userPass && projectPass && servicePass && messagePass;
 }
 
 void LoggingFilterView::restoreSettings(QSettings& _settings) {

@@ -15,6 +15,7 @@
 class QTimer;
 class QWidget;
 class QCheckBox;
+class QComboBox;
 class QLineEdit;
 class QListWidget;
 
@@ -60,6 +61,9 @@ private:
 	QCheckBox* m_msgTypeFilterError;
 	QCheckBox* m_msgTypeFilterMsgIn;
 	QCheckBox* m_msgTypeFilterMsgOut;
+
+	QComboBox* m_userFilter;
+	QComboBox* m_sessionFilter;
 
 	QListWidget* m_serviceFilter;
 
