@@ -6,6 +6,7 @@
 // OToolkit header
 #include "AppBase.h"
 #include "Logging.h"
+#include "LogModeSetter.h"
 #include "LoggingFilterView.h"
 #include "ConnectToLoggerDialog.h"
 #include "LogVisualizationItemViewDialog.h"
@@ -117,6 +118,9 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	m_root = this->createCentralWidgetView(splitter, "Log Visualization");
 	_content.addView(m_root);
 
+	m_logModeSetter = new LogModeSetter;
+	_content.addView(this->createSideWidgetView(m_logModeSetter->getRootWidget(), "Log Switch"));
+
 	m_filterView = new LoggingFilterView;
 	_content.addView(this->createSideWidgetView(m_filterView->getRootWidget(), "Log Filter"));
 
@@ -217,6 +221,7 @@ void Logging::restoreToolSettings(QSettings& _settings) {
 		}
 	}
 
+	m_logModeSetter->restoreSettings(_settings);
 	m_filterView->restoreSettings(_settings);
 
 	bool needAutoConnect = _settings.value("Logging.AutoConnect", false).toBool();
@@ -247,6 +252,7 @@ bool Logging::prepareToolShutdown(QSettings& _settings) {
 	}
 	_settings.setValue("Logging.Table.ColumnWidth", tableColumnWidths);
 
+	m_logModeSetter->saveSettings(_settings);
 	m_filterView->saveSettings(_settings);
 
 	if (this->disconnectFromLogger()) {

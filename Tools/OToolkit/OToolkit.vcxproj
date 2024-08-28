@@ -44,6 +44,7 @@
     <ClCompile Include="src\JSONEditor.cpp" />
     <ClCompile Include="src\Logging.cpp" />
     <ClCompile Include="src\LoggingFilterView.cpp" />
+    <ClCompile Include="src\LogModeSetter.cpp" />
     <ClCompile Include="src\LogVisualizationItemViewDialog.cpp" />
     <ClCompile Include="src\MenuManager.cpp" />
     <ClCompile Include="src\NetworkTools.cpp" />
@@ -86,6 +87,7 @@
     <QtMoc Include="include\Logging.h" />
     <QtMoc Include="include\LogVisualizationItemViewDialog.h" />
     <QtMoc Include="include\LoggingFilterView.h" />
+    <QtMoc Include="include\LogModeSetter.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />

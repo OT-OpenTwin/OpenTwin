@@ -16,6 +16,7 @@
 #include <QtCore/qlist.h>
 #include <QtWidgets/qdialog.h>
 
+class LogModeSetter;
 class LoggingFilterView;
 
 class QWidget;
@@ -90,6 +91,7 @@ private:
 
 	// Data
 
+	LogModeSetter* m_logModeSetter;
 	LoggingFilterView* m_filterView;
 
 	std::list<ot::LogMessage>	m_messages;
