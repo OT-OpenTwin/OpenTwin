@@ -101,8 +101,8 @@ m_timerShowMainWindow(nullptr)
 	m_statusLabel->setMaximumWidth(250);
 	m_statusLabel->setText(QString());
 
-	m_window->statusBar()->addPermanentWidget(m_progressBar, 180);
-	m_window->statusBar()->addPermanentWidget(m_statusLabel, 250);
+	m_window->statusBar()->addPermanentWidget(m_progressBar);
+	m_window->statusBar()->addPermanentWidget(m_statusLabel);
 	m_window->statusBar()->setVisible(true);
 
 	// Setup timer

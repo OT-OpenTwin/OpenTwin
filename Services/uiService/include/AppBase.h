@@ -61,19 +61,21 @@ class UiPluginManager;
 class ToolBar;
 namespace ak { class aNotifier; class aWindow; }
 namespace ak { class aTreeWidget; }
-namespace ot { class WidgetView; }
-namespace ot { class AbstractSettingsItem; }
-namespace ot { class GraphicsPicker; }
-namespace ot { class GraphicsViewView; }
-namespace ot { class GraphicsItem; }
-namespace ot { class TextEditorView; }
+namespace ot { class Label; }
 namespace ot { class Property; }
+namespace ot { class WidgetView; }
+namespace ot { class GraphicsItem; }
+namespace ot { class GraphicsPicker; }
+namespace ot { class TextEditorView; }
+namespace ot { class GraphicsItemCfg; }
+namespace ot { class GraphicsViewView; }
 namespace ot { class PropertyGridView; }
 namespace ot { class PropertyGridItem; }
-namespace ot { class NavigationTreeView; }
 namespace ot { class PlainTextEditView; }
 namespace ot { class GraphicsPickerView; }
-namespace ot { class GraphicsItemCfg; }
+namespace ot { class NavigationTreeView; }
+namespace ot { class AbstractSettingsItem; }
+
 struct structModelViewInfo
 {
 	ViewerUIDtype	view;
@@ -308,6 +310,8 @@ public:
 	bool storeSettingToDataBase(const ot::PropertyGridCfg& _config, const std::string& _subKey);
 
 	ot::PropertyGridCfg getSettingsFromDataBase(const std::string& _subKey);
+
+	void updateLogIntensityInfo(void);
 
 public Q_SLOTS:
 
@@ -570,6 +574,8 @@ private:
 	ak::UID						m_viewerUid;					//! The UID of the viewer
 	ak::UID						m_modelUid;					//! The UID of the model
 	
+	ot::Label* m_logIntensity;
+
 	struct StateInformation {
 		bool viewShown;
 		std::string window;

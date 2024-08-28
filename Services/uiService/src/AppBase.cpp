@@ -33,16 +33,6 @@
 #include <akWidgets/aTextEditWidget.h>
 #include <akWidgets/aTreeWidget.h>
 
-// ADS header
-#include <ads/DockManager.h>
-
-// Qt header
-#include <QtCore/qfile.h>
-#include <QtGui/qscreen.h>
-#include <QtWidgets/qfiledialog.h>
-#include <QtWidgets/qmessagebox.h>
-#include <QtWidgets/qapplication.h>
-
 // OpenTwin header
 #include "DataBase.h"
 
@@ -60,6 +50,7 @@
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/PropertyStringList.h"
 
+#include "OTWidgets/Label.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/IconManager.h"
@@ -83,6 +74,17 @@
 #include "OTWidgets/PropertyInputStringList.h"
 
 #include "OTCommunication/ActionTypes.h"
+
+// ADS header
+#include <ads/DockManager.h>
+
+// Qt header
+#include <QtCore/qfile.h>
+#include <QtGui/qscreen.h>
+#include <QtWidgets/qstatusbar.h>
+#include <QtWidgets/qfiledialog.h>
+#include <QtWidgets/qmessagebox.h>
+#include <QtWidgets/qapplication.h>
 
 // C++ header
 #include <thread>
@@ -1156,6 +1158,15 @@ void AppBase::createUi(void) {
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Setup tab toolbar");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 5);
 
+			ot::Label* logIntensityL = new ot::Label("Log Intensity:");
+			m_logIntensity = new ot::Label;
+			this->updateLogIntensityInfo();
+
+			ak::aWindowManager* windowManager = uiAPI::object::get<ak::aWindowManager>(m_mainWindow);
+			OTAssertNullptr(windowManager);
+			windowManager->window()->statusBar()->addPermanentWidget(logIntensityL);
+			windowManager->window()->statusBar()->addPermanentWidget(m_logIntensity);
+
 			// #######################################################################
 
 			// Setup tab toolbar
@@ -1602,6 +1613,35 @@ ot::PropertyGridCfg AppBase::getSettingsFromDataBase(const std::string& _subKey)
 
 	return config;
 	
+}
+
+void AppBase::updateLogIntensityInfo(void) {
+	ot::LogFlags flags = ot::LogDispatcher::instance().logFlags();
+
+	std::string info = "Currently enabled log flags:\n";
+
+	if (flags & ot::INFORMATION_LOG) info.append(" - Info\n");
+	if (flags & ot::DETAILED_LOG) info.append(" - Detailed Info\n");
+	if (flags & ot::WARNING_LOG) info.append(" - Warning\n");
+	if (flags & ot::ERROR_LOG) info.append(" - Error\n");
+	if (flags & ot::ALL_INCOMING_MESSAGE_LOG_FLAGS) info.append(" - Inbound Messages\n");
+	if (flags & ot::ALL_OUTGOING_MESSAGE_LOG_FLAGS) info.append(" - Outbound Messages\n");
+
+	if (flags == ot::NO_LOG) {
+		// NONE
+		m_logIntensity->setPixmap(ot::IconManager::getPixmap("Status/NoLogging.png"));
+		m_logIntensity->setToolTip("Logging is disabled.");
+	}
+	else if (flags & (~(ot::WARNING_LOG | ot::ERROR_LOG))) {
+		// FULL
+		m_logIntensity->setPixmap(ot::IconManager::getPixmap("Status/FullLogging.png"));
+		m_logIntensity->setToolTip(QString::fromStdString(info));
+	}
+	else {
+		// DEFAULT
+		m_logIntensity->setPixmap(ot::IconManager::getPixmap("Status/BasicLogging.png"));
+		m_logIntensity->setToolTip(QString::fromStdString(info));
+	}
 }
 
 // #################################################################################################################

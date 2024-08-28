@@ -672,6 +672,12 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 		responseDoc.AddMember(OT_ACTION_PARAM_UI_ToolBarTabOrder, ot::JsonArray(theSession->toolBarTabOrder(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	}
 
+	if (m_logModeManager.getGlobalLogFlagsSet()) {
+		ot::JsonArray logData;
+		ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), logData, responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_PARAM_LogFlags, logData, responseDoc.GetAllocator());
+	}
+
 	return responseDoc.toJson();
 }
 

@@ -1204,6 +1204,13 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		// ##################################################################
 
+		if (responseDoc.HasMember(OT_ACTION_PARAM_LogFlags)) {
+			ot::ConstJsonArray logData = ot::json::getArray(responseDoc, OT_ACTION_PARAM_LogFlags);
+			ot::LogFlags logFlags = ot::logFlagsFromJsonArray(logData);
+			ot::LogDispatcher::instance().setLogFlags(logFlags);
+			AppBase::instance()->updateLogIntensityInfo();
+		}
+
 		app->setServiceID(ot::json::getUInt(responseDoc, OT_ACTION_PARAM_SERVICE_ID));
 
 		// Ensure to update the window title containing the project name
@@ -2002,7 +2009,7 @@ ServiceDataUi* ExternalServicesComponent::getServiceFromNameType(const std::stri
 std::string ExternalServicesComponent::handleSetLogFlags(ot::JsonDocument& _document) {
 	ot::ConstJsonArray flags = ot::json::getArray(_document, OT_ACTION_PARAM_Flags);
 	ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(flags));
-
+	AppBase::instance()->updateLogIntensityInfo();
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
