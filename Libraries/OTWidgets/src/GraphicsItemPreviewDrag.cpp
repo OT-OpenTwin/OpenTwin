@@ -5,6 +5,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/JSON.h"
 #include "OTWidgets/GraphicsItemPreviewDrag.h"
 
 // Qt header
@@ -14,7 +15,9 @@
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qstyleoption.h>
 
-ot::GraphicsItemPreviewDrag::GraphicsItemPreviewDrag(const std::string& _itemName) : m_widget(nullptr), m_itemName(_itemName), m_queueCount(0) {}
+ot::GraphicsItemPreviewDrag::GraphicsItemPreviewDrag(const std::string& _itemName, const BasicServiceInformation& _owner)
+	: m_widget(nullptr), m_itemName(_itemName), m_queueCount(0), m_owner(_owner)
+{}
 
 ot::GraphicsItemPreviewDrag::~GraphicsItemPreviewDrag() {}
 
@@ -32,6 +35,10 @@ void ot::GraphicsItemPreviewDrag::slotQueue(void) {
 		mimeData->setText("OT_BLOCK");
 		mimeData->setData(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName, QByteArray::fromStdString(m_itemName));
 		
+		JsonDocument ownerDoc;
+		m_owner.addToJsonObject(ownerDoc, ownerDoc.GetAllocator());
+		mimeData->setData(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner, QByteArray::fromStdString(ownerDoc.toJson()));
+
 		// Create drag
 		drag.setMimeData(mimeData);
 

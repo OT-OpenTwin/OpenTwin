@@ -7,12 +7,14 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
+#include "OTCore/BasicServiceInformation.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtCore/qobject.h>
 
 #define OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName "GraphicsItem.Name"
+#define OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner "GraphicsItem.Owner"
 
 class QWidget;
 
@@ -20,9 +22,10 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsItemPreviewDrag : public QObject {
 		Q_OBJECT
+		OT_DECL_NODEFAULT(GraphicsItemPreviewDrag)
 		OT_DECL_NOCOPY(GraphicsItemPreviewDrag)
 	public:
-		GraphicsItemPreviewDrag(const std::string& _itemName);
+		GraphicsItemPreviewDrag(const std::string& _itemName, const BasicServiceInformation& _owner);
 		virtual ~GraphicsItemPreviewDrag();
 
 		void queue(QWidget* _widget);
@@ -34,6 +37,7 @@ namespace ot {
 		QWidget* m_widget;
 		int m_queueCount;
 		std::string m_itemName;
+		BasicServiceInformation m_owner;
 	};
 
 }

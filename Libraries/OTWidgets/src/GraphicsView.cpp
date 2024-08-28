@@ -499,22 +499,84 @@ void ot::GraphicsView::resizeEvent(QResizeEvent* _event)
 }
 
 void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
-	// Check if the events mime data contains the configuration
-	if (!_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName).isEmpty() && m_dropEnabled) {
-		_event->acceptProposedAction();
+	if (!m_dropEnabled) {
+		_event->ignore();
+		//QGraphicsView::dragEnterEvent(_event);
+		return;
 	}
-	else {
-		QGraphicsView::dragEnterEvent(_event);
+
+	// Check item name provided
+	if (_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName).isEmpty()) {
+		_event->ignore();
+		return;
 	}
+
+	// Check owner provided
+	if (_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner).isEmpty()) {
+		_event->ignore();
+		return;
+	}
+
+	std::string ownerData = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner).toStdString();
+	if (ownerData.empty()) {
+		_event->ignore();
+		return;
+	}
+
+	JsonDocument doc;
+	if (!doc.fromJson(ownerData)) {
+		OT_LOG_E("Failed to parse owner document");
+		_event->ignore();
+		return;
+	}
+	BasicServiceInformation ownerInfo;
+	ownerInfo.setFromJsonObject(doc.GetConstObject());
+
+	// Check owner equals
+	if (ownerInfo != m_owner) {
+		_event->ignore();
+		return;
+	}
+
+	_event->acceptProposedAction();
 }
 
 void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 	if (!m_dropEnabled) {
+		_event->ignore();
 		return;
 	}
 	QString itemName = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName);
 	if (itemName.isEmpty()) {
 		OT_LOG_W("Drop event reqected: MimeData not matching");
+		_event->ignore();
+		return;
+	}
+
+	// Check owner provided
+	if (_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner).isEmpty()) {
+		_event->ignore();
+		return;
+	}
+
+	std::string ownerData = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner).toStdString();
+	if (ownerData.empty()) {
+		_event->ignore();
+		return;
+	}
+
+	JsonDocument doc;
+	if (!doc.fromJson(ownerData)) {
+		OT_LOG_E("Failed to parse owner document");
+		_event->ignore();
+		return;
+	}
+	BasicServiceInformation ownerInfo;
+	ownerInfo.setFromJsonObject(doc.GetConstObject());
+
+	// Check owner equals
+	if (ownerInfo != m_owner) {
+		_event->ignore();
 		return;
 	}
 
@@ -523,13 +585,46 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 }
 
 void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
-	// Check if the events mime data contains the configuration
-	if (!_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName).isEmpty() && m_dropEnabled) {
-		_event->acceptProposedAction();
+	if (!m_dropEnabled) {
+		_event->ignore();
+		//QGraphicsView::dragEnterEvent(_event);
+		return;
 	}
-	else {
-		QGraphicsView::dragMoveEvent(_event);
+
+	// Check item name provided
+	if (_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName).isEmpty()) {
+		_event->ignore();
+		return;
 	}
+
+	// Check owner provided
+	if (_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner).isEmpty()) {
+		_event->ignore();
+		return;
+	}
+
+	std::string ownerData = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_Owner).toStdString();
+	if (ownerData.empty()) {
+		_event->ignore();
+		return;
+	}
+
+	JsonDocument doc;
+	if (!doc.fromJson(ownerData)) {
+		OT_LOG_E("Failed to parse owner document");
+		_event->ignore();
+		return;
+	}
+	BasicServiceInformation ownerInfo;
+	ownerInfo.setFromJsonObject(doc.GetConstObject());
+
+	// Check owner equals
+	if (ownerInfo != m_owner) {
+		_event->ignore();
+		return;
+	}
+
+	_event->acceptProposedAction();
 }
 
 void ot::GraphicsView::beginItemMove(void) {

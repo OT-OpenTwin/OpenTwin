@@ -1629,6 +1629,7 @@ bool AppBase::checkForContinue(
 
 void AppBase::fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo) {
 	m_graphicsPicker->clear();
+	m_graphicsPicker->setOwner(_serviceInfo);
 	m_graphicsPicker->add(m_graphicsPickerManager.getCollections(_serviceInfo));
 	m_graphicsPickerManager.setCurrentOwner(_serviceInfo);
 }
@@ -1977,6 +1978,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name,
 
 	newEditor = new ot::GraphicsViewView;
 	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewIsCentral));
+	newEditor->setOwner(_serviceInfo);
 	newEditor->setGraphicsViewName(_name);
 	newEditor->setGraphicsViewFlag(ot::GraphicsView::ViewManagesSceneRect);
 	newEditor->setDropsEnabled(true);

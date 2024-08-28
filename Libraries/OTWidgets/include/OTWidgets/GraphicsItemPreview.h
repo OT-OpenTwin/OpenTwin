@@ -7,6 +7,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/BasicServiceInformation.h"
 #include "OTWidgets/GraphicsItem.h"
 
 // Qt header
@@ -28,8 +29,13 @@ namespace ot {
 		void setItemName(const std::string& _itemName) { m_itemName = _itemName; };
 		const std::string itemName(void) const { return m_itemName; };
 
+		void setOwner(const BasicServiceInformation& _owner) { m_owner = _owner; };
+		const BasicServiceInformation& getOwner(void) const { return m_owner; };
+
 	private:
 		std::string m_itemName;
+		BasicServiceInformation m_owner;
+
 		GraphicsItemPreviewDrag* m_drag;
 	};
 

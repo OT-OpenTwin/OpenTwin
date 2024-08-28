@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/BasicServiceInformation.h"
 #include "OTGui/GraphicsPickerCollectionCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -51,6 +52,12 @@ namespace ot {
 		void setPreviewBoxSize(const QSize& _size) { m_previewSize = _size; };
 		const QSize& previewBoxSize(void) const { return m_previewSize; };
 
+		void setOwner(const BasicServiceInformation& _owner) { m_owner = _owner; };
+
+		//! \brief Returns the current owner of the graphics picker.
+		//! The owner information will be added to the mime data when dragging an item.
+		const BasicServiceInformation& getOwner(void) const { return m_owner; };
+
 	private Q_SLOTS:
 		void slotSelectionChanged(void);
 
@@ -71,6 +78,8 @@ namespace ot {
 		};
 
 		bool                  m_repaintPreviewRequired;
+
+		BasicServiceInformation m_owner;
 
 		QSize                 m_previewSize;
 		Splitter* m_splitter;

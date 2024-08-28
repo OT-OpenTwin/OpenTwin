@@ -24,7 +24,7 @@ ot::GraphicsItemPreview::~GraphicsItemPreview() {
 void ot::GraphicsItemPreview::mousePressEvent(QMouseEvent* _event) {
 	if (_event->button() == Qt::LeftButton) {
 		if (m_drag == nullptr) {
-			m_drag = new GraphicsItemPreviewDrag(m_itemName);
+			m_drag = new GraphicsItemPreviewDrag(m_itemName, m_owner);
 		}
 		m_drag->queue(this);
 	}

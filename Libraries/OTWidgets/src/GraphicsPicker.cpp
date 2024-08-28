@@ -127,6 +127,7 @@ void ot::GraphicsPicker::slotSelectionChanged(void) {
 				box.view->setPixmap(IconManager::getIcon(QString::fromStdString(info.getPreviewIcon())).pixmap(m_previewSize));
 				box.view->setItemName(info.getName());
 				box.view->setAlignment(Qt::AlignCenter);
+				box.view->setOwner(m_owner);
 
 				box.label = new QLabel(QString::fromStdString(info.getTitle()));
 				box.label->setAlignment(Qt::AlignCenter);

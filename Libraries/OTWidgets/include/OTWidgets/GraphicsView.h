@@ -9,6 +9,7 @@
 #include "OTCore/Flags.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/CoreTypes.h"
+#include "OTCore/BasicServiceInformation.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -60,6 +61,9 @@ namespace ot {
 
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };
 		bool getMouseWheelEnabled(void) const { return m_wheelEnabled; };
+
+		void setOwner(const BasicServiceInformation& _owner) { m_owner = _owner; };
+		const BasicServiceInformation& getOwner(void) const { return m_owner; };
 
 		void setGraphicsViewFlag(GraphicsViewFlag _flag, bool _active = true) { m_viewFlags.setFlag(_flag, _active); };
 		void setGraphicsViewFlags(const GraphicsViewFlags& _flags) { m_viewFlags = _flags; };
@@ -142,6 +146,8 @@ namespace ot {
 		//! If the ot::GraphicsView::ViewStateFlag::ItemMoveInProgress is not set the function instantly returns.
 		//! All currently selected items will notify a move change and configuration change if their position has changed.
 		void endItemMove(void);
+
+		BasicServiceInformation m_owner;
 
 		GraphicsViewFlags m_viewFlags;
 		ViewStateFlags m_viewStateFlags;
