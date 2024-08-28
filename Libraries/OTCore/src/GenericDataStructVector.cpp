@@ -20,20 +20,6 @@ ot::GenericDataStructVector::GenericDataStructVector(uint32_t _numberOfEntries)
 	allocateValueMemory();
 }
 
-ot::GenericDataStructVector& ot::GenericDataStructVector::operator=(const GenericDataStructVector& _other)
-{
-	m_values = _other.m_values;
-	m_numberOfEntries = _other.m_numberOfEntries;
-	return *this;
-}
-
-ot::GenericDataStructVector& ot::GenericDataStructVector::operator=(GenericDataStructVector&& _other) noexcept
-{
-	m_values = std::move(_other.m_values);
-	m_numberOfEntries = _other.m_numberOfEntries;
-	_other.m_numberOfEntries = 0;
-	return *this;
-}
 
 ot::GenericDataStructVector::GenericDataStructVector()
 	:GenericDataStruct(getClassName())

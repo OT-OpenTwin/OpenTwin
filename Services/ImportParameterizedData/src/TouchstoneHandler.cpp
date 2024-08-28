@@ -20,29 +20,6 @@ TouchstoneHandler::TouchstoneHandler(const std::string& _fileName)
 	const std::string extension = _fileName.substr(posOfFileExtension, _fileName.size());
 }
 
-//TouchstoneHandler::TouchstoneHandler(TouchstoneHandler&& _other) noexcept
-//	:m_comments(std::move(_other.m_comments)), m_optionSettings(std::move(_other.m_optionSettings))/*, m_quantityDescription(std::move(_other.m_quantityDescription))*/, m_touchstoneVersion(std::move(_other.m_touchstoneVersion)), m_portNumber(std::move(_other.m_portNumber))
-//{
-//}
-
-//TouchstoneHandler& TouchstoneHandler::operator=(TouchstoneHandler&& _other) noexcept
-//{
-//	m_comments = (std::move(_other.m_comments));
-//	m_optionSettings = (std::move(_other.m_optionSettings));
-//	m_quantityDescription = (std::move(_other.m_quantityDescription));
-//	m_frequencyParameter = std::move(_other.m_frequencyParameter);
-//	m_touchstoneVersion = (std::move(_other.m_touchstoneVersion));
-//	m_portNumber = (std::move(_other.m_portNumber));
-//
-//	m_touchstoneVersion = std::move(_other.m_touchstoneVersion);
-//	m_columnIndex = std::move(_other.m_columnIndex);
-//	m_rowIndex = std::move(_other.m_rowIndex);
-//	m_firstValueOfTuple = std::move(_other.m_firstValueOfTuple);
-//	m_firstValues = std::move(_other.m_firstValues);
-//	m_secondValues = std::move(_other.m_secondValues);
-//	return *this;
-//}
-
 int32_t TouchstoneHandler::deriveNumberOfPorts(const std::string& _fileName)
 {
 	auto posOfFileExtension = _fileName.find_last_of(".") + 1;
@@ -144,8 +121,8 @@ void TouchstoneHandler::analyseDataLine(std::string& content)
 			{
 				if (m_firstValues == nullptr)
 				{
-					m_firstValues = new SParameterMatrixHelper(m_portNumber);
-					m_secondValues = new SParameterMatrixHelper(m_portNumber);
+					m_firstValues = new ot::GenericDataStructMatrix(m_portNumber, m_portNumber);
+					m_secondValues = new ot::GenericDataStructMatrix(m_portNumber, m_portNumber);
 					m_frequencyParameter.values.push_back(turnLineSegmentToVariable(segment));
 				}
 				else

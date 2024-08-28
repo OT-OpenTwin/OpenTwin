@@ -18,21 +18,6 @@ ot::GenericDataStructSingle::GenericDataStructSingle(GenericDataStructSingle&& _
 	_other.m_numberOfEntries = 0;
 }
 
-ot::GenericDataStructSingle& ot::GenericDataStructSingle::operator=(const GenericDataStructSingle& _other)
-{
-	m_value = _other.m_value;
-	m_numberOfEntries = _other.m_numberOfEntries;
-	return *this;
-}
-
-ot::GenericDataStructSingle& ot::GenericDataStructSingle::operator=(GenericDataStructSingle&& _other) noexcept
-{
-	m_value = std::move(_other.m_value);
-	m_numberOfEntries = _other.m_numberOfEntries;
-	_other.m_numberOfEntries = 0;
-	return *this;
-}
-
 ot::GenericDataStructSingle::~GenericDataStructSingle()
 {
 }

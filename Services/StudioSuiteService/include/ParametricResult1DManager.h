@@ -38,8 +38,6 @@ private:
 	std::list<DatasetDescription> extractDataDescriptionCurve(const std::string& _category, RunIDContainer* _runIDContainer, int _runID);
 	DatasetDescription extractDataDescriptionSParameter(const std::string& _category, RunIDContainer* _runIDContainer, int _runID);
 	std::list<std::shared_ptr<ParameterDescription>> extractParameterDescription(const std::string& _category, RunIDContainer* _runIDContainer, int _runID);
-	//void extractMetadataFromDescriptions(std::map<std::string, MetadataQuantity>& _quantitiesByName, std::map<std::string, MetadataParameter>& _parametersByName, std::list<DatasetDescription1D>& _allDataDescriptions);
-	//void addParameterMetadata(std::map<std::string, MetadataParameter>& _parametersByName, std::shared_ptr<MetadataParameter> _parameter);
 
 	int determineNumberOfPorts(const std::string& category, std::map<std::string, Result1DData*>& categoryResults, std::vector<Result1DData*>& sources);
 

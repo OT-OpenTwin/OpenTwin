@@ -80,9 +80,6 @@
     <ClInclude Include="include\ProjectToCollectionConverter.h">
       <Filter>include\CollectionAccess</Filter>
     </ClInclude>
-    <ClInclude Include="include\SParameterMatrixHelper.h">
-      <Filter>include\Creation Helper</Filter>
-    </ClInclude>
     <ClInclude Include="include\ParameterDescription.h">
       <Filter>include\Creation Helper</Filter>
     </ClInclude>
@@ -148,9 +145,6 @@
     <ClCompile Include="src\ProjectToCollectionConverter.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\SParameterMatrixHelper.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\DatasetDescription.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -161,6 +155,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\DatasetOverviewVisualiser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QuantityDescriptionSParameter.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

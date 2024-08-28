@@ -60,6 +60,7 @@ bool ResultCollectionExtender::campaignMetadataWithSameValueExists(std::shared_p
 
 void ResultCollectionExtender::processDataPoints(DatasetDescription* _dataDescription, uint64_t _seriesMetadataIndex)
 {
+	//First we create ways of accessing the parameters
 	std::list<ot::Variable> sharedParameterValues;
 	std::list<ot::UID> parameterIndicesConstant, parameterIndicesNonConstant;
 	std::list<std::list<ot::Variable>::const_iterator> allParameterValueIt;
@@ -76,6 +77,7 @@ void ResultCollectionExtender::processDataPoints(DatasetDescription* _dataDescri
 		bool parameterIsConstantForDataset = parameterDescription->getParameterConstantForDataset();
 		if (parameterIsConstantForDataset)
 		{
+			//For parameter that are constant through the entire data set, we simply take the single value they have and add it to every quantity container later on.
 			parameterIndicesConstant.push_back(parameterID);
 			auto parameterValues = parameterDescription->getMetadataParameter().values;
 			assert(parameterValues.size() == 1);
@@ -83,6 +85,7 @@ void ResultCollectionExtender::processDataPoints(DatasetDescription* _dataDescri
 		}
 		else
 		{
+			//For parameter that need to be iterated together with the quantities, we create here a list of iterators, each pointing at one parameter
 			parameterIndicesNonConstant.push_back(parameterID);
 			auto parameterValueIt = parameterMetadata.values.begin();
 			parameterNamesByNumberOfParameterValues[parameterMetadata.values.size()].push_back(parameterMetadata.parameterName);

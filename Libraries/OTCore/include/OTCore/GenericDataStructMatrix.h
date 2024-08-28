@@ -12,12 +12,13 @@ namespace ot
 	class __declspec(dllexport) GenericDataStructMatrix : public GenericDataStruct
 	{
 	public:
+		//! @brief Only for deserialisation. Generally use the constructor with explicit topology data.
 		GenericDataStructMatrix();
 		~GenericDataStructMatrix();
 		GenericDataStructMatrix(const GenericDataStructMatrix& _other);
 		GenericDataStructMatrix(GenericDataStructMatrix&& _other)noexcept;
-		GenericDataStructMatrix& operator=(const GenericDataStructMatrix& _other);
-		GenericDataStructMatrix& operator=(GenericDataStructMatrix&& _other) noexcept;
+		GenericDataStructMatrix& operator=(const GenericDataStructMatrix& _other) = default;
+		GenericDataStructMatrix& operator=(GenericDataStructMatrix&& _other) noexcept = default;
 
 
 		GenericDataStructMatrix(uint32_t _numberofColumns, uint32_t _numberofRows);
@@ -26,6 +27,9 @@ namespace ot
 		void setValue(uint32_t _columnIndex, uint32_t _rowIndex, ot::Variable&& _value);
 		void setValue(uint32_t _columnIndex, uint32_t _rowIndex, const ot::Variable& _value);
 		void setValues(const ot::Variable* _values, uint32_t _size);
+		
+		//! @brief Assumes the list to be a linearised matrix of the topology this class was initialised with.
+		void setValues(std::list<ot::Variable> _values);
 		/// <summary>
 		/// column-major access
 		/// </summary>

@@ -42,7 +42,6 @@
     <ClInclude Include="include\MetadataSeries.h" />
     <ClInclude Include="include\ResultCollectionMetadataAccess.h" />
     <ClInclude Include="include\DatasetDescription.h" />
-    <ClInclude Include="include\SParameterMatrixHelper.h" />
     <ClInclude Include="include\ValueFormatSetter.h" />
     <ClInclude Include="include\DatasetOverviewVisualiser.h" />
   </ItemGroup>
@@ -54,6 +53,7 @@
     <ClCompile Include="src\ProjectToCollectionConverter.cpp" />
     <ClCompile Include="src\QuantityContainerSerialiser.cpp" />
     <ClCompile Include="src\QuantityDescription.cpp" />
+    <ClCompile Include="src\QuantityDescriptionSParameter.cpp" />
     <ClCompile Include="src\ResultCollectionExtender.cpp" />
     <ClCompile Include="src\MetadataCampaign.cpp" />
     <ClCompile Include="src\MetadataEntityInterface.cpp" />
@@ -63,7 +63,6 @@
     <ClCompile Include="src\MetadataEntrySingle.cpp" />
     <ClCompile Include="src\QuantityContainer.cpp" />
     <ClCompile Include="src\ResultCollectionMetadataAccess.cpp" />
-    <ClCompile Include="src\SParameterMatrixHelper.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

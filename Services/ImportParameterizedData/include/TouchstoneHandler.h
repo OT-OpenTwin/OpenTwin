@@ -5,6 +5,7 @@
 #include "QuantityDescriptionSParameter.h"
 #include "DatasetDescription.h"
 #include "MetadataParameter.h"
+#include "OTCore/GenericDataStructMatrix.h"
 
 class TouchstoneHandler
 {
@@ -43,8 +44,8 @@ private:
 	uint32_t m_columnIndex = 0;
 	uint32_t m_rowIndex = 0;
 
-	SParameterMatrixHelper* m_firstValues = nullptr;
-	SParameterMatrixHelper* m_secondValues = nullptr;
+	ot::GenericDataStructMatrix* m_firstValues = nullptr;
+	ot::GenericDataStructMatrix* m_secondValues = nullptr;
 
 	bool m_firstValueOfTuple = true;
 

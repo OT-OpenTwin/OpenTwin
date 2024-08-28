@@ -6,7 +6,6 @@
 #include "OTCore/Variable.h"
 #include "OTCore/CoreTypes.h"
 
-#include "SParameterMatrixHelper.h"
 #include "MetadataQuantity.h"
 #include "OTCore/DefensiveProgramming.h"
 

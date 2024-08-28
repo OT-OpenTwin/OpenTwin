@@ -11,8 +11,8 @@ namespace ot
 		GenericDataStructSingle();
 		GenericDataStructSingle(const GenericDataStructSingle& _other);
 		GenericDataStructSingle(GenericDataStructSingle&& _other) noexcept;
-		GenericDataStructSingle& operator=(const GenericDataStructSingle& _other);
-		GenericDataStructSingle& operator=(GenericDataStructSingle&& _other) noexcept;
+		GenericDataStructSingle& operator=(const GenericDataStructSingle& _other) = default;
+		GenericDataStructSingle& operator=(GenericDataStructSingle&& _other) noexcept = default;
 		~GenericDataStructSingle();
 
 		void setValue(const ot::Variable& _value);

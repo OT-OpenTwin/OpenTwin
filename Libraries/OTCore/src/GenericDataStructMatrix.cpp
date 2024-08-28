@@ -24,34 +24,18 @@ GenericDataStructMatrix::~GenericDataStructMatrix()
 {}
 
 ot::GenericDataStructMatrix::GenericDataStructMatrix(const GenericDataStructMatrix& _other)
-	:GenericDataStruct(getClassName(),_other.m_numberOfEntries),m_values(_other.m_values)
+	:GenericDataStruct(getClassName(),_other.m_numberOfEntries),m_values(_other.m_values), m_numberOfColumns(_other.m_numberOfColumns), m_numberOfRows(_other.m_numberOfRows)
 {
 }
 
 ot::GenericDataStructMatrix::GenericDataStructMatrix(GenericDataStructMatrix&& _other)noexcept
-	:GenericDataStruct(getClassName(), _other.m_numberOfEntries), m_values(std::move(_other.m_values))
+	:GenericDataStruct(getClassName(), _other.m_numberOfEntries), m_values(std::move(_other.m_values)), m_numberOfColumns(std::move(_other.m_numberOfColumns)), m_numberOfRows(std::move(_other.m_numberOfRows))
 {
 	_other.m_numberOfEntries = 0;
-}
-
-GenericDataStructMatrix& ot::GenericDataStructMatrix::operator=(const GenericDataStructMatrix& _other)
-{
-	m_values = _other.m_values;
-	m_numberOfEntries = _other.m_numberOfEntries;
-	return *this;
-}
-
-GenericDataStructMatrix& ot::GenericDataStructMatrix::operator=(GenericDataStructMatrix&& _other)noexcept
-{
-	m_values = std::move(_other.m_values);
-	m_numberOfEntries = _other.m_numberOfEntries;
-	_other.m_numberOfEntries = 0;
-	return *this;
 }
 
 void GenericDataStructMatrix::setValue(uint32_t _columnIndex, uint32_t _rowIndex, ot::Variable&& _value)
 {
-
 	const uint32_t index = getIndex(_columnIndex, _rowIndex);
 	m_values[index] = std::move(_value);
 }
@@ -64,9 +48,16 @@ void GenericDataStructMatrix::setValue(uint32_t _columnIndex, uint32_t _rowIndex
 
 void ot::GenericDataStructMatrix::setValues(const ot::Variable* _values, uint32_t _size)
 {
+	assert(_size == getNumberOfEntries());
 	m_values.clear();
 	m_values.reserve(_size);
 	m_values.insert(m_values.begin(), &_values[0], &_values[_size]);
+}
+
+void ot::GenericDataStructMatrix::setValues(std::list<ot::Variable> _values)
+{
+	assert(_values.size() == getNumberOfEntries());
+	m_values = { _values.begin(), _values.end() };
 }
 
 const ot::Variable& GenericDataStructMatrix::getValue(uint32_t _columnIndex, uint32_t _rowIndex) const

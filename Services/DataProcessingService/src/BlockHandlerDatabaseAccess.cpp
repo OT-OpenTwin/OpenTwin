@@ -229,30 +229,15 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 							throw std::exception(errorMessage.c_str());
 						}
 
-						uint32_t rowCounter(0), columnCounter(0);
 						uint32_t rows(dimensions[0]), columns(dimensions[0]);
 						//Could be that the value array is smaller then the data array because of the query.
 						auto jsValues = ot::json::getArray(projectedValues, projectionName.c_str());
 						std::list<ot::Variable> values = converter(jsValues);
-						auto currentValue = values.begin();
-						const uint32_t numberOfEntries = rows * columns;
+						
 						ot::GenericDataStructMatrix* dataBlock(new ot::GenericDataStructMatrix(columns, rows));
-						for (uint32_t j = 0; j < numberOfEntries; j++)
-						{
-							dataBlock->setValue(columnCounter, rowCounter, *currentValue);
-							currentValue++;
-							if (columnCounter < columns - 1)
-							{
-								columnCounter++;
-							}
-							else
-							{
-								columnCounter = 0;
-								rowCounter++;
-							}
-						}
-
-						_dataPerPort[queryDescription.m_connectorName].m_data.push_back(std::shared_ptr<ot::GenericDataStruct>(dataBlock));
+						dataBlock->setValues(values);
+						std::shared_ptr<ot::GenericDataStruct> dataBlockBase(dataBlock);
+						_dataPerPort[queryDescription.m_connectorName].m_data.push_back(dataBlockBase);
 					}
 					else
 					{
@@ -264,7 +249,8 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 							ot::Variable value = converter(projectedValues[projectionName.c_str()]);
 							ot::GenericDataStructSingle* dataBlock(new ot::GenericDataStructSingle());
 							dataBlock->setValue(value);
-							_dataPerPort[queryDescription.m_connectorName].m_data.push_back(std::shared_ptr<ot::GenericDataStruct>(dataBlock));
+							std::shared_ptr<ot::GenericDataStruct>datablockBase(dataBlock);
+							_dataPerPort[queryDescription.m_connectorName].m_data.push_back(datablockBase);
 						}
 						else
 						{
@@ -281,7 +267,8 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 					ot::Variable value = converter(projectedValues[projectionName.c_str()]);
 					ot::GenericDataStructSingle* dataBlock(new ot::GenericDataStructSingle());
 					dataBlock->setValue(value);
-					_dataPerPort[queryDescription.m_connectorName].m_data.push_back(std::shared_ptr<ot::GenericDataStruct>(dataBlock));
+					std::shared_ptr<ot::GenericDataStruct>datablockBase(dataBlock);
+					_dataPerPort[queryDescription.m_connectorName].m_data.push_back(datablockBase);
 				}
 			}
 		}

@@ -58,7 +58,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	for (uint64_t i = 0; i < _numberOfParameterValues; i++)
 	{
 		std::list<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
-		for (auto changingParameterValueIt : _changingParameterValues)
+		for (auto& changingParameterValueIt : _changingParameterValues)
 		{
 			currentParameterValues.push_back(*changingParameterValueIt);
 			if (i != _numberOfParameterValues - 1)
@@ -117,7 +117,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	for (uint64_t i = 0; i < _numberOfParameterValues; i++)
 	{
 		std::list<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
-		for (auto changingParameterValueIt : _changingParameterValues)
+		for (auto& changingParameterValueIt : _changingParameterValues)
 		{
 			currentParameterValues.push_back(*changingParameterValueIt);
 			if (i != _numberOfParameterValues - 1)
@@ -168,7 +168,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	for (size_t i = 0; i < _numberOfParameterValues; i++)
 	{
 		std::list<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
-		for (auto changingParameterValueIt : _changingParameterValues)
+		for (auto& changingParameterValueIt : _changingParameterValues)
 		{
 			currentParameterValues.push_back(*changingParameterValueIt);
 			if (i != _numberOfParameterValues - 1)

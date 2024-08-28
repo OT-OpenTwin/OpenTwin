@@ -18,8 +18,8 @@ namespace ot
 		GenericDataStructVector(std::vector<ot::Variable>&& _values) noexcept;
 		GenericDataStructVector(uint32_t _numberOfEntries);
 
-		GenericDataStructVector& operator=(const GenericDataStructVector& _other);
-		GenericDataStructVector& operator=(GenericDataStructVector&& _other) noexcept;
+		GenericDataStructVector& operator=(const GenericDataStructVector& _other) = default;
+		GenericDataStructVector& operator=(GenericDataStructVector&& _other) noexcept = default;
 
 		ot::Variable getValue(uint32_t _index) { assert(_index < m_numberOfEntries); return m_values[_index]; };
 		const std::vector<ot::Variable>& getValues() const { return m_values; }
