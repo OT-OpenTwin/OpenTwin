@@ -117,6 +117,12 @@ std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& 
 	ot::JsonDocument responseDoc;
 	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, newLds->serviceID(), responseDoc.GetAllocator());
 
+	if (m_logModeManager.getGlobalLogFlagsSet()) {
+		ot::JsonArray flagsArr;
+		ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_PARAM_GlobalLogFlags, flagsArr, responseDoc.GetAllocator());
+	}
+
 	// ##### MUTEX #####
 	m_mutex.unlock();
 
@@ -296,6 +302,29 @@ std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
 	return reply.toJson();
 }
 
+std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
+	ot::ConstJsonArray flags = ot::json::getArray(_doc, OT_ACTION_PARAM_Flags);
+	m_logModeManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(flags));
+
+	ot::LogDispatcher::instance().setLogFlags(m_logModeManager.getGlobalLogFlags());
+
+	// Update existing session services
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_SetGlobalLogFlags, doc.GetAllocator());
+	ot::JsonArray flagsArr;
+	ot::addLogFlagsToJsonArray(m_logModeManager.getGlobalLogFlags(), flagsArr, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Flags, flagsArr, doc.GetAllocator());
+
+	std::string json = doc.toJson();
+	for (LocalDirectoryService* lds : m_localDirectoryServices) {
+		std::string response;
+		if (!ot::msg::send("", lds->serviceURL(), ot::EXECUTE, json, response)) {
+			OT_LOG_EAS("Failed to send message to LSS at \"" + lds->serviceURL() + "\"");
+		}
+	}
+
+	return OT_ACTION_RETURN_VALUE_OK;
+}
 
 bool Application::requestToRunService(const ServiceStartupInformation& _info) {
 	// Lock application mutex and determine lds

@@ -52,6 +52,7 @@ private:
 	std::string handleLogIn(const ot::ConstJsonObject& _actionDocument);
 	std::string handleRegister(const ot::ConstJsonObject& _actionDocument);
 	std::string handleRefreshSession(const ot::ConstJsonObject& _actionDocument);
+	std::string handleSetGlobalLoggingMode(const ot::ConstJsonObject& _actionDocument);
 
 	// authentication needed: user functions
 

@@ -340,6 +340,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_LOGIN) { return handleLogIn(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_REGISTER) { return handleRegister(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_REFRESH_SESSION) { return handleRefreshSession(_actionDocument.GetObject()); }
+	else if (_action == OT_ACTION_CMD_SetGlobalLogFlags) { return handleSetGlobalLoggingMode(_actionDocument.GetObject()); }
 
 	//------------------------------------------------------------------------------------
 
@@ -483,6 +484,12 @@ std::string ServiceBase::handleRefreshSession(const ot::ConstJsonObject& _action
 	std::string session = ot::json::getString(_actionDocument, OT_PARAM_DB_USERNAME);
 
 	return MongoSessionFunctions::refreshSession(session, adminClient);
+}
+
+std::string ServiceBase::handleSetGlobalLoggingMode(const ot::ConstJsonObject& _actionDocument) {
+	ot::ConstJsonArray flags = ot::json::getArray(_actionDocument, OT_ACTION_PARAM_Flags);
+	ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(flags));
+	return OT_ACTION_RETURN_VALUE_OK;
 }
 
 // authentication needed: user functions

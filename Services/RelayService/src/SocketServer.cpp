@@ -112,7 +112,7 @@ QString SocketServer::performAction(const char* json, const char* senderIP)
 		ot::JsonDocument doc;
 		doc.fromJson(json);
 
-		std::string action = ot::json::getString(doc, "action");
+		std::string action = ot::json::getString(doc, OT_ACTION_MEMBER);
 
 		OT_LOG("Received HTTP execute message \"" + action + "\"", ot::INBOUND_MESSAGE_LOG);
 
@@ -130,6 +130,11 @@ QString SocketServer::performAction(const char* json, const char* senderIP)
 			else {
 				return OT_ACTION_RETURN_VALUE_FALSE;
 			}
+		}
+		else if (action == OT_ACTION_CMD_SetGlobalLogFlags) {
+			ot::ConstJsonArray logData = ot::json::getArray(doc, OT_ACTION_PARAM_Flags);
+			ot::LogFlags newGlobalFlags = ot::logFlagsFromJsonArray(logData);
+			ot::LogDispatcher::instance().setLogFlags(newGlobalFlags);
 		}
 
 		OT_LOG_E("Received HTTP execute message (not yet suported by relay service): " + action);

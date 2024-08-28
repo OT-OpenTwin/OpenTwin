@@ -195,6 +195,12 @@ std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
 	return reply.toJson();
 }
 
+std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
+	ot::ConstJsonArray flags = ot::json::getArray(_doc, OT_ACTION_PARAM_Flags);
+	ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(flags));
+	return OT_ACTION_RETURN_VALUE_OK;
+}
+
 void Application::globalDirectoryServiceCrashed(void) {
 
 }

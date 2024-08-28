@@ -46,12 +46,13 @@ private:
 
 	// Private functions
 
-	OT_HANDLER(handleStartNewService, Application, OT_ACTION_CMD_StartNewService, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleStartNewRelayService, Application, OT_ACTION_CMD_StartNewRelayService, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleSessionClosed, Application, OT_ACTION_CMD_ShutdownSessionCompleted, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleServiceClosed, Application, OT_ACTION_CMD_ServiceDisconnected, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleGetDebugInformation, Application, OT_ACTION_CMD_GetDebugInformation, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleGetSystemInformation, Application, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleStartNewService, Application, OT_ACTION_CMD_StartNewService, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleStartNewRelayService, Application, OT_ACTION_CMD_StartNewRelayService, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleSessionClosed, Application, OT_ACTION_CMD_ShutdownSessionCompleted, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleServiceClosed, Application, OT_ACTION_CMD_ServiceDisconnected, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetDebugInformation, Application, OT_ACTION_CMD_GetDebugInformation, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetSystemInformation, Application, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleSetGlobalLogFlags, Application, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
 
 	ServiceManager				m_serviceManager;
 	GlobalDirectoryService		m_globalDirectoryService;

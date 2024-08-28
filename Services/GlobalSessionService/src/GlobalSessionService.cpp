@@ -302,9 +302,20 @@ std::string GlobalSessionService::handleSetGlobalLogFlags(ot::JsonDocument& _doc
 	std::string json = doc.toJson();
 	for (const auto& it : m_sessionServiceIdMap) {
 		std::string response;
-		ot::msg::send("", it.second->url(), ot::EXECUTE, json, response);
+		if (!ot::msg::send("", it.second->url(), ot::EXECUTE, json, response)) {
+			OT_LOG_EAS("Failed to send message to LSS at \"" + it.second->url() + "\"");
+		}
 	}
 
+	std::string tmp;
+	if (!ot::msg::send("", m_globalDirectoryUrl, ot::EXECUTE, json, tmp)) {
+		OT_LOG_EAS("Failed to send message to GDS at \"" + m_globalDirectoryUrl + "\"");
+	}
+
+	if (!ot::msg::send("", m_authorizationUrl, ot::EXECUTE, json, tmp)) {
+		OT_LOG_EAS("Failed to send message to Authorization Service at \"" + m_authorizationUrl + "\"");
+	}
+	
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 

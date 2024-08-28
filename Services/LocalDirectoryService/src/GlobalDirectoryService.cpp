@@ -73,6 +73,11 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 
 	LDS_APP->setServiceID(responseDoc[OT_ACTION_PARAM_SERVICE_ID].GetUint());
 
+	if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLogFlags)) {
+		ot::ConstJsonArray logFlags = ot::json::getArray(responseDoc, OT_ACTION_PARAM_GlobalLogFlags);
+		ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(logFlags));
+	}
+
 	OT_LOG_I("Registration at Global Directory Service successful");
 	m_connectionStatus = Connected;
 	healthCheck();
