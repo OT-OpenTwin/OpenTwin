@@ -42,7 +42,9 @@
     <ClCompile Include="src\GraphicsItemDesignerViewStatusOverlay.cpp" />
     <ClCompile Include="src\ImageEditor.cpp" />
     <ClCompile Include="src\JSONEditor.cpp" />
-    <ClCompile Include="src\LogVisualization.cpp" />
+    <ClCompile Include="src\Logging.cpp" />
+    <ClCompile Include="src\LoggingFilterView.cpp" />
+    <ClCompile Include="src\LogVisualizationItemViewDialog.cpp" />
     <ClCompile Include="src\MenuManager.cpp" />
     <ClCompile Include="src\NetworkTools.cpp" />
     <ClCompile Include="src\PortBlockerServer.cpp" />
@@ -81,6 +83,9 @@
     <ClInclude Include="include\GraphicsItemDesignerPreview.h" />
     <QtMoc Include="include\NetworkTools.h" />
     <QtMoc Include="include\PortBlockerServer.h" />
+    <QtMoc Include="include\Logging.h" />
+    <QtMoc Include="include\LogVisualizationItemViewDialog.h" />
+    <QtMoc Include="include\LoggingFilterView.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />
@@ -119,7 +124,6 @@
     <QtMoc Include="include\ToolManager.h" />
     <QtMoc Include="include\ConnectToLoggerDialog.h" />
     <QtMoc Include="include\Terminal.h" />
-    <QtMoc Include="include\LogVisualization.h" />
     <QtMoc Include="include\StatusManager.h" />
     <QtMoc Include="include\AppBase.h" />
     <ClInclude Include="include\JSONEditor.h" />

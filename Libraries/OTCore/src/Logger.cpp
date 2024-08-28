@@ -66,14 +66,17 @@ ot::LogMessage::LogMessage(const std::string& _serviceName, const std::string& _
 	: m_serviceName(_serviceName), m_functionName(_functionName), m_text(_text), m_flags(_flags)
 {}
 
-ot::LogMessage::LogMessage(const LogMessage& _other) : m_serviceName(_other.m_serviceName), m_functionName(_other.m_functionName), m_text(_other.m_text),
-	m_flags(_other.m_flags), m_localSystemTime(_other.m_localSystemTime), m_globalSystemTime(_other.m_globalSystemTime) {}
+ot::LogMessage::LogMessage(const LogMessage& _other) 
+	: m_serviceName(_other.m_serviceName), m_functionName(_other.m_functionName), m_text(_other.m_text), m_userName(_other.m_userName),
+	m_projectName(_other.m_projectName), m_flags(_other.m_flags), m_localSystemTime(_other.m_localSystemTime), m_globalSystemTime(_other.m_globalSystemTime) {}
 
 ot::LogMessage::~LogMessage() {}
 
 ot::LogMessage& ot::LogMessage::operator = (const LogMessage& _other) {
 	m_serviceName = _other.m_serviceName;
 	m_functionName = _other.m_functionName;
+	m_userName = _other.m_userName;
+	m_projectName = _other.m_projectName;
 	m_text = _other.m_text;
 	m_flags = _other.m_flags;
 	m_localSystemTime = _other.m_localSystemTime;

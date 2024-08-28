@@ -223,6 +223,9 @@ bool AppBase::logIn(void) {
 	OTAssert(loginDia.getLoginData().isValid(), "Invalid login data...");
 
 	m_loginData = loginDia.getLoginData();
+
+	ot::LogDispatcher::instance().setUserName(m_loginData.getUserName());
+
 	this->startSessionRefreshTimer();
 
 	m_state |= LoggedInState;

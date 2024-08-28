@@ -21,7 +21,7 @@
 #include <mutex>
 
 class ToolManager;
-class LogVisualization;
+class Logging;
 class Terminal;
 
 class QTabWidget;
@@ -108,7 +108,7 @@ private:
 
 	ToolManager*			m_toolManager;
 	
-	LogVisualization *		m_logger;
+	Logging*				m_logger;
 	
 	ot::PlainTextEditView*	m_output;
 	QApplication*			m_app;

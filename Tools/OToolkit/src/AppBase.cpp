@@ -6,6 +6,7 @@
 // OToolkit header
 #include "FAR.h"
 #include "AppBase.h"
+#include "Logging.h"
 #include "Terminal.h"
 #include "Randomizer.h"
 #include "ToolManager.h"
@@ -15,7 +16,6 @@
 #include "ToolViewManager.h"
 #include "SettingsManager.h"
 #include "ColorStyleEditor.h"
-#include "LogVisualization.h"
 #include "ToolBarManager.h"
 #include "WidgetTest.h"
 #include "GraphicsItemDesigner.h"
@@ -383,7 +383,7 @@ void AppBase::slotInitialize(void) {
 
 void AppBase::slotInitializeTools(void) {
 	// Create tools
-	m_logger = new LogVisualization;
+	m_logger = new Logging;
 	
 	m_toolManager->addTool(m_logger);
 	m_toolManager->addTool(new Terminal);

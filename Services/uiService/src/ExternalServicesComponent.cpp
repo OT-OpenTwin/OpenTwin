@@ -1098,21 +1098,23 @@ std::list<std::string> ExternalServicesComponent::getListOfProjectTypes(void)
 	return projectTypes;
 }
 
-void ExternalServicesComponent::openProject(const std::string & projectName, const std::string& projectType, const std::string & collectionName) {
+void ExternalServicesComponent::openProject(const std::string & _projectName, const std::string& _projectType, const std::string & _collectionName) {
 
 	AppBase * app{ AppBase::instance() };
 	app->lockWelcomeScreen(true);
 
 	try {
-		OT_LOG_D("Open project requested (Project name = \"" + projectName + ")");
+		ot::LogDispatcher::instance().setProjectName(_projectName);
+
+		OT_LOG_D("Open project requested (Project name = \"" + _projectName + ")");
 
 		m_lockManager->lock(app, ot::LockAll);
 
 		StudioSuiteConnectorAPI::openProject();
 
-		m_currentSessionID = projectName;
-		m_currentSessionID.append(":").append(collectionName);
-		AppBase::instance()->SetCollectionName(collectionName);
+		m_currentSessionID = _projectName;
+		m_currentSessionID.append(":").append(_collectionName);
+		AppBase::instance()->SetCollectionName(_collectionName);
 
 		std::string response;
 #ifdef OT_USE_GSS
@@ -1123,21 +1125,21 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		gssDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(app->getCurrentLoginData().getUserName(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
 
 		if (!sendHttpRequest(EXECUTE, app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), gssDoc.toJson(), response)) {
-			assert(0); // Failed to send
-			OT_LOG_E("Failed to send \"Create new session\" request to the global session service");
+			OT_LOG_EA("Failed to send \"Create new session\" request to the global session service");
 			app->showErrorPrompt("Failed to send \"Create new session\" request to the global session service", "Error");
+			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			assert(0); // ERROR
-			OT_LOG_E(response);
+			OT_LOG_EAS(response);
 			app->showErrorPrompt(response.c_str(), "Error");
+			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
-			OT_LOG_W(response);
+			OT_LOG_WAS(response);
 			app->showWarningPrompt(response.c_str(), "Warning");
+			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
 		m_sessionServiceURL = response;
@@ -1145,8 +1147,8 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		OT_LOG_D("GSS provided the LSS at \"" + m_sessionServiceURL + "\"");
 #endif
 
-		app->setCurrentProjectName(projectName);
-		app->setCurrentProjectType(projectType);
+		app->setCurrentProjectName(_projectName);
+		app->setCurrentProjectType(_projectType);
 
 		// ##################################################################
 
@@ -1155,14 +1157,14 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		sessionDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CreateNewSession, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 		// Add project and user information
-		sessionDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
-		sessionDoc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(projectName, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(_collectionName, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(_projectName, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(AppBase::instance()->getCurrentLoginData().getUserName(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 		sessionDoc.AddMember(OT_PARAM_SETTINGS_USERCOLLECTION, ot::JsonString(AppBase::instance()->getCurrentUserCollection(), sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 		// Add session information
 		sessionDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_currentSessionID, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
-		sessionDoc.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(projectType, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
+		sessionDoc.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(_projectType, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
 
 		// Add service information
 		sessionDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, sessionDoc.GetAllocator()), sessionDoc.GetAllocator());
@@ -1178,21 +1180,21 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 
 		response.clear();
 		if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, sessionDoc.toJson(), response)) {
-			assert(0); // Failed to send
-			OT_LOG_E("Failed to send http request to Local Session Service at \"" + m_sessionServiceURL + "\"");
+			OT_LOG_EAS("Failed to send http request to Local Session Service at \"" + m_sessionServiceURL + "\"");
 			app->showErrorPrompt("Failed to send http request to Local Session Service", "Connection Error");
+			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			assert(0); // ERROR
-			OT_LOG_E("Error response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
+			OT_LOG_EAS("Error response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
 			app->showErrorPrompt("Failed to create Session. " + QString::fromStdString(response), "Error");
+			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
-			OT_LOG_W("Warning response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
+			OT_LOG_WAS("Warning response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
 			app->showErrorPrompt("Failed to create Session. " + QString::fromStdString(response), "Error");
+			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
 		
@@ -1312,22 +1314,19 @@ void ExternalServicesComponent::openProject(const std::string & projectName, con
 		ot::startSessionServiceHealthCheck(m_sessionServiceURL);
 #endif // OT_USE_GSS
 
-		// Unlock will be triggered by the finalize ui startup
-		//m_lockManager->unlock(AppBase::instance(), ot::LockAll);
-
 		OT_LOG_D("Open project completed");
 	}
 	catch (const std::exception & e) {
-		assert(0);
-		OT_LOG_E(e.what());
+		OT_LOG_EAS(e.what());
 		app->lockWelcomeScreen(false);
 		app->showErrorPrompt(e.what(), "Error");
+		ot::LogDispatcher::instance().setProjectName("");
 	}
 	catch (...) {
-		assert(0);
-		OT_LOG_E("[FATAL] Unknown error");
+		OT_LOG_EA("[FATAL] Unknown error");
 		app->lockWelcomeScreen(false);
 		app->showErrorPrompt("Unknown error occured while creating a new session", "Fatal Error");
+		ot::LogDispatcher::instance().setProjectName("");
 	}
 }
 
@@ -1470,6 +1469,8 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		if (m_websocket != nullptr) { delete m_websocket; m_websocket = nullptr; }
 
 		OT_LOG_D("Close project done");
+
+		ot::LogDispatcher::instance().setProjectName("");
 	}
 	catch (const std::exception & e) {
 		OT_LOG_E(e.what());

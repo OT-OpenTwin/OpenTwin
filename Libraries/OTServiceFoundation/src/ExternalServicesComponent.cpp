@@ -477,6 +477,8 @@ std::string ot::intern::ExternalServicesComponent::handleInitialize(JsonDocument
 	std::string sessionServiceURL = ot::json::getString(_document, OT_ACTION_PARAM_SESSION_SERVICE_URL);
 	std::string sessionID = ot::json::getString(_document, OT_ACTION_PARAM_SESSION_ID);
 
+	ot::LogDispatcher::instance().setProjectName(sessionID);
+
 	return this->init(sessionServiceURL, sessionID);
 }
 
@@ -533,6 +535,8 @@ std::string ot::intern::ExternalServicesComponent::handleRun(JsonDocument& _docu
 	std::string databaseUsername = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
 	std::string databasePassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
 	m_application->m_DBuserCollection = ot::json::getString(_document, OT_PARAM_SETTINGS_USERCOLLECTION);
+
+	ot::LogDispatcher::instance().setUserName(credentialsUsername);
 
 	m_application->setProjectType(ot::json::getString(_document, OT_ACTION_PARAM_SESSION_TYPE));
 

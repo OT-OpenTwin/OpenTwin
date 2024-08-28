@@ -64,6 +64,12 @@
     <Filter Include="Source Files\NetworkTools">
       <UniqueIdentifier>{2142f0bf-9484-41f4-bfca-43210e9d3e3f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Logger">
+      <UniqueIdentifier>{e4f40ff6-e15d-49f6-b365-9ccacf82daa9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logger">
+      <UniqueIdentifier>{66c19ab9-f23c-4636-86ac-3f4f20aec99b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AppBase.cpp">
@@ -77,9 +83,6 @@
     </ClCompile>
     <ClCompile Include="src\StatusManager.cpp">
       <Filter>Source Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LogVisualization.cpp">
-      <Filter>Source Files\Tools</Filter>
     </ClCompile>
     <ClCompile Include="src\Terminal.cpp">
       <Filter>Source Files\Tools</Filter>
@@ -207,6 +210,15 @@
     <ClCompile Include="src\PortBlockerServer.cpp">
       <Filter>Source Files\NetworkTools</Filter>
     </ClCompile>
+    <ClCompile Include="src\Logging.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LogVisualizationItemViewDialog.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LoggingFilterView.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -280,9 +292,6 @@
     <QtMoc Include="include\AppBase.h">
       <Filter>Header Files\General</Filter>
     </QtMoc>
-    <QtMoc Include="include\LogVisualization.h">
-      <Filter>Header Files\Tools</Filter>
-    </QtMoc>
     <QtMoc Include="include\Terminal.h">
       <Filter>Header Files\Tools</Filter>
     </QtMoc>
@@ -348,6 +357,15 @@
     </QtMoc>
     <QtMoc Include="include\PortBlockerServer.h">
       <Filter>Header Files\NetworkTools</Filter>
+    </QtMoc>
+    <QtMoc Include="include\Logging.h">
+      <Filter>Header Files\Logger</Filter>
+    </QtMoc>
+    <QtMoc Include="include\LogVisualizationItemViewDialog.h">
+      <Filter>Header Files\Logger</Filter>
+    </QtMoc>
+    <QtMoc Include="include\LoggingFilterView.h">
+      <Filter>Header Files\Logger</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
