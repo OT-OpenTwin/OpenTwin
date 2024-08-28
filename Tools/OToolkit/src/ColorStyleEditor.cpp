@@ -572,7 +572,7 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(Color(70, 100, 70))));
 
 	LinearGradientPainter2D* tehb = new LinearGradientPainter2D;
 	tehb->setStart(Point2DD(0.5, 0.));
