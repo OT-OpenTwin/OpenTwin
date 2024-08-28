@@ -241,7 +241,7 @@ void ColorStyleEditor::slotApplyAsCurrent(void) {
 }
 
 void ColorStyleEditor::slotGenerateAndApply(void) {
-	if (m_baseEditor->contentChanged()) {
+	if (m_baseEditor->getContentChanged()) {
 		if (!this->slotExportBase()) return;
 	}
 	this->slotGenerate();

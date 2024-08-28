@@ -188,6 +188,13 @@ void ot::TextEditor::lineNumberAreaPaintEvent(QPaintEvent * _event) {
 	}
 }
 
+void ot::TextEditor::setContentChanged(bool _changed) {
+	if (m_contentChanged == _changed) return;
+	m_contentChanged = _changed;
+	if (m_contentChanged) this->contentChanged();
+	else this->contentSaved();
+}
+
 void ot::TextEditor::setCode(const QString& _text) {
 	setPlainText(_text);
 	document()->clearUndoRedoStacks();
@@ -313,6 +320,7 @@ void ot::TextEditor::slotSaveRequested(void) {
 
 void ot::TextEditor::slotTextChanged(void) {
 	m_contentChanged = true;
+	this->contentChanged();
 }
 
 void ot::TextEditor::slotFindRequested(void) {

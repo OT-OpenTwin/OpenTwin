@@ -54,8 +54,8 @@ namespace ot {
 		int lineNumberAreaWidth(void) const;
 		void lineNumberAreaPaintEvent(QPaintEvent * _event);
 
-		void setContentChanged(bool _changed = true) { m_contentChanged = _changed; };
-		bool contentChanged(void) const { return m_contentChanged; };
+		void setContentChanged(bool _changed = true);
+		bool getContentChanged(void) const { return m_contentChanged; };
 
 		void setTextEditorName(const std::string& _name) { m_textEditorName = _name; };
 		const std::string& textEditorName(void) const { return m_textEditorName; };
@@ -86,6 +86,8 @@ namespace ot {
 		void saveRequested(void);
 
 	protected:
+		virtual void contentSaved(void) {};
+		virtual void contentChanged(void) {};
 		virtual void keyPressEvent(QKeyEvent* _event) override;
 		virtual void resizeEvent(QResizeEvent * _event) override;
 		virtual void wheelEvent(QWheelEvent* _event) override;

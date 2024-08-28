@@ -31,3 +31,15 @@ bool ot::TextEditorView::setupFromConfig(WidgetViewCfg* _config) {
 
 	return true;
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions
+
+void ot::TextEditorView::contentSaved(void) {
+	this->setViewContentModified(false);
+}
+
+void ot::TextEditorView::contentChanged(void) {
+	this->setViewContentModified(true);
+}
