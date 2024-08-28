@@ -189,6 +189,7 @@ public:
 
 	// Action handler
 
+	OT_HANDLER(handleSetLogFlags, ExternalServicesComponent, OT_ACTION_CMD_SetLogFlags, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleCompound, ExternalServicesComponent, OT_ACTION_CMD_Compound, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleMessage, ExternalServicesComponent, OT_ACTION_CMD_Message, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceShutdown, ot::MessageType::ALL_MESSAGE_TYPES)

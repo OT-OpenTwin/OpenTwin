@@ -464,6 +464,13 @@ void ot::intern::ExternalServicesComponent::updateSettingsFromDataBase(PropertyG
 
 // Private functions
 
+std::string ot::intern::ExternalServicesComponent::handleSetLogFlags(JsonDocument& _document) {
+	ConstJsonArray flags = json::getArray(_document, OT_ACTION_PARAM_Flags);
+	ot::LogDispatcher::instance().setLogFlags(logFlagsFromJsonArray(flags));
+
+	return OT_ACTION_RETURN_VALUE_OK;
+}
+
 std::string ot::intern::ExternalServicesComponent::handleInitialize(JsonDocument& _document) {
 	std::string serviceName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string serviceType = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_TYPE);

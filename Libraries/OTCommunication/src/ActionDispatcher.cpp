@@ -124,10 +124,6 @@ std::string ot::ActionDispatcher::dispatchLocked(const std::string& _action, Jso
 				_handlerFound = true;
 			}
 		}
-		else if (_action == OT_ACTION_CMD_SetLogFlags) {
-			ConstJsonArray flags = json::getArray(_document, OT_ACTION_PARAM_Flags);
-			ot::LogDispatcher::instance().setLogFlags(logFlagsFromJsonArray(flags));
-		}
 	}
 	catch (const std::exception& _e) {
 		OT_LOG_EAS(_e.what());

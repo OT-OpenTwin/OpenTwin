@@ -290,6 +290,8 @@ std::string GlobalSessionService::handleSetGlobalLogFlags(ot::JsonDocument& _doc
 	ot::ConstJsonArray flags = ot::json::getArray(_doc, OT_ACTION_PARAM_Flags);
 	m_logModeManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(flags));
 
+	ot::LogDispatcher::instance().setLogFlags(m_logModeManager.getGlobalLogFlags());
+
 	// Update existing session services
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_SetGlobalLogFlags, doc.GetAllocator());

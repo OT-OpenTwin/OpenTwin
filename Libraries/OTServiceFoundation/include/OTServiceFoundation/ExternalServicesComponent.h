@@ -92,16 +92,17 @@ namespace ot {
 
 			// Private functions
 
-			OT_HANDLER(handleInitialize, ExternalServicesComponent, OT_ACTION_CMD_Init, ot::SECURE_MESSAGE_TYPES);
-			OT_HANDLER(handleServiceConnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceConnected, ot::SECURE_MESSAGE_TYPES);
-			OT_HANDLER(handleServiceDisconnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceDisconnected, ot::SECURE_MESSAGE_TYPES);
-			OT_HANDLER(handleShutdownRequestByService, ExternalServicesComponent, OT_ACTION_CMD_ShutdownRequestedByService, ot::SECURE_MESSAGE_TYPES);
-			OT_HANDLER(handleMessage, ExternalServicesComponent, OT_ACTION_CMD_Message, ot::SECURE_MESSAGE_TYPES);
-			OT_HANDLER(handleServiceShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceShutdown, ot::SECURE_MESSAGE_TYPES);
-			OT_HANDLER(handleRun, ExternalServicesComponent, OT_ACTION_CMD_Run, ot::SECURE_MESSAGE_TYPES);
-			OT_HANDLER(handlePreShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServicePreShutdown, ot::SECURE_MESSAGE_TYPES);
-			OT_HANDLER(handleEmergencyShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceEmergencyShutdown, ot::SECURE_MESSAGE_TYPES);
-			OT_HANDLER(handleUIPluginConnected, ExternalServicesComponent, OT_ACTION_CMD_UI_RequestPluginSuccess, ot::SECURE_MESSAGE_TYPES);
+			OT_HANDLER(handleSetLogFlags, ExternalServicesComponent, OT_ACTION_CMD_SetLogFlags, ot::SECURE_MESSAGE_TYPES)
+			OT_HANDLER(handleInitialize, ExternalServicesComponent, OT_ACTION_CMD_Init, ot::SECURE_MESSAGE_TYPES)
+			OT_HANDLER(handleServiceConnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceConnected, ot::SECURE_MESSAGE_TYPES)
+			OT_HANDLER(handleServiceDisconnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceDisconnected, ot::SECURE_MESSAGE_TYPES)
+			OT_HANDLER(handleShutdownRequestByService, ExternalServicesComponent, OT_ACTION_CMD_ShutdownRequestedByService, ot::SECURE_MESSAGE_TYPES)
+			OT_HANDLER(handleMessage, ExternalServicesComponent, OT_ACTION_CMD_Message, ot::SECURE_MESSAGE_TYPES)
+			OT_HANDLER(handleServiceShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceShutdown, ot::SECURE_MESSAGE_TYPES)
+			OT_HANDLER(handleRun, ExternalServicesComponent, OT_ACTION_CMD_Run, ot::SECURE_MESSAGE_TYPES)
+			OT_HANDLER(handlePreShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServicePreShutdown, ot::SECURE_MESSAGE_TYPES)
+			OT_HANDLER(handleEmergencyShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceEmergencyShutdown, ot::SECURE_MESSAGE_TYPES)
+			OT_HANDLER(handleUIPluginConnected, ExternalServicesComponent, OT_ACTION_CMD_UI_RequestPluginSuccess, ot::SECURE_MESSAGE_TYPES)
 
 			// #####################################################################################################################################
 

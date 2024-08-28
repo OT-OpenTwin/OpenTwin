@@ -1025,6 +1025,8 @@ std::string SessionService::handleSetGlobalLogFlags(ot::JsonDocument& _commandDo
 	ot::ConstJsonArray flags = ot::json::getArray(_commandDoc, OT_ACTION_PARAM_Flags);
 	m_logModeManager.setGlobalLogFlags(ot::logFlagsFromJsonArray(flags));
 
+	ot::LogDispatcher::instance().setLogFlags(m_logModeManager.getGlobalLogFlags());
+
 	// Update existing session services
 	this->updateLogMode(m_logModeManager);
 

@@ -1998,6 +1998,13 @@ ServiceDataUi* ExternalServicesComponent::getServiceFromNameType(const std::stri
 
 // Action handler
 
+std::string ExternalServicesComponent::handleSetLogFlags(ot::JsonDocument& _document) {
+	ot::ConstJsonArray flags = ot::json::getArray(_document, OT_ACTION_PARAM_Flags);
+	ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(flags));
+
+	return OT_ACTION_RETURN_VALUE_OK;
+}
+
 std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _document) {
 	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
 	rapidjson::Value documents = _document[OT_ACTION_PARAM_PREFETCH_Documents].GetArray();
