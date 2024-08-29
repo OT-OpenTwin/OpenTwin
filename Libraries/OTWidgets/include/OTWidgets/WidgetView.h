@@ -46,7 +46,7 @@ namespace ot {
 
 		//! @brief Apply settings from the provided configuration.
 		//! @param _config Configuration.
-		virtual bool setupFromConfig(WidgetViewCfg* _config);
+		virtual bool setupViewFromConfig(WidgetViewCfg* _config);
 
 		void setViewData(const WidgetViewBase& _data);
 		const WidgetViewBase& viewData(void) const { return m_data; };

@@ -295,6 +295,12 @@
     <ClCompile Include="src\PixmapImagePainter.cpp">
       <Filter>src\ImagePainter</Filter>
     </ClCompile>
+    <ClCompile Include="src\SyntaxHighlighter.cpp">
+      <Filter>src\Syntax</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SyntaxHighlighterDefaults.cpp">
+      <Filter>src\Syntax</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -344,6 +350,12 @@
     </Filter>
     <Filter Include="src\ImagePainter">
       <UniqueIdentifier>{0e9b2589-bc0a-4599-b9fa-8d27745cf007}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Syntax">
+      <UniqueIdentifier>{793a69dd-1675-4b3f-8487-a6176143b6b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Syntax">
+      <UniqueIdentifier>{91ca5e3c-5ab5-4d44-ab48-85002edea2d8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -547,6 +559,12 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\SvgImagePainter.h">
       <Filter>include\ImagePainter</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\SyntaxHighlighter.h">
+      <Filter>include\Syntax</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\SyntaxHighlighterDefaults.h">
+      <Filter>include\Syntax</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

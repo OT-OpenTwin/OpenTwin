@@ -30,8 +30,8 @@ QWidget* ot::ViewerView::getViewWidget(void) {
 	return this;
 }
 
-bool ot::ViewerView::setupFromConfig(WidgetViewCfg* _config) {
-	if (!WidgetView::setupFromConfig(_config)) return false;
+bool ot::ViewerView::setupViewFromConfig(WidgetViewCfg* _config) {
+	if (!WidgetView::setupViewFromConfig(_config)) return false;
 
 
 	return true;

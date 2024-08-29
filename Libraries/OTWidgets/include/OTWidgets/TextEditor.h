@@ -7,21 +7,21 @@
 
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
+#include "OTGui/TextEditorCfg.h"
 #include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/PlainTextEdit.h"
 
 // Qt header
-#include <qstring.h>
-#include <qstringlist.h>
-#include <qsyntaxhighlighter.h>
-#include <qregularexpression.h>
+#include <QtCore/qstring.h>
+#include <QtCore/qstringlist.h>
+#include <QtCore/qregularexpression.h>
 
 class QPaintEvent;
 class QResizeEvent;
-class QSyntaxHighlighter;
 
 namespace ot {
 	class TextEditor;
+	class SyntaxHighlighter;
 	class TextEditorSearchPopup;
 	
 	class OT_WIDGETS_API_EXPORT TextEditorLineNumberArea : public QWidget {
@@ -51,6 +51,8 @@ namespace ot {
 		TextEditor(QWidget* _parent = (QWidget*)nullptr);
 		virtual ~TextEditor();
 
+		void setupFromConfig(const TextEditorCfg& _config);
+
 		int lineNumberAreaWidth(void) const;
 		void lineNumberAreaPaintEvent(QPaintEvent * _event);
 
@@ -58,15 +60,28 @@ namespace ot {
 		bool getContentChanged(void) const { return m_contentChanged; };
 
 		void setTextEditorName(const std::string& _name) { m_textEditorName = _name; };
-		const std::string& textEditorName(void) const { return m_textEditorName; };
+		const std::string& getTextEditorName(void) const { return m_textEditorName; };
+
+		void setTextEditorTitle(const QString& _title) { m_textEditorTitle = _title; };
+		const QString& getTextEditorTitle(void) const { return m_textEditorTitle; };
 
 		void setCode(const QString& _text);
 		void setCode(const QStringList& _lines);
 
 		QStringList code(void) const;
 
-		void setSyntaxHighlighter(QSyntaxHighlighter * _highlighter);
-		QSyntaxHighlighter * syntaxHighlighter(void) { return m_syntaxHighlighter; }
+		//! \brief Stores the syntax highlighter.
+		//! An existing syntax highlighter will be replaced.
+		//! The TextEditor takes ownership of the highlighter.
+		void storeSyntaxHighlighter(SyntaxHighlighter* _highlighter);
+
+		//! \brief Returns the current syntax highlighter.
+		//! The TextEditor keeps ownership of the highlighter.
+		SyntaxHighlighter* getSyntaxHighlighter(void) { return m_syntaxHighlighter; };
+
+		//! \brief Returns the current syntax highlighter and sets it to 0 internally.
+		//! The caller takes ownership of the highlighter.
+		SyntaxHighlighter* takeSyntaxHighlighter(void);
 
 		bool requiresRefreshing(ot::UID displayedTextEntityID, ot::UID displayedTextEntityVersion);
 
@@ -114,6 +129,7 @@ namespace ot {
 		
 		bool m_contentChanged;
 		std::string m_textEditorName;
+		QString m_textEditorTitle;
 		int m_tabSpaces;
 		bool m_newLineSamePrefix;
 		bool m_enableDuplicateLineShortcut;
@@ -124,6 +140,6 @@ namespace ot {
 		ot::UID								m_displayedTextEntityVersion = 0;
 
 		TextEditorLineNumberArea*			m_lineNumberArea;
-		QSyntaxHighlighter *				m_syntaxHighlighter;
+		SyntaxHighlighter*				m_syntaxHighlighter;
 	};
 }

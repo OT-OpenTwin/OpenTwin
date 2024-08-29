@@ -20,8 +20,8 @@ ot::PlainTextEditView::~PlainTextEditView() {
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-bool ot::PlainTextEditView::setupFromConfig(WidgetViewCfg* _config) {
-	if (!WidgetView::setupFromConfig(_config)) return false;
+bool ot::PlainTextEditView::setupViewFromConfig(WidgetViewCfg* _config) {
+	if (!WidgetView::setupViewFromConfig(_config)) return false;
 	PlainTextEditViewCfg* config = dynamic_cast<PlainTextEditViewCfg*>(_config);
 	if (!config) {
 		OT_LOG_E("Configuration cast failed");

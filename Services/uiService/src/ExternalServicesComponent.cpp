@@ -3967,20 +3967,14 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 
 // Text Editor
 
-std::string ExternalServicesComponent::handleSetTextEditorText(ot::JsonDocument& _document) {
+std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());
 
-	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Name);
-	std::string editorText = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Text);
+	ot::TextEditorCfg config;
+	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	std::string editorTitle = editorName;
-	if (_document.HasMember(OT_ACTION_PARAM_TEXTEDITOR_Title)) {
-		editorTitle = ot::json::getString(_document, OT_ACTION_PARAM_TEXTEDITOR_Title);
-	}
-
-	ot::TextEditorView* editor = AppBase::instance()->findOrCreateTextEditor(editorName, QString::fromStdString(editorTitle), info);
-	editor->setPlainText(QString::fromStdString(editorText));
+	ot::TextEditorView* editor = AppBase::instance()->findOrCreateTextEditor(config, info);
 	editor->setContentChanged(false);
 
 	return "";

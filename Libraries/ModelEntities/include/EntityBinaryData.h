@@ -24,7 +24,7 @@ public:
 
 	void clearData(void);
 
-	const std::vector<char> &getData(void);
+	const std::vector<char>& getData(void) const;
 
 private:
 	virtual int getSchemaVersion(void) { return 1; };

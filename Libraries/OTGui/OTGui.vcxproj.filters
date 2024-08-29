@@ -55,6 +55,12 @@
     <Filter Include="Source Files\Path">
       <UniqueIdentifier>{241e3b9c-0d74-4723-9705-cce4621376ac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Widgets">
+      <UniqueIdentifier>{ef802b43-318f-447f-9750-8bad7155f6ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Widgets">
+      <UniqueIdentifier>{9f1954aa-9fcc-430f-b414-30c1a33e5ef5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\GraphicsPickerCollectionCfg.h">
@@ -288,6 +294,9 @@
     <ClInclude Include="include\OTGui\GraphicsPickerCollectionManager.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\TextEditorCfg.h">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -508,6 +517,9 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsPickerCollectionManager.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextEditorCfg.cpp">
+      <Filter>Source Files\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -29,8 +29,8 @@ QWidget* ot::PlotView::getViewWidget(void) {
 	return this->widget();
 }
 
-bool ot::PlotView::setupFromConfig(WidgetViewCfg* _config) {
-	if (!WidgetView::setupFromConfig(_config)) return false;
+bool ot::PlotView::setupViewFromConfig(WidgetViewCfg* _config) {
+	if (!WidgetView::setupViewFromConfig(_config)) return false;
 
 
 	return true;

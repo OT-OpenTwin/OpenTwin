@@ -25,8 +25,8 @@ QWidget* ot::TextEditorView::getViewWidget(void) {
 	return this;
 }
 
-bool ot::TextEditorView::setupFromConfig(WidgetViewCfg* _config) {
-	if (!WidgetView::setupFromConfig(_config)) return false;
+bool ot::TextEditorView::setupViewFromConfig(WidgetViewCfg* _config) {
+	if (!WidgetView::setupViewFromConfig(_config)) return false;
 
 
 	return true;

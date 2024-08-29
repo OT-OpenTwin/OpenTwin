@@ -294,7 +294,7 @@ public:
 	OT_HANDLER(handleRemoveGraphicsConnection, ExternalServicesComponent, OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// Text Editor
-	OT_HANDLER(handleSetTextEditorText, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_SetText, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetupTextEditor, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSetTextEditorSaved, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSetTextEditorModified, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleCloseTextEditor, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_Close, ot::MessageType::ALL_MESSAGE_TYPES)

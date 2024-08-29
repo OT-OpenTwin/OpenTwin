@@ -27,8 +27,8 @@ QWidget* ot::NavigationTreeView::getViewWidget(void) {
 	return this->widget();
 }
 
-bool ot::NavigationTreeView::setupFromConfig(WidgetViewCfg* _config) {
-	if (!WidgetView::setupFromConfig(_config)) return false;
+bool ot::NavigationTreeView::setupViewFromConfig(WidgetViewCfg* _config) {
+	if (!WidgetView::setupViewFromConfig(_config)) return false;
 
 
 	return true;

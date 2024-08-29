@@ -49,8 +49,7 @@ public:
 	OT_HANDLER(handleOnePropertyDialogValue, Application, OT_ACTION_CMD_UI_OnePropertyDialogValue, ot::SECURE_MESSAGE_TYPES);
 	
 	std::string test(void);
-	std::string createEmptyTestEditor(void);
-
+	
 	// ##################################################################################################################################################################################################################
 
 	// Required functions

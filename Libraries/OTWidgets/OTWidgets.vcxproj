@@ -114,6 +114,8 @@
     <ClCompile Include="src\SpinBox.cpp" />
     <ClCompile Include="src\Splitter.cpp" />
     <ClCompile Include="src\SvgImagePainter.cpp" />
+    <ClCompile Include="src\SyntaxHighlighter.cpp" />
+    <ClCompile Include="src\SyntaxHighlighterDefaults.cpp" />
     <ClCompile Include="src\TabWidget.cpp" />
     <ClCompile Include="src\TextEditor.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
@@ -181,6 +183,8 @@
     <QtMoc Include="include\OTWidgets\TextEditorSearchPopup.h" />
     <QtMoc Include="include\OTWidgets\Splitter.h" />
     <ClInclude Include="include\OTWidgets\SvgImagePainter.h" />
+    <ClInclude Include="include\OTWidgets\SyntaxHighlighter.h" />
+    <ClInclude Include="include\OTWidgets\SyntaxHighlighterDefaults.h" />
     <ClInclude Include="include\OTWidgets\TextEditorView.h" />
     <ClInclude Include="include\OTWidgets\TreeWidgetItem.h" />
     <ClInclude Include="include\OTWidgets\TreeWidgetItemInfo.h" />

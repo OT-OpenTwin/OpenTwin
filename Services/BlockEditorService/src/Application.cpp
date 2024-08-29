@@ -235,31 +235,6 @@ std::string Application::handleOnePropertyDialogValue(ot::JsonDocument& _documen
 	return std::string();
 }
 
-std::string Application::createEmptyTestEditor(void) {
-	if (m_uiComponent) {
-		// Create json document
-		ot::JsonDocument doc;
-		this->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
-
-		// Add action and editor information
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetText, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString("MyEditorName", doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString("Hello\nWorld", doc.GetAllocator()), doc.GetAllocator());
-
-		// If the title is not provided the name will be set as title
-		doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Title, ot::JsonString("New Text Editor", doc.GetAllocator()), doc.GetAllocator());
-
-		// Send the request
-		std::string response;
-		std::string req = doc.toJson();
-		if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, req, response)) {
-			return OT_ACTION_RETURN_VALUE_FAILED;
-		}
-	}
-	
-	return OT_ACTION_RETURN_VALUE_OK;
-}
-
 // ##################################################################################################################################################################################################################
 
 // Required functions

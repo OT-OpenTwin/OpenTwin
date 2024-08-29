@@ -25,7 +25,7 @@ namespace ot {
 
 		virtual QWidget* getViewWidget(void) override;
 
-		virtual bool setupFromConfig(WidgetViewCfg* _config) override;
+		virtual bool setupViewFromConfig(WidgetViewCfg* _config) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

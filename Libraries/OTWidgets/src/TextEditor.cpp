@@ -5,12 +5,13 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/PushButton.h"
-#include "OTGui/ColorStyleTypes.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/TextEditorSearchPopup.h"
+#include "OTWidgets/SyntaxHighlighterDefaults.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -139,6 +140,13 @@ ot::TextEditor::~TextEditor() {
 
 }
 
+void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config) {
+	this->setTextEditorName(_config.getName());
+	this->setTextEditorTitle(QString::fromStdString(_config.getTitle()));
+	this->setCode(QString::fromStdString(_config.getPlainText()));
+	this->storeSyntaxHighlighter(SyntaxHighlighterDefaults::create(_config.getDocumentSyntax(), this->document()));
+}
+
 int ot::TextEditor::lineNumberAreaWidth(void) const {
 	int digits = 1;
 	int max = qMax(1, blockCount());
@@ -196,23 +204,29 @@ void ot::TextEditor::setContentChanged(bool _changed) {
 }
 
 void ot::TextEditor::setCode(const QString& _text) {
-	setPlainText(_text);
+	this->setPlainText(_text);
 	document()->clearUndoRedoStacks();
 }
 
 void ot::TextEditor::setCode(const QStringList& _lines) {
-	clear();
-	for (auto l : _lines) appendPlainText(l);
-	document()->clearUndoRedoStacks();
+	this->clear();
+	for (auto l : _lines) this->appendPlainText(l);
+	this->document()->clearUndoRedoStacks();
 }
 
 QStringList ot::TextEditor::code(void) const {
 	return toPlainText().split("\n", Qt::KeepEmptyParts);
 }
 
-void ot::TextEditor::setSyntaxHighlighter(QSyntaxHighlighter * _highlighter) {
+void ot::TextEditor::storeSyntaxHighlighter(SyntaxHighlighter* _highlighter) {
 	if (m_syntaxHighlighter) delete m_syntaxHighlighter;
 	m_syntaxHighlighter = _highlighter;
+}
+
+ot::SyntaxHighlighter* ot::TextEditor::takeSyntaxHighlighter(void) {
+	SyntaxHighlighter* result = m_syntaxHighlighter;
+	m_syntaxHighlighter = nullptr;
+	return result;
 }
 
 bool ot::TextEditor::requiresRefreshing(ot::UID displayedTextEntityID, ot::UID displayedTextEntityVersion)

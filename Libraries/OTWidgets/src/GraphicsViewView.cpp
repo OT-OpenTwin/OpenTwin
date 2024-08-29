@@ -25,8 +25,8 @@ QWidget* ot::GraphicsViewView::getViewWidget(void) {
 	return this;
 }
 
-bool ot::GraphicsViewView::setupFromConfig(WidgetViewCfg* _config) {
-	if (!WidgetView::setupFromConfig(_config)) return false;
+bool ot::GraphicsViewView::setupViewFromConfig(WidgetViewCfg* _config) {
+	if (!WidgetView::setupViewFromConfig(_config)) return false;
 
 
 	return true;

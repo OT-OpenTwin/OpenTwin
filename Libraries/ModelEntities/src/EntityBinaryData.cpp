@@ -84,7 +84,7 @@ void EntityBinaryData::clearData(void)
 	data.clear();
 }
 
-const std::vector<char> &EntityBinaryData::getData(void)
+const std::vector<char>& EntityBinaryData::getData(void) const
 {
 	return data;
 }

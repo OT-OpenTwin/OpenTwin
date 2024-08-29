@@ -1618,14 +1618,14 @@ ot::PropertyGridCfg AppBase::getSettingsFromDataBase(const std::string& _subKey)
 void AppBase::updateLogIntensityInfo(void) {
 	ot::LogFlags flags = ot::LogDispatcher::instance().logFlags();
 
-	std::string info = "Currently enabled log flags:\n";
+	std::string info = "Currently enabled log flags:";
 
-	if (flags & ot::INFORMATION_LOG) info.append(" - Info\n");
-	if (flags & ot::DETAILED_LOG) info.append(" - Detailed Info\n");
-	if (flags & ot::WARNING_LOG) info.append(" - Warning\n");
-	if (flags & ot::ERROR_LOG) info.append(" - Error\n");
-	if (flags & ot::ALL_INCOMING_MESSAGE_LOG_FLAGS) info.append(" - Inbound Messages\n");
-	if (flags & ot::ALL_OUTGOING_MESSAGE_LOG_FLAGS) info.append(" - Outbound Messages\n");
+	if (flags & ot::INFORMATION_LOG) info.append("\n - Info");
+	if (flags & ot::DETAILED_LOG) info.append("\n - Detailed Info");
+	if (flags & ot::WARNING_LOG) info.append("\n - Warning");
+	if (flags & ot::ERROR_LOG) info.append("\n - Error");
+	if (flags & ot::ALL_INCOMING_MESSAGE_LOG_FLAGS) info.append("\n - Inbound Messages");
+	if (flags & ot::ALL_OUTGOING_MESSAGE_LOG_FLAGS) info.append("\n - Outbound Messages");
 
 	if (flags == ot::NO_LOG) {
 		// NONE
@@ -2064,24 +2064,23 @@ ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _na
 	return this->createNewGraphicsEditor(_name, _title, _serviceInfo);
 }
 
-ot::TextEditorView* AppBase::createNewTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::TextEditorView* newEditor = this->findTextEditor(_name, _serviceInfo);
+ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
+	ot::TextEditorView* newEditor = this->findTextEditor(_config.getName(), _serviceInfo);
 	if (newEditor != nullptr) {
-		OT_LOG_D("TextEditor already exists { \"Editor.Name\": \"" + _name + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
+		OT_LOG_D("TextEditor already exists { \"Editor.Name\": \"" + _config.getName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newEditor;
 	}
 
 	newEditor = new ot::TextEditorView;
-	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewIsCentral));
-	newEditor->setTextEditorName(_name);
-	//newEditor->setTextEditorTitle(_title);
-
+	newEditor->setupFromConfig(_config);
+	newEditor->setViewData(ot::WidgetViewBase(_config.getName(), _config.getTitle(), ot::WidgetViewBase::ViewIsCentral));
+	
 	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
 	m_textEditors.store(_serviceInfo, newEditor);
 
-	connect(newEditor, &ot::TextEditor::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
+	this->connect(newEditor, &ot::TextEditor::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
 
-	OT_LOG_D("TextEditor created { \"Editor.Name\": \"" + _name + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	OT_LOG_D("TextEditor created { \"Editor.Name\": \"" + _config.getName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
 	return newEditor;
 }
@@ -2091,19 +2090,19 @@ ot::TextEditorView* AppBase::findTextEditor(const std::string& _name, const ot::
 		const std::list<ot::TextEditorView*>& lst = m_textEditors[_serviceInfo];
 
 		for (auto v : lst) {
-			if (v->textEditorName() == _name) return v;
+			if (v->getTextEditorName() == _name) return v;
 		}
 	}
 
 	return nullptr;
 }
 
-ot::TextEditorView* AppBase::findOrCreateTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::TextEditorView* v = this->findTextEditor(_name, _serviceInfo);
+ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
+	ot::TextEditorView* v = this->findTextEditor(_config.getName(), _serviceInfo);
 	if (v) return v;
 
-	OT_LOG_D("TextEditor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _name + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
-	return this->createNewTextEditor(_name, _title, _serviceInfo);
+	OT_LOG_D("TextEditor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _config.getName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	return this->createNewTextEditor(_config, _serviceInfo);
 }
 
 void AppBase::closeTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
@@ -2113,7 +2112,7 @@ void AppBase::closeTextEditor(const std::string& _name, const ot::BasicServiceIn
 		lst.clear();
 
 		for (auto v : tmp) {
-			if (v->textEditorName() == _name) {
+			if (v->getTextEditorName() == _name) {
 				ot::WidgetViewManager::instance().closeView(_name);
 			}
 			else {
@@ -2465,7 +2464,7 @@ void AppBase::slotTextEditorSaveRequested(void) {
 
 		try {
 			ot::BasicServiceInformation info(m_textEditors.findOwner(editor).getId());
-			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->textEditorName(), doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->getTextEditorName(), doc.GetAllocator()), doc.GetAllocator());
 			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(editor->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 
 			std::string response;

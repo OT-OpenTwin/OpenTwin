@@ -37,10 +37,19 @@ ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding()
 	}
 }
 
-std::string EntityFileText::getText()
+std::string EntityFileText::getText(void)
 {
 	const std::vector<char> plainData = getData()->getData();
 	return std::string(plainData.begin(),plainData.end());
+}
+
+ot::TextEditorCfg EntityFileText::createConfig(void) {
+	ot::TextEditorCfg result;
+	result.setName(this->getName());
+	result.setTitle(this->getName());
+	result.setPlainText(this->getText());
+
+	return result;
 }
 
 void EntityFileText::setSpecializedProperties()

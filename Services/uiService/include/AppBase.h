@@ -24,6 +24,7 @@
 #include "OTCore/OwnerService.h"
 #include "OTCore/OwnerManagerTemplate.h"
 #include "OTGui/Property.h"
+#include "OTGui/TextEditorCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/GraphicsPickerCollectionManager.h"
@@ -423,11 +424,11 @@ public:
 
 	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
 
-	ot::TextEditorView* createNewTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
+	ot::TextEditorView* createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
 
 	ot::TextEditorView* findTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
 
-	ot::TextEditorView* findOrCreateTextEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
+	ot::TextEditorView* findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
 
 	void closeTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
 

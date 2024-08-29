@@ -38,7 +38,7 @@ ot::WidgetView::~WidgetView() {
 
 // Setter/Getter
 
-bool ot::WidgetView::setupFromConfig(WidgetViewCfg* _config) {
+bool ot::WidgetView::setupViewFromConfig(WidgetViewCfg* _config) {
 	this->setViewData(*_config);
 	return true;
 }

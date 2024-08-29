@@ -651,12 +651,14 @@ void Application::HandleSelectionChanged()
 				EntityFileText* fileEnt = dynamic_cast<EntityFileText*>(entBase);
 				const std::string fileContent = fileEnt->getText();
 				ot::JsonDocument uiRequest;
-				uiRequest.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_SetText, uiRequest.GetAllocator());
+				uiRequest.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, uiRequest.GetAllocator());
 				
-				getBasicServiceInformation().addToJsonObject(uiRequest, uiRequest.GetAllocator());
+				ot::TextEditorCfg cfg = fileEnt->createConfig();
+				ot::JsonObject cfgObj;
+				cfg.addToJsonObject(cfgObj, uiRequest.GetAllocator());
+				uiRequest.AddMember(OT_ACTION_PARAM_Config, cfgObj, uiRequest.GetAllocator());
 
-				uiRequest.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(selectedEntityInfo.begin()->getName(), uiRequest.GetAllocator()), uiRequest.GetAllocator());
-				uiRequest.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(fileContent, uiRequest.GetAllocator()), uiRequest.GetAllocator());
+				getBasicServiceInformation().addToJsonObject(uiRequest, uiRequest.GetAllocator());
 
 				std::string tmp;
 				uiComponent()->sendMessage(true, uiRequest, tmp);

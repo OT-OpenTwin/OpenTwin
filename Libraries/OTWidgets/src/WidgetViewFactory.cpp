@@ -13,7 +13,7 @@ ot::WidgetView* ot::WidgetViewFactory::createView(WidgetViewCfg* _viewConfigurat
 	OTAssertNullptr(_viewConfiguration);
 	ot::WidgetView* newView = WidgetViewFactory::createView(_viewConfiguration->getViewType());
 	if (newView) {
-		if (!newView->setupFromConfig(_viewConfiguration)) {
+		if (!newView->setupViewFromConfig(_viewConfiguration)) {
 			OT_LOG_W("Failed to setup view. Cleaning up...");
 			delete newView;
 			newView = nullptr;

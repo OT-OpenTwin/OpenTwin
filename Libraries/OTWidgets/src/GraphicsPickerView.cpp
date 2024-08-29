@@ -25,8 +25,8 @@ QWidget* ot::GraphicsPickerView::getViewWidget(void) {
 	return this->pickerWidget();
 }
 
-bool ot::GraphicsPickerView::setupFromConfig(WidgetViewCfg* _config) {
-	if (!WidgetView::setupFromConfig(_config)) return false;
+bool ot::GraphicsPickerView::setupViewFromConfig(WidgetViewCfg* _config) {
+	if (!WidgetView::setupViewFromConfig(_config)) return false;
 	
 
 	return true;

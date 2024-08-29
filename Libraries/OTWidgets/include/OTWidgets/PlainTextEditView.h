@@ -22,7 +22,7 @@ namespace ot {
 
 		virtual QWidget* getViewWidget(void) override { return this; };
 
-		virtual bool setupFromConfig(WidgetViewCfg* _config) override;
+		virtual bool setupViewFromConfig(WidgetViewCfg* _config) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

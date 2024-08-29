@@ -332,6 +332,25 @@ std::string ot::toString(BasicKey _key) {
 	}
 }
 
+ot::DocumentSyntax ot::toDocumentSyntax(const std::string& _syntax) {
+	if (_syntax == toString(DocumentSyntax::PlainText)) return DocumentSyntax::PlainText;
+	else if (_syntax == toString(DocumentSyntax::PythonScript)) return DocumentSyntax::PythonScript;
+	else {
+		OT_LOG_EAS("Unknown document syntax \"" + _syntax + "\"");
+		return DocumentSyntax::PlainText;
+	}
+}
+
+std::string ot::toString(DocumentSyntax _syntax) {
+	switch (_syntax) {
+	case ot::DocumentSyntax::PlainText: return "Plain";
+	case ot::DocumentSyntax::PythonScript: return "Python";
+	default:
+		OT_LOG_EAS("Unknown document syntax (" + std::to_string((int)_syntax) + ")");
+		return "Plain";
+	}
+}
+
 ot::LockTypeFlags ot::toLockTypeFlags(const std::vector<std::string>& _flags) {
 	LockTypeFlags flags(NoLockFlags);
 	for (const std::string& flag : _flags) {

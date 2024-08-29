@@ -142,6 +142,13 @@ namespace ot {
 		Key_F12
 	};
 
+	//! \brief Supported document syntax.
+	//! Mainly used for syntax highlighting.
+	enum class DocumentSyntax {
+		PlainText,
+		PythonScript
+	};
+
 	//! \brief Describes the object type to lock in the UI.
 	//! \warning When adding new flags, add the corresponding flag to ot::getAllLockTypeFlags().
 	enum LockTypeFlag {
@@ -188,6 +195,10 @@ namespace ot {
 	OT_GUI_API_EXPORT BasicKey toBasicKey(const std::string& _key);
 
 	OT_GUI_API_EXPORT std::string toString(BasicKey _key);
+
+	OT_GUI_API_EXPORT DocumentSyntax toDocumentSyntax(const std::string& _syntax);
+
+	OT_GUI_API_EXPORT std::string toString(DocumentSyntax _syntax);
 
 	OT_GUI_API_EXPORT LockTypeFlags toLockTypeFlags(const std::vector<std::string>& _flags);
 
