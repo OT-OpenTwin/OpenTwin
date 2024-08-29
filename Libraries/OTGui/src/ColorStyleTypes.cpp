@@ -343,6 +343,7 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	case ot::ColorStyleValueEntry::GraphicsItemSelectionBorder: return "GraphicsItem Selection Border";
 	case ot::ColorStyleValueEntry::GraphicsItemHoverBorder: return "GraphicsItem Hover Border";
 	case ot::ColorStyleValueEntry::GraphicsItemConnectableBackground: return "GraphicsItem Connectable Background";
+	case ot::ColorStyleValueEntry::GraphicsItemLineColor: return "GraphicsItem Line Color";
 
 	case ot::ColorStyleValueEntry::PythonKeyword: return "Python Keyword";
 	case ot::ColorStyleValueEntry::PythonClass: return "Python Class";
@@ -410,6 +411,7 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemSelectionBorder)) return ColorStyleValueEntry::GraphicsItemSelectionBorder;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemHoverBorder)) return ColorStyleValueEntry::GraphicsItemHoverBorder;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemConnectableBackground)) return ColorStyleValueEntry::GraphicsItemConnectableBackground;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemLineColor)) return ColorStyleValueEntry::GraphicsItemLineColor;
 	
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonKeyword)) return ColorStyleValueEntry::PythonKeyword;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonClass)) return ColorStyleValueEntry::PythonClass;

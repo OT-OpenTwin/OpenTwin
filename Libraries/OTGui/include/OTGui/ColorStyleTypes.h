@@ -187,6 +187,7 @@ namespace ot {
 		GraphicsItemSelectionBorder,
 		GraphicsItemHoverBorder,
 		GraphicsItemConnectableBackground,
+		GraphicsItemLineColor,
 
 		PythonKeyword,
 		PythonClass,
