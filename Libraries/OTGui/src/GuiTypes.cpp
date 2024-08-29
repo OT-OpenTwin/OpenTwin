@@ -351,6 +351,13 @@ std::string ot::toString(DocumentSyntax _syntax) {
 	}
 }
 
+std::list<std::string> ot::getAllSupportedDocumentSyntax(void) {
+	return std::list<std::string>({
+		ot::toString(DocumentSyntax::PlainText),
+		ot::toString(DocumentSyntax::PythonScript)
+	});
+}
+
 ot::LockTypeFlags ot::toLockTypeFlags(const std::vector<std::string>& _flags) {
 	LockTypeFlags flags(NoLockFlags);
 	for (const std::string& flag : _flags) {

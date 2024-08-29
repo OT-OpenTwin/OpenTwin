@@ -9,7 +9,6 @@
 #include "OTGui/DefaultSyntaxHighlighterRules.h"
 
 std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::create(DocumentSyntax _syntax) {
-	//return DefaultSyntaxHighlighterRules::createPython();
 	switch (_syntax) {
 	case ot::DocumentSyntax::PlainText: return std::list<ot::SyntaxHighlighterRule>();
 	case ot::DocumentSyntax::PythonScript: return DefaultSyntaxHighlighterRules::createPython();

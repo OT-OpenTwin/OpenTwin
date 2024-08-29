@@ -200,6 +200,8 @@ namespace ot {
 
 	OT_GUI_API_EXPORT std::string toString(DocumentSyntax _syntax);
 
+	OT_GUI_API_EXPORT std::list<std::string> getAllSupportedDocumentSyntax(void);
+
 	OT_GUI_API_EXPORT LockTypeFlags toLockTypeFlags(const std::vector<std::string>& _flags);
 
 	OT_GUI_API_EXPORT LockTypeFlags toLockTypeFlags(const std::list<std::string>& _flags);

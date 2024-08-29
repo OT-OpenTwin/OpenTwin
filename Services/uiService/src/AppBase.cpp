@@ -2099,7 +2099,10 @@ ot::TextEditorView* AppBase::findTextEditor(const std::string& _name, const ot::
 
 ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
 	ot::TextEditorView* v = this->findTextEditor(_config.getName(), _serviceInfo);
-	if (v) return v;
+	if (v) {
+		v->setupFromConfig(_config);
+		return v;
+	}
 
 	OT_LOG_D("TextEditor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _config.getName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 	return this->createNewTextEditor(_config, _serviceInfo);
