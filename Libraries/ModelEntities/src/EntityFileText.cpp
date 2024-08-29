@@ -48,6 +48,7 @@ ot::TextEditorCfg EntityFileText::createConfig(void) {
 	result.setName(this->getName());
 	result.setTitle(this->getName());
 	result.setPlainText(this->getText());
+	result.setDocumentSyntax(ot::DocumentSyntax::PythonScript); // switch to property some day
 
 	return result;
 }
@@ -66,6 +67,14 @@ void EntityFileText::setSpecializedProperties()
 		},
 		encoding.getString(_encoding),
 		"default",getProperties());
+
+	EntityPropertiesSelection::createProperty("Text Properties",
+		"Syntax Highlight",
+		ot::getAllSupportedDocumentSyntax(),
+		ot::toString(ot::DocumentSyntax::PlainText),
+		"default",
+		this->getProperties()
+		);
 }
 
 void EntityFileText::AddStorageData(bsoncxx::builder::basic::document& storage)
