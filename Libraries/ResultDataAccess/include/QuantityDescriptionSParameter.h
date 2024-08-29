@@ -28,18 +28,18 @@ public:
 	void pushBackSecondValue(ot::GenericDataStructMatrix&& _sparameterMatrix);
 
 	//! @brief Depending on the chosen value format, the first value either a real value, the magnitude or the decible value
-	void setFirstValue(uint64_t _index, uint32_t _row, uint32_t _column, ot::Variable&& _value);
+	void setFirstValue(uint64_t _index, const ot::MatrixEntryPointer& _matrixPointer, ot::Variable&& _value);
 
 	//! @brief Depending on the chosen value format, the second value either an imaginary value or the phase
-	void setSecondValue(uint64_t _index, uint32_t _row, uint32_t _column, ot::Variable&& _value);
+	void setSecondValue(uint64_t _index, const ot::MatrixEntryPointer& _matrixPointer, ot::Variable&& _value);
 
 	//! @brief Depending on the chosen value format, the first value either a real value, the magnitude or the decible value
-	const ot::Variable& getFirstValue(uint64_t _index, uint32_t _row, uint32_t _column);
-
+	//const ot::Variable& getFirstValue(uint64_t _index, uint32_t _row, uint32_t _column);
+	const std::vector<ot::Variable> getFirstValues(uint64_t _index);
 
 	//! @brief Depending on the chosen value format, the second value either an imaginary value or the phase
-	const ot::Variable& getSecondValue(uint64_t _index, uint32_t _row, uint32_t _column);
-
+	//const ot::Variable& getSecondValue(uint64_t _index, uint32_t _row, uint32_t _column);
+	const std::vector<ot::Variable> getSecondValues(uint64_t _index);
 
 	//! @brief Depending on the chosen value format, the first value either a real value, the magnitude or the decible value
 	const size_t getNumberOfFirstValues() const { return m_quantityValuesFirst.size(); }
@@ -47,6 +47,7 @@ public:
 	//! @brief Depending on the chosen value format, the second value either an imaginary value or the phase
 	const size_t getNumberOfSecondValues() const { return m_quantityValuesSecond.size(); }
 private:
+	uint64_t m_numberOfMatrixEntries = 0;
 	std::vector<ot::GenericDataStructMatrix> m_quantityValuesFirst;
 	std::vector<ot::GenericDataStructMatrix> m_quantityValuesSecond;
 

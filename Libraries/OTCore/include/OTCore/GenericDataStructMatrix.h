@@ -9,6 +9,12 @@
 
 namespace ot
 {
+	struct __declspec(dllexport) MatrixEntryPointer
+	{
+		uint32_t m_column = 0;
+		uint32_t m_row = 0;
+	};
+
 	class __declspec(dllexport) GenericDataStructMatrix : public GenericDataStruct
 	{
 	public:
@@ -21,11 +27,11 @@ namespace ot
 		GenericDataStructMatrix& operator=(GenericDataStructMatrix&& _other) noexcept = default;
 
 
-		GenericDataStructMatrix(uint32_t _numberofColumns, uint32_t _numberofRows);
-		GenericDataStructMatrix(uint32_t _numberofColumns, uint32_t _numberofRows, ot::Variable _defaultValue);
+		GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer);
+		GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable _defaultValue);
 		
-		void setValue(uint32_t _columnIndex, uint32_t _rowIndex, ot::Variable&& _value);
-		void setValue(uint32_t _columnIndex, uint32_t _rowIndex, const ot::Variable& _value);
+		void setValue(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable&& _value);
+		void setValue(const MatrixEntryPointer& _matrixEntryPointer, const ot::Variable& _value);
 		void setValues(const ot::Variable* _values, uint32_t _size);
 		
 		//! @brief Assumes the list to be a linearised matrix of the topology this class was initialised with.
@@ -33,7 +39,7 @@ namespace ot
 		/// <summary>
 		/// column-major access
 		/// </summary>
-		const ot::Variable& getValue(uint32_t _columnIndex, uint32_t _rowIndex)const;
+		const ot::Variable& getValue(const MatrixEntryPointer& _matrixEntryPointer)const;
 		const ot::Variable* getValues()const;
 		const uint32_t getNumberOfColumns() const { return m_numberOfColumns; }
 		const uint32_t getNumberOfRows() const { return m_numberOfRows; }
@@ -54,4 +60,6 @@ namespace ot
 		
 		inline uint32_t getIndex(const uint32_t& _columnIndex, const uint32_t& _rowIndex) const { return m_numberOfColumns * _rowIndex + _columnIndex; }
 	};
+
+
 }

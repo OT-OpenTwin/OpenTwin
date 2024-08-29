@@ -1,18 +1,19 @@
 #pragma once
 #include "BlockHandler.h"
 #include "EntityBlockDataDimensionReducer.h"
+#include "OTCore/GenericDataStructMatrix.h"
 
 class BlockHandlerDataDimensionReducer :public BlockHandler
 {
 public:
-	BlockHandlerDataDimensionReducer(EntityBlockDataDimensionReducer* blockEntity, const HandlerMap& handlerMap);
+	BlockHandlerDataDimensionReducer(EntityBlockDataDimensionReducer* _blockEntity, const HandlerMap& _handlerMap);
 
 private:
-	uint32_t _column;
-	uint32_t _row;
-	std::string  _inputConnectorName;
-	std::string _outputConnectorName;
+	ot::MatrixEntryPointer m_matrixEntry;
+	
+	std::string  m_inputConnectorName;
+	std::string m_outputConnectorName;
 
-	std::string _blockTypeName;
+	std::string m_blockTypeName;
 	virtual bool executeSpecialized() override;
 };

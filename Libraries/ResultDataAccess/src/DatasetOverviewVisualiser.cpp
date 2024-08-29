@@ -215,26 +215,34 @@ void DatasetOverviewVisualiser::addQuantityToOverview(const MetadataQuantity& _q
 void DatasetOverviewVisualiser::addMetadataToOverview(std::shared_ptr<MetadataEntry> _metadataEntries)
 {
 	const std::string& name = _metadataEntries->getEntryName();
-	m_genericDataStruct->setValue(m_tablePointer.getColumn(), m_tablePointer.getRow(), ot::Variable(name));
+	ot::MatrixEntryPointer matrixPointer;
+	matrixPointer.m_column = m_tablePointer.getColumn();
+	matrixPointer.m_row = m_tablePointer.getRow();
+	m_genericDataStruct->setValue(matrixPointer, ot::Variable(name));
 	m_tablePointer.moveRight();
 	MetadataEntrySingle* singleEntry = dynamic_cast<MetadataEntrySingle*>(_metadataEntries.get());
 	if (singleEntry != nullptr)
 	{
 		const ot::Variable& value = singleEntry->getValue();
-		m_genericDataStruct->setValue(m_tablePointer.getColumn(), m_tablePointer.getRow(), value);
+		matrixPointer.m_column = m_tablePointer.getColumn();
+		matrixPointer.m_row = m_tablePointer.getRow();
+		m_genericDataStruct->setValue(matrixPointer, value);
 	}
 	else
 	{
 		MetadataEntryArray* arrayEntry = dynamic_cast<MetadataEntryArray*>(_metadataEntries.get());
+		matrixPointer.m_column = m_tablePointer.getColumn();
+		matrixPointer.m_row = m_tablePointer.getRow();
 		if (arrayEntry != nullptr)
 		{
 			const std::list<ot::Variable>& values =	arrayEntry->getValues();
 			const std::string concatinated = concatinateMaxNbOfVariablesInString(values);
-			m_genericDataStruct->setValue(m_tablePointer.getColumn(), m_tablePointer.getRow(), concatinated);
+			m_genericDataStruct->setValue(matrixPointer, concatinated);
 		}
 		else
 		{
-			m_genericDataStruct->setValue(m_tablePointer.getColumn(), m_tablePointer.getRow(), "Object");
+
+			m_genericDataStruct->setValue(matrixPointer, "Object");
 		}
 	}
 	m_tablePointer.moveDownAndLeft();
@@ -268,15 +276,23 @@ std::string DatasetOverviewVisualiser::concatinateMaxNbOfVariablesInString(const
 
 void DatasetOverviewVisualiser::addKeyValuePair(const std::string& _key,const ot::Variable& _value)
 {
-	m_genericDataStruct->setValue(m_tablePointer.getColumn(), m_tablePointer.getRow(),ot::Variable(_key));
+	ot::MatrixEntryPointer matrixPointer;
+	matrixPointer.m_column = m_tablePointer.getColumn();
+	matrixPointer.m_row = m_tablePointer.getRow();
+	m_genericDataStruct->setValue(matrixPointer,ot::Variable(_key));
 	m_tablePointer.moveRight();
-	m_genericDataStruct->setValue(m_tablePointer.getColumn(), m_tablePointer.getRow(), _value);
+	matrixPointer.m_column = m_tablePointer.getColumn();
+	matrixPointer.m_row = m_tablePointer.getRow();
+	m_genericDataStruct->setValue(matrixPointer, _value);
 	m_tablePointer.moveDownAndLeft();
 }
 
 void DatasetOverviewVisualiser::addSingleValue(const ot::Variable& _value)
 {
-	m_genericDataStruct->setValue(m_tablePointer.getColumn(), m_tablePointer.getRow(), _value);
+	ot::MatrixEntryPointer matrixPointer;
+	matrixPointer.m_column = m_tablePointer.getColumn();
+	matrixPointer.m_row = m_tablePointer.getRow();
+	m_genericDataStruct->setValue(matrixPointer, _value);
 	m_tablePointer.moveDown();
 }
 
@@ -284,14 +300,21 @@ void DatasetOverviewVisualiser::addSingleValue(const ot::Variable& _value)
 
 void DatasetOverviewVisualiser::addHeading(const std::string& _heading)
 {
-	m_genericDataStruct->setValue(m_tablePointer.getColumn(), m_tablePointer.getRow(), ot::Variable(_heading));
+	ot::MatrixEntryPointer matrixPointer;
+	matrixPointer.m_column = m_tablePointer.getColumn();
+	matrixPointer.m_row = m_tablePointer.getRow();
+	m_genericDataStruct->setValue(matrixPointer, ot::Variable(_heading));
 	m_tablePointer.moveRight();
 	m_tablePointer.moveDown();
 }
 
 void DatasetOverviewVisualiser::initiate(TableDimension& _tableDimension)
 {
-	m_genericDataStruct = new ot::GenericDataStructMatrix(_tableDimension.columns, _tableDimension.rows,ot::Variable(""));
+	ot::MatrixEntryPointer matrixPointer;
+	matrixPointer.m_column = _tableDimension.columns;
+	matrixPointer.m_row = _tableDimension.rows;
+
+	m_genericDataStruct = new ot::GenericDataStructMatrix(matrixPointer,ot::Variable(""));
 }
 
 ot::GenericDataStructMatrix* DatasetOverviewVisualiser::release()

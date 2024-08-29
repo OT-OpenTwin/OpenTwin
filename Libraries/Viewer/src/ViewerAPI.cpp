@@ -788,15 +788,16 @@ void ViewerAPI::showTable(ot::UID _viewerID,  const ot::GenericDataStructMatrix&
 		activeTable->setColumnCount(numberOfColumns);
 		
 		ot::VariableToStringConverter converter;
-		for (uint32_t row = 0; row < numberOfRows; row++)
+		ot::MatrixEntryPointer matrixEntry;
+		for (matrixEntry.m_row= 0; matrixEntry.m_row < numberOfRows; matrixEntry.m_row++)
 		{
-			for (uint32_t column = 0; column < numberOfColumns; column++)
+			for (matrixEntry.m_column = 0; matrixEntry.m_column < numberOfColumns; matrixEntry.m_column++)
 			{
-				ot::Variable value = data.getValue(column, row);
+				ot::Variable value = data.getValue(matrixEntry);
 				const std::string valueAsString = converter(value);
 				QString text = QString::fromStdString(valueAsString);
 				QTableWidgetItem* item = new QTableWidgetItem(text);
-				activeTable->setItem(row, column, item);
+				activeTable->setItem(matrixEntry.m_row,matrixEntry.m_column, item);
 			}
 		}
 		activeTable->resizeColumnsToContents();

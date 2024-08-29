@@ -41,9 +41,8 @@ private:
 	QuantityDescriptionSParameter* m_quantityDescription = nullptr;
 	MetadataParameter m_frequencyParameter;
 
-	uint32_t m_columnIndex = 0;
-	uint32_t m_rowIndex = 0;
-
+	ot::MatrixEntryPointer m_matrixEntry;
+	
 	ot::GenericDataStructMatrix* m_firstValues = nullptr;
 	ot::GenericDataStructMatrix* m_secondValues = nullptr;
 

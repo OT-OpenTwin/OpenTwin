@@ -229,12 +229,14 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 							throw std::exception(errorMessage.c_str());
 						}
 
-						uint32_t rows(dimensions[0]), columns(dimensions[0]);
+						ot::MatrixEntryPointer mantrixEntry;
+						mantrixEntry.m_row = dimensions[0];
+						mantrixEntry.m_column =dimensions[0];
 						//Could be that the value array is smaller then the data array because of the query.
 						auto jsValues = ot::json::getArray(projectedValues, projectionName.c_str());
 						std::list<ot::Variable> values = converter(jsValues);
 						
-						ot::GenericDataStructMatrix* dataBlock(new ot::GenericDataStructMatrix(columns, rows));
+						ot::GenericDataStructMatrix* dataBlock(new ot::GenericDataStructMatrix(mantrixEntry));
 						dataBlock->setValues(values);
 						std::shared_ptr<ot::GenericDataStruct> dataBlockBase(dataBlock);
 						_dataPerPort[queryDescription.m_connectorName].m_data.push_back(dataBlockBase);

@@ -218,10 +218,12 @@ DatasetDescription ParametricResult1DManager::extractDataDescriptionSParameter(c
 		ValueFormatSetter valueFormatSetter;
 		valueFormatSetter.setValueFormatRealImaginary(*quantityDescription, quantityUnit);
 
-		for (uint32_t row = 0; row < numberOfPorts; row++)
+		ot::MatrixEntryPointer matrixEntry;
+
+		for (matrixEntry.m_row= 0; matrixEntry.m_row < numberOfPorts; matrixEntry.m_row++)
 		{
-			uint32_t index = row * numberOfPorts;
-			for (uint32_t column = 0; column < numberOfPorts; column++)
+			uint32_t index = matrixEntry.m_row * numberOfPorts;
+			for (matrixEntry.m_column = 0; matrixEntry.m_column < numberOfPorts; matrixEntry.m_column++)
 			{
 				if (sParameterValues[index] != nullptr)
 				{
@@ -230,9 +232,9 @@ DatasetDescription ParametricResult1DManager::extractDataDescriptionSParameter(c
 					for (size_t frequencyIndex = 0; frequencyIndex < numberOfFrequencyPoints; frequencyIndex++)
 					{
 						ot::Variable realValue = ot::Variable(realValuesOverAllFrequencies[frequencyIndex]);
-						quantityDescription->setFirstValue(frequencyIndex,row,column,std::move(realValue));
+						quantityDescription->setFirstValue(frequencyIndex, matrixEntry,std::move(realValue));
 						ot::Variable imagValue = ot::Variable(imValuesOverAllFrequencies[frequencyIndex]);
-						quantityDescription->setSecondValue(frequencyIndex,row,column,std::move(imagValue));
+						quantityDescription->setSecondValue(frequencyIndex, matrixEntry,std::move(imagValue));
 					}
 				}
 				index++;

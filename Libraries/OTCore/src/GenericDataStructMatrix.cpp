@@ -4,14 +4,14 @@
 
 using namespace ot;
 
-GenericDataStructMatrix::GenericDataStructMatrix(uint32_t _numberOfColumns, uint32_t _numberOfRows)
-	:GenericDataStruct(getClassName(), _numberOfColumns* _numberOfRows), m_numberOfColumns(_numberOfColumns), m_numberOfRows(_numberOfRows)
+GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer)
+	:GenericDataStruct(getClassName(), _matrixEntryPointer.m_row* _matrixEntryPointer.m_column), m_numberOfColumns(_matrixEntryPointer.m_column), m_numberOfRows(_matrixEntryPointer.m_row)
 {
 	allocateValueMemory();
 }
 
-ot::GenericDataStructMatrix::GenericDataStructMatrix(uint32_t _numberOfColumns, uint32_t _numberOfRows, ot::Variable _defaultValue)
-	:GenericDataStruct(getClassName(), _numberOfColumns* _numberOfRows), m_numberOfColumns(_numberOfColumns), m_numberOfRows(_numberOfRows)
+ot::GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable _defaultValue)
+	:GenericDataStruct(getClassName(), _matrixEntryPointer.m_row* _matrixEntryPointer.m_column), m_numberOfColumns(_matrixEntryPointer.m_column), m_numberOfRows(_matrixEntryPointer.m_row)
 {
 	allocateValueMemory(_defaultValue);
 }
@@ -34,15 +34,15 @@ ot::GenericDataStructMatrix::GenericDataStructMatrix(GenericDataStructMatrix&& _
 	_other.m_numberOfEntries = 0;
 }
 
-void GenericDataStructMatrix::setValue(uint32_t _columnIndex, uint32_t _rowIndex, ot::Variable&& _value)
+void GenericDataStructMatrix::setValue(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable&& _value)
 {
-	const uint32_t index = getIndex(_columnIndex, _rowIndex);
+	const uint32_t index = getIndex(_matrixEntryPointer.m_column, _matrixEntryPointer.m_row);
 	m_values[index] = std::move(_value);
 }
 
-void GenericDataStructMatrix::setValue(uint32_t _columnIndex, uint32_t _rowIndex, const ot::Variable& _value)
+void GenericDataStructMatrix::setValue(const MatrixEntryPointer& _matrixEntryPointer, const ot::Variable& _value)
 {
-	const uint32_t index = getIndex(_columnIndex, _rowIndex);
+	const uint32_t index = getIndex(_matrixEntryPointer.m_column,_matrixEntryPointer.m_row);
 	m_values[index] = _value;
 }
 
@@ -60,11 +60,11 @@ void ot::GenericDataStructMatrix::setValues(std::list<ot::Variable> _values)
 	m_values = { _values.begin(), _values.end() };
 }
 
-const ot::Variable& GenericDataStructMatrix::getValue(uint32_t _columnIndex, uint32_t _rowIndex) const
+const ot::Variable& GenericDataStructMatrix::getValue(const MatrixEntryPointer& _matrixEntryPointer) const
 {
-	assert(_columnIndex < m_numberOfColumns);
-	assert(_rowIndex < m_numberOfRows);
-	const uint32_t index =  getIndex(_columnIndex, _rowIndex);
+	assert(_matrixEntryPointer.m_column < m_numberOfColumns);
+	assert(_matrixEntryPointer.m_row < m_numberOfRows);
+	const uint32_t index =  getIndex(_matrixEntryPointer.m_column,_matrixEntryPointer.m_row);
 	return m_values[index];
 }
 

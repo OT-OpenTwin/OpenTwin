@@ -50,15 +50,16 @@ bool BlockHandlerDisplay::executeSpecialized()
 			uint32_t rows =	matrix->getNumberOfRows();
 			uint32_t columns = matrix->getNumberOfColumns();
 
-			for (uint32_t row = 0; row < rows; row++)
+			ot::MatrixEntryPointer matrixEntry;
+			for (matrixEntry.m_row= 0; matrixEntry.m_row < rows; matrixEntry.m_row++)
 			{
 				displayMessage += "[";
-				for (uint32_t column= 0; column< columns; column++)
+				for (matrixEntry.m_column = 0; matrixEntry.m_column < columns; matrixEntry.m_column++)
 				{
-					const ot::Variable& var = matrix->getValue(column, row);
+					const ot::Variable& var = matrix->getValue(matrixEntry);
 					const std::string stringVal = converter(var);
 					displayMessage += stringVal;
-					if (column != columns - 1)
+					if (matrixEntry.m_column != columns - 1)
 					{
 						displayMessage += ", ";
 					}

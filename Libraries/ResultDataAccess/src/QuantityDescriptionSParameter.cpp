@@ -8,6 +8,7 @@ QuantityDescriptionSParameter::QuantityDescriptionSParameter(uint64_t _reserveNu
 QuantityDescriptionSParameter::QuantityDescriptionSParameter(uint32_t _portNumber, uint64_t _reserveNumberOfEntries)
 	:QuantityDescriptionSParameter(_reserveNumberOfEntries)
 {
+	m_numberOfMatrixEntries = _portNumber * _portNumber;
 	m_metadataQuantity.dataDimensions = { _portNumber, _portNumber };
 }
 
@@ -20,15 +21,18 @@ void QuantityDescriptionSParameter::initiateZeroFilledValueMatrices(uint64_t _nu
 {
 	m_quantityValuesFirst.reserve(_numberOfValues);
 	uint32_t numberOfPorts =	m_metadataQuantity.dataDimensions[0];
+	ot::MatrixEntryPointer matrixPointer;
+	matrixPointer.m_column = numberOfPorts;
+	matrixPointer.m_row = numberOfPorts;
 	for (uint64_t i = 0; i < _numberOfValues; i++)
 	{
-		m_quantityValuesFirst.push_back(ot::GenericDataStructMatrix(numberOfPorts, numberOfPorts));
+		m_quantityValuesFirst.push_back(ot::GenericDataStructMatrix(matrixPointer));
 	}
 
 	m_quantityValuesSecond.reserve(_numberOfValues);
 	for (uint64_t i = 0; i < _numberOfValues; i++)
 	{
-		m_quantityValuesSecond.push_back(ot::GenericDataStructMatrix(numberOfPorts, numberOfPorts));
+		m_quantityValuesSecond.push_back(ot::GenericDataStructMatrix(matrixPointer));
 	}
 }
 
@@ -57,28 +61,42 @@ void QuantityDescriptionSParameter::pushBackSecondValue(ot::GenericDataStructMat
 	m_quantityValuesSecond.push_back(_sparameterMatrix);
 }
 
-void QuantityDescriptionSParameter::setFirstValue(uint64_t _index, uint32_t _row, uint32_t _column, ot::Variable&& _value)
+void QuantityDescriptionSParameter::setFirstValue(uint64_t _index, const ot::MatrixEntryPointer& _matrixPointer, ot::Variable&& _value)
 {
-	PRE(firstValueAccessValid(_index, _row, _column));
-	m_quantityValuesFirst[_index].setValue(_row, _column, std::move(_value));
+	PRE(firstValueAccessValid(_index, _matrixPointer.m_row , _matrixPointer.m_column));
+	m_quantityValuesFirst[_index].setValue(_matrixPointer, std::move(_value));
 }
 
-void QuantityDescriptionSParameter::setSecondValue(uint64_t _index, uint32_t _row, uint32_t _column, ot::Variable&& _value)
+void QuantityDescriptionSParameter::setSecondValue(uint64_t _index, const ot::MatrixEntryPointer& _matrixPointer, ot::Variable&& _value)
 {
-	PRE(secondValueAccessValid(_index, _row, _column));
-	m_quantityValuesSecond[_index].setValue(_row, _column, std::move(_value));
+	PRE(secondValueAccessValid(_index, _matrixPointer.m_row, _matrixPointer.m_column));
+	m_quantityValuesSecond[_index].setValue(_matrixPointer, std::move(_value));
 }
 
-const ot::Variable& QuantityDescriptionSParameter::getFirstValue(uint64_t _index, uint32_t _row, uint32_t _column)
+//const ot::Variable& QuantityDescriptionSParameter::getFirstValue(uint64_t _index, uint32_t _row, uint32_t _column)
+//{
+//	PRE(firstValueAccessValid(_index, _row, _column));
+//	return m_quantityValuesFirst[_index].getValue(_row, _column);
+//}
+
+const std::vector<ot::Variable> QuantityDescriptionSParameter::getFirstValues(uint64_t _index)
 {
-	PRE(firstValueAccessValid(_index, _row, _column));
-	return m_quantityValuesFirst[_index].getValue(_row, _column);
+	PRE(m_quantityValuesFirst.size() > _index);
+	const ot::Variable* values =m_quantityValuesFirst[_index].getValues();
+	return std::vector<ot::Variable>(&values[0], &values[m_numberOfMatrixEntries]);
 }
 
-const ot::Variable& QuantityDescriptionSParameter::getSecondValue(uint64_t _index, uint32_t _row, uint32_t _column)
+//const ot::Variable& QuantityDescriptionSParameter::getSecondValue(uint64_t _index, uint32_t _row, uint32_t _column)
+//{
+//	PRE(secondValueAccessValid(_index, _row, _column));
+//	return m_quantityValuesSecond[_index].getValue(_row, _column);
+//}
+
+const std::vector<ot::Variable> QuantityDescriptionSParameter::getSecondValues(uint64_t _index)
 {
-	PRE(secondValueAccessValid(_index, _row, _column));
-	return m_quantityValuesSecond[_index].getValue(_row, _column);
+	PRE(m_quantityValuesSecond.size() > _index);
+	const ot::Variable* values = m_quantityValuesSecond[_index].getValues();
+	return std::vector<ot::Variable>(&values[0], &values[m_numberOfMatrixEntries]);
 }
 
 inline bool QuantityDescriptionSParameter::firstValueAccessValid(uint64_t _index, uint32_t _row, uint32_t _column)

@@ -177,22 +177,17 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 			}
 		}
 
-		for (uint32_t row = 0; row < numberOfPorts; row++)
-		{
-			for (uint32_t column = 0; column < numberOfPorts; column++)
-			{
-				const ot::Variable& quantityValueEntry = _quantityDescription->getFirstValue(i, row, column);
-				addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, firstValueDescription->quantityIndex, quantityValueEntry);
-			}
-		}
 
-		for (uint32_t row = 0; row < numberOfPorts; row++)
+		std::vector<ot::Variable> quantityValueEntriesFirst = _quantityDescription->getFirstValues(i);
+		for (ot::Variable& quantityValueEntry : quantityValueEntriesFirst)
 		{
-			for (uint32_t column = 0; column < numberOfPorts; column++)
-			{
-				const ot::Variable& quantityValueEntry = _quantityDescription->getSecondValue(i, row, column);
-				addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, secondValueDescription->quantityIndex, quantityValueEntry);
-			}
+			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, firstValueDescription->quantityIndex, quantityValueEntry);
+		}
+		
+		std::vector<ot::Variable> quantityValueEntriesSecond = _quantityDescription->getFirstValues(i);
+		for (ot::Variable& quantityValueEntry : quantityValueEntriesSecond)
+		{
+			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, secondValueDescription->quantityIndex, quantityValueEntry);
 		}
 	}
 }
