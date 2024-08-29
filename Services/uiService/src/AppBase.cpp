@@ -2450,14 +2450,15 @@ void AppBase::slotTextEditorSaveRequested(void) {
 		return;
 	}
 
+	/*
 	ot::MessageDialogCfg cfg;
 
 	cfg.setButtons(ot::MessageDialogCfg::BasicButton::Cancel | ot::MessageDialogCfg::BasicButton::Save);
-	//cfg.setButtons(ot::MessageDialogCfg::BasicButton::Save);
-	//cfg.setButtons(ot::MessageDialogCfg::BasicButton::No);
 	cfg.setTitle("Save changed text?");
 	ot::MessageDialogCfg::BasicButton result = ot::MessageDialog::showDialog(cfg);
+	
 	if (result == ot::MessageDialogCfg::BasicButton::Save)
+	*/
 	{
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
