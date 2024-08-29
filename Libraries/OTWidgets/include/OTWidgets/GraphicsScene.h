@@ -15,10 +15,14 @@
 // Qt header
 #include <QtWidgets/qgraphicsscene.h>
 
+// std header
+#include <list>
+
 namespace ot {
 
 	class GraphicsView;
 	class GraphicsItem;
+	class GraphicsElement;
 	class GraphicsConnectionItem;
 	class GraphicsConnectionPreviewItem;
 
@@ -131,7 +135,13 @@ namespace ot {
 
 		Point2D calculateScaledGridStepSize(const QRectF& _rect) const;
 
+		GraphicsElement* findClosestConnectableElement(const QPointF& _pos) const;
+
+		QList<QGraphicsItem*> findItemsInTriggerDistance(const QPointF& _pos) const;
+
 	private:
+		std::list<GraphicsElement *> m_lastHoverElements;
+
 		bool m_ignoreEvents;
 		double m_maxTriggerDistance;
 		Grid m_grid;

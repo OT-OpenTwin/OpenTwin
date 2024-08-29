@@ -22,11 +22,13 @@ ot::GraphicsElement::~GraphicsElement() {
 // Setter / Getter
 
 void ot::GraphicsElement::setGraphicsElementState(GraphicsElementState _state, bool _active) {
+	if (m_state.flagIsSet(_state) == _active) return;
 	m_state.setFlag(_state, _active);
 	this->graphicsElementStateChanged(m_state);
 }
 
 void ot::GraphicsElement::setGraphicsElementStateFlags(const GraphicsElementStateFlags& _state) {
+	if (m_state == _state) return;
 	m_state = _state;
 	this->graphicsElementStateChanged(m_state);
 }

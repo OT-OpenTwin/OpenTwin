@@ -194,7 +194,7 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 void ot::GraphicsItem::handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 	this->handleToolTip(_event);
 	
-	this->setGraphicsElementState(GraphicsElement::HoverState, true);
+	//this->setGraphicsElementState(GraphicsElement::HoverState, true);
 }
 
 void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
@@ -210,7 +210,7 @@ void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
 void ot::GraphicsItem::handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 	ToolTipHandler::hideToolTip();
 
-	this->setGraphicsElementState(GraphicsElement::HoverState, false);
+	//this->setGraphicsElementState(GraphicsElement::HoverState, false);
 }
 
 QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _sizeHint) const {
