@@ -2297,7 +2297,7 @@ void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std
 
 	ot::GraphicsConnectionPackage pckg(view->getGraphicsViewName());
 	ot::GraphicsConnectionCfg connectionConfig(_fromUid, _fromConnector, _toUid, _toConnector);
-	connectionConfig.setLineStyle(ot::OutlineF(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
+	connectionConfig.setLineStyle(ot::OutlineF(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection)));
 	pckg.addConnection(connectionConfig);
 
 	ot::JsonObject pckgObj;

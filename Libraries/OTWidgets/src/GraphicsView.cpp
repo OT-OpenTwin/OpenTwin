@@ -285,6 +285,8 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
 	// Remove connection from items
 	ot::GraphicsConnectionItem* connection = connectionByUID->second;
 	OTAssertNullptr(connection);
+
+	m_scene->connectionAboutToBeRemoved(connection);
 	connection->disconnectItems();
 
 	// Destroy connection

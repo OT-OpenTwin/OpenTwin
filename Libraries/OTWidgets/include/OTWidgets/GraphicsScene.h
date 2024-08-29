@@ -101,6 +101,10 @@ namespace ot {
 
 		void itemAboutToBeRemoved(GraphicsItem* _item);
 
+		void connectionAboutToBeRemoved(GraphicsConnectionItem* _connection);
+
+		void elementAboutToBeRemoved(GraphicsElement* _element);
+
 	Q_SIGNALS:
 		void selectionChangeFinished(void);
 

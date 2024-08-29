@@ -74,9 +74,6 @@ void ot::GraphicsFlowItem::addConnector(const std::string& _name, const std::str
 // Private functions
 
 void ot::GraphicsFlowItem::ini(void) {
-	// Background
-	m_builder.setBackgroundColor(Color(50, 50, 50));
-
 	// Title
 	m_builder.setTitleBackgroundGradientColor(Color(Silver));
 	m_builder.setTitleForegroundColor(Color(White));
@@ -90,8 +87,6 @@ void ot::GraphicsFlowItem::ini(void) {
 	// Connector style
 	GraphicsFlowItemConnector connectorStyle;
 	connectorStyle.setTextColor(Color(White));
-	connectorStyle.setPrimaryColor(Color(White));
-	connectorStyle.setSecondaryColor(Color(Black));
 
 	m_builder.setDefaultConnectorStyle(connectorStyle);
 }

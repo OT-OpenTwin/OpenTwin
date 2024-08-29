@@ -220,9 +220,22 @@ void ot::GraphicsScene::flipAllSelectedItems(Qt::Orientation _flipAxis) {
 }
 
 void ot::GraphicsScene::itemAboutToBeRemoved(GraphicsItem* _item) {
+	this->elementAboutToBeRemoved(_item);
 	if (_item == m_connectionOrigin) {
 		m_connectionOrigin = nullptr;
 		this->stopConnection();
+	}
+}
+
+void ot::GraphicsScene::connectionAboutToBeRemoved(GraphicsConnectionItem* _connection) {
+	this->elementAboutToBeRemoved(_connection);
+}
+
+void ot::GraphicsScene::elementAboutToBeRemoved(GraphicsElement* _element) {
+	auto it = std::find(m_lastHoverElements.begin(), m_lastHoverElements.end(), _element);
+	while (it != m_lastHoverElements.end()) {
+		m_lastHoverElements.erase(it);
+		it = std::find(m_lastHoverElements.begin(), m_lastHoverElements.end(), _element);
 	}
 }
 
@@ -277,7 +290,7 @@ void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 			else if (actualConnection) {
 				newHoverElements.push_back(actualConnection);
 			}
-			else {
+			else if (itm != m_connectionPreview) {
 				OT_LOG_WA("Unknown item in scene");
 			}
 		}

@@ -181,10 +181,12 @@ namespace ot {
 		ToolBarFirstTabForeground,
 
 		GraphicsItemBorder,
+		GraphicsItemConnection,
 		GraphicsItemBackground,
 		GraphicsItemForeground,
 		GraphicsItemSelectionBorder,
 		GraphicsItemHoverBorder,
+		GraphicsItemConnectableBackground,
 
 		PythonKeyword,
 		PythonClass,
