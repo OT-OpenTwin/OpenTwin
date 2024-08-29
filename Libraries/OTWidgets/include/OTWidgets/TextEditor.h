@@ -128,6 +128,7 @@ namespace ot {
 		TextEditorSearchPopup* m_searchPopup;
 		
 		bool m_contentChanged;
+
 		std::string m_textEditorName;
 		QString m_textEditorTitle;
 		int m_tabSpaces;

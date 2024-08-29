@@ -141,10 +141,20 @@ ot::TextEditor::~TextEditor() {
 }
 
 void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config) {
+	bool tmp = this->signalsBlocked();
+	this->blockSignals(true);
+
+	SyntaxHighlighter* newHighlighter = SyntaxHighlighterDefaults::create(_config.getDocumentSyntax(), this->document());
+	newHighlighter->blockSignals(true);
+
 	this->setTextEditorName(_config.getName());
 	this->setTextEditorTitle(QString::fromStdString(_config.getTitle()));
 	this->setCode(QString::fromStdString(_config.getPlainText()));
-	this->storeSyntaxHighlighter(SyntaxHighlighterDefaults::create(_config.getDocumentSyntax(), this->document()));
+	this->storeSyntaxHighlighter(newHighlighter);
+	this->setContentChanged(true);
+	
+	newHighlighter->blockSignals(false);
+	this->blockSignals(tmp);
 }
 
 int ot::TextEditor::lineNumberAreaWidth(void) const {
@@ -204,18 +214,46 @@ void ot::TextEditor::setContentChanged(bool _changed) {
 }
 
 void ot::TextEditor::setCode(const QString& _text) {
+	bool tmp = this->signalsBlocked();
+	bool tmpSyn = false;
+	if (m_syntaxHighlighter) {
+		tmpSyn = m_syntaxHighlighter->signalsBlocked();
+		m_syntaxHighlighter->blockSignals(true);
+	}
+	this->blockSignals(true);
+
+	
 	this->setPlainText(_text);
-	document()->clearUndoRedoStacks();
+	this->document()->clearUndoRedoStacks();
+
+	if (m_syntaxHighlighter) {
+		m_syntaxHighlighter->blockSignals(tmpSyn);
+	}
+	this->blockSignals(tmp);
 }
 
 void ot::TextEditor::setCode(const QStringList& _lines) {
+	bool tmp = this->signalsBlocked();
+	this->blockSignals(true);
+
+	bool tmpSyn = false;
+	if (m_syntaxHighlighter) {
+		tmpSyn = m_syntaxHighlighter->signalsBlocked();
+		m_syntaxHighlighter->blockSignals(true);
+	}
+
 	this->clear();
 	for (auto l : _lines) this->appendPlainText(l);
 	this->document()->clearUndoRedoStacks();
+
+	if (m_syntaxHighlighter) {
+		m_syntaxHighlighter->blockSignals(tmpSyn);
+	}
+	this->blockSignals(tmp);
 }
 
 QStringList ot::TextEditor::code(void) const {
-	return toPlainText().split("\n", Qt::KeepEmptyParts);
+	return this->toPlainText().split("\n", Qt::KeepEmptyParts);
 }
 
 void ot::TextEditor::storeSyntaxHighlighter(SyntaxHighlighter* _highlighter) {
