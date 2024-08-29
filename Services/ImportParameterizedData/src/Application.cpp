@@ -455,6 +455,13 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			entityTextFile->setData(textFileData->getEntityID(), textFileData->getEntityStorageVersion());
 			entityTextFile->StoreToDataBase();
 			m_modelComponent->addEntitiesToModel({ entityTextFile->getEntityID() }, { entityTextFile->getEntityStorageVersion() }, { false }, { textFileData->getEntityID() }, { textFileData->getEntityStorageVersion() }, { entityTextFile->getEntityID() }, "Updated text file.");
+
+			ot::JsonDocument responseDoc;
+			responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+			responseDoc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(entityName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+			getBasicServiceInformation().addToJsonObject(responseDoc, responseDoc.GetAllocator());
+			std::string tmp;
+			m_uiComponent->sendMessage(true, responseDoc, tmp);
 		}
 		else if (_action == OT_ACTION_CMD_MODEL_ExecuteFunction)
 		{
