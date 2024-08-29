@@ -18,7 +18,7 @@
 static WrappedItemFactoryRegistrar<WrappedLineItem> circleRegistrar(OT_FactoryKey_GraphicsLineItem);
 
 WrappedLineItem::WrappedLineItem() {
-	this->setLineStyle(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder)));
+	this->setLineStyle(ot::OutlineF(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemLineColor)));
 }
 
 WrappedLineItem::~WrappedLineItem() {

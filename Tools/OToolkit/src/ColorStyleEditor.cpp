@@ -405,7 +405,7 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBorder), new PropertyPainter2D(new FillPainter2D(ot::Black)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBorder), new PropertyPainter2D(new FillPainter2D(Color(50, 50, 50))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemConnection), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBackground), new PropertyPainter2D(new FillPainter2D(Color(230, 230, 230))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
@@ -579,7 +579,7 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemSelectionBorder), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemHoverBorder), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemConnectableBackground), new PropertyPainter2D(new FillPainter2D(Color(70, 70, 70))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemConnectableBackground), new PropertyPainter2D(new FillPainter2D(Color(100, 100, 100))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemLineColor), new PropertyPainter2D(new FillPainter2D(ot::White)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonClass), new PropertyPainter2D(new FillPainter2D(Color(78, 201, 176))));
@@ -742,7 +742,7 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBorder), new PropertyPainter2D(new FillPainter2D(ot::White)));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBorder), new PropertyPainter2D(new FillPainter2D(Color(200, 200, 200))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemConnection), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 80, 140))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
