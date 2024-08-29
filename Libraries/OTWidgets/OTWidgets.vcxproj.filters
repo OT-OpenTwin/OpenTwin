@@ -298,9 +298,6 @@
     <ClCompile Include="src\SyntaxHighlighter.cpp">
       <Filter>src\Syntax</Filter>
     </ClCompile>
-    <ClCompile Include="src\SyntaxHighlighterDefaults.cpp">
-      <Filter>src\Syntax</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -561,9 +558,6 @@
       <Filter>include\ImagePainter</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\SyntaxHighlighter.h">
-      <Filter>include\Syntax</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\SyntaxHighlighterDefaults.h">
       <Filter>include\Syntax</Filter>
     </ClInclude>
   </ItemGroup>

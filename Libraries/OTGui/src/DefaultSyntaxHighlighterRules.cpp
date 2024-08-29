@@ -1,0 +1,90 @@
+//! @file DefaultSyntaxHighlighterRules.cpp
+//! @author Alexander Kuester (alexk95)
+//! @date August 2024
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// OpenTwin header
+#include "OTCore/Logger.h"
+#include "OTGui/FillPainter2D.h"
+#include "OTGui/DefaultSyntaxHighlighterRules.h"
+
+std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::create(DocumentSyntax _syntax) {
+	//return DefaultSyntaxHighlighterRules::createPython();
+	switch (_syntax) {
+	case ot::DocumentSyntax::PlainText: return std::list<ot::SyntaxHighlighterRule>();
+	case ot::DocumentSyntax::PythonScript: return DefaultSyntaxHighlighterRules::createPython();
+	default:
+		OT_LOG_EAS("Unknown syntax (" + std::to_string((int)_syntax) + ")");
+		return std::list<ot::SyntaxHighlighterRule>();
+	}
+}
+
+std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::createPython(void) {
+    std::list<SyntaxHighlighterRule> result;
+
+    // Keywords
+    Font font;
+    font.setBold(true);
+  
+    const std::list<std::string> keywordPatterns = {
+        "\\bclass\\b", "\\bdef\\b",
+        "\\breturn\\b","\\bif\\b",
+        "\\belse\\b","\\bwhile\\b",
+        "\\bfor\\b","\\bbreak\\b",
+        "\\bcontinue\\b","\\bimport\\b",
+        "\\bfrom\\b","\\bas\\b",
+        "\\bpass\\b","\\braise\\b",
+        "\\bwith\\b","\\btry\\b",
+        "\\bexcept\\b","\\bfinally\\b",
+        "\\blambda\\b","\\bNone\\b",
+        "\\bTrue\\b","\\bFalse\\b",
+        "\\band\\b","\\bor\\b",
+        "\\bnot\\b"
+    };
+
+    for (const std::string& pattern : keywordPatterns) {
+        SyntaxHighlighterRule newRule;
+        newRule.setFont(font);
+        newRule.setRegularExpression(pattern);
+        newRule.setPainter(new FillPainter2D(ot::MidnightBlue));
+        result.push_back(newRule);
+    }
+
+    // Classes
+    SyntaxHighlighterRule classRule;
+    classRule.setFont(font);
+    classRule.setPainter(new FillPainter2D(ot::Blue));
+    classRule.setRegularExpression("\\bQ[A-Za-z]+\\b");
+    result.push_back(classRule);
+
+    // Strings
+    SyntaxHighlighterRule stringRule;
+    stringRule.setPainter(new FillPainter2D(ot::IndianRed));
+    stringRule.setFont(font);
+    stringRule.setRegularExpression("\".*\"|'.*'");
+    result.push_back(stringRule);
+
+    // Functions
+    font.setItalic(true);
+    SyntaxHighlighterRule functionRule;
+    functionRule.setPainter(new FillPainter2D(ot::Blue));
+    functionRule.setFont(font);
+    functionRule.setRegularExpression("\\b[A-Za-z0-9_]+(?=\\()");
+    result.push_back(functionRule);
+
+    // Single-line comments
+    font.setBold(false);
+    font.setItalic(false);
+    SyntaxHighlighterRule singleLineCommentRule;
+    singleLineCommentRule.setFont(font);
+    singleLineCommentRule.setPainter(new FillPainter2D(ot::DarkGreen));
+    singleLineCommentRule.setRegularExpression("\\bQ[A-Za-z]+\\b");
+    result.push_back(singleLineCommentRule);
+
+    // Multi-line comments
+    SyntaxHighlighterRule multilineCommentRule = singleLineCommentRule;
+    multilineCommentRule.setRegularExpression("#[^\n]*");
+    result.push_back(multilineCommentRule);
+
+	return result;
+}

@@ -6,12 +6,13 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/ColorStyleTypes.h"
+#include "OTGui/DefaultSyntaxHighlighterRules.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/SyntaxHighlighter.h"
 #include "OTWidgets/TextEditorSearchPopup.h"
-#include "OTWidgets/SyntaxHighlighterDefaults.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -144,7 +145,8 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config) {
 	bool tmp = this->signalsBlocked();
 	this->blockSignals(true);
 
-	SyntaxHighlighter* newHighlighter = SyntaxHighlighterDefaults::create(_config.getDocumentSyntax(), this->document());
+	SyntaxHighlighter* newHighlighter = new SyntaxHighlighter(this->document());
+	newHighlighter->setRules(DefaultSyntaxHighlighterRules::create(_config.getDocumentSyntax()));
 	newHighlighter->blockSignals(true);
 
 	this->setTextEditorName(_config.getName());

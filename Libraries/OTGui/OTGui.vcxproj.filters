@@ -297,6 +297,12 @@
     <ClInclude Include="include\OTGui\TextEditorCfg.h">
       <Filter>Header Files\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\SyntaxHighlighterRule.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\DefaultSyntaxHighlighterRules.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -520,6 +526,12 @@
     </ClCompile>
     <ClCompile Include="src\TextEditorCfg.cpp">
       <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SyntaxHighlighterRule.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DefaultSyntaxHighlighterRules.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

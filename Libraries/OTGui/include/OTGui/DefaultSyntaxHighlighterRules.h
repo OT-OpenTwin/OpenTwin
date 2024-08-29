@@ -1,4 +1,4 @@
-//! @file SyntaxHighlighterDefaults.h
+//! @file DefaultSyntaxHighlighterRules.h
 //! @author Alexander Kuester (alexk95)
 //! @date August 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -7,20 +7,22 @@
 
 // OpenTwin header
 #include "OTGui/GuiTypes.h"
-#include "OTWidgets/SyntaxHighlighter.h"
+#include "OTGui/SyntaxHighlighterRule.h"
+
+// std header
+#include <list>
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT SyntaxHighlighterDefaults {
-		OT_DECL_NOCOPY(SyntaxHighlighterDefaults)
+	class OT_GUI_API_EXPORT DefaultSyntaxHighlighterRules {
 	public:
-		static SyntaxHighlighter* create(DocumentSyntax _syntax, QTextDocument* _document);
+		static std::list<SyntaxHighlighterRule> create(DocumentSyntax _syntax);
 
-		static void setupPython(SyntaxHighlighter* _highlighter);
+		static std::list<SyntaxHighlighterRule> createPython(void);
 
 	private:
-		SyntaxHighlighterDefaults() {};
-		~SyntaxHighlighterDefaults() {};
+		DefaultSyntaxHighlighterRules() {};
+		~DefaultSyntaxHighlighterRules() {};
 	};
 
 }
