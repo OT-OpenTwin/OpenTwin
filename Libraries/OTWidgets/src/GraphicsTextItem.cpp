@@ -71,13 +71,13 @@ void ot::GraphicsTextItem::paintCustomItem(QPainter* _painter, const QStyleOptio
 
 	QPen textPen = QtFactory::toQPen(cfg->getTextStyle());
 
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState && !this->getBlockStateNotifications()) {
-		if ((this->getGraphicsItemState() & GraphicsItemState::SelectedState) && !(this->getGraphicsItemState() & GraphicsItemState::HoverState)) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
+		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
 			Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
 			textPen.setBrush(QtFactory::toQBrush(newPainter));
 			delete newPainter;
 		}
-		else if (this->getGraphicsItemState() & GraphicsItemState::HoverState) {
+		else if (this->getGraphicsElementState() & GraphicsElement::HoverState) {
 			Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
 			textPen.setBrush(QtFactory::toQBrush(newPainter));
 			delete newPainter;

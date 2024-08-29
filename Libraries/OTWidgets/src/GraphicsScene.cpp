@@ -244,11 +244,10 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 	}
 	
 	qreal minDistance = std::numeric_limits<double>::max();
-	GraphicsBase* targetedBase = nullptr;
+	GraphicsElement* targetedElement = nullptr;
 	bool targetedIsItem = false;
-
 	for (auto itm : lst) {
-		ot::GraphicsBase* actualBase = dynamic_cast<ot::GraphicsBase*>(itm);
+		ot::GraphicsElement* actualBase = dynamic_cast<ot::GraphicsElement*>(itm);
 		/*if (actualItm) {
 			if (actualItm->getGraphicsItemFlags() & ot::GraphicsItemCfg::ItemIsConnectable) {
 				this->startConnection(actualItm);
@@ -266,22 +265,22 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 			if (actualItm) {
 				if ((actualItm->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) && dist >= 0. && ((dist < minDistance && targetedIsItem) || !targetedIsItem)) {
 					minDistance = dist;
-					targetedBase = actualBase;
+					targetedElement = actualBase;
 					targetedIsItem = true;
 				}
 			}
 			// Connection
 			else if (dist >= 0. && dist < minDistance && !targetedIsItem) {
 				minDistance = dist;
-				targetedBase = actualBase;
+				targetedElement = actualBase;
 			}
 		}
 	}
 
 	// Check if a base item was found next to the click position.
-	if (targetedBase) {
-		GraphicsItem* graphicsItem = dynamic_cast<ot::GraphicsItem*>(targetedBase);
-		GraphicsConnectionItem* connectionItem = dynamic_cast<GraphicsConnectionItem*>(targetedBase);
+	if (targetedElement) {
+		GraphicsItem* graphicsItem = dynamic_cast<ot::GraphicsItem*>(targetedElement);
+		GraphicsConnectionItem* connectionItem = dynamic_cast<GraphicsConnectionItem*>(targetedElement);
 
 		if (graphicsItem) {
 			this->startConnection(graphicsItem);

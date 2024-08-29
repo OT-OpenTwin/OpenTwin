@@ -18,7 +18,7 @@
 #include <QtWidgets/qgraphicssceneevent.h>
 
 ot::GraphicsConnectionItem::GraphicsConnectionItem()
-	: m_dest(nullptr), m_origin(nullptr), m_state(NoState)
+	: m_dest(nullptr), m_origin(nullptr)
 {
 	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 	this->setAcceptHoverEvents(true);
@@ -53,12 +53,12 @@ void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGra
 
 	QPen linePen = QtFactory::toQPen(m_config.getLineStyle());
 
-	if (m_state & GraphicsConnectionItem::HoverState) {
+	if (this->getGraphicsElementState() & GraphicsElement::HoverState) {
 		const Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
 		linePen.setBrush(QtFactory::toQBrush(newPainter));
 		delete newPainter;
 	}
-	else if (m_state & GraphicsConnectionItem::SelectedState) {
+	else if (this->getGraphicsElementState() & GraphicsElement::SelectedState) {
 		const Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
 		linePen.setBrush(QtFactory::toQBrush(newPainter));
 		delete newPainter;
@@ -77,10 +77,10 @@ QVariant ot::GraphicsConnectionItem::itemChange(QGraphicsItem::GraphicsItemChang
 	{
 	case QGraphicsItem::ItemSelectedHasChanged:
 		if (this->isSelected()) {
-			m_state |= SelectedState;
+			this->setGraphicsElementState(GraphicsElement::SelectedState, true);
 		}
 		else {
-			m_state &= (~SelectedState);
+			this->setGraphicsElementState(GraphicsElement::SelectedState, false);
 		}
 		break;
 	default:
@@ -114,13 +114,11 @@ void ot::GraphicsConnectionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _ev
 }
 
 void ot::GraphicsConnectionItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
-	m_state |= HoverState;
-	this->update();
+	this->setGraphicsElementState(GraphicsElement::HoverState, true);
 }
 
 void ot::GraphicsConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
-	m_state &= (~HoverState);
-	this->update();
+	this->setGraphicsElementState(GraphicsElement::HoverState, false);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -222,6 +220,15 @@ void ot::GraphicsConnectionItem::updateConnectionInformation(void) {
 		m_config.setDestConnectable("");
 		m_config.setDestUid(0);
 	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected
+
+void ot::GraphicsConnectionItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _flags) {
+	GraphicsElement::graphicsElementStateChanged(_flags);
+	this->update();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

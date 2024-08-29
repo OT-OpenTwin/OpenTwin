@@ -50,7 +50,7 @@ ot::GraphicsFlowItemConnector& ot::GraphicsFlowItemConnector::operator = (const 
 void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft) {
 	// Connector item
 	ot::GraphicsItemCfg* itm = this->createConnectorItem();
-	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable | ot::GraphicsItemCfg::ItemHandlesState);
 	itm->setName(m_name);
 	itm->setMargins(ot::MarginsD(0., 0., 0., 0));
 	itm->setToolTip(m_toolTip);

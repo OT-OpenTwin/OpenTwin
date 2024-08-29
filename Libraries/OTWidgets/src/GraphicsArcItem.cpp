@@ -57,13 +57,13 @@ void ot::GraphicsArcItem::paintCustomItem(QPainter* _painter, const QStyleOption
 	
 	QPen borderPen = QtFactory::toQPen(cfg->getLineStyle());
 
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState && !this->getBlockStateNotifications()) {
-		if ((this->getGraphicsItemState() & GraphicsItemState::SelectedState) && !(this->getGraphicsItemState() & GraphicsItemState::HoverState)) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
+		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
 			Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
 			borderPen.setBrush(QtFactory::toQBrush(newPainter));
 			delete newPainter;
 		}
-		else if (this->getGraphicsItemState() & GraphicsItemState::HoverState) {
+		else if (this->getGraphicsElementState() & GraphicsElement::HoverState) {
 			Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
 			borderPen.setBrush(QtFactory::toQBrush(newPainter));
 			delete newPainter;

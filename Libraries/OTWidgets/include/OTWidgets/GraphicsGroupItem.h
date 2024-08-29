@@ -31,8 +31,6 @@ namespace ot {
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 		virtual const QGraphicsItem* getQGraphicsItem(void) const override { return this; };
 
-		virtual void graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) override;
-
 		virtual QSizeF graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const override;
 
 		virtual ot::GraphicsItem* findItem(const std::string& _itemName) override;
@@ -76,6 +74,8 @@ namespace ot {
 		// Protected
 
 	protected:
+		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _state) override;
+
 		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) override;
 
 	private:

@@ -10,7 +10,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/GraphicsConnectionCfg.h"
-#include "OTWidgets/GraphicsBase.h"
+#include "OTWidgets/GraphicsElement.h"
 
 // Qt header
 #include <QtCore/qrect.h>
@@ -22,16 +22,9 @@ namespace ot {
 	
 	class GraphicsItem;
 
-	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public QGraphicsItem, public GraphicsBase {
+	class OT_WIDGETS_API_EXPORT GraphicsConnectionItem : public QGraphicsItem, public GraphicsElement {
 		OT_DECL_NOCOPY(GraphicsConnectionItem)
 	public:
-		enum GraphicsConnectionState {
-			NoState = 0x00, //! @brief Default state
-			HoverState = 0x01, //! @brief Item is hovered over by user
-			SelectedState = 0x02  //! @brief Item is selected
-		};
-		typedef Flags<GraphicsConnectionState> GraphicsConnectionStateFlags;
-
 		GraphicsConnectionItem();
 		virtual ~GraphicsConnectionItem();
 
@@ -110,6 +103,9 @@ namespace ot {
 		//! Same applies to the destination.
 		void updateConnectionInformation(void);
 
+	protected:
+		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _flags) override;
+
 	private:
 		void calculatePainterPath(QPainterPath& _path) const;
 		void calculateDirectLinePath(QPainterPath& _path) const;
@@ -124,8 +120,6 @@ namespace ot {
 
 		GraphicsConnectionCfg m_config;
 
-		GraphicsConnectionStateFlags m_state;
-
 		GraphicsItem* m_origin;
 		GraphicsItem* m_dest;
 
@@ -134,5 +128,3 @@ namespace ot {
 	};
 
 }
-
-OT_ADD_FLAG_FUNCTIONS(ot::GraphicsConnectionItem::GraphicsConnectionState)

@@ -17,7 +17,6 @@
 
 namespace ot {
 
-	class GraphicsBase;
 	class GraphicsView;
 	class GraphicsItem;
 	class GraphicsConnectionItem;

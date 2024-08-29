@@ -17,11 +17,12 @@
 static ot::GraphicsItemFactoryRegistrar<ot::GraphicsStackItem> stackItemRegistrar(OT_FactoryKey_GraphicsStackItem);
 
 ot::GraphicsStackItem::GraphicsStackItem() 
-	: ot::GraphicsItem(new GraphicsStackItemCfg, GraphicsItem::ForwardSizeState), m_lastCalculatedSize(-1., -1.) 
+	: ot::GraphicsItem(new GraphicsStackItemCfg), m_lastCalculatedSize(-1., -1.) 
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
+	this->setForwardSizeChanges(true);
 }
 
 ot::GraphicsStackItem::~GraphicsStackItem() {
@@ -88,16 +89,6 @@ void ot::GraphicsStackItem::prepareGraphicsItemGeometryChange(void) {
 
 void ot::GraphicsStackItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paint(_painter, _opt, _widget);
-}
-
-void ot::GraphicsStackItem::graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState) {
-		for (const GraphicsStackItemEntry& entry : m_items) {
-			entry.item->setGraphicsItemState(_state);
-		}
-	}
-
-	this->update();
 }
 
 void ot::GraphicsStackItem::graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) {
@@ -246,6 +237,16 @@ double ot::GraphicsStackItem::getMaxAdditionalTriggerDistance(void) const {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected
+
+void ot::GraphicsStackItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _state) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState) {
+		for (const GraphicsStackItemEntry& entry : m_items) {
+			entry.item->setGraphicsElementStateFlags(_state);
+		}
+	}
+
+	this->update();
+}
 
 void ot::GraphicsStackItem::notifyChildsAboutTransformChange(const QTransform& _newTransform) {
 	for (auto i : this->childItems()) {
