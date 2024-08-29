@@ -411,6 +411,12 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemSelectionBorder), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemHoverBorder), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonClass), new PropertyPainter2D(new FillPainter2D(Color(78, 201, 176))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonComment), new PropertyPainter2D(new FillPainter2D(Color(87, 166, 74))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonFunction), new PropertyPainter2D(new FillPainter2D(Color(220, 220, 170))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonKeyword), new PropertyPainter2D(new FillPainter2D(Color(86, 156, 214))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonString), new PropertyPainter2D(new FillPainter2D(Color(214, 157, 133))));
+
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
@@ -570,6 +576,12 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemSelectionBorder), new PropertyPainter2D(new FillPainter2D(ot::Lime)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemHoverBorder), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonClass), new PropertyPainter2D(new FillPainter2D(Color(78, 201, 176))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonComment), new PropertyPainter2D(new FillPainter2D(Color(87, 166, 74))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonFunction), new PropertyPainter2D(new FillPainter2D(Color(220, 220, 170))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonKeyword), new PropertyPainter2D(new FillPainter2D(Color(86, 156, 214))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonString), new PropertyPainter2D(new FillPainter2D(Color(214, 157, 133))));
+	
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorHighlightBackground), new PropertyPainter2D(new FillPainter2D(Color(70, 100, 70))));
@@ -729,6 +741,12 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemSelectionBorder), new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::GraphicsItemHoverBorder), new PropertyPainter2D(new FillPainter2D(Color(210, 90, 10))));
+
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonClass), new PropertyPainter2D(new FillPainter2D(Color(78, 201, 176))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonComment), new PropertyPainter2D(new FillPainter2D(Color(87, 166, 74))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonFunction), new PropertyPainter2D(new FillPainter2D(Color(220, 220, 170))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonKeyword), new PropertyPainter2D(new FillPainter2D(Color(86, 156, 214))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::PythonString), new PropertyPainter2D(new FillPainter2D(Color(214, 157, 133))));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ErrorForeground), new PropertyPainter2D(new FillPainter2D(ot::Red)));
 

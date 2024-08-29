@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTGui/FillPainter2D.h"
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/DefaultSyntaxHighlighterRules.h"
 
 std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::create(DocumentSyntax _syntax) {
@@ -46,20 +46,20 @@ std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::createPy
         SyntaxHighlighterRule newRule;
         newRule.setFont(font);
         newRule.setRegularExpression(pattern);
-        newRule.setPainter(new FillPainter2D(ot::MidnightBlue));
+        newRule.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::PythonKeyword));
         result.push_back(newRule);
     }
 
     // Classes
     SyntaxHighlighterRule classRule;
     classRule.setFont(font);
-    classRule.setPainter(new FillPainter2D(ot::Blue));
+    classRule.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::PythonClass));
     classRule.setRegularExpression("\\bQ[A-Za-z]+\\b");
     result.push_back(classRule);
 
     // Strings
     SyntaxHighlighterRule stringRule;
-    stringRule.setPainter(new FillPainter2D(ot::IndianRed));
+    stringRule.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::PythonString));
     stringRule.setFont(font);
     stringRule.setRegularExpression("\".*\"|'.*'");
     result.push_back(stringRule);
@@ -67,7 +67,7 @@ std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::createPy
     // Functions
     font.setItalic(true);
     SyntaxHighlighterRule functionRule;
-    functionRule.setPainter(new FillPainter2D(ot::Blue));
+    functionRule.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::PythonFunction));
     functionRule.setFont(font);
     functionRule.setRegularExpression("\\b[A-Za-z0-9_]+(?=\\()");
     result.push_back(functionRule);
@@ -77,7 +77,7 @@ std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::createPy
     font.setItalic(false);
     SyntaxHighlighterRule singleLineCommentRule;
     singleLineCommentRule.setFont(font);
-    singleLineCommentRule.setPainter(new FillPainter2D(ot::DarkGreen));
+    singleLineCommentRule.setPainter(new StyleRefPainter2D(ColorStyleValueEntry::PythonComment));
     singleLineCommentRule.setRegularExpression("\\bQ[A-Za-z]+\\b");
     result.push_back(singleLineCommentRule);
 

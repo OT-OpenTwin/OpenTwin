@@ -186,6 +186,12 @@ namespace ot {
 		GraphicsItemSelectionBorder,
 		GraphicsItemHoverBorder,
 
+		PythonKeyword,
+		PythonClass,
+		PythonString,
+		PythonFunction,
+		PythonComment,
+
 		ErrorForeground,
 
 		//! \brief Used to determine the last entry.

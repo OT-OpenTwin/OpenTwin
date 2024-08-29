@@ -342,6 +342,12 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	case ot::ColorStyleValueEntry::GraphicsItemSelectionBorder: return "GraphicsItem Selection Border";
 	case ot::ColorStyleValueEntry::GraphicsItemHoverBorder: return "GraphicsItem Hover Border";
 
+	case ot::ColorStyleValueEntry::PythonKeyword: return "Python Keyword";
+	case ot::ColorStyleValueEntry::PythonClass: return "Python Class";
+	case ot::ColorStyleValueEntry::PythonString: return "Python String";
+	case ot::ColorStyleValueEntry::PythonFunction: return "Python Function";
+	case ot::ColorStyleValueEntry::PythonComment: return "Python Comment";
+
 	case ot::ColorStyleValueEntry::ErrorForeground: return "Error Foreground";
 
 	default:
@@ -400,6 +406,12 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemForeground)) return ColorStyleValueEntry::GraphicsItemForeground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemSelectionBorder)) return ColorStyleValueEntry::GraphicsItemSelectionBorder;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemHoverBorder)) return ColorStyleValueEntry::GraphicsItemHoverBorder;
+
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonKeyword)) return ColorStyleValueEntry::PythonKeyword;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonClass)) return ColorStyleValueEntry::PythonClass;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonString)) return ColorStyleValueEntry::PythonString;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonFunction)) return ColorStyleValueEntry::PythonFunction;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonComment)) return ColorStyleValueEntry::PythonComment;
 
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ErrorForeground)) return ColorStyleValueEntry::ErrorForeground;
 	else {
