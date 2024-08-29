@@ -124,6 +124,7 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 	findShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 	duplicateShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 
+	this->slotUpdateLineNumberAreaWidth(0);
 	this->slotHighlightCurrentLine();
 
 	connect(this, &TextEditor::blockCountChanged, this, &TextEditor::slotUpdateLineNumberAreaWidth);
@@ -168,7 +169,7 @@ int ot::TextEditor::lineNumberAreaWidth(void) const {
 	}
 	digits += 2;
 
-	int space = 3 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
+	int space = 3 + (fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits);
 
 	return space;
 }
@@ -228,6 +229,8 @@ void ot::TextEditor::setCode(const QString& _text) {
 	this->setPlainText(_text);
 	this->document()->clearUndoRedoStacks();
 
+	this->slotUpdateLineNumberAreaWidth(0);
+
 	if (m_syntaxHighlighter) {
 		m_syntaxHighlighter->blockSignals(tmpSyn);
 	}
@@ -247,6 +250,8 @@ void ot::TextEditor::setCode(const QStringList& _lines) {
 	this->clear();
 	for (auto l : _lines) this->appendPlainText(l);
 	this->document()->clearUndoRedoStacks();
+
+	this->slotUpdateLineNumberAreaWidth(0);
 
 	if (m_syntaxHighlighter) {
 		m_syntaxHighlighter->blockSignals(tmpSyn);
