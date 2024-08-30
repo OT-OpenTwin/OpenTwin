@@ -303,6 +303,12 @@
     <ClInclude Include="include\OTGui\DefaultSyntaxHighlighterRules.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\TableCfg.h">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\TableHeaderItemCfg.h">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -532,6 +538,12 @@
     </ClCompile>
     <ClCompile Include="src\DefaultSyntaxHighlighterRules.cpp">
       <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableCfg.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableHeaderItemCfg.cpp">
+      <Filter>Source Files\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
