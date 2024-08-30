@@ -477,8 +477,6 @@ std::string ot::intern::ExternalServicesComponent::handleInitialize(JsonDocument
 	std::string sessionServiceURL = ot::json::getString(_document, OT_ACTION_PARAM_SESSION_SERVICE_URL);
 	std::string sessionID = ot::json::getString(_document, OT_ACTION_PARAM_SESSION_ID);
 
-	ot::LogDispatcher::instance().setProjectName(sessionID);
-
 	return this->init(sessionServiceURL, sessionID);
 }
 

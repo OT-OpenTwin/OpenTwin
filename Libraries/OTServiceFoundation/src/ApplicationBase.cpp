@@ -96,12 +96,18 @@ void ot::ApplicationBase::setSessionServiceURL(const std::string & _url)
 	m_serviceIdMap.insert_or_assign(invalidServiceID, m_sessionService);
 }
 
-void ot::ApplicationBase::setSessionID(const std::string &id)
+void ot::ApplicationBase::setSessionID(const std::string& _id)
 {
-	m_sessionID = id;
+	m_sessionID = _id;
 	size_t index = m_sessionID.find(':');
-	m_projectName    = m_sessionID.substr(0, index);
-	m_collectionName = m_sessionID.substr(index + 1);
+	if (index == std::string::npos) {
+		OT_LOG_EAS("Invalid session id format: \"" + _id + "\"");
+	}
+	else {
+		m_projectName = m_sessionID.substr(0, index);
+		m_collectionName = m_sessionID.substr(index + 1);
+		LogDispatcher::instance().setProjectName(m_projectName);
+	}	
 }
 
 // ##########################################################################################################################################
