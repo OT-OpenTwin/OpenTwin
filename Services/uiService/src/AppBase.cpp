@@ -2015,7 +2015,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name,
 	}
 
 	newEditor = new ot::GraphicsViewView;
-	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewIsCloseable));
+	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewIsCentral /*| ot::WidgetViewBase::ViewIsCloseable*/));
 	newEditor->setOwner(_serviceInfo);
 	newEditor->setGraphicsViewName(_name);
 	newEditor->setGraphicsViewFlag(ot::GraphicsView::ViewManagesSceneRect);
