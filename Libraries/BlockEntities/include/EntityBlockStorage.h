@@ -28,6 +28,11 @@ private:
 	const std::string m_propertyNbOfMetaData = "Number of meta data";
 	const std::string m_groupGeneral = "General";
 
+	const std::string m_propertyConstParameter = "Is constant";
+	const std::string m_propertyName = "Name";
+	const std::string m_propertyUnit = "Unit";
+	const std::string m_propertyType = "Type";
+
 	void createParameterProperties(const std::string& _groupName);
 
 	void createConnectors();
