@@ -51,7 +51,10 @@ namespace ot {
 		TextEditor(QWidget* _parent = (QWidget*)nullptr);
 		virtual ~TextEditor();
 
-		void setupFromConfig(const TextEditorCfg& _config);
+		//! \brief Setup the TextEditor.
+		//! \param _config The config.
+		//! \param _isUpdate If true the text, name and title won't be set.
+		void setupFromConfig(const TextEditorCfg& _config, bool _isUpdate);
 
 		int lineNumberAreaWidth(void) const;
 		void lineNumberAreaPaintEvent(QPaintEvent * _event);

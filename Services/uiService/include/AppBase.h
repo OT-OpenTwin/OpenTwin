@@ -154,7 +154,7 @@ public:
 	);
 
 	//! @brief Will get the current project as modified state
-	bool getCurrentProjectIsModified(void) const { return m_projectIsModified; };
+	bool getCurrentProjectIsModified(void) const;
 
 	//! @brief Will return the current username
 	const LoginData& getCurrentLoginData(void) const { return m_loginData; };
@@ -520,6 +520,8 @@ private:
 
 	void fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo);
 
+	void cleanupWidgetViewInfo(ot::WidgetView* _view);
+
 	AppStateFlags               m_state;
 
 	debugNotifier *				m_debugNotifier;
@@ -539,7 +541,7 @@ private:
 	bool						m_isDebug;
 	bool						m_widgetIsWelcome;
 
-	bool						m_projectIsModified;
+	bool						m_projectStateIsModified;
 
 	ViewerComponent *			m_viewerComponent;
 	ExternalServicesComponent *	m_ExternalServicesComponent;

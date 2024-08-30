@@ -63,7 +63,7 @@ namespace ot {
 		void setParentViewName(const std::string& _parentName) { m_parentViewName = _parentName; };
 
 		//! @brief Return the name of the parent view.
-		const std::string& parentViewName(void) const { return m_parentViewName; };
+		const std::string& getParentViewName(void) const { return m_parentViewName; };
 
 	private:
 		std::string m_parentViewName; //! @brief The parent view name.

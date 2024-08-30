@@ -103,7 +103,7 @@ namespace ot {
 		void setName(const std::string& _name) { m_name = _name; };
 
 		//! @brief Widget view name.
-		const std::string& name(void) const { return m_name; };
+		const std::string& getName(void) const { return m_name; };
 
 		//! @brief Set the widget view title.
 		//! @note /ref title() "Note title()"
@@ -111,7 +111,7 @@ namespace ot {
 
 		//! @brief Returns the WidgetView title.
 		//! @note Note that in case of an empty title the name will be returned instead.
-		const std::string& title(void) const { return (m_title.empty() ? m_name : m_title); };
+		const std::string& getTitle(void) const { return (m_title.empty() ? m_name : m_title); };
 
 		//! @brief Set the widget view flag.
 		//! @param _flag Flag to set.
@@ -122,14 +122,14 @@ namespace ot {
 		void setFlags(ViewFlags _flags) { m_flags = _flags; };
 
 		//! @brief Returns the current flags.
-		ViewFlags flags(void) const { return m_flags; };
+		ViewFlags getFlags(void) const { return m_flags; };
 
 		//! @brief Set the dock location.
 		//! @param _dockLocation The dock location to set.
 		void setDockLocation(ViewDockLocation _dockLocation) { m_dockLocation = _dockLocation; };
 
 		//! @brief Returns the dock location.
-		ViewDockLocation dockLocation(void) const { return m_dockLocation; };
+		ViewDockLocation getDockLocation(void) const { return m_dockLocation; };
 
 	private:
 		std::string m_name; //! @brief WidgetView name.

@@ -49,7 +49,7 @@ namespace ot {
 		virtual bool setupViewFromConfig(WidgetViewCfg* _config);
 
 		void setViewData(const WidgetViewBase& _data);
-		const WidgetViewBase& viewData(void) const { return m_data; };
+		const WidgetViewBase& getViewData(void) const { return m_data; };
 
 		//! @brief Returns the dock widget that belongs to this widget view.
 		ads::CDockWidget* getViewDockWidget(void) const { return m_dockWidget; };
@@ -58,19 +58,19 @@ namespace ot {
 		//! Returns 0 if no widget view is set
 		QAction* getViewToggleAction(void) const;
 
-		//! @brief Protected views wont be removed from the widget view manager when calling remove view.
-		void setViewIsProtected(bool _protected = true) { m_isProtected = _protected; };
+		//! @brief Permanent views wont be removed from the widget view manager when calling remove view.
+		void setViewIsPermanent(bool _permanent = true) { m_isPermanent = _permanent; };
 
-		//! @brief Protected views wont be removed from the widget view manager when calling remove view.
-		bool viewIsProtected(void) const { return m_isProtected; };
+		//! @brief Permanent views wont be removed from the widget view manager when calling remove view.
+		bool getViewIsPermanent(void) const { return m_isPermanent; };
 
 		//! @brief Set the view modified state.
 		//! Modified views will change the title to display an unsaved change.
 		void setViewContentModified(bool _isModified);
-		bool isViewContentModified(void) const { return m_isModified; };
+		bool getViewContentModified(void) const { return m_isModified; };
 
 		//! @brief Returns the widget view title that is currently displayed
-		QString currentViewTitle(void) const;
+		QString getCurrentViewTitle(void) const;
 
 	protected:
 
@@ -84,7 +84,7 @@ namespace ot {
 
 		WidgetViewBase m_data;
 		bool m_isDeletedByManager; //! @brief If false the widget will deregister from the manager upon deleting
-		bool m_isProtected; //! @brief If set the widget wont be removed by the manager
+		bool m_isPermanent; //! @brief If set the widget wont be removed by the manager
 		bool m_isModified; //! @brief If set the current view content was modified
 	};
 

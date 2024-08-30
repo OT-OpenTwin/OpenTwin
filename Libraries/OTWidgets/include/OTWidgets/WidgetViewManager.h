@@ -130,6 +130,9 @@ namespace ot {
 		//! @param _title Title to check
 		bool getViewTitleExists(const QString& _title) const;
 
+		//! \brief Returns true if the content of any of the views is modified.
+		bool getAnyViewContentModified(void);
+
 		//! @brief Return the dock toggle action
 		QAction* getDockToggleAction(void) const { return m_dockToggleRoot; };
 

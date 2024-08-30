@@ -13,7 +13,7 @@
 #include <ads/DockManager.h>
 
 ot::WidgetView::WidgetView()
-	: m_isProtected(false), m_isDeletedByManager(false),
+	: m_isPermanent(false), m_isDeletedByManager(false),
 	m_isModified(false), m_dockWidget(nullptr)
 {
 	m_dockWidget = new ads::CDockWidget("");
@@ -50,20 +50,20 @@ QAction* ot::WidgetView::getViewToggleAction(void) const {
 
 void ot::WidgetView::setViewData(const WidgetViewBase& _data) {
 	m_data = _data;
-	m_dockWidget->setObjectName(QString::fromStdString(_data.name()));
-	m_dockWidget->toggleViewAction()->setText(QString::fromStdString(_data.title()));
-	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, _data.flags() & WidgetViewBase::ViewIsCloseable);
-	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetPinnable, _data.flags() & WidgetViewBase::ViewIsPinnable);
+	m_dockWidget->setObjectName(QString::fromStdString(_data.getName()));
+	m_dockWidget->toggleViewAction()->setText(QString::fromStdString(_data.getTitle()));
+	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, _data.getFlags() & WidgetViewBase::ViewIsCloseable);
+	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetPinnable, _data.getFlags() & WidgetViewBase::ViewIsPinnable);
 
 	this->setViewContentModified(m_isModified);
 }
 
 void ot::WidgetView::setViewContentModified(bool _isModified) {
 	m_isModified = _isModified;
-	m_dockWidget->setWindowTitle((m_isModified ? QString::fromStdString(m_data.title()) + "*" : QString::fromStdString(m_data.title())));
+	m_dockWidget->setWindowTitle((m_isModified ? QString::fromStdString(m_data.getTitle()) + "*" : QString::fromStdString(m_data.getTitle())));
 }
 
-QString ot::WidgetView::currentViewTitle(void) const {
+QString ot::WidgetView::getCurrentViewTitle(void) const {
 	return m_dockWidget->windowTitle();
 }
 

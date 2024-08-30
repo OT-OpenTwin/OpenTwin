@@ -150,7 +150,7 @@ AppBase::AppBase()
 	m_mainWindow(invalidUID),
 	m_ExternalServicesComponent(nullptr),
 	m_widgetIsWelcome(false),
-	m_projectIsModified(false),
+	m_projectStateIsModified(false),
 	m_siteID(0),
 	m_isDebug(false),
 	m_shortcutManager(nullptr),
@@ -338,7 +338,11 @@ void AppBase::setCurrentProjectIsModified(
 	else {
 		uiAPI::window::setTitle(m_mainWindow, title.append(" - Open twin"));
 	}
-	m_projectIsModified = _isModified;
+	m_projectStateIsModified = _isModified;
+}
+
+bool AppBase::getCurrentProjectIsModified(void) const {
+	return m_projectStateIsModified || ot::WidgetViewManager::instance().getAnyViewContentModified();
 }
 
 aWindow * AppBase::mainWindow(void) {
@@ -415,7 +419,7 @@ bool AppBase::closeEvent() {
 		}
 	}
 
-	if (m_projectIsModified) {
+	if (this->getCurrentProjectIsModified()) {
 		QString msg("You have unsaved changes at the project \"");
 		msg.append(m_currentProjectName.c_str());
 		msg.append("\".\nDo you want to save them now?\nUnsaved changes will be lost.");
@@ -1182,28 +1186,28 @@ void AppBase::createUi(void) {
 
 			m_debug = new ot::PlainTextEditView;
 			m_debug->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::ViewIsCentral));
-			m_debug->setViewIsProtected(true);
+			m_debug->setViewIsPermanent(true);
 			m_debug->setPlainText(BUILD_INFO);
 			m_debug->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
 
 			m_output = new ot::PlainTextEditView;
 			m_output->setViewData(ot::WidgetViewBase(TITLE_DOCK_OUTPUT, TITLE_DOCK_OUTPUT, ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
-			m_output->setViewIsProtected(true);
+			m_output->setViewIsPermanent(true);
 			//m_output->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			
 			m_propertyGrid = new ot::PropertyGridView;
 			m_propertyGrid->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROPERTIES, TITLE_DOCK_PROPERTIES, ot::WidgetViewBase::Right, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
-			m_propertyGrid->setViewIsProtected(true);
+			m_propertyGrid->setViewIsPermanent(true);
 			//m_propertyGrid->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			
 			m_projectNavigation = new ot::NavigationTreeView;
 			m_projectNavigation->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROJECTNAVIGATION, TITLE_DOCK_PROJECTNAVIGATION, ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
-			m_projectNavigation->setViewIsProtected(true);
+			m_projectNavigation->setViewIsPermanent(true);
 			//m_projectNavigation->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
 			m_graphicsPicker = new ot::GraphicsPickerView;
 			m_graphicsPicker->setViewData(ot::WidgetViewBase("Block Picker", "Block Picker", ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
-			m_graphicsPicker->setViewIsProtected(true);
+			m_graphicsPicker->setViewIsPermanent(true);
 			//m_graphicsPicker->setInitialiDockLocation(ot::WidgetViewCfg::Left);
 			//m_graphicsPicker->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
@@ -1483,7 +1487,7 @@ void AppBase::setCurrentVisualizationTab(const std::string & _tabName) {
 
 std::string AppBase::getCurrentVisualizationTab(void) {
 	ot::WidgetView* view = ot::WidgetViewManager::instance().getLastFocusedCentralView();
-	if (view) return view->viewData().title();
+	if (view) return view->getViewData().getTitle();
 	else return "";
 }
 
@@ -1666,13 +1670,6 @@ bool AppBase::checkForContinue(
 	}
 	uiAPI::window::setTitle(m_mainWindow, "Open Twin");
 	return true;
-}
-
-void AppBase::fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo) {
-	m_graphicsPicker->clear();
-	m_graphicsPicker->setOwner(_serviceInfo);
-	m_graphicsPicker->add(m_graphicsPickerManager.getCollections(_serviceInfo));
-	m_graphicsPickerManager.setCurrentOwner(_serviceInfo);
 }
 
 void AppBase::setProgressBarVisibility(const char *progressMessage, bool progressBaseVisible, bool continuous)
@@ -2018,7 +2015,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name,
 	}
 
 	newEditor = new ot::GraphicsViewView;
-	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewIsCentral));
+	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewIsCloseable));
 	newEditor->setOwner(_serviceInfo);
 	newEditor->setGraphicsViewName(_name);
 	newEditor->setGraphicsViewFlag(ot::GraphicsView::ViewManagesSceneRect);
@@ -2073,8 +2070,8 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	}
 
 	newEditor = new ot::TextEditorView;
-	newEditor->setupFromConfig(_config);
-	newEditor->setViewData(ot::WidgetViewBase(_config.getName(), _config.getTitle(), ot::WidgetViewBase::ViewIsCentral));
+	newEditor->setupFromConfig(_config, false);
+	newEditor->setViewData(ot::WidgetViewBase(_config.getName(), _config.getTitle(), ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewIsCloseable));
 	
 	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
 	m_textEditors.store(_serviceInfo, newEditor);
@@ -2101,7 +2098,7 @@ ot::TextEditorView* AppBase::findTextEditor(const std::string& _name, const ot::
 ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
 	ot::TextEditorView* v = this->findTextEditor(_config.getName(), _serviceInfo);
 	if (v) {
-		v->setupFromConfig(_config);
+		v->setupFromConfig(_config, true);
 		return v;
 	}
 
@@ -2134,7 +2131,7 @@ void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInf
 		std::list<ot::TextEditorView*>& lst = m_textEditors[_serviceInfo];
 
 		for (auto v : lst) {
-			std::string name = v->viewData().name();
+			std::string name = v->getViewData().getName();
 			ot::WidgetViewManager::instance().closeView(name);
 		}
 		lst.clear();
@@ -2503,8 +2500,8 @@ void AppBase::slotViewFocusLost(ot::WidgetView* _view) {
 
 void AppBase::slotViewFocused(ot::WidgetView* _view) {
 	if (!_view) return;
-	if (_view->viewData().flags() & ot::WidgetViewBase::ViewIsCentral) {
-		m_viewerComponent->viewerTabChanged(_view->viewData().name());
+	if (_view->getViewData().getFlags() & ot::WidgetViewBase::ViewIsCentral) {
+		m_viewerComponent->viewerTabChanged(_view->getViewData().getName());
 	}
 
 	ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_view);
@@ -2517,7 +2514,19 @@ void AppBase::slotViewFocused(ot::WidgetView* _view) {
 }
 
 void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
-	int x = 0;
+	if (!(_view->getViewData().getFlags() & ot::WidgetViewBase::ViewIsCloseable)) return;
+
+	if (_view->getViewContentModified()) {
+		ot::MessageDialogCfg msgCfg;
+		msgCfg.setButtons(ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
+		msgCfg.setTitle("Data Changed");
+		msgCfg.setText("You have unsaved changes in \"" + _view->getViewData().getTitle() + "\". If you continue unsaved changes will be lost. Continue?");
+		msgCfg.setIcon(ot::MessageDialogCfg::Warning);
+		if (ot::MessageDialog::showDialog(msgCfg) != ot::MessageDialogCfg::Yes) return;
+	}
+
+	this->cleanupWidgetViewInfo(_view);
+	ot::WidgetViewManager::instance().closeView(_view->getViewData().getName());
 }
 
 void AppBase::slotOutputContextMenuItemClicked() {
@@ -2581,7 +2590,23 @@ void AppBase::slotTreeItemFocused(QTreeWidgetItem* _item) {
 	
 }
 
-// ###########################################################################################################################################################################################################################################################################################################################
 
-// Asynchronous callbacks
 
+void AppBase::fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo) {
+	m_graphicsPicker->clear();
+	m_graphicsPicker->setOwner(_serviceInfo);
+	m_graphicsPicker->add(m_graphicsPickerManager.getCollections(_serviceInfo));
+	m_graphicsPickerManager.setCurrentOwner(_serviceInfo);
+}
+
+void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
+	ot::GraphicsViewView* graphics = dynamic_cast<ot::GraphicsViewView*>(_view);
+	ot::TextEditorView* txt = dynamic_cast<ot::TextEditorView*>(_view);
+	if (graphics) {
+		m_graphicsViews.erase(graphics);
+	}
+	if (txt) {
+		m_textEditors.erase(txt);
+	}
+	
+}

@@ -208,6 +208,7 @@
 
 #define OT_ACTION_CMD_UI_VIEW_Create "UI.View.Create"
 #define OT_ACTION_CMD_UI_VIEW_Reset "UI.View.Reset"
+#define OT_ACTION_CMD_UI_VIEW_Closed "UI.View.Closed"
 #define OT_ACTION_CMD_UI_VIEW_ClearSelection "UI.View.ClearSelection"
 #define OT_ACTION_CMD_UI_VIEW_RefreshSelection "UI.View.RefreshSelection"
 #define OT_ACTION_CMD_UI_VIEW_SelectObject "UI.View.SelectObject"

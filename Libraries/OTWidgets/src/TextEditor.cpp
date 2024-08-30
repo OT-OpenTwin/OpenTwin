@@ -142,7 +142,7 @@ ot::TextEditor::~TextEditor() {
 
 }
 
-void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config) {
+void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _isUpdate) {
 	bool tmp = this->signalsBlocked();
 	this->blockSignals(true);
 
@@ -150,11 +150,13 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config) {
 	newHighlighter->setRules(DefaultSyntaxHighlighterRules::create(_config.getDocumentSyntax()));
 	newHighlighter->blockSignals(true);
 
-	this->setTextEditorName(_config.getName());
-	this->setTextEditorTitle(QString::fromStdString(_config.getTitle()));
-	this->setCode(QString::fromStdString(_config.getPlainText()));
+	if (!_isUpdate) {
+		this->setTextEditorName(_config.getName());
+		this->setTextEditorTitle(QString::fromStdString(_config.getTitle()));
+		this->setCode(QString::fromStdString(_config.getPlainText()));
+		this->setContentChanged(true);
+	}
 	this->storeSyntaxHighlighter(newHighlighter);
-	this->setContentChanged(true);
 	
 	newHighlighter->blockSignals(false);
 	this->blockSignals(tmp);

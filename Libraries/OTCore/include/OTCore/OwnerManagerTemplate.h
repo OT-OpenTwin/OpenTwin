@@ -34,17 +34,46 @@ namespace ot
 				for (auto obj : *it->second) delete obj;
 				delete it->second;
 
-				this->remove(_owner);
+				this->erase(_owner);
 			}
 		}
 
-		//! @brief Remove all entries for the given owner
+		//! @brief Clean up the memory for the given object.
+		//! The object will be destroyed if it is stored.
+		//! @param _owner The object owner.
+		//! \param _obj The object.
+		void free(V* _obj) {
+			auto it = this->m_data.find(this->findOwner(_obj));
+			if (it != this->m_data.end()) {
+				auto lit = std::find(it->second->begin(), it->second->end(), _obj);
+				if (lit != it->second->end()) {
+					it->second->erase(lit);
+					delete _obj;
+				}
+			}
+		}
+
+		//! \brief Remove all entries for the given owner
 		//! Callee takes ownership of affected objects
-		//! @param _owner The object owner
-		void remove(const ot::Owner<K>& _owner) { this->m_data.erase(_owner); };
+		//! \param _owner The object owner
+		void erase(const ot::Owner<K>& _owner) { this->m_data.erase(_owner); };
+
+		//! \brief Remove object from the owner entries.
+		//! Callee takes ownership of affected object.
+		//! \param _owner The object owner.
+		//! \param _obj The object.
+		void erase(V* _obj) {
+			auto it = this->m_data.find(this->findOwner(_obj));
+			if (it != this->m_data.end()) {
+				auto lit = std::find(it->second->begin(), it->second->end(), _obj);
+				if (lit != it->second->end()) {
+					it->second->erase(lit);
+				}
+			}
+		}
 
 		//! @brief Remove all entries for all owners
-		void removeAll(void) {
+		void eraseAll(void) {
 			for (auto it : this->m_data) { delete it.second; }
 			this->m_data.clear();
 		}
