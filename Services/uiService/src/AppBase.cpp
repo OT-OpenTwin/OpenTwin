@@ -1187,25 +1187,25 @@ void AppBase::createUi(void) {
 			m_debug->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
 
 			m_output = new ot::PlainTextEditView;
-			m_output->setViewData(ot::WidgetViewBase(TITLE_DOCK_OUTPUT, TITLE_DOCK_OUTPUT, ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewIsSide));
+			m_output->setViewData(ot::WidgetViewBase(TITLE_DOCK_OUTPUT, TITLE_DOCK_OUTPUT, ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_output->setViewIsProtected(true);
-			m_output->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+			//m_output->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			
 			m_propertyGrid = new ot::PropertyGridView;
-			m_propertyGrid->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROPERTIES, TITLE_DOCK_PROPERTIES, ot::WidgetViewBase::Right, ot::WidgetViewBase::ViewIsSide));
+			m_propertyGrid->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROPERTIES, TITLE_DOCK_PROPERTIES, ot::WidgetViewBase::Right, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_propertyGrid->setViewIsProtected(true);
-			m_propertyGrid->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+			//m_propertyGrid->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			
 			m_projectNavigation = new ot::NavigationTreeView;
-			m_projectNavigation->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROJECTNAVIGATION, TITLE_DOCK_PROJECTNAVIGATION, ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewIsSide));
+			m_projectNavigation->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROJECTNAVIGATION, TITLE_DOCK_PROJECTNAVIGATION, ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_projectNavigation->setViewIsProtected(true);
-			m_projectNavigation->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+			//m_projectNavigation->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
 			m_graphicsPicker = new ot::GraphicsPickerView;
-			m_graphicsPicker->setViewData(ot::WidgetViewBase("Block Picker", "Block Picker", ot::WidgetViewBase::ViewIsSide));
+			m_graphicsPicker->setViewData(ot::WidgetViewBase("Block Picker", "Block Picker", ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_graphicsPicker->setViewIsProtected(true);
 			//m_graphicsPicker->setInitialiDockLocation(ot::WidgetViewCfg::Left);
-			m_graphicsPicker->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+			//m_graphicsPicker->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Create widgets");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 20);
@@ -1296,6 +1296,7 @@ void AppBase::createUi(void) {
 
 			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusLost, this, &AppBase::slotViewFocusLost);
 			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocused, this, &AppBase::slotViewFocused);
+			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &AppBase::slotViewCloseRequested);
 
 			uiAPI::registerUidNotifier(m_mainWindow, this);
 						
@@ -2513,6 +2514,10 @@ void AppBase::slotViewFocused(ot::WidgetView* _view) {
 			this->fillGraphicsPicker(owner);
 		}
 	}
+}
+
+void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
+	int x = 0;
 }
 
 void AppBase::slotOutputContextMenuItemClicked() {

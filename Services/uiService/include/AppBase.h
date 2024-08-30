@@ -477,6 +477,7 @@ public Q_SLOTS:
 private Q_SLOTS:
 	void slotViewFocusLost(ot::WidgetView* _view);
 	void slotViewFocused(ot::WidgetView* _view);
+	void slotViewCloseRequested(ot::WidgetView* _view);
 	void slotOutputContextMenuItemClicked();
 	void slotColorStyleChanged(const ot::ColorStyle& _style);
 
