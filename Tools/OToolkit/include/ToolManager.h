@@ -66,6 +66,8 @@ public:
 
 	// Runtime handling
 
+	void runTool(const QString& _toolName);
+	
 	void stopAll(void);
 
 	void stopTool(const QString& _toolName);

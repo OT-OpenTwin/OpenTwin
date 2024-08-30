@@ -467,7 +467,7 @@ FAR::~FAR() {
 
 // API base functions
 
-QString FAR::toolName(void) const {
+QString FAR::getToolName(void) const {
 	return "FAR";
 }
 

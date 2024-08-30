@@ -7,6 +7,7 @@
 #include "AppBase.h"
 #include "Logging.h"
 #include "LogModeSetter.h"
+#include "QuickLogExport.h"
 #include "LoggingFilterView.h"
 #include "ConnectToLoggerDialog.h"
 #include "LogVisualizationItemViewDialog.h"
@@ -100,7 +101,7 @@ Logging::~Logging() {
 	settings->setValue("Logging.Table.ColumnWidth", tableColumnWidths);*/
 }
 
-QString Logging::toolName(void) const {
+QString Logging::getToolName(void) const {
 	return QString("Logging");
 }
 
@@ -460,6 +461,39 @@ void Logging::appendLogMessages(const QList<ot::LogMessage>& _messages) {
 		appendLogMessage(m);
 	}
 	m_autoScrollToBottom->setChecked(actb);
+}
+
+void Logging::runQuickExport(void) {
+	if (m_loggerUrl.empty()) {
+		ConnectToLoggerDialog dia;
+		dia.queueConnectRequest();
+		dia.queueRecenterRequest();
+		dia.exec();
+
+		if (!dia.dialogResult() == ot::Dialog::Ok) {
+			return;
+		}
+
+		m_loggerUrl = dia.loggerServiceUrl().toStdString();
+
+		LOGVIS_LOG("Successfully connected to LoggerService. Refreshing log messages...");
+
+		m_connectButton->setText("Disconnect");
+		m_connectButton->setIcon(QIcon(":/images/Connected.png"));
+		this->slotClear();
+		this->appendLogMessages(dia.messageBuffer());
+	}
+
+	if (m_messages.empty()) {
+		LOGVIS_LOGW("No messages to export");
+		return;
+	}
+
+	QuickLogExport exportDia(m_messages);
+	exportDia.centerOnParent(m_root->getViewWidget());
+	if (exportDia.showDialog() == ot::Dialog::Ok) {
+		if (exportDia.isAutoClose()) AppBase::instance()->close();
+	}
 }
 
 QString Logging::logMessageTypeString(const ot::LogMessage& _msg) {

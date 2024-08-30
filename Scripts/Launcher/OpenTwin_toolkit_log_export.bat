@@ -1,0 +1,1 @@
+CALL OpenTwin_toolkit.bat -logexport

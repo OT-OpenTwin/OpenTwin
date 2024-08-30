@@ -34,6 +34,10 @@ namespace ot { class PlainTextEditView; }
 class AppBase : public QMainWindow, public otoolkit::APIInterface, public ot::AbstractLogNotifier {
 	Q_OBJECT
 public:
+	enum StartOption {
+		LogExport
+	};
+
 	// Static functions
 
 	static AppBase * instance(QApplication* _app = (QApplication*)nullptr);
@@ -73,6 +77,8 @@ public:
 	void setUrl(const QString& _url);
 	const QString& url(void) const { return m_url; };
 
+	void parseStartArgs(const std::string& _args);
+
 	void setApplicationInstance(QApplication* _app) { m_app = _app; };
 	QApplication* applicationInstance(void) { return m_app; };
 
@@ -105,6 +111,8 @@ private:
 	Qt::HANDLE				m_mainThread;
 
 	QString					m_url;
+
+	std::list<StartOption> m_startArgs;
 
 	ToolManager*			m_toolManager;
 	

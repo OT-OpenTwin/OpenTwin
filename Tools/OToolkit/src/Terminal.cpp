@@ -383,7 +383,7 @@ Terminal::~Terminal() {
 
 // API base functions
 
-QString Terminal::toolName(void) const {
+QString Terminal::getToolName(void) const {
 	return "OTerminal";
 }
 

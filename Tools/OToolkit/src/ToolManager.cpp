@@ -48,15 +48,15 @@ ToolManager::~ToolManager() {
 // Setter / Getter
 
 bool ToolManager::addTool(otoolkit::Tool* _tool) {
-	otoolkit::Tool* t = this->findTool(_tool->toolName());
+	otoolkit::Tool* t = this->findTool(_tool->getToolName());
 	if (t != nullptr) {
-		OT_LOG_W("Tool already exists: \"" + _tool->toolName().toStdString() + "\"");
+		OT_LOG_W("Tool already exists: \"" + _tool->getToolName().toStdString() + "\"");
 		return false;
 	}
-	m_tools.insert_or_assign(_tool->toolName(), new ToolRuntimeHandler(_tool, this));
+	m_tools.insert_or_assign(_tool->getToolName(), new ToolRuntimeHandler(_tool, this));
 
 	// Create menu and connect the run signal
-	ToolMenuManager* tmm = m_menuManager->addToolMenu(_tool->toolName());
+	ToolMenuManager* tmm = m_menuManager->addToolMenu(_tool->getToolName());
 	this->connect(tmm, &ToolMenuManager::runRequested, this, &ToolManager::slotRunToolTriggered);
 
 	return true;
@@ -81,7 +81,7 @@ void ToolManager::removeTool(const QString& _toolName) {
 }
 
 void ToolManager::removeTool(otoolkit::Tool* _tool) {
-	QString toolName = _tool->toolName();
+	QString toolName = _tool->getToolName();
 
 	// Remove from list
 	auto it = m_tools.find(toolName);
@@ -111,6 +111,46 @@ void ToolManager::clear(void) {
 
 // Runtime handling
 
+void ToolManager::runTool(const QString& _toolName) {
+	auto it = m_tools.find(_toolName);
+	if (it == m_tools.end()) {
+		OT_LOG_E("Tool not found { \"ToolName\": \"" + _toolName.toStdString() + "\" }");
+		return;
+	}
+
+	if (it->second->getTool()->getToolIsRunning()) {
+		OT_LOG_W("Stop not implemented. Restart the application to restart the tool.");
+		// Stop the tool
+
+
+
+		// ....
+
+
+
+	}
+	else {
+		m_ignoreEvents = true;
+		QSettings settings("OpenTwin", "OToolkit");
+		if (!it->second->getTool()->runTool(m_menuManager->toolMenu(_toolName), it->second->getToolWidgets())) {
+			OT_LOG_W("Tool \"" + it->first.toStdString() + "\" statup failed");
+			return;
+		}
+
+		it->second->getTool()->setToolIsRunning(true);
+
+		m_statusManager->addTool(it->first, it->second->getToolWidgets().getStatusWidgets());
+		m_toolBarManager->addTool(it->first, it->second->getToolWidgets().getToolBar());
+		m_toolViewManager->addTool(it->second);
+
+		it->second->getTool()->restoreToolSettings(settings);
+
+		m_ignoreEvents = false;
+
+		it->second->notifyDataChanged();
+	}
+}
+
 void ToolManager::stopAll(void) {
 	std::map<QString, ToolRuntimeHandler*> bak = m_tools;
 	for (auto it : bak) {
@@ -126,20 +166,20 @@ void ToolManager::stopTool(const QString& _toolName) {
 		return;
 	}
 
-	if (!it->second->isRunning()) {
+	if (!it->second->getTool()->getToolIsRunning()) {
 		return;
 	}
 
 	QSettings settings("OpenTwin", "OToolkit");
 
-	it->second->setStopped();
+	it->second->getTool()->setToolIsRunning(false);
 	it->second->getTool()->prepareToolShutdown(settings);
 	this->fwdRemoveTool(_toolName);
 }
 
 void ToolManager::toolDataHasChanged(ToolRuntimeHandler* _handler) {
 	OTAssertNullptr(_handler->getTool());
-	m_toolViewManager->updateViews(_handler->getTool()->toolName());
+	m_toolViewManager->updateViews(_handler->getTool()->getToolName());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -153,43 +193,7 @@ void ToolManager::slotRunToolTriggered(void) {
 		return;
 	}
 
-	auto it = m_tools.find(tmm->toolName());
-	if (it == m_tools.end()) {
-		OT_LOG_E("Tool not found { \"ToolName\": \"" + tmm->toolName().toStdString() + "\" }");
-		return;
-	}
-
-	if (it->second->isRunning()) {
-		OT_LOG_W("Stop not implemented. Restart the application to restart the tool.");
-		// Stop the tool
-
-
-
-		// ....
-
-
-
-	}
-	else {
-		m_ignoreEvents = true;
-		QSettings settings("OpenTwin", "OToolkit");
-		if (!it->second->getTool()->runTool(tmm, it->second->getToolWidgets())) {
-			OT_LOG_W("Tool \"" + it->first.toStdString() + "\" statup failed");
-			return;
-		}
-
-		it->second->setRunning();
-
-		m_statusManager->addTool(it->first, it->second->getToolWidgets().getStatusWidgets());
-		m_toolBarManager->addTool(it->first, it->second->getToolWidgets().getToolBar());
-		m_toolViewManager->addTool(it->second);
-
-		it->second->getTool()->restoreToolSettings(settings);
-
-		m_ignoreEvents = false;
-
-		it->second->notifyDataChanged();
-	}
+	this->runTool(tmm->toolName());
 }
 
 void ToolManager::slotViewFocused(const QString& _viewName, const QString& _toolName) {

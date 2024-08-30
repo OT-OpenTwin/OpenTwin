@@ -26,6 +26,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
+#include "OTCore/StringHelper.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/CheckerboardPainter2D.h"
@@ -189,6 +190,16 @@ void AppBase::closeEvent(QCloseEvent * _event) {
 void AppBase::setUrl(const QString& _url) {
 	m_url = _url;
 	OT_LOG_D("OToolkit url set to: " + m_url.toStdString());
+}
+
+void AppBase::parseStartArgs(const std::string& _args) {
+	std::list<std::string> tmp = ot::splitString(_args, ' ', true);
+	for (const std::string& arg : tmp) {
+		if (arg == "-logexport") m_startArgs.push_back(StartOption::LogExport);
+		else {
+			OT_LOG_W("Unknown start argument \"" + arg + "\"");
+		}
+	}
 }
 
 void AppBase::setUpdateTransparentColorStyleValueEnabled(bool _enabled) {
@@ -419,6 +430,29 @@ void AppBase::slotFinalizeInit(void) {
 	}
 	
 	this->setEnabled(true);
+
+	for (StartOption opt : m_startArgs) {
+		switch (opt) {
+		case AppBase::LogExport:
+		{
+			OTAssertNullptr(m_logger);
+			if (!m_logger->getToolIsRunning()) {
+				m_toolManager->runTool(m_logger->getToolName());
+			}
+
+			if (m_logger->getToolIsRunning()) {
+				QMetaObject::invokeMethod(m_logger, &Logging::runQuickExport, Qt::QueuedConnection);
+			}
+			else {
+				OT_LOG_E("Failed to start logger");
+			}
+		}
+			// Auto start logger
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {

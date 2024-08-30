@@ -52,7 +52,7 @@ public:
 
 	//! @brief Return the unique tool name
 	//! The name will be used to create all required menu entries
-	virtual QString toolName(void) const override;
+	virtual QString getToolName(void) const override;
 
 	//! @brief Create the central widget that will be displayed to the user in the main tab view
 	virtual bool runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) override;
@@ -70,6 +70,7 @@ public:
 	void appendLogMessages(const QList<ot::LogMessage>& _messages);
 
 public Q_SLOTS:
+	void runQuickExport(void);
 	void slotConnect(void);
 	void slotAutoConnect(void);
 	void slotImport(void);

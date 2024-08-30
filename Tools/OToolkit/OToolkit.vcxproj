@@ -49,6 +49,7 @@
     <ClCompile Include="src\MenuManager.cpp" />
     <ClCompile Include="src\NetworkTools.cpp" />
     <ClCompile Include="src\PortBlockerServer.cpp" />
+    <ClCompile Include="src\QuickLogExport.cpp" />
     <ClCompile Include="src\Randomizer.cpp" />
     <ClCompile Include="src\SettingsManager.cpp" />
     <ClCompile Include="src\StatusManager.cpp" />
@@ -88,6 +89,7 @@
     <QtMoc Include="include\LogVisualizationItemViewDialog.h" />
     <QtMoc Include="include\LoggingFilterView.h" />
     <QtMoc Include="include\LogModeSetter.h" />
+    <QtMoc Include="include\QuickLogExport.h" />
     <ClInclude Include="include\WrappedArcItem.h" />
     <ClInclude Include="include\WrappedItemFactory.h" />
     <ClInclude Include="include\WrappedPolygonItem.h" />

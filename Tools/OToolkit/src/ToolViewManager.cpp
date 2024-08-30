@@ -26,13 +26,13 @@ ToolViewManager::~ToolViewManager() {
 // Tool management
 
 void ToolViewManager::addTool(ToolRuntimeHandler* _handler) {
-	const auto& it = m_nameMap.find(_handler->getTool()->toolName());
+	const auto& it = m_nameMap.find(_handler->getTool()->getToolName());
 	if (it != m_nameMap.end()) {
-		OT_LOG_E("Tool \"" + _handler->getTool()->toolName().toStdString() + "\" already exists.");
+		OT_LOG_E("Tool \"" + _handler->getTool()->getToolName().toStdString() + "\" already exists.");
 		return;
 	}
 
-	m_nameMap.insert_or_assign(_handler->getTool()->toolName(), _handler);
+	m_nameMap.insert_or_assign(_handler->getTool()->getToolName(), _handler);
 }
 
 void ToolViewManager::removeTool(const QString& _toolName) {
@@ -102,7 +102,7 @@ void ToolViewManager::slotViewFocused(ot::WidgetView* _view) {
 	OTAssertNullptr(it->second);
 	OTAssertNullptr(it->second->getTool());
 	
-	Q_EMIT viewFocused(QString::fromStdString(_view->getViewData().getName()), it->second->getTool()->toolName());
+	Q_EMIT viewFocused(QString::fromStdString(_view->getViewData().getName()), it->second->getTool()->getToolName());
 }
 
 void ToolViewManager::slotViewFocusLost(ot::WidgetView* _view) {
@@ -119,7 +119,7 @@ void ToolViewManager::slotViewFocusLost(ot::WidgetView* _view) {
 	OTAssertNullptr(it->second);
 	OTAssertNullptr(it->second->getTool());
 
-	Q_EMIT viewFocusLost(QString::fromStdString(_view->getViewData().getName()), it->second->getTool()->toolName());
+	Q_EMIT viewFocusLost(QString::fromStdString(_view->getViewData().getName()), it->second->getTool()->getToolName());
 }
 
 void ToolViewManager::slotViewCloseRequested(ot::WidgetView* _view) {
@@ -136,7 +136,7 @@ void ToolViewManager::slotViewCloseRequested(ot::WidgetView* _view) {
 	OTAssertNullptr(it->second);
 	OTAssertNullptr(it->second->getTool());
 
-	Q_EMIT viewCloseRequested(QString::fromStdString(_view->getViewData().getName()), it->second->getTool()->toolName());
+	Q_EMIT viewCloseRequested(QString::fromStdString(_view->getViewData().getName()), it->second->getTool()->getToolName());
 }
 
 bool ToolViewManager::isViewIgnored(ot::WidgetView* _view) const {

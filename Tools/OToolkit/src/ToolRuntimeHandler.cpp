@@ -11,7 +11,7 @@
 #include "OTCore/Logger.h"
 
 ToolRuntimeHandler::ToolRuntimeHandler(otoolkit::Tool* _tool, ToolManager* _manager) 
-	: m_tool(_tool), m_isRunning(false), m_manager(_manager)
+	: m_tool(_tool), m_manager(_manager)
 {
 	OTAssertNullptr(m_manager);
 }

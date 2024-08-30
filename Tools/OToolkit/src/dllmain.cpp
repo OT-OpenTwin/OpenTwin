@@ -38,6 +38,7 @@
 namespace otoolkit {
 	namespace intern {
 		static std::string g_serviceURL{ };
+		static std::string g_otoolitArgs{ };
 		static bool g_starting{ true };
 	}
 }
@@ -123,6 +124,8 @@ void mainApplicationThread()
 		AppBase::instance()->setUrl(QString::fromStdString(otoolkit::intern::g_serviceURL));
 
 		AppBase::instance()->setUpdateTransparentColorStyleValueEnabled(true);
+		
+		AppBase::instance()->parseStartArgs(otoolkit::intern::g_otoolitArgs);
 
 		otoolkit::intern::g_starting = false;
 
@@ -145,10 +148,11 @@ void mainApplicationThread()
 
 extern "C"
 {
-	_declspec(dllexport) int init(const char * _unused1, const char * _ownUrl, const char * _unused2, const char * _unused3)
+	_declspec(dllexport) int init(const char * _unused1, const char * _ownUrl, const char * _unused2, const char * _OToolkitArgs)
 	{
 		try {
 			otoolkit::intern::g_serviceURL = _ownUrl;
+			otoolkit::intern::g_otoolitArgs = _OToolkitArgs;
 
 			// Run the main application thread detached
 			std::thread appt(mainApplicationThread);

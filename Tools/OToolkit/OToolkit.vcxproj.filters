@@ -222,6 +222,9 @@
     <ClCompile Include="src\LogModeSetter.cpp">
       <Filter>Source Files\Logger</Filter>
     </ClCompile>
+    <ClCompile Include="src\QuickLogExport.cpp">
+      <Filter>Source Files\Logger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\JSONEditor.h">
@@ -371,6 +374,9 @@
       <Filter>Header Files\Logger</Filter>
     </QtMoc>
     <QtMoc Include="include\LogModeSetter.h">
+      <Filter>Header Files\Logger</Filter>
+    </QtMoc>
+    <QtMoc Include="include\QuickLogExport.h">
       <Filter>Header Files\Logger</Filter>
     </QtMoc>
   </ItemGroup>

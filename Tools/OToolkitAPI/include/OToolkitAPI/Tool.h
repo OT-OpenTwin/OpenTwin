@@ -36,7 +36,7 @@ namespace otoolkit {
 
 		//! @brief Return the unique tool name
 		//! The name will be used to create all required menu entries
-		virtual QString toolName(void) const = 0;
+		virtual QString getToolName(void) const = 0;
 
 		//! @brief Create all widgets.
 		//! The menu already contains the following items:
@@ -53,7 +53,7 @@ namespace otoolkit {
 		// Optional virtual functions
 
 		//! @brief Return the icon that will be used in the tool menu
-		virtual QIcon toolIcon(void) const { return QIcon(); };
+		virtual QIcon getToolIcon(void) const { return QIcon(); };
 
 		//! @brief Stop all the logic of this tool
 		virtual bool prepareToolShutdown(QSettings& _settings) { return true; };
@@ -62,6 +62,13 @@ namespace otoolkit {
 
 		virtual void toolWasHidden(void) {};
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Setter / Getter
+
+		void setToolIsRunning(bool _isRunning) { m_isRunning = _isRunning; };
+		bool getToolIsRunning(void) const { return m_isRunning; }
+
 	protected:
 		ot::WidgetView* createCentralWidgetView(QWidget* _widget, const QString& _widgetName) const;
 		ot::WidgetView* createSideWidgetView(QWidget* _widget, const QString& _widgetName) const;
@@ -69,6 +76,8 @@ namespace otoolkit {
 
 	private:
 		ot::WidgetView* createWidgetView(QWidget* _widget, const QString& _widgetName) const;
+
+		bool m_isRunning;
 	};
 
 }

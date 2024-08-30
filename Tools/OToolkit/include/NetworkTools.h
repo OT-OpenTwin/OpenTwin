@@ -38,7 +38,7 @@ public:
 
 	//! @brief Return the unique tool name
 	//! The name will be used to create all required menu entries
-	virtual QString toolName(void) const override { return QString("Network Tools"); };
+	virtual QString getToolName(void) const override { return QString("Network Tools"); };
 
 	//! @brief Create the central widget that will be displayed to the user in the main tab view
 	virtual bool runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) override;

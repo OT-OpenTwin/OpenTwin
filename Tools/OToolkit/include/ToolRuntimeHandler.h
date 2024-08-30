@@ -22,10 +22,6 @@ public:
 
 	otoolkit::Tool* getTool(void) { return m_tool; };
 
-	void setRunning(void) { m_isRunning = true; };
-	void setStopped(void) { m_isRunning = false; };
-	bool isRunning(void) const { return m_isRunning; };
-
 	void setToolWidgets(const otoolkit::ToolWidgets& _toolWidgets) { m_toolWidgets = _toolWidgets; };
 	const otoolkit::ToolWidgets& getToolWidgets(void) const { return m_toolWidgets; };
 	otoolkit::ToolWidgets& getToolWidgets(void) { return m_toolWidgets; };
@@ -36,7 +32,6 @@ private:
 	ToolManager* m_manager;
 	otoolkit::Tool* m_tool;
 	otoolkit::ToolWidgets m_toolWidgets;
-	bool m_isRunning;
 
 	ToolRuntimeHandler() = delete;
 };
