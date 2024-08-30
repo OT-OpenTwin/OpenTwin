@@ -26,6 +26,7 @@ public:
 	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> findAllEntityBlockConnections();
 	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
 	void AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name);
+	void AddConnectionToConnection(const std::list<ot::GraphicsConnectionCfg>& connections, std::string editorName, ot::Point2DD pos);
 	NGSpice m_ngSpice;
 
 	//Function for resultCurves of Simulation

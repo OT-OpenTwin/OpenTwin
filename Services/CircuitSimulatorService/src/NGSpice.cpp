@@ -53,8 +53,6 @@ void NGSpice::clearBufferStructure(std::string name)
 	this->connectionNodeNumbers.clear();
 	Numbers::nodeNumber = 1;
 	SimulationResults::getInstance()->getResultMap().clear();
-	
-
 }
 
 
@@ -78,10 +76,6 @@ void NGSpice::connectionAlgorithm(bool gnd,std::string startingElement,int count
 	{
 		Connection myConn = createConnection(allConnectionEntities, connection);
 
-		
-		
-		
-
 		//First i check if the connection is connected to GND If yes then i state it with node number 0 
 		//I check now if the netlist has gnd Element, if yes i do the whole generation with assuming the GND Element
 		if (gnd == true && startingElement == "EntityBlockCircuitGND")
@@ -95,9 +89,6 @@ void NGSpice::connectionAlgorithm(bool gnd,std::string startingElement,int count
 
 			if (checkIfConnectionIsConnectedToGND(myConn.getOriginConnectable()) ||
 				checkIfConnectionIsConnectedToGND(myConn.getDestConnectable())) {
-
-
-				
 
 				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
 				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
@@ -198,8 +189,6 @@ void NGSpice::connectionAlgorithm(bool gnd,std::string startingElement,int count
 		//If the whole netlist has no gnd at all i do the generation assuming no gnd and no "0" node
 		else
 		{
-
-
 			// Here i check if connection already exists
 			if (checkIfElementOrConnectionVisited(visitedElements, connection))
 			{
@@ -295,8 +284,6 @@ bool NGSpice::checkIfConnectionIsConnectedToVoltageMeter(std::string blockTitle)
 	}
 	
 }
-
-
 
 
 void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)

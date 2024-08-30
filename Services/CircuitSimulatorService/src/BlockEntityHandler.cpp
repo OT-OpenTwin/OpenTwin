@@ -291,6 +291,54 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 
 }
 
+void BlockEntityHandler::AddConnectionToConnection(const std::list<ot::GraphicsConnectionCfg>& connections, std::string editorName, ot::Point2DD pos)
+{
+	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
+	auto connectionEntitiesByID = findAllEntityBlockConnections();
+	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
+	std::list<std::string> entitiesToDelete;
+	std::list<ot::UID> topologyEntityIDList;
+	std::list<ot::UID> topologyEntityVersionList;
+
+	for (auto connection : connections)
+	{
+		//First i get the connection which i want to delete by the connection to be added
+		if (connectionEntitiesByID.find(connection.getDestinationUid()) != connectionEntitiesByID.end()) {
+			//Now i got the connection and want to delete it at the blocks
+			std::shared_ptr<EntityBlockConnection> connectionToDelete = connectionEntitiesByID[connection.getDestinationUid()];
+
+			// Here I check if the the blocks which are connected to the connection exist
+			if (blockEntitiesByBlockID.find(connectionToDelete->getConnectionCfg().getDestinationUid()) != blockEntitiesByBlockID.end() &&
+				blockEntitiesByBlockID.find(connectionToDelete->getConnectionCfg().getOriginUid()) != blockEntitiesByBlockID.end())
+			{
+				//Now I delete the connection at the blocks
+				blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getDestinationUid())]->RemoveConnection(connectionToDelete->getEntityID());
+				blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getOriginUid())]->RemoveConnection(connectionToDelete->getEntityID());
+
+				entitiesForUpdate.push_back(blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getDestinationUid())]);
+				entitiesForUpdate.push_back(blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getOriginUid())]);
+
+
+				entitiesToDelete.push_back(connectionToDelete->getName());
+
+				for (auto entityForUpdate : entitiesForUpdate)
+				{
+					entityForUpdate->StoreToDataBase();
+					topologyEntityIDList.push_back(entityForUpdate->getEntityID());
+					topologyEntityVersionList.push_back(entityForUpdate->getEntityStorageVersion());
+				}
+
+				_modelComponent->deleteEntitiesFromModel(entitiesToDelete);
+				_modelComponent->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, "Removed Connection from Blocks");
+
+
+				
+			}
+		}
+	}
+
+}
+
 void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<EntityBlock> blockEntity) {
 	EntityBlockCircuitVoltageSource* CircuitElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
 	if (CircuitElement != nullptr) {

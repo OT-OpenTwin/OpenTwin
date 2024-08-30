@@ -445,6 +445,21 @@ std::string Application::handleItemChanged(ot::JsonDocument& _document) {
 	return "";
 }
 
+std::string Application::handleConnectionToConnection(ot::JsonDocument& _document) {
+
+	ot::GraphicsConnectionPackage pckg;
+	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
+
+	std::string editorName = pckg.name();
+	
+	ot::Point2DD pos;
+	pos.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_POSITION));
+	m_blockEntityHandler.setPackageName(editorName);
+	m_blockEntityHandler.AddConnectionToConnection(pckg.connections(), editorName, pos);
+	
+	return "";
+}
+
 // ############################## ####################################################################################################################################################################################
 
 // Required functions
