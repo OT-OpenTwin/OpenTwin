@@ -62,11 +62,14 @@ public:
 	virtual bool updateFromProperties() override;
 
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
+
+	static const std::string getIconName() {return "Database_access.svg";}
 protected:
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 private:
+
 	const std::string m_propertyNameProjectName = "Projectname";
 
 	const std::string m_propertyNameDimension = "Outcome dimension";
@@ -94,7 +97,7 @@ private:
 	ot::Connector m_connectorParameter1;
 	ot::Connector m_connectorParameter2;
 	ot::Connector m_connectorParameter3;
-	
+
 	void createUpdatedProperty(const std::string& _propName, const std::string& _propGroup, const std::string& _labelValue, EntityProperties& properties);
 
 	const ValueComparisionDefinition getSelectedValueComparisionDefinition(const std::string& _groupName);

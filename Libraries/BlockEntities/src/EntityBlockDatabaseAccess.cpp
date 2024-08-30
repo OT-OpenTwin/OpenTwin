@@ -2,13 +2,13 @@
 #include "OTCommunication/ActionTypes.h"
 #include "EntityBlockDatabaseAccess.h"
 #include "EntityBlockConnection.h"	
-
+#include "SharedResources.h"
 
 EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-	_navigationTreeIconName = "BlockDataBaseAccess";
-	_navigationTreeIconNameHidden = "BlockDataBaseAccess";
+	_navigationTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	_navigationTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
 	_blockTitle = "Database Access";
 
 
@@ -294,8 +294,8 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::CreateBlockCfg()
 	const ot::Color colourTitle(ot::Lime);
 	const ot::Color colourBackground(ot::White);
 	block.setTitleBackgroundGradientColor(colourTitle);
-	block.setLeftTitleCornerImagePath("Images/Database.png");
-	block.setBackgroundImagePath("Images/Database.svg");
+	block.setLeftTitleCornerImagePath(BlockEntities::SharedResources::getCornerImagePath() + BlockEntities::SharedResources::getCornerImageNameDB());
+	block.setBackgroundImagePath(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
 
 	AddConnectors(block);
 
@@ -402,6 +402,7 @@ ValueCharacteristicProperties EntityBlockDatabaseAccess::getValueCharacteristics
 
 	return valueCharacteristicProperties;
 }
+
 
 void EntityBlockDatabaseAccess::createUpdatedProperty(const std::string& _propName, const std::string& _propGroup, const std::string& _labelValue, EntityProperties& _properties)
 {

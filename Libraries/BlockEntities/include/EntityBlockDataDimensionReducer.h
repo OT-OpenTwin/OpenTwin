@@ -17,6 +17,7 @@ public:
 	const ot::Connector* getOutputConnector() const { return &_outputConnector; }
 	
 	virtual bool updateFromProperties() override;
+	static const std::string getIconName() { return "Database_reducer.svg"; }
 private:
 	int _minValue = 1;
 	

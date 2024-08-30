@@ -13,6 +13,8 @@ public:
 	int32_t getNumberOfQuantities();
 	int32_t getNumberOfParameters();
 	int32_t getNumberOfMetaData();
+
+	static const std::string getIconName() { return "Database_store.svg"; }
 private:	
 	std::list<ot::Connector*> m_quantityInputs;
 	const std::string m_quantityInputNameBase = "Quantity";
@@ -26,6 +28,7 @@ private:
 	const std::string m_propertyNbOfMetaData = "Number of meta data";
 	const std::string m_groupGeneral = "General";
 
+	void createParameterProperties(const std::string& _groupName);
 
 	void createConnectors();
 	void clearConnectors();

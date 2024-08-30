@@ -1731,8 +1731,22 @@ ID AppBase::addNavigationTreeItem(const QString & _treePath, char _delimiter, bo
 	return id;
 }
 
-void AppBase::setNavigationTreeItemIcon(ID _itemID, const QString & _iconName, const QString & _iconPath) {
-	m_projectNavigation->setItemIcon(_itemID, ot::IconManager::getIcon(_iconPath + "/" + _iconName + ".png"));
+void AppBase::setNavigationTreeItemIcon(ID _itemID, const QString & _iconName, const QString & _iconDefaultPath) {
+
+
+
+	QString fullIconPath;
+	if (_iconName.indexOf('/') == -1)
+	{
+		fullIconPath += _iconDefaultPath + "/";
+	}
+	fullIconPath += _iconName;
+	//If no data type was set, png is set as default.
+	if (fullIconPath.indexOf('.') == -1)
+	{
+		fullIconPath += ".png";
+	}
+	m_projectNavigation->setItemIcon(_itemID, ot::IconManager::getIcon(fullIconPath));
 }
 
 void AppBase::setNavigationTreeItemText(ID _itemID, const QString & _itemName) {

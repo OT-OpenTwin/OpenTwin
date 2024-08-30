@@ -1,11 +1,12 @@
 #include "EntityBlockPlot1D.h"
 #include "OTCommunication/ActionTypes.h"
+#include "SharedResources.h"
 
 EntityBlockPlot1D::EntityBlockPlot1D(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-	_navigationTreeIconName = "Plot1DVisible";
-	_navigationTreeIconNameHidden = "Plot1DVisible";
+	_navigationTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	_navigationTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
 	_blockTitle = "Plot 1D";
 
 	const std::string index = "1";
@@ -134,7 +135,8 @@ ot::GraphicsItemCfg* EntityBlockPlot1D::CreateBlockCfg()
 
 	const ot::Color colourTitle(ot::Yellow);
 	block.setTitleBackgroundGradientColor(colourTitle);
-	block.setBackgroundImagePath("Images/Graph.svg");
+	block.setLeftTitleCornerImagePath(BlockEntities::SharedResources::getCornerImagePath() + BlockEntities::SharedResources::getCornerImageNameVis());
+	block.setBackgroundImagePath(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
 	//block.setToolTip("Plots the X and Y values in a 1D plot");
 	AddConnectors(block);
 	

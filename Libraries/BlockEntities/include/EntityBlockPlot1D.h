@@ -22,6 +22,8 @@ public:
 	const std::list<const ot::Connector*> getConnectorsYAxis();
 	const std::list<std::string> getCurveNames();
 	const int getNumberOfCurves();
+
+	static const std::string getIconName() { return "Graph.svg"; }
 private:
 	ot::Connector _xAxisConnector;
 	

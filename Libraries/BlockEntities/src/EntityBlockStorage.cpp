@@ -1,10 +1,11 @@
 #include "EntityBlockStorage.h"
+#include "SharedResources.h"
 
 EntityBlockStorage::EntityBlockStorage(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-	_navigationTreeIconName = "BlockDataBaseAccess";
-	_navigationTreeIconNameHidden = "BlockDataBaseAccess";
+	_navigationTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	_navigationTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
 	_blockTitle = "Store in Database";
 }
 
@@ -17,8 +18,8 @@ ot::GraphicsItemCfg* EntityBlockStorage::CreateBlockCfg()
 	const ot::Color colourTitle(ot::Lime);
 	const ot::Color colourBackground(ot::White);
 	block.setTitleBackgroundGradientColor(colourTitle);
-	block.setLeftTitleCornerImagePath("Images/Database.png");
-	block.setBackgroundImagePath("Images/Database.svg");
+	block.setLeftTitleCornerImagePath(BlockEntities::SharedResources::getCornerImagePath() + BlockEntities::SharedResources::getCornerImageNameDB());
+	block.setBackgroundImagePath(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
 
 	AddConnectors(block);
 
@@ -109,6 +110,11 @@ int32_t EntityBlockStorage::getNumberOfMetaData()
 	EntityPropertiesInteger* integerProp = dynamic_cast<EntityPropertiesInteger*>(base);
 	assert(integerProp != nullptr);
 	return integerProp->getValue();
+}
+
+void EntityBlockStorage::createParameterProperties(const std::string& _groupName)
+{
+	EntityPropertiesBoolean::createProperty(_groupName, "Constant for entire dataset",false,"default",getProperties());
 }
 
 void EntityBlockStorage::createConnectors()

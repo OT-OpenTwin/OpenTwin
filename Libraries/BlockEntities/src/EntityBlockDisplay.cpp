@@ -1,12 +1,13 @@
 #include "EntityBlockDisplay.h"
+#include "SharedResources.h"
 
 EntityBlockDisplay::EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
 	_inputConnector = { ot::ConnectorType::In, "Input", "Input"};
 	_connectorsByName[_inputConnector.getConnectorName()] = _inputConnector;
-	_navigationTreeIconName = "chardevice";
-	_navigationTreeIconNameHidden = "chardevice";
+	_navigationTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	_navigationTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
 	_blockTitle = "Display";
 }
 
@@ -30,7 +31,8 @@ ot::GraphicsItemCfg* EntityBlockDisplay::CreateBlockCfg()
 	
 	const ot::Color colourTitle(ot::Yellow);
 	block.setTitleBackgroundGradientColor(colourTitle);
-	block.setLeftTitleCornerImagePath("Default/chardevice.png");
+	block.setLeftTitleCornerImagePath(BlockEntities::SharedResources::getCornerImagePath() + BlockEntities::SharedResources::getCornerImageNameVis());
+	block.setBackgroundImagePath(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
 	AddConnectors(block);
 
 	ot::GraphicsItemCfg* graphicsItemConfig = block.createGraphicsItem();

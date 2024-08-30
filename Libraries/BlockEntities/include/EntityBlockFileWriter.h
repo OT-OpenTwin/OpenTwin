@@ -18,6 +18,8 @@ public:
 	const std::string& getFileModeAppend() const { return m_fileModeAppend; }
 	const std::string& getFileModeOverride() const { return m_fileModeOverride; }
 
+	static std::string getIconName(){ return "TextFile.svg"; }
+
 private:
 	ot::Connector m_inputConnector;
 	const std::string m_fileModeAppend = "Append";

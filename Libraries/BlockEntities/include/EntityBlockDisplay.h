@@ -13,6 +13,8 @@ public:
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 	const ot::Connector& getConnectorInput() const { return _inputConnector; }
 
+	static const std::string getIconName() { return "Monitor.svg"; }
+
 private:
 	ot::Connector _inputConnector;
 };

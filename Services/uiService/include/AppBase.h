@@ -348,7 +348,7 @@ public:
 
 	ak::ID addNavigationTreeItem(const QString & _treePath, char _delimiter, bool _isEditable, bool selectChildren);
 
-	void setNavigationTreeItemIcon(ak::ID _itemID, const QString & _iconName, const QString & _iconPath);
+	void setNavigationTreeItemIcon(ak::ID _itemID, const QString & _iconName, const QString & _iconDefaultPath);
 
 	void setNavigationTreeItemText(ak::ID _itemID, const QString & _itemName);
 

@@ -13,6 +13,7 @@ public:
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
 	virtual bool updateFromProperties() override;
 
+	static const std::string getIconName() { return "Script.svg"; }
 private:
 	const std::string _propertyNameScripts = "Scripts";
 

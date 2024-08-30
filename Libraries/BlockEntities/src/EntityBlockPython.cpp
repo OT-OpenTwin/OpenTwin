@@ -1,12 +1,13 @@
 #include "EntityBlockPython.h"
 #include "OTCommunication/ActionTypes.h"
 #include "PythonHeaderInterpreter.h"
+#include "SharedResources.h"
 
 EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
-	_navigationTreeIconName = "python";
-	_navigationTreeIconNameHidden = "python";
+	_navigationTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	_navigationTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
 	_blockTitle = "Python";
 }
 
@@ -33,8 +34,8 @@ ot::GraphicsItemCfg* EntityBlockPython::CreateBlockCfg()
 	const ot::Color colourTitle(ot::Cyan);
 	const ot::Color colourBackground(ot::White);
 	block.setTitleBackgroundGradientColor(colourTitle);
-	block.setLeftTitleCornerImagePath("Images/Python.png");
-	block.setBackgroundImagePath("Images/Script.svg");
+	block.setLeftTitleCornerImagePath(BlockEntities::SharedResources::getCornerImagePath() + BlockEntities::SharedResources::getCornerImageNamePython());
+	block.setBackgroundImagePath(BlockEntities::SharedResources::getCornerImagePath() + getIconName());
 	//block.setBackgroundImageInsertMode(ot::GraphicsFlowItemBuilder::OnStack);
 
 	const std::string blockName = getClassName();

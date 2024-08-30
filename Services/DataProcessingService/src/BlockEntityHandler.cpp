@@ -16,7 +16,7 @@
 #include "EntityBlockConnection.h"
 #include "EntityBlockDisplay.h"
 #include "EntityBlockFileWriter.h"
-
+#include "SharedResources.h"
 
 void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName,ot::Point2DD& position)
 {
@@ -222,25 +222,25 @@ ot::GraphicsNewEditorPackage* BlockEntityHandler::BuildUpBlockPicker()
 	controlBlockCollection->addChildCollection(controlBlockVisualizationCollection);
 
 	EntityBlockPython pythonBlock(0, nullptr, nullptr, nullptr, nullptr, "");
-	customizedBlockCollection->addItem(pythonBlock.getClassName(), pythonBlock.CreateBlockHeadline(), "Default/Python.png");
+	customizedBlockCollection->addItem(pythonBlock.getClassName(), pythonBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockPython::getIconName());
 
 	EntityBlockDatabaseAccess dbAccessBlock(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockDatabaseCollection->addItem(dbAccessBlock.getClassName(), dbAccessBlock.CreateBlockHeadline(), "Default/database.png");
+	controlBlockDatabaseCollection->addItem(dbAccessBlock.getClassName(), dbAccessBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath()+ EntityBlockDatabaseAccess::getIconName());
 
 	EntityBlockPlot1D plotBlock(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockVisualizationCollection->addItem(plotBlock.getClassName(), plotBlock.CreateBlockHeadline(), "Images/Graph.jpg");
+	controlBlockVisualizationCollection->addItem(plotBlock.getClassName(), plotBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockPlot1D::getIconName());
 
 	EntityBlockDisplay displayBlock(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockVisualizationCollection->addItem(displayBlock.getClassName(), displayBlock.CreateBlockHeadline(), "Default/chardevice.png");
+	controlBlockVisualizationCollection->addItem(displayBlock.getClassName(), displayBlock.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockDisplay::getIconName());
 
 	EntityBlockDataDimensionReducer dimensionReducer(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockDatabaseCollection->addItem(dimensionReducer.getClassName(), dimensionReducer.CreateBlockHeadline(), "Default/database.png");
+	controlBlockDatabaseCollection->addItem(dimensionReducer.getClassName(), dimensionReducer.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockDataDimensionReducer::getIconName());
 
 	EntityBlockStorage storage(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockDatabaseCollection->addItem(storage.getClassName(), storage.CreateBlockHeadline(), "Default/database.png");
+	controlBlockDatabaseCollection->addItem(storage.getClassName(), storage.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockStorage::getIconName());
 
 	EntityBlockFileWriter fileWriter(0, nullptr, nullptr, nullptr, nullptr, "");
-	controlBlockDatabaseCollection->addItem(fileWriter.getClassName(), fileWriter.CreateBlockHeadline(), "Default/RenameItem.png");
+	controlBlockDatabaseCollection->addItem(fileWriter.getClassName(), fileWriter.CreateBlockHeadline(), BlockEntities::SharedResources::getCornerImagePath() + EntityBlockFileWriter::getIconName());
 
 	pckg->addCollection(controlBlockCollection);
 	pckg->addCollection(customizedBlockCollection);
