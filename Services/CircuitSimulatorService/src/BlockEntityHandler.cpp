@@ -328,11 +328,18 @@ void BlockEntityHandler::AddConnectionToConnection(const std::list<ot::GraphicsC
 					topologyEntityVersionList.push_back(entityForUpdate->getEntityStorageVersion());
 				}
 
+				// Now i remove the connections from model
 				_modelComponent->deleteEntitiesFromModel(entitiesToDelete);
 				_modelComponent->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, "Removed Connection from Blocks");
 
+				// As next step i need to add the intersection item 
 
-				
+				CreateBlockEntity(editorName, "EntityBlockCircuitConnector", pos);
+
+				//Add Connections
+
+
+
 			}
 		}
 	}
