@@ -13,17 +13,8 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT TableHeaderItemCfg : public Serializable {
 	public:
-		enum ResizeMode {
-			Default,
-			ResizeToContents,
-			Stretch
-		};
-
-		static ResizeMode stringToResizeMode(const std::string& _mode);
-		static std::string resizeModeToString(ResizeMode _mode);
-
 		TableHeaderItemCfg();
-		TableHeaderItemCfg(const std::string& _text, ResizeMode _resizeMode = ResizeMode::Default);
+		TableHeaderItemCfg(const std::string& _text);
 		TableHeaderItemCfg(const TableHeaderItemCfg& _other);
 		virtual ~TableHeaderItemCfg();
 
@@ -39,8 +30,10 @@ namespace ot {
 		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		void setText(const std::string& _text) { m_text = _text; };
+		const std::string& getText(void) const { return m_text; };
+
 	private:
-		ResizeMode m_resizeMode;
 		std::string m_text;
 	};
 

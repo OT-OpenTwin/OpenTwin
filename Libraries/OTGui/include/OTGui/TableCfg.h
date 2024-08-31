@@ -53,8 +53,11 @@ namespace ot {
 		
 		void setRowHeader(int _row, const std::string& _headerText);
 		void setRowHeader(int _row, TableHeaderItemCfg* _item);
+		const TableHeaderItemCfg* getRowHeader(int _row) const;
+
 		void setColumnHeader(int _column, const std::string& _headerText);
 		void setColumnHeader(int _column, TableHeaderItemCfg* _item);
+		const TableHeaderItemCfg* getColumnHeader(int _column) const;
 
 	private:
 		void initialize(void);

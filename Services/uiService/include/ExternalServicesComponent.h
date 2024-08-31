@@ -213,7 +213,6 @@ public:
 	OT_HANDLER(handleStoreFileInDatabase, ExternalServicesComponent, OT_Action_CMD_UI_StoreFileInDataBase, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSaveFileContent, ExternalServicesComponent, OT_ACTION_CMD_UI_SaveFileContent, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSelectFilesForStoring, ExternalServicesComponent, OT_ACTION_CMD_UI_SelectFileForStoring, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleTableChange, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleFillPropertyGrid, ExternalServicesComponent, OT_ACTION_CMD_UI_FillPropertyGrid, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddMenuPage, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuPage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddMenuGroup, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuGroup, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -257,12 +256,6 @@ public:
 	OT_HANDLER(handleTetMeshNodeTetEdges, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_TetMeshNodeTetEdges, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddMeshItemFromFacetDatabase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshItemFromFacetDatabase, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddText, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddText, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddTable, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGetTableSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleShowTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSetTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SetTable, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleSelectRanges, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleColorSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddPlot1D, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddPlot1D, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handlePlot1DPropertiesChanged, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleResult1DPropertiesChanged, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Result1DPropsChanged, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -299,6 +292,18 @@ public:
 	OT_HANDLER(handleSetTextEditorModified, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleCloseTextEditor, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_Close, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleCloseAllTextEditors, ExternalServicesComponent, OT_ACTION_CMD_UI_TEXTEDITOR_CloseAll, ot::MessageType::ALL_MESSAGE_TYPES)
+
+	// Table
+	OT_HANDLER(handleSetupTable, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_Setup, ot::MessageType::ALL_MESSAGE_TYPES)
+
+	// Table Old
+	OT_HANDLER(handleTableChange, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddTable, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleGetTableSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleShowTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SetTable, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSelectRanges, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleColorSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection, ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// Studio Suite API
 	OT_HANDLER(handleStudioSuiteImport, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_IMPORT, ot::MessageType::ALL_MESSAGE_TYPES)

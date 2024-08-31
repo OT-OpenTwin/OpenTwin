@@ -284,6 +284,8 @@
 #define OT_ACTION_CMD_UI_TEXTEDITOR_Close "UI.TextEditor.Close"
 #define OT_ACTION_CMD_UI_TEXTEDITOR_CloseAll "UI.TextEditor.CloseAll"
 
+#define OT_ACTION_CMD_UI_TABLE_Setup "UI.Table.Setup"
+
 #define OT_ACTION_CMD_CARTESIANMESH_Run "CARTESIANMESH.Run"
 
 

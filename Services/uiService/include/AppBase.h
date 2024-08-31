@@ -24,6 +24,7 @@
 #include "OTCore/OwnerService.h"
 #include "OTCore/OwnerManagerTemplate.h"
 #include "OTGui/Property.h"
+#include "OTGui/TableCfg.h"
 #include "OTGui/TextEditorCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/PropertyGridCfg.h"
@@ -64,6 +65,7 @@ namespace ak { class aNotifier; class aWindow; }
 namespace ak { class aTreeWidget; }
 namespace ot { class Label; }
 namespace ot { class Property; }
+namespace ot { class TableView; }
 namespace ot { class WidgetView; }
 namespace ot { class GraphicsItem; }
 namespace ot { class GraphicsPicker; }
@@ -396,8 +398,6 @@ public:
 
 	// Property grid
 
-	// Getter
-
 	ot::PropertyGridItem* findProperty(const std::string& _groupName, const std::string& _itemName);
 	ot::PropertyGridItem* findProperty(const std::list<std::string>& _groupPath, const std::string& _itemName);
 
@@ -407,11 +407,13 @@ public:
 
 	ShortcutManager * shortcutManager(void) { return m_shortcutManager; }
 
-	// Setter
-
 	void clearPropertyGrid(void);
 
 	void lockPropertyGrid(bool flag);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Graphics
 
 	void addGraphicsPickerPackage(const ot::GraphicsPickerCollectionPackage& _pckg, const ot::BasicServiceInformation& _serviceInfo);
 
@@ -424,6 +426,12 @@ public:
 
 	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
 
+	std::list<ot::GraphicsViewView*> getAllGraphicsEditors(void);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Text Editor
+
 	ot::TextEditorView* createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
 
 	ot::TextEditorView* findTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
@@ -434,7 +442,15 @@ public:
 
 	void closeAllTextEditors(const ot::BasicServiceInformation& _serviceInfo);
 
-	std::list<ot::GraphicsViewView*> getAllGraphicsEditors(void);
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Table
+
+	ot::TableView* createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
+
+	ot::TableView* findTable(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
+
+	ot::TableView* findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
 
 	// ######################################################################################################################
 
@@ -469,6 +485,7 @@ public Q_SLOTS:
 	void slotGraphicsSelectionChanged(void);
 	void slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections);
 	void slotTextEditorSaveRequested(void);
+	void slotTableSaveRequested(void);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -589,6 +606,7 @@ private:
 	
 	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::GraphicsViewView> m_graphicsViews;
 	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::TextEditorView> m_textEditors;
+	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::TableView> m_tables;
 
 	bool m_visible3D;
 	bool m_visible1D;

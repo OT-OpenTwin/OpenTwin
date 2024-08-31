@@ -48,6 +48,7 @@
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
 
+#include "OTWidgets/TableView.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
@@ -2559,33 +2560,6 @@ std::string ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocum
 	return "";
 }
 
-std::string ExternalServicesComponent::handleTableChange(ot::JsonDocument& _document) {
-	ak::UID visualizationModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
-	const std::string functionName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-	if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn)
-	{
-		bool insertLeft = ot::json::getBool(_document, OT_ACTION_PARAM_BASETYPE_Bool);
-		ViewerAPI::AddToSelectedTableColumn(insertLeft, visualizationModelID);
-	}
-	else if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow)
-	{
-		bool insertAbove = ot::json::getBool(_document, OT_ACTION_PARAM_BASETYPE_Bool);
-
-		ViewerAPI::AddToSelectedTableRow(insertAbove, visualizationModelID);
-	}
-	else if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow)
-	{
-		ViewerAPI::DeleteFromSelectedTableRow(visualizationModelID);
-	}
-	else
-	{
-		assert(functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn);
-		ViewerAPI::DeleteFromSelectedTableColumn(visualizationModelID);
-	}
-
-	return "";
-}
-
 std::string ExternalServicesComponent::handleFillPropertyGrid(ot::JsonDocument& _document) {
 	ot::PropertyGridCfg cfg;
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
@@ -3382,146 +3356,6 @@ std::string ExternalServicesComponent::handleAddText(ot::JsonDocument& _document
 	return "";
 }
 
-std::string ExternalServicesComponent::handleAddTable(ot::JsonDocument& _document) {
-	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-	ak::UID uid = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-	bool isEditable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-
-	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
-	ak::UID tableID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-	ak::UID tableVersion = _document[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
-
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
-
-	ViewerAPI::addVisualizationTableNode(visModelID, name, uid, treeIcons, isHidden, projectName, tableID, tableVersion);
-
-	return "";
-}
-
-std::string ExternalServicesComponent::handleGetTableSelection(ot::JsonDocument& _document) {
-	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
-	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-	ot::ConstJsonObject serializedColor = ot::json::getObject(_document, OT_ACTION_PARAM_COLOUR_BACKGROUND);
-
-	try {
-		ot::Color colour;
-		colour.setFromJsonObject(serializedColor);
-		std::pair<ot::UID, ot::UID> activeTableIdentifyer = ViewerAPI::GetActiveTableIdentifyer(visualizationModelID);
-
-		if (activeTableIdentifyer.first != -1)
-		{
-			SetColourOfSelectedRange(visualizationModelID, colour);
-			RequestTableSelection(visualizationModelID, senderURL, subsequentFunction);
-		}
-
-	}
-	catch (std::exception& e)
-	{
-		OT_LOG_E(e.what());
-		AppBase::instance()->appendInfoMessage("Table selection request could not be handled due to exception: " + QString(e.what()));
-	}
-
-	return "";
-}
-
-std::string ExternalServicesComponent::handleShowTable(ot::JsonDocument& _document) {
-	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-	ak::UID tableEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-	ak::UID tableEntityVersion = _document[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
-	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
-	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-	try
-	{
-		bool refreshColouring = ViewerAPI::setTable(visualizationModelID, tableEntityID, tableEntityVersion);
-
-		if (refreshColouring && subsequentFunction != "")
-		{
-			std::string tableName = ViewerAPI::getTableName(visualizationModelID);
-
-			ot::JsonDocument doc;
-			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(tableName, doc.GetAllocator()), doc.GetAllocator());
-
-			std::string response;
-			sendHttpRequest(EXECUTE, senderURL, doc, response);
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				OT_LOG_E(response);
-				AppBase::instance()->appendInfoMessage("Response while refreshing colour was false");
-			}
-		else OT_ACTION_IF_RESPONSE_WARNING(response)
-		{
-			OT_LOG_W(response);
-			AppBase::instance()->appendInfoMessage("Response while refreshing colour was false");
-		}
-		}
-	}
-	catch (std::exception& e)
-	{
-		OT_LOG_E(e.what());
-		AppBase::instance()->appendInfoMessage("Table could not be shown due to exception: " + QString(e.what()));
-	}
-
-	return "";
-}
-
-std::string ExternalServicesComponent::handleSetTable(ot::JsonDocument& _document) {
-	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-	auto tableContent = ot::json::getObject(_document, OT_ACTION_PARAM_Value);
-	ot::GenericDataStructMatrix data;
-	data.setFromJsonObject(tableContent);
-	ViewerAPI::showTable(visualizationModelID, data);
-
-	return "";
-}
-
-std::string ExternalServicesComponent::handleSelectRanges(ot::JsonDocument& _document) {
-	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-
-	auto listOfSerializedRanges = ot::json::getObjectList(_document, "Ranges");
-	std::vector<ot::TableRange> ranges;
-	ranges.reserve(listOfSerializedRanges.size());
-	for (auto range : listOfSerializedRanges)
-	{
-		ot::TableRange tableRange;
-		tableRange.setFromJsonObject(range);
-		ranges.push_back(tableRange);
-	}
-	try
-	{
-		ViewerAPI::setTableSelection(visualizationModelID, ranges);
-	}
-	catch (std::exception& e)
-	{
-		OT_LOG_E(e.what());
-		AppBase::instance()->appendInfoMessage("Table selection could not be executed due to exception: " + QString(e.what()));
-	}
-
-	return "";
-}
-
-std::string ExternalServicesComponent::handleColorSelection(ot::JsonDocument& _document) {
-	ak::UID visualizationModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
-	ot::ConstJsonObject serializedColor = ot::json::getObject(_document, OT_ACTION_PARAM_COLOUR_BACKGROUND);
-
-	try
-	{
-		ot::Color colour;
-		colour.setFromJsonObject(serializedColor);
-		ViewerAPI::ChangeColourOfSelection(visualizationModelID, colour);
-	}
-	catch (std::exception& e)
-	{
-		OT_LOG_E(e.what());
-		AppBase::instance()->appendInfoMessage("Setting color of table selection could not be executed due to exception: " + QString(e.what()));
-	}
-
-	return "";
-}
-
 std::string ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
@@ -4023,6 +3857,175 @@ std::string ExternalServicesComponent::handleCloseAllTextEditors(ot::JsonDocumen
 	info.setFromJsonObject(_document.GetConstObject());
 
 	AppBase::instance()->closeAllTextEditors(info);
+
+	return "";
+}
+
+// Table
+
+std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::TableCfg config(0, 0);
+	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+
+	ot::TableView* table = AppBase::instance()->findOrCreateTable(config, info);
+	table->setContentChanged(false);
+
+	return "";
+}
+
+// Table Old
+
+std::string ExternalServicesComponent::handleAddTable(ot::JsonDocument& _document) {
+	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
+	ak::UID uid = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
+	bool isEditable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
+
+	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	ak::UID tableID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	ak::UID tableVersion = _document[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
+
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+
+	ViewerAPI::addVisualizationTableNode(visModelID, name, uid, treeIcons, isHidden, projectName, tableID, tableVersion);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleTableChange(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	const std::string functionName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn) {
+		bool insertLeft = ot::json::getBool(_document, OT_ACTION_PARAM_BASETYPE_Bool);
+		ViewerAPI::AddToSelectedTableColumn(insertLeft, visualizationModelID);
+	}
+	else if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow) {
+		bool insertAbove = ot::json::getBool(_document, OT_ACTION_PARAM_BASETYPE_Bool);
+
+		ViewerAPI::AddToSelectedTableRow(insertAbove, visualizationModelID);
+	}
+	else if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow) {
+		ViewerAPI::DeleteFromSelectedTableRow(visualizationModelID);
+	}
+	else {
+		assert(functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn);
+		ViewerAPI::DeleteFromSelectedTableColumn(visualizationModelID);
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleGetTableSelection(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	ot::ConstJsonObject serializedColor = ot::json::getObject(_document, OT_ACTION_PARAM_COLOUR_BACKGROUND);
+
+	try {
+		ot::Color colour;
+		colour.setFromJsonObject(serializedColor);
+		std::pair<ot::UID, ot::UID> activeTableIdentifyer = ViewerAPI::GetActiveTableIdentifyer(visualizationModelID);
+
+		if (activeTableIdentifyer.first != -1) {
+			SetColourOfSelectedRange(visualizationModelID, colour);
+			RequestTableSelection(visualizationModelID, senderURL, subsequentFunction);
+		}
+
+	}
+	catch (std::exception& e) {
+		OT_LOG_E(e.what());
+		AppBase::instance()->appendInfoMessage("Table selection request could not be handled due to exception: " + QString(e.what()));
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleShowTable(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	ak::UID tableEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	ak::UID tableEntityVersion = _document[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
+	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	try {
+		bool refreshColouring = ViewerAPI::setTable(visualizationModelID, tableEntityID, tableEntityVersion);
+
+		if (refreshColouring && subsequentFunction != "") {
+			std::string tableName = ViewerAPI::getTableName(visualizationModelID);
+
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(tableName, doc.GetAllocator()), doc.GetAllocator());
+
+			std::string response;
+			sendHttpRequest(EXECUTE, senderURL, doc, response);
+			OT_ACTION_IF_RESPONSE_ERROR(response) {
+				OT_LOG_E(response);
+				AppBase::instance()->appendInfoMessage("Response while refreshing colour was false");
+			}
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			OT_LOG_W(response);
+			AppBase::instance()->appendInfoMessage("Response while refreshing colour was false");
+		}
+		}
+	}
+	catch (std::exception& e) {
+		OT_LOG_E(e.what());
+		AppBase::instance()->appendInfoMessage("Table could not be shown due to exception: " + QString(e.what()));
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetTable(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	auto tableContent = ot::json::getObject(_document, OT_ACTION_PARAM_Value);
+	ot::GenericDataStructMatrix data;
+	data.setFromJsonObject(tableContent);
+	ViewerAPI::showTable(visualizationModelID, data);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSelectRanges(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+
+	auto listOfSerializedRanges = ot::json::getObjectList(_document, "Ranges");
+	std::vector<ot::TableRange> ranges;
+	ranges.reserve(listOfSerializedRanges.size());
+	for (auto range : listOfSerializedRanges) {
+		ot::TableRange tableRange;
+		tableRange.setFromJsonObject(range);
+		ranges.push_back(tableRange);
+	}
+	try {
+		ViewerAPI::setTableSelection(visualizationModelID, ranges);
+	}
+	catch (std::exception& e) {
+		OT_LOG_E(e.what());
+		AppBase::instance()->appendInfoMessage("Table selection could not be executed due to exception: " + QString(e.what()));
+	}
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleColorSelection(ot::JsonDocument& _document) {
+	ak::UID visualizationModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	ot::ConstJsonObject serializedColor = ot::json::getObject(_document, OT_ACTION_PARAM_COLOUR_BACKGROUND);
+
+	try {
+		ot::Color colour;
+		colour.setFromJsonObject(serializedColor);
+		ViewerAPI::ChangeColourOfSelection(visualizationModelID, colour);
+	}
+	catch (std::exception& e) {
+		OT_LOG_E(e.what());
+		AppBase::instance()->appendInfoMessage("Setting color of table selection could not be executed due to exception: " + QString(e.what()));
+	}
 
 	return "";
 }

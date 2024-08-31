@@ -93,14 +93,14 @@ void ot::TableCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _a
 			columnHeaderArr.PushBack(JsonNullValue(), _allocator);
 		}
 	}
-	_object.AddMember("ColumnHeader", rowHeaderArr, _allocator);
+	_object.AddMember("ColumnHeader", columnHeaderArr, _allocator);
 
 	// Data
 	JsonArray dataArr;
 	for (const std::vector<std::string>& column : m_data) {
 		dataArr.PushBack(JsonArray(column, _allocator), _allocator);
 	}
-	_object.AddMember("Data", rowHeaderArr, _allocator);
+	_object.AddMember("Data", dataArr, _allocator);
 }
 
 void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -133,7 +133,7 @@ void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 			ConstJsonObject itmObj = json::getObject(columnHeaderArr, i);
 			TableHeaderItemCfg* newItem = new TableHeaderItemCfg;
 			newItem->setFromJsonObject(itmObj);
-			m_rowHeader[i] = newItem;
+			m_columnHeader[i] = newItem;
 		}
 	}
 
@@ -192,6 +192,11 @@ void ot::TableCfg::setRowHeader(int _row, TableHeaderItemCfg* _item) {
 	m_rowHeader[_row] = _item;
 }
 
+const ot::TableHeaderItemCfg* ot::TableCfg::getRowHeader(int _row) const {
+	OTAssert(_row < m_rows, "Index out of range");
+	return m_rowHeader[_row];
+}
+
 void ot::TableCfg::setColumnHeader(int _column, const std::string& _headerText) {
 	this->setColumnHeader(_column, new TableHeaderItemCfg(_headerText));
 }
@@ -201,6 +206,11 @@ void ot::TableCfg::setColumnHeader(int _column, TableHeaderItemCfg* _item) {
 	if (m_columnHeader[_column] == _item) return;
 	if (m_columnHeader[_column]) delete m_columnHeader[_column];
 	m_columnHeader[_column] = _item;
+}
+
+const ot::TableHeaderItemCfg* ot::TableCfg::getColumnHeader(int _column) const {
+	OTAssert(_column < m_columns, "Index out of range");
+	return m_columnHeader[_column];
 }
 
 void ot::TableCfg::initialize(void) {

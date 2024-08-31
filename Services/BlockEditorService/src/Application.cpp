@@ -25,74 +25,38 @@ Application* g_instance{ nullptr };
 
 
 // -----
-#include "OTGui/PropertyDialogCfg.h"
-#include "OTGui/OnePropertyDialogCfg.h"
-#include "OTGui/PropertyPainter2D.h"
-#include "OTGui/PropertyGroup.h"
-#include "OTGui/PropertyBool.h"
-#include "OTGui/PropertyColor.h"
-#include "OTGui/PropertyInt.h"
-#include "OTGui/PropertyDouble.h"
-#include "OTGui/PropertyString.h"
-#include "OTGui/PropertyStringList.h"
-#include "OTGui/PropertyFilePath.h"
-#include "OTGui/PropertyDirectory.h"
+#include "OTGui/TableCfg.h"
 
 std::string Application::test(void) {
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PropertyDialog, doc.GetAllocator()), doc.GetAllocator());
+	ot::BasicServiceInformation info = getBasicServiceInformation();
+	info.addToJsonObject(doc, doc.GetAllocator());
+
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_Setup, doc.GetAllocator()), doc.GetAllocator());
 	
-	ot::PropertyDialogCfg cfg;
-	cfg.setTitle("Testing");
-	cfg.setName("Testing");
+	ot::TableCfg cfg(4, 3);
+	cfg.setName("Tester");
 
-	ot::PropertyGroup* r1 = new ot::PropertyGroup("R1", "Test Root 1");
+	cfg.setColumnHeader(0, "Name");
+	cfg.setColumnHeader(1, "Age");
+	cfg.setColumnHeader(2, "Type");
 
-	ot::PropertyGroup* g1 = new ot::PropertyGroup("G1", "Base types");
-	ot::PropertyBool* cb1 = new ot::PropertyBool("Bool", false);
-	ot::PropertyInt* i1 = new ot::PropertyInt("Int", 1);
-	i1->setMin(0);
-	i1->setMax(99);
-	g1->addProperty(cb1);
-	g1->addProperty(i1);
+	cfg.setCellText(0, 0, "Peter");
+	cfg.setCellText(0, 1, "1");
+	cfg.setCellText(0, 2, "T");
 
-	ot::PropertyDouble* d1 = new ot::PropertyDouble("Double", 1.1);
-	d1->setMin(0.0);
-	d1->setMax(1000.);
-	d1->setPrecision(4);
-	g1->addProperty(d1);
+	cfg.setCellText(1, 0, "Jan");
+	cfg.setCellText(1, 1, "2");
+	cfg.setCellText(1, 2, "U");
 
-	ot::PropertyGroup* g2 = new ot::PropertyGroup("G2", "Objects");
-	ot::PropertyColor* c1 = new ot::PropertyColor("Color", ot::Color(1, 2, 3));
-	g2->addProperty(c1);
+	cfg.setCellText(2, 0, "Sebastian");
+	cfg.setCellText(2, 1, "3");
+	cfg.setCellText(2, 2, "V");
 
-	ot::PropertyString* s1 = new ot::PropertyString("String", "Test");
-	s1->setMaxLength(10);
-	g2->addProperty(s1);
+	cfg.setCellText(3, 0, "Alex");
+	cfg.setCellText(3, 1, "4");
+	cfg.setCellText(3, 2, "W");
 
-	ot::PropertyStringList* sl1 = new ot::PropertyStringList("StringList", "Test", std::list<std::string>{ "Test", "Other", "Some" });
-	g2->addProperty(sl1);
-
-	ot::PropertyGroup* g3 = new ot::PropertyGroup("G3", "File system");
-	ot::PropertyFilePath* fp1 = new ot::PropertyFilePath("FilePath", "X:/YourPath/YourFile.YourExtension");
-	g3->addProperty(fp1);
-
-	ot::PropertyFilePath* dir1 = new ot::PropertyFilePath("Directory", "X:/YourPath");
-	g3->addProperty(dir1);
-
-	r1->addChildGroup(g1);
-	r1->addChildGroup(g2);
-	r1->addChildGroup(g3);
-
-	cfg.addRootGroup(r1);
-
-	ot::PropertyGroup* r2 = new ot::PropertyGroup("R2", "Test Root 2");
-	ot::PropertyGroup* g4 = new ot::PropertyGroup("G4", "Test");
-	ot::PropertyPainter2D* pa1 = new ot::PropertyPainter2D(ot::PropertyBase("Painter2D"));
-	g4->addProperty(pa1);
-	r2->addChildGroup(g4);
-	cfg.addRootGroup(r2);
-	
 	ot::JsonObject cfgObj;
 	cfg.addToJsonObject(cfgObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());

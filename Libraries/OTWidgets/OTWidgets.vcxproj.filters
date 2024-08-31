@@ -298,6 +298,12 @@
     <ClCompile Include="src\SyntaxHighlighter.cpp">
       <Filter>src\Syntax</Filter>
     </ClCompile>
+    <ClCompile Include="src\Table.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableView.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -560,6 +566,9 @@
     <ClInclude Include="include\OTWidgets\SyntaxHighlighter.h">
       <Filter>include\Syntax</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\TableView.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -677,6 +686,9 @@
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\PlainTextEdit.h">
+      <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Table.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>

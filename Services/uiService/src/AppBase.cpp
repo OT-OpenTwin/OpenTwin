@@ -51,6 +51,7 @@
 #include "OTGui/PropertyStringList.h"
 
 #include "OTWidgets/Label.h"
+#include "OTWidgets/TableView.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/IconManager.h"
@@ -1966,8 +1967,6 @@ void AppBase::appendDebugMessage(const QString & _message) {
 
 // Property grid
 
-// Getter
-
 void AppBase::lockPropertyGrid(bool flag)
 {
 	m_propertyGrid->getTreeWidget()->setEnabled(!flag);
@@ -2009,11 +2008,13 @@ bool AppBase::getPropertyIsDeletable(const std::string& _groupName, const std::s
 	return itm->getPropertyData().getPropertyFlags() & ot::PropertyBase::IsDeletable;
 }
 
-// Setter
-
 void AppBase::clearPropertyGrid(void) {
 	m_propertyGrid->clear();
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Graphics
 
 void AppBase::clearGraphicsPickerData(void) {
 	m_graphicsPicker->clear();
@@ -2075,6 +2076,14 @@ ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _na
 	OT_LOG_D("Graphics Editor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _name + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 	return this->createNewGraphicsEditor(_name, _title, _serviceInfo);
 }
+
+std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors(void) {
+	return m_graphicsViews.getAll();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Text Editor
 
 ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
 	ot::TextEditorView* newEditor = this->findTextEditor(_config.getName(), _serviceInfo);
@@ -2155,8 +2164,52 @@ void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInf
 	}
 }
 
-std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors(void) {
-	return m_graphicsViews.getAll();
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Table
+
+ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
+	ot::TableView* newTable = this->findTable(_config.getName(), _serviceInfo);
+	if (newTable != nullptr) {
+		OT_LOG_D("Table already exists { \"Table.Name\": \"" + _config.getName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
+		return newTable;
+	}
+
+	newTable = new ot::TableView;
+	newTable->setupFromConfig(_config);
+	newTable->setViewData(ot::WidgetViewBase(_config.getName(), _config.getTitle(), ot::WidgetViewBase::ViewIsCentral /* | ot::WidgetViewBase::ViewIsCloseable */));
+
+	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newTable);
+	m_tables.store(_serviceInfo, newTable);
+
+	this->connect(newTable, &ot::TableView::saveRequested, this, &AppBase::slotTableSaveRequested);
+
+	OT_LOG_D("Table created { \"Editor.Name\": \"" + _config.getName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+
+	return newTable;
+}
+
+ot::TableView* AppBase::findTable(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
+	if (m_tables.contains(_serviceInfo)) {
+		const std::list<ot::TableView*>& lst = m_tables[_serviceInfo];
+
+		for (auto v : lst) {
+			if (v->getTableName() == _name) return v;
+		}
+	}
+
+	return nullptr;
+}
+
+ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
+	ot::TableView* v = this->findTable(_config.getName(), _serviceInfo);
+	if (v) {
+		v->setupFromConfig(_config);
+		return v;
+	}
+
+	OT_LOG_D("Table does not exist. Creating new table. { \"Table.Name\": \"" + _config.getName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	return this->createNewTable(_config, _serviceInfo);
 }
 
 // ######################################################################################################################
@@ -2461,7 +2514,7 @@ void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const 
 void AppBase::slotTextEditorSaveRequested(void) {
 	ot::TextEditorView* editor = dynamic_cast<ot::TextEditorView*>(sender());
 	if (editor == nullptr) {
-		OT_LOG_E("GraphicsScene cast failed");
+		OT_LOG_E("Text Editor cast failed");
 		return;
 	}
 
@@ -2502,6 +2555,16 @@ void AppBase::slotTextEditorSaveRequested(void) {
 			OT_LOG_EA("[FATAL] Unknown error");
 		}
 	}
+}
+
+void AppBase::slotTableSaveRequested(void) {
+	ot::TableView* table = dynamic_cast<ot::TableView*>(sender());
+	if (table == nullptr) {
+		OT_LOG_E("Table cast failed");
+		return;
+	}
+
+	// ...
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
