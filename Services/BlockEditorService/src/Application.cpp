@@ -34,28 +34,20 @@ std::string Application::test(void) {
 
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_Setup, doc.GetAllocator()), doc.GetAllocator());
 	
-	ot::TableCfg cfg(4, 3);
+	int rows = 50000;
+
+	ot::TableCfg cfg(rows, 3);
 	cfg.setName("Tester");
 
 	cfg.setColumnHeader(0, "Name");
 	cfg.setColumnHeader(1, "Age");
-	cfg.setColumnHeader(2, "Type");
+	cfg.setColumnHeader(2, "Ix");
 
-	cfg.setCellText(0, 0, "Peter");
-	cfg.setCellText(0, 1, "1");
-	cfg.setCellText(0, 2, "T");
-
-	cfg.setCellText(1, 0, "Jan");
-	cfg.setCellText(1, 1, "2");
-	cfg.setCellText(1, 2, "U");
-
-	cfg.setCellText(2, 0, "Sebastian");
-	cfg.setCellText(2, 1, "3");
-	cfg.setCellText(2, 2, "V");
-
-	cfg.setCellText(3, 0, "Alex");
-	cfg.setCellText(3, 1, "4");
-	cfg.setCellText(3, 2, "W");
+	for (int r = 0; r < rows; r++) {
+		cfg.setCellText(r, 0, "Name " + std::to_string(r + 1));
+		cfg.setCellText(r, 1, "Age  " + std::to_string(r));
+		cfg.setCellText(r, 2, "Index " + std::to_string(r));
+	}
 
 	ot::JsonObject cfgObj;
 	cfg.addToJsonObject(cfgObj, doc.GetAllocator());

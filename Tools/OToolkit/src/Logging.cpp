@@ -213,15 +213,8 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 void Logging::restoreToolSettings(QSettings& _settings) {
 	m_autoScrollToBottom->setChecked(_settings.value("Logging.AutoScrollToBottom", true).toBool());
-	QString tableColumnWidths = _settings.value("Logging.Table.ColumnWidth", "").toString();
-	QStringList tableColumnWidthsList = tableColumnWidths.split(";", Qt::SkipEmptyParts);
-	if (tableColumnWidthsList.count() == m_table->columnCount()) {
-		int column = 0;
-		for (auto w : tableColumnWidthsList) {
-			m_table->setColumnWidth(column++, w.toInt());
-		}
-	}
-
+	m_columnWidthTmp = _settings.value("Logging.Table.ColumnWidth", "").toString();
+	
 	m_logModeSetter->restoreSettings(_settings);
 	m_filterView->restoreSettings(_settings);
 
@@ -463,6 +456,17 @@ void Logging::appendLogMessages(const QList<ot::LogMessage>& _messages) {
 	m_autoScrollToBottom->setChecked(actb);
 }
 
+void Logging::slotUpdateColumnWidth(void) {
+	QStringList tableColumnWidthsList = m_columnWidthTmp.split(";", Qt::SkipEmptyParts);
+	m_columnWidthTmp.clear();
+	if (tableColumnWidthsList.count() == m_table->columnCount()) {
+		int column = 0;
+		for (auto w : tableColumnWidthsList) {
+			m_table->setColumnWidth(column++, w.toInt());
+		}
+	}
+}
+
 void Logging::runQuickExport(void) {
 	if (m_loggerUrl.empty()) {
 		ConnectToLoggerDialog dia;
@@ -573,7 +577,11 @@ void Logging::connectToLogger(bool _isAutoConnect) {
 	m_connectButton->setIcon(QIcon(":/images/Connected.png"));
 	this->slotClear();
 	this->appendLogMessages(dia.messageBuffer());
-
+	
+	if (!m_columnWidthTmp.isEmpty()) {
+		QMetaObject::invokeMethod(this, &Logging::slotUpdateColumnWidth, Qt::QueuedConnection);
+	}
+	
 	LOGVIS_LOG("Done.");
 }
 

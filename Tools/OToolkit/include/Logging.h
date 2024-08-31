@@ -70,6 +70,8 @@ public:
 	void appendLogMessages(const QList<ot::LogMessage>& _messages);
 
 public Q_SLOTS:
+	void slotUpdateColumnWidth(void);
+
 	void runQuickExport(void);
 	void slotConnect(void);
 	void slotAutoConnect(void);
@@ -100,6 +102,8 @@ private:
 	int							m_warningCount;
 
 	std::string                 m_loggerUrl;
+
+	QString m_columnWidthTmp;
 
 	ot::WidgetView* m_root;
 
