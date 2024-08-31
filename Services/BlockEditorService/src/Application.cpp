@@ -133,7 +133,6 @@ std::string Application::handleEditorSaveRequested(ot::JsonDocument& _document) 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-// OT_HANDLER(handleOnePropertyDialogValue, Application, OT_ACTION_CMD_UI_OnePropertyDialogValue, ot::SECURE_MESSAGE_TYPES);
 std::string Application::handleOnePropertyDialogValue(ot::JsonDocument& _document) {
 	// Get the dialog name that was set when requesting the dialog (DialogCfg::setName())
 	std::string dialogName = ot::json::getString(_document, OT_ACTION_PARAM_ObjectName);
@@ -197,6 +196,21 @@ std::string Application::handleOnePropertyDialogValue(ot::JsonDocument& _documen
 		m_uiComponent->displayMessage(std::string("Dialog test resulted with value: ") + value + "\n");
 	}
 	return std::string();
+}
+
+std::string Application::handleTableSaved(ot::JsonDocument& _document) {
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	ot::TableCfg cfg;
+	cfg.setFromJsonObject(cfgObj);
+
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SetSaved, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(cfg.getName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	this->getBasicServiceInformation().addToJsonObject(responseDoc, responseDoc.GetAllocator());
+
+	std::string tmp;
+	m_uiComponent->sendMessage(true, responseDoc, tmp);
+	return "";
 }
 
 // ##################################################################################################################################################################################################################

@@ -295,7 +295,16 @@ public:
 
 	// Table
 	OT_HANDLER(handleSetupTable, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_Setup, ot::MessageType::ALL_MESSAGE_TYPES)
-
+	OT_HANDLER(handleSetTableSaved, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_SetSaved, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetTableModified, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_SetModified, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleInsertTableRowAfter, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_InsertRowAfter, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleInsertTableRowBefore, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_InsertRowBefore, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRemoveTableRow, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_RemoveRow, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleInsertTableColumnAfter, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_InsertColumnAfter, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleInsertTableColumnBefore, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_InsertColumnBefore, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRemoveTableColumn, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_RemoveColumn, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleCloseTable, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_Close, ot::MessageType::ALL_MESSAGE_TYPES)
+	
 	// Table Old
 	OT_HANDLER(handleTableChange, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddTable, ot::MessageType::ALL_MESSAGE_TYPES)

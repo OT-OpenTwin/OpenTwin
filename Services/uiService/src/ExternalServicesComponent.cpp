@@ -3867,11 +3867,162 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());
 
-	ot::TableCfg config(0, 0);
+	ot::TableCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
 	ot::TableView* table = AppBase::instance()->findOrCreateTable(config, info);
 	table->setContentChanged(false);
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetTableSaved(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+
+	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
+	if (table == nullptr) {
+		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		return "";
+	}
+
+	table->setContentChanged(false);
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetTableModified(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+
+	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
+	if (table == nullptr) {
+		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		return "";
+	}
+
+	table->setContentChanged(true);
+	return "";
+}
+
+std::string ExternalServicesComponent::handleInsertTableRowAfter(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+
+	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
+	if (table == nullptr) {
+		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		return "";
+	}
+
+	int rowIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
+	table->insertRow(rowIndex + 1);
+	table->setContentChanged(true);
+	return "";
+}
+
+std::string ExternalServicesComponent::handleInsertTableRowBefore(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+
+	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
+	if (table == nullptr) {
+		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		return "";
+	}
+
+	int rowIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
+	table->insertRow(rowIndex);
+	table->setContentChanged(true);
+	return "";
+}
+
+std::string ExternalServicesComponent::handleRemoveTableRow(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+
+	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
+	if (table == nullptr) {
+		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		return "";
+	}
+
+	int rowIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
+	table->removeRow(rowIndex);
+	table->setContentChanged(true);
+	return "";
+}
+
+std::string ExternalServicesComponent::handleInsertTableColumnAfter(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+
+	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
+	if (table == nullptr) {
+		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		return "";
+	}
+
+	int columnIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
+	table->insertColumn(columnIndex + 1);
+	table->setContentChanged(true);
+	return "";
+}
+
+std::string ExternalServicesComponent::handleInsertTableColumnBefore(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+
+	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
+	if (table == nullptr) {
+		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		return "";
+	}
+
+	int columnIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
+	table->insertColumn(columnIndex);
+	table->setContentChanged(true);
+	return "";
+}
+
+std::string ExternalServicesComponent::handleRemoveTableColumn(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+
+	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
+	if (table == nullptr) {
+		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		return "";
+	}
+
+	int columnIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
+	table->removeColumn(columnIndex);
+	table->setContentChanged(true);
+	return "";
+}
+
+std::string ExternalServicesComponent::handleCloseTable(ot::JsonDocument& _document) {
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+
+	AppBase::instance()->closeTable(tableName, info);
 
 	return "";
 }

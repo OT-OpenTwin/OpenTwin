@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTWidgets/Table.h"
 
 // Qt header
@@ -70,6 +71,21 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 	this->blockSignals(tmp);
 }
 
+ot::TableCfg ot::Table::createConfig(void) const {
+	TableCfg cfg(this->rowCount(), this->columnCount());
+	cfg.setName(m_tableName);
+	cfg.setTitle(m_tableTitle.toStdString());
+
+	for (int r = 0; r < this->rowCount(); r++) {
+		for (int c = 0; c < this->columnCount(); c++) {
+			OTAssertNullptr(this->item(r, c));
+			cfg.setCellText(r, c, this->item(r, c)->text().toStdString());
+		}
+	}
+
+	return cfg;
+}
+
 void ot::Table::setContentChanged(bool _changed) {
 	if (m_contentChanged == _changed) return;
 	m_contentChanged = _changed;
@@ -86,5 +102,6 @@ void ot::Table::slotSaveRequested(void) {
 }
 
 void ot::Table::slotCellDataChanged(int _row, int _column) {
+	m_contentChanged = true;
 	this->contentChanged();
 }

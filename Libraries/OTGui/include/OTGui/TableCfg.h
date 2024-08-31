@@ -19,7 +19,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT TableCfg : public Serializable {
 	public:
-		TableCfg(int _rows, int _columns);
+		TableCfg(int _rows = 0, int _columns = 0);
 		TableCfg(const TableCfg& _other);
 		virtual ~TableCfg();
 

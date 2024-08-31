@@ -285,12 +285,18 @@
 #define OT_ACTION_CMD_UI_TEXTEDITOR_CloseAll "UI.TextEditor.CloseAll"
 
 #define OT_ACTION_CMD_UI_TABLE_Setup "UI.Table.Setup"
+#define OT_ACTION_CMD_UI_TABLE_SaveRequest "UI.Table.SaveRequest"
+#define OT_ACTION_CMD_UI_TABLE_SetSaved "UI.Table.SetSaved"
+#define OT_ACTION_CMD_UI_TABLE_SetModified "UI.Table.SetModified"
+#define OT_ACTION_CMD_UI_TABLE_InsertRowAfter "UI.Table.InsertRowAfter"
+#define OT_ACTION_CMD_UI_TABLE_InsertRowBefore "UI.Table.InsertRowBefore"
+#define OT_ACTION_CMD_UI_TABLE_RemoveRow "UI.Table.RemoveRow"
+#define OT_ACTION_CMD_UI_TABLE_InsertColumnAfter "UI.Table.InsertColumnAfter"
+#define OT_ACTION_CMD_UI_TABLE_InsertColumnBefore "UI.Table.InsertColumnBefore"
+#define OT_ACTION_CMD_UI_TABLE_RemoveColumn "UI.Table.RemoveColumn"
+#define OT_ACTION_CMD_UI_TABLE_Close "UI.Table.Close"
 
 #define OT_ACTION_CMD_CARTESIANMESH_Run "CARTESIANMESH.Run"
-
-
-
-
 
 #define OT_ACTION_PARAM_BASETYPE_UID "BaseTypes.UID"
 #define OT_ACTION_PARAM_BASETYPE_Bool "BaseTypes.Boolean"
@@ -304,6 +310,7 @@
 #define OT_ACTION_PARAM_JSON "JSON"
 #define OT_ACTION_PARAM_Flags "Flags"
 #define OT_ACTION_PARAM_Value "Value"
+#define OT_ACTION_PARAM_Index "Index"
 #define OT_ACTION_PARAM_Config "Config"
 #define OT_ACTION_PARAM_Package "Package"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"

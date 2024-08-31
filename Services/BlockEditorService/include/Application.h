@@ -44,9 +44,10 @@ public:
 	// The last parameter are flags describing the allowed message types for this handler
 	//OT_HANDLER(myHandleFunctionName, Application, "actionToHandle", ot::SECURE_MESSAGE_TYPES);
 
-	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleEditorSaveRequested, Application, OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(handleOnePropertyDialogValue, Application, OT_ACTION_CMD_UI_OnePropertyDialogValue, ot::SECURE_MESSAGE_TYPES);
+	OT_HANDLER(handleExecuteModelAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleEditorSaveRequested, Application, OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleOnePropertyDialogValue, Application, OT_ACTION_CMD_UI_OnePropertyDialogValue, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleTableSaved, Application, OT_ACTION_CMD_UI_TABLE_SaveRequest, ot::SECURE_MESSAGE_TYPES)
 	
 	std::string test(void);
 	

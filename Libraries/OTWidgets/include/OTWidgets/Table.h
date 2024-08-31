@@ -26,6 +26,7 @@ namespace ot {
 		// Setter / Getter
 
 		void setupFromConfig(const TableCfg& _config);
+		TableCfg createConfig(void) const;
 
 		void setContentChanged(bool _changed = true);
 		bool getContentChanged(void) const { return m_contentChanged; };

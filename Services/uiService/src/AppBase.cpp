@@ -2137,6 +2137,7 @@ void AppBase::closeTextEditor(const std::string& _name, const ot::BasicServiceIn
 
 		for (auto v : tmp) {
 			if (v->getTextEditorName() == _name) {
+				this->cleanupWidgetViewInfo(v);
 				ot::WidgetViewManager::instance().closeView(_name);
 			}
 			else {
@@ -2210,6 +2211,27 @@ ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot:
 
 	OT_LOG_D("Table does not exist. Creating new table. { \"Table.Name\": \"" + _config.getName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 	return this->createNewTable(_config, _serviceInfo);
+}
+
+void AppBase::closeTable(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
+	if (m_tables.contains(_serviceInfo)) {
+		std::list<ot::TableView*>& lst = m_tables[_serviceInfo];
+		std::list<ot::TableView*> tmp = lst;
+		lst.clear();
+
+		for (auto v : tmp) {
+			if (v->getTableName() == _name) {
+				this->cleanupWidgetViewInfo(v);
+				ot::WidgetViewManager::instance().closeView(_name);
+			}
+			else {
+				lst.push_back(v);
+			}
+		}
+	}
+	else {
+		OT_LOG_WA("Text editors not found for given service");
+	}
 }
 
 // ######################################################################################################################
@@ -2564,7 +2586,35 @@ void AppBase::slotTableSaveRequested(void) {
 		return;
 	}
 
-	// ...
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
+
+	try {
+		ot::BasicServiceInformation info(m_tables.findOwner(table).getId());
+
+		ot::JsonObject cfgObj;
+		ot::TableCfg cfg = table->createConfig();
+		cfg.addToJsonObject(cfgObj, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
+
+		std::string response;
+		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+			OT_LOG_EA("Failed to send http request");
+			return;
+		}
+
+		ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
+		if (rMsg != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Request failed: " + rMsg.getWhat());
+			return;
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
+	}
+	catch (...) {
+		OT_LOG_EA("[FATAL] Unknown error");
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
