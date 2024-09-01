@@ -11,10 +11,10 @@
 #include "OTCore/JSON.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCore/OTObjectBase.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/ActionHandleConnector.h"
 #include "OTServiceFoundation/EntityInformation.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 
@@ -43,7 +43,7 @@ namespace ot {
 	class AbstractSettingsItem;
 	class AbstractModelNotifier;
 
-	class OT_SERVICEFOUNDATION_API_EXPORT ApplicationBase : public ServiceBase, public OTObjectBase
+	class OT_SERVICEFOUNDATION_API_EXPORT ApplicationBase : public ServiceBase, public ActionHandler
 	{
 		OT_DECL_NOCOPY(ApplicationBase)
 	public:

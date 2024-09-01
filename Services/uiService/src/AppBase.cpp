@@ -40,7 +40,6 @@
 #include "OTCore/Logger.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/OTAssert.h"
-#include "OTCore/OTObject.h"
 #include "OTCore/ReturnMessage.h"
 
 #include "OTGui/FillPainter2D.h"

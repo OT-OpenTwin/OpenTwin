@@ -22,23 +22,23 @@
 
 namespace ot {
 
-	class ActionHandlerBase;
+	class ActionHandleConnectorBase;
 
 	//! @class ActionDispatcher
-	//! @brief The ActionDispatcher is used to dispatch inbound messages and forward them to their corresponding [\ref ActionHandlerBase "Action Handler"].
+	//! @brief The ActionDispatcher is used to dispatch inbound messages and forward them to their corresponding [\ref ActionHandleConnectorBase "Action Handler"].
 	class OT_COMMUNICATION_API_EXPORT ActionDispatcher {
 		OT_DECL_NOCOPY(ActionDispatcher)
 	public:
 		//! @brief Returns the clobal singleton instance
 		static ActionDispatcher& instance(void);
 
-		//! @brief Add the provided [\ref ActionHandlerBase "handler"] to this ActionDispatcher.
+		//! @brief Add the provided [\ref ActionHandleConnectorBase "handler"] to this ActionDispatcher.
 		//! The handler will be used for all specified actions.
-		//! @note If another [\ref ActionHandlerBase "handler"] already registered for one of the actions, the action will be ignored if "_overwrite" is false and a warning log message is generated.
-		//! @param _handler New handler to add for all actions set in the [\ref ActionHandlerBase "handler"].
+		//! @note If another [\ref ActionHandleConnectorBase "handler"] already registered for one of the actions, the action will be ignored if "_overwrite" is false and a warning log message is generated.
+		//! @param _handler New handler to add for all actions set in the [\ref ActionHandleConnectorBase "handler"].
 		//! @param _overwrite If true, a existing handler will be removed if the provided handler requests the same action.
-		void add(ActionHandlerBase* _handler, bool _overwrite = false);
-		void remove(ActionHandlerBase* _handler);
+		void add(ActionHandleConnectorBase* _handler, bool _overwrite = false);
+		void remove(ActionHandleConnectorBase* _handler);
 
 		//! @brief This function may be called from the main external API that is receiving the perform/ queue messages
 		//! This function will forward the call to the dispatch function and will create a C-String copy of the result so
@@ -78,8 +78,8 @@ namespace ot {
 
 	private:
 
-		std::map<std::string, ActionHandlerBase*> m_data;
-		std::mutex                                m_mutex;
+		std::map<std::string, ActionHandleConnectorBase*> m_data;
+		std::mutex                                        m_mutex;
 
 		ActionDispatcher();
 		virtual ~ActionDispatcher();

@@ -18,17 +18,17 @@
 
 namespace ot {
 
-	//! @class ActionHandlerBase
-	//! @brief Base class for action handlers.
-	//! A action handler has a set of actions.
-	class OT_COMMUNICATION_API_EXPORT ActionHandlerBase {
+	//! @class ActionHandleConnectorBase
+	//! @brief Base class for action handler connectors.
+	//! A action handle connector has a set of actions.
+	class OT_COMMUNICATION_API_EXPORT ActionHandleConnectorBase {
 	public:
-		ActionHandlerBase(const std::string& _actionName, ot::MessageType _messageFlags);
-		ActionHandlerBase(const std::list<std::string>& _actionNames, ot::MessageType _messageFlags);
-		ActionHandlerBase(const ActionHandlerBase& _other);
-		virtual ~ActionHandlerBase();
+		ActionHandleConnectorBase(const std::string& _actionName, ot::MessageType _messageFlags);
+		ActionHandleConnectorBase(const std::list<std::string>& _actionNames, ot::MessageType _messageFlags);
+		ActionHandleConnectorBase(const ActionHandleConnectorBase& _other);
+		virtual ~ActionHandleConnectorBase();
 
-		ActionHandlerBase& operator = (const ActionHandlerBase& _other);
+		ActionHandleConnectorBase& operator = (const ActionHandleConnectorBase& _other);
 
 		bool mayDispatch(ot::MessageType _inboundMessageType) const;
 

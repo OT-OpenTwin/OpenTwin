@@ -85,9 +85,6 @@
     <ClCompile Include="src\VariableToStringConverter.cpp">
       <Filter>src\Variable</Filter>
     </ClCompile>
-    <ClCompile Include="src\OTObjectBase.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\ThisService.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -198,9 +195,6 @@
     <ClInclude Include="include\OTCore\TypeNames.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\OTObject.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\JSON.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -233,9 +227,6 @@
     </ClInclude>
     <ClInclude Include="include\OTCore\VariableToStringConverter.h">
       <Filter>include\VariableType</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\OTObjectBase.h">
-      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\ThisService.h">
       <Filter>include</Filter>

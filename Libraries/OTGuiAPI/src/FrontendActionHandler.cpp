@@ -6,7 +6,6 @@
 
 // OpenTwin header
 #include "OTGuiAPI/FrontendActionHandler.h"
-#include "OTCommunication/ActionDispatcher.h" 
 #include "OTCommunication/ActionDispatcher.h"
 
 std::string ot::FrontendActionHandler::handleKeySequenceActivated(JsonDocument& _document) {

@@ -7,17 +7,17 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTObjectBase.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/ActionHandleConnector.h"
 
 namespace ot {
 
 	//! @class FrontendActionHandler
 	//! @brief The FrontendActionHandler may be used to receive frontend callbacks without deserializing the message.
-	//! The FrontendActionHandler has multiple \ref ActionHandler "action handlers" that will deserialize the action and call the corresponding virtual function.
-	class FrontendActionHandler : public OTObjectBase {
+	//! The FrontendActionHandler has multiple \ref ActionHandleConnector "action handlers" that will deserialize the action and call the corresponding virtual function.
+	class FrontendActionHandler : public ActionHandler {
 		OT_DECL_NOCOPY(FrontendActionHandler)
 	public:
 		FrontendActionHandler() {};

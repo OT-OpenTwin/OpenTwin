@@ -11,11 +11,11 @@
 #include "StartupDispatcher.h"
 
 // Open twin header
-#include "OTCore/ServiceBase.h"		// Base class
-#include "OTCore/OTObjectBase.h"		// Base class
+#include "OTCore/ServiceBase.h"
 #include "OTCore/LogModeManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/ActionHandleConnector.h"
 #include "OTServiceFoundation/IDManager.h"
 #include "OTSystem/SystemLoadInformation.h"
 
@@ -34,7 +34,7 @@ namespace ot {
 	}
 }
 
-class Application : public ot::ServiceBase, public ot::OTObjectBase {
+class Application : public ot::ServiceBase, public ot::ActionHandler {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);

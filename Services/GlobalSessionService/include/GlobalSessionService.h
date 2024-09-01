@@ -8,11 +8,11 @@
 // OpenTwin header
 #include "OTCore/Flags.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCore/OTObjectBase.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/LogModeManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/ActionHandleConnector.h"
 #include "OTServiceFoundation/IDManager.h"
 #include "OTSystem/SystemLoadInformation.h"
 
@@ -24,7 +24,7 @@
 
 class LocalSessionService;
 
-class GlobalSessionService : public ot::OTObjectBase, public ot::ServiceBase {
+class GlobalSessionService : public ot::ActionHandler, public ot::ServiceBase {
 public:
 	static GlobalSessionService * instance(void);
 	static bool hasInstance(void);

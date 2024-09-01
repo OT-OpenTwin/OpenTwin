@@ -29,7 +29,7 @@
     <ClCompile Include="src\ActionDispatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ActionHandlerBase.cpp">
+    <ClCompile Include="src\ActionHandleConnectorBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -55,7 +55,10 @@
     <ClInclude Include="include\OTCommunication\ActionDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCommunication\ActionHandlerBase.h">
+    <ClInclude Include="include\OTCommunication\ActionHandleConnectorBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCommunication\ActionHandleConnector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCommunication\ActionHandler.h">

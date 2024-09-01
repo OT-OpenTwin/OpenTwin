@@ -33,7 +33,6 @@
     <ClCompile Include="src\JSON.cpp" />
     <ClCompile Include="src\LogModeManager.cpp" />
     <ClCompile Include="src\Math.cpp" />
-    <ClCompile Include="src\OTObjectBase.cpp" />
     <ClCompile Include="src\OwnerServiceGlobal.cpp" />
     <ClCompile Include="src\JSONToVariableConverter.cpp" />
     <ClCompile Include="src\Owner.cpp" />
@@ -83,8 +82,6 @@
     <ClInclude Include="include\OTCore\ObjectManagerTemplate.h" />
     <ClInclude Include="include\OTCore\OTAssert.h" />
     <ClInclude Include="include\OTCore\OTClassHelper.h" />
-    <ClInclude Include="include\OTCore\OTObject.h" />
-    <ClInclude Include="include\OTCore\OTObjectBase.h" />
     <ClInclude Include="include\OTCore\Owner.h" />
     <ClInclude Include="include\OTCore\OwnerManagerTemplate.h" />
     <ClInclude Include="include\OTCore\OwnerService.h" />

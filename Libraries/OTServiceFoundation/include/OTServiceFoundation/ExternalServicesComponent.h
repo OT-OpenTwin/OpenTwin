@@ -7,9 +7,9 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTObjectBase.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ActionHandler.h"
 #include "OTSystem/SystemLoadInformation.h"
 
 // std header
@@ -24,7 +24,7 @@ namespace ot {
 
 		//! This is the main class interacting with external services.
 		//! Use the static instance() function to get the global component that should be used in this service
-		class ExternalServicesComponent : public OTObjectBase {
+		class ExternalServicesComponent : public ActionHandler {
 			OT_DECL_NOCOPY(ExternalServicesComponent)
 		public:
 			enum ComponentState {

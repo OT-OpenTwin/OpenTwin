@@ -40,12 +40,12 @@
 #include "OTCore/Flags.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OwnerService.h"
-#include "OTCore/OTObjectBase.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/ActionHandleConnector.h"
 
 class AppBase;
 class LockManager;
@@ -56,7 +56,7 @@ class KeyboardCommandHandler;
 namespace ot { class ServiceBase; };
 namespace ot { class Property; };
 
-class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::OTObjectBase
+class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::ActionHandler
 {
 	Q_OBJECT
 public:
@@ -381,8 +381,6 @@ private:
 	ServiceDataUi * getService(const ot::BasicServiceInformation& _serviceInfo);
 
 	void determineViews(const std::string& modelServiceURL);
-	std::string getStudioSuiteFileNameForCommit();
-	std::string getStudioSuiteFileNameForGet();
 
 	// #################################################################
 

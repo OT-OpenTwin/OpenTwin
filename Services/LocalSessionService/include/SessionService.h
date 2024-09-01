@@ -15,10 +15,10 @@
 #include "GlobalDirectoryService.h"
 
 #include "OTCore/ServiceBase.h"
-#include "OTCore/OTObjectBase.h"
 #include "OTCore/LogModeManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
+#include "OTCommunication/ActionHandleConnector.h"
 #include "OTSystem/SystemLoadInformation.h"
 
 // C++ header
@@ -31,7 +31,7 @@ class Session;
 class RelayService;
 class GlobalSessionService;
 
-class SessionService : public ot::OTObjectBase {
+class SessionService : public ot::ActionHandler {
 public:
 	SessionService();
 	virtual ~SessionService() {}; // todo: add cleanup

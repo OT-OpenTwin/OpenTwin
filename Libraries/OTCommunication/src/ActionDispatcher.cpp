@@ -10,7 +10,7 @@
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionDispatcher.h"
-#include "OTCommunication/ActionHandlerBase.h"
+#include "OTCommunication/ActionHandleConnectorBase.h"
 
 ot::ActionDispatcher& ot::ActionDispatcher::instance(void) {
 	static ActionDispatcher g_instance;
@@ -25,7 +25,7 @@ ot::ActionDispatcher::~ActionDispatcher() {
 
 }
 
-void ot::ActionDispatcher::add(ActionHandlerBase* _item, bool _overwrite) {
+void ot::ActionDispatcher::add(ActionHandleConnectorBase* _item, bool _overwrite) {
 	m_mutex.lock();
 
 	for (const std::string& action : _item->actionNames()) {
@@ -41,7 +41,7 @@ void ot::ActionDispatcher::add(ActionHandlerBase* _item, bool _overwrite) {
 	m_mutex.unlock();
 }
 
-void ot::ActionDispatcher::remove(ActionHandlerBase* _item) {
+void ot::ActionDispatcher::remove(ActionHandleConnectorBase* _item) {
 	m_mutex.lock();
 
 	for (const std::string& action : _item->actionNames()) {
