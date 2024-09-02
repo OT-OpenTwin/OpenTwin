@@ -1,5 +1,5 @@
 #include "EntityBlockStorage.h"
-#include "SharedResources.h"
+#include "SharedResources.h"	 
 
 EntityBlockStorage::EntityBlockStorage(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
@@ -212,6 +212,104 @@ int32_t EntityBlockStorage::getNumberOfMetaData()
 	EntityPropertiesInteger* integerProp = dynamic_cast<EntityPropertiesInteger*>(base);
 	assert(integerProp != nullptr);
 	return integerProp->getValue();
+}
+
+const std::list<ot::Connector> EntityBlockStorage::getConnectorsQuantity()
+{
+	std::list<ot::Connector> allQuantityConnectors;
+	for (auto connectorByName : _connectorsByName)
+	{
+		const std::string connectorName = connectorByName.first;
+		if (connectorName.find(m_quantityInputNameBase) != std::string::npos)
+		{
+			allQuantityConnectors.push_back(connectorByName.second);
+		}
+	}
+	return allQuantityConnectors;
+}
+
+const std::list<ot::Connector> EntityBlockStorage::getConnectorsParameter()
+{
+	std::list<ot::Connector> allParameterConnectors;
+	for (auto connectorByName : _connectorsByName)
+	{
+		const std::string connectorName = connectorByName.first;
+		if (connectorName.find(m_parameterInputNameBase) != std::string::npos)
+		{
+			allParameterConnectors.push_back(connectorByName.second);
+		}
+	}
+	return allParameterConnectors;
+}
+
+const std::list<ot::Connector> EntityBlockStorage::getConnectorsMetadata()
+{
+	std::list<ot::Connector> allMetadataConnectors;
+	for (auto connectorByName : _connectorsByName)
+	{
+		const std::string connectorName = connectorByName.first;
+		if (connectorName.find(m_metaDataInputNameBase) != std::string::npos)
+		{
+			allMetadataConnectors.push_back(connectorByName.second);
+		}
+	}
+	return allMetadataConnectors;
+}
+
+const ParameterProperties EntityBlockStorage::getPropertiesParameter(const std::string& _parameterName)
+{
+	ParameterProperties properties;
+	
+	EntityPropertiesBase* base = getProperties().getProperty(m_propertyConstParameter, _parameterName);
+	assert(base != nullptr);
+	EntityPropertiesBoolean* boolProperty = dynamic_cast<EntityPropertiesBoolean*>(base);
+	assert(boolProperty != nullptr);
+	properties.m_propertyConstParameter = boolProperty->getValue();
+	
+	base = getProperties().getProperty(m_propertyName, _parameterName);
+	assert(base != nullptr);
+	EntityPropertiesString* stringProperty = dynamic_cast<EntityPropertiesString*>(base);
+	assert(stringProperty != nullptr);
+	properties.m_propertyName =	stringProperty->getValue();
+
+	base = getProperties().getProperty(m_propertyUnit, _parameterName);
+	assert(base != nullptr);
+	stringProperty = dynamic_cast<EntityPropertiesString*>(base);
+	assert(stringProperty != nullptr);
+	properties.m_propertyUnit = stringProperty->getValue();
+
+	return properties;
+}
+
+const QuantityProperties EntityBlockStorage::getPropertiesQuantity(const std::string& _quantityName)
+{
+	QuantityProperties quantityProperties;
+
+	EntityPropertiesBase* base = getProperties().getProperty(m_propertyName, _quantityName);
+	EntityPropertiesString* stringProperty = dynamic_cast<EntityPropertiesString*>(base);
+	assert(stringProperty != nullptr);
+	quantityProperties.m_propertyName = stringProperty->getValue();
+
+	base = getProperties().getProperty(m_propertyType, _quantityName);
+	stringProperty = dynamic_cast<EntityPropertiesString*>(base);
+	assert(stringProperty != nullptr);
+	quantityProperties.m_propertyType = stringProperty->getValue();
+
+	base = getProperties().getProperty(m_propertyUnit, _quantityName);
+	stringProperty = dynamic_cast<EntityPropertiesString*>(base);
+	assert(stringProperty != nullptr);
+	quantityProperties.m_propertyUnit = stringProperty->getValue();
+
+	return quantityProperties;
+}
+
+std::string EntityBlockStorage::getSeriesName()
+{
+	EntityPropertiesBase* base = getProperties().getProperty("Name", "Series Metadata");
+	assert(base != nullptr);
+	EntityPropertiesString* stringProp = dynamic_cast<EntityPropertiesString*>(base);
+	assert(stringProp != nullptr);
+	return stringProp->getValue();
 }
 
 void EntityBlockStorage::createParameterProperties(const std::string& _groupName)

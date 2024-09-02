@@ -35,10 +35,6 @@ public:
 	}
 
 	MetadataQuantity& getMetadataQuantity() { return m_metadataQuantity; }
-	void setDependingParameterUIDs(const std::list<ot::UID>& _dependingParameterUIDs)
-	{
-		m_metadataQuantity.dependingParameterIds = { _dependingParameterUIDs.begin(), _dependingParameterUIDs.end() };
-	}
 	
 	//! @brief Depending on the chosen value format. Typical settings (ValueFormatSetter class) for the first value are real value, the magnitude or the decible value.
 	ot::UID getFirstValueQuantityIndex() const;

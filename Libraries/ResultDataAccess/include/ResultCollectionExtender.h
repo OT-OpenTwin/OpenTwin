@@ -39,11 +39,6 @@ public:
 	/// <param name="metadata"></param>
 	void addCampaignMetadata(std::shared_ptr<MetadataEntry> _metadata);
 	
-	void storeMetadata()
-	{
-		storeCampaignChanges();
-	}
-
 	void storeCampaignChanges();
 	bool removeSeries(ot::UID _uid);
 protected:

@@ -27,6 +27,7 @@
     <ClInclude Include="include\QuantityDescription.h" />
     <ClInclude Include="include\QuantityDescriptionCurve.h" />
     <ClInclude Include="include\QuantityDescriptionCurveComplex.h" />
+    <ClInclude Include="include\QuantityDescriptionMatrix.h" />
     <ClInclude Include="include\QuantityDescriptionSParameter.h" />
     <ClInclude Include="include\ResultCollectionExtender.h" />
     <ClInclude Include="include\MetadataCampaign.h" />

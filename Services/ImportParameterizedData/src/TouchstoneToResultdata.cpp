@@ -60,7 +60,7 @@ void TouchstoneToResultdata::createResultdata(int _numberOfPorts)
 		const ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, seriesMetadata);
 			
 		resultCollectionExtender.processDataPoints(&(*datasets.begin()), seriesID);
-		resultCollectionExtender.storeMetadata();
+		resultCollectionExtender.storeCampaignChanges();
 	}
 	else
 	{

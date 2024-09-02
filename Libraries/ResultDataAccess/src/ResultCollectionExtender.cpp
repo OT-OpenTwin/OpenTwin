@@ -346,11 +346,6 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 	else
 	{
 		newQuantity.quantityLabel = newQuantity.quantityName;
-		for (auto& quantityValueDescription : newQuantity.valueDescriptions)
-		{
-			quantityValueDescription.quantityIndex = findNextFreeQuantityIndex();
-		}
-		newQuantity.dependingParameterIds = std::vector<ot::UID>(_dependingParameterIDs.begin(), _dependingParameterIDs.end());
 	}
 
 	if (newQuantity.quantityIndex == 0)
@@ -373,6 +368,13 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 			valueDescription.quantityValueLabel = valueDescriptionLabel;
 			valueDescriptionLabels.insert(valueDescription.quantityValueLabel);
 		}
+
+		for (auto& quantityValueDescription : newQuantity.valueDescriptions)
+		{
+			quantityValueDescription.quantityIndex = findNextFreeQuantityIndex();
+		}
+		newQuantity.dependingParameterIds = std::vector<ot::UID>(_dependingParameterIDs.begin(), _dependingParameterIDs.end());
+
 		newQuantity.quantityIndex = newQuantity.valueDescriptions.begin()->quantityIndex;
 		m_quantitiesUpForStorageByName[newQuantity.quantityName].push_back(&newQuantity);
 	}

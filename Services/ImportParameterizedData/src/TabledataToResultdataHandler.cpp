@@ -182,7 +182,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 					assert(seriesRemoved); //Otherwise panic!
 				}
 			}
-			resultCollectionExtender.storeMetadata();
+			resultCollectionExtender.storeCampaignChanges();
 		}
 	}
 }

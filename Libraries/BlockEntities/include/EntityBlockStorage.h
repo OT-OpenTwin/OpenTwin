@@ -1,5 +1,20 @@
 #pragma once
 #include "EntityBlock.h"
+
+struct __declspec(dllexport) ParameterProperties
+{
+	bool m_propertyConstParameter = false;
+	std::string m_propertyName = "";
+	std::string m_propertyUnit = "";
+};
+
+struct __declspec(dllexport) QuantityProperties
+{
+	std::string m_propertyType = "";
+	std::string m_propertyName = "";
+	std::string m_propertyUnit = "";
+};
+
 class __declspec(dllexport) EntityBlockStorage : public EntityBlock
 {
 public:
@@ -15,6 +30,15 @@ public:
 	int32_t getNumberOfMetaData();
 
 	static const std::string getIconName() { return "Database_store.svg"; }
+
+	const std::list<ot::Connector> getConnectorsQuantity();
+	const std::list<ot::Connector> getConnectorsParameter();
+	const std::list<ot::Connector> getConnectorsMetadata();
+
+	const ParameterProperties getPropertiesParameter(const std::string& _parameterName) ;
+	const QuantityProperties getPropertiesQuantity(const std::string& _quantityName) ;
+
+	std::string getSeriesName();
 private:	
 	std::list<ot::Connector*> m_quantityInputs;
 	const std::string m_quantityInputNameBase = "Quantity";

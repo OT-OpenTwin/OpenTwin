@@ -82,7 +82,7 @@ void ParametricResult1DManager::storeDataInResultCollection()
 	
 	std::list<std::shared_ptr<MetadataEntry>> seriesMetadata;
 	uint64_t seriesMetadataIndex = resultCollectionExtender.buildSeriesMetadata(m_allDataDescriptions, seriesName, seriesMetadata);
-	resultCollectionExtender.storeMetadata();
+	resultCollectionExtender.storeCampaignChanges();
 	//Now we store all data points in the result collection
 	for (DatasetDescription& dataDescription : m_allDataDescriptions)
 	{

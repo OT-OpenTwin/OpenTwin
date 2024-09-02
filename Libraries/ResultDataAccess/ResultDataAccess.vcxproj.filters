@@ -107,6 +107,9 @@
     <ClInclude Include="include\DatasetOverviewVisualiser.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\QuantityDescriptionMatrix.h">
+      <Filter>include\Creation Helper\Container for quantity metadata and datapoints</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\QuantityContainer.cpp">
