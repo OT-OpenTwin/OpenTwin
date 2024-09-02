@@ -6,13 +6,8 @@ public:
 	EntityBlockCircuitConnector(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
 	virtual std::string getClassName(void) override { return "EntityBlockCircuitConnector"; };
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
-
-
 	virtual ot::GraphicsItemCfg* CreateBlockCfg() override;
-
-
-
-	const ot::Connector getLeftConnector() const { return m_LeftConnector; }
+	
 	
 	
 private:

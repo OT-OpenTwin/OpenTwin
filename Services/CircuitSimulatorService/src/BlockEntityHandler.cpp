@@ -24,13 +24,14 @@
 
 //C++
 #include <algorithm>
+#include <queue>
 
 namespace NodeNumbers {
 	static unsigned long long nodeNumber = 0;
 	static unsigned long long connectionNumber = 1;	
 }
 
-void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position) {
+std::shared_ptr<EntityBlock> BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position) {
 	ClassFactoryBlock factory;
 	EntityBase* baseEntity = factory.CreateEntity(blockName);
 	assert(baseEntity != nullptr);
@@ -61,7 +62,7 @@ void BlockEntityHandler::CreateBlockEntity(const std::string& editorName, const 
 	blockEntity->StoreToDataBase();
 	_modelComponent->addEntitiesToModel({ blockEntity->getEntityID() }, { blockEntity->getEntityStorageVersion() }, { false }, { blockCoordinates->getEntityID() }, { blockCoordinates->getEntityStorageVersion() }, { blockEntity->getEntityID() }, "Added Block: " + blockName);
 
-	
+	return blockEntity;
 }
 
 void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::Point2DD& position, const ot::Transform transform, ClassFactory* classFactory) {
@@ -77,8 +78,11 @@ void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::P
 	//Here I will update the rotation
 	
 	auto propertyBase = blockEnt->getProperties().getProperty("Rotation");
-	auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
-	propertyRotation->setValue(transform.getRotation());
+	if(propertyBase != nullptr) { 
+		auto propertyRotation = dynamic_cast<EntityPropertiesDouble*>(propertyBase);
+		propertyRotation->setValue(transform.getRotation());
+	}
+
 	
 
 	//Here I update the Flip
@@ -88,8 +92,11 @@ void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::P
 	stringFlipMap.insert_or_assign(ot::Transform::FlipHorizontally,"FlipHorizontally" );
 
 	auto propertyBaseFlip = blockEnt->getProperties().getProperty("Flip");
-	auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBaseFlip);
-	propertyFlip->setValue(stringFlipMap[transform.getFlipStateFlags()]);
+	if (propertyBaseFlip != nullptr) {
+		auto propertyFlip = dynamic_cast<EntityPropertiesSelection*>(propertyBaseFlip);
+		propertyFlip->setValue(stringFlipMap[transform.getFlipStateFlags()]);
+	}
+
 	
 
 
@@ -201,7 +208,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 	std::list<ot::UID> dataEntityParentList;
 
 	std::string blockName = "EntityBlockConnection";
-
+	int count = 1;
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
 	for (auto& connection : connections) {
 		bool originConnectorIsTypeOut(true), destConnectorIsTypeOut(true);
@@ -213,7 +220,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		ot::UID entityID = _modelComponent->createEntityUID();
 		
 		
-		int count = 1;
+		
 		std::string connectionName;
 		do {
 			connectionName = "Circuits/" + name + "/Connections/" + "Connection" + std::to_string(count);
@@ -293,6 +300,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 
 void BlockEntityHandler::AddConnectionToConnection(const std::list<ot::GraphicsConnectionCfg>& connections, std::string editorName, ot::Point2DD pos)
 {
+	
 	auto blockEntitiesByBlockID = findAllBlockEntitiesByBlockID();
 	auto connectionEntitiesByID = findAllEntityBlockConnections();
 	std::list< std::shared_ptr<EntityBlock>> entitiesForUpdate;
@@ -300,48 +308,80 @@ void BlockEntityHandler::AddConnectionToConnection(const std::list<ot::GraphicsC
 	std::list<ot::UID> topologyEntityIDList;
 	std::list<ot::UID> topologyEntityVersionList;
 
+	std::queue<std::shared_ptr<EntityBlock>> connectedElements;
+	std::queue<std::string> connectors;
+	std::list<ot::GraphicsConnectionCfg> connectionsNew;
+
 	for (auto connection : connections)
 	{
 		//First i get the connection which i want to delete by the connection to be added
-		if (connectionEntitiesByID.find(connection.getDestinationUid()) != connectionEntitiesByID.end()) {
-			//Now i got the connection and want to delete it at the blocks
-			std::shared_ptr<EntityBlockConnection> connectionToDelete = connectionEntitiesByID[connection.getDestinationUid()];
-
-			// Here I check if the the blocks which are connected to the connection exist
-			if (blockEntitiesByBlockID.find(connectionToDelete->getConnectionCfg().getDestinationUid()) != blockEntitiesByBlockID.end() &&
-				blockEntitiesByBlockID.find(connectionToDelete->getConnectionCfg().getOriginUid()) != blockEntitiesByBlockID.end())
-			{
-				//Now I delete the connection at the blocks
-				blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getDestinationUid())]->RemoveConnection(connectionToDelete->getEntityID());
-				blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getOriginUid())]->RemoveConnection(connectionToDelete->getEntityID());
-
-				entitiesForUpdate.push_back(blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getDestinationUid())]);
-				entitiesForUpdate.push_back(blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getOriginUid())]);
-
-
-				entitiesToDelete.push_back(connectionToDelete->getName());
-
-				for (auto entityForUpdate : entitiesForUpdate)
-				{
-					entityForUpdate->StoreToDataBase();
-					topologyEntityIDList.push_back(entityForUpdate->getEntityID());
-					topologyEntityVersionList.push_back(entityForUpdate->getEntityStorageVersion());
-				}
-
-				// Now i remove the connections from model
-				_modelComponent->deleteEntitiesFromModel(entitiesToDelete);
-				_modelComponent->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, "Removed Connection from Blocks");
-
-				// As next step i need to add the intersection item 
-
-				CreateBlockEntity(editorName, "EntityBlockCircuitConnector", pos);
-
-				//Add Connections
-
-
-
-			}
+		if (connectionEntitiesByID.find(connection.getDestinationUid()) == connectionEntitiesByID.end()) {
+			OT_LOG_EA("Element not found");
+			continue;
 		}
+
+		//Now i got the connection and want to delete it at the blocks
+		std::shared_ptr<EntityBlockConnection> connectionToDelete = connectionEntitiesByID[connection.getDestinationUid()];
+
+		//Saving connected Element and connector
+		connectedElements.push(blockEntitiesByBlockID[connection.getOriginUid()]);
+		connectors.push(connection.getOriginConnectable());
+
+		// Here I check if the the blocks which are connected to the connection exist
+		if (blockEntitiesByBlockID.find(connectionToDelete->getConnectionCfg().getDestinationUid()) == blockEntitiesByBlockID.end() ||
+			blockEntitiesByBlockID.find(connectionToDelete->getConnectionCfg().getOriginUid()) == blockEntitiesByBlockID.end()) {
+			OT_LOG_EA("Element not found");
+			continue;
+		}
+
+		//Saving  connected Elements and connectors
+		connectedElements.push(blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getDestinationUid())]);
+		connectors.push(connectionToDelete->getConnectionCfg().getDestConnectable());
+
+		connectedElements.push(blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getOriginUid())]);
+		connectors.push(connectionToDelete->getConnectionCfg().getOriginConnectable());
+
+		//Now I delete the connection at the blocks
+		blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getDestinationUid())]->RemoveConnection(connectionToDelete->getEntityID());
+		blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getOriginUid())]->RemoveConnection(connectionToDelete->getEntityID());
+
+		entitiesForUpdate.push_back(blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getDestinationUid())]);
+		entitiesForUpdate.push_back(blockEntitiesByBlockID[(connectionToDelete->getConnectionCfg().getOriginUid())]);
+
+
+		entitiesToDelete.push_back(connectionToDelete->getName());
+
+		for (auto entityForUpdate : entitiesForUpdate) {
+			entityForUpdate->StoreToDataBase();
+			topologyEntityIDList.push_back(entityForUpdate->getEntityID());
+			topologyEntityVersionList.push_back(entityForUpdate->getEntityStorageVersion());
+		}
+
+		// Now i remove the connections from model
+		_modelComponent->deleteEntitiesFromModel(entitiesToDelete);
+		_modelComponent->updateTopologyEntities(topologyEntityIDList, topologyEntityVersionList, "Removed Connection from Blocks");
+
+
+		// As next step i need to add the intersection item 
+
+		std::shared_ptr<EntityBlock> connector = CreateBlockEntity(editorName, "EntityBlockCircuitConnector", pos);
+
+		//Now i create a GraphicsConnectionCfg for all elements
+		while (!connectedElements.empty() && !connectors.empty()) {
+			ot::GraphicsConnectionCfg temp(connection);
+			temp.setDestUid(connector->getEntityID());
+			temp.setDestConnectable(connector->getName());
+			temp.setOriginUid(connectedElements.front()->getEntityID());
+			temp.setOriginConnectable(connectors.front());
+			/*	ot::GraphicsConnectionCfg(connectedElements.front()->getEntityID(), connectors.front(), connector->getEntityID(), connector->getAllConnectorsByName().begin()->first);*/
+			connectionsNew.push_back(temp);
+			connectedElements.pop();
+			connectors.pop();
+		}
+
+		AddBlockConnection(connectionsNew, editorName);
+
+		
 	}
 
 }
@@ -350,25 +390,7 @@ void BlockEntityHandler::InitSpecialisedCircuitElementEntity(std::shared_ptr<Ent
 	EntityBlockCircuitVoltageSource* CircuitElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
 	if (CircuitElement != nullptr) {
 		CircuitElement->createProperties();
-		//std::string element = Application::instance()->extractStringAfterDelimiter(CircuitElement->, '/', 2);
-
-		//if (element.find("Voltage Source") == 0) // Überprüfen, ob der String mit "Voltage Source" beginnt
-		//{
-		//	if (element == "Voltage Source")
-		//	{
-		//		element = "V1";
-		//	}
-		//	else
-		//	{
-
-		//		std::string suffix = element.substr(15);
-		//		int number = std::stoi(suffix);
-		//		element = "V" + std::to_string(number + 1);
-		//	}
-		//}
-		//auto propertyBase = blockEntity->getProperties().getProperty("Name");
-		//auto propertyName = dynamic_cast<EntityPropertiesString*>(propertyBase);
-		//propertyName->setValue(element);
+		
 	}
 
 	EntityBlockCircuitResistor* resistor = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());

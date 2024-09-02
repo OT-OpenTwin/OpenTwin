@@ -376,7 +376,7 @@ std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document) {
 
 	
 	m_blockEntityHandler.setPackageName(editorName);
-	m_blockEntityHandler.CreateBlockEntity(editorName, itemName, pos);
+	auto temp = m_blockEntityHandler.CreateBlockEntity(editorName, itemName, pos);
 	return "";
 	
 }

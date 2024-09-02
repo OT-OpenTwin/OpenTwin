@@ -19,7 +19,7 @@
 class BlockEntityHandler : public BusinessLogicHandler
 {
 public:
-	void CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
+	std::shared_ptr<EntityBlock> CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
 	void UpdateBlockPosition(const ot::UID& blockID, const ot::Point2DD& position, const ot::Transform transform, ClassFactory* classFactory);
 	void OrderUIToCreateBlockPicker();
 	std::map<ot::UID, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID();
