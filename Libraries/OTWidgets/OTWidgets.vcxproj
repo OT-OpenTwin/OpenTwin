@@ -67,11 +67,13 @@
     <ClCompile Include="src\GraphicsVBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsView.cpp" />
     <ClCompile Include="src\GraphicsViewView.cpp" />
+    <ClCompile Include="src\GuiObjectManager.cpp" />
     <ClCompile Include="src\IconManager.cpp" />
     <ClCompile Include="src\ImagePainterManager.cpp" />
     <ClCompile Include="src\ImagePreview.cpp" />
     <ClCompile Include="src\Label.cpp" />
     <ClCompile Include="src\LineEdit.cpp" />
+    <ClCompile Include="src\ManagedGuiObject.cpp" />
     <ClCompile Include="src\MessageDialog.cpp" />
     <ClCompile Include="src\OnePropertyDialog.cpp" />
     <ClCompile Include="src\OverlayWidgetBase.cpp" />
@@ -171,8 +173,10 @@
     <QtMoc Include="include\OTWidgets\Painter2DPreview.h" />
     <QtMoc Include="include\OTWidgets\Label.h" />
     <QtMoc Include="include\OTWidgets\ImagePreview.h" />
+    <ClInclude Include="include\OTWidgets\GuiObjectManager.h" />
     <ClInclude Include="include\OTWidgets\ImagePainter.h" />
     <ClInclude Include="include\OTWidgets\ImagePainterManager.h" />
+    <ClInclude Include="include\OTWidgets\ManagedGuiObject.h" />
     <ClInclude Include="include\OTWidgets\OverlayWidgetBase.h" />
     <ClInclude Include="include\OTWidgets\PixmapImagePainter.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
