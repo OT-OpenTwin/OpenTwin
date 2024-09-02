@@ -6,21 +6,21 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 	{
 		return ot::Variable(value.GetString());
 	}
-	else if (value.IsInt())
-	{
-		return ot::Variable(value.GetInt());
-	}
 	else if (value.IsInt64())
 	{
 		return ot::Variable(value.GetInt64());
 	}
-	else if (value.IsFloat())
+	else if (value.IsInt())
 	{
-		return ot::Variable(value.GetFloat());
+		return ot::Variable(value.GetInt());
 	}
 	else if (value.IsDouble())
 	{
 		return ot::Variable(value.GetDouble());
+	}
+	else if (value.IsFloat())
+	{
+		return ot::Variable(value.GetFloat());
 	}
 	else if (value.IsBool())
 	{
