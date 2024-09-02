@@ -6,14 +6,17 @@
 
 #pragma once
 
+// OpenTwin header
+#include "OTCommunication/CommunicationAPIExport.h"
+
 namespace ot {
 
-	class ActionHandler {
+	class OT_COMMUNICATION_API_EXPORT ActionHandler {
 	public:
-		ActionHandler() = default;
+		ActionHandler();
 		ActionHandler(const ActionHandler& _other) = default;
 		ActionHandler(ActionHandler&& _other) = default;
-		virtual ~ActionHandler() = default;
+		virtual ~ActionHandler();
 		ActionHandler& operator = (const ActionHandler& _other) = default;
 		ActionHandler& operator = (ActionHandler&& _other) = default;
 	};

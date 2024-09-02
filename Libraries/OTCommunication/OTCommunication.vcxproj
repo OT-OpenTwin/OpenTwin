@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\ActionDispatcher.cpp" />
     <ClCompile Include="src\ActionHandleConnectorBase.cpp" />
+    <ClCompile Include="src\ActionHandler.cpp" />
     <ClCompile Include="src\CommunicationTypes.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\IpConverter.cpp" />
