@@ -178,6 +178,11 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		
 		//We look through the returned documents
 		const uint32_t numberOfDocuments = allEntries.Size();
+		if (numberOfDocuments == 0)
+		{
+			throw std::exception("Query returned nothing.");
+		}
+
 		for (uint32_t i = 0; i < numberOfDocuments; i++)
 		{
 			auto projectedValues = ot::json::getObject(allEntries, i);
