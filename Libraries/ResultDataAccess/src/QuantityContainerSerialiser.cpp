@@ -105,12 +105,12 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	auto quantityMetadata =	_quantityDescription->getMetadataQuantity();
 	
 	assert(quantityMetadata.valueDescriptions.size() == 2); //Quantities that hold complex numbers require two value descriptions. Should have been set upon creation.
+	std::list<MetadataQuantityValueDescription>::iterator valueDescriptionIt =  quantityMetadata.valueDescriptions.begin();
+	MetadataQuantityValueDescription& realValueDescription = *valueDescriptionIt++;
+	ot::UID realQuantityID(realValueDescription.quantityIndex);
 
-	auto realValueDescription = quantityMetadata.valueDescriptions.begin();
-	ot::UID realQuantityID(realValueDescription->quantityIndex);
-
-	auto imagValueDescription = quantityMetadata.valueDescriptions.begin()++;
-	ot::UID imagQuantityID(imagValueDescription->quantityIndex);
+	MetadataQuantityValueDescription& imagValueDescription = *valueDescriptionIt;
+	ot::UID imagQuantityID(imagValueDescription.quantityIndex);
 	
 	m_bucketSize = 1;
 
@@ -162,8 +162,9 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	auto& quantityMetadata = _quantityDescription->getMetadataQuantity();
 	const uint32_t numberOfPorts = quantityMetadata.dataDimensions.front();
 	m_bucketSize = numberOfPorts * numberOfPorts;
-	auto firstValueDescription = quantityMetadata.valueDescriptions.begin();
-	auto secondValueDescription = quantityMetadata.valueDescriptions.begin()++;
+	std::list<MetadataQuantityValueDescription>::iterator valueDescriptionIt = quantityMetadata.valueDescriptions.begin();;
+	MetadataQuantityValueDescription& firstValueDescription = *valueDescriptionIt++;
+	MetadataQuantityValueDescription& secondValueDescription = *valueDescriptionIt;
 
 	for (size_t i = 0; i < _numberOfParameterValues; i++)
 	{
@@ -181,13 +182,13 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 		std::vector<ot::Variable> quantityValueEntriesFirst = _quantityDescription->getFirstValues(i);
 		for (ot::Variable& quantityValueEntry : quantityValueEntriesFirst)
 		{
-			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, firstValueDescription->quantityIndex, quantityValueEntry);
+			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, firstValueDescription.quantityIndex, quantityValueEntry);
 		}
 		
 		std::vector<ot::Variable> quantityValueEntriesSecond = _quantityDescription->getFirstValues(i);
 		for (ot::Variable& quantityValueEntry : quantityValueEntriesSecond)
 		{
-			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, secondValueDescription->quantityIndex, quantityValueEntry);
+			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, secondValueDescription.quantityIndex, quantityValueEntry);
 		}
 	}
 }
