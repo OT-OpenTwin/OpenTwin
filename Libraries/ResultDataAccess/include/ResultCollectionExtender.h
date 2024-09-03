@@ -63,6 +63,9 @@ protected:
 	virtual const uint64_t findNextFreeQuantityIndex();
 	virtual const uint64_t findNextFreeParameterIndex();
 
+	bool quantityIsCorrectlySet(MetadataQuantity& _quantity);
+	bool parameterIsCorrectlySet(MetadataParameter& _parameter);
+
 	bool m_saveModel = true;
 };			  
 

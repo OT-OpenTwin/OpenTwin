@@ -33,10 +33,22 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 		EntityPropertiesSelection* selectionSeries = _dbAccessEntity->getSeriesSelection();
 		updateSelectionIfNecessary(allSeriesLabels, selectionSeries, newProperties);
 		
-		//Get the selected series and look up a list of quantities.
-		const std::string& selectedSeries =	selectionSeries->getValue();
+		auto soFarAddedProperties =	newProperties.getListOfAllProperties();
+		std::string selectedSeries;
+		if (!soFarAddedProperties.empty())
+		{
+			//If a property was added at this point, it can only be a single property which is the series selection
+			auto newSeriesSelection = dynamic_cast<EntityPropertiesSelection*>(soFarAddedProperties.back());
+			newSeriesSelection->getValue();
+		}
+		else
+		{
+			//Otherwise take the selected series.
+			selectedSeries = selectionSeries->getValue();
+		}
+
 		std::list<std::string> allQuantityLabels;
-		if (selectedSeries == "")
+		if (selectedSeries == m_selectedValueNone)
 		{
 			allQuantityLabels = resultCollectionAccess->listAllQuantityLabels();
 		}

@@ -452,10 +452,12 @@ void ResultCollectionExtender::addMetadataToSeries(std::list<DatasetDescription>
 	}
 	for (auto& uniqueQuantity : uniqueQuantities)
 	{
+		PRE(quantityIsCorrectlySet(*uniqueQuantity.second));
 		_newSeries.addQuantity(*uniqueQuantity.second);
 	}
 	for (auto& uniqueParameter : uniqueParameters)
 	{
+		PRE(parameterIsCorrectlySet(uniqueParameter.second));
 		_newSeries.addParameter(std::move(uniqueParameter.second));
 	}
 }
@@ -473,5 +475,37 @@ const uint64_t ResultCollectionExtender::findNextFreeQuantityIndex()
 const uint64_t ResultCollectionExtender::findNextFreeParameterIndex()
 {
 	return m_modelComponent->createEntityUID();
+}
+
+bool ResultCollectionExtender::quantityIsCorrectlySet(MetadataQuantity& _quantity)
+{
+	bool correctlySet =
+		_quantity.quantityIndex != 0 &&
+		_quantity.dataDimensions.size() > 0 &&
+		_quantity.dependingParameterIds.size() > 0 &&
+		_quantity.quantityLabel != "" &&
+		_quantity.quantityName != "" &&
+		_quantity.valueDescriptions.size() > 0;
+	//List of meta data may be empty
+	for (auto& valueDescription : _quantity.valueDescriptions)
+	{
+		correctlySet &=
+			valueDescription.dataTypeName != "" &&
+			valueDescription.quantityIndex != 0;
+		//label, name and unit can be empty
+	}
+	return correctlySet;
+}
+
+bool ResultCollectionExtender::parameterIsCorrectlySet(MetadataParameter& _parameter)
+{
+	bool correctlySet =
+		_parameter.parameterLabel != "" &&
+		_parameter.parameterName != "" &&
+		_parameter.parameterUID != 0 &&
+		_parameter.typeName != "" &&
+		_parameter.values.size() > 0;
+	//Unit and list of meta data may be empty
+	return correctlySet;
 }
 

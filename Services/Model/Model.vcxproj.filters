@@ -66,6 +66,9 @@
     <ClCompile Include="src\UiNotifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\CrossCollectionDatabaseWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\stdafx.h">
@@ -108,6 +111,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\UiNotifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CrossCollectionDatabaseWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

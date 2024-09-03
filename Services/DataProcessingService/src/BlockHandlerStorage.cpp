@@ -298,8 +298,13 @@ QuantityDescription* BlockHandlerStorage::extractQuantityDescription(const ot::C
 		pointer.m_column = 0;
 		pointer.m_row = 0;
 		const ot::Variable& value = matrixEntry->getValue(pointer);
+		const uint32_t numberOfRows = matrixEntry->getNumberOfColumns();
+		const uint32_t numberOfColumns = matrixEntry->getNumberOfRows();
+		ot::MatrixEntryPointer matrixDimension;
+		matrixDimension.m_column = numberOfColumns;
+		matrixDimension.m_row= numberOfRows;
 		_outTypeName = value.getTypeName();
-		auto quantityDescriptionMatrix(std::make_unique<QuantityDescriptionMatrix>());
+		auto quantityDescriptionMatrix(std::make_unique<QuantityDescriptionMatrix>(matrixDimension, pipelineData.size()));
 		for (auto dataEntry : pipelineData)
 		{
 			matrixEntry = dynamic_cast<ot::GenericDataStructMatrix*>(dataEntry.get());

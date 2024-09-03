@@ -284,8 +284,8 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 		m_newEntityVersions.push_back(entitySeries.getEntityStorageVersion());
 	}
 
-	std::list<bool> visibillity(false);
-	
+	std::list<bool> visibillity(m_newEntityIDs.size(), false);
+	assert(m_newEntityIDs.size() == m_newEntityVersions.size() == visibillity.size());
 	_modelComponent.addEntitiesToModel(std::move(m_newEntityIDs), std::move(m_newEntityVersions), std::move(visibillity), {}, {}, {}, "Updated result data collection", true, _saveModel);
 }
 

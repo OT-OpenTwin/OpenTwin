@@ -4,7 +4,11 @@
 class __declspec(dllexport) QuantityDescriptionCurveComplex :public QuantityDescription
 {
 public:
-	
+	QuantityDescriptionCurveComplex()
+	{
+		m_metadataQuantity.dataDimensions.push_back(1);
+	}
+
 	void reserveSizeRealValues(uint64_t _size)
 	{
 		m_quantityValuesReal.reserve(_size);
@@ -33,5 +37,4 @@ public:
 private:
 	std::vector<ot::Variable> m_quantityValuesReal;
 	std::vector<ot::Variable> m_quantityValuesImag;
-	MetadataQuantity m_metadataQuantity;
 };

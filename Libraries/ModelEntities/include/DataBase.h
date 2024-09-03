@@ -42,7 +42,10 @@ public:
 	std::string StoreDataItem(bsoncxx::builder::basic::document &storage);
 	std::string StorePlainDataItem(bsoncxx::builder::basic::document &storage);
 
+	//! @return Corresponse to the database success response.
 	bool GetDocumentFromObjectID(const std::string &storageID, bsoncxx::builder::basic::document &doc);
+		
+	//! @return Corresponse to the database success response.
 	bool GetDocumentFromEntityIDandVersion(unsigned long long entityID, unsigned long long version, bsoncxx::builder::basic::document &doc);
 	EntityBase* GetEntityFromEntityIDandVersion(ot::UID _entityID, ot::UID _version, ClassFactory* classFactory);
 
