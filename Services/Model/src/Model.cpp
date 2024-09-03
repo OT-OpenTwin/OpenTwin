@@ -2962,25 +2962,23 @@ void Model::performSpecialUpdates(EntityBase *entity)
 		performEntityMeshUpdate(dynamic_cast<EntityMeshTet*>(entity));
 		return;
 	}
+	
 	if (dynamic_cast<EntityMeshCartesian*>(entity) != nullptr)
 	{
 		performEntityMeshUpdate(dynamic_cast<EntityMeshCartesian*>(entity));
 		return;
 	}
-	else if (dynamic_cast<EntityFaceAnnotation*>(entity) != nullptr)
+	
+	if (dynamic_cast<EntityFaceAnnotation*>(entity) != nullptr)
 	{
 		updateAnnotationGeometry(dynamic_cast<EntityFaceAnnotation*>(entity));
 		return;
 	}
-	else if (dynamic_cast<EntityParameter*>(entity) != nullptr)
+	
+	if (dynamic_cast<EntityParameter*>(entity) != nullptr)
 	{
 		setParameter(entity->getName(), dynamic_cast<EntityParameter*>(entity)->getNumericValue(), dynamic_cast<EntityParameter*>(entity));
 		return;
-	}
-	else if (dynamic_cast<EntityBlock*>(entity) != nullptr)
-	{
-		/*std::list<EntityBase*> blockEntities{ entity };
-		VisualizeRelatedBlockConnections(blockEntities)*/;
 	}
 }
 

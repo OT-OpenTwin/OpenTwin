@@ -57,6 +57,7 @@ public:
 	std::list<std::string> getListOfPropertiesForGroup(const std::string &group);
 
 	static const std::string createKey(const std::string& _name, const std::string& _group);
+	const bool isKey(const std::string _accesser);
 	const std::string extractNameFromKey(const std::string& _key);
 private:
 	void deleteAllProperties(void);

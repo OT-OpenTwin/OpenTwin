@@ -109,16 +109,33 @@ EntityPropertiesBase *EntityProperties::getProperty(const std::string& _name, co
 {
 	if (_groupName == "")
 	{
-		//Find first of name
-		for (auto property : properties)
+		const bool accesserIsAKey = isKey(_name);
+		if(accesserIsAKey)
 		{
-			const std::string& keyOfCurrentProperty = property.first;
-			const std::string name = extractNameFromKey(keyOfCurrentProperty);
-			if (name == _name)
+			auto property = properties.find(_name);
+			if (property == properties.end())
 			{
-				return properties[keyOfCurrentProperty];
+				return nullptr;
+			}
+			else
+			{
+				return property->second;
 			}
 		}
+		else
+		{
+			//Find first of name
+			for (auto property : properties)
+			{
+				const std::string& keyOfCurrentProperty = property.first;
+				const std::string name = extractNameFromKey(keyOfCurrentProperty);
+				if (name == _name)
+				{
+					return properties[keyOfCurrentProperty];
+				}
+			}
+		}
+		
 		return nullptr;
 	}
 	else
@@ -547,6 +564,12 @@ std::list<std::string> EntityProperties::getListOfPropertiesForGroup(const std::
 const std::string EntityProperties::createKey(const std::string& _name, const std::string& _group)
 {
 	return _group + "/" + _name;
+}
+
+const bool EntityProperties::isKey(const std::string _accesser)
+{
+	size_t posGroupSeperator = _accesser.find('/');
+	return posGroupSeperator != std::string::npos;
 }
 
 const std::string EntityProperties::extractNameFromKey(const std::string& _key)
