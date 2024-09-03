@@ -22,7 +22,7 @@
 #include "OTCommunication/IpConverter.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/Encryption.h"
-
+#include "CrossCollectionDatabaseWrapper.h"
 // std header
 #include <thread>
 
@@ -878,8 +878,8 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 	bool recursive = ot::json::getBool(_document, OT_ACTION_PARAM_Recursive);
 
 	std::string actualOpenedProject = DataBase::GetDataBase()->getProjectName();
-	DataBase::GetDataBase()->setProjectName(collectionName);
-	DataBase::GetDataBase()->RemovePrefetchedDocument(0);
+	CrossCollectionDatabaseWrapper wrapper(collectionName);
+		
 	ModelState secondary(m_model->getSessionCount(), m_model->getServiceIDAsInt());
 	secondary.openProject();
 
@@ -909,9 +909,6 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 			entityVersionList.push_back(identifier.second);
 		}
 	}
-
-	DataBase::GetDataBase()->setProjectName(actualOpenedProject);
-	DataBase::GetDataBase()->RemovePrefetchedDocument(0);
 
 	ot::JsonDocument newDoc;
 	newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDList, newDoc.GetAllocator()), newDoc.GetAllocator());
