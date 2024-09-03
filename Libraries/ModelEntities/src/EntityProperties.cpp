@@ -516,9 +516,9 @@ std::list<EntityPropertiesDouble *> EntityProperties::getListOfNumericalProperti
 
 		if (doubleProp != nullptr)
 		{
-			if (!prop.first.empty())
+			if (!prop.second->getName().empty())
 			{
-				if (prop.first[0] == '#')
+				if (prop.second->getName()[0] == '#')
 				{
 					numericalProperty.push_back(doubleProp);
 				}
