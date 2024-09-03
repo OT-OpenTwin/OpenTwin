@@ -23,9 +23,13 @@ public:
 	double getY(void) { return position[1]; }
 	double getZ(void) { return position[2]; }
 
+	void setEdgeName(const std::string& name) { edgeName = name; }
+	std::string getEdgeName(void) { return edgeName; }
+
 private:
 	ot::UID entityID;
 	double position[3];
+	std::string edgeName;
 };
 
 
@@ -45,6 +49,7 @@ private:
 	bool removeFacesFromEntity(EntityGeometry *geometryEntity, ot::UID brepID, ot::UID brepVersion, std::list<ChamferEdgesData> &faces, std::list<ot::UID> &modifiedEntities);
 	bool findFaceFromPosition(TopoDS_Shape &shape, double x, double y, double z, TopoDS_Shape &face);
 	UpdateManager *getUpdateManager(void) { assert(updateManager != nullptr); return updateManager; }
+	void deletePropertyCategory(EntityGeometry* geometryEntity, const std::string category);
 
 	UpdateManager *updateManager;
 };

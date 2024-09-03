@@ -66,6 +66,7 @@ public:
 	virtual ~FaceSelection() {}
 
 	void setData(unsigned long long _modelID, double _x, double _y, double _z) { modelID = _modelID, x = _x; y = _y; z = _z; }
+
 	unsigned long long getModelID(void) const { return modelID; }
 	double getX(void) const { return x; }
 	double getY(void) const { return y; }
@@ -73,8 +74,12 @@ public:
 
 	void setSelectedItem(SceneNodeGeometry *item) { selectedItem = item; }
 	SceneNodeGeometry *getSelectedItem(void) const { return selectedItem; }
+
 	void setFaceId(unsigned long long id) { faceId = id; }
 	unsigned long long getFaceId(void) const { return faceId; }
+
+	void setFaceName(const std::string& name) { faceName = name; }
+	std::string getFaceName(void) { return faceName; }
 
 	bool operator==(const FaceSelection &other) { return (selectedItem == other.getSelectedItem() && faceId == other.getFaceId()); }
 
@@ -85,6 +90,7 @@ private:
 	double z;
 	SceneNodeGeometry *selectedItem;
 	unsigned long long faceId;
+	std::string faceName;
 };
 
 class EdgeSelection
@@ -101,9 +107,13 @@ public:
 
 	void setSelectedItem(SceneNodeGeometry* item) { selectedItem = item; }
 	SceneNodeGeometry* getSelectedItem(void) const { return selectedItem; }
+
 	void setFaceIds(unsigned long long id1, unsigned long long id2) { faceId1 = id1; faceId2 = id2; }
 	unsigned long long getFaceId1(void) const { return faceId1; }
 	unsigned long long getFaceId2(void) const { return faceId2; }
+
+	void setEdgeName(const std::string& name) { edgeName = name; }
+	std::string getEdgeName(void) { return edgeName; }
 
 	bool operator==(const EdgeSelection& other) const { return (selectedItem == other.getSelectedItem() 
 		                                                  && (   faceId1 == other.getFaceId1() && faceId2 == other.getFaceId2()
@@ -121,6 +131,7 @@ private:
 	unsigned long long faceId1;
 	unsigned long long faceId2;
 	osg::Node* node;
+	std::string edgeName;
 };
 
 bool operator==(const FaceSelection& left, const FaceSelection& right);
@@ -337,6 +348,7 @@ private:
 	void       updateCapGeometryForSceneNodes(SceneNodeBase *root, const osg::Vec3d &normal, const osg::Vec3d &point);
 	void       updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg::Vec3d &normal, const osg::Vec3d &point);
 	bool	   isLineDrawable(osg::Drawable *drawable);
+	void	   clearEdgeSelection(void);
 
 	// Attributes
 	enum { ITEM_SELECTED = 1, ITEM_EXPANDED = 2 };

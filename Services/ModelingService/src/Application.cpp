@@ -188,6 +188,10 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		{
 			getRemoveFacesOperation()->performOperation(selectionInfo);
 		}
+		else if (selectionAction == "CHAMFER_EDGE")
+		{
+			getChamferEdgesManager()->performOperation(selectionInfo);
+		}
 		else
 		{
 			assert(0); // Unhandled action
