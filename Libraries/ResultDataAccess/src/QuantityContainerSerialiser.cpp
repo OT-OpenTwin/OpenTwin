@@ -185,7 +185,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, firstValueDescription.quantityIndex, quantityValueEntry);
 		}
 		
-		std::vector<ot::Variable> quantityValueEntriesSecond = _quantityDescription->getFirstValues(i);
+		std::vector<ot::Variable> quantityValueEntriesSecond = _quantityDescription->getSecondValues(i);
 		for (ot::Variable& quantityValueEntry : quantityValueEntriesSecond)
 		{
 			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, secondValueDescription.quantityIndex, quantityValueEntry);
