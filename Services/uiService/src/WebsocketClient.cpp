@@ -16,7 +16,6 @@
 #include <QtCore/QFile>
 #include <QProcessEnvironment>
 
-
 extern "C"
 {
 	_declspec(dllexport) const char *performAction(const char *json, const char *senderIP);
@@ -24,10 +23,10 @@ extern "C"
 	_declspec(dllexport) void deallocateData(const char *data);
 }
 
-WebsocketClient::WebsocketClient(const std::string &socketUrl) :
+WebsocketClient::WebsocketClient(const std::string& _socketUrl) :
 	QObject(nullptr), m_isConnected(false), m_currentlyProcessingQueuedMessage(false), m_sessionIsClosing(false)
 {
-	std::string wsUrl = "wss://" + socketUrl;
+	std::string wsUrl = "wss://" + _socketUrl;
 	wsUrl = ot::stringReplace(wsUrl, "127.0.0.1", "localhost");
 	m_url = QUrl(wsUrl.c_str());
 
@@ -78,13 +77,118 @@ WebsocketClient::~WebsocketClient()
 	processMessages();
 }
 
+void WebsocketClient::sendMessage(const std::string& _message, std::string& _response) {
+	size_t index1 = _message.find('\n');
+	size_t index2 = _message.find('\n', index1 + 1);
 
-void WebsocketClient::slotSslErrors(const QList<QSslError> &errors)
+	std::string senderIP = _message.substr(index1 + 1, index2 - index1 - 1);
+
+	// Make sure we are connected
+	if (!ensureConnection()) return;
+
+	// Now send our message	
+	m_waitingForResponse[senderIP] = true;
+	m_webSocket.sendTextMessage(_message.c_str());
+
+	// Wait for the reponse
+	while (m_waitingForResponse[senderIP]) {
+		processMessages();
+	}
+
+	// We have received a response and return the text
+	_response = m_responseText;
+}
+
+void WebsocketClient::sendResponse(const std::string& _message) {
+	// Make sure we are connected
+	if (!ensureConnection()) return;
+
+	// Send the reponse
+	m_webSocket.sendTextMessage(_message.c_str());
+}
+
+void WebsocketClient::finishedProcessingQueuedMessage(void) {
+	assert(m_currentlyProcessingQueuedMessage);
+	m_currentlyProcessingQueuedMessage = false;
+
+	if (!m_commandQueue.empty()) {
+		QString message = m_commandQueue.front();
+		m_commandQueue.pop_front();
+
+		this->slotMessageReceived(message);
+	}
+}
+
+// ###############################################################################################################################################
+
+// Private Slots
+
+void WebsocketClient::slotConnected() {
+	OT_LOG_D("Client connected");
+
+	connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &WebsocketClient::slotMessageReceived);
+	m_isConnected = true;
+}
+
+void WebsocketClient::slotMessageReceived(const QString& _message)
 {
+	// Get the action from the message
+	int index1 = _message.indexOf('\n');
+	int index2 = _message.indexOf('\n', index1 + 1);
+
+	QString action = _message.left(index1);
+	QString senderIP = _message.mid(index1 + 1, index2 - index1 - 1);
+
+	// Process the action
+	if (action == "response")
+	{
+		m_responseText = _message.mid(index2 + 1).toStdString();
+		m_waitingForResponse[senderIP.toStdString()] = false;
+	}
+	else if (action == "execute")
+	{
+		if (m_currentlyProcessingQueuedMessage || m_waitingForResponse[senderIP.toStdString()])
+		{
+			m_commandQueue.push_back(_message);
+		}
+		else
+		{
+			sendExecuteOrQueueMessage(_message);
+		}
+	}
+	else if (action == "queue")
+	{
+		if (m_currentlyProcessingQueuedMessage || m_waitingForResponse[senderIP.toStdString()])
+		{
+			m_commandQueue.push_back(_message);
+		}
+		else
+		{
+			sendExecuteOrQueueMessage(_message);
+		}
+	}
+}
+
+void WebsocketClient::slotSocketDisconnected() {
+	if (!m_isConnected) return; // This message might be sent on an unsuccessful connection attempt (when the relay server is not yet ready). In this case, we can 
+	// safely ignore this message.
+
+	OT_LOG_D("Relay server disconnected on websocket");
+	m_isConnected = false;
+
+	if (!m_sessionIsClosing) {
+		// This is an unexpected disconnect of the relay service -> we need to close the session
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceEmergencyShutdown, doc.GetAllocator()), doc.GetAllocator());
+		m_currentlyProcessingQueuedMessage = true;
+		queueAction(doc.toJson().c_str(), "");
+	}
+}
+
+void WebsocketClient::slotSslErrors(const QList<QSslError>& errors) {
 	//Q_UNUSED(errors);
 
-	foreach(QSslError err, errors)
-	{
+	foreach(QSslError err, errors) {
 		OT_LOG_E(err.errorString().toStdString());
 	}
 	// WARNING: Never ignore SSL errors in production code.
@@ -95,141 +199,14 @@ void WebsocketClient::slotSslErrors(const QList<QSslError> &errors)
 	m_webSocket.ignoreSslErrors();
 }
 
-void WebsocketClient::slotConnected()
-{
-	OT_LOG_D("Client connected");
+// ###############################################################################################################################################
 
-	connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &WebsocketClient::slotMessageReceived);
-	m_isConnected = true;
-}
-
-void WebsocketClient::slotSocketDisconnected()
-{
-	if (!m_isConnected) return; // This message might be sent on an unsuccessful connection attempt (when the relay server is not yet ready). In this case, we can 
-							  // safely ignore this message.
-
-	OT_LOG_D("Relay server disconnected on websocket");
-	m_isConnected = false;
-
-	if (!m_sessionIsClosing)
-	{
-		// This is an unexpected disconnect of the relay service -> we need to close the session
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceEmergencyShutdown, doc.GetAllocator()), doc.GetAllocator());
-		m_currentlyProcessingQueuedMessage = true;
-		queueAction(doc.toJson().c_str(), "");
-	}
-}
-
-void WebsocketClient::slotMessageReceived(QString message)
-{
-	// Get the action from the message
-	int index1 = message.indexOf('\n');
-	int index2 = message.indexOf('\n', index1 + 1);
-
-	QString action = message.left(index1);
-	QString senderIP = message.mid(index1 + 1, index2 - index1 - 1);
-
-	// Process the action
-	if (action == "response")
-	{
-		m_responseText = message.mid(index2 + 1).toStdString();
-		m_waitingForResponse[senderIP.toStdString()] = false;
-	}
-	else if (action == "execute")
-	{
-		if (m_currentlyProcessingQueuedMessage || m_waitingForResponse[senderIP.toStdString()])
-		{
-			m_commandQueue.push_back(message);
-		}
-		else
-		{
-			sendExecuteOrQueueMessage(message);
-		}
-	}
-	else if (action == "queue")
-	{
-		if (m_currentlyProcessingQueuedMessage || m_waitingForResponse[senderIP.toStdString()])
-		{
-			m_commandQueue.push_back(message);
-		}
-		else
-		{
-			sendExecuteOrQueueMessage(message);
-		}
-	}
-}
-
-void WebsocketClient::finishedProcessingQueuedMessage(void)
-{
-	assert(m_currentlyProcessingQueuedMessage);
-	m_currentlyProcessingQueuedMessage = false;
-
-	if (!m_commandQueue.empty())
-	{
-		QString message = m_commandQueue.front();
-		m_commandQueue.pop_front();
-
-		this->slotMessageReceived(message);
-	}
-}
-
-void WebsocketClient::sendResponse(const std::string &message)
-{
-	// Make sure we are connected
-	if (!ensureConnection()) return;
-
-	// Send the reponse
-	m_webSocket.sendTextMessage(message.c_str());
-}
-
-void WebsocketClient::sendMessage(const std::string &message, std::string &response)
-{
-	size_t index1 = message.find('\n');
-	size_t index2 = message.find('\n', index1 + 1);
-
-	std::string senderIP = message.substr(index1 + 1, index2 - index1 - 1);
-
-	// Make sure we are connected
-	if (!ensureConnection()) return;
-
-	// Now send our message	
-	m_waitingForResponse[senderIP] = true;
-	m_webSocket.sendTextMessage(message.c_str());
-
-	// Wait for the reponse
-	while (m_waitingForResponse[senderIP])
-	{
-		processMessages();
-	}
-
-	// We have received a response and return the text
-	response = m_responseText;
-}
+// Private helper
 
 void WebsocketClient::processMessages(void) 
 {
 	QEventLoop eventLoop;		
 	eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
-}
-
-bool WebsocketClient::ensureConnection(void)
-{
-	if (!m_isConnected && m_sessionIsClosing) return false;
-
-	while (!m_isConnected)
-	{
-		if (m_webSocket.state() == QAbstractSocket::UnconnectedState)
-		{
-			// The relay service was probably not running when the connection was tried to establish
-			// Try to connect again
-			m_webSocket.open(QUrl(m_url));
-		}
-		processMessages();
-	}
-	assert(m_isConnected);
-
-	return m_isConnected;
 }
 
 void WebsocketClient::sendExecuteOrQueueMessage(QString message)
@@ -271,4 +248,20 @@ void WebsocketClient::sendExecuteOrQueueMessage(QString message)
 	}
 
 	sendResponse(returnMessage);
+}
+
+bool WebsocketClient::ensureConnection(void) {
+	if (!m_isConnected && m_sessionIsClosing) return false;
+
+	while (!m_isConnected) {
+		if (m_webSocket.state() == QAbstractSocket::UnconnectedState) {
+			// The relay service was probably not running when the connection was tried to establish
+			// Try to connect again
+			m_webSocket.open(QUrl(m_url));
+		}
+		processMessages();
+	}
+	assert(m_isConnected);
+
+	return m_isConnected;
 }

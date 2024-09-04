@@ -11,11 +11,11 @@ class WebsocketClient : public QObject
 {
 	Q_OBJECT
 public:
-	WebsocketClient(const std::string& socketUrl);
+	WebsocketClient(const std::string& _socketUrl);
 	~WebsocketClient();
 
-	void sendMessage(const std::string &message, std::string &response);
-	void sendResponse(const std::string &message);
+	void sendMessage(const std::string& _message, std::string& _response);
+	void sendResponse(const std::string& _message);
 
 	void finishedProcessingQueuedMessage(void);
 
@@ -26,7 +26,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void slotConnected();
-	void slotMessageReceived(QString message);
+	void slotMessageReceived(const QString& _message);
 	void slotSocketDisconnected();
 	void slotSslErrors(const QList<QSslError> &errors);
 
