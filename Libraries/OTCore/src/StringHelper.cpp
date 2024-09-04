@@ -65,3 +65,25 @@ std::list<std::wstring> ot::splitString(const std::wstring& _str, const std::wst
 	if (!_skipEmpty || !temp.empty()) ret.push_back(temp);
 	return ret;
 }
+
+std::string ot::stringReplace(const std::string& _str, const std::string& _what, const std::string& _with) {
+	std::string result = _str;
+	size_t start_pos = result.find(_what);
+	while (start_pos != std::string::npos) {
+		start_pos = result.find(_what);
+		result.replace(start_pos, _what.length(), _with);
+		start_pos = result.find(_what, start_pos + _with.length());
+	}
+	return result;
+}
+
+std::wstring ot::stringReplace(const std::wstring& _str, const std::wstring& _what, const std::wstring& _with) {
+	std::wstring result = _str;
+	size_t start_pos = result.find(_what);
+	while (start_pos != std::wstring::npos) {
+		start_pos = result.find(_what);
+		result.replace(start_pos, _what.length(), _with);
+		start_pos = result.find(_what, start_pos + _with.length());
+	}
+	return result;
+}

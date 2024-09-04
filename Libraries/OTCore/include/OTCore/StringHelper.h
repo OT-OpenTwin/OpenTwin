@@ -40,6 +40,12 @@ namespace ot {
 	//! @param _skipEmpty If true, all empty parts will be skipped
 	OT_CORE_API_EXPORT std::list<std::wstring> splitString(const std::wstring& _str, const std::wstring& _splitBy, bool _skipEmpty = false);
 
+	//! \brief Replaces all what occurances in the provided string and returns the result.
+	OT_CORE_API_EXPORT std::string stringReplace(const std::string& _str, const std::string& _what, const std::string& _with);
+
+	//! \brief Replaces all what occurances in the provided string and returns the result.
+	OT_CORE_API_EXPORT std::wstring stringReplace(const std::wstring& _str, const std::wstring& _what, const std::wstring& _with);
+
 	//! @brief Convert the provided string to a number
 	//! @param _string String representing a number
 	//! @param _failed Will be set to true if the operation failed

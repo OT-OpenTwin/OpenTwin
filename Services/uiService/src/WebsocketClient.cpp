@@ -7,9 +7,10 @@
 #include <thread>
 
 // OpenTwin header
-#include "OTCommunication/ActionTypes.h"
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
+#include "OTCore/StringHelper.h"
+#include "OTCommunication/ActionTypes.h"
 
 // SSL
 #include <QtCore/QFile>
@@ -23,23 +24,11 @@ extern "C"
 	_declspec(dllexport) void deallocateData(const char *data);
 }
 
-bool replace(std::string& str, const std::string& from, const std::string& to) {
-	size_t start_pos = str.find(from);
-	if (start_pos == std::string::npos)
-		return false;
-	str.replace(start_pos, from.length(), to);
-	return true;
-}
-
 WebsocketClient::WebsocketClient(const std::string &socketUrl) :
-	QObject(nullptr),
-	isConnected(false),
-	currentlyProcessingQueuedMessage(false),
-	sessionIsClosing(false)
+	QObject(nullptr), m_isConnected(false), m_currentlyProcessingQueuedMessage(false), m_sessionIsClosing(false)
 {
 	std::string wsUrl = "wss://" + socketUrl;
-	// TODO: REMOVE THIS AFTER Qt UPDATE
-	replace(wsUrl, "127.0.0.1", "localhost");
+	wsUrl = ot::stringReplace(wsUrl, "127.0.0.1", "localhost");
 	m_url = QUrl(wsUrl.c_str());
 
 	QString caStr = QCoreApplication::applicationDirPath() + "\\Certificates\\ca.pem";
@@ -72,11 +61,11 @@ WebsocketClient::WebsocketClient(const std::string &socketUrl) :
 	
 	m_webSocket.setSslConfiguration(sslConfiguration);
 
-	connect(&m_webSocket, &QWebSocket::connected, this, &WebsocketClient::onConnected);
-	connect(&m_webSocket, &QWebSocket::disconnected, this, &WebsocketClient::socketDisconnected);
+	connect(&m_webSocket, &QWebSocket::connected, this, &WebsocketClient::slotConnected);
+	connect(&m_webSocket, &QWebSocket::disconnected, this, &WebsocketClient::slotSocketDisconnected);
 
 	connect(&m_webSocket, QOverload<const QList<QSslError>&>::of(&QWebSocket::sslErrors),
-		this, &WebsocketClient::onSslErrors);
+		this, &WebsocketClient::slotSslErrors);
 
 	m_webSocket.open(QUrl(m_url));
 
@@ -90,7 +79,7 @@ WebsocketClient::~WebsocketClient()
 }
 
 
-void WebsocketClient::onSslErrors(const QList<QSslError> &errors)
+void WebsocketClient::slotSslErrors(const QList<QSslError> &errors)
 {
 	//Q_UNUSED(errors);
 
@@ -106,33 +95,33 @@ void WebsocketClient::onSslErrors(const QList<QSslError> &errors)
 	m_webSocket.ignoreSslErrors();
 }
 
-void WebsocketClient::onConnected()
+void WebsocketClient::slotConnected()
 {
 	OT_LOG_D("Client connected");
 
-	connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &WebsocketClient::onMessageReceived);
-	isConnected = true;
+	connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &WebsocketClient::slotMessageReceived);
+	m_isConnected = true;
 }
 
-void WebsocketClient::socketDisconnected()
+void WebsocketClient::slotSocketDisconnected()
 {
-	if (!isConnected) return; // This message might be sent on an unsuccessful connection attempt (when the relay server is not yet ready). In this case, we can 
+	if (!m_isConnected) return; // This message might be sent on an unsuccessful connection attempt (when the relay server is not yet ready). In this case, we can 
 							  // safely ignore this message.
 
 	OT_LOG_D("Relay server disconnected on websocket");
-	isConnected = false;
+	m_isConnected = false;
 
-	if (!sessionIsClosing)
+	if (!m_sessionIsClosing)
 	{
 		// This is an unexpected disconnect of the relay service -> we need to close the session
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceEmergencyShutdown, doc.GetAllocator()), doc.GetAllocator());
-		currentlyProcessingQueuedMessage = true;
+		m_currentlyProcessingQueuedMessage = true;
 		queueAction(doc.toJson().c_str(), "");
 	}
 }
 
-void WebsocketClient::onMessageReceived(QString message)
+void WebsocketClient::slotMessageReceived(QString message)
 {
 	// Get the action from the message
 	int index1 = message.indexOf('\n');
@@ -144,14 +133,14 @@ void WebsocketClient::onMessageReceived(QString message)
 	// Process the action
 	if (action == "response")
 	{
-		responseText = message.mid(index2 + 1).toStdString();
-		waitingForResponse[senderIP.toStdString()] = false;
+		m_responseText = message.mid(index2 + 1).toStdString();
+		m_waitingForResponse[senderIP.toStdString()] = false;
 	}
 	else if (action == "execute")
 	{
-		if (currentlyProcessingQueuedMessage || waitingForResponse[senderIP.toStdString()])
+		if (m_currentlyProcessingQueuedMessage || m_waitingForResponse[senderIP.toStdString()])
 		{
-			commandQueue.push_back(message);
+			m_commandQueue.push_back(message);
 		}
 		else
 		{
@@ -160,9 +149,9 @@ void WebsocketClient::onMessageReceived(QString message)
 	}
 	else if (action == "queue")
 	{
-		if (currentlyProcessingQueuedMessage || waitingForResponse[senderIP.toStdString()])
+		if (m_currentlyProcessingQueuedMessage || m_waitingForResponse[senderIP.toStdString()])
 		{
-			commandQueue.push_back(message);
+			m_commandQueue.push_back(message);
 		}
 		else
 		{
@@ -173,15 +162,15 @@ void WebsocketClient::onMessageReceived(QString message)
 
 void WebsocketClient::finishedProcessingQueuedMessage(void)
 {
-	assert(currentlyProcessingQueuedMessage);
-	currentlyProcessingQueuedMessage = false;
+	assert(m_currentlyProcessingQueuedMessage);
+	m_currentlyProcessingQueuedMessage = false;
 
-	if (!commandQueue.empty())
+	if (!m_commandQueue.empty())
 	{
-		QString message = commandQueue.front();
-		commandQueue.pop_front();
+		QString message = m_commandQueue.front();
+		m_commandQueue.pop_front();
 
-		onMessageReceived(message);
+		this->slotMessageReceived(message);
 	}
 }
 
@@ -205,17 +194,17 @@ void WebsocketClient::sendMessage(const std::string &message, std::string &respo
 	if (!ensureConnection()) return;
 
 	// Now send our message	
-	waitingForResponse[senderIP] = true;
+	m_waitingForResponse[senderIP] = true;
 	m_webSocket.sendTextMessage(message.c_str());
 
 	// Wait for the reponse
-	while (waitingForResponse[senderIP])
+	while (m_waitingForResponse[senderIP])
 	{
 		processMessages();
 	}
 
 	// We have received a response and return the text
-	response = responseText;
+	response = m_responseText;
 }
 
 void WebsocketClient::processMessages(void) 
@@ -226,9 +215,9 @@ void WebsocketClient::processMessages(void)
 
 bool WebsocketClient::ensureConnection(void)
 {
-	if (!isConnected && sessionIsClosing) return false;
+	if (!m_isConnected && m_sessionIsClosing) return false;
 
-	while (!isConnected)
+	while (!m_isConnected)
 	{
 		if (m_webSocket.state() == QAbstractSocket::UnconnectedState)
 		{
@@ -238,9 +227,9 @@ bool WebsocketClient::ensureConnection(void)
 		}
 		processMessages();
 	}
-	assert(isConnected);
+	assert(m_isConnected);
 
-	return isConnected;
+	return m_isConnected;
 }
 
 void WebsocketClient::sendExecuteOrQueueMessage(QString message)
@@ -263,7 +252,7 @@ void WebsocketClient::sendExecuteOrQueueMessage(QString message)
 	}
 	else if (action == "queue")
 	{
-		currentlyProcessingQueuedMessage = true;
+		m_currentlyProcessingQueuedMessage = true;
 		response = queueAction(jsonData.toStdString().c_str(), senderIP.toStdString().c_str());
 	}
 	else

@@ -19,16 +19,16 @@ public:
 
 	void finishedProcessingQueuedMessage(void);
 
-	void isClosing(void) { sessionIsClosing = true; }
+	void isClosing(void) { m_sessionIsClosing = true; }
 
 Q_SIGNALS:
 	void closed();
 
 private Q_SLOTS:
-	void onConnected();
-	void onMessageReceived(QString message);
-	void socketDisconnected();
-	void onSslErrors(const QList<QSslError> &errors);
+	void slotConnected();
+	void slotMessageReceived(QString message);
+	void slotSocketDisconnected();
+	void slotSslErrors(const QList<QSslError> &errors);
 
 private:
 	void processMessages(void);	
@@ -37,11 +37,11 @@ private:
 
 	QWebSocket m_webSocket;
 	QUrl m_url;
-	bool isConnected;
-	std::map<std::string, bool> waitingForResponse;
-	bool currentlyProcessingQueuedMessage;
-	std::string responseText;
-	std::list<QString> commandQueue;
-	bool sessionIsClosing;
+	bool m_isConnected;
+	std::map<std::string, bool> m_waitingForResponse;
+	bool m_currentlyProcessingQueuedMessage;
+	std::string m_responseText;
+	std::list<QString> m_commandQueue;
+	bool m_sessionIsClosing;
 };
 
