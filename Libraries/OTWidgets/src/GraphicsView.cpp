@@ -290,6 +290,7 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
 	connection->disconnectItems();
 
 	// Destroy connection
+	m_scene->removeItem(connection);
 	delete connection;
 	connection = nullptr;
 
