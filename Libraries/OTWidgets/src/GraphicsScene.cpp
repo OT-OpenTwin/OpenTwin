@@ -53,8 +53,11 @@ void ot::GraphicsScene::startConnectionToConnection(ot::GraphicsConnectionItem* 
 	}
 
 	OT_LOG_D("New conncetion to connection");
-	m_view->requestConnectionToConnection(m_connectionOrigin->getRootItem()->getGraphicsItemUid(), m_connectionOrigin->getGraphicsItemName(), _targetedConnection->getConfiguration().getUid(), _pos);
+	UID originUid = m_connectionOrigin->getRootItem()->getGraphicsItemUid();
+	std::string originConnectable = m_connectionOrigin->getGraphicsItemName();
+	UID targetUid = _targetedConnection->getConfiguration().getUid();
 	this->stopConnection();
+	m_view->requestConnectionToConnection(originUid, originConnectable, targetUid, _pos);
 }
 
 void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
@@ -84,8 +87,12 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 			return;
 		}
 		OT_LOG_D("New conncetion");
-		m_view->requestConnection(m_connectionOrigin->getRootItem()->getGraphicsItemUid(), m_connectionOrigin->getGraphicsItemName(), _item->getRootItem()->getGraphicsItemUid(), _item->getGraphicsItemName());
+		UID originUid = m_connectionOrigin->getRootItem()->getGraphicsItemUid();
+		std::string originConnectable = m_connectionOrigin->getGraphicsItemName();
+		UID destUid = _item->getRootItem()->getGraphicsItemUid();
+		std::string destConnectable = _item->getGraphicsItemName();
 		this->stopConnection();
+		m_view->requestConnection(originUid, originConnectable, destUid, destConnectable);
 	}
 }
 
