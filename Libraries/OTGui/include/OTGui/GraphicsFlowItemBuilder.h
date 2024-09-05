@@ -58,17 +58,11 @@ namespace ot {
 		void setTextColor(const ot::Color& _color) { m_textColor = _color; };
 		const ot::Color& textColor(void) const { return m_textColor; };
 
-		//! \brief Set custom primary painter.
-		//! Connector takes ownership of the painter.
-		//! Existing painter will be destroyed before replacing.
-		void setCustomPrimaryPainter(ot::Painter2D* _painter);
-		const ot::Painter2D* getCustomPrimaryPainter(void) const { return m_customPrimaryPainter; };
+		void setPrimaryColor(const ot::Color& _color) { m_primaryColor = _color; };
+		const ot::Color& primaryColor(void) const { return m_primaryColor; };
 
-		//! \brief Set custom secondary painter.
-		//! Connector takes ownership of the painter.
-		//! Existing painter will be destroyed before replacing.
-		void setCustomSecondaryPainter(ot::Painter2D* _painter);
-		const ot::Painter2D* getCustomSecondaryPainter(void) const { return m_customSecondaryPainter; };
+		void setSecondaryColor(const ot::Color& _color) { m_secondaryColor = _color; };
+		const ot::Color& secondaryColor(void) const { return m_secondaryColor; };
 
 		void setFigure(GraphicsFlowItemConnector::ConnectorFigure _figure) { m_figure = _figure; };
 		GraphicsFlowItemConnector::ConnectorFigure figure(void) const { return m_figure; };
@@ -76,9 +70,6 @@ namespace ot {
 		void addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft);
 
 	private:
-		Painter2D* createPrimaryPainter(void) const;
-		Painter2D* createSecondaryPainter(void) const;
-
 		ot::GraphicsItemCfg* createConnectorItem(void);
 		ot::GraphicsItemCfg* createSquareItem(void);
 		ot::GraphicsItemCfg* createCircleItem(void);
@@ -90,8 +81,8 @@ namespace ot {
 		ConnectorFigure m_figure;
 		ot::Color m_textColor;
 		ot::Font m_font;
-		ot::Painter2D* m_customPrimaryPainter;
-		ot::Painter2D* m_customSecondaryPainter;
+		ot::Color m_primaryColor;
+		ot::Color m_secondaryColor;
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -184,6 +175,18 @@ namespace ot {
 		//! @param _input Connector configuration
 		void addRight(const GraphicsFlowItemConnector& _right);
 
+		//! @brief Replace the current background painter
+		//! The item takes ownership
+		void setBackgroundPainter(ot::Painter2D* _painter);
+
+		//! @brief Sets the background color
+		//! Will create a FillPainter2D and replace the current background painter
+		void setBackgroundColor(const ot::Color& _color);
+
+		//! @brief Sets the background color
+		//! Will create a FillPainter2D and replace the current background painter
+		void setBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setBackgroundColor(ot::Color(_r, _g, _b, _a)); };
+
 		//! @brief Replace the current title background painter
 		//! The item takes ownership
 		void setTitleBackgroundPainter(ot::Painter2D* _painter);
@@ -234,6 +237,7 @@ namespace ot {
 		std::string m_title;
 		std::string m_toolTip;
 
+		ot::Painter2D* m_backgroundPainter;
 		ot::Painter2D* m_titleBackgroundPainter;
 		ot::Painter2D* m_titleForegroundPainter;
 

@@ -50,7 +50,7 @@ QRectF ot::GraphicsConnectionPreviewItem::boundingRect(void) const {
 }
 
 void ot::GraphicsConnectionPreviewItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	ot::StyleRefPainter2D newPainter(ColorStyleValueEntry::GraphicsItemConnection);
+	ot::StyleRefPainter2D newPainter(ColorStyleValueEntry::GraphicsItemBorder);
 	QPen newPen(ot::QtFactory::toQBrush(&newPainter), 2.);
 	_painter->setPen(newPen);
 
@@ -76,6 +76,7 @@ void ot::GraphicsConnectionPreviewItem::paint(QPainter* _painter, const QStyleOp
 		break;
 	}
 }
+
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
