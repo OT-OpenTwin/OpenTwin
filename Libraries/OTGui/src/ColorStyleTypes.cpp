@@ -337,7 +337,6 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	case ot::ColorStyleValueEntry::ToolBarFirstTabForeground: return "TabToolBar First Tab Foreground";
 
 	case ot::ColorStyleValueEntry::GraphicsItemBorder: return "GraphicsItem Border Color";
-	case ot::ColorStyleValueEntry::GraphicsItemConnection: return "GraphicsItem Connection Color";
 	case ot::ColorStyleValueEntry::GraphicsItemBackground: return "GraphicsItem Background";
 	case ot::ColorStyleValueEntry::GraphicsItemForeground: return "GraphicsItem Foreground";
 	case ot::ColorStyleValueEntry::GraphicsItemSelectionBorder: return "GraphicsItem Selection Border";
