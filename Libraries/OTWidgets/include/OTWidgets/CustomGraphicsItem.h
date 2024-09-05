@@ -17,7 +17,7 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT CustomGraphicsItem : public QGraphicsItem, public QGraphicsLayoutItem, public ot::GraphicsItem {
 		OT_DECL_NODEFAULT(CustomGraphicsItem)
 	public:
-		CustomGraphicsItem(GraphicsItemCfg* _configuration);
+		CustomGraphicsItem(GraphicsItemCfg* _configuration, const ot::Flags<GraphicsItemState>& _stateFlags = ot::Flags<GraphicsItemState>((NoState)));
 		virtual ~CustomGraphicsItem();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -40,6 +40,7 @@ namespace ot {
 		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 		virtual void prepareGraphicsItemGeometryChange(void) override;
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
+		virtual void graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) override;
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override { return this; };
 		virtual QGraphicsItem* getQGraphicsItem(void) override { return this; };
 		virtual const QGraphicsItem* getQGraphicsItem(void) const override { return this; };
@@ -65,7 +66,6 @@ namespace ot {
 		virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) override;
 
 	protected:
-		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _state) override;
 		void updateItemGeometry(void);
 
 	private:

@@ -9,13 +9,12 @@
 #include "OTWidgets/GraphicsLayoutItemWrapper.h"
 
 ot::GraphicsLayoutItemWrapper::GraphicsLayoutItemWrapper(GraphicsLayoutItem* _owner) 
-	: ot::GraphicsItem(_owner->getConfiguration()->createCopy()), m_owner(_owner)
+	: ot::GraphicsItem(_owner->getConfiguration()->createCopy(), GraphicsItem::ForwardSizeState), m_owner(_owner)
 {
 	OTAssertNullptr(m_owner);
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 	this->setAcceptHoverEvents(true);
-	this->setForwardSizeChanges(true);
 }
 
 ot::GraphicsLayoutItemWrapper::~GraphicsLayoutItemWrapper() {}

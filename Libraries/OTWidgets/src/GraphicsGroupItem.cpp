@@ -70,6 +70,22 @@ void ot::GraphicsGroupItem::callPaint(QPainter* _painter, const QStyleOptionGrap
 	this->paint(_painter, _opt, _widget);
 }
 
+void ot::GraphicsGroupItem::graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState) {
+		for (auto i : this->childItems()) {
+			ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
+			if (itm) {
+				itm->setGraphicsItemState(_state);
+			}
+			else {
+				OT_LOG_EA("Item cast failed");
+			}
+		}
+	}
+
+	this->update();
+}
+
 QSizeF ot::GraphicsGroupItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
 	return this->sizeHint(_hint, _constrains);
 }
@@ -185,22 +201,6 @@ double ot::GraphicsGroupItem::getMaxAdditionalTriggerDistance(void) const {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected
-
-void ot::GraphicsGroupItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _state) {
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState) {
-		for (auto i : this->childItems()) {
-			ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
-			if (itm) {
-				itm->setGraphicsElementStateFlags(_state);
-			}
-			else {
-				OT_LOG_EA("Item cast failed");
-			}
-		}
-	}
-
-	this->update();
-}
 
 void ot::GraphicsGroupItem::notifyChildsAboutTransformChange(const QTransform& _newTransform) {
 	for (auto i : this->childItems()) {

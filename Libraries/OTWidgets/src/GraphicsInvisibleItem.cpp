@@ -61,13 +61,13 @@ void ot::GraphicsInvisibleItem::paintCustomItem(QPainter* _painter, const QStyle
 
 	const GraphicsInvisibleItemCfg* cfg = this->getItemConfiguration<GraphicsInvisibleItemCfg>();
 
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
-		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
+	if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) && !this->getBlockStateNotifications()) {
+		if ((this->getGraphicsItemState() & GraphicsItemState::SelectedState) && !(this->getGraphicsItemState() & GraphicsItemState::HoverState)) {
 			OutlineF selectedOutline(1., GraphicsItem::createSelectionBorderPainter());
 			_painter->setPen(QtFactory::toQPen(selectedOutline));
 			_painter->drawEllipse(br);
 		}
-		else if (this->getGraphicsElementState() & GraphicsElement::HoverState) {
+		else if (this->getGraphicsItemState() & GraphicsItemState::HoverState) {
 			OutlineF hoverOutline(1., GraphicsItem::createHoverBorderPainter());
 			_painter->setPen(QtFactory::toQPen(hoverOutline));
 			_painter->drawEllipse(br);

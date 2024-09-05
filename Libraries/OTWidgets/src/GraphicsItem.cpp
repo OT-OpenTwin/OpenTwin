@@ -47,9 +47,9 @@ ot::Painter2D* ot::GraphicsItem::createHoverBorderPainter(void) {
 
 // Constructor / Destructor
 
-ot::GraphicsItem::GraphicsItem(GraphicsItemCfg* _configuration)
-	: m_config(_configuration), m_moveStartPt(0., 0.), m_parent(nullptr), m_scene(nullptr), m_requestedSize(-1., -1.),
-	m_blockConfigurationNotifications(false), m_blockFlagNotifications(false), m_forwardSizeChanges(false)
+ot::GraphicsItem::GraphicsItem(GraphicsItemCfg* _configuration, const ot::Flags<GraphicsItemState>& _stateFlags)
+	: m_config(_configuration), m_state(_stateFlags), m_moveStartPt(0., 0.), m_parent(nullptr), m_scene(nullptr), m_requestedSize(-1., -1.),
+	m_blockConfigurationNotifications(false), m_blockFlagNotifications(false), m_blockStateNotifications(false)
 {
 
 }
@@ -194,7 +194,10 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 void ot::GraphicsItem::handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 	this->handleToolTip(_event);
 	
-	//this->setGraphicsElementState(GraphicsElement::HoverState, true);
+	this->m_state |= GraphicsItem::HoverState;
+	if (!m_blockStateNotifications) this->graphicsItemStateChanged(m_state);
+
+	this->getQGraphicsItem()->update();
 }
 
 void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
@@ -210,7 +213,10 @@ void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
 void ot::GraphicsItem::handleHoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 	ToolTipHandler::hideToolTip();
 
-	//this->setGraphicsElementState(GraphicsElement::HoverState, false);
+	m_state &= ~(GraphicsItem::HoverState);
+	if (!m_blockStateNotifications) this->graphicsItemStateChanged(m_state);
+
+	this->getQGraphicsItem()->update();
 }
 
 QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _sizeHint) const {
@@ -253,12 +259,14 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 	switch (_change)
 	{
 	case QGraphicsItem::ItemSelectedHasChanged:
-		if (this->getQGraphicsItem()->isSelected()) {
-			this->setGraphicsElementState(GraphicsElementState::SelectedState, true);
+		if (this->getQGraphicsItem()->isSelected() && !(m_state & SelectedState)) {
+			m_state |= SelectedState;
 		}
-		else {
-			this->setGraphicsElementState(GraphicsElementState::SelectedState, false);
+		else if (!this->getQGraphicsItem()->isSelected() && (m_state & SelectedState)) {
+			m_state &= (~SelectedState);
+			
 		}
+		if (!m_blockStateNotifications) this->graphicsItemStateChanged(m_state);
 		break;
 
 	case QGraphicsItem::ItemScenePositionHasChanged:
@@ -288,7 +296,7 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 
 void ot::GraphicsItem::handleSetItemGeometry(const QRectF& _geom) {
 	if (m_parent) {
-		if (m_parent->getForwardSizeChanges()) {
+		if (m_parent->getGraphicsItemState() & GraphicsItem::ForwardSizeState) {
 			this->setGraphicsItemRequestedSize(_geom.size());
 		}
 	}
@@ -391,6 +399,16 @@ void ot::GraphicsItem::setGraphicsItemPos(const Point2DD& _pos) {
 const ot::Point2DD& ot::GraphicsItem::getGraphicsItemPos(void) const {
 	OTAssertNullptr(m_config);
 	return m_config->getPosition();
+}
+
+void ot::GraphicsItem::setStateFlag(GraphicsItemState _state, bool _active) {
+	m_state.setFlag(_state, _active);
+	if (!m_blockStateNotifications) this->graphicsItemStateChanged(m_state);
+}
+
+void ot::GraphicsItem::setGraphicsItemState(GraphicsItemStateFlags _flags) {
+	m_state = _flags;
+	if (!m_blockStateNotifications) this->graphicsItemStateChanged(m_state);
 }
 
 void ot::GraphicsItem::setGraphicsItemFlag(ot::GraphicsItemCfg::GraphicsItemFlag _flag, bool _active) {
@@ -617,12 +635,12 @@ std::list<ot::GraphicsConnectionCfg> ot::GraphicsItem::getConnectionCfgs()
 }
 
 void ot::GraphicsItem::setGraphicsItemSelected(bool _selected) {
-	this->setGraphicsElementState(GraphicsElement::SelectedState, _selected);
+	m_state.setFlag(GraphicsItem::SelectedState, _selected);
 	this->getQGraphicsItem()->setSelected(_selected);
 }
 
 bool ot::GraphicsItem::getGraphicsItemSelected(void) const {
-	return this->getGraphicsElementState() & GraphicsElement::SelectedState;
+	return m_state & GraphicsItem::SelectedState;
 }
 
 void ot::GraphicsItem::setCurrentPosAsMoveStart(void) {
@@ -668,11 +686,6 @@ QRectF ot::GraphicsItem::getTriggerBoundingRect(void) const {
 	QRectF rec = this->getQGraphicsItem()->boundingRect();
 	rec.moveTo(this->getQGraphicsItem()->scenePos());
 	return rec.marginsAdded(QtFactory::toQMargins(this->getConfiguration()->getAdditionalTriggerDistance()));
-}
-
-void ot::GraphicsItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _state) {
-	GraphicsElement::graphicsElementStateChanged(_state);
-	this->getQGraphicsItem()->update();
 }
 
 void ot::GraphicsItem::applyGraphicsItemTransform(void) {

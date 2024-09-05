@@ -39,6 +39,8 @@ namespace ot {
 
 		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) override;
 
+		virtual void graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) override;
+
 		virtual void graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) override;
 
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) override;
@@ -59,8 +61,6 @@ namespace ot {
 		// Protected
 
 	protected:
-		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _state) override;
-
 		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) override;
 
 		//! @brief Call this function from the item constructor to create the layout wrapper instance

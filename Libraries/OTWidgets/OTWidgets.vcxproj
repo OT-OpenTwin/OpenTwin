@@ -37,7 +37,7 @@
     <ClCompile Include="src\FilePathEdit.cpp" />
     <ClCompile Include="src\GlobalColorStyle.cpp" />
     <ClCompile Include="src\GraphicsArcItem.cpp" />
-    <ClCompile Include="src\GraphicsElement.cpp" />
+    <ClCompile Include="src\GraphicsBase.cpp" />
     <ClCompile Include="src\GraphicsBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsConnectionItem.cpp" />
     <ClCompile Include="src\GraphicsConnectionPreviewItem.cpp" />
@@ -159,7 +159,7 @@
     <ClInclude Include="include\OTWidgets\ComboBox.h" />
     <QtMoc Include="include\OTWidgets\FilePathEdit.h" />
     <ClInclude Include="include\OTWidgets\GraphicsArcItem.h" />
-    <ClInclude Include="include\OTWidgets\GraphicsElement.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsBase.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsInvisibleItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsItem.hpp" />

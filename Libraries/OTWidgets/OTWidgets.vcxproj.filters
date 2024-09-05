@@ -280,7 +280,7 @@
     <ClCompile Include="src\GraphicsConnectionPreviewItem.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsElement.cpp">
+    <ClCompile Include="src\GraphicsBase.cpp">
       <Filter>src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\ImagePainterManager.cpp">
@@ -551,7 +551,7 @@
     <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\GraphicsElement.h">
+    <ClInclude Include="include\OTWidgets\GraphicsBase.h">
       <Filter>include\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\ImagePainterManager.h">
