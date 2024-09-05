@@ -56,7 +56,7 @@ void NGSpice::clearBufferStructure(std::string name)
 }
 
 
-void NGSpice::connectionAlgorithm(bool gnd,std::string startingElement,int counter,ot::UID startingElementUID,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
+void NGSpice::connectionAlgorithmWithGNDElement(std::string startingElement,int counter,ot::UID startingElementUID,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
 {
 	counter++;
 
@@ -78,123 +78,36 @@ void NGSpice::connectionAlgorithm(bool gnd,std::string startingElement,int count
 
 		//First i check if the connection is connected to GND If yes then i state it with node number 0 
 		//I check now if the netlist has gnd Element, if yes i do the whole generation with assuming the GND Element
-		if (gnd == true && startingElement == "EntityBlockCircuitGND")
+		
+
+		// Here i check if connection already exists
+		if (checkIfElementOrConnectionVisited(visitedElements, connection))
 		{
-
-			// Here i check if connection already exists
-			if (checkIfElementOrConnectionVisited(visitedElements, connection))
-			{
-				continue;
-			}
-
-			if (checkIfConnectionIsConnectedToGND(myConn.getOriginConnectable()) ||
-				checkIfConnectionIsConnectedToGND(myConn.getDestConnectable())) {
-
-				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
-				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-					myConn.setNodeNumber(connectionWithNodeNumber->second);
-				}
-				else {
-					connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
-					if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-						myConn.setNodeNumber(connectionWithNodeNumber->second);
-					}
-					else {
-						myConn.setNodeNumber("0");
-						connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
-						connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
-					}
-				}
-
-			}
-			else
-			{
-				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
-				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-					myConn.setNodeNumber(connectionWithNodeNumber->second);
-				}
-				else {
-					connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
-					if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-						myConn.setNodeNumber(connectionWithNodeNumber->second);
-					}
-					else {
-						myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
-						connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
-						connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
-					}
-				}
-			}
+			continue;
 		}
-		//If the netlsit has no GND Element but the VoltageSource is a gnd voltageSource i do the following
-		else if (gnd == true && startingElement == "EntityBlockCircuitVoltageSource")
-		{
-			// As i always start with the voltageSource i want to start at the positivePole first so i skip the connection on the negativePole for the voltageSource 
-			// And i dont want to execute the above if Condition so i contructed a counter for this that only for the voltageSource it is relevant
 
-			if (counter == 1 && elementUID == startingElementUID) {
-				if (checkIfConnectionIsConnectedToGndVoltageSource(myConn.getOriginConnectable(), startingElementUID, myConn.getOriginUid()) ||
-					checkIfConnectionIsConnectedToGndVoltageSource(myConn.getDestConnectable(), startingElementUID, myConn.getDestinationUid())) {
-					continue;
-				}
+		if (checkIfConnectionIsConnectedToGND(myConn.getOriginConnectable()) ||
+			checkIfConnectionIsConnectedToGND(myConn.getDestConnectable())) {
+
+			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
+			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+				myConn.setNodeNumber(connectionWithNodeNumber->second);
 			}
-
-
-			// Here i check if connection already exists
-			if (checkIfElementOrConnectionVisited(visitedElements, connection))
-			{
-				continue;
-			}
-
-
-			if (checkIfConnectionIsConnectedToGndVoltageSource(myConn.getOriginConnectable(), startingElementUID, myConn.getOriginUid()) ||
-				checkIfConnectionIsConnectedToGndVoltageSource(myConn.getDestConnectable(), startingElementUID, myConn.getDestinationUid())) {
-
-				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
+			else {
+				connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
 				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
 					myConn.setNodeNumber(connectionWithNodeNumber->second);
 				}
 				else {
-					connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
-					if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-						myConn.setNodeNumber(connectionWithNodeNumber->second);
-					}
-					else {
-						myConn.setNodeNumber("0");
-						connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
-						connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
-					}
+					myConn.setNodeNumber("0");
+					connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+					connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
 				}
+			}
 
-			}
-			else
-			{
-				auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
-				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-					myConn.setNodeNumber(connectionWithNodeNumber->second);
-				}
-				else {
-					connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
-					if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-						myConn.setNodeNumber(connectionWithNodeNumber->second);
-					}
-					else {
-						myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
-						connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
-						connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
-					}
-				}
-			}
 		}
-		//If the whole netlist has no gnd at all i do the generation assuming no gnd and no "0" node
 		else
 		{
-			// Here i check if connection already exists
-			if (checkIfElementOrConnectionVisited(visitedElements, connection))
-			{
-				continue;
-			}
-
 			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
 			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
 				myConn.setNodeNumber(connectionWithNodeNumber->second);
@@ -211,6 +124,7 @@ void NGSpice::connectionAlgorithm(bool gnd,std::string startingElement,int count
 				}
 			}
 		}
+		
 		it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
 		it->second.addConnection(myConn.getDestConnectable(), myConn.getDestinationUid(), myConn);
 
@@ -222,8 +136,156 @@ void NGSpice::connectionAlgorithm(bool gnd,std::string startingElement,int count
 		else {
 			nextElementUID = myConn.getOriginUid();
 		}
-		connectionAlgorithm(gnd,startingElement,counter,startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+		connectionAlgorithmWithGNDElement(startingElement,counter,startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 	}
+}
+
+void NGSpice::connectionAlgorithmWithGNDVoltageSource(std::string startingElement, int counter, ot::UID startingElementUID, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
+{
+	counter++;
+
+	// First get all informations that needed
+	auto circuitMap = Application::instance()->getNGSpice().getMapOfCircuits();
+	auto it = circuitMap.find(editorname);
+	auto element = allEntitiesByBlockID.at(elementUID);
+	auto connections = element->getAllConnections();
+
+	//Check if Element already exists
+	if (checkIfElementOrConnectionVisited(visitedElements, elementUID))
+	{
+		return;
+	}
+
+	for (auto connection : connections) {
+		Connection myConn = createConnection(allConnectionEntities, connection);
+
+		// As i always start with the voltageSource i want to start at the positivePole first so i skip the connection on the negativePole for the voltageSource 
+		// And i dont want to execute the above if Condition so i constructed a counter for this that only for the voltageSource it is relevant
+
+		if (counter == 1 && elementUID == startingElementUID) {
+			if (checkIfConnectionIsConnectedToGndVoltageSource(myConn.getOriginConnectable(), startingElementUID, myConn.getOriginUid()) ||
+				checkIfConnectionIsConnectedToGndVoltageSource(myConn.getDestConnectable(), startingElementUID, myConn.getDestinationUid())) {
+				continue;
+			}
+		}
+
+		// Here i check if connection already exists
+		if (checkIfElementOrConnectionVisited(visitedElements, connection))
+		{
+			continue;
+		}
+
+
+		if (checkIfConnectionIsConnectedToGndVoltageSource(myConn.getOriginConnectable(), startingElementUID, myConn.getOriginUid()) ||
+			checkIfConnectionIsConnectedToGndVoltageSource(myConn.getDestConnectable(), startingElementUID, myConn.getDestinationUid())) {
+
+			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
+			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+				myConn.setNodeNumber(connectionWithNodeNumber->second);
+			}
+			else {
+				connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
+				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+					myConn.setNodeNumber(connectionWithNodeNumber->second);
+				}
+				else {
+					myConn.setNodeNumber("0");
+					connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+					connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+				}
+			}
+
+		}
+		else
+		{
+			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
+			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+				myConn.setNodeNumber(connectionWithNodeNumber->second);
+			}
+			else {
+				connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
+				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+					myConn.setNodeNumber(connectionWithNodeNumber->second);
+				}
+				else {
+					myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
+					connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+					connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+				}
+			}
+		}
+
+		it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
+		it->second.addConnection(myConn.getDestConnectable(), myConn.getDestinationUid(), myConn);
+
+		// Recursive call to explore the next element
+		ot::UID nextElementUID;
+		if (myConn.getOriginUid() == elementUID) {
+			nextElementUID = myConn.getDestinationUid();
+		}
+		else {
+			nextElementUID = myConn.getOriginUid();
+		}
+
+		connectionAlgorithmWithGNDVoltageSource(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+	}
+
+}
+
+void NGSpice::connectionAlgorithmWithoutGND(ot::UID elementUID,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
+{
+	// First get all informations that needed
+	auto circuitMap = Application::instance()->getNGSpice().getMapOfCircuits();
+	auto it = circuitMap.find(editorname);
+	auto element = allEntitiesByBlockID.at(elementUID);
+	auto connections = element->getAllConnections();
+
+	//Check if Element already exists
+	if (checkIfElementOrConnectionVisited(visitedElements, elementUID))
+	{
+		return;
+	}
+
+
+	for (auto connection : connections)	{
+		Connection myConn = createConnection(allConnectionEntities, connection);
+
+		// Here i check if connection already exists
+		if (checkIfElementOrConnectionVisited(visitedElements, connection))
+		{
+			continue;
+		}
+
+		auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
+		if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+			myConn.setNodeNumber(connectionWithNodeNumber->second);
+		}
+		else {
+			connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
+			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+				myConn.setNodeNumber(connectionWithNodeNumber->second);
+			}
+			else {
+				myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
+				connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+				connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+			}
+		}
+
+		it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
+		it->second.addConnection(myConn.getDestConnectable(), myConn.getDestinationUid(), myConn);
+
+		// Recursive call to explore the next element
+		ot::UID nextElementUID;
+		if (myConn.getOriginUid() == elementUID) {
+			nextElementUID = myConn.getDestinationUid();
+		}
+		else {
+			nextElementUID = myConn.getOriginUid();
+		}
+		connectionAlgorithmWithoutGND(nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+	}
+
 }
 
 bool NGSpice::checkIfElementOrConnectionVisited(std::set<ot::UID>& visitedElements, ot::UID elementOrConnectionUID)
@@ -316,20 +378,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			
 			
 			voltageSource->setNetlistName(myElement->getNameOnly());
-			/*std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
-			if (counter == "first")
-			{
-				
-				voltageSource->setNetlistName("V1");
-			}
-			else
-			{
-				int temp = std::stoi(counter);
-				temp += 1;
-				counter = std::to_string(temp);
 
-				voltageSource->setNetlistName("V" + counter);
-			}*/
 
 			if (voltageSource->getFunction() == "PULSE")
 			{
@@ -386,19 +435,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			
 			resistor->setNetlistName(myElement->getNameOnly());
 
-			/*std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
-			if (counter == "first")
-			{
-				resistor->setNetlistName("R1");
-			}
-			else
-			{
-				int temp = std::stoi(counter);
-				temp += 1;
-				counter = std::to_string(temp);
 
-				resistor->setNetlistName("R" + counter);
-			}*/
 
 			ot::UID uid = resistor->getUID();
 			auto resistor_p = resistor.release();
@@ -410,19 +447,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto diode = std::make_unique<Diode>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 
 			diode->setNetlistName(myElement->getNameOnly());
-			/*std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
-			if (counter == "first")
-			{
-				diode->setNetlistName("D1");
-			}
-			else
-			{
-				int temp = std::stoi(counter);
-				temp += 1;
-				counter = std::to_string(temp);
-
-				diode->setNetlistName("D" + counter);
-			}*/
+	
 			ot::UID uid = diode->getUID();
 			auto diode_p = diode.release();
 			it->second.addElement(uid, diode_p);
@@ -433,19 +458,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto capacitor = std::make_unique<Capacitor>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 
 			capacitor->setNetlistName(myElement->getNameOnly());
-			/*std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
-			if (counter == "first")
-			{
-				capacitor->setNetlistName("C1");
-			}
-			else
-			{
-				int temp = std::stoi(counter);
-				temp += 1;
-				counter = std::to_string(temp);
 
-				capacitor->setNetlistName("C" + counter);
-			}*/
 
 			ot::UID uid = capacitor->getUID();
 			auto capacitor_p = capacitor.release();
@@ -457,19 +470,6 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto inductor = std::make_unique<Inductor>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 
 			inductor->setNetlistName(myElement->getNameOnly());
-			/*std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
-			if (counter == "first")
-			{
-				inductor->setNetlistName("L1");
-			}
-			else
-			{
-				int temp = std::stoi(counter);
-				temp += 1;
-				counter = std::to_string(temp);
-
-				inductor->setNetlistName("L" + counter);
-			}*/
 
 			ot::UID uid = inductor->getUID();
 			auto inductor_p = inductor.release();
@@ -481,20 +481,6 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 			voltMeter->setNetlistName(myElement->getNameOnly());
 
-			/*std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
-			if (counter == "first")
-			{
-				voltMeter->setNetlistName("VM1");
-			}
-			else
-			{
-				int temp = std::stoi(counter);
-				temp += 1;
-				counter = std::to_string(temp);
-
-				voltMeter->setNetlistName("VM" + counter);
-			}*/
-
 			ot::UID uid = voltMeter->getUID();
 			auto voltMeter_p = voltMeter.release();
 			it->second.addElement(uid, voltMeter_p);
@@ -504,20 +490,6 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto currentMeter = std::make_unique<CurrentMeter>(myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 
 			currentMeter->setNetlistName(myElement->getNameOnly());
-
-			/*std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
-			if (counter == "first")
-			{
-				currentMeter->setNetlistName("VM1");
-			}
-			else
-			{
-				int temp = std::stoi(counter);
-				temp += 1;
-				counter = std::to_string(temp);
-
-				currentMeter->setNetlistName("VM" + counter);
-			}*/
 
 			ot::UID uid = currentMeter->getUID();
 			auto currentMeter_p = currentMeter.release();
@@ -538,7 +510,6 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 	// next nodenumber. I will take use of traversing graphs with my code of checking parallel connections. I just need a good understandable structure
 
 	// First I get all the VoltageSources of the Circuit
-	bool gnd = true; // It is for checking if the circuit has a ground
 	auto vectorGND = it->second.getMapOfEntityBlcks().find("EntityBlockCircuitGND");
 	if (vectorGND != it->second.getMapOfEntityBlcks().end()) {
 		std::set<ot::UID> visitedElements; // Initialize visited set
@@ -546,26 +517,31 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		for (auto GNDElement : vectorGND->second) {
 			ot::UID elementUID = GNDElement->getEntityID();
 			int counter = 0;
-			connectionAlgorithm(gnd, GNDElement->getClassName(), counter, elementUID, elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+			connectionAlgorithmWithGNDElement( GNDElement->getClassName(), counter, elementUID, elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 		}
 
 	}
 	else
 	{
 		auto vectorVoltageSource = it->second.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource");
-		if (vectorVoltageSource != it->second.getMapOfEntityBlcks().end())
+		if (vectorVoltageSource == it->second.getMapOfEntityBlcks().end())
 		{
-			std::set<ot::UID> visitedElements; // Initialize visited set
+			OT_LOG_E("No VoltageSource found at connection Algorithm");
+		}
+		std::set<ot::UID> visitedElements; // Initialize visited set
 
-			for (auto voltageSource : vectorVoltageSource->second) {
-				auto temp = dynamic_cast<EntityBlockCircuitVoltageSource*>(voltageSource.get());
-				if (temp->getGND() == false)
-				{
-					gnd = false;
-				}
-				ot::UID elementUID = voltageSource->getEntityID();
+		for (auto voltageSource : vectorVoltageSource->second) {
+			auto temp = dynamic_cast<EntityBlockCircuitVoltageSource*>(voltageSource.get());
+
+			ot::UID elementUID = voltageSource->getEntityID();
+			if (temp->getGND() == false)
+			{
+				connectionAlgorithmWithoutGND(elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+			}
+			else
+			{
 				int counter = 0;
-				connectionAlgorithm(gnd,voltageSource->getClassName(), counter, elementUID, elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+				connectionAlgorithmWithGNDVoltageSource(voltageSource->getClassName(), counter, elementUID, elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 			}
 		}
 	}
