@@ -238,8 +238,8 @@ ot::Color EntityResult1DCurve::getColor()
 	color[1] = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Color"))->getColorG();
 	color[2] = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Color"))->getColorB();
 
-	ot::Color selectedColor(static_cast<float>(color[0]), static_cast<float>(color[1]), static_cast<float>(color[2]));
-	return selectedColor;
+	ot::ColorF selectedColor(static_cast<float>(color[0]), static_cast<float>(color[1]), static_cast<float>(color[2]));
+	return selectedColor.toColor();
 }
 
 std::string EntityResult1DCurve::getAxisLabelX()
