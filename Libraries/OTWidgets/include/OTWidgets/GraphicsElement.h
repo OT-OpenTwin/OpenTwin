@@ -14,6 +14,11 @@
 // Qt header
 #include <QtCore/qpoint.h>
 
+// std header
+#include <list>
+
+#pragma warning(disable:4251)
+
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsElement {
@@ -60,6 +65,10 @@ namespace ot {
 		//! \brief Returns the current GraphicsItemStateFlags set.
 		//! \see GraphicsItem, GraphicsItemStateFlags
 		const GraphicsElementStateFlags& getGraphicsElementState(void) const { return m_state; };
+
+		//! \brief Returns all graphics elements nested in this element.
+		//! The result contains this element and all of its childs.
+		virtual std::list<GraphicsElement*> getAllGraphicsElements(void);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

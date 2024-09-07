@@ -25,6 +25,9 @@ ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 	m_maxTriggerDistance(0.)
 {
 	OTAssertNullptr(m_view);
+
+	this->setItemIndexMethod(QGraphicsScene::NoIndex);
+
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
 }
 
@@ -239,10 +242,14 @@ void ot::GraphicsScene::connectionAboutToBeRemoved(GraphicsConnectionItem* _conn
 }
 
 void ot::GraphicsScene::elementAboutToBeRemoved(GraphicsElement* _element) {
-	auto it = std::find(m_lastHoverElements.begin(), m_lastHoverElements.end(), _element);
-	while (it != m_lastHoverElements.end()) {
-		m_lastHoverElements.erase(it);
-		it = std::find(m_lastHoverElements.begin(), m_lastHoverElements.end(), _element);
+	std::list<GraphicsElement*> allElements = _element->getAllGraphicsElements();
+
+	for (GraphicsElement* element : allElements) {
+		auto it = std::find(m_lastHoverElements.begin(), m_lastHoverElements.end(), element);
+		while (it != m_lastHoverElements.end()) {
+			m_lastHoverElements.erase(it);
+			it = std::find(m_lastHoverElements.begin(), m_lastHoverElements.end(), element);
+		}
 	}
 }
 
