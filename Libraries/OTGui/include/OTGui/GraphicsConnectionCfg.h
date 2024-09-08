@@ -25,7 +25,8 @@ namespace ot {
 			DirectLine,
 			SmoothLine,
 			XYLine,
-			YXLine
+			YXLine,
+			AutoXYLine
 		};
 
 		static std::string shapeToString(ConnectionShape _shape);

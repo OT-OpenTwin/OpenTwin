@@ -140,6 +140,9 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPoint(const QPointF
 	case GraphicsConnectionCfg::ConnectionShape::YXLine:
 		distance = this->calculateShortestDistanceToPointYX(_pt);
 		break;
+	case GraphicsConnectionCfg::ConnectionShape::AutoXYLine:
+		distance = this->calculateShortestDistanceToPointAutoXY(_pt);
+		break;
 	default:
 		OT_LOG_EA("Unknown line shape");
 		break;
@@ -247,6 +250,9 @@ void ot::GraphicsConnectionItem::calculatePainterPath(QPainterPath& _path) const
 		break;
 	case ot::GraphicsConnectionCfg::ConnectionShape::YXLine:
 		this->calculateYXLinePath(_path);
+		break;
+	case ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine:
+		this->calculateAutoXYLinePath(_path);
 		break;
 	default:
 		OT_LOG_E("Unknown connection shape (" + std::to_string((int)m_config.getLineShape()) + ")");
@@ -363,6 +369,24 @@ void ot::GraphicsConnectionItem::calculateYXLinePath(QPainterPath& _path) const 
 	_path.lineTo(destinationPoint);
 }
 
+void ot::GraphicsConnectionItem::calculateAutoXYLinePath(QPainterPath& _path) const {
+	switch (this->calculateAutoXYShape())
+	{
+	case ot::GraphicsConnectionCfg::ConnectionShape::XYLine:
+		this->calculateXYLinePath(_path);
+		break;
+
+	case ot::GraphicsConnectionCfg::ConnectionShape::YXLine:
+		this->calculateYXLinePath(_path);
+		break;
+
+	default:
+		OT_LOG_WA("Invalid calculated shape");
+		this->calculateDirectLinePath(_path);
+		break;
+	}
+}
+
 qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointDirect(const QPointF& _pt) const {
 	if (this->originItem() == nullptr || this->destItem() == nullptr) {
 		OT_LOG_EA("Origin and/or destination not set");
@@ -428,4 +452,23 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointYX(const QPoin
 	qreal d2 = Math::calculateShortestDistanceFromPointToLine(_pt.x(), _pt.y(), controlPoint.x(), controlPoint.y(), destinationPoint.x(), destinationPoint.y());
 
 	return std::min(d1, d2);
+}
+
+qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointAutoXY(const QPointF& _pt) const
+{
+	switch (this->calculateAutoXYShape())
+	{
+	case ot::GraphicsConnectionCfg::ConnectionShape::XYLine:
+		return this->calculateShortestDistanceToPointXY(_pt);
+	case ot::GraphicsConnectionCfg::ConnectionShape::YXLine:
+		return this->calculateShortestDistanceToPointYX(_pt);
+	default:
+		OT_LOG_WA("Invalid calculated shape");
+		return this->calculateShortestDistanceToPointDirect(_pt);
+	}
+}
+
+ot::GraphicsConnectionCfg::ConnectionShape ot::GraphicsConnectionItem::calculateAutoXYShape(void) const
+{
+	return GraphicsConnectionCfg::ConnectionShape();
 }

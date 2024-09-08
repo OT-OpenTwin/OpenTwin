@@ -113,10 +113,14 @@ namespace ot {
 		void calculateSmoothLineStep(const QPointF& _origin, const QPointF& _destination, double _halfdistX, double _halfdistY, QPointF& _control, ot::ConnectionDirection _direction) const;
 		void calculateXYLinePath(QPainterPath& _path) const;
 		void calculateYXLinePath(QPainterPath& _path) const;
+		void calculateAutoXYLinePath(QPainterPath& _path) const;
 		qreal calculateShortestDistanceToPointDirect(const QPointF& _pt) const;
 		qreal calculateShortestDistanceToPointSmooth(const QPointF& _pt) const;
 		qreal calculateShortestDistanceToPointXY(const QPointF& _pt) const;
 		qreal calculateShortestDistanceToPointYX(const QPointF& _pt) const;
+		qreal calculateShortestDistanceToPointAutoXY(const QPointF& _pt) const;
+
+		GraphicsConnectionCfg::ConnectionShape calculateAutoXYShape(void) const;
 
 		GraphicsConnectionCfg m_config;
 
