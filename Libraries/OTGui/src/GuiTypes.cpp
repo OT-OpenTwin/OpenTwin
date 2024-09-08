@@ -172,6 +172,17 @@ ot::ConnectionDirection ot::inversedConnectionDirection(ConnectionDirection _dir
 	}
 }
 
+std::list<ot::ConnectionDirection> ot::getAllConnectionDirections(void)
+{
+	return std::list<ConnectionDirection>({
+		ConnectAny,
+		ConnectLeft,
+		ConnectUp,
+		ConnectRight,
+		ConnectDown
+		});
+}
+
 std::string ot::toString(GradientSpread _spread) {
 	switch (_spread)
 	{

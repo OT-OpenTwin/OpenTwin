@@ -189,6 +189,8 @@ namespace ot {
 	//! @brief Returnse the opposite connection of the one provided
 	OT_GUI_API_EXPORT ConnectionDirection inversedConnectionDirection(ConnectionDirection _direction);
 
+	OT_GUI_API_EXPORT std::list<ConnectionDirection> getAllConnectionDirections(void);
+
 	OT_GUI_API_EXPORT std::string toString(GradientSpread _spread);
 	OT_GUI_API_EXPORT GradientSpread stringToGradientSpread(const std::string& _spread);
 

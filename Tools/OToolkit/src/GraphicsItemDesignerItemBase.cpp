@@ -70,6 +70,14 @@ void GraphicsItemDesignerItemBase::fillBasePropertyGrid(ot::PropertyGridCfg& _co
 	newConnectableProperty->setPropertyTip("If enabled the item can be used as origin/destination for connections. The name of the item must be set.");
 	generalGroup->addProperty(newConnectableProperty);
 
+	std::list<std::string> connectionDirections;
+	for (ConnectionDirection direction : getAllConnectionDirections()) {
+		connectionDirections.push_back(toString(direction));
+	}
+	PropertyStringList* newConnectionDirectionProperty = new PropertyStringList("Connection Direction", toString(this->getGraphicsItem()->getConnectionDirection()), connectionDirections);
+	newConnectionDirectionProperty->setPropertyTip("If the item is connectable the connection direction is used to calculate the connection line.");
+	generalGroup->addProperty(newConnectionDirectionProperty);
+
 	PropertyBool* newStateProperty = new PropertyBool("Handle State", this->getGraphicsItem()->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState);
 	newStateProperty->setPropertyTip("If enabled the item will update its appearance according to the current item state (e.g. ItemSelected or ItemHover)");
 	generalGroup->addProperty(newStateProperty);
@@ -159,6 +167,15 @@ bool GraphicsItemDesignerItemBase::basePropertyChanged(const ot::Property* _prop
 		}
 
 		this->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemIsConnectable, actualProperty->getValue());
+		return true;
+	}
+	else if (group->getName() == "General" && _property->getPropertyName() == "Connection Direction") {
+		const PropertyStringList* actualProperty = dynamic_cast<const PropertyStringList*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
+			return false;
+		}
+		this->getGraphicsItem()->setConnectionDirection(stringToConnectionDirection(actualProperty->getCurrent()));
 		return true;
 	}
 	else if (group->getName() == "General" && _property->getPropertyName() == "Handle State") {
