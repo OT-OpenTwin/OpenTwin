@@ -220,68 +220,33 @@ void ot::GraphicsScene::flipAllSelectedItems(Qt::Orientation _flipAxis) {
 }
 
 void ot::GraphicsScene::itemAboutToBeRemoved(GraphicsItem* _item) {
+	this->elementAboutToBeRemoved(_item);
 	if (_item == m_connectionOrigin) {
 		m_connectionOrigin = nullptr;
 		this->stopConnection();
 	}
 }
 
+void ot::GraphicsScene::connectionAboutToBeRemoved(GraphicsConnectionItem* _connection) {
+	this->elementAboutToBeRemoved(_connection);
+}
+
+void ot::GraphicsScene::elementAboutToBeRemoved(GraphicsElement* _element) {
+	auto it = std::find(m_lastHoverElements.begin(), m_lastHoverElements.end(), _element);
+	while (it != m_lastHoverElements.end()) {
+		m_lastHoverElements.erase(it);
+		it = std::find(m_lastHoverElements.begin(), m_lastHoverElements.end(), _element);
+	}
+}
+
 void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) {
 	// Check for a new connection
-	QList<QGraphicsItem*> lst;
-	if (m_maxTriggerDistance > 0.) {
-		QRectF hitRect(
-			_event->scenePos().x() - m_maxTriggerDistance,
-			_event->scenePos().y() - m_maxTriggerDistance,
-			m_maxTriggerDistance * 2.,
-			m_maxTriggerDistance * 2.
-		);
-
-		lst = items(hitRect);
-	}
-	else {
-		lst = items(_event->scenePos());
-	}
-	
-	qreal minDistance = std::numeric_limits<double>::max();
-	GraphicsBase* targetedBase = nullptr;
-	bool targetedIsItem = false;
-
-	for (auto itm : lst) {
-		ot::GraphicsBase* actualBase = dynamic_cast<ot::GraphicsBase*>(itm);
-		/*if (actualItm) {
-			if (actualItm->getGraphicsItemFlags() & ot::GraphicsItemCfg::ItemIsConnectable) {
-				this->startConnection(actualItm);
-				//QGraphicsScene::mouseDoubleClickEvent(_event);
-				return;
-			}
-		}
-		*/
-		if (actualBase) {
-			ot::GraphicsItem* actualItm = dynamic_cast<ot::GraphicsItem*>(itm);
-
-			qreal dist = actualBase->calculateShortestDistanceToPoint(_event->scenePos());
-			
-			// Item
-			if (actualItm) {
-				if ((actualItm->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) && dist >= 0. && ((dist < minDistance && targetedIsItem) || !targetedIsItem)) {
-					minDistance = dist;
-					targetedBase = actualBase;
-					targetedIsItem = true;
-				}
-			}
-			// Connection
-			else if (dist >= 0. && dist < minDistance && !targetedIsItem) {
-				minDistance = dist;
-				targetedBase = actualBase;
-			}
-		}
-	}
+	GraphicsElement* targetedElement = this->findClosestConnectableElement(_event->scenePos());
 
 	// Check if a base item was found next to the click position.
-	if (targetedBase) {
-		GraphicsItem* graphicsItem = dynamic_cast<ot::GraphicsItem*>(targetedBase);
-		GraphicsConnectionItem* connectionItem = dynamic_cast<GraphicsConnectionItem*>(targetedBase);
+	if (targetedElement) {
+		GraphicsItem* graphicsItem = dynamic_cast<ot::GraphicsItem*>(targetedElement);
+		GraphicsConnectionItem* connectionItem = dynamic_cast<GraphicsConnectionItem*>(targetedElement);
 
 		if (graphicsItem) {
 			this->startConnection(graphicsItem);
@@ -301,6 +266,53 @@ void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 		m_connectionPreview->setOriginPos(m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center());
 		m_connectionPreview->setDestPos(_event->scenePos());
 	}
+
+	std::list<GraphicsElement*> clearHoverElements;
+	std::list<GraphicsElement*> newHoverElements;
+
+	// First check for a connectable close by
+	GraphicsElement* targetedElement = this->findClosestConnectableElement(_event->scenePos());
+	
+	if (targetedElement) {
+		newHoverElements.push_back(targetedElement);
+	}
+	else {
+		// No connectable, check for root items and connections at pos
+		QList<QGraphicsItem*> hoverItems = this->items(_event->scenePos());
+		for (QGraphicsItem* itm : hoverItems) {
+			GraphicsItem* actualItem = dynamic_cast<GraphicsItem*>(itm);
+			GraphicsConnectionItem* actualConnection = dynamic_cast<GraphicsConnectionItem*>(itm);
+			if (actualItem) {
+				if (!actualItem->getParentGraphicsItem() && (actualItem->getGraphicsItemFlags() & (GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsState))) {
+					newHoverElements.push_back(actualItem);
+				}
+			}
+			else if (actualConnection) {
+				newHoverElements.push_back(actualConnection);
+			}
+			else if (itm != m_connectionPreview) {
+				OT_LOG_WA("Unknown item in scene");
+			}
+		}
+	}
+
+	// Check for state reset
+	for (GraphicsElement* element : m_lastHoverElements) {
+		if (std::find(newHoverElements.begin(), newHoverElements.end(), element) == newHoverElements.end()) {
+			clearHoverElements.push_back(element);
+		}
+	}
+	
+	// Apply state
+	m_lastHoverElements = newHoverElements;
+
+	for (GraphicsElement* element : clearHoverElements) {
+		element->setGraphicsElementState(GraphicsElement::HoverState, false);
+	}
+	for (GraphicsElement* element : m_lastHoverElements) {
+		element->setGraphicsElementState(GraphicsElement::HoverState, true);
+	}
+
 	QGraphicsScene::mouseMoveEvent(_event);
 }
 
@@ -486,4 +498,62 @@ ot::Point2D ot::GraphicsScene::calculateScaledGridStepSize(const QRectF& _rect) 
 		}
 	}
 	return scaledStepSize;
+}
+
+ot::GraphicsElement* ot::GraphicsScene::findClosestConnectableElement(const QPointF& _pos) const {
+	QList<QGraphicsItem*> lst = this->findItemsInTriggerDistance(_pos);
+
+	qreal minDistance = std::numeric_limits<double>::max();
+	GraphicsElement* targetedElement = nullptr;
+	bool targetedIsItem = false;
+	for (auto itm : lst) {
+		ot::GraphicsElement* actualBase = dynamic_cast<ot::GraphicsElement*>(itm);
+		/*if (actualItm) {
+			if (actualItm->getGraphicsItemFlags() & ot::GraphicsItemCfg::ItemIsConnectable) {
+				this->startConnection(actualItm);
+				//QGraphicsScene::mouseDoubleClickEvent(_event);
+				return;
+			}
+		}
+		*/
+		if (actualBase) {
+			ot::GraphicsItem* actualItm = dynamic_cast<ot::GraphicsItem*>(itm);
+
+			qreal dist = actualBase->calculateShortestDistanceToPoint(_pos);
+
+			// Item
+			if (actualItm) {
+				if ((actualItm->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) && dist >= 0. && ((dist < minDistance && targetedIsItem) || !targetedIsItem)) {
+					minDistance = dist;
+					targetedElement = actualBase;
+					targetedIsItem = true;
+				}
+			}
+			// Connection
+			else if (dist >= 0. && dist < minDistance && !targetedIsItem) {
+				minDistance = dist;
+				targetedElement = actualBase;
+			}
+		}
+	}
+
+	return targetedElement;
+}
+
+QList<QGraphicsItem*> ot::GraphicsScene::findItemsInTriggerDistance(const QPointF& _pos) const {
+	QList<QGraphicsItem*> lst;
+	if (m_maxTriggerDistance > 0.) {
+		QRectF hitRect(
+			_pos.x() - m_maxTriggerDistance,
+			_pos.y() - m_maxTriggerDistance,
+			m_maxTriggerDistance * 2.,
+			m_maxTriggerDistance * 2.
+		);
+
+		lst = this->items(hitRect);
+	}
+	else {
+		lst = this->items(_pos);
+	}
+	return lst;
 }

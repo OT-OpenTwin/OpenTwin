@@ -12,7 +12,7 @@
 #include "OTGui/GuiTypes.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsConnectionCfg.h"
-#include "OTWidgets/GraphicsBase.h"
+#include "OTWidgets/GraphicsElement.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -34,7 +34,7 @@ namespace ot {
 
 	//! @brief Base class for all OpenTwin GraphicsItems
 	//! GraphicsItems should be created by the GraphicsFactory and be setup from the corresponding configuration
-	class OT_WIDGETS_API_EXPORT GraphicsItem : public GraphicsBase {
+	class OT_WIDGETS_API_EXPORT GraphicsItem : public GraphicsElement {
 		OT_DECL_NODEFAULT(GraphicsItem)
 		OT_DECL_NOCOPY(GraphicsItem)
 	public:
@@ -49,19 +49,6 @@ namespace ot {
 			ItemMoved,
 			ItemResized
 		};
-
-		//! \enum GraphicsItemState
-		//! \brief The GraphicsItemState is used to describe the current state of a GraphicsItem.
-		enum GraphicsItemState {
-			NoState           = 0x00, //! \brief Default state
-			HoverState        = 0x01, //! \brief Item is hovered over by user
-			SelectedState     = 0x02, //! \brief Item is selected
-			ForwardSizeState  = 0x08  //! \brief Item forwards requested size requests to child item (e.g. GraphicsLayoutItem).
-		};
-		//! \typedef GraphicsItemStateFlags
-		//! \brief Flags used to manage GraphicsItemState.
-		//! \see GraphicsItem, GraphicsItemState
-		typedef Flags<GraphicsItemState> GraphicsItemStateFlags;
 
 		// ###############################################################################################################################################
 
@@ -82,7 +69,7 @@ namespace ot {
 		//! \brief Constructor.
 		//! \param _configuration Initial configuration
 		//! \param _stateFlags Initial state flags.
-		GraphicsItem(GraphicsItemCfg* _configuration, const ot::Flags<GraphicsItemState>& _stateFlags = ot::Flags<GraphicsItemState>((NoState)));
+		GraphicsItem(GraphicsItemCfg* _configuration);
 
 		//! \brief Destructor.
 		virtual ~GraphicsItem();
@@ -124,9 +111,6 @@ namespace ot {
 
 		//! \brief Will be called whenever the GraphicsItem flags have changed.
 		virtual void graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags);
-
-		//! \brief Will be called whenever the GraphicsItem state flags have changed.
-		virtual void graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {};
 
 		//! \brief Will be called whenever the GraphicsItem configuration has changed.
 		virtual void graphicsItemConfigurationChanged(const GraphicsItemCfg* _config);
@@ -204,20 +188,6 @@ namespace ot {
 		//! \brief Returns the current position set in the configuration.
 		const Point2DD& getGraphicsItemPos(void) const;
 
-		//! \brief Sets the provided state flag.
-		//! \see GraphicsItem, GraphicsItemState
-		//! \param _state The state to set.
-		//! \param _active If true the flag will be set, otherwise unset.
-		void setStateFlag(GraphicsItemState _state, bool _active = true);
-
-		//! \brief Replaces the flags with the flags provided.
-		//! \param _flags Flags to set.
-		void setGraphicsItemState(GraphicsItemStateFlags _flags);
-
-		//! \brief Returns the current GraphicsItemStateFlags set.
-		//! \see GraphicsItem, GraphicsItemStateFlags
-		const GraphicsItemStateFlags& getGraphicsItemState(void) const { return m_state; };
-
 		//! \brief Set the GraphicsScene this item is placed at.
 		virtual void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
 		
@@ -282,6 +252,9 @@ namespace ot {
 		void setGraphicsItemTransform(const Transform& _transform);
 		const Transform& getGraphicsItemTransform(void) const;
 
+		void setForwardSizeChanges(bool _forward) { m_forwardSizeChanges = _forward; };
+		bool getForwardSizeChanges(void) const { return m_forwardSizeChanges; };
+
 		void storeConnection(GraphicsConnectionItem* _connection);
 
 		//! @brief Removes the collection from the list (item will not be destroyed)
@@ -307,12 +280,6 @@ namespace ot {
 		//! \brief If enabled the item will not call graphicsItemFlagsChanged() when the flags have changed.
 		bool getBlockFlagNotifications(void) const { return m_blockFlagNotifications; };
 
-		//! \see getBlockStateNotifications
-		void setBlockStateNotifications(bool _block) { m_blockStateNotifications = _block; };
-		
-		//! \brief If enabled the item will not call graphicsItemStateChanged() when the flags have changed.
-		bool getBlockStateNotifications(void) const { return m_blockStateNotifications; };
-
 		//! \see getBlockConfigurationNotifications
 		void setBlockConfigurationNotifications(bool _block) { m_blockConfigurationNotifications = _block; };
 		
@@ -331,7 +298,13 @@ namespace ot {
 		//! \see GraphicsItemCfg::setAdditionalTriggerDistance(const MarginsD& _d)
 		QRectF getTriggerBoundingRect(void) const;
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Protected notifier
+
 	protected:
+		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _state) override;
+
 		//! \brief Returns the configuration for the current item.
 		//! The configuration may be modified.
 		//! The function will cast the current configuration to the type provided.
@@ -353,15 +326,14 @@ namespace ot {
 	private:
 		GraphicsItemCfg* m_config; //! \brief Configuration used to setup this item. Default 0.
 		
-		GraphicsItemStateFlags m_state; //! \brief Current item state flags.
-		
 		QPointF m_moveStartPt; //! @brief Item move origin.
 		GraphicsItem* m_parent; //! @brief Parent graphics item.
 		GraphicsScene* m_scene; //! @brief Graphics scene.
 
 		QSizeF m_requestedSize; //! \brief Size requested by parent.
 
-		bool m_blockStateNotifications;
+		bool m_forwardSizeChanges;
+
 		bool m_blockFlagNotifications;
 		bool m_blockConfigurationNotifications;
 		
@@ -370,7 +342,5 @@ namespace ot {
 	};
 
 }
-
-OT_ADD_FLAG_FUNCTIONS(ot::GraphicsItem::GraphicsItemState)
 
 #include "OTWidgets/GraphicsItem.hpp"

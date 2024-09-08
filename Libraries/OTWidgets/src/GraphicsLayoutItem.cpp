@@ -10,8 +10,10 @@
 #include "OTWidgets/GraphicsLayoutItemWrapper.h"
 
 ot::GraphicsLayoutItem::GraphicsLayoutItem(GraphicsItemCfg* _configuration)
-	: ot::GraphicsItem(_configuration, GraphicsItem::ForwardSizeState), m_layoutWrap(nullptr)
-{}
+	: ot::GraphicsItem(_configuration), m_layoutWrap(nullptr)
+{
+	this->setForwardSizeChanges(true);
+}
 
 ot::GraphicsLayoutItem::~GraphicsLayoutItem() {
 
@@ -72,23 +74,6 @@ void ot::GraphicsLayoutItem::setGraphicsScene(GraphicsScene* _scene) {
 void ot::GraphicsLayoutItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {
 	OTAssertNullptr(m_layoutWrap);
 	m_layoutWrap->setGraphicsItemFlags(_flags);
-}
-
-void ot::GraphicsLayoutItem::graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {
-	OTAssertNullptr(m_layoutWrap);
-
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState) {
-		std::list<QGraphicsLayoutItem*> lst;
-		this->getAllItems(lst);
-		for (auto i : lst) {
-			ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
-			if (itm) {
-				itm->setGraphicsItemState(_state);
-			}
-		}
-	}
-
-	m_layoutWrap->update();
 }
 
 void ot::GraphicsLayoutItem::graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) {
@@ -160,6 +145,23 @@ double ot::GraphicsLayoutItem::getMaxAdditionalTriggerDistance(void) const {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected
+
+void ot::GraphicsLayoutItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _state) {
+	OTAssertNullptr(m_layoutWrap);
+
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::GraphicsItemFlag::ItemForwardsState) {
+		std::list<QGraphicsLayoutItem*> lst;
+		this->getAllItems(lst);
+		for (auto i : lst) {
+			ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(i);
+			if (itm) {
+				itm->setGraphicsElementStateFlags(_state);
+			}
+		}
+	}
+
+	m_layoutWrap->update();
+}
 
 void ot::GraphicsLayoutItem::notifyChildsAboutTransformChange(const QTransform& _newTransform) {
 	std::list<QGraphicsLayoutItem*> itemsList;

@@ -10,8 +10,8 @@
 // Qt header
 #include <QtGui/qpainter.h>
 
-ot::CustomGraphicsItem::CustomGraphicsItem(GraphicsItemCfg* _configuration, const ot::Flags<GraphicsItemState>& _stateFlags)
-	: ot::GraphicsItem(_configuration, _stateFlags)
+ot::CustomGraphicsItem::CustomGraphicsItem(GraphicsItemCfg* _configuration)
+	: ot::GraphicsItem(_configuration)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
@@ -40,10 +40,6 @@ void ot::CustomGraphicsItem::prepareGraphicsItemGeometryChange(void) {
 
 void ot::CustomGraphicsItem::callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
 	this->paint(_painter, _opt, _widget);
-}
-
-void ot::CustomGraphicsItem::graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) {
-	this->update();
 }
 
 QSizeF ot::CustomGraphicsItem::graphicsItemSizeHint(Qt::SizeHint _hint, const QSizeF& _constrains) const {
@@ -98,6 +94,10 @@ void ot::CustomGraphicsItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 
 void ot::CustomGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 	this->handleHoverLeaveEvent(_event);
+}
+
+void ot::CustomGraphicsItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _state) {
+	GraphicsItem::graphicsElementStateChanged(_state);
 }
 
 void ot::CustomGraphicsItem::updateItemGeometry(void) {

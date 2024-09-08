@@ -337,6 +337,7 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	case ot::ColorStyleValueEntry::ToolBarFirstTabForeground: return "TabToolBar First Tab Foreground";
 
 	case ot::ColorStyleValueEntry::GraphicsItemBorder: return "GraphicsItem Border Color";
+	case ot::ColorStyleValueEntry::GraphicsItemConnection: return "GraphicsItem Connection Color";
 	case ot::ColorStyleValueEntry::GraphicsItemBackground: return "GraphicsItem Background";
 	case ot::ColorStyleValueEntry::GraphicsItemForeground: return "GraphicsItem Foreground";
 	case ot::ColorStyleValueEntry::GraphicsItemSelectionBorder: return "GraphicsItem Selection Border";
@@ -404,6 +405,7 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::ToolBarFirstTabForeground)) return ColorStyleValueEntry::ToolBarFirstTabForeground;
 
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemBorder)) return ColorStyleValueEntry::GraphicsItemBorder;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemConnection)) return ColorStyleValueEntry::GraphicsItemConnection;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemBackground)) return ColorStyleValueEntry::GraphicsItemBackground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemForeground)) return ColorStyleValueEntry::GraphicsItemForeground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemSelectionBorder)) return ColorStyleValueEntry::GraphicsItemSelectionBorder;

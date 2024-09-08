@@ -42,8 +42,6 @@ namespace ot {
 
 		virtual void callPaint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) override;
 
-		virtual void graphicsItemStateChanged(const GraphicsItem::GraphicsItemStateFlags& _state) override;
-
 		//! @brief Will be called when this item was registered as an event handler and the child raised an event
 		virtual void graphicsItemEventHandler(ot::GraphicsItem* _sender, GraphicsItemEvent _event) override;
 
@@ -94,6 +92,8 @@ namespace ot {
 		// Protected
 
 	protected:
+		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _state) override;
+
 		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) override;
 
 	private:

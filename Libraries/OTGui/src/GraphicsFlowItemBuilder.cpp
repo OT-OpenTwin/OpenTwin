@@ -23,16 +23,24 @@
 #include "OTGui/Painter2D.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/Painter2DFactory.h"
+#include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/LinearGradientPainter2D.h"
 #include "OTGui/RadialGradientPainter2D.h"
 
-ot::GraphicsFlowItemConnector::GraphicsFlowItemConnector() : m_figure(ot::GraphicsFlowItemConnector::Square) {}
+ot::GraphicsFlowItemConnector::GraphicsFlowItemConnector() 
+	: m_figure(ot::GraphicsFlowItemConnector::Square), m_customPrimaryPainter(nullptr), m_customSecondaryPainter(nullptr)
+{}
 
-ot::GraphicsFlowItemConnector::GraphicsFlowItemConnector(const GraphicsFlowItemConnector& _other) {
+ot::GraphicsFlowItemConnector::GraphicsFlowItemConnector(const GraphicsFlowItemConnector& _other)
+	: m_customPrimaryPainter(nullptr), m_customSecondaryPainter(nullptr)
+{
 	*this = _other;
 }
 
-ot::GraphicsFlowItemConnector::~GraphicsFlowItemConnector() {}
+ot::GraphicsFlowItemConnector::~GraphicsFlowItemConnector() {
+	if (m_customPrimaryPainter) delete m_customPrimaryPainter;
+	if (m_customSecondaryPainter) delete m_customSecondaryPainter;
+}
 
 ot::GraphicsFlowItemConnector& ot::GraphicsFlowItemConnector::operator = (const GraphicsFlowItemConnector& _other) {
 	if (this != &_other) {
@@ -41,16 +49,28 @@ ot::GraphicsFlowItemConnector& ot::GraphicsFlowItemConnector::operator = (const 
 		m_figure = _other.m_figure;
 		m_textColor = _other.m_textColor;
 		m_font = _other.m_font;
-		m_primaryColor = _other.m_primaryColor;
-		m_secondaryColor = _other.m_secondaryColor;
+		this->setCustomPrimaryPainter((_other.m_customPrimaryPainter ? _other.m_customPrimaryPainter->createCopy() : nullptr));
+		this->setCustomSecondaryPainter((_other.m_customSecondaryPainter ? _other.m_customSecondaryPainter->createCopy() : nullptr));
 	}
 	return *this;
+}
+
+void ot::GraphicsFlowItemConnector::setCustomPrimaryPainter(ot::Painter2D* _painter) {
+	if (_painter == m_customPrimaryPainter) return;
+	if (m_customPrimaryPainter) delete m_customPrimaryPainter;
+	m_customPrimaryPainter = _painter;
+}
+
+void ot::GraphicsFlowItemConnector::setCustomSecondaryPainter(ot::Painter2D* _painter) {
+	if (_painter == m_customSecondaryPainter) return;
+	if (m_customSecondaryPainter) delete m_customSecondaryPainter;
+	m_customSecondaryPainter = _painter;
 }
 
 void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft) {
 	// Connector item
 	ot::GraphicsItemCfg* itm = this->createConnectorItem();
-	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable);
+	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable | ot::GraphicsItemCfg::ItemHandlesState);
 	itm->setName(m_name);
 	itm->setMargins(ot::MarginsD(0., 0., 0., 0));
 	itm->setToolTip(m_toolTip);
@@ -60,7 +80,7 @@ void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCf
 	ot::GraphicsTextItemCfg* itmTxt = new ot::GraphicsTextItemCfg;
 	itmTxt->setName(m_name + "_ctit");
 	itmTxt->setText(m_text);
-	itmTxt->setTextColor(m_textColor);
+	itmTxt->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
 	itmTxt->setTextFont(m_font);
 	itmTxt->setToolTip(m_toolTip);
 	//itmTxt->setMargins(ot::MarginsD(2., 2., 2., 2.));
@@ -84,6 +104,16 @@ void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCf
 		_gridLayout->addChildItem(_row, 0, itmTxt);
 	}
 	
+}
+
+ot::Painter2D* ot::GraphicsFlowItemConnector::createPrimaryPainter(void) const {
+	if (m_customPrimaryPainter) return m_customPrimaryPainter->createCopy();
+	else return new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemConnectableBackground);
+}
+
+ot::Painter2D* ot::GraphicsFlowItemConnector::createSecondaryPainter(void) const {
+	if (m_customSecondaryPainter) return m_customSecondaryPainter->createCopy();
+	else return new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder);
 }
 
 ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createConnectorItem(void) {
@@ -110,30 +140,31 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createConnectorItem(void) {
 }
 
 ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createSquareItem(void) {
-	ot::GraphicsRectangularItemCfg* itm = new ot::GraphicsRectangularItemCfg(new ot::FillPainter2D(m_primaryColor));
+	Painter2D* primaryPainter = m_customPrimaryPainter;
+	ot::GraphicsRectangularItemCfg* itm = new ot::GraphicsRectangularItemCfg(this->createPrimaryPainter());
 	itm->setSize(ot::Size2DD(10., 10.));
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));
-	itm->setOutline(ot::OutlineF(1., m_secondaryColor));
+	itm->setOutline(ot::OutlineF(1., this->createSecondaryPainter()));
 
 	return itm;
 }
 
 ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createCircleItem(void) {
-	ot::GraphicsEllipseItemCfg* itm = new ot::GraphicsEllipseItemCfg(5, 5, new ot::FillPainter2D(m_primaryColor));
+	ot::GraphicsEllipseItemCfg* itm = new ot::GraphicsEllipseItemCfg(5, 5, this->createPrimaryPainter());
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));
-	itm->setOutline(ot::OutlineF(1., m_secondaryColor));
+	itm->setOutline(ot::OutlineF(1., this->createSecondaryPainter()));
 
 	return itm;
 }
 
 ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createTriangleItem(GraphicsTriangleItemCfg::TriangleDirection _direction, GraphicsTriangleItemCfg::TriangleShape _shape) {
 	ot::GraphicsTriangleItemCfg* itm = new ot::GraphicsTriangleItemCfg(_direction, _shape);
-	itm->setBackgroundPainer(new ot::FillPainter2D(m_primaryColor));
+	itm->setBackgroundPainer(this->createPrimaryPainter());
 	itm->setMaximumSize(ot::Size2DD(10., 10.));
 	itm->setMinimumSize(ot::Size2DD(10., 10.));
-	itm->setOutline(ot::OutlineF(1., m_secondaryColor));
+	itm->setOutline(ot::OutlineF(1., this->createSecondaryPainter()));
 
 	return itm;
 }
@@ -145,7 +176,6 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createTriangleItem(GraphicsT
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
-	OTAssertNullptr(m_backgroundPainter);
 	OTAssertNullptr(m_titleBackgroundPainter);
 	OTAssertNullptr(m_titleForegroundPainter);
 	OTAssert(!m_name.empty(), "No name provided");
@@ -153,38 +183,9 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	// --- Create a copy of local data ------------------------------------------------
 
 	// Create a copy of the painter
-	ot::Painter2D* painterBack = nullptr;
-	ot::Painter2D* painterTitleBack = nullptr;
-	ot::Painter2D* painterTitleFront = nullptr;
+	ot::Painter2D* painterTitleBack = m_titleBackgroundPainter->createCopy();
+	ot::Painter2D* painterTitleFront = m_titleForegroundPainter->createCopy();
 
-	try {
-		JsonDocument backDoc;
-		m_backgroundPainter->addToJsonObject(backDoc, backDoc.GetAllocator());
-		painterBack = Painter2DFactory::instance().create(backDoc.GetConstObject());
-
-		JsonDocument titleBackDoc;
-		m_titleBackgroundPainter->addToJsonObject(titleBackDoc, titleBackDoc.GetAllocator());
-		painterTitleBack = Painter2DFactory::instance().create(titleBackDoc.GetConstObject());
-		
-		JsonDocument titleFrontDoc;
-		m_titleForegroundPainter->addToJsonObject(titleFrontDoc, titleFrontDoc.GetAllocator());
-		painterTitleFront = Painter2DFactory::instance().create(titleFrontDoc.GetConstObject());
-	}
-	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
-		if (painterBack) delete painterBack;
-		if (painterTitleBack) delete painterTitleBack;
-		return nullptr;
-	}
-	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
-		if (painterBack) delete painterBack;
-		if (painterTitleBack) delete painterTitleBack;
-		if (painterTitleFront) delete painterTitleFront;
-		return nullptr;
-	}
-
-	OTAssertNullptr(painterBack);
 	OTAssertNullptr(painterTitleBack);
 	OTAssertNullptr(painterTitleFront);
 
@@ -198,8 +199,8 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	root->setGraphicsItemFlags(GraphicsItemCfg::ItemIsMoveable | GraphicsItemCfg::ItemSnapsToGrid | GraphicsItemCfg::ItemForwardsState);
 
 	// Border
-	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg(painterBack);
-	bor->setOutline(ot::OutlineF(1., ot::Color(0, 0, 0)));
+	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
+	bor->setOutline(ot::OutlineF(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
 	bor->setCornerRadius(5);
 	bor->setName(m_name + "_bor");
 	bor->setSizePolicy(ot::Dynamic);
@@ -221,7 +222,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 
 	// Title: Border
 	ot::GraphicsRectangularItemCfg* tBor = new ot::GraphicsRectangularItemCfg(painterTitleBack);
-	tBor->setOutline(OutlineF(1., ot::Color(0, 0, 0)));
+	tBor->setOutline(OutlineF(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
 	tBor->setName(m_name + "_tBor");
 	tBor->setCornerRadius(5);
 	//tBor->setSize(ot::Size2DD(200., 30.));
@@ -358,17 +359,14 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 }
 
 ot::GraphicsFlowItemBuilder::GraphicsFlowItemBuilder()
-	: m_backgroundPainter(nullptr), m_titleBackgroundPainter(nullptr), m_titleForegroundPainter(nullptr),
+	: m_titleBackgroundPainter(nullptr), m_titleForegroundPainter(nullptr),
 	m_backgroundImageAlignment(ot::AlignCenter), m_backgroundImageMargins(5., 2., 2., 2.), m_backgroundImageInsertMode(OnLayout),
 	m_backgroundImageMaintainAspectRatio(true)
 {
-	this->setBackgroundColor(ot::Color(50, 50, 50));
 	this->setTitleBackgroundColor(ot::Color(70, 70, 70));
 	this->setDefaultTitleForegroundGradient();
 
 	m_defaultConnectorStyle.setTextColor(ot::Color(White));
-	m_defaultConnectorStyle.setPrimaryColor(ot::Color(ot::White));
-	m_defaultConnectorStyle.setSecondaryColor(ot::Color(ot::Black));
 }
 
 ot::GraphicsFlowItemBuilder::~GraphicsFlowItemBuilder() {}
@@ -387,7 +385,7 @@ void ot::GraphicsFlowItemBuilder::addLeft(const std::string& _name, const std::s
 	cfg.setName(_name);
 	cfg.setText(_title);
 	cfg.setFigure(_figure);
-	cfg.setPrimaryColor(ot::Color(_color));
+	cfg.setCustomPrimaryPainter(new FillPainter2D(_color));
 
 	this->addLeft(cfg);
 }
@@ -397,7 +395,7 @@ void ot::GraphicsFlowItemBuilder::addLeft(const std::string& _name, const std::s
 	cfg.setName(_name);
 	cfg.setText(_title);
 	cfg.setFigure(_figure);
-	cfg.setPrimaryColor(_color);
+	cfg.setCustomPrimaryPainter(new FillPainter2D(_color));
 
 	this->addLeft(cfg);
 }
@@ -420,7 +418,7 @@ void ot::GraphicsFlowItemBuilder::addRight(const std::string& _name, const std::
 	cfg.setName(_name);
 	cfg.setText(_title);
 	cfg.setFigure(_figure);
-	cfg.setPrimaryColor(ot::Color(_color));
+	cfg.setCustomPrimaryPainter(new FillPainter2D(_color));
 
 	this->addRight(cfg);
 }
@@ -430,23 +428,13 @@ void ot::GraphicsFlowItemBuilder::addRight(const std::string& _name, const std::
 	cfg.setName(_name);
 	cfg.setText(_title);
 	cfg.setFigure(_figure);
-	cfg.setPrimaryColor(_color);
+	cfg.setCustomPrimaryPainter(new FillPainter2D(_color));
 
 	this->addRight(cfg);
 }
 
 void ot::GraphicsFlowItemBuilder::addRight(const GraphicsFlowItemConnector& _output) {
 	m_right.push_back(_output);
-}
-
-void ot::GraphicsFlowItemBuilder::setBackgroundPainter(ot::Painter2D* _painter) {
-	if (m_backgroundPainter == _painter) return;
-	if (m_backgroundPainter) delete m_backgroundPainter;
-	m_backgroundPainter = _painter;
-}
-
-void ot::GraphicsFlowItemBuilder::setBackgroundColor(const ot::Color& _color) {
-	this->setBackgroundPainter(new ot::FillPainter2D(_color));
 }
 
 void ot::GraphicsFlowItemBuilder::setTitleBackgroundPainter(ot::Painter2D* _painter) {
