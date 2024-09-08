@@ -359,7 +359,7 @@ void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _i
 
 void ot::GraphicsView::wheelEvent(QWheelEvent* _event)
 {
-	if (!m_wheelEnabled) return;
+	if ((m_viewStateFlags & MiddleMousePressedState) || !m_wheelEnabled) return;
 	const ViewportAnchor anchor = transformationAnchor();
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 	int angle = _event->angleDelta().y();
