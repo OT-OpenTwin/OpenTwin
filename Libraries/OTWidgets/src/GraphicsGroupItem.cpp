@@ -102,6 +102,20 @@ void ot::GraphicsGroupItem::finalizeGraphicsItem(void) {
 	}
 }
 
+std::list<ot::GraphicsElement*> ot::GraphicsGroupItem::getAllGraphicsElements(void) {
+	std::list<GraphicsElement*> result = GraphicsItem::getAllGraphicsElements();
+	for (QGraphicsItem* child : this->childItems()) {
+		GraphicsElement* actualItem = dynamic_cast<GraphicsElement*>(child);
+		if (actualItem) {
+			result.push_back(actualItem);
+		}
+		else {
+			OT_LOG_EA("Unknown item");
+		}
+	}
+	return result;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Base class functions: QGraphicsItem

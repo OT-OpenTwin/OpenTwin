@@ -10,11 +10,9 @@
 ot::GraphicsElement::GraphicsElement() 
 	: m_state(NoState)
 {
-
 }
 
 ot::GraphicsElement::~GraphicsElement() {
-
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -31,4 +29,8 @@ void ot::GraphicsElement::setGraphicsElementStateFlags(const GraphicsElementStat
 	if (m_state == _state) return;
 	m_state = _state;
 	this->graphicsElementStateChanged(m_state);
+}
+
+std::list<ot::GraphicsElement*> ot::GraphicsElement::getAllGraphicsElements(void) {
+	return std::list<GraphicsElement*>({ this });
 }
