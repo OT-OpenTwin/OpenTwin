@@ -713,8 +713,8 @@ QTransform ot::GraphicsItem::calculateGraphicsItemTransform(QPointF& _transformO
 
 ot::ConnectionDirection ot::GraphicsItem::calculateOutwardsConnectionDirection(void) const {
 	OTAssertNullptr(this->getQGraphicsItem());
-	QPointF thisCenter = this->getQGraphicsItem()->boundingRect().center();
-	QPointF rootCenter = this->getRootItem()->getQGraphicsItem()->boundingRect().center();
+	QPointF thisCenter = this->getQGraphicsItem()->mapToScene(this->getQGraphicsItem()->boundingRect().center());
+	QPointF rootCenter = this->getRootItem()->getQGraphicsItem()->mapToScene(this->getRootItem()->getQGraphicsItem()->boundingRect().center());
 	qreal dx = thisCenter.x() - rootCenter.x();
 	qreal dy = thisCenter.y() - rootCenter.y();
 	
