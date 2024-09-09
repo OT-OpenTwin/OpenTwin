@@ -512,7 +512,18 @@ void ot::GraphicsItem::setConnectionDirection(ot::ConnectionDirection _direction
 
 ot::ConnectionDirection ot::GraphicsItem::getConnectionDirection(void) const {
 	OTAssertNullptr(m_config);
-	return m_config->getConnectionDirection();
+	switch (m_config->getConnectionDirection()) {
+	case ot::ConnectAny: return this->calculateOutwardsConnectionDirection();
+	case ot::ConnectLeft: return ConnectionDirection::ConnectLeft;
+	case ot::ConnectUp: return ConnectionDirection::ConnectUp;
+	case ot::ConnectRight: return ConnectionDirection::ConnectRight;
+	case ot::ConnectDown: return ConnectionDirection::ConnectDown;
+	case ot::ConnectOut: return this->calculateOutwardsConnectionDirection();
+	case ot::ConnectIn: return ot::inversedConnectionDirection(this->calculateOutwardsConnectionDirection());
+	default:
+		OT_LOG_EA("Unknown connection direction");
+		return this->calculateOutwardsConnectionDirection();
+	}
 }
 
 void ot::GraphicsItem::setStringMap(const std::map<std::string, std::string>& _map) {
@@ -698,4 +709,37 @@ QTransform ot::GraphicsItem::calculateGraphicsItemTransform(QPointF& _transformO
 	newTransform.translate(-_transformOrigin.x(), -_transformOrigin.y());
 
 	return newTransform;
+}
+
+ot::ConnectionDirection ot::GraphicsItem::calculateOutwardsConnectionDirection(void) const {
+	OTAssertNullptr(this->getQGraphicsItem());
+	QPointF thisCenter = this->getQGraphicsItem()->boundingRect().center();
+	QPointF rootCenter = this->getRootItem()->getQGraphicsItem()->boundingRect().center();
+	qreal dx = thisCenter.x() - rootCenter.x();
+	qreal dy = thisCenter.y() - rootCenter.y();
+	
+	if (dx == 0. && dy == 0.) {
+		return ConnectionDirection::ConnectAny;
+	}
+
+	bool isRight = true;
+	if (dx < 0.) {
+		dx = dx * (-1.);
+		isRight = false;
+	}
+
+	bool isDown = true;
+	if (dy < 0.) {
+		dy = dy * (-1.);
+		isDown = false;
+	}
+	
+	if (dx >= dy) {
+		if (isRight) return ConnectionDirection::ConnectRight;
+		else return ConnectionDirection::ConnectLeft;
+	}
+	else {
+		if (isDown) return ConnectionDirection::ConnectDown;
+		else return ConnectionDirection::ConnectUp;
+	}
 }

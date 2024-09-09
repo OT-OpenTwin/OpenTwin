@@ -324,6 +324,8 @@ namespace ot {
 		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) {};
 
 	private:
+		ConnectionDirection calculateOutwardsConnectionDirection(void) const;
+
 		GraphicsItemCfg* m_config; //! \brief Configuration used to setup this item. Default 0.
 		
 		QPointF m_moveStartPt; //! @brief Item move origin.

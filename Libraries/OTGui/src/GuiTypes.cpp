@@ -140,6 +140,8 @@ std::string ot::toString(ot::ConnectionDirection _direction) {
 	case ot::ConnectUp: return "Up";
 	case ot::ConnectRight: return "Right";
 	case ot::ConnectDown: return "Down";
+	case ot::ConnectOut: return "Out";
+	case ot::ConnectIn: return "In";
 	default:
 		OT_LOG_EA("Unknown connection direction");
 		throw std::exception("Unknown connection direction");
@@ -152,6 +154,8 @@ ot::ConnectionDirection ot::stringToConnectionDirection(const std::string& _dire
 	else if (_direction == toString(ot::ConnectUp)) return ot::ConnectUp;
 	else if (_direction == toString(ot::ConnectRight)) return ot::ConnectRight;
 	else if (_direction == toString(ot::ConnectDown)) return ot::ConnectDown;
+	else if (_direction == toString(ot::ConnectOut)) return ot::ConnectOut;
+	else if (_direction == toString(ot::ConnectIn)) return ot::ConnectIn;
 	else {
 		OT_LOG_EAS("Unknown connection direction \"" + _direction + "\"");
 		throw std::exception("Unknown connection direction");
@@ -166,6 +170,8 @@ ot::ConnectionDirection ot::inversedConnectionDirection(ConnectionDirection _dir
 	case ot::ConnectUp: return ot::ConnectDown;
 	case ot::ConnectRight: return ot::ConnectLeft;
 	case ot::ConnectDown: return ot::ConnectUp;
+	case ot::ConnectOut: return ot::ConnectIn;
+	case ot::ConnectIn: return ot::ConnectOut;
 	default:
 		OT_LOG_EA("Unknown connection direction");
 		return ot::ConnectAny;
@@ -179,7 +185,9 @@ std::list<ot::ConnectionDirection> ot::getAllConnectionDirections(void)
 		ConnectLeft,
 		ConnectUp,
 		ConnectRight,
-		ConnectDown
+		ConnectDown,
+		ConnectOut,
+		ConnectIn
 		});
 }
 

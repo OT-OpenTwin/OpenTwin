@@ -63,11 +63,13 @@ namespace ot {
 	//! \enum ConnectionDirection
 	//! \brief Describes in which direction a connetion from an item is starting.
 	enum ConnectionDirection {
-		ConnectAny, //! \brief Connections may start in any direction.
-		ConnectLeft, //! \brief Connections start towards left.
-		ConnectUp, //! \brief Connections start upwards.
-		ConnectRight, //! \brief Connections start towards right.
-		ConnectDown //! \brief Connections start downwards.
+		ConnectAny, //! \brief Connection may start in any direction.
+		ConnectLeft, //! \brief Connection start towards left.
+		ConnectUp, //! \brief Connection start upwards.
+		ConnectRight, //! \brief Connection start towards right.
+		ConnectDown, //! \brief Connection start downwards.
+		ConnectOut, //! \brief Connection start outwards relative to the item center.
+		ConnectIn //! \brief Connection start inwards relative to the item center.
 	};
 
 	//! \brief Describes how the painter will behave when painting outsite the gradient area.
