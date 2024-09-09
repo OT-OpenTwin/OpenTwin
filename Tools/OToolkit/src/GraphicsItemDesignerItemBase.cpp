@@ -74,7 +74,7 @@ void GraphicsItemDesignerItemBase::fillBasePropertyGrid(ot::PropertyGridCfg& _co
 	for (ConnectionDirection direction : getAllConnectionDirections()) {
 		connectionDirections.push_back(toString(direction));
 	}
-	PropertyStringList* newConnectionDirectionProperty = new PropertyStringList("Connection Direction", toString(this->getGraphicsItem()->getConnectionDirection()), connectionDirections);
+	PropertyStringList* newConnectionDirectionProperty = new PropertyStringList("Connection Direction", toString(this->getGraphicsItem()->getConfiguration()->getConnectionDirection()), connectionDirections);
 	newConnectionDirectionProperty->setPropertyTip("If the item is connectable the connection direction is used to calculate the connection line.");
 	generalGroup->addProperty(newConnectionDirectionProperty);
 
