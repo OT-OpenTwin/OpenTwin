@@ -309,6 +309,9 @@
     <ClInclude Include="include\OTGui\TableHeaderItemCfg.h">
       <Filter>Header Files\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsConnectionCalculationData.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -544,6 +547,9 @@
     </ClCompile>
     <ClCompile Include="src\TableHeaderItemCfg.cpp">
       <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsConnectionCalculationData.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

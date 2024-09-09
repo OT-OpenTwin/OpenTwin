@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTCore/Math.h"
 #include "OTCore/Logger.h"
+#include "OTGui/GraphicsConnectionCalculationData.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsItem.h"
@@ -470,5 +471,53 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointAutoXY(const Q
 
 ot::GraphicsConnectionCfg::ConnectionShape ot::GraphicsConnectionItem::calculateAutoXYShape(void) const
 {
-	return GraphicsConnectionCfg::ConnectionShape();
+	OTAssertNullptr(m_origin);
+	OTAssertNullptr(m_dest);
+
+	Alignment connectionAlignment = this->calculateConnectionDirectionAlignment();
+	
+	if (
+		connectionAlignment == AlignLeft ||
+		connectionAlignment == AlignTop ||
+		connectionAlignment == AlignRight ||
+		connectionAlignment == AlignBottom ||
+		connectionAlignment == AlignCenter
+		) {
+		return GraphicsConnectionCfg::ConnectionShape::XYLine;
+	}
+
+	GraphicsConnectionCalculationData info(m_origin->getConnectionDirection(), m_dest->getConnectionDirection(), connectionAlignment);
+	std::list<GraphicsConnectionCalculationData> yxLines = GraphicsConnectionCalculationData::getAllYXLines();
+	
+	if (std::find(yxLines.begin(), yxLines.end(), info) != yxLines.end()) {
+		return GraphicsConnectionCfg::ConnectionShape::YXLine;
+	}
+	else {
+		return GraphicsConnectionCfg::ConnectionShape::XYLine;
+	}
+}
+
+ot::Alignment ot::GraphicsConnectionItem::calculateConnectionDirectionAlignment(void) const {
+	OTAssertNullptr(m_origin);
+	OTAssertNullptr(m_dest);
+
+	QPointF originPoint = this->originItem()->getQGraphicsItem()->mapToScene(this->originItem()->getQGraphicsItem()->boundingRect().center());
+	QPointF destinationPoint = this->destItem()->getQGraphicsItem()->mapToScene(this->destItem()->getQGraphicsItem()->boundingRect().center());
+	QPointF delta = destinationPoint - originPoint;
+
+	if (delta.x() > 0.) {
+		if (delta.y() > 0.) return Alignment::AlignBottomRight;
+		else if (delta.y() < 0.) return Alignment::AlignTopRight;
+		else return Alignment::AlignRight;
+	}
+	else if (delta.x() < 0.) {
+		if (delta.y() > 0.) return Alignment::AlignBottomLeft;
+		else if (delta.y() < 0.) return Alignment::AlignTopLeft;
+		else return Alignment::AlignLeft;
+	}
+	else {
+		if (delta.y() > 0.) return Alignment::AlignBottom;
+		else if (delta.y() < 0.) return Alignment::AlignTop;
+		else return Alignment::AlignCenter;
+	}
 }

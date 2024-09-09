@@ -25,6 +25,7 @@
     <ClInclude Include="include\OTGui\ColorStyleTypes.h" />
     <ClInclude Include="include\OTGui\DefaultSyntaxHighlighterRules.h" />
     <ClInclude Include="include\OTGui\GraphicsArcItemCfg.h" />
+    <ClInclude Include="include\OTGui\GraphicsConnectionCalculationData.h" />
     <ClInclude Include="include\OTGui\GraphicsGroupItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsInvisibleItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsItemCfgFactory.h" />
@@ -109,6 +110,7 @@
     <ClCompile Include="src\ColorStyleTypes.cpp" />
     <ClCompile Include="src\DefaultSyntaxHighlighterRules.cpp" />
     <ClCompile Include="src\GraphicsArcItemCfg.cpp" />
+    <ClCompile Include="src\GraphicsConnectionCalculationData.cpp" />
     <ClCompile Include="src\GraphicsGroupItemCfg.cpp" />
     <ClCompile Include="src\GraphicsInvisibleItemCfg.cpp" />
     <ClCompile Include="src\GraphicsItemCfgFactory.cpp" />

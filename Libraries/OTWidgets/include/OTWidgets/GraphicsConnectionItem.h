@@ -122,6 +122,8 @@ namespace ot {
 
 		GraphicsConnectionCfg::ConnectionShape calculateAutoXYShape(void) const;
 
+		ot::Alignment calculateConnectionDirectionAlignment(void) const;
+
 		GraphicsConnectionCfg m_config;
 
 		GraphicsItem* m_origin;
