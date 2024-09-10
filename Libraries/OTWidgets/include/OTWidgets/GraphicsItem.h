@@ -228,9 +228,11 @@ namespace ot {
 		//! \brief Returns the maximum trigger distance in any direction of this item and its childs.
 		virtual double getMaxAdditionalTriggerDistance(void) const;
 		
+		void setGraphicsItemMinimumSize(double _width, double _height) { this->setGraphicsItemMinimumSize(QSizeF(_width, _height)); };
 		void setGraphicsItemMinimumSize(const QSizeF& _size);
 		QSizeF getGraphicsItemMinimumSize(void) const;
-
+	
+		void setGraphicsItemMaximumSize(double _width, double _height) { this->setGraphicsItemMaximumSize(QSizeF(_width, _height)); };
 		void setGraphicsItemMaximumSize(const QSizeF& _size);
 		QSizeF getGraphicsItemMaximumSize(void) const;
 
