@@ -77,6 +77,9 @@ namespace ot {
 		void setLineStyle(const OutlineF& _style) { m_config.setLineStyle(_style); this->update(); };
 		const OutlineF& getLineStyle(void) const { return m_config.getLineStyle(); };
 
+		void setHandleState(bool _handlesState);
+		bool getHandleState(void) const;
+
 		void updateConnectionView(void);
 
 		//! \brief Sets the origin and destination items.

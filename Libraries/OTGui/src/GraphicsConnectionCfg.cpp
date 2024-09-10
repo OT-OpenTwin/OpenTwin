@@ -12,6 +12,7 @@
 #define OT_JSON_Member_Style "Style"
 #define OT_JSON_Member_SourceUid "Source.UID"
 #define OT_JSON_Member_SourceName "Source.Name"
+#define OT_JSON_Member_HandleState "HandleState"
 #define OT_JSON_Member_DestinationUid "Destination.UID"
 #define OT_JSON_Member_DestinationName "Destination.Name"
 
@@ -42,14 +43,14 @@ ot::GraphicsConnectionCfg::ConnectionShape ot::GraphicsConnectionCfg::stringToSh
 }
 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg()
-	: m_lineShape(ConnectionShape::DirectLine), m_destUID(0), m_originUID(0), m_uid(0)
+	: m_lineShape(ConnectionShape::DirectLine), m_destUID(0), m_originUID(0), m_uid(0), m_handlesState(true)
 {
 	m_lineStyle.setWidth(2.);
 }
 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const ot::UID& _originUid, const std::string& _originConnectableName, const ot::UID& _destinationUid, const std::string& _destinationName)
 	: m_lineShape(ConnectionShape::DirectLine), m_uid(0),
-	m_originUID(_originUid), m_originConnectable(_originConnectableName), m_destUID(_destinationUid), m_destConnectable(_destinationName)
+	m_originUID(_originUid), m_originConnectable(_originConnectableName), m_destUID(_destinationUid), m_destConnectable(_destinationName), m_handlesState(true)
 {
 	m_lineStyle.setWidth(2.);
 }
@@ -72,6 +73,7 @@ ot::GraphicsConnectionCfg& ot::GraphicsConnectionCfg::operator = (const Graphics
 	m_destConnectable = _other.m_destConnectable;
 
 	m_uid = _other.m_uid;
+	m_handlesState = _other.m_handlesState;
 
 	m_lineShape = _other.m_lineShape;
 	m_lineStyle = _other.m_lineStyle;
@@ -86,6 +88,7 @@ bool ot::GraphicsConnectionCfg::operator==(const GraphicsConnectionCfg& _other) 
 
 void ot::GraphicsConnectionCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	_object.AddMember(OT_JSON_Member_Uid, m_uid, _allocator);
+	_object.AddMember(OT_JSON_Member_HandleState, m_handlesState, _allocator);
 	_object.AddMember(OT_JSON_Member_SourceUid, m_originUID, _allocator);
 	_object.AddMember(OT_JSON_Member_SourceName, JsonString(m_originConnectable, _allocator), _allocator);
 	_object.AddMember(OT_JSON_Member_DestinationUid, m_destUID, _allocator);
@@ -99,6 +102,7 @@ void ot::GraphicsConnectionCfg::addToJsonObject(JsonValue& _object, JsonAllocato
 
 void ot::GraphicsConnectionCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	m_uid = json::getUInt64(_object, OT_JSON_Member_Uid);
+	m_handlesState = json::getBool(_object, OT_JSON_Member_HandleState);
 	m_originUID = json::getUInt64(_object, OT_JSON_Member_SourceUid);
 	m_originConnectable = json::getString(_object, OT_JSON_Member_SourceName);
 	m_destUID = json::getUInt64(_object, OT_JSON_Member_DestinationUid);

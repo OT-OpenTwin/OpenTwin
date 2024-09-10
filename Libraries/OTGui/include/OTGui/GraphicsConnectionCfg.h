@@ -90,6 +90,9 @@ namespace ot {
 		std::string createConnectionKey(void) const;
 		std::string createConnectionKeyReverse(void) const;
 
+		void setHandlesState(bool _handleState) { m_handlesState = _handleState; };
+		bool getHandleState(void) const { return m_handlesState; };
+
 	private:
 		ot::UID m_originUID;
 		std::string m_originConnectable;
@@ -101,5 +104,7 @@ namespace ot {
 
 		ConnectionShape m_lineShape;
 		OutlineF m_lineStyle;
+
+		bool m_handlesState;
 	};
 }

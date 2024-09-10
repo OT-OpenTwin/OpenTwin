@@ -52,15 +52,17 @@ void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGra
 
 	QPen linePen = QtFactory::toQPen(m_config.getLineStyle());
 
-	if (this->getGraphicsElementState() & GraphicsElement::HoverState) {
-		const Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
-		linePen.setBrush(QtFactory::toQBrush(newPainter));
-		delete newPainter;
-	}
-	else if (this->getGraphicsElementState() & GraphicsElement::SelectedState) {
-		const Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
-		linePen.setBrush(QtFactory::toQBrush(newPainter));
-		delete newPainter;
+	if (m_config.getHandleState()) {
+		if (this->getGraphicsElementState() & GraphicsElement::HoverState) {
+			const Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
+			linePen.setBrush(QtFactory::toQBrush(newPainter));
+			delete newPainter;
+		}
+		else if (this->getGraphicsElementState() & GraphicsElement::SelectedState) {
+			const Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
+			linePen.setBrush(QtFactory::toQBrush(newPainter));
+			delete newPainter;
+		}
 	}
 
 	_painter->setPen(linePen);
@@ -195,6 +197,14 @@ void ot::GraphicsConnectionItem::forgetItem(const GraphicsItem* _item) {
 	if (m_dest == _item) {
 		m_dest = nullptr;
 	}
+}
+
+void ot::GraphicsConnectionItem::setHandleState(bool _handlesState) {
+	m_config.setHandlesState(_handlesState);
+}
+
+bool ot::GraphicsConnectionItem::getHandleState(void) const {
+	return m_config.getHandleState();
 }
 
 void ot::GraphicsConnectionItem::updateConnectionView(void) {
