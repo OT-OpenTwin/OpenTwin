@@ -14,7 +14,7 @@ namespace ot {
 	class GraphicsTextItem;
 	class GraphicsInvisibleItem;
 	class GraphicsConnectionItem;
-
+	
 	class OT_WIDGETS_API_EXPORT VersionGraphItem : public GraphicsStackItem {
 	public:
 		VersionGraphItem();
@@ -45,10 +45,11 @@ namespace ot {
 		VersionGraphVersionCfg m_config;
 		VersionGraphItem* m_parentVersion;
 		GraphicsConnectionItem* m_parentConnection;
-		GraphicsTextItem* m_textItem;
+		GraphicsTextItem* m_nameItem;
+		GraphicsTextItem* m_labelItem;
 		GraphicsInvisibleItem* m_inConnector;
 		GraphicsInvisibleItem* m_outConnector;
-
+		
 		std::list<VersionGraphItem*> m_childVersions;
 		int m_row;
 	};

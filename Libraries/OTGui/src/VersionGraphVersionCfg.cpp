@@ -10,8 +10,8 @@ ot::VersionGraphVersionCfg::VersionGraphVersionCfg() {
 
 }
 
-ot::VersionGraphVersionCfg::VersionGraphVersionCfg(const std::string& _name, const std::string& _title, const std::string& _description)
-	: m_name(_name), m_title(_title), m_description(_description) 
+ot::VersionGraphVersionCfg::VersionGraphVersionCfg(const std::string& _name, const std::string& _label, const std::string& _description)
+	: m_name(_name), m_label(_label), m_description(_description)
 {
 
 }
@@ -30,7 +30,7 @@ ot::VersionGraphVersionCfg& ot::VersionGraphVersionCfg::operator = (const Versio
 	this->clear();
 
 	m_name = _other.m_name;
-	m_title = _other.m_title;
+	m_label = _other.m_label;
 	m_description = _other.m_description;
 	m_childVersions = _other.m_childVersions;
 
@@ -39,7 +39,7 @@ ot::VersionGraphVersionCfg& ot::VersionGraphVersionCfg::operator = (const Versio
 
 void ot::VersionGraphVersionCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
-	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
+	_object.AddMember("Label", JsonString(m_label, _allocator), _allocator);
 	_object.AddMember("Description", JsonString(m_description, _allocator), _allocator);
 
 	JsonArray childArr;
@@ -55,7 +55,7 @@ void ot::VersionGraphVersionCfg::setFromJsonObject(const ot::ConstJsonObject& _o
 	this->clear();
 
 	m_name = json::getString(_object, "Name");
-	m_title = json::getString(_object, "Title");
+	m_label = json::getString(_object, "Label");
 	m_description = json::getString(_object, "Description");
 
 	std::list<ConstJsonObject> childArr = json::getObjectList(_object, "Childs");
@@ -66,8 +66,8 @@ void ot::VersionGraphVersionCfg::setFromJsonObject(const ot::ConstJsonObject& _o
 	}
 }
 
-void ot::VersionGraphVersionCfg::addChildVersion(const std::string& _name, const std::string& _title, const std::string& _description) {
-	this->addChildVersion(VersionGraphVersionCfg(_name, _title, _description));
+void ot::VersionGraphVersionCfg::addChildVersion(const std::string& _name, const std::string& _label, const std::string& _description) {
+	this->addChildVersion(VersionGraphVersionCfg(_name, _label, _description));
 }
 
 void ot::VersionGraphVersionCfg::addChildVersion(const VersionGraphVersionCfg& _child) {

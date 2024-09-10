@@ -28,6 +28,7 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 		this->getGraphicsScene()->addItem(newItem);
 		newItem->setVersionConfig(version);
 		row = newItem->getMaxRowIndex() + 1;
+		m_rootItems.push_back(newItem);
 	}
 }
 

@@ -26,17 +26,16 @@ ot::VersionGraphItem::VersionGraphItem()
 	GraphicsGridLayoutItem* centralLayout = new GraphicsGridLayoutItem;
 	centralLayout->setGraphicsItemName("CentralLayout");
 	centralLayout->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
-	centralLayout->setGraphicsItemMinimumSize(100., OT_VERSIONGRAPHITEM_Height);
-	centralLayout->setGraphicsItemMaximumSize(std::numeric_limits<double>::max(), OT_VERSIONGRAPHITEM_Height);
-	centralLayout->setGraphicsItemSizePolicy(SizePolicy::Preferred);
+	//m_layout->setGraphicsItemMaximumSize(std::numeric_limits<double>::max(), OT_VERSIONGRAPHITEM_Height);
+	//m_layout->setGraphicsItemSizePolicy(SizePolicy::Preferred);
 	centralLayout->getLayoutWrapper()->setMinimumSize(100., OT_VERSIONGRAPHITEM_Height);
-	centralLayout->getLayoutWrapper()->setMaximumSize(std::numeric_limits<double>::max(), OT_VERSIONGRAPHITEM_Height);
+	centralLayout->getLayoutWrapper()->setMaximumHeight(OT_VERSIONGRAPHITEM_Height);
 	centralLayout->setContentsMargins(0., 0., 0., 0.);
 
 	// Create items
 	GraphicsRectangularItem* border = new GraphicsRectangularItem;
 	border->setGraphicsItemName("Border");
-	border->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState);
+	border->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
 	border->setBackgroundPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
 	border->setOutline(OutlineF(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
 	border->setGraphicsItemSizePolicy(SizePolicy::Dynamic);
@@ -55,29 +54,44 @@ ot::VersionGraphItem::VersionGraphItem()
 	m_outConnector->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 	m_outConnector->setConnectionDirection(ConnectRight);
 
-	m_textItem = new GraphicsTextItem;
-	m_textItem->setGraphicsItemName("Text");
-	m_textItem->setGraphicsItemSizePolicy(SizePolicy::Preferred);
-	m_textItem->setGraphicsItemAlignment(AlignCenter);
-	m_textItem->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
-	m_textItem->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
+	m_nameItem = new GraphicsTextItem;
+	m_nameItem->setGraphicsItemName("Name");
+	m_nameItem->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
+	m_nameItem->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
+	m_nameItem->setGraphicsItemMargins(MarginsD(0., 3., 0., 0.));
+
+	m_labelItem = new GraphicsTextItem;
+	m_labelItem->setBlockConfigurationNotifications(true);
+	m_labelItem->setGraphicsItemName("Label");
+	m_labelItem->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
+	m_labelItem->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
+	m_labelItem->setBlockConfigurationNotifications(false);
+
+	GraphicsInvisibleItem* spacerItem = new GraphicsInvisibleItem;
+
+	Font textFont = m_nameItem->getFont();
+	textFont.setSize(10);
+	m_nameItem->setFont(textFont);
+	textFont.setSize(12);
+	m_labelItem->setFont(textFont);
 
 	// Setup layouts
 	this->addItem(border, false, true);
 	this->addItem(centralLayout, true, false);
 
-	centralLayout->addItem(m_inConnector, 1, 0);
-	centralLayout->addItem(m_textItem, 1, 1);
-	centralLayout->addItem(m_outConnector, 1, 2);
+	centralLayout->addItem(m_inConnector, 1, 0, Qt::AlignVCenter | Qt::AlignLeft);
+	centralLayout->addItem(m_nameItem, 0, 1, Qt::AlignLeft);
+	centralLayout->addItem(m_labelItem, 1, 1, Qt::AlignCenter);
+	centralLayout->addItem(m_outConnector, 1, 2, Qt::AlignVCenter | Qt::AlignRight);
+	centralLayout->addItem(spacerItem, 2, 1, Qt::AlignCenter);
 
 	centralLayout->setRowStretchFactor(0, 1);
 	centralLayout->setRowStretchFactor(2, 1);
 	centralLayout->setColumnStretchFactor(1, 1);
 
-	centralLayout->setRowAlignment(1, Qt::AlignCenter);
-	centralLayout->setColumnAlignment(1, Qt::AlignCenter);
-
 	this->setZValue(2);
+
+	this->finalizeGraphicsItem();
 }
 
 ot::VersionGraphItem::~VersionGraphItem() {
@@ -184,9 +198,24 @@ void ot::VersionGraphItem::updateGraphics(void) {
 	Point2DD newPos(0., (OT_VERSIONGRAPHITEM_Height + OT_VERSIONGRAPHITEM_VSpacing) * (double)m_row);
 
 	if (m_parentVersion) {
-		newPos.setX(m_parentVersion->getQGraphicsItem()->pos().x() + m_parentVersion->getQGraphicsItem()->boundingRect().width() + OT_VERSIONGRAPHITEM_HSpacing);
+		QRectF parentRect = m_parentVersion->getQGraphicsItem()->boundingRect();
+		newPos.setX(m_parentVersion->getQGraphicsItem()->pos().x() + parentRect.width() + OT_VERSIONGRAPHITEM_HSpacing);
 	}
 	this->setGraphicsItemPos(newPos);
-	
-	m_textItem->setText(m_config.getTitle());
+
+	if (m_config.getLabel().empty()) {
+		m_nameItem->setText("");
+		m_labelItem->setText(m_config.getName());
+	}
+	else {
+		m_nameItem->setText(m_config.getName());
+		m_labelItem->setText(m_config.getLabel());
+	}
+
+	this->updateGeometry();
+
+	// Update childs
+	for (VersionGraphItem* child : m_childVersions) {
+		child->updateGraphics();
+	}
 }
