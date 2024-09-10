@@ -103,4 +103,5 @@ void ot::CustomGraphicsItem::graphicsElementStateChanged(const GraphicsElementSt
 void ot::CustomGraphicsItem::updateItemGeometry(void) {
 	this->prepareGeometryChange();
 	this->setGeometry(QRectF(this->pos(), this->getPreferredGraphicsItemSize()));
+	this->updateGeometry();
 }

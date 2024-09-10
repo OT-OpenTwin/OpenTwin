@@ -370,8 +370,10 @@ void ot::GraphicsItem::setGraphicsItemPos(const QPointF& _pos) {
 void ot::GraphicsItem::setGraphicsItemPos(const Point2DD& _pos) {
 	OTAssertNullptr(m_config);
 	OTAssertNullptr(this->getQGraphicsItem());
+	this->prepareGraphicsItemGeometryChange();
 	m_config->setPosition(_pos);
 	this->getQGraphicsItem()->setPos(QtFactory::toQPoint(_pos));
+	this->getQGraphicsLayoutItem()->updateGeometry();
 
 	if (!m_blockConfigurationNotifications) this->graphicsItemConfigurationChanged(m_config);
 }
