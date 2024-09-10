@@ -241,7 +241,6 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	tit->setName(m_name + "_tit");
 	tit->setText(m_title);
 	tit->setTextPainter(painterTitleFront);
-	tit->setMargins(ot::MarginsD(2., 2., 2., 2.));
 	tit->setMinimumSize(ot::Size2DD(10., 22.));
 	tit->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
@@ -253,11 +252,15 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		ot::GraphicsImageItemCfg* titLImg = new ot::GraphicsImageItemCfg;
 		titLImg->setName(m_name + "_titLImg");
 		titLImg->setImagePath(m_leftTitleImagePath);
-		titLImg->setMaximumSize(ot::Size2DD(22., 22.));
+		titLImg->setFixedSize(16., 16.);
 		titLImg->setAlignment(ot::AlignCenter);
-		titLImg->setMargins(ot::MarginsD(15., 2., 0., 2.));
+		titLImg->setMargins(ot::MarginsD(15., 0., 0., 0.));
 		titLImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titLImg);
+
+		MarginsD titMargins = tit->getMargins();
+		titMargins.setLeft(15.);
+		tit->setMargins(titMargins);
 	}
 	
 	tLay->addChildItem(tit);
@@ -275,6 +278,10 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		titRImg->setMargins(ot::MarginsD(0., 2., 15., 2.));
 		titRImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titRImg);
+
+		MarginsD titMargins = tit->getMargins();
+		titMargins.setRight(15.);
+		tit->setMargins(titMargins);
 	}
 
 	// Central layout
