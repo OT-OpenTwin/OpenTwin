@@ -89,6 +89,8 @@ namespace ot {
 		//! \brief Returns the maximum trigger distance in any direction of this item and its childs.
 		virtual double getMaxAdditionalTriggerDistance(void) const override;
 
+		void clear(void);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Protected
@@ -99,7 +101,6 @@ namespace ot {
 		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) override;
 
 	private:
-		void memClear(void);
 
 		//! @brief Will calculate the size of the slave child items.
 		//! @return True if the master size has changed and update() is called.

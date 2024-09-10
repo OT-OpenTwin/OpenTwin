@@ -43,7 +43,7 @@ bool ot::GraphicsStackItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	}
 
 	this->setBlockConfigurationNotifications(true);
-	this->memClear();
+	this->clear();
 
 	for (auto itm : cfg->items()) {
 		OTAssertNullptr(itm.item);
@@ -249,6 +249,11 @@ double ot::GraphicsStackItem::getMaxAdditionalTriggerDistance(void) const {
 	return maxDist;
 }
 
+void ot::GraphicsStackItem::clear(void) {
+	for (auto itm : m_items) delete itm.item;
+	m_items.clear();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected
@@ -278,11 +283,6 @@ void ot::GraphicsStackItem::notifyChildsAboutTransformChange(const QTransform& _
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private functions
-
-void ot::GraphicsStackItem::memClear(void) {
-	for (auto itm : m_items) delete itm.item;
-	m_items.clear();
-}
 
 bool ot::GraphicsStackItem::adjustChildItems(void) {
 	QSizeF masterSize(-1., -1.);

@@ -33,11 +33,6 @@ namespace ot {
 
 		virtual void finalizeGraphicsItem(void) override;
 
-	protected:
-
-		//! @brief Paint the item inside the provided rect
-		virtual void paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) override;
-
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
@@ -60,6 +55,11 @@ namespace ot {
 
 		void setTextIsReference(bool _isReference);
 		bool getTextIsReference(void) const;
+
+	protected:
+
+		//! @brief Paint the item inside the provided rect
+		virtual void paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) override;
 
 	};
 
