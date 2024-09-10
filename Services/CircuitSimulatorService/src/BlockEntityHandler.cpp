@@ -463,25 +463,46 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 	
 		if (simulationType == ".dc") {
 			auto it = resultVectors.find("v-sweep");
-			xValues = resultVectors.at("v-sweep");
 			if (it != resultVectors.end()) {
+				xValues = resultVectors.at("v-sweep");
 				resultVectors.erase(it);
 			}
+			else
+			{
+				OT_LOG_E("No v-sweep vector found");
+				//ngSpice_Command(const_cast<char*>("quit"));
+				return;
+			}
+			
+			
 		}
 		else if (simulationType == ".TRAN") {
 			auto it = resultVectors.find("time");
-			xValues = resultVectors.at("time");
 			if (it != resultVectors.end()) {
+				xValues = resultVectors.at("time");
 				resultVectors.erase(it);
-				
 			}
+			else {
+				OT_LOG_E("No time vector found");
+				//ngSpice_Command(const_cast<char*>("quit"));
+				return;
+			}
+			
+			
 		}
 		else {
 			auto it = resultVectors.find("frequency");
-			xValues = resultVectors.at("frequency");
 			if (it != resultVectors.end()) {
+				xValues = resultVectors.at("frequency");
 				resultVectors.erase(it);
 			}
+			else {
+				OT_LOG_E("No frequency vector found");
+				//ngSpice_Command(const_cast<char*>("quit"));
+				return;
+			}
+			
+			
 			
 		}
 			
@@ -496,6 +517,10 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 		auto it = resultVectors.find("v1#branch");
 		if (it != resultVectors.end()) {
 			resultVectors.erase(it);
+		}
+		else {
+			OT_LOG_E("No v1#branch vector found");
+			//ngSpice_Command(const_cast<char*>("quit"));
 		}
 
 
