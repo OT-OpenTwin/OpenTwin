@@ -16,6 +16,7 @@
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/PropertyDialog.h"
 #include "OTWidgets/PropertyGridGroup.h"
+#include "OTWidgets/VersionGraph.h"
 
 // Qt header
 #include <QtWidgets/qtablewidget.h>
@@ -51,26 +52,24 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	ot::WidgetView* r = this->createCentralWidgetView(root, "Test");
 	_content.addView(r);
 
-	TreeWidgetFilter* tree = new TreeWidgetFilter;
-	tree->getTreeWidget()->setAlternatingRowColors(true);
-	tree->getTreeWidget()->setSelectionMode(QAbstractItemView::MultiSelection);
-	root->addWidget(tree->getQWidget());
-	{
-		NavigationTreeItem itm1("Test A");
-		itm1.addChildItem(NavigationTreeItem("1"));
-		itm1.addChildItem(NavigationTreeItem("2"));
-		itm1.addChildItem(NavigationTreeItem("3"));
-		NavigationTreeItem itm2("Test B");
-		itm2.addChildItem(NavigationTreeItem("4"));
-		itm2.addChildItem(NavigationTreeItem("5"));
-		itm2.addChildItem(NavigationTreeItem("6"));
+	ot::VersionGraph* graph = new ot::VersionGraph;
 
-		tree->getTreeWidget()->addItem(TreeWidgetItemInfo(itm1));
-		tree->getTreeWidget()->addItem(TreeWidgetItemInfo(itm2));
-	}
+	ot::VersionGraphCfg cfg;
+	ot::VersionGraphVersionCfg v1("1", "Initial commit");
+	ot::VersionGraphVersionCfg v12("1.2");
+	ot::VersionGraphVersionCfg v22("2.2", "Done some longer work on this item so we have to check the title");
+	ot::VersionGraphVersionCfg v23("2.3");
+	ot::VersionGraphVersionCfg v33("3.3");
 
-	ot::TextEditor* text = new ot::TextEditor;
-	root->addWidget(text);
+	v22.addChildVersion(v23);
+	v22.addChildVersion(v33);
+	v1.addChildVersion(v12);
+	v1.addChildVersion(v22);
+	cfg.addRootVersion(v1);
+	cfg.setActiveVersionName("2.3");
+
+	graph->setupFromConfig(cfg);
+	root->addWidget(graph);
 
 	TestToolBar* test = new TestToolBar(this);
 	QAction* testAction = test->addAction("Test");
