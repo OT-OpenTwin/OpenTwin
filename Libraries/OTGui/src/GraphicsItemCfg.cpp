@@ -167,6 +167,11 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 
 // Setter / Getter
 
+void ot::GraphicsItemCfg::setFixedSize(const Size2DD& _size) {
+	this->setMinimumSize(_size);
+	this->setMaximumSize(_size);
+}
+
 std::string ot::GraphicsItemCfg::getStringForKey(const std::string& _key) const {
 	const auto& it = m_stringMap.find(_key);
 	if (it == m_stringMap.end()) return "#" + _key;

@@ -152,6 +152,10 @@ namespace ot {
 
 		//! \brief Sets the item minimum size.
 		//! \see getMinimumSize
+		void setMinimumSize(double _width, double _height) { this->setMinimumSize(Size2DD(_width, _height)); };
+
+		//! \brief Sets the item minimum size.
+		//! \see getMinimumSize
 		void setMinimumSize(const Size2DD& _size) { m_minSize = _size; };
 
 		//! \brief Item minimum size.
@@ -160,11 +164,25 @@ namespace ot {
 
 		//! \brief Sets the item maximum size.
 		//! \see getMaximumSize
+		void setMaximumSize(double _width, double _height) { this->setMaximumSize(Size2DD(_width, _height)); };
+
+		//! \brief Sets the item maximum size.
+		//! \see getMaximumSize
 		void setMaximumSize(const Size2DD& _size) { m_maxSize = _size; };
 
 		//! \brief Item maximum size.
 		//! If the graphics item is resized (e.g. via layout) then it may not brow above the maximum size.
 		const Size2DD& getMaximumSize(void) const { return m_maxSize; };
+
+		//! \brief Sets the items minimum and maximum size.
+		//! \see getMaximumSize
+		//! \see getMinimumSize
+		void setFixedSize(double _width, double _height) { this->setFixedSize(Size2DD(_width, _height)); };
+
+		//! \brief Sets the items minimum and maximum size.
+		//! \see getMaximumSize
+		//! \see getMinimumSize
+		void setFixedSize(const Size2DD& _size);
 
 		//! @brief Set item margins
 		//! @param _top Top margin
