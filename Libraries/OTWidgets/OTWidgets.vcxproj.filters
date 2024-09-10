@@ -310,6 +310,15 @@
     <ClCompile Include="src\ManagedGuiObject.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\VersionGraph.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VersionGraphView.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VersionGraphItem.cpp">
+      <Filter>src\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -580,6 +589,15 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\ManagedGuiObject.h">
       <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\VersionGraph.h">
+      <Filter>include\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\VersionGraphView.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\VersionGraphItem.h">
+      <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

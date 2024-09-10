@@ -97,6 +97,8 @@
     <ClInclude Include="include\OTGui\TableHeaderItemCfg.h" />
     <ClInclude Include="include\OTGui\TextEditorCfg.h" />
     <ClInclude Include="include\OTGui\Transform.h" />
+    <ClInclude Include="include\OTGui\VersionGraphCfg.h" />
+    <ClInclude Include="include\OTGui\VersionGraphVersionCfg.h" />
     <ClInclude Include="include\OTGui\WidgetViewBase.h" />
     <ClInclude Include="include\OTGui\WidgetViewCfg.h" />
     <ClInclude Include="include\OTGui\WidgetViewCfgFactory.h" />
@@ -180,6 +182,8 @@
     <ClCompile Include="src\TableHeaderItemCfg.cpp" />
     <ClCompile Include="src\TextEditorCfg.cpp" />
     <ClCompile Include="src\Transform.cpp" />
+    <ClCompile Include="src\VersionGraphCfg.cpp" />
+    <ClCompile Include="src\VersionGraphVersionCfg.cpp" />
     <ClCompile Include="src\WidgetViewBase.cpp" />
     <ClCompile Include="src\WidgetViewCfg.cpp" />
     <ClCompile Include="src\WidgetViewCfgFactory.cpp" />

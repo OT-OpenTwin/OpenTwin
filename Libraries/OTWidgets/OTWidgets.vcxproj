@@ -146,6 +146,9 @@
     <ClCompile Include="src\TreeWidgetFilter.cpp" />
     <ClCompile Include="src\TreeWidgetItem.cpp" />
     <ClCompile Include="src\TreeWidgetItemInfo.cpp" />
+    <ClCompile Include="src\VersionGraph.cpp" />
+    <ClCompile Include="src\VersionGraphItem.cpp" />
+    <ClCompile Include="src\VersionGraphView.cpp" />
     <ClCompile Include="src\WidgetView.cpp" />
     <ClCompile Include="src\WidgetViewFactory.cpp" />
     <ClCompile Include="src\WidgetViewManager.cpp" />
@@ -194,6 +197,9 @@
     <ClInclude Include="include\OTWidgets\TextEditorView.h" />
     <ClInclude Include="include\OTWidgets\TreeWidgetItem.h" />
     <ClInclude Include="include\OTWidgets\TreeWidgetItemInfo.h" />
+    <ClInclude Include="include\OTWidgets\VersionGraph.h" />
+    <ClInclude Include="include\OTWidgets\VersionGraphItem.h" />
+    <ClInclude Include="include\OTWidgets\VersionGraphView.h" />
     <ClInclude Include="include\OTWidgets\WidgetProperties.h" />
     <ClInclude Include="include\OTWidgets\Positioning.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />

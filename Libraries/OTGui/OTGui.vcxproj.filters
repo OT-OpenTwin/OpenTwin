@@ -312,6 +312,12 @@
     <ClInclude Include="include\OTGui\GraphicsConnectionCalculationData.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\VersionGraphCfg.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\VersionGraphVersionCfg.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -550,6 +556,12 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsConnectionCalculationData.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VersionGraphCfg.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VersionGraphVersionCfg.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
