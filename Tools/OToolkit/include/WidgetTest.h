@@ -12,6 +12,8 @@
 // Qt header
 #include <QtCore/qobject.h>
 
+namespace ot { class VersionGraphManager; }
+
 class WidgetTest : public QObject, public otoolkit::Tool {
 public:
 	WidgetTest() {};
@@ -29,5 +31,10 @@ public:
 	virtual bool runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
+
+	ot::VersionGraphManager* getVersionGraph(void) const { return m_versionGraph; };
+
+private:
+	ot::VersionGraphManager* m_versionGraph;
 
 };

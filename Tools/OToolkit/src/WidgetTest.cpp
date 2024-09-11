@@ -16,7 +16,7 @@
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/PropertyDialog.h"
 #include "OTWidgets/PropertyGridGroup.h"
-#include "OTWidgets/VersionGraph.h"
+#include "OTWidgets/VersionGraphManager.h"
 
 // Qt header
 #include <QtWidgets/qtablewidget.h>
@@ -29,16 +29,7 @@ public:
 
 public Q_SLOTS:
 	void slotTest(void) {
-		ot::PropertyDialogCfg cfg;
-		ot::PropertyGroup* g1 = new ot::PropertyGroup("General");
-		ot::PropertyGroup* g11 = new ot::PropertyGroup("Appearance");
 
-		ot::PropertyStringList* t1 = new ot::PropertyStringList("ColorStyle", "Bright", std::list<std::string>{ "Bright", "Dark" });
-		g11->addProperty(t1);
-		g1->addChildGroup(g11);
-		cfg.addRootGroup(g1);
-		ot::PropertyDialog dia(cfg);
-		dia.showDialog();
 	}
 
 private:
@@ -52,7 +43,7 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	ot::WidgetView* r = this->createCentralWidgetView(root, "Test");
 	_content.addView(r);
 
-	ot::VersionGraph* graph = new ot::VersionGraph;
+	m_versionGraph = new ot::VersionGraphManager;
 
 	ot::VersionGraphCfg cfg;
 	ot::VersionGraphVersionCfg v1("1", "Initial commit");
@@ -68,8 +59,8 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	cfg.addRootVersion(v1);
 	cfg.setActiveVersionName("2.3");
 
-	graph->setupFromConfig(cfg);
-	root->addWidget(graph);
+	m_versionGraph->setupConfig(cfg);
+	root->addWidget(m_versionGraph->getQWidget());
 
 	TestToolBar* test = new TestToolBar(this);
 	QAction* testAction = test->addAction("Test");
