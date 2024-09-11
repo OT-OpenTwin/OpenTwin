@@ -2034,6 +2034,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name,
 	newEditor->setGraphicsViewName(_name);
 	newEditor->setGraphicsViewFlag(ot::GraphicsView::ViewManagesSceneRect);
 	newEditor->setDropsEnabled(true);
+	newEditor->setSceneMargins(QMarginsF(200., 200., 200., 200.));
 	newEditor->getGraphicsScene()->setGridFlags(ot::Grid::ShowNormalLines | ot::Grid::AutoScaleGrid);
 	newEditor->getGraphicsScene()->setGridSnapMode(ot::Grid::SnapTopLeft);
 	ot::OutlineF newOutline;

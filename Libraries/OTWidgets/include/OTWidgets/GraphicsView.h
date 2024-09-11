@@ -90,6 +90,9 @@ namespace ot {
 		std::list<ot::UID> getSelectedItemUIDs(void) const;
 		std::list<GraphicsItem*> getSelectedGraphicsItems(void) const;
 
+		void setSceneMargins(const QMarginsF& _margins) { m_sceneMargins = _margins; };
+		const QMarginsF& getSceneMargins(void) const { return m_sceneMargins; };
+
 		bool addConnectionIfConnectedItemsExist(const GraphicsConnectionCfg& _config);
 
 		void removeConnection(const GraphicsConnectionCfg& _connectionInformation);
@@ -157,7 +160,7 @@ namespace ot {
 
 		std::string m_viewName;
 		GraphicsScene* m_scene;
-		QMargins m_sceneMargins;
+		QMarginsF m_sceneMargins;
 
 		bool m_wheelEnabled;
 		bool m_dropEnabled;
