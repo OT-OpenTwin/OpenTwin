@@ -30,6 +30,8 @@ namespace ot {
 		void slotUpdateVersionItems(void);
 
 	private:
+		void highlightVersion(const std::string& _name);
+
 		std::list<VersionGraphItem*> m_rootItems;
 
 	};

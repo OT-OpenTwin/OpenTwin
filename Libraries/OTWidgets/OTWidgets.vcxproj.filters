@@ -310,14 +310,17 @@
     <ClCompile Include="src\ManagedGuiObject.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\VersionGraph.cpp">
-      <Filter>src\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VersionGraphView.cpp">
+    <ClCompile Include="src\VersionGraphManagerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
     <ClCompile Include="src\VersionGraphItem.cpp">
-      <Filter>src\Graphics</Filter>
+      <Filter>src\Version</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VersionGraph.cpp">
+      <Filter>src\Version</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VersionGraphManager.cpp">
+      <Filter>src\Version</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -374,6 +377,12 @@
     </Filter>
     <Filter Include="src\Syntax">
       <UniqueIdentifier>{91ca5e3c-5ab5-4d44-ab48-85002edea2d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Version">
+      <UniqueIdentifier>{516d7d1a-bfad-4363-8122-7e9748760a55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Version">
+      <UniqueIdentifier>{b0b7edc4-d8c6-402b-81d4-265470ebbbad}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -590,11 +599,11 @@
     <ClInclude Include="include\OTWidgets\ManagedGuiObject.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\VersionGraphView.h">
+    <ClInclude Include="include\OTWidgets\VersionGraphManagerView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\VersionGraphItem.h">
-      <Filter>include\Graphics</Filter>
+      <Filter>include\Version</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -719,7 +728,10 @@
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\VersionGraph.h">
-      <Filter>include\Graphics</Filter>
+      <Filter>include\Version</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\VersionGraphManager.h">
+      <Filter>include\Version</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

@@ -1,25 +1,19 @@
-//! @file VersionGraphView.h
+//! @file VersionGraphManagerView.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date September 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
-#pragma once
-
 // OpenTwin header
-#include "OTWidgets/WidgetView.h"
-#include "OTWidgets/VersionGraph.h"
+#include "OTCore/OTAssert.h"
+#include "OTWidgets/VersionGraphManagerView.h"
 
-namespace ot {
+ot::VersionGraphManagerView::VersionGraphManagerView()
+{
+	this->addWidgetToDock(this->getGraph());
+}
 
-	class OT_WIDGETS_API_EXPORT VersionGraphView : public VersionGraph, public WidgetView {
-	public:
-		VersionGraphView();
-		virtual ~VersionGraphView();
+ot::VersionGraphManagerView::~VersionGraphManagerView() {}
 
-		virtual QWidget* getViewWidget(void) override { return this; };
-
-	private:
-
-	};
-
+QWidget* ot::VersionGraphManagerView::getViewWidget(void) {
+	return this->getGraph();
 }

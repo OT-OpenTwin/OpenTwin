@@ -10,6 +10,7 @@
 #include "OTCore/Point2D.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/BasicServiceInformation.h"
+#include "OTWidgets/QWidgetInterface.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -32,7 +33,7 @@ namespace ot {
 
 	//! @brief View widget used to display GraphicsItems
 	//! Note that the View creates its own scene.
-	class OT_WIDGETS_API_EXPORT GraphicsView : public QGraphicsView {
+	class OT_WIDGETS_API_EXPORT GraphicsView : public QGraphicsView, public QWidgetInterface {
 		Q_OBJECT
 	public:
 		enum GraphicsViewFlag {
@@ -54,6 +55,8 @@ namespace ot {
 
 		GraphicsView(GraphicsScene* _scene = (GraphicsScene*)nullptr);
 		virtual ~GraphicsView();
+
+		virtual QWidget* getQWidget(void) override { return this; };
 
 		void resetView(void);
 		void fitInCurrentView(void);

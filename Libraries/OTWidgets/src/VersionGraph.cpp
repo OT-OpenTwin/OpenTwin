@@ -31,6 +31,8 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 		m_rootItems.push_back(newItem);
 	}
 
+	this->highlightVersion(_config.getActiveVersionName());
+
 	QMetaObject::invokeMethod(this, &VersionGraph::slotUpdateVersionItems, Qt::QueuedConnection);
 }
 
@@ -44,5 +46,17 @@ void ot::VersionGraph::clear(void) {
 void ot::VersionGraph::slotUpdateVersionItems(void) {
 	for (VersionGraphItem* itm : m_rootItems) {
 		itm->updateGraphics();
+	}
+}
+
+void ot::VersionGraph::highlightVersion(const std::string& _name) {
+	VersionGraphItem* item = nullptr;
+	for (VersionGraphItem* root : m_rootItems) {
+		item = root->findVersionByName(_name);
+		if (item) break;
+	}
+
+	if (item) {
+		item->setGraphicsItemSelected(true);
 	}
 }

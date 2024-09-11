@@ -93,6 +93,12 @@ ot::VersionGraphItem::VersionGraphItem()
 }
 
 ot::VersionGraphItem::~VersionGraphItem() {
+	if (m_parentConnection) {
+		m_parentConnection->disconnectItems();
+		delete m_parentConnection;
+		m_parentConnection = nullptr;
+	}
+
 	if (m_parentVersion) {
 		m_parentVersion->forgetChildVersion(this);
 		m_parentVersion = nullptr;
@@ -100,6 +106,7 @@ ot::VersionGraphItem::~VersionGraphItem() {
 
 	for (VersionGraphItem* child : m_childVersions) {
 		child->setParentVersionItem(nullptr);
+		delete child;
 	}
 }
 
