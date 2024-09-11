@@ -862,7 +862,9 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	}
 
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
+	//ngSpice_Command(const_cast<char*>("circbyline unset askquit"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
+	//ngSpice_Command(const_cast<char*>("circbyline quit"));
 	ngSpice_Command(const_cast<char*>("circbyline .endc"));
 	ngSpice_Command(const_cast<char*>("circbyline .end"));
 	//ngSpice_Command(const_cast<char*>("unset askquit"));

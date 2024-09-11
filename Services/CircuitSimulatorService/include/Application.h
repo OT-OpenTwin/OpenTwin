@@ -41,6 +41,8 @@ private:
 	NGSpice m_ngSpice;
 	BlockEntityHandler m_blockEntityHandler;
 	std::list<ot::UID>	selectedEntities;
+	EntityContainer* entityRoot;
+
 	
 public:
 
@@ -72,11 +74,13 @@ public:
 	void runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion,  EntityBase* solverEntity);
 
 	std::string extractStringAfterDelimiter(const std::string& inputString, char delimiter, size_t occurrence);
-
+	EntityBase* findEntityFromName(const std::string& name);
 
 	//Getter
 	BlockEntityHandler getBlockEntityHandler() { return m_blockEntityHandler; }
 	NGSpice& getNGSpice() { return m_ngSpice; }
+	std::string getCircuitRootName(void) { return "Circuits/"; }
+	EntityBase* getRootNode(void) { return entityRoot; };
 
 	// ##################################################################################################################################################################################################################
 
