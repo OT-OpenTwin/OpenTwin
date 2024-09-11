@@ -34,6 +34,8 @@ std::map<std::string,Connection>& CircuitElement::getList() { return m_listOfCon
 
 std::string CircuitElement::getNetlistName() { return this->m_netlistName; }
 
+std::string CircuitElement::getCustomName() { return this->m_customName; }
+
 //Setter
 void CircuitElement::setItemName(std::string name)	{this->m_itemName = name;}
 
@@ -43,6 +45,8 @@ void CircuitElement::setUID(ot::UID id) { this->m_Uid = id; }
 
 
 void CircuitElement::setNetlistName(std::string name) { this->m_netlistName = name; }
+
+void CircuitElement::setCustomName(std::string name) {	this->m_customName = name; }
 
 //Additional Functions
 

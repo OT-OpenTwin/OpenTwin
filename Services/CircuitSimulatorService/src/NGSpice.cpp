@@ -21,6 +21,7 @@
 #include "EntityBlockCircuitCapacitor.h"
 #include "EntityBlockCircuitInductor.h"
 #include "EntityBlockCircuitCurrentMeter.h"
+#include "EntityBlockCircuitGND.h"
 
 //Third Party Header
 #include <string>
@@ -376,8 +377,21 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto voltageSource = std::make_unique<VoltageSource>(myElement->getVoltage(),myElement->getFunction(),notInitialized,myElement->getAmplitude(),
 										myElement->getBlockTitle(),editorname,myElement->getEntityID(),notInitialized);
 			
-			
-			voltageSource->setNetlistName(myElement->getNameOnly());
+			voltageSource->setCustomName(myElement->getNameOnly());
+		
+			std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
+			if (counter == "first")
+			{
+				voltageSource->setNetlistName("V1");
+			}
+			else
+			{
+				int temp = std::stoi(counter);
+				temp += 1;
+				counter = std::to_string(temp);
+
+				voltageSource->setNetlistName("V" + counter);
+			}
 
 
 			if (voltageSource->getFunction() == "PULSE")
@@ -432,9 +446,21 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
 			auto resistor = std::make_unique<Resistor>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
-			
-			resistor->setNetlistName(myElement->getNameOnly());
+			resistor->setCustomName(myElement->getNameOnly());
 
+			std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
+			if (counter == "first")
+			{
+				resistor->setNetlistName("R1");
+			}
+			else
+			{
+				int temp = std::stoi(counter);
+				temp += 1;
+				counter = std::to_string(temp);
+
+				resistor->setNetlistName("R" + counter);
+			}
 
 
 			ot::UID uid = resistor->getUID();
@@ -445,9 +471,21 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitDiode*>(blockEntity.get());
 			auto diode = std::make_unique<Diode>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
+			diode->setCustomName(myElement->getNameOnly());
 
-			diode->setNetlistName(myElement->getNameOnly());
-	
+			std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
+			if (counter == "first")
+			{
+				diode->setNetlistName("D1");
+			}
+			else
+			{
+				int temp = std::stoi(counter);
+				temp += 1;
+				counter = std::to_string(temp);
+
+				diode->setNetlistName("D" + counter);
+			}
 			ot::UID uid = diode->getUID();
 			auto diode_p = diode.release();
 			it->second.addElement(uid, diode_p);
@@ -456,10 +494,21 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitCapacitor*>(blockEntity.get());
 			auto capacitor = std::make_unique<Capacitor>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
+			capacitor->setCustomName(myElement->getNameOnly());
 
-			capacitor->setNetlistName(myElement->getNameOnly());
+			std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
+			if (counter == "first")
+			{
+				capacitor->setNetlistName("C1");
+			}
+			else
+			{
+				int temp = std::stoi(counter);
+				temp += 1;
+				counter = std::to_string(temp);
 
-
+				capacitor->setNetlistName("C" + counter);
+			}
 			ot::UID uid = capacitor->getUID();
 			auto capacitor_p = capacitor.release();
 			it->second.addElement(uid, capacitor_p);
@@ -468,8 +517,22 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitInductor*>(blockEntity.get());
 			auto inductor = std::make_unique<Inductor>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
+			inductor->setCustomName(myElement->getNameOnly());
 
-			inductor->setNetlistName(myElement->getNameOnly());
+			std::string counter = Application::instance()->extractStringAfterDelimiter(myElement->getName(), '_', 1);
+			if (counter == "first")
+			{
+				inductor->setNetlistName("L1");
+			}
+			else
+			{
+				int temp = std::stoi(counter);
+				temp += 1;
+				counter = std::to_string(temp);
+
+				inductor->setNetlistName("L" + counter);
+			}
+
 
 			ot::UID uid = inductor->getUID();
 			auto inductor_p = inductor.release();
@@ -495,6 +558,16 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			auto currentMeter_p = currentMeter.release();
 			it->second.addElement(uid, currentMeter_p);
 		}
+		/*else if (blockEntity->getClassName() == "EntityBlockCircuitGND") {
+			auto myElement = dynamic_cast<EntityBlockCircuitGND*>(blockEntity.get());
+			auto currentMeter = std::make_unique<CurrentMeter>(myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
+
+			currentMeter->setNetlistName(myElement->getNameOnly());
+
+			ot::UID uid = currentMeter->getUID();
+			auto currentMeter_p = currentMeter.release();
+			it->second.addElement(uid, currentMeter_p);
+		}*/
 	
 	}
 

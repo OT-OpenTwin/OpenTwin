@@ -34,8 +34,9 @@ protected:
 	std::string m_editorName;
 	ot::UID m_Uid;
 	std::string m_netlistName;
+	std::string m_customName;
 	std::map < std::string, Connection > m_listOfConnections;
-
+	
 public:
 
 
@@ -53,13 +54,14 @@ public:
 	ot::UID getUID();
 	std::map<std::string ,Connection>& getList();
 	std::string getNetlistName();
-
+	std::string getCustomName();
 
 	//Setter
 	void setItemName(std::string name);
 	void setEditorName(std::string name);
 	void setUID(ot::UID id);
 	void setNetlistName(std::string name);
+	void setCustomName(std::string name);
 
 	//Additional Functions
 	/*bool*/ void addConnection(std::string connactable,const Connection& obj);
