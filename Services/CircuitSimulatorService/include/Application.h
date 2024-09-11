@@ -41,7 +41,7 @@ private:
 	NGSpice m_ngSpice;
 	BlockEntityHandler m_blockEntityHandler;
 	std::list<ot::UID>	selectedEntities;
-	EntityContainer* entityRoot;
+
 
 	
 public:
@@ -80,7 +80,7 @@ public:
 	BlockEntityHandler getBlockEntityHandler() { return m_blockEntityHandler; }
 	NGSpice& getNGSpice() { return m_ngSpice; }
 	std::string getCircuitRootName(void) { return "Circuits/"; }
-	EntityBase* getRootNode(void) { return entityRoot; };
+	
 
 	// ##################################################################################################################################################################################################################
 

@@ -132,16 +132,15 @@ void Application::createNewCircuit() {
 	
 	circuitName = extractStringAfterDelimiter(circuitName, '/', 1);
 
-	EntityContainer* entityCircuitRoot = dynamic_cast<EntityContainer*>(findEntityFromName(getCircuitRootName()));
-	if (entityCircuitRoot == nullptr)
-	{
-		entityCircuitRoot = new EntityContainer(m_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
-		entityCircuitRoot->setName(getCircuitRootName()+circuitName);
+	EntityContainer* entityCircuitRoot;
+	
+	entityCircuitRoot = new EntityContainer(m_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
+	entityCircuitRoot->setName(getCircuitRootName()+circuitName);
 
-		entityCircuitRoot->StoreToDataBase(),
-		m_modelComponent->addEntitiesToModel({ entityCircuitRoot->getEntityID() }, { entityCircuitRoot->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added FolderEntity");
+	entityCircuitRoot->StoreToDataBase(),
+	m_modelComponent->addEntitiesToModel({ entityCircuitRoot->getEntityID() }, { entityCircuitRoot->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added FolderEntity");
 		
-	}
+	
 	
 	ot::GraphicsNewEditorPackage* editor = new ot::GraphicsNewEditorPackage(circuitName, circuitName);
 	ot::JsonDocument doc;
@@ -376,13 +375,7 @@ std::string Application::extractStringAfterDelimiter(const std::string& inputStr
 	}
 }
 
-EntityBase* Application::findEntityFromName(const std::string& name)
-{
 
-	if (entityRoot == nullptr) return nullptr;
-
-	return entityRoot->getEntityFromName(name);
-}
 
 
 std::string Application::handleNewGraphicsItem(ot::JsonDocument& _document) {
