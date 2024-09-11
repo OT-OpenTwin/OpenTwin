@@ -33,7 +33,7 @@ namespace ot {
 
 		void addChildVersion(VersionGraphItem* _version);
 		void forgetChildVersion(VersionGraphItem* _version);
-		std::list<VersionGraphItem*> getChildVersion(void) const { return m_childVersions; };
+		std::list<VersionGraphItem*> getChildVersions(void) const { return m_childVersions; };
 
 		void connectToParent(void);
 

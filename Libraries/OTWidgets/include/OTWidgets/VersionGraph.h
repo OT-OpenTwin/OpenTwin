@@ -28,8 +28,10 @@ namespace ot {
 
 	public Q_SLOTS:
 		void slotUpdateVersionItems(void);
+		void slotCenterOnVersion(const std::string& _versionName);
 
 	private:
+		VersionGraphItem* getVersion(const std::string& _name);
 		void highlightVersion(const std::string& _name);
 
 		std::list<VersionGraphItem*> m_rootItems;

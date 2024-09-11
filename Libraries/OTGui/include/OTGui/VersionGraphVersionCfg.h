@@ -50,6 +50,15 @@ namespace ot {
 		void setChildVersions(const std::list<VersionGraphVersionCfg>& _versions) { m_childVersions = _versions; };
 		const std::list<VersionGraphVersionCfg>& getChildVersions(void) const { return m_childVersions; };
 
+		//! \see getDirectParentIsHidden
+		void setDirectParentIsHidden(bool _isHidden) { m_directParentIsHidden = _isHidden; };
+
+		//! \brief If the direct parent is hidden the connection line will be displayed as a dashed line.
+		bool getDirectParentIsHidden(void) const { return m_directParentIsHidden; };
+
+		//! \brief Copy data excluding child versions.
+		void applyConfigOnly(const VersionGraphVersionCfg& _other);
+
 	private:
 		void clear(void);
 
@@ -57,6 +66,7 @@ namespace ot {
 		std::string m_label;
 		std::string m_description;
 		std::list<VersionGraphVersionCfg> m_childVersions;
+		bool m_directParentIsHidden;
 	};
 
 }

@@ -6,12 +6,14 @@
 // OpenTwin header
 #include "OTGui/VersionGraphVersionCfg.h"
 
-ot::VersionGraphVersionCfg::VersionGraphVersionCfg() {
+ot::VersionGraphVersionCfg::VersionGraphVersionCfg() 
+	: m_directParentIsHidden(false)
+{
 
 }
 
 ot::VersionGraphVersionCfg::VersionGraphVersionCfg(const std::string& _name, const std::string& _label, const std::string& _description)
-	: m_name(_name), m_label(_label), m_description(_description)
+	: m_name(_name), m_label(_label), m_description(_description), m_directParentIsHidden(false)
 {
 
 }
@@ -33,6 +35,7 @@ ot::VersionGraphVersionCfg& ot::VersionGraphVersionCfg::operator = (const Versio
 	m_label = _other.m_label;
 	m_description = _other.m_description;
 	m_childVersions = _other.m_childVersions;
+	m_directParentIsHidden = _other.m_directParentIsHidden;
 
 	return *this;
 }
@@ -41,6 +44,7 @@ void ot::VersionGraphVersionCfg::addToJsonObject(ot::JsonValue& _object, ot::Jso
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 	_object.AddMember("Label", JsonString(m_label, _allocator), _allocator);
 	_object.AddMember("Description", JsonString(m_description, _allocator), _allocator);
+	_object.AddMember("ParentHidden", m_directParentIsHidden, _allocator);
 
 	JsonArray childArr;
 	for (const VersionGraphVersionCfg& child : m_childVersions) {
@@ -57,6 +61,7 @@ void ot::VersionGraphVersionCfg::setFromJsonObject(const ot::ConstJsonObject& _o
 	m_name = json::getString(_object, "Name");
 	m_label = json::getString(_object, "Label");
 	m_description = json::getString(_object, "Description");
+	m_directParentIsHidden = json::getBool(_object, "ParentHidden");
 
 	std::list<ConstJsonObject> childArr = json::getObjectList(_object, "Childs");
 	for (const ConstJsonObject& childObj : childArr) {
@@ -72,6 +77,13 @@ void ot::VersionGraphVersionCfg::addChildVersion(const std::string& _name, const
 
 void ot::VersionGraphVersionCfg::addChildVersion(const VersionGraphVersionCfg& _child) {
 	m_childVersions.push_back(_child);
+}
+
+void ot::VersionGraphVersionCfg::applyConfigOnly(const VersionGraphVersionCfg& _other) {
+	m_name = _other.m_name;
+	m_label = _other.m_label;
+	m_description = _other.m_description;
+	m_directParentIsHidden = _other.m_directParentIsHidden;
 }
 
 void ot::VersionGraphVersionCfg::clear(void) {

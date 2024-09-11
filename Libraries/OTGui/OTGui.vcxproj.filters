@@ -61,6 +61,12 @@
     <Filter Include="Source Files\Widgets">
       <UniqueIdentifier>{9f1954aa-9fcc-430f-b414-30c1a33e5ef5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Version">
+      <UniqueIdentifier>{4b1516f9-0de1-437d-9eb8-5c75b974da5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Version">
+      <UniqueIdentifier>{3b663971-f8bd-4676-b7f5-71a1c5b3f70c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\GraphicsPickerCollectionCfg.h">
@@ -313,10 +319,10 @@
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\VersionGraphCfg.h">
-      <Filter>Header Files\General</Filter>
+      <Filter>Header Files\Version</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\VersionGraphVersionCfg.h">
-      <Filter>Header Files\General</Filter>
+      <Filter>Header Files\Version</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -557,11 +563,11 @@
     <ClCompile Include="src\GraphicsConnectionCalculationData.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\VersionGraphCfg.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\VersionGraphVersionCfg.cpp">
-      <Filter>Source Files\General</Filter>
+      <Filter>Source Files\Version</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VersionGraphCfg.cpp">
+      <Filter>Source Files\Version</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

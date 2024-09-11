@@ -84,6 +84,7 @@ namespace ot {
 		//! The item keeps ownership of the painter.
 		const ot::Painter2D* getLinePainter(void) const { return m_lineStyle.painter(); };
 
+		void setLineStyle(LineStyle _style) { m_lineStyle.setStyle(_style); };
 		void setLineStyle(const OutlineF& _style) { m_lineStyle = _style; };
 		const OutlineF& getLineStyle(void) const { return m_lineStyle; };
 

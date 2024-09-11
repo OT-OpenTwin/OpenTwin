@@ -169,12 +169,16 @@ void ot::VersionGraphItem::forgetChildVersion(VersionGraphItem* _version) {
 
 void ot::VersionGraphItem::connectToParent(void) {
 	if (m_parentConnection) {
+		OT_LOG_WA("Connection already set");
 		delete m_parentConnection;
 	}
+	
 	m_parentConnection = new GraphicsConnectionItem;
 	GraphicsConnectionCfg connectionConfig;
 	connectionConfig.setLinePainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemConnection));
 	connectionConfig.setLineShape(GraphicsConnectionCfg::ConnectionShape::SmoothLine);
+	connectionConfig.setLineStyle((m_config.getDirectParentIsHidden() ? LineStyle::DashDotDotLine : LineStyle::SolidLine));
+	connectionConfig.setLineWidth((m_config.getDirectParentIsHidden() ? .75 : 1.));
 	connectionConfig.setHandlesState(false);
 	m_parentConnection->setConfiguration(connectionConfig);
 	m_parentConnection->connectItems(m_parentVersion->m_outConnector, m_inConnector);
