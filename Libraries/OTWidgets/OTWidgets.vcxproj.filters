@@ -590,9 +590,6 @@
     <ClInclude Include="include\OTWidgets\ManagedGuiObject.h">
       <Filter>include\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\VersionGraph.h">
-      <Filter>include\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\VersionGraphView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
@@ -720,6 +717,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\Table.h">
       <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\VersionGraph.h">
+      <Filter>include\Graphics</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

@@ -17,13 +17,17 @@ namespace ot {
 	class VersionGraphItem;
 
 	class OT_WIDGETS_API_EXPORT VersionGraph : public GraphicsView {
+		Q_OBJECT
 	public:
 		VersionGraph();
 		virtual ~VersionGraph();
 
 		void setupFromConfig(const VersionGraphCfg& _config);
-
+		
 		void clear(void);
+
+	public Q_SLOTS:
+		void slotUpdateVersionItems(void);
 
 	private:
 		std::list<VersionGraphItem*> m_rootItems;

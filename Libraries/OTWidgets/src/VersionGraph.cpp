@@ -30,6 +30,8 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 		row = newItem->getMaxRowIndex() + 1;
 		m_rootItems.push_back(newItem);
 	}
+
+	QMetaObject::invokeMethod(this, &VersionGraph::slotUpdateVersionItems, Qt::QueuedConnection);
 }
 
 void ot::VersionGraph::clear(void) {
@@ -37,4 +39,10 @@ void ot::VersionGraph::clear(void) {
 		delete itm;
 	}
 	m_rootItems.clear();
+}
+
+void ot::VersionGraph::slotUpdateVersionItems(void) {
+	for (VersionGraphItem* itm : m_rootItems) {
+		itm->updateGraphics();
+	}
 }

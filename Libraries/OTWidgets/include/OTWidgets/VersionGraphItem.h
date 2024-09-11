@@ -39,9 +39,9 @@ namespace ot {
 
 		VersionGraphItem* findVersionByName(const std::string& _versionName);
 
-	private:
 		void updateGraphics(void);
 
+	private:
 		VersionGraphVersionCfg m_config;
 		VersionGraphItem* m_parentVersion;
 		GraphicsConnectionItem* m_parentConnection;

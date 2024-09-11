@@ -61,12 +61,10 @@ ot::VersionGraphItem::VersionGraphItem()
 	m_nameItem->setGraphicsItemMargins(MarginsD(0., 3., 0., 0.));
 
 	m_labelItem = new GraphicsTextItem;
-	m_labelItem->setBlockConfigurationNotifications(true);
 	m_labelItem->setGraphicsItemName("Label");
 	m_labelItem->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
 	m_labelItem->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
-	m_labelItem->setBlockConfigurationNotifications(false);
-
+	
 	GraphicsInvisibleItem* spacerItem = new GraphicsInvisibleItem;
 
 	Font textFont = m_nameItem->getFont();
@@ -198,8 +196,11 @@ void ot::VersionGraphItem::updateGraphics(void) {
 	Point2DD newPos(0., (OT_VERSIONGRAPHITEM_Height + OT_VERSIONGRAPHITEM_VSpacing) * (double)m_row);
 
 	if (m_parentVersion) {
-		QRectF parentRect = m_parentVersion->getQGraphicsItem()->boundingRect();
-		newPos.setX(m_parentVersion->getQGraphicsItem()->pos().x() + parentRect.width() + OT_VERSIONGRAPHITEM_HSpacing);
+		newPos.setX(
+			m_parentVersion->getQGraphicsItem()->pos().x() + 
+			m_parentVersion->getQGraphicsItem()->boundingRect().width() + 
+			OT_VERSIONGRAPHITEM_HSpacing
+		);
 	}
 	this->setGraphicsItemPos(newPos);
 
@@ -212,7 +213,7 @@ void ot::VersionGraphItem::updateGraphics(void) {
 		m_labelItem->setText(m_config.getLabel());
 	}
 
-	this->updateGeometry();
+	//this->updateGeometry();
 
 	// Update childs
 	for (VersionGraphItem* child : m_childVersions) {

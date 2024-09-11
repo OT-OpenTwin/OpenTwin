@@ -197,7 +197,7 @@
     <ClInclude Include="include\OTWidgets\TextEditorView.h" />
     <ClInclude Include="include\OTWidgets\TreeWidgetItem.h" />
     <ClInclude Include="include\OTWidgets\TreeWidgetItemInfo.h" />
-    <ClInclude Include="include\OTWidgets\VersionGraph.h" />
+    <QtMoc Include="include\OTWidgets\VersionGraph.h" />
     <ClInclude Include="include\OTWidgets\VersionGraphItem.h" />
     <ClInclude Include="include\OTWidgets\VersionGraphView.h" />
     <ClInclude Include="include\OTWidgets\WidgetProperties.h" />
