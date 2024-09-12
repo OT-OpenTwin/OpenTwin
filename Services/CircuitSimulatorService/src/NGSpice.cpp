@@ -924,28 +924,16 @@ std::string NGSpice::generateNetlistDCSimulation(EntityBase* solverEntity, std::
 	EntityPropertiesEntityList* elementProperty = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Element"));
 	
 	std::string element = Application::instance()->extractStringAfterDelimiter(elementProperty->getValueName(), '/', 2);
-
-	if (element.find("Voltage Source") == 0) // Überprüfen, ob der String mit "Voltage Source" beginnt
-	{
-		if (element == "Voltage Source")
-		{
-			element = "V1";
-		}
-		else
-		{
-			
-			std::string suffix = element.substr(15); 
-			int number = std::stoi(suffix); 
-			element = "V" + std::to_string(number + 1); 
-		}
-	}
+	std::string netlistName = getNetlistNameOfMap(element);
+	
+	
 
 	std::string simulationLine="";
 	std::string type = ".dc";
 	EntityPropertiesString* from = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("From"));
 	EntityPropertiesString* to = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("To"));
 	EntityPropertiesString* step = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Step"));
-	simulationLine = type + " " + element + " " + from->getValue() + " " + to->getValue() + " " + step->getValue();
+	simulationLine = type + " " + netlistName + " " + from->getValue() + " " + to->getValue() + " " + step->getValue();
 	return simulationLine;
 }
 
@@ -1100,6 +1088,18 @@ bool NGSpice::addToCustomNameToNetlistMap(const std::string& customName, const s
 std::string NGSpice::assignElementID(const std::string& elementType) {
 	elementCounters[elementType]++;
 	return elementType + std::to_string(elementCounters[elementType]);
+}
+
+std::string NGSpice::getNetlistNameOfMap(const std::string& customName) const
+{
+	auto it = customNameToNetlistNameMap.find(customName);
+	if (it != customNameToNetlistNameMap.end()) {
+		return it->second; 
+	}
+	else {
+		OT_LOG_E("Netlist name in customNameToNetlistNameMap not found!");
+		return "failed"; 
+	}
 }
 
 //NGSpice* NGSpice::getInstance() {

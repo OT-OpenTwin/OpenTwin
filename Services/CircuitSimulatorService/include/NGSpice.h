@@ -63,7 +63,7 @@ public:
 	std::string const getVoltMeterConnectionName() const { return m_voltMeterConnection; }
 	std::map<std::string, std::string>& getMapOfCustomToNetlistName() { return this->customNameToNetlistNameMap; }
 	std::map<std::string, int>& getMapOfElementCounters() { return this->elementCounters; }
-
+	std::string getNetlistNameOfMap(const std::string& customName) const;
 	
 
 
