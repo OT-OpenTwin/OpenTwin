@@ -460,7 +460,8 @@ ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker() {
 void BlockEntityHandler::createResultCurves(std::string solverName,std::string simulationType,std::string circuitName) {
 	
 		std::map<std::string, std::vector<double>> resultVectors = SimulationResults::getInstance()->getResultMap();
-		std::list<std::pair<ot::UID, std::string>> curves;
+		std::list<std::pair<ot::UID, std::string>> curvesForVoltage;
+		std::list<std::pair<ot::UID, std::string>> curvesForCurrent;
 		ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
 		std::list<bool> forceVis;
 		const int colorID(0);
@@ -577,7 +578,15 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 
 			std::string yLabel = it.first;
 			EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, yLabel, yUnit, colorID, true);
-			curves.push_back(std::pair<ot::UID, std::string>(curve->getEntityID(), curveName));
+			if (yLabel.find("V(") != std::string::npos || yLabel.find("vd(") != std::string::npos)
+			{
+				curvesForVoltage.push_back(std::pair<ot::UID, std::string>(curve->getEntityID(), curveName));
+			}
+			else
+			{
+				curvesForCurrent.push_back(std::pair<ot::UID, std::string>(curve->getEntityID(), curveName));
+			}
+			
 
 			topoEntID.push_back(curve->getEntityID());
 			topoEntVers.push_back(curve->getEntityStorageVersion());
@@ -587,15 +596,26 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 			forceVis.push_back(false);
 		}
 	
-		//Here i create the plot for all the curves
-		const std::string _plotName = "/" + simulationType + "-Simulation";
-		const std::string plotFolder = solverName + "/" + "Results";
-		const std::string fullPlotName = plotFolder + _plotName;
+		//Here i create the plot for all the curves of voltage
+		const std::string _plotNameVoltage = "/" + simulationType + "-Simulation" + "/" + "Voltage";
+		const std::string plotFolderVoltage = solverName + "/" + "Results";
+		const std::string fullPlotNameVoltage = plotFolderVoltage + _plotNameVoltage;
 
-		//Creating the Plot Entity
-		EntityResult1DPlot* plotID = _modelComponent->addResult1DPlotEntity(fullPlotName, "Result Plot", curves);
-		topoEntID.push_back(plotID->getEntityID());
-		topoEntVers.push_back(plotID->getEntityStorageVersion());
+		//Here i create the plit for all the curves of current
+		const std::string _plotNameCurrent = "/" + simulationType + "-Simulation" + "/" + "Current";
+		const std::string plotFolderCurrent = solverName + "/" + "Results";
+		const std::string fullPlotNameCurrent = plotFolderCurrent + _plotNameCurrent;
+
+		//Creating the Plot Entity for Voltage
+		EntityResult1DPlot* plotIDVoltage = _modelComponent->addResult1DPlotEntity(fullPlotNameVoltage, "Result Plot for Voltage", curvesForVoltage);
+		topoEntID.push_back(plotIDVoltage->getEntityID());
+		topoEntVers.push_back(plotIDVoltage->getEntityStorageVersion());
+		forceVis.push_back(false);
+
+		//Creating the Plot Entity for Current
+		EntityResult1DPlot* plotIDCurrent = _modelComponent->addResult1DPlotEntity(fullPlotNameCurrent, "Result Plot for Current", curvesForCurrent);
+		topoEntID.push_back(plotIDCurrent->getEntityID());
+		topoEntVers.push_back(plotIDCurrent->getEntityStorageVersion());
 		forceVis.push_back(false);
 		
 		_modelComponent->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Created plot");
