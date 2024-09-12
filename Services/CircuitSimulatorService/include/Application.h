@@ -74,7 +74,6 @@ public:
 	void runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion,  EntityBase* solverEntity);
 
 	std::string extractStringAfterDelimiter(const std::string& inputString, char delimiter, size_t occurrence);
-	EntityBase* findEntityFromName(const std::string& name);
 
 	//Getter
 	BlockEntityHandler getBlockEntityHandler() { return m_blockEntityHandler; }
