@@ -164,6 +164,8 @@ void SolverBase::ReadFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiCompo
 		std::string text(chBuf, dwRead);
 
 		solverOutput << text;
+
+		text.erase(text.find_last_not_of(" \t\n\r\f\v") + 1);
 		uiComponent->displayMessage(text);
 
 		if (!bSuccess) break;
