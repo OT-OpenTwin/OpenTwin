@@ -33,7 +33,6 @@ void EntityBlockCircuitVoltageSource::createProperties() {
 	createTRANProperties();
 	createACProperties();
 	
-	EntityPropertiesBoolean::createProperty("Type-VoltageSource", "GND", false, "default", getProperties());
 
 
 	SetVisiblePULSEProperties(false);
@@ -45,12 +44,6 @@ void EntityBlockCircuitVoltageSource::createProperties() {
 
 
 
-//void EntityBlockCircuitVoltageSource::createTransformProperties() {
-//
-//	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0,"default", getProperties());
-//	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
-//	
-//}
 
 void EntityBlockCircuitVoltageSource::createTRANProperties() {
 
@@ -97,13 +90,7 @@ std::string EntityBlockCircuitVoltageSource::getFlip() {
 	return value;
 }
 
-bool EntityBlockCircuitVoltageSource::getGND() {
-	auto propertyBase = getProperties().getProperty("GND");
-	auto propertyFlip = dynamic_cast<EntityPropertiesBoolean*>(propertyBase);
-	assert(propertyBase != nullptr);
-	bool value = propertyFlip->getValue();
-	return value;
-}
+
 
 std::vector<std::string> EntityBlockCircuitVoltageSource::getPulseParameters() {
 
