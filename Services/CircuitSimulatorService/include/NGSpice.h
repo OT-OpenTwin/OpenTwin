@@ -21,11 +21,13 @@
 class NGSpice
 {
 public:
+	
 	std::map<std::string, Circuit> mapOfCircuits;
 	std::map<std::pair<ot::UID, std::string>, std::string> connectionNodeNumbers;
-	
+	std::map<std::string, std::string> customNameToNetlistNameMap;
+	std::map<std::string, int> elementCounters;
 
-
+	//Simulation Functions
 	void updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&,std::string);
 	std::string generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>,std::map<ot::UID, std::shared_ptr<EntityBlock>>&,std::string editorname);
 	std::string generateNetlistDCSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string editorname);
@@ -52,11 +54,20 @@ public:
 	static int MySendDataFunction(pvecvaluesall, int, int, void*);
 	static int MySendInitDataFunction(pvecinfoall, int, void*);
 	
-	
+	//Setter
+	bool addToCustomNameToNetlistMap(const std::string&, const std::string&);
+	std::string assignElementID(const std::string& elementType);
 
 	//Getter
 	std::map<std::string, Circuit>& getMapOfCircuits() { return mapOfCircuits; }
 	std::string const getVoltMeterConnectionName() const { return m_voltMeterConnection; }
+	std::map<std::string, std::string>& getMapOfCustomToNetlistName() { return this->customNameToNetlistNameMap; }
+	std::map<std::string, int>& getMapOfElementCounters() { return this->elementCounters; }
+
+	
+
+
+	
 
 private:
 	const std::string m_voltMeterConnection = "voltageMeterConnection";
@@ -64,4 +75,5 @@ private:
 	const std::string m_positivePole = "positivePole";
 	const std::string m_gndPole = "GNDPole"; 
 
+	
 };
