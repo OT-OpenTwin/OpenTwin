@@ -27,7 +27,6 @@ public:
 	bool connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName);
 	void AddBlockConnection(const std::list<ot::GraphicsConnectionCfg>& connections,std::string name);
 	void AddConnectionToConnection(const std::list<ot::GraphicsConnectionCfg>& connections, std::string editorName, ot::Point2DD pos);
-	NGSpice m_ngSpice;
 
 	//Function for resultCurves of Simulation
 	void createResultCurves(std::string solverName,std::string simulationType,std::string circuitName);

@@ -479,8 +479,6 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 				//ngSpice_Command(const_cast<char*>("quit"));
 				return;
 			}
-			
-			
 		}
 		else if (simulationType == ".TRAN") {
 			auto it = resultVectors.find("time");
@@ -506,10 +504,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 				OT_LOG_E("No frequency vector found");
 				//ngSpice_Command(const_cast<char*>("quit"));
 				return;
-			}
-			
-			
-			
+			}	
 		}
 			
 		
