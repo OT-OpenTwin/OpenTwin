@@ -185,11 +185,13 @@ void NGSpice::connectionAlgorithmWithGNDVoltageSource(std::string startingElemen
 			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
 			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
 				myConn.setNodeNumber(connectionWithNodeNumber->second);
+				connectionNodeNumbers[{myConn.getOriginUid(), myConn.getOriginConnectable()}] = myConn.getNodeNumber();
 			}
 			else {
 				connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
 				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
 					myConn.setNodeNumber(connectionWithNodeNumber->second);
+					connectionNodeNumbers[{myConn.getDestinationUid(), myConn.getDestConnectable()}] = myConn.getNodeNumber();
 				}
 				else {
 					myConn.setNodeNumber("0");
@@ -204,11 +206,13 @@ void NGSpice::connectionAlgorithmWithGNDVoltageSource(std::string startingElemen
 			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
 			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
 				myConn.setNodeNumber(connectionWithNodeNumber->second);
+				connectionNodeNumbers[{myConn.getOriginUid(), myConn.getOriginConnectable()}] = myConn.getNodeNumber();
 			}
 			else {
 				connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
 				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
 					myConn.setNodeNumber(connectionWithNodeNumber->second);
+					connectionNodeNumbers[{myConn.getDestinationUid(), myConn.getDestConnectable()}] = myConn.getNodeNumber();
 				}
 				else {
 					myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));

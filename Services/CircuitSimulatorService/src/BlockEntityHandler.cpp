@@ -578,7 +578,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 
 			std::string yLabel = it.first;
 			EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, yLabel, yUnit, colorID, true);
-			if (yLabel.find("V(") != std::string::npos || yLabel.find("vd(") != std::string::npos)
+			if (yLabel.find("V(") != std::string::npos || yLabel.find("vd_") != std::string::npos)
 			{
 				curvesForVoltage.push_back(std::pair<ot::UID, std::string>(curve->getEntityID(), curveName));
 			}
