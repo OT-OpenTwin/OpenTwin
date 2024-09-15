@@ -21,6 +21,8 @@
 
 namespace ot {
 
+	class GraphicsScene;
+
 	class OT_WIDGETS_API_EXPORT GraphicsElement {
 		OT_DECL_NOCOPY(GraphicsElement)
 	public:
@@ -52,6 +54,12 @@ namespace ot {
 
 		// Setter / Getter
 
+		//! \brief Set the GraphicsScene this element is placed at.
+		virtual void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
+
+		//! \brief Returns the GraphicsScene this item is placed at.
+		virtual GraphicsScene* getGraphicsScene(void) const { return m_scene; };
+
 		//! \brief Sets the provided state flag.
 		//! \see GraphicsItem, GraphicsItemState
 		//! \param _state The state to set.
@@ -78,6 +86,7 @@ namespace ot {
 		virtual void graphicsElementStateChanged(const GraphicsElementStateFlags& _state) {};
 
 	private:
+		GraphicsScene* m_scene;
 		GraphicsElementStateFlags m_state;
 	};
 

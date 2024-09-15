@@ -48,13 +48,17 @@ ot::Painter2D* ot::GraphicsItem::createHoverBorderPainter(void) {
 // Constructor / Destructor
 
 ot::GraphicsItem::GraphicsItem(GraphicsItemCfg* _configuration)
-	: m_config(_configuration), m_moveStartPt(0., 0.), m_parent(nullptr), m_scene(nullptr), m_requestedSize(-1., -1.),
+	: m_config(_configuration), m_moveStartPt(0., 0.), m_parent(nullptr), m_requestedSize(-1., -1.),
 	m_blockConfigurationNotifications(false), m_blockFlagNotifications(false), m_forwardSizeChanges(false)
 {
 
 }
 
 ot::GraphicsItem::~GraphicsItem() {
+	if (this->getGraphicsScene()) {
+		this->getGraphicsScene()->itemAboutToBeRemoved(this);
+	}
+
 	for (GraphicsConnectionItem* connection : m_connections) {
 		connection->forgetItem(this);
 	}
@@ -332,6 +336,10 @@ QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 // ###############################################################################################################################################
 
 // Getter / Setter
+
+ot::GraphicsScene* ot::GraphicsItem::getGraphicsScene(void) const {
+	return (m_parent ? m_parent->getGraphicsScene() : this->GraphicsElement::getGraphicsScene());
+}
 
 ot::GraphicsItem* ot::GraphicsItem::getRootItem(void) {
 	if (m_parent) {

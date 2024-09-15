@@ -24,6 +24,10 @@ ot::GraphicsConnectionItem::GraphicsConnectionItem()
 }
 
 ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
+	if (this->getGraphicsScene()) {
+		this->getGraphicsScene()->connectionAboutToBeRemoved(this);
+	}
+
 	if (m_origin) {
 		m_origin->forgetConnection(this);
 		m_origin = nullptr;

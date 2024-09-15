@@ -28,7 +28,6 @@
 namespace ot {
 
 	class Painter2D;
-	class GraphicsScene;
 	class GraphicsItemCfg;
 	class GraphicsConnectionItem;
 
@@ -168,6 +167,8 @@ namespace ot {
 
 		// Getter / Setter
 
+		virtual GraphicsScene* getGraphicsScene(void) const override;
+
 		GraphicsItem* getRootItem(void);
 
 		const GraphicsItem* getRootItem(void) const;
@@ -187,12 +188,6 @@ namespace ot {
 
 		//! \brief Returns the current position set in the configuration.
 		const Point2DD& getGraphicsItemPos(void) const;
-
-		//! \brief Set the GraphicsScene this item is placed at.
-		virtual void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
-		
-		//! \brief Returns the GraphicsScene this item is placed at.
-		GraphicsScene* getGraphicsScene(void) const { return (m_parent ? m_parent->getGraphicsScene() : m_scene); };
 
 		virtual void setParentGraphicsItem(GraphicsItem* _itm) { m_parent = _itm; };
 		GraphicsItem* getParentGraphicsItem(void) const { return m_parent; };
@@ -332,8 +327,7 @@ namespace ot {
 		
 		QPointF m_moveStartPt; //! @brief Item move origin.
 		GraphicsItem* m_parent; //! @brief Parent graphics item.
-		GraphicsScene* m_scene; //! @brief Graphics scene.
-
+		
 		QSizeF m_requestedSize; //! \brief Size requested by parent.
 
 		bool m_forwardSizeChanges;
