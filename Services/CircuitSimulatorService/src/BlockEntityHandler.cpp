@@ -232,6 +232,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		EntityBlockConnection* connectionEntity = new EntityBlockConnection(entityID, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
 		connectionEntity->createProperties();
 		
+		
 	
 		//Now i create the GraphicsConnectionCfg and set it with the information
 
@@ -240,7 +241,7 @@ void BlockEntityHandler::AddBlockConnection(const std::list<ot::GraphicsConnecti
 		connectionCfg.setDestUid(connection.getDestinationUid());
 		connectionCfg.setOriginConnectable(connection.getOriginConnectable());
 		connectionCfg.setDestConnectable(connection.getDestConnectable());
-
+		connectionCfg.setLineShape(ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine);
 		
 		//Now i set the attirbutes of connectionEntity
 		connectionEntity->setConnectionCfg(connectionCfg);
