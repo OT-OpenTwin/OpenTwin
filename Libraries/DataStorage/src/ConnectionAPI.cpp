@@ -155,12 +155,14 @@ namespace DataStorageAPI
 			{
 				//Last choice, without the OPENTWIN_DEV_ROOT env var, the application is definatly not run by a developer. Thus the application is run from the deployment folder.
 				certKeyPath = ot::os::getExecutablePath();
+				certKeyPath += "\\Certificates";
 			}
 			else
 			{
 				certKeyPath = std::string(devRootPath);
+				certKeyPath += "\\Certificates\\Generated" ;
 			}
-			certKeyPath += "\\Certificates";
+			
 		}
 		else
 		{
