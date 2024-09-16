@@ -163,12 +163,12 @@ void EntityBlockConnection::readSpecificDataFromDataBase(bsoncxx::document::view
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 
 	//Now we read the information about the ConnectionCfg
-	_graphicsScenePackage = doc_view["GraphicPackageName"].get_utf8().value.data();
+	_graphicsScenePackage = std::string(doc_view["GraphicPackageName"].get_utf8().value.data());
 	_info.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
 	_info.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
 	
-	_connectorNameOrigin = doc_view["FromConnectable"].get_utf8().value.to_string();
-	_connectorNameDestination = doc_view["ToConnectable"].get_utf8().value.to_string();
+	_connectorNameOrigin = std::string(doc_view["FromConnectable"].get_utf8().value.data());
+	_connectorNameDestination = std::string(doc_view["ToConnectable"].get_utf8().value.data());
 	_blockIDOrigin = static_cast<ot::UID>(doc_view["FromUID"].get_int64());
 	_blockIDDestination = static_cast<ot::UID>(doc_view["ToUID"].get_int64());	
 }

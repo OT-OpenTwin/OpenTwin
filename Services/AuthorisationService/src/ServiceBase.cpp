@@ -12,6 +12,7 @@
 //#include "OpenTwinCore/TypeConversion.h"
 #include "OTCore/OTAssert.h"
 #include "OTCore/ReturnMessage.h"
+#include "Connection/ConnectionAPI.h"
 
 #define DB_ERROR_MESSAGE_ALREADY_EXISTS "already exists: generic server error"
 

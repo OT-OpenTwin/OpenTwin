@@ -46,8 +46,8 @@ namespace MongoUserFunctions
 			return false; // User not found
 		}
 
-		std::string storedPassword = userDocument->view()["user_pwd"].get_utf8().value.to_string();
-		std::string hashedPassword = hashPassword(password);
+		const std::string storedPassword(userDocument->view()["user_pwd"].get_utf8().value.data());
+		const std::string hashedPassword = hashPassword(password);
 
 		if (storedPassword != hashedPassword) return false;
 
@@ -184,7 +184,7 @@ namespace MongoUserFunctions
 			for (const bsoncxx::document::view& doc : cursor1)
 			{
 				bsoncxx::document::element ele = doc["name"];
-				std::string name = ele.get_utf8().value.to_string();
+				std::string name(ele.get_utf8().value.data());
 				if (name == collectionName.str())
 				{
 					// This collection name is already in use
@@ -200,7 +200,7 @@ namespace MongoUserFunctions
 		return collectionName.str();
 	}
 
-	User getUserDataThroughUsername(std::string username, mongocxx::client& adminClient)
+	User getUserDataThroughUsername(const std::string& username, mongocxx::client& adminClient)
 	{
 		auto userCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
 
@@ -210,18 +210,13 @@ namespace MongoUserFunctions
 
 		auto userData = userCollection.find_one(filter.view());
 
-		if (!userData)
+		if (!userData.has_value())
 		{
 			throw std::runtime_error("User not found");
 
 		}
 
-		User user{};
-
-		user.username = username;
-		user.userId = userData->view()["user_id"].get_utf8().value.to_string();
-		user.roleName = userData->view()["user_role_name"].get_utf8().value.to_string();
-		user.settingsCollectionName = userData->view()["settings_collection_name"].get_utf8().value.to_string();
+		User user(username, userData.value());
 
 		return user;
 	}
@@ -241,12 +236,7 @@ namespace MongoUserFunctions
 			throw std::runtime_error("User not found");
 		}
 
-		User user{};
-
-		user.userId = userId;
-		user.username = userData->view()["user_name"].get_utf8().value.to_string();
-		user.roleName = userData->view()["user_role_name"].get_utf8().value.to_string();
-		user.settingsCollectionName = userData->view()["settings_collection_name"].get_utf8().value.to_string();
+		User user(userId, userData->view());
 
 		return user;
 	}
@@ -261,15 +251,11 @@ namespace MongoUserFunctions
 
 		for (view userData : cursor)
 		{
-			std::string userId = userData["user_id"].get_utf8().value.to_string();
+			std::string userId(userData["user_id"].get_utf8().value.data());
 
 			try
 			{
-				User tmpUser;
-				tmpUser.userId = userId;
-				tmpUser.username = userData["user_name"].get_utf8().value.to_string();
-				tmpUser.roleName = userData["user_role_name"].get_utf8().value.to_string();
-				tmpUser.settingsCollectionName = userData["settings_collection_name"].get_utf8().value.to_string();
+				User tmpUser(userId, userData);
 
 				userList.push_back(std::move(tmpUser));
 			}
@@ -376,8 +362,13 @@ namespace MongoUserFunctions
 
 		authenticatedUserTokens.clear();
 
-		int32_t matchedCount = result.get().matched_count();
-		int32_t modifiedCount = result.get().modified_count();
+		if (!result.has_value())
+		{
+			throw std::exception("Update username failed.");
+		}
+
+		int32_t matchedCount = result.value().matched_count();
+		int32_t modifiedCount = result.value().modified_count();
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
@@ -410,8 +401,13 @@ namespace MongoUserFunctions
 
 		authenticatedUserTokens.clear();
 
-		int32_t matchedCount = result.get().matched_count();
-		int32_t modifiedCount = result.get().modified_count();
+		if (!result.has_value())
+		{
+			throw std::exception("Updata username failed.");
+		}
+
+		int32_t matchedCount = result.value().matched_count();
+		int32_t modifiedCount = result.value().modified_count();
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
@@ -439,8 +435,14 @@ namespace MongoUserFunctions
 
 		authenticatedUserTokens.clear();
 
-		int32_t matchedCount = result.get().matched_count();
-		int32_t modifiedCount = result.get().modified_count();
+		if (!result.has_value())
+		{
+			throw std::exception("Change userpassword failed.");
+		}
+
+
+		int32_t matchedCount = result.value().matched_count();
+		int32_t modifiedCount = result.value().modified_count();
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
@@ -473,8 +475,13 @@ namespace MongoUserFunctions
 
 		authenticatedUserTokens.clear();
 
-		int32_t matchedCount = result.get().matched_count();
-		int32_t modifiedCount = result.get().modified_count();
+		if (!result.has_value())
+		{
+			throw std::exception("Updata username failed.");
+		}
+
+		int32_t matchedCount = result.value().matched_count();
+		int32_t modifiedCount = result.value().modified_count();
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{

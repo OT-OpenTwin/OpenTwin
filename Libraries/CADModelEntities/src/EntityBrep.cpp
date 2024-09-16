@@ -130,8 +130,8 @@ void EntityBrep::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view,
 			for (exp.Init(brep, TopAbs_FACE); exp.More(); exp.Next())
 			{
 				TopoDS_Face aFace = TopoDS::Face(exp.Current());
-
-				setFaceName(aFace, fname->get_utf8().value.to_string());
+				const std::string faceName(fname->get_utf8().value.data());
+				setFaceName(aFace, faceName);
 				fname++;
 			}
 		}

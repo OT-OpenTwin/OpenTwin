@@ -1,4 +1,5 @@
 #include "VariableToBSONConverter.h"
+#include<cassert>
 
 void VariableToBSONConverter::operator()(bsoncxx::builder::basic::document& doc, const ot::Variable& value, const std::string& fieldName)
 {

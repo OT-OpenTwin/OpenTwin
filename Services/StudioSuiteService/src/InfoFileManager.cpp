@@ -4,6 +4,7 @@
 #include "OTServiceFoundation/ModelComponent.h"
 
 #include "EntityFile.h"
+#include <algorithm>
 
 void InfoFileManager::setData(Application* app)
 {

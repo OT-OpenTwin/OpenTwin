@@ -4,6 +4,7 @@
 #include "..\include\DataStorageLogger.h"
 
 #include "OTSystem\UrlEncoding.h"
+#include "OTSystem/OperatingSystem.h"
 
 #include <mongocxx/pool.hpp>
 #include <bsoncxx/stdx/make_unique.hpp>
@@ -141,47 +142,44 @@ namespace DataStorageAPI
 
 	std::string ConnectionAPI::getMongoURL(std::string databaseURL, std::string dbUsername, std::string dbPassword)
 	{
-		static std::string mongoURL;
+		//if (!mongoURL.empty()) return mongoURL;  Deactivate caching, since the connection needs to be checked with different accounts.
 
-		//if (!mongoURL.empty()) return mongoURL;  Deactivated cache to ensure proper reconnection in case of unsuccessful attempts (e.g. wrong password)
-
-		if (databaseURL.substr(0, 4) == "tls@")
+		// Get the path of the executable. First choice: The explicitly defined path.
+		char* explicitCertPath = ot::os::getEnvironmentVariable("OPEN_TWIN_CERTS_PATH");
+		std::string certKeyPath;
+		if (explicitCertPath == nullptr)
 		{
-			std::string ca_cert_file;
-
-			// Get the path of the executable
-#ifdef _WIN32
-			char path[MAX_PATH] = { 0 };
-			GetModuleFileNameA(NULL, path, MAX_PATH);
-			ca_cert_file = path;
-#else
-			char result[PATH_MAX];
-			ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-			ca_cert_flile = std::string(result, (count > 0) ? count : 0);
-#endif
-			ca_cert_file = ca_cert_file.substr(0, ca_cert_file.rfind('\\'));
-			ca_cert_file += "\\Certificates\\ca.pem";
-
-			// Chyeck whether local cert file ca.pem exists
-			if (!std::filesystem::exists(ca_cert_file))
+			//Second choice, the path depending on OT_DEV_ROOT
+			char* devRootPath = ot::os::getEnvironmentVariable("OPENTWIN_DEV_ROOT");
+			if (devRootPath == nullptr)
 			{
-				// Get the development root environment variable and build the path to the deployment cert file
-				char buffer[4096];
-				size_t environmentVariableValueStringLength;
-
-				getenv_s(&environmentVariableValueStringLength, buffer, sizeof(buffer) - 1, "OPENTWIN_DEV_ROOT");
-
-				std::string dev_root = std::string(buffer);
-				ca_cert_file = dev_root + "\\Deployment\\Certificates\\ca.pem";
+				//Last choice, without the OPENTWIN_DEV_ROOT env var, the application is definatly not run by a developer. Thus the application is run from the deployment folder.
+				certKeyPath = ot::os::getExecutablePath();
 			}
+			else
+			{
+				certKeyPath = std::string(devRootPath);
+			}
+			certKeyPath += "\\Certificates";
+		}
+		else
+		{
+			certKeyPath = std::string(explicitCertPath);
+		}
+		certKeyPath += "\\certificateKeyFile.pem";
 
-			databaseURL = databaseURL.substr(4) + "/?tls=true&tlsCAFile=" + ot::url::urlEncode(ca_cert_file);
+		// Check whether local cert file certificateKeyFile.pem exists
+		if (!std::filesystem::exists(certKeyPath))
+		{
+			throw std::exception(("CertificateKeyFile could not be found at path: " + certKeyPath).c_str());
 		}
 
 		std::string uriStr = "mongodb://" + ot::url::urlEncode(dbUsername) + ":" + ot::url::urlEncode(dbPassword) + "@" + databaseURL;
 
-		mongoURL = uriStr;
-		return uriStr;
+		//CA file is not explicitly added since the system root ca is used.
+		std::string mongoURL = uriStr + "/?tls=true&tlsCertificateKeyFile=" + certKeyPath;
+
+		return mongoURL;
 	}
 
 }

@@ -69,7 +69,7 @@ void EntityParameterizedDataCategorization::readSpecificDataFromDataBase(bsoncxx
 {
 	EntityContainer::readSpecificDataFromDataBase(doc_view, entityMap);
 
-	std::string categorySerialized = doc_view["Category"].get_utf8().value.to_string();
+	const std::string categorySerialized(doc_view["Category"].get_utf8().value.data());
 	DataCategorie category = UNKNOWN;
 	_stringDataCategorieMapping.find(categorySerialized) == _stringDataCategorieMapping.end() ? category = UNKNOWN: category = _stringDataCategorieMapping.at(categorySerialized);
 	if (category != UNKNOWN)

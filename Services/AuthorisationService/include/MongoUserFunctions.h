@@ -38,7 +38,7 @@ namespace MongoUserFunctions
 
 	std::string generateUserSettingsCollectionName(mongocxx::client& adminClient);
 
-	User getUserDataThroughUsername(std::string username, mongocxx::client& adminClient);
+	User getUserDataThroughUsername(const std::string& username, mongocxx::client& adminClient);
 
 	User getUserDataThroughId(std::string userId, mongocxx::client& adminClient);
 

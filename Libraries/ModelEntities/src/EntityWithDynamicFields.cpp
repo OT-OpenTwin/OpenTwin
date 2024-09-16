@@ -198,7 +198,7 @@ void EntityWithDynamicFields::AddGenericDocumentToBsonDocument(const GenericBson
 void EntityWithDynamicFields::ExtractElementValues(const bsoncxx::document::element& element, std::string documentName)
 {
 	auto type = element.type();
-	std::string fieldName = element.key().to_string();
+	const std::string fieldName(element.key().data());
 
 	if (type == bsoncxx::type::k_document)
 	{

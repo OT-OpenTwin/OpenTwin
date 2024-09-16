@@ -38,6 +38,6 @@ void EntityFileCSV::AddStorageData(bsoncxx::builder::basic::document & storage)
 void EntityFileCSV::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityFile::readSpecificDataFromDataBase(doc_view, entityMap);
-	_rowDelimiter = doc_view["RowDelimiter"].get_utf8().value.to_string();
-	_columnDelimiter = doc_view["ColumnDelimiter"].get_utf8().value.to_string();
+	_rowDelimiter =std::string(doc_view["RowDelimiter"].get_utf8().value.data());
+	_columnDelimiter = std::string(doc_view["ColumnDelimiter"].get_utf8().value.data());
 }

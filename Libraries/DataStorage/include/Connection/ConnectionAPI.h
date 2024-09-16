@@ -34,9 +34,9 @@ namespace DataStorageAPI
 
 		int getSiteId() { return _siteId; };
 
+		static std::string getMongoURL(std::string databaseURL, std::string dbUsername, std::string dbPassword);
 	private:
 		connection getConnection();
-		static std::string getMongoURL(std::string databaseURL, std::string dbUsername, std::string dbPassword);
 
 		bsoncxx::stdx::optional<connection> tryGetConnection();
 

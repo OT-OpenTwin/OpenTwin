@@ -49,9 +49,9 @@ namespace DataStorageAPI
 		try
 		{
 			auto result = docBase->InsertMultipleDocument(jsonData);
-			if (result)
+			if (result.has_value())
 			{
-				auto count = result.get().inserted_count();
+				auto count = result.value().inserted_count();
 				response.UpdateDataStorageResponse("Inserted count" + std::to_string(count), true, "");
 			}
 			else

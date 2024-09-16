@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "MongoDBAssertions.h"
 #include "../include/ArrayBinaryConverter.h"
+#include <cassert>
 
 using bsoncxx::builder::basic::kvp;
 void DataStorageAPI::MongoDBAssertions::testMongoDBAssertions()

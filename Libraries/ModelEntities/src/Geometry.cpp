@@ -287,7 +287,7 @@ void Geometry::readBSON(bsoncxx::document::view& faceNamesObj, std::map<ot::UID,
 	for (unsigned long index = 0; index < numberIds; index++)
 	{
 		ot::UID id = DataBase::GetIntFromArrayViewIterator(pId);
-		std::string name = pName->get_utf8().value.to_string();
+		std::string name = std::string(pName->get_utf8().value.data());
 
 		pId++;
 		pName++;
