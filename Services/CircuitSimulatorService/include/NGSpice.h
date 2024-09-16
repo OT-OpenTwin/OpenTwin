@@ -45,6 +45,7 @@ public:
 	bool checkIfConnectionIsConnectedToGND(std::string pole);
 	bool checkIfConnectionIsConnectedToGndVoltageSource(std::string pole, ot::UID voltageSourceUID, ot::UID elementUID);
 	bool checkIfConnectionIsConnectedToVoltageMeter( std::string blockTitle);
+	void setNodeNumbersOfVoltageSource(std::string startingElement, int counter, ot::UID startingElementUID, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
 
 	//Callback functions from NGSpice
 	static int MySendCharFunction(char*, int, void*);

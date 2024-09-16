@@ -168,9 +168,18 @@ void NGSpice::connectionAlgorithmWithGNDVoltageSource(std::string startingElemen
 		if (counter == 1 && elementUID == startingElementUID) {
 			if (checkIfConnectionIsConnectedToGndVoltageSource(myConn.getOriginConnectable(), startingElementUID, myConn.getOriginUid()) ||
 				checkIfConnectionIsConnectedToGndVoltageSource(myConn.getDestConnectable(), startingElementUID, myConn.getDestinationUid())) {
+
+				if (myConn.getDestConnectable() == "Connector" || myConn.getOriginConnectable() == "Connector")
+				{
+					myConn.setNodeNumber("0");
+					connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+					connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+				}
 				continue;
 			}
+			
 		}
+
 
 		// Here i check if connection already exists
 		if (checkIfElementOrConnectionVisited(visitedElements, connection))
@@ -298,6 +307,44 @@ bool NGSpice::checkIfConnectionIsConnectedToVoltageMeter(std::string blockTitle)
 		return false;
 	}
 	
+}
+
+void NGSpice::setNodeNumbersOfVoltageSource(std::string startingElement, int counter, ot::UID startingElementUID, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
+{
+	// First get all informations that needed
+	auto circuitMap = Application::instance()->getNGSpice().getMapOfCircuits();
+	auto it = circuitMap.find(editorname);
+	auto element = allEntitiesByBlockID.at(elementUID);
+	auto connections = element->getAllConnections();
+
+	std::vector<Connection> connectionsToBeSet;
+	for (auto connection : connections)
+	{
+		Connection myConn = createConnection(allConnectionEntities, connection);
+		connectionsToBeSet.push_back(myConn);
+	}
+
+	Connection myConn = connectionsToBeSet[0];
+
+	if (checkIfConnectionIsConnectedToGndVoltageSource(myConn.getOriginConnectable(), startingElementUID, myConn.getOriginUid()) ||
+		checkIfConnectionIsConnectedToGndVoltageSource(myConn.getDestConnectable(), startingElementUID, myConn.getDestinationUid()))
+	{
+		myConn.setNodeNumber("0");
+		connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+		connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+
+	}
+	else if(checkIfConnectionIsConnectedToGndVoltageSource(connectionsToBeSet[1].getOriginConnectable(), startingElementUID, connectionsToBeSet[1].getOriginUid()) ||
+			checkIfConnectionIsConnectedToGndVoltageSource(connectionsToBeSet[1].getDestConnectable(), startingElementUID, connectionsToBeSet[1].getDestinationUid()))
+	{
+		myConn = connectionsToBeSet[1];
+		myConn.setNodeNumber("0");
+		connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+		connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+	}
+
+	it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
+	it->second.addConnection(myConn.getDestConnectable(), myConn.getDestinationUid(), myConn);
 }
 
 
@@ -527,6 +574,10 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		for (auto voltageSource : vectorVoltageSource->second) {
 			ot::UID elementUID = voltageSource->getEntityID();	
 			int counter = 0;
+
+			//First set the GND connections of the VoltageSource meaning that i first want to find the connection with 0 and set it to it
+			setNodeNumbersOfVoltageSource(voltageSource->getClassName(), counter, elementUID, elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+			//now i go thorugh all the other connections
 			connectionAlgorithmWithGNDVoltageSource(voltageSource->getClassName(), counter, elementUID, elementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 		}
 	}
