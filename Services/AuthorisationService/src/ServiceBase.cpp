@@ -44,10 +44,9 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 		dbPassword = ot::UserCredentials::encryptString("admin");
 	}
 
-	std::string uriStr = getMongoURL(databaseURL, dbUsername, ot::UserCredentials::decryptString(dbPassword));
-
 	try
 	{
+		std::string uriStr = getMongoURL(databaseURL, dbUsername, ot::UserCredentials::decryptString(dbPassword));
 		mongocxx::uri uri(uriStr);
 		adminClient = mongocxx::client(uri);
 	}
