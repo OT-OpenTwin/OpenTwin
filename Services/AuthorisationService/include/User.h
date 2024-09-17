@@ -22,8 +22,8 @@ class User
 public:
 	User(const std::string& _userName, const bsoncxx::v_noabi::document::view& _userData)
 	{
-		username = _userName;
-		userId = std::string(_userData["user_id"].get_utf8().value.data());
+		userId = _userName;
+		username = std::string(_userData["user_name"].get_utf8().value.data());
 		roleName = std::string(_userData["user_role_name"].get_utf8().value.data());
 		settingsCollectionName = std::string(_userData["settings_collection_name"].get_utf8().value.data());
 	}
