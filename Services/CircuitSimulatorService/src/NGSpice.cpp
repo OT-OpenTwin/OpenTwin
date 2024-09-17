@@ -382,7 +382,8 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			voltageSource->setNetlistName(assignElementID("V"));
 
 			//Add customName and netlistName to Map
-			if (!addToCustomNameToNetlistMap(voltageSource->getCustomName(), voltageSource->getNetlistName()))
+			if (!addToCustomNameToNetlistMap(voltageSource->getCustomName(), voltageSource->getNetlistName()) || 
+				!addToNetlistNameToCustomMap(voltageSource->getCustomName(), voltageSource->getNetlistName()))
 			{
 				OT_LOG_E("customName and netlistName could not be added to map");
 			}
@@ -444,7 +445,8 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			resistor->setNetlistName(assignElementID("R"));
 
 			//Add customName and netlistName to Map
-			if (!addToCustomNameToNetlistMap(resistor->getCustomName(), resistor->getNetlistName()))
+			if (!addToCustomNameToNetlistMap(resistor->getCustomName(), resistor->getNetlistName()) ||
+				!addToNetlistNameToCustomMap(resistor->getCustomName(), resistor->getNetlistName()))
 			{
 				OT_LOG_E("customName and netlistName could not be added to map");
 			}
@@ -462,7 +464,8 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			diode->setNetlistName(assignElementID("D"));
 
 			//Add customName and netlistName to Map
-			if (!addToCustomNameToNetlistMap(diode->getCustomName(), diode->getNetlistName()))
+			if (!addToCustomNameToNetlistMap(diode->getCustomName(), diode->getNetlistName()) ||
+				!addToNetlistNameToCustomMap(diode->getCustomName(), diode->getNetlistName()))
 			{
 				OT_LOG_E("customName and netlistName could not be added to map");
 			}
@@ -480,7 +483,8 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			capacitor->setNetlistName(assignElementID("C"));
 
 			//Add customName and netlistName to Map
-			if (!addToCustomNameToNetlistMap(capacitor->getCustomName(), capacitor->getNetlistName()))
+			if (!addToCustomNameToNetlistMap(capacitor->getCustomName(), capacitor->getNetlistName()) ||
+				!addToNetlistNameToCustomMap(capacitor->getCustomName(), capacitor->getNetlistName()))
 			{
 				OT_LOG_E("customName and netlistName could not be added to map");
 			}
@@ -498,7 +502,8 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 			inductor->setNetlistName(assignElementID("L"));
 
 			//Add customName and netlistName to Map
-			if (!addToCustomNameToNetlistMap(inductor->getCustomName(), inductor->getNetlistName()))
+			if (!addToCustomNameToNetlistMap(inductor->getCustomName(), inductor->getNetlistName()) ||
+				!addToNetlistNameToCustomMap(inductor->getCustomName(), inductor->getNetlistName()))
 			{
 				OT_LOG_E("customName and netlistName could not be added to map");
 			}
@@ -609,7 +614,9 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	std::vector<std::vector<std::string>> nodesOfVoltageMeter;
 	std::vector<std::vector<std::string>> nodesOfCurrentMeter;
-
+	std::vector<std::string> namesOfCurrentMeter;
+	std::vector<std::string> nameOfRShunts;
+	int rshuntCounter = 1; // Initialisiere den Zähler
 	// I need to get the type of Simulation to set then the voltage source if its ac dc or tran
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationTypeProperty != nullptr);
@@ -710,7 +717,12 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		}
 		else if (circuitElement->type() == "CurrentMeter")
 		{
-			
+				CurrentMeter* currentMeter = dynamic_cast<CurrentMeter*>(circuitElement);
+				namesOfCurrentMeter.push_back(currentMeter->getCustomName());
+				std::string name = "Rshunt" + std::to_string(rshuntCounter++); // Erhöhe den Zähler nach jedem Schritt
+				nameOfRShunts.push_back(name);
+				addToCustomNameToNetlistMap(currentMeter->getCustomName(), to_lowercase(name));
+				addToNetlistNameToCustomMap(currentMeter->getCustomName(), to_lowercase(name));
 				std::vector<std::string> nodeNumbers;
 				std::unordered_set<std::string> temp;
 				auto connections = circuitElement->getList();
@@ -843,8 +855,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	//And now i send it to NGSpice in the right order
 	
 	//Now i create for every Current Meter a resistor with Zero Ohm to measure the current through it
-	std::vector<std::string> nameOfRShunts;
-	int rshuntCounter = 1; // Initialisiere den Zähler
+
 
 	for (auto nodes : nodesOfCurrentMeter)
 	{
@@ -855,14 +866,19 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		}
 
 		std::ostringstream oss;
-		std::string name = "Rshunt" + std::to_string(rshuntCounter++); // Erhöhe den Zähler nach jedem Schritt
-		nameOfRShunts.push_back(name);
-
+		std::string name = nameOfRShunts.front();
 		oss << "circbyline " << name << " " << nodeString << "0";
+		/*nameOfRShunts.erase(nameOfRShunts.begin());*/
 		std::string temp = oss.str();
 		ngSpice_Command(const_cast<char*>(temp.c_str()));
-	}
 	
+	}
+
+		
+	for (auto name : namesOfCurrentMeter)
+	{
+	
+	}
 
 	//Here are my Simulation properties which i send to NGSpice
 	ngSpice_Command(const_cast<char*>(simulationLine.c_str()));
@@ -1077,9 +1093,26 @@ bool NGSpice::addToCustomNameToNetlistMap(const std::string& customName, const s
 	return true;
 }
 
+bool NGSpice::addToNetlistNameToCustomMap(const std::string& customName, const std::string& netlistName)
+{
+	if (netlistNameToCustomNameMap.find(netlistName) != netlistNameToCustomNameMap.end()) {
+		OT_LOG_E("The netlist name:" + netlistName + "already exists");
+		return false;
+	}
+
+	netlistNameToCustomNameMap[netlistName] = customName;
+	return true;
+}
+
 std::string NGSpice::assignElementID(const std::string& elementType) {
 	elementCounters[elementType]++;
 	return elementType + std::to_string(elementCounters[elementType]);
+}
+
+std::string NGSpice::to_lowercase(const std::string& str) {
+	std::string lower_str = str;
+	std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(), ::tolower);
+	return lower_str;
 }
 
 std::string NGSpice::getNetlistNameOfMap(const std::string& customName) const

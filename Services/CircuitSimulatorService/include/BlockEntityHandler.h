@@ -33,7 +33,7 @@ public:
 
 	//Setter
 	void setPackageName(std::string name);
-
+	
 	//Getter
 	const std::string getPackageName() const;
 private:

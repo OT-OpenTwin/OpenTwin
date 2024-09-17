@@ -5,6 +5,7 @@
 #include "CircuitElement.h"
 #include "Connection.h"
 
+
 //#include "ExternalDependencies.h"
 #include "Application.h"
 #include "ClassFactoryBlock.h"
@@ -458,6 +459,8 @@ ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker() {
 	return pckg;
 }
 
+
+
 void BlockEntityHandler::createResultCurves(std::string solverName,std::string simulationType,std::string circuitName) {
 	
 		std::map<std::string, std::vector<double>> resultVectors = SimulationResults::getInstance()->getResultMap();
@@ -553,9 +556,22 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 			std::string xLabel;
 			std::string xUnit;
 			std::string yUnit;
-	
+			auto map = Application::instance()->getNGSpice().netlistNameToCustomNameMap;
+
+			std::string name;
+			std::string delimiter = "#branch";
+			std::size_t pos = it.first.find(delimiter);
+
+			std::string key = (pos != std::string::npos) ? it.first.substr(0, pos) : it.first;
+			if (map.find(key) != map.end()) {
+				name = map[key];
+			}
+			else {
+				name = it.first; 
+			}
+
 			if (simulationType == ".dc") {
-				curveName = it.first + "-DC";
+				curveName = name + "-DC";
 				fullCurveName = _curveFolderPath + "/" + curveName;
 				xLabel = "sweep";
 				xUnit = "V";
@@ -563,21 +579,21 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 				
 			}
 			else if (simulationType == ".TRAN") {
-				curveName = it.first + "-TRAN";
+				curveName = name + "-TRAN";
 				fullCurveName = _curveFolderPath +  "/" + curveName;
 				xLabel = "time";
 				xUnit = "ms";
 				yUnit = "V";
 			}
 			else {
-				curveName = it.first + "-AC";
+				curveName = name + "-AC";
 				fullCurveName = _curveFolderPath +  "/" + curveName;
 				xLabel = "frequency";
 				xUnit = "hz";
 				yUnit = "V";
 			}
 
-			std::string yLabel = it.first;
+			std::string yLabel = name;
 			EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, yLabel, yUnit, colorID, true);
 			if (yLabel.find("V(") != std::string::npos || yLabel.find("vd_") != std::string::npos)
 			{
@@ -626,6 +642,8 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 void BlockEntityHandler::setPackageName(std::string name) {
 	this->_packageName = name;
 }
+
+
 
 //Getter
 const std::string BlockEntityHandler::getPackageName() const {

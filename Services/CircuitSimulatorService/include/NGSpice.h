@@ -25,6 +25,7 @@ public:
 	std::map<std::string, Circuit> mapOfCircuits;
 	std::map<std::pair<ot::UID, std::string>, std::string> connectionNodeNumbers;
 	std::map<std::string, std::string> customNameToNetlistNameMap;
+	std::map<std::string, std::string> netlistNameToCustomNameMap;
 	std::map<std::string, int> elementCounters;
 
 	//Simulation Functions
@@ -56,7 +57,9 @@ public:
 	
 	//Setter
 	bool addToCustomNameToNetlistMap(const std::string&, const std::string&);
+	bool addToNetlistNameToCustomMap(const std::string&, const std::string&);
 	std::string assignElementID(const std::string& elementType);
+	std::string to_lowercase(const std::string& str);
 
 	//Getter
 	std::map<std::string, Circuit>& getMapOfCircuits() { return mapOfCircuits; }
