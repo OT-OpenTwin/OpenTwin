@@ -109,7 +109,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\visualc\sharedspice\Debug.x64;$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(NGSPICE_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLD);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLD);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);ngspice.lib;ResultDataAccess.lib;BlockEntities.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -155,7 +155,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OPENTWIN_THIRDPARTY_ROOT)\mySpice\ngspice-41\visualc\sharedspice\Release.x64;$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(NGSPICE_LIBPATHR);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);ngspice.lib;ResultDataAccess.lib;BlockEntities.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
