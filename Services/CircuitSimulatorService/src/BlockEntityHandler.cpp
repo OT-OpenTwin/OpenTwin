@@ -451,10 +451,10 @@ ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker() {
 	a2->addItem(currentMeter.getClassName(), currentMeter.CreateBlockHeadline(), "CircuitElementImages/CurrentMeter.png");
 
 	a3->addItem(element.getClassName(), element.CreateBlockHeadline(), "CircuitElementImages/VoltageSource.png");
-	pckg->addCollection(a);
+	
 
 	a4->addItem(diode.getClassName(), diode.CreateBlockHeadline(), "CircuitElementImages/Diod2.png");
-
+	pckg->addCollection(a);
 	return pckg;
 }
 
