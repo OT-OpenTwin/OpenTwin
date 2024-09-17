@@ -4,7 +4,7 @@ EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* par
 	:EntityBlock(ID, parent, obs, ms, factory, owner)
 {
 	
-	createProperties();
+	
 }
 
 void EntityBlockCircuitElement::createProperties()
