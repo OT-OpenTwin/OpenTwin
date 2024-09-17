@@ -216,7 +216,7 @@ namespace MongoUserFunctions
 
 		}
 
-		User user(username, userData.value());
+		User user(userData.value());
 
 		return user;
 	}
@@ -236,7 +236,7 @@ namespace MongoUserFunctions
 			throw std::runtime_error("User not found");
 		}
 
-		User user(userId, userData->view());
+		User user(userData->view());
 
 		return user;
 	}
@@ -251,11 +251,9 @@ namespace MongoUserFunctions
 
 		for (view userData : cursor)
 		{
-			std::string userId(userData["user_id"].get_utf8().value.data());
-
 			try
 			{
-				User tmpUser(userId, userData);
+				User tmpUser(userData);
 
 				userList.push_back(std::move(tmpUser));
 			}
