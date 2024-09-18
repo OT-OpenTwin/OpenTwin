@@ -64,7 +64,8 @@ void NGSpice::connectionAlgorithmWithGNDElement(std::string startingElement,int 
 	counter++;
 
 	// First get all informations that needed
-	auto circuitMap = Application::instance()->getNGSpice().getMapOfCircuits();
+	auto appInstance = Application::instance();
+	auto circuitMap = appInstance->getNGSpice().getMapOfCircuits();
 	auto it = circuitMap.find(editorname);
 	auto element = allEntitiesByBlockID.at(elementUID);
 	auto connections = element->getAllConnections();
@@ -78,68 +79,65 @@ void NGSpice::connectionAlgorithmWithGNDElement(std::string startingElement,int 
 	for (auto connection : connections)
 	{
 		Connection myConn = createConnection(allConnectionEntities, connection);
-
-		//First i check if the connection is connected to GND If yes then i state it with node number 0 
-		//I check now if the netlist has gnd Element, if yes i do the whole generation with assuming the GND Element
 		
 
-		// Here i check if connection already exists
-		if (checkIfElementOrConnectionVisited(visitedElements, connection))
+		// Check the case if the connection is connected to a connector which is connected to another connector...
+		if (appInstance->extractStringAfterDelimiter(myConn.getDestConnectable(),'/',2).find("Connector") != std::string::npos && myConn.getDestinationUid() != element->getEntityID() ||
+			appInstance->extractStringAfterDelimiter(myConn.getOriginConnectable(), '/', 2).find("Connector") != std::string::npos && myConn.getOriginUid() != element->getEntityID())
 		{
-			continue;
-		}
 
-		if (checkIfConnectionIsConnectedToGND(myConn.getOriginConnectable()) ||
-			checkIfConnectionIsConnectedToGND(myConn.getDestConnectable())) {
-
-			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
-			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-				myConn.setNodeNumber(connectionWithNodeNumber->second);
+			ot::UID nextElementUID;
+			if (myConn.getOriginUid() == elementUID) {
+				nextElementUID = myConn.getDestinationUid();
 			}
 			else {
-				connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
-				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-					myConn.setNodeNumber(connectionWithNodeNumber->second);
-				}
-				else {
-					myConn.setNodeNumber("0");
-					connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
-					connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
-				}
+				nextElementUID = myConn.getOriginUid();
 			}
 
+			handleWithConnectors(nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+
+			connectionAlgorithmWithGNDElement(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 		}
 		else
 		{
-			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
-			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-				myConn.setNodeNumber(connectionWithNodeNumber->second);
-			}
-			else {
-				connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
-				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-					myConn.setNodeNumber(connectionWithNodeNumber->second);
+
+			// Here i check if connection already exists
+			if (checkIfElementOrConnectionVisited(visitedElements, connection))
+			{
+				ot::UID nextElementUID;
+				if (myConn.getOriginUid() == elementUID) {
+					nextElementUID = myConn.getDestinationUid();
 				}
 				else {
-					myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
-					connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
-					connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+					nextElementUID = myConn.getOriginUid();
 				}
-			}
-		}
-		
-		it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
-		it->second.addConnection(myConn.getDestConnectable(), myConn.getDestinationUid(), myConn);
 
-		// Recursive call to explore the next element
-		ot::UID nextElementUID;
-		if (myConn.getOriginUid() == elementUID) {
-			nextElementUID = myConn.getDestinationUid();
+				connectionAlgorithmWithGNDElement(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+			}
+			else {
+				setNodeNumbers(myConn);
+
+				it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
+				it->second.addConnection(myConn.getDestConnectable(), myConn.getDestinationUid(), myConn);
+
+				// Recursive call to explore the next element
+				ot::UID nextElementUID;
+				if (myConn.getOriginUid() == elementUID) {
+					nextElementUID = myConn.getDestinationUid();
+				}
+				else {
+					nextElementUID = myConn.getOriginUid();
+				}
+				connectionAlgorithmWithGNDElement(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+			}
+
+			
 		}
-		else {
-			nextElementUID = myConn.getOriginUid();
-		}
-		connectionAlgorithmWithGNDElement(startingElement,counter,startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+
+		
+		
+		
+		
 	}
 }
 
@@ -188,48 +186,7 @@ void NGSpice::connectionAlgorithmWithGNDVoltageSource(std::string startingElemen
 		}
 
 
-		if (checkIfConnectionIsConnectedToGndVoltageSource(myConn.getOriginConnectable(), startingElementUID, myConn.getOriginUid()) ||
-			checkIfConnectionIsConnectedToGndVoltageSource(myConn.getDestConnectable(), startingElementUID, myConn.getDestinationUid())) {
-
-			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
-			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-				myConn.setNodeNumber(connectionWithNodeNumber->second);
-				connectionNodeNumbers[{myConn.getOriginUid(), myConn.getOriginConnectable()}] = myConn.getNodeNumber();
-			}
-			else {
-				connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
-				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-					myConn.setNodeNumber(connectionWithNodeNumber->second);
-					connectionNodeNumbers[{myConn.getDestinationUid(), myConn.getDestConnectable()}] = myConn.getNodeNumber();
-				}
-				else {
-					myConn.setNodeNumber("0");
-					connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
-					connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
-				}
-			}
-
-		}
-		else
-		{
-			auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
-			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-				myConn.setNodeNumber(connectionWithNodeNumber->second);
-				connectionNodeNumbers[{myConn.getOriginUid(), myConn.getOriginConnectable()}] = myConn.getNodeNumber();
-			}
-			else {
-				connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
-				if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
-					myConn.setNodeNumber(connectionWithNodeNumber->second);
-					connectionNodeNumbers[{myConn.getDestinationUid(), myConn.getDestConnectable()}] = myConn.getNodeNumber();
-				}
-				else {
-					myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
-					connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
-					connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
-				}
-			}
-		}
+		setNodeNumbersWithGNDVoltageSource(myConn, startingElementUID);
 
 		it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
 		it->second.addConnection(myConn.getDestConnectable(), myConn.getDestinationUid(), myConn);
@@ -246,6 +203,132 @@ void NGSpice::connectionAlgorithmWithGNDVoltageSource(std::string startingElemen
 		connectionAlgorithmWithGNDVoltageSource(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 	}
 
+}
+
+void NGSpice::handleWithConnectors(ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
+{
+	auto appInstance = Application::instance();
+	auto circuitMap = appInstance->getNGSpice().getMapOfCircuits();
+	auto it = circuitMap.find(editorname);
+	auto element = allEntitiesByBlockID.at(elementUID);
+	auto connections = element->getAllConnections();
+
+
+	for (auto connection : connections)
+	{
+		Connection myConn = createConnection(allConnectionEntities, connection);
+		if (checkIfElementOrConnectionVisited(visitedElements, connection))
+		{
+			continue;
+		}
+
+		setNodeNumbers(myConn);
+
+		it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
+		it->second.addConnection(myConn.getDestConnectable(), myConn.getDestinationUid(), myConn);
+
+		if (appInstance->extractStringAfterDelimiter(myConn.getDestConnectable(), '/', 2).find("Connector") != std::string::npos && myConn.getDestinationUid() != element->getEntityID())
+		{
+			handleWithConnectors(myConn.getDestinationUid(), allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+		}
+		else if (appInstance->extractStringAfterDelimiter(myConn.getOriginConnectable(), '/', 2).find("Connector") != std::string::npos && myConn.getOriginUid() != element->getEntityID())
+		{
+			handleWithConnectors(myConn.getOriginUid(), allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+		}
+	}
+
+	return;
+	
+}
+
+void NGSpice::setNodeNumbers(Connection& myConn)
+{
+	if (checkIfConnectionIsConnectedToGND(myConn.getOriginConnectable()) ||
+		checkIfConnectionIsConnectedToGND(myConn.getDestConnectable()))
+	{
+		auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
+		if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+			myConn.setNodeNumber(connectionWithNodeNumber->second);
+			connectionNodeNumbers[{myConn.getOriginUid(), myConn.getOriginConnectable()}] = myConn.getNodeNumber();
+		}
+		else {
+			connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
+			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+				myConn.setNodeNumber(connectionWithNodeNumber->second);
+				connectionNodeNumbers[{myConn.getDestinationUid(), myConn.getDestConnectable()}] = myConn.getNodeNumber();
+			}
+			else {
+				myConn.setNodeNumber("0");
+				connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+				connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+			}
+		}
+	}
+	else {
+		auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
+		if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+			myConn.setNodeNumber(connectionWithNodeNumber->second);
+			connectionNodeNumbers[{myConn.getOriginUid(), myConn.getOriginConnectable()}] = myConn.getNodeNumber();
+		}
+		else {
+			connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
+			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+				myConn.setNodeNumber(connectionWithNodeNumber->second);
+				connectionNodeNumbers[{myConn.getDestinationUid(), myConn.getDestConnectable()}] = myConn.getNodeNumber();
+			}
+			else {
+				myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
+				connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+				connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+			}
+		}
+	}
+}
+
+void NGSpice::setNodeNumbersWithGNDVoltageSource(Connection& myConn,ot::UID startingElementUID)
+{
+	if (checkIfConnectionIsConnectedToGndVoltageSource(myConn.getOriginConnectable(), startingElementUID, myConn.getOriginUid()) ||
+		checkIfConnectionIsConnectedToGndVoltageSource(myConn.getDestConnectable(), startingElementUID, myConn.getDestinationUid())) {
+
+		auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
+		if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+			myConn.setNodeNumber(connectionWithNodeNumber->second);
+			connectionNodeNumbers[{myConn.getOriginUid(), myConn.getOriginConnectable()}] = myConn.getNodeNumber();
+		}
+		else {
+			connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
+			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+				myConn.setNodeNumber(connectionWithNodeNumber->second);
+				connectionNodeNumbers[{myConn.getDestinationUid(), myConn.getDestConnectable()}] = myConn.getNodeNumber();
+			}
+			else {
+				myConn.setNodeNumber("0");
+				connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+				connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+			}
+		}
+
+	}
+	else
+	{
+		auto connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getDestinationUid(), myConn.getDestConnectable() });
+		if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+			myConn.setNodeNumber(connectionWithNodeNumber->second);
+			connectionNodeNumbers[{myConn.getOriginUid(), myConn.getOriginConnectable()}] = myConn.getNodeNumber();
+		}
+		else {
+			connectionWithNodeNumber = connectionNodeNumbers.find({ myConn.getOriginUid(), myConn.getOriginConnectable() });
+			if (connectionWithNodeNumber != connectionNodeNumbers.end()) {
+				myConn.setNodeNumber(connectionWithNodeNumber->second);
+				connectionNodeNumbers[{myConn.getDestinationUid(), myConn.getDestConnectable()}] = myConn.getNodeNumber();
+			}
+			else {
+				myConn.setNodeNumber(std::to_string(Numbers::nodeNumber++));
+				connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+				connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+			}
+		}
+	}
 }
 
 
