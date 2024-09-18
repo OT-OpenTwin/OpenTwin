@@ -594,13 +594,18 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 			}
 
 			std::string yLabel = name;
-			EntityResult1DCurve* curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, yLabel, yUnit, colorID, true);
+			EntityResult1DCurve* curve;
 			if (yLabel.find("V(") != std::string::npos || yLabel.find("vd_") != std::string::npos)
 			{
+				yLabel = "Voltage";
+				curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, yLabel, yUnit, colorID, true);
 				curvesForVoltage.push_back(std::pair<ot::UID, std::string>(curve->getEntityID(), curveName));
 			}
 			else
 			{
+				yLabel = "Current";
+				yUnit = "I";
+				curve = _modelComponent->addResult1DCurveEntity(fullCurveName, xValues, it.second, {}, xLabel, xUnit, yLabel, yUnit, colorID, true);
 				curvesForCurrent.push_back(std::pair<ot::UID, std::string>(curve->getEntityID(), curveName));
 			}
 			
