@@ -81,11 +81,26 @@ void NGSpice::connectionAlgorithmWithGNDElement(std::string startingElement,int 
 		Connection myConn = createConnection(allConnectionEntities, connection);
 		
 
-		// Check the case if the connection is connected to a connector which is connected to another connector...
+		//I always start with GND Element and give the Connection the nodeNumber 0 to ensure that the following connections of the connector get the right node number
+		if (counter == 1 && startingElement == "EntityBlockCircuitGND")
+		{
+			if (checkIfConnectionIsConnectedToGND(myConn.getOriginConnectable()) ||
+				checkIfConnectionIsConnectedToGND(myConn.getDestConnectable())) {
+
+				myConn.setNodeNumber("0");
+				connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+				connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+				it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
+				it->second.addConnection(myConn.getDestConnectable(), myConn.getDestinationUid(), myConn);
+
+			}
+		}
+
+		// Check the case if the connection is connected to a connector 
 		if (appInstance->extractStringAfterDelimiter(myConn.getDestConnectable(),'/',2).find("Connector") != std::string::npos && myConn.getDestinationUid() != element->getEntityID() ||
 			appInstance->extractStringAfterDelimiter(myConn.getOriginConnectable(), '/', 2).find("Connector") != std::string::npos && myConn.getOriginUid() != element->getEntityID())
 		{
-
+			
 			ot::UID nextElementUID;
 			if (myConn.getOriginUid() == elementUID) {
 				nextElementUID = myConn.getDestinationUid();
@@ -94,8 +109,11 @@ void NGSpice::connectionAlgorithmWithGNDElement(std::string startingElement,int 
 				nextElementUID = myConn.getOriginUid();
 			}
 
+			// Now i deal with the connectors means that i give all connections of the connector the same nodeNumber and search if the connector is connected to another connector
+			//Meaning i go through and give all in row placed connectors the same nodeNumbers
 			handleWithConnectors(nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 
+			
 			connectionAlgorithmWithGNDElement(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 		}
 		else
