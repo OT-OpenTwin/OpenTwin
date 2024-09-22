@@ -56,6 +56,7 @@ void NGSpice::clearBufferStructure(std::string name)
 	this->customNameToNetlistNameMap.clear();
 	Numbers::nodeNumber = 1;
 	SimulationResults::getInstance()->getResultMap().clear();
+	
 }
 
 
@@ -69,7 +70,11 @@ void NGSpice::connectionAlgorithmWithGNDElement(std::string startingElement,int 
 	auto it = circuitMap.find(editorname);
 	auto element = allEntitiesByBlockID.at(elementUID);
 	auto connections = element->getAllConnections();
-	
+	if (connections.empty())
+	{
+		OT_LOG_E("No Connections at Algorithm with GND Element!");
+		return;
+	}
 	//Check if Element already exists
 	if (checkIfElementOrConnectionVisited(visitedElements,elementUID))
 	{
@@ -164,10 +169,16 @@ void NGSpice::connectionAlgorithmWithGNDVoltageSource(std::string startingElemen
 	counter++;
 
 	// First get all informations that needed
-	auto circuitMap = Application::instance()->getNGSpice().getMapOfCircuits();
+	auto appInstance = Application::instance();
+	auto circuitMap = appInstance->getNGSpice().getMapOfCircuits();
 	auto it = circuitMap.find(editorname);
 	auto element = allEntitiesByBlockID.at(elementUID);
 	auto connections = element->getAllConnections();
+	if (connections.empty())
+	{
+		OT_LOG_E("No Connections at Algorithm with GND Voltage Source! ");
+		return;
+	}
 
 	//Check if Element already exists
 	if (checkIfElementOrConnectionVisited(visitedElements, elementUID))
@@ -181,44 +192,72 @@ void NGSpice::connectionAlgorithmWithGNDVoltageSource(std::string startingElemen
 		// As i always start with the voltageSource i want to start at the positivePole first so i skip the connection on the negativePole for the voltageSource 
 		// And i dont want to execute the above if Condition so i constructed a counter for this that only for the voltageSource it is relevant
 
-		if (counter == 1 && elementUID == startingElementUID) {
+			if (counter == 1 && startingElement == "EntityBlockCircuitVoltageSource"){
+
 			if (checkIfConnectionIsConnectedToGndVoltageSource(myConn.getOriginConnectable(), startingElementUID, myConn.getOriginUid()) ||
 				checkIfConnectionIsConnectedToGndVoltageSource(myConn.getDestConnectable(), startingElementUID, myConn.getDestinationUid())) {
 
-				if (myConn.getDestConnectable() == "Connector" || myConn.getOriginConnectable() == "Connector")
-				{
-					myConn.setNodeNumber("0");
-					connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
-					connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
-				}
-				continue;
+				myConn.setNodeNumber("0");
+				connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestConnectable() }] = myConn.getNodeNumber();
+				connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
+				it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
+				it->second.addConnection(myConn.getDestConnectable(), myConn.getDestinationUid(), myConn);				
 			}
-			
 		}
 
-
-		// Here i check if connection already exists
-		if (checkIfElementOrConnectionVisited(visitedElements, connection))
+		// Check the case if the connection is connected to a connector 
+		if (appInstance->extractStringAfterDelimiter(myConn.getDestConnectable(), '/', 2).find("Connector") != std::string::npos && myConn.getDestinationUid() != element->getEntityID() ||
+			appInstance->extractStringAfterDelimiter(myConn.getOriginConnectable(), '/', 2).find("Connector") != std::string::npos && myConn.getOriginUid() != element->getEntityID())
 		{
-			continue;
+
+			ot::UID nextElementUID;
+			if (myConn.getOriginUid() == elementUID) {
+				nextElementUID = myConn.getDestinationUid();
+			}
+			else {
+				nextElementUID = myConn.getOriginUid();
+			}
+
+			// Now i deal with the connectors means that i give all connections of the connector the same nodeNumber and search if the connector is connected to another connector
+			//Meaning i go through and give all in row placed connectors the same nodeNumbers
+			handleWithConnectors(nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+
+
+			connectionAlgorithmWithGNDVoltageSource(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 		}
+		else
+		{
 
+			// Here i check if connection already exists
+			if (checkIfElementOrConnectionVisited(visitedElements, connection))
+			{
+				ot::UID nextElementUID;
+				if (myConn.getOriginUid() == elementUID) {
+					nextElementUID = myConn.getDestinationUid();
+				}
+				else {
+					nextElementUID = myConn.getOriginUid();
+				}
 
-		setNodeNumbersWithGNDVoltageSource(myConn, startingElementUID);
+				connectionAlgorithmWithGNDVoltageSource(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+			}
+			else {
+				setNodeNumbers(myConn);
 
-		it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
-		it->second.addConnection(myConn.getDestConnectable(), myConn.getDestinationUid(), myConn);
+				it->second.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
+				it->second.addConnection(myConn.getDestConnectable(), myConn.getDestinationUid(), myConn);
 
-		// Recursive call to explore the next element
-		ot::UID nextElementUID;
-		if (myConn.getOriginUid() == elementUID) {
-			nextElementUID = myConn.getDestinationUid();
+				// Recursive call to explore the next element
+				ot::UID nextElementUID;
+				if (myConn.getOriginUid() == elementUID) {
+					nextElementUID = myConn.getDestinationUid();
+				}
+				else {
+					nextElementUID = myConn.getOriginUid();
+				}
+				connectionAlgorithmWithGNDVoltageSource(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+			}
 		}
-		else {
-			nextElementUID = myConn.getOriginUid();
-		}
-
-		connectionAlgorithmWithGNDVoltageSource(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 	}
 
 }
@@ -425,8 +464,14 @@ void NGSpice::setNodeNumbersOfVoltageSource(std::string startingElement, int cou
 		connectionsToBeSet.push_back(myConn);
 	}
 
-	Connection myConn = connectionsToBeSet[0];
+	if (connectionsToBeSet.empty())
+	{
+		OT_LOG_E("No connections to be set!");
+		return;
+	}
 
+	Connection myConn = connectionsToBeSet[0];
+	
 	if (checkIfConnectionIsConnectedToGndVoltageSource(myConn.getOriginConnectable(), startingElementUID, myConn.getOriginUid()) ||
 		checkIfConnectionIsConnectedToGndVoltageSource(myConn.getDestConnectable(), startingElementUID, myConn.getDestinationUid()))
 	{
@@ -957,7 +1002,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	
 	//Now i create for every Current Meter a resistor with Zero Ohm to measure the current through it
 
-
+	std::vector<std::string> tempVecOfShunts;
 	for (auto nodes : nodesOfCurrentMeter)
 	{
 		std::string nodeString = "";
@@ -969,15 +1014,10 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		std::ostringstream oss;
 		std::string name = nameOfRShunts.front();
 		oss << "circbyline " << name << " " << nodeString << "0";
-		/*nameOfRShunts.erase(nameOfRShunts.begin());*/
+		tempVecOfShunts.push_back(name);
+		nameOfRShunts.erase(nameOfRShunts.begin());
 		std::string temp = oss.str();
 		ngSpice_Command(const_cast<char*>(temp.c_str()));
-	
-	}
-
-		
-	for (auto name : namesOfCurrentMeter)
-	{
 	
 	}
 
@@ -1006,7 +1046,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	
 	// Here i create a probe for every Shunt resistor
-	for (auto name : nameOfRShunts)
+	for (auto name : tempVecOfShunts)
 	{
 		std::ostringstream oss;
 		oss << "circbyline .probe I(" << name << ")";
