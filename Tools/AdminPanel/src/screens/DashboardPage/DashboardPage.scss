@@ -1,0 +1,39 @@
+@import './GlobalServices.scss';
+
+$primary-color: #3498db;
+$background-color: #f4f4f4;
+$font-color: #333;
+$box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: $background-color;
+    color: $font-color;
+}
+
+.dashboardPage {
+    margin-top: 5%;
+    display: flex;
+
+    .container {
+        width: 100%;
+        padding: 20px;
+        background-color: white;
+        box-shadow: $box-shadow;
+
+        h2 {
+            color: $primary-color;
+            border-bottom: 2px solid $primary-color;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        // .dashboardContainer {
+        //     display: grid;
+        //     grid-template-columns: auto auto;
+        //     /* Zwei Spalten */
+        //     gap: 20px;
+        //     /* Abstand zwischen den Grid-Elementen */
+        // }
+    }
+}

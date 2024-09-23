@@ -1,0 +1,57 @@
+$primary-color: #3498db;
+$secondary-color: #2ecc71;
+$box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 20px;
+}
+
+.service-item {
+    grid-column: span 2;
+}
+
+.grid-item {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: $box-shadow;
+
+    h3 {
+        margin-top: 0;
+        text-align: center;
+        color: $secondary-color;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+
+        li {
+            display: flex;
+            // justify-content: space-between;
+            align-items: center;
+
+            button {
+                background-color: $primary-color;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+
+                &:hover {
+                    background-color: darken($primary-color, 10%);
+                }
+            }
+        }
+    }
+}
+
+.usage-icon {
+    grid-row: span 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
