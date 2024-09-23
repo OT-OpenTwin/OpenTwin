@@ -10,6 +10,7 @@ import Card from "../../components/Card/Card";
 import userIcon from "../../resources/icons/users-icon.png";
 import groupIcon from "../../resources/icons/groups-icon.png";
 import projectIcon from "../../resources/icons/project-icon.png";
+import dashboardIcon from "../../resources/icons/dashboard-icon.png";
 
 import GetAllUserCount from "../../services/api/AuthorisationService/UserActions/GetAllUserCount";
 import GetAllGroupCount from "../../services/api/AuthorisationService/GroupActions/GetAllGroupCount";
@@ -83,6 +84,16 @@ const LandingPage = () => {
             number={numberOfProjects}
             linkTo={t("landingPage:projectButton")}
             icon={projectIcon}
+          />
+        </Link>
+      </div>
+      <div className="homeContainer">
+        <Link to="/dashboard" style={{ textDecoration: "none" }}>
+          <Card
+            title="Dashboard"
+            number="WIP"
+            linkTo={t("landingPage:projectButton")}
+            icon={dashboardIcon}
           />
         </Link>
       </div>
