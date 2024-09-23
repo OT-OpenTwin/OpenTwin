@@ -39,32 +39,20 @@ ot::GraphicsView::~GraphicsView() {
 // ########################################################################################################
 
 void ot::GraphicsView::resetView(void) {
-	QGraphicsScene* s = scene();
-	if (s == nullptr) return;
-	QRectF boundingRect = s->itemsBoundingRect().marginsAdded(m_sceneMargins);
+	OTAssertNullptr(m_scene);
+	QRectF boundingRect = m_scene->itemsBoundingRect().marginsAdded(m_sceneMargins);
 	if (m_viewFlags & ViewManagesSceneRect) {
-		this->setSceneRect(boundingRect);
+		this->setSceneRect(boundingRect.marginsAdded(m_sceneMargins));
 	}
-	this->fitInView(boundingRect, Qt::AspectRatioMode::KeepAspectRatio);
-	this->centerOn(boundingRect.center());
-}
 
-void ot::GraphicsView::fitInCurrentView(void) {
-	QGraphicsScene* s = scene();
-	if (s == nullptr) return;
-	QRectF boundingRect = s->itemsBoundingRect();
-	if (m_viewFlags & ViewManagesSceneRect) {
-		this->setSceneRect(m_scene->itemsBoundingRect().marginsAdded(QMargins(100, 100, 100, 100)));
-	}
 	this->fitInView(boundingRect, Qt::AspectRatioMode::KeepAspectRatio);
 	this->centerOn(boundingRect.center());
 }
 
 void ot::GraphicsView::viewAll(void) {
-	QGraphicsScene* s = scene();
-	if (s == nullptr) return;
-	QRectF boundingRect = mapFromScene(s->itemsBoundingRect()).boundingRect();
-	QRect viewPortRect = viewport()->rect().marginsRemoved(m_sceneMargins.toMargins());
+	OTAssertNullptr(m_scene);
+	QRectF boundingRect = this->mapFromScene(m_scene->itemsBoundingRect()).boundingRect();
+	QRect viewPortRect = this->viewport()->rect().marginsRemoved(m_sceneMargins.toMargins());
 
 	if (viewPortRect.width() > boundingRect.width() && viewPortRect.height() > boundingRect.height())
 	{

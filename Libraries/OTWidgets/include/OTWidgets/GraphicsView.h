@@ -59,7 +59,6 @@ namespace ot {
 		virtual QWidget* getQWidget(void) override { return this; };
 
 		void resetView(void);
-		void fitInCurrentView(void);
 		void viewAll(void);
 
 		void setMouseWheelEnabled(bool _enabled) { m_wheelEnabled = _enabled; };

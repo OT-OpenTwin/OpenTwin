@@ -28,6 +28,7 @@
     <ClCompile Include="src\ColorStyleValue.cpp" />
     <ClCompile Include="src\ComboBox.cpp" />
     <ClCompile Include="src\ComboButton.cpp" />
+    <ClCompile Include="src\CreateProjectDialog.cpp" />
     <ClCompile Include="src\CustomGraphicsItem.cpp" />
     <ClCompile Include="src\Dialog.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
@@ -162,6 +163,7 @@
     <QtMoc Include="include\OTWidgets\GlobalColorStyle.h" />
     <ClInclude Include="include\OTWidgets\ComboBox.h" />
     <QtMoc Include="include\OTWidgets\FilePathEdit.h" />
+    <QtMoc Include="include\OTWidgets\CreateProjectDialog.h" />
     <ClInclude Include="include\OTWidgets\GraphicsArcItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsElement.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h" />

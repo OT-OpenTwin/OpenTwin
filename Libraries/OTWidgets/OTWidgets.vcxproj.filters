@@ -322,6 +322,9 @@
     <ClCompile Include="src\VersionGraphManager.cpp">
       <Filter>src\Version</Filter>
     </ClCompile>
+    <ClCompile Include="src\CreateProjectDialog.cpp">
+      <Filter>src\Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -732,6 +735,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\VersionGraphManager.h">
       <Filter>include\Version</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\CreateProjectDialog.h">
+      <Filter>include\Dialogs</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>
