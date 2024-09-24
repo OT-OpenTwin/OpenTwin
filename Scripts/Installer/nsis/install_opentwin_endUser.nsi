@@ -552,7 +552,7 @@ FunctionEnd
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT" "$lss_entry"
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT" "$gds_entry"
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT" "$lds_entry"
-			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS" "tls@$NetworkModeSelection:$MONGODB_CUSTOM_PORT"
+			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS" "$NetworkModeSelection:$MONGODB_CUSTOM_PORT"
 		Goto EndCheck
 				
 		customPortRadioBtnChecked:
@@ -627,7 +627,7 @@ FunctionEnd
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT" "$lss_entry"
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT" "$gds_entry"
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT" "$lds_entry"
-				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS" "tls@$NetworkModeSelection:$MONGODB_CUSTOM_PORT"
+				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS" "$NetworkModeSelection:$MONGODB_CUSTOM_PORT"
 
 		EndCheck:	
 
