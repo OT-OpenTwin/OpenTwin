@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{60409ac3-d79b-4c1f-90eb-69bedafff8bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{0e7890ed-9359-4517-92a7-384b7efea974}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\FileWriter.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MongoDBInstaller.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MongoDBServerRunner.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MongoDBSettingsParser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MongoDBShellExecutor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MongoDBUpgrader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SharedResources.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WindowsServiceManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WindowsUtilityFuctions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\FileWriter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MongoDBInstaller.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MongoDBServerRunner.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MongoDBSettings.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MongoDBSettingsParser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MongoDBShellExecutor.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MongoDBUpgrader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SharedResources.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WindowsServiceManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WindowsUtilityFuctions.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
