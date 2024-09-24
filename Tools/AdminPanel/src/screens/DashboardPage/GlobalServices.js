@@ -1,8 +1,21 @@
+/**
+ * GlobalServices component renders details of global session and directory services
+ * along with CPU, memory usage, and available local services.
+ * 
+ * @component
+ * @param {object} props - The component props.
+ * @param {object} props.dataProvider - Data provider instance with service information.
+ * @param {function} props.openLocalServiceModal - Function to open modal for local service details.
+ * @returns {JSX.Element} - The rendered global services component.
+ * @author P. Barthel
+ */
+
 import './GlobalServices.scss';
 import SpeedIcon from '@mui/icons-material/Speed';
 import MemoryIcon from '@mui/icons-material/Memory';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 
+// Generate dummy local services for UI testing (currently unused)
 const generateDummyLocalServices = (count) => {
     const services = [];
     for (let i = 1; i <= count; i++) {
@@ -11,6 +24,7 @@ const generateDummyLocalServices = (count) => {
     return services;
 };
 
+// Component to render details of a specific global service
 const GlobalService = ({ serviceType, serviceData, openLocalServiceModal }) => (
     <div className="grid-item">
         <h3>Global {serviceType} Service</h3>
@@ -43,7 +57,7 @@ const GlobalService = ({ serviceType, serviceData, openLocalServiceModal }) => (
                     <FormatListNumberedIcon style={{ fontSize: '1.5em' }} />
                 </div>
                 <div className="grid-item">
-                    No. of active Services: <b>{serviceData["LocalServices"].length}</b>
+                    No. of active Services: <b>{serviceData["LocalServices"] ? serviceData["LocalServices"].length : 0}</b>
                 </div>
                 {serviceData["LocalServices"].map((service, index) => (
                     <li key={index} className="service-item">
@@ -53,19 +67,12 @@ const GlobalService = ({ serviceType, serviceData, openLocalServiceModal }) => (
                         <button className="service-details-button" style={{ marginLeft: '2em' }} onClick={() => openLocalServiceModal(service.URL)}>Show Details</button>
                     </li>
                 ))}
-                {/* {generateDummyLocalServices(4).map((service, index) => (
-                    <li key={index} className="service-item">
-                        <div className="grid-item">
-                            {service.URL}
-                        </div>
-                        <button className="service-details-button" style={{ marginLeft: '2em' }} onClick={() => openLocalServiceModal(service.URL)}>Show Details</button>
-                    </li>
-                ))} */}
             </div>
         </ul>
     </div>
 );
 
+// Main component to render both global session and directory services
 const GlobalServices = ({ dataProvider, openLocalServiceModal }) => (
     <div className="grid-container">
         <GlobalService

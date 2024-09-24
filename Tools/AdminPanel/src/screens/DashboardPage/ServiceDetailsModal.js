@@ -1,3 +1,16 @@
+/**
+ * ServiceDetailsModal component displays detailed information about a specific service,
+ * such as CPU, memory usage, and service type.
+ * 
+ * @component
+ * @param {object} props - The component props.
+ * @param {boolean} props.isOpen - Determines if the modal is open.
+ * @param {function} props.onRequestClose - Function to close the modal.
+ * @param {object} props.serviceDetails - Detailed information of the service.
+ * @returns {JSX.Element} - The rendered ServiceDetailsModal component.
+ * @author P. Barthel
+ */
+
 import React from 'react';
 import Modal from 'react-modal';
 import './ServiceDetailsModal.scss';

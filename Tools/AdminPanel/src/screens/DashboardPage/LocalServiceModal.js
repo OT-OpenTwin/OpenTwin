@@ -1,3 +1,18 @@
+/**
+ * LocalSessionServiceModal component manages the modal that displays
+ * detailed information about local session services.
+ * 
+ * @component
+ * @param {object} props - The component props.
+ * @param {boolean} props.isOpen - Determines if the modal is open.
+ * @param {function} props.onRequestClose - Function to close the modal.
+ * @param {object} props.modalContent - The content to display in the modal.
+ * @param {function} props.fetchServiceDetails - Function to fetch detailed service information.
+ * @param {object} props.serviceDetails - The details of a specific service to display in a sub-modal.
+ * @returns {JSX.Element} - The rendered LocalSessionServiceModal component.
+ * @author P. Barthel
+ */
+
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 import ServiceDetailsModal from './ServiceDetailsModal';
@@ -6,32 +21,38 @@ import './LocalServiceModal.scss';
 Modal.setAppElement('#root');
 
 const LocalSessionServiceModal = ({ isOpen, onRequestClose, modalContent, fetchServiceDetails, serviceDetails }) => {
-    const [detailsModalIsOpen, setDetailsModalIsOpen] = useState(false);
-    const [expandedSession, setExpandedSession] = useState(null);
-    const [filterText, setFilterText] = useState('');
-    const [sortAscending, setSortAscending] = useState(true);
+    const [detailsModalIsOpen, setDetailsModalIsOpen] = useState(false); // State to manage sub-modal for service details
+    const [expandedSession, setExpandedSession] = useState(null); // State to track which session is expanded
+    const [filterText, setFilterText] = useState(''); // State to manage session filtering
+    const [sortAscending, setSortAscending] = useState(true); // State to toggle sort order
 
+    // Open the details modal and fetch additional service information
     const openDetailsModal = async (url) => {
         await fetchServiceDetails(url);
         setDetailsModalIsOpen(true);
     };
 
+    // Close the service details modal
     const closeDetailsModal = () => {
         setDetailsModalIsOpen(false);
     };
 
+    // Toggle session expansion to show or hide details
     const toggleSession = (sessionId) => {
         setExpandedSession(expandedSession === sessionId ? null : sessionId);
     };
 
+    // Handle filter text input change
     const handleFilterChange = (e) => {
         setFilterText(e.target.value);
     };
 
+    // Toggle sort order between ascending and descending
     const handleSortToggle = () => {
         setSortAscending(!sortAscending);
     };
 
+    // Filter and sort sessions based on user input
     const filteredSessions = modalContent && modalContent["Session.List"]
         ? modalContent["Session.List"]
             .filter(session => session["Session.ID"].toLowerCase().includes(filterText.toLowerCase()))
@@ -86,7 +107,7 @@ const LocalSessionServiceModal = ({ isOpen, onRequestClose, modalContent, fetchS
                                     <h4 onClick={() => toggleSession(session["Session.ID"])}>Session ID: {session["Session.ID"]}</h4>
                                     {expandedSession === session["Session.ID"] && (
                                         <div>
-                                            <p>No. of active Services: {session["Session.Services"].length}</p>
+                                            <p>No. of active Services: {session["Session.Services"] ? session["Session.Services"].length : 0}</p>
                                             <ul>
                                                 {session["Session.Services"].map((service, idx) => (
                                                     <li className='session-service' key={idx}>
