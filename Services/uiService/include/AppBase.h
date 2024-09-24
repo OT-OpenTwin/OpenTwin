@@ -9,7 +9,7 @@
 
 // Frontend header
 #include "uiServiceTypes.h"				// Model and View types
-#include "welcomeScreen.h"
+#include "OldWelcomeScreen.h"
 #include "LoginData.h"
 
 // AK header

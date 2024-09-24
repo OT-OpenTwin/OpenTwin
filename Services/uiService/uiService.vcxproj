@@ -56,7 +56,7 @@
     <ClCompile Include="src\UserSettings.cpp" />
     <ClCompile Include="src\ViewerComponent.cpp" />
     <ClCompile Include="src\WebsocketClient.cpp" />
-    <ClCompile Include="src\welcomeScreen.cpp" />
+    <ClCompile Include="src\OldWelcomeScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(BASE64_ROOT)\base64.h" />
@@ -79,7 +79,7 @@
     <QtMoc Include="include\SelectEntitiesDialog.h" />
     <ClInclude Include="include\ServiceDataUi.h" />
     <ClInclude Include="include\ToolBar.h" />
-    <QtMoc Include="include\welcomeScreen.h" />
+    <QtMoc Include="include\OldWelcomeScreen.h" />
     <ClInclude Include="include\ProjectManagement.h" />
     <ClInclude Include="include\UiPluginComponent.h" />
     <ClInclude Include="include\UiPluginManager.h" />

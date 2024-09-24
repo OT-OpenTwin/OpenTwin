@@ -63,7 +63,7 @@
     <ClCompile Include="src\ProjectManagement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\welcomeScreen.cpp">
+    <ClCompile Include="src\OldWelcomeScreen.cpp">
       <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
     <ClCompile Include="src\ExternalServicesComponent.cpp">
@@ -193,7 +193,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\welcomeScreen.h">
+    <QtMoc Include="include\OldWelcomeScreen.h">
       <Filter>Header Files\CustomWidgets</Filter>
     </QtMoc>
     <QtMoc Include="include\ExternalServicesComponent.h">

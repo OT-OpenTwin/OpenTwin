@@ -7,7 +7,7 @@
  */
 
 // uiService header
-#include "welcomeScreen.h"				// Corresponding header
+#include "OldWelcomeScreen.h"				// Corresponding header
 #include "ProjectManagement.h"
 #include "UserManagement.h"
 #include "ManageOwner.h"

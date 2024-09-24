@@ -9,7 +9,7 @@
 #include <qobject.h>
 #include <qtablewidget.h>
 
-#include "welcomeScreen.h"
+#include "OldWelcomeScreen.h"
 
 
 class QVBoxLayout;
