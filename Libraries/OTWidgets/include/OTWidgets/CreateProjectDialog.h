@@ -9,19 +9,46 @@
 #include "OTCore/ProjectTemplateInformation.h"
 #include "OTWidgets/Dialog.h"
 
+// std header
+#include <list>
+
+class QListWidget;
+
 namespace ot {
 
-	class CreateProjectDialog : public Dialog {
+	class Label;
+	class LineEdit;
+	class PushButton;
+
+	class OT_WIDGETS_API_EXPORT CreateProjectDialog : public Dialog {
 		Q_OBJECT
 		OT_DECL_NOCOPY(CreateProjectDialog)
 	public:
-		CreateProjectDialog();
+		CreateProjectDialog(QWidget* _parentWidget = (QWidget*)nullptr);
 		virtual ~CreateProjectDialog();
 
+		void setProjectTemplates(const std::list<ProjectTemplateInformation>& _templates);
 
+	Q_SIGNALS:
+		void createProject(const QString& _projectName, const QString& _projectTemplate);
+
+	private Q_SLOTS:
+		void slotShowInfo(void);
+		void slotSearch(void);
+		void slotCreate(void);
+		void slotCheckCreateEnabledState(void);
 
 	private:
+		bool isDataValid(void) const;
+		void clear(void);
+		void addListEntry(const ProjectTemplateInformation& _info);
 
+		QListWidget* m_list;
+		Label* m_info;
+
+		LineEdit* m_search;
+		LineEdit* m_name;
+		PushButton* m_createButton;
 	};
 
 }
