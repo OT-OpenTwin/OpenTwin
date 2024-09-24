@@ -70,6 +70,7 @@
 #include "OTWidgets/GraphicsItemLoader.h"
 #include "OTWidgets/GraphicsPickerView.h"
 #include "OTWidgets/PropertyInputDouble.h"
+#include "OTWidgets/CreateProjectDialog.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/PropertyInputStringList.h"
 
@@ -448,7 +449,7 @@ bool AppBase::createNewProjectInDatabase(
 	ProjectManagement pManager(m_loginData);
 
 	assert(pManager.InitializeConnection()); // Failed to connect
-	return pManager.createProject(_projectName.toStdString(), _projectType.toStdString(), m_loginData.getUserName(), "");
+	return pManager.createProject(_projectName.toStdString(), _projectType.toStdString(), m_loginData.getUserName());
 }
 
 void AppBase::lockSelectionAndModification(bool flag)
@@ -514,98 +515,87 @@ void AppBase::welcomeScreenEventCallback(
 	case welcomeScreen::event_createClicked:
 	{
 		std::string currentName = m_welcomeScreen->getProjectName().toStdString();
-		if (currentName.length() > 0) 
-		{
-			// Check if any changes were made to the current project. Will receive a false if the user presses cancel
-			if (!checkForContinue("Create New Project")) { return; }
+		// Check if any changes were made to the current project. Will receive a false if the user presses cancel
+		if (!checkForContinue("Create New Project")) { return; }
 
-			// Check whether the project is currently opened in other instance of the ui
-			if (currentName != m_currentProjectName)
-			{
-				// We have not currently opened this project, check if it is opened elsewhere
-				std::string projectUser;
-				if (m_ExternalServicesComponent->projectIsOpened(currentName, projectUser))
-				{
-					QString msg("The project with the name \"");
-					msg.append(currentName.c_str());
-					msg.append("\" does already exist and is currently opened by user: \"");
-					msg.append(projectUser.c_str());
-					msg.append("\".");
-					uiAPI::promptDialog::show(msg, "Create New Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
-					return;
-				}
-			}
-
-			bool projectExists = false;
-			bool canBeDeleted = false;
-			if (pManager.projectExists(currentName, canBeDeleted))
-			{
-				if (!canBeDeleted)
-				{
-					// Notify that the project already exists and can not be deleted
-					QString msg{ "A project with the name \"" };
-					msg.append(currentName.c_str()).append("\" does already exist and belongs to another owner.");
-					ak::uiAPI::promptDialog::show(msg, "Create New Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
-					return;
-				}
-
-				QString msg("A project with the name \"");
+		// Check whether the project is currently opened in other instance of the ui
+		if (currentName != m_currentProjectName) {
+			// We have not currently opened this project, check if it is opened elsewhere
+			std::string projectUser;
+			if (m_ExternalServicesComponent->projectIsOpened(currentName, projectUser)) {
+				QString msg("The project with the name \"");
 				msg.append(currentName.c_str());
-				msg.append("\" does already exist. Do you want to overwrite it?\nThis cannot be undone.");
-				if (dialogResult::resultYes != uiAPI::promptDialog::show(msg, "Create New Project", promptYesNoIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow()))
-				{
-					return;
-				}
-
-				projectExists = true;
+				msg.append("\" does already exist and is currently opened by user: \"");
+				msg.append(projectUser.c_str());
+				msg.append("\".");
+				uiAPI::promptDialog::show(msg, "Create New Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+				return;
 			}
+		}
 
-			// get List of available project types
-			std::list<std::string> projectTypes = m_ExternalServicesComponent->getListOfProjectTypes();
-
-			createNewProjectDialog newProject;
-
-			newProject.setListOfProjectTypes(projectTypes);
-			newProject.setProjectName(m_welcomeScreen->getProjectName());
-			newProject.setTemplateList(pManager.getDefaultTemplateList());
-			newProject.exec();
-
-			if (!newProject.wasConfirmed())
-			{
+		bool projectExists = false;
+		bool canBeDeleted = false;
+		if (pManager.projectExists(currentName, canBeDeleted)) {
+			if (!canBeDeleted) {
+				// Notify that the project already exists and can not be deleted
+				QString msg{ "A project with the name \"" };
+				msg.append(currentName.c_str()).append("\" does already exist and belongs to another owner.");
+				ak::uiAPI::promptDialog::show(msg, "Create New Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
 				return;
 			}
 
-			std::string projectType = newProject.getProjectType();
-			std::string templateName = newProject.getTemplateName();
-
-			if (projectExists) 
-			{
-				// Check if the project it the same project as the currently open one
-				if (currentName == m_currentProjectName) { 
-					m_ExternalServicesComponent->closeProject(false);
-					m_state &= (~ProjectOpenState);
-				}
-
-				// Delete Project
-				pManager.deleteProject(currentName);
-				m_welcomeScreen->refreshList();
+			QString msg("A project with the name \"");
+			msg.append(currentName.c_str());
+			msg.append("\" does already exist. Do you want to overwrite it?\nThis cannot be undone.");
+			if (dialogResult::resultYes != uiAPI::promptDialog::show(msg, "Create New Project", promptYesNoIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow())) {
+				return;
 			}
 
-			pManager.createProject(currentName, projectType, m_loginData.getUserName(), templateName);
+			projectExists = true;
+		}
 
-			UserManagement manager(m_loginData);
-			assert(manager.checkConnection()); // Failed to connect
-			manager.addRecentProject(currentName);
+		ot::CreateProjectDialog newProjectDialog(this->mainWindow());
+		newProjectDialog.setProjectTemplates(m_ExternalServicesComponent->getListOfProjectTemplates());
+		newProjectDialog.setCurrentProjectName(m_welcomeScreen->getProjectName());
+		this->connect(&newProjectDialog, &ot::CreateProjectDialog::createProject, &newProjectDialog, &ot::CreateProjectDialog::closeOk);
 
-			// Perform open project
-			if (m_currentProjectName.length() > 0) {
+		ot::Dialog::DialogResult result = newProjectDialog.showDialog();
+
+		this->disconnect(&newProjectDialog, &ot::CreateProjectDialog::createProject, &newProjectDialog, &ot::CreateProjectDialog::closeOk);
+
+		if (result != ot::Dialog::Ok) {
+			return;
+		}
+
+		currentName = newProjectDialog.getProjectName().toStdString();
+		std::string projectType = newProjectDialog.getProjectType().toStdString();
+
+		if (projectExists) {
+			// Check if the project it the same project as the currently open one
+			if (currentName == m_currentProjectName) {
 				m_ExternalServicesComponent->closeProject(false);
 				m_state &= (~ProjectOpenState);
 			}
 
-			m_ExternalServicesComponent->openProject(currentName, projectType, pManager.getProjectCollection(currentName));
-			m_state |= ProjectOpenState;
+			// Delete Project
+			pManager.deleteProject(currentName);
+			m_welcomeScreen->refreshList();
 		}
+
+		pManager.createProject(currentName, projectType, m_loginData.getUserName());
+
+		UserManagement manager(m_loginData);
+		assert(manager.checkConnection()); // Failed to connect
+		manager.addRecentProject(currentName);
+
+		// Perform open project
+		if (m_currentProjectName.length() > 0) {
+			m_ExternalServicesComponent->closeProject(false);
+			m_state &= (~ProjectOpenState);
+		}
+
+		m_ExternalServicesComponent->openProject(currentName, projectType, pManager.getProjectCollection(currentName));
+		m_state |= ProjectOpenState;
 	}
 	break;
 	case welcomeScreen::event_openClicked:

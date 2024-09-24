@@ -32,7 +32,7 @@
 #define OT_ACTION_CMD_StartNewServices "Service.Start.Multiple"
 #define OT_ACTION_CMD_StartNewRelayService "Service.Start.Relay"
 #define OT_ACTION_CMD_CreateNewSession "Session.New"
-#define OT_ACTION_CMD_GetListOfProjectTypes "Session.GetTypes"
+#define OT_ACTION_CMD_GetListOfProjectTemplates "GetProjectTemplates"
 #define OT_ACTION_CMD_IsProjectOpen "Check.ProjectOpen"
 #define OT_ACTION_CMD_SendBroadcastMessage "Broadcast"
 #define OT_ACTION_CMD_RegisterNewSessionService "SessionService.New"

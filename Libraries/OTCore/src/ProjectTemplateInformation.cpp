@@ -42,5 +42,5 @@ void ot::ProjectTemplateInformation::setFromJsonObject(const ot::ConstJsonObject
 	m_name = json::getString(_object, "Name");
 	m_description = json::getString(_object, "Description");
 	m_iconSubPath = json::getString(_object, "IconSubPath");
-	m_name = json::getBool(_object, "IsDefault");
+	m_isDefault = json::getBool(_object, "IsDefault");
 }

@@ -64,7 +64,7 @@ void ProjectManagement::setAuthServerURL(const std::string &url)
 	authServerURL = url;
 }
 
-bool ProjectManagement::createProject(const std::string &projectName, const std::string& projectType, const std::string &userName, const std::string &defaultSettingTemplate)
+bool ProjectManagement::createProject(const std::string& _projectName, const std::string& _projectTemplate, const std::string& _userName)
 {
 	assert(!authServerURL.empty());
 
@@ -74,8 +74,8 @@ bool ProjectManagement::createProject(const std::string &projectName, const std:
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CREATE_PROJECT, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_TYPE, ot::JsonString(projectType, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(_projectName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_TYPE, ot::JsonString(_projectTemplate, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
@@ -96,7 +96,7 @@ bool ProjectManagement::createProject(const std::string &projectName, const std:
 	{
 	}
 
-	return createNewCollection(collectionName, defaultSettingTemplate);
+	return createNewCollection(collectionName, _projectTemplate);
 }
 
 bool ProjectManagement::deleteProject(const std::string &projectName)
@@ -483,7 +483,7 @@ bool ProjectManagement::copyProject(const std::string &sourceProjectName, const 
 	std::string sourceProjectType = getProjectType(sourceProjectName);
 
 	// Create a new project with the given name and the same type as the source project
-	if (!createProject(destinationProjectName, sourceProjectType, userName, "")) return false;
+	if (!createProject(destinationProjectName, sourceProjectType, userName)) return false;
 
 	// Now get the collection names of the source and destination projects
 	std::string sourceProjectCollection = getProjectCollection(sourceProjectName);
@@ -703,7 +703,7 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 			projectType = buffer;
 		}
 
-		if (!createProject(projectName, projectType, userName, std::string(""))) return "Unable to create the new project: " + projectName;
+		if (!createProject(projectName, projectType, userName)) return "Unable to create the new project: " + projectName;
 
 		// Now get the collection
 		// Get the project collection

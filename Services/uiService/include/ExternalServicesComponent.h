@@ -41,6 +41,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/BasicServiceInformation.h"
+#include "OTCore/ProjectTemplateInformation.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
@@ -157,7 +158,7 @@ public:
 
 	// Project handling
 
-	std::list<std::string> getListOfProjectTypes(void);
+	std::list<ot::ProjectTemplateInformation> getListOfProjectTemplates(void);
 	void openProject(const std::string & projectName, const std::string& projectType, const std::string & collectionName);
 	void closeProject(bool saveChanges);
 	void saveProject();

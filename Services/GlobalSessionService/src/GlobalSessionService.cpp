@@ -11,6 +11,7 @@
 // OpenTwin header
 #include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
+#include "OTCore/ProjectTemplateInformation.h"
 #include "OTCommunication/Msg.h"
 
 // std header
@@ -157,6 +158,52 @@ std::string GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument& _doc)
 		m_mapMutex.unlock();
 		return it->second->getSessionById(projectName)->userName();
 	}
+}
+
+std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument& _doc) {
+	ot::JsonDocument result(rapidjson::kArrayType);
+
+	ot::ProjectTemplateInformation default3D;
+	default3D.setName(OT_ACTION_PARAM_SESSIONTYPE_3DSIM);
+	default3D.setDescription("3D Simulation project.\nCreate, import, export and modify 3D geometries. Run simulations.");
+	default3D.setIconSubPath("ProjectTemplates/3D.png");
+	default3D.setIsDefault(true);
+
+	ot::JsonObject obj3D;
+	default3D.addToJsonObject(obj3D, result.GetAllocator());
+	result.PushBack(obj3D, result.GetAllocator());
+
+	ot::ProjectTemplateInformation defaultPipeline;
+	defaultPipeline.setName(OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE);
+	defaultPipeline.setDescription("Data pipeline project.\nCreate automations.");
+	defaultPipeline.setIconSubPath("ProjectTemplates/Pipeline.png");
+	defaultPipeline.setIsDefault(true);
+
+	ot::JsonObject objPipeline;
+	defaultPipeline.addToJsonObject(objPipeline, result.GetAllocator());
+	result.PushBack(objPipeline, result.GetAllocator());
+
+	ot::ProjectTemplateInformation defaultCST;
+	defaultCST.setName(OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE);
+	defaultCST.setDescription("CST Studio Suite Project.\nImport and export projects from CST Studio Suite.");
+	defaultCST.setIconSubPath("ProjectTemplates/CST.png");
+	defaultCST.setIsDefault(true);
+
+	ot::JsonObject objCST;
+	defaultCST.addToJsonObject(objCST, result.GetAllocator());
+	result.PushBack(objCST, result.GetAllocator());
+
+	ot::ProjectTemplateInformation defaultDevelopment;
+	defaultDevelopment.setName(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT);
+	defaultDevelopment.setDescription("Development Project.\nRun all services provided by OpenTwin in one session.");
+	defaultDevelopment.setIconSubPath("ProjectTemplates/Development.png");
+	defaultDevelopment.setIsDefault(true);
+
+	ot::JsonObject objDev;
+	defaultDevelopment.addToJsonObject(objDev, result.GetAllocator());
+	result.PushBack(objDev, result.GetAllocator());
+
+	return result.toJson();
 }
 
 std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {

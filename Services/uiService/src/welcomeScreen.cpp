@@ -116,7 +116,7 @@ welcomeScreen::welcomeScreen(
 	my_labelProjectName = new QLabel("Name:");
 	my_labelProjectName->setBuddy(my_editProjectName);
 	my_buttonCreate = new QPushButton("Create");
-	my_buttonCreate->setEnabled(false);
+	//my_buttonCreate->setEnabled(false);
 	my_tableOpenNew = new table(0, TABLE_DATA_COLUMN_COUNT);
 	my_tableOpenNew->verticalHeader()->setVisible(false);
 	my_tableOpenNew->horizontalHeader()->setSectionResizeMode(TABLE_DATA_INDEX_NAME, QHeaderView::ResizeMode::Stretch);
@@ -336,11 +336,11 @@ void welcomeScreen::slotProjectNameChanged(void) {
 	my_editProjectName->setPlaceholderText(EDIT_PLACEHOLDER_RECENTS);
 	if (txt.isEmpty()) {
 		refreshRecent();
-		my_buttonCreate->setEnabled(false);
+		//my_buttonCreate->setEnabled(false);
 	}
 	else {
 		refreshProjectNames();
-		my_buttonCreate->setEnabled(true);
+		//my_buttonCreate->setEnabled(true);
 	}
 }
 
@@ -999,143 +999,6 @@ void createNewAccountDialog::Close(void) {
 		my_confirmed = false;
 		return;
 	}
-	my_cancelClose = false;
-	Q_EMIT isClosing();
-	if (!my_cancelClose) { close(); }
-	else { my_confirmed = false; }
-}
-
-// #############################################################################################################
-
-createNewProjectDialog::createNewProjectDialog()
-	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_cancelClose{ false }, my_confirmed{ false }, my_input{ nullptr },
-	my_layout{ nullptr }, my_template{ nullptr }, my_layoutButtons{ nullptr }, my_widgetButtons{ nullptr }
-{
-	// Create controls
-	my_buttonCancel = new QPushButton{ "Cancel" };
-	my_buttonConfirm = new QPushButton{ "Create" };
-	my_input = new lineEdit;
-	my_input->setReadOnly(true);
-	my_label = new QLabel("New project name");
-	my_label->setBuddy(my_input);
-
-	my_types = new QComboBox;
-	my_label3 = new QLabel("Project type");
-	my_label3->setBuddy(my_types);
-
-	my_template = new QComboBox;
-	my_label2 = new QLabel("Default settings template");
-	my_label2->setBuddy(my_template);
-
-	// Create main layout
-	my_layout = new QVBoxLayout{ this };
-
-	// Create input layout
-	my_layout->addWidget(my_label);
-	my_layout->addWidget(my_input);
-
-	// Create template selection layout
-	my_layout->addWidget(my_label3);
-	my_layout->addWidget(my_types);
-
-	// Create template selection layout
-	my_layout->addWidget(my_label2);
-	my_layout->addWidget(my_template);
-
-	// Create button layout
-	my_widgetButtons = new QWidget;
-	my_layoutButtons = new QHBoxLayout{ my_widgetButtons };
-	my_layoutButtons->addWidget(my_buttonConfirm);
-	my_layoutButtons->addWidget(my_buttonCancel);
-	my_layout->addWidget(my_widgetButtons);
-
-	setWindowTitle("Create New Project");
-	setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
-
-	// Hide info button
-	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-
-	connect(my_input, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
-	connect(my_buttonCancel, SIGNAL(clicked()), this, SLOT(slotButtonCancelPressed()));
-	connect(my_buttonConfirm, SIGNAL(clicked()), this, SLOT(slotButtonConfirmPressed()));
-}
-
-void createNewProjectDialog::setProjectName(const QString &name)
-{ 
-	my_input->setText(name);
-}
-
-void createNewProjectDialog::setTemplateList(std::vector<std::string> templates)
-{
-	my_template->addItem("<None>");
-
-	for (auto item : templates)
-	{
-		my_template->addItem(item.c_str());
-	}
-
-	my_template->setEditText("<None>");
-}
-
-void createNewProjectDialog::setListOfProjectTypes(std::list<std::string>& projectTypes)
-{
-	my_types->addItem("Select project type...");
-
-	for (auto item : projectTypes)
-	{
-		my_types->addItem(item.c_str());
-	}
-
-	my_types->setEditText("Select project type...");
-}
-
-std::string createNewProjectDialog::getTemplateName(void)
-{
-	std::string templateName = my_template->currentText().toStdString();
-
-	if (templateName == "<None>") templateName.clear();
-
-	return templateName;
-}
-
-std::string createNewProjectDialog::getProjectType(void)
-{
-	std::string projectType = my_types->currentText().toStdString();
-
-	if (projectType == "Select project type...") projectType = OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT;
-
-	return projectType;
-}
-
-createNewProjectDialog::~createNewProjectDialog() {
-	delete my_buttonCancel;
-	delete my_buttonConfirm;
-	delete my_input;
-	delete my_template;
-	delete my_types;
-
-	delete my_layoutButtons;
-	delete my_widgetButtons;
-
-	delete my_layout;
-}
-
-void createNewProjectDialog::slotButtonConfirmPressed() { my_confirmed = true; Close(); }
-
-void createNewProjectDialog::slotButtonCancelPressed() { my_confirmed = false;  close(); }
-
-void createNewProjectDialog::slotReturnPressed() { my_confirmed = true; Close(); }
-
-void createNewProjectDialog::Close(void) {
-	if (my_input->text().length() == 0) { return; }
-
-	std::string projectType = my_types->currentText().toStdString();
-	if (projectType == "Select project type...") 
-	{ 
-		ak::uiAPI::promptDialog::show("Please specify a type for the new project.", "Create New Project", ak::promptOkIconLeft, "DialogError", "Default", this);
-		return; 
-	}
-
 	my_cancelClose = false;
 	Q_EMIT isClosing();
 	if (!my_cancelClose) { close(); }

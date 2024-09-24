@@ -411,29 +411,6 @@ std::string SessionService::handleGetGlobalServicesURL(ot::JsonDocument& _comman
 	return doc.toJson();
 }
 
-std::string SessionService::handleGetProjectTypes(ot::JsonDocument& _commandDoc) {
-#ifdef OT_USE_GSS
-	// The info message is only present if the request is done by the UI frontend upon startup
-	if (_commandDoc.HasMember(OT_ACTION_PARAM_MESSAGE)) {
-		if (ot::json::getString(_commandDoc, OT_ACTION_PARAM_MESSAGE) == OT_INFO_MESSAGE_LogIn) {
-			return OT_ACTION_RETURN_INDICATOR_Error "Invalid global session service URL";
-		}
-	}
-#endif // OT_USE_GSS
-
-	std::list<std::string> projectTypes;
-
-	for (auto type : m_mandatoryServicesMap)
-	{
-		projectTypes.push_back(type.first);
-	}
-
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_PARAM_SESSION_TYPE_LIST, ot::JsonArray(projectTypes, doc.GetAllocator()), doc.GetAllocator());
-
-	return doc.toJson();
-}
-
 std::string SessionService::handleGetMandatoryServices(ot::JsonDocument& _commandDoc) {
 	ot::JsonDocument doc;
 	doc.SetArray();

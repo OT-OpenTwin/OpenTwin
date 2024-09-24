@@ -24,15 +24,12 @@ ot::CreateProjectDialog::CreateProjectDialog(QWidget* _parentWidget)
 {
 	// Create layouts
 	QVBoxLayout* centralLayout = new QVBoxLayout(this);
-	QHBoxLayout* searchLayout = new QHBoxLayout;
 	QHBoxLayout* nameAndButtonLayout = new QHBoxLayout;
 
 	// Create controls
 	QSplitter* centralSplitter = new QSplitter(Qt::Horizontal);
 
-	Label* searchLabel = new Label("Search:");
 	m_search = new LineEdit;
-
 	m_list = new QListWidget;
 
 	QScrollArea* infoScrollArea = new QScrollArea;
@@ -49,18 +46,16 @@ ot::CreateProjectDialog::CreateProjectDialog(QWidget* _parentWidget)
 	PushButton* cancelButton = new PushButton("Cancel");
 
 	// Setup controls
-	m_createButton->setEnabled(false);
+	m_search->setPlaceholderText("Search...");
 	m_list->setIconSize(QSize(32, 32));
 	m_info->setMinimumWidth(100);
 	m_info->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+	m_createButton->setEnabled(false);
 
 	// Setup layouts
-	centralLayout->addLayout(searchLayout);
+	centralLayout->addWidget(m_search);
 	centralLayout->addWidget(centralSplitter);
 	centralLayout->addLayout(nameAndButtonLayout);
-
-	searchLayout->addWidget(searchLabel);
-	searchLayout->addWidget(m_search, 1);
 
 	centralSplitter->addWidget(m_list);
 	centralSplitter->addWidget(infoScrollArea);
@@ -118,6 +113,34 @@ void ot::CreateProjectDialog::setProjectTemplates(const std::list<ProjectTemplat
 	for (const ProjectTemplateInformation& info : defaultTemplates) {
 		this->addListEntry(info);
 	}
+}
+
+void ot::CreateProjectDialog::setCurrentProjectName(const QString& _name) {
+	m_name->setText(_name);
+}
+
+QString ot::CreateProjectDialog::getProjectType(void) const {
+	QList<QListWidgetItem*> items = m_list->selectedItems();
+	if (items.count() == 1) {
+		return items.front()->text();
+	}
+	else if (!items.isEmpty()) {
+		OT_LOG_E("Invalid selection");
+	}
+	return QString();
+}
+
+QString ot::CreateProjectDialog::getProjectName(void) const {
+	return m_name->text();
+}
+
+void ot::CreateProjectDialog::showEvent(QShowEvent* _event) {
+	QMetaObject::invokeMethod(this, &CreateProjectDialog::slotFocusName, Qt::QueuedConnection);
+	Dialog::showEvent(_event);
+}
+
+void ot::CreateProjectDialog::slotFocusName(void) {
+	m_name->setFocus();
 }
 
 void ot::CreateProjectDialog::slotShowInfo(void) {

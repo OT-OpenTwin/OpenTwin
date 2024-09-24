@@ -28,11 +28,19 @@ namespace ot {
 		virtual ~CreateProjectDialog();
 
 		void setProjectTemplates(const std::list<ProjectTemplateInformation>& _templates);
+		void setCurrentProjectName(const QString& _name);
+
+		QString getProjectType(void) const;
+		QString getProjectName(void) const;
+
+	protected:
+		virtual void showEvent(QShowEvent* _event) override;
 
 	Q_SIGNALS:
 		void createProject(const QString& _projectName, const QString& _projectTemplate);
 
 	private Q_SLOTS:
+		void slotFocusName(void);
 		void slotShowInfo(void);
 		void slotSearch(void);
 		void slotCreate(void);

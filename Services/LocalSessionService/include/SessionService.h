@@ -160,7 +160,6 @@ private:
 	OT_HANDLER(handleGetDBURL, SessionService, OT_ACTION_CMD_GetDatabaseUrl, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleGetAuthURL, SessionService, OT_ACTION_CMD_GetAuthorisationServerUrl, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleGetGlobalServicesURL, SessionService, OT_ACTION_CMD_GetGlobalServicesUrl, ot::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGetProjectTypes, SessionService, OT_ACTION_CMD_GetListOfProjectTypes, ot::ALL_MESSAGE_TYPES)
 
 	OT_HANDLER(handleGetSystemInformation, SessionService, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleGetMandatoryServices, SessionService, OT_ACTION_CMD_GetMandatoryServices, ot::SECURE_MESSAGE_TYPES)
