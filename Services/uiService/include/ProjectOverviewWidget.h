@@ -46,6 +46,7 @@ private Q_SLOTS:
 	void slotCheckedChanged(void);
 
 private:
+	QTableWidget* m_table;
 	int m_row;
 	bool m_ownerIsCreator;
 	ot::CheckBox* m_checkBox;
@@ -91,6 +92,8 @@ Q_SIGNALS:
 	void projectOwnerRequest(void);
 
 public Q_SLOTS:
+	void slotUpdateItemSelection(void);
+
 	void slotCreateProject(void);
 	void slotProjectDoubleClicked(int _row, int _column);
 	

@@ -35,12 +35,13 @@ enum TableColumn {
 };
 
 ProjectOverviewEntry::ProjectOverviewEntry(const QString& _projectName, const QString& _owner, bool _ownerIsCreator, QTableWidget* _table) 
-	: m_ownerIsCreator(_ownerIsCreator)
+	: m_ownerIsCreator(_ownerIsCreator), m_table(_table)
 {
 	m_row = _table->rowCount();
 	_table->insertRow(m_row);
 
 	m_checkBox = new ot::CheckBox;
+	m_checkBox->setFocusPolicy(Qt::NoFocus);
 	
 	m_nameItem = new QTableWidgetItem;
 	m_nameItem->setFlags(m_nameItem->flags() & ~Qt::ItemIsEditable);
@@ -70,8 +71,11 @@ QString ProjectOverviewEntry::getProjectName(void) const {
 }
 
 void ProjectOverviewEntry::slotCheckedChanged(void) {
+	bool isBlock = m_table->signalsBlocked();
+	m_table->blockSignals(true);
 	m_nameItem->setSelected(m_checkBox->isChecked());
 	m_ownerItem->setSelected(m_checkBox->isChecked());
+	m_table->blockSignals(isBlock);
 	Q_EMIT checkedChanged(m_row);
 }
 
@@ -140,6 +144,7 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 	// Connect signals
 	this->connect(m_filter, &ot::LineEdit::textChanged, this, &ProjectOverviewWidget::slotFilterChanged);
 	this->connect(m_table, &ot::Table::cellDoubleClicked, this, &ProjectOverviewWidget::slotProjectDoubleClicked);
+	this->connect(m_table, &ot::Table::itemSelectionChanged, this, &ProjectOverviewWidget::slotUpdateItemSelection);
 	this->connect(m_createButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotCreateProject);
 	this->connect(m_refreshButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotRefreshProjectList);
 	this->connect(m_toggleViewModeButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotToggleViewMode);
@@ -195,6 +200,23 @@ std::list<QString> ProjectOverviewWidget::getSelectedProjects(void) const {
 		}
 	}
 	return result;
+}
+
+void ProjectOverviewWidget::slotUpdateItemSelection(void) {
+	QList<QTableWidgetItem*> selection = m_table->selectedItems();
+	bool isBlock = m_table->signalsBlocked();
+	m_table->blockSignals(true);
+	
+	// Table to check box
+	for (int r = 0; r < m_table->rowCount(); r++) {
+		if (r >= m_entries.size()) {
+			OT_LOG_E("Data mismatch");
+			break;
+		}
+		m_entries[r]->setIsChecked(m_table->item(r, TableColumn::ColumnName)->isSelected() || m_table->item(r, TableColumn::ColumnOwner)->isSelected());
+	}
+
+	m_table->blockSignals(isBlock);
 }
 
 void ProjectOverviewWidget::slotCreateProject(void) {
