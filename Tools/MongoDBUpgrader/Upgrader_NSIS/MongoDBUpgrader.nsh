@@ -7,12 +7,12 @@ Var UPGRADER_MONGODB_SERVICE_NAME ; Needed for the execution of the upgrader
 Var UPGRADER_MONGODB_INSTALL_PATH ; Needed for the execution of the installer
 
 Function Upgrader_On_Init
-  nsExec::ExecToStack /OEM "$EXEDIR\MongoDBUpgrader.exe --MaxVersion"
+  nsExec::ExecToStack /OEM "$EXEDIR\MongoDBUpgradeManager.exe --MaxVersion"
   Pop $0
   Pop $1
   StrCpy $MONGODB_MAX_VERSION $1
   MessageBox MB_OK "Return: $0 Message: $1"  
-  nsExec::ExecToStack /OEM "$EXEDIR\MongoDBUpgrader.exe --Check"
+  nsExec::ExecToStack /OEM "$EXEDIR\MongoDBUpgradeManager.exe --Check"
   Pop $0
   Pop $1
  MessageBox MB_OK "Return: $0 Message: $1"  
@@ -41,7 +41,7 @@ Section "Upgrade data collection" Sec_Upgr
 	
 	Call BeforeUpgrade
   
-	nsExec::ExecToStack /OEM "$EXEDIR\MongoDBUpgrader.exe" "--Upgrade" "--Admin_Psw" "$UPGRADER_MONGODB_ADMIN_PASSWORD" "--ServiceName" "$UPGRADER_MONGODB_SERVICE_NAME"
+	nsExec::ExecToStack /OEM "$EXEDIR\MongoDBUpgradeManager.exe" "--Upgrade" "--Admin_Psw" "$UPGRADER_MONGODB_ADMIN_PASSWORD" "--ServiceName" "$UPGRADER_MONGODB_SERVICE_NAME"
 
 
 SectionEnd
@@ -50,7 +50,7 @@ Section "Install MongoDB version 7.0" Sec_Inst
 
 	ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$INSTDIR\MongoDB_Installer\mongodb-windows-x86_64-7.0.14-signed" INSTALLLOCATION="$UPGRADER_MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'
 	
-	nsExec::ExecToStack /OEM "$EXEDIR\MongoDBUpgrader.exe" "--SetMongoCfg" "--ServiceName" "$UPGRADER_MONGODB_SERVICE_NAME"
+	nsExec::ExecToStack /OEM "$EXEDIR\MongoDBUpgradeManager.exe" "--SetMongoCfg" "--ServiceName" "$UPGRADER_MONGODB_SERVICE_NAME"
 	
 SectionEnd
 SectionGroupEnd

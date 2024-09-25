@@ -54,12 +54,12 @@ IF "%2"=="BUILD" (
 
 IF %DEBUG%==1 (
 	ECHO %TYPE_NAME% DEBUG
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tools\MongoDBUpgrader\Upgrader_Exe\MongoDBUpgrader.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tools\MongoDBUpgrader\Upgrader_Exe\MongoDBUpgradeManager.vcxproj" %TYPE% "Debug|x64" /Out buildLog_Debug.txt
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE_NAME% RELEASE
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tools\MongoDBUpgrader\Upgrader_Exe\MongoDBUpgrader.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Tools\MongoDBUpgrader\Upgrader_Exe\MongoDBUpgradeManager.vcxproj" %TYPE% "Release|x64" /Out buildLog_Release.txt
 ) 
   
 GOTO END
