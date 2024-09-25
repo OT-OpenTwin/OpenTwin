@@ -84,6 +84,7 @@ void moveMongoCfg()
     std::string serverName = g_serviceName;
     WindowsServiceManager mongoService(serverName);
     const std::string binPath = mongoService.getMongoDBServerBinPath();
+    mongoService.startService();
 
     //Now we extract paths from the binPath
     MongoDBSettingsParser mongoSettingsParser(binPath);
@@ -99,6 +100,7 @@ void moveMongoCfg()
         std::filesystem::remove(destinationPath);
         std::filesystem::rename(cfgPath, destinationPath);
     }
+    mongoService.startService();
 }
 
 void performUpgrade(const std::string& _adminPsw)
