@@ -136,7 +136,7 @@ void ChamferEdges::performOperation(const std::string &selectionInfo)
 		geometryEntity->setManageChildVisibility(false);
 		//geometryEntity->setManageParentVisibility(false);  // The new boolean entity should manage the parent visibility as usual
 		geometryEntity->setBrep(shape);
-		geometryEntity->setTreeIcons("BooleanAddVisible", "BooleanAddHidden");
+		geometryEntity->setTreeIcons("ChamferEdgesVisible", "ChamferEdgesHidden");
 		//geometryEntity->getBrepEntity()->setFaceNameMap(resultFaceNames);
 
 		geometryEntity->getProperties() = baseEntity->getProperties();

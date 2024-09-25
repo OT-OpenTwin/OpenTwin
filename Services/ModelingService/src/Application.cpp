@@ -258,7 +258,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton("Modeling", "Modify", "Boolean Intersect", "Boolean Intersect", lockTypes, "BooleanIntersect", "Default", "");
 
 	_ui->addMenuButton("Modeling", "Modify", "Transform", "Transform", lockTypes, "Transform", "Default", "");
-	_ui->addMenuButton("Modeling", "Modify", "Chamfer Edges", "Chamfer Edges", lockTypes, "Icon", "Default", "");
+	_ui->addMenuButton("Modeling", "Modify", "Chamfer Edges", "Chamfer Edges", lockTypes, "ChamferEdges", "Default", "");
 
 	_ui->addMenuButton("Modeling", "Repair", "Remove Faces", "Remove Faces", lockTypes, "RemoveFace", "Default", "");
 	_ui->addMenuButton("Modeling", "Repair", "Heal", "Heal", lockTypes, "Healing", "Default", "");
