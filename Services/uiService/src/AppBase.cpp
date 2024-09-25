@@ -503,7 +503,7 @@ void AppBase::lockWelcomeScreen(bool flag)
 }
 
 void AppBase::welcomeScreenEventCallback(
-	welcomeScreen::eventType		_type,
+	OldWelcomeScreen::eventType		_type,
 	int								_row,
 	const QString &					_additionalInfo
 ) {
@@ -512,7 +512,7 @@ void AppBase::welcomeScreenEventCallback(
 	assert(pManager.InitializeConnection()); // Failed to connect
 	switch (_type)
 	{
-	case welcomeScreen::event_createClicked:
+	case OldWelcomeScreen::event_createClicked:
 	{
 		std::string currentName = m_welcomeScreen->getProjectName().toStdString();
 		// Check if any changes were made to the current project. Will receive a false if the user presses cancel
@@ -598,7 +598,7 @@ void AppBase::welcomeScreenEventCallback(
 		m_state |= ProjectOpenState;
 	}
 	break;
-	case welcomeScreen::event_openClicked:
+	case OldWelcomeScreen::event_openClicked:
 	{
 		// Check if any changes were made to the current project. Will receive a false if the user presses cancel
 		if (!checkForContinue("Open Project")) { return; }
@@ -679,7 +679,7 @@ void AppBase::welcomeScreenEventCallback(
 		}
 	}
 		break;
-	case welcomeScreen::event_copyClicked:
+	case OldWelcomeScreen::event_copyClicked:
 	{
 		//_additionalInfo holds the new project name
 		//		it is already checked and the current project is closed if this is the one that should be replaced
@@ -698,7 +698,7 @@ void AppBase::welcomeScreenEventCallback(
 
 		break;
 	}
-	case welcomeScreen::event_renameClicked:
+	case OldWelcomeScreen::event_renameClicked:
 	{
 		//_additionalInfo holds the new project name
 		//		it is already checked and the current project is closed if this is the one that should be replaced
@@ -755,7 +755,7 @@ void AppBase::welcomeScreenEventCallback(
 
 		break;
 	}
-	case welcomeScreen::event_deleteClicked:
+	case OldWelcomeScreen::event_deleteClicked:
 	{
 		QString selectedProjectName = m_welcomeScreen->getProjectName(_row);
 
@@ -800,7 +800,7 @@ void AppBase::welcomeScreenEventCallback(
 
 		break;
 	}
-	case welcomeScreen::event_exportClicked:
+	case OldWelcomeScreen::event_exportClicked:
 	{
 		lockUI(true);
 
@@ -827,7 +827,7 @@ void AppBase::welcomeScreenEventCallback(
 	
 		break;
 	}
-	case welcomeScreen::event_accessClicked:
+	case OldWelcomeScreen::event_accessClicked:
 	{
 		lockUI(true);
 
@@ -842,7 +842,7 @@ void AppBase::welcomeScreenEventCallback(
 
 		break;
 	}
-	case welcomeScreen::event_rowDoubleClicked:
+	case OldWelcomeScreen::event_rowDoubleClicked:
 	{
 		// Check if any changes were made to the current project. Will receive a false if the user presses cancel
 	 	if (!checkForContinue("Open Project")) { return; }
@@ -1219,7 +1219,7 @@ void AppBase::createUi(void) {
 				m_output->appendPlainText(BUILD_INFO);
 			}
 
-			m_welcomeScreen = new welcomeScreen(uiAPI::getIcon("OpenSlectedProject", "Default"), uiAPI::getIcon("CopyItem", "Default"),
+			m_welcomeScreen = new OldWelcomeScreen(uiAPI::getIcon("OpenSlectedProject", "Default"), uiAPI::getIcon("CopyItem", "Default"),
 				uiAPI::getIcon("RenameItem", "Default"), 
 				uiAPI::getIcon("Delete", "Default"), uiAPI::getIcon("Export", "Default"), uiAPI::getIcon("ManageAccess", "Default"), 
 				uiAPI::getIcon("ChangeOwner", "Default"), this);

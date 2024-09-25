@@ -43,7 +43,7 @@ class renameProjectDialog;
 
 class AppBase;
 
-class welcomeScreen : public QObject, public ak::aWidget {
+class OldWelcomeScreen : public QObject, public ak::aWidget {
 	Q_OBJECT
 public:
 
@@ -59,7 +59,7 @@ public:
 		event_rowDoubleClicked
 	};
 
-	welcomeScreen(
+	OldWelcomeScreen(
 		const QIcon &			_iconOpen,
 		const QIcon &			_iconCopy,
 		const QIcon &			_iconRename,
@@ -69,7 +69,7 @@ public:
 		const QIcon &			_iconOwner,
 		AppBase *				_manager
 	);
-	virtual ~welcomeScreen();
+	virtual ~OldWelcomeScreen();
 
 	//! @brief Will return the widgets widget to display it
 	virtual QWidget * widget(void) override;
@@ -153,8 +153,8 @@ private:
 
 	
 
-	welcomeScreen() = delete;
-	welcomeScreen(const welcomeScreen&) = delete;
+	OldWelcomeScreen() = delete;
+	OldWelcomeScreen(const OldWelcomeScreen&) = delete;
 
 
 	/*

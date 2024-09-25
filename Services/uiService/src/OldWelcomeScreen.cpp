@@ -54,7 +54,7 @@
 #define EDIT_PLACEHOLDER_RECENTS "[Recent projects] (Press Return to show all projects)"
 #define EDIT_PLACEHOLDER_ALL "[All projects] (Press Backspace to show recent projects)"
 
-welcomeScreen::welcomeScreen(
+OldWelcomeScreen::OldWelcomeScreen(
 	const QIcon &				_iconOpen,
 	const QIcon &				_iconCopy,
 	const QIcon &				_iconRename,
@@ -190,16 +190,16 @@ welcomeScreen::welcomeScreen(
 	//slotProjectNameChanged();
 }
 
-welcomeScreen::~welcomeScreen() {
+OldWelcomeScreen::~OldWelcomeScreen() {
 }
 
-QWidget * welcomeScreen::widget(void) {
+QWidget * OldWelcomeScreen::widget(void) {
 	return my_comboMain.widget;
 }
 
 // #############################################################################################################
 
-void welcomeScreen::refreshRecent(void) {
+void OldWelcomeScreen::refreshRecent(void) {
 	std::list<std::string> recent;
 	my_userManager->getListOfRecentProjects(recent);
 	my_projectManager->readProjectAuthor(recent);
@@ -249,7 +249,7 @@ void welcomeScreen::refreshRecent(void) {
 
 }
 
-void welcomeScreen::refreshProjectNames(void) {
+void OldWelcomeScreen::refreshProjectNames(void) {
 
 	my_tableOpenNew->Clear();
 
@@ -305,13 +305,13 @@ void welcomeScreen::refreshProjectNames(void) {
 
 }
 
-QString welcomeScreen::getProjectName(
+QString OldWelcomeScreen::getProjectName(
 	int									_index
 ) const { return my_tableOpenNew->projectName(_index); }
 
-QString welcomeScreen::getProjectName() const { return my_editProjectName->text(); }
+QString OldWelcomeScreen::getProjectName() const { return my_editProjectName->text(); }
 
-void welcomeScreen::refreshList(void) { 
+void OldWelcomeScreen::refreshList(void) { 
 
 	lock(true);
 
@@ -330,7 +330,7 @@ void welcomeScreen::refreshList(void) {
 
 // Slots
 
-void welcomeScreen::slotProjectNameChanged(void) {
+void OldWelcomeScreen::slotProjectNameChanged(void) {
 
 	QString txt = my_editProjectName->text();
 	my_editProjectName->setPlaceholderText(EDIT_PLACEHOLDER_RECENTS);
@@ -344,7 +344,7 @@ void welcomeScreen::slotProjectNameChanged(void) {
 	}
 }
 
-void welcomeScreen::slotEditReturnPressed(void) {
+void OldWelcomeScreen::slotEditReturnPressed(void) {
 
 	refreshProjectNames();
 	if (my_editProjectName->text().length() == 0) {
@@ -352,7 +352,7 @@ void welcomeScreen::slotEditReturnPressed(void) {
 	}
 }
 
-void welcomeScreen::slotEditBackspacePressed(void) {
+void OldWelcomeScreen::slotEditBackspacePressed(void) {
 
 	if (my_editProjectName->text().length() == 0 && !my_isShowingRecent) {
 		refreshRecent();
@@ -360,7 +360,7 @@ void welcomeScreen::slotEditBackspacePressed(void) {
 	}
 }
 
-void welcomeScreen::slotCreateClicked(void) { 
+void OldWelcomeScreen::slotCreateClicked(void) { 
 	lock(true);
 
 	my_app->welcomeScreenEventCallback(event_createClicked, -1);
@@ -368,12 +368,12 @@ void welcomeScreen::slotCreateClicked(void) {
 	lock(false);
 }
 
-void welcomeScreen::slotRefreshClicked(void) { 
+void OldWelcomeScreen::slotRefreshClicked(void) { 
 
 	refreshList();
 }
 
-void welcomeScreen::slotDataTableCellClicked(QTableWidgetItem * _item) {
+void OldWelcomeScreen::slotDataTableCellClicked(QTableWidgetItem * _item) {
 	lock(true);
 
 	AppBase * app{ AppBase::instance() };
@@ -448,7 +448,7 @@ void welcomeScreen::slotDataTableCellClicked(QTableWidgetItem * _item) {
 	lock(false);
 }
 
-void welcomeScreen::slotDataTableCellDoubleClicked(QTableWidgetItem * _item) {
+void OldWelcomeScreen::slotDataTableCellDoubleClicked(QTableWidgetItem * _item) {
 	lock(true);
 
 	switch (_item->column())
@@ -466,7 +466,7 @@ void welcomeScreen::slotDataTableCellDoubleClicked(QTableWidgetItem * _item) {
 	lock(false);
 }
 
-void welcomeScreen::slotCopyDialogClosing(void) {
+void OldWelcomeScreen::slotCopyDialogClosing(void) {
 	lock(true);
 
 	assert(my_copyDialog != nullptr); // Slot called without a copy dialog
@@ -509,7 +509,7 @@ void welcomeScreen::slotCopyDialogClosing(void) {
 	lock(false);
 }
 
-void welcomeScreen::slotRenameDialogClosing(void) {
+void OldWelcomeScreen::slotRenameDialogClosing(void) {
 	lock(true);
 
 	assert(my_renameDialog != nullptr); // Slot called without a copy dialog
@@ -552,7 +552,7 @@ void welcomeScreen::slotRenameDialogClosing(void) {
 	lock(false);
 }
 
-void welcomeScreen::lock(bool flag)
+void OldWelcomeScreen::lock(bool flag)
 {
 	if (flag)
 	{
@@ -579,7 +579,7 @@ void welcomeScreen::lock(bool flag)
 
 // Private members
 
-welcomeScreen::layoutWidget welcomeScreen::createNewLayoutWidgetCombo(
+OldWelcomeScreen::layoutWidget OldWelcomeScreen::createNewLayoutWidgetCombo(
 	bool								_isHorizontal
 ) const {
 	layoutWidget ret;

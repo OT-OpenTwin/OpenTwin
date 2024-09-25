@@ -54,7 +54,7 @@ class LockManager;
 class ExternalServicesComponent;
 class ProjectManagement;
 class ShortcutManager;
-class welcomeScreen;
+class OldWelcomeScreen;
 class ContextMenuManager;
 class UiPluginComponent;
 class UiPluginManager;
@@ -200,7 +200,7 @@ public:
 	);
 
 	void welcomeScreenEventCallback(
-		welcomeScreen::eventType		_type,
+		OldWelcomeScreen::eventType		_type,
 		int								_row,
 		const QString &					_additionalInfo = QString{}
 	);
@@ -565,7 +565,7 @@ private:
 	ViewerComponent *			m_viewerComponent;
 	ExternalServicesComponent *	m_ExternalServicesComponent;
 
-	welcomeScreen *				m_welcomeScreen;
+	OldWelcomeScreen*			m_welcomeScreen;
 
 	ShortcutManager *			m_shortcutManager;
 	ContextMenuManager *		m_contextMenuManager;
