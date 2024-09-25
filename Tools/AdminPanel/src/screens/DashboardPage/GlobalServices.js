@@ -59,7 +59,7 @@ const GlobalService = ({ serviceType, serviceData, openLocalServiceModal }) => (
                 <div className="grid-item">
                     No. of active Services: <b>{serviceData["LocalServices"] ? serviceData["LocalServices"].length : 0}</b>
                 </div>
-                {serviceData["LocalServices"].map((service, index) => (
+                {serviceData["LocalServices"] && serviceData["LocalServices"].map((service, index) => (
                     <li key={index} className="service-item">
                         <div className="grid-item">
                             {service.URL}
