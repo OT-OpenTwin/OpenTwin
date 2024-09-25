@@ -9,7 +9,6 @@
 
 // Frontend header
 #include "uiServiceTypes.h"				// Model and View types
-#include "OldWelcomeScreen.h"
 #include "LoginData.h"
 
 // AK header
@@ -198,12 +197,6 @@ public:
 	bool createNewProjectInDatabase(
 		const QString &					_projectName,
 		const QString &					_projectType
-	);
-
-	void welcomeScreenEventCallback(
-		OldWelcomeScreen::eventType		_type,
-		int								_row,
-		const QString &					_additionalInfo = QString{}
 	);
 
 	void lockWelcomeScreen(bool flag);
@@ -503,6 +496,19 @@ private Q_SLOTS:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
+	// Private: Welcome Screen Slots
+
+	void slotCreateProject(void);
+	void slotOpenProject(void);
+	void slotCopyProject(void);
+	void slotRenameProject(void);
+	void slotDeleteProject(void);
+	void slotExportProject(void);
+	void slotManageProjectAccess(void);
+	void slotManageProjectOwner(void);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	// Private: Property grid slots
 
 	void slotPropertyGridValueChanged(const ot::Property* _property);
@@ -566,7 +572,6 @@ private:
 	ViewerComponent *			m_viewerComponent;
 	ExternalServicesComponent *	m_ExternalServicesComponent;
 
-	OldWelcomeScreen*			m_oldWelcomeScreen;
 	ProjectOverviewWidget*      m_welcomeScreen;
 
 	ShortcutManager *			m_shortcutManager;

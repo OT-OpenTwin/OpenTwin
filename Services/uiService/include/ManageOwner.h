@@ -9,9 +9,6 @@
 #include <qobject.h>
 #include <qtablewidget.h>
 
-#include "OldWelcomeScreen.h"
-
-
 class QVBoxLayout;
 class QHBoxLayout;
 

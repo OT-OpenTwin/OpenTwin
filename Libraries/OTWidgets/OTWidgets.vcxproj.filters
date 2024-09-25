@@ -325,6 +325,12 @@
     <ClCompile Include="src\CreateProjectDialog.cpp">
       <Filter>src\Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="src\ToolButton.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Action.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -608,6 +614,9 @@
     <ClInclude Include="include\OTWidgets\VersionGraphItem.h">
       <Filter>include\Version</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\Action.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -738,6 +747,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\CreateProjectDialog.h">
       <Filter>include\Dialogs</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ToolButton.h">
+      <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

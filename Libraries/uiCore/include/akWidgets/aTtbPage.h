@@ -73,6 +73,8 @@ namespace ak {
 			bool						_enabled
 		) override;
 
+		tt::Page* getPage(void) const { return m_page; };
+
 	private:
 		tt::Page *						m_page;
 

@@ -11,9 +11,12 @@
 // open twin header
 #include "OTCore/Flags.h"
 #include "OTGui/GuiTypes.h"
+#include <qvectornd.h>
 
 class AppBase;
 class LockManager;
+
+namespace tt { class Page; }
 
 class ToolBar : public ak::aNotifier {
 public:
@@ -27,6 +30,8 @@ public:
 		int				_info2
 	) override;
 	
+	tt::Page* getStartPage(void);
+
 	// ###################################################################################
 
 	ak::UID addPage(ak::UID _creator, const QString & _pageName);

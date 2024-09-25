@@ -8,8 +8,6 @@
 #include <qobject.h>
 #include <qtablewidget.h>
 
-#include "OldWelcomeScreen.h"
-
 namespace ak {
 	class aLogInDialog;
 	class aLabelWidget;

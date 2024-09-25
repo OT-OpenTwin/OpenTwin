@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="$(BASE64_ROOT)\base64.c" />
     <ClCompile Include="src\ContextMenuManager.cpp" />
+    <ClCompile Include="src\CopyProjectDialog.cpp" />
     <ClCompile Include="src\debugNotifier.cpp" />
     <ClCompile Include="src\DevLogger.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
@@ -45,6 +46,7 @@
     <ClCompile Include="src\ManageOwner.cpp" />
     <ClCompile Include="src\NavigationTreeView.cpp" />
     <ClCompile Include="src\ProjectOverviewWidget.cpp" />
+    <ClCompile Include="src\RenameProjectDialog.cpp" />
     <ClCompile Include="src\SelectEntitiesDialog.cpp" />
     <ClCompile Include="src\ServiceDataUi.cpp" />
     <ClCompile Include="src\ShortcutManager.cpp" />
@@ -57,11 +59,11 @@
     <ClCompile Include="src\UserSettings.cpp" />
     <ClCompile Include="src\ViewerComponent.cpp" />
     <ClCompile Include="src\WebsocketClient.cpp" />
-    <ClCompile Include="src\OldWelcomeScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(BASE64_ROOT)\base64.h" />
     <ClInclude Include="include\ContextMenuManager.h" />
+    <QtMoc Include="include\CopyProjectDialog.h" />
     <ClInclude Include="include\debugNotifier.h" />
     <QtMoc Include="include\WebsocketClient.h" />
     <ClInclude Include="include\ControlsManager.h" />
@@ -79,9 +81,9 @@
     <QtMoc Include="include\ProjectOverviewWidget.h" />
     <ClInclude Include="include\QtMetaTypes.h" />
     <QtMoc Include="include\SelectEntitiesDialog.h" />
+    <QtMoc Include="include\RenameProjectDialog.h" />
     <ClInclude Include="include\ServiceDataUi.h" />
     <ClInclude Include="include\ToolBar.h" />
-    <QtMoc Include="include\OldWelcomeScreen.h" />
     <ClInclude Include="include\ProjectManagement.h" />
     <ClInclude Include="include\UiPluginComponent.h" />
     <ClInclude Include="include\UiPluginManager.h" />

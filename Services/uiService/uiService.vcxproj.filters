@@ -63,9 +63,6 @@
     <ClCompile Include="src\ProjectManagement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OldWelcomeScreen.cpp">
-      <Filter>Source Files\CustomWidgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\ExternalServicesComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
@@ -141,6 +138,12 @@
     <ClCompile Include="src\ProjectOverviewWidget.cpp">
       <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\CopyProjectDialog.cpp">
+      <Filter>Source Files\CustomWidgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenameProjectDialog.cpp">
+      <Filter>Source Files\CustomWidgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -196,9 +199,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\OldWelcomeScreen.h">
-      <Filter>Header Files\CustomWidgets</Filter>
-    </QtMoc>
     <QtMoc Include="include\ExternalServicesComponent.h">
       <Filter>Header Files\Components</Filter>
     </QtMoc>
@@ -236,6 +236,12 @@
       <Filter>Header Files\LogIn</Filter>
     </QtMoc>
     <QtMoc Include="include\ProjectOverviewWidget.h">
+      <Filter>Header Files\CustomWidgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\CopyProjectDialog.h">
+      <Filter>Header Files\CustomWidgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\RenameProjectDialog.h">
       <Filter>Header Files\CustomWidgets</Filter>
     </QtMoc>
   </ItemGroup>

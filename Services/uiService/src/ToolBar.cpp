@@ -13,6 +13,7 @@
 // uiCore header
 #include <akAPI/uiAPI.h>
 #include <akWidgets/aToolButtonWidget.h>
+#include <akWidgets/aTtbPage.h>
 #include <akWidgets/aTtbGroup.h>
 #include <akGui/aContextMenuItem.h>
 
@@ -119,6 +120,12 @@ void ToolBar::notify(
 	else if (_sender == m_file.gDefault_aGroup && _event == etClicked) {
 		m_owner->manageGroups();
 	}
+}
+
+tt::Page* ToolBar::getStartPage(void) {
+	auto page = uiAPI::object::get<ak::aTtbPage>(m_file.page);
+	OTAssertNullptr(page);
+	return page->getPage();
 }
 
 ak::UID ToolBar::addPage(ak::UID _creator, const QString & _pageName) {

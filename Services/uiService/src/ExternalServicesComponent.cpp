@@ -1037,6 +1037,8 @@ std::list<ot::ProjectTemplateInformation> ExternalServicesComponent::getListOfPr
 	// Request a session service from the global session service
 	ot::JsonDocument gssDoc;
 	gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetListOfProjectTemplates, gssDoc.GetAllocator()), gssDoc.GetAllocator());
+	gssDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(app->getCurrentLoginData().getSessionUser(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
+	gssDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(app->getCurrentLoginData().getSessionPassword(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
 	
 	if (!sendHttpRequest(EXECUTE, app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), gssDoc.toJson(), response)) {
 		assert(0); // Failed to send
