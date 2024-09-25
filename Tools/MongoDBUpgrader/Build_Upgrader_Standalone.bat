@@ -57,7 +57,7 @@ if "!NSIS_REG_VALUE!"=="" (
 echo +++ COMPILE TIME +++
 
 	REM First we build and copy the c++ executable
-	REM CALL "%UPGRADER_EXE%build.bat" BOTH REBUILD
+	CALL "%UPGRADER_EXE%build.bat" BOTH REBUILD
 	copy %UPGRADER_EXE%\x64\Release\MongoDBUpgradeManager.exe %OT_INSTALLUPGRADER_DIR%\MongoDBUpgradeManager.exe
 	
 	REM Now copying all required dlls to the deployment dir
