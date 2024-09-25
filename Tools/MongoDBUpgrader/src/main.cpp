@@ -8,6 +8,9 @@
 #include "MongoDBInstaller.h"
 #include <conio.h>
 #include "boost/program_options.hpp"
+#include "MongoVersion.h"
+#include <any>
+#include "Logger.h"
 //!brief:
 //! Check if a mongodb service exists
 //! if yes, get the configuration
@@ -26,154 +29,238 @@
 //! replace config of mongo 7
 //! restart mongo 7
 
-const std::string g_defaultServiceName = "MongoDB";
+std::string g_serviceName = "MongoDB";
+std::string Logger::m_loggingPath = ".\\MongoDBUpgrader.log";
 
-int main(int argc, wchar_t* argv[])
+//Exit codes :
+//1: failed, the returned text holds the error message
+//2: upgrade required, the returned text holds found version
+//3: MongoDB found but no MongoDB data found
+//4: Mongo version up - to - date
+const int EXIT_CODE_FAILED = 1;
+const int EXIT_CODE_UPGRADE_REQUIRED = 2;
+const int EXIT_CODE_NO_UPGRADE = 3;
+const int EXIT_CODE_MONGO_UP_TO_DATE = 4;
+
+
+int requiresUpgrade(MongoVersion& _version)
 {
+    std::string serverName = g_serviceName;
+    WindowsServiceManager mongoService(serverName);
+    const std::string binPath = mongoService.getMongoDBServerBinPath();
 
-    //Function 1: Check if upgrade is necessary
+    //Now we extract paths from the binPath
+    MongoDBSettingsParser mongoSettingsParser(binPath);
 
+    //Now we check the current MongoDB version
+    _version.m_fullVersion = mongoSettingsParser.getCurrentMongoDBServiceVersion();
+
+    //Now we analyse the current MongoDB version, if an update is necessary
+    const std::string majorVersion = _version.m_fullVersion.substr(0, _version.m_fullVersion.find_first_of("."));
+    _version.m_majorVersion = std::stoi(majorVersion);
+
+    if (_version.m_majorVersion >= MongoDBUpgrader::getSupportedMaxVersion())
+    {
+        return EXIT_CODE_MONGO_UP_TO_DATE;
+    }
     
+    //The upgrade is really only necessary if the outdated MongoDB server already has data stored
+    mongoSettingsParser.extractDataFromConfig();
+    const MongoDBSettings& mongoSettings = mongoSettingsParser.getMongoDBSettings();
+    //Now we check if there is already data stored by the current version. If so, we need to gradually upgrade the feature compatibility version.
+    const std::string pathToDataStorage = mongoSettings.m_dataPath;
+    if (std::filesystem::exists(pathToDataStorage) && !std::filesystem::is_empty(pathToDataStorage))
+    {
+        return EXIT_CODE_UPGRADE_REQUIRED;
+    }
+    else
+    {
+        return EXIT_CODE_NO_UPGRADE;
+    }
+}
+
+void moveMongoCfg()
+{
+    std::string serverName = g_serviceName;
+    WindowsServiceManager mongoService(serverName);
+    const std::string binPath = mongoService.getMongoDBServerBinPath();
+
+    //Now we extract paths from the binPath
+    MongoDBSettingsParser mongoSettingsParser(binPath);
+    const std::string cfgPath = mongoSettingsParser.getTempMongoServerConfPath();
+
+    if (!std::filesystem::exists(cfgPath))
+    {
+        throw std::exception(("MongoDb.cfg file not found: " + cfgPath).c_str());
+    }
+    else
+    {
+        const std::string destinationPath = mongoSettingsParser.getMongoDBSettings().m_configFilePath;
+        std::filesystem::remove(destinationPath);
+        std::filesystem::rename(cfgPath, destinationPath);
+    }
+}
+
+void performUpgrade(const std::string& _adminPsw)
+{
+    std::string serverName = g_serviceName;
+    WindowsServiceManager mongoService(serverName);
+    const std::string binPath = mongoService.getMongoDBServerBinPath();
+
+    //Now we extract paths from the binPath
+    MongoDBSettingsParser mongoSettingsParser(binPath, _adminPsw);
+
+    //Now we check the current MongoDB version
+    MongoVersion version;
+    version.m_fullVersion = mongoSettingsParser.getCurrentMongoDBServiceVersion();
+
+    //Now we analyse the current MongoDB version, if an update is necessary
+    const std::string majorVersion = version.m_fullVersion.substr(0, version.m_fullVersion.find_first_of("."));
+    const std::string t = version.m_fullVersion.substr(version.m_fullVersion.find_first_of(".") + 1, version.m_fullVersion.size());
+    version.m_minorVersion = t.substr(0, t.find_first_of("."));
+    
+    if (version.m_majorVersion >= MongoDBUpgrader::getSupportedMaxVersion())
+    {
+        throw std::exception("Upgrade not required. MongoDB version is already equal or above what this software suports.");
+    }
+
+    mongoSettingsParser.extractDataFromConfig();
+    const MongoDBSettings& mongoSettings = mongoSettingsParser.getMongoDBSettings();
+    //Now we check if there is already data stored by the current version. If so, we need to gradually upgrade the feature compatibility version.
+    const std::string pathToDataStorage = mongoSettings.m_dataPath;
+    if (std::filesystem::exists(pathToDataStorage) && !std::filesystem::is_empty(pathToDataStorage))
+    {
+        mongoService.stopService();
+        mongocxx::instance instance{}; // This should be done only once.
+        const std::string configPathForServerIteration = mongoSettingsParser.getTempMongoServerConfPath();
+        mongoSettingsParser.createTempMongoServerConf(configPathForServerIteration);
+
+        MongoDBUpgrader upgrader(mongoSettings, configPathForServerIteration);
+
+        if (majorVersion == "4" && version.m_minorVersion == "2")
+        {
+            std::cout << "\n";
+            upgrader.performUpgrade4_2To4_4();
+        }
+        version.m_majorVersion++;
+
+        for (int i = version.m_majorVersion; i <= MongoDBUpgrader::getSupportedMaxVersion(); i++)
+        {
+            std::cout << "\n";
+            upgrader.performUpgrade(i);
+        }
+    }
+    else
+    {
+        throw std::exception("Upgrade not necessary, since MongoDB data directory is not existing or empty.");
+    }
+}
+
+void close(int _exitCode)
+{
+    Logger::INSTANCE().write("Closing application.\n\n");
+    exit(_exitCode);
+}
+
+void setServiceName(boost::program_options::variables_map& _arguments)
+{
+    if (_arguments.count("ServiceName") == 1)
+    {
+        const auto& value = _arguments["ServiceName"].value();
+        g_serviceName = boost::any_cast<std::string>(value);
+        Logger::INSTANCE().write("Using customised service name: " + g_serviceName+ "\n");
+    }
+    else
+    {
+        Logger::INSTANCE().write("Using default service name: " + g_serviceName + "\n");
+    }
+}
+
+int main(int argc, char* argv[])
+{
+    Logger::Init(".\\MongoDBUpgrader.log");
+    
+    Logger::INSTANCE().write("Starting MongoDBUpgrader.\n");
 
     boost::program_options::options_description desc("Allowed options");
+
     desc.add_options()
+        //Function 1: Check if upgrade is necessary
         ("Check", "Checks if an upgrade is necessary")
-        ("silent", "execution without asking the user for confirmation and installs MongoDB without user interaction.");
+        //Function 2: Performs upgrade
+        ("Upgrade", "Performce an upgrade of the database")
+        //Function 3: Get max supported version
+        ("MaxVersion", "Get the version that this software will upgrade MongoDB to.")
+        //Function 4: Set mongodb.cfg
+        ("SetMongoCfg", "Copy the updated mongodb.cfg into the new service directory.")
+        //Function 5: Upgrade cfg
+        ("UpgradeMongoCfg", "Upgrade the current mongodb cfg, so that it works with the new driver.") //ToDo
+        //Parameter for upgrade
+        ("AdminPsw", boost::program_options::value<std::string>(), "Admin Psw for the database")
+        //Parameter for server name
+        ("ServiceName", boost::program_options::value<std::string>(), "Name of the MongoDB service")
+        ;
 
     boost::program_options::variables_map variableMap;
     boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), variableMap);
-    if (variableMap.count("adminPsw") == 1)
-    {
-
-    }
-    bool silent = variableMap.count("silent") == 1;
     try
     {
-        //First we extract information about the service named MongoDB
-        std::cout << "Per default it is assumed that the MongoDB service is running by the name of \"" + g_defaultServiceName + "\" if that is correct, press enter, otherwise enter an alternative name.\n";
-        std::string serverName = "";
-        std::getline(std::cin, serverName);
-        if (serverName == "")
+        if (variableMap.count("Check") == 1)
         {
-            serverName = g_defaultServiceName;
-        }
-        WindowsServiceManager mongoService(serverName);
-        const std::string binPath = mongoService.getMongoDBServerBinPath();
-//        std::cout << "Service runs with the binPath: " << binPath << "\n";
-        //Now we extract paths from the binPath
-        MongoDBSettingsParser mongoSettingsParser(binPath);
-
-        //Now we check the current MongoDB version
-        const std::string currentMongoVersion = mongoSettingsParser.getCurrentMongoDBServiceVersion();
-        std::cout << "Current MongoDB server has the version " << currentMongoVersion << "\n";
-
-        //Now we analyse the current MongoDB version, if an update is necessary
-        const std::string majorVersion = currentMongoVersion.substr(0, currentMongoVersion.find_first_of("."));
-        const std::string t = currentMongoVersion.substr(currentMongoVersion.find_first_of(".") + 1, currentMongoVersion.size());
-        const std::string minorVersion = t.substr(0, t.find_first_of("."));
-
-
-        
-        int majorVersionInt = std::stoi(majorVersion);
-        if (majorVersionInt >= MongoDBUpgrader::getSupportedMaxVersion())
-        {
-            std::cout << "No update required. Closing application.";
-            _getch();
-            exit(ERROR_SUCCESS);
-        }
-
-        mongoSettingsParser.extractDataFromConfig();
-        const MongoDBSettings& mongoSettings = mongoSettingsParser.getMongoDBSettings();
-        //Now we check if there is already data stored by the current version. If so, we need to gradually upgrade the feature compatibility version.
-        const std::string pathToDataStorage = mongoSettings.m_dataPath;
-
-        if (std::filesystem::exists(pathToDataStorage) && !std::filesystem::is_empty(pathToDataStorage))
-        {
-            std::cout << "Data folder contains old projects, it is necessary to upgrade the existing data. Please enter yes/y to proceed or no/n to cancel.\n";
-            std::string input("");
-            bool stayInLoop = true;
-            while (stayInLoop)
+            Logger::INSTANCE().write("Performing upgrade check\n");
+            setServiceName(variableMap);
+            MongoVersion version;
+            int upgrade = requiresUpgrade(version);
+            Logger::INSTANCE().write("Found version: " + version.m_fullVersion+ "\n");
+            if (upgrade != EXIT_CODE_UPGRADE_REQUIRED)
             {
-                std::getline(std::cin, input);
-                if (input == "yes" || input == "y")
-                {
-                    stayInLoop = false;
-                }
-                else if (input == "no" || input == "n")
-                {
-                    return 0;
-                }
-            }
-            std::cout << "Performing upgrade up to version " << MongoDBUpgrader::getSupportedMaxVersion() << "\n";
-            std::cout << "\n!WARNING! Once you have upgraded to 7.0, you will not be able to downgrade FCV and binary version without support assistance.\n\n";
-            std::cout << "Stopping running MongoDB service \n";
-            mongoService.stopService();
-            mongoSettingsParser.requestAdminPassword();
-            mongocxx::instance instance{}; // This should be done only once.
-            const std::string configPathForServerIteration = mongoSettingsParser.getTempMongoServerConfPath();
-            
-
-            MongoDBUpgrader upgrader(mongoSettings, configPathForServerIteration);
-            
-            if (majorVersion == "4" && minorVersion == "2")
-            {
-                std::cout << "\n";
-                upgrader.performUpgrade4_2To4_4();
-            }
-            majorVersionInt++;
-
-            for (int i = majorVersionInt; i <= MongoDBUpgrader::getSupportedMaxVersion(); i++)
-            {
-                std::cout << "\n";
-                upgrader.performUpgrade(i);
+                Logger::INSTANCE().write("No upgrade required.\n");
             }
             
-            //Now we (try) remove the temporary cfg file again
-            try
-            {
-                bool success = std::filesystem::remove(configPathForServerIteration);
-                if (!success)
-                {
-                    std::cout << "Failed to remove the temporary cfg file in installation dir: " + configPathForServerIteration + "\n";
-                }
-            }
-            catch (std::filesystem::filesystem_error& error)
-            {
-                std::cout << "Failed to remove the temporary cfg file in installation dir: " + configPathForServerIteration + " because of: " + error.what() + "\n";
-            }
+            std::cout << version.m_fullVersion;
+            close(upgrade);
         }
-        
-        //Now we install the new MongoDB version
-        std::cout << "Starting installation of MongoDB " << MongoDBUpgrader::getSupportedMaxVersion() << ".\n";
-        MongoDBInstaller installer(g_defaultServiceName);
-        std::string mongoRootPath = mongoSettings.m_executablePath.substr(0, mongoSettings.m_executablePath.find_last_of("\\") - 1);
-        mongoRootPath = mongoRootPath.substr(0, mongoRootPath.find_last_of("\\") - 1);
-        const std::string installPath = mongoRootPath + "\\7.0";
-        if(std::filesystem::exists(installPath) && !std::filesystem::is_empty(installPath))
+        else if (variableMap.count("Upgrade") == 1)
         {
-            std::cout << "An installation of MongoDB v. 7.0 already exists at the default location: " << installPath << " proceed manually with the installation.\n";
-        }
-        else
-        {
-            bool success = installer.installNewVersion(installPath);
-        
-            if (success)
+            Logger::INSTANCE().write("Performing upgrade.\n");
+            setServiceName(variableMap);
+            if (variableMap.count("Admin_Psw") != 1)
             {
-                std::cout << "Upgrade of MongoDB finished. Press key to close.\n";
-                std::cin;
+                std::cout << "Admin_Psw must be set in order to upgrade";
+                Logger::INSTANCE().write("Application is missing Admin_Psw parameter\n");
+                close(EXIT_CODE_FAILED);
             }
             else
             {
-                std::cout << "Installation failed. Closing application. Press key to close.";
-                std::cin;
+                const auto& value = variableMap["Admin_Psw"].value();
+                const std::string adminPSw = boost::any_cast<std::string>(value);
+                performUpgrade(adminPSw);
+                close(ERROR_SUCCESS);
             }
-            //Replacing the new mongod.cfg with an adjusted version of the old mongod.cfg
-            installer.replaceMongoCfg(mongoSettingsParser.getUpdatedConfig());
+        }
+        else if (variableMap.count("SetMongoCfg") == 1)
+        {
+            Logger::INSTANCE().write("Setting mongodb.cfg of service.\n");
+            setServiceName(variableMap);
+            moveMongoCfg();
+            close(ERROR_SUCCESS);
+        }
+        else if (variableMap.count("MaxVersion") == 1)
+        {
+            std::cout << MongoDBUpgrader::getSupportedMaxVersion();
+            close(ERROR_SUCCESS);
+        }
+        else
+        {
+            Logger::INSTANCE().write("Execution without parameter.\n");
+            std::cout << "Missing parameter for the execution\n";
+            close(EXIT_CODE_FAILED);
         }
     }
-    catch (std::exception& e)
+    catch (const std::exception& e)
     {
-        std::cout <<"Application crashed with the following reason: " << e.what() << "\n Press key to close.";
-        _getch();
-    } 
+        std::cout <<"Error occured: "<< e.what();
+        Logger::INSTANCE().write("Error occured: "+std::string(e.what())+"Closing application.\n\n");
+        close(EXIT_CODE_FAILED);
+    }
 }

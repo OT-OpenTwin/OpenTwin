@@ -1,5 +1,6 @@
 #include "WindowsServiceManager.h"
 #include "WindowsUtilityFuctions.h"
+#include "Logger.h"
 
 #include <vector>
 #include <iostream>
@@ -95,14 +96,14 @@ void WindowsServiceManager::startService()
             }
             else
             {
-                std::cout << "Waiting for service to stop ...\n";
+                Logger::INSTANCE().write("Waiting for service to stop ...\n");
                 std::this_thread::sleep_for(std::chrono::seconds(1));
             }
         }
 
         if (status.dwCurrentState == SERVICE_STOPPED)
         {
-            std::cout << "Starting service.\n";
+            Logger::INSTANCE().write("Starting service.\n");
             if (!ControlService(m_service, SERVICE_CONTROL_CONTINUE, &status))
             {
                 std::string errorMessage = wuf::getErrorMessage(GetLastError());
@@ -125,7 +126,7 @@ void WindowsServiceManager::stopService()
     {
         if (status.dwCurrentState != SERVICE_STOPPED && status.dwCurrentState != SERVICE_STOP_PENDING)
         {
-            std::cout << "Stopping service.\n";
+            Logger::INSTANCE().write("Stopping service.\n");
             if (!ControlService(m_service, SERVICE_CONTROL_STOP, &status))
             {
                 std::string errorMessage = wuf::getErrorMessage(GetLastError());
@@ -146,7 +147,7 @@ void WindowsServiceManager::stopService()
             }
             else
             {
-                std::cout << "Stopping of service pending ...\n";
+                Logger::INSTANCE().write("Stopping of service pending ...\n");
                 std::this_thread::sleep_for(std::chrono::seconds(1));
             }
         }

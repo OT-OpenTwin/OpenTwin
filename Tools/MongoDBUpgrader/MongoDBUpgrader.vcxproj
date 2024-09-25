@@ -148,12 +148,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FileWriter.h" />
+    <ClInclude Include="include\Logger.h" />
     <ClInclude Include="include\MongoDBInstaller.h" />
     <ClInclude Include="include\MongoDBServerRunner.h" />
     <ClInclude Include="include\MongoDBSettings.h" />
     <ClInclude Include="include\MongoDBSettingsParser.h" />
     <ClInclude Include="include\MongoDBShellExecutor.h" />
     <ClInclude Include="include\MongoDBUpgrader.h" />
+    <ClInclude Include="include\MongoVersion.h" />
     <ClInclude Include="include\SharedResources.h" />
     <ClInclude Include="include\WindowsServiceManager.h" />
     <ClInclude Include="include\WindowsUtilityFuctions.h" />

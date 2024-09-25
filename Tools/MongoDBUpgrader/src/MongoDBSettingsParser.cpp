@@ -2,6 +2,7 @@
 
 #include "FileWriter.h"
 #include "SharedResources.h"
+#include "Logger.h"
 #include <boost/process.hpp>
 
 
@@ -10,15 +11,15 @@
 #include <fstream>
 #include <cctype>
 
-MongoDBSettingsParser::MongoDBSettingsParser(const std::string _binPath)
+MongoDBSettingsParser::MongoDBSettingsParser(const std::string& _binPath, const std::string& _adminPsw)
+    :MongoDBSettingsParser(_binPath)
 {
-    extractPaths(_binPath);
+    m_settings.m_adminPsw = _adminPsw;
 }
 
-void MongoDBSettingsParser::requestAdminPassword()
+MongoDBSettingsParser::MongoDBSettingsParser(const std::string& _binPath)
 {
-    std::cout << "Please enter the unencrypted Admin password for the current MongoDB server\n";
-    std::getline(std::cin, m_settings.m_adminPsw);
+    extractPaths(_binPath);
 }
 
 std::string MongoDBSettingsParser::getCurrentMongoDBServiceVersion()
@@ -42,7 +43,7 @@ std::string MongoDBSettingsParser::getCurrentMongoDBServiceVersion()
 
 void MongoDBSettingsParser::extractDataFromConfig()
 {
-    std::cout << "Extracting data from config file \"" + m_settings.m_configFilePath + "\"\n";
+    Logger::INSTANCE().write("Extracting data from config file \"" + m_settings.m_configFilePath + "\"\n");
     if (!std::filesystem::exists(m_settings.m_configFilePath)) {
         throw std::runtime_error(("Extracted filepath of the configuration file, used by the MongoDB service, is not valid. Extracted filepath: " +m_settings.m_configFilePath).c_str());
     }
@@ -156,28 +157,35 @@ std::string MongoDBSettingsParser::getUpdatedConfig()
     }
     else
     {
-        std::cout << "It was detected that the configuration file dinied the use of the system CA. Note, that this may lead to issues with this application and/or OpenTwin.";
+        Logger::INSTANCE().write("It was detected that the configuration file dinied the use of the system CA. Note, that this may lead to issues with this application and/or OpenTwin.");
         return m_settings.m_configFileContent;
     }
 }
 
 std::string MongoDBSettingsParser::getTempMongoServerConfPath()
 {
+    const std::string& mongoDir = CurrentPaths::INSTANCE().getMongoServerCollectionDirectory();
+    const std::string tempConfFilePath = mongoDir + "\\mongod.cfg";
+    return tempConfFilePath;
+}
+
+void MongoDBSettingsParser::createTempMongoServerConf(const std::string& _path)
+{
+    FileWriter fileWriter(_path);
+
     if (m_settings.m_tlsUseSystemCA == "" || m_settings.m_tlsUseSystemCA == "false")
     {
-        const std::string& mongoDir = CurrentPaths::INSTANCE().getMongoServerCollectionDirectory();
-
-        const std::string tempConfFilePath = mongoDir + "\\mongod.cfg";
-        FileWriter fileWriter(tempConfFilePath);
         const std::string updatedCfg = getUpdatedConfig();
         fileWriter.write(updatedCfg);
-        return tempConfFilePath;
     }
     else
     {
-        return m_settings.m_configFilePath;
+        fileWriter.write(m_settings.m_configFilePath);
     }
 }
+
+    
+
 
 void MongoDBSettingsParser::extractPaths(const std::string& _binPath)
 

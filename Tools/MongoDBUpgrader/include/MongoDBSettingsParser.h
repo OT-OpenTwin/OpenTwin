@@ -6,16 +6,16 @@
 class MongoDBSettingsParser
 {
 public:
-    MongoDBSettingsParser(const std::string _binPath);
+    MongoDBSettingsParser(const std::string& _binPath);
+    MongoDBSettingsParser(const std::string& _binPath, const std::string& _adminPsw);
     
-    void requestAdminPassword();
     const MongoDBSettings& getMongoDBSettings() { return m_settings; }
     std::string getCurrentMongoDBServiceVersion();
     void extractDataFromConfig();
     std::string getUpdatedConfig();
     std::string getTempMongoServerConfPath();
+    void createTempMongoServerConf(const std::string& _path);
     
-
 private:
 
     MongoDBSettings m_settings;

@@ -5,7 +5,7 @@
 class FileWriter
 {
 public:
-    FileWriter(const std::string& _filePath);
+    FileWriter(const std::string& _filePath, bool _append = false);
     ~FileWriter();
     
     void write(const std::string& _content);

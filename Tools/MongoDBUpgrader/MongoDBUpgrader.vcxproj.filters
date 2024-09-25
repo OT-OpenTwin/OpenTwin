@@ -71,5 +71,11 @@
     <ClInclude Include="include\WindowsUtilityFuctions.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\MongoVersion.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Logger.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

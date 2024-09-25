@@ -1,6 +1,7 @@
 #include "MongoDBServerRunner.h"
 #include <iostream>
 #include "WindowsUtilityFuctions.h"
+#include "Logger.h"
 
 MongoDBServerRunner::MongoDBServerRunner(const std::string& _serverPath, const std::string& _configPath)
 {
@@ -24,7 +25,7 @@ void MongoDBServerRunner::terminate()
 {
     m_process.terminate();
     m_process.wait();
-    std::cout << "Server process terminated: " << wuf::getErrorMessage(m_process.exit_code()) << "\n";
+    Logger::INSTANCE().write("Server process terminated: " + wuf::getErrorMessage(m_process.exit_code()) + "\n");
 }
 
 MongoDBServerRunner::~MongoDBServerRunner()

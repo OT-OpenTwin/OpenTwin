@@ -6,6 +6,8 @@
 
 #include <boost/process.hpp>
 #include <iostream>
+#include "Logger.h"
+
 
 MongoDBInstaller::MongoDBInstaller(const std::string& _serverName)
 	:m_serverName(_serverName)
@@ -39,19 +41,12 @@ bool MongoDBInstaller::installNewVersion(const std::string& _installPath)
 
 void MongoDBInstaller::replaceMongoCfg(const std::string& _configContent)
 {
-    std::cout << "Please confirm that the new MongoDB service runs under the name \n" << m_serverName << "\n or enter the new name:";
-    std::string serverName = "";
-    std::getline(std::cin, serverName);
-    if (serverName == "")
-    {
-        serverName = m_serverName;
-    }
-
-    std::cout << "Searching for new MongoDB service.\n";
-    WindowsServiceManager newMongoService(serverName);
+    
+    Logger::INSTANCE().write("Searching for new MongoDB service.\n");
+    WindowsServiceManager newMongoService(m_serverName);
 
     newMongoService.stopService();
-    std::cout << "Overwriting configuration file.\n";
+    Logger::INSTANCE().write("Overwriting configuration file.\n");
     const std::string newBinPath = newMongoService.getMongoDBServerBinPath();
     MongoDBSettingsParser newMongoSettings(newBinPath);
 
@@ -60,6 +55,6 @@ void MongoDBInstaller::replaceMongoCfg(const std::string& _configContent)
     
     FileWriter fileWriter(configFilePath);
     fileWriter.write(_configContent);
-    std::cout << "Restarting MongoDB service.\n";
+    Logger::INSTANCE().write("Restarting MongoDB service.\n");
     newMongoService.startService();
 }

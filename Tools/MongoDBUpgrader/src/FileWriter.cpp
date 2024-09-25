@@ -1,8 +1,15 @@
 #include "FileWriter.h"
 
-FileWriter::FileWriter(const std::string& _filePath)
+FileWriter::FileWriter(const std::string& _filePath, bool _append)
 {
-    m_fStream = std::fstream(_filePath, std::ios::out);
+    if (_append)
+    {
+        m_fStream = std::fstream(_filePath, std::ios::app);
+    }
+    else
+    {
+        m_fStream = std::fstream(_filePath, std::ios::out);
+    }
     if (!m_fStream.is_open())
     {
         throw std::exception(std::string("Failed to open file: " + _filePath).c_str());
@@ -23,6 +30,7 @@ FileWriter::~FileWriter()
 {
     if (m_fStream.is_open())
     {
+        m_fStream.flush();
         close();
     }
 }

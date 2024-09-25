@@ -1,6 +1,7 @@
 #include "MongoDBShellExecutor.h"
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
+#include "Logger.h"
 
 #include <rapidjson/document.h>
 
@@ -37,7 +38,7 @@ void MongoDBShellExecutor::setFeatureCompatibilityVersion(const std::string& ver
     }
 
     // Run the command
-    std::cout << "Running MongoDB command " << bsoncxx::to_json(command_builder.view()) << "\n";
+    Logger::INSTANCE().write("Running MongoDB command " + bsoncxx::to_json(command_builder.view())+"\n");
     
     auto result = admin_db.run_command(command_builder.view());
 
@@ -57,7 +58,7 @@ void MongoDBShellExecutor::setFeatureCompatibilityVersion(const std::string& ver
     command_builder << "featureCompatibilityVersion" << 1;
     result = admin_db.run_command(command_builder.view());
     resultStr = bsoncxx::to_json(result);
-    std::cout << "Answer to requested featureCompatibilityVersion: " << resultStr<< "\n";
+    Logger::INSTANCE().write("Answer to requested featureCompatibilityVersion: " + resultStr + "\n");
     resultJson.Parse(resultStr.c_str());
     assert(resultJson.HasMember("ok"));
     if (resultJson["ok"] == 1)
@@ -69,7 +70,7 @@ void MongoDBShellExecutor::setFeatureCompatibilityVersion(const std::string& ver
         }
         else
         {
-            std::cout << "New feature compatibility version: " << newVersion << "\n";
+            Logger::INSTANCE().write("New feature compatibility version: " + newVersion + "\n");
         }
     }
     else
@@ -77,7 +78,7 @@ void MongoDBShellExecutor::setFeatureCompatibilityVersion(const std::string& ver
         throw std::exception(("Failed to upgrade the database to version " + version + ". Database response: " + resultStr).c_str());
     }
     
-    std::cout << "Successfully upgraded the database to version: " + version << "\n";
+    Logger::INSTANCE().write("Successfully upgraded the database to version: " + version + "\n");
 }
 
 void MongoDBShellExecutor::shutdownDatabase()

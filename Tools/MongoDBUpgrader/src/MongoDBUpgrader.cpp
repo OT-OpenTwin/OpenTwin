@@ -2,6 +2,7 @@
 #include "SharedResources.h"
 #include "MongoDBServerRunner.h"
 #include "MongoDBShellExecutor.h"
+#include "Logger.h"
 #include "FileWriter.h"
 #include <cassert>
 #include <iostream>
@@ -41,7 +42,7 @@ void MongoDBUpgrader::performUpgrade4_2To4_4()
 
 void MongoDBUpgrader::updateServerFCV(const std::string& _version)
 {
-    std::cout << "Performing upgrade to version " + _version << "\n";
+    Logger::INSTANCE().write("Performing upgrade to version " + _version + "\n");
     const std::string mongoServerPath = CurrentPaths::INSTANCE().getMongoServerCollectionDirectory();
     std::string serverExecutablePath = mongoServerPath + "\\" + _version + "\\mongod.exe";
     MongoDBServerRunner mongoDBProcess(serverExecutablePath, m_cfgPath);
