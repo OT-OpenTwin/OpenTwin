@@ -15,6 +15,10 @@ const NavbarList = [
     title: "PROJECT",
     url: "/projects",
   },
+  {
+    title: "DASHBOARD",
+    url: "/dashboard",
+  },
 ];
 
 export default NavbarList;
