@@ -6,6 +6,7 @@
 #include "EntityGeometry.h"
 #include "Transformations.h"
 #include "BooleanOperations.h"
+#include "ChamferEdges.h"
 #include "entityCache.h"
 #include "PrimitiveManager.h"
 
@@ -17,12 +18,13 @@
 
 #include "Application.h"
 
-UpdateManager::UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ClassFactory* _classFactory) :
+UpdateManager::UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ChamferEdges* _chamferEdgesManager, ClassFactory* _classFactory) :
 	uiComponent(_uiComponent),
 	modelComponent(_modelComponent),
 	entityCache(_entityCache),
 	primitiveManager(_primitiveManager),
 	booleanOperations(_booleanOperations),
+	chamferEdgesManager(_chamferEdgesManager),
 	classFactory(_classFactory)
 {
 
@@ -453,7 +455,7 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 	}
 
 	// Now check whether we have a primitive shape which can be updated below
-	if (!getPrimitiveManager()->isPrimitiveShape(typeProperty->getValue()))
+	if (!getPrimitiveManager()->isPrimitiveShape(typeProperty->getValue()) && typeProperty->getValue() != "Chamfer Edges")
 	{
 		delete geomEntity;
 		geomEntity = nullptr;
@@ -475,7 +477,14 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 
 	// Update the actual shape geometry
 	TopoDS_Shape shape;
-	getPrimitiveManager()->updateShape(typeProperty->getValue(), geomEntity, shape);
+	if (getPrimitiveManager()->isPrimitiveShape(typeProperty->getValue()))
+	{
+		getPrimitiveManager()->updateShape(typeProperty->getValue(), geomEntity, shape);
+	}
+	else if (typeProperty->getValue() == "Chamfer Edges")
+	{
+		getChamferEdgesManager()->updateShape(geomEntity, shape);
+	}
 
 	gp_Trsf newTransform = Transformations::setTransform(geomEntity, shape, gp_Trsf());
 

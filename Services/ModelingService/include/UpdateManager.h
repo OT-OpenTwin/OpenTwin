@@ -13,6 +13,7 @@ class TopoDS_Shape;
 class EntityCache;
 class PrimitiveManager;
 class BooleanOperations;
+class ChamferEdges;
 class ClassFactory;
 
 namespace ot
@@ -27,7 +28,7 @@ namespace ot
 class UpdateManager
 {
 public:
-	UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ClassFactory *_classFactory);
+	UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ChamferEdges* _chamferEdgesManager, ClassFactory *_classFactory);
 	~UpdateManager() {};
 
 	void checkParentUpdates(std::list<ot::UID> modifiedEntities);
@@ -45,12 +46,14 @@ private:
 	void updateSingleEntity(ot::UID entityID, ot::UID entityVersion, ot::UID brepVersion, bool itemsVisible, std::list<ot::UID> &modifiedEntities);
 
 	PrimitiveManager *getPrimitiveManager(void) { assert(primitiveManager != nullptr); return primitiveManager; }
-	BooleanOperations *getBooleanOperations(void) { assert(booleanOperations != nullptr); return booleanOperations; }
+	BooleanOperations* getBooleanOperations(void) { assert(booleanOperations != nullptr); return booleanOperations; }
+	ChamferEdges* getChamferEdgesManager(void) { assert(chamferEdgesManager != nullptr); return chamferEdgesManager; }
 
 	ot::components::UiComponent *uiComponent;
 	ot::components::ModelComponent *modelComponent;
 	EntityCache *entityCache;
 	PrimitiveManager *primitiveManager;
-	BooleanOperations *booleanOperations;
+	BooleanOperations* booleanOperations;
+	ChamferEdges* chamferEdgesManager;
 	ClassFactory* classFactory;
 };

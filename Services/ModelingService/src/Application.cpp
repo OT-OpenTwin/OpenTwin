@@ -432,7 +432,7 @@ UpdateManager *Application::getUpdateManager(void)
 { 
 	if (updateManager == nullptr)
 	{
-		updateManager = new UpdateManager(m_uiComponent, m_modelComponent, &entityCache, getPrimitiveManager(), getBooleanOperations(), &getClassFactory());
+		updateManager = new UpdateManager(m_uiComponent, m_modelComponent, &entityCache, getPrimitiveManager(), getBooleanOperations(), getChamferEdgesManager(), & getClassFactory());
 	}
 
 	return updateManager; 

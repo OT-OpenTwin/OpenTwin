@@ -17,6 +17,7 @@
 #include "TopoDS.hxx"
 #include "TopoDS_Shell.hxx"
 #include "BRepAlgoAPI_Defeaturing.hxx"
+#include <BRepFilletAPI_MakeFillet.hxx>
 
 #include <map>
 #include <set>
@@ -26,7 +27,7 @@ void ChamferEdges::enterChamferEdgesMode(void)
 	std::map<std::string, std::string> options;
 
 	uiComponent->enterEntitySelectionMode(modelComponent->getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::EDGE, 
-									      true, "", ot::components::UiComponent::entitySelectionAction::CHAMFER_EDGE, "remove", options, serviceID);
+									      true, "", ot::components::UiComponent::entitySelectionAction::CHAMFER_EDGE, "chamfer", options, serviceID);
 }
 
 void ChamferEdges::performOperation(const std::string &selectionInfo)
@@ -141,8 +142,18 @@ void ChamferEdges::performOperation(const std::string &selectionInfo)
 		geometryEntity->getProperties() = baseEntity->getProperties();
 
 		deletePropertyCategory(geometryEntity, "Dimensions");
+		deletePropertyCategory(geometryEntity, "Internal");
 
-		geometryEntity->resetTransformation();
+		EntityPropertiesDouble* doubleProp = new EntityPropertiesDouble("#Chamfer width", 0.0);
+		doubleProp->setVisible(false);
+		geometryEntity->getProperties().createProperty(doubleProp, "Dimensions", true);
+
+		EntityPropertiesString* stringProp = new EntityPropertiesString("Chamfer width", "0");
+		geometryEntity->getProperties().createProperty(stringProp, "Dimensions", true);
+
+		EntityPropertiesString* baseShapeProperty = new EntityPropertiesString("baseShape", std::to_string(baseEntity->getEntityID()));
+		baseShapeProperty->setVisible(false);
+		geometryEntity->getProperties().createProperty(baseShapeProperty, "Internal");
 
 		EntityPropertiesString* typeProperty = dynamic_cast<EntityPropertiesString*>(geometryEntity->getProperties().getProperty("shapeType"));
 
@@ -155,19 +166,6 @@ void ChamferEdges::performOperation(const std::string &selectionInfo)
 			typeProperty = new EntityPropertiesString("shapeType", "Chamfer Edges");
 			typeProperty->setVisible(false);
 			geometryEntity->getProperties().createProperty(typeProperty, "Internal");
-		}
-
-		EntityPropertiesString* baseShapeProperty = dynamic_cast<EntityPropertiesString*>(geometryEntity->getProperties().getProperty("baseShape"));
-
-		if (baseShapeProperty != nullptr)
-		{
-			baseShapeProperty->setValue(std::to_string(baseEntity->getEntityID()));
-		}
-		else
-		{
-			baseShapeProperty = new EntityPropertiesString("baseShape", std::to_string(baseEntity->getEntityID()));
-			baseShapeProperty->setVisible(false);
-			geometryEntity->getProperties().createProperty(baseShapeProperty, "Internal");
 		}
 
 		// The geometry entity has two children: brep and facets. We need to assign ids to both of them (since we do not have a model state object here)
@@ -197,65 +195,6 @@ void ChamferEdges::performOperation(const std::string &selectionInfo)
 		geometryEntity = nullptr;
 	}
 
-
-
-	/*
-
-	// Here, we sort the picked faces by entity 
-	std::map<ot::UID, std::list<ChamferEdgesData>> facesMap;
-
-	for (auto face : faceList)
-	{
-		facesMap[face.getEntityID()].push_back(face);
-	}
-
-	modelComponent->enableMessageQueueing(true);
-
-	bool anySuccess = false;
-
-	// In a next step, we process entity by entity and perform the face removal operation for this entity
-	std::list<ot::UID> modifiedEntities;
-
-	for (auto shape : facesMap)
-	{
-		// Here we need to load the geometry entity, since we are going to modify it later. If we took it from the cache, it would be modified there.
-
-		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(shape.first, entityVersionMap[shape.first], *classFactory));
-
-		if (geometryEntity != nullptr)
-		{
-			if (geometryEntity->getEditable())
-			{
-				if (removeFacesFromEntity(geometryEntity, geometryEntity->getBrepStorageObjectID(), entityVersionMap[geometryEntity->getBrepStorageObjectID()], shape.second, modifiedEntities))
-				{
-					anySuccess = true;
-				}
-				else
-				{
-					if (error.empty()) error = "Unable to remove the faces from the following shapes:\n";
-					error.append(geometryEntity->getName() + "\n");
-				}
-			}
-
-			delete geometryEntity;
-			geometryEntity = nullptr;
-		}
-	}
-
-	// Now we ask the model service to check for the potential updates of the parent entities
-	getUpdateManager()->checkParentUpdates(modifiedEntities);
-
-	modelComponent->enableMessageQueueing(false);
-	uiComponent->refreshSelection(modelComponent->getCurrentVisualizationModelID());
-
-	if (anySuccess)
-	{
-		// Now we note the end of the model change operation
-		modelComponent->modelChangeOperationCompleted("remove faces");
-	}
-
-	*/
-
 	// Request a view refresh and release the user interface
 	uiComponent->refreshSelection(modelComponent->getCurrentVisualizationModelID());
 	uiComponent->unlockUI(lockFlags);
@@ -267,13 +206,77 @@ void ChamferEdges::performOperation(const std::string &selectionInfo)
 	}
 }
 
+void ChamferEdges::storeEdgeListInProperties(std::list<ChamferEdgesData> &edgeList, EntityProperties &properties)
+{
+
+}
+
+std::list<ChamferEdgesData> ChamferEdges::readEdgeListFromProperties(EntityProperties& properties)
+{
+	std::list<ChamferEdgesData> edgeList;
+
+
+	return edgeList;
+}
+
 void ChamferEdges::deletePropertyCategory(EntityGeometry* geometryEntity, const std::string category)
 {
 	std::list<std::string> deleteProperties = geometryEntity->getProperties().getListOfPropertiesForGroup(category);
 
 	for (auto prop : deleteProperties)
 	{
-		geometryEntity->getProperties().deleteProperty(prop);
+		geometryEntity->getProperties().deleteProperty(prop, category);
+	}
+}
+
+void ChamferEdges::updateShape(EntityGeometry* geometryEntity, TopoDS_Shape& shape)
+{
+	EntityPropertiesString* baseShapeProperty = dynamic_cast<EntityPropertiesString*>(geometryEntity->getProperties().getProperty("baseShape"));
+	assert(baseShapeProperty != nullptr);
+
+	ot::UID baseShapeID = std::stoull(baseShapeProperty->getValue());
+
+	std::list<ot::EntityInformation> entityInfo;
+	modelComponent->getEntityInformation(ot::UIDList{ baseShapeID }, entityInfo);
+	ot::UID baseShapeVersion = entityInfo.front().getVersion();
+
+	EntityGeometry *baseGeometry = dynamic_cast<EntityGeometry*>(entityCache->getEntity(baseShapeID, baseShapeVersion));
+
+	ot::UID brepID = baseGeometry->getBrepStorageObjectID();
+
+	entityInfo.clear();
+	modelComponent->getEntityInformation(ot::UIDList{ brepID }, entityInfo);
+	ot::UID brepVersion = entityInfo.front().getVersion();
+
+	EntityBrep* baseBrep = dynamic_cast<EntityBrep*>(entityCache->getEntity(brepID, brepVersion));
+
+	performOperation(geometryEntity, baseBrep, shape);
+}
+
+void ChamferEdges::performOperation(EntityGeometry* geometryEntity, EntityBrep* baseBrep, TopoDS_Shape& shape)
+{
+	std::list<ChamferEdgesData> edgeList = readEdgeListFromProperties(geometryEntity->getProperties());
+
+	EntityPropertiesDouble* width = dynamic_cast<EntityPropertiesDouble*>(geometryEntity->getProperties().getProperty("#Chamfer width"));
+	double chamferWidth = width->getValue();
+
+	if (chamferWidth == 0.0)
+	{
+		shape = baseBrep->getBrep();
+	}
+	else
+	{
+		BRepFilletAPI_MakeFillet  MF(baseBrep->getBrep());
+
+		// add all the edges  to fillet 
+		TopExp_Explorer  ex(baseBrep->getBrep(), TopAbs_EDGE);
+		while (ex.More())
+		{
+			MF.Add(chamferWidth, TopoDS::Edge(ex.Current()));
+			ex.Next();
+		}
+
+		shape = MF.Shape();
 	}
 }
 

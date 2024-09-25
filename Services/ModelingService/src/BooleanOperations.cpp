@@ -307,7 +307,7 @@ void BooleanOperations::deletePropertyCategory(EntityGeometry *geometryEntity, c
 
 	for (auto prop : deleteProperties)
 	{
-		geometryEntity->getProperties().deleteProperty(prop);
+		geometryEntity->getProperties().deleteProperty(prop, category);
 	}
 }
 

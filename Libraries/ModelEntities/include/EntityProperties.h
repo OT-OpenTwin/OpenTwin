@@ -22,7 +22,7 @@ public:
 	void merge(EntityProperties& other);
 
 	//! @brief Takes ownership of the property pointer.
-	bool createProperty(EntityPropertiesBase *property, const std::string &group);
+	bool createProperty(EntityPropertiesBase *property, const std::string &group, bool addToFront = false);
 	bool updateProperty(EntityPropertiesBase *property, const std::string &group);
 	bool deleteProperty(const std::string &_name, const std::string& _groupName = "");
 	bool propertyExists(const std::string &_name, const std::string& _groupName = "");

@@ -49,7 +49,7 @@ void EntityProperties::deleteAllProperties(void)
 	propertiesList.clear();
 }
 
-bool EntityProperties::createProperty(EntityPropertiesBase *prop, const std::string &group)
+bool EntityProperties::createProperty(EntityPropertiesBase *prop, const std::string &group, bool addToFront)
 {
 	EntityPropertiesBase *property = getProperty(prop->getName(),group);
 
@@ -60,7 +60,14 @@ bool EntityProperties::createProperty(EntityPropertiesBase *prop, const std::str
 	const std::string key = createKey(prop->getName(), group);
 	properties[key] = prop;
 
-	propertiesList.push_back(prop);
+	if (addToFront)
+	{
+		propertiesList.push_front(prop);
+	}
+	else
+	{
+		propertiesList.push_back(prop);
+	}
 
 	return true;
 }

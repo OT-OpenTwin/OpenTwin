@@ -5,6 +5,7 @@
 
 class Model;
 class EntityGeometry;
+class EntityBrep;
 class TopoDS_Shape;
 class UpdateManager;
 
@@ -44,12 +45,16 @@ public:
 
 	void enterChamferEdgesMode(void);
 	void performOperation(const std::string &selectionInfo);
+	void updateShape(EntityGeometry* geometryEntity, TopoDS_Shape& shape);
 
 private:
 	bool removeFacesFromEntity(EntityGeometry *geometryEntity, ot::UID brepID, ot::UID brepVersion, std::list<ChamferEdgesData> &faces, std::list<ot::UID> &modifiedEntities);
 	bool findFaceFromPosition(TopoDS_Shape &shape, double x, double y, double z, TopoDS_Shape &face);
 	UpdateManager *getUpdateManager(void) { assert(updateManager != nullptr); return updateManager; }
 	void deletePropertyCategory(EntityGeometry* geometryEntity, const std::string category);
-
+	void performOperation(EntityGeometry* geometryEntity, EntityBrep* baseBrep, TopoDS_Shape& shape);
+	void storeEdgeListInProperties(std::list<ChamferEdgesData>& edgeList, EntityProperties& properties);
+	std::list<ChamferEdgesData> readEdgeListFromProperties(EntityProperties& properties);
+	
 	UpdateManager *updateManager;
 };
