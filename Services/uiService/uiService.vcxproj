@@ -44,6 +44,7 @@
     <ClCompile Include="src\ManageGroups.cpp" />
     <ClCompile Include="src\ManageOwner.cpp" />
     <ClCompile Include="src\NavigationTreeView.cpp" />
+    <ClCompile Include="src\ProjectOverviewWidget.cpp" />
     <ClCompile Include="src\SelectEntitiesDialog.cpp" />
     <ClCompile Include="src\ServiceDataUi.cpp" />
     <ClCompile Include="src\ShortcutManager.cpp" />
@@ -75,6 +76,7 @@
     <QtMoc Include="include\LogInGSSEditDialog.h" />
     <ClInclude Include="include\LogInGSSEntry.h" />
     <ClInclude Include="include\NavigationTreeView.h" />
+    <QtMoc Include="include\ProjectOverviewWidget.h" />
     <ClInclude Include="include\QtMetaTypes.h" />
     <QtMoc Include="include\SelectEntitiesDialog.h" />
     <ClInclude Include="include\ServiceDataUi.h" />

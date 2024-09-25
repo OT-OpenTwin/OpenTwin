@@ -138,6 +138,9 @@
     <ClCompile Include="src\LogInGSSEditDialog.cpp">
       <Filter>Source Files\LogIn</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProjectOverviewWidget.cpp">
+      <Filter>Source Files\CustomWidgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ViewerComponent.h">
@@ -231,6 +234,9 @@
     </QtMoc>
     <QtMoc Include="include\LogInGSSEditDialog.h">
       <Filter>Header Files\LogIn</Filter>
+    </QtMoc>
+    <QtMoc Include="include\ProjectOverviewWidget.h">
+      <Filter>Header Files\CustomWidgets</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

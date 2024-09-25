@@ -11,14 +11,16 @@
 #include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qheaderview.h>
 
-ot::Table::Table() 
-	: m_contentChanged(false)
+ot::Table::Table(QWidget* _parentWidget)
+	: QTableWidget(_parentWidget), m_contentChanged(false)
 {
-	QShortcut* saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
-	saveShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+	this->ini();
+}
 
-	this->connect(this, &Table::cellChanged, this, &Table::slotCellDataChanged);
-	this->connect(saveShortcut, &QShortcut::activated, this, &Table::slotSaveRequested);
+ot::Table::Table(int _rows, int _columns, QWidget* _parentWidget) 
+	: QTableWidget(_rows, _columns, _parentWidget), m_contentChanged(false)
+{
+	this->ini();
 }
 
 ot::Table::~Table() {
@@ -104,4 +106,16 @@ void ot::Table::slotSaveRequested(void) {
 void ot::Table::slotCellDataChanged(int _row, int _column) {
 	m_contentChanged = true;
 	this->contentChanged();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private helper
+
+void ot::Table::ini(void) {
+	QShortcut* saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
+	saveShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+
+	this->connect(this, &Table::cellChanged, this, &Table::slotCellDataChanged);
+	this->connect(saveShortcut, &QShortcut::activated, this, &Table::slotSaveRequested);
 }

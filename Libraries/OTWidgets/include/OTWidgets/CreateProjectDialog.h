@@ -9,16 +9,38 @@
 #include "OTCore/ProjectTemplateInformation.h"
 #include "OTWidgets/Dialog.h"
 
-// std header
-#include <list>
+// Qt header
+#include <QtWidgets/qlistwidget.h>
 
-class QListWidget;
+// std header
+#include <map>
+#include <list>
 
 namespace ot {
 
 	class Label;
 	class LineEdit;
 	class PushButton;
+	class CreateProjectDialog;
+
+	class OT_WIDGETS_API_EXPORT CreateProjectDialogEntry : public QListWidgetItem {
+		OT_DECL_NODEFAULT(CreateProjectDialogEntry)
+		OT_DECL_NOCOPY(CreateProjectDialogEntry)
+	public:
+		CreateProjectDialogEntry(const ProjectTemplateInformation& _info, const CreateProjectDialog* _dialog);
+		virtual ~CreateProjectDialogEntry() {};
+
+		const ProjectTemplateInformation& getInfo(void) const { return m_info; };
+
+	private:
+		ProjectTemplateInformation m_info;
+	};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+	
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	class OT_WIDGETS_API_EXPORT CreateProjectDialog : public Dialog {
 		Q_OBJECT
@@ -30,14 +52,24 @@ namespace ot {
 		void setProjectTemplates(const std::list<ProjectTemplateInformation>& _templates);
 		void setCurrentProjectName(const QString& _name);
 
-		QString getProjectType(void) const;
-		QString getProjectName(void) const;
+		std::string getProjectType(void) const;
+		std::string getTemplateName(bool _emptyIfDefault) const;
+		std::string getProjectName(void) const;
+
+		void setDefaultIcon(const QIcon& _icon) { m_defaultIcon = _icon; };
+		const QIcon& getDefaultIcon(void) const { return m_defaultIcon; };
+
+		void setDefaultIconMap(const std::map<std::string, std::string>& _projectNameToIconMap) { m_defaultIconMap = _projectNameToIconMap; };
+		const std::map<std::string, std::string>& getDefaultIconMap(void) const { return m_defaultIconMap; };
+
+		void setCustomIconMap(const std::map<std::string, std::string>& _projectNameToIconMap) { m_customIconMap = _projectNameToIconMap; };
+		const std::map<std::string, std::string>& getCustomIconMap(void) const { return m_customIconMap; };
 
 	protected:
 		virtual void showEvent(QShowEvent* _event) override;
 
 	Q_SIGNALS:
-		void createProject(const QString& _projectName, const QString& _projectTemplate);
+		void createProject(const QString& _projectName, const std::string& _projectType, const std::string& _projectTemplate);
 
 	private Q_SLOTS:
 		void slotFocusName(void);
@@ -57,6 +89,10 @@ namespace ot {
 		LineEdit* m_search;
 		LineEdit* m_name;
 		PushButton* m_createButton;
+
+		QIcon m_defaultIcon;
+		std::map<std::string, std::string> m_defaultIconMap;
+		std::map<std::string, std::string> m_customIconMap;
 	};
 
 }

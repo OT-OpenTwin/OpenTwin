@@ -61,6 +61,7 @@ class UiPluginManager;
 
 // Forward declaration
 class ToolBar;
+class ProjectOverviewWidget;
 namespace ak { class aNotifier; class aWindow; }
 namespace ak { class aTreeWidget; }
 namespace ot { class Label; }
@@ -565,7 +566,8 @@ private:
 	ViewerComponent *			m_viewerComponent;
 	ExternalServicesComponent *	m_ExternalServicesComponent;
 
-	OldWelcomeScreen*			m_welcomeScreen;
+	OldWelcomeScreen*			m_oldWelcomeScreen;
+	ProjectOverviewWidget*      m_welcomeScreen;
 
 	ShortcutManager *			m_shortcutManager;
 	ContextMenuManager *		m_contextMenuManager;

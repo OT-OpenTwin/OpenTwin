@@ -18,7 +18,8 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(Table)
 	public:
-		Table();
+		Table(QWidget* _parentWidget = (QWidget*)nullptr);
+		Table(int _rows, int _columns, QWidget* _parentWidget = (QWidget*)nullptr);
 		virtual ~Table();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -53,6 +54,8 @@ namespace ot {
 		void slotCellDataChanged(int _row, int _column);
 
 	private:
+		void ini(void);
+
 		bool m_contentChanged;
 		std::string m_tableName;
 		QString m_tableTitle;

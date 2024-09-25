@@ -165,8 +165,8 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 
 	ot::ProjectTemplateInformation default3D;
 	default3D.setName(OT_ACTION_PARAM_SESSIONTYPE_3DSIM);
+	default3D.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_3DSIM);
 	default3D.setDescription("3D Simulation project.\nCreate, import, export and modify 3D geometries. Run simulations.");
-	default3D.setIconSubPath("ProjectTemplates/3D.png");
 	default3D.setIsDefault(true);
 
 	ot::JsonObject obj3D;
@@ -175,8 +175,8 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 
 	ot::ProjectTemplateInformation defaultPipeline;
 	defaultPipeline.setName(OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE);
+	defaultPipeline.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE);
 	defaultPipeline.setDescription("Data pipeline project.\nCreate automations.");
-	defaultPipeline.setIconSubPath("ProjectTemplates/Pipeline.png");
 	defaultPipeline.setIsDefault(true);
 
 	ot::JsonObject objPipeline;
@@ -185,8 +185,8 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 
 	ot::ProjectTemplateInformation defaultCST;
 	defaultCST.setName(OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE);
+	defaultCST.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE);
 	defaultCST.setDescription("CST Studio Suite Project.\nImport and export projects from CST Studio Suite.");
-	defaultCST.setIconSubPath("ProjectTemplates/CST.png");
 	defaultCST.setIsDefault(true);
 
 	ot::JsonObject objCST;
@@ -195,8 +195,9 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 
 	ot::ProjectTemplateInformation defaultDevelopment;
 	defaultDevelopment.setName(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT);
+	defaultDevelopment.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT);
+	defaultDevelopment.setBriefDescription("All OpenTwin services");
 	defaultDevelopment.setDescription("Development Project.\nRun all services provided by OpenTwin in one session.");
-	defaultDevelopment.setIconSubPath("ProjectTemplates/Development.png");
 	defaultDevelopment.setIsDefault(true);
 
 	ot::JsonObject objDev;

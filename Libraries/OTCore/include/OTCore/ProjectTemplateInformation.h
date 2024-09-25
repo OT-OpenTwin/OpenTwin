@@ -31,19 +31,23 @@ namespace ot {
 		void setName(const std::string& _name) { m_name = _name; };
 		const std::string& getName(void) const { return m_name; };
 
+		void setProjectType(const std::string& _type) { m_projectType = _type; };
+		const std::string& getProjectType(void) const { return m_projectType; };
+
+		void setBriefDescription(const std::string& _description) { m_briefDescription = _description; };
+		const std::string& getBriefDescription(void) const { return m_briefDescription; };
+
 		void setDescription(const std::string& _description) { m_description = _description; };
 		const std::string& getDescription(void) const { return m_description; };
-
-		void setIconSubPath(const std::string& _path) { m_iconSubPath = _path; };
-		const std::string& getIconSubPath(void) const { return m_iconSubPath; };
 
 		void setIsDefault(bool _isDefault) { m_isDefault = _isDefault; };
 		bool getIsDefault(void) const { return m_isDefault; };
 
 	private:
 		std::string m_name;
+		std::string m_projectType;
+		std::string m_briefDescription;
 		std::string m_description;
-		std::string m_iconSubPath;
 		bool m_isDefault;
 	};
 

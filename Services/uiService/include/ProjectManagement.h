@@ -34,7 +34,7 @@ public:
 
 	bool InitializeConnection(void);
 
-	bool createProject(const std::string& _projectName, const std::string& _projectTemplate, const std::string & _userName);
+	bool createProject(const std::string &projectName, const std::string& projectType, const std::string &userName, const std::string &defaultSettingTemplate);
 	bool deleteProject(const std::string &projectName);
 	std::string exportProject(const std::string &projectName, const std::string &exportFileName, AppBase *parent);
 	std::string importProject(const std::string &projectName, const std::string &userName, const std::string &importFileName, AppBase *parent);

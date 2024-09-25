@@ -8,9 +8,11 @@
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/CreateProjectDialog.h"
 
 // Qt header
+#include <QtGui/qpainter.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qsplitter.h>
 #include <QtWidgets/qlistwidget.h>
@@ -19,13 +21,49 @@
 
 #define OT_CREATEPROJECTDIALOG_TitlePrefix "Create Project"
 
+ot::CreateProjectDialogEntry::CreateProjectDialogEntry(const ProjectTemplateInformation& _info, const CreateProjectDialog* _dialog)
+	: m_info(_info) 
+{
+	this->setText(QString::fromStdString(m_info.getName()));
+	this->setToolTip(QString::fromStdString(m_info.getBriefDescription()));
+
+	if (m_info.getIsDefault()) {
+		const auto it = _dialog->getDefaultIconMap().find(m_info.getProjectType());
+		if (it != _dialog->getDefaultIconMap().end()) {
+			this->setIcon(IconManager::getIcon(QString::fromStdString(it->second)));
+		}
+		else {
+			this->setIcon(_dialog->getDefaultIcon());
+		}
+	}
+	else {
+		const auto it = _dialog->getCustomIconMap().find(m_info.getProjectType());
+		if (it != _dialog->getCustomIconMap().end()) {
+			this->setIcon(IconManager::getIcon(QString::fromStdString(it->second)));
+		}
+		else {
+			this->setIcon(_dialog->getDefaultIcon());
+		}
+	}
+
+	QFont font = this->font();
+	font.setPixelSize(16);
+	this->setFont(font);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 ot::CreateProjectDialog::CreateProjectDialog(QWidget* _parentWidget)
 	: Dialog(_parentWidget)
 {
 	// Create layouts
 	QVBoxLayout* centralLayout = new QVBoxLayout(this);
 	QHBoxLayout* nameAndButtonLayout = new QHBoxLayout;
-
+	
 	// Create controls
 	QSplitter* centralSplitter = new QSplitter(Qt::Horizontal);
 
@@ -47,9 +85,12 @@ ot::CreateProjectDialog::CreateProjectDialog(QWidget* _parentWidget)
 
 	// Setup controls
 	m_search->setPlaceholderText("Search...");
+	
 	m_list->setIconSize(QSize(32, 32));
+	
 	m_info->setMinimumWidth(100);
 	m_info->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+	
 	m_createButton->setEnabled(false);
 
 	// Setup layouts
@@ -79,7 +120,7 @@ ot::CreateProjectDialog::CreateProjectDialog(QWidget* _parentWidget)
 }
 
 ot::CreateProjectDialog::~CreateProjectDialog() {
-
+	
 }
 
 void ot::CreateProjectDialog::setProjectTemplates(const std::list<ProjectTemplateInformation>& _templates) {
@@ -119,19 +160,41 @@ void ot::CreateProjectDialog::setCurrentProjectName(const QString& _name) {
 	m_name->setText(_name);
 }
 
-QString ot::CreateProjectDialog::getProjectType(void) const {
+std::string ot::CreateProjectDialog::getProjectType(void) const {
 	QList<QListWidgetItem*> items = m_list->selectedItems();
 	if (items.count() == 1) {
-		return items.front()->text();
+		CreateProjectDialogEntry* actualItem = dynamic_cast<CreateProjectDialogEntry*>(items.front());
+		if (!actualItem) {
+			OT_LOG_EA("Item cast failed");
+			return std::string();
+		}
+		return actualItem->getInfo().getProjectType();
 	}
 	else if (!items.isEmpty()) {
 		OT_LOG_E("Invalid selection");
 	}
-	return QString();
+	return std::string();
 }
 
-QString ot::CreateProjectDialog::getProjectName(void) const {
-	return m_name->text();
+std::string ot::CreateProjectDialog::getTemplateName(bool _emptyIfDefault) const {
+	QList<QListWidgetItem*> items = m_list->selectedItems();
+	if (items.count() == 1) {
+		CreateProjectDialogEntry* actualItem = dynamic_cast<CreateProjectDialogEntry*>(items.front());
+		if (!actualItem) {
+			OT_LOG_EA("Item cast failed");
+			return std::string();
+		}
+		if (_emptyIfDefault && actualItem->getInfo().getIsDefault()) return std::string();
+		else return actualItem->getInfo().getName();
+	}
+	else if (!items.isEmpty()) {
+		OT_LOG_E("Invalid selection");
+	}
+	return std::string();
+}
+
+std::string ot::CreateProjectDialog::getProjectName(void) const {
+	return m_name->text().toStdString();
 }
 
 void ot::CreateProjectDialog::showEvent(QShowEvent* _event) {
@@ -150,12 +213,23 @@ void ot::CreateProjectDialog::slotShowInfo(void) {
 		this->setWindowTitle(OT_CREATEPROJECTDIALOG_TitlePrefix);
 	}
 	else if (items.count() == 1) {
-		QString info = items.front()->data(Qt::UserRole).toString();
-		if (info.isEmpty()) {
-			info = items.front()->text();
+		CreateProjectDialogEntry* actualItem = dynamic_cast<CreateProjectDialogEntry*>(items.front());
+		if (!actualItem) {
+			OT_LOG_EA("Item cast failed");
+			return;
 		}
-		m_info->setText(info);
-		this->setWindowTitle(OT_CREATEPROJECTDIALOG_TitlePrefix " (" + items.front()->text() + ")");
+		std::string info = actualItem->getInfo().getDescription();
+		if (info.empty()) {
+			if (actualItem->getInfo().getBriefDescription().empty()) {
+				info = actualItem->getInfo().getName();
+			}
+			else {
+				info = actualItem->getInfo().getBriefDescription();
+			}
+		}
+		
+		m_info->setText(QString::fromStdString(info));
+		this->setWindowTitle(OT_CREATEPROJECTDIALOG_TitlePrefix " (" + QString::fromStdString(actualItem->getInfo().getName()) + ")");
 	}
 	else {
 		OT_LOG_E("Invalid selection");
@@ -193,7 +267,6 @@ void ot::CreateProjectDialog::slotCreate(void) {
 		return;
 	}
 
-	QString templateName;
 	QList<QListWidgetItem*> items = m_list->selectedItems();
 	if (items.size() != 1) {
 		QMessageBox msg(QMessageBox::Warning, "Invalid Data", "Please select a project template.", QMessageBox::Ok, this);
@@ -201,10 +274,13 @@ void ot::CreateProjectDialog::slotCreate(void) {
 		return;
 	}
 	else {
-		templateName = items.front()->text();
+		CreateProjectDialogEntry* actualItem = dynamic_cast<CreateProjectDialogEntry*>(items.front());
+		if (!actualItem) {
+			OT_LOG_EA("Item cast failed");
+			return;
+		}
+		Q_EMIT createProject(newName, actualItem->getInfo().getProjectType(), actualItem->getInfo().getName());
 	}
-
-	Q_EMIT createProject(newName, templateName);
 }
 
 void ot::CreateProjectDialog::slotCheckCreateEnabledState(void) {
@@ -221,15 +297,6 @@ void ot::CreateProjectDialog::clear(void) {
 }
 
 void ot::CreateProjectDialog::addListEntry(const ProjectTemplateInformation& _info) {
-	QListWidgetItem* newItem = new QListWidgetItem;
-	
-	QFont font = newItem->font();
-	font.setPixelSize(32);
-	newItem->setFont(font);
-
-	newItem->setText(QString::fromStdString(_info.getName()));
-	newItem->setIcon(IconManager::getIcon(QString::fromStdString(_info.getIconSubPath())));
-	newItem->setData(Qt::UserRole, QVariant(QString::fromStdString(_info.getDescription())));
-
-	m_list->addItem(newItem);
+	CreateProjectDialogEntry* newEntry = new CreateProjectDialogEntry(_info, this);
+	m_list->addItem(newEntry);
 }

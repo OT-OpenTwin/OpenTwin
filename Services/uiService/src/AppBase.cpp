@@ -23,6 +23,7 @@
 #include "DevLogger.h"
 #include "LogInDialog.h"
 #include "NavigationTreeView.h"
+#include "ProjectOverviewWidget.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>
@@ -182,6 +183,7 @@ AppBase::AppBase()
 AppBase::~AppBase() {
 	if (m_viewerComponent != nullptr) { delete m_viewerComponent; m_viewerComponent = nullptr; }
 	if (m_ExternalServicesComponent != nullptr) { delete m_ExternalServicesComponent; m_ExternalServicesComponent = nullptr; }
+	if (m_oldWelcomeScreen != nullptr) { delete m_oldWelcomeScreen; m_oldWelcomeScreen = nullptr; }
 	if (m_welcomeScreen != nullptr) { delete m_welcomeScreen; m_welcomeScreen = nullptr; }
 }
 
@@ -377,10 +379,10 @@ void AppBase::notify(
 			if (_eventType == etTabToolbarChanged) {
 				// The clicked event occurs before the tabs are changed
 				if (_info1 == 0 && !m_widgetIsWelcome) {
-					uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->widget());
+					uiAPI::window::setCentralWidget(m_mainWindow, m_oldWelcomeScreen->widget());
 					m_widgetIsWelcome = true;
-					m_welcomeScreen->refreshProjectNames();
-					m_welcomeScreen->refreshRecent();
+					m_oldWelcomeScreen->refreshProjectNames();
+					m_oldWelcomeScreen->refreshRecent();
 				}
 				else if (m_widgetIsWelcome) {
 					// Changing from welcome screen to other tabView
@@ -449,7 +451,7 @@ bool AppBase::createNewProjectInDatabase(
 	ProjectManagement pManager(m_loginData);
 
 	assert(pManager.InitializeConnection()); // Failed to connect
-	return pManager.createProject(_projectName.toStdString(), _projectType.toStdString(), m_loginData.getUserName());
+	return pManager.createProject(_projectName.toStdString(), _projectType.toStdString(), m_loginData.getUserName(), "");
 }
 
 void AppBase::lockSelectionAndModification(bool flag)
@@ -494,11 +496,13 @@ void AppBase::lockUI(bool flag)
 
 void AppBase::refreshWelcomeScreen(void)
 {
-	m_welcomeScreen->refreshList();
+	m_oldWelcomeScreen->refreshList();
+	m_welcomeScreen->slotRefreshProjectList();
 }
 
 void AppBase::lockWelcomeScreen(bool flag)
 {
+	m_oldWelcomeScreen->lock(flag);
 	m_welcomeScreen->lock(flag);
 }
 
@@ -514,7 +518,7 @@ void AppBase::welcomeScreenEventCallback(
 	{
 	case OldWelcomeScreen::event_createClicked:
 	{
-		std::string currentName = m_welcomeScreen->getProjectName().toStdString();
+		std::string currentName = m_oldWelcomeScreen->getProjectName().toStdString();
 		// Check if any changes were made to the current project. Will receive a false if the user presses cancel
 		if (!checkForContinue("Create New Project")) { return; }
 
@@ -554,9 +558,29 @@ void AppBase::welcomeScreenEventCallback(
 			projectExists = true;
 		}
 
+		// Create new project dialog
 		ot::CreateProjectDialog newProjectDialog(this->mainWindow());
+
+		// Fill icon maps
+		newProjectDialog.setDefaultIcon(ot::IconManager::getIcon("ProjectTemplates/DefaultIcon.png"));
+		newProjectDialog.setDefaultIconMap(std::map<std::string, std::string>({
+			{OT_ACTION_PARAM_SESSIONTYPE_3DSIM, "ProjectTemplates/3D.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE, "ProjectTemplates/Pipeline.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, "ProjectTemplates/CST.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT, "ProjectTemplates/Development.png"}
+			}));
+
+		newProjectDialog.setCustomIconMap(std::map<std::string, std::string>({
+			{OT_ACTION_PARAM_SESSIONTYPE_3DSIM, "ProjectTemplates/Custom3D.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE, "ProjectTemplates/CustomPipeline.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, "ProjectTemplates/CustomCST.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT, "ProjectTemplates/CustomDevelopment.png"}
+			}));
+
+		// Initialize data
 		newProjectDialog.setProjectTemplates(m_ExternalServicesComponent->getListOfProjectTemplates());
-		newProjectDialog.setCurrentProjectName(m_welcomeScreen->getProjectName());
+		newProjectDialog.setCurrentProjectName(m_oldWelcomeScreen->getProjectName());
+
 		this->connect(&newProjectDialog, &ot::CreateProjectDialog::createProject, &newProjectDialog, &ot::CreateProjectDialog::closeOk);
 
 		ot::Dialog::DialogResult result = newProjectDialog.showDialog();
@@ -567,8 +591,9 @@ void AppBase::welcomeScreenEventCallback(
 			return;
 		}
 
-		currentName = newProjectDialog.getProjectName().toStdString();
-		std::string projectType = newProjectDialog.getProjectType().toStdString();
+		currentName = newProjectDialog.getProjectName();
+		std::string projectType = newProjectDialog.getProjectType();
+		std::string templateName = newProjectDialog.getTemplateName(true);
 
 		if (projectExists) {
 			// Check if the project it the same project as the currently open one
@@ -579,10 +604,10 @@ void AppBase::welcomeScreenEventCallback(
 
 			// Delete Project
 			pManager.deleteProject(currentName);
-			m_welcomeScreen->refreshList();
+			m_oldWelcomeScreen->refreshList();
 		}
 
-		pManager.createProject(currentName, projectType, m_loginData.getUserName());
+		pManager.createProject(currentName, projectType, m_loginData.getUserName(), templateName);
 
 		UserManagement manager(m_loginData);
 		assert(manager.checkConnection()); // Failed to connect
@@ -603,7 +628,7 @@ void AppBase::welcomeScreenEventCallback(
 		// Check if any changes were made to the current project. Will receive a false if the user presses cancel
 		if (!checkForContinue("Open Project")) { return; }
 
-		const std::string & selectedProjectName = m_welcomeScreen->getProjectName(_row).toStdString();
+		const std::string & selectedProjectName = m_oldWelcomeScreen->getProjectName(_row).toStdString();
 		bool canBeDeleted = false;
 		if (pManager.projectExists(selectedProjectName, canBeDeleted)) 
 		{
@@ -650,7 +675,7 @@ void AppBase::welcomeScreenEventCallback(
 					uiAPI::promptDialog::show("Unable to access this project. The access permission might have been changed.", "Open Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
 
 					manager.removeRecentProject(selectedProjectName);
-					m_welcomeScreen->refreshList();
+					m_oldWelcomeScreen->refreshList();
 				}
 				else
 				{
@@ -675,7 +700,7 @@ void AppBase::welcomeScreenEventCallback(
 			uiAPI::promptDialog::show("Unable to access this project. The access permission might have been changed or the project has been deleted.", "Open Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
 
 			manager.removeRecentProject(selectedProjectName);
-			m_welcomeScreen->refreshList();
+			m_oldWelcomeScreen->refreshList();
 		}
 	}
 		break;
@@ -683,7 +708,7 @@ void AppBase::welcomeScreenEventCallback(
 	{
 		//_additionalInfo holds the new project name
 		//		it is already checked and the current project is closed if this is the one that should be replaced
-		std::string selectedProjectName = m_welcomeScreen->getProjectName(_row).toStdString();
+		std::string selectedProjectName = m_oldWelcomeScreen->getProjectName(_row).toStdString();
 		std::string newProjectName = _additionalInfo.toStdString();
 
 		pManager.copyProject(selectedProjectName, newProjectName, m_loginData.getUserName());
@@ -694,7 +719,7 @@ void AppBase::welcomeScreenEventCallback(
 		manager.addRecentProject(newProjectName);
 
 		// And refresh the view
-		m_welcomeScreen->refreshList();
+		m_oldWelcomeScreen->refreshList();
 
 		break;
 	}
@@ -702,7 +727,7 @@ void AppBase::welcomeScreenEventCallback(
 	{
 		//_additionalInfo holds the new project name
 		//		it is already checked and the current project is closed if this is the one that should be replaced
-		std::string selectedProjectName = m_welcomeScreen->getProjectName(_row).toStdString();
+		std::string selectedProjectName = m_oldWelcomeScreen->getProjectName(_row).toStdString();
 
 		bool projectIsLocked = false;
 
@@ -750,14 +775,14 @@ void AppBase::welcomeScreenEventCallback(
 			}
 
 			// And refresh the view
-			m_welcomeScreen->refreshList();
+			m_oldWelcomeScreen->refreshList();
 		}
 
 		break;
 	}
 	case OldWelcomeScreen::event_deleteClicked:
 	{
-		QString selectedProjectName = m_welcomeScreen->getProjectName(_row);
+		QString selectedProjectName = m_oldWelcomeScreen->getProjectName(_row);
 
 		bool projectIsLocked = false;
 
@@ -794,7 +819,7 @@ void AppBase::welcomeScreenEventCallback(
 				UserManagement uManager(m_loginData);
 				bool checkConnection = uManager.checkConnection(); assert(checkConnection); // Connect and check
 				uManager.removeRecentProject(selectedProjectName.toStdString());
-				m_welcomeScreen->refreshList();
+				m_oldWelcomeScreen->refreshList();
 			}
 		}
 
@@ -804,7 +829,7 @@ void AppBase::welcomeScreenEventCallback(
 	{
 		lockUI(true);
 
-		QString selectedProjectName = m_welcomeScreen->getProjectName(_row);
+		QString selectedProjectName = m_oldWelcomeScreen->getProjectName(_row);
 
 		// Show the export file selector 
 		QString exportFileName = QFileDialog::getSaveFileName(
@@ -831,7 +856,7 @@ void AppBase::welcomeScreenEventCallback(
 	{
 		lockUI(true);
 
-		QString selectedProjectName = m_welcomeScreen->getProjectName(_row);
+		QString selectedProjectName = m_oldWelcomeScreen->getProjectName(_row);
 
 		// Show the ManageAccess Dialog box
 		ManageAccess accessManager(m_loginData.getAuthorizationUrl(), selectedProjectName.toStdString());
@@ -847,7 +872,7 @@ void AppBase::welcomeScreenEventCallback(
 		// Check if any changes were made to the current project. Will receive a false if the user presses cancel
 	 	if (!checkForContinue("Open Project")) { return; }
 
-		const std::string & selectedProjectName = m_welcomeScreen->getProjectName(_row).toStdString();
+		const std::string & selectedProjectName = m_oldWelcomeScreen->getProjectName(_row).toStdString();
 		bool canBeDeleted = false;
 		if (pManager.projectExists(selectedProjectName, canBeDeleted)) 
 		{
@@ -893,7 +918,7 @@ void AppBase::welcomeScreenEventCallback(
 					uiAPI::promptDialog::show("Unable to access this project. The access permission might have been changed.", "Open Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
 
 					manager.removeRecentProject(selectedProjectName);
-					m_welcomeScreen->refreshList();
+					m_oldWelcomeScreen->refreshList();
 				}
 				else
 				{
@@ -917,7 +942,7 @@ void AppBase::welcomeScreenEventCallback(
 			uiAPI::promptDialog::show("Unable to access this project. The access permission might have been changed or the project has been deleted.", "Open Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
 
 			manager.removeRecentProject(selectedProjectName);
-			m_welcomeScreen->refreshList();
+			m_oldWelcomeScreen->refreshList();
 		}
 	}
 		break;
@@ -1219,7 +1244,9 @@ void AppBase::createUi(void) {
 				m_output->appendPlainText(BUILD_INFO);
 			}
 
-			m_welcomeScreen = new OldWelcomeScreen(uiAPI::getIcon("OpenSlectedProject", "Default"), uiAPI::getIcon("CopyItem", "Default"),
+			m_welcomeScreen = new ProjectOverviewWidget;
+
+			m_oldWelcomeScreen = new OldWelcomeScreen(uiAPI::getIcon("OpenSlectedProject", "Default"), uiAPI::getIcon("CopyItem", "Default"),
 				uiAPI::getIcon("RenameItem", "Default"), 
 				uiAPI::getIcon("Delete", "Default"), uiAPI::getIcon("Export", "Default"), uiAPI::getIcon("ManageAccess", "Default"), 
 				uiAPI::getIcon("ChangeOwner", "Default"), this);
@@ -1245,7 +1272,8 @@ void AppBase::createUi(void) {
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Set widgets to docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 25);
-			m_welcomeScreen->refreshRecent();
+			m_oldWelcomeScreen->refreshRecent();
+			m_welcomeScreen->slotRefreshRecentProjects();
 
 			// #######################################################################
 
@@ -1265,8 +1293,8 @@ void AppBase::createUi(void) {
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker, m_projectNavigation->getViewDockWidget()->dockAreaWidget());
 			m_projectNavigation->getViewDockWidget()->setAsCurrentTab();
 
-			//Note
-			uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->widget());
+			//uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->getQWidget());
+			uiAPI::window::setCentralWidget(m_mainWindow, m_oldWelcomeScreen->widget());
 			//uiAPI::window::setCentralWidget(m_mainWindow, m_widgets.welcomeScreen);
 			m_widgetIsWelcome = true;
 
