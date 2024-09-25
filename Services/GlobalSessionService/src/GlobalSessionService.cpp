@@ -3,6 +3,9 @@
 //! @date March 2022
 // ###########################################################################################################################################################################################################################################################################################################################
 
+#define NOMINMAX //Supress windows macros min max
+#define WIN32_LEAN_AND_MEAN
+
 // GSS header
 #include "GlobalSessionService.h"
 #include "LocalSessionService.h"
@@ -11,8 +14,12 @@
 // OpenTwin header
 #include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
-#include "OTCore/ProjectTemplateInformation.h"
 #include "OTCommunication/Msg.h"
+#include "DataBase.h"
+
+#include "DocumentAPI.h"
+#include "Connection\ConnectionAPI.h"
+#include "Document\DocumentAccess.h"
 
 // std header
 #include <iostream>
@@ -161,8 +168,15 @@ std::string GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument& _doc)
 }
 
 std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument& _doc) {
+	std::string user = ot::json::getString(_doc, OT_PARAM_DB_USERNAME);
+	std::string password = ot::json::getString(_doc, OT_PARAM_DB_PASSWORD);
+
 	ot::JsonDocument result(rapidjson::kArrayType);
 
+	// Get custom templates
+	this->getCustomProjectTemplates(result, user, password);
+
+	// Add default templates
 	ot::ProjectTemplateInformation default3D;
 	default3D.setName(OT_ACTION_PARAM_SESSIONTYPE_3DSIM);
 	default3D.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_3DSIM);
@@ -464,6 +478,91 @@ LocalSessionService * GlobalSessionService::leastLoadedSessionService(void) {
 		}
 	}
 	return leastLoadedSessionService;
+}
+
+void GlobalSessionService::getCustomProjectTemplates(ot::JsonDocument& _resultArray, const std::string& _user, const std::string& _password) {
+	try {
+		DataStorageAPI::ConnectionAPI::establishConnection(m_databaseUrl, "1", _user, _password);
+
+		// Now we run a command on the server and check whether its is really responding to us (the following command throws an exception if not)
+		if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists("Projects", "Catalog")) {
+			OT_LOG_E("Projects/Catalog collection does not exist");
+			return;
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
+		return;
+	}
+	catch (...) {
+		OT_LOG_EA("[FATAL] Unknown error");
+		return;
+	}
+
+	mongocxx::database db = DataStorageAPI::ConnectionAPI::getInstance().getDatabase("ProjectTemplates");
+
+	std::vector<std::string> names = db.list_collection_names();
+
+	for (const std::string& name : names) {
+		try {
+			std::string projectType = OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT;
+			std::string description;
+			std::string briefDescription;
+
+			if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists("ProjectTemplates", name)) {
+				OT_LOG_EAS("Template collection \"" + name + "\" can not be accessed");
+				continue;
+			}
+
+			// Get template information
+			DataStorageAPI::DocumentAccess docManager("ProjectTemplates", name);
+
+			auto queryDoc = bsoncxx::builder::basic::document{};
+			queryDoc.append(bsoncxx::builder::basic::kvp("Information", ""));
+
+			auto filterDoc = bsoncxx::builder::basic::document{};
+
+			auto result = docManager.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
+
+			if (!result.getSuccess()) {
+				OT_LOG_EAS("Grabbing template collection \"" + name + "\" failed");
+				continue;
+			}
+
+			bsoncxx::builder::basic::document doc;
+			doc.append(bsoncxx::builder::basic::kvp("Found", result.getBsonResult().value()));
+
+			auto doc_view = doc.view()["Found"].get_document().view();
+
+			try {
+				projectType = doc_view["ProjectType"].get_utf8().value.data();
+			}
+			catch (...) {}
+			try {
+				description = doc_view["Description"].get_utf8().value.data();
+			}
+			catch (...) {}
+			try {
+				briefDescription = doc_view["BriefDescription"].get_utf8().value.data();
+			}
+			catch (...) {}
+
+			// Create and serialize new information
+			ot::ProjectTemplateInformation newInfo;
+			newInfo.setName(name);
+			newInfo.setIsDefault(false);
+			newInfo.setProjectType(projectType);
+			newInfo.setDescription(description);
+			newInfo.setBriefDescription(briefDescription);
+
+			ot::JsonObject obj;
+			newInfo.addToJsonObject(obj, _resultArray.GetAllocator());
+			_resultArray.PushBack(obj, _resultArray.GetAllocator());
+		}
+		catch (...) {
+			OT_LOG_E("Any request for template collection \"" + name + "\" failed");
+		}
+	}
 }
 
 GlobalSessionService::GlobalSessionService()

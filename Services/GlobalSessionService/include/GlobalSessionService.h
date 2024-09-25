@@ -10,6 +10,7 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/LogModeManager.h"
+#include "OTCore/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTCommunication/ActionHandleConnector.h"
@@ -77,6 +78,8 @@ private:
 	void removeSessionService(LocalSessionService* _service);
 
 	LocalSessionService* leastLoadedSessionService(void);
+
+	void getCustomProjectTemplates(ot::JsonDocument& _resultArray, const std::string& _user, const std::string& _password);
 
 	GlobalSessionService();
 	virtual ~GlobalSessionService();
