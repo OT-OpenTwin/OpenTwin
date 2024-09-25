@@ -210,7 +210,7 @@ void ProjectOverviewWidget::slotUpdateItemSelection(void) {
 	// Table to check box
 	for (int r = 0; r < m_table->rowCount(); r++) {
 		if (r >= m_entries.size()) {
-			OT_LOG_E("Data mismatch");
+			OT_LOG_EA("Data mismatch");
 			break;
 		}
 		m_entries[r]->setIsChecked(m_table->item(r, TableColumn::ColumnName)->isSelected() || m_table->item(r, TableColumn::ColumnOwner)->isSelected());
@@ -388,14 +388,20 @@ void ProjectOverviewWidget::clear(void) {
 		delete entry;
 	}
 	m_entries.clear();
+	bool blocked = m_table->signalsBlocked();
+	m_table->blockSignals(true);
 	m_table->setRowCount(0);
+	m_table->blockSignals(blocked);
 }
 
 void ProjectOverviewWidget::addProject(const QString& _projectName, const QString& _owner, bool _ownerIsCreator) {
+	bool blocked = m_table->signalsBlocked();
+	m_table->blockSignals(true);
 	ProjectOverviewEntry* newEntry = new ProjectOverviewEntry(_projectName, _owner, _ownerIsCreator, m_table);
 	OTAssert(newEntry->getRow() == m_entries.size(), "Index mismatch");
 	m_entries.push_back(newEntry);
 	this->connect(newEntry, &ProjectOverviewEntry::checkedChanged, this, &ProjectOverviewWidget::slotProjectCheckedChanged);
+	m_table->blockSignals(blocked);
 }
 
 void ProjectOverviewWidget::updateCountLabel(bool _hasMore) {
