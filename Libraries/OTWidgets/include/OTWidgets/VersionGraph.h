@@ -26,6 +26,9 @@ namespace ot {
 		
 		void clear(void);
 
+	protected:
+		virtual void showEvent(QShowEvent* _event) override;
+
 	public Q_SLOTS:
 		void slotUpdateVersionItems(void);
 		void slotCenterOnVersion(const std::string& _versionName);
@@ -34,6 +37,7 @@ namespace ot {
 		VersionGraphItem* getVersion(const std::string& _name);
 		void highlightVersion(const std::string& _name);
 
+		std::string m_activeVersion;
 		std::list<VersionGraphItem*> m_rootItems;
 
 	};

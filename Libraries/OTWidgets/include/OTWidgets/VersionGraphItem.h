@@ -20,7 +20,7 @@ namespace ot {
 		OT_DECL_NOCOPY(VersionGraphItem)
 		OT_DECL_NODEFAULT(VersionGraphItem)
 	public:
-		VersionGraphItem(const VersionGraphVersionCfg& _config, int _row, GraphicsScene* _scene);
+		VersionGraphItem(const VersionGraphVersionCfg& _config, int _row, const std::string& _activeVersion, GraphicsScene* _scene);
 		virtual ~VersionGraphItem();
 
 		const VersionGraphVersionCfg& getVersionConfig(void) const { return m_config; };

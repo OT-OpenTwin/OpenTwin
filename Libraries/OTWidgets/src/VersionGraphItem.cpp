@@ -18,12 +18,14 @@
 #define OT_VERSIONGRAPHITEM_VSpacing 30.
 #define OT_VERSIONGRAPHITEM_HSpacing 60.
 
-ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, int _row, GraphicsScene* _scene)
+ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, int _row, const std::string& _activeVersion, GraphicsScene* _scene)
 	: m_parentVersion(nullptr), m_parentConnection(nullptr), m_row(_row), m_config(_config)
 {
 	OTAssertNullptr(_scene);
 	this->setGraphicsScene(_scene);
 
+	this->setGraphicsItemName(m_config.getName());
+	this->setGraphicsItemToolTip(m_config.getDescription());
 	this->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState | GraphicsItemCfg::ItemIsSelectable);
 	
 	GraphicsGridLayoutItem* centralLayout = new GraphicsGridLayoutItem;
@@ -39,8 +41,6 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 	GraphicsRectangularItem* border = new GraphicsRectangularItem;
 	border->setGraphicsItemName("Border");
 	border->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
-	border->setBackgroundPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
-	border->setOutline(OutlineF(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
 	border->setGraphicsItemSizePolicy(SizePolicy::Dynamic);
 
 	m_inConnector = new GraphicsInvisibleItem;
@@ -60,21 +60,34 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 	m_nameItem = new GraphicsTextItem;
 	m_nameItem->setGraphicsItemName("Name");
 	m_nameItem->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
-	m_nameItem->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
 	m_nameItem->setGraphicsItemMargins(MarginsD(0., 3., 0., 0.));
-
+	
 	m_labelItem = new GraphicsTextItem;
 	m_labelItem->setGraphicsItemName("Label");
 	m_labelItem->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
-	m_labelItem->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
 	
 	GraphicsInvisibleItem* spacerItem = new GraphicsInvisibleItem;
 
 	Font textFont = m_nameItem->getFont();
 	textFont.setSize(10);
+	textFont.setBold(m_config.getName() == _activeVersion);
 	m_nameItem->setFont(textFont);
 	textFont.setSize(12);
 	m_labelItem->setFont(textFont);
+
+	OutlineF borderOutline(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder));
+	if (m_config.getName() == _activeVersion) {
+		borderOutline.setStyle(ot::DotLine);
+		border->setBackgroundPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
+		m_labelItem->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
+		m_nameItem->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
+	}
+	else {
+		border->setBackgroundPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
+		m_labelItem->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
+		m_nameItem->setTextPainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
+	}
+	border->setOutline(borderOutline);
 
 	// Setup layouts
 	this->addItem(border, false, true);
@@ -94,6 +107,15 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 
 	this->finalizeGraphicsItem();
 
+	if (m_config.getLabel().empty()) {
+		m_nameItem->setText("");
+		m_labelItem->setText(m_config.getName());
+	}
+	else {
+		m_nameItem->setText(m_config.getName());
+		m_labelItem->setText(m_config.getLabel());
+	}
+
 	_scene->addItem(this);
 
 	// Create item config
@@ -103,7 +125,7 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 	int childRow = m_row;
 
 	for (const VersionGraphVersionCfg& childCfg : m_config.getChildVersions()) {
-		VersionGraphItem* newChild = new VersionGraphItem(childCfg, childRow, _scene);
+		VersionGraphItem* newChild = new VersionGraphItem(childCfg, childRow, _activeVersion, _scene);
 		newChild->setParentVersionItem(this);
 		newChild->connectToParent();
 
@@ -184,9 +206,6 @@ ot::VersionGraphItem* ot::VersionGraphItem::findVersionByName(const std::string&
 void ot::VersionGraphItem::updateGraphics(void) {
 	this->prepareGeometryChange();
 
-	this->setGraphicsItemName(m_config.getName());
-	this->setGraphicsItemToolTip(m_config.getDescription());
-
 	// Calculate positioning
 	Point2DD newPos(0., (OT_VERSIONGRAPHITEM_Height + OT_VERSIONGRAPHITEM_VSpacing) * (double)m_row);
 
@@ -198,15 +217,6 @@ void ot::VersionGraphItem::updateGraphics(void) {
 		);
 	}
 	this->setGraphicsItemPos(newPos);
-
-	if (m_config.getLabel().empty()) {
-		m_nameItem->setText("");
-		m_labelItem->setText(m_config.getName());
-	}
-	else {
-		m_nameItem->setText(m_config.getName());
-		m_labelItem->setText(m_config.getLabel());
-	}
 
 	//this->updateGeometry();
 

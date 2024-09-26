@@ -22,17 +22,15 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 	this->clear();
 
 	int row = 0;
+	m_activeVersion = _config.getActiveVersionName();
 
 	for (const VersionGraphVersionCfg& version : _config.getRootVersions()) {
-		VersionGraphItem* newItem = new VersionGraphItem(version, row, this->getGraphicsScene());
+		VersionGraphItem* newItem = new VersionGraphItem(version, row, m_activeVersion, this->getGraphicsScene());
 		row = newItem->getMaxRowIndex() + 1;
 		m_rootItems.push_back(newItem);
 	}
 
-	this->highlightVersion(_config.getActiveVersionName());
-
 	QMetaObject::invokeMethod(this, &VersionGraph::slotUpdateVersionItems, Qt::QueuedConnection);
-	QMetaObject::invokeMethod(this, "slotCenterOnVersion", Qt::QueuedConnection, Q_ARG(const std::string&, _config.getActiveVersionName()));
 }
 
 void ot::VersionGraph::clear(void) {
@@ -42,10 +40,17 @@ void ot::VersionGraph::clear(void) {
 	m_rootItems.clear();
 }
 
+void ot::VersionGraph::showEvent(QShowEvent* _event) {
+	QMetaObject::invokeMethod(this, &VersionGraph::slotUpdateVersionItems, Qt::QueuedConnection);
+}
+
 void ot::VersionGraph::slotUpdateVersionItems(void) {
 	for (VersionGraphItem* itm : m_rootItems) {
 		itm->updateGraphics();
 	}
+	if (!m_activeVersion.empty()) {
+		this->slotCenterOnVersion(m_activeVersion);
+	}	
 }
 
 void ot::VersionGraph::slotCenterOnVersion(const std::string& _versionName) {
