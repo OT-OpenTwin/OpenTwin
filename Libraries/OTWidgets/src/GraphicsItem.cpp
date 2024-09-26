@@ -89,7 +89,7 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 void ot::GraphicsItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {
 	this->getQGraphicsItem()->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
-	this->getQGraphicsItem()->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsMoveable);
+	this->getQGraphicsItem()->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsSelectable);
 }
 
 void ot::GraphicsItem::graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) {
@@ -158,7 +158,7 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 		m_moveStartPt = qitm->pos(); // The item is root item, so pos returns the scene pos
 	}
 	
-	if ((this->getQGraphicsItem()->flags() & QGraphicsItem::ItemIsSelectable) && !this->getQGraphicsItem()->isSelected()) {
+	if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsSelectable) && !this->getQGraphicsItem()->isSelected()) {
 		OTAssertNullptr(this->getGraphicsScene());
 		if (_event->modifiers() != Qt::ControlModifier) {
 			this->getGraphicsScene()->setIgnoreEvents(true);

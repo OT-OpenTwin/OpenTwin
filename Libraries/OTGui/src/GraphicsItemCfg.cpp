@@ -42,6 +42,7 @@
 
 #define OT_JSON_VALUE_Moveable "Moveable"
 #define OT_JSON_VALUE_Connectable "Connectable"
+#define OT_JSON_VALUE_Selectable "Selectable"
 #define OT_JSON_VALUE_ForwardTooltip "ForwardTooltip"
 #define OT_JSON_VALUE_SnapsToGrid "SnapsToGrid" 
 #define OT_JSON_VALUE_TransformEnabled "TransformEnabled" 
@@ -87,6 +88,7 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 	JsonArray flagArr;
 	if (m_flags & GraphicsItemCfg::ItemIsMoveable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Moveable, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemIsConnectable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Connectable, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemIsSelectable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Selectable, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemForwardsTooltip) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_ForwardTooltip, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemSnapsToGrid) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_SnapsToGrid, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemUserTransformEnabled) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_TransformEnabled, _allocator), _allocator);
@@ -141,6 +143,7 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	for (auto f : flagsArr) {
 		if (f == OT_JSON_VALUE_Moveable) m_flags |= ItemIsMoveable;
 		else if (f == OT_JSON_VALUE_Connectable) m_flags |= ItemIsConnectable;
+		else if (f == OT_JSON_VALUE_Selectable) m_flags |= ItemIsSelectable;
 		else if (f == OT_JSON_VALUE_ForwardTooltip) m_flags |= ItemForwardsTooltip;
 		else if (f == OT_JSON_VALUE_SnapsToGrid) m_flags |= ItemSnapsToGrid;
 		else if (f == OT_JSON_VALUE_TransformEnabled) m_flags |= ItemUserTransformEnabled;
