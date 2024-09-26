@@ -46,5 +46,5 @@ void GraphicsItemDesignerPreview::updateCurrentItem(const ot::GraphicsItemCfg* _
 
 	this->setTransformationAnchor(anchor);
 
-	this->viewAll();
+	this->ensureViewInBounds();
 }

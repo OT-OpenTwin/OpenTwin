@@ -49,13 +49,12 @@ void ot::GraphicsView::resetView(void) {
 	this->centerOn(boundingRect.center());
 }
 
-void ot::GraphicsView::viewAll(void) {
+void ot::GraphicsView::ensureViewInBounds(void) {
 	OTAssertNullptr(m_scene);
-	QRectF boundingRect = this->mapFromScene(m_scene->itemsBoundingRect()).boundingRect();
-	QRect viewPortRect = this->viewport()->rect().marginsRemoved(m_sceneMargins.toMargins());
+	QRect itemsRect = this->mapFromScene(m_scene->itemsBoundingRect().marginsAdded(m_sceneMargins)).boundingRect();
+	QRect viewPortRect = this->viewport()->rect();
 
-	if (viewPortRect.width() > boundingRect.width() && viewPortRect.height() > boundingRect.height())
-	{
+	if (itemsRect.width() < viewPortRect.width() && itemsRect.height() < viewPortRect.height()) {
 		this->resetView();
 	}
 }
@@ -355,11 +354,10 @@ void ot::GraphicsView::wheelEvent(QWheelEvent* _event)
 		factor = 0.9;
 	}
 	this->scale(factor, factor);
-	this->update();
-		
+			
 	this->setTransformationAnchor(anchor);
 
-	this->viewAll();
+	this->ensureViewInBounds();
 }
 
 void ot::GraphicsView::mousePressEvent(QMouseEvent* _event)
@@ -481,7 +479,7 @@ void ot::GraphicsView::resizeEvent(QResizeEvent* _event)
 {
 	QGraphicsView::resizeEvent(_event);
 
-	this->viewAll();
+	this->ensureViewInBounds();
 }
 
 void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
