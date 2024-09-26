@@ -10,6 +10,7 @@
 
 ot::VersionGraph::VersionGraph() {
 	this->getGraphicsScene()->setGridFlags(ot::Grid::NoGridFlags);
+	this->getGraphicsScene()->setMultiselectionEnabled(false);
 	this->setGraphicsViewFlag(GraphicsView::IgnoreConnectionByUser | GraphicsView::ViewManagesSceneRect);
 }
 

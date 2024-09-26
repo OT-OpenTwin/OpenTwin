@@ -22,7 +22,7 @@
 ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 	: m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false),
-	m_maxTriggerDistance(0.)
+	m_maxTriggerDistance(0.), m_multiselectionEnabled(true)
 {
 	OTAssertNullptr(m_view);
 
@@ -34,7 +34,7 @@ ot::GraphicsScene::GraphicsScene(GraphicsView* _view)
 ot::GraphicsScene::GraphicsScene(const QRectF& _sceneRect, GraphicsView* _view)
 	: QGraphicsScene(_sceneRect), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false),
-	m_maxTriggerDistance(0.)
+	m_maxTriggerDistance(0.), m_multiselectionEnabled(true)
 {
 	OTAssertNullptr(m_view);
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
@@ -132,49 +132,14 @@ ot::Point2DD ot::GraphicsScene::snapToGrid(const Point2DD& _pos) const {
 }
 
 void ot::GraphicsScene::deselectAll(void) {
+	bool blocked = this->signalsBlocked();
 	this->blockSignals(true);
 	for (QGraphicsItem* itm : this->selectedItems()) {
 		itm->setSelected(false);
 	}
-	this->blockSignals(false);
+	this->blockSignals(blocked);
 	Q_EMIT selectionChanged();
 }
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Public: Slots
-
-void ot::GraphicsScene::slotSelectionChanged(void) {
-	if (m_ignoreEvents || m_mouseIsPressed) return;
-	this->handleSelectionChanged();
-}
-
-void ot::GraphicsScene::handleSelectionChanged(void) {
-	QList<QGraphicsItem*> tmp = m_lastSelection;
-	m_lastSelection = this->selectedItems();
-	if (tmp.size() != m_lastSelection.size()) {
-		Q_EMIT selectionChangeFinished();
-	}
-	else {
-		for (QGraphicsItem* itm : m_lastSelection) {
-			bool found = false;
-			for (QGraphicsItem* itmCheck : tmp) {
-				if (itm == itmCheck) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				Q_EMIT selectionChangeFinished();
-				return;
-			}
-		}
-	}
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Protected: Event handling
 
 void ot::GraphicsScene::moveAllSelectedItems(const Point2DD& _delta) {
 	if (_delta.x() == 0. && _delta.y() == 0.) return;
@@ -252,6 +217,24 @@ void ot::GraphicsScene::elementAboutToBeRemoved(GraphicsElement* _element) {
 		}
 	}
 }
+
+void ot::GraphicsScene::handleSelectionChanged(void) {
+	if (m_multiselectionEnabled) this->handleMultiSelectionChanged();
+	else this->handleSingleSelectionChanged();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Public: Slots
+
+void ot::GraphicsScene::slotSelectionChanged(void) {
+	if (m_ignoreEvents || m_mouseIsPressed) return;
+	this->handleSelectionChanged();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected: Event handling
 
 void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) {
 	// Check for a new connection
@@ -570,4 +553,60 @@ QList<QGraphicsItem*> ot::GraphicsScene::findItemsInTriggerDistance(const QPoint
 		lst = this->items(_pos);
 	}
 	return lst;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper
+
+void ot::GraphicsScene::handleMultiSelectionChanged(void) {
+	QList<QGraphicsItem*> tmp = m_lastSelection;
+	m_lastSelection = this->selectedItems();
+
+	if (tmp.size() != m_lastSelection.size()) {
+		Q_EMIT selectionChangeFinished();
+	}
+	else {
+		for (QGraphicsItem* itm : m_lastSelection) {
+			bool found = false;
+			for (QGraphicsItem* itmCheck : tmp) {
+				if (itm == itmCheck) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				Q_EMIT selectionChangeFinished();
+				return;
+			}
+		}
+	}
+}
+
+void ot::GraphicsScene::handleSingleSelectionChanged(void) {
+	QList<QGraphicsItem*> tmp = m_lastSelection;
+	m_lastSelection = this->selectedItems();
+
+	// Remove already selected items
+	for (QGraphicsItem* itm : tmp) {
+		auto it = std::find(m_lastSelection.begin(), m_lastSelection.end(), itm);
+		if (it != m_lastSelection.end()) {
+			m_lastSelection.erase(it);
+		}
+	}
+	bool blocked = this->signalsBlocked();
+	this->blockSignals(true);
+
+	this->deselectAll();
+
+	if (m_lastSelection.size() > 1) {
+		m_lastSelection.clear();
+	}
+
+	for (QGraphicsItem* itm : m_lastSelection) {
+		itm->setSelected(true);
+	}
+
+	this->blockSignals(blocked);
+	Q_EMIT selectionChangeFinished();
 }

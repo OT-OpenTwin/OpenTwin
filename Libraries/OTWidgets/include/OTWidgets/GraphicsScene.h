@@ -76,6 +76,9 @@ namespace ot {
 		void setGridLineStyle(const OutlineF& _outline) { m_grid.setGridLineStyle(_outline); };
 		const OutlineF& getGridLineStyle(void) const { return m_grid.getGridLineStyle(); };
 		
+		void setMultiselectionEnabled(bool _enabled) { m_multiselectionEnabled = _enabled; };
+		bool getMultiselectionEnabled(void) const { return m_multiselectionEnabled; };
+
 		void checkMaxTriggerDistance(double _triggerDistance);
 		void checkMaxTriggerDistance(const MarginsD& _triggerDistance);
 
@@ -105,6 +108,8 @@ namespace ot {
 
 		void elementAboutToBeRemoved(GraphicsElement* _element);
 
+		void handleSelectionChanged(void);
+
 	Q_SIGNALS:
 		void selectionChangeFinished(void);
 
@@ -114,7 +119,6 @@ namespace ot {
 
 	public Q_SLOTS:
 		void slotSelectionChanged(void);
-		void handleSelectionChanged(void);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -144,10 +148,15 @@ namespace ot {
 		QList<QGraphicsItem*> findItemsInTriggerDistance(const QPointF& _pos) const;
 
 	private:
+		void handleMultiSelectionChanged(void);
+		void handleSingleSelectionChanged(void);
+
+
 		std::list<GraphicsElement *> m_lastHoverElements;
 
 		bool m_ignoreEvents;
 		double m_maxTriggerDistance;
+		bool m_multiselectionEnabled;
 		Grid m_grid;
 		GraphicsView* m_view;
 		GraphicsItem* m_connectionOrigin;
