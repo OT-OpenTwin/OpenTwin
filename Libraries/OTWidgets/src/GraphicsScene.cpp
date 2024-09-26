@@ -587,6 +587,19 @@ void ot::GraphicsScene::handleSingleSelectionChanged(void) {
 	QList<QGraphicsItem*> deselectList = m_lastSelection;
 	QList<QGraphicsItem*> selectList = this->selectedItems();
 	
+	// Check if the selection did not change
+	if (deselectList.size() == selectList.size()) {
+		bool hasMissing = false;
+		for (QGraphicsItem* itm : deselectList) {
+			auto it = std::find(selectList.begin(), selectList.end(), itm);
+			if (it == selectList.end()) {
+				hasMissing = true;
+				break;
+			}
+		}
+		if (!hasMissing) return;
+	}
+
 	// Remove already selected items from new selection
 	for (QGraphicsItem* itm : deselectList) {
 		auto it = std::find(selectList.begin(), selectList.end(), itm);
