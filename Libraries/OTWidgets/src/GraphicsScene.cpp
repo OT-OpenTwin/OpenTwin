@@ -254,6 +254,22 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 	}
 	else {
 		this->stopConnection();
+
+		QList<QGraphicsItem*> itms = this->items(_event->scenePos());
+		ot::GraphicsItem* itemUnder = nullptr;
+		for (QGraphicsItem* itm : itms) {
+			ot::GraphicsItem* actualItem = dynamic_cast<ot::GraphicsItem*>(itm);
+			if (actualItem) {
+				if (!actualItem->getParentGraphicsItem()) {
+					if (itemUnder) return;
+					else itemUnder = actualItem;
+				}
+			}
+		}
+
+		if (itemUnder) {
+			Q_EMIT graphicsItemDoubleClicked(itemUnder);
+		}
 	}
 }
 

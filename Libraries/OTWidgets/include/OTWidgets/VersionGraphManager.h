@@ -28,6 +28,8 @@ namespace ot {
 
 		void setupConfig(const VersionGraphCfg& _config);
 
+		void activateVersion(const std::string& _versionName);
+
 	public Q_SLOTS:
 		void updateCurrentGraph(void);
 

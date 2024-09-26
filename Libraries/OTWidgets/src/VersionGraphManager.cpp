@@ -52,6 +52,11 @@ void ot::VersionGraphManager::setupConfig(const VersionGraphCfg& _config) {
 	this->updateCurrentGraph();
 }
 
+void ot::VersionGraphManager::activateVersion(const std::string& _versionName) {
+	m_config.setActiveVersionName(_versionName);
+	this->updateCurrentGraph();
+}
+
 void ot::VersionGraphManager::updateCurrentGraph(void) {
 	m_graph->clear();
 

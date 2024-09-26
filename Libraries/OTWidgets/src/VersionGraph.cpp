@@ -12,6 +12,9 @@ ot::VersionGraph::VersionGraph() {
 	this->getGraphicsScene()->setGridFlags(ot::Grid::NoGridFlags);
 	this->getGraphicsScene()->setMultiselectionEnabled(false);
 	this->setGraphicsViewFlag(GraphicsView::IgnoreConnectionByUser | GraphicsView::ViewManagesSceneRect);
+
+	this->connect(this->getGraphicsScene(), &GraphicsScene::selectionChangeFinished, this, &VersionGraph::slotSelectionChanged);
+	this->connect(this->getGraphicsScene(), &GraphicsScene::graphicsItemDoubleClicked, this, &VersionGraph::slotGraphicsItemDoubleClicked);
 }
 
 ot::VersionGraph::~VersionGraph() {
@@ -40,8 +43,37 @@ void ot::VersionGraph::clear(void) {
 	m_rootItems.clear();
 }
 
+bool ot::VersionGraph::isCurrentVersionEndOfBranch(void) const {
+	return this->isVersionIsEndOfBranch(m_activeVersion);
+}
+
+bool ot::VersionGraph::isVersionIsEndOfBranch(const std::string& _versionName) const {
+	VersionGraphItem* version = this->getVersion(_versionName);
+	if (version) {
+		return version->getChildVersions().empty();
+	}
+	else {
+		OT_LOG_EA("Invalid version name");
+		return false;
+	}
+}
+
 void ot::VersionGraph::showEvent(QShowEvent* _event) {
 	QMetaObject::invokeMethod(this, &VersionGraph::slotUpdateVersionItems, Qt::QueuedConnection);
+}
+
+void ot::VersionGraph::slotSelectionChanged(void) {
+	std::list<ot::GraphicsItem*> selection = this->getSelectedGraphicsItems();
+	if (selection.size() > 1) {
+		OT_LOG_EA("Invalid selection");
+		return;
+	}
+	if (selection.empty()) {
+		Q_EMIT versionDeselected();
+	}
+	else {
+		Q_EMIT versionSelected(selection.front()->getGraphicsItemName());
+	}
 }
 
 void ot::VersionGraph::slotUpdateVersionItems(void) {
@@ -83,7 +115,11 @@ void ot::VersionGraph::slotCenterOnVersion(const std::string& _versionName) {
 	}
 }
 
-ot::VersionGraphItem* ot::VersionGraph::getVersion(const std::string& _name) {
+void ot::VersionGraph::slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item) {
+	Q_EMIT versionActivatRequest(_item->getGraphicsItemName());
+}
+
+ot::VersionGraphItem* ot::VersionGraph::getVersion(const std::string& _name) const {
 	VersionGraphItem* item = nullptr;
 	for (VersionGraphItem* root : m_rootItems) {
 		item = root->findVersionByName(_name);
