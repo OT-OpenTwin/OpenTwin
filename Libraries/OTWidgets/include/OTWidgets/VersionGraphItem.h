@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/OTClassHelper.h"
 #include "OTGui/VersionGraphVersionCfg.h"
 #include "OTWidgets/GraphicsStackItem.h"
 
@@ -16,11 +17,12 @@ namespace ot {
 	class GraphicsConnectionItem;
 	
 	class OT_WIDGETS_API_EXPORT VersionGraphItem : public GraphicsStackItem {
+		OT_DECL_NOCOPY(VersionGraphItem)
+		OT_DECL_NODEFAULT(VersionGraphItem)
 	public:
-		VersionGraphItem();
+		VersionGraphItem(const VersionGraphVersionCfg& _config, int _row, GraphicsScene* _scene);
 		virtual ~VersionGraphItem();
 
-		void setVersionConfig(const VersionGraphVersionCfg& _config);
 		const VersionGraphVersionCfg& getVersionConfig(void) const { return m_config; };
 
 		void setParentVersionItem(VersionGraphItem* _item) { m_parentVersion = _item; };

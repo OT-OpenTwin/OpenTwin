@@ -24,11 +24,7 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 	int row = 0;
 
 	for (const VersionGraphVersionCfg& version : _config.getRootVersions()) {
-		VersionGraphItem* newItem = new VersionGraphItem;
-		newItem->setRowIndex(row);
-		newItem->setGraphicsScene(this->getGraphicsScene());
-		this->getGraphicsScene()->addItem(newItem);
-		newItem->setVersionConfig(version);
+		VersionGraphItem* newItem = new VersionGraphItem(version, row, this->getGraphicsScene());
 		row = newItem->getMaxRowIndex() + 1;
 		m_rootItems.push_back(newItem);
 	}

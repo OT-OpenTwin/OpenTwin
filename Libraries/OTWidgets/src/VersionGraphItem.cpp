@@ -18,10 +18,13 @@
 #define OT_VERSIONGRAPHITEM_VSpacing 30.
 #define OT_VERSIONGRAPHITEM_HSpacing 60.
 
-ot::VersionGraphItem::VersionGraphItem() 
-	: m_parentVersion(nullptr), m_parentConnection(nullptr), m_row(0)
+ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, int _row, GraphicsScene* _scene)
+	: m_parentVersion(nullptr), m_parentConnection(nullptr), m_row(_row), m_config(_config)
 {
-	this->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState);
+	OTAssertNullptr(_scene);
+	this->setGraphicsScene(_scene);
+
+	this->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState | GraphicsItemCfg::ItemIsSelectable);
 	
 	GraphicsGridLayoutItem* centralLayout = new GraphicsGridLayoutItem;
 	centralLayout->setGraphicsItemName("CentralLayout");
@@ -90,6 +93,24 @@ ot::VersionGraphItem::VersionGraphItem()
 	this->setZValue(2);
 
 	this->finalizeGraphicsItem();
+
+	_scene->addItem(this);
+
+	// Create item config
+	this->updateGraphics();
+
+	// Create childs
+	int childRow = m_row;
+
+	for (const VersionGraphVersionCfg& childCfg : m_config.getChildVersions()) {
+		VersionGraphItem* newChild = new VersionGraphItem(childCfg, childRow, _scene);
+		newChild->setParentVersionItem(this);
+		newChild->connectToParent();
+
+		m_childVersions.push_back(newChild);
+
+		childRow = newChild->getMaxRowIndex() + 1;
+	}
 }
 
 ot::VersionGraphItem::~VersionGraphItem() {
@@ -107,43 +128,6 @@ ot::VersionGraphItem::~VersionGraphItem() {
 	for (VersionGraphItem* child : m_childVersions) {
 		child->setParentVersionItem(nullptr);
 		delete child;
-	}
-}
-
-void ot::VersionGraphItem::setVersionConfig(const VersionGraphVersionCfg& _config) {
-	OTAssertNullptr(this->getGraphicsScene());
-
-	// Clear data
-	std::list<VersionGraphItem*> childs = m_childVersions;
-	m_childVersions.clear();
-	for (VersionGraphItem* child : childs) {
-		child->setParentVersionItem(nullptr);
-		delete child;
-	}
-
-	// Apply config
-	m_config = _config;
-
-	// Create item config
-	this->updateGraphics();
-
-	// Create childs
-	int childRow = m_row;
-
-	for (const VersionGraphVersionCfg& childCfg : m_config.getChildVersions()) {
-		VersionGraphItem* newChild = new VersionGraphItem;
-		newChild->setParentVersionItem(this);
-		newChild->setRowIndex(childRow);
-		
-		newChild->setGraphicsScene(this->getGraphicsScene());
-		this->getGraphicsScene()->addItem(newChild);
-
-		newChild->setVersionConfig(childCfg);
-		newChild->connectToParent();
-		
-		m_childVersions.push_back(newChild);
-
-		childRow = newChild->getMaxRowIndex() + 1;
 	}
 }
 
