@@ -97,20 +97,24 @@ QVariant ot::GraphicsConnectionItem::itemChange(QGraphicsItem::GraphicsItemChang
 void ot::GraphicsConnectionItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	if (_event->button() == Qt::LeftButton && this->flags() & QGraphicsItem::ItemIsSelectable) {
 		GraphicsScene* sc = dynamic_cast<GraphicsScene*>(this->scene());
-		if (sc) {
-			if (_event->modifiers() != Qt::ControlModifier) {
-				sc->setIgnoreEvents(true);
-				sc->clearSelection();
-				sc->setIgnoreEvents(false);
-			}
-			this->setSelected(true);
-	
-			sc->handleSelectionChanged();
-		}
-		else {
+		if (!sc) {
 			OT_LOG_EA("Scene cast failed");
+			return;
 		}
-		
+		bool ignored = sc->getIgnoreEvents();
+		bool blocked = sc->signalsBlocked();
+		sc->setIgnoreEvents(true);
+		sc->blockSignals(true);
+
+		if (_event->modifiers() != Qt::ControlModifier || !sc->getMultiselectionEnabled()) {
+			sc->clearSelection();
+		}
+		this->setSelected(true);
+
+		sc->setIgnoreEvents(ignored);
+		sc->blockSignals(blocked);
+
+		sc->handleSelectionChanged();
 	}
 }
 

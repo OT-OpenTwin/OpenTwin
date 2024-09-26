@@ -584,29 +584,44 @@ void ot::GraphicsScene::handleMultiSelectionChanged(void) {
 }
 
 void ot::GraphicsScene::handleSingleSelectionChanged(void) {
-	QList<QGraphicsItem*> tmp = m_lastSelection;
-	m_lastSelection = this->selectedItems();
-
-	// Remove already selected items
-	for (QGraphicsItem* itm : tmp) {
-		auto it = std::find(m_lastSelection.begin(), m_lastSelection.end(), itm);
-		if (it != m_lastSelection.end()) {
-			m_lastSelection.erase(it);
+	QList<QGraphicsItem*> deselectList = m_lastSelection;
+	QList<QGraphicsItem*> selectList = this->selectedItems();
+	
+	// Remove already selected items from new selection
+	for (QGraphicsItem* itm : deselectList) {
+		auto it = std::find(selectList.begin(), selectList.end(), itm);
+		if (it != selectList.end()) {
+			selectList.erase(it);
 		}
 	}
+
 	bool blocked = this->signalsBlocked();
 	this->blockSignals(true);
 
-	this->deselectAll();
-
-	if (m_lastSelection.size() > 1) {
-		m_lastSelection.clear();
+	// Check if more than one item is selected, if so deselect all
+	if (selectList.size() > 1) {
+		for (QGraphicsItem* itm : selectList) {
+			auto it = std::find(deselectList.begin(), deselectList.end(), itm);
+			if (it == deselectList.end()) deselectList.push_back(itm);
+		}
+		selectList.clear();
+	}
+	else {
+		// Remove items that are now selected from the deselect list
+		for (QGraphicsItem* itm : selectList) {
+			auto it = std::find(deselectList.begin(), deselectList.end(), itm);
+			if (it != deselectList.end()) deselectList.erase(it);
+		}
 	}
 
-	for (QGraphicsItem* itm : m_lastSelection) {
-		itm->setSelected(true);
+	// Deselect
+	for (QGraphicsItem* itm : deselectList) {
+		itm->setSelected(false);
 	}
+
+	m_lastSelection = selectList;
 
 	this->blockSignals(blocked);
+
 	Q_EMIT selectionChangeFinished();
 }

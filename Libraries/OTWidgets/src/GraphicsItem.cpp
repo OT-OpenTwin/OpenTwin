@@ -159,16 +159,28 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	}
 	
 	if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsSelectable) && !this->getQGraphicsItem()->isSelected()) {
-		OTAssertNullptr(this->getGraphicsScene());
-		if (_event->modifiers() != Qt::ControlModifier) {
-			this->getGraphicsScene()->setIgnoreEvents(true);
-			this->getGraphicsScene()->clearSelection();
-			this->getGraphicsScene()->setIgnoreEvents(false);
+		GraphicsScene* sc = this->getGraphicsScene();
+		if (!sc) {
+			OT_LOG_EA("No scene set");
+			return;
+		}
+
+		bool ignored = sc->getIgnoreEvents();
+		bool blocked = sc->signalsBlocked();
+		sc->setIgnoreEvents(true);
+		sc->blockSignals(true);
+
+		if (_event->modifiers() != Qt::ControlModifier || !sc->getMultiselectionEnabled()) {
+			sc->deselectAll();
 		}
 		this->getQGraphicsItem()->setSelected(true);
+
+		sc->setIgnoreEvents(ignored);
+		sc->blockSignals(blocked);
+
 		this->handleItemChange(QGraphicsItem::ItemSelectedHasChanged, QVariant());
 
-		this->getGraphicsScene()->handleSelectionChanged();
+		sc->handleSelectionChanged();
 	}
 }
 
