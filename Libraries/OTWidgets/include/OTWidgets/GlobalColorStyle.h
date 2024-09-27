@@ -68,7 +68,7 @@ namespace ot {
 		~GlobalColorStyle() {};
 
 		std::string m_currentStyle;
-		ColorStyle m_emptyStyle;
+		ColorStyle m_invalidStyle;
 		std::map<std::string, ColorStyle> m_styles;
 		QStringList m_styleRootSearchPaths;
 

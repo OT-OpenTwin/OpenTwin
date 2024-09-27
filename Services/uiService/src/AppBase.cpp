@@ -260,12 +260,19 @@ bool AppBase::logIn(void) {
 
 		// Restore color style
 		std::string cs = uM.restoreSetting(STATE_NAME_COLORSTYLE);
-
+		
 		if (ot::GlobalColorStyle::instance().hasStyle(cs)) {
 			ot::GlobalColorStyle::instance().setCurrentStyle(cs);
 		}
 		else if (!cs.empty()) {
 			OT_LOG_W("ColorStyle \"" + cs + "\" does not exist");
+		}
+		else if (ot::GlobalColorStyle::instance().hasStyle(ot::toString(ot::ColorStyleName::BrightStyle))) {
+			ot::GlobalColorStyle::instance().setCurrentStyle(ot::toString(ot::ColorStyleName::BrightStyle));
+		}
+		else {
+			QMessageBox msg(QMessageBox::Critical, "Assets missing", "Bright style does not exist. Please check your installation!", QMessageBox::Ok);
+			msg.exec();
 		}
 
 		// Restore window state

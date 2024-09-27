@@ -25,8 +25,10 @@ void ot::GlobalColorStyle::addStyle(const ColorStyle& _style, bool _replace) {
 		OT_LOG_E("Color style already exists (Name: \"" + _style.colorStyleName() + "\")");
 	}
 
+
 	if (_style.colorStyleName().empty()) {
-		m_emptyStyle = _style;
+		OT_LOG_E("Color style name may not be empty");
+		return;
 	}
 
 	m_styles.insert_or_assign(_style.colorStyleName(), _style);
@@ -85,12 +87,12 @@ bool ot::GlobalColorStyle::setCurrentStyle(const std::string& _styleName, bool _
 
 const ot::ColorStyle& ot::GlobalColorStyle::getCurrentStyle(void) const {
 	if (m_currentStyle.empty()) {
-		return m_emptyStyle;
+		return m_invalidStyle;
 	}
 	const auto& it = m_styles.find(m_currentStyle);
 	if (it == m_styles.end()) {
 		OT_LOG_E("Invalid data");
-		return m_emptyStyle;
+		return m_invalidStyle;
 	}
 	return it->second;
 }
@@ -183,6 +185,5 @@ std::list<std::string> ot::GlobalColorStyle::getAvailableStyleNames(void) const 
 }
 
 ot::GlobalColorStyle::GlobalColorStyle() : m_app(nullptr) {
-	m_emptyStyle.setColorStyleName("");
-	m_styles.insert_or_assign(m_emptyStyle.colorStyleName(), m_emptyStyle);
+	m_invalidStyle.setColorStyleName("<Invalid>");
 }
