@@ -28,7 +28,13 @@ namespace ot {
 
 		void setupConfig(const VersionGraphCfg& _config);
 
-		void activateVersion(const std::string& _versionName);
+		void addVersion(const std::string& _parentVersionName, const VersionGraphVersionCfg& _config);
+
+		void activateVersion(const std::string& _versionName, const std::string& _activeBranchVersionName);
+
+		void removeVersion(const std::string& _versionName);
+
+		void removeVersions(const std::list<std::string>& _versionNames);
 
 	public Q_SLOTS:
 		void updateCurrentGraph(void);

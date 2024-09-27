@@ -82,12 +82,15 @@ namespace ot {
 		void applyConfigOnly(const VersionGraphVersionCfg& _other);
 
 	private:
+		void setParentVersion(VersionGraphVersionCfg* _parent) { m_parentVersion = _parent; };
+		void eraseChildVersion(VersionGraphVersionCfg* _child);
 		void clear(void);
 		void clearChilds(void);
 
 		std::string m_name;
 		std::string m_label;
 		std::string m_description;
+		VersionGraphVersionCfg* m_parentVersion;
 		std::list<VersionGraphVersionCfg*> m_childVersions;
 		bool m_directParentIsHidden;
 	};

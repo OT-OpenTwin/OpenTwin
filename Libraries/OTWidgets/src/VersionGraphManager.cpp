@@ -52,8 +52,37 @@ void ot::VersionGraphManager::setupConfig(const VersionGraphCfg& _config) {
 	this->updateCurrentGraph();
 }
 
-void ot::VersionGraphManager::activateVersion(const std::string& _versionName) {
+void ot::VersionGraphManager::addVersion(const std::string& _parentVersionName, const VersionGraphVersionCfg& _config) {
+	if (_parentVersionName.empty()) {
+		m_config.setRootVersion(new VersionGraphVersionCfg(_config));
+	}
+	else {
+		VersionGraphVersionCfg* parent = m_config.findVersion(_parentVersionName);
+		if (parent) {
+			parent->addChildVersion(new VersionGraphVersionCfg(_config));
+		}
+		else {
+			OT_LOG_EAS("Parent version not found \"" + _parentVersionName + "\"");
+		}
+	}
+	
+}
+
+void ot::VersionGraphManager::activateVersion(const std::string& _versionName, const std::string& _activeBranchVersionName) {
 	m_config.setActiveVersionName(_versionName);
+	m_config.setActiveBranchVersionName(_activeBranchVersionName);
+	this->updateCurrentGraph();
+}
+
+void ot::VersionGraphManager::removeVersion(const std::string& _versionName) {
+	m_config.removeVersion(_versionName);
+	this->updateCurrentGraph();
+}
+
+void ot::VersionGraphManager::removeVersions(const std::list<std::string>& _versionNames) {
+	for (const std::string& version : _versionNames) {
+		m_config.removeVersion(version);
+	}
 	this->updateCurrentGraph();
 }
 

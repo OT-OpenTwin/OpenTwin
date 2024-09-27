@@ -58,6 +58,12 @@ namespace ot {
 		//! The VersionGraphCfg keeps ownership of the version.
 		const VersionGraphVersionCfg* getRootVersion(void) const { return m_rootVersion; };
 
+		//! \brief Returns the version with the given name.
+		VersionGraphVersionCfg* findVersion(const std::string& _version);
+
+		//! \brief Removes the version and all of its childs if the version exists.
+		void removeVersion(const std::string& _version);
+
 	private:
 		std::string m_activeVersionName;
 		std::string m_activeBranchVersionName;
