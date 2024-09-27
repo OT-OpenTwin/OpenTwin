@@ -1,7 +1,6 @@
 !include "MUI2.nsh"
 
-Name "MongoDB Upgrade"
-Outfile "MongoDBUpgrade.exe"
+;Outfile "MongoDBUpgrade.exe"
 
 Var UPGRADER_MONGODB_ADMIN_PASSWORD ; Needed for the execution of the upgrader
 Var UPGRADER_MONGODB_SERVICE_NAME ; Needed for the execution of the upgrader
