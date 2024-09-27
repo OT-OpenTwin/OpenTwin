@@ -34,7 +34,10 @@ ot::VersionGraphVersionCfg& ot::VersionGraphVersionCfg::operator = (const Versio
 	m_name = _other.m_name;
 	m_label = _other.m_label;
 	m_description = _other.m_description;
-	m_childVersions = _other.m_childVersions;
+
+	for (const VersionGraphVersionCfg* child : _other.m_childVersions) {
+		m_childVersions.push_back(new VersionGraphVersionCfg(*child));
+	}
 	m_directParentIsHidden = _other.m_directParentIsHidden;
 
 	return *this;
@@ -47,9 +50,9 @@ void ot::VersionGraphVersionCfg::addToJsonObject(ot::JsonValue& _object, ot::Jso
 	_object.AddMember("ParentHidden", m_directParentIsHidden, _allocator);
 
 	JsonArray childArr;
-	for (const VersionGraphVersionCfg& child : m_childVersions) {
+	for (const VersionGraphVersionCfg* child : m_childVersions) {
 		JsonObject childObj;
-		child.addToJsonObject(childObj, _allocator);
+		child->addToJsonObject(childObj, _allocator);
 		childArr.PushBack(childObj, _allocator);
 	}
 	_object.AddMember("Childs", childArr, _allocator);
@@ -65,18 +68,41 @@ void ot::VersionGraphVersionCfg::setFromJsonObject(const ot::ConstJsonObject& _o
 
 	std::list<ConstJsonObject> childArr = json::getObjectList(_object, "Childs");
 	for (const ConstJsonObject& childObj : childArr) {
-		VersionGraphVersionCfg child;
-		child.setFromJsonObject(childObj);
+		VersionGraphVersionCfg* child = new VersionGraphVersionCfg;
+		child->setFromJsonObject(childObj);
 		m_childVersions.push_back(child);
 	}
 }
 
-void ot::VersionGraphVersionCfg::addChildVersion(const std::string& _name, const std::string& _label, const std::string& _description) {
-	this->addChildVersion(VersionGraphVersionCfg(_name, _label, _description));
+ot::VersionGraphVersionCfg* ot::VersionGraphVersionCfg::addChildVersion(const std::string& _name, const std::string& _label, const std::string& _description) {
+	VersionGraphVersionCfg* newVersion = new VersionGraphVersionCfg(_name, _label, _description);
+	m_childVersions.push_back(newVersion);
+	return newVersion;
 }
 
-void ot::VersionGraphVersionCfg::addChildVersion(const VersionGraphVersionCfg& _child) {
+void ot::VersionGraphVersionCfg::addChildVersion(VersionGraphVersionCfg* _child) {
 	m_childVersions.push_back(_child);
+}
+
+void ot::VersionGraphVersionCfg::setChildVersions(const std::list<VersionGraphVersionCfg*>& _versions) {
+	this->clearChilds();
+	m_childVersions = _versions;
+}
+
+ot::VersionGraphVersionCfg* ot::VersionGraphVersionCfg::findVersion(const std::string& _versionName) {
+	if (_versionName == m_name) return this;
+	else {
+		for (VersionGraphVersionCfg* child : m_childVersions) {
+			VersionGraphVersionCfg* result = child->findVersion(_versionName);
+			if (result) return result;
+		}
+	}
+	return nullptr;
+}
+
+ot::VersionGraphVersionCfg* ot::VersionGraphVersionCfg::getLastBranchVersion(void) {
+	if (m_childVersions.empty()) return this;
+	else return m_childVersions.front()->getLastBranchVersion();
 }
 
 void ot::VersionGraphVersionCfg::applyConfigOnly(const VersionGraphVersionCfg& _other) {
@@ -87,5 +113,12 @@ void ot::VersionGraphVersionCfg::applyConfigOnly(const VersionGraphVersionCfg& _
 }
 
 void ot::VersionGraphVersionCfg::clear(void) {
+	this->clearChilds();
+}
+
+void ot::VersionGraphVersionCfg::clearChilds(void) {
+	for (VersionGraphVersionCfg* child : m_childVersions) {
+		delete child;
+	}
 	m_childVersions.clear();
 }

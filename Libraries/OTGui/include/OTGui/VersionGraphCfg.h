@@ -44,14 +44,24 @@ namespace ot {
 		//! The first child a version in an active branch belongs to the active branch (after the active branch version, parent versions are handled by the parent).
 		const std::string& getActiveBranchVersionName(void) const { return m_activeBranchVersionName; };
 
-		void addRootVersion(const VersionGraphVersionCfg& _version);
-		void setRootVersions(const std::list<VersionGraphVersionCfg>& _versions) { m_rootVersions = _versions; };
-		const std::list<VersionGraphVersionCfg>& getRootVersions(void) const { return m_rootVersions; };
+		void setRootVersion(const std::string& _name, const std::string& _label = std::string(), const std::string& _description = std::string());
+		
+		//! \brief Set the provided version as the root version.
+		//! The current root version will be 
+		void setRootVersion(VersionGraphVersionCfg* _version);
+
+		//! \brief Returns the root version.
+		//! The VersionGraphCfg keeps ownership of the version.
+		VersionGraphVersionCfg* getRootVersion(void) { return m_rootVersion; };
+
+		//! \brief Returns the root version.
+		//! The VersionGraphCfg keeps ownership of the version.
+		const VersionGraphVersionCfg* getRootVersion(void) const { return m_rootVersion; };
 
 	private:
 		std::string m_activeVersionName;
 		std::string m_activeBranchVersionName;
-		std::list<VersionGraphVersionCfg> m_rootVersions;
+		VersionGraphVersionCfg* m_rootVersion;
 	};
 
 }

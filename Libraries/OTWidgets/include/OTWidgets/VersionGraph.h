@@ -9,9 +9,6 @@
 #include "OTGui/VersionGraphCfg.h"
 #include "OTWidgets/GraphicsView.h"
 
-// std header
-#include <list>
-
 namespace ot {
 
 	class VersionGraphItem;
@@ -49,7 +46,7 @@ namespace ot {
 
 		std::string m_activeVersion;
 		std::string m_activeVersionBranch;
-		std::list<VersionGraphItem*> m_rootItems;
+		VersionGraphItem* m_rootItem;
 
 	};
 

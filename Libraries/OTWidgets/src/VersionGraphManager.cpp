@@ -81,51 +81,58 @@ void ot::VersionGraphManager::startProcessCompact(bool _includeLabeledVersions) 
 	VersionGraphCfg newConfig;
 	newConfig.setActiveVersionName(m_config.getActiveVersionName());
 
-	for (const VersionGraphVersionCfg& cfg : m_config.getRootVersions()) {
-		VersionGraphVersionCfg newItem;
-		newItem.applyConfigOnly(cfg);
-
-		// Process item childs
-		for (const VersionGraphVersionCfg& childCfg : cfg.getChildVersions()) {
-			this->processCompactItem(newItem, childCfg, newConfig.getActiveVersionName(), true, _includeLabeledVersions);
-		}
-
-		newConfig.addRootVersion(newItem);
+	// Determine branch version
+	VersionGraphVersionCfg* branchVersion = m_config.getRootVersion()->findVersion(m_config.getActiveBranchVersionName());
+	if (branchVersion) {
+		newConfig.setActiveBranchVersionName(branchVersion->getLastBranchVersion()->getName());
+	}
+	else {
+		OT_LOG_E("Branch version not found");
 	}
 
+	// Copy root config
+	VersionGraphVersionCfg* newItem = new VersionGraphVersionCfg;
+	newItem->applyConfigOnly(*m_config.getRootVersion());
+
+	// Process item childs
+	for (const VersionGraphVersionCfg* childCfg : m_config.getRootVersion()->getChildVersions()) {
+		this->processCompactItem(newItem, childCfg, newConfig.getActiveVersionName(), true, _includeLabeledVersions);
+	}
+
+	newConfig.setRootVersion(newItem);
 	m_graph->setupFromConfig(newConfig);
 }
 
-void ot::VersionGraphManager::processCompactItem(VersionGraphVersionCfg& _parent, const VersionGraphVersionCfg& _config, const std::string& _activeVersion, bool _isDirectParent, bool _includeLabeledVersions) {
-	VersionGraphVersionCfg newItem;
-	newItem.applyConfigOnly(_config);
-	newItem.setDirectParentIsHidden(!_isDirectParent);
+void ot::VersionGraphManager::processCompactItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, bool _includeLabeledVersions) {
+	VersionGraphVersionCfg* newItem = new VersionGraphVersionCfg;
+	newItem->applyConfigOnly(*_config);
+	newItem->setDirectParentIsHidden(!_isDirectParent);
 
 	// Active item
-	if (_config.getName() == _activeVersion) {
+	if (_config->getName() == _activeVersion) {
 		// All direct childs of an active item must be visible
-		for (const VersionGraphVersionCfg& childCfg : _config.getChildVersions()) {
-			VersionGraphVersionCfg childItem;
-			childItem.applyConfigOnly(childCfg);
-			childItem.setDirectParentIsHidden(false);
+		for (const VersionGraphVersionCfg* childCfg : _config->getChildVersions()) {
+			VersionGraphVersionCfg* childItem = new VersionGraphVersionCfg;
+			childItem->applyConfigOnly(*childCfg);
+			childItem->setDirectParentIsHidden(false);
 
-			for (const VersionGraphVersionCfg& childsChildCfg : childCfg.getChildVersions()) {
+			for (const VersionGraphVersionCfg* childsChildCfg : childCfg->getChildVersions()) {
 				this->processCompactItem(childItem, childsChildCfg, _activeVersion, true, _includeLabeledVersions);
 			}
 
-			newItem.addChildVersion(childItem);
+			newItem->addChildVersion(childItem);
 		}
 
-		_parent.addChildVersion(newItem);
+		_parent->addChildVersion(newItem);
 	}
 	// Middle item, not active
-	else if (_config.getChildVersions().size() == 1) {
-		const VersionGraphVersionCfg& childCfg = _config.getChildVersions().front();
+	else if (_config->getChildVersions().size() == 1) {
+		const VersionGraphVersionCfg* childCfg = _config->getChildVersions().front();
 
 		// Child is active
-		if (childCfg.getName() == _activeVersion || (_includeLabeledVersions && !newItem.getLabel().empty())) {
+		if (childCfg->getName() == _activeVersion || (_includeLabeledVersions && !newItem->getLabel().empty())) {
 			this->processCompactItem(newItem, childCfg, _activeVersion, true, _includeLabeledVersions);
-			_parent.addChildVersion(newItem);
+			_parent->addChildVersion(newItem);
 		}
 		// Process other childs
 		else {
@@ -136,10 +143,10 @@ void ot::VersionGraphManager::processCompactItem(VersionGraphVersionCfg& _parent
 	// Last item or branch item
 	else {
 		// Process item childs
-		for (const VersionGraphVersionCfg& childCfg : _config.getChildVersions()) {
+		for (const VersionGraphVersionCfg* childCfg : _config->getChildVersions()) {
 			this->processCompactItem(newItem, childCfg, _activeVersion, true, _includeLabeledVersions);
 		}
 
-		_parent.addChildVersion(newItem);
+		_parent->addChildVersion(newItem);
 	}
 }

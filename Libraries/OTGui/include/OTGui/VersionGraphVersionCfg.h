@@ -36,19 +36,41 @@ namespace ot {
 		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		//! \see getName
 		void setName(const std::string& _name) { m_name = _name; };
+
+		//! \brief Returns the version name.
+		//! The name is used to identify the version in a graph.
+		//! The name will be displayed on the version.
 		const std::string& getName(void) const { return m_name; };
 
+		//! \see getLabel
 		void setLabel(const std::string& _title) { m_label = _title; };
+
+		//! \brief Returns the version label.
+		//! The label will be displayed on the version if it is not empty.
 		const std::string& getLabel(void) const { return m_label; };
 
 		void setDescription(const std::string& _description) { m_description = _description; };
 		const std::string& getDescription(void) const { return m_description; };
 
-		void addChildVersion(const std::string& _name, const std::string& _label = std::string(), const std::string& _description = std::string());
-		void addChildVersion(const VersionGraphVersionCfg& _child);
-		void setChildVersions(const std::list<VersionGraphVersionCfg>& _versions) { m_childVersions = _versions; };
-		const std::list<VersionGraphVersionCfg>& getChildVersions(void) const { return m_childVersions; };
+		VersionGraphVersionCfg* addChildVersion(const std::string& _name, const std::string& _label = std::string(), const std::string& _description = std::string());
+
+		//! \brief Adds the provided version as a child.
+		//! This version takes ownership of the provided child version.
+		void addChildVersion(VersionGraphVersionCfg* _child);
+		void setChildVersions(const std::list<VersionGraphVersionCfg*>& _versions);
+
+		//! \brief Returns the child versions.
+		//! This version keeps ownership of the versions.
+		const std::list<VersionGraphVersionCfg*>& getChildVersions(void) const { return m_childVersions; };
+
+		//! \brief Returns the version with the given name.
+		//! Thie version may be this version.
+		VersionGraphVersionCfg* findVersion(const std::string& _versionName);
+
+		//! \brief Returns the last version in this branch (first child versions).
+		VersionGraphVersionCfg* getLastBranchVersion(void);
 
 		//! \see getDirectParentIsHidden
 		void setDirectParentIsHidden(bool _isHidden) { m_directParentIsHidden = _isHidden; };
@@ -61,11 +83,12 @@ namespace ot {
 
 	private:
 		void clear(void);
+		void clearChilds(void);
 
 		std::string m_name;
 		std::string m_label;
 		std::string m_description;
-		std::list<VersionGraphVersionCfg> m_childVersions;
+		std::list<VersionGraphVersionCfg*> m_childVersions;
 		bool m_directParentIsHidden;
 	};
 

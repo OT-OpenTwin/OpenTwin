@@ -7,7 +7,7 @@
 #include "OTGui/VersionGraphCfg.h"
 
 ot::VersionGraphCfg::VersionGraphCfg() {
-
+	m_rootVersion = new VersionGraphVersionCfg;
 }
 
 ot::VersionGraphCfg::VersionGraphCfg(const VersionGraphCfg& _other) {
@@ -15,12 +15,15 @@ ot::VersionGraphCfg::VersionGraphCfg(const VersionGraphCfg& _other) {
 }
 
 ot::VersionGraphCfg::~VersionGraphCfg() {
+	if (m_rootVersion) delete m_rootVersion;
 }
 
 ot::VersionGraphCfg& ot::VersionGraphCfg::operator=(const VersionGraphCfg& _other) {
 	if (this == &_other) return *this;
 
-	m_rootVersions = _other.m_rootVersions;
+	if (m_rootVersion) delete m_rootVersion;
+
+	m_rootVersion = new VersionGraphVersionCfg(*_other.m_rootVersion);
 	m_activeVersionName = _other.m_activeVersionName;
 	m_activeBranchVersionName = _other.m_activeBranchVersionName;
 
@@ -31,29 +34,29 @@ void ot::VersionGraphCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloca
 	_object.AddMember("Active", JsonString(m_activeVersionName, _allocator), _allocator);
 	_object.AddMember("ActiveBranch", JsonString(m_activeBranchVersionName, _allocator), _allocator);
 
-	JsonArray rootArr;
-	for (const VersionGraphVersionCfg& version : m_rootVersions) {
-		JsonObject rootObj;
-		version.addToJsonObject(rootObj, _allocator);
-		rootArr.PushBack(rootObj, _allocator);
-	}
-	_object.AddMember("RootVersions", rootArr, _allocator);
+	JsonObject rootObj;
+	m_rootVersion->addToJsonObject(rootObj, _allocator);
+	_object.AddMember("RootVersion", rootObj, _allocator);
 }
 
 void ot::VersionGraphCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	m_rootVersions.clear();
+	if (m_rootVersion) delete m_rootVersion;
+	m_rootVersion = new VersionGraphVersionCfg;
 
 	m_activeVersionName = json::getString(_object, "Active");
 	m_activeBranchVersionName = json::getString(_object, "ActiveBranch");
-	
-	std::list<ConstJsonObject> rootArr = json::getObjectList(_object, "RootVersions");
-	for (const ConstJsonObject& rootObj : rootArr) {
-		VersionGraphVersionCfg version;
-		version.setFromJsonObject(rootObj);
-		m_rootVersions.push_back(version);
-	}
+	m_rootVersion->setFromJsonObject(json::getObject(_object, "RootVersion"));
 }
 
-void ot::VersionGraphCfg::addRootVersion(const VersionGraphVersionCfg& _version) {
-	m_rootVersions.push_back(_version);
+void ot::VersionGraphCfg::setRootVersion(const std::string& _name, const std::string& _label, const std::string& _description) {
+	m_rootVersion->setName(_name);
+	m_rootVersion->setLabel(_label);
+	m_rootVersion->setDescription(_description);
 }
+
+void ot::VersionGraphCfg::setRootVersion(VersionGraphVersionCfg* _version) {
+	if (m_rootVersion == _version) return;
+	if (m_rootVersion) delete m_rootVersion;
+	m_rootVersion = _version;
+}
+

@@ -38,7 +38,7 @@ namespace ot {
 		void updateCurrentGraphCompactLabelMode(void);
 
 		void startProcessCompact(bool _includeLabeledVersions);
-		void processCompactItem(VersionGraphVersionCfg& _parent, const VersionGraphVersionCfg& _config, const std::string& _activeVersion, bool _isDirectParent, bool _includeLabeledVersions);
+		void processCompactItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, bool _includeLabeledVersions);
 
 		QWidget* m_root;
 		VersionGraph* m_graph;

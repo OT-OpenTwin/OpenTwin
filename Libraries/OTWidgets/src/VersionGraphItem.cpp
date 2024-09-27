@@ -124,8 +124,8 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 	// Create childs
 	int childRow = m_row;
 
-	for (const VersionGraphVersionCfg& childCfg : m_config.getChildVersions()) {
-		VersionGraphItem* newChild = new VersionGraphItem(childCfg, childRow, _activeVersion, _scene);
+	for (const VersionGraphVersionCfg* childCfg : m_config.getChildVersions()) {
+		VersionGraphItem* newChild = new VersionGraphItem(*childCfg, childRow, _activeVersion, _scene);
 		newChild->setParentVersionItem(this);
 		newChild->connectToParent();
 

@@ -8,7 +8,9 @@
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/VersionGraphItem.h"
 
-ot::VersionGraph::VersionGraph() {
+ot::VersionGraph::VersionGraph() 
+	: m_rootItem(nullptr)
+{
 	this->getGraphicsScene()->setGridFlags(ot::Grid::NoGridFlags);
 	this->getGraphicsScene()->setMultiselectionEnabled(false);
 	this->setGraphicsViewFlag(GraphicsView::IgnoreConnectionByUser | GraphicsView::ViewManagesSceneRect);
@@ -24,15 +26,15 @@ ot::VersionGraph::~VersionGraph() {
 void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 	this->clear();
 
-	int row = 0;
+	if (!_config.getRootVersion()) {
+		OT_LOG_E("No root version set");
+		return;
+	}
+
 	m_activeVersion = _config.getActiveVersionName();
 	m_activeVersionBranch = _config.getActiveBranchVersionName();
 
-	for (const VersionGraphVersionCfg& version : _config.getRootVersions()) {
-		VersionGraphItem* newItem = new VersionGraphItem(version, row, m_activeVersion, this->getGraphicsScene());
-		row = newItem->getMaxRowIndex() + 1;
-		m_rootItems.push_back(newItem);
-	}
+	m_rootItem = new VersionGraphItem(*_config.getRootVersion(), 0, m_activeVersion, this->getGraphicsScene());
 
 	VersionGraphItem* branchVersion = this->getVersion(m_activeVersionBranch);
 	if (branchVersion) {
@@ -46,10 +48,8 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 }
 
 void ot::VersionGraph::clear(void) {
-	for (VersionGraphItem* itm : m_rootItems) {
-		delete itm;
-	}
-	m_rootItems.clear();
+	if (m_rootItem) delete m_rootItem;
+	m_rootItem = nullptr;
 }
 
 bool ot::VersionGraph::isCurrentVersionEndOfBranch(void) const {
@@ -86,9 +86,13 @@ void ot::VersionGraph::slotSelectionChanged(void) {
 }
 
 void ot::VersionGraph::slotUpdateVersionItems(void) {
-	for (VersionGraphItem* itm : m_rootItems) {
-		itm->updateGraphics();
+	if (!m_rootItem) {
+		OT_LOG_EA("Root item not set");
+		return;
 	}
+	
+	m_rootItem->updateGraphics();
+	
 	if (!m_activeVersion.empty()) {
 		this->slotCenterOnVersion(m_activeVersion);
 	}	
@@ -132,12 +136,13 @@ void ot::VersionGraph::slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _it
 }
 
 ot::VersionGraphItem* ot::VersionGraph::getVersion(const std::string& _name) const {
-	VersionGraphItem* item = nullptr;
-	for (VersionGraphItem* root : m_rootItems) {
-		item = root->findVersionByName(_name);
-		if (item) break;
+	if (m_rootItem) {
+		return m_rootItem->findVersionByName(_name);
 	}
-	return item;
+	else {
+		OT_LOG_EA("Root item not set");
+		return nullptr;
+	}
 }
 
 void ot::VersionGraph::highlightVersion(const std::string& _name) {
