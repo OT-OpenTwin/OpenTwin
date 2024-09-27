@@ -28,8 +28,21 @@ namespace ot {
 		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		//! \see getActiveVersionName
 		void setActiveVersionName(const std::string& _version) { m_activeVersionName = _version; };
+
+		//! \brief Returns the active version name.
+		//! The active version is the currently active model version.
 		const std::string& getActiveVersionName(void) const { return m_activeVersionName; };
+
+		//! \see getActiveBranchVersionName
+		void setActiveBranchVersionName(const std::string& _version) { m_activeBranchVersionName = _version; };
+
+		//! \brief Returns the active branch version name.
+		//! The active branch version is the currently active branch.
+		//! All parent versions of this version are in the active branch.
+		//! The first child a version in an active branch belongs to the active branch (after the active branch version, parent versions are handled by the parent).
+		const std::string& getActiveBranchVersionName(void) const { return m_activeBranchVersionName; };
 
 		void addRootVersion(const VersionGraphVersionCfg& _version);
 		void setRootVersions(const std::list<VersionGraphVersionCfg>& _versions) { m_rootVersions = _versions; };
@@ -37,6 +50,7 @@ namespace ot {
 
 	private:
 		std::string m_activeVersionName;
+		std::string m_activeBranchVersionName;
 		std::list<VersionGraphVersionCfg> m_rootVersions;
 	};
 

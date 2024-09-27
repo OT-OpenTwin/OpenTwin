@@ -26,11 +26,20 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 
 	int row = 0;
 	m_activeVersion = _config.getActiveVersionName();
+	m_activeVersionBranch = _config.getActiveBranchVersionName();
 
 	for (const VersionGraphVersionCfg& version : _config.getRootVersions()) {
 		VersionGraphItem* newItem = new VersionGraphItem(version, row, m_activeVersion, this->getGraphicsScene());
 		row = newItem->getMaxRowIndex() + 1;
 		m_rootItems.push_back(newItem);
+	}
+
+	VersionGraphItem* branchVersion = this->getVersion(m_activeVersionBranch);
+	if (branchVersion) {
+		branchVersion->setAsActiveVersionBranch();
+	}
+	else {
+		OT_LOG_E("Active branch version not found");
 	}
 
 	QMetaObject::invokeMethod(this, &VersionGraph::slotUpdateVersionItems, Qt::QueuedConnection);

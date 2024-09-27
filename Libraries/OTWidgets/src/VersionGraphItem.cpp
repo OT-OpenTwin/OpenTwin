@@ -225,3 +225,20 @@ void ot::VersionGraphItem::updateGraphics(void) {
 		child->updateGraphics();
 	}
 }
+
+void ot::VersionGraphItem::setAsActiveVersionBranch(void) {
+	VersionGraphItem* lastItem = this;
+	while (!lastItem->getChildVersions().empty()) {
+		lastItem = lastItem->getChildVersions().front();
+	}
+	lastItem->updateToRootAsActiveBranch();
+}
+
+void ot::VersionGraphItem::updateToRootAsActiveBranch(void) {
+	if (m_parentConnection) {
+		m_parentConnection->setLinePainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemSelectionBorder));
+	}
+	if (m_parentVersion) {
+		m_parentVersion->updateToRootAsActiveBranch();
+	}
+}

@@ -43,7 +43,11 @@ namespace ot {
 
 		void updateGraphics(void);
 
+		void setAsActiveVersionBranch(void);
+
 	private:
+		void updateToRootAsActiveBranch(void);
+		
 		VersionGraphVersionCfg m_config;
 		VersionGraphItem* m_parentVersion;
 		GraphicsConnectionItem* m_parentConnection;

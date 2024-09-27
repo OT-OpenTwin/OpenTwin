@@ -22,12 +22,14 @@ ot::VersionGraphCfg& ot::VersionGraphCfg::operator=(const VersionGraphCfg& _othe
 
 	m_rootVersions = _other.m_rootVersions;
 	m_activeVersionName = _other.m_activeVersionName;
+	m_activeBranchVersionName = _other.m_activeBranchVersionName;
 
 	return *this;
 }
 
 void ot::VersionGraphCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Active", JsonString(m_activeVersionName, _allocator), _allocator);
+	_object.AddMember("ActiveBranch", JsonString(m_activeBranchVersionName, _allocator), _allocator);
 
 	JsonArray rootArr;
 	for (const VersionGraphVersionCfg& version : m_rootVersions) {
@@ -42,6 +44,7 @@ void ot::VersionGraphCfg::setFromJsonObject(const ot::ConstJsonObject& _object) 
 	m_rootVersions.clear();
 
 	m_activeVersionName = json::getString(_object, "Active");
+	m_activeBranchVersionName = json::getString(_object, "ActiveBranch");
 	
 	std::list<ConstJsonObject> rootArr = json::getObjectList(_object, "RootVersions");
 	for (const ConstJsonObject& rootObj : rootArr) {

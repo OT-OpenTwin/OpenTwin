@@ -48,6 +48,7 @@ namespace ot {
 		void highlightVersion(const std::string& _name);
 
 		std::string m_activeVersion;
+		std::string m_activeVersionBranch;
 		std::list<VersionGraphItem*> m_rootItems;
 
 	};
