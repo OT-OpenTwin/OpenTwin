@@ -186,7 +186,6 @@ void varifyValidSettings(boost::program_options::variables_map& _arguments)
 {
     Varifier varifier;
     varifier.ensureCorrectMongoEnvVar();
-
 }
 
 int main(int argc, char* argv[])

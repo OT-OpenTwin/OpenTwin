@@ -37,6 +37,7 @@
 
 # Logfiles
 *.tlog
+*.log
 
 # Build Logs
 buildLog_Debug.txt
