@@ -111,110 +111,142 @@ void ChamferEdges::performOperation(const std::string &selectionInfo)
 	EntityBrep* brepEntity = dynamic_cast<EntityBrep*>(entityCache->getEntity(entityBrepInfo.front().getID(), entityBrepInfo.front().getVersion()));
 	assert(brepEntity != nullptr);
 
-	std::string error;
-
-	// TODO: Chamfer edge operation
-	bool success = true;
-
+	// Here we do not perform an operation, but keep the shape as is. The user can later on set the chamfer size which will then update the shape and
+	// perform the operation
 	TopoDS_Shape shape = brepEntity->getBrep();
 
-	// Build a new geometry entity and store it 
-	if (success)
+	std::list<std::string> entityNameList;
+	entityNameList.push_back(baseEntity->getName());
+
+	// Now we update the base entity
+	ot::UID entityID = modelComponent->createEntityUID();
+	ot::UID brepID   = modelComponent->createEntityUID();
+	ot::UID facetsID = modelComponent->createEntityUID();
+
+	EntityGeometry* geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr, nullptr, serviceName);
+	geometryEntity->setName(baseEntity->getName());
+	geometryEntity->setEditable(true);
+	geometryEntity->setSelectChildren(false);
+	geometryEntity->setManageChildVisibility(false);
+	//geometryEntity->setManageParentVisibility(false);  // The new boolean entity should manage the parent visibility as usual
+	geometryEntity->setBrep(shape);
+	geometryEntity->setTreeIcons("ChamferEdgesVisible", "ChamferEdgesHidden");
+	//geometryEntity->getBrepEntity()->setFaceNameMap(resultFaceNames);
+
+	geometryEntity->getProperties() = baseEntity->getProperties();
+
+	deletePropertyCategory(geometryEntity, "Dimensions");
+	deletePropertyCategory(geometryEntity, "Edges");
+	deletePropertyCategory(geometryEntity, "Internal");
+
+	EntityPropertiesDouble* doubleProp = new EntityPropertiesDouble("#Chamfer width", 0.0);
+	doubleProp->setVisible(false);
+	geometryEntity->getProperties().createProperty(doubleProp, "Dimensions", true);
+
+	EntityPropertiesString* stringProp = new EntityPropertiesString("Chamfer width", "0");
+	geometryEntity->getProperties().createProperty(stringProp, "Dimensions", true);
+
+	EntityPropertiesString* baseShapeProperty = new EntityPropertiesString("baseShape", std::to_string(baseEntity->getEntityID()));
+	baseShapeProperty->setVisible(false);
+	geometryEntity->getProperties().createProperty(baseShapeProperty, "Internal");
+
+	EntityPropertiesString* typeProperty = dynamic_cast<EntityPropertiesString*>(geometryEntity->getProperties().getProperty("shapeType"));
+
+	if (typeProperty != nullptr)
 	{
-		std::list<std::string> entityNameList;
-		entityNameList.push_back(baseEntity->getName());
-
-		// Now we update the base entity
-		ot::UID entityID = modelComponent->createEntityUID();
-		ot::UID brepID   = modelComponent->createEntityUID();
-		ot::UID facetsID = modelComponent->createEntityUID();
-
-		EntityGeometry* geometryEntity = new EntityGeometry(entityID, nullptr, nullptr, nullptr, nullptr, serviceName);
-		geometryEntity->setName(baseEntity->getName());
-		geometryEntity->setEditable(true);
-		geometryEntity->setSelectChildren(false);
-		geometryEntity->setManageChildVisibility(false);
-		//geometryEntity->setManageParentVisibility(false);  // The new boolean entity should manage the parent visibility as usual
-		geometryEntity->setBrep(shape);
-		geometryEntity->setTreeIcons("ChamferEdgesVisible", "ChamferEdgesHidden");
-		//geometryEntity->getBrepEntity()->setFaceNameMap(resultFaceNames);
-
-		geometryEntity->getProperties() = baseEntity->getProperties();
-
-		deletePropertyCategory(geometryEntity, "Dimensions");
-		deletePropertyCategory(geometryEntity, "Internal");
-
-		EntityPropertiesDouble* doubleProp = new EntityPropertiesDouble("#Chamfer width", 0.0);
-		doubleProp->setVisible(false);
-		geometryEntity->getProperties().createProperty(doubleProp, "Dimensions", true);
-
-		EntityPropertiesString* stringProp = new EntityPropertiesString("Chamfer width", "0");
-		geometryEntity->getProperties().createProperty(stringProp, "Dimensions", true);
-
-		EntityPropertiesString* baseShapeProperty = new EntityPropertiesString("baseShape", std::to_string(baseEntity->getEntityID()));
-		baseShapeProperty->setVisible(false);
-		geometryEntity->getProperties().createProperty(baseShapeProperty, "Internal");
-
-		EntityPropertiesString* typeProperty = dynamic_cast<EntityPropertiesString*>(geometryEntity->getProperties().getProperty("shapeType"));
-
-		if (typeProperty != nullptr)
-		{
-			typeProperty->setValue("Chamfer Edges");
-		}
-		else
-		{
-			typeProperty = new EntityPropertiesString("shapeType", "Chamfer Edges");
-			typeProperty->setVisible(false);
-			geometryEntity->getProperties().createProperty(typeProperty, "Internal");
-		}
-
-		// The geometry entity has two children: brep and facets. We need to assign ids to both of them (since we do not have a model state object here)
-		geometryEntity->getBrepEntity()->setEntityID(brepID);
-		geometryEntity->getFacets()->setEntityID(facetsID);
-
-		// Now we facet the entity and store it to the data base afterward.
-		geometryEntity->facetEntity(false);
-		geometryEntity->StoreToDataBase();
-
-		ot::UID entityVersion = geometryEntity->getEntityStorageVersion();
-		ot::UID brepVersion = geometryEntity->getBrepEntity()->getEntityStorageVersion();
-		ot::UID facetsVersion = geometryEntity->getFacets()->getEntityStorageVersion();
-
-		entityCache->cacheEntity(geometryEntity->getBrepEntity());
-		geometryEntity->detachBrep();
-
-		// Finally add the new entity to the model (data children need to come first)
-
-		std::list<ot::UID> dataEntityIDList = { brepID, facetsID };
-		std::list<ot::UID> dataEntityVersionList = { brepVersion , facetsVersion };
-		std::list<ot::UID> dataEntityParentList = { entityID, entityID };
-
-		modelComponent->addGeometryOperation(entityID, entityVersion, baseEntity->getName(), dataEntityIDList, dataEntityVersionList, dataEntityParentList, entityNameList, "chamfer edges: " + geometryEntity->getName());
-
-		delete geometryEntity;
-		geometryEntity = nullptr;
+		typeProperty->setValue("Chamfer Edges");
 	}
+	else
+	{
+		typeProperty = new EntityPropertiesString("shapeType", "Chamfer Edges");
+		typeProperty->setVisible(false);
+		geometryEntity->getProperties().createProperty(typeProperty, "Internal");
+	}
+
+	storeEdgeListInProperties(edgeList, geometryEntity->getProperties());
+
+	// The geometry entity has two children: brep and facets. We need to assign ids to both of them (since we do not have a model state object here)
+	geometryEntity->getBrepEntity()->setEntityID(brepID);
+	geometryEntity->getFacets()->setEntityID(facetsID);
+
+	std::map< const opencascade::handle<TopoDS_TShape>, std::string> allFaceNames = brepEntity->getFaceNameMap();
+	geometryEntity->getBrepEntity()->setFaceNameMap(allFaceNames);
+
+	// Now we facet the entity and store it to the data base afterward.
+	geometryEntity->facetEntity(false);
+	geometryEntity->StoreToDataBase();
+
+	ot::UID entityVersion = geometryEntity->getEntityStorageVersion();
+	ot::UID brepVersion = geometryEntity->getBrepEntity()->getEntityStorageVersion();
+	ot::UID facetsVersion = geometryEntity->getFacets()->getEntityStorageVersion();
+
+	entityCache->cacheEntity(geometryEntity->getBrepEntity());
+	geometryEntity->detachBrep();
+
+	// Finally add the new entity to the model (data children need to come first)
+
+	std::list<ot::UID> dataEntityIDList = { brepID, facetsID };
+	std::list<ot::UID> dataEntityVersionList = { brepVersion , facetsVersion };
+	std::list<ot::UID> dataEntityParentList = { entityID, entityID };
+
+	modelComponent->addGeometryOperation(entityID, entityVersion, baseEntity->getName(), dataEntityIDList, dataEntityVersionList, dataEntityParentList, entityNameList, "chamfer edges: " + geometryEntity->getName());
+
+	delete geometryEntity;
+	geometryEntity = nullptr;
 
 	// Request a view refresh and release the user interface
 	uiComponent->refreshSelection(modelComponent->getCurrentVisualizationModelID());
 	uiComponent->unlockUI(lockFlags);
-
-	// Notify the error, if any
-	if (!error.empty())
-	{
-		uiComponent->displayErrorPrompt(error);
-	}
 }
 
 void ChamferEdges::storeEdgeListInProperties(std::list<ChamferEdgesData> &edgeList, EntityProperties &properties)
 {
+	EntityPropertiesInteger::createProperty("Edges", "Number of edges", (int) edgeList.size(), "", properties);
 
+	size_t edgeCounter = 1;
+	for (auto edge : edgeList)
+	{
+		std::string index;
+		index = "(" + std::to_string(edgeCounter) + ")";
+
+		EntityPropertiesString::createProperty("Edges", "Edge name " + index, edge.getEdgeName(), "", properties);
+		EntityPropertiesDouble::createProperty("Edges", "Position X " + index, edge.getX(), "", properties);
+		EntityPropertiesDouble::createProperty("Edges", "Position Y " + index, edge.getY(), "", properties);
+		EntityPropertiesDouble::createProperty("Edges", "Position Z " + index, edge.getZ(), "", properties);
+
+		edgeCounter++;
+	}
 }
 
 std::list<ChamferEdgesData> ChamferEdges::readEdgeListFromProperties(EntityProperties& properties)
 {
 	std::list<ChamferEdgesData> edgeList;
 
+	EntityPropertiesInteger* edgeCountProperty = dynamic_cast<EntityPropertiesInteger*>(properties.getProperty("Number of edges"));
+
+	if (edgeCountProperty != nullptr)
+	{
+		for (size_t edgeCounter = 1; edgeCounter <= edgeCountProperty->getValue(); edgeCounter++)
+		{
+			std::string index;
+			index = "(" + std::to_string(edgeCounter) + ")";
+
+			ChamferEdgesData data;
+			
+			EntityPropertiesString* edgeNameProperty = dynamic_cast<EntityPropertiesString*>(properties.getProperty("Edge name " + index));
+			EntityPropertiesDouble* edgePosX = dynamic_cast<EntityPropertiesDouble*>(properties.getProperty("Position X " + index));
+			EntityPropertiesDouble* edgePosY = dynamic_cast<EntityPropertiesDouble*>(properties.getProperty("Position Y " + index));
+			EntityPropertiesDouble* edgePosZ = dynamic_cast<EntityPropertiesDouble*>(properties.getProperty("Position Z " + index));
+
+			if (edgeNameProperty != nullptr && edgePosX != nullptr && edgePosY != nullptr && edgePosZ != nullptr)
+			{
+				data.setEdgeName(edgeNameProperty->getValue());
+				data.setPosition(edgePosX->getValue(), edgePosY->getValue(), edgePosZ->getValue());
+
+				edgeList.push_back(data);
+			}
+		}
+	}
 
 	return edgeList;
 }
@@ -263,165 +295,170 @@ void ChamferEdges::performOperation(EntityGeometry* geometryEntity, EntityBrep* 
 	if (chamferWidth == 0.0)
 	{
 		shape = baseBrep->getBrep();
+
+		std::map< const opencascade::handle<TopoDS_TShape>, std::string> allFaceNames = baseBrep->getFaceNameMap();
+		geometryEntity->getBrepEntity()->setFaceNameMap(allFaceNames);
 	}
 	else
 	{
+		// Store information about input shape's face names
+		std::map< const opencascade::handle<TopoDS_TShape>, std::string> allFaceNames;
+
+		TopTools_ListOfShape anArguments;
+		anArguments.Append(baseBrep->getBrep());
+
+		TopExp_Explorer exp;
+		for (exp.Init(baseBrep->getBrep(), TopAbs_FACE); exp.More(); exp.Next())
+		{
+			TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+			if (baseBrep->getFaceNameMap().count(aFace.TShape()) != 0)
+			{
+				allFaceNames[aFace.TShape()] = baseBrep->getFaceNameMap().at(aFace.TShape());
+			}
+		}
+
+		// Perform the fillet operation
 		BRepFilletAPI_MakeFillet  MF(baseBrep->getBrep());
 
 		// add all the edges  to fillet 
-		TopExp_Explorer  ex(baseBrep->getBrep(), TopAbs_EDGE);
-		while (ex.More())
+		
+		std::map< const opencascade::handle<TopoDS_TShape>, std::list<std::string>> allEdgeNames;
+
+		for (exp.Init(baseBrep->getBrep(), TopAbs_FACE); exp.More(); exp.Next())
 		{
-			MF.Add(chamferWidth, TopoDS::Edge(ex.Current()));
-			ex.Next();
-		}
+			TopoDS_Face aFace = TopoDS::Face(exp.Current());
 
-		shape = MF.Shape();
-	}
-}
-
-bool ChamferEdges::removeFacesFromEntity(EntityGeometry *geometryEntity, ot::UID brepID, ot::UID brepVersion, std::list<ChamferEdgesData> &faces, std::list<ot::UID> &modifiedEntities)
-{
-	assert(geometryEntity != nullptr);
-
-	EntityBrep *brepEntity = dynamic_cast<EntityBrep*>(entityCache->getEntity(brepID, brepVersion));
-	if (brepEntity == nullptr) return false;
-
-	TopoDS_Shape shape = brepEntity->getBrep();
-
-	// Search for all the OCC faces in the entity and store them in the algorithm
-	BRepAlgoAPI_Defeaturing algorithm;
-	algorithm.SetShape(shape);
-	algorithm.SetRunParallel(false);
-	algorithm.SetToFillHistory(false);
-
-	for (auto face : faces)
-	{
-		TopoDS_Shape result;
-		if (findFaceFromPosition(shape, face.getX(), face.getY(), face.getZ(), result))
-		{
-			algorithm.AddFaceToRemove(result);
-		}
-	}
-
-	if (!algorithm.FacesToRemove().IsEmpty())
-	{
-		// We have something do do (at least one face was selected
-		algorithm.Build();
-
-		if (!algorithm.IsDone())
-		{
-			// We have some errors, the operation did not complete
-			std::stringstream errors;
-			algorithm.DumpErrors(errors);
-
-			std::cout << errors.str() << std::endl;
-			return false;
-		}
-
-		if (algorithm.HasWarnings())
-		{
-			// We have some warnings
-			std::stringstream warnings;
-			algorithm.DumpWarnings(warnings);
-
-			std::cout << warnings.str() << std::endl;
-			return false;
-		}
-
-		// Replace the brep with the new one and facet the entity (this will require new ot::UIDs for brep and facet entities)
-		geometryEntity->resetBrep();
-		geometryEntity->resetFacets();
-
-		geometryEntity->getBrepEntity()->setEntityID(modelComponent->createEntityUID());
-		geometryEntity->getFacets()->setEntityID(modelComponent->createEntityUID());
-
-		// Add the new brep entity to the geometry entity
-		geometryEntity->setBrep(algorithm.Shape());
-
-		// Facet the geometry entity and store it
-		geometryEntity->facetEntity(false);
-
-		geometryEntity->storeBrep();
-
-		ot::UID brepStorageVersion = geometryEntity->getBrepEntity()->getEntityStorageVersion();
-
-		entityCache->cacheEntity(geometryEntity->getBrepEntity());
-		geometryEntity->detachBrep();
-
-		geometryEntity->storeFacets();
-
-		ot::UID facetsStorageVersion = geometryEntity->getFacets()->getEntityStorageVersion();
-
-		geometryEntity->releaseFacets();
-
-		modifiedEntities.push_back(geometryEntity->getEntityID());
-
-		// Store the information about the entities such that they can be added to the model
-
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_UpdateGeometryEntity, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, geometryEntity->getEntityID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Brep, (unsigned long long) geometryEntity->getBrepStorageObjectID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Facets, (unsigned long long) geometryEntity->getFacetsStorageObjectID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Brep, brepStorageVersion, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Facets, facetsStorageVersion, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_OverrideGeometry, false, doc.GetAllocator());	// The modified entity was not yet written 
-
-		ot::PropertyGridCfg cfg;
-		geometryEntity->getProperties().addToConfiguration(nullptr, false, cfg);
-
-		ot::JsonObject cfgObj;
-		cfg.addToJsonObject(cfgObj, doc.GetAllocator());
-
-		doc.AddMember(OT_ACTION_PARAM_MODEL_NewProperties, cfgObj, doc.GetAllocator());
-
-		std::string tmp;
-		modelComponent->sendMessage(false, doc, tmp);
-	}
-	else
-	{
-		return false;
-	}
-
-	return true;
-}
-
-bool ChamferEdges::findFaceFromPosition(TopoDS_Shape &shape, double x, double y, double z, TopoDS_Shape &face)
-{
-	BRepBuilderAPI_MakeVertex vertex(gp_Pnt(x, y, z));
-
-	TopoDS_Shape result;
-	bool success = false;
-
-	double minDist = 1e30;
-
-	TopExp_Explorer exp;
-	for (exp.Init(shape, TopAbs_SHELL); exp.More(); exp.Next())
-	{
-		TopoDS_Shell aShell = TopoDS::Shell(exp.Current());
-		BRepExtrema_DistShapeShape minimumDist(aShell, vertex.Vertex(), Extrema_ExtFlag_MIN);
-
-		int hits = minimumDist.NbSolution();
-
-		assert(!minimumDist.InnerSolution());  // If the point is inside the solid, we get this behavior. In this case, it we don't know what the closest face is.
-												// We need a special treatment for this situation (e.g. invert the solid or make a sheet model out of it).
-
-		for (int hit = 1; hit <= hits; hit++)
-		{
-			if (minimumDist.SupportTypeShape1(hit) == BRepExtrema_SupportType::BRepExtrema_IsInFace)
+			TopExp_Explorer expE;
+			for (expE.Init(aFace, TopAbs_EDGE); expE.More(); expE.Next())
 			{
-				// We found the face which is closest to the given point
+				TopoDS_Edge aEdge = TopoDS::Edge(expE.Current());
 
-				if (minimumDist.Value() < minDist)
+				if (baseBrep->getFaceNameMap().count(aFace.TShape()) != 0)
 				{
-					success = true;
-					minDist = minimumDist.Value();
-					face = minimumDist.SupportOnShape1(hit);
+					allEdgeNames[aEdge.TShape()].push_back(baseBrep->getFaceNameMap().at(aFace.TShape()));
 				}
 			}
 		}
-	}
 
-	return success;
+		std::map< std::string, const opencascade::handle<TopoDS_TShape>> allEdges;
+
+		std::map<const opencascade::handle<TopoDS_TShape>, std::string> allEdgesFace1;
+		std::map<const opencascade::handle<TopoDS_TShape>, std::string> allEdgesFace2;
+
+		for (auto edge : allEdgeNames)
+		{
+			if (edge.second.size() == 2)
+			{
+				std::string face1 = edge.second.front();
+				std::string face2 = edge.second.back();
+
+				std::string edgeName;
+
+				if (face1 <= face2)
+				{
+					edgeName = face1 + ";" + face2;
+
+					allEdgesFace1[edge.first] = face1;
+					allEdgesFace2[edge.first] = face2;
+				}
+				else
+				{
+					edgeName = face2 + ";" + face1;
+
+					allEdgesFace1[edge.first] = face2;
+					allEdgesFace2[edge.first] = face1;
+				}
+
+				allEdges.emplace(edgeName, edge.first);
+			}
+		}
+
+		std::map< const opencascade::handle<TopoDS_TShape>, std::string> allEdgesForChamfer;
+
+		for (auto chamferEdge : edgeList)
+		{
+			if (!chamferEdge.getEdgeName().empty())
+			{
+				if (allEdges.count(chamferEdge.getEdgeName()) != 0)
+				{
+					allEdgesForChamfer.emplace(allEdges[chamferEdge.getEdgeName()], chamferEdge.getEdgeName());
+				}
+			}
+		}
+
+		TopTools_ListOfShape listOfChamferEdges;
+
+		for (exp.Init(baseBrep->getBrep(), TopAbs_EDGE); exp.More(); exp.Next())
+		{
+			TopoDS_Edge edge = TopoDS::Edge(exp.Current());
+
+			if (allEdgesForChamfer.count(edge.TShape()) != 0)
+			{
+				MF.Add(chamferWidth, TopoDS::Edge(exp.Current()));
+				listOfChamferEdges.Append(exp.Current());
+			}
+		}
+
+		try
+		{
+			shape = MF.Shape();
+		}
+		catch (Standard_Failure)
+		{
+			shape = baseBrep->getBrep();
+
+			std::map< const opencascade::handle<TopoDS_TShape>, std::string> allFaceNames = baseBrep->getFaceNameMap();
+			geometryEntity->getBrepEntity()->setFaceNameMap(allFaceNames);
+
+			uiComponent->displayErrorPrompt("ERROR: The chamfer edges operation has failed for shape: " + geometryEntity->getName());
+
+			return;
+		}
+
+		// Apply the face names
+		BRepTools_History aHistory(anArguments, MF);
+		std::map< const opencascade::handle<TopoDS_TShape>, std::string> resultFaceNames;
+
+		// First, we assign the names to all unchanged faces
+		for (exp.Init(shape, TopAbs_FACE); exp.More(); exp.Next())
+		{
+			TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+			if (allFaceNames.count(aFace.TShape()) != 0)
+			{
+				resultFaceNames[aFace.TShape()] = allFaceNames[aFace.TShape()];
+			}
+		}
+
+		// Now check for all modified faces
+		for (exp.Init(baseBrep->getBrep(), TopAbs_FACE); exp.More(); exp.Next())
+		{
+			TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+			for (auto newFace : aHistory.Modified(aFace))
+			{
+				resultFaceNames[newFace.TShape()] = allFaceNames[aFace.TShape()];
+			}
+		}
+
+		// Now we label all the faces generated from the edge blends
+		for (auto edge : listOfChamferEdges)
+		{
+			TopoDS_Edge aEdge = TopoDS::Edge(edge);
+
+			TopTools_ListOfShape listOfGeneratedFaces = aHistory.Generated(edge);
+
+			for (auto face : listOfGeneratedFaces)
+			{
+				TopoDS_Face aFace = TopoDS::Face(face);
+
+				std::string edgeName = allEdgesFace1[aEdge.TShape()] + ":" + allEdgesFace2[aEdge.TShape()];
+
+				resultFaceNames[aFace.TShape()] = edgeName;
+			}
+		}
+		
+		geometryEntity->getBrepEntity()->setFaceNameMap(resultFaceNames);
+	}
 }

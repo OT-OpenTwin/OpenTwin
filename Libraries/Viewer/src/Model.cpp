@@ -1839,7 +1839,7 @@ SceneNodeBase* Model::findSelectedItemByPolytope(osgUtil::Intersector* intersect
 		}
 	}
 
-	// Since we are picking an edge of a solid here, we can have multiple edge hots at the same location.
+	// Since we are picking an edge of a solid here, we can have multiple edge hits at the same location.
 	// These hits should belong to the edges of two adjacent faces.
 	// We need to determine both edge indices and the corresponding geometry scene node item.
 
