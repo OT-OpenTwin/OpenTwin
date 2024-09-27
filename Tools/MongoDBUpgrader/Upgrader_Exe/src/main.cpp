@@ -11,6 +11,8 @@
 #include "MongoVersion.h"
 #include <any>
 #include "Logger.h"
+#include "Varifier.h"
+
 //!brief:
 //! Check if a mongodb service exists
 //! if yes, get the configuration
@@ -118,6 +120,7 @@ void performUpgrade(const std::string& _adminPsw)
 
     //Now we analyse the current MongoDB version, if an update is necessary
     const std::string majorVersion = version.m_fullVersion.substr(0, version.m_fullVersion.find_first_of("."));
+    version.m_majorVersion = std::stoi(majorVersion);
     const std::string t = version.m_fullVersion.substr(version.m_fullVersion.find_first_of(".") + 1, version.m_fullVersion.size());
     version.m_minorVersion = t.substr(0, t.find_first_of("."));
     
@@ -178,6 +181,14 @@ void setServiceName(boost::program_options::variables_map& _arguments)
     }
 }
 
+
+void varifyValidSettings(boost::program_options::variables_map& _arguments)
+{
+    Varifier varifier;
+    varifier.ensureCorrectMongoEnvVar();
+
+}
+
 int main(int argc, char* argv[])
 {
     Logger::Init(".\\MongoDBUpgrader.log");
@@ -197,6 +208,8 @@ int main(int argc, char* argv[])
         ("SetMongoCfg", "Copy the updated mongodb.cfg into the new service directory.")
         //Function 5: Upgrade cfg
         ("UpgradeMongoCfg", "Upgrade the current mongodb cfg, so that it works with the new driver.") //ToDo
+        //Function 5: Verify all MongoDB related settings
+        ("VerifySetup", "Check if all MongoDB related settings are correct.") //ToDo
         //Parameter for upgrade
         ("AdminPsw", boost::program_options::value<std::string>(), "Admin Psw for the database")
         //Parameter for server name
@@ -204,9 +217,9 @@ int main(int argc, char* argv[])
         ;
 
     boost::program_options::variables_map variableMap;
-    boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), variableMap);
     try
     {
+        boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), variableMap);
         if (variableMap.count("Check") == 1)
         {
             Logger::INSTANCE().write("Performing upgrade check\n");
@@ -226,15 +239,15 @@ int main(int argc, char* argv[])
         {
             Logger::INSTANCE().write("Performing upgrade.\n");
             setServiceName(variableMap);
-            if (variableMap.count("Admin_Psw") != 1)
+            if (variableMap.count("AdminPsw") != 1)
             {
-                std::cout << "Admin_Psw must be set in order to upgrade";
-                Logger::INSTANCE().write("Application is missing Admin_Psw parameter\n");
+                std::cout << "AdminPsw must be set in order to upgrade";
+                Logger::INSTANCE().write("Application is missing AdminPsw parameter\n");
                 close(EXIT_CODE_FAILED);
             }
             else
             {
-                const auto& value = variableMap["Admin_Psw"].value();
+                const auto& value = variableMap["AdminPsw"].value();
                 const std::string adminPSw = boost::any_cast<std::string>(value);
                 performUpgrade(adminPSw);
                 close(ERROR_SUCCESS);
@@ -250,6 +263,13 @@ int main(int argc, char* argv[])
         else if (variableMap.count("MaxVersion") == 1)
         {
             std::cout << MongoDBUpgrader::getSupportedMaxVersion();
+            close(ERROR_SUCCESS);
+        }
+        else if (variableMap.count("VerifySetup") == 1)
+        {
+            Logger::INSTANCE().write("Setting mongodb.cfg of service.\n");
+            setServiceName(variableMap);
+            varifyValidSettings(variableMap);
             close(ERROR_SUCCESS);
         }
         else

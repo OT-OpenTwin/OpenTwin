@@ -22,7 +22,7 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{9bfc9e7e-d522-4aa1-80a9-c48a540e8d78}</ProjectGuid>
-    <RootNamespace>MongoDBUpgrader</RootNamespace>
+    <RootNamespace>MongoDBUpgradeManager</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
     <ProjectName>MongoDBUpgradeManager</ProjectName>
   </PropertyGroup>
@@ -144,6 +144,7 @@
     <ClCompile Include="src\MongoDBShellExecutor.cpp" />
     <ClCompile Include="src\MongoDBUpgrader.cpp" />
     <ClCompile Include="src\SharedResources.cpp" />
+    <ClCompile Include="src\Varifier.cpp" />
     <ClCompile Include="src\WindowsServiceManager.cpp" />
     <ClCompile Include="src\WindowsUtilityFuctions.cpp" />
   </ItemGroup>
@@ -158,6 +159,7 @@
     <ClInclude Include="include\MongoDBUpgrader.h" />
     <ClInclude Include="include\MongoVersion.h" />
     <ClInclude Include="include\SharedResources.h" />
+    <ClInclude Include="include\Varifier.h" />
     <ClInclude Include="include\WindowsServiceManager.h" />
     <ClInclude Include="include\WindowsUtilityFuctions.h" />
   </ItemGroup>

@@ -11,11 +11,11 @@ Function Upgrader_On_Init
   Pop $0
   Pop $1
   StrCpy $MONGODB_MAX_VERSION $1
-  MessageBox MB_OK "Return: $0 Message: $1"  
+  ;MessageBox MB_OK "Return: $0 Message: $1"  
   nsExec::ExecToStack /OEM "$EXEDIR\MongoDBUpgradeManager.exe --Check"
   Pop $0
   Pop $1
- MessageBox MB_OK "Return: $0 Message: $1"  
+ ;MessageBox MB_OK "Return: $0 Message: $1"  
   ;Exit codes: 
 	;1: failed, the returned text holds the error message
 	;2: upgrade required, the returned text holds found version
@@ -38,19 +38,17 @@ FunctionEnd
 
 SectionGroup /e "MongoDB Setup"
 Section "Upgrade data collection" Sec_Upgr
-	
-	Call BeforeUpgrade
-  
-	nsExec::ExecToStack /OEM "$EXEDIR\MongoDBUpgradeManager.exe" "--Upgrade" "--Admin_Psw" "$UPGRADER_MONGODB_ADMIN_PASSWORD" "--ServiceName" "$UPGRADER_MONGODB_SERVICE_NAME"
+	  
+	nsExec::ExecToStack /OEM "$EXEDIR\MongoDBUpgradeManager.exe --Upgrade --AdminPsw $UPGRADER_MONGODB_ADMIN_PASSWORD --ServiceName $UPGRADER_MONGODB_SERVICE_NAME"
 
-
+	;MessageBox MB_OK "Return: $0 Message: $1"  
 SectionEnd
 
 Section "Install MongoDB version 7.0" Sec_Inst
-
-	ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$INSTDIR\MongoDB_Installer\mongodb-windows-x86_64-7.0.14-signed" INSTALLLOCATION="$UPGRADER_MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'
-	
-	nsExec::ExecToStack /OEM "$EXEDIR\MongoDBUpgradeManager.exe" "--SetMongoCfg" "--ServiceName" "$UPGRADER_MONGODB_SERVICE_NAME"
+	ExecWait 'msiexec /lxv mdbinstall.log /qb /i "$EXEDIR\MongoDB_Installer\mongodb-windows-x86_64-7.0.14-signed.msi" INSTALLLOCATION="$UPGRADER_MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService"'		
+		
+	nsExec::ExecToStack /OEM "$EXEDIR\MongoDBUpgradeManager.exe --SetMongoCfg --ServiceName $UPGRADER_MONGODB_SERVICE_NAME"
+	;MessageBox MB_OK "Return: $0 Message: $1"  		
 	
 SectionEnd
 SectionGroupEnd

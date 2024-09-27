@@ -39,6 +39,9 @@
     <ClCompile Include="src\WindowsUtilityFuctions.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Varifier.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\FileWriter.h">
@@ -75,6 +78,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Logger.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Varifier.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

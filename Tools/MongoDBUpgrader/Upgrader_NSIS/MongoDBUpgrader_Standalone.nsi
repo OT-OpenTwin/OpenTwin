@@ -14,6 +14,10 @@ Var MONGODB_SETUP_MSG
 Var MONGODB_MAX_VERSION
 Var Dialog
 Var Label
+Var AdminPswHandle
+Var ServiceNameHandle
+Var InstallPathHandle
+
 
 !define DEFAULT_MONGODB_PATH '"C:\Program Files\MongoDB\Server\7.0"'
 !define MUI_ICON_PATH '"..\Icons\openTwin_icon_48x48.ico"'
@@ -41,18 +45,22 @@ Function BeforeUpgrade
 	${NSD_CreateLabel} 0u 0u 100% 12u "Enter MongoDB admin Psw:"
 	Pop $Label
 	${NSD_CreateText} 0u 12u 100% 12u "admin"
-	Pop $UPGRADER_MONGODB_ADMIN_PASSWORD
-  
+	Pop $AdminPswHandle
+	${NSD_GetText} $AdminPswHandle $UPGRADER_MONGODB_ADMIN_PASSWORD
+	
 	${NSD_CreateLabel} 0u 30u 100% 12u "Enter MongoDB service name:"
 	Pop $Label
 	${NSD_CreateText} 0u 42u 100% 12u "MongoDB"
-	Pop $UPGRADER_MONGODB_SERVICE_NAME
-
+	Pop $ServiceNameHandle
+	${NSD_GetText} $ServiceNameHandle $UPGRADER_MONGODB_SERVICE_NAME
+	
 	${NSD_CreateLabel} 0u 60u 100% 12u "MongoDB Installation path:"
 	${NSD_CreateText} 0u 72u 100% 12u ${DEFAULT_MONGODB_PATH}
-	Pop $UPGRADER_MONGODB_INSTALL_PATH
+	Pop $InstallPathHandle
+	${NSD_GetText} $InstallPathHandle $UPGRADER_MONGODB_INSTALL_PATH
   
   nsDialogs::Show
+  
 FunctionEnd
 
 
@@ -91,10 +99,6 @@ FunctionEnd
 
 Page custom BeforeUpgrade
 
-Section "Getting Basic Information"
-	MessageBox MB_OK "On Init"
-	Call Upgrader_On_Init
-SectionEnd
 !define MUI_PAGE_CUSTOMFUNCTION_PRE Upgrader_On_Init
 !define MUI_COMPONENTSPAGE_TEXT_TOP $MONGODB_SETUP_MSG
 !insertmacro MUI_PAGE_COMPONENTS
