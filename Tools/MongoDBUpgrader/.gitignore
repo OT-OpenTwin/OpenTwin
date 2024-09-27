@@ -1,4 +1,6 @@
 /Upgrader_Deployment
+/MongoDB_Installer
+/MongoDB_Server
 buildLog_Debug.txt
 buildLog_Release.txt
 *.log
