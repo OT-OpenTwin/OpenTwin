@@ -34,8 +34,11 @@ Set MAKENSIS_PATH="!NSIS_REG_VALUE!\makensis.exe"
 REM setting relevant paths
 Set UPGRADER_NSI="!OPENTWIN_DEV_ROOT!\Tools\MongoDBUpgrader\Upgrader_NSIS\MongoDBUpgrader_Standalone.nsi"
 Set UPGRADER_EXE="!OPENTWIN_DEV_ROOT!\Tools\MongoDBUpgrader\Upgrader_Exe\"
-Set UPGRADER_Mongo_INSTALLER="!OPENTWIN_DEV_ROOT!\Tools\MongoDBUpgrader\MongoDB_Installer\"
-Set UPGRADER_SERVER="!OPENTWIN_DEV_ROOT!\Tools\MongoDBUpgrader\MongoDB_Server\"
+
+Set UPGRADER_Mongo_INSTALLER="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools\ThirdParty\shared\MongoDB_Installer"
+Set UPGRADER_SERVER="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools\ThirdParty\shared\MongoDB_Server\"
+
+
 MKDIR "%OT_INSTALLUPGRADER_DIR%\MongoDB_Server"
 MKDIR "%OT_INSTALLUPGRADER_DIR%\MongoDB_Installer"
 
