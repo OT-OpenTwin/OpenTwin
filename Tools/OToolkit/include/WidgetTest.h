@@ -15,6 +15,7 @@
 namespace ot { class VersionGraphManager; }
 
 class WidgetTest : public QObject, public otoolkit::Tool {
+	Q_OBJECT
 public:
 	WidgetTest() {};
 	virtual ~WidgetTest() {};
@@ -34,7 +35,14 @@ public:
 
 	ot::VersionGraphManager* getVersionGraph(void) const { return m_versionGraph; };
 
+private Q_SLOTS:
+	void slotVersionDeselected(void);
+	void slotVersionSelected(const std::string& _versionName);
+	void slotVersionActivatRequest(const std::string& _versionName);
+
 private:
+	void updateVersionConfig(const std::string& _activeVersionName, const std::string& _activeVersionBranch);
+
 	ot::VersionGraphManager* m_versionGraph;
 
 };

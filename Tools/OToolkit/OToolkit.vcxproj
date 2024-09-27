@@ -116,7 +116,7 @@
     <QtMoc Include="include\GraphicsItemDesignerNavigation.h" />
     <ClInclude Include="include\GraphicsItemDesignerScene.h" />
     <ClInclude Include="include\GraphicsItemDesignerViewStatusOverlay.h" />
-    <ClInclude Include="include\WidgetTest.h" />
+    <QtMoc Include="include\WidgetTest.h" />
     <QtMoc Include="include\ColorStyleEditor.h" />
     <QtMoc Include="include\ToolMenuManager.h" />
     <QtMoc Include="include\FAR.h" />

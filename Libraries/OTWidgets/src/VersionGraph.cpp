@@ -122,6 +122,9 @@ void ot::VersionGraph::slotCenterOnVersion(const std::string& _versionName) {
 		this->fitInView(sceneRect, Qt::KeepAspectRatio);
 		this->centerOn(sceneRect.center());
 	}
+	else {
+		OT_LOG_E("Version not found \"" + _versionName + "\"");
+	}
 }
 
 void ot::VersionGraph::slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item) {

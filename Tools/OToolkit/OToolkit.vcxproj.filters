@@ -236,9 +236,6 @@
     <ClInclude Include="include\ToolBarManager.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\WidgetTest.h">
-      <Filter>Header Files\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="include\GraphicsItemDesignerInfoOverlay.h">
       <Filter>Header Files\GraphicsItemDesigner</Filter>
     </ClInclude>
@@ -378,6 +375,9 @@
     </QtMoc>
     <QtMoc Include="include\QuickLogExport.h">
       <Filter>Header Files\Logger</Filter>
+    </QtMoc>
+    <QtMoc Include="include\WidgetTest.h">
+      <Filter>Header Files\Tools</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,7 @@
 #include "WidgetTest.h"
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTGui/NavigationTreeItem.h"
 #include "OTGui/PropertyDialogCfg.h"
 #include "OTGui/PropertyStringList.h"
@@ -45,6 +46,35 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 
 	m_versionGraph = new ot::VersionGraphManager;
 
+	this->updateVersionConfig("1.1.5", "1.1.2");
+
+	root->addWidget(m_versionGraph->getQWidget());
+	this->connect(m_versionGraph->getGraph(), &VersionGraph::versionDeselected, this, &WidgetTest::slotVersionDeselected);
+	this->connect(m_versionGraph->getGraph(), &VersionGraph::versionSelected, this, &WidgetTest::slotVersionSelected);
+	this->connect(m_versionGraph->getGraph(), &VersionGraph::versionActivatRequest, this, &WidgetTest::slotVersionActivatRequest);
+
+	TestToolBar* test = new TestToolBar(this);
+	QAction* testAction = test->addAction("Test");
+	test->connect(testAction, &QAction::triggered, test, &TestToolBar::slotTest);
+	_content.setToolBar(test);
+
+	return true;
+}
+
+void WidgetTest::slotVersionDeselected(void) {
+	OT_LOG_D("Version deselected");
+}
+
+void WidgetTest::slotVersionSelected(const std::string& _versionName) {
+	OT_LOG_D("Version selected: " + _versionName);
+}
+
+void WidgetTest::slotVersionActivatRequest(const std::string& _versionName) {
+	OT_LOG_D("Version activate request: " + _versionName);
+	this->updateVersionConfig(_versionName, "1.1.2");
+}
+
+void WidgetTest::updateVersionConfig(const std::string& _activeVersionName, const std::string& _activeVersionBranch) {
 	ot::VersionGraphCfg cfg;
 	ot::VersionGraphVersionCfg v1("1", "Initial commit");
 	ot::VersionGraphVersionCfg v2("2");
@@ -59,8 +89,8 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	ot::VersionGraphVersionCfg v119("1.1.9");
 	ot::VersionGraphVersionCfg v1110("1.1.10");
 	ot::VersionGraphVersionCfg v1111("1.1.11");
-	ot::VersionGraphVersionCfg v11211("1.1.2.1.1");
-	
+	ot::VersionGraphVersionCfg v11211("1.1.1.1.1");
+
 	v1110.addChildVersion(v1111);
 	v119.addChildVersion(v1110);
 	v118.addChildVersion(v119);
@@ -70,21 +100,15 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	v114.addChildVersion(v115);
 	v113.addChildVersion(v114);
 	v112.addChildVersion(v113);
+
 	v111.addChildVersion(v112);
 	v111.addChildVersion(v11211);
+
 	v1.addChildVersion(v2);
 	v1.addChildVersion(v111);
 	cfg.addRootVersion(v1);
-	cfg.setActiveVersionName("1.1.5");
-	cfg.setActiveBranchVersionName("1.1.5");
+	cfg.setActiveVersionName(_activeVersionName);
+	cfg.setActiveBranchVersionName(_activeVersionBranch);
 
 	m_versionGraph->setupConfig(cfg);
-	root->addWidget(m_versionGraph->getQWidget());
-
-	TestToolBar* test = new TestToolBar(this);
-	QAction* testAction = test->addAction("Test");
-	test->connect(testAction, &QAction::triggered, test, &TestToolBar::slotTest);
-	_content.setToolBar(test);
-
-	return true;
 }
