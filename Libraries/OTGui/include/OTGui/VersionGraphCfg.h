@@ -61,8 +61,14 @@ namespace ot {
 		//! \brief Returns the version with the given name.
 		VersionGraphVersionCfg* findVersion(const std::string& _version);
 
+		//! \brief Returns true if a version with the given name prefix exists in any of the versions.
+		bool versionStartingWithNameExists(const std::string& _prefix);
+
 		//! \brief Removes the version and all of its childs if the version exists.
 		void removeVersion(const std::string& _version);
+
+		//! \breif Clear the version graph.
+		void clear(void);
 
 	private:
 		std::string m_activeVersionName;

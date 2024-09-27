@@ -64,6 +64,7 @@
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
 #include "OTWidgets/IconManager.h"
+#include "OTWidgets/VersionGraphManagerView.h"
 
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionDispatcher.h"
@@ -3596,57 +3597,63 @@ std::string ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument&
 // Version Graph
 
 std::string ExternalServicesComponent::handleSetVersionGraph(ot::JsonDocument& _document) {
-	ak::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
-	std::list<std::string> versionList = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_GRAPH_VERSION);
-	std::list<std::string> parentList = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_GRAPH_PARENT);
-	std::list<std::string> descriptionList = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION);
-	std::string activeVersion = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_ACTIVE);
-	std::string activeBranch = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
-
-	std::list<std::tuple<std::string, std::string, std::string>> versionGraph;
-
-	auto description = descriptionList.begin();
-	auto parent = parentList.begin();
-
-	for (auto version : versionList)
-	{
-		versionGraph.push_back(std::tuple<std::string, std::string, std::string>(version, *parent, *description));
-		parent++;
-		description++;
+	ot::VersionGraphManagerView* graphManager = AppBase::instance()->getVersionGraph();
+	if (!graphManager) {
+		OT_LOG_E("Version graph does not exist");
+		return OT_ACTION_RETURN_INDICATOR_Error "Version graph not created";
 	}
 
-	ViewerAPI::setVersionGraph(visModelID, versionGraph, activeVersion, activeBranch);
+	ot::VersionGraphCfg config;
+	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	graphManager->setupConfig(config);
 
 	return "";
 }
 
 std::string ExternalServicesComponent::handleSetVersionGraphActive(ot::JsonDocument& _document) {
-	ak::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	ot::VersionGraphManagerView* graphManager = AppBase::instance()->getVersionGraph();
+	if (!graphManager) {
+		OT_LOG_E("Version graph does not exist");
+		return OT_ACTION_RETURN_INDICATOR_Error "Version graph not created";
+	}
+
 	std::string activeVersion = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_ACTIVE);
 	std::string activeBranch = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
 
-	ViewerAPI::setVersionGraphActive(visModelID, activeVersion, activeBranch);
+	graphManager->activateVersion(activeVersion, activeBranch);
 
 	return "";
 }
 
 std::string ExternalServicesComponent::handleRemoveVersionGraphVersions(ot::JsonDocument& _document) {
-	ak::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
-	std::list<std::string> versions = ot::json::getStringList(_document, OT_ACTION_PARAM_UI_GRAPH_VERSION);
+	ot::VersionGraphManagerView* graphManager = AppBase::instance()->getVersionGraph();
+	if (!graphManager) {
+		OT_LOG_E("Version graph does not exist");
+		return OT_ACTION_RETURN_INDICATOR_Error "Version graph not created";
+	}
 
-	ViewerAPI::removeVersionGraphVersions(visModelID, versions);
+	std::list<std::string> versions = ot::json::getStringList(_document, OT_ACTION_PARAM_List);
+
+	graphManager->removeVersions(versions);
 
 	return "";
 }
 
 std::string ExternalServicesComponent::handleAddAndActivateVersionGraphVersion(ot::JsonDocument& _document) {
-	ak::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
-	std::string newVersion = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_VERSION);
-	std::string parentVersion = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_PARENT);
-	std::string description = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION);
-	std::string activeBranch = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
+	ot::VersionGraphManagerView* graphManager = AppBase::instance()->getVersionGraph();
+	if (!graphManager) {
+		OT_LOG_E("Version graph does not exist");
+		return OT_ACTION_RETURN_INDICATOR_Error "Version graph not created";
+	}
 
-	ViewerAPI::addNewVersionGraphStateAndActivate(visModelID, newVersion, activeBranch, parentVersion, description);
+	std::string activeBranch = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
+	std::string parentVersion = ot::json::getString(_document, OT_ACTION_PARAM_Parent);
+
+	ot::VersionGraphVersionCfg version;
+	version.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+
+	graphManager->addVersion(parentVersion, version);
+	graphManager->activateVersion(version.getName(), activeBranch);
 
 	return "";
 }

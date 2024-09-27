@@ -274,11 +274,11 @@ private:
 	std::string replaceParameterInExpression(std::string expression, const std::string &parameterName, const std::string &newString);
 	bool checkParameterName(const std::string &parameterName);
 	bool isValidParameterNameCharacter(char c);
-	void sendVersionGraphToUI(std::list<std::tuple<std::string, std::string, std::string>> &versionGraph, const std::string &currentVersion, const std::string &activeBranch);
+	void sendVersionGraphToUI(const ot::VersionGraphCfg& _versionGraph, const std::string& _currentVersion, const std::string& _activeBranch);
 	void updateVersionGraph(void);
 	void setActiveVersionTreeState(void);
 	void removeVersionGraphVersions(const std::list<std::string> &versions);
-	void addNewVersionTreeStateAndActivate(const std::string &parentVersion, const std::string &newVersion, const std::string &activeBranch, const std::string &description);
+	void addNewVersionTreeStateAndActivate(const std::string& _parentVersion, const std::string& _branch, const ot::VersionGraphVersionCfg& _version);
 	void getIDsOfFolderItemsOfType(EntityContainer *container, const std::string &className, bool recursive, std::list<ot::UID> &itemList);
 	void otherOwnersNotification(std::map<std::string, std::list<ot::UID>> ownerEntityListMap);
 	size_t getNumberOfVisualizationTriangles(std::list<EntityGeometry *> geometryEntities);

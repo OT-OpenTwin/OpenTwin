@@ -90,8 +90,6 @@ public:
 
 	virtual void updateVTKEntity(unsigned long long modelEntityID) override;
 
-	virtual void activateVersion(const std::string &version) override;
-
 	// #####################################################################################################################################
 
 	void setProcessingGroupOfMessages(bool _flag);
@@ -153,7 +151,6 @@ public:
 	void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 
 	ot::WidgetView* getPlotWidget(ViewerUIDtype _viewerID);
-	ot::WidgetView* getVersionGraphWidget(ViewerUIDtype _viewerID);
 	ot::WidgetView* getTableWidget(ViewerUIDtype _viewerID);
 
 	void viewerTabChanged(const std::string & _tabTitle);

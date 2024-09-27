@@ -75,8 +75,6 @@
     <ClCompile Include="src\TableViewerView.cpp" />
     <ClCompile Include="src\TextureMapManager.cpp" />
     <ClCompile Include="src\TransformManipulator.cpp" />
-    <ClCompile Include="src\VersionGraph.cpp" />
-    <ClCompile Include="src\VersionGraphView.cpp" />
     <ClCompile Include="src\Viewer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">Use</PrecompiledHeader>
@@ -138,8 +136,6 @@
     <ClInclude Include="include\TableViewerView.h" />
     <ClInclude Include="include\TextureMapManager.h" />
     <ClInclude Include="include\TransformManipulator.h" />
-    <QtMoc Include="include\VersionGraph.h" />
-    <ClInclude Include="include\VersionGraphView.h" />
     <ClInclude Include="include\ViewerSettings.h" />
     <ClInclude Include="include\ViewerView.h" />
     <ClInclude Include="include\WorkingPlane.h" />

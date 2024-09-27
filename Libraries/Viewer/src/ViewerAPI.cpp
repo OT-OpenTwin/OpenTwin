@@ -6,7 +6,6 @@
 #include "Notifier.h"
 #include "DataBase.h"
 #include "PlotView.h"
-#include "VersionGraphView.h"
 #include "Rubberband.h"
 #include "EntityParameterizedDataTable.h"
 #include "EntityTableSelectedRanges.h"
@@ -704,46 +703,6 @@ void ViewerAPI::prefetchDocumentsFromStorage(const std::string &projectName, std
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIDs);
 }
 
-void ViewerAPI::setVersionGraph(ot::UID _viewerID, std::list<std::tuple<std::string, std::string, std::string>> &versionGraph, const std::string &activeVersion, const std::string &activeBranch)
-{
-	auto itm = viewerManager.find(_viewerID);
-	if (itm != viewerManager.end()) {
-		if (itm->second != nullptr) {
-			itm->second->getVersionGraph()->setVersionGraph(versionGraph, activeVersion, activeBranch);
-		}
-	}
-}
-
-void ViewerAPI::setVersionGraphActive(ot::UID _viewerID, const std::string &activeVersion, const std::string &activeBranch)
-{
-	auto itm = viewerManager.find(_viewerID);
-	if (itm != viewerManager.end()) {
-		if (itm->second != nullptr) {
-			itm->second->getVersionGraph()->selectVersion(activeVersion, activeBranch);
-		}
-	}
-}
-
-void ViewerAPI::removeVersionGraphVersions(ot::UID _viewerID, const std::list<std::string> &versions)
-{
-	auto itm = viewerManager.find(_viewerID);
-	if (itm != viewerManager.end()) {
-		if (itm->second != nullptr) {
-			itm->second->getVersionGraph()->removeVersions(versions);
-		}
-	}
-}
-
-void ViewerAPI::addNewVersionGraphStateAndActivate(ot::UID _viewerID, const std::string &newVersion, const std::string &activeBranch, const std::string &parentVersion, const std::string &description)
-{
-	auto itm = viewerManager.find(_viewerID);
-	if (itm != viewerManager.end()) {
-		if (itm->second != nullptr) {
-			itm->second->getVersionGraph()->addVersionAndActivate(newVersion, activeBranch, parentVersion, description);
-		}
-	}
-}
-
 void ViewerAPI::setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName) {
 	Viewer * v = viewerManager[_viewerID];
 	if (v != nullptr) {
@@ -931,16 +890,6 @@ void ViewerAPI::DeleteFromSelectedTableRow(ot::UID _viewerID)
 	Viewer* v = viewerManager[_viewerID];
 	if (v != nullptr) {
 		v->getTableViewer()->DeleteSelectedRow();
-	}
-}
-
-ot::WidgetView* ViewerAPI::getVersionGraphWidget(ot::UID _viewerID) {
-	Viewer * v = viewerManager[_viewerID];
-	if (v != nullptr) {
-		return v->getVersionGraph();
-	}
-	else {
-		return nullptr;
 	}
 }
 

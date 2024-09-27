@@ -153,7 +153,6 @@ public:
 	void requestUpdateVTKEntity(unsigned long long modelEntityID);
 	void activateVersion(const std::string &version);
 
-	
 	// ###################################################################################################
 
 	// Project handling

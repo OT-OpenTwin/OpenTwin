@@ -87,7 +87,6 @@ void ot::VersionGraph::slotSelectionChanged(void) {
 
 void ot::VersionGraph::slotUpdateVersionItems(void) {
 	if (!m_rootItem) {
-		OT_LOG_EA("Root item not set");
 		return;
 	}
 	

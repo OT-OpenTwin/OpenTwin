@@ -308,10 +308,12 @@
 #define OT_ACTION_PARAM_PROCESS_ID "PROCESS.ID"
 
 #define OT_ACTION_PARAM_JSON "JSON"
+#define OT_ACTION_PARAM_List "List"
 #define OT_ACTION_PARAM_Flags "Flags"
 #define OT_ACTION_PARAM_Value "Value"
 #define OT_ACTION_PARAM_Index "Index"
 #define OT_ACTION_PARAM_Config "Config"
+#define OT_ACTION_PARAM_Parent "Parent"
 #define OT_ACTION_PARAM_Package "Package"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
@@ -353,9 +355,7 @@
 #define OT_ACTION_PARAM_UI_DIALOG_TITLE "UI.Dialog.Title"
 #define OT_ACTION_PARAM_UI_UID "UI.UID"
 #define OT_ACTION_PARAM_UI_KeySequence "UI.KeySequence"
-#define OT_ACTION_PARAM_UI_GRAPH_VERSION "UI.Graph.Version"
-#define OT_ACTION_PARAM_UI_GRAPH_PARENT "UI.Graph.Parent"
-#define OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION "UI.Graph.Description"
+
 #define OT_ACTION_PARAM_UI_GRAPH_ACTIVE "UI.Graph.Active"
 #define OT_ACTION_PARAM_UI_GRAPH_BRANCH "UI.Graph.Branch"
 

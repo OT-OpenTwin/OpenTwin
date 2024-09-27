@@ -69,6 +69,10 @@ namespace ot {
 		//! Thie version may be this version.
 		VersionGraphVersionCfg* findVersion(const std::string& _versionName);
 
+		//! \brief Returns true if a version with the given name prefix exists in any of the versions childs.
+		//! Also checks this version.
+		bool versionStartingWithNameExists(const std::string& _prefix) const;
+
 		//! \brief Returns the last version in this branch (first child versions).
 		VersionGraphVersionCfg* getLastBranchVersion(void);
 
@@ -80,6 +84,9 @@ namespace ot {
 
 		//! \brief Copy data excluding child versions.
 		void applyConfigOnly(const VersionGraphVersionCfg& _other);
+
+		VersionGraphVersionCfg* getParentVersion(void) { return m_parentVersion; };
+		const VersionGraphVersionCfg* getParentVersion(void) const { return m_parentVersion; };
 
 	private:
 		void setParentVersion(VersionGraphVersionCfg* _parent) { m_parentVersion = _parent; };

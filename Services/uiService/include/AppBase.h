@@ -78,6 +78,7 @@ namespace ot { class PlainTextEditView; }
 namespace ot { class GraphicsPickerView; }
 namespace ot { class NavigationTreeView; }
 namespace ot { class AbstractSettingsItem; }
+namespace ot { class VersionGraphManagerView; }
 
 struct structModelViewInfo
 {
@@ -388,6 +389,8 @@ public:
 
 	void appendDebugMessage(const QString & _message);
 
+	ot::VersionGraphManagerView* getVersionGraph(void) { return m_versionGraph; };
+
 	// ##############################################################################################
 
 	// Property grid
@@ -453,7 +456,7 @@ public:
 	// Prompt
 public Q_SLOTS:
 
-	ak::dialogResult showPrompt(const QString _message, const QString & _title, ak::promptType _type = ak::promptOk);
+	ak::dialogResult showPrompt	(const QString _message, const QString & _title, ak::promptType _type = ak::promptOk);
 
 	void showInfoPrompt(const QString _message, const QString & _title);
 
@@ -488,6 +491,8 @@ public Q_SLOTS:
 	// Private: Slots
 
 private Q_SLOTS:
+	void slotRequestVersion(const std::string& _versionName);
+
 	void slotViewFocusLost(ot::WidgetView* _view);
 	void slotViewFocused(ot::WidgetView* _view);
 	void slotViewCloseRequested(ot::WidgetView* _view);
@@ -613,6 +618,7 @@ private:
 	};
 	StateInformation			m_currentStateWindow;
 	
+	ot::VersionGraphManagerView* m_versionGraph;
 	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::GraphicsViewView> m_graphicsViews;
 	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::TextEditorView> m_textEditors;
 	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::TableView> m_tables;

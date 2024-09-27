@@ -417,11 +417,6 @@ void ViewerComponent::updateVTKEntity(unsigned long long modelEntityID)
 	AppBase::instance()->getExternalServicesComponent()->requestUpdateVTKEntity(modelEntityID);
 }
 
-void ViewerComponent::activateVersion(const std::string &version)
-{
-	AppBase::instance()->getExternalServicesComponent()->activateVersion(version);
-}
-
 void ViewerComponent::setProcessingGroupOfMessages(bool flag)
 {
 	if (flag)
@@ -886,11 +881,6 @@ void ViewerComponent::prefetchDocumentsFromStorage(const std::string &projectNam
 ot::WidgetView* ViewerComponent::getPlotWidget(ViewerUIDtype _viewerID) {
 	return ViewerAPI::getPlotWidget(_viewerID);
 }
-
-ot::WidgetView* ViewerComponent::getVersionGraphWidget(ViewerUIDtype _viewerID) {
-	return ViewerAPI::getVersionGraphWidget(_viewerID);
-}
-
 
 ot::WidgetView* ViewerComponent::getTableWidget(ViewerUIDtype _viewerID)
 {

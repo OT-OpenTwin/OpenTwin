@@ -133,9 +133,6 @@
     <ClCompile Include="src\ClipPlaneManipulator.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\VersionGraph.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Table.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -147,9 +144,6 @@
     </ClCompile>
     <ClCompile Include="src\EntityHandler.cpp">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VersionGraphView.cpp">
-      <Filter>src\WidgetView</Filter>
     </ClCompile>
     <ClCompile Include="src\TableViewerView.cpp">
       <Filter>src\WidgetView</Filter>
@@ -306,9 +300,6 @@
     <ClInclude Include="include\SceneNodeVTK.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
-    <ClInclude Include="include\VersionGraphView.h">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
     <ClInclude Include="include\TableViewerView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
@@ -320,9 +311,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\VersionGraph.h">
-      <Filter>include</Filter>
-    </QtMoc>
     <QtMoc Include="include\Table.h">
       <Filter>include</Filter>
     </QtMoc>

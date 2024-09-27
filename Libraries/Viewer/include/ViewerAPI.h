@@ -77,7 +77,6 @@ namespace ViewerAPI
 
 		virtual void updateVTKEntity(unsigned long long modelEntityID) {};
 
-		virtual void activateVersion(const std::string &version) {};
 	};
 
 	__declspec(dllexport) void registerNotifier(Notifier *notifier);
@@ -184,14 +183,6 @@ namespace ViewerAPI
 
 	__declspec(dllexport) void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 
-	__declspec(dllexport) void setVersionGraph(ot::UID _viewerID, std::list<std::tuple<std::string, std::string, std::string>> &versionGraph, const std::string &activeVersion, const std::string &activeBranch);
-
-	__declspec(dllexport) void setVersionGraphActive(ot::UID _viewerID, const std::string &activeVersion, const std::string &activeBranch);
-
-	__declspec(dllexport) void removeVersionGraphVersions(ot::UID _viewerID, const std::list<std::string> &versions);
-
-	__declspec(dllexport) void addNewVersionGraphStateAndActivate(ot::UID _viewerID, const std::string &newVersion, const std::string &activeBranch, const std::string &parentVersion, const std::string &description);
-
 	__declspec(dllexport) void setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
 
 	__declspec(dllexport) ot::WidgetView* getPlotWidget(ot::UID _viewerID);
@@ -212,8 +203,6 @@ namespace ViewerAPI
 
 
 	/********************************************************************************************/
-
-	__declspec(dllexport) ot::WidgetView* getVersionGraphWidget(ot::UID _viewerID);
 
 	__declspec(dllexport) void viewerTabChanged(const std::string & _tabTitle);
 

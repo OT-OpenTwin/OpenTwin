@@ -5,6 +5,7 @@
 #include <string>
 #include <list>
 #include "UniqueUIDGenerator.h"
+#include "OTGui/VersionGraphCfg.h"
 
 #include <mongocxx/cursor.hpp>
 #include <bsoncxx/document/view.hpp>
@@ -77,10 +78,10 @@ public:
 	void removeEntity(ModelStateEntity::EntityID entityID, bool considerChildren = true);
 
 	// Determine the current modelStateVersion (the last saved one)
-	std::string getModelStateVersion(void) { return currentModelStateVersion; };
+	std::string getModelStateVersion(void) { return m_graphCfg.getActiveVersionName(); };
 
 	// Determine the currently active branch
-	std::string getActiveBranch(void) { return currentActiveBranch; }
+	std::string getActiveBranch(void) { return m_graphCfg.getActiveBranchVersionName(); }
 
 	// Save the current modified model state. The version counter is incremented automatically in the last digit (e.g. 1.2.1 -> 1.2.2)
 	bool saveModelState(bool forceSave, bool forceAbsoluteState, const std::string &saveComment);
@@ -119,7 +120,7 @@ public:
 	void loadVersionGraph(void);
 
 	// Get a list of all model states (version, description);
-	std::list<std::tuple<std::string, std::string, std::string>> getVersionGraph(void);
+	const ot::VersionGraphCfg& getVersionGraph(void) const;
 
 	// Check the database schema version and upgrade, if needed
 	void checkAndUpgradeDataBaseSchema(void);
@@ -201,7 +202,7 @@ private:
 	std::string getVersionDescription(const std::string &version);
 
 	// Add an item to the version graph
-	void addVersionGraphItem(const std::string &version, const std::string &parentVersion, const std::string &description);
+	void addVersionGraphItem(const std::string& _version, const std::string& _parentVersion, const std::string& _label, const std::string& _description);
 
 	// Remove an item from the version graph
 	void removeVersionGraphItem(const std::string &version);
@@ -219,13 +220,14 @@ private:
 	void deleteModelVersion(const std::string &version);
 
 	// Determine all versions which are following the given version (regardless of the branch)
-	void getAllFutureVersions(const std::string &version, std::list<std::string> &futureVersions);
+	void getAllChildVersions(const std::string& _version, std::list<std::string>& _childVersions);
+	void getAllChildVersions(const ot::VersionGraphVersionCfg* _version, std::list<std::string>& _childVersions);
 
 	// Create a new branch and activate it (also update the model entity)
 	void createAndActivateNewBranch(void);
 
 	// Check whether the specified branch already exists
-	bool branchExists(const std::string &branch);
+	bool branchExists(const std::string& _branch);
 
 	// Count the number of dots in a version string
 	int countNumberOfDots(const std::string &text);
@@ -233,15 +235,8 @@ private:
 	// Helper to perform schema upgrade from version 1 to version 2
 	void updateSchema_1_2(void);
 
-	// The last saved model state version. The current state may already contain modifications to the last saved state. The version of the model state
-	// will be incremented automatically when the state is saved.
-	std::string currentModelStateVersion;
-
 	// When we load a relative state, the attribute will hold the version of the last absolute state (base state)
 	std::string currentModelBaseStateVersion;
-
-	// The currently active branch (the first version in the branch will be currentActiveBranch + ".1")
-	std::string currentActiveBranch;
 
 	// Information regarding the entities which are currently part of the model
 	std::map<ModelStateEntity::EntityID, ModelStateEntity> entities;
@@ -258,22 +253,17 @@ private:
 
 	// The maximum number of array entities per state
 	const size_t maxNumberArrayEntitiesPerState;
-
+		
 	// The active branch which is currently stored in the model entity
 	std::string activeBranchInModelEntity;
 
 	// The active version which is currently stored in the model entity
 	std::string activeVersionInModelEntity;
-	
+
 	// The member for creation of Unique IDs
 	DataStorageAPI::UniqueUIDGenerator *uniqueUIDGenerator;
 
 	// The version graph (for each version: version, parentVersion, description).
 	// The version graph needs to be loaded when the project is opened and will then be kept up to date
-	std::list<std::tuple<std::string, std::string, std::string>> versionGraph;
-
-	// Maps to store the access from a version to its parent version, its description and its direct childs
-	std::map<std::string, std::string> versionToParentMap;
-	std::map<std::string, std::string> versionToDescriptionMap;
-	std::map<std::string, std::list<std::string>> versionToChildsMap;
+	ot::VersionGraphCfg m_graphCfg;
 };

@@ -9,11 +9,11 @@
 
 ot::VersionGraphManagerView::VersionGraphManagerView()
 {
-	this->addWidgetToDock(this->getGraph());
+	this->addWidgetToDock(this->getQWidget());
 }
 
 ot::VersionGraphManagerView::~VersionGraphManagerView() {}
 
 QWidget* ot::VersionGraphManagerView::getViewWidget(void) {
-	return this->getGraph();
+	return this->getQWidget();
 }

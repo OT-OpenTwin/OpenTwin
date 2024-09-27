@@ -57,7 +57,6 @@
 #include "ViewerObjectSelectionHandler.h"
 
 #include "PlotView.h"
-#include "VersionGraphView.h"
 
 #include "SceneNodeVTK.h"
 
@@ -233,7 +232,6 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	m_plot = new ot::PlotView(this);
 
 	// Create new view handler
-	m_versionGraph = new ot::VersionGraphView(this);
 	m_tableViewer = new ot::TableViewerView(this);
 
 	// Create settings
@@ -284,9 +282,6 @@ Viewer::~Viewer()
 
 	if (m_plot != nullptr) delete m_plot;
 	m_plot = nullptr;
-
-	if (m_versionGraph != nullptr) delete m_versionGraph;
-	m_versionGraph = nullptr;
 
 	if (m_tableViewer != nullptr) delete m_tableViewer;
 	m_tableViewer = nullptr;

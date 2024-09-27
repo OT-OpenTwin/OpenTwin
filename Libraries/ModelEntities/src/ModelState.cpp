@@ -4,6 +4,7 @@
 #undef min
 
 #include "ModelState.h"
+#include "OTCore/Logger.h"
 
 #include "DataBase.h"
 #include "EntityBase.h"
@@ -50,7 +51,7 @@ ModelState::~ModelState()
 // Reset the model state to an empty project
 void ModelState::reset(void)
 {
-	currentModelStateVersion.clear();
+	m_graphCfg.clear();
 	currentModelBaseStateVersion.clear();
 
 	entities.clear();
@@ -291,7 +292,7 @@ bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const s
 	}
 
 	// Store the current version as the parent version
-	std::string parentVersion = currentModelStateVersion;
+	std::string parentVersion = m_graphCfg.getActiveVersionName();
 
 	// Remove all entities which are newer than the current model state, but older than the last inactive model state or model
 	// state extension. Such entries appear after a previous undo operation.
@@ -326,10 +327,10 @@ bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const s
 	}
 
 	// Now we need to increment our version counter
-	incrementVersion();
+	this->incrementVersion();
 
 	// Now add the new state to the graph
-	addVersionGraphItem(currentModelStateVersion, parentVersion, saveComment);
+	this->addVersionGraphItem(m_graphCfg.getActiveVersionName(), parentVersion, "", saveComment);
 
 	// Finally we store an absolute or relative state 
 	if (saveAbsolute)
@@ -455,33 +456,33 @@ void ModelState::incrementVersion(void)
 	// This function increments the current model state version: currentModelStateVersion
 
 	// Check whether there is a dot in the version string (e.g. 1.1)
-	size_t index = currentModelStateVersion.rfind('.');
+	size_t index = m_graphCfg.getActiveVersionName().rfind('.');
 
 	if (index == std::string::npos)
 	{
 		// There is no dot in the version -> just convert to long, increment and convert back to string
-		long long version = std::atoll(currentModelStateVersion.c_str());
+		long long version = std::atoll(m_graphCfg.getActiveVersionName().c_str());
 
 		version++;
-		currentModelStateVersion = std::to_string(version);
+		m_graphCfg.setActiveVersionName(std::to_string(version));
 	}
 	else
 	{
 		// There is a dot in the version. First, separate the part before the last dot and the one after the last dot
 
-		std::string leadingVersion = currentModelStateVersion.substr(0, index+1);
-		std::string lastVersion = currentModelStateVersion.substr(index+1);
+		std::string leadingVersion = m_graphCfg.getActiveVersionName().substr(0, index+1);
+		std::string lastVersion = m_graphCfg.getActiveVersionName().substr(index+1);
 
 		long long version = std::atoll(lastVersion.c_str());
 
 		version++;
-		currentModelStateVersion = leadingVersion + std::to_string(version);
+		m_graphCfg.setActiveVersionName(leadingVersion + std::to_string(version));
 	}
 }
 
 void ModelState::clearModelState(void)
 {
-	currentModelStateVersion.clear();
+	m_graphCfg.setActiveVersionName("");
 
 	entities.clear();
 
@@ -509,7 +510,7 @@ bool ModelState::loadState(bsoncxx::document::view docView, const std::string &e
 	assert(docView["SchemaVersion_ModelState"].get_int32() == 1);
 	assert(docView["Type"].get_utf8().value.data() == expectedType);
 
-	currentModelStateVersion = docView["Version"].get_utf8().value.data();
+	m_graphCfg.setActiveVersionName(docView["Version"].get_utf8().value.data());
 
 	bool extensionState = docView["Extension"].get_bool();
 
@@ -521,7 +522,7 @@ bool ModelState::loadState(bsoncxx::document::view docView, const std::string &e
 		// We now search for all state extension documents for the current state version
 		auto queryDoc = bsoncxx::builder::stream::document{}
 			<< "SchemaType" << "ModelStateExtension"
-			<< "Version" << currentModelStateVersion
+			<< "Version" << m_graphCfg.getActiveVersionName()
 			<< bsoncxx::builder::stream::finalize;
 
 		auto filterDoc = bsoncxx::builder::basic::document{};
@@ -664,8 +665,8 @@ bool ModelState::saveAbsoluteState(const std::string &saveComment)
 
 	doc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
 	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_ModelState", (int)1));
-	doc.append(bsoncxx::builder::basic::kvp("Version", currentModelStateVersion));
-	doc.append(bsoncxx::builder::basic::kvp("ParentVersion", getPreviousVersion(currentModelStateVersion)));
+	doc.append(bsoncxx::builder::basic::kvp("Version", m_graphCfg.getActiveVersionName()));
+	doc.append(bsoncxx::builder::basic::kvp("ParentVersion", getPreviousVersion(m_graphCfg.getActiveVersionName())));
 	doc.append(bsoncxx::builder::basic::kvp("Type", "absolute"));
 	doc.append(bsoncxx::builder::basic::kvp("Extension", false));
 	doc.append(bsoncxx::builder::basic::kvp("Description", saveComment));
@@ -731,7 +732,7 @@ bool ModelState::saveAbsoluteState(const std::string &saveComment)
 	DataBase::GetDataBase()->StorePlainDataItem(doc);
 
 	// The current version becomes the new base state
-	currentModelBaseStateVersion = currentModelStateVersion;
+	currentModelBaseStateVersion = m_graphCfg.getActiveVersionName();
 	
 	return true;
 }
@@ -754,7 +755,7 @@ bool ModelState::saveAbsoluteStateWithExtension(const std::string &saveComment)
 	}
 
 	// The current version becomes the new base state
-	currentModelBaseStateVersion = currentModelStateVersion;
+	currentModelBaseStateVersion = m_graphCfg.getActiveVersionName();
 
 	return true;
 }
@@ -766,8 +767,8 @@ bool ModelState::writeMainDocument(std::map<ModelStateEntity::EntityID, ModelSta
 
 	doc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
 	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_ModelState", (int)1));
-	doc.append(bsoncxx::builder::basic::kvp("Version", currentModelStateVersion));
-	doc.append(bsoncxx::builder::basic::kvp("ParentVersion", getPreviousVersion(currentModelStateVersion)));
+	doc.append(bsoncxx::builder::basic::kvp("Version", m_graphCfg.getActiveVersionName()));
+	doc.append(bsoncxx::builder::basic::kvp("ParentVersion", getPreviousVersion(m_graphCfg.getActiveVersionName())));
 	doc.append(bsoncxx::builder::basic::kvp("Type", "absolute"));
 	doc.append(bsoncxx::builder::basic::kvp("Extension", true));
 	doc.append(bsoncxx::builder::basic::kvp("Description", saveComment));
@@ -848,7 +849,7 @@ bool ModelState::writeExtensionDocument(std::map<ModelStateEntity::EntityID, Mod
 
 	doc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelStateExtension"));
 	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_ModelStateExtension", (int)1));
-	doc.append(bsoncxx::builder::basic::kvp("Version", currentModelStateVersion));
+	doc.append(bsoncxx::builder::basic::kvp("Version", m_graphCfg.getActiveVersionName()));
 
 	size_t numberArrayEntriesWritten = 0;
 
@@ -932,8 +933,8 @@ bool ModelState::saveIncrementalState(const std::string &saveComment)
 
 	doc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
 	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_ModelState", (int)1));
-	doc.append(bsoncxx::builder::basic::kvp("Version", currentModelStateVersion));
-	doc.append(bsoncxx::builder::basic::kvp("ParentVersion", getPreviousVersion(currentModelStateVersion)));
+	doc.append(bsoncxx::builder::basic::kvp("Version", m_graphCfg.getActiveVersionName()));
+	doc.append(bsoncxx::builder::basic::kvp("ParentVersion", getPreviousVersion(m_graphCfg.getActiveVersionName())));
 	doc.append(bsoncxx::builder::basic::kvp("Type", "relative"));
 	doc.append(bsoncxx::builder::basic::kvp("Extension", extension));
 	doc.append(bsoncxx::builder::basic::kvp("BaseState", currentModelBaseStateVersion));
@@ -1038,12 +1039,12 @@ bool ModelState::saveIncrementalState(const std::string &saveComment)
 
 std::string ModelState::getCurrentModelStateDescription(void) 
 { 
-	return getVersionDescription(currentModelStateVersion); 
+	return getVersionDescription(m_graphCfg.getActiveVersionName());
 }
 
 std::string ModelState::getRedoModelStateDescription(void) 
 { 
-	std::string nextVersion = getNextVersion(currentModelStateVersion);
+	std::string nextVersion = getNextVersion(m_graphCfg.getActiveVersionName());
 	if (nextVersion.empty()) return "";
 
 	return getVersionDescription(nextVersion); 
@@ -1051,14 +1052,14 @@ std::string ModelState::getRedoModelStateDescription(void)
 
 bool ModelState::canUndo(void) 
 { 
-	std::string previousVersion = getPreviousVersion(currentModelStateVersion);
+	std::string previousVersion = getPreviousVersion(m_graphCfg.getActiveVersionName());
 
 	return !previousVersion.empty(); 
 }
 
 bool ModelState::canRedo(void) 
 { 
-	std::string nextVersion = getNextVersion(currentModelStateVersion);
+	std::string nextVersion = getNextVersion(m_graphCfg.getActiveVersionName());
 
 	return !nextVersion.empty(); 
 }
@@ -1066,7 +1067,7 @@ bool ModelState::canRedo(void)
 bool ModelState::undoLastOperation(void)
 {
 	// Determine the parent version
-	std::string parentVersion = getPreviousVersion(currentModelStateVersion);
+	std::string parentVersion = getPreviousVersion(m_graphCfg.getActiveVersionName());
 
 	if (parentVersion.empty())
 	{
@@ -1083,7 +1084,7 @@ bool ModelState::undoLastOperation(void)
 bool ModelState::redoNextOperation(void)
 {
 	// Determine the next version in the current branch
-	std::string nextVersion = getNextVersion(currentModelStateVersion);
+	std::string nextVersion = getNextVersion(m_graphCfg.getActiveVersionName());
 
 	if (nextVersion.empty())
 	{
@@ -1197,7 +1198,7 @@ bool ModelState::getListOfNonModelStateEntities(mongocxx::cursor &cursor, bsoncx
 
 void ModelState::loadVersionGraph(void)
 {
-	versionGraph.clear();
+	m_graphCfg.clear();
 
 	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
 
@@ -1220,15 +1221,24 @@ void ModelState::loadVersionGraph(void)
 		std::string version = result["Version"].get_utf8().value.data();
 		std::string parentVersion = result["ParentVersion"].get_utf8().value.data();
 
-		std::string description = result["Description"].get_utf8().value.data();
+		std::string label;
+		std::string description;
 
-		addVersionGraphItem(version, parentVersion, description);
+		try {
+			label = result["Label"].get_utf8().value.data();
+		}
+		catch (...) {}
+
+		try {
+			description = result["Description"].get_utf8().value.data();
+		} catch (...) {}
+		
+		this->addVersionGraphItem(version, parentVersion, label, description);
 	}
 }
 
-std::list<std::tuple<std::string, std::string, std::string>> ModelState::getVersionGraph(void)
-{
-	return versionGraph;
+const ot::VersionGraphCfg& ModelState::getVersionGraph(void) const {
+	return m_graphCfg;
 }
 
 bool ModelState::openProject(void)
@@ -1258,7 +1268,7 @@ bool ModelState::openProject(void)
 	activeVersionInModelEntity = activeVersion;
 
 	// Activate the branch
-	currentActiveBranch = activeBranch;
+	m_graphCfg.setActiveBranchVersionName(activeBranch);
 
 	// If the active Version is empty, the last version in the active branch is active
 	if (activeVersion.empty())
@@ -1450,7 +1460,7 @@ void ModelState::updateSchema_1_2(void)
 
 bool ModelState::isVersionInActiveBranch(const std::string &version)
 {
-	return isVersionInBranch(version, currentActiveBranch);
+	return isVersionInBranch(version, m_graphCfg.getActiveBranchVersionName());
 }
 
 bool ModelState::isVersionInBranch(const std::string &version, const std::string &branch)
@@ -1519,13 +1529,13 @@ std::string ModelState::getParentBranch(const std::string &branch)
 	return branch.substr(0, index);
 }
 
-int ModelState::countNumberOfDots(const std::string &text)
+int ModelState::countNumberOfDots(const std::string& _text)
 {
 	int count = 0;
 
-	for (size_t index = 0; index < text.size(); index++)
+	for (size_t index = 0; index < _text.size(); index++)
 	{
-		if (text[index] == '.') count++;
+		if (_text[index] == '.') count++;
 	}
 
 	return count;
@@ -1540,18 +1550,18 @@ void ModelState::activateBranch(const std::string &version)
 	if (index == std::string::npos)
 	{
 		// We are in the main branch
-		currentActiveBranch = "";
+		m_graphCfg.setActiveBranchVersionName("");
 	}
 	else
 	{
 		// We are in a child branch
-		currentActiveBranch = version.substr(0, index);
+		m_graphCfg.setActiveBranchVersionName(version.substr(0, index));
 	}
 }
 
 std::string ModelState::getLastVersionInActiveBranch(void)
 {
-	std::string lastVersion = currentModelStateVersion;
+	std::string lastVersion = m_graphCfg.getActiveVersionName();
 
 	std::string nextVersion = getNextVersion(lastVersion);
 	while (!nextVersion.empty())
@@ -1569,7 +1579,7 @@ std::list<std::string> ModelState::removeRedoModelStates(void)
 {
 	// Find a list of all model State version which follow the current one
 	std::list<std::string> futureVersions;
-	getAllFutureVersions(currentModelStateVersion, futureVersions);
+	getAllChildVersions(m_graphCfg.getActiveVersionName(), futureVersions);
 
 	std::list<std::string> removedVersions;
 
@@ -1587,7 +1597,7 @@ std::list<std::string> ModelState::removeRedoModelStates(void)
 
 	// Now it can be that the current branch no longer exists
 	// Since we are adding a new version after the current model state, it is best to activate this branch
-	activateBranch(currentModelStateVersion);
+	activateBranch(m_graphCfg.getActiveVersionName());
 
 	// We need to update the model entity with the new information
 	storeCurrentVersionInModelEntity();
@@ -1603,49 +1613,33 @@ void ModelState::createAndActivateNewBranch(void)
 	do
 	{
 		count++;
-		newBranch = currentModelStateVersion + "." + std::to_string(count);
+		newBranch = m_graphCfg.getActiveVersionName() + "." + std::to_string(count);
 
 	} while (branchExists(newBranch));
 
-	currentActiveBranch      = newBranch;
-	currentModelStateVersion = newBranch + ".0"; // This will be incremented during the next save operation
+	m_graphCfg.setActiveBranchVersionName(newBranch);
+	m_graphCfg.setActiveVersionName(newBranch + ".0"); // This will be incremented during the next save operation
 
 	storeCurrentVersionInModelEntity();
 }
 
-bool ModelState::branchExists(const std::string &branch)
+bool ModelState::branchExists(const std::string& _branch)
 {
-	std::string filter = branch + ".";
-
-	for (auto item : versionGraph)
-	{
-		std::string thisVersion = std::get<0>(item);
-
-		// Here we need to check whether the version starts with the given branch + ".". 
-		if (thisVersion.size() > filter.size())
-		{
-			if (thisVersion.substr(0, filter.size()) == filter)
-			{
-				// This version belongs to the specified branch
-				return true;
-			}
-		}
-	}
-
-	return false; // This branch does not exist
+	std::string filter = _branch + ".";
+	return m_graphCfg.versionStartingWithNameExists(filter);
 }
 
 void ModelState::storeCurrentVersionInModelEntity(void)
 {
 	std::string currentVersionToWrite;
 
-	if (!getNextVersion(currentModelStateVersion).empty())
+	if (!getNextVersion(m_graphCfg.getActiveVersionName()).empty())
 	{
 		// We are not at the end of the branch, so we need to store the exact version
-		currentVersionToWrite = currentModelStateVersion;
+		currentVersionToWrite = m_graphCfg.getActiveVersionName();
 	}
 
-	if (currentActiveBranch != activeBranchInModelEntity || currentVersionToWrite != activeVersionInModelEntity)
+	if (m_graphCfg.getActiveBranchVersionName() != activeBranchInModelEntity || currentVersionToWrite != activeVersionInModelEntity)
 	{
 		mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::GetDataBase()->getProjectName());
 
@@ -1659,91 +1653,90 @@ void ModelState::storeCurrentVersionInModelEntity(void)
 
 		auto modifyDoc = bsoncxx::builder::stream::document{}
 			<< "$set" << bsoncxx::builder::stream::open_document
-			<< "ActiveBranch" << currentActiveBranch
+			<< "ActiveBranch" << m_graphCfg.getActiveBranchVersionName()
 			<< "ActiveVersion" << currentVersionToWrite
 			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
 
 		collection.update_one(queryDoc.view(), modifyDoc.view());
 
-		activeBranchInModelEntity  = currentActiveBranch;
+		activeBranchInModelEntity  = m_graphCfg.getActiveBranchVersionName();
 		activeVersionInModelEntity = currentVersionToWrite;
 	}
 }
 
-std::string ModelState::getPreviousVersion(const std::string &version)
+std::string ModelState::getPreviousVersion(const std::string& _version)
 {
-	if (versionToParentMap.count(version) > 0)
-	{
-		return versionToParentMap[version];
+	ot::VersionGraphVersionCfg* version = m_graphCfg.findVersion(_version);
+	if (version) {
+		if (version->getParentVersion()) return version->getParentVersion()->getName();
+		else return std::string();
+	}
+	else {
+		OT_LOG_E("Version \"" + _version + "\" does not exist");
+		return std::string();
+	}
+}
+
+std::string ModelState::getVersionDescription(const std::string& _version)
+{
+	ot::VersionGraphVersionCfg* version = m_graphCfg.findVersion(_version);
+	if (version) {
+		return version->getDescription();
+	}
+	else {
+		OT_LOG_E("Version \"" + _version + "\" does not exist");
+		return std::string();
+	}
+}
+
+void ModelState::addVersionGraphItem(const std::string& _version, const std::string& _parentVersion, const std::string& _label, const std::string& _description)
+{
+	ot::VersionGraphVersionCfg* parent = m_graphCfg.findVersion(_parentVersion);
+	if (!parent) {
+		OT_LOG_E("Parent version \"" + _parentVersion + "\" not found.");
+		return;
 	}
 
-	// The specified version was not found -> we return an empty string
-	return "";
+	parent->addChildVersion(_version, _label, _description);
 }
 
-std::string ModelState::getVersionDescription(const std::string &version)
+void ModelState::removeVersionGraphItem(const std::string& _version)
 {
-	if (versionToDescriptionMap.count(version) > 0)
-	{
-		return versionToDescriptionMap[version];
+	m_graphCfg.removeVersion(_version);
+}
+
+std::string ModelState::getNextVersion(const std::string& _version)
+{
+	ot::VersionGraphVersionCfg* version = m_graphCfg.findVersion(_version);
+	if (version) {
+		if (version->getChildVersions().empty()) return std::string();
+		else return version->getChildVersions().front()->getName();
 	}
-
-	// The specified version was not found -> we return an empty string
-	return "";
+	else {
+		OT_LOG_E("Version \"" + _version + "\" does not exist");
+		return std::string();
+	}
 }
 
-void ModelState::addVersionGraphItem(const std::string &version, const std::string &parentVersion, const std::string &description)
+void ModelState::getAllChildVersions(const std::string& _version, std::list<std::string>& _childVersions)
 {
-	versionGraph.push_back(std::tuple<std::string, std::string, std::string>(version, parentVersion, description));
-
-	versionToParentMap[version] = parentVersion;
-	versionToDescriptionMap[version] = description;
-	versionToChildsMap[parentVersion].push_back(version);
-}
-
-void ModelState::removeVersionGraphItem(const std::string &version)
-{
-	for (auto versionIterator = versionGraph.begin(); versionIterator != versionGraph.end(); versionIterator++)
-	{
-		std::string thisVersion = std::get<0>(*versionIterator);
-
-		if (thisVersion == version)
-		{
-			// Remove this version entry
-			versionGraph.erase(versionIterator);
-
-			versionToChildsMap[versionToParentMap[version]].remove(version);
-			versionToParentMap.erase(version);
-			versionToDescriptionMap.erase(version);
-			versionToChildsMap.erase(version);
-
-			return;
+	const ot::VersionGraphVersionCfg* version = m_graphCfg.findVersion(_version);
+	if (version) {
+		for (const ot::VersionGraphVersionCfg* child : version->getChildVersions()) {
+			_childVersions.push_back(child->getName());
+			this->getAllChildVersions(child, _childVersions);
 		}
 	}
-	
-	assert(0); // We did not find this version graph item
-}
-
-std::string ModelState::getNextVersion(const std::string &version)
-{
-	for (auto thisVersion : versionToChildsMap[version])
-	{
-		if (isVersionInActiveBranch(thisVersion))
-		{
-			return thisVersion;
-		}
+	else {
+		OT_LOG_E("Version \"" + _version + "\" does not exist");
 	}
-
-	// There is no version after the specified version
-	return "";
 }
 
-void ModelState::getAllFutureVersions(const std::string &version, std::list<std::string> &futureVersions)
-{
-	for (auto childVersion : versionToChildsMap[version])
-	{
-		futureVersions.push_back(childVersion);
-		getAllFutureVersions(childVersion, futureVersions);
+void ModelState::getAllChildVersions(const ot::VersionGraphVersionCfg* _version, std::list<std::string>& _childVersions) {
+	OTAssertNullptr(_version);
+	for (const ot::VersionGraphVersionCfg* child : _version->getChildVersions()) {
+		_childVersions.push_back(child->getName());
+		this->getAllChildVersions(child, _childVersions);
 	}
 }
 

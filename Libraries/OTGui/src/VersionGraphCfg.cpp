@@ -61,7 +61,12 @@ void ot::VersionGraphCfg::setRootVersion(VersionGraphVersionCfg* _version) {
 }
 
 ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findVersion(const std::string& _version) {
-	return m_rootVersion->findVersion(_version);
+	if (_version.empty()) return m_rootVersion;
+	else return m_rootVersion->findVersion(_version);
+}
+
+bool ot::VersionGraphCfg::versionStartingWithNameExists(const std::string& _prefix) {
+	return m_rootVersion->versionStartingWithNameExists(_prefix);
 }
 
 void ot::VersionGraphCfg::removeVersion(const std::string& _version) {
@@ -76,5 +81,14 @@ void ot::VersionGraphCfg::removeVersion(const std::string& _version) {
 
 	if (_version == m_activeVersionName) m_activeVersionName.clear();
 	if (_version == m_activeBranchVersionName) m_activeBranchVersionName.clear();
+}
+
+void ot::VersionGraphCfg::clear(void) {
+	if (m_rootVersion) {
+		delete m_rootVersion;
+	}
+	m_rootVersion = new VersionGraphVersionCfg;
+	m_activeBranchVersionName.clear();
+	m_activeVersionName.clear();
 }
 

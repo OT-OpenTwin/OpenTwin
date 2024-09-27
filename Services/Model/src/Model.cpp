@@ -3843,7 +3843,7 @@ void Model::updateVersionGraph(void)
 	{
 		enableQueuingHttpRequests(true);
 
-		std::list<std::tuple<std::string, std::string, std::string>> versionGraph = getStateManager()->getVersionGraph();
+		const ot::VersionGraphCfg& versionGraph = getStateManager()->getVersionGraph();
 		sendVersionGraphToUI(versionGraph, getStateManager()->getModelStateVersion(), getStateManager()->getActiveBranch());
 
 		enableQueuingHttpRequests(false);
@@ -3932,7 +3932,7 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	std::string currentModelVersion = getStateManager()->getModelStateVersion();
 	std::string activeBranch        = getStateManager()->getActiveBranch();
 
-	addNewVersionTreeStateAndActivate(previousModelVersion, currentModelVersion, activeBranch, comment);
+	addNewVersionTreeStateAndActivate(previousModelVersion, activeBranch, ot::VersionGraphVersionCfg(currentModelVersion, "", comment));
 
 	// Disable write caching to database (this will also flush all pending writes
 	DataBase::GetDataBase()->queueWriting(false);
@@ -4051,31 +4051,21 @@ void Model::uiIsAvailable(void)
 	enableQueuingHttpRequests(false);
 }
 
-void Model::sendVersionGraphToUI(std::list<std::tuple<std::string, std::string, std::string>> &versionGraph, const std::string &currentVersion, const std::string &activeBranch)
+void Model::sendVersionGraphToUI(const ot::VersionGraphCfg& _versionGraph, const std::string& _currentVersion, const std::string& _activeBranch)
 {
 	if (visualizationModelID != 0)
 	{
 		versionGraphCreated = true;
 
-		std::list<std::string> versionList;
-		std::list<std::string> parentList;
-		std::list<std::string> descriptionList;
-
-		for (auto item : versionGraph)
-		{
-			versionList.push_back(std::get<0>(item));
-			parentList.push_back(std::get<1>(item));
-			descriptionList.push_back(std::get<2>(item));
-		}
-
 		ot::JsonDocument notify;
 		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_SetVersionGraph, notify.GetAllocator()), notify.GetAllocator());
-		notify.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, notify.GetAllocator());
-		notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_VERSION, ot::JsonArray(versionList, notify.GetAllocator()), notify.GetAllocator());
-		notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_PARENT, ot::JsonArray(parentList, notify.GetAllocator()), notify.GetAllocator());
-		notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION, ot::JsonArray(descriptionList, notify.GetAllocator()), notify.GetAllocator());
-		notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_ACTIVE, ot::JsonString(currentVersion, notify.GetAllocator()), notify.GetAllocator());
-		notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_BRANCH, ot::JsonString(activeBranch, notify.GetAllocator()), notify.GetAllocator());
+
+		ot::JsonObject cfgObj;
+		_versionGraph.addToJsonObject(cfgObj, notify.GetAllocator());
+
+		notify.AddMember(OT_ACTION_PARAM_Config, cfgObj, notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_ACTIVE, ot::JsonString(_currentVersion, notify.GetAllocator()), notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_BRANCH, ot::JsonString(_activeBranch, notify.GetAllocator()), notify.GetAllocator());
 
 		std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 		Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
@@ -4091,7 +4081,6 @@ void Model::setActiveVersionTreeState(void)
 
 	ot::JsonDocument notify;
 	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive, notify.GetAllocator()), notify.GetAllocator());
-	notify.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_ACTIVE, ot::JsonString(currentVersion, notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_BRANCH, ot::JsonString(activeBranch, notify.GetAllocator()), notify.GetAllocator());
 
@@ -4104,21 +4093,22 @@ void Model::removeVersionGraphVersions(const std::list<std::string> &versions)
 	ot::JsonDocument notify;
 	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions, notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, notify.GetAllocator());
-	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_VERSION, ot::JsonArray(versions, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_List, ot::JsonArray(versions, notify.GetAllocator()), notify.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 }
 
-void Model::addNewVersionTreeStateAndActivate(const std::string &parentVersion, const std::string &newVersion, const std::string &activeBranch, const std::string &description)
+void Model::addNewVersionTreeStateAndActivate(const std::string& _parentVersion, const std::string& _branch, const ot::VersionGraphVersionCfg& _version)
 {
 	ot::JsonDocument notify;
 	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion, notify.GetAllocator()), notify.GetAllocator());
-	notify.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, notify.GetAllocator());
-	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_VERSION, ot::JsonString(newVersion, notify.GetAllocator()), notify.GetAllocator());
-	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_PARENT, ot::JsonString(parentVersion, notify.GetAllocator()), notify.GetAllocator());
-	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_DESCRIPTION, ot::JsonString(description, notify.GetAllocator()), notify.GetAllocator());
-	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_BRANCH, ot::JsonString(activeBranch, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_Parent, ot::JsonString(_parentVersion, notify.GetAllocator()), notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_BRANCH, ot::JsonString(_branch, notify.GetAllocator()), notify.GetAllocator());
+
+	ot::JsonObject versionObj;
+	_version.addToJsonObject(versionObj, notify.GetAllocator());
+	notify.AddMember(OT_ACTION_PARAM_Config, versionObj, notify.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);

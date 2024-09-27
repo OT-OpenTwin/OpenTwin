@@ -77,6 +77,7 @@
 #include "OTWidgets/CreateProjectDialog.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/PropertyInputStringList.h"
+#include "OTWidgets/VersionGraphManagerView.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -170,6 +171,7 @@ AppBase::AppBase()
 	m_projectNavigation(nullptr),
 	m_output(nullptr),
 	m_debug(nullptr),
+	m_versionGraph(nullptr),
 	m_state(NoState)
 {
 	m_contextMenus.output.clear = invalidID;
@@ -1018,9 +1020,15 @@ ViewerUIDtype AppBase::createView(
 	}
 
 	{
-		ot::WidgetView* wv = m_viewerComponent->getVersionGraphWidget(viewID);
-		wv->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewIsCentral));
-		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
+		if (m_versionGraph) {
+			OT_LOG_EA("Version graph already exists");
+			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivatRequest, this, &AppBase::slotRequestVersion);
+			delete m_versionGraph;
+		}
+		m_versionGraph = new ot::VersionGraphManagerView;
+		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewIsCentral));
+		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivatRequest, this, &AppBase::slotRequestVersion);
+		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_versionGraph);
 	}
 	
 	if (getVisibleTable())
@@ -1139,6 +1147,7 @@ void AppBase::switchToTab(const std::string &menu) {
 void AppBase::closeAllViewerTabs(void) {
 	m_graphicsViews.free();
 	m_textEditors.free();
+	m_versionGraph = nullptr;
 	ot::WidgetViewManager::instance().closeViews();
 }
 
@@ -2201,6 +2210,10 @@ void AppBase::slotTableSaveRequested(void) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Slots
+
+void AppBase::slotRequestVersion(const std::string& _versionName) {
+	m_ExternalServicesComponent->activateVersion(_versionName);
+}
 
 void AppBase::slotViewFocusLost(ot::WidgetView* _view) {
 

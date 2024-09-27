@@ -37,7 +37,6 @@ namespace osgText   { class Text; };
 namespace osg		{ class ShapeDrawable; };
 namespace osg		{ class Group; }
 namespace ot        { class Property; }
-namespace ot        { class VersionGraphView; }
 namespace ot        { class TableViewerView; }
 namespace ot        { class PlotView; }
 
@@ -61,7 +60,6 @@ public:
 	void detachFromModel(void);
 
 	ot::PlotView * get1DPlot(void) const { return m_plot; }
-	ot::VersionGraphView* getVersionGraph(void) const { return m_versionGraph; }
 	ot::TableViewerView* getTableViewer() const { return m_tableViewer; }
 
 	void setTabNames(const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
@@ -203,7 +201,6 @@ private:
 	ot::PlotView*						m_plot;
 	std::string							m_plotTabName;
 
-	ot::VersionGraphView*				m_versionGraph;
 	ot::TableViewerView*				m_tableViewer;
 
 	std::string							m_versionGraphTabName;
