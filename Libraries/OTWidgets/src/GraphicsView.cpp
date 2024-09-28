@@ -167,6 +167,7 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool bufferConnection
 	m_scene->itemAboutToBeRemoved(graphicsItem);
 	graphicsItem->removeAllConnections();
 	m_scene->removeItem(graphicsItem->getQGraphicsItem());
+	graphicsItem->setGraphicsScene(nullptr);
 	delete graphicsItem;
 	m_items.erase(_itemUid);
 	

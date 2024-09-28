@@ -26,7 +26,7 @@ ot::GraphicsStackItem::GraphicsStackItem()
 }
 
 ot::GraphicsStackItem::~GraphicsStackItem() {
-
+	
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -250,7 +250,9 @@ double ot::GraphicsStackItem::getMaxAdditionalTriggerDistance(void) const {
 }
 
 void ot::GraphicsStackItem::clear(void) {
-	for (auto itm : m_items) delete itm.item;
+	for (auto itm : m_items) {
+		delete itm.item;
+	}
 	m_items.clear();
 }
 

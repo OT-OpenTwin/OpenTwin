@@ -71,6 +71,8 @@ namespace ot {
 		//! \brief Returns the maximum trigger distance in any direction of this item and its childs.
 		virtual double getMaxAdditionalTriggerDistance(void) const override;
 
+		void clear(void);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Protected

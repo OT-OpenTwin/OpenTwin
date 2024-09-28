@@ -55,8 +55,9 @@ ot::GraphicsItem::GraphicsItem(GraphicsItemCfg* _configuration)
 }
 
 ot::GraphicsItem::~GraphicsItem() {
-	if (this->getGraphicsScene()) {
-		this->getGraphicsScene()->itemAboutToBeRemoved(this);
+	GraphicsScene* sc = this->getGraphicsScene();
+	if (sc) {
+		sc->itemAboutToBeRemoved(this);
 	}
 
 	for (GraphicsConnectionItem* connection : m_connections) {
