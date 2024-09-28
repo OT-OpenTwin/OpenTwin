@@ -1691,13 +1691,18 @@ std::string ModelState::getVersionDescription(const std::string& _version)
 
 void ModelState::addVersionGraphItem(const std::string& _version, const std::string& _parentVersion, const std::string& _label, const std::string& _description)
 {
-	ot::VersionGraphVersionCfg* parent = m_graphCfg.findVersion(_parentVersion);
-	if (!parent) {
-		OT_LOG_E("Parent version \"" + _parentVersion + "\" not found.");
-		return;
+	if (_parentVersion.empty()) {
+		m_graphCfg.setRootVersion(new ot::VersionGraphVersionCfg(_version, _label, _description));
 	}
+	else {
+		ot::VersionGraphVersionCfg* parent = m_graphCfg.findVersion(_parentVersion);
+		if (!parent) {
+			OT_LOG_E("Parent version \"" + _parentVersion + "\" not found.");
+			return;
+		}
 
-	parent->addChildVersion(_version, _label, _description);
+		parent->addChildVersion(_version, _label, _description);
+	}
 }
 
 void ModelState::removeVersionGraphItem(const std::string& _version)

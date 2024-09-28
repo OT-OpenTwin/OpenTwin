@@ -37,10 +37,11 @@ namespace ot {
 	public Q_SLOTS:
 		void slotSelectionChanged(void);
 		void slotUpdateVersionItems(void);
-		void slotCenterOnVersion(const std::string& _versionName);
+		void slotCenterOnActiveVersion(void);
 		void slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item);
 
 	private:
+		void centerOnVersion(const std::string& _versionName);
 		VersionGraphItem* getVersion(const std::string& _name) const;
 		void highlightVersion(const std::string& _name);
 

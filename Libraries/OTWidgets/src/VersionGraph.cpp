@@ -27,7 +27,7 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 	this->clear();
 
 	if (!_config.getRootVersion()) {
-		OT_LOG_E("No root version set");
+		OT_LOG_EA("No root version set");
 		return;
 	}
 
@@ -37,11 +37,11 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 	m_rootItem = new VersionGraphItem(*_config.getRootVersion(), 0, m_activeVersion, this->getGraphicsScene());
 
 	VersionGraphItem* branchVersion = this->getVersion(m_activeVersionBranch);
+	if (!branchVersion) {
+		branchVersion = m_rootItem;
+	}
 	if (branchVersion) {
 		branchVersion->setAsActiveVersionBranch();
-	}
-	else {
-		OT_LOG_E("Active branch version not found");
 	}
 
 	QMetaObject::invokeMethod(this, &VersionGraph::slotUpdateVersionItems, Qt::QueuedConnection);
@@ -93,17 +93,25 @@ void ot::VersionGraph::slotUpdateVersionItems(void) {
 	m_rootItem->updateGraphics();
 	
 	if (!m_activeVersion.empty()) {
-		this->slotCenterOnVersion(m_activeVersion);
+		QMetaObject::invokeMethod(this, &VersionGraph::slotCenterOnActiveVersion, Qt::QueuedConnection);
 	}	
 }
 
-void ot::VersionGraph::slotCenterOnVersion(const std::string& _versionName) {
+void ot::VersionGraph::slotCenterOnActiveVersion(void) {
+	this->centerOnVersion(m_activeVersion);
+}
+
+void ot::VersionGraph::slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item) {
+	Q_EMIT versionActivatRequest(_item->getGraphicsItemName());
+}
+
+void ot::VersionGraph::centerOnVersion(const std::string& _versionName) {
 	VersionGraphItem* item = this->getVersion(_versionName);
 	if (item) {
 		// Get the bounding rectangle of the item
 		QRectF itemRect = item->boundingRect();
 		QRectF sceneRect = item->mapRectToScene(itemRect);
-		
+
 		// Unite with the bounding rectangle of the parent item if it exist
 		if (item->getParentVersionItem()) {
 			QRectF parentRect = item->getParentVersionItem()->boundingRect();
@@ -117,7 +125,7 @@ void ot::VersionGraph::slotCenterOnVersion(const std::string& _versionName) {
 			QRectF childSceneRect = childItem->mapRectToScene(itemRect);
 			sceneRect = childSceneRect.united(sceneRect);
 		}
-		
+
 		// Expand the rectangle
 		sceneRect.adjust(-10., -10., 10., 10.);
 
@@ -126,12 +134,8 @@ void ot::VersionGraph::slotCenterOnVersion(const std::string& _versionName) {
 		this->centerOn(sceneRect.center());
 	}
 	else {
-		OT_LOG_E("Version not found \"" + _versionName + "\"");
+		OT_LOG_EAS("Version not found \"" + _versionName + "\"");
 	}
-}
-
-void ot::VersionGraph::slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item) {
-	Q_EMIT versionActivatRequest(_item->getGraphicsItemName());
 }
 
 ot::VersionGraphItem* ot::VersionGraph::getVersion(const std::string& _name) const {
