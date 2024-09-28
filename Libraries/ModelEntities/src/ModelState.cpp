@@ -1721,7 +1721,7 @@ std::string ModelState::getNextVersion(const std::string& _version) {
 		branchVersion = m_graphCfg.getRootVersion();
 	}
 	else {
-		branchVersion = m_graphCfg.findVersion(m_graphCfg.getActiveBranchVersionName());
+		branchVersion = m_graphCfg.findVersion(m_graphCfg.getActiveBranchVersionName() + ".1");
 	}
 
 	if (!branchVersion) {

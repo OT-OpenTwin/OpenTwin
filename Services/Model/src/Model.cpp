@@ -4051,11 +4051,16 @@ void Model::uiIsAvailable(void)
 	enableQueuingHttpRequests(false);
 }
 
-void Model::sendVersionGraphToUI(const ot::VersionGraphCfg& _versionGraph, const std::string& _currentVersion, const std::string& _activeBranch)
+void Model::sendVersionGraphToUI(const ot::VersionGraphCfg& _versionGraph, const std::string& _currentVersion, std::string _activeBranch)
 {
 	if (visualizationModelID != 0)
 	{
 		versionGraphCreated = true;
+
+		// Add the first version to the active branch version so the graph can find the version
+		if (!_activeBranch.empty()) {
+			_activeBranch.append(".1");
+		}
 
 		ot::JsonDocument notify;
 		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_SetVersionGraph, notify.GetAllocator()), notify.GetAllocator());
@@ -4078,6 +4083,11 @@ void Model::setActiveVersionTreeState(void)
 {
 	std::string currentVersion = getStateManager()->getModelStateVersion();
 	std::string activeBranch   = getStateManager()->getActiveBranch();
+
+	// If there is a branch we use the first version of this branch to specify
+	if (!activeBranch.empty()) {
+		activeBranch.append(".1");
+	}
 
 	ot::JsonDocument notify;
 	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive, notify.GetAllocator()), notify.GetAllocator());

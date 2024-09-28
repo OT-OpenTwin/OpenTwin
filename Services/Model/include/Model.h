@@ -274,7 +274,7 @@ private:
 	std::string replaceParameterInExpression(std::string expression, const std::string &parameterName, const std::string &newString);
 	bool checkParameterName(const std::string &parameterName);
 	bool isValidParameterNameCharacter(char c);
-	void sendVersionGraphToUI(const ot::VersionGraphCfg& _versionGraph, const std::string& _currentVersion, const std::string& _activeBranch);
+	void sendVersionGraphToUI(const ot::VersionGraphCfg& _versionGraph, const std::string& _currentVersion, std::string _activeBranch);
 	void updateVersionGraph(void);
 	void setActiveVersionTreeState(void);
 	void removeVersionGraphVersions(const std::list<std::string> &versions);
