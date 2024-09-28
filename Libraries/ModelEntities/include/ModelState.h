@@ -44,11 +44,12 @@ public:
 	ModelState(unsigned int sessionID, unsigned int serviceID);
 	~ModelState();
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Gerneral
+
 	// Reset the model state to an empty project
 	void reset(void);
-
-	// Create and return a new entity ID (this will increate the maximum entity ID and mark the model state as modified
-	unsigned long long createEntityUID(void);
 
 	// Check whether the model state has been modified since the last save
 	bool isModified() { return stateModified; };
@@ -56,8 +57,15 @@ public:
 	// Open a project, load the version grap and the currently active version
 	bool openProject(void);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Entity handling
+
+	// Create and return a new entity ID (this will increate the maximum entity ID and mark the model state as modified
+	unsigned long long createEntityUID(void);
+
 	// Load a model state with a particular version
-	bool loadModelState(const std::string &version);
+	bool loadModelState(const std::string& _version);
 
 	// Store an entity to the data base (it will be automatically determine whetehr the entity is new or modified)
 	void storeEntity(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID, ModelStateEntity::EntityVersion entityVersion, ModelStateEntity::tEntityType entityType);
@@ -128,6 +136,10 @@ public:
 	// Remove all redo model states and the items belonging to them 
 	std::list<std::string> removeRedoModelStates(void);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Helper
+
 private:
 	// This function loads the model state from a given ModelState document
 	bool loadModelFromDocument(bsoncxx::document::view docView);
@@ -191,6 +203,9 @@ private:
 
 	// Activate the branch which contains the given version
 	void activateBranch(const std::string &version);
+
+	//! \brief Returns true if the specified version has at least one child.
+	bool hasNextVersion(const std::string& _version);
 
 	// Get the next version in the active branch following the given one
 	std::string getNextVersion(const std::string &version);

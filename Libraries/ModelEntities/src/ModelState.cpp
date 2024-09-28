@@ -48,7 +48,10 @@ ModelState::~ModelState()
 {
 }
 
-// Reset the model state to an empty project
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// General
+
 void ModelState::reset(void)
 {
 	m_graphCfg.clear();
@@ -62,13 +65,52 @@ void ModelState::reset(void)
 	stateModified = false;
 }
 
-// Create and return a new entity ID
+bool ModelState::openProject(void) {
+	// load the version graph
+	loadVersionGraph();
+
+	// Load the model entity to determine the currently active branch and version
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
+
+	auto queryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< bsoncxx::builder::stream::finalize;
+
+	auto emptyFilterDoc = bsoncxx::builder::basic::document{};
+
+	auto sortDoc = bsoncxx::builder::basic::document{};
+	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+
+	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
+	if (!result) return false;  // No model entity found
+
+	std::string activeBranch = result->view()["ActiveBranch"].get_utf8().value.data();
+	std::string activeVersion = result->view()["ActiveVersion"].get_utf8().value.data();
+
+	activeBranchInModelEntity = activeBranch;
+	activeVersionInModelEntity = activeVersion;
+
+	// Activate the branch
+	m_graphCfg.setActiveBranchVersionName(activeBranch);
+
+	// If the active Version is empty, the last version in the active branch is active
+	if (activeVersion.empty()) {
+		activeVersion = getLastVersionInActiveBranch();
+	}
+
+	// load the currently active version
+	return loadModelState(activeVersion);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Entity handling
+
 unsigned long long ModelState::createEntityUID(void)
 {
 	return uniqueUIDGenerator->getUID();
 }
 
-// Store an entity to the model state (it will be automatically determined whether the entity is new or modified)
 void ModelState::storeEntity(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID, ModelStateEntity::EntityVersion entityVersion, ModelStateEntity::tEntityType entityType)
 {
 	if (entities.count(entityID) == 0)
@@ -82,7 +124,6 @@ void ModelState::storeEntity(ModelStateEntity::EntityID entityID, ModelStateEnti
 	}
 }
 
-// Add new entity to model state
 void ModelState::addNewEntity(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID, ModelStateEntity::EntityVersion entityVersion, ModelStateEntity::tEntityType entityType)
 {
 	ModelStateEntity newEntity;
@@ -99,7 +140,6 @@ void ModelState::addNewEntity(ModelStateEntity::EntityID entityID, ModelStateEnt
 	stateModified = true;
 }
 
-// Mark entity as modified (new version and parent)
 void ModelState::modifyEntity(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID, ModelStateEntity::EntityVersion entityVersion, ModelStateEntity::tEntityType entityType)
 {
 	if (entities.count(entityID) > 0)
@@ -129,7 +169,6 @@ void ModelState::modifyEntity(ModelStateEntity::EntityID entityID, ModelStateEnt
 	}
 }
 
-// Mark entity as modified (new version)
 void ModelState::modifyEntityVersion(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityVersion entityVersion)
 {
 	if (entities.count(entityID) > 0)
@@ -148,7 +187,6 @@ void ModelState::modifyEntityVersion(ModelStateEntity::EntityID entityID, ModelS
 	}
 }
 
-// Mark entity as modified (new parent)
 void ModelState::modifyEntityParent(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID)
 {
 	if (entities.count(entityID) > 0)
@@ -167,7 +205,6 @@ void ModelState::modifyEntityParent(ModelStateEntity::EntityID entityID, ModelSt
 	}
 }
 
-// Remove entity from model state
 void ModelState::removeEntity(ModelStateEntity::EntityID entityID, bool considerChildren)
 {
 	//std::cout << "remove entity: " << entityID << std::endl;
@@ -204,12 +241,11 @@ void ModelState::removeEntity(ModelStateEntity::EntityID entityID, bool consider
 	}
 }
 
-// Load a model state with a particular version
-bool ModelState::loadModelState(const std::string &version)
+bool ModelState::loadModelState(const std::string& _version)
 {
-	if (!isVersionInActiveBranch(version))
+	if (!isVersionInActiveBranch(_version))
 	{
-		activateBranch(version);
+		activateBranch(_version);
 	}
 
 	// Now we search for an entity with SchemaType "ModelState" and the given version
@@ -217,7 +253,7 @@ bool ModelState::loadModelState(const std::string &version)
 
 	auto queryDoc = bsoncxx::builder::basic::document{};
 	queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
-	queryDoc.append(bsoncxx::builder::basic::kvp("Version", version));
+	queryDoc.append(bsoncxx::builder::basic::kvp("Version", _version));
 
 	auto filterDoc = bsoncxx::builder::basic::document{};
 
@@ -239,13 +275,11 @@ bool ModelState::loadModelState(const std::string &version)
 	return true;
 }
 
-// Clear the information map containing the list of children for each item
 void ModelState::clearChildrenInformation(void)
 {
 	entityChildrenList.clear();
 }
 
-// Build the information map containing the list of children for each item
 void ModelState::buildChildrenInformation(void)
 {
 	entityChildrenList.clear();
@@ -256,7 +290,6 @@ void ModelState::buildChildrenInformation(void)
 	}
 }
 
-// Add an entity to the child list of its parent entity
 void ModelState::addEntityToParent(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentID)
 {
 	if (entityChildrenList.count(parentID) > 0)
@@ -272,7 +305,6 @@ void ModelState::addEntityToParent(ModelStateEntity::EntityID entityID, ModelSta
 	}
 }
 
-// Remove an entity from the child list of its former parent entity
 void ModelState::removeEntityFromParent(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentID)
 {
 	if (entityChildrenList.count(parentID) > 0)
@@ -281,8 +313,6 @@ void ModelState::removeEntityFromParent(ModelStateEntity::EntityID entityID, Mod
 	}
 }
 
-
-// Save the current modified model state. The version counter is incremented automatically in the last digit (e.g. 1.2.1 -> 1.2.2)
 bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const std::string &saveComment)
 {
 	if (!stateModified && !forceSave)
@@ -352,7 +382,6 @@ bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const s
 	return true;
 }
 
-// Determine the current version of an entity
 ModelStateEntity::EntityVersion ModelState::getCurrentEntityVersion(ModelStateEntity::EntityID entityID)
 {
 	// If the entity is not part of the current state, return -1
@@ -377,7 +406,6 @@ ModelStateEntity::EntityID ModelState::getCurrentEntityParent(ModelStateEntity::
 	return entities[entityID].getParentEntityID();
 }
 
-// Get a list of all topology entities in the model
 void ModelState::getListOfTopologyEntites(std::list<unsigned long long> &topologyEntities)
 {
 	// Loop through all entities and add the topology entities to the list
@@ -391,7 +419,6 @@ void ModelState::getListOfTopologyEntites(std::list<unsigned long long> &topolog
 	}
 }
 
-// This function loads the model state from a given ModelState document
 bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 {
 	std::string storageType = docView["Type"].get_utf8().value.data();
@@ -1241,45 +1268,6 @@ const ot::VersionGraphCfg& ModelState::getVersionGraph(void) const {
 	return m_graphCfg;
 }
 
-bool ModelState::openProject(void)
-{
-	// load the version graph
-	loadVersionGraph();
-
-	// Load the model entity to determine the currently active branch and version
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
-
-	auto queryDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << "Model"
-		<< bsoncxx::builder::stream::finalize;
-
-	auto emptyFilterDoc = bsoncxx::builder::basic::document{};
-
-	auto sortDoc = bsoncxx::builder::basic::document{};
-	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
-
-	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
-	if (!result) return false;  // No model entity found
-
-	std::string activeBranch  = result->view()["ActiveBranch"].get_utf8().value.data();
-	std::string activeVersion = result->view()["ActiveVersion"].get_utf8().value.data();
-
-	activeBranchInModelEntity = activeBranch;
-	activeVersionInModelEntity = activeVersion;
-
-	// Activate the branch
-	m_graphCfg.setActiveBranchVersionName(activeBranch);
-
-	// If the active Version is empty, the last version in the active branch is active
-	if (activeVersion.empty())
-	{
-		activeVersion = getLastVersionInActiveBranch();
-	}
-
-	// load the currently active version
-	return loadModelState(activeVersion);
-}
-
 long long ModelState::getCurrentModelEntityVersion(void)
 {
 	// We search for the last model entity in the database and determine its version
@@ -1633,7 +1621,7 @@ void ModelState::storeCurrentVersionInModelEntity(void)
 {
 	std::string currentVersionToWrite;
 
-	if (!getNextVersion(m_graphCfg.getActiveVersionName()).empty())
+	if (!hasNextVersion(m_graphCfg.getActiveVersionName()))
 	{
 		// We are not at the end of the branch, so we need to store the exact version
 		currentVersionToWrite = m_graphCfg.getActiveVersionName();
@@ -1672,7 +1660,7 @@ std::string ModelState::getPreviousVersion(const std::string& _version)
 		else return std::string();
 	}
 	else {
-		OT_LOG_E("Version \"" + _version + "\" does not exist");
+		OT_LOG_EAS("Version \"" + _version + "\" does not exist");
 		return std::string();
 	}
 }
@@ -1684,7 +1672,7 @@ std::string ModelState::getVersionDescription(const std::string& _version)
 		return version->getDescription();
 	}
 	else {
-		OT_LOG_E("Version \"" + _version + "\" does not exist");
+		OT_LOG_EAS("Version \"" + _version + "\" does not exist");
 		return std::string();
 	}
 }
@@ -1697,7 +1685,7 @@ void ModelState::addVersionGraphItem(const std::string& _version, const std::str
 	else {
 		ot::VersionGraphVersionCfg* parent = m_graphCfg.findVersion(_parentVersion);
 		if (!parent) {
-			OT_LOG_E("Parent version \"" + _parentVersion + "\" not found.");
+			OT_LOG_EAS("Parent version \"" + _parentVersion + "\" not found.");
 			return;
 		}
 
@@ -1710,17 +1698,57 @@ void ModelState::removeVersionGraphItem(const std::string& _version)
 	m_graphCfg.removeVersion(_version);
 }
 
-std::string ModelState::getNextVersion(const std::string& _version)
-{
+bool ModelState::hasNextVersion(const std::string& _version) {
 	ot::VersionGraphVersionCfg* version = m_graphCfg.findVersion(_version);
 	if (version) {
-		if (version->getChildVersions().empty()) return std::string();
-		else return version->getChildVersions().front()->getName();
+		return !version->getChildVersions().empty();
 	}
 	else {
-		OT_LOG_E("Version \"" + _version + "\" does not exist");
+		OT_LOG_EAS("Version \"" + _version + "\" does not exist");
+		return false;
+	}
+}
+
+std::string ModelState::getNextVersion(const std::string& _version) {
+	ot::VersionGraphVersionCfg* version = m_graphCfg.findVersion(_version);
+	if (!version) {
+		OT_LOG_EAS("Version \"" + _version + "\" does not exist");
 		return std::string();
 	}
+
+	const ot::VersionGraphVersionCfg* branchVersion = nullptr;
+	if (m_graphCfg.getActiveBranchVersionName().empty()) {
+		branchVersion = m_graphCfg.getRootVersion();
+	}
+	else {
+		branchVersion = m_graphCfg.findVersion(m_graphCfg.getActiveBranchVersionName());
+	}
+
+	if (!branchVersion) {
+		OT_LOG_EAS("Branch version not found");
+		return std::string();
+	}
+
+	while (!branchVersion->getChildVersions().empty()) {
+		branchVersion = branchVersion->getChildVersions().front();
+	}
+
+	// Requested version is end of branch
+	if (branchVersion == version) {
+		return std::string();
+	}
+
+	// Go forward trough branch
+	while (branchVersion->getParentVersion()) {
+		if (branchVersion->getParentVersion() == version) {
+			return branchVersion->getName();
+		}
+		branchVersion = branchVersion->getParentVersion();
+	}
+
+	// Version is not on current branch
+	OT_LOG_WAS("Version \"" + _version + "\" is not on active branch");
+	return std::string();
 }
 
 void ModelState::getAllChildVersions(const std::string& _version, std::list<std::string>& _childVersions)
@@ -1733,7 +1761,7 @@ void ModelState::getAllChildVersions(const std::string& _version, std::list<std:
 		}
 	}
 	else {
-		OT_LOG_E("Version \"" + _version + "\" does not exist");
+		OT_LOG_EAS("Version \"" + _version + "\" does not exist");
 	}
 }
 
