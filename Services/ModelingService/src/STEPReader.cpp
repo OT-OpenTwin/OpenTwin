@@ -490,6 +490,20 @@ void STEPReader::processNode(const TDF_Label &itemLabel, std::string prefix, STE
 					entityGeom->setEditable(true);
 					entityGeom->setBrep(itemShape);
 
+					std::map< const opencascade::handle<TopoDS_TShape>, std::string> allFaceNames;
+
+					TopExp_Explorer exp;
+					size_t count = 1;
+					for (exp.Init(itemShape, TopAbs_FACE); exp.More(); exp.Next())
+					{
+						TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+						allFaceNames[aFace.TShape()] = "f" + std::to_string(count);
+						count++;
+					}
+
+					entityGeom->getBrepEntity()->setFaceNameMap(allFaceNames);
+
 					entityGeom->createProperties(colorR, colorG, colorB, materialsFolder, materialsFolderID);
 
 					analyzeGeometry(entityGeom, messages);
