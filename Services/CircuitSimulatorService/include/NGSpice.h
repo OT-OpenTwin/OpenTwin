@@ -57,6 +57,9 @@ public:
 	static int MyControlledExit(int, bool imidiate, bool quitexit, int, void*);
 	static int MySendDataFunction(pvecvaluesall, int, int, void*);
 	static int MySendInitDataFunction(pvecinfoall, int, void*);
+
+	//Calculate Magnitude
+	static double calculateMagnitude(double real, double imag);
 	
 	//Setter
 	bool addToCustomNameToNetlistMap(const std::string&, const std::string&);

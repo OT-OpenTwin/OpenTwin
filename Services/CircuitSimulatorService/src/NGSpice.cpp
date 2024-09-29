@@ -34,6 +34,7 @@
 
 //C++ Header
 #include <sstream>
+#include <cmath>
 namespace Numbers
 {
 	static unsigned long long nodeNumber = 1;
@@ -822,7 +823,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 			netlistElementName = diode->getNetlistName();
 			netlistLine += netlistElementName + " ";
-			modelNetlistLine += ".MODEL D1N4148 D(IS=1e-15)";
+			modelNetlistLine += ".MODEL D1N4148 D(IS=2,52E-9)";
 			netlistValue = diode->getValue();
 		}
 		else if (circuitElement->type() == "VoltageMeter")
@@ -1053,13 +1054,17 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		std::string probeLine = oss.str();
 		ngSpice_Command(const_cast<char*>(probeLine.c_str()));
 	}
-
+	
 	ngSpice_Command(const_cast<char*>("circbyline .Control"));
 	//ngSpice_Command(const_cast<char*>("circbyline unset askquit"));
 	ngSpice_Command(const_cast<char*>("circbyline run"));
 	//ngSpice_Command(const_cast<char*>("circbyline quit"));
+	//ngSpice_Command(const_cast<char*>("circbyline print VM(2)"));
+	//ngSpice_Command(const_cast<char*>("circbyline print VI(2)"));
+	//ngSpice_Command(const_cast<char*>("circbyline print VR(2)"));
 	ngSpice_Command(const_cast<char*>("circbyline .endc"));
 	ngSpice_Command(const_cast<char*>("circbyline .end"));
+	//ngSpice_Command(nullptr);
 	//ngSpice_Command(const_cast<char*>("unset askquit"));
 	//ngSpice_Command(const_cast<char*>("quit 0"));
 	
@@ -1193,7 +1198,17 @@ int NGSpice::MySendDataFunction(pvecvaluesall vectorsAll, int numStructs, int id
 	
 	for (int i = 0; i < vectorsAll->veccount; ++i) {
 		std::string name = vectorsAll->vecsa[i]->name;
-		double value = vectorsAll->vecsa[i]->creal;
+
+		double value = 0;
+		if (vectorsAll->vecsa[i]->is_complex)
+		{
+			value = calculateMagnitude(vectorsAll->vecsa[i]->creal, vectorsAll->vecsa[i]->cimag);
+		}
+		else
+		{
+			value = vectorsAll->vecsa[i]->creal;
+		}
+		
 		SimulationResults::getInstance()->getResultMap().at(name).push_back(value);
 	}
 	
@@ -1221,6 +1236,11 @@ int NGSpice::MySendInitDataFunction(pvecinfoall vectorInfoAll, int idNumNGSpiceS
 	}
 
 	return 0;
+}
+
+double NGSpice::calculateMagnitude(double real, double imag)
+{
+	return sqrt(real * real + imag * imag);
 }
 
 bool NGSpice::addToCustomNameToNetlistMap(const std::string& customName, const std::string& netlistName) {

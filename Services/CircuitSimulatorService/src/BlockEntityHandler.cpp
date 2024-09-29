@@ -463,7 +463,8 @@ ot::GraphicsPickerCollectionPackage* BlockEntityHandler::BuildUpBlockPicker() {
 
 void BlockEntityHandler::createResultCurves(std::string solverName,std::string simulationType,std::string circuitName) {
 	
-		std::map<std::string, std::vector<double>> resultVectors = SimulationResults::getInstance()->getResultMap();
+
+	std::map<std::string, std::vector<double>> resultVectors = SimulationResults::getInstance()->getResultMap();
 		std::list<std::pair<ot::UID, std::string>> curvesForVoltage;
 		std::list<std::pair<ot::UID, std::string>> curvesForCurrent;
 		ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
