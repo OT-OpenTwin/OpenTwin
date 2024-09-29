@@ -44,9 +44,6 @@ void ChamferEdges::performOperation(const std::string &selectionInfo)
 	doc.fromJson(selectionInfo);
 
 	ot::ConstJsonArray modelID = ot::json::getArray(doc, "modelID");
-	ot::ConstJsonArray posX = ot::json::getArray(doc, "posX");
-	ot::ConstJsonArray posY = ot::json::getArray(doc, "posY");
-	ot::ConstJsonArray posZ = ot::json::getArray(doc, "posZ");
 	ot::ConstJsonArray edgeName = ot::json::getArray(doc, "edgeName");
 
 	// Get a list of all shapes which are involved in this operation for prefetching
@@ -61,7 +58,6 @@ void ChamferEdges::performOperation(const std::string &selectionInfo)
 
 		ChamferEdgesData edgeData;
 		edgeData.setEntityID(entityID);
-		edgeData.setPosition(posX[i].GetDouble(), posY[i].GetDouble(), posZ[i].GetDouble());
 		edgeData.setEdgeName(edgeName[i].GetString());
 		edgeList.push_back(edgeData);
 	}
@@ -208,9 +204,6 @@ void ChamferEdges::storeEdgeListInProperties(std::list<ChamferEdgesData> &edgeLi
 		index = "(" + std::to_string(edgeCounter) + ")";
 
 		EntityPropertiesString::createProperty("Edges", "Edge name " + index, edge.getEdgeName(), "", properties);
-		EntityPropertiesDouble::createProperty("Edges", "Position X " + index, edge.getX(), "", properties);
-		EntityPropertiesDouble::createProperty("Edges", "Position Y " + index, edge.getY(), "", properties);
-		EntityPropertiesDouble::createProperty("Edges", "Position Z " + index, edge.getZ(), "", properties);
 
 		edgeCounter++;
 	}
@@ -232,15 +225,10 @@ std::list<ChamferEdgesData> ChamferEdges::readEdgeListFromProperties(EntityPrope
 			ChamferEdgesData data;
 			
 			EntityPropertiesString* edgeNameProperty = dynamic_cast<EntityPropertiesString*>(properties.getProperty("Edge name " + index));
-			EntityPropertiesDouble* edgePosX = dynamic_cast<EntityPropertiesDouble*>(properties.getProperty("Position X " + index));
-			EntityPropertiesDouble* edgePosY = dynamic_cast<EntityPropertiesDouble*>(properties.getProperty("Position Y " + index));
-			EntityPropertiesDouble* edgePosZ = dynamic_cast<EntityPropertiesDouble*>(properties.getProperty("Position Z " + index));
 
-			if (edgeNameProperty != nullptr && edgePosX != nullptr && edgePosY != nullptr && edgePosZ != nullptr)
+			if (edgeNameProperty != nullptr)
 			{
 				data.setEdgeName(edgeNameProperty->getValue());
-				data.setPosition(edgePosX->getValue(), edgePosY->getValue(), edgePosZ->getValue());
-
 				edgeList.push_back(data);
 			}
 		}

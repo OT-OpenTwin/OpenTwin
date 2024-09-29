@@ -43,9 +43,7 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 	doc.fromJson(selectionInfo);
 
 	ot::ConstJsonArray modelID = ot::json::getArray(doc, "modelID");
-	ot::ConstJsonArray posX = ot::json::getArray(doc, "posX");
-	ot::ConstJsonArray posY = ot::json::getArray(doc, "posY");
-	ot::ConstJsonArray posZ = ot::json::getArray(doc, "posZ");
+	ot::ConstJsonArray faceName = ot::json::getArray(doc, "faceName");
 
 	// Get a list of all shapes which are involved in this operation for prefetching
 	std::set<ot::UID> affectedEntitiesSet;
@@ -59,7 +57,7 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 
 		SimplifyRemoveFaceData faceData;
 		faceData.setEntityID(entityID);
-		faceData.setPosition(posX[i].GetDouble(), posY[i].GetDouble(), posZ[i].GetDouble());
+		faceData.setFaceName(faceName[i].GetString());
 		faceList.push_back(faceData);
 	}
 
@@ -184,7 +182,7 @@ bool SimplifyRemoveFaces::removeFacesFromEntity(EntityGeometry *geometryEntity, 
 	for (auto face : faces)
 	{
 		TopoDS_Shape result;
-		if (findFaceFromPosition(shape, face.getX(), face.getY(), face.getZ(), result))
+		if (findFaceFromName(brepEntity, shape, face.getFaceName(), result))
 		{
 			algorithm.AddFaceToRemove(result);
 		}
@@ -273,41 +271,19 @@ bool SimplifyRemoveFaces::removeFacesFromEntity(EntityGeometry *geometryEntity, 
 	return true;
 }
 
-bool SimplifyRemoveFaces::findFaceFromPosition(TopoDS_Shape &shape, double x, double y, double z, TopoDS_Shape &face)
+bool SimplifyRemoveFaces::findFaceFromName(EntityBrep* brepEntity, TopoDS_Shape &shape, const std::string &faceName, TopoDS_Shape &face)
 {
-	BRepBuilderAPI_MakeVertex vertex(gp_Pnt(x, y, z));
-
-	TopoDS_Shape result;
-	bool success = false;
-
-	double minDist = 1e30;
-
 	TopExp_Explorer exp;
-	for (exp.Init(shape, TopAbs_SHELL); exp.More(); exp.Next())
+	for (exp.Init(shape, TopAbs_FACE); exp.More(); exp.Next())
 	{
-		TopoDS_Shell aShell = TopoDS::Shell(exp.Current());
-		BRepExtrema_DistShapeShape minimumDist(aShell, vertex.Vertex(), Extrema_ExtFlag_MIN);
+		TopoDS_Face aFace = TopoDS::Face(exp.Current());
 
-		int hits = minimumDist.NbSolution();
-
-		assert(!minimumDist.InnerSolution());  // If the point is inside the solid, we get this behavior. In this case, it we don't know what the closest face is.
-												// We need a special treatment for this situation (e.g. invert the solid or make a sheet model out of it).
-
-		for (int hit = 1; hit <= hits; hit++)
+		if (brepEntity->getFaceName(aFace) == faceName)
 		{
-			if (minimumDist.SupportTypeShape1(hit) == BRepExtrema_SupportType::BRepExtrema_IsInFace)
-			{
-				// We found the face which is closest to the given point
-
-				if (minimumDist.Value() < minDist)
-				{
-					success = true;
-					minDist = minimumDist.Value();
-					face = minimumDist.SupportOnShape1(hit);
-				}
-			}
+			face = exp.Current();
+			return true;
 		}
 	}
 
-	return success;
+	return false;
 }

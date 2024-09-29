@@ -62,15 +62,12 @@ public:
 class FaceSelection
 {
 public:
-	FaceSelection() : modelID(0), x(0.0), y(0.0), z(0.0), selectedItem(nullptr), faceId(0) {}
+	FaceSelection() : modelID(0), selectedItem(nullptr), faceId(0) {}
 	virtual ~FaceSelection() {}
 
-	void setData(unsigned long long _modelID, double _x, double _y, double _z) { modelID = _modelID, x = _x; y = _y; z = _z; }
+	void setData(unsigned long long _modelID) { modelID = _modelID; }
 
 	unsigned long long getModelID(void) const { return modelID; }
-	double getX(void) const { return x; }
-	double getY(void) const { return y; }
-	double getZ(void) const { return z; }
 
 	void setSelectedItem(SceneNodeGeometry *item) { selectedItem = item; }
 	SceneNodeGeometry *getSelectedItem(void) const { return selectedItem; }
@@ -85,9 +82,6 @@ public:
 
 private:
 	unsigned long long modelID;
-	double x;
-	double y;
-	double z;
 	SceneNodeGeometry *selectedItem;
 	unsigned long long faceId;
 	std::string faceName;
@@ -96,14 +90,11 @@ private:
 class EdgeSelection
 {
 public:
-	EdgeSelection() : modelID(0), x(0.0), y(0.0), z(0.0), selectedItem(nullptr), faceId1(0), faceId2(0), node(nullptr) {}
+	EdgeSelection() : modelID(0), selectedItem(nullptr), faceId1(0), faceId2(0), node(nullptr) {}
 	virtual ~EdgeSelection() {}
 
-	void setData(unsigned long long _modelID, double _x, double _y, double _z) { modelID = _modelID, x = _x; y = _y; z = _z; }
+	void setData(unsigned long long _modelID) { modelID = _modelID; }
 	unsigned long long getModelID(void) const { return modelID; }
-	double getX(void) const { return x; }
-	double getY(void) const { return y; }
-	double getZ(void) const { return z; }
 
 	void setSelectedItem(SceneNodeGeometry* item) { selectedItem = item; }
 	SceneNodeGeometry* getSelectedItem(void) const { return selectedItem; }
@@ -124,9 +115,6 @@ public:
 
 private:
 	unsigned long long modelID;
-	double x;
-	double y;
-	double z;
 	SceneNodeGeometry* selectedItem;
 	unsigned long long faceId1;
 	unsigned long long faceId2;
@@ -311,8 +299,8 @@ private:
 	SceneNodeBase* findSelectedItemByLineSegment(osgUtil::Intersector* intersector, double sceneRadius, osg::Vec3d& intersectionPoint, unsigned long long& hitIndex);
 	SceneNodeBase* findSelectedItemByPolytope(osgUtil::Intersector* intersector, double sceneRadius, osg::Vec3d& intersectionPoint, ot::UID& faceId1, ot::UID& faceId2);
 	void	   selectSceneNode(SceneNodeBase *selectedItem, bool bCtrlKeyPressed);
-	void	   faceSelected(unsigned long long modelID, double x, double y, double z, SceneNodeGeometry* selectedItem, unsigned long long faceId);
-	void	   edgeSelected(unsigned long long modelID, double x, double y, double z, SceneNodeGeometry* selectedItem, unsigned long long faceId1, unsigned long long faceId2);
+	void	   faceSelected(unsigned long long modelID, SceneNodeGeometry* selectedItem, unsigned long long faceId);
+	void	   edgeSelected(unsigned long long modelID, SceneNodeGeometry* selectedItem, unsigned long long faceId1, unsigned long long faceId2);
 	SceneNodeBase *getParentNode(const std::string &treeName);
 	void	   endCurrentSelectionMode(bool cancelled);
 	SceneNodeGeometry *createNewGeometryNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, bool isEditable,

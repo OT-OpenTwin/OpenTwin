@@ -12,24 +12,18 @@ class UpdateManager;
 class ChamferEdgesData
 {
 public:
-	ChamferEdgesData() : entityID(0), position{ 0.0, 0.0, 0.0 } {}
+	ChamferEdgesData() : entityID(0) {}
 	virtual ~ChamferEdgesData() {}
 
 	void setEntityID(ot::UID id) { entityID = id; }
-	void setPosition(double x, double y, double z) { position[0] = x; position[1] = y; position[2] = z; }
 
 	ot::UID getEntityID(void) { return entityID; }
-
-	double getX(void) { return position[0]; }
-	double getY(void) { return position[1]; }
-	double getZ(void) { return position[2]; }
 
 	void setEdgeName(const std::string& name) { edgeName = name; }
 	std::string getEdgeName(void) { return edgeName; }
 
 private:
 	ot::UID entityID;
-	double position[3];
 	std::string edgeName;
 };
 

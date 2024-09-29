@@ -5,27 +5,25 @@
 
 class Model;
 class EntityGeometry;
+class EntityBrep;
 class TopoDS_Shape;
 class UpdateManager;
 
 class SimplifyRemoveFaceData
 {
 public:
-	SimplifyRemoveFaceData() : entityID(0), position{ 0.0, 0.0, 0.0 } {}
+	SimplifyRemoveFaceData() : entityID(0) {}
 	virtual ~SimplifyRemoveFaceData() {}
 
 	void setEntityID(ot::UID id) { entityID = id; }
-	void setPosition(double x, double y, double z) { position[0] = x; position[1] = y; position[2] = z; }
+	void setFaceName(const std::string & _faceName) { faceName = _faceName; }
 
 	ot::UID getEntityID(void) { return entityID; }
-
-	double getX(void) { return position[0]; }
-	double getY(void) { return position[1]; }
-	double getZ(void) { return position[2]; }
+	std::string getFaceName(void) { return faceName; }
 
 private:
 	ot::UID entityID;
-	double position[3];
+	std::string faceName;
 };
 
 class SimplifyRemoveFaces : public ShapesBase
@@ -42,7 +40,7 @@ public:
 
 private:
 	bool removeFacesFromEntity(EntityGeometry *geometryEntity, ot::UID brepID, ot::UID brepVersion, std::list<SimplifyRemoveFaceData> &faces, std::list<ot::UID> &modifiedEntities);
-	bool findFaceFromPosition(TopoDS_Shape &shape, double x, double y, double z, TopoDS_Shape &face);
+	bool findFaceFromName(EntityBrep* brepEntity, TopoDS_Shape& shape, const std::string& faceName, TopoDS_Shape& face);
 	UpdateManager *getUpdateManager(void) { assert(updateManager != nullptr); return updateManager; }
 
 	UpdateManager *updateManager;
