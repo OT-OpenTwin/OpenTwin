@@ -2627,6 +2627,9 @@ void Model::endCurrentSelectionMode(bool cancelled)
 
 void Model::faceSelected(unsigned long long modelID, double x, double y, double z, SceneNodeGeometry *selectedItem, unsigned long long faceId)
 {
+	std::string faceName = selectedItem->getFaceNameFromId(faceId);
+	if (faceName.empty()) return;
+
 	// Check whether the face is already in the selected list
 	bool addFace = true;
 	for (auto face : currentFaceSelection)
@@ -2641,7 +2644,6 @@ void Model::faceSelected(unsigned long long modelID, double x, double y, double 
 			refreshAllViews();
 			break;
 		}
-
 	}
 
 	if (addFace && selectedItem != nullptr)
@@ -2651,7 +2653,7 @@ void Model::faceSelected(unsigned long long modelID, double x, double y, double 
 		selection.setData(modelID, x, y, z);
 		selection.setSelectedItem(selectedItem);
 		selection.setFaceId(faceId);
-		selection.setFaceName(selectedItem->getFaceNameFromId(faceId));
+		selection.setFaceName(faceName);
 
 		currentFaceSelection.push_back(selection);
 
@@ -2665,6 +2667,9 @@ void Model::faceSelected(unsigned long long modelID, double x, double y, double 
 void Model::edgeSelected(unsigned long long modelID, double x, double y, double z, SceneNodeGeometry* selectedItem, unsigned long long faceId1, unsigned long long faceId2)
 {
 	if (selectedItem == nullptr) return;
+	
+	std::string edgeName = selectedItem->getEdgeNameFromFaceIds(faceId1, faceId2);
+	if (edgeName.empty()) return;
 
 	// Check whether the face is already in the selected list
 	bool addEdge = true;
@@ -2691,7 +2696,7 @@ void Model::edgeSelected(unsigned long long modelID, double x, double y, double 
 		selection.setSelectedItem(selectedItem);
 		selection.setFaceIds(faceId1, faceId2);
 		selection.setNode(selectedItem->addSelectedEdge(faceId1, faceId2));
-		selection.setEdgeName(selectedItem->getEdgeNameFromFaceIds(faceId1, faceId2));
+		selection.setEdgeName(edgeName);
 
 		currentEdgeSelection.push_back(selection);
 
@@ -2820,17 +2825,21 @@ void Model::processHoverView(osgUtil::Intersector *intersector, double sceneRadi
 				unsigned long long faceId = selectedItem->getFaceIdFromTriangleIndex(hitIndex);
 				
 				std::string faceName = selectedItem->getFaceNameFromId(faceId);
-				setCursorText(faceName);
 
-				if (isFaceSelected(selectedItem, faceId))
+				if (!faceName.empty())
 				{
-					selectedItem->setEdgeHighlight(faceId, true, 3.0);
+					setCursorText(faceName);
+
+					if (isFaceSelected(selectedItem, faceId))
+					{
+						selectedItem->setEdgeHighlight(faceId, true, 3.0);
+					}
+					else
+					{
+						selectedItem->setEdgeHighlight(faceId, true, 1.0);
+					}
+					currentHoverItem = selectedItem;
 				}
-				else
-				{
-					selectedItem->setEdgeHighlight(faceId, true, 1.0);
-				}
-				currentHoverItem = selectedItem;
 			}
 			else
 			{
@@ -2855,12 +2864,14 @@ void Model::processHoverView(osgUtil::Intersector *intersector, double sceneRadi
 					clearHoverView();
 				}
 
-				selectedItem->setEdgeHighlightNode(faceId1, faceId2);
-
 				std::string edgeName = selectedItem->getEdgeNameFromFaceIds(faceId1, faceId2);
-				setCursorText(edgeName);
+				if (!edgeName.empty())
+				{
+					selectedItem->setEdgeHighlightNode(faceId1, faceId2);
+					setCursorText(edgeName);
 
-				currentHoverItem = selectedItem;
+					currentHoverItem = selectedItem;
+				}
 			}
 			else
 			{

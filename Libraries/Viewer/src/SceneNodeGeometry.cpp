@@ -730,6 +730,8 @@ std::string SceneNodeGeometry::getEdgeNameFromFaceIds(unsigned long long faceId1
 	std::string face1 = getFaceNameFromId(faceId1);
 	std::string face2 = getFaceNameFromId(faceId2);
 
+	if (face1.empty() || face2.empty()) return "";
+
 	if (face1 == face2) return "";
 
 	if (face1 <= face2)
