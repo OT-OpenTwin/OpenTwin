@@ -8,6 +8,8 @@ namespace ot
 #include <list>
 #include <string>
 
+#include "ShapesBase.h"
+
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 
@@ -19,11 +21,12 @@ class EntityGeometry;
 class EntityCache;
 class TopoDS_Shape;
 class BRepAlgoAPI_BuilderAlgo;
+class ClassFactory;
 
-class BooleanOperations
+class BooleanOperations : public ShapesBase
 {
 public:
-	BooleanOperations(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, const std::string &_serviceName, EntityCache *_entityCache, ot::serviceID_t _serviceID);
+	BooleanOperations(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, const std::string &_serviceName, EntityCache *_entityCache, ot::serviceID_t _serviceID, ClassFactory* _classFactory);
 	~BooleanOperations() {};
 
 	void enterAddMode(const std::list<ot::EntityInformation> &selectedGeometryEntities);
@@ -38,15 +41,8 @@ private:
 	bool add(EntityBrep *base, std::list<EntityBrep *> &tools, TopoDS_Shape &shape, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames);
 	bool subtract(EntityBrep *base, std::list<EntityBrep *> &tools, TopoDS_Shape &shape, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames);
 	bool intersect(EntityBrep *base, std::list<EntityBrep *> &tools, TopoDS_Shape &shape, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames);
-	void deletePropertyCategory(EntityGeometry *geometryEntity, const std::string category);
 	void preOperation(TopoDS_Shape& shapeA, const std::map< const opencascade::handle<TopoDS_TShape>, std::string>& faceNamesA, TopoDS_Shape& shapeB, const std::map< const opencascade::handle<TopoDS_TShape>, std::string>& faceNamesB);
 	std::map< const opencascade::handle<TopoDS_TShape>, std::string> postOperation(BRepAlgoAPI_BuilderAlgo& theAlgo, TopoDS_Shape& resultShape, TopoDS_Shape& shapeA, TopoDS_Shape& shapeB);
-
-	ot::components::UiComponent *uiComponent;
-	ot::components::ModelComponent *modelComponent;
-	std::string serviceName;
-	EntityCache *entityCache;
-	ot::serviceID_t serviceID;
 
 	TopTools_ListOfShape anArguments;
 	std::map< const opencascade::handle<TopoDS_TShape>, std::string> allFaceNames;

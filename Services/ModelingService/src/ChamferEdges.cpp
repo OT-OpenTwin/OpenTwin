@@ -135,9 +135,7 @@ void ChamferEdges::performOperation(const std::string &selectionInfo)
 
 	geometryEntity->getProperties() = baseEntity->getProperties();
 
-	deletePropertyCategory(geometryEntity, "Dimensions");
-	deletePropertyCategory(geometryEntity, "Edges");
-	deletePropertyCategory(geometryEntity, "Internal");
+	deleteNonStandardProperties(geometryEntity);
 
 	EntityPropertiesDouble* doubleProp = new EntityPropertiesDouble("#Chamfer width", 0.0);
 	doubleProp->setVisible(false);
@@ -249,16 +247,6 @@ std::list<ChamferEdgesData> ChamferEdges::readEdgeListFromProperties(EntityPrope
 	}
 
 	return edgeList;
-}
-
-void ChamferEdges::deletePropertyCategory(EntityGeometry* geometryEntity, const std::string category)
-{
-	std::list<std::string> deleteProperties = geometryEntity->getProperties().getListOfPropertiesForGroup(category);
-
-	for (auto prop : deleteProperties)
-	{
-		geometryEntity->getProperties().deleteProperty(prop, category);
-	}
 }
 
 void ChamferEdges::updateShape(EntityGeometry* geometryEntity, TopoDS_Shape& shape)

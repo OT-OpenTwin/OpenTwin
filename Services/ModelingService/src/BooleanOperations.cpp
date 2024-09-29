@@ -23,12 +23,8 @@
 #include <BRepAlgoAPI_Common.hxx>
 #include <BRepBuilderAPI_MakeSolid.hxx>
 
-BooleanOperations::BooleanOperations(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, const std::string &_serviceName, EntityCache *_entityCache, ot::serviceID_t _serviceID) :
-	uiComponent(_uiComponent),
-	modelComponent(_modelComponent),
-	serviceName(_serviceName),
-	entityCache(_entityCache),
-	serviceID(_serviceID)
+BooleanOperations::BooleanOperations(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, const std::string &_serviceName, EntityCache *_entityCache, ot::serviceID_t _serviceID, ClassFactory* _classFactory) :
+	ShapesBase(_uiComponent, _modelComponent, _serviceID, _serviceName, _entityCache, _classFactory)
 {
 
 }
@@ -211,7 +207,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 
 		geometryEntity->getProperties() = baseEntity->getProperties();
 
-		deletePropertyCategory(geometryEntity, "Dimensions");
+		deleteNonStandardProperties(geometryEntity);
 
 		geometryEntity->resetTransformation();
 
@@ -299,16 +295,6 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 
 	// We do not need to delete the brep entities here, since they are managed by the entity cache.
 	brepEntities.clear();
-}
-
-void BooleanOperations::deletePropertyCategory(EntityGeometry *geometryEntity, const std::string category)
-{
-	std::list<std::string> deleteProperties = geometryEntity->getProperties().getListOfPropertiesForGroup(category);
-
-	for (auto prop : deleteProperties)
-	{
-		geometryEntity->getProperties().deleteProperty(prop, category);
-	}
 }
 
 void BooleanOperations::preOperation(TopoDS_Shape& shapeA, const std::map< const opencascade::handle<TopoDS_TShape>, std::string>& faceNamesA, 

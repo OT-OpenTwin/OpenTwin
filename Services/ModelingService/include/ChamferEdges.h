@@ -49,7 +49,6 @@ public:
 
 private:
 	UpdateManager *getUpdateManager(void) { assert(updateManager != nullptr); return updateManager; }
-	void deletePropertyCategory(EntityGeometry* geometryEntity, const std::string category);
 	void performOperation(EntityGeometry* geometryEntity, EntityBrep* baseBrep, TopoDS_Shape& shape);
 	void storeEdgeListInProperties(std::list<ChamferEdgesData>& edgeList, EntityProperties& properties);
 	std::list<ChamferEdgesData> readEdgeListFromProperties(EntityProperties& properties);

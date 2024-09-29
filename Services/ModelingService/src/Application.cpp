@@ -422,7 +422,7 @@ BooleanOperations *Application::getBooleanOperations(void)
 { 
 	if (booleanOperations == nullptr)
 	{
-		booleanOperations = new BooleanOperations(m_uiComponent, m_modelComponent, serviceName(), &entityCache, serviceID());
+		booleanOperations = new BooleanOperations(m_uiComponent, m_modelComponent, serviceName(), &entityCache, serviceID(), &getClassFactory());
 	}
 
 	return booleanOperations; 

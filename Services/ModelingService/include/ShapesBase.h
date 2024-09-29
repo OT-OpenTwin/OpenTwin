@@ -30,6 +30,7 @@ protected:
 	void applyFaceNames(EntityGeometry *geomEntity, const TopoDS_Shape& _shape, std::list<std::string>& faceNames);
 
 	void writeShapeToStepFile(const TopoDS_Shape & _shape, const std::string& _filename);
+	void deleteNonStandardProperties(EntityGeometry* geometryEntity);
 
 protected:
 	ot::components::UiComponent *uiComponent;

@@ -41,6 +41,20 @@ std::string ShapesBase::to_string(double value)
 	return out.str();
 }
 
+void ShapesBase::deleteNonStandardProperties(EntityGeometry* geometryEntity)
+{
+	std::list<EntityPropertiesBase *> propertyList = geometryEntity->getProperties().getListOfAllProperties();
+
+	for (auto prop : propertyList)
+	{
+		if (prop->getGroup() != "Appearance" && prop->getGroup() != "Transformation" && prop->getGroup() != "Solver" && prop->getGroup() != "Mesh")
+		{
+			// We do have a property belonging to a non-standard group
+			geometryEntity->getProperties().deleteProperty(prop->getName(), prop->getGroup());
+		}
+	}
+}
+
 void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<double> &_transform, const std::string& _name, 
 									  const std::string &_type, std::list<std::pair<std::string, std::string>> &shapeParameters, std::list<std::string> &faceNames)
 {
