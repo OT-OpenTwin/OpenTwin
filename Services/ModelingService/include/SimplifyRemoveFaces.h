@@ -3,6 +3,8 @@
 #include "Types.h"
 #include "ShapesBase.h"
 
+#include "BRepAlgoAPI_Defeaturing.hxx"
+
 class Model;
 class EntityGeometry;
 class EntityBrep;
@@ -42,6 +44,7 @@ private:
 	bool removeFacesFromEntity(EntityGeometry *geometryEntity, ot::UID brepID, ot::UID brepVersion, std::list<SimplifyRemoveFaceData> &faces, std::list<ot::UID> &modifiedEntities);
 	bool findFaceFromName(EntityBrep* brepEntity, TopoDS_Shape& shape, const std::string& faceName, TopoDS_Shape& face);
 	UpdateManager *getUpdateManager(void) { assert(updateManager != nullptr); return updateManager; }
+	void handleFaceNaming(EntityBrep* inputEntity, EntityBrep* resultEntity, BRepAlgoAPI_Defeaturing& theAlgo);
 
 	UpdateManager *updateManager;
 };

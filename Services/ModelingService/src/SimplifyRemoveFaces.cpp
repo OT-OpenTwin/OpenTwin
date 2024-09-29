@@ -177,7 +177,7 @@ bool SimplifyRemoveFaces::removeFacesFromEntity(EntityGeometry *geometryEntity, 
 	BRepAlgoAPI_Defeaturing algorithm;
 	algorithm.SetShape(shape);
 	algorithm.SetRunParallel(false);
-	algorithm.SetToFillHistory(false);
+	algorithm.SetToFillHistory(true);
 
 	for (auto face : faces)
 	{
@@ -222,6 +222,8 @@ bool SimplifyRemoveFaces::removeFacesFromEntity(EntityGeometry *geometryEntity, 
 
 		// Add the new brep entity to the geometry entity
 		geometryEntity->setBrep(algorithm.Shape());
+
+		handleFaceNaming(brepEntity, geometryEntity->getBrepEntity(), algorithm);
 
 		// Facet the geometry entity and store it
 		geometryEntity->facetEntity(false);
@@ -286,4 +288,40 @@ bool SimplifyRemoveFaces::findFaceFromName(EntityBrep* brepEntity, TopoDS_Shape 
 	}
 
 	return false;
+}
+
+void SimplifyRemoveFaces::handleFaceNaming(EntityBrep* inputEntity, EntityBrep* resultEntity, BRepAlgoAPI_Defeaturing& theAlgo)
+{
+	TopTools_ListOfShape anArguments;
+	anArguments.Append(inputEntity->getBrep());
+
+	BRepTools_History aHistory(anArguments, theAlgo);
+	TopExp_Explorer exp;
+
+	std::map< const opencascade::handle<TopoDS_TShape>, std::string> allFaceNames = inputEntity->getFaceNameMap();
+	std::map< const opencascade::handle<TopoDS_TShape>, std::string> resultFaceNames;
+
+	// First, we assign the names to all unchanged faces
+	for (exp.Init(resultEntity->getBrep(), TopAbs_FACE); exp.More(); exp.Next())
+	{
+		TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+		if (allFaceNames.count(aFace.TShape()) != 0)
+		{
+			resultFaceNames[aFace.TShape()] = allFaceNames[aFace.TShape()];
+		}
+	}
+
+	// Now check for all modified faces
+	for (exp.Init(inputEntity->getBrep(), TopAbs_FACE); exp.More(); exp.Next())
+	{
+		TopoDS_Face aFace = TopoDS::Face(exp.Current());
+
+		for (auto newFace : aHistory.Modified(aFace))
+		{
+			resultFaceNames[newFace.TShape()] = allFaceNames[aFace.TShape()];
+		}
+	}
+
+	resultEntity->setFaceNameMap(resultFaceNames);
 }
