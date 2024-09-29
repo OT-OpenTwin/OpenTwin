@@ -3932,6 +3932,11 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	std::string currentModelVersion = getStateManager()->getModelStateVersion();
 	std::string activeBranch        = getStateManager()->getActiveBranch();
 
+	// Add the first version to the active branch version so the graph can find the version
+	if (!activeBranch.empty()) {
+		activeBranch.append(".1");
+	}
+
 	addNewVersionTreeStateAndActivate(previousModelVersion, activeBranch, ot::VersionGraphVersionCfg(currentModelVersion, "", comment));
 
 	// Disable write caching to database (this will also flush all pending writes
