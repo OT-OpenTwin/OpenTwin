@@ -110,7 +110,6 @@ public:
 
 	void addSolver(void);
 	void runSolver(void);
-	void addTerminal(void);
 	void definePotential(void);
 	void EnsureVisualizationModelIDKnown(void);
 

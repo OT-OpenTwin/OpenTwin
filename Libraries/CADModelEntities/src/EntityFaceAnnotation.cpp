@@ -3,6 +3,7 @@
 #include "EntityGeometry.h"
 #include "GeometryOperations.h"
 #include "EntityFacetData.h"
+#include "EntityBrep.h"
 #include "DataBase.h"
 #include "Types.h"
 
@@ -50,20 +51,14 @@ void EntityFaceAnnotation::addFacePick(EntityFaceAnnotationData annotation)
 	faceCount->resetNeedsUpdate();
 
 	// Now store the new face
-	EntityPropertiesString *reference = new EntityPropertiesString("Reference entity " + index, annotation.getEntityName());
-	EntityPropertiesDouble *posX = new EntityPropertiesDouble("Position X " + index, annotation.getX());
-	EntityPropertiesDouble *posY = new EntityPropertiesDouble("Position Y " + index, annotation.getY());
-	EntityPropertiesDouble *posZ = new EntityPropertiesDouble("Position Z " + index, annotation.getZ());
+	EntityPropertiesString* reference = new EntityPropertiesString("Reference entity " + index, annotation.getEntityName());
+	EntityPropertiesString* faceName = new EntityPropertiesString("Face name " + index, annotation.getFaceName());
 
 	getProperties().createProperty(reference, "Location " + std::to_string(faceIndex));
-	getProperties().createProperty(posX, "Location " + std::to_string(faceIndex));
-	getProperties().createProperty(posY, "Location " + std::to_string(faceIndex));
-	getProperties().createProperty(posZ, "Location " + std::to_string(faceIndex));
+	getProperties().createProperty(faceName, "Location " + std::to_string(faceIndex));
 
 	reference->resetNeedsUpdate();
-	posX->resetNeedsUpdate();
-	posY->resetNeedsUpdate();
-	posZ->resetNeedsUpdate();
+	faceName->resetNeedsUpdate();
 
 	setModified();
 }
@@ -193,7 +188,7 @@ void EntityFaceAnnotation::addVisualizationNodes(void)
 	EntityBase::addVisualizationNodes();
 }
 
-std::list<TopoDS_Shape> EntityFaceAnnotation::findFacesFromShape(const TopoDS_Shape *shape)
+std::list<TopoDS_Shape> EntityFaceAnnotation::findFacesFromShape(EntityBrep *brep)
 {
 	std::list<TopoDS_Shape> facesList;
 
@@ -202,62 +197,28 @@ std::list<TopoDS_Shape> EntityFaceAnnotation::findFacesFromShape(const TopoDS_Sh
 
 	for (int faceIndex = 1; faceIndex <= faceCount->getValue(); faceIndex++)
 	{
-		findFacesAtIndexFromShape(facesList, faceIndex, shape);
+		findFacesAtIndexFromShape(facesList, faceIndex, brep);
 	}
 
 	return facesList;
 }
 
-void EntityFaceAnnotation::findFacesAtIndexFromShape(std::list<TopoDS_Shape> &facesList, int faceIndex, const TopoDS_Shape *shape)
+void EntityFaceAnnotation::findFacesAtIndexFromShape(std::list<TopoDS_Shape> &facesList, int faceIndex, EntityBrep* brep)
 {
 	std::string index = "(" + std::to_string(faceIndex) + ")";
 
-	EntityPropertiesDouble *posX = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Position X " + index));
-	assert(posX != nullptr);
-
-	EntityPropertiesDouble *posY = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Position Y " + index));
-	assert(posY != nullptr);
-
-	EntityPropertiesDouble *posZ = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Position Z " + index));
-	assert(posZ != nullptr);
-
-	BRepBuilderAPI_MakeVertex vertex(gp_Pnt(posX->getValue(), posY->getValue(), posZ->getValue()));
-
-	TopoDS_Shape result;
-	bool success = false;
-
-	double minDist = 1e30;
+	EntityPropertiesString* faceName = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Face name " + index));
 
 	TopExp_Explorer exp;
-	for (exp.Init(*shape, TopAbs_SHELL); exp.More(); exp.Next())
+	for (exp.Init(brep->getBrep(), TopAbs_FACE); exp.More(); exp.Next())
 	{
-		TopoDS_Shell aShell = TopoDS::Shell(exp.Current());
-		BRepExtrema_DistShapeShape minimumDist(aShell, vertex.Vertex(), Extrema_ExtFlag_MIN);
+		TopoDS_Face aFace = TopoDS::Face(exp.Current());
 
-		int hits = minimumDist.NbSolution();
-
-		assert(!minimumDist.InnerSolution());  // If the point is inside the solid, we get this behavior. In this case, it we don't know what the closest face is.
-												// We need a special treatment for this situation (e.g. invert the solid or make a sheet model out of it).
-
-		for (int hit = 1; hit <= hits; hit++)
+		if (brep->getFaceName(aFace) == faceName->getValue())
 		{
-			if (minimumDist.SupportTypeShape1(hit) == BRepExtrema_SupportType::BRepExtrema_IsInFace)
-			{
-				// We found the face which is closest to the given point
-
-				if (minimumDist.Value() < minDist)
-				{
-					success = true;
-					minDist = minimumDist.Value();
-					result = minimumDist.SupportOnShape1(hit);
-				}
-			}
+			facesList.push_back(exp.Current());
+			return;
 		}
-	}
-
-	if (success)
-	{
-		facesList.push_back(result);
 	}
 }
 

@@ -2,6 +2,7 @@
 
 class Application;
 class EntityFaceAnnotation;
+class EntityBrep;
 
 class TopoDS_Shape;
 class TopoDS_TShape;
@@ -28,7 +29,7 @@ public:
 
 	void loadAllFaceAnnotations(void);
 	void buildEntityNameToAnnotationsMap(void);
-	void buildFaceToAnnotationMap(const std::string &entityName, const TopoDS_Shape *shape);
+	void buildFaceToAnnotationMap(const std::string &entityName, EntityBrep* brep);
 	void buildIndexedFaceToAnnotationVector(const TopoDS_Shape *shape);
 	void buildTagToAnnotationMap(gmsh::vectorpair &output);
 

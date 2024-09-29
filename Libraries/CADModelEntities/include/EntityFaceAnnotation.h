@@ -11,26 +11,23 @@
 #include <string>
 
 class EntityFacetData;
+class EntityBrep;
 
 class __declspec(dllexport) EntityFaceAnnotationData
 {
 public:
-	EntityFaceAnnotationData() : modelID(0), x(0.0), y(0.0), z(0.0) {}
+	EntityFaceAnnotationData() : modelID(0) {}
 	virtual ~EntityFaceAnnotationData() {}
 
-	void setData(const std::string &name, unsigned long long _modelID, double _x, double _y, double _z) { entityName = name;  modelID = _modelID, x = _x; y = _y; z = _z; }
+	void setData(const std::string &name, unsigned long long _modelID, std::string &_faceName) { entityName = name;  modelID = _modelID, faceName = _faceName; }
 	unsigned long long getModelID(void) { return modelID; }
 	std::string getEntityName(void) { return entityName; }
-	double getX(void) { return x; }
-	double getY(void) { return y; }
-	double getZ(void) { return z; }
+	std::string getFaceName(void) { return faceName; }
 
 private:
 	std::string entityName;
+	std::string faceName;
 	unsigned long long modelID;
-	double x;
-	double y;
-	double z;
 };
 
 class __declspec(dllexport) EntityFaceAnnotation : public EntityBase
@@ -46,7 +43,7 @@ public:
 	void addFacePick(EntityFaceAnnotationData annotation);
 	void setColor(double r, double g, double b);
 
-	std::list<TopoDS_Shape> findFacesFromShape(const TopoDS_Shape *shape);
+	std::list<TopoDS_Shape> findFacesFromShape(EntityBrep* brep);
 
 	virtual void StoreToDataBase(void) override;
 
@@ -73,7 +70,7 @@ private:
 	void updateVisualization(bool isHidden);
 	void EnsureFacetsAreLoaded(void);
 	void storeFacets(void);
-	void findFacesAtIndexFromShape(std::list<TopoDS_Shape> &facesList, int faceIndex, const TopoDS_Shape *shape);
+	void findFacesAtIndexFromShape(std::list<TopoDS_Shape> &facesList, int faceIndex, EntityBrep* brep);
 
 	// Persistent data
 	EntityFacetData *facets;

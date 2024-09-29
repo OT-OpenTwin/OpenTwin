@@ -74,15 +74,14 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
 	_ui->addMenuPage("PHREEC");
-	_ui->addMenuPage("Model");
 
-	_ui->addMenuGroup("Model", "Sources");
+	_ui->addMenuGroup("PHREEC", "Sources");
 	_ui->addMenuGroup("PHREEC", "Solver");
 
 	ot::LockTypeFlags modelWrite;
 	modelWrite.setFlag(ot::LockModelWrite);
 
-	_ui->addMenuButton("Model", "Sources", "Add Terminal", "Add Terminal", modelWrite, "FaceSelect", "Default", "Ctrl+T");
+	_ui->addMenuButton("PHREEC", "Sources", "Add Terminal", "Add Terminal", modelWrite, "FaceSelect", "Default", "Ctrl+T");
 	_ui->addMenuButton("PHREEC", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
 	_ui->addMenuButton("PHREEC", "Solver", "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default", "F6");
 	
@@ -136,7 +135,7 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (action == "PHREEC:Solver:Create Solver")	addSolver();
 	else if (action == "PHREEC:Solver:Run Solver")		runPHREEC();
-	else if (action == "Model:Sources:Add Terminal")	addTerminal();
+	else if (action == "PHREEC:Sources:Add Terminal")	addTerminal();
 	else assert(0); // Unhandled button action
 	return std::string();
 }

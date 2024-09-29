@@ -76,13 +76,11 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuPage("GetDP");
 	_ui->addMenuPage("Model");
 
-	//_ui->addMenuGroup("Model", "Sources");
 	_ui->addMenuGroup("GetDP", "Solver");
 	_ui->addMenuGroup("GetDP", "Sources");
 
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
-	//_ui->addMenuButton("Model", "Sources", "Add Terminal", "Add Terminal", modelWrite, "FaceSelect", "Default");
 	_ui->addMenuButton("GetDP", "Solver", "Create Solver", "Create Solver", modelWrite, "AddSolver", "Default");
 	_ui->addMenuButton("GetDP", "Solver", "Run Solver", "Run Solver", modelWrite, "RunSolver", "Default");
 
@@ -138,7 +136,6 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if (action == "GetDP:Solver:Create Solver")	          addSolver();
 	else if (action == "GetDP:Solver:Run Solver")		  runSolver();
-	else if (action == "Model:Sources:Add Terminal")	  addTerminal();
 	else if (action == "GetDP:Sources:Define Electrostatic Potential")  definePotential();
 	else assert(0); // Unhandled button action
 	return std::string();
@@ -178,26 +175,6 @@ void Application::EnsureVisualizationModelIDKnown(void)
 
 	// The visualization model isnot known yet -> get it from the model
 	visualizationModelID = m_modelComponent->getCurrentVisualizationModelID();
-}
-
-void Application::addTerminal(void)
-{
-	EnsureVisualizationModelIDKnown();
-	if (visualizationModelID == 0) return;
-
-	std::map<std::string, std::string> options;
-	options.insert_or_assign("colorR", std::to_string(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultColor("GetDP", "Terminal color", 0, 255)));
-	options.insert_or_assign("colorG", std::to_string(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultColor("GetDP", "Terminal color", 1, 171)));
-	options.insert_or_assign("colorB", std::to_string(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultColor("GetDP", "Terminal color", 2, 0)));
-	options.insert_or_assign("BaseName", "Terminals/terminal");
-	options.insert_or_assign("ModelStateName", "create terminal");
-
-	ot::ServiceBase *receiver = getConnectedServiceByName("Model");
-
-	if (receiver != nullptr)
-	{
-		m_uiComponent->enterEntitySelectionMode(visualizationModelID, ot::components::UiComponent::FACE, true, "", ot::components::UiComponent::PORT, "create a new terminal", options, receiver->serviceID());
-	}
 }
 
 void Application::definePotential(void)

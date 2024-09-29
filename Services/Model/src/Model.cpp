@@ -3455,9 +3455,7 @@ void Model::entitiesSelected(const std::string &selectionAction, const std::stri
 	if (selectionAction == "PORT")
 	{
 		rapidjson::Value modelID = doc["modelID"].GetArray();
-		rapidjson::Value posX = doc["posX"].GetArray();
-		rapidjson::Value posY = doc["posY"].GetArray();
-		rapidjson::Value posZ = doc["posZ"].GetArray();
+		ot::ConstJsonArray faceName = ot::json::getArray(doc, "faceName");
 
 		std::list<EntityFaceAnnotationData> annotations;
 
@@ -3465,13 +3463,14 @@ void Model::entitiesSelected(const std::string &selectionAction, const std::stri
 		{
 			EntityFaceAnnotationData annotation;
 			ot::UID entityID = modelID[i].GetUint64();
+			std::string fname = faceName[i].GetString();
 
 			EntityBase *entity = getEntity(entityID);
 			assert(entity != nullptr);
 
 			if (entity != nullptr)
 			{
-				annotation.setData(entity->getName(), entityID, posX[i].GetDouble(), posY[i].GetDouble(), posZ[i].GetDouble());
+				annotation.setData(entity->getName(), entityID, fname);
 				annotations.push_back(annotation);
 			}
 		}
@@ -3545,10 +3544,8 @@ void Model::updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity)
 		if (geometryEntity != nullptr)
 		{
 			// Now find the face in the geometry for the stored position
-			TopoDS_Shape shape = geometryEntity->getBrep();
-
 			std::list<TopoDS_Shape> faces;
-			findFacesAtIndexFromShape(annotationEntity, faces, faceIndex, &shape);
+			findFacesAtIndexFromShape(annotationEntity, faces, faceIndex, geometryEntity->getBrepEntity());
 
 			for (auto face : faces)
 			{
@@ -3577,56 +3574,22 @@ void Model::updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity)
 	annotationEntity->storeUpdatedFacets();
 }
 
-void Model::findFacesAtIndexFromShape(EntityFaceAnnotation *annotationEntity, std::list<TopoDS_Shape> &facesList, int faceIndex, const TopoDS_Shape *shape)
+void Model::findFacesAtIndexFromShape(EntityFaceAnnotation *annotationEntity, std::list<TopoDS_Shape> &facesList, int faceIndex, EntityBrep* brep)
 {
 	std::string index = "(" + std::to_string(faceIndex) + ")";
 
-	EntityPropertiesDouble *posX = dynamic_cast<EntityPropertiesDouble*>(annotationEntity->getProperties().getProperty("Position X " + index));
-	assert(posX != nullptr);
-
-	EntityPropertiesDouble *posY = dynamic_cast<EntityPropertiesDouble*>(annotationEntity->getProperties().getProperty("Position Y " + index));
-	assert(posY != nullptr);
-
-	EntityPropertiesDouble *posZ = dynamic_cast<EntityPropertiesDouble*>(annotationEntity->getProperties().getProperty("Position Z " + index));
-	assert(posZ != nullptr);
-
-	BRepBuilderAPI_MakeVertex vertex(gp_Pnt(posX->getValue(), posY->getValue(), posZ->getValue()));
-
-	TopoDS_Shape result;
-	bool success = false;
-
-	double minDist = 1e30;
+	EntityPropertiesString* faceName = dynamic_cast<EntityPropertiesString*>(annotationEntity->getProperties().getProperty("Face name " + index));
 
 	TopExp_Explorer exp;
-	for (exp.Init(*shape, TopAbs_SHELL); exp.More(); exp.Next())
+	for (exp.Init(brep->getBrep(), TopAbs_FACE); exp.More(); exp.Next())
 	{
-		TopoDS_Shell aShell = TopoDS::Shell(exp.Current());
-		BRepExtrema_DistShapeShape minimumDist(aShell, vertex.Vertex(), Extrema_ExtFlag_MIN);
+		TopoDS_Face aFace = TopoDS::Face(exp.Current());
 
-		int hits = minimumDist.NbSolution();
-
-		assert(!minimumDist.InnerSolution());  // If the point is inside the solid, we get this behavior. In this case, it we don't know what the closest face is.
-											   // We need a special treatment for this situation (e.g. invert the solid or make a sheet model out of it).
-
-		for (int hit = 1; hit <= hits; hit++)
+		if (brep->getFaceName(aFace) == faceName->getValue())
 		{
-			if (minimumDist.SupportTypeShape1(hit) == BRepExtrema_SupportType::BRepExtrema_IsInFace)
-			{
-				// We found the face which is closest to the given point
-
-				if (minimumDist.Value() < minDist)
-				{
-					success = true;
-					minDist = minimumDist.Value();
-					result = minimumDist.SupportOnShape1(hit);
-				}
-			}
+			facesList.push_back(exp.Current());
+			return;
 		}
-	}
-
-	if (success)
-	{
-		facesList.push_back(result);
 	}
 }
 

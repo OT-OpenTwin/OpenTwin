@@ -20,6 +20,7 @@ class EntityMesh;
 class EntityMeshTet;
 class EntityMeshCartesian;
 class EntityGeometry;
+class EntityBrep;
 class EntityMaterial;
 class EntityParameter;
 class EntityAnnotation;
@@ -255,7 +256,7 @@ private:
 	void showMaterialMissing(void);
 	void importTableFile(const std::string &fileName, bool removeFile);
 	void loadDefaultMaterials(void);
-	void findFacesAtIndexFromShape(EntityFaceAnnotation *annotationEntity, std::list<TopoDS_Shape> &facesList, int faceIndex, const TopoDS_Shape *shape);
+	void findFacesAtIndexFromShape(EntityFaceAnnotation *annotationEntity, std::list<TopoDS_Shape> &facesList, int faceIndex, EntityBrep* brep);
 	void recursiveReplaceEntityName(EntityBase *entity, const std::string &oldName, const std::string &newName, std::list<EntityBase*> &entityList);
 	void addChildrenEntitiesToList(EntityGeometry* entity, std::list<std::pair<ot::UID, ot::UID>>& childrenEntities);
 	void recursivelyAddEntityInfo(EntityBase *entity, std::map<ot::UID, ot::UID> &entityVersionMap);

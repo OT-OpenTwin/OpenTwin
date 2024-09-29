@@ -225,8 +225,6 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	else if (action == "Project:Versions:Information")		  showInformation();
 	else if (action == "Project:Versions:Commit")			  commitChanges();
 	else if (action == "Project:Versions:Checkout")			  getChanges();
-	//else if (action == "Model:Sources:Add Terminal")	      addTerminal();
-	//else if (action == "ElmerFEM:Sources:Define Electrostatic Potential")  definePotential();
 	else assert(0); // Unhandled button action
 	return std::string();
 }

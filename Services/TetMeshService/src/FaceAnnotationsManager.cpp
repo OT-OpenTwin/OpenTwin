@@ -53,7 +53,7 @@ void FaceAnnotationsManager::buildEntityNameToAnnotationsMap(void)
 	}
 }
 
-void FaceAnnotationsManager::buildFaceToAnnotationMap(const std::string &entityName, const TopoDS_Shape *shape)
+void FaceAnnotationsManager::buildFaceToAnnotationMap(const std::string &entityName, EntityBrep *brep)
 {
 	faceToAnnotationMap.clear();
 
@@ -61,7 +61,7 @@ void FaceAnnotationsManager::buildFaceToAnnotationMap(const std::string &entityN
 	for (auto annotation : entityNametoAnnotationsMap[entityName])
 	{
 		// Get a list of faces for this annotation
-		std::list<TopoDS_Shape> faceList = annotation->findFacesFromShape(shape);
+		std::list<TopoDS_Shape> faceList = annotation->findFacesFromShape(brep);
 
 		for (auto face : faceList)
 		{

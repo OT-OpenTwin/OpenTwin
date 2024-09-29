@@ -174,7 +174,7 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 			const TopoDS_Shape *shape = &((entity->getBrep()));
 			std::string entityName    = entity->getName().substr(getEntityMesh()->getName().size() + 1);
 
-			annotationsManager.buildFaceToAnnotationMap(entityName, shape);
+			annotationsManager.buildFaceToAnnotationMap(entityName, entity->getBrepEntity());
 			annotationsManager.buildIndexedFaceToAnnotationVector(shape);
 
 			stepWidthManager.buildIndexedFaceToStepSizeVector(entity, shape, properties);
