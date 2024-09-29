@@ -86,9 +86,7 @@ void ot::VersionGraphManager::removeVersions(const std::list<std::string>& _vers
 	this->updateCurrentGraph();
 }
 
-void ot::VersionGraphManager::updateCurrentGraph(void) {
-	m_graph->clear();
-
+void ot::VersionGraphManager::updateCurrentGraph(void) {	
 	if (m_modeSelector->currentText() == OT_VERSIONGRAPHMANAGER_AllMode) m_graph->setupFromConfig(m_config);
 	else if (m_modeSelector->currentText() == OT_VERSIONGRAPHMANAGER_CompactMode) this->updateCurrentGraphCompactMode();
 	else if (m_modeSelector->currentText() == OT_VERSIONGRAPHMANAGER_CompactWithLabelMode) this->updateCurrentGraphCompactLabelMode();

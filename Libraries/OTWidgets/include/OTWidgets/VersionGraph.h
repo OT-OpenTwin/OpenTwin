@@ -41,10 +41,12 @@ namespace ot {
 		void slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item);
 
 	private:
-		void centerOnVersion(const std::string& _versionName);
+		QRectF calculateFittedViewportRect(void) const;
+		void centerOnVersion(const QRectF& _oldRect);
 		VersionGraphItem* getVersion(const std::string& _name) const;
 		void highlightVersion(const std::string& _name);
 
+		QRectF m_lastViewportRect;
 		std::string m_activeVersion;
 		std::string m_activeVersionBranch;
 		VersionGraphItem* m_rootItem;

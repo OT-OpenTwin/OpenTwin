@@ -24,6 +24,10 @@ ot::VersionGraph::~VersionGraph() {
 }
 
 void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
+	if (m_rootItem) {
+		m_lastViewportRect = this->viewport()->rect().toRectF();
+	}
+
 	this->clear();
 
 	if (!_config.getRootVersion()) {
@@ -98,15 +102,16 @@ void ot::VersionGraph::slotUpdateVersionItems(void) {
 }
 
 void ot::VersionGraph::slotCenterOnActiveVersion(void) {
-	this->centerOnVersion(m_activeVersion);
+	this->centerOnVersion(m_lastViewportRect);
 }
 
 void ot::VersionGraph::slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item) {
 	Q_EMIT versionActivatRequest(_item->getGraphicsItemName());
 }
 
-void ot::VersionGraph::centerOnVersion(const std::string& _versionName) {
-	VersionGraphItem* item = this->getVersion(_versionName);
+QRectF ot::VersionGraph::calculateFittedViewportRect(void) const {
+	if (m_activeVersion.empty()) return QRectF();
+	VersionGraphItem* item = this->getVersion(m_activeVersion);
 	if (item) {
 		// Get the bounding rectangle of the item
 		QRectF itemRect = item->boundingRect();
@@ -129,13 +134,25 @@ void ot::VersionGraph::centerOnVersion(const std::string& _versionName) {
 		// Expand the rectangle
 		sceneRect.adjust(-10., -10., 10., 10.);
 
-		// Center the view on the item's bounding rectangle with margin
-		this->fitInView(sceneRect, Qt::KeepAspectRatio);
-		this->centerOn(sceneRect.center());
+		return sceneRect;
 	}
 	else {
-		OT_LOG_EAS("Version not found \"" + _versionName + "\"");
+		OT_LOG_EAS("Version not found \"" + m_activeVersion + "\"");
+		return QRectF();
 	}
+}
+
+void ot::VersionGraph::centerOnVersion(const QRectF& _oldRect) {
+	QRectF rect = this->calculateFittedViewportRect();
+
+	if (_oldRect.isValid()) {
+		rect.setSize(_oldRect.size().expandedTo(rect.size()));
+	}
+
+	// Center the view on the item's bounding rectangle with margin
+	this->fitInView(rect, Qt::KeepAspectRatio);
+	this->centerOn(rect.center());
+	this->ensureViewInBounds();
 }
 
 ot::VersionGraphItem* ot::VersionGraph::getVersion(const std::string& _name) const {
