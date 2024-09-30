@@ -17,7 +17,7 @@
 #include "TopoDS.hxx"
 #include "TopoDS_Shell.hxx"
 #include "BRepAlgoAPI_Defeaturing.hxx"
-#include <BRepFilletAPI_MakeFillet.hxx>
+#include <BRepFilletAPI_MakeChamfer.hxx>
 
 #include <map>
 #include <set>
@@ -66,7 +66,7 @@ bool ChamferEdges::performActualOperation(EntityGeometry* geometryEntity, Entity
 	history = nullptr;
 
 	// Perform the fillet operation
-	BRepFilletAPI_MakeFillet MF(baseBrep->getBrep());
+	BRepFilletAPI_MakeChamfer MC(baseBrep->getBrep());
 	TopExp_Explorer exp;
 
 	EntityPropertiesDouble* width = dynamic_cast<EntityPropertiesDouble*>(geometryEntity->getProperties().getProperty("#Chamfer width"));
@@ -78,14 +78,14 @@ bool ChamferEdges::performActualOperation(EntityGeometry* geometryEntity, Entity
 
 		if (allEdgesForOperation.count(edge.TShape()) != 0)
 		{
-			MF.Add(chamferWidth, TopoDS::Edge(exp.Current()));
+			MC.Add(chamferWidth, TopoDS::Edge(exp.Current()));
 			listOfProcessedEdges.Append(exp.Current());
 		}
 	}
 
 	try
 	{
-		shape = MF.Shape();
+		shape = MC.Shape();
 	}
 	catch (Standard_Failure)
 	{
@@ -95,7 +95,7 @@ bool ChamferEdges::performActualOperation(EntityGeometry* geometryEntity, Entity
 	TopTools_ListOfShape anArguments;
 	anArguments.Append(baseBrep->getBrep());
 
-	history = new BRepTools_History(anArguments, MF);
+	history = new BRepTools_History(anArguments, MC);
 
 	return true;
 }
