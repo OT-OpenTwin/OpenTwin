@@ -2294,27 +2294,6 @@ void AppBase::slotCreateProject(void) {
 		}
 	}
 
-	bool projectExists = false;
-	bool canBeDeleted = false;
-	if (projectManager.projectExists(currentName, canBeDeleted)) {
-		if (!canBeDeleted) {
-			// Notify that the project already exists and can not be deleted
-			QString msg{ "A project with the name \"" };
-			msg.append(currentName.c_str()).append("\" does already exist and belongs to another owner.");
-			ak::uiAPI::promptDialog::show(msg, "Create New Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
-			return;
-		}
-
-		QString msg("A project with the name \"");
-		msg.append(currentName.c_str());
-		msg.append("\" does already exist. Do you want to overwrite it?\nThis cannot be undone.");
-		if (dialogResult::resultYes != uiAPI::promptDialog::show(msg, "Create New Project", promptYesNoIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow())) {
-			return;
-		}
-
-		projectExists = true;
-	}
-
 	// Create new project dialog
 	ot::CreateProjectDialog newProjectDialog(this->mainWindow());
 
@@ -2352,7 +2331,23 @@ void AppBase::slotCreateProject(void) {
 	std::string projectType = newProjectDialog.getProjectType();
 	std::string templateName = newProjectDialog.getTemplateName(true);
 
-	if (projectExists) {
+	bool canBeDeleted = false;
+	if (projectManager.projectExists(currentName, canBeDeleted)) {
+		if (!canBeDeleted) {
+			// Notify that the project already exists and can not be deleted
+			QString msg{ "A project with the name \"" };
+			msg.append(currentName.c_str()).append("\" does already exist and belongs to another owner.");
+			ak::uiAPI::promptDialog::show(msg, "Create New Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+			return;
+		}
+
+		QString msg("A project with the name \"");
+		msg.append(currentName.c_str());
+		msg.append("\" does already exist. Do you want to overwrite it?\nThis cannot be undone.");
+		if (dialogResult::resultYes != uiAPI::promptDialog::show(msg, "Create New Project", promptYesNoIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow())) {
+			return;
+		}
+
 		// Check if the project it the same project as the currently open one
 		if (currentName == m_currentProjectName) {
 			m_ExternalServicesComponent->closeProject(false);
