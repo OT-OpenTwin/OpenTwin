@@ -47,7 +47,8 @@ namespace ot {
 				BOOLEAN_SUBTRACT,
 				BOOLEAN_INTERSECT,
 				TRANSFORM_SHAPES,
-				CHAMFER_EDGE
+				CHAMFER_EDGE,
+				BLEND_EDGE
 			};
 
 			UiComponent(

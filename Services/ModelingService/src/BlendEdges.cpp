@@ -1,4 +1,4 @@
-#include "ChamferEdges.h"
+#include "BlendEdges.h"
 #include "EntityGeometry.h"
 #include "EntityFaceAnnotation.h"
 #include "DataBase.h"
@@ -22,45 +22,45 @@
 #include <map>
 #include <set>
 
-ot::components::UiComponent::entitySelectionAction ChamferEdges::getSelectionAction()
+ot::components::UiComponent::entitySelectionAction BlendEdges::getSelectionAction()
 {
-	return ot::components::UiComponent::entitySelectionAction::CHAMFER_EDGE;
+	return ot::components::UiComponent::entitySelectionAction::BLEND_EDGE;
 }
 
-std::string ChamferEdges::getOperationDescription()
+std::string BlendEdges::getOperationDescription()
 {
-	return "chamfer";
+	return "blend";
 }
 
-std::string ChamferEdges::getVisibleTreeItemName()
+std::string BlendEdges::getVisibleTreeItemName()
 {
-	return "ChamferEdgesVisible";
+	return "BlendEdgesVisible";
 }
 
-std::string ChamferEdges::getHiddenTreeItemName()
+std::string BlendEdges::getHiddenTreeItemName()
 {
-	return "ChamferEdgesHidden";
+	return "BlendEdgesHidden";
 }
 
-std::string ChamferEdges::getShapeType()
+std::string BlendEdges::getShapeType()
 {
-	return "CHAMFER_EDGES";
+	return "BLEND_EDGES";
 }
 
-void ChamferEdges::addSpecificProperties(EntityGeometry* geometryEntity)
+void BlendEdges::addSpecificProperties(EntityGeometry* geometryEntity)
 {
-	addParametricProperty(geometryEntity, "Chamfer width", 0.0);
+	addParametricProperty(geometryEntity, "Blend radius", 0.0);
 }
 
-bool ChamferEdges::operationActive(EntityGeometry* geometryEntity)
+bool BlendEdges::operationActive(EntityGeometry* geometryEntity)
 {
-	EntityPropertiesDouble* width = dynamic_cast<EntityPropertiesDouble*>(geometryEntity->getProperties().getProperty("#Chamfer width"));
+	EntityPropertiesDouble* width = dynamic_cast<EntityPropertiesDouble*>(geometryEntity->getProperties().getProperty("#Blend radius"));
 	double chamferWidth = width->getValue();
 
 	return (chamferWidth != 0.0);
 }
 
-bool ChamferEdges::performActualOperation(EntityGeometry* geometryEntity, EntityBrep* baseBrep, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesForOperation, TopoDS_Shape& shape, TopTools_ListOfShape& listOfProcessedEdges, BRepTools_History*& history)
+bool BlendEdges::performActualOperation(EntityGeometry* geometryEntity, EntityBrep* baseBrep, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesForOperation, TopoDS_Shape& shape, TopTools_ListOfShape& listOfProcessedEdges, BRepTools_History*& history)
 {
 	listOfProcessedEdges.Clear();
 	history = nullptr;
@@ -69,7 +69,7 @@ bool ChamferEdges::performActualOperation(EntityGeometry* geometryEntity, Entity
 	BRepFilletAPI_MakeFillet MF(baseBrep->getBrep());
 	TopExp_Explorer exp;
 
-	EntityPropertiesDouble* width = dynamic_cast<EntityPropertiesDouble*>(geometryEntity->getProperties().getProperty("#Chamfer width"));
+	EntityPropertiesDouble* width = dynamic_cast<EntityPropertiesDouble*>(geometryEntity->getProperties().getProperty("#Blend radius"));
 	double chamferWidth = width->getValue();
 
 	for (exp.Init(baseBrep->getBrep(), TopAbs_EDGE); exp.More(); exp.Next())

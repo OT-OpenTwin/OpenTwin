@@ -14,6 +14,7 @@ class EntityCache;
 class PrimitiveManager;
 class BooleanOperations;
 class ChamferEdges;
+class BlendEdges;
 class ClassFactory;
 
 namespace ot
@@ -28,7 +29,7 @@ namespace ot
 class UpdateManager
 {
 public:
-	UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ChamferEdges* _chamferEdgesManager, ClassFactory *_classFactory);
+	UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ChamferEdges* _chamferEdgesManager, BlendEdges* _blendEdgesManager, ClassFactory *_classFactory);
 	~UpdateManager() {};
 
 	void checkParentUpdates(std::list<ot::UID> modifiedEntities);
@@ -42,6 +43,7 @@ private:
 	bool updateParent(const std::string& type, EntityGeometry* geomEntity, TopoDS_Shape& shape, std::map<ot::UID, ot::UID>& entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames);
 	bool updateBooleanParent(const std::string& type, EntityGeometry* geomEntity, TopoDS_Shape& shape, std::map<ot::UID, ot::UID>& entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames);
 	bool updateChamferEdgesParent(const std::string& type, EntityGeometry* geomEntity, TopoDS_Shape& shape, std::map<ot::UID, ot::UID>& entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames);
+	bool updateBlendEdgesParent(const std::string& type, EntityGeometry* geomEntity, TopoDS_Shape& shape, std::map<ot::UID, ot::UID>& entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames);
 
 	std::list<ot::UID> splitString(std::string value);
 
@@ -50,6 +52,7 @@ private:
 	PrimitiveManager *getPrimitiveManager(void) { assert(primitiveManager != nullptr); return primitiveManager; }
 	BooleanOperations* getBooleanOperations(void) { assert(booleanOperations != nullptr); return booleanOperations; }
 	ChamferEdges* getChamferEdgesManager(void) { assert(chamferEdgesManager != nullptr); return chamferEdgesManager; }
+	BlendEdges* getBlendEdgesManager(void) { assert(blendEdgesManager != nullptr); return blendEdgesManager; }
 
 	ot::components::UiComponent *uiComponent;
 	ot::components::ModelComponent *modelComponent;
@@ -57,5 +60,6 @@ private:
 	PrimitiveManager *primitiveManager;
 	BooleanOperations* booleanOperations;
 	ChamferEdges* chamferEdgesManager;
+	BlendEdges* blendEdgesManager;
 	ClassFactory* classFactory;
 };

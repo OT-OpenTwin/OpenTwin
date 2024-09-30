@@ -7,6 +7,7 @@
 #include "Transformations.h"
 #include "BooleanOperations.h"
 #include "ChamferEdges.h"
+#include "BlendEdges.h"
 #include "entityCache.h"
 #include "PrimitiveManager.h"
 
@@ -18,13 +19,14 @@
 
 #include "Application.h"
 
-UpdateManager::UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ChamferEdges* _chamferEdgesManager, ClassFactory* _classFactory) :
+UpdateManager::UpdateManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, EntityCache *_entityCache, PrimitiveManager *_primitiveManager, BooleanOperations *_booleanOperations, ChamferEdges* _chamferEdgesManager, BlendEdges* _blendEdgesManager, ClassFactory* _classFactory) :
 	uiComponent(_uiComponent),
 	modelComponent(_modelComponent),
 	entityCache(_entityCache),
 	primitiveManager(_primitiveManager),
 	booleanOperations(_booleanOperations),
 	chamferEdgesManager(_chamferEdgesManager),
+	blendEdgesManager(_blendEdgesManager),
 	classFactory(_classFactory)
 {
 
@@ -203,6 +205,10 @@ bool UpdateManager::updateParent(const std::string& type, EntityGeometry* geomEn
 	else if (type == "CHAMFER_EDGES")
 	{
 		return updateChamferEdgesParent(type, geomEntity, shape, entityVersionMap, resultFaceNames);
+	}
+	else if (type == "BLEND_EDGES")
+	{
+		return updateBlendEdgesParent(type, geomEntity, shape, entityVersionMap, resultFaceNames);
 	}
 	else
 	{
@@ -473,7 +479,7 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 	}
 
 	// Now check whether we have a primitive shape which can be updated below
-	if (!getPrimitiveManager()->isPrimitiveShape(typeProperty->getValue()) && typeProperty->getValue() != "CHAMFER_EDGES")
+	if (!getPrimitiveManager()->isPrimitiveShape(typeProperty->getValue()) && typeProperty->getValue() != "CHAMFER_EDGES" && typeProperty->getValue() != "BLEND_EDGES")
 	{
 		delete geomEntity;
 		geomEntity = nullptr;
@@ -503,6 +509,11 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 	{
 		std::map< const opencascade::handle<TopoDS_TShape>, std::string> resultFaceNames;
 		getChamferEdgesManager()->updateShape(geomEntity, shape, resultFaceNames);
+	}
+	else if (typeProperty->getValue() == "BLEND_EDGES")
+	{
+		std::map< const opencascade::handle<TopoDS_TShape>, std::string> resultFaceNames;
+		getBlendEdgesManager()->updateShape(geomEntity, shape, resultFaceNames);
 	}
 
 	gp_Trsf newTransform = Transformations::setTransform(geomEntity, shape, gp_Trsf());
@@ -550,5 +561,11 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 bool UpdateManager::updateChamferEdgesParent(const std::string& type, EntityGeometry* geomEntity, TopoDS_Shape& shape, std::map<ot::UID, ot::UID>& entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames)
 {
 	getChamferEdgesManager()->updateShape(geomEntity, shape, resultFaceNames);
+	return true;
+}
+
+bool UpdateManager::updateBlendEdgesParent(const std::string& type, EntityGeometry* geomEntity, TopoDS_Shape& shape, std::map<ot::UID, ot::UID>& entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames)
+{
+	getBlendEdgesManager()->updateShape(geomEntity, shape, resultFaceNames);
 	return true;
 }

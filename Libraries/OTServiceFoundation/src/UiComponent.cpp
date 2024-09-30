@@ -735,6 +735,7 @@ void ot::components::UiComponent::enterEntitySelectionMode(
 	case ot::components::UiComponent::BOOLEAN_INTERSECT: cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Selection_Action, JsonString("BOOLEAN_INTERSECT", cmdDoc.GetAllocator()), cmdDoc.GetAllocator()); break;
 	case ot::components::UiComponent::TRANSFORM_SHAPES: cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Selection_Action, JsonString("TRANSFORM", cmdDoc.GetAllocator()), cmdDoc.GetAllocator()); break;
 	case ot::components::UiComponent::CHAMFER_EDGE: cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Selection_Action, JsonString("CHAMFER_EDGE", cmdDoc.GetAllocator()), cmdDoc.GetAllocator()); break;
+	case ot::components::UiComponent::BLEND_EDGE: cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Selection_Action, JsonString("BLEND_EDGE", cmdDoc.GetAllocator()), cmdDoc.GetAllocator()); break;
 	default: assert(0); throw std::exception("Invalid action type");
 	}
 

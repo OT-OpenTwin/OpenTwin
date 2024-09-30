@@ -105,6 +105,12 @@
     <ClCompile Include="src\ChamferEdges.cpp">
       <Filter>Source Files\Operations</Filter>
     </ClCompile>
+    <ClCompile Include="src\EdgesOperationBase.cpp">
+      <Filter>Source Files\Operations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlendEdges.cpp">
+      <Filter>Source Files\Operations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -168,6 +174,12 @@
       <Filter>Header Files\Operations</Filter>
     </ClInclude>
     <ClInclude Include="include\ChamferEdges.h">
+      <Filter>Header Files\Operations</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EdgesOperationBase.h">
+      <Filter>Header Files\Operations</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlendEdges.h">
       <Filter>Header Files\Operations</Filter>
     </ClInclude>
   </ItemGroup>

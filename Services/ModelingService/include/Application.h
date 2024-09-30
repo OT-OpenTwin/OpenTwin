@@ -30,6 +30,7 @@ class BooleanOperations;
 class UpdateManager;
 class Transformations;
 class ChamferEdges;
+class BlendEdges;
 class SimplifyRemoveFaces;
 class STEPReader;
 
@@ -133,6 +134,7 @@ private:
 	UpdateManager       *getUpdateManager(void);
 	Transformations     *getTransformationManager(void);
 	ChamferEdges        *getChamferEdgesManager(void);
+	BlendEdges          *getBlendEdgesManager(void);
 	SimplifyRemoveFaces *getRemoveFacesOperation(void);
 	STEPReader			*getSTEPReader(void);
 
@@ -143,6 +145,7 @@ private:
 	UpdateManager       *updateManager;
 	Transformations     *transformationManager;
 	ChamferEdges        *chamferEdges;
+	BlendEdges          *blendEdges;
 	SimplifyRemoveFaces *removeFaces;
 	STEPReader			*stepReader;
 

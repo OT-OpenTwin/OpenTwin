@@ -25,6 +25,7 @@
 #include "Transformations.h"
 #include "UpdateManager.h"
 #include "ChamferEdges.h"
+#include "BlendEdges.h"
 #include "SimplifyRemoveFaces.h"
 #include "ModalCommandHealing.h"
 
@@ -133,7 +134,8 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		else if (action == "Modeling:Modify:Boolean Subtract")  { getBooleanOperations()->enterSubtractMode(getSelectedGeometryEntities()); }
 		else if (action == "Modeling:Modify:Boolean Intersect") { getBooleanOperations()->enterIntersectMode(getSelectedGeometryEntities()); }
 		else if (action == "Modeling:Modify:Transform")         { getTransformationManager()->enterTransformMode(getSelectedGeometryEntities()); }
-		else if (action == "Modeling:Modify:Chamfer Edges")     { getChamferEdgesManager()->enterChamferEdgesMode(); }
+		else if (action == "Modeling:Modify:Chamfer Edges")     { getChamferEdgesManager()->enterSelectEdgesMode(); }
+		else if (action == "Modeling:Modify:Blend Edges")       { getBlendEdgesManager()->enterSelectEdgesMode(); }
 		else if (action == "Modeling:Repair:Remove Faces")      { getRemoveFacesOperation()->enterRemoveFacesMode(); }
 		else if (action == "Modeling:Repair:Heal")			    { new ModalCommandHealing(this, "Modeling", "Modeling:Repair:Heal"); }
 		else if (action == "Modeling:Import:STEP")			    { importSTEP(); }
@@ -191,6 +193,10 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		else if (selectionAction == "CHAMFER_EDGE")
 		{
 			getChamferEdgesManager()->performOperation(selectionInfo);
+		}
+		else if (selectionAction == "BLEND_EDGE")
+		{
+			getBlendEdgesManager()->performOperation(selectionInfo);
 		}
 		else
 		{
@@ -259,6 +265,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_ui->addMenuButton("Modeling", "Modify", "Transform", "Transform", lockTypes, "Transform", "Default", "");
 	_ui->addMenuButton("Modeling", "Modify", "Chamfer Edges", "Chamfer Edges", lockTypes, "ChamferEdges", "Default", "");
+	_ui->addMenuButton("Modeling", "Modify", "Blend Edges", "Blend Edges", lockTypes, "BlendEdges", "Default", "");
 
 	_ui->addMenuButton("Modeling", "Repair", "Remove Faces", "Remove Faces", lockTypes, "RemoveFace", "Default", "");
 	_ui->addMenuButton("Modeling", "Repair", "Heal", "Heal", lockTypes, "Healing", "Default", "");
@@ -432,7 +439,7 @@ UpdateManager *Application::getUpdateManager(void)
 { 
 	if (updateManager == nullptr)
 	{
-		updateManager = new UpdateManager(m_uiComponent, m_modelComponent, &entityCache, getPrimitiveManager(), getBooleanOperations(), getChamferEdgesManager(), & getClassFactory());
+		updateManager = new UpdateManager(m_uiComponent, m_modelComponent, &entityCache, getPrimitiveManager(), getBooleanOperations(), getChamferEdgesManager(), getBlendEdgesManager(), &getClassFactory());
 	}
 
 	return updateManager; 
@@ -459,6 +466,18 @@ ChamferEdges* Application::getChamferEdgesManager(void)
 
 	return chamferEdges;
 }
+
+BlendEdges* Application::getBlendEdgesManager(void)
+{
+	if (blendEdges == nullptr)
+	{
+		blendEdges = new BlendEdges(m_uiComponent, m_modelComponent, serviceID(), serviceName(), &entityCache, &getClassFactory());
+		blendEdges->setUpdateManager(getUpdateManager());
+	}
+
+	return blendEdges;
+}
+
 
 SimplifyRemoveFaces *Application::getRemoveFacesOperation(void)
 {
