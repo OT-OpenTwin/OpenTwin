@@ -1114,7 +1114,7 @@ std::string NGSpice::generateNetlistTRANSimulation(EntityBase* solverEntity, std
 	std::string simulationLine = "";
 	std::string type = ".TRAN";
 
-	simulationLine = type + " " + duration->getValue() + " " + timeSteps->getValue();
+	simulationLine = type  + " " + timeSteps->getValue() + " " + duration->getValue();
 
 	return simulationLine;
 }
