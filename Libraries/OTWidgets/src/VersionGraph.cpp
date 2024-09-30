@@ -71,10 +71,6 @@ bool ot::VersionGraph::isVersionIsEndOfBranch(const std::string& _versionName) c
 	}
 }
 
-void ot::VersionGraph::showEvent(QShowEvent* _event) {
-	QMetaObject::invokeMethod(this, &VersionGraph::slotUpdateVersionItems, Qt::QueuedConnection);
-}
-
 void ot::VersionGraph::slotSelectionChanged(void) {
 	std::list<ot::GraphicsItem*> selection = this->getSelectedGraphicsItems();
 	if (selection.size() > 1) {
@@ -102,11 +98,28 @@ void ot::VersionGraph::slotUpdateVersionItems(void) {
 }
 
 void ot::VersionGraph::slotCenterOnActiveVersion(void) {
-	this->centerOnVersion(m_lastViewportRect);
+	QRectF rect = this->calculateFittedViewportRect();
+
+	if (m_lastViewportRect.isValid()) {
+		rect.setSize(m_lastViewportRect.size().expandedTo(rect.size()));
+	}
+
+	// Center the view on the item's bounding rectangle with margin
+	this->fitInView(rect, Qt::KeepAspectRatio);
+	this->centerOn(rect.center());
+	this->ensureViewInBounds();
+
+	m_lastViewportRect = rect;
 }
 
 void ot::VersionGraph::slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item) {
 	Q_EMIT versionActivatRequest(_item->getGraphicsItemName());
+}
+
+void ot::VersionGraph::showEvent(QShowEvent* _event) {
+	if (!m_activeVersion.empty()) {
+		QMetaObject::invokeMethod(this, &VersionGraph::slotCenterOnActiveVersion, Qt::QueuedConnection);
+	}
 }
 
 QRectF ot::VersionGraph::calculateFittedViewportRect(void) const {
@@ -140,19 +153,6 @@ QRectF ot::VersionGraph::calculateFittedViewportRect(void) const {
 		OT_LOG_EAS("Version not found \"" + m_activeVersion + "\"");
 		return QRectF();
 	}
-}
-
-void ot::VersionGraph::centerOnVersion(const QRectF& _oldRect) {
-	QRectF rect = this->calculateFittedViewportRect();
-
-	if (_oldRect.isValid()) {
-		rect.setSize(_oldRect.size().expandedTo(rect.size()));
-	}
-
-	// Center the view on the item's bounding rectangle with margin
-	this->fitInView(rect, Qt::KeepAspectRatio);
-	this->centerOn(rect.center());
-	this->ensureViewInBounds();
 }
 
 ot::VersionGraphItem* ot::VersionGraph::getVersion(const std::string& _name) const {

@@ -71,6 +71,8 @@ namespace ot {
 		void clear(void);
 
 	private:
+		void addVersionAndChildsToArray(const VersionGraphVersionCfg* _version, JsonArray& _versionsArray, JsonAllocator& _allocator) const;
+
 		std::string m_activeVersionName;
 		std::string m_activeBranchVersionName;
 		VersionGraphVersionCfg* m_rootVersion;

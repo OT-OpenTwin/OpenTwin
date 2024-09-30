@@ -970,7 +970,7 @@ void Model::setVisualizationModel(ot::UID visModelID)
 	}
 	else
 	{
-		assert(0); // The ui needs to be available before the visualization model is set.
+		OT_LOG_EA("UI needs to be available before the visualization model is set");
 	}
 }
 
@@ -3802,7 +3802,7 @@ void Model::projectOpen()
 
 void Model::updateVersionGraph(void)
 {
-	if (isUIAvailable() && !versionGraphCreated && 	visualizationModelID != 0)
+	if (isUIAvailable() && !versionGraphCreated && visualizationModelID != 0)
 	{
 		enableQueuingHttpRequests(true);
 
@@ -4019,10 +4019,8 @@ void Model::uiIsAvailable(void)
 	enableQueuingHttpRequests(false);
 }
 
-void Model::sendVersionGraphToUI(const ot::VersionGraphCfg& _versionGraph, const std::string& _currentVersion, std::string _activeBranch)
-{
-	if (visualizationModelID != 0)
-	{
+void Model::sendVersionGraphToUI(const ot::VersionGraphCfg& _versionGraph, const std::string& _currentVersion, std::string _activeBranch) {
+	if (visualizationModelID != 0) {
 		versionGraphCreated = true;
 
 		// Add the first version to the active branch version so the graph can find the version

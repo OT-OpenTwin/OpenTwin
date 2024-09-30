@@ -30,6 +30,8 @@ namespace ot {
 
 		void addVersion(const std::string& _parentVersionName, const VersionGraphVersionCfg& _config);
 
+		VersionGraphVersionCfg* addVersion(const ConstJsonObject& _versionConfig);
+
 		void activateVersion(const std::string& _versionName, const std::string& _activeBranchVersionName);
 
 		void removeVersion(const std::string& _versionName);

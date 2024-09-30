@@ -68,6 +68,15 @@ void ot::VersionGraphManager::addVersion(const std::string& _parentVersionName, 
 	
 }
 
+ot::VersionGraphVersionCfg* ot::VersionGraphManager::addVersion(const ConstJsonObject& _versionConfig) {
+	VersionGraphVersionCfg* newVersion = new VersionGraphVersionCfg;
+	if (!newVersion->setFromJsonObject(_versionConfig, &m_config)) {
+		delete newVersion;
+		newVersion = nullptr;
+	}
+	return newVersion;
+}
+
 void ot::VersionGraphManager::activateVersion(const std::string& _versionName, const std::string& _activeBranchVersionName) {
 	m_config.setActiveVersionName(_versionName);
 	m_config.setActiveBranchVersionName(_activeBranchVersionName);

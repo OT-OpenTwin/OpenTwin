@@ -3651,13 +3651,11 @@ std::string ExternalServicesComponent::handleAddAndActivateVersionGraphVersion(o
 	}
 
 	std::string activeBranch = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
-	std::string parentVersion = ot::json::getString(_document, OT_ACTION_PARAM_Parent);
-
-	ot::VersionGraphVersionCfg version;
-	version.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
-
-	graphManager->addVersion(parentVersion, version);
-	graphManager->activateVersion(version.getName(), activeBranch);
+	
+	ot::VersionGraphVersionCfg* newVersion = graphManager->addVersion(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	if (newVersion) {
+		graphManager->activateVersion(newVersion->getName(), activeBranch);
+	}
 
 	return "";
 }

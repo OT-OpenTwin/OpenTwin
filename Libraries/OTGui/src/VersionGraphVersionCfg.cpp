@@ -4,6 +4,8 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
+#include "OTGui/VersionGraphCfg.h"
 #include "OTGui/VersionGraphVersionCfg.h"
 
 ot::VersionGraphVersionCfg::VersionGraphVersionCfg() 
@@ -55,31 +57,44 @@ void ot::VersionGraphVersionCfg::addToJsonObject(ot::JsonValue& _object, ot::Jso
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 	_object.AddMember("Label", JsonString(m_label, _allocator), _allocator);
 	_object.AddMember("Description", JsonString(m_description, _allocator), _allocator);
-	_object.AddMember("ParentHidden", m_directParentIsHidden, _allocator);
-
-	JsonArray childArr;
-	for (const VersionGraphVersionCfg* child : m_childVersions) {
-		JsonObject childObj;
-		child->addToJsonObject(childObj, _allocator);
-		childArr.PushBack(childObj, _allocator);
+	if (m_parentVersion) {
+		_object.AddMember("ParentVersion", JsonString(m_parentVersion->getName(), _allocator), _allocator);
 	}
-	_object.AddMember("Childs", childArr, _allocator);
+	else {
+		_object.AddMember("ParentVersion", JsonNullValue(), _allocator);
+	}
+	
 }
 
-void ot::VersionGraphVersionCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
+bool ot::VersionGraphVersionCfg::setFromJsonObject(const ot::ConstJsonObject& _object, VersionGraphCfg* _graph) {
 	this->clear();
 
 	m_name = json::getString(_object, "Name");
 	m_label = json::getString(_object, "Label");
 	m_description = json::getString(_object, "Description");
-	m_directParentIsHidden = json::getBool(_object, "ParentHidden");
 
-	std::list<ConstJsonObject> childArr = json::getObjectList(_object, "Childs");
-	for (const ConstJsonObject& childObj : childArr) {
-		VersionGraphVersionCfg* child = new VersionGraphVersionCfg;
-		child->setFromJsonObject(childObj);
-		child->setParentVersion(this);
-		m_childVersions.push_back(child);
+	if (_graph->findVersion(m_name)) {
+		OT_LOG_E("Graph already has version \"" + m_name + "\"");
+		return false;
+	}
+
+	if (_object.HasMember("ParentVersion")) {
+		if (_object["ParentVersion"].IsString()) {
+			VersionGraphVersionCfg* parent = _graph->findVersion(_object["ParentVersion"].GetString());
+			if (!parent) {
+				OT_LOG_EA("Parent version not found");
+				return false;
+			}
+			parent->addChildVersion(this);
+		}
+		else {
+			_graph->setRootVersion(this);
+		}
+		return true;
+	}
+	else {
+		OT_LOG_EA("ParentVersion is missing");
+		return false;
 	}
 }
 

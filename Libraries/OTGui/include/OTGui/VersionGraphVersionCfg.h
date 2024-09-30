@@ -17,7 +17,9 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT VersionGraphVersionCfg : public Serializable {
+	class VersionGraphCfg;
+
+	class OT_GUI_API_EXPORT VersionGraphVersionCfg {
 	public:
 		VersionGraphVersionCfg();
 		VersionGraphVersionCfg(const std::string& _name, const std::string& _label = std::string(), const std::string& _description = std::string());
@@ -26,15 +28,10 @@ namespace ot {
 
 		VersionGraphVersionCfg& operator = (const VersionGraphVersionCfg& _other);
 
-		//! \brief Add the object contents to the provided JSON object.
-		//! \param _object Json object reference to write the data to.
-		//! \param _allocator Allocator.
-		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
+		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 
-		//! \brief Set the object contents from the provided JSON object.
-		//! \param _object The JSON object containing the information.
-		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
-		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
+		//! \return Returns true if the version was added to the version graph.
+		bool setFromJsonObject(const ot::ConstJsonObject& _object, VersionGraphCfg* _graph);
 
 		//! \see getName
 		void setName(const std::string& _name) { m_name = _name; };

@@ -31,18 +31,17 @@ namespace ot {
 		void versionSelected(const std::string& _versionName);
 		void versionActivatRequest(const std::string& _versionName);
 
-	protected:
-		virtual void showEvent(QShowEvent* _event) override;
-
 	public Q_SLOTS:
 		void slotSelectionChanged(void);
 		void slotUpdateVersionItems(void);
 		void slotCenterOnActiveVersion(void);
 		void slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item);
 
+	protected:
+		virtual void showEvent(QShowEvent* _event) override;
+
 	private:
 		QRectF calculateFittedViewportRect(void) const;
-		void centerOnVersion(const QRectF& _oldRect);
 		VersionGraphItem* getVersion(const std::string& _name) const;
 		void highlightVersion(const std::string& _name);
 
