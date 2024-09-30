@@ -194,7 +194,25 @@ void UpdateManager::updateSingleParent(ot::UID entityID, ot::UID entityVersion, 
 	geomEntity = nullptr;
 }
 
-bool UpdateManager::updateParent(const std::string &type, EntityGeometry *geomEntity, TopoDS_Shape &shape, std::map<ot::UID, ot::UID> &entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string> &resultFaceNames)
+bool UpdateManager::updateParent(const std::string& type, EntityGeometry* geomEntity, TopoDS_Shape& shape, std::map<ot::UID, ot::UID>& entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames)
+{
+	if (type == "BOOLEAN_ADD" || type == "BOOLEAN_SUBTRACT" || type == "BOOLEAN_INTERSECT")
+	{
+		return updateBooleanParent(type, geomEntity, shape, entityVersionMap, resultFaceNames);
+	}
+	else if (type == "CHAMFER_EDGES")
+	{
+		return updateChamferEdgesParent(type, geomEntity, shape, entityVersionMap, resultFaceNames);
+	}
+	else
+	{
+		uiComponent->displayMessage("ERROR: Unable to update the parent shape: " + geomEntity->getName() + " (unknown shape type: " + type +")\n\n");
+	}
+
+	return false;
+}
+
+bool UpdateManager::updateBooleanParent(const std::string &type, EntityGeometry *geomEntity, TopoDS_Shape &shape, std::map<ot::UID, ot::UID> &entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string> &resultFaceNames)
 {
 	// First, get information about the base and tool properties
 	EntityPropertiesString *baseShapeProperty = dynamic_cast<EntityPropertiesString*>(geomEntity->getProperties().getProperty("baseShape"));
@@ -455,7 +473,7 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 	}
 
 	// Now check whether we have a primitive shape which can be updated below
-	if (!getPrimitiveManager()->isPrimitiveShape(typeProperty->getValue()) && typeProperty->getValue() != "Chamfer Edges")
+	if (!getPrimitiveManager()->isPrimitiveShape(typeProperty->getValue()) && typeProperty->getValue() != "CHAMFER_EDGES")
 	{
 		delete geomEntity;
 		geomEntity = nullptr;
@@ -481,9 +499,10 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 	{
 		getPrimitiveManager()->updateShape(typeProperty->getValue(), geomEntity, shape);
 	}
-	else if (typeProperty->getValue() == "Chamfer Edges")
+	else if (typeProperty->getValue() == "CHAMFER_EDGES")
 	{
-		getChamferEdgesManager()->updateShape(geomEntity, shape);
+		std::map< const opencascade::handle<TopoDS_TShape>, std::string> resultFaceNames;
+		getChamferEdgesManager()->updateShape(geomEntity, shape, resultFaceNames);
 	}
 
 	gp_Trsf newTransform = Transformations::setTransform(geomEntity, shape, gp_Trsf());
@@ -528,3 +547,8 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 	geomEntity = nullptr;
 }
 
+bool UpdateManager::updateChamferEdgesParent(const std::string& type, EntityGeometry* geomEntity, TopoDS_Shape& shape, std::map<ot::UID, ot::UID>& entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames)
+{
+	getChamferEdgesManager()->updateShape(geomEntity, shape, resultFaceNames);
+	return true;
+}

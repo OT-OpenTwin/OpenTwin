@@ -39,7 +39,9 @@ public:
 private:
 	std::list<ot::UID> updateParents(std::list<ot::UID> &entityIDs, std::list<ot::UID> &entityInfoIdList, std::list<ot::UID> &entityInfoVersionList, std::list<ot::UID> &brepVersions);
 	void updateSingleParent(ot::UID entityID, ot::UID entityVersion, std::map<ot::UID, ot::UID> &entityVersionMap, std::list<ot::UID> &modifiedEntities);
-	bool updateParent(const std::string &type, EntityGeometry *geomEntity, TopoDS_Shape &shape, std::map<ot::UID, ot::UID> &entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string> &resultFaceNames);
+	bool updateParent(const std::string& type, EntityGeometry* geomEntity, TopoDS_Shape& shape, std::map<ot::UID, ot::UID>& entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames);
+	bool updateBooleanParent(const std::string& type, EntityGeometry* geomEntity, TopoDS_Shape& shape, std::map<ot::UID, ot::UID>& entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames);
+	bool updateChamferEdgesParent(const std::string& type, EntityGeometry* geomEntity, TopoDS_Shape& shape, std::map<ot::UID, ot::UID>& entityVersionMap, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames);
 
 	std::list<ot::UID> splitString(std::string value);
 

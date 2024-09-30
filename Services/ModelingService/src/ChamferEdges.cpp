@@ -148,11 +148,11 @@ void ChamferEdges::performOperation(const std::string &selectionInfo)
 
 	if (typeProperty != nullptr)
 	{
-		typeProperty->setValue("Chamfer Edges");
+		typeProperty->setValue("CHAMFER_EDGES");
 	}
 	else
 	{
-		typeProperty = new EntityPropertiesString("shapeType", "Chamfer Edges");
+		typeProperty = new EntityPropertiesString("shapeType", "CHAMFER_EDGES");
 		typeProperty->setVisible(false);
 		geometryEntity->getProperties().createProperty(typeProperty, "Internal");
 	}
@@ -237,7 +237,7 @@ std::list<ChamferEdgesData> ChamferEdges::readEdgeListFromProperties(EntityPrope
 	return edgeList;
 }
 
-void ChamferEdges::updateShape(EntityGeometry* geometryEntity, TopoDS_Shape& shape)
+void ChamferEdges::updateShape(EntityGeometry* geometryEntity, TopoDS_Shape& shape, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames)
 {
 	EntityPropertiesString* baseShapeProperty = dynamic_cast<EntityPropertiesString*>(geometryEntity->getProperties().getProperty("baseShape"));
 	assert(baseShapeProperty != nullptr);
@@ -258,10 +258,10 @@ void ChamferEdges::updateShape(EntityGeometry* geometryEntity, TopoDS_Shape& sha
 
 	EntityBrep* baseBrep = dynamic_cast<EntityBrep*>(entityCache->getEntity(brepID, brepVersion));
 
-	performOperation(geometryEntity, baseBrep, shape);
+	performOperation(geometryEntity, baseBrep, shape, resultFaceNames);
 }
 
-void ChamferEdges::performOperation(EntityGeometry* geometryEntity, EntityBrep* baseBrep, TopoDS_Shape& shape)
+void ChamferEdges::performOperation(EntityGeometry* geometryEntity, EntityBrep* baseBrep, TopoDS_Shape& shape, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames)
 {
 	std::list<ChamferEdgesData> edgeList = readEdgeListFromProperties(geometryEntity->getProperties());
 
@@ -394,7 +394,7 @@ void ChamferEdges::performOperation(EntityGeometry* geometryEntity, EntityBrep* 
 
 		// Apply the face names
 		BRepTools_History aHistory(anArguments, MF);
-		std::map< const opencascade::handle<TopoDS_TShape>, std::string> resultFaceNames;
+		resultFaceNames.clear();
 
 		// First, we assign the names to all unchanged faces
 		for (exp.Init(shape, TopAbs_FACE); exp.More(); exp.Next())

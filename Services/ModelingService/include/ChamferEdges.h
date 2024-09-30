@@ -3,6 +3,8 @@
 #include "Types.h"
 #include "ShapesBase.h"
 
+#include "TopoDS_TShape.hxx"
+
 class Model;
 class EntityGeometry;
 class EntityBrep;
@@ -39,13 +41,14 @@ public:
 
 	void enterChamferEdgesMode(void);
 	void performOperation(const std::string &selectionInfo);
-	void updateShape(EntityGeometry* geometryEntity, TopoDS_Shape& shape);
+
+	void updateShape(EntityGeometry* geometryEntity, TopoDS_Shape& shape, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames);
 
 private:
 	UpdateManager *getUpdateManager(void) { assert(updateManager != nullptr); return updateManager; }
-	void performOperation(EntityGeometry* geometryEntity, EntityBrep* baseBrep, TopoDS_Shape& shape);
 	void storeEdgeListInProperties(std::list<ChamferEdgesData>& edgeList, EntityProperties& properties);
 	std::list<ChamferEdgesData> readEdgeListFromProperties(EntityProperties& properties);
-	
+	void performOperation(EntityGeometry* geometryEntity, EntityBrep* baseBrep, TopoDS_Shape& shape, std::map< const opencascade::handle<TopoDS_TShape>, std::string>& resultFaceNames);
+
 	UpdateManager *updateManager;
 };
