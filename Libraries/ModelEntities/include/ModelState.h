@@ -202,7 +202,7 @@ private:
 	std::string getParentBranch(const std::string &branch);
 
 	// Activate the branch which contains the given version
-	void activateBranch(const std::string &version);
+	void activateBranch(const std::string& _version);
 
 	//! \brief Returns true if the specified version has at least one child.
 	bool hasNextVersion(const std::string& _version);

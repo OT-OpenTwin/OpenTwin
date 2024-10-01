@@ -996,15 +996,17 @@ void ExternalServicesComponent::requestUpdateVTKEntity(unsigned long long modelE
 	}
 }
 
-void ExternalServicesComponent::activateVersion(const std::string &version)
+void ExternalServicesComponent::activateVersion(const std::string& _version)
 {
 	try {
 
 		if (this->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL) != nullptr)
 		{
+			OT_LOG_D("Version requested { \"Version\": \"" + _version + "\" }");
+
 			ot::JsonDocument doc;
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ActivateVersion, doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(_version, doc.GetAllocator()), doc.GetAllocator());
 			std::string response;
 
 			this->sendHttpRequest(EXECUTE, this->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL)->serviceURL(), doc, response);
@@ -1017,8 +1019,11 @@ void ExternalServicesComponent::activateVersion(const std::string &version)
 			}
 		}
 	}
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
+	}
 	catch (...) {
-		assert(0); // Error handling
+		OT_LOG_EA("[FATAL] Unknown error");
 	}
 }
 
@@ -3623,6 +3628,8 @@ std::string ExternalServicesComponent::handleSetVersionGraphActive(ot::JsonDocum
 
 	std::string activeVersion = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_ACTIVE);
 	std::string activeBranch = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
+
+	OT_LOG_D("Activating version { \"Version\": \"" + activeVersion + "\", \"Branch\": \"" + activeBranch + "\" }");
 
 	graphManager->activateVersion(activeVersion, activeBranch);
 

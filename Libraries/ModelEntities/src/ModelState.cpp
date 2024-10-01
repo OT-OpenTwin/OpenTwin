@@ -243,6 +243,8 @@ void ModelState::removeEntity(ModelStateEntity::EntityID entityID, bool consider
 
 bool ModelState::loadModelState(const std::string& _version)
 {
+	OT_LOG_D("Loading model state { \"Version\": \"" + _version + "\" }");
+
 	if (!isVersionInActiveBranch(_version))
 	{
 		activateBranch(_version);
@@ -265,6 +267,7 @@ bool ModelState::loadModelState(const std::string& _version)
 	if (!loadModelFromDocument(result->view()))
 	{
 		// The model state could not be loaded
+		OT_LOG_E("Failed to load model state { \"Version\": \"" + _version + "\" }");
 		return false;
 	}
 
@@ -452,7 +455,7 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 			if (nextVersion.empty())
 			{
 				// We have reached the end of the list without finding the desired version -> this should not happen
-				assert(0);
+				OT_LOG_EAS("Failed to find version { \"Version\": \"" + incrementalStateVersion + "\" }");
 				return false;
 			}
 
@@ -463,8 +466,10 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 			auto filterDoc = bsoncxx::builder::basic::document{};
 
 			auto result = docBase.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
-			if (!result) return false; // Model state not found
-
+			if (!result) {
+				OT_LOG_EAS("Model state not found { \"Version\": \"" + incrementalStateVersion + "\" }");
+				return false; // Model state not found
+			}
 			loadIncrementalState(result->view());
 
 		} while (nextVersion != incrementalStateVersion);
@@ -473,7 +478,7 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 	}
 	else
 	{
-		assert(0); // Unknown storage type
+		OT_LOG_EA("Unknown storage type");
 		return false;
 	}
 }
@@ -533,9 +538,15 @@ bool ModelState::loadIncrementalState(bsoncxx::document::view docView)
 
 bool ModelState::loadState(bsoncxx::document::view docView, const std::string &expectedType)
 {
-	assert(docView["SchemaType"].get_utf8().value.data() == std::string("ModelState"));
-	assert(docView["SchemaVersion_ModelState"].get_int32() == 1);
-	assert(docView["Type"].get_utf8().value.data() == expectedType);
+	if (docView["SchemaType"].get_utf8().value.data() != std::string("ModelState")) {
+		OT_LOG_EAS("ShemaType \"ModelState\" not found");
+	}
+	if (docView["SchemaVersion_ModelState"].get_int32() != 1) {
+		OT_LOG_EAS("Invalid \"SchemaVersion_ModelState\": (" + std::to_string(docView["SchemaVersion_ModelState"].get_int32()) + ")");
+	}
+	if (docView["Type"].get_utf8().value.data() != expectedType) {
+		OT_LOG_EAS("Invalid type { \"ExpectedType\": \"" + expectedType + "\", \"ActualType\": \"" + docView["Type"].get_utf8().value.data() + "\" }");
+	}
 
 	m_graphCfg.setActiveVersionName(docView["Version"].get_utf8().value.data());
 
@@ -1529,11 +1540,11 @@ int ModelState::countNumberOfDots(const std::string& _text)
 	return count;
 }
 
-void ModelState::activateBranch(const std::string &version)
+void ModelState::activateBranch(const std::string& _version)
 {
 	// We need to remove the last . part from the version in order to obtain the branch
 
-	int index = version.rfind('.');
+	int index = _version.rfind('.');
 
 	if (index == std::string::npos)
 	{
@@ -1543,7 +1554,7 @@ void ModelState::activateBranch(const std::string &version)
 	else
 	{
 		// We are in a child branch
-		m_graphCfg.setActiveBranchVersionName(version.substr(0, index));
+		m_graphCfg.setActiveBranchVersionName(_version.substr(0, index));
 	}
 }
 

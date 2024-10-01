@@ -151,7 +151,7 @@ public:
 	bool sendKeySequenceActivatedMessage(KeyboardCommandHandler * _sender);
 	void sendRubberbandResultsToService(ot::serviceID_t _serviceId, const std::string& _note, const std::string& _pointJson, const std::vector<double> &transform);
 	void requestUpdateVTKEntity(unsigned long long modelEntityID);
-	void activateVersion(const std::string &version);
+	void activateVersion(const std::string& _version);
 
 	// ###################################################################################################
 
