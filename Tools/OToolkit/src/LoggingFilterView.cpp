@@ -53,8 +53,7 @@ LoggingFilterView::LoggingFilterView()
 	QLabel* messageFilterL = new QLabel("Message contains:");
 	m_messageFilter = new QLineEdit;
 	m_messageFilter->setPlaceholderText("<Confirm by pressing return>");
-	m_messageFilter->setMinimumWidth(250);
-
+	
 	m_userFilter = new QComboBox;
 	m_userFilter->addItem(LFV_Filter_AllNames);
 	filterByUserLayout->addWidget(m_userFilter);
