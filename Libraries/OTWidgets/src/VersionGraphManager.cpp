@@ -118,12 +118,14 @@ void ot::VersionGraphManager::startProcessCompact(bool _includeLabeledVersions) 
 	newConfig.setActiveVersionName(m_config.getActiveVersionName());
 
 	// Determine branch version
-	VersionGraphVersionCfg* branchVersion = m_config.getRootVersion()->findVersion(m_config.getActiveBranchVersionName());
-	if (branchVersion) {
-		newConfig.setActiveBranchVersionName(branchVersion->getLastBranchVersion()->getName());
-	}
-	else {
-		OT_LOG_E("Branch version not found");
+	if (!m_config.getActiveBranchVersionName().empty()) {
+		VersionGraphVersionCfg* branchVersion = m_config.findVersion(m_config.getActiveBranchVersionName());
+		if (branchVersion) {
+			newConfig.setActiveBranchVersionName(branchVersion->getLastBranchVersion()->getName());
+		}
+		else {
+			OT_LOG_EAS("Branch version not found: \"" + m_config.getActiveBranchVersionName() + "\"");
+		}
 	}
 
 	// Copy root config
