@@ -123,7 +123,7 @@ void ot::VersionGraphCfg::clear(void) {
 void ot::VersionGraphCfg::addVersionAndChildsToArray(const VersionGraphVersionCfg* _version, JsonArray& _versionsArray, JsonAllocator& _allocator) const {
 	if (_version) {
 		JsonObject obj;
-		_version->addToJsonObject(obj, _allocator);
+		_version->addToJsonObject(obj, _allocator, "");
 		_versionsArray.PushBack(obj, _allocator);
 		for (VersionGraphVersionCfg* child : _version->getChildVersions()) {
 			this->addVersionAndChildsToArray(child, _versionsArray, _allocator);

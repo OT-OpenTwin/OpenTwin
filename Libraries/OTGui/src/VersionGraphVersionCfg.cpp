@@ -53,11 +53,14 @@ ot::VersionGraphVersionCfg& ot::VersionGraphVersionCfg::operator = (const Versio
 	return *this;
 }
 
-void ot::VersionGraphVersionCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+void ot::VersionGraphVersionCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator, const std::string& _customParentVersion) const {
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 	_object.AddMember("Label", JsonString(m_label, _allocator), _allocator);
 	_object.AddMember("Description", JsonString(m_description, _allocator), _allocator);
-	if (m_parentVersion) {
+	if (!_customParentVersion.empty()) {
+		_object.AddMember("ParentVersion", JsonString(_customParentVersion, _allocator), _allocator);
+	}
+	else if (m_parentVersion) {
 		_object.AddMember("ParentVersion", JsonString(m_parentVersion->getName(), _allocator), _allocator);
 	}
 	else {

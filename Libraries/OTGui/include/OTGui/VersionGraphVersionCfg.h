@@ -28,7 +28,7 @@ namespace ot {
 
 		VersionGraphVersionCfg& operator = (const VersionGraphVersionCfg& _other);
 
-		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
+		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator, const std::string& _customParentVersion) const;
 
 		//! \return Returns true if the version was added to the version graph.
 		bool setFromJsonObject(const ot::ConstJsonObject& _object, VersionGraphCfg* _graph);

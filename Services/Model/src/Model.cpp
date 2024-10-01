@@ -4079,11 +4079,10 @@ void Model::addNewVersionTreeStateAndActivate(const std::string& _parentVersion,
 {
 	ot::JsonDocument notify;
 	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion, notify.GetAllocator()), notify.GetAllocator());
-	notify.AddMember(OT_ACTION_PARAM_Parent, ot::JsonString(_parentVersion, notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_BRANCH, ot::JsonString(_branch, notify.GetAllocator()), notify.GetAllocator());
 
 	ot::JsonObject versionObj;
-	_version.addToJsonObject(versionObj, notify.GetAllocator());
+	_version.addToJsonObject(versionObj, notify.GetAllocator(), _parentVersion);
 	notify.AddMember(OT_ACTION_PARAM_Config, versionObj, notify.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
