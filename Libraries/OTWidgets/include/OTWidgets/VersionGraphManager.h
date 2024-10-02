@@ -18,6 +18,15 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT VersionGraphManager : public QObject, public QWidgetInterface {
 		Q_OBJECT
 	public:
+		enum ViewMode {
+			ViewAll,
+			Compact,
+			CompactLabeled,
+			LabeledOnly
+		};
+		static std::string viewModeToString(ViewMode _mode);
+		static ViewMode stringToViewMode(const std::string& _mode);
+
 		VersionGraphManager();
 		virtual ~VersionGraphManager();
 
@@ -27,6 +36,9 @@ namespace ot {
 		const VersionGraph* getGraph(void) const { return m_graph; };
 
 		void setupConfig(const VersionGraphCfg& _config);
+
+		void setCurrentViewMode(ViewMode _mode);
+		ViewMode getCurrentViewMode(void) const;
 
 		void addVersion(const std::string& _parentVersionName, const VersionGraphVersionCfg& _config);
 
@@ -44,9 +56,11 @@ namespace ot {
 	private:
 		void updateCurrentGraphCompactMode(void);
 		void updateCurrentGraphCompactLabelMode(void);
+		void updateCurrentGraphLabeledOnlyMode(void);
 
 		void startProcessCompact(bool _includeLabeledVersions);
 		void processCompactItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, bool _includeLabeledVersions);
+		void processLabeledOnlyItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent);
 
 		QWidget* m_root;
 		VersionGraph* m_graph;

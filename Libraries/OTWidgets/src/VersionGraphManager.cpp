@@ -12,9 +12,28 @@
 // Qt header
 #include <QtWidgets/qlayout.h>
 
-#define OT_VERSIONGRAPHMANAGER_AllMode "View All"
-#define OT_VERSIONGRAPHMANAGER_CompactMode "Compact View"
-#define OT_VERSIONGRAPHMANAGER_CompactWithLabelMode "Compact View + Labeled"
+std::string ot::VersionGraphManager::viewModeToString(ViewMode _mode) {
+	switch (_mode) {
+	case ot::VersionGraphManager::ViewAll: return "View All";
+	case ot::VersionGraphManager::Compact: return "Compact View";
+	case ot::VersionGraphManager::CompactLabeled: return "Compact View + Labeled";
+	case ot::VersionGraphManager::LabeledOnly: return "Labeled Only";
+	default:
+		OT_LOG_EAS("Unknown view mode (" + std::to_string((int)_mode) + ")");
+		return "View All";
+	}
+}
+
+ot::VersionGraphManager::ViewMode ot::VersionGraphManager::stringToViewMode(const std::string& _mode) {
+	if (_mode == viewModeToString(ViewMode::ViewAll)) return ViewMode::ViewAll;
+	else if (_mode == viewModeToString(ViewMode::Compact)) return ViewMode::Compact;
+	else if (_mode == viewModeToString(ViewMode::CompactLabeled)) return ViewMode::CompactLabeled;
+	else if (_mode == viewModeToString(ViewMode::LabeledOnly)) return ViewMode::LabeledOnly;
+	else {
+		OT_LOG_EAS("Unknown view mode \"" + _mode + "\"");
+		return ViewMode::ViewAll;
+	}
+}
 
 ot::VersionGraphManager::VersionGraphManager() {
 	m_root = new QWidget;
@@ -24,11 +43,12 @@ ot::VersionGraphManager::VersionGraphManager() {
 	Label* modeLabel = new Label("Mode:");
 	m_modeSelector = new ComboBox;
 	m_modeSelector->addItems({
-		OT_VERSIONGRAPHMANAGER_AllMode,
-		OT_VERSIONGRAPHMANAGER_CompactMode,
-		OT_VERSIONGRAPHMANAGER_CompactWithLabelMode
+		QString::fromStdString(viewModeToString(ViewMode::ViewAll)),
+		QString::fromStdString(viewModeToString(ViewMode::Compact)),
+		QString::fromStdString(viewModeToString(ViewMode::CompactLabeled)),
+		QString::fromStdString(viewModeToString(ViewMode::LabeledOnly))
 	});
-	m_modeSelector->setCurrentText(OT_VERSIONGRAPHMANAGER_AllMode);
+	m_modeSelector->setCurrentText(QString::fromStdString(viewModeToString(ViewMode::ViewAll)));
 
 	m_graph = new VersionGraph;
 
@@ -50,6 +70,19 @@ ot::VersionGraphManager::~VersionGraphManager() {
 void ot::VersionGraphManager::setupConfig(const VersionGraphCfg& _config) {
 	m_config = _config;
 	this->updateCurrentGraph();
+}
+
+void ot::VersionGraphManager::setCurrentViewMode(ViewMode _mode) {
+	bool blocked = m_modeSelector->signalsBlocked();
+	m_modeSelector->blockSignals(true);
+
+	m_modeSelector->setCurrentText(QString::fromStdString(viewModeToString(_mode)));
+
+	m_modeSelector->blockSignals(blocked);
+}
+
+ot::VersionGraphManager::ViewMode ot::VersionGraphManager::getCurrentViewMode(void) const {
+	return stringToViewMode(m_modeSelector->currentText().toStdString());
 }
 
 void ot::VersionGraphManager::addVersion(const std::string& _parentVersionName, const VersionGraphVersionCfg& _config) {
@@ -95,13 +128,28 @@ void ot::VersionGraphManager::removeVersions(const std::list<std::string>& _vers
 	this->updateCurrentGraph();
 }
 
-void ot::VersionGraphManager::updateCurrentGraph(void) {	
-	if (m_modeSelector->currentText() == OT_VERSIONGRAPHMANAGER_AllMode) m_graph->setupFromConfig(m_config);
-	else if (m_modeSelector->currentText() == OT_VERSIONGRAPHMANAGER_CompactMode) this->updateCurrentGraphCompactMode();
-	else if (m_modeSelector->currentText() == OT_VERSIONGRAPHMANAGER_CompactWithLabelMode) this->updateCurrentGraphCompactLabelMode();
-	else {
-		OT_LOG_EAS("Invalid mode selected \"" + m_modeSelector->currentText().toStdString() + "\"");
+void ot::VersionGraphManager::updateCurrentGraph(void) {
+	switch (this->getCurrentViewMode()) {
+	case ot::VersionGraphManager::ViewAll:
 		m_graph->setupFromConfig(m_config);
+		break;
+
+	case ot::VersionGraphManager::Compact:
+		this->updateCurrentGraphCompactMode();
+		break;
+
+	case ot::VersionGraphManager::CompactLabeled:
+		this->updateCurrentGraphCompactLabelMode();
+		break;
+
+	case ot::VersionGraphManager::LabeledOnly:
+		this->updateCurrentGraphLabeledOnlyMode();
+		break;
+
+	default:
+		OT_LOG_EAS("Unknown view mode (" + std::to_string((int)this->getCurrentViewMode()) + ")");
+		m_graph->setupFromConfig(m_config);
+		break;
 	}
 }
 
@@ -111,6 +159,34 @@ void ot::VersionGraphManager::updateCurrentGraphCompactMode(void) {
 
 void ot::VersionGraphManager::updateCurrentGraphCompactLabelMode(void) {
 	this->startProcessCompact(true);
+}
+
+void ot::VersionGraphManager::updateCurrentGraphLabeledOnlyMode(void) {
+	VersionGraphCfg newConfig;
+	newConfig.setActiveVersionName(m_config.getActiveVersionName());
+
+	// Determine branch version
+	if (!m_config.getActiveBranchVersionName().empty()) {
+		VersionGraphVersionCfg* branchVersion = m_config.findVersion(m_config.getActiveBranchVersionName());
+		if (branchVersion) {
+			newConfig.setActiveBranchVersionName(branchVersion->getLastBranchVersion()->getName());
+		}
+		else {
+			OT_LOG_EAS("Branch version not found: \"" + m_config.getActiveBranchVersionName() + "\"");
+		}
+	}
+
+	// Copy root config
+	VersionGraphVersionCfg* newItem = new VersionGraphVersionCfg;
+	newItem->applyConfigOnly(*m_config.getRootVersion());
+
+	// Process item childs
+	for (const VersionGraphVersionCfg* childCfg : m_config.getRootVersion()->getChildVersions()) {
+		this->processLabeledOnlyItem(newItem, childCfg, newConfig.getActiveVersionName(), true);
+	}
+
+	newConfig.setRootVersion(newItem);
+	m_graph->setupFromConfig(newConfig);
 }
 
 void ot::VersionGraphManager::startProcessCompact(bool _includeLabeledVersions) {
@@ -174,6 +250,8 @@ void ot::VersionGraphManager::processCompactItem(VersionGraphVersionCfg* _parent
 		}
 		// Process other childs
 		else {
+			delete newItem;
+			newItem = nullptr;
 			this->processCompactItem(_parent, childCfg, _activeVersion, false, _includeLabeledVersions);
 		}
 		
@@ -186,5 +264,26 @@ void ot::VersionGraphManager::processCompactItem(VersionGraphVersionCfg* _parent
 		}
 
 		_parent->addChildVersion(newItem);
+	}
+}
+
+void ot::VersionGraphManager::processLabeledOnlyItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent) {
+	VersionGraphVersionCfg* newParent = _parent;
+	bool newParentIsDirect = false;
+
+	// Active item
+	if (_config->getName() == _activeVersion || !_config->getLabel().empty()) {
+		VersionGraphVersionCfg* newItem = new VersionGraphVersionCfg;
+		newItem->applyConfigOnly(*_config);
+		newItem->setDirectParentIsHidden(!_isDirectParent);
+
+		_parent->addChildVersion(newItem);
+		newParent = newItem;
+		newParentIsDirect = true;
+	}
+
+	// Process childs
+	for (const VersionGraphVersionCfg* childCfg : _config->getChildVersions()) {
+		this->processLabeledOnlyItem(newParent, childCfg, _activeVersion, newParentIsDirect);
 	}
 }
