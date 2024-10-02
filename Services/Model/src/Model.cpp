@@ -4116,6 +4116,7 @@ void Model::activateVersion(const std::string &version)
 
 	if (getStateManager()->loadModelState(version))
 	{
+		OT_LOG_D("Model state loaded { \"Version\": \"" + version + "\" }");
 		updateModelStateForUndoRedo();
 	}
 
@@ -4976,7 +4977,9 @@ void Model::updateModelStateForUndoRedo(void)
 		// Prefetch all entities which are needed below
 		prefetchDocumentsFromStorage(prefetchIds);
 
-		assert(!entityMap.empty());
+		if (entityMap.empty()) {
+			OT_LOG_EA("Entity map is empty after initialization");
+		}
 
 		do
 		{
@@ -5001,13 +5004,12 @@ void Model::updateModelStateForUndoRedo(void)
 						{
 							EntityBase *parentEntity = getEntity(parentID);
 
-							assert(!entityMap.empty());
+							if (entityMap.empty()) {
+								OT_LOG_EA("Entity map is empty before reading entity");
+							}
 
 							EntityBase *newEntity = readEntityFromEntityID(parentEntity, entity, entityMap);
-							assert(!entityMap.empty());
-
 							newEntity->addVisualizationNodes();
-							assert(!entityMap.empty());
 
 							if (dynamic_cast<EntityContainer*>(parentEntity) != nullptr)
 							{
@@ -5021,12 +5023,17 @@ void Model::updateModelStateForUndoRedo(void)
 								setParameter(parameter->getName(), parameter->getNumericValue(), parameter);
 							}
 
-							assert(!entityMap.empty());
+							if (entityMap.empty()) {
+								OT_LOG_EA("Entity map is empty after reading entity");
+							}
 						}
 					}
 					else
 					{
-						assert(parentID != 0); // The top level ids should not be affected by an undo operation
+						if (parentID == 0) {
+							// This should not happen
+							OT_LOG_EA("The top level ID affected by an undo operation");
+						}
 					}
 				}
 			}

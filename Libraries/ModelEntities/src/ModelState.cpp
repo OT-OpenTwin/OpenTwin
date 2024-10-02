@@ -260,7 +260,10 @@ bool ModelState::loadModelState(const std::string& _version)
 	auto filterDoc = bsoncxx::builder::basic::document{};
 
 	auto result = docBase.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
-	if (!result) return false; // Model state not found
+	if (!result) {
+		OT_LOG_E("Model state not found { \"Version\": \"" + _version + "\" }");
+		return false; // Model state not found
+	}
 
 	clearChildrenInformation();
 
@@ -270,6 +273,8 @@ bool ModelState::loadModelState(const std::string& _version)
 		OT_LOG_E("Failed to load model state { \"Version\": \"" + _version + "\" }");
 		return false;
 	}
+
+	storeCurrentVersionInModelEntity();
 
 	buildChildrenInformation();
 
@@ -1628,18 +1633,8 @@ bool ModelState::branchExists(const std::string& _branch)
 	return m_graphCfg.versionStartingWithNameExists(filter);
 }
 
-void ModelState::storeCurrentVersionInModelEntity(void)
-{
-	std::string currentVersionToWrite;
-
-	if (!hasNextVersion(m_graphCfg.getActiveVersionName()))
-	{
-		// We are not at the end of the branch, so we need to store the exact version
-		currentVersionToWrite = m_graphCfg.getActiveVersionName();
-	}
-
-	if (m_graphCfg.getActiveBranchVersionName() != activeBranchInModelEntity || currentVersionToWrite != activeVersionInModelEntity)
-	{
+void ModelState::storeCurrentVersionInModelEntity(void) {
+	if (activeVersionInModelEntity != m_graphCfg.getActiveVersionName() || activeBranchInModelEntity != m_graphCfg.getActiveBranchVersionName()) {
 		mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::GetDataBase()->getProjectName());
 
 		// We need to update the model entity
@@ -1653,13 +1648,13 @@ void ModelState::storeCurrentVersionInModelEntity(void)
 		auto modifyDoc = bsoncxx::builder::stream::document{}
 			<< "$set" << bsoncxx::builder::stream::open_document
 			<< "ActiveBranch" << m_graphCfg.getActiveBranchVersionName()
-			<< "ActiveVersion" << currentVersionToWrite
+			<< "ActiveVersion" << m_graphCfg.getActiveVersionName()
 			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
 
 		collection.update_one(queryDoc.view(), modifyDoc.view());
 
-		activeBranchInModelEntity  = m_graphCfg.getActiveBranchVersionName();
-		activeVersionInModelEntity = currentVersionToWrite;
+		activeBranchInModelEntity = m_graphCfg.getActiveBranchVersionName();
+		activeVersionInModelEntity = m_graphCfg.getActiveVersionName();
 	}
 }
 
