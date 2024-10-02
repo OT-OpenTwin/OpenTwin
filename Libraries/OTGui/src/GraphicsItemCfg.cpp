@@ -44,7 +44,8 @@
 #define OT_JSON_VALUE_Connectable "Connectable"
 #define OT_JSON_VALUE_Selectable "Selectable"
 #define OT_JSON_VALUE_ForwardTooltip "ForwardTooltip"
-#define OT_JSON_VALUE_SnapsToGrid "SnapsToGrid" 
+#define OT_JSON_VALUE_SnapsToGridTopLeft "SnapsToGridTopLeft" 
+#define OT_JSON_VALUE_SnapsToGridCenter "SnapsToGridCenter" 
 #define OT_JSON_VALUE_TransformEnabled "TransformEnabled" 
 #define OT_JSON_VALUE_IgnoreParentTransform "IgnoreParentTransform" 
 #define OT_JSON_VALUE_HandleState "HandleState"
@@ -90,7 +91,8 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 	if (m_flags & GraphicsItemCfg::ItemIsConnectable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Connectable, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemIsSelectable) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_Selectable, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemForwardsTooltip) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_ForwardTooltip, _allocator), _allocator);
-	if (m_flags & GraphicsItemCfg::ItemSnapsToGrid) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_SnapsToGrid, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemSnapsToGridTopLeft) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_SnapsToGridTopLeft, _allocator), _allocator);
+	if (m_flags & GraphicsItemCfg::ItemSnapsToGridCenter) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_SnapsToGridCenter, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemUserTransformEnabled) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_TransformEnabled, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemIgnoresParentTransform) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_IgnoreParentTransform, _allocator), _allocator);
 	if (m_flags & GraphicsItemCfg::ItemHandlesState) flagArr.PushBack(rapidjson::Value(OT_JSON_VALUE_HandleState, _allocator), _allocator);
@@ -145,7 +147,8 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 		else if (f == OT_JSON_VALUE_Connectable) m_flags |= ItemIsConnectable;
 		else if (f == OT_JSON_VALUE_Selectable) m_flags |= ItemIsSelectable;
 		else if (f == OT_JSON_VALUE_ForwardTooltip) m_flags |= ItemForwardsTooltip;
-		else if (f == OT_JSON_VALUE_SnapsToGrid) m_flags |= ItemSnapsToGrid;
+		else if (f == OT_JSON_VALUE_SnapsToGridTopLeft) m_flags |= ItemSnapsToGridTopLeft;
+		else if (f == OT_JSON_VALUE_SnapsToGridCenter) m_flags |= ItemSnapsToGridCenter;
 		else if (f == OT_JSON_VALUE_TransformEnabled) m_flags |= ItemUserTransformEnabled;
 		else if (f == OT_JSON_VALUE_IgnoreParentTransform) m_flags |= ItemIgnoresParentTransform;
 		else if (f == OT_JSON_VALUE_HandleState) m_flags |= ItemHandlesState;

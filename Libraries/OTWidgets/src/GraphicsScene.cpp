@@ -123,12 +123,21 @@ void ot::GraphicsScene::checkMaxTriggerDistance(const MarginsD& _triggerDistance
 	this->checkMaxTriggerDistance(std::max({ _triggerDistance.left(), _triggerDistance.top(), _triggerDistance.right(), _triggerDistance.bottom() }));
 }	
 
-QPointF ot::GraphicsScene::snapToGrid(const QPointF& _pos) const {
-	return QtFactory::toQPoint(m_grid.snapToGrid(QtFactory::toPoint2D(_pos)));
+QPointF ot::GraphicsScene::snapToGrid(const QPointF& _pt) const {
+	return QtFactory::toQPoint(m_grid.snapToGrid(QtFactory::toPoint2D(_pt)));
 }
 
-ot::Point2DD ot::GraphicsScene::snapToGrid(const Point2DD& _pos) const {
-	return m_grid.snapToGrid(_pos);
+QPointF ot::GraphicsScene::snapToGrid(const GraphicsItem* _item) const {
+	QPointF newPos = _item->getQGraphicsItem()->pos();
+	if (_item->getGraphicsItemFlags() & GraphicsItemCfg::ItemSnapsToGridTopLeft) {
+		newPos = this->snapToGrid(newPos);
+	}
+	else if (_item->getGraphicsItemFlags() & GraphicsItemCfg::ItemSnapsToGridCenter) {
+		QRectF rect = _item->getQGraphicsItem()->boundingRect();
+		QPointF delta(rect.width() / 2., rect.height() / 2.);
+		newPos = this->snapToGrid(newPos + delta) - delta;
+	}
+	return newPos;
 }
 
 void ot::GraphicsScene::deselectAll(void) {
@@ -147,7 +156,19 @@ void ot::GraphicsScene::moveAllSelectedItems(const Point2DD& _delta) {
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(item);
 		if (otItem) {
 			if (otItem->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable) {
-				otItem->setGraphicsItemPos(this->snapToGrid(otItem->getGraphicsItemPos() + _delta));
+				if (otItem->getGraphicsItemFlags() & GraphicsItemCfg::ItemSnapsToGridTopLeft) {
+					QPointF newPos = QtFactory::toQPoint(m_grid.snapToGrid(otItem->getGraphicsItemPos() + _delta));;
+					otItem->setGraphicsItemPos(newPos);
+				}
+				else if (otItem->getGraphicsItemFlags() & GraphicsItemCfg::ItemSnapsToGridCenter) {
+					QRectF rect = otItem->getQGraphicsItem()->boundingRect();
+					rect.translate(_delta.x(), _delta.y());
+					QPointF newPos = QtFactory::toQPoint(m_grid.snapToGrid(QtFactory::toPoint2D(rect.center()))) - QPointF(rect.width() / 2., rect.height() / 2.);
+					otItem->setGraphicsItemPos(newPos);
+				}
+				else {
+					otItem->setGraphicsItemPos(otItem->getGraphicsItemPos() + _delta);
+				}
 			}
 		}
 	}
@@ -428,7 +449,6 @@ void ot::GraphicsScene::calculateGridLines(const QRectF& _painterRect, QList<QLi
 
 	int lineCounterX = 0;
 	int lineCounterY = 0;
-
 
 	// If wide lines will be displayed the line counter need to be calculated
 	if ((m_grid.getGridFlags() & Grid::ShowWideLines) && (m_grid.getWideGridLineCounter().x() > 1 || m_grid.getWideGridLineCounter().y() > 1)) {

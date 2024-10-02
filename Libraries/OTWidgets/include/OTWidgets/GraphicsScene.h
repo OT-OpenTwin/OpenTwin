@@ -90,10 +90,11 @@ namespace ot {
 		void setIgnoreEvents(bool _ignore) { m_ignoreEvents = _ignore; };
 		bool getIgnoreEvents(void) const { return m_ignoreEvents; };
 
-		QPointF snapToGrid(const QPointF& _pos) const;
+		QPointF snapToGrid(const QPointF& _pt) const;
 
-		Point2DD snapToGrid(const Point2DD& _pos) const;
-		
+		//! \brief Snaps the item to the grid according to the item flags and returns the top left pos.
+		QPointF snapToGrid(const GraphicsItem* _item) const;
+
 		void deselectAll(void);
 
 		void moveAllSelectedItems(const Point2DD& _delta);

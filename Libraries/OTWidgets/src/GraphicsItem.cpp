@@ -268,8 +268,8 @@ void ot::GraphicsItem::handleItemChange(QGraphicsItem::GraphicsItemChange _chang
 
 	case QGraphicsItem::ItemScenePositionHasChanged:
 	{
-		if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemSnapsToGrid) && !m_parent) {
-			QPointF pos = this->getGraphicsScene()->snapToGrid(this->getQGraphicsItem()->pos());
+		if (!m_parent) {
+			QPointF pos = this->getGraphicsScene()->snapToGrid(this);
 			if (pos != this->getQGraphicsItem()->pos()) {
 				this->setGraphicsItemPos(pos);
 				//this->getGraphicsScene()->update();

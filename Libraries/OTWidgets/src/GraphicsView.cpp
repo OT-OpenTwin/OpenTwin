@@ -119,8 +119,9 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	_item->getRootItem()->getQGraphicsItem()->setZValue(2);
 	_item->setGraphicsScene(m_scene);
 
-	if (m_scene->getGrid().isGridSnapValid()) {
-		_item->setGraphicsItemPos(m_scene->snapToGrid(_item->getGraphicsItemPos()));
+	QPointF pt = m_scene->snapToGrid(_item);
+	if (pt != _item->getQGraphicsItem()->pos()) {
+		_item->setGraphicsItemPos(pt);
 	}
 
 	// Check for max trigger distance
