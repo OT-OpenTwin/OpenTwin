@@ -234,6 +234,46 @@ QPainterPath ot::QtFactory::toQPainterPath(const Path2DF& _path) {
 	return p;
 }
 
+QTransform ot::QtFactory::toQTransform(const ot::Transform& _transform) {
+    QTransform newTransform;
+    
+    // Flip
+    if (_transform.getFlipStateFlags() & Transform::FlipHorizontally) {
+        newTransform.scale(-1, 1);
+    }
+    if (_transform.getFlipStateFlags() & Transform::FlipVertically) {
+        newTransform.scale(1, -1);
+    }
+
+    // Rotate
+    newTransform.rotate(_transform.getRotation());
+
+    return newTransform;
+}
+
+QTransform ot::QtFactory::toQTransformOnCenter(const ot::Transform& _transform, const QPointF& _centerPos) {
+    QTransform newTransform;
+    
+    // Adjust transformation origin
+    newTransform.translate(_centerPos.x(), _centerPos.y());
+
+    // Flip
+    if (_transform.getFlipStateFlags() & Transform::FlipHorizontally) {
+        newTransform.scale(-1, 1);
+    }
+    if (_transform.getFlipStateFlags() & Transform::FlipVertically) {
+        newTransform.scale(1, -1);
+    }
+
+    // Rotate
+    newTransform.rotate(_transform.getRotation());
+
+    // Translate back
+    newTransform.translate(-_centerPos.x(), -_centerPos.y());
+
+    return newTransform;
+}
+
 QString ot::QtFactory::toQString(QEvent::Type _type) {
     static const QMap<QEvent::Type, QString> eventTypeMap = {
         { QEvent::None, "None" },

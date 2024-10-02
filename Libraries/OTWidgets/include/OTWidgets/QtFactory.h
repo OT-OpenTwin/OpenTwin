@@ -16,6 +16,7 @@
 #include "OTGui/Outline.h"
 #include "OTGui/Margins.h"
 #include "OTGui/GuiTypes.h"
+#include "OTGui/Transform.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -29,6 +30,7 @@
 #include <QtGui/qcolor.h>
 #include <QtGui/qbrush.h>
 #include <QtGui/qevent.h>
+#include <QtGui/qtransform.h>
 #include <QtGui/qpainterpath.h>
 
 namespace ot {
@@ -95,8 +97,10 @@ namespace ot {
 
 		static QPainterPath toQPainterPath(const Path2DF& _path);
 
-		static QString toQString(QEvent::Type _type);
+		static QTransform toQTransform(const ot::Transform& _transform);
+		static QTransform toQTransformOnCenter(const ot::Transform& _transform, const QPointF& _centerPos);
 
+		static QString toQString(QEvent::Type _type);
 	private:
 		QtFactory() {};
 		~QtFactory() {};

@@ -668,21 +668,15 @@ void ot::GraphicsItem::parentItemTransformChanged(const QTransform& _parentTrans
 	return;
 
 	// Calculate inverse transform of parent
-	QPointF transformOrigin;
-	QTransform ownTransform = this->calculateGraphicsItemTransform(transformOrigin);
+	QTransform ownTransform = QtFactory::toQTransform(this->getGraphicsItemTransform());
 
 	QTransform invertedParentTransform = _parentTransform.inverted();
 	
 	// Combine with the item's own transformation
 	QTransform newTransform = invertedParentTransform * ownTransform;
 
-	QTransform centeredTransform;
-	centeredTransform.translate(transformOrigin.x(), transformOrigin.y());
-	centeredTransform *= newTransform;
-	centeredTransform.translate(-transformOrigin.x(), -transformOrigin.y());
-
 	//this->getQGraphicsItem()->setTransformOriginPoint(transformOrigin);
-	this->getQGraphicsItem()->setTransform(centeredTransform);
+	this->getQGraphicsItem()->setTransform(newTransform);
 }
 
 QRectF ot::GraphicsItem::getTriggerBoundingRect(void) const {
@@ -700,38 +694,10 @@ void ot::GraphicsItem::graphicsElementStateChanged(const GraphicsElementStateFla
 
 void ot::GraphicsItem::applyGraphicsItemTransform(void) {
 	OTAssertNullptr(this->getQGraphicsItem());
-	
-	// Apply transform
-	QPointF transformOrigin;
-	QTransform newTransform = this->calculateGraphicsItemTransform(transformOrigin);
-	this->getQGraphicsItem()->setTransformOriginPoint(transformOrigin);
+
+	QTransform newTransform = QtFactory::toQTransform(this->getGraphicsItemTransform());
 	this->getQGraphicsItem()->setTransform(newTransform);
-
 	this->notifyChildsAboutTransformChange(newTransform);
-}
-
-QTransform ot::GraphicsItem::calculateGraphicsItemTransform(QPointF& _transformOrigin) const {
-	QTransform newTransform;
-	_transformOrigin = this->getQGraphicsItem()->boundingRect().center();
-
-	// Adjust transformation origin
-	newTransform.translate(_transformOrigin.x(), _transformOrigin.y());
-
-	// Flip
-	if (this->getGraphicsItemTransform().getFlipStateFlags() & Transform::FlipHorizontally) {
-		newTransform.scale(-1, 1);
-	}
-	if (this->getGraphicsItemTransform().getFlipStateFlags() & Transform::FlipVertically) {
-		newTransform.scale(1, -1);
-	}
-
-	// Rotate
-	newTransform.rotate(this->getGraphicsItemTransform().getRotation());
-
-	// Translate back
-	newTransform.translate(-_transformOrigin.x(), -_transformOrigin.y());
-
-	return newTransform;
 }
 
 ot::ConnectionDirection ot::GraphicsItem::calculateOutwardsConnectionDirection(void) const {

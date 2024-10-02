@@ -17,7 +17,6 @@
 
 // Qt header
 #include <QtCore/qpoint.h>
-#include <QtGui/qtransform.h>
 #include <QtWidgets/qgraphicsitem.h>
 #include <QtWidgets/qgraphicslayoutitem.h>
 
@@ -315,8 +314,6 @@ namespace ot {
 		template <class T> const T* getItemConfiguration(void) const;
 
 		virtual void applyGraphicsItemTransform(void);
-
-		QTransform calculateGraphicsItemTransform(QPointF& _transformOrigin) const;
 
 		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) {};
 
