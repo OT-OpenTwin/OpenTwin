@@ -68,6 +68,10 @@ bool ot::PropertyInputColor::setupFromConfiguration(const Property* _configurati
 	return true;
 }
 
+void ot::PropertyInputColor::focusPropertyInput(void) {
+	m_colorBtn->setFocus();
+}
+
 void ot::PropertyInputColor::setColor(const Color& _color) {
 	m_colorBtn->setColor(_color);
 }

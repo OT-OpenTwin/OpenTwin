@@ -63,6 +63,10 @@ bool ot::PropertyInputBool::setupFromConfiguration(const Property* _configuratio
 	return true;
 }
 
+void ot::PropertyInputBool::focusPropertyInput(void) {
+	m_checkBox->setFocus();
+}
+
 void ot::PropertyInputBool::setChecked(bool _isChecked) {
 	m_checkBox->setChecked(_isChecked);
 }

@@ -112,6 +112,10 @@ bool ot::PropertyInputFilePath::setupFromConfiguration(const Property* _configur
 	return true;
 }
 
+void ot::PropertyInputFilePath::focusPropertyInput(void) {
+	m_edit->setFocus();
+}
+
 void ot::PropertyInputFilePath::setCurrentFile(const QString& _file) {
 	m_edit->setText(_file);
 }

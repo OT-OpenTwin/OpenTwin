@@ -1401,6 +1401,8 @@ std::vector<int> AppBase::getSelectedNavigationTreeItems(void) {
 }
 
 void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
+	OTAssertNullptr(m_propertyGrid);
+
 	// Properties with the "ProjectList" special type need to get the project list set by the frontend
 	std::list<ot::Property*> projListProps = _configuration.findPropertiesBySpecialType("ProjectList");
 	for (ot::Property* p : projListProps) {
@@ -1414,8 +1416,13 @@ void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 		actualProp->setList(userProjects);
 	}
 
-
 	m_propertyGrid->setupGridFromConfig(_configuration);
+}
+
+void AppBase::focusPropertyGridItem(const std::string& _group, const std::string& _name) {
+	OTAssertNullptr(m_propertyGrid);
+
+	m_propertyGrid->focusProperty(_group, _name);
 }
 
 /*

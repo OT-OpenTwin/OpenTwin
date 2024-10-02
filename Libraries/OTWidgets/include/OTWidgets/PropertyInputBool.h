@@ -23,6 +23,7 @@ namespace ot {
 		virtual QWidget* getQWidget(void) override;
 		virtual Property* createPropertyConfiguration(void) const override;
 		virtual bool setupFromConfiguration(const Property* _configuration) override;
+		virtual void focusPropertyInput(void) override;
 
 		void setChecked(bool _isChecked);
 		bool isChecked(void) const;

@@ -213,3 +213,12 @@ bool ot::PropertyInputDouble::setupFromConfiguration(const Property* _configurat
 
 	return true;
 }
+
+void ot::PropertyInputDouble::focusPropertyInput(void) {
+	if (m_spinBox) {
+		m_spinBox->setFocus();
+	}
+	else if (m_lineEdit) {
+		m_lineEdit->setFocus();
+	}
+}

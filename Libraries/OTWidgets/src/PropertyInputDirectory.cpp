@@ -99,6 +99,10 @@ bool ot::PropertyInputDirectory::setupFromConfiguration(const Property* _configu
 	return true;
 }
 
+void ot::PropertyInputDirectory::focusPropertyInput(void) {
+	m_edit->setFocus();
+}
+
 void ot::PropertyInputDirectory::setCurrentDirectory(const QString& _dir) {
 	m_edit->setText(_dir);
 }

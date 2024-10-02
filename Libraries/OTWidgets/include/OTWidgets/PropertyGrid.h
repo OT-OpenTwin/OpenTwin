@@ -54,6 +54,9 @@ namespace ot {
 
 		void clear(void);
 
+		void focusProperty(const std::string& _groupName, const std::string& _itemName);
+		void focusProperty(const std::list<std::string>& _groupPath, const std::string& _itemName);
+
 	Q_SIGNALS:
 		void propertyChanged(const Property* const _property);
 		void propertyDeleteRequested(const Property* const _property);

@@ -76,6 +76,10 @@ bool ot::PropertyInputStringList::setupFromConfiguration(const Property* _config
 	return true;
 }
 
+void ot::PropertyInputStringList::focusPropertyInput(void) {
+	m_comboButton->setFocus();
+}
+
 void ot::PropertyInputStringList::setCurrentText(const QString& _text) {
 	m_comboButton->setText(_text);
 }

@@ -79,6 +79,10 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 	return true;
 }
 
+void ot::PropertyInputString::focusPropertyInput(void) {
+	m_lineEdit->setFocus();
+}
+
 void ot::PropertyInputString::setText(const QString& _text) {
 	m_text = _text;
 	m_lineEdit->setText(m_text);

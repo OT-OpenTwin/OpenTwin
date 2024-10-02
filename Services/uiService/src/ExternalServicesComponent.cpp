@@ -2608,14 +2608,6 @@ std::string ExternalServicesComponent::handleSelectFilesForStoring(ot::JsonDocum
 	return "";
 }
 
-std::string ExternalServicesComponent::handleFillPropertyGrid(ot::JsonDocument& _document) {
-	ot::PropertyGridCfg cfg;
-	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
-	cfg.setFromJsonObject(cfgObj);
-	AppBase::instance()->setupPropertyGrid(cfg);
-	return "";
-}
-
 std::string ExternalServicesComponent::handleAddMenuPage(ot::JsonDocument& _document) {
 	std::string pageName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PageName);
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
@@ -3660,6 +3652,23 @@ std::string ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument&
 	}
 #endif // _DEBUG
 
+	return "";
+}
+
+// Property Grid
+
+std::string ExternalServicesComponent::handleFillPropertyGrid(ot::JsonDocument& _document) {
+	ot::PropertyGridCfg cfg;
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	cfg.setFromJsonObject(cfgObj);
+	AppBase::instance()->setupPropertyGrid(cfg);
+	return "";
+}
+
+std::string ExternalServicesComponent::handleFocusPropertyGridItem(ot::JsonDocument& _document) {
+	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_PROPERTY_Name);
+	std::string group = ot::json::getString(_document, OT_ACTION_PARAM_PROPERTY_Group);
+	AppBase::instance()->focusPropertyGridItem(group, name);
 	return "";
 }
 

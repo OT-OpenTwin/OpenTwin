@@ -365,6 +365,8 @@ public:
 	
 	void setupPropertyGrid(const ot::PropertyGridCfg& _configuration);
 
+	void focusPropertyGridItem(const std::string& _group, const std::string& _name);
+
 	//void fillPropertyGrid(const std::string &settings);
 
 	QString getNavigationTreeItemText(ak::ID _itemID);

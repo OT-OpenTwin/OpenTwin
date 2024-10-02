@@ -25,6 +25,7 @@ namespace ot {
 		virtual QWidget* getQWidget(void) override;
 		virtual Property* createPropertyConfiguration(void) const override;
 		virtual bool setupFromConfiguration(const Property* _configuration) override;
+		virtual void focusPropertyInput(void) override;
 
 		void setCurrentDirectory(const QString& _dir);
 		QString currentDirectory(void) const;

@@ -216,7 +216,6 @@ public:
 	OT_HANDLER(handleStoreFileInDatabase, ExternalServicesComponent, OT_Action_CMD_UI_StoreFileInDataBase, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSaveFileContent, ExternalServicesComponent, OT_ACTION_CMD_UI_SaveFileContent, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSelectFilesForStoring, ExternalServicesComponent, OT_ACTION_CMD_UI_SelectFileForStoring, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleFillPropertyGrid, ExternalServicesComponent, OT_ACTION_CMD_UI_FillPropertyGrid, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddMenuPage, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuPage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddMenuGroup, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuGroup, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddMenuSubgroup, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuSubgroup, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -277,6 +276,10 @@ public:
 	OT_HANDLER(handleAddSettingsData, ExternalServicesComponent, OT_ACTION_CMD_UI_AddSettingsData, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddIconSearchPath, ExternalServicesComponent, OT_ACTION_CMD_UI_AddIconSearchPath, ot::MessageType::ALL_MESSAGE_TYPES)
 	
+	// Property Grid
+	OT_HANDLER(handleFillPropertyGrid, ExternalServicesComponent, OT_ACTION_CMD_UI_FillPropertyGrid, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleFocusPropertyGridItem, ExternalServicesComponent, OT_ACTION_CMD_UI_FocusPropertyGridItem, ot::MessageType::ALL_MESSAGE_TYPES)
+
 	// Version Graph
 	OT_HANDLER(handleSetVersionGraph, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetVersionGraph, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSetVersionGraphActive, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive, ot::MessageType::ALL_MESSAGE_TYPES)

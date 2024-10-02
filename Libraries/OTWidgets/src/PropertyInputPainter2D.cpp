@@ -75,6 +75,10 @@ bool ot::PropertyInputPainter2D::setupFromConfiguration(const Property* _configu
 	return true;
 }
 
+void ot::PropertyInputPainter2D::focusPropertyInput(void) {
+	m_button->getButton()->setFocus();
+}
+
 const ot::Painter2D* ot::PropertyInputPainter2D::getPainter(void) const {
 	return m_button->getPainter();
 }

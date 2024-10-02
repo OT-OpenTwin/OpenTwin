@@ -7,6 +7,7 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/PropertyGrid.h"
+#include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
 #include "OTWidgets/PropertyGridItemDelegate.h"
@@ -137,6 +138,32 @@ void ot::PropertyGrid::clear(void) {
 	m_tree->clear();
 	m_tree->blockSignals(false);
 	this->blockSignals(false);
+}
+
+void ot::PropertyGrid::focusProperty(const std::string& _groupName, const std::string& _itemName) {
+	std::list<std::string> newPath;
+	newPath.push_back(_groupName);
+	this->focusProperty(newPath, _itemName);
+}
+
+void ot::PropertyGrid::focusProperty(const std::list<std::string>& _groupPath, const std::string& _itemName) {
+	PropertyGridItem* prop = this->findItem(_groupPath, _itemName);
+	if (!prop) {
+		std::string fullPath;
+		for (const std::string& gr : _groupPath) {
+			if (!fullPath.empty()) {
+				fullPath.append("/");
+			}
+			fullPath.append(gr);
+		}
+		OT_LOG_EAS("Property not found { \"Group\": \"" + fullPath + "\", \"Property\": \"" + _itemName + "\" }");
+		return;
+	}
+	
+	m_tree->scrollToItem(prop);
+
+	OTAssertNullptr(prop->getInput());
+	prop->getInput()->focusPropertyInput();
 }
 
 void ot::PropertyGrid::slotPropertyChanged(const Property* const _property) {

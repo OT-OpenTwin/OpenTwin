@@ -148,6 +148,7 @@
 #define OT_Action_CMD_UI_StoreFileInDataBase "UI.SaveFileInDataBase"
 #define OT_ACTION_CMD_UI_SelectFileForStoring "UI.SelectFileForStoring"
 #define OT_ACTION_CMD_UI_SaveFileContent "UI.SaveFileContent"
+#define OT_ACTION_CMD_UI_FocusPropertyGridItem "UI.FocusPropertyGridItem"
 #define OT_ACTION_CMD_UI_FillPropertyGrid "UI.FillPropertyGrid"
 #define OT_ACTION_CMD_UI_AddMenuPage "UI.TTB.AddPage"
 #define OT_ACTION_CMD_UI_AddMenuGroup "UI.TTB.AddGroup"
@@ -319,6 +320,9 @@
 #define OT_ACTION_PARAM_Package "Package"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
+
+#define OT_ACTION_PARAM_PROPERTY_Name "PropertyName"
+#define OT_ACTION_PARAM_PROPERTY_Group "PropertyGroup"
 
 #define OT_ACTION_PARAM_UI_ToolBarTabOrder "UI.TTB.TabOrder"
 #define OT_ACTION_PARAM_UI_CONTROL_TabName "UI.TTB.TabName"
