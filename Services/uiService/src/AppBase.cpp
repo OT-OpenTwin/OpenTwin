@@ -1022,11 +1022,15 @@ ViewerUIDtype AppBase::createView(
 	{
 		if (m_versionGraph) {
 			OT_LOG_EA("Version graph already exists");
+			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
+			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
 			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivatRequest, this, &AppBase::slotRequestVersion);
 			delete m_versionGraph;
 		}
 		m_versionGraph = new ot::VersionGraphManagerView;
 		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewIsCentral));
+		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
+		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivatRequest, this, &AppBase::slotRequestVersion);
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_versionGraph);
 	}
@@ -2211,6 +2215,15 @@ void AppBase::slotTableSaveRequested(void) {
 
 // Private: Slots
 
+void AppBase::slotVersionSelected(const std::string& _versionName) {
+	m_ExternalServicesComponent->versionSelected(_versionName);
+}
+
+void AppBase::slotVersionDeselected(void) {
+	if (m_propertyGrid) m_propertyGrid->clear();
+	m_ExternalServicesComponent->versionDeselected();
+}
+
 void AppBase::slotRequestVersion(const std::string& _versionName) {
 	m_ExternalServicesComponent->activateVersion(_versionName);
 }
@@ -2695,7 +2708,7 @@ void AppBase::slotPropertyGridValueChanged(const ot::Property* _property) {
 	// We first ask the viewer whether it needs to handle the property grid change.
 	if (!m_viewerComponent->propertyGridValueChanged(_property))
 	{
-		// If not, we pass thic change on to the external services component
+		// If not, we pass this change on to the external services component
 		m_ExternalServicesComponent->propertyGridValueChanged(_property);
 	}
 }

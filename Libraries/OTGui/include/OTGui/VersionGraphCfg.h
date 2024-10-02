@@ -61,6 +61,9 @@ namespace ot {
 		//! \brief Returns the version with the given name.
 		VersionGraphVersionCfg* findVersion(const std::string& _version);
 
+		//! \brief Returns the version with the given name.
+		const VersionGraphVersionCfg* findVersion(const std::string& _version) const;
+
 		//! \brief Returns true if a version with the given name prefix exists in any of the versions.
 		bool versionStartingWithNameExists(const std::string& _prefix);
 

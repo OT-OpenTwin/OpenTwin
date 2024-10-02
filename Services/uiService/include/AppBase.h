@@ -491,6 +491,8 @@ public Q_SLOTS:
 	// Private: Slots
 
 private Q_SLOTS:
+	void slotVersionSelected(const std::string& _versionName);
+	void slotVersionDeselected(void);
 	void slotRequestVersion(const std::string& _versionName);
 
 	void slotViewFocusLost(ot::WidgetView* _view);

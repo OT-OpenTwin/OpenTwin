@@ -58,8 +58,6 @@ public:
 	OT_HANDLER(handleGetEntityProperties, Application, OT_ACTION_CMD_MODEL_GetEntityProperties, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleGetEntityPropertiesByName, Application, OT_ACTION_CMD_MODEL_GetEntityPropertiesFromName, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleUpdatePropertyGrid, Application, OT_ACTION_CMD_MODEL_UpdatePropertyGrid, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleGetCurrentVersion, Application, OT_ACTION_CMD_MODEL_GetCurrentVersion, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleActivateVersion, Application, OT_ACTION_CMD_MODEL_ActivateVersion, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleGetCurrentVisualizationModelID, Application, OT_ACTION_CMD_MODEL_GetCurrentVisModelID, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleAddPropertiesToEntities, Application, OT_ACTION_CMD_MODEL_AddPropertiesToEntities, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleUpdatePropertiesOfEntities, Application, OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities, ot::SECURE_MESSAGE_TYPES)
@@ -71,6 +69,13 @@ public:
 	OT_HANDLER(handleGetEntityIdentifier, Application, OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleGetEntitiesFromAnotherCollection, Application, OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleViewsFromProjectType, Application, OT_ACTION_PARAM_MODEL_ViewsForProjectType, ot::SECURE_MESSAGE_TYPES)
+
+	// Versions
+
+	OT_HANDLER(handleGetCurrentVersion, Application, OT_ACTION_CMD_MODEL_GetCurrentVersion, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleActivateVersion, Application, OT_ACTION_CMD_MODEL_ActivateVersion, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleVersionSelected, Application, OT_ACTION_CMD_MODEL_VersionSelected, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleVersionDeselected, Application, OT_ACTION_CMD_MODEL_VersionDeselected, ot::SECURE_MESSAGE_TYPES)
 
 	// ##################################################################################################################################################################################################################
 

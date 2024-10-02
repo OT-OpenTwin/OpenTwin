@@ -131,6 +131,17 @@ ot::VersionGraphVersionCfg* ot::VersionGraphVersionCfg::findVersion(const std::s
 	return nullptr;
 }
 
+const ot::VersionGraphVersionCfg* ot::VersionGraphVersionCfg::findVersion(const std::string& _versionName) const {
+	if (_versionName == m_name) return this;
+	else {
+		for (VersionGraphVersionCfg* child : m_childVersions) {
+			VersionGraphVersionCfg* result = child->findVersion(_versionName);
+			if (result) return result;
+		}
+	}
+	return nullptr;
+}
+
 bool ot::VersionGraphVersionCfg::versionStartingWithNameExists(const std::string& _prefix) const {
 	size_t ix = m_name.find(_prefix);
 	if (ix == 0) return true;

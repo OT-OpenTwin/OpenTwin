@@ -1255,7 +1255,7 @@ void ModelState::loadVersionGraph(void)
 		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
 
 	DataStorageAPI::QueryBuilder filter;
-	auto filterDoc = filter.GenerateSelectQuery({ "SchemaType", "Version", "ParentVersion", "Description" }, false);
+	auto filterDoc = filter.GenerateSelectQuery({ "SchemaType", "Version", "ParentVersion", "Description", "Label" }, false);
 
 	auto results = docBase.GetAllDocument(std::move(queryDoc), std::move(filterDoc), 0);
 
@@ -1278,6 +1278,10 @@ void ModelState::loadVersionGraph(void)
 		
 		this->addVersionGraphItem(version, parentVersion, label, description);
 	}
+}
+
+ot::VersionGraphCfg& ModelState::getVersionGraph(void) {
+	return m_graphCfg;
 }
 
 const ot::VersionGraphCfg& ModelState::getVersionGraph(void) const {
@@ -1607,6 +1611,28 @@ std::list<std::string> ModelState::removeRedoModelStates(void)
 	storeCurrentVersionInModelEntity();
 
 	return removedVersions;
+}
+
+void ModelState::updateVersionEntity(const std::string& _version) {
+	const ot::VersionGraphVersionCfg* version = m_graphCfg.findVersion(_version);
+	if (!version) {
+		OT_LOG_EAS("Version not found \"" + _version + "\"");
+		return;
+	}
+
+	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::GetDataBase()->getProjectName());
+
+	auto queryDoc = bsoncxx::builder::basic::document{};
+	queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
+	queryDoc.append(bsoncxx::builder::basic::kvp("Version", _version));
+
+	auto modifyDoc = bsoncxx::builder::stream::document{}
+		<< "$set" << bsoncxx::builder::stream::open_document
+		<< "Description" << version->getDescription()
+		<< "Label" << version->getLabel()
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+	collection.update_one(queryDoc.view(), modifyDoc.view());
 }
 
 void ModelState::createAndActivateNewBranch(void)

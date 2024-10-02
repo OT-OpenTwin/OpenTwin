@@ -607,7 +607,10 @@ void ExternalServicesComponent::propertyGridValueChanged(const ot::Property* _pr
 		ak::UID modelID = AppBase::instance()->getViewerComponent()->getActiveDataModel();
 
 		ot::Property* cleanedProperty = this->createCleanedProperty(_property);
-		if (!cleanedProperty) return;
+		if (!cleanedProperty) {
+			OT_LOG_EA("Failed to create cleaned property");
+			return;
+		}
 
 		ot::PropertyGridCfg newConfig;
 		newConfig.addRootGroup(cleanedProperty->getRootGroup());
@@ -996,27 +999,88 @@ void ExternalServicesComponent::requestUpdateVTKEntity(unsigned long long modelE
 	}
 }
 
+void ExternalServicesComponent::versionSelected(const std::string& _version) {
+	try {
+		ServiceDataUi* model = this->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
+		if (!model) {
+			OT_LOG_EA(OT_INFO_SERVICE_TYPE_MODEL " service not found");
+			return;
+		}
+		OT_LOG_D("Version requested { \"Version\": \"" + _version + "\" }");
+
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_VersionSelected, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(_version, doc.GetAllocator()), doc.GetAllocator());
+		std::string response;
+
+		this->sendHttpRequest(EXECUTE, model->serviceURL(), doc, response);
+		// Check if response is an error or warning
+		OT_ACTION_IF_RESPONSE_ERROR(response) {
+			assert(0); // ERROR
+		}
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			assert(0); // WARNING
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
+	}
+	catch (...) {
+		OT_LOG_EA("[FATAL] Unknown error");
+	}
+}
+
+void ExternalServicesComponent::versionDeselected(void) {
+	try {
+		ServiceDataUi* model = this->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
+		if (!model) {
+			OT_LOG_EA(OT_INFO_SERVICE_TYPE_MODEL " service not found");
+			return;
+		}
+		
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_VersionDeselected, doc.GetAllocator()), doc.GetAllocator());
+		std::string response;
+
+		this->sendHttpRequest(EXECUTE, model->serviceURL(), doc, response);
+		// Check if response is an error or warning
+		OT_ACTION_IF_RESPONSE_ERROR(response) {
+			assert(0); // ERROR
+		}
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			assert(0); // WARNING
+		}
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_EAS(_e.what());
+	}
+	catch (...) {
+		OT_LOG_EA("[FATAL] Unknown error");
+	}
+}
+
 void ExternalServicesComponent::activateVersion(const std::string& _version)
 {
 	try {
+		ServiceDataUi* model = this->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
+		if (!model) {
+			OT_LOG_EA(OT_INFO_SERVICE_TYPE_MODEL " service not found");
+			return;
+		}
+		OT_LOG_D("Version requested { \"Version\": \"" + _version + "\" }");
 
-		if (this->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL) != nullptr)
-		{
-			OT_LOG_D("Version requested { \"Version\": \"" + _version + "\" }");
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ActivateVersion, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(_version, doc.GetAllocator()), doc.GetAllocator());
+		std::string response;
 
-			ot::JsonDocument doc;
-			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ActivateVersion, doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(_version, doc.GetAllocator()), doc.GetAllocator());
-			std::string response;
-
-			this->sendHttpRequest(EXECUTE, this->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL)->serviceURL(), doc, response);
-			// Check if response is an error or warning
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
-			}
-			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-				assert(0); // WARNING
-			}
+		this->sendHttpRequest(EXECUTE, model->serviceURL(), doc, response);
+		// Check if response is an error or warning
+		OT_ACTION_IF_RESPONSE_ERROR(response) {
+			assert(0); // ERROR
+		}
+		else OT_ACTION_IF_RESPONSE_WARNING(response) {
+			assert(0); // WARNING
 		}
 	}
 	catch (const std::exception& _e) {

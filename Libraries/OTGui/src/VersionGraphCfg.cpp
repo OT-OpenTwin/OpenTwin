@@ -85,6 +85,12 @@ ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findVersion(const std::string& 
 	else return nullptr;
 }
 
+const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findVersion(const std::string& _version) const {
+	if (_version.empty()) return m_rootVersion;
+	else if (m_rootVersion) return m_rootVersion->findVersion(_version);
+	else return nullptr;
+}
+
 bool ot::VersionGraphCfg::versionStartingWithNameExists(const std::string& _prefix) {
 	if (m_rootVersion) {
 		return m_rootVersion->versionStartingWithNameExists(_prefix);

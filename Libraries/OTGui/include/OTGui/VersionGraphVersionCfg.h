@@ -63,8 +63,12 @@ namespace ot {
 		const std::list<VersionGraphVersionCfg*>& getChildVersions(void) const { return m_childVersions; };
 
 		//! \brief Returns the version with the given name.
-		//! Thie version may be this version.
+		//! The version may be this version.
 		VersionGraphVersionCfg* findVersion(const std::string& _versionName);
+
+		//! \brief Returns the version with the given name.
+		//! The version may be this version.
+		const VersionGraphVersionCfg* findVersion(const std::string& _versionName) const;
 
 		//! \brief Returns true if a version with the given name prefix exists in any of the versions childs.
 		//! Also checks this version.

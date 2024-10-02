@@ -71,9 +71,13 @@
 
 #include "tinyexpr.h"
 
+// OpenTwin header
 #include "EntityBlock.h"
 #include "OTGui/KeySequence.h"
 #include "OTGui/NavigationTreeItem.h"
+#include "OTGui/PropertyGroup.h"
+#include "OTGui/PropertyString.h"
+#include "OTGui/VersionGraphVersionCfg.h"
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 
@@ -85,7 +89,6 @@ void Model::entityModified(EntityBase *entity)
 { 
 	setModified(); 
 }
-
 
 // Model class
 
@@ -1803,6 +1806,7 @@ void Model::updatePropertyGrid(void)
 		this->addCommonPropertiesToConfig(selectedModelEntityIDs, true, cfg);
 	}
 
+	m_selectedVersion.clear();
 	Application::instance()->getNotifier()->fillPropertyGrid(cfg);
 }
 
@@ -1852,18 +1856,56 @@ void Model::resetAllViews(void)
 
 void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const ot::PropertyGridCfg& _configuration, bool update, bool itemsVisible)
 {
-	std::list<EntityBase *> entities;
-	for (auto entityID : entityIDList) entities.push_back(getEntity(entityID));
-
-	EntityProperties properties;
-	properties.buildFromConfiguration(_configuration, getRootNode());
-
-	setProperties(entities, properties);
-
-	if (update)
-	{
-		updateEntities(itemsVisible);
+	if (!m_selectedVersion.empty()) {
+		this->setVersionPropertiesFromJson(_configuration);
 	}
+	else {
+		std::list<EntityBase*> entities;
+		for (auto entityID : entityIDList) entities.push_back(getEntity(entityID));
+
+		EntityProperties properties;
+		properties.buildFromConfiguration(_configuration, getRootNode());
+
+		setProperties(entities, properties);
+
+		if (update) {
+			updateEntities(itemsVisible);
+		}
+	}
+}
+
+void Model::setVersionPropertiesFromJson(const ot::PropertyGridCfg& _configuration) {
+	if (m_selectedVersion.empty()) {
+		OT_LOG_W("No version selected. Ignoring..");
+		return;
+	}
+
+	ot::VersionGraphVersionCfg* version = getStateManager()->getVersionGraph().findVersion(m_selectedVersion);
+	if (!version) {
+		OT_LOG_EAS("Selected version not found \"" + m_selectedVersion + "\"");
+		return;
+	}
+
+	std::list<ot::Property*> properties = _configuration.getAllProperties();
+	for (ot::Property* prop : properties) {
+		std::string path = prop->getPropertyPath();
+		if (path == "Version/Label") {
+			ot::PropertyString* actualProperty = dynamic_cast<ot::PropertyString*>(prop);
+			if (!actualProperty) {
+				OT_LOG_EAS("Property cast failed \"" + path + "\"");
+				continue;
+			}
+			version->setLabel(actualProperty->getValue());
+		}
+		else {
+			OT_LOG_EAS("Unknown version property \"" + path + "\"");
+		}
+	}
+
+	getStateManager()->updateVersionEntity(m_selectedVersion);
+
+	const ot::VersionGraphCfg& cfg = getStateManager()->getVersionGraph();
+	this->sendVersionGraphToUI(cfg, cfg.getActiveVersionName(), cfg.getActiveBranchVersionName());
 }
 
 void Model::deleteProperty(const std::list<ot::UID> &entityIDList, const std::string& propertyName, const std::string& propertyGroup)
@@ -4110,13 +4152,13 @@ std::string Model::getCurrentModelVersion(void)
 	return getStateManager()->getModelStateVersion();
 }
 
-void Model::activateVersion(const std::string &version)
+void Model::activateVersion(const std::string& _version)
 {
 	enableQueuingHttpRequests(true);
 
-	if (getStateManager()->loadModelState(version))
+	if (getStateManager()->loadModelState(_version))
 	{
-		OT_LOG_D("Model state loaded { \"Version\": \"" + version + "\" }");
+		OT_LOG_D("Model state loaded { \"Version\": \"" + _version + "\" }");
 		updateModelStateForUndoRedo();
 	}
 
@@ -4124,6 +4166,34 @@ void Model::activateVersion(const std::string &version)
 	refreshAllViews();
 
 	enableQueuingHttpRequests(false);
+}
+
+void Model::versionSelected(const std::string& _version) {
+	ot::PropertyGridCfg cfg;
+
+	const ot::VersionGraphVersionCfg* version = getStateManager()->getVersionGraph().findVersion(_version);
+	if (!version) {
+		OT_LOG_EAS("Version not found \"" + _version + "\"");
+		return;
+	}
+
+	ot::PropertyGroup* generalGroup = new ot::PropertyGroup("Version");
+	cfg.addRootGroup(generalGroup);
+
+	ot::PropertyString* nameProp = new ot::PropertyString("Name", version->getName(), ot::PropertyBase::IsReadOnly);
+	ot::PropertyString* descriptionProp = new ot::PropertyString("Description", version->getDescription(), ot::PropertyBase::IsReadOnly);
+	ot::PropertyString* labelProp = new ot::PropertyString("Label", version->getLabel());
+
+	generalGroup->addProperty(nameProp);
+	generalGroup->addProperty(descriptionProp);
+	generalGroup->addProperty(labelProp);
+
+	m_selectedVersion = _version;
+	Application::instance()->getNotifier()->fillPropertyGrid(cfg);
+}
+
+void Model::versionDeselected(void) {
+	m_selectedVersion.clear();
 }
 
 std::list<ot::UID> Model::getNewEntityIDs(unsigned long long count)

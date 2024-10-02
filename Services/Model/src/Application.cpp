@@ -641,28 +641,6 @@ std::string Application::handleUpdatePropertyGrid(ot::JsonDocument& _document) {
 	return "";
 }
 
-std::string Application::handleGetCurrentVersion(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	return m_model->getCurrentModelVersion();
-}
-
-std::string Application::handleActivateVersion(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
-	}
-
-	std::string version = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
-
-	m_model->activateVersion(version);
-
-	return "";
-}
-
 std::string Application::handleGetCurrentVisualizationModelID(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
@@ -925,6 +903,54 @@ std::string Application::handleViewsFromProjectType(ot::JsonDocument& _document)
 
 	ProjectTypeManager typeManager(m_model->getProjectType());
 	return typeManager.getViews();
+}
+
+// Versions
+
+std::string Application::handleGetCurrentVersion(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+	}
+
+	return m_model->getCurrentModelVersion();
+}
+
+std::string Application::handleActivateVersion(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+	}
+
+	std::string version = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
+
+	m_model->activateVersion(version);
+
+	return "";
+}
+
+std::string Application::handleVersionSelected(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+	}
+
+	std::string version = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
+
+	m_model->versionSelected(version);
+
+	return "";
+}
+
+std::string Application::handleVersionDeselected(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+	}
+
+	m_model->versionDeselected();
+
+	return "";
 }
 
 // ##################################################################################################################################################################################################################

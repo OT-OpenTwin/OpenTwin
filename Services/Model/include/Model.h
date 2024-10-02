@@ -65,6 +65,7 @@ public:
 
 	void addCommonPropertiesToConfig(const std::list<ot::UID> &entityIDList, bool visibleOnly, ot::PropertyGridCfg& _config);
 	void        setPropertiesFromJson(const std::list<ot::UID>& entityIDList, const ot::PropertyGridCfg& _configuration, bool updateEntities, bool itemsVisible);
+	void setVersionPropertiesFromJson(const ot::PropertyGridCfg& _configuration);
 	void        deleteProperty(const std::list<ot::UID>& entityIDList, const std::string &propertyName, const std::string& propertyGroup);
 
 	bool entitiesNeedUpdate(void);
@@ -157,6 +158,9 @@ public:
 
 	std::string getCurrentModelVersion(void);
 	void activateVersion(const std::string &version);
+	void versionSelected(const std::string &version);
+	void versionDeselected(void);
+
 	void addEntitiesToModel(std::list<ot::UID> &topologyEntityIDList, std::list<ot::UID> &topologyEntityVersionList, std::list<bool> &topologyEntityForceVisible, std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList, const std::string &description, bool saveModel, bool askForCreationOfBranch);
 	void addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion, const std::string &geomEntityName, std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList, std::list<std::string> &childrenList, const std::string &description);
 	void deleteEntitiesFromModel(std::list<std::string> &entityNameList, bool saveModel);
@@ -320,6 +324,7 @@ private:
 	bool						   versionGraphCreated;
 	std::string					   newTableItemName;
 	std::map<ot::UID, bool>		   meshingActive;
+	std::string                    m_selectedVersion;
 
 	std::atomic_bool				modelSelectionChangedNotificationInProgress;
 	std::map<std::string, std::pair<double, EntityParameter*>>  parameterMap;

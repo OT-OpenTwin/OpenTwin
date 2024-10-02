@@ -128,6 +128,9 @@ public:
 	void loadVersionGraph(void);
 
 	// Get a list of all model states (version, description);
+	ot::VersionGraphCfg& getVersionGraph(void);
+
+	// Get a list of all model states (version, description);
 	const ot::VersionGraphCfg& getVersionGraph(void) const;
 
 	// Check the database schema version and upgrade, if needed
@@ -135,6 +138,9 @@ public:
 
 	// Remove all redo model states and the items belonging to them 
 	std::list<std::string> removeRedoModelStates(void);
+	
+	// Write the version information to the entity in the data base
+	void updateVersionEntity(const std::string& _version);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
