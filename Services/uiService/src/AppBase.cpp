@@ -117,6 +117,7 @@ const QString c_promtIcoPath = "Default";
 #define WELCOME_SCREEN_ID_OPEN 1
 #define WELCOME_SCREEN_ID_NEW 2
 
+#define STATE_NAME_VERSIONVIEWMODE "VersionView"
 #define STATE_NAME_WINDOW "UISettings"
 #define STATE_NAME_VIEW "ViewSettings"
 #define STATE_NAME_COLORSTYLE "ColorStyle"
@@ -1169,6 +1170,13 @@ void AppBase::restoreSessionState(void) {
 
 	UserManagement uM(m_loginData);
 
+	if (m_versionGraph) {
+		std::string mode = uM.restoreSetting(STATE_NAME_VERSIONVIEWMODE + std::string("_") + m_currentProjectType);
+		if (!mode.empty()) {
+			m_versionGraph->setCurrentViewMode(ot::VersionGraphManager::stringToViewMode(mode));
+		}
+	}
+
 	std::string s = uM.restoreSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType);
 	if (s.empty()) return;
 
@@ -1188,6 +1196,11 @@ void AppBase::storeSessionState(void) {
 
 	m_currentStateWindow.view = ot::WidgetViewManager::instance().saveState();
 	uM.storeSetting(STATE_NAME_VIEW + std::string("_") + m_currentProjectType, m_currentStateWindow.view);
+
+	if (m_versionGraph) {
+		std::string mode = ot::VersionGraphManager::viewModeToString(m_versionGraph->getCurrentViewMode());
+		uM.storeSetting(STATE_NAME_VERSIONVIEWMODE + std::string("_") + m_currentProjectType, mode);
+	}
 }
 
 bool AppBase::storeSettingToDataBase(const ot::PropertyGridCfg& _config, const std::string& _subKey) {

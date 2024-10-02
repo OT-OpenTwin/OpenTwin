@@ -79,6 +79,8 @@ void ot::VersionGraphManager::setCurrentViewMode(ViewMode _mode) {
 	m_modeSelector->setCurrentText(QString::fromStdString(viewModeToString(_mode)));
 
 	m_modeSelector->blockSignals(blocked);
+
+	this->updateCurrentGraph();
 }
 
 ot::VersionGraphManager::ViewMode ot::VersionGraphManager::getCurrentViewMode(void) const {
