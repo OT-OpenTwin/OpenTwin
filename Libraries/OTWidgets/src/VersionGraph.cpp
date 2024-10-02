@@ -9,7 +9,7 @@
 #include "OTWidgets/VersionGraphItem.h"
 
 ot::VersionGraph::VersionGraph() 
-	: m_rootItem(nullptr)
+	: m_rootItem(nullptr), m_updateItemPositionRequired(false)
 {
 	this->getGraphicsScene()->setGridFlags(ot::Grid::NoGridFlags);
 	this->getGraphicsScene()->setMultiselectionEnabled(false);
@@ -25,7 +25,7 @@ ot::VersionGraph::~VersionGraph() {
 
 void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 	if (m_rootItem) {
-		m_lastViewportRect = this->viewport()->rect().toRectF();
+		m_lastViewportRect = this->getVisibleSceneRect();
 	}
 
 	this->clear();
@@ -48,7 +48,7 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 		branchVersion->setAsActiveVersionBranch();
 	}
 
-	QMetaObject::invokeMethod(this, &VersionGraph::slotUpdateVersionItems, Qt::QueuedConnection);
+	m_updateItemPositionRequired = true;
 }
 
 void ot::VersionGraph::clear(void) {
@@ -85,30 +85,26 @@ void ot::VersionGraph::slotSelectionChanged(void) {
 	}
 }
 
-void ot::VersionGraph::slotUpdateVersionItems(void) {
-	if (!m_rootItem) {
-		return;
-	}
-	
-	m_rootItem->updateGraphics();
-	
-	if (!m_activeVersion.empty()) {
-		QMetaObject::invokeMethod(this, &VersionGraph::slotCenterOnActiveVersion, Qt::QueuedConnection);
-	}	
-}
-
 void ot::VersionGraph::slotCenterOnActiveVersion(void) {
 	QRectF rect = this->calculateFittedViewportRect();
 
 	if (m_lastViewportRect.isValid()) {
-		rect.setSize(m_lastViewportRect.size().expandedTo(rect.size()));
+		qreal w = 0.;
+		if (m_lastViewportRect.width() > rect.width()) {
+			w = (m_lastViewportRect.width() - rect.width()) / 2.;
+		}
+		qreal h = 0.;
+		if (m_lastViewportRect.height() > rect.height()) {
+			h = (m_lastViewportRect.height() - rect.height()) / 2.;
+		}
+		rect.adjust(-w, -h, w, h);
 	}
 
 	// Center the view on the item's bounding rectangle with margin
 	this->fitInView(rect, Qt::KeepAspectRatio);
 	this->centerOn(rect.center());
 	this->ensureViewInBounds();
-
+	
 	m_lastViewportRect = rect;
 }
 
@@ -117,8 +113,34 @@ void ot::VersionGraph::slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _it
 }
 
 void ot::VersionGraph::showEvent(QShowEvent* _event) {
+	GraphicsView::showEvent(_event);
 	if (!m_activeVersion.empty()) {
 		QMetaObject::invokeMethod(this, &VersionGraph::slotCenterOnActiveVersion, Qt::QueuedConnection);
+	}
+}
+
+void ot::VersionGraph::paintEvent(QPaintEvent* _event) {
+	if (m_updateItemPositionRequired) {
+		this->updateVersionPositions();
+	}
+	GraphicsView::paintEvent(_event);
+}
+
+void ot::VersionGraph::updateVersionPositions(void) {
+	m_updateItemPositionRequired = false;
+
+	if (!m_rootItem) {
+		return;
+	}
+
+	m_rootItem->updateVersionPosition();
+
+	QRectF itmRect = this->getGraphicsScene()->itemsBoundingRect();
+	itmRect.adjust(-10, -10, 10, 10);
+	this->setSceneRect(itmRect);
+
+	if (!m_activeVersion.empty()) {
+		this->slotCenterOnActiveVersion();
 	}
 }
 

@@ -107,6 +107,8 @@ namespace ot {
 
 		void notifyItemConfigurationChanged(const ot::GraphicsItem* _item);
 
+		QRectF getVisibleSceneRect(void) const;
+
 	Q_SIGNALS:
 		//! @brief Will be emitted when an item was dropped into the scene by the user
 		//! @param _name Item name

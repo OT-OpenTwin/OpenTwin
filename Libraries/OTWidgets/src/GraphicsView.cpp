@@ -15,6 +15,7 @@
 
 // Qt header
 #include <QtGui/qevent.h>
+#include <QtGui/qmatrix4x4.h>
 #include <QtCore/qmimedata.h>
 #include <QtWidgets/qscrollbar.h>
 #include <QtWidgets/qgraphicsproxywidget.h>
@@ -335,6 +336,10 @@ void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _i
 
 	if (m_viewStateFlags & ItemMoveInProgress) return;
 	Q_EMIT itemConfigurationChanged(_item->getConfiguration());
+}
+
+QRectF ot::GraphicsView::getVisibleSceneRect(void) const {
+	return this->mapToScene(this->viewport()->rect()).boundingRect();
 }
 
 // ########################################################################################################

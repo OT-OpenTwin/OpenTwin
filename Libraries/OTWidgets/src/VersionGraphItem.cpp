@@ -105,8 +105,6 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 
 	this->setZValue(2);
 
-	this->finalizeGraphicsItem();
-
 	if (m_config.getLabel().empty()) {
 		m_nameItem->setText("");
 		m_labelItem->setText(m_config.getName());
@@ -117,9 +115,9 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 	}
 
 	_scene->addItem(this);
+	this->finalizeGraphicsItem();
 
-	// Create item config
-	this->updateGraphics();
+	m_currentSize = this->boundingRect().size();
 
 	// Create childs
 	int childRow = m_row;
@@ -203,7 +201,7 @@ ot::VersionGraphItem* ot::VersionGraphItem::findVersionByName(const std::string&
 	return result;
 }
 
-void ot::VersionGraphItem::updateGraphics(void) {
+void ot::VersionGraphItem::updateVersionPosition(void) {
 	this->prepareGeometryChange();
 
 	// Calculate positioning
@@ -212,17 +210,14 @@ void ot::VersionGraphItem::updateGraphics(void) {
 	if (m_parentVersion) {
 		newPos.setX(
 			m_parentVersion->getQGraphicsItem()->pos().x() + 
-			m_parentVersion->getQGraphicsItem()->boundingRect().width() + 
-			OT_VERSIONGRAPHITEM_HSpacing
+			m_parentVersion->getCurrentSize().width() + OT_VERSIONGRAPHITEM_HSpacing
 		);
 	}
 	this->setGraphicsItemPos(newPos);
 
-	//this->updateGeometry();
-
 	// Update childs
 	for (VersionGraphItem* child : m_childVersions) {
-		child->updateGraphics();
+		child->updateVersionPosition();
 	}
 }
 

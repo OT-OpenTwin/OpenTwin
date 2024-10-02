@@ -41,9 +41,11 @@ namespace ot {
 
 		VersionGraphItem* findVersionByName(const std::string& _versionName);
 
-		void updateGraphics(void);
+		void updateVersionPosition(void);
 
 		void setAsActiveVersionBranch(void);
+
+		const QSizeF& getCurrentSize(void) const { return m_currentSize; };
 
 	private:
 		void updateToRootAsActiveBranch(void);
@@ -58,6 +60,7 @@ namespace ot {
 		
 		std::list<VersionGraphItem*> m_childVersions;
 		int m_row;
+		QSizeF m_currentSize;
 	};
 
 }

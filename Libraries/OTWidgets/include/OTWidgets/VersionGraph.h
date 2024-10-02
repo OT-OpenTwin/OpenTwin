@@ -33,18 +33,20 @@ namespace ot {
 
 	public Q_SLOTS:
 		void slotSelectionChanged(void);
-		void slotUpdateVersionItems(void);
 		void slotCenterOnActiveVersion(void);
 		void slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item);
-
+		
 	protected:
 		virtual void showEvent(QShowEvent* _event) override;
+		virtual void paintEvent(QPaintEvent* _event) override;
 
 	private:
+		void updateVersionPositions(void);
 		QRectF calculateFittedViewportRect(void) const;
 		VersionGraphItem* getVersion(const std::string& _name) const;
 		void highlightVersion(const std::string& _name);
 
+		bool m_updateItemPositionRequired;
 		QRectF m_lastViewportRect;
 		std::string m_activeVersion;
 		std::string m_activeVersionBranch;
