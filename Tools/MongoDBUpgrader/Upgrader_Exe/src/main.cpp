@@ -86,7 +86,7 @@ void moveMongoCfg()
     std::string serverName = g_serviceName;
     WindowsServiceManager mongoService(serverName);
     const std::string binPath = mongoService.getMongoDBServerBinPath();
-    mongoService.startService();
+    mongoService.stopService();
 
     //Now we extract paths from the binPath
     MongoDBSettingsParser mongoSettingsParser(binPath);
@@ -99,10 +99,11 @@ void moveMongoCfg()
     else
     {
         const std::string destinationPath = mongoSettingsParser.getMongoDBSettings().m_configFilePath;
+        Logger::INSTANCE().write("Removing automatically created cfg file: " + destinationPath + "\n");
         std::filesystem::remove(destinationPath);
+        Logger::INSTANCE().write("Copying cfg with former settings to: " + destinationPath + "\n");
         std::filesystem::rename(cfgPath, destinationPath);
     }
-    mongoService.startService();
 }
 
 void performUpgrade(const std::string& _adminPsw)
@@ -141,17 +142,30 @@ void performUpgrade(const std::string& _adminPsw)
         mongoSettingsParser.createTempMongoServerConf(configPathForServerIteration);
 
         MongoDBUpgrader upgrader(mongoSettings, configPathForServerIteration);
-
-        if (majorVersion == "4" && version.m_minorVersion == "2")
+        int foundFCV = upgrader.checkForFeatureCompatibilityVersion(version.m_majorVersion);
+        if (foundFCV == 0)
         {
-            std::cout << "\n";
+            throw std::exception("Failed to determine the current fcv.\n");
+        }
+        else if (foundFCV == MongoDBUpgrader::getSupportedMaxVersion())
+        {
+            throw std::exception(std::string("Upgrade not necessary, since MongoDB data feature compatibility version is already on version "+ std::to_string(foundFCV) + ".").c_str());
+        }
+        else
+        {
+            Logger::INSTANCE().write("Detected feature compatibility version: " + std::to_string(foundFCV) + "\n");
+        }
+
+        if (foundFCV == 4 && majorVersion == "4" && version.m_minorVersion == "2")
+        {
+            //std::cout << "\n";
             upgrader.performUpgrade4_2To4_4();
         }
-        version.m_majorVersion++;
+        foundFCV++;
 
-        for (int i = version.m_majorVersion; i <= MongoDBUpgrader::getSupportedMaxVersion(); i++)
+
+        for (int i = foundFCV; i <= MongoDBUpgrader::getSupportedMaxVersion(); i++)
         {
-            std::cout << "\n";
             upgrader.performUpgrade(i);
         }
     }
@@ -183,17 +197,28 @@ void setServiceName(boost::program_options::variables_map& _arguments)
 
 
 void varifyValidSettings(boost::program_options::variables_map& _arguments)
-{
+{    
+    Logger::INSTANCE().write("Checking environment variable for MongoDB address.\n");
     Varifier varifier;
-    varifier.ensureCorrectMongoEnvVar();
+    varifier.ensureCorrectMongoEnvVar();    
+
+    Logger::INSTANCE().write("Setting service permissions.\n");
+    setServiceName(_arguments);
+    WindowsServiceManager mongoService(g_serviceName);
+    mongoService.stopService();
+
+    const std::string binPath = mongoService.getMongoDBServerBinPath();
+    //Now we extract paths from the binPath
+    MongoDBSettingsParser mongoSettingsParser(binPath);
+    mongoSettingsParser.extractDataFromConfig();
+
+    varifier.setPermissions(mongoSettingsParser.getMongoDBSettings().m_dataPath);
+    varifier.setPermissions(mongoSettingsParser.getMongoDBSettings().m_logPath);
+    varifier.setPermissions(mongoSettingsParser.getMongoDBSettings().m_configFilePath);
 }
 
 int main(int argc, char* argv[])
 {
-    Logger::Init(".\\MongoDBUpgrader.log");
-    
-    Logger::INSTANCE().write("Starting MongoDBUpgrader.\n");
-
     boost::program_options::options_description desc("Allowed options");
 
     desc.add_options()
@@ -206,19 +231,31 @@ int main(int argc, char* argv[])
         //Function 4: Set mongodb.cfg
         ("SetMongoCfg", "Copy the updated mongodb.cfg into the new service directory.")
         //Function 5: Upgrade cfg
-        ("UpgradeMongoCfg", "Upgrade the current mongodb cfg, so that it works with the new driver.") //ToDo
+        //("UpgradeMongoCfg", "Upgrade the current mongodb cfg, so that it works with the new driver.") //ToDo
         //Function 5: Verify all MongoDB related settings
         ("VerifySetup", "Check if all MongoDB related settings are correct.") //ToDo
         //Parameter for upgrade
         ("AdminPsw", boost::program_options::value<std::string>(), "Admin Psw for the database")
         //Parameter for server name
         ("ServiceName", boost::program_options::value<std::string>(), "Name of the MongoDB service")
+        ("LogPath", boost::program_options::value<std::string>(), "Path for the logfile.")
         ;
 
     boost::program_options::variables_map variableMap;
     try
     {
         boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), variableMap);
+        if (variableMap.count("LogPath") == 1)
+        {
+            const auto& value = variableMap["LogPath"].value();
+            std::string logPath = boost::any_cast<std::string>(value);
+            Logger::Init(logPath + "\\MongoDBUpgrader.log");
+        }
+        else
+        {
+            Logger::Init(".\\MongoDBUpgrader.log");
+        }
+        Logger::INSTANCE().write("Starting MongoDBUpgrader.\n");
         if (variableMap.count("Check") == 1)
         {
             Logger::INSTANCE().write("Performing upgrade check\n");
@@ -266,7 +303,7 @@ int main(int argc, char* argv[])
         }
         else if (variableMap.count("VerifySetup") == 1)
         {
-            Logger::INSTANCE().write("Setting mongodb.cfg of service.\n");
+            Logger::INSTANCE().write("Verifying valid settings.\n");
             setServiceName(variableMap);
             varifyValidSettings(variableMap);
             close(ERROR_SUCCESS);

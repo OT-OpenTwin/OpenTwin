@@ -11,6 +11,7 @@ struct MongoDBSettings
     std::string m_certKeyFile = "";
     std::string m_executablePath = "";
     std::string m_dataPath = "";
+    std::string m_logPath = "";
 
     std::string m_tlsUseSystemCA = "";
 };

@@ -11,6 +11,10 @@
 #include <fstream>
 #include <cctype>
 
+
+
+//C4244, C4267 Boost warning to ignore
+
 MongoDBSettingsParser::MongoDBSettingsParser(const std::string& _binPath, const std::string& _adminPsw)
     :MongoDBSettingsParser(_binPath)
 {
@@ -61,7 +65,7 @@ void MongoDBSettingsParser::extractDataFromConfig()
             mode : requireTLS
             certificateKeyFile : C : \Users\JWagner\OpenTwin_Cert\certificateKeyFile.pem*/
         std::string line;
-        size_t journalNumberOfIntentations = 0;
+        size_t journalNumberOfIntentations(0), sysLogNumberOfIntentations(0);
         std::list<std::string> journalSectionBuffer;
         while (std::getline(configFile, line))
         {
@@ -69,7 +73,7 @@ void MongoDBSettingsParser::extractDataFromConfig()
             std::string cleanedLine = removeTrailingComments(line);
            
             //All entries of the journal section are buffered
-            if (journalNumberOfIntentations == 0)
+            if (journalNumberOfIntentations == 0 && sysLogNumberOfIntentations == 0)
             {
                 //Currently not in the journal section
                 if (cleanedLine.find(m_cfgKeyWordPort) != std::string::npos)
@@ -103,8 +107,12 @@ void MongoDBSettingsParser::extractDataFromConfig()
                 {
                     journalNumberOfIntentations = cleanedLine.find(m_cfgKeyWordJournal);
                 }
+                if (cleanedLine.find(m_cfgKeyWordSysLog) != std::string::npos)
+                {
+                    sysLogNumberOfIntentations = 2;
+                }
             }
-            else
+            else if(journalNumberOfIntentations != 0)
             {
                 //The parser is currently in the journal section
                 int currentIntentationLvl = static_cast<int>(cleanedLine.find_first_not_of(' '));
@@ -122,6 +130,25 @@ void MongoDBSettingsParser::extractDataFromConfig()
                     journalSectionBuffer.push_back(line);
                 }
             }
+            else if (sysLogNumberOfIntentations != 0)
+            {
+                int currentIntentationLvl = static_cast<int>(cleanedLine.find_first_not_of(' '));
+                if (currentIntentationLvl == std::string::npos)
+                {
+                    currentIntentationLvl = 0;
+                }
+                if (currentIntentationLvl < sysLogNumberOfIntentations)
+                {
+                    sysLogNumberOfIntentations = 0;
+                }
+                if(cleanedLine.find(m_cfgKeyWordSysPath) != std::string::npos)
+                { 
+                    size_t serperatorPos = cleanedLine.find(':');
+                    m_settings.m_logPath = cleanedLine.substr(serperatorPos + 2);
+                    sysLogNumberOfIntentations = 0;
+                }
+            }
+
             //If we are not in the journal section, we add all existing lines, including comments
             if (journalNumberOfIntentations == 0)
             {

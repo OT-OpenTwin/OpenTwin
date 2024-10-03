@@ -6,25 +6,80 @@
 #include "FileWriter.h"
 #include <cassert>
 #include <iostream>
+#include <boost/process/system.hpp>
+
 
 MongoDBUpgrader::MongoDBUpgrader(const MongoDBSettings& _settings, const std::string& _tempCfgPath)
     : m_settings(_settings), m_cfgPath(_tempCfgPath)
 {}
+
+int MongoDBUpgrader::checkForFeatureCompatibilityVersion(int _startVersion)
+{
+    int foundFCV = 0;
+    for (int version = _startVersion; version <= maxVersion; version++)
+    {
+        std::string serverVersion("");
+        if (version == 4)
+        {
+            serverVersion = CurrentPaths::INSTANCE().getMongoVersion4_4();
+        }
+        else if (version == 5)
+        {
+            serverVersion = CurrentPaths::INSTANCE().getMongoVersion5();
+        }
+        else if (version == 6)
+        {
+            serverVersion = CurrentPaths::INSTANCE().getMongoVersion6();
+        }
+        else if (version == 7)
+        {
+            serverVersion = CurrentPaths::INSTANCE().getMongoVersion7();
+        }
+        else
+        {
+            assert(maxVersion == 7);
+        }
+        const std::string mongoServerPath = CurrentPaths::INSTANCE().getMongoServerCollectionDirectory() + "\\"+ serverVersion + "\\mongod.exe";
+        std::unique_ptr<MongoDBServerRunner> server;
+        try
+        {
+            server = std::make_unique<MongoDBServerRunner>(mongoServerPath, m_cfgPath);
+            try
+            {
+                MongoDBShellExecutor mongoOperator(m_settings);
+                foundFCV = mongoOperator.getFeatureCompatibilityVersion();
+                mongoOperator.shutdownDatabase();
+                //std::this_thread::sleep_for(std::chrono::seconds(1));
+                server->terminate();
+                return foundFCV;
+            }
+            catch (std::exception& e)
+            {
+                Logger::INSTANCE().write("Failed to request the current server compatibility version. Error: " + std::string(e.what()));
+            }
+        }
+        catch (std::exception& e)
+        {
+            Logger::INSTANCE().write("Failed to start the server of version " + serverVersion + ". Assuming a not matching feature compatibility version and proceeding with next server. Error message:"+std::string(e.what()) + "\n");
+        }
+    }
+    return 0;
+}
 
 void MongoDBUpgrader::performUpgrade(int version)
 {
     std::string serverVersion("");
     if (version == 5)
     {
-        serverVersion = "5.0.28";
+        serverVersion = CurrentPaths::INSTANCE().getMongoVersion5();
     }
     else if (version == 6)
     {
-        serverVersion = "6.0.16";
+        serverVersion = CurrentPaths::INSTANCE().getMongoVersion6();
     }
     else if (version == 7)
     {
-        serverVersion = "7.0.14";
+        serverVersion = CurrentPaths::INSTANCE().getMongoVersion7();
     }
     else
     {
@@ -36,7 +91,7 @@ void MongoDBUpgrader::performUpgrade(int version)
 
 void MongoDBUpgrader::performUpgrade4_2To4_4()
 {
-    const std::string serverVersion = CurrentPaths::INSTANCE().getMongoVersion4();
+    const std::string serverVersion = CurrentPaths::INSTANCE().getMongoVersion4_4();
     updateServerFCV(serverVersion);
 }
 

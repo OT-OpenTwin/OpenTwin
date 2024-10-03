@@ -22,6 +22,28 @@ MongoDBShellExecutor::MongoDBShellExecutor(const MongoDBSettings& _settings)
     }
 }
 
+int MongoDBShellExecutor::getFeatureCompatibilityVersion()
+{
+    auto admin_db = m_client["admin"];
+
+    bsoncxx::builder::stream::document command_builder;
+    command_builder << "getParameter" << 1;
+    command_builder << "featureCompatibilityVersion" << 1;
+    auto result = admin_db.run_command(command_builder.view());
+    std::string resultStr = bsoncxx::to_json(result);
+    rapidjson::Document resultJson(rapidjson::kObjectType);
+    resultJson.Parse(resultStr.c_str());
+    
+    //{ "featureCompatibilityVersion" : { "version" : "7.0" }, "ok" : 1.0 }
+    auto subDoc = resultJson["featureCompatibilityVersion"].GetObject();
+    std::string versionString = subDoc["version"].GetString();
+    size_t pos = versionString.find_first_of('.') - 1;
+    pos = pos == 0 ? 1 : pos;
+    std::string majorVersion = versionString.substr(0, pos);
+    int versionInt = std::stoi(majorVersion);
+    return versionInt;
+}
+
 void MongoDBShellExecutor::setFeatureCompatibilityVersion(const std::string& version)
 {
     auto admin_db = m_client["admin"];

@@ -138,7 +138,10 @@ void WindowsServiceManager::stopService()
                 throw std::exception(("Failed to close service. Current state: " + wuf::getErrorMessage(status.dwCurrentState)).c_str());
             }
         }
-
+        else
+        {
+            Logger::INSTANCE().write("Service already stopped.\n");
+        }
         while (status.dwCurrentState == SERVICE_STOP_PENDING)
         {
             if (!QueryServiceStatus(m_service, &status))

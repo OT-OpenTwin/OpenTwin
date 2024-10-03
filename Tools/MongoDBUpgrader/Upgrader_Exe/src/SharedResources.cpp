@@ -6,6 +6,8 @@ CurrentPaths::CurrentPaths()
 {
     //std::string executableAbsPath = boost::dll::program_location().string();
     m_executablDirectory = wuf::getExecutablePath();
-    m_mongoServerCollectionDir = m_executablDirectory + "\\" + m_mongoServerDirName;
-    m_mongoNewVersionInstallationExe = m_executablDirectory + "\\" + m_mongoInstallerDirName + "\\" + m_newMongoVersionInstaller;
+    size_t parentPos =m_executablDirectory.find_last_of("\\");
+    std::string parentDir = m_executablDirectory.substr(0, parentPos);
+    m_mongoServerCollectionDir = parentDir + "\\" + m_mongoServerDirName;
+    m_mongoNewVersionInstallationExe = parentDir + "\\" + m_mongoInstallerDirName + "\\" + m_newMongoVersionInstaller;
 }

@@ -1,4 +1,7 @@
 #pragma once
+#pragma warning(disable : 4267)
+#pragma warning(disable : 4244)
+
 #include <string>
 #include <list>
 #include "MongoDBSettings.h"
@@ -24,6 +27,8 @@ private:
     const std::string m_cfgKeyWordBindIP = "bindIp";
     const std::string m_cfgKeyWordCertKeyFile = "certificateKeyFile";
     const std::string m_cfgKeyWordDBPath = "dbPath";
+    const std::string m_cfgKeyWordSysLog = "systemLog";
+    const std::string m_cfgKeyWordSysPath = "path";
     const std::string m_cfgKeyWordTLSUse = "tlsUseSystemCA";
     const std::string m_cfgKeyWordJournal = "journal";
 
