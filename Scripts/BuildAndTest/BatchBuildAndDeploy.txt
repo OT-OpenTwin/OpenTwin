@@ -1,0 +1,4 @@
+open sftp://su17251:%OPENTWIN_FTP_PASSWORD%@access-5016428849.ud-webspace.de/ -hostkey="ssh-ed25519 255 1gx2w8Rtv3wCgi7Jh8myf/KVd72cRQbow03UP8P095Q"
+synchronize remote %OPENTWIN_DEV_ROOT%\Deployment\Documentation /home/www/public/doc
+synchronize remote %OPENTWIN_DEV_ROOT%\InstallationImages /home/www/public/nightly
+exit
