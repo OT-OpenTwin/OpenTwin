@@ -1,3 +1,13 @@
+# Build Logs
+buildLog_Release.txt
+buildLog_Debug.txt
+buildLog_Summary.txt
+RUSTbuildLog.txt
+AdminPanel_buildLog.txt
+Documentation_buildLog.txt
+DoxygenDocumentation_buildLog.txt
+buildLog_Nightly.txt
+
+# Report Directories
 Reports
 TestReports
-DoxygenDocumentation_buildLog.txt
