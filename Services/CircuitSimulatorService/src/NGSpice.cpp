@@ -823,7 +823,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 			netlistElementName = diode->getNetlistName();
 			netlistLine += netlistElementName + " ";
-			modelNetlistLine += ".MODEL D1N4148 D(IS=2,52E-9)";
+			modelNetlistLine += ".MODEL D1N4148 D(IS=2.52E-9,RS=0.01,N=1.5,Vfwd=0.7)";
 			netlistValue = diode->getValue();
 		}
 		else if (circuitElement->type() == "VoltageMeter")
