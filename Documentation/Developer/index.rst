@@ -50,7 +50,10 @@ Overview
 
    code_docs/code_docs
 
-
+.. toctree::
+   
+   test_cases/test_cases
+   
 Indices and tables
 ==================
 
