@@ -59,6 +59,13 @@ exit 1
 )
 
 REM ===================================================================
+REM Build the documentation
+REM ===================================================================
+
+cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildDocumentation.bat"
+
+REM ===================================================================
 REM Create the deployment
 REM ===================================================================
 
