@@ -983,7 +983,6 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	if (simulationType == ".dc")
 	{
 		simulationLine = generateNetlistDCSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
-
 	}
 	else if (simulationType == ".TRAN")
 	{
@@ -996,6 +995,11 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	}
 
+
+	if (simulationLine == "failed")
+	{
+		return "failed";
+	}
 	simulationLine = "circbyline " + simulationLine;
 
 
@@ -1078,6 +1082,12 @@ std::string NGSpice::generateNetlistDCSimulation(EntityBase* solverEntity, std::
 	EntityPropertiesEntityList* elementProperty = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Element"));
 	
 	std::string element = Application::instance()->extractStringAfterDelimiter(elementProperty->getValueName(), '/', 2);
+	if (element == "failed")
+	{
+		OT_LOG_E("No Element for DC Simulation found or selected!");
+		return "failed";
+		
+	}
 	std::string netlistName = getNetlistNameOfMap(element);
 	
 	
@@ -1149,9 +1159,13 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 
 	
 	 updateBufferClasses(allConnectionEntities,allEntitiesByBlockID,editorname);
-	 generateNetlist( solverEntity, allConnectionEntities,allEntitiesByBlockID, editorname);
+	std::string temp =  generateNetlist( solverEntity, allConnectionEntities,allEntitiesByBlockID, editorname);
+	if (temp == "failed")
+	{
+		return "failed";
+	}
 
-	 Numbers::RshunNumbers = 0;
+	Numbers::RshunNumbers = 0;
 
 	/*char command[1000];
 	const char* netlist = "C:/Users/Sebastian/Desktop/NGSpice_Dateien_Test/Test.cir";
