@@ -353,6 +353,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	if (status == "failed")
 	{
 		OT_LOG_E("NGSpice Initialize function failed!");
+		m_ngSpice.clearBufferStructure(name);
 		return;
 	}
 	m_blockEntityHandler.createResultCurves(solverName,simulationTypeProperty->getValue(),circuitName->getValueName());

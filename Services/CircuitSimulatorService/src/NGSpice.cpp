@@ -57,7 +57,8 @@ void NGSpice::clearBufferStructure(std::string name)
 	this->customNameToNetlistNameMap.clear();
 	Numbers::nodeNumber = 1;
 	SimulationResults::getInstance()->getResultMap().clear();
-	
+	ngSpice_Command(const_cast<char*>("reset"));
+	//ngSpice_Init(MySendCharFunction, MySendStat, MyControlledExit, MySendDataFunction, MySendInitDataFunction, nullptr, nullptr);
 }
 
 
@@ -823,7 +824,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 			netlistElementName = diode->getNetlistName();
 			netlistLine += netlistElementName + " ";
-			modelNetlistLine += ".MODEL D1N4148 D(IS=2.52E-9,RS=0.01,N=1.5,Vfwd=0.7)";
+			modelNetlistLine += ".MODEL D1N4148 D(IS=2.52E-9,RS=0.01,N=1.5)";
 			netlistValue = diode->getValue();
 		}
 		else if (circuitElement->type() == "VoltageMeter")
@@ -1156,9 +1157,9 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 		OT_LOG_E("Something went wrong");
 	}
 
-
-	
-	 updateBufferClasses(allConnectionEntities,allEntitiesByBlockID,editorname);
+    //int result = ngSpice_Command(const_cast<char*>("show"));
+	//ngSpice_Command(const_cast<char*>("reset"));
+	updateBufferClasses(allConnectionEntities,allEntitiesByBlockID,editorname);
 	std::string temp =  generateNetlist( solverEntity, allConnectionEntities,allEntitiesByBlockID, editorname);
 	if (temp == "failed")
 	{
