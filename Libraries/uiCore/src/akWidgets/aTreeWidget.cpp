@@ -566,6 +566,16 @@ ak::aTreeWidgetItem * ak::aTreeWidget::item(ID _itemID) {
 	return itm->second;
 }
 
+ak::aTreeWidgetItem* ak::aTreeWidget::itemFromPath(const QString& _itemPath, char _delimiter) {
+	for (const auto& it : m_items) {
+		QString itmPath = it.second->getItemPathString(_delimiter);
+		if (itmPath == _itemPath) {
+			return it.second;
+		}
+	}
+	return nullptr;
+}
+
 bool ak::aTreeWidget::enabled() const { return m_tree->isEnabled(); }
 
 int ak::aTreeWidget::itemCount(void) const { return m_items.size(); }

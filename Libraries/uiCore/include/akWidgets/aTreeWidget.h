@@ -360,6 +360,8 @@ namespace ak {
 		//! @param _itemID The ID of the item
 		aTreeWidgetItem * item(ID _itemID);
 
+		aTreeWidgetItem* itemFromPath(const QString& _itemPath, char _delimiter = '|');
+
 		//! @brief Will return the enabled state of this tree
 		bool enabled() const;
 
