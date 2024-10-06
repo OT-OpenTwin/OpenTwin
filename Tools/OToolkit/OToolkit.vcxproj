@@ -23,6 +23,8 @@
     <ClCompile Include="src\ColorStyleEditor.cpp" />
     <ClCompile Include="src\ConnectToLoggerDialog.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\ExternalLibrary.cpp" />
+    <ClCompile Include="src\ExternalLibraryManager.cpp" />
     <ClCompile Include="src\FAR.cpp" />
     <ClCompile Include="src\GraphicsItemDesigner.cpp" />
     <ClCompile Include="src\GraphicsItemDesignerDrawHandler.cpp" />
@@ -82,6 +84,8 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\SettingsManager.h" />
+    <ClInclude Include="include\ExternalLibrary.h" />
+    <ClInclude Include="include\ExternalLibraryManager.h" />
     <ClInclude Include="include\GraphicsItemDesignerPreview.h" />
     <QtMoc Include="include\NetworkTools.h" />
     <QtMoc Include="include\PortBlockerServer.h" />

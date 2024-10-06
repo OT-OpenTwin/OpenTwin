@@ -22,6 +22,7 @@
     <ClCompile Include="src\ToolWidgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OToolkitAPI\APIFunctions.h" />
     <ClInclude Include="include\OToolkitAPI\OToolkitAPI.h" />
     <ClInclude Include="include\OToolkitAPI\otoolkitapi_global.h" />
     <ClInclude Include="include\OToolkitAPI\Tool.h" />

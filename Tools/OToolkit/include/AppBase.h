@@ -20,9 +20,10 @@
 // std header
 #include <mutex>
 
-class ToolManager;
 class Logging;
 class Terminal;
+class ToolManager;
+class ExternalLibraryManager;
 
 class QTabWidget;
 class QAction;
@@ -48,7 +49,7 @@ public:
 
 	virtual void log(const ot::LogMessage& _message) override;
 
-	virtual void log(const QString& _sender, otoolkit::APIInterface::InterfaceLogType _type, const QString& _message) override;
+	virtual void log(const QString& _sender, InterfaceLogType _type, const QString& _message) override;
 
 	virtual bool addTool(otoolkit::Tool* _tool) override;
 
@@ -116,6 +117,8 @@ private:
 
 	ToolManager*			m_toolManager;
 	
+	ExternalLibraryManager* m_externalLibraryManager;
+
 	Logging*				m_logger;
 	
 	ot::PlainTextEditView*	m_output;

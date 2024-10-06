@@ -21,7 +21,9 @@
 #define MENU_LOGW(___msg) OTOOLKIT_LOGW("Menu", ___msg)
 #define MENU_LOGE(___msg) OTOOLKIT_LOGE("Menu", ___msg)
 
-MenuManager::MenuManager() {
+MenuManager::MenuManager() 
+	: m_externalToolsMenu(nullptr)
+{
 	// Create root menus
 	m_fileMenu = this->addMenu("File");
 	this->addAction(ot::WidgetViewManager::instance().getDockToggleAction());
@@ -44,7 +46,7 @@ MenuManager::~MenuManager() {
 
 }
 
-ToolMenuManager* MenuManager::addToolMenu(const QString& _toolName) {
+ToolMenuManager* MenuManager::addToolMenu(const QString& _toolName, bool _isExternal) {
 	// Check if menu already exists
 	ToolMenuManager* menu = this->toolMenu(_toolName);
 	if (menu) {
@@ -54,7 +56,17 @@ ToolMenuManager* MenuManager::addToolMenu(const QString& _toolName) {
 
 	menu = new ToolMenuManager(_toolName);
 	m_toolMenus.insert_or_assign(_toolName, menu);
-	m_toolsMenu->addMenu(menu);
+
+	if (_isExternal) {
+		if (!m_externalToolsMenu) {
+			m_externalToolsMenu = m_toolsMenu->addMenu("External");
+		}
+		m_externalToolsMenu->addMenu(menu);
+	}
+	else {
+		m_toolsMenu->addMenu(menu);
+	}
+		
 	return menu;
 }
 

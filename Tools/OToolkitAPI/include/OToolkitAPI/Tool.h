@@ -69,6 +69,9 @@ namespace otoolkit {
 		void setToolIsRunning(bool _isRunning) { m_isRunning = _isRunning; };
 		bool getToolIsRunning(void) const { return m_isRunning; }
 
+		void setToolIsExternal(bool _isExternal) { m_isExternal = _isExternal; };
+		bool getToolIsExternal(void) const { return m_isExternal; };
+
 	protected:
 		ot::WidgetView* createCentralWidgetView(QWidget* _widget, const QString& _widgetName) const;
 		ot::WidgetView* createSideWidgetView(QWidget* _widget, const QString& _widgetName) const;
@@ -78,6 +81,7 @@ namespace otoolkit {
 		ot::WidgetView* createWidgetView(QWidget* _widget, const QString& _widgetName) const;
 
 		bool m_isRunning;
+		bool m_isExternal;
 	};
 
 }
