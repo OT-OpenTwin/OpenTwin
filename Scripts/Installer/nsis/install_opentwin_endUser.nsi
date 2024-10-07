@@ -70,14 +70,19 @@
 	Var DirHandleDB
 	Var DirHandleLog
 	Var BrowseButton
-	Var MONGODB_INSTALL_PATH
 	Var MONGODB_DB_PATH
 	Var MONGODB_LOG_PATH
-	Var MONGODB_ADMIN_PASSWORD
 	Var UNINSTALL_MONGODB_FLAG
 	
 	Var OPEN_TWIN_SERVICES_ADDRESS
-
+	
+	# For MongoDB Upgrade
+	Var First_MONGODB_Install_FLAG
+	Var UPGRADER_MONGODB_SERVICE_NAME
+	Var UPGRADER_MONGODB_ADMIN_PASSWORD
+	Var MONGODB_SETUP_MSG
+	Var UPGRADER_MONGODB_INSTALL_PATH
+	Var AdminPswHandle	
 #=================================================================
 #						END OF VARIABLES
 #=================================================================
@@ -108,12 +113,19 @@
 	!define CREATE_CERTIFICATE_BATCH '"$INSTDIR\Certificates\CreateServerCertificate_custom.cmd"'
 	!define DEFAULT_MONGODB_STORAGE_PATH '"C:\OT-DataStorage\data"'
 	!define DEFAULT_MONGODB_LOG_PATH '"C:\OT-DataStorage\log"'
-	!define DEFAULT_MONGODB_INSTALL_PATH '"$PROGRAMFILES64\MongoDB\Server\4.4"'
+	!define DEFAULT_MONGODB_INSTALL_PATH '"$PROGRAMFILES64\MongoDB\Server\7.0"'
 	!define MONGODB_DELETION_PATH '"$PROGRAMFILES64\MongoDB"'
 	!define LICENSE_FILE_PATH '"..\..\..\LICENSE.md"'
 	!define DEFAULT_MONGODB_ADMIN_PASSWORD "admin"
 
 	!define MONGODB_STANDARD_PORT "27017"
+	
+	!define UPGRADER_ROOT "..\..\..\Tools\MongoDBUpgrader"
+	!define HELPER_FILES_PATH "..\helper"
+	!define MONGODB_UPGRADER_INST_EXE_PATH "$INSTDIR\Upgrader\MongoDB_Executable"
+	!define MONGODB_INST_MSI_PATH "$INSTDIR\Upgrader\MongoDB_Installer" ;The relative position is used by the Upgrader.exe in the MongoDB_Executable folder
+	!define MONGODB_INST_SERVER_PATH "$INSTDIR\Upgrader\MongoDB_Server"
+	!define LOG_PATH "$INSTDIR\BuildInformation"
 #=================================================================
 #						END OF DEFINES
 #=================================================================
@@ -676,21 +688,26 @@ FunctionEnd
 	!define MUI_LICENSEPAGE_CHECKBOX
 	!insertmacro MUI_PAGE_LICENSE ${LICENSE_FILE_PATH}
 
-	; Components page
+	
+	Page custom SetupMongoDBInstallation OnSetupMongoDBInstallationLeave
+	!define MUI_COMPONENTSPAGE_TEXT_TOP $MONGODB_SETUP_MSG
 	!insertmacro MUI_PAGE_COMPONENTS
-
+	
+	Page custom DataBaseAccess_Query DataBaseAccess_Leave ;Just in case an upgrade is selected
+	
 	; Page calls - order is relevant!
 	; Directory page
 	!insertmacro MUI_PAGE_DIRECTORY
+	
+	;Necesssary if MongoDB gets installed for the first time
 	Page custom DatabaseEntry
 	Page custom DatabasePassword OnDatabasePasswordLeave
-	
-	#page custom DatabaseInfo #MongoDB paths debug page
 	Page custom NetworkModePage OnNetworkLeave
 	Page custom PublicIPCertificate OnPublicCertficateLeave
-	#Page custom NetworkInfoPage
 	Page custom PortPage OnPortLeave
-	#Page custom PortInfoPage
+	
+	;If there is already a MongoDB Installation, an Upgrade of some kind is needed
+	
 
 	; Start menu page
 	var ICONS_GROUP
@@ -727,11 +744,16 @@ Section "-Extract Installer Tools (Required)" SEC01
 	SectionIn RO ;read only section
 	SetOutPath "$INSTDIR\Tools\ThirdParty"
 	DetailPrint "Extracting toolchain..."
-	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\*.*"
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\RefreshEnv.cmd"
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\VC_redist.x64.exe"
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\VC_redist.x86.exe"
+	
+	SetOutPath ${LOG_PATH}
+	File "${HELPER_FILES_PATH}\BuildInfo.txt"
 	
 	DetailPrint "Extracting installation helper..."
-	SetOutPath "$INSTDIR\Tools\helper"
-	File /r "..\helper\*.*"
+	SetOutPath "$INSTDIR"
+	File /r "${HELPER_FILES_PATH}\Configuration\*.*"
 
 	DetailPrint "Extracting javascript files..."
 	SetOutPath "$INSTDIR\Tools\javascript"
@@ -754,7 +776,7 @@ Section "OpenTwin Main Files (Required)" SEC02
 
 	${If} $PublicIpSet <> 0 #public IP was set
 		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c ""$INSTDIR\Tools\ThirdParty\RefreshEnv.cmd" && cd "$INSTDIR\Certificates" && "$INSTDIR\Certificates\CreateServerCertificate.bat""" '
+		ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c ""$INSTDIR\Tools\ThirdParty\RefreshEnv.cmd" && cd "$INSTDIR\Certificates" && "$INSTDIR\Certificates\CreateServerCertificate.bat""" '
 	${Else}
 		Goto +2
 	${EndIf}
@@ -772,70 +794,25 @@ Section "OpenTwin Main Files (Required)" SEC02
 	!insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
 
+####### Checking if a MongoDB upgrade or a first installation is required ######
 
-Section "MongoDB Setup" SEC03
-	AddSize 738000
-	; /i = package to install
-	; /qn = quiet install
-	; INSTALLLOCATION = install directory
+#################################################################################
+!include ${UPGRADER_ROOT}\Upgrader_NSIS\MongoDBUpgrader.nsh
+!include MongoUpgraderTemplateFunctions.nsh
+!include CheckForMongoInstallation.nsh
+!include MongoFirstInstallSetup.nsh
+
+Section "-Post MongoInstall"
+	;MessageBox MB_OK "Deleting Mongo Files"
+	DetailPrint "Removing MongoDB executables ..."
 	
-	#this execwait would have to be enabled again if the custom install location can be used again
-	#ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$INSTDIR\Tools\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'
-	
-	DetailPrint "Running MongoDB installation scripts..."
-
-	ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$INSTDIR\Tools\ThirdParty\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'		
-	Sleep 5000
-	
-	nsExec::ExecToLog 'net stop "MongoDB"'	
-
-	##########################################
-	# call for python scripts via $INSTDIR
-	##########################################
-	
-	DetailPrint "Running scripts..."
-
-	# update the mongodB config file without authentication
-	ExecWait '"$INSTDIR\Tools\helper\ConfigMongoDBNoAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "$MONGODB_ADMIN_PASSWORD" "$INSTDIR\Tools\javascript\db_admin.js"'
-
-	SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
-	
-	#set directory permissions for the mongoDB service
-	ExecWait '"$INSTDIR\Tools\helper\SetPermissions.exe" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH"'
-
-	# restarting mongoDB service
-	nsExec::ExecToLog 'net start "MongoDB"'
-	Sleep 5000
-
-	# 'net' command waits for the service to be stopped/started automatically
-	# no additional checks needed
-
-	# call for js script to paste admin user creation
-	ExpandEnvStrings $0 %COMSPEC%
-		ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" --host $NetworkModeSelection --port $MONGODB_CUSTOM_PORT < "$INSTDIR\Tools\javascript\db_admin.js_tmp" " "'
-
-	Delete "$INSTDIR\Tools\javascript\db_admin.js_tmp"
-	
-	nsExec::ExecToLog 'net stop "MongoDB"'	
-
-	# mongoDB_storage_script_wauth.py
-	${If} $PublicIpSet <> 0
-		ExecWait '"$INSTDIR\Tools\helper\ConfigMongoDBWithAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$PUBLIC_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
-		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$PUBLIC_CERT_PATH\ca.pem"""" '	
-	${Else}
-		ExecWait '"$INSTDIR\Tools\helper\ConfigMongoDBWithAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$DEFAULT_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
-		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$DEFAULT_CERT_PATH\ca.pem"""" '
-	${EndIf}
-		
-	DetailPrint "Restart services..."
-	nsExec::ExecToLog 'net start "MongoDB"'	
-	
-	#DetailPrint "Wait..."
-	#Sleep 10000
-	
+	RMDir /r "$INSTDIR\Upgrader"
+	;RMDir /r "${MONGODB_INST_SERVER_PATH}"
+	;RMDir /r "${MONGODB_UPGRADER_INST_EXE_PATH}"
+	;RMDir /r "${MONGODB_INST_MSI_PATH}"
+ 
 SectionEnd
+
 
 Section -AdditionalIcons
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
@@ -859,163 +836,37 @@ SectionEnd
 #Section descriptions
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC02} "Install all required OpenTwin files"
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "Install MongoDB and set up all configurations for OpenTwin"
+  !insertmacro MUI_DESCRIPTION_TEXT ${Sec_Upgr} "Upgrade of the existing data storage. !WARNING! Once you have upgraded to version 7.0, you will not be able to downgrade the FCV and binary version without support assistance."
+  !insertmacro MUI_DESCRIPTION_TEXT ${Sec_Inst} "Install MongoDB 7.0. The configuration from the current installation will be used for the new installation."
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
-# DATABASE DIRECTORY OPERATIONS (ACTIVE)
-	Function DatabaseEntry
-	
-		${IfNot} ${SectionIsSelected} ${SEC03}
-			Abort
-		${EndIf}
-	
-		!insertmacro MUI_HEADER_TEXT "MongoDB Directories" "MongoDB and its setup are required for OpenTwin to run. A location for the storage and log files are needed for the MongoDB installation"
+Function DataBaseAccess_Leave
+	Pop $AdminPswHandle
+	${NSD_GetText} $AdminPswHandle $UPGRADER_MONGODB_ADMIN_PASSWORD
+	;MessageBox MB_OK "Psw. $UPGRADER_MONGODB_ADMIN_PASSWORD"
+FunctionEnd
 
-		nsDialogs::Create 1018
-		Pop $Dialog
+Function DataBaseAccess_Query
 
-		${If} $Dialog == error
-			Abort
-		${EndIf}
+	${IfNot} ${SectionIsSelected} ${Sec_Upgr}
+		Abort
+	${EndIf}
+	!insertmacro MUI_HEADER_TEXT "MongoDB Admin Access" "In order to upgrade the existing MongoDB installation, the MongoDB admin psw. is needed. Please enter:"
+	nsDialogs::Create 1018
+	Pop $Dialog
 
-		${NSD_CreateLabel} 0 0 100% 30u "Please specify locations for the MongoDB installation, storage and log file dump. For the storage (databse) it is recommended to select directories on disks with a lot of space. These paths can later be changed in the mongod.cfg withing the MongoDB installation directory"
-		#get DB location
+	${If} $Dialog == error
+		Abort
+	${EndIf}
 		
-		#custom installation path has been disabled due to a bug in the MongoDB installer
-		${NSD_CreateLabel} 0 50 100% 10u "MongoDB Installation path:"
-		${NSD_CreateText} 0 70 100% 12u ${DEFAULT_MONGODB_INSTALL_PATH}
-			Pop $DirHandleMainInstall
-			#variable assign for later use
-			${NSD_GetText} $DirHandleMainInstall $MONGODB_INSTALL_PATH
-			SendMessage $DirHandleMainInstall ${EM_SETREADONLY} 1 0 #set DirHandleMainInstall to read only
-			
-		#uncomment these to re-enable the browse button
-		#check 'Function SelectDBDirectory' also
-
-		#${NSD_CreateBrowseButton} 350 68 65u 15u "Browse..."
-		#	Pop $BrowseButton
-		#${NSD_OnClick} $BrowseButton SelectMongoDBMainDirectory
-
-		${NSD_CreateHLine} 0 110 100% 10u ""
-		
-		
-		${NSD_CreateLabel} 0 125 100% 10u "MongoDB Database path:"
-		${NSD_CreateText} 0 145 75% 12u ${DEFAULT_MONGODB_STORAGE_PATH}
-			Pop $DirHandleDB
-			${NSD_GetText} $DirHandleDB $MONGODB_DB_PATH
-		${NSD_CreateBrowseButton} 350 143 65u 15u "Browse..."
-			Pop $BrowseButton
-		${NSD_OnClick} $BrowseButton SelectDBDirectory
-
-		#get log location
-		${NSD_CreateLabel} 0 180 100% 10u "MongoDB Log files path:"
-		${NSD_CreateText} 0 200 75% 12u ${DEFAULT_MONGODB_LOG_PATH}
-			Pop $DirHandleLog
-			${NSD_GetText} $DirHandleLog $MONGODB_LOG_PATH
-		${NSD_CreateBrowseButton} 350 198 65u 15u "Browse..."
-			Pop $BrowseButton
-		${NSD_OnClick} $BrowseButton SelectLogDirectory
-
-		nsDialogs::Show
-	FunctionEnd
-
-	/* #uncomment this to enable the functionality of the browse button	
-		Function SelectMongoDBMainDirectory
-			nsDialogs::SelectFolderDialog "Select a Directory" ""
-			Pop $0 	#Get selected directory
-			${If} $0 != error
-				SendMessage $DirHandleMainInstall ${WM_SETTEXT} 0 "STR:$0" #assign selected directory to DirHandle
-				StrCpy $MONGODB_INSTALL_PATH $0
-			${EndIf}
-			
-		FunctionEnd
-	*/
-
-		Function SelectDBDirectory
-			nsDialogs::SelectFolderDialog "Select a Directory" ""
-			Pop $0 	#Get selected directory
-			${If} $0 != error
-				SendMessage $DirHandleDB ${WM_SETTEXT} 0 "STR:$0" #assign selected directory to DirHandle
-				StrCpy $MONGODB_DB_PATH $0
-			${EndIf}
-			
-		FunctionEnd
-
-
-		Function SelectLogDirectory
-			nsDialogs::SelectFolderDialog "Select a Directory" ""
-			Pop $0 	#Get selected directory
-			${If} $0 != error
-				SendMessage $DirHandleLog ${WM_SETTEXT} 0 "STR:$0" #assign selected directory to DirHandle
-				StrCpy $MONGODB_LOG_PATH $0
-			${EndIf}
-		FunctionEnd
-
-# DATABASE ADMIN PASSWORD (ACTIVE)
-	Function DatabasePassword
+	${NSD_CreateLabel} 0u 0u 100% 12u "Enter MongoDB admin Psw:"
+	Pop $Label
+	${NSD_CreateText} 0u 20u 100% 12u "admin"
+	Pop $AdminPswHandle
+	${NSD_Edit_SetReadOnly} $AdminPswHandle 0
 	
-		${IfNot} ${SectionIsSelected} ${SEC03}
-			Abort
-		${EndIf}
-	
-		!insertmacro MUI_HEADER_TEXT "MongoDB Administrator Password" "An administrator password needs to be specified for protecting the database."
-
-		nsDialogs::Create 1018
-		Pop $Dialog
-
-		${If} $Dialog == error
-			Abort
-		${EndIf}
-		
-		#custom installation path has been disabled due to a bug in the MongoDB installer
-		${NSD_CreateLabel} 0 50 100% 10u "Specify administrator password:"
-		${NSD_CreatePassword} 0 70 100% 12u $MONGODB_ADMIN_PASSWORD
-		Pop $mongodb_admin_pwd1
-
-		${NSD_CreateLabel} 0 120 100% 10u "Retype administrator password:"
-		${NSD_CreatePassword} 0 140 100% 12u $MONGODB_ADMIN_PASSWORD
-		Pop $mongodb_admin_pwd2
-
-		nsDialogs::Show
-	FunctionEnd
-	
-	Function OnDatabasePasswordLeave
-	
-		${NSD_GetText} $mongodb_admin_pwd1 $0
-		${NSD_GetText} $mongodb_admin_pwd2 $1
-		
-		StrCmp $0 $1 0 jump_to_if_not_equal
-			StrCpy $MONGODB_ADMIN_PASSWORD $0
-			goto end
-		jump_to_if_not_equal:
-			MessageBox MB_ICONSTOP|MB_OK "The passwords do not match."
-			Abort
-		end:
-
-	FunctionEnd
-
-	
-/* DATABASE INFO PAGE (DISABLED)
-	Function DatabaseInfo
-		nsDialogs::Create 1018
-		Pop $Dialog
-
-		${If} $Dialog == error
-			Abort
-		${EndIf}
-
-		${NSD_CreateLabel} 0 0 100% 10u "MONGODB_INSTALL_PATH:"
-			${NSD_CreateLabel} 0 25 100% 30 $MONGODB_INSTALL_PATH
-
-		${NSD_CreateLabel} 0 100 100% 10u "MONGODB_DB_PATH:"
-			${NSD_CreateLabel} 0 125 100% 30 $MONGODB_DB_PATH
-
-		${NSD_CreateLabel} 0 175 100% 10u "MONGODB_LOG_PATH:"
-			${NSD_CreateLabel} 0 200 100% 30 $MONGODB_LOG_PATH
-		nsDialogs::Show
-	FunctionEnd
-*/
-
+	nsDialogs::Show
+FunctionEnd
 
 
 #UNINSTALLER - non functional, unfinished
@@ -1025,12 +876,13 @@ Function un.onUninstSuccess
 FunctionEnd
 
 Function un.onInit	
+	;MessageBox MB_OK "First uninstall"
   	MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +1 IDNO AbortUninstall
-  	MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Do you also want to uninstall MongoDB and all of its components?" IDYES +1 IDNO +3
-	StrCpy $UNINSTALL_MONGODB_FLAG 1
-		Goto +4
-	StrCpy $UNINSTALL_MONGODB_FLAG 0
-		Goto +2
+  	;MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Do you also want to uninstall MongoDB and all of its components?" IDYES +1 IDNO +3
+	;StrCpy $UNINSTALL_MONGODB_FLAG 1
+	;	Goto +4
+	;StrCpy $UNINSTALL_MONGODB_FLAG 0
+	Goto +2
 AbortUninstall:
     Abort
  			
@@ -1076,22 +928,18 @@ Function .onInit
 			MessageBox MB_YESNO|MB_ICONSTOP "Failed to uninstall, continue anyway?" /SD IDYES IDYES +2
 				Abort
 		${EndIf}
-		
-		;$UNINSTALL_MONGODB_FLAG 1
-		!insertmacro UnSelectSection ${SEC03}
-		!insertmacro SetSectionFlag ${SEC03} ${SF_RO}
 
 	${EndIf}
 
     StrCpy $PortReturnChecker 0
 	StrCpy $PublicIpSet 0
 	StrCpy $PublicCertPageChecker 0
-	StrCpy $MONGODB_ADMIN_PASSWORD ${DEFAULT_MONGODB_ADMIN_PASSWORD}
+	StrCpy $UPGRADER_MONGODB_ADMIN_PASSWORD ${DEFAULT_MONGODB_ADMIN_PASSWORD}
 
 	StrCpy "$ROOTDIR" "$WINDIR" 2
-
+	
+	StrCpy $UPGRADER_MONGODB_SERVICE_NAME "MongoDB" ; Default value
 FunctionEnd
-
 
 Section Uninstall
 #Delete ALL env variables set by the installer
@@ -1108,12 +956,12 @@ Section Uninstall
 #===============================================================================================================================	
 	
 ${If} $UNINSTALL_MONGODB_FLAG != 0
-	nsExec::ExecToLog 'net stop "MongoDB"'
-	ExecWait 'sc delete MongoDB'
+	;nsExec::ExecToLog 'net stop "MongoDB"'
+	;ExecWait 'sc delete MongoDB'
 
-	Delete "$MONGODB_INSTALL_PATH\*.*"
-	RMDir /r "$MONGODB_INSTALL_PATH"
-	RMDir /r ${MONGODB_DELETION_PATH}
+	;Delete "$UPGRADER_MONGODB_INSTALL_PATH\*.*"
+	;RMDir /r "$UPGRADER_MONGODB_INSTALL_PATH"
+	;RMDir /r ${MONGODB_DELETION_PATH}
 ${EndIf}
 
 

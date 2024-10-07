@@ -1,4 +1,4 @@
-!include "MUI.nsh"
+!include "MUI2.nsh"
 !include "nsDialogs.nsh"
 
 !include LogicLib.nsh
@@ -8,26 +8,50 @@ Name "OpenTwin MongoDB Upgrade"
 ;Outfile "MongoDBUpgrade_Only.exe"
 
 RequestExecutionLevel admin
-
+!define INSTDIR ..\Upgrader_Deployment
 ################################ Variables ###############################
 Var MONGODB_SETUP_MSG
-Var MONGODB_MAX_VERSION
 Var Dialog
 Var Label
 Var AdminPswHandle
 Var ServiceNameHandle
 Var InstallPathHandle
-
+Var UPGRADER_MONGODB_ADMIN_PASSWORD
+Var UPGRADER_MONGODB_SERVICE_NAME
+Var UPGRADER_MONGODB_INSTALL_PATH
+Var UPGRADER_ROOT
+Var First_MONGODB_Install_FLAG
+Var Sec_Upgr
 
 !define DEFAULT_MONGODB_PATH '"C:\Program Files\MongoDB\Server\7.0"'
 !define MUI_ICON_PATH '"..\Icons\openTwin_icon_48x48.ico"'
 ;!define OPENTWIN_APP_ICON '"$INSTDIR\icons\Application\OpenTwin.ico"'
 !define PRODUCT_NAME "OpenTwin"
+!define MONGODB_UPGRADER_INST_EXE_PATH "$EXEDIR\Upgrader_Exe"
+!define MONGODB_INST_SERVER_PATH "$EXEDIR\MongoDB_Server"
+!define MONGODB_INST_MSI_PATH "$EXEDIR\MongoDB_Installer"
+!define HELPER_FILES_PATH "..\Upgrader_Deployment"
+
 BrandingText "OpenTwin Simulation Platform"
 
 ######################## Including Upgrader Functionality ################
 !include MongoDBUpgrader.nsh
 ##########################################################################
+
+Function Extract_Installer_Tools
+	;SectionIn RO ;read only section
+	
+	;SetOutPath "${MONGODB_INST_MSI_PATH}"
+	;DetailPrint "Extracting additional files ..."
+	;
+	;File /r "..\Upgrader_Deployment\MongoDB_Installer\*.*"
+	;
+	;SetOutPath "${MONGODB_INST_SERVER_PATH}"
+	;File /r "..\Upgrader_Deployment\MongoDB_Server\*.*"
+	;SetOutPath "${MONGODB_UPGRADER_INST_EXE_PATH}"
+	;File /r "..\Upgrader_Deployment\Upgrader_Exe\*.*"
+
+FunctionEnd
 
 ##########################################################################
 ################################ Functions ###############################
@@ -39,7 +63,7 @@ Function BeforeUpgrade
 	Pop $Dialog
 	${If} $Dialog == error
 		;MessageBox MB_OK "Fail"
-		Abort
+		Quit
 	${EndIf}
 
 	${NSD_CreateLabel} 0u 0u 100% 12u "Enter MongoDB admin Psw:"
@@ -90,6 +114,10 @@ Function Upgrader_MongoDB_Up_To_Date
 	Quit
 FunctionEnd
 
+Function After_First_MongoDB_Install
+
+FunctionEnd
+
 ##########################################################################
 
 !define MUI_ABORTWARNING
@@ -107,5 +135,36 @@ Page custom BeforeUpgrade
 
 
 Function .onInit
+StrCpy $UPGRADER_ROOT $EXEDIR
 
+nsExec::ExecToStack 'sc.exe query "MongoDB"'
+Pop $0
+
+${If} $0 == 0
+	StrCpy $First_MONGODB_Install_FLAG 0
+	;Call Extract_Installer_Tools
+${ElseIf} $0 == 1060
+	StrCpy $First_MONGODB_Install_FLAG 1 ;The return code for server not found is 1060
+	MessageBox MB_OKCANCEL "No MongoDB service was found. You can enter a different service name in the following, but if this is the first MongoDB installation, the OpenTwin Installer is the better choice. This executable does not adjust a new MongoDB config in the way it is needed for OpenTwin." 
+	Quit
+${Else}
+	StrCpy $First_MONGODB_Install_FLAG -1
+	Quit
+${EndIf}
+
+FunctionEnd
+
+
+Function .onInstSuccess 
+	Call .onInstEnd
+FunctionEnd
+
+Function .onInstFailed
+	Call .onInstEnd
+FunctionEnd
+
+Function .onInstEnd 
+	RMDir /r ${MONGODB_INST_MSI_PATH}
+	RMDir /r ${MONGODB_INST_SERVER_PATH}
+	RMDir /r ${MONGODB_UPGRADER_INST_EXE_PATH}
 FunctionEnd

@@ -41,6 +41,7 @@ Set UPGRADER_SERVER="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools\ThirdParty\share
 
 MKDIR "%OT_INSTALLUPGRADER_DIR%\MongoDB_Server"
 MKDIR "%OT_INSTALLUPGRADER_DIR%\MongoDB_Installer"
+MKDIR "%OT_INSTALLUPGRADER_DIR%\Upgrader_Exe"
 
 
 
@@ -61,12 +62,12 @@ echo +++ COMPILE TIME +++
 
 	REM First we build and copy the c++ executable
 	CALL "%UPGRADER_EXE%build.bat" BOTH REBUILD
-	copy %UPGRADER_EXE%\x64\Release\MongoDBUpgradeManager.exe %OT_INSTALLUPGRADER_DIR%\MongoDBUpgradeManager.exe
+	copy %UPGRADER_EXE%\x64\Release\MongoDBUpgradeManager.exe %OT_INSTALLUPGRADER_DIR%\Upgrader_Exe\MongoDBUpgradeManager.exe
 	
 	REM Now copying all required dlls to the deployment dir
-	copy %OPENTWIN_THIRDPARTY_ROOT%\boost\boost_1_71_0\lib64-msvc-14.1\boost_filesystem-vc141-mt-x64-1_71.dll %OT_INSTALLUPGRADER_DIR%\boost_filesystem-vc141-mt-x64-1_71.dll
-	copy %OPENTWIN_THIRDPARTY_ROOT%\MongoDb\mongo-cxx-driver-r3.10.0\x64\Release\bin %OT_INSTALLUPGRADER_DIR%
-	copy %OPENTWIN_THIRDPARTY_ROOT%\MongoDb\mongo-c-driver-1.27.3\x64\Release\bin %OT_INSTALLUPGRADER_DIR%
+	copy %OPENTWIN_THIRDPARTY_ROOT%\boost\boost_1_71_0\lib64-msvc-14.1\boost_filesystem-vc141-mt-x64-1_71.dll %OT_INSTALLUPGRADER_DIR%\Upgrader_Exe\boost_filesystem-vc141-mt-x64-1_71.dll
+	copy %OPENTWIN_THIRDPARTY_ROOT%\MongoDb\mongo-cxx-driver-r3.10.0\x64\Release\bin %OT_INSTALLUPGRADER_DIR%\Upgrader_Exe
+	copy %OPENTWIN_THIRDPARTY_ROOT%\MongoDb\mongo-c-driver-1.27.3\x64\Release\bin %OT_INSTALLUPGRADER_DIR%\Upgrader_Exe
 
 	REM Copying the required MongoDB files
 	copy %UPGRADER_Mongo_INSTALLER%\mongodb-windows-x86_64-7.0.14-signed.msi %OT_INSTALLUPGRADER_DIR%\MongoDB_Installer\mongodb-windows-x86_64-7.0.14-signed.msi

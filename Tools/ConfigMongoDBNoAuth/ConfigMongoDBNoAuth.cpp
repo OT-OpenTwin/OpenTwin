@@ -58,7 +58,7 @@ void modifyConfigFile(const std::string& configFile, const std::string& dbPath, 
 	std::list<std::string> outputFileContent;
 
 	std::filesystem::path logFilePath = std::filesystem::path(logPath) / std::filesystem::path("mongodb.log");
-
+	bool tlsUseSystemCAIsSet = false;
 	for (auto line : inputFileContent)
 	{
 		if (lineStartsWith(line, "dbPath:"))
@@ -83,6 +83,11 @@ void modifyConfigFile(const std::string& configFile, const std::string& dbPath, 
 			outputFileContent.push_back(line);
 			outputFileContent.push_back("  authorization: disabled");
 		}
+		else if (lineStartsWith(line, "tlsUseSystemCA:"))
+		{
+			outputFileContent.push_back("  tlsUseSystemCA: true");
+			tlsUseSystemCAIsSet = true;
+		}
 		else if (lineStartsWith(line, "security:"))
 		{
 			assert(0);
@@ -91,6 +96,12 @@ void modifyConfigFile(const std::string& configFile, const std::string& dbPath, 
 		{
 			outputFileContent.push_back(line);
 		}
+	}
+
+	if (!tlsUseSystemCAIsSet)
+	{
+		outputFileContent.push_back("setParameter:");
+		outputFileContent.push_back("  tlsUseSystemCA: true");
 	}
 
 	// And finally we write the content back to the file
