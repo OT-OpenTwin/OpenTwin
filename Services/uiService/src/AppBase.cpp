@@ -1001,7 +1001,7 @@ ViewerUIDtype AppBase::createView(
 	if (getVisible3D())
 	{
 		ot::WidgetView* wv = m_viewerComponent->getViewerWidget(viewID);
-		wv->setViewData(ot::WidgetViewBase(text3D.toStdString(), text3D.toStdString(), ot::WidgetViewBase::ViewIsCentral));
+		wv->setViewData(ot::WidgetViewBase(text3D.toStdString(), text3D.toStdString(), ot::WidgetViewBase::ViewIsCentral, ot::WidgetViewBase::View3D));
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
 	}
 	else
@@ -1012,7 +1012,7 @@ ViewerUIDtype AppBase::createView(
 	if (getVisible1D())
 	{
 		ot::WidgetView* wv = m_viewerComponent->getPlotWidget(viewID);
-		wv->setViewData(ot::WidgetViewBase(text1D.toStdString(), text1D.toStdString(), ot::WidgetViewBase::ViewIsCentral));
+		wv->setViewData(ot::WidgetViewBase(text1D.toStdString(), text1D.toStdString(), ot::WidgetViewBase::ViewIsCentral, ot::WidgetViewBase::View1D));
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
 	}
 	else
@@ -1029,7 +1029,7 @@ ViewerUIDtype AppBase::createView(
 			delete m_versionGraph;
 		}
 		m_versionGraph = new ot::VersionGraphManagerView;
-		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewIsCentral));
+		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewIsCentral, ot::WidgetViewBase::ViewVersion));
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivatRequest, this, &AppBase::slotRequestVersion);
@@ -1039,7 +1039,7 @@ ViewerUIDtype AppBase::createView(
 	if (getVisibleTable())
 	{	
 		ot::WidgetView* wv = m_viewerComponent->getTableWidget(viewID);
-		wv->setViewData(ot::WidgetViewBase(textTable.toStdString(), textTable.toStdString(), ot::WidgetViewBase::ViewIsCentral));
+		wv->setViewData(ot::WidgetViewBase(textTable.toStdString(), textTable.toStdString(), ot::WidgetViewBase::ViewIsCentral, ot::WidgetViewBase::ViewTable));
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
 	}
 	else
@@ -1643,7 +1643,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name,
 	}
 
 	newEditor = new ot::GraphicsViewView;
-	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewIsCentral /*| ot::WidgetViewBase::ViewIsCloseable*/));
+	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewIsCentral /*| ot::WidgetViewBase::ViewIsCloseable*/, ot::WidgetViewBase::ViewGraphics));
 	newEditor->setOwner(_serviceInfo);
 	newEditor->setGraphicsViewName(_name);
 	newEditor->setGraphicsViewFlag(ot::GraphicsView::ViewManagesSceneRect);
@@ -1708,7 +1708,7 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 
 	newEditor = new ot::TextEditorView;
 	newEditor->setupFromConfig(_config, false);
-	newEditor->setViewData(ot::WidgetViewBase(_config.getName(), _config.getTitle(), ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewIsCloseable));
+	newEditor->setViewData(ot::WidgetViewBase(_config.getName(), _config.getTitle(), ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewIsCloseable, ot::WidgetViewBase::ViewText));
 	
 	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
 	m_textEditors.store(_serviceInfo, newEditor);
@@ -1792,7 +1792,7 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 
 	newTable = new ot::TableView;
 	newTable->setupFromConfig(_config);
-	newTable->setViewData(ot::WidgetViewBase(_config.getName(), _config.getTitle(), ot::WidgetViewBase::ViewIsCentral /* | ot::WidgetViewBase::ViewIsCloseable */));
+	newTable->setViewData(ot::WidgetViewBase(_config.getName(), _config.getTitle(), ot::WidgetViewBase::ViewIsCentral /* | ot::WidgetViewBase::ViewIsCloseable */, ot::WidgetViewBase::ViewTable));
 
 	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newTable);
 	m_tables.store(_serviceInfo, newTable);
@@ -2255,7 +2255,7 @@ void AppBase::slotViewFocusLost(ot::WidgetView* _view) {
 void AppBase::slotViewFocused(ot::WidgetView* _view) {
 	if (!_view) return;
 	if (_view->getViewData().getFlags() & ot::WidgetViewBase::ViewIsCentral) {
-		m_viewerComponent->viewerTabChanged(_view->getViewData().getName());
+		m_viewerComponent->viewerTabChanged(_view->getViewData().getName(), _view->getViewData().getViewType());
 	}
 
 	ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_view);
@@ -2264,6 +2264,9 @@ void AppBase::slotViewFocused(ot::WidgetView* _view) {
 		if (owner != m_graphicsPickerManager.getCurrentOwner()) {
 			this->fillGraphicsPicker(owner);
 		}
+	}
+	else {
+		this->clearGraphicsPicker();
 	}
 }
 
@@ -2778,10 +2781,17 @@ void AppBase::slotTreeItemFocused(QTreeWidgetItem* _item) {
 
 
 void AppBase::fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo) {
-	m_graphicsPicker->clear();
+	this->clearGraphicsPicker();
+
 	m_graphicsPicker->setOwner(_serviceInfo);
 	m_graphicsPicker->add(m_graphicsPickerManager.getCollections(_serviceInfo));
 	m_graphicsPickerManager.setCurrentOwner(_serviceInfo);
+}
+
+void AppBase::clearGraphicsPicker(void) {
+	m_graphicsPicker->clear();
+	m_graphicsPicker->setOwner(ot::BasicServiceInformation());
+	m_graphicsPickerManager.setCurrentOwner(ot::BasicServiceInformation());
 }
 
 void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {

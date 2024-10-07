@@ -45,6 +45,16 @@ namespace ot {
 			Bottom //! @brief Bottom dock location.
 		};
 
+		enum ViewType {
+			View3D, //! \brief 3D view
+			View1D, //! \brief 1D plot view
+			ViewText, //! \brief Text editor view
+			ViewTable, //! \brief Table view
+			ViewVersion, //! \brief Version graph view
+			ViewGraphics, //! \brief Graphics view
+			CustomView //! \brief Custom view
+		};
+
 		//! @brief Returns a string representation of the provided view flag.
 		//! @param _flag The single view flag to be converted to a string.
 		static std::string toString(ViewFlag _flag);
@@ -69,12 +79,18 @@ namespace ot {
 		//! @param _dockLocation The string representing the dock location (/ref toString(ViewDockLocation _dockLocation) "Dock location to string")
 		static ViewDockLocation stringToDockLocation(const std::string& _dockLocation);
 
+		//! \brief Returns the string representation of the provided view type.
+		static std::string toString(ViewType _type);
+
+		//! \brief Returns the view type represented by the provided string.
+		static ViewType stringToViewType(const std::string& _type);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		WidgetViewBase();
-		WidgetViewBase(const std::string& _nameAndTitle, ViewFlags _flags = ViewFlags());
-		WidgetViewBase(const std::string& _name, const std::string& _title, ViewFlags _flags = ViewFlags());
-		WidgetViewBase(const std::string& _name, const std::string& _title, ViewDockLocation _dockLocation, ViewFlags _flags = ViewFlags());
+		WidgetViewBase(const std::string& _nameAndTitle, ViewFlags _flags = ViewFlags(), ViewType _type = CustomView);
+		WidgetViewBase(const std::string& _name, const std::string& _title, ViewFlags _flags = ViewFlags(), ViewType _type = CustomView);
+		WidgetViewBase(const std::string& _name, const std::string& _title, ViewDockLocation _dockLocation, ViewFlags _flags = ViewFlags(), ViewType _type = CustomView);
 		WidgetViewBase(const WidgetViewBase& _other);
 		virtual ~WidgetViewBase();
 
@@ -131,12 +147,17 @@ namespace ot {
 		//! @brief Returns the dock location.
 		ViewDockLocation getDockLocation(void) const { return m_dockLocation; };
 
+		void setViewType(ViewType _type) { m_type = _type; };
+
+		ViewType getViewType(void) const { return m_type; };
+
 	private:
 		std::string m_name; //! @brief WidgetView name.
 		std::string m_title; //! @brief WidgetView title (if empty the name will be used).
 
 		ViewFlags m_flags; //! @brief WidgetView flags.
 		ViewDockLocation m_dockLocation; //! @brief WidgetView dock location.
+		ViewType m_type;
 	};
 
 }
