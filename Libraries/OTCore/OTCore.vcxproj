@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\BasicServiceInformation.h" />
+    <ClInclude Include="include\OTCore\ComplexNumbers.h" />
     <ClInclude Include="include\OTCore\DefensiveProgramming.h" />
     <ClInclude Include="include\OTCore\LogModeManager.h" />
     <ClInclude Include="include\OTCore\Math.h" />

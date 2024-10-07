@@ -40,6 +40,14 @@ ot::JsonValue ot::VariableToJSONConverter::operator()(const Variable& value, Jso
 		rJValue.SetString(temp, jsonAllocator);
 		return rJValue;
 	}
+	else if (value.isComplex())
+	{
+		const auto complexValue = value.getComplex();
+		ot::JsonObject rJValue;
+		rJValue.AddMember(rapidjson::StringRef(ot::g_realSerialiseKey.c_str()), complexValue.real(), jsonAllocator);
+		rJValue.AddMember(rapidjson::StringRef(ot::g_ImagSerialiseKey.c_str()), complexValue.imag(), jsonAllocator);
+		return rJValue;
+	}
 	else
 	{
 		throw std::exception("Not supported type for variable_t to rapidjson::Value conversion.");

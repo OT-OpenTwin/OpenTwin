@@ -267,6 +267,9 @@
     <ClInclude Include="include\OTCore\ProjectTemplateInformation.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\ComplexNumbers.h">
+      <Filter>include\VariableType</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

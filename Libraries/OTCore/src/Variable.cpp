@@ -33,10 +33,18 @@ ot::Variable::Variable(const std::string& value)
 }
 
 
-ot::Variable::Variable(std::string&& value)
+ot::Variable::Variable(std::string&& value) noexcept
 {
 	_value = StringWrapper(value);
 }
+
+ot::Variable::Variable(const complex& value)
+	:_value(value)
+{}
+
+ot::Variable::Variable(complex&& value) noexcept
+	:_value(std::move(value))
+{}
 
 ot::Variable& ot::Variable::operator=(const Variable& other)
 {
@@ -44,7 +52,7 @@ ot::Variable& ot::Variable::operator=(const Variable& other)
 	return *this;
 }
 
-ot::Variable& ot::Variable::operator=(Variable&& other)
+ot::Variable& ot::Variable::operator=(Variable&& other) noexcept
 {
 	_value = std::move(other._value);
 	return *this;
@@ -85,7 +93,17 @@ void ot::Variable::setValue(const std::string& value)
 	_value = value;
 }
 
-void ot::Variable::setValue(const std::string&& value)
+void ot::Variable::setValue(std::string&& value)
+{
+	_value = std::move(value);
+}
+
+void ot::Variable::setValue(const std::complex<double>& value)
+{
+	_value = value;
+}
+
+void ot::Variable::setValue(std::complex<double>&& value)
 {
 	_value = std::move(value);
 }
@@ -121,6 +139,11 @@ bool ot::Variable::isConstCharPtr() const
 	return std::holds_alternative<StringWrapper>(_value);
 }
 
+bool ot::Variable::isComplex() const
+{
+	return std::holds_alternative<complex>(_value);
+}
+
 float ot::Variable::getFloat() const
 {
 	return std::get<float>(_value);
@@ -149,6 +172,11 @@ bool ot::Variable::getBool() const
 const char* ot::Variable::getConstCharPtr() const
 {
 	return static_cast<const char*>(std::get<StringWrapper>(_value));
+}
+
+const ot::complex ot::Variable::getComplex() const
+{
+	return std::get<complex>(_value);
 }
 
 bool ot::Variable::operator==(const Variable& other) const

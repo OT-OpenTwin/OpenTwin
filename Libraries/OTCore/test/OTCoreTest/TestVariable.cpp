@@ -28,6 +28,64 @@ TEST(VariableTest, VariableToJSON)
 	EXPECT_EQ(result.GetInt(), var.getInt32());
 }
 
+TEST(VariableTest, VariableInt64ToJSON)
+{
+	ot::JsonDocument(doc);
+	int64_t temp = 13;
+	ot::Variable var(temp);
+	ot::VariableToJSONConverter converter;
+	rapidjson::Value result = converter(var, doc.GetAllocator());
+	EXPECT_TRUE(result.IsInt64());
+	EXPECT_EQ(result.GetInt64(), var.getInt64());
+}
+
+TEST(VariableTest, VariableInt32ToJSON)
+{
+	ot::JsonDocument(doc);
+	int32_t temp = 13;
+	ot::Variable var(temp);
+	ot::VariableToJSONConverter converter;
+	rapidjson::Value result = converter(var, doc.GetAllocator());
+	EXPECT_TRUE(result.IsInt());
+	EXPECT_EQ(result.GetInt(), var.getInt32());
+}
+TEST(VariableTest, VariableIntDoubleToJSON)
+{
+	ot::JsonDocument(doc);
+	double temp = 13.;
+	ot::Variable var(temp);
+	ot::VariableToJSONConverter converter;
+	rapidjson::Value result = converter(var, doc.GetAllocator());
+	EXPECT_TRUE(result.IsDouble());
+	EXPECT_EQ(result.GetDouble(), var.getDouble());
+}
+
+TEST(VariableTest, VariableIntFloatToJSON)
+{
+	ot::JsonDocument(doc);
+	float temp = 13.f;
+	ot::Variable var(temp);
+	ot::VariableToJSONConverter converter;
+	rapidjson::Value result = converter(var, doc.GetAllocator());
+	EXPECT_TRUE(result.IsFloat());
+	EXPECT_EQ(result.GetFloat(), var.getFloat());
+}
+
+TEST(VariableTest, VariableComplexToJSON)
+{
+	ot::JsonDocument(doc);
+	ot::complex value(3.5, -0.2);
+	ot::Variable var(value);
+
+	ot::VariableToJSONConverter converter;
+	rapidjson::Value result = converter(var, doc.GetAllocator());
+	EXPECT_TRUE(result.IsObject());
+	ot::JSONToVariableConverter backConverter;
+	ot::Variable actual = backConverter(result);
+	EXPECT_TRUE(actual.isComplex());
+
+	EXPECT_EQ(actual.getComplex(), var.getComplex());
+}
 
 TEST(VariableTest, JSONToVariable)
 {
@@ -56,6 +114,12 @@ double calculate(double start, double decrement, int count)
 	return start;
 }
 
+double calculate(float start, float decrement, int count)
+{
+	for (int i = 0; i < count; ++i)
+		start -= decrement;
+	return start;
+}
 //float calculate(float start, float decrement, int count)
 //{
 //	for (int i = 0; i < count; ++i)
