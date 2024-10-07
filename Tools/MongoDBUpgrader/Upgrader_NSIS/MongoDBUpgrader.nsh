@@ -2,7 +2,7 @@
 Var MONGODB_MAX_VERSION
 
 Function Upgrader_On_Init
-	MessageBox MB_OK "Upgrader On Init: $First_MONGODB_Install_FLAG"
+	;MessageBox MB_OK "Upgrader On Init: $First_MONGODB_Install_FLAG"
 	${If} $First_MONGODB_Install_FLAG == 0
 		;MessageBox MB_OK "Extracting MongoDBUpgrader Exes. LogPath: ${LOG_PATH}"
 		;CreateDirectory ${LOG_PATH}
@@ -14,14 +14,14 @@ Function Upgrader_On_Init
 		SetOutPath "${MONGODB_INST_SERVER_PATH}"
 		File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\MongoDB_Server\*.*"
 	
-		MessageBox MB_OK "Upgrader On Init, executes"
+		;MessageBox MB_OK "Upgrader On Init, executes"
 		nsExec::ExecToStack /OEM "${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe --MaxVersion";--LogPath ${LOG_PATH}
 		Pop $0
 		Pop $1
 		StrCpy $MONGODB_MAX_VERSION $1
 		;MessageBox MB_OK "Return: $0 Message: $1"  
 		
-		MessageBox MB_OK "Before execution"
+		;MessageBox MB_OK "Before execution"
 		nsExec::ExecToStack /OEM "${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe --Check"
 		Pop $0
 		Pop $1
@@ -56,10 +56,10 @@ Section "Upgrade data collection" Sec_Upgr
 	!insertmacro MUI_HEADER_TEXT "Upgrade of existing MongoDB data" "The upgrade requires a series of iterative steps. All steps are logged in ${LOG_PATH}\.MongoDBUpgrader.log"
 	MessageBox MB_OKCANCEL "Preparing to upgrade the existing MongoDB stored data. Be aware that an upgrade my not be reversable without help of the official MongoDB support staff. Creating a back up of the existing data may be a good thing to do." IDOK ok IDCANCEL cancel
 	cancel:
-		MessageBox MB_OK "Cancel"
+		;MessageBox MB_OK "Cancel"
 		Abort
 	ok:
-		MessageBox MB_OK "Execute Upgrade: ${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe --Upgrade --AdminPsw $UPGRADER_MONGODB_ADMIN_PASSWORD --ServiceName $UPGRADER_MONGODB_SERVICE_NAME"
+		;MessageBox MB_OK "Execute Upgrade: ${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe --Upgrade --AdminPsw $UPGRADER_MONGODB_ADMIN_PASSWORD --ServiceName $UPGRADER_MONGODB_SERVICE_NAME"
 		DetailPrint "Upgrading MongoDB data feature compatibility version ..."
 		nsExec::ExecToStack /OEM "${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe --Upgrade --AdminPsw $UPGRADER_MONGODB_ADMIN_PASSWORD --ServiceName $UPGRADER_MONGODB_SERVICE_NAME"
 SectionEnd
