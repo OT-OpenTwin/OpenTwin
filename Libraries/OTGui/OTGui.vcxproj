@@ -37,6 +37,7 @@
     <ClInclude Include="include\OTGui\GraphicsShapeItemCfg.h" />
     <ClInclude Include="include\OTGui\Grid.h" />
     <ClInclude Include="include\OTGui\KeySequence.h" />
+    <ClInclude Include="include\OTGui\NavigationTreeItemIcon.h" />
     <ClInclude Include="include\OTGui\Outline.h" />
     <ClInclude Include="include\OTGui\MessageDialogCfg.h" />
     <ClInclude Include="include\OTGui\DialogCfg.h" />
@@ -71,6 +72,9 @@
     <ClInclude Include="include\OTGui\Painter2DFactory.h" />
     <ClInclude Include="include\OTGui\Path2D.h" />
     <ClInclude Include="include\OTGui\PlainTextEditViewCfg.h" />
+    <ClInclude Include="include\OTGui\Plot1DAxisCfg.h" />
+    <ClInclude Include="include\OTGui\Plot1DCfg.h" />
+    <ClInclude Include="include\OTGui\Plot1DCurveCfg.h" />
     <ClInclude Include="include\OTGui\Property.h" />
     <ClInclude Include="include\OTGui\PropertyBase.h" />
     <ClInclude Include="include\OTGui\PropertyBool.h" />
@@ -124,6 +128,7 @@
     <ClCompile Include="src\GraphicsShapeItemCfg.cpp" />
     <ClCompile Include="src\Grid.cpp" />
     <ClCompile Include="src\KeySequence.cpp" />
+    <ClCompile Include="src\NavigationTreeItemIcon.cpp" />
     <ClCompile Include="src\Outline.cpp" />
     <ClCompile Include="src\MessageDialogCfg.cpp" />
     <ClCompile Include="src\DialogCfg.cpp" />
@@ -158,6 +163,9 @@
     <ClCompile Include="src\Painter2DFactory.cpp" />
     <ClCompile Include="src\Path2D.cpp" />
     <ClCompile Include="src\PlainTextEditViewCfg.cpp" />
+    <ClCompile Include="src\Plot1DAxisCfg.cpp" />
+    <ClCompile Include="src\Plot1DCfg.cpp" />
+    <ClCompile Include="src\Plot1DCurveCfg.cpp" />
     <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyBase.cpp" />
     <ClCompile Include="src\PropertyBool.cpp" />
