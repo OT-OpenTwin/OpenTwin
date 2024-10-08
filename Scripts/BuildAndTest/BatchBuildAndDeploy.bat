@@ -82,6 +82,8 @@ ECHO ===================================================================
 ECHO Build the installers
 ECHO ===================================================================
 
+DEL "%OPENTWIN_DEV_ROOT%\InstallationImages\*.*" 2> nul
+
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\Installer"
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Installer\Build_Installers_noInput.bat"
 
