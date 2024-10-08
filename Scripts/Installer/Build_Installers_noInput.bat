@@ -124,8 +124,9 @@ REM	"!SEVENZIP_REG_DATA!\7z.exe" x !PLUGIN_ZIPFILE! -o!NSIS_REG_VALUE! -y -aos
 	echo ---------------------------------------------
 	echo ERROR: The script has enountered an issue. Please try again.
 	pause
-	exit
+	exit /b 1
 
 :EXIT
 endlocal
-exit
+exit /b 0
+
