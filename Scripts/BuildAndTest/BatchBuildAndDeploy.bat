@@ -26,6 +26,8 @@ IF "%OPENTWIN_FTP_PASSWORD%" == "" (
 	goto PAUSE_END
 )
 
+DEL "%OPENTWIN_DEV_ROOT%\Scripts\buildLog_Nightly.txt"
+
 ECHO ===================================================================
 ECHO Get the latest version from the repository
 ECHO ===================================================================
