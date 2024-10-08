@@ -555,6 +555,8 @@ private:
 
 	void fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo);
 
+	void clearGraphicsPicker(void);
+
 	void cleanupWidgetViewInfo(ot::WidgetView* _view);
 
 	AppStateFlags               m_state;

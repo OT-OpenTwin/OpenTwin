@@ -893,11 +893,11 @@ void ViewerAPI::DeleteFromSelectedTableRow(ot::UID _viewerID)
 	}
 }
 
-void ViewerAPI::viewerTabChanged(const std::string & _tabTitle) 
+void ViewerAPI::viewerTabChanged(const std::string & _tabTitle, ot::WidgetViewBase::ViewType _type)
 {
 	if (globalActiveModel != nullptr)
 	{
-		globalActiveModel->viewerTabChanged(_tabTitle);
+		globalActiveModel->viewerTabChanged(_tabTitle, _type);
 	}
 }
 
