@@ -1,7 +1,6 @@
 #pragma once
 
 #include "OTCore/CoreTypes.h"
-#include "OTGui/WidgetViewBase.h"
 #include "OTGui/PropertyGridCfg.h"
 
 #include <list>
@@ -233,7 +232,7 @@ public:
 	unsigned int getFaceSelectionTraversalMask(void);
 	unsigned int getEdgeSelectionTraversalMask(void);
 
-	void viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type);
+	void viewerTabChanged(const std::string & _tabTitle);
 
 	void set1DPlotItemSelected(unsigned long long treeItemID, bool ctrlPressed);
 	void reset1DPlotItemSelection(void);

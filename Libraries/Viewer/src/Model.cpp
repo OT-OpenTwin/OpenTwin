@@ -3349,15 +3349,15 @@ void Model::visualizationPlot1DPropertiesChanged(unsigned long long modelEntityI
 	update1DPlot(sceneNodesRoot);
 }
 
-void Model::viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type)
+void Model::viewerTabChanged(const std::string & _tabTitle)
 {
 	removeUIControls();
 
-	if (_type == ot::WidgetViewBase::View3D)
+	if (_tabTitle == "3D")
 	{
 		setupUIControls3D();
 	}
-	else if(_type == ot::WidgetViewBase::View1D)
+	else if(_tabTitle == "1D")
 	{
 		setupUIControls1D();
 	}

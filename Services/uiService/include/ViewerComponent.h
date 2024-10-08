@@ -153,7 +153,7 @@ public:
 	ot::WidgetView* getPlotWidget(ViewerUIDtype _viewerID);
 	ot::WidgetView* getTableWidget(ViewerUIDtype _viewerID);
 
-	void viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type);
+	void viewerTabChanged(const std::string & _tabTitle);
 
 	ViewerUIDtype createViewer(ModelUIDtype _modelUid, double _scaleWidth, double _scaleHeight,
 		int _backgroundR, int _backgroundG, int _backgroundB, int _overlayR, int _overlayG, int _overlayB);

@@ -887,9 +887,11 @@ ot::WidgetView* ViewerComponent::getTableWidget(ViewerUIDtype _viewerID)
 	return ViewerAPI::getTable(_viewerID);
 }
 
-void ViewerComponent::viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type) {
-	ViewerAPI::viewerTabChanged(_tabTitle, _type);
+
+void ViewerComponent::viewerTabChanged(const std::string & _tabTitle) {
+	ViewerAPI::viewerTabChanged(_tabTitle);
 }
+
 
 ViewerUIDtype ViewerComponent::createViewer(ModelUIDtype _modelUid, double _scaleWidth, double _scaleHeight,
 	int _backgroundR, int _backgroundG, int _backgroundB, int _overlayR, int _overlayG, int _overlayB)
