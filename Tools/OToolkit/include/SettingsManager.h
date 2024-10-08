@@ -29,6 +29,9 @@ public:
 
 	bool showDialog(void);
 
+	const QString& getExternalToolsPath(void) const { return m_externalToolsPath; };
+	const QString& getExternalToolsDebugPath(void) const { return m_externalToolsDebugPath; };
+
 private Q_SLOTS:
 	void slotPropertyChanged(const std::string& _owner, const ot::Property* const _property);
 	void slotPropertyDeleteRequested(const std::string& _owner, const ot::Property* const _property);
@@ -40,4 +43,6 @@ private:
 
 	AppBase* m_app;
 	ot::ColorStyleName m_currentColorStyle;
+	QString m_externalToolsPath;
+	QString m_externalToolsDebugPath;
 };

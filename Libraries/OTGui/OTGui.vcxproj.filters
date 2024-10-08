@@ -67,6 +67,12 @@
     <Filter Include="Source Files\Version">
       <UniqueIdentifier>{3b663971-f8bd-4676-b7f5-71a1c5b3f70c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Plot">
+      <UniqueIdentifier>{8ad76964-6009-40f3-ad46-71b0618a8e6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Plot">
+      <UniqueIdentifier>{a84228d3-ce67-4600-a1ad-6b53e60cf8d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGui\GraphicsPickerCollectionCfg.h">
@@ -324,6 +330,18 @@
     <ClInclude Include="include\OTGui\VersionGraphVersionCfg.h">
       <Filter>Header Files\Version</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\Plot1DCfg.h">
+      <Filter>Header Files\Plot</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\Plot1DCurveCfg.h">
+      <Filter>Header Files\Plot</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\Plot1DAxisCfg.h">
+      <Filter>Header Files\Plot</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\NavigationTreeItemIcon.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -568,6 +586,18 @@
     </ClCompile>
     <ClCompile Include="src\VersionGraphCfg.cpp">
       <Filter>Source Files\Version</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NavigationTreeItemIcon.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plot1DAxisCfg.cpp">
+      <Filter>Source Files\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plot1DCurveCfg.cpp">
+      <Filter>Source Files\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plot1DCfg.cpp">
+      <Filter>Source Files\Plot</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

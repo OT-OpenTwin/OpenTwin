@@ -11,6 +11,7 @@
 #include "OTGui/Property.h"
 #include "OTGui/PropertyGroup.h"
 #include "OTGui/ColorStyleTypes.h"
+#include "OTGui/PropertyDirectory.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyDialog.h"
@@ -65,6 +66,30 @@ void SettingsManager::generalSettingsChanged(const std::string& _propertyPath, c
 		ot::GlobalColorStyle::instance().setCurrentStyle(actualProperty->getCurrent());
 		m_app->createSettingsInstance()->setValue("ColorStyle", QString::fromStdString(actualProperty->getCurrent()));
 	}
+	else if (_propertyPath == "External Tools/Library Path") {
+		const ot::PropertyDirectory* actualProperty = dynamic_cast<const ot::PropertyDirectory*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Invalid property { \"Property\": \"" + _propertyPath + "\" }");
+			return;
+		}
+
+		m_externalToolsPath = QString::fromStdString(actualProperty->getPath());
+		m_app->createSettingsInstance()->setValue("ExternalToolsPath", m_externalToolsPath);
+
+		OT_LOG_W("Please restart the OToolkit to apply the changes.");
+	}
+	else if (_propertyPath == "External Tools/Library Debug Path") {
+		const ot::PropertyDirectory* actualProperty = dynamic_cast<const ot::PropertyDirectory*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Invalid property { \"Property\": \"" + _propertyPath + "\" }");
+			return;
+		}
+
+		m_externalToolsDebugPath = QString::fromStdString(actualProperty->getPath());
+		m_app->createSettingsInstance()->setValue("ExternalToolsDebugPath", m_externalToolsDebugPath);
+
+		OT_LOG_W("Please restart the OToolkit to apply the changes.");
+	}
 }
 
 void SettingsManager::updateSettings(void) {
@@ -82,7 +107,9 @@ void SettingsManager::updateGeneralSettings(void) {
 	options.push_back(ot::toString(ot::ColorStyleName::DarkStyle));
 	options.push_back(ot::toString(ot::ColorStyleName::BlueStyle));
 
-	currentStyle = m_app->createSettingsInstance()->value("ColorStyle", QString::fromStdString(currentStyle)).toString().toStdString();
+	otoolkit::SettingsRef settingsRef = m_app->createSettingsInstance();
+
+	currentStyle = settingsRef->value("ColorStyle", QString::fromStdString(currentStyle)).toString().toStdString();
 	bool styleSet = false;
 	for (const std::string& opt : options) {
 		if (opt == currentStyle) {
@@ -114,6 +141,21 @@ void SettingsManager::updateGeneralSettings(void) {
 
 	generalGroup->addProperty(new ot::PropertyStringList("Color Style", currentStyle, options));
 	config.addRootGroup(generalGroup);
+
+	ot::PropertyGroup* externalToolsGroup = new ot::PropertyGroup("External Tools");
+
+	m_externalToolsPath = settingsRef->value("ExternalToolsPath", QString()).toString();
+	m_externalToolsDebugPath = settingsRef->value("ExternalToolsDebugPath", QString()).toString();
+
+	ot::PropertyDirectory* libPathProp = new ot::PropertyDirectory("Library Path", m_externalToolsPath.toStdString());
+	libPathProp->setPropertyTip("Library path for external tools that will be loaded in the Release mode of the OToolkit.\nTools need to have the *.ottool extension.");
+	externalToolsGroup->addProperty(libPathProp);
+
+	ot::PropertyDirectory* libPathDebugProp = new ot::PropertyDirectory("Library Debug Path", m_externalToolsDebugPath.toStdString());
+	libPathDebugProp->setPropertyTip("Library path for external tools that will be loaded in the Debug mode of the OToolkit.\nTools need to have the *.ottoold extension.");
+	externalToolsGroup->addProperty(libPathDebugProp);
+
+	config.addRootGroup(externalToolsGroup);
 
 	ot::ApplicationPropertiesManager::instance().add("General", config);
 }

@@ -2280,7 +2280,14 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	}
 
 	this->cleanupWidgetViewInfo(_view);
-	ot::WidgetViewManager::instance().closeView(_view->getViewData().getName());
+	std::string viewName = _view->getViewData().getName();
+	ot::WidgetViewManager::instance().closeView(viewName);
+
+	// Deselect navigation item if exists
+	auto itm = m_projectNavigation->itemFromPath(QString::fromStdString(viewName), '/');
+	if (itm) {
+		m_projectNavigation->setItemSelected(itm->id(), false);
+	}
 }
 
 void AppBase::slotOutputContextMenuItemClicked() {

@@ -57,7 +57,8 @@ void NGSpice::clearBufferStructure(std::string name)
 	this->customNameToNetlistNameMap.clear();
 	Numbers::nodeNumber = 1;
 	SimulationResults::getInstance()->getResultMap().clear();
-	
+	ngSpice_Command(const_cast<char*>("reset"));
+	//ngSpice_Init(MySendCharFunction, MySendStat, MyControlledExit, MySendDataFunction, MySendInitDataFunction, nullptr, nullptr);
 }
 
 
@@ -823,7 +824,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 			netlistElementName = diode->getNetlistName();
 			netlistLine += netlistElementName + " ";
-			modelNetlistLine += ".MODEL D1N4148 D(IS=2,52E-9)";
+			modelNetlistLine += ".MODEL D1N4148 D(IS=2.52E-9,RS=0.01,N=1.5)";
 			netlistValue = diode->getValue();
 		}
 		else if (circuitElement->type() == "VoltageMeter")
@@ -983,7 +984,6 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	if (simulationType == ".dc")
 	{
 		simulationLine = generateNetlistDCSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
-
 	}
 	else if (simulationType == ".TRAN")
 	{
@@ -996,6 +996,11 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	}
 
+
+	if (simulationLine == "failed")
+	{
+		return "failed";
+	}
 	simulationLine = "circbyline " + simulationLine;
 
 
@@ -1078,6 +1083,12 @@ std::string NGSpice::generateNetlistDCSimulation(EntityBase* solverEntity, std::
 	EntityPropertiesEntityList* elementProperty = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Element"));
 	
 	std::string element = Application::instance()->extractStringAfterDelimiter(elementProperty->getValueName(), '/', 2);
+	if (element == "failed")
+	{
+		OT_LOG_E("No Element for DC Simulation found or selected!");
+		return "failed";
+		
+	}
 	std::string netlistName = getNetlistNameOfMap(element);
 	
 	
@@ -1146,12 +1157,16 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 		OT_LOG_E("Something went wrong");
 	}
 
+    //int result = ngSpice_Command(const_cast<char*>("show"));
+	//ngSpice_Command(const_cast<char*>("reset"));
+	updateBufferClasses(allConnectionEntities,allEntitiesByBlockID,editorname);
+	std::string temp =  generateNetlist( solverEntity, allConnectionEntities,allEntitiesByBlockID, editorname);
+	if (temp == "failed")
+	{
+		return "failed";
+	}
 
-	
-	 updateBufferClasses(allConnectionEntities,allEntitiesByBlockID,editorname);
-	 generateNetlist( solverEntity, allConnectionEntities,allEntitiesByBlockID, editorname);
-
-	 Numbers::RshunNumbers = 0;
+	Numbers::RshunNumbers = 0;
 
 	/*char command[1000];
 	const char* netlist = "C:/Users/Sebastian/Desktop/NGSpice_Dateien_Test/Test.cir";

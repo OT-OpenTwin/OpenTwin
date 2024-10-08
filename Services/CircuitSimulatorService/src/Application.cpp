@@ -336,13 +336,26 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	std::string name =  extractStringAfterDelimiter(circuitName->getValueName(), '/', 1);
 	std::string solverName = solver.getName();
 
+	if (name == "failed")
+	{
+		OT_LOG_E("No Circuit found or selected!");
+		return;
+	}
+
+
 	m_blockEntityHandler.setPackageName(name);
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
 	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections();
 
 
 
-	m_ngSpice.ngSpice_Initialize (solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name);
+	std::string status = m_ngSpice.ngSpice_Initialize (solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name);
+	if (status == "failed")
+	{
+		OT_LOG_E("NGSpice Initialize function failed!");
+		m_ngSpice.clearBufferStructure(name);
+		return;
+	}
 	m_blockEntityHandler.createResultCurves(solverName,simulationTypeProperty->getValue(),circuitName->getValueName());
 	m_ngSpice.clearBufferStructure(name);
 	

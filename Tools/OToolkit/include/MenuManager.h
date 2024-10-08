@@ -26,10 +26,10 @@ public:
 	MenuManager();
 	virtual ~MenuManager();
 
-	QMenu* fileMenu(void) { return m_fileMenu; };
-	QMenu* toolsMenu(void) { return m_toolsMenu; };
+	QMenu* getFileMenu(void) { return m_fileMenu; };
+	QMenu* getToolsMenu(void) { return m_toolsMenu; };
 
-	ToolMenuManager* addToolMenu(const QString& _toolName);
+	ToolMenuManager* addToolMenu(const QString& _toolName, bool _isExternal);
 	ToolMenuManager* toolMenu(const QString& _toolName);
 
 Q_SIGNALS:
@@ -43,6 +43,7 @@ private Q_SLOTS:
 private:
 	QMenu* m_fileMenu;
 	QMenu* m_toolsMenu;
+	QMenu* m_externalToolsMenu;
 
 	std::map<QString, ToolMenuManager*> m_toolMenus;
 

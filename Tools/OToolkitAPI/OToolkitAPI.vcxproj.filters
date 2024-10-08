@@ -37,5 +37,8 @@
     <ClInclude Include="include\OToolkitAPI\ToolWidgets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\OToolkitAPI\APIFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

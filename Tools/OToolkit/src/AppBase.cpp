@@ -16,6 +16,7 @@
 #include "ToolViewManager.h"
 #include "SettingsManager.h"
 #include "ColorStyleEditor.h"
+#include "ExternalLibraryManager.h"
 #include "ToolBarManager.h"
 #include "WidgetTest.h"
 #include "GraphicsItemDesigner.h"
@@ -410,6 +411,8 @@ void AppBase::slotInitializeTools(void) {
 		m_toolManager->addTool(new WidgetTest);
 	}
 
+	m_externalLibraryManager->importTools(m_toolManager);
+
 	OT_LOG_I("Welcome to OToolkit (Build: " __DATE__ " " __TIME__ ")");
 
 	QMetaObject::invokeMethod(this, &AppBase::slotFinalizeInit, Qt::QueuedConnection);
@@ -484,6 +487,9 @@ AppBase::AppBase(QApplication* _app)
 	this->setMenuBar(m_toolManager->getMenuManager());
 	this->setStatusBar(m_toolManager->getStatusManager());
 	
+	// Create external tool manager
+	m_externalLibraryManager = new ExternalLibraryManager;
+
 	// Create output
 	m_output->setViewData(ot::WidgetViewBase("Output", "Output", ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewFlag::ViewIsSide));
 	m_output->setObjectName("OToolkit_Output");

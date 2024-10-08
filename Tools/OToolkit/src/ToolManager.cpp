@@ -56,7 +56,7 @@ bool ToolManager::addTool(otoolkit::Tool* _tool) {
 	m_tools.insert_or_assign(_tool->getToolName(), new ToolRuntimeHandler(_tool, this));
 
 	// Create menu and connect the run signal
-	ToolMenuManager* tmm = m_menuManager->addToolMenu(_tool->getToolName());
+	ToolMenuManager* tmm = m_menuManager->addToolMenu(_tool->getToolName(), _tool->getToolIsExternal());
 	this->connect(tmm, &ToolMenuManager::runRequested, this, &ToolManager::slotRunToolTriggered);
 
 	return true;

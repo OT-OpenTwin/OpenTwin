@@ -400,8 +400,6 @@ void Model::setupUIControls()
 	
 	addMenuAction("Model", "Plots", "Add Curves", "Add Curves", modelWrite, "Result1DVisible", "Default");
 
-	addMenuGroup("View", "Visibility");
-
 	uiCreated = true;
 
 	// Send an initial notification to properly set the state of the new controls

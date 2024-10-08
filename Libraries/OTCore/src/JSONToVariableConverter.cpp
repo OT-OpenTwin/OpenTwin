@@ -6,25 +6,32 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 	{
 		return ot::Variable(value.GetString());
 	}
-	else if (value.IsInt64())
-	{
-		return ot::Variable(value.GetInt64());
-	}
 	else if (value.IsInt())
 	{
 		return ot::Variable(value.GetInt());
 	}
-	else if (value.IsDouble())
+	else if (value.IsInt64())
 	{
-		return ot::Variable(value.GetDouble());
+		return ot::Variable(value.GetInt64());
 	}
 	else if (value.IsFloat())
 	{
 		return ot::Variable(value.GetFloat());
 	}
+	else if (value.IsDouble())
+	{
+		return ot::Variable(value.GetDouble());
+	}
 	else if (value.IsBool())
 	{
 		return ot::Variable(value.GetBool());
+	}
+	else if (value.IsObject())
+	{
+		assert(value.HasMember(ot::g_ImagSerialiseKey.c_str()));
+		assert(value.HasMember(ot::g_realSerialiseKey.c_str()));
+		ot::complex var(value[ot::g_realSerialiseKey.c_str()].GetDouble(), value[ot::g_ImagSerialiseKey.c_str()].GetDouble());
+		return ot::Variable(std::move(var));
 	}
 	else
 	{

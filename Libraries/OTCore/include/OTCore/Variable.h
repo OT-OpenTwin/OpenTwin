@@ -13,6 +13,7 @@
 #include <limits>
 #include <algorithm>
 #include <math.h>
+#include "ComplexNumbers.h"
 
 #pragma warning(disable:4251)
 namespace ot
@@ -113,12 +114,13 @@ namespace ot
 		Variable(bool value);
 		Variable(const char* value);
 		Variable(const std::string& value);
-		Variable(std::string&& value);
-		
+		Variable(std::string&& value) noexcept;
+		Variable(const complex& value);
+		Variable(complex&& value) noexcept;
 		Variable(const Variable& other) = default;
 		Variable(Variable&& other) = default;
 		Variable& operator=(const Variable& other);
-		Variable& operator=(Variable&& other);
+		Variable& operator=(Variable&& other) noexcept;
 
 		void setValue(float value);
 		void setValue(double value);
@@ -127,8 +129,9 @@ namespace ot
 		void setValue(bool value);
 		void setValue(const char* value);
 		void setValue(const std::string& value);
-		void setValue(const std::string&& value);
-
+		void setValue(std::string&& value);
+		void setValue(const complex& _value);
+		void setValue(complex&& _value);
 
 		bool isFloat() const;
 		bool isDouble() const;
@@ -136,6 +139,7 @@ namespace ot
 		bool isInt64() const;
 		bool isBool() const;
 		bool isConstCharPtr() const;
+		bool isComplex() const;
 
 		float getFloat() const;
 		double getDouble() const;
@@ -143,6 +147,7 @@ namespace ot
 		int64_t getInt64() const;
 		bool getBool() const;
 		const char* getConstCharPtr() const;
+		const complex getComplex() const;
 
 		bool operator==(const Variable& other)const;
 		bool operator>(const Variable& other)const;
@@ -151,9 +156,7 @@ namespace ot
 		std::string getTypeName()const;
 
 	private:
-		using variable_t = std::variant<int32_t, int64_t, bool, float, double ,StringWrapper>;
-		
-
+		using variable_t = std::variant<int32_t, int64_t, bool, float, double ,StringWrapper, complex>;
 		inline bool DoubleCompare(const double& a, const double& b) const
 		{
 			constexpr const double epsilon = 1.0e-12; //std::numeric_limits<double>::epsilon()

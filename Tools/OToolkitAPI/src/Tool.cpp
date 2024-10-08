@@ -11,7 +11,7 @@
 #include "OTWidgets/BasicWidgetView.h"
 
 otoolkit::Tool::Tool() 
-	: m_isRunning(false)
+	: m_isRunning(false), m_isExternal(false)
 {
 
 }

@@ -387,6 +387,8 @@ bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const s
 	addedOrModifiedEntities.clear();
 	removedEntities.clear();
 
+	storeCurrentVersionInModelEntity();
+
 	return true;
 }
 
@@ -1649,8 +1651,6 @@ void ModelState::createAndActivateNewBranch(void)
 
 	m_graphCfg.setActiveBranchVersionName(newBranch);
 	m_graphCfg.setActiveVersionName(newBranch + ".0"); // This will be incremented during the next save operation
-
-	storeCurrentVersionInModelEntity();
 }
 
 bool ModelState::branchExists(const std::string& _branch)
@@ -1661,6 +1661,10 @@ bool ModelState::branchExists(const std::string& _branch)
 
 void ModelState::storeCurrentVersionInModelEntity(void) {
 	if (activeVersionInModelEntity != m_graphCfg.getActiveVersionName() || activeBranchInModelEntity != m_graphCfg.getActiveBranchVersionName()) {
+		if (m_graphCfg.getActiveVersionName().empty()) {
+			OT_LOG_E("Attempting to store empty version { \"Version\": \"" + m_graphCfg.getActiveVersionName() + "\", \"Branch\": \"" + m_graphCfg.getActiveBranchVersionName() + "\" }");
+			return;
+		}
 		mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::GetDataBase()->getProjectName());
 
 		// We need to update the model entity

@@ -5,24 +5,34 @@
 TEST(GenericDataStructMatrix, FillingWithOneValue)
 {
 	ot::Variable expectedValue(5);
-	ot::GenericDataStructMatrix matrix(3, 3);
+	ot::MatrixEntryPointer entry;
+	entry.m_column = 3;
+	entry.m_row = 3;
+	ot::GenericDataStructMatrix matrix(entry);
 	{
 		ot::Variable value(5);
-		matrix.setValue(2, 2, std::move(value));
+		entry.m_column = 2;
+		entry.m_row = 2;
+		matrix.setValue(entry, std::move(value));
 	}
-	const ot::Variable& actualValue = matrix.getValue(2, 2);
+	const ot::Variable& actualValue = matrix.getValue(entry);
 
 	EXPECT_EQ(actualValue, expectedValue);
 }
 
 TEST(GenericDataStructMatrix, Serialization)
 {
-	ot::GenericDataStructMatrix expectedMatrix(4, 4);
+	ot::MatrixEntryPointer entry;
+	entry.m_column = 4;
+	entry.m_row = 4;
+	ot::GenericDataStructMatrix expectedMatrix(entry);
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			expectedMatrix.setValue(j, i, ot::Variable(i * 4 + j));
+			entry.m_column = j;
+			entry.m_row = i;
+			expectedMatrix.setValue(entry, ot::Variable(i * 4 + j));
 		}
 	}
 
@@ -32,13 +42,21 @@ TEST(GenericDataStructMatrix, Serialization)
 	doc.AddMember("Matrix", val, doc.GetAllocator());
 	
 	auto serActualMatrix = ot::json::getObject(doc, "Matrix");
-	ot::GenericDataStructMatrix actualMatrix(4, 4);
+	
+	entry.m_column = 4;
+	entry.m_row = 4;
+
+	ot::GenericDataStructMatrix actualMatrix(entry);
 	actualMatrix.setFromJsonObject(serActualMatrix);
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			EXPECT_EQ(actualMatrix.getValue(j, i), expectedMatrix.getValue(j, i));
+			entry.m_column = j;
+			entry.m_row = i;
+			const ot::Variable actVal = actualMatrix.getValue(entry);
+			const ot::Variable expectVal = expectedMatrix.getValue(entry);
+			EXPECT_EQ(actVal, expectVal );
 		}
 	}
 }
@@ -104,12 +122,17 @@ TEST(GenericDataStruct, TypeDetectionVector)
 
 TEST(GenericDataStruct, TypeDetectionMatrix)
 {
-	ot::GenericDataStructMatrix expectedMatrix(4, 4);
+	ot::MatrixEntryPointer entry;
+	entry.m_column = 4;
+	entry.m_row = 4;
+	ot::GenericDataStructMatrix expectedMatrix(entry);
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			expectedMatrix.setValue(j, i, ot::Variable(i * 4 + j));
+			entry.m_column = j;
+			entry.m_row = i;
+			expectedMatrix.setValue(entry, ot::Variable(i * 4 + j));
 		}
 	}
 
