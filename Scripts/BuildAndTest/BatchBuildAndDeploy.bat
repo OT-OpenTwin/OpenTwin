@@ -26,9 +26,9 @@ IF "%OPENTWIN_FTP_PASSWORD%" == "" (
 	goto PAUSE_END
 )
 
-REM ===================================================================
-REM Get the latest version from the repository
-REM ===================================================================
+ECHO ===================================================================
+ECHO Get the latest version from the repository
+ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%"
 git pull
@@ -37,9 +37,9 @@ cd /D "%OPENTWIN_THIRDPARTY_ROOT%"
 git pull
 
 
-REM ===================================================================
-REM Call build script
-REM ===================================================================
+ECHO ===================================================================
+ECHO Build the software
+ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\RebuildAll.bat" BOTH BUILD
@@ -51,39 +51,45 @@ REM ===================================================================
 @echo off
 findstr /c:"1 failed" < buildLog_Summary.txt
 if %errorlevel%==0 (
+ECHO ===================================================================
+ECHO ERROR: Build failed
+ECHO ===================================================================
 exit 1
 )
 findstr /c:"2 failed" < buildLog_Summary.txt
 if %errorlevel%==0 (
+ECHO ===================================================================
+ECHO ERROR: Build failed
+ECHO ===================================================================
 exit 1
 )
 
-REM ===================================================================
-REM Build the documentation
-REM ===================================================================
+ECHO ===================================================================
+ECHO Build the documentation
+ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildDocumentation.bat"
 
-REM ===================================================================
-REM Create the deployment
-REM ===================================================================
+ECHO ===================================================================
+ECHO Create the deployment
+ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CreateDeployment.bat"
 
-REM ===================================================================
-REM Build the installers
-REM ===================================================================
+ECHO ===================================================================
+ECHO Build the installers
+ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\Installer"
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Installer\Build_Installers_noInput.bat"
 
-REM ===================================================================
-REM Upload the documentation and the nightly installers
-REM ===================================================================
+ECHO ===================================================================
+ECHO Upload the documentation and the nightly installers
+ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
-"%OPENTWIN_THIRDPARTY_ROOT%\WinSCP\WinSCP.com" /ini=nul /script="%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BatchBuildAndDeploy.txt"
+REM "%OPENTWIN_THIRDPARTY_ROOT%\WinSCP\WinSCP.com" /ini=nul /script="%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BatchBuildAndDeploy.txt"
 
 exit 0
