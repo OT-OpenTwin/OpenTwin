@@ -34,3 +34,7 @@ void ot::GraphicsElement::setGraphicsElementStateFlags(const GraphicsElementStat
 std::list<ot::GraphicsElement*> ot::GraphicsElement::getAllGraphicsElements(void) {
 	return std::list<GraphicsElement*>({ this });
 }
+
+std::list<ot::GraphicsElement*> ot::GraphicsElement::getAllDirectChildElements(void) {
+	return std::list<GraphicsElement*>();
+}

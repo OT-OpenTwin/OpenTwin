@@ -39,6 +39,8 @@ namespace ot {
 
 		virtual std::list<GraphicsElement*> getAllGraphicsElements(void) override;
 
+		virtual std::list<GraphicsElement*> getAllDirectChildElements(void) override;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Base class functions: QGraphicsItem

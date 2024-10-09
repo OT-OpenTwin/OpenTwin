@@ -19,6 +19,8 @@
 
 #pragma warning(disable:4251)
 
+class QGraphicsItem;
+
 namespace ot {
 
 	class GraphicsScene;
@@ -54,6 +56,12 @@ namespace ot {
 
 		// Setter / Getter
 
+		//! \brief Returns the QGraphicsItem.
+		virtual QGraphicsItem* getQGraphicsItem(void) = 0;
+
+		//! \brief Returns the const QGraphicsItem.
+		virtual const QGraphicsItem* getQGraphicsItem(void) const = 0;
+
 		//! \brief Set the GraphicsScene this element is placed at.
 		virtual void setGraphicsScene(GraphicsScene* _scene) { m_scene = _scene; };
 
@@ -77,6 +85,8 @@ namespace ot {
 		//! \brief Returns all graphics elements nested in this element.
 		//! The result contains this element and all of its childs.
 		virtual std::list<GraphicsElement*> getAllGraphicsElements(void);
+
+		virtual std::list<GraphicsElement*> getAllDirectChildElements(void);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

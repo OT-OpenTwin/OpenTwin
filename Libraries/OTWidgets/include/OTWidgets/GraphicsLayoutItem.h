@@ -56,6 +56,8 @@ namespace ot {
 
 		virtual std::list<GraphicsElement*> getAllGraphicsElements(void) override;
 
+		virtual std::list<GraphicsElement*> getAllDirectChildElements(void) override;
+
 		GraphicsLayoutItemWrapper* getLayoutWrapper(void) const { return m_layoutWrap; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################

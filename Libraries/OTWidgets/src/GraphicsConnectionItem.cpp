@@ -162,6 +162,14 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPoint(const QPointF
 	return distance;
 }
 
+QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem(void) {
+	return this;
+}
+
+const QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem(void) const {
+	return this;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 bool ot::GraphicsConnectionItem::setConfiguration(const ot::GraphicsConnectionCfg& _cfg) {
