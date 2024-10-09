@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTWidgets/Label.h"
+#include "OTWidgets/LineEdit.h"
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/VersionGraphManager.h"
 
@@ -40,6 +41,10 @@ ot::VersionGraphManager::VersionGraphManager() {
 	QVBoxLayout* rootLay = new QVBoxLayout(m_root);
 	QHBoxLayout* modeLay = new QHBoxLayout;
 	
+	m_textFilter = new LineEdit;
+	m_textFilter->setPlaceholderText("Find...");
+	m_textFilter->setToolTip("Find version containing the text in its label or description (mode independent)");
+
 	Label* modeLabel = new Label("Mode:");
 	m_modeSelector = new ComboBox;
 	m_modeSelector->addItems({
@@ -56,10 +61,11 @@ ot::VersionGraphManager::VersionGraphManager() {
 	rootLay->addWidget(m_graph, 1);
 
 	modeLay->setContentsMargins(0, 0, 0, 0);
-	modeLay->addStretch(1);
+	modeLay->addWidget(m_textFilter, 1);
 	modeLay->addWidget(modeLabel);
 	modeLay->addWidget(m_modeSelector);
 
+	this->connect(m_textFilter, &LineEdit::textChanged, this, &VersionGraphManager::updateCurrentGraph);
 	this->connect(m_modeSelector, &ComboBox::currentTextChanged, this, &VersionGraphManager::updateCurrentGraph);
 }
 
@@ -131,6 +137,12 @@ void ot::VersionGraphManager::removeVersions(const std::list<std::string>& _vers
 }
 
 void ot::VersionGraphManager::updateCurrentGraph(void) {
+	QString txt = m_textFilter->text();
+	if (!txt.isEmpty()) {
+		this->updateCurrentGraphTextMode(txt);
+		return;
+	}
+
 	switch (this->getCurrentViewMode()) {
 	case ot::VersionGraphManager::ViewAll:
 		m_graph->setupFromConfig(m_config);
@@ -153,6 +165,34 @@ void ot::VersionGraphManager::updateCurrentGraph(void) {
 		m_graph->setupFromConfig(m_config);
 		break;
 	}
+}
+
+void ot::VersionGraphManager::updateCurrentGraphTextMode(const QString& _text) {
+	VersionGraphCfg newConfig;
+	newConfig.setActiveVersionName(m_config.getActiveVersionName());
+
+	// Determine branch version
+	if (!m_config.getActiveBranchVersionName().empty()) {
+		VersionGraphVersionCfg* branchVersion = m_config.findVersion(m_config.getActiveBranchVersionName());
+		if (branchVersion) {
+			newConfig.setActiveBranchVersionName(branchVersion->getLastBranchVersion()->getName());
+		}
+		else {
+			OT_LOG_EAS("Branch version not found: \"" + m_config.getActiveBranchVersionName() + "\"");
+		}
+	}
+
+	// Copy root config
+	VersionGraphVersionCfg* newItem = new VersionGraphVersionCfg;
+	newItem->applyConfigOnly(*m_config.getRootVersion());
+
+	// Process item childs
+	for (const VersionGraphVersionCfg* childCfg : m_config.getRootVersion()->getChildVersions()) {
+		this->processTextFilter(newItem, childCfg, newConfig.getActiveVersionName(), true, _text);
+	}
+
+	newConfig.setRootVersion(newItem);
+	m_graph->setupFromConfig(newConfig);
 }
 
 void ot::VersionGraphManager::updateCurrentGraphCompactMode(void) {
@@ -189,6 +229,27 @@ void ot::VersionGraphManager::updateCurrentGraphLabeledOnlyMode(void) {
 
 	newConfig.setRootVersion(newItem);
 	m_graph->setupFromConfig(newConfig);
+}
+
+void ot::VersionGraphManager::processTextFilter(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, const QString& _filterText) {
+	VersionGraphVersionCfg* newParent = _parent;
+	bool newParentIsDirect = false;
+
+	// Active item
+	if (_config->getName() == _activeVersion || QString::fromStdString(_config->getLabel()).contains(_filterText, Qt::CaseInsensitive) || QString::fromStdString(_config->getDescription()).contains(_filterText, Qt::CaseInsensitive)) {
+		VersionGraphVersionCfg* newItem = new VersionGraphVersionCfg;
+		newItem->applyConfigOnly(*_config);
+		newItem->setDirectParentIsHidden(!_isDirectParent);
+
+		_parent->addChildVersion(newItem);
+		newParent = newItem;
+		newParentIsDirect = true;
+	}
+
+	// Process childs
+	for (const VersionGraphVersionCfg* childCfg : _config->getChildVersions()) {
+		this->processTextFilter(newParent, childCfg, _activeVersion, newParentIsDirect, _filterText);
+	}
 }
 
 void ot::VersionGraphManager::startProcessCompact(bool _includeLabeledVersions) {

@@ -13,6 +13,7 @@
 
 namespace ot {
 
+	class LineEdit;
 	class ComboBox;
 
 	class OT_WIDGETS_API_EXPORT VersionGraphManager : public QObject, public QWidgetInterface {
@@ -54,16 +55,19 @@ namespace ot {
 		void updateCurrentGraph(void);
 
 	private:
+		void updateCurrentGraphTextMode(const QString& _text);
 		void updateCurrentGraphCompactMode(void);
 		void updateCurrentGraphCompactLabelMode(void);
 		void updateCurrentGraphLabeledOnlyMode(void);
 
+		void processTextFilter(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, const QString& _filterText);
 		void startProcessCompact(bool _includeLabeledVersions);
 		void processCompactItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, bool _includeLabeledVersions);
 		void processLabeledOnlyItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent);
 
 		QWidget* m_root;
 		VersionGraph* m_graph;
+		LineEdit* m_textFilter;
 		ComboBox* m_modeSelector;
 
 		VersionGraphCfg m_config;
