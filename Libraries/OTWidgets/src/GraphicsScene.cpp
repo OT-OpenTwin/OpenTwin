@@ -76,7 +76,7 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 		p.setColor(QColor(64, 64, 255));
 		p.setWidth(1);
 		m_connectionPreview->setConnectionShape(m_connectionPreviewShape);
-		m_connectionPreview->setOriginPos(m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center());
+		m_connectionPreview->setOriginPos(m_connectionOrigin->getQGraphicsItem()->mapToScene(m_connectionOrigin->getQGraphicsItem()->boundingRect().center()));
 		m_connectionPreview->setOriginDir(m_connectionOrigin->getConnectionDirection());
 		m_connectionPreview->setDestPos(m_connectionPreview->originPos());
 		m_connectionPreview->setDestDir(ot::inversedConnectionDirection(m_connectionOrigin->getConnectionDirection()));
@@ -297,7 +297,7 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_connectionPreview) {
 		OTAssertNullptr(m_connectionOrigin);
-		m_connectionPreview->setOriginPos(m_connectionOrigin->getQGraphicsItem()->scenePos() + m_connectionOrigin->getQGraphicsItem()->boundingRect().center());
+		m_connectionPreview->setOriginPos(m_connectionOrigin->getQGraphicsItem()->mapToScene(m_connectionOrigin->getQGraphicsItem()->boundingRect().center()));
 		m_connectionPreview->setDestPos(_event->scenePos());
 	}
 
