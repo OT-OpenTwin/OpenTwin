@@ -20,7 +20,7 @@ Function SetupMongoDBInstallation
 		Call Upgrader_On_Init ; Since there is no dialog, NSIS seems to skip the leave function
 	${ElseIf} $0 == 1060 ;Service not found, confirm next
 		StrCpy $First_MONGODB_Install_FLAG 1 ;The return code for server not found is 1060
-		StrCpy $Upgr_Dialog_Txt "Failed to find a serive of the name MongoDB. If a MongoDB installation exists but is running under a different name, adjust the following information accordingly:"
+		StrCpy $Upgr_Dialog_Txt "Failed to find a service running under the name MongoDB. If a MongoDB installation exists but is running under a different name, adjust the following information accordingly:"
 		Call ConfirmNoMongoDBServer
 	${Else}
 		StrCpy $First_MONGODB_Install_FLAG -1 ;Service not found, confirm next

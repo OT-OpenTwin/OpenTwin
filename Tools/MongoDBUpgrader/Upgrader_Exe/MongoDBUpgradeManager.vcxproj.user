@@ -1,8 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>--Upgrade --AdminPsw admin --ServiceName MongoDB</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--Check</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerEnvironment>PATH=$(OT_ALL_DLLD);$(BOOST_LIBPATHD);$(MONGO_CXX_DLLD);$(MONGO_C_DLLD);PATH</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=C:\ThirdParty\boost\boost_1_86_0\lib64-msvc-14.3;$(OT_ALL_DLLD);$(BOOST_LIBPATHD);$(MONGO_CXX_DLLD);$(MONGO_C_DLLD);PATH</LocalDebuggerEnvironment>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>--Check</LocalDebuggerCommandArguments>
+    <LocalDebuggerEnvironment>PATH=$(BOOST_LIBPATHR);$(MONGO_CXX_DLLR);$(MONGO_C_DLLR);PATH</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

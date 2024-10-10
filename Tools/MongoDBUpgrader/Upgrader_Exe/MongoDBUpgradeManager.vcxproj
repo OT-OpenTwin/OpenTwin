@@ -43,13 +43,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -112,7 +112,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(BOOST_LIBPATHD);$(MONGO_CXX_LIBPATHD);$(MONGO_C_LIBPATHD)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>boost_filesystem-vc141-mt-gd-x64-1_71.lib;$(MONGO_C_LIB);$(MONGO_CXX_LIB);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>boost_filesystem-vc143-mt-gd-x64-1_86.lib;$(MONGO_C_LIB);$(MONGO_CXX_LIB);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -132,7 +132,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(BOOST_LIBPATHR);$(MONGO_CXX_LIBPATHR);$(MONGO_C_LIBPATHR)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>boost_filesystem-vc141-mt-x64-1_71.lib;$(MONGO_C_LIB);$(MONGO_CXX_LIB);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>boost_filesystem-vc143-mt-x64-1_86.lib;$(MONGO_C_LIB);$(MONGO_CXX_LIB);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
