@@ -331,6 +331,75 @@
     <ClCompile Include="src\Action.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="src\AbstractPlot.cpp">
+      <Filter>src\Plot\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AbstractPlotAxis.cpp">
+      <Filter>src\Plot\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Plot.cpp">
+      <Filter>src\Plot\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlotDataset.cpp">
+      <Filter>src\Plot\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlotView.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlot.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlotAxis.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlotGrid.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlotLegend.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlotMagnifier.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlotMarker.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlotPanner.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlotPicker.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlotWidgetCanvas.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlotZoomer.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PolarPlot.cpp">
+      <Filter>src\Plot\Polar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PolarPlotAxis.cpp">
+      <Filter>src\Plot\Polar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PolarPlotData.cpp">
+      <Filter>src\Plot\Polar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PolarPlotGrid.cpp">
+      <Filter>src\Plot\Polar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PolarPlotLegend.cpp">
+      <Filter>src\Plot\Polar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PolarPlotMagnifier.cpp">
+      <Filter>src\Plot\Polar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PolarPlotMarker.cpp">
+      <Filter>src\Plot\Polar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PolarPlotPanner.cpp">
+      <Filter>src\Plot\Polar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -392,6 +461,30 @@
     </Filter>
     <Filter Include="src\Version">
       <UniqueIdentifier>{b0b7edc4-d8c6-402b-81d4-265470ebbbad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Plot">
+      <UniqueIdentifier>{03f5eca2-3889-45ed-bfb4-f3cbf1a905f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Plot\Base">
+      <UniqueIdentifier>{07281784-b954-4569-87fc-072744e6092e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Plot\Cartesian">
+      <UniqueIdentifier>{380477a6-ab80-4b22-86db-914b42a8ba7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Plot\Polar">
+      <UniqueIdentifier>{7d16cccc-8797-4a6e-992b-08b9dd014cfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Plot">
+      <UniqueIdentifier>{f1afb6fc-edb0-4bde-84e5-76ad9866227f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Plot\Base">
+      <UniqueIdentifier>{f0dfcb70-c71b-47ee-a86f-8a1029b90967}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Plot\Cartesian">
+      <UniqueIdentifier>{ce2e0e49-4b13-4f2f-b58d-196e1b40f26c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Plot\Polar">
+      <UniqueIdentifier>{a9a34595-f45c-40e4-9afa-881e031858ae}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -617,6 +710,72 @@
     <ClInclude Include="include\OTWidgets\Action.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\AbstractPlot.h">
+      <Filter>include\Plot\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\AbstractPlotAxis.h">
+      <Filter>include\Plot\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PlotView.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PlotDataset.h">
+      <Filter>include\Plot\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlot.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotAxis.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotGrid.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotLegend.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotMagnifier.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotMarker.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotPanner.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotPicker.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotWidgetCanvas.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotZoomer.h">
+      <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PolarPlot.h">
+      <Filter>include\Plot\Polar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PolarPlotAxis.h">
+      <Filter>include\Plot\Polar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PolarPlotData.h">
+      <Filter>include\Plot\Polar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PolarPlotGrid.h">
+      <Filter>include\Plot\Polar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PolarPlotLegend.h">
+      <Filter>include\Plot\Polar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PolarPlotMagnifier.h">
+      <Filter>include\Plot\Polar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PolarPlotMarker.h">
+      <Filter>include\Plot\Polar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PolarPlotPanner.h">
+      <Filter>include\Plot\Polar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -750,6 +909,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ToolButton.h">
       <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\Plot.h">
+      <Filter>include\Plot\Base</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

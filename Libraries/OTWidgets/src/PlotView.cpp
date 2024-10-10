@@ -3,18 +3,14 @@
 //! @date March 2024
 // ###########################################################################################################################################################################################################################################################################################################################
 
-#include "stdafx.h"
-
 // OpenTwin header
-#include "PlotView.h"
 #include "OTWidgets/WidgetViewRegistrar.h"
+#include "OTWidgets/PlotView.h"
 
 static ot::WidgetViewRegistrar<ot::PlotView> PlotViewRegistrar(OT_WIDGETTYPE_Plot);
 
-ot::PlotView::PlotView(Viewer* _viewer)
-	: Plot(_viewer)
-{
-	this->addWidgetToDock(this->widget());
+ot::PlotView::PlotView() {
+	this->addWidgetToDock(this->getQWidget());
 }
 
 ot::PlotView::~PlotView() {
@@ -26,7 +22,7 @@ ot::PlotView::~PlotView() {
 // Base class functions
 
 QWidget* ot::PlotView::getViewWidget(void) {
-	return this->widget();
+	return this->getQWidget();
 }
 
 bool ot::PlotView::setupViewFromConfig(WidgetViewCfg* _config) {

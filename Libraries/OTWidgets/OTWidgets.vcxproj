@@ -19,9 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AbstractPlot.cpp" />
+    <ClCompile Include="src\AbstractPlotAxis.cpp" />
     <ClCompile Include="src\Action.cpp" />
     <ClCompile Include="src\ApplicationPropertiesManager.cpp" />
     <ClCompile Include="src\BasicWidgetView.cpp" />
+    <ClCompile Include="src\CartesianPlot.cpp" />
+    <ClCompile Include="src\CartesianPlotAxis.cpp" />
+    <ClCompile Include="src\CartesianPlotGrid.cpp" />
+    <ClCompile Include="src\CartesianPlotLegend.cpp" />
+    <ClCompile Include="src\CartesianPlotMagnifier.cpp" />
+    <ClCompile Include="src\CartesianPlotMarker.cpp" />
+    <ClCompile Include="src\CartesianPlotPanner.cpp" />
+    <ClCompile Include="src\CartesianPlotPicker.cpp" />
+    <ClCompile Include="src\CartesianPlotWidgetCanvas.cpp" />
+    <ClCompile Include="src\CartesianPlotZoomer.cpp" />
     <ClCompile Include="src\CheckBox.cpp" />
     <ClCompile Include="src\ColorPickButton.cpp" />
     <ClCompile Include="src\ColorPreviewBox.cpp" />
@@ -93,6 +105,17 @@
     <ClCompile Include="src\Painter2DPreview.cpp" />
     <ClCompile Include="src\PixmapImagePainter.cpp" />
     <ClCompile Include="src\PlainTextEditView.cpp" />
+    <ClCompile Include="src\Plot.cpp" />
+    <ClCompile Include="src\PlotDataset.cpp" />
+    <ClCompile Include="src\PlotView.cpp" />
+    <ClCompile Include="src\PolarPlot.cpp" />
+    <ClCompile Include="src\PolarPlotAxis.cpp" />
+    <ClCompile Include="src\PolarPlotData.cpp" />
+    <ClCompile Include="src\PolarPlotGrid.cpp" />
+    <ClCompile Include="src\PolarPlotLegend.cpp" />
+    <ClCompile Include="src\PolarPlotMagnifier.cpp" />
+    <ClCompile Include="src\PolarPlotMarker.cpp" />
+    <ClCompile Include="src\PolarPlotPanner.cpp" />
     <ClCompile Include="src\Positioning.cpp" />
     <ClCompile Include="src\QtFactory.cpp" />
     <ClCompile Include="src\PlainTextEdit.cpp" />
@@ -159,8 +182,20 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\ApplicationPropertiesManager.h" />
+    <ClInclude Include="include\OTWidgets\AbstractPlot.h" />
+    <ClInclude Include="include\OTWidgets\AbstractPlotAxis.h" />
     <ClInclude Include="include\OTWidgets\Action.h" />
     <ClInclude Include="include\OTWidgets\BasicWidgetView.h" />
+    <ClInclude Include="include\OTWidgets\CartesianPlot.h" />
+    <ClInclude Include="include\OTWidgets\CartesianPlotAxis.h" />
+    <ClInclude Include="include\OTWidgets\CartesianPlotGrid.h" />
+    <ClInclude Include="include\OTWidgets\CartesianPlotLegend.h" />
+    <ClInclude Include="include\OTWidgets\CartesianPlotMagnifier.h" />
+    <ClInclude Include="include\OTWidgets\CartesianPlotMarker.h" />
+    <ClInclude Include="include\OTWidgets\CartesianPlotPanner.h" />
+    <ClInclude Include="include\OTWidgets\CartesianPlotPicker.h" />
+    <ClInclude Include="include\OTWidgets\CartesianPlotWidgetCanvas.h" />
+    <ClInclude Include="include\OTWidgets\CartesianPlotZoomer.h" />
     <ClInclude Include="include\OTWidgets\ColorStyle.h" />
     <ClInclude Include="include\OTWidgets\ColorStyleValue.h" />
     <QtMoc Include="include\OTWidgets\GlobalColorStyle.h" />
@@ -189,6 +224,17 @@
     <ClInclude Include="include\OTWidgets\OverlayWidgetBase.h" />
     <ClInclude Include="include\OTWidgets\PixmapImagePainter.h" />
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
+    <QtMoc Include="include\OTWidgets\Plot.h" />
+    <ClInclude Include="include\OTWidgets\PlotDataset.h" />
+    <ClInclude Include="include\OTWidgets\PlotView.h" />
+    <ClInclude Include="include\OTWidgets\PolarPlot.h" />
+    <ClInclude Include="include\OTWidgets\PolarPlotAxis.h" />
+    <ClInclude Include="include\OTWidgets\PolarPlotData.h" />
+    <ClInclude Include="include\OTWidgets\PolarPlotGrid.h" />
+    <ClInclude Include="include\OTWidgets\PolarPlotLegend.h" />
+    <ClInclude Include="include\OTWidgets\PolarPlotMagnifier.h" />
+    <ClInclude Include="include\OTWidgets\PolarPlotMarker.h" />
+    <ClInclude Include="include\OTWidgets\PolarPlotPanner.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\PropertyGridView.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputFactoryRegistrar.h" />
@@ -377,7 +423,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
       <PreprocessorDefinitions>OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -388,8 +434,8 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;qtadvanceddockingd.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(QT_ADS_ROOT)\lib;$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;qtadvanceddockingd.lib;$(QWT_LIB_LIBD);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(QT_ADS_ROOT)\lib;$(QWT_LIB_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -400,7 +446,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
       <PreprocessorDefinitions>OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -422,7 +468,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -431,8 +477,8 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;qtadvanceddocking.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(QT_ADS_ROOT)\lib;$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;qtadvanceddocking.lib;$(QWT_LIB_LIBR);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(QT_ADS_ROOT)\lib;$(QWT_LIB_LIBPATHR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -443,7 +489,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
       <LanguageStandard>stdcpp20</LanguageStandard>
