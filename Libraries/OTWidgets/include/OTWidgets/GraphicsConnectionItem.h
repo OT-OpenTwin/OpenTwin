@@ -49,6 +49,12 @@ namespace ot {
 		//! \param _pt Point in scene coordinates.
 		virtual qreal calculateShortestDistanceToPoint(const QPointF& _pt) const override;
 
+		//! \brief Returns the QGraphicsItem.
+		virtual QGraphicsItem* getQGraphicsItem(void) override;
+
+		//! \brief Returns the const QGraphicsItem.
+		virtual const QGraphicsItem* getQGraphicsItem(void) const override;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		//! @brief Will set the connection properties as provided in the configuration

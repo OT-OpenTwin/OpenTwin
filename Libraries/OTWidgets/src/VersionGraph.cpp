@@ -25,7 +25,7 @@ ot::VersionGraph::~VersionGraph() {
 
 void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 	if (m_rootItem) {
-		m_lastViewportRect = this->getVisibleSceneRect();
+		m_lastViewportRect = this->getVisibleSceneRect().marginsRemoved(QMarginsF(2., 2., 2., 2.));
 	}
 
 	this->clear();

@@ -102,7 +102,7 @@ REM	"!SEVENZIP_REG_DATA!\7z.exe" x !PLUGIN_ZIPFILE! -o!NSIS_REG_VALUE! -y -aos
 	copy %UPGRADER_EXE%\x64\Release\MongoDBUpgradeManager.exe .\Upgrader_Exe\MongoDBUpgradeManager.exe
 	
 	REM Now copying all required dlls to the deployment dir
-	copy %OPENTWIN_THIRDPARTY_ROOT%\boost\boost_1_71_0\lib64-msvc-14.1\boost_filesystem-vc141-mt-x64-1_71.dll .\Upgrader_Exe\boost_filesystem-vc141-mt-x64-1_71.dll
+	copy %OPENTWIN_THIRDPARTY_ROOT%\boost\boost_1_86_0\lib64-msvc-14.3\boost_filesystem-vc143-mt-x64-1_86.dll .\Upgrader_Exe\boost_filesystem-vc143-mt-x64-1_86.dll
 	copy %OPENTWIN_THIRDPARTY_ROOT%\MongoDb\mongo-cxx-driver-r3.10.0\x64\Release\bin .\Upgrader_Exe
 	copy %OPENTWIN_THIRDPARTY_ROOT%\MongoDb\mongo-c-driver-1.27.3\x64\Release\bin .\Upgrader_Exe
 	copy %UPGRADER_NSH% .

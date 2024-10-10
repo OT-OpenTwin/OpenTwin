@@ -150,6 +150,22 @@ std::list<ot::GraphicsElement*> ot::GraphicsLayoutItem::getAllGraphicsElements(v
 	for (QGraphicsLayoutItem* itm : childs) {
 		GraphicsElement* actualItem = dynamic_cast<GraphicsElement*>(itm);
 		if (actualItem) {
+			result.splice(result.end(), actualItem->getAllGraphicsElements());
+		}
+		else {
+			OT_LOG_EA("Unknown item");
+		}
+	}
+	return result;
+}
+
+std::list<ot::GraphicsElement*> ot::GraphicsLayoutItem::getAllDirectChildElements(void) {
+	std::list<QGraphicsLayoutItem*> childs;
+	std::list<GraphicsElement*> result;
+	this->getAllItems(childs);
+	for (QGraphicsLayoutItem* itm : childs) {
+		GraphicsElement* actualItem = dynamic_cast<GraphicsElement*>(itm);
+		if (actualItem) {
 			result.push_back(actualItem);
 		}
 		else {

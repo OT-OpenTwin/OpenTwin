@@ -101,7 +101,7 @@
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)/$(OT_INC);$(EMBREE_INCD);$(CGAL_INCD);$(GMP_INCD);$(OC_INCD);$(GMSH_ROOT_INC);$(MONGO_BOOST_ROOT);$(BOOST_INCD);$(BASE64_ROOT);$(ZLIB_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)/$(OT_INC);$(EMBREE_INCD);$(CGAL_INCD);$(GMP_INCD);$(OC_INCD);$(GMSH_ROOT_INC);$(BOOST_INCD);$(BASE64_ROOT);$(ZLIB_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -147,7 +147,7 @@
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)/$(OT_INC);$(EMBREE_INCR);$(CGAL_INCR);$(GMP_INCR);$(OC_INCR);$(GMSH_ROOT_INC);$(MONGO_BOOST_ROOT);$(BOOST_INCR);$(BASE64_ROOT);$(ZLIB_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)/$(OT_INC);$(EMBREE_INCR);$(CGAL_INCR);$(GMP_INCR);$(OC_INCR);$(GMSH_ROOT_INC);$(BOOST_INCR);$(BASE64_ROOT);$(ZLIB_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <LanguageStandard>stdcpp20</LanguageStandard>

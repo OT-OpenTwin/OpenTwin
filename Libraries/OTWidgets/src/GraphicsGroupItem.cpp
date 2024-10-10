@@ -107,6 +107,20 @@ std::list<ot::GraphicsElement*> ot::GraphicsGroupItem::getAllGraphicsElements(vo
 	for (QGraphicsItem* child : this->childItems()) {
 		GraphicsElement* actualItem = dynamic_cast<GraphicsElement*>(child);
 		if (actualItem) {
+			result.splice(result.end(), actualItem->getAllGraphicsElements());
+		}
+		else {
+			OT_LOG_EA("Unknown item");
+		}
+	}
+	return result;
+}
+
+std::list<ot::GraphicsElement*> ot::GraphicsGroupItem::getAllDirectChildElements(void) {
+	std::list<GraphicsElement*> result;
+	for (QGraphicsItem* child : this->childItems()) {
+		GraphicsElement* actualItem = dynamic_cast<GraphicsElement*>(child);
+		if (actualItem) {
 			result.push_back(actualItem);
 		}
 		else {

@@ -131,13 +131,15 @@ std::list<ot::GraphicsElement*> ot::GraphicsStackItem::getAllGraphicsElements(vo
 {
 	std::list<GraphicsElement*> result = GraphicsItem::getAllGraphicsElements();
 	for (GraphicsStackItemEntry child : m_items) {
-		GraphicsElement* actualItem = dynamic_cast<GraphicsElement*>(child.item);
-		if (actualItem) {
-			result.push_back(actualItem);
-		}
-		else {
-			OT_LOG_EA("Unknown item");
-		}
+		result.splice(result.end(), child.item->getAllGraphicsElements());
+	}
+	return result;
+}
+
+std::list<ot::GraphicsElement*> ot::GraphicsStackItem::getAllDirectChildElements(void) {
+	std::list<GraphicsElement*> result;
+	for (GraphicsStackItemEntry child : m_items) {
+		result.push_back(child.item);
 	}
 	return result;
 }
@@ -235,7 +237,6 @@ void ot::GraphicsStackItem::addItem(ot::GraphicsItem* _item, bool _isMaster, boo
 		_item->addGraphicsItemEventHandler(this);
 	}
 	m_items.push_back(e);
-
 	this->addToGroup(e.item->getQGraphicsItem());
 }
 

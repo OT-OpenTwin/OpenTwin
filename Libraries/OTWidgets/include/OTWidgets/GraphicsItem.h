@@ -82,12 +82,6 @@ namespace ot {
 		//! \brief Returns the QGraphicsLayoutItem.
 		virtual QGraphicsLayoutItem* getQGraphicsLayoutItem(void) = 0;
 
-		//! \brief Returns the QGraphicsItem.
-		virtual QGraphicsItem* getQGraphicsItem(void) = 0;
-
-		//! \brief Returns the const QGraphicsItem.
-		virtual const QGraphicsItem* getQGraphicsItem(void) const = 0;
-
 		//! \brief Calls QGraphicsLayoutItem::prepareGeometryChange().
 		virtual void prepareGraphicsItemGeometryChange(void) = 0;
 

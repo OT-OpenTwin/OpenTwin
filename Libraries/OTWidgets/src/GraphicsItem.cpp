@@ -682,8 +682,7 @@ void ot::GraphicsItem::parentItemTransformChanged(const QTransform& _parentTrans
 QRectF ot::GraphicsItem::getTriggerBoundingRect(void) const {
 	OTAssertNullptr(this->getQGraphicsItem());
 	OTAssertNullptr(this->getConfiguration());
-	QRectF rec = this->getQGraphicsItem()->boundingRect();
-	rec.moveTo(this->getQGraphicsItem()->scenePos());
+	QRectF rec = this->getQGraphicsItem()->mapRectToScene(this->getQGraphicsItem()->boundingRect());
 	return rec.marginsAdded(QtFactory::toQMargins(this->getConfiguration()->getAdditionalTriggerDistance()));
 }
 

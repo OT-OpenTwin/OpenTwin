@@ -6,6 +6,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Color.h"
 #include "OTCore/GenericDataStructMatrix.h"
+#include "OTGui/WidgetViewBase.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTServiceFoundation/ContextMenu.h"
 #include "OTServiceFoundation/TableRange.h"
@@ -204,7 +205,7 @@ namespace ViewerAPI
 
 	/********************************************************************************************/
 
-	__declspec(dllexport) void viewerTabChanged(const std::string & _tabTitle);
+	__declspec(dllexport) void viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type);
 
 	__declspec(dllexport) void shortcutActivated(const std::string & _keySequence);
 
