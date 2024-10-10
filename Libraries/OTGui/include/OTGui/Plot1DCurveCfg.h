@@ -13,9 +13,11 @@
 // std header
 #include <string>
 
+#pragma warning(disable:4251)
+
 namespace ot {
 
-	class Plot1DCurveCfg : public Serializable {
+	class OT_GUI_API_EXPORT Plot1DCurveCfg : public Serializable {
 	public:
 		Plot1DCurveCfg();
 		Plot1DCurveCfg(UID _id, UID _version, const std::string& _name);
@@ -44,12 +46,20 @@ namespace ot {
 		void setVersion(UID _version) { m_version = _version; };
 		UID getVersion(void) const { return m_version; };
 
+		void setTreeId(UID _id) { m_treeId = _id; };
+		UID getTreeId(void) const { return m_treeId; };
+
+		void setDimmed(bool _isDimmed) { m_dimmed = _isDimmed; };
+		bool getDimmed(void) const { return m_dimmed; };
+
 		void setName(const std::string& _name) { m_name = _name; };
 		const std::string& getName(void) const { return m_name; };
 
 	private:
+		bool m_dimmed;
 		UID m_id;
 		UID m_version;
+		UID m_treeId;
 		std::string m_name;
 	};
 

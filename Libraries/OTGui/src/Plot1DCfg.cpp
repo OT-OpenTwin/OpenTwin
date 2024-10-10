@@ -57,7 +57,7 @@ ot::Plot1DCfg::AxisQuantity ot::Plot1DCfg::stringToAxisQuantity(const std::strin
 
 ot::Plot1DCfg::Plot1DCfg() 
 	: m_uid(0), m_visualizationUid(0), m_type(Plot1DCfg::Cartesian), m_axisQuantity(Plot1DCfg::Magnitude),
-	m_gridVisible(false), m_isHidden(false), m_legendVisible(false)
+	m_gridVisible(false), m_gridWidth(1.), m_isHidden(false), m_legendVisible(false)
 {}
 
 ot::Plot1DCfg::Plot1DCfg(const Plot1DCfg& _other) {
@@ -80,6 +80,7 @@ ot::Plot1DCfg& ot::Plot1DCfg::operator=(const Plot1DCfg& _other) {
 
 	m_gridVisible = _other.m_gridVisible;
 	m_gridColor = _other.m_gridColor;
+	m_gridWidth = _other.m_gridWidth;
 
 	m_isHidden = _other.m_isHidden;
 	m_legendVisible = _other.m_legendVisible;
@@ -108,6 +109,7 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	JsonObject gridColorObject;
 	m_gridColor.addToJsonObject(gridColorObject, _allocator);
 	_object.AddMember("GridColor", gridColorObject, _allocator);
+	_object.AddMember("GridWidth", m_gridWidth, _allocator);
 
 	_object.AddMember("Hidden", m_isHidden, _allocator);
 	_object.AddMember("LegendVisible", m_legendVisible, _allocator);
@@ -147,6 +149,7 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 	m_gridVisible = json::getBool(_object, "GridVisible");
 	m_gridColor.setFromJsonObject(json::getObject(_object, "GridColor"));
+	m_gridWidth = json::getDouble(_object, "GridWidth");
 
 	m_isHidden = json::getBool(_object, "Hidden");
 	m_legendVisible = json::getBool(_object, "LegendVisible");

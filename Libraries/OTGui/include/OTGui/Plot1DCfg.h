@@ -16,7 +16,7 @@
 
 namespace ot {
 
-	class Plot1DCfg : public Serializable {
+	class OT_GUI_API_EXPORT Plot1DCfg : public Serializable {
 	public:
 		enum PlotType {
 			Cartesian,
@@ -35,7 +35,7 @@ namespace ot {
 		static PlotType stringToPlotType(const std::string& _type);
 
 		static std::string axisQuantityToString(AxisQuantity _quantity);
-		AxisQuantity stringToAxisQuantity(const std::string& _quantity);
+		static AxisQuantity stringToAxisQuantity(const std::string& _quantity);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -85,6 +85,9 @@ namespace ot {
 
 		void setGridColor(const Color& _color) { m_gridColor = _color; };
 		const Color& getGridColor(void) const { return m_gridColor; };
+
+		void setGridLineWidth(double _width) { m_gridWidth = _width; };
+		double getGridLineWidth(void) const { return m_gridWidth; };
 
 		void setHidden(bool _isHidden) { m_isHidden = _isHidden; };
 		bool getHidden(void) const { return m_isHidden; };
@@ -141,6 +144,7 @@ namespace ot {
 
 		bool m_gridVisible;
 		ot::Color m_gridColor;
+		double m_gridWidth;
 
 		bool m_isHidden;
 		bool m_legendVisible;

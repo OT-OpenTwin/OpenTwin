@@ -14,7 +14,7 @@
 
 namespace ot {
 
-	class Plot1DAxisCfg : public Serializable {
+	class OT_GUI_API_EXPORT Plot1DAxisCfg : public Serializable {
 	public:
 		Plot1DAxisCfg();
 		Plot1DAxisCfg(const Plot1DAxisCfg& _other);
