@@ -26,17 +26,15 @@ IF "%OPENTWIN_FTP_PASSWORD%" == "" (
 	goto PAUSE_END
 )
 
-DEL "%OPENTWIN_DEV_ROOT%\Scripts\buildLog_Nightly.txt"
-
 ECHO ===================================================================
 ECHO Get the latest version from the repository
 ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%"
-git pull
+REM git pull
 
 cd /D "%OPENTWIN_THIRDPARTY_ROOT%"
-git pull
+REM git pull
 
 
 ECHO ===================================================================
@@ -44,7 +42,7 @@ ECHO Build the software
 ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\RebuildAll.bat" BOTH BUILD
+REM CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\RebuildAll.bat" BOTH BUILD
 
 REM ===================================================================
 REM Check the build results
@@ -71,20 +69,18 @@ ECHO Build the documentation
 ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildDocumentation.bat"
+REM CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildDocumentation.bat"
 
 ECHO ===================================================================
 ECHO Create the deployment
 ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CreateDeployment.bat"
+REM CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CreateDeployment.bat"
 
 ECHO ===================================================================
 ECHO Build the installers
 ECHO ===================================================================
-
-DEL "%OPENTWIN_DEV_ROOT%\InstallationImages\*.*" 2> nul
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\Installer"
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Installer\Build_Installers_noInput.bat"
