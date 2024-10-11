@@ -1,8 +1,8 @@
 #include "MongoDBShellExecutor.h"
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/json.hpp>
 #include "Logger.h"
 
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/json.hpp>
 #include <rapidjson/document.h>
 
 MongoDBShellExecutor::MongoDBShellExecutor(const MongoDBSettings& _settings)

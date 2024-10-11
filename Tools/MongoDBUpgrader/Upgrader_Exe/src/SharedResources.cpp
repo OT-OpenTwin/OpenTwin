@@ -1,6 +1,7 @@
 #include "SharedResources.h"
-#include <boost/dll.hpp>
 #include "WindowsUtilityFuctions.h"
+
+#include <boost/dll.hpp>
 
 CurrentPaths::CurrentPaths()
 {

@@ -2,6 +2,7 @@
 #define NOMINMAX //Supress windows macros min max
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
 #include <string>
 
 class WindowsServiceManager

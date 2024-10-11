@@ -3,10 +3,10 @@
 #include "WindowsServiceManager.h"
 #include "MongoDBSettingsParser.h"
 #include "FileWriter.h"
+#include "Logger.h"
 
 #include <boost/process.hpp>
 #include <iostream>
-#include "Logger.h"
 
 
 MongoDBInstaller::MongoDBInstaller(const std::string& _serverName)

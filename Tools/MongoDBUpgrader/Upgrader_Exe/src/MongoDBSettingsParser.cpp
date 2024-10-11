@@ -1,17 +1,14 @@
 #include "MongoDBSettingsParser.h"
-
 #include "FileWriter.h"
 #include "SharedResources.h"
 #include "Logger.h"
+
+
 #include <boost/process.hpp>
-
-
 #include <iostream>
 #include <filesystem>
 #include <fstream>
 #include <cctype>
-
-
 
 //C4244, C4267 Boost warning to ignore
 
