@@ -965,6 +965,10 @@ Section "-Extract Installer Tools (Required)" SEC01
 	DetailPrint "Extracting toolchain..."
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\dev\*.*"
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\MongoDB_Installer\*.*"
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\RefreshEnv.cmd"
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\VC_redist.x64.exe"
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\VC_redist.x86.exe"
+	
 	File /r "..\helper\*.*"
 	File /r "..\javascript\*.*"
 
