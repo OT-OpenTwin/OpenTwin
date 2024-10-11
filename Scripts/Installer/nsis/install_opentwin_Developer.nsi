@@ -1046,8 +1046,8 @@ SectionGroup /e "OpenTwin"
 		
 		DetailPrint "Running MongoDB installation scripts..."
 
-		ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$TempToolChain\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'		
-		ExecWait 'msiexec /qb /i "$TempToolChain\mongodb-compass-1.42.3-win32-x64.msi"'
+		ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$TempToolChain\MongoDB_Installer\mongodb-windows-x86_64-7.0.14-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService"'		
+		ExecWait 'msiexec /qb /i "$TempToolChain\MongoDB_Installer\mongodb-compass-1.44.4-win32-x64.msi"'
 		DetailPrint "Waiting for MongoDB Compass Application..."
 			Push ${DEFAULT_MONGODB_COMPASS_PATH}
 			Push "MongoDB Compass"
