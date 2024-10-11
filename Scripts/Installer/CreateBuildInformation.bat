@@ -14,7 +14,7 @@ IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
 )
 
 set buildInfoFile="%OPENTWIN_DEV_ROOT%\Scripts\Installer\helper\BuildInfo.txt"
-del %buildInfoFile%
+REM del %buildInfoFile%
 
 ECHO This installer was created with the following revisions: >> %buildInfoFile%
 
