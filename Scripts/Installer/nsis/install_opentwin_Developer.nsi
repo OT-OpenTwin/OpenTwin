@@ -125,7 +125,7 @@
 
 	!define DEFAULT_MONGODB_STORAGE_PATH '"$DEV_ROOT\DataStorage\data"'
 	!define DEFAULT_MONGODB_LOG_PATH '"$DEV_ROOT\DataStorage\log"'
-	!define DEFAULT_MONGODB_INSTALL_PATH '"$PROGRAMFILES64\MongoDB\Server\4.4"'
+	!define DEFAULT_MONGODB_INSTALL_PATH '"$PROGRAMFILES64\MongoDB\Server\7.0"'
 	!define DEFAULT_MONGODB_COMPASS_PATH '"$PROGRAMFILES64\MongoDB Compass"'
 	!define MONGODB_DELETION_PATH '"$PROGRAMFILES64\MongoDB"'
 	!define DEFAULT_MONGODB_ADMIN_PASSWORD "admin"
@@ -964,7 +964,7 @@ Section "-Extract Installer Tools (Required)" SEC01
 
 	DetailPrint "Extracting toolchain..."
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\dev\*.*"
-	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\*.*"
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\MongoDB_Installer\*.*"
 	File /r "..\helper\*.*"
 	File /r "..\javascript\*.*"
 
