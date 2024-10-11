@@ -93,7 +93,6 @@ namespace ViewerAPI
 	__declspec(dllexport) ot::UID createViewer(ot::UID osgModelID, double scaleWidth, double scaleHeight, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB);
 	__declspec(dllexport) ot::WidgetView* getViewerWidget(ot::UID viewer);
 
-	__declspec(dllexport) void resetAllViews1D(ot::UID osgModelID);
 	__declspec(dllexport) void resetAllViews3D(ot::UID osgModelID);
 	__declspec(dllexport) void refreshAllViews(ot::UID osgModelID);
 	__declspec(dllexport) void clearSelection(ot::UID osgModelID);
@@ -139,15 +138,7 @@ namespace ViewerAPI
 	__declspec(dllexport) void visualizationCartesianMeshNodeShowLines(ot::UID osgModelID, unsigned long long modelEntityID, bool showMeshLines);
 	__declspec(dllexport) void addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3]);
 	__declspec(dllexport) void visualizationTetMeshNodeTetEdges(ot::UID osgModelID, unsigned long long modelEntityID, bool displayTetEdges);
-
-	__declspec(dllexport) std::list<std::string> getSelectedCurves(ot::UID osgModelID);
-	__declspec(dllexport) void removeSelectedCurveNodes(ot::UID osgModelID);
-
-	__declspec(dllexport) void addVisualizationPlot1DNode(ot::UID osgModelID, const std::string &name, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-														  bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax, std::list<ot::UID> &curvesID, std::list<ot::UID> &curvesVersions,  std::list<std::string> &curvesNames);
-	__declspec(dllexport) void visualizationResult1DPropertiesChanged(ot::UID osgModelID, unsigned long long entityID, unsigned long long entityVersion);
-	__declspec(dllexport) void visualizationPlot1DPropertiesChanged(ot::UID osgModelID, ot::UID modelEntityID, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-		bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax);
+	
 	__declspec(dllexport) void addVisualizationTextNode(ot::UID osgModelID, const std::string &name, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName,
 														ot::UID textEntityID, ot::UID textEntityVersion);
 	__declspec(dllexport) void addVisualizationTableNode(ot::UID osgModelID, const std::string &name, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName,
@@ -184,9 +175,7 @@ namespace ViewerAPI
 
 	__declspec(dllexport) void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 
-	__declspec(dllexport) void setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
-
-	__declspec(dllexport) ot::WidgetView* getPlotWidget(ot::UID _viewerID);
+	__declspec(dllexport) void setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _versionGraphTabName);
 
 	/***************************************** Table API *****************************************/
 	__declspec(dllexport) ot::WidgetView* getTable (ot::UID _viewerID);

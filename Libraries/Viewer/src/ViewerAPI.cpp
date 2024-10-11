@@ -5,7 +5,6 @@
 #include "ViewerView.h"
 #include "Notifier.h"
 #include "DataBase.h"
-#include "PlotView.h"
 #include "Rubberband.h"
 #include "EntityParameterizedDataTable.h"
 #include "EntityTableSelectedRanges.h"
@@ -140,11 +139,6 @@ ot::WidgetView* ViewerAPI::getViewerWidget(ot::UID viewerID)
 void ViewerAPI::registerNotifier(ViewerAPI::Notifier *notifier)
 {
 	globalNotifier = notifier;
-}
-
-void ViewerAPI::resetAllViews1D(ot::UID osgModelID)
-{
-	getModelFromID(osgModelID)->resetAllViews1D();
 }
 
 void ViewerAPI::resetAllViews3D(ot::UID osgModelID)
@@ -352,22 +346,6 @@ void ViewerAPI::visualizationTetMeshNodeTetEdges(ot::UID osgModelID, unsigned lo
 	}
 }
 
-std::list<std::string> ViewerAPI::getSelectedCurves(ot::UID osgModelID)
-{
-	Model* model = osgModelManager.at(osgModelID);
-	
-	std::list<std::string> curveDescriptions = model->getSelectedCurves();
-	
-	return curveDescriptions;
-}
-
-void ViewerAPI::removeSelectedCurveNodes(ot::UID osgModelID)
-{
-	Model* model = osgModelManager.at(osgModelID);
-
-	model->removedSelectedCurveNodes();
-}
-
 void ViewerAPI::addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3])
 {
 	try
@@ -389,23 +367,6 @@ void ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(ot::UID osgModelID
 		Model *model = osgModelManager.at(osgModelID);
 
 		model->addVisualizationMeshItemNodeFromFacetDataBase(name, modelEntityID, treeIcons, isHidden, projectName, entityID, version, tetEdgesID, tetEdgesVersion);
-	}
-	catch (std::out_of_range)
-	{
-		throw std::exception("The specified model does not exist");
-	}
-}
-
-void ViewerAPI::addVisualizationPlot1DNode(ot::UID osgModelID, const std::string &name, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden,
-										   const std::string &projectName, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-										   bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax, std::list<ot::UID> &curvesID, std::list<ot::UID> &curvesVersions,
-										   std::list<std::string> &curvesNames)
-{
-	try
-	{
-		Model *model = osgModelManager.at(osgModelID);
-
-		model->addVisualizationPlot1DNode(name, modelEntityID, treeIcons, isHidden, projectName, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax, curvesID, curvesVersions, curvesNames);
 	}
 	catch (std::out_of_range)
 	{
@@ -442,37 +403,6 @@ void ViewerAPI::addVisualizationTableNode(ot::UID osgModelID, const std::string 
 		throw std::exception("The specified model does not exist");
 	}
 }
-
-
-void ViewerAPI::visualizationResult1DPropertiesChanged(ot::UID osgModelID, unsigned long long entityID, unsigned long long version)
-{
-	try
-	{
-		Model *model = osgModelManager.at(osgModelID);
-
-		model->visualizationResult1DPropertiesChanged(entityID, version);
-	}
-	catch (std::out_of_range)
-	{
-		throw std::exception("The specified model does not exist");
-	}
-}
-
-void ViewerAPI::visualizationPlot1DPropertiesChanged(ot::UID osgModelID, ot::UID modelEntityID, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-												     bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax)
-{
-	try
-	{
-		Model *model = osgModelManager.at(osgModelID);
-
-		model->visualizationPlot1DPropertiesChanged(modelEntityID, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax);
-	}
-	catch (std::out_of_range)
-	{
-		throw std::exception("The specified model does not exist");
-	}
-}
-
 
 void ViewerAPI::updateObjectColor(ot::UID osgModelID, unsigned long long modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective)
 {
@@ -703,23 +633,12 @@ void ViewerAPI::prefetchDocumentsFromStorage(const std::string &projectName, std
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIDs);
 }
 
-void ViewerAPI::setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName) {
+void ViewerAPI::setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _versionGraphTabName) {
 	Viewer * v = viewerManager[_viewerID];
 	if (v != nullptr) {
-		v->setTabNames(_osgViewTabName, _plotTabName, _versionGraphTabName);
+		v->setTabNames(_osgViewTabName, _versionGraphTabName);
 	}
 }
-
-ot::WidgetView* ViewerAPI::getPlotWidget(ot::UID _viewerID) {
-	Viewer * v = viewerManager[_viewerID];
-	if (v != nullptr) {
-		return v->get1DPlot();
-	}
-	else {
-		return nullptr;
-	}
-}
-
 
 ot::WidgetView* ViewerAPI::getTable(ot::UID _viewerID)
 {

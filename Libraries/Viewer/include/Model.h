@@ -14,11 +14,9 @@
 #include "Geometry.h"
 #include "SceneNodeBase.h"
 #include "Types.h"
-#include "Plot.h"
 
 class Viewer;
 class SceneNodeGeometry;
-class SceneNodePlot1DItem;
 class SceneNodeResult1DItem;
 class ManipulatorBase;
 
@@ -30,7 +28,6 @@ public:
 		operationsGroupID(0),
 		visiblityGroupID(0),
 		styleGroupID(0),
-		resetView1DButtonID(0),
 		resetView3DButtonID(0),
 		showAllButtonID(0),
 		showSelectedButtonID(0),
@@ -47,7 +44,6 @@ public:
 	unsigned long long operationsGroupID;
 	unsigned long long visiblityGroupID;
 	unsigned long long styleGroupID;
-	unsigned long long resetView1DButtonID;
 	unsigned long long resetView3DButtonID;
 	unsigned long long showAllButtonID;
 	unsigned long long showSelectedButtonID;
@@ -140,7 +136,6 @@ public:
 
 	void attachViewer(Viewer *viewer);
 	void detachViewer(Viewer *viewer);
-	void resetAllViews1D(void);
 	void resetAllViews3D(void);
 	void refreshAllViews(void);
 	void clearSelection(void);
@@ -174,14 +169,6 @@ public:
 	void addVisualizationCartesianMeshItemNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3]);
 	void visualizationTetMeshNodeTetEdges(unsigned long long modelEntityID, bool displayTetEdges);
 
-	void addVisualizationPlot1DNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden,
-									const std::string &projectName, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-									bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax, std::list<unsigned long long> &curvesID, std::list<unsigned long long> &curvesVersions,
-									std::list<std::string> &curvesNames);
-	void addVisualizationResult1DNode(const std::string &treeName, unsigned long long curveEntityID, unsigned long long curveEntityVersion, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName);
-	void visualizationResult1DPropertiesChanged(unsigned long long entityID, unsigned long long version);
-	void visualizationPlot1DPropertiesChanged(unsigned long long modelEntityID, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-											  bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax);
 	void addVisualizationTextNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long textEntityID, unsigned long long textEntityVersion);
 	void addVisualizationTableNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long tableEntityID, unsigned long long tableEntityVersion);
 	void addVTKNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
@@ -235,9 +222,6 @@ public:
 
 	void viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type);
 
-	void set1DPlotItemSelected(unsigned long long treeItemID, bool ctrlPressed);
-	void reset1DPlotItemSelection(void);
-
 	void hideEntities(std::list<unsigned long long> hiddenID);
 
 	void showBranch(const std::string &branchName);
@@ -264,8 +248,6 @@ public:
 	void lockSelectionAndModification(bool flag);
 
 	void updateCapGeometry(osg::Vec3d normal, osg::Vec3d point);
-	std::list<std::string> getSelectedCurves();
-	void removedSelectedCurveNodes();
 
 	void setCursorText(const std::string& text);
 
@@ -273,7 +255,6 @@ private:
 	// Methods
 	void	   fillTree(void);
 	void	   setupUIControls3D(void);
-	void	   setupUIControls1D(void);
 	void	   removeUIControls(void);
 	void	   updateUIControlState(std::list<ot::UID> &selectedTreeItemID);
 	void	   showAllSceneNodes(SceneNodeBase *root);
@@ -317,19 +298,7 @@ private:
 	void	   setSelectedFacesHighlight(SceneNodeGeometry *selectedItem, unsigned long long faceId, bool highlight);
 	void       clearSelectedFacesHighlight(void);
 	bool       isFaceSelected(SceneNodeGeometry *selectedItem, unsigned long long faceId);
-	void	   clear1DPlot(void);
-	void	   set1DPlotIncompatibleData(void);
-	void       remove1DPlotErrorState(void);
-	void	   update1DPlot(SceneNodeBase *root);
-	void	   add1DPlotItems(SceneNodeBase *root, bool &firstCurve, SceneNodePlot1DItem *&commonPlot, AbstractPlot::PlotType &plotType, PlotDataset::axisQuantity &yAxisQuantity, std::string &title, bool &grid, int gridColor[], bool &legend, bool &logscaleX, bool &logscaleY,
-							  bool &autoscaleX, bool &autoscaleY, double &xmin, double &xmax, double &ymin, double &ymax, std::string &, std::list<PlotCurveItem> &selectedCurves, bool &compatible);
-	SceneNodePlot1DItem *getPlotFromCurve(SceneNodeResult1DItem *curve);
-	bool	   changeResult1DEntityVersion(SceneNodeBase *root, unsigned long long entityID, unsigned long long version);
-	bool	   gridCompatible(bool grid1, int r1, int g1, int b1, bool grid2, int r2, int g2, int b2);
-	bool	   axisCompatible(bool logscale1, bool autoscale1, double min1, double max1, bool logscale2, bool autoscale2, double min2, double max2);
-	bool	   plotCompatible(AbstractPlot::PlotType type1, PlotDataset::axisQuantity quantity1, AbstractPlot::PlotType type2, PlotDataset::axisQuantity quantity2);
-	void	   addCompatibleDimmedPlotItems(SceneNodeBase *root, AbstractPlot::PlotType &plotType, PlotDataset::axisQuantity &yAxisQuantity, std::string &title, bool &grid, int gridColor[], bool &legend, bool &logscaleX, bool &logscaleY,
-											bool &autoscaleX, bool &autoscaleY, double &xmin, double &xmax, double &ymin, double &ymax, std::string &projectName, std::list<PlotCurveItem> &selectedCurves);
+	
 	void       manageParentVisibility(SceneNodeBase *item);
 	void	   updateWorkingPlaneTransform(void);
 	bool       getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, osg::Matrix &matrix);

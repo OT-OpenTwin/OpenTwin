@@ -38,7 +38,6 @@ namespace osg		{ class ShapeDrawable; };
 namespace osg		{ class Group; }
 namespace ot        { class Property; }
 namespace ot        { class TableViewerView; }
-namespace ot        { class PlotView; }
 
 class Viewer : public QOpenGLWidget
 {
@@ -59,13 +58,9 @@ public:
 
 	void detachFromModel(void);
 
-	ot::PlotView * get1DPlot(void) const { return m_plot; }
 	ot::TableViewerView* getTableViewer() const { return m_tableViewer; }
 
-	void setTabNames(const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
-
-	void set1DPlotItemSelected(unsigned long long treeItemID, bool controlPressed);
-	void reset1DPlotItemSelection(void);
+	void setTabNames(const std::string & _osgViewTabName, const std::string & _versionGraphTabName);
 
 	Rubberband * getRubberband(void) { return rubberband; }
 
@@ -198,9 +193,6 @@ private:
 	osg::ref_ptr<osg::Switch>          handlerNode;
 	HandlerBase						  *currentHandler;
 
-	ot::PlotView*						m_plot;
-	std::string							m_plotTabName;
-
 	ot::TableViewerView*				m_tableViewer;
 
 	std::string							m_versionGraphTabName;
@@ -219,7 +211,6 @@ private:
 	AxisCenterCross *					axisCenterCross;
 	osg::ref_ptr<osg::Group>			axisCenterCrossGroup;
 
-	bool								lastPlotEmpty;
 	bool								freezeViewFlag;
 
 	osg::Vec3							clipPlaneNormal;

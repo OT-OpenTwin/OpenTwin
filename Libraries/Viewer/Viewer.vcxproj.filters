@@ -25,12 +25,6 @@
     <ClCompile Include="src\SceneNodeMeshItem.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\SceneNodePlot1DItem.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeResult1DItem.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\stdafx.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -49,19 +43,7 @@
     <ClCompile Include="src\SceneNodeCartesianMesh.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Plot.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\AbstractPlot.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\xyPlot.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\SceneNodeCartesianMeshItem.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\polarPlot.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\SceneNodeTextItem.cpp">
@@ -148,9 +130,6 @@
     <ClCompile Include="src\TableViewerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
-    <ClCompile Include="src\PlotView.cpp">
-      <Filter>src\WidgetView</Filter>
-    </ClCompile>
     <ClCompile Include="src\ViewerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
@@ -172,18 +151,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\ViewManipulator.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Plot.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\AbstractPlot.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\xyPlot.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\polarPlot.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\SceneNodeMaterialFactory.h">
@@ -285,12 +252,6 @@
     <ClInclude Include="include\SceneNodeMeshItem.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
-    <ClInclude Include="include\SceneNodePlot1DItem.h">
-      <Filter>include\SceneNodes</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodeResult1DItem.h">
-      <Filter>include\SceneNodes</Filter>
-    </ClInclude>
     <ClInclude Include="include\SceneNodeTableItem.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
@@ -301,9 +262,6 @@
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
     <ClInclude Include="include\TableViewerView.h">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PlotView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\ViewerView.h">

@@ -56,8 +56,6 @@
 #include "ViewManipulator.h"
 #include "ViewerObjectSelectionHandler.h"
 
-#include "PlotView.h"
-
 #include "SceneNodeVTK.h"
 
 #include "ViewerSettings.h"
@@ -89,7 +87,6 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	osgLight(nullptr),
 	lightSourceDistance(2.0),
 	lightSourceDistanceInfinite(false),
-	lastPlotEmpty(true),
 	freezeViewFlag(false),
 	currentHandler(nullptr),
 	clipPlaneActive(false),
@@ -228,9 +225,6 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	osgAxisViewer->setLight(osgAxisLight);
 	osgAxisViewer->realize();
 
-	// Create new Plot
-	m_plot = new ot::PlotView(this);
-
 	// Create new view handler
 	m_tableViewer = new ot::TableViewerView(this);
 
@@ -277,11 +271,9 @@ Viewer::~Viewer()
 
 	if (workingPlane != nullptr) delete workingPlane;
 	workingPlane = nullptr;
+
 	if (axisCross != nullptr) delete axisCross;
 	axisCross = nullptr;
-
-	if (m_plot != nullptr) delete m_plot;
-	m_plot = nullptr;
 
 	if (m_tableViewer != nullptr) delete m_tableViewer;
 	m_tableViewer = nullptr;
@@ -334,11 +326,6 @@ void Viewer::refresh(bool _ignoreUpdateSettingsRequest)
 			}
 		}
 		if (axisCenterCross) { axisCenterCross->refreshAfterGeometryChange(); }
-	}
-
-	if (lastPlotEmpty)
-	{
-		reset();
 	}
 
 	update();
@@ -567,8 +554,6 @@ void Viewer::paintGL()
 				osgLight->setLinearAttenuation(dynamicLight / (lightSourceDistance * size));
 			}
 		}
-
-		lastPlotEmpty = (osgCameraManipulator->getDistance() <= 0);
 
 		osgViewer->frame();
 
@@ -838,26 +823,9 @@ void Viewer::detachFromModel(void)
 	model = nullptr;
 }
 
-void Viewer::setTabNames(const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName) {
+void Viewer::setTabNames(const std::string & _osgViewTabName, const std::string & _versionGraphTabName) {
 	osgViewerTabName = _osgViewTabName;
-	m_plotTabName = _plotTabName;
 	m_versionGraphTabName = _versionGraphTabName;
-}
-
-void Viewer::set1DPlotItemSelected(unsigned long long treeItemID, bool controlPressed)
-{
-	if (model != nullptr)
-	{
-		model->set1DPlotItemSelected(treeItemID, controlPressed);
-	}
-}
-
-void Viewer::reset1DPlotItemSelection(void)
-{
-	if (model != nullptr)
-	{
-		model->reset1DPlotItemSelection();
-	}
 }
 
 void Viewer::createRubberband(ot::serviceID_t _senderId, std::string & _note, const std::string & _configurationJson)

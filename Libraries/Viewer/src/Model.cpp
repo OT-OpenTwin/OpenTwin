@@ -27,8 +27,6 @@
 #include "SceneNodeMeshItem.h"
 #include "SceneNodeCartesianMesh.h"
 #include "SceneNodeCartesianMeshItem.h"
-#include "SceneNodePlot1DItem.h"
-#include "SceneNodeResult1DItem.h"
 #include "SceneNodeTextItem.h"
 #include "SceneNodeTableItem.h"
 #include "SceneNodeVTK.h"
@@ -37,7 +35,6 @@
 #include "TransformManipulator.h"
 
 #include "DataBase.h"
-#include "PlotView.h"
 
 bool operator==(const FaceSelection& left, const FaceSelection& right) 
 { 
@@ -222,14 +219,6 @@ void Model::resetAllViews3D(void)
 	{
 		viewer->reset();
 		viewer->refresh();
-	}
-}
-
-void Model::resetAllViews1D(void)
-{
-	for (auto viewer : viewerList)
-	{
-		viewer->get1DPlot()->resetView();
 	}
 }
 
@@ -975,7 +964,6 @@ void Model::setSelectedTreeItems(std::list<ot::UID> &selectedTreeItemID, std::li
 		updateWorkingPlaneTransform();
 		
 		updateUIControlState(selectedTreeItemID);
-		clear1DPlot();
 		refreshAllViews();
 		return;
 	}
@@ -1016,16 +1004,6 @@ void Model::setSelectedTreeItems(std::list<ot::UID> &selectedTreeItemID, std::li
 	updateUIControlState(selectedTreeItemID);
 	refreshAllViews();
 
-	// reset the 1d view, if necessary
-	if (!isItem1DSelected)
-	{
-		clear1DPlot();
-	}
-	else
-	{
-		update1DPlot(sceneNodesRoot);
-	}
-
 	if (isItem1DSelected && !isItem3DSelected)
 	{
 		// Ensure that we have the 1D view active
@@ -1056,248 +1034,6 @@ void Model::ensure3DView(void)
 	{
 		getNotifier()->setCurrentVisualizationTab("3D");
 	}
-}
-
-void Model::set1DPlotIncompatibleData(void)
-{
-	for (auto viewer : viewerList)
-	{
-		if (viewer->get1DPlot() != nullptr)
-		{
-			viewer->get1DPlot()->setIncompatibleData();
-		}
-	}
-}
-
-void Model::remove1DPlotErrorState(void) {
-	for (auto viewer : viewerList)
-	{
-		if (viewer->get1DPlot() != nullptr)
-		{
-			viewer->get1DPlot()->setErrorState(false);
-		}
-	}
-}
-
-void Model::clear1DPlot(void)
-{
-	for (auto viewer : viewerList)
-	{
-		if (viewer->get1DPlot() != nullptr)
-		{
-			viewer->get1DPlot()->clear(false);
-		}
-	}
-}
-
-void Model::update1DPlot(SceneNodeBase *root)
-{
-	std::list<PlotCurveItem> selectedCurves;
-	AbstractPlot::PlotType plotType;
-	PlotDataset::axisQuantity yAxisQuantity;
-	std::string title;
-	std::string projectName;
-	bool grid = false;
-	int gridColor[3] = { 0, 0, 0 };
-	bool legend = false;
-	bool logscaleX = false;
-	bool logscaleY = false;
-	bool autoscaleX = false;
-	bool autoscaleY = false;
-	double xmin = 0.0;
-	double xmax = 0.0;
-	double ymin = 0.0;
-	double ymax = 0.0;
-	SceneNodePlot1DItem *commonPlot = nullptr;
-	bool firstCurve = true;
-	bool compatible = true;
-
-	// Determine the selected items
-	add1DPlotItems(root, firstCurve, commonPlot, plotType, yAxisQuantity, title, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax, projectName, selectedCurves, compatible);
-
-	if (!compatible)
-	{
-		// Here we need to show a message that the data is incompatible
-		set1DPlotIncompatibleData();
-		return;
-	}
-
-	// Here we remove the error state if there was one set before
-	remove1DPlotErrorState();
-
-	// If all selected curves belong to a single plot, add all unselected curces as dimmed
-	if (commonPlot != nullptr)
-	{
-		addCompatibleDimmedPlotItems(commonPlot, plotType, yAxisQuantity, title, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax, projectName, selectedCurves);
-	}
-
-	for (auto viewer : viewerList)
-	{
-		if (viewer->get1DPlot() != nullptr)
-		{
-			viewer->get1DPlot()->setFromDataBase(plotType, yAxisQuantity, title, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax, projectName, selectedCurves);
-		}
-	}
-}
-
-void Model::add1DPlotItems(SceneNodeBase *root, bool &firstCurve, SceneNodePlot1DItem *&commonPlot, AbstractPlot::PlotType &plotType, PlotDataset::axisQuantity &yAxisQuantity, std::string &title, bool &grid, int gridColor[], bool &legend, bool &logscaleX, bool &logscaleY,
-						   bool &autoscaleX, bool &autoscaleY, double &xmin, double &xmax, double &ymin, double &ymax, std::string &projectName, std::list<PlotCurveItem> &selectedCurves, bool &compatible)
-{
-	if (root->isSelected() && root->isVisible())
-	{
-		SceneNodeResult1DItem *curve = dynamic_cast<SceneNodeResult1DItem *>(root);
-
-		if (curve != nullptr)
-		{
-			if (firstCurve)
-			{
-				SceneNodePlot1DItem *plot = getPlotFromCurve(curve);
-				assert(plot != nullptr);
-
-				title = plot->getTitle();
-				plotType = plot->getPlotType();
-				yAxisQuantity = plot->getPlotQuantity();
-				grid = plot->getGrid();
-				gridColor[0] = plot->getGridColorR();
-				gridColor[1] = plot->getGridColorG();
-				gridColor[2] = plot->getGridColorB();
-				legend = plot->getLegend();
-				logscaleX = plot->getLogscaleX();
-				logscaleY = plot->getLogscaleY();
-				autoscaleX = plot->getAutoscaleX();
-				autoscaleY = plot->getAutoscaleY();
-				xmin = plot->getXmin();
-				xmax = plot->getXmax();
-				ymin = plot->getYmin();
-				ymax = plot->getYmax();
-
-				projectName = curve->getProjectName();
-
-				commonPlot = plot;
-				firstCurve = false;
-			}
-			else
-			{
-				SceneNodePlot1DItem *plot = getPlotFromCurve(curve);
-				assert(plot != nullptr);
-
-				if (projectName != curve->getProjectName() || title != plot->getTitle() || legend != plot->getLegend() ||
-					!gridCompatible(grid, gridColor[0], gridColor[1], gridColor[2], plot->getGrid(), plot->getGridColorR(), plot->getGridColorG(), plot->getGridColorB()) ||
-					!axisCompatible(logscaleX, autoscaleX, xmin, xmax, plot->getLogscaleX(), plot->getAutoscaleX(), plot->getXmin(), plot->getXmax()) ||
-					!axisCompatible(logscaleY, autoscaleY, ymin, ymax, plot->getLogscaleY(), plot->getAutoscaleY(), plot->getYmin(), plot->getYmax()))
-				{
-					compatible = false;
-					return;
-				}
-
-				if (plot != commonPlot) commonPlot = nullptr;
-			}
-
-			PlotCurveItem curveItem;
-			curveItem.setModelEntity(curve->getModelEntityID(), curve->getModelEntityVersion());
-			curveItem.setTreeID(curve->getTreeItemID());
-
-			std::string parentName = curve->getParent()->getName();
-			std::string curveName = curve->getName().substr(parentName.length()+1);
-			curveItem.setName(curveName);
-
-			selectedCurves.push_back(curveItem);
-		}
-	}
-
-	for (auto child : root->getChildren())
-	{
-		add1DPlotItems(child, firstCurve, commonPlot, plotType, yAxisQuantity, title, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax, projectName, selectedCurves, compatible);
-		if (!compatible) break;
-	}
-}
-
-void Model::addCompatibleDimmedPlotItems(SceneNodeBase *root, AbstractPlot::PlotType &plotType, PlotDataset::axisQuantity &yAxisQuantity, std::string &title, bool &grid, int gridColor[], bool &legend, bool &logscaleX, bool &logscaleY,
-										 bool &autoscaleX, bool &autoscaleY, double &xmin, double &xmax, double &ymin, double &ymax, std::string &projectName, std::list<PlotCurveItem> &selectedCurves)
-{
-	if (!root->isSelected() && root->isVisible())
-	{
-		SceneNodeResult1DItem *curve = dynamic_cast<SceneNodeResult1DItem *>(root);
-
-		if (curve != nullptr)
-		{
-			SceneNodePlot1DItem *plot = getPlotFromCurve(curve);
-			assert(plot != nullptr);
-
-			if (projectName == curve->getProjectName() && title == plot->getTitle() && legend == plot->getLegend() &&
-				gridCompatible(grid, gridColor[0], gridColor[1], gridColor[2], plot->getGrid(), plot->getGridColorR(), plot->getGridColorG(), plot->getGridColorB()) &&
-				axisCompatible(logscaleX, autoscaleX, xmin, xmax, plot->getLogscaleX(), plot->getAutoscaleX(), plot->getXmin(), plot->getXmax()) &&
-				axisCompatible(logscaleY, autoscaleY, ymin, ymax, plot->getLogscaleY(), plot->getAutoscaleY(), plot->getYmin(), plot->getYmax()))
-			{
-				PlotCurveItem curveItem;
-				curveItem.setModelEntity(curve->getModelEntityID(), curve->getModelEntityVersion());
-				curveItem.setTreeID(curve->getTreeItemID());
-				curveItem.setDimmed(true);
-
-				std::string parentName = curve->getParent()->getName();
-				std::string curveName = curve->getName().substr(parentName.length() + 1);
-				curveItem.setName(curveName);
-
-				selectedCurves.push_back(curveItem);
-			}
-		}
-	}
-
-	for (auto child : root->getChildren())
-	{
-		addCompatibleDimmedPlotItems(child, plotType, yAxisQuantity, title, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax, projectName, selectedCurves);
-	}
-}
-
-
-bool Model::gridCompatible(bool grid1, int r1, int g1, int b1, bool grid2, int r2, int g2, int b2)
-{
-	if (grid1 != grid2) return false;
-
-	if (grid1)
-	{
-		if (r1 != r2 || g1 != g2 || b1 != b2) return false;
-	}
-
-	return true;
-}
-
-bool Model::axisCompatible(bool logscale1, bool autoscale1, double min1, double max1, bool logscale2, bool autoscale2, double min2, double max2)
-{
-	if (logscale1 != logscale2) return false;
-	if (autoscale1 != autoscale2) return false;
-
-	if (!autoscale1)
-	{
-		if (fabs(min1 - min2) > 1e-10 || fabs(max1 - max2) > 1e-10) return false;
-	}
-
-	return true;
-}
-
-bool Model::plotCompatible(AbstractPlot::PlotType type1, PlotDataset::axisQuantity quantity1, AbstractPlot::PlotType type2, PlotDataset::axisQuantity quantity2) {
-	if (type1 != type2) { return false; }
-	if (type1 == AbstractPlot::Cartesian) {
-		if (quantity1 != quantity2) { return false; }
-	}
-	return true;
-}
-
-SceneNodePlot1DItem *Model::getPlotFromCurve(SceneNodeResult1DItem *curve)
-{
-	SceneNodePlot1DItem *plotItem = nullptr;
-
-	SceneNodeBase *parent = curve->getParent();
-
-	do 
-	{
-		plotItem = dynamic_cast<SceneNodePlot1DItem *>(parent);
-
-		parent = parent->getParent();
-
-	} while (parent != nullptr && plotItem == nullptr);
-
-	return plotItem;
 }
 
 void Model::manageParentVisibility(SceneNodeBase *item)
@@ -1646,27 +1382,6 @@ void Model::setupUIControls3D(void)
 	updateUIControlState(selectedTreeItemID);
 }
 
-void Model::setupUIControls1D(void)
-{
-	assert(getNotifier() != nullptr);
-	if (getNotifier() == nullptr) return;
-	if (!removeItemIDList.empty()) return;
-
-	removeItemIDList.push_front(uiControls.viewPageID = getNotifier()->addMenuPage("View"));
-
-	removeItemIDList.push_front(uiControls.operationsGroupID = getNotifier()->addMenuGroup(uiControls.viewPageID, "Operations"));
-	removeItemIDList.push_front(uiControls.visiblityGroupID = getNotifier()->addMenuGroup(uiControls.viewPageID, "Visibility"));
-
-	removeItemIDList.push_front(uiControls.resetView1DButtonID = getNotifier()->addMenuPushButton(uiControls.operationsGroupID, "Reset View", "ResetView", "Space"));
-
-	removeItemIDList.push_front(uiControls.showSelectedButtonID = getNotifier()->addMenuPushButton(uiControls.visiblityGroupID, "Show Selected", "ShowSelected", "Ctrl+S"));
-	removeItemIDList.push_front(uiControls.hideSelectedButtonID = getNotifier()->addMenuPushButton(uiControls.visiblityGroupID, "Hide Selected", "HideSelected", "Ctrl+H"));
-
-	// Send an initial notification to properly set the state of the new controls
-	std::list<ot::UID> selectedTreeItemID;
-	updateUIControlState(selectedTreeItemID);
-}
-
 void Model::removeUIControls(void)
 {
 	if (removeItemIDList.empty()) return;
@@ -1681,7 +1396,6 @@ void Model::removeUIControls(void)
 void Model::executeAction(unsigned long long buttonID)
 {
 	     if (buttonID == uiControls.resetView3DButtonID)   	         resetAllViews3D();
-	else if (buttonID == uiControls.resetView1DButtonID)	         resetAllViews1D();
 	else if (buttonID == uiControls.showAllButtonID)                 showAllSceneNodesAction();
 	else if (buttonID == uiControls.showSelectedButtonID)	         showSelectedSceneNodesAction();
 	else if (buttonID == uiControls.hideSelectedButtonID)            hideSelectedSceneNodesAction();
@@ -3100,111 +2814,6 @@ void Model::addVisualizationCartesianMeshItemNode(const std::string &treeName, u
 	}
 }
 
-void Model::addVisualizationPlot1DNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden,
-									   const std::string &projectName, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-									   bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax, std::list<unsigned long long> &curvesID, std::list<unsigned long long> &curvesVersions,
-									   std::list<std::string> &curvesNames)
-{
-	SceneNodePlot1DItem *plotNode = new SceneNodePlot1DItem;
-
-	plotNode->setName(treeName);
-	plotNode->setModelEntityID(modelEntityID);
-	plotNode->setTreeIcons(treeIcons);
-
-	// Get the parent scene node
-	SceneNodeBase *parentNode = getParentNode(treeName);
-	assert(parentNode != nullptr); // We assume that the parent node already exists
-
-	// Now add the current node as child to the parent
-	parentNode->addChild(plotNode);
-
-	// Add the tree name to the tree
-	addSceneNodesToTree(plotNode);
-
-	// Add the node to the maps for faster access
-	nameToSceneNodesMap[treeName] = plotNode;
-	treeItemToSceneNodesMap[plotNode->getTreeItemID()] = plotNode;
-	modelItemToSceneNodesMap[modelEntityID] = plotNode;
-
-	plotNode->setProjectName(projectName);
-	plotNode->setTitle(title);
-
-	bool isComplex;
-	plotNode->setPlotType(AbstractPlot::plotTypeFromString(plotType, isComplex));
-	if (isComplex) { plotNode->setPlotQuantity(PlotDataset::Complex); }
-	else { plotNode->setPlotQuantity(PlotDataset::plotQuantityFromString(plotQuantity)); }
-	
-	plotNode->setCurves(curvesID, curvesVersions, curvesNames);
-	plotNode->setGrid(grid);
-	plotNode->setGridColor(gridColor);
-	plotNode->setLegend(legend);
-	plotNode->setLogscaleX(logscaleX);
-	plotNode->setLogscaleY(logscaleY);
-	plotNode->setAutoscaleX(autoscaleX);
-	plotNode->setAutoscaleY(autoscaleY);
-	plotNode->setXmin(xmin);
-	plotNode->setXmax(xmax);
-	plotNode->setYmin(ymin);
-	plotNode->setYmax(ymax);
-
-	plotNode->setModel(this);
-
-	if (isHidden)
-	{
-		setItemVisibleState(plotNode, false);
-	}
-
-	// Create the nodes for the curve
-
-	TreeIcon curveTreeIcons;
-	curveTreeIcons.size = 32;
-	curveTreeIcons.visibleIcon = "Result1DVisible";
-	curveTreeIcons.hiddenIcon = "Result1DHidden";
-
-	for (unsigned long long n = 0; n < plotNode->getNumberOfCurves(); n++)
-	{
-		unsigned long long curveID = plotNode->getCurveID(n);
-		unsigned long long curveVersion = plotNode->getCurveVersion(n);
-		std::string curveName = plotNode->getCurveName(n);
-
-		addVisualizationResult1DNode(treeName + "/" + curveName, curveID, curveVersion, curveTreeIcons, isHidden, projectName);
-	}
-}
-
-void Model::addVisualizationResult1DNode(const std::string &treeName, unsigned long long curveEntityID, unsigned long long curveEntityVersion, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName)
-{
-	SceneNodeResult1DItem *resultNode = new SceneNodeResult1DItem;
-
-	resultNode->setName(treeName);
-	resultNode->setModelEntityID(curveEntityID);
-	resultNode->setModelEntityVersion(curveEntityVersion);
-	resultNode->setTreeIcons(treeIcons);
-
-	// Get the parent scene node
-	SceneNodeBase *parentNode = getParentNode(treeName);
-	assert(parentNode != nullptr); // We assume that the parent node already exists
-
-	// Now add the current node as child to the parent
-	parentNode->addChild(resultNode);
-
-	// Add the tree name to the tree
-	addSceneNodesToTree(resultNode);
-
-	// Add the node to the maps for faster access
-	nameToSceneNodesMap[treeName] = resultNode;
-	treeItemToSceneNodesMap[resultNode->getTreeItemID()] = resultNode;
-	modelItemToSceneNodesMap[curveEntityID] = resultNode;
-
-	resultNode->setStorage(projectName);
-
-	resultNode->setModel(this);
-
-	if (isHidden)
-	{
-		setItemVisibleState(resultNode, false);
-	}
-}
-
 void Model::addVisualizationTextNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long textEntityID, unsigned long long textEntityVersion)
 {
 	SceneNodeTextItem *textNode = new SceneNodeTextItem;
@@ -3277,78 +2886,6 @@ void Model::addVisualizationTableNode(const std::string &treeName, unsigned long
 	}
 }
 
-void Model::visualizationResult1DPropertiesChanged(unsigned long long entityID, unsigned long long version)
-{
-	bool needsRedraw = changeResult1DEntityVersion(sceneNodesRoot, entityID, version);
-
-	if (needsRedraw)
-	{
-		update1DPlot(sceneNodesRoot);
-	}
-}
-
-bool Model::changeResult1DEntityVersion(SceneNodeBase *root, unsigned long long entityID, unsigned long long version)
-{
-	SceneNodePlot1DItem *plot = dynamic_cast<SceneNodePlot1DItem *>(root);
-	SceneNodeResult1DItem *curve = dynamic_cast<SceneNodeResult1DItem *>(root);
-
-	bool needsRedraw = false;
-
-	if (plot != nullptr)
-	{
-		needsRedraw |= plot->changeResult1DEntityVersion(entityID, version);
-	}
-
-	if (curve != nullptr)
-	{
-		if (curve->getModelEntityID() == entityID)
-		{
-			if (curve->getModelEntityVersion() != version)
-			{
-				curve->setModelEntityVersion(version);
-				needsRedraw = true;
-			}
-		}
-	}
-
-	for (auto child : root->getChildren())
-	{
-		needsRedraw |= changeResult1DEntityVersion(child, entityID, version);
-	}
-
-	return needsRedraw;
-}
-
-void Model::visualizationPlot1DPropertiesChanged(unsigned long long modelEntityID, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-												 bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax)
-{
-	SceneNodePlot1DItem *plotNode = dynamic_cast<SceneNodePlot1DItem *>(modelItemToSceneNodesMap[modelEntityID]);
-	assert(plotNode != nullptr);
-
-	if (plotNode == nullptr) return;
-
-	plotNode->setTitle(title);
-
-	bool isComplex;
-	plotNode->setPlotType(AbstractPlot::plotTypeFromString(plotType, isComplex));
-	if (isComplex) { plotNode->setPlotQuantity(PlotDataset::Complex); }
-	else { plotNode->setPlotQuantity(PlotDataset::plotQuantityFromString(plotQuantity)); }
-	
-	plotNode->setGrid(grid);
-	plotNode->setGridColor(gridColor);
-	plotNode->setLegend(legend);
-	plotNode->setLogscaleX(logscaleX);
-	plotNode->setLogscaleY(logscaleY);
-	plotNode->setAutoscaleX(autoscaleX);
-	plotNode->setAutoscaleY(autoscaleY);
-	plotNode->setXmin(xmin);
-	plotNode->setXmax(xmax);
-	plotNode->setYmin(ymin);
-	plotNode->setYmax(ymax);
-
-	update1DPlot(sceneNodesRoot);
-}
-
 void Model::viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type)
 {
 	removeUIControls();
@@ -3357,56 +2894,11 @@ void Model::viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::V
 	{
 		setupUIControls3D();
 	}
-	else if(_type == ot::WidgetViewBase::View1D)
-	{
-		setupUIControls1D();
-	}
 	else
 	{
 		// Now there may be other tabs in the UI, created by a ui plugin
 		//assert(0); // Unknown tab title
 	}
-}
-
-void Model::set1DPlotItemSelected(unsigned long long treeItemID, bool ctrlPressed)
-{
-	if (!ctrlPressed)
-	{
-		getNotifier()->selectSingleTreeItem(treeItemID);
-	}
-	else
-	{
-		SceneNodeBase *treeItem = treeItemToSceneNodesMap[treeItemID];
-		assert(treeItem != nullptr);
-
-		if (treeItem != nullptr)
-		{
-			// Check, if the corresponding plot is selected and the current child will be deselected. If so, toggle the selection of this item
-			if (treeItem->isSelected())
-			{
-				SceneNodeResult1DItem *curve = dynamic_cast<SceneNodeResult1DItem*>(treeItem);
-
-				if (curve != nullptr)
-				{
-					SceneNodePlot1DItem *plot = getPlotFromCurve(curve);
-					if (plot != nullptr)
-					{
-						if (plot->isSelected())
-						{
-							getNotifier()->toggleTreeItemSelection(plot->getTreeItemID(), false);
-						}
-					}
-				}
-			}
-
-			getNotifier()->toggleTreeItemSelection(treeItemID, false);
-		}
-	}
-}
-
-void Model::reset1DPlotItemSelection(void)
-{
-	getNotifier()->clearTreeSelection();
 }
 
 void Model::addVTKNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
@@ -3492,48 +2984,6 @@ void Model::updateCapGeometry(osg::Vec3d normal, osg::Vec3d point)
 	// First, we traverse the tree and find all geometry nodes
 	updateCapGeometryForSceneNodes(sceneNodesRoot, normal, point);
 }
-
-std::list<std::string> Model::getSelectedCurves()
-{
-	ot::UIDList treeItemIDs;
-	getSelectedTreeItemIDs(treeItemIDs);
-	std::list<std::string> curveDescriptions;
-	for (ot::UID treeID : treeItemIDs)
-	{
-		auto sceneNodeBaseByUID = treeItemToSceneNodesMap.find(treeID);
-		assert(sceneNodeBaseByUID != treeItemToSceneNodesMap.end());
-		auto sceneNodeBase = sceneNodeBaseByUID->second;
-		SceneNodeResult1DItem* curve = dynamic_cast<SceneNodeResult1DItem*>(sceneNodeBase);
-		if (curve != nullptr)
-		{
-			curveDescriptions.push_back(curve->getName());
-		}
-	}
-	return curveDescriptions;
-}
-
-void Model::removedSelectedCurveNodes()
-{
-	ot::UIDList treeItemIDs;
-	getSelectedTreeItemIDs(treeItemIDs);
-	ot::UIDList treeItemDeleteList;  // We group the tree item deletions for better performance
-	for (ot::UID treeID : treeItemIDs)
-	{
-		auto sceneNodeBaseByUID = treeItemToSceneNodesMap.find(treeID);
-		assert(sceneNodeBaseByUID != treeItemToSceneNodesMap.end());
-		auto sceneNodeBase = sceneNodeBaseByUID->second;
-		SceneNodeResult1DItem* curve = dynamic_cast<SceneNodeResult1DItem*>(sceneNodeBase);
-		
-		if (curve!= nullptr)
-		{
-			removeSceneNodeAndChildren(curve, treeItemDeleteList);
-		}
-	}
-	// Remove the shapes from the tree
-	getNotifier()->removeTreeItems(treeItemDeleteList);
-}
-
-
 
 void Model::updateCapGeometryForSceneNodes(SceneNodeBase *root, const osg::Vec3d &normal, const osg::Vec3d &point)
 {
