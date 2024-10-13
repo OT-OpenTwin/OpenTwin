@@ -31,10 +31,10 @@ ECHO Get the latest version from the repository
 ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%"
-REM git pull
+git pull
 
 cd /D "%OPENTWIN_THIRDPARTY_ROOT%"
-REM git pull
+git pull
 
 
 ECHO ===================================================================
@@ -42,7 +42,7 @@ ECHO Build the software
 ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
-REM CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\RebuildAll.bat" BOTH BUILD
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\RebuildAll.bat" BOTH BUILD
 
 REM ===================================================================
 REM Check the build results
@@ -69,14 +69,14 @@ ECHO Build the documentation
 ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
-REM CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildDocumentation.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildDocumentation.bat"
 
 ECHO ===================================================================
 ECHO Create the deployment
 ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
-REM CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CreateDeployment.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CreateDeployment.bat"
 
 ECHO ===================================================================
 ECHO Build the installers
@@ -90,6 +90,6 @@ ECHO Upload the documentation and the nightly installers
 ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
-REM "%OPENTWIN_THIRDPARTY_ROOT%\WinSCP\WinSCP.com" /ini=nul /script="%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BatchBuildAndDeploy.txt"
+"%OPENTWIN_THIRDPARTY_ROOT%\WinSCP\WinSCP.com" /ini=nul /script="%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BatchBuildAndDeploy.txt"
 
 exit 0
