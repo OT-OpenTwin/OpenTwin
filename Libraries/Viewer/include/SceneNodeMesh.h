@@ -53,7 +53,6 @@ public:
 
 	void ensureDataLoaded(void);
 
-	virtual bool isItem1D(void) { return false; };
 	virtual bool isItem3D(void) { return true; };
 
 	double getNodeX(size_t index) { return coordX[index]; }

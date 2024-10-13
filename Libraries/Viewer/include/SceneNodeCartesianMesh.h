@@ -55,7 +55,6 @@ public:
 
 	void ensureDataLoaded(void);
 
-	virtual bool isItem1D(void) { return false; };
 	virtual bool isItem3D(void) { return true; };
 
 	virtual void setTransparent(bool t) override;

@@ -17,7 +17,6 @@
 
 class Viewer;
 class SceneNodeGeometry;
-class SceneNodeResult1DItem;
 class ManipulatorBase;
 
 class UIControls
@@ -229,7 +228,6 @@ public:
 
 	void freeze3DView(bool flag);
 
-	void ensure1DView(void);
 	void ensure3DView(void);
 
 	bool isSingleItemSelected(void) { return singleItemSelected; }

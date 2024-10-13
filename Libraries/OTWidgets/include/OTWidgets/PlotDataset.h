@@ -99,11 +99,11 @@ namespace ot {
 		std::string getAxisTitleX(void) { return m_axisTitleX; }
 		std::string getAxisTitleY(void) { return m_axisTitleY; }
 
+		void updateVisualization(void);
+
 	private:
 
 		void memFree(void);
-
-		void repaint(void);
 
 		friend class Plot;
 

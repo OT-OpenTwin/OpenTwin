@@ -34,7 +34,6 @@ public:
 	Model *getModel(void) { return model; };
 	void setModel(Model *m) { model = m; };
 
-	virtual bool isItem1D(void) { return false; };
 	virtual bool isItem3D(void) { return true; };
 
 	void updateVTKNode(const std::string &projName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);

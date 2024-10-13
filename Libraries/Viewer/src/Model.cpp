@@ -973,7 +973,6 @@ void Model::setSelectedTreeItems(std::list<ot::UID> &selectedTreeItemID, std::li
 	// Now at least one shape is selected
 	// -> selected shapes are drawn opaque and all others are drawn transparent
 
-	bool isItem1DSelected = false;
 	bool isItem3DSelected = false;
 
 	// First set the selected state for all selected nodes
@@ -983,7 +982,6 @@ void Model::setSelectedTreeItems(std::list<ot::UID> &selectedTreeItemID, std::li
 
 		if (sceneNode != nullptr)
 		{
-			isItem1DSelected |= sceneNode->isItem1D();
 			isItem3DSelected |= sceneNode->isItem3D();
 
 			assert(sceneNode != nullptr);
@@ -1004,13 +1002,7 @@ void Model::setSelectedTreeItems(std::list<ot::UID> &selectedTreeItemID, std::li
 	updateUIControlState(selectedTreeItemID);
 	refreshAllViews();
 
-	if (isItem1DSelected && !isItem3DSelected)
-	{
-		// Ensure that we have the 1D view active
-		ensure1DView();
-	}
-
-	if (isItem3DSelected && !isItem1DSelected)
+	if (isItem3DSelected)
 	{
 		// Ensure that we have the 3D view active
 		ensure3DView();
@@ -1018,14 +1010,6 @@ void Model::setSelectedTreeItems(std::list<ot::UID> &selectedTreeItemID, std::li
 
 	// Update the working plane transformation 
 	updateWorkingPlaneTransform();
-}
-
-void Model::ensure1DView(void)
-{
-	if (getNotifier()->getCurrentVisualizationTab() != "Versions")
-	{
-		getNotifier()->setCurrentVisualizationTab("1D");
-	}
 }
 
 void Model::ensure3DView(void)

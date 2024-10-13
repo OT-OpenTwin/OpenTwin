@@ -133,6 +133,9 @@
     <ClCompile Include="src\ViewerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\PlotManager.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
@@ -265,6 +268,9 @@
       <Filter>include\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\ViewerView.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlotManager.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
