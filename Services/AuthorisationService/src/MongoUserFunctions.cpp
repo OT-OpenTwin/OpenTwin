@@ -8,8 +8,9 @@
 #include "OTCore/JSON.h"
 #include "OTCommunication/ActionTypes.h"
 
-#include <boost/uuid/detail/md5.hpp>
-#include <boost/algorithm/hex.hpp>
+#include <boost/uuid/namespaces.hpp>
+#include <boost/uuid/name_generator_md5.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 #include <set>
 
@@ -49,7 +50,14 @@ namespace MongoUserFunctions
 		const std::string storedPassword(userDocument->view()["user_pwd"].get_utf8().value.data());
 		const std::string hashedPassword = hashPassword(password);
 
-		if (storedPassword != hashedPassword) return false;
+		if (storedPassword.empty())
+		{
+			changeUserPassword(username, password, adminClient);
+		}
+		else
+		{
+			if (storedPassword != hashedPassword) return false;
+		}
 
 		authenticatedUserTokens.insert(token);
 		
@@ -143,23 +151,16 @@ namespace MongoUserFunctions
 		return true;
 	}
 
-	std::string toString(const boost::uuids::detail::md5::digest_type& digest)
-	{
-		const auto intDigest = reinterpret_cast<const int*>(&digest);
-		std::string result;
-		boost::algorithm::hex(intDigest, intDigest + (sizeof(boost::uuids::detail::md5::digest_type) / sizeof(int)), std::back_inserter(result));
-		return result;
-	}
-
 	std::string hashPassword(const std::string& password)
 	{
-		boost::uuids::detail::md5 hash;
-		boost::uuids::detail::md5::digest_type digest;
+		using namespace boost::uuids;
 
-		hash.process_bytes(password.data(), password.size());
-		hash.get_digest(digest);
+		name_generator_md5 gen(ns::x500dn());
 
-		return toString(digest);
+		uuid u1 = gen(password);
+
+		std::string result = boost::uuids::to_string(u1);
+		return result;
 	}
 
 	std::string generateUserSettingsCollectionName(mongocxx::client& adminClient)
