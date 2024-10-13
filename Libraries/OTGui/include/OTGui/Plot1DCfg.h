@@ -7,8 +7,8 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
+#include "OTCore/CoreTypes.h"
 #include "OTGui/Plot1DAxisCfg.h"
-#include "OTGui/Plot1DCurveCfg.h"
 #include "OTGui/NavigationTreeItemIcon.h"
 
 // std header
@@ -128,10 +128,6 @@ namespace ot {
 		void setYAxisIsAutoScale(bool _autoScaleEnabled) { m_yAxis.setIsAutoScale(_autoScaleEnabled); };
 		bool getYAxisIsAutoScale(void) const { return m_yAxis.getIsAutoScale(); };
 
-		void addCurve(const Plot1DCurveCfg& _curve);
-		void setCurves(const std::list<Plot1DCurveCfg>& _curves) { m_curves = _curves; };
-		const std::list<Plot1DCurveCfg>& getCurves(void) const { return m_curves; };
-
 	private:
 		UID m_uid;
 		UID m_visualizationUid;
@@ -153,8 +149,6 @@ namespace ot {
 
 		Plot1DAxisCfg m_xAxis;
 		Plot1DAxisCfg m_yAxis;
-
-		std::list<Plot1DCurveCfg> m_curves;
 	};
 
 }

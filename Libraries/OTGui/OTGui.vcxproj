@@ -74,7 +74,8 @@
     <ClInclude Include="include\OTGui\PlainTextEditViewCfg.h" />
     <ClInclude Include="include\OTGui\Plot1DAxisCfg.h" />
     <ClInclude Include="include\OTGui\Plot1DCfg.h" />
-    <ClInclude Include="include\OTGui\Plot1DCurveCfg.h" />
+    <ClInclude Include="include\OTGui\Plot1DCurveInfoCfg.h" />
+    <ClInclude Include="include\OTGui\Plot1DDataBaseCfg.h" />
     <ClInclude Include="include\OTGui\Property.h" />
     <ClInclude Include="include\OTGui\PropertyBase.h" />
     <ClInclude Include="include\OTGui\PropertyBool.h" />
@@ -165,7 +166,8 @@
     <ClCompile Include="src\PlainTextEditViewCfg.cpp" />
     <ClCompile Include="src\Plot1DAxisCfg.cpp" />
     <ClCompile Include="src\Plot1DCfg.cpp" />
-    <ClCompile Include="src\Plot1DCurveCfg.cpp" />
+    <ClCompile Include="src\Plot1DCurveInfoCfg.cpp" />
+    <ClCompile Include="src\Plot1DDataBaseCfg.cpp" />
     <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyBase.cpp" />
     <ClCompile Include="src\PropertyBool.cpp" />

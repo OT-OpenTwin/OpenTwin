@@ -90,8 +90,6 @@ ot::Plot1DCfg& ot::Plot1DCfg::operator=(const Plot1DCfg& _other) {
 	m_xAxis = _other.m_xAxis;
 	m_yAxis = _other.m_yAxis;
 
-	m_curves = _other.m_curves;
-
 	return *this;
 }
 
@@ -125,18 +123,10 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	JsonObject yAxisObject;
 	m_yAxis.addToJsonObject(yAxisObject, _allocator);
 	_object.AddMember("YAxis", yAxisObject, _allocator);
-
-	JsonArray curvesArray;
-	for (const Plot1DCurveCfg& curve : m_curves) {
-		JsonObject curveObject;
-		curve.addToJsonObject(curveObject, _allocator);
-		curvesArray.PushBack(curveObject, _allocator);
-	}
-	_object.AddMember("Curves", curvesArray, _allocator);
 }
 
 void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	m_curves.clear();
+	
 
 	m_uid = json::getUInt64(_object, "UID");
 	m_visualizationUid = json::getUInt64(_object, "VisUID");
@@ -158,19 +148,4 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 	m_xAxis.setFromJsonObject(json::getObject(_object, "XAxis"));
 	m_yAxis.setFromJsonObject(json::getObject(_object, "YAxis"));
-
-	ConstJsonObjectList curvesArray = json::getObjectList(_object, "Curves");
-	for (const ConstJsonObject& curveObject : curvesArray) {
-		Plot1DCurveCfg newCurve;
-		newCurve.setFromJsonObject(curveObject);
-		m_curves.push_back(newCurve);
-	}
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Setter / Getter
-
-void ot::Plot1DCfg::addCurve(const Plot1DCurveCfg& _curve) {
-	m_curves.push_back(_curve);
 }

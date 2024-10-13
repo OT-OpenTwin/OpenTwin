@@ -22,11 +22,11 @@ ot::PlotManager::~PlotManager() {
 }
 
 
-void ot::PlotManager::importData(const std::string& _projectName, const std::list<Plot1DCurveCfg>& _entitiesToImport) {
+void ot::PlotManager::importData(const std::string& _projectName, const std::list<Plot1DCurveInfoCfg>& _entitiesToImport) {
 	if (_entitiesToImport.empty()) return;
 
 	std::list<std::pair<UID, UID>> prefetchCurves;
-	for (const Plot1DCurveCfg& item : _entitiesToImport) {
+	for (const Plot1DCurveInfoCfg& item : _entitiesToImport) {
 		prefetchCurves.push_back(std::pair<UID, UID>(item.getId(), item.getVersion()));
 	}
 
