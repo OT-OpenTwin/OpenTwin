@@ -6,6 +6,7 @@
 #include "DataBase.h"
 #include "Types.h"
 
+#include "OTGui/Plot1DCurveInfoCfg.h"
 #include "OTCommunication/ActionTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
@@ -59,7 +60,9 @@ void EntityResult1DCurve::AddStorageData(bsoncxx::builder::basic::document &stor
 		bsoncxx::builder::basic::kvp("xAxisLabel", xAxisLabel),
 		bsoncxx::builder::basic::kvp("yAxisLabel", yAxisLabel),
 		bsoncxx::builder::basic::kvp("xAxisUnit", xAxisUnit),
-		bsoncxx::builder::basic::kvp("yAxisUnit", yAxisUnit)
+		bsoncxx::builder::basic::kvp("yAxisUnit", yAxisUnit),
+		bsoncxx::builder::basic::kvp("ServiceName", m_serviceInfo.serviceName()),
+		bsoncxx::builder::basic::kvp("ServiceType", m_serviceInfo.serviceType())
 	);
 }
 
@@ -81,6 +84,12 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(bsoncxx::document::view &
 	catch (std::exception)
 	{
 	}
+
+	try {
+		m_serviceInfo.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
+		m_serviceInfo.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
+	}
+	catch (...) {}
 
 	color[0] = doc_view["colorR"].get_double();
 	color[1] = doc_view["colorG"].get_double();
@@ -174,12 +183,12 @@ bool EntityResult1DCurve::updateFromProperties(void)
 	// Send a notification message to the observer, that the result1d properties have changed
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Result1DPropsChanged, doc.GetAllocator()), doc.GetAllocator());
-	ot::JsonArray entityIDs;
-	entityIDs.PushBack(this->getEntityID(),doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, entityIDs, doc.GetAllocator());
-	ot::JsonArray entityVersions;
-	entityVersions.PushBack(this->getEntityStorageVersion(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, entityVersions, doc.GetAllocator());
+	m_serviceInfo.addToJsonObject(doc, doc.GetAllocator());
+
+	ot::Plot1DCurveInfoCfg config(this->getEntityID(), this->getEntityStorageVersion(), this->getName());
+	ot::JsonObject configObject;
+	config.addToJsonObject(configObject, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, configObject, doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 

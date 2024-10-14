@@ -55,6 +55,7 @@ EntityResult1DPlot*ot::components::ModelComponent::addResult1DPlotEntity(const s
 {
 	EntityResult1DPlot*plot = new EntityResult1DPlot(createEntityUID(), nullptr, nullptr, nullptr, nullptr, "Model");
 
+	plot->setServiceInformation(m_application->getBasicServiceInformation());
 	plot->setName(name);
 	plot->setEditable(true);
 	plot->createProperties();
@@ -80,6 +81,7 @@ EntityResult1DCurve *ot::components::ModelComponent::addResult1DCurveEntity(cons
 {
 	EntityResult1DCurve *curve = new EntityResult1DCurve(createEntityUID(), nullptr, nullptr, nullptr, nullptr, "Model");
 
+	curve->setServiceInformation(m_application->getBasicServiceInformation());
 	curve->setName(name);
 	curve->setEditable(true);
 	curve->createProperties();

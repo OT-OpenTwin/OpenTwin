@@ -4,6 +4,7 @@
 #include "EntityContainer.h"
 #include "Types.h"
 #include "OTCore/Color.h"
+#include "OTCore/BasicServiceInformation.h"
 
 class EntityResult1DCurveData;
 
@@ -59,6 +60,9 @@ public:
 	std::string getUnitX();
 	std::string getUnitY();
 
+	void setServiceInformation(const ot::BasicServiceInformation& _info) { m_serviceInfo = _info; }
+	const ot::BasicServiceInformation& getServiceInformation(void) const { return m_serviceInfo; };
+
 private:
 	void EnsureCurveDataLoaded(void);
 	virtual int getSchemaVersion(void) { return 1; };
@@ -66,6 +70,8 @@ private:
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	void setCurveProperty(const std::string &name, const std::string &value);
 	void syncSettingsFromProperties(void);
+	
+	ot::BasicServiceInformation m_serviceInfo;
 	EntityResult1DCurveData *getCurveData(void);
 	EntityResult1DCurveData *curveData;
 	long long curveDataStorageId;
