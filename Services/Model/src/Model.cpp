@@ -3410,38 +3410,6 @@ size_t Model::getNumberOfVisualizationTriangles(std::list<EntityGeometry *> geom
 	return numberTriangles;
 }
 
-void Model::addResult1DEntity(const std::string &name, const std::vector<double> &xdata, const std::vector<double> &ydataRe, const std::vector<double> &ydataIm,
-							  const std::string &curveLabel, const std::string &xlabel, const std::string &xunit,
-							  const std::string &ylabel, const std::string &yunit)
-{
-	EntityResult1DCurve *curve = new EntityResult1DCurve(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
-
-	curve->setName(name);
-	curve->setEditable(true);
-	curve->createProperties();
-
-	curve->setXLabel(xlabel);
-	curve->setYLabel(ylabel);
-	curve->setXUnit(xunit);
-	curve->setYUnit(yunit);
-
-	curve->setCreateVisualizationItem(true);
-
-	// Now we store the data in the entity
-	curve->setCurveXData(xdata);
-	curve->setCurveYData(ydataRe, ydataIm);
-
-	// Release the data from memory (this will write it to the data base)
-	curve->releaseCurveData();
-
-	// Finally, add the new entity to the model 
-	GeometryOperations::EntityList allNewEntities;
-	addEntityToModel(curve->getName(), curve, entityRoot, true, allNewEntities);
-
-	// and create the visualization item
-	curve->addVisualizationNodes();
-}
-
 void Model::addAnnotationEntities(std::list<EntityAnnotation *> &errorAnnotations)
 {
 	GeometryOperations::EntityList allNewEntities;

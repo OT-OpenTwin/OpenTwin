@@ -105,10 +105,7 @@ public:
 									    const std::vector<std::array<double, 3>> &triangle_p2,
 									    const std::vector<std::array<double, 3>> &triangle_p3,
 									    const std::vector<std::array<double, 3>> &triangle_rgb);
-	void addResult1DEntity(const std::string &name, const std::vector<double> &xdata, const std::vector<double> &ydata, const std::vector<double> &ydataIm,
-						   const std::string &curveLabel, const std::string &xlabel, const std::string &xunit,
-						   const std::string &ylabel, const std::string &yunit);
-
+	
 	void updateObjectFacetsFromDataBase(ot::UID modelEntityID, ot::UID entityID);
 
 	void removeShapesFromVisualization(std::list<ot::UID> &removeFromDisplay);
