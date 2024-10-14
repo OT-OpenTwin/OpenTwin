@@ -436,15 +436,17 @@ void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 		{
 			return;
 		}
-		std::set<ot::UID> selectedCurves;
+		std::list<ot::UID> selectedCurves;
 		
 		if (selectedEntityIDs.size() != 1) return;
 		EntityBase* selectedEntity	= entityMap[*selectedEntityIDs.begin()];
 		EntityResult1DPlot* selectedPlot =	dynamic_cast<EntityResult1DPlot*>(selectedEntity);
 		if (selectedPlot != nullptr)
 		{
-			ot::UIDList curveIDs = selectedPlot->getCurves();
-			selectedCurves = { curveIDs.begin(),curveIDs.end() };
+			const std::list<ot::Plot1DCurveInfoCfg>& curves = selectedPlot->getCurves();
+			for (const ot::Plot1DCurveInfoCfg& curve : curves) {
+				selectedCurves.push_back(curve.getId());
+			}
 		}
 		else
 		{
@@ -464,7 +466,7 @@ void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 				const std::string curveText = fullName.substr(fullName.find_last_of("/")+1, fullName.size());
 				item->setText(curveText);
 				
-				bool isAlreadyPartOfPlot = selectedCurves.find(curveEntity->getEntityID()) != selectedCurves.end();
+				bool isAlreadyPartOfPlot = std::find(selectedCurves.begin(), selectedCurves.end(), curveEntity->getEntityID()) != selectedCurves.end();
 				if (isAlreadyPartOfPlot)
 				{
 					item->setFlags(ot::ItemIsSelected);
@@ -1719,15 +1721,13 @@ void Model::updateCurvesInPlot(const std::list<std::string>& curveNames, const o
 	auto baseEntity = entityMap.find(plotID);
 	assert(baseEntity != entityMap.end());
 	EntityResult1DPlot* plotEntity = dynamic_cast<EntityResult1DPlot*>(baseEntity->second);
-	ot::UIDList curveIDs;
-	std::list<std::string> curveNamesOnly;
+	std::list<ot::Plot1DCurveInfoCfg> curves;
 	for (const std::string& curveName : curveNames)
 	{
 		EntityBase* baseEnt = findEntityFromName(curveName);
-		curveIDs.push_back(baseEnt->getEntityID());
-		curveNamesOnly.push_back(curveName.substr(curveName.find_last_of("/") + 1, curveName.size()));
+		curves.push_back(ot::Plot1DCurveInfoCfg(baseEnt->getEntityID(), 0, curveName.substr(curveName.find_last_of("/") + 1, curveName.size())));
 	}
-	plotEntity->overrideReferencedCurves(curveIDs, curveNamesOnly);
+	plotEntity->overrideReferencedCurves(curves);
 	plotEntity->StoreToDataBase();
 
 	setModified();
@@ -4612,8 +4612,7 @@ void Model::deleteCurves(std::list<std::string>& entityNameList)
 		
 		//The curve name cannot be mapped via the model state since the name belongs only to the navigationtree item and not to the entity itself.
 		EntityResult1DPlot* plotEntity = plotEntityByName->second;
-		bool deletionCompleted = plotEntity->deleteCurve(curveNameWithoutPath);
-		assert(deletionCompleted);
+		plotEntity->deleteCurve(curveNameWithoutPath);
 		plotIDs.push_back(plotEntity->getEntityID());
 		plotVersions.push_back(plotEntity->getEntityStorageVersion());
 		setModified();

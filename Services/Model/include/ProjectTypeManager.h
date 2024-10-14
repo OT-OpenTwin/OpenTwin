@@ -45,7 +45,6 @@ private:
 	bool _hasDatasetRMD					= true;
 
 	bool _has3DView						= true;
-	bool _has1DView						= true;
 	bool _hasTableView					= true;
 	bool _hasBlockPicker				= true;
 

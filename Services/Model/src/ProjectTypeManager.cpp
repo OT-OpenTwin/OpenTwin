@@ -52,7 +52,6 @@ void ProjectTypeManager::initializeProjectType3DSimulation(void)
 	_hasDatasetRMD					= false;
 
 	_has3DView						= true;
-	_has1DView						= true;
 	_hasTableView					= false;
 	_hasBlockPicker					= false;
 }
@@ -72,7 +71,6 @@ void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 	_hasDatasetRMD					= true;
 
 	_has3DView						= false;
-	_has1DView						= true;
 	_hasTableView					= true;
 	_hasBlockPicker					= true;
 
@@ -98,7 +96,6 @@ void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 	_hasDatasetRMD = true;
 
 	_has3DView = true;
-	_has1DView = true;
 	_hasTableView = false;
 	_hasBlockPicker = false;
 
@@ -110,7 +107,6 @@ std::string ProjectTypeManager::getViews(void)
 {
 	ot::JsonDocument newDoc;
 	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Visible3D, _has3DView, newDoc.GetAllocator());
-	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Visible1D, _has1DView, newDoc.GetAllocator());
 	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_VisibleTable, _hasTableView, newDoc.GetAllocator());
 	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker, _hasBlockPicker, newDoc.GetAllocator());
 
