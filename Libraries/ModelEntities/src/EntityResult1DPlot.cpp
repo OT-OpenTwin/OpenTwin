@@ -5,6 +5,7 @@
 #include "DataBase.h"
 #include "Types.h"
 
+#include "OTCore/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
@@ -38,15 +39,17 @@ void EntityResult1DPlot::AddStorageData(bsoncxx::builder::basic::document &stora
 	auto curveID = bsoncxx::builder::basic::array();
 	auto curveName = bsoncxx::builder::basic::array();
 
-	for (auto curve : curves)
+	for (const ot::Plot1DCurveInfoCfg& curve : m_curves)
 	{
-		curveID.append((long long) curve);
-		curveName.append(curveNamesByUID[curve]);
+		curveID.append((long long) curve.getId());
+		curveName.append(curve.getName());
 	}
 
 	storage.append(
 		bsoncxx::builder::basic::kvp("Curves", curveID),
-		bsoncxx::builder::basic::kvp("CurveNames", curveName)
+		bsoncxx::builder::basic::kvp("CurveNames", curveName),
+		bsoncxx::builder::basic::kvp("ServiceName", m_serviceInfo.serviceName()),
+		bsoncxx::builder::basic::kvp("ServiceType", m_serviceInfo.serviceType())
 	);
 }
 
@@ -58,23 +61,27 @@ void EntityResult1DPlot::readSpecificDataFromDataBase(bsoncxx::document::view &d
 	// Here we can load any special information about the entity
 	auto arrayCurveItems = doc_view["Curves"].get_array().value;
 	auto arrayCurveNames = doc_view["CurveNames"].get_array().value;
-	curves.clear();
-	curveNamesByUID.clear();
+	try {
+		m_serviceInfo.setServiceName(doc_view["ServiceName"].get_utf8().value.data());
+		m_serviceInfo.setServiceType(doc_view["ServiceType"].get_utf8().value.data());
+	}
+	catch (...) {}
+	m_curves.clear();
 
 	for (const bsoncxx::array::element& item : arrayCurveItems)
 	{
 		ot::UID curveID = item.get_int64();
-		curves.push_back(curveID);
+		m_curves.push_back(ot::Plot1DCurveInfoCfg(curveID, 0, ""));
 	}
 
-	auto it = curves.begin();
+	auto it = m_curves.begin();
 	for (const bsoncxx::array::element& name : arrayCurveNames)
 	{
-		std::string curveName = name.get_utf8().value.data();
-		curveNamesByUID[*it] = curveName;
-
+		OTAssert(it != m_curves.end(), "Size mismatch");
+		it->setName(name.get_utf8().value.data());
 		it++;
 	}
+	OTAssert(it == m_curves.end(), "Size mismatch");
 
 	resetModified();
 }
@@ -86,32 +93,18 @@ void EntityResult1DPlot::addVisualizationNodes(void)
 	EntityBase::addVisualizationNodes();
 }
 
-void EntityResult1DPlot::addVisualizationItem(bool isHidden)
+void EntityResult1DPlot::addVisualizationItem(bool _isHidden)
 {
-	TreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "Plot1DVisible";
-	treeIcons.hiddenIcon = "Plot1DHidden";
-
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddPlot1D, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
+	m_serviceInfo.addToJsonObject(doc, doc.GetAllocator());
 
-	std::list<unsigned long long> versions;
-	for (auto curve : curves)
-	{
-		versions.push_back(getCurrentEntityVersion(curve));
-	}
-
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveIDs, ot::JsonArray(curves, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveVersions, ot::JsonArray(versions, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveNames, ot::JsonArray(this->getCurveNames(), doc.GetAllocator()), doc.GetAllocator());
-
-	this->addPropertiesToDocument(doc);
-	treeIcons.addToJsonDoc(doc);
+	ot::Plot1DDataBaseCfg plotCfg;
+	this->addToConfiguration(plotCfg, true);
+	plotCfg.setHidden(_isHidden);
+	ot::JsonObject cfgObj;
+	plotCfg.addToJsonObject(cfgObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 }
@@ -151,9 +144,13 @@ bool EntityResult1DPlot::updateFromProperties(void)
 	// Send a notification message to the observer, that the result1d properties have changed
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, this->getEntityID(), doc.GetAllocator());
+	m_serviceInfo.addToJsonObject(doc, doc.GetAllocator());
 
-	addPropertiesToDocument(doc);
+	ot::Plot1DDataBaseCfg plotCfg;
+	this->addToConfiguration(plotCfg, false);
+	ot::JsonObject cfgObj;
+	plotCfg.addToJsonObject(cfgObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 
@@ -163,59 +160,36 @@ bool EntityResult1DPlot::updateFromProperties(void)
 	return updatePropertyVisibilities(); // Notify, whether property grid update is necessary
 }
 
-void EntityResult1DPlot::setPlotType(const std::string &type) { 
+void EntityResult1DPlot::setPlotType(ot::Plot1DCfg::PlotType _type) {
 	if (!getProperties().propertyExists("Plot type")) {
-		assert(0);
+		OT_LOG_EAS("Property \"Plot type\" does not exist");
 		return;
 	}
-	setSelectionPlotProperty("Plot type", type); 
+	setSelectionPlotProperty("Plot type", ot::Plot1DCfg::plotTypeToString(_type)); 
 }
-std::string EntityResult1DPlot::getPlotType(void) { 
+ot::Plot1DCfg::PlotType EntityResult1DPlot::getPlotType(void) {
 	if (getProperties().propertyExists("Plot type")) {
-		return getSelectionPlotProperty("Plot type");
+		return ot::Plot1DCfg::stringToPlotType(getSelectionPlotProperty("Plot type"));
 	}
 	else {
-		return "Cartesian";
+		return ot::Plot1DCfg::Cartesian;
 	}
 }
 
-void EntityResult1DPlot::setPlotQuantity(const std::string &quantity) { 
+void EntityResult1DPlot::setPlotQuantity(ot::Plot1DCfg::AxisQuantity _quantity) {
 	if (!getProperties().propertyExists("Plot quantity")) {
-		assert(0);
+		OT_LOG_EAS("Property \"Plot quantity\" does not exist");
 		return;
 	}
-	setSelectionPlotProperty("Plot quantity", quantity);
+	setSelectionPlotProperty("Plot quantity", ot::Plot1DCfg::axisQuantityToString(_quantity));
 }
-std::string EntityResult1DPlot::getPlotQuantity(void) { 
+ot::Plot1DCfg::AxisQuantity EntityResult1DPlot::getPlotQuantity(void) {
 	if (getProperties().propertyExists("Plot quantity")) {
-		return getSelectionPlotProperty("Plot quantity");
+		return ot::Plot1DCfg::stringToAxisQuantity(getSelectionPlotProperty("Plot quantity"));
 	}
 	else {
-		return "Real";
+		return ot::Plot1DCfg::Real;
 	}
-}
-
-void EntityResult1DPlot::addPropertiesToDocument(ot::JsonDocument& doc)
-{
-	int gridColorR = 0, gridColorG = 0, gridColorB = 0;
-	getGridColor(gridColorR, gridColorG, gridColorB);
-
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Title, ot::JsonString(getTitle(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_PlotType, ot::JsonString(getPlotType(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_PlotQuantity, ot::JsonString(getPlotQuantity(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Legend, getLegend(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Grid, getGrid(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_LogscaleX, getLogscaleX(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_LogscaleY, getLogscaleY(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_AutoscaleX, getAutoscaleX(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_AutoscaleY, getAutoscaleY(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Xmin, getXmin(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Xmax, getXmax(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Ymin, getYmin(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Ymax, getYmax(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_GridColorR, gridColorR, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_GridColorG, gridColorG, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_GridColorB, gridColorB, doc.GetAllocator());
 }
 
 void EntityResult1DPlot::setStringPlotProperty(const std::string &name, const std::string &value)
@@ -323,68 +297,48 @@ void EntityResult1DPlot::getGridColor(int &colorR, int &colorG, int &colorB)
 	}
 }
 
-void EntityResult1DPlot::addCurve(ot::UID curveID, const std::string &name)
+void EntityResult1DPlot::addCurve(ot::UID _curveID, const std::string& _name)
 {
-	deleteCurve(curveID);
-	curves.push_back(curveID);
-	curveNamesByUID[curveID] = name;
-	setModified();
+	this->deleteCurve(_curveID);
+	m_curves.push_back(ot::Plot1DCurveInfoCfg(_curveID, 0, _name));
+	this->setModified();
 }
 
-bool EntityResult1DPlot::deleteCurve(ot::UID curveID)
+void EntityResult1DPlot::deleteCurve(ot::UID _curveID)
 {
-	if (curveNamesByUID.find(curveID) != curveNamesByUID.end())
-	{
-		curves.remove(curveID);
-		curveNamesByUID.erase(curveID);
-		setModified();
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-	
-}
-
-bool EntityResult1DPlot::deleteCurve(const std::string& curveName)
-{
-	for (const auto curveNameByUID : curveNamesByUID)
-	{
-		if (curveNameByUID.second == curveName)
-		{
-			setModified();
-			return deleteCurve(curveNameByUID.first);
+	bool erased = true;
+	while (erased) {
+		erased = false;
+		for (auto it = m_curves.begin(); it != m_curves.end(); it++) {
+			if (it->getId() == _curveID) {
+				m_curves.erase(it);
+				erased = true;
+				setModified();
+				break;
+			}
 		}
 	}
-	return false;
 }
 
-std::list<ot::UID> EntityResult1DPlot::getCurves(void)
+void EntityResult1DPlot::deleteCurve(const std::string& _curveName)
 {
-	return curves;
-}
-
-std::list<std::string> EntityResult1DPlot::getCurveNames(void)
-{
-	std::list<std::string> names;
-	for (auto curve : curves)
-	{
-		names.push_back(curveNamesByUID[curve]);
+	bool erased = true;
+	while (erased) {
+		erased = false;
+		for (auto it = m_curves.begin(); it != m_curves.end(); it++) {
+			if (it->getName() == _curveName) {
+				m_curves.erase(it);
+				erased = true;
+				setModified();
+				break;
+			}
+		}
 	}
-
-	return names;
 }
 
-void EntityResult1DPlot::overrideReferencedCurves(const ot::UIDList& curveIDs, const std::list<std::string>& curveNames)
+void EntityResult1DPlot::overrideReferencedCurves(const std::list<ot::Plot1DCurveInfoCfg>& _curves)
 {
-	curves = curveIDs;
-	curveNamesByUID.clear();
-	auto curveName = curveNames.begin();
-	for (const ot::UID& curveID : curveIDs)
-	{
-		curveNamesByUID[curveID] = *curveName;
-	}
+	m_curves = _curves;
 	setModified();
 }
 
@@ -439,4 +393,41 @@ bool EntityResult1DPlot::updatePropertyVisibilities(void)
 	}
 
 	return updatePropertiesGrid;
+}
+
+void EntityResult1DPlot::updateCurveVersions(void) {
+	for (ot::Plot1DCurveInfoCfg& curve : m_curves) {
+		curve.setVersion(this->getCurrentEntityVersion(curve.getId()));
+	}
+}
+
+void EntityResult1DPlot::addToConfiguration(ot::Plot1DDataBaseCfg& _plotCfg, bool _includeCurves) {
+	_plotCfg.setTreeIcons(ot::NavigationTreeItemIcon("Plot1DVisible", "Plot1DHidden"));
+	_plotCfg.setProjectName(DataBase::GetDataBase()->getProjectName());
+	_plotCfg.setUid(this->getEntityID());
+	_plotCfg.setName(this->getName());
+	_plotCfg.setTitle(this->getTitle());
+	_plotCfg.setPlotType(this->getPlotType());
+	_plotCfg.setAxisQuantity(this->getPlotQuantity());
+	_plotCfg.setLegendVisible(this->getLegendVisible());
+	_plotCfg.setGridVisible(this->getGridVisible());
+
+	int r = 0, g = 0, b = 0;
+	this->getGridColor(r, g, b);
+	_plotCfg.setGridColor(ot::Color(r, g, b));
+
+	_plotCfg.setXAxisMin(this->getXmin());
+	_plotCfg.setXAxisMax(this->getXmax());
+	_plotCfg.setXAxisIsLogScale(this->getLogscaleX());
+	_plotCfg.setXAxisIsAutoScale(this->getAutoscaleX());
+
+	_plotCfg.setYAxisMin(this->getYmin());
+	_plotCfg.setYAxisMax(this->getYmax());
+	_plotCfg.setYAxisIsLogScale(this->getLogscaleY());
+	_plotCfg.setYAxisIsAutoScale(this->getAutoscaleY());
+
+	if (_includeCurves) {
+		this->updateCurveVersions();
+		_plotCfg.setCurves(m_curves);
+	}
 }
