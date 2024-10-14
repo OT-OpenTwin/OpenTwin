@@ -66,7 +66,7 @@ namespace ot {
 		);
 
 		void setConfig(const Plot1DCfg& _config) { m_config = _config; };
-		const Plot1DCfg& setConfig(void) const { return m_config; };
+		const Plot1DCfg& getConfig(void) const { return m_config; };
 
 		void setFromDataBaseConfig(const Plot1DDataBaseCfg& _config);
 
