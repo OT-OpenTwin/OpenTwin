@@ -878,10 +878,6 @@ void ViewerComponent::prefetchDocumentsFromStorage(const std::string &projectNam
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-ot::WidgetView* ViewerComponent::getPlotWidget(ViewerUIDtype _viewerID) {
-	return ViewerAPI::getPlotWidget(_viewerID);
-}
-
 ot::WidgetView* ViewerComponent::getTableWidget(ViewerUIDtype _viewerID)
 {
 	return ViewerAPI::getTable(_viewerID);
@@ -985,8 +981,8 @@ void ViewerComponent::setDataBaseConnectionInformation(const std::string &databa
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-void ViewerComponent::setTabTitles(ViewerUIDtype visualizationModelID, const std::string & _tabName3D, const std::string & _tabName1D, const std::string & _tabNameVersions) {
-	ViewerAPI::setTabNames(visualizationModelID, _tabName3D, _tabName1D, _tabNameVersions);
+void ViewerComponent::setTabTitles(ViewerUIDtype visualizationModelID, const std::string & _tabName3D, const std::string & _tabNameVersions) {
+	ViewerAPI::setTabNames(visualizationModelID, _tabName3D, _tabNameVersions);
 }
 
 void ViewerComponent::shortcutActivated(const std::string &keySequence) {

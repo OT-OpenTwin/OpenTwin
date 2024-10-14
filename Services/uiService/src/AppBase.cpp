@@ -27,6 +27,7 @@
 #include "CopyProjectDialog.h"
 #include "RenameProjectDialog.h"
 #include "ManageOwner.h"
+#include "PlotManager.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>
@@ -165,7 +166,6 @@ AppBase::AppBase()
 	m_uiPluginManager(nullptr),
 	m_graphicsPicker(nullptr),
 	m_visible3D(false),
-	m_visible1D(false),
 	m_visibleTable(false),
 	m_visibleBlockPicker(false),
 	m_propertyGrid(nullptr),
@@ -993,7 +993,6 @@ ViewerUIDtype AppBase::createView(
 
 	//NOTE, in future need to store tab information
 	QString text3D = availableTabText("3D");
-	QString text1D = availableTabText("1D");
 	QString textVersion = availableTabText("Versions");
 	QString textBlock = availableTabText("BlockDiagram");
 	QString textTable = availableTabText("Table");
@@ -1009,17 +1008,6 @@ ViewerUIDtype AppBase::createView(
 		m_viewerComponent->getViewerWidget(viewID)->getViewWidget()->setVisible(false);
 	}
 	
-	if (getVisible1D())
-	{
-		ot::WidgetView* wv = m_viewerComponent->getPlotWidget(viewID);
-		wv->setViewData(ot::WidgetViewBase(text1D.toStdString(), text1D.toStdString(), ot::WidgetViewBase::ViewIsCentral, ot::WidgetViewBase::View1D));
-		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
-	}
-	else
-	{
-		m_viewerComponent->getPlotWidget(viewID)->getViewWidget()->setVisible(false);
-	}
-
 	{
 		if (m_versionGraph) {
 			OT_LOG_EA("Version graph already exists");
@@ -1846,6 +1834,54 @@ void AppBase::closeTable(const std::string& _name, const ot::BasicServiceInforma
 	else {
 		OT_LOG_WA("Text editors not found for given service");
 	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Plot 1D
+
+ot::PlotManager* AppBase::createNewPlot1D(const ot::Plot1DDataBaseCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
+	ot::PlotManager* newPlot = this->findPlot1D(_config.getName(), _serviceInfo);
+	if (newPlot != nullptr) {
+		OT_LOG_D("Plot already exists { \"Plot.Name\": \"" + _config.getName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
+		return newPlot;
+	}
+
+	newPlot = new ot::PlotManager;
+	newPlot->setFromDataBaseConfig(_config);
+	newPlot->setViewData(ot::WidgetViewBase(_config.getName(), _config.getTitle(), ot::WidgetViewBase::ViewIsCentral /* | ot::WidgetViewBase::ViewIsCloseable */, ot::WidgetViewBase::View1D));
+
+	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newPlot);
+	m_plots.store(_serviceInfo, newPlot);
+
+	OT_LOG_D("Plot created { \"Plot.Name\": \"" + _config.getName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+
+	return newPlot;
+}
+
+ot::PlotManager* AppBase::findPlot1D(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
+	if (m_plots.contains(_serviceInfo)) {
+		const std::list<ot::PlotManager*>& lst = m_plots[_serviceInfo];
+
+		for (auto v : lst) {
+			if (v->getConfig().getName() == _name) {
+				return v;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+ot::PlotManager* AppBase::findOrCreatePlot1D(const ot::Plot1DDataBaseCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
+	ot::PlotManager* v = this->findPlot1D(_config.getName(), _serviceInfo);
+	if (v) {
+		v->setFromDataBaseConfig(_config);
+		return v;
+	}
+
+	OT_LOG_D("Plot does not exist. Creating new Plot. { \"Plot.Name\": \"" + _config.getName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	return this->createNewPlot1D(_config, _serviceInfo);
 }
 
 // ######################################################################################################################

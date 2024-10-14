@@ -11,7 +11,7 @@
 
 namespace ot {
 
-	class Plot1DDataBaseCfg : public Plot1DCfg {
+	class OT_GUI_API_EXPORT Plot1DDataBaseCfg : public Plot1DCfg {
 	public:
 		Plot1DDataBaseCfg();
 		Plot1DDataBaseCfg(const Plot1DDataBaseCfg& _other);

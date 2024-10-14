@@ -150,7 +150,6 @@ public:
 	void isModified(ViewerUIDtype viewerUID, bool modifiedState);
 	void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 
-	ot::WidgetView* getPlotWidget(ViewerUIDtype _viewerID);
 	ot::WidgetView* getTableWidget(ViewerUIDtype _viewerID);
 
 	void viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type);
@@ -171,7 +170,7 @@ public:
 	void setDataBaseConnectionInformation(const std::string &databaseURL, const std::string &userName, const std::string &encryptedPassword);
 	void sendSelectionChangedNotification();
 
-	void setTabTitles(ViewerUIDtype visualizationModelID, const std::string & _tabName3D, const std::string & _tabName1D, const std::string & _tabNameVersions);
+	void setTabTitles(ViewerUIDtype visualizationModelID, const std::string & _tabName3D, const std::string & _tabNameVersions);
 
 	void shortcutActivated(const std::string &keySequence);
 

@@ -27,6 +27,7 @@
 #include "OTGui/TextEditorCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/PropertyGridCfg.h"
+#include "OTGui/Plot1DDataBaseCfg.h"
 #include "OTGui/GraphicsPickerCollectionManager.h"
 #include "OTWidgets/ColorStyle.h"
 #include "OTServiceFoundation/UserCredentials.h"
@@ -67,6 +68,7 @@ namespace ot { class Label; }
 namespace ot { class Property; }
 namespace ot { class TableView; }
 namespace ot { class WidgetView; }
+namespace ot { class PlotManager; }
 namespace ot { class GraphicsItem; }
 namespace ot { class GraphicsPicker; }
 namespace ot { class TextEditorView; }
@@ -374,12 +376,10 @@ public:
 	std::vector<int> getSelectedNavigationTreeItems(void);
 
 	void setVisible3D(bool visible3D) { m_visible3D = visible3D; }
-	void setVisible1D(bool visible1D) { m_visible1D = visible1D; }
 	void setVisibleTable(bool visibleTable) { m_visibleTable = visibleTable; }
 	void setVisibleBlockPicker(bool visibleBlockPicker) { m_visibleBlockPicker = visibleBlockPicker; }
 
 	bool getVisible3D() { return m_visible3D; }
-	bool getVisible1D() { return m_visible1D; }
 	bool getVisibleTable() { return m_visibleTable; }
 	bool getVisibleBlockPicker() { return m_visibleBlockPicker; }
 
@@ -452,6 +452,16 @@ public:
 	ot::TableView* findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
 
 	void closeTable(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Plot 1D
+
+	ot::PlotManager* createNewPlot1D(const ot::Plot1DDataBaseCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
+
+	ot::PlotManager* findPlot1D(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
+
+	ot::PlotManager* findOrCreatePlot1D(const ot::Plot1DDataBaseCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
 
 	// ######################################################################################################################
 
@@ -628,9 +638,9 @@ private:
 	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::GraphicsViewView> m_graphicsViews;
 	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::TextEditorView> m_textEditors;
 	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::TableView> m_tables;
+	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::PlotManager> m_plots;
 
 	bool m_visible3D;
-	bool m_visible1D;
 	bool m_visibleTable;
 	bool m_visibleBlockPicker;
 

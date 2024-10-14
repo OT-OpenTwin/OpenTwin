@@ -179,7 +179,7 @@ void ot::Plot::setIncompatibleData(void) {
 }
 
 void ot::Plot::refresh(void) {
-
+	this->applyConfig();
 }
 
 void ot::Plot::clear(bool _clearCache) {
@@ -295,7 +295,7 @@ void ot::Plot::applyConfig(void) {
 		axisTitleX = m_cache.begin()->second.second->getAxisTitleX();
 		axisTitleY = m_cache.begin()->second.second->getAxisTitleY();
 
-		for (auto itm : m_cache) {
+		for (const auto& itm : m_cache) {
 			if (axisTitleX != m_cache.begin()->second.second->getAxisTitleX()) compatible = false;
 			if (axisTitleY != m_cache.begin()->second.second->getAxisTitleY()) compatible = false;
 			if (!compatible) break;

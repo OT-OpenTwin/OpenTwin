@@ -76,6 +76,8 @@
 
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 
+#include "PlotManager.h"
+
 // Curl
 #include "curl/curl.h"					// Curl
 
@@ -1406,14 +1408,12 @@ void ExternalServicesComponent::determineViews(const std::string &modelServiceUR
 	responseDoc.fromJson(response);
 
 	bool visible3D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible3D].GetBool();
-	bool visible1D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible1D].GetBool();
 	bool visibleTable = responseDoc[OT_ACTION_PARAM_UI_TREE_VisibleTable].GetBool();
 	bool visibleBlockPicker = responseDoc[OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker].GetBool();
 
 	AppBase* app{ AppBase::instance() };
 
 	app->setVisible3D(visible3D);
-	app->setVisible1D(visible1D);
 	app->setVisibleTable(visibleTable);
 	app->setVisibleBlockPicker(visibleBlockPicker);
 }
@@ -3168,8 +3168,7 @@ std::string ExternalServicesComponent::handleRemoveShapes(ot::JsonDocument& _doc
 		}
 	}
 	
-	std::list<std::string> curveNames = ViewerAPI::getSelectedCurves(visualizationModelID);
-	ViewerAPI::removeSelectedCurveNodes(visualizationModelID);
+	std::list<std::string> curveNames /*= ViewerAPI::getSelectedCurves(visualizationModelID)*/;
 
 	ot::JsonDocument requestDoc;
 	ot::JsonArray jCurveNames;
@@ -3793,68 +3792,38 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 // 1D Plot
 
 std::string ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
-	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-	ak::UID uid = _document[OT_ACTION_PARAM_UI_UID].GetUint64();
-	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	ot::Plot1DDataBaseCfg config;
+	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	int gridColor[3] = { 0, 0, 0 };
-	std::string title = ot::json::getString(_document, OT_ACTION_PARAM_VIEW1D_Title);
-	std::string plotType = ot::json::getString(_document, OT_ACTION_PARAM_VIEW1D_PlotType);
-	std::string plotQuantity = ot::json::getString(_document, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
-	bool grid = _document[OT_ACTION_PARAM_VIEW1D_Grid].GetBool();
-	bool legend = _document[OT_ACTION_PARAM_VIEW1D_Legend].GetBool();
-	bool logscaleX = _document[OT_ACTION_PARAM_VIEW1D_LogscaleX].GetBool();
-	bool logscaleY = _document[OT_ACTION_PARAM_VIEW1D_LogscaleY].GetBool();
-	bool autoscaleX = _document[OT_ACTION_PARAM_VIEW1D_AutoscaleX].GetBool();
-	bool autoscaleY = _document[OT_ACTION_PARAM_VIEW1D_AutoscaleY].GetBool();
-	double xmin = _document[OT_ACTION_PARAM_VIEW1D_Xmin].GetDouble();
-	double xmax = _document[OT_ACTION_PARAM_VIEW1D_Xmax].GetDouble();
-	double ymin = _document[OT_ACTION_PARAM_VIEW1D_Ymin].GetDouble();
-	double ymax = _document[OT_ACTION_PARAM_VIEW1D_Ymax].GetDouble();
-	gridColor[0] = _document[OT_ACTION_PARAM_VIEW1D_GridColorR].GetInt();
-	gridColor[1] = _document[OT_ACTION_PARAM_VIEW1D_GridColorG].GetInt();
-	gridColor[2] = _document[OT_ACTION_PARAM_VIEW1D_GridColorB].GetInt();
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
 
-	std::list<ak::UID> curvesID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VIEW1D_CurveIDs);
-	std::list<ak::UID> curvesVersions = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VIEW1D_CurveVersions);
-	std::list<std::string> curvesNames = ot::json::getStringList(_document, OT_ACTION_PARAM_VIEW1D_CurveNames);
-
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
-
-	ViewerAPI::addVisualizationPlot1DNode(visModelID, name, uid, treeIcons, isHidden, projectName, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax, curvesID, curvesVersions, curvesNames);
+	AppBase::instance()->findOrCreatePlot1D(config, info);
 
 	return "";
 }
 
 std::string ExternalServicesComponent::handlePlot1DPropertiesChanged(ot::JsonDocument& _document) {
-	int gridColor[3] = { 0, 0, 0 };
-	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-	ak::UID uid = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
-	std::string title = ot::json::getString(_document, OT_ACTION_PARAM_VIEW1D_Title);
-	std::string plotType = ot::json::getString(_document, OT_ACTION_PARAM_VIEW1D_PlotType);
-	std::string plotQuantity = ot::json::getString(_document, OT_ACTION_PARAM_VIEW1D_PlotQuantity);
-	bool grid = _document[OT_ACTION_PARAM_VIEW1D_Grid].GetBool();
-	bool legend = _document[OT_ACTION_PARAM_VIEW1D_Legend].GetBool();
-	bool logscaleX = _document[OT_ACTION_PARAM_VIEW1D_LogscaleX].GetBool();
-	bool logscaleY = _document[OT_ACTION_PARAM_VIEW1D_LogscaleY].GetBool();
-	bool autoscaleX = _document[OT_ACTION_PARAM_VIEW1D_AutoscaleX].GetBool();
-	bool autoscaleY = _document[OT_ACTION_PARAM_VIEW1D_AutoscaleY].GetBool();
-	double xmin = _document[OT_ACTION_PARAM_VIEW1D_Xmin].GetDouble();
-	double xmax = _document[OT_ACTION_PARAM_VIEW1D_Xmax].GetDouble();
-	double ymin = _document[OT_ACTION_PARAM_VIEW1D_Ymin].GetDouble();
-	double ymax = _document[OT_ACTION_PARAM_VIEW1D_Ymax].GetDouble();
-	gridColor[0] = _document[OT_ACTION_PARAM_VIEW1D_GridColorR].GetInt();
-	gridColor[1] = _document[OT_ACTION_PARAM_VIEW1D_GridColorG].GetInt();
-	gridColor[2] = _document[OT_ACTION_PARAM_VIEW1D_GridColorB].GetInt();
+	ot::Plot1DCfg config;
+	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	ViewerAPI::visualizationPlot1DPropertiesChanged(visModelID, uid, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax);
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	ot::PlotManager* plot = AppBase::instance()->findPlot1D(config.getName(), info);
+	if (!plot) {
+		OT_LOG_EAS("Plot not found { \"Name\": \"" + config.getName() + "\", \"Service.Name\": \"" + info.serviceName() + "\" }");
+		return "";
+	}
+
+	plot->setConfig(config);
+	plot->refresh();
 
 	return "";
 }
 
 std::string ExternalServicesComponent::handleResult1DPropertiesChanged(ot::JsonDocument& _document) {
+	/*
 	ak::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
 	ot::UIDList entityIDs = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_ITM_ID);
 	ot::UIDList entityVersions = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_ITM_Version);
@@ -3865,7 +3834,7 @@ std::string ExternalServicesComponent::handleResult1DPropertiesChanged(ot::JsonD
 		ViewerAPI::visualizationResult1DPropertiesChanged(visModelID, entityID, *entityVersion);
 		entityVersion++;
 	}
-
+	*/
 	return "";
 }
 
