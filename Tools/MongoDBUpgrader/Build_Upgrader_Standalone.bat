@@ -1,4 +1,4 @@
-@echo on
+@echo off
 REM This script requires the following environment variables to be set:
 REM 1. OPENTWIN_DEV_ROOT
 REM 2. OPENTWIN_THIRDPARTY_ROOT
@@ -23,8 +23,6 @@ MKDIR "%OT_INSTALLUPGRADER_DIR%"
 
 REM Getting the path for NSIS make
 set NSIS_REG_KEY=HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\NSIS
-set SEVENZIP_REG_KEY=HKEY_CURRENT_USER\SOFTWARE\7-Zip
-set SEVENZIP_VALUE=Path
 
 set "NSIS_REG_VALUE="
 
@@ -32,7 +30,6 @@ for /f "tokens=2,*" %%a in ('reg query "%NSIS_REG_KEY%" /ve 2^>nul') do (
     set "NSIS_REG_VALUE=%%b"
 )
 
-for /f "tokens=2*" %%a in ('reg query "%SEVENZIP_REG_KEY%" /v "%SEVENZIP_VALUE%" 2^>nul') do set SEVENZIP_REG_DATA=%%b
 
 Set MAKENSIS_PATH="!NSIS_REG_VALUE!\makensis.exe"
 
@@ -48,12 +45,6 @@ MKDIR "%OT_INSTALLUPGRADER_DIR%\MongoDB_Server"
 MKDIR "%OT_INSTALLUPGRADER_DIR%\MongoDB_Installer"
 MKDIR "%OT_INSTALLUPGRADER_DIR%\Upgrader_Exe"
 
-if "!SEVENZIP_REG_DATA!"=="" (
-	echo ERROR: 7Zip is not installed on your system!
-	GOTO END_FAIL
-)	else (
-	echo 7Zip Installation verified in '!SEVENZIP_REG_DATA!'...
-)
 
 if "!NSIS_REG_VALUE!"=="" (
     echo NSIS Installation not found!
@@ -71,7 +62,7 @@ if "!NSIS_REG_VALUE!"=="" (
 echo +++ COMPILE TIME +++
 
 	echo Extracting Third Party Toolchain using 7-Zip...
-	"!SEVENZIP_REG_DATA!\7z.exe" x !THIRDPARTY_ZIPFILE! -o!THIRDPARTY_UNZIP_PATH! -y
+	"!OPENTWIN_THIRDPARTY_ROOT!\7-Zip\Win64\7z.exe" x !THIRDPARTY_ZIPFILE! -o!THIRDPARTY_UNZIP_PATH! -y
 
 	REM First we build and copy the c++ executable
 	CALL "%UPGRADER_EXE%build.bat" BOTH REBUILD
