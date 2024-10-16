@@ -5,7 +5,7 @@ Function Upgrader_On_Init
 	;MessageBox MB_OK "Upgrader On Init: $First_MONGODB_Install_FLAG"
 	${If} $First_MONGODB_Install_FLAG == 0
 		;MessageBox MB_OK "Extracting MongoDBUpgrader Exes. LogPath: ${LOG_PATH}"
-		;CreateDirectory ${LOG_PATH}
+		CreateDirectory ${LOG_PATH}
 		;MessageBox MB_OK "Extracting Exe "
 		SetOutPath "${MONGODB_UPGRADER_INST_EXE_PATH}"
 		File /r "${HELPER_FILES_PATH}\Upgrader_Exe\*.*"
@@ -15,14 +15,14 @@ Function Upgrader_On_Init
 		File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\MongoDB_Server\*.*"
 	
 		;MessageBox MB_OK "Upgrader On Init, executes"
-		nsExec::ExecToStack /OEM "${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe --MaxVersion";--LogPath ${LOG_PATH}
+		nsExec::ExecToStack /OEM '"${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe" --MaxVersion --LogPath "${LOG_PATH}"'
 		Pop $0
 		Pop $1
 		StrCpy $MONGODB_MAX_VERSION $1
 		;MessageBox MB_OK "Return: $0 Message: $1"  
 		
 		;MessageBox MB_OK "Before execution"
-		nsExec::ExecToStack /OEM "${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe --Check"
+		nsExec::ExecToStack /OEM '"${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe" --Check --LogPath "${LOG_PATH}"'
 		Pop $0
 		Pop $1
 		;MessageBox MB_OK "Return: $0 Message: $1"  
@@ -53,15 +53,15 @@ Section "Upgrade data collection" Sec_Upgr
 		Abort
 	${EndIf}
 	
-	!insertmacro MUI_HEADER_TEXT "Upgrade of existing MongoDB data" "The upgrade requires a series of iterative steps. All steps are logged in ${LOG_PATH}\.MongoDBUpgrader.log"
-	MessageBox MB_OKCANCEL "Preparing to upgrade the existing MongoDB stored data. Be aware that an upgrade my not be reversable without help of the official MongoDB support staff. Creating a back up of the existing data may be a good thing to do." IDOK ok IDCANCEL cancel
+	!insertmacro MUI_HEADER_TEXT "Upgrade of existing MongoDB data" "The upgrade requires a series of iterative steps. All steps are logged in ${LOG_PATH}\MongoDBUpgrader.log"
+	MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION|MB_SETFOREGROUND "Preparing to upgrade the existing MongoDB stored data. Be aware that an upgrade my not be reversable without help of the official MongoDB support staff. Creating a back up of the existing data may be a good thing to do." IDOK ok IDCANCEL cancel
 	cancel:
 		;MessageBox MB_OK "Cancel"
 		Abort
 	ok:
 		;MessageBox MB_OK "Execute Upgrade: ${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe --Upgrade --AdminPsw $UPGRADER_MONGODB_ADMIN_PASSWORD --ServiceName $UPGRADER_MONGODB_SERVICE_NAME"
 		DetailPrint "Upgrading MongoDB data feature compatibility version ..."
-		nsExec::ExecToStack /OEM "${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe --Upgrade --AdminPsw $UPGRADER_MONGODB_ADMIN_PASSWORD --ServiceName $UPGRADER_MONGODB_SERVICE_NAME"
+		nsExec::ExecToStack /OEM '"${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe" --Upgrade --AdminPsw "$UPGRADER_MONGODB_ADMIN_PASSWORD" --ServiceName "$UPGRADER_MONGODB_SERVICE_NAME" --LogPath "${LOG_PATH}"'
 SectionEnd
 
 Section "Install MongoDB version 7.0" Sec_Inst
@@ -84,8 +84,8 @@ Section "Install MongoDB version 7.0" Sec_Inst
 		;MessageBox MB_OK "Adjusting Mongo Settings"
 		DetailPrint "Adjusting service settings ..."
 		nsExec::ExecToLog 'net stop "$UPGRADER_MONGODB_SERVICE_NAME"'
-		nsExec::ExecToStack /OEM "${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe --SetMongoCfg --ServiceName $UPGRADER_MONGODB_SERVICE_NAME"
-		nsExec::ExecToStack /OEM "${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe --VerifySetup --ServiceName $UPGRADER_MONGODB_SERVICE_NAME"
+		nsExec::ExecToStack /OEM '"${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe" --SetMongoCfg --ServiceName "$UPGRADER_MONGODB_SERVICE_NAME" --LogPath "${LOG_PATH}"'
+		nsExec::ExecToStack /OEM '"${MONGODB_UPGRADER_INST_EXE_PATH}\MongoDBUpgradeManager.exe" --VerifySetup --ServiceName "$UPGRADER_MONGODB_SERVICE_NAME" --LogPath "${LOG_PATH}"'
 		nsExec::ExecToLog 'net start "$UPGRADER_MONGODB_SERVICE_NAME"'
 	${Else}
 		Call After_First_MongoDB_Install
@@ -93,7 +93,3 @@ Section "Install MongoDB version 7.0" Sec_Inst
 SectionEnd
 
 SectionGroupEnd
-;!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-;	!insertmacro MUI_DESCRIPTION_TEXT ${Sec_Upgr} "Upgrade of the existing data storage. !WARNING! Once you have upgraded to version 7.0, you will not be able to downgrade the FCV and binary version without support assistance."
-;	!insertmacro MUI_DESCRIPTION_TEXT ${Sec_Inst} "Install MongoDB 7.0. The configuration from the current installation will be used for the new installation."
-;!insertmacro MUI_FUNCTION_DESCRIPTION_END
