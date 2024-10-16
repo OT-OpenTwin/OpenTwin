@@ -36,3 +36,8 @@ DEL buildLog_Nightly.txt
 
 CALL BatchBuildAndDeploy.bat > buildLog_Nightly.txt 2>&1
 
+if %ERRORLEVEL% equ 0 (
+	.\SendBuildEmailNotification.ps1 SUCCESSFUL
+) else (
+	.\SendBuildEmailNotification.ps1 FAILED
+)
