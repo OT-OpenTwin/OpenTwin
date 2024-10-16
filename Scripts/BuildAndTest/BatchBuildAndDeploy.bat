@@ -54,14 +54,14 @@ if %errorlevel%==0 (
 ECHO ===================================================================
 ECHO ERROR: Build failed
 ECHO ===================================================================
-exit 1
+exit /b 1
 )
 findstr /c:"2 failed" < buildLog_Summary.txt
 if %errorlevel%==0 (
 ECHO ===================================================================
 ECHO ERROR: Build failed
 ECHO ===================================================================
-exit 1
+exit /b 1
 )
 
 ECHO ===================================================================
@@ -92,4 +92,4 @@ ECHO ===================================================================
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
 "%OPENTWIN_THIRDPARTY_ROOT%\WinSCP\WinSCP.com" /ini=nul /script="%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BatchBuildAndDeploy.txt"
 
-exit 0
+exit /b 0
