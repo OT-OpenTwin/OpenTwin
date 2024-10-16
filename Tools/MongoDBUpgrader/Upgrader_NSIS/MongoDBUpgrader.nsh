@@ -53,7 +53,7 @@ Section "Upgrade data collection" Sec_Upgr
 		Abort
 	${EndIf}
 	
-	!insertmacro MUI_HEADER_TEXT "Upgrade of existing MongoDB data" "The upgrade requires a series of iterative steps. All steps are logged in ${LOG_PATH}\.MongoDBUpgrader.log"
+	!insertmacro MUI_HEADER_TEXT "Upgrade of existing MongoDB data" "The upgrade requires a series of iterative steps. All steps are logged in ${LOG_PATH}\MongoDBUpgrader.log"
 	MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION|MB_SETFOREGROUND "Preparing to upgrade the existing MongoDB stored data. Be aware that an upgrade my not be reversable without help of the official MongoDB support staff. Creating a back up of the existing data may be a good thing to do." IDOK ok IDCANCEL cancel
 	cancel:
 		;MessageBox MB_OK "Cancel"
