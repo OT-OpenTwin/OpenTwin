@@ -7,11 +7,12 @@ $smtpServer = "smtp.gmail.com"
 $smtpFrom = "opentwin.buildauto@gmail.com"
 $smtpTo = $env:OPEN_TWIN_EMAIL_LIST
 $messageSubject = "OpenTwin Nightly Build $BuildResult"
-$messageBody = Get-Content -Raw -Path "$env:OPENTWIN_DEV_ROOT\Scripts\BuildAndTest\buildLog_Nightly.txt"
+$messageBody = "This is an automatically generated email from the nightly OpenTwin build.\nPlease take a look at the attachements for more detailed information"
 $smtpUsername = "opentwin.buildauto@gmail.com"
 $smtpPassword = $env:OPEN_TWIN_EMAIL_PWD
-$attachmentPath1 = "$env:OPENTWIN_DEV_ROOT\Scripts\BuildAndTest\buildLog_Release.txt"
-$attachmentPath2 = "$env:OPENTWIN_DEV_ROOT\Scripts\BuildAndTest\buildLog_Debug.txt"
+$attachmentPath1 = "$env:OPENTWIN_DEV_ROOT\Scripts\BuildAndTest\buildLog_Nightly.txt"
+$attachmentPath2 = "$env:OPENTWIN_DEV_ROOT\Scripts\BuildAndTest\buildLog_Release.txt"
+$attachmentPath3 = "$env:OPENTWIN_DEV_ROOT\Scripts\BuildAndTest\buildLog_Debug.txt"
 
 # Create email message
 $message = New-Object system.net.mail.mailmessage
@@ -24,8 +25,10 @@ $message.IsBodyHtml = $false
 # Add attachment
 $attachment1 = New-Object System.Net.Mail.Attachment($attachmentPath1)
 $attachment2 = New-Object System.Net.Mail.Attachment($attachmentPath2)
+$attachment3 = New-Object System.Net.Mail.Attachment($attachmentPath3)
 $message.Attachments.Add($attachment1)
 $message.Attachments.Add($attachment2)
+$message.Attachments.Add($attachment3)
 
 # Set up SMTP client
 $smtp = New-Object Net.Mail.SmtpClient($smtpServer, 587)
