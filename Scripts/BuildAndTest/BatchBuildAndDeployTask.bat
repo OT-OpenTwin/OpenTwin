@@ -26,6 +26,16 @@ IF "%OPENTWIN_FTP_PASSWORD%" == "" (
 	goto PAUSE_END
 )
 
+IF "%OPEN_TWIN_EMAIL_LIST%" == "" (
+	ECHO Please specify the following environment variables: OPEN_TWIN_EMAIL_LIST
+	goto PAUSE_END
+)
+
+IF "%OPEN_TWIN_EMAIL_PWD%" == "" (
+	ECHO Please specify the following environment variables: OPEN_TWIN_EMAIL_PWD
+	goto PAUSE_END
+)
+
 ECHO ===================================================================
 ECHO Start the build and deploy batch script
 ECHO ===================================================================
