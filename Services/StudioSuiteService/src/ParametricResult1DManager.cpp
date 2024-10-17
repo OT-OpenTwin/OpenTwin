@@ -64,8 +64,11 @@ void ParametricResult1DManager::extractData(Result1DManager& result1DManager)
 			std::list<DatasetDescription>	curveDescriptions = extractDataDescriptionCurve(category, runIDContainer,runID);
 			m_allDataDescriptions.splice(m_allDataDescriptions.end(), std::move(curveDescriptions));
 		}
-		DatasetDescription sparameterDescriptions = extractDataDescriptionSParameter("1D Results/S-Parameters", runIDContainer,runID);
-		m_allDataDescriptions.push_back(std::move(sparameterDescriptions));
+		DatasetDescription sparameterDescriptions;
+		if (extractDataDescriptionSParameter("1D Results/S-Parameters", runIDContainer, runID, sparameterDescriptions))
+		{
+			m_allDataDescriptions.push_back(std::move(sparameterDescriptions));
+		}
 	}
 }
 
@@ -192,14 +195,13 @@ std::list<DatasetDescription>  ParametricResult1DManager::extractDataDescription
 	return allCurveDescriptions;
 }
 
-DatasetDescription ParametricResult1DManager::extractDataDescriptionSParameter(const std::string& _category, RunIDContainer* _runIDContainer, int _runID)
+bool ParametricResult1DManager::extractDataDescriptionSParameter(const std::string& _category, RunIDContainer* _runIDContainer, int _runID, DatasetDescription &dataDescription)
 {
 	std::map<std::string, Result1DData*> categoryResults = _runIDContainer->getResultsForCategory(_category);
 	if (!categoryResults.empty())
 	{
 		//We determine the characteristics that are shared by all curves.
 		auto allParameterDescriptions = extractParameterDescription(_category, _runIDContainer, _runID);
-		DatasetDescription dataDescription;
 
 		dataDescription.addParameterDescriptions(allParameterDescriptions);
 
@@ -241,11 +243,11 @@ DatasetDescription ParametricResult1DManager::extractDataDescriptionSParameter(c
 			}
 		}
 		dataDescription.setQuantityDescription(quantityDescription.release());
-		return dataDescription;
+		return true;
 	}
 	else
 	{
-		return DatasetDescription();
+		return false;
 	}
 }
 
