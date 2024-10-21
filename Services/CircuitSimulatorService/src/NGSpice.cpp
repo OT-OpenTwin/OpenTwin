@@ -58,7 +58,9 @@ void NGSpice::clearBufferStructure(std::string name)
 	this->netlistNameToCustomNameMap.clear();
 	Numbers::nodeNumber = 1;
 	SimulationResults::getInstance()->getResultMap().clear();
+	ngSpice_Command(const_cast<char*>("show"));
 	ngSpice_Command(const_cast<char*>("reset"));
+	
 	//ngSpice_Init(MySendCharFunction, MySendStat, MyControlledExit, MySendDataFunction, MySendInitDataFunction, nullptr, nullptr);
 }
 
@@ -732,6 +734,7 @@ bool NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 		if (vectorVoltageSource == it->second.getMapOfEntityBlcks().end())
 		{
 			OT_LOG_E("No VoltageSource found at connection Algorithm");
+			return false;
 		}
 		std::set<ot::UID> visitedElements; // Initialize visited set
 
@@ -1200,6 +1203,7 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 //Callback Functions for NGSpice
 int NGSpice::MySendCharFunction(char* output, int ident, void* userData)
 {
+	
 	Application::instance()->uiComponent()->displayMessage(std::string(output) + "\n");
 
 	return 0;

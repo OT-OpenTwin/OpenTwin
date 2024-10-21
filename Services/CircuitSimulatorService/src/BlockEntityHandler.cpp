@@ -596,6 +596,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 
 			std::string yLabel = name;
 			EntityResult1DCurve* curve=nullptr;
+			
 			if (yLabel.find("V(") != std::string::npos || yLabel.find("vd_") != std::string::npos)
 			{
 				yLabel = "Voltage";
