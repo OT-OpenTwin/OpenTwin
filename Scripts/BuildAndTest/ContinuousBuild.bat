@@ -32,11 +32,11 @@ ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%"
 git pull
-for /f "delims=" %A in ('call git rev-parse --short HEAD') do set OT_VERSION=%A
+for /f "delims=" %%A in ('call git rev-parse --short HEAD') do set OT_VERSION=%%A
 
 cd /D "%OPENTWIN_THIRDPARTY_ROOT%"
 git pull
-for /f "delims=" %A in ('call git rev-parse --short HEAD') do set THIRD_PARTY_VERSION=%A
+for /f "delims=" %%A in ('call git rev-parse --short HEAD') do set THIRD_PARTY_VERSION=%%A
 
 set OT_VERSION_STRING=%OT_VERSION%:%THIRD_PARTY_VERSION%
 
