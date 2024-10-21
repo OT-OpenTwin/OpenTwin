@@ -153,8 +153,12 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _isUpdat
 	if (!_isUpdate) {
 		this->setTextEditorName(_config.getName());
 		this->setTextEditorTitle(QString::fromStdString(_config.getTitle()));
-		this->setCode(QString::fromStdString(_config.getPlainText()));
-		this->setContentChanged(true);
+
+		QString newText = QString::fromStdString(_config.getPlainText());
+		newText.remove('\r');
+		if (newText != this->toPlainText()) {
+			this->setCode(newText);
+		}
 	}
 	this->storeSyntaxHighlighter(newHighlighter);
 	
@@ -226,8 +230,7 @@ void ot::TextEditor::setCode(const QString& _text) {
 		m_syntaxHighlighter->blockSignals(true);
 	}
 	this->blockSignals(true);
-
-	
+		
 	this->setPlainText(_text);
 	this->document()->clearUndoRedoStacks();
 
@@ -237,6 +240,8 @@ void ot::TextEditor::setCode(const QString& _text) {
 		m_syntaxHighlighter->blockSignals(tmpSyn);
 	}
 	this->blockSignals(tmp);
+
+	this->setContentChanged(true);
 }
 
 void ot::TextEditor::setCode(const QStringList& _lines) {
@@ -259,6 +264,8 @@ void ot::TextEditor::setCode(const QStringList& _lines) {
 		m_syntaxHighlighter->blockSignals(tmpSyn);
 	}
 	this->blockSignals(tmp);
+
+	this->setContentChanged(true);
 }
 
 QStringList ot::TextEditor::code(void) const {
@@ -380,8 +387,7 @@ void ot::TextEditor::slotSaveRequested(void) {
 }
 
 void ot::TextEditor::slotTextChanged(void) {
-	m_contentChanged = true;
-	this->contentChanged();
+	this->setContentChanged(true);
 }
 
 void ot::TextEditor::slotFindRequested(void) {
