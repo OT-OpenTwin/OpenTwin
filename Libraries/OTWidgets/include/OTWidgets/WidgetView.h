@@ -72,6 +72,8 @@ namespace ot {
 		//! @brief Returns the widget view title that is currently displayed
 		QString getCurrentViewTitle(void) const;
 
+		void setAsCurrentViewTab(void);
+
 	protected:
 
 		//! @brief Call this function as soon as the widget for this view is created to add it to the dock

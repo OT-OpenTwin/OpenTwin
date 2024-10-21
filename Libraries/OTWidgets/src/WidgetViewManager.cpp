@@ -207,7 +207,7 @@ void ot::WidgetViewManager::setCurrentView(const std::string& _viewName) {
 	WidgetView* view = this->findView(_viewName);
 	if (!view) return;
 
-	view->getViewDockWidget()->setAsCurrentTab();
+	view->setAsCurrentViewTab();
 }
 
 std::string ot::WidgetViewManager::saveState(int _version) const {
