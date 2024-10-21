@@ -42,7 +42,8 @@ ot::TextEncoding::EncodingStandard ot::EncodingGuesser::operator()(const char* f
 ot::TextEncoding::EncodingStandard ot::EncodingGuesser::operator()(const std::vector<char>& fileContent)
 {
 	uint64_t numberOfBytes = fileContent.size();
-	return operator()(&fileContent[0], numberOfBytes);
+	if (numberOfBytes == 0) return TextEncoding::UTF8;
+	else return operator()(&fileContent[0], numberOfBytes);
 }
 
 bool ot::EncodingGuesser::CheckIfISO(byte* fileContent, int64_t numberOfBytes)
