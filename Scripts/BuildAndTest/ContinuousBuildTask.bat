@@ -49,7 +49,7 @@ CALL ContinuousBuild.bat > buildLog_Continuous.txt 2>&1
 if %ERRORLEVEL% equ 1 (
 	powershell.exe -ExecutionPolicy Bypass -File "SendContiBuildEmailNotification.ps1" "FAILED"
 ) else (
-	if %ERRORLEVEL% equ 2 (
+	if %ERRORLEVEL% equ 0 (
 		powershell.exe -ExecutionPolicy Bypass -File "SendContiBuildEmailNotification.ps1" "SUCCESSFUL"
 	)
 )
