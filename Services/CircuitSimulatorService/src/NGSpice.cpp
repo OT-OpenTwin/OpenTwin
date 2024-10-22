@@ -80,6 +80,11 @@ bool NGSpice::connectionAlgorithmWithGNDElement(std::string startingElement,int 
 		OT_LOG_E("No Connections at Algorithm with GND Element!");
 		return false;
 	}
+	else if (element->getClassName() != "EntityBlockCircuitGND" && connections.size() < 2)
+	{
+		OT_LOG_E("Circuit is not complete pls check the connections");
+		return false;
+	}
 	//Check if Element already exists
 	if (checkIfElementOrConnectionVisited(visitedElements,elementUID))
 	{
@@ -124,7 +129,10 @@ bool NGSpice::connectionAlgorithmWithGNDElement(std::string startingElement,int 
 			handleWithConnectors(nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 
 			
-			connectionAlgorithmWithGNDElement(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+			if (!connectionAlgorithmWithGNDElement(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements))
+			{
+				return false;
+			}
 		}
 		else
 		{
@@ -140,7 +148,10 @@ bool NGSpice::connectionAlgorithmWithGNDElement(std::string startingElement,int 
 					nextElementUID = myConn.getOriginUid();
 				}
 
-				connectionAlgorithmWithGNDElement(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+				if (!connectionAlgorithmWithGNDElement(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements))
+				{
+					return false;
+				}
 			}
 			else {
 				setNodeNumbers(myConn);
@@ -156,7 +167,10 @@ bool NGSpice::connectionAlgorithmWithGNDElement(std::string startingElement,int 
 				else {
 					nextElementUID = myConn.getOriginUid();
 				}
-				connectionAlgorithmWithGNDElement(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+				if (!connectionAlgorithmWithGNDElement(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements))
+				{
+					return false;
+				}
 			}
 
 			
@@ -180,6 +194,11 @@ bool NGSpice::connectionAlgorithmWithGNDVoltageSource(std::string startingElemen
 	if (connections.empty())
 	{
 		OT_LOG_E("No Connections at Algorithm with GND Voltage Source! ");
+		return false;
+	}
+	else if (element->getClassName() != "EntityBlockCircuitGND" && connections.size() < 2)
+	{
+		OT_LOG_E("Circuit is not complete pls check the connections");
 		return false;
 	}
 
@@ -226,7 +245,10 @@ bool NGSpice::connectionAlgorithmWithGNDVoltageSource(std::string startingElemen
 			handleWithConnectors(nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
 
 
-			connectionAlgorithmWithGNDVoltageSource(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+			if (!connectionAlgorithmWithGNDElement(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements))
+			{
+				return false;
+			}
 		}
 		else
 		{
@@ -242,7 +264,10 @@ bool NGSpice::connectionAlgorithmWithGNDVoltageSource(std::string startingElemen
 					nextElementUID = myConn.getOriginUid();
 				}
 
-				connectionAlgorithmWithGNDVoltageSource(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+				if (!connectionAlgorithmWithGNDElement(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements))
+				{
+					return false;
+				}
 			}
 			else {
 				setNodeNumbers(myConn);
@@ -258,7 +283,10 @@ bool NGSpice::connectionAlgorithmWithGNDVoltageSource(std::string startingElemen
 				else {
 					nextElementUID = myConn.getOriginUid();
 				}
-				connectionAlgorithmWithGNDVoltageSource(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements);
+				if (!connectionAlgorithmWithGNDVoltageSource(startingElement, counter, startingElementUID, nextElementUID, allConnectionEntities, allEntitiesByBlockID, editorname, visitedElements))
+				{
+					return false;
+				}
 			}
 		}
 	}
@@ -474,7 +502,7 @@ bool NGSpice::setNodeNumbersOfVoltageSource(std::string startingElement, int cou
 		connectionsToBeSet.push_back(myConn);
 	}
 
-	if (connectionsToBeSet.empty())
+	if (connectionsToBeSet.empty() || connectionsToBeSet.size() < 2)
 	{
 		OT_LOG_E("No connections to be set!");
 		return false;
@@ -1163,8 +1191,7 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 		std::list<std::string> enabled;
 
 		std::list<std::string> disabled;
-		/*disabled.push_back("Circuit Simulator:Simulate:New Simulation");
-		m_uiComponent->setControlsEnabledState(enabled, disabled);*/
+
 
 	}
 	else if (status == 1)
@@ -1172,8 +1199,7 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 		OT_LOG_E("Something went wrong");
 	}
 
-    //int result = ngSpice_Command(const_cast<char*>("show"));
-	//ngSpice_Command(const_cast<char*>("reset"));
+
 	if (!updateBufferClasses(allConnectionEntities, allEntitiesByBlockID, editorname))
 	{
 		return "failed";
