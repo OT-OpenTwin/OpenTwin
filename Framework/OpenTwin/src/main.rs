@@ -108,15 +108,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
     
     let download_route = warp::path::end()
         .map(|| warp::reply::html(get_download_html_body()));
-    
-    
+
+    let installer_route = warp::path("installer")
+        .and(warp::fs::file(concat!(env!("OPENTWIN_DEV_ROOT"), "/Framework/OpenTwin/requests.http")));
+
+    let downloadPage_installer_route = download_route.or(installer_route);
+
     tokio::task::spawn(async move {
-        warp::serve(download_route) 
+        warp::serve(downloadPage_installer_route)
         .run(([127, 0, 0, 1], 80))
         .await;
     });
     
-    let info_route = warp::path::end().map(move || {
+    let info_route = warp::path::end()
+        .map(move || {
 		
 		let dll_file_name = Path::new(GLOBAL.get()).file_name().unwrap().to_str();
 		let service_name = Path::new(dll_file_name.unwrap()).file_stem().unwrap().to_str();
@@ -127,7 +132,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
             StatusCode::CREATED,
         );
 	});
-    
 
     let execute_route = warp::path("execute").and(
         warp::post()
@@ -435,7 +439,9 @@ fn get_download_html_body() -> String {
             KoCFLklSAf4/G8ayBHfTCwQAAAAASUVORK5CYII=\">
 
             <div id=\"welcome_txt\">Welcome to OpenTwin</div>
-            <button id=\"download_btn\">Download</button>
+            <a href=\"http://127.0.0.1:80/installer/requests.http\" download=\"installer\">
+                <button id=\"download_btn\">Download</button>
+            </a>
 
             <style>
                 body {
@@ -481,11 +487,5 @@ fn get_download_html_body() -> String {
                     background-color: #2f5c92;
                 }
             </style>
-
-            <script type=\"text/javascript\">
-                document.getElementById(\"download_btn\").addEventListener(\"click\", () => {
-                    alert(\"Downloading Installer...\");
-                }, false);
-            </script>
         </body>".to_string()
 }
