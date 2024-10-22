@@ -108,6 +108,15 @@ public:
 	void setValue(double _value);
 	double getValue(void) const { return m_value; };
 
+	void setRange(double _min, double _max);
+	void setMin(double _min);
+	double getMin(void) const { return m_min; };
+	void setMax(double _max);
+	double getMax(void) const { return m_max; };
+
+	void setAllowCustomValues(bool _allowCustomValues);
+	bool getAllowCustomValues(void) const { return m_allowCustomValues; };
+
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
@@ -122,6 +131,9 @@ public:
 
 private:
 	double m_value;
+	bool m_allowCustomValues;
+	double m_min;
+	double m_max;
 };
 
 // ################################################################################################################################################################
@@ -145,6 +157,15 @@ public:
 	void setValue(long _value);
 	long getValue(void) const { return m_value; };
 
+	void setRange(long _min, long _max);
+	void setMin(long _min);
+	long getMin(void) const { return m_min; };
+	void setMax(long _max);
+	long getMax(void) const { return m_max; };
+
+	void setAllowCustomValues(bool _allowCustomValues);
+	bool getAllowCustomValues(void) const { return m_allowCustomValues; };
+
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
@@ -159,6 +180,9 @@ public:
 
 private:
 	long m_value;
+	bool m_allowCustomValues;
+	long m_min;
+	long m_max;
 };
 
 // ################################################################################################################################################################
