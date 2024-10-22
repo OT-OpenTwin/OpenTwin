@@ -102,6 +102,32 @@ bool EntityPropertiesBase::needsUpdate(void)
 
 // ################################################################################################################################################################
 
+EntityPropertiesDouble::EntityPropertiesDouble() 
+	: m_value(0.)
+{
+
+}
+
+EntityPropertiesDouble::EntityPropertiesDouble(const std::string& _name, double _value) 
+	: m_value(_value)
+{
+	this->setName(_name);
+}
+
+EntityPropertiesDouble::EntityPropertiesDouble(const EntityPropertiesDouble& _other) 
+	: EntityPropertiesBase(_other)
+{
+	m_value = _other.m_value;
+}
+
+EntityPropertiesDouble& EntityPropertiesDouble::operator=(const EntityPropertiesDouble& _other) {
+	if (&_other != this) {
+		EntityPropertiesBase::operator=(_other);
+		m_value = _other.getValue();
+	}
+	return *this;
+}
+
 void EntityPropertiesDouble::createProperty(const std::string &group, const std::string &name, double defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
 	// Load the template defaults if any
@@ -116,7 +142,7 @@ void EntityPropertiesDouble::createProperty(const std::string &group, const std:
 
 void EntityPropertiesDouble::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root)
 {
-	ot::PropertyDouble* newProp = new ot::PropertyDouble(this->getName(), value);
+	ot::PropertyDouble* newProp = new ot::PropertyDouble(this->getName(), m_value);
 	newProp->setPropertyFlag(ot::Property::AllowCustomValues);
 	this->setupPropertyData(_configuration, newProp);
 }
@@ -137,9 +163,7 @@ void EntityPropertiesDouble::addToJsonDocument(ot::JsonDocument& jsonDoc, Entity
 	ot::JsonObject container;
 	EntityPropertiesBase::addBaseDataToJsonDocument(container, jsonDoc.GetAllocator(), "double");
 
-	container.AddMember("Value", value, jsonDoc.GetAllocator());
-
-	rapidjson::Value::StringRefType jsonName(getName().c_str());
+	container.AddMember("Value", m_value, jsonDoc.GetAllocator());
 
 	jsonDoc.AddMember(ot::JsonString(this->getName(), jsonDoc.GetAllocator()), container, jsonDoc.GetAllocator());
 }
@@ -164,6 +188,13 @@ void EntityPropertiesDouble::copySettings(EntityPropertiesBase *other, EntityBas
 	}
 }
 
+void EntityPropertiesDouble::setValue(double _value) {
+	if (m_value != _value) {
+		this->setNeedsUpdate();
+		m_value = _value;
+	}
+}
+
 bool EntityPropertiesDouble::hasSameValue(EntityPropertiesBase* other)
 {
 	EntityPropertiesDouble* entity = dynamic_cast<EntityPropertiesDouble*>(other);
@@ -174,6 +205,30 @@ bool EntityPropertiesDouble::hasSameValue(EntityPropertiesBase* other)
 }
 
 // ################################################################################################################################################################
+
+EntityPropertiesInteger::EntityPropertiesInteger() 
+	: m_value(0)
+{}
+
+EntityPropertiesInteger::EntityPropertiesInteger(const std::string& _name, long _value)
+	: m_value(_value)
+{
+	this->setName(_name);
+}
+
+EntityPropertiesInteger::EntityPropertiesInteger(const EntityPropertiesInteger& _other) 
+	: EntityPropertiesBase(_other)
+{
+	m_value = _other.getValue();
+}
+
+EntityPropertiesInteger& EntityPropertiesInteger::operator=(const EntityPropertiesInteger& _other) {
+	if (&_other != this) {
+		EntityPropertiesBase::operator=(_other);
+		m_value = _other.getValue();
+	}
+	return *this;
+}
 
 void EntityPropertiesInteger::createProperty(const std::string &group, const std::string &name, long defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
@@ -189,7 +244,7 @@ void EntityPropertiesInteger::createProperty(const std::string &group, const std
 
 void EntityPropertiesInteger::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root)
 {
-	ot::PropertyInt* newProp = new ot::PropertyInt(this->getName(), value);
+	ot::PropertyInt* newProp = new ot::PropertyInt(this->getName(), m_value);
 	this->setupPropertyData(_configuration, newProp);
 }
 
@@ -204,21 +259,15 @@ void EntityPropertiesInteger::setFromConfiguration(const ot::Property* _property
 	setValue(actualProperty->getValue());
 }
 
-void EntityPropertiesInteger::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
-{
-	rapidjson::Document::AllocatorType& allocator = jsonDoc.GetAllocator();
+void EntityPropertiesInteger::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) {
+	ot::JsonAllocator& allocator = jsonDoc.GetAllocator();
 
-	rapidjson::Value container(rapidjson::kObjectType);
-
+	ot::JsonObject container;
 	EntityPropertiesBase::addBaseDataToJsonDocument(container, allocator, "integer");
 
-	rapidjson::Value jsonValue(rapidjson::kNumberType);
-	jsonValue.SetInt64(value);
-	container.AddMember("Value", jsonValue, allocator);
+	container.AddMember("Value", ot::JsonNumber(m_value), allocator);
 
-	rapidjson::Value::StringRefType jsonName(getName().c_str());
-
-	jsonDoc.AddMember(jsonName, container, allocator);
+	jsonDoc.AddMember(ot::JsonString(this->getName(), jsonDoc.GetAllocator()), container, allocator);
 }
 
 void EntityPropertiesInteger::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
@@ -238,6 +287,13 @@ void EntityPropertiesInteger::copySettings(EntityPropertiesBase *other, EntityBa
 	if (entity != nullptr)
 	{
 		setValue(entity->getValue());
+	}
+}
+
+void EntityPropertiesInteger::setValue(long _value) {
+	if (m_value != _value) {
+		this->setNeedsUpdate();
+		m_value = _value;
 	}
 }
 
