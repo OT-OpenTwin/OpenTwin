@@ -171,9 +171,16 @@ void EntityPropertiesDouble::addToJsonDocument(ot::JsonDocument& jsonDoc, Entity
 void EntityPropertiesDouble::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
 	this->setValue(ot::json::getDouble(object, "Value"));
-	this->setMin(ot::json::getDouble(object, "MinValue", std::numeric_limits<double>::lowest()));
-	this->setMax(ot::json::getDouble(object, "MaxValue", std::numeric_limits<double>::max()));
-	this->setAllowCustomValues(ot::json::getBool(object, "AllowCustom", true));
+
+	if (object.HasMember("MinValue")) {
+		this->setMin(ot::json::getDouble(object, "MinValue", std::numeric_limits<double>::lowest()));
+	}
+	if (object.HasMember("MaxValue")) {
+		this->setMax(ot::json::getDouble(object, "MaxValue", std::numeric_limits<double>::max()));
+	}
+	if (object.HasMember("AllowCustom")) {
+		this->setAllowCustomValues(ot::json::getBool(object, "AllowCustom", true));
+	}
 }
 
 void EntityPropertiesDouble::copySettings(EntityPropertiesBase *other, EntityBase *root)
@@ -319,9 +326,15 @@ void EntityPropertiesInteger::addToJsonDocument(ot::JsonDocument& jsonDoc, Entit
 void EntityPropertiesInteger::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
 	this->setValue(ot::json::getInt64(object, "Value"));
-	this->setMin(ot::json::getInt64(object, "MinValue", std::numeric_limits<long>::lowest()));
-	this->setMax(ot::json::getInt64(object, "MaxValue", std::numeric_limits<long>::max()));
-	this->setAllowCustomValues(ot::json::getBool(object, "AllowCustom", true));
+	if (object.HasMember("MinValue")) {
+		this->setMin(ot::json::getInt64(object, "MinValue", std::numeric_limits<long>::lowest()));
+	}
+	if (object.HasMember("MaxValue")) {
+		this->setMax(ot::json::getInt64(object, "MaxValue", std::numeric_limits<long>::max()));
+	}
+	if (object.HasMember("AllowCustom")) {
+		this->setAllowCustomValues(ot::json::getBool(object, "AllowCustom", true));
+	}
 }
 
 void EntityPropertiesInteger::setValue(long _value) {
