@@ -953,6 +953,20 @@ std::string Application::handleVersionDeselected(ot::JsonDocument& _document) {
 	return "";
 }
 
+std::string Application::handleSetVersionLabel(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+	}
+
+	std::string version = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
+	std::string label = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_VersionLabel);
+
+	m_model->setVersionLabel(version, label);
+
+	return "";
+}
+
 // ##################################################################################################################################################################################################################
 
 // Setter / Getter

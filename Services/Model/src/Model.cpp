@@ -1906,6 +1906,23 @@ void Model::setVersionPropertiesFromJson(const ot::PropertyGridCfg& _configurati
 	this->sendVersionGraphToUI(cfg, cfg.getActiveVersionName(), cfg.getActiveBranchVersionName());
 }
 
+void Model::setVersionLabel(const std::string& version, const std::string& label)
+{
+	ot::VersionGraphVersionCfg* versionObject = getStateManager()->getVersionGraph().findVersion(version);
+
+	if (!versionObject) {
+		OT_LOG_EAS("Selected version not found \"" + version + "\"");
+		return;
+	}
+
+	versionObject->setLabel(label);
+
+	getStateManager()->updateVersionEntity(version);
+
+	const ot::VersionGraphCfg& cfg = getStateManager()->getVersionGraph();
+	this->sendVersionGraphToUI(cfg, cfg.getActiveVersionName(), cfg.getActiveBranchVersionName());
+}
+
 void Model::deleteProperty(const std::list<ot::UID> &entityIDList, const std::string& propertyName, const std::string& propertyGroup)
 {
 	std::list<EntityBase*> entities;

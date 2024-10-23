@@ -124,6 +124,7 @@
 #define OT_ACTION_CMD_MODEL_ActivateVersion "Model.ActivateVersion"
 #define OT_ACTION_CMD_MODEL_VersionSelected "Model.VersionSelected"
 #define OT_ACTION_CMD_MODEL_VersionDeselected "Model.VersionDeselected"
+#define OT_ACTION_CMD_MODEL_SetVersionLabel "Model.SetVersionLabel"
 #define OT_ACTION_CMD_MODEL_AddPropertiesToEntities "Model.Entities.AddProperty"
 #define OT_ACTION_CMD_MODEL_UpdatePropertiesOfEntities "Model.Entities.UpdateProperty"
 #define OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER "Model.Entities.GetIdentifier"
@@ -530,6 +531,7 @@
 #define OT_ACTION_PARAM_MODEL_EntityChildrenList "Model.Entity.Children"
 #define OT_ACTION_PARAM_MODEL_State "Model.Entity.State"
 #define OT_ACTION_PARAM_MODEL_Version "Model.Version"
+#define OT_ACTION_PARAM_MODEL_VersionLabel "Model.VersionLabel"
 #define OT_ACTION_PARAM_MODEL_JSON "Model.JSON"
 #define OT_ACTION_PARAM_MODEL_ViewsForProjectType "Model.ViewsForType"
 

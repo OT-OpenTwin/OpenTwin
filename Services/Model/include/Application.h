@@ -76,6 +76,7 @@ public:
 	OT_HANDLER(handleActivateVersion, Application, OT_ACTION_CMD_MODEL_ActivateVersion, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleVersionSelected, Application, OT_ACTION_CMD_MODEL_VersionSelected, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleVersionDeselected, Application, OT_ACTION_CMD_MODEL_VersionDeselected, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleSetVersionLabel, Application, OT_ACTION_CMD_MODEL_SetVersionLabel, ot::SECURE_MESSAGE_TYPES)
 
 	// ##################################################################################################################################################################################################################
 

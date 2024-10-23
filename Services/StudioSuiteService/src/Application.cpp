@@ -478,18 +478,26 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 
 	modelComponent()->deleteEntitiesFromModel(deletedNameList, false);
 
-	modelComponent()->storeNewEntities(changeMessage, false);
+	modelComponent()->storeNewEntities("Studio Suite project uploaded", false);
 
 	// Determine the new version
 	std::string newVersion = modelComponent()->getCurrentModelVersion();
 
-	// Finally we send the new version to the frontend 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_COPY, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(newVersion, doc.GetAllocator()), doc.GetAllocator());
+	// Set the label for the new version
+	ot::JsonDocument doc1;
+	doc1.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SetVersionLabel, doc1.GetAllocator()), doc1.GetAllocator());
+	doc1.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(newVersion, doc1.GetAllocator()), doc1.GetAllocator());
+	doc1.AddMember(OT_ACTION_PARAM_MODEL_VersionLabel, ot::JsonString(changeMessage, doc1.GetAllocator()), doc1.GetAllocator());
 
 	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
+	modelComponent()->sendMessage(true, doc1, tmp);
+
+	// Finally we send the new version to the frontend 
+	ot::JsonDocument doc2;
+	doc2.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_COPY, doc2.GetAllocator()), doc2.GetAllocator());
+	doc2.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(newVersion, doc2.GetAllocator()), doc2.GetAllocator());
+
+	uiComponent()->sendMessage(true, doc2, tmp);
 }
 
 void Application::changeUnits(const std::string &content)
