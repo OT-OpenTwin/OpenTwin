@@ -323,7 +323,7 @@ void TableViewer::SetLoopRanges(uint32_t& outRowStart, uint32_t& outColumnStart,
 	_shownMinRow = _activeTable->getMinRow() - 1;
 	_shownMaxRow = _activeTable->getMaxRow() - 1;
 
-	if (numberOfRows < _shownMaxRow) //max Row lays within the possible index
+	if (numberOfRows <= _shownMaxRow) //max Row lays within the possible index
 	{
 		outRowEnd = numberOfRows - 1;
 	}
@@ -336,7 +336,7 @@ void TableViewer::SetLoopRanges(uint32_t& outRowStart, uint32_t& outColumnStart,
 		outRowEnd = _shownMaxRow;
 	}
 
-	if (numberOfColumns < _shownMaxCol) //max Row lays within the possible index
+	if (numberOfColumns <= _shownMaxCol) //max Row lays within the possible index
 	{
 		outColumnEnd = numberOfColumns - 1;
 	}
