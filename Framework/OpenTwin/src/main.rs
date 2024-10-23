@@ -104,34 +104,33 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
 	
     // GET /any path
 
-    // create endpoint for download page and start it without tls
+    let dll_file_name = Path::new(GLOBAL.get()).file_name().unwrap().to_str();
+    let service_name = Path::new(dll_file_name.unwrap()).file_stem().unwrap().to_str();
     
-    let download_route = warp::path::end()
-        .map(|| warp::reply::html(get_download_html_body()));
+    if service_name == Some("GlobalSessionService") {
+        let download_route = warp::path::end()
+            .map(|| warp::reply::html(get_download_html_body()));
 
-    let installer_route = warp::path("installer")
-        .and(warp::fs::file(concat!(env!("OPENTWIN_DEV_ROOT"), "/Framework/OpenTwin/requests.http")));
+        let installer_route = warp::path("installer")
+            .and(warp::fs::file(concat!(env!("OPENTWIN_DEV_ROOT"), "/Framework/OpenTwin/requests.http")));
 
-    let downloadPage_installer_route = download_route.or(installer_route);
+        tokio::task::spawn(async move {
+            warp::serve(download_route.or(installer_route))
+            .run(([127, 0, 0, 1], 80))
+            .await;
+        });
 
-    tokio::task::spawn(async move {
-        warp::serve(downloadPage_installer_route)
-        .run(([127, 0, 0, 1], 80))
-        .await;
-    });
+        println!("HTTP Server listening on http://127.0.0.1:80")
+    }
     
     let info_route = warp::path::end()
         .map(move || {
-		
-		let dll_file_name = Path::new(GLOBAL.get()).file_name().unwrap().to_str();
-		let service_name = Path::new(dll_file_name.unwrap()).file_stem().unwrap().to_str();
-
-        let computed_string: String = "OpenTwin Microservice (".to_string() + service_name.expect("UNKNOWN") + ")";
-        return reply::with_status(
-            computed_string,
-            StatusCode::CREATED,
-        );
-	});
+            let computed_string: String = "OpenTwin Microservice (".to_string() + service_name.expect("UNKNOWN") + ")";
+            return reply::with_status(
+                computed_string,
+                StatusCode::CREATED,
+            );
+	    });
 
     let execute_route = warp::path("execute").and(
         warp::post()
@@ -184,7 +183,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
     let binding_address = format!("0.0.0.0:{}", service_port.unwrap().to_string());
     let listener = net::TcpListener::bind(&binding_address).await?;
 
-    println!("Server listening on {:?} (publishing {:?})", binding_address, service_url);
+    println!("HTTPS Server listening on {:?} (publishing {:?})", binding_address, service_url);
 
     // Serve the routes and wait for TCP connections which are protected by mTLS
     
