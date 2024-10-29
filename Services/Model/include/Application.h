@@ -8,6 +8,7 @@
 
 // OpenTwin header
 #include "OTServiceFoundation/ApplicationBase.h"
+#include "SelectionHandler.h"
 
 // std header
 #include <list>
@@ -164,6 +165,8 @@ public:
 	//! @param The item that has been changed in the uiService (instance will be deleted after this function call).
 	virtual bool settingChanged(const ot::Property* _item) override;
 
+	SelectionHandler& getSelectionHandler() { return m_selectionHandler; }
+
 private:
 	void queueAction(ActionType _type, const ot::JsonDocument& _document);
 
@@ -183,6 +186,7 @@ private:
 	bool m_continueAsyncActionWorker;
 
 	Model* m_model;
+	SelectionHandler m_selectionHandler;
 	MicroserviceNotifier* m_notifier;
 	
 	Application();

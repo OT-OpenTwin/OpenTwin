@@ -16,6 +16,8 @@
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
 
+
+
 class EntityMesh;
 class EntityMeshTet;
 class EntityMeshCartesian;
@@ -48,15 +50,13 @@ public:
 	void			removeEntityFromMap(EntityBase *entity, bool keepInProject, bool keepParameterDependency, bool considerChildren = true);
 	void		    removeEntityWithChildrenFromMap(EntityBase *entity, bool keepInProject, bool keepParameterDependency, std::list<EntityBase*> &removedEntities);
 
-
-	EntityBase *	getEntity(ot::UID uID);
 	bool			entityExists(ot::UID uID);
 	void			getModelBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax);
 	void			setVisualizationModel(ot::UID visModelID);
 	ot::UID				getVisualizationModel(void);
 	void			executeAction(const std::string &action, ot::JsonDocument &doc);
 	void			executeFunction(const std::string &function, const std::string &fileName, bool removeFile);
-	void			modelSelectionChangedNotification(std::list<ot::UID> &selectedEntityID, std::list<ot::UID> &selectedVisibleEntityID);
+	void			modelSelectionChangedNotification(const std::list<ot::UID>& _selectedEntityID,const std::list<ot::UID>& _selectedVisibleEntityID);
 	void			modelItemRenamed(ot::UID entityID, const std::string &newName);
 	void			keySequenceActivated(const std::string &keySequence);
 	void			updateCurvesInPlot(const std::list<std::string>& curveNames, const ot::UID& plotID);
@@ -208,6 +208,7 @@ public:
 
 	void promptResponse(const std::string &type, const std::string &answer, const std::string &parameter1);
 
+	EntityBase* getEntityByID(ot::UID _entityID) const;
 
 private:
 	// Methods
@@ -248,7 +249,6 @@ private:
 	void addMenuCheckBox(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &boxName, const std::string &boxText, bool checked, ot::LockTypeFlags &flags);
 	void addMenuLineEdit(const std::string &menu, const std::string &group, const std::string &subgroup, const std::string &editName, const std::string &editText, const std::string &editLabel, ot::LockTypeFlags &flags);
 	bool isUIAvailable(void);
-	void processSelectionsForOtherOwners(std::list<ot::UID> &selectedEntities);
 	void performSpecialUpdates(EntityBase *entity);
 	void performEntityMeshUpdate(EntityMeshTet *entity);
 	void performEntityMeshUpdate(EntityMeshCartesian *entity);
@@ -286,7 +286,6 @@ private:
 	void removeVersionGraphVersions(const std::list<std::string> &versions);
 	void addNewVersionTreeStateAndActivate(const std::string& _parentVersion, const std::string& _branch, const ot::VersionGraphVersionCfg& _version);
 	void getIDsOfFolderItemsOfType(EntityContainer *container, const std::string &className, bool recursive, std::list<ot::UID> &itemList);
-	void otherOwnersNotification(std::map<std::string, std::list<ot::UID>> ownerEntityListMap);
 	size_t getNumberOfVisualizationTriangles(std::list<EntityGeometry *> geometryEntities);
 	std::list<EntityBase*> getListOfEntitiesToConsiderForPropertyChange(const std::list<EntityBase*>& entities);
 	void getEntityProperties(EntityBase* entity, bool recursive, const std::string& propertyGroupFilter, std::map<ot::UID, ot::PropertyGridCfg>& _entityProperties);
@@ -308,8 +307,7 @@ private:
 	std::map<EntityBase*, bool>	   pendingEntityUpdates;
 	
 	// Temporary attributes
-	std::list<ot::UID>				   selectedModelEntityIDs;
-	std::list<ot::UID>				   selectedVisibleModelEntityIDs;
+
 	ot::UID							   visualizationModelID;
 	bool						   isModified;
 	std::string					   projectName;
@@ -320,14 +318,13 @@ private:
 	std::map<std::string, bool>    uiSubGroupMap;
 	std::map<std::string, bool>    uiActionMap;
 	bool						   clearUiOnDelete;
-	std::list<std::string>		   ownersWithSelection;
+	
 	bool						   uiCreated;
 	bool						   versionGraphCreated;
 	std::string					   newTableItemName;
 	std::map<ot::UID, bool>		   meshingActive;
 	std::string                    m_selectedVersion;
 
-	std::atomic_bool				modelSelectionChangedNotificationInProgress;
 	std::map<std::string, std::pair<double, EntityParameter*>>  parameterMap;
 
 
