@@ -402,8 +402,7 @@ void Model::setupUIControls()
 	uiCreated = true;
 
 	// Send an initial notification to properly set the state of the new controls
-	std::list<ot::UID> selectedEntityID, selectedVisibleEntityID;
-	modelSelectionChangedNotification(selectedEntityID, selectedVisibleEntityID);
+	Application::instance()->getSelectionHandler().clearAllBuffer();
 
 	updateUndoRedoStatus();
 }
@@ -520,12 +519,6 @@ void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 	
 	else assert(0); // Unhandled button action
 }
-
-void Model::modelSelectionChangedNotification(const std::list<ot::UID>& _selectedEntityIDs, const std::list<ot::UID>& _selectedVisibleEntityIDs)
-{
-
-}
-
 
 void Model::updateUndoRedoStatus(void)
 {
@@ -897,8 +890,7 @@ void Model::setVisualizationModel(ot::UID visModelID)
 		// Request a view reset
 		Application::instance()->getNotifier()->resetAllViews(visualizationModelID);
 
-		ot::UIDList empty, emptyVisible;
-		modelSelectionChangedNotification(empty, emptyVisible);
+		Application::instance()->getSelectionHandler().clearAllBuffer();
 
 		updateVersionGraph();
 
@@ -3075,11 +3067,6 @@ void Model::reportWarning(const std::string &message)
 void Model::reportInformation(const std::string &message)
 {
 	Application::instance()->getNotifier()->reportInformation(message);
-}
-
-void Model::updateMenuStates(void)
-{
-	modelSelectionChangedNotification(Application::instance()->getSelectionHandler().getSelectedEntityIDs(), Application::instance()->getSelectionHandler().getSelectedVisibleEntityIDs());
 }
 
 void Model::showSelectedShapeInformation(void)

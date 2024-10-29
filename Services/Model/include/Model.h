@@ -56,7 +56,6 @@ public:
 	ot::UID				getVisualizationModel(void);
 	void			executeAction(const std::string &action, ot::JsonDocument &doc);
 	void			executeFunction(const std::string &function, const std::string &fileName, bool removeFile);
-	void			modelSelectionChangedNotification(const std::list<ot::UID>& _selectedEntityID,const std::list<ot::UID>& _selectedVisibleEntityID);
 	void			modelItemRenamed(ot::UID entityID, const std::string &newName);
 	void			keySequenceActivated(const std::string &keySequence);
 	void			updateCurvesInPlot(const std::list<std::string>& curveNames, const ot::UID& plotID);
@@ -188,8 +187,6 @@ public:
 
 	void addModalCommand(ModalCommandBase *command);
 	void removeModalCommand(ModalCommandBase *command);
-
-	void updateMenuStates(void);
 
 	void hideEntities(std::list<ot::UID> &hiddenEntityIDs);
 
