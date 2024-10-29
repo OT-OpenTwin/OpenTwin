@@ -43,12 +43,36 @@ std::string EntityFileText::getText(void)
 	return std::string(plainData.begin(),plainData.end());
 }
 
+void EntityFileText::setText(const std::string& _text)
+{
+	auto dataEntity = getData();
+	dataEntity->clearData();
+
+	//Ensure correct encoding at this location!
+	dataEntity->setData(_text.data(), _text.size());
+	if (getModelState() != nullptr)
+	{
+		dataEntity->StoreToDataBase();
+		getModelState()->addNewEntity(dataEntity->getEntityID(), this->getEntityID(), dataEntity->getEntityStorageVersion(), ModelStateEntity::tEntityType::DATA);
+		setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+	}
+}
+
 ot::TextEditorCfg EntityFileText::createConfig(void) {
 	ot::TextEditorCfg result;
 	result.setName(this->getName());
 	result.setTitle(this->getName());
 	result.setPlainText(this->getText());
-	result.setDocumentSyntax(ot::DocumentSyntax::PythonScript); // switch to property some day
+
+	const std::string fileType = getFileType();
+	if (fileType == "py")
+	{
+		result.setDocumentSyntax(ot::DocumentSyntax::PythonScript);
+	}
+	else
+	{
+		result.setDocumentSyntax(ot::DocumentSyntax::PlainText);
+	}
 
 	return result;
 }

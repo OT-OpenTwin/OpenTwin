@@ -2,9 +2,9 @@
 #include "EntityFile.h"
 #include "OTCore/TextEncoding.h"
 #include "OTGui/TextEditorCfg.h"
-#include "EntityInterfaceText.h"
+#include "VisualisationInterfaceText.h"
 
-class __declspec(dllexport) EntityFileText : public EntityFile, public EntityInterfaceText
+class __declspec(dllexport) EntityFileText : public EntityFile, public VisualisationInterfaceText
 {
 public:
 	EntityFileText(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
@@ -15,9 +15,12 @@ public:
 	void setTextEncoding(ot::TextEncoding::EncodingStandard encoding);
 	ot::TextEncoding::EncodingStandard getTextEncoding();
 
+	//Text visualisation interface
 	std::string getText(void) override;
-
-	ot::TextEditorCfg createConfig(void);
+	//! @brief Setting a text will change the underlying data entity. If the modelstate is set, the data entity is directly stored and added to the modelstate.
+	void setText(const std::string& _text) override;
+	bool visualiseText() override { return true; }
+	ot::TextEditorCfg createConfig() override;
 
 protected:
 	void setSpecializedProperties() override;

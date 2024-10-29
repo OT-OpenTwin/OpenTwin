@@ -370,7 +370,7 @@
     <ClInclude Include="include\EntitySolverCircuitSimulator.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="include\EntityInterfaceText.h">
+    <ClInclude Include="include\VisualisationInterfaceText.h">
       <Filter>Header Files\EntityInterfaces</Filter>
     </ClInclude>
   </ItemGroup>
