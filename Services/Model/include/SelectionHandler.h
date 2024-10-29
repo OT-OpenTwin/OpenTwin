@@ -38,5 +38,5 @@ private:
 	void createVisualisationRequests();
 	void notifyOwnerThread(const std::map<std::string, std::list<ot::UID>>& _ownerEntityListMap);
 
-	void sendTextVisualisationRequest(IVisualisationText* _textVisEntity);
+	void sendTextVisualisationRequest(IVisualisationText* _textVisEntity, const std::string& _ownerServiceName);
 };

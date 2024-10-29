@@ -652,24 +652,6 @@ void Application::HandleSelectionChanged()
 				std::string tmp;
 				uiComponent()->sendMessage(true, doc, tmp);
 			}
-			else if (entityName.find(ot::FolderNames::PythonScriptFolder) != std::string::npos)
-			{
-				EntityBase* entBase = modelComponent()->readEntityFromEntityIDandVersion(selectedEntityInfo.begin()->getID(), selectedEntityInfo.begin()->getVersion(), getClassFactory());
-				EntityFileText* fileEnt = dynamic_cast<EntityFileText*>(entBase);
-				const std::string fileContent = fileEnt->getText();
-				ot::JsonDocument uiRequest;
-				uiRequest.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, uiRequest.GetAllocator());
-				
-				ot::TextEditorCfg cfg = fileEnt->createConfig();
-				ot::JsonObject cfgObj;
-				cfg.addToJsonObject(cfgObj, uiRequest.GetAllocator());
-				uiRequest.AddMember(OT_ACTION_PARAM_Config, cfgObj, uiRequest.GetAllocator());
-
-				getBasicServiceInformation().addToJsonObject(uiRequest, uiRequest.GetAllocator());
-
-				std::string tmp;
-				uiComponent()->sendMessage(true, uiRequest, tmp);
-			}
 			else if (entityName.find(ot::FolderNames::DatasetFolder) != std::string::npos)
 			{
 				if (_visualizationModel == -1)

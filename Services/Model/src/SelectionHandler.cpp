@@ -13,7 +13,7 @@ void SelectionHandler::processSelectionChanged(const std::list<ot::UID>& _select
 	m_selectedVisibleEntityIDs = _selectedVisibleEntityIDs;
 
 	toggleButtonEnabledState();
-	//createVisualisationRequests();
+	createVisualisationRequests();
 	notifyOwners(); // ! The owners may be notified before the ui received its message. If the services react and send messages to the ui, it may not be in the expected state. Race condition.
 	
 	Application::instance()->getModel()->updatePropertyGrid();
@@ -138,7 +138,8 @@ void SelectionHandler::createVisualisationRequests()
 		IVisualisationText* textVisEntity = dynamic_cast<IVisualisationText*>(baseEntity);
 		if (textVisEntity != nullptr)
 		{
-			sendTextVisualisationRequest(textVisEntity);
+			sendTextVisualisationRequest(textVisEntity, baseEntity->getOwningService());
+
 		}
 	}
 }
@@ -157,7 +158,7 @@ void SelectionHandler::notifyOwnerThread(const std::map<std::string, std::list<o
 	m_modelSelectionChangedNotificationInProgress = false;
 }
 
-void SelectionHandler::sendTextVisualisationRequest(IVisualisationText* _textVisEntity)
+void SelectionHandler::sendTextVisualisationRequest(IVisualisationText* _textVisEntity, const std::string& _ownerServiceName)
 {
 	if (_textVisEntity->visualiseText())
 	{
@@ -169,8 +170,9 @@ void SelectionHandler::sendTextVisualisationRequest(IVisualisationText* _textVis
 		ot::JsonObject cfgObj;
 		editorCfg.addToJsonObject(cfgObj, uiRequest.GetAllocator());
 		uiRequest.AddMember(OT_ACTION_PARAM_Config, cfgObj, uiRequest.GetAllocator());
+		ot::BasicServiceInformation serviceInformation(_ownerServiceName);
+		serviceInformation.addToJsonObject(uiRequest, uiRequest.GetAllocator()); 		
 
 		Application::instance()->queuedRequestToFrontend(uiRequest);
-		//getBasicServiceInformation().addToJsonObject(uiRequest, uiRequest.GetAllocator()); 		
 	}
 }
