@@ -103,7 +103,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
     GLOBAL.set(lib_path.to_string());
 	
     // GET /any path
-
+    let download_file_path: String = if option_env!("OPENTWIN_DEV_ROOT").is_some() {
+        env!("OPENTWIN_DEV_ROOT").to_owned() + "/Framework/OpenTwin/requests.http"
+    } else {
+        std::env::current_exe().unwrap().to_str().unwrap().to_string()
+    };
     let dll_file_name = Path::new(GLOBAL.get()).file_name().unwrap().to_str();
     let service_name = Path::new(dll_file_name.unwrap()).file_stem().unwrap().to_str();
     if service_name == Some("GlobalSessionService") {
@@ -111,7 +115,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
             .map(|| warp::reply::html(get_download_html_body()));
 
         let installer_route = warp::path("installer")
-            .and(warp::fs::file(concat!(env!("OPENTWIN_DEV_ROOT"), "/Framework/OpenTwin/requests.http")));
+            .and(warp::fs::file(download_file_path));
         
         tokio::task::spawn(async move {
             warp::serve(download_route.or(installer_route))
