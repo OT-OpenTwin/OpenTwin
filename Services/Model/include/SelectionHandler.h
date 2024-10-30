@@ -23,6 +23,7 @@ public:
 	void processSelectionChanged(const std::list<ot::UID>& _selectedEntityIDs, const std::list<ot::UID>&  _selectedVisibleEntityIDs);
 	const std::atomic_bool& notificationInProcess() { return m_modelSelectionChangedNotificationInProgress; }
 	void clearAllBufferAndNotify();
+	void clearAllBuffer();
 	void deselectEntity(ot::UID _entityID, const std::string& _owner);
 
 	const std::list<ot::UID>& getSelectedEntityIDs();

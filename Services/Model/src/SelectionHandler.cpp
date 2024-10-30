@@ -24,6 +24,13 @@ void SelectionHandler::clearAllBufferAndNotify()
 	processSelectionChanged(selectecEntities, selectedVisibleEntities);
 }
 
+void SelectionHandler::clearAllBuffer()
+{
+	m_selectedEntityIDs.clear();
+	m_selectedVisibleEntityIDs.clear();
+	m_ownersWithSelection.clear();
+}
+
 void SelectionHandler::deselectEntity(ot::UID _entityID, const std::string& _owner)
 {
 	std::lock_guard<std::mutex> guard(m_changeSelectedEntitiesBuffer);

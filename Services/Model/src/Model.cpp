@@ -148,7 +148,7 @@ void Model::clearAll(void)
 	// Reset all the temporary attributes
 	entityMap.clear();
 	pendingEntityUpdates.clear();
-	Application::instance()->getSelectionHandler().clearAllBufferAndNotify();
+	Application::instance()->getSelectionHandler().clearAllBuffer();
 	parameterMap.clear();
 
 	// Now we delete all entities (recursively)
