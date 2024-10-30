@@ -3,6 +3,7 @@
 #include <atomic>
 #include <string>
 #include <map>
+#include <mutex>
 
 #include "OTCore/CoreTypes.h"
 #include "IVisualisationText.h"
@@ -21,13 +22,16 @@ public:
 
 	void processSelectionChanged(const std::list<ot::UID>& _selectedEntityIDs, const std::list<ot::UID>&  _selectedVisibleEntityIDs);
 	const std::atomic_bool& notificationInProcess() { return m_modelSelectionChangedNotificationInProgress; }
-	void clearAllBuffer();
+	void clearAllBufferAndNotify();
 	void deselectEntity(ot::UID _entityID, const std::string& _owner);
 
-	const std::list<ot::UID>& getSelectedEntityIDs() { return m_selectedEntityIDs; }
-	const std::list<ot::UID>& getSelectedVisibleEntityIDs() { return m_selectedVisibleEntityIDs; }
+	const std::list<ot::UID>& getSelectedEntityIDs();
+	const std::list<ot::UID>& getSelectedVisibleEntityIDs();
+
 private:
 	std::atomic_bool m_modelSelectionChangedNotificationInProgress = false;
+	std::mutex m_changeSelectedEntitiesBuffer;
+
 	std::map<std::string,ot::UIDList> m_ownersWithSelection;
 	std::list<ot::UID> m_selectedEntityIDs;
 	std::list<ot::UID> m_selectedVisibleEntityIDs;
@@ -35,8 +39,7 @@ private:
 	void toggleButtonEnabledState();
 	bool anyMaterialItemSelected();
 	void notifyOwners();
-	void createVisualisationRequests();
 	void notifyOwnerThread(const std::map<std::string, std::list<ot::UID>>& _ownerEntityListMap);
 
-	void sendTextVisualisationRequest(IVisualisationText* _textVisEntity, const std::string& _ownerServiceName);
+	void setSelectedEntityIDs(const std::list<ot::UID>& _selectedEntityIDs, const std::list<ot::UID>& _selectedVisibleEntityIDs);
 };

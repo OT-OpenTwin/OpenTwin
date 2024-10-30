@@ -148,7 +148,7 @@ void Model::clearAll(void)
 	// Reset all the temporary attributes
 	entityMap.clear();
 	pendingEntityUpdates.clear();
-	Application::instance()->getSelectionHandler().clearAllBuffer();
+	Application::instance()->getSelectionHandler().clearAllBufferAndNotify();
 	parameterMap.clear();
 
 	// Now we delete all entities (recursively)
@@ -402,7 +402,7 @@ void Model::setupUIControls()
 	uiCreated = true;
 
 	// Send an initial notification to properly set the state of the new controls
-	Application::instance()->getSelectionHandler().clearAllBuffer();
+	Application::instance()->getSelectionHandler().clearAllBufferAndNotify();
 
 	updateUndoRedoStatus();
 }
@@ -890,7 +890,7 @@ void Model::setVisualizationModel(ot::UID visModelID)
 		// Request a view reset
 		Application::instance()->getNotifier()->resetAllViews(visualizationModelID);
 
-		Application::instance()->getSelectionHandler().clearAllBuffer();
+		Application::instance()->getSelectionHandler().clearAllBufferAndNotify();
 
 		updateVersionGraph();
 

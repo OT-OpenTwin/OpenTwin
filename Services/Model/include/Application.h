@@ -94,6 +94,7 @@ public:
 
 	bool queuedRequestToFrontend(const ot::JsonDocument& _request);
 	bool queuedRequestToFrontend(const ot::JsonDocument& _request, const std::list<std::pair<ot::UID, ot::UID>>& _prefetchIDs);
+	void flushRequestsToFrontEnd();
 
 	// ##################################################################################################################################################################################################################
 

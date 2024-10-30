@@ -9,25 +9,25 @@
 void SelectionHandler::processSelectionChanged(const std::list<ot::UID>& _selectedEntityIDs, const std::list<ot::UID>& _selectedVisibleEntityIDs)
 {
 	QueuingHttpRequestsRAII queueRequests;
-	m_selectedEntityIDs = _selectedEntityIDs;
-	m_selectedVisibleEntityIDs = _selectedVisibleEntityIDs;
 
+	setSelectedEntityIDs(_selectedEntityIDs, _selectedVisibleEntityIDs);
 	toggleButtonEnabledState();
-	createVisualisationRequests();
-	notifyOwners(); // ! The owners may be notified before the ui received its message. If the services react and send messages to the ui, it may not be in the expected state. Race condition.
-	
 	Application::instance()->getModel()->updatePropertyGrid();
+	Application::instance()->flushRequestsToFrontEnd();
+	//Order important to avoid a racing condition.
+	notifyOwners(); 
 }
 
-void SelectionHandler::clearAllBuffer()
+void SelectionHandler::clearAllBufferAndNotify()
 {
-	m_selectedEntityIDs.clear();
-	m_selectedVisibleEntityIDs.clear();
-	m_ownersWithSelection.clear();
+	ot::UIDList selectecEntities{}, selectedVisibleEntities{};
+	processSelectionChanged(selectecEntities, selectedVisibleEntities);
 }
 
 void SelectionHandler::deselectEntity(ot::UID _entityID, const std::string& _owner)
 {
+	std::lock_guard<std::mutex> guard(m_changeSelectedEntitiesBuffer);
+
 	m_selectedEntityIDs.remove(_entityID);
 	m_selectedVisibleEntityIDs.remove(_entityID);
 	
@@ -40,6 +40,18 @@ void SelectionHandler::deselectEntity(ot::UID _entityID, const std::string& _own
 			m_ownersWithSelection.erase(ownerIt->first);
 		}
 	}
+}
+
+const std::list<ot::UID>& SelectionHandler::getSelectedEntityIDs()
+{
+	std::lock_guard<std::mutex> guard(m_changeSelectedEntitiesBuffer);
+	return m_selectedEntityIDs;
+}
+
+const std::list<ot::UID>& SelectionHandler::getSelectedVisibleEntityIDs()
+{
+	std::lock_guard<std::mutex> guard(m_changeSelectedEntitiesBuffer);
+	 return m_selectedVisibleEntityIDs; 
 }
 
 void SelectionHandler::toggleButtonEnabledState()
@@ -127,22 +139,7 @@ void SelectionHandler::notifyOwners()
 	}
 }
 
-void SelectionHandler::createVisualisationRequests()
-{
-	Model* model = Application::instance()->getModel();
-	assert(model != nullptr);
-	for (ot::UID entityID : m_selectedVisibleEntityIDs)
-	{
-		EntityBase* baseEntity = model->getEntityByID(entityID);
-		
-		IVisualisationText* textVisEntity = dynamic_cast<IVisualisationText*>(baseEntity);
-		if (textVisEntity != nullptr)
-		{
-			sendTextVisualisationRequest(textVisEntity, baseEntity->getOwningService());
 
-		}
-	}
-}
 
 void SelectionHandler::notifyOwnerThread(const std::map<std::string, std::list<ot::UID>>& _ownerEntityListMap)
 {
@@ -158,21 +155,45 @@ void SelectionHandler::notifyOwnerThread(const std::map<std::string, std::list<o
 	m_modelSelectionChangedNotificationInProgress = false;
 }
 
-void SelectionHandler::sendTextVisualisationRequest(IVisualisationText* _textVisEntity, const std::string& _ownerServiceName)
+void SelectionHandler::setSelectedEntityIDs(const std::list<ot::UID>& _selectedEntityIDs, const std::list<ot::UID>& _selectedVisibleEntityIDs)
 {
-	if (_textVisEntity->visualiseText())
-	{
-		ot::TextEditorCfg editorCfg = _textVisEntity->createConfig();
-				
-		ot::JsonDocument uiRequest;
-		uiRequest.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, uiRequest.GetAllocator());
-
-		ot::JsonObject cfgObj;
-		editorCfg.addToJsonObject(cfgObj, uiRequest.GetAllocator());
-		uiRequest.AddMember(OT_ACTION_PARAM_Config, cfgObj, uiRequest.GetAllocator());
-		ot::BasicServiceInformation serviceInformation(_ownerServiceName);
-		serviceInformation.addToJsonObject(uiRequest, uiRequest.GetAllocator()); 		
-
-		Application::instance()->queuedRequestToFrontend(uiRequest);
-	}
+	std::lock_guard<std::mutex> guard(m_changeSelectedEntitiesBuffer);
+	m_selectedEntityIDs = _selectedEntityIDs;
+	m_selectedVisibleEntityIDs = _selectedVisibleEntityIDs;
 }
+
+//void SelectionHandler::sendTextVisualisationRequest(IVisualisationText* _textVisEntity, const std::string& _ownerServiceName)
+//{
+//	if (_textVisEntity->visualiseText())
+//	{
+//		ot::TextEditorCfg editorCfg = _textVisEntity->createConfig();
+//				
+//		ot::JsonDocument uiRequest;
+//		uiRequest.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, uiRequest.GetAllocator());
+//
+//		ot::JsonObject cfgObj;
+//		editorCfg.addToJsonObject(cfgObj, uiRequest.GetAllocator());
+//		uiRequest.AddMember(OT_ACTION_PARAM_Config, cfgObj, uiRequest.GetAllocator());
+//		ot::BasicServiceInformation serviceInformation(_ownerServiceName);
+//		serviceInformation.addToJsonObject(uiRequest, uiRequest.GetAllocator()); 		
+//
+//		Application::instance()->queuedRequestToFrontend(uiRequest);
+//	}
+//}
+
+//void SelectionHandler::createVisualisationRequests()
+//{
+//	Model* model = Application::instance()->getModel();
+//	assert(model != nullptr);
+//	for (ot::UID entityID : m_selectedVisibleEntityIDs)
+//	{
+//		EntityBase* baseEntity = model->getEntityByID(entityID);
+//		
+//		IVisualisationText* textVisEntity = dynamic_cast<IVisualisationText*>(baseEntity);
+//		if (textVisEntity != nullptr)
+//		{
+//			sendTextVisualisationRequest(textVisEntity, baseEntity->getOwningService());
+//
+//		}
+//	}
+//}
