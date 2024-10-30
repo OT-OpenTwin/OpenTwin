@@ -52,7 +52,7 @@ ot::GenericDataStruct* DatasetOverviewVisualiser::buildTableOverview(const Metad
 {
 	const std::list<MetadataSeries>& allSeries = _metadataCampaign.getSeriesMetadata();
 
-	uint32_t totalNbOfSeriesRows(0), columns(0);
+	uint32_t totalNbOfSeriesRows(0), columns(1);
 	for (const MetadataSeries& series : allSeries)
 	{
 		TableDimension tableDimension =	calculateNeededTableSize(series);
