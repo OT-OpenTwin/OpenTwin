@@ -106,14 +106,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
 
     let dll_file_name = Path::new(GLOBAL.get()).file_name().unwrap().to_str();
     let service_name = Path::new(dll_file_name.unwrap()).file_stem().unwrap().to_str();
-    
     if service_name == Some("GlobalSessionService") {
         let download_route = warp::path::end()
             .map(|| warp::reply::html(get_download_html_body()));
 
         let installer_route = warp::path("installer")
             .and(warp::fs::file(concat!(env!("OPENTWIN_DEV_ROOT"), "/Framework/OpenTwin/requests.http")));
-
+        
         tokio::task::spawn(async move {
             warp::serve(download_route.or(installer_route))
             .run(([127, 0, 0, 1], 80))
@@ -438,8 +437,8 @@ fn get_download_html_body() -> String {
             KoCFLklSAf4/G8ayBHfTCwQAAAAASUVORK5CYII=\">
 
             <div id=\"welcome_txt\">Welcome to OpenTwin</div>
-            <a href=\"http://127.0.0.1:80/installer/requests.http\" download=\"installer\">
-                <button id=\"download_btn\">Download</button>
+            <a href=\"http://127.0.0.1:80/installer/requests.http\" download=\"installer.exe\">
+                <button id=\"downloadBtn\">Download</button>
             </a>
 
             <style>
@@ -466,7 +465,7 @@ fn get_download_html_body() -> String {
                     color: white;
                 }
         
-                #download_btn {
+                #downloadBtn {
                     width: 150px;
                     height: 50px;
                     top: 60%;
@@ -482,9 +481,14 @@ fn get_download_html_body() -> String {
                     font-family: 'Courier New', Courier, monospace;
                 }
 
-                #download_btn:hover {
+                #downloadBtn:hover {
                     background-color: #2f5c92;
                 }
             </style>
+            <script type=\"text/javascript\">
+                document.getElementById(\"downloadBtn\").addEventListener(\"click\", () => {
+                    alert(\"Downloading Installer...\n Please execute the installer after the download.\");
+                }, false);
+            </script>
         </body>".to_string()
 }
