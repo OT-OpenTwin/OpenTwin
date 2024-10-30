@@ -8,6 +8,7 @@
 
 // OpenTwin header
 #include "OTServiceFoundation/ApplicationBase.h"
+#include "SelectionHandler.h"
 
 // std header
 #include <list>
@@ -76,6 +77,7 @@ public:
 	OT_HANDLER(handleActivateVersion, Application, OT_ACTION_CMD_MODEL_ActivateVersion, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleVersionSelected, Application, OT_ACTION_CMD_MODEL_VersionSelected, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleVersionDeselected, Application, OT_ACTION_CMD_MODEL_VersionDeselected, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleSetVersionLabel, Application, OT_ACTION_CMD_MODEL_SetVersionLabel, ot::SECURE_MESSAGE_TYPES)
 
 	// ##################################################################################################################################################################################################################
 
@@ -163,6 +165,8 @@ public:
 	//! @param The item that has been changed in the uiService (instance will be deleted after this function call).
 	virtual bool settingChanged(const ot::Property* _item) override;
 
+	SelectionHandler& getSelectionHandler() { return m_selectionHandler; }
+
 private:
 	void queueAction(ActionType _type, const ot::JsonDocument& _document);
 
@@ -182,6 +186,7 @@ private:
 	bool m_continueAsyncActionWorker;
 
 	Model* m_model;
+	SelectionHandler m_selectionHandler;
 	MicroserviceNotifier* m_notifier;
 	
 	Application();

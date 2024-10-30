@@ -5,8 +5,7 @@ param (
 # Set SMTP server settings
 $smtpServer = "smtp.gmail.com"
 $smtpFrom = "opentwin.buildauto@gmail.com"
-#$smtpTo = $env:OPEN_TWIN_EMAIL_LIST
-$smtpTo = "peter_thoma@outlook.com"
+$smtpTo = $env:OPEN_TWIN_EMAIL_LIST
 $messageSubject = "OpenTwin Continuous Build $BuildResult"
 $messageBody = "This is an automatically generated email from the continuous OpenTwin build." + [Environment]::NewLine + [Environment]::NewLine +"Please take a look at the attachements for more detailed information"
 $smtpUsername = "opentwin.buildauto@gmail.com"

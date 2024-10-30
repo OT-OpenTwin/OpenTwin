@@ -522,7 +522,7 @@ std::string Application::handleGetEntityChildInformationByID(ot::JsonDocument& _
 
 	std::list<ot::UID> entityIDList;
 
-	EntityContainer* entity = dynamic_cast<EntityContainer*>(m_model->getEntity(entityID));
+	EntityContainer* entity = dynamic_cast<EntityContainer*>(m_model->getEntityByID(entityID));
 
 	if (entity != nullptr)
 	{
@@ -953,6 +953,20 @@ std::string Application::handleVersionDeselected(ot::JsonDocument& _document) {
 	return "";
 }
 
+std::string Application::handleSetVersionLabel(ot::JsonDocument& _document) {
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
+	}
+
+	std::string version = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Version);
+	std::string label = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_VersionLabel);
+
+	m_model->setVersionLabel(version, label);
+
+	return "";
+}
+
 // ##################################################################################################################################################################################################################
 
 // Setter / Getter
@@ -1178,9 +1192,53 @@ void Application::handleAsyncSelectionChanged(const ot::JsonDocument& _document)
 		OT_LOG_EA("No model created yet");
 	}
 
-	std::list<ot::UID> selectedEntityID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
-	std::list<ot::UID> selectedVisibleEntityID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedVisibleEntityIDs);
-	m_model->modelSelectionChangedNotification(selectedEntityID, selectedVisibleEntityID);
+	std::list<ot::UID> selectedEntityIDs = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);
+	std::list<ot::UID> selectedVisibleEntityIDs = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedVisibleEntityIDs);
+
+	if (m_model->getVisualizationModel() == 0)
+	{
+		return;
+	}
+
+	// Since we are performing notifications in a parallel thread, we need to make sure that all notifications are done before
+	// we send the next round of notifications
+	using namespace std::chrono_literals;
+	while (m_selectionHandler.notificationInProcess())
+	{
+		std::this_thread::sleep_for(1ms);
+	}
+
+	// It might happen that the UI still has some reference to entitires which have already been deleted.
+	// Therefore we filter the items by checing whether they still exist.
+
+	std::list<ot::UID> selectedEntityIDsVerified, selectedVisibleEntityIDsVerified;
+	for (auto entityID : selectedEntityIDs)
+	{
+		if (m_model->getEntityByID(entityID) != nullptr)
+		{
+			selectedEntityIDsVerified.push_back(entityID);
+		}
+		else
+		{
+			const std::string message = "Notification about selected entity that does not exist in this model state; id: " + std::to_string(entityID);
+			OT_LOG_W(message);
+		}
+	}
+
+	for (auto entityID : selectedVisibleEntityIDs)
+	{
+		if (m_model->getEntityByID(entityID) != nullptr)
+		{
+			selectedVisibleEntityIDsVerified.push_back(entityID);
+		}
+		else
+		{
+			const std::string message = "Notification about selected visible entity that does not exist in this model state; id: " + std::to_string(entityID);
+			OT_LOG_W(message);
+		}
+	}
+
+	m_selectionHandler.processSelectionChanged(selectedEntityIDsVerified, selectedVisibleEntityIDsVerified);
 }
 
 bool Application::getContinueAsyncActionWorker(void) {

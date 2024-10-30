@@ -13,22 +13,23 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	if (curveDescription != nullptr)
 	{
 		storeDataPoints(_seriesIndex, _parameterIDs, _constParameterValues, _changingParameterValues, _numberOfParameterValues,curveDescription);
+		flushQuantityContainer(); 
 		return;
 	}
 	auto complexCurveDescription = dynamic_cast<QuantityDescriptionCurveComplex*>(_quantityDescription);
 	if (complexCurveDescription != nullptr)
 	{
 		storeDataPoints(_seriesIndex, _parameterIDs, _constParameterValues, _changingParameterValues, _numberOfParameterValues, complexCurveDescription);
+		flushQuantityContainer();
 		return;
 	}
 	auto sparameterDescription = dynamic_cast<QuantityDescriptionSParameter*>(_quantityDescription);
 	if (sparameterDescription != nullptr)
 	{
 		storeDataPoints(_seriesIndex, _parameterIDs, _constParameterValues, _changingParameterValues, _numberOfParameterValues, sparameterDescription);
+		flushQuantityContainer();
 		return;
 	}
-
-	flushQuantityContainer();
 }
 
 void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, uint64_t _numberOfParameterValues, QuantityDescriptionCurve* _quantityDescription)

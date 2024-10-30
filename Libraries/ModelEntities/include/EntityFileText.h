@@ -2,28 +2,35 @@
 #include "EntityFile.h"
 #include "OTCore/TextEncoding.h"
 #include "OTGui/TextEditorCfg.h"
-#include "EntityInterfaceText.h"
+#include "IVisualisationText.h"
 
-class __declspec(dllexport) EntityFileText : public EntityFile, public EntityInterfaceText
+class __declspec(dllexport) EntityFileText : public EntityFile, public IVisualisationText
 {
 public:
-	EntityFileText(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner);
+	EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner);
 
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
 	virtual std::string getClassName(void) override { return "EntityFileText"; };
 
-	void setTextEncoding(ot::TextEncoding::EncodingStandard encoding);
+	void setTextEncoding(ot::TextEncoding::EncodingStandard _encoding);
 	ot::TextEncoding::EncodingStandard getTextEncoding();
 
+	//Text visualisation interface
 	std::string getText(void) override;
+	//! @brief Setting a text will change the underlying data entity. If the modelstate is set, the data entity is directly stored and added to the modelstate.
+	void setText(const std::string& _text) override;
+	bool visualiseText() override { return true; }
+	ot::TextEditorCfg createConfig() override;
+	ot::ContentChangedHandling getContentChangedHandling() override;
 
-	ot::TextEditorCfg createConfig(void);
+	void setContentChangedHandling(ot::ContentChangedHandling _contentChangedHandling);
 
 protected:
 	void setSpecializedProperties() override;
-	virtual void AddStorageData(bsoncxx::builder::basic::document& storage) override;
-	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
+	virtual void AddStorageData(bsoncxx::builder::basic::document& _storage) override;
+	void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
 private:
-	ot::TextEncoding::EncodingStandard _encoding = ot::TextEncoding::EncodingStandard::UNKNOWN;
+	ot::ContentChangedHandling m_contentChangedHandling = ot::ContentChangedHandling::SimpleSave;
+	ot::TextEncoding::EncodingStandard m_encoding = ot::TextEncoding::EncodingStandard::UNKNOWN;
 };

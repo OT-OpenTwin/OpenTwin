@@ -102,22 +102,43 @@ bool EntityPropertiesBase::needsUpdate(void)
 
 // ################################################################################################################################################################
 
-void EntityPropertiesDouble::createProperty(const std::string &group, const std::string &name, double defaultValue, const std::string &defaultCategory, EntityProperties &properties)
+EntityPropertiesDouble::EntityPropertiesDouble() 
+	: m_value(0.), m_allowCustomValues(true), m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max())
 {
-	// Load the template defaults if any
-	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
 
-	// Now load the default value if available. Otherwise take the provided default
-	double value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultDouble(defaultCategory, name, defaultValue);
+}
 
-	// Finally create the new property
-	properties.createProperty(new EntityPropertiesDouble(name, value), group);
+EntityPropertiesDouble::EntityPropertiesDouble(const std::string& _name, double _value) 
+	: m_value(_value), m_allowCustomValues(true), m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max())
+{
+	this->setName(_name);
+}
+
+EntityPropertiesDouble::EntityPropertiesDouble(const EntityPropertiesDouble& _other) 
+	: EntityPropertiesBase(_other)
+{
+	m_value = _other.m_value;
+	m_allowCustomValues = _other.m_allowCustomValues;
+	m_min = _other.m_min;
+	m_max = _other.m_max;
+}
+
+EntityPropertiesDouble& EntityPropertiesDouble::operator=(const EntityPropertiesDouble& _other) {
+	if (&_other != this) {
+		EntityPropertiesBase::operator=(_other);
+		m_value = _other.m_value;
+		m_allowCustomValues = _other.m_allowCustomValues;
+		m_min = _other.m_min;
+		m_max = _other.m_max;
+	}
+	return *this;
 }
 
 void EntityPropertiesDouble::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root)
 {
-	ot::PropertyDouble* newProp = new ot::PropertyDouble(this->getName(), value);
-	newProp->setPropertyFlag(ot::Property::AllowCustomValues);
+	ot::PropertyDouble* newProp = new ot::PropertyDouble(this->getName(), m_value);
+	newProp->setPropertyFlag((m_allowCustomValues ? ot::Property::AllowCustomValues : ot::Property::NoFlags));
+	newProp->setRange(m_min, m_max);
 	this->setupPropertyData(_configuration, newProp);
 }
 
@@ -129,7 +150,9 @@ void EntityPropertiesDouble::setFromConfiguration(const ot::Property* _property,
 		return;
 	}
 
-	setValue(actualProperty->getValue());
+	this->setValue(actualProperty->getValue());
+	this->setRange(actualProperty->getMin(), actualProperty->getMax());
+	this->setAllowCustomValues(actualProperty->getPropertyFlags() & ot::PropertyBase::AllowCustomValues);
 }
 
 void EntityPropertiesDouble::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
@@ -137,18 +160,27 @@ void EntityPropertiesDouble::addToJsonDocument(ot::JsonDocument& jsonDoc, Entity
 	ot::JsonObject container;
 	EntityPropertiesBase::addBaseDataToJsonDocument(container, jsonDoc.GetAllocator(), "double");
 
-	container.AddMember("Value", value, jsonDoc.GetAllocator());
-
-	rapidjson::Value::StringRefType jsonName(getName().c_str());
+	container.AddMember("Value", m_value, jsonDoc.GetAllocator());
+	container.AddMember("AllowCustom", m_allowCustomValues, jsonDoc.GetAllocator());
+	container.AddMember("MinValue", m_min, jsonDoc.GetAllocator());
+	container.AddMember("MaxValue", m_max, jsonDoc.GetAllocator());
 
 	jsonDoc.AddMember(ot::JsonString(this->getName(), jsonDoc.GetAllocator()), container, jsonDoc.GetAllocator());
 }
 
 void EntityPropertiesDouble::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
-	const rapidjson::Value& val = object["Value"];
+	this->setValue(ot::json::getDouble(object, "Value"));
 
-	setValue(val.GetDouble());
+	if (object.HasMember("MinValue")) {
+		this->setMin(ot::json::getDouble(object, "MinValue", std::numeric_limits<double>::lowest()));
+	}
+	if (object.HasMember("MaxValue")) {
+		this->setMax(ot::json::getDouble(object, "MaxValue", std::numeric_limits<double>::max()));
+	}
+	if (object.HasMember("AllowCustom")) {
+		this->setAllowCustomValues(ot::json::getBool(object, "AllowCustom", true));
+	}
 }
 
 void EntityPropertiesDouble::copySettings(EntityPropertiesBase *other, EntityBase *root)
@@ -160,12 +192,52 @@ void EntityPropertiesDouble::copySettings(EntityPropertiesBase *other, EntityBas
 
 	if (entity != nullptr)
 	{
-		setValue(entity->getValue());
+		this->setValue(entity->getValue());
+		this->setRange(entity->getMin(), entity->getMax());
+		this->setAllowCustomValues(entity->getAllowCustomValues());
 	}
 }
 
-bool EntityPropertiesDouble::hasSameValue(EntityPropertiesBase* other)
-{
+void EntityPropertiesDouble::setValue(double _value) {
+	if (m_value != _value) {
+		this->setNeedsUpdate();
+		m_value = _value;
+	}
+}
+
+void EntityPropertiesDouble::setRange(double _min, double _max) {
+	if (m_min != _min) {
+		this->setNeedsUpdate();
+		m_min = _min;
+	}
+	if (m_max != _max) {
+		this->setNeedsUpdate();
+		m_max = _max;
+	}
+}
+
+void EntityPropertiesDouble::setMin(double _min) {
+	if (m_min != _min) {
+		this->setNeedsUpdate();
+		m_min = _min;
+	}
+}
+
+void EntityPropertiesDouble::setMax(double _max) {
+	if (m_max != _max) {
+		this->setNeedsUpdate();
+		m_max = _max;
+	}
+}
+
+void EntityPropertiesDouble::setAllowCustomValues(bool _allowCustomValues) {
+	if (m_allowCustomValues != _allowCustomValues) {
+		this->setNeedsUpdate();
+		m_allowCustomValues = _allowCustomValues;
+	}
+}
+
+bool EntityPropertiesDouble::hasSameValue(EntityPropertiesBase* other) {
 	EntityPropertiesDouble* entity = dynamic_cast<EntityPropertiesDouble*>(other);
 
 	if (entity == nullptr) return false;
@@ -173,23 +245,54 @@ bool EntityPropertiesDouble::hasSameValue(EntityPropertiesBase* other)
 	return (getValue() == entity->getValue());
 }
 
-// ################################################################################################################################################################
-
-void EntityPropertiesInteger::createProperty(const std::string &group, const std::string &name, long defaultValue, const std::string &defaultCategory, EntityProperties &properties)
-{
+void EntityPropertiesDouble::createProperty(const std::string& group, const std::string& name, double defaultValue, const std::string& defaultCategory, EntityProperties& properties) {
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
 
 	// Now load the default value if available. Otherwise take the provided default
-	long value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultLong(defaultCategory, name, defaultValue);
+	double value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultDouble(defaultCategory, name, defaultValue);
 
 	// Finally create the new property
-	properties.createProperty(new EntityPropertiesInteger(name, value), group);
+	properties.createProperty(new EntityPropertiesDouble(name, value), group);
+}
+
+// ################################################################################################################################################################
+
+EntityPropertiesInteger::EntityPropertiesInteger() 
+	: m_value(0), m_allowCustomValues(true), m_min(std::numeric_limits<long>::lowest()), m_max(std::numeric_limits<long>::max())
+{}
+
+EntityPropertiesInteger::EntityPropertiesInteger(const std::string& _name, long _value)
+	: m_value(_value), m_allowCustomValues(true), m_min(std::numeric_limits<long>::lowest()), m_max(std::numeric_limits<long>::max())
+{
+	this->setName(_name);
+}
+
+EntityPropertiesInteger::EntityPropertiesInteger(const EntityPropertiesInteger& _other) 
+	: EntityPropertiesBase(_other)
+{
+	m_value = _other.getValue();
+	m_allowCustomValues = _other.m_allowCustomValues;
+	m_min = _other.m_min;
+	m_max = _other.m_max;
+}
+
+EntityPropertiesInteger& EntityPropertiesInteger::operator=(const EntityPropertiesInteger& _other) {
+	if (&_other != this) {
+		EntityPropertiesBase::operator=(_other);
+		m_value = _other.getValue();
+		m_allowCustomValues = _other.m_allowCustomValues;
+		m_min = _other.m_min;
+		m_max = _other.m_max;
+	}
+	return *this;
 }
 
 void EntityPropertiesInteger::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root)
 {
-	ot::PropertyInt* newProp = new ot::PropertyInt(this->getName(), value);
+	ot::PropertyInt* newProp = new ot::PropertyInt(this->getName(), m_value);
+	newProp->setPropertyFlag((m_allowCustomValues ? ot::Property::AllowCustomValues : ot::Property::NoFlags));
+	newProp->setRange(m_min, m_max);
 	this->setupPropertyData(_configuration, newProp);
 }
 
@@ -201,43 +304,75 @@ void EntityPropertiesInteger::setFromConfiguration(const ot::Property* _property
 		return;
 	}
 
-	setValue(actualProperty->getValue());
+	this->setValue(actualProperty->getValue());
+	this->setRange(actualProperty->getMin(), actualProperty->getMax());
+	this->setAllowCustomValues(actualProperty->getPropertyFlags() & ot::PropertyBase::AllowCustomValues);
 }
 
-void EntityPropertiesInteger::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root)
-{
-	rapidjson::Document::AllocatorType& allocator = jsonDoc.GetAllocator();
+void EntityPropertiesInteger::addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) {
+	ot::JsonAllocator& allocator = jsonDoc.GetAllocator();
 
-	rapidjson::Value container(rapidjson::kObjectType);
-
+	ot::JsonObject container;
 	EntityPropertiesBase::addBaseDataToJsonDocument(container, allocator, "integer");
 
-	rapidjson::Value jsonValue(rapidjson::kNumberType);
-	jsonValue.SetInt64(value);
-	container.AddMember("Value", jsonValue, allocator);
+	container.AddMember("Value", ot::JsonNumber(m_value), allocator);
+	container.AddMember("AllowCustom", m_allowCustomValues, jsonDoc.GetAllocator());
+	container.AddMember("MinValue", ot::JsonNumber(m_min), jsonDoc.GetAllocator());
+	container.AddMember("MaxValue", ot::JsonNumber(m_max), jsonDoc.GetAllocator());
 
-	rapidjson::Value::StringRefType jsonName(getName().c_str());
-
-	jsonDoc.AddMember(jsonName, container, allocator);
+	jsonDoc.AddMember(ot::JsonString(this->getName(), jsonDoc.GetAllocator()), container, allocator);
 }
 
 void EntityPropertiesInteger::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
-	const rapidjson::Value& val = object["Value"];
-
-	setValue((long)val.GetInt64());
+	this->setValue(ot::json::getInt64(object, "Value"));
+	if (object.HasMember("MinValue")) {
+		this->setMin(ot::json::getInt64(object, "MinValue", std::numeric_limits<long>::lowest()));
+	}
+	if (object.HasMember("MaxValue")) {
+		this->setMax(ot::json::getInt64(object, "MaxValue", std::numeric_limits<long>::max()));
+	}
+	if (object.HasMember("AllowCustom")) {
+		this->setAllowCustomValues(ot::json::getBool(object, "AllowCustom", true));
+	}
 }
 
-void EntityPropertiesInteger::copySettings(EntityPropertiesBase *other, EntityBase *root)
-{
-	EntityPropertiesBase::copySettings(other, root);
+void EntityPropertiesInteger::setValue(long _value) {
+	if (m_value != _value) {
+		this->setNeedsUpdate();
+		m_value = _value;
+	}
+}
 
-	EntityPropertiesInteger *entity = dynamic_cast<EntityPropertiesInteger *>(other);
-	assert(entity != nullptr);
+void EntityPropertiesInteger::setRange(long _min, long _max) {
+	if (m_min != _min) {
+		this->setNeedsUpdate();
+		m_min = _min;
+	}
+	if (m_max != _max) {
+		this->setNeedsUpdate();
+		m_max = _max;
+	}
+}
 
-	if (entity != nullptr)
-	{
-		setValue(entity->getValue());
+void EntityPropertiesInteger::setMin(long _min) {
+	if (m_min != _min) {
+		this->setNeedsUpdate();
+		m_min = _min;
+	}
+}
+
+void EntityPropertiesInteger::setMax(long _max) {
+	if (m_max != _max) {
+		this->setNeedsUpdate();
+		m_max = _max;
+	}
+}
+
+void EntityPropertiesInteger::setAllowCustomValues(bool _allowCustomValues) {
+	if (m_allowCustomValues != _allowCustomValues) {
+		this->setNeedsUpdate();
+		m_allowCustomValues = _allowCustomValues;
 	}
 }
 
@@ -248,6 +383,30 @@ bool EntityPropertiesInteger::hasSameValue(EntityPropertiesBase* other)
 	if (entity == nullptr) return false;
 
 	return (getValue() == entity->getValue());
+}
+
+void EntityPropertiesInteger::copySettings(EntityPropertiesBase* other, EntityBase* root) {
+	EntityPropertiesBase::copySettings(other, root);
+
+	EntityPropertiesInteger* entity = dynamic_cast<EntityPropertiesInteger*>(other);
+	assert(entity != nullptr);
+
+	if (entity != nullptr) {
+		this->setValue(entity->getValue());
+		this->setRange(entity->getMin(), entity->getMax());
+		this->setAllowCustomValues(entity->getAllowCustomValues());
+	}
+}
+
+void EntityPropertiesInteger::createProperty(const std::string& group, const std::string& name, long defaultValue, const std::string& defaultCategory, EntityProperties& properties) {
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	long value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultLong(defaultCategory, name, defaultValue);
+
+	// Finally create the new property
+	properties.createProperty(new EntityPropertiesInteger(name, value), group);
 }
 
 // ################################################################################################################################################################

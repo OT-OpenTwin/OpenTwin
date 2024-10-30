@@ -79,6 +79,7 @@
 #include "OTGui/PropertyString.h"
 #include "OTGui/VersionGraphVersionCfg.h"
 
+
 // Observer
 void Model::entityRemoved(EntityBase *entity) 
 { 
@@ -105,8 +106,7 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	clearUiOnDelete(true),
 	uiCreated(false),
 	versionGraphCreated(false),
-	stateManager(nullptr),
-	modelSelectionChangedNotificationInProgress(false)
+	stateManager(nullptr)
 {
 	//NOTE, debug only
 	std::cout << "Created model for project \"" << _projectName << "\"" << std::endl;
@@ -148,8 +148,7 @@ void Model::clearAll(void)
 	// Reset all the temporary attributes
 	entityMap.clear();
 	pendingEntityUpdates.clear();
-	selectedModelEntityIDs.clear();
-	selectedVisibleModelEntityIDs.clear();
+	Application::instance()->getSelectionHandler().clearAllBuffer();
 	parameterMap.clear();
 
 	// Now we delete all entities (recursively)
@@ -403,8 +402,7 @@ void Model::setupUIControls()
 	uiCreated = true;
 
 	// Send an initial notification to properly set the state of the new controls
-	std::list<ot::UID> selectedEntityID, selectedVisibleEntityID;
-	modelSelectionChangedNotification(selectedEntityID, selectedVisibleEntityID);
+	Application::instance()->getSelectionHandler().clearAllBuffer();
 
 	updateUndoRedoStatus();
 }
@@ -431,7 +429,7 @@ void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 		std::list<ot::NavigationTreeItem> alreadyContained;
 		ot::SelectEntitiesDialogCfg configuration;
 
-		ot::UIDList selectedEntityIDs =	selectedModelEntityIDs;
+		ot::UIDList selectedEntityIDs = Application::instance()->getSelectionHandler().getSelectedEntityIDs();
 		if (selectedEntityIDs.size() == 0)
 		{
 			return;
@@ -521,60 +519,6 @@ void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 	
 	else assert(0); // Unhandled button action
 }
-
-void Model::modelSelectionChangedNotification(std::list<ot::UID> &selectedEntityIDIn, std::list<ot::UID> &selectedVisibleEntityIDIn)
-{
-	if (visualizationModelID == 0) { return; }
-
-	// Since we are performing notifications in a parallel thread, we need to make sure that all notifications are done before
-	// we send the next round of notifications
-	using namespace std::chrono_literals;
-
-	while (modelSelectionChangedNotificationInProgress) std::this_thread::sleep_for(1ms);
-
-	// It might happen that the UI still has some reference to entitires which have already been deleted.
-	// Therefore we filter the items by checing whether they still exist.
-
-	std::list<ot::UID> selectedEntityID, selectedVisibleEntityID;
-	for (auto entity : selectedEntityIDIn) if (getEntity(entity) != nullptr) selectedEntityID.push_back(entity);
-	for (auto entity : selectedVisibleEntityIDIn) if (getEntity(entity) != nullptr) selectedVisibleEntityID.push_back(entity);
-
-	selectedModelEntityIDs = selectedEntityID;
-	selectedVisibleModelEntityIDs = selectedVisibleEntityID;
-
-	std::list<std::string> enabled;
-	std::list<std::string> disabled;
-
-	if (selectedEntityID.size() > 0)
-	{
-		enabled.push_back("Model:Edit:Delete");
-	}
-	else
-	{
-		disabled.push_back("Model:Edit:Delete");
-	}
-
-	if (anyMaterialItemSelected(selectedEntityID))
-	{
-		enabled.push_back("Model:Material:Show By Material");
-	}
-	else
-	{
-		disabled.push_back("Model:Material:Show By Material");
-	}
-
-	processSelectionsForOtherOwners(selectedModelEntityIDs);
-
-	enableQueuingHttpRequests(true);
-
-	Application::instance()->getNotifier()->enableDisableControls(enabled, disabled);
-
-	// Now get the common properties of all selected entities and send them to the property grid
-	updatePropertyGrid();
-
-	enableQueuingHttpRequests(false);
-}
-
 
 void Model::updateUndoRedoStatus(void)
 {
@@ -816,7 +760,7 @@ void  Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool ke
 
 	// Depending on the operation, the entity might already have been removed from the list
 	entityMap.erase(entity->getEntityID());
-
+	
 	// Now we also remove the entity from the model state manager (this will also remove all children from the state Manager)
 	// Removing the children here from the state manager is important, since not the entire information about an entity may be loaded 
 	// (e.g. the data entities). In this case, the remove function would not automatically be called for these entities although they are
@@ -827,24 +771,8 @@ void  Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool ke
 		getStateManager()->removeEntity(entity->getEntityID(),considerChildren);
 	}
 
-	selectedModelEntityIDs.remove(entity->getEntityID());
-	selectedVisibleModelEntityIDs.remove(entity->getEntityID());
-
+	Application::instance()->getSelectionHandler().deselectEntity(entity->getEntityID(), entity->getOwningService());
 	setModified();
-}
-
-EntityBase *Model::getEntity(ot::UID uID)
-{
-	try
-	{
-		return entityMap.at(uID);
-	}
-	catch (std::out_of_range)
-	{
-		return nullptr;
-	}
-
-	return nullptr;
 }
 
 bool Model::entityExists(ot::UID uID)
@@ -962,8 +890,7 @@ void Model::setVisualizationModel(ot::UID visModelID)
 		// Request a view reset
 		Application::instance()->getNotifier()->resetAllViews(visualizationModelID);
 
-		ot::UIDList empty, emptyVisible;
-		modelSelectionChangedNotification(empty, emptyVisible);
+		Application::instance()->getSelectionHandler().clearAllBuffer();
 
 		updateVersionGraph();
 
@@ -1196,7 +1123,7 @@ void Model::setParameterDependency(std::list<std::string> &parameters, ot::UID e
 void Model::removeParameterDependency(ot::UID entityID)
 {
 	// Here we need to check whether we are currently removing a parameter. 
-	EntityParameter *parameterEntity = dynamic_cast<EntityParameter *>(getEntity(entityID));		
+	EntityParameter *parameterEntity = dynamic_cast<EntityParameter *>(getEntityByID(entityID));		
 
 	for (auto &parameter : parameterMap)
 	{
@@ -1427,9 +1354,9 @@ std::list<EntityBase*> Model::getListOfSelectedEntities(const std::string& typeF
 {
 	std::list<EntityBase *> selectedEntities;
 
-	for (auto entityID : selectedModelEntityIDs)
+	for (ot::UID entityID : Application::instance()->getSelectionHandler().getSelectedEntityIDs())
 	{
-		EntityBase *entity = getEntity(entityID);
+		EntityBase *entity = getEntityByID(entityID);
 
 		if (entity->getClassName() == typeFilter)
 		{
@@ -1452,7 +1379,7 @@ void Model::addPropertiesToEntities(std::list<ot::UID>& entityIDList, const ot::
 	// Now we loop through all entities
 	for (auto entityID : entityIDList)
 	{
-		EntityBase* entity = getEntity(entityID);
+		EntityBase* entity = getEntityByID(entityID);
 		assert(entity != nullptr);
 
 		for (auto prop : allProperties)
@@ -1487,7 +1414,7 @@ void Model::updatePropertiesOfEntities(std::list<ot::UID>& entityIDList, const s
 	// Now we loop through all entities
 	for (auto entityID : entityIDList)
 	{
-		EntityBase* entity = getEntity(entityID);
+		EntityBase* entity = getEntityByID(entityID);
 		assert(entity != nullptr);
 		for (auto prop : allProperties)
 		{
@@ -1507,7 +1434,10 @@ void Model::updatePropertiesOfEntities(std::list<ot::UID>& entityIDList, const s
 void Model::deleteSelectedShapes(void)
 {
 	std::list<EntityBase *> selectedEntities;
-	for (auto entityID : selectedModelEntityIDs) selectedEntities.push_back(entityMap[entityID]);
+	for (ot::UID entityID : Application::instance()->getSelectionHandler().getSelectedEntityIDs())
+	{
+		selectedEntities.push_back(entityMap[entityID]);
+	}
 
 	// Remove all protected entities from the list
 	std::list<EntityBase *> selectedUnprotectedEntities;
@@ -1608,7 +1538,7 @@ bool Model::anyMaterialItemSelected(std::list<ot::UID> &selectedEntityID)
 
 void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 {
-	EntityBase *entity = getEntity(entityID);
+	EntityBase *entity = getEntityByID(entityID);
 	assert(entity != nullptr);
 	if (entity == nullptr) return;
 
@@ -1740,68 +1670,18 @@ void Model::updateCurvesInPlot(const std::list<std::string>& curveNames, const o
 	}
 }
 
-void Model::processSelectionsForOtherOwners(std::list<ot::UID> &selectedEntities)
-{
-	std::map<std::string, std::list<ot::UID>> ownerEntityListMap;
-
-	// All owners which were involved in the previous selection will receive a notification
-	for (auto owner : ownersWithSelection)
-	{
-		ownerEntityListMap[owner] = {};
-	}
-
-	// Here we check which owners are part of the selection and assign their entities
-	for (auto entity : selectedEntities)
-	{
-		if (getEntity(entity)->getOwningService() != Application::instance()->serviceName())
-		{
-			// This entity is owned by another service
-			ownerEntityListMap[getEntity(entity)->getOwningService()].push_back(entity);
-		}
-	}
-
-	// Now we loop through all owners and send them their list of selected entities
-	ownersWithSelection.clear();
-	for (auto owner : ownerEntityListMap)
-	{
-		if (!owner.second.empty()) ownersWithSelection.push_back(owner.first);
-	}
-
-	if (!ownerEntityListMap.empty())
-	{
-		modelSelectionChangedNotificationInProgress = true;
-
-		std::thread workerThread(&Model::otherOwnersNotification, this, ownerEntityListMap);
-		workerThread.detach();
-	}
-}
-
-void Model::otherOwnersNotification(std::map<std::string, std::list<ot::UID>> ownerEntityListMap)
-{
-	for (auto owner : ownerEntityListMap)
-	{
-		ot::JsonDocument notify;
-		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_SelectionChanged, notify.GetAllocator()), notify.GetAllocator());
-		notify.AddMember(OT_ACTION_PARAM_MODEL_SelectedEntityIDs, ot::JsonArray(owner.second, notify.GetAllocator()), notify.GetAllocator());
-
-		Application::instance()->getNotifier()->sendMessageToService(true, owner.first, notify);
-	}
-
-	modelSelectionChangedNotificationInProgress = false;
-}
-
 void Model::updatePropertyGrid(void)
 {
 	EntityProperties properties;
 	ot::PropertyGridCfg cfg;
-	
-	if (selectedVisibleModelEntityIDs.size() > 0)
+	const ot::UIDList& selectedVisibleEntityIDs = Application::instance()->getSelectionHandler().getSelectedVisibleEntityIDs();
+	if (selectedVisibleEntityIDs.size() > 0)
 	{
-		this->addCommonPropertiesToConfig(selectedVisibleModelEntityIDs, true, cfg);
+		this->addCommonPropertiesToConfig(selectedVisibleEntityIDs, true, cfg);
 	}	
 	else
 	{
-		this->addCommonPropertiesToConfig(selectedModelEntityIDs, true, cfg);
+		this->addCommonPropertiesToConfig(selectedVisibleEntityIDs, true, cfg);
 	}
 
 	m_selectedVersion.clear();
@@ -1829,7 +1709,7 @@ void Model::clearEntityUpdates(EntityBase *entity)
 void Model::addCommonPropertiesToConfig(const std::list<ot::UID> &entityIDList, bool visibleOnly, ot::PropertyGridCfg& _config)
 {
 	std::list<EntityBase *> entities;
-	for (auto entityID : entityIDList) entities.push_back(getEntity(entityID));
+	for (auto entityID : entityIDList) entities.push_back(getEntityByID(entityID));
 
 	EntityProperties props;
 	getCommonProperties(entities, props);
@@ -1859,7 +1739,7 @@ void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const 
 	}
 	else {
 		std::list<EntityBase*> entities;
-		for (auto entityID : entityIDList) entities.push_back(getEntity(entityID));
+		for (auto entityID : entityIDList) entities.push_back(getEntityByID(entityID));
 
 		EntityProperties properties;
 		properties.buildFromConfiguration(_configuration, getRootNode());
@@ -1906,10 +1786,27 @@ void Model::setVersionPropertiesFromJson(const ot::PropertyGridCfg& _configurati
 	this->sendVersionGraphToUI(cfg, cfg.getActiveVersionName(), cfg.getActiveBranchVersionName());
 }
 
+void Model::setVersionLabel(const std::string& version, const std::string& label)
+{
+	ot::VersionGraphVersionCfg* versionObject = getStateManager()->getVersionGraph().findVersion(version);
+
+	if (!versionObject) {
+		OT_LOG_EAS("Selected version not found \"" + version + "\"");
+		return;
+	}
+
+	versionObject->setLabel(label);
+
+	getStateManager()->updateVersionEntity(version);
+
+	const ot::VersionGraphCfg& cfg = getStateManager()->getVersionGraph();
+	this->sendVersionGraphToUI(cfg, cfg.getActiveVersionName(), cfg.getActiveBranchVersionName());
+}
+
 void Model::deleteProperty(const std::list<ot::UID> &entityIDList, const std::string& propertyName, const std::string& propertyGroup)
 {
 	std::list<EntityBase*> entities;
-	for (auto entityID : entityIDList) entities.push_back(getEntity(entityID));
+	for (auto entityID : entityIDList) entities.push_back(getEntityByID(entityID));
 
 	std::list<EntityBase*> entitiesToSet = getListOfEntitiesToConsiderForPropertyChange(entities);
 
@@ -2040,7 +1937,7 @@ void Model::getCommonProperties(const std::list<EntityBase *> &entities, EntityP
 void Model::getEntityProperties(ot::UID entityID, bool recursive, const std::string& propertyGroupFilter, std::map<ot::UID, ot::PropertyGridCfg>& _entityProperties)
 {
 	// Get the specified entity
-	EntityBase* entity = getEntity(entityID);
+	EntityBase* entity = getEntityByID(entityID);
 
 	// Add the properties of the given entity (and potentially its children) to the map
 	getEntityProperties(entity, recursive, propertyGroupFilter, _entityProperties);
@@ -2585,7 +2482,7 @@ void Model::updateEntities(bool itemsVisible)
 
 			for (auto &entityDependency : dependencyMap)
 			{
-				EntityBase* dependentEntity = getEntity(entityDependency.first);
+				EntityBase* dependentEntity = getEntityByID(entityDependency.first);
 
 				for (auto &propertyDependency : entityDependency.second)
 				{
@@ -2641,7 +2538,7 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 		{
 			ot::UID brepVersion = 0;
 
-			EntityGeometry *geomEntity = dynamic_cast<EntityGeometry *>(getEntity(entity.first));
+			EntityGeometry *geomEntity = dynamic_cast<EntityGeometry *>(getEntityByID(entity.first));
 			if (geomEntity != nullptr)
 			{
 				brepVersion = getStateManager()->getCurrentEntityVersion(geomEntity->getBrepStorageObjectID());
@@ -2777,7 +2674,7 @@ void Model::replaceParameterByString(EntityParameter *parameter, const std::stri
 
 	for (auto &entityDependency : dependencyMap)
 	{
-		EntityBase *entity = getEntity(entityDependency.first);
+		EntityBase *entity = getEntityByID(entityDependency.first);
 		assert(entity != nullptr);
 
 		if (entity != nullptr)
@@ -2888,10 +2785,10 @@ bool Model::evaluateExpressionDouble(const std::string &expression, double &valu
 			parameters.push_back(var->name);
 		}
 
-		if (!parameters.empty() && dynamic_cast<EntityParameter *>(getEntity(entityID)) != nullptr)
+		if (!parameters.empty() && dynamic_cast<EntityParameter *>(getEntityByID(entityID)) != nullptr)
 		{
 			// We are updating a paramter -> check for circular dependency
-			if (checkCircularParameterDependency(dynamic_cast<EntityParameter *>(getEntity(entityID)), parameters))
+			if (checkCircularParameterDependency(dynamic_cast<EntityParameter *>(getEntityByID(entityID)), parameters))
 			{
 				// We do have a circular dependency -> error
 				te_free(expr);
@@ -2902,7 +2799,7 @@ bool Model::evaluateExpressionDouble(const std::string &expression, double &valu
 				}
 
 				std::string message;
-				message = "*** ERROR *** Circular dependency detected in expression for parameter: " + getEntity(entityID)->getName() + "\n\n";
+				message = "*** ERROR *** Circular dependency detected in expression for parameter: " + getEntityByID(entityID)->getName() + "\n\n";
 
 				displayMessage(message);
 
@@ -2978,7 +2875,7 @@ bool Model::checkWhetherParameterDependsOnGivenParameter(EntityParameter *parame
 	// Now check whether there are any other parameters on which we are depending. If so, check their dependency
 	for (auto &dependingOnEntity : dependencyMap)
 	{
-		EntityParameter *dependingOnParameter = dynamic_cast<EntityParameter *>(getEntity(dependingOnEntity.first));
+		EntityParameter *dependingOnParameter = dynamic_cast<EntityParameter *>(getEntityByID(dependingOnEntity.first));
 
 		if (dependingOnParameter != nullptr)
 		{
@@ -3172,15 +3069,13 @@ void Model::reportInformation(const std::string &message)
 	Application::instance()->getNotifier()->reportInformation(message);
 }
 
-void Model::updateMenuStates(void)
-{
-	modelSelectionChangedNotification(selectedModelEntityIDs, selectedVisibleModelEntityIDs);
-}
-
 void Model::showSelectedShapeInformation(void)
 {
 	std::list<EntityBase *> selectedEntities;
-	for (auto entityID : selectedModelEntityIDs) selectedEntities.push_back(entityMap[entityID]);
+	for (ot::UID entityID : Application::instance()->getSelectionHandler().getSelectedEntityIDs())
+	{
+		selectedEntities.push_back(entityMap[entityID]);
+	}
 
 	// We need to ensure that we have all necessary geometry information loaded (prefetching)
 	std::list<ot::UID> prefetchIds;
@@ -3289,7 +3184,7 @@ void Model::showSelectedShapeInformation(void)
 			{
 				for (auto &entityDependency : dependencyMap)
 				{
-					message += "    " + getEntity(entityDependency.first)->getName() + "\n";
+					message += "    " + getEntityByID(entityDependency.first)->getName() + "\n";
 
 					for (auto &propertyDependency : entityDependency.second)
 					{
@@ -3505,7 +3400,7 @@ void Model::entitiesSelected(const std::string &selectionAction, const std::stri
 			ot::UID entityID = modelID[i].GetUint64();
 			std::string fname = faceName[i].GetString();
 
-			EntityBase *entity = getEntity(entityID);
+			EntityBase *entity = getEntityByID(entityID);
 			assert(entity != nullptr);
 
 			if (entity != nullptr)
@@ -3579,7 +3474,7 @@ void Model::updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity)
 
 		ot::UID modelEntityID = getEntityNameToIDMap()[geometryName->getValue()];
 
-		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry *> (getEntity(modelEntityID));
+		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry *> (getEntityByID(modelEntityID));
 
 		if (geometryEntity != nullptr)
 		{
@@ -3969,6 +3864,20 @@ void Model::promptResponse(const std::string &type, const std::string &answer, c
 	else
 	{
 		assert(0); // Unknown type
+	}
+}
+
+EntityBase* Model::getEntityByID(ot::UID _entityID) const
+{
+	auto entityBaseIt = entityMap.find(_entityID);
+	if (entityBaseIt == entityMap.end())
+	{
+		assert(0); //Entity was not found
+		return nullptr;
+	}
+	else
+	{
+		return entityBaseIt->second;
 	}
 }
 
@@ -4644,7 +4553,7 @@ void Model::updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVers
 	// We add the binaryData items as childs to the visualization entity id and update this entity. This function is called as part of the 
 	// update process, so the modelChangeOperationCompleted function will be called later.
 
-	EntityVis2D3D *visEntity = dynamic_cast<EntityVis2D3D *>(getEntity(visEntityID));
+	EntityVis2D3D *visEntity = dynamic_cast<EntityVis2D3D *>(getEntityByID(visEntityID));
 	assert(visEntity != nullptr);
 	if (visEntity == nullptr) return;
 
@@ -4688,7 +4597,7 @@ void Model::updateVisualizationEntity(ot::UID visEntityID, ot::UID visEntityVers
 
 void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const ot::PropertyGridCfg& _configuration, bool updateProperties)
 {
-	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry *>(getEntity(geomEntityID));
+	EntityGeometry *geomEntity = dynamic_cast<EntityGeometry *>(getEntityByID(geomEntityID));
 	if (geomEntity == nullptr)
 	{
 		assert(0); // The geometry entity does not exist
@@ -4797,7 +4706,7 @@ void Model::requestUpdateVisualizationEntity(ot::UID visEntityID)
 	// We add the binaryData items as childs to the visualization entity id and update this entity. This function is called as part of the 
 	// update process, so the modelChangeOperationCompleted function will be called later.
 
-	EntityVis2D3D *visEntity = dynamic_cast<EntityVis2D3D *>(getEntity(visEntityID));
+	EntityVis2D3D *visEntity = dynamic_cast<EntityVis2D3D *>(getEntityByID(visEntityID));
 	if (visEntity == nullptr)
 	{
 		assert(0); // Unknown type
@@ -4853,7 +4762,7 @@ void Model::getEntityNames(std::list<ot::UID> &entityIDList, std::list<std::stri
 
 	for (auto entity : entityIDList)
 	{
-		EntityBase *baseEntity = getEntity(entity);
+		EntityBase *baseEntity = getEntityByID(entity);
 
 		if (baseEntity != nullptr)
 		{
@@ -4872,7 +4781,7 @@ void Model::getEntityTypes(std::list<ot::UID> &entityIDList, std::list<std::stri
 
 	for (auto entity : entityIDList)
 	{
-		EntityBase *baseEntity = getEntity(entity);
+		EntityBase *baseEntity = getEntityByID(entity);
 
 		if (baseEntity != nullptr)
 		{
@@ -5070,7 +4979,7 @@ void Model::updateModelStateForUndoRedo(void)
 						}
 						else
 						{
-							EntityBase *parentEntity = getEntity(parentID);
+							EntityBase *parentEntity = getEntityByID(parentID);
 
 							if (entityMap.empty()) {
 								OT_LOG_EA("Entity map is empty before reading entity");
@@ -5126,9 +5035,9 @@ void Model::showByMaterial(void)
 	std::map<std::string, ot::UID> materialNameToIDMap;
 	std::map<ot::UID, std::string> materialIdToNameMap;
 
-	for (auto selEntityID : selectedModelEntityIDs)
+	for (auto selEntityID : Application::instance()->getSelectionHandler().getSelectedEntityIDs())
 	{
-		EntityMaterial* entityMaterial = dynamic_cast<EntityMaterial*>(getEntity(selEntityID));
+		EntityMaterial* entityMaterial = dynamic_cast<EntityMaterial*>(getEntityByID(selEntityID));
 
 		if (entityMaterial != nullptr)
 		{
@@ -5231,7 +5140,7 @@ void Model::showMaterialMissing(void)
 
 	for (auto entity : entityMap)
 	{
-		EntityMaterial *entityMaterial = dynamic_cast<EntityMaterial*>(getEntity(entity.first));
+		EntityMaterial *entityMaterial = dynamic_cast<EntityMaterial*>(getEntityByID(entity.first));
 
 		if (entityMaterial != nullptr)
 		{
@@ -5432,7 +5341,7 @@ std::string Model::checkParentUpdates(std::list<ot::UID> &modifiedEntities)
 	// Here we consider only one level up, since we will then update their parents in a second round.
 	for (auto entityID : modifiedEntities)
 	{
-		EntityBase *entity = getEntity(entityID);
+		EntityBase *entity = getEntityByID(entityID);
 		assert(entity != nullptr);
 
 		EntityBase *parent = entity->getParent();
@@ -5462,7 +5371,7 @@ std::string Model::checkParentUpdates(std::list<ot::UID> &modifiedEntities)
 
 	for (auto entityID : affectedParentList)
 	{
-		EntityGeometry *entity = dynamic_cast<EntityGeometry *>(getEntity(entityID));
+		EntityGeometry *entity = dynamic_cast<EntityGeometry *>(getEntityByID(entityID));
 		assert(entity != nullptr);
 
 		if (entity != nullptr)

@@ -5,10 +5,13 @@
 #include "ClassFactory.h"
 #include "Application.h"
 #include "PreviewAssemblerRMD.h"
+#include "LocaleSettingsSwitch.h"
 
 #include "Documentation.h"
-#include <algorithm>
+#include "OTCore/StringToVariableConverter.h"
 
+#include <algorithm>
+#include <bitset>
 
 DataCategorizationHandler::DataCategorizationHandler(std::string baseFolder, std::string parameterFolder, std::string quantityFolder, std::string tableFolder, std::string previewTableName)
 	:_baseFolder(baseFolder), _parameterFolder(parameterFolder), _quantityFolder(quantityFolder), _tableFolder(tableFolder), _previewTableName(previewTableName),
@@ -285,14 +288,16 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 	std::list<ot::UID> dataEntityParentList{ };
 	std::list<std::string> takenNames;
 
-
 	ot::EntityInformation entityInfo;
 	_modelComponent->getEntityInformation(_scriptFolder, entityInfo);
 	_scriptFolderUID = entityInfo.getID();
+	
+	const char selectedSeparator = tableEntPtr->getSelectedDecimalSeparator();
+	LocaleSettingsSwitch decimalSeparatorSetting(selectedSeparator);
+	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr->getTableData().get(), ranges);
 
 	for (auto categoryEntity : _activeCollectionEntities)
-	{
-		
+	{	
 		for (size_t i = 0; i < ranges.size(); i++)
 		{
 			std::unique_ptr<EntityTableSelectedRanges> tableRange
@@ -303,11 +308,11 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 			if (allScripts.size() > 0)
 			{
 				_modelComponent->getEntityInformation(*allScripts.begin(), entityInfo);
-				tableRange->createProperties(_scriptFolder, _scriptFolderUID, entityInfo.getName(), entityInfo.getID());
+				tableRange->createProperties(_scriptFolder, _scriptFolderUID, entityInfo.getName(), entityInfo.getID(), dataType);
 			}
 			else
 			{
-				tableRange->createProperties(_scriptFolder, _scriptFolderUID, "", -1);
+				tableRange->createProperties(_scriptFolder, _scriptFolderUID, "", -1,dataType);
 			}
 			
 			tableRange->SetRange(ranges[i].GetTopRow(), ranges[i].GetBottomRow(), ranges[i].GetLeftColumn(), ranges[i].GetRightColumn());
@@ -348,8 +353,6 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 			std::replace(name.begin(), name.end(), '/', '\\');
 			name =	CreateNewUniqueTopologyNamePlainPossible(categoryEntity->getName(), name, takenNames);
 			tableRange->setName(name);
-
-
 
 			tableRange->StoreToDataBase();
 			topologyEntityIDList.push_back(tableRange->getEntityID());
@@ -521,6 +524,73 @@ std::pair<ot::UID, ot::UID> DataCategorizationHandler::CreateNewTable(std::strin
 	return newTableIdentifier;
 }
 
+std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(EntityResultTableData<std::string>* _tableData, const std::vector<ot::TableRange>& _selectedRanges)
+{
+	ot::StringToVariableConverter converter;
+	std::bitset<5> dataType;
+	//If one filed value is detected that is definately a string, we end the search.
+	bool stringDetected = false;
+	auto rangeIt = _selectedRanges.begin();
+	while (!stringDetected && rangeIt != _selectedRanges.end())
+	{
+		int row = rangeIt->GetTopRow();
+		while(!stringDetected && row <= rangeIt->GetBottomRow())
+		{
+			int column = rangeIt->GetLeftColumn();
+			while(!stringDetected && column <= rangeIt->GetRightColumn())
+			{
+				std::string value = _tableData->getValue(row, column);
+				if (value != "")
+				{
+					ot::Variable variable = converter(value);
+				
+					dataType[0] = dataType[0] || variable.isInt32();
+					dataType[1] = dataType[1] || variable.isInt64();
+					dataType[2] = dataType[2] || variable.isFloat();
+					dataType[3] = dataType[3] || variable.isDouble();
+					dataType[4] = dataType[4] || variable.isConstCharPtr();
+				
+					if (dataType[4] == 1)
+					{
+						stringDetected = true;
+					}
+				}
+				column++;
+			}
+			row++;
+		}
+		rangeIt++;
+	}
+	//Now we get the common denominator of all detected datypes
+	//Dominance is as following (Strong to weak) : String, Double, Float, Int64, Int32
+	std::string typeName("");
+	if (dataType[4])
+	{
+		typeName = ot::TypeNames::getStringTypeName();;
+	}
+	else if (dataType[3])
+	{
+		typeName = ot::TypeNames::getDoubleTypeName();
+	}
+	else if (dataType[2])
+	{
+		typeName = ot::TypeNames::getFloatTypeName();
+	}
+	else if (dataType[1])
+	{
+		typeName = ot::TypeNames::getInt64TypeName();
+	}
+	else if (dataType[0])
+	{
+		typeName = ot::TypeNames::getInt32TypeName();
+	}
+	else
+	{
+		typeName = ot::TypeNames::getStringTypeName(); //Default, happens when all entries were empty, i.e. ""
+	}
+	return typeName;
+}
+
 std::list<std::shared_ptr<EntityTableSelectedRanges>> DataCategorizationHandler::FindAllTableSelectionsWithScripts()
 {
 	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
@@ -633,7 +703,8 @@ std::tuple<std::list<std::string>, std::list<std::string>> DataCategorizationHan
 			_modelComponent->getEntityInformation(selection->getTableName(), entityInfo);
 			bool selectEntireColumn = selection->getSelectEntireColumn();
 			bool selectEntireRow = selection->getSelectEntireRow();
-			newSelection->createProperties(_scriptFolder, _scriptFolderUID, selection->getScriptName(), entityInfo.getID(),selectEntireRow,selectEntireColumn);
+			std::string dataType = selection->getSelectedType();
+			newSelection->createProperties(_scriptFolder, _scriptFolderUID, selection->getScriptName(), entityInfo.getID(),dataType,selectEntireRow,selectEntireColumn);
 			
 			
 			newSelection->SetTableProperties(selection->getTableName(),entityInfo.getID(),selection->getTableOrientation());

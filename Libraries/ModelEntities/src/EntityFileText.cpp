@@ -1,19 +1,19 @@
 #include "EntityFileText.h"
 #include <locale>
-EntityFileText::EntityFileText(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	: EntityFile(ID,parent,obs,ms,factory,owner)
+EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
+	: EntityFile(_ID,_parent,_obs,_ms,_factory,_owner)
 {
 }
 
-void EntityFileText::setTextEncoding(ot::TextEncoding::EncodingStandard encoding)
+void EntityFileText::setTextEncoding(ot::TextEncoding::EncodingStandard _encoding)
 {
-	_encoding = encoding;
+	m_encoding = _encoding;
 	EntityPropertiesBase* base=	getProperties().getProperty("Text Encoding");
 	if (base != nullptr)
 	{
 		auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(base);
 		ot::TextEncoding encoding;
-		selectionProperty->setValue(encoding.getString(_encoding));
+		selectionProperty->setValue(encoding.getString(m_encoding));
 		selectionProperty->setNeedsUpdate();
 	}
 	else
@@ -37,10 +37,25 @@ ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding()
 	}
 }
 
-std::string EntityFileText::getText(void)
+std::string EntityFileText::getText(void) 
 {
 	const std::vector<char> plainData = getData()->getData();
 	return std::string(plainData.begin(),plainData.end());
+}
+
+void EntityFileText::setText(const std::string& _text)
+{
+	auto dataEntity = getData();
+	dataEntity->clearData();
+
+	//Ensure correct encoding at this location!
+	dataEntity->setData(_text.data(), _text.size());
+	if (getModelState() != nullptr)
+	{
+		dataEntity->StoreToDataBase();
+		getModelState()->addNewEntity(dataEntity->getEntityID(), this->getEntityID(), dataEntity->getEntityStorageVersion(), ModelStateEntity::tEntityType::DATA);
+		setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+	}
 }
 
 ot::TextEditorCfg EntityFileText::createConfig(void) {
@@ -48,9 +63,29 @@ ot::TextEditorCfg EntityFileText::createConfig(void) {
 	result.setName(this->getName());
 	result.setTitle(this->getName());
 	result.setPlainText(this->getText());
-	result.setDocumentSyntax(ot::DocumentSyntax::PythonScript); // switch to property some day
+
+	const std::string fileType = getFileType();
+	if (fileType == "py")
+	{
+		result.setDocumentSyntax(ot::DocumentSyntax::PythonScript);
+	}
+	else
+	{
+		result.setDocumentSyntax(ot::DocumentSyntax::PlainText);
+	}
 
 	return result;
+}
+
+ot::ContentChangedHandling EntityFileText::getContentChangedHandling()
+{
+	return m_contentChangedHandling;
+}
+
+void EntityFileText::setContentChangedHandling(ot::ContentChangedHandling _contentChangedHandling)
+{
+	m_contentChangedHandling = _contentChangedHandling; 
+	setModified();
 }
 
 void EntityFileText::setSpecializedProperties()
@@ -65,7 +100,7 @@ void EntityFileText::setSpecializedProperties()
 			encoding.getString(ot::TextEncoding::UTF16_LEBOM),
 			encoding.getString(ot::TextEncoding::UNKNOWN),
 		},
-		encoding.getString(_encoding),
+		encoding.getString(m_encoding),
 		"default",getProperties());
 
 	EntityPropertiesSelection::createProperty("Text Properties",
@@ -77,19 +112,39 @@ void EntityFileText::setSpecializedProperties()
 		);
 }
 
-void EntityFileText::AddStorageData(bsoncxx::builder::basic::document& storage)
+void EntityFileText::AddStorageData(bsoncxx::builder::basic::document& _storage)
 {
-	EntityFile::AddStorageData(storage);
+	EntityFile::AddStorageData(_storage);
 	ot::TextEncoding encoding;
-	std::string encodingStr = encoding.getString(_encoding);
-	storage.append(bsoncxx::builder::basic::kvp("TextEncoding", encodingStr));
+	std::string encodingStr = encoding.getString(m_encoding);
+	_storage.append(bsoncxx::builder::basic::kvp("TextEncoding", encodingStr));
+	_storage.append(bsoncxx::builder::basic::kvp("ContentChangedHandler", static_cast<int32_t>(m_contentChangedHandling)));
 }
 
-void EntityFileText::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityFileText::readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap)
 {
-	EntityFile::readSpecificDataFromDataBase(doc_view,entityMap);
+	EntityFile::readSpecificDataFromDataBase(_doc_view,_entityMap);
 	
-	const std::string encodingStr(doc_view["TextEncoding"].get_utf8().value.data());
+	const std::string encodingStr(_doc_view["TextEncoding"].get_utf8().value.data());
+	int32_t contentChangedHandling = _doc_view["ContentChangedHandler"].get_int32().value;
+
+	if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::NotifyOwner))
+	{
+		m_contentChangedHandling = ot::ContentChangedHandling::NotifyOwner;
+	}
+	else if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::OwnerHandles))
+	{
+		m_contentChangedHandling = ot::ContentChangedHandling::OwnerHandles;
+	}
+	else if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::SimpleSave))
+	{
+		m_contentChangedHandling = ot::ContentChangedHandling::SimpleSave;
+	}
+	else
+	{
+		assert(false);
+	}
+
 	ot::TextEncoding encoding;
-	_encoding =	encoding.getType(encodingStr);
+	m_encoding = encoding.getType(encodingStr);
 }
