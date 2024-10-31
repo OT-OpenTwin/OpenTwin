@@ -102,14 +102,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
 
     GLOBAL.set(lib_path.to_string());
 	
-    // GET /any path
+    // creating path to file which will be downloaded depending on if it is an enduser or a developer machine
     let download_file_path: String = if option_env!("OPENTWIN_DEV_ROOT").is_some() {
-        env!("OPENTWIN_DEV_ROOT").to_owned() + "/Framework/OpenTwin/requests.http"
+        env!("OPENTWIN_DEV_ROOT").to_owned() + "/Deployment/FrontendInstaller/"
     } else {
-        std::env::current_exe().unwrap().to_str().unwrap().to_string()
+        std::env::current_exe().unwrap().to_str().unwrap().to_string() + "/FrontendInstaller/"
     };
     let dll_file_name = Path::new(GLOBAL.get()).file_name().unwrap().to_str();
     let service_name = Path::new(dll_file_name.unwrap()).file_stem().unwrap().to_str();
+
+    // endpoint for http file download
     if service_name == Some("GlobalSessionService") {
         let download_route = warp::path::end()
             .map(|| warp::reply::html(get_download_html_body()));
@@ -126,6 +128,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
         println!("HTTP Server listening on http://127.0.0.1:80")
     }
     
+    // GET /any path
     let info_route = warp::path::end()
         .map(move || {
             let computed_string: String = "OpenTwin Microservice (".to_string() + service_name.expect("UNKNOWN") + ")";
