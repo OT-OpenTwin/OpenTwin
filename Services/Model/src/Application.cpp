@@ -1010,6 +1010,11 @@ bool Application::queuedRequestToFrontend(const ot::JsonDocument& _request, cons
 	return this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, _request, tmp);
 }
 
+void Application::flushRequestsToFrontEnd()
+{
+	this->flushQueuedHttpRequests(OT_INFO_SERVICE_TYPE_UI);
+}
+
 // ##################################################################################################################################################################################################################
 
 // Required functions
