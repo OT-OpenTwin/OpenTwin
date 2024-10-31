@@ -14,6 +14,8 @@ IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
 	goto END_FAIL
 )
 
+Set THIRDPARTY_UNZIP_PATH="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools"
+Set THIRDPARTY_ZIPFILE="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools\ThirdParty.zip.001"
 
 Set OT_INSTALLUPGRADER_DIR="%OPENTWIN_DEV_ROOT%\Tools\MongoDBUpgrader\Upgrader_Deployment"
 RMDIR /S /Q "%OT_INSTALLUPGRADER_DIR%"
@@ -21,13 +23,13 @@ MKDIR "%OT_INSTALLUPGRADER_DIR%"
 
 REM Getting the path for NSIS make
 set NSIS_REG_KEY=HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\NSIS
+
 set "NSIS_REG_VALUE="
 
 for /f "tokens=2,*" %%a in ('reg query "%NSIS_REG_KEY%" /ve 2^>nul') do (
     set "NSIS_REG_VALUE=%%b"
 )
 
-for /f "tokens=2*" %%a in ('reg query "%SEVENZIP_REG_KEY%" /v "%SEVENZIP_VALUE%" 2^>nul') do set SEVENZIP_REG_DATA=%%b
 
 Set MAKENSIS_PATH="!NSIS_REG_VALUE!\makensis.exe"
 
@@ -44,7 +46,6 @@ MKDIR "%OT_INSTALLUPGRADER_DIR%\MongoDB_Installer"
 MKDIR "%OT_INSTALLUPGRADER_DIR%\Upgrader_Exe"
 
 
-
 if "!NSIS_REG_VALUE!"=="" (
     echo NSIS Installation not found!
 	GOTO END_FAIL
@@ -59,6 +60,9 @@ if "!NSIS_REG_VALUE!"=="" (
 
 :COMPILE
 echo +++ COMPILE TIME +++
+
+	echo Extracting Third Party Toolchain using 7-Zip...
+	"!OPENTWIN_THIRDPARTY_ROOT!\7-Zip\Win64\7z.exe" x !THIRDPARTY_ZIPFILE! -o!THIRDPARTY_UNZIP_PATH! -y
 
 	REM First we build and copy the c++ executable
 	CALL "%UPGRADER_EXE%build.bat" BOTH REBUILD

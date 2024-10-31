@@ -10,7 +10,7 @@
 #include "OTWidgets/Plot.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
-#define OT_WIDGETTYPE_Plot "Plot"
+#define OT_WIDGETTYPE_Plot "Plot_New"
 
 namespace ot {
 

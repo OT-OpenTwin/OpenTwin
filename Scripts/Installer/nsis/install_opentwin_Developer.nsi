@@ -125,7 +125,7 @@
 
 	!define DEFAULT_MONGODB_STORAGE_PATH '"$DEV_ROOT\DataStorage\data"'
 	!define DEFAULT_MONGODB_LOG_PATH '"$DEV_ROOT\DataStorage\log"'
-	!define DEFAULT_MONGODB_INSTALL_PATH '"$PROGRAMFILES64\MongoDB\Server\4.4"'
+	!define DEFAULT_MONGODB_INSTALL_PATH '"$PROGRAMFILES64\MongoDB\Server\7.0"'
 	!define DEFAULT_MONGODB_COMPASS_PATH '"$PROGRAMFILES64\MongoDB Compass"'
 	!define MONGODB_DELETION_PATH '"$PROGRAMFILES64\MongoDB"'
 	!define DEFAULT_MONGODB_ADMIN_PASSWORD "admin"
@@ -964,7 +964,11 @@ Section "-Extract Installer Tools (Required)" SEC01
 
 	DetailPrint "Extracting toolchain..."
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\dev\*.*"
-	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\*.*"
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\MongoDB_Installer\*.*"
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\RefreshEnv.cmd"
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\VC_redist.x64.exe"
+	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\VC_redist.x86.exe"
+	
 	File /r "..\helper\*.*"
 	File /r "..\javascript\*.*"
 
@@ -1046,8 +1050,8 @@ SectionGroup /e "OpenTwin"
 		
 		DetailPrint "Running MongoDB installation scripts..."
 
-		ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$TempToolChain\mongodb-windows-x86_64-4.4.28-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService,Client"'		
-		ExecWait 'msiexec /qb /i "$TempToolChain\mongodb-compass-1.42.3-win32-x64.msi"'
+		ExecWait 'msiexec /l*v mdbinstall.log  /qb /i "$TempToolChain\MongoDB_Installer\mongodb-windows-x86_64-7.0.14-signed.msi" INSTALLLOCATION="$MONGODB_INSTALL_PATH" SHOULD_INSTALL_COMPASS="0" ADDLOCAL="ServerService"'		
+		ExecWait 'msiexec /qb /i "$TempToolChain\MongoDB_Installer\mongodb-compass-1.44.4-win32-x64.msi"'
 		DetailPrint "Waiting for MongoDB Compass Application..."
 			Push ${DEFAULT_MONGODB_COMPASS_PATH}
 			Push "MongoDB Compass"

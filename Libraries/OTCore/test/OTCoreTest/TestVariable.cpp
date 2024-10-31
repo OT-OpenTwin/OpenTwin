@@ -300,6 +300,27 @@ TEST(StringToVariable, StringToBoolVariable)
 	EXPECT_EQ(actualValue.getBool(), expectedValue);
 }
 
+TEST(StringToVariable, String)
+{
+	ot::StringToVariableConverter converter;
+	const ot::Variable actualValue = converter("F");
+	EXPECT_TRUE(actualValue.isConstCharPtr());
+}
+
+TEST(StringToVariable, ScientificNotationWrongDelimiter)
+{
+	ot::StringToVariableConverter converter;
+	const ot::Variable actualValue = converter("-1,00E+00");
+	EXPECT_TRUE(actualValue.isConstCharPtr());
+}
+
+TEST(StringToVariable, ScientificNotation)
+{
+	ot::StringToVariableConverter converter;
+	const ot::Variable actualValue = converter("-1.00E+00");
+	EXPECT_TRUE(actualValue.isFloat());
+}
+
 TEST(VariableTest, StringMove)
 {
 	std::vector<ot::Variable> var;

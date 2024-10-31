@@ -36,7 +36,7 @@ private:
 	std::string determineRunIDLabel(std::list<int>& runIDList);
 	
 	std::list<DatasetDescription> extractDataDescriptionCurve(const std::string& _category, RunIDContainer* _runIDContainer, int _runID);
-	DatasetDescription extractDataDescriptionSParameter(const std::string& _category, RunIDContainer* _runIDContainer, int _runID);
+	bool extractDataDescriptionSParameter(const std::string& _category, RunIDContainer* _runIDContainer, int _runID, DatasetDescription &dataDescription);
 	std::list<std::shared_ptr<ParameterDescription>> extractParameterDescription(const std::string& _category, RunIDContainer* _runIDContainer, int _runID);
 
 	int determineNumberOfPorts(const std::string& category, std::map<std::string, Result1DData*>& categoryResults, std::vector<Result1DData*>& sources);

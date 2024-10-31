@@ -1,18 +1,18 @@
-#include <iostream>
-#include <string>
-#include <filesystem>
 #include "WindowsServiceManager.h"
 #include "MongoDBSettingsParser.h"
 #include "MongoDBUpgrader.h"
-#include "mongocxx/instance.hpp"
 #include "MongoDBInstaller.h"
-#include <conio.h>
-#include "boost/program_options.hpp"
 #include "MongoVersion.h"
-#include <any>
 #include "Logger.h"
 #include "Varifier.h"
 
+#include <iostream>
+#include <string>
+#include <filesystem>
+#include <mongocxx/instance.hpp>
+#include <conio.h>
+#include <any>
+#include <boost/program_options.hpp>
 //!brief:
 //! Check if a mongodb service exists
 //! if yes, get the configuration

@@ -1,7 +1,8 @@
 #include "MongoDBServerRunner.h"
-#include <iostream>
 #include "WindowsUtilityFuctions.h"
 #include "Logger.h"
+
+#include <iostream>
 
 MongoDBServerRunner::MongoDBServerRunner(const std::string& _serverPath, const std::string& _configPath)
 {

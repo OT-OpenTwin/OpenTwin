@@ -15,34 +15,37 @@ class __declspec(dllexport) EntityFile: public EntityBase
 public:
 	EntityFile(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 
-	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
+	virtual bool getEntityBox(double &_xmin, double &_xmax, double &_ymin, double &_ymax, double &_zmin, double &_zmax) override;
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
 	virtual std::string getClassName(void) override { return "EntityFile"; };
 	virtual bool updateFromProperties(void) override;
 	virtual void addVisualizationNodes() override;
 
-	void setFileProperties(std::string path, std::string fileName, std::string fileType);
-	void setData(ot::UID dataID, ot::UID dataVersion);
+	void setFileProperties(const std::string& _path, const std::string& _fileName, const std::string& _fileType);
+	
+	//! @brief Does not reset the data entity. If a new data entity is assinged, this topology entity will still hold a reference to the old one. However, typically one would update the old data entity.
+	void setData(ot::UID _dataID, ot::UID _dataVersion);
+	//! @brief  Requires the ClassFactoryHandler to be set.
 	std::shared_ptr<EntityBinaryData> getData();
-	std::string getPath() const { return _path; }
-	std::string getFileName() const { return _fileName; }
-	std::string getFileType() const { return _fileType; }
+
+	std::string getPath() const { return m_path; }
+	std::string getFileName() const { return m_fileName; }
+	std::string getFileType() const { return m_fileType; }
 
 protected:
 	virtual void setSpecializedProperties() {};
-	virtual void AddStorageData(bsoncxx::builder::basic::document& storage) override;
-	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
+	virtual void AddStorageData(bsoncxx::builder::basic::document& _storage) override;
+	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase *>& _entityMap) override;
 
 private:
-	std::string _path ="";
-	std::string _fileName ="";
-	std::string _fileType ="";
-	long long _dataUID = -1;
-	long long _dataVersion = -1;
+	std::string m_path ="";
+	std::string m_fileName ="";
+	std::string m_fileType ="";
+	long long m_dataUID = -1;
+	long long m_dataVersion = -1;
+	std::shared_ptr<EntityBinaryData> m_data = nullptr;
 
 	void EnsureDataIsLoaded();
-	std::shared_ptr<EntityBinaryData> _data = nullptr;
-	
 	void setProperties();
 	virtual int getSchemaVersion() { return 1; }
 };

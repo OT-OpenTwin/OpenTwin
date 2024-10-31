@@ -1,15 +1,17 @@
 #pragma once
 #pragma warning(disable : 4251)
 
+// OpenTwin header
+#include "OTGui/PropertyGridCfg.h"
+#include "Types.h"
+
+// std header
 #include <string>
 #include <vector>
 
-class EntityProperties;
 class EntityBase;
 class EntityContainer;
-
-#include "Types.h"
-#include "OTGui/PropertyGridCfg.h"
+class EntityProperties;
 
 namespace ot { class Property; };
 namespace ot { class Painter2D; };
@@ -90,21 +92,30 @@ private:
 class __declspec(dllexport) EntityPropertiesDouble : public EntityPropertiesBase
 {
 public:
-	EntityPropertiesDouble() : value(0.0) {};
+	EntityPropertiesDouble();
 	virtual ~EntityPropertiesDouble() {};
 
-	EntityPropertiesDouble(const std::string &n, double v) : value(v) { setName(n); };
+	EntityPropertiesDouble(const std::string& _name, double _value);
 
-	EntityPropertiesDouble(const EntityPropertiesDouble &other) : EntityPropertiesBase(other) { value = other.value; };
+	EntityPropertiesDouble(const EntityPropertiesDouble& _other);
 
 	virtual EntityPropertiesBase *createCopy(void) override { return new EntityPropertiesDouble(*this); };
 
-	EntityPropertiesDouble& operator=(const EntityPropertiesDouble &other) { if (&other != this) { EntityPropertiesBase::operator=(other); value = other.getValue(); }; return *this; };
+	EntityPropertiesDouble& operator=(const EntityPropertiesDouble& _other);
 
 	virtual eType getType(void) override { return DOUBLE; };
 
-	void setValue(double v) { if (value != v) setNeedsUpdate();  value = v; };
-	double getValue(void) const { return value; };
+	void setValue(double _value);
+	double getValue(void) const { return m_value; };
+
+	void setRange(double _min, double _max);
+	void setMin(double _min);
+	double getMin(void) const { return m_min; };
+	void setMax(double _max);
+	double getMax(void) const { return m_max; };
+
+	void setAllowCustomValues(bool _allowCustomValues);
+	bool getAllowCustomValues(void) const { return m_allowCustomValues; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
@@ -119,7 +130,10 @@ public:
 	static void createProperty(const std::string &group, const std::string &name, double defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 
 private:
-	double value;
+	double m_value;
+	bool m_allowCustomValues;
+	double m_min;
+	double m_max;
 };
 
 // ################################################################################################################################################################
@@ -127,21 +141,30 @@ private:
 class __declspec(dllexport) EntityPropertiesInteger : public EntityPropertiesBase
 {
 public:
-	EntityPropertiesInteger() : value(0) {};
+	EntityPropertiesInteger();
 	virtual ~EntityPropertiesInteger() {};
 
-	EntityPropertiesInteger(const std::string &n, long v) : value(v) { setName(n); };
+	EntityPropertiesInteger(const std::string& _name, long _value);
 
-	EntityPropertiesInteger(const EntityPropertiesInteger &other) : EntityPropertiesBase(other) { value = other.value; };
+	EntityPropertiesInteger(const EntityPropertiesInteger& _other);
 
 	virtual EntityPropertiesBase *createCopy(void) override { return new EntityPropertiesInteger(*this); };
 
-	EntityPropertiesInteger& operator=(const EntityPropertiesInteger &other) { if (&other != this) { EntityPropertiesBase::operator=(other); value = other.getValue(); }; return *this; };
+	EntityPropertiesInteger& operator=(const EntityPropertiesInteger& _other);
 
 	virtual eType getType(void) override { return INTEGER; };
 
-	void setValue(long v) { if (value != v) setNeedsUpdate(); value = v; };
-	long getValue(void) const { return value; };
+	void setValue(long _value);
+	long getValue(void) const { return m_value; };
+
+	void setRange(long _min, long _max);
+	void setMin(long _min);
+	long getMin(void) const { return m_min; };
+	void setMax(long _max);
+	long getMax(void) const { return m_max; };
+
+	void setAllowCustomValues(bool _allowCustomValues);
+	bool getAllowCustomValues(void) const { return m_allowCustomValues; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
@@ -156,7 +179,10 @@ public:
 	static void createProperty(const std::string &group, const std::string &name, long defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 
 private:
-	long value;
+	long m_value;
+	bool m_allowCustomValues;
+	long m_min;
+	long m_max;
 };
 
 // ################################################################################################################################################################

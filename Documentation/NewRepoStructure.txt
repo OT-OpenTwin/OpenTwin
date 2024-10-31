@@ -1,4 +1,4 @@
-T
+*
 |
 +--> OTOpenTwin                         (OPENTWIN_DEV_ROOT must point here)
 |          |

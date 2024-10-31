@@ -3684,7 +3684,8 @@ std::string ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocume
 
 	AppBase::instance()->addGraphicsPickerPackage(pckg, info);
 
-	AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info);
+	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info);
+	view->setAsCurrentViewTab();
 
 	return "";
 }
@@ -3696,7 +3697,7 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 	ot::GraphicsScenePackage pckg("");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 
 	for (auto graphicsItemCfg : pckg.items()) {
 		ot::GraphicsItem* graphicsItem = ot::GraphicsItemFactory::instance().itemFromConfig(graphicsItemCfg, true);
@@ -3707,6 +3708,8 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 			editor->addItem(graphicsItem);
 		}
 	}
+
+	editor->setAsCurrentViewTab();
 
 	return "";
 }
@@ -3750,11 +3753,13 @@ std::string ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocum
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 
 	for (const auto& connection : pckg.connections()) {
 		editor->addConnectionIfConnectedItemsExist(connection);
 	}
+
+	editor->setAsCurrentViewTab();
 
 	return "";
 }
@@ -3849,6 +3854,7 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 
 	ot::TextEditorView* editor = AppBase::instance()->findOrCreateTextEditor(config, info);
 	editor->setContentChanged(false);
+	editor->setAsCurrentViewTab();
 
 	return "";
 }
@@ -3911,6 +3917,7 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 
 	ot::TableView* table = AppBase::instance()->findOrCreateTable(config, info);
 	table->setContentChanged(false);
+	table->setAsCurrentViewTab();
 
 	return "";
 }

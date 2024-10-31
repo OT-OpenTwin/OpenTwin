@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <boost/process/child.hpp>
+#include <boost/process/v1/child.hpp>
 
 class MongoDBServerRunner
 {

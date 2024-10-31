@@ -90,13 +90,12 @@ REM	"!SEVENZIP_REG_DATA!\7z.exe" x !PLUGIN_ZIPFILE! -o!NSIS_REG_VALUE! -y -aos
 	copy %OPENTWIN_DEV_ROOT%\Libraries\OTSystem\x64\Release\OTSystem.dll .\Configuration
 	
 	REM Now all tools, necessary for MongoDB installation/upgrade
-	Set UPGRADER_EXE="%UPGRADER_PATH%\Upgrader_Exe"
+	Set UPGRADER_EXE="%UPGRADER_PATH%\Upgrader_Exe\"
 
 	Set UPGRADER_Mongo_INSTALLER="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools\ThirdParty\shared\MongoDB_Installer"
 	Set UPGRADER_SERVER="!OPENTWIN_THIRDPARTY_ROOT!\Installer_Tools\ThirdParty\shared\MongoDB_Server\"
 	
 	MKDIR "Upgrader_Exe"
-	
 	
 	CALL "%UPGRADER_EXE%\build.bat" BOTH REBUILD
 	copy %UPGRADER_EXE%\x64\Release\MongoDBUpgradeManager.exe .\Upgrader_Exe\MongoDBUpgradeManager.exe
@@ -105,14 +104,14 @@ REM	"!SEVENZIP_REG_DATA!\7z.exe" x !PLUGIN_ZIPFILE! -o!NSIS_REG_VALUE! -y -aos
 	copy %OPENTWIN_THIRDPARTY_ROOT%\boost\boost_1_86_0\lib64-msvc-14.3\boost_filesystem-vc143-mt-x64-1_86.dll .\Upgrader_Exe\boost_filesystem-vc143-mt-x64-1_86.dll
 	copy %OPENTWIN_THIRDPARTY_ROOT%\MongoDb\mongo-cxx-driver-r3.10.0\x64\Release\bin .\Upgrader_Exe
 	copy %OPENTWIN_THIRDPARTY_ROOT%\MongoDb\mongo-c-driver-1.27.3\x64\Release\bin .\Upgrader_Exe
-	copy %UPGRADER_NSH% .
+	
 	REM Copying the required MongoDB files
 		
 	cd %cd%
 	
 	echo COMPILING OPENTWIN INSTALLATION SCRIPTS
 	!MAKENSIS_PATH! /V3 "/XOutFile "%OT_INSTALLIMAGES_DIR%\Install_OpenTwin.exe"" !ENDUSER_NSI!
-	REM !MAKENSIS_PATH! /V3 "/XOutFile "%OT_INSTALLIMAGES_DIR%\Install_OpenTwin_Development.exe"" !DEVELOPER_NSI!
+	!MAKENSIS_PATH! /V3 "/XOutFile "%OT_INSTALLIMAGES_DIR%\Install_OpenTwin_Development.exe"" !DEVELOPER_NSI!
 	GOTO END_SUCCESS
 
 :END_SUCCESS

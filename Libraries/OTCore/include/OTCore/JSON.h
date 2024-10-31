@@ -61,11 +61,29 @@ namespace ot {
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
+	class JsonNumber : public JsonValue {
+		OT_DECL_NOCOPY(JsonNumber)
+		OT_DECL_NODEFAULT(JsonNumber)
+	public:
+		JsonNumber(long _value) : JsonValue(rapidjson::kNumberType) { this->SetInt64(_value); };
+		JsonNumber(long long _value) : JsonValue(rapidjson::kNumberType) { this->SetInt64(_value); };
+		JsonNumber(unsigned long _value) : JsonValue(rapidjson::kNumberType) { this->SetUint64(_value); };
+		JsonNumber(unsigned long long _value) : JsonValue(rapidjson::kNumberType) { this->SetUint64(_value); };
+		JsonNumber(float _value) : JsonValue(rapidjson::kNumberType) { this->SetFloat(_value); };
+		JsonNumber(double _value) : JsonValue(rapidjson::kNumberType) { this->SetDouble(_value); };
+	};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	//! @class JsonString
 	//! @brief JSON String value
 	class JsonString : public JsonValue {
 		OT_DECL_NOCOPY(JsonString)
-			JsonString() = delete;
+		OT_DECL_NODEFAULT(JsonString)
 	public:
 		JsonString(const char* _cstr, JsonAllocator& _allocator) : JsonValue(_cstr, _allocator) {};
 		JsonString(const std::string& _str, JsonAllocator& _allocator) : JsonValue(_str.c_str(), _allocator) {};

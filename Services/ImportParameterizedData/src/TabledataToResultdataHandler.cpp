@@ -394,8 +394,6 @@ std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const
 	MetadataAssemblyRangeData rangeData;
 	rangeData.LoadAllRangeSelectionInformation(_metadataAssembly.allSelectionRanges, _loadedTables);
 
-	
-
 	//Loading parameter information
 
 	MetadataAssemblyRangeData parameterData;

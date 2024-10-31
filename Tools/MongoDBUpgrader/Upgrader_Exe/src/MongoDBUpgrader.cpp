@@ -4,9 +4,10 @@
 #include "MongoDBShellExecutor.h"
 #include "Logger.h"
 #include "FileWriter.h"
+
 #include <cassert>
 #include <iostream>
-#include <boost/process/system.hpp>
+#include <boost/process/v1/system.hpp>
 
 
 MongoDBUpgrader::MongoDBUpgrader(const MongoDBSettings& _settings, const std::string& _tempCfgPath)

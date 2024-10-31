@@ -267,6 +267,7 @@ void TableViewer::SetTableData()
 				QString text = QString::fromStdString(tableData->getValue(r, 0));
 				QTableWidgetItem* item = new QTableWidgetItem(text);
 				_table->setVerticalHeaderItem(rowPtr, item);
+				rowPtr++;
 			}
 
 			int columnPtr = 0;
@@ -274,7 +275,7 @@ void TableViewer::SetTableData()
 			{
 				QString text = QString::fromStdString(std::to_string(c));
 				QTableWidgetItem* item = new QTableWidgetItem(text);
-				_table->setVerticalHeaderItem(columnPtr, item);
+				_table->setHorizontalHeaderItem(columnPtr, item);
 				columnPtr++;
 			}
 		}
@@ -317,10 +318,10 @@ void TableViewer::SetTableData()
 
 void TableViewer::SetLoopRanges(uint32_t& outRowStart, uint32_t& outColumnStart, uint32_t& outRowEnd, uint32_t& outColumnEnd, uint64_t numberOfColumns, uint64_t numberOfRows)
 {
-	_shownMinCol = _activeTable->getMinColumn();
-	_shownMaxCol = _activeTable->getMaxColumn();
-	_shownMinRow = _activeTable->getMinRow();
-	_shownMaxRow = _activeTable->getMaxRow();
+	_shownMinCol = _activeTable->getMinColumn() -1; //The display index is 1-based and the access index is 0-based.
+	_shownMaxCol = _activeTable->getMaxColumn() - 1;
+	_shownMinRow = _activeTable->getMinRow() - 1;
+	_shownMaxRow = _activeTable->getMaxRow() - 1;
 
 	if (numberOfRows <= _shownMaxRow) //max Row lays within the possible index
 	{
@@ -359,7 +360,7 @@ void TableViewer::SetLoopRanges(uint32_t& outRowStart, uint32_t& outColumnStart,
 		outRowStart = _shownMinRow;
 	}
 	
-	if (_shownMinCol > outColumnEnd || _shownMinCol < 0 || _shownMinCol < outRowStart)
+	if (_shownMinCol > outColumnEnd || _shownMinCol < 0 || _shownMinCol < outColumnStart)
 	{
 
 		//outRowStart remains the default; 0 respectively 1 if the header is in the zeroth column

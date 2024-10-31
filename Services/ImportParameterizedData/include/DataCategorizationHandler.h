@@ -99,6 +99,8 @@ private:
 	bool CheckIfPreviewIsUpToDate(std::shared_ptr<EntityParameterizedDataPreviewTable> categorizationEntity, std::list<std::pair<ot::UID, ot::UID>>& existingRanges);
 	std::pair<ot::UID, ot::UID> CreateNewTable(std::string tableName, EntityParameterizedDataCategorization::DataCategorie category, std::list<std::pair<ot::UID, ot::UID>>& existingRanges);
 
+	std::string determineDataTypeOfSelectionRanges(EntityResultTableData<std::string>* _tableData,const std::vector<ot::TableRange>& _selectedRanges);
+
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> FindAllTableSelectionsWithScripts();
 	std::map<std::string, std::string> LoadAllPythonScripts(std::list< std::string>& scriptNames);
 	

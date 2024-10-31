@@ -1,4 +1,5 @@
 #include "WindowsUtilityFuctions.h"
+
 #include <stdio.h>
 #include <malloc.h>
 
@@ -75,7 +76,7 @@ wuf::RegistryHandler::~RegistryHandler()
 
 bool wuf::RegistryHandler::setStringVal(const std::string& _entryName, const std::string& _entrydata)
 {
-    LONG setRes = RegSetValueExA(m_hKey, _entryName.c_str(), 0, REG_SZ, (LPBYTE)_entrydata.c_str(), _entrydata.size());
+    LONG setRes = RegSetValueExA(m_hKey, _entryName.c_str(), 0, REG_SZ, (LPBYTE)_entrydata.c_str(), static_cast<DWORD>(_entrydata.size()));
     return setRes == ERROR_SUCCESS;
 }
 

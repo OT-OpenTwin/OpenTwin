@@ -44,6 +44,17 @@ const DataGrid = ({ list, columnHeader, ...props }) => {
           <>
             <div className="cellAction">
               <Link
+                to="/users/changePassword"
+                style={{ textDecoration: "none" }}
+              >
+                <Button
+                  size="small"
+                  onClick={() => setUserDetails(rowData.row.username)}
+                >
+                 {t("dataGrid:changePasswordButton")}
+                </Button>
+              </Link>
+              <Link
                 to="/users/changeUsername"
                 style={{ textDecoration: "none" }}
               >
@@ -52,19 +63,6 @@ const DataGrid = ({ list, columnHeader, ...props }) => {
                   onClick={() => setUserDetails(rowData.row.username)}
                 >
                   {t("dataGrid:changeUsernameButton")}
-                </Button>
-              </Link>
-            </div>
-            <div className="cellAction">
-              <Link
-                to="/users/changePassword"
-                style={{ textDecoration: "none" }}
-              >
-                <Button
-                  size="small"
-                  onClick={() => setUserDetails(rowData.row.username)}
-                >
-                  {t("dataGrid:changePasswordButton")}
                 </Button>
               </Link>
             </div>

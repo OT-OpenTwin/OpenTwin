@@ -8,12 +8,12 @@
 #include <iostream>
 #include <memory>
 
-EntityFile::EntityFile(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner) :
-	EntityBase(ID,parent,obs,ms,factory,owner)
+EntityFile::EntityFile(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner) :
+	EntityBase(_ID,_parent,_obs,_ms,_factory,_owner)
 {
 }
 
-bool EntityFile::getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax)
+bool EntityFile::getEntityBox(double & _xmin, double & _xmax, double & _ymin, double & _ymax, double & _zmin, double & _zmax)
 {
 	return false;
 }
@@ -53,38 +53,40 @@ void EntityFile::addVisualizationNodes(void)
 	EntityBase::addVisualizationNodes();
 }
 
-void EntityFile::setFileProperties(std::string path, std::string fileName, std::string fileType)
+void EntityFile::setFileProperties(const std::string& _path, const std::string& _fileName, const std::string& _fileType)
 {
-	_path = path;
-	_fileName = fileName;
-	_fileType = fileType;
+	m_path = _path;
+	m_fileName = _fileName;
+	m_fileType = _fileType;
 	setProperties();
 }
 
 std::shared_ptr<EntityBinaryData> EntityFile::getData()
 {
 	EnsureDataIsLoaded();
-	return _data;
+	return m_data;
 }
 
 void EntityFile::EnsureDataIsLoaded()
 {
-	if (_data == nullptr)
+	if (m_data == nullptr)
 	{
+		assert(m_dataUID != -1 && m_dataVersion != -1);
 		std::map<ot::UID, EntityBase*> entitymap;
-		auto entityBase = readEntityFromEntityIDAndVersion(this, _dataUID, _dataVersion, entitymap);
+		EntityBase* entityBase = readEntityFromEntityIDAndVersion(this, m_dataUID, m_dataVersion, entitymap);
 		assert(entityBase != nullptr);
-		_data.reset(dynamic_cast<EntityBinaryData*>(entityBase));
+		m_data.reset(dynamic_cast<EntityBinaryData*>(entityBase));
+		entityBase = nullptr;
 	}
 }
 
 void EntityFile::setProperties()
 {
-	auto filePathProperty = new EntityPropertiesString("Path", _path);
+	auto filePathProperty = new EntityPropertiesString("Path", m_path);
 	filePathProperty->setReadOnly(true);
-	auto fileNameProperty = new EntityPropertiesString("Filename", _fileName);
+	auto fileNameProperty = new EntityPropertiesString("Filename", m_fileName);
 	fileNameProperty->setReadOnly(true);
-	auto fileType = new EntityPropertiesString("FileType", _fileType);
+	auto fileType = new EntityPropertiesString("FileType", m_fileType);
 	fileType->setReadOnly(true);
 	getProperties().createProperty(filePathProperty, "Selected File");
 	getProperties().createProperty(fileNameProperty, "Selected File");
@@ -93,33 +95,33 @@ void EntityFile::setProperties()
 	setSpecializedProperties();
 }
 
-void EntityFile::setData(ot::UID dataID, ot::UID dataVersion)
+void EntityFile::setData(ot::UID _dataID, ot::UID _dataVersion)
 {
-	_dataUID = dataID;
-	_dataVersion = dataVersion;
+	m_dataUID = _dataID;
+	m_dataVersion = _dataVersion;
 	setModified();
 }
 
-void EntityFile::AddStorageData(bsoncxx::builder::basic::document & storage)
+void EntityFile::AddStorageData(bsoncxx::builder::basic::document& _storage)
 {
 	// We store the parent class information first 
-	EntityBase::AddStorageData(storage);
+	EntityBase::AddStorageData(_storage);
 
-	storage.append(
-		bsoncxx::builder::basic::kvp("FilePath", _path),
-		bsoncxx::builder::basic::kvp("FileName", _fileName),
-		bsoncxx::builder::basic::kvp("FileType", _fileType),
-		bsoncxx::builder::basic::kvp("DataUID", _dataUID),
-		bsoncxx::builder::basic::kvp("DataVersionID", _dataVersion)
+	_storage.append(
+		bsoncxx::builder::basic::kvp("FilePath", m_path),
+		bsoncxx::builder::basic::kvp("FileName", m_fileName),
+		bsoncxx::builder::basic::kvp("FileType", m_fileType),
+		bsoncxx::builder::basic::kvp("DataUID", m_dataUID),
+		bsoncxx::builder::basic::kvp("DataVersionID", m_dataVersion)
 	);
 }
 
-void EntityFile::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityFile::readSpecificDataFromDataBase(bsoncxx::document::view & _doc_view, std::map<ot::UID, EntityBase*>& _entityMap)
 {
-	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
-	_fileName = std::string(doc_view["FileName"].get_utf8().value.data());
-	_path = std::string(doc_view["FilePath"].get_utf8().value.data());
-	_fileType = std::string(doc_view["FileType"].get_utf8().value.data());
-	_dataUID = doc_view["DataUID"].get_int64();
-	_dataVersion = doc_view["DataVersionID"].get_int64();
+	EntityBase::readSpecificDataFromDataBase(_doc_view, _entityMap);
+	m_fileName = std::string(_doc_view["FileName"].get_utf8().value.data());
+	m_path = std::string(_doc_view["FilePath"].get_utf8().value.data());
+	m_fileType = std::string(_doc_view["FileType"].get_utf8().value.data());
+	m_dataUID = _doc_view["DataUID"].get_int64();
+	m_dataVersion = _doc_view["DataVersionID"].get_int64();
 }

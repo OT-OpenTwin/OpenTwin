@@ -25,8 +25,9 @@
     <ClInclude Include="include\BSONToVariableConverter.h" />
     <ClInclude Include="include\ClassFactoryHandler.h" />
     <ClInclude Include="include\ClassFactoryHandlerAbstract.h" />
+    <ClInclude Include="include\ContentChangedHandling.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
-    <ClInclude Include="include\EntityInterfaceText.h" />
+    <ClInclude Include="include\IVisualisationText.h" />
     <ClInclude Include="include\EntityMetadataSeries.h" />
     <ClInclude Include="include\EntityMetadataCampaign.h" />
     <ClInclude Include="include\EntityResultUnstructuredMesh.h" />
@@ -325,6 +326,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>$(Qt_DEFINES_);%(PreprocessorDefinitions);_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <DisableSpecificWarnings>4996;4828</DisableSpecificWarnings>
+      <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

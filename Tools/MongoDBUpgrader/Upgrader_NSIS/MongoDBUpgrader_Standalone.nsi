@@ -1,4 +1,4 @@
-!include "MUI2.nsh"
+!include "MUI.nsh"
 !include "nsDialogs.nsh"
 
 !include LogicLib.nsh
@@ -21,9 +21,10 @@ Var UPGRADER_MONGODB_SERVICE_NAME
 Var UPGRADER_MONGODB_INSTALL_PATH
 Var UPGRADER_ROOT
 Var First_MONGODB_Install_FLAG
-Var Sec_Upgr
 
 !define DEFAULT_MONGODB_PATH '"C:\Program Files\MongoDB\Server\7.0"'
+!define DEFAULT_MONGODB_LOG_PATH '"C:\OT-DataStorage\log"'
+
 !define MUI_ICON_PATH '"..\Icons\openTwin_icon_48x48.ico"'
 ;!define OPENTWIN_APP_ICON '"$INSTDIR\icons\Application\OpenTwin.ico"'
 !define PRODUCT_NAME "OpenTwin"
@@ -33,25 +34,16 @@ Var Sec_Upgr
 !define HELPER_FILES_PATH "..\Upgrader_Deployment"
 
 BrandingText "OpenTwin Simulation Platform"
+!define LOG_PATH "$EXEDIR\BuildInformation"
 
 ######################## Including Upgrader Functionality ################
 !include MongoDBUpgrader.nsh
 ##########################################################################
 
-Function Extract_Installer_Tools
-	;SectionIn RO ;read only section
-	
-	;SetOutPath "${MONGODB_INST_MSI_PATH}"
-	;DetailPrint "Extracting additional files ..."
-	;
-	;File /r "..\Upgrader_Deployment\MongoDB_Installer\*.*"
-	;
-	;SetOutPath "${MONGODB_INST_SERVER_PATH}"
-	;File /r "..\Upgrader_Deployment\MongoDB_Server\*.*"
-	;SetOutPath "${MONGODB_UPGRADER_INST_EXE_PATH}"
-	;File /r "..\Upgrader_Deployment\Upgrader_Exe\*.*"
-
-FunctionEnd
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+	!insertmacro MUI_DESCRIPTION_TEXT ${Sec_Upgr} "Upgrade of the existing data storage. !WARNING! Once you have upgraded to version 7.0, you will not be able to downgrade the FCV and binary version without support assistance."
+	!insertmacro MUI_DESCRIPTION_TEXT ${Sec_Inst} "Install MongoDB 7.0. The configuration from the current installation will be used for the new installation."
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ##########################################################################
 ################################ Functions ###############################
@@ -66,19 +58,19 @@ Function BeforeUpgrade
 		Quit
 	${EndIf}
 
-	${NSD_CreateLabel} 0u 0u 100% 12u "Enter MongoDB admin Psw:"
+	${NSD_CreateLabel} 0u 0u 100% 12u "MongoDB admin password:"
 	Pop $Label
 	${NSD_CreateText} 0u 12u 100% 12u "admin"
 	Pop $AdminPswHandle
 	${NSD_GetText} $AdminPswHandle $UPGRADER_MONGODB_ADMIN_PASSWORD
 	
-	${NSD_CreateLabel} 0u 30u 100% 12u "Enter MongoDB service name:"
+	${NSD_CreateLabel} 0u 30u 100% 12u "MongoDB service name:"
 	Pop $Label
 	${NSD_CreateText} 0u 42u 100% 12u "MongoDB"
 	Pop $ServiceNameHandle
 	${NSD_GetText} $ServiceNameHandle $UPGRADER_MONGODB_SERVICE_NAME
 	
-	${NSD_CreateLabel} 0u 60u 100% 12u "MongoDB Installation path:"
+	${NSD_CreateLabel} 0u 60u 100% 12u "MongoDB installation path:"
 	${NSD_CreateText} 0u 72u 100% 12u ${DEFAULT_MONGODB_PATH}
 	Pop $InstallPathHandle
 	${NSD_GetText} $InstallPathHandle $UPGRADER_MONGODB_INSTALL_PATH
@@ -154,6 +146,9 @@ ${EndIf}
 
 FunctionEnd
 
+Function .onGUIEnd
+	Call .onInstEnd
+FunctionEnd
 
 Function .onInstSuccess 
 	Call .onInstEnd
@@ -165,6 +160,9 @@ FunctionEnd
 
 Function .onInstEnd 
 	RMDir /r ${MONGODB_INST_MSI_PATH}
+	Delete ${MONGODB_INST_MSI_PATH}
 	RMDir /r ${MONGODB_INST_SERVER_PATH}
+	Delete ${MONGODB_INST_SERVER_PATH}
 	RMDir /r ${MONGODB_UPGRADER_INST_EXE_PATH}
+	Delete ${MONGODB_UPGRADER_INST_EXE_PATH}
 FunctionEnd

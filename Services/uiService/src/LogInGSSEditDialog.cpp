@@ -28,10 +28,16 @@ LogInGSSEditDialogEntry::LogInGSSEditDialogEntry(const LogInGSSEntry& _entry, Lo
 	// Create controls
 	m_name = new ot::LineEdit(_entry.getName());
 	m_name->setMinimumWidth(180);
+	m_name->setPlaceholderText("Name (e.g. Local)");
+	m_name->setToolTip("Name (e.g. Local)");
 	m_url = new ot::LineEdit(_entry.getUrl());
 	m_url->setMinimumWidth(150);
+	m_url->setPlaceholderText("Session Service URL (e.g. 127.0.0.1)");
+	m_url->setToolTip("Session Service URL (e.g. 127.0.0.1)");
 	m_port = new ot::LineEdit(_entry.getPort());
 	m_port->setMinimumWidth(150);
+	m_port->setPlaceholderText("Session Service Port (e.g. 8091)");
+	m_port->setToolTip("Session Service Port (e.g. 8091)");
 	m_delete = new QTableWidgetItem;
 	auto deleteFlags = m_delete->flags();
 	deleteFlags.setFlag(Qt::ItemFlag::ItemIsEditable, false);

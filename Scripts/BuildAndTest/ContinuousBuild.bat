@@ -32,10 +32,27 @@ ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%"
 git pull
+for /f "delims=" %%A in ('call git rev-parse --short HEAD') do set OT_VERSION=%%A
 
 cd /D "%OPENTWIN_THIRDPARTY_ROOT%"
 git pull
+for /f "delims=" %%A in ('call git rev-parse --short HEAD') do set THIRD_PARTY_VERSION=%%A
 
+set OT_VERSION_STRING=%OT_VERSION%:%THIRD_PARTY_VERSION%
+
+IF "%OT_LAST_CONTIBUILD_VERSIONS%" == "%OT_VERSION_STRING%" (
+	ECHO "The software is unchanged. No build necessary"
+	exit /b 2
+)
+
+ECHO ===================================================================
+ECHO Building Software for following commits:
+ECHO OpenTwin = %OT_VERSION%
+ECHO ThirdParty = %THIRD_PARTY_VERSION%
+ECHO ===================================================================
+ECHO ""
+
+SETX OT_LAST_CONTIBUILD_VERSIONS %OT_VERSION_STRING%
 
 ECHO ===================================================================
 ECHO Build the software
@@ -63,33 +80,5 @@ ECHO ERROR: Build failed
 ECHO ===================================================================
 exit /b 1
 )
-
-ECHO ===================================================================
-ECHO Build the documentation
-ECHO ===================================================================
-
-cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildDocumentation.bat"
-
-ECHO ===================================================================
-ECHO Create the deployment
-ECHO ===================================================================
-
-cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CreateDeployment.bat"
-
-ECHO ===================================================================
-ECHO Build the installers
-ECHO ===================================================================
-
-cd /D "%OPENTWIN_DEV_ROOT%\Scripts\Installer"
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Installer\Build_Installers_noInput.bat"
-
-ECHO ===================================================================
-ECHO Upload the documentation and the nightly installers
-ECHO ===================================================================
-
-cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
-"%OPENTWIN_THIRDPARTY_ROOT%\WinSCP\WinSCP.com" /ini=nul /script="%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BatchBuildAndDeploy.txt"
 
 exit /b 0
