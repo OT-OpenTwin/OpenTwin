@@ -28,6 +28,13 @@ std::vector<char> FileHandler::ExtractFileContentAsBinary(const std::string& fil
 	}
 }
 
+void FileHandler::addFileContentToJson(ot::JsonValue& _object, ot::JsonAllocator& _allocator, const std::string& _fileName)
+{
+	std::vector<char> fileContent =	ExtractFileContentAsBinary(_fileName);
+
+
+}
+
 ot::JsonDocument FileHandler::StoreFileInDataBase(const ot::UIDList& entityIDs, const ot::UIDList& entityVersions)
 {
 	assert(entityIDs.size() == _filePaths.size() * 2);

@@ -12,6 +12,7 @@
 #include <memory>
 #include "OTCore/CoreTypes.h"
 #include "EntityFile.h"
+#include "OTCore/JSON.h"
 
 class FileHandler
 {
@@ -22,6 +23,9 @@ public:
 	FileHandler& operator=(const FileHandler& other) = delete;
 	FileHandler& operator=(const FileHandler&& other) = delete;
 
+	void addFileContentToJson(ot::JsonValue& _object, ot::JsonAllocator& _allocator, const std::string& _fileName);
+
+	
 	ot::JsonDocument StoreFileInDataBase(const ot::UIDList& entityIDs, const ot::UIDList& entityVersions);
 	
 	/// <summary>
@@ -51,6 +55,7 @@ private:
 	std::list<std::string> _filePaths;
 	std::string _entityPath = "";
 	std::string _entityType;
+
 
 	std::vector<char> ExtractFileContentAsBinary(const std::string& fileName);
 
