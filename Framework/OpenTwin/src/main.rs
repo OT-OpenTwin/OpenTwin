@@ -494,7 +494,7 @@ fn get_download_html_body() -> String {
             </style>
             <script type=\"text/javascript\">
                 document.getElementById(\"downloadBtn\").addEventListener(\"click\", () => {
-                    alert(\"Downloading Installer...\n Please execute the installer after the download.\");
+                    alert(\"Downloading Installer...\\nPlease execute the installer after the download.\");
                 }, false);
             </script>
         </body>".to_string()
