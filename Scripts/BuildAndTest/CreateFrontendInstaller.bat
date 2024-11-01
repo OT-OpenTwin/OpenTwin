@@ -27,184 +27,209 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
+SET OPENTWIN_FRONTEND_DEPLOYMENT=%OPENTWIN_DEV_ROOT%\Deployment_Frontend
+
 REM Clean up the Deployment directory
 
-RMDIR /S /Q "%SIM_PLAT_ROOT%\Deployment\Frontend"
-MKDIR "%SIM_PLAT_ROOT%\Deployment\Frontend"
+RMDIR /S /Q "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
-RMDIR /S /Q "%SIM_PLAT_ROOT%\Deployment\Frontend-Installer"
-MKDIR "%SIM_PLAT_ROOT%\Deployment\Frontend-Installer"
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Deployment\FrontendInstaller"
+MKDIR "%OPENTWIN_DEV_ROOT%\Deployment\FrontendInstaller"
 
 REM ===========================================================================
 REM Copy the library files
 REM ===========================================================================
 
 REM Qwt
-COPY "%QWT_LIB_ROOT%\lib\qwt.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%QWT_POLAR_LIB_ROOT%\lib\qwtpolar.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
+COPY "%QWT_LIB_DLLR%\qwt.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QWTPOLAR_LIB_DLLR%\qwtpolar.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM QtTabToolbar
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\QtTabToolbar\src\TabToolbar\Release\TabToolbar.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
+COPY "%QT_TT_DLLR%\TabToolbar.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
+REM Qt AdvancedDockingSystem
+COPY "%QT_ADS_ROOT%\lib\qtadvanceddocking.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM OpenSceneGraph
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\OpenSceneGraph\OpenSceneGraph-OpenSceneGraph-3.6.3\bin\Release\*.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
+COPY "%OSG_DLLR%\*.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\osgPlugins-3.6.3"
+XCOPY /S "%OSG_DLLR%\osgPlugins-3.6.3" "%OPENTWIN_FRONTEND_DEPLOYMENT%\osgPlugins-3.6.3"
 
-MKDIR "%SIM_PLAT_ROOT%\Deployment\Frontend\fonts"
-XCOPY /S "%SIM_PLAT_ROOT%\Libraries\Fonts" "%SIM_PLAT_ROOT%\Deployment\Frontend\fonts"
+REM Fonts
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\fonts"
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\Fonts" "%OPENTWIN_FRONTEND_DEPLOYMENT%\fonts"
 
-MKDIR "%SIM_PLAT_ROOT%\Deployment\Frontend\osgPlugins-3.6.3"
-XCOPY /S "%SIM_PLAT_ROOT%\Third_Party_Libraries\OpenSceneGraph\OpenSceneGraph-OpenSceneGraph-3.6.3\bin\Release\osgPlugins-3.6.3" "%SIM_PLAT_ROOT%\Deployment\Frontend\osgPlugins-3.6.3"
+REM OpenGL Software Rendering
+COPY "%OPENTWIN_THIRDPARTY_ROOT%\MesaOpenGL\*.*" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM Qt
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\libEGL.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\libGLESv2.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\opengl32sw.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt53DAnimation.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt53DCore.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt53DExtras.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt53DInput.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt53DLogic.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt53DQuick.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt53DQuickAnimation.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt53DQuickExtras.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt53DQuickInput.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt53DQuickRender.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt53DQuickScene2D.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt53DRender.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Bluetooth.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Charts.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Concurrent.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Core.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5DataVisualization.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5DBus.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Gamepad.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Gui.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Help.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Location.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Multimedia.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5MultimediaQuick.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5MultimediaWidgets.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Network.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5NetworkAuth.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Nfc.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5OpenGL.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Positioning.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5PositioningQuick.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5PrintSupport.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Purchasing.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Qml.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Quick.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5QuickControls2.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5QuickParticles.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5QuickTemplates2.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5QuickTest.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5QuickWidgets.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5RemoteObjects.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Script.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5ScriptTools.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Scxml.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Sensors.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5SerialBus.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5SerialPort.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Sql.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Svg.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Test.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5TextToSpeech.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5WebChannel.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5WebEngine.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-REM COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5WebEngineCore.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5WebEngineWidgets.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5WebSockets.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5WebView.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Widgets.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5WinExtras.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5Xml.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\bin\Qt5XmlPatterns.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
+REM COPY "%QT_DLLR%\libEGL.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+REM COPY "%QT_DLLR%\libGLESv2.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+REM COPY "%QT_DLLR%\opengl32sw.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt63DAnimation.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt63DCore.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt63DExtras.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt63DInput.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt63DLogic.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt63DQuick.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt63DQuickAnimation.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt63DQuickExtras.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt63DQuickInput.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt63DQuickRender.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt63DQuickScene2D.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt63DRender.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Bluetooth.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Charts.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Concurrent.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Core.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6DataVisualization.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6DBus.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Gamepad.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Gui.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Help.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Location.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Multimedia.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6MultimediaQuick.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6MultimediaWidgets.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Network.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6NetworkAuth.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Nfc.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6OpenGL.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6OpenGLWidgets.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Positioning.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6PositioningQuick.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6PrintSupport.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Purchasing.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Qml.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Quick.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6QuickControls2.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6QuickParticles.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6QuickTemplates2.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6QuickTest.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6QuickWidgets.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6RemoteObjects.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Script.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6ScriptTools.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Scxml.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Sensors.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6SerialBus.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6SerialPort.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Sql.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Svg.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Test.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6TextToSpeech.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6WebChannel.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6WebEngine.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6WebEngineCore.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6WebEngineWidgets.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6WebSockets.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6WebView.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Widgets.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6WinExtras.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6Xml.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\Qt6XmlPatterns.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
-MKDIR "%SIM_PLAT_ROOT%\Deployment\Frontend\plugins"
-MKDIR "%SIM_PLAT_ROOT%\Deployment\Frontend\plugins\platforms"
-MKDIR "%SIM_PLAT_ROOT%\Deployment\Frontend\plugins\platformthemes"
-MKDIR "%SIM_PLAT_ROOT%\Deployment\Frontend\plugins\styles"
-MKDIR "%SIM_PLAT_ROOT%\Deployment\Frontend\plugins\imageformats"
-XCOPY /S "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\plugins\platforms\*.dll"      "%SIM_PLAT_ROOT%\Deployment\Frontend\plugins\platforms"
-XCOPY /S "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\plugins\platformthemes\*.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend\plugins\platformthemes"
-XCOPY /S "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\plugins\styles\*.dll"         "%SIM_PLAT_ROOT%\Deployment\Frontend\plugins\styles"
-XCOPY /S "%SIM_PLAT_ROOT%\Third_Party_Libraries\Qt\5.11.2\msvc2017_64\plugins\imageformats\*.dll"   "%SIM_PLAT_ROOT%\Deployment\Frontend\plugins\imageformats"
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins"
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\platforms"
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\renderers"
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\rendererplugins"
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\tls"
+XCOPY /S "%QDIR%\plugins\imageformats" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+XCOPY /S "%QDIR%\plugins\platforms" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\platforms"
+XCOPY /S "%QDIR%\plugins\renderers" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\renderers"
+XCOPY /S "%QDIR%\plugins\rendererplugins" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\rendererplugins"
+XCOPY /S "%QDIR%\plugins\tls" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\tls"
+
+for /r "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins" %%f in (*.pdb) do (
+    del "%%f"
+)
 
 REM Copy the OpenSSL libs for the Qt Websocket
-
-COPY /Y "%SIM_PLAT_ROOT%\Third_Party_Libraries\OpenSSL\LibsForQtWebsocket\*.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
+COPY /Y "%OPENSSL_WEBSOCKET_DLLR%\*.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM Copy the icons
-
-MKDIR "%SIM_PLAT_ROOT%\Deployment\Frontend\icons"
-XCOPY /S "%SIM_PLAT_ROOT%\Libraries\Icons" "%SIM_PLAT_ROOT%\Deployment\Frontend\icons"
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\icons"
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\Icons" "%OPENTWIN_FRONTEND_DEPLOYMENT%\icons"
 
 REM CURL
-
-COPY "%CURL_DLL%\libcurl.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
+COPY "%CURL_DLLR%\libcurl.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM OPENSSL
+COPY "%OPENSSL_DLL%\libcrypto-1_1-x64.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OPENSSL_DLL%\libssl-1_1-x64.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
-COPY "%OPENSSL_DLL%\libcrypto-1_1-x64.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%OPENSSL_DLL%\libssl-1_1-x64.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
+REM EMBREE
+COPY "%EMBREE_BIN%\embree3.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%EMBREE_BIN%\tbb12.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM MongoDB
-
-COPY /Y "%MONGO_CXX_ROOT%\Release\bin\*.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY /Y "%MONGO_C_ROOT%\Release\bin\*.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
+COPY /Y "%MONGO_CXX_DLLR%\*.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY /Y "%MONGO_C_DLLR%\*.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM ZLIB
+COPY "%ZLIB_DLLPATHR%\zlib.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
-COPY "%ZLIB_LIB%\zlibwapi.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
+REM OpenCascade
+COPY "%FMP_DLLR%\*.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%FRI_DLLR%\*.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%FRT_DLLR%\*.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OC_DLLR%\*.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%TBB_DLLR%\tbb.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%TBB_DLLR%\tbb_preview.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%TBB_DLLR%\tbbmalloc.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OVR_DLLR%\*.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%JEM_DLLR%\*.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM ===========================================================================
 REM Copy the build files
 REM ===========================================================================
 
-REM Library OpenTwinCommunication
-COPY "%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\x64\Release\OpenTwinCommunication.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
+COPY "%OT_CORE_ROOT%\%OT_DLLR%\OTCore.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_RANDOM_ROOT%\%OT_DLLR%\OTRandom.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_SYSTEM_ROOT%\%OT_DLLR%\OTSystem.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_COMMUNICATION_ROOT%\%OT_DLLR%\OTCommunication.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_MODELENTITIES_ROOT%\%OT_DLLR%\ModelEntities.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_CADMODELENTITIES_ROOT%\%OT_DLLR%\CADModelEntities.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_VIEWER_ROOT%\%OT_DLLR%\Viewer.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_DATASTORAGE_ROOT%\%OT_DLLR%\DataStorage.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_UIPLUGINAPI_ROOT%\%OT_DLLR%\UIPluginAPI.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_UICORE_ROOT%\%OT_DLLR%\uiCore.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_RUBBERBANDAPI_ROOT%\%OT_DLLR%\RubberbandEngineCore.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_RUBBERBAND_ROOT%\%OT_DLLR%\RubberbandEngineOsgWrapper.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_QWTWRAPPER_ROOT%\%OT_DLLR%\QwtWrapper.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_GUI_ROOT%\%OT_DLLR%\OTGui.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_GUIAPI_ROOT%\%OT_DLLR%\OTGuiAPI.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_SCI_ROOT%\%OT_DLLR%\OTsci.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_WIDGETS_ROOT%\%OT_DLLR%\OTWidgets.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\%OT_DLLR%\StudioSuiteConnector.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_BLOCKENTITIES_ROOT%\%OT_DLLR%\BlockEntities.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_UI_SERVICE_ROOT%\%OT_DLLR%\uiFrontend.exe" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_FOUNDATION_ROOT%\%OT_DLLR%\OTServiceFoundation.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
-REM Library OpenTwinServiceFoundation
-COPY "%SIM_PLAT_ROOT%\Libraries\OpenTwinServiceFoundation\x64\Release\OpenTwinServiceFoundation.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
+REM  Copy Color Styles
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\ColorStyles"
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\ColorStyles" "%OPENTWIN_FRONTEND_DEPLOYMENT%\ColorStyles"
 
-REM Library OpenTwinLogger
-COPY "%SIM_PLAT_ROOT%\Libraries\OpenTwinLogger\x64\Release\OpenTwinLogger.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-
-REM Library ModelEntities
-COPY "%SIM_PLAT_ROOT%\Libraries\ModelEntities\x64\Release\ModelEntities.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-
-REM Library Viewer
-COPY "%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release\Viewer.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-
-REM Library DataStorage
-COPY "%SIM_PLAT_ROOT%\Libraries\DataStorage\x64\Release\DataStorage.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-
-REM UI Core
-COPY "%UICORE_LIB_ROOT%\x64\Release\uiCore.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-
-REM Rubberband 
-COPY "%RUBBERBAND_ENGINE_CORE%\x64\Release\RubberbandEngineCore.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-COPY "%RUBBERBAND_ENGINE_OSG%\x64\Release\RubberbandOsgWrapper.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-
-REM UI Service
-COPY "%UISERVICE_LIB_ROOT%\x64\Release\uiService.dll" "%SIM_PLAT_ROOT%\Deployment\Frontend"
-
-REM UI Frontend
-COPY "%UISERVICE_LIB_ROOT%\x64\ExeRelease\uiFrontend.exe" "%SIM_PLAT_ROOT%\Deployment\Frontend\OpenTwin.exe"
+REM  Copy GraphicsItems
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\GraphicsItems"
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\GraphicsItems\*.ot.json" "%OPENTWIN_FRONTEND_DEPLOYMENT%\GraphicsItems"
 
 REM Copy the certificates
-MKDIR "%SIM_PLAT_ROOT%\Deployment\Frontend\Certificates"
-COPY "%SIM_PLAT_ROOT%\Microservices\SSL_certificates\ca.pem" "%SIM_PLAT_ROOT%\Deployment\Frontend\Certificates"
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\Certificates"
+COPY "%OPENTWIN_DEV_ROOT%\Certificates\Generated\ca.pem" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Certificates"
+COPY "%OPENTWIN_DEV_ROOT%\Certificates\Generated\server.pem" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Certificates"
+COPY "%OPENTWIN_DEV_ROOT%\Certificates\Generated\server-key.pem" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Certificates"
 
-ECHO [Paths] > "%SIM_PLAT_ROOT%\Deployment\Frontend\qt.conf"
-ECHO Plugins = .\\plugins >> "%SIM_PLAT_ROOT%\Deployment\Frontend\qt.conf"
+ECHO [Paths] > "%OPENTWIN_FRONTEND_DEPLOYMENT%\qt.conf"
+ECHO Plugins = .\\plugins >> "%OPENTWIN_FRONTEND_DEPLOYMENT%\qt.conf"
 
 REM ===========================================================================
 REM Finally create the installer
 REM ===========================================================================
 
-CALL "C:\Program Files (x86)\NSIS\makensis.exe" Install-OpenTwin.nsi
+REM CALL "C:\Program Files (x86)\NSIS\makensis.exe" Install-OpenTwin.nsi
 
-MOVE "Install OpenTwin.exe" ..\Deployment\Frontend-Installer"
+REM MOVE "Install OpenTwin.exe" ..\Deployment\Frontend-Installer"
 
