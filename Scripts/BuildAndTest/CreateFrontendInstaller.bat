@@ -32,65 +32,18 @@ REM Clean up the FrontendDeployment directory
 RMDIR /S /Q "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Deployment_Frontend\FrontendInstaller"
-MKDIR "%OPENTWIN_DEV_ROOT%\Deployment_Frontend\FrontendInstaller"
+RMDIR /S /Q "%OPENTWIN_FRONTEND_DEPLOYMENT%\FrontendInstaller"
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\FrontendInstaller"
 
 REM ==========================================
 REM Copy ThirdParty files
 REM ==========================================
 
-REM QtTabToolbar
-COPY "%QT_TT_LIBPATHR%\TabToolbar.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
-
 REM Curl
 COPY "%CURL_DLLR%\libcurl.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
-REM OpenSceneGraph-OpenSceneGraph-3.6.3
-COPY "%OSG_DLLR%\OpenThreads.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-
-COPY "%OSG_DLLR%\osg.dll" 			"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OSG_DLLR%\osgDB.dll" 		"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OSG_DLLR%\osgGA.dll" 		"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OSG_DLLR%\osgText.dll" 		"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OSG_DLLR%\osgUtil.dll" 		"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OSG_DLLR%\osgViewer.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-
-REM Qt6
-COPY "%QT_DLLR%\bin\QT6Core.dll" 			"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%QT_DLLR%\bin\QT6Gui.dll" 			"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%QT_DLLR%\bin\QT6Network.dll" 		"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%QT_DLLR%\bin\QT6OpenGL.dll" 			"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%QT_DLLR%\bin\QT6OpenGLWidgets.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%QT_DLLR%\bin\QT6Svg.dll" 			"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%QT_DLLR%\bin\QT6WebSockets.dll" 		"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%QT_DLLR%\bin\QT6Widgets.dll" 		"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-
-REM Qt-Advanced-Docking-System
-COPY "%QT_ADS_ROOT%\lib\qtandvanceddocking.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
-
-REM QT plugins
-MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins"
-
-MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
-COPY "%QT_DLLR%\plugins\imageformats\qgif.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%\Frontend\plugins\imageformats"
-COPY "%QT_DLLR%\plugins\imageformats\qicns.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Frontend\plugins\imageformats"
-COPY "%QT_DLLR%\plugins\imageformats\qico.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%\Frontend\plugins\imageformats"
-COPY "%QT_DLLR%\plugins\imageformats\qjpeg.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Frontend\plugins\imageformats"
-COPY "%QT_DLLR%\plugins\imageformats\qsvg.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%\Frontend\plugins\imageformats"
-COPY "%QT_DLLR%\plugins\imageformats\qtga.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%\Frontend\plugins\imageformats"
-COPY "%QT_DLLR%\plugins\imageformats\qtiff.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Frontend\plugins\imageformats"
-COPY "%QT_DLLR%\plugins\imageformats\qwbmp.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Frontend\plugins\imageformats"
-COPY "%QT_DLLR%\plugins\imageformats\qwebp.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Frontend\plugins\imageformats"
-
-MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\platforms"
-COPY "%QT_DLLR%\plugins\platforms\qwindows.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\platforms"
-
-MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\styles"
-COPY "%QT_DLLR%\plugins\styles\qwindowsvistastyle.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\styles"
-
-REM OpenSSL
-COPY "%OPENSSL_DLL%\libcrypto-1_1-x64.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OPENSSL_DLL%\libssl-1_1-x64.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+REM Embree
+COPY "%EMBREE_BIN%\tbb12.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM MongoDB
 COPY "%MONGO_C_DLLR%\bson-1.0.dll"			"%OPENTWIN_FRONTEND_DEPLOYMENT%"
@@ -110,17 +63,67 @@ COPY /Y "%MONGO_CXX_DLLR%\vcruntime140.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
 COPY /Y "%MONGO_CXX_DLLR%\vcruntime140_1.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM OpenCASCADE
-COPY "%OC_ROOT%\jemalloc-vc14-64\bin\jemalloc.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OC_DLLR%\TKBRep.dll" 						"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OC_DLLR%\TKernel.dll" 						"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OC_DLLR%\TKG2d.dll" 							"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OC_DLLR%\TKG3d.dll" 							"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OC_DLLR%\TKGeomAlgo.dll" 					"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OC_DLLR%\TKGeomBase.dll" 					"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OC_DLLR%\TKMath.dll" 						"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OC_DLLR%\TKMesh.dll" 						"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OC_DLLR%\TKShHealing.dll" 					"%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OC_DLLR%\TKTopAlgo.dll" 						"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OPENTWIN_THIRDPARTY_ROOT%\OpenCASCADE\OpenCASCADE-7.8.0-vc14-64\jemalloc-vc14-64\bin\jemalloc.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OC_DLLR%\TKBRep.dll" 	 "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OC_DLLR%\TKernel.dll" 	 "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OC_DLLR%\TKG2d.dll" 		 "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OC_DLLR%\TKG3d.dll" 		 "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OC_DLLR%\TKGeomAlgo.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OC_DLLR%\TKGeomBase.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OC_DLLR%\TKMath.dll" 	 "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OC_DLLR%\TKMesh.dll" 	 "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OC_DLLR%\TKShHealing.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OC_DLLR%\TKTopAlgo.dll" 	 "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
+REM OpenSceneGraph-OpenSceneGraph-3.6.3
+COPY "%OSG_DLLR%\OpenThreads.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
+COPY "%OSG_DLLR%\osg.dll" 		"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OSG_DLLR%\osgDB.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OSG_DLLR%\osgGA.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OSG_DLLR%\osgText.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OSG_DLLR%\osgUtil.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OSG_DLLR%\osgViewer.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
+REM OpenSSL
+COPY "%OPENSSL_DLL%\libcrypto-1_1-x64.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OPENSSL_DLL%\libssl-1_1-x64.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
+REM Qt6
+COPY "%QT_DLLR%\QT6Core.dll" 			"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\QT6Gui.dll" 			"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\QT6Network.dll" 		"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\QT6OpenGL.dll" 			"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\QT6OpenGLWidgets.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\QT6Svg.dll" 			"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\QT6WebSockets.dll" 		"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%QT_DLLR%\QT6Widgets.dll" 		"%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
+REM Qt-Advanced-Docking-System
+COPY "%QT_ADS_ROOT%\lib\qtadvanceddocking.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
+REM QT Plugins
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins"
+
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QDIR%\plugins\imageformats\qgif.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QDIR%\plugins\imageformats\qicns.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QDIR%\plugins\imageformats\qico.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QDIR%\plugins\imageformats\qjpeg.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QDIR%\plugins\imageformats\qsvg.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QDIR%\plugins\imageformats\qtga.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QDIR%\plugins\imageformats\qtiff.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QDIR%\plugins\imageformats\qwbmp.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QDIR%\plugins\imageformats\qwebp.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\platforms"
+COPY "%QDIR%\plugins\platforms\qwindows.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\platforms"
+
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\styles"
+COPY "%QDIR%\plugins\styles\qwindowsvistastyle.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\styles"
+
+REM QtTabToolbar
+COPY "%QT_TT_DLLR%\TabToolbar.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM Qwt
 COPY "%QWT_LIB_DLLR%\qwt.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
@@ -164,13 +167,13 @@ COPY "%OT_WIDGETS_ROOT%\%OT_DLLR%\OTWidgets.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%
 
 REM Rubberband
 COPY "%OT_RUBBERBANDAPI_ROOT%\%OT_DLLR%\RubberbandEngineCore.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OT_RUBBERBAND_ROOT%\%OT_DLLR%\RubberbandOsgWrapper.dll"    "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_RUBBERBAND_ROOT%\%OT_DLLR%\RubberbandEngineOsgWrapper.dll"    "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM StudioSuiteConnector
 COPY "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\%OT_DLLR%\StudioSuiteConnector.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM UI Core
-COPY ""%OT_UICORE_ROOT%\%OT_DLLR%\uiCore.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_UICORE_ROOT%\%OT_DLLR%\uiCore.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM UIPluginAPI
 COPY "%OT_UIPLUGINAPI_ROOT%\%OT_DLLR%\UIPluginAPI.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
@@ -195,3 +198,11 @@ REM ==========================================
 REM CALL "C:\Program Files (x86)\NSIS\makensis.exe" Install-OpenTwin.nsi
 
 REM MOVE "Install OpenTwin.exe" ..\Deployment_Frontend\FrontendInstaller"
+
+:PAUSE_END
+pause
+GOTO END
+
+:END
+REM Sets the exit code of the script to be 0
+exit /B 0
