@@ -28,7 +28,6 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 )
 
 REM Clean up the FrontendDeployment directory
-
 RMDIR /S /Q "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 MKDIR "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 
@@ -41,7 +40,7 @@ REM ===========================================================================
 
 REM Qwt
 COPY "%QWT_LIB_ROOT%\lib\qwt.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
-COPY "%QWT_POLAR_LIB_ROOT%\lib\qwtpolar.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
+REM ######### COPY "%QWT_POLAR_LIB_ROOT%\lib\qwtpolar.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 
 REM QtTabToolbar
 COPY "%SIM_PLAT_ROOT%\OT\ThirdParty\QtTabToolbar\src\TabToolbar\Release\TabToolbar.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
@@ -139,22 +138,19 @@ MKDIR "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend\icons"
 XCOPY /S "%SIM_PLAT_ROOT%\OT\OpenTwin\Assets\Icons" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend\icons"
 
 REM CURL
-
-COPY "%CURL_DLL%\libcurl.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
+REM ######## the systemvar does not exist when called
+REM COPY "%CURL_DLL%\libcurl.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 
 REM OPENSSL
-
 COPY "%OPENSSL_DLL%\libcrypto-1_1-x64.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 COPY "%OPENSSL_DLL%\libssl-1_1-x64.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 
 REM MongoDB
-
 COPY /Y "%MONGO_CXX_ROOT%\Release\bin\*.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 COPY /Y "%MONGO_C_ROOT%\Release\bin\*.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 
 REM ZLIB
-
-COPY "%ZLIB_LIB%\zlibwapi.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
+REM ########### COPY "%ZLIB_LIB%\zlibwapi.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 
 REM ===========================================================================
 REM Copy the build files
@@ -164,13 +160,10 @@ REM Library CADModelEntities
 COPY "%SIM_PLAT_ROOT%\OT\OpenTwin\Libraries\CADModelEntities\x64\Release\CADModelEntities.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 
 REM Library OpenTwinCommunication
-COPY "%SIM_PLAT_ROOT%\OT\OpenTwin\Libraries\OpenTwinCommunication\x64\Release\OpenTwinCommunication.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
+COPY "%SIM_PLAT_ROOT%\OT\OpenTwin\Libraries\OTCommunication\x64\Release\OTCommunication.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 
 REM Library OpenTwinServiceFoundation
-COPY "%SIM_PLAT_ROOT%\OT\OpenTwin\Libraries\OpenTwinServiceFoundation\x64\Release\OpenTwinServiceFoundation.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
-
-REM Library OpenTwinLogger
-COPY "%SIM_PLAT_ROOT%\OT\OpenTwin\Libraries\OpenTwinLogger\x64\Release\OpenTwinLogger.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
+COPY "%SIM_PLAT_ROOT%\OT\OpenTwin\Libraries\OTServiceFoundation\x64\Release\OTServiceFoundation.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 
 REM Library ModelEntities
 COPY "%SIM_PLAT_ROOT%\OT\OpenTwin\Libraries\ModelEntities\x64\Release\ModelEntities.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
@@ -182,17 +175,17 @@ REM Library DataStorage
 COPY "%SIM_PLAT_ROOT%\OT\OpenTwin\Libraries\DataStorage\x64\Release\DataStorage.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 
 REM UI Core
-COPY "%UICORE_LIB_ROOT%\x64\Release\uiCore.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
+COPY "%OT_UICORE_ROOT%\x64\Release\uiCore.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 
-REM Rubberband 
-COPY "%RUBBERBAND_ENGINE_CORE%\x64\Release\RubberbandEngineCore.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
-COPY "%RUBBERBAND_ENGINE_OSG%\x64\Release\RubberbandOsgWrapper.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
+REM Rubberband
+COPY "%OT_RUBBERBANDAPI_ROOT%\x64\Release\RubberbandEngineCore.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
+COPY "%OT_RUBBERBAND_ROOT%\x64\Release\RubberbandOsgWrapper.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 
 REM UI Service
-COPY "%UISERVICE_LIB_ROOT%\x64\Release\uiService.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
+COPY "%OT_UI_SERVICE_ROOT%\x64\Release\uiService.dll" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend"
 
 REM UI Frontend
-COPY "%UISERVICE_LIB_ROOT%\x64\ExeRelease\uiFrontend.exe" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend\OpenTwin.exe"
+COPY "%OT_UI_SERVICE_ROOT%\x64\ExeRelease\uiFrontend.exe" "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend\OpenTwin.exe"
 
 REM Copy the certificates
 MKDIR "%SIM_PLAT_ROOT%\FrontendDeployment\Frontend\Certificates"
@@ -207,5 +200,8 @@ REM ===========================================================================
 
 REM CALL "C:\Program Files (x86)\NSIS\makensis.exe" Install-OpenTwin.nsi
 
-MOVE "Install OpenTwin.exe" ..\FrontendDeployment\Frontend-Installer"
+REM ####### system cannot find the path
+REM MOVE "Install OpenTwin.exe" ..\FrontendDeployment\Frontend-Installer"
+
+pause
 
