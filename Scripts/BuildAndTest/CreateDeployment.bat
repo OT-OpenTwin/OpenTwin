@@ -141,7 +141,20 @@ COPY "%QT_DLLR%\Qt6Xml.dll" "%OT_DEPLOYMENT_DIR%"
 COPY "%QT_DLLR%\Qt6XmlPatterns.dll" "%OT_DEPLOYMENT_DIR%"
 
 MKDIR "%OT_DEPLOYMENT_DIR%\plugins"
-XCOPY /S "%QDIR%\plugins" "%OT_DEPLOYMENT_DIR%\plugins"
+MKDIR "%OT_DEPLOYMENT_DIR%\plugins\imageformats"
+MKDIR "%OT_DEPLOYMENT_DIR%\plugins\platforms"
+MKDIR "%OT_DEPLOYMENT_DIR%\plugins\renderers"
+MKDIR "%OT_DEPLOYMENT_DIR%\plugins\rendererplugins"
+MKDIR "%OT_DEPLOYMENT_DIR%\plugins\tls"
+XCOPY /S "%QDIR%\plugins\imageformats" "%OT_DEPLOYMENT_DIR%\plugins\imageformats"
+XCOPY /S "%QDIR%\plugins\platforms" "%OT_DEPLOYMENT_DIR%\plugins\platforms"
+XCOPY /S "%QDIR%\plugins\renderers" "%OT_DEPLOYMENT_DIR%\plugins\renderers"
+XCOPY /S "%QDIR%\plugins\rendererplugins" "%OT_DEPLOYMENT_DIR%\plugins\rendererplugins"
+XCOPY /S "%QDIR%\plugins\tls" "%OT_DEPLOYMENT_DIR%\plugins\tls"
+
+for /r "%OT_DEPLOYMENT_DIR%\plugins" %%f in (*.pdb) do (
+    del "%%f"
+)
 
 REM Copy the OpenSSL libs for the Qt Websocket
 COPY /Y "%OPENSSL_WEBSOCKET_DLLR%\*.dll" "%OT_DEPLOYMENT_DIR%"
