@@ -282,7 +282,7 @@ std::list<std::string> ExternalServicesComponent::GetAllUserProjects()
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString("", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, 0, doc.GetAllocator());
 	std::string response;
-	if (!ot::msg::send("", authorizationURL, ot::EXECUTE, doc.toJson(), response))
+	if (!ot::msg::send("", authorizationURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		throw std::exception("Could not get the projectlist of the authorization service.");
 	}
