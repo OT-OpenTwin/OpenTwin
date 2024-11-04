@@ -342,6 +342,7 @@
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\ProgressReport.cpp" />
     <ClCompile Include="src\ProjectTypeManager.cpp" />
+    <ClCompile Include="src\QueuingDatabaseWritingRAII.cpp" />
     <ClCompile Include="src\SelectionHandler.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -367,6 +368,7 @@
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\ProgressReport.h" />
     <ClInclude Include="include\ProjectTypeManager.h" />
+    <ClInclude Include="include\QueuingDatabaseWritingRAII.h" />
     <ClInclude Include="include\QueuingHttpRequestsRAII.h" />
     <ClInclude Include="include\SelectionHandler.h" />
     <ClInclude Include="include\stdafx.h" />

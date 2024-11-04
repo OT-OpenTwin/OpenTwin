@@ -11,7 +11,8 @@
 #include "Model.h"
 #include "OTCore/FolderNames.h"
 #include <assert.h>
-
+#include "QueuingHttpRequestsRAII.h"
+#include "QueuingDatabaseWritingRAII.h"
 
 void FileHandler::addButtons(ot::components::UiComponent* _uiComponent, const std::string& _pageName)
 {
@@ -55,20 +56,34 @@ void FileHandler::importFile(const std::string& _fileMask, const std::string& _d
 	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(_functionName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, ot::JsonValue(true), doc.GetAllocator());
-
+	doc.AddMember(OT_ACTION_PARAM_FILE_LoadMultiple, ot::JsonValue(true), doc.GetAllocator());
 	std::string response;
 	Application::instance()->uiComponent()->sendMessage(false, doc, response);
 }
 
+
 void FileHandler::storeTextFile(ot::JsonDocument& _document)
 {
-	std::string content = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Content);
-	uint64_t uncompressedDataLength = ot::json::getUInt64(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
-	std::string fileName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_OriginalName);
+	std::list<std::string> contents = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_Content);
+	std::list<int64_t> 	uncompressedDataLengths = ot::json::getInt64List(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+	std::list<std::string> fileNames = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_OriginalName);
+	assert(fileNames.size() == contents.size() && contents.size() == uncompressedDataLengths.size());
 
-	std::string fileContent = ot::decryptAndUnzipString(content, uncompressedDataLength);
-	ensureUTF8Encoding(fileContent);
-	storeFileInDataBase(fileContent,fileName);
+	{
+		QueuingDatabaseWritingRAII queueDatabase;
+		auto uncompressedDataLength = uncompressedDataLengths.begin();
+		auto content = contents.begin();
+		for (const std::string& fileName : fileNames)
+		{
+			std::string fileContent = ot::decryptAndUnzipString(*content, *uncompressedDataLength);
+			ensureUTF8Encoding(fileContent);
+			storeFileInDataBase(fileContent, fileName);
+			uncompressedDataLength++;
+			content++;
+		}
+	}
+
+	addTextFilesToModel();
 }
 
 void FileHandler::ensureUTF8Encoding(std::string& _text)
@@ -95,8 +110,6 @@ void FileHandler::ensureUTF8Encoding(std::string& _text)
 	}
 }
 
-#include "QueuingHttpRequestsRAII.h"
-
 void FileHandler::storeFileInDataBase(const std::string& _text, const std::string& _fileName)
 {
 	Model* model = Application::instance()->getModel();
@@ -121,9 +134,16 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	
 	newText.setTextEncoding(guesser(_text.data(), _text.size()));
 	newText.StoreToDataBase();
-	ot::UIDList entTopoIDs{ entIDTopo }, entTopoVersion{ newText.getEntityStorageVersion() }, entDataIDs{ entIDData }, entDataVers{ fileContent.getEntityStorageVersion() }, entDataParent{ entIDTopo };
-	std::list<bool> forceVis{ false };
-	
+	m_entityIDsTopo.push_back(entIDTopo);
+	m_entityVersionsTopo.push_back(newText.getEntityStorageVersion());
+	m_entityIDsData.push_back(entIDData);
+	m_entityVersionsData.push_back(fileContent.getEntityStorageVersion());
+	m_forceVisible.push_back(false);
+}
+
+void FileHandler::addTextFilesToModel()
+{
 	QueuingHttpRequestsRAII wrapper;
-	model->addEntitiesToModel(entTopoIDs, entTopoVersion, forceVis, entDataIDs, entDataVers, entDataParent, "Added File", true, false);
+	Model* model = Application::instance()->getModel();
+	model->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added File", true, false);
 }

@@ -19,9 +19,15 @@ public:
 
 private:
 	ot::MenuButtonDescription m_buttonFileImport;
-
+	ot::UIDList m_entityIDsTopo;
+	ot::UIDList m_entityVersionsTopo;
+	ot::UIDList m_entityIDsData;
+	ot::UIDList m_entityVersionsData;
+	std::list<bool> m_forceVisible;
+	
 	void importFile(const std::string& _fileMask, const std::string& _dialogTitle, const std::string& _functionName);
 	void storeTextFile(ot::JsonDocument& _doc);
+	void addTextFilesToModel();
 	void ensureUTF8Encoding(std::string& _text);
 	void storeFileInDataBase(const std::string& _text, const std::string& _fileName);
 };

@@ -385,6 +385,7 @@
 #define OT_ACTION_PARAM_FILE_Content_UncompressedDataLength "File.Content.DataLength.Uncompressed"
 #define OT_ACTION_PARAM_FILE_OriginalName "File.OriginalName"
 #define OT_ACTION_PARAM_FILE_LoadContent "File.LoadContent"
+#define OT_ACTION_PARAM_FILE_LoadMultiple "File.LoadMultiple"
 #define OT_ACTION_PARAM_FILE_Type "File.Type"
 #define OT_ACTION_PARAM_SENDER_URL "Sender.URL"
 #define OT_ACTION_PARAM_HOSTNAME "Host.Name"
