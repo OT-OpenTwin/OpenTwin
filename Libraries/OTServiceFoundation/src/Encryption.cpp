@@ -8,6 +8,7 @@
 #include "OTCore/OTAssert.h"
 #include "OTServiceFoundation/Encryption.h"
 
+#include <zlib.h>
 // Third party header
 #include "base64.h"
 
@@ -46,6 +47,7 @@ std::string ot::encryptString(const std::string& _str) {
 std::string ot::decryptString(const std::string& _str) {
 	int decoded_compressed_data_length = Base64decode_len(_str.c_str());
 	char* decoded_compressed_string = new char[decoded_compressed_data_length];
+
 	char* decoded_decompressed_string = new char[decoded_compressed_data_length];
 
 	Base64decode(decoded_compressed_string, _str.c_str());
@@ -73,4 +75,55 @@ std::string ot::decryptString(const std::string& _str) {
 	delete[] decoded_decompressed_string; decoded_decompressed_string = nullptr;
 
 	return base64_decoded;
+}
+
+OT_SERVICEFOUNDATION_API_EXPORT std::string ot::decryptAndUnzipString(const std::string& _content, uint64_t _uncompressedLength)
+{
+	int decoded_compressed_data_length = Base64decode_len(_content.c_str());
+	char* decodedCompressedContent = new char[decoded_compressed_data_length];
+
+	Base64decode(decodedCompressedContent, _content.c_str());
+
+	// Decompress the data
+	char* decodedUncompressesContent = new char[_uncompressedLength];
+	uLongf destLen = (uLongf)_uncompressedLength;
+	uLong  sourceLen = decoded_compressed_data_length;
+	uncompress((Bytef*)decodedUncompressesContent, &destLen, (Bytef*)decodedCompressedContent, sourceLen);
+
+	delete[] decodedCompressedContent;
+	decodedCompressedContent = nullptr;
+
+	std::string decodedAndUnzipped(decodedUncompressesContent);
+	delete[] decodedUncompressesContent;
+	decodedUncompressesContent = nullptr;
+
+	return decodedAndUnzipped;
+}
+
+OT_SERVICEFOUNDATION_API_EXPORT std::string ot::encryptAndZipString(const std::string& _content)
+{
+	
+	// Compress the file data content
+	uLong compressedSize = compressBound((uLong)_content.size());
+
+	char* compressedData = new char[compressedSize];
+	if (_content.size() > UINT32_MAX)
+	{
+		throw std::exception("Message to large for compression.");
+	}
+	compress((Bytef*)compressedData, &compressedSize, (Bytef*)_content.data(), static_cast<uint32_t>(_content.size()));
+
+	// Convert the binary to an encoded string
+	int encoded_data_length = Base64encode_len(compressedSize);
+	char* base64_string = new char[encoded_data_length];
+
+	Base64encode(base64_string, compressedData, compressedSize); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
+
+	delete[] compressedData;
+	compressedData = nullptr;
+
+	std::string compressedEncryptedContent(base64_string);
+	delete[] base64_string;
+	base64_string = nullptr;
+	return compressedEncryptedContent;
 }

@@ -15,5 +15,7 @@ namespace ot {
 
 	OT_SERVICEFOUNDATION_API_EXPORT std::string encryptString(const std::string& _str);
 	OT_SERVICEFOUNDATION_API_EXPORT std::string decryptString(const std::string& _str);
+	OT_SERVICEFOUNDATION_API_EXPORT std::string decryptAndUnzipString(const std::string& _str, uint64_t uncompressedLength);
+	OT_SERVICEFOUNDATION_API_EXPORT std::string encryptAndZipString(const std::string& _str);
 
 }

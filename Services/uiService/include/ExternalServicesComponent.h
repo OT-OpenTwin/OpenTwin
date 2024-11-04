@@ -7,7 +7,6 @@
  */
 
 #pragma once
-#include "FileHandler.h"
 
 // Wrapper header
 #include <uiServiceTypes.h>				// Model and View types
@@ -202,7 +201,6 @@ public:
 	OT_HANDLER(handleServiceDisconnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceDisconnected, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleShutdownRequestedByService, ExternalServicesComponent, OT_ACTION_CMD_ShutdownRequestedByService, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceSetupCompleted, ExternalServicesComponent, OT_ACTION_CMD_UI_ServiceSetupCompleted, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleModelExecuteFunction, ExternalServicesComponent, OT_ACTION_CMD_MODEL_ExecuteFunction, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayDebugMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayDebugMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportError, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportError, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -213,7 +211,6 @@ public:
 	OT_HANDLER(handleDeregisterForModelEvents, ExternalServicesComponent, OT_ACTION_CMD_UI_DeregisterForModelEvents, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleGenerateUIDs, ExternalServicesComponent, OT_ACTION_CMD_UI_GenerateUIDs, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleRequestFileForReading, ExternalServicesComponent, OT_ACTION_CMD_UI_RequestFileForReading, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStoreFileInDatabase, ExternalServicesComponent, OT_Action_CMD_UI_StoreFileInDataBase, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSaveFileContent, ExternalServicesComponent, OT_ACTION_CMD_UI_SaveFileContent, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSelectFilesForStoring, ExternalServicesComponent, OT_ACTION_CMD_UI_SelectFileForStoring, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddMenuPage, ExternalServicesComponent, OT_ACTION_CMD_UI_AddMenuPage, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -416,7 +413,6 @@ private:
 	bool											m_prefetchingDataCompleted;
 	bool                                            m_servicesUiSetupCompleted;
 
-	FileHandler										m_fileHandler;
 
 	ExternalServicesComponent() = delete;
 	ExternalServicesComponent(ExternalServicesComponent &) = delete;

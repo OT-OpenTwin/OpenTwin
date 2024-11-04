@@ -14,6 +14,7 @@
 #include "ModelNotifier.h"
 #include "base64.h"
 #include "zlib.h"
+#include "FileHandler.h"
 
 // OpenTwin header
 #include "DataBase.h"
@@ -710,7 +711,11 @@ std::string Application::handleExecuteAction(ot::JsonDocument& _document) {
 	}
 
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
-	m_model->executeAction(action, _document);
+	bool alreadyHandled = m_baseHandler.tryToHandleAction(action, _document);
+	if (!alreadyHandled)
+	{
+		m_model->executeAction(action, _document);
+	}
 
 	return "";
 }
@@ -722,50 +727,54 @@ std::string Application::handleExecuteFunction(ot::JsonDocument& _document) {
 	}
 
 	std::string function = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-	std::string mode = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mode);
-
-	if (mode == OT_ACTION_VALUE_FILE_Mode_Name)
+	bool alreadyHandled = 	m_baseHandler.tryToHandleAction(function, _document);
+	if (!alreadyHandled)
 	{
-		std::string fileName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Name);
-		m_model->executeFunction(function, fileName, false);
-	}
-	else if (mode == OT_ACTION_VALUE_FILE_Mode_Content)
-	{
-		std::string content = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Content);
-		unsigned long long uncompressedDataLength = ot::json::getUInt64(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
+		std::string mode = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mode);
 
-		// Create a tmp file from uncompressing the data
-		// Decode the encoded string into binary data
-		int decoded_compressed_data_length = Base64decode_len(content.c_str());
-		char* decodedCompressedString = new char[decoded_compressed_data_length];
+		if (mode == OT_ACTION_VALUE_FILE_Mode_Name)
+		{
+			std::string fileName = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Name);
+			m_model->executeFunction(function, fileName, false);
+		}
+		else if (mode == OT_ACTION_VALUE_FILE_Mode_Content)
+		{
+			std::string content = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Content);
+			unsigned long long uncompressedDataLength = ot::json::getUInt64(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
 
-		Base64decode(decodedCompressedString, content.c_str());
+			// Create a tmp file from uncompressing the data
+			// Decode the encoded string into binary data
+			int decoded_compressed_data_length = Base64decode_len(content.c_str());
+			char* decodedCompressedString = new char[decoded_compressed_data_length];
 
-		// Decompress the data
-		char* decodedString = new char[uncompressedDataLength];
-		uLongf destLen = (uLongf)uncompressedDataLength;
-		uLong  sourceLen = decoded_compressed_data_length;
-		uncompress((Bytef*)decodedString, &destLen, (Bytef*)decodedCompressedString, sourceLen);
+			Base64decode(decodedCompressedString, content.c_str());
 
-		delete[] decodedCompressedString;
-		decodedCompressedString = nullptr;
+			// Decompress the data
+			char* decodedString = new char[uncompressedDataLength];
+			uLongf destLen = (uLongf)uncompressedDataLength;
+			uLong  sourceLen = decoded_compressed_data_length;
+			uncompress((Bytef*)decodedString, &destLen, (Bytef*)decodedCompressedString, sourceLen);
 
-		// Store the data in a temporary file
-		std::string tmpFileName = DataBase::GetDataBase()->getTmpFileName();
+			delete[] decodedCompressedString;
+			decodedCompressedString = nullptr;
 
-		std::ofstream file(tmpFileName, std::ios::binary);
-		file.write(decodedString, uncompressedDataLength);
-		file.close();
+			// Store the data in a temporary file
+			std::string tmpFileName = DataBase::GetDataBase()->getTmpFileName();
 
-		delete[] decodedString;
-		decodedString = nullptr;
+			std::ofstream file(tmpFileName, std::ios::binary);
+			file.write(decodedString, uncompressedDataLength);
+			file.close();
 
-		// Process the file content
-		m_model->executeFunction(function, tmpFileName, true);
-	}
-	else
-	{
-		OT_LOG_E("Unknown mode");
+			delete[] decodedString;
+			decodedString = nullptr;
+
+			// Process the file content
+			m_model->executeFunction(function, tmpFileName, true);
+		}
+		else
+		{
+			OT_LOG_E("Unknown mode");
+		}
 	}
 
 	return "";
@@ -1148,6 +1157,11 @@ bool Application::settingChanged(const ot::Property* _item) {
 
 // Private functions
 
+void Application::addButtons()
+{
+	m_fileHandler.addButtons(uiComponent(), "Model");
+}
+
 void Application::queueAction(ActionType _type, const ot::JsonDocument& _document) {
 	ActionData newData;
 	newData.type = _type;
@@ -1262,6 +1276,7 @@ Application::Application()
 
 	std::thread asyncActionThread(&Application::asyncActionWorker, this);
 	asyncActionThread.detach();
+	m_baseHandler.setNextHandler(&m_fileHandler);
 }
 
 Application::~Application() {

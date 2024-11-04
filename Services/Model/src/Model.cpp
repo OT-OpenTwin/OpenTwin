@@ -359,6 +359,7 @@ void Model::addMenuLineEdit(const std::string &menu, const std::string &group, c
 	}
 }
 
+
 void Model::setupUIControls()
 {	
 	assert(!uiCreated);
@@ -398,6 +399,9 @@ void Model::setupUIControls()
 	addMenuAction("Model", "Edit", "Delete", "Delete", modelWrite, "Delete", "Default", ot::KeySequence(ot::Key_Delete));
 	
 	addMenuAction("Model", "Plots", "Add Curves", "Add Curves", modelWrite, "Result1DVisible", "Default");
+
+	
+	Application::instance()->addButtons();
 
 	uiCreated = true;
 

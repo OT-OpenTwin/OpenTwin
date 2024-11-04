@@ -9,6 +9,7 @@
 // OpenTwin header
 #include "OTServiceFoundation/ApplicationBase.h"
 #include "SelectionHandler.h"
+#include "FileHandler.h"
 
 // std header
 #include <list>
@@ -168,6 +169,8 @@ public:
 
 	SelectionHandler& getSelectionHandler() { return m_selectionHandler; }
 
+	void addButtons();
+
 private:
 	void queueAction(ActionType _type, const ot::JsonDocument& _document);
 
@@ -185,11 +188,14 @@ private:
 	std::mutex m_asyncActionMutex;
 	std::list<ActionData> m_queuedActions;
 	bool m_continueAsyncActionWorker;
-
+	
 	Model* m_model;
 	SelectionHandler m_selectionHandler;
 	MicroserviceNotifier* m_notifier;
 	
+	ActionAndFunctionHandler m_baseHandler;
+	FileHandler m_fileHandler;
+
 	Application();
 	~Application();
 };

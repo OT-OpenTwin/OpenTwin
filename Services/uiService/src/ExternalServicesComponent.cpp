@@ -2254,28 +2254,6 @@ std::string ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocum
 	return "";
 }
 
-std::string ExternalServicesComponent::handleModelExecuteFunction(ot::JsonDocument& _document) {
-	const std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-
-	ot::UIDList entityIDs = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
-	ot::UIDList entityVersions = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityVersionList);
-
-	if (subsequentFunction == m_fileHandler.GetStoreFileFunctionName())
-	{
-		ot::JsonDocument  reply = m_fileHandler.StoreFileInDataBase(entityIDs, entityVersions);
-		std::string response;
-		sendHttpRequest(QUEUE, m_fileHandler.GetSenderURL(), reply, response);
-		// Check if response is an error or warning
-		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			OT_LOG_EAS(response);
-		}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			OT_LOG_WAS(response);
-		}
-	}
-
-	return "";
-}
 
 std::string ExternalServicesComponent::handleDisplayMessage(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
@@ -2448,6 +2426,7 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
 	bool loadContent = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadContent);
 
+	
 	QString fileName = QFileDialog::getOpenFileName(
 		nullptr,
 		dialogTitle.c_str(),
@@ -2484,54 +2463,6 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
 			assert(0); // WARNING
 		}
-	}
-
-	return "";
-}
-
-std::string ExternalServicesComponent::handleStoreFileInDatabase(ot::JsonDocument& _document) {
-	std::string dialogTitle = ot::json::getString(_document, OT_ACTION_PARAM_UI_DIALOG_TITLE);
-	std::string fileMask = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
-	std::string entityType = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Type);
-	try
-	{
-		std::list<std::string> absoluteFilePaths = RequestFileNames(dialogTitle, fileMask);
-
-		if (absoluteFilePaths.size() != 0)
-		{
-			ot::JsonDocument sendingDoc;
-
-			int requiredIdentifierPairsPerFile = 2;
-			const int numberOfUIDs = static_cast<int>(absoluteFilePaths.size()) * requiredIdentifierPairsPerFile;
-
-			sendingDoc.AddMember(OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT, numberOfUIDs, sendingDoc.GetAllocator());
-			const std::string url = uiServiceURL();
-			sendingDoc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(url, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
-			sendingDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(m_fileHandler.GetStoreFileFunctionName(), sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
-			sendingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
-
-			std::string response;
-			sendHttpRequest(QUEUE, m_modelServiceURL, sendingDoc, response);
-			// Check if response is an error or warning
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
-			}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
-		}
-
-		std::list<std::string> takenNames = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_TAKEN_NAMES);
-		std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SENDER);
-		std::string entityPath = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
-		std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-		std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
-		m_fileHandler.SetNewFileImportRequest(std::move(senderURL), std::move(subsequentFunction), std::move(senderName), std::move(takenNames), std::move(absoluteFilePaths), std::move(entityPath), entityType);
-		}
-	}
-	catch (std::exception& e)
-	{
-		OT_LOG_E(e.what());
-		AppBase::instance()->appendInfoMessage("Failed to load file due to: " + QString(e.what()));
 	}
 
 	return "";

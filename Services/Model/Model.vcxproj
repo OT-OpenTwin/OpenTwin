@@ -334,6 +334,7 @@
     <ClCompile Include="src\ClassFactoryModel.cpp" />
     <ClCompile Include="src\CrossCollectionDatabaseWrapper.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\FileHandler.cpp" />
     <ClCompile Include="src\GeometryOperations.cpp" />
     <ClCompile Include="src\MicroserviceAPI.cpp" />
     <ClCompile Include="src\MicroserviceNotifier.cpp" />
@@ -354,6 +355,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\ActionHandler.h" />
     <ClInclude Include="include\CheckGeometry.h" />
     <ClInclude Include="include\ClassFactoryModel.h" />
     <ClInclude Include="include\CrossCollectionDatabaseWrapper.h" />
