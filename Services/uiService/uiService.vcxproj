@@ -183,6 +183,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_DEFAULT_SERVICE_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/$(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_GUI_ROOT)/$(OT_INC);$(OT_WIDGETS_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(QWT_LIB_INCD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);$(BOOST_INCD);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_INC);$(QT_ADS_ROOT)\include;$(QT_TT_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <PreprocessorDefinitions>_UNICODE;QT_NO_CAST_TO_ASCII;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/utf-8 </AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OT_GUI_ROOT)/$(OT_LIBD);$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_UICORE_ROOT)/$(OT_DLLD);$(OT_WIDGETS_ROOT)/$(OT_LIBD);$(OT_VIEWER_ROOT)/$(OT_DLLD);$(QWT_LIB_LIBPATHD);$(OT_UIPLUGINAPI_ROOT)/$(OT_DLLD);$(ZLIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLD);$(OT_RUBBERBAND_ROOT)/$(OT_DLLD);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_DLLD);$(QT_ADS_ROOT)\lib;$(QT_TT_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

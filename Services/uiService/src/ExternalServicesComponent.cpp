@@ -37,6 +37,7 @@
 #include "OTCore/OwnerManagerTemplate.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTCore/GenericDataStructMatrix.h"
+#include "OTCore/ReturnMessage.h"
 
 #include "OTGui/GuiTypes.h"
 #include "OTGui/GraphicsPackage.h"
@@ -2426,107 +2427,115 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
 	bool loadContent = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadContent);
 	bool loadMultiple = false;
-	
-	if (_document.HasMember(OT_ACTION_PARAM_FILE_LoadContent))
+	try
 	{
-		loadMultiple = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadMultiple);
-	}
-	
-	if (loadMultiple)
-	{
-		QStringList fileNames = QFileDialog::getOpenFileNames(
-			nullptr,
-			dialogTitle.c_str(),
-			QDir::currentPath(),
-			QString(fileMask.c_str()) + " ;; All files (*.*)");
-
-		if (!fileNames.isEmpty())
+		if (_document.HasMember(OT_ACTION_PARAM_FILE_LoadContent))
 		{
-			ot::JsonDocument inDoc;
-			inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
-			inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+			loadMultiple = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadMultiple);
+		}
 
-			ot::JsonArray fileNamesJson, fileContents, fileModes, uncompressedDataLengths;
+		if (loadMultiple)
+		{
+			QStringList fileNames = QFileDialog::getOpenFileNames(
+				nullptr,
+				dialogTitle.c_str(),
+				QDir::currentPath(),
+				QString(fileMask.c_str()) + " ;; All files (*.*)");
 
-			for (QString& fileName : fileNames)
+			if (!fileNames.isEmpty())
 			{
-				const std::string fileNameStd = fileName.toStdString();
-				ot::JsonString fileNameJson(fileNameStd,inDoc.GetAllocator());
-				fileNamesJson.PushBack(fileNameJson, inDoc.GetAllocator());
+				ot::JsonDocument inDoc;
+				inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
+				inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+
+				ot::JsonArray fileNamesJson, fileContents, fileModes, uncompressedDataLengths;
+				for (QString& fileName : fileNames)
+				{
+					std::string localEncodingString = fileName.toLocal8Bit().constData();
+					const std::string utf8String = fileName.toStdString();
+
+					ot::JsonString fileNameJson(utf8String, inDoc.GetAllocator());
+					fileNamesJson.PushBack(fileNameJson, inDoc.GetAllocator());
+					if (loadContent)
+					{
+						std::string fileContent;
+						uint64_t uncompressedDataLength{ 0 };
+						// The file can not be directly accessed from the remote site and we need to send the file content over the communication
+						ReadFileContent(localEncodingString, fileContent, uncompressedDataLength);
+						fileContents.PushBack(ot::JsonString(fileContent, inDoc.GetAllocator()), inDoc.GetAllocator());
+						uncompressedDataLengths.PushBack(static_cast<int64_t>(uncompressedDataLength), inDoc.GetAllocator());
+						fileModes.PushBack(ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+					}
+				}
+				inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, fileNamesJson, inDoc.GetAllocator());
+				if (loadContent)
+				{
+					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, fileContents, inDoc.GetAllocator());
+					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLengths, inDoc.GetAllocator());
+					inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, fileModes, inDoc.GetAllocator());
+				}
+
+
+				std::string response;
+				sendHttpRequest(EXECUTE, senderURL, inDoc, response);
+
+				// Check if response is an error or warning
+				OT_ACTION_IF_RESPONSE_ERROR(response) {
+					assert(0); // ERROR
+				}
+				else OT_ACTION_IF_RESPONSE_WARNING(response) {
+					assert(0); // WARNING
+				}
+			}
+		}
+		else
+		{
+
+			QString fileName = QFileDialog::getOpenFileName(
+				nullptr,
+				dialogTitle.c_str(),
+				QDir::currentPath(),
+				QString(fileMask.c_str()) + " ;; All files (*.*)");
+
+			if (fileName != "")
+			{
+				ot::JsonDocument inDoc;
+				inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
+
 				if (loadContent)
 				{
 					std::string fileContent;
-					uint64_t uncompressedDataLength{ 0 };
+					unsigned long long uncompressedDataLength{ 0 };
+
 					// The file can not be directly accessed from the remote site and we need to send the file content over the communication
 					ReadFileContent(fileName.toStdString(), fileContent, uncompressedDataLength);
-					fileContents.PushBack(ot::JsonString(fileContent,inDoc.GetAllocator()), inDoc.GetAllocator());
-					uncompressedDataLengths.PushBack(static_cast<int64_t>(uncompressedDataLength), inDoc.GetAllocator());
-					fileModes.PushBack(ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Content,inDoc.GetAllocator()), inDoc.GetAllocator());
+					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, rapidjson::Value(fileContent.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), inDoc.GetAllocator());
+					// We need to send the file content
+					inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, rapidjson::Value(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+				}
+				inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+				inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+
+				std::string response;
+				sendHttpRequest(EXECUTE, senderURL, inDoc, response);
+
+				// Check if response is an error or warning
+				OT_ACTION_IF_RESPONSE_ERROR(response) {
+					assert(0); // ERROR
+				}
+				else OT_ACTION_IF_RESPONSE_WARNING(response) {
+					assert(0); // WARNING
 				}
 			}
-			inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, fileNamesJson, inDoc.GetAllocator());
-			if (loadContent)
-			{
-				inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, fileContents, inDoc.GetAllocator());
-				inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLengths, inDoc.GetAllocator());
-				inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, fileModes, inDoc.GetAllocator());
-			}
-
-
-			std::string response;
-			sendHttpRequest(EXECUTE, senderURL, inDoc, response);
-
-			// Check if response is an error or warning
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
-			}
-			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-				assert(0); // WARNING
-			}
 		}
+		return ot::ReturnMessage().toJson();
 	}
-	else
+	catch (std::exception& _e)
 	{
-
-		QString fileName = QFileDialog::getOpenFileName(
-			nullptr,
-			dialogTitle.c_str(),
-			QDir::currentPath(),
-			QString(fileMask.c_str()) + " ;; All files (*.*)");
-
-		if (fileName != "")
-		{
-			ot::JsonDocument inDoc;
-			inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
-
-			if (loadContent)
-			{
-				std::string fileContent;
-				unsigned long long uncompressedDataLength{ 0 };
-
-				// The file can not be directly accessed from the remote site and we need to send the file content over the communication
-				ReadFileContent(fileName.toStdString(), fileContent, uncompressedDataLength);
-				inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, rapidjson::Value(fileContent.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-				inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), inDoc.GetAllocator());
-				// We need to send the file content
-				inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, rapidjson::Value(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
-			}
-			inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-			inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-
-			std::string response;
-			sendHttpRequest(EXECUTE, senderURL, inDoc, response);
-
-			// Check if response is an error or warning
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
-			}
-			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-				assert(0); // WARNING
-			}
-		}
+		 //ToDo: Display here
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, _e.what()).toJson();
 	}
-	return "";
 }
 
 std::string ExternalServicesComponent::handleSaveFileContent(ot::JsonDocument& _document) {

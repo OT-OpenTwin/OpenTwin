@@ -73,10 +73,11 @@ void FileHandler::storeTextFile(ot::JsonDocument& _document)
 		QueuingDatabaseWritingRAII queueDatabase;
 		auto uncompressedDataLength = uncompressedDataLengths.begin();
 		auto content = contents.begin();
-		for (const std::string& fileName : fileNames)
+		for (std::string& fileName : fileNames)
 		{
 			std::string fileContent = ot::decryptAndUnzipString(*content, *uncompressedDataLength);
 			ensureUTF8Encoding(fileContent);
+			ensureUTF8Encoding(fileName);
 			storeFileInDataBase(fileContent, fileName);
 			uncompressedDataLength++;
 			content++;
