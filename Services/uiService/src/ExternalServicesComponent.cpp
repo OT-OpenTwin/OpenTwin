@@ -3828,18 +3828,12 @@ std::string ExternalServicesComponent::handlePlot1DPropertiesChanged(ot::JsonDoc
 }
 
 std::string ExternalServicesComponent::handleResult1DPropertiesChanged(ot::JsonDocument& _document) {
-	/*
-	ak::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
-	ot::UIDList entityIDs = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_ITM_ID);
-	ot::UIDList entityVersions = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_ITM_Version);
-	auto entityVersion = entityVersions.begin();
-	for (ot::UID entityID : entityIDs) {
-		OTAssert(entityVersion != entityVersions.end(), "List size mismatch");
+	ot::Plot1DCurveInfoCfg config;
+	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-		ViewerAPI::visualizationResult1DPropertiesChanged(visModelID, entityID, *entityVersion);
-		entityVersion++;
-	}
-	*/
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
 	return "";
 }
 

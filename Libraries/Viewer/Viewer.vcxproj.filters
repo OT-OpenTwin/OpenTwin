@@ -10,21 +10,6 @@
     <ClCompile Include="src\Notifier.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\SceneNodeAnnotation.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeContainer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeGeometry.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeMesh.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeMeshItem.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\stdafx.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -38,18 +23,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\ViewManipulator.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeCartesianMesh.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeCartesianMeshItem.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeTextItem.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeTableItem.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\SceneNodeMaterialFactory.cpp">
@@ -71,9 +44,6 @@
       <Filter>src\Materials</Filter>
     </ClCompile>
     <ClCompile Include="src\Rubberband.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeVTK.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\WorkingPlane.cpp">
@@ -135,6 +105,42 @@
     </ClCompile>
     <ClCompile Include="src\PlotManager.cpp">
       <Filter>src\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeAnnotation.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeContainer.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeCartesianMesh.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeCartesianMeshItem.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeGeometry.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeMesh.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeMeshItem.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeTableItem.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeTextItem.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeVTK.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodePlot1D.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodePlot1DCurve.cpp">
+      <Filter>src\SceneNodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -273,6 +279,12 @@
     <ClInclude Include="include\PlotManager.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
+    <ClInclude Include="include\SceneNodePlot1D.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodePlot1DCurve.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\Table.h">
@@ -303,6 +315,9 @@
     </Filter>
     <Filter Include="src\WidgetView">
       <UniqueIdentifier>{98463fc9-d8b8-47a9-9a36-1c785d62bce7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\SceneNodes">
+      <UniqueIdentifier>{30204bce-b2bc-4f68-a01e-3f97fe948afe}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

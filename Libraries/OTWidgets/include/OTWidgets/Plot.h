@@ -88,11 +88,28 @@ namespace ot {
 
 		void datasetSelectionChanged(PlotDataset* _selectedDataset);
 
+		//! \brief Returns the dataset for the given plot curve.
+		//! Returns NULL if the dataset does not exist.
+		//! The Plot keeps ownership of the dataset.
 		PlotDataset* findDataset(QwtPlotCurve* _curve);
 
+		//! \brief Returns the dataset for the given plot curve.
+		//! Returns NULL if the dataset does not exist.
+		//! The Plot keeps ownership of the dataset.
 		PlotDataset* findDataset(QwtPolarCurve* _curve);
 
+		//! \brief Returns the cached dataset for the given entity id.
+		//! Returns NULL if the dataset does not exist.
+		//! The Plot keeps ownership of the dataset.
+		PlotDataset* findDataset(UID _entityID);
+
 		void setAxisQuantity(Plot1DCfg::AxisQuantity _quantity);
+
+		bool hasCachedEntity(UID _entityID) const;
+
+		//! \brief Updates the entity version of the specified dataset if needed.
+		//! Returns false if the dataset does not exist or the version did not change.
+		bool changeCachedDatasetEntityVersion(UID _entityID, UID _newEntityVersion);
 
 	Q_SIGNALS:
 		void resetItemSelectionRequest(void);

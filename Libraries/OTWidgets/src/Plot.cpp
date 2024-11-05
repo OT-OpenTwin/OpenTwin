@@ -273,9 +273,39 @@ ot::PlotDataset* ot::Plot::findDataset(QwtPolarCurve * _curve) {
 	return nullptr;
 }
 
+ot::PlotDataset* ot::Plot::findDataset(UID _entityID) {
+	auto it = m_cache.find(_entityID);
+	if (it == m_cache.end()) {
+		return nullptr;
+	}
+	else {
+		return it->second.second;
+	}
+}
+
 void ot::Plot::setAxisQuantity(Plot1DCfg::AxisQuantity _quantity) {
 	for (auto itm : m_cache) {
 		itm.second.second->calculateData(_quantity);
+	}
+}
+
+bool ot::Plot::hasCachedEntity(UID _entityID) const {
+	return m_cache.find(_entityID) != m_cache.end();
+}
+
+bool ot::Plot::changeCachedDatasetEntityVersion(UID _entityID, UID _newEntityVersion) {
+	auto it = m_cache.find(_entityID);
+	if (it == m_cache.end()) {
+		return false;
+	}
+
+	if (it->second.first == _newEntityVersion) {
+		return false;
+	}
+	else {
+		it->second.first = _newEntityVersion;
+		it->second.second->setCurveEntityVersion(_newEntityVersion);
+		return true;
 	}
 }
 
