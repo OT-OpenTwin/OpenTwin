@@ -58,7 +58,7 @@ void NGSpice::clearBufferStructure(std::string name)
 	this->netlistNameToCustomNameMap.clear();
 	Numbers::nodeNumber = 1;
 	SimulationResults::getInstance()->getResultMap().clear();
-	ngSpice_Command(const_cast<char*>("show"));
+	/*ngSpice_Command(const_cast<char*>("show"));*/
 	ngSpice_Command(const_cast<char*>("reset"));
 	
 	//ngSpice_Init(MySendCharFunction, MySendStat, MyControlledExit, MySendDataFunction, MySendInitDataFunction, nullptr, nullptr);
