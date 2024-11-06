@@ -29,5 +29,8 @@ private:
 	void storeTextFile(ot::JsonDocument& _doc);
 	void addTextFilesToModel();
 	void ensureUTF8Encoding(std::string& _text);
+
+	//! @brief Filecontent is stored as binary, thus the encoding does not matter. The filename however is stored in properties and used in the visualisation. 
+	//! Thus UTF8 encoding is required.
 	void storeFileInDataBase(const std::string& _text, const std::string& _fileName);
 };
