@@ -29,6 +29,17 @@ ot::Plot1DAxisCfg& ot::Plot1DAxisCfg::operator=(const Plot1DAxisCfg& _other) {
 	return *this;
 }
 
+bool ot::Plot1DAxisCfg::operator==(const Plot1DAxisCfg& _other) const {
+	return m_min == _other.m_min &&
+		m_max == _other.m_max &&
+		m_isLogScale == _other.m_isLogScale &&
+		m_isAutoScale == _other.m_isAutoScale;
+}
+
+bool ot::Plot1DAxisCfg::operator!=(const Plot1DAxisCfg& _other) const {
+	return !(*this == _other);
+}
+
 void ot::Plot1DAxisCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Min", m_min, _allocator);
 	_object.AddMember("Max", m_max, _allocator);

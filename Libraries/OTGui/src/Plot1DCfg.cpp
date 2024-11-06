@@ -56,7 +56,7 @@ ot::Plot1DCfg::AxisQuantity ot::Plot1DCfg::stringToAxisQuantity(const std::strin
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ot::Plot1DCfg::Plot1DCfg() 
-	: m_uid(0), m_visualizationUid(0), m_type(Plot1DCfg::Cartesian), m_axisQuantity(Plot1DCfg::Magnitude),
+	: m_uid(0), m_type(Plot1DCfg::Cartesian), m_axisQuantity(Plot1DCfg::Magnitude),
 	m_gridVisible(false), m_gridWidth(1.), m_isHidden(false), m_legendVisible(false)
 {}
 
@@ -70,7 +70,6 @@ ot::Plot1DCfg& ot::Plot1DCfg::operator=(const Plot1DCfg& _other) {
 	if (this == &_other) return *this;
 
 	m_uid = _other.m_uid;
-	m_visualizationUid = _other.m_visualizationUid;
 	
 	m_name = _other.m_name;
 	m_title = _other.m_title;
@@ -95,7 +94,6 @@ ot::Plot1DCfg& ot::Plot1DCfg::operator=(const Plot1DCfg& _other) {
 
 void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("UID", m_uid, _allocator);
-	_object.AddMember("VisUID", m_visualizationUid, _allocator);
 
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
@@ -126,10 +124,7 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 }
 
 void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	
-
 	m_uid = json::getUInt64(_object, "UID");
-	m_visualizationUid = json::getUInt64(_object, "VisUID");
 
 	m_name = json::getString(_object, "Name");
 	m_title = json::getString(_object, "Title");
@@ -148,4 +143,30 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 	m_xAxis.setFromJsonObject(json::getObject(_object, "XAxis"));
 	m_yAxis.setFromJsonObject(json::getObject(_object, "YAxis"));
+}
+
+bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
+	return (m_uid == _other.m_uid) &&
+
+		(m_name == _other.m_name) &&
+		(m_title == _other.m_title) &&
+		(m_projectName == _other.m_projectName) &&
+		(m_type == _other.m_type) &&
+		(m_axisQuantity == _other.m_axisQuantity) &&
+
+		(m_gridVisible == _other.m_gridVisible) &&
+		(m_gridColor == _other.m_gridColor) &&
+		(m_gridWidth == _other.m_gridWidth) &&
+
+		(m_isHidden == _other.m_isHidden) &&
+		(m_legendVisible == _other.m_legendVisible) &&
+
+		(m_treeIcons == _other.m_treeIcons) &&
+
+		(m_xAxis == _other.m_xAxis) &&
+		(m_yAxis == _other.m_yAxis);
+}
+
+bool ot::Plot1DCfg::operator!=(const Plot1DCfg& _other) const {
+	return !(*this == _other);
 }

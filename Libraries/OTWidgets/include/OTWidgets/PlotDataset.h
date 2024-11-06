@@ -62,6 +62,7 @@ namespace ot {
 		void detach(void);
 
 		void setCurveTitle(const QString& _title);
+		const QString& getCurveTitle(void) const { return m_curveTitle; };
 
 		void setDimmed(bool _isDimmed, bool _repaint = true);
 
@@ -78,6 +79,8 @@ namespace ot {
 		// ###########################################################################
 
 		// Getter
+
+		bool getCurveIsVisible(void) const { return m_isVisible; };
 
 		int id(void) const { return m_id; }
 

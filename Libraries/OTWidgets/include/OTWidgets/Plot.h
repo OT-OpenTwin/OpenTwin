@@ -111,6 +111,8 @@ namespace ot {
 		//! Returns false if the dataset does not exist or the version did not change.
 		bool changeCachedDatasetEntityVersion(UID _entityID, UID _newEntityVersion);
 
+		std::list<PlotDataset*> getDatasets(void) const;
+
 	Q_SIGNALS:
 		void resetItemSelectionRequest(void);
 		void setItemSelectedRequest(UID _treeItemUid, bool _hasControlModifier);

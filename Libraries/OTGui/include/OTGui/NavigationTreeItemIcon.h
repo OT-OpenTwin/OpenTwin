@@ -25,6 +25,9 @@ namespace ot {
 
 		NavigationTreeItemIcon& operator = (const NavigationTreeItemIcon& _other);
 
+		bool operator == (const NavigationTreeItemIcon& _other) const;
+		bool operator != (const NavigationTreeItemIcon& _other) const;
+		
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
 		//! \param _allocator Allocator.

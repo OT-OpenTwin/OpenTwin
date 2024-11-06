@@ -309,6 +309,16 @@ bool ot::Plot::changeCachedDatasetEntityVersion(UID _entityID, UID _newEntityVer
 	}
 }
 
+std::list<ot::PlotDataset*> ot::Plot::getDatasets(void) const {
+	std::list<PlotDataset*> result;
+
+	for (const auto& it : m_cache) {
+		result.push_back(it.second.second);
+	}
+
+	return result;
+}
+
 void ot::Plot::applyConfig(void) {
 	m_cartesianPlot->setTitle(m_config.getTitle().c_str());
 	m_polarPlot->setTitle(m_config.getTitle().c_str());

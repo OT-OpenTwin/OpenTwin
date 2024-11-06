@@ -12,6 +12,10 @@ ot::Plot1DDataBaseCfg::Plot1DDataBaseCfg(const Plot1DDataBaseCfg& _other) {
 	*this = _other;
 }
 
+ot::Plot1DDataBaseCfg::Plot1DDataBaseCfg(const Plot1DCfg& _other)
+	: Plot1DCfg(_other)
+{}
+
 ot::Plot1DDataBaseCfg::~Plot1DDataBaseCfg() {}
 
 ot::Plot1DDataBaseCfg& ot::Plot1DDataBaseCfg::operator = (const Plot1DDataBaseCfg& _other) {
@@ -20,6 +24,16 @@ ot::Plot1DDataBaseCfg& ot::Plot1DDataBaseCfg::operator = (const Plot1DDataBaseCf
 
 	m_curves = _other.m_curves;
 
+	return *this;
+}
+
+ot::Plot1DDataBaseCfg& ot::Plot1DDataBaseCfg::operator=(const Plot1DCfg& _other) {
+	Plot1DCfg::operator=(_other);
+	
+	if (this != &_other) {
+		m_curves.clear();
+	}
+	
 	return *this;
 }
 
