@@ -3,6 +3,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/PropertyGridCfg.h"
+#include "OTGui/Plot1DDataBaseCfg.h"
 
 #include <list>
 #include <tuple>
@@ -16,8 +17,11 @@
 #include "Types.h"
 
 class Viewer;
-class SceneNodeGeometry;
 class ManipulatorBase;
+class SceneNodePlot1D;
+class SceneNodeGeometry;
+class SceneNodePlot1DCurve;
+namespace ot { class PlotDataset; }
 
 class UIControls
 {
@@ -306,6 +310,31 @@ private:
 	bool	   isLineDrawable(osg::Drawable *drawable);
 	void	   clearEdgeSelection(void);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Plot 1D
+
+public:
+	void addPlot1DNode(const ot::Plot1DDataBaseCfg& _config);
+	void addPlot1DCurveNode(const TreeIcon& _treeIcons, const std::string& _treeItemPath, ot::PlotDataset* _dataset);
+	void plot1DCurvePropertiesChanged(const ot::Plot1DCurveInfoCfg& _curve);
+	void plot1DPropertiesChanged(const ot::Plot1DCfg& _config);
+	
+	void set1DPlotItemSelected(ot::UID _treeItemID, bool _ctrlPressed);
+	void reset1DPlotItemSelection(void);
+
+	std::list<std::string> getSelectedCurves(void);
+	void removedSelectedCurveNodes(void);
+
+private:
+	bool changePlot1DCurveEntityVersion(SceneNodeBase* _rootNode, const ot::Plot1DCurveInfoCfg& _curve);
+
+	void update1DPlot(SceneNodeBase* _rootNode);
+	void gather1DPlotItems(SceneNodeBase* _rootNode, ot::Plot1DDataBaseCfg& _config, bool& _compatible, bool& _firstCurve, SceneNodePlot1D*& _commonPlot, std::list<SceneNodePlot1D*>& _plotNodes);
+	void gatherCompatibleDimmedPlotItems(SceneNodeBase* _rootNode, ot::Plot1DDataBaseCfg& _config);
+
+	SceneNodePlot1D* getPlotFromCurve(SceneNodePlot1DCurve* _curve) const;
+
 	// Attributes
 	enum { ITEM_SELECTED = 1, ITEM_EXPANDED = 2 };
 
@@ -313,9 +342,9 @@ private:
 	std::list<Viewer *>							   viewerList;
 	SceneNodeBase*     							   sceneNodesRoot;
 	std::map<std::string, SceneNodeBase *>		   nameToSceneNodesMap;
-	std::map <ot::UID, SceneNodeBase *>			   treeItemToSceneNodesMap;
-	std::map <unsigned long long, SceneNodeBase *> modelItemToSceneNodesMap;
-	std::map <osg::Node*, SceneNodeBase *>	       osgNodetoSceneNodesMap;
+	std::map<ot::UID, SceneNodeBase *>			   treeItemToSceneNodesMap;
+	std::map<unsigned long long, SceneNodeBase *> modelItemToSceneNodesMap;
+	std::map<osg::Node*, SceneNodeBase *>	       osgNodetoSceneNodesMap;
 	bool										   isActive;
 	UIControls									   uiControls;
 	bool										   wireFrameState;

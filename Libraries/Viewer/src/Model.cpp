@@ -30,11 +30,15 @@
 #include "SceneNodeTextItem.h"
 #include "SceneNodeTableItem.h"
 #include "SceneNodeVTK.h"
+#include "SceneNodePlot1D.h"
+#include "SceneNodePlot1DCurve.h"
 
 #include "ManipulatorBase.h"
 #include "TransformManipulator.h"
 
 #include "DataBase.h"
+#include "OTCore/Logger.h"
+#include "OTWidgets/PlotDataset.h"
 
 bool operator==(const FaceSelection& left, const FaceSelection& right) 
 { 
@@ -3005,4 +3009,325 @@ void Model::updateCapGeometryForGeometryItem(SceneNodeGeometry *item, const osg:
 		OutputDebugString(L"Intersection\n\n");
 	}
 
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Plot 1D
+
+void Model::addPlot1DNode(const ot::Plot1DDataBaseCfg& _config) {
+	SceneNodePlot1D* plotNode = new SceneNodePlot1D;
+
+	plotNode->setFromDataBaseConfig(_config);
+
+	TreeIcon icon;
+	icon.size = 32;
+	icon.visibleIcon = _config.getTreeIcons().getVisibleIcon();
+	icon.hiddenIcon = _config.getTreeIcons().getHiddenIcon();
+	plotNode->setTreeIcons(icon);
+
+	// Get the parent scene node
+	SceneNodeBase* parentNode = this->getParentNode(_config.getName());
+	if (!parentNode) {
+		OT_LOG_EAS("Parent node not found { \"TreePath\": \"" + _config.getName() + "\" }");
+		return;
+	}
+	
+	// Now add the current node as child to the parent
+	parentNode->addChild(plotNode);
+
+	// Add the tree name to the tree
+	addSceneNodesToTree(plotNode);
+
+	// Add the node to the maps for faster access
+	nameToSceneNodesMap[_config.getName()] = plotNode;
+	treeItemToSceneNodesMap[plotNode->getTreeItemID()] = plotNode;
+	modelItemToSceneNodesMap[_config.getUid()] = plotNode;
+
+	// Create the nodes for the curve
+	TreeIcon curveTreeIcons;
+	curveTreeIcons.size = 32;
+	curveTreeIcons.visibleIcon = "Result1DVisible";
+	curveTreeIcons.hiddenIcon = "Result1DHidden";
+
+	for (ot::PlotDataset* dataset : plotNode->getDatasets()) {
+		this->addPlot1DCurveNode(curveTreeIcons, _config.getName() + "/" + dataset->getCurveTitle().toStdString(), dataset);
+	}
+}
+
+void Model::addPlot1DCurveNode(const TreeIcon& _treeIcons, const std::string& _treeItemPath, ot::PlotDataset* _dataset) {
+	SceneNodePlot1DCurve* curveNode = new SceneNodePlot1DCurve(_dataset);
+
+	curveNode->setName(_treeItemPath);
+	curveNode->setModelEntityID(_dataset->getEntityID());
+	curveNode->setTreeIcons(_treeIcons);
+
+	// Get the parent scene node
+	SceneNodeBase* parentNode = getParentNode(_treeItemPath);
+	if (!parentNode) {
+		OT_LOG_EAS("Parent node not found { \"TreePath\": \"" + _treeItemPath + "\" }");
+		return;
+	}
+
+	// Now add the current node as child to the parent
+	parentNode->addChild(curveNode);
+
+	// Add the tree name to the tree
+	this->addSceneNodesToTree(curveNode);
+
+	// Add the node to the maps for faster access
+	nameToSceneNodesMap[_treeItemPath] = curveNode;
+	treeItemToSceneNodesMap[curveNode->getTreeItemID()] = curveNode;
+	modelItemToSceneNodesMap[_dataset->getEntityID()] = curveNode;
+
+	// curveNode->setStorage
+
+	if (_dataset->getCurveIsVisible()) {
+		this->setItemVisibleState(curveNode, false);
+	}
+}
+
+void Model::plot1DCurvePropertiesChanged(const ot::Plot1DCurveInfoCfg& _curve) {
+	bool needsRedraw = this->changePlot1DCurveEntityVersion(sceneNodesRoot, _curve);
+
+	if (needsRedraw) {
+		this->update1DPlot(sceneNodesRoot);
+	}
+}
+
+void Model::plot1DPropertiesChanged(const ot::Plot1DCfg& _config) {
+	auto it = modelItemToSceneNodesMap.find(_config.getUid());
+	if (it == modelItemToSceneNodesMap.end()) {
+		OT_LOG_EAS("Plot node (" + std::to_string(_config.getUid()) + ") not found");
+		return;
+	}
+	SceneNodePlot1D* plotNode = dynamic_cast<SceneNodePlot1D*>(it->second);
+	if (plotNode == nullptr) {
+		OT_LOG_EA("Nullptr stored");
+		return;
+	}
+	
+	plotNode->setConfig(_config);
+
+	this->update1DPlot(sceneNodesRoot);
+}
+
+void Model::set1DPlotItemSelected(ot::UID _treeItemID, bool _ctrlPressed) {
+	if (!_ctrlPressed) {
+		getNotifier()->selectSingleTreeItem(_treeItemID);
+	}
+	else {
+		auto it = treeItemToSceneNodesMap.find(_treeItemID);
+		if (it == treeItemToSceneNodesMap.end()) {
+			OT_LOG_EAS("Scene node for tree item (" + std::to_string(_treeItemID) + ") not found");
+			return;
+		}
+
+		// Check, if the corresponding plot is selected and the current child will be deselected. If so, toggle the selection of this item
+		if (it->second->isSelected()) {
+			SceneNodePlot1DCurve* curve = dynamic_cast<SceneNodePlot1DCurve*>(it->second);
+
+			if (curve != nullptr) {
+				SceneNodePlot1D* plot = this->getPlotFromCurve(curve);
+				if (plot != nullptr) {
+					if (plot->isSelected()) {
+						getNotifier()->toggleTreeItemSelection(plot->getTreeItemID(), false);
+					}
+				}
+			}
+		}
+
+		getNotifier()->toggleTreeItemSelection(_treeItemID, false);
+	}
+}
+
+void Model::reset1DPlotItemSelection(void) {
+	getNotifier()->clearTreeSelection();
+}
+
+std::list<std::string> Model::getSelectedCurves(void) {
+	ot::UIDList treeItemIDs;
+	getSelectedTreeItemIDs(treeItemIDs);
+	std::list<std::string> curveDescriptions;
+	for (ot::UID treeID : treeItemIDs) {
+		auto sceneNodeBaseByUID = treeItemToSceneNodesMap.find(treeID);
+		assert(sceneNodeBaseByUID != treeItemToSceneNodesMap.end());
+		auto sceneNodeBase = sceneNodeBaseByUID->second;
+		SceneNodePlot1DCurve* curve = dynamic_cast<SceneNodePlot1DCurve*>(sceneNodeBase);
+		if (curve != nullptr) {
+			curveDescriptions.push_back(curve->getName());
+		}
+	}
+	return curveDescriptions;
+}
+
+void Model::removedSelectedCurveNodes(void) {
+	ot::UIDList treeItemIDs;
+	getSelectedTreeItemIDs(treeItemIDs);
+	ot::UIDList treeItemDeleteList;  // We group the tree item deletions for better performance
+	for (ot::UID treeID : treeItemIDs) {
+		auto sceneNodeBaseByUID = treeItemToSceneNodesMap.find(treeID);
+		assert(sceneNodeBaseByUID != treeItemToSceneNodesMap.end());
+		auto sceneNodeBase = sceneNodeBaseByUID->second;
+		SceneNodePlot1DCurve* curve = dynamic_cast<SceneNodePlot1DCurve*>(sceneNodeBase);
+
+		if (curve != nullptr) {
+			removeSceneNodeAndChildren(curve, treeItemDeleteList);
+		}
+	}
+	// Remove the shapes from the tree
+	getNotifier()->removeTreeItems(treeItemDeleteList);
+}
+
+bool Model::changePlot1DCurveEntityVersion(SceneNodeBase* _rootNode, const ot::Plot1DCurveInfoCfg& _curve) {
+	SceneNodePlot1D* plot = dynamic_cast<SceneNodePlot1D*>(_rootNode);
+	SceneNodePlot1DCurve* curve = dynamic_cast<SceneNodePlot1DCurve*>(_rootNode);
+
+	bool needsRedraw = false;
+
+	if (plot != nullptr) {
+		needsRedraw |= plot->changeCurveEntityVersion(_curve.getId(), _curve.getVersion());
+	}
+
+	if (curve != nullptr) {
+		if (curve->getModelEntityID() == _curve.getId()) {
+			if (curve->getModelEntityVersion() != _curve.getVersion()) {
+				curve->setModelEntityVersion(_curve.getVersion());
+				needsRedraw = true;
+			}
+		}
+	}
+
+	for (auto child : _rootNode->getChildren()) {
+		needsRedraw |= this->changePlot1DCurveEntityVersion(child, _curve);
+	}
+
+	return needsRedraw;
+}
+
+void Model::update1DPlot(SceneNodeBase* _rootNode) {
+	ot::Plot1DDataBaseCfg config;
+	SceneNodePlot1D* commonPlot = nullptr;
+	bool firstCurve = true;
+	bool compatible = true;
+	std::list<SceneNodePlot1D*> plotNodes;
+
+	// Determine the selected items
+	this->gather1DPlotItems(_rootNode, config, compatible, firstCurve, commonPlot, plotNodes);
+
+	if (!compatible) {
+		// Here we need to show a message that the data is incompatible
+		for (SceneNodePlot1D* plot : plotNodes) {
+			plot->setIncompatibleData();
+		}
+		return;
+	}
+
+	// If all selected curves belong to a single plot, add all unselected curves as dimmed
+	if (commonPlot != nullptr) {
+		this->gatherCompatibleDimmedPlotItems(commonPlot, config);
+	}
+
+	for (SceneNodePlot1D* plotNode : plotNodes) {
+		// Here we remove the error state if there was one set before
+		plotNode->removeErrorState();
+
+		plotNode->setFromDataBaseConfig(config);
+	}
+}
+
+void Model::gather1DPlotItems(SceneNodeBase* _rootNode, ot::Plot1DDataBaseCfg& _config, bool& _compatible, bool& _firstCurve, SceneNodePlot1D*& _commonPlot, std::list<SceneNodePlot1D*>& _plotNodes) {
+	if (_rootNode->isSelected() && _rootNode->isVisible()) {
+		SceneNodePlot1DCurve* curve = dynamic_cast<SceneNodePlot1DCurve*>(_rootNode);
+
+		if (curve != nullptr) {
+			SceneNodePlot1D* plot = this->getPlotFromCurve(curve);
+			if (!plot) {
+				OT_LOG_EA("Plot not found");
+				return;
+			}
+
+			if (std::find(_plotNodes.begin(), _plotNodes.end(), plot) == _plotNodes.end()) {
+				_plotNodes.push_back(plot);
+			}
+
+			if (_firstCurve) {
+				_config = plot->getConfig();
+
+				_commonPlot = plot;
+				_firstCurve = false;
+			}
+			else {
+				if (_config != plot->getConfig()) {
+					_compatible = false;
+					return;
+				}
+
+				if (plot != _commonPlot) _commonPlot = nullptr;
+			}
+
+			ot::Plot1DCurveInfoCfg curveItem;
+			curveItem.setId(curve->getModelEntityID());
+			curveItem.setVersion(curve->getModelEntityVersion());
+			curveItem.setTreeId(curve->getTreeItemID());
+
+			std::string parentName = curve->getParent()->getName();
+			std::string curveName = curve->getName().substr(parentName.length() + 1);
+			curveItem.setName(curveName);
+
+			_config.addCurve(curveItem);
+		}
+	}
+
+	for (auto child : _rootNode->getChildren()) {
+		this->gather1DPlotItems(child, _config, _compatible, _firstCurve, _commonPlot, _plotNodes);
+		if (!_compatible) break;
+	}
+}
+
+void Model::gatherCompatibleDimmedPlotItems(SceneNodeBase* _rootNode, ot::Plot1DDataBaseCfg& _config) {
+	if (!_rootNode->isSelected() && _rootNode->isVisible()) {
+		SceneNodePlot1DCurve* curve = dynamic_cast<SceneNodePlot1DCurve*>(_rootNode);
+
+		if (curve != nullptr) {
+			SceneNodePlot1D* plot = this->getPlotFromCurve(curve);
+
+			if (!plot) {
+				OT_LOG_EA("Plot not found");
+				return;
+			}
+
+			if (_config == plot->getConfig()) {
+				ot::Plot1DCurveInfoCfg curveItem;
+				curveItem.setId(curve->getModelEntityID());
+				curveItem.setVersion(curve->getModelEntityVersion());
+				curveItem.setTreeId(curve->getTreeItemID());
+				curveItem.setDimmed(true);
+
+				std::string parentName = curve->getParent()->getName();
+				std::string curveName = curve->getName().substr(parentName.length() + 1);
+				curveItem.setName(curveName);
+
+				_config.addCurve(curveItem);
+			}
+		}
+	}
+
+	for (auto child : _rootNode->getChildren()) {
+		this->gatherCompatibleDimmedPlotItems(child, _config);
+	}
+}
+
+SceneNodePlot1D* Model::getPlotFromCurve(SceneNodePlot1DCurve* _curve) const {
+	SceneNodePlot1D* plotNode = nullptr;
+
+	SceneNodeBase* parent = _curve->getParent();
+
+	do {
+		plotNode = dynamic_cast<SceneNodePlot1D*>(parent);
+		parent = parent->getParent();
+
+	} while (parent != nullptr && plotNode == nullptr);
+
+	return plotNode;
 }

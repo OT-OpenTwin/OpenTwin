@@ -9,7 +9,7 @@
 #include "SceneNodePlot1DCurve.h"
 
 SceneNodePlot1DCurve::SceneNodePlot1DCurve(ot::PlotDataset* _dataset)
-	: m_dataset(_dataset)
+	: m_dataset(_dataset), m_modelEntityVersion(0)
 {
 
 }
