@@ -141,6 +141,7 @@ public:
 	// ###################################################################################################
 
 	// Messaging
+	void sendToModelService(const std::string& _message, std::string _response);
 
 	bool sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response);
 	bool sendHttpRequest(RequestType operation, ot::OwnerService _service, ot::JsonDocument &doc, std::string &response);
@@ -235,6 +236,7 @@ public:
 	OT_HANDLER(handleAddNodeFromFacetData, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddNodeFromFacetData, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddNodeFromDataBase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddContainerNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddContainerNode, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddTextNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddText, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddVis2D3DNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleUpdateVis2D3DNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_UpdateVis2D3DNode, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleUpdateColor, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_UpdateColor, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -254,7 +256,7 @@ public:
 	OT_HANDLER(handleAddCartesianMeshItem, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshItem, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleTetMeshNodeTetEdges, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_TetMeshNodeTetEdges, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddMeshItemFromFacetDatabase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshItemFromFacetDatabase, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddText, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddText, ot::MessageType::ALL_MESSAGE_TYPES)
+	
 	OT_HANDLER(handleEnterEntitySelectionMode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSetModifiedState, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetModifiedState, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSetProgressVisibility, ExternalServicesComponent, OT_ACTION_CMD_UI_SetProgressVisibility, ot::MessageType::ALL_MESSAGE_TYPES)

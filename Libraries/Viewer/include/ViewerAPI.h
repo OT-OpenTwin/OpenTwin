@@ -78,6 +78,7 @@ namespace ViewerAPI
 
 		virtual void updateVTKEntity(unsigned long long modelEntityID) {};
 
+		virtual void messageModelService(const std::string& _message) {};
 	};
 
 	__declspec(dllexport) void registerNotifier(Notifier *notifier);
@@ -119,6 +120,7 @@ namespace ViewerAPI
 													       bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long entityVersion);
 
 	__declspec(dllexport) void addVisualizationContainerNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool editable);
+	__declspec(dllexport) void addVisualizationNodeText(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool editable);
 	__declspec(dllexport) void addVTKNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
 	__declspec(dllexport) void updateVTKNode(ot::UID osgModelID, unsigned long long modelEntityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
 
@@ -187,7 +189,7 @@ namespace ViewerAPI
 	__declspec(dllexport) void setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
 
 	__declspec(dllexport) ot::WidgetView* getPlotWidget(ot::UID _viewerID);
-
+	
 	/***************************************** Table API *****************************************/
 	__declspec(dllexport) ot::WidgetView* getTable (ot::UID _viewerID);
 	__declspec(dllexport) void showTable(ot::UID _viewerID,const ot::GenericDataStructMatrix& data);

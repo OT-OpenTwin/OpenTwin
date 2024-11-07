@@ -87,6 +87,9 @@
     <ClCompile Include="src\QueuingDatabaseWritingRAII.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ViewVisualisationHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\stdafx.h">
@@ -151,6 +154,9 @@
     </ClInclude>
     <ClInclude Include="include\QueuingDatabaseWritingRAII.h">
       <Filter>Header Files\RAIIWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ViewVisualisationHandler.h">
+      <Filter>Header Files\Handler</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

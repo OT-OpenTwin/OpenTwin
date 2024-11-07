@@ -846,6 +846,11 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const ot:
 	}
 }
 
+void ExternalServicesComponent::sendToModelService(const std::string& _message, std::string _response)
+{
+	sendHttpRequest(QUEUE, m_modelServiceURL, _message, _response);
+}
+
 bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response)
 {
 	try { return sendHttpRequest(operation, url, doc.toJson(), response); }
@@ -3085,6 +3090,17 @@ std::string ExternalServicesComponent::handleAddContainerNode(ot::JsonDocument& 
 	return "";
 }
 
+std::string ExternalServicesComponent::handleAddTextNode(ot::JsonDocument& _document)
+{
+	ot::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string treeName = ot::json::getString(_document, OT_ACTION_PARAM_UI_TREE_Name);
+	ot::UID modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
+	ViewerAPI::addVisualizationNodeText(visModelID, treeName, modelEntityID, treeIcons, editable);
+	return "";
+}
+
 std::string ExternalServicesComponent::handleAddVis2D3DNode(ot::JsonDocument& _document) {
 	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 	std::string treeName = ot::json::getString(_document, OT_ACTION_PARAM_UI_TREE_Name);
@@ -3376,24 +3392,6 @@ std::string ExternalServicesComponent::handleAddMeshItemFromFacetDatabase(ot::Js
 
 	ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(visModelID, name, uid, treeIcons, isHidden, projectName, entityID, entityVersion, tetEdgesID, tetEdgesVersion);
 	
-	return "";
-}
-
-std::string ExternalServicesComponent::handleAddText(ot::JsonDocument& _document) {
-	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-	ak::UID uid = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-	bool isEditable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-
-	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
-	ak::UID textID = _document[OT_ACTION_PARAM_TEXT_ID].GetUint64();
-	ak::UID textVersion = _document[OT_ACTION_PARAM_TEXT_VERSION].GetUint64();
-
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
-
-	ViewerAPI::addVisualizationTextNode(visModelID, name, uid, treeIcons, isHidden, projectName, textID, textVersion);
-
 	return "";
 }
 

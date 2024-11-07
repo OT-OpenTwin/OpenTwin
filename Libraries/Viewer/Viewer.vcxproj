@@ -74,6 +74,7 @@
     <ClCompile Include="src\TableViewer.cpp" />
     <ClCompile Include="src\TableViewerView.cpp" />
     <ClCompile Include="src\TextureMapManager.cpp" />
+    <ClCompile Include="src\TextVisualiser.cpp" />
     <ClCompile Include="src\TransformManipulator.cpp" />
     <ClCompile Include="src\Viewer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
@@ -102,6 +103,7 @@
     <ClInclude Include="include\HandlerBase.h" />
     <ClInclude Include="include\HandlerIntersector.h" />
     <ClInclude Include="include\HandleWheel.h" />
+    <ClInclude Include="include\IVisualiser.h" />
     <ClInclude Include="include\LineIntersector.h" />
     <ClInclude Include="include\ManipulatorBase.h" />
     <ClInclude Include="include\MaterialMetal.h" />
@@ -135,6 +137,7 @@
     <ClInclude Include="include\TableViewer.h" />
     <ClInclude Include="include\TableViewerView.h" />
     <ClInclude Include="include\TextureMapManager.h" />
+    <ClInclude Include="include\TextVisualiser.h" />
     <ClInclude Include="include\TransformManipulator.h" />
     <ClInclude Include="include\ViewerSettings.h" />
     <ClInclude Include="include\ViewerView.h" />

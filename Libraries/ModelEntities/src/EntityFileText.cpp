@@ -1,5 +1,8 @@
 #include "EntityFileText.h"
 #include <locale>
+#include "OTCommunication/ActionTypes.h"
+#include "DataBase.h"
+
 EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	: EntityFile(_ID,_parent,_obs,_ms,_factory,_owner)
 {
@@ -20,6 +23,24 @@ void EntityFileText::setTextEncoding(ot::TextEncoding::EncodingStandard _encodin
 	{
 		throw std::exception("Property \"Text Encoding\" could not be loaded");
 	}
+}
+
+void EntityFileText::addVisualizationNodes()
+{
+	TreeIcon treeIcons;
+	treeIcons.size = 32;
+	treeIcons.visibleIcon = "TextVisible";
+	treeIcons.hiddenIcon = "TextHidden";
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddText, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
+	
+	treeIcons.addToJsonDoc(doc);
+
+	getObserver()->sendMessageToViewer(doc);
 }
 
 ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding() 
@@ -46,15 +67,19 @@ std::string EntityFileText::getText(void)
 void EntityFileText::setText(const std::string& _text)
 {
 	auto dataEntity = getData();
-	dataEntity->clearData();
-
-	//Ensure correct encoding at this location!
-	dataEntity->setData(_text.data(), _text.size());
-	if (getModelState() != nullptr)
+	if (dataEntity != nullptr)
 	{
-		dataEntity->StoreToDataBase();
-		getModelState()->addNewEntity(dataEntity->getEntityID(), this->getEntityID(), dataEntity->getEntityStorageVersion(), ModelStateEntity::tEntityType::DATA);
-		setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+		dataEntity->clearData();
+		//Ensure correct encoding at this location!
+		dataEntity->setData(_text.data(), _text.size());
+		
+		if (getModelState() != nullptr)
+		{
+			dataEntity->StoreToDataBase();
+			getModelState()->addNewEntity(dataEntity->getEntityID(), this->getEntityID(), dataEntity->getEntityStorageVersion(), ModelStateEntity::tEntityType::DATA);
+			setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+		}
+
 	}
 }
 

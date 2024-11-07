@@ -288,6 +288,8 @@
 #define OT_ACTION_CMD_UI_TEXTEDITOR_Close "UI.TextEditor.Close"
 #define OT_ACTION_CMD_UI_TEXTEDITOR_CloseAll "UI.TextEditor.CloseAll"
 
+#define OT_ACTION_CMD_UI_RequestTextData "UI.TextEditor.RequestData"
+
 #define OT_ACTION_CMD_UI_TABLE_Setup "UI.Table.Setup"
 #define OT_ACTION_CMD_UI_TABLE_SaveRequest "UI.Table.SaveRequest"
 #define OT_ACTION_CMD_UI_TABLE_SetSaved "UI.Table.SetSaved"

@@ -353,6 +353,7 @@
     <ClCompile Include="src\TableReader.cpp" />
     <ClCompile Include="src\UIControlsHandler.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
+    <ClCompile Include="src\ViewVisualisationHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
@@ -376,6 +377,7 @@
     <ClInclude Include="include\TriangleBoxOverlapTest.h" />
     <ClInclude Include="include\UIControlsHandler.h" />
     <ClInclude Include="include\UiNotifier.h" />
+    <ClInclude Include="include\ViewVisualisationHandler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

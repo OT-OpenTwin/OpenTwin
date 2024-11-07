@@ -231,6 +231,20 @@ void ViewerAPI::addVisualizationContainerNode(ot::UID osgModelID, const std::str
 	}
 }
 
+void ViewerAPI::addVisualizationNodeText(ot::UID osgModelID, const std::string& treeName, unsigned long long modelEntityID, const TreeIcon& treeIcons, bool editable)
+{
+	try
+	{
+		Model* model = osgModelManager.at(osgModelID);
+
+		model->addSceneNodeText(treeName, modelEntityID, treeIcons, editable);
+	}
+	catch (std::out_of_range)
+	{
+		throw std::exception("The specified model does not exist");
+	}
+}
+
 void ViewerAPI::addVTKNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
 {
 	try

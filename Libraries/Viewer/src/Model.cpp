@@ -689,6 +689,53 @@ void Model::addNodeFromFacetDataBase(const std::string &treeName, double surface
 	}
 }
 
+void Model::addSceneNodeText(const std::string& treeName, unsigned long long modelEntityID, const TreeIcon& treeIcons, bool editable)
+{
+	// Check whether we already have a container node
+	if (nameToSceneNodesMap.count(treeName) != 0)
+	{
+		if (dynamic_cast<SceneNodeTextItem*>(nameToSceneNodesMap[treeName]) != nullptr) return;
+		assert(0); // This is not a container node -> overwrite
+	}
+
+	// Create the new container node
+
+	SceneNodeTextItem* textNode = new SceneNodeTextItem;
+
+	textNode ->setName(treeName);
+	textNode ->setEditable(editable);
+	textNode ->setModelEntityID(modelEntityID);
+	textNode ->setTreeIcons(treeIcons);
+	textNode->setModel(this);
+	textNode->addVisualiserText();
+
+	// Get the parent scene node
+	SceneNodeBase* parentNode = getParentNode(treeName);
+	assert(parentNode != nullptr); // We assume that the parent node already exists
+
+	if (parentNode == nullptr)
+	{
+		// If the model is corrupt, this might happen. We deal with this by ignoring the current item
+		delete textNode;
+		return;
+	}
+
+	// Now add the current node as child to the parent
+	parentNode->addChild(textNode);
+
+	// Now add the current nodes osg node to the parent's osg node
+	parentNode->getShapeNode()->addChild(textNode->getShapeNode());
+
+	// Add the tree name to the tree
+	addSceneNodesToTree(textNode);
+
+	// Add the node to the maps for faster access
+	nameToSceneNodesMap[treeName] = textNode;
+	osgNodetoSceneNodesMap[textNode->getShapeNode()] = textNode;
+	treeItemToSceneNodesMap[textNode->getTreeItemID()] = textNode;
+	modelItemToSceneNodesMap[modelEntityID] = textNode;
+}
+
 SceneNodeGeometry *Model::createNewGeometryNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, 
 												bool isHidden, bool isEditable, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility)
 {
@@ -3207,20 +3254,18 @@ void Model::addVisualizationResult1DNode(const std::string &treeName, unsigned l
 
 void Model::addVisualizationTextNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long textEntityID, unsigned long long textEntityVersion)
 {
-	SceneNodeTextItem *textNode = new SceneNodeTextItem;
+	SceneNodeTextItem* textNode = new SceneNodeTextItem;
 
 	textNode->setName(treeName);
 	textNode->setModelEntityID(modelEntityID);
-
-	textNode->setTextEntityID(textEntityID);
-	textNode->setTextEntityVersion(textEntityVersion);
 	textNode->setTreeIcons(treeIcons);
+	textNode->addVisualiserText();
 
 	// Get the parent scene node
-	SceneNodeBase *parentNode = getParentNode(treeName);
+	SceneNodeBase* parentNode = getParentNode(treeName);
 	assert(parentNode != nullptr); // We assume that the parent node already exists
 
-								   // Now add the current node as child to the parent
+	// Now add the current node as child to the parent
 	parentNode->addChild(textNode);
 
 	// Add the tree name to the tree

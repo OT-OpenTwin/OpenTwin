@@ -154,6 +154,12 @@
     <ClCompile Include="src\ViewerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\TextVisualiser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeDisplay.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
@@ -309,6 +315,15 @@
     <ClInclude Include="include\ViewerView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
+    <ClInclude Include="include\IVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TextVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeDisplay.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\Table.h">
@@ -339,6 +354,9 @@
     </Filter>
     <Filter Include="src\WidgetView">
       <UniqueIdentifier>{98463fc9-d8b8-47a9-9a36-1c785d62bce7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Visualiser">
+      <UniqueIdentifier>{da4035b1-a386-45a5-bc16-89b6d14f54c6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

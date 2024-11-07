@@ -77,6 +77,7 @@
     <ClInclude Include="include\LogInGSSEntry.h" />
     <ClInclude Include="include\NavigationTreeView.h" />
     <QtMoc Include="include\ProjectOverviewWidget.h" />
+    <ClInclude Include="include\Notifier.h" />
     <ClInclude Include="include\QtMetaTypes.h" />
     <QtMoc Include="include\SelectEntitiesDialog.h" />
     <QtMoc Include="include\RenameProjectDialog.h" />

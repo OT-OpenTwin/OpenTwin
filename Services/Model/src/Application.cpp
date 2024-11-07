@@ -15,7 +15,7 @@
 #include "base64.h"
 #include "zlib.h"
 #include "FileHandler.h"
-
+#include "OTCore/ReturnMessage.h"
 // OpenTwin header
 #include "DataBase.h"
 #include "OTCore/Logger.h"
@@ -914,6 +914,8 @@ std::string Application::handleViewsFromProjectType(ot::JsonDocument& _document)
 	return typeManager.getViews();
 }
 
+
+
 // Versions
 
 std::string Application::handleGetCurrentVersion(ot::JsonDocument& _document) {
@@ -976,6 +978,12 @@ std::string Application::handleSetVersionLabel(ot::JsonDocument& _document) {
 	return "";
 }
 
+std::string Application::handleTextVisualisation(ot::JsonDocument& _document)
+{
+	ot::UID entityID =  ot::json::getUInt64(_document,OT_ACTION_PARAM_MODEL_EntityID);
+	m_visualisationHandler.handleVisualisationRequest(entityID);
+	return "";
+}
 // ##################################################################################################################################################################################################################
 
 // Setter / Getter
@@ -1010,7 +1018,11 @@ std::string Application::getEntityInformation(std::list<ot::UID>& _entityIDList)
 bool Application::queuedRequestToFrontend(const ot::JsonDocument& _request) {
 	if (!this->isUiConnected()) return false;
 	std::string tmp;
-	return this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, _request, tmp);
+	this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, _request, tmp);
+	ot::ReturnMessage message;
+	message.fromJson(tmp);
+	assert(message.getStatus() == ot::ReturnMessage::Ok);
+	return message.getStatus() == ot::ReturnMessage::Ok;
 }
 
 bool Application::queuedRequestToFrontend(const ot::JsonDocument& _request, const std::list<std::pair<ot::UID, ot::UID>>& _prefetchIDs) {

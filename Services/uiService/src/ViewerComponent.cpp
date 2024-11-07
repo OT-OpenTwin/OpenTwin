@@ -15,6 +15,7 @@
 #include "ShortcutManager.h"
 #include "UserSettings.h"
 #include "ContextMenuManager.h"
+#include "OTCore/ReturnMessage.h"
 
 #include "OTCore/OTAssert.h"
 #include "OTWidgets/DoubleSpinBox.h"
@@ -415,6 +416,12 @@ void ViewerComponent::saveSettings(const ot::PropertyGridCfg& _config)
 void ViewerComponent::updateVTKEntity(unsigned long long modelEntityID)
 {
 	AppBase::instance()->getExternalServicesComponent()->requestUpdateVTKEntity(modelEntityID);
+}
+
+void ViewerComponent::messageModelService(const std::string& _message)
+{
+	std::string response;
+	AppBase::instance()->getExternalServicesComponent()->sendToModelService(_message, response);
 }
 
 void ViewerComponent::setProcessingGroupOfMessages(bool flag)

@@ -64,7 +64,7 @@ public:
 	ContextMenuEntry * addEntry(const std::string& _name, const std::string& _text, const std::string& _role, const std::string& _icon = std::string());
 
 	void addSeperator(void);
-
+	  
 	void setIsViewerContext(bool _isViewer = true) { m_isViewerContext = _isViewer; }
 	
 	// #####################################################################################################

@@ -155,6 +155,8 @@ public:
 								  bool reflective, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isHidden, 
 								  bool isEditable, const std::string &projectName, unsigned long long entityID, unsigned long long version,
 							      bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation);
+	void addSceneNodeText(const std::string& treeName, unsigned long long modelEntityID, const TreeIcon& treeIcons, bool editable);
+	
 	void addVisualizationContainerNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool editable);
 	void addVisualizationAnnotationNode(const std::string &treeName, unsigned long long modelEntityID, 
 									const TreeIcon &treeIcons, bool isHidden,
