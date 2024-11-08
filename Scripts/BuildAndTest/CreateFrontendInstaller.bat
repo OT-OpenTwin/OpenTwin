@@ -86,8 +86,8 @@ COPY "%OSG_DLLR%\osgUtil.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
 COPY "%OSG_DLLR%\osgViewer.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM OpenSSL
-COPY "%OPENSSL_DLL%\libcrypto-1_1-x64.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
-COPY "%OPENSSL_DLL%\libssl-1_1-x64.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OPENSSL_DLL%\libcrypto-1_1-x64.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OPENSSL_DLL%\libssl-1_1-x64.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM Qt6
 COPY "%QT_DLLR%\QT6Core.dll" 			"%OPENTWIN_FRONTEND_DEPLOYMENT%"
@@ -130,6 +130,18 @@ COPY "%QWT_LIB_DLLR%\qwt.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM ZLib
 COPY "%ZLIB_DLLPATHR%\zlib.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
+REM ==========================================
+REM Copy OpenTwin assets
+REM ==========================================
+
+REM Icons
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\icons"
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\Icons" "%OPENTWIN_FRONTEND_DEPLOYMENT%\icons"
+
+REM Colorstyles
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\colorstyles"
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\ColorStyles" "%OPENTWIN_FRONTEND_DEPLOYMENT%\colorstyles"
 
 REM ==========================================
 REM Copy OpenTwin build files
@@ -195,9 +207,11 @@ REM ==========================================
 REM Finally create the Installer
 REM ==========================================
 
-REM CALL "C:\Program Files (x86)\NSIS\makensis.exe" Install-OpenTwin.nsi
+REM CALL "C:\Program Files (x86)\NSIS\makensis.exe" "%OPENTWIN_DEV_ROOT%\Scripts\Installer\nsis\install_opentwin_endUser.nsi"
 
-REM MOVE "Install OpenTwin.exe" ..\Deployment_Frontend\FrontendInstaller"
+REM MOVE "Install OpenTwin.exe" "%OPENTWIN_FRONTEND_DEPLOYMENT%\FrontendInstaller"
+
+goto SUCCESSFUL_END
 
 :PAUSE_END
 pause
@@ -206,3 +220,6 @@ GOTO END
 :END
 REM Sets the exit code of the script to be 0
 exit /B 0
+
+:SUCCESSFUL_END
+exit 0
