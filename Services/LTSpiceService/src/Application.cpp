@@ -46,10 +46,10 @@
 #include "base64.h"
 
 // The name of this service
-#define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_STUDIOSUITE
+#define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_LTSPICE
 
 // The type of this service
-#define MY_SERVICE_TYPE OT_INFO_SERVICE_TYPE_STUDIOSUITE
+#define MY_SERVICE_TYPE OT_INFO_SERVICE_TYPE_LTSPICE
 
 Application::Application()
 	: ot::ApplicationBase(MY_SERVICE_NAME, MY_SERVICE_TYPE, new UiNotifier(), new ModelNotifier())

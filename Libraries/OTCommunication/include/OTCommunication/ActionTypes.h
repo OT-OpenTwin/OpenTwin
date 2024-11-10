@@ -425,6 +425,7 @@
 #define OT_ACTION_PARAM_SESSIONTYPE_3DSIM "3D Simulation"
 #define OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE "Data Pipeline"
 #define OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE "CST Studio Suite"
+#define OT_ACTION_PARAM_SESSIONTYPE_LTSPICE "LT Spice"
 
 #define OT_ACTION_PARAM_SITE_ID "Site.ID"
 #define OT_ACTION_PARAM_SESSION_SERVICE_URL "SessionService.URL"
@@ -697,6 +698,7 @@
 #define OT_INFO_SERVICE_TYPE_BlockEditorService "BlockEditorService"
 #define OT_INFO_SERVICE_TYPE_CircuitSimulatorService "CircuitSimulatorService"
 #define OT_INFO_SERVICE_TYPE_STUDIOSUITE "StudioSuiteService"
+#define OT_INFO_SERVICE_TYPE_LTSPICE "LTSpiceService"
 
 #define OT_INFO_MESSAGE_LogIn "UI.LogIn"
 

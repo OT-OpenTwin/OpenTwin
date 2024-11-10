@@ -207,6 +207,16 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 	defaultCST.addToJsonObject(objCST, result.GetAllocator());
 	result.PushBack(objCST, result.GetAllocator());
 
+	ot::ProjectTemplateInformation defaultLTSpice;
+	defaultLTSpice.setName(OT_ACTION_PARAM_SESSIONTYPE_LTSPICE);
+	defaultLTSpice.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_LTSPICE);
+	defaultLTSpice.setDescription("LT Spice Project.\nImport and export projects from LT Spice.");
+	defaultLTSpice.setIsDefault(true);
+
+	ot::JsonObject objLTSpice;
+	defaultLTSpice.addToJsonObject(objLTSpice, result.GetAllocator());
+	result.PushBack(objLTSpice, result.GetAllocator());
+
 	ot::ProjectTemplateInformation defaultDevelopment;
 	defaultDevelopment.setName(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT);
 	defaultDevelopment.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT);

@@ -34,7 +34,8 @@ SET OT_LOCALDIRECTORYSERVICE_CONFIGURATION={"DefaultMaxCrashRestarts": 8,^
 		"DataProcessingService",^
 		"BlockEditorService",^
 		"CircuitSimulatorService",^
-		"StudioSuiteService"^
+		"StudioSuiteService",^
+		"LTSpiceService"^
 		]^
 	}
 
