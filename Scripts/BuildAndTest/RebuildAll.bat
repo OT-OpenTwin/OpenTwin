@@ -214,6 +214,11 @@ ECHO ===============================================================
 CALL "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
+ECHO Build Library: LTSpiceConnector
+ECHO ===============================================================
+CALL "%OT_LTSPICE_CONNECTOR_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
 ECHO Build Microservice Launcher: OpenTwin
 ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\build.bat" %1 %2 > RUSTbuildLog.txt
@@ -316,6 +321,11 @@ ECHO ===============================================================
 ECHO Build Service: StudioSuiteService
 ECHO ===============================================================
 CALL "%OT_STUDIOSUITE_SERVICE_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
+ECHO Build Service: LTSpiceService
+ECHO ===============================================================
+CALL "%OT_LTSPICE_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: PythonExecutionService
