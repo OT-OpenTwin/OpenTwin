@@ -30,6 +30,10 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 	{
 		initializeProjectTypeStudioSuite();
 	}
+	else if (projectType == OT_ACTION_PARAM_SESSIONTYPE_LTSPICE)
+	{
+		initializeProjectTypeLTSpice();
+	}
 	else
 	{
 		// This is an unknown project type which defaults to development
@@ -104,6 +108,29 @@ void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 
 	_datasetRootName = ot::FolderNames::DatasetFolder;
 	_datasetRMD      = getDatasetRootName() + "/Information";
+}
+
+void ProjectTypeManager::initializeProjectTypeLTSpice(void)
+{
+	_hasGeometryRoot = false;
+	_hasMaterialRoot = false;
+	_hasMeshRoot = false;
+	_hasSolverRoot = false;
+	_hasScriptsRoot = false;
+	_hasUnitRoot = false;
+	_hasDataCategorizationRoot = false;
+	_hasRMDCategorization = false;
+	_hasRMDCategorizationPreview = false;
+	_hasDatasetRoot = true;
+	_hasDatasetRMD = true;
+
+	_has3DView = false;
+	_has1DView = true;
+	_hasTableView = false;
+	_hasBlockPicker = true;
+
+	_datasetRootName = ot::FolderNames::DatasetFolder;
+	_datasetRMD = getDatasetRootName() + "/Information";
 }
 
 std::string ProjectTypeManager::getViews(void)
