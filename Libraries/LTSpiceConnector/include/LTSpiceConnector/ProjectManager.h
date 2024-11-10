@@ -40,10 +40,10 @@ public:
 private:
     enum operationType { OPERATION_NONE, OPERATION_IMPORT, OPERATION_GET, OPERATION_COMMIT};
 
-    ProjectManager() : currentOperation(OPERATION_NONE), includeResults(false), includeParametricResults(false) {};
+    ProjectManager() : currentOperation(OPERATION_NONE), includeResults(false) {};
     ~ProjectManager() {};
 
-    std::string                getBaseProjectName(const std::string& cstFileName);
+    std::string                getBaseProjectName(const std::string& ltsFileName);
     std::string                createCacheFolder(const std::string& baseProjectName);
     std::list<std::string>     determineUploadFiles(const std::string& baseProjectName, bool incResults);
     void                       uploadFiles(const std::string& projectRoot, std::list<std::string>& uploadFileList, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList);
@@ -78,7 +78,6 @@ private:
     std::list<std::string> deletedFiles;
     std::string changeMessage;
     bool includeResults;
-    bool includeParametricResults;
     operationType currentOperation;
     std::string localProjectFileName;
 };

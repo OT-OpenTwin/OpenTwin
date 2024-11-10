@@ -30,7 +30,6 @@
     <ClCompile Include="src\Result1DRunIDContainer.cpp" />
     <ClCompile Include="src\ServiceConnector.cpp" />
     <ClCompile Include="src\InfoFileManager.cpp" />
-    <ClCompile Include="src\StudioConnector.cpp" />
     <ClCompile Include="src\LTSpiceConnectorAPI.cpp" />
     <ClCompile Include="src\VersionFile.cpp" />
   </ItemGroup>
@@ -44,7 +43,6 @@
     <ClInclude Include="include\LTSpiceConnector\Result1DRunIDContainer.h" />
     <ClInclude Include="include\LTSpiceConnector\ServiceConnector.h" />
     <ClInclude Include="include\LTSpiceConnector\InfoFileManager.h" />
-    <ClInclude Include="include\LTSpiceConnector\StudioConnector.h" />
     <ClInclude Include="include\LTSpiceConnector\LTSpiceConnectorAPI.h" />
     <ClInclude Include="include\LTSpiceConnector\VersionFile.h" />
   </ItemGroup>

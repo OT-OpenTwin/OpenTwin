@@ -7,7 +7,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/JSON.h"
 
-namespace StudioSuiteConnectorAPI
+namespace LTSpiceConnectorAPI
 {
 	__declspec(dllexport) std::string processAction(std::string action, ot::JsonDocument& doc, std::string projectName, QObject* mainObject, const QIcon& windowIcon);
 
@@ -25,8 +25,8 @@ namespace StudioSuiteConnectorAPI
 	__declspec(dllexport) bool checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists, std::string& errorMessage);
 	__declspec(dllexport) void setAndStoreLocalFileName(std::string fileName, const std::string& studioSuiteServiceURL, QObject* mainObject);
 
-	std::string getStudioSuiteFileNameForCommit(const std::string &projectName, const std::string& studioSuiteServiceURL, QObject* mainObject);
-	std::string getStudioSuiteFileNameForGet(const std::string &projectName, const std::string& studioSuiteServiceURL, QObject* mainObject);
+	std::string getLTSpiceFileNameForCommit(const std::string &projectName, const std::string& studioSuiteServiceURL, QObject* mainObject);
+	std::string getLTSpiceFileNameForGet(const std::string &projectName, const std::string& studioSuiteServiceURL, QObject* mainObject);
 	std::string getLocalFileNameFromProject(const std::string& studioSuiteServiceURL, QObject* mainObject);
 	std::string getSimpleFileNameFromProject(const std::string& studioSuiteServiceURL, QObject* mainObject);
 

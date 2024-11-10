@@ -1,6 +1,5 @@
 #include "LTSpiceConnector/ProjectManager.h"
 #include "LTSpiceConnector/ServiceConnector.h"
-#include "LTSpiceConnector/StudioConnector.h"
 #include "LTSpiceConnector/VersionFile.h"
 #include "LTSpiceConnector/ProgressInfo.h"
 #include "LTSpiceConnector/Result1DFileManager.h"
@@ -74,20 +73,15 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 		projectName = prjName;
 		changeMessage = message;
 		includeResults = incResults;
-		includeParametricResults = incParametricResults;
 
 		ProgressInfo::getInstance().setProgressState(true, "Importing project", false);
 		ProgressInfo::getInstance().setProgressValue(0);
 
-		// Determine the base project name (without .cst extension)
+		// Determine the base project name (without .asc extension)
 		baseProjectName = getBaseProjectName(fileName);
 
 		// Create the cache folder
 		cacheFolderName = createCacheFolder(baseProjectName);
-
-		// Open the cst project in a studio suite instance, save it and extract the data
-		StudioConnector studioObject;
-		studioObject.searchProjectAndExtractData(fileName, baseProjectName, includeResults, includeParametricResults);
 
 		// Get the files to be uploaded
 		uploadFileList = determineUploadFiles(baseProjectName, includeResults);
@@ -98,7 +92,7 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 		std::string hostName = QHostInfo::localHostName().toStdString();
 
 		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_UPLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_COUNT, 2 * uploadFileList.size(), doc.GetAllocator());  // We need ids for the data entities and the file entities
 		doc.AddMember(OT_ACTION_PARAM_FILE_Name, ot::JsonString(fileName, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_HOSTNAME, ot::JsonString(hostName, doc.GetAllocator()), doc.GetAllocator());
@@ -156,7 +150,6 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 		projectName = prjName;
 		changeMessage = changeComment;
 		includeResults = incResults;
-		includeParametricResults = incParametricResults;
 
 		ProgressInfo::getInstance().setProgressState(true, "Committing project", false);
 		ProgressInfo::getInstance().setProgressValue(0);
@@ -167,10 +160,6 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 		// Set the name of the cache folder
 		cacheFolderName = baseProjectName + ".cache";
 
-		// Open the cst project in a studio suite instance, save it and extract the data
-		StudioConnector studioObject;
-		studioObject.searchProjectAndExtractData(fileName, baseProjectName, includeResults, includeParametricResults);
-
 		// Get the files to be uploaded
 		uploadFileList = determineUploadFiles(baseProjectName, includeResults);
 
@@ -180,7 +169,7 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 		std::string hostName = QHostInfo::localHostName().toStdString();
 
 		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_UPLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_COUNT, 2 * uploadFileList.size(), doc.GetAllocator());  // We need ids for the data entities and the file entities
 		doc.AddMember(OT_ACTION_PARAM_FILE_Name, ot::JsonString(fileName, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_HOSTNAME, ot::JsonString(hostName, doc.GetAllocator()), doc.GetAllocator());
@@ -220,10 +209,6 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 		// Set the name of the cache folder
 		cacheFolderName = baseProjectName + ".cache";
 
-		// Make sure to close the cst project in a studio suite instance
-		StudioConnector studioObject;
-		studioObject.closeProject(fileName);
-
 		ProgressInfo::getInstance().setProgressState(true, "Getting project", false);
 		ProgressInfo::getInstance().setProgressValue(10);
 
@@ -237,7 +222,7 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 			ProgressInfo::getInstance().setProgressValue(20);
 
 			ot::JsonDocument doc;
-			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_DOWNLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_DOWNLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
 
 			ServiceConnector::getInstance().sendExecuteRequest(doc);
 		}
@@ -245,16 +230,13 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 		{
 			ProgressInfo::getInstance().setProgressValue(90);
 
-			// We have successfully restored the project data, so we can now open the project
-			studioObject.openProject(fileName);
-
 			// Update the version file
 			writeVersionFile(baseProjectName, projectName, version, cacheFolderName);
 
 			ProgressInfo::getInstance().setProgressState(false, "", false);
 			ProgressInfo::getInstance().unlockGui();
 
-			ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been restored successfully to version " + version + ".");
+			ProgressInfo::getInstance().showInformation("The LTSpice project has been restored successfully to version " + version + ".");
 		}
 	}
 	catch (std::string& error)
@@ -280,15 +262,6 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 
 		// Upload files (progress range 15-70)
 		uploadFiles(projectRoot, uploadFileList, entityIDList, entityVersionList);
-
-		// Send the units information
-		sendUnitsInformation(baseProjectName);
-
-		// Send the material information
-		sendMaterialInformation(baseProjectName);
-
-		// Send the shapes information and triangulations (progress range 70-80)
-		sendShapeInformationAndTriangulation(baseProjectName, infoFileManager);
 
 		// Send the (parametric) 1D result data (progress range 80-90)
 		send1dResultData(baseProjectName, infoFileManager);
@@ -324,7 +297,7 @@ void ProjectManager::send1dResultData(const std::string& projectRoot, InfoFileMa
 	// previously stored data will be deleted. If the want to include the results, the flag should be true, since if there is no change
 	// the previously stored data should be kept. 
 
-	bool appendData = includeParametricResults;  
+	bool appendData = false; // includeParametricResults;
 	std::string dataContent;
 	size_t uncompressedDataLength = 0;
 
@@ -495,12 +468,12 @@ void ProjectManager::copyFiles(const std::string &newVersion)
 	ProgressInfo::getInstance().unlockGui();
 }
 
-std::string ProjectManager::getBaseProjectName(const std::string& cstFileName)
+std::string ProjectManager::getBaseProjectName(const std::string& ltsFileName)
 {
-	size_t index = cstFileName.rfind('.');
-	if (index == std::string::npos) throw("Unable to determine project base name from cst file name: " + cstFileName);
+	size_t index = ltsFileName.rfind('.');
+	if (index == std::string::npos) throw("Unable to determine project base name from LTSpice file name: " + ltsFileName);
 
-	return cstFileName.substr(0, index);
+	return ltsFileName.substr(0, index);
 }
 
 std::string ProjectManager::createCacheFolder(const std::string& baseProjectName)
@@ -1279,10 +1252,6 @@ void ProjectManager::downloadFiles(const std::string& fileName, const std::strin
 
 		return;
 	}
-
-	// We have successfully restored the project data, so we can now open the project
-	StudioConnector studioObject;
-	studioObject.openProject(fileName);
 
 	// Update the version file
 	writeVersionFile(baseProjectName, projectName, version, cacheFolderName);

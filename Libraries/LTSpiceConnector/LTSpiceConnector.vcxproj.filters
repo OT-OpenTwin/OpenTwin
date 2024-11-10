@@ -10,9 +10,6 @@
     <ClCompile Include="src\ProjectManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\StudioConnector.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\VersionFile.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -60,9 +57,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\LTSpiceConnector\ProjectManager.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\LTSpiceConnector\StudioConnector.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\LTSpiceConnector\VersionFile.h">

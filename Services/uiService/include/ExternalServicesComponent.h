@@ -333,6 +333,16 @@ public:
 	OT_HANDLER(handleStudioSuiteInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_INFORMATION, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleStudioSuiteSetCSTFile, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_SETCSTFILE, ot::MessageType::ALL_MESSAGE_TYPES)
 
+	// LTSpice API
+	OT_HANDLER(handleLTSpiceImport, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_IMPORT, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleLTSpiceCommit, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_COMMIT, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleLTSpiceGet, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_GET, ot::MessageType::ALL_MESSAGE_TYPES)
+	//OT_HANDLER(handleLTSpiceUpload, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_UPLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
+	//OT_HANDLER(handleLTSpiceDownload, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_DOWNLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
+	//OT_HANDLER(handleLTSpiceCopy, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_COPY, ot::MessageType::ALL_MESSAGE_TYPES)
+	//OT_HANDLER(handleLTSpiceInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_INFORMATION, ot::MessageType::ALL_MESSAGE_TYPES)
+	//OT_HANDLER(handleLTSpiceSetCSTFile, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_SETCSTFILE, ot::MessageType::ALL_MESSAGE_TYPES)
+
 	// Dialogs
 	OT_HANDLER(handleEntitySelectionDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_EntitySelectionDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handlePropertyDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_PropertyDialog, ot::MessageType::ALL_MESSAGE_TYPES)
