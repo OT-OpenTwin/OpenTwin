@@ -160,6 +160,9 @@
     <ClCompile Include="src\SceneNodeDisplay.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\PlotManager.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">
@@ -323,6 +326,9 @@
     </ClInclude>
     <ClInclude Include="include\SceneNodeDisplay.h">
       <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlotManager.h">
+      <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
