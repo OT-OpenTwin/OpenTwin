@@ -1,73 +1,40 @@
 #include "stdafx.h"
 
+// OpenTwin header
+#include "DataBase.h"
 #include "SceneNodePlot1DCurve.h"
 
-#include "DataBase.h"
-#include "Model.h"
-
-#include <osg/StateSet>
-#include <osg/Node>
-#include <osg/BlendFunc>
-#include <osg/CullFace>
-#include <osg/Switch>
-#include <osg/Geometry>
-#include <osg/Geode>
-#include <osg/PolygonOffset>
-#include <osg/PolygonMode>
-#include <osg/LineWidth>
-#include <osg/LightModel>
-
 SceneNodePlot1DCurve::SceneNodePlot1DCurve() :
-	modelEntityVersion(0),
-	model(nullptr)
+	m_modelEntityVersion(0)
 {
 
 }
 
-SceneNodePlot1DCurve::~SceneNodePlot1DCurve()
-{
-	// Remove the OSG objects 
-	// This geometry node will always have a parent group or switch node
+SceneNodePlot1DCurve::~SceneNodePlot1DCurve() {
 
-	// loop through all parent nodes
-	if (getShapeNode() != nullptr)
-	{
-		unsigned int numParents = getShapeNode()->getNumParents();
-
-		for (unsigned int i = 0; i < numParents; i++)
-		{
-			osg::Group *parent = getShapeNode()->getParent(i);
-
-			// Remove the child node from the parent (the node itself will then be deleted by reference counting automatically)
-			parent->removeChild(getShapeNode());
-		}
-
-		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
-		shapeNode = nullptr;
-	}
 }
 
-void SceneNodePlot1DCurve::setTransparent(bool t)
+void SceneNodePlot1DCurve::setTransparent(bool _transparent)
 {
-	if (t == isTransparent()) return;
+	if (_transparent == isTransparent()) return;
 
-	SceneNodeBase::setTransparent(t);
+	SceneNodeBase::setTransparent(_transparent);
 }
 
-void SceneNodePlot1DCurve::setWireframe(bool w)
+void SceneNodePlot1DCurve::setWireframe(bool _wireframe)
 {
-	if (w == isWireframe()) return;
+	if (_wireframe == isWireframe()) return;
 
-	SceneNodeBase::setWireframe(w);
+	SceneNodeBase::setWireframe(_wireframe);
 }
 
-void SceneNodePlot1DCurve::setVisible(bool v)
+void SceneNodePlot1DCurve::setVisible(bool _visible)
 {
-	if (v == isVisible()) return;
+	if (_visible == isVisible()) return;
 
-	SceneNodeBase::setVisible(v);
+	SceneNodeBase::setVisible(_visible);
 }
 
-void SceneNodePlot1DCurve::setHighlighted(bool h)
+void SceneNodePlot1DCurve::setHighlighted(bool _highlighted)
 {
 }

@@ -3247,10 +3247,8 @@ void Model::addVisualizationResult1DNode(const std::string &treeName, unsigned l
 	treeItemToSceneNodesMap[curveNode->getTreeItemID()] = curveNode;
 	modelItemToSceneNodesMap[curveEntityID] = curveNode;
 
-	curveNode->setStorage(projectName);
-
-	curveNode->setModel(this);
-
+	curveNode->setProjectName(projectName);
+	
 	if (isHidden)
 	{
 		setItemVisibleState(curveNode, false);
