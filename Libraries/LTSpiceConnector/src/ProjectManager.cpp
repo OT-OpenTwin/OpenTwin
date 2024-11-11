@@ -993,39 +993,21 @@ bool ProjectManager::checkValidLocalFile(std::string fileName, std::string proje
 	// Set the name of the cache folder
 	std::string cacheFolderName = baseProjectName + ".cache";
 
-	bool cstFileExists = std::filesystem::is_regular_file(fileName);
-	if (!cstFileExists && ensureProjectExists)
+	bool ltSpiceFileExists = std::filesystem::is_regular_file(fileName);
+	if (!ltSpiceFileExists && ensureProjectExists)
 	{
 		errorMessage = "The specified file does not exist.";
 		return false; // We need an existing project, but this one did not exist
 	}
 
 	// Now we check whether the associated directory is ok
-	if (cstFileExists)
+	if (!ltSpiceFileExists)
 	{
-		// The directory also needs to exist in this case
-		if (!std::filesystem::is_directory(baseProjectName))
-		{
-			errorMessage = "The project exists, but does not have an associated project folder. \n"
-						   "Please open the project in CST Studio Suite to extract the project's content.";
-			return false;
-		}
-	}
-	else
-	{
-		// The directory must not exist in this case (and the cache folder must not exist as well
-		if (std::filesystem::is_directory(baseProjectName))
-		{
-			errorMessage = "The project file does not exist, but there is a folder with the same name. \n"
-				           "This would cause problems when the CST Studio Suite project is opened.";
-
-			return false;
-		}
-
+		// The cache folder must not exist (if the file does not exist)
 		if (std::filesystem::is_directory(cacheFolderName))
 		{
 			errorMessage = "The project file does not exist, but there is a cache folder with the same name. \n"
-				           "This would cause problems when the CST Studio Suite project is opened.";
+				           "This would cause problems when the LTSpice project is opened.";
 
 			return false;
 		}

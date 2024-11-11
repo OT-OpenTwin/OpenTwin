@@ -114,7 +114,7 @@ public:
 	void modelSelectionChangedNotification(void);
 
 	void importProject(void);
-	void setCSTFile(void);
+	void setLTSpiceFile(void);
 	void showInformation(void);
 	void commitChanges(void);
 	void getChanges(void);

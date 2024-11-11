@@ -341,7 +341,7 @@ public:
 	//OT_HANDLER(handleLTSpiceDownload, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_DOWNLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleLTSpiceCopy, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_COPY, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleLTSpiceInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_INFORMATION, ot::MessageType::ALL_MESSAGE_TYPES)
-	//OT_HANDLER(handleLTSpiceSetCSTFile, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_SETCSTFILE, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleLTSpiceSetLTSpiceFile, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE, ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// Dialogs
 	OT_HANDLER(handleEntitySelectionDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_EntitySelectionDialog, ot::MessageType::ALL_MESSAGE_TYPES)

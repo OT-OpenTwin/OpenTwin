@@ -23,11 +23,11 @@ namespace LTSpiceConnectorAPI
 	__declspec(dllexport) std::string getLocalFileName();
 	__declspec(dllexport) void setLocalFileName(std::string fileName);
 	__declspec(dllexport) bool checkValidLocalFile(std::string fileName, std::string projectName, bool ensureProjectExists, std::string& errorMessage);
-	__declspec(dllexport) void setAndStoreLocalFileName(std::string fileName, const std::string& studioSuiteServiceURL, QObject* mainObject);
+	__declspec(dllexport) void setAndStoreLocalFileName(std::string fileName, const std::string& ltSpiceServiceURL, QObject* mainObject);
 
 	std::string getLTSpiceFileNameForCommit(const std::string &projectName, const std::string& studioSuiteServiceURL, QObject* mainObject);
 	std::string getLTSpiceFileNameForGet(const std::string &projectName, const std::string& studioSuiteServiceURL, QObject* mainObject);
 	std::string getLocalFileNameFromProject(const std::string& ltSpiceServiceURL, QObject* mainObject);
-	std::string getSimpleFileNameFromProject(const std::string& studioSuiteServiceURL, QObject* mainObject);
+	std::string getSimpleFileNameFromProject(const std::string& ltSpiceServiceURL, QObject* mainObject);
 
 }

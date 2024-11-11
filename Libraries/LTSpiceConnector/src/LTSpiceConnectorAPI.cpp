@@ -151,58 +151,58 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 		ProjectInformationDialog projectInformationDialog(windowIcon, localFileName, serverVersion, localVersion);
 		projectInformationDialog.exec();
 	}
-	//else if (action == OT_ACTION_CMD_UI_LTS_SETCSTFILE) {
+	else if (action == OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE) {
 
-	//	std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
+		std::string ltSpiceServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 
-	//	std::string localFileName = LTSpiceConnectorAPI::getLocalFileName();
+		std::string localFileName = LTSpiceConnectorAPI::getLocalFileName();
 
-	//	if (localFileName.empty())
-	//	{
-	//		// Try to get the current file name from the server
-	//		localFileName = getLocalFileNameFromProject(studioSuiteServiceURL, mainObject);
-	//		LTSpiceConnectorAPI::setLocalFileName(localFileName);
-	//	}
+		if (localFileName.empty())
+		{
+			// Try to get the current file name from the server
+			localFileName = getLocalFileNameFromProject(ltSpiceServiceURL, mainObject);
+			LTSpiceConnectorAPI::setLocalFileName(localFileName);
+		}
 
-	//	std::string simpleFileName = LTSpiceConnectorAPI::getSimpleFileNameFromProject(studioSuiteServiceURL, mainObject);
+		std::string simpleFileName = LTSpiceConnectorAPI::getSimpleFileNameFromProject(ltSpiceServiceURL, mainObject);
 
-	//	std::filesystem::path filePath(localFileName);
+		std::filesystem::path filePath(localFileName);
 
-	//	std::string currentDirectory = filePath.parent_path().string();
-	//	std::string currentFileName = filePath.filename().string();
+		std::string currentDirectory = filePath.parent_path().string();
+		std::string currentFileName = filePath.filename().string();
 
-	//	if (currentDirectory.empty())
-	//	{
-	//		currentDirectory = QDir::currentPath().toStdString();
-	//	}
+		if (currentDirectory.empty())
+		{
+			currentDirectory = QDir::currentPath().toStdString();
+		}
 
-	//	QFileDialog fileBrowser;
-	//	fileBrowser.setFileMode(QFileDialog::Directory);
-	//	fileBrowser.selectFile(currentDirectory.c_str());
-	//	fileBrowser.setOption(QFileDialog::ShowDirsOnly, false);
+		QFileDialog fileBrowser;
+		fileBrowser.setFileMode(QFileDialog::Directory);
+		fileBrowser.selectFile(currentDirectory.c_str());
+		fileBrowser.setOption(QFileDialog::ShowDirsOnly, false);
 
-	//	if (!fileBrowser.exec())
-	//	{
-	//		return ""; // Operation cancelled
-	//	}
-	//	localFileName = fileBrowser.selectedFiles()[0].toStdString() + "/" + simpleFileName;
+		if (!fileBrowser.exec())
+		{
+			return ""; // Operation cancelled
+		}
+		localFileName = fileBrowser.selectedFiles()[0].toStdString() + "/" + simpleFileName;
 
-	//	if (!localFileName.empty())
-	//	{
-	//		std::string errorMessage; 
+		if (!localFileName.empty())
+		{
+			std::string errorMessage; 
 
-	//		if (!LTSpiceConnectorAPI::checkValidLocalFile(localFileName, projectName, false, errorMessage))
-	//		{
-	//			errorMessage += "\n\nThe local file name has not been changed.";
-	//			ak::uiAPI::promptDialog::show(errorMessage.c_str(), "Set CST File", ak::promptOkIconLeft, "DialogError", "Default");
-	//			return "";
-	//		}
+			if (!LTSpiceConnectorAPI::checkValidLocalFile(localFileName, projectName, false, errorMessage))
+			{
+				errorMessage += "\n\nThe local file name has not been changed.";
+				ak::uiAPI::promptDialog::show(errorMessage.c_str(), "Set LTSpice File", ak::promptOkIconLeft, "DialogError", "Default");
+				return "";
+			}
 
-	//		LTSpiceConnectorAPI::setAndStoreLocalFileName(localFileName, studioSuiteServiceURL, mainObject);
+			LTSpiceConnectorAPI::setAndStoreLocalFileName(localFileName, ltSpiceServiceURL, mainObject);
 
-	//		ak::uiAPI::promptDialog::show("The local file has been changed successfully.", "Set CST File", ak::promptOkIconLeft, "DialogInformation", "Default");
-	//	}
-	//}
+			ak::uiAPI::promptDialog::show("The local file has been changed successfully.", "Set LTSpice File", ak::promptOkIconLeft, "DialogInformation", "Default");
+		}
+	}
 
 	return "";
 }
@@ -275,19 +275,19 @@ std::string LTSpiceConnectorAPI::getLocalFileNameFromProject(const std::string& 
 	return localFileName;
 }
 
-std::string LTSpiceConnectorAPI::getSimpleFileNameFromProject(const std::string& studioSuiteServiceURL, QObject* mainObject)
+std::string LTSpiceConnectorAPI::getSimpleFileNameFromProject(const std::string& ltSpiceServiceURL, QObject* mainObject)
 {
 	// Send a message to the service and request the filename
 
 	std::string hostName = QHostInfo::localHostName().toStdString();
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_GET_SIMPLE_FILENAME, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_GET_SIMPLE_FILENAME, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string message = doc.toJson();
 
-	char* url = new char[studioSuiteServiceURL.length() + 1];
-	strcpy(url, studioSuiteServiceURL.c_str());
+	char* url = new char[ltSpiceServiceURL.length() + 1];
+	strcpy(url, ltSpiceServiceURL.c_str());
 
 	char* msg = new char[message.length() + 1];
 	strcpy(msg, message.c_str());
@@ -303,20 +303,20 @@ std::string LTSpiceConnectorAPI::getSimpleFileNameFromProject(const std::string&
 	return simpleFileName;
 }
 
-void LTSpiceConnectorAPI::setAndStoreLocalFileName(std::string fileName, const std::string& studioSuiteServiceURL, QObject* mainObject)
+void LTSpiceConnectorAPI::setAndStoreLocalFileName(std::string fileName, const std::string& ltSpiceServiceURL, QObject* mainObject)
 {
 	// Send a message to the service and set the filename on the server to be stored in the project
 	std::string hostName = QHostInfo::localHostName().toStdString();
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_SET_LOCAL_FILENAME, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_SET_LOCAL_FILENAME, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_HOSTNAME, ot::JsonString(hostName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_Name, ot::JsonString(fileName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string message = doc.toJson();
 
-	char* url = new char[studioSuiteServiceURL.length() + 1];
-	strcpy(url, studioSuiteServiceURL.c_str());
+	char* url = new char[ltSpiceServiceURL.length() + 1];
+	strcpy(url, ltSpiceServiceURL.c_str());
 
 	char* msg = new char[message.length() + 1];
 	strcpy(msg, message.c_str());

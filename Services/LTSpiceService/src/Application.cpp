@@ -185,7 +185,7 @@ bool Application::startAsRelayService(void) const
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if		(action == "Project:Local Project:Import")		  importProject();
-	else if (action == "Project:Local Project:Set File")	  setCSTFile();
+	else if (action == "Project:Local Project:Set File")	  setLTSpiceFile();
 	else if (action == "Project:Versions:Information")		  showInformation();
 	else if (action == "Project:Versions:Commit")			  commitChanges();
 	else if (action == "Project:Versions:Checkout")			  getChanges();
@@ -250,18 +250,18 @@ void Application::importProject(void)
 	uiComponent()->sendMessage(true, doc, tmp);
 }
 
-void Application::setCSTFile(void)
+void Application::setLTSpiceFile(void)
 {
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
 		return;
 	}
 
 	// Send the set file message to the UI
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_SETCSTFILE, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
