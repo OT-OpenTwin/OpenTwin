@@ -97,6 +97,9 @@ namespace ot {
 	protected:
 		virtual void importData(const std::string& _projectName, const std::list<Plot1DCurveCfg>& _curvesToImport) {};
 
+		std::map<UID, std::pair<UID, PlotDataset*>>& getCache(void) { return m_cache; };
+		const std::map<UID, std::pair<UID, PlotDataset*>>& getCache(void) const { return m_cache; };
+
 	private:
 		QWidget* m_centralWidget;
 		QLabel* m_errorLabel;
