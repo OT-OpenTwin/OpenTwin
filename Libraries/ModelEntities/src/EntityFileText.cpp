@@ -2,6 +2,10 @@
 #include <locale>
 #include "OTCommunication/ActionTypes.h"
 #include "DataBase.h"
+#include "OTCore/EncodingGuesser.h"
+#include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
+#include "OTCore/EncodingConverter_UTF16ToUTF8.h"
+#include "OTCore/Logger.h"
 
 EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	: EntityFile(_ID,_parent,_obs,_ms,_factory,_owner)
@@ -61,7 +65,30 @@ ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding()
 std::string EntityFileText::getText(void) 
 {
 	const std::vector<char> plainData = getData()->getData();
-	return std::string(plainData.begin(),plainData.end());
+	std::string textFromBinary(plainData.begin(), plainData.end());
+
+	ot::TextEncoding::EncodingStandard encoding = getTextEncoding();
+	if (encoding == ot::TextEncoding::EncodingStandard::UTF8 || encoding == ot::TextEncoding::EncodingStandard::UTF8_BOM)
+	{
+		return textFromBinary;
+	}
+	else if (encoding == ot::TextEncoding::EncodingStandard::ANSI)
+	{
+		ot::EncodingConverter_ISO88591ToUTF8 converter;
+		const std::string textAsUTF8 = converter(textFromBinary);
+		return textAsUTF8;
+	}
+	else if (encoding == ot::TextEncoding::EncodingStandard::UTF16_BEBOM || encoding == ot::TextEncoding::EncodingStandard::UTF16_LEBOM)
+	{
+		ot::EncodingConverter_UTF16ToUTF8 converter;
+		const std::string textAsUTF8 = converter(encoding,textFromBinary);
+		return textAsUTF8;
+	}
+	else
+	{
+		assert(encoding == ot::TextEncoding::EncodingStandard::UNKNOWN);
+		OT_LOG_W("Unable to determine the encoding of text file " + getName() + ".");
+	}
 }
 
 void EntityFileText::setText(const std::string& _text)
