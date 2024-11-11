@@ -154,7 +154,7 @@ void ProjectManager::commitProject(const std::string& fileName, const std::strin
 		ProgressInfo::getInstance().setProgressState(true, "Committing project", false);
 		ProgressInfo::getInstance().setProgressValue(0);
 
-		// Determine the base project name (without .cst extension)
+		// Determine the base project name (without .asc extension)
 		baseProjectName = getBaseProjectName(fileName);
 
 		// Set the name of the cache folder
@@ -593,7 +593,7 @@ std::list<std::string> ProjectManager::determineUploadFiles(const std::string& b
 			if (fileExtension != ".asc")
 			{
 				// This file is not present anymore
-				deletedFiles.push_back(file.first);
+				deletedFiles.push_back("Files/" + file.first);
 			}
 		}
 	}
@@ -646,20 +646,17 @@ bool ProjectManager::fileContentDiffers(const std::string& file1, const std::str
 
 void ProjectManager::getCacheFileWriteTimes(const std::string& versionFolderName, std::map<std::string, std::filesystem::file_time_type>& cacheFileWriteTimes, std::map<std::string, bool> &cacheFiles)
 {
-	std::string resultDirName = versionFolderName;
+	std::string cacheDirName = versionFolderName;
 
-	for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(resultDirName))
+	for (const auto& dirEntry : std::filesystem::directory_iterator(cacheDirName))
 	{
 		std::string path = dirEntry.path().string();
 		std::replace(path.begin(), path.end(), '\\', '/');
 
-		std::string cacheFile = path.substr(resultDirName.length());
+		std::string cacheFile = path.substr(cacheDirName.length()+1);
 		cacheFiles[cacheFile] = false;
 
-		if (!dirEntry.is_directory())
-		{
-			cacheFileWriteTimes[cacheFile] = std::filesystem::last_write_time(path);
-		}
+		cacheFileWriteTimes[cacheFile] = std::filesystem::last_write_time(path);
 	}
 }
 
@@ -678,16 +675,35 @@ void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const st
 		throw("Unable to create cache version folder: " + versionFolderName);
 	}
 
-	// Now copy all upload files to the cache version folder
-	for (auto fileName : uploadFileList)
+	// Now copy all project files to the cache version folder
+	std::string projectDirName = std::filesystem::path(baseProjectName + ".asc").parent_path().string();
+	std::replace(projectDirName.begin(), projectDirName.end(), '\\', '/');
+
+	for (const auto& dirEntry : std::filesystem::directory_iterator(projectDirName))
 	{
-		try
+		if (!dirEntry.is_directory())
 		{
-			copyFile(fileName, versionFolderName);
-		}
-		catch (std::exception& error)
-		{
-			throw("Unable to copy data to cache (" + std::string(error.what()) + ") : " + versionFolderName);
+			std::string path = dirEntry.path().string();
+			std::replace(path.begin(), path.end(), '\\', '/');
+
+			std::string fileExtension = dirEntry.path().extension().string();
+			transform(fileExtension.begin(), fileExtension.end(), fileExtension.begin(), ::tolower);
+
+			std::string filter = baseProjectName + ".";
+			std::string firstPart = path.substr(0, filter.length());
+
+			if (firstPart == filter)
+			{
+				// This file belongs to the project 
+				try
+				{
+					copyFile(path, versionFolderName);
+				}
+				catch (std::exception& error)
+				{
+					throw("Unable to copy data to cache (" + std::string(error.what()) + ") : " + versionFolderName);
+				}
+			}
 		}
 	}
 }
