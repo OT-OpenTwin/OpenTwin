@@ -5,7 +5,7 @@
 #include "ViewerView.h"
 #include "Notifier.h"
 #include "DataBase.h"
-#include "PlotView.h"
+#include "PlotViewOld.h"
 #include "Rubberband.h"
 #include "EntityParameterizedDataTable.h"
 #include "EntityTableSelectedRanges.h"

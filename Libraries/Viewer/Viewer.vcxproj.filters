@@ -148,16 +148,13 @@
     <ClCompile Include="src\TableViewerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
-    <ClCompile Include="src\PlotView.cpp">
+    <ClCompile Include="src\PlotViewOld.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
     <ClCompile Include="src\ViewerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
     <ClCompile Include="src\TextVisualiser.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeDisplay.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\PlotManager.cpp">
@@ -312,7 +309,7 @@
     <ClInclude Include="include\TableViewerView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\PlotView.h">
+    <ClInclude Include="include\PlotViewOld.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\ViewerView.h">
@@ -323,9 +320,6 @@
     </ClInclude>
     <ClInclude Include="include\TextVisualiser.h">
       <Filter>include\Visualiser</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodeDisplay.h">
-      <Filter>include\SceneNodes</Filter>
     </ClInclude>
     <ClInclude Include="include\PlotManager.h">
       <Filter>include\WidgetView</Filter>

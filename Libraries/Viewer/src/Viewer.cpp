@@ -56,7 +56,7 @@
 #include "ViewManipulator.h"
 #include "ViewerObjectSelectionHandler.h"
 
-#include "PlotView.h"
+#include "PlotViewOld.h"
 
 #include "SceneNodeVTK.h"
 
@@ -229,7 +229,7 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	osgAxisViewer->realize();
 
 	// Create new Plot
-	m_plot = new ot::PlotView(this);
+	m_plot = new ot::PlotViewOld(this);
 
 	// Create new view handler
 	m_tableViewer = new ot::TableViewerView(this);

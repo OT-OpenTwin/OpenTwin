@@ -1,4 +1,4 @@
-//! @file PlotView.cpp
+//! @file PlotViewOld.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date March 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,17 +6,17 @@
 #include "stdafx.h"
 
 // OpenTwin header
-#include "PlotView.h"
+#include "PlotViewOld.h"
 #include "OTWidgets/WidgetViewRegistrar.h"
 
-static ot::WidgetViewRegistrar<ot::PlotView> PlotViewRegistrar(OT_WIDGETTYPE_Plot);
+static ot::WidgetViewRegistrar<ot::PlotViewOld> PlotViewOldRegistrar(OT_WIDGETTYPE_Plot);
 
-ot::PlotView::PlotView(Viewer* _viewer)
+ot::PlotViewOld::PlotViewOld(Viewer* _viewer)
 	: Plot(_viewer) {
 	this->addWidgetToDock(this->widget());
 }
 
-ot::PlotView::~PlotView() {
+ot::PlotViewOld::~PlotViewOld() {
 
 }
 
@@ -24,11 +24,11 @@ ot::PlotView::~PlotView() {
 
 // Base class functions
 
-QWidget* ot::PlotView::getViewWidget(void) {
+QWidget* ot::PlotViewOld::getViewWidget(void) {
 	return this->widget();
 }
 
-bool ot::PlotView::setupViewFromConfig(WidgetViewCfg* _config) {
+bool ot::PlotViewOld::setupViewFromConfig(WidgetViewCfg* _config) {
 	if (!WidgetView::setupViewFromConfig(_config)) return false;
 
 

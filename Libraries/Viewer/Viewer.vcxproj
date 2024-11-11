@@ -47,7 +47,7 @@
     <ClCompile Include="src\Notifier.cpp" />
     <ClCompile Include="src\Plot.cpp" />
     <ClCompile Include="src\PlotManager.cpp" />
-    <ClCompile Include="src\PlotView.cpp" />
+    <ClCompile Include="src\PlotViewOld.cpp" />
     <ClCompile Include="src\polarPlot.cpp" />
     <ClCompile Include="src\Rubberband.cpp" />
     <ClCompile Include="src\SceneNodeAnnotation.cpp" />
@@ -116,7 +116,7 @@
     <ClInclude Include="include\Notifier.h" />
     <ClInclude Include="include\Plot.h" />
     <ClInclude Include="include\PlotManager.h" />
-    <ClInclude Include="include\PlotView.h" />
+    <ClInclude Include="include\PlotViewOld.h" />
     <ClInclude Include="include\polarPlot.h" />
     <ClInclude Include="include\Rubberband.h" />
     <ClInclude Include="include\SceneNodeAnnotation.h" />
