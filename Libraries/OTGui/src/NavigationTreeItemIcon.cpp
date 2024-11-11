@@ -27,6 +27,14 @@ ot::NavigationTreeItemIcon& ot::NavigationTreeItemIcon::operator = (const Naviga
 	return *this;
 }
 
+bool ot::NavigationTreeItemIcon::operator==(const NavigationTreeItemIcon& _other) const {
+	return m_visibleIcon == _other.m_visibleIcon && m_hiddenIcon == _other.m_hiddenIcon;
+}
+
+bool ot::NavigationTreeItemIcon::operator!=(const NavigationTreeItemIcon& _other) const {
+	return !(*this == _other);
+}
+
 void ot::NavigationTreeItemIcon::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Visible", JsonString(m_visibleIcon, _allocator), _allocator);
 	_object.AddMember("Hidden", JsonString(m_hiddenIcon, _allocator), _allocator);

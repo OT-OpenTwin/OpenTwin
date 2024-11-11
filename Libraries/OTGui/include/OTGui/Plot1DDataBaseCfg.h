@@ -15,9 +15,11 @@ namespace ot {
 	public:
 		Plot1DDataBaseCfg();
 		Plot1DDataBaseCfg(const Plot1DDataBaseCfg& _other);
+		Plot1DDataBaseCfg(const Plot1DCfg& _other);
 		virtual ~Plot1DDataBaseCfg();
 
 		Plot1DDataBaseCfg& operator = (const Plot1DDataBaseCfg& _other);
+		Plot1DDataBaseCfg& operator = (const Plot1DCfg& _other);
 		
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.

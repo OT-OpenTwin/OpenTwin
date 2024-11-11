@@ -94,6 +94,14 @@ namespace ot {
 
 		void setAxisQuantity(Plot1DCfg::AxisQuantity _quantity);
 
+		bool hasCachedEntity(UID _entityID) const;
+
+		//! \brief Updates the entity version of the specified dataset if needed.
+		//! Returns false if the dataset does not exist or the version did not change.
+		bool changeCachedDatasetEntityVersion(UID _entityID, UID _newEntityVersion);
+
+		std::list<PlotDataset*> getDatasets(void) const;
+
 	Q_SIGNALS:
 		void resetItemSelectionRequest(void);
 		void setItemSelectedRequest(UID _treeItemUid, bool _hasControlModifier);

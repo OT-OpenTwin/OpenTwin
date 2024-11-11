@@ -55,15 +55,15 @@ namespace ot {
 		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		bool operator == (const Plot1DCfg& _other) const;
+		bool operator != (const Plot1DCfg& _other) const;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
 
 		void setUid(UID _uid) { m_uid = _uid; };
 		UID getUid(void) const { return m_uid; };
-
-		void setVisualizationUid(UID _uid) { m_visualizationUid = _uid; };
-		UID getVisualizationUid(void) const { return m_visualizationUid; };
 
 		void setName(const std::string& _name) { m_name = _name; };
 		const std::string& getName(void) const { return m_name; };
@@ -130,8 +130,7 @@ namespace ot {
 
 	private:
 		UID m_uid;
-		UID m_visualizationUid;
-
+		
 		std::string m_name;
 		std::string m_title;
 		std::string m_projectName;

@@ -279,6 +279,36 @@ void ot::Plot::setAxisQuantity(Plot1DCfg::AxisQuantity _quantity) {
 	}
 }
 
+bool ot::Plot::hasCachedEntity(UID _entityID) const {
+	return m_cache.find(_entityID) != m_cache.end();
+}
+
+bool ot::Plot::changeCachedDatasetEntityVersion(UID _entityID, UID _newEntityVersion) {
+	auto it = m_cache.find(_entityID);
+	if (it == m_cache.end()) {
+		return false;
+	}
+
+	if (it->second.first == _newEntityVersion) {
+		return false;
+	}
+	else {
+		it->second.first = _newEntityVersion;
+		it->second.second->setCurveEntityVersion(_newEntityVersion);
+		return true;
+	}
+}
+
+std::list<ot::PlotDataset*> ot::Plot::getDatasets(void) const {
+	std::list<PlotDataset*> result;
+
+	for (const auto& it : m_cache) {
+		result.push_back(it.second.second);
+	}
+
+	return result;
+}
+
 void ot::Plot::applyConfig(void) {
 	m_cartesianPlot->setTitle(m_config.getTitle().c_str());
 	m_polarPlot->setTitle(m_config.getTitle().c_str());
