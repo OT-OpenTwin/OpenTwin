@@ -273,6 +273,16 @@ ot::PlotDataset* ot::Plot::findDataset(QwtPolarCurve * _curve) {
 	return nullptr;
 }
 
+ot::PlotDataset* ot::Plot::findDataset(UID _entityID) {
+	auto it = m_cache.find(_entityID);
+	if (it == m_cache.end()) {
+		return nullptr;
+	}
+	else {
+		return it->second.second;
+	}
+}
+
 void ot::Plot::setAxisQuantity(Plot1DCfg::AxisQuantity _quantity) {
 	for (auto itm : m_cache) {
 		itm.second.second->calculateData(_quantity);
