@@ -1,4 +1,4 @@
-//! @file Plot1DCurveCfg.h
+//! @file Plot1DCurveInfoCfg.h
 //! @author Alexander Kuester (alexk95)
 //! @date October 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -17,14 +17,14 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT Plot1DCurveCfg : public Serializable {
+	class OT_GUI_API_EXPORT Plot1DCurveInfoCfg : public Serializable {
 	public:
-		Plot1DCurveCfg();
-		Plot1DCurveCfg(UID _id, UID _version, const std::string& _name);
-		Plot1DCurveCfg(const Plot1DCurveCfg& _other);
-		virtual ~Plot1DCurveCfg();
+		Plot1DCurveInfoCfg();
+		Plot1DCurveInfoCfg(UID _id, UID _version, const std::string& _name);
+		Plot1DCurveInfoCfg(const Plot1DCurveInfoCfg& _other);
+		virtual ~Plot1DCurveInfoCfg();
 
-		Plot1DCurveCfg& operator = (const Plot1DCurveCfg& _other);
+		Plot1DCurveInfoCfg& operator = (const Plot1DCurveInfoCfg& _other);
 
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.

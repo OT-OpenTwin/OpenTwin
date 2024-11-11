@@ -16,7 +16,7 @@ namespace ot {
 		virtual ~PlotManager();
 
 	protected:
-		virtual void importData(const std::string& _projectName, const std::list<Plot1DCurveCfg>& _curvesToImport) override;
+		virtual void importData(const std::string& _projectName, const std::list<Plot1DCurveInfoCfg>& _curvesToImport) override;
 
 	private:
 
