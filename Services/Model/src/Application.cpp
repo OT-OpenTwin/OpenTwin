@@ -1018,11 +1018,7 @@ std::string Application::getEntityInformation(std::list<ot::UID>& _entityIDList)
 bool Application::queuedRequestToFrontend(const ot::JsonDocument& _request) {
 	if (!this->isUiConnected()) return false;
 	std::string tmp;
-	this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, _request, tmp);
-	ot::ReturnMessage message;
-	message.fromJson(tmp);
-	assert(message.getStatus() == ot::ReturnMessage::Ok);
-	return message.getStatus() == ot::ReturnMessage::Ok;
+	return this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, _request, tmp);
 }
 
 bool Application::queuedRequestToFrontend(const ot::JsonDocument& _request, const std::list<std::pair<ot::UID, ot::UID>>& _prefetchIDs) {
