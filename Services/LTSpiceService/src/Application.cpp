@@ -316,7 +316,7 @@ void Application::getChanges(void)
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
 		return;
 	}
 
@@ -325,7 +325,7 @@ void Application::getChanges(void)
 
 	// Send the commit message to the UI
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_GET, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_GET, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());
 

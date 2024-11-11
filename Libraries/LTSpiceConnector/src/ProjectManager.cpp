@@ -203,7 +203,7 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 		ProgressInfo::getInstance().setProgressState(true, "Getting project", false);
 		ProgressInfo::getInstance().setProgressValue(0);
 
-		// Determine the base project name (without .cst extension)
+		// Determine the base project name (without .asc extension)
 		baseProjectName = getBaseProjectName(fileName);
 
 		// Set the name of the cache folder
@@ -222,6 +222,8 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 			ProgressInfo::getInstance().setProgressValue(20);
 
 			ot::JsonDocument doc;
+			// ******** NOT YET IMPLEMENTED ****
+			assert(0);
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_DOWNLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
 
 			ServiceConnector::getInstance().sendExecuteRequest(doc);
@@ -686,9 +688,6 @@ void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const st
 			std::string path = dirEntry.path().string();
 			std::replace(path.begin(), path.end(), '\\', '/');
 
-			std::string fileExtension = dirEntry.path().extension().string();
-			transform(fileExtension.begin(), fileExtension.end(), fileExtension.begin(), ::tolower);
-
 			std::string filter = baseProjectName + ".";
 			std::string firstPart = path.substr(0, filter.length());
 
@@ -925,14 +924,40 @@ void ProjectManager::readFileContent(const std::string &fileName, std::string &c
 
 void ProjectManager::deleteLocalProjectFiles(const std::string &baseProjectName)
 {
-	std::string cstFileName = baseProjectName + ".cst";
-	std::remove(cstFileName.c_str());
+	std::string projectDirName = std::filesystem::path(baseProjectName + ".asc").parent_path().string();
+	std::replace(projectDirName.begin(), projectDirName.end(), '\\', '/');
 
-	std::filesystem::remove_all(baseProjectName);
+	for (const auto& dirEntry : std::filesystem::directory_iterator(projectDirName))
+	{
+		if (!dirEntry.is_directory())
+		{
+			std::string path = dirEntry.path().string();
+			std::replace(path.begin(), path.end(), '\\', '/');
+
+			std::string filter = baseProjectName + ".";
+			std::string firstPart = path.substr(0, filter.length());
+
+			if (firstPart == filter)
+			{
+				// This file belongs to the project 
+				try
+				{
+					std::remove(path.c_str());
+				}
+				catch (std::exception& error)
+				{
+					throw("Unable to remove local project file (" + std::string(error.what()) + ") : " + path);
+				}
+			}
+		}
+	}
 }
 
 bool ProjectManager::restoreFromCache(const std::string& baseProjectName, const std::string& cacheFolderName, const std::string& version)
 {
+	std::string projectDirName = std::filesystem::path(baseProjectName + ".asc").parent_path().string();
+	std::replace(projectDirName.begin(), projectDirName.end(), '\\', '/');
+
 	try
 	{
 		std::string cacheDirectory = cacheFolderName + "/" + version;
@@ -940,19 +965,23 @@ bool ProjectManager::restoreFromCache(const std::string& baseProjectName, const 
 		// Check whether current version is in cache
 		if (std::filesystem::is_directory(cacheDirectory))
 		{
-			std::filesystem::path basePath(baseProjectName);
-			std::string simpleFileName = basePath.filename().string() + ".cst";
-
-			std::string cstCacheFileName = cacheDirectory + "/" + simpleFileName;
-
-			// We have a corresponding cache entry -> restore the data
-			std::filesystem::create_directory(baseProjectName);
-
-			copyFile(cstCacheFileName, baseProjectName + ".cst");
-
-			if (std::filesystem::is_directory(cacheDirectory + "/Result"))
+			for (const auto& dirEntry : std::filesystem::directory_iterator(cacheDirectory))
 			{
-				copyDirectory(cacheDirectory + "/Result", baseProjectName + "/Result");
+				if (!dirEntry.is_directory())
+				{
+					std::string path = dirEntry.path().string();
+					std::replace(path.begin(), path.end(), '\\', '/');
+
+					try
+					{
+						copyFile(path, projectDirName);
+					}
+					catch (std::exception& error)
+					{
+						throw("Unable to copy data from cache (" + std::string(error.what()) + ") : " + path);
+					}
+
+				}
 			}
 
 			return true;
