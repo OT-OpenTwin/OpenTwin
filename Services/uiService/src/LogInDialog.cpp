@@ -789,7 +789,7 @@ LogInDialog::WorkerError LogInDialog::workerConnectToGSS(void) {
 	doc.AddMember(OT_ACTION_PARAM_MESSAGE, ot::JsonString(OT_INFO_MESSAGE_LogIn, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_loginData.getGss().getConnectionUrl().toStdString(), ot::EXECUTE, doc.toJson(), response, 5000)) {
+	if (!ot::msg::send("", m_loginData.getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, 5000)) {
 		return WorkerError::GSSConnectionFailed;
 	}
 

@@ -19,8 +19,6 @@
 #include <osg/LightModel>
 
 SceneNodeTextItem::SceneNodeTextItem() :
-	textEntityID(0),
-	textEntityVersion(0),
 	model(nullptr),
 	textLoaded(false)
 {
@@ -50,64 +48,28 @@ SceneNodeTextItem::~SceneNodeTextItem()
 	}
 }
 
-void SceneNodeTextItem::setSelected(bool s) 
+void SceneNodeTextItem::setSelected(bool _selection)
 {
 	if (getModel() != nullptr)
 	{
-		if (!isSelected() && s && getModel()->isSingleItemSelected())
+		if (!isSelected() && _selection && getModel()->isSingleItemSelected())
 		{
-			// This entity is just selected -> display its text in the output window
-
-			if (!textLoaded)
+			const std::list<IVisualiser*> visualisers = getVisualiser();
+			for (IVisualiser* visualiser : visualisers)
 			{
-				loadText();
+				if (visualiser->isVisible())
+				{
+					visualiser->visualise();
+				}
 			}
-
-			std::string message =
-				"----------------------------------------------------------------------------------------------------------------------------------\n" +
-				this->getName() +
-				"\n----------------------------------------------------------------------------------------------------------------------------------\n\n" +
-				text +
-				"\n----------------------------------------------------------------------------------------------------------------------------------\n\n";
-
-			getNotifier()->displayText(message);
 		}
 	}
 
-	SceneNodeBase::setSelected(s);
+	SceneNodeBase::setSelected(_selection);
 }
 
-void SceneNodeTextItem::loadText(void)
+void SceneNodeTextItem::addVisualiserText()
 {
-	// Now load the data of the item first
-
-	auto doc = bsoncxx::builder::basic::document{};
-
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(textEntityID, textEntityVersion, doc))
-	{
-		assert(0);
-		return;
-	}
-
-	auto doc_view = doc.view()["Found"].get_document().view();
-
-	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
-
-	if (entityType != "EntityResultTextData")
-	{
-		assert(0);
-		return;
-	}
-
-	int schemaVersion = (int)DataBase::GetIntFromView(doc_view, "SchemaVersion_EntityResultTextData");
-	if (schemaVersion != 1)
-	{
-		assert(0);
-		return;
-	}
-
-	// Read the text
-	text = doc_view["textData"].get_utf8().value.data();
-	textLoaded = true;
+	auto textVis = new TextVisualiser(getModelEntityID());
+	addVisualiser(textVis);
 }
-

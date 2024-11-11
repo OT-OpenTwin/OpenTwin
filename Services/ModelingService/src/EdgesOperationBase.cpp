@@ -432,9 +432,87 @@ void EdgesOperationBase::performOperation(EntityGeometry* geometryEntity, Entity
 			}
 		}
 
+		// Now we label all the faces generated from an operation on a vertex
+		for (exp.Init(baseBrep->getBrep(), TopAbs_VERTEX); exp.More(); exp.Next())
+		{
+			TopoDS_Vertex aVertex = TopoDS::Vertex(exp.Current());
+
+			TopTools_ListOfShape listOfGeneratedFaces = history->Generated(aVertex);
+
+			for (auto face : listOfGeneratedFaces)
+			{
+				TopoDS_Face aFace = TopoDS::Face(face);
+
+				if (resultFaceNames.count(aFace.TShape()) == 0)
+				{
+					// Now search the edges for the vertex and therefore generate a list of all adjacent faces
+					std::list<opencascade::handle<TopoDS_TShape>> allEdgesForVertex;
+					getAllEdgesForVertex(baseBrep, aVertex, allEdgesForOperation, allEdgesForVertex);
+
+					std::string vertexName = getVertexNameFromEdges(allEdgesForVertex, allEdgesFace1, allEdgesFace2);
+
+					resultFaceNames[aFace.TShape()] = vertexName;
+				}
+			}
+		}
+
 		delete history;
 		history = nullptr;
 		
 		geometryEntity->getBrepEntity()->setFaceNameMap(resultFaceNames);
 	}
+}
+
+void EdgesOperationBase::getAllEdgesForVertex(EntityBrep* baseBrep, TopoDS_Vertex& aVertex, std::map<const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesForOperation, std::list<opencascade::handle<TopoDS_TShape>>& allEdgesForVertex)
+{
+	TopExp_Explorer exp;
+	for (exp.Init(baseBrep->getBrep(), TopAbs_EDGE); exp.More(); exp.Next())
+	{
+		TopoDS_Edge aEdge = TopoDS::Edge(exp.Current());
+
+		if (allEdgesForOperation.count(aEdge.TShape()) > 0)
+		{
+			// This is an edge which is used for the operation, so we check whether the edge has the vertex we are searching for
+			TopExp_Explorer expE;
+			for (expE.Init(aEdge, TopAbs_VERTEX); expE.More(); expE.Next())
+			{
+				TopoDS_Vertex aEdgeVertex = TopoDS::Vertex(expE.Current());
+
+				if (aEdgeVertex.TShape() == aVertex.TShape())
+				{
+					// This edge has the searched for vertex
+					allEdgesForVertex.push_back(aEdge.TShape());
+					break;
+				}
+			}
+		}
+	}
+}
+
+std::string EdgesOperationBase::getVertexNameFromEdges(std::list<opencascade::handle<TopoDS_TShape>>& allEdgesForVertex, std::map<const opencascade::handle<TopoDS_TShape>, std::string> &allEdgesFace1, std::map<const opencascade::handle<TopoDS_TShape>, std::string> &allEdgesFace2)
+{
+	std::set<std::string> faceNames;
+	
+	for (auto edge : allEdgesForVertex)
+	{
+		faceNames.emplace(allEdgesFace1[edge]);
+		faceNames.emplace(allEdgesFace2[edge]);
+	}
+
+	std::string vertexName;
+
+	for (auto face : faceNames)
+	{
+		if (vertexName.empty())
+		{
+			vertexName = face;
+
+		}
+		else
+		{
+			vertexName += ":" + face;
+		}
+	}
+
+	return vertexName;
 }

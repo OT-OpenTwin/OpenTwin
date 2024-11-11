@@ -94,6 +94,14 @@ SessionService::SessionService()
 	StudioSuiteSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
 	StudioSuiteSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_STUDIOSUITE, OT_INFO_SERVICE_TYPE_STUDIOSUITE));
 	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, StudioSuiteSessionServices);
+
+	//
+	// LTSpice services list (this contains all services relevant for LTSpice integration)
+	//
+	std::vector<ot::ServiceBase>* LTSpiceSessionServices = new std::vector<ot::ServiceBase>;
+	LTSpiceSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
+	LTSpiceSessionServices->push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_LTSPICE, OT_INFO_SERVICE_TYPE_LTSPICE));
+	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_LTSPICE, LTSpiceSessionServices);
 }
 
 bool SessionService::isServiceInDebugMode(const std::string& _serviceName) {

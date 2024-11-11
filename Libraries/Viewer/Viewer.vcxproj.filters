@@ -10,27 +10,6 @@
     <ClCompile Include="src\Notifier.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\SceneNodeAnnotation.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeContainer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeGeometry.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeMesh.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeMeshItem.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodePlot1DItem.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeResult1DItem.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\stdafx.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -46,9 +25,6 @@
     <ClCompile Include="src\ViewManipulator.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\SceneNodeCartesianMesh.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Plot.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -58,16 +34,7 @@
     <ClCompile Include="src\xyPlot.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\SceneNodeCartesianMeshItem.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\polarPlot.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeTextItem.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeTableItem.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\SceneNodeMaterialFactory.cpp">
@@ -89,9 +56,6 @@
       <Filter>src\Materials</Filter>
     </ClCompile>
     <ClCompile Include="src\Rubberband.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeVTK.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\WorkingPlane.cpp">
@@ -148,11 +112,53 @@
     <ClCompile Include="src\TableViewerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
-    <ClCompile Include="src\PlotView.cpp">
+    <ClCompile Include="src\PlotViewOld.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
     <ClCompile Include="src\ViewerView.cpp">
       <Filter>src\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextVisualiser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlotManager.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodePlot1D.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodePlot1DCurve.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeAnnotation.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeCartesianMesh.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeCartesianMeshItem.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeContainer.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeGeometry.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeMesh.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeMeshItem.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeTableItem.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeTextItem.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeVTK.cpp">
+      <Filter>src\SceneNodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -285,10 +291,10 @@
     <ClInclude Include="include\SceneNodeMeshItem.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
-    <ClInclude Include="include\SceneNodePlot1DItem.h">
+    <ClInclude Include="include\SceneNodePlot1D.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
-    <ClInclude Include="include\SceneNodeResult1DItem.h">
+    <ClInclude Include="include\SceneNodePlot1DCurve.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
     <ClInclude Include="include\SceneNodeTableItem.h">
@@ -303,10 +309,19 @@
     <ClInclude Include="include\TableViewerView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\PlotView.h">
+    <ClInclude Include="include\PlotViewOld.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\ViewerView.h">
+      <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TextVisualiser.h">
+      <Filter>include\Visualiser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlotManager.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
@@ -339,6 +354,12 @@
     </Filter>
     <Filter Include="src\WidgetView">
       <UniqueIdentifier>{98463fc9-d8b8-47a9-9a36-1c785d62bce7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Visualiser">
+      <UniqueIdentifier>{da4035b1-a386-45a5-bc16-89b6d14f54c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\SceneNodes">
+      <UniqueIdentifier>{09d63a78-ff4b-4b00-9891-41d3c1bd0ff5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

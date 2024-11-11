@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTGui/Plot1DCfg.h"
+#include "OTGui/Plot1DDataBaseCfg.h"
 #include "OTWidgets/QWidgetInterface.h"
 #include "OTWidgets/AbstractPlot.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
@@ -64,7 +65,10 @@ namespace ot {
 			long					_dataSize
 		);
 
-		void setFromConfig(const Plot1DCfg& _config);
+		void setConfig(const Plot1DCfg& _config) { m_config = _config; };
+		const Plot1DCfg& getConfig(void) const { return m_config; };
+
+		void setFromDataBaseConfig(const Plot1DDataBaseCfg& _config);
 
 		void resetView(void);
 
@@ -84,20 +88,46 @@ namespace ot {
 
 		void datasetSelectionChanged(PlotDataset* _selectedDataset);
 
+		//! \brief Returns the dataset for the given plot curve.
+		//! Returns NULL if the dataset does not exist.
+		//! The Plot keeps ownership of the dataset.
 		PlotDataset* findDataset(QwtPlotCurve* _curve);
 
+		//! \brief Returns the dataset for the given plot curve.
+		//! Returns NULL if the dataset does not exist.
+		//! The Plot keeps ownership of the dataset.
 		PlotDataset* findDataset(QwtPolarCurve* _curve);
 
+		//! \brief Returns the cached dataset for the given entity id.
+		//! Returns NULL if the dataset does not exist.
+		//! The Plot keeps ownership of the dataset.
+		PlotDataset* findDataset(UID _entityID);
+
 		void setAxisQuantity(Plot1DCfg::AxisQuantity _quantity);
+
+		bool hasCachedEntity(UID _entityID) const;
+
+		//! \brief Updates the entity version of the specified dataset if needed.
+		//! Returns false if the dataset does not exist or the version did not change.
+		bool changeCachedDatasetEntityVersion(UID _entityID, UID _newEntityVersion);
+
+		std::list<PlotDataset*> getDatasets(void) const;
 
 	Q_SIGNALS:
 		void resetItemSelectionRequest(void);
 		void setItemSelectedRequest(UID _treeItemUid, bool _hasControlModifier);
 
 	protected:
-		virtual void importData(const std::string& _projectName, const std::list<Plot1DCurveCfg>& _curvesToImport) {};
+		virtual void importData(const std::string& _projectName, const std::list<Plot1DCurveInfoCfg>& _curvesToImport) {};
+
+		std::map<UID, std::pair<UID, PlotDataset*>>& getCache(void) { return m_cache; };
+		const std::map<UID, std::pair<UID, PlotDataset*>>& getCache(void) const { return m_cache; };
 
 	private:
+		void applyConfig(void);
+
+		Plot1DCfg m_config;
+
 		QWidget* m_centralWidget;
 		QLabel* m_errorLabel;
 		QVBoxLayout* m_centralLayout;

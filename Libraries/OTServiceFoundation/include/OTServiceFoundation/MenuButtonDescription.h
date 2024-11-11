@@ -25,6 +25,10 @@ namespace ot {
 			{
 				_buttonText = buttonName;
 			}
+			else
+			{
+				_buttonText = buttonText;
+			}
 		}
 
 		const std::string GetPageName(void) { return _pageName; }

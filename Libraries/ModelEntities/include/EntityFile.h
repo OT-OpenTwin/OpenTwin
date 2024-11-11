@@ -37,12 +37,14 @@ protected:
 	virtual void AddStorageData(bsoncxx::builder::basic::document& _storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase *>& _entityMap) override;
 
+
+	long long m_dataUID = -1;
+	long long m_dataVersion = -1;
 private:
 	std::string m_path ="";
 	std::string m_fileName ="";
 	std::string m_fileType ="";
-	long long m_dataUID = -1;
-	long long m_dataVersion = -1;
+
 	std::shared_ptr<EntityBinaryData> m_data = nullptr;
 
 	void EnsureDataIsLoaded();

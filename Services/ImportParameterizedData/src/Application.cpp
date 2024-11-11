@@ -47,7 +47,7 @@ void Application::deleteInstance(void) {
 Application::Application()
 	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, new UiNotifier(), new ModelNotifier())
 {
-	_dataSourceHandler = new DataSourceHandler();
+	
 	_tableHandler = new TableHandler( _tableFolder);
 	_parametrizedDataHandler = new DataCategorizationHandler( _dataCategorizationFolder, _parameterFolder, _quantityFolder, _tableFolder, _previewTableNAme);
 	_tabledataToResultdataHandler = new TabledataToResultdataHandler(_dataCategorizationFolder,_datasetFolder, _parameterFolder, _quantityFolder, _tableFolder);
@@ -91,7 +91,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	const std::string pageName = "Import Parameterized Data";
-	_dataSourceHandler->setUIComponent(_ui);
+
 	_tableHandler->setUIComponent(_ui);
 	_parametrizedDataHandler->setUIComponent(_ui);
 	_tabledataToResultdataHandler->setUIComponent(_ui);
@@ -114,7 +114,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
-	_buttonImportCSV.SetDescription(pageName, groupNameImport, "Import File");
 	_buttonImportPythonScript.SetDescription(pageName, groupNameImport, "Import Python Script");
 	_buttonCreateTable.SetDescription(pageName, groupNameTableHandling, "Turn into Table");
 	_buttonImportTouchstone.SetDescription(pageName, groupNameImport, "Import Touchstone");
@@ -139,7 +138,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_buttonCreateDataCollection.SetDescription(pageName, groupNameParameterizedDataCreation, "Create Data Collection");
 
-	_ui->addMenuButton(_buttonImportCSV, modelWrite, "TextVisible");
 	_ui->addMenuButton(_buttonImportTouchstone, modelWrite, "regional-indicator-symbol-letter-s");
 	_ui->addMenuButton(_buttonImportPythonScript, modelWrite, "python");
 	_ui->addMenuButton(_buttonCreateTable, modelWrite, "TableVisible");
@@ -186,7 +184,7 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
-	_dataSourceHandler->setModelComponent(_model);
+
 	_tableHandler->setModelComponent(_model);
 	_parametrizedDataHandler->setModelComponent(_model);
 	_tabledataToResultdataHandler->setModelComponent(_model);
@@ -253,25 +251,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 		{
 			_parametrizedDataHandler->CheckEssentials();
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-			if (action == _buttonImportCSV.GetFullDescription())
-			{
-				ot::JsonDocument doc;
-				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_Action_CMD_UI_StoreFileInDataBase, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import File", doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString("CSV files (*.csv;*.txt)", doc.GetAllocator()), doc.GetAllocator());
-				EntityFileCSV csvFile(0,nullptr,nullptr,nullptr,nullptr,"");
-				doc.AddMember(OT_ACTION_PARAM_FILE_Type, ot::JsonString(csvFile.getClassName(), doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_dataSourcesFolder, doc.GetAllocator()), doc.GetAllocator());
-				std::list<std::string> takenNames =	m_modelComponent->getListOfFolderItems(_dataSourcesFolder);
-				doc.AddMember(OT_ACTION_PARAM_FILE_TAKEN_NAMES, ot::JsonArray(takenNames, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_SENDER, ot::JsonString(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("addFilesToModel", doc.GetAllocator()), doc.GetAllocator());
-
-				std::string tmp;
-				uiComponent()->sendMessage(true, doc, tmp);
-			}
-			else if (action == _buttonImportTouchstone.GetFullDescription())
+			if (action == _buttonImportTouchstone.GetFullDescription())
 			{
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
@@ -466,18 +446,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 		else if (_action == OT_ACTION_CMD_MODEL_ExecuteFunction)
 		{
 			std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
-			if (subsequentFunction == "addFilesToModel")
-			{
-				std::list<std::string> fileNames = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_OriginalName);
-				
-				ot::UIDList topoIDs = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_TopologyEntityIDList);
-				ot::UIDList topoVers = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_TopologyEntityVersionList);
-				ot::UIDList dataIDs = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_DataEntityIDList);
-				ot::UIDList dataVers = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_DataEntityVersionList);
-				_dataSourceHandler->AddNewFilesToModel(topoIDs, topoVers, dataIDs, dataVers, fileNames);
-				m_modelComponent->updatePropertyGrid();
-			}
-			else if (subsequentFunction == "importTouchstoneData")
+			if (subsequentFunction == "importTouchstoneData")
 			{
 				std::string originalName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 

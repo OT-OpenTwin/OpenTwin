@@ -27,6 +27,8 @@
     <ClInclude Include="include\ClassFactoryHandlerAbstract.h" />
     <ClInclude Include="include\ContentChangedHandling.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
+    <ClInclude Include="include\EntityResultText.h" />
+    <ClInclude Include="include\EntityResultTextData.h" />
     <ClInclude Include="include\IVisualisationText.h" />
     <ClInclude Include="include\EntityMetadataSeries.h" />
     <ClInclude Include="include\EntityMetadataCampaign.h" />
@@ -88,8 +90,6 @@
     <ClInclude Include="include\EntityResultTable.hpp" />
     <ClInclude Include="include\EntityResultTableData.h" />
     <ClInclude Include="include\EntityResultTableData.hpp" />
-    <ClInclude Include="include\EntityResultText.h" />
-    <ClInclude Include="include\EntityResultTextData.h" />
     <ClInclude Include="include\EntitySignalType.h" />
     <ClInclude Include="include\EntitySolver.h" />
     <ClInclude Include="include\EntitySolverFITTD.h" />
@@ -165,6 +165,8 @@
     <ClCompile Include="src\EntityParameter.cpp" />
     <ClCompile Include="src\EntityParameterizedDataCategorization.cpp" />
     <ClCompile Include="src\EntityMetadataCampaign.cpp" />
+    <ClCompile Include="src\EntityResultText.cpp" />
+    <ClCompile Include="src\EntityResultTextData.cpp" />
     <ClCompile Include="src\EntityResultUnstructuredMesh.cpp" />
     <ClCompile Include="src\EntityResultUnstructuredMeshData.cpp" />
     <ClCompile Include="src\EntitySolverCircuitSimulator.cpp" />
@@ -184,8 +186,6 @@
     <ClCompile Include="src\EntityResult1DCurveData.cpp" />
     <ClCompile Include="src\EntityResult3D.cpp" />
     <ClCompile Include="src\EntityResult3DData.cpp" />
-    <ClCompile Include="src\EntityResultText.cpp" />
-    <ClCompile Include="src\EntityResultTextData.cpp" />
     <ClCompile Include="src\EntitySignalType.cpp" />
     <ClCompile Include="src\EntitySolver.cpp" />
     <ClCompile Include="src\EntitySolverFITTD.cpp" />

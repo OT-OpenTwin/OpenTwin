@@ -111,9 +111,6 @@
     <ClCompile Include="src\DevLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\FileHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\SelectEntitiesDialog.cpp">
       <Filter>Source Files\CustomWidgets</Filter>
     </ClCompile>
@@ -182,9 +179,6 @@
     <ClInclude Include="$(BASE64_ROOT)\base64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\FileHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\NavigationTreeView.h">
       <Filter>Header Files\WidgetView</Filter>
     </ClInclude>
@@ -196,6 +190,9 @@
     </ClInclude>
     <ClInclude Include="include\LoginData.h">
       <Filter>Header Files\LogIn</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Notifier.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -62,6 +62,7 @@ namespace ot {
 		void detach(void);
 
 		void setCurveTitle(const QString& _title);
+		const QString& getCurveTitle(void) const { return m_curveTitle; };
 
 		void setDimmed(bool _isDimmed, bool _repaint = true);
 
@@ -78,6 +79,8 @@ namespace ot {
 		// ###########################################################################
 
 		// Getter
+
+		bool getCurveIsVisible(void) const { return m_isVisible; };
 
 		int id(void) const { return m_id; }
 
@@ -99,11 +102,11 @@ namespace ot {
 		std::string getAxisTitleX(void) { return m_axisTitleX; }
 		std::string getAxisTitleY(void) { return m_axisTitleY; }
 
+		void updateVisualization(void);
+
 	private:
 
 		void memFree(void);
-
-		void repaint(void);
 
 		friend class Plot;
 

@@ -334,6 +334,7 @@
     <ClCompile Include="src\ClassFactoryModel.cpp" />
     <ClCompile Include="src\CrossCollectionDatabaseWrapper.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\FileHandler.cpp" />
     <ClCompile Include="src\GeometryOperations.cpp" />
     <ClCompile Include="src\MicroserviceAPI.cpp" />
     <ClCompile Include="src\MicroserviceNotifier.cpp" />
@@ -341,6 +342,7 @@
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\ProgressReport.cpp" />
     <ClCompile Include="src\ProjectTypeManager.cpp" />
+    <ClCompile Include="src\QueuingDatabaseWritingRAII.cpp" />
     <ClCompile Include="src\SelectionHandler.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -349,13 +351,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\TableReader.cpp" />
+    <ClCompile Include="src\UIControlsHandler.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
+    <ClCompile Include="src\ViewVisualisationHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\ActionHandler.h" />
     <ClInclude Include="include\CheckGeometry.h" />
     <ClInclude Include="include\ClassFactoryModel.h" />
     <ClInclude Include="include\CrossCollectionDatabaseWrapper.h" />
+    <ClInclude Include="include\FileHandler.h" />
     <ClInclude Include="include\GeometryOperations.h" />
     <ClInclude Include="include\MicroserviceAPI.h" />
     <ClInclude Include="include\Model.h" />
@@ -363,12 +369,15 @@
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\ProgressReport.h" />
     <ClInclude Include="include\ProjectTypeManager.h" />
+    <ClInclude Include="include\QueuingDatabaseWritingRAII.h" />
     <ClInclude Include="include\QueuingHttpRequestsRAII.h" />
     <ClInclude Include="include\SelectionHandler.h" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\TableReader.h" />
     <ClInclude Include="include\TriangleBoxOverlapTest.h" />
+    <ClInclude Include="include\UIControlsHandler.h" />
     <ClInclude Include="include\UiNotifier.h" />
+    <ClInclude Include="include\ViewVisualisationHandler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

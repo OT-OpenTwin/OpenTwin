@@ -33,7 +33,6 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
-    <ClCompile Include="src\FileHandler.cpp" />
     <ClCompile Include="src\LoginData.cpp" />
     <ClCompile Include="src\LogInDialog.cpp" />
     <ClCompile Include="src\LogInGSSEditDialog.cpp" />
@@ -72,13 +71,13 @@
     <QtMoc Include="include\ManageAccess.h" />
     <QtMoc Include="include\ManageOwner.h" />
     <QtMoc Include="include\DevLogger.h" />
-    <ClInclude Include="include\FileHandler.h" />
     <QtMoc Include="include\LogInDialog.h" />
     <ClInclude Include="include\LoginData.h" />
     <QtMoc Include="include\LogInGSSEditDialog.h" />
     <ClInclude Include="include\LogInGSSEntry.h" />
     <ClInclude Include="include\NavigationTreeView.h" />
     <QtMoc Include="include\ProjectOverviewWidget.h" />
+    <ClInclude Include="include\Notifier.h" />
     <ClInclude Include="include\QtMetaTypes.h" />
     <QtMoc Include="include\SelectEntitiesDialog.h" />
     <QtMoc Include="include\RenameProjectDialog.h" />
@@ -182,13 +181,15 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_DEFAULT_SERVICE_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/$(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_GUI_ROOT)/$(OT_INC);$(OT_WIDGETS_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(QWT_LIB_INCD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);$(BOOST_INCD);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_INC);$(QT_ADS_ROOT)\include;$(QT_TT_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_DEFAULT_SERVICE_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/$(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_GUI_ROOT)/$(OT_INC);$(OT_WIDGETS_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(QWT_LIB_INCD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);$(BOOST_INCD);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_INC);$(OT_LTSPICE_CONNECTOR_ROOT)/$(OT_INC);$(QT_ADS_ROOT)\include;$(QT_TT_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <PreprocessorDefinitions>_UNICODE;QT_NO_CAST_TO_ASCII;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/utf-8 </AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(OT_GUI_ROOT)/$(OT_LIBD);$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_UICORE_ROOT)/$(OT_DLLD);$(OT_WIDGETS_ROOT)/$(OT_LIBD);$(OT_VIEWER_ROOT)/$(OT_DLLD);$(QWT_LIB_LIBPATHD);$(OT_UIPLUGINAPI_ROOT)/$(OT_DLLD);$(ZLIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLD);$(OT_RUBBERBAND_ROOT)/$(OT_DLLD);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_DLLD);$(QT_ADS_ROOT)\lib;$(QT_TT_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);uiCore.lib;OTGui.lib;OTWidgets.lib;Viewer.lib;UIPluginAPI.lib;qwtd.lib;zlibd.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;StudioSuiteConnector.lib;qtadvanceddockingd.lib;$(QT_TT_LIBD);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_GUI_ROOT)/$(OT_LIBD);$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_UICORE_ROOT)/$(OT_DLLD);$(OT_WIDGETS_ROOT)/$(OT_LIBD);$(OT_VIEWER_ROOT)/$(OT_DLLD);$(QWT_LIB_LIBPATHD);$(OT_UIPLUGINAPI_ROOT)/$(OT_DLLD);$(ZLIB_LIBPATHD);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLD);$(OT_RUBBERBAND_ROOT)/$(OT_DLLD);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_DLLD);$(OT_LTSPICE_CONNECTOR_ROOT)/$(OT_DLLD);$(QT_ADS_ROOT)\lib;$(QT_TT_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);uiCore.lib;OTGui.lib;OTWidgets.lib;Viewer.lib;UIPluginAPI.lib;qwtd.lib;zlibd.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;StudioSuiteConnector.lib;LTSpiceConnector.lib;qtadvanceddockingd.lib;$(QT_TT_LIBD);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
@@ -211,13 +212,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_DEFAULT_SERVICE_INCR);$(BOOST_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/$(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_GUI_ROOT)/$(OT_INC);$(OT_WIDGETS_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(QWT_LIB_INCR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_INC);$(QT_ADS_ROOT)\include;$(QT_TT_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_DEFAULT_SERVICE_INCR);$(BOOST_INCD);$(OT_UICORE_ROOT)/$(OT_INC);$(OT_VIEWER_ROOT)/$(OT_INC);$(OT_FOUNDATION_ROOT)/$(OT_INC);$(OT_GUI_ROOT)/$(OT_INC);$(OT_WIDGETS_ROOT)/$(OT_INC);$(OT_UIPLUGINAPI_ROOT)/$(OT_INC);$(QWT_LIB_INCR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_INC);$(OT_RUBBERBAND_ROOT)/$(OT_INC);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_INC);$(OT_LTSPICE_CONNECTOR_ROOT)/$(OT_INC);$(QT_ADS_ROOT)\include;$(QT_TT_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_UICORE_ROOT)/$(OT_DLLR);$(OT_GUI_ROOT)/$(OT_LIBR);$(OT_WIDGETS_ROOT)/$(OT_LIBR);$(OT_VIEWER_ROOT)\$(OT_DLLR);$(QWT_LIB_LIBPATHR);$(OT_UIPLUGINAPI_ROOT)/$(OT_DLLR);$(ZLIB_LIBPATHR);$(OT_RUBBERBAND_ROOT)/$(OT_DLLR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLR);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_DLLR);$(QT_ADS_ROOT)\lib;$(QT_TT_LIBPATHR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);uiCore.lib;OTGui.lib;OTWidgets.lib;Viewer.lib;UIPluginAPI.lib;qwtd.lib;$(Qt_LIBS_);zlib.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;StudioSuiteConnector.lib;qtadvanceddocking.lib;$(QT_TT_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_UICORE_ROOT)/$(OT_DLLR);$(OT_GUI_ROOT)/$(OT_LIBR);$(OT_WIDGETS_ROOT)/$(OT_LIBR);$(OT_VIEWER_ROOT)\$(OT_DLLR);$(QWT_LIB_LIBPATHR);$(OT_UIPLUGINAPI_ROOT)/$(OT_DLLR);$(ZLIB_LIBPATHR);$(OT_RUBBERBAND_ROOT)/$(OT_DLLR);$(OT_RUBBERBANDAPI_ROOT)/$(OT_DLLR);$(OT_STUDIO_SUITE_CONNECTOR_ROOT)/$(OT_DLLR);$(OT_LTSPICE_CONNECTOR_ROOT)/$(OT_DLLR);$(QT_ADS_ROOT)\lib;$(QT_TT_LIBPATHR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);uiCore.lib;OTGui.lib;OTWidgets.lib;Viewer.lib;UIPluginAPI.lib;qwtd.lib;$(Qt_LIBS_);zlib.lib;RubberbandEngineCore.lib;RubberbandEngineOsgWrapper.lib;StudioSuiteConnector.lib;LTSpiceConnector.lib;qtadvanceddocking.lib;$(QT_TT_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>

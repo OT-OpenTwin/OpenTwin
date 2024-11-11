@@ -90,6 +90,8 @@ public:
 
 	virtual void updateVTKEntity(unsigned long long modelEntityID) override;
 
+	virtual void messageModelService(const std::string& _message) override;
+
 	// #####################################################################################################################################
 
 	void setProcessingGroupOfMessages(bool _flag);

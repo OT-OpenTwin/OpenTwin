@@ -1,5 +1,12 @@
 #include "EntityFileText.h"
 #include <locale>
+#include "OTCommunication/ActionTypes.h"
+#include "DataBase.h"
+#include "OTCore/EncodingGuesser.h"
+#include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
+#include "OTCore/EncodingConverter_UTF16ToUTF8.h"
+#include "OTCore/Logger.h"
+
 EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	: EntityFile(_ID,_parent,_obs,_ms,_factory,_owner)
 {
@@ -22,6 +29,24 @@ void EntityFileText::setTextEncoding(ot::TextEncoding::EncodingStandard _encodin
 	}
 }
 
+void EntityFileText::addVisualizationNodes()
+{
+	TreeIcon treeIcons;
+	treeIcons.size = 32;
+	treeIcons.visibleIcon = "TextVisible";
+	treeIcons.hiddenIcon = "TextHidden";
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddText, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
+	
+	treeIcons.addToJsonDoc(doc);
+
+	getObserver()->sendMessageToViewer(doc);
+}
+
 ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding() 
 {
 	EntityPropertiesBase* base = getProperties().getProperty("Text Encoding");
@@ -40,21 +65,48 @@ ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding()
 std::string EntityFileText::getText(void) 
 {
 	const std::vector<char> plainData = getData()->getData();
-	return std::string(plainData.begin(),plainData.end());
+	std::string textFromBinary(plainData.begin(), plainData.end());
+
+	ot::TextEncoding::EncodingStandard encoding = getTextEncoding();
+	if (encoding == ot::TextEncoding::EncodingStandard::UTF8 || encoding == ot::TextEncoding::EncodingStandard::UTF8_BOM)
+	{
+		return textFromBinary;
+	}
+	else if (encoding == ot::TextEncoding::EncodingStandard::ANSI)
+	{
+		ot::EncodingConverter_ISO88591ToUTF8 converter;
+		const std::string textAsUTF8 = converter(textFromBinary);
+		return textAsUTF8;
+	}
+	else if (encoding == ot::TextEncoding::EncodingStandard::UTF16_BEBOM || encoding == ot::TextEncoding::EncodingStandard::UTF16_LEBOM)
+	{
+		ot::EncodingConverter_UTF16ToUTF8 converter;
+		const std::string textAsUTF8 = converter(encoding,textFromBinary);
+		return textAsUTF8;
+	}
+	else
+	{
+		assert(encoding == ot::TextEncoding::EncodingStandard::UNKNOWN);
+		OT_LOG_W("Unable to determine the encoding of text file " + getName() + ".");
+	}
 }
 
 void EntityFileText::setText(const std::string& _text)
 {
 	auto dataEntity = getData();
-	dataEntity->clearData();
-
-	//Ensure correct encoding at this location!
-	dataEntity->setData(_text.data(), _text.size());
-	if (getModelState() != nullptr)
+	if (dataEntity != nullptr)
 	{
-		dataEntity->StoreToDataBase();
-		getModelState()->addNewEntity(dataEntity->getEntityID(), this->getEntityID(), dataEntity->getEntityStorageVersion(), ModelStateEntity::tEntityType::DATA);
-		setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+		dataEntity->clearData();
+		//Ensure correct encoding at this location!
+		dataEntity->setData(_text.data(), _text.size());
+		
+		if (getModelState() != nullptr)
+		{
+			dataEntity->StoreToDataBase();
+			getModelState()->addNewEntity(dataEntity->getEntityID(), this->getEntityID(), dataEntity->getEntityStorageVersion(), ModelStateEntity::tEntityType::DATA);
+			setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+		}
+
 	}
 }
 

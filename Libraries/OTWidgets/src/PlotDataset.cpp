@@ -65,56 +65,56 @@ void ot::PlotDataset::replaceData(double* _dataX, double* _dataY, long _dataSize
 void ot::PlotDataset::setCurveIsVisibile(bool _isVisible, bool _repaint) {
 	m_isVisible = true;
 	if (_repaint) {
-		this->repaint();
+		this->updateVisualization();
 	}
 }
 
 void ot::PlotDataset::setCurveWidth(double _penSize, bool _repaint) {
 	m_curvePenSize = _penSize;
 	if (_repaint) {
-		this->repaint();
+		this->updateVisualization();
 	}
 }
 
 void ot::PlotDataset::setCurveColor(const QColor& _color, bool _repaint) {
 	m_curveColor = _color;
 	if (_repaint) {
-		this->repaint();
+		this->updateVisualization();
 	}
 }
 
 void ot::PlotDataset::setCurvePointsVisible(bool _isVisible, bool _repaint) {
 	m_curvePointsVisible = _isVisible;
 	if (_repaint) {
-		this->repaint();
+		this->updateVisualization();
 	}
 }
 
 void ot::PlotDataset::setCurvePointInnerColor(const QColor& _color, bool _repaint) {
 	m_curvePointInnerColor = _color;
 	if (_repaint) {
-		this->repaint();
+		this->updateVisualization();
 	}
 }
 
 void ot::PlotDataset::setCurvePointOuterColor(const QColor& _color, bool _repaint) {
 	m_curvePointOutterColor = _color;
 	if (_repaint) {
-		this->repaint();
+		this->updateVisualization();
 	}
 }
 
 void ot::PlotDataset::setCurvePointSize(int _size, bool _repaint) {
 	m_curvePointSize = _size;
 	if (_repaint) {
-		this->repaint();
+		this->updateVisualization();
 	}
 }
 
 void ot::PlotDataset::setCurvePointOuterColorWidth(double _size, bool _repaint) {
 	m_curvePointOutterColorWidth = _size;
 	if (_repaint) {
-		this->repaint();
+		this->updateVisualization();
 	}
 }
 
@@ -149,7 +149,7 @@ void ot::PlotDataset::setCurveTitle(const QString& _title) {
 void ot::PlotDataset::setDimmed(bool _isDimmed, bool _repaint) {
 	m_isDimmed = _isDimmed;
 	if (_repaint) {
-		this->repaint();
+		this->updateVisualization();
 	}
 }
 
@@ -278,31 +278,7 @@ bool ot::PlotDataset::getCopyOfYim(double*& _yim, long& _size) {
 	return true;
 }
 
-// ###########################################################################
-
-// Private functions
-
-void ot::PlotDataset::memFree(void) {
-	if (m_dataX) {
-		delete[] m_dataX;
-		m_dataX = nullptr;
-	}
-	if (m_dataY) {
-		delete[] m_dataY;
-		m_dataY = nullptr;
-	}
-	if (m_dataXcalc) {
-		delete[] m_dataXcalc;
-		m_dataXcalc = nullptr;
-	}
-	if (m_dataYcalc) {
-		delete[] m_dataYcalc;
-		m_dataYcalc = nullptr;
-	}
-	m_dataSize = 0;
-}
-
-void ot::PlotDataset::repaint(void) {
+void ot::PlotDataset::updateVisualization(void) {
 
 	m_cartesianCurve->setVisible(m_isVisible);
 	m_polarCurve->setVisible(m_isVisible);
@@ -349,4 +325,28 @@ void ot::PlotDataset::repaint(void) {
 	else {
 		m_cartesianCurve->setSymbol(nullptr);
 	}
+}
+
+// ###########################################################################
+
+// Private functions
+
+void ot::PlotDataset::memFree(void) {
+	if (m_dataX) {
+		delete[] m_dataX;
+		m_dataX = nullptr;
+	}
+	if (m_dataY) {
+		delete[] m_dataY;
+		m_dataY = nullptr;
+	}
+	if (m_dataXcalc) {
+		delete[] m_dataXcalc;
+		m_dataXcalc = nullptr;
+	}
+	if (m_dataYcalc) {
+		delete[] m_dataYcalc;
+		m_dataYcalc = nullptr;
+	}
+	m_dataSize = 0;
 }

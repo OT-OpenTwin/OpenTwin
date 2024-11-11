@@ -203,6 +203,26 @@
 #define OT_ACTION_CMD_UI_SS_SET_LOCAL_FILENAME "StudioSuite.SetLocalFileName"
 #define OT_ACTION_CMD_UI_SS_GET_SIMPLE_FILENAME "StudioSuite.GetSimpleFileName"
 
+#define OT_ACTION_CMD_UI_LTS_IMPORT "LTSpice.Import"
+#define OT_ACTION_CMD_UI_LTS_COMMIT "LTSpice.Commit"
+#define OT_ACTION_CMD_UI_LTS_GET "LTSpice.Get"
+//#define OT_ACTION_CMD_UI_LTS_UPLOAD "LTSpice.Upload"
+//#define OT_ACTION_CMD_UI_LTS_DOWNLOAD "LTSpice.Download"
+//#define OT_ACTION_CMD_UI_LTS_COPY "LTSpice.Copy"
+//#define OT_ACTION_CMD_UI_LTS_INFORMATION "LTSpice.Information"
+//#define OT_ACTION_CMD_UI_LTS_SETCSTFILE "LTSpice.SetCSTFile"
+#define OT_ACTION_CMD_UI_LTS_UPLOAD_NEEDED "LTSpice.UploadNeeded"
+#define OT_ACTION_CMD_UI_LTS_DOWNLOAD_NEEDED "LTSpice.DownloadNeeded"
+//#define OT_ACTION_CMD_UI_LTS_FILES_UPLOADED "LTSpice.FilesUploaded"
+//#define OT_ACTION_CMD_UI_LTS_UNITS "LTSpice.UnitsInformation"
+//#define OT_ACTION_CMD_UI_LTS_MATERIALS "LTSpice.MaterialsInformation"
+//#define OT_ACTION_CMD_UI_LTS_SHAPEINFO "LTSpice.ShapesInformation"
+//#define OT_ACTION_CMD_UI_LTS_TRIANGLES "LTSpice.ShapesTriangles"
+//#define OT_ACTION_CMD_UI_LTS_RESULT1D "LTSpice.Result1D"
+//#define OT_ACTION_CMD_UI_LTS_GET_LOCAL_FILENAME "LTSpice.GetLocalFileName"
+//#define OT_ACTION_CMD_UI_LTS_SET_LOCAL_FILENAME "LTSpice.SetLocalFileName"
+//#define OT_ACTION_CMD_UI_LTS_GET_SIMPLE_FILENAME "LTSpice.GetSimpleFileName"
+
 #define OT_ACTION_CMD_UI_AddPluginSearchPath "UI.Plugin.AddSearchPath"
 #define OT_ACTION_CMD_UI_RequestPlugin "UI.Plugin.RequestConnection"
 #define OT_ACTION_CMD_UI_RequestPluginSuccess "UI.Plugin.RequestConnection.Success"
@@ -287,6 +307,8 @@
 #define OT_ACTION_CMD_UI_TEXTEDITOR_SetModified "UI.TextEditor.SetModified"
 #define OT_ACTION_CMD_UI_TEXTEDITOR_Close "UI.TextEditor.Close"
 #define OT_ACTION_CMD_UI_TEXTEDITOR_CloseAll "UI.TextEditor.CloseAll"
+
+#define OT_ACTION_CMD_UI_RequestTextData "UI.TextEditor.RequestData"
 
 #define OT_ACTION_CMD_UI_TABLE_Setup "UI.Table.Setup"
 #define OT_ACTION_CMD_UI_TABLE_SaveRequest "UI.Table.SaveRequest"
@@ -385,6 +407,7 @@
 #define OT_ACTION_PARAM_FILE_Content_UncompressedDataLength "File.Content.DataLength.Uncompressed"
 #define OT_ACTION_PARAM_FILE_OriginalName "File.OriginalName"
 #define OT_ACTION_PARAM_FILE_LoadContent "File.LoadContent"
+#define OT_ACTION_PARAM_FILE_LoadMultiple "File.LoadMultiple"
 #define OT_ACTION_PARAM_FILE_Type "File.Type"
 #define OT_ACTION_PARAM_SENDER_URL "Sender.URL"
 #define OT_ACTION_PARAM_HOSTNAME "Host.Name"
@@ -422,6 +445,7 @@
 #define OT_ACTION_PARAM_SESSIONTYPE_3DSIM "3D Simulation"
 #define OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE "Data Pipeline"
 #define OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE "CST Studio Suite"
+#define OT_ACTION_PARAM_SESSIONTYPE_LTSPICE "LT Spice"
 
 #define OT_ACTION_PARAM_SITE_ID "Site.ID"
 #define OT_ACTION_PARAM_SESSION_SERVICE_URL "SessionService.URL"
@@ -694,6 +718,7 @@
 #define OT_INFO_SERVICE_TYPE_BlockEditorService "BlockEditorService"
 #define OT_INFO_SERVICE_TYPE_CircuitSimulatorService "CircuitSimulatorService"
 #define OT_INFO_SERVICE_TYPE_STUDIOSUITE "StudioSuiteService"
+#define OT_INFO_SERVICE_TYPE_LTSPICE "LTSpiceService"
 
 #define OT_INFO_MESSAGE_LogIn "UI.LogIn"
 

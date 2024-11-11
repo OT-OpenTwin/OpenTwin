@@ -37,6 +37,7 @@
 #include "OTCore/OwnerManagerTemplate.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTCore/GenericDataStructMatrix.h"
+#include "OTCore/ReturnMessage.h"
 
 #include "OTGui/GuiTypes.h"
 #include "OTGui/GraphicsPackage.h"
@@ -75,6 +76,7 @@
 #include "OTServiceFoundation/ContextMenu.h"
 
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
+#include "LTSpiceConnector/LTSpiceConnectorAPI.h"
 
 // Curl
 #include "curl/curl.h"					// Curl
@@ -282,7 +284,7 @@ std::list<std::string> ExternalServicesComponent::GetAllUserProjects()
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString("", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, 0, doc.GetAllocator());
 	std::string response;
-	if (!ot::msg::send("", authorizationURL, ot::EXECUTE, doc.toJson(), response))
+	if (!ot::msg::send("", authorizationURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		throw std::exception("Could not get the projectlist of the authorization service.");
 	}
@@ -843,6 +845,11 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const ot:
 	else {
 		return false;
 	}
+}
+
+void ExternalServicesComponent::sendToModelService(const std::string& _message, std::string _response)
+{
+	sendHttpRequest(QUEUE, m_modelServiceURL, _message, _response);
 }
 
 bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response)
@@ -2254,28 +2261,6 @@ std::string ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocum
 	return "";
 }
 
-std::string ExternalServicesComponent::handleModelExecuteFunction(ot::JsonDocument& _document) {
-	const std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-
-	ot::UIDList entityIDs = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
-	ot::UIDList entityVersions = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityVersionList);
-
-	if (subsequentFunction == m_fileHandler.GetStoreFileFunctionName())
-	{
-		ot::JsonDocument  reply = m_fileHandler.StoreFileInDataBase(entityIDs, entityVersions);
-		std::string response;
-		sendHttpRequest(QUEUE, m_fileHandler.GetSenderURL(), reply, response);
-		// Check if response is an error or warning
-		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			OT_LOG_EAS(response);
-		}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			OT_LOG_WAS(response);
-		}
-	}
-
-	return "";
-}
 
 std::string ExternalServicesComponent::handleDisplayMessage(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
@@ -2447,94 +2432,116 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
 	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
 	bool loadContent = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadContent);
-
-	QString fileName = QFileDialog::getOpenFileName(
-		nullptr,
-		dialogTitle.c_str(),
-		QDir::currentPath(),
-		QString(fileMask.c_str()) + " ;; All files (*.*)");
-
-	if (fileName != "")
-	{
-		ot::JsonDocument inDoc;
-		inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
-
-		if (loadContent)
-		{
-			std::string fileContent;
-			unsigned long long uncompressedDataLength{ 0 };
-
-			// The file can not be directly accessed from the remote site and we need to send the file content over the communication
-			ReadFileContent(fileName.toStdString(), fileContent, uncompressedDataLength);
-			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, rapidjson::Value(fileContent.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-			inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), inDoc.GetAllocator());
-			// We need to send the file content
-			inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, rapidjson::Value(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
-		}
-		inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-		inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
-
-		std::string response;
-		sendHttpRequest(EXECUTE, senderURL, inDoc, response);
-
-		// Check if response is an error or warning
-		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			assert(0); // ERROR
-		}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
-		}
-	}
-
-	return "";
-}
-
-std::string ExternalServicesComponent::handleStoreFileInDatabase(ot::JsonDocument& _document) {
-	std::string dialogTitle = ot::json::getString(_document, OT_ACTION_PARAM_UI_DIALOG_TITLE);
-	std::string fileMask = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
-	std::string entityType = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Type);
+	bool loadMultiple = false;
 	try
 	{
-		std::list<std::string> absoluteFilePaths = RequestFileNames(dialogTitle, fileMask);
-
-		if (absoluteFilePaths.size() != 0)
+		if (_document.HasMember(OT_ACTION_PARAM_FILE_LoadContent))
 		{
-			ot::JsonDocument sendingDoc;
+			loadMultiple = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadMultiple);
+		}
 
-			int requiredIdentifierPairsPerFile = 2;
-			const int numberOfUIDs = static_cast<int>(absoluteFilePaths.size()) * requiredIdentifierPairsPerFile;
+		if (loadMultiple)
+		{
+			QStringList fileNames = QFileDialog::getOpenFileNames(
+				nullptr,
+				dialogTitle.c_str(),
+				QDir::currentPath(),
+				QString(fileMask.c_str()) + " ;; All files (*.*)");
 
-			sendingDoc.AddMember(OT_ACTION_PARAM_MODEL_ENTITY_IDENTIFIER_AMOUNT, numberOfUIDs, sendingDoc.GetAllocator());
-			const std::string url = uiServiceURL();
-			sendingDoc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(url, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
-			sendingDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(m_fileHandler.GetStoreFileFunctionName(), sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
-			sendingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, sendingDoc.GetAllocator()), sendingDoc.GetAllocator());
+			if (!fileNames.isEmpty())
+			{
+				ot::JsonDocument inDoc;
+				inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
+				inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
 
-			std::string response;
-			sendHttpRequest(QUEUE, m_modelServiceURL, sendingDoc, response);
-			// Check if response is an error or warning
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				assert(0); // ERROR
+				ot::JsonArray fileNamesJson, fileContents, fileModes, uncompressedDataLengths;
+				for (QString& fileName : fileNames)
+				{
+					std::string localEncodingString = fileName.toLocal8Bit().constData();
+					const std::string utf8String = fileName.toStdString();
+
+					ot::JsonString fileNameJson(utf8String, inDoc.GetAllocator());
+					fileNamesJson.PushBack(fileNameJson, inDoc.GetAllocator());
+					if (loadContent)
+					{
+						std::string fileContent;
+						uint64_t uncompressedDataLength{ 0 };
+						// The file can not be directly accessed from the remote site and we need to send the file content over the communication
+						ReadFileContent(localEncodingString, fileContent, uncompressedDataLength);
+						fileContents.PushBack(ot::JsonString(fileContent, inDoc.GetAllocator()), inDoc.GetAllocator());
+						uncompressedDataLengths.PushBack(static_cast<int64_t>(uncompressedDataLength), inDoc.GetAllocator());
+						fileModes.PushBack(ot::JsonString(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+					}
+				}
+				inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, fileNamesJson, inDoc.GetAllocator());
+				if (loadContent)
+				{
+					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, fileContents, inDoc.GetAllocator());
+					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLengths, inDoc.GetAllocator());
+					inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, fileModes, inDoc.GetAllocator());
+				}
+
+
+				std::string response;
+				sendHttpRequest(EXECUTE, senderURL, inDoc, response);
+
+				// Check if response is an error or warning
+				OT_ACTION_IF_RESPONSE_ERROR(response) {
+					assert(0); // ERROR
+				}
+				else OT_ACTION_IF_RESPONSE_WARNING(response) {
+					assert(0); // WARNING
+				}
 			}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			assert(0); // WARNING
 		}
+		else
+		{
 
-		std::list<std::string> takenNames = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_TAKEN_NAMES);
-		std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SENDER);
-		std::string entityPath = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
-		std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-		std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
-		m_fileHandler.SetNewFileImportRequest(std::move(senderURL), std::move(subsequentFunction), std::move(senderName), std::move(takenNames), std::move(absoluteFilePaths), std::move(entityPath), entityType);
+			QString fileName = QFileDialog::getOpenFileName(
+				nullptr,
+				dialogTitle.c_str(),
+				QDir::currentPath(),
+				QString(fileMask.c_str()) + " ;; All files (*.*)");
+
+			if (fileName != "")
+			{
+				ot::JsonDocument inDoc;
+				inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
+
+				if (loadContent)
+				{
+					std::string fileContent;
+					unsigned long long uncompressedDataLength{ 0 };
+
+					// The file can not be directly accessed from the remote site and we need to send the file content over the communication
+					ReadFileContent(fileName.toStdString(), fileContent, uncompressedDataLength);
+					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, rapidjson::Value(fileContent.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), inDoc.GetAllocator());
+					// We need to send the file content
+					inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, rapidjson::Value(OT_ACTION_VALUE_FILE_Mode_Content, inDoc.GetAllocator()), inDoc.GetAllocator());
+				}
+				inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+				inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, rapidjson::Value(fileName.toStdString().c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
+
+				std::string response;
+				sendHttpRequest(EXECUTE, senderURL, inDoc, response);
+
+				// Check if response is an error or warning
+				OT_ACTION_IF_RESPONSE_ERROR(response) {
+					assert(0); // ERROR
+				}
+				else OT_ACTION_IF_RESPONSE_WARNING(response) {
+					assert(0); // WARNING
+				}
+			}
 		}
+		return ot::ReturnMessage().toJson();
 	}
-	catch (std::exception& e)
+	catch (std::exception& _e)
 	{
-		OT_LOG_E(e.what());
-		AppBase::instance()->appendInfoMessage("Failed to load file due to: " + QString(e.what()));
+		 //ToDo: Display here
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, _e.what()).toJson();
 	}
-
-	return "";
 }
 
 std::string ExternalServicesComponent::handleSaveFileContent(ot::JsonDocument& _document) {
@@ -3084,6 +3091,17 @@ std::string ExternalServicesComponent::handleAddContainerNode(ot::JsonDocument& 
 	return "";
 }
 
+std::string ExternalServicesComponent::handleAddTextNode(ot::JsonDocument& _document)
+{
+	ot::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+	std::string treeName = ot::json::getString(_document, OT_ACTION_PARAM_UI_TREE_Name);
+	ot::UID modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
+	ViewerAPI::addVisualizationNodeText(visModelID, treeName, modelEntityID, treeIcons, editable);
+	return "";
+}
+
 std::string ExternalServicesComponent::handleAddVis2D3DNode(ot::JsonDocument& _document) {
 	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 	std::string treeName = ot::json::getString(_document, OT_ACTION_PARAM_UI_TREE_Name);
@@ -3375,24 +3393,6 @@ std::string ExternalServicesComponent::handleAddMeshItemFromFacetDatabase(ot::Js
 
 	ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(visModelID, name, uid, treeIcons, isHidden, projectName, entityID, entityVersion, tetEdgesID, tetEdgesVersion);
 	
-	return "";
-}
-
-std::string ExternalServicesComponent::handleAddText(ot::JsonDocument& _document) {
-	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-	ak::UID uid = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-	bool isEditable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-
-	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
-	ak::UID textID = _document[OT_ACTION_PARAM_TEXT_ID].GetUint64();
-	ak::UID textVersion = _document[OT_ACTION_PARAM_TEXT_VERSION].GetUint64();
-
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
-
-	ViewerAPI::addVisualizationTextNode(visModelID, name, uid, treeIcons, isHidden, projectName, textID, textVersion);
-
 	return "";
 }
 
@@ -4299,6 +4299,48 @@ std::string ExternalServicesComponent::handleStudioSuiteSetCSTFile(ot::JsonDocum
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
 	return StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
 }
+
+// LTSpice API
+
+std::string ExternalServicesComponent::handleLTSpiceImport(ot::JsonDocument& _document) {
+	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
+	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
+}
+
+std::string ExternalServicesComponent::handleLTSpiceCommit(ot::JsonDocument& _document) {
+	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
+	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
+}
+
+std::string ExternalServicesComponent::handleLTSpiceGet(ot::JsonDocument& _document) {
+	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
+	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
+}
+
+//std::string ExternalServicesComponent::handleLTSpiceUpload(ot::JsonDocument& _document) {
+//	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
+//	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
+//}
+//
+//std::string ExternalServicesComponent::handleLTSpiceDownload(ot::JsonDocument& _document) {
+//	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
+//	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
+//}
+//
+//std::string ExternalServicesComponent::handleLTSpiceCopy(ot::JsonDocument& _document) {
+//	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
+//	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
+//}
+//
+//std::string ExternalServicesComponent::handleLTSpiceInformation(ot::JsonDocument& _document) {
+//	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
+//	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
+//}
+//
+//std::string ExternalServicesComponent::handleLTSpiceSetCSTFile(ot::JsonDocument& _document) {
+//	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
+//	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
+//}
 
 // Dialogs
 

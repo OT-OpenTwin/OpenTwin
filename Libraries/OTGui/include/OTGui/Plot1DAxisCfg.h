@@ -22,6 +22,9 @@ namespace ot {
 
 		Plot1DAxisCfg& operator = (const Plot1DAxisCfg& _other);
 
+		bool operator==(const Plot1DAxisCfg& _other) const;
+		bool operator!=(const Plot1DAxisCfg& _other) const;
+
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
 		//! \param _allocator Allocator.

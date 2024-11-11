@@ -2343,6 +2343,7 @@ void AppBase::slotCreateProject(void) {
 		{OT_ACTION_PARAM_SESSIONTYPE_3DSIM, "ProjectTemplates/3D.png"},
 		{OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE, "ProjectTemplates/Pipeline.png"},
 		{OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, "ProjectTemplates/CST.png"},
+		{OT_ACTION_PARAM_SESSIONTYPE_LTSPICE, "ProjectTemplates/LTSpice.png"},
 		{OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT, "ProjectTemplates/Development.png"}
 		}));
 
@@ -2350,6 +2351,7 @@ void AppBase::slotCreateProject(void) {
 		{OT_ACTION_PARAM_SESSIONTYPE_3DSIM, "ProjectTemplates/Custom3D.png"},
 		{OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE, "ProjectTemplates/CustomPipeline.png"},
 		{OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, "ProjectTemplates/CustomCST.png"},
+		{OT_ACTION_PARAM_SESSIONTYPE_LTSPICE, "ProjectTemplates/CustomLTSpice.png"},
 		{OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT, "ProjectTemplates/CustomDevelopment.png"}
 		}));
 

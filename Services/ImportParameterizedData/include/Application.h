@@ -14,7 +14,7 @@
 
 // C++ header
 #include <string>
-#include "DataSourceHandler.h"
+
 #include "TableHandler.h"
 #include "DataCategorizationHandler.h"
 #include "TabledataToResultdataHandler.h"
@@ -122,7 +122,6 @@ private:
 	Application();
 	virtual ~Application();
 	
-	ot::MenuButtonDescription _buttonImportCSV;
 	ot::MenuButtonDescription _buttonImportPythonScript;
 	ot::MenuButtonDescription _buttonImportTouchstone;
 	ot::MenuButtonDescription _buttonCreateTable;
@@ -159,7 +158,6 @@ private:
 
 	ot::UID _visualizationModel = -1;
 	   
-	DataSourceHandler * _dataSourceHandler = nullptr;
 	TableHandler* _tableHandler = nullptr;
 	DataCategorizationHandler* _parametrizedDataHandler = nullptr;
 	TabledataToResultdataHandler* _tabledataToResultdataHandler = nullptr;

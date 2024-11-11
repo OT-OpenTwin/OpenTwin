@@ -46,7 +46,8 @@
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Notifier.cpp" />
     <ClCompile Include="src\Plot.cpp" />
-    <ClCompile Include="src\PlotView.cpp" />
+    <ClCompile Include="src\PlotManager.cpp" />
+    <ClCompile Include="src\PlotViewOld.cpp" />
     <ClCompile Include="src\polarPlot.cpp" />
     <ClCompile Include="src\Rubberband.cpp" />
     <ClCompile Include="src\SceneNodeAnnotation.cpp" />
@@ -58,8 +59,8 @@
     <ClCompile Include="src\SceneNodeMaterialFactory.cpp" />
     <ClCompile Include="src\SceneNodeMesh.cpp" />
     <ClCompile Include="src\SceneNodeMeshItem.cpp" />
-    <ClCompile Include="src\SceneNodePlot1DItem.cpp" />
-    <ClCompile Include="src\SceneNodeResult1DItem.cpp" />
+    <ClCompile Include="src\SceneNodePlot1D.cpp" />
+    <ClCompile Include="src\SceneNodePlot1DCurve.cpp" />
     <ClCompile Include="src\SceneNodeTableItem.cpp" />
     <ClCompile Include="src\SceneNodeTextItem.cpp" />
     <ClCompile Include="src\SceneNodeVTK.cpp" />
@@ -74,6 +75,7 @@
     <ClCompile Include="src\TableViewer.cpp" />
     <ClCompile Include="src\TableViewerView.cpp" />
     <ClCompile Include="src\TextureMapManager.cpp" />
+    <ClCompile Include="src\TextVisualiser.cpp" />
     <ClCompile Include="src\TransformManipulator.cpp" />
     <ClCompile Include="src\Viewer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
@@ -102,6 +104,7 @@
     <ClInclude Include="include\HandlerBase.h" />
     <ClInclude Include="include\HandlerIntersector.h" />
     <ClInclude Include="include\HandleWheel.h" />
+    <ClInclude Include="include\IVisualiser.h" />
     <ClInclude Include="include\LineIntersector.h" />
     <ClInclude Include="include\ManipulatorBase.h" />
     <ClInclude Include="include\MaterialMetal.h" />
@@ -112,7 +115,8 @@
     <ClInclude Include="include\Model.h" />
     <ClInclude Include="include\Notifier.h" />
     <ClInclude Include="include\Plot.h" />
-    <ClInclude Include="include\PlotView.h" />
+    <ClInclude Include="include\PlotManager.h" />
+    <ClInclude Include="include\PlotViewOld.h" />
     <ClInclude Include="include\polarPlot.h" />
     <ClInclude Include="include\Rubberband.h" />
     <ClInclude Include="include\SceneNodeAnnotation.h" />
@@ -125,8 +129,8 @@
     <ClInclude Include="include\SceneNodeMaterialFactory.h" />
     <ClInclude Include="include\SceneNodeMesh.h" />
     <ClInclude Include="include\SceneNodeMeshItem.h" />
-    <ClInclude Include="include\SceneNodePlot1DItem.h" />
-    <ClInclude Include="include\SceneNodeResult1DItem.h" />
+    <ClInclude Include="include\SceneNodePlot1D.h" />
+    <ClInclude Include="include\SceneNodePlot1DCurve.h" />
     <ClInclude Include="include\SceneNodeTableItem.h" />
     <ClInclude Include="include\SceneNodeTextItem.h" />
     <ClInclude Include="include\SceneNodeVTK.h" />
@@ -135,6 +139,7 @@
     <ClInclude Include="include\TableViewer.h" />
     <ClInclude Include="include\TableViewerView.h" />
     <ClInclude Include="include\TextureMapManager.h" />
+    <ClInclude Include="include\TextVisualiser.h" />
     <ClInclude Include="include\TransformManipulator.h" />
     <ClInclude Include="include\ViewerSettings.h" />
     <ClInclude Include="include\ViewerView.h" />

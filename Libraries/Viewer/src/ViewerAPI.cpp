@@ -5,7 +5,7 @@
 #include "ViewerView.h"
 #include "Notifier.h"
 #include "DataBase.h"
-#include "PlotView.h"
+#include "PlotViewOld.h"
 #include "Rubberband.h"
 #include "EntityParameterizedDataTable.h"
 #include "EntityTableSelectedRanges.h"
@@ -224,6 +224,20 @@ void ViewerAPI::addVisualizationContainerNode(ot::UID osgModelID, const std::str
 		Model *model = osgModelManager.at(osgModelID);
 
 		model->addVisualizationContainerNode(treeName, modelEntityID, treeIcons, editable);
+	}
+	catch (std::out_of_range)
+	{
+		throw std::exception("The specified model does not exist");
+	}
+}
+
+void ViewerAPI::addVisualizationNodeText(ot::UID osgModelID, const std::string& treeName, unsigned long long modelEntityID, const TreeIcon& treeIcons, bool editable)
+{
+	try
+	{
+		Model* model = osgModelManager.at(osgModelID);
+
+		model->addSceneNodeText(treeName, modelEntityID, treeIcons, editable);
 	}
 	catch (std::out_of_range)
 	{

@@ -31,6 +31,7 @@ private:
 	void initializeProjectType3DSimulation(void);
 	void initializeProjectTypeDataPipeline(void);
 	void initializeProjectTypeStudioSuite(void);
+	void initializeProjectTypeLTSpice(void);
 
 	bool _hasGeometryRoot				= true;
 	bool _hasMaterialRoot				= true;

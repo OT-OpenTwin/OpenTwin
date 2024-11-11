@@ -24,6 +24,7 @@ public:
 	ot::ContentChangedHandling getContentChangedHandling() override;
 
 	void setContentChangedHandling(ot::ContentChangedHandling _contentChangedHandling);
+	virtual void addVisualizationNodes() override;
 
 protected:
 	void setSpecializedProperties() override;

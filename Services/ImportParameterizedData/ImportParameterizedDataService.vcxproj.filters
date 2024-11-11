@@ -13,9 +13,6 @@
     <ClCompile Include="src\UiNotifier.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\DataSourceHandler.cpp">
-      <Filter>src\DataSources</Filter>
-    </ClCompile>
     <ClCompile Include="src\TableHandler.cpp">
       <Filter>src\Table</Filter>
     </ClCompile>
@@ -89,9 +86,6 @@
     </ClInclude>
     <ClInclude Include="include\UiNotifier.h">
       <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DataSourceHandler.h">
-      <Filter>include\DataSources</Filter>
     </ClInclude>
     <ClInclude Include="include\TableHandler.h">
       <Filter>include\TableHandler</Filter>

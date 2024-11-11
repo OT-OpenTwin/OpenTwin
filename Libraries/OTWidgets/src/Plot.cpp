@@ -96,18 +96,15 @@ ot::PlotDataset * ot::Plot::addDataset(
 	return new PlotDataset(this, ++m_currentDatasetId, _title, _dataX, _dataY, _dataSize);
 }
 
-void ot::Plot::setFromConfig(const Plot1DCfg& _config) {
+void ot::Plot::setFromDataBaseConfig(const Plot1DDataBaseCfg& _config) {
 	// Detach all current data and refresh the title
 	this->clear(false);
 
-	m_cartesianPlot->setTitle(_config.getTitle().c_str());
-	m_polarPlot->setTitle(_config.getTitle().c_str());
-
-	this->setPlotType(_config.getPlotType());
+	m_config = _config;
 
 	// Check cache
-	std::list<Plot1DCurveCfg> entitiesToImport;
-	for (const Plot1DCurveCfg& curveInfo : _config.getCurves()) {
+	std::list<Plot1DCurveInfoCfg> entitiesToImport;
+	for (const Plot1DCurveInfoCfg& curveInfo : _config.getCurves()) {
 		// Check for entity ID
 		auto itm = m_cache.find(curveInfo.getId());
 		if (itm != m_cache.end()) {
@@ -128,89 +125,8 @@ void ot::Plot::setFromConfig(const Plot1DCfg& _config) {
 
 	// Import remaining entities
 	this->importData(_config.getProjectName(), entitiesToImport);
-	
-	// Ensure that the axis titles are compatible
-	bool compatible = true;
 
-	std::string axisTitleX;
-	std::string axisTitleY;
-
-	if (!m_cache.empty())
-	{
-		axisTitleX = m_cache.begin()->second.second->getAxisTitleX();
-		axisTitleY = m_cache.begin()->second.second->getAxisTitleY();	
-
-		for (auto itm : m_cache) {
-			if (axisTitleX != m_cache.begin()->second.second->getAxisTitleX()) compatible = false;
-			if (axisTitleY != m_cache.begin()->second.second->getAxisTitleY()) compatible = false;
-			if (!compatible) break;
-		}
-	}
-
-	if (!compatible)
-	{
-		setIncompatibleData();
-		return;
-	}
-
-	this->setAxisQuantity(_config.getAxisQuantity());
-	
-	// Setup plot XY
-	m_cartesianPlot->setPlotGridVisible(_config.getGridVisible(), false);
-	m_cartesianPlot->setPlotGridColor(_config.getGridColor(), false);
-	m_cartesianPlot->setPlotGridLineWidth(0.5, true);
-
-	m_cartesianPlot->setPlotLegendVisible(_config.getLegendVisible());
-
-	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX.c_str());
-	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY.c_str());
-
-	// Setup axis
-	m_cartesianPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, _config.getXAxisIsAutoScale());
-	m_cartesianPlot->setPlotAxisAutoScale(AbstractPlotAxis::yLeft, _config.getYAxisIsAutoScale());
-
-	m_cartesianPlot->setPlotAxisLogScale(AbstractPlotAxis::xBottom, _config.getXAxisIsLogScale());
-	m_cartesianPlot->setPlotAxisLogScale(AbstractPlotAxis::yLeft, _config.getYAxisIsLogScale());
-
-	m_cartesianPlot->setPlotAxisMax(AbstractPlotAxis::xBottom, _config.getXAxisMax());
-	m_cartesianPlot->setPlotAxisMin(AbstractPlotAxis::xBottom, _config.getXAxisMin());
-
-	m_cartesianPlot->setPlotAxisMax(AbstractPlotAxis::yLeft, _config.getYAxisMax());
-	m_cartesianPlot->setPlotAxisMin(AbstractPlotAxis::yLeft, _config.getYAxisMin());
-
-	m_cartesianPlot->updateGrid();
-	m_cartesianPlot->updateLegend();
-
-	m_cartesianPlot->updateWholePlot();
-
-	// Setup plot XY
-	m_polarPlot->setPlotGridVisible(_config.getGridVisible(), false);
-	m_polarPlot->setPlotGridColor(_config.getGridColor(), false);
-	m_polarPlot->setPlotGridLineWidth(0.5, true);
-
-	m_polarPlot->setPlotLegendVisible(_config.getLegendVisible());
-
-	m_polarPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX.c_str());
-	m_polarPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY.c_str());
-
-	// Setup axis
-	m_polarPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, _config.getXAxisIsAutoScale());
-	m_polarPlot->setPlotAxisAutoScale(AbstractPlotAxis::yLeft, _config.getYAxisIsAutoScale());
-
-	m_polarPlot->setPlotAxisLogScale(AbstractPlotAxis::xBottom, _config.getXAxisIsLogScale());
-	m_polarPlot->setPlotAxisLogScale(AbstractPlotAxis::yLeft, _config.getYAxisIsLogScale());
-
-	m_polarPlot->setPlotAxisMax(AbstractPlotAxis::xBottom, _config.getXAxisMax());
-	m_polarPlot->setPlotAxisMin(AbstractPlotAxis::xBottom, _config.getXAxisMin());
-
-	m_polarPlot->setPlotAxisMax(AbstractPlotAxis::yLeft, _config.getYAxisMax());
-	m_polarPlot->setPlotAxisMin(AbstractPlotAxis::yLeft, _config.getYAxisMin());
-
-	m_polarPlot->updateGrid();
-	m_polarPlot->updateLegend();
-
-	m_polarPlot->updateWholePlot();
-
+	this->applyConfig();
 }
 
 void ot::Plot::resetView(void) {
@@ -263,7 +179,7 @@ void ot::Plot::setIncompatibleData(void) {
 }
 
 void ot::Plot::refresh(void) {
-
+	this->applyConfig();
 }
 
 void ot::Plot::clear(bool _clearCache) {
@@ -357,223 +273,135 @@ ot::PlotDataset* ot::Plot::findDataset(QwtPolarCurve * _curve) {
 	return nullptr;
 }
 
+ot::PlotDataset* ot::Plot::findDataset(UID _entityID) {
+	auto it = m_cache.find(_entityID);
+	if (it == m_cache.end()) {
+		return nullptr;
+	}
+	else {
+		return it->second.second;
+	}
+}
+
 void ot::Plot::setAxisQuantity(Plot1DCfg::AxisQuantity _quantity) {
 	for (auto itm : m_cache) {
 		itm.second.second->calculateData(_quantity);
 	}
 }
 
-// ###########################################################################################################################################################################################################################################################################################################################
+bool ot::Plot::hasCachedEntity(UID _entityID) const {
+	return m_cache.find(_entityID) != m_cache.end();
+}
 
-// Private functions
-/*
-void ot::Plot::importData(const std::string & _projectName, const std::list<Plot1DCurveCfg>& _entitiesToImport) {
-	if (_entitiesToImport.empty()) return;
-
-	std::list<std::pair<unsigned long long, unsigned long long>> prefetchCurves;
-	for (auto item : _entitiesToImport)
-	{
-		prefetchCurves.push_back(std::pair<unsigned long long, unsigned long long>(item.getModelEntityID(), item.getModelEntityVersion()));
+bool ot::Plot::changeCachedDatasetEntityVersion(UID _entityID, UID _newEntityVersion) {
+	auto it = m_cache.find(_entityID);
+	if (it == m_cache.end()) {
+		return false;
 	}
 
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchCurves);
-
-	std::list<std::pair<unsigned long long, unsigned long long>> prefetchCurveData;
-	std::list< PlotDataset *> curves;
-
-	for (auto item : _entitiesToImport)
-	{
-		unsigned long long entityID = item.getModelEntityID();
-		unsigned long long entityVersion = item.getModelEntityVersion();
-
-		EntityHandler handler;
-		EntityBase* baseEntity = handler.readEntityFromEntityIDandVersion(entityID, entityVersion);
-		std::unique_ptr<EntityResult1DCurve> curve(dynamic_cast<EntityResult1DCurve*>(baseEntity));
-
-		// Read the curve data item
-		unsigned long long curveDataStorageId = curve->getCurveDataStorageId();
-		unsigned long long curveDataStorageVersion = curve->getCurveDataStorageVersion();
-		baseEntity = handler.readEntityFromEntityIDandVersion(curveDataStorageId, curveDataStorageVersion);
-		std::unique_ptr<EntityResult1DCurveData> curveData(dynamic_cast<EntityResult1DCurveData*>(baseEntity));
-		std::string curveLabel = item.getName();
-
-		ot::Color colour = curve->getColor();
-		
-		std::string xAxisLabel = curve->getAxisLabelX();
-		std::string yAxisLabel = curve->getAxisLabelY();
-
-		std::string xAxisUnit = curve->getUnitX();
-		std::string yAxisUnit = curve->getUnitY();
-
-		std::string axisTitleX = xAxisLabel + " [" + xAxisUnit + "]";
-		std::string axisTitleY = yAxisLabel + " [" + yAxisUnit + "]";
-
-		PlotDataset * newDataset = addDataset(curveLabel.c_str(), nullptr, nullptr, 0);
-
-		newDataset->setEntityID(entityID);
-		newDataset->setEntityVersion(entityVersion);
-		newDataset->setCurveEntityID(curveDataStorageId);
-		newDataset->setCurveEntityVersion(curveDataStorageVersion);
-		newDataset->setTreeItemID(item.getTreeID());
-		newDataset->setDimmed(item.isDimmed(), false);
-
-		newDataset->setCurvePointsVisible(false, false);
-		
-		newDataset->setCurveColor(QColor(colour.r(), colour.g(), colour.b()), false);
-		newDataset->setCurveTitle(curveLabel.c_str());
-		newDataset->setAxisTitleX(axisTitleX);
-		newDataset->setAxisTitleY(axisTitleY);
-
-		newDataset->repaint();
-
-		// Check whether we already have the curve data
-
-		bool loadCurveDataRequired = true;
-
-		if (m_cache.count(newDataset->getEntityID()) > 0)
-		{
-			PlotDataset * oldDataset = m_cache[newDataset->getEntityID()].second;
-
-			if (oldDataset != nullptr)
-			{
-				if (oldDataset->getCurveEntityID() == newDataset->getCurveEntityID()
-					&& oldDataset->getCurveEntityVersion() == newDataset->getCurveEntityVersion())
-				{
-					// The curve data in the previous data set is the same as the one in the new data set
-
-					double *x = nullptr, *y = nullptr;
-					long n;
-
-					if (oldDataset->getCopyOfData(x, y, n))
-					{
-						newDataset->replaceData(x, y, n);
-						loadCurveDataRequired = false;
-						newDataset->attach();
-					}
-				}
-
-			}
-		}
-
-		if (loadCurveDataRequired)
-		{
-			prefetchCurveData.push_back(std::pair<unsigned long long, unsigned long long>(curveDataStorageId, curveDataStorageVersion));
-
-			curves.push_back(newDataset);
-		}
-
-		removeFromCache(newDataset->getEntityID());
-
-		m_cache.insert_or_assign(newDataset->getEntityID(), std::pair<unsigned long long, PlotDataset *>(newDataset->getEntityVersion(), newDataset));
+	if (it->second.first == _newEntityVersion) {
+		return false;
 	}
-
-	if (prefetchCurveData.empty()) return; // Nothing to load
-
-	// Now load the curve data
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchCurveData);
-
-	for (auto item : curves)
-	{
-		// Here we get the storage data of the underlying curve data
-		unsigned long long entityID = item->getCurveEntityID();
-		unsigned long long entityVersion = item->getCurveEntityVersion();
-
-		auto doc = bsoncxx::builder::basic::document{};
-
-		if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(entityID, entityVersion, doc))
-		{
-			assert(0);
-			return;
-		}
-
-		auto doc_view = doc.view()["Found"].get_document().view();
-
-		std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
-
-		EntityResult1DCurveData curveDataEntName(0, nullptr, nullptr, nullptr, nullptr, "");
-		if (entityType != curveDataEntName.getClassName())
-		{
-			assert(0);
-			return;
-		}
-
-		std::string schemaVersionField = "SchemaVersion_" + curveDataEntName.getClassName();
-		int schemaVersion = (int)DataBase::GetIntFromView(doc_view, schemaVersionField.c_str());
-		if (schemaVersion != 1)
-		{
-			assert(0);
-			return;
-		}
-
-		auto arrayX = doc_view["dataX"].get_array().value;
-		auto arrayYre = doc_view["dataY"].get_array().value;
-		auto arrayYim = doc_view["dataYim"].get_array().value;
-
-		size_t nX = std::distance(arrayX.begin(), arrayX.end());
-		size_t nYre = std::distance(arrayYre.begin(), arrayYre.end());
-		size_t nYim = std::distance(arrayYim.begin(), arrayYim.end());
-
-		double * x = new double[nX];
-		auto iX = arrayX.begin();
-
-		for (unsigned long index = 0; index < nX; index++)
-		{
-			x[index] = iX->get_double();
-			iX++;
-		}
-
-		double *yre = nullptr, *yim = nullptr;
-
-		if (nYre > 0)
-		{
-			yre = new double[nYre];
-
-			auto iYre = arrayYre.begin();
-
-			for (unsigned long index = 0; index < nYre; index++)
-			{
-				yre[index] = iYre->get_double();
-				iYre++;
-			}
-		}
-		else {
-			yre = new double[nX];
-			for (unsigned long index = 0; index < nX; index++)
-			{
-				yre[index] = 0;
-			}
-		}
-
-		// First we set the new data
-		item->replaceData(x, yre, nX);
-
-		if (nYim > 0)
-		{
-			yim = new double[nYim];
-
-			auto iYim = arrayYim.begin();
-
-			for (unsigned long index = 0; index < nYim; index++)
-			{
-				yim[index] = iYim->get_double();
-				iYim++;
-			}
-
-			// Set the imaginary values
-			assert(nX == nYre);
-		}
-		else {
-			yim = new double[nX];
-			for (unsigned long index = 0; index < nX; index++)
-			{
-				yim[index] = 0;
-			}
-		}
-
-		item->setYim(yim);
-
-		// Attatch the curve to the plot
-		item->attach();
+	else {
+		it->second.first = _newEntityVersion;
+		it->second.second->setCurveEntityVersion(_newEntityVersion);
+		return true;
 	}
 }
-*/
+
+std::list<ot::PlotDataset*> ot::Plot::getDatasets(void) const {
+	std::list<PlotDataset*> result;
+
+	for (const auto& it : m_cache) {
+		result.push_back(it.second.second);
+	}
+
+	return result;
+}
+
+void ot::Plot::applyConfig(void) {
+	m_cartesianPlot->setTitle(m_config.getTitle().c_str());
+	m_polarPlot->setTitle(m_config.getTitle().c_str());
+
+	this->setPlotType(m_config.getPlotType());
+
+	// Ensure that the axis titles are compatible
+	bool compatible = true;
+
+	std::string axisTitleX;
+	std::string axisTitleY;
+
+	if (!m_cache.empty()) {
+		axisTitleX = m_cache.begin()->second.second->getAxisTitleX();
+		axisTitleY = m_cache.begin()->second.second->getAxisTitleY();
+
+		for (const auto& itm : m_cache) {
+			if (axisTitleX != m_cache.begin()->second.second->getAxisTitleX()) compatible = false;
+			if (axisTitleY != m_cache.begin()->second.second->getAxisTitleY()) compatible = false;
+			if (!compatible) break;
+		}
+	}
+
+	if (!compatible) {
+		setIncompatibleData();
+		return;
+	}
+
+	this->setAxisQuantity(m_config.getAxisQuantity());
+
+	// Setup plot XY
+	m_cartesianPlot->setPlotGridVisible(m_config.getGridVisible(), false);
+	m_cartesianPlot->setPlotGridColor(m_config.getGridColor(), false);
+	m_cartesianPlot->setPlotGridLineWidth(0.5, true);
+
+	m_cartesianPlot->setPlotLegendVisible(m_config.getLegendVisible());
+
+	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX.c_str());
+	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY.c_str());
+
+	// Setup axis
+	m_cartesianPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsAutoScale());
+	m_cartesianPlot->setPlotAxisAutoScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsAutoScale());
+
+	m_cartesianPlot->setPlotAxisLogScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsLogScale());
+	m_cartesianPlot->setPlotAxisLogScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsLogScale());
+
+	m_cartesianPlot->setPlotAxisMax(AbstractPlotAxis::xBottom, m_config.getXAxisMax());
+	m_cartesianPlot->setPlotAxisMin(AbstractPlotAxis::xBottom, m_config.getXAxisMin());
+
+	m_cartesianPlot->setPlotAxisMax(AbstractPlotAxis::yLeft, m_config.getYAxisMax());
+	m_cartesianPlot->setPlotAxisMin(AbstractPlotAxis::yLeft, m_config.getYAxisMin());
+
+	m_cartesianPlot->updateGrid();
+	m_cartesianPlot->updateLegend();
+
+	m_cartesianPlot->updateWholePlot();
+
+	// Setup plot XY
+	m_polarPlot->setPlotGridVisible(m_config.getGridVisible(), false);
+	m_polarPlot->setPlotGridColor(m_config.getGridColor(), false);
+	m_polarPlot->setPlotGridLineWidth(0.5, true);
+
+	m_polarPlot->setPlotLegendVisible(m_config.getLegendVisible());
+
+	m_polarPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX.c_str());
+	m_polarPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY.c_str());
+
+	// Setup axis
+	m_polarPlot->setPlotAxisAutoScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsAutoScale());
+	m_polarPlot->setPlotAxisAutoScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsAutoScale());
+
+	m_polarPlot->setPlotAxisLogScale(AbstractPlotAxis::xBottom, m_config.getXAxisIsLogScale());
+	m_polarPlot->setPlotAxisLogScale(AbstractPlotAxis::yLeft, m_config.getYAxisIsLogScale());
+
+	m_polarPlot->setPlotAxisMax(AbstractPlotAxis::xBottom, m_config.getXAxisMax());
+	m_polarPlot->setPlotAxisMin(AbstractPlotAxis::xBottom, m_config.getXAxisMin());
+
+	m_polarPlot->setPlotAxisMax(AbstractPlotAxis::yLeft, m_config.getYAxisMax());
+	m_polarPlot->setPlotAxisMin(AbstractPlotAxis::yLeft, m_config.getYAxisMin());
+
+	m_polarPlot->updateGrid();
+	m_polarPlot->updateLegend();
+
+	m_polarPlot->updateWholePlot();
+}

@@ -7,8 +7,8 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
+#include "OTCore/CoreTypes.h"
 #include "OTGui/Plot1DAxisCfg.h"
-#include "OTGui/Plot1DCurveCfg.h"
 #include "OTGui/NavigationTreeItemIcon.h"
 
 // std header
@@ -55,15 +55,15 @@ namespace ot {
 		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		bool operator == (const Plot1DCfg& _other) const;
+		bool operator != (const Plot1DCfg& _other) const;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
 
 		void setUid(UID _uid) { m_uid = _uid; };
 		UID getUid(void) const { return m_uid; };
-
-		void setVisualizationUid(UID _uid) { m_visualizationUid = _uid; };
-		UID getVisualizationUid(void) const { return m_visualizationUid; };
 
 		void setName(const std::string& _name) { m_name = _name; };
 		const std::string& getName(void) const { return m_name; };
@@ -128,14 +128,9 @@ namespace ot {
 		void setYAxisIsAutoScale(bool _autoScaleEnabled) { m_yAxis.setIsAutoScale(_autoScaleEnabled); };
 		bool getYAxisIsAutoScale(void) const { return m_yAxis.getIsAutoScale(); };
 
-		void addCurve(const Plot1DCurveCfg& _curve);
-		void setCurves(const std::list<Plot1DCurveCfg>& _curves) { m_curves = _curves; };
-		const std::list<Plot1DCurveCfg>& getCurves(void) const { return m_curves; };
-
 	private:
 		UID m_uid;
-		UID m_visualizationUid;
-
+		
 		std::string m_name;
 		std::string m_title;
 		std::string m_projectName;
@@ -153,8 +148,6 @@ namespace ot {
 
 		Plot1DAxisCfg m_xAxis;
 		Plot1DAxisCfg m_yAxis;
-
-		std::list<Plot1DCurveCfg> m_curves;
 	};
 
 }
