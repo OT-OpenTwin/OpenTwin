@@ -40,13 +40,10 @@ CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon, QString type, 
 
 	// Create checkboxes
 	my_includeResults = new QCheckBox("Include results");
-	my_includeParametricResults = new QCheckBox("Include parametric results");
 
 	my_includeResults->setChecked(true);
-	my_includeParametricResults->setChecked(true);
 
 	my_layout->addWidget(my_includeResults);
-	my_layout->addWidget(my_includeParametricResults);
 
 	// Create button layout
 	my_widgetButtons = new QWidget;
@@ -55,7 +52,7 @@ CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon, QString type, 
 	my_layoutButtons->addWidget(my_buttonCancel);
 	my_layout->addWidget(my_widgetButtons);
 
-	setWindowTitle(type + "Project");
+	setWindowTitle(type + " Project");
 	setWindowIcon(windowIcon);
 
 	my_input->setMinimumWidth(300);
@@ -66,7 +63,6 @@ CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon, QString type, 
 	connect(my_input, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
 	connect(my_buttonCancel, SIGNAL(clicked()), this, SLOT(slotButtonCancelPressed()));
 	connect(my_buttonConfirm, SIGNAL(clicked()), this, SLOT(slotButtonConfirmPressed()));
-	connect(my_includeResults, SIGNAL(stateChanged(int)), this, SLOT(slotIncludeResultsChecked(int)));
 }
 
 CommitMessageDialog::~CommitMessageDialog() {
@@ -81,14 +77,12 @@ CommitMessageDialog::~CommitMessageDialog() {
 	delete my_widgetInput;
 	
 	delete my_includeResults;
-	delete my_includeParametricResults;
 
 	delete my_layout;
 }
 
 QString CommitMessageDialog::changeMessage(void) { return my_input->text(); }
 bool CommitMessageDialog::includeResults(void) { return my_includeResults->isChecked(); }
-bool CommitMessageDialog::includeParametricResults(void) { return (my_includeResults->isChecked() && my_includeParametricResults->isChecked()); }
 
 void CommitMessageDialog::reset(const QString& _projectToCopy) {
 	my_input->setText(_projectToCopy);
@@ -101,13 +95,6 @@ void CommitMessageDialog::slotButtonConfirmPressed() { my_confirmed = true; Clos
 void CommitMessageDialog::slotButtonCancelPressed() { my_confirmed = false;  close(); }
 
 void CommitMessageDialog::slotReturnPressed() { my_confirmed = true; Close(); }
-
-void CommitMessageDialog::slotIncludeResultsChecked(int state)
-{
-	bool includeResults = my_includeResults->isChecked();
-
-	my_includeParametricResults->setEnabled(includeResults);
-}
 
 void CommitMessageDialog::Close(void) {
 	if (my_input->text().length() == 0) { return; }

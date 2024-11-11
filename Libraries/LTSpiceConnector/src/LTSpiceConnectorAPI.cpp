@@ -14,39 +14,38 @@
 
 std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocument& doc, std::string projectName, QObject *mainObject, const QIcon &windowIcon)
 {
-	if (action == OT_ACTION_CMD_UI_SS_IMPORT) {
+	if (action == OT_ACTION_CMD_UI_LTS_IMPORT) {
 
 		QString fileName = QFileDialog::getOpenFileName(
 			nullptr,
-			"Import CST File",
+			"Import LTSpice File",
 			QDir::currentPath(),
-			QString("*.cst ;; All files (*.*)"));
+			QString("*.asc ;; All files (*.*)"));
 
 		if (fileName == "") return "";
 
-		CommitMessageDialog commitMessageDialog(windowIcon, "Import", "Import CST Studio Suite project");
+		CommitMessageDialog commitMessageDialog(windowIcon, "Import", "Import LTSpice project");
 		commitMessageDialog.exec();
 		if (!commitMessageDialog.wasConfirmed()) return "";
 
 		std::string message = commitMessageDialog.changeMessage().toStdString();
 		bool includeResults = commitMessageDialog.includeResults();
-		bool includeParametricResults = commitMessageDialog.includeParametricResults();
 
 		QMetaObject::invokeMethod(mainObject, "lockGui", Qt::DirectConnection);
 
-		std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
+		std::string ltSpiceServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 
-		LTSpiceConnectorAPI::setStudioServiceData(studioSuiteServiceURL, mainObject);
+		LTSpiceConnectorAPI::setLTSpiceServiceData(ltSpiceServiceURL, mainObject);
 		LTSpiceConnectorAPI::setLocalFileName(fileName.toStdString());
 
-		std::thread workerThread(LTSpiceConnectorAPI::importProject, fileName.toStdString(), projectName, message, includeResults, includeParametricResults);
+		std::thread workerThread(LTSpiceConnectorAPI::importProject, fileName.toStdString(), projectName, message, includeResults);
 		workerThread.detach();
 	}
-	else if (action == OT_ACTION_CMD_UI_SS_COMMIT) {
+	else if (action == OT_ACTION_CMD_UI_LTS_COMMIT) {
 
-		std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
+		std::string ltSpiceServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 
-		std::string fileName = getLTSpiceFileNameForCommit(projectName, studioSuiteServiceURL, mainObject);
+		std::string fileName = getLTSpiceFileNameForCommit(projectName, ltSpiceServiceURL, mainObject);
 		if (fileName.empty())
 		{
 			ak::uiAPI::promptDialog::show("No valid local project file has been defined. Please set the local file location.", "Commit", ak::promptOkIconLeft, "DialogError", "Default");
@@ -58,11 +57,10 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 		if (!commitMessageDialog.wasConfirmed()) return "";
 		std::string changeComment = commitMessageDialog.changeMessage().toStdString();
 		bool includeResults = commitMessageDialog.includeResults();
-		bool includeParametricResults = commitMessageDialog.includeParametricResults();
 
 		QMetaObject::invokeMethod(mainObject, "lockGui", Qt::DirectConnection);
 
-		LTSpiceConnectorAPI::setStudioServiceData(studioSuiteServiceURL, mainObject);
+		LTSpiceConnectorAPI::setLTSpiceServiceData(ltSpiceServiceURL, mainObject);
 
 		// We need to make sure that the project is at the correct version in OT
 		std::string currentVersion = LTSpiceConnectorAPI::getCurrentVersion(fileName, projectName);
@@ -72,19 +70,19 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 
 		QMetaObject::invokeMethod(mainObject, "activateModelVersion", Qt::DirectConnection, Q_ARG(const char*, vsn));
 
-		std::thread workerThread(LTSpiceConnectorAPI::commitProject, fileName, projectName, changeComment, includeResults, includeParametricResults);
+		std::thread workerThread(LTSpiceConnectorAPI::commitProject, fileName, projectName, changeComment, includeResults);
 		workerThread.detach();
 	}
-	else if (action == OT_ACTION_CMD_UI_SS_GET) {
+	else if (action == OT_ACTION_CMD_UI_LTS_GET) {
 
-		std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
+		std::string ltSpiceServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 		std::string version = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
 
 		ak::dialogResult result = ak::uiAPI::promptDialog::show("Getting another project version from the repository will override the local project data.\n"
 			"Do you really want to continue?", "Get", ak::promptYesNoIconLeft, "DialogWarning", "Default");
 		if (result != ak::dialogResult::resultYes) { return ""; }
 
-		std::string fileName = getLTSpiceFileNameForGet(projectName, studioSuiteServiceURL, mainObject);
+		std::string fileName = getLTSpiceFileNameForGet(projectName, ltSpiceServiceURL, mainObject);
 		if (fileName.empty())
 		{
 			ak::uiAPI::promptDialog::show("No valid local project file has been defined. Please set the local file location.", "Commit", ak::promptOkIconLeft, "DialogError", "Default");
@@ -93,12 +91,12 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 
 		QMetaObject::invokeMethod(mainObject, "lockGui", Qt::DirectConnection);
 
-		LTSpiceConnectorAPI::setStudioServiceData(studioSuiteServiceURL, mainObject);
+		LTSpiceConnectorAPI::setLTSpiceServiceData(ltSpiceServiceURL, mainObject);
 
 		std::thread workerThread(LTSpiceConnectorAPI::getProject, fileName, projectName, version);
 		workerThread.detach();
 	}
-	else if (action == OT_ACTION_CMD_UI_SS_UPLOAD) {
+	else if (action == OT_ACTION_CMD_UI_LTS_UPLOAD) {
 
 		std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
 		std::list<ot::UID> entityVersionList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
@@ -108,103 +106,103 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 		std::thread workerThread(LTSpiceConnectorAPI::uploadFiles, entityIDList, entityVersionList, infoEntityID, infoEntityVersion);
 		workerThread.detach();
 	}
-	else if (action == OT_ACTION_CMD_UI_SS_DOWNLOAD) {
+	//else if (action == OT_ACTION_CMD_UI_LTS_DOWNLOAD) {
 
-		std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-		std::list<ot::UID> entityVersionList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-		std::string version = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
+	//	std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	//	std::list<ot::UID> entityVersionList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+	//	std::string version = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
 
-		std::string fileName = LTSpiceConnectorAPI::getLocalFileName();
+	//	std::string fileName = LTSpiceConnectorAPI::getLocalFileName();
 
-		std::thread workerThread(LTSpiceConnectorAPI::downloadFiles, fileName, projectName, entityIDList, entityVersionList, version);
-		workerThread.detach();
-	}
-	else if (action == OT_ACTION_CMD_UI_SS_COPY) {
+	//	std::thread workerThread(LTSpiceConnectorAPI::downloadFiles, fileName, projectName, entityIDList, entityVersionList, version);
+	//	workerThread.detach();
+	//}
+	else if (action == OT_ACTION_CMD_UI_LTS_COPY) {
 
 		std::string newVersion = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
 
 		std::thread workerThread(LTSpiceConnectorAPI::copyFiles, newVersion);
 		workerThread.detach();
 	}
-	else if (action == OT_ACTION_CMD_UI_SS_INFORMATION) {
+	//else if (action == OT_ACTION_CMD_UI_LTS_INFORMATION) {
 
-		std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
-		std::string serverVersion = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
-		std::string localFileName = LTSpiceConnectorAPI::getLocalFileName();
+	//	std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
+	//	std::string serverVersion = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
+	//	std::string localFileName = LTSpiceConnectorAPI::getLocalFileName();
 
-		if (localFileName.empty())
-		{
-			// Try to get the current file name from the server
-			localFileName = getLocalFileNameFromProject(studioSuiteServiceURL, mainObject);
-			LTSpiceConnectorAPI::setLocalFileName(localFileName);
-		}
+	//	if (localFileName.empty())
+	//	{
+	//		// Try to get the current file name from the server
+	//		localFileName = getLocalFileNameFromProject(studioSuiteServiceURL, mainObject);
+	//		LTSpiceConnectorAPI::setLocalFileName(localFileName);
+	//	}
 
-		std::string localVersion;
+	//	std::string localVersion;
 
-		try
-		{
-			localVersion = getCurrentVersion(localFileName, projectName);
-		}
-		catch (std::string)
-		{
-			localVersion.clear();
-		}
+	//	try
+	//	{
+	//		localVersion = getCurrentVersion(localFileName, projectName);
+	//	}
+	//	catch (std::string)
+	//	{
+	//		localVersion.clear();
+	//	}
 
-		ProjectInformationDialog projectInformationDialog(windowIcon, localFileName, serverVersion, localVersion);
-		projectInformationDialog.exec();
-	}
-	else if (action == OT_ACTION_CMD_UI_SS_SETCSTFILE) {
+	//	ProjectInformationDialog projectInformationDialog(windowIcon, localFileName, serverVersion, localVersion);
+	//	projectInformationDialog.exec();
+	//}
+	//else if (action == OT_ACTION_CMD_UI_LTS_SETCSTFILE) {
 
-		std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
+	//	std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 
-		std::string localFileName = LTSpiceConnectorAPI::getLocalFileName();
+	//	std::string localFileName = LTSpiceConnectorAPI::getLocalFileName();
 
-		if (localFileName.empty())
-		{
-			// Try to get the current file name from the server
-			localFileName = getLocalFileNameFromProject(studioSuiteServiceURL, mainObject);
-			LTSpiceConnectorAPI::setLocalFileName(localFileName);
-		}
+	//	if (localFileName.empty())
+	//	{
+	//		// Try to get the current file name from the server
+	//		localFileName = getLocalFileNameFromProject(studioSuiteServiceURL, mainObject);
+	//		LTSpiceConnectorAPI::setLocalFileName(localFileName);
+	//	}
 
-		std::string simpleFileName = LTSpiceConnectorAPI::getSimpleFileNameFromProject(studioSuiteServiceURL, mainObject);
+	//	std::string simpleFileName = LTSpiceConnectorAPI::getSimpleFileNameFromProject(studioSuiteServiceURL, mainObject);
 
-		std::filesystem::path filePath(localFileName);
+	//	std::filesystem::path filePath(localFileName);
 
-		std::string currentDirectory = filePath.parent_path().string();
-		std::string currentFileName = filePath.filename().string();
+	//	std::string currentDirectory = filePath.parent_path().string();
+	//	std::string currentFileName = filePath.filename().string();
 
-		if (currentDirectory.empty())
-		{
-			currentDirectory = QDir::currentPath().toStdString();
-		}
+	//	if (currentDirectory.empty())
+	//	{
+	//		currentDirectory = QDir::currentPath().toStdString();
+	//	}
 
-		QFileDialog fileBrowser;
-		fileBrowser.setFileMode(QFileDialog::Directory);
-		fileBrowser.selectFile(currentDirectory.c_str());
-		fileBrowser.setOption(QFileDialog::ShowDirsOnly, false);
+	//	QFileDialog fileBrowser;
+	//	fileBrowser.setFileMode(QFileDialog::Directory);
+	//	fileBrowser.selectFile(currentDirectory.c_str());
+	//	fileBrowser.setOption(QFileDialog::ShowDirsOnly, false);
 
-		if (!fileBrowser.exec())
-		{
-			return ""; // Operation cancelled
-		}
-		localFileName = fileBrowser.selectedFiles()[0].toStdString() + "/" + simpleFileName;
+	//	if (!fileBrowser.exec())
+	//	{
+	//		return ""; // Operation cancelled
+	//	}
+	//	localFileName = fileBrowser.selectedFiles()[0].toStdString() + "/" + simpleFileName;
 
-		if (!localFileName.empty())
-		{
-			std::string errorMessage; 
+	//	if (!localFileName.empty())
+	//	{
+	//		std::string errorMessage; 
 
-			if (!LTSpiceConnectorAPI::checkValidLocalFile(localFileName, projectName, false, errorMessage))
-			{
-				errorMessage += "\n\nThe local file name has not been changed.";
-				ak::uiAPI::promptDialog::show(errorMessage.c_str(), "Set CST File", ak::promptOkIconLeft, "DialogError", "Default");
-				return "";
-			}
+	//		if (!LTSpiceConnectorAPI::checkValidLocalFile(localFileName, projectName, false, errorMessage))
+	//		{
+	//			errorMessage += "\n\nThe local file name has not been changed.";
+	//			ak::uiAPI::promptDialog::show(errorMessage.c_str(), "Set CST File", ak::promptOkIconLeft, "DialogError", "Default");
+	//			return "";
+	//		}
 
-			LTSpiceConnectorAPI::setAndStoreLocalFileName(localFileName, studioSuiteServiceURL, mainObject);
+	//		LTSpiceConnectorAPI::setAndStoreLocalFileName(localFileName, studioSuiteServiceURL, mainObject);
 
-			ak::uiAPI::promptDialog::show("The local file has been changed successfully.", "Set CST File", ak::promptOkIconLeft, "DialogInformation", "Default");
-		}
-	}
+	//		ak::uiAPI::promptDialog::show("The local file has been changed successfully.", "Set CST File", ak::promptOkIconLeft, "DialogInformation", "Default");
+	//	}
+	//}
 
 	return "";
 }
@@ -335,14 +333,14 @@ void LTSpiceConnectorAPI::openProject()
 	ProjectManager::getInstance().openProject();
 }
 
-void LTSpiceConnectorAPI::setStudioServiceData(std::string studioSuiteServiceURL, QObject* mainObject)
+void LTSpiceConnectorAPI::setLTSpiceServiceData(std::string ltSpiceServiceURL, QObject* mainObject)
 {
-	ProjectManager::getInstance().setStudioServiceData(studioSuiteServiceURL, mainObject);
+	ProjectManager::getInstance().setLTSpiceServiceData(ltSpiceServiceURL, mainObject);
 }
 
-void LTSpiceConnectorAPI::importProject(std::string fileName, std::string projectName, std::string message, bool includeResults, bool includeParametricResults)
+void LTSpiceConnectorAPI::importProject(std::string fileName, std::string projectName, std::string message, bool includeResults)
 {
-	ProjectManager::getInstance().importProject(fileName, projectName, message, includeResults, includeParametricResults);
+	ProjectManager::getInstance().importProject(fileName, projectName, message, includeResults);
 }
 
 std::string LTSpiceConnectorAPI::getCurrentVersion(std::string fileName, std::string projectName)
@@ -350,9 +348,9 @@ std::string LTSpiceConnectorAPI::getCurrentVersion(std::string fileName, std::st
 	return ProjectManager::getInstance().getCurrentVersion(fileName, projectName);
 }
 
-void LTSpiceConnectorAPI::commitProject(std::string fileName, std::string projectName, std::string changeComment, bool includeResults, bool includeParametricResults)
+void LTSpiceConnectorAPI::commitProject(std::string fileName, std::string projectName, std::string changeComment, bool includeResults)
 {
-	ProjectManager::getInstance().commitProject(fileName, projectName, changeComment, includeResults, includeParametricResults);
+	ProjectManager::getInstance().commitProject(fileName, projectName, changeComment, includeResults);
 }
 
 void LTSpiceConnectorAPI::getProject(std::string fileName, std::string projectName, std::string version)

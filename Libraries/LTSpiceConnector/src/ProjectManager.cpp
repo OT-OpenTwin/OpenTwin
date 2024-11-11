@@ -48,15 +48,15 @@ void ProjectManager::setLocalFileName(std::string fileName)
 	localProjectFileName = fileName; 
 }
 
-void ProjectManager::setStudioServiceData(const std::string& studioSuiteServiceURL, QObject* mainObject)
+void ProjectManager::setLTSpiceServiceData(const std::string& ltSpiceServiceURL, QObject* mainObject)
 {
-	ServiceConnector::getInstance().setServiceURL(studioSuiteServiceURL);
+	ServiceConnector::getInstance().setServiceURL(ltSpiceServiceURL);
 	ServiceConnector::getInstance().setMainObject(mainObject);
 
 	ProgressInfo::getInstance().setMainObject(mainObject);
 }
 
-void ProjectManager::importProject(const std::string& fileName, const std::string& prjName, const std::string &message, bool incResults, bool incParametricResults)
+void ProjectManager::importProject(const std::string& fileName, const std::string& prjName, const std::string &message, bool incResults)
 {
 	try
 	{
@@ -133,7 +133,7 @@ std::string ProjectManager::getCurrentVersion(const std::string& fileName, const
 	return version.getVersion();
 }
 
-void ProjectManager::commitProject(const std::string& fileName, const std::string& prjName, const std::string& changeComment, bool incResults, bool incParametricResults)
+void ProjectManager::commitProject(const std::string& fileName, const std::string& prjName, const std::string& changeComment, bool incResults)
 {
 	try
 	{
@@ -260,11 +260,8 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		// Load the hash information for the entities 
 		InfoFileManager infoFileManager(infoEntityID, infoEntityVersion);
 
-		// Upload files (progress range 15-70)
+		// Upload files (progress range 15-90)
 		uploadFiles(projectRoot, uploadFileList, entityIDList, entityVersionList);
-
-		// Send the (parametric) 1D result data (progress range 80-90)
-		send1dResultData(baseProjectName, infoFileManager);
 
 		// Create the new version
 		commitNewVersion(changeMessage);
@@ -448,11 +445,11 @@ void ProjectManager::copyFiles(const std::string &newVersion)
 
 		if (currentOperation == OPERATION_IMPORT)
 		{
-			ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been imported successfully.");
+			ProgressInfo::getInstance().showInformation("The LTSpice project has been imported successfully.");
 		}
 		else if (currentOperation == OPERATION_COMMIT)
 		{
-			ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been commited successfully (version: " + newVersion + ").");
+			ProgressInfo::getInstance().showInformation("The LTSpice project has been commited successfully (version: " + newVersion + ").");
 		}
 		else
 		{
@@ -498,7 +495,7 @@ std::list<std::string> ProjectManager::determineUploadFiles(const std::string& b
 	std::list<std::string> uploadFiles;
 	std::string path;
 
-	path = baseProjectName + ".cst";
+	path = baseProjectName + ".asc";
 	std::replace(path.begin(), path.end(), '\\', '/');
 
 	uploadFiles.push_back(path);
@@ -530,70 +527,75 @@ std::list<std::string> ProjectManager::determineUploadFiles(const std::string& b
 
 	if (includeResults)
 	{
-		std::string resultDirName = baseProjectName + "/Result";
-		std::string cacheResultDirName = versionFolderName + "/Result";
+		std::string projectDirName = std::filesystem::path(baseProjectName + ".asc").parent_path().string();
+		std::replace(projectDirName.begin(), projectDirName.end(), '\\', '/');
 
-		for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(resultDirName))
+		std::string cacheResultDirName = versionFolderName;
+
+		for (const auto& dirEntry : std::filesystem::directory_iterator(projectDirName))
 		{
 			if (!dirEntry.is_directory())
 			{
 				path = dirEntry.path().string();
 				std::replace(path.begin(), path.end(), '\\', '/');
 
-				std::string correspondingCacheFile = path.substr(resultDirName.length());
+				std::string fileExtension = dirEntry.path().extension().string();
+				transform(fileExtension.begin(), fileExtension.end(), fileExtension.begin(), ::tolower);
 
-				if (cacheFiles.count(correspondingCacheFile) == 0)
+				if (fileExtension != ".asc")
 				{
-					// This file does not exist in the cache
-					uploadFiles.push_back(path);
-				}
-				else
-				{
-					// This file exists in the cache
-					cacheFiles[correspondingCacheFile] = true; // This file is still present
+					std::string filter = baseProjectName + ".";
+					std::string firstPart = path.substr(0, filter.length());
 
-					auto cacheFileTimeStamp = cacheFileWriteTimes[correspondingCacheFile];
-					auto newFileTimeStamp = std::filesystem::last_write_time(path);
-
-					if (newFileTimeStamp > cacheFileTimeStamp)
+					if (firstPart == filter)
 					{
-						// The time stamp of this file has changed. Now we need to compare the file content to determine whether 
-						// the file has indeed changed
-						if (fileContentDiffers(path, cacheResultDirName + correspondingCacheFile))
+						// This file belongs to the project and is not the main schematic file
+						std::string correspondingCacheFile = path.substr(projectDirName.length() + 1);
+
+						if (cacheFiles.count(correspondingCacheFile) == 0)
 						{
-							// This file has changed compared to the data in the cache
+							// This file does not exist in the cache
 							uploadFiles.push_back(path);
+						}
+						else
+						{
+							// This file exists in the cache
+							cacheFiles[correspondingCacheFile] = true; // This file is still present
+
+							auto cacheFileTimeStamp = cacheFileWriteTimes[correspondingCacheFile];
+							auto newFileTimeStamp = std::filesystem::last_write_time(path);
+
+							if (newFileTimeStamp > cacheFileTimeStamp)
+							{
+								// The time stamp of this file has changed. Now we need to compare the file content to determine whether 
+								// the file has indeed changed
+								if (fileContentDiffers(path, cacheResultDirName + correspondingCacheFile))
+								{
+									// This file has changed compared to the data in the cache
+									uploadFiles.push_back(path);
+								}
+							}
 						}
 					}
 				}
-			}
-			else
-			{
-				path = dirEntry.path().string();
-				std::replace(path.begin(), path.end(), '\\', '/');
-
-				std::string correspondingCacheFile = path.substr(resultDirName.length());
-
-				cacheFiles[correspondingCacheFile] = true; // This file is still present
 			}
 		}
 	}
 
 	// Now we check whether there are any files in the cache which do not exist anymore
-	std::string fileNamePrefix = "Files/" + std::filesystem::path(baseProjectName).filename().string() + "/Result";
 	for (auto file : cacheFiles)
 	{
 		if (!file.second)
 		{
-			// This file is not present anymore
-			deletedFiles.push_back(fileNamePrefix + file.first);
-		}
-	}
+			std::string fileExtension = std::filesystem::path(file.first).extension().string();
+			transform(fileExtension.begin(), fileExtension.end(), fileExtension.begin(), ::tolower);
 
-	if (!includeResults)
-	{
-		deletedFiles.push_back(fileNamePrefix);
-		deletedFiles.push_back("Files/" + std::filesystem::path(baseProjectName).filename().string());
+			if (fileExtension != ".asc")
+			{
+				// This file is not present anymore
+				deletedFiles.push_back(file.first);
+			}
+		}
 	}
 
 	return uploadFiles;
@@ -644,7 +646,7 @@ bool ProjectManager::fileContentDiffers(const std::string& file1, const std::str
 
 void ProjectManager::getCacheFileWriteTimes(const std::string& versionFolderName, std::map<std::string, std::filesystem::file_time_type>& cacheFileWriteTimes, std::map<std::string, bool> &cacheFiles)
 {
-	std::string resultDirName = versionFolderName + "/Result";
+	std::string resultDirName = versionFolderName;
 
 	for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(resultDirName))
 	{
@@ -676,33 +678,17 @@ void ProjectManager::copyCacheFiles(const std::string& baseProjectName, const st
 		throw("Unable to create cache version folder: " + versionFolderName);
 	}
 
-	if (copyResults)
-	{
-		if (!std::filesystem::create_directory(versionFolderName + "/Result"))
-		{
-			throw("Unable to create cache result folder: " + versionFolderName + "/Result");
-		}
-	}
-
 	// Now copy all upload files to the cache version folder
-	std::string cstFileName = baseProjectName + ".cst";
-	std::string resultFolderName = baseProjectName + "/Result";
-
-	std::replace(cstFileName.begin(), cstFileName.end(), '\\', '/');
-	std::replace(resultFolderName.begin(), resultFolderName.end(), '\\', '/');
-
-	try
+	for (auto fileName : uploadFileList)
 	{
-		copyFile(cstFileName, versionFolderName);
-
-		if (copyResults)
+		try
 		{
-			copyDirectory(resultFolderName, versionFolderName + "/Result");
+			copyFile(fileName, versionFolderName);
 		}
-	}
-	catch (std::exception &error)
-	{
-		throw("Unable to copy data to cache (" + std::string(error.what()) + ") : " + versionFolderName);
+		catch (std::exception& error)
+		{
+			throw("Unable to copy data to cache (" + std::string(error.what()) + ") : " + versionFolderName);
+		}
 	}
 }
 
@@ -779,7 +765,7 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 			dataSize = 0;
 		}
 
-		int percent = (int)(50.0 * fileCount / uploadFileList.size() + 15.0);
+		int percent = (int)(75.0 * fileCount / uploadFileList.size() + 15.0);
 		if (percent > lastPercent)
 		{
 			ProgressInfo::getInstance().setProgressValue(percent);
@@ -790,13 +776,13 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 
 	DataBase::GetDataBase()->queueWriting(false);
 
-	ProgressInfo::getInstance().setProgressValue(70);
+	ProgressInfo::getInstance().setProgressValue(90);
 }
 
 void ProjectManager::commitNewVersion(const std::string &changeMessage)
 {
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_FILES_UPLOADED, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_FILES_UPLOADED, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MESSAGE, ot::JsonString(changeMessage, doc.GetAllocator()), doc.GetAllocator());
 
 	// add the list of new files and modified files together with the entityID and versions
@@ -827,107 +813,6 @@ void ProjectManager::commitNewVersion(const std::string &changeMessage)
 
 	// Send the message to the service
 	ServiceConnector::getInstance().sendExecuteRequest(doc);
-}
-
-void ProjectManager::sendUnitsInformation(const std::string &projectRoot)
-{
-	std::string fileContent;
-	readFileContent(projectRoot + "/Temp/Upload/units.info", fileContent);
-
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UNITS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(fileContent, doc.GetAllocator()), doc.GetAllocator());
-
-	// Send the message to the service
-	ServiceConnector::getInstance().sendExecuteRequest(doc);
-}
-
-void ProjectManager::sendMaterialInformation(const std::string& projectRoot)
-{
-	std::string fileContent;
-	readFileContent(projectRoot + "/Temp/Upload/material.info", fileContent);
-
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_MATERIALS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(fileContent, doc.GetAllocator()), doc.GetAllocator());
-
-	// Send the message to the service
-	ServiceConnector::getInstance().sendExecuteRequest(doc);
-}
-
-void ProjectManager::sendShapeInformationAndTriangulation(const std::string& projectRoot, InfoFileManager &infoFileManager)
-{
-	std::string fileContent;
-	readFileContent(projectRoot + "/Temp/Upload/shape.info", fileContent);
-
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_SHAPEINFO, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(fileContent, doc.GetAllocator()), doc.GetAllocator());
-
-	// Send the message to the service
-	ServiceConnector::getInstance().sendExecuteRequest(doc);
-
-	// Read the list of shape names and assign them the index of the STL file
-	std::map<std::string, int> allShapesMap = determineAllShapes(std::stringstream(fileContent));
-	 
-	// Now send the modified triangulations (one by one)
-	sendTriangulations(projectRoot, allShapesMap, infoFileManager);
-}
-
-void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map<std::string, int> trianglesMap, InfoFileManager& infoFileManager)
-{
-	std::list<std::string> shapeNames;
-	std::list<std::string> shapeTriangles;
-	std::list<std::string> shapeHash;
-
-	// We combine potentially several triangulations into a single message in order to avoid sending an excessive number of 
-	// messages in case of many small objects.
-	size_t dataSize = 0;
-
-	int shapeCount = 0;
-	int lastPercent = 70;
-
-	for (auto shape : trianglesMap)
-	{
-		std::string fileContent;
-		readFileContent(projectRoot + "/Temp/Upload/stl" + std::to_string(shape.second) + ".stl", fileContent);
-
-		std::string hash = calculateHash(fileContent);
-
-		if (infoFileManager.getTriangleHash(shape.first) != hash)
-		{
-			// The hash value is different -> sending the shape is required
-
-			shapeNames.push_back(shape.first);
-			shapeTriangles.push_back(fileContent);
-			shapeHash.push_back(hash);
-
-			dataSize += (shape.first.size() + fileContent.size() + shapeHash.size());
-
-			if (dataSize > 10000000)
-			{
-				sendTriangleLists(shapeNames, shapeTriangles, shapeHash);
-				dataSize = 0;
-				shapeNames.clear();
-				shapeTriangles.clear();
-			}
-		}
-
-		int percent = (int)(8.0 * shapeCount / trianglesMap.size() + 70.0);
-		if (percent > lastPercent)
-		{
-			ProgressInfo::getInstance().setProgressValue(percent);
-			lastPercent = percent;
-		}
-		shapeCount++;
-	}
-
-	if (dataSize > 0)
-	{
-		sendTriangleLists(shapeNames, shapeTriangles, shapeHash);
-	}
-
-	ProgressInfo::getInstance().setProgressValue(80);
 }
 
 std::string ProjectManager::calculateHash(const std::string& fileContent)
@@ -982,18 +867,6 @@ std::string ProjectManager::calculateHash(const std::string& fileContent)
 	std::string hashValue = hashCalculator.result().toHex().toStdString();
 
 	return hashValue;
-}
-
-void ProjectManager::sendTriangleLists(std::list<std::string>& shapeNames, std::list<std::string>& shapeTriangles, std::list<std::string>& shapeHash)
-{
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_TRIANGLES, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_Name, ot::JsonArray(shapeNames, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonArray(shapeTriangles, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_Hash, ot::JsonArray(shapeHash, doc.GetAllocator()), doc.GetAllocator());
-
-	// Send the message to the service
-	ServiceConnector::getInstance().sendExecuteRequest(doc);
 }
 
 std::map<std::string, int> ProjectManager::determineAllShapes(std::stringstream fileContent)

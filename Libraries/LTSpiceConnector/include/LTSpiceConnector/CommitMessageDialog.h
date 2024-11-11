@@ -33,7 +33,6 @@ public:
 
 	QString changeMessage(void);
 	bool includeResults(void);
-	bool includeParametricResults(void);
 
 	bool wasConfirmed(void) const { return my_confirmed; }
 
@@ -50,7 +49,6 @@ private Q_SLOTS:
 	void slotButtonConfirmPressed();
 	void slotButtonCancelPressed();
 	void slotReturnPressed();
-	void slotIncludeResultsChecked(int state);
 
 private:
 
@@ -74,7 +72,6 @@ private:
 	QWidget* my_widgetInput;
 
 	QCheckBox* my_includeResults;
-	QCheckBox* my_includeParametricResults;
 
 	CommitMessageDialog(const CommitMessageDialog&) = delete;
 	CommitMessageDialog& operator = (CommitMessageDialog&) = delete;
