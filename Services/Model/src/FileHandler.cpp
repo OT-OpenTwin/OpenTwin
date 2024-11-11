@@ -8,11 +8,13 @@
 #include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 #include "OTCore/EncodingConverter_UTF16ToUTF8.h"
 #include "EntityFileText.h"
+#include "EntityFileCSV.h"
 #include "Model.h"
 #include "OTCore/FolderNames.h"
 #include <assert.h>
 #include "QueuingHttpRequestsRAII.h"
 #include "QueuingDatabaseWritingRAII.h"
+
 
 void FileHandler::addButtons(ot::components::UiComponent* _uiComponent, const std::string& _pageName)
 {
@@ -116,26 +118,36 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	ot::UID entIDData =	model->createEntityUID();
 	ot::UID entIDTopo =	model->createEntityUID();
 	const std::string serviceName = Application::instance()->serviceName();
-	EntityFileText newText(entIDTopo, nullptr, nullptr, nullptr, nullptr, serviceName);	
-
-	EntityBinaryData fileContent(entIDData, &newText, nullptr, nullptr, nullptr,serviceName);
-	fileContent.setData(_text.data(), _text.size());
-	fileContent.StoreToDataBase();
-
-	newText.setData(fileContent.getEntityID(), fileContent.getEntityStorageVersion());
 
 	size_t fileNamePos = _fileName.find_last_of("/");
 	std::string path = _fileName.substr(0, fileNamePos);
-	std::string name = _fileName.substr(fileNamePos+1);
+	std::string name = _fileName.substr(fileNamePos + 1);
 	std::string type = name.substr(name.find_last_of('.') + 1);
+
+	std::unique_ptr<EntityFileText> textFile;
+	if (type == "csv")
+	{
+		textFile.reset(new EntityFileCSV (entIDTopo, nullptr, nullptr, nullptr, nullptr, serviceName));
+	}
+	else
+	{
+		textFile.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr, nullptr, serviceName));
+	}
+
+	EntityBinaryData fileContent(entIDData, textFile.get(), nullptr, nullptr, nullptr, serviceName);
+	fileContent.setData(_text.data(), _text.size());
+	fileContent.StoreToDataBase();
+
+	textFile->setData(fileContent.getEntityID(), fileContent.getEntityStorageVersion());
+
 	ot::EncodingGuesser guesser;
-	newText.setFileProperties(path, name,type);
-	newText.setName( ot::FolderNames::FilesFolder + "/" + name);
+	textFile->setFileProperties(path, name,type);
+	textFile->setName( ot::FolderNames::FilesFolder + "/" + name);
 	
-	newText.setTextEncoding(guesser(_text.data(), _text.size()));
-	newText.StoreToDataBase();
+	textFile->setTextEncoding(guesser(_text.data(), _text.size()));
+	textFile->StoreToDataBase();
 	m_entityIDsTopo.push_back(entIDTopo);
-	m_entityVersionsTopo.push_back(newText.getEntityStorageVersion());
+	m_entityVersionsTopo.push_back(textFile->getEntityStorageVersion());
 	m_entityIDsData.push_back(entIDData);
 	m_entityVersionsData.push_back(fileContent.getEntityStorageVersion());
 	m_forceVisible.push_back(false);
