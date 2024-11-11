@@ -18,8 +18,8 @@
 
 class Viewer;
 class SceneNodeGeometry;
-class SceneNodePlot1DItem;
-class SceneNodeResult1DItem;
+class SceneNodePlot1D;
+class SceneNodePlot1DCurve;
 class ManipulatorBase;
 
 class UIControls
@@ -323,9 +323,9 @@ private:
 	void	   set1DPlotIncompatibleData(void);
 	void       remove1DPlotErrorState(void);
 	void	   update1DPlot(SceneNodeBase *root);
-	void	   add1DPlotItems(SceneNodeBase *root, bool &firstCurve, SceneNodePlot1DItem *&commonPlot, AbstractPlot::PlotType &plotType, PlotDataset::axisQuantity &yAxisQuantity, std::string &title, bool &grid, int gridColor[], bool &legend, bool &logscaleX, bool &logscaleY,
+	void	   add1DPlotItems(SceneNodeBase *root, bool &firstCurve, SceneNodePlot1D*&commonPlot, AbstractPlot::PlotType &plotType, PlotDataset::axisQuantity &yAxisQuantity, std::string &title, bool &grid, int gridColor[], bool &legend, bool &logscaleX, bool &logscaleY,
 							  bool &autoscaleX, bool &autoscaleY, double &xmin, double &xmax, double &ymin, double &ymax, std::string &, std::list<PlotCurveItem> &selectedCurves, bool &compatible);
-	SceneNodePlot1DItem *getPlotFromCurve(SceneNodeResult1DItem *curve);
+	SceneNodePlot1D* getPlotFromCurve(SceneNodePlot1DCurve* curve);
 	bool	   changeResult1DEntityVersion(SceneNodeBase *root, unsigned long long entityID, unsigned long long version);
 	bool	   gridCompatible(bool grid1, int r1, int g1, int b1, bool grid2, int r2, int g2, int b2);
 	bool	   axisCompatible(bool logscale1, bool autoscale1, double min1, double max1, bool logscale2, bool autoscale2, double min2, double max2);

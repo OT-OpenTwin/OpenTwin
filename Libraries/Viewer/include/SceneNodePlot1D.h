@@ -18,11 +18,11 @@ namespace osg
 
 class Model;
 
-class SceneNodePlot1DItem : public SceneNodeBase
+class SceneNodePlot1D : public SceneNodeBase
 {
 public:
-	SceneNodePlot1DItem();
-	virtual ~SceneNodePlot1DItem();
+	SceneNodePlot1D();
+	virtual ~SceneNodePlot1D();
 
 	virtual void setTransparent(bool t) override;
 	virtual void setWireframe(bool w) override;

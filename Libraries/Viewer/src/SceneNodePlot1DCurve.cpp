@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "SceneNodeResult1DItem.h"
+#include "SceneNodePlot1DCurve.h"
 
 #include "DataBase.h"
 #include "Model.h"
@@ -17,14 +17,14 @@
 #include <osg/LineWidth>
 #include <osg/LightModel>
 
-SceneNodeResult1DItem::SceneNodeResult1DItem() :
+SceneNodePlot1DCurve::SceneNodePlot1DCurve() :
 	modelEntityVersion(0),
 	model(nullptr)
 {
 
 }
 
-SceneNodeResult1DItem::~SceneNodeResult1DItem()
+SceneNodePlot1DCurve::~SceneNodePlot1DCurve()
 {
 	// Remove the OSG objects 
 	// This geometry node will always have a parent group or switch node
@@ -47,27 +47,27 @@ SceneNodeResult1DItem::~SceneNodeResult1DItem()
 	}
 }
 
-void SceneNodeResult1DItem::setTransparent(bool t)
+void SceneNodePlot1DCurve::setTransparent(bool t)
 {
 	if (t == isTransparent()) return;
 
 	SceneNodeBase::setTransparent(t);
 }
 
-void SceneNodeResult1DItem::setWireframe(bool w)
+void SceneNodePlot1DCurve::setWireframe(bool w)
 {
 	if (w == isWireframe()) return;
 
 	SceneNodeBase::setWireframe(w);
 }
 
-void SceneNodeResult1DItem::setVisible(bool v)
+void SceneNodePlot1DCurve::setVisible(bool v)
 {
 	if (v == isVisible()) return;
 
 	SceneNodeBase::setVisible(v);
 }
 
-void SceneNodeResult1DItem::setHighlighted(bool h)
+void SceneNodePlot1DCurve::setHighlighted(bool h)
 {
 }

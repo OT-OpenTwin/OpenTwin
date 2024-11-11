@@ -59,8 +59,8 @@
     <ClCompile Include="src\SceneNodeMaterialFactory.cpp" />
     <ClCompile Include="src\SceneNodeMesh.cpp" />
     <ClCompile Include="src\SceneNodeMeshItem.cpp" />
-    <ClCompile Include="src\SceneNodePlot1DItem.cpp" />
-    <ClCompile Include="src\SceneNodeResult1DItem.cpp" />
+    <ClCompile Include="src\SceneNodePlot1D.cpp" />
+    <ClCompile Include="src\SceneNodePlot1DCurve.cpp" />
     <ClCompile Include="src\SceneNodeTableItem.cpp" />
     <ClCompile Include="src\SceneNodeTextItem.cpp" />
     <ClCompile Include="src\SceneNodeVTK.cpp" />
@@ -129,8 +129,8 @@
     <ClInclude Include="include\SceneNodeMaterialFactory.h" />
     <ClInclude Include="include\SceneNodeMesh.h" />
     <ClInclude Include="include\SceneNodeMeshItem.h" />
-    <ClInclude Include="include\SceneNodePlot1DItem.h" />
-    <ClInclude Include="include\SceneNodeResult1DItem.h" />
+    <ClInclude Include="include\SceneNodePlot1D.h" />
+    <ClInclude Include="include\SceneNodePlot1DCurve.h" />
     <ClInclude Include="include\SceneNodeTableItem.h" />
     <ClInclude Include="include\SceneNodeTextItem.h" />
     <ClInclude Include="include\SceneNodeVTK.h" />

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "SceneNodePlot1DItem.h"
+#include "SceneNodePlot1D.h"
 
 #include "DataBase.h"
 #include "Model.h"
@@ -17,7 +17,7 @@
 #include <osg/LineWidth>
 #include <osg/LightModel>
 
-SceneNodePlot1DItem::SceneNodePlot1DItem() :
+SceneNodePlot1D::SceneNodePlot1D() :
 	plotGrid(false),
 	plotGridColorR(0),
 	plotGridColorG(0),
@@ -37,7 +37,7 @@ SceneNodePlot1DItem::SceneNodePlot1DItem() :
 
 }
 
-SceneNodePlot1DItem::~SceneNodePlot1DItem()
+SceneNodePlot1D::~SceneNodePlot1D()
 {
 	// Remove the OSG objects 
 	// This geometry node will always have a parent group or switch node
@@ -60,32 +60,32 @@ SceneNodePlot1DItem::~SceneNodePlot1DItem()
 	}
 }
 
-void SceneNodePlot1DItem::setTransparent(bool t)
+void SceneNodePlot1D::setTransparent(bool t)
 {
 	if (t == isTransparent()) return;
 
 	SceneNodeBase::setTransparent(t);
 }
 
-void SceneNodePlot1DItem::setWireframe(bool w)
+void SceneNodePlot1D::setWireframe(bool w)
 {
 	if (w == isWireframe()) return;
 
 	SceneNodeBase::setWireframe(w);
 }
 
-void SceneNodePlot1DItem::setVisible(bool v)
+void SceneNodePlot1D::setVisible(bool v)
 {
 	if (v == isVisible()) return;
 
 	SceneNodeBase::setVisible(v);
 }
 
-void SceneNodePlot1DItem::setHighlighted(bool h)
+void SceneNodePlot1D::setHighlighted(bool h)
 {
 }
 
-void SceneNodePlot1DItem::setCurves(std::list<unsigned long long> &curvesID, std::list<unsigned long long> &curvesVersions, std::list<std::string> &curvesNames)
+void SceneNodePlot1D::setCurves(std::list<unsigned long long> &curvesID, std::list<unsigned long long> &curvesVersions, std::list<std::string> &curvesNames)
 {
 	curveID.clear();
 	curveVersion.clear();
@@ -115,13 +115,13 @@ void SceneNodePlot1DItem::setCurves(std::list<unsigned long long> &curvesID, std
 	}
 }
 
-void SceneNodePlot1DItem::addCurveNodes(void)
+void SceneNodePlot1D::addCurveNodes(void)
 {
 
 
 }
 
-bool SceneNodePlot1DItem::changeResult1DEntityVersion(unsigned long long _curveEntityID, unsigned long long _curveVersion)
+bool SceneNodePlot1D::changeResult1DEntityVersion(unsigned long long _curveEntityID, unsigned long long _curveVersion)
 {
 	bool changed = false;
 
@@ -139,7 +139,7 @@ bool SceneNodePlot1DItem::changeResult1DEntityVersion(unsigned long long _curveE
 	return (changed && plotSelectedAndVisible);
 }
 
-bool SceneNodePlot1DItem::isAnyChildSelectedAndVisible(SceneNodeBase *root)
+bool SceneNodePlot1D::isAnyChildSelectedAndVisible(SceneNodeBase *root)
 {
 	if (root->isSelected() && root->isVisible()) return true;
 
