@@ -209,7 +209,7 @@
 #define OT_ACTION_CMD_UI_LTS_UPLOAD "LTSpice.Upload"
 //#define OT_ACTION_CMD_UI_LTS_DOWNLOAD "LTSpice.Download"
 #define OT_ACTION_CMD_UI_LTS_COPY "LTSpice.Copy"
-//#define OT_ACTION_CMD_UI_LTS_INFORMATION "LTSpice.Information"
+#define OT_ACTION_CMD_UI_LTS_INFORMATION "LTSpice.Information"
 //#define OT_ACTION_CMD_UI_LTS_SETCSTFILE "LTSpice.SetCSTFile"
 #define OT_ACTION_CMD_UI_LTS_UPLOAD_NEEDED "LTSpice.UploadNeeded"
 #define OT_ACTION_CMD_UI_LTS_DOWNLOAD_NEEDED "LTSpice.DownloadNeeded"

@@ -124,33 +124,33 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 		std::thread workerThread(LTSpiceConnectorAPI::copyFiles, newVersion);
 		workerThread.detach();
 	}
-	//else if (action == OT_ACTION_CMD_UI_LTS_INFORMATION) {
+	else if (action == OT_ACTION_CMD_UI_LTS_INFORMATION) {
 
-	//	std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
-	//	std::string serverVersion = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
-	//	std::string localFileName = LTSpiceConnectorAPI::getLocalFileName();
+		std::string ltSpiceServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
+		std::string serverVersion = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
+		std::string localFileName = LTSpiceConnectorAPI::getLocalFileName();
 
-	//	if (localFileName.empty())
-	//	{
-	//		// Try to get the current file name from the server
-	//		localFileName = getLocalFileNameFromProject(studioSuiteServiceURL, mainObject);
-	//		LTSpiceConnectorAPI::setLocalFileName(localFileName);
-	//	}
+		if (localFileName.empty())
+		{
+			// Try to get the current file name from the server
+			localFileName = getLocalFileNameFromProject(ltSpiceServiceURL, mainObject);
+			LTSpiceConnectorAPI::setLocalFileName(localFileName);
+		}
 
-	//	std::string localVersion;
+		std::string localVersion;
 
-	//	try
-	//	{
-	//		localVersion = getCurrentVersion(localFileName, projectName);
-	//	}
-	//	catch (std::string)
-	//	{
-	//		localVersion.clear();
-	//	}
+		try
+		{
+			localVersion = getCurrentVersion(localFileName, projectName);
+		}
+		catch (std::string)
+		{
+			localVersion.clear();
+		}
 
-	//	ProjectInformationDialog projectInformationDialog(windowIcon, localFileName, serverVersion, localVersion);
-	//	projectInformationDialog.exec();
-	//}
+		ProjectInformationDialog projectInformationDialog(windowIcon, localFileName, serverVersion, localVersion);
+		projectInformationDialog.exec();
+	}
 	//else if (action == OT_ACTION_CMD_UI_LTS_SETCSTFILE) {
 
 	//	std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
@@ -246,20 +246,20 @@ std::string LTSpiceConnectorAPI::getLTSpiceFileNameForGet(const std::string& pro
 	return localFileName;
 }
 
-std::string LTSpiceConnectorAPI::getLocalFileNameFromProject(const std::string& studioSuiteServiceURL, QObject* mainObject)
+std::string LTSpiceConnectorAPI::getLocalFileNameFromProject(const std::string& ltSpiceServiceURL, QObject* mainObject)
 {
 	// Send a message to the service and request the filename
 
 	std::string hostName = QHostInfo::localHostName().toStdString();
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_GET_LOCAL_FILENAME, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_GET_LOCAL_FILENAME, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_HOSTNAME, ot::JsonString(hostName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string message = doc.toJson();
 
-	char* url = new char[studioSuiteServiceURL.length() + 1];
-	strcpy(url, studioSuiteServiceURL.c_str());
+	char* url = new char[ltSpiceServiceURL.length() + 1];
+	strcpy(url, ltSpiceServiceURL.c_str());
 
 	char* msg = new char[message.length() + 1];
 	strcpy(msg, message.c_str());

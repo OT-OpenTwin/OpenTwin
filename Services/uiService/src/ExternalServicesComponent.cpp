@@ -4326,17 +4326,17 @@ std::string ExternalServicesComponent::handleLTSpiceUpload(ot::JsonDocument& _do
 //	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
 //	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
 //}
-//
+
 std::string ExternalServicesComponent::handleLTSpiceCopy(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
 	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
 }
 
-//std::string ExternalServicesComponent::handleLTSpiceInformation(ot::JsonDocument& _document) {
-//	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-//	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-//}
-//
+std::string ExternalServicesComponent::handleLTSpiceInformation(ot::JsonDocument& _document) {
+	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
+	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
+}
+
 //std::string ExternalServicesComponent::handleLTSpiceSetCSTFile(ot::JsonDocument& _document) {
 //	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
 //	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
