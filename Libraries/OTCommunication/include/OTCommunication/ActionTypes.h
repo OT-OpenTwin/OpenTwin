@@ -207,7 +207,7 @@
 #define OT_ACTION_CMD_UI_LTS_COMMIT "LTSpice.Commit"
 #define OT_ACTION_CMD_UI_LTS_GET "LTSpice.Get"
 #define OT_ACTION_CMD_UI_LTS_UPLOAD "LTSpice.Upload"
-//#define OT_ACTION_CMD_UI_LTS_DOWNLOAD "LTSpice.Download"
+#define OT_ACTION_CMD_UI_LTS_DOWNLOAD "LTSpice.Download"
 #define OT_ACTION_CMD_UI_LTS_COPY "LTSpice.Copy"
 #define OT_ACTION_CMD_UI_LTS_INFORMATION "LTSpice.Information"
 #define OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE "LTSpice.SetLTSpiceFile"

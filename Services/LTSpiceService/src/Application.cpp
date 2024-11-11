@@ -83,7 +83,7 @@ std::string Application::processAction(const std::string & _action, ot::JsonDocu
 		uploadNeeded(_doc);
 		return "";
 	}
-	else if (_action == OT_ACTION_CMD_UI_SS_DOWNLOAD_NEEDED)
+	else if (_action == OT_ACTION_CMD_UI_LTS_DOWNLOAD_NEEDED)
 	{
 		downloadNeeded(_doc);
 		return "";
@@ -403,7 +403,7 @@ void Application::downloadNeeded(ot::JsonDocument& _doc)
 	std::string version = modelComponent()->getCurrentModelVersion();
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_DOWNLOAD, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_DOWNLOAD, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(versionID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());

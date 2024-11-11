@@ -222,8 +222,6 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 			ProgressInfo::getInstance().setProgressValue(20);
 
 			ot::JsonDocument doc;
-			// ******** NOT YET IMPLEMENTED ****
-			assert(0);
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_DOWNLOAD_NEEDED, doc.GetAllocator()), doc.GetAllocator());
 
 			ServiceConnector::getInstance().sendExecuteRequest(doc);
@@ -1134,7 +1132,7 @@ void ProjectManager::downloadFiles(const std::string& fileName, const std::strin
 
 	if (!success)
 	{
-		ProgressInfo::getInstance().showError("The CST Studio Suite project could not be restored to version " + version + ".");
+		ProgressInfo::getInstance().showError("The LTSpice project could not be restored to version " + version + ".");
 
 		ProgressInfo::getInstance().setProgressState(false, "", false);
 		ProgressInfo::getInstance().unlockGui();
@@ -1145,7 +1143,7 @@ void ProjectManager::downloadFiles(const std::string& fileName, const std::strin
 	// Finally restore the project from the cache
 	if (!restoreFromCache(baseProjectName, cacheFolderName, version))
 	{
-		ProgressInfo::getInstance().showError("The CST Studio Suite project could not be restored to version " + version + ".");
+		ProgressInfo::getInstance().showError("The LTSpice project could not be restored to version " + version + ".");
 
 		ProgressInfo::getInstance().setProgressState(false, "", false);
 		ProgressInfo::getInstance().unlockGui();
@@ -1159,7 +1157,7 @@ void ProjectManager::downloadFiles(const std::string& fileName, const std::strin
 	ProgressInfo::getInstance().setProgressState(false, "", false);
 	ProgressInfo::getInstance().unlockGui();
 
-	ProgressInfo::getInstance().showInformation("The CST Studio Suite project has been restored successfully to version " + version + ".");
+	ProgressInfo::getInstance().showInformation("The LTSpice project has been restored successfully to version " + version + ".");
 }
 
 bool ProjectManager::downloadFile(const std::string &cacheFolderVersion, ot::UID entityID, ot::UID version)

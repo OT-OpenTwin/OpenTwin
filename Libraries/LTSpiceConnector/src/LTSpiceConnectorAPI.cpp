@@ -106,17 +106,17 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 		std::thread workerThread(LTSpiceConnectorAPI::uploadFiles, entityIDList, entityVersionList, infoEntityID, infoEntityVersion);
 		workerThread.detach();
 	}
-	//else if (action == OT_ACTION_CMD_UI_LTS_DOWNLOAD) {
+	else if (action == OT_ACTION_CMD_UI_LTS_DOWNLOAD) {
 
-	//	std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
-	//	std::list<ot::UID> entityVersionList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
-	//	std::string version = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
+		std::list<ot::UID> entityIDList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+		std::list<ot::UID> entityVersionList = ot::json::getUInt64List(doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+		std::string version = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
 
-	//	std::string fileName = LTSpiceConnectorAPI::getLocalFileName();
+		std::string fileName = LTSpiceConnectorAPI::getLocalFileName();
 
-	//	std::thread workerThread(LTSpiceConnectorAPI::downloadFiles, fileName, projectName, entityIDList, entityVersionList, version);
-	//	workerThread.detach();
-	//}
+		std::thread workerThread(LTSpiceConnectorAPI::downloadFiles, fileName, projectName, entityIDList, entityVersionList, version);
+		workerThread.detach();
+	}
 	else if (action == OT_ACTION_CMD_UI_LTS_COPY) {
 
 		std::string newVersion = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
