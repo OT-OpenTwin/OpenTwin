@@ -39,6 +39,10 @@ namespace ot {
 		void setCurves(const std::list<Plot1DCurveInfoCfg>& _curves) { m_curves = _curves; };
 		const std::list<Plot1DCurveInfoCfg>& getCurves(void) const { return m_curves; };
 
+		//! \brief Updates the curve version.
+		//! Returns true if the version has been changed.
+		bool updateCurveVersion(ot::UID _curveEntityUID, ot::UID _newCurveEntityVersion);
+
 	private:
 		std::list<Plot1DCurveInfoCfg> m_curves;
 	};

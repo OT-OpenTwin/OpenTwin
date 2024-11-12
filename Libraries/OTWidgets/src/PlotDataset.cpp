@@ -27,7 +27,8 @@ ot::PlotDataset::PlotDataset(Plot* _ownerPlot, int _id, const QString& _title, d
 	m_ownerPlot(_ownerPlot), m_curveTitle(_title), m_isAttatched(false),
 	m_curveColor(255, 0, 0), m_curvePenSize(1.0), m_isVisible(true), m_isDimmed(false), m_curvePointInnerColor(0, 255, 0),
 	m_curvePointOutterColor(0, 255, 0), m_curvePointOutterColorWidth(1.0), m_curvePointSize(5), m_dataYim(nullptr), m_dataYcalc(nullptr),
-	m_polarData(nullptr), m_dataXcalc(nullptr) 
+	m_curvePointsVisible(false), m_curveTreeItemID(0), m_polarData(nullptr), m_dataXcalc(nullptr), 
+	m_entityID(0), m_entityVersion(0), m_curveEntityID(0), m_curveEntityVersion(0)
 {
 	m_cartesianCurve = new QwtPlotCurve(_title);
 	m_cartesianCurvePointSymbol = new QwtSymbol;
@@ -58,7 +59,7 @@ void ot::PlotDataset::replaceData(double* _dataX, double* _dataY, long _dataSize
 
 	m_cartesianCurve->setRawSamples(m_dataX, m_dataY, m_dataSize);
 
-	m_polarData->replaceData(m_dataX, m_dataY, m_dataSize);
+	m_polarData->setData(m_dataX, m_dataY, m_dataSize);
 	m_polarCurve->setData(m_polarData);
 }
 
@@ -120,7 +121,7 @@ void ot::PlotDataset::setCurvePointOuterColorWidth(double _size, bool _repaint) 
 
 void ot::PlotDataset::attach(void) {
 	if (m_isAttatched) {
-		OT_LOG_WA("Dataset already attached");
+		//OT_LOG_WA("Dataset already attached");
 		return;
 	}
 	m_isAttatched = true;
@@ -131,7 +132,6 @@ void ot::PlotDataset::attach(void) {
 
 void ot::PlotDataset::detach(void) {
 	if (!m_isAttatched) {
-		OT_LOG_WA("Dataset already detached");
 		return;
 	}
 	m_isAttatched = false;
@@ -177,7 +177,7 @@ void ot::PlotDataset::calculateData(Plot1DCfg::AxisQuantity _axisQuantity) {
 		}
 
 		m_cartesianCurve->setRawSamples(m_dataX, m_dataYcalc, m_dataSize);
-		m_polarData->replaceData(m_dataX, m_dataYcalc, m_dataSize);
+		m_polarData->setData(m_dataX, m_dataYcalc, m_dataSize);
 		break;
 
 	case Plot1DCfg::Phase:
@@ -187,17 +187,17 @@ void ot::PlotDataset::calculateData(Plot1DCfg::AxisQuantity _axisQuantity) {
 			m_dataYcalc[i] = atan2(m_dataYim[i], m_dataY[i]) / intern::pi * 180;
 		}
 		m_cartesianCurve->setRawSamples(m_dataX, m_dataYcalc, m_dataSize);
-		m_polarData->replaceData(m_dataX, m_dataYcalc, m_dataSize);
+		m_polarData->setData(m_dataX, m_dataYcalc, m_dataSize);
 		break;
 
 	case Plot1DCfg::Real:
 		m_cartesianCurve->setRawSamples(m_dataX, m_dataY, m_dataSize);
-		m_polarData->replaceData(m_dataX, m_dataY, m_dataSize);
+		m_polarData->setData(m_dataX, m_dataY, m_dataSize);
 		break;
 
 	case Plot1DCfg::Imaginary:
 		m_cartesianCurve->setRawSamples(m_dataX, m_dataYim, m_dataSize);
-		m_polarData->replaceData(m_dataX, m_dataYim, m_dataSize);
+		m_polarData->setData(m_dataX, m_dataYim, m_dataSize);
 		break;
 
 	case Plot1DCfg::Complex:
@@ -211,7 +211,7 @@ void ot::PlotDataset::calculateData(Plot1DCfg::AxisQuantity _axisQuantity) {
 			m_dataYcalc[i] = v;
 		}
 		m_cartesianCurve->setRawSamples(m_dataXcalc, m_dataYcalc, m_dataSize);
-		m_polarData->replaceData(m_dataXcalc, m_dataYcalc, m_dataSize);
+		m_polarData->setData(m_dataXcalc, m_dataYcalc, m_dataSize);
 		break;
 
 	default:

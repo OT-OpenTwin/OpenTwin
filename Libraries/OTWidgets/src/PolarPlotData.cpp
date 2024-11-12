@@ -14,7 +14,7 @@ ot::PolarPlotData::PolarPlotData(double* _azimuth, double* _radius, size_t _data
 }
 
 ot::PolarPlotData::~PolarPlotData() {
-	this->clear();
+
 }
 
 QwtPointPolar ot::PolarPlotData::sample(size_t _i) const {
@@ -27,21 +27,8 @@ QwtPointPolar ot::PolarPlotData::sample(size_t _i) const {
 	}
 }
 
-void ot::PolarPlotData::replaceData(double* _azimuth, double* _radius, size_t _dataSize) {
-	this->clear();
+void ot::PolarPlotData::setData(double* _azimuth, double* _radius, size_t _dataSize) {
 	m_azimuth = _azimuth;
 	m_radius = _radius;
 	m_size = _dataSize;
-}
-
-void ot::PolarPlotData::clear(void) {
-	if (m_azimuth) {
-		delete[] m_azimuth;
-		m_azimuth = nullptr;
-	}
-	if (m_radius) {
-		delete[] m_radius;
-		m_radius = nullptr;
-	}
-	m_size = 0;
 }

@@ -33,11 +33,6 @@ void ot::AbstractPlot::setPlotAxis(AbstractPlotAxis * _axisXBottom, AbstractPlot
 	m_axisXTop = _axisXTop;
 	m_axisYLeft = _axisYLeft;
 	m_axisYRight = _axisYRight;
-
-	OTAssertNullptr(m_axisXBottom);
-	OTAssertNullptr(m_axisXTop);
-	OTAssertNullptr(m_axisYLeft);
-	OTAssertNullptr(m_axisYRight);
 }
 
 ot::AbstractPlotAxis * ot::AbstractPlot::getPlotAxis(AbstractPlotAxis::AxisID _id) {
