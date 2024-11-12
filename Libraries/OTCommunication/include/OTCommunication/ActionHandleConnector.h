@@ -35,6 +35,7 @@ namespace ot {
 
 		ActionHandleConnector();
 		ActionHandleConnector(const std::string& _actionName, ot::MessageType _messageFlags, ActionHandler* _handler, ConnectorMessageRef _handlerFunction);
+		ActionHandleConnector(const std::initializer_list<const char*>& _actionNames, ot::MessageType _messageFlags, ActionHandler* _handler, ConnectorMessageRef _handlerFunction);
 		ActionHandleConnector(const std::list<std::string>& _actionNames, ot::MessageType _messageFlags, ActionHandler* _handler, ConnectorMessageRef _handlerFunction);
 		ActionHandleConnector(const ActionHandleConnector<T>& _other);
 
@@ -60,6 +61,11 @@ template <class T>
 ot::ActionHandleConnector<T>::ActionHandleConnector(const std::string& _actionName, ot::MessageType _messageFlags, ActionHandler* _obj, ConnectorMessageRef _func)
 	: ActionHandleConnectorBase(_actionName, _messageFlags), m_obj(_obj), m_func(_func)
 {}
+
+template <class T>
+ot::ActionHandleConnector<T>::ActionHandleConnector(const std::initializer_list<const char*>& _actionNames, ot::MessageType _messageFlags, ActionHandler* _obj, ConnectorMessageRef _func)
+	: ActionHandleConnectorBase(std::list<std::string>(_actionNames), _messageFlags), m_obj(_obj), m_func(_func) {
+}
 
 template <class T>
 ot::ActionHandleConnector<T>::ActionHandleConnector(const std::list<std::string>& _actionNames, ot::MessageType _messageFlags, ActionHandler* _obj, ConnectorMessageRef _func)
