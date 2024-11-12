@@ -334,6 +334,19 @@ public:
 	OT_HANDLER(handleStudioSuiteSetCSTFile, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_SETCSTFILE, ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// LTSpice API
+	/*
+	OT_HANDLER(handleLTSpiceAction, ExternalServicesComponent, (
+		OT_ACTION_CMD_UI_LTS_IMPORT,
+		OT_ACTION_CMD_UI_LTS_COMMIT,
+		OT_ACTION_CMD_UI_LTS_GET,
+		OT_ACTION_CMD_UI_LTS_UPLOAD,
+		OT_ACTION_CMD_UI_LTS_DOWNLOAD,
+		OT_ACTION_CMD_UI_LTS_COPY,
+		OT_ACTION_CMD_UI_LTS_INFORMATION,
+		OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE
+		), ot::MessageType::ALL_MESSAGE_TYPES)
+	*/
+
 	OT_HANDLER(handleLTSpiceImport, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_IMPORT, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleLTSpiceCommit, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_COMMIT, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleLTSpiceGet, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_GET, ot::MessageType::ALL_MESSAGE_TYPES)

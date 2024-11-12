@@ -4261,6 +4261,12 @@ std::string ExternalServicesComponent::handleStudioSuiteSetCSTFile(ot::JsonDocum
 
 // LTSpice API
 
+/*
+std::string ExternalServicesComponent::handleLTSpiceAction(ot::JsonDocument& _document) {
+	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
+	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
+}
+*/
 std::string ExternalServicesComponent::handleLTSpiceImport(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
 	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
