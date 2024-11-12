@@ -3822,13 +3822,40 @@ std::string ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _docume
 	gridColor[1] = _document[OT_ACTION_PARAM_VIEW1D_GridColorG].GetInt();
 	gridColor[2] = _document[OT_ACTION_PARAM_VIEW1D_GridColorB].GetInt();
 
-	std::list<ak::UID> curvesID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VIEW1D_CurveIDs);
-	std::list<ak::UID> curvesVersions = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VIEW1D_CurveVersions);
+	std::list<ot::UID> curvesID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VIEW1D_CurveIDs);
+	std::list<ot::UID> curvesVersions = ot::json::getUInt64List(_document, OT_ACTION_PARAM_VIEW1D_CurveVersions);
 	std::list<std::string> curvesNames = ot::json::getStringList(_document, OT_ACTION_PARAM_VIEW1D_CurveNames);
 
 	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
 
-	ViewerAPI::addVisualizationPlot1DNode(visModelID, name, uid, treeIcons, isHidden, projectName, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax, curvesID, curvesVersions, curvesNames);
+	ot::Plot1DDataBaseCfg config;
+	config.setUid(uid);
+	config.setName(name);
+	config.setTitle(title);
+	config.setProjectName(projectName);
+	config.setPlotType(ot::Plot1DCfg::stringToPlotType(plotType));
+	config.setAxisQuantity(ot::Plot1DCfg::stringToAxisQuantity(plotQuantity));
+	config.setGridVisible(grid);
+	config.setGridColor(ot::Color(gridColor[0], gridColor[1], gridColor[2]));
+	config.setLegendVisible(legend);
+	config.setXAxisIsLogScale(logscaleX);
+	config.setXAxisIsAutoScale(autoscaleX);
+	config.setXAxisMin(xmin);
+	config.setXAxisMax(xmax);
+	config.setYAxisIsLogScale(logscaleY);
+	config.setYAxisIsAutoScale(autoscaleY);
+	config.setYAxisMin(ymin);
+	config.setYAxisMax(ymax);
+
+	auto versionIt = curvesVersions.begin();
+	auto namesIt = curvesNames.begin();
+	for (ot::UID id : curvesID) {
+		config.addCurve(ot::Plot1DCurveInfoCfg(id, *versionIt, *namesIt));
+		versionIt++;
+		namesIt++;
+	}
+
+	ViewerAPI::addVisualizationPlot1DNode(visModelID, config);
 
 	return "";
 }
@@ -3854,7 +3881,24 @@ std::string ExternalServicesComponent::handlePlot1DPropertiesChanged(ot::JsonDoc
 	gridColor[1] = _document[OT_ACTION_PARAM_VIEW1D_GridColorG].GetInt();
 	gridColor[2] = _document[OT_ACTION_PARAM_VIEW1D_GridColorB].GetInt();
 
-	ViewerAPI::visualizationPlot1DPropertiesChanged(visModelID, uid, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax);
+	ot::Plot1DCfg config;
+	config.setUid(uid);
+	config.setTitle(title);
+	config.setPlotType(ot::Plot1DCfg::stringToPlotType(plotType));
+	config.setAxisQuantity(ot::Plot1DCfg::stringToAxisQuantity(plotQuantity));
+	config.setGridVisible(grid);
+	config.setGridColor(ot::Color(gridColor[0], gridColor[1], gridColor[2]));
+	config.setLegendVisible(legend);
+	config.setXAxisIsLogScale(logscaleX);
+	config.setXAxisIsAutoScale(autoscaleX);
+	config.setXAxisMin(xmin);
+	config.setXAxisMax(xmax);
+	config.setYAxisIsLogScale(logscaleY);
+	config.setYAxisIsAutoScale(autoscaleY);
+	config.setYAxisMin(ymin);
+	config.setYAxisMax(ymax);
+
+	ViewerAPI::visualizationPlot1DPropertiesChanged(visModelID, config);
 
 	return "";
 }

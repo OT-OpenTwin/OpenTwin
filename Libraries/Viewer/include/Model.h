@@ -3,18 +3,19 @@
 #include "OTCore/CoreTypes.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/PropertyGridCfg.h"
+#include "OTGui/Plot1DDataBaseCfg.h"
+#include "Types.h"
+#include "Geometry.h"
+#include "SceneNodeBase.h"
 
+// std header
 #include <list>
 #include <tuple>
 
+// OSG header
 #include <osg/ref_ptr>
 #include <osg/Group>
 #include <osgUtil/IntersectionVisitor>
-
-#include "Geometry.h"
-#include "SceneNodeBase.h"
-#include "Types.h"
-#include "Plot.h"
 
 class Viewer;
 class SceneNodeGeometry;
@@ -176,14 +177,12 @@ public:
 	void addVisualizationCartesianMeshItemNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3]);
 	void visualizationTetMeshNodeTetEdges(unsigned long long modelEntityID, bool displayTetEdges);
 
-	void addVisualizationPlot1DNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden,
-									const std::string &projectName, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-									bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax, std::list<unsigned long long> &curvesID, std::list<unsigned long long> &curvesVersions,
-									std::list<std::string> &curvesNames);
-	void addVisualizationResult1DNode(const std::string &treeName, unsigned long long curveEntityID, unsigned long long curveEntityVersion, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName);
-	void visualizationResult1DPropertiesChanged(unsigned long long entityID, unsigned long long version);
-	void visualizationPlot1DPropertiesChanged(unsigned long long modelEntityID, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-											  bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax);
+	void addVisualizationPlot1DNode(const ot::Plot1DDataBaseCfg& _config);
+	void addVisualizationResult1DNode(const ot::Plot1DCurveInfoCfg& _curveInfo, const TreeIcon& _treeIcons, bool _isHidden);
+	
+	void visualizationResult1DPropertiesChanged(ot::UID _entityID, ot::UID _version);
+	void visualizationPlot1DPropertiesChanged(const ot::Plot1DCfg& _config);
+
 	void addVisualizationTextNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long textEntityID, unsigned long long textEntityVersion);
 	void addVisualizationTableNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long tableEntityID, unsigned long long tableEntityVersion);
 	void addVTKNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
@@ -319,19 +318,6 @@ private:
 	void	   setSelectedFacesHighlight(SceneNodeGeometry *selectedItem, unsigned long long faceId, bool highlight);
 	void       clearSelectedFacesHighlight(void);
 	bool       isFaceSelected(SceneNodeGeometry *selectedItem, unsigned long long faceId);
-	void	   clear1DPlot(void);
-	void	   set1DPlotIncompatibleData(void);
-	void       remove1DPlotErrorState(void);
-	void	   update1DPlot(SceneNodeBase *root);
-	void	   add1DPlotItems(SceneNodeBase *root, bool &firstCurve, SceneNodePlot1D*&commonPlot, AbstractPlot::PlotType &plotType, PlotDataset::axisQuantity &yAxisQuantity, std::string &title, bool &grid, int gridColor[], bool &legend, bool &logscaleX, bool &logscaleY,
-							  bool &autoscaleX, bool &autoscaleY, double &xmin, double &xmax, double &ymin, double &ymax, std::string &, std::list<PlotCurveItem> &selectedCurves, bool &compatible);
-	SceneNodePlot1D* getPlotFromCurve(SceneNodePlot1DCurve* curve);
-	bool	   changeResult1DEntityVersion(SceneNodeBase *root, unsigned long long entityID, unsigned long long version);
-	bool	   gridCompatible(bool grid1, int r1, int g1, int b1, bool grid2, int r2, int g2, int b2);
-	bool	   axisCompatible(bool logscale1, bool autoscale1, double min1, double max1, bool logscale2, bool autoscale2, double min2, double max2);
-	bool	   plotCompatible(AbstractPlot::PlotType type1, PlotDataset::axisQuantity quantity1, AbstractPlot::PlotType type2, PlotDataset::axisQuantity quantity2);
-	void	   addCompatibleDimmedPlotItems(SceneNodeBase *root, AbstractPlot::PlotType &plotType, PlotDataset::axisQuantity &yAxisQuantity, std::string &title, bool &grid, int gridColor[], bool &legend, bool &logscaleX, bool &logscaleY,
-											bool &autoscaleX, bool &autoscaleY, double &xmin, double &xmax, double &ymin, double &ymax, std::string &projectName, std::list<PlotCurveItem> &selectedCurves);
 	void       manageParentVisibility(SceneNodeBase *item);
 	void	   updateWorkingPlaneTransform(void);
 	bool       getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, osg::Matrix &matrix);
@@ -341,6 +327,16 @@ private:
 	bool	   isLineDrawable(osg::Drawable *drawable);
 	void	   clearEdgeSelection(void);
 
+	// Plot 1D
+	void	   clear1DPlot(void);
+	void	   set1DPlotIncompatibleData(void);
+	void       remove1DPlotErrorState(void);
+	void	   update1DPlot(SceneNodeBase* root);
+	void	   add1DPlotItems(SceneNodeBase* _root, bool& _isFirstCurve, SceneNodePlot1D*& _commonPlot, bool& _isCompatible, ot::Plot1DDataBaseCfg& _config);
+	SceneNodePlot1D* getPlotFromCurve(SceneNodePlot1DCurve* curve);
+	bool	   updateCurveEntityVersion(SceneNodeBase* _root, ot::UID _entityID, ot::UID _version);
+	void	   addCompatibleDimmedPlotItems(SceneNodeBase* _root, ot::Plot1DDataBaseCfg& _config);
+	
 	// Attributes
 	enum { ITEM_SELECTED = 1, ITEM_EXPANDED = 2 };
 

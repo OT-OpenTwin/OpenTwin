@@ -32,14 +32,10 @@ public:
 	void setModelEntityVersion(ot::UID _version) { m_modelEntityVersion = _version; };
 	ot::UID getModelEntityVersion(void) { return m_modelEntityVersion; };
 
-	void setProjectName(const std::string& _name) { m_projectName = _name; };
-	std::string getProjectName(void) { return m_projectName; };
-
 	virtual bool isItem1D(void) { return true; };
 	virtual bool isItem3D(void) { return false; };
 
 private:
-	std::string m_projectName;
 	ot::UID m_modelEntityVersion;
 };
 

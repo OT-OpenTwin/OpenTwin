@@ -38,7 +38,7 @@ namespace osg		{ class ShapeDrawable; };
 namespace osg		{ class Group; }
 namespace ot        { class Property; }
 namespace ot        { class TableViewerView; }
-namespace ot        { class PlotViewOld; }
+namespace ot        { class PlotManager; }
 
 class Viewer : public QOpenGLWidget
 {
@@ -59,7 +59,7 @@ public:
 
 	void detachFromModel(void);
 
-	ot::PlotViewOld* get1DPlot(void) const { return m_plot; }
+	ot::PlotManager* get1DPlot(void) const { return m_plot; }
 	ot::TableViewerView* getTableViewer() const { return m_tableViewer; }
 
 	void setTabNames(const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
@@ -198,7 +198,7 @@ private:
 	osg::ref_ptr<osg::Switch>          handlerNode;
 	HandlerBase						  *currentHandler;
 
-	ot::PlotViewOld*						m_plot;
+	ot::PlotManager*						m_plot;
 	std::string							m_plotTabName;
 
 	ot::TableViewerView*				m_tableViewer;
