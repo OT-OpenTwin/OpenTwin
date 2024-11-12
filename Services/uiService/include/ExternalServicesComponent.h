@@ -56,13 +56,12 @@ class KeyboardCommandHandler;
 namespace ot { class ServiceBase; };
 namespace ot { class Property; };
 
-class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::ActionHandler
-{
+class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::ActionHandler {
 	Q_OBJECT
 public:
 	enum RequestType { EXECUTE, QUEUE };
 
-	ExternalServicesComponent(AppBase * _owner);
+	ExternalServicesComponent(AppBase* _owner);
 	virtual ~ExternalServicesComponent(void);
 
 	void shutdown(void);
@@ -71,13 +70,13 @@ public:
 
 	// Getter
 
-	const std::string & sessionServiceURL(void) const { return m_sessionServiceURL; }
+	const std::string& sessionServiceURL(void) const { return m_sessionServiceURL; }
 
-	const std::string & uiServiceURL(void) const { return m_uiServiceURL; }
+	const std::string& uiServiceURL(void) const { return m_uiServiceURL; }
 
-	ControlsManager * controlsManager(void) { return m_controlsManager; }
+	ControlsManager* controlsManager(void) { return m_controlsManager; }
 
-	LockManager * lockManager(void) { return m_lockManager; }
+	LockManager* lockManager(void) { return m_lockManager; }
 
 	// ###################################################################################################
 
@@ -89,13 +88,13 @@ public:
 
 	void setRelayServiceIsRequired(void);
 
-	void setMessagingRelay(const std::string & _relayAddress);
+	void setMessagingRelay(const std::string& _relayAddress);
 
 	// ###################################################################################################
 
 	// UI Element creation
-	
-	KeyboardCommandHandler * addShortcut(ServiceDataUi* _sender, const std::string& _keySequence);
+
+	KeyboardCommandHandler* addShortcut(ServiceDataUi* _sender, const std::string& _keySequence);
 
 	// ###################################################################################################
 
@@ -119,20 +118,20 @@ public:
 
 	void fillPropertyGrid(const std::string& _settings);
 
-	void modelSelectionChangedNotification(ModelUIDtype modelID, std::list<ModelUIDtype> &selectedEntityID, std::list<ModelUIDtype> &selectedVisibleEntityID);
+	void modelSelectionChangedNotification(ModelUIDtype modelID, std::list<ModelUIDtype>& selectedEntityID, std::list<ModelUIDtype>& selectedVisibleEntityID);
 
-	void itemRenamed(ModelUIDtype modelID, const std::string &newName);
+	void itemRenamed(ModelUIDtype modelID, const std::string& newName);
 
 	ot::Property* createCleanedProperty(const ot::Property* const _item);
 
 	void propertyGridValueChanged(const ot::Property* _property);
 	void propertyGridValueDeleteRequested(const ot::Property* _property);
-	
+
 	void executeAction(ModelUIDtype modelID, ModelUIDtype buttonID);
 
-	void entitiesSelected(ModelUIDtype modelID, ot::serviceID_t replyToServiceID, const std::string &selectionAction, const std::string &selectionInfo, std::list<std::string> &optionNames, std::list<std::string> &optionValues);
-	
-	void prefetchDataThread(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs);
+	void entitiesSelected(ModelUIDtype modelID, ot::serviceID_t replyToServiceID, const std::string& selectionAction, const std::string& selectionInfo, std::list<std::string>& optionNames, std::list<std::string>& optionValues);
+
+	void prefetchDataThread(const std::string& projectName, std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs);
 
 	void contextMenuItemClicked(ot::ServiceBase* _sender, const std::string& _menuName, const std::string& _itemName);
 
@@ -143,13 +142,13 @@ public:
 	// Messaging
 	void sendToModelService(const std::string& _message, std::string _response);
 
-	bool sendHttpRequest(RequestType operation, const std::string &url, ot::JsonDocument &doc, std::string &response);
-	bool sendHttpRequest(RequestType operation, ot::OwnerService _service, ot::JsonDocument &doc, std::string &response);
-	bool sendHttpRequest(RequestType operation, const ot::BasicServiceInformation& _service, ot::JsonDocument &doc, std::string &response);
+	bool sendHttpRequest(RequestType operation, const std::string& url, ot::JsonDocument& doc, std::string& response);
+	bool sendHttpRequest(RequestType operation, ot::OwnerService _service, ot::JsonDocument& doc, std::string& response);
+	bool sendHttpRequest(RequestType operation, const ot::BasicServiceInformation& _service, ot::JsonDocument& doc, std::string& response);
 	bool sendHttpRequest(RequestType operation, const std::string& url, const std::string& message, std::string& response);
-	bool sendRelayedRequest(RequestType operation, const std::string &url, const std::string &json, std::string &response);
-	bool sendKeySequenceActivatedMessage(KeyboardCommandHandler * _sender);
-	void sendRubberbandResultsToService(ot::serviceID_t _serviceId, const std::string& _note, const std::string& _pointJson, const std::vector<double> &transform);
+	bool sendRelayedRequest(RequestType operation, const std::string& url, const std::string& json, std::string& response);
+	bool sendKeySequenceActivatedMessage(KeyboardCommandHandler* _sender);
+	void sendRubberbandResultsToService(ot::serviceID_t _serviceId, const std::string& _note, const std::string& _pointJson, const std::vector<double>& transform);
 	void requestUpdateVTKEntity(unsigned long long modelEntityID);
 
 	void versionSelected(const std::string& _version);
@@ -161,17 +160,17 @@ public:
 	// Project handling
 
 	std::list<ot::ProjectTemplateInformation> getListOfProjectTemplates(void);
-	void openProject(const std::string & projectName, const std::string& projectType, const std::string & collectionName);
+	void openProject(const std::string& projectName, const std::string& projectType, const std::string& collectionName);
 	void closeProject(bool saveChanges);
 	void saveProject();
-	bool projectIsOpened(const std::string &projectName, std::string &projectUser);
+	bool projectIsOpened(const std::string& projectName, std::string& projectUser);
 
 	// ###################################################################################################
 
 	// File operations
 	std::list<std::string> RequestFileNames(const std::string& dialogTitle, const std::string& fileMask);
 
-	void ReadFileContent(const std::string &fileName, std::string &fileContent, unsigned long long &uncompressedDataLength);
+	void ReadFileContent(const std::string& fileName, std::string& fileContent, unsigned long long& uncompressedDataLength);
 
 	// ###################################################################################################
 
@@ -256,7 +255,7 @@ public:
 	OT_HANDLER(handleAddCartesianMeshItem, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddCartesianMeshItem, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleTetMeshNodeTetEdges, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_TetMeshNodeTetEdges, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddMeshItemFromFacetDatabase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddMeshItemFromFacetDatabase, ot::MessageType::ALL_MESSAGE_TYPES)
-	
+
 	OT_HANDLER(handleEnterEntitySelectionMode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSetModifiedState, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetModifiedState, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSetProgressVisibility, ExternalServicesComponent, OT_ACTION_CMD_UI_SetProgressVisibility, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -271,17 +270,17 @@ public:
 	OT_HANDLER(handleUnlock, ExternalServicesComponent, OT_ACTION_CMD_UI_Unlock, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddSettingsData, ExternalServicesComponent, OT_ACTION_CMD_UI_AddSettingsData, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddIconSearchPath, ExternalServicesComponent, OT_ACTION_CMD_UI_AddIconSearchPath, ot::MessageType::ALL_MESSAGE_TYPES)
-	
+
 	// Property Grid
 	OT_HANDLER(handleFillPropertyGrid, ExternalServicesComponent, OT_ACTION_CMD_UI_FillPropertyGrid, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleFocusPropertyGridItem, ExternalServicesComponent, OT_ACTION_CMD_UI_FocusPropertyGridItem, ot::MessageType::ALL_MESSAGE_TYPES)
-
+		
 	// Version Graph
 	OT_HANDLER(handleSetVersionGraph, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetVersionGraph, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSetVersionGraphActive, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleRemoveVersionGraphVersions, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddAndActivateVersionGraphVersion, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion, ot::MessageType::ALL_MESSAGE_TYPES)
-
+		
 	// 1D Plot
 	OT_HANDLER(handleAddPlot1D, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddPlot1D, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handlePlot1DPropertiesChanged, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -313,7 +312,7 @@ public:
 	OT_HANDLER(handleInsertTableColumnBefore, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_InsertColumnBefore, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleRemoveTableColumn, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_RemoveColumn, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleCloseTable, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_Close, ot::MessageType::ALL_MESSAGE_TYPES)
-	
+
 	// Table Old
 	OT_HANDLER(handleTableChange, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddTable, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -335,7 +334,7 @@ public:
 
 	// LTSpice API
 	/*
-	OT_HANDLER(handleLTSpiceAction, ExternalServicesComponent, (
+	OT_HANDLER(handleLTSpiceAction, ExternalServicesComponent, OT_ACTIONLIST(
 		OT_ACTION_CMD_UI_LTS_IMPORT,
 		OT_ACTION_CMD_UI_LTS_COMMIT,
 		OT_ACTION_CMD_UI_LTS_GET,
@@ -344,7 +343,7 @@ public:
 		OT_ACTION_CMD_UI_LTS_COPY,
 		OT_ACTION_CMD_UI_LTS_INFORMATION,
 		OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE
-		), ot::MessageType::ALL_MESSAGE_TYPES)
+	), ot::MessageType::ALL_MESSAGE_TYPES)
 	*/
 
 	OT_HANDLER(handleLTSpiceImport, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_IMPORT, ot::MessageType::ALL_MESSAGE_TYPES)
