@@ -376,6 +376,9 @@
     <ClInclude Include="include\EntityResultTextData.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="include\IVisualisationTable.h">
+      <Filter>Header Files\EntityInterfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">

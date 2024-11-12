@@ -29,6 +29,7 @@
     <ClInclude Include="include\EntityCoordinates2D.h" />
     <ClInclude Include="include\EntityResultText.h" />
     <ClInclude Include="include\EntityResultTextData.h" />
+    <ClInclude Include="include\IVisualisationTable.h" />
     <ClInclude Include="include\IVisualisationText.h" />
     <ClInclude Include="include\EntityMetadataSeries.h" />
     <ClInclude Include="include\EntityMetadataCampaign.h" />

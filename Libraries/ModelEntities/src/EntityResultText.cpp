@@ -76,13 +76,9 @@ void EntityResultText::addVisualizationItem(bool isHidden)
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddText, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_TEXT_ID, (ot::UID)textDataStorageId, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_TEXT_VERSION, (ot::UID)textDataStorageVersion, doc.GetAllocator());
 
 	treeIcons.addToJsonDoc(doc);
 
@@ -124,6 +120,36 @@ EntityResultTextData *EntityResultText::getTextData(void)
 	assert(textData != nullptr);
 
 	return textData;
+}
+
+std::string EntityResultText::getText()
+{
+	EnsureTextDataLoaded();
+	assert(textData != nullptr);
+
+	return textData->getText();
+}
+
+bool EntityResultText::visualiseText()
+{
+	return true;
+}
+
+ot::TextEditorCfg EntityResultText::createConfig()
+{
+	ot::TextEditorCfg result;
+	result.setName(this->getName());
+	result.setTitle(this->getName());
+	result.setPlainText(this->getText());
+
+	result.setDocumentSyntax(ot::DocumentSyntax::PlainText);
+	
+	return result;
+}
+
+ot::ContentChangedHandling EntityResultText::getContentChangedHandling()
+{
+	return ot::ContentChangedHandling::SimpleSave;
 }
 
 void EntityResultText::deleteTextData(void)
@@ -188,12 +214,4 @@ void EntityResultText::setText(const std::string &text)
 	textData->setText(text);
 
 	storeTextData();
-}
-
-std::string &EntityResultText::getText(void)
-{
-	EnsureTextDataLoaded();
-	assert(textData != nullptr);
-
-	return textData->getText();
 }
