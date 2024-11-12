@@ -39,6 +39,11 @@ bool FileHandler::handleAction(const std::string& _action, ot::JsonDocument& _do
 		storeTextFile(_doc);
 		actionIsHandled = true;
 	}
+	else if (_action == OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest)
+	{
+		storeChangedText(_doc);
+		actionIsHandled = true;
+	}
 	else
 	{
 		actionIsHandled = false;
@@ -112,6 +117,38 @@ void FileHandler::ensureUTF8Encoding(std::string& _text)
 	}
 }
 
+void FileHandler::storeChangedText(ot::JsonDocument& _doc)
+{
+	const std::string entityName = _doc[OT_ACTION_PARAM_TEXTEDITOR_Name].GetString();
+	const std::string textContent = _doc[OT_ACTION_PARAM_TEXTEDITOR_Text].GetString();
+
+	Model* model =	Application::instance()->getModel();
+	assert(model != nullptr);
+
+	const auto entityIDsByName = model->getEntityNameToIDMap();
+	auto entityIDByName	= entityIDsByName.find(entityName);
+	if(entityIDByName != entityIDsByName.end())
+	{
+		ot::UID entityID = entityIDByName->second;
+		EntityBase* entityBase = model->getEntityByID(entityID);
+		IVisualisationText* textVisualisationEntity = dynamic_cast<IVisualisationText*>(entityBase);
+		if(textVisualisationEntity != nullptr)
+		{
+			textVisualisationEntity->setText(textContent);
+			model->setModified();
+			model->modelChangeOperationCompleted("Updated Text.");
+		}
+		else
+		{
+			OT_LOG_E("Failed to visualise " + entityName + " since it does not support the corresponding visualisation interface.");
+		}
+	}
+	else
+	{
+		OT_LOG_E("Failed to handle changed text request since the entity could not be found by name: " + entityName);
+	}
+}
+
 void FileHandler::storeFileInDataBase(const std::string& _text, const std::string& _fileName)
 {
 	Model* model = Application::instance()->getModel();
@@ -138,7 +175,7 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	fileContent.setData(_text.data(), _text.size());
 	fileContent.StoreToDataBase();
 
-	textFile->setData(fileContent.getEntityID(), fileContent.getEntityStorageVersion());
+	textFile->setData(fileContent.getEntityID(),fileContent.getEntityStorageVersion());
 
 	ot::EncodingGuesser guesser;
 	textFile->setFileProperties(path, name,type);

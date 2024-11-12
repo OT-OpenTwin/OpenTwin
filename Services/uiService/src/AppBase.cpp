@@ -2165,7 +2165,9 @@ void AppBase::slotTextEditorSaveRequested(void) {
 	*/
 	{
 		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
+		
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
 
 		try {
 			ot::BasicServiceInformation info(m_textEditors.findOwner(editor).getId());
@@ -2182,6 +2184,10 @@ void AppBase::slotTextEditorSaveRequested(void) {
 			if (rMsg != ot::ReturnMessage::Ok) {
 				OT_LOG_E("Request failed: " + rMsg.getWhat());
 				return;
+			}
+			else
+			{
+				editor->setContentChanged(false);
 			}
 		}
 		catch (const std::exception& _e) {

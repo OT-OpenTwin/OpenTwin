@@ -103,10 +103,15 @@ void EntityFileText::setText(const std::string& _text)
 		if (getModelState() != nullptr)
 		{
 			dataEntity->StoreToDataBase();
-			getModelState()->addNewEntity(dataEntity->getEntityID(), this->getEntityID(), dataEntity->getEntityStorageVersion(), ModelStateEntity::tEntityType::DATA);
 			setData(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+			getModelState()->modifyEntityVersion(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+			this->StoreToDataBase();
+			getModelState()->modifyEntityVersion(this->getEntityID(), this->getEntityStorageVersion());
 		}
-
+		else
+		{
+			setModified();
+		}
 	}
 }
 
