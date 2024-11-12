@@ -41,7 +41,7 @@ bool FileHandler::handleAction(const std::string& _action, ot::JsonDocument& _do
 	}
 	else if (_action == OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest)
 	{
-		storeChangedText(_doc);
+		handleChangedText(_doc);
 		actionIsHandled = true;
 	}
 	else
@@ -117,7 +117,7 @@ void FileHandler::ensureUTF8Encoding(std::string& _text)
 	}
 }
 
-void FileHandler::storeChangedText(ot::JsonDocument& _doc)
+void FileHandler::handleChangedText(ot::JsonDocument& _doc)
 {
 	const std::string entityName = _doc[OT_ACTION_PARAM_TEXTEDITOR_Name].GetString();
 	const std::string textContent = _doc[OT_ACTION_PARAM_TEXTEDITOR_Text].GetString();
@@ -134,9 +134,35 @@ void FileHandler::storeChangedText(ot::JsonDocument& _doc)
 		IVisualisationText* textVisualisationEntity = dynamic_cast<IVisualisationText*>(entityBase);
 		if(textVisualisationEntity != nullptr)
 		{
-			textVisualisationEntity->setText(textContent);
-			model->setModified();
-			model->modelChangeOperationCompleted("Updated Text.");
+			ot::ContentChangedHandling changedHandling = textVisualisationEntity->getContentChangedHandling();
+			if (changedHandling == ot::ContentChangedHandling::ModelServiceSaves)
+			{
+				
+				storeChangedText(textVisualisationEntity, textContent);
+			}
+			else if (changedHandling == ot::ContentChangedHandling::OwnerHandles)
+			{
+				const std::string& owner =	entityBase->getOwningService();
+				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
+				{
+					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(_doc), owner); //Potentially dangerous ? Usually the document should not be used afterwards.
+					workerThread.detach();
+				}
+			}
+			else if (changedHandling == ot::ContentChangedHandling::ModelServiceSavesNotifyOwner)
+			{
+				storeChangedText(textVisualisationEntity, textContent);
+				
+				const std::string& owner = entityBase->getOwningService();
+				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
+				{
+					ot::JsonDocument notify;
+					notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, notify.GetAllocator()), notify.GetAllocator());
+					notify.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
+					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), owner);
+					workerThread.detach();
+				}
+			}
 		}
 		else
 		{
@@ -147,6 +173,23 @@ void FileHandler::storeChangedText(ot::JsonDocument& _doc)
 	{
 		OT_LOG_E("Failed to handle changed text request since the entity could not be found by name: " + entityName);
 	}
+}
+
+void FileHandler::storeChangedText(IVisualisationText* _entity, const std::string _text)
+{
+	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+	assert(_entity != nullptr);
+
+	_entity->setText(_text);
+	model->setModified();
+	model->modelChangeOperationCompleted("Updated Text.");
+}
+
+void FileHandler::NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner)
+{
+	std::string response;
+	Application::instance()->sendMessage(true, _owner, _doc, response);
 }
 
 void FileHandler::storeFileInDataBase(const std::string& _text, const std::string& _fileName)
@@ -164,14 +207,14 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	std::unique_ptr<EntityFileText> textFile;
 	if (type == "csv")
 	{
-		textFile.reset(new EntityFileCSV (entIDTopo, nullptr, nullptr, nullptr, nullptr, serviceName));
+		textFile.reset(new EntityFileCSV (entIDTopo, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL));
 	}
 	else
 	{
-		textFile.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr, nullptr, serviceName));
+		textFile.reset(new EntityFileText(entIDTopo, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL));
 	}
 
-	EntityBinaryData fileContent(entIDData, textFile.get(), nullptr, nullptr, nullptr, serviceName);
+	EntityBinaryData fileContent(entIDData, textFile.get(), nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_MODEL);
 	fileContent.setData(_text.data(), _text.size());
 	fileContent.StoreToDataBase();
 

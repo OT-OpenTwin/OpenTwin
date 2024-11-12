@@ -56,7 +56,7 @@ private:
 	EntityResultTextData *textData;
 	long long textDataStorageId;
 	long long textDataStorageVersion;
-
+	ot::ContentChangedHandling m_contentChangedHandling = ot::ContentChangedHandling::ModelServiceSaves;
 
 };
 

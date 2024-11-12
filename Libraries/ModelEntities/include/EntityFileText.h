@@ -32,6 +32,6 @@ protected:
 	void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
 private:
-	ot::ContentChangedHandling m_contentChangedHandling = ot::ContentChangedHandling::SimpleSave;
+	ot::ContentChangedHandling m_contentChangedHandling = ot::ContentChangedHandling::ModelServiceSaves;
 	ot::TextEncoding::EncodingStandard m_encoding = ot::TextEncoding::EncodingStandard::UNKNOWN;
 };

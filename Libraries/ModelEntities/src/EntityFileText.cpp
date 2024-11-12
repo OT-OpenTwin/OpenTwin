@@ -88,6 +88,7 @@ std::string EntityFileText::getText(void)
 	{
 		assert(encoding == ot::TextEncoding::EncodingStandard::UNKNOWN);
 		OT_LOG_W("Unable to determine the encoding of text file " + getName() + ".");
+		return textFromBinary;
 	}
 }
 
@@ -185,17 +186,17 @@ void EntityFileText::readSpecificDataFromDataBase(bsoncxx::document::view& _doc_
 	const std::string encodingStr(_doc_view["TextEncoding"].get_utf8().value.data());
 	int32_t contentChangedHandling = _doc_view["ContentChangedHandler"].get_int32().value;
 
-	if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::NotifyOwner))
+	if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::ModelServiceSavesNotifyOwner))
 	{
-		m_contentChangedHandling = ot::ContentChangedHandling::NotifyOwner;
+		m_contentChangedHandling = ot::ContentChangedHandling::ModelServiceSavesNotifyOwner;
 	}
 	else if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::OwnerHandles))
 	{
 		m_contentChangedHandling = ot::ContentChangedHandling::OwnerHandles;
 	}
-	else if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::SimpleSave))
+	else if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::ModelServiceSaves))
 	{
-		m_contentChangedHandling = ot::ContentChangedHandling::SimpleSave;
+		m_contentChangedHandling = ot::ContentChangedHandling::ModelServiceSaves;
 	}
 	else
 	{

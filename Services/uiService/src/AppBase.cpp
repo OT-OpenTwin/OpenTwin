@@ -2211,7 +2211,7 @@ void AppBase::slotTextEditorSaveRequested(void) {
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
 
 		try {
-			ot::BasicServiceInformation info(m_textEditors.findOwner(editor).getId());
+			ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
 			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->getTextEditorName(), doc.GetAllocator()), doc.GetAllocator());
 			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(editor->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 

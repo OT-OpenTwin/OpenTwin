@@ -149,7 +149,7 @@ ot::TextEditorCfg EntityResultText::createConfig()
 
 ot::ContentChangedHandling EntityResultText::getContentChangedHandling()
 {
-	return ot::ContentChangedHandling::SimpleSave;
+	return m_contentChangedHandling;
 }
 
 void EntityResultText::deleteTextData(void)
