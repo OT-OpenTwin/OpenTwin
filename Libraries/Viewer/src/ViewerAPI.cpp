@@ -410,11 +410,11 @@ void ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(ot::UID osgModelID
 	}
 }
 
-void ViewerAPI::addVisualizationPlot1DNode(ot::UID osgModelID, const ot::Plot1DDataBaseCfg& _config)
+void ViewerAPI::addVisualizationPlot1DNode(ot::UID _osgModelID, const ot::Plot1DDataBaseCfg& _config)
 {
 	try
 	{
-		Model *model = osgModelManager.at(osgModelID);
+		Model *model = osgModelManager.at(_osgModelID);
 		model->addVisualizationPlot1DNode(_config);
 	}
 	catch (std::out_of_range)
@@ -454,13 +454,13 @@ void ViewerAPI::addVisualizationTableNode(ot::UID osgModelID, const std::string 
 }
 
 
-void ViewerAPI::visualizationResult1DPropertiesChanged(ot::UID osgModelID, unsigned long long entityID, unsigned long long version)
+void ViewerAPI::visualizationResult1DPropertiesChanged(ot::UID _osgModelID, ot::UID _entityID, ot::UID _version)
 {
 	try
 	{
-		Model *model = osgModelManager.at(osgModelID);
+		Model *model = osgModelManager.at(_osgModelID);
 
-		model->visualizationResult1DPropertiesChanged(entityID, version);
+		model->visualizationResult1DPropertiesChanged(_entityID, _version);
 	}
 	catch (std::out_of_range)
 	{
@@ -568,11 +568,11 @@ void ViewerAPI::setHoverTreeItem(ot::UID hoverItemID)
 	globalActiveModel->setHoverTreeItem(hoverItemID);
 }
 
-void ViewerAPI::setEntityName(unsigned long long modelEntityID, const std::string &newName)
+void ViewerAPI::setEntityName(unsigned long long _modelEntityID, const std::string& _newName)
 {
 	if (globalActiveModel == nullptr) return;
 
-	globalActiveModel->setEntityName(modelEntityID, newName);
+	globalActiveModel->setEntityName(_modelEntityID, _newName);
 }
 
 void ViewerAPI::renameEntityPath(const std::string &oldPath, const std::string &newPath)

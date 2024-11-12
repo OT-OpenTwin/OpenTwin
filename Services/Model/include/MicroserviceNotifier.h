@@ -39,8 +39,6 @@ public:
 	//Not existing in uiComponent
 	void activateMenuTab(const std::string &pageName);
 	//Not existing in uiComponent
-	void updatePlotEntities(ot::UIDList& plotIDs, ot::UIDList& plotVersions, ot::UID visModelID);
-	//Not existing in uiComponent
 	void enableDisableControls(std::list<std::string> &enabled, std::list<std::string> &disabled);
 	//setControlToolTip in uiComponent ?
 	void setToolTip(const std::string &item, const std::string &text);

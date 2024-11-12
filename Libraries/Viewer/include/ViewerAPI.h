@@ -3,8 +3,8 @@
 #include "Geometry.h"
 #include "Types.h"
 
-#include "OTCore/CoreTypes.h"
 #include "OTCore/Color.h"
+#include "OTCore/CoreTypes.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/PropertyGridCfg.h"
@@ -146,9 +146,9 @@ namespace ViewerAPI
 	__declspec(dllexport) std::list<std::string> getSelectedCurves(ot::UID osgModelID);
 	__declspec(dllexport) void removeSelectedCurveNodes(ot::UID osgModelID);
 
-	__declspec(dllexport) void addVisualizationPlot1DNode(ot::UID osgModelID, const ot::Plot1DDataBaseCfg& _config);
+	__declspec(dllexport) void addVisualizationPlot1DNode(ot::UID _osgModelID, const ot::Plot1DDataBaseCfg& _config);
 
-	__declspec(dllexport) void visualizationResult1DPropertiesChanged(ot::UID osgModelID, unsigned long long entityID, unsigned long long entityVersion);
+	__declspec(dllexport) void visualizationResult1DPropertiesChanged(ot::UID _osgModelID, ot::UID _entityID, ot::UID _version);
 	__declspec(dllexport) void visualizationPlot1DPropertiesChanged(ot::UID osgModelID, const ot::Plot1DCfg& _config);
 	__declspec(dllexport) void addVisualizationTextNode(ot::UID osgModelID, const std::string &name, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName,
 														ot::UID textEntityID, ot::UID textEntityVersion);
