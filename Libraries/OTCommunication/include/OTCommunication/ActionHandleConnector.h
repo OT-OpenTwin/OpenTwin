@@ -25,6 +25,9 @@
 //! @param ___actionName The action that should be registered in the dispatch system.
 #define OT_HANDLER(___functionName, ___className, ___actionName, ___messageTypeFlags) std::string ___functionName(ot::JsonDocument& _document); OT_ADD_HANDLER(___functionName, ___className, ___actionName, ___messageTypeFlags);
 
+//! \brief Creates a string list.
+#define OT_ACTIONLIST(...) std::list<std::string>({__VA_ARGS__})
+
 namespace ot {
 
 	//! @class ActionHandleConnector
