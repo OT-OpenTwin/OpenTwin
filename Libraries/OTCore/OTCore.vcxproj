@@ -50,6 +50,7 @@
     <ClCompile Include="src\StringToVariableConverter.cpp" />
     <ClCompile Include="src\TextEncoding.cpp" />
     <ClCompile Include="src\ThisService.cpp" />
+    <ClCompile Include="src\UIDNamePair.cpp" />
     <ClCompile Include="src\Variable.cpp" />
     <ClCompile Include="src\VariableListToStringListConverter.cpp" />
     <ClCompile Include="src\VariableToBSONStringConverter.cpp" />
@@ -105,6 +106,7 @@
     <ClInclude Include="include\OTCore\TextEncoding.h" />
     <ClInclude Include="include\OTCore\ThisService.h" />
     <ClInclude Include="include\OTCore\TypeNames.h" />
+    <ClInclude Include="include\OTCore\UIDNamePair.h" />
     <ClInclude Include="include\OTCore\Variable.h" />
     <ClInclude Include="include\OTCore\VariableListToStringListConverter.h" />
     <ClInclude Include="include\OTCore\VariableToBSONStringConverter.h" />
