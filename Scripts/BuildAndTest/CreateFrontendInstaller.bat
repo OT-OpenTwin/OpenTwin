@@ -207,9 +207,9 @@ REM ==========================================
 REM Finally create the Installer
 REM ==========================================
 
-REM CALL "C:\Program Files (x86)\NSIS\makensis.exe" "%OPENTWIN_DEV_ROOT%\Scripts\Installer\nsis\install_opentwin_endUser.nsi"
+CALL "C:\Program Files (x86)\NSIS\makensis.exe" Install-OpenTwin.nsi
 
-REM MOVE "Install OpenTwin.exe" "%OPENTWIN_FRONTEND_DEPLOYMENT%\FrontendInstaller"
+MOVE "Install OpenTwin.exe" "%OPENTWIN_FRONTEND_DEPLOYMENT%\FrontendInstaller"
 
 goto SUCCESSFUL_END
 
