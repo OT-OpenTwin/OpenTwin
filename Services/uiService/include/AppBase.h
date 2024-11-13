@@ -532,13 +532,13 @@ private Q_SLOTS:
 	void slotTreeItemFocused(QTreeWidgetItem* _item);
 
 private:
-	enum AppStateFlag {
+	enum class AppState {
 		NoState                = 0x00,
 		RestoringSettingsState = 0x01,
 		LoggedInState          = 0x10,
 		ProjectOpenState       = 0x20
 	};
-	typedef ot::Flags<AppStateFlag> AppStateFlags;
+	typedef ot::Flags<AppState> AppStateFlags;
 
 	friend class ToolBar;
 	friend class KeyboardCommandHandler;
@@ -637,7 +637,7 @@ private:
 	AppBase(AppBase&) = delete;
 	AppBase& operator = (AppBase&) = delete;
 
-	OT_FRIEND_FLAG_FUNCTIONS(AppStateFlag)
+	OT_FRIEND_FLAG_FUNCTIONS(AppBase::AppState)
 };
 
-OT_ADD_FLAG_FUNCTIONS(AppBase::AppStateFlag)
+OT_ADD_FLAG_FUNCTIONS(AppBase::AppState)

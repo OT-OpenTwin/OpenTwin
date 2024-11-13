@@ -173,7 +173,7 @@ AppBase::AppBase()
 	m_output(nullptr),
 	m_debug(nullptr),
 	m_versionGraph(nullptr),
-	m_state(NoState)
+	m_state(AppState::NoState)
 {
 	m_contextMenus.output.clear = invalidID;
 
@@ -238,7 +238,7 @@ bool AppBase::logIn(void) {
 
 	this->startSessionRefreshTimer();
 
-	m_state |= LoggedInState;
+	m_state |= AppState::LoggedInState;
 
 	// Now retreive information about the user collection
 	UserManagement uM(m_loginData);
@@ -256,7 +256,7 @@ bool AppBase::logIn(void) {
 	{
 		uM.initializeNewSession();
 
-		m_state |= RestoringSettingsState;
+		m_state |= AppState::RestoringSettingsState;
 
 		m_currentStateWindow.window = uM.restoreSetting(STATE_NAME_WINDOW);
 		m_currentStateWindow.view = uM.restoreSetting(STATE_NAME_VIEW);
@@ -289,7 +289,7 @@ bool AppBase::logIn(void) {
 
 		this->initializeDefaultUserSettings();
 
-		m_state &= (~RestoringSettingsState);
+		m_state &= (~AppState::RestoringSettingsState);
 	}
 
 	// Create shortcut manager
@@ -451,7 +451,7 @@ bool AppBase::closeEvent() {
 	}
 
 	m_ExternalServicesComponent->closeProject(false);
-	m_state &= (~ProjectOpenState);
+	m_state &= (~AppState::ProjectOpenState);
 
 	return true;
 }
@@ -2301,8 +2301,8 @@ void AppBase::slotOutputContextMenuItemClicked() {
 }
 
 void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
-	if (m_state & RestoringSettingsState) return;
-	if (!(m_state & LoggedInState)) return;
+	if (m_state & AppState::RestoringSettingsState) return;
+	if (!(m_state & AppState::LoggedInState)) return;
 
 	UserManagement uM(m_loginData);
 
@@ -2399,7 +2399,7 @@ void AppBase::slotCreateProject(void) {
 		// Check if the project it the same project as the currently open one
 		if (currentName == m_currentProjectName) {
 			m_ExternalServicesComponent->closeProject(false);
-			m_state &= (~ProjectOpenState);
+			m_state &= (~AppState::ProjectOpenState);
 		}
 
 		// Delete Project
@@ -2416,11 +2416,11 @@ void AppBase::slotCreateProject(void) {
 	// Perform open project
 	if (m_currentProjectName.length() > 0) {
 		m_ExternalServicesComponent->closeProject(false);
-		m_state &= (~ProjectOpenState);
+		m_state &= (~AppState::ProjectOpenState);
 	}
 
 	m_ExternalServicesComponent->openProject(currentName, projectType, projectManager.getProjectCollection(currentName));
-	m_state |= ProjectOpenState;
+	m_state |= AppState::ProjectOpenState;
 }
 
 void AppBase::slotOpenProject(void) {
@@ -2487,10 +2487,10 @@ void AppBase::slotOpenProject(void) {
 					// Perform open project
 					if (m_currentProjectName.length() > 0) {
 						m_ExternalServicesComponent->closeProject(false);
-						m_state &= (~ProjectOpenState);
+						m_state &= (~AppState::ProjectOpenState);
 					}
 					m_ExternalServicesComponent->openProject(selectedProjectName, projectType, projectCollection);
-					m_state |= ProjectOpenState;
+					m_state |= AppState::ProjectOpenState;
 				}
 			}
 		}
@@ -2571,7 +2571,7 @@ void AppBase::slotRenameProject(void) {
 	bool reopenProject = false;
 	if (m_currentProjectName == selectedProjectName.toStdString()) {
 		m_ExternalServicesComponent->closeProject(false);
-		m_state &= (~ProjectOpenState);
+		m_state &= (~AppState::ProjectOpenState);
 		reopenProject = true;
 	}
 
@@ -2589,7 +2589,7 @@ void AppBase::slotRenameProject(void) {
 	// Reopen the project if needed
 	if (reopenProject) {
 		m_ExternalServicesComponent->openProject(newProjectName, projectManager.getProjectType(newProjectName), projectManager.getProjectCollection(newProjectName));
-		m_state |= ProjectOpenState;
+		m_state |= AppState::ProjectOpenState;
 	}
 
 	// And refresh the view
@@ -2639,7 +2639,7 @@ void AppBase::slotDeleteProject(void) {
 		// Check if the project it the same project as the currently open one
 		if (proj.toStdString() == m_currentProjectName) {
 			m_ExternalServicesComponent->closeProject(false);
-			m_state &= (~ProjectOpenState);
+			m_state &= (~AppState::ProjectOpenState);
 		}
 
 		projectManager.deleteProject(proj.toStdString());
