@@ -12,4 +12,5 @@ User Interface API
    color_style
    properties
    text_editor
+   table
    graphics_editor
