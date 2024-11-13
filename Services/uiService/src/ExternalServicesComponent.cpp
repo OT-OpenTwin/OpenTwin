@@ -50,7 +50,9 @@
 #include "OTGui/GraphicsLayoutItemCfg.h"
 #include "OTGui/SelectEntitiesDialogCfg.h"
 
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/TableView.h"
+#include "OTWidgets/IconManager.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsLayoutItem.h"
 #include "OTWidgets/GraphicsItemFactory.h"
@@ -65,7 +67,6 @@
 #include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
-#include "OTWidgets/IconManager.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
 #include "OTCommunication/ActionTypes.h"
@@ -4090,8 +4091,19 @@ std::string ExternalServicesComponent::handleSetTableSelection(ot::JsonDocument&
 	// Get table
 	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
 
+	if (!table) {
+		OT_LOG_EAS("Table \"" + tableName + "\" does not exist");
+		return "";
+	}
+
 	// Apply selection
-	
+	if (clearSelection) {
+		table->clearSelection();
+	}
+	for (const ot::TableRange& range : ranges) {		
+		table->setRangeSelected(ot::QtFactory::toQTableRange(range), true);
+	}
+
 	return "";
 }
 
@@ -4107,9 +4119,12 @@ std::string ExternalServicesComponent::handleGetTableSelection(ot::JsonDocument&
 	// Get table
 	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
 
-	// Gather info
+	if (!table) {
+		OT_LOG_EAS("Table \"" + tableName + "\" does not exist");
+		return "";
+	}
 
-
+	this->sendTableSelectionInformation(senderURL, subsequentFunction, table);
 
 	return "";
 }
@@ -4126,14 +4141,14 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 
 	// Get optional parameters
 	bool callback = false;
-	std::string callbackService;
+	std::string callbackUrl;
 	std::string callbackFunction;
 
 	if (_document.HasMember(OT_ACTION_PARAM_RequestCallback)) {
 		callback = ot::json::getBool(_document, OT_ACTION_PARAM_RequestCallback);
 	}
 	if (callback) {
-		callbackService = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+		callbackUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
 		callbackFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
 	}
 
@@ -4157,12 +4172,25 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 	// Get table
 	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
 
-	// Apply changes
+	if (!table) {
+		OT_LOG_EAS("Table \"" + tableName + "\" does not exist");
+		return "";
+	}
 
+	// Apply selection
+	if (clearSelection) {
+		table->clearSelection();
+	}
+	for (const ot::TableRange& range : ranges) {
+		table->setRangeSelected(ot::QtFactory::toQTableRange(range), true);
+	}
+	
+	// Apply color
+	table->setSelectedCellsBackground(color);
 
 	// Callback if required
 	if (callback) {
-		// same call as "handleGetTableSelection"
+		this->sendTableSelectionInformation(callbackUrl, callbackFunction, table);
 	}
 
 	return "";
@@ -4559,6 +4587,32 @@ std::string ExternalServicesComponent::handlePluginMessage(ot::JsonDocument& _do
 		return OT_ACTION_RETURN_INDICATOR_Error "Failed to process message";
 	}
 	return "";
+}
+
+void ExternalServicesComponent::sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::Table* _table) {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(_callbackFunction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _table->getTableEntityId(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, _table->getTableEntityVersion(), doc.GetAllocator());
+
+	ot::JsonArray rangesArray;
+	for (const QTableWidgetSelectionRange& qrange : _table->selectedRanges()) {
+		ot::JsonObject rangeObject;
+		ot::TableRange range = ot::QtFactory::toTableRange(qrange);
+		range.addToJsonObject(rangeObject, doc.GetAllocator());
+		rangesArray.PushBack(rangeObject, doc.GetAllocator());
+	}
+	doc.AddMember(OT_ACTION_PARAM_Ranges, rangesArray, doc.GetAllocator());
+
+	std::string response;
+	sendHttpRequest(EXECUTE, _serviceUrl, doc, response);
+	OT_ACTION_IF_RESPONSE_ERROR(response) {
+		OT_LOG_EAS(response);
+	}
+	else OT_ACTION_IF_RESPONSE_WARNING(response) {
+		OT_LOG_WAS(response);
+	}
 }
 
 // ###################################################################################################

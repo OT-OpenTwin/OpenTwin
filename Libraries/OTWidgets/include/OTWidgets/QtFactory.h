@@ -17,6 +17,7 @@
 #include "OTGui/Margins.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/Transform.h"
+#include "OTGui/TableRange.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -32,6 +33,7 @@
 #include <QtGui/qevent.h>
 #include <QtGui/qtransform.h>
 #include <QtGui/qpainterpath.h>
+#include <QtWidgets/qtablewidget.h>
 
 namespace ot {
 
@@ -99,6 +101,9 @@ namespace ot {
 
 		static QTransform toQTransform(const ot::Transform& _transform);
 		static QTransform toQTransformOnCenter(const ot::Transform& _transform, const QPointF& _centerPos);
+
+		static ot::TableRange toTableRange(const QTableWidgetSelectionRange& _range);
+		static QTableWidgetSelectionRange toQTableRange(const ot::TableRange& _range);
 
 		static QString toQString(QEvent::Type _type);
 	private:

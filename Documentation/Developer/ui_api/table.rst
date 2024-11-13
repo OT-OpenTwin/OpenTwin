@@ -107,6 +107,8 @@ Note that specified table must already exist.
      - std::string
      - Name of the callback function that should be triggered in the service which receives the callback.
 
+The callback action ``OT_ACTION_CMD_MODEL_ExecuteFunction`` will be send with the following parameters:
+
 .. list-table:: Callback Parameters
    :header-rows: 1
 

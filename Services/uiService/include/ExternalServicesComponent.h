@@ -53,8 +53,9 @@ class ServiceDataUi;
 class WebsocketClient;
 class ControlsManager;
 class KeyboardCommandHandler;
-namespace ot { class ServiceBase; };
+namespace ot { class Table; };
 namespace ot { class Property; };
+namespace ot { class ServiceBase; };
 
 class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::ActionHandler {
 	Q_OBJECT
@@ -416,6 +417,8 @@ private:
 
 	void determineViews(const std::string& modelServiceURL);
 
+	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::Table* _table);
+
 	// #################################################################
 
 	std::string										m_sessionServiceURL;
@@ -439,7 +442,6 @@ private:
 
 	bool											m_prefetchingDataCompleted;
 	bool                                            m_servicesUiSetupCompleted;
-
 
 	ExternalServicesComponent() = delete;
 	ExternalServicesComponent(ExternalServicesComponent &) = delete;
