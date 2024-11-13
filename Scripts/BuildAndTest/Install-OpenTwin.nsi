@@ -29,7 +29,7 @@ InstallDirRegKey HKLM "${REGPATH_UNINSTSUBKEY}" "UninstallString"
 !include Integration.nsh
 
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "..\License.md"
+!insertmacro MUI_PAGE_LICENSE "..\..\License.md"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 
@@ -114,7 +114,6 @@ Function un.onInit
   !insertmacro EnsureAdminRights
 FunctionEnd
 
-
 Section "Program files (Required)"
   SectionIn Ro
 
@@ -126,7 +125,7 @@ Section "Program files (Required)"
   WriteRegDWORD HKLM "${REGPATH_UNINSTSUBKEY}" "NoModify" 1
   WriteRegDWORD HKLM "${REGPATH_UNINSTSUBKEY}" "NoRepair" 1
 
-  File /r "..\Deployment\Frontend\*.*" ; Pretend that we have a real application to install
+  File /r ..\..\Deployment_Frontend\*.*
 SectionEnd
 
 Section "Start Menu shortcut"
@@ -134,7 +133,6 @@ Section "Start Menu shortcut"
   SetOutPath $INSTDIR
   CreateShortcut "$SMPrograms\${NAME}.lnk" "$InstDir\OpenTwin.exe"
 SectionEnd
-
 
 Section -Uninstall
   ${UnpinShortcut} "$SMPrograms\${NAME}.lnk"
