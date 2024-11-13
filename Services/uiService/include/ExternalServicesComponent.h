@@ -327,17 +327,18 @@ public:
 	OT_HANDLER(handleColorSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection, ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// Studio Suite API
-	OT_HANDLER(handleStudioSuiteImport, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_IMPORT, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteCommit, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_COMMIT, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteGet, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_GET, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteUpload, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_UPLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteDownload, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_DOWNLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteCopy, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_COPY, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_INFORMATION, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteSetCSTFile, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_SETCSTFILE, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleStudioSuiteAction, ExternalServicesComponent, OT_ACTIONLIST(
+		OT_ACTION_CMD_UI_SS_IMPORT,
+		OT_ACTION_CMD_UI_SS_COMMIT,
+		OT_ACTION_CMD_UI_SS_GET,
+		OT_ACTION_CMD_UI_SS_UPLOAD,
+		OT_ACTION_CMD_UI_SS_DOWNLOAD,
+		OT_ACTION_CMD_UI_SS_COPY,
+		OT_ACTION_CMD_UI_SS_INFORMATION,
+		OT_ACTION_CMD_UI_SS_SETCSTFILE
+	), ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// LTSpice API
-	/*
 	OT_HANDLER(handleLTSpiceAction, ExternalServicesComponent, OT_ACTIONLIST(
 		OT_ACTION_CMD_UI_LTS_IMPORT,
 		OT_ACTION_CMD_UI_LTS_COMMIT,
@@ -348,16 +349,6 @@ public:
 		OT_ACTION_CMD_UI_LTS_INFORMATION,
 		OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE
 	), ot::MessageType::ALL_MESSAGE_TYPES)
-	*/
-
-	OT_HANDLER(handleLTSpiceImport, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_IMPORT, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceCommit, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_COMMIT, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceGet, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_GET, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceUpload, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_UPLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceDownload, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_DOWNLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceCopy, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_COPY, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_INFORMATION, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceSetLTSpiceFile, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE, ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// Dialogs
 	OT_HANDLER(handleEntitySelectionDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_EntitySelectionDialog, ot::MessageType::ALL_MESSAGE_TYPES)

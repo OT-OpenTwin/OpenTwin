@@ -4351,90 +4351,14 @@ std::string ExternalServicesComponent::handleColorSelection(ot::JsonDocument& _d
 
 // Studio Suite API
 
-std::string ExternalServicesComponent::handleStudioSuiteImport(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleStudioSuiteCommit(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleStudioSuiteGet(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleStudioSuiteUpload(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleStudioSuiteDownload(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleStudioSuiteCopy(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleStudioSuiteInformation(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleStudioSuiteSetCSTFile(ot::JsonDocument& _document) {
+std::string ExternalServicesComponent::handleStudioSuiteAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
 	return StudioSuiteConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
 }
 
 // LTSpice API
 
-/*
 std::string ExternalServicesComponent::handleLTSpiceAction(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-*/
-std::string ExternalServicesComponent::handleLTSpiceImport(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleLTSpiceCommit(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleLTSpiceGet(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleLTSpiceUpload(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleLTSpiceDownload(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleLTSpiceCopy(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleLTSpiceInformation(ot::JsonDocument& _document) {
-	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
-	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
-}
-
-std::string ExternalServicesComponent::handleLTSpiceSetLTSpiceFile(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_MEMBER);
 	return LTSpiceConnectorAPI::processAction(action, _document, AppBase::instance()->getCurrentProjectName(), this, AppBase::instance()->mainWindow()->windowIcon());
 }
