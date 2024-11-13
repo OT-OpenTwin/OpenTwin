@@ -63,7 +63,7 @@ COPY /Y "%MONGO_CXX_DLLR%\vcruntime140.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
 COPY /Y "%MONGO_CXX_DLLR%\vcruntime140_1.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM OpenCASCADE
-COPY "%OPENTWIN_THIRDPARTY_ROOT%\OpenCASCADE\OpenCASCADE-7.8.0-vc14-64\jemalloc-vc14-64\bin\jemalloc.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%JEM_DLLR%\jemalloc.dll"   "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 COPY "%OC_DLLR%\TKBRep.dll" 	 "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 COPY "%OC_DLLR%\TKernel.dll" 	 "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 COPY "%OC_DLLR%\TKG2d.dll" 		 "%OPENTWIN_FRONTEND_DEPLOYMENT%"
@@ -84,6 +84,9 @@ COPY "%OSG_DLLR%\osgGA.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
 COPY "%OSG_DLLR%\osgText.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
 COPY "%OSG_DLLR%\osgUtil.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
 COPY "%OSG_DLLR%\osgViewer.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
+COPY "%OSG_DLLR%\osgPlugins-3.6.3\osgdb_freetype.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OSG_DLLR%\osgPlugins-3.6.3\osgdb_glsl.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM OpenSSL
 COPY "%OPENSSL_DLL%\libcrypto-1_1-x64.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%"
@@ -106,21 +109,23 @@ REM QT Plugins
 MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins"
 
 MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
-COPY "%QDIR%\plugins\imageformats\qgif.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
-COPY "%QDIR%\plugins\imageformats\qicns.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
-COPY "%QDIR%\plugins\imageformats\qico.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
-COPY "%QDIR%\plugins\imageformats\qjpeg.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
-COPY "%QDIR%\plugins\imageformats\qsvg.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
-COPY "%QDIR%\plugins\imageformats\qtga.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
-COPY "%QDIR%\plugins\imageformats\qtiff.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
-COPY "%QDIR%\plugins\imageformats\qwbmp.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
-COPY "%QDIR%\plugins\imageformats\qwebp.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QT_PLUGINS%\imageformats\qgif.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QT_PLUGINS%\imageformats\qicns.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QT_PLUGINS%\imageformats\qico.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QT_PLUGINS%\imageformats\qjpeg.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QT_PLUGINS%\imageformats\qsvg.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QT_PLUGINS%\imageformats\qtga.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QT_PLUGINS%\imageformats\qtiff.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QT_PLUGINS%\imageformats\qwbmp.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
+COPY "%QT_PLUGINS%\imageformats\qwebp.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\imageformats"
 
 MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\platforms"
-COPY "%QDIR%\plugins\platforms\qwindows.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\platforms"
+COPY "%QT_PLUGINS%\platforms\qwindows.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\platforms"
 
-MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\styles"
-COPY "%QDIR%\plugins\styles\qwindowsvistastyle.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\styles"
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\tls"
+COPY "%QT_PLUGINS%\tls\qcertonlybackend.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\tls"
+COPY "%QT_PLUGINS%\tls\qopensslbackend.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\tls"
+COPY "%QT_PLUGINS%\tls\qschannelbackend.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%\plugins\tls"
 
 REM QtTabToolbar
 COPY "%QT_TT_DLLR%\TabToolbar.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
@@ -152,6 +157,13 @@ COPY "%OT_CADMODELENTITIES_ROOT%\%OT_DLLR%\CADModelEntities.dll" "%OPENTWIN_FRON
 
 REM DataStorage
 COPY "%OT_DATASTORAGE_ROOT%\%OT_DLLR%\DataStorage.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
+REM LTSpice
+COPY "%OT_LTSPICE_SERVICE_ROOT%\%OT_DLLR%\LTSpiceService.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
+REM LTSpiceConnector
+COPY "%OT_LTSPICE_CONNECTOR_ROOT%\%OT_DLLR%\LTSpiceConnector.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
 
 REM ModelEntities
 COPY "%OT_MODELENTITIES_ROOT%\%OT_DLLR%\ModelEntities.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
