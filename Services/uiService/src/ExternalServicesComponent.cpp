@@ -4063,6 +4063,111 @@ std::string ExternalServicesComponent::handleCloseTable(ot::JsonDocument& _docum
 	return "";
 }
 
+std::string ExternalServicesComponent::handleSetTableSelection(ot::JsonDocument& _document) {
+	// Get parameters
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+
+	// Get ranges
+	ot::ConstJsonObjectList rangesList = ot::json::getObjectList(_document, OT_ACTION_PARAM_Ranges);
+	std::vector<ot::TableRange> ranges;
+	ranges.reserve(rangesList.size());
+	
+	for (const ot::ConstJsonObject& rangeObject : rangesList) {
+		ot::TableRange range;
+		range.setFromJsonObject(rangeObject);
+		ranges.push_back(range);
+	}
+
+	// Optional parameters
+	bool clearSelection = false;
+	if (_document.HasMember(OT_ACTION_PARAM_ClearSelection)) {
+		clearSelection = ot::json::getBool(_document, OT_ACTION_PARAM_ClearSelection);
+	}
+
+	// Get table
+	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
+
+	// Apply selection
+	
+	return "";
+}
+
+std::string ExternalServicesComponent::handleGetTableSelection(ot::JsonDocument& _document) {
+	// Get parameters
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+
+	// Get table
+	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
+
+	// Gather info
+
+
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(ot::JsonDocument& _document) {
+	// Get parameters
+	ot::BasicServiceInformation info;
+	info.setFromJsonObject(_document.GetConstObject());
+
+	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+
+	ot::Color color;
+	color.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Color));
+
+	// Get optional parameters
+	bool callback = false;
+	std::string callbackService;
+	std::string callbackFunction;
+
+	if (_document.HasMember(OT_ACTION_PARAM_RequestCallback)) {
+		callback = ot::json::getBool(_document, OT_ACTION_PARAM_RequestCallback);
+	}
+	if (callback) {
+		callbackService = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+		callbackFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	}
+
+	// Optional parameters
+	bool clearSelection = false;
+	if (_document.HasMember(OT_ACTION_PARAM_ClearSelection)) {
+		clearSelection = ot::json::getBool(_document, OT_ACTION_PARAM_ClearSelection);
+	}
+
+	std::vector<ot::TableRange> ranges;
+	if (_document.HasMember(OT_ACTION_PARAM_Ranges)) {
+		ot::ConstJsonObjectList rangesList = ot::json::getObjectList(_document, OT_ACTION_PARAM_Ranges);
+		ranges.reserve(rangesList.size());
+		for (const ot::ConstJsonObject& rangeObject : rangesList) {
+			ot::TableRange range;
+			range.setFromJsonObject(rangeObject);
+			ranges.push_back(range);
+		}
+	}
+
+	// Get table
+	ot::TableView* table = AppBase::instance()->findTable(tableName, info);
+
+	// Apply changes
+
+
+	// Callback if required
+	if (callback) {
+		// same call as "handleGetTableSelection"
+	}
+
+	return "";
+}
+
 // Table Old
 
 std::string ExternalServicesComponent::handleAddTable(ot::JsonDocument& _document) {
@@ -4106,7 +4211,7 @@ std::string ExternalServicesComponent::handleTableChange(ot::JsonDocument& _docu
 	return "";
 }
 
-std::string ExternalServicesComponent::handleGetTableSelection(ot::JsonDocument& _document) {
+std::string ExternalServicesComponent::handleGetTableSelectionOld(ot::JsonDocument& _document) {
 	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
 	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
@@ -4121,7 +4226,6 @@ std::string ExternalServicesComponent::handleGetTableSelection(ot::JsonDocument&
 			SetColourOfSelectedRange(visualizationModelID, colour);
 			RequestTableSelection(visualizationModelID, senderURL, subsequentFunction);
 		}
-
 	}
 	catch (std::exception& e) {
 		OT_LOG_E(e.what());
