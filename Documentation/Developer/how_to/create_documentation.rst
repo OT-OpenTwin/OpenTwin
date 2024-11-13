@@ -34,8 +34,7 @@ This example shows how to embed code snippets:
     :emphasize-lines: 3
 
 
-    void my_function()
-    {
+    void my_function() {
         printf("just a test");
         my_function();
         int i = 6;
