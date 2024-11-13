@@ -1,114 +1,53 @@
 #pragma once
 
-namespace osg
-{
-	class Node;
-	class Switch;
-}
-
-#include "Geometry.h"
-#include "SceneNodeBase.h"
+// OpenTwin header
+#include "OTCore/OTClassHelper.h"
+#include "OTGui/Plot1DDataBaseCfg.h"
 #include "DataBase.h"
-#include "Plot.h"
+#include "SceneNodeBase.h"
 
-#include <string>
+// std header
 #include <map>
-
-#include <osg/Array>
+#include <string>
 
 class Model;
 
-class SceneNodePlot1D : public SceneNodeBase
-{
+class SceneNodePlot1D : public SceneNodeBase {
+	OT_DECL_NOCOPY(SceneNodePlot1D)
 public:
 	SceneNodePlot1D();
 	virtual ~SceneNodePlot1D();
 
-	virtual void setTransparent(bool t) override;
-	virtual void setWireframe(bool w) override;
-	virtual void setVisible(bool v) override;
-	virtual void setHighlighted(bool h) override;
-
-	void setProjectName(const std::string &proj) { projectName = proj; };
-	void setTitle(const std::string &title) { plotTitle = title; };
-	void setGrid(bool flag) { plotGrid = flag; }
-	void setGridColor(int color[]) { plotGridColorR = color[0]; plotGridColorG = color[1]; plotGridColorB = color[2]; }
-	void setLegend(bool flag) { plotLegend = flag; }
-	void setLogscaleX(bool flag) { plotLogscaleX = flag; }
-	void setLogscaleY(bool flag) { plotLogscaleY = flag; }
-	void setAutoscaleX(bool flag) { plotAutoscaleX = flag; }
-	void setAutoscaleY(bool flag) { plotAutoscaleY = flag; }
-	void setXmin(double value) { plotXmin = value; }
-	void setXmax(double value) { plotXmax = value; }
-	void setYmin(double value) { plotYmin = value; }
-	void setYmax(double value) { plotYmax = value; }
-	void setPlotType(AbstractPlot::PlotType value) { plotType = value; }
-	void setPlotQuantity(PlotDataset::axisQuantity value) { plotQuantity = value; }
-
-	void setCurves(std::list<unsigned long long> &curvesID, std::list<unsigned long long> &curvesVersions, std::list<std::string> &curvesNames);
-
-	std::string getProjectName(void) { return projectName; };
-	std::string getTitle(void) { return plotTitle; };
-
-	bool getGrid(void) { return plotGrid; }
-	int getGridColorR(void) { return plotGridColorR; }
-	int getGridColorG(void) { return plotGridColorG; }
-	int getGridColorB(void) { return plotGridColorB; }
-	bool getLegend(void) { return plotLegend; }
-	bool getLogscaleX(void) { return plotLogscaleX; }
-	bool getLogscaleY(void) { return plotLogscaleY; }
-	bool getAutoscaleX(void) { return plotAutoscaleX; }
-	bool getAutoscaleY(void) { return plotAutoscaleY; }
-	double getXmin(void) { return plotXmin; }
-	double getXmax(void) { return plotXmax; }
-	double getYmin(void) { return plotYmin; }
-	double getYmax(void) { return plotYmax; }
-	AbstractPlot::PlotType getPlotType(void) { return plotType; }
-	PlotDataset::axisQuantity getPlotQuantity(void) { return plotQuantity; }
+	virtual void setTransparent(bool _transparent) override;
+	virtual void setWireframe(bool _wireframe) override;
+	virtual void setVisible(bool _visible) override;
+	virtual void setHighlighted(bool _highlighted) override;
 
 	bool getSelectChildren(void) override { return false; };
 
-	Model *getModel(void) { return model; };
-	void setModel(Model *m) { model = m; };
+	virtual bool isItem1D(void) override { return true; };
+	virtual bool isItem3D(void) override { return false; };
 
-	void addCurveNodes(void);
+	void setConfig(const ot::Plot1DCfg& _config);
+	void setDataBaseConfig(const ot::Plot1DDataBaseCfg& _config);
+	const ot::Plot1DDataBaseCfg& getConfig(void) const { return m_config; };
 
-	unsigned long long getNumberOfCurves(void) { return curveID.size(); };
-	unsigned long long getCurveID(unsigned long long index) { return curveID[index]; };
-	unsigned long long getCurveVersion(unsigned long long index) { return curveVersion[index]; };
-	std::string getCurveName(unsigned long long index) { return curveName[index]; };
+	void setModel(Model* _model) { m_model = _model; };
+	Model *getModel(void) { return m_model; };
 
-	virtual bool isItem1D(void) { return true; };
-	virtual bool isItem3D(void) { return false; };
+	void addCurve(const ot::Plot1DCurveInfoCfg& _curve);
+	void setCurves(const std::list<ot::Plot1DCurveInfoCfg>& _curves);
+	const std::list<ot::Plot1DCurveInfoCfg>& getCurves(void) const;
+	size_t getNumberOfCurves(void) const;
+	const ot::Plot1DCurveInfoCfg& getCurveInfo(size_t _index) const;
 
-	bool changeResult1DEntityVersion(unsigned long long _curveEntityID, unsigned long long _curveVersion);
+	bool updateCurveEntityVersion(ot::UID _curveEntityID, ot::UID _curveVersion);
 
 private:
+	void applyConfigInfo(void);
 	bool isAnyChildSelectedAndVisible(SceneNodeBase *root);
 
-	std::string projectName;
-	AbstractPlot::PlotType plotType;
-	PlotDataset::axisQuantity plotQuantity;
-	std::string plotTitle;
-	bool plotGrid;
-	int plotGridColorR;
-	int plotGridColorG;
-	int plotGridColorB;
-	bool plotLegend;
-	bool plotLogscaleX;
-	bool plotLogscaleY;
-	bool plotAutoscaleX;
-	bool plotAutoscaleY;
-	double plotXmin;
-	double plotXmax;
-	double plotYmin;
-	double plotYmax;
-	unsigned long long modelEntityVersion;
-	std::vector<unsigned long long> curveID;
-	std::vector<unsigned long long> curveVersion;
-	std::vector<std::string> curveName;
-
-
-	Model *model;
+	ot::Plot1DDataBaseCfg m_config;
+	Model* m_model;
 };
 

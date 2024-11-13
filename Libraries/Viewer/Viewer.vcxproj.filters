@@ -25,16 +25,7 @@
     <ClCompile Include="src\ViewManipulator.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Plot.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\AbstractPlot.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\xyPlot.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\polarPlot.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\SceneNodeMaterialFactory.cpp">
@@ -112,9 +103,6 @@
     <ClCompile Include="src\TableViewerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
-    <ClCompile Include="src\PlotViewOld.cpp">
-      <Filter>src\WidgetView</Filter>
-    </ClCompile>
     <ClCompile Include="src\ViewerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
@@ -180,16 +168,7 @@
     <ClInclude Include="include\ViewManipulator.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Plot.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\AbstractPlot.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\xyPlot.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\polarPlot.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\SceneNodeMaterialFactory.h">
@@ -307,9 +286,6 @@
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
     <ClInclude Include="include\TableViewerView.h">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PlotViewOld.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\ViewerView.h">

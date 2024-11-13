@@ -23,11 +23,11 @@ namespace ot {
 
 		virtual QwtPointPolar sample(size_t _i) const override;
 
-		void replaceData(double* _azimuth, double* _radius, size_t _dataSize);
+		//! \brief Sets the data.
+		//! The caller keeps ownership of the data.
+		void setData(double* _azimuth, double* _radius, size_t _dataSize);
 
 	private:
-		void clear(void);
-
 		double* m_azimuth;
 		double* m_radius;
 		size_t m_size;

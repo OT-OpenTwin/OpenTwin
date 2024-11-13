@@ -257,6 +257,7 @@ EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot:
 
 EntityBase *EntityBase::readEntityFromEntityID(EntityBase *parent, ot::UID entityID, std::map<ot::UID, EntityBase *> &entityMap)
 {
+	assert(modelState != nullptr);
 	ot::UID version = modelState->getCurrentEntityVersion(entityID);
 
 	return readEntityFromEntityIDAndVersion(parent, entityID, version, entityMap);

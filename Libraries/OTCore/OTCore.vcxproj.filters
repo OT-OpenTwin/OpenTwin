@@ -109,6 +109,9 @@
     <ClCompile Include="src\ProjectTemplateInformation.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\UIDNamePair.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -269,6 +272,9 @@
     </ClInclude>
     <ClInclude Include="include\OTCore\ComplexNumbers.h">
       <Filter>include\VariableType</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\UIDNamePair.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

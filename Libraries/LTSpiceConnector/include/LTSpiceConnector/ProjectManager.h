@@ -24,11 +24,11 @@ public:
     }
 
     void openProject();
-    void setStudioServiceData(const std::string& studioSuiteServiceURL, QObject* mainObject);
+    void setLTSpiceServiceData(const std::string& ltSpiceServiceURL, QObject* mainObject);
 
-    void importProject(const std::string& fileName, const std::string& prjName, const std::string& changeMessage, bool incResults, bool incParametricResults);
+    void importProject(const std::string& fileName, const std::string& prjName, const std::string& changeMessage, bool incResults);
     std::string getCurrentVersion(const std::string& fileName, const std::string& prjName);
-    void commitProject(const std::string& fileName, const std::string& prjName, const std::string& changeComment, bool incResults, bool incParametricResults);
+    void commitProject(const std::string& fileName, const std::string& prjName, const std::string& changeComment, bool incResults);
     void getProject(const std::string& fileName, const std::string& prjName, const std::string& version);
     void uploadFiles(std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList, ot::UID infoEntityID, ot::UID infoEntityVersion);
     void downloadFiles(const std::string& fileName, const std::string& projectName, std::list<ot::UID>& entityIDList, std::list<ot::UID>& entityVersionList, const std::string& version);

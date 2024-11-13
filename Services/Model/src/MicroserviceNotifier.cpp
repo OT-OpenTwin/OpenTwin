@@ -183,25 +183,6 @@ void MicroserviceNotifier::activateMenuTab(const std::string &pageName)
 	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
-void MicroserviceNotifier::updatePlotEntities(ot::UIDList& entityIDs, ot::UIDList& entityVersions, ot::UID visModelID)
-{
-	ot::JsonDocument doc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged);
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, rapidjson::Value(visModelID), doc.GetAllocator());
-	ot::JsonArray jEntityIDs;
-	for (ot::UID id : entityIDs)
-	{
-		jEntityIDs.PushBack(ot::JsonValue(id), doc.GetAllocator());
-	}
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, jEntityIDs,doc.GetAllocator());
-	ot::JsonArray jEntityVersions;
-	for (ot::UID version : entityVersions)
-	{
-		jEntityVersions.PushBack(ot::JsonValue(version), doc.GetAllocator());
-	}
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Version, jEntityVersions, doc.GetAllocator());
-	Application::instance()->queuedRequestToFrontend(doc);
-}
-
 void MicroserviceNotifier::removeUIElements(const std::string &type, std::list<std::string> &itemList)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_RemoveElements);

@@ -27,6 +27,7 @@ private:
 	
 	void importFile(const std::string& _fileMask, const std::string& _dialogTitle, const std::string& _functionName);
 	void storeTextFile(ot::JsonDocument& _doc);
+	void storeChangedText(ot::JsonDocument& _doc);
 	void addTextFilesToModel();
 	void ensureUTF8Encoding(std::string& _text);
 

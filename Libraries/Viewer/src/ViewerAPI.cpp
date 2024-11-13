@@ -5,7 +5,7 @@
 #include "ViewerView.h"
 #include "Notifier.h"
 #include "DataBase.h"
-#include "PlotViewOld.h"
+#include "PlotManager.h"
 #include "Rubberband.h"
 #include "EntityParameterizedDataTable.h"
 #include "EntityTableSelectedRanges.h"
@@ -410,16 +410,12 @@ void ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(ot::UID osgModelID
 	}
 }
 
-void ViewerAPI::addVisualizationPlot1DNode(ot::UID osgModelID, const std::string &name, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden,
-										   const std::string &projectName, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-										   bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax, std::list<ot::UID> &curvesID, std::list<ot::UID> &curvesVersions,
-										   std::list<std::string> &curvesNames)
+void ViewerAPI::addVisualizationPlot1DNode(ot::UID _osgModelID, const ot::Plot1DDataBaseCfg& _config)
 {
 	try
 	{
-		Model *model = osgModelManager.at(osgModelID);
-
-		model->addVisualizationPlot1DNode(name, modelEntityID, treeIcons, isHidden, projectName, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax, curvesID, curvesVersions, curvesNames);
+		Model *model = osgModelManager.at(_osgModelID);
+		model->addVisualizationPlot1DNode(_config);
 	}
 	catch (std::out_of_range)
 	{
@@ -458,13 +454,13 @@ void ViewerAPI::addVisualizationTableNode(ot::UID osgModelID, const std::string 
 }
 
 
-void ViewerAPI::visualizationResult1DPropertiesChanged(ot::UID osgModelID, unsigned long long entityID, unsigned long long version)
+void ViewerAPI::visualizationResult1DPropertiesChanged(ot::UID _osgModelID, ot::UID _entityID, ot::UID _version)
 {
 	try
 	{
-		Model *model = osgModelManager.at(osgModelID);
+		Model *model = osgModelManager.at(_osgModelID);
 
-		model->visualizationResult1DPropertiesChanged(entityID, version);
+		model->visualizationResult1DPropertiesChanged(_entityID, _version);
 	}
 	catch (std::out_of_range)
 	{
@@ -472,14 +468,13 @@ void ViewerAPI::visualizationResult1DPropertiesChanged(ot::UID osgModelID, unsig
 	}
 }
 
-void ViewerAPI::visualizationPlot1DPropertiesChanged(ot::UID osgModelID, ot::UID modelEntityID, const std::string &title, const std::string &plotType, const std::string &plotQuantity, bool grid, int gridColor[], bool legend, bool logscaleX, bool logscaleY,
-												     bool autoscaleX, bool autoscaleY, double xmin, double xmax, double ymin, double ymax)
+void ViewerAPI::visualizationPlot1DPropertiesChanged(ot::UID osgModelID, const ot::Plot1DCfg& _config)
 {
 	try
 	{
 		Model *model = osgModelManager.at(osgModelID);
 
-		model->visualizationPlot1DPropertiesChanged(modelEntityID, title, plotType, plotQuantity, grid, gridColor, legend, logscaleX, logscaleY, autoscaleX, autoscaleY, xmin, xmax, ymin, ymax);
+		model->visualizationPlot1DPropertiesChanged(_config);
 	}
 	catch (std::out_of_range)
 	{
@@ -573,11 +568,11 @@ void ViewerAPI::setHoverTreeItem(ot::UID hoverItemID)
 	globalActiveModel->setHoverTreeItem(hoverItemID);
 }
 
-void ViewerAPI::setEntityName(unsigned long long modelEntityID, const std::string &newName)
+void ViewerAPI::setEntityName(unsigned long long _modelEntityID, const std::string& _newName)
 {
 	if (globalActiveModel == nullptr) return;
 
-	globalActiveModel->setEntityName(modelEntityID, newName);
+	globalActiveModel->setEntityName(_modelEntityID, _newName);
 }
 
 void ViewerAPI::renameEntityPath(const std::string &oldPath, const std::string &newPath)

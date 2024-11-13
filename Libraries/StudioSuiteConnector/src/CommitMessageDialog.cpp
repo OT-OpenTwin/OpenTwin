@@ -55,7 +55,7 @@ CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon, QString type, 
 	my_layoutButtons->addWidget(my_buttonCancel);
 	my_layout->addWidget(my_widgetButtons);
 
-	setWindowTitle(type + "Project");
+	setWindowTitle(type + " Project");
 	setWindowIcon(windowIcon);
 
 	my_input->setMinimumWidth(300);

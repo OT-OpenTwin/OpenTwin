@@ -78,71 +78,35 @@ void Application::run(void)
 
 std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
 {
-	if (_action == OT_ACTION_CMD_UI_SS_UPLOAD_NEEDED)
+	if (_action == OT_ACTION_CMD_UI_LTS_UPLOAD_NEEDED)
 	{
 		uploadNeeded(_doc);
 		return "";
 	}
-	else if (_action == OT_ACTION_CMD_UI_SS_DOWNLOAD_NEEDED)
+	else if (_action == OT_ACTION_CMD_UI_LTS_DOWNLOAD_NEEDED)
 	{
 		downloadNeeded(_doc);
 		return "";
 	}
-	else if (_action == OT_ACTION_CMD_UI_SS_FILES_UPLOADED)
+	else if (_action == OT_ACTION_CMD_UI_LTS_FILES_UPLOADED)
 	{
 		filesUploaded(_doc);
 		return "";
 	}
-	else if (_action == OT_ACTION_CMD_UI_SS_UNITS)
-	{
-		std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
-		changeUnits(content);
-		return "";
-	}
-	else if (_action == OT_ACTION_CMD_UI_SS_MATERIALS)
-	{
-		std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
-		changeMaterials(content);
-		return "";
-	}
-	else if (_action == OT_ACTION_CMD_UI_SS_SHAPEINFO)
-	{
-		std::string content = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
-		shapeInformation(content);
-		return "";
-	}
-	else if (_action == OT_ACTION_CMD_UI_SS_RESULT1D)
-	{
-		bool appendData = ot::json::getBool(_doc, OT_ACTION_PARAM_APPEND);
-		std::string data = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
-		size_t uncompressedDataLength = ot::json::getUInt64(_doc, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
-
-		result1D(appendData, data, uncompressedDataLength);
-		return "";
-	}
-	else if (_action == OT_ACTION_CMD_UI_SS_TRIANGLES)
-	{
-		std::list<std::string> names = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Name);
-		std::list<std::string> triangles = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Content);
-		std::list<std::string> hash = ot::json::getStringList(_doc, OT_ACTION_PARAM_FILE_Hash);
-
-		shapeTriangles(names, triangles, hash);
-		return "";
-	}
-	else if (_action == OT_ACTION_CMD_UI_SS_GET_LOCAL_FILENAME)
+	else if (_action == OT_ACTION_CMD_UI_LTS_GET_LOCAL_FILENAME)
 	{
 		std::string hostName = ot::json::getString(_doc, OT_ACTION_PARAM_HOSTNAME);
 
 		return getLocalFileName(hostName);
 	}
-	else if (_action == OT_ACTION_CMD_UI_SS_SET_LOCAL_FILENAME)
+	else if (_action == OT_ACTION_CMD_UI_LTS_SET_LOCAL_FILENAME)
 	{
 		std::string hostName = ot::json::getString(_doc, OT_ACTION_PARAM_HOSTNAME);
 		std::string fileName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Name);
 
 		setLocalFileName(hostName, fileName);
 	}
-	else if (_action == OT_ACTION_CMD_UI_SS_GET_SIMPLE_FILENAME)
+	else if (_action == OT_ACTION_CMD_UI_LTS_GET_SIMPLE_FILENAME)
 	{
 		return getSimpleFileName();
 	}
@@ -221,7 +185,7 @@ bool Application::startAsRelayService(void) const
 std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	std::string action = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ActionName);
 	if		(action == "Project:Local Project:Import")		  importProject();
-	else if (action == "Project:Local Project:Set File")	  setCSTFile();
+	else if (action == "Project:Local Project:Set File")	  setLTSpiceFile();
 	else if (action == "Project:Versions:Information")		  showInformation();
 	else if (action == "Project:Versions:Commit")			  commitChanges();
 	else if (action == "Project:Versions:Checkout")			  getChanges();
@@ -286,18 +250,18 @@ void Application::importProject(void)
 	uiComponent()->sendMessage(true, doc, tmp);
 }
 
-void Application::setCSTFile(void)
+void Application::setLTSpiceFile(void)
 {
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
 		return;
 	}
 
 	// Send the set file message to the UI
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_SETCSTFILE, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
@@ -311,13 +275,13 @@ void Application::commitChanges(void)
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
 		return;
 	}
 
 	// Send the commit message to the UI
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_COMMIT, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_COMMIT, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
@@ -329,7 +293,7 @@ void Application::showInformation(void)
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
 		return;
 	}
 
@@ -337,7 +301,7 @@ void Application::showInformation(void)
 
 	// Send the information message to the UI
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_INFORMATION, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_INFORMATION, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(currentVersion, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 
@@ -352,7 +316,7 @@ void Application::getChanges(void)
 	// Check whether the project has already been initialized
 	if (!isProjectInitialized())
 	{
-		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import a Studio Suite project file first.");
+		uiComponent()->displayErrorPrompt("This project has not yet been initialized. Please import an LTSpice project file first.");
 		return;
 	}
 
@@ -361,7 +325,7 @@ void Application::getChanges(void)
 
 	// Send the commit message to the UI
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_GET, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_GET, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());
 
@@ -406,7 +370,7 @@ void Application::uploadNeeded(ot::JsonDocument& _doc)
 	infoFileManager.readInformation();
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_UPLOAD, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_UPLOAD, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(versionID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, infoFileManager.getInfoEntityID(), doc.GetAllocator());
@@ -439,7 +403,7 @@ void Application::downloadNeeded(ot::JsonDocument& _doc)
 	std::string version = modelComponent()->getCurrentModelVersion();
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_DOWNLOAD, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_DOWNLOAD, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(versionID, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(version, doc.GetAllocator()), doc.GetAllocator());
@@ -478,7 +442,7 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 
 	modelComponent()->deleteEntitiesFromModel(deletedNameList, false);
 
-	modelComponent()->storeNewEntities("Studio Suite project uploaded", false);
+	modelComponent()->storeNewEntities("LTSpice project uploaded", false);
 
 	// Determine the new version
 	std::string newVersion = modelComponent()->getCurrentModelVersion();
@@ -494,7 +458,7 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 
 	// Finally we send the new version to the frontend 
 	ot::JsonDocument doc2;
-	doc2.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_COPY, doc2.GetAllocator()), doc2.GetAllocator());
+	doc2.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_LTS_COPY, doc2.GetAllocator()), doc2.GetAllocator());
 	doc2.AddMember(OT_ACTION_PARAM_MODEL_Version, ot::JsonString(newVersion, doc2.GetAllocator()), doc2.GetAllocator());
 
 	uiComponent()->sendMessage(true, doc2, tmp);

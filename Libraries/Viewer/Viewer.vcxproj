@@ -45,10 +45,7 @@
     <ClCompile Include="src\MaterialRough.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Notifier.cpp" />
-    <ClCompile Include="src\Plot.cpp" />
     <ClCompile Include="src\PlotManager.cpp" />
-    <ClCompile Include="src\PlotViewOld.cpp" />
-    <ClCompile Include="src\polarPlot.cpp" />
     <ClCompile Include="src\Rubberband.cpp" />
     <ClCompile Include="src\SceneNodeAnnotation.cpp" />
     <ClCompile Include="src\SceneNodeCartesianMesh.cpp" />
@@ -90,7 +87,6 @@
     <ClCompile Include="src\ViewerView.cpp" />
     <ClCompile Include="src\ViewManipulator.cpp" />
     <ClCompile Include="src\WorkingPlane.cpp" />
-    <ClCompile Include="src\xyPlot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AbstractPlot.h" />
@@ -114,10 +110,7 @@
     <ClInclude Include="include\MaterialBase.h" />
     <ClInclude Include="include\Model.h" />
     <ClInclude Include="include\Notifier.h" />
-    <ClInclude Include="include\Plot.h" />
     <ClInclude Include="include\PlotManager.h" />
-    <ClInclude Include="include\PlotViewOld.h" />
-    <ClInclude Include="include\polarPlot.h" />
     <ClInclude Include="include\Rubberband.h" />
     <ClInclude Include="include\SceneNodeAnnotation.h" />
     <ClInclude Include="include\SceneNodeBase.h" />
@@ -144,7 +137,6 @@
     <ClInclude Include="include\ViewerSettings.h" />
     <ClInclude Include="include\ViewerView.h" />
     <ClInclude Include="include\WorkingPlane.h" />
-    <ClInclude Include="include\xyPlot.h" />
     <QtMoc Include="include\Viewer.h" />
     <ClInclude Include="include\ViewerAPI.h" />
     <ClInclude Include="include\ViewerObjectSelectionHandler.h" />

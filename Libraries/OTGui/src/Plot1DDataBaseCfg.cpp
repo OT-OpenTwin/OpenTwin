@@ -30,10 +30,6 @@ ot::Plot1DDataBaseCfg& ot::Plot1DDataBaseCfg::operator = (const Plot1DDataBaseCf
 ot::Plot1DDataBaseCfg& ot::Plot1DDataBaseCfg::operator=(const Plot1DCfg& _other) {
 	Plot1DCfg::operator=(_other);
 	
-	if (this != &_other) {
-		m_curves.clear();
-	}
-	
 	return *this;
 }
 
@@ -67,4 +63,15 @@ void ot::Plot1DDataBaseCfg::setFromJsonObject(const ot::ConstJsonObject& _object
 
 void ot::Plot1DDataBaseCfg::addCurve(const Plot1DCurveInfoCfg& _curve) {
 	m_curves.push_back(_curve);
+}
+
+bool ot::Plot1DDataBaseCfg::updateCurveVersion(ot::UID _curveEntityUID, ot::UID _newCurveEntityVersion) {
+	bool changed = false;
+	for (Plot1DCurveInfoCfg& curve : m_curves) {
+		if (curve.getId() == _curveEntityUID && curve.getVersion() != _newCurveEntityVersion) {
+			curve.setVersion(_newCurveEntityVersion);
+			changed = true;
+		}
+	}
+	return changed;
 }

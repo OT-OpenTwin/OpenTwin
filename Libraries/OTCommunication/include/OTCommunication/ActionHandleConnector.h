@@ -25,6 +25,9 @@
 //! @param ___actionName The action that should be registered in the dispatch system.
 #define OT_HANDLER(___functionName, ___className, ___actionName, ___messageTypeFlags) std::string ___functionName(ot::JsonDocument& _document); OT_ADD_HANDLER(___functionName, ___className, ___actionName, ___messageTypeFlags);
 
+//! \brief Creates a string list.
+#define OT_ACTIONLIST(...) std::list<std::string>({__VA_ARGS__})
+
 namespace ot {
 
 	//! @class ActionHandleConnector
@@ -35,6 +38,7 @@ namespace ot {
 
 		ActionHandleConnector();
 		ActionHandleConnector(const std::string& _actionName, ot::MessageType _messageFlags, ActionHandler* _handler, ConnectorMessageRef _handlerFunction);
+		ActionHandleConnector(const std::initializer_list<const char*>& _actionNames, ot::MessageType _messageFlags, ActionHandler* _handler, ConnectorMessageRef _handlerFunction);
 		ActionHandleConnector(const std::list<std::string>& _actionNames, ot::MessageType _messageFlags, ActionHandler* _handler, ConnectorMessageRef _handlerFunction);
 		ActionHandleConnector(const ActionHandleConnector<T>& _other);
 
@@ -60,6 +64,11 @@ template <class T>
 ot::ActionHandleConnector<T>::ActionHandleConnector(const std::string& _actionName, ot::MessageType _messageFlags, ActionHandler* _obj, ConnectorMessageRef _func)
 	: ActionHandleConnectorBase(_actionName, _messageFlags), m_obj(_obj), m_func(_func)
 {}
+
+template <class T>
+ot::ActionHandleConnector<T>::ActionHandleConnector(const std::initializer_list<const char*>& _actionNames, ot::MessageType _messageFlags, ActionHandler* _obj, ConnectorMessageRef _func)
+	: ActionHandleConnectorBase(std::list<std::string>(_actionNames), _messageFlags), m_obj(_obj), m_func(_func) {
+}
 
 template <class T>
 ot::ActionHandleConnector<T>::ActionHandleConnector(const std::list<std::string>& _actionNames, ot::MessageType _messageFlags, ActionHandler* _obj, ConnectorMessageRef _func)

@@ -5,6 +5,7 @@
 #include "DataBase.h"
 #include "Types.h"
 
+#include "OTCore/OTAssert.h"
 #include "OTCommunication/ActionTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
@@ -38,10 +39,10 @@ void EntityResult1DPlot::AddStorageData(bsoncxx::builder::basic::document &stora
 	auto curveID = bsoncxx::builder::basic::array();
 	auto curveName = bsoncxx::builder::basic::array();
 
-	for (auto curve : curves)
+	for (const ot::UIDNamePair& curve : m_curves)
 	{
-		curveID.append((long long) curve);
-		curveName.append(curveNamesByUID[curve]);
+		curveID.append((long long) curve.getUid());
+		curveName.append(curve.getName());
 	}
 
 	storage.append(
@@ -58,21 +59,18 @@ void EntityResult1DPlot::readSpecificDataFromDataBase(bsoncxx::document::view &d
 	// Here we can load any special information about the entity
 	auto arrayCurveItems = doc_view["Curves"].get_array().value;
 	auto arrayCurveNames = doc_view["CurveNames"].get_array().value;
-	curves.clear();
-	curveNamesByUID.clear();
+	m_curves.clear();
 
-	for (const bsoncxx::array::element& item : arrayCurveItems)
-	{
+	ot::UIDList curveIds;
+	for (const bsoncxx::array::element& item : arrayCurveItems) {
 		ot::UID curveID = item.get_int64();
-		curves.push_back(curveID);
+		curveIds.push_back(curveID);
 	}
 
-	auto it = curves.begin();
-	for (const bsoncxx::array::element& name : arrayCurveNames)
-	{
-		std::string curveName = name.get_utf8().value.data();
-		curveNamesByUID[*it] = curveName;
-
+	auto it = curveIds.begin();
+	for (const bsoncxx::array::element& name : arrayCurveNames) {
+		OTAssert(it != curveIds.end(), "Size mismatch");
+		m_curves.push_back(ot::UIDNamePair(*it, name.get_utf8().value.data()));
 		it++;
 	}
 
@@ -88,30 +86,24 @@ void EntityResult1DPlot::addVisualizationNodes(void)
 
 void EntityResult1DPlot::addVisualizationItem(bool isHidden)
 {
-	TreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "Plot1DVisible";
-	treeIcons.hiddenIcon = "Plot1DHidden";
+	ot::Plot1DDataBaseCfg config;
+	config.setHidden(isHidden);
+	this->addBasicsToConfig(config);
+	
+	for (ot::UIDNamePair& curveInfo : m_curves) {
+		ot::Plot1DCurveInfoCfg curve;
+		curve.setId(curveInfo.getUid());
+		curve.setName(curveInfo.getName());
+		curve.setVersion(getCurrentEntityVersion(curveInfo.getUid()));
+		config.addCurve(curve);
+	}
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddPlot1D, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_UID, this->getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, isHidden, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_PROJECT_NAME, ot::JsonString(DataBase::GetDataBase()->getProjectName(), doc.GetAllocator()), doc.GetAllocator());
-
-	std::list<unsigned long long> versions;
-	for (auto curve : curves)
-	{
-		versions.push_back(getCurrentEntityVersion(curve));
-	}
-
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveIDs, ot::JsonArray(curves, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveVersions, ot::JsonArray(versions, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveNames, ot::JsonArray(this->getCurveNames(), doc.GetAllocator()), doc.GetAllocator());
-
-	this->addPropertiesToDocument(doc);
-	treeIcons.addToJsonDoc(doc);
+	
+	ot::JsonObject configObj;
+	config.addToJsonObject(configObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 }
@@ -151,9 +143,12 @@ bool EntityResult1DPlot::updateFromProperties(void)
 	// Send a notification message to the observer, that the result1d properties have changed
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, this->getEntityID(), doc.GetAllocator());
-
-	addPropertiesToDocument(doc);
+	
+	ot::Plot1DCfg config;
+	this->addBasicsToConfig(config);
+	ot::JsonObject configObj;
+	config.addToJsonObject(configObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
 
 	getObserver()->sendMessageToViewer(doc);
 
@@ -195,27 +190,33 @@ std::string EntityResult1DPlot::getPlotQuantity(void) {
 	}
 }
 
-void EntityResult1DPlot::addPropertiesToDocument(ot::JsonDocument& doc)
+void EntityResult1DPlot::addBasicsToConfig(ot::Plot1DCfg& _config)
 {
 	int gridColorR = 0, gridColorG = 0, gridColorB = 0;
-	getGridColor(gridColorR, gridColorG, gridColorB);
+	this->getGridColor(gridColorR, gridColorG, gridColorB);
 
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Title, ot::JsonString(getTitle(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_PlotType, ot::JsonString(getPlotType(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_PlotQuantity, ot::JsonString(getPlotQuantity(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Legend, getLegend(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Grid, getGrid(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_LogscaleX, getLogscaleX(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_LogscaleY, getLogscaleY(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_AutoscaleX, getAutoscaleX(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_AutoscaleY, getAutoscaleY(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Xmin, getXmin(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Xmax, getXmax(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Ymin, getYmin(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_Ymax, getYmax(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_GridColorR, gridColorR, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_GridColorG, gridColorG, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_GridColorB, gridColorB, doc.GetAllocator());
+	_config.setName(this->getName());
+	_config.setUid(this->getEntityID());
+	_config.setTitle(this->getTitle());
+	_config.setProjectName(DataBase::GetDataBase()->getProjectName());
+	_config.setTreeIcons(ot::NavigationTreeItemIcon("Plot1DVisible", "Plot1DHidden"));
+
+	_config.setPlotType(ot::Plot1DCfg::stringToPlotType(this->getPlotType()));
+	_config.setAxisQuantity(ot::Plot1DCfg::stringToAxisQuantity(this->getPlotQuantity()));
+
+	_config.setGridColor(ot::Color(gridColorR, gridColorG, gridColorB));
+	_config.setGridVisible(this->getGrid());
+
+	_config.setLegendVisible(this->getLegend());
+
+	_config.setXAxisIsLogScale(this->getLogscaleX());
+	_config.setXAxisIsAutoScale(this->getAutoscaleX());
+	_config.setXAxisMin(this->getXmin());
+	_config.setXAxisMax(this->getXmax());
+	_config.setYAxisIsLogScale(this->getLogscaleY());
+	_config.setYAxisIsAutoScale(this->getAutoscaleY());
+	_config.setYAxisMin(this->getYmin());
+	_config.setYAxisMax(this->getYmax());
 }
 
 void EntityResult1DPlot::setStringPlotProperty(const std::string &name, const std::string &value)
@@ -323,68 +324,56 @@ void EntityResult1DPlot::getGridColor(int &colorR, int &colorG, int &colorB)
 	}
 }
 
-void EntityResult1DPlot::addCurve(ot::UID curveID, const std::string &name)
+void EntityResult1DPlot::addCurve(ot::UID _curveID, const std::string& _name)
 {
-	deleteCurve(curveID);
-	curves.push_back(curveID);
-	curveNamesByUID[curveID] = name;
+	deleteCurve(_curveID);
+	m_curves.push_back(ot::UIDNamePair(_curveID, _name));
 	setModified();
 }
 
-bool EntityResult1DPlot::deleteCurve(ot::UID curveID)
+bool EntityResult1DPlot::deleteCurve(ot::UID _curveID)
 {
-	if (curveNamesByUID.find(curveID) != curveNamesByUID.end())
-	{
-		curves.remove(curveID);
-		curveNamesByUID.erase(curveID);
-		setModified();
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-	
-}
-
-bool EntityResult1DPlot::deleteCurve(const std::string& curveName)
-{
-	for (const auto curveNameByUID : curveNamesByUID)
-	{
-		if (curveNameByUID.second == curveName)
-		{
-			setModified();
-			return deleteCurve(curveNameByUID.first);
+	for (auto it = m_curves.begin(); it != m_curves.end(); it++) {
+		if (it->getUid() == _curveID) {
+			m_curves.erase(it);
+			this->setModified();
+			return true;
 		}
 	}
 	return false;
 }
 
-std::list<ot::UID> EntityResult1DPlot::getCurves(void)
+bool EntityResult1DPlot::deleteCurve(const std::string& _curveName)
 {
-	return curves;
+	for (auto it = m_curves.begin(); it != m_curves.end(); it++) {
+		if (it->getName() == _curveName) {
+			m_curves.erase(it);
+			this->setModified();
+			return true;
+		}
+	}
+	return false;
 }
 
-std::list<std::string> EntityResult1DPlot::getCurveNames(void)
-{
-	std::list<std::string> names;
-	for (auto curve : curves)
-	{
-		names.push_back(curveNamesByUID[curve]);
+ot::UIDList EntityResult1DPlot::getCurveIDs(void) const {
+	ot::UIDList result;
+	for (const ot::UIDNamePair& info : m_curves) {
+		result.push_back(info.getUid());
 	}
-
-	return names;
+	return result;
 }
 
-void EntityResult1DPlot::overrideReferencedCurves(const ot::UIDList& curveIDs, const std::list<std::string>& curveNames)
-{
-	curves = curveIDs;
-	curveNamesByUID.clear();
-	auto curveName = curveNames.begin();
-	for (const ot::UID& curveID : curveIDs)
-	{
-		curveNamesByUID[curveID] = *curveName;
+std::list<std::string> EntityResult1DPlot::getCurveNames(void) const {
+	std::list<std::string> result;
+	for (const ot::UIDNamePair& info : m_curves) {
+		result.push_back(info.getName());
 	}
+	return result;
+}
+
+void EntityResult1DPlot::overrideReferencedCurves(const ot::UIDNamePairList& _curves)
+{
+	m_curves = _curves;
 	setModified();
 }
 

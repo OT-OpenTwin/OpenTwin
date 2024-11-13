@@ -3,11 +3,12 @@
 
 #include "EntityContainer.h"
 #include "Types.h"
+#include "OTCore/UIDNamePair.h"
+#include "OTGui/Plot1DDataBaseCfg.h"
 
 #include <list>
 
-class __declspec(dllexport) EntityResult1DPlot : public EntityContainer
-{
+class __declspec(dllexport) EntityResult1DPlot : public EntityContainer {
 public:
 	EntityResult1DPlot(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual ~EntityResult1DPlot();
@@ -74,12 +75,13 @@ public:
 	
 	bool updatePropertyVisibilities(void);
 
-	void addCurve(ot::UID curveID, const std::string &name);
-	bool deleteCurve(ot::UID curveID);
-	bool deleteCurve(const std::string& curveName);
-	std::list<ot::UID> getCurves(void);
-	std::list<std::string> getCurveNames(void);
-	void overrideReferencedCurves(const ot::UIDList& curveIDs, const std::list<std::string>& curveNames);
+	void addCurve(ot::UID _curveID, const std::string& _name);
+	bool deleteCurve(ot::UID _curveID);
+	bool deleteCurve(const std::string& _curveName);
+	const ot::UIDNamePairList& getCurves(void) const { return m_curves; };
+	ot::UIDList getCurveIDs(void) const;
+	std::list<std::string> getCurveNames(void) const;
+	void overrideReferencedCurves(const ot::UIDNamePairList& _curves);
 	
 private:
 	virtual int getSchemaVersion(void) { return 1; };
@@ -93,10 +95,10 @@ private:
 	std::string getSelectionPlotProperty(const std::string &name);
 	bool getBoolPlotProperty(const std::string &name);
 	double getDoublePlotProperty(const std::string &name);
-	void addPropertiesToDocument(ot::JsonDocument &doc);
 
-	std::list<ot::UID> curves;
-	std::map<ot::UID, std::string> curveNamesByUID;
+	void addBasicsToConfig(ot::Plot1DCfg& _config);
+
+	ot::UIDNamePairList m_curves;
 };
 
 

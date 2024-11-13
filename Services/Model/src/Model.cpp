@@ -445,7 +445,7 @@ void Model::executeAction(const std::string &action, ot::JsonDocument &doc)
 		EntityResult1DPlot* selectedPlot =	dynamic_cast<EntityResult1DPlot*>(selectedEntity);
 		if (selectedPlot != nullptr)
 		{
-			ot::UIDList curveIDs = selectedPlot->getCurves();
+			ot::UIDList curveIDs = selectedPlot->getCurveIDs();
 			selectedCurves = { curveIDs.begin(),curveIDs.end() };
 		}
 		else
@@ -1653,24 +1653,22 @@ void Model::updateCurvesInPlot(const std::list<std::string>& curveNames, const o
 	auto baseEntity = entityMap.find(plotID);
 	assert(baseEntity != entityMap.end());
 	EntityResult1DPlot* plotEntity = dynamic_cast<EntityResult1DPlot*>(baseEntity->second);
-	ot::UIDList curveIDs;
-	std::list<std::string> curveNamesOnly;
+	ot::UIDNamePairList curves;
 	for (const std::string& curveName : curveNames)
 	{
 		EntityBase* baseEnt = findEntityFromName(curveName);
-		curveIDs.push_back(baseEnt->getEntityID());
-		curveNamesOnly.push_back(curveName.substr(curveName.find_last_of("/") + 1, curveName.size()));
+		curves.push_back(ot::UIDNamePair(baseEnt->getEntityID(), curveName.substr(curveName.find_last_of("/") + 1, curveName.size())));
 	}
-	plotEntity->overrideReferencedCurves(curveIDs, curveNamesOnly);
+	plotEntity->overrideReferencedCurves(curves);
 	plotEntity->StoreToDataBase();
 
 	setModified();
 	modelChangeOperationCompleted("Updated curve reference in plot");
-	if (visualizationModelID != 0)
-	{
-		ot::UIDList plotIDs{ plotID };
-		ot::UIDList plotVersions{ plotEntity->getEntityStorageVersion() };
-		Application::instance()->getNotifier()->updatePlotEntities(plotIDs,plotVersions, visualizationModelID);
+	if (visualizationModelID != 0) {
+		OT_LOG_EA("Visualization model ID must be 0");
+		//ot::UIDList plotIDs{ plotID };
+		//ot::UIDList plotVersions{ plotEntity->getEntityStorageVersion() };
+		//Application::instance()->getNotifier()->updatePlotEntities(plotIDs,plotVersions, visualizationModelID);
 	}
 }
 
@@ -4532,9 +4530,9 @@ void Model::deleteCurves(std::list<std::string>& entityNameList)
 		setModified();
 	}
 	
-	if (visualizationModelID != 0)
-	{
-		Application::instance()->getNotifier()->updatePlotEntities(plotIDs, plotVersions, visualizationModelID);
+	if (visualizationModelID != 0) {
+		OT_LOG_EA("Visualization model ID must be 0");
+		//Application::instance()->getNotifier()->updatePlotEntities(plotIDs, plotVersions, visualizationModelID);
 	}
 
 	modelChangeOperationCompleted("Removed curves from plot");
