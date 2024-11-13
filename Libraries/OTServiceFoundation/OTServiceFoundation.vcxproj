@@ -196,6 +196,7 @@
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
     <ClCompile Include="src\ContextMenu.cpp" />
     <ClCompile Include="src\Encryption.cpp" />
+    <ClCompile Include="src\ErrorWarningLogFrontendNotifier.cpp" />
     <ClCompile Include="src\Foundation.cpp" />
     <ClCompile Include="src\ModelServiceAPI.cpp" />
     <ClCompile Include="src\ProgressUpdater.cpp" />
@@ -218,6 +219,7 @@
     <ClInclude Include="include\OTServiceFoundation\ContextMenu.h" />
     <ClInclude Include="include\OTServiceFoundation\Encryption.h" />
     <ClInclude Include="include\OTServiceFoundation\EntityInformation.h" />
+    <ClInclude Include="include\OTServiceFoundation\ErrorWarningLogFrontendNotifier.h" />
     <ClInclude Include="include\OTServiceFoundation\ExternalServicesComponent.h" />
     <ClInclude Include="include\OTServiceFoundation\Foundation.h" />
     <ClInclude Include="include\OTServiceFoundation\FoundationAPIExport.h" />
