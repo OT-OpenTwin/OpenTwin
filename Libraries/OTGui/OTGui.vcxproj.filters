@@ -348,6 +348,9 @@
     <ClInclude Include="include\OTGui\TableRange.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\EntityViewBaseInfo.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -609,6 +612,9 @@
       <Filter>Source Files\Plot</Filter>
     </ClCompile>
     <ClCompile Include="src\TableRange.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityViewBaseInfo.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>

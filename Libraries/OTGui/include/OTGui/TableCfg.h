@@ -6,9 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Serializable.h"
-#include "OTCore/OTClassHelper.h"
-#include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/EntityViewBaseInfo.h"
 #include "OTGui/TableHeaderItemCfg.h"
 
 // std header
@@ -17,9 +15,9 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT TableCfg : public Serializable {
+	class OT_GUI_API_EXPORT TableCfg : public EntityViewBaseInfo {
 	public:
-		TableCfg(int _rows = 0, int _columns = 0);
+		TableCfg(int _rows = 0, int _columns = 0, EntityViewBaseInfo _baseInfo = EntityViewBaseInfo());
 		TableCfg(const TableCfg& _other);
 		virtual ~TableCfg();
 
@@ -39,12 +37,6 @@ namespace ot {
 		//! Resets the row and column count back to 0.
 		void clear(void);
 
-		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& getName(void) const { return m_name; };
-
-		void setTitle(const std::string& _title) { m_title = _title; };
-		const std::string& getTitle(void) const { return (m_title.empty() ? m_name : m_title); };
-
 		int getRowCount(void) const { return m_rows; };
 		int getColumnCount(void) const { return m_columns; };
 
@@ -61,9 +53,6 @@ namespace ot {
 
 	private:
 		void initialize(void);
-
-		std::string m_name;
-		std::string m_title;
 
 		int m_rows;
 		int m_columns;

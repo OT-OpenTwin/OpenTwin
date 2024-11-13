@@ -7,14 +7,14 @@
 #include "OTCore/Logger.h"
 #include "OTGui/TableCfg.h"
 
-ot::TableCfg::TableCfg(int _rows, int _columns) 
-	: m_rows(_rows), m_columns(_columns)
+ot::TableCfg::TableCfg(int _rows, int _columns, EntityViewBaseInfo _baseInfo)
+	: EntityViewBaseInfo(_baseInfo), m_rows(_rows), m_columns(_columns)
 {
 	this->initialize();
 }
 
 ot::TableCfg::TableCfg(const TableCfg& _other) 
-	: m_rows(0), m_columns(0)
+	: EntityViewBaseInfo(_other), m_rows(0), m_columns(0)
 {
 	*this = _other;
 }
@@ -25,13 +25,12 @@ ot::TableCfg::~TableCfg() {
 
 ot::TableCfg& ot::TableCfg::operator = (const TableCfg& _other) {
 	if (this == &_other) return *this;
+	EntityViewBaseInfo::operator=(_other);
 
 	// Clear data
 	this->clear();
 
 	// Initialize data
-	m_name = _other.m_name;
-	m_title = _other.m_title;
 	m_rows = _other.m_rows;
 	m_columns = _other.m_columns;
 
@@ -62,8 +61,8 @@ ot::TableCfg& ot::TableCfg::operator = (const TableCfg& _other) {
 }
 
 void ot::TableCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
-	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
+	EntityViewBaseInfo::addToJsonObject(_object, _allocator);
+
 	_object.AddMember("Rows", m_rows, _allocator);
 	_object.AddMember("Columns", m_columns, _allocator);
 
@@ -104,10 +103,10 @@ void ot::TableCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _a
 }
 
 void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
+	EntityViewBaseInfo::setFromJsonObject(_object);
+
 	this->clear();
 
-	m_name = json::getString(_object, "Name");
-	m_title = json::getString(_object, "Title");
 	m_rows = json::getInt(_object, "Rows");
 	m_columns = json::getInt(_object, "Columns");
 
