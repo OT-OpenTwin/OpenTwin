@@ -7,6 +7,7 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/Table.h"
 #include "OTWidgets/QtFactory.h"
+#include "OTWidgets/TableItemDelegate.h"
 
 // Qt header
 #include <QtWidgets/qshortcut.h>
@@ -133,7 +134,9 @@ void ot::Table::setSelectedCellsBackground(const ot::Color& _color) {
 }
 
 void ot::Table::setSelectedCellsBackground(const QColor& _color) {
-
+	for (QTableWidgetItem* item : this->selectedItems()) {
+		item->setBackground(QBrush(_color));
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -154,6 +157,8 @@ void ot::Table::slotCellDataChanged(int _row, int _column) {
 // Private helper
 
 void ot::Table::ini(void) {
+	new TableItemDelegate(this); // Will be destroyed via Qt
+
 	QShortcut* saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
 	saveShortcut->setContext(Qt::WidgetWithChildrenShortcut);
 

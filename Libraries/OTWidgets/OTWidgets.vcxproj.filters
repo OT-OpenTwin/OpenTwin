@@ -400,6 +400,9 @@
     <ClCompile Include="src\PolarPlotPanner.cpp">
       <Filter>src\Plot\Polar</Filter>
     </ClCompile>
+    <ClCompile Include="src\TableItemDelegate.cpp">
+      <Filter>src\StyledDelegates</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -485,6 +488,12 @@
     </Filter>
     <Filter Include="src\Plot\Polar">
       <UniqueIdentifier>{a9a34595-f45c-40e4-9afa-881e031858ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\StyledDelegates">
+      <UniqueIdentifier>{85780b8c-6fa1-4fc2-bb29-5bb08b6a2575}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\StyledDelegates">
+      <UniqueIdentifier>{666d82f1-aafe-4aeb-bdc5-d1e54fbe0966}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -775,6 +784,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PolarPlotPanner.h">
       <Filter>include\Plot\Polar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\TableItemDelegate.h">
+      <Filter>include\StyledDelegates</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
