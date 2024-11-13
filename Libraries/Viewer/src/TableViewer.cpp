@@ -89,15 +89,15 @@ void TableViewer::SelectRanges(std::vector<ot::TableRange>& ranges)
 		}
 		for (auto range : ranges)
 		{
-			int displayedTableTopRowIndx = range.GetTopRow() - minRow;
-			int displayedTableBottomRowIndx = range.GetBottomRow() - minRow;
+			int displayedTableTopRowIndx = range.getTopRow() - minRow;
+			int displayedTableBottomRowIndx = range.getBottomRow() - minRow;
 			if (displayedTableBottomRowIndx >= 0 || displayedTableTopRowIndx >= 0) //&& (same for column)
 			{
 				if (displayedTableTopRowIndx < 0)
 				{
 					displayedTableTopRowIndx = 0;
 				}
-				if (range.GetBottomRow() > maxRow)
+				if (range.getBottomRow() > maxRow)
 				{
 					displayedTableBottomRowIndx = maxRow - minRow;
 				}
@@ -107,15 +107,15 @@ void TableViewer::SelectRanges(std::vector<ot::TableRange>& ranges)
 				}
 			}
 
-			int displayedTableLeftColIndx = range.GetLeftColumn() - minCol;
-			int displayedTableRightColIndx = range.GetRightColumn() - minCol;
+			int displayedTableLeftColIndx = range.getLeftColumn() - minCol;
+			int displayedTableRightColIndx = range.getRightColumn() - minCol;
 			if (displayedTableLeftColIndx >= 0 || displayedTableRightColIndx >= 0)
 			{
 				if (displayedTableLeftColIndx < 0)
 				{
 					displayedTableLeftColIndx = 0;
 				}
-				if(range.GetRightColumn()> maxCol)
+				if(range.getRightColumn()> maxCol)
 				{
 					displayedTableRightColIndx = maxCol - minCol;
 				}

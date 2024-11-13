@@ -315,14 +315,14 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 				tableRange->createProperties(_scriptFolder, _scriptFolderUID, "", -1,dataType);
 			}
 			
-			tableRange->SetRange(ranges[i].GetTopRow(), ranges[i].GetBottomRow(), ranges[i].GetLeftColumn(), ranges[i].GetRightColumn());
+			tableRange->SetRange(ranges[i].getTopRow(), ranges[i].getBottomRow(), ranges[i].getLeftColumn(), ranges[i].getRightColumn());
 			tableRange->SetTableProperties(tableEntPtr->getName(), tableEntPtr->getEntityID(), tableEntPtr->getSelectedHeaderOrientationString());
 			tableRange->setEditable(true);
 			std::string name = "";
 
 			if (tableRange->getTableOrientation() == EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
 			{
-				for (int32_t column = ranges[i].GetLeftColumn(); column <= ranges[i].GetRightColumn(); column++)
+				for (int32_t column = ranges[i].getLeftColumn(); column <= ranges[i].getRightColumn(); column++)
 				{
 					if (name == "")
 					{
@@ -337,7 +337,7 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 			}
 			else
 			{
-				for (int32_t row = ranges[i].GetTopRow(); row <= ranges[i].GetBottomRow(); row++)
+				for (int32_t row = ranges[i].getTopRow(); row <= ranges[i].getBottomRow(); row++)
 				{
 					if (name == "")
 					{
@@ -533,11 +533,11 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(Entity
 	auto rangeIt = _selectedRanges.begin();
 	while (!stringDetected && rangeIt != _selectedRanges.end())
 	{
-		int row = rangeIt->GetTopRow();
-		while(!stringDetected && row <= rangeIt->GetBottomRow())
+		int row = rangeIt->getTopRow();
+		while(!stringDetected && row <= rangeIt->getBottomRow())
 		{
-			int column = rangeIt->GetLeftColumn();
-			while(!stringDetected && column <= rangeIt->GetRightColumn())
+			int column = rangeIt->getLeftColumn();
+			while(!stringDetected && column <= rangeIt->getRightColumn())
 			{
 				std::string value = _tableData->getValue(row, column);
 				if (value != "")

@@ -40,6 +40,7 @@
 #include "OTCore/ReturnMessage.h"
 
 #include "OTGui/GuiTypes.h"
+#include "OTGui/TableRange.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/MessageDialogCfg.h"
@@ -72,7 +73,6 @@
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/Msg.h"
 
-#include "OTServiceFoundation/TableRange.h"
 #include "OTServiceFoundation/ContextMenu.h"
 
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"

@@ -12,6 +12,9 @@
 // Qt header
 #include <QtWidgets/qtablewidget.h>
 
+// std header
+#include <vector>
+
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT Table : public QTableWidget {

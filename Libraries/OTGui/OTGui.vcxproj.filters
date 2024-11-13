@@ -345,6 +345,9 @@
     <ClInclude Include="include\OTGui\Plot1DDataBaseCfg.h">
       <Filter>Header Files\Plot</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\TableRange.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -604,6 +607,9 @@
     </ClCompile>
     <ClCompile Include="src\Plot1DDataBaseCfg.cpp">
       <Filter>Source Files\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableRange.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

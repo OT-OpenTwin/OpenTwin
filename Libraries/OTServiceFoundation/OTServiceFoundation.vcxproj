@@ -205,7 +205,6 @@
     <ClCompile Include="src\ExternalServicesComponent.cpp" />
     <ClCompile Include="src\ModalCommandBase.cpp" />
     <ClCompile Include="src\ModelComponent.cpp" />
-    <ClCompile Include="src\TableRange.cpp" />
     <ClCompile Include="src\TypeConverter.cpp" />
     <ClCompile Include="src\UiComponent.cpp" />
     <ClCompile Include="src\UiPluginComponent.cpp" />
@@ -234,7 +233,6 @@
     <ClInclude Include="include\OTServiceFoundation\ModelServiceAPI.h" />
     <ClInclude Include="include\OTServiceFoundation\ProgressUpdater.h" />
     <ClInclude Include="include\OTServiceFoundation\PythonServiceInterface.h" />
-    <ClInclude Include="include\OTServiceFoundation\TableRange.h" />
     <ClInclude Include="include\OTServiceFoundation\TypeConverter.h" />
     <ClInclude Include="include\OTServiceFoundation\UiComponent.h" />
     <ClInclude Include="include\OTServiceFoundation\UiPluginComponent.h" />

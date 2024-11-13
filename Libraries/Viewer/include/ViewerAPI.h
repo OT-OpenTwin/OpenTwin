@@ -10,7 +10,7 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/Plot1DDataBaseCfg.h"
 #include "OTServiceFoundation/ContextMenu.h"
-#include "OTServiceFoundation/TableRange.h"
+#include "OTGui/TableRange.h"
 
 #include <list>
 #include <vector>

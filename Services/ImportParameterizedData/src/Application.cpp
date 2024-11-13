@@ -17,7 +17,7 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/EntityInformation.h"
-#include "OTServiceFoundation/TableRange.h"
+#include "OTGui/TableRange.h"
 #include "OTGui/OnePropertyDialogCfg.h"
 #include "OTGui/PropertyInt.h"
 #include "EntityFileCSV.h"
