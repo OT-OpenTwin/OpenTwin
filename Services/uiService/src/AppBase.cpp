@@ -173,7 +173,10 @@ AppBase::AppBase()
 	m_output(nullptr),
 	m_debug(nullptr),
 	m_versionGraph(nullptr),
-	m_state(AppState::NoState)
+	m_state(AppState::NoState),
+	m_welcomeScreen(nullptr),
+	m_ttb(nullptr),
+	m_logIntensity(nullptr)
 {
 	m_contextMenus.output.clear = invalidID;
 
@@ -184,6 +187,9 @@ AppBase::AppBase()
 	m_debugNotifier->disable();
 
 	m_contextMenuManager = new ContextMenuManager;
+
+	this->setDeleteLogNotifierLater(true);
+	ot::LogDispatcher::instance().addReceiver(this);
 }
 
 AppBase::~AppBase() {
@@ -378,6 +384,19 @@ LockManager * AppBase::lockManager(void) {
 // ##############################################################################################
 
 // Event handling
+
+void AppBase::log(const ot::LogMessage& _message) {
+	static const ot::LogFlag flags = ot::ERROR_LOG | ot::WARNING_LOG;
+	if (_message.getFlags() & flags) {
+		// Construct display text
+		if (_message.getFlags() & ot::ERROR_LOG) {
+			this->appendInfoMessage("[ERROR] [Frontend] " + QString::fromStdString(_message.getText()));
+		}
+		else if (_message.getFlags() & ot::WARNING_LOG) {
+			this->appendInfoMessage("[WARNING] [Frontend] " + QString::fromStdString(_message.getText()));
+		}
+	}
+}
 
 void AppBase::notify(
 	UID					_senderId,
@@ -1569,7 +1588,9 @@ void AppBase::replaceInfoMessage(const QString & _message) {
 }
 
 void AppBase::appendInfoMessage(const QString & _message) {
-	m_output->appendPlainText(_message);
+	if (m_output) {
+		m_output->appendPlainText(_message);
+	}
 }
 
 void AppBase::appendDebugMessage(const QString & _message) {
