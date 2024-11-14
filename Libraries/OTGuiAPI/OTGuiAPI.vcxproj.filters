@@ -36,7 +36,7 @@
     <ClInclude Include="include\OTGuiAPI\GuiAPIManager.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGuiAPI\FrontendAPI.h">
+    <ClInclude Include="include\OTGuiAPI\Frontend.h">
       <Filter>Header Files\CommunicationAPIs</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGuiAPI\FrontendActionHandler.h">
@@ -53,7 +53,7 @@
     <ClCompile Include="src\GuiAPIManager.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
-    <ClCompile Include="src\FrontendAPI.cpp">
+    <ClCompile Include="src\Frontend.cpp">
       <Filter>Source Files\CommunicationAPIs</Filter>
     </ClCompile>
     <ClCompile Include="src\FrontendActionHandler.cpp">

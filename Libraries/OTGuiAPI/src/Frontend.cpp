@@ -1,4 +1,4 @@
-//! @file FrontendAPI.cpp
+//! @file Frontend.cpp
 //!
 //! @author Alexander Kuester (alexk95)
 //! @date April 2024
@@ -7,10 +7,10 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTGuiAPI/FrontendAPI.h"
+#include "OTGuiAPI/Frontend.h"
 #include "OTGuiAPI/GuiAPIManager.h"
 
-bool ot::FrontendAPI::setControlEnabled(const std::string& _controlName, bool _isEnabled, bool _sendRequest) {
+bool ot::Frontend::setControlEnabled(const std::string& _controlName, bool _isEnabled, bool _sendRequest) {
 	// Ensure the control was actually created
 	if (!this->controlExists(_controlName)) {
 		OT_LOG_W("A control with the name \"" + _controlName + "\" does not exist");
@@ -48,15 +48,15 @@ bool ot::FrontendAPI::setControlEnabled(const std::string& _controlName, bool _i
 	}
 }
 
-bool ot::FrontendAPI::setControlEnabled(const std::string& _toolBarPageName, const std::string& _toolBarGroupName, const std::string& _controlName, bool _isEnabled, bool _sendRequest) {
+bool ot::Frontend::setControlEnabled(const std::string& _toolBarPageName, const std::string& _toolBarGroupName, const std::string& _controlName, bool _isEnabled, bool _sendRequest) {
 	return this->setControlEnabled(this->toolBarControlName(_toolBarPageName, _toolBarGroupName, _controlName), _isEnabled, _sendRequest);
 }
 
-bool ot::FrontendAPI::setControlEnabled(const std::string& _toolBarPageName, const std::string& _toolBarGroupName, const std::string& _toolBarSubGroupName, const std::string& _controlName, bool _isEnabled, bool _sendRequest) {
+bool ot::Frontend::setControlEnabled(const std::string& _toolBarPageName, const std::string& _toolBarGroupName, const std::string& _toolBarSubGroupName, const std::string& _controlName, bool _isEnabled, bool _sendRequest) {
 	return this->setControlEnabled(this->toolBarControlName(_toolBarPageName, _toolBarGroupName, _toolBarSubGroupName, _controlName), _isEnabled, _sendRequest);
 }
 
-bool ot::FrontendAPI::sendCurrentControlEnabledStates(void) {
+bool ot::Frontend::sendCurrentControlEnabledStates(void) {
 	return false;
 }
 

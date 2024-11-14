@@ -1,5 +1,5 @@
-Graphics Editor
-===============
+Graphics Editor API
+===================
 
 Create Items
 ------------
