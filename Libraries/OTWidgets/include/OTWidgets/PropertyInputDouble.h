@@ -38,6 +38,8 @@ namespace ot {
 		void lclEditingFinishedChanged(void);
 
 	private:
+		double m_min;
+		double m_max;
 		LineEdit* m_lineEdit;
 		DoubleSpinBox* m_spinBox;
 	};
