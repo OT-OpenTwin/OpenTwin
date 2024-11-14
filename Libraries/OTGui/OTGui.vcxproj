@@ -96,6 +96,10 @@
     <ClInclude Include="include\OTGui\PropertyStringList.h" />
     <ClInclude Include="include\OTGui\RadialGradientPainter2D.h" />
     <ClInclude Include="include\OTGui\SelectEntitiesDialogCfg.h" />
+    <ClInclude Include="include\OTGui\StyledText.h" />
+    <ClInclude Include="include\OTGui\StyledTextBuilder.h" />
+    <ClInclude Include="include\OTGui\StyledTextEntry.h" />
+    <ClInclude Include="include\OTGui\StyledTextStyle.h" />
     <ClInclude Include="include\OTGui\StyleRefPainter2D.h" />
     <ClInclude Include="include\OTGui\StyleValue.h" />
     <ClInclude Include="include\OTGui\SyntaxHighlighterRule.h" />
@@ -188,6 +192,10 @@
     <ClCompile Include="src\PropertyStringList.cpp" />
     <ClCompile Include="src\RadialGradientPainter2D.cpp" />
     <ClCompile Include="src\SelectEntitiesDialogCfg.cpp" />
+    <ClCompile Include="src\StyledText.cpp" />
+    <ClCompile Include="src\StyledTextBuilder.cpp" />
+    <ClCompile Include="src\StyledTextEntry.cpp" />
+    <ClCompile Include="src\StyledTextStyle.cpp" />
     <ClCompile Include="src\StyleRefPainter2D.cpp" />
     <ClCompile Include="src\StyleValue.cpp" />
     <ClCompile Include="src\SyntaxHighlighterRule.cpp" />

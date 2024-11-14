@@ -140,6 +140,7 @@
     <ClCompile Include="src\QWidgetInterface.cpp" />
     <ClCompile Include="src\SpinBox.cpp" />
     <ClCompile Include="src\Splitter.cpp" />
+    <ClCompile Include="src\StyledTextConverter.cpp" />
     <ClCompile Include="src\SvgImagePainter.cpp" />
     <ClCompile Include="src\SyntaxHighlighter.cpp" />
     <ClCompile Include="src\Table.cpp" />
@@ -243,6 +244,7 @@
     <ClInclude Include="include\OTWidgets\PropertyInputPainter2D.h" />
     <QtMoc Include="include\OTWidgets\TextEditorSearchPopup.h" />
     <QtMoc Include="include\OTWidgets\Splitter.h" />
+    <ClInclude Include="include\OTWidgets\StyledTextConverter.h" />
     <ClInclude Include="include\OTWidgets\SvgImagePainter.h" />
     <ClInclude Include="include\OTWidgets\SyntaxHighlighter.h" />
     <QtMoc Include="include\OTWidgets\Table.h" />

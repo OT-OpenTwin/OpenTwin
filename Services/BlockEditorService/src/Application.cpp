@@ -28,6 +28,9 @@ Application* g_instance{ nullptr };
 #include "OTGui/TableCfg.h"
 
 std::string Application::test(void) {
+	OT_LOG_E("Test error log");
+	OT_LOG_W("Test warning log");
+
 	ot::JsonDocument doc;
 	ot::BasicServiceInformation info = getBasicServiceInformation();
 	info.addToJsonObject(doc, doc.GetAllocator());

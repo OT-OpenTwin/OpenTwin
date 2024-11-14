@@ -389,11 +389,12 @@ public:
 
 	// Info text output
 
-	void replaceInfoMessage(const QString & _message);
+	void replaceInfoMessage(const QString& _message);
+	
+	void appendInfoMessage(const QString& _message);
+	void appendHtmlInfoMessage(const QString& _html);
 
-	void appendInfoMessage(const QString & _message);
-
-	void appendDebugMessage(const QString & _message);
+	void appendDebugMessage(const QString& _message);
 
 	ot::VersionGraphManagerView* getVersionGraph(void) { return m_versionGraph; };
 

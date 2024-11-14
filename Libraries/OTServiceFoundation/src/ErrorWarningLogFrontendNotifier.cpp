@@ -26,18 +26,19 @@ void ot::ErrorWarningLogFrontendNotifier::log(const LogMessage& _message) {
 		if (m_app->isUiConnected()) {
 			OTAssertNullptr(m_app->uiComponent());
 			
-			// Construct display text
-			std::string message;
+			StyledTextBuilder message;
+
+			message << "[";
 			if (_message.getFlags() & ot::ERROR_LOG) {
-				message = "[ERROR] ";
+				message << StyledText::Error << StyledText::Bold << "ERROR" << StyledText::ClearStyle;
 			}
 			else if (_message.getFlags() & ot::WARNING_LOG) {
-				message = "[WARNING] ";
+				message << StyledText::Warning << StyledText::Bold << "WARNING" << StyledText::ClearStyle;
 			}
-			message.append("[" + _message.getServiceName() + "] " + _message.getText());
+			message << "] [" << _message.getServiceName() << "] " << _message.getText();
 			
 			// Display
-			m_app->uiComponent()->displayMessage(message);
+			m_app->uiComponent()->displayStyledMessage(message);
 		}
 	}
 }

@@ -403,6 +403,9 @@
     <ClCompile Include="src\TableItemDelegate.cpp">
       <Filter>src\StyledDelegates</Filter>
     </ClCompile>
+    <ClCompile Include="src\StyledTextConverter.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -787,6 +790,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\TableItemDelegate.h">
       <Filter>include\StyledDelegates</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\StyledTextConverter.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -189,6 +189,12 @@ namespace ot {
 		GraphicsItemConnectableBackground,
 		GraphicsItemLineColor,
 
+		StyledTextHighlight,
+		StyledTextLightHighlight,
+		StyledTextComment,
+		StyledTextWarning,
+		StyledTextError,
+
 		PythonKeyword,
 		PythonClass,
 		PythonString,

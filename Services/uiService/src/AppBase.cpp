@@ -75,6 +75,7 @@
 #include "OTWidgets/GraphicsPickerView.h"
 #include "OTWidgets/PropertyInputDouble.h"
 #include "OTWidgets/CreateProjectDialog.h"
+#include "OTWidgets/StyledTextConverter.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/PropertyInputStringList.h"
 #include "OTWidgets/VersionGraphManagerView.h"
@@ -388,6 +389,19 @@ LockManager * AppBase::lockManager(void) {
 void AppBase::log(const ot::LogMessage& _message) {
 	static const ot::LogFlag flags = ot::ERROR_LOG | ot::WARNING_LOG;
 	if (_message.getFlags() & flags) {
+		ot::StyledTextBuilder message;
+
+		message << "[";
+		if (_message.getFlags() & ot::ERROR_LOG) {
+			message << ot::StyledText::Error << ot::StyledText::Bold << "ERROR" << ot::StyledText::ClearStyle;
+		}
+		else if (_message.getFlags() & ot::WARNING_LOG) {
+			message << ot::StyledText::Warning << ot::StyledText::Bold << "WARNING" << ot::StyledText::ClearStyle;
+		}
+		message << "] [Frontend] " << _message.getText();
+
+		this->appendHtmlInfoMessage(ot::StyledTextConverter::toHtml(message));
+
 		// Construct display text
 		if (_message.getFlags() & ot::ERROR_LOG) {
 			this->appendInfoMessage("[ERROR] [Frontend] " + QString::fromStdString(_message.getText()));
@@ -1583,13 +1597,19 @@ void AppBase::fillPropertyGrid(const std::string &settings) {
 
 // Info text output
 
-void AppBase::replaceInfoMessage(const QString & _message) {
+void AppBase::replaceInfoMessage(const QString& _message) {
 	m_output->setPlainText(_message);
 }
 
 void AppBase::appendInfoMessage(const QString & _message) {
 	if (m_output) {
 		m_output->appendPlainText(_message);
+	}
+}
+
+void AppBase::appendHtmlInfoMessage(const QString& _html) {
+	if (m_output) {
+		m_output->appendHtml(_html);
 	}
 }
 

@@ -67,6 +67,7 @@
 #include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
+#include "OTWidgets/StyledTextConverter.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
 #include "OTCommunication/ActionTypes.h"
@@ -2262,11 +2263,18 @@ std::string ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocum
 	return "";
 }
 
-
 std::string ExternalServicesComponent::handleDisplayMessage(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
 	
 	AppBase::instance()->appendInfoMessage(QString::fromStdString(message));
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleDisplayStyledMessage(ot::JsonDocument& _document) {
+	ot::StyledTextBuilder builder(ot::json::getObject(_document, OT_ACTION_PARAM_MESSAGE));
+
+	AppBase::instance()->appendHtmlInfoMessage(ot::StyledTextConverter::toHtml(builder));
 
 	return "";
 }

@@ -345,6 +345,12 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 	case ot::ColorStyleValueEntry::GraphicsItemConnectableBackground: return "GraphicsItem Connectable Background";
 	case ot::ColorStyleValueEntry::GraphicsItemLineColor: return "GraphicsItem Line Color";
 
+	case ot::ColorStyleValueEntry::StyledTextHighlight: return "Styled Text Highlight";
+	case ot::ColorStyleValueEntry::StyledTextLightHighlight: return "Styled Light Highlight";
+	case ot::ColorStyleValueEntry::StyledTextComment: return "Styled Text Comment";
+	case ot::ColorStyleValueEntry::StyledTextWarning: return "Styled Text Warning";
+	case ot::ColorStyleValueEntry::StyledTextError: return "Styled Text Error";
+
 	case ot::ColorStyleValueEntry::PythonKeyword: return "Python Keyword";
 	case ot::ColorStyleValueEntry::PythonClass: return "Python Class";
 	case ot::ColorStyleValueEntry::PythonString: return "Python String";
@@ -412,6 +418,12 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemHoverBorder)) return ColorStyleValueEntry::GraphicsItemHoverBorder;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemConnectableBackground)) return ColorStyleValueEntry::GraphicsItemConnectableBackground;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::GraphicsItemLineColor)) return ColorStyleValueEntry::GraphicsItemLineColor;
+
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::StyledTextHighlight)) return ColorStyleValueEntry::StyledTextHighlight;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::StyledTextLightHighlight)) return ColorStyleValueEntry::StyledTextLightHighlight;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::StyledTextComment)) return ColorStyleValueEntry::StyledTextComment;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::StyledTextWarning)) return ColorStyleValueEntry::StyledTextWarning;
+	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::StyledTextError)) return ColorStyleValueEntry::StyledTextError;
 	
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonKeyword)) return ColorStyleValueEntry::PythonKeyword;
 	else if (_colorStyleValueEntry == toString(ColorStyleValueEntry::PythonClass)) return ColorStyleValueEntry::PythonClass;

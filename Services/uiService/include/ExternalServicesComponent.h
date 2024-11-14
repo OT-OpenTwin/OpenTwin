@@ -203,6 +203,7 @@ public:
 	OT_HANDLER(handleShutdownRequestedByService, ExternalServicesComponent, OT_ACTION_CMD_ShutdownRequestedByService, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceSetupCompleted, ExternalServicesComponent, OT_ACTION_CMD_UI_ServiceSetupCompleted, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayMessage, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleDisplayStyledMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayStyledMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayDebugMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayDebugMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportError, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportError, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportWarning, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportWarning, ot::MessageType::ALL_MESSAGE_TYPES)
