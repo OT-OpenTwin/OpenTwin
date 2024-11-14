@@ -4,7 +4,7 @@ ot::GenericDataStructMatrix CSVToTableTransformer::operator()(const std::string&
 {
 	std::vector<std::string> rows = splitByDelimiter(_csvText, _properties.m_rowDelimiter);
 
-	size_t maxNumberOfColumns(0);
+	size_t maxNumberOfColumns(1);
 	for (std::string& row : rows)
 	{
 		size_t  numberOfColumns = countStringInString(row, _properties.m_columnDelimiter);
@@ -40,7 +40,7 @@ std::vector<std::string> CSVToTableTransformer::splitByDelimiter(const std::stri
 	size_t pos_start = 0, pos_end, delim_len = _delimiter.length();
 	std::vector<std::string> segments;
 	size_t numberOfSegments = countStringInString(_text, _delimiter);
-	segments.reserve(numberOfSegments);
+	segments.reserve(numberOfSegments + 1);
 
 	while ((pos_end = _text.find(_delimiter, pos_start)) != std::string::npos)
 	{
@@ -48,6 +48,8 @@ std::vector<std::string> CSVToTableTransformer::splitByDelimiter(const std::stri
 		pos_start = pos_end + delim_len;
 		segments.push_back(row);
 	}
+	std::string row = _text.substr(pos_start);
+	segments.push_back(row);
 	return segments;
 }
 

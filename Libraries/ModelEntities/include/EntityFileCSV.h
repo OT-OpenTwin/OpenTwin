@@ -23,7 +23,7 @@ public:
 
 	ot::TableHeaderOrientation getHeaderOrientation();
 	std::string getHeaderOrientation(ot::TableHeaderOrientation _orientation);
-
+	bool visualiseText() override { return false; }
 private:
 	void setSpecializedProperties() override;
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;

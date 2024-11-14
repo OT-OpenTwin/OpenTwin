@@ -14,7 +14,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID)
 	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
 	
 	IVisualisationText* textEntity = dynamic_cast<IVisualisationText*>(baseEntity);
-	if (textEntity != nullptr)
+	if (textEntity != nullptr && textEntity->visualiseText())
 	{
 		ot::JsonDocument document;
 		info.addToJsonObject(document, document.GetAllocator());
@@ -29,7 +29,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID)
 	}
 	
 	IVisualisationTable* tableEntity = dynamic_cast<IVisualisationTable*>(baseEntity);
-	if (tableEntity != nullptr)
+	if (tableEntity != nullptr && tableEntity->visualiseTable())
 	{
 		ot::JsonDocument document;
 		info.addToJsonObject(document, document.GetAllocator());
