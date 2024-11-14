@@ -350,6 +350,7 @@
     </ClInclude>
     <ClInclude Include="include\OTGui\EntityViewBaseInfo.h">
       <Filter>Header Files\General</Filter>
+	</ClInclude>
     <ClInclude Include="include\OTGui\VisualisationTypes.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
@@ -632,6 +633,8 @@
       <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityViewBaseInfo.cpp">
+		<Filter>Source Files\General</Filter>
+	</ClCompile>
     <ClCompile Include="src\VisualisationTypes.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
