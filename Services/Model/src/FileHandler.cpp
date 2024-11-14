@@ -134,7 +134,7 @@ void FileHandler::handleChangedText(ot::JsonDocument& _doc)
 		IVisualisationText* textVisualisationEntity = dynamic_cast<IVisualisationText*>(entityBase);
 		if(textVisualisationEntity != nullptr)
 		{
-			ot::ContentChangedHandling changedHandling = textVisualisationEntity->getContentChangedHandling();
+			ot::ContentChangedHandling changedHandling = textVisualisationEntity->getTextContentChangedHandling();
 			if (changedHandling == ot::ContentChangedHandling::ModelServiceSaves)
 			{
 				

@@ -262,8 +262,7 @@
 #define OT_ACTION_CMD_UI_VIEW_OBJ_Result1DPropsChanged "UI.VIEW.OBJ.Result1DPropertiesChanged"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_AddPlot1D "UI.VIEW.OBJ.AddPlot1D"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged "UI.VIEW.OBJ.Plot1DPropertiesChanged"
-#define OT_ACTION_CMD_UI_VIEW_OBJ_AddText "UI.VIEW.OBJ.AddText"
-#define OT_ACTION_CMD_UI_VIEW_OBJ_AddTable "UI.VIEW.OBJ.AddTable"
+#define OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode "UI.VIEW.OBJ.SceneNode"
 #define OT_ACTION_CMD_UI_VIEW_CreateRubberband "UI.VIEW.CreateRubberband"
 // rm
 #define OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection "UI.VIEW.GetTableSelection"

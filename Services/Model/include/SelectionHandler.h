@@ -6,7 +6,7 @@
 #include <mutex>
 
 #include "OTCore/CoreTypes.h"
-#include "IVisualisationText.h"
+
 
 class SelectionHandler
 {

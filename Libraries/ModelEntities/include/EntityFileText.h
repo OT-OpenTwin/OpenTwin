@@ -21,17 +21,16 @@ public:
 	void setText(const std::string& _text) override;
 	bool visualiseText() override { return true; }
 	ot::TextEditorCfg createConfig() override;
-	ot::ContentChangedHandling getContentChangedHandling() override;
+	ot::ContentChangedHandling getTextContentChangedHandling() override;
 
 	void setContentChangedHandling(ot::ContentChangedHandling _contentChangedHandling);
-	virtual void addVisualizationNodes() override;
-
+	char getSelectedDecimalSeparator();
 protected:
 	void setSpecializedProperties() override;
 	virtual void AddStorageData(bsoncxx::builder::basic::document& _storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
 private:
-	ot::ContentChangedHandling m_contentChangedHandling = ot::ContentChangedHandling::ModelServiceSaves;
+	ot::ContentChangedHandling m_contentChangedHandlingText = ot::ContentChangedHandling::ModelServiceSaves;
 	ot::TextEncoding::EncodingStandard m_encoding = ot::TextEncoding::EncodingStandard::UNKNOWN;
 };

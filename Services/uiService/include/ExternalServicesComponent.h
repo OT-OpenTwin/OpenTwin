@@ -237,7 +237,7 @@ public:
 	OT_HANDLER(handleAddNodeFromFacetData, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddNodeFromFacetData, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddNodeFromDataBase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddContainerNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddContainerNode, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddTextNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddText, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddSceneNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddVis2D3DNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleUpdateVis2D3DNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_UpdateVis2D3DNode, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleUpdateColor, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_UpdateColor, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -320,8 +320,7 @@ public:
 
 	// Table Old
 	OT_HANDLER(handleTableChange, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddTable, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGetTableSelectionOld, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleGetTableSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleShowTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSetTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SetTable, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSelectRanges, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges, ot::MessageType::ALL_MESSAGE_TYPES)

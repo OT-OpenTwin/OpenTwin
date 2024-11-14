@@ -8,6 +8,8 @@
 // OpenTwin header
 #include "OTGui/EntityViewBaseInfo.h"
 #include "OTGui/TableHeaderItemCfg.h"
+#include "TableHeaderOrientation.h"
+#include "OTCore/GenericDataStructMatrix.h"
 
 // std header
 #include <string>
@@ -18,6 +20,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT TableCfg : public EntityViewBaseInfo {
 	public:
 		TableCfg(int _rows = 0, int _columns = 0, EntityViewBaseInfo _baseInfo = EntityViewBaseInfo());
+		TableCfg(const ot::GenericDataStructMatrix& _matrix, ot::TableHeaderOrientation _orientation);
 		TableCfg(const TableCfg& _other);
 		virtual ~TableCfg();
 

@@ -50,8 +50,7 @@ void MetadataAssemblyRangeData::LoadAllRangeSelectionInformation(const std::list
 		}
 
 		//For floating numbers it is essential to choose the correct decimal delimiter.
-		const char selectedSeparator = table->getSelectedDecimalSeparator();
-		LocaleSettingsSwitch decimalSeparatorSetting(selectedSeparator);
+
 
 		TransformSelectedDataIntoSelectedDataType(allFields, rangeTypesByRangeNames);
 	}

@@ -6,11 +6,59 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/TableCfg.h"
+#include "OTCore/VariableToStringConverter.h"
 
 ot::TableCfg::TableCfg(int _rows, int _columns, EntityViewBaseInfo _baseInfo)
 	: EntityViewBaseInfo(_baseInfo), m_rows(_rows), m_columns(_columns)
 {
 	this->initialize();
+}
+
+ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, ot::TableHeaderOrientation _orientation)
+	:m_rows(_matrix.getNumberOfRows()), m_columns(_matrix.getNumberOfColumns())
+{
+	const uint32_t numberOfColumns = _matrix.getNumberOfColumns();
+	const uint32_t numberOfRows = _matrix.getNumberOfRows();
+	MatrixEntryPointer matrixPointer;
+	ot::VariableToStringConverter converter;
+	uint32_t rowStarter(0), columnStarter(0);
+	if (_orientation == ot::TableHeaderOrientation::horizontal)
+	{
+		rowStarter = 1;
+		matrixPointer.m_row = 0;
+		for (matrixPointer.m_column= 0; matrixPointer.m_column < numberOfColumns; matrixPointer.m_column++)
+		{
+			const ot::Variable& variable = _matrix.getValue(matrixPointer);
+			const std::string entry = converter(variable);
+			setColumnHeader(matrixPointer.m_column, entry);
+		}
+	}
+	else if (_orientation == ot::TableHeaderOrientation::vertical)
+	{
+		columnStarter = 1;
+		matrixPointer.m_column = 0;
+		for (matrixPointer.m_row = 0; matrixPointer.m_row < numberOfRows; matrixPointer.m_row++)
+		{
+			const ot::Variable& variable = _matrix.getValue(matrixPointer);
+			const std::string entry = converter(variable);
+			setRowHeader(matrixPointer.m_row, entry);
+		}
+	}
+	else
+	{
+		rowStarter = 0;
+		columnStarter = 0;
+	}
+
+	for(matrixPointer.m_column = columnStarter; matrixPointer.m_column < numberOfColumns; matrixPointer.m_column++)
+	{
+		for (matrixPointer.m_row = rowStarter; matrixPointer.m_row < numberOfRows; matrixPointer.m_row++)
+		{
+			const ot::Variable& variable =	_matrix.getValue(matrixPointer);
+			const std::string entry = converter(variable);	
+			setCellText(matrixPointer.m_row, matrixPointer.m_column, entry);
+		}
+	}	
 }
 
 ot::TableCfg::TableCfg(const TableCfg& _other) 

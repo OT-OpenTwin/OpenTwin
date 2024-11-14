@@ -11,5 +11,5 @@ public:
 	virtual void setText(const std::string& _text) = 0;
 	virtual bool visualiseText() = 0;
 	virtual ot::TextEditorCfg createConfig() = 0;
-	virtual ot::ContentChangedHandling getContentChangedHandling() = 0;
+	virtual ot::ContentChangedHandling getTextContentChangedHandling() = 0;
 };

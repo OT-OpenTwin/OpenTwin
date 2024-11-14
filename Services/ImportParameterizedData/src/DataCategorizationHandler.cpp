@@ -292,8 +292,6 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 	_modelComponent->getEntityInformation(_scriptFolder, entityInfo);
 	_scriptFolderUID = entityInfo.getID();
 	
-	const char selectedSeparator = tableEntPtr->getSelectedDecimalSeparator();
-	LocaleSettingsSwitch decimalSeparatorSetting(selectedSeparator);
 	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr->getTableData().get(), ranges);
 
 	for (auto categoryEntity : _activeCollectionEntities)

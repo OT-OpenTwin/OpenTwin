@@ -231,13 +231,14 @@ void ViewerAPI::addVisualizationContainerNode(ot::UID osgModelID, const std::str
 	}
 }
 
-void ViewerAPI::addVisualizationNodeText(ot::UID osgModelID, const std::string& treeName, unsigned long long modelEntityID, const TreeIcon& treeIcons, bool editable)
+
+void ViewerAPI::addVisualizationNode(ot::UID osgModelID, const std::string& treeName, unsigned long long modelEntityID, const TreeIcon& treeIcons, bool editable, ot::VisualisationTypes _visualisationTypes)
 {
 	try
 	{
 		Model* model = osgModelManager.at(osgModelID);
 
-		model->addSceneNodeText(treeName, modelEntityID, treeIcons, editable);
+		model->addSceneNode(treeName, modelEntityID, treeIcons, editable,_visualisationTypes);
 	}
 	catch (std::out_of_range)
 	{
@@ -423,35 +424,6 @@ void ViewerAPI::addVisualizationPlot1DNode(ot::UID _osgModelID, const ot::Plot1D
 	}
 }
 
-void ViewerAPI::addVisualizationTextNode(ot::UID osgModelID, const std::string &name, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName,
-										 ot::UID textEntityID, ot::UID textEntityVersion)
-{
-	try
-	{
-		Model *model = osgModelManager.at(osgModelID);
-
-		model->addVisualizationTextNode(name, modelEntityID, treeIcons, isHidden, projectName, textEntityID, textEntityVersion);
-	}
-	catch (std::out_of_range)
-	{
-		throw std::exception("The specified model does not exist");
-	}
-}
-
-void ViewerAPI::addVisualizationTableNode(ot::UID osgModelID, const std::string &name, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName,
-										  ot::UID tableEntityID, ot::UID tableEntityVersion)
-{
-	try
-	{
-		Model *model = osgModelManager.at(osgModelID);
-
-		model->addVisualizationTableNode(name, modelEntityID, treeIcons, isHidden, projectName, tableEntityID, tableEntityVersion);
-	}
-	catch (std::out_of_range)
-	{
-		throw std::exception("The specified model does not exist");
-	}
-}
 
 
 void ViewerAPI::visualizationResult1DPropertiesChanged(ot::UID _osgModelID, ot::UID _entityID, ot::UID _version)

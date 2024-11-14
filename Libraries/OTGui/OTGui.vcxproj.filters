@@ -350,6 +350,11 @@
     </ClInclude>
     <ClInclude Include="include\OTGui\EntityViewBaseInfo.h">
       <Filter>Header Files\General</Filter>
+    <ClInclude Include="include\OTGui\VisualisationTypes.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\TableHeaderOrientation.h">
+      <Filter>Header Files\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\StyledTextBuilder.h">
       <Filter>Header Files\General</Filter>
@@ -627,6 +632,7 @@
       <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityViewBaseInfo.cpp">
+    <ClCompile Include="src\VisualisationTypes.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="src\StyledTextStyle.cpp">

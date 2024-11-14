@@ -44,7 +44,7 @@ public:
 	std::string getText() override;
 	bool visualiseText() override;
 	ot::TextEditorCfg createConfig() override;
-	ot::ContentChangedHandling getContentChangedHandling() override;
+	ot::ContentChangedHandling getTextContentChangedHandling() override;
 
 private:
 	void EnsureTextDataLoaded(void);

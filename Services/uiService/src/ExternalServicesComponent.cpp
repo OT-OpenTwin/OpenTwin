@@ -3100,14 +3100,19 @@ std::string ExternalServicesComponent::handleAddContainerNode(ot::JsonDocument& 
 	return "";
 }
 
-std::string ExternalServicesComponent::handleAddTextNode(ot::JsonDocument& _document)
+#include "OTGui/VisualisationTypes.h"
+
+std::string ExternalServicesComponent::handleAddSceneNode(ot::JsonDocument& _document)
 {
 	ot::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 	std::string treeName = ot::json::getString(_document, OT_ACTION_PARAM_UI_TREE_Name);
 	ot::UID modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
 	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-	ViewerAPI::addVisualizationNodeText(visModelID, treeName, modelEntityID, treeIcons, editable);
+	ot::VisualisationTypes visualisationTypes;
+	visualisationTypes.setFromJsonObject(_document.GetConstObject());
+	ViewerAPI::addVisualizationNode(visModelID, treeName, modelEntityID, treeIcons, editable,visualisationTypes);
+
 	return "";
 }
 
@@ -4205,25 +4210,6 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 }
 
 // Table Old
-
-std::string ExternalServicesComponent::handleAddTable(ot::JsonDocument& _document) {
-	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-	std::string name = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName);
-	ak::UID uid = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
-	bool isEditable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
-
-	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
-	ak::UID tableID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-	ak::UID tableVersion = _document[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
-
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
-
-	ViewerAPI::addVisualizationTableNode(visModelID, name, uid, treeIcons, isHidden, projectName, tableID, tableVersion);
-
-	return "";
-}
-
 std::string ExternalServicesComponent::handleTableChange(ot::JsonDocument& _document) {
 	ak::UID visualizationModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
 	const std::string functionName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);

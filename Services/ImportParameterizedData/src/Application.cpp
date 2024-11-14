@@ -115,7 +115,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
 	_buttonImportPythonScript.SetDescription(pageName, groupNameImport, "Import Python Script");
-	_buttonCreateTable.SetDescription(pageName, groupNameTableHandling, "Turn into Table");
 	_buttonImportTouchstone.SetDescription(pageName, groupNameImport, "Import Touchstone");
 
 	_buttonTableDeleteRow.SetDescription(pageName, groupNameTableHandling, "Delete Row", "", subgroupNameTableHandlingRow);
@@ -140,7 +139,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_ui->addMenuButton(_buttonImportTouchstone, modelWrite, "regional-indicator-symbol-letter-s");
 	_ui->addMenuButton(_buttonImportPythonScript, modelWrite, "python");
-	_ui->addMenuButton(_buttonCreateTable, modelWrite, "TableVisible");
 	_ui->addMenuButton(_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
 	_ui->addMenuButton(_buttonCreateMSMDEntry, modelWrite, "SelectionMSMD");
 	_ui->addMenuButton(_buttonCreateQuantityEntry, modelWrite, "SelectionQuantity");
@@ -168,7 +166,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 		m_uiComponent->setControlsEnabledState(enabled, disabled);
 	}
 
-	uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), false);
 	SetControlstateTableFunctions(false);
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
@@ -281,20 +278,6 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 
 				std::string tmp;
 				uiComponent()->sendMessage(true, doc, tmp);
-			}
-			else if (action == _buttonCreateTable.GetFullDescription())
-			{
-				std::list<ot::EntityInformation> selectedEntityInfos;
-				if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-				m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfos);
-				for (const auto& entityInfo : selectedEntityInfos)
-				{
-					const std::string& name = entityInfo.getName();
-					if (name.find(_dataSourcesFolder) != std::string::npos)
-					{
-						_tableHandler->AddTableView(entityInfo.getID(), entityInfo.getVersion());
-					}
-				}
 			}
 			else if (action == _buttonCreateRMDEntry.GetFullDescription())
 			{
@@ -543,7 +526,6 @@ void Application::HandleSelectionChanged()
 				break;
 			}
 		}
-		uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), showCreateTableBtn);
 		uiComponent()->sendUpdatedControlState();
 
 		if (m_selectedEntities.size() == 1)

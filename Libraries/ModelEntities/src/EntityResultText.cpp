@@ -6,6 +6,7 @@
 #include "EntityResultTextData.h"
 #include "DataBase.h"
 #include "Types.h"
+#include "OTGui/VisualisationTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -75,11 +76,15 @@ void EntityResultText::addVisualizationItem(bool isHidden)
 	treeIcons.hiddenIcon = "TextHidden";
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddText, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
+	ot::VisualisationTypes visTypes;
+	visTypes.addTextVisualisation();
+
+	visTypes.addToJsonObject(doc, doc.GetAllocator());
 	treeIcons.addToJsonDoc(doc);
 
 	getObserver()->sendMessageToViewer(doc);
@@ -147,7 +152,7 @@ ot::TextEditorCfg EntityResultText::createConfig()
 	return result;
 }
 
-ot::ContentChangedHandling EntityResultText::getContentChangedHandling()
+ot::ContentChangedHandling EntityResultText::getTextContentChangedHandling()
 {
 	return m_contentChangedHandling;
 }

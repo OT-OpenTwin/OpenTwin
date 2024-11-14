@@ -50,6 +50,9 @@
     <Filter Include="Header Files\EntityInterfaces">
       <UniqueIdentifier>{d7adf380-0920-4835-bd70-d8cdff2f0f84}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\CSVToTableHandling">
+      <UniqueIdentifier>{bb0e6433-44c9-4a34-bd55-bf9f6a20a387}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\EntityProperties.h">
@@ -379,6 +382,15 @@
     <ClInclude Include="include\IVisualisationTable.h">
       <Filter>Header Files\EntityInterfaces</Filter>
     </ClInclude>
+    <ClInclude Include="include\CSVProperties.h">
+      <Filter>Header Files\CSVToTableHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CSVToTableTransformer.h">
+      <Filter>Header Files\CSVToTableHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="include\VisualisationTypeSerialiser.h">
+      <Filter>Header Files\EntityInterfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -644,6 +656,12 @@
     </ClCompile>
     <ClCompile Include="src\EntityResultTextData.cpp">
       <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CSVToTableTransformer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VisualisationTypeSerialiser.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

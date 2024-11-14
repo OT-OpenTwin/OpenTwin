@@ -26,6 +26,8 @@
     <ClInclude Include="include\ClassFactoryHandler.h" />
     <ClInclude Include="include\ClassFactoryHandlerAbstract.h" />
     <ClInclude Include="include\ContentChangedHandling.h" />
+    <ClInclude Include="include\CSVProperties.h" />
+    <ClInclude Include="include\CSVToTableTransformer.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
     <ClInclude Include="include\EntityResultText.h" />
     <ClInclude Include="include\EntityResultTextData.h" />
@@ -128,12 +130,14 @@
     <ClInclude Include="include\TemplateDefaultManager.h" />
     <ClInclude Include="include\Types.h" />
     <ClInclude Include="include\VariableToBSONConverter.h" />
+    <ClInclude Include="include\VisualisationTypeSerialiser.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\PropertyBundleDataHandle.h" />
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\BSONToVariableConverter.cpp" />
     <ClCompile Include="src\ClassFactory.cpp" />
+    <ClCompile Include="src\CSVToTableTransformer.cpp" />
     <ClCompile Include="src\DataBase.cpp" />
     <ClCompile Include="src\EntityAnnotation.cpp" />
     <ClCompile Include="src\EntityAnnotationData.cpp" />
@@ -218,6 +222,7 @@
     <ClCompile Include="src\TemplateDefaultManager.cpp" />
     <ClCompile Include="src\Types.cpp" />
     <ClCompile Include="src\VariableToBSONConverter.cpp" />
+    <ClCompile Include="src\VisualisationTypeSerialiser.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E42BCD5B-E9E3-4272-AE88-E387DB3DD031}</ProjectGuid>
