@@ -2994,20 +2994,16 @@ void Model::addVisualizationResult1DNode(const ot::Plot1DCurveInfoCfg& _curveInf
 	if (_isHidden) {
 		this->setItemVisibleState(curveNode, false);
 	}
-}
 
-	modelItemToSceneNodesMap[curveEntityID] = curveNode;
-
-	curveNode->setProjectName(projectName);
-	
-	if (isHidden)
+	modelItemToSceneNodesMap[_curveInfo.getId()] = curveNode;
+		
+	if (_isHidden)
 	{
 		setItemVisibleState(curveNode, false);
 	}
 }
 
-void Model::visualizationResult1DPropertiesChanged(unsigned long long entityID, unsigned long long version)
-{
+void Model::visualizationResult1DPropertiesChanged(ot::UID _entityID, ot::UID _version)
 {
 	bool needsRedraw = this->updateCurveEntityVersion(sceneNodesRoot, _entityID, _version);
 
@@ -3016,7 +3012,7 @@ void Model::visualizationResult1DPropertiesChanged(unsigned long long entityID, 
 	}
 }
 
-bool Model::updateCurveEntityVersion(SceneNodeBase* _root, ot::UID _entityID, ot::UID _version)
+bool Model::updateCurveEntityVersion(SceneNodeBase * _root, ot::UID _entityID, ot::UID _version)
 {
 	SceneNodePlot1D *plot = dynamic_cast<SceneNodePlot1D*>(_root);
 	SceneNodePlot1DCurve* curve = dynamic_cast<SceneNodePlot1DCurve*>(_root);
