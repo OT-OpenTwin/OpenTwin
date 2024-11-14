@@ -224,7 +224,7 @@ void SubprocessHandler::setDatabase(const std::string& url, const std::string& u
 
 void SubprocessHandler::ModelComponentWasSet()
 {
-	const std::string url = _modelComponent->serviceURL();
+	const std::string url = _modelComponent->getServiceURL();
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_MODEL, doc.GetAllocator()), doc.GetAllocator());
@@ -236,7 +236,7 @@ void SubprocessHandler::ModelComponentWasSet()
 
 void SubprocessHandler::UIComponentWasSet()
 {
-	const std::string url = _uiComponent->serviceURL();
+	const std::string url = _uiComponent->getServiceURL();
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, doc.GetAllocator()), doc.GetAllocator());

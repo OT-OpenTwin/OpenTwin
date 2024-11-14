@@ -12,7 +12,7 @@ ot::ModalCommandBase::ModalCommandBase(ot::ApplicationBase *app, const std::stri
 ot::ModalCommandBase::~ModalCommandBase()
 {
 	application->removeModalCommand(this);
-	application->enableMessageQueuing(application->uiComponent()->serviceName(), true);
+	application->enableMessageQueuing(application->uiComponent()->getServiceName(), true);
 
 	// Remove all UI elements from the modal command tab
 	std::list<std::string> objectNameList;
@@ -27,7 +27,7 @@ ot::ModalCommandBase::~ModalCommandBase()
 
 	// Update the menu states and send everything
 	application->modelSelectionChanged();
-	application->enableMessageQueuing(application->uiComponent()->serviceName(), false);
+	application->enableMessageQueuing(application->uiComponent()->getServiceName(), false);
 
 	// Activate the previous tab from which the command was originally started
 	application->uiComponent()->activateMenuPage(actionMenuID);
@@ -36,7 +36,7 @@ ot::ModalCommandBase::~ModalCommandBase()
 void ot::ModalCommandBase::setupUI(void)
 {
 	// Add the specific commands
-	application->enableMessageQueuing(application->uiComponent()->serviceName(), true);
+	application->enableMessageQueuing(application->uiComponent()->getServiceName(), true);
 
 	LockTypeFlags modelRead;
 	modelRead.setFlag(LockModelRead);
@@ -51,7 +51,7 @@ void ot::ModalCommandBase::setupUI(void)
 
 	application->modelSelectionChanged();
 
-	application->enableMessageQueuing(application->uiComponent()->serviceName(), false);
+	application->enableMessageQueuing(application->uiComponent()->getServiceName(), false);
 }
 
 void ot::ModalCommandBase::addMenuPage(const std::string &menu)

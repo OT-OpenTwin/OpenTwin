@@ -23,8 +23,8 @@ ot::ServiceBase::ServiceBase(const std::string& _name, const std::string& _type,
 	: m_serviceID{ _id }, m_serviceName{ _name }, m_serviceType{ _type }, m_serviceURL{ _url }, m_siteId(_siteId), m_sessionCount(1) {}
 
 ot::ServiceBase::ServiceBase(const ServiceBase & _other)
-	: m_serviceID{ _other.serviceID() }, m_serviceName{ _other.serviceName() },
-	m_serviceType{ _other.serviceType() }, m_serviceURL{ _other.serviceURL() },
+	: m_serviceID{ _other.getServiceID() }, m_serviceName{ _other.getServiceName() },
+	m_serviceType{ _other.getServiceType() }, m_serviceURL{ _other.getServiceURL() },
 	m_siteId(_other.m_siteId) {}
 
 ot::ServiceBase& ot::ServiceBase::operator = (const ServiceBase& _other) {

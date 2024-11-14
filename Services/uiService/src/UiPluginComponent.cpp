@@ -18,15 +18,15 @@ UiPluginComponent::~UiPluginComponent() {}
 void UiPluginComponent::sendMessageToService(const std::string& _message) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PluginMessage, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, AppBase::instance()->serviceID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(AppBase::instance()->serviceURL(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(AppBase::instance()->serviceName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(AppBase::instance()->serviceType(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, AppBase::instance()->getServiceID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(AppBase::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(AppBase::instance()->getServiceName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(AppBase::instance()->getServiceType(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_UID, m_plugin->uid(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_NAME, ot::JsonString(m_plugin->name().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MESSAGE, ot::JsonString(_message, doc.GetAllocator()), doc.GetAllocator());
 	std::string response;
-	AppBase::instance()->getExternalServicesComponent()->sendHttpRequest(ExternalServicesComponent::EXECUTE, m_plugin->owner()->serviceURL(), doc, response);
+	AppBase::instance()->getExternalServicesComponent()->sendHttpRequest(ExternalServicesComponent::EXECUTE, m_plugin->owner()->getServiceURL(), doc, response);
 	// Check if response is an error or warning
 	OT_ACTION_IF_RESPONSE_ERROR(response) { assert(0); AppBase::instance()->appendInfoMessage(("[ERROR] Failed to send message to service: " + response + "\n").c_str()); }
 	else OT_ACTION_IF_RESPONSE_WARNING(response) { assert(0); AppBase::instance()->appendInfoMessage(("[WARNING] Failed to send message to service: " + response + "\n").c_str()); }

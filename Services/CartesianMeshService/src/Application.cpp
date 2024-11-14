@@ -210,7 +210,7 @@ void Application::createMesh(void)
 	ot::UID entityID = m_modelComponent->createEntityUID();
 
 	// Create the new mesh item
-	EntityMeshCartesian *meshEntity = new EntityMeshCartesian(entityID, nullptr, nullptr, nullptr, nullptr, serviceName());
+	EntityMeshCartesian *meshEntity = new EntityMeshCartesian(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
 
 	meshEntity->setName(meshName);
 	meshEntity->setEditable(true);

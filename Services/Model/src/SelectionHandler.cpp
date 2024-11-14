@@ -115,7 +115,7 @@ void SelectionHandler::notifyOwners()
 	}
 
 	// Here we check which owners are part of the selection and assign their entities
-	const std::string modelServiceName = Application::instance()->serviceName();
+	const std::string modelServiceName = Application::instance()->getServiceName();
 	Model* model = Application::instance()->getModel();
 	for (auto entityID : m_selectedEntityIDs)
 	{

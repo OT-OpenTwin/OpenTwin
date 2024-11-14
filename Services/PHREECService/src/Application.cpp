@@ -192,7 +192,7 @@ void Application::addTerminal(void)
 
 	if (receiver != nullptr)
 	{
-		m_uiComponent->enterEntitySelectionMode(visualizationModelID, ot::components::UiComponent::FACE, true, "", ot::components::UiComponent::PORT, "create a new terminal", options, receiver->serviceID());
+		m_uiComponent->enterEntitySelectionMode(visualizationModelID, ot::components::UiComponent::FACE, true, "", ot::components::UiComponent::PORT, "create a new terminal", options, receiver->getServiceID());
 	}
 }
 
@@ -230,7 +230,7 @@ void Application::addSolver(void)
 	m_modelComponent->getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
 	// Create the new solver item and store it in the data base
-	EntitySolverPHREEC *solverEntity = new EntitySolverPHREEC(entityID, nullptr, nullptr, nullptr, nullptr, serviceName());
+	EntitySolverPHREEC *solverEntity = new EntitySolverPHREEC(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
 
@@ -423,7 +423,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::string &mo
 
 	PHREECLauncher phreecSolver(this);
 
-	std::string output = phreecSolver.startSolver(DataBase::GetDataBase()->getDataBaseServerURL(), frequencyHz, m_uiComponent->serviceURL(),
+	std::string output = phreecSolver.startSolver(DataBase::GetDataBase()->getDataBaseServerURL(), frequencyHz, m_uiComponent->getServiceURL(),
 		DataBase::GetDataBase()->getProjectName(), modelVersion, meshEntityID, debugFlag, getServiceIDAsInt(), getSessionCount(), m_modelComponent);
 	m_uiComponent->displayMessage(output + "\n");
 

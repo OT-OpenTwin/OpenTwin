@@ -47,7 +47,7 @@ extern "C" {
 
 	_declspec(dllexport) const char *getServiceURL(void)
 	{
-		std::string serviceURL = Application::instance()->serviceURL();
+		std::string serviceURL = Application::instance()->getServiceURL();
 
 		char *strServiceURL = new char[serviceURL.size() + 1];
 		strcpy_s(strServiceURL, serviceURL.size() + 1, serviceURL.c_str());

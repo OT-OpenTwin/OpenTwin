@@ -419,7 +419,7 @@ PrimitiveManager *Application::getPrimitiveManager(void)
 { 
 	if (primitiveManager == nullptr)
 	{
-		primitiveManager = new PrimitiveManager(m_uiComponent, m_modelComponent, serviceName(), serviceID(), &entityCache, &getClassFactory());
+		primitiveManager = new PrimitiveManager(m_uiComponent, m_modelComponent, getServiceName(), getServiceID(), &entityCache, &getClassFactory());
 	}
 
 	return primitiveManager; 
@@ -429,7 +429,7 @@ BooleanOperations *Application::getBooleanOperations(void)
 { 
 	if (booleanOperations == nullptr)
 	{
-		booleanOperations = new BooleanOperations(m_uiComponent, m_modelComponent, serviceName(), &entityCache, serviceID(), &getClassFactory());
+		booleanOperations = new BooleanOperations(m_uiComponent, m_modelComponent, getServiceName(), &entityCache, getServiceID(), &getClassFactory());
 	}
 
 	return booleanOperations; 
@@ -449,7 +449,7 @@ Transformations *Application::getTransformationManager(void)
 { 
 	if (transformationManager == nullptr)
 	{
-		transformationManager = new Transformations(m_uiComponent, m_modelComponent, serviceID(), serviceName(), &entityCache, &getClassFactory());
+		transformationManager = new Transformations(m_uiComponent, m_modelComponent, getServiceID(), getServiceName(), &entityCache, &getClassFactory());
 		transformationManager->setUpdateManager(getUpdateManager());	
 	}
 
@@ -460,7 +460,7 @@ ChamferEdges* Application::getChamferEdgesManager(void)
 {
 	if (chamferEdges == nullptr)
 	{
-		chamferEdges = new ChamferEdges(m_uiComponent, m_modelComponent, serviceID(), serviceName(), &entityCache, &getClassFactory());
+		chamferEdges = new ChamferEdges(m_uiComponent, m_modelComponent, getServiceID(), getServiceName(), &entityCache, &getClassFactory());
 		chamferEdges->setUpdateManager(getUpdateManager());
 	}
 
@@ -471,7 +471,7 @@ BlendEdges* Application::getBlendEdgesManager(void)
 {
 	if (blendEdges == nullptr)
 	{
-		blendEdges = new BlendEdges(m_uiComponent, m_modelComponent, serviceID(), serviceName(), &entityCache, &getClassFactory());
+		blendEdges = new BlendEdges(m_uiComponent, m_modelComponent, getServiceID(), getServiceName(), &entityCache, &getClassFactory());
 		blendEdges->setUpdateManager(getUpdateManager());
 	}
 
@@ -483,7 +483,7 @@ SimplifyRemoveFaces *Application::getRemoveFacesOperation(void)
 {
 	if (removeFaces == nullptr)
 	{
-		removeFaces = new SimplifyRemoveFaces(m_uiComponent, m_modelComponent, serviceID(), serviceName(), &entityCache, &getClassFactory());
+		removeFaces = new SimplifyRemoveFaces(m_uiComponent, m_modelComponent, getServiceID(), getServiceName(), &entityCache, &getClassFactory());
 		removeFaces->setUpdateManager(getUpdateManager());	
 	}
 
@@ -494,7 +494,7 @@ STEPReader *Application::getSTEPReader(void)
 {
 	if (stepReader == nullptr)
 	{
-		stepReader = new STEPReader(this, serviceName());
+		stepReader = new STEPReader(this, getServiceName());
 	}
 
 	return stepReader; 
@@ -510,7 +510,7 @@ void Application::importSTEP(void)
 	doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString("STEP files (*.stp;*.step)", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("importSTEPFile", doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent, true, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;
 	uiComponent()->sendMessage(true, doc, tmp);

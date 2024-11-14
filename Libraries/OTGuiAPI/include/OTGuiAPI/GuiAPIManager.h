@@ -29,7 +29,7 @@ namespace ot {
 		void frontendDisconnected(void);
 
 		//! @brief Returns true if the frontend information was set
-		bool isFrontendConnected(void) const { return !(m_frontend.serviceURL().empty()); };
+		bool isFrontendConnected(void) const { return !(m_frontend.getServiceURL().empty()); };
 
 		//! @brief Send the provided message to the frontend.
 		//! If no frontend is connected a warning log is generated and the method returns false.

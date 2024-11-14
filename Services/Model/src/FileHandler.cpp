@@ -53,8 +53,8 @@ bool FileHandler::handleAction(const std::string& _action, ot::JsonDocument& _do
 
 void FileHandler::importFile(const std::string& _fileMask, const std::string& _dialogTitle, const std::string& _functionName)
 {
-	const std::string& serviceURL = Application::instance()->serviceURL();
-	const std::string serviceName =	Application::instance()->serviceName();
+	const std::string& serviceURL = Application::instance()->getServiceURL();
+	const std::string serviceName =	Application::instance()->getServiceName();
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
@@ -197,7 +197,7 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	Model* model = Application::instance()->getModel();
 	ot::UID entIDData =	model->createEntityUID();
 	ot::UID entIDTopo =	model->createEntityUID();
-	const std::string serviceName = Application::instance()->serviceName();
+	const std::string serviceName = Application::instance()->getServiceName();
 
 	size_t fileNamePos = _fileName.find_last_of("/");
 	std::string path = _fileName.substr(0, fileNamePos);

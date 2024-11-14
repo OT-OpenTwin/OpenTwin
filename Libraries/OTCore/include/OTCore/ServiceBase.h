@@ -81,7 +81,7 @@ namespace ot {
 		// Getter
 
 		//! @brief Return the service ID
-		serviceID_t serviceID(void) const { return m_serviceID; };
+		serviceID_t getServiceID(void) const { return m_serviceID; };
 
 		//! @brief Return the service ID as an Integer (The service ID is an Integer stored as a String)
 		int getServiceIDAsInt(void) const;
@@ -90,16 +90,16 @@ namespace ot {
 		int getSessionCount(void) const { return m_sessionCount; };
 
 		//! @brief Return the service URL
-		const std::string& serviceURL(void) const { return m_serviceURL; };
+		const std::string& getServiceURL(void) const { return m_serviceURL; };
 
 		//! @brief Return the service name
-		std::string serviceName(void) const { return m_serviceName; };
+		std::string getServiceName(void) const { return m_serviceName; };
 
 		//! @brief Return the service type
-		std::string serviceType(void) const { return m_serviceType; };
+		std::string getServiceType(void) const { return m_serviceType; };
 
 		//! @brief Return the site ID
-		std::string siteId(void) const { return m_siteId; };
+		std::string getSiteId(void) const { return m_siteId; };
 
 		BasicServiceInformation getBasicServiceInformation(void) const { return BasicServiceInformation(m_serviceName, m_serviceType); };
 

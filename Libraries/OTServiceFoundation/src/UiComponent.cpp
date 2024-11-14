@@ -45,7 +45,7 @@ void ot::components::UiComponent::addMenuPage(
 		JsonDocument cmdDoc;
 		cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_AddMenuPage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, JsonString(_pageName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
 		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -64,7 +64,7 @@ void ot::components::UiComponent::addMenuGroup(
 		cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_AddMenuGroup, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, JsonString(_pageName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_GroupName, JsonString(_groupName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
 		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -85,7 +85,7 @@ void ot::components::UiComponent::addMenuSubGroup(
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, JsonString(_pageName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_GroupName, JsonString(_groupName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName, JsonString(_subgroupName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
 		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -116,7 +116,7 @@ void ot::components::UiComponent::addMenuButton(
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_IconName, JsonString(_iconName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_IconFolder, JsonString(_iconFolder, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		if (!_keySequence.empty()) {
 			cmdDoc.AddMember(OT_ACTION_PARAM_UI_KeySequence, JsonString(_keySequence, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
@@ -163,7 +163,7 @@ void ot::components::UiComponent::addMenuButton(
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_IconName, JsonString(_iconName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_IconFolder, JsonString(_iconFolder, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		if (!_keySequence.empty()) {
 			cmdDoc.AddMember(OT_ACTION_PARAM_UI_KeySequence, JsonString(_keySequence, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
@@ -199,7 +199,7 @@ void ot::components::UiComponent::addMenuCheckbox(
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, JsonString(_checkboxText, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_CheckedState, _isChecked, cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
 		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -229,7 +229,7 @@ void ot::components::UiComponent::addMenuCheckbox(
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, JsonString(_checkboxText, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_CheckedState, _isChecked, cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
 		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -257,7 +257,7 @@ void ot::components::UiComponent::addMenuLineEdit(
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, JsonString(_initialText, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText, JsonString(_labelText, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
 		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -287,7 +287,7 @@ void ot::components::UiComponent::addMenuLineEdit(
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, JsonString(_initialText, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectLabelText, JsonString(_labelText, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 		std::string response;
 		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -303,7 +303,7 @@ void ot::components::UiComponent::activateMenuPage(
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_ActivateToolbarTab, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_TabName, JsonString(_pageName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -315,7 +315,7 @@ void ot::components::UiComponent::addShortcut(
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_AddShortcut, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_KeySequence, JsonString(_keySequence, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -329,7 +329,7 @@ void ot::components::UiComponent::createRubberband(
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_VIEW_CreateRubberband, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_VIEW_RUBBERBAND_Note, JsonString(_note, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_VIEW_RUBBERBAND_Document, JsonString(_configurationJson, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -371,7 +371,7 @@ void ot::components::UiComponent::setControlToolTip(
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_OBJ_SetToolTip, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, JsonString(_controlName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, JsonString(_toolTipText, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -400,7 +400,7 @@ void ot::components::UiComponent::setControlsEnabledState(
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_EnableDisableControls, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_EnabledControlsList, JsonArray(_enabledControls, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_DisabledControlsList, JsonArray(_disabledControls, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -416,7 +416,7 @@ void ot::components::UiComponent::setLineEditValues(
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, JsonString(_controlName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectText, JsonString(_text, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ErrorState, _errorState, cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -430,7 +430,7 @@ void ot::components::UiComponent::setCheckboxValues(
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_SetCheckboxValues, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, JsonString(_controlName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectName, _checkedState, cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -442,7 +442,7 @@ void ot::components::UiComponent::lockUI(
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_Lock, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -454,7 +454,7 @@ void ot::components::UiComponent::unlockUI(
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_Unlock, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_ElementLockTypes, JsonArray(toStringList(_lockTypes), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -466,7 +466,7 @@ void ot::components::UiComponent::switchMenuTab(
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_SwitchMenuTab, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_PageName, JsonString(_pageName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -475,7 +475,7 @@ void ot::components::UiComponent::switchMenuTab(
 void ot::components::UiComponent::registerForModelEvents(void) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_RegisterForModelEvents, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -484,7 +484,7 @@ void ot::components::UiComponent::registerForModelEvents(void) const {
 void ot::components::UiComponent::deregisterForModelEvents(void) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_DeregisterForModelEvents, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -495,10 +495,10 @@ void ot::components::UiComponent::addIconSearchPath(const std::string& _iconPath
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_AddIconSearchPath, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_IconFolder, JsonString(_iconPath, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->serviceURL(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_application->serviceName(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_application->serviceType(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->getServiceURL(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_application->getServiceName(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_application->getServiceType(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 
 	std::string response;
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -523,7 +523,7 @@ void ot::components::UiComponent::displayMessage(
 ) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_DisplayMessage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
 	std::string response;
@@ -533,7 +533,7 @@ void ot::components::UiComponent::displayMessage(
 void ot::components::UiComponent::displayStyledMessage(const StyledTextBuilder& _builder) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_DisplayStyledMessage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	JsonObject builderObject;
 	_builder.addToJsonObject(builderObject, cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, builderObject, cmdDoc.GetAllocator());
@@ -547,7 +547,7 @@ void ot::components::UiComponent::displayDebugMessage(
 ) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_DisplayDebugMessage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
 	std::string response;
@@ -559,7 +559,7 @@ void ot::components::UiComponent::displayErrorPrompt(
 ) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_ReportError, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
 	std::string response;
@@ -571,7 +571,7 @@ void ot::components::UiComponent::displayWarningPrompt(
 ) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_ReportWarning, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
 	std::string response;
@@ -583,7 +583,7 @@ void ot::components::UiComponent::displayInformationPrompt(
 ) const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_ReportInformation, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	
 	std::string response;
@@ -598,7 +598,7 @@ void ot::components::UiComponent::setProgressInformation(std::string message, bo
 {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_SetProgressVisibility, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_VisibleState, true, cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContinuousState, continuous, cmdDoc.GetAllocator());
@@ -611,7 +611,7 @@ void ot::components::UiComponent::setProgress(int percentage)
 {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_SetProgressbarValue, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_PERCENT, percentage, cmdDoc.GetAllocator());
 	
 	std::string response;
@@ -622,7 +622,7 @@ void ot::components::UiComponent::closeProgressInformation(void)
 {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_SetProgressVisibility, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString("", cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_VisibleState, false, cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContinuousState, false, cmdDoc.GetAllocator());
@@ -670,7 +670,7 @@ void ot::components::UiComponent::removeUIElements(const std::list<std::string> 
 {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_RemoveElements, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectNames, JsonArray(_itemList, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
 	std::string response;
@@ -689,7 +689,7 @@ void ot::components::UiComponent::removeAllUIElements(void)
 {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_RemoveElements, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ObjectNames, JsonArray(m_uiElements, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 
 	std::string response;
@@ -720,7 +720,7 @@ void ot::components::UiComponent::enterEntitySelectionMode(
 
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_VIEW_EnterEntitySelectionMode, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModelUID, cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_REPLYTO, _serviceToReplyTo, cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Selection_AllowMultipleSelection, _allowMultipleSelection, cmdDoc.GetAllocator());
@@ -759,7 +759,7 @@ void ot::components::UiComponent::freeze3DView(UID _visualizationModelUID, bool 
 {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_Freeze3DView, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModelUID, cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_BOOLEAN_STATE, _flag, cmdDoc.GetAllocator());
 
@@ -771,7 +771,7 @@ void ot::components::UiComponent::refreshSelection(UID _visualizationModelUID)
 {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_VIEW_RefreshSelection, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModelUID, cmdDoc.GetAllocator());
 
 	std::string response;
@@ -782,7 +782,7 @@ void ot::components::UiComponent::refreshAllViews(UID _visualizationModelUID)
 {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_VIEW_Refresh, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModelUID, cmdDoc.GetAllocator());
 
 	std::string response;
@@ -844,10 +844,10 @@ void ot::components::UiComponent::requestUiPlugin(const std::string& _pluginName
 	}
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_RequestPlugin, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->serviceURL(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_application->serviceName(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_application->serviceType(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->getServiceURL(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_application->getServiceName(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_application->getServiceType(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_NAME, JsonString(_pluginName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_PATH, JsonString(_filename, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	
@@ -859,10 +859,10 @@ void ot::components::UiComponent::addPluginSearchPath(const std::string& _plugin
 #ifdef _DEBUG
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_AddPluginSearchPath, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->serviceURL(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_application->serviceName(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_application->serviceType(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->getServiceURL(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_application->getServiceName(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_application->getServiceType(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_PATH, JsonString(_pluginPath, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	
 	std::string response;
@@ -885,7 +885,7 @@ void ot::components::UiComponent::sendSettingsData(const PropertyGridCfg& _confi
 
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_AddSettingsData, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->serviceID(), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
 	
 	JsonObject configObj;
 	_config.addToJsonObject(configObj, cmdDoc.GetAllocator());

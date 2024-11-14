@@ -333,7 +333,7 @@ void PropertyHandlerDatabaseAccessBlock::requestPropertyUpdate(ot::UIDList entit
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDs,requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_JSON, ot::JsonString(propertiesAsJSON, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	
-	const std::string& modelServiceURL = Application::instance()->modelComponent()->serviceURL();
+	const std::string& modelServiceURL = Application::instance()->modelComponent()->getServiceURL();
 
 	std::string response;
 	if (!ot::msg::send("", modelServiceURL, ot::EXECUTE, requestDoc.toJson(), response))

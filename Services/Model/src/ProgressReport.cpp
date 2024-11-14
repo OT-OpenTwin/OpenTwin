@@ -54,7 +54,7 @@ void ProgressReport::setUILock(bool flag, lockType type)
 		{
 			ot::JsonDocument doc;
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_Lock, doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
 			
 			ot::LockTypeFlags f;
 
@@ -94,7 +94,7 @@ void ProgressReport::setUILock(bool flag, lockType type)
 			{
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_Unlock, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->serviceID(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
 
 				ot::LockTypeFlags f;
 

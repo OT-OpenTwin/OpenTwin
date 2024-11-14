@@ -39,8 +39,8 @@ bool GlobalDirectoryService::requestToStartService(const ot::ServiceBase& _servi
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewService, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_serviceInformation.serviceName(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInformation.serviceType(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(_serviceInformation.getServiceName(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(_serviceInformation.getServiceType(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICE_URL, ot::JsonString(m_sessionService->url(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
@@ -76,8 +76,8 @@ bool GlobalDirectoryService::requestToStartServices(const std::list<ot::ServiceB
 	ot::JsonArray serviceArr;
 	for (auto s : _serviceInformation) {
 		ot::JsonObject serviceObj;
-		serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(s.serviceName(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
-		serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(s.serviceType(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+		serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(s.getServiceName(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+		serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(s.getServiceType(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
 		serviceArr.PushBack(serviceObj, requestDoc.GetAllocator());
 	}
 	requestDoc.AddMember(OT_ACTION_PARAM_SESSION_SERVICES, serviceArr, requestDoc.GetAllocator());

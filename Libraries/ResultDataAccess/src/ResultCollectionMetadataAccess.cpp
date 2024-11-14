@@ -18,7 +18,7 @@ ResultCollectionMetadataAccess::ResultCollectionMetadataAccess(const std::string
 ResultCollectionMetadataAccess::ResultCollectionMetadataAccess(const std::string& _crossCollectionName, ot::components::ModelComponent* _modelComponent, ClassFactory* _classFactory, const std::string& _sessionServiceURL)
 	:m_modelComponent(_modelComponent), m_collectionName(_crossCollectionName)
 {
-	CrossCollectionAccess crossCollectionAccess(_crossCollectionName, _sessionServiceURL, _modelComponent->serviceURL());
+	CrossCollectionAccess crossCollectionAccess(_crossCollectionName, _sessionServiceURL, _modelComponent->getServiceURL());
 	std::shared_ptr<EntityMetadataCampaign> campaignMetadataEntity =	crossCollectionAccess.getMeasurementCampaignMetadata(*_modelComponent, _classFactory);
 	if (campaignMetadataEntity != nullptr)
 	{

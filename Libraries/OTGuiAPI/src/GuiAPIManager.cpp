@@ -17,11 +17,11 @@ ot::GuiAPIManager& ot::GuiAPIManager::instance(void) {
 
 void ot::GuiAPIManager::frontendConnected(const ServiceBase& _serviceInformation) {
 	m_frontend = _serviceInformation;
-	if (m_frontend.serviceURL().empty()) {
+	if (m_frontend.getServiceURL().empty()) {
 		OT_LOG_W("Provided frontend infromation does not contain a url");
 	}
 	else {
-		OT_LOG_D("User frontend url set to \"" + m_frontend.serviceURL() + "\"");
+		OT_LOG_D("User frontend url set to \"" + m_frontend.getServiceURL() + "\"");
 	}
 }
 
@@ -36,7 +36,7 @@ bool ot::GuiAPIManager::sendQueuedRequestToFrontend(const std::string& _message)
 	}
 
 	std::string tmp;
-	return msg::send(ThisService::instance().serviceURL(), m_frontend.serviceURL(), ot::QUEUE, _message, tmp);
+	return msg::send(ThisService::instance().getServiceURL(), m_frontend.getServiceURL(), ot::QUEUE, _message, tmp);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

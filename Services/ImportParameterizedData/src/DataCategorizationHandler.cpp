@@ -756,7 +756,7 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 	if (_pythonInterface == nullptr)
 	{
 		auto pythonService = Application::instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE);
-		_pythonInterface = new ot::PythonServiceInterface(pythonService->serviceURL());
+		_pythonInterface = new ot::PythonServiceInterface(pythonService->getServiceURL());
 	}
 	auto pythonScriptName = pythonScriptNames.begin();
 	for (auto newSelectionEntityName = newSelectionEntityNames.begin(); newSelectionEntityName != newSelectionEntityNames.end(); newSelectionEntityName++)
@@ -909,7 +909,7 @@ void DataCategorizationHandler::RequestRangesSelection(std::vector<ot::TableRang
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges, doc.GetAllocator()), doc.GetAllocator());
 
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _modelComponent->getCurrentVisualizationModelID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonArray vectOfRanges;
 	for (auto range : ranges)
@@ -950,7 +950,7 @@ void DataCategorizationHandler::RequestColouringRanges(ot::Color colour)
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection, doc.GetAllocator()), doc.GetAllocator());
 
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _modelComponent->getCurrentVisualizationModelID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SENDER_URL,ot::JsonString(Application::instance()->serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL,ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonObject obj;
 	colour.addToJsonObject(obj, doc.GetAllocator());

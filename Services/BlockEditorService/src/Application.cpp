@@ -121,7 +121,7 @@ std::string Application::handleEditorSaveRequested(ot::JsonDocument& _document) 
 	// Send the request
 	std::string response;
 	std::string req = doc.toJson();
-	if (!ot::msg::send("", m_uiComponent->serviceURL(), ot::QUEUE, req, response)) {
+	if (!ot::msg::send("", m_uiComponent->getServiceURL(), ot::QUEUE, req, response)) {
 		return OT_ACTION_RETURN_VALUE_FAILED;
 	}
 

@@ -12,7 +12,7 @@ ot::ThisService& ot::ThisService::instance(void) {
 }
 
 void ot::ThisService::addIdToJsonDocument(JsonDocument& _document) {
-	_document.AddMember("Service.ID", ThisService::instance().serviceID(), _document.GetAllocator());
+	_document.AddMember("Service.ID", ThisService::instance().getServiceID(), _document.GetAllocator());
 }
 
 ot::serviceID_t ot::ThisService::getIdFromJsonDocument(const JsonDocument& _document) {

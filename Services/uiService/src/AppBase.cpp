@@ -734,7 +734,7 @@ void AppBase::settingsChanged(const std::string& _owner, const ot::Property* _pr
 	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
 
 	std::string response;
-	m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::QUEUE, serviceInfo->serviceURL(), doc, response);
+	m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::QUEUE, serviceInfo->getServiceURL(), doc, response);
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		OT_LOG_E(response);
 		this->appendInfoMessage(QString("[ERROR] Sending message resulted in error: ") + response.c_str() + "\n");
