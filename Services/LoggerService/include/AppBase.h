@@ -27,7 +27,7 @@ public:
 
 	// Action handler
 
-	OT_HANDLER(handleLog, AppBase, OT_ACTION_CMD_Log, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleLog, AppBase, OT_ACTION_CMD_Log, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleRegister, AppBase, OT_ACTION_CMD_RegisterNewService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleDeregister, AppBase, OT_ACTION_CMD_RemoveService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleClear, AppBase, OT_ACTION_CMD_Reset, ot::SECURE_MESSAGE_TYPES)
