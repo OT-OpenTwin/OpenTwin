@@ -67,12 +67,18 @@ set VSLANG=1033
 
 IF %DEBUG%==1 (
 	ECHO %TYPE_NAME% DEBUG
-	"%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Debug /p:Platform=x64 > buildlog_Debug.txt
+	ECHO ======================================================================================== >> buildlog_Debug.txt
+	ECHO Building project: %1 >> buildlog_Debug.txt
+	ECHO ======================================================================================== >> buildlog_Debug.txt
+	"%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Debug /p:Platform=x64 >> buildlog_Debug.txt
 )
 
 IF %RELEASE%==1 (
 	ECHO %TYPE_NAME% RELEASE
-	"%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Release /p:Platform=x64 > buildlog_Release.txt
+	ECHO ======================================================================================== >> buildlog_Release.txt
+	ECHO Building project: %1 >> buildlog_Release.txt
+	ECHO ======================================================================================== >> buildlog_Release.txt
+	"%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Release /p:Platform=x64 >> buildlog_Release.txt
 ) 
   
 GOTO END
