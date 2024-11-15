@@ -200,6 +200,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -249,6 +250,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild />
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
