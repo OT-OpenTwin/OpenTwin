@@ -24,6 +24,7 @@
 #include "OTServiceFoundation/AbstractUiNotifier.h"
 #include "OTServiceFoundation/AbstractModelNotifier.h"
 #include "OTServiceFoundation/ModalCommandBase.h"
+#include "OTServiceFoundation/ErrorWarningLogFrontendNotifier.h"
 
 #include "DataBase.h"
 #include "Document\DocumentAccess.h"
@@ -49,6 +50,8 @@ ot::ApplicationBase::ApplicationBase(const std::string & _serviceName, const std
 	m_sessionService.doc = nullptr;
 	m_sessionService.enabledCounter = 0;
 	m_sessionService.service = nullptr;
+
+	new ErrorWarningLogFrontendNotifier(this); // Log Dispatcher gets the ownership of the notifier.
 }
 
 ot::ApplicationBase::~ApplicationBase()
@@ -198,7 +201,7 @@ void ot::ApplicationBase::flushQueuedHttpRequests(const std::string & _service)
 
 		std::string response;
 		if (queuedDoc->IsObject()) {
-			ot::msg::send(this->serviceURL(), destination->second.service->serviceURL(), ot::QUEUE, queuedDoc->toJson(), response);
+			ot::msg::send(this->getServiceURL(), destination->second.service->getServiceURL(), ot::QUEUE, queuedDoc->toJson(), response);
 
 			delete queuedDoc;
 			destination->second.doc = nullptr;
@@ -263,7 +266,7 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceN
 	}
 	else
 	{
-		return ot::msg::send(m_serviceURL, destination->second.service->serviceURL(), (_queue ? QUEUE : EXECUTE), _doc.toJson(), _response);
+		return ot::msg::send(m_serviceURL, destination->second.service->getServiceURL(), (_queue ? QUEUE : EXECUTE), _doc.toJson(), _response);
 	}
 }
 
@@ -275,7 +278,7 @@ bool ot::ApplicationBase::broadcastMessage(bool _queue, const std::string& _mess
 	doc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	return ot::msg::send(m_serviceURL, m_sessionService.service->serviceURL(), (_queue ? QUEUE : EXECUTE), doc.toJson(), response);
+	return ot::msg::send(m_serviceURL, m_sessionService.service->getServiceURL(), (_queue ? QUEUE : EXECUTE), doc.toJson(), response);
 }
 
 bool ot::ApplicationBase::broadcastMessage(bool _queue, const JsonDocument& _doc) {
@@ -597,14 +600,14 @@ void ot::ApplicationBase::__serviceConnected(const std::string & _name, const st
 		m_serviceNameMap.insert_or_assign(_name, info);
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults("UI Configuration");
 
-		this->enableMessageQueuing(m_uiComponent->serviceName(), true);
+		this->enableMessageQueuing(m_uiComponent->getServiceName(), true);
 
 		m_uiComponent->sendSettingsData(this->createSettings());
 		
 		this->uiConnected(m_uiComponent);
 		m_uiComponent->sendUpdatedControlState();
 		m_uiComponent->notifyUiSetupCompleted();
-		this->enableMessageQueuing(m_uiComponent->serviceName(), false);
+		this->enableMessageQueuing(m_uiComponent->getServiceName(), false);
 
 		GuiAPIManager::instance().frontendConnected(*m_uiComponent);
 	}

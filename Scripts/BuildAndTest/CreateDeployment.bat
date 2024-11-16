@@ -53,7 +53,7 @@ REM ===========================================================================
 	
 REM Qwt
 COPY "%QWT_LIB_DLLR%\qwt.dll" "%OT_DEPLOYMENT_DIR%"
-COPY "%QWTPOLAR_LIB_DLLR%\qwtpolar.dll" "%OT_DEPLOYMENT_DIR%"
+REM COPY "%QWTPOLAR_LIB_DLLR%\qwtpolar.dll" "%OT_DEPLOYMENT_DIR%"
 
 REM QtTabToolbar
 COPY "%QT_TT_DLLR%\TabToolbar.dll" "%OT_DEPLOYMENT_DIR%"

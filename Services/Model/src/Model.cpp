@@ -168,7 +168,7 @@ void Model::resetToNew(void)
 
 	ProjectTypeManager typeManager(projectType);
 
-	entityRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+	entityRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 	entityMap[entityRoot->getEntityID()] = entityRoot;
 
 	GeometryOperations::EntityList allNewEntities;
@@ -176,42 +176,42 @@ void Model::resetToNew(void)
 	// Create the various root items
 	if (typeManager.hasGeometryRoot())
 	{
-		EntityBase* entityGeometryRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+		EntityBase* entityGeometryRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 		entityGeometryRoot->setName(getGeometryRootName());
 		addEntityToModel(entityGeometryRoot->getName(), entityGeometryRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasMaterialRoot())
 	{
-		EntityBase* entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+		EntityBase* entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 		entityMaterialRoot->setName(getMaterialRootName());
 		addEntityToModel(entityMaterialRoot->getName(), entityMaterialRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasMeshRoot())
 	{
-		EntityBase* entityMeshRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+		EntityBase* entityMeshRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 		entityMeshRoot->setName(getMeshRootName());
 		addEntityToModel(entityMeshRoot->getName(), entityMeshRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasSolverRoot())
 	{
-		EntityContainer* entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+		EntityContainer* entitySolverRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 		entitySolverRoot->setName(getSolverRootName());
 		addEntityToModel(entitySolverRoot->getName(), entitySolverRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasScriptsRoot())
 	{
-		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+		EntityContainer* entityScriptRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 		entityScriptRoot->setName(getScriptsRootName());
 		addEntityToModel(entityScriptRoot->getName(), entityScriptRoot, entityRoot, true, allNewEntities);
 	}
 
 	if (typeManager.hasUnitRoot())
 	{
-		auto entityUnits = new EntityUnits(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+		auto entityUnits = new EntityUnits(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 		entityUnits->setName(getUnitRootName());
 		entityUnits->createProperties();
 		//entityUnits->StoreToDataBase();
@@ -220,7 +220,7 @@ void Model::resetToNew(void)
 
 	if (typeManager.hasDataCategorizationRoot())
 	{
-		EntityBase* entityRMDCategorizationRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+		EntityBase* entityRMDCategorizationRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 		entityRMDCategorizationRoot->setName(typeManager.getDataCategorizationRootName());
 		addEntityToModel(entityRMDCategorizationRoot->getName(), entityRMDCategorizationRoot, entityRoot, true, allNewEntities);
 	}
@@ -243,7 +243,7 @@ void Model::resetToNew(void)
 
 	if (typeManager.hasDatasetRoot())
 	{
-		EntityBase* entityDatasetRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+		EntityBase* entityDatasetRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 		entityDatasetRoot->setName(typeManager.getDatasetRootName());
 		addEntityToModel(entityDatasetRoot->getName(), entityDatasetRoot, entityRoot, true, allNewEntities);
 	}
@@ -699,7 +699,7 @@ void Model::addEntityToModel(std::string entityPath, EntityBase *entity, EntityB
 		if (container == nullptr)
 		{
 			// The container does not exist, create a new item
-			container = new EntityContainer(createEntityUID(), root, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+			container = new EntityContainer(createEntityUID(), root, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 
 			container->setName(folderName);
 			container->setEditable(entity->getEditable() && entityRoot != containerRoot); // If the entity is editable, a newly created container 
@@ -982,7 +982,7 @@ void Model::importTableFile(const std::string &fileName, bool removeFile)
 {
 	TableReader reader;
 	reader.setModel(this);
-	std::string error = reader.readFromFile(fileName, newTableItemName, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+	std::string error = reader.readFromFile(fileName, newTableItemName, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 
 	if (removeFile)
 	{
@@ -1068,7 +1068,7 @@ EntityParameter* Model::createNewParameterItem(const std::string &parameterName)
 	EntityContainer *entityParameterRoot = dynamic_cast<EntityContainer*>(findEntityFromName(getParameterRootName()));
 	if (entityParameterRoot == nullptr)
 	{
-		entityParameterRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+		entityParameterRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 		entityParameterRoot->setName(getParameterRootName());
 
 		GeometryOperations::EntityList allNewEntities;
@@ -1077,7 +1077,7 @@ EntityParameter* Model::createNewParameterItem(const std::string &parameterName)
 		addVisualizationContainerNode(entityParameterRoot->getName(), entityParameterRoot->getEntityID(), entityParameterRoot->getEditable());
 	}
 
-	EntityParameter *parameterItem = new EntityParameter(createEntityUID(), entityParameterRoot, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+	EntityParameter *parameterItem = new EntityParameter(createEntityUID(), entityParameterRoot, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 	
 	parameterItem->setName(parameterName);
 	parameterItem->setEditable(true);
@@ -1173,7 +1173,7 @@ EntityMaterial* Model::createNewMaterial(const std::string &materialName)
 	EntityContainer *entityMaterialRoot = dynamic_cast<EntityContainer*>(findEntityFromName(getMaterialRootName()));
 	if (entityMaterialRoot == nullptr)
 	{
-		entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+		entityMaterialRoot = new EntityContainer(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 		entityMaterialRoot->setName(getMaterialRootName());
 
 		GeometryOperations::EntityList allNewEntities;
@@ -1182,7 +1182,7 @@ EntityMaterial* Model::createNewMaterial(const std::string &materialName)
 		addVisualizationContainerNode(entityMaterialRoot->getName(), entityMaterialRoot->getEntityID(), entityMaterialRoot->getEditable());
 	}
 
-	EntityMaterial *materialItem = new EntityMaterial(createEntityUID(), entityMaterialRoot, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+	EntityMaterial *materialItem = new EntityMaterial(createEntityUID(), entityMaterialRoot, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 
 	materialItem->setName(materialName);
 	materialItem->setEditable(true);
@@ -3311,7 +3311,7 @@ void Model::addResult1DEntity(const std::string &name, const std::vector<double>
 							  const std::string &curveLabel, const std::string &xlabel, const std::string &xunit,
 							  const std::string &ylabel, const std::string &yunit)
 {
-	EntityResult1DCurve *curve = new EntityResult1DCurve(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->serviceName());
+	EntityResult1DCurve *curve = new EntityResult1DCurve(createEntityUID(), nullptr, this, getStateManager(), &classFactory, Application::instance()->getServiceName());
 
 	curve->setName(name);
 	curve->setEditable(true);
@@ -3441,7 +3441,7 @@ void Model::createFaceAnnotation(const std::list<EntityFaceAnnotationData> &anno
 
 	} while (entityNameToIDMap[annotationName]);
 
-	EntityFaceAnnotation *annotationEntity = new EntityFaceAnnotation(0, nullptr, nullptr, nullptr, &classFactory, Application::instance()->serviceName());
+	EntityFaceAnnotation *annotationEntity = new EntityFaceAnnotation(0, nullptr, nullptr, nullptr, &classFactory, Application::instance()->getServiceName());
 
 	annotationEntity->setName(annotationName);
 	annotationEntity->setColor(r, g, b);
@@ -5404,7 +5404,7 @@ std::string Model::checkParentUpdates(std::list<ot::UID> &modifiedEntities)
 
 int Model::getServiceIDAsInt(void)
 {
-	return Application::instance()->serviceID();
+	return Application::instance()->getServiceID();
 }
 
 int Model::getSessionCount(void)

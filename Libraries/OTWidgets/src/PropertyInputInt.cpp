@@ -18,7 +18,7 @@ static ot::PropertyInputFactoryRegistrar<ot::PropertyInputInt> propertyInputIntR
 #define OT_PROPERTY_INT_MULTIPLEVALUESTEXT OT_PROPERTY_INT_MULTIPLEVALUESCHAR OT_PROPERTY_INT_MULTIPLEVALUESCHAR OT_PROPERTY_INT_MULTIPLEVALUESCHAR
 
 ot::PropertyInputInt::PropertyInputInt()
-	: m_lineEdit(nullptr)
+	: m_lineEdit(nullptr), m_min(std::numeric_limits<int>::lowest()), m_max(std::numeric_limits<int>::max())
 {
 	m_spinBox = new SpinBox;
 	this->connect(m_spinBox, &QSpinBox::valueChanged, this, &PropertyInputInt::lclValueChanged);
@@ -116,6 +116,7 @@ bool ot::PropertyInputInt::hasInputError(void) const {
 void ot::PropertyInputInt::lclValueChanged(int) {
 	OTAssertNullptr(m_spinBox);
 	m_spinBox->setSpecialValueText("");
+	OTAssert(this->getValue() >= m_min && this->getValue() <= m_max, "Value out of range");
 	PropertyInput::slotValueChanged();
 }
 
@@ -135,7 +136,7 @@ void ot::PropertyInputInt::lclTextChanged(void) {
 		m_lineEdit->setText(str);
 		m_lineEdit->blockSignals(false);
 
-		this->slotValueChanged();
+		this->lclEditingFinishedChanged();
 	}
 
 	if (this->hasInputError()) {
@@ -149,17 +150,26 @@ void ot::PropertyInputInt::lclTextChanged(void) {
 void ot::PropertyInputInt::lclEditingFinishedChanged(void) {
 	OTAssertNullptr(m_lineEdit);
 	if (this->hasInputError()) return;
-	PropertyInput::slotValueChanged();
+
+	int val = this->getValue();
+	if (val < m_min) {
+		m_lineEdit->blockSignals(true);
+		m_lineEdit->setText(QString::number(m_min));
+		m_lineEdit->blockSignals(false);
+	}
+	if (val > m_max) {
+		m_lineEdit->blockSignals(true);
+		m_lineEdit->setText(QString::number(m_max));
+		m_lineEdit->blockSignals(false);
+	}
+
+	this->slotValueChanged();
 }
 
 ot::Property* ot::PropertyInputInt::createPropertyConfiguration(void) const {
 	ot::PropertyInt* newProperty = new ot::PropertyInt(this->data());
-
-	if (m_spinBox) {
-		newProperty->setMin(m_spinBox->minimum());
-		newProperty->setMax(m_spinBox->maximum());
-
-	}
+	newProperty->setMin(m_min);
+	newProperty->setMax(m_max);
 	newProperty->setValue(this->getValue());
 
 	return newProperty;
@@ -172,6 +182,9 @@ bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration
 		OT_LOG_E("Property cast failed");
 		return false;
 	}
+
+	m_min = actualProperty->getMin();
+	m_max = actualProperty->getMax();
 
 	if (this->data().getPropertyFlags() & Property::AllowCustomValues) {
 		if (m_spinBox) delete m_spinBox;

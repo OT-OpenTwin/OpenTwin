@@ -64,7 +64,7 @@ const char* ot::foundation::queueAction(const std::string& _json, const std::str
 const char* ot::foundation::getServiceURL(void)
 {
 	try {
-		std::string serviceURL = ot::intern::ExternalServicesComponent::instance().application()->serviceURL();
+		std::string serviceURL = ot::intern::ExternalServicesComponent::instance().application()->getServiceURL();
 
 		char* retVal = new char[serviceURL.length() + 1];
 		strcpy_s(retVal, serviceURL.length() + 1, serviceURL.c_str());
@@ -90,10 +90,10 @@ int ot::foundation::init(
 	try {
 		// Setup logger
 #ifdef _DEBUG
-		if (_application) ot::ServiceLogNotifier::initialize(_application->serviceName(), "", true);
+		if (_application) ot::ServiceLogNotifier::initialize(_application->getServiceName(), "", true);
 		else ot::ServiceLogNotifier::initialize("<NO APPLICATION>", "", true);
 #else
-		if (_application) ot::ServiceLogNotifier::initialize(_application->serviceName(), "", false);
+		if (_application) ot::ServiceLogNotifier::initialize(_application->getServiceName(), "", false);
 		else ot::ServiceLogNotifier::initialize("<NO APPLICATION>", "", false);
 #endif
 
@@ -107,7 +107,7 @@ int ot::foundation::init(
 			std::string deplyomentPath = _application->deploymentPath();
 			if (deplyomentPath.empty()) return -20;
 
-			std::string data = _application->serviceName();
+			std::string data = _application->getServiceName();
 			std::transform(data.begin(), data.end(), data.begin(),
 				[](unsigned char c) { return std::tolower(c); });
 
@@ -176,7 +176,7 @@ int ot::foundation::initDebugExplicit(
 ) {
 	try {
 		// Setup logger
-		if (_application) ot::ServiceLogNotifier::initialize(_application->serviceName(), "", true);
+		if (_application) ot::ServiceLogNotifier::initialize(_application->getServiceName(), "", true);
 		else ot::ServiceLogNotifier::initialize("<NO APPLICATION>", "", true);
 
 
@@ -188,7 +188,7 @@ int ot::foundation::initDebugExplicit(
 		std::string deplyomentPath = _application->deploymentPath();
 		if (deplyomentPath.empty()) return -20;
 
-		std::string data = _application->serviceName();
+		std::string data = _application->getServiceName();
 		std::transform(data.begin(), data.end(), data.begin(),
 			[](unsigned char c) { return std::tolower(c); });
 

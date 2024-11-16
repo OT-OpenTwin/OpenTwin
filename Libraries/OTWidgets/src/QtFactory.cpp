@@ -274,6 +274,14 @@ QTransform ot::QtFactory::toQTransformOnCenter(const ot::Transform& _transform, 
     return newTransform;
 }
 
+ot::TableRange ot::QtFactory::toTableRange(const QTableWidgetSelectionRange& _range) {
+    return ot::TableRange(_range.topRow(), _range.bottomRow(), _range.leftColumn(), _range.rightColumn());
+}
+
+QTableWidgetSelectionRange ot::QtFactory::toQTableRange(const ot::TableRange& _range) {
+    return QTableWidgetSelectionRange(_range.getTopRow(), _range.getBottomRow(), _range.getLeftColumn(), _range.getRightColumn());
+}
+
 QString ot::QtFactory::toQString(QEvent::Type _type) {
     static const QMap<QEvent::Type, QString> eventTypeMap = {
         { QEvent::None, "None" },

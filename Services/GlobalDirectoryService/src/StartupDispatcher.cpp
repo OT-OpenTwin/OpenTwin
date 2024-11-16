@@ -119,5 +119,5 @@ void StartupDispatcher::serviceStartRequestFailed(const ServiceStartupInformatio
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.sessionInformation().id(), doc.GetAllocator()), doc.GetAllocator());
 	
 	// Fire message
-	ot::msg::sendAsync(Application::instance()->serviceURL(), _serviceInfo.sessionInformation().sessionServiceURL(), ot::EXECUTE, doc.toJson());
+	ot::msg::sendAsync(Application::instance()->getServiceURL(), _serviceInfo.sessionInformation().sessionServiceURL(), ot::EXECUTE, doc.toJson());
 }

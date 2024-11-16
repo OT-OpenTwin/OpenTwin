@@ -5,7 +5,6 @@
 #include "Application.h"
 #include "Model.h"
 
-
 void SelectionHandler::processSelectionChanged(const std::list<ot::UID>& _selectedEntityIDs, const std::list<ot::UID>& _selectedVisibleEntityIDs)
 {
 	QueuingHttpRequestsRAII queueRequests;
@@ -116,7 +115,7 @@ void SelectionHandler::notifyOwners()
 	}
 
 	// Here we check which owners are part of the selection and assign their entities
-	const std::string modelServiceName = Application::instance()->serviceName();
+	const std::string modelServiceName = Application::instance()->getServiceName();
 	Model* model = Application::instance()->getModel();
 	for (auto entityID : m_selectedEntityIDs)
 	{
@@ -168,39 +167,3 @@ void SelectionHandler::setSelectedEntityIDs(const std::list<ot::UID>& _selectedE
 	m_selectedEntityIDs = _selectedEntityIDs;
 	m_selectedVisibleEntityIDs = _selectedVisibleEntityIDs;
 }
-
-//void SelectionHandler::sendTextVisualisationRequest(IVisualisationText* _textVisEntity, const std::string& _ownerServiceName)
-//{
-//	if (_textVisEntity->visualiseText())
-//	{
-//		ot::TextEditorCfg editorCfg = _textVisEntity->createConfig();
-//				
-//		ot::JsonDocument uiRequest;
-//		uiRequest.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, uiRequest.GetAllocator());
-//
-//		ot::JsonObject cfgObj;
-//		editorCfg.addToJsonObject(cfgObj, uiRequest.GetAllocator());
-//		uiRequest.AddMember(OT_ACTION_PARAM_Config, cfgObj, uiRequest.GetAllocator());
-//		ot::BasicServiceInformation serviceInformation(_ownerServiceName);
-//		serviceInformation.addToJsonObject(uiRequest, uiRequest.GetAllocator()); 		
-//
-//		Application::instance()->queuedRequestToFrontend(uiRequest);
-//	}
-//}
-
-//void SelectionHandler::createVisualisationRequests()
-//{
-//	Model* model = Application::instance()->getModel();
-//	assert(model != nullptr);
-//	for (ot::UID entityID : m_selectedVisibleEntityIDs)
-//	{
-//		EntityBase* baseEntity = model->getEntityByID(entityID);
-//		
-//		IVisualisationText* textVisEntity = dynamic_cast<IVisualisationText*>(baseEntity);
-//		if (textVisEntity != nullptr)
-//		{
-//			sendTextVisualisationRequest(textVisEntity, baseEntity->getOwningService());
-//
-//		}
-//	}
-//}

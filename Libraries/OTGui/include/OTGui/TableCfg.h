@@ -6,10 +6,10 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Serializable.h"
-#include "OTCore/OTClassHelper.h"
-#include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/EntityViewBaseInfo.h"
 #include "OTGui/TableHeaderItemCfg.h"
+#include "TableHeaderOrientation.h"
+#include "OTCore/GenericDataStructMatrix.h"
 
 // std header
 #include <string>
@@ -17,9 +17,10 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT TableCfg : public Serializable {
+	class OT_GUI_API_EXPORT TableCfg : public EntityViewBaseInfo {
 	public:
-		TableCfg(int _rows = 0, int _columns = 0);
+		TableCfg(int _rows = 0, int _columns = 0, EntityViewBaseInfo _baseInfo = EntityViewBaseInfo());
+		TableCfg(const ot::GenericDataStructMatrix& _matrix, ot::TableHeaderOrientation _orientation);
 		TableCfg(const TableCfg& _other);
 		virtual ~TableCfg();
 
@@ -39,34 +40,26 @@ namespace ot {
 		//! Resets the row and column count back to 0.
 		void clear(void);
 
-		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& getName(void) const { return m_name; };
-
-		void setTitle(const std::string& _title) { m_title = _title; };
-		const std::string& getTitle(void) const { return (m_title.empty() ? m_name : m_title); };
-
 		int getRowCount(void) const { return m_rows; };
 		int getColumnCount(void) const { return m_columns; };
 
-		void setCellText(int _row, int _column, const std::string& _text);
-		const std::string& getCellText(int _row, int _column) const;
+		void setCellText(uint32_t _row, uint32_t _column, const std::string& _text);
+		const std::string& getCellText(uint32_t _row, uint32_t _column) const;
 		
-		void setRowHeader(int _row, const std::string& _headerText);
-		void setRowHeader(int _row, TableHeaderItemCfg* _item);
-		const TableHeaderItemCfg* getRowHeader(int _row) const;
+		void setRowHeader(uint32_t _row, const std::string& _headerText);
+		void setRowHeader(uint32_t _row, TableHeaderItemCfg* _item);
+		const TableHeaderItemCfg* getRowHeader(uint32_t _row) const;
 
-		void setColumnHeader(int _column, const std::string& _headerText);
-		void setColumnHeader(int _column, TableHeaderItemCfg* _item);
-		const TableHeaderItemCfg* getColumnHeader(int _column) const;
+		void setColumnHeader(uint32_t _column, const std::string& _headerText);
+		void setColumnHeader(uint32_t _column, TableHeaderItemCfg* _item);
+		const TableHeaderItemCfg* getColumnHeader(uint32_t _column) const;
 
 	private:
 		void initialize(void);
+		void initialize(uint32_t _rows, uint32_t _columns);
 
-		std::string m_name;
-		std::string m_title;
-
-		int m_rows;
-		int m_columns;
+		uint32_t m_rows;
+		uint32_t m_columns;
 
 		std::vector<TableHeaderItemCfg*> m_rowHeader;
 		std::vector<TableHeaderItemCfg*> m_columnHeader;

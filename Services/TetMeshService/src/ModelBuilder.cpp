@@ -332,7 +332,7 @@ void ModelBuilder::createAllShapes(BRepAlgoAPI_BuilderAlgo &booleanOperation, co
 
 EntityGeometry *ModelBuilder::createGeometryEntity(const std::string &name, TopoDS_Shape &shape, const ot::PropertyGridCfg& shapeProperties)
 {
-	EntityGeometry *entityGeom = new EntityGeometry(0, nullptr, nullptr, nullptr, nullptr, application->serviceName());
+	EntityGeometry *entityGeom = new EntityGeometry(0, nullptr, nullptr, nullptr, nullptr, application->getServiceName());
 
 	entityGeom->setName(name);
 	entityGeom->setEditable(true);

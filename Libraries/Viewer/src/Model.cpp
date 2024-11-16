@@ -30,15 +30,17 @@
 #include "SceneNodeCartesianMeshItem.h"
 #include "SceneNodePlot1D.h"
 #include "SceneNodePlot1DCurve.h"
-#include "SceneNodeTextItem.h"
-#include "SceneNodeTableItem.h"
 #include "SceneNodeVTK.h"
+#include "SceneNodeMultiVisualisation.h"
 
 #include "ManipulatorBase.h"
 #include "TransformManipulator.h"
 
 #include "DataBase.h"
 #include "PlotManager.h"
+
+#include "TextVisualiser.h"
+#include "TableVisualiser.h"
 
 bool operator==(const FaceSelection& left, const FaceSelection& right) 
 { 
@@ -690,51 +692,66 @@ void Model::addNodeFromFacetDataBase(const std::string &treeName, double surface
 	}
 }
 
-void Model::addSceneNodeText(const std::string& treeName, unsigned long long modelEntityID, const TreeIcon& treeIcons, bool editable)
+void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, const TreeIcon& _treeIcons, bool _editable, ot::VisualisationTypes _visualisationTypes)
 {
 	// Check whether we already have a container node
-	if (nameToSceneNodesMap.count(treeName) != 0)
+	auto existingSceneNode = nameToSceneNodesMap.find(_treeName);
+	if (existingSceneNode != nameToSceneNodesMap.end())
 	{
-		if (dynamic_cast<SceneNodeTextItem*>(nameToSceneNodesMap[treeName]) != nullptr) return;
+		if (dynamic_cast<SceneNodeMultiVisualisation*>(existingSceneNode->second) != nullptr) 
+		{
+			return;
+		}
 		assert(0); // This is not a container node -> overwrite
 	}
 
 	// Create the new container node
+	SceneNodeMultiVisualisation* sceneNode = new SceneNodeMultiVisualisation();
 
-	SceneNodeTextItem* textNode = new SceneNodeTextItem;
+	sceneNode->setName(_treeName);
+	sceneNode->setEditable(_editable);
+	sceneNode->setModelEntityID(_modelEntityID);
+	sceneNode->setTreeIcons(_treeIcons);
+	sceneNode->setModel(this);
+	
+	if (_visualisationTypes.visualiseAsTable())
+	{
+		auto textVis = new TextVisualiser(_modelEntityID);
+		sceneNode->addVisualiser(textVis);
+	}
 
-	textNode ->setName(treeName);
-	textNode ->setEditable(editable);
-	textNode ->setModelEntityID(modelEntityID);
-	textNode ->setTreeIcons(treeIcons);
-	textNode->setModel(this);
-	textNode->addVisualiserText();
+	if (_visualisationTypes.visualiseAsText())
+	{
+		auto tableVis = new TableVisualiser(_modelEntityID);
+		sceneNode->addVisualiser(tableVis);
+	}
 
 	// Get the parent scene node
-	SceneNodeBase* parentNode = getParentNode(treeName);
+	SceneNodeBase* parentNode = getParentNode(_treeName);
 	assert(parentNode != nullptr); // We assume that the parent node already exists
 
 	if (parentNode == nullptr)
 	{
 		// If the model is corrupt, this might happen. We deal with this by ignoring the current item
-		delete textNode;
+		delete sceneNode;
 		return;
 	}
 
 	// Now add the current node as child to the parent
-	parentNode->addChild(textNode);
+	parentNode->addChild(sceneNode);
 
 	// Now add the current nodes osg node to the parent's osg node
-	parentNode->getShapeNode()->addChild(textNode->getShapeNode());
+	parentNode->getShapeNode()->addChild(sceneNode->getShapeNode());
 
 	// Add the tree name to the tree
-	addSceneNodesToTree(textNode);
+	addSceneNodesToTree(sceneNode);
 
 	// Add the node to the maps for faster access
-	nameToSceneNodesMap[treeName] = textNode;
-	osgNodetoSceneNodesMap[textNode->getShapeNode()] = textNode;
-	treeItemToSceneNodesMap[textNode->getTreeItemID()] = textNode;
-	modelItemToSceneNodesMap[modelEntityID] = textNode;
+	nameToSceneNodesMap[_treeName] = sceneNode;
+	osgNodetoSceneNodesMap[sceneNode->getShapeNode()] = sceneNode;
+	treeItemToSceneNodesMap[sceneNode->getTreeItemID()] = sceneNode;
+	modelItemToSceneNodesMap[_modelEntityID] = sceneNode;
+
 }
 
 SceneNodeGeometry *Model::createNewGeometryNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, 
@@ -2977,75 +2994,12 @@ void Model::addVisualizationResult1DNode(const ot::Plot1DCurveInfoCfg& _curveInf
 	if (_isHidden) {
 		this->setItemVisibleState(curveNode, false);
 	}
-}
 
-void Model::addVisualizationTextNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long textEntityID, unsigned long long textEntityVersion)
-{
-	SceneNodeTextItem* textNode = new SceneNodeTextItem;
-
-	textNode->setName(treeName);
-	textNode->setModelEntityID(modelEntityID);
-	textNode->setTreeIcons(treeIcons);
-	textNode->addVisualiserText();
-
-	// Get the parent scene node
-	SceneNodeBase* parentNode = getParentNode(treeName);
-	assert(parentNode != nullptr); // We assume that the parent node already exists
-
-	// Now add the current node as child to the parent
-	parentNode->addChild(textNode);
-
-	// Add the tree name to the tree
-	addSceneNodesToTree(textNode);
-
-	// Add the node to the maps for faster access
-	nameToSceneNodesMap[treeName] = textNode;
-	treeItemToSceneNodesMap[textNode->getTreeItemID()] = textNode;
-	modelItemToSceneNodesMap[modelEntityID] = textNode;
-
-	textNode->setStorage(projectName);
-
-	textNode->setModel(this);
-
-	if (isHidden)
+	modelItemToSceneNodesMap[_curveInfo.getId()] = curveNode;
+		
+	if (_isHidden)
 	{
-		setItemVisibleState(textNode, false);
-	}
-}
-
-void Model::addVisualizationTableNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long tableEntityID, unsigned long long tableEntityVersion)
-{
-	SceneNodeTableItem *tableNode = new SceneNodeTableItem;
-
-	tableNode->setName(treeName);
-	tableNode->setModelEntityID(modelEntityID);
-
-	tableNode->setTableEntityID(tableEntityID);
-	tableNode->setTableEntityVersion(tableEntityVersion);
-	tableNode->setTreeIcons(treeIcons);
-
-	// Get the parent scene node
-	SceneNodeBase *parentNode = getParentNode(treeName);
-	assert(parentNode != nullptr); // We assume that the parent node already exists
-
-								   // Now add the current node as child to the parent
-	parentNode->addChild(tableNode);
-
-	// Add the tree name to the tree
-	addSceneNodesToTree(tableNode);
-
-	// Add the node to the maps for faster access
-	nameToSceneNodesMap[treeName] = tableNode;
-	treeItemToSceneNodesMap[tableNode->getTreeItemID()] = tableNode;
-	modelItemToSceneNodesMap[modelEntityID] = tableNode;
-
-	tableNode->setStorage(projectName);
-
-	tableNode->setModel(this);
-
-	if (isHidden)
-	{
-		setItemVisibleState(tableNode, false);
+		setItemVisibleState(curveNode, false);
 	}
 }
 
@@ -3058,7 +3012,7 @@ void Model::visualizationResult1DPropertiesChanged(ot::UID _entityID, ot::UID _v
 	}
 }
 
-bool Model::updateCurveEntityVersion(SceneNodeBase* _root, ot::UID _entityID, ot::UID _version)
+bool Model::updateCurveEntityVersion(SceneNodeBase * _root, ot::UID _entityID, ot::UID _version)
 {
 	SceneNodePlot1D *plot = dynamic_cast<SceneNodePlot1D*>(_root);
 	SceneNodePlot1DCurve* curve = dynamic_cast<SceneNodePlot1DCurve*>(_root);

@@ -1,13 +1,11 @@
 #pragma once
-#include "IVisualiser.h"
+#include "Visualiser.h"
 #include "OTCore/CoreTypes.h"
 #include <string>
 
-class TextVisualiser : public IVisualiser
+class TextVisualiser : public Visualiser
 {
 public:
-	TextVisualiser(ot::UID _modelEntityID) :m_modelEntityID(_modelEntityID) {}
+	TextVisualiser(ot::UID _modelEntityID) :Visualiser(_modelEntityID) {}
 	void visualise() override;
-private:
-	ot::UID m_modelEntityID;
 };

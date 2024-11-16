@@ -17,7 +17,7 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/EntityInformation.h"
-#include "OTServiceFoundation/TableRange.h"
+#include "OTGui/TableRange.h"
 #include "OTGui/OnePropertyDialogCfg.h"
 #include "OTGui/PropertyInt.h"
 #include "EntityFileCSV.h"
@@ -115,7 +115,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
 	_buttonImportPythonScript.SetDescription(pageName, groupNameImport, "Import Python Script");
-	_buttonCreateTable.SetDescription(pageName, groupNameTableHandling, "Turn into Table");
 	_buttonImportTouchstone.SetDescription(pageName, groupNameImport, "Import Touchstone");
 
 	_buttonTableDeleteRow.SetDescription(pageName, groupNameTableHandling, "Delete Row", "", subgroupNameTableHandlingRow);
@@ -140,7 +139,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_ui->addMenuButton(_buttonImportTouchstone, modelWrite, "regional-indicator-symbol-letter-s");
 	_ui->addMenuButton(_buttonImportPythonScript, modelWrite, "python");
-	_ui->addMenuButton(_buttonCreateTable, modelWrite, "TableVisible");
 	_ui->addMenuButton(_buttonCreateRMDEntry, modelWrite, "SelectionRMD");
 	_ui->addMenuButton(_buttonCreateMSMDEntry, modelWrite, "SelectionMSMD");
 	_ui->addMenuButton(_buttonCreateQuantityEntry, modelWrite, "SelectionQuantity");
@@ -168,7 +166,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 		m_uiComponent->setControlsEnabledState(enabled, disabled);
 	}
 
-	uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), false);
 	SetControlstateTableFunctions(false);
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
@@ -258,7 +255,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import Touchstone File", doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_FILE_Mask, ot::JsonString("Touchstone files (*.s*p)", doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("importTouchstoneData", doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_FILE_LoadContent,ot::JsonValue(true),doc.GetAllocator());
 
 				std::string tmp;
@@ -276,25 +273,11 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				std::list<std::string> takenNames = m_modelComponent->getListOfFolderItems(_scriptsFolder);
 				doc.AddMember(OT_ACTION_PARAM_FILE_TAKEN_NAMES, ot::JsonArray(takenNames, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_SENDER, ot::JsonString(OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("addFilesToModel", doc.GetAllocator()), doc.GetAllocator());
 
 				std::string tmp;
 				uiComponent()->sendMessage(true, doc, tmp);
-			}
-			else if (action == _buttonCreateTable.GetFullDescription())
-			{
-				std::list<ot::EntityInformation> selectedEntityInfos;
-				if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-				m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfos);
-				for (const auto& entityInfo : selectedEntityInfos)
-				{
-					const std::string& name = entityInfo.getName();
-					if (name.find(_dataSourcesFolder) != std::string::npos)
-					{
-						_tableHandler->AddTableView(entityInfo.getID(), entityInfo.getVersion());
-					}
-				}
 			}
 			else if (action == _buttonCreateRMDEntry.GetFullDescription())
 			{
@@ -501,7 +484,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				}
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)entityInfos.begin()->getVersion(), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)entityInfos.begin()->getID(), doc.GetAllocator());
@@ -543,7 +526,6 @@ void Application::HandleSelectionChanged()
 				break;
 			}
 		}
-		uiComponent()->setControlState(_buttonCreateTable.GetFullDescription(), showCreateTableBtn);
 		uiComponent()->sendUpdatedControlState();
 
 		if (m_selectedEntities.size() == 1)
@@ -557,7 +539,7 @@ void Application::HandleSelectionChanged()
 				}
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)selectedEntityInfo.begin()->getVersion(), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)selectedEntityInfo.begin()->getID(), doc.GetAllocator());
@@ -590,7 +572,7 @@ void Application::HandleSelectionChanged()
 				auto previewTable = _parametrizedDataHandler->GetPreview(*selectedEntityInfo.begin());
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, static_cast<uint64_t>(_visualizationModel), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, static_cast<uint64_t>(previewTable.second), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, static_cast<uint64_t>(previewTable.first), doc.GetAllocator());
@@ -692,7 +674,7 @@ void Application::RequestSelectedRanges()
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection, doc.GetAllocator()), doc.GetAllocator());
 
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, m_modelComponent->getCurrentVisualizationModelID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("CreateSelectedRangeEntity", doc.GetAllocator()), doc.GetAllocator());
 

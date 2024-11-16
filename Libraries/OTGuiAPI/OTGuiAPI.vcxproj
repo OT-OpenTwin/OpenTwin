@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTGuiAPI\FrontendActionHandler.h" />
-    <ClInclude Include="include\OTGuiAPI\FrontendAPI.h" />
+    <ClInclude Include="include\OTGuiAPI\Frontend.h" />
     <ClInclude Include="include\OTGuiAPI\GraphicsFlowItem.h" />
     <ClInclude Include="include\OTGuiAPI\GuiAPIManager.h" />
     <ClInclude Include="include\OTGuiAPI\OTGuiAPIAPIExport.h" />
@@ -28,7 +28,7 @@
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FrontendActionHandler.cpp" />
-    <ClCompile Include="src\FrontendAPI.cpp" />
+    <ClCompile Include="src\Frontend.cpp" />
     <ClCompile Include="src\GraphicsFlowItem.cpp" />
     <ClCompile Include="src\GuiAPIManager.cpp" />
   </ItemGroup>
@@ -114,6 +114,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(R_JSON_INCD);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(OT_GUIAPI_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(CURL_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -154,6 +155,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(OT_GUI_ROOT)\$(OT_INC);$(OT_GUIAPI_ROOT)\$(OT_INC);$(OT_COMMUNICATION_ROOT)\$(OT_INC);$(CURL_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

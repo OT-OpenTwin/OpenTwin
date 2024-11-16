@@ -16,6 +16,7 @@
 #include <osg/ref_ptr>
 #include <osg/Group>
 #include <osgUtil/IntersectionVisitor>
+#include "OTGui/VisualisationTypes.h"
 
 class Viewer;
 class SceneNodeGeometry;
@@ -156,7 +157,7 @@ public:
 								  bool reflective, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isHidden, 
 								  bool isEditable, const std::string &projectName, unsigned long long entityID, unsigned long long version,
 							      bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation);
-	void addSceneNodeText(const std::string& treeName, unsigned long long modelEntityID, const TreeIcon& treeIcons, bool editable);
+	void addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, const TreeIcon& _treeIcons, bool _editable, ot::VisualisationTypes _visualisationTypes);
 	
 	void addVisualizationContainerNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool editable);
 	void addVisualizationAnnotationNode(const std::string &treeName, unsigned long long modelEntityID, 
@@ -183,8 +184,6 @@ public:
 	void visualizationResult1DPropertiesChanged(ot::UID _entityID, ot::UID _version);
 	void visualizationPlot1DPropertiesChanged(const ot::Plot1DCfg& _config);
 
-	void addVisualizationTextNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long textEntityID, unsigned long long textEntityVersion);
-	void addVisualizationTableNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long tableEntityID, unsigned long long tableEntityVersion);
 	void addVTKNode(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
 	void updateVTKNode(unsigned long long modelEntityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
 

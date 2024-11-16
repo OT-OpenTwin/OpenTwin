@@ -95,7 +95,7 @@ std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& 
 
 	// Check if a local directory service under the given url is already registered
 	for (auto lds : m_localDirectoryServices) {
-		if (lds->serviceURL() == ServiceURL) {
+		if (lds->getServiceURL() == ServiceURL) {
 			// ##### MUTEX #####
 			m_mutex.unlock();
 			OT_LOG_E("LDS connected: A LocalDirectoryService under the given URL is already registered");
@@ -115,7 +115,7 @@ std::string Application::handleLocalDirectoryServiceConnected(ot::JsonDocument& 
 
 	// Create response
 	ot::JsonDocument responseDoc;
-	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, newLds->serviceID(), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, newLds->getServiceID(), responseDoc.GetAllocator());
 
 	if (m_logModeManager.getGlobalLogFlagsSet()) {
 		ot::JsonArray flagsArr;
@@ -262,7 +262,7 @@ std::string Application::handleUpdateSystemLoad(ot::JsonDocument& _jsonDocument)
 
 	LocalDirectoryService * lds = nullptr;
 	for (LocalDirectoryService * l : m_localDirectoryServices) {
-		if (l->serviceID() == id) { lds = l; break; }
+		if (l->getServiceID() == id) { lds = l; break; }
 	}
 
 	if (lds == nullptr) return OT_ACTION_RETURN_INDICATOR_Error "Unknown Local Directory Service ID";
@@ -292,7 +292,7 @@ std::string Application::handleGetSystemInformation(ot::JsonDocument& _doc) {
 		ot::JsonValue info;
 		info.SetObject();
 
-		info.AddMember(OT_ACTION_PARAM_LDS_URL, ot::JsonString(service->serviceURL(), reply.GetAllocator()), reply.GetAllocator());
+		info.AddMember(OT_ACTION_PARAM_LDS_URL, ot::JsonString(service->getServiceURL(), reply.GetAllocator()), reply.GetAllocator());
 
 		servicesInfo.PushBack(info, reply.GetAllocator());
 	}
@@ -318,8 +318,8 @@ std::string Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 	std::string json = doc.toJson();
 	for (LocalDirectoryService* lds : m_localDirectoryServices) {
 		std::string response;
-		if (!ot::msg::send("", lds->serviceURL(), ot::EXECUTE, json, response)) {
-			OT_LOG_EAS("Failed to send message to LSS at \"" + lds->serviceURL() + "\"");
+		if (!ot::msg::send("", lds->getServiceURL(), ot::EXECUTE, json, response)) {
+			OT_LOG_EAS("Failed to send message to LSS at \"" + lds->getServiceURL() + "\"");
 		}
 	}
 

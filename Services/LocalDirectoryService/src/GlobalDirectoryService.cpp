@@ -44,13 +44,13 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 	
 	ot::JsonDocument registerDoc;
 	registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewLocalDirecotoryService, registerDoc.GetAllocator()), registerDoc.GetAllocator());
-	registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(LDS_APP->serviceURL(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
+	registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(LDS_APP->getServiceURL(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
 	registerDoc.AddMember(OT_ACTION_PARAM_SUPPORTED_SERVICES, ot::JsonArray(LDS_APP->supportedServices(), registerDoc.GetAllocator()), registerDoc.GetAllocator());
 	addSystemValues(registerDoc);
 
 	// Send request and check if the request was successful
 	std::string response;
-	if (!ot::msg::send(LDS_APP->serviceURL(), m_serviceURL, ot::EXECUTE, registerDoc.toJson(), response)) {
+	if (!ot::msg::send(LDS_APP->getServiceURL(), m_serviceURL, ot::EXECUTE, registerDoc.toJson(), response)) {
 		OT_LOG_E("Failed to send register request to global directory service");
 		return;
 	}
@@ -89,12 +89,12 @@ void GlobalDirectoryService::healthCheck(void) {
 
 		ot::JsonDocument systemStatusDoc;
 		systemStatusDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateSystemLoad, systemStatusDoc.GetAllocator()), systemStatusDoc.GetAllocator());
-		systemStatusDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, LDS_APP->serviceID(), systemStatusDoc.GetAllocator());
+		systemStatusDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, LDS_APP->getServiceID(), systemStatusDoc.GetAllocator());
 		
 		addSystemValues(systemStatusDoc);
 
 		std::string response;
-		if (!ot::msg::send(LDS_APP->serviceURL(), m_serviceURL, ot::EXECUTE, systemStatusDoc.toJson(), response)) {
+		if (!ot::msg::send(LDS_APP->getServiceURL(), m_serviceURL, ot::EXECUTE, systemStatusDoc.toJson(), response)) {
 			OT_LOG_E("Failed to send updated system load to global directory service");
 			LDS_APP->globalDirectoryServiceCrashed();
 			return;

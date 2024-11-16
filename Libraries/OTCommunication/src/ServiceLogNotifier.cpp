@@ -66,8 +66,9 @@ void ot::ServiceLogNotifier::log(const LogMessage& _message) {
 
 	try {
 		// Write log message to logger service
-		if (!ot::msg::send("", m_loggingServiceURL, ot::EXECUTE, doc.toJson(), response, 3000, false, false)) {
-			//assert(0);
+		if (!ot::msg::send("", m_loggingServiceURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, 3000, false, false)) {
+			OTAssert(0, "Failed to send log message");
+			m_loggingServiceURL.clear();
 		}
 	}
 

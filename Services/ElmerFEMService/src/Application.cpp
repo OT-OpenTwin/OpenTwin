@@ -238,7 +238,7 @@ void Application::addSolver(void)
 	m_modelComponent->getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
 	// Create the new solver item and store it in the data base
-	EntitySolverElmerFEM*solverEntity = new EntitySolverElmerFEM(entityID, nullptr, nullptr, nullptr, nullptr, serviceName());
+	EntitySolverElmerFEM*solverEntity = new EntitySolverElmerFEM(entityID, nullptr, nullptr, nullptr, nullptr, getServiceName());
 	solverEntity->setName(solverName);
 	solverEntity->setEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);
@@ -415,7 +415,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 	modelComponent()->clearNewEntityList();
 
 	std::string logFileText;
-	std::string output = elmerFEMSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->serviceURL(),
+	std::string output = elmerFEMSolver.startSolver(logFileText, DataBase::GetDataBase()->getDataBaseServerURL(), m_uiComponent->getServiceURL(),
 												    DataBase::GetDataBase()->getProjectName(), solverEntity, getServiceIDAsInt(), getSessionCount(), m_modelComponent);
 	m_uiComponent->displayMessage(output + "\n");
 

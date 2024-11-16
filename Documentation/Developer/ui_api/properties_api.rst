@@ -1,5 +1,5 @@
-Properties
-===========
+Properties API
+==============
 
 Concept
 -------

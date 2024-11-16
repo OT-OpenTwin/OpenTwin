@@ -53,7 +53,7 @@ bool LocalDirectoryService::requestToRunService(const ServiceStartupInformation&
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.sessionInformation().id(), doc.GetAllocator()), doc.GetAllocator());
 	
 	std::string response;
-	if (!ot::msg::send(Application::instance()->serviceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response)) return false;
+	if (!ot::msg::send(Application::instance()->getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response)) return false;
 	bool success = (response == OT_ACTION_RETURN_VALUE_OK);
 	if (success) {
 		m_services.push_back(std::pair<SessionInformation, ServiceInformation>(
@@ -69,7 +69,7 @@ bool LocalDirectoryService::requestToRunRelayService(const ServiceStartupInforma
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_serviceInfo.sessionInformation().id(), doc.GetAllocator()), doc.GetAllocator());
 	
 	std::string response;
-	if (!ot::msg::send(Application::instance()->serviceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response)) return false;
+	if (!ot::msg::send(Application::instance()->getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response)) return false;
 	OT_ACTION_IF_RESPONSE_ERROR(response) return false;
 	OT_ACTION_IF_RESPONSE_WARNING(response) return false;
 
@@ -109,7 +109,7 @@ void LocalDirectoryService::sessionClosed(const SessionInformation& _session) {
 
 					// Send message and check response
 					std::string response;
-					if (!ot::msg::send(Application::instance()->serviceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response)) {
+					if (!ot::msg::send(Application::instance()->getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response)) {
 						OT_LOG_E("Failed to send session closed notification to LDS at " + m_serviceURL);
 					}
 					else if (response != OT_ACTION_RETURN_VALUE_OK) {
@@ -152,7 +152,7 @@ void LocalDirectoryService::serviceClosed(const SessionInformation& _session, co
 
 					// Send message and check response
 					std::string response;
-					if (!ot::msg::send(Application::instance()->serviceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response)) {
+					if (!ot::msg::send(Application::instance()->getServiceURL(), m_serviceURL, ot::EXECUTE, doc.toJson(), response)) {
 						OT_LOG_E("Failed to send service closed notification to LDS at " + m_serviceURL);
 					}
 					else if (response != OT_ACTION_RETURN_VALUE_OK) {

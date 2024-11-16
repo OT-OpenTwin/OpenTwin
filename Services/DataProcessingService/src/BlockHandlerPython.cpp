@@ -11,7 +11,7 @@ BlockHandlerPython::BlockHandlerPython(EntityBlockPython* blockEntity, const Han
     : BlockHandler(blockEntity, handlerMap)
 {
       ot::ServiceBase* pythonService = Application::instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE);
-      const std::string pythonServiceURL = pythonService->serviceURL();
+      const std::string pythonServiceURL = pythonService->getServiceURL();
       _pythonServiceInterface = new ot::PythonServiceInterface(pythonServiceURL);
 
       auto allConnectorsByName = blockEntity->getAllConnectorsByName();

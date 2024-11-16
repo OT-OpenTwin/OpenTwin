@@ -3,10 +3,11 @@
 
 #include "EntityContainer.h"
 #include "Types.h"
+#include "IVisualisationText.h"
 
 class EntityResultTextData;
 
-class __declspec(dllexport) EntityResultText : public EntityContainer
+class __declspec(dllexport) EntityResultText : public EntityContainer, public IVisualisationText
 {
 public:
 	EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
@@ -38,8 +39,12 @@ public:
 	long long getTextDataStorageId(void) { return textDataStorageId; }
 	long long getTextDataStorageVersion(void) { return textDataStorageVersion; }
 
-	void setText(const std::string &text);
-	std::string &getText(void);
+	// Inherited via IVisualisationText
+	void setText(const std::string &text) override;
+	std::string getText() override;
+	bool visualiseText() override;
+	ot::TextEditorCfg createConfig() override;
+	ot::ContentChangedHandling getTextContentChangedHandling() override;
 
 private:
 	void EnsureTextDataLoaded(void);
@@ -51,6 +56,8 @@ private:
 	EntityResultTextData *textData;
 	long long textDataStorageId;
 	long long textDataStorageVersion;
+	ot::ContentChangedHandling m_contentChangedHandling = ot::ContentChangedHandling::ModelServiceSaves;
+
 };
 
 

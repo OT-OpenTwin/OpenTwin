@@ -1,3 +1,8 @@
+//! \file AppBase.cpp
+//! \author Alexander Kuester (alexk95)
+//! \date January 2021
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #include "AppBase.h"
 
 #include "OTCommunication/Msg.h"
@@ -53,36 +58,9 @@ AppBase& AppBase::instance(void) {
 	return g_instance;
 }
 
-std::string AppBase::dispatchAction(const std::string& _action, ot::JsonDocument& _jsonDocument) {
-	if (_action == OT_ACTION_CMD_Log) return handleLog(_jsonDocument);
-	else if (_action == OT_ACTION_CMD_Ping) return OT_ACTION_CMD_Ping;
-	else if (_action == OT_ACTION_CMD_RegisterNewService) return handleRegister(_jsonDocument);
-	else if (_action == OT_ACTION_CMD_RemoveService) return handleDeregister(_jsonDocument);
-	else if (_action == OT_ACTION_CMD_Reset) return handleClear();
-	else if (_action == OT_ACTION_CMD_GetDebugInformation) return handleGetDebugInfo();
-	else if (_action == OT_ACTION_CMD_ServiceShutdown) exit(0);
-	else if (_action == OT_ACTION_CMD_ServiceEmergencyShutdown) exit(-100);
-	else return OT_ACTION_RETURN_UnknownAction;
-}
+// ###########################################################################################################################################################################################################################################################################################################################
 
-std::string AppBase::handleGetDebugInfo(void) {
-	ot::JsonDocument doc;
-	doc.AddMember("MessageCount", m_count, doc.GetAllocator());
-
-	m_receiverMutex.lock();
-	doc.AddMember("Receivers", ot::JsonArray(m_receiver, doc.GetAllocator()), doc.GetAllocator());
-	m_receiverMutex.unlock();
-
-	return doc.toJson();
-}
-
-std::string AppBase::handleClear(void) {
-	m_messages.clear();
-	m_count = 0;
-	m_receiver.clear();
-
-	return OT_ACTION_RETURN_VALUE_OK;
-}
+// Action handler
 
 std::string AppBase::handleLog(ot::JsonDocument& _jsonDocument) {
 	ot::ConstJsonObject obj = ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_LOG);
@@ -95,7 +73,7 @@ std::string AppBase::handleLog(ot::JsonDocument& _jsonDocument) {
 		intern::replacePasswords(newText);
 		msg.setText(newText);
 	}
-	
+
 	msg.setCurrentTimeAsGlobalSystemTime();
 
 	m_messages.push_back(msg);
@@ -147,6 +125,29 @@ std::string AppBase::handleDeregister(ot::JsonDocument& _jsonDocument) {
 	m_receiverMutex.unlock();
 	return ret;
 }
+
+std::string AppBase::handleClear(ot::JsonDocument& _jsonDocument) {
+	m_messages.clear();
+	m_count = 0;
+	m_receiver.clear();
+
+	return OT_ACTION_RETURN_VALUE_OK;
+}
+
+std::string AppBase::handleGetDebugInfo(ot::JsonDocument& _jsonDocument) {
+	ot::JsonDocument doc;
+	doc.AddMember("MessageCount", m_count, doc.GetAllocator());
+
+	m_receiverMutex.lock();
+	doc.AddMember("Receivers", ot::JsonArray(m_receiver, doc.GetAllocator()), doc.GetAllocator());
+	m_receiverMutex.unlock();
+
+	return doc.toJson();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper
 
 void AppBase::notifyListeners(const ot::LogMessage& _message) {
 	ot::JsonDocument doc;
@@ -203,6 +204,8 @@ void AppBase::removeReceiver(const std::string& _receiver) {
 	m_receiverMutex.unlock();
 }
 
-AppBase::AppBase() : m_count(0) {}
+AppBase::AppBase() 
+	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_LOGGER, OT_INFO_SERVICE_TYPE_LOGGER), m_count(0)
+{}
 
 AppBase::~AppBase() {}

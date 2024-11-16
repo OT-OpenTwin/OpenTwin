@@ -9,8 +9,9 @@
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/Plot1DDataBaseCfg.h"
+#include "OTGui/VisualisationTypes.h"
 #include "OTServiceFoundation/ContextMenu.h"
-#include "OTServiceFoundation/TableRange.h"
+#include "OTGui/TableRange.h"
 
 #include <list>
 #include <vector>
@@ -121,7 +122,8 @@ namespace ViewerAPI
 													       bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long entityVersion);
 
 	__declspec(dllexport) void addVisualizationContainerNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool editable);
-	__declspec(dllexport) void addVisualizationNodeText(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool editable);
+	
+	__declspec(dllexport) void addVisualizationNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool editable, ot::VisualisationTypes _visualisationTypes);
 	__declspec(dllexport) void addVTKNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
 	__declspec(dllexport) void updateVTKNode(ot::UID osgModelID, unsigned long long modelEntityID, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion);
 
@@ -150,10 +152,6 @@ namespace ViewerAPI
 
 	__declspec(dllexport) void visualizationResult1DPropertiesChanged(ot::UID _osgModelID, ot::UID _entityID, ot::UID _version);
 	__declspec(dllexport) void visualizationPlot1DPropertiesChanged(ot::UID osgModelID, const ot::Plot1DCfg& _config);
-	__declspec(dllexport) void addVisualizationTextNode(ot::UID osgModelID, const std::string &name, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName,
-														ot::UID textEntityID, ot::UID textEntityVersion);
-	__declspec(dllexport) void addVisualizationTableNode(ot::UID osgModelID, const std::string &name, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName,
-														ot::UID tableEntityID, ot::UID tableEntityVersion);
 
 	__declspec(dllexport) void setEntityName(ot::UID modelEntityID, const std::string &newName);
 	__declspec(dllexport) void renameEntityPath(const std::string &oldPath, const std::string &newPath);

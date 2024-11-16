@@ -21,7 +21,6 @@ public:
 	void createProperties(HeaderOrientation defaultOrientation);
 	std::string getSelectedHeaderOrientationString();
 	HeaderOrientation getSelectedHeaderOrientation();
-	char getSelectedDecimalSeparator();
 	static std::string GetHeaderOrientation(HeaderOrientation orientation);
 
 private:

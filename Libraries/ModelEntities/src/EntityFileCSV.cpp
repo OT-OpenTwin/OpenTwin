@@ -1,6 +1,10 @@
 #include "EntityFileCSV.h"
 
+#include "CSVToTableTransformer.h"
 #include "OTCommunication/ActionTypes.h"
+#include "CSVProperties.h"
+#include <string>
+
 
 EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 : EntityFileText(ID,parent,obs,ms,factory,owner){}
@@ -8,36 +12,98 @@ EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * o
 std::string EntityFileCSV::getRowDelimiter()
 {
 	auto rowDelim = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Row Delimiter"));
-	_rowDelimiter = rowDelim->getValue();
-	return _rowDelimiter;
+	m_rowDelimiter = rowDelim->getValue();
+	return m_rowDelimiter;
 }
 
 std::string EntityFileCSV::getColumnDelimiter()
 {
 	auto delim = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Column Delimiter"));
-	_columnDelimiter = delim->getValue();
-	return _columnDelimiter;
+	m_columnDelimiter = delim->getValue();
+	return m_columnDelimiter;
+}
+
+ot::TableHeaderOrientation EntityFileCSV::getHeaderOrientation()
+{
+	auto selectedOrientation = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Header position"));
+	if (selectedOrientation->getValue() == m_headerSettingHorizontal)
+	{
+		return ot::TableHeaderOrientation::horizontal;
+	}
+	else
+	{
+		return ot::TableHeaderOrientation::vertical;
+	}
+}
+
+std::string EntityFileCSV::getHeaderOrientation(ot::TableHeaderOrientation _orientation)
+{
+	auto orientationString = m_orientationToString.find(_orientation);
+	assert(orientationString != m_orientationToString.end());
+	return orientationString->second; 
 }
 
 void EntityFileCSV::setSpecializedProperties()
 {
 	EntityFileText::setSpecializedProperties();
-	EntityPropertiesString::createProperty("CSV Properties", "Row Delimiter", _rowDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
-	EntityPropertiesString::createProperty("CSV Properties", "Column Delimiter", _columnDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
+	EntityPropertiesString::createProperty("CSV Properties", "Row Delimiter", m_rowDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
+	EntityPropertiesString::createProperty("CSV Properties", "Column Delimiter", m_columnDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
+	EntityPropertiesSelection::createProperty("Table header", "Header position", { m_headerSettingHorizontal,m_headerSettingVertical }, m_headerSettingHorizontal, "tableInformation", getProperties());
 }
 
 void EntityFileCSV::AddStorageData(bsoncxx::builder::basic::document & storage)
 {
 	EntityFile::AddStorageData(storage);
 	storage.append(
-		bsoncxx::builder::basic::kvp("RowDelimiter",_rowDelimiter),
-		bsoncxx::builder::basic::kvp("ColumnDelimiter",_columnDelimiter)
+		bsoncxx::builder::basic::kvp("RowDelimiter",m_rowDelimiter),
+		bsoncxx::builder::basic::kvp("ColumnDelimiter",m_columnDelimiter)
 	);
 }
 
 void EntityFileCSV::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityFile::readSpecificDataFromDataBase(doc_view, entityMap);
-	_rowDelimiter =std::string(doc_view["RowDelimiter"].get_utf8().value.data());
-	_columnDelimiter = std::string(doc_view["ColumnDelimiter"].get_utf8().value.data());
+	m_rowDelimiter =std::string(doc_view["RowDelimiter"].get_utf8().value.data());
+	m_columnDelimiter = std::string(doc_view["ColumnDelimiter"].get_utf8().value.data());
+}
+
+
+const ot::GenericDataStructMatrix EntityFileCSV::getTable()
+{
+	CSVProperties properties;
+
+	properties.m_rowDelimiter = getRowDelimiter();
+	properties.m_columnDelimiter = getColumnDelimiter();
+	properties.m_decimalDelimiter = getSelectedDecimalSeparator();
+	const std::string text = getText();
+
+	CSVToTableTransformer transformer;
+	ot::GenericDataStructMatrix matrix = transformer(text, properties);
+	
+	return matrix;
+}
+
+void EntityFileCSV::setTable(const ot::GenericDataStructMatrix& _table)
+{
+
+}
+
+ot::TableCfg EntityFileCSV::getTableConfig()
+{
+	ot::GenericDataStructMatrix matrix = getTable();
+	ot::TableHeaderOrientation headerOrientation =	getHeaderOrientation();
+	ot::TableCfg tableCfg(matrix, headerOrientation);
+	tableCfg.setName(getName());
+	tableCfg.setTitle(getName());
+	return tableCfg;
+}
+
+bool EntityFileCSV::visualiseTable()
+{
+	return true;
+}
+
+ot::ContentChangedHandling EntityFileCSV::getTableContentChangedHandling()
+{
+	return m_tableContentChangedHandling;
 }

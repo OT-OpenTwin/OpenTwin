@@ -6,11 +6,17 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Color.h"
 #include "OTGui/TableCfg.h"
+#include "OTGui/TableRange.h"
+#include "OTGui/EntityViewBaseInfo.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtWidgets/qtablewidget.h>
+
+// std header
+#include <vector>
 
 namespace ot {
 
@@ -32,11 +38,20 @@ namespace ot {
 		void setContentChanged(bool _changed = true);
 		bool getContentChanged(void) const { return m_contentChanged; };
 
-		void setTableName(const std::string& _name) { m_tableName = _name; };
-		const std::string& getTableName(void) const { return m_tableName; };
+		void setTableName(const std::string& _name);
+		const std::string& getTableName(void) const;
 
-		void setTableTitle(const QString& _title) { m_tableTitle = _title; };
-		const QString& getTableTitle(void) const { return m_tableTitle; };
+		void setTableTitle(const std::string& _title);
+		const std::string& getTableTitle(void) const;
+
+		void setTableEntityId(UID _id);
+		UID getTableEntityId(void) const;
+
+		void setTableEntityVersion(UID _version);
+		UID getTableEntityVersion(void) const;
+
+		void setSelectedCellsBackground(const ot::Color& _color);
+		void setSelectedCellsBackground(const QColor& _color);
 
 	Q_SIGNALS:
 		void saveRequested(void);
@@ -57,9 +72,7 @@ namespace ot {
 		void ini(void);
 
 		bool m_contentChanged;
-		std::string m_tableName;
-		QString m_tableTitle;
-
+		EntityViewBaseInfo m_tableInfo;
 	};
 
 }

@@ -292,8 +292,6 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 	_modelComponent->getEntityInformation(_scriptFolder, entityInfo);
 	_scriptFolderUID = entityInfo.getID();
 	
-	const char selectedSeparator = tableEntPtr->getSelectedDecimalSeparator();
-	LocaleSettingsSwitch decimalSeparatorSetting(selectedSeparator);
 	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr->getTableData().get(), ranges);
 
 	for (auto categoryEntity : _activeCollectionEntities)
@@ -315,14 +313,14 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 				tableRange->createProperties(_scriptFolder, _scriptFolderUID, "", -1,dataType);
 			}
 			
-			tableRange->SetRange(ranges[i].GetTopRow(), ranges[i].GetBottomRow(), ranges[i].GetLeftColumn(), ranges[i].GetRightColumn());
+			tableRange->SetRange(ranges[i].getTopRow(), ranges[i].getBottomRow(), ranges[i].getLeftColumn(), ranges[i].getRightColumn());
 			tableRange->SetTableProperties(tableEntPtr->getName(), tableEntPtr->getEntityID(), tableEntPtr->getSelectedHeaderOrientationString());
 			tableRange->setEditable(true);
 			std::string name = "";
 
 			if (tableRange->getTableOrientation() == EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
 			{
-				for (int32_t column = ranges[i].GetLeftColumn(); column <= ranges[i].GetRightColumn(); column++)
+				for (int32_t column = ranges[i].getLeftColumn(); column <= ranges[i].getRightColumn(); column++)
 				{
 					if (name == "")
 					{
@@ -337,7 +335,7 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 			}
 			else
 			{
-				for (int32_t row = ranges[i].GetTopRow(); row <= ranges[i].GetBottomRow(); row++)
+				for (int32_t row = ranges[i].getTopRow(); row <= ranges[i].getBottomRow(); row++)
 				{
 					if (name == "")
 					{
@@ -533,11 +531,11 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(Entity
 	auto rangeIt = _selectedRanges.begin();
 	while (!stringDetected && rangeIt != _selectedRanges.end())
 	{
-		int row = rangeIt->GetTopRow();
-		while(!stringDetected && row <= rangeIt->GetBottomRow())
+		int row = rangeIt->getTopRow();
+		while(!stringDetected && row <= rangeIt->getBottomRow())
 		{
-			int column = rangeIt->GetLeftColumn();
-			while(!stringDetected && column <= rangeIt->GetRightColumn())
+			int column = rangeIt->getLeftColumn();
+			while(!stringDetected && column <= rangeIt->getRightColumn())
 			{
 				std::string value = _tableData->getValue(row, column);
 				if (value != "")
@@ -758,7 +756,7 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 	if (_pythonInterface == nullptr)
 	{
 		auto pythonService = Application::instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE);
-		_pythonInterface = new ot::PythonServiceInterface(pythonService->serviceURL());
+		_pythonInterface = new ot::PythonServiceInterface(pythonService->getServiceURL());
 	}
 	auto pythonScriptName = pythonScriptNames.begin();
 	for (auto newSelectionEntityName = newSelectionEntityNames.begin(); newSelectionEntityName != newSelectionEntityNames.end(); newSelectionEntityName++)
@@ -911,7 +909,7 @@ void DataCategorizationHandler::RequestRangesSelection(std::vector<ot::TableRang
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges, doc.GetAllocator()), doc.GetAllocator());
 
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _modelComponent->getCurrentVisualizationModelID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonArray vectOfRanges;
 	for (auto range : ranges)
@@ -952,7 +950,7 @@ void DataCategorizationHandler::RequestColouringRanges(ot::Color colour)
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection, doc.GetAllocator()), doc.GetAllocator());
 
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _modelComponent->getCurrentVisualizationModelID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SENDER_URL,ot::JsonString(Application::instance()->serviceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL,ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonObject obj;
 	colour.addToJsonObject(obj, doc.GetAllocator());

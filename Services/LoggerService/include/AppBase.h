@@ -1,24 +1,43 @@
+//! \file AppBase.h
+//! \author Alexander Kuester (alexk95)
+//! \date January 2021
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
+// OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
+#include "OTCore/ServiceBase.h"
+#include "OTCore/OTClassHelper.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ActionHandleConnector.h"
 
+// std header
 #include <mutex>
 #include <string>
 #include <list>
 
-class AppBase {
+class AppBase : public ot::ServiceBase, public ot::ActionHandler {
+	OT_DECL_NOCOPY(AppBase)
 public:
 	static AppBase& instance(void);
 
-	std::string dispatchAction(const std::string& _action, ot::JsonDocument& _jsonDocument);
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Action handler
+
+	OT_HANDLER(handleLog, AppBase, OT_ACTION_CMD_Log, ot::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleRegister, AppBase, OT_ACTION_CMD_RegisterNewService, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleDeregister, AppBase, OT_ACTION_CMD_RemoveService, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleClear, AppBase, OT_ACTION_CMD_Reset, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetDebugInfo, AppBase, OT_ACTION_CMD_GetDebugInformation, ot::SECURE_MESSAGE_TYPES)
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Private: Helper
 
 private:
-	std::string handleGetDebugInfo(void);
-	std::string handleClear(void);
-	std::string handleLog(ot::JsonDocument& _jsonDocument);
-	std::string handleRegister(ot::JsonDocument& _jsonDocument);
-	std::string handleDeregister(ot::JsonDocument& _jsonDocument);
 	void notifyListeners(const ot::LogMessage& _message);
 
 	void workerNotify(std::list<std::string> _receiver, std::string _message);

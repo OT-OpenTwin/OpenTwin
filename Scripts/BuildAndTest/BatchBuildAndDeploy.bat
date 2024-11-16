@@ -49,14 +49,7 @@ REM Check the build results
 REM ===================================================================
 
 @echo off
-findstr /c:"1 failed" < buildLog_Summary.txt
-if %errorlevel%==0 (
-ECHO ===================================================================
-ECHO ERROR: Build failed
-ECHO ===================================================================
-exit /b 1
-)
-findstr /c:"2 failed" < buildLog_Summary.txt
+findstr /c:"Build failed" < buildLog_Summary.txt
 if %errorlevel%==0 (
 ECHO ===================================================================
 ECHO ERROR: Build failed

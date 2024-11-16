@@ -1,5 +1,5 @@
-Text Editor
-===========
+Text Editor API
+===============
 
 Create Editor
 ^^^^^^^^^^^^^

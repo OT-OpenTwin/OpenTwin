@@ -2,6 +2,7 @@
 #include "EntityFile.h"
 #include "OTCore/JSON.h"
 #include "OTCommunication/ActionTypes.h"
+#include "VisualisationTypeSerialiser.h"
 
 // std header
 #include <fstream>
@@ -33,24 +34,23 @@ bool EntityFile::updateFromProperties(void)
 
 void EntityFile::addVisualizationNodes(void)
 {
-	if (!getName().empty())
-	{
-		TreeIcon treeIcons;
-		treeIcons.size = 32;
-		treeIcons.visibleIcon = "TextVisible";
-		treeIcons.hiddenIcon = "TextHidden";
+	TreeIcon treeIcons;
+	treeIcons.size = 32;
+	treeIcons.visibleIcon = "TextVisible";
+	treeIcons.hiddenIcon = "TextHidden";
 
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
-		
-		treeIcons.addToJsonDoc(doc);
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
 
-		getObserver()->sendMessageToViewer(doc);
-	}
-	EntityBase::addVisualizationNodes();
+	VisualisationTypeSerialiser visualisationTypeSerialiser;
+	visualisationTypeSerialiser(this, doc, doc.GetAllocator());
+
+	treeIcons.addToJsonDoc(doc);
+
+	getObserver()->sendMessageToViewer(doc);
 }
 
 void EntityFile::setFileProperties(const std::string& _path, const std::string& _fileName, const std::string& _fileType)

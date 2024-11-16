@@ -1,29 +1,20 @@
-/*
- * dllmain.cpp
- *
- *  Created on: January 11, 2021
- *	Author: Alexander Kuester
- *  Copyright (c) 2020 openTwin
- */
+//! \file dllmain.cpp
+//! \author Alexander Kuester (alexk95)
+//! \date January 2021
+// ###########################################################################################################################################################################################################################################################################################################################
 
+// OpenTwin header
 #include "AppBase.h"
-
-// C++ header
-#include <Windows.h>
-#include <string>
-
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
+#include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
-#include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionDispatcher.h"
 
-// SessionService header
-
-#ifdef _DEBUG
-#include <iostream>
-#endif // _DEBUG
-
+// std header
+#include <Windows.h>
+#include <string>
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -41,55 +32,91 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     return TRUE;
 }
 
-// #####################################################################################################################################
-
-// Microservice Calls
-
-static std::string globalServiceURL;
-
-std::string dispatchAction(const char * _json, const char * _senderIP) {
-	try {
-		ot::JsonDocument actionDoc;
-		actionDoc.fromJson(_json);
-		if (actionDoc.IsObject()) {
-
-			std::string action = ot::json::getString(actionDoc, OT_ACTION_MEMBER);
-
-			return AppBase::instance().dispatchAction(action, actionDoc);
+namespace ot {
+	namespace intern {
+		
+		//! \brief Creates a C-String copy of the provided C++ String
+		char* getCStringCopy(const std::string& _string) {
+			char* retval = new char[_string.length() + 1];
+			strcpy_s(retval, _string.length() + 1, _string.c_str());
+			return retval;
 		}
-		else {
-			return OT_ACTION_RETURN_INDICATOR_Error "Ivalid action format";
+
+		std::string dispatchActionWrapper(const char* _json, ot::MessageType _messageType) {
+			try {
+				ot::JsonDocument actionDoc;
+				actionDoc.fromJson(_json);
+				if (actionDoc.IsObject()) {
+
+					std::string action = ot::json::getString(actionDoc, OT_ACTION_MEMBER);
+
+					// Messages that can be processed directly
+					if (action == OT_ACTION_CMD_Ping) {
+						return OT_ACTION_CMD_Ping;
+					}
+					else if (action == OT_ACTION_CMD_ServiceShutdown) {
+						exit(0);
+					}
+					else if (action == OT_ACTION_CMD_ServiceEmergencyShutdown) {
+						exit(-100);
+					}
+					else {
+						bool handlerFound = false;
+						std::string result = ot::ActionDispatcher::instance().dispatch(action, actionDoc, handlerFound, _messageType);
+						if (handlerFound) {
+							return result;
+						}
+						else {
+							return OT_ACTION_RETURN_UnknownAction;
+						}
+					}
+					
+				}
+				else {
+					return OT_ACTION_RETURN_INDICATOR_Error "Ivalid action format";
+				}
+			}
+			catch (const std::exception& _e) {
+				return OT_ACTION_RETURN_INDICATOR_Error + std::string(_e.what());
+			}
+			catch (...) {
+				return OT_ACTION_RETURN_UnknownError;
+			}
 		}
-	}
-	catch (const std::exception& _e) {
-		return OT_ACTION_RETURN_INDICATOR_Error + std::string(_e.what());
-	}
-	catch (...) {
-		return OT_ACTION_RETURN_UnknownError;
+
+		char* dispatchAction(const char* _json, ot::MessageType _messageType) {
+			return getCStringCopy(dispatchActionWrapper(_json, _messageType));
+		}
 	}
 }
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Microservice Calls
 
 extern "C"
 {
 	_declspec(dllexport) int init(const char * _unused1, const char * _serviceURL, const char * _unused2, const char * _unused3)
 	{
 		try {
-			if (_serviceURL == nullptr) { return -1; }
+			if (_serviceURL == nullptr) {
+				return -1;
+			}
 
-			globalServiceURL = _serviceURL;
-			
 #ifdef _DEBUG
 			ot::LogDispatcher::initialize(OT_INFO_SERVICE_TYPE_LOGGER, true);
 			ot::LogDispatcher::instance().setLogFlags(ot::INFORMATION_LOG | ot::DETAILED_LOG | ot::WARNING_LOG | ot::ERROR_LOG);
-			OT_LOG_D("LoggerService starting");
 #else
 			ot::LogDispatcher::initialize(OT_INFO_SERVICE_TYPE_LOGGER, false);
 			ot::LogDispatcher::instance().setLogFlags(ot::NO_LOG);
 #endif // _DEBUG
+			OT_LOG_D("LoggerService starting");
+
+			AppBase::instance().setServiceURL(_serviceURL);
 		}
-		catch (const std::exception & e) {
+		catch (const std::exception & _e) {
 			OutputDebugStringA("ERROR: ");
-			OutputDebugStringA(e.what());
+			OutputDebugStringA(_e.what());
 			OutputDebugStringA("\n");
 			return 1;
 		}
@@ -100,36 +127,27 @@ extern "C"
 		return 0;
 	};
 
-	_declspec(dllexport) const char *getServiceURL(void)
-	{
-		char * retVal = new char[globalServiceURL.length() + 1];
-		strcpy_s(retVal, globalServiceURL.length() + 1, globalServiceURL.c_str());
-		return retVal;
+	_declspec(dllexport) const char *getServiceURL(void) {
+		return ot::intern::getCStringCopy(AppBase::instance().getServiceURL());
 	};
 
-	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP)
-	{
-		std::string ret = dispatchAction(_json, _senderIP);
-		char *retval = new char[ret.length() + 1];
-		strcpy_s(retval, ret.length() + 1, ret.c_str());
-		return retval;
+	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP) {
+		return ot::intern::dispatchAction(_json, ot::EXECUTE);
 	};
 
-	_declspec(dllexport) const char *performActionOneWayTLS(const char * _json, const char * _senderIP)
-	{
-		return performAction(_json, _senderIP);
+	_declspec(dllexport) const char *performActionOneWayTLS(const char * _json, const char * _senderIP) {
+		return ot::intern::dispatchAction(_json, ot::EXECUTE_ONE_WAY_TLS);
 	};
 
 	// The logger service is not queueing actions
-	_declspec(dllexport) const char *queueAction(const char *json, const char *senderIP)
-	{
-		return performAction(json, senderIP);
+	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP) {
+		return ot::intern::dispatchAction(_json, ot::QUEUE);
 	};
 
-
-	_declspec(dllexport) void deallocateData(const char *data)
-	{
-		// Destroy data (return value form performAction and queueAction functions)
-		if (data != nullptr) delete[] data;
+	_declspec(dllexport) void deallocateData(const char * _data) {
+		// Destroy data (e.g. return value form performAction)
+		if (_data != nullptr) {
+			delete[] _data;
+		}
 	};
 }

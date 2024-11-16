@@ -1069,8 +1069,8 @@ std::string Application::processMessage(ServiceBase* _sender, const std::string&
 void Application::uiConnected(ot::components::UiComponent* _ui) {
 	ot::JsonDocument registerDoc;
 	registerDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RegisterForModelEvents, registerDoc.GetAllocator()), registerDoc.GetAllocator());
-	registerDoc.AddMember(OT_ACTION_PARAM_PORT, ot::JsonString(ot::IpConverter::portFromIp(this->serviceURL()), registerDoc.GetAllocator()), registerDoc.GetAllocator());
-	registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, this->serviceID(), registerDoc.GetAllocator());
+	registerDoc.AddMember(OT_ACTION_PARAM_PORT, ot::JsonString(ot::IpConverter::portFromIp(this->getServiceURL()), registerDoc.GetAllocator()), registerDoc.GetAllocator());
+	registerDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, this->getServiceID(), registerDoc.GetAllocator());
 	registerDoc.AddMember(OT_ACTION_PARAM_RegisterForModelEvents, true, registerDoc.GetAllocator());
 
 	std::string response;
@@ -1081,7 +1081,7 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 
 	ot::JsonDocument commandDoc;
 	commandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_MODEL_Create, commandDoc.GetAllocator()), commandDoc.GetAllocator());
-	commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, this->serviceID(), commandDoc.GetAllocator());
+	commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, this->getServiceID(), commandDoc.GetAllocator());
 
 	response.clear();
 	if (!this->sendMessage(true, OT_INFO_SERVICE_TYPE_UI, commandDoc, response)) {

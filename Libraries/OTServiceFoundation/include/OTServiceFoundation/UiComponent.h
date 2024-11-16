@@ -9,10 +9,11 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/ServiceBase.h"			// Base class
 #include "OTCore/Flags.h"
-#include "OTGui/PropertyGridCfg.h"
+#include "OTCore/ServiceBase.h"			// Base class
 #include "OTGui/GuiTypes.h"
+#include "OTGui/PropertyGridCfg.h"
+#include "OTGui/StyledTextBuilder.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 #include "OTServiceFoundation/MenuButtonDescription.h"
 #include "OTServiceFoundation/ContextMenu.h"
@@ -336,11 +337,13 @@ namespace ot {
 
 			// Information IO
 
-			//! @brief Will display a message in the UIs output window
-			//! @param _message The message to display
-			void displayMessage(
-				const std::string &				_message
-			) const;
+			//! @brief Will display a message in the Frontends output window.
+			//! @param _message The message to display.
+			void displayMessage(const std::string& _message) const;
+
+			//! \brief Will display a styled text message in the Frontends output window.
+			//! \param _builder StyledTextBuilder containing the message
+			void displayStyledMessage(const StyledTextBuilder& _builder) const;
 
 			//! @brief Will display a message in the UIs debug output window
 			//! @param _message The message to display

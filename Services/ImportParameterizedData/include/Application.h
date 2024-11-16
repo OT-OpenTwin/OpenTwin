@@ -124,7 +124,6 @@ private:
 	
 	ot::MenuButtonDescription _buttonImportPythonScript;
 	ot::MenuButtonDescription _buttonImportTouchstone;
-	ot::MenuButtonDescription _buttonCreateTable;
 	
 	ot::MenuButtonDescription _buttonTableDeleteRow;
 	ot::MenuButtonDescription _buttonTableAddRowBelow;

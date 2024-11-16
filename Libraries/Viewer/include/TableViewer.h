@@ -16,7 +16,7 @@
 #include "EntityTableSelectedRanges.h"
 
 #include "OTCore/Color.h"
-#include "OTServiceFoundation/TableRange.h"
+#include "OTGui/TableRange.h"
 
 class TableViewer
 {

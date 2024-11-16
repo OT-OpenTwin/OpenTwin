@@ -53,8 +53,9 @@ class ServiceDataUi;
 class WebsocketClient;
 class ControlsManager;
 class KeyboardCommandHandler;
-namespace ot { class ServiceBase; };
+namespace ot { class Table; };
 namespace ot { class Property; };
+namespace ot { class ServiceBase; };
 
 class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::ActionHandler {
 	Q_OBJECT
@@ -202,6 +203,7 @@ public:
 	OT_HANDLER(handleShutdownRequestedByService, ExternalServicesComponent, OT_ACTION_CMD_ShutdownRequestedByService, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceSetupCompleted, ExternalServicesComponent, OT_ACTION_CMD_UI_ServiceSetupCompleted, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayMessage, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleDisplayStyledMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayStyledMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayDebugMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayDebugMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportError, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportError, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportWarning, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportWarning, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -235,7 +237,7 @@ public:
 	OT_HANDLER(handleAddNodeFromFacetData, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddNodeFromFacetData, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddNodeFromDataBase, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddNodeFromDataBase, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddContainerNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddContainerNode, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddTextNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddText, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleAddSceneNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleAddVis2D3DNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_AddVis2D3DNode, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleUpdateVis2D3DNode, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_UpdateVis2D3DNode, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleUpdateColor, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_UpdateColor, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -312,28 +314,31 @@ public:
 	OT_HANDLER(handleInsertTableColumnBefore, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_InsertColumnBefore, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleRemoveTableColumn, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_RemoveColumn, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleCloseTable, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_Close, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetTableSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_SetSelection, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleGetTableSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_GetSelection, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleSetCurrentTableSelectionBackground, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_SetCurrentSelectionBackground, ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// Table Old
 	OT_HANDLER(handleTableChange, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleAddTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_AddTable, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGetTableSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleGetTableSelectionOld, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleShowTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSetTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SetTable, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSelectRanges, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleColorSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection, ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// Studio Suite API
-	OT_HANDLER(handleStudioSuiteImport, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_IMPORT, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteCommit, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_COMMIT, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteGet, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_GET, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteUpload, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_UPLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteDownload, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_DOWNLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteCopy, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_COPY, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_INFORMATION, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleStudioSuiteSetCSTFile, ExternalServicesComponent, OT_ACTION_CMD_UI_SS_SETCSTFILE, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleStudioSuiteAction, ExternalServicesComponent, OT_ACTIONLIST(
+		OT_ACTION_CMD_UI_SS_IMPORT,
+		OT_ACTION_CMD_UI_SS_COMMIT,
+		OT_ACTION_CMD_UI_SS_GET,
+		OT_ACTION_CMD_UI_SS_UPLOAD,
+		OT_ACTION_CMD_UI_SS_DOWNLOAD,
+		OT_ACTION_CMD_UI_SS_COPY,
+		OT_ACTION_CMD_UI_SS_INFORMATION,
+		OT_ACTION_CMD_UI_SS_SETCSTFILE
+	), ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// LTSpice API
-	/*
 	OT_HANDLER(handleLTSpiceAction, ExternalServicesComponent, OT_ACTIONLIST(
 		OT_ACTION_CMD_UI_LTS_IMPORT,
 		OT_ACTION_CMD_UI_LTS_COMMIT,
@@ -344,16 +349,6 @@ public:
 		OT_ACTION_CMD_UI_LTS_INFORMATION,
 		OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE
 	), ot::MessageType::ALL_MESSAGE_TYPES)
-	*/
-
-	OT_HANDLER(handleLTSpiceImport, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_IMPORT, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceCommit, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_COMMIT, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceGet, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_GET, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceUpload, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_UPLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceDownload, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_DOWNLOAD, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceCopy, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_COPY, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_INFORMATION, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleLTSpiceSetLTSpiceFile, ExternalServicesComponent, OT_ACTION_CMD_UI_LTS_SETLTSPICEFILE, ot::MessageType::ALL_MESSAGE_TYPES)
 
 	// Dialogs
 	OT_HANDLER(handleEntitySelectionDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_EntitySelectionDialog, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -413,6 +408,8 @@ private:
 
 	void determineViews(const std::string& modelServiceURL);
 
+	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::Table* _table);
+
 	// #################################################################
 
 	std::string										m_sessionServiceURL;
@@ -436,7 +433,6 @@ private:
 
 	bool											m_prefetchingDataCompleted;
 	bool                                            m_servicesUiSetupCompleted;
-
 
 	ExternalServicesComponent() = delete;
 	ExternalServicesComponent(ExternalServicesComponent &) = delete;

@@ -126,11 +126,16 @@ namespace DataStorageAPI
 
 	void ConnectionAPI::establishConnection(const std::string &serverURL, const std::string &siteID, const std::string &userName, const std::string &userPassword)
 	{
+		std::string fixedServerURL(serverURL);
+		if (serverURL.find("tls@") != std::string::npos)
+		{
+			fixedServerURL = fixedServerURL.substr(4);
+		}
 
 		// Read and store the siteID
 		int serviceSiteID = std::stoi(siteID);
 
-		std::string mongoServerURI = getMongoURL(serverURL, userName, userPassword);
+		std::string mongoServerURI = getMongoURL(fixedServerURL, userName, userPassword);
 
 		// Establish a connection to the server
 		DataStorageAPI::ConnectionAPI::getInstance().setMongoInstance(serviceSiteID, &std::cout);

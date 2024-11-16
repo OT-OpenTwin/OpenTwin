@@ -16,7 +16,7 @@
 #include "EntityParameterizedDataTable.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Color.h"
-#include "OTServiceFoundation/TableRange.h"
+#include "OTGui/TableRange.h"
 #include "OTServiceFoundation/EntityInformation.h"
 #include "MetadataAssemblyData.h"
 #include "EntityTableSelectedRanges.h"

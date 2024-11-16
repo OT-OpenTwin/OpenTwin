@@ -166,7 +166,7 @@ void ot::components::ModelComponent::importTableFile(const std::string &itemName
 
 	// Send the command
 	std::string response;
-	if (!ot::msg::send(m_application->serviceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
+	if (!ot::msg::send(m_application->getServiceURL(), m_serviceURL, ot::EXECUTE, requestDoc.toJson(), response)) {
 		std::cout << "ERROR: Failed to get new entity id's: Failed to send HTTP request" << std::endl;
 		return;
 	}
@@ -223,7 +223,7 @@ const std::string& ot::components::ModelComponent::getModelServiceURL()
 
 const std::string& ot::components::ModelComponent::getThisServiceURL()
 {
-	return m_application->serviceURL();
+	return m_application->getServiceURL();
 }
 
 void ot::components::ModelComponent::loadMaterialInformation()

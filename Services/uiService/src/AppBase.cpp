@@ -75,6 +75,7 @@
 #include "OTWidgets/GraphicsPickerView.h"
 #include "OTWidgets/PropertyInputDouble.h"
 #include "OTWidgets/CreateProjectDialog.h"
+#include "OTWidgets/StyledTextConverter.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/PropertyInputStringList.h"
 #include "OTWidgets/VersionGraphManagerView.h"
@@ -173,7 +174,10 @@ AppBase::AppBase()
 	m_output(nullptr),
 	m_debug(nullptr),
 	m_versionGraph(nullptr),
-	m_state(NoState)
+	m_state(AppState::NoState),
+	m_welcomeScreen(nullptr),
+	m_ttb(nullptr),
+	m_logIntensity(nullptr)
 {
 	m_contextMenus.output.clear = invalidID;
 
@@ -184,6 +188,9 @@ AppBase::AppBase()
 	m_debugNotifier->disable();
 
 	m_contextMenuManager = new ContextMenuManager;
+
+	this->setDeleteLogNotifierLater(true);
+	ot::LogDispatcher::instance().addReceiver(this);
 }
 
 AppBase::~AppBase() {
@@ -238,7 +245,7 @@ bool AppBase::logIn(void) {
 
 	this->startSessionRefreshTimer();
 
-	m_state |= LoggedInState;
+	m_state |= AppState::LoggedInState;
 
 	// Now retreive information about the user collection
 	UserManagement uM(m_loginData);
@@ -256,7 +263,7 @@ bool AppBase::logIn(void) {
 	{
 		uM.initializeNewSession();
 
-		m_state |= RestoringSettingsState;
+		m_state |= AppState::RestoringSettingsState;
 
 		m_currentStateWindow.window = uM.restoreSetting(STATE_NAME_WINDOW);
 		m_currentStateWindow.view = uM.restoreSetting(STATE_NAME_VIEW);
@@ -289,7 +296,7 @@ bool AppBase::logIn(void) {
 
 		this->initializeDefaultUserSettings();
 
-		m_state &= (~RestoringSettingsState);
+		m_state &= (~AppState::RestoringSettingsState);
 	}
 
 	// Create shortcut manager
@@ -379,6 +386,32 @@ LockManager * AppBase::lockManager(void) {
 
 // Event handling
 
+void AppBase::log(const ot::LogMessage& _message) {
+	static const ot::LogFlag flags = ot::ERROR_LOG | ot::WARNING_LOG;
+	if (_message.getFlags() & flags) {
+		ot::StyledTextBuilder message;
+
+		message << "[";
+		if (_message.getFlags() & ot::ERROR_LOG) {
+			message << ot::StyledText::Error << ot::StyledText::Bold << "ERROR" << ot::StyledText::ClearStyle;
+		}
+		else if (_message.getFlags() & ot::WARNING_LOG) {
+			message << ot::StyledText::Warning << ot::StyledText::Bold << "WARNING" << ot::StyledText::ClearStyle;
+		}
+		message << "] [Frontend] " << _message.getText();
+
+		this->appendHtmlInfoMessage(ot::StyledTextConverter::toHtml(message));
+
+		// Construct display text
+		if (_message.getFlags() & ot::ERROR_LOG) {
+			this->appendInfoMessage("[ERROR] [Frontend] " + QString::fromStdString(_message.getText()));
+		}
+		else if (_message.getFlags() & ot::WARNING_LOG) {
+			this->appendInfoMessage("[WARNING] [Frontend] " + QString::fromStdString(_message.getText()));
+		}
+	}
+}
+
 void AppBase::notify(
 	UID					_senderId,
 	eventType			_eventType,
@@ -451,7 +484,7 @@ bool AppBase::closeEvent() {
 	}
 
 	m_ExternalServicesComponent->closeProject(false);
-	m_state &= (~ProjectOpenState);
+	m_state &= (~AppState::ProjectOpenState);
 
 	return true;
 }
@@ -701,7 +734,7 @@ void AppBase::settingsChanged(const std::string& _owner, const ot::Property* _pr
 	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
 
 	std::string response;
-	m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::QUEUE, serviceInfo->serviceURL(), doc, response);
+	m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::QUEUE, serviceInfo->getServiceURL(), doc, response);
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		OT_LOG_E(response);
 		this->appendInfoMessage(QString("[ERROR] Sending message resulted in error: ") + response.c_str() + "\n");
@@ -1564,12 +1597,20 @@ void AppBase::fillPropertyGrid(const std::string &settings) {
 
 // Info text output
 
-void AppBase::replaceInfoMessage(const QString & _message) {
+void AppBase::replaceInfoMessage(const QString& _message) {
 	m_output->setPlainText(_message);
 }
 
 void AppBase::appendInfoMessage(const QString & _message) {
-	m_output->appendPlainText(_message);
+	if (m_output) {
+		m_output->appendPlainText(_message);
+	}
+}
+
+void AppBase::appendHtmlInfoMessage(const QString& _html) {
+	if (m_output) {
+		m_output->appendHtml(_html);
+	}
 }
 
 void AppBase::appendDebugMessage(const QString & _message) {
@@ -2170,7 +2211,7 @@ void AppBase::slotTextEditorSaveRequested(void) {
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
 
 		try {
-			ot::BasicServiceInformation info(m_textEditors.findOwner(editor).getId());
+			ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
 			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->getTextEditorName(), doc.GetAllocator()), doc.GetAllocator());
 			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(editor->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 
@@ -2301,8 +2342,8 @@ void AppBase::slotOutputContextMenuItemClicked() {
 }
 
 void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
-	if (m_state & RestoringSettingsState) return;
-	if (!(m_state & LoggedInState)) return;
+	if (m_state & AppState::RestoringSettingsState) return;
+	if (!(m_state & AppState::LoggedInState)) return;
 
 	UserManagement uM(m_loginData);
 
@@ -2399,7 +2440,7 @@ void AppBase::slotCreateProject(void) {
 		// Check if the project it the same project as the currently open one
 		if (currentName == m_currentProjectName) {
 			m_ExternalServicesComponent->closeProject(false);
-			m_state &= (~ProjectOpenState);
+			m_state &= (~AppState::ProjectOpenState);
 		}
 
 		// Delete Project
@@ -2416,11 +2457,11 @@ void AppBase::slotCreateProject(void) {
 	// Perform open project
 	if (m_currentProjectName.length() > 0) {
 		m_ExternalServicesComponent->closeProject(false);
-		m_state &= (~ProjectOpenState);
+		m_state &= (~AppState::ProjectOpenState);
 	}
 
 	m_ExternalServicesComponent->openProject(currentName, projectType, projectManager.getProjectCollection(currentName));
-	m_state |= ProjectOpenState;
+	m_state |= AppState::ProjectOpenState;
 }
 
 void AppBase::slotOpenProject(void) {
@@ -2487,10 +2528,10 @@ void AppBase::slotOpenProject(void) {
 					// Perform open project
 					if (m_currentProjectName.length() > 0) {
 						m_ExternalServicesComponent->closeProject(false);
-						m_state &= (~ProjectOpenState);
+						m_state &= (~AppState::ProjectOpenState);
 					}
 					m_ExternalServicesComponent->openProject(selectedProjectName, projectType, projectCollection);
-					m_state |= ProjectOpenState;
+					m_state |= AppState::ProjectOpenState;
 				}
 			}
 		}
@@ -2571,7 +2612,7 @@ void AppBase::slotRenameProject(void) {
 	bool reopenProject = false;
 	if (m_currentProjectName == selectedProjectName.toStdString()) {
 		m_ExternalServicesComponent->closeProject(false);
-		m_state &= (~ProjectOpenState);
+		m_state &= (~AppState::ProjectOpenState);
 		reopenProject = true;
 	}
 
@@ -2589,7 +2630,7 @@ void AppBase::slotRenameProject(void) {
 	// Reopen the project if needed
 	if (reopenProject) {
 		m_ExternalServicesComponent->openProject(newProjectName, projectManager.getProjectType(newProjectName), projectManager.getProjectCollection(newProjectName));
-		m_state |= ProjectOpenState;
+		m_state |= AppState::ProjectOpenState;
 	}
 
 	// And refresh the view
@@ -2639,7 +2680,7 @@ void AppBase::slotDeleteProject(void) {
 		// Check if the project it the same project as the currently open one
 		if (proj.toStdString() == m_currentProjectName) {
 			m_ExternalServicesComponent->closeProject(false);
-			m_state &= (~ProjectOpenState);
+			m_state &= (~AppState::ProjectOpenState);
 		}
 
 		projectManager.deleteProject(proj.toStdString());

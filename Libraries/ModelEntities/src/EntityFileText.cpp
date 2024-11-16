@@ -6,6 +6,7 @@
 #include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 #include "OTCore/EncodingConverter_UTF16ToUTF8.h"
 #include "OTCore/Logger.h"
+#include "OTGui/VisualisationTypes.h"
 
 EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	: EntityFile(_ID,_parent,_obs,_ms,_factory,_owner)
@@ -29,22 +30,19 @@ void EntityFileText::setTextEncoding(ot::TextEncoding::EncodingStandard _encodin
 	}
 }
 
-void EntityFileText::addVisualizationNodes()
+char EntityFileText::getSelectedDecimalSeparator()
 {
-	TreeIcon treeIcons;
-	treeIcons.size = 32;
-	treeIcons.visibleIcon = "TextVisible";
-	treeIcons.hiddenIcon = "TextHidden";
+	EntityPropertiesBase* baseProperty = getProperties().getProperty("Decimal point character");
+	if (baseProperty == nullptr)
+	{
+		std::locale mylocale("");
+		auto defaulDecimalSeparator = std::use_facet<std::numpunct<char>>(mylocale).decimal_point();
+		return defaulDecimalSeparator; // Maybe create the property if not existing ?
+	}
+	auto selection = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_AddText, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_TREE_Name, ot::JsonString(this->getName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getEntityID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsEditable, this->getEditable(), doc.GetAllocator());
-	
-	treeIcons.addToJsonDoc(doc);
-
-	getObserver()->sendMessageToViewer(doc);
+	const char separator = selection->getValue()[0];
+	return separator;
 }
 
 ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding() 
@@ -88,6 +86,7 @@ std::string EntityFileText::getText(void)
 	{
 		assert(encoding == ot::TextEncoding::EncodingStandard::UNKNOWN);
 		OT_LOG_W("Unable to determine the encoding of text file " + getName() + ".");
+		return textFromBinary;
 	}
 }
 
@@ -134,14 +133,14 @@ ot::TextEditorCfg EntityFileText::createConfig(void) {
 	return result;
 }
 
-ot::ContentChangedHandling EntityFileText::getContentChangedHandling()
+ot::ContentChangedHandling EntityFileText::getTextContentChangedHandling()
 {
-	return m_contentChangedHandling;
+	return m_contentChangedHandlingText;
 }
 
 void EntityFileText::setContentChangedHandling(ot::ContentChangedHandling _contentChangedHandling)
 {
-	m_contentChangedHandling = _contentChangedHandling; 
+	m_contentChangedHandlingText = _contentChangedHandling;
 	setModified();
 }
 
@@ -159,6 +158,17 @@ void EntityFileText::setSpecializedProperties()
 		},
 		encoding.getString(m_encoding),
 		"default",getProperties());
+		
+	std::locale mylocale("");
+	auto defaulDecimalSeparator = std::use_facet<std::numpunct<char>>(mylocale).decimal_point();
+
+	EntityPropertiesSelection::createProperty("Text Properties", "Decimal point character",
+		{
+			".",
+			","
+		}
+		, std::string(1, defaulDecimalSeparator),
+		"default", getProperties());
 
 	EntityPropertiesSelection::createProperty("Text Properties",
 		"Syntax Highlight",
@@ -175,7 +185,7 @@ void EntityFileText::AddStorageData(bsoncxx::builder::basic::document& _storage)
 	ot::TextEncoding encoding;
 	std::string encodingStr = encoding.getString(m_encoding);
 	_storage.append(bsoncxx::builder::basic::kvp("TextEncoding", encodingStr));
-	_storage.append(bsoncxx::builder::basic::kvp("ContentChangedHandler", static_cast<int32_t>(m_contentChangedHandling)));
+	_storage.append(bsoncxx::builder::basic::kvp("ContentChangedHandler", static_cast<int32_t>(m_contentChangedHandlingText)));
 }
 
 void EntityFileText::readSpecificDataFromDataBase(bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap)
@@ -185,17 +195,17 @@ void EntityFileText::readSpecificDataFromDataBase(bsoncxx::document::view& _doc_
 	const std::string encodingStr(_doc_view["TextEncoding"].get_utf8().value.data());
 	int32_t contentChangedHandling = _doc_view["ContentChangedHandler"].get_int32().value;
 
-	if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::NotifyOwner))
+	if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::ModelServiceSavesNotifyOwner))
 	{
-		m_contentChangedHandling = ot::ContentChangedHandling::NotifyOwner;
+		m_contentChangedHandlingText = ot::ContentChangedHandling::ModelServiceSavesNotifyOwner;
 	}
 	else if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::OwnerHandles))
 	{
-		m_contentChangedHandling = ot::ContentChangedHandling::OwnerHandles;
+		m_contentChangedHandlingText = ot::ContentChangedHandling::OwnerHandles;
 	}
-	else if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::SimpleSave))
+	else if (contentChangedHandling == static_cast<int32_t>(ot::ContentChangedHandling::ModelServiceSaves))
 	{
-		m_contentChangedHandling = ot::ContentChangedHandling::SimpleSave;
+		m_contentChangedHandlingText = ot::ContentChangedHandling::ModelServiceSaves;
 	}
 	else
 	{

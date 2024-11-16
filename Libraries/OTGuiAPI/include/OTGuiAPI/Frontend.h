@@ -17,11 +17,11 @@
 
 namespace ot {
 
-	//! @class FrontendAPI
+	//! @class Frontend
 	//! @brief Frontend request layer.
-	//! The FrontendAPI prvoides a set methods that may be used to send requests to the frontend.
-	class FrontendAPI {
-		OT_DECL_NOCOPY(FrontendAPI)
+	//! The Frontend prvoides a set methods that may be used to send requests to the frontend.
+	class Frontend {
+		OT_DECL_NOCOPY(Frontend)
 	public:
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -82,8 +82,8 @@ namespace ot {
 		std::map<std::string, bool> m_controlsEnabledState; //! @brief Contains the currently requested enabled state
 		std::map<std::string, bool> m_controlsEnabledStateInFrontend; //! @brief Contains the current enabled state in the frontend
 
-		FrontendAPI() {};
-		~FrontendAPI() {};
+		Frontend() {};
+		~Frontend() {};
 	};
 
 }

@@ -97,7 +97,7 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 	gmsh::model::mesh::renumberElements();
 
 	// Create a new tet mesh entity
-	EntityMeshTet* meshEntity = new EntityMeshTet(application->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->serviceName());
+	EntityMeshTet* meshEntity = new EntityMeshTet(application->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->getServiceName());
 
 	EntityPropertiesString::createProperty("General", "File name", originalName, "", meshEntity->getProperties());
 

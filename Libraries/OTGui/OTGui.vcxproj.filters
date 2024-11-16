@@ -345,6 +345,30 @@
     <ClInclude Include="include\OTGui\Plot1DDataBaseCfg.h">
       <Filter>Header Files\Plot</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\TableRange.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\EntityViewBaseInfo.h">
+      <Filter>Header Files\General</Filter>
+	</ClInclude>
+    <ClInclude Include="include\OTGui\VisualisationTypes.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\TableHeaderOrientation.h">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\StyledTextBuilder.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\StyledTextStyle.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\StyledText.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\StyledTextEntry.h">
+      <Filter>Header Files\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -604,6 +628,27 @@
     </ClCompile>
     <ClCompile Include="src\Plot1DDataBaseCfg.cpp">
       <Filter>Source Files\Plot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableRange.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityViewBaseInfo.cpp">
+		<Filter>Source Files\General</Filter>
+	</ClCompile>
+    <ClCompile Include="src\VisualisationTypes.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StyledTextStyle.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StyledTextBuilder.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StyledText.cpp">
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StyledTextEntry.cpp">
+      <Filter>Source Files\General</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

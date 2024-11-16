@@ -1,7 +1,7 @@
 #pragma once
 
 #include "OTCore/CoreTypes.h"
-#include "IVisualiser.h"
+#include "Visualiser.h"
 #include <string>
 #include <list>
 #include <cassert>
@@ -17,7 +17,7 @@ public:
 					  wireframe(false), highlighted(false), offset(1.0), selectChildren(true), manageVisibilityOfParent(true), manageVisibilityOfChildren(true), parent(nullptr) {};
 	virtual ~SceneNodeBase() 
 	{ 
-		for (IVisualiser* visualiser : m_visualiser)
+		for (Visualiser* visualiser : m_visualiser)
 		{
 			delete visualiser;
 			visualiser = nullptr;
@@ -95,8 +95,8 @@ public:
 	virtual bool isItem1D(void) = 0;
 	virtual bool isItem3D(void) = 0;
 
-	void addVisualiser(IVisualiser* _visualiser) { m_visualiser.push_back(_visualiser); }
-	const std::list<IVisualiser*>& getVisualiser() { return m_visualiser; }
+	void addVisualiser(Visualiser* _visualiser) { m_visualiser.push_back(_visualiser); }
+	const std::list<Visualiser*>& getVisualiser() { return m_visualiser; }
 
 protected:
 	osg::Switch *      shapeNode;
@@ -121,6 +121,6 @@ private:
 	std::list<SceneNodeBase*> children;
 	TreeIcon		   treeIcons;
 
-	std::list<IVisualiser*> m_visualiser;
+	std::list<Visualiser*> m_visualiser;
 };
 

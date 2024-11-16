@@ -291,7 +291,7 @@ bool ProximityMeshing::checkSelfIntersection(SelfIntersectionCheck &checker)
 
 void ProximityMeshing::visualiseSelfIntersections(const std::string &meshName, std::vector < std::tuple<double, double, double, uint32_t, uint32_t> > IntersectingInfo, std::list<EntityAnnotation *> &errorAnnotation)
 {
-	EntityAnnotation *annotation = new EntityAnnotation(application->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->serviceName());
+	EntityAnnotation *annotation = new EntityAnnotation(application->modelComponent()->createEntityUID(), nullptr, nullptr, nullptr, nullptr, application->getServiceName());
 	
 	if (IntersectingInfo.size() != 0) 
 	{

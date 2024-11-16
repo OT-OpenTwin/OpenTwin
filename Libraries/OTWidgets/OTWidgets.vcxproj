@@ -140,9 +140,11 @@
     <ClCompile Include="src\QWidgetInterface.cpp" />
     <ClCompile Include="src\SpinBox.cpp" />
     <ClCompile Include="src\Splitter.cpp" />
+    <ClCompile Include="src\StyledTextConverter.cpp" />
     <ClCompile Include="src\SvgImagePainter.cpp" />
     <ClCompile Include="src\SyntaxHighlighter.cpp" />
     <ClCompile Include="src\Table.cpp" />
+    <ClCompile Include="src\TableItemDelegate.cpp" />
     <ClCompile Include="src\TableView.cpp" />
     <ClCompile Include="src\TabWidget.cpp" />
     <ClCompile Include="src\TextEditor.cpp">
@@ -242,9 +244,11 @@
     <ClInclude Include="include\OTWidgets\PropertyInputPainter2D.h" />
     <QtMoc Include="include\OTWidgets\TextEditorSearchPopup.h" />
     <QtMoc Include="include\OTWidgets\Splitter.h" />
+    <ClInclude Include="include\OTWidgets\StyledTextConverter.h" />
     <ClInclude Include="include\OTWidgets\SvgImagePainter.h" />
     <ClInclude Include="include\OTWidgets\SyntaxHighlighter.h" />
     <QtMoc Include="include\OTWidgets\Table.h" />
+    <ClInclude Include="include\OTWidgets\TableItemDelegate.h" />
     <ClInclude Include="include\OTWidgets\TableView.h" />
     <ClInclude Include="include\OTWidgets\TextEditorView.h" />
     <QtMoc Include="include\OTWidgets\ToolButton.h" />
@@ -463,7 +467,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DebugInformationFormat />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>

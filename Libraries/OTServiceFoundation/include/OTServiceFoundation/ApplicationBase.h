@@ -174,10 +174,10 @@ namespace ot {
 		std::string webSocketURL(void) { return m_websocketURL; }
 
 		//! @brief Will return the session service URL
-		std::string sessionServiceURL(void) { return m_sessionService.service->serviceURL(); }
+		std::string sessionServiceURL(void) { return m_sessionService.service->getServiceURL(); }
 
 		//! @brief Will return the local directory service URL
-		std::string directoryServiceURL(void) { return m_directoryService.service->serviceURL(); }
+		std::string directoryServiceURL(void) { return m_directoryService.service->getServiceURL(); }
 
 		//! @brief Will return the session ID this service is running in
 		std::string sessionID(void) { return m_sessionID; }

@@ -18,6 +18,7 @@
 #include <akWidgets/aComboButtonWidgetItem.h>
 #include <akWidgets/aWindow.h>
 
+#include "OTCore/Logger.h"
 #include "OTCore/Point2D.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OwnerService.h"
@@ -87,7 +88,7 @@ struct structModelViewInfo
 };
 
 //! The API manager is used to manage the global objects required for this API to work
-class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier {
+class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier, ot::AbstractLogNotifier {
 	Q_OBJECT
 public:
 	
@@ -178,6 +179,9 @@ public:
 	// ##############################################################################################
 
 	// Event handling
+
+	//! @brief Called when the a log message was created.
+	virtual void log(const ot::LogMessage& _message) override;
 
 	//! @brief Will call the callback function with the provided parameters
 	//! @param _senderId The sender ID the message was send from
@@ -385,11 +389,12 @@ public:
 
 	// Info text output
 
-	void replaceInfoMessage(const QString & _message);
+	void replaceInfoMessage(const QString& _message);
+	
+	void appendInfoMessage(const QString& _message);
+	void appendHtmlInfoMessage(const QString& _html);
 
-	void appendInfoMessage(const QString & _message);
-
-	void appendDebugMessage(const QString & _message);
+	void appendDebugMessage(const QString& _message);
 
 	ot::VersionGraphManagerView* getVersionGraph(void) { return m_versionGraph; };
 
@@ -532,13 +537,13 @@ private Q_SLOTS:
 	void slotTreeItemFocused(QTreeWidgetItem* _item);
 
 private:
-	enum AppStateFlag {
+	enum class AppState {
 		NoState                = 0x00,
 		RestoringSettingsState = 0x01,
 		LoggedInState          = 0x10,
 		ProjectOpenState       = 0x20
 	};
-	typedef ot::Flags<AppStateFlag> AppStateFlags;
+	typedef ot::Flags<AppState> AppStateFlags;
 
 	friend class ToolBar;
 	friend class KeyboardCommandHandler;
@@ -637,7 +642,7 @@ private:
 	AppBase(AppBase&) = delete;
 	AppBase& operator = (AppBase&) = delete;
 
-	OT_FRIEND_FLAG_FUNCTIONS(AppStateFlag)
+	OT_FRIEND_FLAG_FUNCTIONS(AppBase::AppState)
 };
 
-OT_ADD_FLAG_FUNCTIONS(AppBase::AppStateFlag)
+OT_ADD_FLAG_FUNCTIONS(AppBase::AppState)

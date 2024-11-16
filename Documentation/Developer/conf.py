@@ -29,4 +29,13 @@ html_static_path = ['_static']
 html_style = 'css/my_theme.css'
 html_logo = 'images/logo_small.png'
 
+# -- Prolog for every file   -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-rst_prolog
+# Here we can add useful substitutions
 
+rst_prolog = """
+.. # define a hard line break for HTML. br = break
+.. |br| raw:: html
+
+   <br />
+"""

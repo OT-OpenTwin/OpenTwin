@@ -1,10 +1,9 @@
 #include "BlockHandlerFileWriter.h"
+#include "OTCore/OTAssert.h"
 #include "OTCore/GenericDataStruct.h"
 #include "OTCore/GenericDataStructSingle.h"
 #include "OTCore/GenericDataStructVector.h"
 #include "OTCore/GenericDataStructMatrix.h"
-
-
 
 BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntity, handlerMap)
@@ -141,7 +140,7 @@ void BlockHandlerFileWriter::streamVariable(std::ofstream& stream, const ot::Var
 	}
 	else
 	{
-		assert("Not supported type", 0);
+		OTAssert(0, "Not supported type");
 	}
 
 }

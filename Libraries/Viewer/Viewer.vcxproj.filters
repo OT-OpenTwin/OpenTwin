@@ -106,9 +106,6 @@
     <ClCompile Include="src\ViewerView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
-    <ClCompile Include="src\TextVisualiser.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\PlotManager.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
@@ -139,14 +136,17 @@
     <ClCompile Include="src\SceneNodeMeshItem.cpp">
       <Filter>src\SceneNodes</Filter>
     </ClCompile>
-    <ClCompile Include="src\SceneNodeTableItem.cpp">
-      <Filter>src\SceneNodes</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNodeTextItem.cpp">
-      <Filter>src\SceneNodes</Filter>
-    </ClCompile>
     <ClCompile Include="src\SceneNodeVTK.cpp">
       <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneNodeMultiVisualisation.cpp">
+      <Filter>src\SceneNodes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableVisualiser.cpp">
+      <Filter>src\Visualiser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -276,12 +276,6 @@
     <ClInclude Include="include\SceneNodePlot1DCurve.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
-    <ClInclude Include="include\SceneNodeTableItem.h">
-      <Filter>include\SceneNodes</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SceneNodeTextItem.h">
-      <Filter>include\SceneNodes</Filter>
-    </ClInclude>
     <ClInclude Include="include\SceneNodeVTK.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
@@ -291,7 +285,7 @@
     <ClInclude Include="include\ViewerView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\IVisualiser.h">
+    <ClInclude Include="include\Visualiser.h">
       <Filter>include\Visualiser</Filter>
     </ClInclude>
     <ClInclude Include="include\TextVisualiser.h">
@@ -299,6 +293,12 @@
     </ClInclude>
     <ClInclude Include="include\PlotManager.h">
       <Filter>include\WidgetView</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SceneNodeMultiVisualisation.h">
+      <Filter>include\SceneNodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TableVisualiser.h">
+      <Filter>include\Visualiser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -336,6 +336,9 @@
     </Filter>
     <Filter Include="src\SceneNodes">
       <UniqueIdentifier>{09d63a78-ff4b-4b00-9891-41d3c1bd0ff5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Visualiser">
+      <UniqueIdentifier>{0daf6459-a3e0-4628-87ec-9bc1695b8382}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

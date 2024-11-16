@@ -245,15 +245,22 @@ bool EntityPropertiesDouble::hasSameValue(EntityPropertiesBase* other) {
 	return (getValue() == entity->getValue());
 }
 
-void EntityPropertiesDouble::createProperty(const std::string& group, const std::string& name, double defaultValue, const std::string& defaultCategory, EntityProperties& properties) {
+void EntityPropertiesDouble::createProperty(const std::string& _group, const std::string& _name, double _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties) {
+	EntityPropertiesDouble::createProperty(_group, _name, _defaultValue, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max(), _defaultCategory, _properties);
+}
+
+void EntityPropertiesDouble::createProperty(const std::string& _group, const std::string& _name, double _defaultValue, double _minValue, double _maxValue, const std::string& _defaultCategory, EntityProperties& _properties) {
 	// Load the template defaults if any
-	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(_defaultCategory);
 
 	// Now load the default value if available. Otherwise take the provided default
-	double value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultDouble(defaultCategory, name, defaultValue);
+	double value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultDouble(_defaultCategory, _name, _defaultValue);
 
 	// Finally create the new property
-	properties.createProperty(new EntityPropertiesDouble(name, value), group);
+	EntityPropertiesDouble* newProperty = new EntityPropertiesDouble(_name, value);
+	newProperty->setMin(_minValue);
+	newProperty->setMax(_maxValue);
+	_properties.createProperty(newProperty, _group);
 }
 
 // ################################################################################################################################################################
@@ -398,15 +405,29 @@ void EntityPropertiesInteger::copySettings(EntityPropertiesBase* other, EntityBa
 	}
 }
 
-void EntityPropertiesInteger::createProperty(const std::string& group, const std::string& name, long defaultValue, const std::string& defaultCategory, EntityProperties& properties) {
+void EntityPropertiesInteger::createProperty(const std::string& _group, const std::string& _name, long _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties) {
 	// Load the template defaults if any
-	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(_defaultCategory);
 
 	// Now load the default value if available. Otherwise take the provided default
-	long value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultLong(defaultCategory, name, defaultValue);
+	long value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultLong(_defaultCategory, _name, _defaultValue);
 
 	// Finally create the new property
-	properties.createProperty(new EntityPropertiesInteger(name, value), group);
+	_properties.createProperty(new EntityPropertiesInteger(_name, value), _group);
+}
+
+void EntityPropertiesInteger::createProperty(const std::string& _group, const std::string& _name, long _defaultValue, long _minValue, long _maxValue, const std::string& _defaultCategory, EntityProperties& _properties) {
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(_defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	long value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultLong(_defaultCategory, _name, _defaultValue);
+
+	// Finally create the new property
+	EntityPropertiesInteger* newProperty = new EntityPropertiesInteger(_name, value);
+	newProperty->setMin(_minValue);
+	newProperty->setMax(_maxValue);
+	_properties.createProperty(newProperty, _group);
 }
 
 // ################################################################################################################################################################

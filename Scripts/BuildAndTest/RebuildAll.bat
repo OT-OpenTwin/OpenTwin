@@ -402,23 +402,33 @@ REM ====================================================================
 REM Create the buildlog summary
 REM ====================================================================
 
-if "%2"=="" (
-	SET searchString="= Rebuild All:"
-) ELSE IF "%2"=="REBUILD" (
-	SET searchString="= Rebuild All:"
-) ELSE (
-	SET searchString="= Build:"
-)
-
-FIND %searchString% buildLog_Debug.txt buildLog_Release.txt > buildLog_Summary.txt
-FIND """message"":" RUSTbuildLog.txt >> buildLog_Summary.txt
-
 ECHO %OT_LCL_BuildStart% >> buildLog_Summary.txt
 
 REM Get the current timestamp (capture echo call from the batch)
 for /f "delims=" %%a in ('call "%OPENTWIN_DEV_ROOT%\Scripts\Other\PrintCurrentTimestamp.bat" "Build finished at: " ""') do set OT_LCL_BuildEnd=%%a
 ECHO %OT_LCL_BuildEnd%
 ECHO %OT_LCL_BuildEnd% >> buildLog_Summary.txt
+
+ECHO. >> buildLog_Summary.txt
+ECHO ==================================================================== >> buildLog_Summary.txt
+ECHO Release Builds >> buildLog_Summary.txt
+ECHO ==================================================================== >> buildLog_Summary.txt
+
+FIND "--- Build " buildLog_Release.txt >> buildLog_Summary.txt
+
+ECHO. >> buildLog_Summary.txt
+ECHO ==================================================================== >> buildLog_Summary.txt
+ECHO Debug Builds >> buildLog_Summary.txt
+ECHO ==================================================================== >> buildLog_Summary.txt
+
+FIND "--- Build " buildLog_Debug.txt >> buildLog_Summary.txt
+
+ECHO. >> buildLog_Summary.txt
+ECHO ==================================================================== >> buildLog_Summary.txt
+ECHO Rust Builds >> buildLog_Summary.txt
+ECHO ==================================================================== >> buildLog_Summary.txt
+
+FIND """message"":" RUSTbuildLog.txt >> buildLog_Summary.txt
 
 EXIT /b 0
 
