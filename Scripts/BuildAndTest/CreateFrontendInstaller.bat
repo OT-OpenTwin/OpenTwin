@@ -231,7 +231,7 @@ GOTO END
 
 :END
 REM Sets the exit code of the script to be 0
-exit /B 0
+exit /B 1
 
 :SUCCESSFUL_END
 exit 0
