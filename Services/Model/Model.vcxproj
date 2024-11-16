@@ -202,6 +202,7 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC);$(BOOST_INCD)\;$(OT_BLOCKENTITIES_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
       <ExceptionHandling>Sync</ExceptionHandling>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -282,6 +283,7 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC);$(BOOST_INCR)\;$(OT_BLOCKENTITIES_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
       <ExceptionHandling>Sync</ExceptionHandling>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

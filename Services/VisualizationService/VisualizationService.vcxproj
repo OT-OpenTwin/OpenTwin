@@ -104,6 +104,7 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(VTK_INC);$(BOOST_INCD);%OSG_ROOT%\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -147,6 +148,7 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(VTK_INC);$(BOOST_INCR);%OSG_ROOT%\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
