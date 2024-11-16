@@ -104,9 +104,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
 	
     // creating path to file which will be downloaded depending on if it is an enduser or a developer machine
     let download_file_path: String = if option_env!("OPENTWIN_DEV_ROOT").is_some() {
-        env!("OPENTWIN_DEV_ROOT").to_owned() + "/Deployment/FrontendInstaller/"
+        env!("OPENTWIN_DEV_ROOT").to_owned() + "/Deployment_Frontend/FrontendInstaller/Install_OpenTwin.exe"
     } else {
-        std::env::current_exe().unwrap().to_str().unwrap().to_string() + "/FrontendInstaller/"
+        std::env::current_exe().unwrap().to_str().unwrap().to_string() + "/FrontendInstaller/Install_OpenTwin.exe"
     };
     let dll_file_name = Path::new(GLOBAL.get()).file_name().unwrap().to_str();
     let service_name = Path::new(dll_file_name.unwrap()).file_stem().unwrap().to_str();
@@ -444,7 +444,7 @@ fn get_download_html_body() -> String {
             KoCFLklSAf4/G8ayBHfTCwQAAAAASUVORK5CYII=\">
 
             <div id=\"welcome_txt\">Welcome to OpenTwin</div>
-            <a href=\"http://127.0.0.1:80/installer/requests.http\" download=\"installer.exe\">
+            <a href=\"http://127.0.0.1:80/installer/Install_OpenTwin.exe\" download>
                 <button id=\"downloadBtn\">Download</button>
             </a>
 
