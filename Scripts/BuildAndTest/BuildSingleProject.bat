@@ -8,17 +8,17 @@ REM This script requires the following environment variables to be set:
 REM 1. OPENTWIN_DEV_ROOT
 REM 2. OPENTWIN_THIRDPARTY_ROOT
 REM 2. DEVENV_ROOT_2022
-IF "%OPENTWIN_DEV_ROOT%" == "" (
+IF "%OPENTWIN_DEV_ROOT%"=="" (
 	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
 	goto PAUSE_END
 )
 
-IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
+IF "%OPENTWIN_THIRDPARTY_ROOT%"=="" (
 	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
 	goto PAUSE_END
 )
 
-IF "%DEVENV_ROOT_2022%" == "" (
+IF "%DEVENV_ROOT_2022%"=="" (
 	ECHO Please specify the following environment variables: DEVENV_ROOT_2022
 	goto PAUSE_END
 )
@@ -65,21 +65,39 @@ IF "%OPENTWIN_DEV_PARALLEL_BUILDS%" NEQ "" (
 REM Set the language to english
 set VSLANG=1033
 
-IF %DEBUG%==1 (
-	ECHO %TYPE_NAME% DEBUG
-	ECHO ======================================================================================== >> buildlog_Debug.txt
-	ECHO Building project: %1 >> buildlog_Debug.txt
-	ECHO ======================================================================================== >> buildlog_Debug.txt
-	"%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Debug /p:Platform=x64 >> buildlog_Debug.txt
+IF %DEBUG% neq 1 (
+	GOTO RELEASE_BUILD
+)
+	
+ECHO %TYPE_NAME% DEBUG
+ECHO ======================================================================================== >> buildlog_Debug.txt
+ECHO Building project: %1 >> buildlog_Debug.txt
+ECHO ======================================================================================== >> buildlog_Debug.txt
+"%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Debug /p:Platform=x64 >> buildlog_Debug.txt
+
+if %ERRORLEVEL% neq 0 (
+	ECHO --- Build %1: failed --- >> buildlog_Debug.txt
+) ELSE (
+	ECHO --- Build %1: successful --- >> buildlog_Debug.txt
 )
 
-IF %RELEASE%==1 (
-	ECHO %TYPE_NAME% RELEASE
-	ECHO ======================================================================================== >> buildlog_Release.txt
-	ECHO Building project: %1 >> buildlog_Release.txt
-	ECHO ======================================================================================== >> buildlog_Release.txt
-	"%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Release /p:Platform=x64 >> buildlog_Release.txt
-) 
+:RELEASE_BUILD
+
+IF %RELEASE% neq 1 (
+	GOTO END
+)
+
+ECHO %TYPE_NAME% RELEASE
+ECHO ======================================================================================== >> buildlog_Release.txt
+ECHO Building project: %1 >> buildlog_Release.txt
+ECHO ======================================================================================== >> buildlog_Release.txt
+"%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Release /p:Platform=x64 >> buildlog_Release.txt
+
+if %ERRORLEVEL% neq 0 (
+	ECHO --- Build %1: failed --- >> buildlog_Release.txt
+) ELSE (
+	ECHO --- Build %1: successful --- >> buildlog_Release.txt
+)
   
 GOTO END
 
