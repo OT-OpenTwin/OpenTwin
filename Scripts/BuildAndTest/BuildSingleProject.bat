@@ -76,9 +76,9 @@ ECHO ===========================================================================
 "%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Debug /p:Platform=x64 >> buildlog_Debug.txt
 
 if %ERRORLEVEL% neq 0 (
-	ECHO --- Build %1: failed --- >> buildlog_Debug.txt
+	ECHO --- Build failed: %1 --- >> buildlog_Debug.txt
 ) ELSE (
-	ECHO --- Build %1: successful --- >> buildlog_Debug.txt
+	ECHO --- Build successful: %1 --- >> buildlog_Debug.txt
 )
 
 :RELEASE_BUILD
@@ -94,9 +94,9 @@ ECHO ===========================================================================
 "%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Release /p:Platform=x64 >> buildlog_Release.txt
 
 if %ERRORLEVEL% neq 0 (
-	ECHO --- Build %1: failed --- >> buildlog_Release.txt
+	ECHO --- Build failed: %1 --- >> buildlog_Release.txt
 ) ELSE (
-	ECHO --- Build %1: successful --- >> buildlog_Release.txt
+	ECHO --- Build successful: %1 --- >> buildlog_Release.txt
 )
   
 GOTO END
