@@ -31,8 +31,6 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 REM Clean up the FrontendDeployment directory
 RMDIR /S /Q "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%"
-
-RMDIR /S /Q "%OPENTWIN_FRONTEND_DEPLOYMENT%\FrontendInstaller"
 MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\FrontendInstaller"
 
 REM ==========================================
@@ -41,9 +39,6 @@ REM ==========================================
 
 REM Curl
 COPY "%CURL_DLLR%\libcurl.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
-
-REM Embree
-COPY "%EMBREE_BIN%\tbb12.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM MongoDB
 COPY "%MONGO_C_DLLR%\bson-1.0.dll"			"%OPENTWIN_FRONTEND_DEPLOYMENT%"
@@ -63,7 +58,10 @@ COPY /Y "%MONGO_CXX_DLLR%\vcruntime140.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
 COPY /Y "%MONGO_CXX_DLLR%\vcruntime140_1.dll" 	"%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM OpenCASCADE
+COPY "%TBB_DLLR%\tbb12.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%TBB_DLLR%\tbbmalloc.dll"  "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 COPY "%JEM_DLLR%\jemalloc.dll"   "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
 COPY "%OC_DLLR%\TKBRep.dll" 	 "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 COPY "%OC_DLLR%\TKernel.dll" 	 "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 COPY "%OC_DLLR%\TKG2d.dll" 		 "%OPENTWIN_FRONTEND_DEPLOYMENT%"
@@ -158,12 +156,8 @@ COPY "%OT_CADMODELENTITIES_ROOT%\%OT_DLLR%\CADModelEntities.dll" "%OPENTWIN_FRON
 REM DataStorage
 COPY "%OT_DATASTORAGE_ROOT%\%OT_DLLR%\DataStorage.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
-REM LTSpice
-COPY "%OT_LTSPICE_SERVICE_ROOT%\%OT_DLLR%\LTSpiceService.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
-
 REM LTSpiceConnector
 COPY "%OT_LTSPICE_CONNECTOR_ROOT%\%OT_DLLR%\LTSpiceConnector.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
-
 
 REM ModelEntities
 COPY "%OT_MODELENTITIES_ROOT%\%OT_DLLR%\ModelEntities.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
@@ -222,6 +216,7 @@ REM ==========================================
 CALL "C:\Program Files (x86)\NSIS\makensis.exe" Install-OpenTwin.nsi
 
 MOVE "Install OpenTwin.exe" "%OPENTWIN_FRONTEND_DEPLOYMENT%\FrontendInstaller"
+REN "%OPENTWIN_FRONTEND_DEPLOYMENT%\FrontendInstaller\Install OpenTwin.exe" Install_OpenTwin.exe
 
 goto SUCCESSFUL_END
 
@@ -234,4 +229,4 @@ REM Sets the exit code of the script to be 0
 exit /B 1
 
 :SUCCESSFUL_END
-exit 0
+exit /B 0
