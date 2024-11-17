@@ -15,6 +15,7 @@
 #include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/ServiceLogNotifier.h"
 #include "DataBase.h"
 
 #include "DocumentAPI.h"
@@ -386,6 +387,12 @@ std::string GlobalSessionService::handleSetGlobalLogFlags(ot::JsonDocument& _doc
 
 	if (!ot::msg::send("", m_authorizationUrl, ot::EXECUTE, json, tmp)) {
 		OT_LOG_EAS("Failed to send message to Authorization Service at \"" + m_authorizationUrl + "\"");
+	}
+
+	if (!ot::ServiceLogNotifier::instance().loggingServiceURL().empty()) {
+		if (!ot::msg::send("", ot::ServiceLogNotifier::instance().loggingServiceURL(), ot::EXECUTE, json, tmp)) {
+			OT_LOG_EAS("Failed to send message to Logging Service at \"" + ot::ServiceLogNotifier::instance().loggingServiceURL() + "\"");
+		}
 	}
 	
 	return OT_ACTION_RETURN_VALUE_OK;

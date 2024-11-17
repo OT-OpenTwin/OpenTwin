@@ -18,10 +18,13 @@
 #include <string>
 #include <list>
 
-class AppBase : public ot::ServiceBase, public ot::ActionHandler {
+class AppBase : public ot::ServiceBase, public ot::ActionHandler, public ot::AbstractLogNotifier {
 	OT_DECL_NOCOPY(AppBase)
 public:
 	static AppBase& instance(void);
+
+	//! @brief Called when the a log message was created.
+	virtual void log(const ot::LogMessage& _message) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -32,20 +35,30 @@ public:
 	OT_HANDLER(handleDeregister, AppBase, OT_ACTION_CMD_RemoveService, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleClear, AppBase, OT_ACTION_CMD_Reset, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleGetDebugInfo, AppBase, OT_ACTION_CMD_GetDebugInformation, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleSetGlobalLogFlags, AppBase, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleSetCacheSize, AppBase, OT_ACTION_CMD_SetLogCacheSize, ot::SECURE_MESSAGE_TYPES)
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Helper
 
+	void updateBufferSizeFromLogFlags(const ot::LogFlags& _flags);
+
 private:
+	void appendLogMessage(const ot::LogMessage& _message);
+
 	void notifyListeners(const ot::LogMessage& _message);
 
 	void workerNotify(std::list<std::string> _receiver, std::string _message);
 
 	void removeReceiver(const std::string& _receiver);
 
+	void resizeBuffer(void);
+
+	size_t						m_bufferSize;
+
 	std::list<ot::LogMessage>	m_messages;
-	unsigned int				m_count;
+	size_t						m_count;
 
 	std::list<std::string>		m_receiver;
 	std::mutex					m_receiverMutex;

@@ -7,6 +7,7 @@
 #include "AppBase.h"
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
+#include "OTCore/StringHelper.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
@@ -35,13 +36,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 namespace ot {
 	namespace intern {
 		
-		//! \brief Creates a C-String copy of the provided C++ String
-		char* getCStringCopy(const std::string& _string) {
-			char* retval = new char[_string.length() + 1];
-			strcpy_s(retval, _string.length() + 1, _string.c_str());
-			return retval;
-		}
-
 		std::string dispatchActionWrapper(const char* _json, ot::MessageType _messageType) {
 			try {
 				ot::JsonDocument actionDoc;
@@ -85,7 +79,7 @@ namespace ot {
 		}
 
 		char* dispatchAction(const char* _json, ot::MessageType _messageType) {
-			return getCStringCopy(dispatchActionWrapper(_json, _messageType));
+			return ot::getCStringCopy(dispatchActionWrapper(_json, _messageType));
 		}
 	}
 }
@@ -100,19 +94,31 @@ extern "C"
 	{
 		try {
 			if (_serviceURL == nullptr) {
+				OTAssert(0, "Service URL not set");
 				return -1;
 			}
 
+			// Initialize log dispatcher
 #ifdef _DEBUG
-			ot::LogDispatcher::initialize(OT_INFO_SERVICE_TYPE_LOGGER, true);
-			ot::LogDispatcher::instance().setLogFlags(ot::INFORMATION_LOG | ot::DETAILED_LOG | ot::WARNING_LOG | ot::ERROR_LOG);
+			ot::LogDispatcher::initialize(OT_INFO_SERVICE_TYPE_LOGGER, false);
 #else
 			ot::LogDispatcher::initialize(OT_INFO_SERVICE_TYPE_LOGGER, false);
-			ot::LogDispatcher::instance().setLogFlags(ot::NO_LOG);
-#endif // _DEBUG
-			OT_LOG_D("LoggerService starting");
+#endif
 
 			AppBase::instance().setServiceURL(_serviceURL);
+
+			// Initialize log message cache
+			AppBase::instance().updateBufferSizeFromLogFlags(ot::LogDispatcher::instance().logFlags());
+
+			// Set log flags for the logger service
+#ifdef _DEBUG
+			ot::LogDispatcher::instance().setLogFlags(ot::INFORMATION_LOG | ot::DETAILED_LOG | ot::WARNING_LOG | ot::ERROR_LOG);
+			ot::LogDispatcher::instance().addReceiver(&AppBase::instance());
+#else
+			ot::LogDispatcher::instance().setLogFlags(ot::NO_LOG);
+#endif // _DEBUG
+
+			OT_LOG_D("LoggerService starting");
 		}
 		catch (const std::exception & _e) {
 			OutputDebugStringA("ERROR: ");
@@ -128,7 +134,7 @@ extern "C"
 	};
 
 	_declspec(dllexport) const char *getServiceURL(void) {
-		return ot::intern::getCStringCopy(AppBase::instance().getServiceURL());
+		return ot::getCStringCopy(AppBase::instance().getServiceURL());
 	};
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP) {
