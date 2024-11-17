@@ -401,14 +401,6 @@ void AppBase::log(const ot::LogMessage& _message) {
 		message << "] [Frontend] " << _message.getText();
 
 		this->appendHtmlInfoMessage(ot::StyledTextConverter::toHtml(message));
-
-		// Construct display text
-		if (_message.getFlags() & ot::ERROR_LOG) {
-			this->appendInfoMessage("[ERROR] [Frontend] " + QString::fromStdString(_message.getText()));
-		}
-		else if (_message.getFlags() & ot::WARNING_LOG) {
-			this->appendInfoMessage("[WARNING] [Frontend] " + QString::fromStdString(_message.getText()));
-		}
 	}
 }
 
