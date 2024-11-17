@@ -167,17 +167,17 @@ QVariant ot::GraphicsStackItem::itemChange(QGraphicsItem::GraphicsItemChange _ch
 }
 
 QRectF ot::GraphicsStackItem::boundingRect(void) const {
-	QRectF rec = QGraphicsItemGroup::boundingRect();
-	QPointF tl = rec.topLeft();
-	QSizeF s = rec.size();
+	QRectF rec;
 
 	for (auto itm : m_items) {
-		QRectF r = itm.item->getQGraphicsItem()->boundingRect();
-		tl.setX(std::min(tl.x(), r.topLeft().x()));
-		tl.setY(std::min(tl.y(), r.topLeft().y()));
-		s = s.expandedTo(QSizeF(r.topLeft().x() + r.size().width(), r.topLeft().y() + r.size().height()));
+		if (rec.isValid()) {
+			rec = itm.item->getQGraphicsItem()->boundingRect().united(rec);
+		}
+		else {
+			rec = itm.item->getQGraphicsItem()->boundingRect();
+		}
 	}
-	return this->handleGetGraphicsItemBoundingRect(QRectF(tl, s));
+	return this->handleGetGraphicsItemBoundingRect(rec);
 }
 
 void ot::GraphicsStackItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
