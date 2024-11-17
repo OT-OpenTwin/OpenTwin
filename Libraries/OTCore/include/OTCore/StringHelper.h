@@ -46,6 +46,9 @@ namespace ot {
 	//! \brief Replaces all what occurances in the provided string and returns the result.
 	OT_CORE_API_EXPORT std::wstring stringReplace(const std::wstring& _str, const std::wstring& _what, const std::wstring& _with);
 
+	//! \brief Creates a C-String copy of the provided C++ String
+	OT_CORE_API_EXPORT char* getCStringCopy(const std::string& _str);
+
 	//! @brief Convert the provided string to a number
 	//! @param _string String representing a number
 	//! @param _failed Will be set to true if the operation failed

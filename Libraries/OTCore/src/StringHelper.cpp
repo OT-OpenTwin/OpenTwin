@@ -87,3 +87,10 @@ std::wstring ot::stringReplace(const std::wstring& _str, const std::wstring& _wh
 	}
 	return result;
 }
+
+char* ot::getCStringCopy(const std::string& _str) {
+	size_t len = _str.length() + 1;
+	char* retval = new char[len];
+	strcpy_s(retval, len, _str.c_str());
+	return retval;
+}
