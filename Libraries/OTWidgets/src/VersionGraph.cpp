@@ -120,10 +120,10 @@ void ot::VersionGraph::showEvent(QShowEvent* _event) {
 }
 
 void ot::VersionGraph::paintEvent(QPaintEvent* _event) {
+	GraphicsView::paintEvent(_event);
 	if (m_updateItemPositionRequired) {
 		this->updateVersionPositions();
 	}
-	GraphicsView::paintEvent(_event);
 }
 
 void ot::VersionGraph::updateVersionPositions(void) {
@@ -133,7 +133,7 @@ void ot::VersionGraph::updateVersionPositions(void) {
 		return;
 	}
 
-	m_rootItem->updateVersionPosition();
+	m_rootItem->updateVersionPositionAndSize();
 
 	QRectF itmRect = this->getGraphicsScene()->itemsBoundingRect();
 	itmRect.adjust(-10, -10, 10, 10);
