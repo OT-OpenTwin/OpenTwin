@@ -1,59 +1,107 @@
 #include "CSVToTableTransformer.h"
-
-ot::GenericDataStructMatrix CSVToTableTransformer::operator()(const std::string& _csvText, const CSVProperties& _properties) const
+#include "OTCore/VariableToStringConverter.h"
+ot::GenericDataStructMatrix CSVToTableTransformer::operator()(const std::string& _csvText, const CSVProperties& _properties) 
 {
+	assert(_properties.m_columnDelimiter != "" && _properties.m_rowDelimiter != "");
 	std::vector<std::string> rows = splitByDelimiter(_csvText, _properties.m_rowDelimiter);
 
-	size_t maxNumberOfColumns(1);
-	for (std::string& row : rows)
+	std::list<std::vector<std::string>> matrixRaw;
+		
+	for (uint64_t i = 0; i < rows.size(); i++)
 	{
-		size_t  numberOfColumns = countStringInString(row, _properties.m_columnDelimiter);
-		maxNumberOfColumns = maxNumberOfColumns > numberOfColumns ? maxNumberOfColumns : numberOfColumns;
+		std::string& row = rows[i];
+		const std::vector<std::string> columns = splitByDelimiter(row, _properties.m_columnDelimiter);
+		matrixRaw.push_back(columns);
 	}
 
-	ot::MatrixEntryPointer matrixDimensions;
-	matrixDimensions.m_column = maxNumberOfColumns;
-	matrixDimensions.m_row = rows.size();
-	ot::GenericDataStructMatrix matrix(matrixDimensions);
+	const ot::GenericDataStructMatrix matrix = std::move(transformRawMatrixToGenericDatastruct(matrixRaw));
 
-	ot::MatrixEntryPointer entryPointer;
-	entryPointer.m_column = 0;
-	entryPointer.m_row = 0;
-
-	for (std::string& row : rows)
-	{
-		std::vector<std::string> entries = splitByDelimiter(row, _properties.m_columnDelimiter);
-
-		for (std::string& entry : entries)
-		{
-			matrix.setValue(entryPointer, ot::Variable(entry));
-			entryPointer.m_column++;
-		}
-		entryPointer.m_column = 0;
-		entryPointer.m_row++;
-	}
 	return matrix;
 }
 
-std::vector<std::string> CSVToTableTransformer::splitByDelimiter(const std::string& _text, const std::string& _delimiter) const
+void CSVToTableTransformer::clearBuffer()
 {
-	size_t pos_start = 0, pos_end, delim_len = _delimiter.length();
-	std::vector<std::string> segments;
-	size_t numberOfSegments = countStringInString(_text, _delimiter);
-	segments.reserve(numberOfSegments + 1);
-
-	while ((pos_end = _text.find(_delimiter, pos_start)) != std::string::npos)
-	{
-		std::string row = _text.substr(pos_start, pos_end - pos_start);
-		pos_start = pos_end + delim_len;
-		segments.push_back(row);
-	}
-	std::string row = _text.substr(pos_start);
-	segments.push_back(row);
-	return segments;
+	m_composed = "";
+	m_segments.clear();
 }
 
-uint64_t CSVToTableTransformer::countStringInString(const std::string& _text, const std::string& _searchCriteria) const
+void CSVToTableTransformer::buildSegment(const std::string& _subString, const std::string& _delimiter, bool _lastSegment)
+{
+	m_composed += _subString;
+	std::string::difference_type numberOfMasks = std::count(m_composed.begin(), m_composed.end(), m_maskingChar);
+	if (numberOfMasks % 2 == 0)
+	{
+		m_composed.erase(remove(m_composed.begin(), m_composed.end(), m_maskingChar), m_composed.end());
+		if (_lastSegment)
+		{
+			m_segments.push_back(m_composed);
+			m_composed = "";
+		}
+	}
+	else
+	{
+		if (_lastSegment)
+		{
+			m_composed += _delimiter;
+		}
+	}
+}
+
+std::vector<std::string> CSVToTableTransformer::splitByDelimiter(const std::string& _text, const std::string& _delimiter)
+{
+	clearBuffer();
+	size_t pos_start = 0, pos_end, delim_len = _delimiter.length();
+	size_t numberOfSegments = countStringInString(_text, _delimiter);
+	m_segments.reserve(numberOfSegments + 1);
+	std::string composed("");
+	bool lastEntry = false;
+	while ((pos_end = _text.find(_delimiter, pos_start)) != std::string::npos)
+	{
+		const std::string row = _text.substr(pos_start, pos_end - pos_start);
+		buildSegment(row,_delimiter);
+		pos_start = pos_end + delim_len;
+	}
+	if (pos_start < _text.size())
+	{
+		std::string row = _text.substr(pos_start);
+		buildSegment(row, _delimiter,false);
+		m_segments.push_back(m_composed);
+	}
+	m_segments.shrink_to_fit();
+	std::vector<std::string> returnValue(m_segments);
+	clearBuffer();
+	return returnValue;
+}
+
+ot::GenericDataStructMatrix CSVToTableTransformer::transformRawMatrixToGenericDatastruct(const std::list<std::vector<std::string>>& _rawMatrix)
+{
+	ot::MatrixEntryPointer matrixDimensions;
+
+	size_t maxNumberOfColumns(1);
+	for (auto& row : _rawMatrix)
+	{
+		size_t  numberOfColumns = row.size();
+		maxNumberOfColumns = maxNumberOfColumns > numberOfColumns ? maxNumberOfColumns : numberOfColumns;
+	}
+	matrixDimensions.m_column = maxNumberOfColumns;
+	matrixDimensions.m_row = _rawMatrix.size();
+	ot::GenericDataStructMatrix matrix(matrixDimensions);
+
+	ot::MatrixEntryPointer entryPointer;
+	auto rowPointer = _rawMatrix.begin();
+	for (entryPointer.m_row = 0; entryPointer.m_row < _rawMatrix.size(); entryPointer.m_row++, rowPointer++)
+	{
+		for (entryPointer.m_column = 0; entryPointer.m_column < rowPointer->size(); entryPointer.m_column++)
+		{
+			ot::Variable cellValue((*rowPointer)[entryPointer.m_column]);
+			matrix.setValue(entryPointer, cellValue);
+		}
+	}
+
+	return matrix;
+}
+
+uint64_t CSVToTableTransformer::countStringInString(const std::string& _text, const std::string& _searchCriteria) 
 {
 	uint64_t count = 0;
 	uint64_t nPos = _text.find(_searchCriteria, 0);
