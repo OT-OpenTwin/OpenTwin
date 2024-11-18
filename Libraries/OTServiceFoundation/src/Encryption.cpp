@@ -92,8 +92,8 @@ OT_SERVICEFOUNDATION_API_EXPORT std::string ot::decryptAndUnzipString(const std:
 
 	delete[] decodedCompressedContent;
 	decodedCompressedContent = nullptr;
-
-	std::string decodedAndUnzipped(decodedUncompressesContent);
+	std::string decodedAndUnzipped(decodedUncompressesContent, _uncompressedLength);
+	
 	delete[] decodedUncompressesContent;
 	decodedUncompressesContent = nullptr;
 
@@ -122,7 +122,7 @@ OT_SERVICEFOUNDATION_API_EXPORT std::string ot::encryptAndZipString(const std::s
 	delete[] compressedData;
 	compressedData = nullptr;
 
-	std::string compressedEncryptedContent(base64_string);
+	std::string compressedEncryptedContent(base64_string, encoded_data_length);
 	delete[] base64_string;
 	base64_string = nullptr;
 	return compressedEncryptedContent;
