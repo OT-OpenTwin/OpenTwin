@@ -332,7 +332,7 @@ void ot::VersionGraphManager::processCompactItem(VersionGraphVersionCfg* _parent
 	}
 	
 	// Last item or branch item with matching filter (item is shown)
-	else if (this->checkFilterValid(_config, _filterText)) {
+	else if (this->checkFilterValid(_config, _filterText) || _config->getChildVersions().size() == 0) {
 		// Process item childs
 		for (const VersionGraphVersionCfg* childCfg : _config->getChildVersions()) {
 			this->processCompactItem(newItem, childCfg, _activeVersion, true, _includeLabeledVersions, _filterText);
