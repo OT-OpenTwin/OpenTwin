@@ -34,6 +34,7 @@
 #include "InfoFileManager.h"
 #include "Result1DManager.h"
 #include "ParametricResult1DManager.h"
+#include "ParametricCombination.h"
 
 #include "boost/algorithm/string.hpp"
 
@@ -41,6 +42,7 @@
 #include <map>
 #include <sstream>
 #include <filesystem>
+#include <regex>
 
 #include "zlib.h"
 #include "base64.h"
@@ -441,6 +443,10 @@ void Application::filesUploaded(ot::JsonDocument& _doc)
 	}
 
 	modelComponent()->deleteEntitiesFromModel(deletedNameList, false);
+
+	modelComponent()->storeNewEntities("", false, false);
+
+	extractResults();
 
 	modelComponent()->storeNewEntities("LTSpice project uploaded", false);
 
@@ -1098,3 +1104,221 @@ void Application::setLocalFileName(const std::string& hostName, const std::strin
 		assert(0);
 	}
 }
+
+void Application::extractResults()
+{
+	std::string projectFileName = "Files/" + std::filesystem::path(getSimpleFileName()).stem().string();
+	if (projectFileName.empty()) return;
+
+	// First, we get a list of all parametric runs and their parameter combinations from the .log file
+	std::list<ParametricCombination> parameterRuns; 
+	getParametricCombinations(projectFileName + ".log", parameterRuns);
+
+	// Now we read the curves from the .raw file
+	LTSpiceData spiceData = getCurveData(projectFileName + ".raw");
+
+	// Split the curves into the individual parametric runs (if necessary)
+
+
+	// Finally, we store the parametric data of the curves
+
+
+}
+
+void Application::getParametricCombinations(const std::string& logFileName, std::list<ParametricCombination>& parameterRuns)
+{
+	parameterRuns.clear();
+
+	// Read the data of the log file entity into a string logFileContent
+	ot::EntityInformation entityInfo;
+	modelComponent()->getEntityInformation(logFileName, entityInfo);
+	
+	EntityFile *fileEntity = dynamic_cast<EntityFile*>(modelComponent()->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), getClassFactory()));
+	if (fileEntity == nullptr) return;
+
+	std::shared_ptr<EntityBinaryData> data = fileEntity->getData();
+	if (data == nullptr) return;
+
+	std::vector<char> logFileData = data->getData();
+	std::string logFileContent(logFileData.begin(), logFileData.end());
+
+	// Now extract all lines with a step message from the logfile data
+	std::vector<std::string> stepLines;
+	std::istringstream stream(logFileContent);
+	std::string line;
+
+	while (std::getline(stream, line)) {
+		std::string lowerStr = line;
+		std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
+		if (lowerStr.find(".step") != std::string::npos) {
+			stepLines.push_back(line);
+		}
+	}
+
+	// Finally, we need to process each line and extract its parameter combinations
+	std::vector<std::pair<std::string, double>> params;
+	std::regex stepRegex(R"((\w+)=([-+]?\d*\.?\d+))"); // Regex für Parameter=Wert
+	std::smatch match;
+
+	for (auto line : stepLines)
+	{
+		ParametricCombination parameterCombination;
+
+		auto searchStart = line.cbegin();
+		while (std::regex_search(searchStart, line.cend(), match, stepRegex)) {
+			std::string param = match[1].str();           // parameter name
+			double value = std::stod(match[2].str());     // parameter value
+			parameterCombination.addParameter(param, value);
+			searchStart = match.suffix().first;
+		}
+
+		parameterRuns.push_back(parameterCombination);
+	}
+}
+
+LTSpiceData Application::getCurveData(const std::string& rawFileName)
+{
+	LTSpiceData result;
+
+	ot::EntityInformation entityInfo;
+	modelComponent()->getEntityInformation(rawFileName, entityInfo);
+
+	EntityFile* fileEntity = dynamic_cast<EntityFile*>(modelComponent()->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), getClassFactory()));
+	if (fileEntity == nullptr) return result;
+
+	std::shared_ptr<EntityBinaryData> data = fileEntity->getData();
+	if (data == nullptr) return result;
+
+	std::vector<char> rawFileData = data->getData();
+
+	std::stringstream dataStream(std::ios::in | std::ios::out | std::ios::binary);
+	dataStream.write(rawFileData.data(), rawFileData.size());
+
+	result = readLTSpiceRaw(dataStream);
+
+	return result;
+}
+
+bool Application::getLine(std::stringstream& data, std::string &line)
+{
+	line.clear();
+	while (!data.eof())
+	{
+		char c = 0;
+		data.get(c);
+
+		if (c == '\n')
+		{
+			data.get(c); // Skip the following 0
+			return true;
+		}
+		if (c != 0 && c != '\r') line.push_back(c);
+	}
+
+	return !(line.empty());
+}
+
+double bytesToDouble(const uint8_t* bytes) {
+	// 8-Byte-Wert für die Interpretation
+	uint64_t intRepresentation = 0;
+
+	// Big-Endian zu uint64_t umwandeln
+	for (int i = 0; i < 8; ++i) {
+		intRepresentation = (intRepresentation << 8) | bytes[i];
+	}
+
+	// In double umwandeln
+	double result;
+	std::memcpy(&result, &intRepresentation, sizeof(double)); // Typ-Punning
+	return result;
+}
+
+LTSpiceData Application::readLTSpiceRaw(std::stringstream& data) 
+{
+	LTSpiceData result;
+
+	bool binaryData = false;
+
+	std::string line;
+	while (getLine(data, line)) {
+		if (line.find("Flags:") != std::string::npos) {
+			if (line.find("complex") != std::string::npos) {
+				result.isComplex = true;
+			}
+		}
+		else if (line.find("No. Variables:") != std::string::npos) {
+			int numVariables = std::stoi(line.substr(15));
+			result.variables.reserve(numVariables);
+		}
+		else if (line.find("Variables:") != std::string::npos) {
+			for (int i = 0; i < result.variables.capacity(); i++) {
+				std::string varline;
+				if (getLine(data, varline))
+				{
+					std::stringstream varStream(varline);
+					LTSpiceVariable var;
+					varStream >> var.index >> var.name >> var.unit;
+					result.variables.push_back(var);
+				}
+			}
+		}
+		else if (line.find("Binary:") != std::string::npos) {
+			binaryData = true;
+			break;  // Start of the binary data block
+		}
+		else if (line.find("Values:") != std::string::npos) {
+			break;  // Start of the ascii data block
+		}
+	}
+
+	if (binaryData)
+	{
+		// Read the binary data (distinguish between real and complex data)
+		while (!data.eof()) {
+			std::vector<std::complex<double>> dataRow;
+			for (size_t i = 0; i < result.variables.size(); i++) {
+				if (i == 0)
+				{
+					// This variable is stored in double-precision
+					if (result.isComplex) {
+						double realPart, imagPart;
+						data.read(reinterpret_cast<char*>(&realPart), sizeof(double));
+						data.read(reinterpret_cast<char*>(&imagPart), sizeof(double));
+						dataRow.emplace_back(realPart, imagPart);
+					}
+					else {
+						double realValue;
+						data.read(reinterpret_cast<char*>(&realValue), sizeof(double));
+						dataRow.emplace_back(realValue, 0.0f);
+					}
+				}
+				else
+				{
+					// This variable is stored in single-precision
+					if (result.isComplex) {
+						double realPart, imagPart;
+						data.read(reinterpret_cast<char*>(&realPart), sizeof(double));
+						data.read(reinterpret_cast<char*>(&imagPart), sizeof(double));
+						dataRow.emplace_back(realPart, imagPart);
+					}
+					else {
+						float realValue;
+						data.read(reinterpret_cast<char*>(&realValue), sizeof(float));
+						dataRow.emplace_back(realValue, 0.0f);
+					}
+				}
+			}
+			if (data) result.data.push_back(dataRow);
+		}
+	}
+	else
+	{
+		// Read the ascii data (distinguish between real and complex data)
+		assert(0); // Not yet implemented
+
+
+	}
+
+	return result;
+}
+

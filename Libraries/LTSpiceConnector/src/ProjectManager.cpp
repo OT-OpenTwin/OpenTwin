@@ -582,9 +582,9 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 		std::ifstream dataFile(file, std::ios::binary | std::ios::ate);
 
 		std::streampos size = dataFile.tellg();
+		dataFile.seekg(0, std::ios::beg);
 
 		char *memBlock = new char[size];
-		dataFile.seekg(0, std::ios::beg);
 		dataFile.read(memBlock, size);
 		dataFile.close();
 

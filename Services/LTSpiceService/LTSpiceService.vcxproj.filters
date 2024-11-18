@@ -74,5 +74,8 @@
     <ClInclude Include="include\Result1DData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ParametricCombination.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
