@@ -28,15 +28,6 @@
     <ClCompile Include="src\InfoFileManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Result1DFileManager.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Result1DFileData.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Result1DRunIDContainer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c">
       <Filter>Third Party Files</Filter>
     </ClCompile>
@@ -69,15 +60,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\LTSpiceConnector\InfoFileManager.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\LTSpiceConnector\Result1DFileManager.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\LTSpiceConnector\Result1DRunIDContainer.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\LTSpiceConnector\Result1DFileData.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

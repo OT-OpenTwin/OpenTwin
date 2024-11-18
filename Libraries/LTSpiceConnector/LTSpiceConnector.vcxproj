@@ -25,9 +25,6 @@
     <ClCompile Include="src\ProgressInfo.cpp" />
     <ClCompile Include="src\ProjectInformationDialog.cpp" />
     <ClCompile Include="src\ProjectManager.cpp" />
-    <ClCompile Include="src\Result1DFileData.cpp" />
-    <ClCompile Include="src\Result1DFileManager.cpp" />
-    <ClCompile Include="src\Result1DRunIDContainer.cpp" />
     <ClCompile Include="src\ServiceConnector.cpp" />
     <ClCompile Include="src\InfoFileManager.cpp" />
     <ClCompile Include="src\LTSpiceConnectorAPI.cpp" />
@@ -38,9 +35,6 @@
     <ClInclude Include="include\LTSpiceConnector\ProgressInfo.h" />
     <QtMoc Include="include\LTSpiceConnector\ProjectInformationDialog.h" />
     <ClInclude Include="include\LTSpiceConnector\ProjectManager.h" />
-    <ClInclude Include="include\LTSpiceConnector\Result1DFileData.h" />
-    <ClInclude Include="include\LTSpiceConnector\Result1DFileManager.h" />
-    <ClInclude Include="include\LTSpiceConnector\Result1DRunIDContainer.h" />
     <ClInclude Include="include\LTSpiceConnector\ServiceConnector.h" />
     <ClInclude Include="include\LTSpiceConnector\InfoFileManager.h" />
     <ClInclude Include="include\LTSpiceConnector\LTSpiceConnectorAPI.h" />
