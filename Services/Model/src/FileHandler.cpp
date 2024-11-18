@@ -5,8 +5,6 @@
 #include "OTServiceFoundation/Encryption.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTCore/EncodingGuesser.h"
-#include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
-#include "OTCore/EncodingConverter_UTF16ToUTF8.h"
 #include "EntityFileText.h"
 #include "EntityFileCSV.h"
 #include "Model.h"
@@ -83,7 +81,6 @@ void FileHandler::storeTextFile(ot::JsonDocument& _document)
 		for (std::string& fileName : fileNames)
 		{
 			std::string fileContent = ot::decryptAndUnzipString(*content, *uncompressedDataLength);
-			ensureUTF8Encoding(fileName);
 			storeFileInDataBase(fileContent, fileName);
 			uncompressedDataLength++;
 			content++;
@@ -91,30 +88,6 @@ void FileHandler::storeTextFile(ot::JsonDocument& _document)
 	}
 
 	addTextFilesToModel();
-}
-
-void FileHandler::ensureUTF8Encoding(std::string& _text)
-{
-	ot::EncodingGuesser guesser;
-	ot::TextEncoding::EncodingStandard encodingStandard = guesser(_text.data(),_text.size());
-	if (encodingStandard == ot::TextEncoding::EncodingStandard::ANSI)
-	{
-		ot::EncodingConverter_ISO88591ToUTF8 converter;
-		converter(_text);
-	}
-	else if (encodingStandard == ot::TextEncoding::EncodingStandard::UTF16_BEBOM || encodingStandard == ot::TextEncoding::EncodingStandard::UTF16_LEBOM)
-	{
-		ot::EncodingConverter_UTF16ToUTF8 converter;
-		converter(encodingStandard,_text);
-	}
-	else if (encodingStandard == ot::TextEncoding::EncodingStandard::UNKNOWN)
-	{
-		throw std::exception("File could not be imported, because the text encoding could not be determined.");
-	}
-	else
-	{
-		assert(encodingStandard == ot::TextEncoding::EncodingStandard::UTF8 || encodingStandard == ot::TextEncoding::EncodingStandard::UTF8_BOM);
-	}
 }
 
 void FileHandler::handleChangedText(ot::JsonDocument& _doc)

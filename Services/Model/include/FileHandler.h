@@ -26,9 +26,9 @@ private:
 	std::list<bool> m_forceVisible;
 	
 	void importFile(const std::string& _fileMask, const std::string& _dialogTitle, const std::string& _functionName);
+	//! @brief Stores the string as byte array. Content cannot be searched for but it is not necessary to guarantee UTF8 encoding
 	void storeTextFile(ot::JsonDocument& _doc);
 	void addTextFilesToModel();
-	void ensureUTF8Encoding(std::string& _text);
 	
 	void handleChangedText(ot::JsonDocument& _doc);
 	void storeChangedText(IVisualisationText* _entity, const std::string _text);
