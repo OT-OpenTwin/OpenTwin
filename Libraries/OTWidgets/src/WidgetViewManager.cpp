@@ -120,9 +120,12 @@ void ot::WidgetViewManager::closeView(const std::string& _viewName) {
 	OTAssertNullptr(m_dockManager);
 
 	WidgetView* view = this->findView(_viewName);
-	if (view == nullptr) return;
-
-	if (view->getViewIsPermanent()) return;
+	if (view == nullptr) {
+		return;
+	}
+	if (view->getViewIsPermanent()) {
+		return;
+	}
 
 	// Set the view as deleted by manager so it wont remove itself and remove it from the maps
 	view->m_isDeletedByManager = true;
@@ -134,6 +137,9 @@ void ot::WidgetViewManager::closeView(const std::string& _viewName) {
 
 	// Remove the dock widget itself
 	m_dockManager->removeDockWidget(view->getViewDockWidget());
+
+	// Finally destroy the view
+	delete view;
 }
 
 void ot::WidgetViewManager::closeViews(const BasicServiceInformation& _owner) {
