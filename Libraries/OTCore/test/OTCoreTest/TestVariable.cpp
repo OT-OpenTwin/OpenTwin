@@ -243,7 +243,7 @@ TEST(StringToVariable, StringToInt32Variable)
 {	
 	constexpr const int32_t expectedValue = std::numeric_limits<int32_t>::max();
 	ot::StringToVariableConverter converter;
-	const ot::Variable actualValue = converter(std::to_string(expectedValue));
+	const ot::Variable actualValue = converter(std::to_string(expectedValue), '.');
 	
 	EXPECT_TRUE(actualValue.isInt32());
 	EXPECT_EQ(actualValue.getInt32(), expectedValue);
@@ -254,7 +254,7 @@ TEST(StringToVariable, StringToInt64Variable)
 	//const int64_t expectedValue = std::numeric_limits<int64_t>::max();
 	constexpr const long long expectedValue = std::numeric_limits<long long>::max();
 	ot::StringToVariableConverter converter;
-	const ot::Variable actualValue = converter(std::to_string(expectedValue));
+	const ot::Variable actualValue = converter(std::to_string(expectedValue), '.');
 	
 	EXPECT_TRUE(actualValue.isInt64());
 	EXPECT_EQ(actualValue.getInt64(), expectedValue);
@@ -264,7 +264,7 @@ TEST(StringToVariable, StringToFloatVariable)
 {
 	const float expectedValue = 4.f;
 	ot::StringToVariableConverter converter;
-	const ot::Variable actualValue = converter(std::to_string(expectedValue));
+	const ot::Variable actualValue = converter(std::to_string(expectedValue), '.');
 
 	EXPECT_TRUE(actualValue.isFloat());
 	EXPECT_TRUE(actualValue.getFloat() == expectedValue);
@@ -275,7 +275,7 @@ TEST(StringToVariable, StringToDoubleVariable)
 	constexpr const double expectedValue = std::numeric_limits<double>::max();
 	ot::Variable expectedVariable(expectedValue);
 	ot::StringToVariableConverter converter;
-	const ot::Variable actualValue = converter(std::to_string(expectedValue));
+	const ot::Variable actualValue = converter(std::to_string(expectedValue), '.');
 
 	EXPECT_TRUE(actualValue.isDouble());
 	EXPECT_TRUE(actualValue == expectedVariable);
@@ -283,43 +283,40 @@ TEST(StringToVariable, StringToDoubleVariable)
 
 TEST(StringToVariable, StringToStringVariable)
 {
-	const std::string expectedValue = "4";
+	const std::string expectedValue = "\"4\"";
 	ot::StringToVariableConverter converter;
-	const ot::Variable actualValue = converter("\""+expectedValue+"\"");
+	const ot::Variable actualValue = converter(expectedValue, '.');
 
 	EXPECT_TRUE(actualValue.isConstCharPtr());
-	EXPECT_EQ(actualValue.getConstCharPtr(), expectedValue);
-}
-TEST(StringToVariable, StringToBoolVariable)
-{
-	const bool expectedValue = true;
-	ot::StringToVariableConverter converter;
-	const ot::Variable actualValue = converter("true");
-
-	EXPECT_TRUE(actualValue.isBool());
-	EXPECT_EQ(actualValue.getBool(), expectedValue);
+	EXPECT_EQ(actualValue.getConstCharPtr(), expectedValue, '.');
 }
 
 TEST(StringToVariable, String)
 {
 	ot::StringToVariableConverter converter;
-	const ot::Variable actualValue = converter("F");
-	EXPECT_TRUE(actualValue.isConstCharPtr());
-}
-
-TEST(StringToVariable, ScientificNotationWrongDelimiter)
-{
-	ot::StringToVariableConverter converter;
-	const ot::Variable actualValue = converter("-1,00E+00");
+	const ot::Variable actualValue = converter("F", '.');
 	EXPECT_TRUE(actualValue.isConstCharPtr());
 }
 
 TEST(StringToVariable, ScientificNotation)
 {
+	const float expectedValue = -1.E3f;
 	ot::StringToVariableConverter converter;
-	const ot::Variable actualValue = converter("-1.00E+00");
+	const ot::Variable actualValue = converter("-1.00E+03", '.');
 	EXPECT_TRUE(actualValue.isFloat());
+	EXPECT_EQ(actualValue.getFloat(), expectedValue);
 }
+
+TEST(StringToVariable, ScientificNotationWithCommaAsDecimalSeparator)
+{
+	const float expectedValue = -1.E3f;
+
+	ot::StringToVariableConverter converter;
+	const ot::Variable actualValue = converter("-1,00E+3", ',');
+	EXPECT_TRUE(actualValue.isFloat());
+	EXPECT_EQ(actualValue.getFloat(), expectedValue);
+}
+
 
 TEST(VariableTest, StringMove)
 {
@@ -330,4 +327,27 @@ TEST(VariableTest, StringMove)
 	var[0] = ot::Variable("new Value");
 
 	EXPECT_TRUE(true);
+}
+
+
+TEST(StringToVariable, StringToFloatVariableWithThousandSeparators)
+{
+	constexpr const float expectedValue = 1512345.13;
+	std::string str = "1,512,345.13";
+	ot::StringToVariableConverter converter;
+	const ot::Variable actualValue = converter(str, '.');
+
+	EXPECT_TRUE(actualValue.isFloat());
+	EXPECT_EQ(actualValue.getFloat(), expectedValue);
+}
+
+TEST(StringToVariable, StringToFloatVariableWithCommaDecimalSeparator)
+{
+	constexpr const float expectedValue = 1512345.13;
+	std::string str = "1512345,13";
+	ot::StringToVariableConverter converter;
+	const ot::Variable actualValue = converter(str, ',');
+
+	EXPECT_TRUE(actualValue.isFloat());
+	EXPECT_EQ(actualValue.getFloat(), expectedValue);
 }

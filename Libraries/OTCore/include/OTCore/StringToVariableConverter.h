@@ -12,7 +12,12 @@ namespace ot
 	class __declspec(dllexport)  StringToVariableConverter
 	{
 	public:
+		Variable operator() (const std::string& _value, const char _decimalSeparator);
 
-		Variable operator() (const std::string& value);
+	private:
+		Variable convertIfFitsNumericalValue(const std::string& _value);
+		void removeThousandsSeparators(std::string& _value, const char _currentSeparator);
+		void removeWhitespaces(std::string& _value);
+		void ensurePointAsDecimalSeparator(std::string& _value);
 	};
 }
