@@ -12,7 +12,7 @@
 #include <assert.h>
 #include "QueuingHttpRequestsRAII.h"
 #include "QueuingDatabaseWritingRAII.h"
-
+#include "OTCore/StringHelper.h"
 
 void FileHandler::addButtons(ot::components::UiComponent* _uiComponent, const std::string& _pageName)
 {
@@ -20,21 +20,40 @@ void FileHandler::addButtons(ot::components::UiComponent* _uiComponent, const st
 
 	_uiComponent->addMenuGroup(_pageName,groupName);
 	m_buttonFileImport.SetDescription(_pageName, groupName, "Import Text File");
+	m_buttonPythonImport.SetDescription(_pageName, groupName, "Import Python Script");
+
+	_uiComponent->addMenuButton(m_buttonPythonImport, ot::LockModelWrite, "python");
 	_uiComponent->addMenuButton(m_buttonFileImport, ot::LockModelWrite, "TextVisible");
 }
 
 bool FileHandler::handleAction(const std::string& _action, ot::JsonDocument& _doc)
 {
 	bool actionIsHandled= false;
-	const std::string buttonDescr = m_buttonFileImport.GetFullDescription();
-	if (_action == buttonDescr)
+	
+	if (_action == m_buttonFileImport.GetFullDescription())
 	{
-		importFile("Text files (*.csv;*.txt)","Import Text File","ImportTextFile");
+		const std::string fileMask = "Text files (*.csv;*.txt)";
+		const std::string fileDialogTitle = "Import Text File";
+		const std::string subsequentFunction = "ImportTextFile";
+		importFile(fileMask,fileDialogTitle,subsequentFunction);
+		actionIsHandled = true;
+	}
+	else if (_action == m_buttonPythonImport.GetFullDescription())
+	{
+		const std::string fileMask = "Python files (*.py)";
+		const std::string fileDialogTitle = "Import Python Script";
+		const std::string subsequentFunction = "ImportPythonScript";
+		importFile(fileMask, fileDialogTitle, subsequentFunction);
 		actionIsHandled = true;
 	}
 	else if (_action == "ImportTextFile")
 	{
-		storeTextFile(_doc);
+		storeTextFile(_doc, ot::FolderNames::FilesFolder);
+		actionIsHandled = true;
+	}
+	else if (_action == "ImportPythonScript")
+	{
+		storeTextFile(_doc, ot::FolderNames::PythonScriptFolder);
 		actionIsHandled = true;
 	}
 	else if (_action == OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest)
@@ -53,7 +72,6 @@ void FileHandler::importFile(const std::string& _fileMask, const std::string& _d
 {
 	const std::string& serviceURL = Application::instance()->getServiceURL();
 	const std::string serviceName =	Application::instance()->getServiceName();
-
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString(_dialogTitle, doc.GetAllocator()), doc.GetAllocator());
@@ -67,7 +85,7 @@ void FileHandler::importFile(const std::string& _fileMask, const std::string& _d
 }
 
 
-void FileHandler::storeTextFile(ot::JsonDocument& _document)
+void FileHandler::storeTextFile(ot::JsonDocument& _document, const std::string& _folderName)
 {
 	std::list<std::string> contents = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_Content);
 	std::list<int64_t> 	uncompressedDataLengths = ot::json::getInt64List(_document, OT_ACTION_PARAM_FILE_Content_UncompressedDataLength);
@@ -81,7 +99,8 @@ void FileHandler::storeTextFile(ot::JsonDocument& _document)
 		for (std::string& fileName : fileNames)
 		{
 			std::string fileContent = ot::decryptAndUnzipString(*content, *uncompressedDataLength);
-			storeFileInDataBase(fileContent, fileName);
+		
+			storeFileInDataBase(fileContent, fileName,_folderName);
 			uncompressedDataLength++;
 			content++;
 		}
@@ -165,9 +184,11 @@ void FileHandler::NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _o
 	Application::instance()->sendMessage(true, _owner, _doc, response);
 }
 
-void FileHandler::storeFileInDataBase(const std::string& _text, const std::string& _fileName)
+void FileHandler::storeFileInDataBase(const std::string& _text, const std::string& _fileName, const std::string& _folderName)
 {
 	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+	
 	ot::UID entIDData =	model->createEntityUID();
 	ot::UID entIDTopo =	model->createEntityUID();
 	const std::string serviceName = Application::instance()->getServiceName();
@@ -176,6 +197,8 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	std::string path = _fileName.substr(0, fileNamePos);
 	std::string name = _fileName.substr(fileNamePos + 1);
 	std::string type = name.substr(name.find_last_of('.') + 1);
+
+	ot::stringToLowerCase(type);
 
 	std::unique_ptr<EntityFileText> textFile;
 	if (type == "csv")
@@ -195,7 +218,10 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 
 	ot::EncodingGuesser guesser;
 	textFile->setFileProperties(path, name,type);
-	textFile->setName( ot::FolderNames::FilesFolder + "/" + name);
+	
+	std::list<std::string> folderEntities = model->getListOfFolderItems(_folderName, true);
+	const std::string entityName = CreateNewUniqueTopologyName(folderEntities, _folderName, name);;
+	textFile->setName(entityName);
 	
 	textFile->setTextEncoding(guesser(_text.data(), _text.size()));
 	textFile->StoreToDataBase();

@@ -5,6 +5,14 @@
 
 // OpenTwin header
 #include "OTCore/StringHelper.h"
+#include <algorithm>
+
+void ot::stringToLowerCase(std::string& _string)
+{
+	std::transform(_string.begin(), _string.end(), _string.begin(),
+		[](unsigned char c) { return std::tolower(c); });
+}
+
 
 std::list<std::string> ot::splitString(const std::string& _str, char _splitBy, bool _skipEmpty) {
 	std::string temp = _str;

@@ -16,6 +16,9 @@
 
 namespace ot {
 
+	OT_CORE_API_EXPORT void stringToLowerCase(std::string& _string);
+
+
 	//! @brief Split the provided string
 	//! @param _str String to split
 	//! @param _splitBy Char to split at
