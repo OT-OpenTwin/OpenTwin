@@ -1716,6 +1716,12 @@ std::string ModelState::getVersionDescription(const std::string& _version)
 void ModelState::addVersionGraphItem(const std::string& _version, const std::string& _parentVersion, const std::string& _label, const std::string& _description)
 {
 	if (_parentVersion.empty()) {
+		if (m_graphCfg.getRootVersion()) {
+			if (!m_graphCfg.getRootVersion()->getName().empty()) {
+				OT_LOG_EAS("Root version already set { \"OldVerionName\": \"" + m_graphCfg.getRootVersion()->getName() + "\", \"NewVersionName\": \"" + _version + "\" }. Ignoring..");
+				return;
+			}
+		}
 		m_graphCfg.setRootVersion(new ot::VersionGraphVersionCfg(_version, _label, _description));
 	}
 	else {
@@ -1723,6 +1729,12 @@ void ModelState::addVersionGraphItem(const std::string& _version, const std::str
 		if (!parent) {
 			OT_LOG_EAS("Parent version \"" + _parentVersion + "\" not found.");
 			return;
+		}
+		for (const ot::VersionGraphVersionCfg* child : parent->getChildVersions()) {
+			if (child->getName() == _version) {
+				OT_LOG_EAS("Child version already exists { \"ParentVersion\": \"" + _parentVersion + "\", \"ChildVersion\": \"" + _version + "\" }. Ignoring..");
+				return;
+			}
 		}
 
 		parent->addChildVersion(_version, _label, _description);
