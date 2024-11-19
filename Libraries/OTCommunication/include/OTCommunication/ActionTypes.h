@@ -124,6 +124,7 @@
 #define OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION "Model.OtherCollection.GetEntities"
 #define OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot "Model.Plot.UpdateCurves"
 #define OT_ACTION_CMD_MODEL_DeleteCurvesFromPlots "Model.Plot.DeleteCurves"
+#define OT_ACTION_CMD_MODEL_RequestVisualisationData "Model.Visualisation.Data"
 
 #define OT_ACTION_CMD_UI_ServiceSetupCompleted "UI.Service.SetupCompleted"
 #define OT_ACTION_CMD_UI_RegisterForModelEvents "UI.ModelView.Events.Register"
@@ -257,6 +258,7 @@
 #define OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged "UI.VIEW.OBJ.Plot1DPropertiesChanged"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode "UI.VIEW.OBJ.SceneNode"
 #define OT_ACTION_CMD_UI_VIEW_CreateRubberband "UI.VIEW.CreateRubberband"
+
 // rm
 #define OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection "UI.VIEW.GetTableSelection"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable "UI.VIEW.Table.Show"
