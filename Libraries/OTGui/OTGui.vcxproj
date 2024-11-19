@@ -72,7 +72,6 @@
     <ClInclude Include="include\OTGui\Painter2D.h" />
     <ClInclude Include="include\OTGui\Painter2DFactory.h" />
     <ClInclude Include="include\OTGui\Path2D.h" />
-    <ClInclude Include="include\OTGui\PlainTextEditViewCfg.h" />
     <ClInclude Include="include\OTGui\Plot1DAxisCfg.h" />
     <ClInclude Include="include\OTGui\Plot1DCfg.h" />
     <ClInclude Include="include\OTGui\Plot1DCurveInfoCfg.h" />
@@ -113,10 +112,6 @@
     <ClInclude Include="include\OTGui\VersionGraphVersionCfg.h" />
     <ClInclude Include="include\OTGui\VisualisationTypes.h" />
     <ClInclude Include="include\OTGui\WidgetViewBase.h" />
-    <ClInclude Include="include\OTGui\WidgetViewCfg.h" />
-    <ClInclude Include="include\OTGui\WidgetViewCfgFactory.h" />
-    <ClInclude Include="include\OTGui\WidgetViewCfgRegistrar.h" />
-    <ClInclude Include="include\OTGui\WidgetViewCfgRegistrar.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BasicGraphicsIntersectionItem.cpp" />
@@ -172,7 +167,6 @@
     <ClCompile Include="src\Painter2D.cpp" />
     <ClCompile Include="src\Painter2DFactory.cpp" />
     <ClCompile Include="src\Path2D.cpp" />
-    <ClCompile Include="src\PlainTextEditViewCfg.cpp" />
     <ClCompile Include="src\Plot1DAxisCfg.cpp" />
     <ClCompile Include="src\Plot1DCfg.cpp" />
     <ClCompile Include="src\Plot1DCurveInfoCfg.cpp" />
@@ -210,8 +204,6 @@
     <ClCompile Include="src\VersionGraphVersionCfg.cpp" />
     <ClCompile Include="src\VisualisationTypes.cpp" />
     <ClCompile Include="src\WidgetViewBase.cpp" />
-    <ClCompile Include="src\WidgetViewCfg.cpp" />
-    <ClCompile Include="src\WidgetViewCfgFactory.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

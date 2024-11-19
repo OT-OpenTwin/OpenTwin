@@ -38,11 +38,6 @@ ot::WidgetView::~WidgetView() {
 
 // Setter/Getter
 
-bool ot::WidgetView::setupViewFromConfig(WidgetViewCfg* _config) {
-	this->setViewData(*_config);
-	return true;
-}
-
 QAction* ot::WidgetView::getViewToggleAction(void) const {
 	if (!m_dockWidget) return nullptr;
 	else return m_dockWidget->toggleViewAction();

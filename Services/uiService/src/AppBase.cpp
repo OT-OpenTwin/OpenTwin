@@ -876,11 +876,12 @@ void AppBase::createUi(void) {
 
 			// Display docks
 			OT_LOG_D("Settings up dock window visibility");
-
+	
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_debug);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output, ads::BottomDockWidgetArea);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation, ads::LeftDockWidgetArea);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid, m_projectNavigation->getViewDockWidget()->dockAreaWidget(), ads::BottomDockWidgetArea);
+			
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker, m_projectNavigation->getViewDockWidget()->dockAreaWidget());
 			m_projectNavigation->getViewDockWidget()->setAsCurrentTab();
 
@@ -2793,7 +2794,7 @@ void AppBase::slotPropertyGridValueDeleteRequested(const ot::Property* _property
 // Private: Tree slots
 
 void AppBase::slotTreeItemSelectionChanged(void) {
-	m_viewerComponent->sendSelectionChangedNotification();
+	m_viewerComponent->handleSelectionChanged(true);
 }
 
 void AppBase::slotTreeItemTextChanged(QTreeWidgetItem* _item, int _column) {

@@ -10,8 +10,6 @@
 
 #include "akWidgets/aTreeWidget.h"
 
-#define OT_WIDGETTYPE_NavigationTree "NavigationTree"
-
 namespace ot {
 
 	class NavigationTreeView : public ak::aTreeWidget, public WidgetView {
@@ -24,8 +22,6 @@ namespace ot {
 		// Base class functions
 
 		virtual QWidget* getViewWidget(void) override;
-
-		virtual bool setupViewFromConfig(WidgetViewCfg* _config) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

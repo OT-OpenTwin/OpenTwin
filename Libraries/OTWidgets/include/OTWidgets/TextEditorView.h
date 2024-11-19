@@ -9,8 +9,6 @@
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/TextEditor.h"
 
-#define OT_WIDGETTYPE_TextEditor "TextEditor"
-
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT TextEditorView : public TextEditor, public WidgetView {
@@ -23,8 +21,6 @@ namespace ot {
 		// Base class functions
 
 		virtual QWidget* getViewWidget(void) override;
-
-		virtual bool setupViewFromConfig(WidgetViewCfg* _config) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

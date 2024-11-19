@@ -150,8 +150,7 @@ void ViewerComponent::expandSingleTreeItem(ot::UID treeItemID)
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-bool ViewerComponent::isTreeItemExpanded(ot::UID treeItemID)
-{
+bool ViewerComponent::isTreeItemExpanded(ot::UID treeItemID) {
 	try {
 		try { return AppBase::instance()->isTreeItemExpanded(treeItemID); }
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::isTreeItemExpanded()"); }
@@ -163,8 +162,7 @@ bool ViewerComponent::isTreeItemExpanded(ot::UID treeItemID)
 	return false;
 }
 
-void ViewerComponent::toggleTreeItemSelection(ot::UID treeItemID, bool considerChilds)
-{
+void ViewerComponent::toggleTreeItemSelection(ot::UID treeItemID, bool considerChilds) {
 	try {
 		try { 
 			AppBase::instance()->toggleNavigationTreeItemSelection(treeItemID, considerChilds);
@@ -176,8 +174,7 @@ void ViewerComponent::toggleTreeItemSelection(ot::UID treeItemID, bool considerC
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-void ViewerComponent::clearTreeSelection(void)
-{
+void ViewerComponent::clearTreeSelection(void) {
 	try {
 		try { AppBase::instance()->clearNavigationTreeSelection(); }
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::clearTreeSelection()"); }
@@ -187,9 +184,8 @@ void ViewerComponent::clearTreeSelection(void)
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-void ViewerComponent::refreshSelection(void)
-{
-	sendSelectionChangedNotification();
+void ViewerComponent::refreshSelection(void) {
+	this->handleSelectionChanged(true);
 }
 
 void ViewerComponent::addKeyShortcut(const std::string &keySequence) {
@@ -443,7 +439,7 @@ void ViewerComponent::setProcessingGroupOfMessages(bool flag)
 			// Process all delayed actions 
 			if (treeSelectionReceived)
 			{
-				sendSelectionChangedNotification();
+				this->handleSelectionChanged(true);
 			}
 		}
 	}
@@ -474,8 +470,7 @@ void ViewerComponent::notify(
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-void ViewerComponent::sendSelectionChangedNotification()
-{
+void ViewerComponent::handleSelectionChanged(bool _selectionFromTree) {
 	if (processingGroupCounter > 0)
 	{
 		treeSelectionReceived = true;

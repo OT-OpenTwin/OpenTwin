@@ -6,11 +6,9 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCore/StringHelper.h"
-#include "OTGui/WidgetViewCfg.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/WidgetViewManager.h"
-#include "OTWidgets/WidgetViewFactory.h"
 
 // ADS header
 #include <ads/DockManager.h>
@@ -19,26 +17,6 @@
 // Qt header
 #include <QtCore/qtimer.h>
 #include <QtWidgets/qmenu.h>
-
-namespace ot {
-	namespace intern {
-
-		ads::DockWidgetArea convertDockArea(ot::WidgetViewCfg::ViewDockLocation _dockLocation) {
-			switch (_dockLocation)
-			{
-			case ot::WidgetViewCfg::Default: return ads::CenterDockWidgetArea;
-			case ot::WidgetViewCfg::Left: return ads::LeftDockWidgetArea;
-			case ot::WidgetViewCfg::Top: return ads::TopDockWidgetArea;
-			case ot::WidgetViewCfg::Right: return ads::RightDockWidgetArea;
-			case ot::WidgetViewCfg::Bottom: return ads::BottomDockWidgetArea;
-			default:
-				OT_LOG_E("Unknown dock location (" + std::to_string((int)_dockLocation) + ")");
-				return ads::CenterDockWidgetArea;
-			}
-		}
-
-	}
-}
 
 ot::WidgetViewManager& ot::WidgetViewManager::instance(void) {
 	static WidgetViewManager g_instance;
@@ -71,32 +49,12 @@ void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
 
 // View Management
 
-bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view) {
-	return this->addViewImpl(_owner, _view, nullptr);
+bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::DockWidgetArea _insertArea) {
+	return this->addViewImpl(_owner, _view, nullptr, _insertArea);
 }
 
-bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area) {
-	return this->addViewImpl(_owner, _view, _area);
-}
-
-ot::WidgetView* ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetViewCfg* _viewConfiguration) {
-	OTAssertNullptr(m_dockManager);
-
-	WidgetView* newView = WidgetViewFactory::createView(_viewConfiguration);
-	if (newView) {
-		ads::CDockAreaWidget* parentArea = nullptr;
-		if (!_viewConfiguration->getParentViewName().empty()) {
-			WidgetView* parentView = this->findView(_viewConfiguration->getParentViewName());
-			if (parentView) {
-				parentArea = parentView->getViewDockWidget()->dockAreaWidget();
-			}
-		}
-		if (!this->addView(_owner, newView, parentArea)) {
-			delete newView;
-			newView = nullptr;
-		}
-	}
-	return newView;
+bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _parentArea, ads::DockWidgetArea _insertArea) {
+	return this->addViewImpl(_owner, _view, _parentArea, _insertArea);
 }
 
 ot::WidgetView* ot::WidgetViewManager::findView(const std::string& _viewName) const {
@@ -378,7 +336,7 @@ ot::WidgetViewManager::~WidgetViewManager() {
 	this->deleteLater();
 }
 
-bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area) {
+bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _parentArea, ads::DockWidgetArea _insertArea) {
 	OTAssertNullptr(m_dockManager);
 	OTAssertNullptr(_view);
 	// Ensure view does not exist
@@ -398,13 +356,15 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	_view->getViewDockWidget()->setWindowIcon(ot::IconManager::getApplicationIcon());
 
 	// Add view
-	if (!_area) _area = this->determineBestParentArea(_view);
+	if (!_parentArea) {
+		_parentArea = this->determineBestParentArea(_view);
+	}
 
-	if (_area) {
-		m_dockManager->addDockWidget(intern::convertDockArea(_view->getViewData().getDockLocation()), _view->getViewDockWidget(), _area);
+	if (_parentArea) {
+		m_dockManager->addDockWidget(_insertArea, _view->getViewDockWidget(), _parentArea);
 	}
 	else {
-		m_dockManager->addDockWidgetTab(intern::convertDockArea(_view->getViewData().getDockLocation()), _view->getViewDockWidget());
+		m_dockManager->addDockWidgetTab(_insertArea, _view->getViewDockWidget());
 	}
 
 	// Add view toggle (if view is closeable)

@@ -9,8 +9,6 @@
 #include "OTWidgets/Table.h"
 #include "OTWidgets/WidgetView.h"
 
-#define OT_WIDGETTYPE_Table "Table"
-
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT TableView : public Table, public WidgetView {
@@ -24,8 +22,6 @@ namespace ot {
 		// Base class functions
 
 		virtual QWidget* getViewWidget(void) override;
-
-		virtual bool setupViewFromConfig(WidgetViewCfg* _config) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -7,9 +7,6 @@
 
 // OpenTwin header
 #include "NavigationTreeView.h"
-#include "OTWidgets/WidgetViewRegistrar.h"
-
-//static ot::WidgetViewRegistrar<ot::NavigationTreeView> NavigationTreeViewRegistrar(OT_WIDGETTYPE_NavigationTree);
 
 ot::NavigationTreeView::NavigationTreeView() {
 	this->addWidgetToDock(this->widget());
@@ -25,11 +22,4 @@ ot::NavigationTreeView::~NavigationTreeView() {
 
 QWidget* ot::NavigationTreeView::getViewWidget(void) {
 	return this->widget();
-}
-
-bool ot::NavigationTreeView::setupViewFromConfig(WidgetViewCfg* _config) {
-	if (!WidgetView::setupViewFromConfig(_config)) return false;
-
-
-	return true;
 }

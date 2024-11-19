@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/WidgetViewCfg.h"
+#include "OTGui/WidgetViewBase.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -43,10 +43,6 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter/Getter
-
-		//! @brief Apply settings from the provided configuration.
-		//! @param _config Configuration.
-		virtual bool setupViewFromConfig(WidgetViewCfg* _config);
 
 		void setViewData(const WidgetViewBase& _data);
 		const WidgetViewBase& getViewData(void) const { return m_data; };

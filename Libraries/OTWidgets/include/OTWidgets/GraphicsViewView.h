@@ -9,8 +9,6 @@
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/GraphicsView.h"
 
-#define OT_WIDGETTYPE_GraphicsView "GraphicsView"
-
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsViewView : public GraphicsView, public WidgetView {
@@ -23,8 +21,6 @@ namespace ot {
 		// Base class functions
 
 		virtual QWidget* getViewWidget(void) override;
-
-		virtual bool setupViewFromConfig(WidgetViewCfg* _config) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

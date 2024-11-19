@@ -139,13 +139,7 @@
     <ClCompile Include="src\WidgetViewManager.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
-    <ClCompile Include="src\WidgetViewFactory.cpp">
-      <Filter>src\WidgetView</Filter>
-    </ClCompile>
     <ClCompile Include="src\WidgetView.cpp">
-      <Filter>src\WidgetView</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PlainTextEditView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsPickerView.cpp">
@@ -406,6 +400,9 @@
     <ClCompile Include="src\StyledTextConverter.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\PlainTextEditView.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -586,18 +583,6 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsItemPreview.h">
       <Filter>include\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetViewRegistrar.h">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetViewRegistrar.hpp">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\WidgetViewFactory.h">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\PlainTextEditView.h">
-      <Filter>include\WidgetView</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\GraphicsPickerView.h">
       <Filter>include\WidgetView</Filter>
@@ -793,6 +778,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\StyledTextConverter.h">
       <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PlainTextEditView.h">
+      <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -10,8 +10,6 @@
 
 #include "Viewer.h"
 
-#define OT_WIDGETTYPE_Viewer "Viewer"
-
 namespace ot {
 
 	class ViewerView : public Viewer, public WidgetView {
@@ -25,8 +23,6 @@ namespace ot {
 		// Base class functions
 
 		virtual QWidget* getViewWidget(void) override;
-
-		virtual bool setupViewFromConfig(WidgetViewCfg* _config) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

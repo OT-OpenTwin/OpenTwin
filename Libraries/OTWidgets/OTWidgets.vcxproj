@@ -179,7 +179,6 @@
     <ClCompile Include="src\VersionGraphManager.cpp" />
     <ClCompile Include="src\VersionGraphManagerView.cpp" />
     <ClCompile Include="src\WidgetView.cpp" />
-    <ClCompile Include="src\WidgetViewFactory.cpp" />
     <ClCompile Include="src\WidgetViewManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -225,8 +224,8 @@
     <ClInclude Include="include\OTWidgets\ManagedGuiObject.h" />
     <ClInclude Include="include\OTWidgets\OverlayWidgetBase.h" />
     <ClInclude Include="include\OTWidgets\PixmapImagePainter.h" />
-    <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
     <QtMoc Include="include\OTWidgets\Plot.h" />
+    <ClInclude Include="include\OTWidgets\PlainTextEditView.h" />
     <ClInclude Include="include\OTWidgets\PlotDataset.h" />
     <ClInclude Include="include\OTWidgets\PlotView.h" />
     <ClInclude Include="include\OTWidgets\PolarPlot.h" />
@@ -261,10 +260,7 @@
     <ClInclude Include="include\OTWidgets\WidgetProperties.h" />
     <ClInclude Include="include\OTWidgets\Positioning.h" />
     <ClInclude Include="include\OTWidgets\WidgetView.h" />
-    <ClInclude Include="include\OTWidgets\WidgetViewFactory.h" />
     <QtMoc Include="include\OTWidgets\WidgetViewManager.h" />
-    <ClInclude Include="include\OTWidgets\WidgetViewRegistrar.h" />
-    <ClInclude Include="include\OTWidgets\WidgetViewRegistrar.hpp" />
     <QtMoc Include="include\OTWidgets\DockWatcherAction.h" />
     <QtMoc Include="include\OTWidgets\CheckBox.h" />
     <QtMoc Include="include\OTWidgets\ColorPickButton.h" />

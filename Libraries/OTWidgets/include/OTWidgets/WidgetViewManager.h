@@ -32,7 +32,6 @@ namespace ads {
 namespace ot {
 
 	class WidgetView;
-	class WidgetViewCfg;
 
 	//! @brief The widget view manager is used to manage widget views.
 	class OT_WIDGETS_API_EXPORT WidgetViewManager : public QObject {
@@ -51,24 +50,21 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// View Management
-
+		
 		//! @brief Add the provided widget view.
 		//! If a central widget view is set the provided view will be added to its dock area by taking the initial dock location into account.
 		//! @param _owner Widget view owner.
 		//! @param _view Widget view to add.
-		bool addView(const BasicServiceInformation& _owner, WidgetView* _view);
+		//! \param _insertArea The relative area to add the view.
+		bool addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::DockWidgetArea _insertArea = ads::CenterDockWidgetArea);
 
 		//! @brief Add the provided widget view to the specified dock area.
 		//! @param _owner Widget view owner.
 		//! @param _view Widget view to add.
-		//! @param _area The target area to add the view to.
-		bool addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area);
+		//! @param _parentArea The target area to add the view to.
+		//! \param _insertArea The relative area to add the view.
+		bool addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _parentArea, ads::DockWidgetArea _insertArea = ads::CenterDockWidgetArea);
 		
-		//! @brief Create a widget view and add it to the manager.
-		//! @param _owner Widget view owner.
-		//! @param _viewConfiguration Widget view configuration.
-		WidgetView* addView(const BasicServiceInformation& _owner, WidgetViewCfg* _viewConfiguration);
-
 		//! @brief Returns the widget view with the specified name.
 		//! If the view does not exists return 0.
 		//! @param _viewName Widget view name.
@@ -159,7 +155,9 @@ namespace ot {
 
 		//! \brief Adds the view and stores the information.
 		//! The view's dock widget will get the IconManager::getApplicationIcon() set.
-		bool addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _area);
+		//! \param _parentArea The target area to add the view to.
+		//! \param _insertArea The relative area to add the view.
+		bool addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _parentArea, ads::DockWidgetArea _insertArea);
 
 		ads::CDockAreaWidget* determineBestParentArea(WidgetView* _newView) const;
 
