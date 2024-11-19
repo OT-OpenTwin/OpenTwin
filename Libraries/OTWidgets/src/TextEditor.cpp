@@ -100,7 +100,7 @@ void ot::TextEditorLineNumberArea::paintEvent(QPaintEvent * _event) {
 // ###################################################################################################################################
 
 ot::TextEditor::TextEditor(QWidget* _parent)
-	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false), m_lastSavedUndoStackCount(0), m_searchPopup(nullptr),
+	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false), m_lastSavedUndoStackCount(-1), m_searchPopup(nullptr),
 	m_tabSpaces(4), m_newLineSamePrefix(false), m_enableDuplicateLineShortcut(false), m_enableSameTextHighlighting(false),
 	m_sameTextHighlightingMinimum(2)
 {
@@ -394,7 +394,14 @@ void ot::TextEditor::slotSaveRequested(void) {
 }
 
 void ot::TextEditor::slotTextChanged(void) {
-	this->setContentChanged(m_lastSavedUndoStackCount != this->document()->availableUndoSteps());
+	if (m_lastSavedUndoStackCount > this->document()->availableUndoSteps()) {
+		m_lastSavedUndoStackCount = -1;
+		this->setContentChanged(true);
+	}
+	else {
+		this->setContentChanged(m_lastSavedUndoStackCount != this->document()->availableUndoSteps());
+	}
+	
 }
 
 void ot::TextEditor::slotFindRequested(void) {
