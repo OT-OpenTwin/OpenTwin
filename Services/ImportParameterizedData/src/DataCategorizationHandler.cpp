@@ -540,7 +540,7 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(Entity
 				std::string value = _tableData->getValue(row, column);
 				if (value != "")
 				{
-					ot::Variable variable = converter(value);
+					ot::Variable variable = converter(value,'.');
 				
 					dataType[0] = dataType[0] || variable.isInt32();
 					dataType[1] = dataType[1] || variable.isInt64();
