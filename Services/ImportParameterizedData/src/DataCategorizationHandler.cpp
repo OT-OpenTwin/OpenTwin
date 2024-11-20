@@ -6,6 +6,7 @@
 #include "Application.h"
 #include "PreviewAssemblerRMD.h"
 #include "LocaleSettingsSwitch.h"
+#include "IVisualisationTable.h"
 
 #include "Documentation.h"
 #include "OTCore/StringToVariableConverter.h"
@@ -13,272 +14,342 @@
 #include <algorithm>
 #include <bitset>
 
-DataCategorizationHandler::DataCategorizationHandler(std::string baseFolder, std::string parameterFolder, std::string quantityFolder, std::string tableFolder, std::string previewTableName)
-	:_baseFolder(baseFolder), _parameterFolder(parameterFolder), _quantityFolder(quantityFolder), _tableFolder(tableFolder), _previewTableName(previewTableName),
-	_rmdColour(88, 175, 233, 100), _msmdColour(166, 88, 233, 100), _parameterColour(88, 233, 122, 100), _quantityColour(233, 185, 88, 100)
+DataCategorizationHandler::DataCategorizationHandler(std::string _baseFolder, std::string _parameterFolder, std::string _quantityFolder, std::string _tableFolder, std::string _previewTableName)
+	:m_baseFolder(_baseFolder), m_parameterFolder(_parameterFolder), m_quantityFolder(_quantityFolder), m_tableFolder(_tableFolder), m_previewTableName(_previewTableName),
+	m_rmdColour(88, 175, 233, 100), m_msmdColour(166, 88, 233, 100), m_parameterColour(88, 233, 122, 100), m_quantityColour(233, 185, 88, 100)
 {
 
 }
 
-void DataCategorizationHandler::AddSelectionsAsRMD(std::list<ot::UID> selectedEntities)
+std::string DataCategorizationHandler::markSelectionForStorage(const ot::UIDList& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
 {
-	_backgroundColour = _rmdColour;
-	AddSelectionsWithCategory(selectedEntities, EntityParameterizedDataCategorization::DataCategorie::researchMetadata);
-}
-
-void DataCategorizationHandler::AddSelectionsAsMSMD(std::list<ot::UID> selectedEntities)
-{
-	_backgroundColour = _msmdColour;
-	AddSelectionsWithCategory(selectedEntities, EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata);
-}
-
-void DataCategorizationHandler::AddSelectionsAsParameter(std::list<ot::UID> selectedEntities)
-{
-	_backgroundColour = _parameterColour;
-	AddSelectionsWithCategory(selectedEntities, EntityParameterizedDataCategorization::DataCategorie::parameter);
-}
-
-void DataCategorizationHandler::AddSelectionsAsQuantity(std::list<ot::UID> selectedEntities)
-{
-	_backgroundColour = _quantityColour;
-	AddSelectionsWithCategory(selectedEntities, EntityParameterizedDataCategorization::DataCategorie::quantity);
-}
-
-void DataCategorizationHandler::ModelComponentWasSet()
-{
-	//ot::EntityInformation entityInfo;
-	//_modelComponent->getEntityInformation(_scriptFolder, entityInfo);
-	//_scriptFolderUID = entityInfo.getID();
-	//std::list<std::string> allItems =	_modelComponent->getListOfFolderItems(_baseFolder);
-	//_modelComponent->getEntityInformation(*allItems.begin(), entityInfo);
-	//_rmdPath = entityInfo.getName();
-}
-
-void DataCategorizationHandler::AddSelectionsWithCategory(std::list<ot::UID>& selectedEntities, EntityParameterizedDataCategorization::DataCategorie category)
-{
-
-
-	 CheckEssentials();
-	_activeCollectionEntities.clear();
-	_markedForStorringEntities.clear();
-	std::list<ot::EntityInformation> entityInfos;
-	std::list<std::string> entityList = _modelComponent->getListOfFolderItems(_baseFolder);
-	assert(entityList.size() == 1);
-	_modelComponent->getEntityInformation(entityList, entityInfos);
-
-	if (category == EntityParameterizedDataCategorization::DataCategorie::researchMetadata)
+	if (_selectedEntities.empty())
 	{
-		assert(entityInfos.begin()->getName() == _rmdPath);
-		AddRMDEntries(*entityInfos.begin());
+		_uiComponent->displayDebugMessage("No table selection detected.");
+	}
+	//1) RMD entries don't need a selected EntityParameterizedDataCategorization
+	//2) Series metadata require a selected series metadata
+	//2a) None selected: Create a new one
+	//3a) One or more selected: remember that EntityParameterizedDataCategorization
+	std::list<EntityBase*> selectedEntities;
+	try
+	{
+		Application::instance()->prefetchDocumentsFromStorage(_selectedEntities);
+		for (ot::UID entityID : _selectedEntities)
+		{
+			ot::UID versionID = Application::instance()->getPrefetchedEntityVersion(entityID);
+			EntityBase* baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityID, versionID, Application::instance()->getClassFactory());
+			selectedEntities.push_back(baseEnt);
+		}
+		std::string returnValue("");
+		if (isValidSelection(selectedEntities))
+		{
+			const std::string tableName = getTableFromSelection(selectedEntities);
+			bufferCorrespondingMetadataNames(selectedEntities,_category);
+			setBackgroundColour(_category);
+			returnValue = tableName;
+		}
+
+		for (EntityBase*& selectedEntity : selectedEntities)
+		{
+			delete selectedEntity;
+			selectedEntity = nullptr;
+		}
+		
+		return returnValue;
+	}
+	catch (std::exception e)
+	{
+		const std::string message = "Failed to create table selection due to error: " + std::string(e.what());
+		OT_LOG_E(message);
+		for (EntityBase*& entity : selectedEntities)
+		{
+			delete entity;
+			entity = nullptr;
+		}
+		return "";
+	}
+}
+
+bool DataCategorizationHandler::isValidSelection(std::list<EntityBase*>& _selectedEntities)
+{
+	
+	uint32_t selectedTables(0);
+	for (EntityBase* entity : _selectedEntities)
+	{
+		IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entity);
+		if (table != nullptr)
+		{
+			selectedTables++;
+		}
+	}
+
+	if (selectedTables == 1)
+	{
+		return true;
 	}
 	else
 	{
-		bool hasACategorizationEntitySelected = false;
-		Application::instance()->prefetchDocumentsFromStorage(selectedEntities);
+		_uiComponent->displayDebugMessage("Data categorisation requires a single selected table.");
+		return false;
+	}
+}
 
-		for (ot::UID entityID : selectedEntities)
+std::string DataCategorizationHandler::getTableFromSelection(std::list<EntityBase*>& _selectedEntities)
+{
+	std::string tableEntityName("");
+	for (EntityBase* entity : _selectedEntities)
+	{
+		IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entity);
+		if (table != nullptr)
 		{
-			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityID, Application::instance()->getPrefetchedEntityVersion(entityID), Application::instance()->getClassFactory());
-			auto categorizationEnt = dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt);
-			if (categorizationEnt != nullptr)
+			tableEntityName = entity->getName();
+		}
+	}
+	assert(tableEntityName != "");
+	return tableEntityName;
+}
+
+void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<EntityBase*>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
+{
+	if (_category == EntityParameterizedDataCategorization::DataCategorie::researchMetadata)
+	{
+		ot::EntityInformation entityInfo;
+		_modelComponent->getEntityInformation(m_rmdEntityName, entityInfo);
+		EntityBase* entityBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
+		auto dataCatEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase));
+		assert(dataCatEntity != nullptr);
+		assert(dataCatEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::researchMetadata);
+		m_bufferedCategorisationNames.insert(dataCatEntity->getName());
+	}
+	else
+	{
+		bool hasACategorisationEntitySelected = checkForCategorisationEntity(_selectedEntities);
+		if (hasACategorisationEntitySelected)
+		{
+			if (_category == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
 			{
-				hasACategorizationEntitySelected = true;
-				delete categorizationEnt;
-				categorizationEnt = nullptr;
-				break;
+				addSMDEntries(_selectedEntities);
 			}
 			else
 			{
-				delete baseEnt;
-				baseEnt = nullptr;
+				addParamOrQuantityEntries(_selectedEntities, _category);
 			}
 		}
-
-		if (!hasACategorizationEntitySelected)
+		else
 		{
-			std::string entityName = CreateNewUniqueTopologyName(_rmdPath, _msmdFolder);
+			std::string entityName = CreateNewUniqueTopologyName(m_rmdEntityName, m_smdFolder);
 			bool addNewEntityToActiveList;
-			if (category == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
+			if (_category == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
 			{
 				addNewEntityToActiveList = true;
-				AddNewCategorizationEntity(entityName, category, addNewEntityToActiveList);
+				addNewCategorizationEntity(entityName, _category, addNewEntityToActiveList);
 			}
 			else
 			{
 				addNewEntityToActiveList = false;
-				AddNewCategorizationEntity(entityName, EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata, addNewEntityToActiveList);
-				
-				if (category == EntityParameterizedDataCategorization::DataCategorie::parameter)
+				addNewCategorizationEntity(entityName, EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata, addNewEntityToActiveList);
+
+				if (_category == EntityParameterizedDataCategorization::DataCategorie::parameter)
 				{
-					entityName += "/" + _parameterFolder;
+					entityName += "/" + m_parameterFolder;
 				}
 				else
 				{
-					entityName += "/" + _quantityFolder;
+					entityName += "/" + m_quantityFolder;
 				}
 
 				addNewEntityToActiveList = true;
-				AddNewCategorizationEntity(entityName, category, addNewEntityToActiveList);
-			}
-		}
-		else
-		{
-			if (category == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
-			{
-				AddMSMDEntries(selectedEntities);
-			}
-			else 
-			{
-				AddParamOrQuantityEntries(selectedEntities,category);
+				addNewCategorizationEntity(entityName, _category, addNewEntityToActiveList);
 			}
 		}
 	}
 }
 
-void DataCategorizationHandler::AddNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive)
+void DataCategorizationHandler::setBackgroundColour(EntityParameterizedDataCategorization::DataCategorie _category)
 {
-	ot::UID entID = _modelComponent->createEntityUID();
-	std::shared_ptr<EntityParameterizedDataCategorization> newEntity(new EntityParameterizedDataCategorization(entID, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-	newEntity->CreateProperties(category);
-	newEntity->setName(name);
-	newEntity->setEditable(true);
-	_markedForStorringEntities.push_back(newEntity);
-	if (addToActive)
+	if (_category == EntityParameterizedDataCategorization::DataCategorie::researchMetadata)
 	{
-		_activeCollectionEntities.push_back(newEntity);
+		m_backgroundColour = m_rmdColour;
+	}
+	else if (_category == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
+	{
+		m_backgroundColour = m_msmdColour;
+	}
+	else if (_category == EntityParameterizedDataCategorization::DataCategorie::parameter)
+	{
+		m_backgroundColour = m_parameterColour;
+	}
+	else if (_category == EntityParameterizedDataCategorization::DataCategorie::quantity)
+	{
+		m_backgroundColour = m_quantityColour;
+	}
+	else 
+	{
+		assert(_category == EntityParameterizedDataCategorization::DataCategorie::quantity);
 	}
 }
 
-void DataCategorizationHandler::AddRMDEntries(ot::EntityInformation entityInfo)
+void DataCategorizationHandler::clearBufferedMetadata()
 {
-	auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
-	std::shared_ptr<EntityParameterizedDataCategorization> dataCatEntity(dynamic_cast<EntityParameterizedDataCategorization*>(baseEntity));
-	assert(dataCatEntity != nullptr);
-	assert(dataCatEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::researchMetadata);
-
-	_activeCollectionEntities.push_back(dataCatEntity);
+	m_bufferedCategorisationNames.clear();
+	m_markedForStorringEntities.clear();
 }
 
-void DataCategorizationHandler::AddMSMDEntries(std::list<ot::UID>& selectedEntities)
+bool DataCategorizationHandler::checkForCategorisationEntity(std::list<EntityBase*>& _selectedEntities)
 {
-	for (ot::UID entityID : selectedEntities)
+	for (EntityBase* entityBase : _selectedEntities)
 	{
-		auto baseEnt =	_modelComponent->readEntityFromEntityIDandVersion(entityID, Application::instance()->getPrefetchedEntityVersion(entityID), Application::instance()->getClassFactory());
-		std::shared_ptr<EntityParameterizedDataCategorization> categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt));
-		if (categorizationEntity == nullptr)
+		auto categorizationEnt = dynamic_cast<EntityParameterizedDataCategorization*>(entityBase);
+		if (categorizationEnt != nullptr)
 		{
-			delete baseEnt;
-		}
-		else
-		{
-			if (categorizationEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
-			{
-				_activeCollectionEntities.push_back(categorizationEntity);
-			}
+			return true;
 		}
 	}
-	if (_activeCollectionEntities.size() == 0)
-	{
-		std::string entityName = CreateNewUniqueTopologyName(_rmdPath, _msmdFolder);
-		bool addToActiveEntities = true;
-		AddNewCategorizationEntity(entityName, EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata, addToActiveEntities);
-	}
+	return false;
 }
 
-void DataCategorizationHandler::AddParamOrQuantityEntries(std::list<ot::UID>& selectedEntities, EntityParameterizedDataCategorization::DataCategorie category)
+void DataCategorizationHandler::addSMDEntries(std::list<EntityBase*>& _selectedEntities)
 {
-	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> msmdEntities, quantityEntities; //or Parameterentity. Depeding on the parameter.
-
-	for (ot::UID entityID : selectedEntities)
+	// Now we search the selected entities for the series metadata categorisations that correspond to the selection and add them to the buffer
+	for (auto entityBase : _selectedEntities)
 	{
-
-		auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityID, Application::instance()->getPrefetchedEntityVersion(entityID), Application::instance()->getClassFactory());
-		std::shared_ptr<EntityParameterizedDataCategorization> categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt));
-		if (categorizationEntity == nullptr)
+		auto categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase));
+		
+		if (categorizationEntity != nullptr)
 		{
-			delete baseEnt;
-		}
-		else
-		{
-			if (categorizationEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
+			if (categorizationEntity->GetSelectedDataCategorie() != EntityParameterizedDataCategorization::measurementSeriesMetadata)
 			{
-				msmdEntities.push_back(categorizationEntity);
+				m_bufferedCategorisationNames.insert(categorizationEntity->getName());
 			}
-			else if (categorizationEntity->GetSelectedDataCategorie() == category)
+			else if (categorizationEntity->GetSelectedDataCategorie() != EntityParameterizedDataCategorization::parameter|| categorizationEntity->GetSelectedDataCategorie() != EntityParameterizedDataCategorization::quantity)
 			{
-				quantityEntities.push_back(categorizationEntity);
-			}
-		}
-	}
-
-	for (auto msmdEntity : msmdEntities)
-	{
-		bool msmdContainedInQuantityContained = false;
-		for (auto quantityEntity : quantityEntities)
-		{
-			if (quantityEntity->getName().find(msmdEntity->getName()) != std::string::npos)
-			{
-				msmdContainedInQuantityContained = true;
-				break;
-			}
-		}
-		if (!msmdContainedInQuantityContained)
-		{
-			std::string entityName;
-			if (category == EntityParameterizedDataCategorization::DataCategorie::quantity)
-			{
-				entityName = msmdEntity->getName() + "/" + _quantityFolder;
+				size_t lastDevider = categorizationEntity->getName().find_last_of('/');
+				const std::string seriesMetadataName =	categorizationEntity->getName().substr(0, lastDevider - 1);
+				m_bufferedCategorisationNames.insert(seriesMetadataName);
 			}
 			else
 			{
-				entityName = msmdEntity->getName() + "/" + _parameterFolder;
+				//ignoring the rmd entry.
 			}
-			bool addEntityToActiveList = true;
-			AddNewCategorizationEntity(entityName, category, addEntityToActiveList);
 		}
 	}
-	for (auto quantityEntity : quantityEntities)
+	// If none is selected, we need to create a new smd categorisation.
+	if (m_bufferedCategorisationNames.size() == 0)
 	{
-		_activeCollectionEntities.push_back(quantityEntity);
+		std::string entityName = CreateNewUniqueTopologyName(m_rmdEntityName, m_smdFolder);
+		bool addToActiveEntities = true;
+		addNewCategorizationEntity(entityName, EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata, addToActiveEntities);
+	}
+}
+
+void DataCategorizationHandler::addParamOrQuantityEntries(std::list<EntityBase*>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
+{
+	std::list<EntityParameterizedDataCategorization*> seriesCategorisations, quantityOrParameterCategorisations; //or Parameterentity. Depeding on the parameter.
+	// First we sort the selected entities into series metadata and quantity/parameter
+	for (auto entityBase : _selectedEntities)
+	{
+		auto categorizationEntity(dynamic_cast<EntityParameterizedDataCategorization*>(entityBase));
+		if (categorizationEntity != nullptr)
+		{		
+			if (categorizationEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
+			{
+				seriesCategorisations.push_back(categorizationEntity);
+			}
+			else if (categorizationEntity->GetSelectedDataCategorie() == _category)
+			{
+				quantityOrParameterCategorisations.push_back(categorizationEntity);
+			}
+		}
+	}
+	
+	// If a smd entity is selected but that smd has no parameter/quantity entity below itself, the parameter/quantity entity needs to be created
+	for (auto seriesCategorisation : seriesCategorisations)
+	{
+		bool smdHasSubCategorisationEntity = false;
+		for (auto quantityOrParameterCategorisation : quantityOrParameterCategorisations)
+		{
+			if (quantityOrParameterCategorisation->getName().find(seriesCategorisation->getName()) != std::string::npos)
+			{
+				smdHasSubCategorisationEntity = true;
+				break;
+			}
+		}
+		
+		if (!smdHasSubCategorisationEntity)
+		{
+			std::string entityName;
+			if (_category == EntityParameterizedDataCategorization::DataCategorie::quantity)
+			{
+				entityName = seriesCategorisation->getName() + "/" + m_quantityFolder;
+			}
+			else
+			{
+				entityName = seriesCategorisation->getName() + "/" + m_parameterFolder;
+			}
+			const bool addEntityToActiveList = true;
+			addNewCategorizationEntity(entityName, _category, addEntityToActiveList);
+			m_bufferedCategorisationNames.insert(entityName);
+		}
+	}
+	// Now we add the names of the selected quantity/parameter categorisations
+	for (auto quantityOrParameterCategorisation : quantityOrParameterCategorisations)
+	{
+		m_bufferedCategorisationNames.insert(quantityOrParameterCategorisation->getName());
 	}
 
-	if (_activeCollectionEntities.size() == 0)
+	//If nothing was selected, we nee to create a new series + quantity/parameter
+	if (m_bufferedCategorisationNames.size() == 0)
 	{
-		std::string entityName = CreateNewUniqueTopologyName(_rmdPath, _msmdFolder);
+		std::string entityName = CreateNewUniqueTopologyName(m_rmdEntityName, m_smdFolder);
 		bool addToActiveEntities = false;
-		AddNewCategorizationEntity(entityName, EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata, addToActiveEntities);
-		
-		if (category == EntityParameterizedDataCategorization::DataCategorie::quantity)
+		addNewCategorizationEntity(entityName, EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata, addToActiveEntities);
+
+		if (_category == EntityParameterizedDataCategorization::DataCategorie::quantity)
 		{
-			entityName += "/" + _quantityFolder;
+			entityName += "/" + m_quantityFolder;
 		}
 		else
 		{
-			entityName += "/" + _parameterFolder;
+			entityName += "/" + m_parameterFolder;
 		}
 		addToActiveEntities = true;
-		AddNewCategorizationEntity(entityName, category, addToActiveEntities);
+		addNewCategorizationEntity(entityName, _category, addToActiveEntities);
 	}
-
 }
 
 
-void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::UID tableEntityVersion, std::vector<ot::TableRange> ranges)
+void DataCategorizationHandler::addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive)
 {
-	if (ranges.size() == 0)
+	ot::UID entID = _modelComponent->createEntityUID();
+	auto newEntity(std::make_shared<EntityParameterizedDataCategorization>(entID, nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+	newEntity->CreateProperties(category);
+	newEntity->setName(name);
+	newEntity->setEditable(true);
+	m_markedForStorringEntities.push_back(newEntity);
+	if (addToActive)
+	{
+		m_bufferedCategorisationNames.insert(newEntity->getName());
+	}
+}
+
+
+
+void DataCategorizationHandler::storeSelectionRanges(ot::UID _tableEntityID, ot::UID _tableEntityVersion, const std::vector<ot::TableRange>& _ranges)
+{
+	if (_ranges.size() == 0)
 	{
 		return;
 	}
 
-	auto tableBase = _modelComponent->readEntityFromEntityIDandVersion(tableEntityID, tableEntityVersion, Application::instance()->getClassFactory());
-	auto tableEntity = dynamic_cast<EntityParameterizedDataTable*>(tableBase);
-
+	auto tableBase = _modelComponent->readEntityFromEntityIDandVersion(_tableEntityID, _tableEntityVersion, Application::instance()->getClassFactory());
+	auto tableEntity = dynamic_cast<IVisualisationTable*>(tableBase);
 	if (tableEntity == nullptr)
 	{
 		assert(0);
 		return;
 	}
-	std::unique_ptr<EntityParameterizedDataTable> tableEntPtr(tableEntity);
+	std::unique_ptr<IVisualisationTable> tableEntPtr(tableEntity);
 
 	std::list<ot::UID> topologyEntityIDList;
 	std::list<ot::UID> topologyEntityVersionList;
@@ -288,43 +359,50 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 	std::list<ot::UID> dataEntityParentList{ };
 	std::list<std::string> takenNames;
 
-	ot::EntityInformation entityInfo;
-	_modelComponent->getEntityInformation(_scriptFolder, entityInfo);
-	_scriptFolderUID = entityInfo.getID();
 	
-	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr->getTableData().get(), ranges);
+	assert(m_scriptFolderUID != -1);
+		
+	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr->getTable(), _ranges);
 
-	for (auto categoryEntity : _activeCollectionEntities)
+	//Now we create the selection entities
+	for (auto& bufferedCategorisationName : m_bufferedCategorisationNames)
 	{	
-		for (size_t i = 0; i < ranges.size(); i++)
+		for (size_t i = 0; i < _ranges.size(); i++)
 		{
 			std::unique_ptr<EntityTableSelectedRanges> tableRange
 			(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
 		
+			// We need to initialise the entityProperty with the python folder
 			ot::EntityInformation entityInfo;
-			std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(_scriptFolder);
+			std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(ot::FolderNames::PythonScriptFolder);
+			_modelComponent->getEntityInformation(*allScripts.begin(), entityInfo);
 			if (allScripts.size() > 0)
 			{
 				_modelComponent->getEntityInformation(*allScripts.begin(), entityInfo);
-				tableRange->createProperties(_scriptFolder, _scriptFolderUID, entityInfo.getName(), entityInfo.getID(), dataType);
+				tableRange->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, entityInfo.getName(), entityInfo.getID(), dataType);
 			}
 			else
 			{
-				tableRange->createProperties(_scriptFolder, _scriptFolderUID, "", -1,dataType);
+				tableRange->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, "", -1,dataType);
 			}
 			
-			tableRange->SetRange(ranges[i].getTopRow(), ranges[i].getBottomRow(), ranges[i].getLeftColumn(), ranges[i].getRightColumn());
-			tableRange->SetTableProperties(tableEntPtr->getName(), tableEntPtr->getEntityID(), tableEntPtr->getSelectedHeaderOrientationString());
+			tableRange->SetRange(_ranges[i].getTopRow(), _ranges[i].getBottomRow(), _ranges[i].getLeftColumn(), _ranges[i].getRightColumn());
+			tableRange->SetTableProperties(tableBase->getName(), tableBase->getEntityID(), ot::toString(tableEntPtr->getHeaderOrientation()));
 			tableRange->setEditable(true);
+			
+			// The name of the entity should correspond to the header value of the table. This header value will later be used as key of the database entry
 			std::string name = "";
-
+			ot::MatrixEntryPointer matrixPtr;
 			if (tableRange->getTableOrientation() == EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
 			{
-				for (int32_t column = ranges[i].getLeftColumn(); column <= ranges[i].getRightColumn(); column++)
+				matrixPtr.m_row = 0;
+				for (matrixPtr.m_column = static_cast<uint32_t>(_ranges[i].getLeftColumn()); matrixPtr.m_column <= static_cast<uint32_t>(_ranges[i].getRightColumn()); matrixPtr.m_column++)
 				{
 					if (name == "")
 					{
-						name =(tableEntPtr->getTableData()->getValue(0, column));
+						ot::Variable cellEntry =  tableEntPtr->getTable().getValue(matrixPtr);
+						assert(cellEntry.isConstCharPtr());
+						name = cellEntry.getConstCharPtr();
 					}
 					else
 					{
@@ -335,11 +413,14 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 			}
 			else
 			{
-				for (int32_t row = ranges[i].getTopRow(); row <= ranges[i].getBottomRow(); row++)
+				matrixPtr.m_column = 0;
+				for (matrixPtr.m_row = static_cast<uint32_t>(_ranges[i].getTopRow()); matrixPtr.m_row  <= static_cast<uint32_t>(_ranges[i].getBottomRow()); matrixPtr.m_row++)
 				{
 					if (name == "")
 					{
-						name = (tableEntPtr->getTableData()->getValue(0, row));
+						ot::Variable cellEntry = tableEntPtr->getTable().getValue(matrixPtr);
+						assert(cellEntry.isConstCharPtr());
+						name = cellEntry.getConstCharPtr();
 					}
 					else
 					{
@@ -349,7 +430,7 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 				}
 			}
 			std::replace(name.begin(), name.end(), '/', '\\');
-			name =	CreateNewUniqueTopologyNamePlainPossible(categoryEntity->getName(), name, takenNames);
+			name =	CreateNewUniqueTopologyNamePlainPossible(bufferedCategorisationName, name, takenNames);
 			tableRange->setName(name);
 
 			tableRange->StoreToDataBase();
@@ -359,57 +440,58 @@ void DataCategorizationHandler::StoreSelectionRanges(ot::UID tableEntityID, ot::
 		}
 	}
 
-	for (auto categoryEntity : _markedForStorringEntities)
+	//Lastly we store all entities marked for storage.
+	for (auto categoryEntity : m_markedForStorringEntities)
 	{
 		categoryEntity->StoreToDataBase();
 		topologyEntityIDList.push_back(categoryEntity->getEntityID());
 		topologyEntityVersionList.push_back(categoryEntity->getEntityStorageVersion());
 		topologyEntityForceVisible.push_back(false);
 
-		auto newPreviewEntity = new EntityParameterizedDataPreviewTable(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+		/*auto newPreviewEntity = new EntityParameterizedDataPreviewTable(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
 		newPreviewEntity->setName(categoryEntity->getName() + "/" + _previewTableName);
 
 		newPreviewEntity->StoreToDataBase();
 		topologyEntityIDList.push_back(newPreviewEntity->getEntityID());
 		topologyEntityVersionList.push_back(newPreviewEntity->getEntityStorageVersion());
-		topologyEntityForceVisible.push_back(false);
+		topologyEntityForceVisible.push_back(false);*/
 	}
 
 	_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
 		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new table selection range");
 }
 
-std::pair<ot::UID, ot::UID> DataCategorizationHandler::GetPreview(ot::EntityInformation selectedPreviewTable)
-{
-	std::string tableName = selectedPreviewTable.getName();
-	std::string containerName = tableName.substr(0, tableName.find_last_of("/"));
-
-	std::list<std::pair<ot::UID, ot::UID>> existingRanges;
-	FindExistingRanges(containerName, existingRanges);
-
-	auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(selectedPreviewTable.getID(), selectedPreviewTable.getVersion(), Application::instance()->getClassFactory());
-	std::shared_ptr<EntityParameterizedDataPreviewTable> currentPreview(dynamic_cast<EntityParameterizedDataPreviewTable*>(baseEnt));
-
-	if (currentPreview == nullptr)
-	{
-		assert(0);
-	}
-
-	if (CheckIfPreviewIsUpToDate(currentPreview,existingRanges) && currentPreview->getTableDataStorageId() != -1 && currentPreview->getTableDataStorageVersion() != -1)
-	{
-		return std::make_pair<ot::UID, ot::UID>(selectedPreviewTable.getID(),selectedPreviewTable.getVersion());
-	}
-	else
-	{
-		std::pair<ot::UID, ot::UID> categorizationEntityIdentifier;
-		FindContainerEntity(containerName, categorizationEntityIdentifier);
-		auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(categorizationEntityIdentifier.first, categorizationEntityIdentifier.second, Application::instance()->getClassFactory());
-		std::unique_ptr<EntityParameterizedDataCategorization> categoryEnt(dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt));
-		auto newTableIdentifier = CreateNewTable(tableName, categoryEnt->GetSelectedDataCategorie(), existingRanges);
-		return newTableIdentifier;
-	}
-
-}
+//std::pair<ot::UID, ot::UID> DataCategorizationHandler::GetPreview(ot::EntityInformation selectedPreviewTable)
+//{
+//	std::string tableName = selectedPreviewTable.getName();
+//	std::string containerName = tableName.substr(0, tableName.find_last_of("/"));
+//
+//	std::list<std::pair<ot::UID, ot::UID>> existingRanges;
+//	FindExistingRanges(containerName, existingRanges);
+//
+//	auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(selectedPreviewTable.getID(), selectedPreviewTable.getVersion(), Application::instance()->getClassFactory());
+//	std::shared_ptr<EntityParameterizedDataPreviewTable> currentPreview(dynamic_cast<EntityParameterizedDataPreviewTable*>(baseEnt));
+//
+//	if (currentPreview == nullptr)
+//	{
+//		assert(0);
+//	}
+//
+//	if (CheckIfPreviewIsUpToDate(currentPreview,existingRanges) && currentPreview->getTableDataStorageId() != -1 && currentPreview->getTableDataStorageVersion() != -1)
+//	{
+//		return std::make_pair<ot::UID, ot::UID>(selectedPreviewTable.getID(),selectedPreviewTable.getVersion());
+//	}
+//	else
+//	{
+//		std::pair<ot::UID, ot::UID> categorizationEntityIdentifier;
+//		FindContainerEntity(containerName, categorizationEntityIdentifier);
+//		auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(categorizationEntityIdentifier.first, categorizationEntityIdentifier.second, Application::instance()->getClassFactory());
+//		std::unique_ptr<EntityParameterizedDataCategorization> categoryEnt(dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt));
+//		auto newTableIdentifier = createNewTable(tableName, categoryEnt->GetSelectedDataCategorie(), existingRanges);
+//		return newTableIdentifier;
+//	}
+//
+//}
 
 void DataCategorizationHandler::FindExistingRanges(std::string containerName, std::list<std::pair<ot::UID, ot::UID>>& existingRanges)
 {
@@ -488,56 +570,27 @@ bool DataCategorizationHandler::CheckIfPreviewIsUpToDate(std::shared_ptr<EntityP
 	return previewIsUpToDate;
 }
 
-std::pair<ot::UID, ot::UID> DataCategorizationHandler::CreateNewTable(std::string tableName, EntityParameterizedDataCategorization::DataCategorie category, std::list<std::pair<ot::UID, ot::UID>>& existingRanges)
-{
-	ot::UIDList existingRangesIDs;
-	for (auto existingRange : existingRanges)
-	{
-		existingRangesIDs.push_back(existingRange.first);
-	}
-	std::unique_ptr<PreviewAssembler> previewAssembler(nullptr); 
-	
-	//Currently only this assembler is needed and implemented
-	previewAssembler.reset(new PreviewAssemblerRMD(_modelComponent, _tableFolder));
-	
-	auto updatedTableEntity = previewAssembler->AssembleTable(existingRangesIDs);
-	updatedTableEntity->setName(tableName);
-	for (auto range : existingRanges)
-	{
-		updatedTableEntity->AddRangeToPreviewStatus(std::make_pair<>(range.first, range.second));
-	}
-	updatedTableEntity->createProperties();
-	updatedTableEntity->StoreToDataBase();
-
-	ot::UIDList topoEntID { updatedTableEntity->getEntityID() };
-	ot::UIDList topoEntVer{ updatedTableEntity->getEntityStorageVersion() };
-	std::list<bool> forceVis{ false };
-	ot::UIDList dataEntID { updatedTableEntity->getTableData()->getEntityID() };
-	ot::UIDList dataEntVersion { updatedTableEntity->getTableData()->getEntityStorageVersion() };
-	ot::UIDList dataEntParents{ updatedTableEntity->getEntityID() };
-
-	_modelComponent->addEntitiesToModel(topoEntID, topoEntVer, forceVis, dataEntID, dataEntVersion, dataEntParents, "Updated a categorization entity and its table preview");
-
-	auto newTableIdentifier = std::make_pair<ot::UID, ot::UID>(updatedTableEntity->getEntityID(), updatedTableEntity->getEntityStorageVersion());
-	return newTableIdentifier;
-}
-
-std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(EntityResultTableData<std::string>* _tableData, const std::vector<ot::TableRange>& _selectedRanges)
+std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(const ot::GenericDataStructMatrix& _tableContent, const std::vector<ot::TableRange>& _selectedRanges)
 {
 	ot::StringToVariableConverter converter;
 	std::bitset<5> dataType;
 	//If one filed value is detected that is definately a string, we end the search.
 	bool stringDetected = false;
 	auto rangeIt = _selectedRanges.begin();
+	ot::MatrixEntryPointer matrixPointer;
+	
+	
 	while (!stringDetected && rangeIt != _selectedRanges.end())
 	{
-		int row = rangeIt->getTopRow();
-		while(!stringDetected && row <= rangeIt->getBottomRow())
+		matrixPointer.m_row = static_cast<uint32_t>(rangeIt->getTopRow());
+		while(!stringDetected && matrixPointer.m_row <= static_cast<uint32_t>(rangeIt->getBottomRow()))
 		{
-			int column = rangeIt->getLeftColumn();
-			while(!stringDetected && column <= rangeIt->getRightColumn())
+			matrixPointer.m_column = static_cast<uint32_t>(rangeIt->getLeftColumn());
+			while(!stringDetected && matrixPointer.m_column <= static_cast<uint32_t>(rangeIt->getRightColumn()))
 			{
-				std::string value = _tableData->getValue(row, column);
+				const ot::Variable& cellValue = _tableContent.getValue(matrixPointer);
+				assert(cellValue.isConstCharPtr());
+				std::string value = cellValue.getConstCharPtr();
 				if (value != "")
 				{
 					ot::Variable variable = converter(value,'.');
@@ -553,9 +606,9 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(Entity
 						stringDetected = true;
 					}
 				}
-				column++;
+				matrixPointer.m_column++;
 			}
-			row++;
+			matrixPointer.m_row++;
 		}
 		rangeIt++;
 	}
@@ -592,7 +645,7 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(Entity
 std::list<std::shared_ptr<EntityTableSelectedRanges>> DataCategorizationHandler::FindAllTableSelectionsWithScripts()
 {
 	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
-	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(_baseFolder, tempEntity.getClassName(), true);
+	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(m_baseFolder, tempEntity.getClassName(), true);
 	Application::instance()->prefetchDocumentsFromStorage(selectionRangeIDs);
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRangeEntities;
@@ -632,7 +685,7 @@ std::map<std::string, std::string> DataCategorizationHandler::LoadAllPythonScrip
 std::map<std::string, std::pair<ot::UID, ot::UID>> DataCategorizationHandler::GetAllTables()
 {
 	std::map<std::string, std::pair<ot::UID, ot::UID>> allTableIdentifierByName;
-	std::list<std::string> allTables =	_modelComponent->getListOfFolderItems(_tableFolder);
+	std::list<std::string> allTables =	_modelComponent->getListOfFolderItems(m_tableFolder);
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(allTables, entityInfos);
 
@@ -647,11 +700,11 @@ std::map<std::string, std::pair<ot::UID, ot::UID>> DataCategorizationHandler::Ge
 	return allTableIdentifierByName;
 }
 
-std::map<std::string, ot::UID> DataCategorizationHandler::GetAllScripts()
+std::map<std::string, ot::UID> DataCategorizationHandler::getAllScripts()
 {
 	std::map<std::string, ot::UID> scriptUIDsByName;
 	
-	std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(_scriptFolder);
+	std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(ot::FolderNames::PythonScriptFolder);
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(allScripts, entityInfos);
 
@@ -673,7 +726,7 @@ std::tuple<std::list<std::string>, std::list<std::string>> DataCategorizationHan
 	for (auto& elements : allRelevantTableSelectionsByMSMD)
 	{
 		std::unique_ptr<EntityParameterizedDataCategorization> newMSMD(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-		newMSMD->setName(CreateNewUniqueTopologyName(_rmdPath, _msmdFolder));
+		newMSMD->setName(CreateNewUniqueTopologyName(m_rmdEntityName, m_smdFolder));
 		allMSMDNames += newMSMD->getName() + ", ";
 		newMSMD->CreateProperties(EntityParameterizedDataCategorization::measurementSeriesMetadata);
 		newMSMD->StoreToDataBase();
@@ -702,7 +755,7 @@ std::tuple<std::list<std::string>, std::list<std::string>> DataCategorizationHan
 			bool selectEntireColumn = selection->getSelectEntireColumn();
 			bool selectEntireRow = selection->getSelectEntireRow();
 			std::string dataType = selection->getSelectedType();
-			newSelection->createProperties(_scriptFolder, _scriptFolderUID, selection->getScriptName(), entityInfo.getID(),dataType,selectEntireRow,selectEntireColumn);
+			newSelection->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, selection->getScriptName(), entityInfo.getID(),dataType,selectEntireRow,selectEntireColumn);
 			
 			
 			newSelection->SetTableProperties(selection->getTableName(),entityInfo.getID(),selection->getTableOrientation());
@@ -743,7 +796,7 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 	for (const auto& tableSelection : allRelevantTableSelections)
 	{
 		std::string tableSelectionName = tableSelection->getName();
-		tableSelectionName = tableSelectionName.substr(tableSelectionName.find(_msmdFolder), tableSelectionName.size());
+		tableSelectionName = tableSelectionName.substr(tableSelectionName.find(m_smdFolder), tableSelectionName.size());
 		std::string msmdName = tableSelectionName.substr(0, tableSelectionName.find_first_of('/'));
 		allRelevantTableSelectionsByMSMD[msmdName].push_back(tableSelection);
 	}
@@ -781,7 +834,7 @@ void DataCategorizationHandler::SetColourOfRanges(std::string selectedTableName)
 {
 	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
 
-	auto entityList = _modelComponent->getIDsOfFolderItemsOfType(_baseFolder,"EntityTableSelectedRanges",true);
+	auto entityList = _modelComponent->getIDsOfFolderItemsOfType(m_baseFolder,"EntityTableSelectedRanges",true);
 	std::list<ot::EntityInformation> entityInfos;
 	_modelComponent->getEntityInformation(entityList, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
@@ -822,7 +875,7 @@ void DataCategorizationHandler::SetColourOfRanges(std::string selectedTableName)
 			}
 			else if (n == 4) //Third topology level: Parameter and Quantities
 			{
-				if (name.find(_parameterFolder) != std::string::npos)
+				if (name.find(m_parameterFolder) != std::string::npos)
 				{
 					parameterRanges.push_back(ot::TableRange(tableEdges[0], tableEdges[1], tableEdges[2], tableEdges[3]));
 				}
@@ -837,22 +890,22 @@ void DataCategorizationHandler::SetColourOfRanges(std::string selectedTableName)
 	if (rmdRanges.size() != 0)
 	{
 		RequestRangesSelection(rmdRanges);
-		RequestColouringRanges( _rmdColour);
+		RequestColouringRanges( m_rmdColour);
 	}
 	if (msmdRanges.size() != 0)
 	{
 		RequestRangesSelection(msmdRanges);
-		RequestColouringRanges(_msmdColour);
+		RequestColouringRanges(m_msmdColour);
 	}
 	if (parameterRanges.size() != 0)
 	{
 		RequestRangesSelection(parameterRanges);
-		RequestColouringRanges(_parameterColour);
+		RequestColouringRanges(m_parameterColour);
 	}
 	if (quantityRanges.size() != 0)
 	{
 		RequestRangesSelection(quantityRanges);
-		RequestColouringRanges(_quantityColour);
+		RequestColouringRanges(m_quantityColour);
 	}
 }
 
@@ -886,20 +939,20 @@ void DataCategorizationHandler::SelectRange(ot::UIDList iDs, ot::UIDList version
 	RequestColouringRanges(category);*/
 }
 
-inline void DataCategorizationHandler::CheckEssentials()
+inline void DataCategorizationHandler::ensureEssentials()
 {
-	if (_rmdPath == "")
+	if (m_rmdEntityName == "")
 	{
 		ot::EntityInformation entityInfo;
-		std::list<std::string> allItems = _modelComponent->getListOfFolderItems(_baseFolder);
+		std::list<std::string> allItems = _modelComponent->getListOfFolderItems(m_baseFolder);
 		_modelComponent->getEntityInformation(*allItems.begin(), entityInfo);
-		_rmdPath = entityInfo.getName();
+		m_rmdEntityName = entityInfo.getName();
 	}
-	if (_scriptFolderUID == 0)
+	if (m_scriptFolderUID == 0)
 	{
 		ot::EntityInformation entityInfo;
-		_modelComponent->getEntityInformation(_scriptFolder, entityInfo);
-		_scriptFolderUID = entityInfo.getID();
+		_modelComponent->getEntityInformation(ot::FolderNames::PythonScriptFolder , entityInfo);
+		m_scriptFolderUID = entityInfo.getID();
 	}
 }
 
@@ -928,19 +981,19 @@ void DataCategorizationHandler::RequestColouringRanges(std::string colour)
 {
 	if (colour == EntityParameterizedDataCategorization::GetStringDataCategorization(EntityParameterizedDataCategorization::DataCategorie::researchMetadata))
 	{
-		RequestColouringRanges(_rmdColour);
+		RequestColouringRanges(m_rmdColour);
 	}
 	else if (colour == EntityParameterizedDataCategorization::GetStringDataCategorization(EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata))
 	{
-		RequestColouringRanges(_msmdColour);
+		RequestColouringRanges(m_msmdColour);
 	}
 	else if (colour == EntityParameterizedDataCategorization::GetStringDataCategorization(EntityParameterizedDataCategorization::DataCategorie::parameter))
 	{
-		RequestColouringRanges(_parameterColour);
+		RequestColouringRanges(m_parameterColour);
 	}
 	else if (colour == EntityParameterizedDataCategorization::GetStringDataCategorization(EntityParameterizedDataCategorization::DataCategorie::quantity))
 	{
-		RequestColouringRanges(_quantityColour);
+		RequestColouringRanges(m_quantityColour);
 	}
 }
 

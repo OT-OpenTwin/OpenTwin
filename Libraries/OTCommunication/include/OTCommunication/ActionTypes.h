@@ -260,7 +260,7 @@
 #define OT_ACTION_CMD_UI_VIEW_CreateRubberband "UI.VIEW.CreateRubberband"
 
 // rm
-#define OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection "UI.VIEW.GetTableSelection"
+
 #define OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable "UI.VIEW.Table.Show"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_SetTable "UI.VIEW.Table.Set"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change "UI.VIEW.Table.Change"

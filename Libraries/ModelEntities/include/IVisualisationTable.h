@@ -13,4 +13,5 @@ public:
 	virtual ot::TableCfg getTableConfig() = 0;
 	virtual bool visualiseTable() = 0;
 	virtual ot::ContentChangedHandling getTableContentChangedHandling() = 0;
+	virtual ot::TableHeaderOrientation getHeaderOrientation() =  0;
 };

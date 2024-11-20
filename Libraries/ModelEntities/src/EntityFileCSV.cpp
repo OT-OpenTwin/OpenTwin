@@ -36,16 +36,9 @@ ot::TableHeaderOrientation EntityFileCSV::getHeaderOrientation()
 	}
 }
 
-std::string EntityFileCSV::getHeaderOrientation(ot::TableHeaderOrientation _orientation)
-{
-	auto orientationString = m_orientationToString.find(_orientation);
-	assert(orientationString != m_orientationToString.end());
-	return orientationString->second; 
-}
-
 bool EntityFileCSV::visualiseText()
 {
-	return true;
+	return false;
 }
 
 void EntityFileCSV::setSpecializedProperties()

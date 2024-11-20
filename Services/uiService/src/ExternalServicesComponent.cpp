@@ -4233,29 +4233,6 @@ std::string ExternalServicesComponent::handleTableChange(ot::JsonDocument& _docu
 	return "";
 }
 
-std::string ExternalServicesComponent::handleGetTableSelectionOld(ot::JsonDocument& _document) {
-	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
-	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-	ot::ConstJsonObject serializedColor = ot::json::getObject(_document, OT_ACTION_PARAM_COLOUR_BACKGROUND);
-
-	try {
-		ot::Color colour;
-		colour.setFromJsonObject(serializedColor);
-		std::pair<ot::UID, ot::UID> activeTableIdentifyer = ViewerAPI::GetActiveTableIdentifyer(visualizationModelID);
-
-		if (activeTableIdentifyer.first != -1) {
-			SetColourOfSelectedRange(visualizationModelID, colour);
-			RequestTableSelection(visualizationModelID, senderURL, subsequentFunction);
-		}
-	}
-	catch (std::exception& e) {
-		OT_LOG_E(e.what());
-		AppBase::instance()->appendInfoMessage("Table selection request could not be handled due to exception: " + QString(e.what()));
-	}
-
-	return "";
-}
 
 std::string ExternalServicesComponent::handleShowTable(ot::JsonDocument& _document) {
 	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
