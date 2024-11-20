@@ -23,15 +23,13 @@ REM Setup eviroment
 SET OPENTWIN_FRONTEND_DEPLOYMENT=%OPENTWIN_DEV_ROOT%\Deployment_Frontend
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
-REM Ensure that the script finished successfully
-IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
-	goto END
-)
-
 REM Clean up the FrontendDeployment directory
 RMDIR /S /Q "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%"
-MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\FrontendInstaller"
+
+REM create FrontendInstaller folder in Deployment
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%"\Deployment\FrontendInstaller
+MKDIR "%OPENTWIN_DEV_ROOT%\Deployment\FrontendInstaller"
 
 REM ==========================================
 REM Copy ThirdParty files
@@ -136,7 +134,7 @@ REM ZLib
 COPY "%ZLIB_DLLPATHR%\zlib.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
 REM ==========================================
-REM Copy OpenTwin assets
+REM Copy OpenTwin Assets
 REM ==========================================
 
 REM Icons
@@ -146,6 +144,10 @@ XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\Icons" "%OPENTWIN_FRONTEND_DEPLOYMENT%\icon
 REM Colorstyles
 MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\colorstyles"
 XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\ColorStyles" "%OPENTWIN_FRONTEND_DEPLOYMENT%\colorstyles"
+
+REM GraphicsItems
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\GraphicsItems"
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\GraphicsItems" "%OPENTWIN_FRONTEND_DEPLOYMENT%\GraphicsItems"
 
 REM ==========================================
 REM Copy OpenTwin build files
@@ -199,6 +201,7 @@ COPY "%OT_UIPLUGINAPI_ROOT%\%OT_DLLR%\UIPluginAPI.dll" "%OPENTWIN_FRONTEND_DEPLO
 
 REM UI Service
 COPY "%OT_UI_SERVICE_ROOT%\%OT_DLLR%\uiFrontend.exe" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+REN "%OPENTWIN_FRONTEND_DEPLOYMENT%\uiFrontend.exe" OpenTwin.exe
 
 REM Viewer
 COPY "%OT_VIEWER_ROOT%\%OT_DLLR%\Viewer.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
@@ -216,18 +219,11 @@ REM ==========================================
 
 CALL "C:\Program Files (x86)\NSIS\makensis.exe" Install-OpenTwin.nsi
 
-MOVE "Install OpenTwin.exe" "%OPENTWIN_FRONTEND_DEPLOYMENT%\FrontendInstaller"
-REN "%OPENTWIN_FRONTEND_DEPLOYMENT%\FrontendInstaller\Install OpenTwin.exe" Install_OpenTwin.exe
+REM move the installer into the Deployment folder for distribution via a server
+MOVE "Install_OpenTwin_Frontend.exe" "%OPENTWIN_DEV_ROOT%\Deployment\FrontendInstaller"
 
-goto SUCCESSFUL_END
+exit /B 0
 
 :PAUSE_END
 pause
-GOTO END
-
-:END
-REM Sets the exit code of the script to be 0
 exit /B 1
-
-:SUCCESSFUL_END
-exit /B 0
