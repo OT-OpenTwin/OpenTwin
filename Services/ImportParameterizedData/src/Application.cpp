@@ -235,7 +235,8 @@ void Application::modelSelectionChanged(void)
 
 // ##################################################################################################################################
 
-void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc) {
+void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc)
+{
 	std::mutex onlyOneActionPerTime;
 	std::lock_guard<std::mutex> lock (onlyOneActionPerTime);
 	try
