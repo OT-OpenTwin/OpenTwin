@@ -32,6 +32,12 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT WidgetView {
 		OT_DECL_NOCOPY(WidgetView)
 	public:
+		static std::string createStoredViewName(const WidgetViewBase& _view);
+
+		//! \brief Creates the name that should be used in the view management logic.
+		//! The resulted name has the following syntax: <entityName>$<viewTypeString>
+		static std::string createStoredViewName(const std::string& _entityName, WidgetViewBase::ViewType _viewType);
+
 		WidgetView();
 		virtual ~WidgetView();
 

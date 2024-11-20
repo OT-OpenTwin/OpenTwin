@@ -110,11 +110,11 @@ std::shared_ptr<EntityBase> EntityBuffer::LoadEntity(const std::string& absolute
 		ot::EntityInformation entityInfo;
 
 		_modelServiceAPI->getEntityInformation(absoluteEntityName, entityInfo);
-		if (entityInfo.getName() == "")
+		if (entityInfo.getEntityName() == "")
 		{
 			throw std::exception(("Requested entity " + absoluteEntityName + " does not exist.").c_str());
 		}
-		EntityBase* entity = _modelServiceAPI->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
+		EntityBase* entity = _modelServiceAPI->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
 		_bufferedEntities[absoluteEntityName] = std::shared_ptr<EntityBase>(entity);
 	}
 	return _bufferedEntities[absoluteEntityName];

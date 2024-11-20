@@ -394,10 +394,10 @@ void Application::downloadNeeded(ot::JsonDocument& _doc)
 
 	for (auto file : fileInfo)
 	{
-		if (file.getType() == "EntityFile" && file.getName() != "Files/Information")
+		if (file.getEntityType() == "EntityFile" && file.getEntityName() != "Files/Information")
 		{
-			entityID.push_back(file.getID());
-			versionID.push_back(file.getVersion());
+			entityID.push_back(file.getEntityID());
+			versionID.push_back(file.getEntityVersion());
 		}
 	}
 
@@ -475,7 +475,7 @@ void Application::changeUnits(const std::string &content)
 	// Load the current units entity
 	ot::EntityInformation entityInformation;
 	modelComponent()->getEntityInformation("Units", entityInformation);
-	EntityUnits* units = dynamic_cast<EntityUnits*> (modelComponent()->readEntityFromEntityIDandVersion(entityInformation.getID(), entityInformation.getVersion(), getClassFactory()));
+	EntityUnits* units = dynamic_cast<EntityUnits*> (modelComponent()->readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), getClassFactory()));
 	assert(units != nullptr);
 	if (units == nullptr) return;
 
@@ -539,9 +539,9 @@ void Application::changeMaterials(const std::string &content)
 
 	for (auto material : currentMaterialInfo)
 	{
-		if (materialProcessed.count(material.getName()) == 0)
+		if (materialProcessed.count(material.getEntityName()) == 0)
 		{
-			obsoleteMaterials.push_back(material.getName());
+			obsoleteMaterials.push_back(material.getEntityName());
 		}
 	}
 
@@ -597,7 +597,7 @@ bool Application::processSingleMaterial(std::stringstream& buffer, std::map<std:
 	ot::EntityInformation entityInformation;
 	if (modelComponent()->getEntityInformation("Materials/" + materialName, entityInformation))
 	{
-		material = dynamic_cast<EntityMaterial*> (modelComponent()->readEntityFromEntityIDandVersion(entityInformation.getID(), entityInformation.getVersion(), getClassFactory()));
+		material = dynamic_cast<EntityMaterial*> (modelComponent()->readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), getClassFactory()));
 	}
 
 	bool changed = false;
@@ -785,9 +785,9 @@ void Application::shapeTriangles(std::list<std::string>& shapeNames, std::list<s
 	modelComponent()->getEntityInformation(entityList, entityInfo);
 
 	assert(entityInfo.size() == 1);
-	assert(entityInfo.front().getName() == materialsFolder);
+	assert(entityInfo.front().getEntityName() == materialsFolder);
 
-	ot::UID materialsFolderID = entityInfo.front().getID();
+	ot::UID materialsFolderID = entityInfo.front().getEntityID();
 
 	auto triangles = shapeTriangles.begin();
 	auto hash      = shapeHash.begin();
@@ -1133,7 +1133,7 @@ void Application::getParametricCombinations(const std::string& logFileName, std:
 	ot::EntityInformation entityInfo;
 	modelComponent()->getEntityInformation(logFileName, entityInfo);
 	
-	EntityFile *fileEntity = dynamic_cast<EntityFile*>(modelComponent()->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), getClassFactory()));
+	EntityFile *fileEntity = dynamic_cast<EntityFile*>(modelComponent()->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), getClassFactory()));
 	if (fileEntity == nullptr) return;
 
 	std::shared_ptr<EntityBinaryData> data = fileEntity->getData();
@@ -1183,7 +1183,7 @@ LTSpiceData Application::getCurveData(const std::string& rawFileName)
 	ot::EntityInformation entityInfo;
 	modelComponent()->getEntityInformation(rawFileName, entityInfo);
 
-	EntityFile* fileEntity = dynamic_cast<EntityFile*>(modelComponent()->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), getClassFactory()));
+	EntityFile* fileEntity = dynamic_cast<EntityFile*>(modelComponent()->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), getClassFactory()));
 	if (fileEntity == nullptr) return result;
 
 	std::shared_ptr<EntityBinaryData> data = fileEntity->getData();

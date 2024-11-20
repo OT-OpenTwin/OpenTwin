@@ -39,7 +39,7 @@ void BooleanOperations::enterAddMode(const std::list<ot::EntityInformation> &sel
 		return;
 	}
 
-	std::string baseShapeName = selectedGeometryEntities.front().getName();
+	std::string baseShapeName = selectedGeometryEntities.front().getEntityName();
 
 	std::map<std::string, std::string> options;
 	options["BaseShape"] = baseShapeName;
@@ -58,7 +58,7 @@ void BooleanOperations::enterSubtractMode(const std::list<ot::EntityInformation>
 		return;
 	}
 
-	std::string baseShapeName = selectedGeometryEntities.front().getName();
+	std::string baseShapeName = selectedGeometryEntities.front().getEntityName();
 
 	std::map<std::string, std::string> options;
 	options["BaseShape"] = baseShapeName;
@@ -77,7 +77,7 @@ void BooleanOperations::enterIntersectMode(const std::list<ot::EntityInformation
 		return;
 	}
 
-	std::string baseShapeName = selectedGeometryEntities.front().getName();
+	std::string baseShapeName = selectedGeometryEntities.front().getEntityName();
 
 	std::map<std::string, std::string> options;
 	options["BaseShape"] = baseShapeName;
@@ -106,12 +106,12 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 	std::list<ot::EntityInformation> geometryEntities;
 	for (auto entity : entityInfo)
 	{
-		if (entity.getType() == "EntityGeometry")
+		if (entity.getEntityType() == "EntityGeometry")
 		{
 			geometryEntities.push_back(entity);
 		}
 
-		if (entity.getName() == baseEntityName)
+		if (entity.getEntityName() == baseEntityName)
 		{
 			uiComponent->displayErrorPrompt("The base shape must not be selected as tool shape for the operation as well");
 			return;
@@ -125,7 +125,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 
 	// Load all geometry entities and determine a list of their brep ids
 
-	EntityGeometry *baseEntity = dynamic_cast<EntityGeometry*>(entityCache->getEntity(baseEntityInfo.getID(), baseEntityInfo.getVersion()));
+	EntityGeometry *baseEntity = dynamic_cast<EntityGeometry*>(entityCache->getEntity(baseEntityInfo.getEntityID(), baseEntityInfo.getEntityVersion()));
 	if (baseEntity == nullptr) { assert(0); return; }
 
 	std::list<ot::UID> requiredBreps;
@@ -135,7 +135,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 
 	for (auto entity : geometryEntities)
 	{
-		EntityGeometry *toolEntity = dynamic_cast<EntityGeometry*>(entityCache->getEntity(entity.getID(), entity.getVersion()));
+		EntityGeometry *toolEntity = dynamic_cast<EntityGeometry*>(entityCache->getEntity(entity.getEntityID(), entity.getEntityVersion()));
 
 		if (toolEntity != nullptr)
 		{
@@ -155,7 +155,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 	std::list<EntityBrep *> brepEntities;
 	for (auto entity : brepEntityInfo)
 	{
-		EntityBrep *brepEntity = dynamic_cast<EntityBrep*>(entityCache->getEntity(entity.getID(), entity.getVersion()));
+		EntityBrep *brepEntity = dynamic_cast<EntityBrep*>(entityCache->getEntity(entity.getEntityID(), entity.getEntityVersion()));
 		brepEntities.push_back(brepEntity);
 	}
 
@@ -187,7 +187,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 		entityNameList.push_back(baseEntityName);
 		for (auto tool : geometryEntities)
 		{
-			entityNameList.push_back(tool.getName());
+			entityNameList.push_back(tool.getEntityName());
 		}
 
 		// Now we update the base entity

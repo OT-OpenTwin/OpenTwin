@@ -186,8 +186,8 @@ void Application::definePotential(void)
 
 	// Get an entity list
 	ot::UIDList updateEntities;
-	for (auto entity : selectedGeometryEntities) updateEntities.push_back(entity.getID());
-	for (auto entity : selectedTetMeshEntities) updateEntities.push_back(entity.getID());
+	for (auto entity : selectedGeometryEntities) updateEntities.push_back(entity.getEntityID());
+	for (auto entity : selectedTetMeshEntities) updateEntities.push_back(entity.getEntityID());
 
 	// Create a property object with the new properties and get it as JSON string
 	EntityProperties properties;
@@ -281,18 +281,18 @@ void Application::runSolver(void)
 	std::map<std::string, bool> solverRunMap;
 	for (auto entity : selectedEntityInfo)
 	{
-		if (entity.getType() == "EntitySolverGetDP")
+		if (entity.getEntityType() == "EntitySolverGetDP")
 		{
-			if (entity.getName().substr(0, 8) == "Solvers/")
+			if (entity.getEntityName().substr(0, 8) == "Solvers/")
 			{
-				size_t index = entity.getName().find('/', 8);
+				size_t index = entity.getEntityName().find('/', 8);
 				if (index != std::string::npos)
 				{
-					solverRunMap[entity.getName().substr(0, index - 1)] = true;
+					solverRunMap[entity.getEntityName().substr(0, index - 1)] = true;
 				}
 				else
 				{
-					solverRunMap[entity.getName()] = true;
+					solverRunMap[entity.getEntityName()] = true;
 				}
 			}
 		}
@@ -320,7 +320,7 @@ void Application::runSolver(void)
 
 	for (auto info : solverInfo)
 	{
-		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getID(), info.getVersion()));
+		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsSolver);
@@ -330,8 +330,8 @@ void Application::runSolver(void)
 	std::map<std::string, EntityBase *> solverMap;
 	for (auto info : solverInfo)
 	{
-		EntityBase *entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), getClassFactory());
-		solverMap[info.getName()] = entity;
+		EntityBase *entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory());
+		solverMap[info.getEntityName()] = entity;
 	}
 
 	std::list<ot::EntityInformation> meshInfo;
@@ -345,13 +345,13 @@ void Application::runSolver(void)
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase *> solverMap) {
 	for (auto solver : solverInfo)
 	{
-		runSingleSolver(solver, meshInfo, solverMap[solver.getName()]);
+		runSingleSolver(solver, meshInfo, solverMap[solver.getEntityName()]);
 	}
 }
 
 void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::EntityInformation> &meshInfo, EntityBase *solverEntity) 
 {
-	std::string solverName = solver.getName();
+	std::string solverName = solver.getEntityName();
 	if (solverName.substr(0, 8) == "Solvers/")
 	{
 		solverName = solverName.substr(8);
@@ -381,7 +381,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 
 	for (auto meshItem : meshInfo)
 	{
-		if (meshItem.getID() == meshEntityID)
+		if (meshItem.getEntityID() == meshEntityID)
 		{
 			meshFound = true;
 			break;
@@ -394,9 +394,9 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 		meshEntityID = 0;
 		for (auto meshItem : meshInfo)
 		{
-			if (meshItem.getName() == mesh->getValueName())
+			if (meshItem.getEntityName() == mesh->getValueName())
 			{
-				meshEntityID = meshItem.getID();
+				meshEntityID = meshItem.getEntityID();
 				break;
 			}
 		}
@@ -420,7 +420,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::E
 
 	// Store the output in a result item
 
-	EntityResultText *text = m_modelComponent->addResultTextEntity(solver.getName() + "/Output", logFileText + output);
+	EntityResultText *text = m_modelComponent->addResultTextEntity(solver.getEntityName() + "/Output", logFileText + output);
 
 	modelComponent()->addNewTopologyEntity(text->getEntityID(), text->getEntityStorageVersion(), false);
 	modelComponent()->addNewDataEntity(text->getTextDataStorageId(), text->getTextDataStorageVersion(), text->getEntityID());

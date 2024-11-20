@@ -153,7 +153,7 @@ Graph GraphHandler::buildGraph(std::map<ot::UID, std::shared_ptr<EntityBlock>>& 
 		for (const auto& entityInfo: entityInfos)
 		{
 			ClassFactoryBlock classFactory;
-			EntityBase* baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+			EntityBase* baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), classFactory);
 			
 			std::unique_ptr<EntityBlockConnection>connectionEnt(dynamic_cast<EntityBlockConnection*>(baseEnt));
 			auto connection = connectionEnt->getConnectionCfg();

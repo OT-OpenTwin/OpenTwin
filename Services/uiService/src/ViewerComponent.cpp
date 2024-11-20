@@ -344,13 +344,13 @@ void ViewerComponent::displayText(const std::string &text)
 	AppBase::instance()->appendInfoMessage(QString::fromStdString(text));
 }
 
-void ViewerComponent::setCurrentVisualizationTab(const std::string & _tabName) {
-	AppBase::instance()->setCurrentVisualizationTab(_tabName);
+void ViewerComponent::setCurrentVisualizationTabFromTitle(const std::string & _tabTitle) {
+	AppBase::instance()->setCurrentVisualizationTabFromTitle(_tabTitle);
 }
 
-std::string ViewerComponent::getCurrentVisualizationTab(void)
+std::string ViewerComponent::getCurrentVisualizationTabTitle(void)
 {
-	return AppBase::instance()->getCurrentVisualizationTab();
+	return AppBase::instance()->getCurrentVisualizationTabTitle();
 }
 
 void ViewerComponent::enableDisableControls(std::list<ak::UID> &enabled, std::list<ak::UID> &disabled)

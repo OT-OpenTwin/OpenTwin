@@ -6,9 +6,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Serializable.h"
 #include "OTGui/GuiTypes.h"
-#include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/WidgetViewBase.h"
 
 // std header
 #include <string>
@@ -17,7 +16,7 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT TextEditorCfg : public Serializable {
+	class OT_GUI_API_EXPORT TextEditorCfg : public WidgetViewBase {
 	public:
 		TextEditorCfg();
 		TextEditorCfg(const TextEditorCfg& _other);
@@ -35,12 +34,6 @@ namespace ot {
 		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& getName(void) const { return m_name; };
-
-		void setTitle(const std::string& _title) { m_title = _title; };
-		const std::string& getTitle(void) const { return (m_title.empty() ? m_name : m_title); };
-
 		void setPlainText(const std::string& _text) { m_text = _text; };
 		const std::string& getPlainText(void) const { return m_text; };
 
@@ -48,8 +41,6 @@ namespace ot {
 		DocumentSyntax getDocumentSyntax(void) const { return m_syntax; };
 
 	private:
-		std::string m_name;
-		std::string m_title;
 		std::string m_text;
 		DocumentSyntax m_syntax;
 	};

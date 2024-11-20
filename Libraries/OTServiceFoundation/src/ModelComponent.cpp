@@ -238,8 +238,8 @@ void ot::components::ModelComponent::loadMaterialInformation()
 
 	for (auto matItem : materialInformation)
 	{
-		materialIDToNameMap[matItem.getID()]   = matItem.getName();
-		materialNameToIDMap[matItem.getName()] = matItem.getID();
+		materialIDToNameMap[matItem.getEntityID()]   = matItem.getEntityName();
+		materialNameToIDMap[matItem.getEntityName()] = matItem.getEntityID();
 	}
 }
 

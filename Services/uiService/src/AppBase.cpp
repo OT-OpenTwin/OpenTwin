@@ -1101,11 +1101,11 @@ ViewerUIDtype AppBase::createView(
 	return viewID;
 }
 
-void AppBase::setCurrentVisualizationTab(const std::string & _tabName) {
-	ot::WidgetViewManager::instance().setCurrentView(_tabName);
+void AppBase::setCurrentVisualizationTabFromTitle(const std::string & _tabTitle) {
+	ot::WidgetViewManager::instance().setCurrentViewFromTitle(_tabTitle);
 }
 
-std::string AppBase::getCurrentVisualizationTab(void) {
+std::string AppBase::getCurrentVisualizationTabTitle(void) {
 	ot::WidgetView* view = ot::WidgetViewManager::instance().getLastFocusedCentralView();
 	if (view) return view->getViewData().getTitle();
 	else return "";
@@ -1734,22 +1734,21 @@ std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors(void) {
 // Text Editor
 
 ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::TextEditorView* newEditor = this->findTextEditor(_config.getName(), _serviceInfo);
+	ot::TextEditorView* newEditor = this->findTextEditor(_config.getEntityName(), _serviceInfo);
 	if (newEditor != nullptr) {
-		OT_LOG_D("TextEditor already exists { \"Editor.Name\": \"" + _config.getName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
+		OT_LOG_D("TextEditor already exists { \"Editor.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newEditor;
 	}
 
 	newEditor = new ot::TextEditorView;
 	newEditor->setupFromConfig(_config, false);
-	newEditor->setViewData(ot::WidgetViewBase(_config.getName(), _config.getTitle(), ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewIsCloseable, ot::WidgetViewBase::ViewText));
 	
 	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
 	m_textEditors.store(_serviceInfo, newEditor);
 
 	this->connect(newEditor, &ot::TextEditor::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
 
-	OT_LOG_D("TextEditor created { \"Editor.Name\": \"" + _config.getName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	OT_LOG_D("TextEditor created { \"Editor.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
 	return newEditor;
 }
@@ -1759,7 +1758,9 @@ ot::TextEditorView* AppBase::findTextEditor(const std::string& _name, const ot::
 		const std::list<ot::TextEditorView*>& lst = m_textEditors[_serviceInfo];
 
 		for (auto v : lst) {
-			if (v->getTextEditorName() == _name) return v;
+			if (v->getViewData().getEntityName() == _name) {
+				return v;
+			}
 		}
 	}
 
@@ -1767,13 +1768,13 @@ ot::TextEditorView* AppBase::findTextEditor(const std::string& _name, const ot::
 }
 
 ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::TextEditorView* v = this->findTextEditor(_config.getName(), _serviceInfo);
+	ot::TextEditorView* v = this->findTextEditor(_config.getEntityName(), _serviceInfo);
 	if (v) {
 		v->setupFromConfig(_config, true);
 		return v;
 	}
 
-	OT_LOG_D("TextEditor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _config.getName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	OT_LOG_D("TextEditor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _config.getEntityName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 	return this->createNewTextEditor(_config, _serviceInfo);
 }
 
@@ -1784,9 +1785,9 @@ void AppBase::closeTextEditor(const std::string& _name, const ot::BasicServiceIn
 		lst.clear();
 
 		for (auto v : tmp) {
-			if (v->getTextEditorName() == _name) {
+			if (v->getViewData().getEntityName() == _name) {
 				this->cleanupWidgetViewInfo(v);
-				ot::WidgetViewManager::instance().closeView(_name);
+				ot::WidgetViewManager::instance().closeView(_name, v->getViewData().getViewType());
 			}
 			else {
 				lst.push_back(v);
@@ -1803,8 +1804,8 @@ void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInf
 		std::list<ot::TextEditorView*>& lst = m_textEditors[_serviceInfo];
 
 		for (auto v : lst) {
-			std::string name = v->getViewData().getName();
-			ot::WidgetViewManager::instance().closeView(name);
+			std::string name = v->getViewData().getEntityName();
+			ot::WidgetViewManager::instance().closeView(name, v->getViewData().getViewType());
 		}
 		lst.clear();
 	}
@@ -1818,22 +1819,21 @@ void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInf
 // Table
 
 ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::TableView* newTable = this->findTable(_config.getName(), _serviceInfo);
+	ot::TableView* newTable = this->findTable(_config.getEntityName(), _serviceInfo);
 	if (newTable != nullptr) {
-		OT_LOG_D("Table already exists { \"Table.Name\": \"" + _config.getName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
+		OT_LOG_D("Table already exists { \"Table.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newTable;
 	}
 
 	newTable = new ot::TableView;
 	newTable->setupFromConfig(_config);
-	newTable->setViewData(ot::WidgetViewBase(_config.getName(), _config.getTitle(), ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewIsCloseable, ot::WidgetViewBase::ViewTable));
 
 	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newTable);
 	m_tables.store(_serviceInfo, newTable);
 
 	this->connect(newTable, &ot::TableView::saveRequested, this, &AppBase::slotTableSaveRequested);
 
-	OT_LOG_D("Table created { \"Editor.Name\": \"" + _config.getName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	OT_LOG_D("Table created { \"Editor.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
 	return newTable;
 }
@@ -1843,7 +1843,9 @@ ot::TableView* AppBase::findTable(const std::string& _name, const ot::BasicServi
 		const std::list<ot::TableView*>& lst = m_tables[_serviceInfo];
 
 		for (auto v : lst) {
-			if (v->getTableName() == _name) return v;
+			if (v->getViewData().getEntityName() == _name) {
+				return v;
+			}
 		}
 	}
 
@@ -1851,13 +1853,13 @@ ot::TableView* AppBase::findTable(const std::string& _name, const ot::BasicServi
 }
 
 ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::TableView* v = this->findTable(_config.getName(), _serviceInfo);
+	ot::TableView* v = this->findTable(_config.getEntityName(), _serviceInfo);
 	if (v) {
 		v->setupFromConfig(_config);
 		return v;
 	}
 
-	OT_LOG_D("Table does not exist. Creating new table. { \"Table.Name\": \"" + _config.getName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	OT_LOG_D("Table does not exist. Creating new table. { \"Table.Name\": \"" + _config.getEntityName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 	return this->createNewTable(_config, _serviceInfo);
 }
 
@@ -1868,9 +1870,9 @@ void AppBase::closeTable(const std::string& _name, const ot::BasicServiceInforma
 		lst.clear();
 
 		for (auto v : tmp) {
-			if (v->getTableName() == _name) {
+			if (v->getViewData().getEntityName() == _name) {
 				this->cleanupWidgetViewInfo(v);
-				ot::WidgetViewManager::instance().closeView(_name);
+				ot::WidgetViewManager::instance().closeView(_name, v->getViewData().getViewType());
 			}
 			else {
 				lst.push_back(v);
@@ -2205,7 +2207,7 @@ void AppBase::slotTextEditorSaveRequested(void) {
 
 		try {
 			ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
-			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->getTextEditorName(), doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->getViewData().getEntityName(), doc.GetAllocator()), doc.GetAllocator());
 			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(editor->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 
 			std::string response;
@@ -2294,8 +2296,8 @@ void AppBase::slotViewFocusLost(ot::WidgetView* _view) {
 
 void AppBase::slotViewFocused(ot::WidgetView* _view) {
 	if (!_view) return;
-	if (_view->getViewData().getFlags() & ot::WidgetViewBase::ViewIsCentral) {
-		m_viewerComponent->viewerTabChanged(_view->getViewData().getName(), _view->getViewData().getViewType());
+	if (_view->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
+		m_viewerComponent->viewerTabChanged(_view->getViewData().getEntityName(), _view->getViewData().getViewType());
 	}
 
 	ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_view);
@@ -2308,7 +2310,7 @@ void AppBase::slotViewFocused(ot::WidgetView* _view) {
 }
 
 void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
-	if (!(_view->getViewData().getFlags() & ot::WidgetViewBase::ViewIsCloseable)) return;
+	if (!(_view->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCloseable)) return;
 
 	if (_view->getViewContentModified()) {
 		ot::MessageDialogCfg msgCfg;
@@ -2320,8 +2322,8 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	}
 
 	this->cleanupWidgetViewInfo(_view);
-	std::string viewName = _view->getViewData().getName();
-	ot::WidgetViewManager::instance().closeView(viewName);
+	std::string viewName = _view->getViewData().getEntityName();
+	ot::WidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
 
 	// Deselect navigation item if exists
 	auto itm = m_projectNavigation->itemFromPath(QString::fromStdString(viewName), '/');
@@ -2819,8 +2821,6 @@ void AppBase::slotTreeItemFocused(QTreeWidgetItem* _item) {
 	}
 	
 }
-
-
 
 void AppBase::fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo) {
 	this->clearGraphicsPicker();

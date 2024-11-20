@@ -143,7 +143,7 @@ bool EntityResultText::visualiseText()
 ot::TextEditorCfg EntityResultText::createConfig()
 {
 	ot::TextEditorCfg result;
-	result.setName(this->getName());
+	result.setEntityName(this->getName());
 	result.setTitle(this->getName());
 	result.setPlainText(this->getText());
 

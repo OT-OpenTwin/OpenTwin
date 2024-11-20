@@ -4484,12 +4484,12 @@ std::string ExternalServicesComponent::handlePluginMessage(ot::JsonDocument& _do
 	return "";
 }
 
-void ExternalServicesComponent::sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::Table* _table) {
+void ExternalServicesComponent::sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(_callbackFunction, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _table->getTableEntityId(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, _table->getTableEntityVersion(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _table->getViewData().getEntityID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, _table->getViewData().getEntityVersion(), doc.GetAllocator());
 
 	ot::JsonArray rangesArray;
 	for (const QTableWidgetSelectionRange& qrange : _table->selectedRanges()) {

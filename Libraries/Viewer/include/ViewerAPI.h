@@ -61,8 +61,8 @@ namespace ViewerAPI
 
 		virtual void displayText(const std::string &text) { };
 
-		virtual void setCurrentVisualizationTab(const std::string & _tabName) {}
-		virtual std::string getCurrentVisualizationTab(void) { return ""; }
+		virtual void setCurrentVisualizationTabFromTitle(const std::string & _tabTitle) {}
+		virtual std::string getCurrentVisualizationTabTitle(void) { return ""; }
 
 		virtual void enableDisableControls(std::list<unsigned long long> &enabled, std::list<unsigned long long> &disabled) {};
 

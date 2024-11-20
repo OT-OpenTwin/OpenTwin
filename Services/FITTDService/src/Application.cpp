@@ -179,9 +179,9 @@ void Application::addMonitor(void)
 	assert(m_modelComponent != nullptr);
 	m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
 	auto selectedSolver = selectedEntityInfo.begin();
-	assert(selectedSolver->getType() == "EntitySolverFITTD");
+	assert(selectedSolver->getEntityType() == "EntitySolverFITTD");
 	
-	auto solverEntity = dynamic_cast<EntitySolverFITTD*>( m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getID(), selectedSolver->getVersion(), getClassFactory()));
+	auto solverEntity = dynamic_cast<EntitySolverFITTD*>( m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion(), getClassFactory()));
 	assert(solverEntity != nullptr);
 	
 	//Create new monitor
@@ -189,7 +189,7 @@ void Application::addMonitor(void)
 	auto newMonitor = new EntitySolverMonitor(newMonitorID, nullptr, nullptr, nullptr, nullptr, "Model");
 
 	// Get a list of all items of this specific solver
-	std::string solverName = selectedSolver->getName();
+	std::string solverName = selectedSolver->getEntityName();
 	std::string fullMonitorPath = solverName + "/" + FolderNames::GetFolderNameMonitors();
 	std::list<std::string> solverItems = m_modelComponent->getListOfFolderItems(fullMonitorPath);
 
@@ -237,9 +237,9 @@ void Application::addPort(void)
 	assert(m_modelComponent != nullptr);
 	m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
 	auto selectedSolver = selectedEntityInfo.begin();
-	assert(selectedSolver->getType() == "EntitySolverFITTD");
+	assert(selectedSolver->getEntityType() == "EntitySolverFITTD");
 
-	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getID(), selectedSolver->getVersion(), getClassFactory()));
+	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion(), getClassFactory()));
 	assert(solverEntity != nullptr);
 
 	//Create new monitor
@@ -247,7 +247,7 @@ void Application::addPort(void)
 	auto newPort = new EntitySolverPort(newPortID, nullptr, nullptr, nullptr, nullptr, "Model");
 
 	// Find the next free numbered entity name
-	std::string solverName = selectedSolver->getName();
+	std::string solverName = selectedSolver->getEntityName();
 	std::string fullPortPath = solverName + "/" + FolderNames::GetFolderNamePorts();
 	std::list<std::string> solverItems = m_modelComponent->getListOfFolderItems(fullPortPath);
 
@@ -266,14 +266,14 @@ void Application::addPort(void)
 	ot::EntityInformation entityInfos;
 	m_modelComponent->getEntityInformation(signalTypeFolderName, entityInfos);
 	std::list<ot::EntityInformation> childInfos;
-	m_modelComponent->getEntityChildInformation(entityInfos.getID(), childInfos, false);
+	m_modelComponent->getEntityChildInformation(entityInfos.getEntityID(), childInfos, false);
 	std::string firstSignalName;
 	ot::UID firstSignalID;
-	childInfos.size() != 0 ? firstSignalName = childInfos.front().getName() : firstSignalName = "";
-	childInfos.size() != 0 ? firstSignalID = childInfos.front().getID() : firstSignalID = 0;
+	childInfos.size() != 0 ? firstSignalName = childInfos.front().getEntityName() : firstSignalName = "";
+	childInfos.size() != 0 ? firstSignalID = childInfos.front().getEntityID() : firstSignalID = 0;
 
 
-	newPort->createProperties(signalTypeFolderName, entityInfos.getVersion(), firstSignalName, firstSignalID);
+	newPort->createProperties(signalTypeFolderName, entityInfos.getEntityVersion(), firstSignalName, firstSignalID);
 	newPort->StoreToDataBase();
 
 	// Register the new solver item in the model
@@ -307,14 +307,14 @@ void Application::addSignalType(void)
 	assert(m_modelComponent != nullptr);
 	m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
 	auto selectedSolver = selectedEntityInfo.begin();
-	assert(selectedSolver->getType() == "EntitySolverFITTD");
+	assert(selectedSolver->getEntityType() == "EntitySolverFITTD");
 
-	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getID(), selectedSolver->getVersion(), getClassFactory()));
+	auto solverEntity = dynamic_cast<EntitySolverFITTD*>(m_modelComponent->readEntityFromEntityIDandVersion(selectedSolver->getEntityID(), selectedSolver->getEntityVersion(), getClassFactory()));
 	assert(solverEntity != nullptr);
 
 	// Get a list of all items of this specific solver
 	const std::string folderName = FolderNames::GetFolderNameSignalType();
-	std::string solverName = selectedSolver->getName();
+	std::string solverName = selectedSolver->getEntityName();
 	const std::string signalTypeFolderPath = solverName + "/" + folderName;
 	std::list<std::string> solverItems = m_modelComponent->getListOfFolderItems(signalTypeFolderPath);
 	std::string signalName;
@@ -438,18 +438,18 @@ void Application::runSolver(void)
 	std::map<std::string, bool> solverRunMap;
 	for (auto entity : selectedEntityInfo)
 	{
-		if (entity.getType() == "EntitySolverFITTD")
+		if (entity.getEntityType() == "EntitySolverFITTD")
 		{
-			if (entity.getName().substr(0, 8) == "Solvers/")
+			if (entity.getEntityName().substr(0, 8) == "Solvers/")
 			{
-				size_t index = entity.getName().find('/', 8);
+				size_t index = entity.getEntityName().find('/', 8);
 				if (index != std::string::npos)
 				{
-					solverRunMap[entity.getName().substr(0, index - 1)] = true;
+					solverRunMap[entity.getEntityName().substr(0, index - 1)] = true;
 				}
 				else
 				{
-					solverRunMap[entity.getName()] = true;
+					solverRunMap[entity.getEntityName()] = true;
 				}
 			}
 		}

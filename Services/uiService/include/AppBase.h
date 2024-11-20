@@ -242,8 +242,8 @@ public:
 		const std::string &				_projectName
 	);
 
-	void setCurrentVisualizationTab(const std::string & _tabName);
-	std::string getCurrentVisualizationTab(void);
+	void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle);
+	std::string getCurrentVisualizationTabTitle(void);
 
 	void importProject(void);
 	void manageGroups(void);

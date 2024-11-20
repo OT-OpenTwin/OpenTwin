@@ -151,9 +151,6 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _isUpdat
 	newHighlighter->blockSignals(true);
 
 	if (!_isUpdate) {
-		this->setTextEditorName(_config.getName());
-		this->setTextEditorTitle(QString::fromStdString(_config.getTitle()));
-
 		QString newText = QString::fromStdString(_config.getPlainText());
 		newText.remove('\r');
 		if (newText != this->toPlainText()) {

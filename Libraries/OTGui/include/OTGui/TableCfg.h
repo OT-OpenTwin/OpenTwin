@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/EntityViewBaseInfo.h"
+#include "OTGui/WidgetViewBase.h"
 #include "OTGui/TableHeaderItemCfg.h"
 #include "TableHeaderOrientation.h"
 #include "OTCore/GenericDataStructMatrix.h"
@@ -17,9 +17,9 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT TableCfg : public EntityViewBaseInfo {
+	class OT_GUI_API_EXPORT TableCfg : public WidgetViewBase {
 	public:
-		TableCfg(int _rows = 0, int _columns = 0, EntityViewBaseInfo _baseInfo = EntityViewBaseInfo());
+		TableCfg(int _rows = 0, int _columns = 0, WidgetViewBase _baseInfo = WidgetViewBase(WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable, WidgetViewBase::ViewTable));
 		TableCfg(const ot::GenericDataStructMatrix& _matrix, ot::TableHeaderOrientation _orientation);
 		TableCfg(const TableCfg& _other);
 		virtual ~TableCfg();

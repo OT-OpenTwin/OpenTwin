@@ -96,9 +96,9 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 	application->modelComponent()->getEntityInformation(entityList, entityInfo);
 
 	assert(entityInfo.size() == 1);
-	assert(entityInfo.front().getName() == materialsFolder);
+	assert(entityInfo.front().getEntityName() == materialsFolder);
 
-	ot::UID materialsFolderID = entityInfo.front().getID();
+	ot::UID materialsFolderID = entityInfo.front().getEntityID();
 
 	// Create a new emtpy mesh data entity
 	getEntityMesh()->setModified();

@@ -91,7 +91,7 @@ ot::TableCfg EntityFileCSV::getTableConfig()
 	ot::GenericDataStructMatrix matrix = getTable();
 	ot::TableHeaderOrientation headerOrientation =	getHeaderOrientation();
 	ot::TableCfg tableCfg(matrix, headerOrientation);
-	tableCfg.setName(getName());
+	tableCfg.setEntityName(getName());
 	tableCfg.setTitle(getName());
 	return tableCfg;
 }

@@ -53,8 +53,8 @@ class ServiceDataUi;
 class WebsocketClient;
 class ControlsManager;
 class KeyboardCommandHandler;
-namespace ot { class Table; };
 namespace ot { class Property; };
+namespace ot { class TableView; };
 namespace ot { class ServiceBase; };
 
 class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::ActionHandler {
@@ -407,7 +407,7 @@ private:
 
 	void determineViews(const std::string& modelServiceURL);
 
-	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::Table* _table);
+	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
 
 	// #################################################################
 

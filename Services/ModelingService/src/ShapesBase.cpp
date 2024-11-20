@@ -76,9 +76,9 @@ void ShapesBase::storeShapeInModel(const TopoDS_Shape & _shape, std::vector<doub
 		modelComponent->getEntityInformation(entityList, entityInfo);
 
 		assert(entityInfo.size() == 1);
-		assert(entityInfo.front().getName() == materialsFolder);
+		assert(entityInfo.front().getEntityName() == materialsFolder);
 
-		materialsFolderID = entityInfo.front().getID();
+		materialsFolderID = entityInfo.front().getEntityID();
 	}
 
 	// Find the parent folder name of the entity

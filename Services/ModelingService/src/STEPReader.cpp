@@ -453,9 +453,9 @@ void STEPReader::processNode(const TDF_Label &itemLabel, std::string prefix, STE
 					application->modelComponent()->getEntityInformation(entityList, entityInfo);
 
 					assert(entityInfo.size() == 1);
-					assert(entityInfo.front().getName() == materialsFolder);
+					assert(entityInfo.front().getEntityName() == materialsFolder);
 
-					materialsFolderID = entityInfo.front().getID();
+					materialsFolderID = entityInfo.front().getEntityID();
 				}
 
 				for (auto itemShape : shapes)

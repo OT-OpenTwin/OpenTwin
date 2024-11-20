@@ -22,6 +22,13 @@ QWidget* ot::TextEditorView::getViewWidget(void) {
 	return this;
 }
 
+void ot::TextEditorView::setupFromConfig(const TextEditorCfg& _config, bool _isUpdate) {
+	TextEditor::setupFromConfig(_config, _isUpdate);
+	if (!_isUpdate) {
+		this->setViewData(_config);
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Base class functions

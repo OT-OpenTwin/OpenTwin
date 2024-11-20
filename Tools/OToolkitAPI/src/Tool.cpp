@@ -25,7 +25,7 @@ ot::WidgetView* otoolkit::Tool::createCentralWidgetView(QWidget* _widget, const 
 	if (!view) return nullptr;
 	
 	ot::WidgetViewBase vd = view->getViewData();
-	vd.setFlag(ot::WidgetViewBase::ViewIsCentral);
+	vd.setViewFlag(ot::WidgetViewBase::ViewIsCentral);
 	view->setViewData(vd);
 
 	return view;
@@ -36,7 +36,7 @@ ot::WidgetView* otoolkit::Tool::createSideWidgetView(QWidget* _widget, const QSt
 	if (!view) return nullptr;
 
 	ot::WidgetViewBase vd = view->getViewData();
-	vd.setFlag(ot::WidgetViewBase::ViewIsSide);
+	vd.setViewFlag(ot::WidgetViewBase::ViewIsSide);
 	view->setViewData(vd);
 	
 	return view;
@@ -47,9 +47,9 @@ ot::WidgetView* otoolkit::Tool::createToolWidgetView(QWidget* _widget, const QSt
 	if (!view) return nullptr;
 
 	ot::WidgetViewBase vd = view->getViewData();
-	vd.setFlag(ot::WidgetViewBase::ViewIsTool);
-	vd.setFlag(ot::WidgetViewBase::ViewIsPinnable);
-	vd.setFlag(ot::WidgetViewBase::ViewIsCloseable);
+	vd.setViewFlag(ot::WidgetViewBase::ViewIsTool);
+	vd.setViewFlag(ot::WidgetViewBase::ViewIsPinnable);
+	vd.setViewFlag(ot::WidgetViewBase::ViewIsCloseable);
 	view->setViewData(vd);
 
 	return view;
@@ -63,7 +63,7 @@ ot::WidgetView* otoolkit::Tool::createWidgetView(QWidget* _widget, const QString
 	ot::BasicWidgetView* ret = new ot::BasicWidgetView(_widget);
 
 	ot::WidgetViewBase basicInformation;
-	basicInformation.setName(this->getToolName().toStdString() + "_" + _widgetName.toStdString());
+	basicInformation.setEntityName(this->getToolName().toStdString() + "_" + _widgetName.toStdString());
 	basicInformation.setTitle(_widgetName.toStdString());
 	ret->setViewData(basicInformation);
 

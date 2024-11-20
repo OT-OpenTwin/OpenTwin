@@ -34,8 +34,6 @@ ot::Table::~Table() {
 // Setter / Getter
 
 void ot::Table::setupFromConfig(const TableCfg& _config) {
-	m_tableInfo = _config;
-
 	bool tmp = this->signalsBlocked();
 	this->blockSignals(true);
 
@@ -78,7 +76,7 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 }
 
 ot::TableCfg ot::Table::createConfig(void) const {
-	TableCfg cfg(this->rowCount(), this->columnCount(), m_tableInfo);
+	TableCfg cfg(this->rowCount(), this->columnCount());
 	
 	for (int r = 0; r < this->rowCount(); r++) {
 		for (int c = 0; c < this->columnCount(); c++) {
@@ -95,38 +93,6 @@ void ot::Table::setContentChanged(bool _changed) {
 	m_contentChanged = _changed;
 	if (m_contentChanged) this->contentChanged();
 	else this->contentSaved();
-}
-
-void ot::Table::setTableName(const std::string& _name) {
-	m_tableInfo.setName(_name);
-}
-
-const std::string& ot::Table::getTableName(void) const {
-	return m_tableInfo.getName();
-}
-
-void ot::Table::setTableTitle(const std::string& _title) {
-	m_tableInfo.setTitle(_title);
-}
-
-const std::string& ot::Table::getTableTitle(void) const {
-	return m_tableInfo.getTitle();
-}
-
-void ot::Table::setTableEntityId(UID _id) {
-	m_tableInfo.setEntityId(_id);
-}
-
-ot::UID ot::Table::getTableEntityId(void) const {
-	return m_tableInfo.getEntityId();
-}
-
-void ot::Table::setTableEntityVersion(UID _version) {
-	m_tableInfo.setEntityVersion(_version);
-}
-
-ot::UID ot::Table::getTableEntityVersion(void) const {
-	return m_tableInfo.getEntityVersion();
 }
 
 void ot::Table::setSelectedCellsBackground(const ot::Color& _color) {

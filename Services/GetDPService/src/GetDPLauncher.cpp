@@ -142,7 +142,7 @@ void GetDPLauncher::readMeshItemInfo(ot::UID meshDataID, std::map<ot::UID, ot::E
 
 	for (auto item : info)
 	{
-		meshItemInfo[item.getID()] = item;
+		meshItemInfo[item.getEntityID()] = item;
 	}
 }
 
@@ -164,7 +164,7 @@ void GetDPLauncher::readMaterialProperties(std::map<std::string, EntityPropertie
 
 	for (auto &entity : entityInformation)
 	{
-		materialProperties[entity.getName()] = entityProperties[entity.getID()];
+		materialProperties[entity.getEntityName()] = entityProperties[entity.getEntityID()];
 	}
 }
 
@@ -243,7 +243,7 @@ std::string GetDPLauncher::extractMesh(EntityBase* solverEntity, const std::stri
 	application->modelComponent()->getEntityInformation(entityList, entityInfo);
 	if (entityInfo.empty()) return "";
 
-	meshDataID = entityInfo.front().getID();
+	meshDataID = entityInfo.front().getEntityID();
 
 	// Get the gmsh data storage ID
 	ot::UIDList entityIDList;

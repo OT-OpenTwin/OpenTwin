@@ -51,9 +51,9 @@ void PreviewAssembler::LoadTableSources(std::list<std::string>& tableNames)
 		for (auto entityInfo : entityInfos)
 		{
 			
-			if (entityInfo.getName() == tableName)
+			if (entityInfo.getEntityName() == tableName)
 			{
-				auto baseEnt =	_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), Application::instance()->getClassFactory());
+				auto baseEnt =	_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
 				std::shared_ptr<EntityParameterizedDataTable> sourceTable(dynamic_cast<EntityParameterizedDataTable*>(baseEnt));
 				if (sourceTable == nullptr)
 				{

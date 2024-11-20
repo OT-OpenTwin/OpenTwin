@@ -24,7 +24,6 @@
     <ClInclude Include="include\OTGui\CheckerboardPainter2D.h" />
     <ClInclude Include="include\OTGui\ColorStyleTypes.h" />
     <ClInclude Include="include\OTGui\DefaultSyntaxHighlighterRules.h" />
-    <ClInclude Include="include\OTGui\EntityViewBaseInfo.h" />
     <ClInclude Include="include\OTGui\GraphicsArcItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsConnectionCalculationData.h" />
     <ClInclude Include="include\OTGui\GraphicsGroupItemCfg.h" />
@@ -119,7 +118,6 @@
     <ClCompile Include="src\CheckerboardPainter2D.cpp" />
     <ClCompile Include="src\ColorStyleTypes.cpp" />
     <ClCompile Include="src\DefaultSyntaxHighlighterRules.cpp" />
-    <ClCompile Include="src\EntityViewBaseInfo.cpp" />
     <ClCompile Include="src\GraphicsArcItemCfg.cpp" />
     <ClCompile Include="src\GraphicsConnectionCalculationData.cpp" />
     <ClCompile Include="src\GraphicsGroupItemCfg.cpp" />

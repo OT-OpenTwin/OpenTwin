@@ -58,9 +58,9 @@ void MeshImport::importMesh(const std::string& meshName, const std::string& orig
 	application->modelComponent()->getEntityInformation(entityList, entityInfo);
 
 	assert(entityInfo.size() == 1);
-	assert(entityInfo.front().getName() == materialsFolder);
+	assert(entityInfo.front().getEntityName() == materialsFolder);
 
-	ot::UID materialsFolderID = entityInfo.front().getID();
+	ot::UID materialsFolderID = entityInfo.front().getEntityID();
 
 	// Store the mesh in a temporary file
 	std::string tmpDir = TmpFileManager::createTmpDir();

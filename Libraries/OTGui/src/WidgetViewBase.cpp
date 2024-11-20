@@ -112,20 +112,16 @@ ot::WidgetViewBase::ViewType ot::WidgetViewBase::stringToViewType(const std::str
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::WidgetViewBase::WidgetViewBase()
-	: m_flags(WidgetViewBase::NoViewFlags), m_dockLocation(WidgetViewBase::Default), m_type(WidgetViewBase::CustomView)
+ot::WidgetViewBase::WidgetViewBase(ViewFlags _flags, ViewType _type)
+	: m_flags(_flags), m_dockLocation(WidgetViewBase::Default), m_type(_type)
 {}
 
-ot::WidgetViewBase::WidgetViewBase(const std::string& _nameAndTitle, ViewFlags _flags, ViewType _type)
-	: m_name(_nameAndTitle), m_title(_nameAndTitle), m_dockLocation(WidgetViewBase::Default), m_flags(_flags), m_type(_type)
+ot::WidgetViewBase::WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewFlags _flags, ViewType _type)
+	: BasicEntityInformation(_entityName), m_title(_title), m_dockLocation(WidgetViewBase::Default), m_flags(_flags), m_type(_type)
 {}
 
-ot::WidgetViewBase::WidgetViewBase(const std::string& _name, const std::string& _title, ViewFlags _flags, ViewType _type)
-	: m_name(_name), m_title(_title), m_dockLocation(WidgetViewBase::Default), m_flags(_flags), m_type(_type)
-{}
-
-ot::WidgetViewBase::WidgetViewBase(const std::string& _name, const std::string& _title, ViewDockLocation _dockLocation, ViewFlags _flags, ViewType _type)
-	: m_name(_name), m_title(_title), m_dockLocation(_dockLocation), m_flags(_flags), m_type(_type)
+ot::WidgetViewBase::WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewDockLocation _dockLocation, ViewFlags _flags, ViewType _type)
+	: BasicEntityInformation(_entityName), m_title(_title), m_dockLocation(_dockLocation), m_flags(_flags), m_type(_type)
 {}
 
 ot::WidgetViewBase::WidgetViewBase(const WidgetViewBase& _other) {
@@ -137,14 +133,14 @@ ot::WidgetViewBase::~WidgetViewBase() {
 }
 
 ot::WidgetViewBase& ot::WidgetViewBase::operator = (const WidgetViewBase& _other) {
-	if (this == &_other) return *this;
+	BasicEntityInformation::operator=(_other);
 
-	m_name = _other.m_name;
-	m_title = _other.m_title;
-	m_flags = _other.m_flags;
-	m_dockLocation = _other.m_dockLocation;
-	m_type = _other.m_type;
-
+	if (this != &_other) {
+		m_title = _other.m_title;
+		m_flags = _other.m_flags;
+		m_dockLocation = _other.m_dockLocation;
+		m_type = _other.m_type;
+	}
 	return *this;
 }
 
@@ -153,7 +149,8 @@ ot::WidgetViewBase& ot::WidgetViewBase::operator = (const WidgetViewBase& _other
 // Base class functions
 
 void ot::WidgetViewBase::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
+	BasicEntityInformation::addToJsonObject(_object, _allocator);
+
 	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
 	_object.AddMember("Type", JsonString(this->toString(m_type), _allocator), _allocator);
 	_object.AddMember("Flags", JsonArray(this->toStringList(m_flags), _allocator), _allocator);
@@ -161,9 +158,14 @@ void ot::WidgetViewBase::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocat
 }
 
 void ot::WidgetViewBase::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	m_name = json::getString(_object, "Name");
+	BasicEntityInformation::setFromJsonObject(_object);
+
 	m_title = json::getString(_object, "Title");
 	m_type = this->stringToViewType(json::getString(_object, "Type"));
 	m_flags = this->stringListToViewFlags(json::getStringList(_object, "Flags"));
 	m_dockLocation = this->stringToDockLocation(json::getString(_object, "DockLocation"));
+}
+
+void ot::WidgetViewBase::setEntityInformation(const BasicEntityInformation& _info) {
+	BasicEntityInformation::operator=(_info);
 }

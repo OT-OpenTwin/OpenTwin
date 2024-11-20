@@ -1,44 +1,40 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/BasicEntityInformation.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 
 // std header
 #include <string>
-#include <Types.h>
 
-#include "EntityBase.h"
+class EntityBase;
 
 namespace ot {
 
-	class OT_SERVICEFOUNDATION_API_EXPORT EntityInformation
-	{
+	class OT_SERVICEFOUNDATION_API_EXPORT EntityInformation : public BasicEntityInformation {
 	public:
-		EntityInformation() : m_id(0), m_version(0) {};
-		EntityInformation(EntityBase* entity)
-		{
-			m_id = entity->getEntityID();
-			m_version = entity->getEntityStorageVersion();
-			m_name = entity->getName();
-			m_type = entity->getClassName();
-		}
-		virtual ~EntityInformation() {};
+		EntityInformation();
+		EntityInformation(EntityBase* _entity);
+		EntityInformation(const EntityInformation&) = default;
+		virtual ~EntityInformation();
 
-		void setID(UID _id) { m_id = _id; }
-		void setVersion(UID _version) { m_version = _version; }
-		void setName(std::string _name) { m_name = _name; }
-		void setType(std::string _type) { m_type = _type; }
+		EntityInformation& operator = (const EntityInformation&) = default;
 
-		UID getID(void) const { return m_id; }
-		UID getVersion(void) const { return m_version; }
-		std::string getName(void) const { return m_name; }
-		std::string getType(void) const { return m_type; }
+		//! \brief Add the object contents to the provided JSON object.
+		//! \param _object Json object reference to write the data to.
+		//! \param _allocator Allocator.
+		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
+
+		//! \brief Set the object contents from the provided JSON object.
+		//! \param _object The JSON object containing the information.
+		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
+		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
+
+		void setEntityType(std::string _type) { m_type = _type; };
+		const std::string& getEntityType(void) const { return m_type; };
 
 	private:
-		UID				m_id;
-		UID				m_version;
-		std::string		m_name;
-		std::string		m_type;
+		std::string m_type;
 	};
 
 }

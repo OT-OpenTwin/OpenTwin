@@ -506,17 +506,17 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIds;
 	for (auto info : materialInfo)
 	{
-		prefetchIds.push_back(std::pair<unsigned long long, unsigned long long>(info.getID(), info.getVersion()));
+		prefetchIds.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
 
 	for (auto info : materialInfo)
 	{
-		EntityMaterial *material = dynamic_cast<EntityMaterial *>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), application->getClassFactory()));
+		EntityMaterial *material = dynamic_cast<EntityMaterial *>(getApplication()->modelComponent()->readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), application->getClassFactory()));
 
 		if (material == nullptr)
 		{
-			error = "ERROR: Material " + info.getName() + " does not exist.\n\n";
+			error = "ERROR: Material " + info.getEntityName() + " does not exist.\n\n";
 			return error;
 		}
 
@@ -546,7 +546,7 @@ std::string CartesianMeshCreation::readMaterialInformation(const std::list<Entit
 		delete material;
 
 		materialList.push_back(materialData);
-		materialMap[info.getName()] = materialData;
+		materialMap[info.getEntityName()] = materialData;
 	}
 
 	// For faster access, we now need to store the pointer to the material in the objects temporary storage

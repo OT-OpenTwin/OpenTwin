@@ -235,8 +235,7 @@ void Application::modelSelectionChanged(void)
 
 // ##################################################################################################################################
 
-void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc)
-{
+void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc) {
 	std::mutex onlyOneActionPerTime;
 	std::lock_guard<std::mutex> lock (onlyOneActionPerTime);
 	try
@@ -467,7 +466,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 		{
 			std::list<ot::EntityInformation> entityInfos;
 			m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
-			if (entityInfos.begin()->getName().find(_tableFolder) != std::string::npos)
+			if (entityInfos.begin()->getEntityName().find(_tableFolder) != std::string::npos)
 			{
 				if (_visualizationModel == -1)
 				{
@@ -477,8 +476,8 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)entityInfos.begin()->getVersion(), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)entityInfos.begin()->getID(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)entityInfos.begin()->getEntityVersion(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)entityInfos.begin()->getEntityID(), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("ColourRanges", doc.GetAllocator()), doc.GetAllocator());
 
 				std::string tmp;
@@ -510,7 +509,7 @@ void Application::HandleSelectionChanged()
 		bool showCreateTableBtn = false;
 		for (const auto& entityInfo : selectedEntityInfo)
 		{
-			const std::string& entityName = entityInfo.getName();
+			const std::string& entityName = entityInfo.getEntityName();
 			if (entityName.find(_dataSourcesFolder) != std::string::npos)
 			{
 				showCreateTableBtn = true;
@@ -521,7 +520,7 @@ void Application::HandleSelectionChanged()
 
 		if (m_selectedEntities.size() == 1)
 		{
-			std::string entityName = selectedEntityInfo.begin()->getName();
+			std::string entityName = selectedEntityInfo.begin()->getEntityName();
 			if (entityName.find(_tableFolder) != std::string::npos)
 			{
 				if (_visualizationModel == -1)
@@ -532,8 +531,8 @@ void Application::HandleSelectionChanged()
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)selectedEntityInfo.begin()->getVersion(), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)selectedEntityInfo.begin()->getID(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)selectedEntityInfo.begin()->getEntityVersion(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)selectedEntityInfo.begin()->getEntityID(), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("ColourRanges", doc.GetAllocator()), doc.GetAllocator());
 
 				std::string tmp;
@@ -549,7 +548,7 @@ void Application::HandleSelectionChanged()
 				{
 					m_resultAccess = new ResultCollectionMetadataAccess(m_collectionName, m_modelComponent, &getClassFactory());
 				}
-				std::string selectedEntityName =	selectedEntityInfo.begin()->getName();
+				std::string selectedEntityName =	selectedEntityInfo.begin()->getEntityName();
 				DatasetOverviewVisualiser visualiser;
 				std::unique_ptr<ot::GenericDataStruct>data = nullptr;
 				const MetadataCampaign&	campaign = m_resultAccess->getMetadataCampaign();
@@ -589,11 +588,11 @@ void Application::HandleSelectionChanged()
 		ot::UIDList potentialRangesID, potentialRangesVersions;
 		for (auto entityInfo : selectedEntityInfo)
 		{
-			std::string name = entityInfo.getName();
+			std::string name = entityInfo.getEntityName();
 			if (name.find(_dataCategorizationFolder) != std::string::npos)
 			{
-				potentialRangesID.push_back(entityInfo.getID());
-				potentialRangesVersions.push_back(entityInfo.getVersion());
+				potentialRangesID.push_back(entityInfo.getEntityID());
+				potentialRangesVersions.push_back(entityInfo.getEntityVersion());
 			}
 		}
 		Application::instance()->prefetchDocumentsFromStorage(potentialRangesID);

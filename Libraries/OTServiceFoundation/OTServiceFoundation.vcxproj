@@ -198,6 +198,7 @@
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
     <ClCompile Include="src\ContextMenu.cpp" />
     <ClCompile Include="src\Encryption.cpp" />
+    <ClCompile Include="src\EntityInformation.cpp" />
     <ClCompile Include="src\ErrorWarningLogFrontendNotifier.cpp" />
     <ClCompile Include="src\Foundation.cpp" />
     <ClCompile Include="src\ModelServiceAPI.cpp" />

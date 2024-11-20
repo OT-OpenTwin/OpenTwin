@@ -115,6 +115,9 @@
     <ClCompile Include="src\StringToNumericCheck.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\BasicEntityInformation.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -283,6 +286,9 @@
       <Filter>include\VariableType</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\LocalSettingsSwitch.h" />
+    <ClInclude Include="include\OTCore\BasicEntityInformation.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

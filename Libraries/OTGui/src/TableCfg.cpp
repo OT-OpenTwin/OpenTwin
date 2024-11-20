@@ -8,14 +8,14 @@
 #include "OTGui/TableCfg.h"
 #include "OTCore/VariableToStringConverter.h"
 
-ot::TableCfg::TableCfg(int _rows, int _columns, EntityViewBaseInfo _baseInfo)
-	: EntityViewBaseInfo(_baseInfo), m_rows(_rows), m_columns(_columns)
+ot::TableCfg::TableCfg(int _rows, int _columns, WidgetViewBase _baseInfo)
+	: WidgetViewBase(_baseInfo), m_rows(_rows), m_columns(_columns)
 {
 	this->initialize();
 }
 
 ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, ot::TableHeaderOrientation _orientation)
-	:m_rows(_matrix.getNumberOfRows()), m_columns(_matrix.getNumberOfColumns())
+	: WidgetViewBase(WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable), m_rows(_matrix.getNumberOfRows()), m_columns(_matrix.getNumberOfColumns())
 {
 	MatrixEntryPointer matrixPointer;
 	ot::VariableToStringConverter converter;
@@ -23,7 +23,7 @@ ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, ot::TableHead
 	if (_orientation == ot::TableHeaderOrientation::horizontal)
 	{
 		rowStarter = 1;
-		initialize(_matrix.getNumberOfRows() - rowStarter, _matrix.getNumberOfColumns() - columnStarter);
+		this->initialize(_matrix.getNumberOfRows() - rowStarter, _matrix.getNumberOfColumns() - columnStarter);
 
 		if(rowStarter< m_rows)
 		{
@@ -72,7 +72,7 @@ ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, ot::TableHead
 }
 
 ot::TableCfg::TableCfg(const TableCfg& _other) 
-	: EntityViewBaseInfo(_other), m_rows(0), m_columns(0)
+	: WidgetViewBase(_other), m_rows(0), m_columns(0)
 {
 	*this = _other;
 }
@@ -83,7 +83,7 @@ ot::TableCfg::~TableCfg() {
 
 ot::TableCfg& ot::TableCfg::operator = (const TableCfg& _other) {
 	if (this == &_other) return *this;
-	EntityViewBaseInfo::operator=(_other);
+	WidgetViewBase::operator=(_other);
 
 	// Clear data
 	this->clear();
@@ -119,7 +119,7 @@ ot::TableCfg& ot::TableCfg::operator = (const TableCfg& _other) {
 }
 
 void ot::TableCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	EntityViewBaseInfo::addToJsonObject(_object, _allocator);
+	WidgetViewBase::addToJsonObject(_object, _allocator);
 
 	_object.AddMember("Rows", m_rows, _allocator);
 	_object.AddMember("Columns", m_columns, _allocator);
@@ -161,7 +161,7 @@ void ot::TableCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _a
 }
 
 void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	EntityViewBaseInfo::setFromJsonObject(_object);
+	WidgetViewBase::setFromJsonObject(_object);
 
 	this->clear();
 
@@ -288,4 +288,3 @@ void ot::TableCfg::initialize(uint32_t _rows, uint32_t _columns)
 	m_columns = _columns;
 	this->initialize();
 }
-

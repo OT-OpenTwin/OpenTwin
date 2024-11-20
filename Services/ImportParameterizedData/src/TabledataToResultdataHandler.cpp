@@ -529,9 +529,9 @@ void TabledataToResultdataHandler::loadRequiredTables(std::list<string>& _requir
 		{
 			for (auto entityInfo : entityInfos)
 			{
-				if (entityInfo.getName() == requiredTable)
+				if (entityInfo.getEntityName() == requiredTable)
 				{
-					tableToLoadIDs.push_back(entityInfo.getID());
+					tableToLoadIDs.push_back(entityInfo.getEntityID());
 				}
 			}
 		}

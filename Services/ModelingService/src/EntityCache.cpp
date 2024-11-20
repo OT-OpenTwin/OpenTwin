@@ -116,7 +116,7 @@ void EntityCache::prefetchEntities(std::list<ot::EntityInformation> &entityList)
 
 	for (auto entity : entityList)
 	{
-		prefetchList.push_back(std::pair<unsigned long long, unsigned long long>(entity.getID(), entity.getVersion()));
+		prefetchList.push_back(std::pair<unsigned long long, unsigned long long>(entity.getEntityID(), entity.getEntityVersion()));
 	}
 
 	prefetchEntities(prefetchList);

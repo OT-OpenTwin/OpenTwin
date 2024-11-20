@@ -20,7 +20,7 @@ void MeasurementCampaignHandler::ConnectToCollection(const std::string& collecti
 
 		for (auto& entityInfo : allMeasurementMetadata)
 		{
-			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), *classFactory);
+			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), *classFactory);
 			auto metadata = dynamic_cast<EntityMetadataSeries*>(baseEnt);
 			assert(metadata != nullptr);
 			measurementMetadata.push_back(std::shared_ptr<EntityMetadataSeries>(metadata));
@@ -62,8 +62,8 @@ std::list<ot::EntityInformation> MeasurementCampaignHandler::getMSMDEntityInform
 	for (ot::UID id : entityIDs)
 	{
 		ot::EntityInformation entityInfo;
-		entityInfo.setID(id);
-		entityInfo.setVersion(*version);
+		entityInfo.setEntityID(id);
+		entityInfo.setEntityVersion(*version);
 		version++;
 	}
 

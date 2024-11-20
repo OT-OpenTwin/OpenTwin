@@ -102,7 +102,7 @@ void ToolViewManager::slotViewFocused(ot::WidgetView* _view) {
 	OTAssertNullptr(it->second);
 	OTAssertNullptr(it->second->getTool());
 	
-	Q_EMIT viewFocused(QString::fromStdString(_view->getViewData().getName()), it->second->getTool()->getToolName());
+	Q_EMIT viewFocused(QString::fromStdString(_view->getViewData().getEntityName()), it->second->getTool()->getToolName());
 }
 
 void ToolViewManager::slotViewFocusLost(ot::WidgetView* _view) {
@@ -119,7 +119,7 @@ void ToolViewManager::slotViewFocusLost(ot::WidgetView* _view) {
 	OTAssertNullptr(it->second);
 	OTAssertNullptr(it->second->getTool());
 
-	Q_EMIT viewFocusLost(QString::fromStdString(_view->getViewData().getName()), it->second->getTool()->getToolName());
+	Q_EMIT viewFocusLost(QString::fromStdString(_view->getViewData().getEntityName()), it->second->getTool()->getToolName());
 }
 
 void ToolViewManager::slotViewCloseRequested(ot::WidgetView* _view) {
@@ -136,7 +136,7 @@ void ToolViewManager::slotViewCloseRequested(ot::WidgetView* _view) {
 	OTAssertNullptr(it->second);
 	OTAssertNullptr(it->second->getTool());
 
-	Q_EMIT viewCloseRequested(QString::fromStdString(_view->getViewData().getName()), it->second->getTool()->getToolName());
+	Q_EMIT viewCloseRequested(QString::fromStdString(_view->getViewData().getEntityName()), it->second->getTool()->getToolName());
 }
 
 bool ToolViewManager::isViewIgnored(ot::WidgetView* _view) const {

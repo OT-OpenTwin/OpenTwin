@@ -7,8 +7,8 @@
 
 // OpenTwin header
 #include "OTCore/Flags.h"
-#include "OTCore/Serializable.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTCore/BasicEntityInformation.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 // std header
@@ -19,10 +19,10 @@
 
 namespace ot {
 
-	//! @class WidgetViewBase
-	//! @brief General widget view information class.
+	//! \class WidgetViewBase
+	//! \brief General widget view information class.
 	//! The WidgetViewBase holds the general information of a WidgetView.
-	class OT_GUI_API_EXPORT WidgetViewBase : public ot::Serializable {
+	class OT_GUI_API_EXPORT WidgetViewBase : public BasicEntityInformation {
 	public:
 		//! @brief ViewFlags are used to describe the view behaviour in the frontend.
 		enum ViewFlag {
@@ -87,10 +87,9 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-		WidgetViewBase();
-		WidgetViewBase(const std::string& _nameAndTitle, ViewFlags _flags = ViewFlags(), ViewType _type = CustomView);
-		WidgetViewBase(const std::string& _name, const std::string& _title, ViewFlags _flags = ViewFlags(), ViewType _type = CustomView);
-		WidgetViewBase(const std::string& _name, const std::string& _title, ViewDockLocation _dockLocation, ViewFlags _flags = ViewFlags(), ViewType _type = CustomView);
+		WidgetViewBase(ViewFlags _flags = ViewFlags(), ViewType _type = CustomView);
+		WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewFlags _flags = ViewFlags(), ViewType _type = CustomView);
+		WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewDockLocation _dockLocation, ViewFlags _flags = ViewFlags(), ViewType _type = CustomView);
 		WidgetViewBase(const WidgetViewBase& _other);
 		virtual ~WidgetViewBase();
 
@@ -114,31 +113,22 @@ namespace ot {
 
 		// Setter/Getter
 
-		//! @brief Set the widget view name.
-		//! @param _name Name to set.
-		void setName(const std::string& _name) { m_name = _name; };
-
-		//! @brief Widget view name.
-		const std::string& getName(void) const { return m_name; };
-
-		//! @brief Set the widget view title.
-		//! @note /ref title() "Note title()"
 		void setTitle(const std::string& _title) { m_title = _title; };
-
-		//! @brief Returns the WidgetView title.
-		//! @note Note that in case of an empty title the name will be returned instead.
-		const std::string& getTitle(void) const { return (m_title.empty() ? m_name : m_title); };
+		const std::string& getTitle(void) const { return m_title; };
 
 		//! @brief Set the widget view flag.
 		//! @param _flag Flag to set.
 		//! @param _active If false the flag will be unset instead.
-		void setFlag(ViewFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setViewFlag(ViewFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
 
 		//! @brief Replace the current flags with the flags provided.
-		void setFlags(ViewFlags _flags) { m_flags = _flags; };
+		void setViewFlags(ViewFlags _flags) { m_flags = _flags; };
 
 		//! @brief Returns the current flags.
-		ViewFlags getFlags(void) const { return m_flags; };
+		ViewFlags getViewFlags(void) const { return m_flags; };
+
+		void setViewType(ViewType _type) { m_type = _type; };
+		ViewType getViewType(void) const { return m_type; };
 
 		//! @brief Set the dock location.
 		//! @param _dockLocation The dock location to set.
@@ -147,17 +137,14 @@ namespace ot {
 		//! @brief Returns the dock location.
 		ViewDockLocation getDockLocation(void) const { return m_dockLocation; };
 
-		void setViewType(ViewType _type) { m_type = _type; };
-
-		ViewType getViewType(void) const { return m_type; };
+		void setEntityInformation(const BasicEntityInformation& _info);
 
 	private:
-		std::string m_name; //! @brief WidgetView name.
-		std::string m_title; //! @brief WidgetView title (if empty the name will be used).
+		std::string m_title; //! \brief WidgetView title (if empty the name will be used).
 
-		ViewFlags m_flags; //! @brief WidgetView flags.
-		ViewDockLocation m_dockLocation; //! @brief WidgetView dock location.
-		ViewType m_type;
+		ViewFlags m_flags; //! \brief WidgetView flags.
+		ViewType m_type; //! \brief View Type
+		ViewDockLocation m_dockLocation; //! \brief WidgetView dock location.
 	};
 
 }

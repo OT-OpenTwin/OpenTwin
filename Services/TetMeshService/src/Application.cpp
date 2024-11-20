@@ -265,9 +265,9 @@ void Application::createMesh(void)
 		m_modelComponent->getEntityInformation(entityList, entityInfo);
 
 		assert(entityInfo.size() == 1);
-		assert(entityInfo.front().getName() == materialsFolder);
+		assert(entityInfo.front().getEntityName() == materialsFolder);
 
-		materialsFolderID = entityInfo.front().getID();
+		materialsFolderID = entityInfo.front().getEntityID();
 	}
 
 	meshEntity->createProperties(materialsFolder, materialsFolderID);
@@ -311,18 +311,18 @@ void Application::updateMesh(void)
 	std::map<std::string, bool> mesherRunMap;
 	for (auto entity : selectedEntityInfo)
 	{
-		if (entity.getType() == "EntityMeshTet")  
+		if (entity.getEntityType() == "EntityMeshTet")
 		{
-			if (entity.getName().substr(0, 7) == "Meshes/")
+			if (entity.getEntityName().substr(0, 7) == "Meshes/")
 			{
-				size_t index = entity.getName().find('/', 7);
+				size_t index = entity.getEntityName().find('/', 7);
 				if (index != std::string::npos)
 				{
-					mesherRunMap[entity.getName().substr(0, index - 1)] = true;
+					mesherRunMap[entity.getEntityName().substr(0, index - 1)] = true;
 				}
 				else
 				{
-					mesherRunMap[entity.getName()] = true;
+					mesherRunMap[entity.getEntityName()] = true;
 				}
 			}
 		}
@@ -350,7 +350,7 @@ void Application::updateMesh(void)
 
 	for (auto info : mesherInfo)
 	{
-		prefetchIdsMesher.push_back(std::pair<unsigned long long, unsigned long long>(info.getID(), info.getVersion()));
+		prefetchIdsMesher.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsMesher);
@@ -359,12 +359,12 @@ void Application::updateMesh(void)
 	std::map<std::string, EntityMeshTet *> mesherMap;
 	for (auto info : mesherInfo)
 	{
-		EntityMeshTet *entity = dynamic_cast<EntityMeshTet*> (m_modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), getClassFactory()));
+		EntityMeshTet *entity = dynamic_cast<EntityMeshTet*> (m_modelComponent->readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory()));
 		assert(entity != nullptr);
 
 		if (entity != nullptr)
 		{
-			mesherMap[info.getName()] = entity;
+			mesherMap[info.getEntityName()] = entity;
 		}
 	}
 
@@ -377,7 +377,7 @@ void Application::mesherThread(std::list<ot::EntityInformation> mesherInfo, std:
 {
 	for (auto mesher : mesherInfo)
 	{
-		runSingleMesher(mesher, mesherMap[mesher.getName()]);
+		runSingleMesher(mesher, mesherMap[mesher.getEntityName()]);
 	}
 }
 
@@ -498,20 +498,20 @@ std::string Application::getCurrentlySelectedMeshName(void)
 	std::map<std::string, bool> mesherRunMap;
 	for (auto entity : selectedEntityInfo)
 	{
-		if (entity.getType() == "EntityMeshTet")
+		if (entity.getEntityType() == "EntityMeshTet")
 		{
-			if (entity.getName().substr(0, 7) == "Meshes/")
+			if (entity.getEntityName().substr(0, 7) == "Meshes/")
 			{
 				std::string thisMeshName;
 
-				size_t index = entity.getName().find('/', 7);
+				size_t index = entity.getEntityName().find('/', 7);
 				if (index != std::string::npos)
 				{
-					thisMeshName = entity.getName().substr(0, index - 1);
+					thisMeshName = entity.getEntityName().substr(0, index - 1);
 				}
 				else
 				{
-					thisMeshName = entity.getName();
+					thisMeshName = entity.getEntityName();
 				}
 
 				if (selectedMeshItem.empty())
@@ -548,7 +548,7 @@ ot::UID Application::getCurrentlySelectedMeshDataID(void)
 	m_modelComponent->getEntityInformation(entityList, entityInfo);
 	if (entityInfo.empty()) return 0;
 
-	return entityInfo.front().getID();
+	return entityInfo.front().getEntityID();
 }
 
 void Application::importMeshFile(const std::string& originalName, const std::string& content, ot::UID uncompressedDataLength)

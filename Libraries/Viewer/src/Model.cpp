@@ -1109,17 +1109,17 @@ void Model::setSelectedTreeItems(std::list<ot::UID> &selectedTreeItemID, std::li
 
 void Model::ensure1DView(void)
 {
-	if (getNotifier()->getCurrentVisualizationTab() != "Versions")
+	if (getNotifier()->getCurrentVisualizationTabTitle() != "Versions")
 	{
-		getNotifier()->setCurrentVisualizationTab("1D");
+		getNotifier()->setCurrentVisualizationTabFromTitle("1D");
 	}
 }
 
 void Model::ensure3DView(void)
 {
-	if (getNotifier()->getCurrentVisualizationTab() != "Versions")
+	if (getNotifier()->getCurrentVisualizationTabTitle() != "Versions")
 	{
-		getNotifier()->setCurrentVisualizationTab("3D");
+		getNotifier()->setCurrentVisualizationTabFromTitle("3D");
 	}
 }
 

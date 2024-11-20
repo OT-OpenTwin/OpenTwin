@@ -101,7 +101,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 				std::list<ot::EntityInformation> entityInfos;
 				m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
 
-				auto entBase = m_modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), getClassFactory());
+				auto entBase = m_modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), getClassFactory());
 				auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
 				if (dbAccess != nullptr)
 				{
@@ -124,7 +124,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 				ot::EntityInformation entityInfo;
 				m_modelComponent->getEntityInformation("Scripts", entityInfo);
 				ExternalDependencies dependencies;
-				dependencies.setPythonScriptFolderID(entityInfo.getID());
+				dependencies.setPythonScriptFolderID(entityInfo.getEntityID());
 			}
 
 			_blockEntityHandler.CreateBlockEntity(editorName, itemName, position);

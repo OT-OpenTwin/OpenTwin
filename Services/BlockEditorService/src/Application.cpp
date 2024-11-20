@@ -40,7 +40,7 @@ std::string Application::test(void) {
 	int rows = 50000;
 
 	ot::TableCfg cfg(rows, 3);
-	cfg.setName("Tester");
+	cfg.setEntityName("Tester");
 
 	cfg.setColumnHeader(0, "Name");
 	cfg.setColumnHeader(1, "Age");
@@ -200,7 +200,7 @@ std::string Application::handleTableSaved(ot::JsonDocument& _document) {
 
 	ot::JsonDocument responseDoc;
 	responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SetSaved, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-	responseDoc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(cfg.getName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(cfg.getEntityName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	this->getBasicServiceInformation().addToJsonObject(responseDoc, responseDoc.GetAllocator());
 
 	std::string tmp;

@@ -56,7 +56,7 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 	std::list<ot::UID> requiredBreps;
 	for (auto shape : selectedGeometryEntities)
 	{
-		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(application->modelComponent()->readEntityFromEntityIDandVersion(shape.getID(), shape.getVersion(), application->getClassFactory()));
+		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(application->modelComponent()->readEntityFromEntityIDandVersion(shape.getEntityID(), shape.getEntityVersion(), application->getClassFactory()));
 
 		if (geometryEntity->getEditable())
 		{
@@ -115,7 +115,7 @@ void ShapeHealing::healSelectedShapes(double tolerance, bool fixSmallEdges, bool
 	for (auto geometryEntity : geometryEntities)
 	{
 		// Perform the actual shape healing
-		EntityBrep *brepEntity = dynamic_cast<EntityBrep*>(application->getEntityCache()->getEntity(brepInfo->getID(), brepInfo->getVersion()));
+		EntityBrep *brepEntity = dynamic_cast<EntityBrep*>(application->getEntityCache()->getEntity(brepInfo->getEntityID(), brepInfo->getEntityVersion()));
 		if (brepEntity == nullptr)
 		{
 			brepInfo++;

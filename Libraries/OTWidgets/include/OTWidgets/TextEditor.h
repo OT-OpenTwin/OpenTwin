@@ -54,19 +54,13 @@ namespace ot {
 		//! \brief Setup the TextEditor.
 		//! \param _config The config.
 		//! \param _isUpdate If true the text, name and title won't be set.
-		void setupFromConfig(const TextEditorCfg& _config, bool _isUpdate);
+		virtual void setupFromConfig(const TextEditorCfg& _config, bool _isUpdate);
 
 		int lineNumberAreaWidth(void) const;
 		void lineNumberAreaPaintEvent(QPaintEvent * _event);
 
 		void setContentChanged(bool _changed = true);
 		bool getContentChanged(void) const { return m_contentChanged; };
-
-		void setTextEditorName(const std::string& _name) { m_textEditorName = _name; };
-		const std::string& getTextEditorName(void) const { return m_textEditorName; };
-
-		void setTextEditorTitle(const QString& _title) { m_textEditorTitle = _title; };
-		const QString& getTextEditorTitle(void) const { return m_textEditorTitle; };
 
 		void setCode(const QString& _text);
 		void setCode(const QStringList& _lines);
@@ -133,8 +127,6 @@ namespace ot {
 		int m_lastSavedUndoStackCount;
 		bool m_contentChanged;
 
-		std::string m_textEditorName;
-		QString m_textEditorTitle;
 		int m_tabSpaces;
 		bool m_newLineSamePrefix;
 		bool m_enableDuplicateLineShortcut;

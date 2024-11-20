@@ -22,6 +22,17 @@ QWidget* ot::TableView::getViewWidget(void) {
 	return this;
 }
 
+void ot::TableView::setupFromConfig(const TableCfg& _config) {
+	Table::setupFromConfig(_config);
+	this->setViewData(_config);
+}
+
+ot::TableCfg ot::TableView::createConfig(void) const {
+	ot::TableCfg config = Table::createConfig();
+	config.setEntityInformation(this->getViewData());
+	return config;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Base class functions
