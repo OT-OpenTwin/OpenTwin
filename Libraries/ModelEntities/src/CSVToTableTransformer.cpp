@@ -31,7 +31,6 @@ void CSVToTableTransformer::buildSegment(const std::string& _subString, const st
 	std::string::difference_type numberOfMasks = std::count(m_composed.begin(), m_composed.end(), m_maskingChar);
 	if (numberOfMasks % 2 == 0)
 	{
-		m_composed.erase(remove(m_composed.begin(), m_composed.end(), m_maskingChar), m_composed.end());
 		if (_lastSegment)
 		{
 			m_segments.push_back(m_composed);
@@ -93,7 +92,9 @@ ot::GenericDataStructMatrix CSVToTableTransformer::transformRawMatrixToGenericDa
 	{
 		for (entryPointer.m_column = 0; entryPointer.m_column < rowPointer->size(); entryPointer.m_column++)
 		{
-			ot::Variable cellValue((*rowPointer)[entryPointer.m_column]);
+			std::string rawValue = (*rowPointer)[entryPointer.m_column];
+			rawValue.erase(remove(rawValue.begin(), rawValue.end(), m_maskingChar), rawValue.end());
+			ot::Variable cellValue(rawValue);
 			matrix.setValue(entryPointer, cellValue);
 		}
 	}
