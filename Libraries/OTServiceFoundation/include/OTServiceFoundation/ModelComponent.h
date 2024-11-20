@@ -69,7 +69,7 @@ namespace ot {
 			void clearNewEntityList(void);
 			void addNewTopologyEntity(UID entityID, UID entityVersion, bool forceVisible);
 			void addNewDataEntity(UID entityID, UID entityVersion, UID entityParentID);
-			void storeNewEntities(const std::string &description, bool askForBranchCreation = true);
+			void storeNewEntities(const std::string &description, bool askForBranchCreation = true, bool storeModel = true);
 
 			void loadMaterialInformation();
 			std::string getCurrentMaterialName(EntityPropertiesEntityList* material);

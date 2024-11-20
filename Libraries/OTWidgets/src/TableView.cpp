@@ -5,9 +5,6 @@
 
 // OpenTwin header
 #include "OTWidgets/TableView.h"
-#include "OTWidgets/WidgetViewRegistrar.h"
-
-static ot::WidgetViewRegistrar<ot::TableView> TableViewRegistrar(OT_WIDGETTYPE_Table);
 
 ot::TableView::TableView() {
 	this->addWidgetToDock(this);
@@ -23,13 +20,6 @@ ot::TableView::~TableView() {
 
 QWidget* ot::TableView::getViewWidget(void) {
 	return this;
-}
-
-bool ot::TableView::setupViewFromConfig(WidgetViewCfg* _config) {
-	if (!WidgetView::setupViewFromConfig(_config)) return false;
-
-
-	return true;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

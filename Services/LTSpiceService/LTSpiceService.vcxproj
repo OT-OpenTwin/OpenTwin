@@ -209,6 +209,7 @@
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\InfoFileManager.h" />
+    <ClInclude Include="include\ParametricCombination.h" />
     <ClInclude Include="include\ParametricResult1DManager.h" />
     <ClInclude Include="include\Result1DData.h" />
     <ClInclude Include="include\Result1DManager.h" />

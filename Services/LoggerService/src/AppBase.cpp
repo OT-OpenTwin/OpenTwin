@@ -14,7 +14,8 @@
 #include <iostream>
 #endif // _DEBUG
 
-#define OT_LOG_BUFFER_LIMIT 10000
+#define OT_LOG_BUFFER_LIMIT_LOW 1000
+#define OT_LOG_BUFFER_LIMIT_MAX 10000
 
 namespace intern {
 
@@ -46,9 +47,9 @@ namespace intern {
 			if (lastIx == std::string::npos) break;
 
 			_string.replace(checkIx + 1, (lastIx - checkIx) - 1, "****");
-			
-			lastIx = _string.find('\"', checkIx + 1) + 1; // Last index is now invalid after replacing
-			passwordIx = _string.find(OT_ACTION_PASSWORD_SUBTEXT, lastIx);
+
+lastIx = _string.find('\"', checkIx + 1) + 1; // Last index is now invalid after replacing
+passwordIx = _string.find(OT_ACTION_PASSWORD_SUBTEXT, lastIx);
 		}
 	}
 }
@@ -56,6 +57,10 @@ namespace intern {
 AppBase& AppBase::instance(void) {
 	static AppBase g_instance;
 	return g_instance;
+}
+
+void AppBase::log(const ot::LogMessage& _message) {
+	this->appendLogMessage(_message);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -76,16 +81,7 @@ std::string AppBase::handleLog(ot::JsonDocument& _jsonDocument) {
 
 	msg.setCurrentTimeAsGlobalSystemTime();
 
-	m_messages.push_back(msg);
-
-	if (m_count >= OT_LOG_BUFFER_LIMIT) {
-		m_messages.pop_front();
-	}
-	else {
-		m_count++;
-	}
-
-	notifyListeners(msg);
+	this->appendLogMessage(msg);
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
@@ -145,9 +141,48 @@ std::string AppBase::handleGetDebugInfo(ot::JsonDocument& _jsonDocument) {
 	return doc.toJson();
 }
 
+std::string AppBase::handleSetGlobalLogFlags(ot::JsonDocument& _jsonDocument) {
+	ot::ConstJsonArray flags = ot::json::getArray(_jsonDocument, OT_ACTION_PARAM_Flags);
+	this->updateBufferSizeFromLogFlags(ot::logFlagsFromJsonArray(flags));
+
+	return OT_ACTION_RETURN_VALUE_OK;
+}
+
+std::string AppBase::handleSetCacheSize(ot::JsonDocument& _jsonDocument) {
+	size_t size = ot::json::getUInt64(_jsonDocument, OT_ACTION_PARAM_Size);
+	m_bufferSize = size;
+	this->resizeBuffer();
+
+	return OT_ACTION_RETURN_VALUE_OK;
+}
+
+void AppBase::updateBufferSizeFromLogFlags(const ot::LogFlags& _flags) {
+	if ((_flags | ot::WARNING_LOG | ot::ERROR_LOG) == (ot::WARNING_LOG | ot::ERROR_LOG)) {
+		m_bufferSize = OT_LOG_BUFFER_LIMIT_LOW;
+	}
+	else {
+		m_bufferSize = OT_LOG_BUFFER_LIMIT_MAX;
+	}
+	OT_LOG_D("Log buffer size set to " + std::to_string(m_bufferSize));
+
+	this->resizeBuffer();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Helper
+
+void AppBase::appendLogMessage(const ot::LogMessage& _message) {
+	if (m_count >= m_bufferSize) {
+		m_messages.pop_front();
+	}
+	else {
+		m_count++;
+	}
+
+	m_messages.push_back(_message);
+	this->notifyListeners(_message);
+}
 
 void AppBase::notifyListeners(const ot::LogMessage& _message) {
 	ot::JsonDocument doc;
@@ -204,8 +239,20 @@ void AppBase::removeReceiver(const std::string& _receiver) {
 	m_receiverMutex.unlock();
 }
 
+void AppBase::resizeBuffer(void) {
+	if (m_count > m_bufferSize) {
+		auto it = m_messages.begin();
+		std::advance(it, m_count - m_bufferSize);
+		m_messages.erase(m_messages.begin(), it);
+		m_count = m_bufferSize;
+	}
+}
+
 AppBase::AppBase() 
-	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_LOGGER, OT_INFO_SERVICE_TYPE_LOGGER), m_count(0)
-{}
+	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_LOGGER, OT_INFO_SERVICE_TYPE_LOGGER), m_count(0), m_bufferSize(1000)
+{
+	// Set this so the log dispatcher will not destroy the AppBase
+	this->setDeleteLogNotifierLater(true);
+}
 
 AppBase::~AppBase() {}

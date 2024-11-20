@@ -14,11 +14,14 @@
 #include "EntityGeometry.h"
 
 #include "InfoFileManager.h"
+#include "ParametricCombination.h"
 
 // C++ header
 #include <string>
 #include <list>
 #include <map>
+#include <sstream>
+#include <complex>
 
 // Forward declaration
 class EntityBase;
@@ -30,6 +33,18 @@ namespace ot {
 }
 
 class EntityUnits;
+
+struct LTSpiceVariable {
+	int index;
+	std::string name;
+	std::string unit;
+};
+
+struct LTSpiceData {
+	std::vector<LTSpiceVariable> variables;
+	std::vector<std::vector<std::complex<double>>> data;
+	bool isComplex = false;
+};
 
 class Application : public ot::ApplicationBase {
 public:
@@ -139,6 +154,11 @@ public:
 	void addHostNameAndFileName(const std::string& hostName, const std::string& fileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames);
 	std::string getSimpleFileName();
 	long long getCurrentModelEntityVersion(void);
+	void extractResults();
+	void getParametricCombinations(const std::string& logFileName, std::list<ParametricCombination>& parameterRuns);
+	LTSpiceData getCurveData(const std::string& rawFileName);
+	LTSpiceData readLTSpiceRaw(std::stringstream &data);
+	bool getLine(std::stringstream& data, std::string &line);
 
 private:
 	void uploadNeeded(ot::JsonDocument& _doc);

@@ -43,6 +43,11 @@ std::string EntityFileCSV::getHeaderOrientation(ot::TableHeaderOrientation _orie
 	return orientationString->second; 
 }
 
+bool EntityFileCSV::visualiseText()
+{
+	return true;
+}
+
 void EntityFileCSV::setSpecializedProperties()
 {
 	EntityFileText::setSpecializedProperties();

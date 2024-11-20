@@ -171,7 +171,7 @@ public:
 	void registerAtNotifier(void);
 
 	void setDataBaseConnectionInformation(const std::string &databaseURL, const std::string &userName, const std::string &encryptedPassword);
-	void sendSelectionChangedNotification();
+	void handleSelectionChanged(bool _selectionFromTree);
 
 	void setTabTitles(ViewerUIDtype visualizationModelID, const std::string & _tabName3D, const std::string & _tabName1D, const std::string & _tabNameVersions);
 

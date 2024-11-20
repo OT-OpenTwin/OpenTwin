@@ -5,9 +5,6 @@
 
 // OpenTwin header
 #include "OTWidgets/GraphicsPickerView.h"
-#include "OTWidgets/WidgetViewRegistrar.h"
-
-static ot::WidgetViewRegistrar<ot::GraphicsPickerView> GraphicsPickerViewRegistrar(OT_WIDGETTYPE_GraphicsPicker);
 
 ot::GraphicsPickerView::GraphicsPickerView() {
 	this->addWidgetToDock(this->pickerWidget());
@@ -23,11 +20,4 @@ ot::GraphicsPickerView::~GraphicsPickerView() {
 
 QWidget* ot::GraphicsPickerView::getViewWidget(void) {
 	return this->pickerWidget();
-}
-
-bool ot::GraphicsPickerView::setupViewFromConfig(WidgetViewCfg* _config) {
-	if (!WidgetView::setupViewFromConfig(_config)) return false;
-	
-
-	return true;
 }

@@ -55,15 +55,18 @@ namespace ot {
 		void updateCurrentGraph(void);
 
 	private:
-		void updateCurrentGraphTextMode(const QString& _text);
+		void updateCurrentGraphViewAllMode(void);
 		void updateCurrentGraphCompactMode(void);
 		void updateCurrentGraphCompactLabelMode(void);
 		void updateCurrentGraphLabeledOnlyMode(void);
 
-		void processTextFilter(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, const QString& _filterText);
-		void startProcessCompact(bool _includeLabeledVersions);
-		void processCompactItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, bool _includeLabeledVersions);
-		void processLabeledOnlyItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent);
+		//! \brief Returns true if the filter matches the version or the filter is empty
+		bool checkFilterValid(const VersionGraphVersionCfg* _versionConfig, const QString& _filterText) const;
+
+		void processViewAllWithTextFilter(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, const QString& _filterText);
+		void startProcessCompact(bool _includeLabeledVersions, const QString& _filterText);
+		void processCompactItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, bool _includeLabeledVersions, const QString& _filterText);
+		void processLabeledOnlyItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, const QString& _filterText);
 
 		QWidget* m_root;
 		VersionGraph* m_graph;

@@ -130,6 +130,7 @@ namespace ot {
 
 		TextEditorSearchPopup* m_searchPopup;
 		
+		int m_lastSavedUndoStackCount;
 		bool m_contentChanged;
 
 		std::string m_textEditorName;

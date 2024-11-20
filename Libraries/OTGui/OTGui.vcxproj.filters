@@ -180,21 +180,6 @@
     <ClInclude Include="include\OTGui\DialogCfg.h">
       <Filter>Header Files\Dialogs</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\WidgetViewCfg.h">
-      <Filter>Header Files\WidgetView</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\PlainTextEditViewCfg.h">
-      <Filter>Header Files\WidgetView</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\WidgetViewCfgFactory.h">
-      <Filter>Header Files\WidgetView</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\WidgetViewCfgRegistrar.h">
-      <Filter>Header Files\WidgetView</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTGui\WidgetViewCfgRegistrar.hpp">
-      <Filter>Header Files\WidgetView</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTGui\PropertyPainter2D.h">
       <Filter>Header Files\Properties</Filter>
     </ClInclude>
@@ -350,7 +335,7 @@
     </ClInclude>
     <ClInclude Include="include\OTGui\EntityViewBaseInfo.h">
       <Filter>Header Files\General</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="include\OTGui\VisualisationTypes.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
@@ -475,15 +460,6 @@
     </ClCompile>
     <ClCompile Include="src\DialogCfg.cpp">
       <Filter>Source Files\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WidgetViewCfg.cpp">
-      <Filter>Source Files\WidgetView</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PlainTextEditViewCfg.cpp">
-      <Filter>Source Files\WidgetView</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WidgetViewCfgFactory.cpp">
-      <Filter>Source Files\WidgetView</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyPainter2D.cpp">
       <Filter>Source Files\Properties</Filter>
@@ -633,8 +609,8 @@
       <Filter>Source Files\General</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityViewBaseInfo.cpp">
-		<Filter>Source Files\General</Filter>
-	</ClCompile>
+      <Filter>Source Files\General</Filter>
+    </ClCompile>
     <ClCompile Include="src\VisualisationTypes.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>

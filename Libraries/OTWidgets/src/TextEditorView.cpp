@@ -5,9 +5,6 @@
 
 // OpenTwin header
 #include "OTWidgets/TextEditorView.h"
-#include "OTWidgets/WidgetViewRegistrar.h"
-
-static ot::WidgetViewRegistrar<ot::TextEditorView> TextEditorViewRegistrar(OT_WIDGETTYPE_TextEditor);
 
 ot::TextEditorView::TextEditorView() {
 	this->addWidgetToDock(this);
@@ -23,13 +20,6 @@ ot::TextEditorView::~TextEditorView() {
 
 QWidget* ot::TextEditorView::getViewWidget(void) {
 	return this;
-}
-
-bool ot::TextEditorView::setupViewFromConfig(WidgetViewCfg* _config) {
-	if (!WidgetView::setupViewFromConfig(_config)) return false;
-
-
-	return true;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

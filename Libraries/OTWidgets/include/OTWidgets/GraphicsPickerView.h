@@ -9,8 +9,6 @@
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/GraphicsPicker.h"
 
-#define OT_WIDGETTYPE_GraphicsPicker "GraphicsPicker"
-
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT GraphicsPickerView : public GraphicsPicker, public WidgetView {
@@ -23,8 +21,6 @@ namespace ot {
 		// Base class functions
 
 		virtual QWidget* getViewWidget(void) override;
-
-		virtual bool setupViewFromConfig(WidgetViewCfg* _config) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -10,8 +10,6 @@
 #include "OTWidgets/Plot.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
-#define OT_WIDGETTYPE_Plot "Plot_New"
-
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT PlotView : public Plot, public WidgetView {
@@ -24,8 +22,6 @@ namespace ot {
 		// Base class functions
 
 		virtual QWidget* getViewWidget(void) override;
-
-		virtual bool setupViewFromConfig(WidgetViewCfg* _config) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -24,27 +24,27 @@
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QtLastBackgroundBuild>2024-11-15T14:12:48.4328123Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-11-19T12:54:46.0853496Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2024-11-15T14:12:48.1949495Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-11-19T12:54:46.0235615Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QtLastBackgroundBuild>2024-11-15T14:12:48.4969580Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-11-19T12:54:46.1470834Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleasePerfTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2024-11-15T14:12:48.5609626Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-11-19T12:54:46.2492053Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
-    <QtLastBackgroundBuild>2024-11-15T14:12:48.0786651Z</QtLastBackgroundBuild>
+    <QtLastBackgroundBuild>2024-11-19T12:54:45.8409541Z</QtLastBackgroundBuild>
     <QtTouchProperty>
     </QtTouchProperty>
   </PropertyGroup>

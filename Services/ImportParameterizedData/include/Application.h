@@ -121,8 +121,6 @@ public:
 private:
 	Application();
 	virtual ~Application();
-	
-	ot::MenuButtonDescription _buttonImportPythonScript;
 	ot::MenuButtonDescription _buttonImportTouchstone;
 	
 	ot::MenuButtonDescription _buttonTableDeleteRow;

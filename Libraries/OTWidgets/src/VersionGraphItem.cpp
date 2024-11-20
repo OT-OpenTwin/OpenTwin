@@ -24,6 +24,8 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 	OTAssertNullptr(_scene);
 	this->setGraphicsScene(_scene);
 
+	_scene->addItem(this);
+
 	this->setGraphicsItemName(m_config.getName());
 	this->setGraphicsItemToolTip(m_config.getDescription());
 	this->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState | GraphicsItemCfg::ItemIsSelectable);
@@ -114,7 +116,6 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 		m_labelItem->setText(m_config.getLabel());
 	}
 
-	_scene->addItem(this);
 	this->finalizeGraphicsItem();
 
 	m_currentSize = this->boundingRect().size();
@@ -201,15 +202,17 @@ ot::VersionGraphItem* ot::VersionGraphItem::findVersionByName(const std::string&
 	return result;
 }
 
-void ot::VersionGraphItem::updateVersionPosition(void) {
+void ot::VersionGraphItem::updateVersionPositionAndSize(void) {
 	this->prepareGeometryChange();
+
+	m_currentSize = this->boundingRect().size();
 
 	// Calculate positioning
 	Point2DD newPos(0., (OT_VERSIONGRAPHITEM_Height + OT_VERSIONGRAPHITEM_VSpacing) * (double)m_row);
 
 	if (m_parentVersion) {
 		newPos.setX(
-			m_parentVersion->getQGraphicsItem()->pos().x() + 
+			m_parentVersion->getQGraphicsItem()->pos().x() +
 			m_parentVersion->getCurrentSize().width() + OT_VERSIONGRAPHITEM_HSpacing
 		);
 	}
@@ -217,7 +220,7 @@ void ot::VersionGraphItem::updateVersionPosition(void) {
 
 	// Update childs
 	for (VersionGraphItem* child : m_childVersions) {
-		child->updateVersionPosition();
+		child->updateVersionPositionAndSize();
 	}
 }
 

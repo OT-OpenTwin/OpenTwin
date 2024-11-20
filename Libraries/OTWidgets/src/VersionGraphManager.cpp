@@ -136,16 +136,10 @@ void ot::VersionGraphManager::removeVersions(const std::list<std::string>& _vers
 	this->updateCurrentGraph();
 }
 
-void ot::VersionGraphManager::updateCurrentGraph(void) {
-	QString txt = m_textFilter->text();
-	if (!txt.isEmpty()) {
-		this->updateCurrentGraphTextMode(txt);
-		return;
-	}
-
+void ot::VersionGraphManager::updateCurrentGraph(void) {	
 	switch (this->getCurrentViewMode()) {
 	case ot::VersionGraphManager::ViewAll:
-		m_graph->setupFromConfig(m_config);
+		this->updateCurrentGraphViewAllMode();
 		break;
 
 	case ot::VersionGraphManager::Compact:
@@ -167,7 +161,7 @@ void ot::VersionGraphManager::updateCurrentGraph(void) {
 	}
 }
 
-void ot::VersionGraphManager::updateCurrentGraphTextMode(const QString& _text) {
+void ot::VersionGraphManager::updateCurrentGraphViewAllMode(void) {
 	VersionGraphCfg newConfig;
 	newConfig.setActiveVersionName(m_config.getActiveVersionName());
 
@@ -188,7 +182,7 @@ void ot::VersionGraphManager::updateCurrentGraphTextMode(const QString& _text) {
 
 	// Process item childs
 	for (const VersionGraphVersionCfg* childCfg : m_config.getRootVersion()->getChildVersions()) {
-		this->processTextFilter(newItem, childCfg, newConfig.getActiveVersionName(), true, _text);
+		this->processViewAllWithTextFilter(newItem, childCfg, newConfig.getActiveVersionName(), true, m_textFilter->text());
 	}
 
 	newConfig.setRootVersion(newItem);
@@ -196,11 +190,11 @@ void ot::VersionGraphManager::updateCurrentGraphTextMode(const QString& _text) {
 }
 
 void ot::VersionGraphManager::updateCurrentGraphCompactMode(void) {
-	this->startProcessCompact(false);
+	this->startProcessCompact(false, m_textFilter->text());
 }
 
 void ot::VersionGraphManager::updateCurrentGraphCompactLabelMode(void) {
-	this->startProcessCompact(true);
+	this->startProcessCompact(true, m_textFilter->text());
 }
 
 void ot::VersionGraphManager::updateCurrentGraphLabeledOnlyMode(void) {
@@ -224,19 +218,33 @@ void ot::VersionGraphManager::updateCurrentGraphLabeledOnlyMode(void) {
 
 	// Process item childs
 	for (const VersionGraphVersionCfg* childCfg : m_config.getRootVersion()->getChildVersions()) {
-		this->processLabeledOnlyItem(newItem, childCfg, newConfig.getActiveVersionName(), true);
+		this->processLabeledOnlyItem(newItem, childCfg, newConfig.getActiveVersionName(), true, m_textFilter->text());
 	}
 
 	newConfig.setRootVersion(newItem);
 	m_graph->setupFromConfig(newConfig);
 }
 
-void ot::VersionGraphManager::processTextFilter(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, const QString& _filterText) {
+bool ot::VersionGraphManager::checkFilterValid(const VersionGraphVersionCfg* _versionConfig, const QString& _filterText) const {
+	if (_filterText.isEmpty()) {
+		return true;
+	}
+	else if (QString::fromStdString(_versionConfig->getLabel()).contains(_filterText, Qt::CaseInsensitive) || 
+		QString::fromStdString(_versionConfig->getDescription()).contains(_filterText, Qt::CaseInsensitive)) 
+	{
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+void ot::VersionGraphManager::processViewAllWithTextFilter(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, const QString& _filterText) {
 	VersionGraphVersionCfg* newParent = _parent;
 	bool newParentIsDirect = false;
 
 	// Active item
-	if (_config->getName() == _activeVersion || QString::fromStdString(_config->getLabel()).contains(_filterText, Qt::CaseInsensitive) || QString::fromStdString(_config->getDescription()).contains(_filterText, Qt::CaseInsensitive)) {
+	if (_config->getName() == _activeVersion || this->checkFilterValid(_config, _filterText)) {
 		VersionGraphVersionCfg* newItem = new VersionGraphVersionCfg;
 		newItem->applyConfigOnly(*_config);
 		newItem->setDirectParentIsHidden(!_isDirectParent);
@@ -248,11 +256,11 @@ void ot::VersionGraphManager::processTextFilter(VersionGraphVersionCfg* _parent,
 
 	// Process childs
 	for (const VersionGraphVersionCfg* childCfg : _config->getChildVersions()) {
-		this->processTextFilter(newParent, childCfg, _activeVersion, newParentIsDirect, _filterText);
+		this->processViewAllWithTextFilter(newParent, childCfg, _activeVersion, newParentIsDirect, _filterText);
 	}
 }
 
-void ot::VersionGraphManager::startProcessCompact(bool _includeLabeledVersions) {
+void ot::VersionGraphManager::startProcessCompact(bool _includeLabeledVersions, const QString& _filterText) {
 	VersionGraphCfg newConfig;
 	newConfig.setActiveVersionName(m_config.getActiveVersionName());
 
@@ -273,19 +281,19 @@ void ot::VersionGraphManager::startProcessCompact(bool _includeLabeledVersions) 
 
 	// Process item childs
 	for (const VersionGraphVersionCfg* childCfg : m_config.getRootVersion()->getChildVersions()) {
-		this->processCompactItem(newItem, childCfg, newConfig.getActiveVersionName(), true, _includeLabeledVersions);
+		this->processCompactItem(newItem, childCfg, newConfig.getActiveVersionName(), true, _includeLabeledVersions, _filterText);
 	}
 
 	newConfig.setRootVersion(newItem);
 	m_graph->setupFromConfig(newConfig);
 }
 
-void ot::VersionGraphManager::processCompactItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, bool _includeLabeledVersions) {
+void ot::VersionGraphManager::processCompactItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, bool _includeLabeledVersions, const QString& _filterText) {
 	VersionGraphVersionCfg* newItem = new VersionGraphVersionCfg;
 	newItem->applyConfigOnly(*_config);
 	newItem->setDirectParentIsHidden(!_isDirectParent);
 
-	// Active item
+	// Active item or filter match
 	if (_config->getName() == _activeVersion) {
 		// All direct childs of an active item must be visible
 		for (const VersionGraphVersionCfg* childCfg : _config->getChildVersions()) {
@@ -294,7 +302,7 @@ void ot::VersionGraphManager::processCompactItem(VersionGraphVersionCfg* _parent
 			childItem->setDirectParentIsHidden(false);
 
 			for (const VersionGraphVersionCfg* childsChildCfg : childCfg->getChildVersions()) {
-				this->processCompactItem(childItem, childsChildCfg, _activeVersion, true, _includeLabeledVersions);
+				this->processCompactItem(childItem, childsChildCfg, _activeVersion, true, _includeLabeledVersions, _filterText);
 			}
 
 			newItem->addChildVersion(childItem);
@@ -302,40 +310,57 @@ void ot::VersionGraphManager::processCompactItem(VersionGraphVersionCfg* _parent
 
 		_parent->addChildVersion(newItem);
 	}
+
 	// Middle item, not active
 	else if (_config->getChildVersions().size() == 1) {
 		const VersionGraphVersionCfg* childCfg = _config->getChildVersions().front();
 
 		// Child is active
-		if (childCfg->getName() == _activeVersion || (_includeLabeledVersions && !newItem->getLabel().empty())) {
-			this->processCompactItem(newItem, childCfg, _activeVersion, true, _includeLabeledVersions);
+		if ((childCfg->getName() == _activeVersion || (_includeLabeledVersions && !newItem->getLabel().empty())) && 
+			this->checkFilterValid(_config, _filterText)) // if a filter is set this needs to match the filter
+		{
+			this->processCompactItem(newItem, childCfg, _activeVersion, true, _includeLabeledVersions, _filterText);
 			_parent->addChildVersion(newItem);
 		}
 		// Process other childs
 		else {
 			delete newItem;
 			newItem = nullptr;
-			this->processCompactItem(_parent, childCfg, _activeVersion, false, _includeLabeledVersions);
+			this->processCompactItem(_parent, childCfg, _activeVersion, false, _includeLabeledVersions, _filterText);
 		}
 		
 	}
-	// Last item or branch item
-	else {
+	
+	// Last item or branch item with matching filter (item is shown)
+	else if (this->checkFilterValid(_config, _filterText) || _config->getChildVersions().size() == 0) {
 		// Process item childs
 		for (const VersionGraphVersionCfg* childCfg : _config->getChildVersions()) {
-			this->processCompactItem(newItem, childCfg, _activeVersion, true, _includeLabeledVersions);
+			this->processCompactItem(newItem, childCfg, _activeVersion, true, _includeLabeledVersions, _filterText);
 		}
 
 		_parent->addChildVersion(newItem);
 	}
+
+	// Last item or branch item without filter match (item is hidden)
+	else {
+		delete newItem;
+		newItem = nullptr;
+
+		// Process item childs
+		for (const VersionGraphVersionCfg* childCfg : _config->getChildVersions()) {
+			this->processCompactItem(_parent, childCfg, _activeVersion, false, _includeLabeledVersions, _filterText);
+		}
+	}
 }
 
-void ot::VersionGraphManager::processLabeledOnlyItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent) {
+void ot::VersionGraphManager::processLabeledOnlyItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, const QString& _filterText) {
 	VersionGraphVersionCfg* newParent = _parent;
 	bool newParentIsDirect = false;
 
-	// Active item
-	if (_config->getName() == _activeVersion || !_config->getLabel().empty()) {
+	// Active item or labeled item (with filter match on labeled)
+	if (_config->getName() == _activeVersion || 
+		(!_config->getLabel().empty() && this->checkFilterValid(_config, _filterText)))
+	{
 		VersionGraphVersionCfg* newItem = new VersionGraphVersionCfg;
 		newItem->applyConfigOnly(*_config);
 		newItem->setDirectParentIsHidden(!_isDirectParent);
@@ -347,6 +372,6 @@ void ot::VersionGraphManager::processLabeledOnlyItem(VersionGraphVersionCfg* _pa
 
 	// Process childs
 	for (const VersionGraphVersionCfg* childCfg : _config->getChildVersions()) {
-		this->processLabeledOnlyItem(newParent, childCfg, _activeVersion, newParentIsDirect);
+		this->processLabeledOnlyItem(newParent, childCfg, _activeVersion, newParentIsDirect, _filterText);
 	}
 }

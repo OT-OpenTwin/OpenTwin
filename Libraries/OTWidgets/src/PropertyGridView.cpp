@@ -6,9 +6,6 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTWidgets/PropertyGridView.h"
-#include "OTWidgets/WidgetViewRegistrar.h"
-
-//static ot::WidgetViewRegistrar<ot::PropertyGridView> PropertyGridViewRegistrar(OT_WIDGETTYPE_PropertyGridView);
 
 ot::PropertyGridView::PropertyGridView() {
 	this->addWidgetToDock(this->getQWidget());

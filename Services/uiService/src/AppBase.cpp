@@ -401,14 +401,6 @@ void AppBase::log(const ot::LogMessage& _message) {
 		message << "] [Frontend] " << _message.getText();
 
 		this->appendHtmlInfoMessage(ot::StyledTextConverter::toHtml(message));
-
-		// Construct display text
-		if (_message.getFlags() & ot::ERROR_LOG) {
-			this->appendInfoMessage("[ERROR] [Frontend] " + QString::fromStdString(_message.getText()));
-		}
-		else if (_message.getFlags() & ot::WARNING_LOG) {
-			this->appendInfoMessage("[WARNING] [Frontend] " + QString::fromStdString(_message.getText()));
-		}
 	}
 }
 
@@ -884,11 +876,12 @@ void AppBase::createUi(void) {
 
 			// Display docks
 			OT_LOG_D("Settings up dock window visibility");
-
+	
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_debug);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output, ads::BottomDockWidgetArea);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation, ads::LeftDockWidgetArea);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid, m_projectNavigation->getViewDockWidget()->dockAreaWidget(), ads::BottomDockWidgetArea);
+			
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker, m_projectNavigation->getViewDockWidget()->dockAreaWidget());
 			m_projectNavigation->getViewDockWidget()->setAsCurrentTab();
 
@@ -1833,7 +1826,7 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 
 	newTable = new ot::TableView;
 	newTable->setupFromConfig(_config);
-	newTable->setViewData(ot::WidgetViewBase(_config.getName(), _config.getTitle(), ot::WidgetViewBase::ViewIsCentral /* | ot::WidgetViewBase::ViewIsCloseable */, ot::WidgetViewBase::ViewTable));
+	newTable->setViewData(ot::WidgetViewBase(_config.getName(), _config.getTitle(), ot::WidgetViewBase::ViewIsCentral | ot::WidgetViewBase::ViewIsCloseable, ot::WidgetViewBase::ViewTable));
 
 	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newTable);
 	m_tables.store(_serviceInfo, newTable);
@@ -2335,6 +2328,9 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	if (itm) {
 		m_projectNavigation->setItemSelected(itm->id(), false);
 	}
+	else {
+		OT_LOG_W("Navigation entry for view not found. { \"ViewName\": \"" + viewName + "\" }");
+	}
 }
 
 void AppBase::slotOutputContextMenuItemClicked() {
@@ -2798,7 +2794,7 @@ void AppBase::slotPropertyGridValueDeleteRequested(const ot::Property* _property
 // Private: Tree slots
 
 void AppBase::slotTreeItemSelectionChanged(void) {
-	m_viewerComponent->sendSelectionChangedNotification();
+	m_viewerComponent->handleSelectionChanged(true);
 }
 
 void AppBase::slotTreeItemTextChanged(QTreeWidgetItem* _item, int _column) {
@@ -2843,11 +2839,15 @@ void AppBase::clearGraphicsPicker(void) {
 void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	ot::GraphicsViewView* graphics = dynamic_cast<ot::GraphicsViewView*>(_view);
 	ot::TextEditorView* txt = dynamic_cast<ot::TextEditorView*>(_view);
+	ot::TableView* table = dynamic_cast<ot::TableView*>(_view);
 	if (graphics) {
 		m_graphicsViews.erase(graphics);
 	}
 	if (txt) {
 		m_textEditors.erase(txt);
+	}
+	if (table) {
+		m_tables.erase(table);
 	}
 	
 }

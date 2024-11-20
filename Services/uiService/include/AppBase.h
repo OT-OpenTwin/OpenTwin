@@ -490,6 +490,7 @@ public Q_SLOTS:
 	void slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
 	void slotGraphicsSelectionChanged(void);
 	void slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const std::list<std::string>& _connections);
+	
 	void slotTextEditorSaveRequested(void);
 	void slotTableSaveRequested(void);
 

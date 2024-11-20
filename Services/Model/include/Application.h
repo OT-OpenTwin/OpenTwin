@@ -72,7 +72,7 @@ public:
 		OT_HANDLER(handleGetEntityIdentifier, Application, OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleGetEntitiesFromAnotherCollection, Application, OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleViewsFromProjectType, Application, OT_ACTION_PARAM_MODEL_ViewsForProjectType, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleTextVisualisation, Application, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, ot::SECURE_MESSAGE_TYPES);
+		OT_HANDLER(handleVisualisationDataRequest, Application, OT_ACTION_CMD_MODEL_RequestVisualisationData, ot::SECURE_MESSAGE_TYPES);
 	// Versions
 
 	OT_HANDLER(handleGetCurrentVersion, Application, OT_ACTION_CMD_MODEL_GetCurrentVersion, ot::SECURE_MESSAGE_TYPES)

@@ -8,7 +8,7 @@ bool OptionsParameterHandlerReference::IndividualInterpretation(const std::strin
 		std::string resistanceValue = entry.substr(1, entry.size());
 		resistanceValue.erase(std::remove_if(resistanceValue.begin(), resistanceValue.end(), isspace), resistanceValue.end());
 		ot::StringToVariableConverter converter;
-		ot::Variable value = converter(resistanceValue);
+		ot::Variable value = converter(resistanceValue,'.');
 		options.setReferenceResistance(value);
 		return true;
 	}

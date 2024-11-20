@@ -61,14 +61,7 @@
 
 #define OT_ACTION_CMD_SetGlobalLogFlags "Logger.SetGlobal"
 #define OT_ACTION_CMD_SetSpecificLogFlags "Logger.SetSpecific"
-
-#define OT_ACTION_PARAM_LSS "LocalSessionServices"
-#define OT_ACTION_PARAM_LSS_URL "URL"
-#define OT_ACTION_PARAM_LSS_SessionCount "SessionCount"
-#define OT_ACTION_PARAM_LSS_GLOBAL_CPU "GlobalCPU"
-#define OT_ACTION_PARAM_LSS_GLOBAL_MEMORY "GlobalMemory"
-#define OT_ACTION_PARAM_LDS "LocalDirectoryServices"
-#define OT_ACTION_PARAM_LDS_URL "URL"
+#define OT_ACTION_CMD_SetLogCacheSize "Logger.SetCacheSize"
 
 #define OT_ACTION_CMD_ServiceEnableDebug "Service.DebugEnable"
 #define OT_ACTION_CMD_ServiceDisableDebug "Service.DebugDisable"
@@ -131,6 +124,7 @@
 #define OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION "Model.OtherCollection.GetEntities"
 #define OT_ACTION_CMD_MODEL_UpdateCurvesOfPlot "Model.Plot.UpdateCurves"
 #define OT_ACTION_CMD_MODEL_DeleteCurvesFromPlots "Model.Plot.DeleteCurves"
+#define OT_ACTION_CMD_MODEL_RequestVisualisationData "Model.Visualisation.Data"
 
 #define OT_ACTION_CMD_UI_ServiceSetupCompleted "UI.Service.SetupCompleted"
 #define OT_ACTION_CMD_UI_RegisterForModelEvents "UI.ModelView.Events.Register"
@@ -264,6 +258,7 @@
 #define OT_ACTION_CMD_UI_VIEW_OBJ_Plot1DPropsChanged "UI.VIEW.OBJ.Plot1DPropertiesChanged"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode "UI.VIEW.OBJ.SceneNode"
 #define OT_ACTION_CMD_UI_VIEW_CreateRubberband "UI.VIEW.CreateRubberband"
+
 // rm
 #define OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection "UI.VIEW.GetTableSelection"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable "UI.VIEW.Table.Show"
@@ -333,6 +328,7 @@
 
 #define OT_ACTION_PARAM_JSON "JSON"
 #define OT_ACTION_PARAM_List "List"
+#define OT_ACTION_PARAM_Size "Size"
 #define OT_ACTION_PARAM_Color "Color"
 #define OT_ACTION_PARAM_Flags "Flags"
 #define OT_ACTION_PARAM_Value "Value"
@@ -371,6 +367,14 @@
 
 #define OT_ACTION_PARAM_PROPERTY_Name "PropertyName"
 #define OT_ACTION_PARAM_PROPERTY_Group "PropertyGroup"
+
+#define OT_ACTION_PARAM_LSS "LocalSessionServices"
+#define OT_ACTION_PARAM_LSS_URL "URL"
+#define OT_ACTION_PARAM_LSS_SessionCount "SessionCount"
+#define OT_ACTION_PARAM_LSS_GLOBAL_CPU "GlobalCPU"
+#define OT_ACTION_PARAM_LSS_GLOBAL_MEMORY "GlobalMemory"
+#define OT_ACTION_PARAM_LDS "LocalDirectoryServices"
+#define OT_ACTION_PARAM_LDS_URL "URL"
 
 #define OT_ACTION_PARAM_UI_ToolBarTabOrder "UI.TTB.TabOrder"
 #define OT_ACTION_PARAM_UI_CONTROL_TabName "UI.TTB.TabName"

@@ -320,15 +320,14 @@ void BlockHandlerDatabaseAccess::AddComparision(const ValueComparisionDefinition
 		const bool notationIsCorrect = (openingBracket == '(' || openingBracket == '[') && (closingBracket == ')' || closingBracket == ']') && posDelimiter != std::string::npos;
 		if (notationIsCorrect)
 		{
-
 			const bool dataTypeCompatible = type == ot::TypeNames::getInt32TypeName() || type == ot::TypeNames::getInt64TypeName() || type == ot::TypeNames::getDoubleTypeName() || type == ot::TypeNames::getFloatTypeName();
 			if (dataTypeCompatible)
 			{
 				const std::string firstValue = valueStr.substr(1, posDelimiter - 1);
 				const std::string secondValue = valueStr.substr(posDelimiter + 1, valueStr.size()-1);
 
-				ot::Variable vFirstValue(converter(firstValue));
-				ot::Variable vSecondValue(converter(secondValue));
+				ot::Variable vFirstValue(converter(firstValue,'.'));
+				ot::Variable vSecondValue(converter(secondValue,'.'));
 
 				std::string correspondingComparator;
 				if (openingBracket == '(')

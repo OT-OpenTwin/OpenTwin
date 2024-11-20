@@ -2,7 +2,6 @@
 #include "LTSpiceConnector/ServiceConnector.h"
 #include "LTSpiceConnector/VersionFile.h"
 #include "LTSpiceConnector/ProgressInfo.h"
-#include "LTSpiceConnector/Result1DFileManager.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -274,161 +273,6 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		ProgressInfo::getInstance().unlockGui();
 		ProgressInfo::getInstance().showError(error);
 	}
-}
-
-void ProjectManager::send1dResultData(const std::string& projectRoot, InfoFileManager &infoFileManager)
-{
-	// First, we get a list of all available run-ids
-	std::string uploadDirectory = projectRoot + "/Temp/Upload/";
-
-	std::list<int> runIds = getAllRunIds(uploadDirectory);
-
-	// Load all result data and determine the hashes
-	Result1DFileManager result1DData(uploadDirectory, runIds);
-
-	// Now check whether the run-ids (1,2,3,...) have changed. In this case, a full upload is needed.
-	// Otherwise, only the new run-ids need to be uploaded (added).
-	std::list<int> changedRunIds = checkForChangedData(runIds, uploadDirectory, result1DData, infoFileManager);
-
-	// Here we have two cases: Either we do not want to include the results. In this case, the append flag needs to be false such that the 
-	// previously stored data will be deleted. If the want to include the results, the flag should be true, since if there is no change
-	// the previously stored data should be kept. 
-
-	bool appendData = false; // includeParametricResults;
-	std::string dataContent;
-	size_t uncompressedDataLength = 0;
-
-	if (!changedRunIds.empty())
-	{
-		appendData = (changedRunIds.size() < runIds.size());
-
-		// Create a zip archive of the to-be uploaded run-ids (including the cache information)
-		// In a first step, we calculate the buffer size to store all the data
-		uncompressedDataLength = sizeof(size_t);   // Store the number of run IDs
-		size_t validRunIds = 0;
-
-		for (int runId : changedRunIds)
-		{
-			Result1DRunIDContainer* container = result1DData.getRunContainer(runId);
-			if (container != nullptr)
-			{
-				uncompressedDataLength += container->getSize();
-				validRunIds++;
-			}
-		}
-
-		assert(uncompressedDataLength > 0);
-		if (uncompressedDataLength > 0)
-		{
-			std::vector<char> buffer;
-			buffer.reserve(uncompressedDataLength);
-
-			// Write the number of valid runids
-			char* valueBuffer = (char*)(&validRunIds);
-
-			for (size_t index = 0; index < sizeof(size_t); index++)
-			{
-				buffer.push_back(valueBuffer[index]);
-			}
-
-			// Now we write all data to the buffer
-			for (int runId : changedRunIds)
-			{
-				Result1DRunIDContainer* container = result1DData.getRunContainer(runId);
-				if (container != nullptr)
-				{
-					container->writeToBuffer(runId, buffer);
-				}
-			}
-
-			// In a next step, we do not need the original data anymore
-			result1DData.clear();
-
-			// Create a buffer for the compressed storage
-			uLong compressedSize = compressBound((uLong)uncompressedDataLength);
-
-			char* compressedData = new char[compressedSize];
-			compress((Bytef*)compressedData, &compressedSize, (Bytef*)buffer.data(), uncompressedDataLength);
-
-			buffer.clear();
-
-			// Convert the binary to an encoded string
-			int encoded_data_length = Base64encode_len(compressedSize);
-			char* base64_string = new char[encoded_data_length];
-
-			Base64encode(base64_string, compressedData, compressedSize); // "base64_string" is a then null terminated string that is an encoding of the binary data pointed to by "data"
-
-			delete[] compressedData;
-			compressedData = nullptr;
-
-			dataContent = std::string(base64_string);
-
-			delete[] base64_string;
-			base64_string = nullptr;
-		}
-	}
-
-	// Finally send the zip archive to the server (together with the information whether the data shall be replaced or added)
-	// In case that we do not have any results or we do not want to add the results, the message is still sent, but with an empty content
-
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_RESULT1D, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_APPEND, appendData, doc.GetAllocator());  // We need ids for the data entities and the file entities
-	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(dataContent, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, rapidjson::Value(uncompressedDataLength), doc.GetAllocator());
-
-	ServiceConnector::getInstance().sendExecuteRequest(doc);
-}
-
-std::list<int> ProjectManager::getAllRunIds(const std::string & uploadDirectory)
-{
-	std::list<int> runIds;
-
-	for (const auto& dirEntry : std::filesystem::directory_iterator(uploadDirectory))
-	{
-		if (dirEntry.is_directory())
-		{
-			// This could be a runid
-			std::string dirname = dirEntry.path().filename().string();
-			if (std::find_if(dirname.begin(), dirname.end(), [](unsigned char c) { return !std::isdigit(c); }) == dirname.end())
-			{
-				// The directory name consists of digits only -> is an integer number#
-				int runId = atoi(dirname.c_str());
-				if (runId != 0)
-				{
-					// We have a parametric result
-					runIds.push_back(runId);
-				}
-			}
-		}
-	}
-
-	// Finally we sort the list
-	runIds.sort();
-
-	return runIds;
-}
-
-std::list<int> ProjectManager::checkForChangedData(std::list<int> &allRunIds, const std::string &uploadDirectory, Result1DFileManager & result1DData, InfoFileManager& infoFileManager)
-{
-	std::list<int> changedRunIds;
-
-	for (int runID : allRunIds)
-	{
-		// Here we check whether this runID has changed
-		bool hasChanged = false;
-
-		Result1DRunIDContainer* container = result1DData.getRunContainer(runID);
-		assert(container != nullptr);
-		if (container == nullptr) break;
-
-		if (container->hasChanged(runID, infoFileManager))
-		{
-			changedRunIds.push_back(runID);
-		}
-	}
-		
-	return changedRunIds;
 }
 
 void ProjectManager::copyFiles(const std::string &newVersion)
@@ -738,9 +582,9 @@ void ProjectManager::uploadFiles(const std::string &projectRoot, std::list<std::
 		std::ifstream dataFile(file, std::ios::binary | std::ios::ate);
 
 		std::streampos size = dataFile.tellg();
+		dataFile.seekg(0, std::ios::beg);
 
 		char *memBlock = new char[size];
-		dataFile.seekg(0, std::ios::beg);
 		dataFile.read(memBlock, size);
 		dataFile.close();
 
@@ -826,98 +670,6 @@ void ProjectManager::commitNewVersion(const std::string &changeMessage)
 
 	// Send the message to the service
 	ServiceConnector::getInstance().sendExecuteRequest(doc);
-}
-
-std::string ProjectManager::calculateHash(const std::string& fileContent)
-{
-	// First, we process the file and extract each pair of three vertices in one string
-	std::stringstream stlData(fileContent);
-
-	int vertexID = 0;
-	std::string vertexData;
-	vertexData.reserve(320);
-
-	std::list<std::string> vertexList;
-
-	while (!stlData.eof())
-	{
-		std::string line;
-		std::getline(stlData, line);
-
-		size_t index = line.find("vertex");
-
-		if (index != std::string::npos)
-		{
-			// This line contains a vertex
-			vertexData += line.substr(index+6);
-			vertexID++;
-
-			if (vertexID == 3)
-			{
-				// We have collected three vertices -> next triangle
-				vertexList.push_back(vertexData);
-				vertexData.clear();
-				vertexData.reserve(320);
-				vertexID = 0;
-			}
-		}
-	}
-
-	// Now we need to sort the list with the vertex data, since the ordering of the triangles may differ from time to time
-	vertexList.sort();
-
-	// Now get the list into a string
-	std::stringstream data;
-	for (auto item : vertexList)
-	{
-		data << item;
-	}
-
-	// And finally calculate the hash
-	QCryptographicHash hashCalculator(QCryptographicHash::Md5);
-	hashCalculator.addData(data.str().c_str(), data.str().size());
-	
-	std::string hashValue = hashCalculator.result().toHex().toStdString();
-
-	return hashValue;
-}
-
-std::map<std::string, int> ProjectManager::determineAllShapes(std::stringstream fileContent)
-{
-	std::map<std::string, int> shapeNameToIdMap;
-
-	int id = 0; 
-
-	while (!fileContent.eof())
-	{
-		std::string name, material;
-
-		std::getline(fileContent, name);
-		std::getline(fileContent, material);
-
-		if (!name.empty() && !material.empty())
-		{
-			shapeNameToIdMap[name] = id;
-			id++;
-		}
-	}
-
-	return shapeNameToIdMap;
-}
-
-void ProjectManager::readFileContent(const std::string &fileName, std::string &content)
-{
-	content.clear();
-
-	std::ifstream t(fileName);
-	if (!t.is_open()) throw std::string("Unable to read file: " + fileName);
-
-	t.seekg(0, std::ios::end);
-	content.reserve(t.tellg());
-	t.seekg(0, std::ios::beg);
-
-	content.assign((std::istreambuf_iterator<char>(t)),
-					std::istreambuf_iterator<char>());
 }
 
 void ProjectManager::deleteLocalProjectFiles(const std::string &baseProjectName)

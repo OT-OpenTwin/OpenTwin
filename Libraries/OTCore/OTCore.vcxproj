@@ -31,6 +31,7 @@
     <ClCompile Include="src\GenericDataStructSingle.cpp" />
     <ClCompile Include="src\GenericDataStructVector.cpp" />
     <ClCompile Include="src\JSON.cpp" />
+    <ClCompile Include="src\StringToNumericCheck.cpp" />
     <ClCompile Include="src\LogModeManager.cpp" />
     <ClCompile Include="src\Math.cpp" />
     <ClCompile Include="src\OwnerServiceGlobal.cpp" />
@@ -61,6 +62,7 @@
     <ClInclude Include="include\OTCore\BasicServiceInformation.h" />
     <ClInclude Include="include\OTCore\ComplexNumbers.h" />
     <ClInclude Include="include\OTCore\DefensiveProgramming.h" />
+    <ClInclude Include="include\OTCore\LocalSettingsSwitch.h" />
     <ClInclude Include="include\OTCore\LogModeManager.h" />
     <ClInclude Include="include\OTCore\Math.h" />
     <ClInclude Include="include\OTCore\ProjectTemplateInformation.h" />
@@ -100,6 +102,7 @@
     <ClInclude Include="include\OTCore\ServiceBase.h" />
     <ClInclude Include="include\OTCore\Size2D.h" />
     <ClInclude Include="include\OTCore\StringHelper.h" />
+    <ClInclude Include="include\OTCore\StringToNumericCheck.h" />
     <ClInclude Include="include\OTCore\StringToVariableConverter.h" />
     <ClInclude Include="include\OTCore\TemplateTypeName.h" />
     <ClInclude Include="include\OTCore\TemplateTypeName.hpp" />

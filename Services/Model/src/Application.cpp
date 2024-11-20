@@ -978,10 +978,11 @@ std::string Application::handleSetVersionLabel(ot::JsonDocument& _document) {
 	return "";
 }
 
-std::string Application::handleTextVisualisation(ot::JsonDocument& _document)
+std::string Application::handleVisualisationDataRequest(ot::JsonDocument& _document)
 {
 	ot::UID entityID =  ot::json::getUInt64(_document,OT_ACTION_PARAM_MODEL_EntityID);
-	m_visualisationHandler.handleVisualisationRequest(entityID);
+	const std::string visualisationType = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
+	m_visualisationHandler.handleVisualisationRequest(entityID,visualisationType);
 	return "";
 }
 // ##################################################################################################################################################################################################################

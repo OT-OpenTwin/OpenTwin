@@ -41,7 +41,7 @@ namespace ot {
 
 		VersionGraphItem* findVersionByName(const std::string& _versionName);
 
-		void updateVersionPosition(void);
+		void updateVersionPositionAndSize(void);
 
 		void setAsActiveVersionBranch(void);
 

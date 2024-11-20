@@ -100,7 +100,7 @@ void ot::TextEditorLineNumberArea::paintEvent(QPaintEvent * _event) {
 // ###################################################################################################################################
 
 ot::TextEditor::TextEditor(QWidget* _parent)
-	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false), m_searchPopup(nullptr), 
+	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false), m_lastSavedUndoStackCount(-1), m_searchPopup(nullptr),
 	m_tabSpaces(4), m_newLineSamePrefix(false), m_enableDuplicateLineShortcut(false), m_enableSameTextHighlighting(false),
 	m_sameTextHighlightingMinimum(2)
 {
@@ -218,8 +218,13 @@ void ot::TextEditor::lineNumberAreaPaintEvent(QPaintEvent * _event) {
 void ot::TextEditor::setContentChanged(bool _changed) {
 	if (m_contentChanged == _changed) return;
 	m_contentChanged = _changed;
-	if (m_contentChanged) this->contentChanged();
-	else this->contentSaved();
+	if (m_contentChanged) {
+		this->contentChanged();
+	}
+	else {
+		m_lastSavedUndoStackCount = this->document()->availableUndoSteps();
+		this->contentSaved();
+	}
 }
 
 void ot::TextEditor::setCode(const QString& _text) {
@@ -233,6 +238,7 @@ void ot::TextEditor::setCode(const QString& _text) {
 		
 	this->setPlainText(_text);
 	this->document()->clearUndoRedoStacks();
+	m_lastSavedUndoStackCount = 0;
 
 	this->slotUpdateLineNumberAreaWidth(0);
 
@@ -257,6 +263,7 @@ void ot::TextEditor::setCode(const QStringList& _lines) {
 	this->clear();
 	for (auto l : _lines) this->appendPlainText(l);
 	this->document()->clearUndoRedoStacks();
+	m_lastSavedUndoStackCount = 0;
 
 	this->slotUpdateLineNumberAreaWidth(0);
 
@@ -387,7 +394,14 @@ void ot::TextEditor::slotSaveRequested(void) {
 }
 
 void ot::TextEditor::slotTextChanged(void) {
-	this->setContentChanged(true);
+	if (m_lastSavedUndoStackCount > this->document()->availableUndoSteps()) {
+		m_lastSavedUndoStackCount = -1;
+		this->setContentChanged(true);
+	}
+	else {
+		this->setContentChanged(m_lastSavedUndoStackCount != this->document()->availableUndoSteps());
+	}
+	
 }
 
 void ot::TextEditor::slotFindRequested(void) {

@@ -60,9 +60,9 @@ ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, ot::TableHead
 
 	}
 
-	for(matrixPointer.m_column = columnStarter; matrixPointer.m_column < m_columns; matrixPointer.m_column++)
+	for(matrixPointer.m_column = columnStarter; matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++)
 	{
-		for (matrixPointer.m_row = rowStarter; matrixPointer.m_row < m_rows; matrixPointer.m_row++)
+		for (matrixPointer.m_row = rowStarter; matrixPointer.m_row < _matrix.getNumberOfRows(); matrixPointer.m_row++)
 		{
 			const ot::Variable& variable =	_matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);	
