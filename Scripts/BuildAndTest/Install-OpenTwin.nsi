@@ -14,13 +14,13 @@ first time a user launches the application.
 
 !include Mui2.nsh
 
-!define NAME "OpenTwin"
+!define NAME "OpenTwin_Frontend"
 !define REGPATH_UNINSTSUBKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}"
 Name "${NAME}"
-OutFile "Install ${NAME}.exe"
+OutFile "Install_${NAME}.exe"
 Unicode True
 !define MUI_PAGE_HEADER_TEXT "Welcome to OpenTwin"
-BrandingText "(C) OpenTwin 2021"
+BrandingText "(C) OpenTwin 2024"
 RequestExecutionLevel Admin ; Request admin rights on WinVista+ (when UAC is turned on)
 InstallDir "$ProgramFiles\$(^Name)"
 InstallDirRegKey HKLM "${REGPATH_UNINSTSUBKEY}" "UninstallString"
@@ -119,7 +119,7 @@ Section "Program files (Required)"
 
   SetOutPath $InstDir
   WriteUninstaller "$InstDir\Uninst.exe"
-  WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayName" "${NAME}"
+  WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayName" "OpenTwin"
   WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$InstDir\OpenTwin.exe,0"
   WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "UninstallString" '"$InstDir\Uninst.exe"'
   WriteRegDWORD HKLM "${REGPATH_UNINSTSUBKEY}" "NoModify" 1
@@ -138,11 +138,7 @@ Section -Uninstall
   ${UnpinShortcut} "$SMPrograms\${NAME}.lnk"
   Delete "$SMPrograms\${NAME}.lnk"
 
-  Delete "$InstDir\*.*"
-  RMDir /r "$InstDir\fonts"
-  RMDir /r "$InstDir\icons"
-  RMDir /r "$InstDir\osgPlugins-3.6.3"
-  RMDir /r "$InstDir\plugins"
-  RMDir "$InstDir"
+  RMDir /r "$InstDir"
+
   DeleteRegKey HKLM "${REGPATH_UNINSTSUBKEY}"
 SectionEnd
