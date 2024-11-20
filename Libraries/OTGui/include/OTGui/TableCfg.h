@@ -19,7 +19,7 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT TableCfg : public WidgetViewBase {
 	public:
-		TableCfg(int _rows = 0, int _columns = 0, WidgetViewBase _baseInfo = WidgetViewBase(WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable, WidgetViewBase::ViewTable));
+		TableCfg(int _rows = 0, int _columns = 0, WidgetViewBase _baseInfo = WidgetViewBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable));
 		TableCfg(const ot::GenericDataStructMatrix& _matrix, ot::TableHeaderOrientation _orientation);
 		TableCfg(const TableCfg& _other);
 		virtual ~TableCfg();

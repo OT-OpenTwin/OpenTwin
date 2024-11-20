@@ -6,7 +6,9 @@
 // OpenTwin header
 #include "OTWidgets/TableView.h"
 
-ot::TableView::TableView() {
+ot::TableView::TableView() 
+	: WidgetView(WidgetViewBase::ViewTable)
+{
 	this->addWidgetToDock(this);
 }
 

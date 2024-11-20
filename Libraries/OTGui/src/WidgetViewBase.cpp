@@ -89,6 +89,9 @@ std::string ot::WidgetViewBase::toString(ViewType _type) {
 	case ot::WidgetViewBase::ViewTable: return "Table";
 	case ot::WidgetViewBase::ViewVersion: return "Version";
 	case ot::WidgetViewBase::ViewGraphics: return "Graphics";
+	case ot::WidgetViewBase::ViewGraphicsPicker: return "GraphicsPicker";
+	case ot::WidgetViewBase::ViewProperties: return "Properties";
+	case ot::WidgetViewBase::ViewNavigation: return "Navigation";
 	case ot::WidgetViewBase::CustomView: return "Custom";
 	default:
 		OT_LOG_EAS("Unknown view type (" + std::to_string((int)_type) + ")");
@@ -103,6 +106,9 @@ ot::WidgetViewBase::ViewType ot::WidgetViewBase::stringToViewType(const std::str
 	else if (_type == WidgetViewBase::toString(ViewType::ViewTable)) return ViewType::ViewTable;
 	else if (_type == WidgetViewBase::toString(ViewType::ViewVersion)) return ViewType::ViewVersion;
 	else if (_type == WidgetViewBase::toString(ViewType::ViewGraphics)) return ViewType::ViewGraphics;
+	else if (_type == WidgetViewBase::toString(ViewType::ViewGraphicsPicker)) return ViewType::ViewGraphicsPicker;
+	else if (_type == WidgetViewBase::toString(ViewType::ViewProperties)) return ViewType::ViewProperties;
+	else if (_type == WidgetViewBase::toString(ViewType::ViewNavigation)) return ViewType::ViewNavigation;
 	else if (_type == WidgetViewBase::toString(ViewType::CustomView)) return ViewType::CustomView;
 	else {
 		OT_LOG_EAS("Unknown view type \"" + _type + "\"");
@@ -112,15 +118,15 @@ ot::WidgetViewBase::ViewType ot::WidgetViewBase::stringToViewType(const std::str
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-ot::WidgetViewBase::WidgetViewBase(ViewFlags _flags, ViewType _type)
+ot::WidgetViewBase::WidgetViewBase(ViewType _type, ViewFlags _flags)
 	: m_flags(_flags), m_dockLocation(WidgetViewBase::Default), m_type(_type)
 {}
 
-ot::WidgetViewBase::WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewFlags _flags, ViewType _type)
+ot::WidgetViewBase::WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewType _type, ViewFlags _flags)
 	: BasicEntityInformation(_entityName), m_title(_title), m_dockLocation(WidgetViewBase::Default), m_flags(_flags), m_type(_type)
 {}
 
-ot::WidgetViewBase::WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewDockLocation _dockLocation, ViewFlags _flags, ViewType _type)
+ot::WidgetViewBase::WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewDockLocation _dockLocation, ViewType _type, ViewFlags _flags)
 	: BasicEntityInformation(_entityName), m_title(_title), m_dockLocation(_dockLocation), m_flags(_flags), m_type(_type)
 {}
 

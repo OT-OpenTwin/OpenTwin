@@ -8,6 +8,7 @@
 #include "OTWidgets/VersionGraphManagerView.h"
 
 ot::VersionGraphManagerView::VersionGraphManagerView()
+	: WidgetView(WidgetViewBase::ViewVersion)
 {
 	this->addWidgetToDock(this->getQWidget());
 }

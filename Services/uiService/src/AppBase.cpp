@@ -789,28 +789,28 @@ void AppBase::createUi(void) {
 			OT_LOG_D("Creating views");
 
 			m_debug = new ot::PlainTextEditView;
-			m_debug->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::ViewIsCentral));
+			m_debug->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsCentral));
 			m_debug->setViewIsPermanent(true);
 			m_debug->setPlainText(BUILD_INFO);
 			m_debug->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
 
 			m_output = new ot::PlainTextEditView;
-			m_output->setViewData(ot::WidgetViewBase(TITLE_DOCK_OUTPUT, TITLE_DOCK_OUTPUT, ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
+			m_output->setViewData(ot::WidgetViewBase(TITLE_DOCK_OUTPUT, TITLE_DOCK_OUTPUT, ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_output->setViewIsPermanent(true);
 			//m_output->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			
 			m_propertyGrid = new ot::PropertyGridView;
-			m_propertyGrid->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROPERTIES, TITLE_DOCK_PROPERTIES, ot::WidgetViewBase::Right, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
+			m_propertyGrid->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROPERTIES, TITLE_DOCK_PROPERTIES, ot::WidgetViewBase::Right, ot::WidgetViewBase::ViewProperties, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_propertyGrid->setViewIsPermanent(true);
 			//m_propertyGrid->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 			
 			m_projectNavigation = new ot::NavigationTreeView;
-			m_projectNavigation->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROJECTNAVIGATION, TITLE_DOCK_PROJECTNAVIGATION, ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
+			m_projectNavigation->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROJECTNAVIGATION, TITLE_DOCK_PROJECTNAVIGATION, ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewNavigation, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_projectNavigation->setViewIsPermanent(true);
 			//m_projectNavigation->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 
 			m_graphicsPicker = new ot::GraphicsPickerView;
-			m_graphicsPicker->setViewData(ot::WidgetViewBase("Block Picker", "Block Picker", ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
+			m_graphicsPicker->setViewData(ot::WidgetViewBase("Block Picker", "Block Picker", ot::WidgetViewBase::Left, ot::WidgetViewBase::ViewGraphicsPicker, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_graphicsPicker->setViewIsPermanent(true);
 			//m_graphicsPicker->setInitialiDockLocation(ot::WidgetViewCfg::Left);
 			//m_graphicsPicker->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
@@ -1027,7 +1027,7 @@ ViewerUIDtype AppBase::createView(
 	if (getVisible3D())
 	{
 		ot::WidgetView* wv = m_viewerComponent->getViewerWidget(viewID);
-		wv->setViewData(ot::WidgetViewBase(text3D.toStdString(), text3D.toStdString(), ot::WidgetViewBase::ViewIsCentral, ot::WidgetViewBase::View3D));
+		wv->setViewData(ot::WidgetViewBase(text3D.toStdString(), text3D.toStdString(), ot::WidgetViewBase::View3D, ot::WidgetViewBase::ViewIsCentral));
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
 	}
 	else
@@ -1038,7 +1038,7 @@ ViewerUIDtype AppBase::createView(
 	if (getVisible1D())
 	{
 		ot::WidgetView* wv = m_viewerComponent->getPlotWidget(viewID);
-		wv->setViewData(ot::WidgetViewBase(text1D.toStdString(), text1D.toStdString(), ot::WidgetViewBase::ViewIsCentral, ot::WidgetViewBase::View1D));
+		wv->setViewData(ot::WidgetViewBase(text1D.toStdString(), text1D.toStdString(), ot::WidgetViewBase::View1D, ot::WidgetViewBase::ViewIsCentral));
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
 	}
 	else
@@ -1055,7 +1055,7 @@ ViewerUIDtype AppBase::createView(
 			delete m_versionGraph;
 		}
 		m_versionGraph = new ot::VersionGraphManagerView;
-		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewIsCentral, ot::WidgetViewBase::ViewVersion));
+		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewVersion, ot::WidgetViewBase::ViewIsCentral));
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivatRequest, this, &AppBase::slotRequestVersion);
@@ -1065,7 +1065,7 @@ ViewerUIDtype AppBase::createView(
 	if (getVisibleTable())
 	{	
 		ot::WidgetView* wv = m_viewerComponent->getTableWidget(viewID);
-		wv->setViewData(ot::WidgetViewBase(textTable.toStdString(), textTable.toStdString(), ot::WidgetViewBase::ViewIsCentral, ot::WidgetViewBase::ViewTable));
+		wv->setViewData(ot::WidgetViewBase(textTable.toStdString(), textTable.toStdString(), ot::WidgetViewBase::ViewTable, ot::WidgetViewBase::ViewIsCentral));
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
 	}
 	else
@@ -1677,7 +1677,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name,
 	}
 
 	newEditor = new ot::GraphicsViewView;
-	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewIsCentral /*| ot::WidgetViewBase::ViewIsCloseable*/, ot::WidgetViewBase::ViewGraphics));
+	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewGraphics, ot::WidgetViewBase::ViewIsCentral /*| ot::WidgetViewBase::ViewIsCloseable*/));
 	newEditor->setOwner(_serviceInfo);
 	newEditor->setGraphicsViewName(_name);
 	newEditor->setGraphicsViewFlag(ot::GraphicsView::ViewManagesSceneRect);

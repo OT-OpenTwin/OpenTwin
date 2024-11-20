@@ -62,7 +62,7 @@ ot::WidgetView* otoolkit::Tool::createWidgetView(QWidget* _widget, const QString
 	}
 	ot::BasicWidgetView* ret = new ot::BasicWidgetView(_widget);
 
-	ot::WidgetViewBase basicInformation;
+	ot::WidgetViewBase basicInformation(ot::WidgetViewBase::CustomView);
 	basicInformation.setEntityName(this->getToolName().toStdString() + "_" + _widgetName.toStdString());
 	basicInformation.setTitle(_widgetName.toStdString());
 	ret->setViewData(basicInformation);

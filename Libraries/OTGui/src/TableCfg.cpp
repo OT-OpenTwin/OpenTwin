@@ -15,7 +15,7 @@ ot::TableCfg::TableCfg(int _rows, int _columns, WidgetViewBase _baseInfo)
 }
 
 ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, ot::TableHeaderOrientation _orientation)
-	: WidgetViewBase(WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable), m_rows(_matrix.getNumberOfRows()), m_columns(_matrix.getNumberOfColumns())
+	: WidgetViewBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable), m_rows(_matrix.getNumberOfRows()), m_columns(_matrix.getNumberOfColumns())
 {
 	MatrixEntryPointer matrixPointer;
 	ot::VariableToStringConverter converter;

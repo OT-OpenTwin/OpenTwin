@@ -8,7 +8,9 @@
 // OpenTwin header
 #include "NavigationTreeView.h"
 
-ot::NavigationTreeView::NavigationTreeView() {
+ot::NavigationTreeView::NavigationTreeView()
+	: WidgetView(WidgetViewBase::ViewNavigation)
+{
 	this->addWidgetToDock(this->widget());
 }
 

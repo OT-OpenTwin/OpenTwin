@@ -23,6 +23,7 @@ namespace ot {
 	//! \brief General widget view information class.
 	//! The WidgetViewBase holds the general information of a WidgetView.
 	class OT_GUI_API_EXPORT WidgetViewBase : public BasicEntityInformation {
+		OT_DECL_NODEFAULT(WidgetViewBase)
 	public:
 		//! @brief ViewFlags are used to describe the view behaviour in the frontend.
 		enum ViewFlag {
@@ -46,13 +47,16 @@ namespace ot {
 		};
 
 		enum ViewType {
-			View3D, //! \brief 3D view
-			View1D, //! \brief 1D plot view
-			ViewText, //! \brief Text editor view
-			ViewTable, //! \brief Table view
-			ViewVersion, //! \brief Version graph view
-			ViewGraphics, //! \brief Graphics view
-			CustomView //! \brief Custom view
+			View3D, //! \brief 3D view.
+			View1D, //! \brief 1D plot view.
+			ViewText, //! \brief Text editor view.
+			ViewTable, //! \brief Table view.
+			ViewVersion, //! \brief Version graph view.
+			ViewGraphics, //! \brief Graphics view.
+			ViewGraphicsPicker, //! \brief Graphics picker view.
+			ViewProperties, //! \brief Properties view.
+			ViewNavigation, //! \brief Navigation view.
+			CustomView //! \brief Custom view.
 		};
 
 		//! @brief Returns a string representation of the provided view flag.
@@ -87,9 +91,9 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-		WidgetViewBase(ViewFlags _flags = ViewFlags(), ViewType _type = CustomView);
-		WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewFlags _flags = ViewFlags(), ViewType _type = CustomView);
-		WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewDockLocation _dockLocation, ViewFlags _flags = ViewFlags(), ViewType _type = CustomView);
+		WidgetViewBase(ViewType _type, ViewFlags _flags = ViewFlags());
+		WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewType _type, ViewFlags _flags = ViewFlags());
+		WidgetViewBase(const std::string& _entityName, const std::string& _title, ViewDockLocation _dockLocation, ViewType _type, ViewFlags _flags = ViewFlags());
 		WidgetViewBase(const WidgetViewBase& _other);
 		virtual ~WidgetViewBase();
 

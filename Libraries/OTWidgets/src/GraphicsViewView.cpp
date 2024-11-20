@@ -6,7 +6,9 @@
 // OpenTwin header
 #include "OTWidgets/GraphicsViewView.h"
 
-ot::GraphicsViewView::GraphicsViewView() {
+ot::GraphicsViewView::GraphicsViewView() 
+	: WidgetView(WidgetViewBase::ViewGraphics)
+{
 	this->addWidgetToDock(this);
 }
 

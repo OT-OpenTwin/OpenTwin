@@ -6,7 +6,9 @@
 // OpenTwin header
 #include "OTWidgets/TextEditorView.h"
 
-ot::TextEditorView::TextEditorView() {
+ot::TextEditorView::TextEditorView()
+	: WidgetView(WidgetViewBase::ViewText)
+{
 	this->addWidgetToDock(this);
 }
 

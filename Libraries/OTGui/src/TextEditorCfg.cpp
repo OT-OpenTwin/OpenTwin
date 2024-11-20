@@ -7,7 +7,7 @@
 #include "OTGui/TextEditorCfg.h"
 
 ot::TextEditorCfg::TextEditorCfg() 
-	: WidgetViewBase(WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable, WidgetViewBase::ViewText), m_syntax(DocumentSyntax::PlainText)
+	: WidgetViewBase(WidgetViewBase::ViewText, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable), m_syntax(DocumentSyntax::PlainText)
 {}
 
 ot::TextEditorCfg::TextEditorCfg(const TextEditorCfg& _other)
