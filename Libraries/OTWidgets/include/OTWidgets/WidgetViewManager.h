@@ -136,7 +136,7 @@ namespace ot {
 
 		//! @brief Returns true if a view with the given title (or current title) exists
 		//! @param _title Title to check
-		bool getViewTitleExists(const QString& _title) const;
+		bool getViewTitleExists(const std::string& _title) const;
 
 		//! \brief Returns true if the content of any of the views is modified.
 		bool getAnyViewContentModified(void);

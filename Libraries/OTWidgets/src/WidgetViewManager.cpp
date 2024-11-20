@@ -281,8 +281,8 @@ bool ot::WidgetViewManager::getViewExists(const std::string& _entityName, Widget
 	return this->findView(_entityName, _type) != nullptr;
 }
 
-bool ot::WidgetViewManager::getViewTitleExists(const QString& _title) const {
-	return this->findViewFromTitle(_title.toStdString()) != nullptr;
+bool ot::WidgetViewManager::getViewTitleExists(const std::string& _title) const {
+	return this->findViewFromTitle(_title) != nullptr;
 }
 
 bool ot::WidgetViewManager::getAnyViewContentModified(void) {
@@ -414,13 +414,22 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 		OT_LOG_W("WidgetView already exists { \"EntityName\": \"" + nameTypeEntry.first + "\", \"ViewType\": \"" + WidgetViewBase::toString(nameTypeEntry.second) + "\" }");
 		return false;
 	}
-	
+
 	// Get view name list for given owner
 	ViewNameTypeList* lst = this->findOrCreateViewNameTypeList(_owner);
 	auto lstIt = std::find(lst->begin(), lst->end(), nameTypeEntry);
 	if (lstIt != lst->end()) {
 		OT_LOG_E("Invalid entry");
 		return false;
+	}
+
+	// Check if the title already exists and try to create a unique one
+	if (this->getViewTitleExists(_view->getViewData().getTitle())) {
+		WidgetViewBase newViewData = _view->getViewData();
+		newViewData.setTitle(_view->getViewData().getTitle() + " - " + WidgetViewBase::toString(_view->getViewData().getViewType()));
+		if (!this->getViewTitleExists(newViewData.getTitle())) {
+			_view->setViewData(newViewData);
+		}
 	}
 
 	_view->getViewDockWidget()->setWindowIcon(ot::IconManager::getApplicationIcon());

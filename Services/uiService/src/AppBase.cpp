@@ -1321,13 +1321,13 @@ void AppBase::setProgressBarValue(int progressPercentage)
 QString AppBase::availableTabText(
 	const QString &				_initialTabText
 ) {
-	if (!ot::WidgetViewManager::instance().getViewTitleExists(_initialTabText)) {
+	if (!ot::WidgetViewManager::instance().getViewTitleExists(_initialTabText.toStdString())) {
 		return _initialTabText;
 	}
 
 	int v = 1;
 	QString nxt = _initialTabText + " [" + QString::number(v) + "]";
-	while (ot::WidgetViewManager::instance().getViewTitleExists(nxt)) {
+	while (ot::WidgetViewManager::instance().getViewTitleExists(nxt.toStdString())) {
 		nxt = _initialTabText + " [" + QString::number(++v) + "]";
 	}
 	return nxt;
