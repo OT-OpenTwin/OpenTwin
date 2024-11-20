@@ -1,7 +1,7 @@
 #pragma once
 #include "OTServiceFoundation/ModelServiceAPI.h"
 #include "ClassFactory.h"
-//#include "ClassFactoryBlock.h"
+#include "ClassFactoryBlock.h"
 
 class Application
 {
@@ -25,11 +25,11 @@ public:
 private:
 	Application()
 	{
-	//	_classFactory.SetNextHandler(&_classFactoryBlock);
-	//	_classFactoryBlock.SetChainRoot(&_classFactory);
+		_classFactory.SetNextHandler(&_classFactoryBlock);
+		_classFactoryBlock.SetChainRoot(&_classFactory);
 	}
 	ClassFactory _classFactory;
-	//ClassFactoryBlock _classFactoryBlock;
+	ClassFactoryBlock _classFactoryBlock;
 	ot::ModelServiceAPI* _modelServiceAPI = nullptr;
 
 	std::map<ot::UID, ot::UID> m_prefetchedEntityVersions;
