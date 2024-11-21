@@ -1699,7 +1699,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	newEditor->getGraphicsScene()->setGridLineStyle(newOutline);
 
 	m_graphicsViews.insert_or_assign(_entityName, newEditor);
-	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
+	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor);
 
 	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
@@ -1757,7 +1757,7 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	newEditor->setupFromConfig(_config, false);
 	
 	m_textEditors.insert_or_assign(_config.getEntityName(), newEditor);
-	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
+	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor);
 
 	this->connect(newEditor, &ot::TextEditor::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
 
@@ -1824,7 +1824,7 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 	newTable->setupFromConfig(_config);
 
 	m_tables.insert_or_assign(_config.getEntityName(), newTable);
-	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newTable);
+	ot::WidgetViewManager::instance().addView(_serviceInfo, newTable);
 
 	this->connect(newTable, &ot::TableView::saveRequested, this, &AppBase::slotTableSaveRequested);
 
