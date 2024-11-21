@@ -60,6 +60,7 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 			this->setVerticalHeaderItem(r, new QTableWidgetItem(QString::fromStdString(headerItem->getText())));
 		}
 	}
+	header->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
 
 	header = this->horizontalHeader();
 	for (int c = 0; c < _config.getColumnCount(); c++) {
@@ -68,7 +69,7 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 			this->setHorizontalHeaderItem(c, new QTableWidgetItem(QString::fromStdString(headerItem->getText())));
 		}
 	}
-
+	header->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
 	this->resizeColumnsToContents();
 	this->resizeRowsToContents();
 
