@@ -21,7 +21,7 @@ DataCategorizationHandler::DataCategorizationHandler(std::string _baseFolder, st
 
 }
 
-std::string DataCategorizationHandler::markSelectionForStorage(const ot::UIDList& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
+std::string DataCategorizationHandler::markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
 {
 	if (_selectedEntities.empty())
 	{
@@ -35,10 +35,10 @@ std::string DataCategorizationHandler::markSelectionForStorage(const ot::UIDList
 	try
 	{
 		Application::instance()->prefetchDocumentsFromStorage(_selectedEntities);
-		for (ot::UID entityID : _selectedEntities)
+		for (const ot::EntityInformation& entityInfo : _selectedEntities)
 		{
-			ot::UID versionID = Application::instance()->getPrefetchedEntityVersion(entityID);
-			EntityBase* baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityID, versionID, Application::instance()->getClassFactory());
+			ot::UID versionID = Application::instance()->getPrefetchedEntityVersion(entityInfo.getEntityID());
+			EntityBase* baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), versionID, Application::instance()->getClassFactory());
 			selectedEntities.push_back(baseEnt);
 		}
 		std::string returnValue("");
@@ -999,16 +999,16 @@ void DataCategorizationHandler::RequestColouringRanges(std::string colour)
 
 void DataCategorizationHandler::RequestColouringRanges(ot::Color colour)
 {
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection, doc.GetAllocator()), doc.GetAllocator());
+	//ot::JsonDocument doc;
+	//doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection, doc.GetAllocator()), doc.GetAllocator());
 
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _modelComponent->getCurrentVisualizationModelID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SENDER_URL,ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	//doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _modelComponent->getCurrentVisualizationModelID(), doc.GetAllocator());
+	//doc.AddMember(OT_ACTION_PARAM_SENDER_URL,ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	ot::JsonObject obj;
-	colour.addToJsonObject(obj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_COLOUR_BACKGROUND, obj, doc.GetAllocator());
+	//ot::JsonObject obj;
+	//colour.addToJsonObject(obj, doc.GetAllocator());
+	//doc.AddMember(OT_ACTION_PARAM_COLOUR_BACKGROUND, obj, doc.GetAllocator());
 
-	std::string tmp;
-	_uiComponent->sendMessage(true, doc, tmp);
+	//std::string tmp;
+	//_uiComponent->sendMessage(true, doc, tmp);
 }

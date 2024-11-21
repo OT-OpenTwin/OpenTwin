@@ -628,8 +628,6 @@
 #define OT_ACTION_PARAM_TEXT_ID "Text.Entity.ID"
 #define OT_ACTION_PARAM_TEXT_VERSION "Text.Entity.Version"
 
-#define OT_ACTION_PARAM_COLOUR_BACKGROUND "Colour.Background"
-
 #define OT_ACTION_PARAM_SETTINGS_DataName "SettingsData.Dataset.Name"
 #define OT_ACTION_PARAM_SETTINGS_Version "SettingsData.Version"
 #define OT_ACTION_PARAM_SETTINGS_Groups "SettingsData.Groups"

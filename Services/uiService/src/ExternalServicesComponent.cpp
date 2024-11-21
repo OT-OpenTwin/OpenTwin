@@ -4303,23 +4303,6 @@ std::string ExternalServicesComponent::handleSelectRanges(ot::JsonDocument& _doc
 	return "";
 }
 
-std::string ExternalServicesComponent::handleColorSelection(ot::JsonDocument& _document) {
-	ak::UID visualizationModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
-	ot::ConstJsonObject serializedColor = ot::json::getObject(_document, OT_ACTION_PARAM_COLOUR_BACKGROUND);
-
-	try {
-		ot::Color colour;
-		colour.setFromJsonObject(serializedColor);
-		ViewerAPI::ChangeColourOfSelection(visualizationModelID, colour);
-	}
-	catch (std::exception& e) {
-		OT_LOG_E(e.what());
-		AppBase::instance()->appendInfoMessage("Setting color of table selection could not be executed due to exception: " + QString(e.what()));
-	}
-
-	return "";
-}
-
 // Studio Suite API
 
 std::string ExternalServicesComponent::handleStudioSuiteAction(ot::JsonDocument& _document) {

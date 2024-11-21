@@ -38,7 +38,7 @@ ot::TableHeaderOrientation EntityFileCSV::getHeaderOrientation()
 
 bool EntityFileCSV::visualiseText()
 {
-	return false;
+	return true;
 }
 
 void EntityFileCSV::setSpecializedProperties()

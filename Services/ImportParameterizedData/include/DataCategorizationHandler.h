@@ -38,7 +38,7 @@ public:
 	DataCategorizationHandler& operator=(const DataCategorizationHandler& other) = delete;
 	
 	//! @brief If the selection is valid it returns the table name. Otherwise the string is empty.
-	std::string markSelectionForStorage(const ot::UIDList& _selectedEntities,EntityParameterizedDataCategorization::DataCategorie _category);
+	std::string markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities,EntityParameterizedDataCategorization::DataCategorie _category);
 	
 
 	

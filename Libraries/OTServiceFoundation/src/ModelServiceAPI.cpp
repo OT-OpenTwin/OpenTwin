@@ -431,7 +431,11 @@ void ot::ModelServiceAPI::getSelectedEntityInformation(std::list<EntityInformati
 	// Prepare the request
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetSelectedEntityInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SETTINGS_Type, JsonString(typeFilter, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	
+	if (typeFilter != "")
+	{
+		requestDoc.AddMember(OT_ACTION_PARAM_SETTINGS_Type, JsonString(typeFilter, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	}
 
 	// Send the command
 	std::string response;

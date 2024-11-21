@@ -1362,7 +1362,7 @@ std::list<EntityBase*> Model::getListOfSelectedEntities(const std::string& typeF
 	{
 		EntityBase *entity = getEntityByID(entityID);
 
-		if (entity->getClassName() == typeFilter)
+		if (typeFilter == "" || entity->getClassName() == typeFilter)
 		{
 			selectedEntities.push_back(entity);
 		}
