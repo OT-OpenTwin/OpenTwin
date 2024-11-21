@@ -72,6 +72,9 @@
     <ClCompile Include="src\CircuitElements\CurrentMeter.cpp">
       <Filter>Source Files\CircuitElements</Filter>
     </ClCompile>
+    <ClCompile Include="src\SubprocessHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -121,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="include\CircuitElements\CurrentMeter.h">
       <Filter>Header Files\CircuitElements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SubprocessHandler.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

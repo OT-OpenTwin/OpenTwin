@@ -14,7 +14,7 @@
 
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h"	// Base class
-
+#include "SubprocessHandler.h"
 // C++ header
 #include <string>
 #include <map>
@@ -41,7 +41,7 @@ private:
 	NGSpice m_ngSpice;
 	BlockEntityHandler m_blockEntityHandler;
 	std::list<ot::UID>	selectedEntities;
-
+	//SubprocessHandler* _subprocessHandler = nullptr;
 
 	
 public:
@@ -150,4 +150,8 @@ public:
 	//! send to the uiService to update the Settings in the dialog
 	//! @param The item that has been changed in the uiService (instance will be deleted after this function call)
 	virtual bool settingChanged(const ot::Property* _item) override;
+
+
+
+	
 };

@@ -331,7 +331,12 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationTypeProperty != nullptr);
 
-	
+	//const int sessionCount = Application::instance()->getSessionCount();
+	//const int serviceID = Application::instance()->getServiceIDAsInt();
+	//if (_subprocessHandler == nullptr)
+	//{
+	//	_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
+	//}
 
 	std::string name =  extractStringAfterDelimiter(circuitName->getValueName(), '/', 1);
 	std::string solverName = solver.getEntityName();
@@ -496,6 +501,13 @@ void Application::run(void) {
 	{
 		assert(0);
 	}
+
+	/*const int sessionCount = Application::instance()->getSessionCount();
+	const int serviceID = Application::instance()->getServiceIDAsInt();
+	if (_subprocessHandler == nullptr)
+	{
+		_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
+	}*/
 }
 
 std::string Application::processAction(const std::string & _action, ot::JsonDocument & _doc) {
@@ -519,6 +531,14 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 	/*m_blockEntityHandler.setPackageName("Circuit"); */
 	m_blockEntityHandler.OrderUIToCreateBlockPicker();
 
+	//if (_subprocessHandler == nullptr)
+	//{
+	//	const int sessionCount = Application::instance()->getSessionCount();
+	//	const int serviceID = Application::instance()->getServiceIDAsInt();
+	//	_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
+	//}
+	//_subprocessHandler->setUIComponent(_ui);
+
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
 }
@@ -533,7 +553,13 @@ void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugi
 
 void Application::modelConnected(ot::components::ModelComponent * _model) {
 	m_blockEntityHandler.setModelComponent(_model);
-	
+	//if (_subprocessHandler == nullptr)
+	//{
+	//	const int sessionCount = Application::instance()->getSessionCount();
+	//	const int serviceID = Application::instance()->getServiceIDAsInt();
+	//	_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
+	//}
+	//_subprocessHandler->setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model) {

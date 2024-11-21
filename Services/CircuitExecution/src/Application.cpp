@@ -13,25 +13,25 @@
 
 void Application::setModelServiceURL(const std::string& url)
 {
-	_modelServiceAPI = new ot::ModelServiceAPI("", url);
+	m_modelServiceAPI = new ot::ModelServiceAPI("", url);
 }
 
 void Application::setUIServiceURL(const std::string& url)
 {
-	_uiURL = url;
+	m_uiURL = url;
 }
 
 ClassFactory& Application::getClassFactory()
 {
 
-	return _classFactory;
+	return m_classFactory;
 }
 
 void Application::prefetchDocumentsFromStorage(const std::list<ot::UID>& entities)
 {
 	// First get the version information for all entities
 	std::list<ot::EntityInformation> entityInfo;
-	_modelServiceAPI->getEntityInformation(entities, entityInfo);
+	m_modelServiceAPI->getEntityInformation(entities, entityInfo);
 
 	// Now prefetch the documents
 	prefetchDocumentsFromStorage(entityInfo);
