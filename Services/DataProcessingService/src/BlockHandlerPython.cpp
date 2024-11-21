@@ -87,7 +87,7 @@ bool BlockHandlerPython::executeSpecialized()
         }
         else
         {
-            _uiComponent->displayMessage(returnMessage.getWhat());
+            throw std::exception(returnMessage.getWhat().c_str());
         }
     }
     return allInputsComplete;
