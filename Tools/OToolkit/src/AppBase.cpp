@@ -429,7 +429,7 @@ void AppBase::slotFinalizeInit(void) {
 	// Check current view to correctly display toolbar, statusbar and so on
 	ot::WidgetView* currentView = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
 	if (currentView) {
-		m_toolManager->getToolViewManager()->slotViewFocused(currentView);
+		m_toolManager->getToolViewManager()->slotViewFocusChanged(currentView, nullptr);
 	}
 	
 	this->setEnabled(true);

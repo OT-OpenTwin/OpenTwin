@@ -503,8 +503,7 @@ private Q_SLOTS:
 	void slotVersionDeselected(void);
 	void slotRequestVersion(const std::string& _versionName);
 
-	void slotViewFocusLost(ot::WidgetView* _view);
-	void slotViewFocused(ot::WidgetView* _view);
+	void slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView);
 	void slotViewCloseRequested(ot::WidgetView* _view);
 	void slotOutputContextMenuItemClicked();
 	void slotColorStyleChanged(const ot::ColorStyle& _style);
@@ -630,6 +629,8 @@ private:
 	};
 	StateInformation			m_currentStateWindow;
 	
+	ot::WidgetView* m_lastFocusedCentralView;
+
 	ot::VersionGraphManagerView* m_versionGraph;
 	std::map<std::string, ot::GraphicsViewView*> m_graphicsViews;
 	std::map<std::string, ot::TextEditorView*> m_textEditors;

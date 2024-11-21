@@ -178,7 +178,8 @@ AppBase::AppBase()
 	m_state(AppState::NoState),
 	m_welcomeScreen(nullptr),
 	m_ttb(nullptr),
-	m_logIntensity(nullptr)
+	m_logIntensity(nullptr),
+	m_lastFocusedCentralView(nullptr)
 {
 	m_contextMenus.output.clear = invalidID;
 
@@ -909,8 +910,7 @@ void AppBase::createUi(void) {
 			this->connect(m_projectNavigation, &ak::aTreeWidget::itemTextChanged, this, &AppBase::slotTreeItemTextChanged);
 			this->connect(m_projectNavigation, &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
 
-			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusLost, this, &AppBase::slotViewFocusLost);
-			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocused, this, &AppBase::slotViewFocused);
+			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusChanged, this, &AppBase::slotViewFocusChanged);
 			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &AppBase::slotViewCloseRequested);
 
 			uiAPI::registerUidNotifier(m_mainWindow, this);
@@ -2271,22 +2271,70 @@ void AppBase::slotRequestVersion(const std::string& _versionName) {
 	m_ExternalServicesComponent->activateVersion(_versionName);
 }
 
-void AppBase::slotViewFocusLost(ot::WidgetView* _view) {
+void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView) {
+	ak::aTreeWidgetItem* itemToDeselect = nullptr;
 
-}
-
-void AppBase::slotViewFocused(ot::WidgetView* _view) {
-	if (!_view) return;
-	if (_view->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
-		m_viewerComponent->viewerTabChanged(_view->getViewData().getEntityName(), _view->getViewData().getViewType());
+	// Previous (focus lost)
+	if (_previousView) {
+		// Select corresponding tree entry if exists
+		if (_previousView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) { // Focus out is from central
+			itemToDeselect = m_projectNavigation->itemFromPath(QString::fromStdString(_previousView->getViewData().getEntityName()), '/');
+		}
+		else if (m_lastFocusedCentralView) { // Use last focused central for deselect
+			itemToDeselect = m_projectNavigation->itemFromPath(QString::fromStdString(m_lastFocusedCentralView->getViewData().getEntityName()), '/');
+		}
 	}
 
-	ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_view);
-	if (graphicsView) {
-		ot::BasicServiceInformation owner = ot::WidgetViewManager::instance().getOwnerFromView(graphicsView);
-		if (owner != m_graphicsPickerManager.getCurrentOwner()) {
-			this->fillGraphicsPicker(owner);
+	// Newly focused (focus in)
+	if (_focusedView) {
+		// Update graphics picker content
+		ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_focusedView);
+		if (graphicsView) {
+			ot::BasicServiceInformation owner = ot::WidgetViewManager::instance().getOwnerFromView(graphicsView);
+			if (owner != m_graphicsPickerManager.getCurrentOwner()) {
+				this->fillGraphicsPicker(owner);
+			}
 		}
+
+		// Forward focus events of central views to the viewer component
+		if (_focusedView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
+			m_viewerComponent->viewerTabChanged(_focusedView->getViewData().getEntityName(), _focusedView->getViewData().getViewType());
+
+			ak::aTreeWidgetItem* itemToSelect = m_projectNavigation->itemFromPath(QString::fromStdString(_focusedView->getViewData().getEntityName()), '/');
+
+			// Change item selection according to focused view
+			if (m_lastFocusedCentralView != _focusedView && itemToSelect != itemToDeselect) {
+				bool changed = false;
+				bool blocked = m_projectNavigation->signalsBlocked();
+				m_projectNavigation->blockSignals(blocked);
+
+				// Deselect
+				if (itemToDeselect) {
+					if (itemToDeselect->isSelected()) {
+						itemToDeselect->setSelected(false);
+						changed = true;
+					}
+				}
+
+				// Select
+				if (itemToSelect) {
+					if (!itemToSelect->isSelected()) {
+						itemToSelect->setSelected(true);
+						changed = true;
+					}
+				}
+
+				m_projectNavigation->blockSignals(blocked);
+
+				// Notify if needed
+				if (changed) {
+					m_projectNavigation->selectionChangedEvent(true);
+				}
+			}
+
+			m_lastFocusedCentralView = _focusedView;
+		}
+
 	}
 }
 

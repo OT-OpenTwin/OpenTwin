@@ -339,16 +339,12 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CD
 	WidgetView* o = this->getViewFromDockWidget(_oldFocus);
 	WidgetView* n = this->getViewFromDockWidget(_newFocus);
 
-	if (o) {
-		Q_EMIT viewFocusLost(o);
-	}
-
 	if (n) {
 		m_focusInfo.last = n;
 		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsCentral) m_focusInfo.lastCentral = n;
 		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsSide) m_focusInfo.lastSide = n;
 		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsTool) m_focusInfo.lastTool = n;
-		Q_EMIT viewFocused(n);
+		Q_EMIT viewFocusChanged(n, o);
 	}
 }
 

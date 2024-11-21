@@ -170,8 +170,7 @@ namespace ot {
 		WidgetView* getLastFocusedCentralView(void) const { return m_focusInfo.lastCentral; };
 
 	Q_SIGNALS:
-		void viewFocusLost(WidgetView* _view);
-		void viewFocused(WidgetView* _view);
+		void viewFocusChanged(WidgetView* _focusedView, WidgetView* _previousView);
 		void viewCloseRequested(WidgetView* _view);
 
 	private Q_SLOTS:

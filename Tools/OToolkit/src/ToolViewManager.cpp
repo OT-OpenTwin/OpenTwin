@@ -12,8 +12,7 @@
 #include "OTWidgets/WidgetViewManager.h"
 
 ToolViewManager::ToolViewManager() {
-	this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocused, this, &ToolViewManager::slotViewFocused);
-	this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusLost, this, &ToolViewManager::slotViewFocusLost);
+	this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusChanged, this, &ToolViewManager::slotViewFocusChanged);
 	this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &ToolViewManager::slotViewCloseRequested);
 }
 
@@ -88,38 +87,36 @@ ToolRuntimeHandler* ToolViewManager::findTool(ot::WidgetView* _view) const {
 
 // Slots
 
-void ToolViewManager::slotViewFocused(ot::WidgetView* _view) {
-	OTAssertNullptr(_view);
+void ToolViewManager::slotViewFocusChanged(ot::WidgetView* _focused, ot::WidgetView* _previousView) {
+	if (_previousView) {
+		if (this->isViewIgnored(_previousView)) return;
 
-	if (this->isViewIgnored(_view)) return;
+		const auto& it = m_viewMap.find(_previousView);
+		if (it == m_viewMap.end()) {
+			OT_LOG_E("View not found");
+			return;
+		}
 
-	const auto& it = m_viewMap.find(_view);
-	if (it == m_viewMap.end()) {
-		OT_LOG_E("View not found");
-		return;
+		OTAssertNullptr(it->second);
+		OTAssertNullptr(it->second->getTool());
+
+		Q_EMIT viewFocusLost(QString::fromStdString(_previousView->getViewData().getEntityName()), it->second->getTool()->getToolName());
 	}
 
-	OTAssertNullptr(it->second);
-	OTAssertNullptr(it->second->getTool());
-	
-	Q_EMIT viewFocused(QString::fromStdString(_view->getViewData().getEntityName()), it->second->getTool()->getToolName());
-}
+	if (_focused) {
+		if (this->isViewIgnored(_focused)) return;
 
-void ToolViewManager::slotViewFocusLost(ot::WidgetView* _view) {
-	OTAssertNullptr(_view);
+		const auto& it = m_viewMap.find(_focused);
+		if (it == m_viewMap.end()) {
+			OT_LOG_E("View not found");
+			return;
+		}
 
-	if (this->isViewIgnored(_view)) return;
+		OTAssertNullptr(it->second);
+		OTAssertNullptr(it->second->getTool());
 
-	const auto& it = m_viewMap.find(_view);
-	if (it == m_viewMap.end()) {
-		OT_LOG_E("View not found");
-		return;
+		Q_EMIT viewFocused(QString::fromStdString(_focused->getViewData().getEntityName()), it->second->getTool()->getToolName());
 	}
-
-	OTAssertNullptr(it->second);
-	OTAssertNullptr(it->second->getTool());
-
-	Q_EMIT viewFocusLost(QString::fromStdString(_view->getViewData().getEntityName()), it->second->getTool()->getToolName());
 }
 
 void ToolViewManager::slotViewCloseRequested(ot::WidgetView* _view) {
