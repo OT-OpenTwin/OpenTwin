@@ -23,6 +23,7 @@ DataCategorizationHandler::DataCategorizationHandler(std::string _baseFolder, st
 
 std::string DataCategorizationHandler::markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
 {
+	ensureEssentials();
 	if (_selectedEntities.empty())
 	{
 		_uiComponent->displayDebugMessage("No table selection detected.");
