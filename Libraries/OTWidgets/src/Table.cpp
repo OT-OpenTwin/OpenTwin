@@ -107,9 +107,12 @@ void ot::Table::setSelectedCellsBackground(const ot::Color& _color) {
 }
 
 void ot::Table::setSelectedCellsBackground(const QColor& _color) {
+	bool blocked = this->signalsBlocked();
+	this->blockSignals(true);
 	for (QTableWidgetItem* item : this->selectedItems()) {
 		item->setBackground(QBrush(_color));
 	}
+	this->blockSignals(blocked);
 }
 
 void ot::Table::prepareForDataChange(void) {
