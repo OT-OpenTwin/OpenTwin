@@ -105,6 +105,8 @@ std::string DataCategorizationHandler::getTableFromSelection(std::list<EntityBas
 		if (table != nullptr)
 		{
 			tableEntityName = entity->getName();
+			m_bufferedTableID = entity->getEntityID();
+			m_bufferedTableVersion = entity->getEntityStorageVersion();
 		}
 	}
 	assert(tableEntityName != "");
@@ -336,14 +338,16 @@ void DataCategorizationHandler::addNewCategorizationEntity(std::string name, Ent
 
 
 
-void DataCategorizationHandler::storeSelectionRanges(ot::UID _tableEntityID, ot::UID _tableEntityVersion, const std::vector<ot::TableRange>& _ranges)
+void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::TableRange>& _ranges)
 {
 	if (_ranges.size() == 0)
 	{
 		return;
 	}
 
-	auto tableBase = _modelComponent->readEntityFromEntityIDandVersion(_tableEntityID, _tableEntityVersion, Application::instance()->getClassFactory());
+	auto tableBase = _modelComponent->readEntityFromEntityIDandVersion(m_bufferedTableID, m_bufferedTableVersion, Application::instance()->getClassFactory());
+	m_bufferedTableID = -1;
+	m_bufferedTableVersion = -1;
 	auto tableEntity = dynamic_cast<IVisualisationTable*>(tableBase);
 	if (tableEntity == nullptr)
 	{
@@ -949,7 +953,7 @@ inline void DataCategorizationHandler::ensureEssentials()
 		_modelComponent->getEntityInformation(*allItems.begin(), entityInfo);
 		m_rmdEntityName = entityInfo.getEntityName();
 	}
-	if (m_scriptFolderUID == 0)
+	if (m_scriptFolderUID == -1)
 	{
 		ot::EntityInformation entityInfo;
 		_modelComponent->getEntityInformation(ot::FolderNames::PythonScriptFolder , entityInfo);

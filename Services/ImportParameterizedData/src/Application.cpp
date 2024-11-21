@@ -344,10 +344,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 					tableRange.setFromJsonObject(range);
 					ranges.push_back(tableRange);
 				}
-
-				ot::UID tableEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				ot::UID tableEntityVersion = _doc[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
-				_parametrizedDataHandler->storeSelectionRanges(tableEntityID, tableEntityVersion, ranges);
+				_parametrizedDataHandler->storeSelectionRanges(ranges);
 			}
 			else if (subsequentFunction == "ColourRanges")
 			{

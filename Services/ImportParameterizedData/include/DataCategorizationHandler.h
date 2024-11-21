@@ -42,7 +42,7 @@ public:
 	
 
 	
-	void storeSelectionRanges(ot::UID _tableEntityID, ot::UID _tableEntityVersion, const std::vector<ot::TableRange>& _ranges);
+	void storeSelectionRanges(const std::vector<ot::TableRange>& _ranges);
 	void CreateNewScriptDescribedMSMD();
 
 	//std::pair<ot::UID, ot::UID> GetPreview(ot::EntityInformation selectedPreviewTable);
@@ -81,6 +81,8 @@ private:
 	std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>> _allRelevantTableSelectionsByMSMD;
 	std::map<std::string, std::list<std::optional<std::list<ot::Variable>>>> _allVariablesByMSMD;
 	std::set<std::string> m_bufferedCategorisationNames;
+	ot::UID m_bufferedTableID = -1;
+	ot::UID m_bufferedTableVersion = -1;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> m_markedForStorringEntities;
 
 	ot::PythonServiceInterface* _pythonInterface = nullptr;
