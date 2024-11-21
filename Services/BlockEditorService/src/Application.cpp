@@ -37,19 +37,19 @@ std::string Application::test(void) {
 
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_Setup, doc.GetAllocator()), doc.GetAllocator());
 	
-	int rows = 50000;
-
-	ot::TableCfg cfg(rows, 3);
+	int rows = 2000;
+	int cols = 1000;
+	ot::TableCfg cfg(rows, cols);
 	cfg.setEntityName("Tester");
 
-	cfg.setColumnHeader(0, "Name");
-	cfg.setColumnHeader(1, "Age");
-	cfg.setColumnHeader(2, "Ix");
+	for (int c = 0; c < cols; c++) {
+		cfg.setColumnHeader(c, "Title " + std::to_string(c + 1));
+	}
 
 	for (int r = 0; r < rows; r++) {
-		cfg.setCellText(r, 0, "Name " + std::to_string(r + 1));
-		cfg.setCellText(r, 1, "Age  " + std::to_string(r));
-		cfg.setCellText(r, 2, "Index " + std::to_string(r));
+		for (int c = 0; c < cols; c++) {
+			cfg.setCellText(r, c, "Cell (r = " + std::to_string(r) + "; c = " + std::to_string(c) + ")");
+		}
 	}
 
 	ot::JsonObject cfgObj;
