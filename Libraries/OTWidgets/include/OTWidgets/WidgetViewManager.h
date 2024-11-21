@@ -38,6 +38,10 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(WidgetViewManager)
 	public:
+		typedef std::pair<std::string, WidgetViewBase::ViewType> ViewNameTypeListEntry;
+		typedef std::list<ViewNameTypeListEntry> ViewNameTypeList;
+		typedef std::pair<BasicServiceInformation, ot::WidgetView*> ViewEntry;
+
 		//! @brief Return the clobal instance
 		static WidgetViewManager& instance(void);
 
@@ -81,6 +85,10 @@ namespace ot {
 
 		//! @brief Returns the widget view that owns this dock
 		WidgetView* getViewFromDockWidget(ads::CDockWidget* _dock) const;
+
+		//! @brief Close and destroy the provided view.
+		//! @param _view The view to close.
+		void closeView(WidgetView* _view);
 
 		//! @brief Close the widget view with the specified name.
 		//! Widget views that are protected will be ignored.
@@ -130,6 +138,10 @@ namespace ot {
 
 		// Information gathering
 
+		//! @brief Returns the owner for the given view.
+		//! Returns default BasicServiceInformation if the view is not stored in this manager.
+		BasicServiceInformation getOwnerFromView(WidgetView* _view) const;
+
 		//! @brief Returns true if a view with the given name exists
 		//! @param _entityName Name to check
 		bool getViewExists(const std::string& _entityName, WidgetViewBase::ViewType _type) const;
@@ -137,6 +149,12 @@ namespace ot {
 		//! @brief Returns true if a view with the given title (or current title) exists
 		//! @param _title Title to check
 		bool getViewTitleExists(const std::string& _title) const;
+
+		//! @brief Returns all view names that belong to the given owner.
+		ViewNameTypeList getViewNamesFromOwner(const BasicServiceInformation& _owner) const;
+
+		//! @brief Returns all view names with the given type that belong to the given owner.
+		std::list<std::string> getViewNamesFromOwner(const BasicServiceInformation& _owner, WidgetViewBase::ViewType _type) const;
 
 		//! \brief Returns true if the content of any of the views is modified.
 		bool getAnyViewContentModified(void);
@@ -162,10 +180,6 @@ namespace ot {
 		void slotUpdateViewVisibility(void);
 
 	private:
-		typedef std::pair<std::string, WidgetViewBase::ViewType> ViewNameTypeListEntry;
-		typedef std::list<ViewNameTypeListEntry> ViewNameTypeList;
-		typedef std::pair<BasicServiceInformation, ot::WidgetView*> ViewEntry;
-
 		WidgetViewManager();
 		~WidgetViewManager();
 

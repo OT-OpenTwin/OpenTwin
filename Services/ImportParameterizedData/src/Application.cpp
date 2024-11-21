@@ -529,8 +529,6 @@ void Application::RequestSelectedRanges(const std::string& _tableName)
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SetCurrentSelectionBackground, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_tableName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_RequestCallback, true, doc.GetAllocator());
-	ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
-	modelService.addToJsonObject(doc, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("CreateSelectedRangeEntity", doc.GetAllocator()), doc.GetAllocator());
 

@@ -62,6 +62,7 @@
   <ItemGroup>
     <ClInclude Include="include\OTCore\BasicServiceInformation.h" />
     <ClInclude Include="include\OTCore\ComplexNumbers.h" />
+    <ClInclude Include="include\OTCore\ContainerHelper.h" />
     <ClInclude Include="include\OTCore\DefensiveProgramming.h" />
     <ClInclude Include="include\OTCore\BasicEntityInformation.h" />
     <ClInclude Include="include\OTCore\LocalSettingsSwitch.h" />
@@ -91,7 +92,6 @@
     <ClInclude Include="include\OTCore\OTAssert.h" />
     <ClInclude Include="include\OTCore\OTClassHelper.h" />
     <ClInclude Include="include\OTCore\Owner.h" />
-    <ClInclude Include="include\OTCore\OwnerManagerTemplate.h" />
     <ClInclude Include="include\OTCore\OwnerService.h" />
     <ClInclude Include="include\OTCore\OwnerServiceGlobal.h" />
     <ClInclude Include="include\OTCore\PerformanceTests.h" />

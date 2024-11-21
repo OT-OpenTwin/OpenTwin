@@ -123,9 +123,6 @@
     <ClInclude Include="include\OTCore\Owner.h">
       <Filter>include\Owner</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\OwnerManagerTemplate.h">
-      <Filter>include\Owner</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTCore\OwnerService.h">
       <Filter>include\Owner</Filter>
     </ClInclude>
@@ -287,6 +284,9 @@
     </ClInclude>
     <ClInclude Include="include\OTCore\LocalSettingsSwitch.h" />
     <ClInclude Include="include\OTCore\BasicEntityInformation.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\ContainerHelper.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

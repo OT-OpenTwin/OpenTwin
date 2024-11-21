@@ -19,8 +19,6 @@ Note that calling SetText for an existing editor will set the editors contents c
         // ...
 
         // Create response document
-        ot::JsonDocument doc;
-        this->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
 
         // Add the "SetSaved" action to notify the editor that the changes have been saved
         doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved, doc.GetAllocator()), doc.GetAllocator());
@@ -62,8 +60,7 @@ When the handler is called, the provided document holds the editor name and text
 
 	    // Create response document
 	    ot::JsonDocument doc;
-	    this->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
-
+	    
 	    // Add the "SetSaved" action to notify the editor that the changes have been saved
 	    doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved, doc.GetAllocator()), doc.GetAllocator());
 

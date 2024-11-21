@@ -112,8 +112,7 @@ std::string Application::handleEditorSaveRequested(ot::JsonDocument& _document) 
 
 	// Create response document
 	ot::JsonDocument doc;
-	this->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
-
+	
 	// Add the "SetSaved" action to notify the editor that the changes have been saved
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetSaved, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editorName, doc.GetAllocator()), doc.GetAllocator());
@@ -201,7 +200,6 @@ std::string Application::handleTableSaved(ot::JsonDocument& _document) {
 	ot::JsonDocument responseDoc;
 	responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SetSaved, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	responseDoc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(cfg.getEntityName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
-	this->getBasicServiceInformation().addToJsonObject(responseDoc, responseDoc.GetAllocator());
 
 	std::string tmp;
 	m_uiComponent->sendMessage(true, responseDoc, tmp);

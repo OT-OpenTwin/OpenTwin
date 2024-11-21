@@ -45,6 +45,7 @@
 #include "OTCore/Point2D.h"
 #include "OTCore/OTAssert.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTCore/ContainerHelper.h"
 
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/ColorStyleTypes.h"
@@ -1176,8 +1177,9 @@ void AppBase::switchToTab(const std::string &menu) {
 }
 
 void AppBase::closeAllViewerTabs(void) {
-	m_graphicsViews.free();
-	m_textEditors.free();
+	m_graphicsViews.clear();
+	m_textEditors.clear();
+	m_tables.clear();
 	m_versionGraph = nullptr;
 	ot::WidgetViewManager::instance().closeViews();
 }
@@ -1669,17 +1671,22 @@ void AppBase::clearGraphicsPickerData(void) {
 	m_graphicsPickerManager.setCurrentOwner(ot::BasicServiceInformation());
 }
 
-ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo) {
-	ot::GraphicsViewView* newEditor = this->findGraphicsEditor(_name, _serviceInfo);
+ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo) {
+	ot::GraphicsViewView* newEditor = this->findGraphicsEditor(_entityName);
 	if (newEditor != nullptr) {
-		OT_LOG_D("GraphicsEditor already exists { \"Editor.Name\": \"" + _name + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
+		OT_LOG_D("GraphicsEditor already exists { \"Editor.Name\": \"" + _entityName + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newEditor;
 	}
 
+	if (ot::WidgetViewManager::instance().findView(_entityName, ot::WidgetViewBase::ViewGraphics)) {
+		OT_LOG_EAS("GraphicsEditor managed data mismatch { \"Entity\": \"" + _entityName + "\" }");
+		return nullptr;
+	}
+
 	newEditor = new ot::GraphicsViewView;
-	newEditor->setViewData(ot::WidgetViewBase(_name, _title.toStdString(), ot::WidgetViewBase::ViewGraphics, ot::WidgetViewBase::ViewIsCentral /*| ot::WidgetViewBase::ViewIsCloseable*/));
+	newEditor->setViewData(ot::WidgetViewBase(_entityName, _title.toStdString(), ot::WidgetViewBase::ViewGraphics, ot::WidgetViewBase::ViewIsCentral /*| ot::WidgetViewBase::ViewIsCloseable*/));
 	newEditor->setOwner(_serviceInfo);
-	newEditor->setGraphicsViewName(_name);
+	newEditor->setGraphicsViewName(_entityName);
 	newEditor->setGraphicsViewFlag(ot::GraphicsView::ViewManagesSceneRect);
 	newEditor->setDropsEnabled(true);
 	newEditor->setSceneMargins(QMarginsF(200., 200., 200., 200.));
@@ -1691,7 +1698,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name,
 	newOutline.setStyle(ot::DotLine);
 	newEditor->getGraphicsScene()->setGridLineStyle(newOutline);
 
-	m_graphicsViews.store(_serviceInfo, newEditor);
+	m_graphicsViews.insert_or_assign(_entityName, newEditor);
 	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
 
 	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
@@ -1700,33 +1707,34 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _name,
 	connect(newEditor, &ot::GraphicsView::itemConfigurationChanged, this, &AppBase::slotGraphicsItemChanged);
 	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChangeFinished, this, &AppBase::slotGraphicsSelectionChanged);
 
-	OT_LOG_D("GraphicsEditor created { \"Editor.Name\": \"" + _name  + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	OT_LOG_D("GraphicsEditor created { \"Editor.Name\": \"" + _entityName + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
 	return newEditor;
 }
 
-ot::GraphicsViewView* AppBase::findGraphicsEditor(const std::string& _name, ot::BasicServiceInformation _serviceInfo) {
-	if (m_graphicsViews.contains(_serviceInfo)) {
-		const std::list<ot::GraphicsViewView*>& lst = m_graphicsViews[_serviceInfo];
-
-		for (auto v : lst) {
-			if (v->getGraphicsViewName() == _name) return v;
-		}
+ot::GraphicsViewView* AppBase::findGraphicsEditor(const std::string& _entityName) {
+	auto it = m_graphicsViews.find(_entityName);
+	if (it == m_graphicsViews.end()) {
+		return nullptr;
 	}
-
-	return nullptr;
+	else {
+		return it->second;
+	}
 }
 
-ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::GraphicsViewView* v = this->findGraphicsEditor(_name, _serviceInfo);
-	if (v) return v;
+ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
+	ot::GraphicsViewView* v = this->findGraphicsEditor(_entityName);
+	if (v) {
+		return v;
+	}
 
-	OT_LOG_D("Graphics Editor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _name + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
-	return this->createNewGraphicsEditor(_name, _title, _serviceInfo);
+	OT_LOG_D("Graphics Editor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _entityName + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+
+	return this->createNewGraphicsEditor(_entityName, _title, _serviceInfo);
 }
 
 std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors(void) {
-	return m_graphicsViews.getAll();
+	return std::move(ot::listFromMapValues(m_graphicsViews));
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -1734,17 +1742,22 @@ std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors(void) {
 // Text Editor
 
 ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::TextEditorView* newEditor = this->findTextEditor(_config.getEntityName(), _serviceInfo);
+	ot::TextEditorView* newEditor = this->findTextEditor(_config.getEntityName());
 	if (newEditor != nullptr) {
 		OT_LOG_D("TextEditor already exists { \"Editor.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newEditor;
 	}
 
+	if (ot::WidgetViewManager::instance().findView(_config.getEntityName(), ot::WidgetViewBase::ViewText)) {
+		OT_LOG_EAS("TextEditor managed data mismatch { \"Entity\": \"" + _config.getEntityName() + "\" }");
+		return nullptr;
+	}
+
 	newEditor = new ot::TextEditorView;
 	newEditor->setupFromConfig(_config, false);
 	
+	m_textEditors.insert_or_assign(_config.getEntityName(), newEditor);
 	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
-	m_textEditors.store(_serviceInfo, newEditor);
 
 	this->connect(newEditor, &ot::TextEditor::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
 
@@ -1753,22 +1766,18 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	return newEditor;
 }
 
-ot::TextEditorView* AppBase::findTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
-	if (m_textEditors.contains(_serviceInfo)) {
-		const std::list<ot::TextEditorView*>& lst = m_textEditors[_serviceInfo];
-
-		for (auto v : lst) {
-			if (v->getViewData().getEntityName() == _name) {
-				return v;
-			}
-		}
+ot::TextEditorView* AppBase::findTextEditor(const std::string& _entityName) {
+	auto it = m_textEditors.find(_entityName);
+	if (it == m_textEditors.end()) {
+		return nullptr;
 	}
-
-	return nullptr;
+	else {
+		return it->second;
+	}
 }
 
 ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::TextEditorView* v = this->findTextEditor(_config.getEntityName(), _serviceInfo);
+	ot::TextEditorView* v = this->findTextEditor(_config.getEntityName());
 	if (v) {
 		v->setupFromConfig(_config, true);
 		return v;
@@ -1778,39 +1787,20 @@ ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _co
 	return this->createNewTextEditor(_config, _serviceInfo);
 }
 
-void AppBase::closeTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
-	if (m_textEditors.contains(_serviceInfo)) {
-		std::list<ot::TextEditorView*>& lst = m_textEditors[_serviceInfo];
-		std::list<ot::TextEditorView*> tmp = lst;
-		lst.clear();
+void AppBase::closeTextEditor(const std::string& _entityName) {
+	ot::TextEditorView* view = this->findTextEditor(_entityName);
+	if (!view) {
+		OT_LOG_EAS("Text editor \"" + _entityName + "\" not found");
+		return;
+	}
 
-		for (auto v : tmp) {
-			if (v->getViewData().getEntityName() == _name) {
-				this->cleanupWidgetViewInfo(v);
-				ot::WidgetViewManager::instance().closeView(_name, v->getViewData().getViewType());
-			}
-			else {
-				lst.push_back(v);
-			}
-		}
-	}
-	else {
-		OT_LOG_WA("Text editors not found for given service");
-	}
+	this->cleanupWidgetViewInfo(view);
+	ot::WidgetViewManager::instance().closeView(view);
 }
 
 void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInfo) {
-	if (m_textEditors.contains(_serviceInfo)) {
-		std::list<ot::TextEditorView*>& lst = m_textEditors[_serviceInfo];
-
-		for (auto v : lst) {
-			std::string name = v->getViewData().getEntityName();
-			ot::WidgetViewManager::instance().closeView(name, v->getViewData().getViewType());
-		}
-		lst.clear();
-	}
-	else {
-		OT_LOG_WA("Text editors not found for given service");
+	for (const std::string& editorName : ot::WidgetViewManager::instance().getViewNamesFromOwner(_serviceInfo, ot::WidgetViewBase::ViewText)) {
+		this->closeTextEditor(editorName);
 	}
 }
 
@@ -1819,17 +1809,22 @@ void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInf
 // Table
 
 ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::TableView* newTable = this->findTable(_config.getEntityName(), _serviceInfo);
+	ot::TableView* newTable = this->findTable(_config.getEntityName());
 	if (newTable != nullptr) {
 		OT_LOG_D("Table already exists { \"Table.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
 		return newTable;
 	}
 
+	if (ot::WidgetViewManager::instance().findView(_config.getEntityName(), ot::WidgetViewBase::ViewTable)) {
+		OT_LOG_EAS("TextEditor managed data mismatch { \"Entity\": \"" + _config.getEntityName() + "\" }");
+		return nullptr;
+	}
+
 	newTable = new ot::TableView;
 	newTable->setupFromConfig(_config);
 
+	m_tables.insert_or_assign(_config.getEntityName(), newTable);
 	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newTable);
-	m_tables.store(_serviceInfo, newTable);
 
 	this->connect(newTable, &ot::TableView::saveRequested, this, &AppBase::slotTableSaveRequested);
 
@@ -1838,22 +1833,18 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 	return newTable;
 }
 
-ot::TableView* AppBase::findTable(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
-	if (m_tables.contains(_serviceInfo)) {
-		const std::list<ot::TableView*>& lst = m_tables[_serviceInfo];
-
-		for (auto v : lst) {
-			if (v->getViewData().getEntityName() == _name) {
-				return v;
-			}
-		}
+ot::TableView* AppBase::findTable(const std::string& _entityName) {
+	auto it = m_tables.find(_entityName);
+	if (it == m_tables.end()) {
+		return nullptr;
 	}
-
-	return nullptr;
+	else {
+		return it->second;
+	}
 }
 
 ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
-	ot::TableView* v = this->findTable(_config.getEntityName(), _serviceInfo);
+	ot::TableView* v = this->findTable(_config.getEntityName());
 	if (v) {
 		v->setupFromConfig(_config);
 		return v;
@@ -1863,25 +1854,15 @@ ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot:
 	return this->createNewTable(_config, _serviceInfo);
 }
 
-void AppBase::closeTable(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo) {
-	if (m_tables.contains(_serviceInfo)) {
-		std::list<ot::TableView*>& lst = m_tables[_serviceInfo];
-		std::list<ot::TableView*> tmp = lst;
-		lst.clear();
+void AppBase::closeTable(const std::string& _entityName, const ot::BasicServiceInformation& _serviceInfo) {
+	ot::TableView* view = this->findTable(_entityName);
+	if (!view) {
+		OT_LOG_EAS("Table \"" + _entityName + "\" not found");
+		return;
+	}
 
-		for (auto v : tmp) {
-			if (v->getViewData().getEntityName() == _name) {
-				this->cleanupWidgetViewInfo(v);
-				ot::WidgetViewManager::instance().closeView(_name, v->getViewData().getViewType());
-			}
-			else {
-				lst.push_back(v);
-			}
-		}
-	}
-	else {
-		OT_LOG_WA("Text editors not found for given service");
-	}
+	this->cleanupWidgetViewInfo(view);
+	ot::WidgetViewManager::instance().closeView(view);
 }
 
 // ######################################################################################################################
@@ -1961,7 +1942,7 @@ void AppBase::slotGraphicsItemRequested(const QString& _name, const QPointF& _po
 
 	try {
 		
-		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
+		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
@@ -1999,7 +1980,7 @@ void AppBase::slotGraphicsItemChanged(const ot::GraphicsItemCfg* _newConfig) {
 	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
 
 	try {
-		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
+		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 		doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(view->getGraphicsViewName(), doc.GetAllocator()), doc.GetAllocator());
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
@@ -2042,7 +2023,7 @@ void AppBase::slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std
 	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, doc.GetAllocator());
 	
 	try {
-		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
+		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2087,7 +2068,7 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 	doc.AddMember(OT_ACTION_PARAM_POSITION, controlPosObj, doc.GetAllocator());
 
 	try {
-		ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
+		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 		std::string response;
 		if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
 			OT_LOG_E("Failed to send http request");
@@ -2168,7 +2149,7 @@ void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const 
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, ot::JsonArray(_items, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionIds, ot::JsonArray(_connections, doc.GetAllocator()), doc.GetAllocator());
-	ot::BasicServiceInformation info(m_graphicsViews.findOwner(view).getId());
+	ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 
 	std::string response;
 	if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
@@ -2246,7 +2227,7 @@ void AppBase::slotTableSaveRequested(void) {
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
 
 	try {
-		ot::BasicServiceInformation info(m_tables.findOwner(table).getId());
+		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(table);
 
 		ot::JsonObject cfgObj;
 		ot::TableCfg cfg = table->createConfig();
@@ -2302,7 +2283,7 @@ void AppBase::slotViewFocused(ot::WidgetView* _view) {
 
 	ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_view);
 	if (graphicsView) {
-		ot::BasicServiceInformation owner = m_graphicsViews.findOwner(graphicsView).getId();
+		ot::BasicServiceInformation owner = ot::WidgetViewManager::instance().getOwnerFromView(graphicsView);
 		if (owner != m_graphicsPickerManager.getCurrentOwner()) {
 			this->fillGraphicsPicker(owner);
 		}
@@ -2841,13 +2822,13 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	ot::TextEditorView* txt = dynamic_cast<ot::TextEditorView*>(_view);
 	ot::TableView* table = dynamic_cast<ot::TableView*>(_view);
 	if (graphics) {
-		m_graphicsViews.erase(graphics);
+		ot::removeFromMapByValue(m_graphicsViews, graphics);
 	}
 	if (txt) {
-		m_textEditors.erase(txt);
+		ot::removeFromMapByValue(m_textEditors, txt);
 	}
 	if (table) {
-		m_tables.erase(table);
+		ot::removeFromMapByValue(m_tables, table);
 	}
 	
 }

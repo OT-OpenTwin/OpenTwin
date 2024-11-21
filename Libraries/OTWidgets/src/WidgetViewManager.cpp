@@ -96,30 +96,34 @@ ot::WidgetView* ot::WidgetViewManager::getViewFromDockWidget(ads::CDockWidget* _
 	return nullptr;
 }
 
-void ot::WidgetViewManager::closeView(const std::string& _entityName, WidgetViewBase::ViewType _type) {
-	OTAssertNullptr(m_dockManager);
-
-	WidgetView* view = this->findView(_entityName, _type);
-	if (view == nullptr) {
-		return;
-	}
-	if (view->getViewIsPermanent()) {
+void ot::WidgetViewManager::closeView(WidgetView* _view) {
+	OTAssertNullptr(_view);
+	if (_view->getViewIsPermanent()) {
 		return;
 	}
 
 	// Set the view as deleted by manager so it wont remove itself and remove it from the maps
-	view->m_isDeletedByManager = true;
-	this->forgetView(_entityName, _type);
+	_view->m_isDeletedByManager = true;
+	this->forgetView(_view);
 
 	// Remove the toggle dock action
-	view->getViewDockWidget()->toggleViewAction()->setVisible(false);
-	m_dockToggleRoot->menu()->removeAction(view->getViewDockWidget()->toggleViewAction());
+	_view->getViewDockWidget()->toggleViewAction()->setVisible(false);
+	m_dockToggleRoot->menu()->removeAction(_view->getViewDockWidget()->toggleViewAction());
 
 	// Remove the dock widget itself
-	m_dockManager->removeDockWidget(view->getViewDockWidget());
+	m_dockManager->removeDockWidget(_view->getViewDockWidget());
 
 	// Finally destroy the view
-	delete view;
+	delete _view;
+}
+
+void ot::WidgetViewManager::closeView(const std::string& _entityName, WidgetViewBase::ViewType _type) {
+	OTAssertNullptr(m_dockManager);
+
+	WidgetView* view = this->findView(_entityName, _type);
+	if (view) {
+		this->closeView(view);
+	}
 }
 
 void ot::WidgetViewManager::closeViews(const BasicServiceInformation& _owner) {
@@ -277,12 +281,43 @@ bool ot::WidgetViewManager::restoreState(std::string _state, int _version) {
 
 // Information gathering
 
+ot::BasicServiceInformation ot::WidgetViewManager::getOwnerFromView(WidgetView* _view) const {
+	for (const auto& it : m_views) {
+		if (it.second == _view) {
+			return it.first;
+		}
+	}
+
+	OT_LOG_EA("View not found");
+	return BasicServiceInformation();
+}
+
 bool ot::WidgetViewManager::getViewExists(const std::string& _entityName, WidgetViewBase::ViewType _type) const {
 	return this->findView(_entityName, _type) != nullptr;
 }
 
 bool ot::WidgetViewManager::getViewTitleExists(const std::string& _title) const {
 	return this->findViewFromTitle(_title) != nullptr;
+}
+
+ot::WidgetViewManager::ViewNameTypeList ot::WidgetViewManager::getViewNamesFromOwner(const BasicServiceInformation& _owner) const {
+	auto it = m_viewOwnerMap.find(_owner);
+	if (it == m_viewOwnerMap.end()) {
+		return ViewNameTypeList();
+	}
+	else {
+		return std::move(ViewNameTypeList(*it->second));
+	}
+}
+
+std::list<std::string> ot::WidgetViewManager::getViewNamesFromOwner(const BasicServiceInformation& _owner, WidgetViewBase::ViewType _type) const {
+	std::list<std::string> result;
+	for (const ViewNameTypeListEntry& entry : this->getViewNamesFromOwner(_owner)) {
+		if (entry.second == _type) {
+			result.push_back(entry.first);
+		}
+	}
+	return std::move(result);
 }
 
 bool ot::WidgetViewManager::getAnyViewContentModified(void) {
