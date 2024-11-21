@@ -226,9 +226,9 @@ void Application::createMesh(void)
 		m_modelComponent->getEntityInformation(entityList, entityInfo);
 
 		assert(entityInfo.size() == 1);
-		assert(entityInfo.front().getName() == materialsFolder);
+		assert(entityInfo.front().getEntityName() == materialsFolder);
 
-		materialsFolderID = entityInfo.front().getID();
+		materialsFolderID = entityInfo.front().getEntityID();
 	}
 
 	meshEntity->createProperties(materialsFolder, materialsFolderID);
@@ -272,18 +272,18 @@ void Application::updateMesh(void)
 	std::map<std::string, bool> mesherRunMap;
 	for (auto entity : selectedEntityInfo)
 	{
-		if (entity.getType() == "EntityMeshCartesian")  
+		if (entity.getEntityType() == "EntityMeshCartesian")
 		{
-			if (entity.getName().substr(0, 7) == "Meshes/")
+			if (entity.getEntityName().substr(0, 7) == "Meshes/")
 			{
-				size_t index = entity.getName().find('/', 7);
+				size_t index = entity.getEntityName().find('/', 7);
 				if (index != std::string::npos)
 				{
-					mesherRunMap[entity.getName().substr(0, index - 1)] = true;
+					mesherRunMap[entity.getEntityName().substr(0, index - 1)] = true;
 				}
 				else
 				{
-					mesherRunMap[entity.getName()] = true;
+					mesherRunMap[entity.getEntityName()] = true;
 				}
 			}
 		}
@@ -311,7 +311,7 @@ void Application::updateMesh(void)
 
 	for (auto info : mesherInfo)
 	{
-		prefetchIdsMesher.push_back(std::pair<unsigned long long, unsigned long long>(info.getID(), info.getVersion()));
+		prefetchIdsMesher.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsMesher);
@@ -320,8 +320,8 @@ void Application::updateMesh(void)
 	std::map<std::string, EntityBase *> mesherMap;
 	for (auto info : mesherInfo)
 	{
-		EntityBase *entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), getClassFactory());
-		mesherMap[info.getName()] = entity;
+		EntityBase *entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory());
+		mesherMap[info.getEntityName()] = entity;
 	}
 
 	// Finally start the worker thread to run the solvers
@@ -333,7 +333,7 @@ void Application::mesherThread(std::list<ot::EntityInformation> mesherInfo, std:
 {
 	for (auto mesher : mesherInfo)
 	{
-		runSingleMesher(mesher, mesherMap[mesher.getName()]);
+		runSingleMesher(mesher, mesherMap[mesher.getEntityName()]);
 	}
 }
 

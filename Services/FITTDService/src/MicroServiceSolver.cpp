@@ -142,7 +142,7 @@ EntityBase * MicroServiceSolver::LoadEntityFromName(std::string name)
 {
 	ot::EntityInformation entityInformation;
 	modelComponent->getEntityInformation(name, entityInformation);
-	return modelComponent->readEntityFromEntityIDandVersion(entityInformation.getID(), entityInformation.getVersion(), *classFactory);
+	return modelComponent->readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), *classFactory);
 }
 
 

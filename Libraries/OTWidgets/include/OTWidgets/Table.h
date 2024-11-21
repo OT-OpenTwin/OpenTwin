@@ -9,7 +9,6 @@
 #include "OTCore/Color.h"
 #include "OTGui/TableCfg.h"
 #include "OTGui/TableRange.h"
-#include "OTGui/EntityViewBaseInfo.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -32,23 +31,11 @@ namespace ot {
 
 		// Setter / Getter
 
-		void setupFromConfig(const TableCfg& _config);
-		TableCfg createConfig(void) const;
+		virtual void setupFromConfig(const TableCfg& _config);
+		virtual TableCfg createConfig(void) const;
 
 		void setContentChanged(bool _changed = true);
 		bool getContentChanged(void) const { return m_contentChanged; };
-
-		void setTableName(const std::string& _name);
-		const std::string& getTableName(void) const;
-
-		void setTableTitle(const std::string& _title);
-		const std::string& getTableTitle(void) const;
-
-		void setTableEntityId(UID _id);
-		UID getTableEntityId(void) const;
-
-		void setTableEntityVersion(UID _version);
-		UID getTableEntityVersion(void) const;
 
 		void setSelectedCellsBackground(const ot::Color& _color);
 		void setSelectedCellsBackground(const QColor& _color);
@@ -72,7 +59,6 @@ namespace ot {
 		void ini(void);
 
 		bool m_contentChanged;
-		EntityViewBaseInfo m_tableInfo;
 	};
 
 }

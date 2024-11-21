@@ -40,9 +40,9 @@ ot::ReturnValues PythonAPI::Execute(std::list<std::string>& scripts, std::list<s
 			pythonParameterSet.reset(pyObBuilder.setVariableTuple(parameterSetForScript));
 		}
 
-		OT_LOG_D("Execute script " + scriptEntity.getName());
+		OT_LOG_D("Execute script " + scriptEntity.getEntityName());
 		CPythonObjectNew pReturnValue = _wrapper.ExecuteFunction(entryPoint, pythonParameterSet, moduleName);
-		returnValues.addData(scriptEntity.getName(), pyObBuilder.getGenericDataStructList(pReturnValue));
+		returnValues.addData(scriptEntity.getEntityName(), pyObBuilder.getGenericDataStructList(pReturnValue));
 		currentParameterSet++;
 		OT_LOG_D("Script execution succeeded");
 		EntityBuffer::INSTANCE().ClearBuffer();// Entities and properties are buffered by name. It needs to be cleared, so that no outdated entities are accessed in the next execution.
@@ -75,7 +75,7 @@ std::list<ot::EntityInformation> PythonAPI::EnsureScriptsAreLoaded(std::list<std
 			bool found = false;
 			for (auto& entity : entityInfos)
 			{
-				if (entity.getName() == scriptName) { found = true; break; }
+				if (entity.getEntityName() == scriptName) { found = true; break; }
 			}
 			if (!found) { missingScripts += scriptName + ", "; }
 		}
@@ -86,7 +86,7 @@ std::list<ot::EntityInformation> PythonAPI::EnsureScriptsAreLoaded(std::list<std
 	std::list<ot::EntityInformation> scriptsNotLoadedYet;
 	for (auto& entityInfo : entityInfos)
 	{
-		const std::string scriptName = entityInfo.getName();
+		const std::string scriptName = entityInfo.getEntityName();
 		OT_LOG_D("Loading script " + scriptName);
 		std::optional<std::string> moduleName = PythonLoadedModules::INSTANCE()->getModuleName(entityInfo);
 		if (!moduleName.has_value())
@@ -115,7 +115,7 @@ std::list<ot::EntityInformation> PythonAPI::EnsureScriptsAreLoaded(std::list<std
 		{
 			for (ot::EntityInformation& entityInfo : entityInfos)
 			{
-				if (entityInfo.getName() == scriptName)
+				if (entityInfo.getEntityName() == scriptName)
 				{
 					scriptEntityInfoList.push_back(entityInfo);
 					break;
@@ -130,7 +130,7 @@ std::list<ot::EntityInformation> PythonAPI::EnsureScriptsAreLoaded(std::list<std
 void PythonAPI::LoadScipt(ot::EntityInformation& entityInformation)
 {
 	auto modelComponent = Application::instance()->ModelServiceAPI();
-	auto baseEntity = modelComponent.readEntityFromEntityIDandVersion(entityInformation.getID(), entityInformation.getVersion(), Application::instance()->getClassFactory());
+	auto baseEntity = modelComponent.readEntityFromEntityIDandVersion(entityInformation.getEntityID(), entityInformation.getEntityVersion(), Application::instance()->getClassFactory());
 	std::unique_ptr<EntityFile> script(dynamic_cast<EntityFile*>(baseEntity));
 	auto plainData = script->getData()->getData();
 	std::string execution(plainData.begin(), plainData.end());

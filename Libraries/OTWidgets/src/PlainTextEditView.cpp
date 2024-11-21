@@ -7,7 +7,9 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/PlainTextEditView.h"
 
-ot::PlainTextEditView::PlainTextEditView() {
+ot::PlainTextEditView::PlainTextEditView() 
+	: WidgetView(WidgetViewBase::ViewText)
+{
 	this->addWidgetToDock(this);
 }
 

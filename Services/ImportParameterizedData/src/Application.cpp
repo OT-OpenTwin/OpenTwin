@@ -100,33 +100,16 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuPage(pageName);
 
 	const std::string groupNameImport = "Import";
-	const std::string groupNameTableHandling = "Table Handling";
 	const std::string groupNameParameterizedDataCreation = "Creation of Parameterized Data Collection";
 	const std::string subgroupNameTableHandlingRow = "Row";
 	const std::string subgroupNameTableHandlingColumn = "Column";
 	const std::string subgroupNameTableHandlingState = "State";
 	_ui->addMenuGroup(pageName, groupNameImport);
-	_ui->addMenuGroup(pageName, groupNameTableHandling);
-	_ui->addMenuSubGroup(pageName, groupNameTableHandling, subgroupNameTableHandlingRow);
-	_ui->addMenuSubGroup(pageName, groupNameTableHandling, subgroupNameTableHandlingColumn);
-	_ui->addMenuSubGroup(pageName, groupNameTableHandling, subgroupNameTableHandlingState);
 	_ui->addMenuGroup(pageName, groupNameParameterizedDataCreation);
 
 	ot::LockTypeFlags modelWrite(ot::LockModelWrite);
 
 	_buttonImportTouchstone.SetDescription(pageName, groupNameImport, "Import Touchstone");
-
-	_buttonTableDeleteRow.SetDescription(pageName, groupNameTableHandling, "Delete Row", "", subgroupNameTableHandlingRow);
-	_buttonTableAddRowBelow.SetDescription(pageName, groupNameTableHandling, "Insert Row Below", "", subgroupNameTableHandlingRow);
-	_buttonTableAddRowAbove.SetDescription(pageName, groupNameTableHandling, "Insert Row Above", "", subgroupNameTableHandlingRow);
-	
-	_buttonTableDeleteColumn.SetDescription(pageName, groupNameTableHandling,"Delete Column", "", subgroupNameTableHandlingColumn);
-	_buttonTableAddColumnLeft.SetDescription(pageName, groupNameTableHandling, "Insert Column Left", "", subgroupNameTableHandlingColumn);
-	_buttonTableAddColumnRight.SetDescription(pageName, groupNameTableHandling, "Insert Column Right", "", subgroupNameTableHandlingColumn);
-	
-	_buttonTableSave.SetDescription(pageName, groupNameTableHandling, "Apply Changes", "", subgroupNameTableHandlingState);;
-	_buttonTableReset.SetDescription(pageName, groupNameTableHandling, "Revert Changes", "", subgroupNameTableHandlingState);;
-	_buttonTableResetToSelection.SetDescription(pageName, groupNameTableHandling, "Reset To Selection", "", subgroupNameTableHandlingState);;
 
 	_buttonCreateRMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation,"Campaign Metadata");
 	_buttonCreateMSMDEntry.SetDescription(pageName, groupNameParameterizedDataCreation, "Series Metadata");
@@ -142,17 +125,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuButton(_buttonCreateQuantityEntry, modelWrite, "SelectionQuantity");
 	_ui->addMenuButton(_buttonCreateParameterEntry, modelWrite, "SelectionParameter");
 	
-	_ui->addMenuButton(_buttonTableAddColumnLeft, modelWrite, "table-column-insert");
-	_ui->addMenuButton(_buttonTableAddColumnRight, modelWrite, "table-column-insert");
-	_ui->addMenuButton(_buttonTableDeleteColumn, modelWrite, "table-column-delete");
-	
-	_ui->addMenuButton(_buttonTableAddRowAbove, modelWrite, "table-row-insert");
-	_ui->addMenuButton(_buttonTableAddRowBelow, modelWrite, "table-row-insert");
-	_ui->addMenuButton(_buttonTableDeleteRow, modelWrite, "table-row-delete");
-
-	_ui->addMenuButton(_buttonTableSave,  modelWrite, "table-save");
-	_ui->addMenuButton(_buttonTableReset, modelWrite, "table-refresh");
-	_ui->addMenuButton(_buttonTableResetToSelection, modelWrite, "table-refresh");
 
 	_ui->addMenuButton(_buttonAutomaticCreationMSMD, modelWrite, "BatchProcessing");
 	_ui->addMenuButton(_buttonCreateDataCollection, modelWrite, "database");
@@ -244,7 +216,6 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 		std::string returnMessage = "";
 		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
 		{
-			_parametrizedDataHandler->CheckEssentials();
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 			if (action == _buttonImportTouchstone.GetFullDescription())
 			{
@@ -261,23 +232,47 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action == _buttonCreateRMDEntry.GetFullDescription())
 			{
-				_parametrizedDataHandler->AddSelectionsAsRMD(m_selectedEntities);
-				RequestSelectedRanges();
+				std::list<ot::EntityInformation> selectedEntities;
+				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+
+				const std::string tableName = _parametrizedDataHandler->markSelectionForStorage(selectedEntities,EntityParameterizedDataCategorization::researchMetadata);
+				if (tableName != "")
+				{
+					RequestSelectedRanges(tableName);
+				}
 			}
 			else if (action == _buttonCreateMSMDEntry.GetFullDescription())
 			{
-				_parametrizedDataHandler->AddSelectionsAsMSMD(m_selectedEntities);
-				RequestSelectedRanges();
+				std::list<ot::EntityInformation> selectedEntities;
+				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+
+				const std::string tableName = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::measurementSeriesMetadata);
+				if (tableName != "")
+				{
+					RequestSelectedRanges(tableName);
+				}
 			}
 			else if (action == _buttonCreateParameterEntry.GetFullDescription())
 			{
-				_parametrizedDataHandler->AddSelectionsAsParameter(m_selectedEntities);
-				RequestSelectedRanges();
+				std::list<ot::EntityInformation> selectedEntities;
+				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+
+				const std::string tableName = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::parameter);
+				if (tableName != "")
+				{
+					RequestSelectedRanges(tableName);
+				}
 			}
 			else if (action == _buttonCreateQuantityEntry.GetFullDescription())
 			{
-				_parametrizedDataHandler->AddSelectionsAsQuantity(m_selectedEntities);
-				RequestSelectedRanges();
+				std::list<ot::EntityInformation> selectedEntities;
+				m_modelComponent->getSelectedEntityInformation(selectedEntities);
+
+				const std::string tableName = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::quantity);
+				if (tableName != "")
+				{
+					RequestSelectedRanges(tableName);
+				}
 			}
 			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
 			{
@@ -290,94 +285,6 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				_tabledataToResultdataHandler->createDataCollection(dataBaseURL(), m_collectionName);
 				m_uiComponent->displayMessage("Creation of dataset finished\n");
 				m_uiComponent->displayMessage("===========================================================================\n\n");
-			}
-			else if (action == _buttonTableAddColumnLeft.GetFullDescription())
-			{
-				ot::JsonDocument doc;
-				if (_visualizationModel == -1)
-				{
-					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-				}
-				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, true, doc.GetAllocator());
-
-				std::string tmp;
-				uiComponent()->sendMessage(true, doc, tmp);
-			}
-			else if (action == _buttonTableAddColumnRight.GetFullDescription())
-			{
-				ot::JsonDocument doc;
-				if (_visualizationModel == -1)
-				{
-					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-				}
-				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, false, doc.GetAllocator());
-
-				std::string tmp;
-				uiComponent()->sendMessage(true, doc, tmp);
-			}
-			else if (action == _buttonTableDeleteColumn.GetFullDescription())
-			{
-				ot::JsonDocument doc;
-				if (_visualizationModel == -1)
-				{
-					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-				}
-				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn, doc.GetAllocator()), doc.GetAllocator());
-
-				std::string tmp;
-				uiComponent()->sendMessage(true, doc, tmp);
-			}
-			else if (action == _buttonTableAddRowAbove.GetFullDescription())
-			{
-				ot::JsonDocument doc;
-				if (_visualizationModel == -1)
-				{
-					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-				}
-				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, true, doc.GetAllocator());
-
-				std::string tmp;
-				uiComponent()->sendMessage(true, doc, tmp);
-			}
-			else if (action == _buttonTableAddRowBelow.GetFullDescription())
-			{
-				ot::JsonDocument doc;
-				if (_visualizationModel == -1)
-				{
-					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-				}
-				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_BASETYPE_Bool, false, doc.GetAllocator());
-
-				std::string tmp;
-				uiComponent()->sendMessage(true, doc, tmp);
-			}
-			else if (action == _buttonTableDeleteRow.GetFullDescription())
-			{
-				ot::JsonDocument doc;
-				if (_visualizationModel == -1)
-				{
-					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-				}
-				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow, doc.GetAllocator()), doc.GetAllocator());
-
-				std::string tmp;
-				uiComponent()->sendMessage(true, doc, tmp);
 			}
 			else
 			{
@@ -440,7 +347,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 
 				ot::UID tableEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 				ot::UID tableEntityVersion = _doc[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
-				_parametrizedDataHandler->StoreSelectionRanges(tableEntityID, tableEntityVersion, ranges);
+				_parametrizedDataHandler->storeSelectionRanges(tableEntityID, tableEntityVersion, ranges);
 			}
 			else if (subsequentFunction == "ColourRanges")
 			{
@@ -456,7 +363,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 		{
 			std::list<ot::EntityInformation> entityInfos;
 			m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
-			if (entityInfos.begin()->getName().find(_tableFolder) != std::string::npos)
+			if (entityInfos.begin()->getEntityName().find(_tableFolder) != std::string::npos)
 			{
 				if (_visualizationModel == -1)
 				{
@@ -466,8 +373,8 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)entityInfos.begin()->getVersion(), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)entityInfos.begin()->getID(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)entityInfos.begin()->getEntityVersion(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)entityInfos.begin()->getEntityID(), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("ColourRanges", doc.GetAllocator()), doc.GetAllocator());
 
 				std::string tmp;
@@ -492,6 +399,7 @@ void Application::HandleSelectionChanged()
 	std::lock_guard<std::mutex> lock(onlyOneActionPerTime);
 	try
 	{
+		
 		std::list<ot::EntityInformation> selectedEntityInfo;
 		if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
 		m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
@@ -499,7 +407,7 @@ void Application::HandleSelectionChanged()
 		bool showCreateTableBtn = false;
 		for (const auto& entityInfo : selectedEntityInfo)
 		{
-			const std::string& entityName = entityInfo.getName();
+			const std::string& entityName = entityInfo.getEntityName();
 			if (entityName.find(_dataSourcesFolder) != std::string::npos)
 			{
 				showCreateTableBtn = true;
@@ -510,7 +418,7 @@ void Application::HandleSelectionChanged()
 
 		if (m_selectedEntities.size() == 1)
 		{
-			std::string entityName = selectedEntityInfo.begin()->getName();
+			std::string entityName = selectedEntityInfo.begin()->getEntityName();
 			if (entityName.find(_tableFolder) != std::string::npos)
 			{
 				if (_visualizationModel == -1)
@@ -521,42 +429,9 @@ void Application::HandleSelectionChanged()
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)selectedEntityInfo.begin()->getVersion(), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)selectedEntityInfo.begin()->getID(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)selectedEntityInfo.begin()->getEntityVersion(), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)selectedEntityInfo.begin()->getEntityID(), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("ColourRanges", doc.GetAllocator()), doc.GetAllocator());
-
-				std::string tmp;
-				uiComponent()->sendMessage(true, doc, tmp);
-			}
-			else if (entityName.find(_previewTableNAme) != std::string::npos)
-			{
-				bool showTableBtns = true;
-				uiComponent()->setControlState(_buttonTableAddColumnLeft.GetFullDescription(), showTableBtns);
-				uiComponent()->setControlState(_buttonTableAddColumnRight.GetFullDescription(), showTableBtns);
-				uiComponent()->setControlState(_buttonTableDeleteColumn.GetFullDescription(), showTableBtns);
-				
-				uiComponent()->setControlState(_buttonTableAddRowAbove.GetFullDescription(), showTableBtns);
-				uiComponent()->setControlState(_buttonTableAddRowBelow.GetFullDescription(), showTableBtns);
-				uiComponent()->setControlState(_buttonTableDeleteRow.GetFullDescription(), showTableBtns);
-				
-				uiComponent()->setControlState(_buttonTableReset.GetFullDescription(), showTableBtns);
-				uiComponent()->setControlState(_buttonTableResetToSelection.GetFullDescription(), showTableBtns);
-				uiComponent()->setControlState(_buttonTableSave.GetFullDescription(), showTableBtns);
-
-				uiComponent()->sendUpdatedControlState();
-				
-				if (_visualizationModel == -1)
-				{
-					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-				}
-				auto previewTable = _parametrizedDataHandler->GetPreview(*selectedEntityInfo.begin());
-				ot::JsonDocument doc;
-				doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, static_cast<uint64_t>(_visualizationModel), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, static_cast<uint64_t>(previewTable.second), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, static_cast<uint64_t>(previewTable.first), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, "", doc.GetAllocator());
 
 				std::string tmp;
 				uiComponent()->sendMessage(true, doc, tmp);
@@ -571,7 +446,7 @@ void Application::HandleSelectionChanged()
 				{
 					m_resultAccess = new ResultCollectionMetadataAccess(m_collectionName, m_modelComponent, &getClassFactory());
 				}
-				std::string selectedEntityName =	selectedEntityInfo.begin()->getName();
+				std::string selectedEntityName =	selectedEntityInfo.begin()->getEntityName();
 				DatasetOverviewVisualiser visualiser;
 				std::unique_ptr<ot::GenericDataStruct>data = nullptr;
 				const MetadataCampaign&	campaign = m_resultAccess->getMetadataCampaign();
@@ -611,11 +486,11 @@ void Application::HandleSelectionChanged()
 		ot::UIDList potentialRangesID, potentialRangesVersions;
 		for (auto entityInfo : selectedEntityInfo)
 		{
-			std::string name = entityInfo.getName();
+			std::string name = entityInfo.getEntityName();
 			if (name.find(_dataCategorizationFolder) != std::string::npos)
 			{
-				potentialRangesID.push_back(entityInfo.getID());
-				potentialRangesVersions.push_back(entityInfo.getVersion());
+				potentialRangesID.push_back(entityInfo.getEntityID());
+				potentialRangesVersions.push_back(entityInfo.getEntityVersion());
 			}
 		}
 		Application::instance()->prefetchDocumentsFromStorage(potentialRangesID);
@@ -648,19 +523,18 @@ void Application::HandleSelectionChanged()
 	}
 }
 
-void Application::RequestSelectedRanges()
+void Application::RequestSelectedRanges(const std::string& _tableName)
 {
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection, doc.GetAllocator()), doc.GetAllocator());
-
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, m_modelComponent->getCurrentVisualizationModelID(), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SetCurrentSelectionBackground, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_tableName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_RequestCallback, true, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-
 	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("CreateSelectedRangeEntity", doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonObject obj;
 	_parametrizedDataHandler->GetSerializedColour().addToJsonObject(obj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_COLOUR_BACKGROUND, obj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Color, obj, doc.GetAllocator());
 
 	std::string tmp;
 	uiComponent()->sendMessage(true, doc, tmp);
@@ -668,17 +542,5 @@ void Application::RequestSelectedRanges()
 
 void Application::SetControlstateTableFunctions(bool showTableBtns)
 {
-	uiComponent()->setControlState(_buttonTableAddColumnLeft.GetFullDescription(), showTableBtns);
-	uiComponent()->setControlState(_buttonTableAddColumnRight.GetFullDescription(), showTableBtns);
-	uiComponent()->setControlState(_buttonTableDeleteColumn.GetFullDescription(), showTableBtns);
-
-	uiComponent()->setControlState(_buttonTableAddRowAbove.GetFullDescription(), showTableBtns);
-	uiComponent()->setControlState(_buttonTableAddRowBelow.GetFullDescription(), showTableBtns);
-	uiComponent()->setControlState(_buttonTableDeleteRow.GetFullDescription(), showTableBtns);
-
-	uiComponent()->setControlState(_buttonTableReset.GetFullDescription(), showTableBtns);
-	uiComponent()->setControlState(_buttonTableResetToSelection.GetFullDescription(), showTableBtns);
-	uiComponent()->setControlState(_buttonTableSave.GetFullDescription(), showTableBtns);
-
 	uiComponent()->sendUpdatedControlState();
 }

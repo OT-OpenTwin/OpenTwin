@@ -25,6 +25,7 @@
     <ClCompile Include="src\EncodingConverter_ISO88591ToUTF8.cpp" />
     <ClCompile Include="src\EncodingConverter_UTF16ToUTF8.cpp" />
     <ClCompile Include="src\EncodingGuesser.cpp" />
+    <ClCompile Include="src\BasicEntityInformation.cpp" />
     <ClCompile Include="src\GenericDataStruct.cpp" />
     <ClCompile Include="src\GenericDataStructFactory.cpp" />
     <ClCompile Include="src\GenericDataStructMatrix.cpp" />
@@ -61,7 +62,9 @@
   <ItemGroup>
     <ClInclude Include="include\OTCore\BasicServiceInformation.h" />
     <ClInclude Include="include\OTCore\ComplexNumbers.h" />
+    <ClInclude Include="include\OTCore\ContainerHelper.h" />
     <ClInclude Include="include\OTCore\DefensiveProgramming.h" />
+    <ClInclude Include="include\OTCore\BasicEntityInformation.h" />
     <ClInclude Include="include\OTCore\LocalSettingsSwitch.h" />
     <ClInclude Include="include\OTCore\LogModeManager.h" />
     <ClInclude Include="include\OTCore\Math.h" />
@@ -89,7 +92,6 @@
     <ClInclude Include="include\OTCore\OTAssert.h" />
     <ClInclude Include="include\OTCore\OTClassHelper.h" />
     <ClInclude Include="include\OTCore\Owner.h" />
-    <ClInclude Include="include\OTCore\OwnerManagerTemplate.h" />
     <ClInclude Include="include\OTCore\OwnerService.h" />
     <ClInclude Include="include\OTCore\OwnerServiceGlobal.h" />
     <ClInclude Include="include\OTCore\PerformanceTests.h" />

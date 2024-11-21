@@ -123,18 +123,6 @@ private:
 	virtual ~Application();
 	ot::MenuButtonDescription _buttonImportTouchstone;
 	
-	ot::MenuButtonDescription _buttonTableDeleteRow;
-	ot::MenuButtonDescription _buttonTableAddRowBelow;
-	ot::MenuButtonDescription _buttonTableAddRowAbove;
-	
-	ot::MenuButtonDescription _buttonTableDeleteColumn;
-	ot::MenuButtonDescription _buttonTableAddColumnLeft;
-	ot::MenuButtonDescription _buttonTableAddColumnRight;
-	
-	ot::MenuButtonDescription _buttonTableSave;
-	ot::MenuButtonDescription _buttonTableReset;
-	ot::MenuButtonDescription _buttonTableResetToSelection;
-
 	ot::MenuButtonDescription _buttonCreateMSMDEntry;
 	ot::MenuButtonDescription _buttonCreateRMDEntry;
 	ot::MenuButtonDescription _buttonCreateParameterEntry;
@@ -163,7 +151,7 @@ private:
 		
 	void HandleSelectionChanged();
 	void ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc);
-	void RequestSelectedRanges();
+	void RequestSelectedRanges(const std::string& _tableName);
 	void SetControlstateTableFunctions(bool visible);
 
 };

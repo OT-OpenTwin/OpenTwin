@@ -259,7 +259,7 @@ std::vector<EntityBase*> ResultCollectionMetadataAccess::findAllExistingMetadata
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIdandVersion;
 	for (auto& entityInfo : entityInfos)
 	{
-		prefetchIdandVersion.push_back(std::pair<ot::UID, ot::UID>(entityInfo.getID(), entityInfo.getVersion()));
+		prefetchIdandVersion.push_back(std::pair<ot::UID, ot::UID>(entityInfo.getEntityID(), entityInfo.getEntityVersion()));
 	}
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
 
@@ -267,7 +267,7 @@ std::vector<EntityBase*> ResultCollectionMetadataAccess::findAllExistingMetadata
 	allExistingMetadata.reserve(entityInfos.size());
 	for (auto& entityInfo : entityInfos)
 	{
-		allExistingMetadata.push_back(m_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), *_classFactory));
+		allExistingMetadata.push_back(m_modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), *_classFactory));
 	}
 	
 	return allExistingMetadata;

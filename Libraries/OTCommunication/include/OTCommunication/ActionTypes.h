@@ -260,7 +260,7 @@
 #define OT_ACTION_CMD_UI_VIEW_CreateRubberband "UI.VIEW.CreateRubberband"
 
 // rm
-#define OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection "UI.VIEW.GetTableSelection"
+
 #define OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable "UI.VIEW.Table.Show"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_SetTable "UI.VIEW.Table.Set"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change "UI.VIEW.Table.Change"
@@ -627,8 +627,6 @@
 
 #define OT_ACTION_PARAM_TEXT_ID "Text.Entity.ID"
 #define OT_ACTION_PARAM_TEXT_VERSION "Text.Entity.Version"
-
-#define OT_ACTION_PARAM_COLOUR_BACKGROUND "Colour.Background"
 
 #define OT_ACTION_PARAM_SETTINGS_DataName "SettingsData.Dataset.Name"
 #define OT_ACTION_PARAM_SETTINGS_Version "SettingsData.Version"

@@ -405,7 +405,7 @@ std::list<ot::EntityInformation> Application::getSelectedGeometryEntities(void)
 
 	for (auto item : entityInfo)
 	{
-		if (item.getName().substr(0, filter.size()) == filter)
+		if (item.getEntityName().substr(0, filter.size()) == filter)
 		{
 			// Here we have a geometry entity under the Geometry folder
 			entityInfoGeometry.push_back(item);

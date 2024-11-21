@@ -703,9 +703,9 @@ void ot::ApplicationBase::prefetchDocumentsFromStorage(const std::list<ot::Entit
 
 	for (auto entity : entityInfo)
 	{
-		m_prefetchedEntityVersions[entity.getID()] = entity.getVersion();
+		m_prefetchedEntityVersions[entity.getEntityID()] = entity.getEntityVersion();
 
-		prefetchIdandVersion.push_back(std::pair<UID, UID>(entity.getID(), entity.getVersion()));
+		prefetchIdandVersion.push_back(std::pair<UID, UID>(entity.getEntityID(), entity.getEntityVersion()));
 	}
 
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);

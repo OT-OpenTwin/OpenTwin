@@ -30,9 +30,16 @@ namespace ot {
 	//! @class WidgetView
 	//! @brief The WidgetView class is used to integrate the Qt-ADS functionallity into open twin.
 	class OT_WIDGETS_API_EXPORT WidgetView {
+		OT_DECL_NODEFAULT(WidgetView)
 		OT_DECL_NOCOPY(WidgetView)
 	public:
-		WidgetView();
+		static std::string createStoredViewName(const WidgetViewBase& _view);
+
+		//! \brief Creates the name that should be used in the view management logic.
+		//! The resulted name has the following syntax: <entityName>$<viewTypeString>
+		static std::string createStoredViewName(const std::string& _entityName, WidgetViewBase::ViewType _viewType);
+
+		WidgetView(WidgetViewBase::ViewType _viewType);
 		virtual ~WidgetView();
 
 		// ###########################################################################################################################################################################################################################################################################################################################

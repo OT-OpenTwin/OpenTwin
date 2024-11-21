@@ -9,7 +9,7 @@
 #include "TableViewerView.h"
 
 ot::TableViewerView::TableViewerView(QWidget* _parent)
-	: TableViewer(_parent)
+	: TableViewer(_parent), WidgetView(WidgetViewBase::ViewTable)
 {
 	this->addWidgetToDock(this->getTable());
 }

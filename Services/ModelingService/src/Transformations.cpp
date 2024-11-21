@@ -34,7 +34,7 @@ void Transformations::enterTransformMode(const std::list<ot::EntityInformation> 
 	int count = 1;
 	for (auto entity : selectedGeometryEntities)
 	{
-		options[std::to_string(count)] = entity.getName();
+		options[std::to_string(count)] = entity.getEntityName();
 		count++;
 	}
 
@@ -149,7 +149,7 @@ void Transformations::transformEntities(const std::string &selectionInfo, std::m
 
 	for (auto entity : geometryEntityInfo)
 	{
-		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(entity.getID(), entity.getVersion(), *classFactory));
+		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry*>(modelComponent->readEntityFromEntityIDandVersion(entity.getEntityID(), entity.getEntityVersion(), *classFactory));
 
 		if (geometryEntity != nullptr)
 		{
@@ -197,7 +197,7 @@ void Transformations::transformEntities(const std::string &selectionInfo, std::m
 		for (auto brep : brepEntityInfo)
 		{
 			// Now we load the corresponding brep 
-			EntityBrep *brepEntity = dynamic_cast<EntityBrep*>(entityCache->getEntity(brep.getID(), brep.getVersion()));
+			EntityBrep *brepEntity = dynamic_cast<EntityBrep*>(entityCache->getEntity(brep.getEntityID(), brep.getEntityVersion()));
 			if (brepEntity == nullptr) continue;
 
 			BRepBndLib tightBox;
@@ -224,7 +224,7 @@ void Transformations::transformEntities(const std::string &selectionInfo, std::m
 		updateTransformationProperties(geometryEntity, transformTranslate, transformAxis, transformAngle, rotationCenter);
 
 		// Now we load the corresponding brep (since this was already loaded for the bounding box calc, it will come from the cache)
-		EntityBrep *brepEntity = dynamic_cast<EntityBrep*>(entityCache->getEntity(brep->getID(), brep->getVersion()));
+		EntityBrep *brepEntity = dynamic_cast<EntityBrep*>(entityCache->getEntity(brep->getEntityID(), brep->getEntityVersion()));
 		if (brepEntity == nullptr)
 		{
 			brep++;

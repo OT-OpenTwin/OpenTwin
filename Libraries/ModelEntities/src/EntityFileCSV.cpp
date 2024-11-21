@@ -36,13 +36,6 @@ ot::TableHeaderOrientation EntityFileCSV::getHeaderOrientation()
 	}
 }
 
-std::string EntityFileCSV::getHeaderOrientation(ot::TableHeaderOrientation _orientation)
-{
-	auto orientationString = m_orientationToString.find(_orientation);
-	assert(orientationString != m_orientationToString.end());
-	return orientationString->second; 
-}
-
 bool EntityFileCSV::visualiseText()
 {
 	return true;
@@ -98,7 +91,7 @@ ot::TableCfg EntityFileCSV::getTableConfig()
 	ot::GenericDataStructMatrix matrix = getTable();
 	ot::TableHeaderOrientation headerOrientation =	getHeaderOrientation();
 	ot::TableCfg tableCfg(matrix, headerOrientation);
-	tableCfg.setName(getName());
+	tableCfg.setEntityName(getName());
 	tableCfg.setTitle(getName());
 	return tableCfg;
 }

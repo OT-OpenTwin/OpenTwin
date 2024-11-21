@@ -23,6 +23,9 @@ namespace ot {
 
 		virtual QWidget* getViewWidget(void) override;
 
+		virtual void setupFromConfig(const TableCfg& _config) override;
+		virtual TableCfg createConfig(void) const override;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 	protected:

@@ -7,7 +7,9 @@
 #include "OTCore/Logger.h"
 #include "OTWidgets/PropertyGridView.h"
 
-ot::PropertyGridView::PropertyGridView() {
+ot::PropertyGridView::PropertyGridView() 
+	: WidgetView(WidgetViewBase::ViewProperties) 
+{
 	this->addWidgetToDock(this->getQWidget());
 }
 

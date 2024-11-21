@@ -6,7 +6,9 @@
 // OpenTwin header
 #include "OTWidgets/GraphicsPickerView.h"
 
-ot::GraphicsPickerView::GraphicsPickerView() {
+ot::GraphicsPickerView::GraphicsPickerView() 
+	: WidgetView(WidgetViewBase::ViewGraphicsPicker)
+{
 	this->addWidgetToDock(this->pickerWidget());
 }
 

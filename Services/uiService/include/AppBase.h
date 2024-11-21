@@ -22,7 +22,6 @@
 #include "OTCore/Point2D.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OwnerService.h"
-#include "OTCore/OwnerManagerTemplate.h"
 #include "OTGui/Property.h"
 #include "OTGui/TableCfg.h"
 #include "OTGui/TextEditorCfg.h"
@@ -42,6 +41,7 @@
 #include <QtCore/qsettings.h>
 
 // C++ header
+#include <map>
 #include <vector>
 
 // Forward declaration
@@ -242,8 +242,8 @@ public:
 		const std::string &				_projectName
 	);
 
-	void setCurrentVisualizationTab(const std::string & _tabName);
-	std::string getCurrentVisualizationTab(void);
+	void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle);
+	std::string getCurrentVisualizationTabTitle(void);
 
 	void importProject(void);
 	void manageGroups(void);
@@ -424,11 +424,11 @@ public:
 	//! \brief Clears the graphics picker and stored service picker data.
 	void clearGraphicsPickerData(void);
 
-	ot::GraphicsViewView* createNewGraphicsEditor(const std::string& _name, const QString& _title, ot::BasicServiceInformation _serviceInfo);
+	ot::GraphicsViewView* createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo);
 
-	ot::GraphicsViewView* findGraphicsEditor(const std::string& _name, ot::BasicServiceInformation _serviceInfo);
+	ot::GraphicsViewView* findGraphicsEditor(const std::string& _entityName);
 
-	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _name, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
+	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
 
 	std::list<ot::GraphicsViewView*> getAllGraphicsEditors(void);
 
@@ -438,11 +438,11 @@ public:
 
 	ot::TextEditorView* createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
 
-	ot::TextEditorView* findTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
+	ot::TextEditorView* findTextEditor(const std::string& _entityName);
 
 	ot::TextEditorView* findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
 
-	void closeTextEditor(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
+	void closeTextEditor(const std::string& _entityName);
 
 	void closeAllTextEditors(const ot::BasicServiceInformation& _serviceInfo);
 
@@ -452,7 +452,7 @@ public:
 
 	ot::TableView* createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
 
-	ot::TableView* findTable(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
+	ot::TableView* findTable(const std::string& _entityName);
 
 	ot::TableView* findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
 
@@ -631,10 +631,10 @@ private:
 	StateInformation			m_currentStateWindow;
 	
 	ot::VersionGraphManagerView* m_versionGraph;
-	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::GraphicsViewView> m_graphicsViews;
-	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::TextEditorView> m_textEditors;
-	ot::OwnerManagerTemplate<ot::BasicServiceInformation, ot::TableView> m_tables;
-
+	std::map<std::string, ot::GraphicsViewView*> m_graphicsViews;
+	std::map<std::string, ot::TextEditorView*> m_textEditors;
+	std::map<std::string, ot::TableView*> m_tables;
+	
 	bool m_visible3D;
 	bool m_visible1D;
 	bool m_visibleTable;

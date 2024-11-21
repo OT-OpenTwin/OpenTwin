@@ -73,8 +73,8 @@ public:
 
 	virtual void displayText(const std::string &text) override;
 
-	virtual void setCurrentVisualizationTab(const std::string & _tabName) override;
-	virtual std::string getCurrentVisualizationTab(void) override;
+	virtual void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) override;
+	virtual std::string getCurrentVisualizationTabTitle(void) override;
 
 	virtual void enableDisableControls(std::list<ViewerUIDtype> &enabled, std::list<ViewerUIDtype> &disabled) override;
 

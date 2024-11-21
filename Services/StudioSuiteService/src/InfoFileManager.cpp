@@ -26,7 +26,7 @@ void InfoFileManager::readInformation()
 	if (application->modelComponent()->getEntityInformation("Files/Information", triangleInfoItem))
 	{
 		// The triangulation exists -> load the item
-		EntityFile* fileEntity = dynamic_cast<EntityFile*> (application->modelComponent()->readEntityFromEntityIDandVersion(triangleInfoItem.getID(), triangleInfoItem.getVersion(), application->getClassFactory()));
+		EntityFile* fileEntity = dynamic_cast<EntityFile*> (application->modelComponent()->readEntityFromEntityIDandVersion(triangleInfoItem.getEntityID(), triangleInfoItem.getEntityVersion(), application->getClassFactory()));
 
 		if (fileEntity != nullptr)
 		{
@@ -164,7 +164,7 @@ void InfoFileManager::writeInformation()
 	else
 	{
 		// Load the existing item
-		fileEntity = dynamic_cast<EntityFile*> (application->modelComponent()->readEntityFromEntityIDandVersion(triangleInfoItem.getID(), triangleInfoItem.getVersion(), application->getClassFactory()));
+		fileEntity = dynamic_cast<EntityFile*> (application->modelComponent()->readEntityFromEntityIDandVersion(triangleInfoItem.getEntityID(), triangleInfoItem.getEntityVersion(), application->getClassFactory()));
 	}
 
 	// Now create a new data item

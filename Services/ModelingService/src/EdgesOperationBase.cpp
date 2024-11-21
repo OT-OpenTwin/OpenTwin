@@ -99,7 +99,7 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 
 	//entityVersionMap[entity.getID()] = entity.getVersion();
 
-	EntityGeometry *baseEntity = dynamic_cast<EntityGeometry *>(entityCache->getEntity(entityInfo.front().getID(), entityInfo.front().getVersion()));
+	EntityGeometry *baseEntity = dynamic_cast<EntityGeometry *>(entityCache->getEntity(entityInfo.front().getEntityID(), entityInfo.front().getEntityVersion()));
 	ot::UID entityBrepID = baseEntity->getBrepStorageObjectID();
 
 	std::list<ot::EntityInformation> entityBrepInfo;
@@ -108,7 +108,7 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 	// Prefetch the brep entity
 	entityCache->prefetchEntities(entityBrepInfo);
 
-	EntityBrep* brepEntity = dynamic_cast<EntityBrep*>(entityCache->getEntity(entityBrepInfo.front().getID(), entityBrepInfo.front().getVersion()));
+	EntityBrep* brepEntity = dynamic_cast<EntityBrep*>(entityCache->getEntity(entityBrepInfo.front().getEntityID(), entityBrepInfo.front().getEntityVersion()));
 	assert(brepEntity != nullptr);
 
 	// Here we do not perform an operation, but keep the shape as is. The user can later on set the chamfer size which will then update the shape and
@@ -242,7 +242,7 @@ void EdgesOperationBase::updateShape(EntityGeometry* geometryEntity, TopoDS_Shap
 
 	std::list<ot::EntityInformation> entityInfo;
 	modelComponent->getEntityInformation(ot::UIDList{ baseShapeID }, entityInfo);
-	ot::UID baseShapeVersion = entityInfo.front().getVersion();
+	ot::UID baseShapeVersion = entityInfo.front().getEntityVersion();
 
 	EntityGeometry *baseGeometry = dynamic_cast<EntityGeometry*>(entityCache->getEntity(baseShapeID, baseShapeVersion));
 
@@ -250,7 +250,7 @@ void EdgesOperationBase::updateShape(EntityGeometry* geometryEntity, TopoDS_Shap
 
 	entityInfo.clear();
 	modelComponent->getEntityInformation(ot::UIDList{ brepID }, entityInfo);
-	ot::UID brepVersion = entityInfo.front().getVersion();
+	ot::UID brepVersion = entityInfo.front().getEntityVersion();
 
 	EntityBrep* baseBrep = dynamic_cast<EntityBrep*>(entityCache->getEntity(brepID, brepVersion));
 

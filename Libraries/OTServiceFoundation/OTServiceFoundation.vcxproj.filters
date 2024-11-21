@@ -55,6 +55,9 @@
     <ClCompile Include="src\ErrorWarningLogFrontendNotifier.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\EntityInformation.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTServiceFoundation\AbstractModelNotifier.h">

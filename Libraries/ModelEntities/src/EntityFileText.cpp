@@ -118,7 +118,7 @@ void EntityFileText::setText(const std::string& _text)
 
 ot::TextEditorCfg EntityFileText::createConfig(void) {
 	ot::TextEditorCfg result;
-	result.setName(this->getName());
+	result.setEntityName(this->getName());
 	result.setTitle(this->getName());
 	result.setPlainText(this->getText());
 

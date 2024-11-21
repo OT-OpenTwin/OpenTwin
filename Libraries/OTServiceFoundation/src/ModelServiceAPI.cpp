@@ -174,16 +174,16 @@ void ot::ModelServiceAPI::getAvailableMeshes(std::string& _meshFolderName, UID& 
 	assert(meshFolderInfo.size() == 1);
 	if (meshFolderInfo.size() != 1) return;
 
-	_meshFolderName = meshFolderInfo.front().getName();
-	_meshFolderID = meshFolderInfo.front().getID();
+	_meshFolderName = meshFolderInfo.front().getEntityName();
+	_meshFolderID = meshFolderInfo.front().getEntityID();
 
 	std::list<EntityInformation> meshInfo;
 	getEntityChildInformation(_meshFolderName, meshInfo, false);
 
 	if (meshInfo.empty()) return;
 
-	_meshName = meshInfo.front().getName();
-	_meshID = meshInfo.front().getID();
+	_meshName = meshInfo.front().getEntityName();
+	_meshID = meshInfo.front().getEntityID();
 }
 
 void ot::ModelServiceAPI::addEntitiesToModel(std::list<UID>& _topologyEntityIDList, std::list<UID>& _topologyEntityVersionList, std::list<bool>& _topologyEntityForceVisible,
@@ -348,10 +348,10 @@ void ot::ModelServiceAPI::getEntityInformation(const std::list<UID>& _entities, 
 	for (size_t index = 0; index < entityIDVec.size(); index++)
 	{
 		EntityInformation info;
-		info.setID(entityIDVec[index]);
-		info.setVersion(entityVersionVec[index]);
-		info.setName(entityNameVec[index]);
-		info.setType(entityTypeVec[index]);
+		info.setEntityID(entityIDVec[index]);
+		info.setEntityVersion(entityVersionVec[index]);
+		info.setEntityName(entityNameVec[index]);
+		info.setEntityType(entityTypeVec[index]);
 
 		_entityInfo.push_back(info);
 	}
@@ -417,10 +417,10 @@ void ot::ModelServiceAPI::getEntityInformation(const std::list<std::string>& _en
 	for (size_t index = 0; index < entityIDVec.size(); index++)
 	{
 		EntityInformation info;
-		info.setID(entityIDVec[index]);
-		info.setVersion(entityVersionVec[index]);
-		info.setName(entityNameVec[index]);
-		info.setType(entityTypeVec[index]);
+		info.setEntityID(entityIDVec[index]);
+		info.setEntityVersion(entityVersionVec[index]);
+		info.setEntityName(entityNameVec[index]);
+		info.setEntityType(entityTypeVec[index]);
 
 		_entityInfo.push_back(info);
 	}
@@ -431,7 +431,11 @@ void ot::ModelServiceAPI::getSelectedEntityInformation(std::list<EntityInformati
 	// Prepare the request
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetSelectedEntityInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-	requestDoc.AddMember(OT_ACTION_PARAM_SETTINGS_Type, JsonString(typeFilter, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	
+	if (typeFilter != "")
+	{
+		requestDoc.AddMember(OT_ACTION_PARAM_SETTINGS_Type, JsonString(typeFilter, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+	}
 
 	// Send the command
 	std::string response;
@@ -472,10 +476,10 @@ void ot::ModelServiceAPI::getSelectedEntityInformation(std::list<EntityInformati
 	for (size_t index = 0; index < entityIDVec.size(); index++)
 	{
 		EntityInformation info;
-		info.setID(entityIDVec[index]);
-		info.setVersion(entityVersionVec[index]);
-		info.setName(entityNameVec[index]);
-		info.setType(entityTypeVec[index]);
+		info.setEntityID(entityIDVec[index]);
+		info.setEntityVersion(entityVersionVec[index]);
+		info.setEntityName(entityNameVec[index]);
+		info.setEntityType(entityTypeVec[index]);
 
 		_entityInfo.push_back(info);
 	}
@@ -527,10 +531,10 @@ void ot::ModelServiceAPI::getEntityChildInformation(const std::string& _entity, 
 	for (size_t index = 0; index < entityIDVec.size(); index++)
 	{
 		EntityInformation info;
-		info.setID(entityIDVec[index]);
-		info.setVersion(entityVersionVec[index]);
-		info.setName(entityNameVec[index]);
-		info.setType(entityTypeVec[index]);
+		info.setEntityID(entityIDVec[index]);
+		info.setEntityVersion(entityVersionVec[index]);
+		info.setEntityName(entityNameVec[index]);
+		info.setEntityType(entityTypeVec[index]);
 
 		_entityInfo.push_back(info);
 	}
@@ -582,10 +586,10 @@ void ot::ModelServiceAPI::getEntityChildInformation(UID _entity, std::list<Entit
 	for (size_t index = 0; index < entityIDVec.size(); index++)
 	{
 		EntityInformation info;
-		info.setID(entityIDVec[index]);
-		info.setVersion(entityVersionVec[index]);
-		info.setName(entityNameVec[index]);
-		info.setType(entityTypeVec[index]);
+		info.setEntityID(entityIDVec[index]);
+		info.setEntityVersion(entityVersionVec[index]);
+		info.setEntityName(entityNameVec[index]);
+		info.setEntityType(entityTypeVec[index]);
 
 		_entityInfo.push_back(info);
 	}

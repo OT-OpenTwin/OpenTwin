@@ -59,7 +59,6 @@ Set Current Selection
 ^^^^^^^^^^^^^^^^^^^^^
 
 To modify the current selection of the table send the ``OT_ACTION_CMD_UI_TABLE_SetSelection`` action to the Frontend.
-Note that the BasicServiceInformation must be provided via the action document.
 Note that specified table must already exist.
 
 .. list-table:: Action Parameters
@@ -88,7 +87,6 @@ Get Current Selection
 
 To request a callback for the current table selection send the ``OT_ACTION_CMD_UI_TABLE_GetSelection`` action to the Frontend.
 Since all actions to the Frontend are queued this action will be handled asynchronous.
-Note that the BasicServiceInformation must be provided via the action document.
 Note that specified table must already exist.
 
 .. list-table:: Action Parameters
@@ -131,7 +129,6 @@ Set Current Selection Background
 
 If the background color of the current table selection should be changed send the ``OT_ACTION_CMD_UI_TABLE_SetCurrentSelectionBackground`` action to the Frontend.
 The current selection can be optionally changed when sending this action.
-Note that the BasicServiceInformation must be provided via the action document.
 Note that specified table must already exist.
 
 .. list-table:: Action Parameters

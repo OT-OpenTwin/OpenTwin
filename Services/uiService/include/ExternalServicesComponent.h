@@ -53,8 +53,8 @@ class ServiceDataUi;
 class WebsocketClient;
 class ControlsManager;
 class KeyboardCommandHandler;
-namespace ot { class Table; };
 namespace ot { class Property; };
+namespace ot { class TableView; };
 namespace ot { class ServiceBase; };
 
 class ExternalServicesComponent : public QObject, public ak::aNotifier, public ot::ActionHandler {
@@ -320,11 +320,10 @@ public:
 
 	// Table Old
 	OT_HANDLER(handleTableChange, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_Table_Change, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleGetTableSelectionOld, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_GetTableSelection, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleShowTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSetTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SetTable, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSelectRanges, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleColorSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection, ot::MessageType::ALL_MESSAGE_TYPES)
+	
 
 	// Studio Suite API
 	OT_HANDLER(handleStudioSuiteAction, ExternalServicesComponent, OT_ACTIONLIST(
@@ -408,7 +407,7 @@ private:
 
 	void determineViews(const std::string& modelServiceURL);
 
-	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::Table* _table);
+	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
 
 	// #################################################################
 

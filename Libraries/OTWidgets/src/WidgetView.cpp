@@ -12,9 +12,17 @@
 #include <ads/DockAreaWidget.h>
 #include <ads/DockManager.h>
 
-ot::WidgetView::WidgetView()
+std::string ot::WidgetView::createStoredViewName(const WidgetViewBase& _view) {
+	return WidgetView::createStoredViewName(_view.getEntityName(), _view.getViewType());
+}
+
+std::string ot::WidgetView::createStoredViewName(const std::string& _entityName, WidgetViewBase::ViewType _viewType) {
+	return _entityName + "$" + WidgetViewBase::toString(_viewType);
+}
+
+ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType)
 	: m_isPermanent(false), m_isDeletedByManager(false),
-	m_isModified(false), m_dockWidget(nullptr)
+	m_isModified(false), m_dockWidget(nullptr), m_data(_viewType)
 {
 	m_dockWidget = new ads::CDockWidget("");
 	m_dockWidget->setFeature(ads::CDockWidget::CustomCloseHandling, true);
@@ -45,17 +53,19 @@ QAction* ot::WidgetView::getViewToggleAction(void) const {
 
 void ot::WidgetView::setViewData(const WidgetViewBase& _data) {
 	m_data = _data;
-	m_dockWidget->setObjectName(QString::fromStdString(_data.getName()));
+
+	m_dockWidget->setObjectName(QString::fromStdString(WidgetView::createStoredViewName(m_data)));
 	m_dockWidget->toggleViewAction()->setText(QString::fromStdString(_data.getTitle()));
-	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, _data.getFlags() & WidgetViewBase::ViewIsCloseable);
-	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetPinnable, _data.getFlags() & WidgetViewBase::ViewIsPinnable);
+	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, _data.getViewFlags() & WidgetViewBase::ViewIsCloseable);
+	m_dockWidget->setFeature(ads::CDockWidget::DockWidgetPinnable, _data.getViewFlags() & WidgetViewBase::ViewIsPinnable);
 
 	this->setViewContentModified(m_isModified);
 }
 
 void ot::WidgetView::setViewContentModified(bool _isModified) {
 	m_isModified = _isModified;
-	m_dockWidget->setWindowTitle((m_isModified ? QString::fromStdString(m_data.getTitle()) + "*" : QString::fromStdString(m_data.getTitle())));
+	QString title = (m_data.getTitle().empty() ? QString::fromStdString(m_data.getEntityName()) : QString::fromStdString(m_data.getTitle()));
+	m_dockWidget->setWindowTitle((m_isModified ? title + "*" : title));
 }
 
 QString ot::WidgetView::getCurrentViewTitle(void) const {

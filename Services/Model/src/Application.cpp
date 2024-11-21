@@ -463,7 +463,11 @@ std::string Application::handleGetSelectedEntityInformation(ot::JsonDocument& _d
 		return OT_ACTION_RETURN_INDICATOR_Error "No model created yet";
 	}
 
-	std::string typeFilter = ot::json::getString(_document, OT_ACTION_PARAM_SETTINGS_Type);
+	std::string typeFilter("");
+	if (ot::json::exists(_document, OT_ACTION_PARAM_SETTINGS_Type))
+	{
+		typeFilter = ot::json::getString(_document, OT_ACTION_PARAM_SETTINGS_Type);
+	}
 
 	std::list<EntityBase*> entityList = m_model->getListOfSelectedEntities(typeFilter);
 

@@ -85,14 +85,14 @@ void SolverElectrostatics::getMaterialsToObjectsMap(std::map<std::string, std::l
     // Here we need to loop through all mesh items and their properties and get their materials
     for (auto item : entityProperties)
     {
-        if (meshItemInfo[item.first].getType() == "EntityMeshTetItem")
+        if (meshItemInfo[item.first].getEntityType() == "EntityMeshTetItem")
         {
             EntityPropertiesEntityList* materialProperty = dynamic_cast<EntityPropertiesEntityList*>(item.second.getProperty("Material"));
 
             if (materialProperty != nullptr)
             {
                 std::string materialName = app->modelComponent()->getCurrentMaterialName(materialProperty);
-                materialsToObjectsMap[materialName].push_back(meshItemInfo[item.first].getName());
+                materialsToObjectsMap[materialName].push_back(meshItemInfo[item.first].getEntityName());
             }
         }
     }
@@ -107,7 +107,7 @@ void SolverElectrostatics::getPotentialDefinitions(std::map<std::string, double>
 
         if (potential != nullptr)
         {
-            potentialDefinitions[meshItemInfo[item.first].getName()] = potential->getValue();
+            potentialDefinitions[meshItemInfo[item.first].getEntityName()] = potential->getValue();
         }
     }
 }

@@ -277,18 +277,18 @@ void Application::runPHREEC(void)
 	std::map<std::string, bool> solverRunMap;
 	for (auto entity : selectedEntityInfo)
 	{
-		if (entity.getType() == "EntitySolverPHREEC" || entity.getType() == "EntitySolver")  // EntitySolver for backward compatibility
+		if (entity.getEntityType() == "EntitySolverPHREEC" || entity.getEntityType() == "EntitySolver")  // EntitySolver for backward compatibility
 		{
-			if (entity.getName().substr(0, 8) == "Solvers/")
+			if (entity.getEntityName().substr(0, 8) == "Solvers/")
 			{
-				size_t index = entity.getName().find('/', 8);
+				size_t index = entity.getEntityName().find('/', 8);
 				if (index != std::string::npos)
 				{
-					solverRunMap[entity.getName().substr(0, index - 1)] = true;
+					solverRunMap[entity.getEntityName().substr(0, index - 1)] = true;
 				}
 				else
 				{
-					solverRunMap[entity.getName()] = true;
+					solverRunMap[entity.getEntityName()] = true;
 				}
 			}
 		}
@@ -316,7 +316,7 @@ void Application::runPHREEC(void)
 
 	for (auto info : solverInfo)
 	{
-		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getID(), info.getVersion()));
+		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsSolver);
@@ -326,8 +326,8 @@ void Application::runPHREEC(void)
 	std::map<std::string, EntityBase *> solverMap;
 	for (auto info : solverInfo)
 	{
-		EntityBase *entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), getClassFactory());
-		solverMap[info.getName()] = entity;
+		EntityBase *entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory());
+		solverMap[info.getEntityName()] = entity;
 	}
 
 	std::list<ot::EntityInformation> meshInfo;
@@ -344,12 +344,12 @@ void Application::runPHREEC(void)
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::string modelVersion, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase *> solverMap) {
 	for (auto solver : solverInfo)
 	{
-		runSingleSolver(solver, modelVersion, meshInfo, solverMap[solver.getName()]);
+		runSingleSolver(solver, modelVersion, meshInfo, solverMap[solver.getEntityName()]);
 	}
 }
 
 void Application::runSingleSolver(ot::EntityInformation &solver, std::string &modelVersion, std::list<ot::EntityInformation> &meshInfo, EntityBase *solverEntity) {
-	std::string solverName = solver.getName();
+	std::string solverName = solver.getEntityName();
 	if (solverName.substr(0, 8) == "Solvers/")
 	{
 		solverName = solverName.substr(8);
@@ -394,7 +394,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::string &mo
 
 	for (auto meshItem : meshInfo)
 	{
-		if (meshItem.getID() == meshEntityID)
+		if (meshItem.getEntityID() == meshEntityID)
 		{
 			meshFound = true;
 			break;
@@ -407,9 +407,9 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::string &mo
 		meshEntityID = 0;
 		for (auto meshItem : meshInfo)
 		{
-			if (meshItem.getName() == mesh->getValueName())
+			if (meshItem.getEntityName() == mesh->getValueName())
 			{
-				meshEntityID = meshItem.getID();
+				meshEntityID = meshItem.getEntityID();
 				break;
 			}
 		}
@@ -436,7 +436,7 @@ void Application::runSingleSolver(ot::EntityInformation &solver, std::string &mo
 	std::list<ot::UID> dataEntityVersionList;
 	std::list<ot::UID> dataEntityParentList;
 
-	EntityResultText *text = m_modelComponent->addResultTextEntity(solver.getName() + "/Output", output);
+	EntityResultText *text = m_modelComponent->addResultTextEntity(solver.getEntityName() + "/Output", output);
 
 	topologyEntityIDList.push_back(text->getEntityID());
 	topologyEntityVersionList.push_back(text->getEntityStorageVersion());

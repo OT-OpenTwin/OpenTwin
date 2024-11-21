@@ -6,7 +6,9 @@
 // OpenTwin header
 #include "OTWidgets/PlotView.h"
 
-ot::PlotView::PlotView() {
+ot::PlotView::PlotView() 
+	: WidgetView(WidgetViewBase::View1D)
+{
 	this->addWidgetToDock(this->getQWidget());
 }
 

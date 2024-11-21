@@ -71,7 +71,7 @@ void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::P
 	std::list<ot::EntityInformation> entityInfos;
 	ot::UIDList entityIDList{ blockID };
 	_modelComponent->getEntityInformation(entityIDList, entityInfos);
-	auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), *classFactory);
+	auto entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), *classFactory);
 	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
 	
 	
@@ -106,7 +106,7 @@ void BlockEntityHandler::UpdateBlockPosition(const ot::UID& blockID, const ot::P
 	entityInfos.clear();
 	entityIDList = { positionID };
 	_modelComponent->getEntityInformation(entityIDList, entityInfos);
-	entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getID(), entityInfos.begin()->getVersion(), *classFactory);
+	entBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfos.begin()->getEntityID(), entityInfos.begin()->getEntityVersion(), *classFactory);
 	std::unique_ptr<EntityCoordinates2D> coordinateEnt(dynamic_cast<EntityCoordinates2D*>(entBase));
 	coordinateEnt->setCoordinates(position);
 	coordinateEnt->StoreToDataBase();
@@ -149,7 +149,7 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 
 	std::map<ot::UID, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
 	for (auto& entityInfo : entityInfos) {
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), classFactory);
 		if (baseEntity != nullptr && baseEntity->getClassName() != "EntityBlockConnection") { //Otherwise not a BlockEntity, since ClassFactoryBlock does not handle others 
 			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
 			assert(blockEntity != nullptr);
@@ -169,7 +169,7 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::fi
 
 	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> entityBlockConnectionsByBlockID;
 	for (auto& entityInfo : entityInfos) {
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getID(), entityInfo.getVersion(), classFactory);
+		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), classFactory);
 		if (baseEntity != nullptr && baseEntity->getClassName() == "EntityBlockConnection") {
 			std::shared_ptr<EntityBlockConnection> blockEntityConnection(dynamic_cast<EntityBlockConnection*>(baseEntity));
 			assert(blockEntityConnection != nullptr);
@@ -177,9 +177,7 @@ std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::fi
 		}
 	}
 
-	return entityBlockConnectionsByBlockID;
-
-	
+	return entityBlockConnectionsByBlockID;	
 }
 
 bool BlockEntityHandler::connectorHasTypeOut(std::shared_ptr<EntityBlock> blockEntity, const std::string& connectorName) {

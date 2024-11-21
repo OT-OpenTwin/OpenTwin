@@ -77,9 +77,9 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 
 	for (auto entity : entityInfo)
 	{
-		entityVersionMap[entity.getID()] = entity.getVersion();
+		entityVersionMap[entity.getEntityID()] = entity.getEntityVersion();
 
-		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry *>(entityCache->getEntity(entity.getID(), entity.getVersion()));
+		EntityGeometry *geometryEntity = dynamic_cast<EntityGeometry *>(entityCache->getEntity(entity.getEntityID(), entity.getEntityVersion()));
 
 		if (geometryEntity->getEditable())
 		{
@@ -96,7 +96,7 @@ void SimplifyRemoveFaces::performOperation(const std::string &selectionInfo)
 	// Add the brep entities to the version map
 	for (auto entity : entityBrepInfo)
 	{
-		entityVersionMap[entity.getID()] = entity.getVersion();
+		entityVersionMap[entity.getEntityID()] = entity.getEntityVersion();
 	}
 
 	// Here, we sort the picked faces by entity 

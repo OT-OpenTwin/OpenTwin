@@ -228,7 +228,7 @@ void Application::addSolver()
 	ot::EntityInformation entityInfo;
 	m_modelComponent->getEntityInformation("Circuits", entityInfo);
 
-	solverEntity->createProperties("Circuits", entityInfo.getID(), circuitName, circuitID);
+	solverEntity->createProperties("Circuits", entityInfo.getEntityID(), circuitName, circuitID);
 	solverEntity->StoreToDataBase();
 
 	// Register the new solver item in the model
@@ -266,14 +266,14 @@ void Application::runCircuitSimulation() {
 	//Here we first need to check which solvers are selected and then run them one by on
 	std::map<std::string, bool> solverRunMap;
 	for (auto entity : selectedEntityInfo) {
-		if (entity.getType() == "EntitySolverCircuitSimulator" || entity.getType() == "EntitySolver") {
-			if (entity.getName().substr(0, 8) == "Solvers/") {
-				size_t index = entity.getName().find('/', 8);
+		if (entity.getEntityType() == "EntitySolverCircuitSimulator" || entity.getEntityType() == "EntitySolver") {
+			if (entity.getEntityName().substr(0, 8) == "Solvers/") {
+				size_t index = entity.getEntityName().find('/', 8);
 				if (index != std::string::npos) {
-					solverRunMap[entity.getName().substr(0, index - 1)] = true;
+					solverRunMap[entity.getEntityName().substr(0, index - 1)] = true;
 				}
 				else {
-					solverRunMap[entity.getName()] = true;
+					solverRunMap[entity.getEntityName()] = true;
 				}
 			}
 		}
@@ -298,7 +298,7 @@ void Application::runCircuitSimulation() {
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIdsSolver;
 
 	for (auto info : solverInfo) {
-		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getID(), info.getVersion()));
+		prefetchIdsSolver.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdsSolver);
@@ -306,8 +306,8 @@ void Application::runCircuitSimulation() {
 	//Now read the solver objects for each solver
 	std::map<std::string, EntityBase*> solverMap;
 	for (auto info : solverInfo) {
-		EntityBase* entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), getClassFactory());
-		solverMap[info.getName()] = entity;
+		EntityBase* entity = m_modelComponent->readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), getClassFactory());
+		solverMap[info.getEntityName()] = entity;
 	}
 
 	// Get the current model version
@@ -320,7 +320,7 @@ void Application::runCircuitSimulation() {
 
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::string modelVersion, std::map<std::string, EntityBase*> solverMap) {
 	for (auto solver : solverInfo) {
-		runSingleSolver(solver, modelVersion, solverMap[solver.getName()]);
+		runSingleSolver(solver, modelVersion, solverMap[solver.getEntityName()]);
 	}
 }
 
@@ -334,7 +334,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	
 
 	std::string name =  extractStringAfterDelimiter(circuitName->getValueName(), '/', 1);
-	std::string solverName = solver.getName();
+	std::string solverName = solver.getEntityName();
 
 	if (name == "failed")
 	{

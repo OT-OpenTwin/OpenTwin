@@ -319,14 +319,14 @@ void PHREECMeshExport::processMaterialData(const std::string &meshName, std::lis
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIds;
 	for (auto info : materialInfo)
 	{
-		prefetchIds.push_back(std::pair<unsigned long long, unsigned long long>(info.getID(), info.getVersion()));
+		prefetchIds.push_back(std::pair<unsigned long long, unsigned long long>(info.getEntityID(), info.getEntityVersion()));
 	}
 
 	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIds);
 
 	for (auto info : materialInfo)
 	{
-		materialMap[info.getName()] = dynamic_cast<EntityMaterial *>(modelComponent->readEntityFromEntityIDandVersion(info.getID(), info.getVersion(), application->getClassFactory()));
+		materialMap[info.getEntityName()] = dynamic_cast<EntityMaterial *>(modelComponent->readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion(), application->getClassFactory()));
 	}
 
 	// Finally process the list of sections and create the material

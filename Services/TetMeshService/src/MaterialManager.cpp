@@ -55,14 +55,14 @@ void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometr
 
 	for (auto mat : materialInformation)
 	{
-		EntityMaterial *material = dynamic_cast<EntityMaterial *> (application->modelComponent()->readEntityFromEntityIDandVersion(mat.getID(), mat.getVersion(), application->getClassFactory()));
+		EntityMaterial *material = dynamic_cast<EntityMaterial *> (application->modelComponent()->readEntityFromEntityIDandVersion(mat.getEntityID(), mat.getEntityVersion(), application->getClassFactory()));
 
 		if (material == nullptr)
 		{
-			throw std::string("ERROR: Unable to load material: " + mat.getName() + "\n\n");
+			throw std::string("ERROR: Unable to load material: " + mat.getEntityName() + "\n\n");
 		}
 
-		materialMap[mat.getName()] = material;
+		materialMap[mat.getEntityName()] = material;
 	}
 }
 

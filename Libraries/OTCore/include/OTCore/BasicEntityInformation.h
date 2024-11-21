@@ -1,4 +1,4 @@
-//! @file EntityViewBaseInfo.h
+//! @file BasicEntityInformation.h
 //! @author Alexander Kuester (alexk95)
 //! @date November 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -8,8 +8,6 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
-#include "OTCore/OTClassHelper.h"
-#include "OTGui/OTGuiAPIExport.h"
 
 // std header
 #include <string>
@@ -18,16 +16,15 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT EntityViewBaseInfo : public Serializable {
+	class OT_CORE_API_EXPORT BasicEntityInformation : public Serializable {
 	public:
-		EntityViewBaseInfo();
-		EntityViewBaseInfo(const std::string& _name);
-		EntityViewBaseInfo(const std::string& _name, UID _entityId, UID _entityVersion);
-		EntityViewBaseInfo(const std::string& _name, const std::string& _title, UID _entityId, UID _entityVersion);
-		EntityViewBaseInfo(const EntityViewBaseInfo& _other);
-		virtual ~EntityViewBaseInfo();
+		BasicEntityInformation();
+		BasicEntityInformation(const std::string& _entityName);
+		BasicEntityInformation(const std::string& _entityName, UID _entityId, UID _entityVersion);
+		BasicEntityInformation(const BasicEntityInformation& _other);
+		virtual ~BasicEntityInformation();
 
-		EntityViewBaseInfo& operator = (const EntityViewBaseInfo& _other);
+		BasicEntityInformation& operator = (const BasicEntityInformation& _other);
 
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
@@ -39,24 +36,19 @@ namespace ot {
 		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& getName(void) const { return m_name; };
+		void setEntityName(const std::string& _entityName) { m_entityName = _entityName; };
+		const std::string& getEntityName(void) const { return m_entityName; };
 
-		void setTitle(const std::string& _title) { m_title = _title; };
-		const std::string& getTitle(void) const { return (m_title.empty() ? m_name : m_title); };
+		void setEntityID(UID _entityId) { m_entityId = _entityId; };
+		UID getEntityID(void) const { return m_entityId; };
 
-		void setEntityId(UID _id) { m_entityId = _id; };
-		UID getEntityId(void) const { return m_entityId; };
-
-		void setEntityVersion(UID _version) { m_entityVersion = _version; };
+		void setEntityVersion(UID _entityVersion) { m_entityVersion = _entityVersion; };
 		UID getEntityVersion(void) const { return m_entityVersion; };
 
 	private:
-		std::string m_name;
-		std::string m_title;
-		UID m_entityId;
-		UID m_entityVersion;
-
+		std::string m_entityName; //! \brief Name of entity that is displayed in the widget view.
+		UID m_entityId; //! \brief ID of the entity that is displayed in the widget view.
+		UID m_entityVersion; //! \brief Version of the entity that is displayed in the widget view.
 	};
 
 }

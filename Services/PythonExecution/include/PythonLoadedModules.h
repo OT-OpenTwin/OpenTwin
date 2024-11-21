@@ -52,7 +52,7 @@ public:
 
 	std::string CreateUniqueModuleName(ot::EntityInformation& entityInfo)
 	{
-		return std::to_string(entityInfo.getID()) + std::to_string(entityInfo.getVersion());
+		return std::to_string(entityInfo.getEntityID()) + std::to_string(entityInfo.getEntityVersion());
 	}
 private:
 

@@ -20,7 +20,7 @@
 #include <QtCore/qbytearray.h>
 
 // std header
-#include <map>
+#include <list>
 #include <string>
 
 class QAction;
@@ -38,6 +38,10 @@ namespace ot {
 		Q_OBJECT
 		OT_DECL_NOCOPY(WidgetViewManager)
 	public:
+		typedef std::pair<std::string, WidgetViewBase::ViewType> ViewNameTypeListEntry;
+		typedef std::list<ViewNameTypeListEntry> ViewNameTypeList;
+		typedef std::pair<BasicServiceInformation, ot::WidgetView*> ViewEntry;
+
 		//! @brief Return the clobal instance
 		static WidgetViewManager& instance(void);
 
@@ -67,16 +71,29 @@ namespace ot {
 		
 		//! @brief Returns the widget view with the specified name.
 		//! If the view does not exists return 0.
-		//! @param _viewName Widget view name.
-		WidgetView* findView(const std::string& _viewName) const;
+		//! @param _entityName Widget view name.
+		WidgetView* findView(const std::string& _entityName, WidgetViewBase::ViewType _type) const;
+
+		//! \brief Returns the widget view that matches the title.
+		//! Will log and assert if more than one view with the same title were found.
+		//! Checks the view title and the current view title.
+		WidgetView* findViewFromTitle(const std::string& _viewTitle) const;
+
+		//! \brief Searches for the view and owner of the view.
+		//! Returns true if the view was found.
+		bool findViewAndOwner(const std::string& _entityName, WidgetViewBase::ViewType _type, WidgetView*& _view, BasicServiceInformation& _owner) const;
 
 		//! @brief Returns the widget view that owns this dock
 		WidgetView* getViewFromDockWidget(ads::CDockWidget* _dock) const;
 
+		//! @brief Close and destroy the provided view.
+		//! @param _view The view to close.
+		void closeView(WidgetView* _view);
+
 		//! @brief Close the widget view with the specified name.
 		//! Widget views that are protected will be ignored.
-		//! @param _viewName Widget view name.
-		void closeView(const std::string& _viewName);
+		//! @param _entityName Widget view name.
+		void closeView(const std::string& _entityName, WidgetViewBase::ViewType _type);
 
 		//! @brief Close all widget views that belong to the given owner.
 		//! Widget views that are protected will be ignored.
@@ -94,16 +111,19 @@ namespace ot {
 
 		//! @brief Remove the widget view with the given name from the manager.
 		//! The caller takes ownership of the view.
-		//! @param _viewName Widget view name.
-		WidgetView* forgetView(const std::string& _viewName);
+		//! @param _entityName Widget view name.
+		WidgetView* forgetView(const std::string& _entityName, WidgetViewBase::ViewType _type);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// View manipulation
 
 		//! @brief Sets the specified widget view as the current tab in its tab area.
-		//! @param _viewName Widget view name.
-		void setCurrentView(const std::string& _viewName);
+		//! @param _entityName Widget view name.
+		void setCurrentView(const std::string& _entityName, WidgetViewBase::ViewType _type);
+
+		//! \brief Sets the current view title.
+		void setCurrentViewFromTitle(const std::string& _viewTitle);
 
 		//! @brief Saves the current state that can be restored later.
 		//! @param _version State version (see restoreState).
@@ -118,13 +138,23 @@ namespace ot {
 
 		// Information gathering
 
+		//! @brief Returns the owner for the given view.
+		//! Returns default BasicServiceInformation if the view is not stored in this manager.
+		BasicServiceInformation getOwnerFromView(WidgetView* _view) const;
+
 		//! @brief Returns true if a view with the given name exists
-		//! @param _viewName Name to check
-		bool getViewExists(const std::string& _viewName) const;
+		//! @param _entityName Name to check
+		bool getViewExists(const std::string& _entityName, WidgetViewBase::ViewType _type) const;
 
 		//! @brief Returns true if a view with the given title (or current title) exists
 		//! @param _title Title to check
-		bool getViewTitleExists(const QString& _title) const;
+		bool getViewTitleExists(const std::string& _title) const;
+
+		//! @brief Returns all view names that belong to the given owner.
+		ViewNameTypeList getViewNamesFromOwner(const BasicServiceInformation& _owner) const;
+
+		//! @brief Returns all view names with the given type that belong to the given owner.
+		std::list<std::string> getViewNamesFromOwner(const BasicServiceInformation& _owner, WidgetViewBase::ViewType _type) const;
 
 		//! \brief Returns true if the content of any of the views is modified.
 		bool getAnyViewContentModified(void);
@@ -153,6 +183,10 @@ namespace ot {
 		WidgetViewManager();
 		~WidgetViewManager();
 
+		bool getViewExists(const ViewNameTypeListEntry& _entry) const;
+
+		WidgetView* findView(const ViewNameTypeListEntry& _entry) const;
+
 		//! \brief Adds the view and stores the information.
 		//! The view's dock widget will get the IconManager::getApplicationIcon() set.
 		//! \param _parentArea The target area to add the view to.
@@ -165,8 +199,8 @@ namespace ot {
 
 		ads::CDockAreaWidget* determineBestRestoreArea(WidgetView* _view, WidgetViewBase::ViewFlag _viewType) const;
 
-		std::list<std::string>* findViewNameList(const BasicServiceInformation& _owner);
-		std::list<std::string>* findOrCreateViewNameList(const BasicServiceInformation& _owner);
+		ViewNameTypeList* findViewNameTypeList(const BasicServiceInformation& _owner);
+		ViewNameTypeList* findOrCreateViewNameTypeList(const BasicServiceInformation& _owner);
 
 		ads::CDockManager* m_dockManager; //! @brief Dock manager managed by this manager
 		QAction*           m_dockToggleRoot; //! @brief Action containing the toggle dock visibility menu and actions
@@ -178,8 +212,8 @@ namespace ot {
 		};
 		FocusInfo        m_focusInfo;
 
-		std::map<BasicServiceInformation, std::list<std::string>*> m_viewOwnerMap; //! @brief Maps owners to widget view names
-		std::map<std::string, std::pair<BasicServiceInformation, WidgetView*>> m_viewNameMap; //! @brief Maps Widget view names to widget views and their owners
+		std::map<BasicServiceInformation, ViewNameTypeList*> m_viewOwnerMap; //! @brief Maps owners to widget view names and types
+		std::list<ViewEntry> m_views; //! @brief Contains all views and their owners.
 	};
 
 }

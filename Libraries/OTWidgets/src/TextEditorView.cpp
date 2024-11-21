@@ -6,7 +6,9 @@
 // OpenTwin header
 #include "OTWidgets/TextEditorView.h"
 
-ot::TextEditorView::TextEditorView() {
+ot::TextEditorView::TextEditorView()
+	: WidgetView(WidgetViewBase::ViewText)
+{
 	this->addWidgetToDock(this);
 }
 
@@ -20,6 +22,13 @@ ot::TextEditorView::~TextEditorView() {
 
 QWidget* ot::TextEditorView::getViewWidget(void) {
 	return this;
+}
+
+void ot::TextEditorView::setupFromConfig(const TextEditorCfg& _config, bool _isUpdate) {
+	TextEditor::setupFromConfig(_config, _isUpdate);
+	if (!_isUpdate) {
+		this->setViewData(_config);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

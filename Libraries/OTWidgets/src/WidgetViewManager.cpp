@@ -57,57 +57,83 @@ bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, Widge
 	return this->addViewImpl(_owner, _view, _parentArea, _insertArea);
 }
 
-ot::WidgetView* ot::WidgetViewManager::findView(const std::string& _viewName) const {
-	OTAssertNullptr(m_dockManager);
-
-	const auto it = m_viewNameMap.find(_viewName);
-	if (it == m_viewNameMap.end()) return nullptr;
-	else return it->second.second;
+ot::WidgetView* ot::WidgetViewManager::findView(const std::string& _entityName, WidgetViewBase::ViewType _type) const {
+	ViewNameTypeListEntry entry;
+	entry.first = _entityName;
+	entry.second = _type;
+	return this->findView(entry);
+	
 }
 
-ot::WidgetView* ot::WidgetViewManager::getViewFromDockWidget(ads::CDockWidget* _dock) const {
-	OTAssertNullptr(m_dockManager);
-
-	for (const auto& it : m_viewNameMap) {
-		if (it.second.second->getViewDockWidget() == _dock) return it.second.second;
+ot::WidgetView* ot::WidgetViewManager::findViewFromTitle(const std::string& _viewTitle) const {
+	for (const ViewEntry& entry : m_views) {
+		if (entry.second->getViewData().getTitle() == _viewTitle || entry.second->getCurrentViewTitle().toStdString() == _viewTitle) {
+			return entry.second;
+		}
 	}
 	return nullptr;
 }
 
-void ot::WidgetViewManager::closeView(const std::string& _viewName) {
-	OTAssertNullptr(m_dockManager);
-
-	WidgetView* view = this->findView(_viewName);
-	if (view == nullptr) {
-		return;
+bool ot::WidgetViewManager::findViewAndOwner(const std::string& _entityName, WidgetViewBase::ViewType _type, WidgetView*& _view, BasicServiceInformation& _owner) const {
+	for (const ViewEntry& view : m_views) {
+		if (view.second->getViewData().getEntityName() == _entityName && view.second->getViewData().getViewType() == _type) {
+			_owner = view.first;
+			_view = view.second;
+			return true;
+		}
 	}
-	if (view->getViewIsPermanent()) {
+
+	return false;
+}
+
+ot::WidgetView* ot::WidgetViewManager::getViewFromDockWidget(ads::CDockWidget* _dock) const {
+	for (const ViewEntry& view : m_views) {
+		if (view.second->getViewDockWidget() == _dock) {
+			return view.second;
+		}
+	}
+
+	return nullptr;
+}
+
+void ot::WidgetViewManager::closeView(WidgetView* _view) {
+	OTAssertNullptr(_view);
+	if (_view->getViewIsPermanent()) {
 		return;
 	}
 
 	// Set the view as deleted by manager so it wont remove itself and remove it from the maps
-	view->m_isDeletedByManager = true;
-	this->forgetView(_viewName);
+	_view->m_isDeletedByManager = true;
+	this->forgetView(_view);
 
 	// Remove the toggle dock action
-	view->getViewDockWidget()->toggleViewAction()->setVisible(false);
-	m_dockToggleRoot->menu()->removeAction(view->getViewDockWidget()->toggleViewAction());
+	_view->getViewDockWidget()->toggleViewAction()->setVisible(false);
+	m_dockToggleRoot->menu()->removeAction(_view->getViewDockWidget()->toggleViewAction());
 
 	// Remove the dock widget itself
-	m_dockManager->removeDockWidget(view->getViewDockWidget());
+	m_dockManager->removeDockWidget(_view->getViewDockWidget());
 
 	// Finally destroy the view
-	delete view;
+	delete _view;
+}
+
+void ot::WidgetViewManager::closeView(const std::string& _entityName, WidgetViewBase::ViewType _type) {
+	OTAssertNullptr(m_dockManager);
+
+	WidgetView* view = this->findView(_entityName, _type);
+	if (view) {
+		this->closeView(view);
+	}
 }
 
 void ot::WidgetViewManager::closeViews(const BasicServiceInformation& _owner) {
 	OTAssertNullptr(m_dockManager);
 
-	std::list<std::string>* lst = this->findViewNameList(_owner);
+	ViewNameTypeList* lst = this->findViewNameTypeList(_owner);
 	if (lst) {
-		std::list<std::string> tmp = *lst;
-		for (const std::string& i : tmp) {
-			this->closeView(i);
+		ViewNameTypeList tmp = *lst;
+		for (const ViewNameTypeListEntry& i : tmp) {
+			this->closeView(i.first, i.second);
 		}
 	}
 }
@@ -115,63 +141,94 @@ void ot::WidgetViewManager::closeViews(const BasicServiceInformation& _owner) {
 void ot::WidgetViewManager::closeViews(void) {
 	OTAssertNullptr(m_dockManager);
 
-	std::list<std::string> tmp;
-	for (const auto& it : m_viewNameMap) {
-		tmp.push_back(it.first);
+	ViewNameTypeList tmp;
+	for (const ViewEntry& view : m_views) {
+		ViewNameTypeListEntry entry;
+		entry.first = view.second->getViewData().getEntityName();
+		entry.second = view.second->getViewData().getViewType();
+		tmp.push_back(entry);
 	}
-	for (const std::string& i : tmp) {
-		this->closeView(i);
+	for (const ViewNameTypeListEntry& i : tmp) {
+		this->closeView(i.first, i.second);
 	}
 }
 
 void ot::WidgetViewManager::forgetView(WidgetView* _view) {
 	OTAssertNullptr(m_dockManager);
 	OTAssertNullptr(_view);
-	this->forgetView(_view->getViewData().getName());
+	this->forgetView(_view->getViewData().getEntityName(), _view->getViewData().getViewType());
 }
 
-ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _viewName) {
+ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName, WidgetViewBase::ViewType _type) {
 	OTAssertNullptr(m_dockManager);
 
 	// Find view and owner
-	auto nameIt = m_viewNameMap.find(_viewName);
-	if (nameIt == m_viewNameMap.end()) return nullptr;
-
-	// Get view
-	ot::WidgetView* ret = nameIt->second.second;
-
+	WidgetView* view = nullptr;
+	BasicServiceInformation owner;
+	if (!this->findViewAndOwner(_entityName, _type, view, owner)) {
+		return nullptr;
+	}
+	
 	// Disconnect signals
-	this->disconnect(ret->getViewDockWidget(), &ads::CDockWidget::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
+	this->disconnect(view->getViewDockWidget(), &ads::CDockWidget::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
 
 	// If the view is the current central, set current central to 0
-	if (nameIt->second.second == m_focusInfo.last) m_focusInfo.last = nullptr;
-	if (nameIt->second.second == m_focusInfo.lastSide) m_focusInfo.lastSide = nullptr;
-	if (nameIt->second.second == m_focusInfo.lastTool) m_focusInfo.lastTool = nullptr;
-	if (nameIt->second.second == m_focusInfo.lastCentral) m_focusInfo.lastCentral = nullptr;
+	if (view == m_focusInfo.last) m_focusInfo.last = nullptr;
+	if (view == m_focusInfo.lastSide) m_focusInfo.lastSide = nullptr;
+	if (view == m_focusInfo.lastTool) m_focusInfo.lastTool = nullptr;
+	if (view == m_focusInfo.lastCentral) m_focusInfo.lastCentral = nullptr;
 
 	// Find name list from owner and erase the view entry
-	std::list<std::string>* lst = this->findViewNameList(nameIt->second.first);
-	auto lstIt = std::find(lst->begin(), lst->end(), _viewName);
-	if (lstIt != lst->end()) lst->erase(lstIt);
-	if (lst->empty()) m_viewOwnerMap.erase(nameIt->second.first);
+	ViewNameTypeList* lst = this->findViewNameTypeList(owner);
+	if (lst) {
+		ViewNameTypeListEntry entry;
+		entry.first = _entityName;
+		entry.second = _type;
 
-	// Now remove the entry from the view name map
-	m_viewNameMap.erase(_viewName);
+		auto lstIt = std::find(lst->begin(), lst->end(), entry);
+		if (lstIt != lst->end()) {
+			lst->erase(lstIt);
+		}
+		// If the owner has no more views, erase the owner.
+		if (lst->empty()) {
+			m_viewOwnerMap.erase(owner);
+		}
+	}
+	else {
+		OT_LOG_EAS("ViewNameTypeList not found");
+	}
+	
+	ViewEntry viewsEntry;
+	viewsEntry.first = owner;
+	viewsEntry.second = view;
 
-	return ret;
+	auto viewIterator = std::find(m_views.begin(), m_views.end(), viewsEntry);
+	if (viewIterator == m_views.end()) {
+		OT_LOG_EA("View entry not found");
+	}
+	else {
+		m_views.erase(viewIterator);
+	}
+
+	return view;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // View manipulation
 
-void ot::WidgetViewManager::setCurrentView(const std::string& _viewName) {
-	OTAssertNullptr(m_dockManager);
+void ot::WidgetViewManager::setCurrentView(const std::string& _entityName, WidgetViewBase::ViewType _type) {
+	WidgetView* view = this->findView(_entityName, _type);
+	if (view) {
+		view->setAsCurrentViewTab();
+	}
+}
 
-	WidgetView* view = this->findView(_viewName);
-	if (!view) return;
-
-	view->setAsCurrentViewTab();
+void ot::WidgetViewManager::setCurrentViewFromTitle(const std::string& _viewTitle) {
+	WidgetView* view = this->findViewFromTitle(_viewTitle);
+	if (view) {
+		view->setAsCurrentViewTab();
+	}
 }
 
 std::string ot::WidgetViewManager::saveState(int _version) const {
@@ -224,20 +281,50 @@ bool ot::WidgetViewManager::restoreState(std::string _state, int _version) {
 
 // Information gathering
 
-bool ot::WidgetViewManager::getViewExists(const std::string& _viewName) const {
-	return this->findView(_viewName);
+ot::BasicServiceInformation ot::WidgetViewManager::getOwnerFromView(WidgetView* _view) const {
+	for (const auto& it : m_views) {
+		if (it.second == _view) {
+			return it.first;
+		}
+	}
+
+	OT_LOG_EA("View not found");
+	return BasicServiceInformation();
 }
 
-bool ot::WidgetViewManager::getViewTitleExists(const QString& _title) const {
-	for (const auto& it : m_viewNameMap) {
-		if (QString::fromStdString(it.second.second->getViewData().getTitle()) == _title || it.second.second->getCurrentViewTitle() == _title) return true;
+bool ot::WidgetViewManager::getViewExists(const std::string& _entityName, WidgetViewBase::ViewType _type) const {
+	return this->findView(_entityName, _type) != nullptr;
+}
+
+bool ot::WidgetViewManager::getViewTitleExists(const std::string& _title) const {
+	return this->findViewFromTitle(_title) != nullptr;
+}
+
+ot::WidgetViewManager::ViewNameTypeList ot::WidgetViewManager::getViewNamesFromOwner(const BasicServiceInformation& _owner) const {
+	auto it = m_viewOwnerMap.find(_owner);
+	if (it == m_viewOwnerMap.end()) {
+		return ViewNameTypeList();
 	}
-	return false;
+	else {
+		return std::move(ViewNameTypeList(*it->second));
+	}
+}
+
+std::list<std::string> ot::WidgetViewManager::getViewNamesFromOwner(const BasicServiceInformation& _owner, WidgetViewBase::ViewType _type) const {
+	std::list<std::string> result;
+	for (const ViewNameTypeListEntry& entry : this->getViewNamesFromOwner(_owner)) {
+		if (entry.second == _type) {
+			result.push_back(entry.first);
+		}
+	}
+	return std::move(result);
 }
 
 bool ot::WidgetViewManager::getAnyViewContentModified(void) {
-	for (const auto& it : m_viewNameMap) {
-		if (it.second.second->getViewContentModified()) return true;
+	for (const ViewEntry& entry : m_views) {
+		if (entry.second->getViewContentModified()) {
+			return true;
+		}
 	}
 	return false;
 }
@@ -258,9 +345,9 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CD
 
 	if (n) {
 		m_focusInfo.last = n;
-		if (n->getViewData().getFlags() & WidgetViewBase::ViewIsCentral) m_focusInfo.lastCentral = n;
-		if (n->getViewData().getFlags() & WidgetViewBase::ViewIsSide) m_focusInfo.lastSide = n;
-		if (n->getViewData().getFlags() & WidgetViewBase::ViewIsTool) m_focusInfo.lastTool = n;
+		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsCentral) m_focusInfo.lastCentral = n;
+		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsSide) m_focusInfo.lastSide = n;
+		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsTool) m_focusInfo.lastTool = n;
 		Q_EMIT viewFocused(n);
 	}
 }
@@ -272,7 +359,7 @@ void ot::WidgetViewManager::slotViewCloseRequested(void) {
 		return;
 	}
 
-	if (view->getViewData().getFlags() & WidgetViewBase::ViewDefaultCloseHandling) {
+	if (view->getViewData().getViewFlags() & WidgetViewBase::ViewDefaultCloseHandling) {
 		view->getViewDockWidget()->toggleView(view->getViewDockWidget()->isClosed());
 	}
 	else {
@@ -281,23 +368,23 @@ void ot::WidgetViewManager::slotViewCloseRequested(void) {
 }
 
 void ot::WidgetViewManager::slotUpdateViewVisibility(void) {
-	for (const auto& it : m_viewNameMap) {
-		if (!(it.second.second->getViewData().getFlags() & WidgetViewBase::ViewFlag::ViewIsCloseable) && !it.second.second->getViewDockWidget()->dockAreaWidget()) {
+	for (const ViewEntry& entry : m_views) {
+		if (!(entry.second->getViewData().getViewFlags() & WidgetViewBase::ViewFlag::ViewIsCloseable) && !entry.second->getViewDockWidget()->dockAreaWidget()) {
 			bool added = false;
-			ads::CDockAreaWidget* area = this->determineBestRestoreArea(it.second.second);
+			ads::CDockAreaWidget* area = this->determineBestRestoreArea(entry.second);
 			if (area) {
 				ads::CDockContainerWidget* container = area->dockContainer();
 				if (container) {
-					m_dockManager->addDockWidgetToContainer(ads::CenterDockWidgetArea, it.second.second->getViewDockWidget(), container);
+					m_dockManager->addDockWidgetToContainer(ads::CenterDockWidgetArea, entry.second->getViewDockWidget(), container);
 					added = true;
 				}
 				else {
-					m_dockManager->addDockWidget(ads::CenterDockWidgetArea, it.second.second->getViewDockWidget(), area);
+					m_dockManager->addDockWidget(ads::CenterDockWidgetArea, entry.second->getViewDockWidget(), area);
 				}
 			}
 			
 			if (!m_dockManager->dockContainers().empty()) {
-				m_dockManager->addDockWidgetToContainer(ads::CenterDockWidgetArea, it.second.second->getViewDockWidget(), m_dockManager->dockContainers().first());
+				m_dockManager->addDockWidgetToContainer(ads::CenterDockWidgetArea, entry.second->getViewDockWidget(), m_dockManager->dockContainers().first());
 				added = true;
 			}
 			else {
@@ -305,7 +392,7 @@ void ot::WidgetViewManager::slotUpdateViewVisibility(void) {
 				if (defaultarea) {
 					ads::CDockContainerWidget* container = defaultarea->dockContainer();
 					if (container) {
-						m_dockManager->addDockWidgetToContainer(ads::CenterDockWidgetArea, it.second.second->getViewDockWidget(), container);
+						m_dockManager->addDockWidgetToContainer(ads::CenterDockWidgetArea, entry.second->getViewDockWidget(), container);
 						added = true;
 					}
 				}
@@ -313,7 +400,7 @@ void ot::WidgetViewManager::slotUpdateViewVisibility(void) {
 
 			if (!added) {
 				OT_LOG_W("No suitable dock location found");
-				m_dockManager->addDockWidget(ads::CenterDockWidgetArea, it.second.second->getViewDockWidget());
+				m_dockManager->addDockWidget(ads::CenterDockWidgetArea, entry.second->getViewDockWidget());
 			}
 		}
 	}
@@ -336,21 +423,48 @@ ot::WidgetViewManager::~WidgetViewManager() {
 	this->deleteLater();
 }
 
+bool ot::WidgetViewManager::getViewExists(const ViewNameTypeListEntry& _entry) const {
+	return this->findView(_entry) != nullptr;
+}
+
+ot::WidgetView* ot::WidgetViewManager::findView(const ViewNameTypeListEntry& _entry) const {
+	for (const ViewEntry& view : m_views) {
+		if (view.second->getViewData().getEntityName() == _entry.first && view.second->getViewData().getViewType() == _entry.second) {
+			return view.second;
+		}
+	}
+
+	return nullptr;
+}
+
 bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _parentArea, ads::DockWidgetArea _insertArea) {
 	OTAssertNullptr(m_dockManager);
 	OTAssertNullptr(_view);
 	// Ensure view does not exist
-	if (this->getViewExists(_view->getViewData().getName())) {
-		OT_LOG_W("A widget view with the name \"" + _view->getViewData().getName() + "\" already exists");
+	ViewNameTypeListEntry nameTypeEntry;
+	nameTypeEntry.first = _view->getViewData().getEntityName();
+	nameTypeEntry.second = _view->getViewData().getViewType();
+
+	if (this->getViewExists(nameTypeEntry)) {
+		OT_LOG_W("WidgetView already exists { \"EntityName\": \"" + nameTypeEntry.first + "\", \"ViewType\": \"" + WidgetViewBase::toString(nameTypeEntry.second) + "\" }");
 		return false;
 	}
-	
+
 	// Get view name list for given owner
-	auto lst = this->findOrCreateViewNameList(_owner);
-	auto lstIt = std::find(lst->begin(), lst->end(), _view->getViewData().getName());
+	ViewNameTypeList* lst = this->findOrCreateViewNameTypeList(_owner);
+	auto lstIt = std::find(lst->begin(), lst->end(), nameTypeEntry);
 	if (lstIt != lst->end()) {
 		OT_LOG_E("Invalid entry");
 		return false;
+	}
+
+	// Check if the title already exists and try to create a unique one
+	if (this->getViewTitleExists(_view->getViewData().getTitle())) {
+		WidgetViewBase newViewData = _view->getViewData();
+		newViewData.setTitle(_view->getViewData().getTitle() + " - " + WidgetViewBase::toString(_view->getViewData().getViewType()));
+		if (!this->getViewTitleExists(newViewData.getTitle())) {
+			_view->setViewData(newViewData);
+		}
 	}
 
 	_view->getViewDockWidget()->setWindowIcon(ot::IconManager::getApplicationIcon());
@@ -373,8 +487,11 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	}
 	
 	// Store information
-	lst->push_back(_view->getViewData().getName());
-	m_viewNameMap.insert_or_assign(_view->getViewData().getName(), std::pair<BasicServiceInformation, WidgetView*>(_owner, _view));
+	lst->push_back(nameTypeEntry);
+	ViewEntry newViewEntry;
+	newViewEntry.first = _owner;
+	newViewEntry.second = _view;
+	m_views.push_back(newViewEntry);
 
 	// Update focus information
 	this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
@@ -386,7 +503,7 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 }
 
 ads::CDockAreaWidget* ot::WidgetViewManager::determineBestParentArea(WidgetView* _newView) const {
-	if (_newView->getViewData().getFlags() & WidgetViewBase::ViewIsSide) {
+	if (_newView->getViewData().getViewFlags() & WidgetViewBase::ViewIsSide) {
 		if (m_focusInfo.lastCentral) {
 			return m_focusInfo.lastCentral->getViewDockWidget()->dockAreaWidget();
 		}
@@ -413,15 +530,15 @@ ads::CDockAreaWidget* ot::WidgetViewManager::determineBestParentArea(WidgetView*
 
 ads::CDockAreaWidget* ot::WidgetViewManager::determineBestRestoreArea(WidgetView* _view) const {
 	ads::CDockAreaWidget* area = nullptr;
-	if (_view->getViewData().getFlags() & WidgetViewBase::ViewIsCentral) {
+	if (_view->getViewData().getViewFlags() & WidgetViewBase::ViewIsCentral) {
 		area = this->determineBestRestoreArea(_view, WidgetViewBase::ViewIsCentral);
 		if (area) return area;
 	}
-	if (_view->getViewData().getFlags() & WidgetViewBase::ViewIsSide) {
+	if (_view->getViewData().getViewFlags() & WidgetViewBase::ViewIsSide) {
 		area = this->determineBestRestoreArea(_view, WidgetViewBase::ViewIsSide);
 		if (area) return area;
 	}
-	if (_view->getViewData().getFlags() & WidgetViewBase::ViewIsTool) {
+	if (_view->getViewData().getViewFlags() & WidgetViewBase::ViewIsTool) {
 		area = this->determineBestRestoreArea(_view, WidgetViewBase::ViewIsTool);
 		if (area) return area;
 	}
@@ -435,15 +552,17 @@ ads::CDockAreaWidget* ot::WidgetViewManager::determineBestRestoreArea(WidgetView
 }
 
 ads::CDockAreaWidget* ot::WidgetViewManager::determineBestRestoreArea(WidgetView* _view, WidgetViewBase::ViewFlag _viewType) const {
-	for (const auto& it : m_viewNameMap) {
-		if (it.second.second != _view && it.second.second->getViewData().getFlags() & _viewType) {
-			if (it.second.second->getViewDockWidget()->dockAreaWidget()) return it.second.second->getViewDockWidget()->dockAreaWidget();
+	for (const ViewEntry& entry : m_views) {
+		if (entry.second != _view && entry.second->getViewData().getViewFlags() & _viewType) {
+			if (entry.second->getViewDockWidget()->dockAreaWidget()) {
+				return entry.second->getViewDockWidget()->dockAreaWidget();
+			}
 		}
 	}
 	return nullptr;
 }
 
-std::list<std::string>* ot::WidgetViewManager::findViewNameList(const BasicServiceInformation& _owner) {
+ot::WidgetViewManager::ViewNameTypeList* ot::WidgetViewManager::findViewNameTypeList(const BasicServiceInformation& _owner) {
 	auto it = m_viewOwnerMap.find(_owner);
 	if (it == m_viewOwnerMap.end()) {
 		return nullptr;
@@ -453,10 +572,10 @@ std::list<std::string>* ot::WidgetViewManager::findViewNameList(const BasicServi
 	}
 }
 
-std::list<std::string>* ot::WidgetViewManager::findOrCreateViewNameList(const BasicServiceInformation& _owner) {
-	std::list<std::string>* ret = this->findViewNameList(_owner);
+ot::WidgetViewManager::ViewNameTypeList* ot::WidgetViewManager::findOrCreateViewNameTypeList(const BasicServiceInformation& _owner) {
+	ViewNameTypeList* ret = this->findViewNameTypeList(_owner);
 	if (!ret) {
-		ret = new std::list<std::string>;
+		ret = new ViewNameTypeList;
 		m_viewOwnerMap.insert_or_assign(_owner, ret);
 	}
 	return ret;

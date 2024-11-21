@@ -21,8 +21,7 @@ public:
 	bool visualiseTable() override;
 	ot::ContentChangedHandling getTableContentChangedHandling() override;
 
-	ot::TableHeaderOrientation getHeaderOrientation();
-	std::string getHeaderOrientation(ot::TableHeaderOrientation _orientation);
+	ot::TableHeaderOrientation getHeaderOrientation() override;
 	bool visualiseText() override;
 private:
 	void setSpecializedProperties() override;
@@ -34,7 +33,6 @@ private:
 
 	const std::string m_headerSettingHorizontal = "first row";
 	const std::string m_headerSettingVertical = "first column";
-	const std::map<ot::TableHeaderOrientation, const std::string> m_orientationToString;
 
 	ot::ContentChangedHandling m_tableContentChangedHandling = ot::ContentChangedHandling::ModelServiceSavesNotifyOwner;
 };

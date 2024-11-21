@@ -1,5 +1,7 @@
 #pragma once
 #include <stdint.h>
+#include <string>
+
 namespace ot
 {
 	enum class TableHeaderOrientation : uint32_t
@@ -8,4 +10,6 @@ namespace ot
 		vertical = 1,
 		none = 2
 	};
+
+	__declspec(dllexport) std::string toString(const ot::TableHeaderOrientation& _orientation);
 }
