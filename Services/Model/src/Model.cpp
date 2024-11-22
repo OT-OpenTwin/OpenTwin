@@ -3809,6 +3809,7 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 		);
 
 		DataBase::GetDataBase()->StoreDataItem(doc);
+		DataBase::GetDataBase()->flushWritingQueue();
 
 		anyDataChangeSinceLastWrite = false;
 	}
