@@ -13,5 +13,5 @@ ot::Painter2DFactory& ot::Painter2DFactory::instance(void) {
 }
 
 ot::Painter2D* ot::Painter2DFactory::create(const ConstJsonObject& _jsonObject) {
-	return this->createFromJSON(_jsonObject, OT_JSON_MEMBER_Painter2DType);
+	return Painter2DFactory::instance().createFromJSON(_jsonObject, OT_JSON_MEMBER_Painter2DType);
 }

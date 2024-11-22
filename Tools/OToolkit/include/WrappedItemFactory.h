@@ -18,7 +18,7 @@ class WrappedItemFactory : public ot::FactoryTemplate<GraphicsItemDesignerItemBa
 public:
 	static WrappedItemFactory& instance(void);
 
-	GraphicsItemDesignerItemBase* createFromConfig(const ot::GraphicsItemCfg* _config);
+	static GraphicsItemDesignerItemBase* createFromConfig(const ot::GraphicsItemCfg* _config);
 
 };
 

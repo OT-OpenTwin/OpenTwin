@@ -44,7 +44,7 @@ bool ot::GraphicsGroupItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	for (GraphicsItemCfg* i : cfg->getItems()) {
 		OTAssertNullptr(i);
 
-		ot::GraphicsItem* itm = ot::GraphicsItemFactory::instance().itemFromConfig(i);
+		ot::GraphicsItem* itm = ot::GraphicsItemFactory::itemFromConfig(i);
 		if (itm) {
 			this->addItem(itm);
 		}

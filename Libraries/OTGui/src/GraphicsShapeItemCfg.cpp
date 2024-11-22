@@ -58,7 +58,7 @@ void ot::GraphicsShapeItemCfg::setFromJsonObject(const ConstJsonObject& _object)
 	m_path.setFromJsonObject(json::getObject(_object, "Path"));
 
 	ConstJsonObject backgroundObj = json::getObject(_object, "Background");
-	Painter2D* backPainter = Painter2DFactory::instance().create(backgroundObj);
+	Painter2D* backPainter = Painter2DFactory::create(backgroundObj);
 	if (backPainter) {
 		this->setBackgroundPainter(backPainter);
 	}

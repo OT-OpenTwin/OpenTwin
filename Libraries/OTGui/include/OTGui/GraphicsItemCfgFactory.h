@@ -17,7 +17,7 @@ namespace ot {
 	public:
 		static GraphicsItemCfgFactory& instance(void);
 
-		GraphicsItemCfg* create(const ConstJsonObject& _object);
+		static GraphicsItemCfg* create(const ConstJsonObject& _object);
 
 	private:
 		GraphicsItemCfgFactory() {};

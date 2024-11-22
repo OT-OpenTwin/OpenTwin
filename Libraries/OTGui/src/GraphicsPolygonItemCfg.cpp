@@ -70,7 +70,7 @@ void ot::GraphicsPolygonItemCfg::setFromJsonObject(const ConstJsonObject& _objec
 	}
 
 	ConstJsonObject backgroundObj = json::getObject(_object, "Background");
-	Painter2D* backPainter = Painter2DFactory::instance().create(backgroundObj);
+	Painter2D* backPainter = Painter2DFactory::create(backgroundObj);
 	if (backPainter) {
 		this->setBackgroundPainter(backPainter);
 	}

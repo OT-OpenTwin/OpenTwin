@@ -31,7 +31,7 @@ void GraphicsItemDesignerPreview::updateCurrentItem(const ot::GraphicsItemCfg* _
 		m_item = nullptr;
 	}
 
-	m_item = ot::GraphicsItemFactory::instance().itemFromConfig(_newConfiguration);
+	m_item = ot::GraphicsItemFactory::itemFromConfig(_newConfiguration);
 	if (!m_item) return;
 	this->addItem(m_item);
 

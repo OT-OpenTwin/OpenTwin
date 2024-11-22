@@ -24,14 +24,14 @@ namespace ot {
 
 		//! @brief Will create the configuration from the provided json object and then create the item using the created configuration.
 		//! @param _configObject The JSON object containing the GraphicsItemCfg.
-		ot::GraphicsItem* create(const ConstJsonObject& _configObject, bool _isRoot = false);
+		static ot::GraphicsItem* create(const ConstJsonObject& _configObject, bool _isRoot = false);
 
 		//! \brief Creates a graphics item from the provided configuration.
 		//! The graphics item will be created according to the graphics item cfg name.
 		//! If the created item is the root item finalizeGraphicsItem() will be called.
 		//! @param _config The graphics item configuration.
 		//! @param _isRoot If true, the item will be added to a stack with a highlight item on top. The highlight item will be set to the root item.
-		ot::GraphicsItem* itemFromConfig(const ot::GraphicsItemCfg* _config, bool _isRoot = false);
+		static ot::GraphicsItem* itemFromConfig(const ot::GraphicsItemCfg* _config, bool _isRoot = false);
 
 	private:
 		GraphicsItemFactory() {};

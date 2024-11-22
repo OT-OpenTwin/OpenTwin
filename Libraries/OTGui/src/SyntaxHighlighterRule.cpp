@@ -59,7 +59,7 @@ void ot::SyntaxHighlighterRule::setFromJsonObject(const ot::ConstJsonObject& _ob
 	m_regex = json::getString(_object, "Regex");
 
 	ConstJsonObject painterObj = json::getObject(_object, "Painter");
-	this->setPainter(Painter2DFactory::instance().create(painterObj));
+	this->setPainter(Painter2DFactory::create(painterObj));
 
 	ConstJsonObject fontObj = json::getObject(_object, "Font");
 	m_font.setFromJsonObject(fontObj);

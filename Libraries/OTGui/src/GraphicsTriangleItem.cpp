@@ -117,7 +117,7 @@ void ot::GraphicsTriangleItemCfg::setFromJsonObject(const ConstJsonObject& _obje
 	m_direction = this->stringToTriangleDirection(json::getString(_object, OT_JSON_MEMBER_Direction));
 
 	ConstJsonObject backgroundPainterObj = json::getObject(_object, OT_JSON_MEMBER_BackgroundPainter);
-	ot::Painter2D* p = Painter2DFactory::instance().create(backgroundPainterObj);
+	ot::Painter2D* p = Painter2DFactory::create(backgroundPainterObj);
 	if (p) {
 		this->setBackgroundPainer(p);
 	}

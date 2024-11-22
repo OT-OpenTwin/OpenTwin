@@ -21,11 +21,11 @@ ot::GraphicsItemFactory& ot::GraphicsItemFactory::instance(void) {
 
 ot::GraphicsItem* ot::GraphicsItemFactory::create(const ConstJsonObject& _configObject, bool _isRoot) {
 	// Create configuration
-	GraphicsItemCfg* cfg = GraphicsItemCfgFactory::instance().create(_configObject);
+	GraphicsItemCfg* cfg = GraphicsItemCfgFactory::create(_configObject);
 	if (!cfg) return nullptr;
 
 	// Create item
-	return this->itemFromConfig(cfg, _isRoot);
+	return GraphicsItemFactory::itemFromConfig(cfg, _isRoot);
 }
 
 ot::GraphicsItem* ot::GraphicsItemFactory::itemFromConfig(const ot::GraphicsItemCfg* _configuration, bool _isRoot) {
@@ -50,7 +50,7 @@ ot::GraphicsItem* ot::GraphicsItemFactory::itemFromConfig(const ot::GraphicsItem
 	}
 
 	// Create item
-	GraphicsItem* itm = this->createFromKey(_configuration->getFactoryKey());
+	GraphicsItem* itm = GraphicsItemFactory::instance().createFromKey(_configuration->getFactoryKey());
 	if (!itm) return nullptr;
 	if (!itm->setupFromConfig(_configuration)) {
 		OT_LOG_EA("Setup from configuration failed");

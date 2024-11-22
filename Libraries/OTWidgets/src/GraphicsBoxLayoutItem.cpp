@@ -29,7 +29,7 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 	for (auto itm : cfg->items()) {
 		if (itm.first) {
-			ot::GraphicsItem* i = ot::GraphicsItemFactory::instance().itemFromConfig(itm.first);
+			ot::GraphicsItem* i = ot::GraphicsItemFactory::itemFromConfig(itm.first);
 			if (i == nullptr) {
 				OT_LOG_EA("GraphicsFactory failed");
 				this->setBlockConfigurationNotifications(false);

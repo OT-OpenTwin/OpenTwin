@@ -70,7 +70,7 @@ void ot::GraphicsRectangularItemCfg::setFromJsonObject(const ConstJsonObject& _o
 	m_cornerRadius = json::getInt(_object, OT_JSON_MEMBER_CornerRadius);
 
 	ConstJsonObject backgroundPainterObj = json::getObject(_object, OT_JSON_MEMBER_BackgroundPainter);
-	ot::Painter2D* p = Painter2DFactory::instance().create(backgroundPainterObj);
+	ot::Painter2D* p = Painter2DFactory::create(backgroundPainterObj);
 	if (p) {
 		this->setBackgroundPainer(p);
 	}

@@ -14,7 +14,7 @@ WrappedItemFactory& WrappedItemFactory::instance(void) {
 
 GraphicsItemDesignerItemBase* WrappedItemFactory::createFromConfig(const ot::GraphicsItemCfg* _config) {
 	OTAssertNullptr(_config);
-	GraphicsItemDesignerItemBase* newItem = this->createFromKey(_config->getFactoryKey());
+	GraphicsItemDesignerItemBase* newItem = WrappedItemFactory::instance().createFromKey(_config->getFactoryKey());
 	if (!newItem) {
 		OT_LOG_E("Factory failed");
 		return newItem;

@@ -1323,7 +1323,7 @@ void EntityPropertiesGuiPainter::addToJsonDocument(ot::JsonDocument& jsonDoc, En
 
 void EntityPropertiesGuiPainter::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
 {
-	ot::Painter2D* newPainter = ot::Painter2DFactory::instance().createFromJSON(ot::json::getObject(object, "Value"), OT_JSON_MEMBER_Painter2DType);
+	ot::Painter2D* newPainter = ot::Painter2DFactory::create(ot::json::getObject(object, "Value"));
 	if (!newPainter) return;
 
 	setValue(newPainter);

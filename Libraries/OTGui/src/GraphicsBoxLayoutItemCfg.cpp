@@ -63,7 +63,7 @@ void ot::GraphicsBoxLayoutItemCfg::setFromJsonObject(const ConstJsonObject& _obj
 			GraphicsItemCfg* itm = nullptr;
 			try {
 				ConstJsonObject itemObj = json::getObject(pairObj, OT_JSON_MEMBER_Item);
-				itm = GraphicsItemCfgFactory::instance().create(itemObj);
+				itm = GraphicsItemCfgFactory::create(itemObj);
 				if (!itm) {
 					continue;
 				}

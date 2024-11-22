@@ -467,7 +467,7 @@ std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _d
 
 std::string Application::handleItemChanged(ot::JsonDocument& _document) {
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-	ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::instance().createFromJSON(ot::json::getObject(_document, OT_ACTION_PARAM_Config), OT_JSON_MEMBER_GraphicsItemCfgType);
+	ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::create(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 	if (!itemConfig) return "";
 
 	const ot::UID blockID = itemConfig->getUid();

@@ -35,7 +35,7 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		int y = 0;
 		for (auto c : r) {
 			if (c) {
-				ot::GraphicsItem* i = ot::GraphicsItemFactory::instance().itemFromConfig(c);
+				ot::GraphicsItem* i = ot::GraphicsItemFactory::itemFromConfig(c);
 				if (i == nullptr) {
 					OT_LOG_EA("GraphicsFactory failed");
 					this->setBlockConfigurationNotifications(false);

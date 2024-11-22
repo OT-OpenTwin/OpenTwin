@@ -122,7 +122,7 @@ void ot::GraphicsScenePackage::setFromJsonObject(const ConstJsonObject& _object)
 
 	std::list<ConstJsonObject> itemsArr = json::getObjectList(_object, OT_JSON_Member_Items);
 	for (auto itmObj : itemsArr) {
-		ot::GraphicsItemCfg* itm = GraphicsItemCfgFactory::instance().create(itmObj);
+		ot::GraphicsItemCfg* itm = GraphicsItemCfgFactory::create(itmObj);
 		OTAssertNullptr(itm);
 		if (itm) m_items.push_back(itm);
 	}

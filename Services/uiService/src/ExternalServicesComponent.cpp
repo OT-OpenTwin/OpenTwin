@@ -3714,7 +3714,7 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 
 	for (auto graphicsItemCfg : pckg.items()) {
-		ot::GraphicsItem* graphicsItem = ot::GraphicsItemFactory::instance().itemFromConfig(graphicsItemCfg, true);
+		ot::GraphicsItem* graphicsItem = ot::GraphicsItemFactory::itemFromConfig(graphicsItemCfg, true);
 		if (graphicsItem != nullptr) {
 			//const double xCoordinate = graphicsItemCfg->getPosition().x();
 			//const double yCoordinate = graphicsItemCfg->getPosition().y();

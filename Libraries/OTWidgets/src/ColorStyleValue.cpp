@@ -50,7 +50,7 @@ void ot::ColorStyleValue::setFromJsonObject(const ot::ConstJsonObject& _object) 
 	m_entryKey = stringToColorStyleValueEntry(json::getString(_object, "Name"));
 
 	ConstJsonObject painterObj = json::getObject(_object, "Painter");
-	Painter2D* newPainter = Painter2DFactory::instance().create(painterObj);
+	Painter2D* newPainter = Painter2DFactory::create(painterObj);
 	if (!newPainter) {
 		OT_LOG_E("Failed to create painter");
 		return;
