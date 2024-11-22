@@ -16,7 +16,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT MenuCfg : public MenuItemCfg {
 	public:
 		MenuCfg();
-		MenuCfg(const std::string& _text, const std::string& _iconPath = std::string(), const std::string& _shortcut = std::string());
+		MenuCfg(const std::string& _text, const std::string& _iconPath = std::string());
 		MenuCfg(const MenuCfg& _other);
 		MenuCfg(const ot::ConstJsonObject& _object);
 		virtual ~MenuCfg();
@@ -45,14 +45,14 @@ namespace ot {
 		//! @param _text Menu text.
 		//! @param _iconPath Menu icon path.
 		//! @param _shortcut Menu shortcut.
-		MenuCfg* addMenu(const std::string& _text, const std::string& _iconPath = std::string(), const std::string& _shortcut = std::string());
+		MenuCfg* addMenu(const std::string& _text, const std::string& _iconPath = std::string());
 		
 		//! @brief Creates and adds a child item.
 		//! The menu takes ownership of the created child item.
 		//! @param _text Item text.
 		//! @param _iconPath Item icon path.
 		//! @param _shortcut Item shortcut.
-		MenuItemCfg* addItem(const std::string& _text, const std::string& _iconPath = std::string(), const std::string& _shortcut = std::string());
+		MenuItemCfg* addItem(const std::string& _text, const std::string& _iconPath = std::string());
 
 		//! @brief Creates and adds a separator.
 		void addSeparator(void);

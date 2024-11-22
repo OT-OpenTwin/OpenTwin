@@ -13,7 +13,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT MenuItemCfg : public MenuEntryCfg {
 	public:
 		MenuItemCfg();
-		MenuItemCfg(const std::string& _text, const std::string& _iconPath = std::string(), const std::string& _shortcut = std::string());
+		MenuItemCfg(const std::string& _text, const std::string& _iconPath = std::string());
 		MenuItemCfg(const MenuItemCfg& _other);
 		MenuItemCfg(const ot::ConstJsonObject& _object);
 		virtual ~MenuItemCfg();
@@ -33,10 +33,15 @@ namespace ot {
 		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		void setText(const std::string& _text) { m_text = _text; };
+		const std::string& getText(void) const { return m_text; };
+
+		void setIconPath(const std::string& _iconPath) { m_iconPath = _iconPath; };
+		const std::string& getIconPath(void) const { return m_iconPath; };
+
 	private:
 		std::string m_text;
 		std::string m_iconPath;
-		std::string m_shortcut;
 	};
 
 }

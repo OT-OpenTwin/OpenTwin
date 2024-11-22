@@ -14,8 +14,8 @@ ot::MenuCfg::MenuCfg() {
 
 }
 
-ot::MenuCfg::MenuCfg(const std::string& _text, const std::string& _iconPath, const std::string& _shortcut)
-	: MenuItemCfg(_text, _iconPath, _shortcut)
+ot::MenuCfg::MenuCfg(const std::string& _text, const std::string& _iconPath)
+	: MenuItemCfg(_text, _iconPath)
 {
 
 }
@@ -70,14 +70,14 @@ void ot::MenuCfg::add(MenuEntryCfg* _entry) {
 	m_childs.push_back(_entry);
 }
 
-ot::MenuCfg* ot::MenuCfg::addMenu(const std::string& _text, const std::string& _iconPath, const std::string& _shortcut) {
-	MenuCfg* newMenu = new MenuCfg(_text, _iconPath, _shortcut);
+ot::MenuCfg* ot::MenuCfg::addMenu(const std::string& _text, const std::string& _iconPath) {
+	MenuCfg* newMenu = new MenuCfg(_text, _iconPath);
 	this->add(newMenu);
 	return newMenu;
 }
 
-ot::MenuItemCfg* ot::MenuCfg::addItem(const std::string& _text, const std::string& _iconPath, const std::string& _shortcut) {
-	MenuItemCfg* newItem = new MenuItemCfg(_text, _iconPath, _shortcut);
+ot::MenuItemCfg* ot::MenuCfg::addItem(const std::string& _text, const std::string& _iconPath) {
+	MenuItemCfg* newItem = new MenuItemCfg(_text, _iconPath);
 	this->add(newItem);
 	return newItem;
 }
