@@ -18,7 +18,7 @@ namespace ot {
 	//! @class GraphicsItemFactory.
 	//! @brief The GraphicsItemFactory is used to create graphics items from their factory name or from a GraphicsItemCfg.
 	//! @note Note that items that register at this factory must register with the same key as their configuration equivalents.
-	class OT_WIDGETS_API_EXPORT GraphicsItemFactory : public FactoryTemplate<std::string, GraphicsItem> {
+	class OT_WIDGETS_API_EXPORT GraphicsItemFactory : public FactoryTemplate<GraphicsItem> {
 	public:
 		static GraphicsItemFactory& instance(void);
 
@@ -41,9 +41,9 @@ namespace ot {
 	//! @class GraphicsItemFactoryRegistrar.
 	//! @brief The GraphicsItemFactoryRegistrar is used to register a GraphicsItem constructor at the GraphicsItemFactory.
 	//! @note Note that the key used to register must be equal to the configraion equivalent (see GraphicsItemCfg).
-	template<class T> class GraphicsItemFactoryRegistrar : public FactoryRegistrarTemplate<std::string, GraphicsItemFactory, T> {
+	template<class T> class GraphicsItemFactoryRegistrar : public FactoryRegistrarTemplate<GraphicsItemFactory, T> {
 	public:
-		GraphicsItemFactoryRegistrar(const std::string& _key) : FactoryRegistrarTemplate<std::string, GraphicsItemFactory, T>(_key) {};
+		GraphicsItemFactoryRegistrar(const std::string& _key) : FactoryRegistrarTemplate<GraphicsItemFactory, T>(_key) {};
 	};
 
 }

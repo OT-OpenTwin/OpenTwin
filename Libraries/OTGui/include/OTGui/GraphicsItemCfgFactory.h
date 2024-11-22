@@ -13,7 +13,7 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT GraphicsItemCfgFactory : public FactoryTemplate<std::string, GraphicsItemCfg> {
+	class OT_GUI_API_EXPORT GraphicsItemCfgFactory : public FactoryTemplate<GraphicsItemCfg> {
 	public:
 		static GraphicsItemCfgFactory& instance(void);
 
@@ -25,9 +25,9 @@ namespace ot {
 	};
 
 	template <class T>
-	class OT_GUI_API_EXPORT GraphicsItemCfgFactoryRegistrar : public FactoryRegistrarTemplate<std::string, GraphicsItemCfgFactory, T> {
+	class OT_GUI_API_EXPORT GraphicsItemCfgFactoryRegistrar : public FactoryRegistrarTemplate<GraphicsItemCfgFactory, T> {
 	public:
-		GraphicsItemCfgFactoryRegistrar(const std::string& _key) : FactoryRegistrarTemplate<std::string, GraphicsItemCfgFactory, T>(_key) {};
+		GraphicsItemCfgFactoryRegistrar(const std::string& _key) : FactoryRegistrarTemplate<GraphicsItemCfgFactory, T>(_key) {};
 	};
 
 }
