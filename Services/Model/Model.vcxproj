@@ -331,6 +331,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\ActionAndFunctionHandler.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\CheckGeometry.cpp" />
     <ClCompile Include="src\ClassFactoryModel.cpp" />
@@ -359,7 +360,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
-    <ClInclude Include="include\ActionHandler.h" />
+    <ClInclude Include="include\ActionAndFunctionHandler.h" />
     <ClInclude Include="include\CheckGeometry.h" />
     <ClInclude Include="include\ClassFactoryModel.h" />
     <ClInclude Include="include\CrossCollectionDatabaseWrapper.h" />

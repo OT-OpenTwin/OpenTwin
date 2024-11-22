@@ -1289,6 +1289,7 @@ Application::Application()
 
 	std::thread asyncActionThread(&Application::asyncActionWorker, this);
 	asyncActionThread.detach();
+	m_fileHandler.setDontDeleteHandler();
 	m_baseHandler.setNextHandler(&m_fileHandler);
 }
 

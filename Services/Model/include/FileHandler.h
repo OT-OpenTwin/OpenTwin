@@ -1,7 +1,9 @@
 #pragma once
+
+// OpenTwin header
 #include "OTServiceFoundation/MenuButtonDescription.h"
 #include "OTServiceFoundation/UiComponent.h"
-#include "ActionHandler.h"
+#include "ActionAndFunctionHandler.h"
 #include "IVisualisationText.h"
 #include "IVisualisationTable.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
@@ -12,7 +14,7 @@ class FileHandler : public ActionAndFunctionHandler, public BusinessLogicHandler
 {
 public:
 	FileHandler() = default;
-	~FileHandler() = default;
+	virtual ~FileHandler() = default;
 
 	FileHandler(const FileHandler& _other) = delete;
 	FileHandler(FileHandler&& _other) = delete;
@@ -20,6 +22,8 @@ public:
 	FileHandler& operator=(FileHandler&& _other) = delete;
 
 	void addButtons(ot::components::UiComponent* _uiComponent, const std::string& _pageName);
+
+protected:
 	virtual bool handleAction(const std::string& _action, ot::JsonDocument& _doc) override;
 
 private:
