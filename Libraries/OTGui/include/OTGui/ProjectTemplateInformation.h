@@ -8,6 +8,7 @@
 // OpenTwin header
 #include "OTCore/Serializable.h"
 #include "OTGui/OTGuiAPIExport.h"
+#include "OTGui/StyledTextBuilder.h"
 
 // std header
 #include <string>
@@ -37,8 +38,8 @@ namespace ot {
 		void setBriefDescription(const std::string& _description) { m_briefDescription = _description; };
 		const std::string& getBriefDescription(void) const { return m_briefDescription; };
 
-		void setDescription(const std::string& _description) { m_description = _description; };
-		const std::string& getDescription(void) const { return m_description; };
+		void setDescription(const StyledTextBuilder& _description) { m_description = _description; };
+		const StyledTextBuilder& getDescription(void) const { return m_description; };
 
 		void setIsDefault(bool _isDefault) { m_isDefault = _isDefault; };
 		bool getIsDefault(void) const { return m_isDefault; };
@@ -47,7 +48,7 @@ namespace ot {
 		std::string m_name;
 		std::string m_projectType;
 		std::string m_briefDescription;
-		std::string m_description;
+		StyledTextBuilder m_description;
 		bool m_isDefault;
 	};
 

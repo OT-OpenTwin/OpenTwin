@@ -33,6 +33,15 @@ void ot::StyledTextBuilder::setFromJsonObject(const ot::ConstJsonObject& _object
 	}
 }
 
+bool ot::StyledTextBuilder::isEmpty(void) const {
+	for (const StyledTextEntry& entry : m_entries) {
+		if (!entry.getText().empty()) {
+			return false;
+		}
+	}
+	return true;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Builder

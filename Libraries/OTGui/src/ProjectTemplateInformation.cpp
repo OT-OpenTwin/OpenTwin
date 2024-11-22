@@ -35,7 +35,9 @@ void ot::ProjectTemplateInformation::addToJsonObject(ot::JsonValue& _object, ot:
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 	_object.AddMember("Type", JsonString(m_projectType, _allocator), _allocator);
 	_object.AddMember("Brief", JsonString(m_briefDescription, _allocator), _allocator);
-	_object.AddMember("Description", JsonString(m_description, _allocator), _allocator);
+	JsonObject descriptionObj;
+	m_description.addToJsonObject(descriptionObj, _allocator);
+	_object.AddMember("Description", descriptionObj, _allocator);
 	_object.AddMember("IsDefault", m_isDefault, _allocator);
 }
 
@@ -43,6 +45,6 @@ void ot::ProjectTemplateInformation::setFromJsonObject(const ot::ConstJsonObject
 	m_name = json::getString(_object, "Name");
 	m_projectType = json::getString(_object, "Type");
 	m_briefDescription = json::getString(_object, "Brief");
-	m_description = json::getString(_object, "Description");
+	m_description.setFromJsonObject(json::getObject(_object, "Description"));
 	m_isDefault = json::getBool(_object, "IsDefault");
 }
