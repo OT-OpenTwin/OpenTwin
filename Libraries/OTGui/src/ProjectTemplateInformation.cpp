@@ -4,11 +4,10 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
-#include "OTCore/ProjectTemplateInformation.h"
+#include "OTGui/ProjectTemplateInformation.h"
 
-ot::ProjectTemplateInformation::ProjectTemplateInformation() 
-	: m_isDefault(false)
-{
+ot::ProjectTemplateInformation::ProjectTemplateInformation()
+	: m_isDefault(false) {
 
 }
 

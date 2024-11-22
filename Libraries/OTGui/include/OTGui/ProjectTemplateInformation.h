@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
-#include "OTCore/CoreAPIExport.h"
+#include "OTGui/OTGuiAPIExport.h"
 
 // std header
 #include <string>
@@ -16,7 +16,7 @@
 
 namespace ot {
 
-	class OT_CORE_API_EXPORT ProjectTemplateInformation : public Serializable {
+	class OT_GUI_API_EXPORT ProjectTemplateInformation : public Serializable {
 	public:
 		ProjectTemplateInformation();
 		ProjectTemplateInformation(const ProjectTemplateInformation& _other);

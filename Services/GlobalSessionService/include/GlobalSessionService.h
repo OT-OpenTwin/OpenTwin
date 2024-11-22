@@ -10,7 +10,7 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/LogModeManager.h"
-#include "OTCore/ProjectTemplateInformation.h"
+#include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTCommunication/ActionHandleConnector.h"

@@ -106,9 +106,6 @@
     <ClCompile Include="src\LogModeManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\ProjectTemplateInformation.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\UIDNamePair.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -268,9 +265,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\LogModeManager.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTCore\ProjectTemplateInformation.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\ComplexNumbers.h">

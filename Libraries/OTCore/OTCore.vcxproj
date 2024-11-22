@@ -39,7 +39,6 @@
     <ClCompile Include="src\JSONToVariableConverter.cpp" />
     <ClCompile Include="src\Owner.cpp" />
     <ClCompile Include="src\Point2D.cpp" />
-    <ClCompile Include="src\ProjectTemplateInformation.cpp" />
     <ClCompile Include="src\Queue.cpp" />
     <ClCompile Include="src\Rect.cpp" />
     <ClCompile Include="src\ReturnMessage.cpp" />
@@ -68,7 +67,6 @@
     <ClInclude Include="include\OTCore\LocalSettingsSwitch.h" />
     <ClInclude Include="include\OTCore\LogModeManager.h" />
     <ClInclude Include="include\OTCore\Math.h" />
-    <ClInclude Include="include\OTCore\ProjectTemplateInformation.h" />
     <ClInclude Include="include\OTCore\Rect.h" />
     <ClInclude Include="include\OTCore\Color.h" />
     <ClInclude Include="include\OTCore\CoreAPIExport.h" />
