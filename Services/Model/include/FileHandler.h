@@ -3,7 +3,11 @@
 #include "OTServiceFoundation/UiComponent.h"
 #include "ActionHandler.h"
 #include "IVisualisationText.h"
+#include "IVisualisationTable.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
+#include "OTGui/TableCfg.h"
+#include "OTCore/GenericDataStructMatrix.h"
+
 class FileHandler : public ActionAndFunctionHandler, public BusinessLogicHandler
 {
 public:
@@ -34,7 +38,10 @@ private:
 	void addTextFilesToModel();
 	
 	void handleChangedText(ot::JsonDocument& _doc);
+	void handleChangedTable(ot::JsonDocument& _doc);
+	ot::GenericDataStructMatrix createMatrix(const ot::TableCfg& _tableCfg);
 	void storeChangedText(IVisualisationText* _entity, const std::string _text);
+	void storeChangedTableContex(IVisualisationTable* _entity ,ot::TableCfg& _cfg);
 	void NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner);
 	//! @brief Filecontent is stored as binary, thus the encoding does not matter. The filename however is stored in properties and used in the visualisation. 
 	//! Thus UTF8 encoding is required.

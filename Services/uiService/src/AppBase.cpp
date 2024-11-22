@@ -2188,7 +2188,7 @@ void AppBase::slotTextEditorSaveRequested(void) {
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
 
 		try {
-			ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
+			ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL); //Modelservice handles these central tasks
 			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->getViewData().getEntityName(), doc.GetAllocator()), doc.GetAllocator());
 			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(editor->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 
@@ -2229,10 +2229,11 @@ void AppBase::slotTableSaveRequested(void) {
 	}
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
 
 	try {
-		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(table);
+		ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL); //Modelservice handles these central tasks
 
 		ot::JsonObject cfgObj;
 		ot::TableCfg cfg = table->createConfig();

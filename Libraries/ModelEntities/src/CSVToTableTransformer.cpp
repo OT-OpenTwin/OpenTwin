@@ -19,6 +19,32 @@ ot::GenericDataStructMatrix CSVToTableTransformer::operator()(const std::string&
 	return matrix;
 }
 
+std::string CSVToTableTransformer::operator()(const ot::GenericDataStructMatrix& _matrix, const CSVProperties& _properties)
+{
+	ot::MatrixEntryPointer matrixEntry;
+	uint32_t numberOfColumns =	_matrix.getNumberOfColumns();
+	uint32_t numberOfRows = _matrix.getNumberOfRows();
+	std::string csvText("");
+	for (matrixEntry.m_row = 0; matrixEntry.m_row < numberOfRows; matrixEntry.m_row++)
+	{
+		for (matrixEntry.m_column = 0; matrixEntry.m_column < numberOfColumns; matrixEntry.m_column++)
+		{
+			const ot::Variable& cellValue =	_matrix.getValue(matrixEntry);
+			assert(cellValue.isConstCharPtr());
+			csvText += cellValue.getConstCharPtr();
+			if (matrixEntry.m_column < numberOfColumns - 1)
+			{
+				csvText += _properties.m_columnDelimiter;
+			}
+		}
+		if (matrixEntry.m_row< numberOfRows - 1)
+		{
+			csvText += _properties.m_rowDelimiter;
+		}
+	}
+	return csvText;
+}
+
 void CSVToTableTransformer::clearBuffer()
 {
 	m_composed = "";

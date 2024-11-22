@@ -7,6 +7,7 @@ class CSVToTableTransformer
 {
 public:
 	ot::GenericDataStructMatrix operator() (const std::string& _csvText, const CSVProperties& _properties);
+	std::string operator() (const ot::GenericDataStructMatrix& _matrix, const CSVProperties& _properties);
 
 private:
 	char m_maskingChar = '"';
