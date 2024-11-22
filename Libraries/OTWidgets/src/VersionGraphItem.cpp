@@ -71,10 +71,10 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 	GraphicsInvisibleItem* spacerItem = new GraphicsInvisibleItem;
 
 	Font textFont = m_nameItem->getFont();
-	textFont.setSize(10);
+	textFont.setSize(6);
 	textFont.setBold(m_config.getName() == _activeVersion);
 	m_nameItem->setFont(textFont);
-	textFont.setSize(12);
+	textFont.setSize(8);
 	m_labelItem->setFont(textFont);
 
 	OutlineF borderOutline(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder));
