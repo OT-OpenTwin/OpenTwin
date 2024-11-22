@@ -42,9 +42,6 @@ void EntityParameterizedDataCategorization::CreateProperties(DataCategorie categ
 	if (returnVal != "")
 	{
 		_selectedCategory = categorie;
-		//Should be eventually selectable/ changeable.
-		//EntityPropertiesSelection::createProperty(_dataCategorieGroup, _dataCategorieGroup, { _dataCategorieRMD, _dataCategorieMSMD, _dataCategorieParam, _dataCategorieQuant }, returnVal, _defaultCategory, getProperties());
-		EntityPropertiesString::createProperty(_dataCategorieGroup, _dataCategorieGroup, returnVal, _defaultCategory, getProperties());
 	}
 }
 
