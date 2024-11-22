@@ -1755,7 +1755,8 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 
 	newEditor = new ot::TextEditorView;
 	newEditor->setupFromConfig(_config, false);
-	
+	newEditor->getViewData().getViewType();
+	newEditor->getViewData().getEntityName();
 	m_textEditors.insert_or_assign(_config.getEntityName(), newEditor);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor);
 
@@ -2205,6 +2206,10 @@ void AppBase::slotTextEditorSaveRequested(void) {
 			else
 			{
 				editor->setContentChanged(false);
+				const std::string& name = editor->getViewData().getEntityName();
+				const auto& viewerType =	editor->getViewData().getViewType();
+				ot::UID globalActiveViewModel = -1;
+				ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::changesSaved, viewerType);
 			}
 		}
 		catch (const std::exception& _e) {
@@ -2244,6 +2249,14 @@ void AppBase::slotTableSaveRequested(void) {
 		if (rMsg != ot::ReturnMessage::Ok) {
 			OT_LOG_E("Request failed: " + rMsg.getWhat());
 			return;
+		}
+		else
+		{
+			table->setContentChanged(false);
+			const auto& viewType = table->getViewData().getViewType();
+			const std::string& name = table->getViewData().getEntityName();
+			ot::UID globalActiveViewModel = -1;
+			ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::changesSaved, viewType);
 		}
 	}
 	catch (const std::exception& _e) {
@@ -2351,7 +2364,11 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	}
 
 	this->cleanupWidgetViewInfo(_view);
-	std::string viewName = _view->getViewData().getEntityName();
+	const std::string& viewName = _view->getViewData().getEntityName();
+	const auto& viewType = _view->getViewData().getViewType();
+	ot::UID globalActiveViewModel = -1;
+	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedStates::viewClosed, viewType);
+
 	ot::WidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
 
 	// Deselect navigation item if exists

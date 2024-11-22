@@ -3859,6 +3859,11 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	editor->setContentChanged(false);
 	editor->setAsCurrentViewTab();
 
+	const std::string& name = editor->getViewData().getEntityName();
+	const auto& viewerType = editor->getViewData().getViewType();
+	ot::UID globalActiveViewModel = -1;
+	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::viewOpened, viewerType);
+
 	return "";
 }
 
@@ -3912,6 +3917,11 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 	ot::TableView* table = AppBase::instance()->findOrCreateTable(config, info);
 	table->setContentChanged(false);
 	table->setAsCurrentViewTab();
+	
+	const std::string& name = table->getViewData().getEntityName();
+	const auto& viewerType = table->getViewData().getViewType();
+	ot::UID globalActiveViewModel = -1;
+	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::viewOpened, viewerType);
 
 	return "";
 }

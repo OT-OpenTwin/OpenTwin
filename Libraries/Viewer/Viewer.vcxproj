@@ -100,6 +100,7 @@
     <ClInclude Include="include\HandlerBase.h" />
     <ClInclude Include="include\HandlerIntersector.h" />
     <ClInclude Include="include\HandleWheel.h" />
+    <ClInclude Include="include\ViewChangedStates.h" />
     <ClInclude Include="include\Visualiser.h" />
     <ClInclude Include="include\LineIntersector.h" />
     <ClInclude Include="include\ManipulatorBase.h" />

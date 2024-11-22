@@ -367,6 +367,28 @@ void ViewerAPI::visualizationTetMeshNodeTetEdges(ot::UID osgModelID, unsigned lo
 	}
 }
 
+void ViewerAPI::notifySceneNodeAboutViewChange(ot::UID osgModelID, const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
+{
+	try
+	{
+		Model* model = nullptr;
+		if(osgModelID == -1)
+		{ 
+			model = globalActiveModel;
+		}
+		else
+		{
+			model = osgModelManager.at(osgModelID);
+		}
+		assert(model != nullptr);
+		model->notifySceneNodeAboutViewChange(_sceneNodeName, _state, _viewType);
+	}
+	catch (std::out_of_range)
+	{
+		throw std::exception("The specified model does not exist");
+	}
+}
+
 std::list<std::string> ViewerAPI::getSelectedCurves(ot::UID osgModelID)
 {
 	Model* model = osgModelManager.at(osgModelID);

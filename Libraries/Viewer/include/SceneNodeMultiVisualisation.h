@@ -20,6 +20,8 @@ public:
 	SceneNodeMultiVisualisation() = default;
 	virtual ~SceneNodeMultiVisualisation();
 
+	void setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
+
 	virtual void setSelected(bool _selection) override;
 
 	void setStorage(const std::string& _projectName) { projectName = _projectName; }

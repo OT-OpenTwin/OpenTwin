@@ -12,6 +12,8 @@
 #include "OTGui/VisualisationTypes.h"
 #include "OTServiceFoundation/ContextMenu.h"
 #include "OTGui/TableRange.h"
+#include "ViewChangedStates.h"
+#include "OTGui/WidgetViewBase.h"
 
 #include <list>
 #include <vector>
@@ -144,6 +146,8 @@ namespace ViewerAPI
 	__declspec(dllexport) void visualizationCartesianMeshNodeShowLines(ot::UID osgModelID, unsigned long long modelEntityID, bool showMeshLines);
 	__declspec(dllexport) void addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3]);
 	__declspec(dllexport) void visualizationTetMeshNodeTetEdges(ot::UID osgModelID, unsigned long long modelEntityID, bool displayTetEdges);
+	
+	__declspec(dllexport) void notifySceneNodeAboutViewChange(ot::UID osgModelID, const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
 
 	__declspec(dllexport) std::list<std::string> getSelectedCurves(ot::UID osgModelID);
 	__declspec(dllexport) void removeSelectedCurveNodes(ot::UID osgModelID);

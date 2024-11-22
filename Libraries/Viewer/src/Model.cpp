@@ -2721,6 +2721,15 @@ void Model::removeSceneNode(osg::Node *node)
 	osgNodetoSceneNodesMap.erase(node);
 }
 
+void Model::notifySceneNodeAboutViewChange(const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
+{
+	auto sceneNodeIt = nameToSceneNodesMap.find(_sceneNodeName);
+	assert(sceneNodeIt != nameToSceneNodesMap.end());
+	SceneNodeMultiVisualisation* sceneNodeMultiVisualisation =  dynamic_cast<SceneNodeMultiVisualisation*>(sceneNodeIt->second);
+	assert(sceneNodeMultiVisualisation != nullptr);
+	sceneNodeMultiVisualisation->setViewChange(_state, _viewType);
+}
+
 void Model::addVisualizationMeshNodeFromFacetDataBase(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, double edgeColorRGB[3], bool displayTetEdges, const std::string &projectName, unsigned long long entityID, unsigned long long version)
 {
 	SceneNodeMesh *meshNode = new SceneNodeMesh;

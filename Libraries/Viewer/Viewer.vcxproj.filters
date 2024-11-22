@@ -300,6 +300,9 @@
     <ClInclude Include="include\TableVisualiser.h">
       <Filter>include\Visualiser</Filter>
     </ClInclude>
+    <ClInclude Include="include\ViewChangedStates.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\Table.h">
