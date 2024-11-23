@@ -206,25 +206,16 @@ QString ak::toQString(
 	case otComboBox: return QString("ComboBox");
 	case otComboButton: return QString("ComboButton");
 	case otCheckBox: return QString("CheckBox");
-	case otDatePicker: return QString("DatePicker");
-	case otDatePickerDialog: return QString("DatePickerDialog");
-	case otDefaultWelcomeScreen: return ("DefaultWelcomeScreen");
-	case otDock: return QString("Dock");
-	case otDockWatcher: return QString("DockWatcher");
-	case otGlobalKeyListener: return QString("GlobalKeyListener");
-	case otGraphicsView: return QString("GraphicsView");
 	case otLabel: return QString("Label");
 	case otLineEdit: return QString("LineEdit");
 	case otList: return QString("List");
 	case otMainWindow: return QString("Window");
 	case otNiceLineEdit: return QString("NiceLineEdit");
 	case otPrompt: return QString("Prompt");
-	case otPropertyGrid: return QString("PropertyGrid");
 	case otPushButton: return QString("PushButton");
 	case otRadioButton: return QString("RadioButton");
 	case otSpecialTabBar: return QString("SpecialTabBar");
 	case otSpinBox: return QString("SpinBox");
-	case otTable: return QString("Table");
 	case otTabToolbar: return QString("TabToolBar");
 	case otTabToolbarGroup: return QString("TabToolBarGroup");
 	case otTabToolbarPage: return QString("TabBoolBarPage");
@@ -281,24 +272,6 @@ QString ak::toQString(
 	default: assert(0); // Not implemented yet
 	}
 	return QString("");
-}
-
-QString ak::toQString(
-	dialogResult							_dialogResult
-) {
-	switch (_dialogResult)
-	{
-	case resultYes: return QString("Result.Yes");
-	case resultNo: return QString("Result.No");
-	case resultOk: return QString("Result.Ok");
-	case resultCancel: return QString("Result.Cancel");
-	case resultIgnore: return QString("Result.Ignore");
-	case resultRetry: return QString("Result.Retry");
-	case resultNone: return QString("Result.None");
-	default:
-		assert(0);
-		return QString();
-	}
 }
 
 QString ak::toQString(

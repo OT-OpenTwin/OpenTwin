@@ -14,9 +14,6 @@
 #include <qheaderview.h>
 #include <qevent.h>
 
-// AK header
-#include <akAPI/uiAPI.h>
-
 ProjectInformationDialog::ProjectInformationDialog(const QIcon &windowIcon, const std::string& localFileName, const std::string& serverVersion, const std::string& localVersion)
 {
 	// Create controls

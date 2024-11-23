@@ -27,8 +27,10 @@
 #include "OTGui/TextEditorCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/PropertyGridCfg.h"
+#include "OTGui/MessageDialogCfg.h"
 #include "OTGui/GraphicsPickerCollectionManager.h"
 #include "OTWidgets/ColorStyle.h"
+#include "OTWidgets/MessageBoxHandler.h"
 #include "OTServiceFoundation/UserCredentials.h"
 
 #include <akGui/aWindowEventHandler.h>
@@ -84,7 +86,7 @@ struct structModelViewInfo
 };
 
 //! The API manager is used to manage the global objects required for this API to work
-class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier, ot::AbstractLogNotifier {
+class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier, ot::AbstractLogNotifier, ot::MessageBoxHandler {
 	Q_OBJECT
 public:
 	
@@ -453,15 +455,18 @@ public:
 	// ######################################################################################################################
 
 	// Prompt
+
+	virtual ot::MessageDialogCfg::BasicButton showPrompt(const ot::MessageDialogCfg& _config) override;
+
+	ot::MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons);
+
 public Q_SLOTS:
 
-	ak::dialogResult showPrompt	(const QString _message, const QString & _title, ak::promptType _type = ak::promptOk);
+	void showInfoPrompt(const std::string& _message, const std::string& _title);
 
-	void showInfoPrompt(const QString _message, const QString & _title);
+	void showWarningPrompt(const std::string& _message, const std::string& _title);
 
-	void showWarningPrompt(const QString _message, const QString & _title);
-
-	void showErrorPrompt(const QString _message, const QString & _title);
+	void showErrorPrompt(const std::string& _message, const std::string& _title);
 
 public:
 
@@ -547,7 +552,7 @@ private:
 
 	void sessionRefreshTimer(const std::string _sessionUserName, const std::string _authorizationUrl);
 
-	bool checkForContinue(QString _title);
+	bool checkForContinue(const std::string& _title);
 
 	void fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo);
 

@@ -480,11 +480,11 @@ void ExternalServicesComponent::notify(ak::UID _senderId, ak::eventType _event, 
 				// Check if response is an error or warning
 				OT_ACTION_IF_RESPONSE_ERROR(response) {
 					assert(0); // ERROR
-					AppBase::instance()->showErrorPrompt(response.c_str(), "Error");
+					AppBase::instance()->showErrorPrompt(response, "Error");
 				}
 				else OT_ACTION_IF_RESPONSE_WARNING(response) {
 					assert(0); // WARNING
-					AppBase::instance()->showWarningPrompt(response.c_str(), "Warning");
+					AppBase::instance()->showWarningPrompt(response, "Warning");
 				}
 			}
 			else { executeAction(AppBase::instance()->getViewerComponent()->getActiveDataModel(), _senderId); }
@@ -899,12 +899,12 @@ bool ExternalServicesComponent::sendKeySequenceActivatedMessage(KeyboardCommandH
 	// Check if response is an error or warning
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		assert(0); // ERROR
-		AppBase::instance()->showErrorPrompt(response.c_str(), "Error");
+		AppBase::instance()->showErrorPrompt(response, "Error");
 		return false;
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		assert(0); // WARNING
-		AppBase::instance()->showWarningPrompt(response.c_str(), "Warning");
+		AppBase::instance()->showWarningPrompt(response, "Warning");
 		return false;
 	}
 	return true;
@@ -1086,13 +1086,13 @@ std::list<ot::ProjectTemplateInformation> ExternalServicesComponent::getListOfPr
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		assert(0); // ERROR
 		OT_LOG_E(response);
-		app->showErrorPrompt(response.c_str(), "Error");
+		app->showErrorPrompt(response, "Error");
 		return result;
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		assert(0); // WARNING
 		OT_LOG_W(response);
-		app->showWarningPrompt(response.c_str(), "Warning");
+		app->showWarningPrompt(response, "Warning");
 		return result;
 	}
 	
@@ -1148,13 +1148,13 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
 			OT_LOG_EAS(response);
-			app->showErrorPrompt(response.c_str(), "Error");
+			app->showErrorPrompt(response, "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
 			OT_LOG_WAS(response);
-			app->showWarningPrompt(response.c_str(), "Warning");
+			app->showWarningPrompt(response, "Warning");
 			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
@@ -1203,13 +1203,13 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
 			OT_LOG_EAS("Error response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
-			app->showErrorPrompt("Failed to create Session. " + QString::fromStdString(response), "Error");
+			app->showErrorPrompt("Failed to create Session. " + response, "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
 			OT_LOG_WAS("Warning response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
-			app->showErrorPrompt("Failed to create Session. " + QString::fromStdString(response), "Error");
+			app->showErrorPrompt("Failed to create Session. " + response, "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
@@ -1714,7 +1714,7 @@ void ExternalServicesComponent::deallocateData(const char *data)
 
 void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
 	ot::stopSessionServiceHealthCheck();
-	ak::uiAPI::promptDialog::show("The session service has died unexpectedly. The application will be closed now.", "Error", ak::promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+	AppBase::instance()->showErrorPrompt("The session service has died unexpectedly. The application will be closed now.", "Error");
 	exit(0);
 }
 
@@ -2120,8 +2120,7 @@ std::string ExternalServicesComponent::handlePreShutdown(ot::JsonDocument& _docu
 }
 
 std::string ExternalServicesComponent::handleEmergencyShutdown(ot::JsonDocument& _document) {
-	QString msg("An unexpected error occurred and the session needs to be closed.");
-	ak::uiAPI::promptDialog::show(msg, "Open Twin", ak::promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+	AppBase::instance()->showErrorPrompt("An unexpected error occurred and the session needs to be closed.", "Error");
 	exit(1);
 
 	return "";
@@ -2242,72 +2241,36 @@ std::string ExternalServicesComponent::handleDisplayDebugMessage(ot::JsonDocumen
 
 std::string ExternalServicesComponent::handleReportError(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+	AppBase::instance()->showErrorPrompt(message, "Open Twin");
 
 	return "";
 }
 
 std::string ExternalServicesComponent::handleReportWarning(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
+	AppBase::instance()->showWarningPrompt(message, "Open Twin");
 
 	return "";
 }
 
 std::string ExternalServicesComponent::handleReportInformation(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogInformation", "Default", AppBase::instance()->mainWindow());
+	AppBase::instance()->showInfoPrompt(message, "Open Twin");
 
 	return "";
 }
 
 std::string ExternalServicesComponent::handlePromptInformation(ot::JsonDocument& _document) {
-	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	std::string icon = ot::json::getString(_document, OT_ACTION_PARAM_ICON);
-	std::string options = ot::json::getString(_document, OT_ACTION_PARAM_OPTIONS);
+	ot::MessageDialogCfg config;
+	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+
 	std::string promptResponse = ot::json::getString(_document, OT_ACTION_PARAM_RESPONSE);
 	std::string sender = ot::json::getString(_document, OT_ACTION_PARAM_SENDER);
 	std::string parameter1 = ot::json::getString(_document, OT_ACTION_PARAM_PARAMETER1);
 
-	ak::promptType promptType = ak::promptIconLeft;
+	ot::MessageDialogCfg::BasicButton result = AppBase::instance()->showPrompt(config);
 
-	if (options == "YesNo")
-	{
-		promptType = ak::promptType::promptYesNoIconLeft;
-	}
-	else if (options == "YesNoCancel")
-	{
-		promptType = ak::promptType::promptYesNoCancelIconLeft;
-	}
-	else if (options == "OkCancel")
-	{
-		promptType = ak::promptType::promptOkCancelIconLeft;
-	}
-	else if (options == "Ok")
-	{
-		promptType = ak::promptType::promptOkIconLeft;
-	}
-	else
-	{
-		assert(0); // Unknown options
-	}
-
-	ak::dialogResult result = ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", promptType, icon.c_str(), "Default", AppBase::instance()->mainWindow());
-
-	std::string queryResult;
-
-	switch (result)
-	{
-	case ak::dialogResult::resultCancel: queryResult = "Cancel"; break;
-	case ak::dialogResult::resultIgnore: queryResult = "Ignore"; break;
-	case ak::dialogResult::resultNo:     queryResult = "No"; break;
-	case ak::dialogResult::resultYes:    queryResult = "Yes"; break;
-	case ak::dialogResult::resultNone:   queryResult = "None"; break;
-	case ak::dialogResult::resultOk:     queryResult = "Ok"; break;
-	case ak::dialogResult::resultRetry:  queryResult = "Retry"; break;
-	default:
-		assert(0); // Unknown type
-	}
+	std::string queryResult = ot::MessageDialogCfg::toString(result);
 
 	ot::JsonDocument docOut;
 	docOut.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PromptResponse, docOut.GetAllocator()), docOut.GetAllocator());
@@ -2537,7 +2500,7 @@ std::string ExternalServicesComponent::handleSaveFileContent(ot::JsonDocument& _
 	decodedString = nullptr;
 
 	// Show a success message
-	ak::uiAPI::promptDialog::show(std::string("The file has been successfully saved:\n" + fileName).c_str(), dialogTitle.c_str(), ak::promptOkIconLeft, "DialogInformation", "Default", AppBase::instance()->mainWindow());
+	AppBase::instance()->showInfoPrompt("The file has been successfully saved:\n" + fileName, dialogTitle);
 	
 	return "";
 }

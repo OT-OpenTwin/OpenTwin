@@ -3,8 +3,7 @@
 #include "StudioSuiteConnector/CommitMessageDialog.h"
 #include "StudioSuiteConnector/ProjectInformationDialog.h"
 
-#include "akAPI/uiAPI.h"
-
+#include "OTWidgets/MessageBoxManager.h"
 #include "OTCommunication/ActionTypes.h"
 
 #include <QFileDialog>					// QFileDialog
@@ -49,7 +48,7 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 		std::string fileName = getStudioSuiteFileNameForCommit(projectName, studioSuiteServiceURL, mainObject);
 		if (fileName.empty())
 		{
-			ak::uiAPI::promptDialog::show("No valid local project file has been defined. Please set the local file location.", "Commit", ak::promptOkIconLeft, "DialogError", "Default");
+			ot::MessageBoxManager::showErrorPrompt("No valid local project file has been defined. Please set the local file location.", "Commit");
 			return "";
 		}
 
@@ -80,14 +79,17 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 		std::string studioSuiteServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 		std::string version = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
 
-		ak::dialogResult result = ak::uiAPI::promptDialog::show("Getting another project version from the repository will override the local project data.\n"
-			"Do you really want to continue?", "Get", ak::promptYesNoIconLeft, "DialogWarning", "Default");
-		if (result != ak::dialogResult::resultYes) { return ""; }
+		ot::MessageDialogCfg::BasicButton result = ot::MessageBoxManager::showWarningPrompt("Getting another project version from the repository will override the local project data.\n"
+			"Do you really want to continue?", "Get", ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
+
+		if (result != ot::MessageDialogCfg::Yes) {
+			return "";
+		}
 
 		std::string fileName = getStudioSuiteFileNameForGet(projectName, studioSuiteServiceURL, mainObject);
 		if (fileName.empty())
 		{
-			ak::uiAPI::promptDialog::show("No valid local project file has been defined. Please set the local file location.", "Commit", ak::promptOkIconLeft, "DialogError", "Default");
+			ot::MessageBoxManager::showWarningPrompt("No valid local project file has been defined. Please set the local file location.", "Commit");
 			return "";
 		}
 
@@ -196,13 +198,13 @@ std::string StudioSuiteConnectorAPI::processAction(std::string action, ot::JsonD
 			if (!StudioSuiteConnectorAPI::checkValidLocalFile(localFileName, projectName, false, errorMessage))
 			{
 				errorMessage += "\n\nThe local file name has not been changed.";
-				ak::uiAPI::promptDialog::show(errorMessage.c_str(), "Set CST File", ak::promptOkIconLeft, "DialogError", "Default");
+				ot::MessageBoxManager::showErrorPrompt(errorMessage, "Set CST File");
 				return "";
 			}
 
 			StudioSuiteConnectorAPI::setAndStoreLocalFileName(localFileName, studioSuiteServiceURL, mainObject);
 
-			ak::uiAPI::promptDialog::show("The local file has been changed successfully.", "Set CST File", ak::promptOkIconLeft, "DialogInformation", "Default");
+			ot::MessageBoxManager::showInfoPrompt("The local file has been changed successfully.", "Set CST File");
 		}
 	}
 

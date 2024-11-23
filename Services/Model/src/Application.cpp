@@ -819,7 +819,9 @@ std::string Application::handlePromptResponse(ot::JsonDocument& _document) {
 	std::string answer = ot::json::getString(_document, OT_ACTION_PARAM_ANSWER);
 	std::string parameter1 = ot::json::getString(_document, OT_ACTION_PARAM_PARAMETER1);
 
-	m_model->promptResponse(response, answer, parameter1);
+	ot::MessageDialogCfg::BasicButton actualAnswer = ot::MessageDialogCfg::stringToButton(answer);
+
+	m_model->promptResponse(response, actualAnswer, parameter1);
 
 	return "";
 }

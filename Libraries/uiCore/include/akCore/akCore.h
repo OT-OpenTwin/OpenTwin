@@ -75,17 +75,6 @@ namespace ak {
 		dfYYYYDDMM
 	};
 
-	//! Describes the dialog result
-	enum dialogResult {
-		resultYes,
-		resultNo,
-		resultOk,
-		resultCancel,
-		resultRetry,
-		resultIgnore,
-		resultNone
-	};
-
 	//! Describes the dock location of a dock widget
 	enum dockLocation {
 		dockLeft,
@@ -178,18 +167,10 @@ namespace ak {
 	enum objectType {
 		otNone,
 		otAction,
-		otColorEditButton,
 		otComboBox,
 		otComboButton,
 		otComboButtonItem,
 		otCheckBox,
-		otDatePicker,
-		otDatePickerDialog,
-		otDefaultWelcomeScreen,
-		otDock,
-		otDockWatcher,
-		otGlobalKeyListener,
-		otGraphicsView,
 		otLabel,
 		otLineEdit,
 		otList,
@@ -197,13 +178,10 @@ namespace ak {
 		otMenu,
 		otNiceLineEdit,
 		otPrompt,
-		otPropertyGrid,
-		otPropertyGridItem,
 		otPushButton,
 		otRadioButton,
 		otSpecialTabBar,
 		otSpinBox,
-		otTable,
 		otTabToolbar,
 		otTabToolbarGroup,
 		otTabToolbarPage,
@@ -344,12 +322,6 @@ namespace ak {
 	//! @param _dockLocation The dock location to be converted
 	UICORE_API_EXPORT QString toQString(
 		dockLocation							_dockLocation
-	);
-
-	//! @brief Create a string representation of the provided dialog result
-	//! @param _dialogResult The dialog result to be converted
-	UICORE_API_EXPORT QString toQString(
-		dialogResult							_dialogResult
 	);
 
 	//! @brief Create a string representation of the provided prompt type

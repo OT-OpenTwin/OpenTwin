@@ -3821,7 +3821,7 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	if (getStateManager()->canRedo() && !silentlyCreateBranch)
 	{
 		Application::instance()->getNotifier()->promptChoice("There is redo information available which will be discarded if you change the model at this stage. \n\n"
-								    "Do you want to create a new version branch for these changes?", "Warning", "YesNo", "DiscardRedoInfoAndSave", comment);
+			"Do you want to create a new version branch for these changes?", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No, "DiscardRedoInfoAndSave", comment);
 
 		return;
 	}
@@ -3847,26 +3847,22 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	resetModified();
 }
 
-void Model::promptResponse(const std::string &type, const std::string &answer, const std::string &parameter1)
+void Model::promptResponse(const std::string& _type, ot::MessageDialogCfg::BasicButton _answer, const std::string& _parameter1)
 {
-	if (type == "DiscardRedoInfoAndSave")
-	{
-		if (answer != "Yes")
-		{
+	if (_type == "DiscardRedoInfoAndSave") {
+		if (_answer != ot::MessageDialogCfg::Yes) {
 			// We need to remove the redo information
 			const std::list<std::string> removedStates = getStateManager()->removeRedoModelStates();
 
-			if (!removedStates.empty())
-			{
+			if (!removedStates.empty()) {
 				removeVersionGraphVersions(removedStates);
 			}
 		}
 
-		projectSave(parameter1, true);
+		projectSave(_parameter1, true);
 	}
-	else
-	{
-		assert(0); // Unknown type
+	else {
+		OT_LOG_EAS("Unknown promt type \"" + _type + "\"");
 	}
 }
 

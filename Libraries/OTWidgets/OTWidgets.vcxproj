@@ -91,6 +91,8 @@
     <ClCompile Include="src\Label.cpp" />
     <ClCompile Include="src\LineEdit.cpp" />
     <ClCompile Include="src\ManagedGuiObject.cpp" />
+    <ClCompile Include="src\MessageBoxHandler.cpp" />
+    <ClCompile Include="src\MessageBoxManager.cpp" />
     <ClCompile Include="src\MessageDialog.cpp" />
     <ClCompile Include="src\OnePropertyDialog.cpp" />
     <ClCompile Include="src\OverlayWidgetBase.cpp" />
@@ -228,6 +230,8 @@
     <ClInclude Include="include\OTWidgets\ImagePainter.h" />
     <ClInclude Include="include\OTWidgets\ImagePainterManager.h" />
     <ClInclude Include="include\OTWidgets\ManagedGuiObject.h" />
+    <ClInclude Include="include\OTWidgets\MessageBoxHandler.h" />
+    <ClInclude Include="include\OTWidgets\MessageBoxManager.h" />
     <ClInclude Include="include\OTWidgets\OverlayWidgetBase.h" />
     <ClInclude Include="include\OTWidgets\PixmapImagePainter.h" />
     <QtMoc Include="include\OTWidgets\Plot.h" />

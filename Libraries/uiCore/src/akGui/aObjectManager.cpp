@@ -21,30 +21,22 @@
 #include <akCore/aObject.h>
 #include <akCore/aUidMangager.h>
 
-// AK Dialogs
-#include <akDialogs/aPromptDialog.h>
-
 // AK GUI header
 #include <akGui/aAction.h>
-#include <akGui/aDialog.h>
 #include <akGui/aObjectManager.h>
 #include <akGui/aSignalLinker.h>
 #include <akGui/aSpecialTabBar.h>
 #include <akGui/aTimer.h>
-#include <akGui/aGlobalKeyListener.h>
 
 // AK Widgets header
 #include <akWidgets/aCheckBoxWidget.h>
-#include <akWidgets/aColorEditButtonWidget.h>
 #include <akWidgets/aComboBoxWidget.h>
 #include <akWidgets/aComboButtonWidget.h>
-#include <akWidgets/aDockWidget.h>
 #include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aListWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
 #include <akWidgets/aPushButtonWidget.h>
-#include <akWidgets/aTableWidget.h>
 #include <akWidgets/aTabWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
 #include <akWidgets/aTtbGroup.h>
@@ -135,21 +127,6 @@ ak::UID ak::aObjectManager::createCheckBox(
 	return obj->uid();
 }
 
-ak::UID ak::aObjectManager::createColorEditButton(
-	UID												_creatorUid,
-	const aColor &									_color,
-	const QString &										_textOverride
-) {
-	// Create object
-	aColorEditButtonWidget * obj = new aColorEditButtonWidget(_color, _textOverride);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
 ak::UID ak::aObjectManager::createComboBox(
 	UID												_creatorUid
 ) {
@@ -188,36 +165,6 @@ ak::UID ak::aObjectManager::createComboButtonItem(
 	aComboButtonWidgetItem * obj = new aComboButtonWidgetItem(_icon, _text);
 	// Set parameter
 	obj->setUid(m_uidManager->getId());
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createDock(
-	UID												_creatorUid,
-	const QString &										_text
-) {
-	// Create object
-	aDockWidget * obj = new aDockWidget(_text);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createGlobalKeyListener(
-	UID											_creatorUid,
-	QApplication *								_app,
-	Qt::Key										_key,
-	const std::vector<Qt::KeyboardModifier>&	_keyModifiers,
-	bool										_blockOthers
-) {
-	// Create object
-	aGlobalKeyListener * obj = new aGlobalKeyListener(_app, _key, _keyModifiers, _blockOthers);
-	m_signalLinker->addLink(obj);
 	// Store data
 	m_mapObjects.insert_or_assign(obj->uid(), obj);
 	addCreatedUid(_creatorUid, obj->uid());
@@ -289,21 +236,6 @@ ak::UID ak::aObjectManager::createSpecialTabBar(
 	// Create object
 	aSpecialTabBar * obj = new aSpecialTabBar;
 	obj->setUid(m_uidManager->getId());
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createTable(
-	UID												_creatorUid,
-	int													_rows,
-	int													_columns
-) {
-	// Create object
-	aTableWidget * obj = new aTableWidget(_rows, _columns);
-	// Set parameter
-	m_signalLinker->addLink(obj);
 	// Store data
 	m_mapObjects.insert_or_assign(obj->uid(), obj);
 	addCreatedUid(_creatorUid, obj->uid());

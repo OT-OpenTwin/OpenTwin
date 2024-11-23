@@ -39,7 +39,6 @@ namespace tt { class TabToolbar; }
 namespace ak {
 
 	// Forward declaration
-	class aIconManager;
 	class aMessenger;
 	class aObjectManager;
 	class aTtbContainer;
@@ -90,39 +89,6 @@ namespace ak {
 
 		void setCentralWidget(
 			QWidget *												_centralWidget
-		);
-
-		// #############################################################################################################
-
-		// Dock management
-
-		//! @brief Will add the provided dock and place it at the specified dock location
-		//! @param _dock The dock to add
-		//! @param _dockLocation The location to add the dock at
-		void addDock(
-			QDockWidget*										_dock,
-			dockLocation								_dockLocation
-		);
-
-		//! @brief Will tabify two docks
-		//! Will tabify two docks. The sub dock will be tabified as a child to the main dock
-		//! @param _mainDockUid The UID of the main (parent) dock
-		//! @param _subDockUid The UID of the sub (child) dock
-		void tabifyDock(
-			QDockWidget*							_mainDock,
-			QDockWidget*							_subDock
-		);
-
-		//! @brief Will set the priority of the bottom left corner to the specified dock location
-		//! @param _dockLocation Which dock location will get the priority over the lower left corner of the UI
-		void setDockPriorityBottomLeft(
-			dockLocation								_dockLocation
-		);
-
-		//! @brief Will set the priority of the bottom right corner to the specified dock location
-		//! @param _dockLocation Which dock location will get the priority over the lower right corner of the UI
-		void setDockPriorityBottomRight(
-			dockLocation								_dockLocation
 		);
 
 		// #############################################################################################################

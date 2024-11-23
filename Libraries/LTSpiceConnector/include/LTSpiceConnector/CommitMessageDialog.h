@@ -12,9 +12,6 @@
 #include <qdialog.h>
 #include <qcheckbox.h>
 
-// AK header
-#include <akWidgets/aWidget.h>
-
 class QLayout;
 class QLabel;
 class QPushButton;

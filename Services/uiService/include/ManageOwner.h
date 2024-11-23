@@ -1,25 +1,15 @@
 #pragma once
 
-// uiCore header
-#include <akCore/akCore.h>
-#include <akGui/aColor.h>
-
+// OpenTwin header
+#include "OTWidgets/Table.h"
 #include "OTWidgets/Dialog.h"
 
-#include <qobject.h>
-#include <qtablewidget.h>
-
-class QVBoxLayout;
-class QHBoxLayout;
-
 namespace ot {
-	class Label;
 	class LineEdit;
 	class CheckBox;
-	class PushButton;
 }
 
-class ManageOwnerTable : public QTableWidget {
+class ManageOwnerTable : public ot::Table {
 	Q_OBJECT
 public:
 	ManageOwnerTable();
@@ -56,7 +46,6 @@ public:
 	virtual ~ManageOwner();
 
 public Q_SLOTS:
-	void slotClose(void);
 	void slotShowGroupsWithAccessOnly(void);
 	void slotGroupsFilter(void);
 	void slotGroupsSelection(void);
@@ -68,16 +57,7 @@ protected:
 	bool hasSuccessful(const std::string &response);
 	bool hasError(const std::string &response);
 	void readUserList(void);
-
-	QVBoxLayout *								m_centralLayout;
-	QHBoxLayout *								m_groupLabelLayout;
-	QHBoxLayout *								m_buttonLabelLayout;
-
-	QWidget *									m_groupLabelLayoutW;
-	QWidget *									m_buttonLabelLayoutW;
-
-	ot::PushButton*								m_btnClose;
-	ot::Label *									m_labelGroups;
+	
 	ot::LineEdit *								m_filterGroups;
 	ManageOwnerTable *							m_ownersList;
 

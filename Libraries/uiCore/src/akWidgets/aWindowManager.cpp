@@ -18,7 +18,6 @@
 #include <akGui/aObjectManager.h>
 #include <akGui/aTtbContainer.h>
 
-#include <akWidgets/aDockWidget.h>
 #include <akWidgets/aTtbPage.h>
 #include <akWidgets/aWindow.h>
 #include <akWidgets/aWindowManager.h>
@@ -178,94 +177,6 @@ void ak::aWindowManager::setCentralWidget(
 	assert(_centralWidget != nullptr); // nullptr provided
 	m_window->takeCentralWidget();
 	m_window->SetCentralWidget(_centralWidget);
-}
-
-// #############################################################################################################
-
-// Dock management
-
-void ak::aWindowManager::addDock(
-	QDockWidget*										_dock,
-	dockLocation								_dockLocation
-) {
-	try {
-		if (_dock == nullptr) { throw aException("Is nullptr", "Check dock"); }
-		switch (_dockLocation)
-		{
-		case dockLeft:
-			m_window->addDockWidget(Qt::LeftDockWidgetArea, _dock);
-			break;
-		case dockRight:
-			m_window->addDockWidget(Qt::RightDockWidgetArea, _dock);
-			break;
-		case dockBottom:
-			m_window->addDockWidget(Qt::BottomDockWidgetArea, _dock);
-			break;
-		default:
-			assert(0); // Not implemented yet
-			break;
-		}
-		m_window->resizeDocks({ _dock }, { 0 }, Qt::Orientation::Vertical);
-		m_window->resizeDocks({ _dock }, { 0 }, Qt::Orientation::Horizontal);
-		//_dock->resize(200, 200);
-	}
-	catch (const aException & e) { throw aException(e, "ak::aWindowManager::addDock()"); }
-	catch (const std::exception & e) { throw aException(e.what(), "ak::aWindowManager::addDock()"); }
-	catch (...) { throw aException("Unknown error", "ak::aWindowManager::addDock()"); }
-}
-
-void ak::aWindowManager::tabifyDock(
-	QDockWidget*							_mainDock,
-	QDockWidget*							_subDock
-) {
-	assert(_mainDock != nullptr); // Cast failed
-	assert(_subDock != nullptr); // Cast failed
-
-	// tabify dock
-	m_window->tabifyDockWidget(_mainDock, _subDock);
-	//_subDock->resize(200, 200);
-	m_window->resizeDocks({ _subDock }, { 0 }, Qt::Orientation::Vertical);
-	m_window->resizeDocks({ _subDock }, { 0 }, Qt::Orientation::Horizontal);
-	//_subDock->resize(200, 200);
-	_mainDock->raise();
-}
-
-void ak::aWindowManager::setDockPriorityBottomLeft(
-	dockLocation						_dockLocation
-) {
-	try {
-		switch (_dockLocation)
-		{
-		case dockLeft:
-			m_window->setCorner(Qt::Corner::BottomLeftCorner, Qt::DockWidgetArea::LeftDockWidgetArea); break;
-		case dockBottom:
-			m_window->setCorner(Qt::Corner::BottomLeftCorner, Qt::DockWidgetArea::BottomDockWidgetArea); break;
-		default:
-			throw aException("Invalid dock location", "Check dock location");
-		}
-	}
-	catch (const aException & e) { throw aException(e, "ak::aWindowManager::setDockPriorityBottomLeft()"); }
-	catch (const std::exception & e) { throw aException(e.what(), "ak::aWindowManager::setDockPriorityBottomLeft()"); }
-	catch (...) { throw aException("Unknown error", "ak::aWindowManager::setDockPriorityBottomLeft()"); }
-}
-
-void ak::aWindowManager::setDockPriorityBottomRight(
-	dockLocation						_dockLocation
-) {
-	try {
-		switch (_dockLocation)
-		{
-		case dockRight:
-			m_window->setCorner(Qt::Corner::BottomRightCorner, Qt::DockWidgetArea::RightDockWidgetArea); break;
-		case dockBottom:
-			m_window->setCorner(Qt::Corner::BottomRightCorner, Qt::DockWidgetArea::BottomDockWidgetArea); break;
-		default:
-			throw aException("Invalid dock location", "Check dock location");
-		}
-	}
-	catch (const aException & e) { throw aException(e, "ak::aWindowManager::setDockPriorityBottomLeft()"); }
-	catch (const std::exception & e) { throw aException(e.what(), "ak::aWindowManager::setDockPriorityBottomLeft()"); }
-	catch (...) { throw aException("Unknown error", "ak::aWindowManager::setDockPriorityBottomLeft()"); }
 }
 
 // #############################################################################################################

@@ -1,9 +1,8 @@
+// Frontend header
 #include "ManageOwner.h"
 #include "AppBase.h"
 
-#include <akAPI/uiAPI.h>
-#include <akWidgets/aTableWidget.h>
-
+// OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/CheckBox.h"
@@ -12,10 +11,12 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 
-#include <qlayout.h>
-#include <qtablewidget.h>
-#include <qevent.h>
+// Qt header
+#include <QtGui/qevent.h>
+#include <QtWidgets/qlayout.h>
+#include <QtWidgets/qheaderview.h>
 
+// std header
 #include <array>
 #include <cctype>
 
@@ -23,23 +24,23 @@
 // Table Widget 
 
 ManageOwnerTable::ManageOwnerTable()
-	: QTableWidget(), my_selectedRow(-1)
+	: my_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
 
 	setMouseTracking(true);
-	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
+	connect(this, &ManageOwnerTable::itemSelectionChanged, this, &ManageOwnerTable::slotSelectionChanged);
 }
 
 ManageOwnerTable::ManageOwnerTable(int _rows, int _columns)
-	: QTableWidget(_rows, _columns), my_selectedRow(-1)
+	: ot::Table(_rows, _columns), my_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
 
 	setMouseTracking(true);
-	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
+	connect(this, &ManageOwnerTable::itemSelectionChanged, this, &ManageOwnerTable::slotSelectionChanged);
 }
 
 ManageOwnerTable::~ManageOwnerTable() {
@@ -148,36 +149,25 @@ ManageOwner::ManageOwner(const std::string &authServerURL, const std::string &as
 	m_assetOwner = ownerName;
 	m_ownerCheckBox = nullptr;
 
-	// Create controls
- 	m_btnClose = new ot::PushButton("Close");
-
-	m_buttonLabelLayoutW = new QWidget;
-	m_buttonLabelLayout = new QHBoxLayout(m_buttonLabelLayoutW);
-	m_buttonLabelLayout->setContentsMargins(0, 0, 0, 5);
-
-	m_buttonLabelLayout->addStretch(1);
-	m_buttonLabelLayout->addWidget(m_btnClose, Qt::Alignment::enum_type::AlignRight);
-	m_buttonLabelLayout->setStretchFactor(m_btnClose, 0);
-
 	// Create layouts
-	m_centralLayout = new QVBoxLayout(this);
+	QVBoxLayout* centralLayout = new QVBoxLayout(this);
+	QHBoxLayout* groupLabelLayout = new QHBoxLayout;
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
-	m_groupLabelLayoutW = new QWidget;
-	m_groupLabelLayout = new QHBoxLayout(m_groupLabelLayoutW);
-	m_groupLabelLayout->setContentsMargins(0, 0, 0, 0);
-
-	m_labelGroups = new ot::Label;
-	m_labelGroups->setText(QString(assetType.c_str()) + " Owner");
-	QFont font = m_labelGroups->font();
-	font.setPointSize(font.pointSize() * 2);
-	m_labelGroups->setFont(font);
-
-	m_groupLabelLayout->addWidget(m_labelGroups);
+	// Create controls
+ 	ot::PushButton* btnClose = new ot::PushButton("Close");
+	ot::Label* labelGroups = new ot::Label(QString(assetType.c_str()) + " Owner");
 
 	m_filterGroups = new ot::LineEdit;
-	m_filterGroups->setPlaceholderText("Filter...");
 
 	m_ownersList = new ManageOwnerTable(0, 2);
+
+	// Setup controls
+	QFont font = labelGroups->font();
+	font.setPointSize(font.pointSize() * 2);
+	labelGroups->setFont(font);
+
+	m_filterGroups->setPlaceholderText("Filter...");
 
 	QStringList membersLabels;
 	membersLabels.push_back("Owner");
@@ -189,40 +179,45 @@ ManageOwner::ManageOwner(const std::string &authServerURL, const std::string &as
 	m_ownersList->horizontalHeaderItem(0)->setTextAlignment(Qt::Alignment::enum_type::AlignCenter | Qt::Alignment::enum_type::AlignVCenter);
 	m_ownersList->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
 
-	m_centralLayout->addWidget(m_groupLabelLayoutW);
-	m_centralLayout->addWidget(m_filterGroups);
-	m_centralLayout->addWidget(m_ownersList);
+	// Setup layouts
+	groupLabelLayout->setContentsMargins(0, 0, 0, 0);
+	buttonLayout->setContentsMargins(0, 0, 0, 5);
 
-	int minWidth = m_labelGroups->fontMetrics().boundingRect(m_labelGroups->text()).width();
+	// Fill layouts
+	buttonLayout->addStretch(1);
+	buttonLayout->addWidget(btnClose, Qt::AlignmentFlag::AlignRight);
+	groupLabelLayout->addWidget(labelGroups);
+
+	centralLayout->addLayout(groupLabelLayout);
+	centralLayout->addWidget(m_filterGroups);
+	centralLayout->addWidget(m_ownersList);
+	centralLayout->addLayout(buttonLayout);
+
+	// Setup window
+	int minWidth = labelGroups->fontMetrics().boundingRect(labelGroups->text()).width();
 	
 	setWindowTitle("Manage Owner of " + QString(assetType.c_str()) + ": " + QString(assetName.c_str()));
 	setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
 
 	setMinimumSize(minWidth * 4, minWidth * 4);
 
-	m_centralLayout->addWidget(m_buttonLabelLayoutW);
-
-	connect(m_btnClose, &ot::PushButton::clicked, this, &ManageOwner::slotClose);
+	// Connect signals
+	connect(btnClose, &ot::PushButton::clicked, this, &ManageOwner::closeCancel);
 	connect(m_filterGroups, &ot::LineEdit::textChanged, this, &ManageOwner::slotGroupsFilter);
 	connect(m_ownersList, &ManageOwnerTable::selectionChanged, this, &ManageOwner::slotGroupsSelection);
 
+	// Initialize data
 	readUserList();
 	fillOwnerList();
 }
 
-ManageOwner::~ManageOwner() 
-{
-	m_centralLayout->deleteLater();
+ManageOwner::~ManageOwner() {
+
 }
 
 // ####################################################################################################
 
 // Slots
-
-void ManageOwner::slotClose(void) 
-{
-	this->close(ot::Dialog::Cancel);
-}
 
 void ManageOwner::slotShowGroupsWithAccessOnly(void)
 {
@@ -393,11 +388,15 @@ void ManageGroupOwner::slotGroupCheckBoxChanged(bool state, int row)
 		m_ownerCheckBox->setChecked(false);
 	}
 
-	std::string message = "After changing the owner, you will no longer be able to modify the group's properties.\n\n"
-		"Are you sure to proceed?";
+	ot::MessageDialogCfg config;
+	config.setText("After changing the owner, you will no longer be able to modify the group's properties.\n\n"
+		"Are you sure to proceed?");
+	config.setTitle("Change Owner");
+	config.setIcon(ot::MessageDialogCfg::Warning);
+	config.setButtons(ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
 
-	if (ak::uiAPI::promptDialog::show(message.c_str(), "Change Owner", ak::promptType::promptOkCancelIconLeft, "DialogWarning", "Default", this) != ak::dialogResult::resultOk)
-	{
+
+	if (AppBase::instance()->showPrompt(config) != ot::MessageDialogCfg::Yes) {
 		fillOwnerList();
 		return;
 	}
@@ -412,19 +411,16 @@ void ManageGroupOwner::slotGroupCheckBoxChanged(bool state, int row)
 	doc.AddMember(OT_PARAM_AUTH_GROUP_OWNER_NEW_USER_USERNAME, ot::JsonString(newOwner, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response)) {
 		assert(0);
 		return;
 	}
 
-	if (hasSuccessful(response))
-	{
+	if (hasSuccessful(response)) {
 		m_assetOwner = newOwner;
 	}
-	else
-	{
-		ak::uiAPI::promptDialog::show("The owner could not be changed.", "Change Owner", ak::promptType::promptOkIconLeft, "DialogError", "Default", this);
+	else {
+		AppBase::instance()->showErrorPrompt("The owner could not be changed.", "Change Owner");
 	}
 
 	fillOwnerList();
@@ -441,10 +437,16 @@ void ManageProjectOwner::slotGroupCheckBoxChanged(bool state, int row)
 		m_ownerCheckBox->setChecked(false);
 	}
 
-	std::string message = "After changing the owner, you might no longer be able to access the project.\n\n"
-		"Are you sure to proceed?";
+	ot::MessageDialogCfg config;
+	config.setText("After changing the owner, you might no longer be able to access the project.\n\n"
+		"Are you sure to proceed?");
 
-	if (ak::uiAPI::promptDialog::show(message.c_str(), "Change Owner", ak::promptType::promptOkCancelIconLeft, "DialogWarning", "Default", this) != ak::dialogResult::resultOk)
+	config.setTitle("Change Owner");
+	config.setIcon(ot::MessageDialogCfg::Warning);
+	config.setButtons(ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
+
+
+	if (AppBase::instance()->showPrompt(config) != ot::MessageDialogCfg::Yes)
 	{
 		fillOwnerList();
 		return;
@@ -468,7 +470,7 @@ void ManageProjectOwner::slotGroupCheckBoxChanged(bool state, int row)
 
 	if (hasError(response))
 	{
-		ak::uiAPI::promptDialog::show("The owner could not be changed.", "Change Owner", ak::promptType::promptOkIconLeft, "DialogError", "Default", this);
+		AppBase::instance()->showErrorPrompt("The owner could not be changed.", "Change Owner");
 	}
 	else
 	{

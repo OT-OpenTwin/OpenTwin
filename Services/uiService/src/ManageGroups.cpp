@@ -1,23 +1,24 @@
+// Frontend header
 #include "ManageGroups.h"
 #include "ManageOwner.h"
 #include "AppBase.h"
 
-#include <akAPI/uiAPI.h>
-#include <akWidgets/aWindow.h>
-#include <akWidgets/aPushButtonWidget.h>
-#include <akWidgets/aLabelWidget.h>
-#include <akWidgets/aLineEditWidget.h>
-#include <akWidgets/aTableWidget.h>
-#include <akWidgets/aCheckBoxWidget.h>
-
+// OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
+#include "OTWidgets/Label.h"
+#include "OTWidgets/LineEdit.h"
+#include "OTWidgets/CheckBox.h"
+#include "OTWidgets/PushButton.h"
+#include "OTWidgets/IconManager.h"
 
-#include <qlayout.h>
-#include <qtablewidget.h>
-#include <qevent.h>
+// Qt header
+#include <QtGui/qevent.h>
+#include <QtWidgets/qlayout.h>
+#include <QtWidgets/qheaderview.h>
 
+// std header
 #include <array>
 #include <cctype>
 
@@ -25,7 +26,7 @@
 // Table Widget 
 
 ManageGroupsTable::ManageGroupsTable()
-	: QTableWidget(), my_selectedRow(-1)
+	: m_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
@@ -35,7 +36,7 @@ ManageGroupsTable::ManageGroupsTable()
 }
 
 ManageGroupsTable::ManageGroupsTable(int _rows, int _columns)
-	: QTableWidget(_rows, _columns), my_selectedRow(-1)
+	: ot::Table(_rows, _columns), m_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
@@ -56,27 +57,27 @@ void ManageGroupsTable::addRow(const std::array<QTableWidgetItem *, 2> & _column
 		f.setFlag(Qt::ItemFlag::ItemIsEditable, false);
 		_columns[c]->setFlags(f);
 	}
-	my_dataRowItems.push_back(_columns);
+	m_dataRowItems.push_back(_columns);
 }
 
 void ManageGroupsTable::Clear() {
-	for (auto itm : my_dataRowItems) {
+	for (auto itm : m_dataRowItems) {
 		for (auto cell : itm) {
 			QTableWidgetItem * actualCell = cell;
 			delete actualCell;
 		}
 	}
-	my_dataRowItems.clear();
+	m_dataRowItems.clear();
 	setRowCount(0);
-	my_selectedRow = -1;
+	m_selectedRow = -1;
 }
 
 void ManageGroupsTable::mouseMoveEvent(QMouseEvent * _event) {
 	QTableWidgetItem * itm = itemAt(_event->pos());
 	if (itm == nullptr) {
-		for (auto r : my_dataRowItems) {
+		for (auto r : m_dataRowItems) {
 			for (auto c : r) {
-				if (c->row() == my_selectedRow) {
+				if (c->row() == m_selectedRow) {
 				}
 				else {
 				}
@@ -84,11 +85,11 @@ void ManageGroupsTable::mouseMoveEvent(QMouseEvent * _event) {
 		}
 	}
 	else {
-		for (auto r : my_dataRowItems) {
+		for (auto r : m_dataRowItems) {
 			for (auto c : r) {
 				if (c->row() == itm->row()) {
 				}
-				else if (c->row() == my_selectedRow) {
+				else if (c->row() == m_selectedRow) {
 				}
 				else {
 				}
@@ -98,9 +99,9 @@ void ManageGroupsTable::mouseMoveEvent(QMouseEvent * _event) {
 }
 
 void ManageGroupsTable::leaveEvent(QEvent * _event) {
-	for (auto r : my_dataRowItems) {
+	for (auto r : m_dataRowItems) {
 		for (auto c : r) {
-			if (c->row() == my_selectedRow) {
+			if (c->row() == m_selectedRow) {
 			}
 			else {
 			}
@@ -109,18 +110,18 @@ void ManageGroupsTable::leaveEvent(QEvent * _event) {
 }
 
 void ManageGroupsTable::slotSelectionChanged() {
-	my_selectedRow = -1;
+	m_selectedRow = -1;
 	disconnect(this, SIGNAL(itemSelectionChanged()), this, SLOT(slotSelectionChanged()));
 	QList<QTableWidgetItem *> selection = selectedItems();
 	for (auto itm : selection) {
-		for (auto c : my_dataRowItems.at(itm->row())) {
+		for (auto c : m_dataRowItems.at(itm->row())) {
 			c->setSelected(false);
 		}
-		my_selectedRow = itm->row();
+		m_selectedRow = itm->row();
 	}
-	for (int r = 0; r < my_dataRowItems.size(); r++) {
-		if (r != my_selectedRow) {
-			for (auto c : my_dataRowItems.at(r)) {
+	for (int r = 0; r < m_dataRowItems.size(); r++) {
+		if (r != m_selectedRow) {
+			for (auto c : m_dataRowItems.at(r)) {
 			}
 		}
 	}
@@ -132,88 +133,70 @@ void ManageGroupsTable::getSelectedItems(QTableWidgetItem *&first, QTableWidgetI
 {
 	first = second = nullptr;
 
-	if (my_selectedRow < 0) return;
+	if (m_selectedRow < 0) return;
 
-	first  = item(my_selectedRow, 0);
-	second = item(my_selectedRow, 1);
+	first  = item(m_selectedRow, 0);
+	second = item(m_selectedRow, 1);
 }
 
 // ####################################################################################################
+
 // Add group dialog
 
-addGroupDialog::addGroupDialog(const std::string &authServerURL)
-	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_confirmed{ false }, my_input{ nullptr },
-	my_layout{ nullptr }, my_layoutButtons{ nullptr }, my_layoutInput{ nullptr }, my_widgetButtons{ nullptr }, my_widgetInput{ nullptr }
-{
-
+AddGroupDialog::AddGroupDialog(const std::string &authServerURL) {
 	m_authServerURL = authServerURL;
 
+	// Create layouts
+	QVBoxLayout* centralLayout = new QVBoxLayout(this);
+	QHBoxLayout* inputLayout = new QHBoxLayout;
+	QHBoxLayout* buttonsLayout = new QHBoxLayout;
+
 	// Create controls
-	my_buttonCancel = new ak::aPushButtonWidget{ "Cancel" };
-	my_buttonConfirm = new ak::aPushButtonWidget{ "OK" };
-	my_input = new ak::aLineEditWidget;
-	my_label = new ak::aLabelWidget("Group name");
-	my_label->setBuddy(my_input);
+	ot::PushButton* okButton = new ot::PushButton("Ok");
+	ot::PushButton* cancelButton = new ot::PushButton("Cancel");
 
-	// Create main layout
-	my_layout = new QVBoxLayout{ this };
+	m_input = new ot::LineEdit;
+	ot::Label* groupLabel = new ot::Label("Group name:");
+	groupLabel->setBuddy(m_input);
 
-	// Create input layout
-	my_widgetInput = new QWidget;
-	my_layoutInput = new QHBoxLayout{ my_widgetInput };
-	my_layoutInput->addWidget(my_label);
-	my_layoutInput->addWidget(my_input);
-	my_layout->addWidget(my_widgetInput);
+	// Setup layouts
+	inputLayout->addWidget(groupLabel);
+	inputLayout->addWidget(m_input);
 
-	// Create button layout
-	my_widgetButtons = new QWidget;
-	my_layoutButtons = new QHBoxLayout{ my_widgetButtons };
-	my_layoutButtons->addWidget(my_buttonConfirm);
-	my_layoutButtons->addWidget(my_buttonCancel);
-	my_layout->addWidget(my_widgetButtons);
+	buttonsLayout->addWidget(okButton);
+	buttonsLayout->addWidget(cancelButton);
 
-	setWindowTitle("Create New Group");
-	setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
+	centralLayout->addLayout(inputLayout);
+	centralLayout->addLayout(buttonsLayout);
 
-	//setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
+	// Setup window
+	this->setWindowTitle("Create New Group");
+	this->setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
 
-	// Hide info button
-	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-
-	connect(my_input, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
-	connect(my_buttonCancel, SIGNAL(clicked()), this, SLOT(slotButtonCancelPressed()));
-	connect(my_buttonConfirm, SIGNAL(clicked()), this, SLOT(slotButtonConfirmPressed()));
-
-	my_confirmed = false;
+	// Connect signals
+	connect(m_input, &ot::LineEdit::returnPressed, this, &AddGroupDialog::slotConfirm);
+	connect(okButton, &ot::PushButton::clicked, this, &AddGroupDialog::slotConfirm);
+	connect(cancelButton, &ot::PushButton::clicked, this, &AddGroupDialog::closeCancel);
 }
 
-addGroupDialog::~addGroupDialog() 
-{
-	delete my_buttonCancel;
-	delete my_buttonConfirm;
-	delete my_input;
+AddGroupDialog::~AddGroupDialog() {
 
-	delete my_layoutButtons;
-	delete my_widgetButtons;
-
-	delete my_layoutInput;
-	delete my_widgetInput;
-
-	delete my_layout;
 }
 
-QString addGroupDialog::groupName(void) const { return my_input->text(); }
+QString AddGroupDialog::groupName(void) const {
+	return m_input->text();
+}
 
-void addGroupDialog::slotButtonConfirmPressed() 
+void AddGroupDialog::slotConfirm()
 { 
 	// Add new group
-	if (my_input->text().length() == 0)
-	{
-		ak::uiAPI::promptDialog::show("Please specify a name for the new group", "Create New Group", ak::promptType::promptOkIconLeft, "DialogError", "Default", this);
+	AppBase* app = AppBase::instance();
+	OTAssertNullptr(app);
+
+	if (m_input->text().length() == 0) {
+		app->showErrorPrompt("Please specify a name for the new group", "Create New Group");
 		return;
 	}
-
-	AppBase * app{ AppBase::instance() };
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CREATE_GROUP, doc.GetAllocator()), doc.GetAllocator());
@@ -222,27 +205,23 @@ void addGroupDialog::slotButtonConfirmPressed()
 	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
-		assert(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response)) {
+		OT_LOG_EA("Failed to send message");
 		return;
 	}
 
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
 	
-	if (hasError(response))
-	{
-		ak::uiAPI::promptDialog::show("The new group can not be created (the name may already be in use)", "Create New Group", ak::promptType::promptOkIconLeft, "DialogError", "Default", this);
+	if (hasError(response)) {
+		app->showErrorPrompt("The new group can not be created (the name may already be in use)", "Create New Group");
 		return;
 	}
 
-	my_confirmed = true; 
-	Close(); 
+	this->closeOk();
 }
 
-bool addGroupDialog::hasError(const std::string &response)
-{
+bool AddGroupDialog::hasError(const std::string &response) {
 	ot::JsonDocument doc;
 	doc.fromJson(response);
 
@@ -250,157 +229,97 @@ bool addGroupDialog::hasError(const std::string &response)
 	return ot::json::exists(doc, OT_ACTION_AUTH_ERROR);
 }
 
-void addGroupDialog::slotButtonCancelPressed() 
-{
-	my_confirmed = false;  
-	close(); 
-}
-
-void addGroupDialog::slotReturnPressed() 
-{
-	Q_EMIT my_buttonConfirm->clicked();
-}
-
-void addGroupDialog::Close(void) 
-{
-	Q_EMIT isClosing();
-	close();
-}
-
-
 // ####################################################################################################
+
 // Rename group dialog
 
-renameGroupDialog::renameGroupDialog(const std::string &groupName, const std::string &authServerURL)
-	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_cancelClose{ false }, my_confirmed{ false }, my_input{ nullptr },
-	my_layout{ nullptr }, my_layoutButtons{ nullptr }, my_layoutInput{ nullptr }, my_widgetButtons{ nullptr }, my_widgetInput{ nullptr }
-{
-	my_groupToRename = groupName;
+RenameGroupDialog::RenameGroupDialog(const std::string &groupName, const std::string &authServerURL) {
+	m_groupToRename = groupName;
 	m_authServerURL = authServerURL;
 
+	// Create layouts
+	QVBoxLayout* centralLayout = new QVBoxLayout(this);
+	QHBoxLayout* inputLayout = new QHBoxLayout;
+	QHBoxLayout* buttonsLayout = new QHBoxLayout;
+
 	// Create controls
-	my_buttonCancel = new ak::aPushButtonWidget{ "Cancel" };
-	my_buttonConfirm = new ak::aPushButtonWidget{ "Confirm" };
+	ot::PushButton* cancelButton = new ot::PushButton("Cancel");
+	ot::PushButton* confirmButton = new ot::PushButton("Confirm");
 	
-	my_input = new ak::aLineEditWidget;
-	my_input->setText(my_groupToRename.c_str());
+	m_input = new ot::LineEdit(QString::fromStdString(m_groupToRename));
 
-	my_label = new ak::aLabelWidget("Name");
-	my_label->setBuddy(my_input);
+	ot::Label* inputLabel = new ot::Label("Name");
+	inputLabel->setBuddy(m_input);
 
-	// Create main layout
-	my_layout = new QVBoxLayout{ this };
+	// Setup layouts
+	inputLayout->addWidget(inputLabel);
+	inputLayout->addWidget(m_input);
 
-	// Create input layout
-	my_widgetInput = new QWidget;
-	my_layoutInput = new QHBoxLayout{ my_widgetInput };
-	my_layoutInput->addWidget(my_label);
-	my_layoutInput->addWidget(my_input);
-	my_layout->addWidget(my_widgetInput);
+	buttonsLayout->addWidget(confirmButton);
+	buttonsLayout->addWidget(cancelButton);
 
-	// Create button layout
-	my_widgetButtons = new QWidget;
-	my_layoutButtons = new QHBoxLayout{ my_widgetButtons };
-	my_layoutButtons->addWidget(my_buttonConfirm);
-	my_layoutButtons->addWidget(my_buttonCancel);
-	my_layout->addWidget(my_widgetButtons);
+	centralLayout->addLayout(inputLayout);
+	centralLayout->addLayout(buttonsLayout);
 
-	setWindowTitle("Rename Group");
-	setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
+	// Setup window
+	this->setWindowTitle("Rename Group");
+	this->setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
 
-	// Hide info button
-	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-
-	connect(my_input, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
-	connect(my_buttonCancel, SIGNAL(clicked()), this, SLOT(slotButtonCancelPressed()));
-	connect(my_buttonConfirm, SIGNAL(clicked()), this, SLOT(slotButtonConfirmPressed()));
+	// Connect signals
+	connect(m_input, &ot::LineEdit::returnPressed, this, &RenameGroupDialog::slotConfirm);
+	connect(cancelButton, &ot::PushButton::clicked, this, &RenameGroupDialog::closeCancel);
+	connect(confirmButton, &ot::PushButton::clicked, this, &RenameGroupDialog::slotConfirm);
 }
 
-renameGroupDialog::~renameGroupDialog() 
-{
-	delete my_buttonCancel;
-	delete my_buttonConfirm;
-	delete my_input;
+RenameGroupDialog::~RenameGroupDialog() {
 
-	delete my_layoutButtons;
-	delete my_widgetButtons;
-
-	delete my_layoutInput;
-	delete my_widgetInput;
-
-	delete my_layout;
 }
 
-QString renameGroupDialog::groupName(void) const 
+QString RenameGroupDialog::groupName(void) const
 { 
-	return my_input->text(); 
+	return m_input->text(); 
 }
 
-void renameGroupDialog::slotButtonConfirmPressed() 
-{ 
+void RenameGroupDialog::slotConfirm() {
+	AppBase* app{ AppBase::instance() };
+	OTAssertNullptr(app);
+
 	// Add new group
-	if (my_input->text().length() == 0)
-	{
-		ak::uiAPI::promptDialog::show("Please specify a new name for the group", "Rename Group", ak::promptType::promptOkIconLeft, "DialogError", "Default", this);
+	if (m_input->text().length() == 0) {
+		app->showErrorPrompt("Please specify a new name for the group", "Rename Group");
 		return;
 	}
 
-	if (my_groupToRename == my_input->text().toStdString()) 
-	{
-		ak::uiAPI::promptDialog::show("The new name of the new group must be different from the original.", "Rename Group", ak::promptType::promptOkIconLeft, "DialogError", "Default", this);
-		my_confirmed = false;
+	if (m_groupToRename == m_input->text().toStdString()) {
+		app->showWarningPrompt("The new name of the new group must be different from the original.", "Rename Group");
 		return;
 	}
-
-	AppBase * app{ AppBase::instance() };
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_GROUP_NAME, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(my_groupToRename, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_NEW_GROUP_NAME, ot::JsonString(my_input->text().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(m_groupToRename, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_NEW_GROUP_NAME, ot::JsonString(m_input->text().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 	
 	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
-	{
-		assert(0);
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response)) {
+		OT_LOG_EA("Failed to send request");
 		return;
 	}
 
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
 
-	if (!hasSuccessful(response))
-	{
-		ak::uiAPI::promptDialog::show("The new group can not be renamed (the new name may already be in use)", "Rename Group", ak::promptType::promptOkIconLeft, "DialogError", "Default", this);
+	if (!hasSuccessful(response)) {
+		app->showErrorPrompt("The new group can not be renamed (the new name may already be in use)", "Rename Group");
 		return;
 	}
 
-	my_confirmed = true; 
-	Close(); 
+	this->closeOk();
 }
 
-void renameGroupDialog::slotButtonCancelPressed() 
-{ 
-	my_confirmed = false;
-	close(); 
-}
-
-void renameGroupDialog::slotReturnPressed() 
-{
-	Q_EMIT my_buttonConfirm->clicked();
- }
-
-void renameGroupDialog::Close(void) 
-{
-	my_cancelClose = false;
-	Q_EMIT isClosing();
-	if (!my_cancelClose) { close(); }
-	else { my_confirmed = false; }
-}
-
-bool renameGroupDialog::hasSuccessful(const std::string &response)
+bool RenameGroupDialog::hasSuccessful(const std::string &response)
 {
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
@@ -417,114 +336,81 @@ bool renameGroupDialog::hasSuccessful(const std::string &response)
 }
 
 // ####################################################################################################
+
 // Main dialog box
 
 ManageGroups::ManageGroups(const std::string &authServerURL) 
 {
 	m_authServerURL = authServerURL;
 
-	// Create controls
- 	m_btnClose = new ak::aPushButtonWidget("Close");
-
-	m_buttonLabelLayoutW = new QWidget;
-	m_buttonLabelLayout = new QHBoxLayout(m_buttonLabelLayoutW);
-	m_buttonLabelLayout->setContentsMargins(0, 0, 0, 5);
-
-	m_buttonLabelLayout->addStretch(1);
-	m_buttonLabelLayout->addWidget(m_btnClose, Qt::Alignment::enum_type::AlignRight);
-	m_buttonLabelLayout->setStretchFactor(m_btnClose, 0);
-
 	// Create layouts
-	m_centralLayout = new QVBoxLayout(this);
+	QVBoxLayout* centralLayout = new QVBoxLayout(this);
+	QHBoxLayout* listFrameLayout = new QHBoxLayout;
+	QVBoxLayout* listLeftLayout = new QVBoxLayout;
+	QVBoxLayout* listRightLayout = new QVBoxLayout;
+	QHBoxLayout* groupLabelLayout = new QHBoxLayout;
+	
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
+	buttonLayout->setContentsMargins(0, 0, 0, 5);
 
-	m_listFrameLayoutW = new QWidget;
-	m_listFrameLayout = new QHBoxLayout(m_listFrameLayoutW);
-	m_listFrameLayout->setContentsMargins(0, 0, 0, 5);
+	QHBoxLayout* memberLabelLayout = new QHBoxLayout;
+	memberLabelLayout->setContentsMargins(0, 0, 0, 0);
 
-	m_listLeftLayoutW = new QWidget;
-	m_listLeftLayout = new QVBoxLayout(m_listLeftLayoutW);
-	m_listLeftLayout->setContentsMargins(0, 0, 10, 0);
+	// Create controls
+ 	ot::PushButton* closeButton = new ot::PushButton("Close");
 
-	m_listRightLayoutW = new QWidget;
-	m_listRightLayout = new QVBoxLayout(m_listRightLayoutW);
-	m_listRightLayout->setContentsMargins(10, 0, 0, 0);
+	ot::PushButton* btnAdd = new ot::PushButton("");
+	btnAdd->setIcon(ot::IconManager::getIcon("Default/NewGroup.png"));
+	btnAdd->setToolTip("Create new group");
 
-	m_listFrameLayout->addWidget(m_listLeftLayoutW);
-	m_listFrameLayout->addWidget(m_listRightLayoutW);
-
-	m_groupLabelLayoutW = new QWidget;
-	m_groupLabelLayout = new QHBoxLayout(m_groupLabelLayoutW);
-	m_groupLabelLayout->setContentsMargins(0, 0, 0, 0);
-
-	m_labelGroups = new ak::aLabelWidget;
-	m_labelGroups->setText("My Groups");
-	QFont font = m_labelGroups->font();
-	font.setPointSize(font.pointSize() * 2);
-	m_labelGroups->setFont(font);
-
-	m_btnAdd = new ak::aPushButtonWidget("");
-	m_btnAdd->setIcon( ak::uiAPI::getIcon("NewGroup", "Default"));
-	m_btnAdd->setToolTip("Create new group");
-
-	m_btnDelete = new ak::aPushButtonWidget("");
-	m_btnDelete->setIcon( ak::uiAPI::getIcon("Delete", "Default"));
+	m_btnDelete = new ot::PushButton("");
+	m_btnDelete->setIcon(ot::IconManager::getIcon("Default/Delete.png"));
 	m_btnDelete->setToolTip("Delete selected group");
 
-	m_btnRename = new ak::aPushButtonWidget("");
-	m_btnRename->setIcon( ak::uiAPI::getIcon("RenameItem", "Default"));
+	m_btnRename = new ot::PushButton("");
+	m_btnRename->setIcon(ot::IconManager::getIcon("Default/RenameItem.png"));
 	m_btnRename->setToolTip("Rename selected group");
 
-	m_btnOwner = new ak::aPushButtonWidget("");
-	m_btnOwner->setIcon( ak::uiAPI::getIcon("ChangeOwner", "Default"));
+	m_btnOwner = new ot::PushButton("");
+	m_btnOwner->setIcon(ot::IconManager::getIcon("Default/ChangeOwner.png"));
 	m_btnOwner->setToolTip("Change owner of selected group");
 
-	m_groupLabelLayout->addWidget(m_labelGroups);
-	m_groupLabelLayout->addStretch(1);
-	m_groupLabelLayout->addWidget(m_btnAdd);
-	m_groupLabelLayout->addWidget(m_btnRename);
-	m_groupLabelLayout->addWidget(m_btnOwner);
-	m_groupLabelLayout->addWidget(m_btnDelete);
-
 	m_groupsList = new ManageGroupsTable(0, 2);
+
+	m_filterGroups = new ot::LineEdit;
+
+	ot::Label* labelGroups = new ot::Label("My Groups");
+	ot::Label* labelMembers = new ot::Label("Group Members");
+
+	m_showMembersOnly = new ot::CheckBox("Show group members only");
+
+	m_filterMembers = new ot::LineEdit;
+
+	m_membersList = new ManageGroupsTable(0, 2);
+
+	// Setup controls
+	QFont font = labelGroups->font();
+	font.setPointSize(font.pointSize() * 2);
+	labelGroups->setFont(font);
 
 	QStringList groupsLabels;
 	groupsLabels.push_back("Group Name");
 	groupsLabels.push_back("Owner");
 
+	labelMembers->setFont(font);
+
 	m_groupsList->setHorizontalHeaderLabels(groupsLabels);
 
-	m_filterGroups = new ak::aLineEditWidget;
 	m_filterGroups->setPlaceholderText("Filter...");
 
 	m_groupsList->horizontalHeader()->setDefaultAlignment(Qt::Alignment::enum_type::AlignLeft | Qt::Alignment::enum_type::AlignVCenter);
 	m_groupsList->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
 
-	m_listLeftLayout->addWidget(m_groupLabelLayoutW);
-	m_listLeftLayout->addWidget(m_filterGroups);
-	m_listLeftLayout->addWidget(m_groupsList);
-
-	m_memberLabelLayoutW = new QWidget;
-	m_memberLabelLayout = new QHBoxLayout(m_memberLabelLayoutW);
-	m_memberLabelLayout->setContentsMargins(0, 0, 0, 0);
-
-	m_labelMembers = new ak::aLabelWidget;
-	m_labelMembers->setText("Group Members");
-	m_labelMembers->setFont(font);
-
-	m_showMembersOnly = new ak::aCheckBoxWidget;
-	m_showMembersOnly->setText("Show group members only");
 	m_showMembersOnly->setChecked(true);
 	m_showMembersOnly->setMinimumSize(QSize(0, 0));
 	m_showMembersOnly->setContentsMargins(0, 0, 0, 0);
 
-	m_memberLabelLayout->addWidget(m_labelMembers);
-	m_memberLabelLayout->addStretch(1);
-	m_memberLabelLayout->addWidget(m_showMembersOnly);
-
-	m_filterMembers = new ak::aLineEditWidget;
 	m_filterMembers->setPlaceholderText("Filter...");
-
-	m_membersList = new ManageGroupsTable(0, 2);
 
 	QStringList membersLabels;
 	membersLabels.push_back("In Group");
@@ -536,59 +422,77 @@ ManageGroups::ManageGroups(const std::string &authServerURL)
 	m_membersList->horizontalHeaderItem(0)->setTextAlignment(Qt::Alignment::enum_type::AlignCenter | Qt::Alignment::enum_type::AlignVCenter);
 	m_membersList->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
 
-	m_listRightLayout->addWidget(m_memberLabelLayoutW);
-	m_listRightLayout->addWidget(m_filterMembers);
-	m_listRightLayout->addWidget(m_membersList);
+	// Setup layouts
+	listFrameLayout->setContentsMargins(0, 0, 0, 5);
+	listLeftLayout->setContentsMargins(0, 0, 10, 0);
+	listRightLayout->setContentsMargins(10, 0, 0, 0);
+	groupLabelLayout->setContentsMargins(0, 0, 0, 0);
+	
+	groupLabelLayout->addWidget(labelGroups);
+	groupLabelLayout->addStretch(1);
+	groupLabelLayout->addWidget(btnAdd);
+	groupLabelLayout->addWidget(m_btnRename);
+	groupLabelLayout->addWidget(m_btnOwner);
+	groupLabelLayout->addWidget(m_btnDelete);
 
-	int minWidth = m_labelGroups->fontMetrics().boundingRect(m_labelGroups->text()).width();
+	buttonLayout->addStretch(1);
+	buttonLayout->addWidget(closeButton, Qt::AlignmentFlag::AlignRight);
+	
+	memberLabelLayout->addWidget(labelMembers);
+	memberLabelLayout->addStretch(1);
+	memberLabelLayout->addWidget(m_showMembersOnly);
+
+	listLeftLayout->addLayout(groupLabelLayout);
+	listLeftLayout->addWidget(m_filterGroups);
+	listLeftLayout->addWidget(m_groupsList);
+
+	listRightLayout->addLayout(memberLabelLayout);
+	listRightLayout->addWidget(m_filterMembers);
+	listRightLayout->addWidget(m_membersList);
+
+	listFrameLayout->addLayout(listLeftLayout);
+	listFrameLayout->addLayout(listRightLayout);
+
+	centralLayout->addLayout(listFrameLayout);
+	centralLayout->addLayout(buttonLayout);
+
+	// Setup window
+	int minWidth = labelGroups->fontMetrics().boundingRect(labelGroups->text()).width();
 	
 	setWindowTitle("Manage User Groups");
 	setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
 	
-	hideInfoButton();
 	setMinimumSize(minWidth * 10, minWidth * 8);
 
-	m_centralLayout->addWidget(m_listFrameLayoutW);
-	m_centralLayout->addWidget(m_buttonLabelLayoutW);
-
-	connect(m_btnClose, &ak::aPushButtonWidget::clicked, this, &ManageGroups::slotClose);
-	connect(m_btnAdd, &ak::aPushButtonWidget::clicked, this, &ManageGroups::slotAddGroup);
-	connect(m_btnRename, &ak::aPushButtonWidget::clicked, this, &ManageGroups::slotRenameGroup);
-	connect(m_btnOwner, &ak::aPushButtonWidget::clicked, this, &ManageGroups::slotChangeGroupOwner);
-	connect(m_btnDelete, &ak::aPushButtonWidget::clicked, this, &ManageGroups::slotDeleteGroup);
-	connect(m_showMembersOnly, &ak::aCheckBoxWidget::stateChanged, this, &ManageGroups::slotShowMembersOnly);
-	connect(m_filterGroups, &ak::aLineEditWidget::textChanged, this, &ManageGroups::slotGroupFilter);
-	connect(m_filterMembers, &ak::aLineEditWidget::textChanged, this, &ManageGroups::slotMemberFilter);
+	connect(closeButton, &ot::PushButton::clicked, this, &ManageGroups::closeCancel);
+	connect(btnAdd, &ot::PushButton::clicked, this, &ManageGroups::slotAddGroup);
+	connect(m_btnRename, &ot::PushButton::clicked, this, &ManageGroups::slotRenameGroup);
+	connect(m_btnOwner, &ot::PushButton::clicked, this, &ManageGroups::slotChangeGroupOwner);
+	connect(m_btnDelete, &ot::PushButton::clicked, this, &ManageGroups::slotDeleteGroup);
+	connect(m_showMembersOnly, &ot::CheckBox::stateChanged, this, &ManageGroups::slotShowMembersOnly);
+	connect(m_filterGroups, &ot::LineEdit::textChanged, this, &ManageGroups::slotGroupFilter);
+	connect(m_filterMembers, &ot::LineEdit::textChanged, this, &ManageGroups::slotMemberFilter);
 	connect(m_groupsList, &ManageGroupsTable::selectionChanged, this, &ManageGroups::slotGroupsSelection);
-	connect(m_membersList, &ManageGroupsTable::selectionChanged, this, &ManageGroups::slotMembersSelection);
-
+	
 	readUserList();
 
 	fillGroupsList();
 	fillMembersList();
 }
 
-ManageGroups::~ManageGroups() 
-{
-	m_centralLayout->deleteLater();
+ManageGroups::~ManageGroups() {
+	
 }
 
 // ####################################################################################################
 
 // Slots
 
-void ManageGroups::slotClose(void) 
-{
-	Close(ak::resultCancel);
-}
-
 void ManageGroups::slotAddGroup(void)
 {
-	addGroupDialog dialog(m_authServerURL);
+	AddGroupDialog dialog(m_authServerURL);
 
-	dialog.exec();
-
-	if (dialog.wasConfirmed())
+	if (dialog.showDialog() == ot::Dialog::Ok)
 	{
 		fillGroupsList();
 	}
@@ -604,12 +508,9 @@ void ManageGroups::slotRenameGroup(void)
 
 	std::string groupName = groupNameItem->text().toStdString();
 
-	renameGroupDialog dialog(groupName, m_authServerURL);
+	RenameGroupDialog dialog(groupName, m_authServerURL);
 
-	dialog.exec();
-
-	if (dialog.wasConfirmed())
-	{
+	if (dialog.showDialog() == ot::Dialog::Ok) {
 		fillGroupsList();
 	}
 }
@@ -642,8 +543,13 @@ void ManageGroups::slotDeleteGroup(void)
 
 	std::string groupName = groupNameItem->text().toStdString();
 
-	if (ak::uiAPI::promptDialog::show("Are you sure to delete group: " + QString(groupName.c_str()) + "\nThis operation can not be undone.", "Delete Group", ak::promptType::promptOkCancelIconLeft, "DialogWarning", "Default", this) == ak::dialogResult::resultOk)
-	{
+	ot::MessageDialogCfg config;
+	config.setText("Are you sure to delete group: " + groupName + "\nThis operation can not be undone.");
+	config.setTitle("Delete Group");
+	config.setIcon(ot::MessageDialogCfg::Warning);
+	config.setButtons(ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
+
+	if (AppBase::instance()->showPrompt(config) == ot::MessageDialogCfg::Yes) {
 		// Delete the group
 		assert(!m_authServerURL.empty());
 
@@ -668,33 +574,23 @@ void ManageGroups::slotDeleteGroup(void)
 	}
 }
 
-void ManageGroups::slotShowMembersOnly(void)
-{
+void ManageGroups::slotShowMembersOnly(void) {
 	fillMembersList();
 }
 
-void ManageGroups::slotGroupFilter(void)
-{
+void ManageGroups::slotGroupFilter(void) {
 	fillGroupsList();
 }
 
-void ManageGroups::slotMemberFilter(void)
-{
+void ManageGroups::slotMemberFilter(void) {
 	fillMembersList();
 }
 
-void ManageGroups::slotGroupsSelection(void)
-{
+void ManageGroups::slotGroupsSelection(void) {
 	fillMembersList();
 }
 
-void ManageGroups::slotMembersSelection(void)
-{
-
-}
-
-void ManageGroups::slotMemberCheckBoxChanged(bool state, int row)
-{
+void ManageGroups::slotMemberCheckBoxChanged(bool state, int row) {
 	assert(!m_authServerURL.empty());
 
 	QTableWidgetItem *groupNameItem = nullptr;
@@ -728,15 +624,16 @@ void ManageGroups::slotMemberCheckBoxChanged(bool state, int row)
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
-		assert(0);
+		OT_LOG_EAS("Failed to send request");
 		return;
 	}
 
-	assert(hasSuccessful(response));
+	if (!hasSuccessful(response)) {
+		OT_LOG_EA("Request returned error");
+	}
 }
 
-bool ManageGroups::hasSuccessful(const std::string &response)
-{
+bool ManageGroups::hasSuccessful(const std::string &response) {
 	ot::JsonDocument doc;
 	doc.fromJson(response);
 
@@ -1033,5 +930,3 @@ void ManageGroups::readUserList(void)
 		m_userInGroup[userName] = false;
 	}
 }
-
-

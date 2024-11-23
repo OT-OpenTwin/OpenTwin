@@ -29,7 +29,6 @@
 #include <akCore/aException.h>
 #include <akWidgets/aWindow.h>
 #include <akWidgets/aWindowManager.h>
-#include <akWidgets/aDockWidget.h>
 #include <akWidgets/aTreeWidget.h>
 
 // OpenTwin header
@@ -67,6 +66,7 @@
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/PlainTextEditView.h"
 #include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/MessageBoxManager.h"
 #include "OTWidgets/GraphicsItemLoader.h"
 #include "OTWidgets/GraphicsPickerView.h"
 #include "OTWidgets/PropertyInputDouble.h"
@@ -179,6 +179,8 @@ AppBase::AppBase()
 	
 	this->setDeleteLogNotifierLater(true);
 	ot::LogDispatcher::instance().addReceiver(this);
+
+	ot::MessageBoxManager::instance().setHandler(this);
 }
 
 AppBase::~AppBase() {
@@ -437,12 +439,18 @@ bool AppBase::closeEvent() {
 	}
 
 	if (this->getCurrentProjectIsModified()) {
-		QString msg("You have unsaved changes at the project \"");
-		msg.append(m_currentProjectName.c_str());
-		msg.append("\".\nDo you want to save them now?\nUnsaved changes will be lost.");
-		dialogResult result = uiAPI::promptDialog::show(msg, "Exit application", promptYesNoCancelIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
-		if (result == dialogResult::resultCancel) { return false; }
-		else if (result == dialogResult::resultYes) { m_ExternalServicesComponent->saveProject(); }
+		std::string msg("You have unsaved changes at the project \"" +
+			m_currentProjectName + 
+			"\".\nDo you want to save them now?\nUnsaved changes will be lost.");
+
+		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, "Exit Application", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
+
+		if (result == ot::MessageDialogCfg::Cancel) {
+			return false;
+		}
+		else if (result == ot::MessageDialogCfg::Yes) {
+			m_ExternalServicesComponent->saveProject();
+		}
 	}
 
 	// Store current UI settings
@@ -535,13 +543,13 @@ void AppBase::exportProjectWorker(std::string selectedProjectName, std::string e
 
 	if (!error.empty())
 	{
-		QMetaObject::invokeMethod(this, "showErrorPrompt", Qt::QueuedConnection, Q_ARG(QString,  QString(error.c_str())), Q_ARG(QString,  QString("Export Project To File")));
+		QMetaObject::invokeMethod(this, "showErrorPrompt", Qt::QueuedConnection, Q_ARG(const std::string&,  error), Q_ARG(const std::string&, std::string("Export Project To File")));
 	}
 	else
 	{
 		std::string success = "Project exported successfully: " + exportFileName;
 
-		QMetaObject::invokeMethod(this, "showInfoPrompt", Qt::QueuedConnection, Q_ARG(QString,  QString(success.c_str())), Q_ARG(QString, QString("Export Project To File")));
+		QMetaObject::invokeMethod(this, "showInfoPrompt", Qt::QueuedConnection, Q_ARG(const std::string&, success), Q_ARG(const std::string&, std::string("Export Project To File")));
 	}
 }
 
@@ -620,7 +628,7 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 	{
 		pManager.deleteProject(projectName);
 
-		QMetaObject::invokeMethod(this, "showErrorPrompt", Qt::QueuedConnection, Q_ARG(QString,  QString(error.c_str())), Q_ARG(QString,  QString("Import Project From File")));
+		QMetaObject::invokeMethod(this, "showErrorPrompt", Qt::QueuedConnection, Q_ARG(const std::string&,  error), Q_ARG(const std::string&, std::string("Import Project From File")));
 	}
 	else
 	{
@@ -632,7 +640,7 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 
 		std::string success = "Project imported successfully: " + projectName;
 
-		QMetaObject::invokeMethod(this, "showInfoPrompt", Qt::QueuedConnection, Q_ARG(QString,  QString(success.c_str())), Q_ARG(QString, QString("Import Project From File")));
+		QMetaObject::invokeMethod(this, "showInfoPrompt", Qt::QueuedConnection, Q_ARG(const std::string&, success), Q_ARG(const std::string&, std::string("Import Project From File")));
 	}
 }
 
@@ -736,8 +744,6 @@ void AppBase::createUi(void) {
 			// ########################################################################
 
 			// Setup UI
-			uiAPI::window::setDockBottomLeftPriority(m_mainWindow, dockLeft);
-			uiAPI::window::setDockBottomRightPriority(m_mainWindow, dockRight);
 			uiAPI::window::addEventHandler(m_mainWindow, this);
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Setup tab toolbar");
@@ -941,14 +947,19 @@ void AppBase::createUi(void) {
 			uiAPI::setSurfaceFormatDefaultSamplesCount(4);
 			OT_LOG_D("UI creation completed");
 		}
-		catch (const aException & e) { throw aException(e, "ini()"); }
-		catch (const std::exception & e)
-		{ 
+		catch (const aException & e) {
+			throw aException(e, "ini()");
+		}
+		catch (const std::exception & e) { 
 			throw aException(e.what(), "ini()"); 
 		}
-		catch (...) { throw aException("Unknown error", "ini()"); }
+		catch (...) {
+			throw aException("Unknown error", "ini()");
+		}
 	}
-	catch (const std::exception & e) { uiAPI::promptDialog::show(e.what(), "Error", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow()); }
+	catch (const std::exception & e) {
+		this->showErrorPrompt(e.what(), "Critical Error");
+	}
 }
 
 void AppBase::setDebug(bool _debug) { m_isDebug = _debug; }
@@ -1253,21 +1264,22 @@ void AppBase::updateLogIntensityInfo(void) {
 
 // Private functions
 
-bool AppBase::checkForContinue(
-	QString									_title
-) {
-	if (m_ExternalServicesComponent->isCurrentModelModified())
-	{
-		QString msg("Do you want to save the changes made to the project \"");
-		msg.append(m_currentProjectName.c_str());
-		msg.append("\"?\nUnsaved changes will be lost.");
-		dialogResult result = uiAPI::promptDialog::show(msg, _title, promptYesNoCancelIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
-		if (result == dialogResult::resultCancel) { return false; }
-		if (result == dialogResult::resultYes) {
-			if (m_ExternalServicesComponent->isCurrentModelModified())
-			{ m_ExternalServicesComponent->saveProject(); }
+bool AppBase::checkForContinue(const std::string& _title) {
+	if (m_ExternalServicesComponent->isCurrentModelModified()) {
+		std::string msg("Do you want to save the changes made to the project \"" + 
+			m_currentProjectName + 
+			"\"?\nUnsaved changes will be lost.");
+
+		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
+
+		if (result == ot::MessageDialogCfg::Cancel) {
+			return false;
+		}
+		else if (result == ot::MessageDialogCfg::Yes && m_ExternalServicesComponent->isCurrentModelModified()) {
+			m_ExternalServicesComponent->saveProject();
 		}
 	}
+
 	uiAPI::window::setTitle(m_mainWindow, "Open Twin");
 	return true;
 }
@@ -1835,36 +1847,35 @@ void AppBase::closeTable(const std::string& _entityName, const ot::BasicServiceI
 
 // Slots
 
-dialogResult AppBase::showPrompt(const QString _message, const QString & _title, promptType _type) {
+ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const ot::MessageDialogCfg & _config) {
 	if (m_mainWindow != invalidUID) {
-		aWindow * window = uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
-		return uiAPI::promptDialog::show(_message, _title, _type, window);
+		return ot::MessageDialog::showDialog(_config, uiAPI::object::get<aWindowManager>(m_mainWindow)->window());
 	}
-	else { return uiAPI::promptDialog::show(_message, _title, _type); }
+	else {
+		return ot::MessageDialog::showDialog(_config);
+	}
 }
 
-void AppBase::showInfoPrompt(const QString _message, const QString & _title) {
-	if (m_mainWindow != invalidUID) {
-		aWindow * window = uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
-		uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoInfo, c_promtIcoPath, window);
-	}
-	else { uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoInfo, c_promtIcoPath); }
+ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const std::string& _message, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons) {
+	ot::MessageDialogCfg config;
+	config.setText(_message);
+	config.setTitle(_title);
+	config.setButtons(_buttons);
+	config.setIcon(_icon);
+
+	return this->showPrompt(config);
 }
 
-void AppBase::showWarningPrompt(const QString _message, const QString & _title) {
-	if (m_mainWindow != invalidUID) {
-		aWindow * window = uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
-		uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoWarning, c_promtIcoPath, window);
-	}
-	else { uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoWarning, c_promtIcoPath); }
+void AppBase::showInfoPrompt(const std::string& _message, const std::string& _title) {
+	this->showPrompt(_message, _title, ot::MessageDialogCfg::Information, ot::MessageDialogCfg::Ok);
 }
 
-void AppBase::showErrorPrompt(const QString _message, const QString & _title) {
-	if (m_mainWindow != invalidUID) {
-		aWindow * window = uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
-		uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoError, c_promtIcoPath, window);
-	}
-	else { uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoError, c_promtIcoPath); }
+void AppBase::showWarningPrompt(const std::string& _message, const std::string& _title) {
+	this->showPrompt(_message, _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Ok);
+}
+
+void AppBase::showErrorPrompt(const std::string& _message, const std::string& _title) {
+	this->showPrompt(_message, _title, ot::MessageDialogCfg::Critical, ot::MessageDialogCfg::Ok);
 }
 
 // #######################################################################################################################
@@ -2377,12 +2388,13 @@ void AppBase::slotCreateProject(void) {
 		// We have not currently opened this project, check if it is opened elsewhere
 		std::string projectUser;
 		if (m_ExternalServicesComponent->projectIsOpened(currentName, projectUser)) {
-			QString msg("The project with the name \"");
+			std::string msg("The project with the name \"");
 			msg.append(currentName.c_str());
 			msg.append("\" does already exist and is currently opened by user: \"");
 			msg.append(projectUser.c_str());
 			msg.append("\".");
-			uiAPI::promptDialog::show(msg, "Create New Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+
+			this->showErrorPrompt(msg, "Create New Project");
 			return;
 		}
 	}
@@ -2430,16 +2442,13 @@ void AppBase::slotCreateProject(void) {
 	if (projectManager.projectExists(currentName, canBeDeleted)) {
 		if (!canBeDeleted) {
 			// Notify that the project already exists and can not be deleted
-			QString msg{ "A project with the name \"" };
-			msg.append(currentName.c_str()).append("\" does already exist and belongs to another owner.");
-			ak::uiAPI::promptDialog::show(msg, "Create New Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+			this->showErrorPrompt("A project with the name \"" + currentName + "\" does already exist and belongs to another owner.", "Create New Project");
 			return;
 		}
 
-		QString msg("A project with the name \"");
-		msg.append(currentName.c_str());
-		msg.append("\" does already exist. Do you want to overwrite it?\nThis cannot be undone.");
-		if (dialogResult::resultYes != uiAPI::promptDialog::show(msg, "Create New Project", promptYesNoIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow())) {
+		std::string msg("A project with the name \"" + currentName + "\" does already exist. Do you want to overwrite it?\nThis cannot be undone.");
+
+		if (this->showPrompt(msg, "Create New Project", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No) == ot::MessageDialogCfg::Ok) {
 			return;
 		}
 
@@ -2491,10 +2500,7 @@ void AppBase::slotOpenProject(void) {
 
 			// Check whether the project is currently opened in this or another other instance of the ui
 			if (selectedProjectName == m_currentProjectName) {
-				QString msg("The project with the name \"");
-				msg.append(selectedProjectName.c_str());
-				msg.append("\" is already opened in this instance.");
-				uiAPI::promptDialog::show(msg, "Open Project", promptOkIconLeft, "DialogInformation", "Default", AppBase::instance()->mainWindow());
+				this->showInfoPrompt("The project with the name \"" + selectedProjectName + "\" is already opened in this instance.", "Open Project");
 
 				projectIsOpened = true;
 			}
@@ -2502,12 +2508,9 @@ void AppBase::slotOpenProject(void) {
 				// We have not currently opened this project, check if it is opened elsewhere
 				std::string projectUser;
 				if (m_ExternalServicesComponent->projectIsOpened(selectedProjectName, projectUser)) {
-					QString msg("The project with the name \"");
-					msg.append(selectedProjectName.c_str());
-					msg.append("\" is already opened by user: \"");
-					msg.append(projectUser.c_str());
-					msg.append("\".");
-					uiAPI::promptDialog::show(msg, "Open Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+					std::string msg("The project with the name \"" + selectedProjectName + "\" is already opened by user: \"" + projectUser + "\".");
+
+					this->showErrorPrompt(msg, "Open Project");
 
 					projectIsOpened = true;
 				}
@@ -2522,7 +2525,7 @@ void AppBase::slotOpenProject(void) {
 				assert(userManager.checkConnection()); // Failed to connect
 
 				if (!projectManager.canAccessProject(projectCollection)) {
-					uiAPI::promptDialog::show("Unable to access this project. The access permission might have been changed.", "Open Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+					this->showErrorPrompt("Unable to access this project. The access permission might have been changed.", "Open Project");
 
 					userManager.removeRecentProject(selectedProjectName);
 					m_welcomeScreen->slotRefreshProjectList();
@@ -2546,7 +2549,7 @@ void AppBase::slotOpenProject(void) {
 			UserManagement userManager(m_loginData);
 			assert(userManager.checkConnection()); // Failed to connect
 
-			uiAPI::promptDialog::show("Unable to access this project. The access permission might have been changed or the project has been deleted.", "Open Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+			this->showErrorPrompt("Unable to access this project. The access permission might have been changed or the project has been deleted.", "Open Project");
 
 			userManager.removeRecentProject(selectedProjectName);
 			m_welcomeScreen->slotRefreshProjectList();
@@ -2603,12 +2606,12 @@ void AppBase::slotRenameProject(void) {
 	if (selectedProjectName.toStdString() != m_currentProjectName) {
 		std::string projectUser;
 		if (m_ExternalServicesComponent->projectIsOpened(selectedProjectName.toStdString(), projectUser)) {
-			QString msg("The project with the name \"");
-			msg.append(selectedProjectName);
+			std::string msg("The project with the name \"");
+			msg.append(selectedProjectName.toStdString());
 			msg.append("\" is currently opened by user: \"");
-			msg.append(projectUser.c_str());
+			msg.append(projectUser);
 			msg.append("\".");
-			uiAPI::promptDialog::show(msg, "Rename Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+			this->showErrorPrompt(msg, "Rename Project");
 
 			return;
 		}
@@ -2672,12 +2675,12 @@ void AppBase::slotDeleteProject(void) {
 		if (proj.toStdString() != m_currentProjectName) {
 			std::string projectUser;
 			if (m_ExternalServicesComponent->projectIsOpened(proj.toStdString(), projectUser)) {
-				QString msg("The project with the name \"");
-				msg.append(proj);
+				std::string msg("The project with the name \"");
+				msg.append(proj.toStdString());
 				msg.append("\" is currently opened by user: \"");
-				msg.append(projectUser.c_str());
+				msg.append(projectUser);
 				msg.append("\".");
-				uiAPI::promptDialog::show(msg, "Delete Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+				this->showErrorPrompt(msg, "Delete Project");
 
 				continue;
 			}
