@@ -180,7 +180,6 @@ namespace ak {
 		otPrompt,
 		otPushButton,
 		otRadioButton,
-		otSpecialTabBar,
 		otSpinBox,
 		otTabToolbar,
 		otTabToolbarGroup,

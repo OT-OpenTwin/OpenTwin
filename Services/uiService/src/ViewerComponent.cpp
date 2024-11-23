@@ -947,7 +947,7 @@ void ViewerComponent::deactivateCurrentlyActiveModel(void) {
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-void ViewerComponent::setColors(const ak::aColor & _background, const ak::aColor & _foreground) {
+void ViewerComponent::setColors(const ot::Color & _background, const ot::Color & _foreground) {
 	try {
 		try {
 			for (auto itm : m_viewers) {

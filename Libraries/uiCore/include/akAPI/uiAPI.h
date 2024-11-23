@@ -17,7 +17,6 @@
 #include <akCore/akCore.h>
 #include <akCore/globalDataTypes.h>
 
-#include <akGui/aColor.h>
 #include <akGui/aObjectManager.h>
 
 #include <akWidgets/aComboButtonWidgetItem.h>
@@ -312,12 +311,6 @@ namespace ak {
 			UID									_creatorUid,
 			const QIcon &						_icon,
 			const QString &						_text = QString("")
-		);
-
-		//! @brief Will create a new special TabBar and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		UICORE_API_EXPORT UID createSpecialTabBar(
-			UID									_creatorUid
 		);
 
 		//! @brief Will create a new TabToolBar subcountainer and return its UID
@@ -719,37 +712,6 @@ namespace ak {
 
 		// ###############################################################################################################################################
 
-		// Special tab bar
-
-		namespace specialTabBar {
-
-			UICORE_API_EXPORT void clearColors(
-				UID			_specialTabBarUID,
-				bool			_repaint = true
-			);
-
-			UICORE_API_EXPORT void clearColor(
-				UID			_specialTabBarUID,
-				int				_index,
-				bool			_repaint = true
-			);
-
-			UICORE_API_EXPORT void addColor(
-				UID			_specialTabBarUID,
-				int				_index,
-				aColor		_color,
-				bool			_repaint = true
-			);
-
-			UICORE_API_EXPORT void setRepaintBlocked(
-				UID			_specialTabBarUID,
-				bool			_blocked = true
-			);
-
-		} // namespace specialTabBar
-
-		// ###############################################################################################################################################
-
 		// TabView
 
 		namespace tabWidget {
@@ -849,22 +811,6 @@ namespace ak {
 				UID								_tabWidgetUID,
 				ID								_tab,
 				const QString &						_text
-			);
-
-			//! @brief Will set the provided tab bar to the tab view
-			//! @param _tabWidgetUID The UID of the tab view to set the tab bar at
-			//! @param _specialTabBarUID The UID of the special tab bar to set
-			UICORE_API_EXPORT void setSpecialTabBar(
-				UID								_tabWidgetUID,
-				UID								_specialTabBarUID
-			);
-
-			//! @brief Will set the provided tab bar to the tab view
-			//! @param _tabWidgetUID The UID of the tab view to set the tab bar at
-			//! @param _specialTabBar The special tab bar to set
-			UICORE_API_EXPORT void setSpecialTabBar(
-				UID								_tabWidgetUID,
-				QTabBar *							_specialTabBar
 			);
 
 			UICORE_API_EXPORT void setVisible(

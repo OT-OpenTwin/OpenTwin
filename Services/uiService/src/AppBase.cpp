@@ -988,8 +988,8 @@ ViewerUIDtype AppBase::createView(
 	
 	int DPIRatio = uiAPI::window::devicePixelRatio();
 
-	aColor col(255, 255, 255);
-	aColor overlayCol;
+	ot::Color col(255, 255, 255);
+	ot::Color overlayCol;
 
 	ViewerUIDtype viewID = m_viewerComponent->createViewer(_modelUID, (double)DPIRatio, (double)DPIRatio,
 		col.r(), col.g(), col.b(), overlayCol.r(), overlayCol.g(), overlayCol.b());
@@ -1429,141 +1429,6 @@ void AppBase::focusPropertyGridItem(const std::string& _group, const std::string
 
 	m_propertyGrid->focusProperty(_group, _name);
 }
-
-/*
-void AppBase::fillPropertyGrid(const std::string &settings) {
-	this->clearPropertyGrid();
-
-	// Read settings into JSOC Doc
-	ot::JsonDocument doc;
-
-	// Parse the document with the json string we have "received"
-	doc.Parse(settings.c_str());
-
-	// Check if the document is an object
-	assert(doc.IsObject()); // Doc is not an object
-
-	std::map<std::string, bool> groupMap;
-
-	std::vector<std::vector<int>> groupColors = { {164, 147, 133}, {143, 128, 154}, {117, 139, 154}, {166, 135, 148}, {141, 158, 161} };
-	int groupColorIndex = 0;
-
-	for (rapidjson::Value::ConstMemberIterator i = doc.MemberBegin(); i != doc.MemberEnd(); i++)
-	{
-		std::string name = i->name.GetString();
-		assert(i->value.IsObject());
-
-		rapidjson::Value& item = doc[name.c_str()];
-
-		std::string type = item["Type"].GetString();
-		bool multipleValues = item["MultipleValues"].GetBool();
-		bool readOnly = item["ReadOnly"].GetBool();
-		bool protectedProperty = item["Protected"].GetBool();
-		bool errorState = item["ErrorState"].GetBool();
-		std::string group = item["Group"].GetString();
-		
-		if (!group.empty())
-		{
-			if (groupMap.find(group) == groupMap.end())
-			{
-				//double r = groupColors[groupColorIndex % groupColors.size()][0] / 255.0;
-				//double g = groupColors[groupColorIndex % groupColors.size()][1] / 255.0;
-				//double b = groupColors[groupColorIndex % groupColors.size()][2] / 255.0;
-				int r = groupColors[groupColorIndex % groupColors.size()][0];
-				int g = groupColors[groupColorIndex % groupColors.size()][1];
-				int b = groupColors[groupColorIndex % groupColors.size()][2];
-
-				this->addPropertyGroup(group.c_str(), ak::aColor(r, g, b), ak::aColor(0, 0, 0), ak::aColor(255, 0, 0));
-				groupMap[group] = true;
-
-				groupColorIndex++;
-			}
-		}
-
-		if (type == "double")
-		{
-			double value = item["Value"].GetDouble();
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value);
-		}
-		else if (type == "integer")
-		{
-			long value = (long)(item["Value"].GetInt64());
-			long min = INT_MIN;
-			long max = INT_MAX;
-			if (item.HasMember("ValueMin")) min = (long)item["ValueMin"].GetInt64();
-			if (item.HasMember("ValueMax")) max = (long)item["ValueMax"].GetInt64();
-			//if (item.HasMember("NumberInputMode")) app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, value, min, max);
-			//else app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, value);
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value, min, max);
-		}
-		else if (type == "boolean")
-		{
-			bool value = item["Value"].GetBool();
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value);
-		}
-		else if (type == "string")
-		{
-			QString value = item["Value"].GetString();
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value);
-		}
-		else if (type == "selection")
-		{
-			std::vector<QString> selection;
-
-			rapidjson::Value options = item["Options"].GetArray();
-
-			for (int i = 0; i < options.Size(); i++)
-			{
-				selection.push_back(QString(options[i].GetString()));
-			}
-
-			QString value = item["Value"].GetString();
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, selection, value);
-		}
-		else if (type == "color")
-		{
-			double colorR = item["ValueR"].GetDouble();
-			double colorG = item["ValueG"].GetDouble();
-			double colorB = item["ValueB"].GetDouble();
-
-			ak::aColor value(colorR * 255, colorG * 255, colorB * 255, 0);
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value);
-		}
-		else if (type == "entitylist")
-		{
-			std::vector<QString> selection;
-
-			rapidjson::Value options = item["Options"].GetArray();
-
-			for (int i = 0; i < options.Size(); i++)
-			{
-				selection.push_back(QString(options[i].GetString()));
-			}
-
-			QString value = item["ValueName"].GetString();
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, selection, value);
-		}
-		else if (type == "projectlist")
-		{
-			std::vector<QString> selection;
-
-			std::list<std::string> userProjects = m_ExternalServicesComponent->GetAllUserProjects();
-
-			for (auto& project : userProjects)
-			{
-				selection.push_back(QString(project.c_str()));
-			}
-
-			QString value = item["Value"].GetString();
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, selection, value);
-		}
-		else
-		{
-			OT_LOG_EA("Unknown property type");
-		}
-	}
-}
-*/
 
 // ##############################################################################################
 

@@ -15,7 +15,6 @@
  // AK header
 #include <akCore/globalDataTypes.h>
 #include <akCore/akCore.h>
-#include <akGui/aColor.h>
 
 // C++ header
 #include <map>							// map
@@ -134,12 +133,6 @@ namespace ak {
 			UID												_creatorUid,
 			const QIcon &										_icon,
 			const QString &										_text = QString("")
-		);
-
-		//! @brief Will create a new special TabBar and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		UID createSpecialTabBar(
-			UID												_creatorUid
 		);
 
 		//! @brief WIll create a timer and return its UID

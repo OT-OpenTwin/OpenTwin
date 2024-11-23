@@ -80,7 +80,6 @@
 
 // AK header
 #include <akAPI/uiAPI.h>
-#include <akGui/aColor.h>
 #include <akCore/akCore.h>
 
 #include "base64.h"

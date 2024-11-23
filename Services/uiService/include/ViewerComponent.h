@@ -22,7 +22,6 @@
 
 // AK header
 #include <akCore/aNotifier.h>
-#include <akGui/aColor.h>
 #include <QTableWidgetItem>
 
 namespace ak { class aTreeWidget; };
@@ -165,7 +164,7 @@ public:
 	void activateModel(ViewerUIDtype viewerUID);
 	void deactivateCurrentlyActiveModel(void);
 
-	void setColors(const ak::aColor & _background, const ak::aColor & _foreground);
+	void setColors(const ot::Color & _background, const ot::Color & _foreground);
 
 	//! @brief Will register this component as notifier in the Viewer API
 	void registerAtNotifier(void);

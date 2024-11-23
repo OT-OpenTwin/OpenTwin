@@ -24,7 +24,6 @@
 
 // AK GUI
 #include <akGui/aAction.h>
-#include <akGui/aSpecialTabBar.h>
 #include <akGui/aTtbContainer.h>
 #include <akGui/aWindowEventHandler.h>
 
@@ -310,13 +309,6 @@ ak::UID ak::uiAPI::createPushButton(
 ) {
 	assert(m_objManager != nullptr); // API not initialized
 	return m_objManager->createPushButton(_creatorUid, _icon, _text);
-}
-
-ak::UID ak::uiAPI::createSpecialTabBar(
-	UID												_creatorUid
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createSpecialTabBar(_creatorUid);
 }
 
 ak::UID ak::uiAPI::createTabToolBarSubContainer(
@@ -612,7 +604,6 @@ void ak::uiAPI::object::setEnabled(
 	case otList: akCastObject<aListWidget>(obj)->setEnabled(_enabled); return;
 	case otNiceLineEdit: akCastObject<aNiceLineEditWidget>(obj)->setEnabled(_enabled); return;
 	case otPushButton: akCastObject<aPushButtonWidget>(obj)->setEnabled(_enabled); return;
-	case otSpecialTabBar: akCastObject<aSpecialTabBar>(obj)->setEnabled(_enabled); return;
 	case otTabToolbarGroup: akCastObject<aTtbGroup>(obj)->setEnabled(_enabled); return;
 	case otTabToolbarPage: akCastObject<aTtbPage>(obj)->setEnabled(_enabled); return;
 	case otTabToolbarSubgroup: akCastObject<aTtbSubGroup>(obj)->setEnabled(_enabled); return;
@@ -640,7 +631,6 @@ bool ak::uiAPI::object::getIsEnabled(
 	case otList: return akCastObject<aListWidget>(obj)->isEnabled();
 	case otNiceLineEdit: return akCastObject<aNiceLineEditWidget>(obj)->isEnabled();
 	case otPushButton: return akCastObject<aPushButtonWidget>(obj)->isEnabled();
-	case otSpecialTabBar: return akCastObject<aSpecialTabBar>(obj)->isEnabled();
 	case otTabToolbarGroup: return akCastObject<aTtbGroup>(obj)->enabled();
 	case otTabToolbarPage: return akCastObject<aTtbPage>(obj)->enabled();
 	case otTabToolbarSubgroup: return akCastObject<aTtbSubGroup>(obj)->enabled();
@@ -667,67 +657,6 @@ ak::objectType ak::uiAPI::object::type(
 }
 
 // Object
-
-// ###############################################################################################################################################
-
-// Special tab bar
-
-void ak::uiAPI::specialTabBar::clearColors(
-	UID			_specialTabBarUID,
-	bool			_repaint
-) {
-	assert(m_objManager != nullptr); // API not initialized
-
-	aSpecialTabBar * actualTabBar = nullptr;
-	actualTabBar = dynamic_cast<aSpecialTabBar *>(m_objManager->object(_specialTabBarUID));
-	assert(actualTabBar != nullptr); // Invalid object type
-
-	actualTabBar->clearColors(_repaint);
-}
-
-void ak::uiAPI::specialTabBar::clearColor(
-	UID			_specialTabBarUID,
-	int				_index,
-	bool			_repaint
-) {
-	assert(m_objManager != nullptr); // API not initialized
-
-	aSpecialTabBar * actualTabBar = nullptr;
-	actualTabBar = dynamic_cast<aSpecialTabBar *>(m_objManager->object(_specialTabBarUID));
-	assert(actualTabBar != nullptr); // Invalid object type
-
-	actualTabBar->clearColor(_index, _repaint);
-}
-
-void ak::uiAPI::specialTabBar::addColor(
-	UID			_specialTabBarUID,
-	int				_index,
-	aColor		_color,
-	bool			_repaint
-) {
-	assert(m_objManager != nullptr); // API not initialized
-
-	aSpecialTabBar * actualTabBar = nullptr;
-	actualTabBar = dynamic_cast<aSpecialTabBar *>(m_objManager->object(_specialTabBarUID));
-	assert(actualTabBar != nullptr); // Invalid object type
-
-	actualTabBar->addColor(_index, _color, _repaint);
-}
-
-void ak::uiAPI::specialTabBar::setRepaintBlocked(
-	UID			_specialTabBarUID,
-	bool			_blocked
-) {
-	assert(m_objManager != nullptr); // API not initialized
-
-	aSpecialTabBar * actualTabBar = nullptr;
-	actualTabBar = dynamic_cast<aSpecialTabBar *>(m_objManager->object(_specialTabBarUID));
-	assert(actualTabBar != nullptr); // Invalid object type
-
-	actualTabBar->setRepaintBlocked(_blocked);
-}
-
-// Special tab bar
 	
 // ###############################################################################################################################################
 
@@ -828,16 +757,6 @@ void ak::uiAPI::tabWidget::setTabText(
 	ID								_tab,
 	const QString &						_text
 ) { object::get<aTabWidget>(_tabWidgetUID)->setTabText(_tab, _text); }
-
-void ak::uiAPI::tabWidget::setSpecialTabBar(
-	UID								_tabWidgetUID,
-	UID								_specialTabBarUID
-) { setSpecialTabBar(_tabWidgetUID, object::get<aSpecialTabBar>(_specialTabBarUID)); }
-
-void ak::uiAPI::tabWidget::setSpecialTabBar(
-	UID								_tabWidgetUID,
-	QTabBar *							_specialTabBar
-) { object::get<aTabWidget>(_tabWidgetUID)->setCustomTabBar(_specialTabBar); }
 
 void ak::uiAPI::tabWidget::setVisible(
 	UID				_tabWidgetUID,

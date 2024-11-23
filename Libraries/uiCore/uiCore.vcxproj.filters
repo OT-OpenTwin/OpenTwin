@@ -93,9 +93,6 @@
     <ClCompile Include="src\akGui\aAction.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
-    <ClCompile Include="src\akGui\aColor.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
     <ClCompile Include="src\akGui\aObjectManager.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
@@ -162,23 +159,14 @@
     <ClCompile Include="src\akWidgets\aWindowManagerTimerSignalLinker.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\akGui\aSpecialTabBar.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
     <ClCompile Include="src\akGui\aTimer.cpp">
       <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akCore\aDateHelper.cpp">
-      <Filter>Source Files\ak\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\akWidgets\aSpinBoxWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="src\akWidgets\aDoubleSpinBoxWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akCore\aDate.cpp">
-      <Filter>Source Files\ak\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\akWidgets\aAnimationOverlayWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
@@ -215,9 +203,6 @@
     <ClInclude Include="include\akCore\globalDataTypes.h">
       <Filter>Header Files\ak\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\akGui\aColor.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </ClInclude>
     <ClInclude Include="include\akGui\aObjectManager.h">
       <Filter>Header Files\ak\Gui</Filter>
     </ClInclude>
@@ -241,12 +226,6 @@
     </ClInclude>
     <ClInclude Include="include\akGui\aTimer.h">
       <Filter>Header Files\ak\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akCore\aDateHelper.h">
-      <Filter>Header Files\ak\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akCore\aDate.h">
-      <Filter>Header Files\ak\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\akCore\aAssert.h">
       <Filter>Header Files\ak\Core</Filter>
@@ -309,9 +288,6 @@
     </QtMoc>
     <QtMoc Include="include\akWidgets\aWindowManagerTimerSignalLinker.h">
       <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akGui\aSpecialTabBar.h">
-      <Filter>Header Files\ak\Gui</Filter>
     </QtMoc>
     <QtMoc Include="include\akWidgets\aSpinBoxWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>

@@ -25,7 +25,6 @@
 #include <akGui/aAction.h>
 #include <akGui/aObjectManager.h>
 #include <akGui/aSignalLinker.h>
-#include <akGui/aSpecialTabBar.h>
 #include <akGui/aTimer.h>
 
 // AK Widgets header
@@ -224,18 +223,6 @@ ak::UID ak::aObjectManager::createPushButton(
 	aPushButtonWidget * obj = new aPushButtonWidget(_icon, _text);
 	// Set parameter
 	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createSpecialTabBar(
-	UID												_creatorUid
-) {
-	// Create object
-	aSpecialTabBar * obj = new aSpecialTabBar;
-	obj->setUid(m_uidManager->getId());
 	// Store data
 	m_mapObjects.insert_or_assign(obj->uid(), obj);
 	addCreatedUid(_creatorUid, obj->uid());

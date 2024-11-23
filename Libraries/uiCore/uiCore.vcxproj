@@ -203,8 +203,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\akAPI\uiAPI.cpp" />
-    <ClCompile Include="src\akCore\aDate.cpp" />
-    <ClCompile Include="src\akCore\aDateHelper.cpp" />
     <ClCompile Include="src\akCore\aException.cpp" />
     <ClCompile Include="src\akCore\akCore.cpp" />
     <ClCompile Include="src\akCore\aMessenger.cpp" />
@@ -214,10 +212,8 @@
     <ClCompile Include="src\akCore\aSingletonAllowedMessages.cpp" />
     <ClCompile Include="src\akCore\aUidManager.cpp" />
     <ClCompile Include="src\akGui\aAction.cpp" />
-    <ClCompile Include="src\akGui\aColor.cpp" />
     <ClCompile Include="src\akGui\aObjectManager.cpp" />
     <ClCompile Include="src\akGui\aSignalLinker.cpp" />
-    <ClCompile Include="src\akGui\aSpecialTabBar.cpp" />
     <ClCompile Include="src\akGui\aTimer.cpp" />
     <ClCompile Include="src\akGui\aTtbContainer.cpp" />
     <ClCompile Include="src\akTools\ClassHelper.cpp" />
@@ -248,8 +244,6 @@
   <ItemGroup>
     <ClInclude Include="include\akAPI\uiAPI.h" />
     <ClInclude Include="include\akCore\aAssert.h" />
-    <ClInclude Include="include\akCore\aDate.h" />
-    <ClInclude Include="include\akCore\aDateHelper.h" />
     <ClInclude Include="include\akCore\aException.h" />
     <ClInclude Include="include\akCore\akCore.h" />
     <ClInclude Include="include\akCore\aMessenger.h" />
@@ -259,9 +253,7 @@
     <ClInclude Include="include\akCore\aSingletonAllowedMessages.h" />
     <ClInclude Include="include\akCore\aUidMangager.h" />
     <ClInclude Include="include\akCore\globalDataTypes.h" />
-    <ClInclude Include="include\akGui\aColor.h" />
     <ClInclude Include="include\akGui\aObjectManager.h" />
-    <QtMoc Include="include\akGui\aSpecialTabBar.h" />
     <ClInclude Include="include\akGui\aTimer.h" />
     <ClInclude Include="include\akGui\aTtbContainer.h" />
     <ClInclude Include="include\akGui\aWindowEventHandler.h" />
