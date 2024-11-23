@@ -18,8 +18,8 @@ namespace ot {
 	class ContextMenuAction : public QAction {
 		OT_DECL_NOCOPY(ContextMenuAction)
 	public:
-		ContextMenuAction();
-		ContextMenuAction(const MenuButtonCfg& _config);
+		ContextMenuAction(QObject* _parent = (QObject*) nullptr);
+		ContextMenuAction(const MenuButtonCfg& _config, QObject* _parent = (QObject*) nullptr);
 		virtual ~ContextMenuAction();
 
 		void setFromConfiguration(const MenuButtonCfg& _config);

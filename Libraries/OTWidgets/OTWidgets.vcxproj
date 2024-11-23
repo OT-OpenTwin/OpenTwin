@@ -205,7 +205,7 @@
     <ClInclude Include="include\OTWidgets\ComboBox.h" />
     <QtMoc Include="include\OTWidgets\FilePathEdit.h" />
     <QtMoc Include="include\OTWidgets\CreateProjectDialog.h" />
-    <ClInclude Include="include\OTWidgets\ContextMenu.h" />
+    <QtMoc Include="include\OTWidgets\ContextMenu.h" />
     <ClInclude Include="include\OTWidgets\ContextMenuAction.h" />
     <ClInclude Include="include\OTWidgets\GraphicsArcItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsElement.h" />

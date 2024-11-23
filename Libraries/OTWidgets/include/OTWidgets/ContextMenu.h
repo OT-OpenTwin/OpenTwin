@@ -16,16 +16,24 @@
 namespace ot {
 
 	class ContextMenu : public QMenu {
+		Q_OBJECT
 		OT_DECL_NOCOPY(ContextMenu)
 	public:
-		ContextMenu();
-		ContextMenu(const MenuCfg& _config);
+		ContextMenu(QWidget* _parent = (QWidget*) nullptr);
+		ContextMenu(const MenuCfg& _config, QWidget* _parent = (QWidget*) nullptr);
 		virtual ~ContextMenu();
 
 		void setFromConfiguration(const MenuCfg& _config);
 
 		void setContextMenuName(const std::string& _name) { m_name = _name; };
 		const std::string& getContextMenuName(void) const { return m_name; };
+
+	Q_SIGNALS:
+		void contextActionTriggered(const std::string& _actionName);
+
+	private Q_SLOTS:
+		void slotActionTriggered(void);
+		void slotActionTriggered(const std::string& _actionName);
 
 	private:
 		std::string m_name;

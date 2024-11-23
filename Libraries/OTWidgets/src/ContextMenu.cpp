@@ -8,11 +8,15 @@
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/ContextMenuAction.h"
 
-ot::ContextMenu::ContextMenu() {
+ot::ContextMenu::ContextMenu(QWidget* _parent)
+    : QMenu(_parent)
+{
 
 }
 
-ot::ContextMenu::ContextMenu(const MenuCfg& _config) {
+ot::ContextMenu::ContextMenu(const MenuCfg& _config, QWidget* _parent)
+    : QMenu(_parent)
+{
 	this->setFromConfiguration(_config);
 }
 
@@ -44,7 +48,9 @@ void ot::ContextMenu::setFromConfiguration(const MenuCfg& _config) {
                 OT_LOG_EAS("Item configuration cast failed");
                 continue;
             }
-            this->addAction(new ContextMenuAction(*itemCfg));
+            ContextMenuAction* newAction = new ContextMenuAction(*itemCfg, this);
+            this->addAction(newAction);
+            this->connect(newAction, &QAction::triggered, this, qOverload<>(&ContextMenu::slotActionTriggered));
         }
         break;
 
@@ -55,7 +61,9 @@ void ot::ContextMenu::setFromConfiguration(const MenuCfg& _config) {
                 OT_LOG_EAS("Menu configuration cast failed");
                 continue;
             }
-            this->addMenu(new ContextMenu(*menuCfg));
+            ContextMenu* newMenu = new ContextMenu(*menuCfg, this);
+            this->addMenu(newMenu);
+            this->connect(newMenu, &ContextMenu::contextActionTriggered, this, qOverload<const std::string&>(&ContextMenu::slotActionTriggered));
         }
         break;
 
@@ -69,4 +77,18 @@ void ot::ContextMenu::setFromConfiguration(const MenuCfg& _config) {
         }
     }
 
+}
+
+void ot::ContextMenu::slotActionTriggered(void) {
+    ContextMenuAction* actualAction = dynamic_cast<ContextMenuAction*>(this->sender());
+    if (actualAction) {
+        this->slotActionTriggered(actualAction->getContextMenuActionName());
+    }
+    else {
+        OT_LOG_EA("ContextMenuAction cast failed");
+    }
+}
+
+void ot::ContextMenu::slotActionTriggered(const std::string& _actionName) {
+    Q_EMIT contextActionTriggered(_actionName);
 }

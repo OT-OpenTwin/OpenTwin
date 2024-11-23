@@ -788,9 +788,6 @@
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\ContextMenu.h">
-      <Filter>include\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\ContextMenuAction.h">
       <Filter>include\General</Filter>
     </ClInclude>
@@ -930,6 +927,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\Plot.h">
       <Filter>include\Plot\Base</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ContextMenu.h">
+      <Filter>include\General</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

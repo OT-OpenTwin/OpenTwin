@@ -7,11 +7,15 @@
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/ContextMenuAction.h"
 
-ot::ContextMenuAction::ContextMenuAction() {
+ot::ContextMenuAction::ContextMenuAction(QObject* _parent)
+    : QAction(_parent)
+{
 
 }
 
-ot::ContextMenuAction::ContextMenuAction(const MenuButtonCfg& _config) {
+ot::ContextMenuAction::ContextMenuAction(const MenuButtonCfg& _config, QObject* _parent)
+    : QAction(_parent)
+{
 	this->setFromConfiguration(_config);
 }
 
