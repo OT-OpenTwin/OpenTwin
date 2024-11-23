@@ -20,8 +20,8 @@ namespace ot {
 	class OT_GUI_API_EXPORT MenuEntryCfg : public Serializable {
 	public:
 		enum EntryType {
-			Item,
 			Menu,
+			Button,
 			Separator
 		};
 

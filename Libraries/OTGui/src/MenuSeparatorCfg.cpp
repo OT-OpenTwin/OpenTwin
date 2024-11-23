@@ -7,7 +7,7 @@
 #include "OTGui/MenuSeparatorCfg.h"
 #include "OTGui/MenuEntryCfgFactory.h"
 
-ot::MenuEntryCfgFactoryRegistrar<ot::MenuSeparatorCfg> separatorRegistarar(ot::MenuEntryCfg::toString(ot::MenuEntryCfg::Separator));
+static ot::MenuEntryCfgFactoryRegistrar<ot::MenuSeparatorCfg> separatorRegistarar(ot::MenuEntryCfg::toString(ot::MenuEntryCfg::Separator));
 
 ot::MenuSeparatorCfg::MenuSeparatorCfg() {
 

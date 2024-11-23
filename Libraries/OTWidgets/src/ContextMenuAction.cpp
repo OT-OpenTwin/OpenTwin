@@ -11,17 +11,18 @@ ot::ContextMenuAction::ContextMenuAction() {
 
 }
 
-ot::ContextMenuAction::ContextMenuAction(const MenuItemCfg& _config) {
+ot::ContextMenuAction::ContextMenuAction(const MenuButtonCfg& _config) {
 	this->setFromConfiguration(_config);
 }
 
 ot::ContextMenuAction::~ContextMenuAction() {
-
+    
 }
 
-void ot::ContextMenuAction::setFromConfiguration(const MenuItemCfg& _config) {
-    // Set text
+void ot::ContextMenuAction::setFromConfiguration(const MenuButtonCfg& _config) {
+    m_name = _config.getName();
     this->setText(QString::fromStdString(_config.getText()));
+    this->setToolTip(QString::fromStdString(_config.getToolTip()));
 
     // Set icon if needed
     if (_config.getIconPath().empty()) {

@@ -363,7 +363,7 @@
     <ClInclude Include="include\OTGui\MenuCfg.h">
       <Filter>Header Files\Menu</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\MenuItemCfg.h">
+    <ClInclude Include="include\OTGui\MenuButtonCfg.h">
       <Filter>Header Files\Menu</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\MenuEntryCfg.h">
@@ -373,6 +373,9 @@
       <Filter>Header Files\Menu</Filter>
     </ClInclude>
     <ClInclude Include="include\OTGui\MenuEntryCfgFactory.h">
+      <Filter>Header Files\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\MenuClickableEntryCfg.h">
       <Filter>Header Files\Menu</Filter>
     </ClInclude>
   </ItemGroup>
@@ -656,13 +659,16 @@
     <ClCompile Include="src\MenuCfg.cpp">
       <Filter>Source Files\Menu</Filter>
     </ClCompile>
-    <ClCompile Include="src\MenuItemCfg.cpp">
+    <ClCompile Include="src\MenuButtonCfg.cpp">
       <Filter>Source Files\Menu</Filter>
     </ClCompile>
     <ClCompile Include="src\MenuSeparatorCfg.cpp">
       <Filter>Source Files\Menu</Filter>
     </ClCompile>
     <ClCompile Include="src\MenuEntryCfgFactory.cpp">
+      <Filter>Source Files\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MenuClickableEntryCfg.cpp">
       <Filter>Source Files\Menu</Filter>
     </ClCompile>
   </ItemGroup>

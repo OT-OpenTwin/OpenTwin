@@ -9,8 +9,8 @@
 
 std::string ot::MenuEntryCfg::toString(EntryType _type) {
 	switch (_type) {
-	case ot::MenuEntryCfg::Item: return "Item";
 	case ot::MenuEntryCfg::Menu: return "Menu";
+	case ot::MenuEntryCfg::Button: return "Button";
 	case ot::MenuEntryCfg::Separator: return "Separator";
 	default:
 		OT_LOG_EAS("Unknown entry type (" + std::to_string((int)_type) + ")");
@@ -19,8 +19,8 @@ std::string ot::MenuEntryCfg::toString(EntryType _type) {
 }
 
 ot::MenuEntryCfg::EntryType ot::MenuEntryCfg::stringToEntryType(const std::string& _type) {
-	if (_type == MenuEntryCfg::toString(EntryType::Item)) return EntryType::Item;
-	else if (_type == MenuEntryCfg::toString(EntryType::Menu)) return EntryType::Menu;
+	if (_type == MenuEntryCfg::toString(EntryType::Menu)) return EntryType::Menu;
+	else if (_type == MenuEntryCfg::toString(EntryType::Button)) return EntryType::Button;
 	else if (_type == MenuEntryCfg::toString(EntryType::Separator)) return EntryType::Separator;
 	else {
 		OT_LOG_EAS("Unknown entry type \"" + _type + "\"");

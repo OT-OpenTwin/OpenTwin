@@ -8,22 +8,23 @@
 #include "OTGui/MenuSeparatorCfg.h"
 #include "OTGui/MenuEntryCfgFactory.h"
 
-ot::MenuEntryCfgFactoryRegistrar<ot::MenuCfg> menuRegistarar(ot::MenuEntryCfg::toString(ot::MenuEntryCfg::Menu));
+static ot::MenuEntryCfgFactoryRegistrar<ot::MenuCfg> menuRegistarar(ot::MenuEntryCfg::toString(ot::MenuEntryCfg::Menu));
 
 ot::MenuCfg::MenuCfg() {
 
 }
 
-ot::MenuCfg::MenuCfg(const std::string& _text, const std::string& _iconPath)
-	: MenuItemCfg(_text, _iconPath)
+ot::MenuCfg::MenuCfg(const std::string& _name, const std::string& _text, const std::string& _iconPath)
+	: MenuClickableEntryCfg(_name, _text, _iconPath)
 {
 
 }
 
 ot::MenuCfg::MenuCfg(const MenuCfg& _other)
-	: MenuItemCfg(_other)
+	: MenuClickableEntryCfg(_other)
 {
 	for (const MenuEntryCfg* entry : _other.getEntries()) {
+		OTAssertNullptr(entry);
 		this->add(entry->createCopy());
 	}
 }
@@ -41,10 +42,11 @@ ot::MenuEntryCfg* ot::MenuCfg::createCopy(void) const {
 }
 
 void ot::MenuCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	MenuItemCfg::addToJsonObject(_object, _allocator);
+	MenuClickableEntryCfg::addToJsonObject(_object, _allocator);
 
 	JsonArray entryArr;
 	for (const MenuEntryCfg* entry : m_childs) {
+		OTAssertNullptr(entry);
 		JsonObject entryObj;
 		entry->addToJsonObject(entryObj, _allocator);
 		entryArr.PushBack(entryObj, _allocator);
@@ -53,16 +55,16 @@ void ot::MenuCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _al
 }
 
 void ot::MenuCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	MenuItemCfg::setFromJsonObject(_object);
+	MenuClickableEntryCfg::setFromJsonObject(_object);
 
 	this->clear();
+	
 	for (const ConstJsonObject& entryObj : json::getObjectList(_object, "Childs")) {
 		MenuEntryCfg* newEntry = MenuEntryCfgFactory::create(entryObj);
 		if (newEntry) {
 			this->add(newEntry);
 		}
 	}
-
 }
 
 void ot::MenuCfg::add(MenuEntryCfg* _entry) {
@@ -70,14 +72,14 @@ void ot::MenuCfg::add(MenuEntryCfg* _entry) {
 	m_childs.push_back(_entry);
 }
 
-ot::MenuCfg* ot::MenuCfg::addMenu(const std::string& _text, const std::string& _iconPath) {
-	MenuCfg* newMenu = new MenuCfg(_text, _iconPath);
+ot::MenuCfg* ot::MenuCfg::addMenu(const std::string& _name, const std::string& _text, const std::string& _iconPath) {
+	MenuCfg* newMenu = new MenuCfg(_name, _text, _iconPath);
 	this->add(newMenu);
 	return newMenu;
 }
 
-ot::MenuItemCfg* ot::MenuCfg::addItem(const std::string& _text, const std::string& _iconPath) {
-	MenuItemCfg* newItem = new MenuItemCfg(_text, _iconPath);
+ot::MenuButtonCfg* ot::MenuCfg::addButton(const std::string& _name, const std::string& _text, const std::string& _iconPath, MenuButtonCfg::ButtonAction _action) {
+	MenuButtonCfg* newItem = new MenuButtonCfg(_name, _text, _iconPath, _action);
 	this->add(newItem);
 	return newItem;
 }

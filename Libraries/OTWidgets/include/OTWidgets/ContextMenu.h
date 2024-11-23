@@ -24,8 +24,11 @@ namespace ot {
 
 		void setFromConfiguration(const MenuCfg& _config);
 
-	private:
+		void setContextMenuName(const std::string& _name) { m_name = _name; };
+		const std::string& getContextMenuName(void) const { return m_name; };
 
+	private:
+		std::string m_name;
 	};
 
 }

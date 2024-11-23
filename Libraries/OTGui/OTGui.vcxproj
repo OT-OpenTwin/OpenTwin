@@ -24,9 +24,10 @@
     <ClInclude Include="include\OTGui\CheckerboardPainter2D.h" />
     <ClInclude Include="include\OTGui\ColorStyleTypes.h" />
     <ClInclude Include="include\OTGui\MenuCfg.h" />
+    <ClInclude Include="include\OTGui\MenuClickableEntryCfg.h" />
     <ClInclude Include="include\OTGui\MenuEntryCfg.h" />
     <ClInclude Include="include\OTGui\MenuEntryCfgFactory.h" />
-    <ClInclude Include="include\OTGui\MenuItemCfg.h" />
+    <ClInclude Include="include\OTGui\MenuButtonCfg.h" />
     <ClInclude Include="include\OTGui\DefaultSyntaxHighlighterRules.h" />
     <ClInclude Include="include\OTGui\GraphicsArcItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsConnectionCalculationData.h" />
@@ -138,9 +139,10 @@
     <ClCompile Include="src\Grid.cpp" />
     <ClCompile Include="src\KeySequence.cpp" />
     <ClCompile Include="src\MenuCfg.cpp" />
+    <ClCompile Include="src\MenuClickableEntryCfg.cpp" />
     <ClCompile Include="src\MenuEntryCfg.cpp" />
     <ClCompile Include="src\MenuEntryCfgFactory.cpp" />
-    <ClCompile Include="src\MenuItemCfg.cpp" />
+    <ClCompile Include="src\MenuButtonCfg.cpp" />
     <ClCompile Include="src\MenuSeparatorCfg.cpp" />
     <ClCompile Include="src\NavigationTreeItemIcon.cpp" />
     <ClCompile Include="src\Outline.cpp" />

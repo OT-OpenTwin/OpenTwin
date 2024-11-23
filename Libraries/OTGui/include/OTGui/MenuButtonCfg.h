@@ -1,4 +1,4 @@
-//! @file MenuItemCfg.h
+//! @file MenuButtonCfg.h
 //! @author Alexander Kuester (alexk95)
 //! @date November 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,22 +6,30 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/MenuEntryCfg.h"
+#include "OTGui/MenuClickableEntryCfg.h"
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT MenuItemCfg : public MenuEntryCfg {
+	class OT_GUI_API_EXPORT MenuButtonCfg : public MenuClickableEntryCfg {
 	public:
-		MenuItemCfg();
-		MenuItemCfg(const std::string& _text, const std::string& _iconPath = std::string());
-		MenuItemCfg(const MenuItemCfg& _other);
-		MenuItemCfg(const ot::ConstJsonObject& _object);
-		virtual ~MenuItemCfg();
+		enum ButtonAction {
+			NotifyOwner,
+			Clear
+		};
 
-		MenuItemCfg& operator = (const MenuItemCfg&) = delete;
+		static std::string toString(ButtonAction _action);
+		static ButtonAction stringToButtonAction(const std::string& _action);
+
+		MenuButtonCfg();
+		MenuButtonCfg(const std::string& _name, const std::string& _text, const std::string& _iconPath = std::string(), ButtonAction _action = ButtonAction::NotifyOwner);
+		MenuButtonCfg(const MenuButtonCfg& _other);
+		MenuButtonCfg(const ot::ConstJsonObject& _object);
+		virtual ~MenuButtonCfg();
+
+		MenuButtonCfg& operator = (const MenuButtonCfg&) = delete;
 
 		virtual MenuEntryCfg* createCopy(void) const override;
-		virtual EntryType getMenuEntryType(void) const override { return MenuEntryCfg::Item; };
+		virtual EntryType getMenuEntryType(void) const override { return MenuEntryCfg::Button; };
 
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
@@ -33,15 +41,11 @@ namespace ot {
 		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		void setText(const std::string& _text) { m_text = _text; };
-		const std::string& getText(void) const { return m_text; };
-
-		void setIconPath(const std::string& _iconPath) { m_iconPath = _iconPath; };
-		const std::string& getIconPath(void) const { return m_iconPath; };
+		void setButtonAction(ButtonAction _action) { m_action = _action; };
+		ButtonAction getButtonAction(void) const { return m_action; };
 
 	private:
-		std::string m_text;
-		std::string m_iconPath;
+		ButtonAction m_action;
 	};
 
 }

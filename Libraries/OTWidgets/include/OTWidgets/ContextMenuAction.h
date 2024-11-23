@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
-#include "OTGui/MenuItemCfg.h"
+#include "OTGui/MenuButtonCfg.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
@@ -19,13 +19,16 @@ namespace ot {
 		OT_DECL_NOCOPY(ContextMenuAction)
 	public:
 		ContextMenuAction();
-		ContextMenuAction(const MenuItemCfg& _config);
+		ContextMenuAction(const MenuButtonCfg& _config);
 		virtual ~ContextMenuAction();
 
-		void setFromConfiguration(const MenuItemCfg& _config);
+		void setFromConfiguration(const MenuButtonCfg& _config);
+
+		void setContextMenuActionName(const std::string& _name) { m_name = _name; };
+		const std::string& getContextMenuActionName(void) const { return m_name; };
 
 	private:
-
+		std::string m_name;
 	};
 
 }

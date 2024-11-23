@@ -6,25 +6,26 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/MenuItemCfg.h"
+#include "OTGui/MenuButtonCfg.h"
+#include "OTGui/MenuClickableEntryCfg.h"
 
 // std header
 #include <list>
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT MenuCfg : public MenuItemCfg {
+	class OT_GUI_API_EXPORT MenuCfg : public MenuClickableEntryCfg {
 	public:
 		MenuCfg();
-		MenuCfg(const std::string& _text, const std::string& _iconPath = std::string());
+		MenuCfg(const std::string& _name, const std::string& _text, const std::string& _iconPath = std::string());
 		MenuCfg(const MenuCfg& _other);
 		MenuCfg(const ot::ConstJsonObject& _object);
 		virtual ~MenuCfg();
 
-		MenuItemCfg& operator = (const MenuItemCfg&) = delete;
+		MenuCfg& operator = (const MenuCfg&) = delete;
 
 		virtual MenuEntryCfg* createCopy(void) const override;
-		virtual EntryType getMenuEntryType(void) const override { return MenuEntryCfg::Item; };
+		virtual EntryType getMenuEntryType(void) const override { return MenuEntryCfg::Menu; };
 
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
@@ -45,14 +46,14 @@ namespace ot {
 		//! @param _text Menu text.
 		//! @param _iconPath Menu icon path.
 		//! @param _shortcut Menu shortcut.
-		MenuCfg* addMenu(const std::string& _text, const std::string& _iconPath = std::string());
+		MenuCfg* addMenu(const std::string& _name, const std::string& _text, const std::string& _iconPath = std::string());
 		
 		//! @brief Creates and adds a child item.
 		//! The menu takes ownership of the created child item.
 		//! @param _text Item text.
 		//! @param _iconPath Item icon path.
 		//! @param _shortcut Item shortcut.
-		MenuItemCfg* addItem(const std::string& _text, const std::string& _iconPath = std::string());
+		MenuButtonCfg* addButton(const std::string& _name, const std::string& _text, const std::string& _iconPath = std::string(), MenuButtonCfg::ButtonAction _action = MenuButtonCfg::ButtonAction::NotifyOwner);
 
 		//! @brief Creates and adds a separator.
 		void addSeparator(void);
