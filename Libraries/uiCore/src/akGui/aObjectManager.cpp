@@ -33,10 +33,7 @@
 #include <akWidgets/aComboButtonWidget.h>
 #include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aLineEditWidget.h>
-#include <akWidgets/aListWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
-#include <akWidgets/aPushButtonWidget.h>
-#include <akWidgets/aTabWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
 #include <akWidgets/aTtbGroup.h>
 #include <akWidgets/aTtbPage.h>
@@ -200,35 +197,6 @@ ak::UID ak::aObjectManager::createNiceLineEdit(
 	return obj->uid();
 }
 
-ak::UID ak::aObjectManager::createPushButton(
-	UID												_creatorUid,
-	const QString &										_text
-) {
-	// Create object
-	aPushButtonWidget * obj = new aPushButtonWidget(_text);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createPushButton(
-	UID												_creatorUid,
-	const QIcon &										_icon,
-	const QString &										_text
-) {
-	// Create object
-	aPushButtonWidget * obj = new aPushButtonWidget(_icon, _text);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
 ak::UID ak::aObjectManager::createTimer(
 	UID												_creatorUid
 ) {
@@ -276,19 +244,6 @@ ak::UID ak::aObjectManager::createToolButton(
 ) {
 	// Create object
 	aToolButtonWidget * obj = new aToolButtonWidget(_icon, _text);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createTabView(
-	UID												_creatorUid
-) {
-	// Create object
-	aTabWidget * obj = new aTabWidget;
 	// Set parameter
 	m_signalLinker->addLink(obj);
 	// Store data

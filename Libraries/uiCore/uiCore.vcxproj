@@ -225,11 +225,8 @@
     <ClCompile Include="src\akWidgets\aDoubleSpinBoxWidget.cpp" />
     <ClCompile Include="src\akWidgets\aLabelWidget.cpp" />
     <ClCompile Include="src\akWidgets\aLineEditWidget.cpp" />
-    <ClCompile Include="src\akWidgets\aListWidget.cpp" />
     <ClCompile Include="src\akWidgets\aNiceLineEditWidget.cpp" />
-    <ClCompile Include="src\akWidgets\aPushButtonWidget.cpp" />
     <ClCompile Include="src\akWidgets\aSpinBoxWidget.cpp" />
-    <ClCompile Include="src\akWidgets\aTabWidget.cpp" />
     <ClCompile Include="src\akWidgets\aToolButtonWidget.cpp" />
     <ClCompile Include="src\akWidgets\aTreeWidget.cpp" />
     <ClCompile Include="src\akWidgets\aTtbGroup.cpp" />
@@ -270,10 +267,7 @@
     <QtMoc Include="include\akWidgets\aWindow.h" />
     <QtMoc Include="include\akWidgets\aTreeWidget.h" />
     <QtMoc Include="include\akWidgets\aToolButtonWidget.h" />
-    <QtMoc Include="include\akWidgets\aTabWidget.h" />
-    <QtMoc Include="include\akWidgets\aPushButtonWidget.h" />
     <QtMoc Include="include\akWidgets\aNiceLineEditWidget.h" />
-    <QtMoc Include="include\akWidgets\aListWidget.h" />
     <QtMoc Include="include\akWidgets\aLineEditWidget.h" />
     <QtMoc Include="include\akWidgets\aLabelWidget.h" />
     <QtMoc Include="include\akWidgets\aComboButtonWidgetItem.h" />

@@ -33,10 +33,7 @@
 #include <akWidgets/aComboButtonWidget.h>
 #include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aLineEditWidget.h>
-#include <akWidgets/aListWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
-#include <akWidgets/aPushButtonWidget.h>
-#include <akWidgets/aTabWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
 #include <akWidgets/aTtbGroup.h>
 #include <akWidgets/aTtbPage.h>
@@ -294,23 +291,6 @@ ak::UID ak::uiAPI::createNiceLineEdit(
 	return m_objManager->createNiceLineEdit(_creatorUid, _initialText, _infoLabelText);
 }
 
-ak::UID ak::uiAPI::createPushButton(
-	UID												_creatorUid,
-	const QString &										_text
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createPushButton(_creatorUid, _text);
-}
-
-ak::UID ak::uiAPI::createPushButton(
-	UID												_creatorUid,
-	const QIcon &										_icon,
-	const QString &										_text
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createPushButton(_creatorUid, _icon, _text);
-}
-
 ak::UID ak::uiAPI::createTabToolBarSubContainer(
 	UID												_creatorUid,
 	UID												_parentUid,
@@ -359,13 +339,6 @@ ak::UID ak::uiAPI::createToolButton(
 ) {
 	assert(m_objManager != nullptr); // API not initialized
 	return m_objManager->createToolButton(_creatorUid, _text, ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"));
-}
-
-ak::UID ak::uiAPI::createTabView(
-	UID												_creatorUid
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createTabView(_creatorUid);
 }
 
 ak::UID ak::uiAPI::createWindow(
@@ -601,13 +574,10 @@ void ak::uiAPI::object::setEnabled(
 	case otCheckBox: akCastObject<aCheckBoxWidget>(obj)->setEnabled(_enabled); return;
 	case otLabel: akCastObject<aLabelWidget>(obj)->setEnabled(_enabled); return;
 	case otLineEdit: akCastObject<aLineEditWidget>(obj)->setEnabled(_enabled); return;
-	case otList: akCastObject<aListWidget>(obj)->setEnabled(_enabled); return;
 	case otNiceLineEdit: akCastObject<aNiceLineEditWidget>(obj)->setEnabled(_enabled); return;
-	case otPushButton: akCastObject<aPushButtonWidget>(obj)->setEnabled(_enabled); return;
 	case otTabToolbarGroup: akCastObject<aTtbGroup>(obj)->setEnabled(_enabled); return;
 	case otTabToolbarPage: akCastObject<aTtbPage>(obj)->setEnabled(_enabled); return;
 	case otTabToolbarSubgroup: akCastObject<aTtbSubGroup>(obj)->setEnabled(_enabled); return;
-	case otTabView: akCastObject<aTabWidget>(obj)->setEnabled(_enabled); return;
 	case otToolButton: akCastObject<aToolButtonWidget>(obj)->setEnabled(_enabled); return;
 	default:
 		assert(0);	// Invalid object type
@@ -628,14 +598,10 @@ bool ak::uiAPI::object::getIsEnabled(
 	case otCheckBox: return akCastObject<aCheckBoxWidget>(obj)->isEnabled();
 	case otLabel: return akCastObject<aLabelWidget>(obj)->isEnabled();
 	case otLineEdit: return akCastObject<aLineEditWidget>(obj)->isEnabled();
-	case otList: return akCastObject<aListWidget>(obj)->isEnabled();
 	case otNiceLineEdit: return akCastObject<aNiceLineEditWidget>(obj)->isEnabled();
-	case otPushButton: return akCastObject<aPushButtonWidget>(obj)->isEnabled();
 	case otTabToolbarGroup: return akCastObject<aTtbGroup>(obj)->enabled();
 	case otTabToolbarPage: return akCastObject<aTtbPage>(obj)->enabled();
 	case otTabToolbarSubgroup: return akCastObject<aTtbSubGroup>(obj)->enabled();
-	case otTabView: return akCastObject<aTabWidget>(obj)->isEnabled();
-	case otToolButton: return akCastObject<aPushButtonWidget>(obj)->isEnabled();
 	default:
 		assert(0);	// Invalid object type
 		return false;
@@ -657,134 +623,6 @@ ak::objectType ak::uiAPI::object::type(
 }
 
 // Object
-	
-// ###############################################################################################################################################
-
-// TabView
-
-ak::ID ak::uiAPI::tabWidget::addTab(
-	UID				_tabWidgetUID,
-	UID				_widgetUID,
-	const QString &		_title
-) { return object::get<aTabWidget>(_tabWidgetUID)->addTab(object::get<aWidget>(_widgetUID)->widget(), _title); }
-
-ak::ID ak::uiAPI::tabWidget::addTab(
-	UID				_tabWidgetUID,
-	UID				_widgetUID,
-	const QString &		_title,
-	const QString &		_iconName,
-	const QString &		_iconFolder
-) {
-	return object::get<aTabWidget>(_tabWidgetUID)->addTab(object::get<aWidget>(_widgetUID)->widget(), ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"), _title);
-}
-
-ak::ID ak::uiAPI::tabWidget::addTab(
-	UID				_tabWidgetUID,
-	UID				_widgetUID,
-	const QString &		_title,
-	const QIcon &		_icon
-) { return object::get<aTabWidget>(_tabWidgetUID)->addTab(object::get<aWidget>(_widgetUID)->widget(), _icon, _title); }
-
-ak::ID ak::uiAPI::tabWidget::addTab(
-	UID				_tabWidgetUID,
-	QWidget *			_widget,
-	const QString &		_title
-) {
-	return object::get<aTabWidget>(_tabWidgetUID)->addTab(_widget, _title);
-}
-
-ak::ID ak::uiAPI::tabWidget::addTab(
-	UID				_tabWidgetUID,
-	QWidget *			_widget,
-	const QString &		_title,
-	const QString &		_iconName,
-	const QString &		_iconFolder
-) {
-	return object::get<aTabWidget>(_tabWidgetUID)->addTab(_widget, ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"), _title);
-}
-
-ak::ID ak::uiAPI::tabWidget::addTab(
-	UID				_tabWidgetUID,
-	QWidget *			_widget,
-	const QString &		_title,
-	const QIcon &		_icon
-) { return object::get<aTabWidget>(_tabWidgetUID)->addTab(_widget, _icon, _title); }
-
-void ak::uiAPI::tabWidget::closeAllTabs(
-	UID				_tabWidgetUID
-) { object::get<aTabWidget>(_tabWidgetUID)->clear(); }
-
-void ak::uiAPI::tabWidget::closeTab(
-	UID				_tabWidgetUID,
-	ID				_tabID
-) { return object::get<aTabWidget>(_tabWidgetUID)->removeTab(_tabID); }
-
-ak::ID ak::uiAPI::tabWidget::getFocusedTab(
-	UID				_tabWidgetUID
-) { return object::get<aTabWidget>(_tabWidgetUID)->currentIndex(); }
-
-bool ak::uiAPI::tabWidget::getTabsClosable(
-	UID				_tabWidgetUID
-) { return object::get<aTabWidget>(_tabWidgetUID)->tabsClosable(); }
-
-QString ak::uiAPI::tabWidget::getTabText(
-	UID				_tabWidgetUID,
-	ID				_tabID
-) { return object::get<aTabWidget>(_tabWidgetUID)->tabText(_tabID); }
-
-void ak::uiAPI::tabWidget::setEnabled(
-	UID				_tabWidgetUID,
-	bool				_enabled
-) { object::get<aTabWidget>(_tabWidgetUID)->setEnabled(_enabled); }
-
-void ak::uiAPI::tabWidget::setTabbarLocation(
-	UID								_tabWidgetUID,
-	tabLocation						_location
-) { object::get<aTabWidget>(_tabWidgetUID)->setTabLocation(_location); }
-
-void ak::uiAPI::tabWidget::setTabFocused(
-	UID				_tabWidgetUID,
-	ID				_tabID
-) { object::get<aTabWidget>(_tabWidgetUID)->setCurrentIndex(_tabID); }
-
-void ak::uiAPI::tabWidget::setTabsClosable(
-	UID								_tabWidgetUID,
-	bool								_closeable
-) { object::get<aTabWidget>(_tabWidgetUID)->setTabsClosable(_closeable); }
-
-void ak::uiAPI::tabWidget::setTabText(
-	UID								_tabWidgetUID,
-	ID								_tab,
-	const QString &						_text
-) { object::get<aTabWidget>(_tabWidgetUID)->setTabText(_tab, _text); }
-
-void ak::uiAPI::tabWidget::setVisible(
-	UID				_tabWidgetUID,
-	bool				_visible
-) { object::get<aTabWidget>(_tabWidgetUID)->setVisible(_visible); }
-
-void ak::uiAPI::tabWidget::setObjectName(
-	UID							_tabWidgetUID,
-	const QString &					_name
-) {	object::get<aTabWidget>(_tabWidgetUID)->setObjectName(_name); }
-
-bool ak::uiAPI::tabWidget::hasTab(
-	UID							_tabWidgetUID,
-	const QString &				_tabText
-) { return object::get<aTabWidget>(_tabWidgetUID)->hasTab(_tabText); }
-
-ak::ID ak::uiAPI::tabWidget::getTabIDByText(
-	UID							_tabWidgetUID,
-	const QString & _tabText
-) {
-	auto t = object::get<aTabWidget>(_tabWidgetUID)->tabTitles();
-	for (int i = 0; i < t.size(); i++) {
-		if (t.at(i) == _tabText) { return i; }
-	}
-	return invalidID;
-}
-
-// TabView
 
 // ###############################################################################################################################################
 

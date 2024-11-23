@@ -26,8 +26,6 @@
 #include <akWidgets/aComboButtonWidget.h>
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
-#include <akWidgets/aPushButtonWidget.h>
-#include <akWidgets/aTabWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
 
 // Qt header
@@ -101,25 +99,6 @@ ak::aSignalLinker::~aSignalLinker()
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(editingFinished()), this, SLOT(slotEditingFinished()));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
-			break;
-		case otPushButton:
-			itm->second.object->disconnect(itm->second.object, SIGNAL(clicked()), this, SLOT(slotClicked()));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(toggled(bool)), this, SLOT(slotToggled(bool)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
-			break;
-		case otTabView:
-			itm->second.object->disconnect(itm->second.object, SIGNAL(currentChanged(int)), this, SLOT(slotItemChanged(int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(tabBarClicked(int)), this, SLOT(slotItemClicked(int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(tabCloseRequested(int)), this, SLOT(slotItemClicked(int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(slotItemDoubleClicked(int)));
-			break;
-		case otTextEdit:
-			itm->second.object->disconnect(itm->second.object, SIGNAL(cursorPositionChanged()), this, SLOT(slotCursorPositionChanged()));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(textChanged()), this, SLOT(slotChanged()));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
 			break;
 		case otTimer:
 			itm->second.object->disconnect(itm->second.object, SIGNAL(timeout()), this, SLOT(slotTimeout()));
@@ -258,38 +237,6 @@ ak::UID ak::aSignalLinker::addLink(
 	_object->connect(_object, &aNiceLineEditWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
 	_object->connect(_object, &aNiceLineEditWidget::editingFinished, this, &aSignalLinker::slotEditingFinished);
 	_object->connect(_object, &aNiceLineEditWidget::returnPressed, this, &aSignalLinker::slotReturnPressed);
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aPushButtonWidget *									_object,
-	UID													_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otPushButton });
-
-	_object->connect(_object, &aPushButtonWidget::clicked, this, &aSignalLinker::slotClicked);
-	_object->connect(_object, &aPushButtonWidget::toggled, this, &aSignalLinker::slotToggled);
-	_object->connect(_object, &aPushButtonWidget::keyPressed, this, &aSignalLinker::slotKeyPressed);
-	_object->connect(_object, &aPushButtonWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
-
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aTabWidget *										_object,
-	UID													_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otTabView });
-	_object->connect(_object, &QTabWidget::currentChanged, this, &aSignalLinker::slotItemChanged);
-	_object->connect(_object, &QTabWidget::tabBarClicked, this, &aSignalLinker::slotItemClicked);
-	_object->connect(_object, &QTabWidget::tabCloseRequested, this, &aSignalLinker::slotItemClicked);
-	_object->connect(_object, &QTabWidget::tabBarDoubleClicked, this, &aSignalLinker::slotItemDoubleClicked);
 	return _objectUid;
 }
 

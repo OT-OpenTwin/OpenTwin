@@ -117,24 +117,6 @@ namespace ak {
 			const QString &										_infoLabelText
 		);
 
-		//! @brief Will create a push button and return its UID
-		//! @param _creatorUid The UID of the creator
-		//! @param _text The text of the push button
-		UID createPushButton(
-			UID												_creatorUid,
-			const QString &										_text = QString("")
-		);
-
-		//! @brief Will create a push button and return its UID
-		//! @param _creatorUid The UID of the creator
-		//! @param _icon The icon of the push button
-		//! @param _text The text of the push button
-		UID createPushButton(
-			UID												_creatorUid,
-			const QIcon &										_icon,
-			const QString &										_text = QString("")
-		);
-
 		//! @brief WIll create a timer and return its UID
 		//! @param _creatorUid The UID of the creator
 		UID createTimer(
@@ -163,12 +145,6 @@ namespace ak {
 			UID												_creatorUid,
 			const QString &										_text,
 			const QIcon &										_icon
-		);
-
-		//! @brief Will create a new tab view and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		UID createTabView(
-			UID												_creatorUid
 		);
 
 		//! @brief Will create a tab toolbar sub container and return its UID

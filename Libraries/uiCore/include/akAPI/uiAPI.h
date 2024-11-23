@@ -293,26 +293,6 @@ namespace ak {
 			const QString &						_infoLabelText
 		);
 
-		//! @brief Will create a new PushButton and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _text The initial text of the PushButton
-		//! @throw ak::Exception if the provided UID is invalid or the API is not initialized
-		UICORE_API_EXPORT UID createPushButton(
-			UID									_creatorUid,
-			const QString &						_text = QString("")
-		);
-
-		//! @brief Will create a new PushButton and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _icon The icon of the PushButton
-		//! @param _text The initial text of the PushButton
-		//! @throw ak::Exception if the provided UID is invalid or the API is not initialized
-		UICORE_API_EXPORT UID createPushButton(
-			UID									_creatorUid,
-			const QIcon &						_icon,
-			const QString &						_text = QString("")
-		);
-
 		//! @brief Will create a new TabToolBar subcountainer and return its UID
 		//! @param _creatorUid The UID of the creator who creates this object
 		//! @param _parentUid The UID of the parent TabToolBar object (may be a uiManager, TabToolBarPage or TabToolBarGroup)
@@ -364,13 +344,6 @@ namespace ak {
 			const QString &						_text,
 			const QString &						_iconName,
 			const QString &						_iconFolder
-		);
-
-		//! @brief Will create a new tab view and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @throw ak::Exception if the provided UID is invalid or the API is not initialized
-		UICORE_API_EXPORT UID createTabView(
-			UID									_creatorUid
 		);
 
 		//! @brief Will create a new UI manager and return its UID
@@ -707,134 +680,6 @@ namespace ak {
 				}
 				return obj;
 			}
-
-		}
-
-		// ###############################################################################################################################################
-
-		// TabView
-
-		namespace tabWidget {
-
-			UICORE_API_EXPORT ID addTab(
-				UID				_tabWidgetUID,
-				UID				_widgetUID,
-				const QString &		_title
-			);
-
-			UICORE_API_EXPORT ID addTab(
-				UID				_tabWidgetUID,
-				UID				_widgetUID,
-				const QString &		_title,
-				const QString &		_iconName,
-				const QString &		_iconFolder
-			);
-
-			UICORE_API_EXPORT ID addTab(
-				UID				_tabWidgetUID,
-				UID				_widgetUID,
-				const QString &		_title,
-				const QIcon &		_icon
-			);
-
-			UICORE_API_EXPORT ID addTab(
-				UID				_tabWidgetUID,
-				QWidget *			_widget,
-				const QString &		_title
-			);
-
-			UICORE_API_EXPORT ID addTab(
-				UID				_tabWidgetUID,
-				QWidget *			_widget,
-				const QString &		_title,
-				const QString &		_iconName,
-				const QString &		_iconFolder
-			);
-
-			UICORE_API_EXPORT ID addTab(
-				UID				_tabWidgetUID,
-				QWidget *			_widget,
-				const QString &		_title,
-				const QIcon &		_icon
-			);
-
-			//! @brief Will close all tabs of the specified tabWidget
-			UICORE_API_EXPORT void closeAllTabs(
-				UID				_tabWidgetUID
-			);
-
-			UICORE_API_EXPORT void closeTab(
-				UID				_tabWidgetUID,
-				ID				_tabID
-			);
-
-			UICORE_API_EXPORT ID getFocusedTab(
-				UID				_tabWidgetUID
-			);
-
-			UICORE_API_EXPORT bool getTabsClosable(
-				UID				_tabWidgetUID
-			);
-
-			UICORE_API_EXPORT QString getTabText(
-				UID				_tabWidgetUID,
-				ID				_tabID
-			);
-
-			UICORE_API_EXPORT void setEnabled(
-				UID				_tabWidgetUID,
-				bool				_enabled
-			);
-
-			UICORE_API_EXPORT void setTabbarLocation(
-				UID								_tabWidgetUID,
-				tabLocation						_location
-			);
-
-			UICORE_API_EXPORT void setTabFocused(
-				UID				_tabWidgetUID,
-				ID				_tabID
-			);
-
-			//! @brief Will set the closeabled state for the tabs in this tabWidget
-			//! @param _closeable If true the tabs can be closed by the user
-			UICORE_API_EXPORT void setTabsClosable(
-				UID								_tabWidgetUID,
-				bool								_closeable
-			);
-
-			//! @brief Will set the text of the specified tab
-			//! @param _tabWidgetUID The UID of the tab view
-			//! @param _tab The tab to set the text at
-			//! @param _text The text to set
-			UICORE_API_EXPORT void setTabText(
-				UID								_tabWidgetUID,
-				ID								_tab,
-				const QString &						_text
-			);
-
-			UICORE_API_EXPORT void setVisible(
-				UID				_tabWidgetUID,
-				bool				_visible
-			);
-
-			UICORE_API_EXPORT void setObjectName(
-				UID							_tabWidgetUID,
-				const QString &					_name
-			);
-
-			//! @brief Will return true if a tab with the provided text exists
-			//! @param _tabText The text of the tab to look for
-			UICORE_API_EXPORT bool hasTab(
-				UID							_tabWidgetUID,
-				const QString & _tabText
-			);
-
-			//! @brief Will return the ID of the first tab with the specified name
-			UICORE_API_EXPORT ID getTabIDByText(
-				UID							_tabWidgetUID,
-				const QString & _tabText
-			);
 
 		}
 

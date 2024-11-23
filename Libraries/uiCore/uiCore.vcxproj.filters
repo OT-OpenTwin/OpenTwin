@@ -120,16 +120,7 @@
     <ClCompile Include="src\akWidgets\aLineEditWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\akWidgets\aListWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\akWidgets\aNiceLineEditWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aPushButtonWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aTabWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="src\akWidgets\aToolButtonWidget.cpp">
@@ -262,16 +253,7 @@
     <QtMoc Include="include\akWidgets\aLineEditWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\akWidgets\aListWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
     <QtMoc Include="include\akWidgets\aNiceLineEditWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aPushButtonWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aTabWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\akWidgets\aToolButtonWidget.h">
