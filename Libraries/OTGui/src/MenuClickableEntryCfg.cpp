@@ -26,6 +26,19 @@ ot::MenuClickableEntryCfg::~MenuClickableEntryCfg() {
 
 }
 
+ot::MenuClickableEntryCfg& ot::MenuClickableEntryCfg::operator=(const MenuClickableEntryCfg& _other) {
+	if (this != &_other) {
+		MenuEntryCfg::operator=(_other);
+
+		m_name = _other.m_name;
+		m_text = _other.m_text;
+		m_iconPath = _other.m_iconPath;
+		m_toolTip = _other.m_toolTip;
+	}
+
+	return *this;
+}
+
 void ot::MenuClickableEntryCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	MenuEntryCfg::addToJsonObject(_object, _allocator);
 

@@ -37,6 +37,21 @@ ot::MenuCfg::~MenuCfg() {
 	this->clear();
 }
 
+ot::MenuCfg& ot::MenuCfg::operator=(const MenuCfg& _other) {
+	if (this != &_other) {
+		this->clear();
+
+		MenuClickableEntryCfg::operator=(_other);
+
+		for (const MenuEntryCfg* entry : _other.getEntries()) {
+			OTAssertNullptr(entry);
+			this->add(entry->createCopy());
+		}
+	}
+
+	return *this;
+}
+
 ot::MenuEntryCfg* ot::MenuCfg::createCopy(void) const {
 	return new MenuCfg(*this);
 }
@@ -44,14 +59,14 @@ ot::MenuEntryCfg* ot::MenuCfg::createCopy(void) const {
 void ot::MenuCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	MenuClickableEntryCfg::addToJsonObject(_object, _allocator);
 
-	JsonArray entryArr;
-	for (const MenuEntryCfg* entry : m_childs) {
-		OTAssertNullptr(entry);
-		JsonObject entryObj;
-		entry->addToJsonObject(entryObj, _allocator);
-		entryArr.PushBack(entryObj, _allocator);
+	JsonArray childArr;
+	for (const MenuEntryCfg* child : m_childs) {
+		OTAssertNullptr(child);
+		JsonObject childObj;
+		child->addToJsonObject(childObj, _allocator);
+		childArr.PushBack(childObj, _allocator);
 	}
-	_object.AddMember("Childs", entryArr, _allocator);
+	_object.AddMember("Childs", childArr, _allocator);
 }
 
 void ot::MenuCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -87,6 +102,29 @@ ot::MenuButtonCfg* ot::MenuCfg::addButton(const std::string& _name, const std::s
 void ot::MenuCfg::addSeparator(void) {
 	MenuSeparatorCfg* newSeparator = new MenuSeparatorCfg;
 	this->add(newSeparator);
+}
+
+ot::MenuButtonCfg* ot::MenuCfg::findMenuButton(const std::string& _name) const {
+	for (MenuEntryCfg* child : m_childs) {
+		OTAssertNullptr(child);
+		const MenuCfg* childMenu = dynamic_cast<const MenuCfg*>(child);
+		if (childMenu) {
+			ot::MenuButtonCfg* result = childMenu->findMenuButton(_name);
+			if (result) {
+				return result;
+			}
+		}
+		else {
+			MenuButtonCfg* button = dynamic_cast<MenuButtonCfg*>(child);
+			if (button) {
+				if (button->getName() == _name) {
+					return button;
+				}
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 void ot::MenuCfg::clear(void) {

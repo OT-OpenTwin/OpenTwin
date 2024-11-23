@@ -33,7 +33,7 @@ namespace ot {
 		MenuEntryCfg(const MenuEntryCfg& _other);
 		virtual ~MenuEntryCfg();
 		
-		MenuEntryCfg& operator = (const MenuEntryCfg&) = delete;
+		MenuEntryCfg& operator = (const MenuEntryCfg& _other);
 
 		virtual MenuEntryCfg* createCopy(void) const = 0;
 		virtual EntryType getMenuEntryType(void) const = 0;

@@ -22,7 +22,7 @@ namespace ot {
 		MenuCfg(const ot::ConstJsonObject& _object);
 		virtual ~MenuCfg();
 
-		MenuCfg& operator = (const MenuCfg&) = delete;
+		MenuCfg& operator = (const MenuCfg& _other);
 
 		virtual MenuEntryCfg* createCopy(void) const override;
 		virtual EntryType getMenuEntryType(void) const override { return MenuEntryCfg::Menu; };
@@ -57,6 +57,10 @@ namespace ot {
 
 		//! @brief Creates and adds a separator.
 		void addSeparator(void);
+
+		//! @brief Searches for the menu button with the given name in this menu and all of its child menus.
+		//! The menu keeps ownership of the button.
+		MenuButtonCfg* findMenuButton(const std::string& _name) const;
 
 		const std::list<MenuEntryCfg*>& getEntries(void) const { return m_childs; };
 

@@ -45,6 +45,10 @@ ot::MenuEntryCfg::~MenuEntryCfg() {
 
 }
 
+ot::MenuEntryCfg& ot::MenuEntryCfg::operator=(const MenuEntryCfg& _other) {
+	return *this;
+}
+
 void ot::MenuEntryCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("EntryType", JsonString(this->toString(this->getMenuEntryType()), _allocator), _allocator);
 }

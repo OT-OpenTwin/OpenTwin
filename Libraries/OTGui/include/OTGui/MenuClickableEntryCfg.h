@@ -17,7 +17,7 @@ namespace ot {
 		MenuClickableEntryCfg(const MenuClickableEntryCfg& _other);
 		virtual ~MenuClickableEntryCfg();
 
-		MenuClickableEntryCfg& operator = (const MenuClickableEntryCfg&) = delete;
+		MenuClickableEntryCfg& operator = (const MenuClickableEntryCfg& _other);
 
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
