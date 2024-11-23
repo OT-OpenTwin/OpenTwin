@@ -40,8 +40,6 @@ namespace ot {
 	private:
 		OT_HANDLER(handleKeySequenceActivated, FrontendActionHandler, OT_ACTION_CMD_KeySequenceActivated, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleSettingsItemChanged, FrontendActionHandler, OT_ACTION_CMD_UI_SettingsItemChanged, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleContextMenuItemClicked, FrontendActionHandler, OT_ACTION_CMD_UI_ContextMenuItemClicked, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleContextMenuItemCheckedChanged, FrontendActionHandler, OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged, ot::SECURE_MESSAGE_TYPES)
 
 	};
 

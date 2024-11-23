@@ -48,8 +48,6 @@ QString ak::toQString(
 	case etTimeout: return QString("Timeout");
 	case etToggeledChecked: return QString("ToggeledToChecked");
 	case etToggeledUnchecked: return QString("ToggeledToUnchecked");
-	case etContextMenuItemClicked: return QString("ContextMenuItemClicked");
-	case etContextMenuItemCheckedChanged: return QString("ContextMenuItemCheckedChanged");
 	case etVisibilityChanged: return QString("VisibilityChanged");
 	case etReturnPressed: return QString("ReturnPressed");
 	case etEditingFinished: return QString("EditingFinished");
@@ -237,7 +235,6 @@ QString ak::toQString(
 	case otTimePickerDialog: return QString("TimePickerDialog");
 	case otTimer: return QString("Timer");
 	case otToolButton: return QString("ToolButton");
-	case otToolButtonCustomContextMenu: return QString("ToolButtonCustomContextMenu");
 	case otTree: return QString("Tree");
 	case otTreeItem: return QString("TreeItem");
 	default: assert(0); // Not implemented yet
@@ -346,19 +343,6 @@ QString ak::toQString(
 	case keyF9: return QString("KeyF9");
 	case keyReturn: return QString("KeyReturn");
 	case keySpace: return QString("KeySpace");
-	default:
-		assert(0); // Not implemented yet
-		return QString("");
-	}
-}
-
-QString ak::toQString(
-	contextMenuRole							_role
-) {
-	switch (_role)
-	{
-	case cmrNone: return QString("None");
-	case cmrClear: return QString("Clear");
 	default:
 		assert(0); // Not implemented yet
 		return QString("");

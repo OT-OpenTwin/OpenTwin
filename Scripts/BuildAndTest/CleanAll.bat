@@ -102,11 +102,6 @@ ECHO ===============================================================
 CALL "%OT_UICORE_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
-ECHO Clean Library: UI Plugin API
-ECHO ===============================================================
-CALL "%OT_UIPLUGINAPI_ROOT%\Clean.bat" 
-
-ECHO ===============================================================
 ECHO Clean Library: RubberbandEngine: Core
 ECHO ===============================================================
 CALL "%OT_RUBBERBANDAPI_ROOT%\Clean.bat" 

@@ -54,9 +54,6 @@
     <ClCompile Include="src\ViewerComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="src\debugNotifier.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\UserManagement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,19 +81,10 @@
     <ClCompile Include="src\UserSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ContextMenuManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ManageGroups.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ManageAccess.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UiPluginComponent.cpp">
-      <Filter>Source Files\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UiPluginManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ManageOwner.cpp">
@@ -149,9 +137,6 @@
     <ClInclude Include="include\uiServiceTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\debugNotifier.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\UserManagement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -164,16 +149,7 @@
     <ClInclude Include="include\ToolBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ContextMenuManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\QtMetaTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\UiPluginComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="include\UiPluginManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="$(BASE64_ROOT)\base64.h">

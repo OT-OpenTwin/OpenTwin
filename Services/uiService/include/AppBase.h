@@ -47,7 +47,6 @@
 // Forward declaration
 class QWidget;
 class QTreeWidgetItem;
-class debugNotifier;
 class ViewerComponent;
 class ControlsManager;
 class LockManager;
@@ -55,9 +54,6 @@ class ExternalServicesComponent;
 class ProjectManagement;
 class ShortcutManager;
 class OldWelcomeScreen;
-class ContextMenuManager;
-class UiPluginComponent;
-class UiPluginManager;
 
 // Forward declaration
 class ToolBar;
@@ -171,10 +167,6 @@ public:
 	ControlsManager * controlsManager(void);
 
 	LockManager * lockManager(void);
-
-	ContextMenuManager * contextMenuManager(void) { return m_contextMenuManager; }
-
-	UiPluginManager * uiPluginManager(void) { return m_uiPluginManager; }
 
 	// ##############################################################################################
 
@@ -505,7 +497,6 @@ private Q_SLOTS:
 
 	void slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView);
 	void slotViewCloseRequested(ot::WidgetView* _view);
-	void slotOutputContextMenuItemClicked();
 	void slotColorStyleChanged(const ot::ColorStyle& _style);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -566,8 +557,6 @@ private:
 
 	AppStateFlags               m_state;
 
-	debugNotifier *				m_debugNotifier;
-	
 	std::string					m_uiServiceURL;
 	int							m_siteID;
 	std::string					m_relayURLs;
@@ -591,21 +580,10 @@ private:
 	ProjectOverviewWidget*      m_welcomeScreen;
 
 	ShortcutManager *			m_shortcutManager;
-	ContextMenuManager *		m_contextMenuManager;
-
-	UiPluginManager *			m_uiPluginManager;
-
+	
 	LoginData m_loginData;
 
 	// Default UI
-
-	struct contextMenuOutput {
-		ak::ID				clear;
-	};
-
-	struct contextMenus {
-		contextMenuOutput	output;
-	};
 
 	ToolBar *					m_ttb;
 	ot::NavigationTreeView* m_projectNavigation;
@@ -614,7 +592,6 @@ private:
 	ot::PlainTextEditView* m_debug;
 	ot::GraphicsPickerView* m_graphicsPicker;
 	ot::GraphicsPickerCollectionManager m_graphicsPickerManager;
-	contextMenus				m_contextMenus;
 	ak::UID						m_uid;							//! The UID of the wrapper
 	ak::UID						m_mainWindow;
 	ak::UID						m_viewerUid;					//! The UID of the viewer

@@ -67,8 +67,8 @@ public:
 
 	virtual ViewerUIDtype addMenuPage(const std::string &pageName) override;
 	virtual ViewerUIDtype addMenuGroup(ViewerUIDtype menuPageID, const std::string &groupName) override;
-	virtual ViewerUIDtype addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName, const ot::ContextMenu& _contextMenu = ot::ContextMenu("")) override;
-	virtual ViewerUIDtype addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName, const std::string &keySequence, const ot::ContextMenu& _contextMenu = ot::ContextMenu("")) override;
+	virtual ViewerUIDtype addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName) override;
+	virtual ViewerUIDtype addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName, const std::string &keySequence) override;
 	virtual void removeUIElements(std::list<ViewerUIDtype> &itemIDList) override;
 
 	virtual void displayText(const std::string &text) override;
@@ -178,10 +178,6 @@ public:
 	void shortcutActivated(const std::string &keySequence);
 
 	void settingsItemChanged(const ot::Property* _property);
-
-	void contextMenuItemClicked(const std::string& _menuName, const std::string& _itemName);
-
-	void contextMenuItemCheckedChanged(const std::string& _menuName, const std::string& _itemName, bool _isChecked);
 
 	bool propertyGridValueChanged(const ot::Property* _property);
 	

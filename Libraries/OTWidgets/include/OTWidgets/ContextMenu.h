@@ -15,7 +15,7 @@
 
 namespace ot {
 
-	class ContextMenu : public QMenu {
+	class OT_WIDGETS_API_EXPORT ContextMenu : public QMenu {
 		Q_OBJECT
 		OT_DECL_NOCOPY(ContextMenu)
 	public:

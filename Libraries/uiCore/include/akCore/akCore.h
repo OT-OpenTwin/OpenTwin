@@ -67,11 +67,6 @@ namespace ak {
 		ctClearCreatedObjects
 	};
 
-	enum contextMenuRole {
-		cmrNone,
-		cmrClear
-	};
-
 	//! Describes the date format
 	enum dateFormat {
 		dfDDMMYYYY,
@@ -127,11 +122,9 @@ namespace ak {
 		etTimeout = 1 << 24,
 		etToggeledChecked = 1 << 25,
 		etToggeledUnchecked = 1 << 26,
-		etContextMenuItemClicked = 1 << 27,
-		etContextMenuItemCheckedChanged = 1 << 28,
-		etVisibilityChanged = 1 << 29,
-		etReturnPressed = 1 << 30,
-		etEditingFinished = 1 << 31,
+		etVisibilityChanged = 1 << 27,
+		etReturnPressed = 1 << 28,
+		etEditingFinished = 1 << 29,
 		etDeleted = (unsigned long long ) (1) << 32
 	};
 
@@ -221,7 +214,6 @@ namespace ak {
 		otTimePickerDialog,
 		otTimer,
 		otToolButton,
-		otToolButtonCustomContextMenu,
 		otTree,
 		otTreeItem
 	};
@@ -369,11 +361,6 @@ namespace ak {
 	//! @brief Create a string representation of the provided keyType
 	UICORE_API_EXPORT QString toQString(
 		keyType									_keyType
-	);
-
-	//! @brief Create a string representation of the provided contextMenuRole
-	UICORE_API_EXPORT QString toQString(
-		contextMenuRole							_role
 	);
 
 	//! @brief Create a string representation of the provided date format

@@ -164,8 +164,6 @@
 #define OT_ACTION_CMD_UI_SetProgressbarValue "UI.Progressbar.SetValue"
 #define OT_ACTION_CMD_UI_AddSettingsData "UI.AddSettingsData"
 #define OT_ACTION_CMD_UI_SettingsItemChanged "UI.SettingsData.ItemChanged"
-#define OT_ACTION_CMD_UI_ContextMenuItemClicked "UI.ContextMenu.Item.Clicked"
-#define OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged "UI.ContextMenu.Item.CheckedChanged"
 #define OT_ACTION_CMD_UI_AddIconSearchPath "UI.IconManager.AddSearchPath"
 #define OT_ACTION_CMD_UI_MessageDialog "UI.MessageDialog"
 #define OT_ACTION_CMD_UI_MessageDialogValue "UI.MessageDialogValue"
@@ -212,11 +210,6 @@
 #define OT_ACTION_CMD_UI_LTS_GET_LOCAL_FILENAME "LTSpice.GetLocalFileName"
 #define OT_ACTION_CMD_UI_LTS_SET_LOCAL_FILENAME "LTSpice.SetLocalFileName"
 #define OT_ACTION_CMD_UI_LTS_GET_SIMPLE_FILENAME "LTSpice.GetSimpleFileName"
-
-#define OT_ACTION_CMD_UI_AddPluginSearchPath "UI.Plugin.AddSearchPath"
-#define OT_ACTION_CMD_UI_RequestPlugin "UI.Plugin.RequestConnection"
-#define OT_ACTION_CMD_UI_RequestPluginSuccess "UI.Plugin.RequestConnection.Success"
-#define OT_ACTION_CMD_UI_PluginMessage "UI.Plugin.SendMessage"
 
 #define OT_ACTION_CMD_UI_MODEL_Create "UI.Model.Create"
 
@@ -405,10 +398,6 @@
 #define OT_ACTION_PARAM_UI_CONTROL_IconName "UI.Cfg.IconName"
 #define OT_ACTION_PARAM_UI_CONTROL_IconFolder "UI.Cfg.IconFolder"
 #define OT_ACTION_PARAM_UI_CONTROL_PropertyGridSettingsJSON "UI.PropertyGrid.Settings.JSON"
-#define OT_ACTION_PARAM_UI_CONTROL_ContextMenu "UI.Cfg.ContextMenu"
-#define OT_ACTION_PARAM_UI_CONTROL_ContextMenuName "UI.Cfg.ContextMenu.Name"
-#define OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName "UI.Cfg.ContextMenu.Item.Name"
-#define OT_ACTION_PARAM_UI_CONTROL_Checkable "UI.Cfg.ContextMenu.Item.Checkable"
 #define OT_ACTION_PARAM_UI_CONTROL_BOOLEAN_STATE "UI.Cfg.BooleanState"
 #define OT_ACTION_PARAM_UI_DIALOG_TITLE "UI.Dialog.Title"
 #define OT_ACTION_PARAM_UI_UID "UI.UID"
@@ -421,11 +410,6 @@
 #define OT_ACTION_PARAM_UI_TREE_Visible1D "UI.View.1D"
 #define OT_ACTION_PARAM_UI_TREE_VisibleTable "UI.View.Table"
 #define OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker "UI.View.BlockPicker"
-
-#define OT_ACTION_PARAM_UI_PLUGIN_ACTION_MEMBER "UI.Plugin.Action"
-#define OT_ACTION_PARAM_UI_PLUGIN_NAME "UI.Plugin.Name"
-#define OT_ACTION_PARAM_UI_PLUGIN_PATH "UI.Plugin.Path"
-#define OT_ACTION_PARAM_UI_PLUGIN_UID "UI.Plugin.UID"
 
 #define OT_ACTION_PARAM_FILE_Mode "File.Mode"
 #define OT_ACTION_PARAM_FILE_Mask "File.Mask"

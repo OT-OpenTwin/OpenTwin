@@ -348,36 +348,6 @@ namespace ak {
 			const QString &						_text = QString("")
 		);
 
-		//! @brief Will create a new DockWatcher and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _text The initial text of the DockWatcher
-		UICORE_API_EXPORT UID createDockWatcher(
-			UID									_creatorUid,
-			const QString &						_text = QString("Docks")
-		);
-
-		//! @brief Will create a new DockWatcher and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _icon The initial icon of the DockWatcher
-		//! @param _text The initial text of the DockWatcher
-		UICORE_API_EXPORT UID createDockWatcher(
-			UID									_creatorUid,
-			const QIcon &						_icon,
-			const QString &						_text = QString("Docks")
-		);
-
-		//! @brief Will create a new DockWatcher and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _iconName The icon name of the icon to set at the DockWatcher
-		//! @param _iconFOlder The icon folder of the icon to set at the DockWatcher
-		//! @param _text The initial text of the DockWatcher
-		UICORE_API_EXPORT UID createDockWatcher(
-			UID									_creatorUid,
-			const QString &						_iconName,
-			const QString &						_iconFolder,
-			const QString &						_text = QString("Docks")
-		);
-
 		UICORE_API_EXPORT UID createGlobalKeyListener(
 			UID											_creatorUid,
 			Qt::Key										_key,
@@ -457,15 +427,6 @@ namespace ak {
 			const QString &						_text = QString("")
 		);
 
-		//! @brief Will create a new TextEdit and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _initialText The initial text of the TextEdit
-		//! @throw ak::Exception if the provided UID is invalid or the API is not initialized
-		UICORE_API_EXPORT UID createTextEdit(
-			UID									_creatorUid,
-			const QString &						_initialText = QString("")
-		);
-
 		//! @brief Will create a new timer and return its UID
 		//! @param _creatorUid The UID of the creator who creates this object
 		UICORE_API_EXPORT UID createTimer(
@@ -476,11 +437,6 @@ namespace ak {
 		//! @param _creatorUid The UID of the creator
 		UICORE_API_EXPORT UID createToolButton(
 			UID									_creatorUid
-		);
-
-		UICORE_API_EXPORT UID createToolButtonCustomContextMenu(
-			UID									_creatorUid,
-			UID									_toolButtonUid
 		);
 
 		//! @brief Will create a toolButton and return its UID
@@ -643,62 +599,6 @@ namespace ak {
 
 		// ###############################################################################################################################################
 
-		// Context menu
-
-		namespace contextMenu {
-
-			//! @brief Will add a context menu item and return its ID
-			//! @param _textEditUID The UID of the text edit
-			//! @param _text The text of the new item
-			//! @param _role The role of the item, if none a signal will be emitted, otherwise the corresponding action will be performed
-			UICORE_API_EXPORT ID addItem(
-				UID								_textEditUID,
-				const QString &					_text,
-				contextMenuRole					_role = cmrNone
-			);
-
-			//! @brief Will add a context menu item and return its ID
-			//! @param _textEditUID The UID of the text edit
-			//! @param _icon The icon of the new item
-			//! @param _text The text of the new item
-			//! @param _role The role of the item, if none a signal will be emitted, otherwise the corresponding action will be performed
-			UICORE_API_EXPORT ID addItem(
-				UID								_textEditUID,
-				const QIcon &					_icon,
-				const QString &					_text,
-				contextMenuRole					_role = cmrNone
-			);
-
-			//! @brief Will add a context menu item and return its ID
-			//! @param _textEditUID The UID of the text edit
-			//! @param _icon The icon of the new item
-			//! @param _text The text of the new item
-			//! @param _iconSubFolder The sub folder the icon is located at (Folder depends on the search directories)
-			//! @param _role The role of the item, if none a signal will be emitted, otherwise the corresponding action will be performed
-			UICORE_API_EXPORT ID addItem(
-				UID							_textEditUID,
-				const QString &					_text,
-				const QString &					_iconName,
-				const QString &					_iconSubFolder,
-				contextMenuRole					_role = cmrNone
-			);
-
-			//! @brief Will add a sperator at the context menu of the textEdit
-			//! @param _textEditUID The UID of the text edit
-			UICORE_API_EXPORT void addSeparator(
-				UID							_textEditUID
-			);
-
-			//! @brief Will remove all context menu items from the context menu
-			//! @param _textEditUID The UID of the text edit
-			UICORE_API_EXPORT void clear(
-				UID							_textEditUID
-			);
-
-		}
-
-		// ###############################################################################################################################################
-
 		// Dialog
 
 		namespace dialog {
@@ -741,44 +641,6 @@ namespace ak {
 			//! @brief Will return the currently set visible state of the 
 			UICORE_API_EXPORT bool isVisible(
 				UID												_dockUID
-			);
-
-		}
-
-		// ###############################################################################################################################################
-
-		// Dock watcher
-
-		namespace dockWatcher {
-
-			UICORE_API_EXPORT void addWatch(
-				ak::UID						_dockWatcherUid,
-				ak::UID						_dockUid
-			);
-
-			UICORE_API_EXPORT void addWatch(
-				ak::UID						_dockWatcherUid,
-				QDockWidget *				_dock
-			);
-
-			UICORE_API_EXPORT void removeWatch(
-				ak::UID						_dockWatcherUid,
-				ak::UID						_dockUid
-			);
-
-			UICORE_API_EXPORT void removeWatch(
-				ak::UID						_dockWatcherUid,
-				QDockWidget *				_dock
-			);
-
-			UICORE_API_EXPORT void setWatchEnabled(
-				ak::UID						_dockWatcherUid,
-				bool						_isEnbaled
-			);
-
-			UICORE_API_EXPORT bool isWatchEnabled(
-				ak::UID						_dockWatcherUid,
-				bool						_isEnbaled
 			);
 
 		}
@@ -1316,38 +1178,6 @@ namespace ak {
 
 		// ###############################################################################################################################################
 
-		// TextEdit
-
-		namespace textEdit {
-
-			UICORE_API_EXPORT void appendText(
-				UID				_textEditUID,
-				const QString &		_text
-			);
-
-			UICORE_API_EXPORT void clear(
-				UID				_textEditUID
-			);
-
-			UICORE_API_EXPORT void setAutoScrollToBottomEnabled(
-				UID				_textEditUID,
-				bool				_enabled = true
-			);
-
-			UICORE_API_EXPORT void setReadOnly(
-				UID				_textEditUID,
-				bool				_readOnly = true
-			);
-
-			UICORE_API_EXPORT void setText(
-				UID				_textEditUID,
-				const QString &		_text
-			);
-
-		}
-
-		// ###############################################################################################################################################
-
 		// Timer
 
 		namespace timer {
@@ -1448,70 +1278,6 @@ namespace ak {
 				UID							_toolButtonUID,
 				const QString &					_iconName,
 				const QString &					_iconFolder
-			);
-
-			//! @brief Will add a new menu item to the menu
-			//! @param _toolButtonUID The UID of the tool button
-			//! @param _text The text of the new item
-			UICORE_API_EXPORT ID addMenuItem(
-				UID							_toolButtonUID,
-				const QString &					_text
-			);
-
-			//! @brief Will add a new menu item to the menu
-			//! @param _toolButtonUID The UID of the tool button
-			//! @param _text The text of the new item
-			UICORE_API_EXPORT ID addMenuItem(
-				UID							_toolButtonUID,
-				const QIcon &					_icon,
-				const QString &					_text
-			);
-
-			//! @brief Will add a new menu item to the menu
-			//! @param _toolButtonUID The UID of the tool button
-			//! @param _text The text of the new item
-			UICORE_API_EXPORT ID addMenuItem(
-				UID							_toolButtonUID,
-				const QString &					_text,
-				const QString &					_iconName,
-				const QString &					_iconFolder
-			);
-
-			//! @brief Will add a menu seperator to the menu
-			//! @param _toolButtonUID The UID of the tool button
-			UICORE_API_EXPORT void addMenuSeperator(
-				UID							_toolButtonUID
-			);
-
-			//! @brief Will clear the menu
-			//! @param _toolButtonUID The UID of the tool button
-			UICORE_API_EXPORT void clearMenu(
-				UID							_toolButtonUID
-			);
-
-			//! @brief Will set the checked state of the specified menu item
-			//! @param _toolButtonUID The UID of the tool button
-			//! @param _itemID The ID of the item
-			//! @param _checked The checked state to set
-			UICORE_API_EXPORT void setMenuItemChecked(
-				UID								_toolButtonUID,
-				ID								_itemID,
-				bool							_checked = true
-			);
-
-			//! @brief Will disable the ability to check and uncheck the item (can be reenabled with setChecked)
-			//! @param _toolButtonUID The UID of the tool button
-			//! @param _itemID The ID of the item
-			UICORE_API_EXPORT void setMenuItemNotCheckable(
-				UID								_toolButtonUID,
-				ID								_itemID
-			);
-
-			//! @brief Will return the text of the specified menu item
-			//! @param _itemID The ID of the menu item
-			UICORE_API_EXPORT QString getMenuItemText(
-				UID								_toolButtonUID,
-				ID								_itemID
 			);
 
 		} // namespace toolButton

@@ -27,7 +27,6 @@ class QMenu;
 namespace ak {
 
 	class aAction;
-	class aContextMenuItem;
 
 	class UICORE_API_EXPORT aToolButtonWidget : public QToolButton, public aWidget {
 		Q_OBJECT
@@ -76,58 +75,19 @@ namespace ak {
 		//! @brief Will return the current toolTip of this toolButton
 		QString ToolTip(void) const;
 
-		//! @brief Will add a new menu item to the menu
-		//! This toolButton will take over control over the contextMenuItem
-		//! @param _item The item to add
-		ID addMenuItem(
-			aContextMenuItem *					_item
-		);
-
-		//! @brief Will add a menu seperator to the menu
-		void addMenuSeperator(void);
-
-		//! @brief Will clear the menu
-		void clearMenu(void);
-
-		//! @brief Will set the checked state of the specified menu item
-		//! @param _itemID The ID of the item
-		//! @param _checked The checked state to set
-		void setMenuItemChecked(
-			ID								_itemID,
-			bool								_checked = true
-		);
-
-		//! @brief Will disable the ability to check and uncheck the item (can be reenabled with setChecked)
-		//! @param _itemID The ID of the item
-		void setMenuItemNotCheckable(
-			ID								_itemID
-		);
-
-		//! @brief Will return the text of the specified menu item
-		//! @param _itemID The ID of the menu item
-		QString getMenuItemText(
-			ID								_itemID
-		);
-
 	Q_SIGNALS:
 		void btnClicked();
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
-		void menuItemClicked(ID);
-		void menuItemCheckedChanged(ID, bool);
 
 	private Q_SLOTS:
 		void slotClicked();
-		void slotMenuItemClicked();
-		void slotMenuItemCheckedChanged();
 
 	private:
 
 		//! @brief Initializes the components of this toolButton
 		void ini(void);
 
-		QMenu *							m_menu;
-		std::vector<aContextMenuItem *>	m_menuItems;
 		aAction *						m_action;
 
 	};

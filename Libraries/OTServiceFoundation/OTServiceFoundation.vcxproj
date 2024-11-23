@@ -196,7 +196,6 @@
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c" />
     <ClCompile Include="src\ApplicationBase.cpp" />
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
-    <ClCompile Include="src\ContextMenu.cpp" />
     <ClCompile Include="src\Encryption.cpp" />
     <ClCompile Include="src\EntityInformation.cpp" />
     <ClCompile Include="src\ErrorWarningLogFrontendNotifier.cpp" />
@@ -211,7 +210,6 @@
     <ClCompile Include="src\ModelComponent.cpp" />
     <ClCompile Include="src\TypeConverter.cpp" />
     <ClCompile Include="src\UiComponent.cpp" />
-    <ClCompile Include="src\UiPluginComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\ThirdParty\base64\base64.h" />
@@ -219,7 +217,6 @@
     <ClInclude Include="include\OTServiceFoundation\AbstractUiNotifier.h" />
     <ClInclude Include="include\OTServiceFoundation\ApplicationBase.h" />
     <ClInclude Include="include\OTServiceFoundation\BusinessLogicHandler.h" />
-    <ClInclude Include="include\OTServiceFoundation\ContextMenu.h" />
     <ClInclude Include="include\OTServiceFoundation\Encryption.h" />
     <ClInclude Include="include\OTServiceFoundation\EntityInformation.h" />
     <ClInclude Include="include\OTServiceFoundation\ErrorWarningLogFrontendNotifier.h" />
@@ -240,7 +237,6 @@
     <ClInclude Include="include\OTServiceFoundation\PythonServiceInterface.h" />
     <ClInclude Include="include\OTServiceFoundation\TypeConverter.h" />
     <ClInclude Include="include\OTServiceFoundation\UiComponent.h" />
-    <ClInclude Include="include\OTServiceFoundation\UiPluginComponent.h" />
     <ClInclude Include="include\OTServiceFoundation\UserCredentials.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1106,10 +1106,6 @@ void Application::uiDisconnected(const ot::components::UiComponent* _ui) {
 
 }
 
-void Application::uiPluginConnected(ot::components::UiPluginComponent* _uiPlugin) {
-
-}
-
 void Application::modelConnected(ot::components::ModelComponent* _model) {
 
 }

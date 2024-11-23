@@ -28,7 +28,6 @@
 
 // AK GUI
 #include <akGui/aAction.h>
-#include <akGui/aContextMenuItem.h>
 #include <akGui/aSpecialTabBar.h>
 #include <akGui/aTtbContainer.h>
 #include <akGui/aWindowEventHandler.h>
@@ -39,7 +38,6 @@
 #include <akWidgets/aComboBoxWidget.h>
 #include <akWidgets/aComboButtonWidget.h>
 #include <akWidgets/aDockWidget.h>
-#include <akWidgets/aDockWatcherWidget.h>
 #include <akWidgets/aGraphicsWidget.h>
 #include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aLineEditWidget.h>
@@ -48,7 +46,6 @@
 #include <akWidgets/aPushButtonWidget.h>
 #include <akWidgets/aTableWidget.h>
 #include <akWidgets/aTabWidget.h>
-#include <akWidgets/aTextEditWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
 #include <akWidgets/aTtbGroup.h>
 #include <akWidgets/aTtbPage.h>
@@ -361,33 +358,6 @@ ak::UID ak::uiAPI::createDock(
 	return m_objManager->createDock(_creatorUid, _text);
 }
 
-ak::UID ak::uiAPI::createDockWatcher(
-	UID									_creatorUid,
-	const QString &						_text
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createDockWatcher(_creatorUid, _text);
-}
-
-ak::UID ak::uiAPI::createDockWatcher(
-	UID									_creatorUid,
-	const QIcon &						_icon,
-	const QString &						_text
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createDockWatcher(_creatorUid, _icon, _text);
-}
-
-ak::UID ak::uiAPI::createDockWatcher(
-	UID									_creatorUid,
-	const QString &						_iconName,
-	const QString &						_iconFolder,
-	const QString &						_text
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createDockWatcher(_creatorUid, ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"), _text);
-}
-
 ak::UID ak::uiAPI::createGlobalKeyListener(
 	UID											_creatorUid,
 	Qt::Key										_key,
@@ -470,14 +440,6 @@ ak::UID ak::uiAPI::createTabToolBarSubContainer(
 	return m_objManager->createTabToolBarSubContainer(_creatorUid, _parentUid, _text);
 }
 
-ak::UID ak::uiAPI::createTextEdit(
-	UID												_creatorUid,
-	const QString &										_initialText
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createTextEdit(_creatorUid, _initialText);
-}
-
 ak::UID ak::uiAPI::createTimer(
 	UID												_creatorUid
 ) {
@@ -498,15 +460,6 @@ ak::UID ak::uiAPI::createToolButton(
 ) {
 	assert(m_objManager != nullptr); // API not initialized
 	return m_objManager->createToolButton(_creatorUid, _text);
-}
-
-ak::UID ak::uiAPI::createToolButtonCustomContextMenu(
-	UID									_creatorUid,
-	UID									_toolButtonUid
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aToolButtonWidget * button = object::get<aToolButtonWidget>(_toolButtonUid);
-	return m_objManager->createToolButtonCustomContextMenu(_creatorUid, button);
 }
 
 ak::UID ak::uiAPI::createToolButton(
@@ -630,105 +583,6 @@ bool ak::uiAPI::container::isEnabled(
 
 // ###############################################################################################################################################
 
-// ContextMenu
-
-ak::ID ak::uiAPI::contextMenu::addItem(
-	UID							_widgetUID,
-	const QString &					_text,
-	contextMenuRole		_role
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aObject * obj = m_objManager->object(_widgetUID);
-	aContextMenuItem * newItem = new aContextMenuItem(_text, _role);
-
-	switch (obj->type())
-	{
-	case otTextEdit: return akCastObject<aTextEditWidget>(obj)->addContextMenuItem(newItem);
-	default:
-		delete newItem;
-		assert(0); // Invalid object type
-		return ak::invalidID;
-	}
-}
-
-ak::ID ak::uiAPI::contextMenu::addItem(
-	UID							_widgetUID,
-	const QIcon &					_icon,
-	const QString &					_text,
-	contextMenuRole		_role
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aObject * obj = m_objManager->object(_widgetUID);
-	assert(obj != nullptr); // Invalid UID
-	aContextMenuItem * newItem = new aContextMenuItem(_icon, _text, _role);
-
-	switch (obj->type())
-	{
-	case otTextEdit: return akCastObject<aTextEditWidget>(obj)->addContextMenuItem(newItem);
-	default:
-		delete newItem;
-		assert(0); // Invalid object type
-		return ak::invalidID;
-	}
-}
-
-ak::ID ak::uiAPI::contextMenu::addItem(
-	UID							_widgetUID,
-	const QString &					_text,
-	const QString &					_iconName,
-	const QString &					_iconSize,
-	contextMenuRole		_role
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aObject * obj = m_objManager->object(_widgetUID);
-	assert(obj != nullptr); // Invalid UID
-	aContextMenuItem * newItem = new aContextMenuItem(ot::IconManager::getIcon(_iconSize + "/" + _iconName + ".png"), _text, _role);
-
-	switch (obj->type())
-	{
-	case otTextEdit: return akCastObject<aTextEditWidget>(obj)->addContextMenuItem(newItem);
-	default:
-		delete newItem;
-		assert(0); // Invalid object type
-		return ak::invalidID;
-	}
-}
-
-void ak::uiAPI::contextMenu::addSeparator(
-	UID							_widgetUID
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aObject * obj = m_objManager->object(_widgetUID);
-	assert(obj != nullptr); // Invalid UID
-	switch (obj->type())
-	{
-	case otTextEdit: return akCastObject<aTextEditWidget>(obj)->addContextMenuSeparator();
-	break;
-	default:
-		assert(0); // Invalid object type
-	}
-}
-
-void ak::uiAPI::contextMenu::clear(
-	UID							_widgetUID
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aObject * obj = m_objManager->object(_widgetUID);
-	assert(obj != nullptr); // Invalid UID
-
-	switch (obj->type())
-	{
-	case otTextEdit: return akCastObject<aTextEditWidget>(obj)->clearContextMenu();
-	break;
-	default:
-		assert(0); // Invalid object type
-	}
-}
-
-// ContextMenu
-
-// ###############################################################################################################################################
-
 // Dialog
 
 QString ak::uiAPI::dialog::openDirectory(const QString & _title, const QString & _initialDir) {
@@ -777,54 +631,6 @@ bool ak::uiAPI::dock::isVisible(
 ) { return object::get<aDockWidget>(_dockUID)->isVisible(); }
 
 // Dock
-
-// ###############################################################################################################################################
-
-// Dock watcher
-
-void ak::uiAPI::dockWatcher::addWatch(
-	ak::UID						_dockWatcherUid,
-	ak::UID						_dockUid
-) {
-	addWatch(_dockWatcherUid, object::get<aDockWidget>(_dockUid));
-}
-
-void ak::uiAPI::dockWatcher::addWatch(
-	ak::UID						_dockWatcherUid,
-	QDockWidget*				_dock
-) {
-	object::get<aDockWatcherWidget>(_dockWatcherUid)->addWatch(_dock);
-}
-
-void ak::uiAPI::dockWatcher::removeWatch(
-	ak::UID						_dockWatcherUid,
-	ak::UID						_dockUid
-) {
-	removeWatch(_dockWatcherUid, object::get<aDockWidget>(_dockUid));
-}
-
-void ak::uiAPI::dockWatcher::removeWatch(
-	ak::UID						_dockWatcherUid,
-	QDockWidget*				_dock
-) {
-	object::get<aDockWatcherWidget>(_dockWatcherUid)->removeWatch(_dock);
-}
-
-void ak::uiAPI::dockWatcher::setWatchEnabled(
-	ak::UID						_dockWatcherUid,
-	bool						_isEnbaled
-) {
-	object::get<aDockWatcherWidget>(_dockWatcherUid)->setWatcherEnabled(_isEnbaled);
-}
-
-bool ak::uiAPI::dockWatcher::isWatchEnabled(
-	ak::UID						_dockWatcherUid,
-	bool						_isEnbaled
-) {
-	return object::get<aDockWatcherWidget>(_dockWatcherUid)->isWatcherEnabled();
-}
-
-// Dock watcher
 
 // ###############################################################################################################################################
 
@@ -1072,7 +878,6 @@ void ak::uiAPI::object::setEnabled(
 	case otComboButton: akCastObject<aComboButtonWidget>(obj)->setEnabled(_enabled); return;
 	case otCheckBox: akCastObject<aCheckBoxWidget>(obj)->setEnabled(_enabled); return;
 	case otDock: akCastObject<aDockWidget>(obj)->setEnabled(_enabled); return;
-	case otDockWatcher: akCastObject<aDockWatcherWidget>(obj)->setEnabled(_enabled); return;
 	case otGraphicsView: akCastObject<aGraphicsWidget>(obj)->setEnabled(_enabled); return;
 	case otLabel: akCastObject<aLabelWidget>(obj)->setEnabled(_enabled); return;
 	case otLineEdit: akCastObject<aLineEditWidget>(obj)->setEnabled(_enabled); return;
@@ -1086,7 +891,6 @@ void ak::uiAPI::object::setEnabled(
 	case otTabToolbarPage: akCastObject<aTtbPage>(obj)->setEnabled(_enabled); return;
 	case otTabToolbarSubgroup: akCastObject<aTtbSubGroup>(obj)->setEnabled(_enabled); return;
 	case otTabView: akCastObject<aTabWidget>(obj)->setEnabled(_enabled); return;
-	case otTextEdit: akCastObject<aTextEditWidget>(obj)->setEnabled(_enabled); return;
 	case otToolButton: akCastObject<aToolButtonWidget>(obj)->setEnabled(_enabled); return;
 	default:
 		assert(0);	// Invalid object type
@@ -1107,7 +911,6 @@ bool ak::uiAPI::object::getIsEnabled(
 	case otComboButton: return akCastObject<aComboButtonWidget>(obj)->isEnabled();
 	case otCheckBox: return akCastObject<aCheckBoxWidget>(obj)->isEnabled();
 	case otDock: return akCastObject<aDockWidget>(obj)->isEnabled();
-	case otDockWatcher: return akCastObject<aDockWatcherWidget>(obj)->isEnabled();
 	case otGraphicsView: return akCastObject<aGraphicsWidget>(obj)->isEnabled();
 	case otLabel: return akCastObject<aLabelWidget>(obj)->isEnabled();
 	case otLineEdit: return akCastObject<aLineEditWidget>(obj)->isEnabled();
@@ -1121,7 +924,6 @@ bool ak::uiAPI::object::getIsEnabled(
 	case otTabToolbarPage: return akCastObject<aTtbPage>(obj)->enabled();
 	case otTabToolbarSubgroup: return akCastObject<aTtbSubGroup>(obj)->enabled();
 	case otTabView: return akCastObject<aTabWidget>(obj)->isEnabled();
-	case otTextEdit: return akCastObject<aTextEditWidget>(obj)->isEnabled();
 	case otToolButton: return akCastObject<aPushButtonWidget>(obj)->isEnabled();
 	default:
 		assert(0);	// Invalid object type
@@ -1392,67 +1194,6 @@ ak::ID ak::uiAPI::tabWidget::getTabIDByText(
 
 // ###############################################################################################################################################
 
-// TextEdit
-
-void ak::uiAPI::textEdit::appendText(
-	UID				_textEditUID,
-	const QString &		_text
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aTextEditWidget * actualTextEdit = nullptr;
-	actualTextEdit = dynamic_cast<aTextEditWidget *>(m_objManager->object(_textEditUID));
-	assert(actualTextEdit != nullptr); // Invalid object type
-	actualTextEdit->moveCursor(QTextCursor::End, QTextCursor::MoveAnchor);
-	return actualTextEdit->insertPlainText(_text);
-}
-
-void ak::uiAPI::textEdit::clear(
-	UID				_textEditUID
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aTextEditWidget * actualTextEdit = nullptr;
-	actualTextEdit = dynamic_cast<aTextEditWidget *>(m_objManager->object(_textEditUID));
-	assert(actualTextEdit != nullptr); // Invalid object type
-	return actualTextEdit->clear();
-}
-
-void ak::uiAPI::textEdit::setAutoScrollToBottomEnabled(
-	UID				_textEditUID,
-	bool				_enabled
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aTextEditWidget * actualTextEdit = nullptr;
-	actualTextEdit = dynamic_cast<aTextEditWidget *>(m_objManager->object(_textEditUID));
-	assert(actualTextEdit != nullptr); // Invalid object type
-	return actualTextEdit->setAutoScrollToBottom(_enabled);
-}
-
-void ak::uiAPI::textEdit::setReadOnly(
-	UID				_textEditUID,
-	bool				_readOnly
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aTextEditWidget * actualTextEdit = nullptr;
-	actualTextEdit = dynamic_cast<aTextEditWidget *>(m_objManager->object(_textEditUID));
-	assert(actualTextEdit != nullptr); // Invalid object type
-	actualTextEdit->setReadOnly(_readOnly);
-}
-
-void ak::uiAPI::textEdit::setText(
-	UID				_textEditUID,
-	const QString &		_text
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aTextEditWidget * actualTextEdit = nullptr;
-	actualTextEdit = dynamic_cast<aTextEditWidget *>(m_objManager->object(_textEditUID));
-	assert(actualTextEdit != nullptr); // Invalid object type
-	return actualTextEdit->setPlainText(_text);
-}
-
-// TextEdit
-
-// ###############################################################################################################################################
-
 // Timer
 
 int ak::uiAPI::timer::getInterval(
@@ -1624,99 +1365,6 @@ void ak::uiAPI::toolButton::setIcon(
 	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
 	assert(actualToolButton != nullptr); // Invalid object type
 	actualToolButton->getAction()->setIcon(ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"));
-}
-
-ak::ID ak::uiAPI::toolButton::addMenuItem(
-	UID							_toolButtonUID,
-	const QString &					_text
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aToolButtonWidget * actualToolButton = nullptr;
-	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
-	assert(actualToolButton != nullptr); // Invalid object type
-	aContextMenuItem * itm = new aContextMenuItem(_text, cmrNone);
-	return actualToolButton->addMenuItem(itm);
-}
-
-ak::ID ak::uiAPI::toolButton::addMenuItem(
-	UID							_toolButtonUID,
-	const QIcon &					_icon,
-	const QString &					_text
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aToolButtonWidget * actualToolButton = nullptr;
-	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
-	assert(actualToolButton != nullptr); // Invalid object type
-	aContextMenuItem * itm = new aContextMenuItem(_icon ,_text, cmrNone);
-	return actualToolButton->addMenuItem(itm);
-}
-
-ak::ID ak::uiAPI::toolButton::addMenuItem(
-	UID							_toolButtonUID,
-	const QString &					_text,
-	const QString &					_iconName,
-	const QString &					_iconFolder
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aToolButtonWidget * actualToolButton = nullptr;
-	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
-	assert(actualToolButton != nullptr); // Invalid object type
-	aContextMenuItem * itm = new aContextMenuItem(ot::IconManager::getIcon(_iconFolder + "/" + _iconName + ".png"), _text, cmrNone);
-	return actualToolButton->addMenuItem(itm);
-}
-
-void ak::uiAPI::toolButton::addMenuSeperator(
-	UID							_toolButtonUID
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aToolButtonWidget * actualToolButton = nullptr;
-	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
-	assert(actualToolButton != nullptr); // Invalid object type
-	actualToolButton->addMenuSeperator();
-}
-
-void ak::uiAPI::toolButton::clearMenu(
-	UID							_toolButtonUID
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aToolButtonWidget * actualToolButton = nullptr;
-	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
-	assert(actualToolButton != nullptr); // Invalid object type
-	actualToolButton->clearMenu();
-}
-
-void ak::uiAPI::toolButton::setMenuItemChecked(
-	UID							_toolButtonUID,
-	ID							_itemID,
-	bool							_checked
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aToolButtonWidget * actualToolButton = nullptr;
-	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
-	assert(actualToolButton != nullptr); // Invalid object type
-	actualToolButton->setMenuItemChecked(_itemID, _checked);
-}
-
-void ak::uiAPI::toolButton::setMenuItemNotCheckable(
-	UID							_toolButtonUID,
-	ID							_itemID
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aToolButtonWidget * actualToolButton = nullptr;
-	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
-	assert(actualToolButton != nullptr); // Invalid object type
-	actualToolButton->setMenuItemNotCheckable(_itemID);
-}
-
-QString ak::uiAPI::toolButton::getMenuItemText(
-	UID							_toolButtonUID,
-	ID							_itemID
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	aToolButtonWidget * actualToolButton = nullptr;
-	actualToolButton = dynamic_cast<aToolButtonWidget *>(m_objManager->object(_toolButtonUID));
-	assert(actualToolButton != nullptr); // Invalid object type
-	return actualToolButton->getMenuItemText(_itemID);
 }
 
 // Tool button

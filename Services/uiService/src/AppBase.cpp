@@ -9,17 +9,13 @@
 #include "ServiceDataUi.h"
 #include "ViewerComponent.h"	// Viewer component
 #include "ExternalServicesComponent.h"		// ExternalServices component
-#include "debugNotifier.h"		// DebugNotifier
 #include "UserManagement.h"
 #include "ProjectManagement.h"
 #include "ControlsManager.h"
 #include "ToolBar.h"
 #include "ShortcutManager.h"
-#include "ContextMenuManager.h"
 #include "ManageGroups.h"
 #include "ManageAccess.h"
-#include "UiPluginComponent.h"
-#include "UiPluginManager.h"
 #include "DevLogger.h"
 #include "LogInDialog.h"
 #include "NavigationTreeView.h"
@@ -34,7 +30,6 @@
 #include <akWidgets/aWindow.h>
 #include <akWidgets/aWindowManager.h>
 #include <akWidgets/aDockWidget.h>
-#include <akWidgets/aTextEditWidget.h>
 #include <akWidgets/aTreeWidget.h>
 
 // OpenTwin header
@@ -154,7 +149,6 @@ AppBase::AppBase()
 	m_uid(invalidUID),
 	m_modelUid(invalidUID),
 	m_viewerUid(invalidUID),
-	m_debugNotifier(nullptr),
 	m_viewerComponent(nullptr),
 	m_mainWindow(invalidUID),
 	m_ExternalServicesComponent(nullptr),
@@ -163,8 +157,6 @@ AppBase::AppBase()
 	m_siteID(0),
 	m_isDebug(false),
 	m_shortcutManager(nullptr),
-	m_contextMenuManager(nullptr),
-	m_uiPluginManager(nullptr),
 	m_graphicsPicker(nullptr),
 	m_visible3D(false),
 	m_visible1D(false),
@@ -181,16 +173,10 @@ AppBase::AppBase()
 	m_logIntensity(nullptr),
 	m_lastFocusedCentralView(nullptr)
 {
-	m_contextMenus.output.clear = invalidID;
-
 	m_currentStateWindow.viewShown = false;
 
-	m_debugNotifier = new debugNotifier(invalidUID);
 	m_ExternalServicesComponent = new ExternalServicesComponent(this);
-	m_debugNotifier->disable();
-
-	m_contextMenuManager = new ContextMenuManager;
-
+	
 	this->setDeleteLogNotifierLater(true);
 	ot::LogDispatcher::instance().addReceiver(this);
 }
@@ -304,17 +290,6 @@ bool AppBase::logIn(void) {
 	// Create shortcut manager
 	if (m_shortcutManager) delete m_shortcutManager;
 	m_shortcutManager = new ShortcutManager;
-
-	// Create plugin manager
-	if (m_uiPluginManager) delete m_uiPluginManager;
-	m_uiPluginManager = new UiPluginManager(this);
-
-#ifdef _DEBUG
-	m_uiPluginManager->addPluginSearchPath(qgetenv("OPENTWIN_DEV_ROOT") + "\\Deployment\\uiPlugins");
-	//new DispatchableItemExample;
-#else
-	m_uiPluginManager->addPluginSearchPath(QDir::currentPath() + "\\uiPlugins");
-#endif // _DEBUG
 
 	return true;
 }
@@ -858,12 +833,6 @@ void AppBase::createUi(void) {
 			m_debug->setReadOnly(true);
 			m_debug->setAutoScrollToBottomEnabled(true);
 
-			//m_propertyGrid->setGroupIcons(ot::IconManager::getIcon("Default/ArrowBlueRight.png"), ot::IconManager::getIcon("Default/ArrowGreenDown.png"));
-			//m_propertyGrid->setDeleteIcon(ot::IconManager::getIcon("Default/DeleteProperty.png"));
-
-			//m_contextMenus.output.clear = uiAPI::contextMenu::addItem(m_widgets.output, "Clear", "Clear", "Default", cmrClear);
-			//uiAPI::contextMenu::addItem(m_widgets.debug, "Clear", "Clear", "Default", cmrClear);
-
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Set widgets to docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 25);
 			m_welcomeScreen->slotRefreshRecentProjects();
@@ -914,9 +883,7 @@ void AppBase::createUi(void) {
 			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &AppBase::slotViewCloseRequested);
 
 			uiAPI::registerUidNotifier(m_mainWindow, this);
-						
-			uiAPI::registerAllMessagesNotifier(m_debugNotifier);
-
+			
 			// #######################################################################
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Initialize viewer component");
@@ -987,8 +954,6 @@ void AppBase::createUi(void) {
 void AppBase::setDebug(bool _debug) { m_isDebug = _debug; }
 
 bool AppBase::debug(void) const { return m_isDebug; }
-
-void AppBase::setDebugOutputUid(UID _uid) { m_debugNotifier->setOutputUid(_uid); }
 
 void AppBase::registerSession(
 	const std::string &				_projectName,
@@ -2380,10 +2345,6 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	else {
 		OT_LOG_W("Navigation entry for view not found. { \"ViewName\": \"" + viewName + "\" }");
 	}
-}
-
-void AppBase::slotOutputContextMenuItemClicked() {
-	m_output->setPlainText(BUILD_INFO);
 }
 
 void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {

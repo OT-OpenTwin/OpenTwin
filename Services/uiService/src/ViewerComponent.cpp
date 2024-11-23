@@ -14,7 +14,6 @@
 #include "ControlsManager.h"
 #include "ShortcutManager.h"
 #include "UserSettings.h"
-#include "ContextMenuManager.h"
 #include "OTCore/ReturnMessage.h"
 
 #include "OTCore/OTAssert.h"
@@ -277,7 +276,7 @@ ViewerUIDtype ViewerComponent::addMenuGroup(ViewerUIDtype menuPageID, const std:
 	return 0;
 }
 
-ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName, const ot::ContextMenu& _contextMenu)
+ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName)
 {
 	try {
 		try {
@@ -290,9 +289,6 @@ ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, cons
 			flags.setFlag(ot::LockViewRead);
 			AppBase::instance()->lockManager()->uiElementCreated(this, btnUid, flags);
 
-			if (_contextMenu.hasItems()) {
-				AppBase::instance()->contextMenuManager()->createItem(nullptr, AppBase::instance()->getViewerUID(), btnUid, _contextMenu)->setIsViewerContext(true);
-			}
 			return btnUid;
 		}
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::addMenuPushButton()"); }
@@ -303,8 +299,8 @@ ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, cons
 	return 0;
 }
 
-ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName, const std::string &keySequence, const ot::ContextMenu& _contextMenu) {
-	ViewerUIDtype uid = addMenuPushButton(menuGroupID, buttonName, iconName, _contextMenu);
+ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, const std::string &buttonName, const std::string &iconName, const std::string &keySequence) {
+	ViewerUIDtype uid = addMenuPushButton(menuGroupID, buttonName, iconName);
 
 	KeyboardCommandHandler * newHandler = new KeyboardCommandHandler(nullptr, AppBase::instance(), keySequence.c_str());
 	newHandler->setAsViewerHandler(true);
@@ -327,7 +323,6 @@ void ViewerComponent::removeUIElements(std::list<ViewerUIDtype> &itemIDList)
 			for (auto itm : i) {
 				app->controlsManager()->uiControlWasDestroyed(itm);
 				app->lockManager()->uiElementDestroyed(itm);
-				app->contextMenuManager()->uiItemDestroyed(itm);
 			}
 
 			AppBase::instance()->shortcutManager()->clearViewerHandler();
@@ -998,18 +993,6 @@ void ViewerComponent::shortcutActivated(const std::string &keySequence) {
 void ViewerComponent::settingsItemChanged(const ot::Property* _property) {
 	for (auto vId : m_viewers) {
 		ViewerAPI::settingsItemChanged(vId, _property);
-	}
-}
-
-void ViewerComponent::contextMenuItemClicked(const std::string& _menuName, const std::string& _itemName) {
-	for (auto vId : m_viewers) {
-		ViewerAPI::contextMenuItemClicked(vId, _menuName, _itemName);
-	}
-}
-
-void ViewerComponent::contextMenuItemCheckedChanged(const std::string& _menuName, const std::string& _itemName, bool _isChecked) {
-	for (auto vId : m_viewers) {
-		ViewerAPI::contextMenuItemCheckedChanged(vId, _menuName, _itemName, _isChecked);
 	}
 }
 

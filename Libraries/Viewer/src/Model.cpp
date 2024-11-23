@@ -1457,12 +1457,10 @@ void Model::setupUIControls3D(void)
 	removeItemIDList.push_front(uiControls.hideUnselectedButtonID		= getNotifier()->addMenuPushButton(uiControls.visiblityGroupID, "Hide Unselected", "HideUnselected"));
 
 	removeItemIDList.push_front(uiControls.stateWireframeButtonID		= getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Wireframe", "Wireframe"));
-	removeItemIDList.push_front(uiControls.stateWorkingPlaneButtonID	= getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Working plane", "WorkingPlane",
-		                                                                      ot::ContextMenu("WorkingPlaneContext") << ot::ContextMenuItem("Settings", "Settings", "Settings", ot::ContextMenuItemRole(ot::ContextMenuItemRole::SettingsReference, "Viewer:WorkingPlane"))));
-	removeItemIDList.push_front(uiControls.stateAxisCrossButtonID       = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Axis cross", "AxisCross",
-		                                                                      ot::ContextMenu("AxisCrossContext") << ot::ContextMenuItem("Settings", "Settings", "Settings", ot::ContextMenuItemRole(ot::ContextMenuItemRole::SettingsReference, "Viewer:AxisCross"))));
-	removeItemIDList.push_front(uiControls.stateCenterAxisCrossButtonID = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Center axis cross", "CenterAxisCross",	ot::ContextMenu("CenterAxisCrossContext") << ot::ContextMenuItem("Settings", "Settings", "Settings", ot::ContextMenuItemRole(ot::ContextMenuItemRole::SettingsReference, "Viewer:AxisCross"))));
-	removeItemIDList.push_front(uiControls.cutplaneButtonID             = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Cutplane", "Cutplane",	ot::ContextMenu("CutplaneContext") << ot::ContextMenuItem("Settings", "Settings", "Settings", ot::ContextMenuItemRole(ot::ContextMenuItemRole::SettingsReference, "Viewer:Cutplane"))));
+	removeItemIDList.push_front(uiControls.stateWorkingPlaneButtonID	= getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Working plane", "WorkingPlane"));
+	removeItemIDList.push_front(uiControls.stateAxisCrossButtonID       = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Axis cross", "AxisCross"));
+	removeItemIDList.push_front(uiControls.stateCenterAxisCrossButtonID = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Center axis cross", "CenterAxisCross"));
+	removeItemIDList.push_front(uiControls.cutplaneButtonID             = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Cutplane", "Cutplane"));
 
 	// Send an initial notification to properly set the state of the new controls
 	std::list<ot::UID> selectedTreeItemID;
@@ -3081,8 +3079,7 @@ void Model::viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::V
 	}
 	else
 	{
-		// Now there may be other tabs in the UI, created by a ui plugin
-		//assert(0); // Unknown tab title
+		
 	}
 }
 

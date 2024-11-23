@@ -102,8 +102,7 @@ namespace ot {
 			OT_HANDLER(handleRun, ExternalServicesComponent, OT_ACTION_CMD_Run, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handlePreShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServicePreShutdown, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handleEmergencyShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceEmergencyShutdown, ot::SECURE_MESSAGE_TYPES)
-			OT_HANDLER(handleUIPluginConnected, ExternalServicesComponent, OT_ACTION_CMD_UI_RequestPluginSuccess, ot::SECURE_MESSAGE_TYPES)
-
+			
 			// #####################################################################################################################################
 
 			// Private member

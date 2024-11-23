@@ -65,7 +65,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(UICORE_ENV_INC);%SIM_PLAT_ROOT%\Libraries\Viewer\include;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\include;$(OT_UIPLUGINAPI_ROOT)\include;$(QWT_LIB_ROOT)\src;$(QWT_POLAR_LIB_ROOT)\src;%CURL_INC%;$(Qt_INCLUDEPATH_);$(MONGO_C_ROOT)\ExeDebugTest\include;$(MONGO_CXX_ROOT)\ExeDebugTest\include;$(MONGO_BOOST_ROOT);$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(UICORE_ENV_INC);%OPENTWIN_DEV_ROOT%\Libraries\Viewer\include;%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCommunication\include;$(OPENTWIN_DEV_ROOT)\Libraries\OpenTwinServiceFoundation\include;$(OPENTWIN_DEV_ROOT)\Libraries\OpenTwinLogger\include;$(QWT_LIB_ROOT)\src;$(QWT_POLAR_LIB_ROOT)\src;%CURL_INC%;$(Qt_INCLUDEPATH_);$(MONGO_C_ROOT)\ExeDebugTest\include;$(MONGO_CXX_ROOT)\ExeDebugTest\include;$(MONGO_BOOST_ROOT);$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -98,7 +98,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MinimalRebuild />
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(UICORE_ENV_INC);%SIM_PLAT_ROOT%\Libraries\Viewer\include;%SIM_PLAT_ROOT%\Libraries\OpenTwinCommunication\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinServiceFoundation\include;$(SIM_PLAT_ROOT)\Libraries\OpenTwinLogger\include;$(OT_UIPLUGINAPI_ROOT)\include;$(QWT_LIB_ROOT)\src;$(QWT_POLAR_LIB_ROOT)\src;%CURL_INC%;$(Qt_INCLUDEPATH_);$(MONGO_C_ROOT)\ExeDebugTest\include;$(MONGO_CXX_ROOT)\ExeDebugTest\include;$(MONGO_BOOST_ROOT);$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(UICORE_ENV_INC);%OPENTWIN_DEV_ROOT%\Libraries\Viewer\include;%OPENTWIN_DEV_ROOT%\Libraries\OpenTwinCommunication\include;$(OPENTWIN_DEV_ROOT)\Libraries\OpenTwinServiceFoundation\include;$(OPENTWIN_DEV_ROOT)\Libraries\OpenTwinLogger\include;$(QWT_LIB_ROOT)\src;$(QWT_POLAR_LIB_ROOT)\src;%CURL_INC%;$(Qt_INCLUDEPATH_);$(MONGO_C_ROOT)\ExeDebugTest\include;$(MONGO_CXX_ROOT)\ExeDebugTest\include;$(MONGO_BOOST_ROOT);$(RUBBERBAND_ENGINE_CORE)\include;$(RUBBERBAND_ENGINE_OSG)\include;$(GOOGLE_TEST_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

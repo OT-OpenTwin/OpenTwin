@@ -26,13 +26,11 @@
 
 // AK GUI header
 #include <akGui/aAction.h>
-#include <akGui/aContextMenuItem.h>
 #include <akGui/aDialog.h>
 #include <akGui/aObjectManager.h>
 #include <akGui/aSignalLinker.h>
 #include <akGui/aSpecialTabBar.h>
 #include <akGui/aTimer.h>
-#include <akGui/aToolButtonCustomContextMenu.h>
 #include <akGui/aGlobalKeyListener.h>
 
 // AK Widgets header
@@ -41,7 +39,6 @@
 #include <akWidgets/aComboBoxWidget.h>
 #include <akWidgets/aComboButtonWidget.h>
 #include <akWidgets/aDockWidget.h>
-#include <akWidgets/aDockWatcherWidget.h>
 #include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aListWidget.h>
@@ -49,7 +46,6 @@
 #include <akWidgets/aPushButtonWidget.h>
 #include <akWidgets/aTableWidget.h>
 #include <akWidgets/aTabWidget.h>
-#include <akWidgets/aTextEditWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
 #include <akWidgets/aTtbGroup.h>
 #include <akWidgets/aTtbPage.h>
@@ -212,35 +208,6 @@ ak::UID ak::aObjectManager::createDock(
 	return obj->uid();
 }
 
-ak::UID ak::aObjectManager::createDockWatcher(
-	UID									_creatorUid,
-	const QString &						_text
-) {
-	// Create object
-	aDockWatcherWidget * obj = new aDockWatcherWidget(_text);
-	// Set parameter
-	obj->setUid(m_uidManager->getId());
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createDockWatcher(
-	UID									_creatorUid,
-	const QIcon &						_icon,
-	const QString &						_text
-) {
-	// Create object
-	aDockWatcherWidget * obj = new aDockWatcherWidget(_icon, _text);
-	// Set parameter
-	obj->setUid(m_uidManager->getId());
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
 ak::UID ak::aObjectManager::createGlobalKeyListener(
 	UID											_creatorUid,
 	QApplication *								_app,
@@ -343,21 +310,6 @@ ak::UID ak::aObjectManager::createTable(
 	return obj->uid();
 }
 
-ak::UID ak::aObjectManager::createTextEdit(
-	UID												_creatorUid,
-	const QString &										_initialText
-) {
-	// Create object
-	aTextEditWidget * obj = new aTextEditWidget();
-	obj->setPlainText(_initialText);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
 ak::UID ak::aObjectManager::createTimer(
 	UID												_creatorUid
 ) {
@@ -405,20 +357,6 @@ ak::UID ak::aObjectManager::createToolButton(
 ) {
 	// Create object
 	aToolButtonWidget * obj = new aToolButtonWidget(_icon, _text);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createToolButtonCustomContextMenu(
-	UID												_creatorUid,
-	aToolButtonWidget *								_toolButton
-) {
-	// Create object
-	aToolButtonCustomContextMenu * obj = new aToolButtonCustomContextMenu(_toolButton);
 	// Set parameter
 	m_signalLinker->addLink(obj);
 	// Store data

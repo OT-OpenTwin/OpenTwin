@@ -120,24 +120,6 @@ namespace ak {
 			const QString &										_text = QString()
 		);
 
-		//! @brief Will create a new DockWatcher and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _text The initial text of the DockWatcher
-		UID createDockWatcher(
-			UID									_creatorUid,
-			const QString &						_text = QString("Docks")
-		);
-
-		//! @brief Will create a new DockWatcher and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _icon The initial icon of the DockWatcher
-		//! @param _text The initial text of the DockWatcher
-		UID createDockWatcher(
-			UID									_creatorUid,
-			const QIcon &						_icon,
-			const QString &						_text = QString("Docks")
-		);
-
 		UID createGlobalKeyListener(
 			UID											_creatorUid,
 			QApplication *								_app,
@@ -197,14 +179,6 @@ namespace ak {
 			int													_columns
 		);
 
-		//! @brief Will create a text edit and return its UID
-		//! @param _creatorUid The UID of the creator
-		//! @param _initialText The initial text of the text edit
-		UID createTextEdit(
-			UID												_creatorUid,
-			const QString &										_initialText = QString("")
-		);
-
 		//! @brief WIll create a timer and return its UID
 		//! @param _creatorUid The UID of the creator
 		UID createTimer(
@@ -215,11 +189,6 @@ namespace ak {
 		//! @param _creatorUid The UID of the creator
 		UID createToolButton(
 			UID												_creatorUid
-		);
-
-		UID createToolButtonCustomContextMenu(
-			UID												_creatorUid,
-			aToolButtonWidget *								_toolButton
 		);
 
 		//! @brief Will create a toolButton and return its UID

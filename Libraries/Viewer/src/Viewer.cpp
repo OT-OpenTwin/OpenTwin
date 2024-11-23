@@ -1224,14 +1224,6 @@ void Viewer::settingsSynchronized(const ot::PropertyGridCfg& _dataset) {
 	if (useVertexBuffers) { settings->useVertexBufferObjects = useVertexBuffers->getValue(); }
 }
 
-void Viewer::contextMenuItemClicked(const std::string& _menuName, const std::string& _itemName) {
-
-}
-
-void Viewer::contextMenuItemCheckedChanged(const std::string& _menuName, const std::string& _itemName, bool _isChecked) {
-
-}
-
 void Viewer::toggleWorkingPlane(void) {
 	if (workingPlane->setVisible(!workingPlane->isVisible())) {
 		getNotifier()->updateSettings(createSettings());

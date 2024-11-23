@@ -15,7 +15,7 @@
 
 namespace ot {
 
-	class ContextMenuAction : public QAction {
+	class OT_WIDGETS_API_EXPORT ContextMenuAction : public QAction {
 		OT_DECL_NOCOPY(ContextMenuAction)
 	public:
 		ContextMenuAction(QObject* _parent = (QObject*) nullptr);

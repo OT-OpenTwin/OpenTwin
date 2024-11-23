@@ -64,6 +64,9 @@ namespace ot {
 
 		const std::list<MenuEntryCfg*>& getEntries(void) const { return m_childs; };
 
+		//! @brief Returns true if this menu has no buttons (child menus do not count).
+		bool isEmpty(void) const;
+
 	private:
 		void clear(void);
 

@@ -127,6 +127,25 @@ ot::MenuButtonCfg* ot::MenuCfg::findMenuButton(const std::string& _name) const {
 	return nullptr;
 }
 
+bool ot::MenuCfg::isEmpty(void) const {
+	for (const MenuEntryCfg* child : m_childs) {
+		const MenuButtonCfg* button = dynamic_cast<const MenuButtonCfg*>(child);
+		if (button) {
+			return false;
+		}
+		else {
+			const MenuCfg* childMenu = dynamic_cast<const MenuCfg*>(child);
+			if (childMenu) {
+				if (!childMenu->isEmpty()) {
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
 void ot::MenuCfg::clear(void) {
 	for (MenuEntryCfg* child : m_childs) {
 		delete child;

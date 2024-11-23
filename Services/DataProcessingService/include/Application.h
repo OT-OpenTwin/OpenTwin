@@ -69,9 +69,6 @@ public:
 	//! @brief Will be called when a UI disconnected from the session (is already closed)
 	virtual void uiDisconnected(const ot::components::UiComponent * _ui) override;
 
-	//! @brief Will be called when a UI plugin was sucessfully connected
-	virtual void uiPluginConnected(ot::components::UiPluginComponent * _uiPlugin) override;
-
 	//! @brief Will be called when a model service connected to the session and is ready to work
 	virtual void modelConnected(ot::components::ModelComponent * _model) override;
 

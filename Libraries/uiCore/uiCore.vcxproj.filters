@@ -153,16 +153,10 @@
     <ClCompile Include="src\akWidgets\aPushButtonWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\akWidgets\aRadioButtonWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\akWidgets\aTableWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="src\akWidgets\aTabWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aTextEditWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="src\akWidgets\aToolButtonWidget.cpp">
@@ -198,9 +192,6 @@
     <ClCompile Include="src\akGui\aTimer.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
-    <ClCompile Include="src\akGui\aContextMenuItem.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
     <ClCompile Include="src\akWidgets\aGraphicsWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
@@ -222,9 +213,6 @@
     <ClCompile Include="src\akWidgets\aDoubleSpinBoxWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\akWidgets\aDockWatcherWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\akCore\aDate.cpp">
       <Filter>Source Files\ak\Core</Filter>
     </ClCompile>
@@ -234,17 +222,11 @@
     <ClCompile Include="src\akGui\aGlobalKeyListener.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
-    <ClCompile Include="src\akGui\aToolButtonCustomContextMenu.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
     <ClCompile Include="src\akWidgets\aAnimationOverlayWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="src\akTools\ClassHelper.cpp">
       <Filter>Source Files\ak\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aPlainTextEditWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -370,16 +352,10 @@
     <QtMoc Include="include\akWidgets\aPushButtonWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\akWidgets\aRadioButtonWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
     <QtMoc Include="include\akWidgets\aTableWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\akWidgets\aTabWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aTextEditWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\akWidgets\aToolButtonWidget.h">
@@ -403,9 +379,6 @@
     <QtMoc Include="include\akGui\aSpecialTabBar.h">
       <Filter>Header Files\ak\Gui</Filter>
     </QtMoc>
-    <QtMoc Include="include\akGui\aContextMenuItem.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </QtMoc>
     <QtMoc Include="include\akWidgets\aDatePickWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
@@ -418,22 +391,13 @@
     <QtMoc Include="include\akWidgets\aDoubleSpinBoxWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\akWidgets\aDockWatcherWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
     <QtMoc Include="include\akGui\aGlobalKeyListener.h">
       <Filter>Header Files\ak\Gui</Filter>
     </QtMoc>
     <QtMoc Include="include\akGui\aDialog.h">
       <Filter>Header Files\ak\Gui</Filter>
     </QtMoc>
-    <QtMoc Include="include\akGui\aToolButtonCustomContextMenu.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </QtMoc>
     <QtMoc Include="include\akWidgets\aAnimationOverlayWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aPlainTextEditWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
   </ItemGroup>

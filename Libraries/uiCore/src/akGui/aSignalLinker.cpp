@@ -20,7 +20,6 @@
 #include <akGui/aSignalLinker.h>
 #include <akGui/aTimer.h>
 #include <akGui/aGlobalKeyListener.h>
-#include <akGui/aToolButtonCustomContextMenu.h>
 
 // AK Widgets header
 #include <akWidgets/aCheckBoxWidget.h>
@@ -33,7 +32,6 @@
 #include <akWidgets/aPushButtonWidget.h>
 #include <akWidgets/aTableWidget.h>
 #include <akWidgets/aTabWidget.h>
-#include <akWidgets/aTextEditWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
 
 // Qt header
@@ -97,7 +95,6 @@ ak::aSignalLinker::~aSignalLinker()
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
 			break;
 		case otDock:
-			itm->second.object->disconnect(itm->second.object, SIGNAL(visibilityChanged(bool)), this, SLOT(slotVisibilityChanged(bool)));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(closing()), this, SLOT(slotClosing()));
 			break;
 		case otPropertyGrid:
@@ -147,7 +144,6 @@ ak::aSignalLinker::~aSignalLinker()
 			itm->second.object->disconnect(itm->second.object, SIGNAL(textChanged()), this, SLOT(slotChanged()));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(contextMenuItemClicked(ak::ID)), this, SLOT(slotContextMenuItemClicked(ak::ID)));
 			break;
 		case otTimer:
 			itm->second.object->disconnect(itm->second.object, SIGNAL(timeout()), this, SLOT(slotTimeout()));
@@ -156,8 +152,6 @@ ak::aSignalLinker::~aSignalLinker()
 			itm->second.object->disconnect(itm->second.object, SIGNAL(btnClicked()), this, SLOT(slotClicked()));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(slotKeyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(menuItemClicked(ak::ID)), this, SLOT(slotContextMenuItemClicked(ak::ID)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(menuItemCheckedChanged(ak::ID, bool)), this, SLOT(slotContextMenuItemCheckedChanged(ak::ID, bool)));
 			break;
 		case otTree:
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
@@ -314,7 +308,6 @@ ak::UID ak::aSignalLinker::addLink(
 	_object->setUid(_objectUid);
 	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otDock });
 
-	_object->connect(_object, &aDockWidget::visibilityChanged, this, &aSignalLinker::slotVisibilityChanged);
 	_object->connect(_object, &aDockWidget::closing, this, &aSignalLinker::slotClosing);
 
 	return _objectUid;
@@ -371,23 +364,6 @@ ak::UID ak::aSignalLinker::addLink(
 }
 
 ak::UID ak::aSignalLinker::addLink(
-	aTextEditWidget *									_object,
-	UID													_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otTextEdit });
-	_object->connect(_object, &QTextEdit::cursorPositionChanged, this, &aSignalLinker::slotCursorPositionChanged);
-	_object->connect(_object, &QTextEdit::selectionChanged, this, &aSignalLinker::slotSelectionChanged);
-	_object->connect(_object, &QTextEdit::textChanged, this, &aSignalLinker::slotChanged);
-	_object->connect(_object, &aTextEditWidget::keyPressed, this, &aSignalLinker::slotKeyPressed);
-	_object->connect(_object, &aTextEditWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
-	_object->connect(_object, &aTextEditWidget::contextMenuItemClicked, this, &aSignalLinker::slotContextMenuItemClicked);
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
 	aTimer *											_object,
 	UID													_objectUid
 ) {
@@ -412,21 +388,6 @@ ak::UID ak::aSignalLinker::addLink(
 	_object->connect(_object, &aToolButtonWidget::btnClicked, this, &aSignalLinker::slotClicked);
 	_object->connect(_object, &aToolButtonWidget::keyPressed, this, &aSignalLinker::slotKeyPressed);
 	_object->connect(_object, &aToolButtonWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
-	_object->connect(_object, &aToolButtonWidget::menuItemClicked, this, &aSignalLinker::slotContextMenuItemClicked);
-	_object->connect(_object, &aToolButtonWidget::menuItemCheckedChanged, this, &aSignalLinker::slotContextMenuItemCheckedChanged);
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aToolButtonCustomContextMenu *						_object,
-	UID													_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otToolButtonCustomContextMenu });
-	_object->connect(_object, &aToolButtonCustomContextMenu::menuItemClicked, this, &aSignalLinker::slotContextMenuItemClicked);
-	_object->connect(_object, &aToolButtonCustomContextMenu::menuItemCheckedChanged, this, &aSignalLinker::slotContextMenuItemCheckedChanged);
 	return _objectUid;
 }
 
@@ -534,16 +495,6 @@ void ak::aSignalLinker::slotToggled(bool _checked)
 }
 
 void ak::aSignalLinker::slotTimeout(void) { raiseEvent(getSenderUid(sender()), etTimeout, 0, 0); }
-
-void ak::aSignalLinker::slotContextMenuItemClicked(ak::ID _itemId) { raiseEvent(getSenderUid(sender()), etContextMenuItemClicked, _itemId, 0); }
-
-void ak::aSignalLinker::slotContextMenuItemCheckedChanged(ak::ID _itemId, bool _isChecked) {
-	raiseEvent(getSenderUid(sender()), etContextMenuItemCheckedChanged, _itemId, _isChecked);
-}
-
-void ak::aSignalLinker::slotVisibilityChanged(bool _visibility) {
-	raiseEvent(getSenderUid(sender()), etContextMenuItemCheckedChanged, _visibility, 0);
-}
 
 void ak::aSignalLinker::slotClosing(void) {
 	raiseEvent(getSenderUid(sender()), etClosing, 0, 0);

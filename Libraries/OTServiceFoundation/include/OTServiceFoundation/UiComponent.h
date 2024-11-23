@@ -16,7 +16,6 @@
 #include "OTGui/StyledTextBuilder.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 #include "OTServiceFoundation/MenuButtonDescription.h"
-#include "OTServiceFoundation/ContextMenu.h"
 
 // C++ header
 #include <list>
@@ -28,8 +27,6 @@ namespace ot {
 	class ApplicationBase;
 	
 	namespace components {
-
-		class UiPluginComponent;
 
 		class OT_SERVICEFOUNDATION_API_EXPORT UiComponent : public ServiceBase {
 		public:
@@ -106,8 +103,7 @@ namespace ot {
 				const LockTypeFlags &		_lockTypes,
 				const std::string &			_iconName,
 				const std::string &			_iconFolder = std::string("Default"),
-				const std::string &			_keySequence = std::string(""),
-				const ContextMenu&			_contextMenu = ContextMenu("")
+				const std::string &			_keySequence = std::string("")
 			);
 
 			void addMenuButton(
@@ -115,8 +111,7 @@ namespace ot {
 				const LockTypeFlags&		_lockTypes,
 				const std::string &			_iconName,
 				const std::string &			_iconFolder = std::string("Default"),
-				const std::string &			_keySequence = std::string(""),
-				const ContextMenu&			_contextMenu = ContextMenu("")
+				const std::string &			_keySequence = std::string("")
 			);
 
 
@@ -139,8 +134,7 @@ namespace ot {
 				const LockTypeFlags&		_lockTypes,
 				const std::string &			_iconName,
 				const std::string &			_iconFolder = std::string("Default"),
-				const std::string &			_keySequence = std::string(""),
-				const ContextMenu&			_contextMenu = ContextMenu("")
+				const std::string &			_keySequence = std::string("")
 			);
 
 			//! @brief Will add a new CheckBox in the specified menu group at the UI
@@ -429,20 +423,6 @@ namespace ot {
 			void setControlState(const std::string controlName, bool enabled);
 
 			bool sendMessage(bool _queue, JsonDocument& _doc, std::string& _response);
-
-			// Plugin
-
-			//! @brief Will request the uiService to load the specified plugin
-			//! The request will be queued.
-			//! Upon connection the Service will be netified by providing a UiPluginComponent.
-			//! @param _pluginName The name of the plugin. The name must be unique for a service and can be used to access the plugin later
-			//! @param _filename The filename or the full path of the plugin
-			void requestUiPlugin(const std::string& _pluginName, const std::string& _filename);
-
-			//! @brief Will add the provided path to the uiService plugin manager
-			//! If a plugin will be requested the provided path will be searched for the plugin.
-			//! This function has no effect when running in release mode
-			void addPluginSearchPath(const std::string& _pluginPath);
 
 		protected:
 

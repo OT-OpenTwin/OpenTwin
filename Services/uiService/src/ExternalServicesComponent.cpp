@@ -14,8 +14,6 @@
 #include "ToolBar.h"
 #include "ShortcutManager.h"
 #include "UserSettings.h"
-#include "ContextMenuManager.h"
-#include "UiPluginManager.h"
 #include "SelectEntitiesDialog.h"
 #include "ServiceDataUi.h"
 #include "UserManagement.h"
@@ -73,8 +71,6 @@
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/Msg.h"
-
-#include "OTServiceFoundation/ContextMenu.h"
 
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
@@ -757,43 +753,6 @@ void ExternalServicesComponent::prefetchDataThread(const std::string &projectNam
 {
 	prefetchDocumentsFromStorage(projectName, prefetchIDs);
 	m_prefetchingDataCompleted = true;
-}
-
-void ExternalServicesComponent::contextMenuItemClicked(ot::ServiceBase * _sender, const std::string& _menuName, const std::string& _itemName) {
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ContextMenuItemClicked, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenuName, ot::JsonString(_menuName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName, ot::JsonString(_itemName, doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	sendHttpRequest(EXECUTE, _sender->getServiceURL(), doc, response);
-
-	// Check if response is an error or warning
-	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		OT_LOG_E(response);
-	}
-	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		OT_LOG_W(response);
-	}
-}
-
-void ExternalServicesComponent::contextMenuItemCheckedChanged(ot::ServiceBase* _sender, const std::string& _menuName, const std::string& _itemName, bool _isChecked) {
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenuName, ot::JsonString(_menuName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName, ot::JsonString(_itemName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_CheckedState, _isChecked, doc.GetAllocator());
-
-	std::string response;
-	sendHttpRequest(EXECUTE, _sender->getServiceURL(), doc, response);
-
-	// Check if response is an error or warning
-	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		OT_LOG_E(response);
-	}
-	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		OT_LOG_W(response);
-	}
 }
 
 bool ExternalServicesComponent::projectIsOpened(const std::string &projectName, std::string &projectUser)
@@ -1503,8 +1462,6 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 			m_lockManager->cleanService(s.second, false, true);
 			m_controlsManager->serviceDisconnected(s.second);
 			app->shortcutManager()->creatorDestroyed(s.second);
-			app->contextMenuManager()->serviceDisconnected(s.second);
-			m_owner->uiPluginManager()->unloadPlugins(s.second);
 			delete s.second;
 		}
 		m_lockManager->cleanService(app->getViewerComponent());
@@ -1513,7 +1470,6 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		app->shortcutManager()->clearViewerHandler();
 		app->clearNavigationTree();
 		app->clearPropertyGrid();
-		app->contextMenuManager()->serviceDisconnected(nullptr);
 		app->clearGraphicsPickerData();
 
 		// Clear all maps
@@ -2215,9 +2171,7 @@ std::string ExternalServicesComponent::handleServiceDisconnected(ot::JsonDocumen
 		// Clean up elements
 		m_lockManager->cleanService(actualService, false, true);
 		m_controlsManager->serviceDisconnected(actualService);
-		m_owner->uiPluginManager()->unloadPlugins(actualService);
 		AppBase::instance()->shortcutManager()->creatorDestroyed(actualService);
-		AppBase::instance()->contextMenuManager()->serviceDisconnected(actualService);
 
 		// Clean up entry
 		m_serviceIdMap.erase(actualService->getServiceID());
@@ -2691,11 +2645,7 @@ std::string ExternalServicesComponent::handleAddMenuButton(ot::JsonDocument& _do
 	std::string iconName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_IconName);
 	std::string iconFolder = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	ot::ContextMenu contextMenu("");
-	if (_document.HasMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenu)) {
-		ot::ConstJsonObject contextMenuData = ot::json::getObject(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenu);
-		contextMenu.setFromJsonObject(contextMenuData);
-	}
+	
 	ServiceDataUi* senderService = getService(serviceId);
 	
 	ot::LockTypeFlags flags = (ot::LockAll);
@@ -2740,10 +2690,6 @@ std::string ExternalServicesComponent::handleAddMenuButton(ot::JsonDocument& _do
 					ak::uiAPI::toolButton::setToolTip(buttonID, text.c_str());
 				}
 			}
-		}
-
-		if (contextMenu.hasItems()) {
-			AppBase::instance()->contextMenuManager()->createItem(senderService, getServiceUiUid(senderService), buttonID, contextMenu);
 		}
 	}
 
@@ -4377,60 +4323,6 @@ std::string ExternalServicesComponent::handleMessageDialog(ot::JsonDocument& _do
 	std::string response;
 	sendHttpRequest(EXECUTE, info, responseDoc, response);
 
-	return "";
-}
-
-// Plugin handling
-
-std::string ExternalServicesComponent::handlePluginSearchPath(ot::JsonDocument& _document) {
-#ifdef _DEBUG
-	std::string pluginPath = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_PATH);
-	m_owner->uiPluginManager()->addPluginSearchPath(pluginPath.c_str());
-	AppBase::instance()->appendDebugMessage("[ERROR] Added UI plugin search path: " + QString::fromStdString(pluginPath));
-#endif // _DEBUG
-	return "";
-}
-
-std::string ExternalServicesComponent::handleRequestPlugin(ot::JsonDocument& _document) {
-	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	std::string pluginName = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_NAME);
-	std::string pluginPath = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_PATH);
-	ServiceDataUi* service = getService(serviceId);
-	ak::UID pluginUid = m_owner->uiPluginManager()->loadPlugin(pluginName.c_str(), pluginPath.c_str(), service);
-
-	if (pluginUid) {
-		AppBase* app = AppBase::instance();
-
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestPluginSuccess, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, app->getServiceID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(app->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(app->getServiceName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(app->getServiceType(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_NAME, ot::JsonString(pluginName, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_UID, pluginUid, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_PATH, ot::JsonString(pluginPath, doc.GetAllocator()), doc.GetAllocator());
-
-		std::string response;
-		sendHttpRequest(EXECUTE, service->getServiceURL(), doc, response);
-
-		// Check if response is an error or warning
-		OT_ACTION_IF_RESPONSE_ERROR(response) { assert(0); }
-		else OT_ACTION_IF_RESPONSE_WARNING(response) { assert(0); }
-	}
-	return "";
-}
-
-std::string ExternalServicesComponent::handlePluginMessage(ot::JsonDocument& _document) {
-	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	std::string pluginAction = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_ACTION_MEMBER);
-	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	std::string pluginName = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_NAME);
-	unsigned long long pluginUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_UI_PLUGIN_UID);
-	ServiceDataUi* service = getService(serviceId);
-	if (!AppBase::instance()->uiPluginManager()->forwardMessageToPlugin(pluginUID, pluginAction, message)) {
-		return OT_ACTION_RETURN_INDICATOR_Error "Failed to process message";
-	}
 	return "";
 }
 

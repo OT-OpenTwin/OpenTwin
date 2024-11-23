@@ -43,6 +43,7 @@
     <ClCompile Include="src\ComboButton.cpp" />
     <ClCompile Include="src\ContextMenu.cpp" />
     <ClCompile Include="src\ContextMenuAction.cpp" />
+    <ClCompile Include="src\ContextMenuManager.cpp" />
     <ClCompile Include="src\CreateProjectDialog.cpp" />
     <ClCompile Include="src\CustomGraphicsItem.cpp" />
     <ClCompile Include="src\Dialog.cpp" />
@@ -207,6 +208,7 @@
     <QtMoc Include="include\OTWidgets\CreateProjectDialog.h" />
     <QtMoc Include="include\OTWidgets\ContextMenu.h" />
     <ClInclude Include="include\OTWidgets\ContextMenuAction.h" />
+    <QtMoc Include="include\OTWidgets\ContextMenuManager.h" />
     <ClInclude Include="include\OTWidgets\GraphicsArcItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsElement.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionPreviewItem.h" />

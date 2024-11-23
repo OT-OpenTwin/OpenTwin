@@ -937,24 +937,6 @@ void ViewerAPI::settingsItemChanged(ot::UID _viewerID, const ot::Property* _item
 	viewer->second->settingsItemChanged(_item);
 }
 
-void ViewerAPI::contextMenuItemClicked(ot::UID _viewerID, const std::string& _menuName, const std::string& _itemName) {
-	auto viewer = viewerManager.find(_viewerID);
-	if (viewer == viewerManager.end()) {
-		assert(0);
-		return;
-	}
-	viewer->second->contextMenuItemClicked(_menuName, _itemName);
-}
-
-void ViewerAPI::contextMenuItemCheckedChanged(ot::UID _viewerID, const std::string& _menuName, const std::string& _itemName, bool _isChecked) {
-	auto viewer = viewerManager.find(_viewerID);
-	if (viewer == viewerManager.end()) {
-		assert(0);
-		return;
-	}
-	viewer->second->contextMenuItemCheckedChanged(_menuName, _itemName, _isChecked);
-}
-
 bool ViewerAPI::propertyGridValueChanged(ot::UID _viewerID, const ot::Property* _property)
 {
 	auto viewer = viewerManager.find(_viewerID);

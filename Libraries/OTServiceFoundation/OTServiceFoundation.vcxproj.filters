@@ -4,9 +4,6 @@
     <ClCompile Include="src\ApplicationBase.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\ContextMenu.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\BusinessLogicHandler.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -40,9 +37,6 @@
     <ClCompile Include="src\UiComponent.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\UiPluginComponent.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\UserCredentials.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -70,9 +64,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\BusinessLogicHandler.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\ContextMenu.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\Encryption.h">
@@ -127,9 +118,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\UiComponent.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\UiPluginComponent.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\UserCredentials.h">

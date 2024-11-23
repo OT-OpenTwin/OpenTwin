@@ -82,10 +82,6 @@ public:
 	bool geometrySettingsItemChanged(const std::string& _logicalName, const ot::Property*_item, bool& _settingsUpdateRequired);
 	bool displaySettingsItemChanged(const std::string& _logicalName, const ot::Property*_item, bool& _settingsUpdateRequired);
 
-	void contextMenuItemClicked(const std::string& _menuName, const std::string& _itemName);
-
-	void contextMenuItemCheckedChanged(const std::string& _menuName, const std::string& _itemName, bool _isChecked);
-
 	void toggleWorkingPlane(void);
 	void setWorkingPlaneTransform(osg::Matrix matrix);
 	osg::Matrix getWorkingPlaneTransform(void);
