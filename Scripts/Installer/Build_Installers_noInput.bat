@@ -78,6 +78,8 @@ REM	"!SEVENZIP_REG_DATA!\7z.exe" x !PLUGIN_ZIPFILE! -o!NSIS_REG_VALUE! -y -aos
 	echo Copying Installation helpers...
 	RMDIR /S /Q "!HELPER_PATH!"
 	mkdir !HELPER_PATH!
+
+	Call "%OPENTWIN_DEV_ROOT%\Scripts\Installer\CreateBuildInformation.bat"
 	
 	cd !HELPER_PATH!
 	mkdir Configuration

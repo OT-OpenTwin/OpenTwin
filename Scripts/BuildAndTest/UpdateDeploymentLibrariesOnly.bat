@@ -195,13 +195,6 @@ COPY "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\.htaccess" "%OPENTWIN_D
 COPY /Y "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\httpd.conf" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\conf"
 COPY /Y "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\httpd-ahssl.conf" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\conf\extra"
 
-REM ====================================================================
-REM  Create the build informatiomn file
-REM ====================================================================
-
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CreateBuildInformation.bat"
-
-
 GOTO END
 
 :PAUSE_END
