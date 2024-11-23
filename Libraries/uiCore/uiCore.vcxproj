@@ -222,11 +222,9 @@
     <ClCompile Include="src\akWidgets\aComboBoxWidget.cpp" />
     <ClCompile Include="src\akWidgets\aComboButtonWidget.cpp" />
     <ClCompile Include="src\akWidgets\aComboButtonWidgetItem.cpp" />
-    <ClCompile Include="src\akWidgets\aDoubleSpinBoxWidget.cpp" />
     <ClCompile Include="src\akWidgets\aLabelWidget.cpp" />
     <ClCompile Include="src\akWidgets\aLineEditWidget.cpp" />
     <ClCompile Include="src\akWidgets\aNiceLineEditWidget.cpp" />
-    <ClCompile Include="src\akWidgets\aSpinBoxWidget.cpp" />
     <ClCompile Include="src\akWidgets\aToolButtonWidget.cpp" />
     <ClCompile Include="src\akWidgets\aTreeWidget.cpp" />
     <ClCompile Include="src\akWidgets\aTtbGroup.cpp" />
@@ -256,8 +254,6 @@
     <ClInclude Include="include\akGui\aWindowEventHandler.h" />
     <QtMoc Include="include\akWidgets\aAnimationOverlayWidget.h" />
     <ClInclude Include="include\akTools\ClassHelper.h" />
-    <QtMoc Include="include\akWidgets\aSpinBoxWidget.h" />
-    <QtMoc Include="include\akWidgets\aDoubleSpinBoxWidget.h" />
     <ClInclude Include="include\akWidgets\aTtbGroup.h" />
     <ClInclude Include="include\akWidgets\aTtbPage.h" />
     <ClInclude Include="include\akWidgets\aTtbSubgroup.h" />

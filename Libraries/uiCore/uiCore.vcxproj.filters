@@ -153,12 +153,6 @@
     <ClCompile Include="src\akGui\aTimer.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
-    <ClCompile Include="src\akWidgets\aSpinBoxWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aDoubleSpinBoxWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\akWidgets\aAnimationOverlayWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
@@ -269,12 +263,6 @@
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\akWidgets\aWindowManagerTimerSignalLinker.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aSpinBoxWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aDoubleSpinBoxWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\akWidgets\aAnimationOverlayWidget.h">
