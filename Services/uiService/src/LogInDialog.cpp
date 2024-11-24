@@ -523,7 +523,7 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 		msg.append("Incompatible versions of frontend and backend services.");
 		break;
 	case WorkerError::GSSConnectionFailed:
-		msg.append("Failed to connect to Global Session Service.");
+		msg.append("Failed to connect to Global Session Service. Check backend service status, firewall settings and certificates.");
 		break;
 	case WorkerError::InvalidGssResponse:
 		msg.append("Invalid Global Session Service response.");
