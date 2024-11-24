@@ -12,6 +12,7 @@
 #include "Session.h"
 
 // OpenTwin header
+#include "OTSystem/SystemInformation.h"
 #include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/Msg.h"
@@ -24,9 +25,11 @@
 
 // std header
 #include <iostream>
+#include <fstream>
 #include <thread>
 #include <chrono>
 #include <limits>
+#include <filesystem>
 
 GlobalSessionService * g_instance{ nullptr };
 
@@ -270,6 +273,14 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 	}
 
 	return result.toJson();
+}
+
+std::string GlobalSessionService::handleGetBuildInformation(ot::JsonDocument& _doc)
+{
+	ot::SystemInformation info;
+	std::string buildInfo = info.getBuildInformation();
+
+	return buildInfo;
 }
 
 std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {

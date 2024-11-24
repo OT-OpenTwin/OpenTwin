@@ -10,7 +10,7 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
-#include "OTSystem/SystemLoadInformation.h"
+#include "OTSystem/SystemInformation.h"
 
 // std header
 #include <string> // string
@@ -109,7 +109,7 @@ namespace ot {
 
 			ApplicationBase * m_application;			// The application object
 			ComponentState    m_componentState;
-			SystemLoadInformation m_systemLoad;
+			SystemInformation m_systemLoad;
 
 			std::string credentialsUsername;
 			std::string credentialsPassword;

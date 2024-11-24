@@ -17,7 +17,7 @@
 #include "OTCommunication/ActionHandler.h"
 #include "OTCommunication/ActionHandleConnector.h"
 #include "OTServiceFoundation/IDManager.h"
-#include "OTSystem/SystemLoadInformation.h"
+#include "OTSystem/SystemInformation.h"
 
 // C++ header
 #include <string>
@@ -48,7 +48,7 @@ private:
 	ot::IDManager<ot::serviceID_t>			m_ldsIdManager;
 	std::mutex								m_mutex;
 	StartupDispatcher						m_startupDispatcher;
-	ot::SystemLoadInformation				m_systemLoadInformation;
+	ot::SystemInformation					m_systemLoadInformation;
 	ot::LogModeManager m_logModeManager;
 
 public:

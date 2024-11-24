@@ -22,6 +22,7 @@
 #define OT_ACTION_CMD_GetAuthorisationServerUrl "Get.AuthURL"
 #define OT_ACTION_CMD_GetGlobalServicesUrl "Get.GlobalServicesURL"
 #define OT_ACTION_CMD_GetMandatoryServices "Get.MandatoryServices"
+#define OT_ACTION_CMD_GetBuildInformation "Get.BuildInformation"
 
 #define OT_ACTION_CMD_Message "Message"
 #define OT_ACTION_CMD_Compound "Compound"

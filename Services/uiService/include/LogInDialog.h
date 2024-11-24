@@ -58,6 +58,7 @@ private:
 	enum class WorkerError {
 		NoError,
 		GSSConnectionFailed,
+		IncompatibleVersions,
 		InvalidGssResponse,
 		InvalidGssResponseSyntax,
 		AuthorizationConnetionFailed,
@@ -135,6 +136,7 @@ private:
 	void loginWorkerStart(void);
 	void registerWorkerStart(void);
 	void changePasswordWorkerStart(void);
+	WorkerError workerCheckVersionCompatibility(void);
 	WorkerError workerConnectToGSS(void);
 	WorkerError workerLogin(const UserManagement& _userManager);
 	WorkerError workerRegister(const UserManagement& _userManager);

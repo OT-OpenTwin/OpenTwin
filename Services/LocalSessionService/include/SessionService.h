@@ -19,7 +19,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTCommunication/ActionHandleConnector.h"
-#include "OTSystem/SystemLoadInformation.h"
+#include "OTSystem/SystemInformation.h"
 
 // C++ header
 #include <string>
@@ -199,7 +199,7 @@ private:
 	std::string									m_ip;
 	std::string									m_port;
 	ot::serviceID_t								m_id;
-	ot::SystemLoadInformation					m_systemLoadInformation;
+	ot::SystemInformation						m_systemLoadInformation;
 
 	//NOTE, debug only this variable contains the IP address that is used for the services 
 	

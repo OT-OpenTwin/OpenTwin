@@ -24,7 +24,7 @@
     <ClCompile Include="src\Network.cpp" />
     <ClCompile Include="src\OperatingSystem.cpp" />
     <ClCompile Include="src\PortManager.cpp" />
-    <ClCompile Include="src\SystemLoadInformation.cpp" />
+    <ClCompile Include="src\SystemInformation.cpp" />
     <ClCompile Include="src\UrlEncoding.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -34,7 +34,7 @@
     <ClInclude Include="include\OTSystem\OperatingSystem.h" />
     <ClInclude Include="include\OTSystem\PortManager.h" />
     <ClInclude Include="include\OTSystem\SystemAPIExport.h" />
-    <ClInclude Include="include\OTSystem\SystemLoadInformation.h" />
+    <ClInclude Include="include\OTSystem\SystemInformation.h" />
     <ClInclude Include="include\OTSystem\SystemTypes.h" />
     <ClInclude Include="include\OTSystem\UrlEncoding.h" />
   </ItemGroup>
@@ -121,6 +121,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -158,6 +160,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

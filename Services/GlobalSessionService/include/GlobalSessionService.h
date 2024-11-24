@@ -15,7 +15,7 @@
 #include "OTCommunication/ActionHandler.h"
 #include "OTCommunication/ActionHandleConnector.h"
 #include "OTServiceFoundation/IDManager.h"
-#include "OTSystem/SystemLoadInformation.h"
+#include "OTSystem/SystemInformation.h"
 
 // C++ header
 #include <string>
@@ -60,6 +60,7 @@ private:
 	OT_HANDLER(handleCreateSession, GlobalSessionService, OT_ACTION_CMD_CreateNewSession, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleCheckProjectOpen, GlobalSessionService, OT_ACTION_CMD_IsProjectOpen, ot::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleGetProjectTemplatesList, GlobalSessionService, OT_ACTION_CMD_GetListOfProjectTemplates, ot::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleGetBuildInformation, GlobalSessionService, OT_ACTION_CMD_GetBuildInformation, ot::ALL_MESSAGE_TYPES)
 
 	OT_HANDLER(handleGetSystemInformation, GlobalSessionService, OT_ACTION_CMD_GetSystemInformation, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleRegisterSessionService, GlobalSessionService, OT_ACTION_CMD_RegisterNewSessionService, ot::SECURE_MESSAGE_TYPES)
@@ -99,7 +100,7 @@ private:
 	std::map<ot::serviceID_t, LocalSessionService*>	m_sessionServiceIdMap;
 	ot::IDManager<ot::serviceID_t>				m_sessionServiceIdManager;
 	bool										m_forceHealthCheck;
-	ot::SystemLoadInformation					m_SystemLoadInformation;
+	ot::SystemInformation						m_SystemLoadInformation;
 
 	ot::LogModeManager m_logModeManager;
 

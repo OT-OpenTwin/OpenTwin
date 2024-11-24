@@ -16,7 +16,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTCommunication/ActionHandleConnector.h"
-#include "OTSystem/SystemLoadInformation.h"
+#include "OTSystem/SystemInformation.h"
 
 // C++ header
 #include <string>
@@ -56,7 +56,7 @@ private:
 
 	ServiceManager				m_serviceManager;
 	GlobalDirectoryService		m_globalDirectoryService;
-	ot::SystemLoadInformation	m_systemLoadInformation;
+	ot::SystemInformation		m_systemLoadInformation;
 
 	// ##################################################################################################################################
 public:

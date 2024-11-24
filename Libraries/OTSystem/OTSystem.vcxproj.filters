@@ -30,7 +30,7 @@
     <ClCompile Include="src\PortManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SystemLoadInformation.cpp">
+    <ClCompile Include="src\SystemInformation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\UrlEncoding.cpp">
@@ -59,7 +59,7 @@
     <ClInclude Include="include\OTSystem\SystemTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTSystem\SystemLoadInformation.h">
+    <ClInclude Include="include\OTSystem\SystemInformation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OTSystem\UrlEncoding.h">

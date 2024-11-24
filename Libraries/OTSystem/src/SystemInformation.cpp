@@ -1,25 +1,31 @@
 
-#include "OTSystem/SystemLoadInformation.h"
+#include "OTSystem/SystemInformation.h"
+#include "OTSystem/Application.h"
 
 #include <windows.h>
 #include <psapi.h>
 #include <thread>
+#include <filesystem>
+#include <fstream>
 
-ot::SystemLoadInformation::SystemLoadInformation() :
+ot::SystemInformation::SystemInformation() :
 	m_initialized(false),
 	m_cpuQuery(0),
 	m_cpuTotal(0),
 	m_numProcessors(0),
-	m_self(0)
+	m_self(0),
+	m_lastCPU({0}),
+	m_lastSysCPU({0}),
+	m_lastUserCPU({0})
 {
 
 }
 
-ot::SystemLoadInformation::~SystemLoadInformation()
+ot::SystemInformation::~SystemInformation()
 {
 }
 
-void ot::SystemLoadInformation::initialize()
+void ot::SystemInformation::initialize()
 {
 	// Initialize information for current process data
 	SYSTEM_INFO sysInfo;
@@ -45,7 +51,7 @@ void ot::SystemLoadInformation::initialize()
 	m_initialized = true;
 }
 
-void ot::SystemLoadInformation::getCurrentProcessCPUAndMemoryLoad(double& cpuLoad, double& memoryLoad)
+void ot::SystemInformation::getCurrentProcessCPUAndMemoryLoad(double& cpuLoad, double& memoryLoad)
 {
 	if (!m_initialized)
 	{
@@ -93,7 +99,7 @@ void ot::SystemLoadInformation::getCurrentProcessCPUAndMemoryLoad(double& cpuLoa
 	cpuLoad = percent * 100;
 }
 
-void ot::SystemLoadInformation::getGlobalCPUAndMemoryLoad(double& cpuLoad, double& memoryLoad)
+void ot::SystemInformation::getGlobalCPUAndMemoryLoad(double& cpuLoad, double& memoryLoad)
 {
 	if (!m_initialized)
 	{
@@ -117,3 +123,45 @@ void ot::SystemLoadInformation::getGlobalCPUAndMemoryLoad(double& cpuLoad, doubl
 	PdhGetFormattedCounterValue(m_cpuTotal, PDH_FMT_DOUBLE, NULL, &counterVal);
 	cpuLoad = counterVal.doubleValue;
 }
+
+std::string ot::SystemInformation::getBuildInformation()
+{
+	std::string buildInfo;
+
+	std::string fileName = ot::app::getCurrentExecutableDirectory() + "\\BuildInfo.txt";
+
+	// Chyeck whether local build information file exists
+	if (!std::filesystem::exists(fileName))
+	{
+		// Get the development root environment variable and build the path to the deployment cert file
+		char buffer[4096];
+		size_t environmentVariableValueStringLength;
+
+		getenv_s(&environmentVariableValueStringLength, buffer, sizeof(buffer) - 1, "OPENTWIN_DEV_ROOT");
+
+		std::string dev_root(buffer);
+		fileName = dev_root + "\\Deployment\\BuildInfo.txt";
+	}
+
+	try
+	{
+		std::ifstream file(fileName);
+		if (!file.is_open()) throw std::exception();
+
+		while (!file.eof())
+		{
+			std::string line;
+			std::getline(file, line);
+
+			buildInfo.append("\n");
+			buildInfo.append(line);
+		}
+	}
+	catch (std::exception)
+	{
+		// The build info file could not be found, return an empty string
+	}
+
+	return buildInfo;
+}
+
