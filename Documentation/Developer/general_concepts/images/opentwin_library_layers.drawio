@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2024-04-22T17:19:19.526Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.2.5 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="tBIUeDOSh0__ciQgDpvt" version="24.2.5" type="device">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.7.17 Chrome/128.0.6613.36 Electron/32.0.1 Safari/537.36" version="24.7.17">
   <diagram name="Page-1" id="VFPsIcZypVvUhBZFZJ3J">
-    <mxGraphModel dx="2462" dy="1003" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2448" dy="990" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -40,10 +40,10 @@
         <mxCell id="drg9CU4EAO1dnW2Tuc6c-26" value="OTDataStorage" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="40" y="360" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="drg9CU4EAO1dnW2Tuc6c-27" value="OTResultDataAccess" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
-          <mxGeometry x="40" y="40" width="120" height="40" as="geometry" />
+        <mxCell id="drg9CU4EAO1dnW2Tuc6c-27" value="OTResultDataAccess" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="40" y="40" width="360" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="drg9CU4EAO1dnW2Tuc6c-28" value="OTStudioSuiteConnector" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+        <mxCell id="drg9CU4EAO1dnW2Tuc6c-28" value="OTStudioSuiteConnector &amp;amp;&lt;br&gt;OTLTSpiceConnector" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
           <mxGeometry x="400" y="40" width="240" height="40" as="geometry" />
         </mxCell>
         <mxCell id="drg9CU4EAO1dnW2Tuc6c-29" value="OTViewer" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
@@ -85,9 +85,9 @@
             <mxPoint x="100" y="200" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="drg9CU4EAO1dnW2Tuc6c-43" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="drg9CU4EAO1dnW2Tuc6c-27" target="drg9CU4EAO1dnW2Tuc6c-24" edge="1">
+        <mxCell id="drg9CU4EAO1dnW2Tuc6c-43" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" target="drg9CU4EAO1dnW2Tuc6c-24" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="420" y="140" as="sourcePoint" />
+            <mxPoint x="100" y="80" as="sourcePoint" />
             <mxPoint x="470" y="90" as="targetPoint" />
           </mxGeometry>
         </mxCell>
@@ -154,19 +154,25 @@
             <mxPoint x="579.71" y="439" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="ih_BGPtm0dUYrXPU0Y7V-1" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.668;entryY=-0.03;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1">
+        <mxCell id="ih_BGPtm0dUYrXPU0Y7V-1" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.668;entryY=-0.03;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="580" y="320" as="sourcePoint" />
             <mxPoint x="580" y="359" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="ih_BGPtm0dUYrXPU0Y7V-3" value="OTRandom" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+        <mxCell id="ih_BGPtm0dUYrXPU0Y7V-3" value="OTRandom" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="640" y="360" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="ih_BGPtm0dUYrXPU0Y7V-4" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.083;entryY=-0.008;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1">
+        <mxCell id="ih_BGPtm0dUYrXPU0Y7V-4" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.083;entryY=-0.008;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="699.52" y="400" as="sourcePoint" />
             <mxPoint x="699.52" y="439" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="9bbRT0lwQs7MqZWFNnxW-1" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="339.93" y="80" as="sourcePoint" />
+            <mxPoint x="339.93" y="120" as="targetPoint" />
           </mxGeometry>
         </mxCell>
       </root>
