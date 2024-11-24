@@ -75,9 +75,6 @@
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
 
-// Curl
-#include "curl/curl.h"					// Curl
-
 // AK header
 #include <akAPI/uiAPI.h>
 #include <akCore/akCore.h>
@@ -165,15 +162,6 @@ extern "C"
 		}
 	};
 }
-
-#ifdef _DEBUG
-void _outputDebugMessage(const std::string & _msg) {
-	OutputDebugStringA("[OPEN TWIN] [DEBUG] ");
-	OutputDebugStringA(_msg.c_str());
-	OutputDebugStringA("\n");
-	std::cout << _msg << std::endl;
-}
-#endif // _DEBUG
 
 // ###################################################################################################
 
@@ -2051,7 +2039,8 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 		while (!m_prefetchingDataCompleted)
 		{
 			QApplication::processEvents();
-			Sleep(25);
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(25ms);
 		}
 
 		workerThread.join();
@@ -4345,10 +4334,6 @@ void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 	}
 
 	if (sessionServiceDied) {
-#ifdef _DEBUG
-		_outputDebugMessage("Session service has died unexpectedly. Shutting down...");
-#endif // _DEBUG
-
 		QMetaObject::invokeMethod(AppBase::instance()->getExternalServicesComponent(), "shutdownAfterSessionServiceDisconnected", Qt::QueuedConnection);
 	}
 }

@@ -30,7 +30,6 @@
 #include "OTGui/GraphicsPickerCollectionManager.h"
 #include "OTWidgets/ColorStyle.h"
 #include "OTWidgets/MessageBoxHandler.h"
-#include "OTServiceFoundation/UserCredentials.h"
 
 #include <akGui/aWindowEventHandler.h>
 #include <akCore/aNotifier.h>
