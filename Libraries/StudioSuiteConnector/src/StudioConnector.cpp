@@ -1,15 +1,21 @@
-#include "StudioSuiteConnector/StudioConnector.h"
+// Project header
 #include "StudioSuiteConnector/ProgressInfo.h"
+#include "StudioSuiteConnector/StudioConnector.h"
 
-#include "OTCommunication/ActionTypes.h"
+// OpenTwin header
 #include "OTSystem/OperatingSystem.h"
+#include "OTCore/Logger.h"
+#include "OTCommunication/ActionTypes.h"
 
+// Qt header
+#include <QtCore/quuid.h>
+#include <QtCore/qsettings.h>
+
+// std header
+#include <thread>
 #include <cassert>
 #include <sstream>
 #include <filesystem>
-
-#include "quuid.h"
-#include "qsettings.h"
 
 //#define DEBUG_PYTHON_SERVER
 
