@@ -418,6 +418,9 @@
     <ClCompile Include="src\MessageBoxManager.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
+    <ClCompile Include="src\WidgetViewDockManager.cpp">
+      <Filter>src\WidgetView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -811,6 +814,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\MessageBoxHandler.h">
       <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\WidgetViewDockManager.h">
+      <Filter>include\WidgetView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -23,7 +23,7 @@ ot::WidgetViewManager& ot::WidgetViewManager::instance(void) {
 	return g_instance;
 }
 
-void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
+void ot::WidgetViewManager::initialize(WidgetViewDockManager* _dockManager) {
 	if (m_dockManager) {
 		OT_LOG_WA("WidgetViewManager already initialized");
 		return;
@@ -34,7 +34,7 @@ void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
 	if (!m_dockManager) {
 		ads::CDockManager::setConfigFlag(ads::CDockManager::DisableTabTextEliding, true);
 		ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
-		m_dockManager = new ads::CDockManager;
+		m_dockManager = new WidgetViewDockManager;
 		m_dockManager->setStyleSheet("");
 	}
 
@@ -49,8 +49,8 @@ void ot::WidgetViewManager::initialize(ads::CDockManager* _dockManager) {
 
 // View Management
 
-bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view) {
-	return this->addViewImpl(_owner, _view);
+bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags) {
+	return this->addViewImpl(_owner, _view, _insertFlags);
 }
 
 ot::WidgetView* ot::WidgetViewManager::findView(const std::string& _entityName, WidgetViewBase::ViewType _type) const {
@@ -365,7 +365,7 @@ void ot::WidgetViewManager::slotUpdateViewVisibility(void) {
 			!entry.second->getViewDockWidget()->dockAreaWidget()) 
 		{
 			OT_LOG_W("Restored");
-			m_dockManager->addDockWidgetTab(this->getDockWidgetArea(entry.second), entry.second->getViewDockWidget());
+			m_dockManager->addView(entry.second, nullptr, ot::WidgetView::NoInsertFlags);
 		}
 	}
 }
@@ -401,7 +401,7 @@ ot::WidgetView* ot::WidgetViewManager::findView(const ViewNameTypeListEntry& _en
 	return nullptr;
 }
 
-bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view) {
+bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags) {
 	OTAssertNullptr(m_dockManager);
 	OTAssertNullptr(_view);
 	// Ensure view does not exist
@@ -435,19 +435,13 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 
 
 	ads::CDockAreaWidget* area = nullptr;
-
+	
 	if (m_useFocusInfo) {
 		area = this->getBestDockArea(_view);
 	}
 
-	// Add view
-	if (area) {
-		m_dockManager->addDockWidget(this->getDockWidgetArea(_view), _view->getViewDockWidget(), area);
-	}
-	else {
-		m_dockManager->addDockWidgetTab(this->getDockWidgetArea(_view), _view->getViewDockWidget());
-	}
-
+	m_dockManager->addView(_view, area, _insertFlags);
+	
 	// Add view toggle (if view is closeable)
 	if (_view->getViewDockWidget()->features() & ads::CDockWidget::DockWidgetClosable) {
 		m_dockToggleRoot->menu()->addAction(_view->getViewDockWidget()->toggleViewAction());
@@ -482,20 +476,6 @@ ads::CDockAreaWidget* ot::WidgetViewManager::getBestDockArea(const WidgetView* _
 	else {
 		return nullptr;
 	}
-}
-
-ads::DockWidgetArea ot::WidgetViewManager::getDockWidgetArea(const WidgetView* _view) const {
-	switch (_view->getViewData().getDockLocation()) {
-	case ot::WidgetViewBase::Default: return ads::CenterDockWidgetArea;
-	case ot::WidgetViewBase::Left: return ads::LeftDockWidgetArea;
-	case ot::WidgetViewBase::Top: return ads::TopDockWidgetArea;
-	case ot::WidgetViewBase::Right: return ads::RightDockWidgetArea;
-	case ot::WidgetViewBase::Bottom: return ads::BottomDockWidgetArea;
-	default:
-		OT_LOG_EAS("Unknown dock location (" + std::to_string((int)_view->getViewData().getDockLocation()) + ")");
-		return ads::CenterDockWidgetArea;
-	}
-
 }
 
 ot::WidgetViewManager::ViewNameTypeList* ot::WidgetViewManager::findViewNameTypeList(const BasicServiceInformation& _owner) {

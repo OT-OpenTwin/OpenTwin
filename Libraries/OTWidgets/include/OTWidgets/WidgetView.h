@@ -33,6 +33,12 @@ namespace ot {
 		OT_DECL_NODEFAULT(WidgetView)
 		OT_DECL_NOCOPY(WidgetView)
 	public:
+		enum InsertFlag {
+			NoInsertFlags = 0 << 0,
+			KeepCurrentFocus = 1 << 0
+		};
+		typedef ot::Flags<InsertFlag> InsertFlags;
+
 		static std::string createStoredViewName(const WidgetViewBase& _view);
 
 		//! \brief Creates the name that should be used in the view management logic.
@@ -95,3 +101,5 @@ namespace ot {
 	};
 
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::WidgetView::InsertFlag)

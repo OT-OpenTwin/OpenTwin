@@ -184,9 +184,11 @@
     <ClCompile Include="src\VersionGraphManager.cpp" />
     <ClCompile Include="src\VersionGraphManagerView.cpp" />
     <ClCompile Include="src\WidgetView.cpp" />
+    <ClCompile Include="src\WidgetViewDockManager.cpp" />
     <ClCompile Include="src\WidgetViewManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTWidgets\WidgetViewDockManager.h" />
     <QtMoc Include="include\OTWidgets\ApplicationPropertiesManager.h" />
     <ClInclude Include="include\OTWidgets\AbstractPlot.h" />
     <ClInclude Include="include\OTWidgets\AbstractPlotAxis.h" />

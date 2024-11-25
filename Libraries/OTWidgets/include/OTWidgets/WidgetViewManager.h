@@ -9,11 +9,11 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/WidgetViewBase.h"
-#include "OTWidgets/OTWidgetsAPIExport.h"
+#include "OTWidgets/WidgetView.h"
+#include "OTWidgets/WidgetViewDockManager.h"
 
 // Qt ADS header
 #include <ads/DockWidget.h>
-#include <ads/DockManager.h>
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -46,7 +46,7 @@ namespace ot {
 		static WidgetViewManager& instance(void);
 
 		//! @brief Must be called upon startup, if no dock manager is provided a new one will be created
-		void initialize(ads::CDockManager* _dockManager = nullptr);
+		void initialize(WidgetViewDockManager* _dockManager = nullptr);
 
 		//! @brief Returns the dock manager that is managed by this widget view manager
 		ads::CDockManager* getDockManager(void) const { return m_dockManager; };
@@ -60,7 +60,7 @@ namespace ot {
 		//! @param _owner Widget view owner.
 		//! @param _view Widget view to add.
 		//! \param _insertArea The relative area to add the view.
-		bool addView(const BasicServiceInformation& _owner, WidgetView* _view);
+		bool addView(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags = WidgetView::InsertFlags(WidgetView::NoInsertFlags));
 
 		//! @brief Returns the widget view with the specified name.
 		//! If the view does not exists return 0.
@@ -185,16 +185,14 @@ namespace ot {
 		//! The view's dock widget will get the IconManager::getApplicationIcon() set.
 		//! \param _parentArea The target area to add the view to.
 		//! \param _insertArea The relative area to add the view.
-		bool addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view);
+		bool addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags);
 
 		ads::CDockAreaWidget* getBestDockArea(const WidgetView* _view) const;
-
-		ads::DockWidgetArea getDockWidgetArea(const WidgetView* _view) const;
 
 		ViewNameTypeList* findViewNameTypeList(const BasicServiceInformation& _owner);
 		ViewNameTypeList* findOrCreateViewNameTypeList(const BasicServiceInformation& _owner);
 
-		ads::CDockManager* m_dockManager; //! @brief Dock manager managed by this manager
+		WidgetViewDockManager* m_dockManager; //! @brief Dock manager managed by this manager
 		QAction*           m_dockToggleRoot; //! @brief Action containing the toggle dock visibility menu and actions
 		struct FocusInfo {
 			WidgetView* last;
