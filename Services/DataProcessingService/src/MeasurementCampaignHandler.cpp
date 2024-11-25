@@ -32,7 +32,7 @@ void MeasurementCampaignHandler::ConnectToCollection(const std::string& collecti
 	}
 	else
 	{
-		_uiComponent->displayDebugMessage("No measurement metadata detected in project: " + projectName);
+		_uiComponent->displayMessage("No measurement metadata detected in project: " + projectName);
 	}
 }
 

@@ -386,8 +386,6 @@ public:
 	void appendInfoMessage(const QString& _message);
 	void appendHtmlInfoMessage(const QString& _html);
 
-	void appendDebugMessage(const QString& _message);
-
 	ot::VersionGraphManagerView* getVersionGraph(void) { return m_versionGraph; };
 
 	// ##############################################################################################
@@ -592,7 +590,6 @@ private:
 	ot::NavigationTreeView* m_projectNavigation;
 	ot::PropertyGridView*  m_propertyGrid;
 	ot::PlainTextEditView* m_output;
-	ot::PlainTextEditView* m_debug;
 	ot::GraphicsPickerView* m_graphicsPicker;
 	ot::GraphicsPickerCollectionManager m_graphicsPickerManager;
 	ak::UID						m_uid;							//! The UID of the wrapper

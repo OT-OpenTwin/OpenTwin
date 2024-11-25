@@ -2219,14 +2219,6 @@ std::string ExternalServicesComponent::handleDisplayStyledMessage(ot::JsonDocume
 	return "";
 }
 
-std::string ExternalServicesComponent::handleDisplayDebugMessage(ot::JsonDocument& _document) {
-	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	
-	AppBase::instance()->appendDebugMessage(QString::fromStdString(message));
-
-	return "";
-}
-
 std::string ExternalServicesComponent::handleReportError(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
 	AppBase::instance()->showErrorPrompt(message, "Open Twin");
@@ -3477,10 +3469,10 @@ std::string ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument&
 	std::string iconPath = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
 	try {
 		ot::IconManager::addSearchPath(QString::fromStdString(iconPath));
-		AppBase::instance()->appendDebugMessage("[ERROR] Added icon search path: " + QString::fromStdString(iconPath));
+		OT_LOG_D("[ERROR] Added icon search path: " + iconPath);
 	}
 	catch (...) {
-		AppBase::instance()->appendInfoMessage("[ERROR] Failed to add icon search path: Path not found");
+		OT_LOG_EA("[ERROR] Failed to add icon search path: Path not found");
 	}
 #endif // _DEBUG
 

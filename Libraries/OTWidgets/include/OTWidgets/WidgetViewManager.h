@@ -60,15 +60,8 @@ namespace ot {
 		//! @param _owner Widget view owner.
 		//! @param _view Widget view to add.
 		//! \param _insertArea The relative area to add the view.
-		bool addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::DockWidgetArea _insertArea = ads::CenterDockWidgetArea);
+		bool addView(const BasicServiceInformation& _owner, WidgetView* _view);
 
-		//! @brief Add the provided widget view to the specified dock area.
-		//! @param _owner Widget view owner.
-		//! @param _view Widget view to add.
-		//! @param _parentArea The target area to add the view to.
-		//! \param _insertArea The relative area to add the view.
-		bool addView(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _parentArea, ads::DockWidgetArea _insertArea = ads::CenterDockWidgetArea);
-		
 		//! @brief Returns the widget view with the specified name.
 		//! If the view does not exists return 0.
 		//! @param _entityName Widget view name.
@@ -113,6 +106,8 @@ namespace ot {
 		//! The caller takes ownership of the view.
 		//! @param _entityName Widget view name.
 		WidgetView* forgetView(const std::string& _entityName, WidgetViewBase::ViewType _type);
+
+		void setUseFocusInfo(bool _use) { m_useFocusInfo = _use; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -190,13 +185,11 @@ namespace ot {
 		//! The view's dock widget will get the IconManager::getApplicationIcon() set.
 		//! \param _parentArea The target area to add the view to.
 		//! \param _insertArea The relative area to add the view.
-		bool addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, ads::CDockAreaWidget* _parentArea, ads::DockWidgetArea _insertArea);
+		bool addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view);
 
-		ads::CDockAreaWidget* determineBestParentArea(WidgetView* _newView) const;
+		ads::CDockAreaWidget* getBestDockArea(const WidgetView* _view) const;
 
-		ads::CDockAreaWidget* determineBestRestoreArea(WidgetView* _view) const;
-
-		ads::CDockAreaWidget* determineBestRestoreArea(WidgetView* _view, WidgetViewBase::ViewFlag _viewType) const;
+		ads::DockWidgetArea getDockWidgetArea(const WidgetView* _view) const;
 
 		ViewNameTypeList* findViewNameTypeList(const BasicServiceInformation& _owner);
 		ViewNameTypeList* findOrCreateViewNameTypeList(const BasicServiceInformation& _owner);
@@ -210,6 +203,7 @@ namespace ot {
 			WidgetView* lastTool;
 		};
 		FocusInfo        m_focusInfo;
+		bool             m_useFocusInfo;
 
 		std::map<BasicServiceInformation, ViewNameTypeList*> m_viewOwnerMap; //! @brief Maps owners to widget view names and types
 		std::list<ViewEntry> m_views; //! @brief Contains all views and their owners.

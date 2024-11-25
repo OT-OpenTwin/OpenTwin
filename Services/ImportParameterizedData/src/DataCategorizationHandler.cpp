@@ -26,7 +26,7 @@ std::string DataCategorizationHandler::markSelectionForStorage(const std::list<o
 	ensureEssentials();
 	if (_selectedEntities.empty())
 	{
-		_uiComponent->displayDebugMessage("No table selection detected.");
+		_uiComponent->displayMessage("No table selection detected.");
 	}
 	//1) RMD entries don't need a selected EntityParameterizedDataCategorization
 	//2) Series metadata require a selected series metadata
@@ -91,7 +91,7 @@ bool DataCategorizationHandler::isValidSelection(std::list<EntityBase*>& _select
 	}
 	else
 	{
-		_uiComponent->displayDebugMessage("Data categorisation requires a single selected table.");
+		_uiComponent->displayMessage("Data categorisation requires a single selected table.");
 		return false;
 	}
 }

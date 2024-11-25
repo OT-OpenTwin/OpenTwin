@@ -339,12 +339,6 @@ namespace ot {
 			//! \param _builder StyledTextBuilder containing the message
 			void displayStyledMessage(const StyledTextBuilder& _builder) const;
 
-			//! @brief Will display a message in the UIs debug output window
-			//! @param _message The message to display
-			void displayDebugMessage(
-				const std::string &				_message
-			) const;
-
 			//! @brief Will display a message in a error prompt dialog
 			//! @param _message The message to display
 			void displayErrorPrompt(

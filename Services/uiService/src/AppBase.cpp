@@ -165,7 +165,6 @@ AppBase::AppBase()
 	m_propertyGrid(nullptr),
 	m_projectNavigation(nullptr),
 	m_output(nullptr),
-	m_debug(nullptr),
 	m_versionGraph(nullptr),
 	m_state(AppState::NoState),
 	m_welcomeScreen(nullptr),
@@ -771,11 +770,11 @@ void AppBase::createUi(void) {
 			// Create docks
 			OT_LOG_D("Creating views");
 
-			m_debug = new ot::PlainTextEditView;
-			m_debug->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsCentral));
-			m_debug->setViewIsPermanent(true);
-			m_debug->setPlainText(BUILD_INFO);
-			m_debug->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
+			ot::PlainTextEditView* defaultView = new ot::PlainTextEditView;
+			defaultView->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::Default, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsCentral));
+			defaultView->setViewIsPermanent(true);
+			defaultView->setPlainText(BUILD_INFO);
+			defaultView->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
 
 			m_output = new ot::PlainTextEditView;
 			m_output->setViewData(ot::WidgetViewBase(TITLE_DOCK_OUTPUT, TITLE_DOCK_OUTPUT, ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
@@ -811,7 +810,6 @@ void AppBase::createUi(void) {
 				f.setFamily("Courier");
 				f.setFixedPitch(true);
 				m_output->setFont(f);
-				m_debug->setFont(f);
 
 				m_output->appendPlainText(BUILD_INFO);
 			}
@@ -836,9 +834,6 @@ void AppBase::createUi(void) {
 			m_output->setReadOnly(true);
 			m_output->setAutoScrollToBottomEnabled(true);
 
-			m_debug->setReadOnly(true);
-			m_debug->setAutoScrollToBottomEnabled(true);
-
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Set widgets to docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 25);
 			m_welcomeScreen->slotRefreshRecentProjects();
@@ -854,12 +849,15 @@ void AppBase::createUi(void) {
 			// Display docks
 			OT_LOG_D("Settings up dock window visibility");
 	
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_debug);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output, ads::BottomDockWidgetArea);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation, ads::LeftDockWidgetArea);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid, m_projectNavigation->getViewDockWidget()->dockAreaWidget(), ads::BottomDockWidgetArea);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), defaultView);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid);
 			
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker, m_projectNavigation->getViewDockWidget()->dockAreaWidget());
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker);
+
+			ot::WidgetViewManager::instance().setUseFocusInfo(true);
+
 			m_projectNavigation->getViewDockWidget()->setAsCurrentTab();
 
 			uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->getQWidget());
@@ -1001,6 +999,8 @@ ViewerUIDtype AppBase::createView(
 	QString textBlock = availableTabText("BlockDiagram");
 	QString textTable = availableTabText("Table");
 
+	ot::WidgetViewManager::instance().setUseFocusInfo(false);
+
 	if (getVisible3D())
 	{
 		ot::WidgetView* wv = m_viewerComponent->getViewerWidget(viewID);
@@ -1049,6 +1049,8 @@ ViewerUIDtype AppBase::createView(
 	{
 		m_viewerComponent->getTableWidget(viewID)->getViewWidget()->setVisible(false);
 	}
+
+	ot::WidgetViewManager::instance().setUseFocusInfo(true);
 
 	m_graphicsPicker->pickerWidget()->setVisible(getVisibleBlockPicker());
 
@@ -1448,10 +1450,6 @@ void AppBase::appendHtmlInfoMessage(const QString& _html) {
 	if (m_output) {
 		m_output->appendHtml(_html);
 	}
-}
-
-void AppBase::appendDebugMessage(const QString & _message) {
-	m_debug->appendPlainText(_message);
 }
 
 // ##############################################################################################

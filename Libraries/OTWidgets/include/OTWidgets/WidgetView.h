@@ -52,6 +52,7 @@ namespace ot {
 		// Setter/Getter
 
 		void setViewData(const WidgetViewBase& _data);
+		WidgetViewBase& getViewData(void) { return m_data; };
 		const WidgetViewBase& getViewData(void) const { return m_data; };
 
 		//! @brief Returns the dock widget that belongs to this widget view.
