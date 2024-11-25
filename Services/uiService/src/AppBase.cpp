@@ -1032,7 +1032,7 @@ ViewerUIDtype AppBase::createView(
 			delete m_versionGraph;
 		}
 		m_versionGraph = new ot::VersionGraphManagerView;
-		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewVersion, ot::WidgetViewBase::ViewIsCentral));
+		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewVersion, ot::WidgetViewBase::ViewFlag::ViewIsSide));
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivatRequest, this, &AppBase::slotRequestVersion);

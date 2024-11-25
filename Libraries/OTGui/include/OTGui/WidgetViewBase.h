@@ -32,8 +32,8 @@ namespace ot {
 			ViewDefaultCloseHandling = 0x02, //! @brief If set and 'ViewIsCloseable' is set the view will close with the default close behaviour, otherwise a closeRequested signal is emitted.
 			ViewIsPinnable           = 0x04, //! @brief If set the view may be pinned to the auto hide areas.
 			ViewIsCentral            = 0x10, //! @brief If set the view is assumed to be a main view and therefore rather be located in the middle of the screen (Should not be mixed with ViewIsSide or ViewIsTool).
-			ViewIsSide               = 0x20, //! @brief If set the view is assumed to be a main view and therefore rather be located in the middle of the screen (Should not be mixed with ViewIsCentral or ViewIsTool).
-			ViewIsTool               = 0x40  //! @brief If set the view is assumed to be a main view and therefore rather be located in the middle of the screen (Should not be mixed with ViewIsCentral or ViewIsSide).
+			ViewIsSide               = 0x20, //! @brief If set the view is assumed to be a side view and therefore rather be located on the outer dock areas of the screen (Should not be mixed with ViewIsCentral or ViewIsTool).
+			ViewIsTool               = 0x40  //! @brief If set the view is assumed to be a tool view and therefore rather be located on the outer dock areas of the screen (Should not be mixed with ViewIsCentral or ViewIsSide).
 		};
 		typedef Flags<ViewFlag> ViewFlags; //! /ref ViewFlag "ViewFlag"
 
