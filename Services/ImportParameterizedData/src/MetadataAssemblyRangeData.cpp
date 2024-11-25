@@ -65,17 +65,17 @@ uint64_t MetadataAssemblyRangeData::getNumberOfFields() const
 std::vector<std::string> MetadataAssemblyRangeData::ExtractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> range, std::shared_ptr<EntityParameterizedDataTable> table, std::map<std::string, std::map<std::uint32_t, std::string>>& outAllSortedFields)
 {
 	std::vector<std::string> fieldKey;
-	uint32_t selection[4];
-	range->getSelectedRange(selection[0], selection[1], selection[2], selection[3], table);
+	
+	ot::TableRange selection = range->getSelectedRange();
 
 	std::map<std::string, std::map<std::uint32_t,std::string>> extractedField;
 
 	if (range->getTableOrientation() == EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
 	{
-		for (uint32_t column = selection[2]; column <= selection[3]; column++)
+		for (uint32_t column = selection.getLeftColumn(); column <= selection.getRightColumn(); column++)
 		{
 			fieldKey.push_back(table->getTableData()->getValue(0, column));
-			for (uint32_t row = selection[0]; row <= selection[1]; row++)
+			for (uint32_t row = selection.getTopRow(); row <= selection.getBottomRow(); row++)
 			{
 				const std::string& value = table->getTableData()->getValue(row, column);
 				outAllSortedFields[fieldKey.back()].insert({row, value});
@@ -84,10 +84,10 @@ std::vector<std::string> MetadataAssemblyRangeData::ExtractFieldsFromRange(std::
 	}
 	else
 	{
-		for (uint32_t row = selection[0]; row <= selection[1]; row++)
+		for (uint32_t row = selection.getTopRow(); row <= selection.getBottomRow(); row++)
 		{
 			fieldKey.push_back(table->getTableData()->getValue(row, 0));
-			for (uint32_t column = selection[2]; column <= selection[3]; column++)
+			for (uint32_t column = selection.getLeftColumn(); column <= selection.getRightColumn(); column++)
 			{
 				const std::string& value = table->getTableData()->getValue(row, column);
 				outAllSortedFields[fieldKey.back()].insert({column, value});

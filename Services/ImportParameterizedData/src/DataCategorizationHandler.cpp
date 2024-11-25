@@ -336,6 +336,33 @@ void DataCategorizationHandler::addNewCategorizationEntity(std::string name, Ent
 	}
 }
 
+void DataCategorizationHandler::requestColouringRanges(bool _clearSelection, const std::string& _tableName, const ot::Color& _colour, const std::list<ot::TableRange>& ranges)
+{
+	ot::JsonDocument doc;
+
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SetCurrentSelectionBackground, doc.GetAllocator()), doc.GetAllocator());
+
+	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_tableName,doc.GetAllocator()),doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_ClearSelection, _clearSelection, doc.GetAllocator());
+
+	ot::JsonObject obj;
+	_colour.addToJsonObject(obj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Color, obj, doc.GetAllocator());
+
+	ot::JsonArray vectOfRanges;
+	for (auto range : ranges)
+	{
+		ot::JsonObject temp;
+		range.addToJsonObject(temp, doc.GetAllocator());
+		vectOfRanges.PushBack(temp, doc.GetAllocator());
+	}
+	doc.AddMember(OT_ACTION_PARAM_Ranges, vectOfRanges, doc.GetAllocator());
+
+	std::string answer;
+	_uiComponent->sendMessage(true, doc, answer);
+}
+
 
 
 void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::TableRange>& _ranges)
@@ -391,7 +418,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 				tableRange->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, "", -1,dataType);
 			}
 			
-			tableRange->SetRange(_ranges[i].getTopRow(), _ranges[i].getBottomRow(), _ranges[i].getLeftColumn(), _ranges[i].getRightColumn());
+			tableRange->setRange(_ranges[i]);
 			tableRange->SetTableProperties(tableBase->getName(), tableBase->getEntityID(), ot::toString(tableEntPtr->getHeaderOrientation()));
 			tableRange->setEditable(true);
 			
@@ -757,16 +784,14 @@ std::tuple<std::list<std::string>, std::list<std::string>> DataCategorizationHan
 			newSelection->setName(newSelectionName);
 			ot::EntityInformation entityInfo;
 			_modelComponent->getEntityInformation(selection->getTableName(), entityInfo);
-			bool selectEntireColumn = selection->getSelectEntireColumn();
-			bool selectEntireRow = selection->getSelectEntireRow();
 			std::string dataType = selection->getSelectedType();
-			newSelection->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, selection->getScriptName(), entityInfo.getEntityID(),dataType,selectEntireRow,selectEntireColumn);
+			newSelection->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, selection->getScriptName(), entityInfo.getEntityID(),dataType);
 			
 			
 			newSelection->SetTableProperties(selection->getTableName(),entityInfo.getEntityID(),selection->getTableOrientation());
-			uint32_t topRow, bottomRow, leftColun, rightColumn;
-			selection->getSelectedRange(topRow, bottomRow, leftColun, rightColumn);
-			newSelection->SetRange(topRow, bottomRow, leftColun, rightColumn);
+			
+			ot::TableRange selectedRange = selection->getSelectedRange();
+			newSelection->setRange(selectedRange);
 			_modelComponent->getEntityInformation(selection->getScriptName(), entityInfo);
 			newSelection->setConsiderForBatchprocessing(true);
 			newSelection->StoreToDataBase();
@@ -835,88 +860,9 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 	}
 }
 
-void DataCategorizationHandler::SetColourOfRanges(std::string selectedTableName)
-{
-	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
-
-	auto entityList = _modelComponent->getIDsOfFolderItemsOfType(m_baseFolder,"EntityTableSelectedRanges",true);
-	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent->getEntityInformation(entityList, entityInfos);
-	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-
-	std::vector<ot::TableRange> rmdRanges;
-	std::vector<ot::TableRange> msmdRanges;
-	std::vector<ot::TableRange> quantityRanges;
-	std::vector<ot::TableRange> parameterRanges;
-
-	for (auto entityInfo : entityInfos)
-	{
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
-		std::unique_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
-		if (rangeEntity->getTableName() == selectedTableName)
-		{
-			std::string name = entityInfo.getEntityName();
-			std::string::difference_type n = std::count(name.begin(), name.end(), '/');
-			uint32_t tableEdges[4];
-			rangeEntity->getSelectedRange(tableEdges[0], tableEdges[1], tableEdges[2], tableEdges[3]);
-			if (rangeEntity->getSelectEntireRow())
-			{
-				tableEdges[2] = 0;
-				tableEdges[3] = INT_MAX;
-			}
-			if (rangeEntity->getSelectEntireColumn())
-			{
-				tableEdges[0] = 0;
-				tableEdges[1] = INT_MAX;
-			}
-
-			if (n == 2) //First topology level: RMD
-			{
-				rmdRanges.push_back(ot::TableRange(tableEdges[0], tableEdges[1], tableEdges[2], tableEdges[3]));
-			}
-			else if (n == 3) //Second topology level: MSMD files
-			{
-				msmdRanges.push_back(ot::TableRange(tableEdges[0], tableEdges[1], tableEdges[2], tableEdges[3]));
-			}
-			else if (n == 4) //Third topology level: Parameter and Quantities
-			{
-				if (name.find(m_parameterFolder) != std::string::npos)
-				{
-					parameterRanges.push_back(ot::TableRange(tableEdges[0], tableEdges[1], tableEdges[2], tableEdges[3]));
-				}
-				else
-				{
-					quantityRanges.push_back(ot::TableRange(tableEdges[0], tableEdges[1], tableEdges[2], tableEdges[3]));
-				}
-			}
-		}
-	}
-
-	if (rmdRanges.size() != 0)
-	{
-		RequestRangesSelection(rmdRanges);
-		RequestColouringRanges( m_rmdColour);
-	}
-	if (msmdRanges.size() != 0)
-	{
-		RequestRangesSelection(msmdRanges);
-		RequestColouringRanges(m_msmdColour);
-	}
-	if (parameterRanges.size() != 0)
-	{
-		RequestRangesSelection(parameterRanges);
-		RequestColouringRanges(m_parameterColour);
-	}
-	if (quantityRanges.size() != 0)
-	{
-		RequestRangesSelection(quantityRanges);
-		RequestColouringRanges(m_quantityColour);
-	}
-}
-
 void DataCategorizationHandler::SelectRange(ot::UIDList iDs, ot::UIDList versions)
 {
-	std::vector<ot::TableRange> ranges;
+	std::map<std::string, std::map<uint32_t,std::list<ot::TableRange>>> rangesByColourIDByTableNames;
 	auto versionIt = versions.begin();
 	for (auto idIt = iDs.begin(); idIt != iDs.end(); ++idIt)
 	{
@@ -924,24 +870,76 @@ void DataCategorizationHandler::SelectRange(ot::UIDList iDs, ot::UIDList version
 		versionIt++;
 
 		std::unique_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
+		
+		//First we get the selected range
+		
+		ot::TableRange selectedRange =  rangeEntity->getSelectedRange();
 
-		uint32_t tR, bR, lC, rC;
-		rangeEntity->getSelectedRange(tR, bR, lC, rC);
-		if (rangeEntity->getSelectEntireRow())
+		//Now we determine the colour for the range
+		const std::string tableName = rangeEntity->getTableName();
+		uint32_t colourID;
+		std::string name = rangeEntity->getName();
+		std::string::difference_type n = std::count(name.begin(), name.end(), '/');
+		if (n == 2) //First topology level: RMD
 		{
-			lC = 0;
-			rC = INT_MAX;
+			colourID = 0;
 		}
-		if (rangeEntity->getSelectEntireColumn())
+		else if (n == 3) //Second topology level: MSMD files
 		{
-			tR = 0;
-			bR = INT_MAX;
+			colourID = 1;
 		}
-		ranges.push_back(ot::TableRange(tR, bR, lC, rC));
+		else if (n == 4) //Third topology level: Parameter and Quantities
+		{
+			if (name.find(m_parameterFolder) != std::string::npos)
+			{
+				colourID = 2;
+			}
+			else
+			{
+				colourID = 3;
+			}
+		}
+		else
+		{
+			assert(0);
+		}
+
+		//Now we store the range for its colour and table 
+		rangesByColourIDByTableNames[tableName][colourID].push_back(selectedRange);
 	}
-	RequestRangesSelection(ranges);
-	/*std::string category = rangeEntity->getCategorization();
-	RequestColouringRanges(category);*/
+
+	bool clearSelection = true;
+	for (const auto& rangesByColourIDByTableName : rangesByColourIDByTableNames)
+	{
+		const std::string tableName = rangesByColourIDByTableName.first;
+		auto& rangesByColourIDs = rangesByColourIDByTableName.second;
+		for(const auto& rangesByColourID : rangesByColourIDs)
+		{	
+			uint32_t colourID = rangesByColourID.first;
+			ot::Color typeColour;
+			if (colourID == 0)
+			{
+				typeColour = m_rmdColour;
+			}
+			else if (colourID == 1)
+			{
+				typeColour = m_msmdColour;
+			}
+			else if (colourID == 2)
+			{
+				typeColour = m_parameterColour;
+			}
+			else
+			{
+				assert(colourID == 3);
+				typeColour = m_quantityColour;
+			}
+			
+			const auto& ranges = rangesByColourID.second;
+			requestColouringRanges(clearSelection,tableName, typeColour, ranges);
+			clearSelection = false;
+		}
+	}
 }
 
 inline void DataCategorizationHandler::ensureEssentials()
@@ -961,59 +959,3 @@ inline void DataCategorizationHandler::ensureEssentials()
 	}
 }
 
-void DataCategorizationHandler::RequestRangesSelection(std::vector<ot::TableRange>& ranges)
-{
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges, doc.GetAllocator()), doc.GetAllocator());
-
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _modelComponent->getCurrentVisualizationModelID(), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-
-	ot::JsonArray vectOfRanges;
-	for (auto range : ranges)
-	{
-		ot::JsonObject temp;
-		range.addToJsonObject(temp, doc.GetAllocator());
-		vectOfRanges.PushBack(temp, doc.GetAllocator());
-	}
-	doc.AddMember("Ranges", vectOfRanges, doc.GetAllocator());
-
-	std::string tmp;
-	_uiComponent->sendMessage(true, doc, tmp);
-}
-
-void DataCategorizationHandler::RequestColouringRanges(std::string colour)
-{
-	if (colour == EntityParameterizedDataCategorization::GetStringDataCategorization(EntityParameterizedDataCategorization::DataCategorie::researchMetadata))
-	{
-		RequestColouringRanges(m_rmdColour);
-	}
-	else if (colour == EntityParameterizedDataCategorization::GetStringDataCategorization(EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata))
-	{
-		RequestColouringRanges(m_msmdColour);
-	}
-	else if (colour == EntityParameterizedDataCategorization::GetStringDataCategorization(EntityParameterizedDataCategorization::DataCategorie::parameter))
-	{
-		RequestColouringRanges(m_parameterColour);
-	}
-	else if (colour == EntityParameterizedDataCategorization::GetStringDataCategorization(EntityParameterizedDataCategorization::DataCategorie::quantity))
-	{
-		RequestColouringRanges(m_quantityColour);
-	}
-}
-
-void DataCategorizationHandler::RequestColouringRanges(ot::Color colour)
-{
-	//ot::JsonDocument doc;
-	//doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection, doc.GetAllocator()), doc.GetAllocator());
-
-	//doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _modelComponent->getCurrentVisualizationModelID(), doc.GetAllocator());
-	//doc.AddMember(OT_ACTION_PARAM_SENDER_URL,ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-
-	//ot::JsonObject obj;
-	//colour.addToJsonObject(obj, doc.GetAllocator());
-	//doc.AddMember(OT_ACTION_PARAM_COLOUR_BACKGROUND, obj, doc.GetAllocator());
-
-	//std::string tmp;
-	//_uiComponent->sendMessage(true, doc, tmp);
-}

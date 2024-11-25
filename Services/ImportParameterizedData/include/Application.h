@@ -149,6 +149,4 @@ private:
 	void HandleSelectionChanged();
 	void ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc);
 	void RequestSelectedRanges(const std::string& _tableName);
-	void SetControlstateTableFunctions(bool visible);
-
 };

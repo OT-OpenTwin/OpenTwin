@@ -47,7 +47,7 @@ bool EntityTableSelectedRanges::updateFromProperties(void)
 	return UpdateVisibility();
 }
 
-void EntityTableSelectedRanges::createProperties(const std::string& pythonScriptFolder, ot::UID pythonScriptFolderID, const std::string& pythonScriptName, ot::UID pythonScriptID, const std::string& _defaultType, bool selectEntireRow , bool selectEntireColumn)
+void EntityTableSelectedRanges::createProperties(const std::string& pythonScriptFolder, ot::UID pythonScriptFolderID, const std::string& pythonScriptName, ot::UID pythonScriptID, const std::string& _defaultType)
 {
 	std::string sourceFileGroup = "Source file";
 
@@ -78,10 +78,6 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 	
 	auto passOnScript = new EntityPropertiesBoolean(_propNamePassOnScript, false);
 	passOnScript->setVisible(false);
-
-
-	EntityPropertiesBoolean::createProperty(rangeGroup, "Select entire row", selectEntireRow, "default", getProperties());
-	EntityPropertiesBoolean::createProperty(rangeGroup, "Select entire column", selectEntireColumn, "default", getProperties());
 
 	getProperties().createProperty(topRow, rangeGroup);
 	getProperties().createProperty(bottomRow, rangeGroup);
@@ -124,48 +120,15 @@ const std::string EntityTableSelectedRanges::getTableOrientation()
 	return headerPosEnt->getValue();
 }
 
-void EntityTableSelectedRanges::getSelectedRange(uint32_t& topRow, uint32_t& bottomRow, uint32_t& leftColumn, uint32_t& rightColumn, std::shared_ptr<EntityParameterizedDataTable> referencedTable)
+ot::TableRange EntityTableSelectedRanges::getSelectedRange()
 {
-	getSelectedRange(topRow, bottomRow, leftColumn, rightColumn);
-	if (getSelectEntireColumn())
-	{
-		bottomRow = referencedTable->getTableData()->getNumberOfRows() -1;
-		if (referencedTable->getSelectedHeaderOrientation() == EntityParameterizedDataTable::HeaderOrientation::horizontal)
-		{
-			topRow = 1;
-		}
-		else
-		{
-			topRow = 0;
-		}
-	}
-	if (getSelectEntireRow())
-	{
-		rightColumn = referencedTable->getTableData()->getNumberOfColumns() - 1;
-		if (referencedTable->getSelectedHeaderOrientation() == EntityParameterizedDataTable::HeaderOrientation::vertical)
-		{
-			leftColumn = 1;
-		}
-		else
-		{
-			leftColumn = 0;
-		}
-	}
+	auto topRowEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Top row"));
+	auto bottomRowEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Bottom row"));
+	auto leftColumnEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Left column"));
+	auto rightColumnEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Right column"));
 
-}
-
-void EntityTableSelectedRanges::getSelectedRange(uint32_t& topRow, uint32_t& bottomRow, uint32_t& leftColumn, uint32_t& rightColumn)
-{
-	
-	auto topRowEnt =		dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Top row"));
-	auto bottomRowEnt =		dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Bottom row"));
-	auto leftColumnEnt =	dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Left column"));
-	auto rightColumnEnt =	dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Right column"));
-
-	topRow = topRowEnt->getValue();
-	bottomRow = bottomRowEnt->getValue();
-	leftColumn = leftColumnEnt->getValue();
-	rightColumn = rightColumnEnt->getValue();
+	ot::TableRange tableRange(topRowEnt->getValue(), bottomRowEnt->getValue(), leftColumnEnt->getValue(), rightColumnEnt->getValue());
+	return tableRange;
 }
 
 bool EntityTableSelectedRanges::getConsiderForBatchprocessing()
@@ -181,19 +144,6 @@ void EntityTableSelectedRanges::setConsiderForBatchprocessing(bool considerForBa
 	UpdateVisibility();
 }
 
-bool EntityTableSelectedRanges::getSelectEntireRow()
-{
-	auto selectEntireRowEnt = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty("Select entire row"));
-	return selectEntireRowEnt->getValue();
-}
-
-bool EntityTableSelectedRanges::getSelectEntireColumn()
-{
-	auto selectEntireRowEnt = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty("Select entire column"));
-	return selectEntireRowEnt->getValue();
-}
-
-
 bool EntityTableSelectedRanges::getPassOnScript()
 {
 	auto considerForBatchProcessing = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNamePassOnScript));
@@ -206,21 +156,26 @@ std::string EntityTableSelectedRanges::getScriptName()
 	return selectedScript->getValueName();
 }
 
-void EntityTableSelectedRanges::SetRange(uint32_t topRow, uint32_t bottomRow, uint32_t leftColumn, uint32_t rightColumn)
+void EntityTableSelectedRanges::setRange(const ot::TableRange& _range)
 {
-	if (bottomRow >= topRow && rightColumn >= leftColumn)
+	if (_range.getBottomRow() >= _range.getTopRow() && _range.getRightColumn() >= _range.getLeftColumn())
 	{
 		auto topRowEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Top row"));
 		auto bottomRowEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Bottom row"));
 		auto leftColumnEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Left column"));
 		auto rightColumnEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Right column"));
-		topRowEnt->setValue(topRow);
-		bottomRowEnt->setValue(bottomRow);
-		leftColumnEnt->setValue(leftColumn);
-		rightColumnEnt->setValue(rightColumn);
+		topRowEnt->setValue(_range.getTopRow());
+		bottomRowEnt->setValue(_range.getBottomRow());
+		leftColumnEnt->setValue(_range.getLeftColumn());
+		rightColumnEnt->setValue(_range.getRightColumn());
 		setModified();
 	}
+	else
+	{
+		OT_LOG_E("Tried to set a table selection range with non fitting values.");
+	}
 }
+
 
 bool EntityTableSelectedRanges::UpdateVisibility()
 {
