@@ -605,6 +605,7 @@
 #define OT_ACTION_PARAM_VIEW1D_Ymin "View1D.Ymin"
 #define OT_ACTION_PARAM_VIEW1D_Ymax "View1D.Ymax"
 
+#define OT_ACTION_PARAM_VIEW_SetActiveView "View.ActiveView.Set"
 #define OT_ACTION_PARAM_VIEW_RUBBERBAND_Note "View.Rubberband.Note"
 #define OT_ACTION_PARAM_VIEW_RUBBERBAND_Document "View.Rubberband.Document"
 #define OT_ACTION_PARAM_VIEW_RUBBERBAND_PointDocument "View.Rubberband.PointDocument"

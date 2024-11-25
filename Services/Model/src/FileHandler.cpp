@@ -135,8 +135,7 @@ void FileHandler::handleChangedTable(ot::JsonDocument& _doc)
 			ot::ContentChangedHandling changedHandling = tableVisualisationEntity->getTableContentChangedHandling();
 			if (changedHandling == ot::ContentChangedHandling::ModelServiceSaves)
 			{
-
-				
+				storeChangedTable(tableVisualisationEntity, config);
 			}
 			else if (changedHandling == ot::ContentChangedHandling::OwnerHandles)
 			{
@@ -149,7 +148,7 @@ void FileHandler::handleChangedTable(ot::JsonDocument& _doc)
 			}
 			else if (changedHandling == ot::ContentChangedHandling::ModelServiceSavesNotifyOwner)
 			{
-
+				storeChangedTable(tableVisualisationEntity, config);
 				const std::string& owner = entityBase->getOwningService();
 				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
 				{
@@ -199,7 +198,8 @@ ot::GenericDataStructMatrix FileHandler::createMatrix(const ot::TableCfg& _table
 		matrixEntry.m_row = 0;
 		for (matrixEntry.m_column = 0; matrixEntry.m_column < matrixDimension.m_column; matrixEntry.m_column++)
 		{
-			const ot::Variable cellValue(_tableCfg.getCellText(matrixEntry.m_row, matrixEntry.m_column));
+			const auto headerCfg = _tableCfg.getColumnHeader(matrixEntry.m_column);
+			const ot::Variable cellValue(headerCfg->getText());
 			matrix.setValue(matrixEntry, cellValue);
 		}
 	}
@@ -209,7 +209,8 @@ ot::GenericDataStructMatrix FileHandler::createMatrix(const ot::TableCfg& _table
 		matrixEntry.m_column = 0;
 		for (matrixEntry.m_row= 0; matrixEntry.m_row < matrixDimension.m_row; matrixEntry.m_row++)
 		{
-			const ot::Variable cellValue(_tableCfg.getCellText(matrixEntry.m_row, matrixEntry.m_column));
+			const auto headerCfg = _tableCfg.getRowHeader(matrixEntry.m_row);
+			const ot::Variable cellValue(headerCfg->getText());
 			matrix.setValue(matrixEntry, cellValue);
 		}
 	}
@@ -218,7 +219,7 @@ ot::GenericDataStructMatrix FileHandler::createMatrix(const ot::TableCfg& _table
 	{
 		for (matrixEntry.m_column = startColumn; matrixEntry.m_column < matrixDimension.m_column; matrixEntry.m_column++)
 		{
-			const std::string& tableCell = _tableCfg.getCellText(matrixEntry.m_row, matrixEntry.m_column);
+			const std::string& tableCell = _tableCfg.getCellText(matrixEntry.m_row - startRow, matrixEntry.m_column - startColumn);
 			matrix.setValue(matrixEntry, ot::Variable(tableCell));
 		}
 	}
@@ -226,7 +227,7 @@ ot::GenericDataStructMatrix FileHandler::createMatrix(const ot::TableCfg& _table
 	return matrix;
 }
 
-void FileHandler::storeChangedTableContex(IVisualisationTable* _entity, ot::TableCfg& _cfg)
+void FileHandler::storeChangedTable(IVisualisationTable* _entity, ot::TableCfg& _cfg)
 {
 	Model* model = Application::instance()->getModel();
 	assert(model != nullptr);

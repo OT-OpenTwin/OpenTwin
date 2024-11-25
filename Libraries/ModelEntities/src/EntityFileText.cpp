@@ -64,6 +64,7 @@ ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding()
 
 std::string EntityFileText::getText(void) 
 {
+	
 	const std::vector<char> plainData = getData()->getData();
 	std::string textFromBinary(plainData.begin(), plainData.end());
 

@@ -7,7 +7,7 @@ public:
 	Visualiser(ot::UID _entityID)
 		:m_entityID(_entityID){}
 
-	virtual void visualise() = 0;
+	virtual void visualise(bool _setFocus = true) = 0;
 	bool isVisible() { return m_visible; }
 	//! @brief Switch to turn a visualisation type off
 	void setVisible(bool _visible) { m_visible = _visible;}

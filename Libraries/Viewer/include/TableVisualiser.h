@@ -5,5 +5,5 @@ class TableVisualiser : public Visualiser
 {
 public:
 	TableVisualiser(ot::UID _entityID) : Visualiser(_entityID){}
-	void visualise() override;
+	void visualise(bool _setFocus = true) override;
 };

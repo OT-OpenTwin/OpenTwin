@@ -99,6 +99,8 @@ void EntityFile::setData(ot::UID _dataID, ot::UID _dataVersion)
 {
 	m_dataUID = _dataID;
 	m_dataVersion = _dataVersion;
+	m_data.reset();
+	m_data = nullptr;
 	setModified();
 }
 

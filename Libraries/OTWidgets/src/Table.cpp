@@ -92,6 +92,26 @@ ot::TableCfg ot::Table::createConfig(void) const {
 		}
 	}
 
+	for (int row = 0; row < rowCount(); row++)
+	{
+		const auto item =	verticalHeaderItem(row);
+		if (item != nullptr)
+		{
+			const std::string text = item->text().toStdString();
+			cfg.setRowHeader(row, text);
+		}
+	}
+	
+	for (int column = 0; column < columnCount(); column++)
+	{
+		const auto item = horizontalHeaderItem(column);
+		if (item != nullptr)
+		{
+			const std::string text = item->text().toStdString();
+			cfg.setColumnHeader(column, text);
+		}
+	}
+
 	return cfg;
 }
 

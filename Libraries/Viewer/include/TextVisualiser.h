@@ -7,5 +7,5 @@ class TextVisualiser : public Visualiser
 {
 public:
 	TextVisualiser(ot::UID _modelEntityID) :Visualiser(_modelEntityID) {}
-	void visualise() override;
+	void visualise(bool _setFocus = true) override;
 };

@@ -5,7 +5,7 @@
 #include "IVisualisationText.h"
 #include "IVisualisationTable.h"
 
-void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, const std::string& _visualisationType)
+void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView)
 {
 	Model* model = Application::instance()->getModel();
 	EntityBase* baseEntity = model->getEntityByID(_entityID);
@@ -21,6 +21,8 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			ot::JsonDocument document;
 			info.addToJsonObject(document, document.GetAllocator());
 			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TABLE_Setup, document.GetAllocator());
+			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
+
 			ot::TableCfg tableCfg = tableEntity->getTableConfig();
 			ot::JsonObject cfgObj;
 			tableCfg.addToJsonObject(cfgObj, document.GetAllocator());
@@ -39,6 +41,8 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			ot::JsonDocument document;
 			info.addToJsonObject(document, document.GetAllocator());
 			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, document.GetAllocator());
+			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
+
 			ot::TextEditorCfg configuration = textEntity->createConfig();
 			ot::JsonObject cfgObj;
 			configuration.addToJsonObject(cfgObj, document.GetAllocator());

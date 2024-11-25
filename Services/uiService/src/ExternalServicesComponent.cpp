@@ -3749,6 +3749,9 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());
 
+	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
+	assert(0); // @Alex: Prevent the switch of active view depending on this boolean
+
 	ot::TextEditorCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
@@ -3807,6 +3810,9 @@ std::string ExternalServicesComponent::handleCloseAllTextEditors(ot::JsonDocumen
 std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _document) {
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());
+
+	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
+	assert(0); // @Alex: Prevent the switch of active view depending on this boolean
 
 	ot::TableCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
