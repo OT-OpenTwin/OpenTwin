@@ -716,13 +716,13 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 	
 	if (_visualisationTypes.visualiseAsTable())
 	{
-		auto textVis = new TextVisualiser(_modelEntityID);
+		auto textVis = new TextVisualiser(sceneNode);
 		sceneNode->addVisualiser(textVis);
 	}
 
 	if (_visualisationTypes.visualiseAsText())
 	{
-		auto tableVis = new TableVisualiser(_modelEntityID);
+		auto tableVis = new TableVisualiser(sceneNode);
 		sceneNode->addVisualiser(tableVis);
 	}
 
@@ -2722,7 +2722,10 @@ void Model::removeSceneNode(osg::Node *node)
 void Model::notifySceneNodeAboutViewChange(const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
 {
 	auto sceneNodeIt = nameToSceneNodesMap.find(_sceneNodeName);
-	assert(sceneNodeIt != nameToSceneNodesMap.end());
+	if (sceneNodeIt == nameToSceneNodesMap.end()) {
+		OT_LOG_EAS("Scene node \"" + _sceneNodeName + "\" not found");
+		return;
+	}
 	SceneNodeMultiVisualisation* sceneNodeMultiVisualisation =  dynamic_cast<SceneNodeMultiVisualisation*>(sceneNodeIt->second);
 	assert(sceneNodeMultiVisualisation != nullptr);
 	sceneNodeMultiVisualisation->setViewChange(_state, _viewType);

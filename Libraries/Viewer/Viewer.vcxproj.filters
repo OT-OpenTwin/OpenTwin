@@ -148,6 +148,9 @@
     <ClCompile Include="src\TableVisualiser.cpp">
       <Filter>src\Visualiser</Filter>
     </ClCompile>
+    <ClCompile Include="src\Visualiser.cpp">
+      <Filter>src\Visualiser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Model.h">

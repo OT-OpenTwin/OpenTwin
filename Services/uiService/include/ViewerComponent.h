@@ -61,6 +61,7 @@ public:
 	virtual void lockSelectionAndModification(bool flag) override;
 	virtual void removeViewer(ot::UID viewerID) override;
 
+	virtual void closeView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
 
 	// Menu/Widgets
 
