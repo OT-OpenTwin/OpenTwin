@@ -40,9 +40,9 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/BasicServiceInformation.h"
-#include "OTCore/ProjectTemplateInformation.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
+#include "OTGui/ProjectTemplateInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTCommunication/ActionHandleConnector.h"
@@ -134,10 +134,6 @@ public:
 
 	void prefetchDataThread(const std::string& projectName, std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs);
 
-	void contextMenuItemClicked(ot::ServiceBase* _sender, const std::string& _menuName, const std::string& _itemName);
-
-	void contextMenuItemCheckedChanged(ot::ServiceBase* _sender, const std::string& _menuName, const std::string& _itemName, bool _isChecked);
-
 	// ###################################################################################################
 
 	// Messaging
@@ -204,7 +200,6 @@ public:
 	OT_HANDLER(handleServiceSetupCompleted, ExternalServicesComponent, OT_ACTION_CMD_UI_ServiceSetupCompleted, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleDisplayStyledMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayStyledMessage, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleDisplayDebugMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_DisplayDebugMessage, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportError, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportError, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportWarning, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportWarning, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleReportInformation, ExternalServicesComponent, OT_ACTION_CMD_UI_ReportInformation, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -355,11 +350,6 @@ public:
 	OT_HANDLER(handleOnePropertyDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_OnePropertyDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleMessageDialog, ExternalServicesComponent, OT_ACTION_CMD_UI_MessageDialog, ot::MessageType::ALL_MESSAGE_TYPES)
 
-	// Plugin handling
-	OT_HANDLER(handlePluginSearchPath, ExternalServicesComponent, OT_ACTION_CMD_UI_AddPluginSearchPath, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handleRequestPlugin, ExternalServicesComponent, OT_ACTION_CMD_UI_RequestPlugin, ot::MessageType::ALL_MESSAGE_TYPES)
-	OT_HANDLER(handlePluginMessage, ExternalServicesComponent, OT_ACTION_CMD_UI_PluginMessage, ot::MessageType::ALL_MESSAGE_TYPES)
-	
 public Q_SLOTS:
 	char *performAction(const char *json, const char *senderIP);
 	void queueAction(const char *json, const char *senderIP);

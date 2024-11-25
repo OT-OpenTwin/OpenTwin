@@ -7,7 +7,7 @@
 #include "Types.h"
 #include "Geometry.h"
 #include "SceneNodeBase.h"
-
+#include "ViewChangedStates.h"
 // std header
 #include <list>
 #include <tuple>
@@ -227,6 +227,7 @@ public:
 	void setSceneNode(osg::Node *node, SceneNodeBase *sceneNode);
 	void removeSceneNode(osg::Node *node);
 
+	void notifySceneNodeAboutViewChange(const std::string& _sceneNodeName,const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
 	std::list<Viewer *> getViewerList(void) { return viewerList; };
 
 	unsigned int getCurrentTraversalMask(void);

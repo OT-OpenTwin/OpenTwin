@@ -139,7 +139,7 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 		else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged)
 		{
 			std::string editorName = ot::json::getString(_doc, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-			ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::instance().createFromJSON(ot::json::getObject(_doc, OT_ACTION_PARAM_Config), OT_JSON_MEMBER_GraphicsItemCfgType);
+			ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::create(ot::json::getObject(_doc, OT_ACTION_PARAM_Config));
 			if (!itemConfig) return "";
 
 			const ot::UID blockID = itemConfig->getUid();
@@ -183,10 +183,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)
 {
-
-}
-
-void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugin) {
 
 }
 

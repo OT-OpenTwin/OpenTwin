@@ -34,5 +34,5 @@ private:
 	const std::string m_headerSettingHorizontal = "first row";
 	const std::string m_headerSettingVertical = "first column";
 
-	ot::ContentChangedHandling m_tableContentChangedHandling = ot::ContentChangedHandling::ModelServiceSavesNotifyOwner;
+	ot::ContentChangedHandling m_tableContentChangedHandling = ot::ContentChangedHandling::ModelServiceSaves;
 };

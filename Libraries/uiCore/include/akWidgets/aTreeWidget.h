@@ -221,8 +221,8 @@ namespace ak {
 
 		// Filter
 
-		//! @brief Will set the visible mode of the filter textedit
-		//! @param _visible If true, the filter textedit will be visible
+		//! @brief Will set the visible mode of the filter lineedit
+		//! @param _visible If true, the filter lineedit will be visible
 		void setFilterVisible(
 			bool						_visible
 		);

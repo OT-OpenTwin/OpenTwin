@@ -31,6 +31,9 @@ namespace ot {
 		//! \throw May throw an exception if the provided object is not valid (members missing or invalid types).
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+		//! @brief Returns true if the builder has no entries that should be displayed (no text provided).
+		bool isEmpty(void) const;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Builder

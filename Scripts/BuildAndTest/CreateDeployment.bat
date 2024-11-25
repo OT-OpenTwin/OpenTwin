@@ -43,7 +43,6 @@ taskkill /IM "httpd.exe" /F 2> nul
 REM Clean up the Deployment directory
 RMDIR /S /Q "%OT_DEPLOYMENT_DIR%"
 MKDIR "%OT_DEPLOYMENT_DIR%"
-MKDIR "%OT_DEPLOYMENT_DIR%\uiPlugins"
 MKDIR "%OT_DEPLOYMENT_DIR%\Certificates"
 MKDIR "%OT_DEPLOYMENT_DIR%\Python"
 

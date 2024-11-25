@@ -367,6 +367,28 @@ void ViewerAPI::visualizationTetMeshNodeTetEdges(ot::UID osgModelID, unsigned lo
 	}
 }
 
+void ViewerAPI::notifySceneNodeAboutViewChange(ot::UID osgModelID, const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
+{
+	try
+	{
+		Model* model = nullptr;
+		if(osgModelID == -1)
+		{ 
+			model = globalActiveModel;
+		}
+		else
+		{
+			model = osgModelManager.at(osgModelID);
+		}
+		assert(model != nullptr);
+		model->notifySceneNodeAboutViewChange(_sceneNodeName, _state, _viewType);
+	}
+	catch (std::out_of_range)
+	{
+		throw std::exception("The specified model does not exist");
+	}
+}
+
 std::list<std::string> ViewerAPI::getSelectedCurves(ot::UID osgModelID)
 {
 	Model* model = osgModelManager.at(osgModelID);
@@ -913,24 +935,6 @@ void ViewerAPI::settingsItemChanged(ot::UID _viewerID, const ot::Property* _item
 		return;
 	}
 	viewer->second->settingsItemChanged(_item);
-}
-
-void ViewerAPI::contextMenuItemClicked(ot::UID _viewerID, const std::string& _menuName, const std::string& _itemName) {
-	auto viewer = viewerManager.find(_viewerID);
-	if (viewer == viewerManager.end()) {
-		assert(0);
-		return;
-	}
-	viewer->second->contextMenuItemClicked(_menuName, _itemName);
-}
-
-void ViewerAPI::contextMenuItemCheckedChanged(ot::UID _viewerID, const std::string& _menuName, const std::string& _itemName, bool _isChecked) {
-	auto viewer = viewerManager.find(_viewerID);
-	if (viewer == viewerManager.end()) {
-		assert(0);
-		return;
-	}
-	viewer->second->contextMenuItemCheckedChanged(_menuName, _itemName, _isChecked);
 }
 
 bool ViewerAPI::propertyGridValueChanged(ot::UID _viewerID, const ot::Property* _property)

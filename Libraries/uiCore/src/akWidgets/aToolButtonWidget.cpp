@@ -12,7 +12,6 @@
 
 // AK header
 #include <akGui/aAction.h>
-#include <akGui/aContextMenuItem.h>
 #include <akWidgets/aToolButtonWidget.h>
 
 // Qt header
@@ -76,91 +75,12 @@ void ak::aToolButtonWidget::SetToolTip(
 
 QString ak::aToolButtonWidget::ToolTip(void) const { return toolTip(); }
 
-ak::ID ak::aToolButtonWidget::addMenuItem(
-	aContextMenuItem *					_item
-) {
-	if (m_menu == nullptr) {
-		m_menu = new QMenu();
-		setMenu(m_menu);
-	}
-	_item->setId(m_menuItems.size());
-	m_menuItems.push_back(_item);
-
-	m_menu->addAction(_item);
-
-	connect(_item, SIGNAL(triggered(bool)), this, SLOT(slotMenuItemClicked()));
-	connect(_item, SIGNAL(toggled(bool)), this, SLOT(slotMenuItemCheckedChanged()));
-
-	return _item->id();
-}
-
-void ak::aToolButtonWidget::addMenuSeperator(void) {
-	if (m_menu == nullptr) {
-		m_menu = new QMenu();
-		setMenu(m_menu);
-	}
-	m_menu->addSeparator();
-}
-
-void ak::aToolButtonWidget::clearMenu(void) {
-	if (m_menu != nullptr) {
-		for (auto itm : m_menuItems) { aContextMenuItem * item = itm; delete itm; }
-		setMenu(nullptr);
-		delete m_menu;
-		m_menu = nullptr;
-		m_menuItems.clear();
-	}
-}
-
-void ak::aToolButtonWidget::setMenuItemChecked(
-	ak::ID								_itemID,
-	bool								_checked
-) {
-	assert(_itemID >= 0 && _itemID < m_menuItems.size());	// Index out of range
-	aContextMenuItem * itm = m_menuItems[_itemID];
-	itm->setCheckable(true);
-	itm->setChecked(_checked);
-}
-
-void ak::aToolButtonWidget::setMenuItemNotCheckable(
-	ak::ID								_itemID
-) {
-	assert(_itemID >= 0 && _itemID < m_menuItems.size());	// Index out of range
-	aContextMenuItem * itm = m_menuItems[_itemID];
-	itm->setCheckable(false);
-}
-
-QString ak::aToolButtonWidget::getMenuItemText(
-	ak::ID								_itemID
-) {
-	assert(_itemID >= 0 && _itemID < m_menuItems.size());	// Index out of range
-	aContextMenuItem * itm = m_menuItems[_itemID];
-	return itm->text();
-}
-
 // #######################################################################################################
 
 // Slots
 
 void ak::aToolButtonWidget::slotClicked() {
-	if (m_menuItems.size() != 0) {
-		showMenu();
-	}
-	else { Q_EMIT btnClicked(); }
-}
-
-void ak::aToolButtonWidget::slotMenuItemClicked() {
-	aContextMenuItem * itm = nullptr;
-	itm = dynamic_cast<aContextMenuItem *>(sender());
-	assert(itm != nullptr); // Cast failed
-	Q_EMIT menuItemClicked(itm->id());
-}
-
-void ak::aToolButtonWidget::slotMenuItemCheckedChanged() {
-	aContextMenuItem * itm = nullptr;
-	itm = dynamic_cast<aContextMenuItem *>(sender());
-	assert(itm != nullptr); // Cast failed
-	Q_EMIT menuItemCheckedChanged(itm->id(), itm->isChecked());
+	Q_EMIT btnClicked();
 }
 
 // #######################################################################################################
@@ -174,7 +94,6 @@ void ak::aToolButtonWidget::ini(void) {
 	setFocusPolicy(Qt::FocusPolicy::NoFocus);
 	m_action->setToolTip("");
 	m_action->setWhatsThis("");
-	m_menu = nullptr;
 	m_action->setMenuRole(QAction::MenuRole::NoRole);
 	m_action->setIconVisibleInMenu(true);
 	connect(m_action, &aAction::triggered, this, &aToolButtonWidget::slotClicked);

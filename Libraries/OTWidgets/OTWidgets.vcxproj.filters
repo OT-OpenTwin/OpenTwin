@@ -403,6 +403,21 @@
     <ClCompile Include="src\PlainTextEditView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\ContextMenu.cpp">
+      <Filter>src\ContextMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ContextMenuAction.cpp">
+      <Filter>src\ContextMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ContextMenuManager.cpp">
+      <Filter>src\ContextMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageBoxHandler.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageBoxManager.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -494,6 +509,12 @@
     </Filter>
     <Filter Include="src\StyledDelegates">
       <UniqueIdentifier>{666d82f1-aafe-4aeb-bdc5-d1e54fbe0966}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\ContextMenu">
+      <UniqueIdentifier>{797f8cc2-4b48-41b0-ab84-d7705601f14d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ContextMenu">
+      <UniqueIdentifier>{1702c1b1-239b-4758-8bfa-9bdb661cb348}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -782,6 +803,15 @@
     <ClInclude Include="include\OTWidgets\PlainTextEditView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\ContextMenuAction.h">
+      <Filter>include\ContextMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\MessageBoxManager.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\MessageBoxHandler.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -918,6 +948,12 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\Plot.h">
       <Filter>include\Plot\Base</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ContextMenu.h">
+      <Filter>include\ContextMenu</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\ContextMenuManager.h">
+      <Filter>include\ContextMenu</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

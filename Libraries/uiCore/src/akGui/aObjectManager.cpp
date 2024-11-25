@@ -21,35 +21,19 @@
 #include <akCore/aObject.h>
 #include <akCore/aUidMangager.h>
 
-// AK Dialogs
-#include <akDialogs/aPromptDialog.h>
-
 // AK GUI header
 #include <akGui/aAction.h>
-#include <akGui/aContextMenuItem.h>
-#include <akGui/aDialog.h>
 #include <akGui/aObjectManager.h>
 #include <akGui/aSignalLinker.h>
-#include <akGui/aSpecialTabBar.h>
 #include <akGui/aTimer.h>
-#include <akGui/aToolButtonCustomContextMenu.h>
-#include <akGui/aGlobalKeyListener.h>
 
 // AK Widgets header
 #include <akWidgets/aCheckBoxWidget.h>
-#include <akWidgets/aColorEditButtonWidget.h>
 #include <akWidgets/aComboBoxWidget.h>
 #include <akWidgets/aComboButtonWidget.h>
-#include <akWidgets/aDockWidget.h>
-#include <akWidgets/aDockWatcherWidget.h>
 #include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aLineEditWidget.h>
-#include <akWidgets/aListWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
-#include <akWidgets/aPushButtonWidget.h>
-#include <akWidgets/aTableWidget.h>
-#include <akWidgets/aTabWidget.h>
-#include <akWidgets/aTextEditWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
 #include <akWidgets/aTtbGroup.h>
 #include <akWidgets/aTtbPage.h>
@@ -139,21 +123,6 @@ ak::UID ak::aObjectManager::createCheckBox(
 	return obj->uid();
 }
 
-ak::UID ak::aObjectManager::createColorEditButton(
-	UID												_creatorUid,
-	const aColor &									_color,
-	const QString &										_textOverride
-) {
-	// Create object
-	aColorEditButtonWidget * obj = new aColorEditButtonWidget(_color, _textOverride);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
 ak::UID ak::aObjectManager::createComboBox(
 	UID												_creatorUid
 ) {
@@ -198,65 +167,6 @@ ak::UID ak::aObjectManager::createComboButtonItem(
 	return obj->uid();
 }
 
-ak::UID ak::aObjectManager::createDock(
-	UID												_creatorUid,
-	const QString &										_text
-) {
-	// Create object
-	aDockWidget * obj = new aDockWidget(_text);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createDockWatcher(
-	UID									_creatorUid,
-	const QString &						_text
-) {
-	// Create object
-	aDockWatcherWidget * obj = new aDockWatcherWidget(_text);
-	// Set parameter
-	obj->setUid(m_uidManager->getId());
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createDockWatcher(
-	UID									_creatorUid,
-	const QIcon &						_icon,
-	const QString &						_text
-) {
-	// Create object
-	aDockWatcherWidget * obj = new aDockWatcherWidget(_icon, _text);
-	// Set parameter
-	obj->setUid(m_uidManager->getId());
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createGlobalKeyListener(
-	UID											_creatorUid,
-	QApplication *								_app,
-	Qt::Key										_key,
-	const std::vector<Qt::KeyboardModifier>&	_keyModifiers,
-	bool										_blockOthers
-) {
-	// Create object
-	aGlobalKeyListener * obj = new aGlobalKeyListener(_app, _key, _keyModifiers, _blockOthers);
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
 ak::UID ak::aObjectManager::createLineEdit(
 	UID													_creatorUid,
 	const QString &											_initialText
@@ -281,77 +191,6 @@ ak::UID ak::aObjectManager::createNiceLineEdit(
 	// Set parameter
 	m_signalLinker->addLink(obj);
 	obj->setUid(m_uidManager->getId());
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createPushButton(
-	UID												_creatorUid,
-	const QString &										_text
-) {
-	// Create object
-	aPushButtonWidget * obj = new aPushButtonWidget(_text);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createPushButton(
-	UID												_creatorUid,
-	const QIcon &										_icon,
-	const QString &										_text
-) {
-	// Create object
-	aPushButtonWidget * obj = new aPushButtonWidget(_icon, _text);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createSpecialTabBar(
-	UID												_creatorUid
-) {
-	// Create object
-	aSpecialTabBar * obj = new aSpecialTabBar;
-	obj->setUid(m_uidManager->getId());
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createTable(
-	UID												_creatorUid,
-	int													_rows,
-	int													_columns
-) {
-	// Create object
-	aTableWidget * obj = new aTableWidget(_rows, _columns);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createTextEdit(
-	UID												_creatorUid,
-	const QString &										_initialText
-) {
-	// Create object
-	aTextEditWidget * obj = new aTextEditWidget();
-	obj->setPlainText(_initialText);
-	// Set parameter
-	m_signalLinker->addLink(obj);
 	// Store data
 	m_mapObjects.insert_or_assign(obj->uid(), obj);
 	addCreatedUid(_creatorUid, obj->uid());
@@ -405,33 +244,6 @@ ak::UID ak::aObjectManager::createToolButton(
 ) {
 	// Create object
 	aToolButtonWidget * obj = new aToolButtonWidget(_icon, _text);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createToolButtonCustomContextMenu(
-	UID												_creatorUid,
-	aToolButtonWidget *								_toolButton
-) {
-	// Create object
-	aToolButtonCustomContextMenu * obj = new aToolButtonCustomContextMenu(_toolButton);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createTabView(
-	UID												_creatorUid
-) {
-	// Create object
-	aTabWidget * obj = new aTabWidget;
 	// Set parameter
 	m_signalLinker->addLink(obj);
 	// Store data

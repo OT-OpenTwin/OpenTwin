@@ -10,7 +10,7 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
-#include "OTSystem/SystemLoadInformation.h"
+#include "OTSystem/SystemInformation.h"
 
 // std header
 #include <string> // string
@@ -102,15 +102,14 @@ namespace ot {
 			OT_HANDLER(handleRun, ExternalServicesComponent, OT_ACTION_CMD_Run, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handlePreShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServicePreShutdown, ot::SECURE_MESSAGE_TYPES)
 			OT_HANDLER(handleEmergencyShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceEmergencyShutdown, ot::SECURE_MESSAGE_TYPES)
-			OT_HANDLER(handleUIPluginConnected, ExternalServicesComponent, OT_ACTION_CMD_UI_RequestPluginSuccess, ot::SECURE_MESSAGE_TYPES)
-
+			
 			// #####################################################################################################################################
 
 			// Private member
 
 			ApplicationBase * m_application;			// The application object
 			ComponentState    m_componentState;
-			SystemLoadInformation m_systemLoad;
+			SystemInformation m_systemLoad;
 
 			std::string credentialsUsername;
 			std::string credentialsPassword;

@@ -33,6 +33,15 @@ void ot::StyledTextBuilder::setFromJsonObject(const ot::ConstJsonObject& _object
 	}
 }
 
+bool ot::StyledTextBuilder::isEmpty(void) const {
+	for (const StyledTextEntry& entry : m_entries) {
+		if (!entry.getText().empty()) {
+			return false;
+		}
+	}
+	return true;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Builder
@@ -62,48 +71,29 @@ ot::StyledTextBuilder& ot::StyledTextBuilder::operator<<(StyledText::ColorRefere
 
 ot::StyledTextBuilder& ot::StyledTextBuilder::operator<<(StyledText::TextControl _control) {
 	// Check for changes and apply new style
+	StyledTextStyle newStyle = m_entries.back().getStyle();
+
 	switch (_control) {
-	case ot::StyledText::ClearStyle:
-		if (m_entries.back().getStyle().hasStyleSet()) {
-			this->applyNextStyle(StyledTextStyle());
-		}
-		break;
-
-	case ot::StyledText::Bold:
-		if (!m_entries.back().getStyle().getBold()) {
-			StyledTextStyle newStyle = m_entries.back().getStyle();
-			newStyle.setBold(true);
-			this->applyNextStyle(newStyle);
-		}
-		break;
-
-	case ot::StyledText::Italic:
-		if (!m_entries.back().getStyle().getItalic()) {
-			StyledTextStyle newStyle = m_entries.back().getStyle();
-			newStyle.setItalic(true);
-			this->applyNextStyle(newStyle);
-		}
-		break;
-
-	case ot::StyledText::NotBold:
-		if (m_entries.back().getStyle().getBold()) {
-			StyledTextStyle newStyle = m_entries.back().getStyle();
-			newStyle.setBold(false);
-			this->applyNextStyle(newStyle);
-		}
-		break;
-
-	case ot::StyledText::NotItalic:
-		if (m_entries.back().getStyle().getItalic()) {
-			StyledTextStyle newStyle = m_entries.back().getStyle();
-			newStyle.setItalic(false);
-			this->applyNextStyle(newStyle);
-		}
-		break;
-
+	case ot::StyledText::ClearStyle: newStyle = StyledTextStyle(); break;
+	case ot::StyledText::Bold: newStyle.setBold(true); break;
+	case ot::StyledText::NotBold: newStyle.setBold(false); break;
+	case ot::StyledText::Italic: newStyle.setItalic(true); break;
+	case ot::StyledText::NotItalic: newStyle.setItalic(false); break;
+	case ot::StyledText::Underline: newStyle.setUnderline(true); break;
+	case ot::StyledText::NotUnderline: newStyle.setUnderline(false); break;
+	case ot::StyledText::LineTrough: newStyle.setLineTrough(true); break;
+	case ot::StyledText::NotLineTrough: newStyle.setLineTrough(false); break;
+	case ot::StyledText::Text: newStyle.setTextSize(StyledTextStyle::TextSize::Regular); break;
+	case ot::StyledText::Header1: newStyle.setTextSize(StyledTextStyle::TextSize::Header1); break;
+	case ot::StyledText::Header2: newStyle.setTextSize(StyledTextStyle::TextSize::Header2); break;
+	case ot::StyledText::Header3: newStyle.setTextSize(StyledTextStyle::TextSize::Header3); break;
 	default:
 		OT_LOG_EAS("Unknown TextControl (" + std::to_string((int)_control) + ")");
 		break;
+	}
+
+	if (m_entries.back().getStyle() != newStyle) {
+		this->applyNextStyle(newStyle);
 	}
 
 	return *this;

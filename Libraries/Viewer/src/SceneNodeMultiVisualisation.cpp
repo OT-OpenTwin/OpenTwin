@@ -2,7 +2,8 @@
 #include "SceneNodeMultiVisualisation.h"
 #include <osg/Node>
 #include <osg/Switch>
-#
+#include "TableVisualiser.h"
+
 SceneNodeMultiVisualisation::~SceneNodeMultiVisualisation()
 {
 	//Always necessary?
@@ -24,6 +25,63 @@ SceneNodeMultiVisualisation::~SceneNodeMultiVisualisation()
 	}
 }
 
+void SceneNodeMultiVisualisation::setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
+{
+	if (_state == ot::ViewChangedStates::changesSaved)
+	{
+		const std::list< Visualiser*>& allVisualiser = getVisualiser();
+		for (Visualiser* visualiser : allVisualiser)
+		{
+			//Update the other visualiser 
+			if (_viewType == ot::WidgetViewBase::ViewType::ViewTable)
+			{
+				TextVisualiser* textVisualiser = dynamic_cast<TextVisualiser*>(visualiser);
+				if (textVisualiser != nullptr)
+				{
+					textVisualiser->visualise();
+				}
+			}
+			else if (_viewType == ot::WidgetViewBase::ViewType::ViewText)
+			{
+				TableVisualiser* tableVisualiser = dynamic_cast<TableVisualiser*>(visualiser);
+				if (tableVisualiser != nullptr)
+				{
+					tableVisualiser->visualise();
+				}
+			}
+			else
+			{
+				assert(0); // not supported view Type for scene node.
+			}
+		}
+	}
+	else
+	{
+		const std::list< Visualiser*>& allVisualiser = getVisualiser();
+		bool viewIsOpen = _state == ot::ViewChangedStates::viewOpened ? true : false;
+		bool thisIsTheView = false;
+		for (Visualiser* visualiser : allVisualiser)
+		{
+			if (_viewType == ot::WidgetViewBase::ViewType::ViewText)
+			{
+				TextVisualiser* textVisualiser = dynamic_cast<TextVisualiser*>(visualiser);
+				thisIsTheView = textVisualiser != nullptr;
+			}
+			else if (_viewType == ot::WidgetViewBase::ViewType::ViewTable)
+			{
+				TableVisualiser* tableVisualiser = dynamic_cast<TableVisualiser*>(visualiser);
+				thisIsTheView = tableVisualiser != nullptr;
+			}
+
+			if (thisIsTheView)
+			{
+				visualiser->setViewIsOpen(viewIsOpen);
+				break;
+			}
+		}
+	}
+}
+
 void SceneNodeMultiVisualisation::setSelected(bool _selection)
 {
 	if (getModel() != nullptr)
@@ -33,7 +91,7 @@ void SceneNodeMultiVisualisation::setSelected(bool _selection)
 			const std::list<Visualiser*> visualisers = getVisualiser();
 			for (Visualiser* visualiser : visualisers)
 			{
-				if (visualiser->isVisible())
+				if (visualiser->isVisible() && !visualiser->viewIsCurrentlyOpen())
 				{
 					visualiser->visualise();
 				}

@@ -48,8 +48,6 @@ QString ak::toQString(
 	case etTimeout: return QString("Timeout");
 	case etToggeledChecked: return QString("ToggeledToChecked");
 	case etToggeledUnchecked: return QString("ToggeledToUnchecked");
-	case etContextMenuItemClicked: return QString("ContextMenuItemClicked");
-	case etContextMenuItemCheckedChanged: return QString("ContextMenuItemCheckedChanged");
 	case etVisibilityChanged: return QString("VisibilityChanged");
 	case etReturnPressed: return QString("ReturnPressed");
 	case etEditingFinished: return QString("EditingFinished");
@@ -208,36 +206,17 @@ QString ak::toQString(
 	case otComboBox: return QString("ComboBox");
 	case otComboButton: return QString("ComboButton");
 	case otCheckBox: return QString("CheckBox");
-	case otDatePicker: return QString("DatePicker");
-	case otDatePickerDialog: return QString("DatePickerDialog");
-	case otDefaultWelcomeScreen: return ("DefaultWelcomeScreen");
-	case otDock: return QString("Dock");
-	case otDockWatcher: return QString("DockWatcher");
-	case otGlobalKeyListener: return QString("GlobalKeyListener");
-	case otGraphicsView: return QString("GraphicsView");
 	case otLabel: return QString("Label");
 	case otLineEdit: return QString("LineEdit");
-	case otList: return QString("List");
 	case otMainWindow: return QString("Window");
 	case otNiceLineEdit: return QString("NiceLineEdit");
-	case otPrompt: return QString("Prompt");
-	case otPropertyGrid: return QString("PropertyGrid");
-	case otPushButton: return QString("PushButton");
-	case otRadioButton: return QString("RadioButton");
-	case otSpecialTabBar: return QString("SpecialTabBar");
 	case otSpinBox: return QString("SpinBox");
-	case otTable: return QString("Table");
 	case otTabToolbar: return QString("TabToolBar");
 	case otTabToolbarGroup: return QString("TabToolBarGroup");
 	case otTabToolbarPage: return QString("TabBoolBarPage");
 	case otTabToolbarSubgroup: return QString("TabToolBarSubGroup");
-	case otTabView: return QString("TabView");
-	case otTextEdit: return QString("TextEdit");
-	case otTimePicker: return QString("TimePicker");
-	case otTimePickerDialog: return QString("TimePickerDialog");
 	case otTimer: return QString("Timer");
 	case otToolButton: return QString("ToolButton");
-	case otToolButtonCustomContextMenu: return QString("ToolButtonCustomContextMenu");
 	case otTree: return QString("Tree");
 	case otTreeItem: return QString("TreeItem");
 	default: assert(0); // Not implemented yet
@@ -287,24 +266,6 @@ QString ak::toQString(
 }
 
 QString ak::toQString(
-	dialogResult							_dialogResult
-) {
-	switch (_dialogResult)
-	{
-	case resultYes: return QString("Result.Yes");
-	case resultNo: return QString("Result.No");
-	case resultOk: return QString("Result.Ok");
-	case resultCancel: return QString("Result.Cancel");
-	case resultIgnore: return QString("Result.Ignore");
-	case resultRetry: return QString("Result.Retry");
-	case resultNone: return QString("Result.None");
-	default:
-		assert(0);
-		return QString();
-	}
-}
-
-QString ak::toQString(
 	promptType								_promptType
 ) {
 	switch (_promptType)
@@ -346,19 +307,6 @@ QString ak::toQString(
 	case keyF9: return QString("KeyF9");
 	case keyReturn: return QString("KeyReturn");
 	case keySpace: return QString("KeySpace");
-	default:
-		assert(0); // Not implemented yet
-		return QString("");
-	}
-}
-
-QString ak::toQString(
-	contextMenuRole							_role
-) {
-	switch (_role)
-	{
-	case cmrNone: return QString("None");
-	case cmrClear: return QString("Clear");
 	default:
 		assert(0); // Not implemented yet
 		return QString("");

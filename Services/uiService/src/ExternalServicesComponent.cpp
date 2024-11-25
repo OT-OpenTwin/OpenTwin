@@ -14,8 +14,6 @@
 #include "ToolBar.h"
 #include "ShortcutManager.h"
 #include "UserSettings.h"
-#include "ContextMenuManager.h"
-#include "UiPluginManager.h"
 #include "SelectEntitiesDialog.h"
 #include "ServiceDataUi.h"
 #include "UserManagement.h"
@@ -74,17 +72,11 @@
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/Msg.h"
 
-#include "OTServiceFoundation/ContextMenu.h"
-
 #include "StudioSuiteConnector/StudioSuiteConnectorAPI.h"
 #include "LTSpiceConnector/LTSpiceConnectorAPI.h"
 
-// Curl
-#include "curl/curl.h"					// Curl
-
 // AK header
 #include <akAPI/uiAPI.h>
-#include <akGui/aColor.h>
 #include <akCore/akCore.h>
 
 #include "base64.h"
@@ -170,15 +162,6 @@ extern "C"
 		}
 	};
 }
-
-#ifdef _DEBUG
-void _outputDebugMessage(const std::string & _msg) {
-	OutputDebugStringA("[OPEN TWIN] [DEBUG] ");
-	OutputDebugStringA(_msg.c_str());
-	OutputDebugStringA("\n");
-	std::cout << _msg << std::endl;
-}
-#endif // _DEBUG
 
 // ###################################################################################################
 
@@ -484,11 +467,11 @@ void ExternalServicesComponent::notify(ak::UID _senderId, ak::eventType _event, 
 				// Check if response is an error or warning
 				OT_ACTION_IF_RESPONSE_ERROR(response) {
 					assert(0); // ERROR
-					AppBase::instance()->showErrorPrompt(response.c_str(), "Error");
+					AppBase::instance()->showErrorPrompt(response, "Error");
 				}
 				else OT_ACTION_IF_RESPONSE_WARNING(response) {
 					assert(0); // WARNING
-					AppBase::instance()->showWarningPrompt(response.c_str(), "Warning");
+					AppBase::instance()->showWarningPrompt(response, "Warning");
 				}
 			}
 			else { executeAction(AppBase::instance()->getViewerComponent()->getActiveDataModel(), _senderId); }
@@ -759,43 +742,6 @@ void ExternalServicesComponent::prefetchDataThread(const std::string &projectNam
 	m_prefetchingDataCompleted = true;
 }
 
-void ExternalServicesComponent::contextMenuItemClicked(ot::ServiceBase * _sender, const std::string& _menuName, const std::string& _itemName) {
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ContextMenuItemClicked, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenuName, ot::JsonString(_menuName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName, ot::JsonString(_itemName, doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	sendHttpRequest(EXECUTE, _sender->getServiceURL(), doc, response);
-
-	// Check if response is an error or warning
-	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		OT_LOG_E(response);
-	}
-	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		OT_LOG_W(response);
-	}
-}
-
-void ExternalServicesComponent::contextMenuItemCheckedChanged(ot::ServiceBase* _sender, const std::string& _menuName, const std::string& _itemName, bool _isChecked) {
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenuName, ot::JsonString(_menuName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName, ot::JsonString(_itemName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_UI_CONTROL_CheckedState, _isChecked, doc.GetAllocator());
-
-	std::string response;
-	sendHttpRequest(EXECUTE, _sender->getServiceURL(), doc, response);
-
-	// Check if response is an error or warning
-	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		OT_LOG_E(response);
-	}
-	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		OT_LOG_W(response);
-	}
-}
-
 bool ExternalServicesComponent::projectIsOpened(const std::string &projectName, std::string &projectUser)
 {
 	ot::JsonDocument doc;
@@ -940,12 +886,12 @@ bool ExternalServicesComponent::sendKeySequenceActivatedMessage(KeyboardCommandH
 	// Check if response is an error or warning
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		assert(0); // ERROR
-		AppBase::instance()->showErrorPrompt(response.c_str(), "Error");
+		AppBase::instance()->showErrorPrompt(response, "Error");
 		return false;
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		assert(0); // WARNING
-		AppBase::instance()->showWarningPrompt(response.c_str(), "Warning");
+		AppBase::instance()->showWarningPrompt(response, "Warning");
 		return false;
 	}
 	return true;
@@ -1127,13 +1073,13 @@ std::list<ot::ProjectTemplateInformation> ExternalServicesComponent::getListOfPr
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
 		assert(0); // ERROR
 		OT_LOG_E(response);
-		app->showErrorPrompt(response.c_str(), "Error");
+		app->showErrorPrompt(response, "Error");
 		return result;
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		assert(0); // WARNING
 		OT_LOG_W(response);
-		app->showWarningPrompt(response.c_str(), "Warning");
+		app->showWarningPrompt(response, "Warning");
 		return result;
 	}
 	
@@ -1189,13 +1135,13 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
 			OT_LOG_EAS(response);
-			app->showErrorPrompt(response.c_str(), "Error");
+			app->showErrorPrompt(response, "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
 			OT_LOG_WAS(response);
-			app->showWarningPrompt(response.c_str(), "Warning");
+			app->showWarningPrompt(response, "Warning");
 			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
@@ -1244,13 +1190,13 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
 			OT_LOG_EAS("Error response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
-			app->showErrorPrompt("Failed to create Session. " + QString::fromStdString(response), "Error");
+			app->showErrorPrompt("Failed to create Session. " + response, "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
 			OT_LOG_WAS("Warning response from  Local Session Service at \"" + m_sessionServiceURL + "\": " + response);
-			app->showErrorPrompt("Failed to create Session. " + QString::fromStdString(response), "Error");
+			app->showErrorPrompt("Failed to create Session. " + response, "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
@@ -1503,8 +1449,6 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 			m_lockManager->cleanService(s.second, false, true);
 			m_controlsManager->serviceDisconnected(s.second);
 			app->shortcutManager()->creatorDestroyed(s.second);
-			app->contextMenuManager()->serviceDisconnected(s.second);
-			m_owner->uiPluginManager()->unloadPlugins(s.second);
 			delete s.second;
 		}
 		m_lockManager->cleanService(app->getViewerComponent());
@@ -1513,7 +1457,6 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		app->shortcutManager()->clearViewerHandler();
 		app->clearNavigationTree();
 		app->clearPropertyGrid();
-		app->contextMenuManager()->serviceDisconnected(nullptr);
 		app->clearGraphicsPickerData();
 
 		// Clear all maps
@@ -1758,7 +1701,7 @@ void ExternalServicesComponent::deallocateData(const char *data)
 
 void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
 	ot::stopSessionServiceHealthCheck();
-	ak::uiAPI::promptDialog::show("The session service has died unexpectedly. The application will be closed now.", "Error", ak::promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+	AppBase::instance()->showErrorPrompt("The session service has died unexpectedly. The application will be closed now.", "Error");
 	exit(0);
 }
 
@@ -2096,7 +2039,8 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 		while (!m_prefetchingDataCompleted)
 		{
 			QApplication::processEvents();
-			Sleep(25);
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(25ms);
 		}
 
 		workerThread.join();
@@ -2164,8 +2108,7 @@ std::string ExternalServicesComponent::handlePreShutdown(ot::JsonDocument& _docu
 }
 
 std::string ExternalServicesComponent::handleEmergencyShutdown(ot::JsonDocument& _document) {
-	QString msg("An unexpected error occurred and the session needs to be closed.");
-	ak::uiAPI::promptDialog::show(msg, "Open Twin", ak::promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+	AppBase::instance()->showErrorPrompt("An unexpected error occurred and the session needs to be closed.", "Error");
 	exit(1);
 
 	return "";
@@ -2215,9 +2158,7 @@ std::string ExternalServicesComponent::handleServiceDisconnected(ot::JsonDocumen
 		// Clean up elements
 		m_lockManager->cleanService(actualService, false, true);
 		m_controlsManager->serviceDisconnected(actualService);
-		m_owner->uiPluginManager()->unloadPlugins(actualService);
 		AppBase::instance()->shortcutManager()->creatorDestroyed(actualService);
-		AppBase::instance()->contextMenuManager()->serviceDisconnected(actualService);
 
 		// Clean up entry
 		m_serviceIdMap.erase(actualService->getServiceID());
@@ -2278,82 +2219,38 @@ std::string ExternalServicesComponent::handleDisplayStyledMessage(ot::JsonDocume
 	return "";
 }
 
-std::string ExternalServicesComponent::handleDisplayDebugMessage(ot::JsonDocument& _document) {
-	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	
-	AppBase::instance()->appendDebugMessage(QString::fromStdString(message));
-
-	return "";
-}
-
 std::string ExternalServicesComponent::handleReportError(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+	AppBase::instance()->showErrorPrompt(message, "Open Twin");
 
 	return "";
 }
 
 std::string ExternalServicesComponent::handleReportWarning(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
+	AppBase::instance()->showWarningPrompt(message, "Open Twin");
 
 	return "";
 }
 
 std::string ExternalServicesComponent::handleReportInformation(ot::JsonDocument& _document) {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", ak::promptIconLeft, "DialogInformation", "Default", AppBase::instance()->mainWindow());
+	AppBase::instance()->showInfoPrompt(message, "Open Twin");
 
 	return "";
 }
 
 std::string ExternalServicesComponent::handlePromptInformation(ot::JsonDocument& _document) {
-	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	std::string icon = ot::json::getString(_document, OT_ACTION_PARAM_ICON);
-	std::string options = ot::json::getString(_document, OT_ACTION_PARAM_OPTIONS);
+	ot::MessageDialogCfg config;
+	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+
 	std::string promptResponse = ot::json::getString(_document, OT_ACTION_PARAM_RESPONSE);
 	std::string sender = ot::json::getString(_document, OT_ACTION_PARAM_SENDER);
 	std::string parameter1 = ot::json::getString(_document, OT_ACTION_PARAM_PARAMETER1);
 
-	ak::promptType promptType = ak::promptIconLeft;
+	ot::MessageDialogCfg::BasicButton result = AppBase::instance()->showPrompt(config);
 
-	if (options == "YesNo")
-	{
-		promptType = ak::promptType::promptYesNoIconLeft;
-	}
-	else if (options == "YesNoCancel")
-	{
-		promptType = ak::promptType::promptYesNoCancelIconLeft;
-	}
-	else if (options == "OkCancel")
-	{
-		promptType = ak::promptType::promptOkCancelIconLeft;
-	}
-	else if (options == "Ok")
-	{
-		promptType = ak::promptType::promptOkIconLeft;
-	}
-	else
-	{
-		assert(0); // Unknown options
-	}
-
-	ak::dialogResult result = ak::uiAPI::promptDialog::show(message.c_str(), "Open Twin", promptType, icon.c_str(), "Default", AppBase::instance()->mainWindow());
-
-	std::string queryResult;
-
-	switch (result)
-	{
-	case ak::dialogResult::resultCancel: queryResult = "Cancel"; break;
-	case ak::dialogResult::resultIgnore: queryResult = "Ignore"; break;
-	case ak::dialogResult::resultNo:     queryResult = "No"; break;
-	case ak::dialogResult::resultYes:    queryResult = "Yes"; break;
-	case ak::dialogResult::resultNone:   queryResult = "None"; break;
-	case ak::dialogResult::resultOk:     queryResult = "Ok"; break;
-	case ak::dialogResult::resultRetry:  queryResult = "Retry"; break;
-	default:
-		assert(0); // Unknown type
-	}
+	std::string queryResult = ot::MessageDialogCfg::toString(result);
 
 	ot::JsonDocument docOut;
 	docOut.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PromptResponse, docOut.GetAllocator()), docOut.GetAllocator());
@@ -2583,7 +2480,7 @@ std::string ExternalServicesComponent::handleSaveFileContent(ot::JsonDocument& _
 	decodedString = nullptr;
 
 	// Show a success message
-	ak::uiAPI::promptDialog::show(std::string("The file has been successfully saved:\n" + fileName).c_str(), dialogTitle.c_str(), ak::promptOkIconLeft, "DialogInformation", "Default", AppBase::instance()->mainWindow());
+	AppBase::instance()->showInfoPrompt("The file has been successfully saved:\n" + fileName, dialogTitle);
 	
 	return "";
 }
@@ -2691,11 +2588,7 @@ std::string ExternalServicesComponent::handleAddMenuButton(ot::JsonDocument& _do
 	std::string iconName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_IconName);
 	std::string iconFolder = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	ot::ContextMenu contextMenu("");
-	if (_document.HasMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenu)) {
-		ot::ConstJsonObject contextMenuData = ot::json::getObject(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenu);
-		contextMenu.setFromJsonObject(contextMenuData);
-	}
+	
 	ServiceDataUi* senderService = getService(serviceId);
 	
 	ot::LockTypeFlags flags = (ot::LockAll);
@@ -2740,10 +2633,6 @@ std::string ExternalServicesComponent::handleAddMenuButton(ot::JsonDocument& _do
 					ak::uiAPI::toolButton::setToolTip(buttonID, text.c_str());
 				}
 			}
-		}
-
-		if (contextMenu.hasItems()) {
-			AppBase::instance()->contextMenuManager()->createItem(senderService, getServiceUiUid(senderService), buttonID, contextMenu);
 		}
 	}
 
@@ -3580,10 +3469,10 @@ std::string ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument&
 	std::string iconPath = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_IconFolder);
 	try {
 		ot::IconManager::addSearchPath(QString::fromStdString(iconPath));
-		AppBase::instance()->appendDebugMessage("[ERROR] Added icon search path: " + QString::fromStdString(iconPath));
+		OT_LOG_D("[ERROR] Added icon search path: " + iconPath);
 	}
 	catch (...) {
-		AppBase::instance()->appendInfoMessage("[ERROR] Failed to add icon search path: Path not found");
+		OT_LOG_EA("[ERROR] Failed to add icon search path: Path not found");
 	}
 #endif // _DEBUG
 
@@ -3714,7 +3603,7 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
 
 	for (auto graphicsItemCfg : pckg.items()) {
-		ot::GraphicsItem* graphicsItem = ot::GraphicsItemFactory::instance().itemFromConfig(graphicsItemCfg, true);
+		ot::GraphicsItem* graphicsItem = ot::GraphicsItemFactory::itemFromConfig(graphicsItemCfg, true);
 		if (graphicsItem != nullptr) {
 			//const double xCoordinate = graphicsItemCfg->getPosition().x();
 			//const double yCoordinate = graphicsItemCfg->getPosition().y();
@@ -3852,12 +3741,20 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());
 
+	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
+	assert(0); // @Alex: Prevent the switch of active view depending on this boolean
+
 	ot::TextEditorCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
 	ot::TextEditorView* editor = AppBase::instance()->findOrCreateTextEditor(config, info);
 	editor->setContentChanged(false);
 	editor->setAsCurrentViewTab();
+
+	const std::string& name = editor->getViewData().getEntityName();
+	const auto& viewerType = editor->getViewData().getViewType();
+	ot::UID globalActiveViewModel = -1;
+	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::viewOpened, viewerType);
 
 	return "";
 }
@@ -3906,12 +3803,20 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());
 
+	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
+	assert(0); // @Alex: Prevent the switch of active view depending on this boolean
+
 	ot::TableCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
 	ot::TableView* table = AppBase::instance()->findOrCreateTable(config, info);
 	table->setContentChanged(false);
 	table->setAsCurrentViewTab();
+	
+	const std::string& name = table->getViewData().getEntityName();
+	const auto& viewerType = table->getViewData().getViewType();
+	ot::UID globalActiveViewModel = -1;
+	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::viewOpened, viewerType);
 
 	return "";
 }
@@ -4033,12 +3938,9 @@ std::string ExternalServicesComponent::handleRemoveTableColumn(ot::JsonDocument&
 }
 
 std::string ExternalServicesComponent::handleCloseTable(ot::JsonDocument& _document) {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
-
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	AppBase::instance()->closeTable(tableName, info);
+	AppBase::instance()->closeTable(tableName);
 
 	return "";
 }
@@ -4370,60 +4272,6 @@ std::string ExternalServicesComponent::handleMessageDialog(ot::JsonDocument& _do
 	return "";
 }
 
-// Plugin handling
-
-std::string ExternalServicesComponent::handlePluginSearchPath(ot::JsonDocument& _document) {
-#ifdef _DEBUG
-	std::string pluginPath = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_PATH);
-	m_owner->uiPluginManager()->addPluginSearchPath(pluginPath.c_str());
-	AppBase::instance()->appendDebugMessage("[ERROR] Added UI plugin search path: " + QString::fromStdString(pluginPath));
-#endif // _DEBUG
-	return "";
-}
-
-std::string ExternalServicesComponent::handleRequestPlugin(ot::JsonDocument& _document) {
-	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	std::string pluginName = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_NAME);
-	std::string pluginPath = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_PATH);
-	ServiceDataUi* service = getService(serviceId);
-	ak::UID pluginUid = m_owner->uiPluginManager()->loadPlugin(pluginName.c_str(), pluginPath.c_str(), service);
-
-	if (pluginUid) {
-		AppBase* app = AppBase::instance();
-
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestPluginSuccess, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, app->getServiceID(), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(app->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(app->getServiceName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(app->getServiceType(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_NAME, ot::JsonString(pluginName, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_UID, pluginUid, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_PATH, ot::JsonString(pluginPath, doc.GetAllocator()), doc.GetAllocator());
-
-		std::string response;
-		sendHttpRequest(EXECUTE, service->getServiceURL(), doc, response);
-
-		// Check if response is an error or warning
-		OT_ACTION_IF_RESPONSE_ERROR(response) { assert(0); }
-		else OT_ACTION_IF_RESPONSE_WARNING(response) { assert(0); }
-	}
-	return "";
-}
-
-std::string ExternalServicesComponent::handlePluginMessage(ot::JsonDocument& _document) {
-	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
-	std::string pluginAction = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_ACTION_MEMBER);
-	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
-	std::string pluginName = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_NAME);
-	unsigned long long pluginUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_UI_PLUGIN_UID);
-	ServiceDataUi* service = getService(serviceId);
-	if (!AppBase::instance()->uiPluginManager()->forwardMessageToPlugin(pluginUID, pluginAction, message)) {
-		return OT_ACTION_RETURN_INDICATOR_Error "Failed to process message";
-	}
-	return "";
-}
-
 void ExternalServicesComponent::sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
@@ -4481,10 +4329,6 @@ void sessionServiceHealthChecker(std::string _sessionServiceURL) {
 	}
 
 	if (sessionServiceDied) {
-#ifdef _DEBUG
-		_outputDebugMessage("Session service has died unexpectedly. Shutting down...");
-#endif // _DEBUG
-
 		QMetaObject::invokeMethod(AppBase::instance()->getExternalServicesComponent(), "shutdownAfterSessionServiceDisconnected", Qt::QueuedConnection);
 	}
 }

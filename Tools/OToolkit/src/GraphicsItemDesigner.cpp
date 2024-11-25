@@ -65,7 +65,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	_content.addView(view);
 
 	m_preview = new GraphicsItemDesignerPreview;
-	view = this->createToolWidgetView(m_preview, "GID Preview");
+	view = this->createCentralWidgetView(m_preview, "GID Preview");
 	_content.addView(view);
 
 	m_toolBar = new GraphicsItemDesignerToolBar(this);
@@ -192,7 +192,7 @@ void GraphicsItemDesigner::slotImportRequested(void) {
 	}
 
 	// Create config
-	ot::GraphicsItemCfg* newConfig = ot::GraphicsItemCfgFactory::instance().create(dataDoc.GetConstObject());
+	ot::GraphicsItemCfg* newConfig = ot::GraphicsItemCfgFactory::create(dataDoc.GetConstObject());
 	if (!newConfig) {
 		return;
 	}
@@ -281,7 +281,7 @@ void GraphicsItemDesigner::slotUpdateConfigRequested(void) {
 	}
 
 	// Create config
-	ot::GraphicsItemCfg* newConfig = ot::GraphicsItemCfgFactory::instance().create(dataDoc.GetConstObject());
+	ot::GraphicsItemCfg* newConfig = ot::GraphicsItemCfgFactory::create(dataDoc.GetConstObject());
 	if (!newConfig) {
 		return;
 	}
@@ -421,7 +421,7 @@ void GraphicsItemDesigner::slotDeleteItemsRequested(const ot::UIDList& _items, c
 }
 
 void GraphicsItemDesigner::createItemFromConfig(const ot::GraphicsItemCfg* _config, bool _keepName) {
-	GraphicsItemDesignerItemBase* newItem = WrappedItemFactory::instance().createFromConfig(_config);
+	GraphicsItemDesignerItemBase* newItem = WrappedItemFactory::createFromConfig(_config);
 	if (newItem) {
 		newItem->getGraphicsItem()->setGraphicsItemUid(m_drawHandler->generateUid());
 		m_view->addItem(newItem->getGraphicsItem());

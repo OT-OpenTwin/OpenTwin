@@ -150,15 +150,14 @@ void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _isUpdat
 	newHighlighter->setRules(DefaultSyntaxHighlighterRules::create(_config.getDocumentSyntax()));
 	newHighlighter->blockSignals(true);
 
-	if (!_isUpdate) {
-		QString newText = QString::fromStdString(_config.getPlainText());
-		newText.remove('\r');
-		if (newText != this->toPlainText()) {
-			this->setCode(newText);
-		}
+	QString newText = QString::fromStdString(_config.getPlainText());
+	newText.remove('\r');
+	if (newText != this->toPlainText()) {
+		this->setCode(newText);
 	}
+
 	this->storeSyntaxHighlighter(newHighlighter);
-	
+
 	newHighlighter->blockSignals(false);
 	this->blockSignals(tmp);
 }

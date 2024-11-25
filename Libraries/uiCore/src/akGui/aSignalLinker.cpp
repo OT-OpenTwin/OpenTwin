@@ -19,26 +19,17 @@
 #include <akGui/aAction.h>
 #include <akGui/aSignalLinker.h>
 #include <akGui/aTimer.h>
-#include <akGui/aGlobalKeyListener.h>
-#include <akGui/aToolButtonCustomContextMenu.h>
 
 // AK Widgets header
 #include <akWidgets/aCheckBoxWidget.h>
-#include <akWidgets/aColorEditButtonWidget.h>
 #include <akWidgets/aComboBoxWidget.h>
 #include <akWidgets/aComboButtonWidget.h>
-#include <akWidgets/aDockWidget.h>
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
-#include <akWidgets/aPushButtonWidget.h>
-#include <akWidgets/aTableWidget.h>
-#include <akWidgets/aTabWidget.h>
-#include <akWidgets/aTextEditWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
 
 // Qt header
 #include <qmessagebox.h>			// QMessageBox
-#include <qdockwidget.h>
 #include <qtreewidget.h>
 #include <qstring.h>
 #include <qevent.h>
@@ -80,9 +71,6 @@ ak::aSignalLinker::~aSignalLinker()
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
 			break;
-		case otColorEditButton:
-			itm->second.object->disconnect(itm->second.object, SIGNAL(changed()), this, SLOT(slotChanged()));
-			break;
 		case otComboBox:
 			itm->second.object->disconnect(itm->second.object, SIGNAL(activated(int)), this, SLOT(slotIndexActivated(int)));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(currentIndexChanged(int)), this, SLOT(slotIndexChanged(int)));
@@ -95,14 +83,6 @@ ak::aSignalLinker::~aSignalLinker()
 			itm->second.object->disconnect(itm->second.object, SIGNAL(changed()), this, SLOT(slotChanged()));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
-			break;
-		case otDock:
-			itm->second.object->disconnect(itm->second.object, SIGNAL(visibilityChanged(bool)), this, SLOT(slotVisibilityChanged(bool)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(closing()), this, SLOT(slotClosing()));
-			break;
-		case otPropertyGrid:
-			itm->second.object->disconnect(itm->second.object, SIGNAL(cleared()), this, SLOT(slotCleared()));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(itemChanged(int)), this, SLOT(slotItemChanged(int)));
 			break;
 		case otLineEdit:
 			itm->second.object->disconnect(itm->second.object, SIGNAL(cursorPositionChanged(int, int)), this, SLOT(slotCursorPositionChangedIndex(int, int)));
@@ -120,35 +100,6 @@ ak::aSignalLinker::~aSignalLinker()
 			itm->second.object->disconnect(itm->second.object, SIGNAL(editingFinished()), this, SLOT(slotEditingFinished()));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
 			break;
-		case otPushButton:
-			itm->second.object->disconnect(itm->second.object, SIGNAL(clicked()), this, SLOT(slotClicked()));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(toggled(bool)), this, SLOT(slotToggled(bool)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
-			break;
-		case otTable:
-			itm->second.object->disconnect(itm->second.object, SIGNAL(cellActivated(int, int)), this, SLOT(tableCellActivated(int, int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(cellChanged(int, int)), this, SLOT(tableCellChanged(int, int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(cellClicked(int, int)), this, SLOT(tableCellClicked(int, int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(tableCellDoubleClicked(int, int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(cellEntered(int, int)), this, SLOT(tableCellEntered(int, int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
-			break;
-		case otTabView:
-			itm->second.object->disconnect(itm->second.object, SIGNAL(currentChanged(int)), this, SLOT(slotItemChanged(int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(tabBarClicked(int)), this, SLOT(slotItemClicked(int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(tabCloseRequested(int)), this, SLOT(slotItemClicked(int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(tabBarDoubleClicked(int)), this, SLOT(slotItemDoubleClicked(int)));
-			break;
-		case otTextEdit:
-			itm->second.object->disconnect(itm->second.object, SIGNAL(cursorPositionChanged()), this, SLOT(slotCursorPositionChanged()));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(textChanged()), this, SLOT(slotChanged()));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(contextMenuItemClicked(ak::ID)), this, SLOT(slotContextMenuItemClicked(ak::ID)));
-			break;
 		case otTimer:
 			itm->second.object->disconnect(itm->second.object, SIGNAL(timeout()), this, SLOT(slotTimeout()));
 			break;
@@ -156,8 +107,6 @@ ak::aSignalLinker::~aSignalLinker()
 			itm->second.object->disconnect(itm->second.object, SIGNAL(btnClicked()), this, SLOT(slotClicked()));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(slotKeyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(menuItemClicked(ak::ID)), this, SLOT(slotContextMenuItemClicked(ak::ID)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(menuItemCheckedChanged(ak::ID, bool)), this, SLOT(slotContextMenuItemCheckedChanged(ak::ID, bool)));
 			break;
 		case otTree:
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
@@ -217,20 +166,6 @@ ak::UID ak::aSignalLinker::addLink(
 	_object->connect(_object, &aCheckBoxWidget::stateChanged, this, &aSignalLinker::slotStateChanged);
 	_object->connect(_object, &aCheckBoxWidget::keyPressed, this, &aSignalLinker::slotKeyPressed);
 	_object->connect(_object, &aCheckBoxWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
-
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aColorEditButtonWidget *						_object,
-	UID												_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otColorEditButton });
-
-	_object->connect(_object, &aColorEditButtonWidget::changed, this, &aSignalLinker::slotChanged);
 
 	return _objectUid;
 }
@@ -306,88 +241,6 @@ ak::UID ak::aSignalLinker::addLink(
 }
 
 ak::UID ak::aSignalLinker::addLink(
-	aDockWidget *									_object,
-	UID												_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otDock });
-
-	_object->connect(_object, &aDockWidget::visibilityChanged, this, &aSignalLinker::slotVisibilityChanged);
-	_object->connect(_object, &aDockWidget::closing, this, &aSignalLinker::slotClosing);
-
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aPushButtonWidget *									_object,
-	UID													_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otPushButton });
-
-	_object->connect(_object, &aPushButtonWidget::clicked, this, &aSignalLinker::slotClicked);
-	_object->connect(_object, &aPushButtonWidget::toggled, this, &aSignalLinker::slotToggled);
-	_object->connect(_object, &aPushButtonWidget::keyPressed, this, &aSignalLinker::slotKeyPressed);
-	_object->connect(_object, &aPushButtonWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
-
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aTableWidget *										_object,
-	UID													_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otTable });
-	_object->connect(_object, &QTableWidget::cellActivated, this, &aSignalLinker::tableCellActivated);
-	_object->connect(_object, &QTableWidget::cellChanged, this, &aSignalLinker::tableCellChanged);
-	_object->connect(_object, &QTableWidget::cellClicked, this, &aSignalLinker::tableCellClicked);
-	_object->connect(_object, &QTableWidget::cellDoubleClicked, this, &aSignalLinker::tableCellDoubleClicked);
-	_object->connect(_object, &QTableWidget::cellEntered, this, &aSignalLinker::tableCellEntered);
-	_object->connect(_object, &aTableWidget::keyPressed, this, &aSignalLinker::slotKeyPressed);
-	_object->connect(_object, &aTableWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aTabWidget *										_object,
-	UID													_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otTabView });
-	_object->connect(_object, &QTabWidget::currentChanged, this, &aSignalLinker::slotItemChanged);
-	_object->connect(_object, &QTabWidget::tabBarClicked, this, &aSignalLinker::slotItemClicked);
-	_object->connect(_object, &QTabWidget::tabCloseRequested, this, &aSignalLinker::slotItemClicked);
-	_object->connect(_object, &QTabWidget::tabBarDoubleClicked, this, &aSignalLinker::slotItemDoubleClicked);
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aTextEditWidget *									_object,
-	UID													_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otTextEdit });
-	_object->connect(_object, &QTextEdit::cursorPositionChanged, this, &aSignalLinker::slotCursorPositionChanged);
-	_object->connect(_object, &QTextEdit::selectionChanged, this, &aSignalLinker::slotSelectionChanged);
-	_object->connect(_object, &QTextEdit::textChanged, this, &aSignalLinker::slotChanged);
-	_object->connect(_object, &aTextEditWidget::keyPressed, this, &aSignalLinker::slotKeyPressed);
-	_object->connect(_object, &aTextEditWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
-	_object->connect(_object, &aTextEditWidget::contextMenuItemClicked, this, &aSignalLinker::slotContextMenuItemClicked);
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
 	aTimer *											_object,
 	UID													_objectUid
 ) {
@@ -412,33 +265,6 @@ ak::UID ak::aSignalLinker::addLink(
 	_object->connect(_object, &aToolButtonWidget::btnClicked, this, &aSignalLinker::slotClicked);
 	_object->connect(_object, &aToolButtonWidget::keyPressed, this, &aSignalLinker::slotKeyPressed);
 	_object->connect(_object, &aToolButtonWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
-	_object->connect(_object, &aToolButtonWidget::menuItemClicked, this, &aSignalLinker::slotContextMenuItemClicked);
-	_object->connect(_object, &aToolButtonWidget::menuItemCheckedChanged, this, &aSignalLinker::slotContextMenuItemCheckedChanged);
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aToolButtonCustomContextMenu *						_object,
-	UID													_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otToolButtonCustomContextMenu });
-	_object->connect(_object, &aToolButtonCustomContextMenu::menuItemClicked, this, &aSignalLinker::slotContextMenuItemClicked);
-	_object->connect(_object, &aToolButtonCustomContextMenu::menuItemCheckedChanged, this, &aSignalLinker::slotContextMenuItemCheckedChanged);
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aGlobalKeyListener *								_object,
-	UID													_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otGlobalKeyListener });
-	_object->connect(_object, &aGlobalKeyListener::keyCombinationPressed, this, &aSignalLinker::slotKeyCombinationPressed);
 	return _objectUid;
 }
 
@@ -534,16 +360,6 @@ void ak::aSignalLinker::slotToggled(bool _checked)
 }
 
 void ak::aSignalLinker::slotTimeout(void) { raiseEvent(getSenderUid(sender()), etTimeout, 0, 0); }
-
-void ak::aSignalLinker::slotContextMenuItemClicked(ak::ID _itemId) { raiseEvent(getSenderUid(sender()), etContextMenuItemClicked, _itemId, 0); }
-
-void ak::aSignalLinker::slotContextMenuItemCheckedChanged(ak::ID _itemId, bool _isChecked) {
-	raiseEvent(getSenderUid(sender()), etContextMenuItemCheckedChanged, _itemId, _isChecked);
-}
-
-void ak::aSignalLinker::slotVisibilityChanged(bool _visibility) {
-	raiseEvent(getSenderUid(sender()), etContextMenuItemCheckedChanged, _visibility, 0);
-}
 
 void ak::aSignalLinker::slotClosing(void) {
 	raiseEvent(getSenderUid(sender()), etClosing, 0, 0);

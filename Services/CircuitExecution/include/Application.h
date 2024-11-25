@@ -12,7 +12,7 @@ public:
 		return &INSTANCE;
 	}
 
-	ot::ModelServiceAPI& ModelServiceAPI() { return *_modelServiceAPI; };
+	ot::ModelServiceAPI& ModelServiceAPI() { return *m_modelServiceAPI; };
 	void setModelServiceURL(const std::string& url);
 	void setUIServiceURL(const std::string& url);
 
@@ -25,13 +25,13 @@ public:
 private:
 	Application()
 	{
-		_classFactory.SetNextHandler(&_classFactoryBlock);
-		_classFactoryBlock.SetChainRoot(&_classFactory);
+		m_classFactory.SetNextHandler(&m_classFactoryBlock);
+		m_classFactoryBlock.SetChainRoot(&m_classFactory);
 	}
-	ClassFactory _classFactory;
-	ClassFactoryBlock _classFactoryBlock;
-	ot::ModelServiceAPI* _modelServiceAPI = nullptr;
+	ClassFactory m_classFactory;
+	ClassFactoryBlock m_classFactoryBlock;
+	ot::ModelServiceAPI* m_modelServiceAPI = nullptr;
 
 	std::map<ot::UID, ot::UID> m_prefetchedEntityVersions;
-	std::string _uiURL;
+	std::string m_uiURL;
 };

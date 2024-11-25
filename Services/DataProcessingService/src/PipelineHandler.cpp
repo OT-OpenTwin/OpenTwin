@@ -28,7 +28,7 @@ void PipelineHandler::RunAll(const std::list<std::shared_ptr<GraphNode>>& rootNo
 	}
 	catch (const std::exception& ex)
 	{
-		_uiComponent->displayErrorPrompt(std::string(ex.what())+"\n");
+		OT_LOG_E(std::string(ex.what())+"\n");
 	}
 }
 

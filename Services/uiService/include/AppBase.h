@@ -14,7 +14,6 @@
 // AK header
 #include <akCore/aException.h>
 #include <akCore/globalDataTypes.h>
-#include <akGui/aColor.h>
 #include <akWidgets/aComboButtonWidgetItem.h>
 #include <akWidgets/aWindow.h>
 
@@ -27,9 +26,10 @@
 #include "OTGui/TextEditorCfg.h"
 #include "OTGui/GraphicsPackage.h"
 #include "OTGui/PropertyGridCfg.h"
+#include "OTGui/MessageDialogCfg.h"
 #include "OTGui/GraphicsPickerCollectionManager.h"
 #include "OTWidgets/ColorStyle.h"
-#include "OTServiceFoundation/UserCredentials.h"
+#include "OTWidgets/MessageBoxHandler.h"
 
 #include <akGui/aWindowEventHandler.h>
 #include <akCore/aNotifier.h>
@@ -47,7 +47,6 @@
 // Forward declaration
 class QWidget;
 class QTreeWidgetItem;
-class debugNotifier;
 class ViewerComponent;
 class ControlsManager;
 class LockManager;
@@ -55,9 +54,6 @@ class ExternalServicesComponent;
 class ProjectManagement;
 class ShortcutManager;
 class OldWelcomeScreen;
-class ContextMenuManager;
-class UiPluginComponent;
-class UiPluginManager;
 
 // Forward declaration
 class ToolBar;
@@ -88,7 +84,7 @@ struct structModelViewInfo
 };
 
 //! The API manager is used to manage the global objects required for this API to work
-class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier, ot::AbstractLogNotifier {
+class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier, ot::AbstractLogNotifier, ot::MessageBoxHandler {
 	Q_OBJECT
 public:
 	
@@ -171,10 +167,6 @@ public:
 	ControlsManager * controlsManager(void);
 
 	LockManager * lockManager(void);
-
-	ContextMenuManager * contextMenuManager(void) { return m_contextMenuManager; }
-
-	UiPluginManager * uiPluginManager(void) { return m_uiPluginManager; }
 
 	// ##############################################################################################
 
@@ -394,8 +386,6 @@ public:
 	void appendInfoMessage(const QString& _message);
 	void appendHtmlInfoMessage(const QString& _html);
 
-	void appendDebugMessage(const QString& _message);
-
 	ot::VersionGraphManagerView* getVersionGraph(void) { return m_versionGraph; };
 
 	// ##############################################################################################
@@ -456,20 +446,23 @@ public:
 
 	ot::TableView* findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
 
-	void closeTable(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
+	void closeTable(const std::string& _name);
 
 	// ######################################################################################################################
 
 	// Prompt
+
+	virtual ot::MessageDialogCfg::BasicButton showPrompt(const ot::MessageDialogCfg& _config) override;
+
+	ot::MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons);
+
 public Q_SLOTS:
 
-	ak::dialogResult showPrompt	(const QString _message, const QString & _title, ak::promptType _type = ak::promptOk);
+	void showInfoPrompt(const std::string& _message, const std::string& _title);
 
-	void showInfoPrompt(const QString _message, const QString & _title);
+	void showWarningPrompt(const std::string& _message, const std::string& _title);
 
-	void showWarningPrompt(const QString _message, const QString & _title);
-
-	void showErrorPrompt(const QString _message, const QString & _title);
+	void showErrorPrompt(const std::string& _message, const std::string& _title);
 
 public:
 
@@ -503,10 +496,8 @@ private Q_SLOTS:
 	void slotVersionDeselected(void);
 	void slotRequestVersion(const std::string& _versionName);
 
-	void slotViewFocusLost(ot::WidgetView* _view);
-	void slotViewFocused(ot::WidgetView* _view);
+	void slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView);
 	void slotViewCloseRequested(ot::WidgetView* _view);
-	void slotOutputContextMenuItemClicked();
 	void slotColorStyleChanged(const ot::ColorStyle& _style);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -557,7 +548,7 @@ private:
 
 	void sessionRefreshTimer(const std::string _sessionUserName, const std::string _authorizationUrl);
 
-	bool checkForContinue(QString _title);
+	bool checkForContinue(const std::string& _title);
 
 	void fillGraphicsPicker(const ot::BasicServiceInformation& _serviceInfo);
 
@@ -567,8 +558,6 @@ private:
 
 	AppStateFlags               m_state;
 
-	debugNotifier *				m_debugNotifier;
-	
 	std::string					m_uiServiceURL;
 	int							m_siteID;
 	std::string					m_relayURLs;
@@ -592,30 +581,17 @@ private:
 	ProjectOverviewWidget*      m_welcomeScreen;
 
 	ShortcutManager *			m_shortcutManager;
-	ContextMenuManager *		m_contextMenuManager;
-
-	UiPluginManager *			m_uiPluginManager;
-
+	
 	LoginData m_loginData;
 
 	// Default UI
-
-	struct contextMenuOutput {
-		ak::ID				clear;
-	};
-
-	struct contextMenus {
-		contextMenuOutput	output;
-	};
 
 	ToolBar *					m_ttb;
 	ot::NavigationTreeView* m_projectNavigation;
 	ot::PropertyGridView*  m_propertyGrid;
 	ot::PlainTextEditView* m_output;
-	ot::PlainTextEditView* m_debug;
 	ot::GraphicsPickerView* m_graphicsPicker;
 	ot::GraphicsPickerCollectionManager m_graphicsPickerManager;
-	contextMenus				m_contextMenus;
 	ak::UID						m_uid;							//! The UID of the wrapper
 	ak::UID						m_mainWindow;
 	ak::UID						m_viewerUid;					//! The UID of the viewer
@@ -630,6 +606,8 @@ private:
 	};
 	StateInformation			m_currentStateWindow;
 	
+	ot::WidgetView* m_lastFocusedCentralView;
+
 	ot::VersionGraphManagerView* m_versionGraph;
 	std::map<std::string, ot::GraphicsViewView*> m_graphicsViews;
 	std::map<std::string, ot::TextEditorView*> m_textEditors;

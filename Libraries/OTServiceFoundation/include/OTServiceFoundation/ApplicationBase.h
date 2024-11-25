@@ -30,14 +30,12 @@ namespace ot {
 	namespace components {
 		class UiComponent;
 		class ModelComponent;
-		class UiPluginComponent;
 	}
 	
 	namespace intern {
 		class ExternalServicesComponent;
 	}
 
-	class AbstractUIPlugin;
 	class ModalCommandBase;
 	class AbstractUiNotifier;
 	class AbstractSettingsItem;
@@ -71,9 +69,6 @@ namespace ot {
 		//! @brief Will be called when a UI connected to the session and is ready to work
 		virtual void uiConnected(components::UiComponent * _ui) = 0;
 		
-		//! @brief Will be called when a UI plugin was sucessfully connected
-		virtual void uiPluginConnected(components::UiPluginComponent * _uiPlugin) = 0;
-
 		//! @brief Will be called when a UI disconnected from the session (is already closed)
 		virtual void uiDisconnected(const components::UiComponent * _serviceInfo) = 0;
 
@@ -215,18 +210,6 @@ namespace ot {
 		//! @brief Will return the modelNotifier attached to this application
 		AbstractModelNotifier * modelNotifier(void) { return m_modelNotifier; }
 
-		//! @brief Will return th ui plugin with the specified UID
-		components::UiPluginComponent * getUiPluginByUID(unsigned long long _pluginUID);
-
-		//! @brief Will return th ui plugin with the specified Name
-		components::UiPluginComponent * getUiPluginByName(const std::string& _pluginName);
-
-		//! @brief Will return true if a ui plugin with the specified UID exists
-		bool pluginExists(unsigned long long _pluginUID);
-
-		//! @brief Will return true if a ui plugin with the specified Name exists
-		bool pluginExists(const std::string& _pluginName);
-
 		//! @brief Returns a handle to the global class factory for the service
 		ClassFactory& getClassFactory(void) { return classFactory; }
 
@@ -311,9 +294,6 @@ namespace ot {
 
 		std::map<serviceID_t, structServiceInformation>	m_serviceIdMap;
 
-		std::map<unsigned long long, components::UiPluginComponent *>	m_uiPluginComponents;
-		std::list<std::string>							m_pendingUiPluginRequests;
-
 		structServiceInformation						m_sessionService;
 		structServiceInformation						m_directoryService;
 		components::ModelComponent *					m_modelComponent;
@@ -343,13 +323,10 @@ namespace ot {
 
 		OT_HANDLER(handleKeySequenceActivated, ApplicationBase, OT_ACTION_CMD_KeySequenceActivated, ot::SECURE_MESSAGE_TYPES)
 		OT_HANDLER(handleSettingsItemChanged, ApplicationBase, OT_ACTION_CMD_UI_SettingsItemChanged, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleContextMenuItemClicked, ApplicationBase, OT_ACTION_CMD_UI_ContextMenuItemClicked, ot::SECURE_MESSAGE_TYPES)
-		OT_HANDLER(handleContextMenuItemCheckedChanged, ApplicationBase, OT_ACTION_CMD_UI_ContextMenuItemCheckedChanged, ot::SECURE_MESSAGE_TYPES)
 		
 		void __serviceDisconnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id);
 		std::string __processMessage(const std::string & _message, JsonDocument&doc, serviceID_t _senderID);
 		void __shuttingDown(bool _requestedAsCommand);
-		void __addUiPlugin(components::UiPluginComponent * _component);
 
 		std::string			m_DBuserCollection;
 		ClassFactory classFactory;

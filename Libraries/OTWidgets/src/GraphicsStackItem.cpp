@@ -50,7 +50,7 @@ bool ot::GraphicsStackItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 		ot::GraphicsItem* i = nullptr;
 		try {
-			i = ot::GraphicsItemFactory::instance().itemFromConfig(itm.item);
+			i = ot::GraphicsItemFactory::itemFromConfig(itm.item);
 			if (i) {
 				this->addItem(i, itm.isMaster, itm.isSlave);
 			}

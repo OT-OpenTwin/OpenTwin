@@ -83,7 +83,16 @@ const ot::GenericDataStructMatrix EntityFileCSV::getTable()
 
 void EntityFileCSV::setTable(const ot::GenericDataStructMatrix& _table)
 {
+	CSVProperties properties;
 
+	properties.m_rowDelimiter = getRowDelimiter();
+	properties.m_columnDelimiter = getColumnDelimiter();
+	properties.m_decimalDelimiter = getSelectedDecimalSeparator();
+
+	CSVToTableTransformer transformer;
+
+	const std::string csvTableText = transformer(_table, properties);
+	setText(csvTableText);
 }
 
 ot::TableCfg EntityFileCSV::getTableConfig()

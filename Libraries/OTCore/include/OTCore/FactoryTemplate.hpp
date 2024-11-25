@@ -11,11 +11,10 @@
 #include "OTCore/FactoryTemplate.h"
 
 // std header
-#include <string>
 #include <type_traits>
 
-template<class KeyType, class ValueType>
-void ot::FactoryTemplate<KeyType, ValueType>::registerConstructor(const KeyType& _key, ConstructorFunctionType _constructor) {
+template<class ValueType>
+void ot::FactoryTemplate<ValueType>::registerConstructor(const std::string& _key, ConstructorFunctionType _constructor) {
 	auto it = m_constructors.find(_key);
 	if (it != m_constructors.end()) {
 		OT_LOG_E("Constructor already registered");
@@ -24,45 +23,16 @@ void ot::FactoryTemplate<KeyType, ValueType>::registerConstructor(const KeyType&
 	m_constructors.insert_or_assign(_key, _constructor);
 }
 
-template<class KeyType, class ValueType>
-void ot::FactoryTemplate<KeyType, ValueType>::deregisterConstructor(const KeyType& _key) {
+template<class ValueType>
+void ot::FactoryTemplate<ValueType>::deregisterConstructor(const std::string& _key) {
 	m_constructors.erase(_key);
 }
 
-template<class KeyType, class ValueType>
-ValueType* ot::FactoryTemplate<KeyType, ValueType>::createFromKey(const KeyType& _key) {
+template<class ValueType>
+ValueType* ot::FactoryTemplate<ValueType>::createFromKey(const std::string& _key) {
 	auto it = m_constructors.find(_key);
 	if (it == m_constructors.end()) {
-		if constexpr (std::is_same<KeyType, std::string>::value) {
-			OT_LOG_E("Constructor \"" + _key + "\" not found");
-		}
-		else if constexpr (std::is_same<KeyType, short>::value) {
-			OT_LOG_E("Constructor (" + std::to_string(_key) + ") not found");
-		}
-		else if constexpr (std::is_same<KeyType, unsigned short>::value) {
-			OT_LOG_E("Constructor (" + std::to_string(_key) + ") not found");
-		}
-		else if constexpr (std::is_same<KeyType, int>::value) {
-			OT_LOG_E("Constructor (" + std::to_string(_key) + ") not found");
-		}
-		else if constexpr (std::is_same<KeyType, unsigned int>::value) {
-			OT_LOG_E("Constructor (" + std::to_string(_key) + ") not found");
-		}
-		else if constexpr (std::is_same<KeyType, long>::value) {
-			OT_LOG_E("Constructor (" + std::to_string(_key) + ") not found");
-		}
-		else if constexpr (std::is_same<KeyType, unsigned long>::value) {
-			OT_LOG_E("Constructor (" + std::to_string(_key) + ") not found");
-		}
-		else if constexpr (std::is_same<KeyType, long long>::value) {
-			OT_LOG_E("Constructor (" + std::to_string(_key) + ") not found");
-		}
-		else if constexpr (std::is_same<KeyType, unsigned long long>::value) {
-			OT_LOG_E("Constructor (" + std::to_string(_key) + ") not found");
-		}
-		else {
-			OT_LOG_E("Constructor not found");
-		}
+		OT_LOG_E("Constructor \"" + _key + "\" not found");
 		return nullptr;
 	}
 	else {
@@ -70,8 +40,8 @@ ValueType* ot::FactoryTemplate<KeyType, ValueType>::createFromKey(const KeyType&
 	}	
 }
 
-template<class KeyType, class ValueType> 
-ValueType* ot::FactoryTemplate<KeyType, ValueType>::createFromJSON(const ConstJsonObject& _jsonObject, const char* _typeKey) {
+template<class ValueType> 
+ValueType* ot::FactoryTemplate<ValueType>::createFromJSON(const ConstJsonObject& _jsonObject, const char* _typeKey) {
 	std::string t = json::getString(_jsonObject, _typeKey);
 	if (t.empty()) {
 		OT_LOG_E("Key empty");
@@ -89,8 +59,8 @@ ValueType* ot::FactoryTemplate<KeyType, ValueType>::createFromJSON(const ConstJs
 	return ret;
 }
 
-template<class KeyType, class ValueType>
-ValueType* ot::FactoryTemplate<KeyType, ValueType>::createFromJSON(const ConstJsonObject& _jsonObject, const std::string& _typeKey) {
+template<class ValueType>
+ValueType* ot::FactoryTemplate<ValueType>::createFromJSON(const ConstJsonObject& _jsonObject, const std::string& _typeKey) {
 	return this->createFromJSON(_jsonObject, _typeKey.c_str());
 }
 
@@ -100,8 +70,8 @@ ValueType* ot::FactoryTemplate<KeyType, ValueType>::createFromJSON(const ConstJs
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-template <typename KeyType, class FactoryType, typename CreatedType>
-ot::FactoryRegistrarTemplate<KeyType, FactoryType, CreatedType>::FactoryRegistrarTemplate(const KeyType& _key)
+template <class FactoryType, typename CreatedType>
+ot::FactoryRegistrarTemplate<FactoryType, CreatedType>::FactoryRegistrarTemplate(const std::string& _key)
 	: m_key(_key)
 {
 	static_assert(std::is_same<decltype(&FactoryType::instance), decltype(&FactoryType::instance)>::value,
@@ -115,7 +85,7 @@ ot::FactoryRegistrarTemplate<KeyType, FactoryType, CreatedType>::FactoryRegistra
 		});
 }
 
-template <typename KeyType, class FactoryType, typename CreatedType>
-ot::FactoryRegistrarTemplate<KeyType, FactoryType, CreatedType>::~FactoryRegistrarTemplate() {
+template <class FactoryType, typename CreatedType>
+ot::FactoryRegistrarTemplate<FactoryType, CreatedType>::~FactoryRegistrarTemplate() {
 	FactoryType::instance().deregisterConstructor(m_key);
 }

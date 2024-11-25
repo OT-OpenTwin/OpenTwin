@@ -23,6 +23,11 @@
     <ClInclude Include="include\OTGui\Border.h" />
     <ClInclude Include="include\OTGui\CheckerboardPainter2D.h" />
     <ClInclude Include="include\OTGui\ColorStyleTypes.h" />
+    <ClInclude Include="include\OTGui\MenuCfg.h" />
+    <ClInclude Include="include\OTGui\MenuClickableEntryCfg.h" />
+    <ClInclude Include="include\OTGui\MenuEntryCfg.h" />
+    <ClInclude Include="include\OTGui\MenuEntryCfgFactory.h" />
+    <ClInclude Include="include\OTGui\MenuButtonCfg.h" />
     <ClInclude Include="include\OTGui\DefaultSyntaxHighlighterRules.h" />
     <ClInclude Include="include\OTGui\GraphicsArcItemCfg.h" />
     <ClInclude Include="include\OTGui\GraphicsConnectionCalculationData.h" />
@@ -37,6 +42,7 @@
     <ClInclude Include="include\OTGui\GraphicsShapeItemCfg.h" />
     <ClInclude Include="include\OTGui\Grid.h" />
     <ClInclude Include="include\OTGui\KeySequence.h" />
+    <ClInclude Include="include\OTGui\MenuSeparatorCfg.h" />
     <ClInclude Include="include\OTGui\NavigationTreeItemIcon.h" />
     <ClInclude Include="include\OTGui\Outline.h" />
     <ClInclude Include="include\OTGui\MessageDialogCfg.h" />
@@ -75,6 +81,7 @@
     <ClInclude Include="include\OTGui\Plot1DCfg.h" />
     <ClInclude Include="include\OTGui\Plot1DCurveInfoCfg.h" />
     <ClInclude Include="include\OTGui\Plot1DDataBaseCfg.h" />
+    <ClInclude Include="include\OTGui\ProjectTemplateInformation.h" />
     <ClInclude Include="include\OTGui\Property.h" />
     <ClInclude Include="include\OTGui\PropertyBase.h" />
     <ClInclude Include="include\OTGui\PropertyBool.h" />
@@ -131,6 +138,12 @@
     <ClCompile Include="src\GraphicsShapeItemCfg.cpp" />
     <ClCompile Include="src\Grid.cpp" />
     <ClCompile Include="src\KeySequence.cpp" />
+    <ClCompile Include="src\MenuCfg.cpp" />
+    <ClCompile Include="src\MenuClickableEntryCfg.cpp" />
+    <ClCompile Include="src\MenuEntryCfg.cpp" />
+    <ClCompile Include="src\MenuEntryCfgFactory.cpp" />
+    <ClCompile Include="src\MenuButtonCfg.cpp" />
+    <ClCompile Include="src\MenuSeparatorCfg.cpp" />
     <ClCompile Include="src\NavigationTreeItemIcon.cpp" />
     <ClCompile Include="src\Outline.cpp" />
     <ClCompile Include="src\MessageDialogCfg.cpp" />
@@ -169,6 +182,7 @@
     <ClCompile Include="src\Plot1DCfg.cpp" />
     <ClCompile Include="src\Plot1DCurveInfoCfg.cpp" />
     <ClCompile Include="src\Plot1DDataBaseCfg.cpp" />
+    <ClCompile Include="src\ProjectTemplateInformation.cpp" />
     <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyBase.cpp" />
     <ClCompile Include="src\PropertyBool.cpp" />

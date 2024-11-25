@@ -48,6 +48,8 @@
 #include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qmessagebox.h>
 
+#define BUILD_INFO "Open Twin - Build " + QString(__DATE__) + " - " + QString(__TIME__) + "\n\n"
+
 enum InternLogType {
 	InternInfo,
 	InternWarning,
@@ -429,7 +431,7 @@ void AppBase::slotFinalizeInit(void) {
 	// Check current view to correctly display toolbar, statusbar and so on
 	ot::WidgetView* currentView = ot::WidgetViewManager::instance().getCurrentlyFocusedView();
 	if (currentView) {
-		m_toolManager->getToolViewManager()->slotViewFocused(currentView);
+		m_toolManager->getToolViewManager()->slotViewFocusChanged(currentView, nullptr);
 	}
 	
 	this->setEnabled(true);
@@ -490,6 +492,13 @@ AppBase::AppBase(QApplication* _app)
 	// Create external tool manager
 	m_externalLibraryManager = new ExternalLibraryManager;
 
+	ot::PlainTextEditView* defaultView = new ot::PlainTextEditView;
+	defaultView->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::Default, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsCentral));
+	defaultView->setViewIsPermanent(true);
+	defaultView->setPlainText(BUILD_INFO);
+	defaultView->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
+	m_toolManager->getToolViewManager()->addIgnoredView(defaultView);
+
 	// Create output
 	m_output->setViewData(ot::WidgetViewBase("Output", "Output", ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewFlag::ViewIsSide));
 	m_output->setObjectName("OToolkit_Output");
@@ -505,7 +514,9 @@ AppBase::AppBase(QApplication* _app)
 	this->setWindowTitle("OToolkit");
 	this->setWindowIcon(ot::IconManager::getApplicationIcon());
 
+	ot::WidgetViewManager::instance().addView(ot::BasicServiceInformation(), defaultView);
 	ot::WidgetViewManager::instance().addView(ot::BasicServiceInformation(), m_output);
+	ot::WidgetViewManager::instance().setUseFocusInfo(true);
 
 	// Setup global shortcuts
 	m_recenterShortcut = new QShortcut(QKeySequence("F11"), this, nullptr, nullptr, Qt::WindowShortcut);

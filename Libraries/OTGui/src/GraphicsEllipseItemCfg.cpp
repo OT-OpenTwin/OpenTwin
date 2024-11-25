@@ -69,7 +69,7 @@ void ot::GraphicsEllipseItemCfg::setFromJsonObject(const ConstJsonObject& _objec
 	m_outline.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Outline));
 	
 	ConstJsonObject backgroundPainterObj = json::getObject(_object, OT_JSON_MEMBER_BackgroundPainter);
-	ot::Painter2D* p = Painter2DFactory::instance().create(backgroundPainterObj);
+	ot::Painter2D* p = Painter2DFactory::create(backgroundPainterObj);
 	p->setFromJsonObject(backgroundPainterObj);
 	this->setBackgroundPainer(p);
 }

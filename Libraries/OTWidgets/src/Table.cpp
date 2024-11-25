@@ -10,17 +10,18 @@
 #include "OTWidgets/TableItemDelegate.h"
 
 // Qt header
+#include <QtCore/qtimer.h>
 #include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qheaderview.h>
 
 ot::Table::Table(QWidget* _parentWidget)
-	: QTableWidget(_parentWidget), m_contentChanged(false)
+	: QTableWidget(_parentWidget), m_contentChanged(false), m_resizeRequired(false), m_stopResizing(true)
 {
 	this->ini();
 }
 
 ot::Table::Table(int _rows, int _columns, QWidget* _parentWidget) 
-	: QTableWidget(_rows, _columns, _parentWidget), m_contentChanged(false)
+	: QTableWidget(_rows, _columns, _parentWidget), m_contentChanged(false), m_resizeRequired(false), m_stopResizing(true)
 {
 	this->ini();
 }
@@ -38,6 +39,8 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 	this->blockSignals(true);
 
 	this->clear();
+	m_columnWidthBuffer.clear();
+	m_rowHeightBuffer.clear();
 
 	// Initialize dimensions
 	this->setRowCount(_config.getRowCount());
@@ -60,7 +63,6 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 			this->setVerticalHeaderItem(r, new QTableWidgetItem(QString::fromStdString(headerItem->getText())));
 		}
 	}
-	header->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
 
 	header = this->horizontalHeader();
 	for (int c = 0; c < _config.getColumnCount(); c++) {
@@ -69,10 +71,14 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 			this->setHorizontalHeaderItem(c, new QTableWidgetItem(QString::fromStdString(headerItem->getText())));
 		}
 	}
-	header->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
-	this->resizeColumnsToContents();
-	this->resizeRowsToContents();
 
+	if (this->isVisible()) {
+		this->resizeColumnsToContentIfNeeded();
+	}
+	else {
+		m_resizeRequired = true;
+	}
+	
 	this->blockSignals(tmp);
 }
 
@@ -83,6 +89,26 @@ ot::TableCfg ot::Table::createConfig(void) const {
 		for (int c = 0; c < this->columnCount(); c++) {
 			OTAssertNullptr(this->item(r, c));
 			cfg.setCellText(r, c, this->item(r, c)->text().toStdString());
+		}
+	}
+
+	for (int row = 0; row < rowCount(); row++)
+	{
+		const auto item =	verticalHeaderItem(row);
+		if (item != nullptr)
+		{
+			const std::string text = item->text().toStdString();
+			cfg.setRowHeader(row, text);
+		}
+	}
+	
+	for (int column = 0; column < columnCount(); column++)
+	{
+		const auto item = horizontalHeaderItem(column);
+		if (item != nullptr)
+		{
+			const std::string text = item->text().toStdString();
+			cfg.setColumnHeader(column, text);
 		}
 	}
 
@@ -101,9 +127,70 @@ void ot::Table::setSelectedCellsBackground(const ot::Color& _color) {
 }
 
 void ot::Table::setSelectedCellsBackground(const QColor& _color) {
+	bool blocked = this->signalsBlocked();
+	this->blockSignals(true);
 	for (QTableWidgetItem* item : this->selectedItems()) {
 		item->setBackground(QBrush(_color));
 	}
+	this->blockSignals(blocked);
+}
+
+void ot::Table::prepareForDataChange(void) {
+	m_stopResizing = true;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected
+
+void ot::Table::showEvent(QShowEvent* _event) {
+	QTableWidget::showEvent(_event);
+
+	if (!m_columnWidthBuffer.empty() || !m_rowHeightBuffer.empty()) {
+		if (this->columnCount() != m_columnWidthBuffer.size()) {
+			OT_LOG_EA("Column width buffer is invalid");
+		} else if (this->rowCount() != m_rowHeightBuffer.size()) {
+			OT_LOG_EA("Row height buffer is invalid");
+		}
+		else if (!m_columnWidthBuffer.empty()) {
+			m_stopResizing = false;
+			this->slotRestoreColumnSize(0);
+		}
+		else if (!m_rowHeightBuffer.empty()) {
+			m_stopResizing = false;
+			this->slotRestoreRowSize(0);
+		}
+	}
+	else if (m_resizeRequired) {
+		this->resizeColumnsToContentIfNeeded();
+		m_resizeRequired = false;
+	}
+}
+
+void ot::Table::hideEvent(QHideEvent* _event) {
+	m_columnWidthBuffer.clear();
+	m_rowHeightBuffer.clear();
+	m_columnWidthBuffer.reserve(this->columnCount());
+	m_rowHeightBuffer.reserve(this->rowCount());
+
+	for (int i = 0; i < this->columnCount(); i++) {
+		if (this->horizontalHeader()->sectionResizeMode(i) != QHeaderView::Interactive) {
+			m_columnWidthBuffer.clear();
+			m_rowHeightBuffer.clear();
+			return;
+		}
+		m_columnWidthBuffer.push_back(this->columnWidth(i));
+	}
+	for (int i = 0; i < this->rowCount(); i++) {
+		if (this->verticalHeader()->sectionResizeMode(i) != QHeaderView::Interactive) {
+			m_columnWidthBuffer.clear();
+			m_rowHeightBuffer.clear();
+			return;
+		}
+		m_rowHeightBuffer.push_back(this->rowHeight(i));
+	}
+
+	m_stopResizing = true;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -119,6 +206,62 @@ void ot::Table::slotCellDataChanged(int _row, int _column) {
 	this->contentChanged();
 }
 
+void ot::Table::slotRestoreColumnSize(int _column) {
+	if (m_stopResizing) { // Stop
+		return;
+	}
+	if (_column >= this->columnCount()) { // Last column reached, now go for rows
+		if (!m_rowHeightBuffer.empty()) {
+			this->slotRestoreRowSize(0);
+		}
+	}
+	else { // Resize column and queue next
+		OTAssert(m_columnWidthBuffer.size() == this->columnCount(), "Invalid data");
+		this->setColumnWidth(_column, m_columnWidthBuffer[_column]);
+		_column++;
+
+		QTimer::singleShot(0, [=]() { Table::slotRestoreColumnSize(_column); });
+	}
+}
+
+void ot::Table::slotResizeColumnToContent(int _column) {
+	if (m_stopResizing) { // Stop
+		return;
+	}
+	if (_column >= this->columnCount()) { // Last column reached, now go for rows
+		this->resizeRowsToContentIfNeeded();
+	}
+	else { // Resize column and queue next
+		this->resizeColumnToContents(_column++);
+
+		QTimer::singleShot(0, [=]() { Table::slotResizeColumnToContent(_column); });
+	}
+}
+
+void ot::Table::slotRestoreRowSize(int _row) {
+	if (m_stopResizing || _row >= this->rowCount()) { // Stop
+		return;
+	}
+	else { // Resize column and queue next
+		OTAssert(m_rowHeightBuffer.size() == this->rowCount(), "Invalid data");
+		this->setRowHeight(_row, m_rowHeightBuffer[_row]);
+		_row++;
+
+		QTimer::singleShot(0, [=]() { Table::slotRestoreRowSize(_row); });
+	}
+}
+
+void ot::Table::slotResizeRowToContent(int _row) {
+	if (m_stopResizing || _row >= this->rowCount()) { // Stop
+		return;
+	}
+	else { // Resize column and queue next
+		this->resizeRowToContents(_row++);
+
+		QTimer::singleShot(0, [=]() { Table::slotResizeRowToContent(_row); });
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private helper
@@ -131,4 +274,42 @@ void ot::Table::ini(void) {
 
 	this->connect(this, &Table::cellChanged, this, &Table::slotCellDataChanged);
 	this->connect(saveShortcut, &QShortcut::activated, this, &Table::slotSaveRequested);
+}
+
+void ot::Table::resizeColumnsToContentIfNeeded(void) {
+	// Ensure we have any content
+	if (this->horizontalHeader()->count() == 0) {
+		this->resizeRowsToContentIfNeeded();
+		return;
+	}
+
+	// Ensure the content is interactive
+	for (int i = 0; i < this->horizontalHeader()->count(); i++) {
+		if (this->horizontalHeader()->sectionResizeMode(i) != QHeaderView::Interactive) {
+			this->resizeRowsToContentIfNeeded();
+			return;
+		}
+	}
+
+	// Start resizing
+	m_stopResizing = false;
+	this->slotResizeColumnToContent(0);
+}
+
+void ot::Table::resizeRowsToContentIfNeeded(void) {
+	// Ensure we have any content
+	if (this->verticalHeader()->count() == 0) {
+		return;
+	}
+
+	// Ensure the content is interactive
+	for (int i = 0; i < this->verticalHeader()->count(); i++) {
+		if (this->verticalHeader()->sectionResizeMode(i) != QHeaderView::Interactive) {
+			return;
+		}
+	}
+
+	// Start resizing
+	m_stopResizing = false;
+	this->slotResizeRowToContent(0);
 }

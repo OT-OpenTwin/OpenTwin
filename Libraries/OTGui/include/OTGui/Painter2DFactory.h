@@ -13,11 +13,11 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT Painter2DFactory : public FactoryTemplate<std::string, Painter2D> {
+	class OT_GUI_API_EXPORT Painter2DFactory : public FactoryTemplate<Painter2D> {
 	public:
 		static Painter2DFactory& instance(void);
 		
-		Painter2D* create(const ConstJsonObject& _jsonObject);
+		static Painter2D* create(const ConstJsonObject& _jsonObject);
 
 	private:
 		Painter2DFactory() {};
@@ -25,8 +25,8 @@ namespace ot {
 	};
 
 	template <class T>
-	class OT_GUI_API_EXPORT Painter2DFactoryRegistrar : public FactoryRegistrarTemplate<std::string, Painter2DFactory, T> {
+	class OT_GUI_API_EXPORT Painter2DFactoryRegistrar : public FactoryRegistrarTemplate<Painter2DFactory, T> {
 	public:
-		Painter2DFactoryRegistrar(const std::string& _key) : FactoryRegistrarTemplate<std::string, Painter2DFactory, T>(_key) {};
+		Painter2DFactoryRegistrar(const std::string& _key) : FactoryRegistrarTemplate<Painter2DFactory, T>(_key) {};
 	};
 }

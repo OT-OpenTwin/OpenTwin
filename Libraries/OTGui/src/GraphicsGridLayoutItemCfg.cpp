@@ -121,7 +121,7 @@ void ot::GraphicsGridLayoutItemCfg::setFromJsonObject(const ConstJsonObject& _ob
 				GraphicsItemCfg* itm = nullptr;
 				try {
 					ConstJsonObject itemObj = json::getObject(columnArr, c);
-					itm = GraphicsItemCfgFactory::instance().create(itemObj);
+					itm = GraphicsItemCfgFactory::create(itemObj);
 					if (!itm) {
 						continue;
 					}

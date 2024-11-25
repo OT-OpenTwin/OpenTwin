@@ -15,7 +15,6 @@
  // AK header
 #include <akCore/globalDataTypes.h>
 #include <akCore/akCore.h>
-#include <akGui/aColor.h>
 
 // C++ header
 #include <map>							// map
@@ -34,7 +33,6 @@ namespace ak {
 	class aMessenger;
 	class aUidManager;
 	class aSignalLinker;
-	class aGlobalKeyListener;
 	class aToolButtonWidget;
 
 	//! @brief The objectManager is used for creating and manipulating objects and widgets
@@ -77,16 +75,6 @@ namespace ak {
 			bool												_checked = false
 		);
 
-		//! @brief Will create a color edit button and return its UID
-		//! @param _creatorUid The UID of the creator
-		//! @param _color The initial color set to the color edit button
-		//! @param _textOverride If a text is provided then the default color text will be overridden
-		UID createColorEditButton(
-			UID												_creatorUid,
-			const aColor &								_color,
-			const QString &										_textOverride = QString("")
-		);
-
 		//! @brief Will create a combo box and return its UID
 		//! @param _creatorUid The UID of the creator
 		UID createComboBox(
@@ -112,40 +100,6 @@ namespace ak {
 			const QString &										_text = QString("")
 		);
 
-		//! @brief Will create a dock and return its UID
-		//! @param _creatorUid The UID of the creator
-		//! @param _text The text of the dock
-		UID createDock(
-			UID												_creatorUid,
-			const QString &										_text = QString()
-		);
-
-		//! @brief Will create a new DockWatcher and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _text The initial text of the DockWatcher
-		UID createDockWatcher(
-			UID									_creatorUid,
-			const QString &						_text = QString("Docks")
-		);
-
-		//! @brief Will create a new DockWatcher and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _icon The initial icon of the DockWatcher
-		//! @param _text The initial text of the DockWatcher
-		UID createDockWatcher(
-			UID									_creatorUid,
-			const QIcon &						_icon,
-			const QString &						_text = QString("Docks")
-		);
-
-		UID createGlobalKeyListener(
-			UID											_creatorUid,
-			QApplication *								_app,
-			Qt::Key										_key,
-			const std::vector<Qt::KeyboardModifier>&	_keyModifier,
-			bool										_blockOthers
-		);
-
 		//! @brief Will create a line edit and return its UID
 		//! param _creatorUid The UID of the creator
 		//! @param _initialText The initial text to display
@@ -163,48 +117,6 @@ namespace ak {
 			const QString &										_infoLabelText
 		);
 
-		//! @brief Will create a push button and return its UID
-		//! @param _creatorUid The UID of the creator
-		//! @param _text The text of the push button
-		UID createPushButton(
-			UID												_creatorUid,
-			const QString &										_text = QString("")
-		);
-
-		//! @brief Will create a push button and return its UID
-		//! @param _creatorUid The UID of the creator
-		//! @param _icon The icon of the push button
-		//! @param _text The text of the push button
-		UID createPushButton(
-			UID												_creatorUid,
-			const QIcon &										_icon,
-			const QString &										_text = QString("")
-		);
-
-		//! @brief Will create a new special TabBar and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		UID createSpecialTabBar(
-			UID												_creatorUid
-		);
-
-		//! @brief Will create a table and return its UID
-		//! @param _creatorUid The UID of the creator
-		//! @param _rows The initial row count of the table
-		//! @param _columns The initial column count of the table
-		UID createTable(
-			UID												_creatorUid,
-			int													_rows,
-			int													_columns
-		);
-
-		//! @brief Will create a text edit and return its UID
-		//! @param _creatorUid The UID of the creator
-		//! @param _initialText The initial text of the text edit
-		UID createTextEdit(
-			UID												_creatorUid,
-			const QString &										_initialText = QString("")
-		);
-
 		//! @brief WIll create a timer and return its UID
 		//! @param _creatorUid The UID of the creator
 		UID createTimer(
@@ -215,11 +127,6 @@ namespace ak {
 		//! @param _creatorUid The UID of the creator
 		UID createToolButton(
 			UID												_creatorUid
-		);
-
-		UID createToolButtonCustomContextMenu(
-			UID												_creatorUid,
-			aToolButtonWidget *								_toolButton
 		);
 
 		//! @brief Will create a toolButton and return its UID
@@ -238,12 +145,6 @@ namespace ak {
 			UID												_creatorUid,
 			const QString &										_text,
 			const QIcon &										_icon
-		);
-
-		//! @brief Will create a new tab view and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		UID createTabView(
-			UID												_creatorUid
 		);
 
 		//! @brief Will create a tab toolbar sub container and return its UID

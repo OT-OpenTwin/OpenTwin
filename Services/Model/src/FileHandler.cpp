@@ -61,6 +61,11 @@ bool FileHandler::handleAction(const std::string& _action, ot::JsonDocument& _do
 		handleChangedText(_doc);
 		actionIsHandled = true;
 	}
+	else if (_action == OT_ACTION_CMD_UI_TABLE_SaveRequest)
+	{
+		handleChangedTable(_doc);
+		actionIsHandled = true;
+	}
 	else
 	{
 		actionIsHandled = false;
@@ -107,6 +112,131 @@ void FileHandler::storeTextFile(ot::JsonDocument& _document, const std::string& 
 	}
 
 	addTextFilesToModel();
+}
+
+void FileHandler::handleChangedTable(ot::JsonDocument& _doc)
+{
+	ot::TableCfg config;
+	config.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_Config));
+	const std::string entityName = config.getEntityName();
+	
+	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+
+	const auto entityIDsByName = model->getEntityNameToIDMap();
+	auto entityIDByName = entityIDsByName.find(entityName);
+	if (entityIDByName != entityIDsByName.end())
+	{
+		ot::UID entityID = entityIDByName->second;
+		EntityBase* entityBase = model->getEntityByID(entityID);
+		IVisualisationTable* tableVisualisationEntity = dynamic_cast<IVisualisationTable*>(entityBase);
+		if (tableVisualisationEntity != nullptr)
+		{
+			ot::ContentChangedHandling changedHandling = tableVisualisationEntity->getTableContentChangedHandling();
+			if (changedHandling == ot::ContentChangedHandling::ModelServiceSaves)
+			{
+				storeChangedTable(tableVisualisationEntity, config);
+			}
+			else if (changedHandling == ot::ContentChangedHandling::OwnerHandles)
+			{
+				const std::string& owner = entityBase->getOwningService();
+				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
+				{
+					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(_doc), owner); //Potentially dangerous ? Usually the document should not be used afterwards.
+					workerThread.detach();
+				}
+			}
+			else if (changedHandling == ot::ContentChangedHandling::ModelServiceSavesNotifyOwner)
+			{
+				storeChangedTable(tableVisualisationEntity, config);
+				const std::string& owner = entityBase->getOwningService();
+				if (owner != OT_INFO_SERVICE_TYPE_MODEL)
+				{
+					ot::JsonDocument notify;
+					notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, notify.GetAllocator()), notify.GetAllocator());
+					notify.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SetModified, notify.GetAllocator()), notify.GetAllocator());
+					std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), owner);
+					workerThread.detach();
+				}
+			}
+		}
+		else
+		{
+			OT_LOG_E("Failed to visualise " + entityName + " since it does not support the corresponding visualisation interface.");
+		}
+	}
+	else
+	{
+		OT_LOG_E("Failed to handle changed text request since the entity could not be found by name: " + entityName);
+	}
+}
+
+ot::GenericDataStructMatrix FileHandler::createMatrix(const ot::TableCfg& _tableCfg)
+{
+	ot::MatrixEntryPointer matrixDimension;
+	matrixDimension.m_column = static_cast<uint32_t>(_tableCfg.getColumnCount());
+	matrixDimension.m_row = static_cast<uint32_t>(_tableCfg.getRowCount());
+	auto horizontalHeaderPtr =	_tableCfg.getColumnHeader(0);
+	auto verticalHeaderPtr =	_tableCfg.getRowHeader(0);
+	if (horizontalHeaderPtr != nullptr )
+	{
+		matrixDimension.m_row++;
+		assert(verticalHeaderPtr == nullptr);
+	}
+	else if (verticalHeaderPtr != nullptr)
+	{
+		matrixDimension.m_column++;
+		assert(horizontalHeaderPtr == nullptr);
+	}
+	
+	ot::GenericDataStructMatrix matrix(matrixDimension);
+	ot::MatrixEntryPointer matrixEntry;
+	uint32_t startRow(0), startColumn(0);
+	if (horizontalHeaderPtr != nullptr)
+	{
+		startRow = 1;
+		matrixEntry.m_row = 0;
+		for (matrixEntry.m_column = 0; matrixEntry.m_column < matrixDimension.m_column; matrixEntry.m_column++)
+		{
+			const auto headerCfg = _tableCfg.getColumnHeader(matrixEntry.m_column);
+			const ot::Variable cellValue(headerCfg->getText());
+			matrix.setValue(matrixEntry, cellValue);
+		}
+	}
+	if (verticalHeaderPtr != nullptr)
+	{
+		startColumn = 1;
+		matrixEntry.m_column = 0;
+		for (matrixEntry.m_row= 0; matrixEntry.m_row < matrixDimension.m_row; matrixEntry.m_row++)
+		{
+			const auto headerCfg = _tableCfg.getRowHeader(matrixEntry.m_row);
+			const ot::Variable cellValue(headerCfg->getText());
+			matrix.setValue(matrixEntry, cellValue);
+		}
+	}
+	
+	for (matrixEntry.m_row = startRow; matrixEntry.m_row < matrixDimension.m_row; matrixEntry.m_row++)
+	{
+		for (matrixEntry.m_column = startColumn; matrixEntry.m_column < matrixDimension.m_column; matrixEntry.m_column++)
+		{
+			const std::string& tableCell = _tableCfg.getCellText(matrixEntry.m_row - startRow, matrixEntry.m_column - startColumn);
+			matrix.setValue(matrixEntry, ot::Variable(tableCell));
+		}
+	}
+
+	return matrix;
+}
+
+void FileHandler::storeChangedTable(IVisualisationTable* _entity, ot::TableCfg& _cfg)
+{
+	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+	assert(_entity != nullptr);
+
+	ot::GenericDataStructMatrix matrix = createMatrix(_cfg);
+	_entity->setTable(matrix);
+	model->setModified();
+	model->modelChangeOperationCompleted("Updated Table.");
 }
 
 void FileHandler::handleChangedText(ot::JsonDocument& _doc)

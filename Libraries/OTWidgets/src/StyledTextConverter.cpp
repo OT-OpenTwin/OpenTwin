@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/StringHelper.h"
 #include "OTGui/Painter2D.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/StyledTextConverter.h"
@@ -16,11 +17,20 @@ QString ot::StyledTextConverter::toHtml(const StyledTextBuilder& _builder) {
 	QString result("<p>");
 	
 	for (const StyledTextEntry& entry : _builder.getEntries()) {
-		if (entry.getStyle().hasStyleSet()) {
-			StyledTextConverter::addHtmlSpan(entry.getStyle(), result, QString::fromStdString(entry.getText()));
-		}
-		else {
-			result = result % QString::fromStdString(entry.getText());
+		std::list<std::string> lst = ot::splitString(entry.getText(), "\n");
+		bool first = true;
+		for (const std::string& text : lst) {
+			if (!first) {
+				result = result % "</p>\n<p>";
+			}
+
+			if (entry.getStyle().hasStyleSet()) {
+				StyledTextConverter::addHtmlSpan(entry.getStyle(), result, QString::fromStdString(text));
+			}
+			else {
+				result = result % QString::fromStdString(text);
+			}
+			first = false;
 		}
 	}
 
@@ -29,15 +39,55 @@ QString ot::StyledTextConverter::toHtml(const StyledTextBuilder& _builder) {
 }
 
 void ot::StyledTextConverter::addHtmlSpan(const StyledTextStyle& _style, QString& _destination, const QString& _text) {
-	_destination = _destination % "<span style=\"";
-	_destination = _destination % StyledTextConverter::getColorFromReference(_style.getColorReference());
-	if (_style.getBold()) {
-		_destination = _destination % "font-weight:bold;";
+	// Add custom closing tags for text size
+	QString customClose;
+	switch (_style.getTextSize()) {
+	case ot::StyledTextStyle::TextSize::Regular: break;
+	case ot::StyledTextStyle::TextSize::Header1:
+		_destination = _destination % "<h1>";
+		customClose = "</h1>";
+		break;
+
+	case ot::StyledTextStyle::TextSize::Header2:
+		_destination = _destination % "<h2>";
+		customClose = "</h2>";
+		break;
+
+	case ot::StyledTextStyle::TextSize::Header3:
+		_destination = _destination % "<h3>";
+		customClose = "</h3>";
+		break;
+
+	default:
+		OT_LOG_EAS("Unknown TextSize (" + std::to_string((int)_style.getTextSize()) + ")");
+		break;
 	}
-	if (_style.getItalic()) {
-		_destination = _destination % "font-style:italic;";
+
+	// Add custom closing tags for underline and line trough
+	if (_style.getUnderline()) {
+		_destination = _destination % "<u>";
+		customClose.append("</u>");
 	}
-	_destination = _destination % "\">" % _text % "</span>";
+	if (_style.getLineTrough()) {
+		_destination = _destination % "<s>";
+		customClose.append("</s>");
+	}
+
+	// Add span if needed
+	if (_style.getColorReference() != StyledText::Default || _style.getBold() || _style.getItalic()) {
+		_destination = _destination % "<span style=\"";
+		_destination = _destination % StyledTextConverter::getColorFromReference(_style.getColorReference());
+		if (_style.getBold()) {
+			_destination = _destination % "font-weight:bold;";
+		}
+		if (_style.getItalic()) {
+			_destination = _destination % "font-style:italic;";
+		}
+		_destination = _destination % "\">";
+		customClose.append("</span>");
+	}
+	
+	_destination = _destination % _text % customClose;
 }
 
 QString ot::StyledTextConverter::getColorFromReference(StyledText::ColorReference _colorReference) {

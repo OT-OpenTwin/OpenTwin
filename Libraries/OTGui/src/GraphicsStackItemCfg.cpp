@@ -77,7 +77,7 @@ void ot::GraphicsStackItemCfg::setFromJsonObject(const ConstJsonObject& _object)
 
 		ot::GraphicsItemCfg* itm = nullptr;
 		try {
-			itm = GraphicsItemCfgFactory::instance().create(itemContObj);
+			itm = GraphicsItemCfgFactory::create(itemContObj);
 			if (itm) {
 				GraphicsStackItemCfgEntry e;
 				e.isMaster = json::getBool(itemObj, OT_JSON_MEMBER_IsMaster);

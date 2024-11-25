@@ -9,17 +9,13 @@
 #include "ServiceDataUi.h"
 #include "ViewerComponent.h"	// Viewer component
 #include "ExternalServicesComponent.h"		// ExternalServices component
-#include "debugNotifier.h"		// DebugNotifier
 #include "UserManagement.h"
 #include "ProjectManagement.h"
 #include "ControlsManager.h"
 #include "ToolBar.h"
 #include "ShortcutManager.h"
-#include "ContextMenuManager.h"
 #include "ManageGroups.h"
 #include "ManageAccess.h"
-#include "UiPluginComponent.h"
-#include "UiPluginManager.h"
 #include "DevLogger.h"
 #include "LogInDialog.h"
 #include "NavigationTreeView.h"
@@ -33,8 +29,6 @@
 #include <akCore/aException.h>
 #include <akWidgets/aWindow.h>
 #include <akWidgets/aWindowManager.h>
-#include <akWidgets/aDockWidget.h>
-#include <akWidgets/aTextEditWidget.h>
 #include <akWidgets/aTreeWidget.h>
 
 // OpenTwin header
@@ -72,6 +66,7 @@
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/PlainTextEditView.h"
 #include "OTWidgets/WidgetViewManager.h"
+#include "OTWidgets/MessageBoxManager.h"
 #include "OTWidgets/GraphicsItemLoader.h"
 #include "OTWidgets/GraphicsPickerView.h"
 #include "OTWidgets/PropertyInputDouble.h"
@@ -154,7 +149,6 @@ AppBase::AppBase()
 	m_uid(invalidUID),
 	m_modelUid(invalidUID),
 	m_viewerUid(invalidUID),
-	m_debugNotifier(nullptr),
 	m_viewerComponent(nullptr),
 	m_mainWindow(invalidUID),
 	m_ExternalServicesComponent(nullptr),
@@ -163,8 +157,6 @@ AppBase::AppBase()
 	m_siteID(0),
 	m_isDebug(false),
 	m_shortcutManager(nullptr),
-	m_contextMenuManager(nullptr),
-	m_uiPluginManager(nullptr),
 	m_graphicsPicker(nullptr),
 	m_visible3D(false),
 	m_visible1D(false),
@@ -173,25 +165,21 @@ AppBase::AppBase()
 	m_propertyGrid(nullptr),
 	m_projectNavigation(nullptr),
 	m_output(nullptr),
-	m_debug(nullptr),
 	m_versionGraph(nullptr),
 	m_state(AppState::NoState),
 	m_welcomeScreen(nullptr),
 	m_ttb(nullptr),
-	m_logIntensity(nullptr)
+	m_logIntensity(nullptr),
+	m_lastFocusedCentralView(nullptr)
 {
-	m_contextMenus.output.clear = invalidID;
-
 	m_currentStateWindow.viewShown = false;
 
-	m_debugNotifier = new debugNotifier(invalidUID);
 	m_ExternalServicesComponent = new ExternalServicesComponent(this);
-	m_debugNotifier->disable();
-
-	m_contextMenuManager = new ContextMenuManager;
-
+	
 	this->setDeleteLogNotifierLater(true);
 	ot::LogDispatcher::instance().addReceiver(this);
+
+	ot::MessageBoxManager::instance().setHandler(this);
 }
 
 AppBase::~AppBase() {
@@ -303,17 +291,6 @@ bool AppBase::logIn(void) {
 	// Create shortcut manager
 	if (m_shortcutManager) delete m_shortcutManager;
 	m_shortcutManager = new ShortcutManager;
-
-	// Create plugin manager
-	if (m_uiPluginManager) delete m_uiPluginManager;
-	m_uiPluginManager = new UiPluginManager(this);
-
-#ifdef _DEBUG
-	m_uiPluginManager->addPluginSearchPath(qgetenv("OPENTWIN_DEV_ROOT") + "\\Deployment\\uiPlugins");
-	//new DispatchableItemExample;
-#else
-	m_uiPluginManager->addPluginSearchPath(QDir::currentPath() + "\\uiPlugins");
-#endif // _DEBUG
 
 	return true;
 }
@@ -461,12 +438,18 @@ bool AppBase::closeEvent() {
 	}
 
 	if (this->getCurrentProjectIsModified()) {
-		QString msg("You have unsaved changes at the project \"");
-		msg.append(m_currentProjectName.c_str());
-		msg.append("\".\nDo you want to save them now?\nUnsaved changes will be lost.");
-		dialogResult result = uiAPI::promptDialog::show(msg, "Exit application", promptYesNoCancelIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
-		if (result == dialogResult::resultCancel) { return false; }
-		else if (result == dialogResult::resultYes) { m_ExternalServicesComponent->saveProject(); }
+		std::string msg("You have unsaved changes at the project \"" +
+			m_currentProjectName + 
+			"\".\nDo you want to save them now?\nUnsaved changes will be lost.");
+
+		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, "Exit Application", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
+
+		if (result == ot::MessageDialogCfg::Cancel) {
+			return false;
+		}
+		else if (result == ot::MessageDialogCfg::Yes) {
+			m_ExternalServicesComponent->saveProject();
+		}
 	}
 
 	// Store current UI settings
@@ -559,13 +542,13 @@ void AppBase::exportProjectWorker(std::string selectedProjectName, std::string e
 
 	if (!error.empty())
 	{
-		QMetaObject::invokeMethod(this, "showErrorPrompt", Qt::QueuedConnection, Q_ARG(QString,  QString(error.c_str())), Q_ARG(QString,  QString("Export Project To File")));
+		QMetaObject::invokeMethod(this, "showErrorPrompt", Qt::QueuedConnection, Q_ARG(const std::string&,  error), Q_ARG(const std::string&, std::string("Export Project To File")));
 	}
 	else
 	{
 		std::string success = "Project exported successfully: " + exportFileName;
 
-		QMetaObject::invokeMethod(this, "showInfoPrompt", Qt::QueuedConnection, Q_ARG(QString,  QString(success.c_str())), Q_ARG(QString, QString("Export Project To File")));
+		QMetaObject::invokeMethod(this, "showInfoPrompt", Qt::QueuedConnection, Q_ARG(const std::string&, success), Q_ARG(const std::string&, std::string("Export Project To File")));
 	}
 }
 
@@ -644,7 +627,7 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 	{
 		pManager.deleteProject(projectName);
 
-		QMetaObject::invokeMethod(this, "showErrorPrompt", Qt::QueuedConnection, Q_ARG(QString,  QString(error.c_str())), Q_ARG(QString,  QString("Import Project From File")));
+		QMetaObject::invokeMethod(this, "showErrorPrompt", Qt::QueuedConnection, Q_ARG(const std::string&,  error), Q_ARG(const std::string&, std::string("Import Project From File")));
 	}
 	else
 	{
@@ -656,7 +639,7 @@ void AppBase::importProjectWorker(std::string projectName, std::string currentUs
 
 		std::string success = "Project imported successfully: " + projectName;
 
-		QMetaObject::invokeMethod(this, "showInfoPrompt", Qt::QueuedConnection, Q_ARG(QString,  QString(success.c_str())), Q_ARG(QString, QString("Import Project From File")));
+		QMetaObject::invokeMethod(this, "showInfoPrompt", Qt::QueuedConnection, Q_ARG(const std::string&, success), Q_ARG(const std::string&, std::string("Import Project From File")));
 	}
 }
 
@@ -760,8 +743,6 @@ void AppBase::createUi(void) {
 			// ########################################################################
 
 			// Setup UI
-			uiAPI::window::setDockBottomLeftPriority(m_mainWindow, dockLeft);
-			uiAPI::window::setDockBottomRightPriority(m_mainWindow, dockRight);
 			uiAPI::window::addEventHandler(m_mainWindow, this);
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Setup tab toolbar");
@@ -789,11 +770,11 @@ void AppBase::createUi(void) {
 			// Create docks
 			OT_LOG_D("Creating views");
 
-			m_debug = new ot::PlainTextEditView;
-			m_debug->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsCentral));
-			m_debug->setViewIsPermanent(true);
-			m_debug->setPlainText(BUILD_INFO);
-			m_debug->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
+			ot::PlainTextEditView* defaultView = new ot::PlainTextEditView;
+			defaultView->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::Default, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsCentral));
+			defaultView->setViewIsPermanent(true);
+			defaultView->setPlainText(BUILD_INFO);
+			defaultView->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
 
 			m_output = new ot::PlainTextEditView;
 			m_output->setViewData(ot::WidgetViewBase(TITLE_DOCK_OUTPUT, TITLE_DOCK_OUTPUT, ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
@@ -829,7 +810,6 @@ void AppBase::createUi(void) {
 				f.setFamily("Courier");
 				f.setFixedPitch(true);
 				m_output->setFont(f);
-				m_debug->setFont(f);
 
 				m_output->appendPlainText(BUILD_INFO);
 			}
@@ -854,15 +834,6 @@ void AppBase::createUi(void) {
 			m_output->setReadOnly(true);
 			m_output->setAutoScrollToBottomEnabled(true);
 
-			m_debug->setReadOnly(true);
-			m_debug->setAutoScrollToBottomEnabled(true);
-
-			//m_propertyGrid->setGroupIcons(ot::IconManager::getIcon("Default/ArrowBlueRight.png"), ot::IconManager::getIcon("Default/ArrowGreenDown.png"));
-			//m_propertyGrid->setDeleteIcon(ot::IconManager::getIcon("Default/DeleteProperty.png"));
-
-			//m_contextMenus.output.clear = uiAPI::contextMenu::addItem(m_widgets.output, "Clear", "Clear", "Default", cmrClear);
-			//uiAPI::contextMenu::addItem(m_widgets.debug, "Clear", "Clear", "Default", cmrClear);
-
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Set widgets to docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 25);
 			m_welcomeScreen->slotRefreshRecentProjects();
@@ -878,12 +849,15 @@ void AppBase::createUi(void) {
 			// Display docks
 			OT_LOG_D("Settings up dock window visibility");
 	
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_debug);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output, ads::BottomDockWidgetArea);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation, ads::LeftDockWidgetArea);
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid, m_projectNavigation->getViewDockWidget()->dockAreaWidget(), ads::BottomDockWidgetArea);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), defaultView);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid);
 			
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker, m_projectNavigation->getViewDockWidget()->dockAreaWidget());
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker);
+
+			ot::WidgetViewManager::instance().setUseFocusInfo(true);
+
 			m_projectNavigation->getViewDockWidget()->setAsCurrentTab();
 
 			uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->getQWidget());
@@ -909,14 +883,11 @@ void AppBase::createUi(void) {
 			this->connect(m_projectNavigation, &ak::aTreeWidget::itemTextChanged, this, &AppBase::slotTreeItemTextChanged);
 			this->connect(m_projectNavigation, &ak::aTreeWidget::itemFocused, this, &AppBase::slotTreeItemFocused);
 
-			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusLost, this, &AppBase::slotViewFocusLost);
-			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocused, this, &AppBase::slotViewFocused);
+			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusChanged, this, &AppBase::slotViewFocusChanged);
 			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &AppBase::slotViewCloseRequested);
 
 			uiAPI::registerUidNotifier(m_mainWindow, this);
-						
-			uiAPI::registerAllMessagesNotifier(m_debugNotifier);
-
+			
 			// #######################################################################
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Initialize viewer component");
@@ -974,21 +945,24 @@ void AppBase::createUi(void) {
 			uiAPI::setSurfaceFormatDefaultSamplesCount(4);
 			OT_LOG_D("UI creation completed");
 		}
-		catch (const aException & e) { throw aException(e, "ini()"); }
-		catch (const std::exception & e)
-		{ 
+		catch (const aException & e) {
+			throw aException(e, "ini()");
+		}
+		catch (const std::exception & e) { 
 			throw aException(e.what(), "ini()"); 
 		}
-		catch (...) { throw aException("Unknown error", "ini()"); }
+		catch (...) {
+			throw aException("Unknown error", "ini()");
+		}
 	}
-	catch (const std::exception & e) { uiAPI::promptDialog::show(e.what(), "Error", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow()); }
+	catch (const std::exception & e) {
+		this->showErrorPrompt(e.what(), "Critical Error");
+	}
 }
 
 void AppBase::setDebug(bool _debug) { m_isDebug = _debug; }
 
 bool AppBase::debug(void) const { return m_isDebug; }
-
-void AppBase::setDebugOutputUid(UID _uid) { m_debugNotifier->setOutputUid(_uid); }
 
 void AppBase::registerSession(
 	const std::string &				_projectName,
@@ -1012,8 +986,8 @@ ViewerUIDtype AppBase::createView(
 	
 	int DPIRatio = uiAPI::window::devicePixelRatio();
 
-	aColor col(255, 255, 255);
-	aColor overlayCol;
+	ot::Color col(255, 255, 255);
+	ot::Color overlayCol;
 
 	ViewerUIDtype viewID = m_viewerComponent->createViewer(_modelUID, (double)DPIRatio, (double)DPIRatio,
 		col.r(), col.g(), col.b(), overlayCol.r(), overlayCol.g(), overlayCol.b());
@@ -1024,6 +998,8 @@ ViewerUIDtype AppBase::createView(
 	QString textVersion = availableTabText("Versions");
 	QString textBlock = availableTabText("BlockDiagram");
 	QString textTable = availableTabText("Table");
+
+	ot::WidgetViewManager::instance().setUseFocusInfo(false);
 
 	if (getVisible3D())
 	{
@@ -1056,7 +1032,7 @@ ViewerUIDtype AppBase::createView(
 			delete m_versionGraph;
 		}
 		m_versionGraph = new ot::VersionGraphManagerView;
-		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewVersion, ot::WidgetViewBase::ViewIsCentral));
+		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewVersion, ot::WidgetViewBase::ViewFlag::ViewIsSide));
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivatRequest, this, &AppBase::slotRequestVersion);
@@ -1073,6 +1049,8 @@ ViewerUIDtype AppBase::createView(
 	{
 		m_viewerComponent->getTableWidget(viewID)->getViewWidget()->setVisible(false);
 	}
+
+	ot::WidgetViewManager::instance().setUseFocusInfo(true);
 
 	m_graphicsPicker->pickerWidget()->setVisible(getVisibleBlockPicker());
 
@@ -1288,21 +1266,22 @@ void AppBase::updateLogIntensityInfo(void) {
 
 // Private functions
 
-bool AppBase::checkForContinue(
-	QString									_title
-) {
-	if (m_ExternalServicesComponent->isCurrentModelModified())
-	{
-		QString msg("Do you want to save the changes made to the project \"");
-		msg.append(m_currentProjectName.c_str());
-		msg.append("\"?\nUnsaved changes will be lost.");
-		dialogResult result = uiAPI::promptDialog::show(msg, _title, promptYesNoCancelIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow());
-		if (result == dialogResult::resultCancel) { return false; }
-		if (result == dialogResult::resultYes) {
-			if (m_ExternalServicesComponent->isCurrentModelModified())
-			{ m_ExternalServicesComponent->saveProject(); }
+bool AppBase::checkForContinue(const std::string& _title) {
+	if (m_ExternalServicesComponent->isCurrentModelModified()) {
+		std::string msg("Do you want to save the changes made to the project \"" + 
+			m_currentProjectName + 
+			"\"?\nUnsaved changes will be lost.");
+
+		ot::MessageDialogCfg::BasicButton result = this->showPrompt(msg, _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No | ot::MessageDialogCfg::Cancel);
+
+		if (result == ot::MessageDialogCfg::Cancel) {
+			return false;
+		}
+		else if (result == ot::MessageDialogCfg::Yes && m_ExternalServicesComponent->isCurrentModelModified()) {
+			m_ExternalServicesComponent->saveProject();
 		}
 	}
+
 	uiAPI::window::setTitle(m_mainWindow, "Open Twin");
 	return true;
 }
@@ -1453,141 +1432,6 @@ void AppBase::focusPropertyGridItem(const std::string& _group, const std::string
 	m_propertyGrid->focusProperty(_group, _name);
 }
 
-/*
-void AppBase::fillPropertyGrid(const std::string &settings) {
-	this->clearPropertyGrid();
-
-	// Read settings into JSOC Doc
-	ot::JsonDocument doc;
-
-	// Parse the document with the json string we have "received"
-	doc.Parse(settings.c_str());
-
-	// Check if the document is an object
-	assert(doc.IsObject()); // Doc is not an object
-
-	std::map<std::string, bool> groupMap;
-
-	std::vector<std::vector<int>> groupColors = { {164, 147, 133}, {143, 128, 154}, {117, 139, 154}, {166, 135, 148}, {141, 158, 161} };
-	int groupColorIndex = 0;
-
-	for (rapidjson::Value::ConstMemberIterator i = doc.MemberBegin(); i != doc.MemberEnd(); i++)
-	{
-		std::string name = i->name.GetString();
-		assert(i->value.IsObject());
-
-		rapidjson::Value& item = doc[name.c_str()];
-
-		std::string type = item["Type"].GetString();
-		bool multipleValues = item["MultipleValues"].GetBool();
-		bool readOnly = item["ReadOnly"].GetBool();
-		bool protectedProperty = item["Protected"].GetBool();
-		bool errorState = item["ErrorState"].GetBool();
-		std::string group = item["Group"].GetString();
-		
-		if (!group.empty())
-		{
-			if (groupMap.find(group) == groupMap.end())
-			{
-				//double r = groupColors[groupColorIndex % groupColors.size()][0] / 255.0;
-				//double g = groupColors[groupColorIndex % groupColors.size()][1] / 255.0;
-				//double b = groupColors[groupColorIndex % groupColors.size()][2] / 255.0;
-				int r = groupColors[groupColorIndex % groupColors.size()][0];
-				int g = groupColors[groupColorIndex % groupColors.size()][1];
-				int b = groupColors[groupColorIndex % groupColors.size()][2];
-
-				this->addPropertyGroup(group.c_str(), ak::aColor(r, g, b), ak::aColor(0, 0, 0), ak::aColor(255, 0, 0));
-				groupMap[group] = true;
-
-				groupColorIndex++;
-			}
-		}
-
-		if (type == "double")
-		{
-			double value = item["Value"].GetDouble();
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value);
-		}
-		else if (type == "integer")
-		{
-			long value = (long)(item["Value"].GetInt64());
-			long min = INT_MIN;
-			long max = INT_MAX;
-			if (item.HasMember("ValueMin")) min = (long)item["ValueMin"].GetInt64();
-			if (item.HasMember("ValueMax")) max = (long)item["ValueMax"].GetInt64();
-			//if (item.HasMember("NumberInputMode")) app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, value, min, max);
-			//else app->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, value);
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value, min, max);
-		}
-		else if (type == "boolean")
-		{
-			bool value = item["Value"].GetBool();
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value);
-		}
-		else if (type == "string")
-		{
-			QString value = item["Value"].GetString();
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value);
-		}
-		else if (type == "selection")
-		{
-			std::vector<QString> selection;
-
-			rapidjson::Value options = item["Options"].GetArray();
-
-			for (int i = 0; i < options.Size(); i++)
-			{
-				selection.push_back(QString(options[i].GetString()));
-			}
-
-			QString value = item["Value"].GetString();
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, selection, value);
-		}
-		else if (type == "color")
-		{
-			double colorR = item["ValueR"].GetDouble();
-			double colorG = item["ValueG"].GetDouble();
-			double colorB = item["ValueB"].GetDouble();
-
-			ak::aColor value(colorR * 255, colorG * 255, colorB * 255, 0);
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, value);
-		}
-		else if (type == "entitylist")
-		{
-			std::vector<QString> selection;
-
-			rapidjson::Value options = item["Options"].GetArray();
-
-			for (int i = 0; i < options.Size(); i++)
-			{
-				selection.push_back(QString(options[i].GetString()));
-			}
-
-			QString value = item["ValueName"].GetString();
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, selection, value);
-		}
-		else if (type == "projectlist")
-		{
-			std::vector<QString> selection;
-
-			std::list<std::string> userProjects = m_ExternalServicesComponent->GetAllUserProjects();
-
-			for (auto& project : userProjects)
-			{
-				selection.push_back(QString(project.c_str()));
-			}
-
-			QString value = item["Value"].GetString();
-			this->addProperty(group.c_str(), name.c_str(), multipleValues, readOnly, !protectedProperty, errorState, selection, value);
-		}
-		else
-		{
-			OT_LOG_EA("Unknown property type");
-		}
-	}
-}
-*/
-
 // ##############################################################################################
 
 // Info text output
@@ -1606,10 +1450,6 @@ void AppBase::appendHtmlInfoMessage(const QString& _html) {
 	if (m_output) {
 		m_output->appendHtml(_html);
 	}
-}
-
-void AppBase::appendDebugMessage(const QString & _message) {
-	m_debug->appendPlainText(_message);
 }
 
 // ##############################################################################################
@@ -1699,7 +1539,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	newEditor->getGraphicsScene()->setGridLineStyle(newOutline);
 
 	m_graphicsViews.insert_or_assign(_entityName, newEditor);
-	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
+	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor);
 
 	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
@@ -1755,9 +1595,10 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 
 	newEditor = new ot::TextEditorView;
 	newEditor->setupFromConfig(_config, false);
-	
+	newEditor->getViewData().getViewType();
+	newEditor->getViewData().getEntityName();
 	m_textEditors.insert_or_assign(_config.getEntityName(), newEditor);
-	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newEditor);
+	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor);
 
 	this->connect(newEditor, &ot::TextEditor::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
 
@@ -1824,7 +1665,7 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 	newTable->setupFromConfig(_config);
 
 	m_tables.insert_or_assign(_config.getEntityName(), newTable);
-	ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), newTable);
+	ot::WidgetViewManager::instance().addView(_serviceInfo, newTable);
 
 	this->connect(newTable, &ot::TableView::saveRequested, this, &AppBase::slotTableSaveRequested);
 
@@ -1854,7 +1695,7 @@ ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot:
 	return this->createNewTable(_config, _serviceInfo);
 }
 
-void AppBase::closeTable(const std::string& _entityName, const ot::BasicServiceInformation& _serviceInfo) {
+void AppBase::closeTable(const std::string& _entityName) {
 	ot::TableView* view = this->findTable(_entityName);
 	if (!view) {
 		OT_LOG_EAS("Table \"" + _entityName + "\" not found");
@@ -1869,36 +1710,35 @@ void AppBase::closeTable(const std::string& _entityName, const ot::BasicServiceI
 
 // Slots
 
-dialogResult AppBase::showPrompt(const QString _message, const QString & _title, promptType _type) {
+ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const ot::MessageDialogCfg & _config) {
 	if (m_mainWindow != invalidUID) {
-		aWindow * window = uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
-		return uiAPI::promptDialog::show(_message, _title, _type, window);
+		return ot::MessageDialog::showDialog(_config, uiAPI::object::get<aWindowManager>(m_mainWindow)->window());
 	}
-	else { return uiAPI::promptDialog::show(_message, _title, _type); }
+	else {
+		return ot::MessageDialog::showDialog(_config);
+	}
 }
 
-void AppBase::showInfoPrompt(const QString _message, const QString & _title) {
-	if (m_mainWindow != invalidUID) {
-		aWindow * window = uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
-		uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoInfo, c_promtIcoPath, window);
-	}
-	else { uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoInfo, c_promtIcoPath); }
+ot::MessageDialogCfg::BasicButton AppBase::showPrompt(const std::string& _message, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons) {
+	ot::MessageDialogCfg config;
+	config.setText(_message);
+	config.setTitle(_title);
+	config.setButtons(_buttons);
+	config.setIcon(_icon);
+
+	return this->showPrompt(config);
 }
 
-void AppBase::showWarningPrompt(const QString _message, const QString & _title) {
-	if (m_mainWindow != invalidUID) {
-		aWindow * window = uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
-		uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoWarning, c_promtIcoPath, window);
-	}
-	else { uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoWarning, c_promtIcoPath); }
+void AppBase::showInfoPrompt(const std::string& _message, const std::string& _title) {
+	this->showPrompt(_message, _title, ot::MessageDialogCfg::Information, ot::MessageDialogCfg::Ok);
 }
 
-void AppBase::showErrorPrompt(const QString _message, const QString & _title) {
-	if (m_mainWindow != invalidUID) {
-		aWindow * window = uiAPI::object::get<aWindowManager>(m_mainWindow)->window();
-		uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoError, c_promtIcoPath, window);
-	}
-	else { uiAPI::promptDialog::show(_message, _title, promptIconLeft, c_promtIcoError, c_promtIcoPath); }
+void AppBase::showWarningPrompt(const std::string& _message, const std::string& _title) {
+	this->showPrompt(_message, _title, ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Ok);
+}
+
+void AppBase::showErrorPrompt(const std::string& _message, const std::string& _title) {
+	this->showPrompt(_message, _title, ot::MessageDialogCfg::Critical, ot::MessageDialogCfg::Ok);
 }
 
 // #######################################################################################################################
@@ -2187,7 +2027,7 @@ void AppBase::slotTextEditorSaveRequested(void) {
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
 
 		try {
-			ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
+			ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL); //Modelservice handles these central tasks
 			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Name, ot::JsonString(editor->getViewData().getEntityName(), doc.GetAllocator()), doc.GetAllocator());
 			doc.AddMember(OT_ACTION_PARAM_TEXTEDITOR_Text, ot::JsonString(editor->toPlainText().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 
@@ -2205,6 +2045,10 @@ void AppBase::slotTextEditorSaveRequested(void) {
 			else
 			{
 				editor->setContentChanged(false);
+				const std::string& name = editor->getViewData().getEntityName();
+				const auto& viewerType =	editor->getViewData().getViewType();
+				ot::UID globalActiveViewModel = -1;
+				ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::changesSaved, viewerType);
 			}
 		}
 		catch (const std::exception& _e) {
@@ -2224,10 +2068,11 @@ void AppBase::slotTableSaveRequested(void) {
 	}
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SaveRequest, doc.GetAllocator()), doc.GetAllocator());
 
 	try {
-		ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(table);
+		ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL); //Modelservice handles these central tasks
 
 		ot::JsonObject cfgObj;
 		ot::TableCfg cfg = table->createConfig();
@@ -2244,6 +2089,14 @@ void AppBase::slotTableSaveRequested(void) {
 		if (rMsg != ot::ReturnMessage::Ok) {
 			OT_LOG_E("Request failed: " + rMsg.getWhat());
 			return;
+		}
+		else
+		{
+			table->setContentChanged(false);
+			const auto& viewType = table->getViewData().getViewType();
+			const std::string& name = table->getViewData().getEntityName();
+			ot::UID globalActiveViewModel = -1;
+			ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, name, ot::ViewChangedStates::changesSaved, viewType);
 		}
 	}
 	catch (const std::exception& _e) {
@@ -2271,22 +2124,70 @@ void AppBase::slotRequestVersion(const std::string& _versionName) {
 	m_ExternalServicesComponent->activateVersion(_versionName);
 }
 
-void AppBase::slotViewFocusLost(ot::WidgetView* _view) {
+void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView) {
+	ak::aTreeWidgetItem* itemToDeselect = nullptr;
 
-}
-
-void AppBase::slotViewFocused(ot::WidgetView* _view) {
-	if (!_view) return;
-	if (_view->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
-		m_viewerComponent->viewerTabChanged(_view->getViewData().getEntityName(), _view->getViewData().getViewType());
+	// Previous (focus lost)
+	if (_previousView) {
+		// Select corresponding tree entry if exists
+		if (_previousView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) { // Focus out is from central
+			itemToDeselect = m_projectNavigation->itemFromPath(QString::fromStdString(_previousView->getViewData().getEntityName()), '/');
+		}
+		else if (m_lastFocusedCentralView) { // Use last focused central for deselect
+			itemToDeselect = m_projectNavigation->itemFromPath(QString::fromStdString(m_lastFocusedCentralView->getViewData().getEntityName()), '/');
+		}
 	}
 
-	ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_view);
-	if (graphicsView) {
-		ot::BasicServiceInformation owner = ot::WidgetViewManager::instance().getOwnerFromView(graphicsView);
-		if (owner != m_graphicsPickerManager.getCurrentOwner()) {
-			this->fillGraphicsPicker(owner);
+	// Newly focused (focus in)
+	if (_focusedView) {
+		// Update graphics picker content
+		ot::GraphicsViewView* graphicsView = dynamic_cast<ot::GraphicsViewView*>(_focusedView);
+		if (graphicsView) {
+			ot::BasicServiceInformation owner = ot::WidgetViewManager::instance().getOwnerFromView(graphicsView);
+			if (owner != m_graphicsPickerManager.getCurrentOwner()) {
+				this->fillGraphicsPicker(owner);
+			}
 		}
+
+		// Forward focus events of central views to the viewer component
+		if (_focusedView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
+			m_viewerComponent->viewerTabChanged(_focusedView->getViewData().getEntityName(), _focusedView->getViewData().getViewType());
+
+			ak::aTreeWidgetItem* itemToSelect = m_projectNavigation->itemFromPath(QString::fromStdString(_focusedView->getViewData().getEntityName()), '/');
+
+			// Change item selection according to focused view
+			if (m_lastFocusedCentralView != _focusedView && itemToSelect != itemToDeselect) {
+				bool changed = false;
+				bool blocked = m_projectNavigation->signalsBlocked();
+				m_projectNavigation->blockSignals(blocked);
+
+				// Deselect
+				if (itemToDeselect) {
+					if (itemToDeselect->isSelected()) {
+						itemToDeselect->setSelected(false);
+						changed = true;
+					}
+				}
+
+				// Select
+				if (itemToSelect) {
+					if (!itemToSelect->isSelected()) {
+						itemToSelect->setSelected(true);
+						changed = true;
+					}
+				}
+
+				m_projectNavigation->blockSignals(blocked);
+
+				// Notify if needed
+				if (changed) {
+					m_projectNavigation->selectionChangedEvent(true);
+				}
+			}
+
+			m_lastFocusedCentralView = _focusedView;
+		}
+
 	}
 }
 
@@ -2304,6 +2205,10 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 
 	this->cleanupWidgetViewInfo(_view);
 	std::string viewName = _view->getViewData().getEntityName();
+	ot::WidgetViewBase::ViewType viewType = _view->getViewData().getViewType();
+	ot::UID globalActiveViewModel = -1;
+	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedStates::viewClosed, viewType);
+
 	ot::WidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
 
 	// Deselect navigation item if exists
@@ -2314,10 +2219,6 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	else {
 		OT_LOG_W("Navigation entry for view not found. { \"ViewName\": \"" + viewName + "\" }");
 	}
-}
-
-void AppBase::slotOutputContextMenuItemClicked() {
-	m_output->setPlainText(BUILD_INFO);
 }
 
 void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
@@ -2350,12 +2251,13 @@ void AppBase::slotCreateProject(void) {
 		// We have not currently opened this project, check if it is opened elsewhere
 		std::string projectUser;
 		if (m_ExternalServicesComponent->projectIsOpened(currentName, projectUser)) {
-			QString msg("The project with the name \"");
+			std::string msg("The project with the name \"");
 			msg.append(currentName.c_str());
 			msg.append("\" does already exist and is currently opened by user: \"");
 			msg.append(projectUser.c_str());
 			msg.append("\".");
-			uiAPI::promptDialog::show(msg, "Create New Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+
+			this->showErrorPrompt(msg, "Create New Project");
 			return;
 		}
 	}
@@ -2403,16 +2305,13 @@ void AppBase::slotCreateProject(void) {
 	if (projectManager.projectExists(currentName, canBeDeleted)) {
 		if (!canBeDeleted) {
 			// Notify that the project already exists and can not be deleted
-			QString msg{ "A project with the name \"" };
-			msg.append(currentName.c_str()).append("\" does already exist and belongs to another owner.");
-			ak::uiAPI::promptDialog::show(msg, "Create New Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+			this->showErrorPrompt("A project with the name \"" + currentName + "\" does already exist and belongs to another owner.", "Create New Project");
 			return;
 		}
 
-		QString msg("A project with the name \"");
-		msg.append(currentName.c_str());
-		msg.append("\" does already exist. Do you want to overwrite it?\nThis cannot be undone.");
-		if (dialogResult::resultYes != uiAPI::promptDialog::show(msg, "Create New Project", promptYesNoIconLeft, "DialogWarning", "Default", AppBase::instance()->mainWindow())) {
+		std::string msg("A project with the name \"" + currentName + "\" does already exist. Do you want to overwrite it?\nThis cannot be undone.");
+
+		if (this->showPrompt(msg, "Create New Project", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No) == ot::MessageDialogCfg::Ok) {
 			return;
 		}
 
@@ -2464,10 +2363,7 @@ void AppBase::slotOpenProject(void) {
 
 			// Check whether the project is currently opened in this or another other instance of the ui
 			if (selectedProjectName == m_currentProjectName) {
-				QString msg("The project with the name \"");
-				msg.append(selectedProjectName.c_str());
-				msg.append("\" is already opened in this instance.");
-				uiAPI::promptDialog::show(msg, "Open Project", promptOkIconLeft, "DialogInformation", "Default", AppBase::instance()->mainWindow());
+				this->showInfoPrompt("The project with the name \"" + selectedProjectName + "\" is already opened in this instance.", "Open Project");
 
 				projectIsOpened = true;
 			}
@@ -2475,12 +2371,9 @@ void AppBase::slotOpenProject(void) {
 				// We have not currently opened this project, check if it is opened elsewhere
 				std::string projectUser;
 				if (m_ExternalServicesComponent->projectIsOpened(selectedProjectName, projectUser)) {
-					QString msg("The project with the name \"");
-					msg.append(selectedProjectName.c_str());
-					msg.append("\" is already opened by user: \"");
-					msg.append(projectUser.c_str());
-					msg.append("\".");
-					uiAPI::promptDialog::show(msg, "Open Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+					std::string msg("The project with the name \"" + selectedProjectName + "\" is already opened by user: \"" + projectUser + "\".");
+
+					this->showErrorPrompt(msg, "Open Project");
 
 					projectIsOpened = true;
 				}
@@ -2495,7 +2388,7 @@ void AppBase::slotOpenProject(void) {
 				assert(userManager.checkConnection()); // Failed to connect
 
 				if (!projectManager.canAccessProject(projectCollection)) {
-					uiAPI::promptDialog::show("Unable to access this project. The access permission might have been changed.", "Open Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+					this->showErrorPrompt("Unable to access this project. The access permission might have been changed.", "Open Project");
 
 					userManager.removeRecentProject(selectedProjectName);
 					m_welcomeScreen->slotRefreshProjectList();
@@ -2519,7 +2412,7 @@ void AppBase::slotOpenProject(void) {
 			UserManagement userManager(m_loginData);
 			assert(userManager.checkConnection()); // Failed to connect
 
-			uiAPI::promptDialog::show("Unable to access this project. The access permission might have been changed or the project has been deleted.", "Open Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+			this->showErrorPrompt("Unable to access this project. The access permission might have been changed or the project has been deleted.", "Open Project");
 
 			userManager.removeRecentProject(selectedProjectName);
 			m_welcomeScreen->slotRefreshProjectList();
@@ -2576,12 +2469,12 @@ void AppBase::slotRenameProject(void) {
 	if (selectedProjectName.toStdString() != m_currentProjectName) {
 		std::string projectUser;
 		if (m_ExternalServicesComponent->projectIsOpened(selectedProjectName.toStdString(), projectUser)) {
-			QString msg("The project with the name \"");
-			msg.append(selectedProjectName);
+			std::string msg("The project with the name \"");
+			msg.append(selectedProjectName.toStdString());
 			msg.append("\" is currently opened by user: \"");
-			msg.append(projectUser.c_str());
+			msg.append(projectUser);
 			msg.append("\".");
-			uiAPI::promptDialog::show(msg, "Rename Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+			this->showErrorPrompt(msg, "Rename Project");
 
 			return;
 		}
@@ -2645,12 +2538,12 @@ void AppBase::slotDeleteProject(void) {
 		if (proj.toStdString() != m_currentProjectName) {
 			std::string projectUser;
 			if (m_ExternalServicesComponent->projectIsOpened(proj.toStdString(), projectUser)) {
-				QString msg("The project with the name \"");
-				msg.append(proj);
+				std::string msg("The project with the name \"");
+				msg.append(proj.toStdString());
 				msg.append("\" is currently opened by user: \"");
-				msg.append(projectUser.c_str());
+				msg.append(projectUser);
 				msg.append("\".");
-				uiAPI::promptDialog::show(msg, "Delete Project", promptOkIconLeft, "DialogError", "Default", AppBase::instance()->mainWindow());
+				this->showErrorPrompt(msg, "Delete Project");
 
 				continue;
 			}

@@ -716,13 +716,13 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 	
 	if (_visualisationTypes.visualiseAsTable())
 	{
-		auto textVis = new TextVisualiser(_modelEntityID);
+		auto textVis = new TextVisualiser(sceneNode);
 		sceneNode->addVisualiser(textVis);
 	}
 
 	if (_visualisationTypes.visualiseAsText())
 	{
-		auto tableVis = new TableVisualiser(_modelEntityID);
+		auto tableVis = new TableVisualiser(sceneNode);
 		sceneNode->addVisualiser(tableVis);
 	}
 
@@ -1457,12 +1457,10 @@ void Model::setupUIControls3D(void)
 	removeItemIDList.push_front(uiControls.hideUnselectedButtonID		= getNotifier()->addMenuPushButton(uiControls.visiblityGroupID, "Hide Unselected", "HideUnselected"));
 
 	removeItemIDList.push_front(uiControls.stateWireframeButtonID		= getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Wireframe", "Wireframe"));
-	removeItemIDList.push_front(uiControls.stateWorkingPlaneButtonID	= getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Working plane", "WorkingPlane",
-		                                                                      ot::ContextMenu("WorkingPlaneContext") << ot::ContextMenuItem("Settings", "Settings", "Settings", ot::ContextMenuItemRole(ot::ContextMenuItemRole::SettingsReference, "Viewer:WorkingPlane"))));
-	removeItemIDList.push_front(uiControls.stateAxisCrossButtonID       = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Axis cross", "AxisCross",
-		                                                                      ot::ContextMenu("AxisCrossContext") << ot::ContextMenuItem("Settings", "Settings", "Settings", ot::ContextMenuItemRole(ot::ContextMenuItemRole::SettingsReference, "Viewer:AxisCross"))));
-	removeItemIDList.push_front(uiControls.stateCenterAxisCrossButtonID = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Center axis cross", "CenterAxisCross",	ot::ContextMenu("CenterAxisCrossContext") << ot::ContextMenuItem("Settings", "Settings", "Settings", ot::ContextMenuItemRole(ot::ContextMenuItemRole::SettingsReference, "Viewer:AxisCross"))));
-	removeItemIDList.push_front(uiControls.cutplaneButtonID             = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Cutplane", "Cutplane",	ot::ContextMenu("CutplaneContext") << ot::ContextMenuItem("Settings", "Settings", "Settings", ot::ContextMenuItemRole(ot::ContextMenuItemRole::SettingsReference, "Viewer:Cutplane"))));
+	removeItemIDList.push_front(uiControls.stateWorkingPlaneButtonID	= getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Working plane", "WorkingPlane"));
+	removeItemIDList.push_front(uiControls.stateAxisCrossButtonID       = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Axis cross", "AxisCross"));
+	removeItemIDList.push_front(uiControls.stateCenterAxisCrossButtonID = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Center axis cross", "CenterAxisCross"));
+	removeItemIDList.push_front(uiControls.cutplaneButtonID             = getNotifier()->addMenuPushButton(uiControls.styleGroupID, "Cutplane", "Cutplane"));
 
 	// Send an initial notification to properly set the state of the new controls
 	std::list<ot::UID> selectedTreeItemID;
@@ -2721,6 +2719,18 @@ void Model::removeSceneNode(osg::Node *node)
 	osgNodetoSceneNodesMap.erase(node);
 }
 
+void Model::notifySceneNodeAboutViewChange(const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
+{
+	auto sceneNodeIt = nameToSceneNodesMap.find(_sceneNodeName);
+	if (sceneNodeIt == nameToSceneNodesMap.end()) {
+		OT_LOG_EAS("Scene node \"" + _sceneNodeName + "\" not found");
+		return;
+	}
+	SceneNodeMultiVisualisation* sceneNodeMultiVisualisation =  dynamic_cast<SceneNodeMultiVisualisation*>(sceneNodeIt->second);
+	assert(sceneNodeMultiVisualisation != nullptr);
+	sceneNodeMultiVisualisation->setViewChange(_state, _viewType);
+}
+
 void Model::addVisualizationMeshNodeFromFacetDataBase(const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, double edgeColorRGB[3], bool displayTetEdges, const std::string &projectName, unsigned long long entityID, unsigned long long version)
 {
 	SceneNodeMesh *meshNode = new SceneNodeMesh;
@@ -3072,8 +3082,7 @@ void Model::viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::V
 	}
 	else
 	{
-		// Now there may be other tabs in the UI, created by a ui plugin
-		//assert(0); // Unknown tab title
+		
 	}
 }
 

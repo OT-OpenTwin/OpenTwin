@@ -11,6 +11,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
+#include "OTGui/MessageDialogCfg.h"
 
 class MicroserviceNotifier
 {
@@ -60,7 +61,7 @@ public:
 	//Not existing in uiComponent
 	void selectObject(ot::UID visualizationModelID, ot::UID entityID);
 	//Not existing in uiComponent
-	void promptChoice(const std::string &message, const std::string &icon, const std::string &options, const std::string &promptResponse, const std::string &parameter1);
+	void promptChoice(const std::string& _message, ot::MessageDialogCfg::BasicIcon _icon, ot::MessageDialogCfg::BasicButtons _buttons, const std::string& _promptResponse, const std::string& _parameter1);
 	//Not existing in uiComponent
 	void addVisualizationNodeFromFacetData(ot::UID visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
 		double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected);

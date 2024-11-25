@@ -51,7 +51,6 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\BlockEntities.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\Model.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\Viewer.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\DataStorage.dll" 2>NUL
-DEL "%OPENTWIN_DEPLOYMENT_DIR%\UIPluginAPI.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\uiCore.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\RubberbandEngineCore.dll" 2>NUL	
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\RubberbandEngineOsgWrapper.dll" 2>NUL
@@ -86,6 +85,7 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\StudioSuiteConnector.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\LTSpiceConnector.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\open_twin.exe" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\CircuitSimulatorService.dll" 2>NUL
+DEL "%OPENTWIN_DEPLOYMENT_DIR%\CircuitExecution.exe" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OToolkit.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\ResultDataAccess.dll" 2>NUL
 
@@ -116,7 +116,6 @@ COPY "%OT_MODELENTITIES_ROOT%\%OT_DLLR%\ModelEntities.dll" "%OPENTWIN_DEPLOYMENT
 COPY "%OT_CADMODELENTITIES_ROOT%\%OT_DLLR%\CADModelEntities.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_VIEWER_ROOT%\%OT_DLLR%\Viewer.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_DATASTORAGE_ROOT%\%OT_DLLR%\DataStorage.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OT_UIPLUGINAPI_ROOT%\%OT_DLLR%\UIPluginAPI.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_UICORE_ROOT%\%OT_DLLR%\uiCore.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_RUBBERBANDAPI_ROOT%\%OT_DLLR%\RubberbandEngineCore.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_RUBBERBAND_ROOT%\%OT_DLLR%\RubberbandEngineOsgWrapper.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
@@ -161,6 +160,7 @@ COPY "%OT_PYTHON_EXECUTION_ROOT%\%OT_DLLR%\PythonExecution.exe" "%OPENTWIN_DEPLO
 COPY "%OT_BLOCKEDITORSERVICE_ROOT%\%OT_DLLR%\BlockEditorService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_DATA_PROCESSING_SERVICE_ROOT%\%OT_DLLR%\DataProcessingService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OT_CIRCUIT_SIMULATOR_SERVICE_ROOT%\%OT_DLLR%\CircuitSimulatorService.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
+COPY "%OT_CIRCUIT_EXECUTION_ROOT%\%OT_DLLR%\CircuitExecution.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
 
 COPY "%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\release\open_twin.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
 
@@ -194,6 +194,13 @@ XCOPY /E /Q "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\build\*.*" "%OPENTWIN_DEPLOYME
 COPY "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\.htaccess" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\htdocs"
 COPY /Y "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\httpd.conf" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\conf"
 COPY /Y "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\httpd-ahssl.conf" "%OPENTWIN_DEPLOYMENT_DIR%\Apache\conf\extra"
+
+REM ====================================================================
+REM  Create the build informatiomn file
+REM ====================================================================
+
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CreateBuildInformation.bat"
+
 
 GOTO END
 

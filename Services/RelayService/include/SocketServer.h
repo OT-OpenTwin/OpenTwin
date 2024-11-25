@@ -2,7 +2,7 @@
 #define SOCKETSERVER_H
 
 // OpenTwin header
-#include "OTSystem/SystemLoadInformation.h"
+#include "OTSystem/SystemInformation.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -84,7 +84,7 @@ private:
 	QList<QWebSocket *> m_clients;
 	std::string responseText;
 	bool responseReceived;
-	ot::SystemLoadInformation m_systemLoad;
+	ot::SystemInformation m_systemLoad;
 };
 
 #endif //SOCKETSERVER_H

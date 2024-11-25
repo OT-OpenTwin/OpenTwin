@@ -19,6 +19,7 @@
 #include "OTWidgets/ImagePreview.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTSystem/SystemInformation.h"
 
 // Qt header
 #include <QtCore/qjsonarray.h>
@@ -518,8 +519,11 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 
 	switch (_error)
 	{
+	case WorkerError::IncompatibleVersions:
+		msg.append("Incompatible versions of frontend and backend services.");
+		break;
 	case WorkerError::GSSConnectionFailed:
-		msg.append("Failed to connect to Global Session Service.");
+		msg.append("Failed to connect to Global Session Service. Check backend service status, firewall settings and certificates.");
 		break;
 	case WorkerError::InvalidGssResponse:
 		msg.append("Invalid Global Session Service response.");
@@ -692,6 +696,13 @@ void LogInDialog::stopWorkerWithError(WorkerError _error) {
 void LogInDialog::loginWorkerStart(void) {
 	WorkerError currentError = WorkerError::NoError;
 
+	// Check the version compatiblity
+	currentError = this->workerCheckVersionCompatibility();
+	if (currentError != WorkerError::NoError) {
+		this->stopWorkerWithError(currentError);
+		return;
+	}
+	
 	// Get data from GSS
 	currentError = this->workerConnectToGSS();
 	if (currentError != WorkerError::NoError) {
@@ -781,6 +792,28 @@ void LogInDialog::changePasswordWorkerStart(void) {
 	m_loginData.clear();
 
 	QMetaObject::invokeMethod(this, &LogInDialog::slotChangePasswordSuccess, Qt::QueuedConnection);
+}
+
+LogInDialog::WorkerError LogInDialog::workerCheckVersionCompatibility(void) {
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetBuildInformation, doc.GetAllocator()), doc.GetAllocator());
+
+	std::string response;
+	if (!ot::msg::send("", m_loginData.getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, 5000)) {
+		return WorkerError::GSSConnectionFailed;
+	}
+
+	// Now we get the local build information
+	ot::SystemInformation info;
+	std::string buildInfo = info.getBuildInformation();
+
+	// Compare the compatibility
+	if (response != buildInfo)
+	{
+		return WorkerError::IncompatibleVersions;
+	}
+
+	return WorkerError::NoError;
 }
 
 LogInDialog::WorkerError LogInDialog::workerConnectToGSS(void) {

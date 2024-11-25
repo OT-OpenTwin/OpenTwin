@@ -135,17 +135,11 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 		m_uiComponent->setControlsEnabledState(enabled, disabled);
 	}
-
-	SetControlstateTableFunctions(false);
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui)
 {
-
-}
-
-void Application::uiPluginConnected(ot::components::UiPluginComponent * _uiPlugin) {
 
 }
 
@@ -344,15 +338,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 					tableRange.setFromJsonObject(range);
 					ranges.push_back(tableRange);
 				}
-
-				ot::UID tableEntityID = _doc[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-				ot::UID tableEntityVersion = _doc[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
-				_parametrizedDataHandler->storeSelectionRanges(tableEntityID, tableEntityVersion, ranges);
-			}
-			else if (subsequentFunction == "ColourRanges")
-			{
-				std::string tableName = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_EntityName);
-				_parametrizedDataHandler->SetColourOfRanges(tableName);
+				_parametrizedDataHandler->storeSelectionRanges(ranges);
 			}
 			else
 			{
@@ -395,8 +381,6 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 
 void Application::HandleSelectionChanged()
 {
-	std::mutex onlyOneActionPerTime;
-	std::lock_guard<std::mutex> lock(onlyOneActionPerTime);
 	try
 	{
 		
@@ -404,85 +388,6 @@ void Application::HandleSelectionChanged()
 		if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
 		m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
 		
-		bool showCreateTableBtn = false;
-		for (const auto& entityInfo : selectedEntityInfo)
-		{
-			const std::string& entityName = entityInfo.getEntityName();
-			if (entityName.find(_dataSourcesFolder) != std::string::npos)
-			{
-				showCreateTableBtn = true;
-				break;
-			}
-		}
-		uiComponent()->sendUpdatedControlState();
-
-		if (m_selectedEntities.size() == 1)
-		{
-			std::string entityName = selectedEntityInfo.begin()->getEntityName();
-			if (entityName.find(_tableFolder) != std::string::npos)
-			{
-				if (_visualizationModel == -1)
-				{
-					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-				}
-				ot::JsonDocument doc;
-				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)selectedEntityInfo.begin()->getEntityVersion(), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)selectedEntityInfo.begin()->getEntityID(), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("ColourRanges", doc.GetAllocator()), doc.GetAllocator());
-
-				std::string tmp;
-				uiComponent()->sendMessage(true, doc, tmp);
-			}
-			else if (entityName.find(ot::FolderNames::DatasetFolder) != std::string::npos)
-			{
-				if (_visualizationModel == -1)
-				{
-					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-				}
-				if (m_resultAccess == nullptr)
-				{
-					m_resultAccess = new ResultCollectionMetadataAccess(m_collectionName, m_modelComponent, &getClassFactory());
-				}
-				std::string selectedEntityName =	selectedEntityInfo.begin()->getEntityName();
-				DatasetOverviewVisualiser visualiser;
-				std::unique_ptr<ot::GenericDataStruct>data = nullptr;
-				const MetadataCampaign&	campaign = m_resultAccess->getMetadataCampaign();
-				if (campaign.getCampaignName() == selectedEntityName)
-				{
-					data.reset(visualiser.buildTableOverview(campaign));
-				}
-				else
-				{
-					const MetadataSeries* seriesMetadata =	m_resultAccess->findMetadataSeries(selectedEntityName);
-					assert(seriesMetadata != nullptr);
-					data.reset(visualiser.buildTableOverview(*seriesMetadata));
-				}
-
-				assert(data != nullptr);
-
-				ot::JsonDocument doc;
-				ot::JsonObject dataObject;
-				data->addToJsonObject(dataObject, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_OBJ_SetTable, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_Value, dataObject, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				
-				std::string response;
-				bool success = m_uiComponent->sendMessage(true, doc, response);
-			}
-			else
-			{
-				SetControlstateTableFunctions(false);
-			}
-		}
-		else
-		{
-			SetControlstateTableFunctions(false);
-		}
-
 		ot::UIDList potentialRangesID, potentialRangesVersions;
 		for (auto entityInfo : selectedEntityInfo)
 		{
@@ -515,7 +420,6 @@ void Application::HandleSelectionChanged()
 			version++;
 		}
 		_parametrizedDataHandler->SelectRange(selectedRangesID, selectedRangesVersion);
-
 	}
 	catch (std::exception& e)
 	{
@@ -538,9 +442,4 @@ void Application::RequestSelectedRanges(const std::string& _tableName)
 
 	std::string tmp;
 	uiComponent()->sendMessage(true, doc, tmp);
-}
-
-void Application::SetControlstateTableFunctions(bool showTableBtns)
-{
-	uiComponent()->sendUpdatedControlState();
 }

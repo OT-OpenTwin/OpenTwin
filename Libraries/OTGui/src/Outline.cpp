@@ -167,7 +167,7 @@ void ot::Outline::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_join = stringToJoinStyle(json::getString(_object, "Join"));
 
 	ConstJsonObject painterObj = json::getObject(_object, "Painter");
-	Painter2D* p = Painter2DFactory::instance().create(painterObj);
+	Painter2D* p = Painter2DFactory::create(painterObj);
 	if (p) {
 		this->setPainter(p);
 	}
@@ -286,7 +286,7 @@ void ot::OutlineF::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_join = stringToJoinStyle(json::getString(_object, "Join"));
 	
 	ConstJsonObject painterObj = json::getObject(_object, "Painter");
-	Painter2D* p = Painter2DFactory::instance().create(painterObj);
+	Painter2D* p = Painter2DFactory::create(painterObj);
 	if (p) {
 		this->setPainter(p);
 	}

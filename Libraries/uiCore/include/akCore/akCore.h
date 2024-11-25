@@ -67,28 +67,12 @@ namespace ak {
 		ctClearCreatedObjects
 	};
 
-	enum contextMenuRole {
-		cmrNone,
-		cmrClear
-	};
-
 	//! Describes the date format
 	enum dateFormat {
 		dfDDMMYYYY,
 		dfMMDDYYYY,
 		dfYYYYMMDD,
 		dfYYYYDDMM
-	};
-
-	//! Describes the dialog result
-	enum dialogResult {
-		resultYes,
-		resultNo,
-		resultOk,
-		resultCancel,
-		resultRetry,
-		resultIgnore,
-		resultNone
 	};
 
 	//! Describes the dock location of a dock widget
@@ -127,11 +111,9 @@ namespace ak {
 		etTimeout = 1 << 24,
 		etToggeledChecked = 1 << 25,
 		etToggeledUnchecked = 1 << 26,
-		etContextMenuItemClicked = 1 << 27,
-		etContextMenuItemCheckedChanged = 1 << 28,
-		etVisibilityChanged = 1 << 29,
-		etReturnPressed = 1 << 30,
-		etEditingFinished = 1 << 31,
+		etVisibilityChanged = 1 << 27,
+		etReturnPressed = 1 << 28,
+		etEditingFinished = 1 << 29,
 		etDeleted = (unsigned long long ) (1) << 32
 	};
 
@@ -185,43 +167,22 @@ namespace ak {
 	enum objectType {
 		otNone,
 		otAction,
-		otColorEditButton,
 		otComboBox,
 		otComboButton,
 		otComboButtonItem,
 		otCheckBox,
-		otDatePicker,
-		otDatePickerDialog,
-		otDefaultWelcomeScreen,
-		otDock,
-		otDockWatcher,
-		otGlobalKeyListener,
-		otGraphicsView,
 		otLabel,
 		otLineEdit,
-		otList,
 		otMainWindow,
 		otMenu,
 		otNiceLineEdit,
-		otPrompt,
-		otPropertyGrid,
-		otPropertyGridItem,
-		otPushButton,
-		otRadioButton,
-		otSpecialTabBar,
 		otSpinBox,
-		otTable,
 		otTabToolbar,
 		otTabToolbarGroup,
 		otTabToolbarPage,
 		otTabToolbarSubgroup,
-		otTabView,
-		otTextEdit,
-		otTimePicker,
-		otTimePickerDialog,
 		otTimer,
 		otToolButton,
-		otToolButtonCustomContextMenu,
 		otTree,
 		otTreeItem
 	};
@@ -354,12 +315,6 @@ namespace ak {
 		dockLocation							_dockLocation
 	);
 
-	//! @brief Create a string representation of the provided dialog result
-	//! @param _dialogResult The dialog result to be converted
-	UICORE_API_EXPORT QString toQString(
-		dialogResult							_dialogResult
-	);
-
 	//! @brief Create a string representation of the provided prompt type
 	//! @param _promptType The prompt type to be converted
 	UICORE_API_EXPORT QString toQString(
@@ -369,11 +324,6 @@ namespace ak {
 	//! @brief Create a string representation of the provided keyType
 	UICORE_API_EXPORT QString toQString(
 		keyType									_keyType
-	);
-
-	//! @brief Create a string representation of the provided contextMenuRole
-	UICORE_API_EXPORT QString toQString(
-		contextMenuRole							_role
 	);
 
 	//! @brief Create a string representation of the provided date format

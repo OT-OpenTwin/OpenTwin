@@ -4,6 +4,6 @@
 class ViewVisualisationHandler
 {
 public:
-	void handleVisualisationRequest(ot::UID _entityID, const std::string& _visualisationType);
+	void handleVisualisationRequest(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView);
 
 };

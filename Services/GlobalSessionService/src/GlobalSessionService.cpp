@@ -12,6 +12,7 @@
 #include "Session.h"
 
 // OpenTwin header
+#include "OTSystem/SystemInformation.h"
 #include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/Msg.h"
@@ -24,9 +25,11 @@
 
 // std header
 #include <iostream>
+#include <fstream>
 #include <thread>
 #include <chrono>
 #include <limits>
+#include <filesystem>
 
 GlobalSessionService * g_instance{ nullptr };
 
@@ -178,58 +181,106 @@ std::string GlobalSessionService::handleGetProjectTemplatesList(ot::JsonDocument
 	this->getCustomProjectTemplates(result, user, password);
 
 	// Add default templates
-	ot::ProjectTemplateInformation default3D;
-	default3D.setName(OT_ACTION_PARAM_SESSIONTYPE_3DSIM);
-	default3D.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_3DSIM);
-	default3D.setDescription("3D Simulation project.\nCreate, import, export and modify 3D geometries. Run simulations.");
-	default3D.setIsDefault(true);
+	{
+		using namespace ot;
+		ProjectTemplateInformation default3D;
+		default3D.setName(OT_ACTION_PARAM_SESSIONTYPE_3DSIM);
+		default3D.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_3DSIM);
+		default3D.setIsDefault(true);
 
-	ot::JsonObject obj3D;
-	default3D.addToJsonObject(obj3D, result.GetAllocator());
-	result.PushBack(obj3D, result.GetAllocator());
+		StyledTextBuilder description;
+		description << StyledText::Header1 << "3D Simulation project" << StyledText::Text <<
+			"Create, import, export and modify 3D geometries. Run simulations.";
 
-	ot::ProjectTemplateInformation defaultPipeline;
-	defaultPipeline.setName(OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE);
-	defaultPipeline.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE);
-	defaultPipeline.setDescription("Data pipeline project.\nCreate automations.");
-	defaultPipeline.setIsDefault(true);
+		default3D.setDescription(description);
 
-	ot::JsonObject objPipeline;
-	defaultPipeline.addToJsonObject(objPipeline, result.GetAllocator());
-	result.PushBack(objPipeline, result.GetAllocator());
+		JsonObject obj3D;
+		default3D.addToJsonObject(obj3D, result.GetAllocator());
+		result.PushBack(obj3D, result.GetAllocator());
+	}
 
-	ot::ProjectTemplateInformation defaultCST;
-	defaultCST.setName(OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE);
-	defaultCST.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE);
-	defaultCST.setDescription("CST Studio Suite Project.\nImport and export projects from CST Studio Suite.");
-	defaultCST.setIsDefault(true);
+	{
+		using namespace ot;
+		ProjectTemplateInformation defaultPipeline;
+		defaultPipeline.setName(OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE);
+		defaultPipeline.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE);
+		defaultPipeline.setIsDefault(true);
 
-	ot::JsonObject objCST;
-	defaultCST.addToJsonObject(objCST, result.GetAllocator());
-	result.PushBack(objCST, result.GetAllocator());
+		StyledTextBuilder description;
+		description << StyledText::Header1 << "Data pipeline project" << StyledText::Text <<
+			"Create automations.";
 
-	ot::ProjectTemplateInformation defaultLTSpice;
-	defaultLTSpice.setName(OT_ACTION_PARAM_SESSIONTYPE_LTSPICE);
-	defaultLTSpice.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_LTSPICE);
-	defaultLTSpice.setDescription("LT Spice Project.\nImport and export projects from LT Spice.");
-	defaultLTSpice.setIsDefault(true);
+		defaultPipeline.setDescription(description);
 
-	ot::JsonObject objLTSpice;
-	defaultLTSpice.addToJsonObject(objLTSpice, result.GetAllocator());
-	result.PushBack(objLTSpice, result.GetAllocator());
+		JsonObject objPipeline;
+		defaultPipeline.addToJsonObject(objPipeline, result.GetAllocator());
+		result.PushBack(objPipeline, result.GetAllocator());
+	}
 
-	ot::ProjectTemplateInformation defaultDevelopment;
-	defaultDevelopment.setName(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT);
-	defaultDevelopment.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT);
-	defaultDevelopment.setBriefDescription("All OpenTwin services");
-	defaultDevelopment.setDescription("Development Project.\nRun all services provided by OpenTwin in one session.");
-	defaultDevelopment.setIsDefault(true);
+	{
+		using namespace ot;
+		ProjectTemplateInformation defaultCST;
+		defaultCST.setName(OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE);
+		defaultCST.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE);
+		defaultCST.setIsDefault(true);
 
-	ot::JsonObject objDev;
-	defaultDevelopment.addToJsonObject(objDev, result.GetAllocator());
-	result.PushBack(objDev, result.GetAllocator());
+		StyledTextBuilder description;
+		description << StyledText::Header1 << "CST Studio Suite Project" << StyledText::Text <<
+			"Import and export projects from CST Studio Suite.";
+
+		defaultCST.setDescription(description);
+
+		JsonObject objCST;
+		defaultCST.addToJsonObject(objCST, result.GetAllocator());
+		result.PushBack(objCST, result.GetAllocator());
+	}
+
+	{
+		using namespace ot;
+		ProjectTemplateInformation defaultLTSpice;
+		defaultLTSpice.setName(OT_ACTION_PARAM_SESSIONTYPE_LTSPICE);
+		defaultLTSpice.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_LTSPICE);
+		defaultLTSpice.setIsDefault(true);
+
+		StyledTextBuilder description;
+		description << StyledText::Header1 << "LT Spice Project" << StyledText::Text <<
+			"Import and export projects from LT Spice.";
+
+		defaultLTSpice.setDescription(description);
+
+		ot::JsonObject objLTSpice;
+		defaultLTSpice.addToJsonObject(objLTSpice, result.GetAllocator());
+		result.PushBack(objLTSpice, result.GetAllocator());
+	}
+
+	{
+		using namespace ot;
+		ProjectTemplateInformation defaultDevelopment;
+		defaultDevelopment.setName(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT);
+		defaultDevelopment.setProjectType(OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT);
+		defaultDevelopment.setBriefDescription("All OpenTwin services");
+		defaultDevelopment.setIsDefault(true);
+
+		StyledTextBuilder description;
+		description << StyledText::Header1 << "Development Project" << StyledText::Text <<
+			"Run all services provided by OpenTwin in one session.";
+
+		defaultDevelopment.setDescription(description);
+
+		JsonObject objDev;
+		defaultDevelopment.addToJsonObject(objDev, result.GetAllocator());
+		result.PushBack(objDev, result.GetAllocator());
+	}
 
 	return result.toJson();
+}
+
+std::string GlobalSessionService::handleGetBuildInformation(ot::JsonDocument& _doc)
+{
+	ot::SystemInformation info;
+	std::string buildInfo = info.getBuildInformation();
+
+	return buildInfo;
 }
 
 std::string GlobalSessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
@@ -569,8 +620,23 @@ void GlobalSessionService::getCustomProjectTemplates(ot::JsonDocument& _resultAr
 			newInfo.setName(name);
 			newInfo.setIsDefault(false);
 			newInfo.setProjectType(projectType);
-			newInfo.setDescription(description);
 			newInfo.setBriefDescription(briefDescription);
+
+			ot::StyledTextBuilder descriptionBuilder;
+			bool descriptionOk = false;
+			if (description.find('{') == 0) {
+				ot::JsonDocument descriptionDoc;
+				if (descriptionDoc.fromJson(description)) {
+					if (descriptionDoc.IsObject()) {
+						descriptionBuilder.setFromJsonObject(descriptionDoc.GetConstObject());
+						descriptionOk = true;
+					}
+				}
+			}
+			if (!descriptionOk) {
+				descriptionBuilder << description;
+			}
+			newInfo.setDescription(descriptionBuilder);
 
 			ot::JsonObject obj;
 			newInfo.addToJsonObject(obj, _resultArray.GetAllocator());

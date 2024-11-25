@@ -14,9 +14,6 @@
 #include <qheaderview.h>
 #include <qevent.h>
 
-// AK header
-#include <akAPI/uiAPI.h>
-
 CommitMessageDialog::CommitMessageDialog(const QIcon &windowIcon, QString type, QString message)
 	: my_buttonCancel{ nullptr }, my_buttonConfirm{ nullptr }, my_cancelClose{ false }, my_confirmed{ false }, my_input{ nullptr },
 	my_layout{ nullptr }, my_layoutButtons{ nullptr }, my_layoutInput{ nullptr }, my_widgetButtons{ nullptr }, my_widgetInput{ nullptr }

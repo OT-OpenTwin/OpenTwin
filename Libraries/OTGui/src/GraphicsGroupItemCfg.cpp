@@ -50,7 +50,7 @@ void ot::GraphicsGroupItemCfg::setFromJsonObject(const ConstJsonObject& _object)
 
 	std::list<ConstJsonObject> itemArr = json::getObjectList(_object, "Items");
 	for (const auto& itemObj : itemArr) {
-		ot::GraphicsItemCfg* itm = GraphicsItemCfgFactory::instance().create(itemObj);
+		ot::GraphicsItemCfg* itm = GraphicsItemCfgFactory::create(itemObj);
 		if (itm) {
 			m_items.push_back(itm);
 		}

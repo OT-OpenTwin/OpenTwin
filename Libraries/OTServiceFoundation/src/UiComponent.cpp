@@ -12,7 +12,6 @@
 #include "OTCommunication/actionTypes.h"
 
 #include "OTServiceFoundation/UiComponent.h"
-#include "OTServiceFoundation/UiPluginComponent.h"
 #include "OTServiceFoundation/ApplicationBase.h"
 
 #include "TemplateDefaultManager.h"
@@ -102,8 +101,7 @@ void ot::components::UiComponent::addMenuButton(
 	const LockTypeFlags&		_lockTypes,
 	const std::string &			_iconName,
 	const std::string &			_iconFolder,
-	const std::string &			_keySequence,
-	const ContextMenu&			_contextMenu
+	const std::string &			_keySequence
 ) {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(_pageName, _groupName, _buttonName))
 	{
@@ -122,10 +120,6 @@ void ot::components::UiComponent::addMenuButton(
 			cmdDoc.AddMember(OT_ACTION_PARAM_UI_KeySequence, JsonString(_keySequence, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		}
 
-		JsonObject contextMenuData;
-		_contextMenu.addToJsonObject(contextMenuData, cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenu, contextMenuData, cmdDoc.GetAllocator());
-
 		std::string response;
 		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
 
@@ -134,9 +128,9 @@ void ot::components::UiComponent::addMenuButton(
 	}
 }
 
-void ot::components::UiComponent::addMenuButton(MenuButtonDescription& _menuButtonDescription,  const LockTypeFlags& _lockTypes, const std::string & _iconName, const std::string & _iconFolder, const std::string & _keySequence, const ContextMenu & _contextMenu)
+void ot::components::UiComponent::addMenuButton(MenuButtonDescription& _menuButtonDescription,  const LockTypeFlags& _lockTypes, const std::string & _iconName, const std::string & _iconFolder, const std::string & _keySequence)
 {
-	this->addMenuButton(_menuButtonDescription.GetPageName(), _menuButtonDescription.GetGroupName(), _menuButtonDescription.GetSubgroupName(), _menuButtonDescription.GetButtonName(), _menuButtonDescription.GetButtonText(), _lockTypes, _iconName, _iconFolder, _keySequence, _contextMenu);
+	this->addMenuButton(_menuButtonDescription.GetPageName(), _menuButtonDescription.GetGroupName(), _menuButtonDescription.GetSubgroupName(), _menuButtonDescription.GetButtonName(), _menuButtonDescription.GetButtonText(), _lockTypes, _iconName, _iconFolder, _keySequence);
 }
 
 void ot::components::UiComponent::addMenuButton(
@@ -148,8 +142,7 @@ void ot::components::UiComponent::addMenuButton(
 	const LockTypeFlags&		_lockTypes,
 	const std::string &			_iconName,
 	const std::string &			_iconFolder,
-	const std::string &			_keySequence,
-	const ContextMenu&			_contextMenu
+	const std::string &			_keySequence
 ) {
 	if (TemplateDefaultManager::getTemplateDefaultManager()->isUIMenuActionVisible(_pageName, _groupName, _buttonName))
 	{
@@ -168,10 +161,6 @@ void ot::components::UiComponent::addMenuButton(
 		if (!_keySequence.empty()) {
 			cmdDoc.AddMember(OT_ACTION_PARAM_UI_KeySequence, JsonString(_keySequence, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 		}
-
-		JsonObject contextMenuData;
-		_contextMenu.addToJsonObject(contextMenuData, cmdDoc.GetAllocator());
-		cmdDoc.AddMember(OT_ACTION_PARAM_UI_CONTROL_ContextMenu, contextMenuData, cmdDoc.GetAllocator());
 
 		std::string response;
 		m_application->sendMessage(true, m_serviceName, cmdDoc, response);
@@ -542,18 +531,6 @@ void ot::components::UiComponent::displayStyledMessage(const StyledTextBuilder& 
 	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
 }
 
-void ot::components::UiComponent::displayDebugMessage(
-	const std::string &				_message
-) const {
-	JsonDocument cmdDoc;
-	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_DisplayDebugMessage, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, JsonString(_message, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-
-	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
-}
-
 void ot::components::UiComponent::displayErrorPrompt(
 	const std::string &				_message
 ) const {
@@ -831,44 +808,6 @@ void ot::components::UiComponent::setControlState(const std::string controlName,
 
 bool ot::components::UiComponent::sendMessage(bool _queue, JsonDocument& _doc, std::string& _response) {
 	return m_application->sendMessage(true, m_serviceName, _doc, _response);
-}
-
-// #####################################################################################################################
-
-// Plugin
-
-void ot::components::UiComponent::requestUiPlugin(const std::string& _pluginName, const std::string& _filename) {
-	if (m_application->pluginExists(_pluginName)) {
-		OT_LOG_EAS("A plugin with the name \"" + _pluginName + "\" is already connected");
-		return;
-	}
-	JsonDocument cmdDoc;
-	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_RequestPlugin, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->getServiceURL(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_application->getServiceName(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_application->getServiceType(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_NAME, JsonString(_pluginName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_PATH, JsonString(_filename, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	
-	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
-}
-
-void ot::components::UiComponent::addPluginSearchPath(const std::string& _pluginPath) {
-#ifdef _DEBUG
-	JsonDocument cmdDoc;
-	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_AddPluginSearchPath, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->getServiceURL(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_application->getServiceName(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_application->getServiceType(), cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	cmdDoc.AddMember(OT_ACTION_PARAM_UI_PLUGIN_PATH, JsonString(_pluginPath, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
-	
-	std::string response;
-	m_application->sendMessage(true, m_serviceName, cmdDoc, response);
-#endif // _DEBUG
-
 }
 
 // #####################################################################################################################

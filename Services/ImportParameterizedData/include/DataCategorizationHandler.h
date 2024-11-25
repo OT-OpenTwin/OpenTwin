@@ -42,12 +42,8 @@ public:
 	
 
 	
-	void storeSelectionRanges(ot::UID _tableEntityID, ot::UID _tableEntityVersion, const std::vector<ot::TableRange>& _ranges);
+	void storeSelectionRanges(const std::vector<ot::TableRange>& _ranges);
 	void CreateNewScriptDescribedMSMD();
-
-	//std::pair<ot::UID, ot::UID> GetPreview(ot::EntityInformation selectedPreviewTable);
-
-	void SetColourOfRanges(std::string tableName);
 
 	void SelectRange(ot::UIDList iDs, ot::UIDList versions);
 
@@ -81,6 +77,8 @@ private:
 	std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>> _allRelevantTableSelectionsByMSMD;
 	std::map<std::string, std::list<std::optional<std::list<ot::Variable>>>> _allVariablesByMSMD;
 	std::set<std::string> m_bufferedCategorisationNames;
+	ot::UID m_bufferedTableID = -1;
+	ot::UID m_bufferedTableVersion = -1;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> m_markedForStorringEntities;
 
 	ot::PythonServiceInterface* _pythonInterface = nullptr;
@@ -95,9 +93,7 @@ private:
 	void addParamOrQuantityEntries(std::list<EntityBase*>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
 	void addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive);
 
-	void RequestRangesSelection(std::vector<ot::TableRange>& ranges);
-	void RequestColouringRanges(std::string colour);
-	void RequestColouringRanges(ot::Color colour);
+	void requestColouringRanges(bool _clearSelection ,const std::string& _tableName, const ot::Color& _colour, const std::list<ot::TableRange>& ranges);
 
 	void FindExistingRanges(std::string containerName, std::list<std::pair<ot::UID, ot::UID>>& existingRanges);
 	void FindContainerEntity(std::string containerName, std::pair<ot::UID, ot::UID>& categorizationEntityIdentifier);

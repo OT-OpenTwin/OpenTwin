@@ -78,7 +78,7 @@ void ot::PropertyPainter2D::getPropertyData(ot::JsonValue& _object, ot::JsonAllo
 
 void ot::PropertyPainter2D::setPropertyData(const ot::ConstJsonObject& _object) {
 	ConstJsonObject painterObj = json::getObject(_object, "Value");
-	Painter2D* newPainter = Painter2DFactory::instance().create(painterObj);
+	Painter2D* newPainter = Painter2DFactory::create(painterObj);
 	if (newPainter) {
 		this->setPainter(newPainter);
 	}

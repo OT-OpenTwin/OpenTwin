@@ -3,8 +3,7 @@
 #include "LTSpiceConnector/CommitMessageDialog.h"
 #include "LTSpiceConnector/ProjectInformationDialog.h"
 
-#include "akAPI/uiAPI.h"
-
+#include "OTWidgets/MessageBoxManager.h"
 #include "OTCommunication/ActionTypes.h"
 
 #include <QFileDialog>					// QFileDialog
@@ -48,7 +47,7 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 		std::string fileName = getLTSpiceFileNameForCommit(projectName, ltSpiceServiceURL, mainObject);
 		if (fileName.empty())
 		{
-			ak::uiAPI::promptDialog::show("No valid local project file has been defined. Please set the local file location.", "Commit", ak::promptOkIconLeft, "DialogError", "Default");
+			ot::MessageBoxManager::showErrorPrompt("No valid local project file has been defined. Please set the local file location.", "Commit");
 			return "";
 		}
 
@@ -78,14 +77,15 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 		std::string ltSpiceServiceURL = ot::json::getString(doc, OT_ACTION_PARAM_SERVICE_URL);
 		std::string version = ot::json::getString(doc, OT_ACTION_PARAM_MODEL_Version);
 
-		ak::dialogResult result = ak::uiAPI::promptDialog::show("Getting another project version from the repository will override the local project data.\n"
-			"Do you really want to continue?", "Get", ak::promptYesNoIconLeft, "DialogWarning", "Default");
-		if (result != ak::dialogResult::resultYes) { return ""; }
+		if (ot::MessageDialogCfg::Yes != ot::MessageBoxManager::showWarningPrompt("Getting another project version from the repository will override the local project data.\nDo you really want to continue?", "Get")) 
+		{
+			return "";
+		}
 
 		std::string fileName = getLTSpiceFileNameForGet(projectName, ltSpiceServiceURL, mainObject);
 		if (fileName.empty())
 		{
-			ak::uiAPI::promptDialog::show("No valid local project file has been defined. Please set the local file location.", "Commit", ak::promptOkIconLeft, "DialogError", "Default");
+			ot::MessageBoxManager::showErrorPrompt("No valid local project file has been defined. Please set the local file location.", "Commit");
 			return "";
 		}
 
@@ -194,13 +194,13 @@ std::string LTSpiceConnectorAPI::processAction(std::string action, ot::JsonDocum
 			if (!LTSpiceConnectorAPI::checkValidLocalFile(localFileName, projectName, false, errorMessage))
 			{
 				errorMessage += "\n\nThe local file name has not been changed.";
-				ak::uiAPI::promptDialog::show(errorMessage.c_str(), "Set LTSpice File", ak::promptOkIconLeft, "DialogError", "Default");
+				ot::MessageBoxManager::showErrorPrompt(errorMessage, "Set LTSpice File");
 				return "";
 			}
 
 			LTSpiceConnectorAPI::setAndStoreLocalFileName(localFileName, ltSpiceServiceURL, mainObject);
 
-			ak::uiAPI::promptDialog::show("The local file has been changed successfully.", "Set LTSpice File", ak::promptOkIconLeft, "DialogInformation", "Default");
+			ot::MessageBoxManager::showInfoPrompt("The local file has been changed successfully.", "Set LTSpice File");
 		}
 	}
 

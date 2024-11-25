@@ -90,6 +90,9 @@
     <ClCompile Include="src\ViewVisualisationHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ActionAndFunctionHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\stdafx.h">
@@ -146,7 +149,7 @@
     <ClInclude Include="include\UIControlsHandler.h">
       <Filter>Header Files\Handler</Filter>
     </ClInclude>
-    <ClInclude Include="include\ActionHandler.h">
+    <ClInclude Include="include\ActionAndFunctionHandler.h">
       <Filter>Header Files\Handler</Filter>
     </ClInclude>
     <ClInclude Include="include\QueuingHttpRequestsRAII.h">

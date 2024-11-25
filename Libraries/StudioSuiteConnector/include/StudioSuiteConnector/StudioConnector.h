@@ -1,6 +1,5 @@
 #pragma once
 
-#include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTCore/ReturnMessage.h"
 
 #include <QtNetwork/qlocalserver.h>

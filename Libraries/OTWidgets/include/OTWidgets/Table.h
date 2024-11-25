@@ -40,12 +40,16 @@ namespace ot {
 		void setSelectedCellsBackground(const ot::Color& _color);
 		void setSelectedCellsBackground(const QColor& _color);
 
+		void prepareForDataChange(void);
+
 	Q_SIGNALS:
 		void saveRequested(void);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 	protected:
+		virtual void showEvent(QShowEvent* _event) override;
+		virtual void hideEvent(QHideEvent* _event) override;
 		virtual void contentSaved(void) {};
 		virtual void contentChanged(void) {};
 
@@ -54,11 +58,21 @@ namespace ot {
 	private Q_SLOTS:
 		void slotSaveRequested(void);
 		void slotCellDataChanged(int _row, int _column);
+		void slotRestoreColumnSize(int _column);
+		void slotResizeColumnToContent(int _column);
+		void slotRestoreRowSize(int _row);
+		void slotResizeRowToContent(int _row);
 
 	private:
 		void ini(void);
+		void resizeColumnsToContentIfNeeded(void);
+		void resizeRowsToContentIfNeeded(void);
 
+		bool m_stopResizing;
+		bool m_resizeRequired;
 		bool m_contentChanged;
+		std::vector<int> m_columnWidthBuffer;
+		std::vector<int> m_rowHeightBuffer;
 	};
 
 }

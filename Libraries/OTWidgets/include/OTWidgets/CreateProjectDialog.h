@@ -6,7 +6,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/ProjectTemplateInformation.h"
+#include "OTGui/ProjectTemplateInformation.h"
 #include "OTWidgets/Dialog.h"
 
 // Qt header

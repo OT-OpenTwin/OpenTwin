@@ -9,6 +9,7 @@
 #include "OTWidgets/PushButton.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/GlobalColorStyle.h"
+#include "OTWidgets/StyledTextConverter.h"
 #include "OTWidgets/CreateProjectDialog.h"
 
 // Qt header
@@ -73,6 +74,7 @@ ot::CreateProjectDialog::CreateProjectDialog(QWidget* _parentWidget)
 	QScrollArea* infoScrollArea = new QScrollArea;
 	m_info = new Label;
 	m_info->setWordWrap(true);
+	m_info->setTextFormat(Qt::RichText);
 	infoScrollArea->setWidget(m_info);
 	infoScrollArea->setWidgetResizable(true);
 	infoScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -208,8 +210,8 @@ void ot::CreateProjectDialog::slotFocusName(void) {
 
 void ot::CreateProjectDialog::slotShowInfo(void) {
 	QList<QListWidgetItem*> items = m_list->selectedItems();
+	m_info->clear();
 	if (items.isEmpty()) {
-		m_info->clear();
 		this->setWindowTitle(OT_CREATEPROJECTDIALOG_TitlePrefix);
 	}
 	else if (items.count() == 1) {
@@ -218,17 +220,21 @@ void ot::CreateProjectDialog::slotShowInfo(void) {
 			OT_LOG_EA("Item cast failed");
 			return;
 		}
-		std::string info = actualItem->getInfo().getDescription();
-		if (info.empty()) {
+		
+		if (actualItem->getInfo().getDescription().isEmpty()) {
+			std::string info;
 			if (actualItem->getInfo().getBriefDescription().empty()) {
 				info = actualItem->getInfo().getName();
 			}
 			else {
 				info = actualItem->getInfo().getBriefDescription();
 			}
+			m_info->setText(QString::fromStdString(info));
+		}
+		else {
+			m_info->setText(StyledTextConverter::toHtml(actualItem->getInfo().getDescription()));
 		}
 		
-		m_info->setText(QString::fromStdString(info));
 		this->setWindowTitle(OT_CREATEPROJECTDIALOG_TitlePrefix " (" + QString::fromStdString(actualItem->getInfo().getName()) + ")");
 	}
 	else {

@@ -12,6 +12,7 @@
 
 namespace ot {
 
+	//! @brief The StyledText is used to manipulate the style when working with the StyledTextBuilder.
 	class StyledText {
 	public:
 		//! \brief Controls color style references.
@@ -30,12 +31,34 @@ namespace ot {
 			//! Will also reset the current ColorReference back to Default.
 			ClearStyle,
 			Bold, //! \brief Enable bold text.
-			Italic, //! \brief Enable italic text.
 			NotBold, //! \brief Disable bold text.
-			NotItalic //! \brief Disable italic text.
+			Italic, //! \brief Enable italic text.
+			NotItalic, //! \brief Disable italic text.
+			Underline, //! \brief Enable underline text.
+			NotUnderline, //! \brief Disable underline text.
+			LineTrough, //! \brief Enable line trough text.
+			NotLineTrough, //! \brief Disable line trough text.
+
+			//! \brief Big header sized text (disable Text and other header setting).
+			//! \note Note that the header text will be displayed on a separate line. <br>
+			//! If the text is "<text><header><text>" the output will be: <br>
+			//! <text> <br>
+			//! <header> <br>
+			//! <text>
+			Header1,
+
+			//! \brief Medium header sized text (disable Text and other header setting).
+			Header2,
+
+			//! \brief Small header sized text (disable Text and other header setting).
+			Header3,
+			Text, //! \brief Regular text (disable Header).
 		};
 
+		//! @brief Creates a string representation of the provided ColorReference.
 		static std::string toString(ColorReference _colorReference);
+
+		//! @brief Creates a ColorReference from the provided string.
 		static ColorReference stringToColorReference(const std::string& _colorReference);
 
 	private:

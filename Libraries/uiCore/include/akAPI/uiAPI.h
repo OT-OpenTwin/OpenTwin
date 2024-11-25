@@ -17,7 +17,6 @@
 #include <akCore/akCore.h>
 #include <akCore/globalDataTypes.h>
 
-#include <akGui/aColor.h>
 #include <akGui/aObjectManager.h>
 
 #include <akWidgets/aComboButtonWidgetItem.h>
@@ -48,13 +47,10 @@ class QApplication;
 namespace ak {
 
 	// Forward declaration
-	class aDockWidget;
 	class aMessenger;
 	class aNotifier;
 	class aUidManager;
-	class aFile;
 	class aObjectManager;
-	class aIconManager;
 	class aWindowEventHandler;
 	
 	namespace uiAPI {
@@ -71,7 +67,6 @@ namespace ak {
 			//! @brief Will initialize the API
 			//! @param _messenger The external messenger. If nullptr a new one will be created
 			//! @param _uidManager The external UID manager. If nullptr a new one will be created
-			//! @param _iconManager The external icon manager. If nullptr a new one will be created
 			//! @param _objectManager The external object manager. If nullptr a new one will be created
 			void ini(
 				QApplication* _applicationInstance,
@@ -84,27 +79,6 @@ namespace ak {
 
 			//! @brief Will return the default surface format
 			QSurfaceFormat * getDefaultSurfaceFormat(void);
-
-			//! @brief Will return the file with the provided UID
-			//! @param _fileUid The UID of the file to get, if the provided UID is invalid a new one will be created
-			ak::aFile * getFile(
-				UID						_fileUid = ak::invalidUID
-			);
-
-			//! @brief Will return the file with the provided UID
-			//! @param _fileUid The UID of the file to get
-			ak::aFile * getExistingFile(
-				UID						_fileUid
-			);
-
-			//! @brief Will delete the provided file
-			//! @param _fileUid The UID of the file to delete
-			void deleteFile(
-				UID						_fileUid
-			);
-
-			//! @brief Will delete all files created
-			void deleteAllFiles();
 
 			QApplication* app() { return m_app; }
 
@@ -125,8 +99,7 @@ namespace ak {
 			bool						m_isInitialized;				//! If true, then the API was initialized
 
 			aUidManager *				m_fileUidManager;				//! The UID manager used for files in this API
-			std::map<UID, ak::aFile *>	m_mapFiles;					//! Map containing all files created in this API
-
+			
 		private:
 			apiManager(const apiManager &) = delete;
 			apiManager & operator = (const apiManager &) = delete;
@@ -285,34 +258,6 @@ namespace ak {
 			bool								_checked = false
 		);
 
-		//! @brief Will create a new ColorEditButton and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _r The Red-Channel value of the ColorEditButton color
-		//! @param _g The Green-Channel value of the ColorEditButton color
-		//! @param _b The Blue-Channel value of the ColorEditButton color
-		//! @param _a The Alpha-Channel value of the ColorEditButton color
-		//! @param _textOverride If provided the RGB-text representation of the provided color will be overwritten by the text provided
-		//! @throw ak::Exception if the API is not initialized
-		UICORE_API_EXPORT UID createColorEditButton(
-			UID									_creatorUid,
-			int									_r,
-			int									_g,
-			int									_b,
-			int									_a = 255,
-			const QString &						_textOverride = QString("")
-		);
-
-		//! @brief Will create a new ColorEditButton and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _color The color of the ColorEditButton
-		//! @param _textOverride If provided the RGB-text representation of the provided color will be overwritten by the text provided
-		//! @throw ak::Exception if the API is not initialized
-		UICORE_API_EXPORT UID createColorEditButton(
-			UID									_creatorUid,
-			const aColor &						_color,
-			const QString &						_textOverride = QString("")
-		);
-
 		//! @brief Will create a new ComboBox and return its UID
 		//! @param _creatorUid The UID of the creator who creates this object
 		//! @throw ak::Exception if the API is not initialized
@@ -329,67 +274,6 @@ namespace ak {
 			UID									_creatorUid,
 			const QString &						_text = QString(""),
 			const std::vector<QString> &		_possibleSelection = std::vector<QString>()
-		);
-
-		/*
-		//! @brief Will create a defaultWelcomeScreen and return its UID
-		//! @param _creatorUid The UID of the creator
-		UICORE_API_EXPORT UID createWelcomeScreen(
-			UID												_creatorUid
-		);
-		*/
-
-		//! @brief Will create a new Dock and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _text The initial text of the Dock
-		//! @throw ak::Exception if the provided UID is invalid or the API is not initialized
-		UICORE_API_EXPORT UID createDock(
-			UID									_creatorUid,
-			const QString &						_text = QString("")
-		);
-
-		//! @brief Will create a new DockWatcher and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _text The initial text of the DockWatcher
-		UICORE_API_EXPORT UID createDockWatcher(
-			UID									_creatorUid,
-			const QString &						_text = QString("Docks")
-		);
-
-		//! @brief Will create a new DockWatcher and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _icon The initial icon of the DockWatcher
-		//! @param _text The initial text of the DockWatcher
-		UICORE_API_EXPORT UID createDockWatcher(
-			UID									_creatorUid,
-			const QIcon &						_icon,
-			const QString &						_text = QString("Docks")
-		);
-
-		//! @brief Will create a new DockWatcher and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _iconName The icon name of the icon to set at the DockWatcher
-		//! @param _iconFOlder The icon folder of the icon to set at the DockWatcher
-		//! @param _text The initial text of the DockWatcher
-		UICORE_API_EXPORT UID createDockWatcher(
-			UID									_creatorUid,
-			const QString &						_iconName,
-			const QString &						_iconFolder,
-			const QString &						_text = QString("Docks")
-		);
-
-		UICORE_API_EXPORT UID createGlobalKeyListener(
-			UID											_creatorUid,
-			Qt::Key										_key,
-			Qt::KeyboardModifier						_keyModifier,
-			bool										_blockOthers = false
-		);
-
-		UICORE_API_EXPORT UID createGlobalKeyListener(
-			UID											_creatorUid,
-			Qt::Key										_key,
-			const std::vector<Qt::KeyboardModifier>&	_keyModifiers,
-			bool										_blockOthers = false
 		);
 
 		//! @brief Will create a line edit and return its UID
@@ -409,43 +293,6 @@ namespace ak {
 			const QString &						_infoLabelText
 		);
 
-		//! @brief Will create a new PushButton and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _text The initial text of the PushButton
-		//! @throw ak::Exception if the provided UID is invalid or the API is not initialized
-		UICORE_API_EXPORT UID createPushButton(
-			UID									_creatorUid,
-			const QString &						_text = QString("")
-		);
-
-		//! @brief Will create a new PushButton and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _icon The icon of the PushButton
-		//! @param _text The initial text of the PushButton
-		//! @throw ak::Exception if the provided UID is invalid or the API is not initialized
-		UICORE_API_EXPORT UID createPushButton(
-			UID									_creatorUid,
-			const QIcon &						_icon,
-			const QString &						_text = QString("")
-		);
-
-		//! @brief Will create a new special TabBar and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		UICORE_API_EXPORT UID createSpecialTabBar(
-			UID									_creatorUid
-		);
-
-		//! @brief Will create a new Table and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _rows The initial row count of the Table
-		//! @param _columns The initial column count of the Table
-		//! @throw ak::Exception if the provided UID is invalid or the API is not initialized
-		UICORE_API_EXPORT UID createTable(
-			UID									_creatorUid,
-			int									_rows,
-			int									_columns
-		);
-
 		//! @brief Will create a new TabToolBar subcountainer and return its UID
 		//! @param _creatorUid The UID of the creator who creates this object
 		//! @param _parentUid The UID of the parent TabToolBar object (may be a uiManager, TabToolBarPage or TabToolBarGroup)
@@ -455,15 +302,6 @@ namespace ak {
 			UID									_creatorUid,
 			UID									_parentUid,
 			const QString &						_text = QString("")
-		);
-
-		//! @brief Will create a new TextEdit and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _initialText The initial text of the TextEdit
-		//! @throw ak::Exception if the provided UID is invalid or the API is not initialized
-		UICORE_API_EXPORT UID createTextEdit(
-			UID									_creatorUid,
-			const QString &						_initialText = QString("")
 		);
 
 		//! @brief Will create a new timer and return its UID
@@ -476,11 +314,6 @@ namespace ak {
 		//! @param _creatorUid The UID of the creator
 		UICORE_API_EXPORT UID createToolButton(
 			UID									_creatorUid
-		);
-
-		UICORE_API_EXPORT UID createToolButtonCustomContextMenu(
-			UID									_creatorUid,
-			UID									_toolButtonUid
 		);
 
 		//! @brief Will create a toolButton and return its UID
@@ -511,13 +344,6 @@ namespace ak {
 			const QString &						_text,
 			const QString &						_iconName,
 			const QString &						_iconFolder
-		);
-
-		//! @brief Will create a new tab view and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @throw ak::Exception if the provided UID is invalid or the API is not initialized
-		UICORE_API_EXPORT UID createTabView(
-			UID									_creatorUid
 		);
 
 		//! @brief Will create a new UI manager and return its UID
@@ -643,62 +469,6 @@ namespace ak {
 
 		// ###############################################################################################################################################
 
-		// Context menu
-
-		namespace contextMenu {
-
-			//! @brief Will add a context menu item and return its ID
-			//! @param _textEditUID The UID of the text edit
-			//! @param _text The text of the new item
-			//! @param _role The role of the item, if none a signal will be emitted, otherwise the corresponding action will be performed
-			UICORE_API_EXPORT ID addItem(
-				UID								_textEditUID,
-				const QString &					_text,
-				contextMenuRole					_role = cmrNone
-			);
-
-			//! @brief Will add a context menu item and return its ID
-			//! @param _textEditUID The UID of the text edit
-			//! @param _icon The icon of the new item
-			//! @param _text The text of the new item
-			//! @param _role The role of the item, if none a signal will be emitted, otherwise the corresponding action will be performed
-			UICORE_API_EXPORT ID addItem(
-				UID								_textEditUID,
-				const QIcon &					_icon,
-				const QString &					_text,
-				contextMenuRole					_role = cmrNone
-			);
-
-			//! @brief Will add a context menu item and return its ID
-			//! @param _textEditUID The UID of the text edit
-			//! @param _icon The icon of the new item
-			//! @param _text The text of the new item
-			//! @param _iconSubFolder The sub folder the icon is located at (Folder depends on the search directories)
-			//! @param _role The role of the item, if none a signal will be emitted, otherwise the corresponding action will be performed
-			UICORE_API_EXPORT ID addItem(
-				UID							_textEditUID,
-				const QString &					_text,
-				const QString &					_iconName,
-				const QString &					_iconSubFolder,
-				contextMenuRole					_role = cmrNone
-			);
-
-			//! @brief Will add a sperator at the context menu of the textEdit
-			//! @param _textEditUID The UID of the text edit
-			UICORE_API_EXPORT void addSeparator(
-				UID							_textEditUID
-			);
-
-			//! @brief Will remove all context menu items from the context menu
-			//! @param _textEditUID The UID of the text edit
-			UICORE_API_EXPORT void clear(
-				UID							_textEditUID
-			);
-
-		}
-
-		// ###############################################################################################################################################
-
 		// Dialog
 
 		namespace dialog {
@@ -707,194 +477,6 @@ namespace ak {
 			UICORE_API_EXPORT QString openDirectory(const QString & _title, const QString & _initialDir);
 
 		}
-
-		// ###############################################################################################################################################
-
-		// Dock
-
-		namespace dock {
-
-			//! @brief Will set the widget as central widget of the dock
-			//! @param _dockUID The UID of the dock
-			//! @param _widgetUID The UID of the widget to set as central widget
-			UICORE_API_EXPORT void setCentralWidget(
-				UID												_dockUID,
-				UID												_widgetUID
-			);
-
-			//! @brief Will set the provided widget as central widget of the dock
-			//! @param _dockUID The UID of the dock
-			//! @param _widget The widget to set as central widget
-			UICORE_API_EXPORT void setCentralWidget(
-				UID												_dockUID,
-				QWidget *											_widget
-			);
-
-			//! @brief Will set the visible state of the specified dock
-			//! @param _dockUID The UID of the dock
-			//! @param _visible The visible state to set
-			UICORE_API_EXPORT void setVisible(
-				UID												_dockUID,
-				bool												_visible = true
-			);
-
-			//! @brief Will return the currently set visible state of the 
-			UICORE_API_EXPORT bool isVisible(
-				UID												_dockUID
-			);
-
-		}
-
-		// ###############################################################################################################################################
-
-		// Dock watcher
-
-		namespace dockWatcher {
-
-			UICORE_API_EXPORT void addWatch(
-				ak::UID						_dockWatcherUid,
-				ak::UID						_dockUid
-			);
-
-			UICORE_API_EXPORT void addWatch(
-				ak::UID						_dockWatcherUid,
-				QDockWidget *				_dock
-			);
-
-			UICORE_API_EXPORT void removeWatch(
-				ak::UID						_dockWatcherUid,
-				ak::UID						_dockUid
-			);
-
-			UICORE_API_EXPORT void removeWatch(
-				ak::UID						_dockWatcherUid,
-				QDockWidget *				_dock
-			);
-
-			UICORE_API_EXPORT void setWatchEnabled(
-				ak::UID						_dockWatcherUid,
-				bool						_isEnbaled
-			);
-
-			UICORE_API_EXPORT bool isWatchEnabled(
-				ak::UID						_dockWatcherUid,
-				bool						_isEnbaled
-			);
-
-		}
-
-		// ###############################################################################################################################################
-
-		// File
-
-		namespace file {
-
-			// File setter
-
-			//! @brief Will load informations from the specifiied file
-			UICORE_API_EXPORT UID load(
-				const QString &										_filePath
-			);
-
-			//! @brief Will load informations from the specified file
-			//! @param _fileUid The UID of the file
-			//! @param _filePath If provided this path will be set as current file path
-			UICORE_API_EXPORT void load(
-				UID												_fileUid,
-				const QString &										_filePath = QString("")
-			);
-
-			//! @brief Will save the current set lines to the current set file path
-			//! @param _fileUid The UID of the file
-			//! @param _append If true, the file will be opened on append mode
-			UICORE_API_EXPORT void save(
-				UID												_fileUid,
-				bool												_append = false
-			);
-
-			//! @brief Will save the current set lines to the provided file path
-			//! @param _fileUid The UID of the file
-			//! @param _filePath The fule path to set as current file
-			//! @param _append If true, the file will be opened on append mode
-			UICORE_API_EXPORT void save(
-				UID												_fileUid,
-				const QString &										_filePath,
-				bool												_append = false
-			);
-
-			//! @brief Will set the current path for the file
-			//! @param _fileUid The UID of the file
-			//! @param _path The file path to set
-			UICORE_API_EXPORT void setPath(
-				UID												_fileUid,
-				const QString &										_path
-			);
-
-			//! @brief Will set the current lines for the file
-			//! @param _fileUid The UID of the file
-			//! @param _lines The lines to set
-			UICORE_API_EXPORT void setLines(
-				UID												_fileUid,
-				const QStringList &									_lines
-			);
-
-			//! @brief Will append the provided line to the current lines
-			//! @param _fileUid The UID of the file
-			//! @param _line The line to add
-			UICORE_API_EXPORT void addLine(
-				UID												_fileUid,
-				const QString &										_line
-			);
-
-			//! @brief Will append the provided lines to the current lines
-			//! @param _fileUid The UID of the file
-			//! @param _lines The lines to add
-			UICORE_API_EXPORT void addLine(
-				UID												_fileUid,
-				const QStringList &									_lines
-			);
-
-			// #######################################################################################################
-
-			// File Getter
-
-			//! @brief Will return the files name
-			//! @param _fileUid The UID of the file
-			UICORE_API_EXPORT QString name(
-				UID												_fileUid
-			);
-
-			//! @brief Will return the files path
-			//! @param _fileUid The UID of the file
-			UICORE_API_EXPORT QString path(
-				UID												_fileUid
-			);
-
-			//! @brief Will return the files extension
-			//! @param _fileUid The UID of the file
-			UICORE_API_EXPORT QString extension(
-				UID												_fileUid
-			);
-
-			//! @brief Will return the lines in this file
-			//! @param _fileUid The UID of the file
-			UICORE_API_EXPORT QStringList lines(
-				UID												_fileUid
-			);
-
-			//! @brief Will return the count of the lines in this file
-			//! @param _fileUid The UID of the file
-			UICORE_API_EXPORT int linesCount(
-				UID												_fileUid
-			);
-
-			//! @brief Will return true if the file has changed after it was loaded or saved the last time
-			//! @param _fileUid The UID of the file
-			UICORE_API_EXPORT bool hasChanged(
-				UID												_fileUid
-			);
-
-		} // namespace file
 
 		// ###############################################################################################################################################
 
@@ -1103,251 +685,6 @@ namespace ak {
 
 		// ###############################################################################################################################################
 
-		// Prompt
-
-		namespace promptDialog {
-			
-			UICORE_API_EXPORT dialogResult show(
-				const QString &				_message,
-				const QString &				_title,
-				promptType					_type,
-				const QString &				_iconName,
-				const QString &				_iconPath,
-				QWidget *					_parentWidget = nullptr
-			);
-
-			UICORE_API_EXPORT dialogResult show(
-				const QString &				_message,
-				const QString &				_title,
-				promptType					_type,
-				const QIcon &				_icon,
-				QWidget *					_parentWidget = nullptr
-			);
-
-			UICORE_API_EXPORT dialogResult show(
-				const QString &				_message,
-				const QString &				_title,
-				promptType					_type,
-				QWidget *					_parentWidget = nullptr
-			);
-
-			UICORE_API_EXPORT dialogResult show(
-				const QString &				_message,
-				const QString &				_title,
-				QWidget *					_parentWidget = nullptr
-			);
-
-		} // namespace prompt
-
-		// ###############################################################################################################################################
-
-		// Special tab bar
-
-		namespace specialTabBar {
-
-			UICORE_API_EXPORT void clearColors(
-				UID			_specialTabBarUID,
-				bool			_repaint = true
-			);
-
-			UICORE_API_EXPORT void clearColor(
-				UID			_specialTabBarUID,
-				int				_index,
-				bool			_repaint = true
-			);
-
-			UICORE_API_EXPORT void addColor(
-				UID			_specialTabBarUID,
-				int				_index,
-				aColor		_color,
-				bool			_repaint = true
-			);
-
-			UICORE_API_EXPORT void setRepaintBlocked(
-				UID			_specialTabBarUID,
-				bool			_blocked = true
-			);
-
-		} // namespace specialTabBar
-
-		// ###############################################################################################################################################
-
-		// TabView
-
-		namespace tabWidget {
-
-			UICORE_API_EXPORT ID addTab(
-				UID				_tabWidgetUID,
-				UID				_widgetUID,
-				const QString &		_title
-			);
-
-			UICORE_API_EXPORT ID addTab(
-				UID				_tabWidgetUID,
-				UID				_widgetUID,
-				const QString &		_title,
-				const QString &		_iconName,
-				const QString &		_iconFolder
-			);
-
-			UICORE_API_EXPORT ID addTab(
-				UID				_tabWidgetUID,
-				UID				_widgetUID,
-				const QString &		_title,
-				const QIcon &		_icon
-			);
-
-			UICORE_API_EXPORT ID addTab(
-				UID				_tabWidgetUID,
-				QWidget *			_widget,
-				const QString &		_title
-			);
-
-			UICORE_API_EXPORT ID addTab(
-				UID				_tabWidgetUID,
-				QWidget *			_widget,
-				const QString &		_title,
-				const QString &		_iconName,
-				const QString &		_iconFolder
-			);
-
-			UICORE_API_EXPORT ID addTab(
-				UID				_tabWidgetUID,
-				QWidget *			_widget,
-				const QString &		_title,
-				const QIcon &		_icon
-			);
-
-			//! @brief Will close all tabs of the specified tabWidget
-			UICORE_API_EXPORT void closeAllTabs(
-				UID				_tabWidgetUID
-			);
-
-			UICORE_API_EXPORT void closeTab(
-				UID				_tabWidgetUID,
-				ID				_tabID
-			);
-
-			UICORE_API_EXPORT ID getFocusedTab(
-				UID				_tabWidgetUID
-			);
-
-			UICORE_API_EXPORT bool getTabsClosable(
-				UID				_tabWidgetUID
-			);
-
-			UICORE_API_EXPORT QString getTabText(
-				UID				_tabWidgetUID,
-				ID				_tabID
-			);
-
-			UICORE_API_EXPORT void setEnabled(
-				UID				_tabWidgetUID,
-				bool				_enabled
-			);
-
-			UICORE_API_EXPORT void setTabbarLocation(
-				UID								_tabWidgetUID,
-				tabLocation						_location
-			);
-
-			UICORE_API_EXPORT void setTabFocused(
-				UID				_tabWidgetUID,
-				ID				_tabID
-			);
-
-			//! @brief Will set the closeabled state for the tabs in this tabWidget
-			//! @param _closeable If true the tabs can be closed by the user
-			UICORE_API_EXPORT void setTabsClosable(
-				UID								_tabWidgetUID,
-				bool								_closeable
-			);
-
-			//! @brief Will set the text of the specified tab
-			//! @param _tabWidgetUID The UID of the tab view
-			//! @param _tab The tab to set the text at
-			//! @param _text The text to set
-			UICORE_API_EXPORT void setTabText(
-				UID								_tabWidgetUID,
-				ID								_tab,
-				const QString &						_text
-			);
-
-			//! @brief Will set the provided tab bar to the tab view
-			//! @param _tabWidgetUID The UID of the tab view to set the tab bar at
-			//! @param _specialTabBarUID The UID of the special tab bar to set
-			UICORE_API_EXPORT void setSpecialTabBar(
-				UID								_tabWidgetUID,
-				UID								_specialTabBarUID
-			);
-
-			//! @brief Will set the provided tab bar to the tab view
-			//! @param _tabWidgetUID The UID of the tab view to set the tab bar at
-			//! @param _specialTabBar The special tab bar to set
-			UICORE_API_EXPORT void setSpecialTabBar(
-				UID								_tabWidgetUID,
-				QTabBar *							_specialTabBar
-			);
-
-			UICORE_API_EXPORT void setVisible(
-				UID				_tabWidgetUID,
-				bool				_visible
-			);
-
-			UICORE_API_EXPORT void setObjectName(
-				UID							_tabWidgetUID,
-				const QString &					_name
-			);
-
-			//! @brief Will return true if a tab with the provided text exists
-			//! @param _tabText The text of the tab to look for
-			UICORE_API_EXPORT bool hasTab(
-				UID							_tabWidgetUID,
-				const QString & _tabText
-			);
-
-			//! @brief Will return the ID of the first tab with the specified name
-			UICORE_API_EXPORT ID getTabIDByText(
-				UID							_tabWidgetUID,
-				const QString & _tabText
-			);
-
-		}
-
-		// ###############################################################################################################################################
-
-		// TextEdit
-
-		namespace textEdit {
-
-			UICORE_API_EXPORT void appendText(
-				UID				_textEditUID,
-				const QString &		_text
-			);
-
-			UICORE_API_EXPORT void clear(
-				UID				_textEditUID
-			);
-
-			UICORE_API_EXPORT void setAutoScrollToBottomEnabled(
-				UID				_textEditUID,
-				bool				_enabled = true
-			);
-
-			UICORE_API_EXPORT void setReadOnly(
-				UID				_textEditUID,
-				bool				_readOnly = true
-			);
-
-			UICORE_API_EXPORT void setText(
-				UID				_textEditUID,
-				const QString &		_text
-			);
-
-		}
-
-		// ###############################################################################################################################################
-
 		// Timer
 
 		namespace timer {
@@ -1448,70 +785,6 @@ namespace ak {
 				UID							_toolButtonUID,
 				const QString &					_iconName,
 				const QString &					_iconFolder
-			);
-
-			//! @brief Will add a new menu item to the menu
-			//! @param _toolButtonUID The UID of the tool button
-			//! @param _text The text of the new item
-			UICORE_API_EXPORT ID addMenuItem(
-				UID							_toolButtonUID,
-				const QString &					_text
-			);
-
-			//! @brief Will add a new menu item to the menu
-			//! @param _toolButtonUID The UID of the tool button
-			//! @param _text The text of the new item
-			UICORE_API_EXPORT ID addMenuItem(
-				UID							_toolButtonUID,
-				const QIcon &					_icon,
-				const QString &					_text
-			);
-
-			//! @brief Will add a new menu item to the menu
-			//! @param _toolButtonUID The UID of the tool button
-			//! @param _text The text of the new item
-			UICORE_API_EXPORT ID addMenuItem(
-				UID							_toolButtonUID,
-				const QString &					_text,
-				const QString &					_iconName,
-				const QString &					_iconFolder
-			);
-
-			//! @brief Will add a menu seperator to the menu
-			//! @param _toolButtonUID The UID of the tool button
-			UICORE_API_EXPORT void addMenuSeperator(
-				UID							_toolButtonUID
-			);
-
-			//! @brief Will clear the menu
-			//! @param _toolButtonUID The UID of the tool button
-			UICORE_API_EXPORT void clearMenu(
-				UID							_toolButtonUID
-			);
-
-			//! @brief Will set the checked state of the specified menu item
-			//! @param _toolButtonUID The UID of the tool button
-			//! @param _itemID The ID of the item
-			//! @param _checked The checked state to set
-			UICORE_API_EXPORT void setMenuItemChecked(
-				UID								_toolButtonUID,
-				ID								_itemID,
-				bool							_checked = true
-			);
-
-			//! @brief Will disable the ability to check and uncheck the item (can be reenabled with setChecked)
-			//! @param _toolButtonUID The UID of the tool button
-			//! @param _itemID The ID of the item
-			UICORE_API_EXPORT void setMenuItemNotCheckable(
-				UID								_toolButtonUID,
-				ID								_itemID
-			);
-
-			//! @brief Will return the text of the specified menu item
-			//! @param _itemID The ID of the menu item
-			UICORE_API_EXPORT QString getMenuItemText(
-				UID								_toolButtonUID,
-				ID								_itemID
 			);
 
 		} // namespace toolButton
@@ -1678,43 +951,6 @@ namespace ak {
 			//! @param _windowUID The UID of the window
 			UICORE_API_EXPORT bool getStatusProgressContinuous(
 				UID												_windowUID
-			);
-
-			//! @brief Will add a dock at the specified location to the window
-			//! @param _windowUID The UID of the window
-			//! @param _dockUid The UID of the dock to add
-			//! @param _dockLocation The dock location to add the dock at
-			UICORE_API_EXPORT void addDock(
-				UID												_windowUID,
-				UID												_dockUid,
-				dockLocation									_dockLocation
-			);
-
-			//! @brief Will tabify two docks
-			//! The parent dock will be raised
-			//! @param _windowUID The UID of the window
-			//! @param _parentDockUid The UID of the parent dock
-			//! @param _dockUid The UID of the dock to add as a tabbed dock
-			UICORE_API_EXPORT void tabifyDock(
-				UID												_windowUID,
-				UID												_parentDockUid,
-				UID												_dockUid
-			);
-
-			//! @brief Will set the dock priority in the bottom left corner
-			//! @param _windowUID The UID of the window
-			//! @param _dockLocation The dock location that will have the higher priority
-			UICORE_API_EXPORT void setDockBottomLeftPriority(
-				UID												_windowUID,
-				dockLocation									_dockLocation
-			);
-
-			//! @brief Will set the dock priority in the bottom right corner
-			//! @param _windowUID The UID of the window
-			//! @param _dockLocation The dock location that will have the higher priority
-			UICORE_API_EXPORT void setDockBottomRightPriority(
-				UID												_windowUID,
-				dockLocation									_dockLocation
 			);
 
 			//! @brief Will set the windows central widget (The widget will be added to a container, the actual central widget differs)
@@ -1990,12 +1226,6 @@ namespace ak {
 			//! @param _type The tab location that should be represented
 			UICORE_API_EXPORT QString toString(
 				tabLocation								_tabLocation
-			);
-
-			//! @brief Create a string representation of the provided dialog result
-			//! @param _dialogResult The dialog result to be converted
-			UICORE_API_EXPORT QString toString(
-				dialogResult							_dialogResult
 			);
 
 			//! @brief Will return a string representation of the provided keyType

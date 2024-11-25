@@ -20,7 +20,6 @@
 #include "OTServiceFoundation/ApplicationBase.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
-#include "OTServiceFoundation/UiPluginComponent.h"
 #include "OTServiceFoundation/AbstractUiNotifier.h"
 #include "OTServiceFoundation/AbstractModelNotifier.h"
 #include "OTServiceFoundation/ModalCommandBase.h"
@@ -58,7 +57,6 @@ ot::ApplicationBase::~ApplicationBase()
 {
 	if (m_uiNotifier) { delete m_uiNotifier; }
 	if (m_modelNotifier) { delete m_modelNotifier; }
-	for (auto plugin : m_uiPluginComponents) delete plugin.second;
 }
 
 std::string ot::ApplicationBase::deploymentPath(void) const {
@@ -133,32 +131,6 @@ ot::ServiceBase * ot::ApplicationBase::getConnectedServiceByName(const std::stri
 		return nullptr;
 	}
 	return itm->second.service;
-}
-
-ot::components::UiPluginComponent * ot::ApplicationBase::getUiPluginByUID(unsigned long long _pluginUID) {
-	auto it = m_uiPluginComponents.find(_pluginUID);
-	if (it != m_uiPluginComponents.end()) return it->second;
-	OTAssert(0, "Unknown plugin UID");
-	return nullptr;
-}
-
-ot::components::UiPluginComponent * ot::ApplicationBase::getUiPluginByName(const std::string& _pluginName) {
-	for (auto p : m_uiPluginComponents) {
-		if (p.second->pluginName() == _pluginName) return p.second;
-	}
-	OTAssert(0, "Unknown plugin Name");
-	return nullptr;
-}
-
-bool ot::ApplicationBase::pluginExists(unsigned long long _pluginUID) {
-	return m_uiPluginComponents.find(_pluginUID) != m_uiPluginComponents.end();
-}
-
-bool ot::ApplicationBase::pluginExists(const std::string& _pluginName) {
-	for (auto p : m_uiPluginComponents) {
-		if (p.second->pluginName() == _pluginName) { return true; }
-	}
-	return false;
 }
 
 // ##########################################################################################################################################
@@ -550,33 +522,6 @@ std::string ot::ApplicationBase::handleSettingsItemChanged(JsonDocument& _docume
 	return "";
 }
 
-std::string ot::ApplicationBase::handleContextMenuItemClicked(JsonDocument& _document) {
-	if (m_uiNotifier) {
-		std::string menuName = json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenuName);
-		std::string itemName = json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName);
-		m_uiNotifier->contextMenuItemClicked(menuName, itemName);
-		return OT_ACTION_RETURN_VALUE_OK;
-	}
-	else {
-		OTAssert(0, "No UI connected");
-		return OT_ACTION_RETURN_INDICATOR_Error "No UI connected";
-	}
-}
-
-std::string ot::ApplicationBase::handleContextMenuItemCheckedChanged(JsonDocument& _document) {
-	if (m_uiNotifier) {
-		std::string menuName = json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenuName);
-		std::string itemName = json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ContextMenuItemName);
-		bool isChecked = json::getBool(_document, OT_ACTION_PARAM_UI_CONTROL_CheckedState);
-		m_uiNotifier->contextMenuItemCheckedChanged(menuName, itemName, isChecked);
-		return OT_ACTION_RETURN_VALUE_OK;
-	}
-	else {
-		OTAssert(0, "No UI connected");
-		return OT_ACTION_RETURN_INDICATOR_Error "No UI connected";
-	}
-}
-
 void ot::ApplicationBase::__serviceConnected(const std::string & _name, const std::string & _type, const std::string & _url, serviceID_t _id) {
 	// Prepare information to store data
 	structServiceInformation info;
@@ -670,21 +615,6 @@ std::string ot::ApplicationBase::__processMessage(const std::string & _message, 
 #else
 	return processMessage(getConnectedServiceByID(_senderID), _message, _doc);
 #endif // _DEBUG
-}
-
-void ot::ApplicationBase::__addUiPlugin(components::UiPluginComponent * _component) {
-	if (_component == nullptr) { return; }
-	auto it = m_uiPluginComponents.find(_component->pluginUID());
-	if (it != m_uiPluginComponents.end()) {
-		delete it->second;
-	}
-	for (auto it : m_uiPluginComponents) {
-		if (it.second->pluginName() == _component->pluginName()) {
-			delete it.second;
-			break;
-		}
-	}
-	m_uiPluginComponents.insert_or_assign(_component->pluginUID(), _component);
 }
 
 void ot::ApplicationBase::prefetchDocumentsFromStorage(const std::list<UID> &entities)

@@ -10,8 +10,8 @@
 #include "OTGui/PropertyGridCfg.h"
 #include "OTGui/Plot1DDataBaseCfg.h"
 #include "OTGui/VisualisationTypes.h"
-#include "OTServiceFoundation/ContextMenu.h"
 #include "OTGui/TableRange.h"
+#include "ViewChangedStates.h"
 
 #include <list>
 #include <vector>
@@ -52,10 +52,12 @@ namespace ViewerAPI
 		virtual void lockSelectionAndModification(bool flag) {};
 		virtual void removeViewer(ot::UID viewerID) {};
 
+		virtual void closeView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {};
+
 		virtual unsigned long long addMenuPage(const std::string &pageName) { return 0; };
 		virtual unsigned long long addMenuGroup(unsigned long long menuPageID, const std::string &groupName) { return 0; };
-		virtual unsigned long long addMenuPushButton(unsigned long long menuGroupID, const std::string &buttonName, const std::string &iconName, const ot::ContextMenu& _contextMenu = ot::ContextMenu("")) { return 0; };
-		virtual unsigned long long addMenuPushButton(unsigned long long menuGroupID, const std::string &buttonName, const std::string &iconName, const std::string &keySequence, const ot::ContextMenu& _contextMenu = ot::ContextMenu("")) { return 0; };
+		virtual unsigned long long addMenuPushButton(unsigned long long menuGroupID, const std::string &buttonName, const std::string &iconName) { return 0; };
+		virtual unsigned long long addMenuPushButton(unsigned long long menuGroupID, const std::string &buttonName, const std::string &iconName, const std::string &keySequence) { return 0; };
 
 		virtual void removeUIElements(std::list<unsigned long long> &itemIDList) {};
 
@@ -144,6 +146,8 @@ namespace ViewerAPI
 	__declspec(dllexport) void visualizationCartesianMeshNodeShowLines(ot::UID osgModelID, unsigned long long modelEntityID, bool showMeshLines);
 	__declspec(dllexport) void addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3]);
 	__declspec(dllexport) void visualizationTetMeshNodeTetEdges(ot::UID osgModelID, unsigned long long modelEntityID, bool displayTetEdges);
+	
+	__declspec(dllexport) void notifySceneNodeAboutViewChange(ot::UID osgModelID, const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
 
 	__declspec(dllexport) std::list<std::string> getSelectedCurves(ot::UID osgModelID);
 	__declspec(dllexport) void removeSelectedCurveNodes(ot::UID osgModelID);
@@ -212,10 +216,6 @@ namespace ViewerAPI
 	__declspec(dllexport) void createRubberband(ot::UID _viewerID, ot::serviceID_t _senderId, std::string & _note, const std::string & _configurationJson);
 
 	__declspec(dllexport) void settingsItemChanged(ot::UID _viewerID, const ot::Property* _property);
-
-	__declspec(dllexport) void contextMenuItemClicked(ot::UID _viewerID, const std::string& _menuName, const std::string& _itemName);
-
-	__declspec(dllexport) void contextMenuItemCheckedChanged(ot::UID _viewerID, const std::string& _menuName, const std::string& _itemName, bool _isChecked);
 
 	__declspec(dllexport) bool propertyGridValueChanged(ot::UID _viewerID, const ot::Property* _property);
 

@@ -1,25 +1,16 @@
 #pragma once
 
-// uiCore header
-#include <akCore/akCore.h>
-#include <akGui/aDialog.h>
-#include <akGui/aColor.h>
+// OpenTwin header
+#include "OTWidgets/Table.h"
+#include "OTWidgets/Dialog.h"
 
-#include <qobject.h>
-#include <qtablewidget.h>
+// Qt header
+#include <QtCore/qobject.h>
 
-namespace ak {
-	class aLogInDialog;
-	class aLabelWidget;
-	class aComboButtonWidget;
-	class aTableWidget;
-	class aPushButtonWidget;
-	class aLineEditWidget;
-	class aCheckBoxWidget;
-	class aPropertyGridWidget;
-}
+namespace ot { class LineEdit; }
+namespace ot { class CheckBox; }
 
-class ManageAccessTable : public QTableWidget {
+class ManageAccessTable : public ot::Table {
 	Q_OBJECT
 public:
 	ManageAccessTable();
@@ -48,10 +39,7 @@ private:
 	int				my_selectedRow;
 };
 
-class QVBoxLayout;
-class QHBoxLayout;
-
-class ManageAccess : public ak::aDialog {
+class ManageAccess : public ot::Dialog {
 	Q_OBJECT
 
 public:
@@ -59,7 +47,6 @@ public:
 	virtual ~ManageAccess();
 
 public Q_SLOTS:
-	void slotClose(void);
 	void slotShowGroupsWithAccessOnly(void);
 	void slotGroupsFilter(void);
 	void slotGroupsSelection(void);
@@ -71,18 +58,9 @@ private:
 	bool hasSuccessful(const std::string &response);
 	void readGroupsList(void);
 
-	QVBoxLayout *								m_centralLayout;
-	QHBoxLayout *								m_groupLabelLayout;
-	QHBoxLayout *								m_buttonLabelLayout;
-
-	QWidget *									m_groupLabelLayoutW;
-	QWidget *									m_buttonLabelLayoutW;
-
-	ak::aPushButtonWidget *						m_btnClose;
-	ak::aLabelWidget *							m_labelGroups;
-	ak::aLineEditWidget *						m_filterGroups;
+	ot::LineEdit*								m_filterGroups;
 	ManageAccessTable *							m_groupsList;
-	ak::aCheckBoxWidget *						m_showGroupsWithAccessOnly;
+	ot::CheckBox *								m_showGroupsWithAccessOnly;
 
 	std::string									m_authServerURL;
 	std::string									m_projectName;

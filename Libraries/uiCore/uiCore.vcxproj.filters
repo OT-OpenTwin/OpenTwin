@@ -31,17 +31,11 @@
     <Filter Include="Header Files\ak\Core">
       <UniqueIdentifier>{ac31f2ef-9e74-4bb9-8118-efb87b5edd04}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\ak\Dialogs">
-      <UniqueIdentifier>{9edd78e5-9295-43c4-94dd-7bfaba3618bb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\ak\Widgets">
       <UniqueIdentifier>{921a4c90-e2eb-4496-8903-2cff4d821bc3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\ak\API">
       <UniqueIdentifier>{dcf8cd4f-3056-4bf5-a4c5-f4ae775327cb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\ak\Dialogs">
-      <UniqueIdentifier>{e825047d-62a8-4894-86e2-977fb0bd3044}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\ak\Gui">
       <UniqueIdentifier>{d6b9540d-37ca-4c34-8216-1f561e22dbee}</UniqueIdentifier>
@@ -75,9 +69,6 @@
     <ClCompile Include="src\akCore\aException.cpp">
       <Filter>Source Files\ak\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\akCore\aFile.cpp">
-      <Filter>Source Files\ak\Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\akCore\akCore.cpp">
       <Filter>Source Files\ak\Core</Filter>
     </ClCompile>
@@ -99,16 +90,7 @@
     <ClCompile Include="src\akCore\aUidManager.cpp">
       <Filter>Source Files\ak\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\akDialogs\aPromptDialog.cpp">
-      <Filter>Source Files\ak\Dialogs</Filter>
-    </ClCompile>
     <ClCompile Include="src\akGui\aAction.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akGui\aColor.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akGui\aDialog.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
     <ClCompile Include="src\akGui\aObjectManager.cpp">
@@ -123,9 +105,6 @@
     <ClCompile Include="src\akWidgets\aCheckBoxWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\akWidgets\aColorEditButtonWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\akWidgets\aComboBoxWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
@@ -135,34 +114,13 @@
     <ClCompile Include="src\akWidgets\aComboButtonWidgetItem.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\akWidgets\aDockWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\akWidgets\aLabelWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="src\akWidgets\aLineEditWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\akWidgets\aListWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\akWidgets\aNiceLineEditWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aPushButtonWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aRadioButtonWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aTableWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aTabWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aTextEditWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="src\akWidgets\aToolButtonWidget.cpp">
@@ -192,49 +150,7 @@
     <ClCompile Include="src\akWidgets\aWindowManagerTimerSignalLinker.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\akGui\aSpecialTabBar.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
     <ClCompile Include="src\akGui\aTimer.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akGui\aContextMenuItem.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aGraphicsWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akCore\aDateHelper.cpp">
-      <Filter>Source Files\ak\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aDatePickWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aCalendarWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aTimePickWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aSpinBoxWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aDoubleSpinBoxWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aDockWatcherWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akCore\aDate.cpp">
-      <Filter>Source Files\ak\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akCore\aTime.cpp">
-      <Filter>Source Files\ak\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akGui\aGlobalKeyListener.cpp">
-      <Filter>Source Files\ak\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akGui\aToolButtonCustomContextMenu.cpp">
       <Filter>Source Files\ak\Gui</Filter>
     </ClCompile>
     <ClCompile Include="src\akWidgets\aAnimationOverlayWidget.cpp">
@@ -243,15 +159,9 @@
     <ClCompile Include="src\akTools\ClassHelper.cpp">
       <Filter>Source Files\ak\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="src\akWidgets\aPlainTextEditWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\akCore\aException.h">
-      <Filter>Header Files\ak\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akCore\aFile.h">
       <Filter>Header Files\ak\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\akCore\akCore.h">
@@ -278,9 +188,6 @@
     <ClInclude Include="include\akCore\globalDataTypes.h">
       <Filter>Header Files\ak\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\akGui\aColor.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </ClInclude>
     <ClInclude Include="include\akGui\aObjectManager.h">
       <Filter>Header Files\ak\Gui</Filter>
     </ClInclude>
@@ -305,18 +212,6 @@
     <ClInclude Include="include\akGui\aTimer.h">
       <Filter>Header Files\ak\Gui</Filter>
     </ClInclude>
-    <ClInclude Include="include\akCore\aDateHelper.h">
-      <Filter>Header Files\ak\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akWidgets\aCalendarWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akCore\aDate.h">
-      <Filter>Header Files\ak\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\akCore\aTime.h">
-      <Filter>Header Files\ak\Core</Filter>
-    </ClInclude>
     <ClInclude Include="include\akCore\aAssert.h">
       <Filter>Header Files\ak\Core</Filter>
     </ClInclude>
@@ -328,9 +223,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\akDialogs\aPromptDialog.h">
-      <Filter>Header Files\ak\Dialogs</Filter>
-    </QtMoc>
     <QtMoc Include="include\akGui\aAction.h">
       <Filter>Header Files\ak\Gui</Filter>
     </QtMoc>
@@ -338,9 +230,6 @@
       <Filter>Header Files\ak\Gui</Filter>
     </QtMoc>
     <QtMoc Include="include\akWidgets\aCheckBoxWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aColorEditButtonWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\akWidgets\aComboBoxWidget.h">
@@ -352,34 +241,13 @@
     <QtMoc Include="include\akWidgets\aComboButtonWidgetItem.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\akWidgets\aDockWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
     <QtMoc Include="include\akWidgets\aLabelWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\akWidgets\aLineEditWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\akWidgets\aListWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
     <QtMoc Include="include\akWidgets\aNiceLineEditWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aPushButtonWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aRadioButtonWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aTableWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aTabWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aTextEditWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\akWidgets\aToolButtonWidget.h">
@@ -397,43 +265,7 @@
     <QtMoc Include="include\akWidgets\aWindowManagerTimerSignalLinker.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\akWidgets\aGraphicsWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akGui\aSpecialTabBar.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akGui\aContextMenuItem.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aDatePickWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aTimePickWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aSpinBoxWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aDoubleSpinBoxWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aDockWatcherWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akGui\aGlobalKeyListener.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akGui\aDialog.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akGui\aToolButtonCustomContextMenu.h">
-      <Filter>Header Files\ak\Gui</Filter>
-    </QtMoc>
     <QtMoc Include="include\akWidgets\aAnimationOverlayWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aPlainTextEditWidget.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
   </ItemGroup>

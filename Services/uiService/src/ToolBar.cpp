@@ -15,7 +15,6 @@
 #include <akWidgets/aToolButtonWidget.h>
 #include <akWidgets/aTtbPage.h>
 #include <akWidgets/aTtbGroup.h>
-#include <akGui/aContextMenuItem.h>
 
 const QString c_icoExit = "ExitAppBlue";
 const QString c_icoDocks = "Docks";

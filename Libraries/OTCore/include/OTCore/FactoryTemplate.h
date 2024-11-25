@@ -11,6 +11,7 @@
 // std header
 #include <map>
 #include <memory>
+#include <string>
 #include <functional>
 
 namespace ot {
@@ -18,9 +19,9 @@ namespace ot {
 	//! @class FactoryTemplate
 	//! @brief The FactoryTemplate may be used to quickly create default factories that are only used for item creation without any further logic.
 	//! @note Note that the createFromJson() methods will call setFromJsonObject() if the created item inherits from Serializable.
-	//! @tparam KeyType Key type (e.g. std::string).
+	//! The key for creating an object is a std::string.
 	//! @tparam ValueType Value type (e.g. MyClass).
-	template<class KeyType, class ValueType> class FactoryTemplate {
+	template<class ValueType> class FactoryTemplate {
 	public:
 		//! @brief Constructor type definition.
 		typedef std::function<ValueType*()> ConstructorFunctionType;
@@ -29,15 +30,15 @@ namespace ot {
 		//! If a constructor for the given key already exists a warning log will be generated and the request will be ignored.
 		//! @param _key The constructor key.
 		//! @param _constructor The constructor.
-		void registerConstructor(const KeyType& _key, ConstructorFunctionType _constructor);
+		void registerConstructor(const std::string& _key, ConstructorFunctionType _constructor);
 
 		//! @brief Remove the constructor for the given key.
 		//! @param _key The constructor key.
-		void deregisterConstructor(const KeyType& _key);
+		void deregisterConstructor(const std::string& _key);
 
 		//! @brief Call the constructor for the given key and return the created instance.
 		//! @param _key The constructor key.
-		ValueType* createFromKey(const KeyType& _key);
+		ValueType* createFromKey(const std::string& _key);
 
 		//! @brief Creates an instance according to the key in the provided JSON object.
 		//! If the key is empty the request will be ignored.
@@ -57,7 +58,7 @@ namespace ot {
 		~FactoryTemplate() {};
 
 	private:
-		std::map<KeyType, ConstructorFunctionType> m_constructors; //! @brief Key to constructor map.
+		std::map<std::string, ConstructorFunctionType> m_constructors; //! @brief Key to constructor map.
 	};
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -71,24 +72,24 @@ namespace ot {
 	//! @tparam KeyType The type of the key used to store and later acces the constructor.
 	//! @tparam FactoryType The factory that is used to register.
 	//! @tparam CreatedType The type of the created instance.
-	template <typename KeyType, class FactoryType, typename CreatedType>
+	template <class FactoryType, typename CreatedType>
 	class FactoryRegistrarTemplate {
 		OT_DECL_NOCOPY(FactoryRegistrarTemplate)
 		OT_DECL_NODEFAULT(FactoryRegistrarTemplate)
 	public:
 		//! @brief Constructor.
 		//! @param _key The key for the constructor that is used to register at the factory.
-		FactoryRegistrarTemplate(const KeyType& _key);
+		FactoryRegistrarTemplate(const std::string& _key);
 		
 		//! @brief Destructor.
 		//! When called the constructor will be deregistered from the factory.
 		virtual ~FactoryRegistrarTemplate();
 
 		//! @brief Get the constructor key.
-		const KeyType& getKey(void) const { return m_key; };
+		const std::string& getKey(void) const { return m_key; };
 
 	private:
-		KeyType m_key; //! @brief Constructor key.
+		std::string m_key; //! @brief Constructor key.
 	};
 
 }

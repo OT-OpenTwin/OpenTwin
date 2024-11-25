@@ -1,22 +1,23 @@
+// Frontend header
 #include "ManageAccess.h"
 #include "AppBase.h"
 
-#include <akAPI/uiAPI.h>
-#include <akWidgets/aPushButtonWidget.h>
-#include <akWidgets/aLabelWidget.h>
-#include <akWidgets/aLineEditWidget.h>
-#include <akWidgets/aTableWidget.h>
-#include <akWidgets/aCheckBoxWidget.h>
-
+// OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/Msg.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTWidgets/Label.h"
+#include "OTWidgets/LineEdit.h"
+#include "OTWidgets/CheckBox.h"
+#include "OTWidgets/PushButton.h"
 
-#include <qlayout.h>
-#include <qtablewidget.h>
-#include <qevent.h>
+// Qt header
+#include <QtGui/qevent.h>
+#include <QtWidgets/qlayout.h>
+#include <QtWidgets/qheaderview.h>
 
+// std header
 #include <array>
 #include <cctype>
 
@@ -24,7 +25,7 @@
 // Table Widget 
 
 ManageAccessTable::ManageAccessTable()
-	: QTableWidget(), my_selectedRow(-1)
+	: my_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
@@ -34,7 +35,7 @@ ManageAccessTable::ManageAccessTable()
 }
 
 ManageAccessTable::ManageAccessTable(int _rows, int _columns)
-	: QTableWidget(_rows, _columns), my_selectedRow(-1)
+	: ot::Table(_rows, _columns), my_selectedRow(-1)
 {
 	verticalHeader()->setVisible(false);
 	setFocusPolicy(Qt::NoFocus);
@@ -139,6 +140,7 @@ void ManageAccessTable::getSelectedItems(QTableWidgetItem *&first, QTableWidgetI
 
 
 // ####################################################################################################
+
 // Main dialog box
 
 ManageAccess::ManageAccess(const std::string &authServerURL, const std::string &projectName) 
@@ -146,44 +148,30 @@ ManageAccess::ManageAccess(const std::string &authServerURL, const std::string &
 	m_authServerURL = authServerURL;
 	m_projectName = projectName;
 
-	// Create controls
- 	m_btnClose = new ak::aPushButtonWidget("Close");
-
-	m_buttonLabelLayoutW = new QWidget;
-	m_buttonLabelLayout = new QHBoxLayout(m_buttonLabelLayoutW);
-	m_buttonLabelLayout->setContentsMargins(0, 0, 0, 5);
-
-	m_buttonLabelLayout->addStretch(1);
-	m_buttonLabelLayout->addWidget(m_btnClose, Qt::Alignment::enum_type::AlignRight);
-	m_buttonLabelLayout->setStretchFactor(m_btnClose, 0);
-
 	// Create layouts
-	m_centralLayout = new QVBoxLayout(this);
+	QVBoxLayout* centralLayout = new QVBoxLayout(this);
+	QHBoxLayout* groupLayout = new QHBoxLayout;
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
 
-	m_groupLabelLayoutW = new QWidget;
-	m_groupLabelLayout = new QHBoxLayout(m_groupLabelLayoutW);
-	m_groupLabelLayout->setContentsMargins(0, 0, 0, 0);
+	// Create controls
+	ot::PushButton* closeButton = new ot::PushButton("Close");
 
-	m_labelGroups = new ak::aLabelWidget;
-	m_labelGroups->setText("User Groups");
-	QFont font = m_labelGroups->font();
-	font.setPointSize(font.pointSize() * 2);
-	m_labelGroups->setFont(font);
+	ot::Label* labelGroups = new ot::Label("User Groups");
 
-	m_showGroupsWithAccessOnly = new ak::aCheckBoxWidget;
-	m_showGroupsWithAccessOnly->setText("Show groups with access only");
+	m_filterGroups = new ot::LineEdit;
+	m_filterGroups->setPlaceholderText("Filter...");
+
+	m_showGroupsWithAccessOnly = new ot::CheckBox("Show groups with access only");
 	m_showGroupsWithAccessOnly->setChecked(true);
 	m_showGroupsWithAccessOnly->setMinimumSize(QSize(0, 0));
 	m_showGroupsWithAccessOnly->setContentsMargins(0, 0, 0, 0);
 
-	m_groupLabelLayout->addWidget(m_labelGroups);
-	m_groupLabelLayout->addStretch(1);
-	m_groupLabelLayout->addWidget(m_showGroupsWithAccessOnly);
-
-	m_filterGroups = new ak::aLineEditWidget;
-	m_filterGroups->setPlaceholderText("Filter...");
-
 	m_groupsList = new ManageAccessTable(0, 2);
+
+	// Setup controls
+	QFont font = labelGroups->font();
+	font.setPointSize(font.pointSize() * 2);
+	labelGroups->setFont(font);
 
 	QStringList membersLabels;
 	membersLabels.push_back("Access");
@@ -195,42 +183,49 @@ ManageAccess::ManageAccess(const std::string &authServerURL, const std::string &
 	m_groupsList->horizontalHeaderItem(0)->setTextAlignment(Qt::Alignment::enum_type::AlignCenter | Qt::Alignment::enum_type::AlignVCenter);
 	m_groupsList->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
 
-	m_centralLayout->addWidget(m_groupLabelLayoutW);
-	m_centralLayout->addWidget(m_filterGroups);
-	m_centralLayout->addWidget(m_groupsList);
+	int minWidth = labelGroups->fontMetrics().boundingRect(labelGroups->text()).width();
 
-	int minWidth = m_labelGroups->fontMetrics().boundingRect(m_labelGroups->text()).width();
-	
-	setWindowTitle("Manage Access To Project: " + QString(projectName.c_str()));
-	setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
+	// Setup layouts
+	groupLayout->setContentsMargins(0, 0, 0, 0);
+	buttonLayout->setContentsMargins(0, 0, 0, 5);
 
-	hideInfoButton();
-	setMinimumSize(minWidth * 4, minWidth * 4);
+	// Fill layouts
+	buttonLayout->addStretch(1);
+	buttonLayout->addWidget(closeButton, Qt::Alignment::enum_type::AlignRight);
 
-	m_centralLayout->addWidget(m_buttonLabelLayoutW);
+	groupLayout->addWidget(labelGroups);
+	groupLayout->addStretch(1);
+	groupLayout->addWidget(m_showGroupsWithAccessOnly);
 
-	connect(m_btnClose, &ak::aPushButtonWidget::clicked, this, &ManageAccess::slotClose);
-	connect(m_showGroupsWithAccessOnly, &ak::aCheckBoxWidget::stateChanged, this, &ManageAccess::slotShowGroupsWithAccessOnly);
-	connect(m_filterGroups, &ak::aLineEditWidget::textChanged, this, &ManageAccess::slotGroupsFilter);
+	centralLayout->addLayout(groupLayout);
+	centralLayout->addWidget(m_filterGroups);
+	centralLayout->addWidget(m_groupsList);
+	centralLayout->addLayout(buttonLayout);
+
+	// Setup window
+
+	this->setWindowTitle("Manage Access To Project: " + QString(projectName.c_str()));
+	this->setWindowIcon(AppBase::instance()->mainWindow()->windowIcon());
+
+	this->setMinimumSize(minWidth * 4, minWidth * 4);
+
+	// Connect signals
+	connect(closeButton, &ot::PushButton::clicked, this, &ManageAccess::closeCancel);
+	connect(m_showGroupsWithAccessOnly, &ot::CheckBox::stateChanged, this, &ManageAccess::slotShowGroupsWithAccessOnly);
+	connect(m_filterGroups, &ot::LineEdit::textChanged, this, &ManageAccess::slotGroupsFilter);
 	connect(m_groupsList, &ManageAccessTable::selectionChanged, this, &ManageAccess::slotGroupsSelection);
 
-	readGroupsList();
-	fillGroupsList();
+	this->readGroupsList();
+	this->fillGroupsList();
 }
 
-ManageAccess::~ManageAccess() 
-{
-	m_centralLayout->deleteLater();
+ManageAccess::~ManageAccess() {
+	
 }
 
 // ####################################################################################################
 
 // Slots
-
-void ManageAccess::slotClose(void) 
-{
-	Close(ak::resultCancel);
-}
 
 void ManageAccess::slotShowGroupsWithAccessOnly(void)
 {

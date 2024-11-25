@@ -53,37 +53,12 @@ std::map<std::string, std::list<std::string>> PreviewAssemblerRMD::CollectUnique
 		{
 			if (sourceTable->getName() == _selectedRangeEntities[i]->getTableName())
 			{
-				uint32_t selection[4];
-				_selectedRangeEntities[i]->getSelectedRange(selection[0], selection[1], selection[2], selection[3], sourceTable);
+				ot::TableRange selection =  _selectedRangeEntities[i]->getSelectedRange();
 				auto sourceTableData = sourceTable->getTableData();
-				if (_selectedRangeEntities[i]->getSelectEntireRow())
-				{
-					selection[3] = static_cast<uint32_t>(sourceTableData->getNumberOfColumns())- 1;
-					if (sourceTable->getSelectedHeaderOrientation() == EntityParameterizedDataTable::HeaderOrientation::vertical)
-					{
-						selection[2] = 1;
-					}
-					else
-					{
-						selection[2] = 0;
-					}
-				}
-				if (_selectedRangeEntities[i]->getSelectEntireColumn())
-				{
-					selection[1] = static_cast<uint32_t>(sourceTableData->getNumberOfRows()) - 1;
-					if (sourceTable->getSelectedHeaderOrientation() == EntityParameterizedDataTable::HeaderOrientation::horizontal)
-					{
-						selection[0] = 1;
-					}
-					else
-					{
-						selection[0] = 0;
-					}
-				}
 
-				for (uint32_t column = selection[2]; column <= selection[3]; column++)
+				for (uint32_t column = selection.getLeftColumn(); column <= selection.getRightColumn(); column++)
 				{
-					for (uint32_t row = selection[0]; row <= selection[1]; row++)
+					for (uint32_t row = selection.getTopRow(); row <= selection.getBottomRow(); row++)
 					{
 						previewFields[sourceTableData->getValue(0, column)].push_back(sourceTableData->getValue(row, column));
 					}

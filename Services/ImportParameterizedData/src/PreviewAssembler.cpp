@@ -74,18 +74,18 @@ void PreviewAssembler::LoadTableSources(std::list<std::string>& tableNames)
 
 void PreviewAssembler::CountPreviewFieldsFromSelectedRanges()
 {
-	uint32_t selectedRange[4];
+	
 	_numberOfFields = 0;
 	for (size_t i = 0; i < _selectedRangeEntities.size(); i++)
 	{
-		_selectedRangeEntities[i]->getSelectedRange(selectedRange[0], selectedRange[1], selectedRange[2], selectedRange[3]);
+		ot::TableRange selectedRange =	_selectedRangeEntities[i]->getSelectedRange();
 		if (_selectedRangeEntities[i]->getTableOrientation() == EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
 		{
-			_numberOfFields += selectedRange[3] - selectedRange[2] + 1;
+			_numberOfFields += selectedRange.getRightColumn() - selectedRange.getLeftColumn() + 1;
 		}
 		else
 		{
-			_numberOfFields += selectedRange[1] - selectedRange[0] + 1;
+			_numberOfFields += selectedRange.getBottomRow() - selectedRange.getTopRow() + 1;
 		}
 	}
 }

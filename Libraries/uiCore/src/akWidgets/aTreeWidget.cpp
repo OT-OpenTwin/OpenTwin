@@ -13,7 +13,6 @@
 // AK header
 #include <akCore/aException.h>
 #include <akCore/aAssert.h>
-#include <akGui/aColor.h>
 
 #include <akWidgets/aTreeWidget.h>
 #include <akWidgets/aLineEditWidget.h>

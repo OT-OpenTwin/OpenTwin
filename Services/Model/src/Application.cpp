@@ -819,7 +819,9 @@ std::string Application::handlePromptResponse(ot::JsonDocument& _document) {
 	std::string answer = ot::json::getString(_document, OT_ACTION_PARAM_ANSWER);
 	std::string parameter1 = ot::json::getString(_document, OT_ACTION_PARAM_PARAMETER1);
 
-	m_model->promptResponse(response, answer, parameter1);
+	ot::MessageDialogCfg::BasicButton actualAnswer = ot::MessageDialogCfg::stringToButton(answer);
+
+	m_model->promptResponse(response, actualAnswer, parameter1);
 
 	return "";
 }
@@ -986,7 +988,8 @@ std::string Application::handleVisualisationDataRequest(ot::JsonDocument& _docum
 {
 	ot::UID entityID =  ot::json::getUInt64(_document,OT_ACTION_PARAM_MODEL_EntityID);
 	const std::string visualisationType = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-	m_visualisationHandler.handleVisualisationRequest(entityID,visualisationType);
+	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
+	m_visualisationHandler.handleVisualisationRequest(entityID,visualisationType,setViewAsActive);
 	return "";
 }
 // ##################################################################################################################################################################################################################
@@ -1103,10 +1106,6 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent* _ui) {
-
-}
-
-void Application::uiPluginConnected(ot::components::UiPluginComponent* _uiPlugin) {
 
 }
 
@@ -1289,6 +1288,7 @@ Application::Application()
 
 	std::thread asyncActionThread(&Application::asyncActionWorker, this);
 	asyncActionThread.detach();
+	m_fileHandler.setDontDeleteHandler();
 	m_baseHandler.setNextHandler(&m_fileHandler);
 }
 

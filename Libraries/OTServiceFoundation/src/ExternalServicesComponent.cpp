@@ -20,7 +20,6 @@
 #include "OTCommunication/ActionDispatcher.h"
 
 #include "OTServiceFoundation/ApplicationBase.h"
-#include "OTServiceFoundation/UiPluginComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ExternalServicesComponent.h"	// Corresponding header
 
@@ -599,20 +598,6 @@ std::string ot::intern::ExternalServicesComponent::handleEmergencyShutdown(JsonD
 	std::thread t(ot::intern::exitWorker, -100);
 	t.detach();
 	return OT_ACTION_RETURN_VALUE_OK;
-}
-
-std::string ot::intern::ExternalServicesComponent::handleUIPluginConnected(JsonDocument& _document) {
-	components::UiComponent * ui = m_application->uiComponent();
-	unsigned long long pluginUID = ot::json::getUInt64(_document, OT_ACTION_PARAM_UI_PLUGIN_UID);
-	std::string pluginName = ot::json::getString(_document, OT_ACTION_PARAM_UI_PLUGIN_NAME);
-	if (ui == nullptr) {
-		return OT_ACTION_RETURN_INDICATOR_Error "UI is not connected";
-	}
-
-	components::UiPluginComponent * component = new components::UiPluginComponent(pluginUID, pluginName, m_application, ui);
-	m_application->__addUiPlugin(component);
-	m_application->uiPluginConnected(component);
-	return std::string();
 }
 
 void ot::intern::ExternalServicesComponent::getCPUAndMemoryLoad(double& globalCPULoad, double& globalMemoryLoad, double& processCPULoad, double& processMemoryLoad)

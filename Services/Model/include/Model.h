@@ -15,8 +15,7 @@
 
 #include "OTGui/GuiTypes.h"
 #include "OTGui/PropertyGridCfg.h"
-
-
+#include "OTGui/MessageDialogCfg.h"
 
 class EntityMesh;
 class EntityMeshTet;
@@ -203,7 +202,7 @@ public:
 	ModelState* getStateManager(void);
 	void setStateMangager(ModelState* state);
 
-	void promptResponse(const std::string &type, const std::string &answer, const std::string &parameter1);
+	void promptResponse(const std::string& _type, ot::MessageDialogCfg::BasicButton _answer, const std::string& _parameter1);
 
 	EntityBase* getEntityByID(ot::UID _entityID) const;
 

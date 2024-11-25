@@ -179,11 +179,6 @@ ECHO ===============================================================
 CALL "%OT_UICORE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Library: UI Plugin API
-ECHO ===============================================================
-CALL "%OT_UIPLUGINAPI_ROOT%\build.bat" %1 %2
-
-ECHO ===============================================================
 ECHO Build Library: RubberbandEngine: Core
 ECHO ===============================================================
 CALL "%OT_RUBBERBANDAPI_ROOT%\build.bat" %1 %2
