@@ -65,7 +65,7 @@ bool GraphicsItemDesigner::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _con
 	_content.addView(view);
 
 	m_preview = new GraphicsItemDesignerPreview;
-	view = this->createToolWidgetView(m_preview, "GID Preview");
+	view = this->createCentralWidgetView(m_preview, "GID Preview");
 	_content.addView(view);
 
 	m_toolBar = new GraphicsItemDesignerToolBar(this);
