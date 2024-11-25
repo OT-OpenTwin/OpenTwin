@@ -23,7 +23,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\Visualiser.cpp" />
     <ClCompile Include="src\AbstractPlot.cpp" />
     <ClCompile Include="src\AxisCenterCross.cpp" />
     <ClCompile Include="src\AxisCross.cpp" />
@@ -87,6 +86,7 @@
     <ClCompile Include="src\ViewerSettings.cpp" />
     <ClCompile Include="src\ViewerView.cpp" />
     <ClCompile Include="src\ViewManipulator.cpp" />
+    <ClCompile Include="src\Visualiser.cpp" />
     <ClCompile Include="src\WorkingPlane.cpp" />
   </ItemGroup>
   <ItemGroup>
