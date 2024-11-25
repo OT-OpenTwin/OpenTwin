@@ -119,7 +119,7 @@ ot::GenericDataStructMatrix CSVToTableTransformer::transformRawMatrixToGenericDa
 		for (entryPointer.m_column = 0; entryPointer.m_column < rowPointer->size(); entryPointer.m_column++)
 		{
 			std::string rawValue = (*rowPointer)[entryPointer.m_column];
-			rawValue.erase(remove(rawValue.begin(), rawValue.end(), m_maskingChar), rawValue.end());
+			//rawValue.erase(remove(rawValue.begin(), rawValue.end(), m_maskingChar), rawValue.end());
 			ot::Variable cellValue(rawValue);
 			matrix.setValue(entryPointer, cellValue);
 		}
