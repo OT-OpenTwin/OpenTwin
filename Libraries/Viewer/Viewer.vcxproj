@@ -23,6 +23,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\Visualiser.cpp" />
     <ClCompile Include="src\AbstractPlot.cpp" />
     <ClCompile Include="src\AxisCenterCross.cpp" />
     <ClCompile Include="src\AxisCross.cpp" />

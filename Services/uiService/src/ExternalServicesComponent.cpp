@@ -3940,12 +3940,9 @@ std::string ExternalServicesComponent::handleRemoveTableColumn(ot::JsonDocument&
 }
 
 std::string ExternalServicesComponent::handleCloseTable(ot::JsonDocument& _document) {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.GetConstObject());
-
 	std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
-	AppBase::instance()->closeTable(tableName, info);
+	AppBase::instance()->closeTable(tableName);
 
 	return "";
 }

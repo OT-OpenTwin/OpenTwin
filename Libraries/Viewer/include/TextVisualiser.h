@@ -3,9 +3,8 @@
 #include "OTCore/CoreTypes.h"
 #include <string>
 
-class TextVisualiser : public Visualiser
-{
+class TextVisualiser : public Visualiser {
 public:
-	TextVisualiser(ot::UID _modelEntityID) :Visualiser(_modelEntityID) {}
+	TextVisualiser(SceneNodeBase* _sceneNode);
 	void visualise() override;
 };

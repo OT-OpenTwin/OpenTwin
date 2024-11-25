@@ -448,7 +448,7 @@ public:
 
 	ot::TableView* findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
 
-	void closeTable(const std::string& _name, const ot::BasicServiceInformation& _serviceInfo);
+	void closeTable(const std::string& _name);
 
 	// ######################################################################################################################
 

@@ -1697,7 +1697,7 @@ ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot:
 	return this->createNewTable(_config, _serviceInfo);
 }
 
-void AppBase::closeTable(const std::string& _entityName, const ot::BasicServiceInformation& _serviceInfo) {
+void AppBase::closeTable(const std::string& _entityName) {
 	ot::TableView* view = this->findTable(_entityName);
 	if (!view) {
 		OT_LOG_EAS("Table \"" + _entityName + "\" not found");

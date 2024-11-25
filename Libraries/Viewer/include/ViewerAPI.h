@@ -12,7 +12,6 @@
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/TableRange.h"
 #include "ViewChangedStates.h"
-#include "OTGui/WidgetViewBase.h"
 
 #include <list>
 #include <vector>
@@ -52,6 +51,8 @@ namespace ViewerAPI
 		virtual double getDoublePropertyValue(const std::string& _groupName, const std::string& _itemName) { return 0.0; };
 		virtual void lockSelectionAndModification(bool flag) {};
 		virtual void removeViewer(ot::UID viewerID) {};
+
+		virtual void closeView(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {};
 
 		virtual unsigned long long addMenuPage(const std::string &pageName) { return 0; };
 		virtual unsigned long long addMenuGroup(unsigned long long menuPageID, const std::string &groupName) { return 0; };
