@@ -2206,8 +2206,8 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 	}
 
 	this->cleanupWidgetViewInfo(_view);
-	const std::string& viewName = _view->getViewData().getEntityName();
-	const auto& viewType = _view->getViewData().getViewType();
+	std::string viewName = _view->getViewData().getEntityName();
+	ot::WidgetViewBase::ViewType viewType = _view->getViewData().getViewType();
 	ot::UID globalActiveViewModel = -1;
 	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedStates::viewClosed, viewType);
 
