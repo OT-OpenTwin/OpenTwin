@@ -2156,7 +2156,11 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 			ak::aTreeWidgetItem* itemToSelect = m_projectNavigation->itemFromPath(QString::fromStdString(_focusedView->getViewData().getEntityName()), '/');
 
 			// Change item selection according to focused view
-			if (m_lastFocusedCentralView != _focusedView && itemToSelect != itemToDeselect) {
+			if (itemToSelect == itemToDeselect) {
+				itemToDeselect = nullptr;
+			}
+
+			if (m_lastFocusedCentralView != _focusedView && (itemToSelect  || itemToDeselect)) {
 				bool changed = false;
 				bool blocked = m_projectNavigation->signalsBlocked();
 				m_projectNavigation->blockSignals(blocked);
