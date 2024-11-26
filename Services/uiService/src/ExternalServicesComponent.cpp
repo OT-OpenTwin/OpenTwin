@@ -3803,14 +3803,28 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 	info.setFromJsonObject(_document.GetConstObject());
 
 	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
+	bool overrideCurrentContent = ot::json::getBool(_document, OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent);
 
 	ot::TableCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	ot::TableView* table = AppBase::instance()->findOrCreateTable(config, info);
-	table->setContentChanged(false);
-	table->setAsCurrentViewTab();
+
+	ot::TableView* table = AppBase::instance()->findTable(config.getEntityName());
+	if (table == nullptr)
+	{
+		table = AppBase::instance()->createNewTable(config, info);
+	}
+	else if (overrideCurrentContent)
+	{
+		table->setupFromConfig(config);
+	}
+
+	if (setViewAsActive)
+	{
+		table->setAsCurrentViewTab();
+	}
 	
+	table->setContentChanged(false);
 	const std::string& name = table->getViewData().getEntityName();
 	const auto& viewerType = table->getViewData().getViewType();
 	ot::UID globalActiveViewModel = -1;
@@ -4134,28 +4148,6 @@ std::string ExternalServicesComponent::handleSetTable(ot::JsonDocument& _documen
 	ot::GenericDataStructMatrix data;
 	data.setFromJsonObject(tableContent);
 	ViewerAPI::showTable(visualizationModelID, data);
-
-	return "";
-}
-
-std::string ExternalServicesComponent::handleSelectRanges(ot::JsonDocument& _document) {
-	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-
-	auto listOfSerializedRanges = ot::json::getObjectList(_document, "Ranges");
-	std::vector<ot::TableRange> ranges;
-	ranges.reserve(listOfSerializedRanges.size());
-	for (auto range : listOfSerializedRanges) {
-		ot::TableRange tableRange;
-		tableRange.setFromJsonObject(range);
-		ranges.push_back(tableRange);
-	}
-	try {
-		ViewerAPI::setTableSelection(visualizationModelID, ranges);
-	}
-	catch (std::exception& e) {
-		OT_LOG_E(e.what());
-		AppBase::instance()->appendInfoMessage("Table selection could not be executed due to exception: " + QString(e.what()));
-	}
 
 	return "";
 }

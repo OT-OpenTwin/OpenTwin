@@ -336,6 +336,17 @@ void DataCategorizationHandler::addNewCategorizationEntity(std::string name, Ent
 	}
 }
 
+void DataCategorizationHandler::requestToOpenTable(const std::string& _tableName)
+{
+	ot::JsonDocument document;
+	document.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_Setup, document.GetAllocator()), document.GetAllocator());
+	document.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_tableName, document.GetAllocator()), document.GetAllocator());
+	document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, true, document.GetAllocator());
+	
+	std::string answer;
+	Application::instance()->modelComponent()->sendMessage(false, document, answer);
+}
+
 void DataCategorizationHandler::requestColouringRanges(bool _clearSelection, const std::string& _tableName, const ot::Color& _colour, const std::list<ot::TableRange>& ranges)
 {
 	ot::JsonDocument doc;
@@ -936,6 +947,7 @@ void DataCategorizationHandler::SelectRange(ot::UIDList iDs, ot::UIDList version
 			}
 			
 			const auto& ranges = rangesByColourID.second;
+			requestToOpenTable(tableName);
 			requestColouringRanges(clearSelection,tableName, typeColour, ranges);
 			clearSelection = false;
 		}

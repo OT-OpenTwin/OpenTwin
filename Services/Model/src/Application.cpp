@@ -984,6 +984,25 @@ std::string Application::handleSetVersionLabel(ot::JsonDocument& _document) {
 	return "";
 }
 
+std::string Application::handleShowTable(ot::JsonDocument& _document)
+{
+	const std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
+	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
+	
+	auto entityIDByName	= m_model->getEntityNameToIDMap().find(tableName);
+	if (entityIDByName != m_model->getEntityNameToIDMap().end())
+	{
+		ot::UID tableID = entityIDByName->second;
+		m_visualisationHandler.handleVisualisationRequest(tableID, OT_ACTION_CMD_UI_TABLE_Setup, setViewAsActive);
+		return ot::ReturnMessage().toJson();
+	}
+	else
+	{
+		OT_LOG_E("Request to show table " + tableName + " could not be handled, since it is not part of the current state");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed).toJson();
+	}
+}
+
 std::string Application::handleVisualisationDataRequest(ot::JsonDocument& _document)
 {
 	ot::UID entityID =  ot::json::getUInt64(_document,OT_ACTION_PARAM_MODEL_EntityID);

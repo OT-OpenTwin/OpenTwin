@@ -5,7 +5,7 @@
 #include "IVisualisationText.h"
 #include "IVisualisationTable.h"
 
-void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView)
+void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent)
 {
 	Model* model = Application::instance()->getModel();
 	EntityBase* baseEntity = model->getEntityByID(_entityID);
@@ -22,7 +22,8 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			info.addToJsonObject(document, document.GetAllocator());
 			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TABLE_Setup, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
-
+			document.AddMember(OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent, _overrideContent, document.GetAllocator());
+		
 			ot::TableCfg tableCfg = tableEntity->getTableConfig();
 			ot::JsonObject cfgObj;
 			tableCfg.addToJsonObject(cfgObj, document.GetAllocator());

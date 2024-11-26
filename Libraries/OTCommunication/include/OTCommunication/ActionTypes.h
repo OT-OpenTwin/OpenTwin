@@ -294,6 +294,7 @@
 #define OT_ACTION_CMD_UI_RequestTextData "UI.TextEditor.RequestData"
 
 #define OT_ACTION_CMD_UI_TABLE_Setup "UI.Table.Setup"
+#define OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent "UI.Table.Override"
 #define OT_ACTION_CMD_UI_TABLE_SaveRequest "UI.Table.SaveRequest"
 #define OT_ACTION_CMD_UI_TABLE_SetSaved "UI.Table.SetSaved"
 #define OT_ACTION_CMD_UI_TABLE_SetModified "UI.Table.SetModified"

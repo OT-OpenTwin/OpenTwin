@@ -93,6 +93,7 @@ private:
 	void addParamOrQuantityEntries(std::list<EntityBase*>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
 	void addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive);
 
+	void requestToOpenTable(const std::string& _tableName);
 	void requestColouringRanges(bool _clearSelection ,const std::string& _tableName, const ot::Color& _colour, const std::list<ot::TableRange>& ranges);
 
 	void FindExistingRanges(std::string containerName, std::list<std::pair<ot::UID, ot::UID>>& existingRanges);

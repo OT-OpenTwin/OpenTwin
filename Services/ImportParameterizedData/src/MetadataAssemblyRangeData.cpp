@@ -70,12 +70,19 @@ std::vector<std::string> MetadataAssemblyRangeData::ExtractFieldsFromRange(std::
 
 	std::map<std::string, std::map<std::uint32_t,std::string>> extractedField;
 
+	uint32_t minColumn = static_cast<uint32_t>(selection.getLeftColumn());
+	uint32_t maxColumn = static_cast<uint32_t>(selection.getRightColumn());
+	uint32_t minRow = static_cast<uint32_t>(selection.getTopRow());
+	uint32_t maxRow = static_cast<uint32_t>(selection.getBottomRow());
+
 	if (range->getTableOrientation() == EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
 	{
-		for (uint32_t column = selection.getLeftColumn(); column <= selection.getRightColumn(); column++)
+
+
+		for (uint32_t column = minColumn; column <= maxColumn; column++)
 		{
 			fieldKey.push_back(table->getTableData()->getValue(0, column));
-			for (uint32_t row = selection.getTopRow(); row <= selection.getBottomRow(); row++)
+			for (uint32_t row = minRow; row <= maxRow; row++)
 			{
 				const std::string& value = table->getTableData()->getValue(row, column);
 				outAllSortedFields[fieldKey.back()].insert({row, value});
@@ -84,10 +91,10 @@ std::vector<std::string> MetadataAssemblyRangeData::ExtractFieldsFromRange(std::
 	}
 	else
 	{
-		for (uint32_t row = selection.getTopRow(); row <= selection.getBottomRow(); row++)
+		for (uint32_t row = minRow; row <= maxRow; row++)
 		{
 			fieldKey.push_back(table->getTableData()->getValue(row, 0));
-			for (uint32_t column = selection.getLeftColumn(); column <= selection.getRightColumn(); column++)
+			for (uint32_t column = minColumn; column <= maxColumn; column++)
 			{
 				const std::string& value = table->getTableData()->getValue(row, column);
 				outAllSortedFields[fieldKey.back()].insert({column, value});
