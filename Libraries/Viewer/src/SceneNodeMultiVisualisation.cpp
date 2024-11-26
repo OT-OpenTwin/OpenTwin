@@ -32,11 +32,11 @@ void SceneNodeMultiVisualisation::setViewChange(const ot::ViewChangedStates& _st
 		const std::list< Visualiser*>& allVisualiser = getVisualiser();
 		for (Visualiser* visualiser : allVisualiser)
 		{
-			//Update the other visualiser 
+			//Update the other visualiser, if it is open 
 			if (_viewType == ot::WidgetViewBase::ViewType::ViewTable)
 			{
 				TextVisualiser* textVisualiser = dynamic_cast<TextVisualiser*>(visualiser);
-				if (textVisualiser != nullptr)
+				if (textVisualiser != nullptr && textVisualiser->viewIsCurrentlyOpen())
 				{
 					textVisualiser->visualise();
 				}
@@ -44,7 +44,7 @@ void SceneNodeMultiVisualisation::setViewChange(const ot::ViewChangedStates& _st
 			else if (_viewType == ot::WidgetViewBase::ViewType::ViewText)
 			{
 				TableVisualiser* tableVisualiser = dynamic_cast<TableVisualiser*>(visualiser);
-				if (tableVisualiser != nullptr)
+				if (tableVisualiser != nullptr && tableVisualiser->viewIsCurrentlyOpen())
 				{
 					tableVisualiser->visualise();
 				}
