@@ -3,6 +3,7 @@
 #include "EntityParameterizedDataCategorization.h"
 #include "EntityParameterizedDataTable.h"
 #include "OTGui/TableRange.h"
+#include "OTGui/TableHeaderOrientation.h"
 #include <vector>
 
 class __declspec(dllexport) EntityTableSelectedRanges : public EntityBase
@@ -19,7 +20,7 @@ public:
 
 	std::string getSelectedType();
 	const std::string getTableName();
-	const std::string getTableOrientation();
+	const ot::TableHeaderOrientation getTableOrientation();
 	ot::TableRange getSelectedRange();
 	bool getConsiderForBatchprocessing();
 	void setConsiderForBatchprocessing(bool considerForBatchprocessing);

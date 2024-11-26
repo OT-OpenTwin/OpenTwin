@@ -1,5 +1,6 @@
 #include "MetadataAssemblyRangeData.h"
 #include "LocaleSettingsSwitch.h"
+#include "DataCategorizationHandler.h"
 
 MetadataAssemblyRangeData::MetadataAssemblyRangeData()
 	: _decimalDelimmiter(*std::localeconv()->decimal_point)
@@ -66,16 +67,18 @@ std::vector<std::string> MetadataAssemblyRangeData::ExtractFieldsFromRange(std::
 {
 	std::vector<std::string> fieldKey;
 	
-	ot::TableRange selection = range->getSelectedRange();
+	ot::TableRange selectionRange = range->getSelectedRange();
+	ot::TableHeaderOrientation headerOrientation=	range->getTableOrientation();
 
+	ot::TableRange matrixRange = DataCategorizationHandler::selectionRangeToMatrixRange(selectionRange, headerOrientation);
 	std::map<std::string, std::map<std::uint32_t,std::string>> extractedField;
 
-	uint32_t minColumn = static_cast<uint32_t>(selection.getLeftColumn());
-	uint32_t maxColumn = static_cast<uint32_t>(selection.getRightColumn());
-	uint32_t minRow = static_cast<uint32_t>(selection.getTopRow());
-	uint32_t maxRow = static_cast<uint32_t>(selection.getBottomRow());
+	uint32_t minColumn = static_cast<uint32_t>(matrixRange.getLeftColumn());
+	uint32_t maxColumn = static_cast<uint32_t>(matrixRange.getRightColumn());
+	uint32_t minRow = static_cast<uint32_t>(matrixRange.getTopRow());
+	uint32_t maxRow = static_cast<uint32_t>(matrixRange.getBottomRow());
 
-	if (range->getTableOrientation() == EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
+	if (range->getTableOrientation() == ot::TableHeaderOrientation::horizontal)
 	{
 
 

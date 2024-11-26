@@ -31,8 +31,5 @@ private:
 	std::string m_rowDelimiter = "\n";
 	std::string m_columnDelimiter = ";";
 
-	const std::string m_headerSettingHorizontal = "first row";
-	const std::string m_headerSettingVertical = "first column";
-
 	ot::ContentChangedHandling m_tableContentChangedHandling = ot::ContentChangedHandling::ModelServiceSaves;
 };

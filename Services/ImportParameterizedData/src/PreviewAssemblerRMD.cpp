@@ -1,5 +1,5 @@
 #include "PreviewAssemblerRMD.h"
-
+#include "DataCategorizationHandler.h"
 void PreviewAssemblerRMD::InitiatePreviewTable(std::shared_ptr<EntityResultTableData<std::string>> previewTableData)
 {
 	previewTableData->setNumberOfRows(1);
@@ -53,12 +53,18 @@ std::map<std::string, std::list<std::string>> PreviewAssemblerRMD::CollectUnique
 		{
 			if (sourceTable->getName() == _selectedRangeEntities[i]->getTableName())
 			{
-				ot::TableRange selection =  _selectedRangeEntities[i]->getSelectedRange();
+				ot::TableRange selectionRange =  _selectedRangeEntities[i]->getSelectedRange();
+				ot::TableHeaderOrientation headerOrientation = _selectedRangeEntities[i]->getTableOrientation();
+				ot::TableRange matrixRange =	DataCategorizationHandler::selectionRangeToMatrixRange(selectionRange,headerOrientation);
+				uint32_t minColumn = static_cast<uint32_t>(matrixRange.getLeftColumn());
+				uint32_t maxColumn = static_cast<uint32_t>(matrixRange.getRightColumn());
+				uint32_t minRow = static_cast<uint32_t>(matrixRange.getTopRow());
+				uint32_t maxRow = static_cast<uint32_t>(matrixRange.getBottomRow());
 				auto sourceTableData = sourceTable->getTableData();
 
-				for (uint32_t column = selection.getLeftColumn(); column <= selection.getRightColumn(); column++)
+				for (uint32_t column = minColumn; column <= maxColumn; column++)
 				{
-					for (uint32_t row = selection.getTopRow(); row <= selection.getBottomRow(); row++)
+					for (uint32_t row = minRow; row <= maxRow; row++)
 					{
 						previewFields[sourceTableData->getValue(0, column)].push_back(sourceTableData->getValue(row, column));
 					}

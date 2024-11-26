@@ -12,4 +12,5 @@ namespace ot
 	};
 
 	__declspec(dllexport) std::string toString(const ot::TableHeaderOrientation& _orientation);
+	__declspec(dllexport) ot::TableHeaderOrientation stringToHeaderOrientation(const std::string& _orientation);
 }

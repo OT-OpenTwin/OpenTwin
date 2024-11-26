@@ -6,11 +6,11 @@
 #include <stdint.h>
 #include <vector>
 #include <map>
+#include "OTGui/TableHeaderOrientation.h"
 
 class __declspec(dllexport) EntityParameterizedDataTable : public EntityResultTable<std::string>
 {
 public:
-	enum HeaderOrientation {horizontal,vertical};
 	EntityParameterizedDataTable(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	void SetTableDimensions(uint32_t numberOfRows, uint32_t numberOfColumns);
 	void SetSourceFile(std::string sourceFileName, std::string sourceFilePath);
@@ -18,11 +18,10 @@ public:
 	std::string getFileName() const { return _sourceFileName; }
 	std::string getFilePath() const { return _sourceFilePath; }
 
-	void createProperties(HeaderOrientation defaultOrientation);
+	void createProperties(ot::TableHeaderOrientation defaultOrientation);
 	std::string getSelectedHeaderOrientationString();
-	HeaderOrientation getSelectedHeaderOrientation();
-	static std::string GetHeaderOrientation(HeaderOrientation orientation);
-
+	ot::TableHeaderOrientation getSelectedHeaderOrientation();
+	
 private:
 	void createProperties() override {};
 	uint32_t _numberOfColumns;
@@ -30,12 +29,7 @@ private:
 	std::vector<uint32_t> _numberOfUniquesInColumns;
 	std::string _sourceFileName;
 	std::string _sourceFilePath;
-
-	static const std::string _headerSettingHorizontal;
-	static const std::string _headerSettingVertical;
 	const std::string _defaulCategory = "tableInformation";
-
-	static std::map<HeaderOrientation, const std::string> _orientationToString;
 
 	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;

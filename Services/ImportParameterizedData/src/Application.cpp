@@ -228,45 +228,25 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			{
 				std::list<ot::EntityInformation> selectedEntities;
 				m_modelComponent->getSelectedEntityInformation(selectedEntities);
-
-				const std::string tableName = _parametrizedDataHandler->markSelectionForStorage(selectedEntities,EntityParameterizedDataCategorization::researchMetadata);
-				if (tableName != "")
-				{
-					RequestSelectedRanges(tableName);
-				}
+				 _parametrizedDataHandler->markSelectionForStorage(selectedEntities,EntityParameterizedDataCategorization::researchMetadata);
 			}
 			else if (action == _buttonCreateMSMDEntry.GetFullDescription())
 			{
 				std::list<ot::EntityInformation> selectedEntities;
 				m_modelComponent->getSelectedEntityInformation(selectedEntities);
-
-				const std::string tableName = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::measurementSeriesMetadata);
-				if (tableName != "")
-				{
-					RequestSelectedRanges(tableName);
-				}
+				_parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::measurementSeriesMetadata);
 			}
 			else if (action == _buttonCreateParameterEntry.GetFullDescription())
 			{
 				std::list<ot::EntityInformation> selectedEntities;
 				m_modelComponent->getSelectedEntityInformation(selectedEntities);
-
-				const std::string tableName = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::parameter);
-				if (tableName != "")
-				{
-					RequestSelectedRanges(tableName);
-				}
+				_parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::parameter);
 			}
 			else if (action == _buttonCreateQuantityEntry.GetFullDescription())
 			{
 				std::list<ot::EntityInformation> selectedEntities;
 				m_modelComponent->getSelectedEntityInformation(selectedEntities);
-
-				const std::string tableName = _parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::quantity);
-				if (tableName != "")
-				{
-					RequestSelectedRanges(tableName);
-				}
+				_parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::quantity);
 			}
 			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
 			{
@@ -419,27 +399,10 @@ void Application::HandleSelectionChanged()
 			}
 			version++;
 		}
-		_parametrizedDataHandler->SelectRange(selectedRangesID, selectedRangesVersion);
+		_parametrizedDataHandler->selectRange(selectedRangesID, selectedRangesVersion);
 	}
 	catch (std::exception& e)
 	{
 		m_uiComponent->displayMessage("Changed selection caused exception: " + std::string(e.what()));
 	}
-}
-
-void Application::RequestSelectedRanges(const std::string& _tableName)
-{
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SetCurrentSelectionBackground, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_tableName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_RequestCallback, true, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("CreateSelectedRangeEntity", doc.GetAllocator()), doc.GetAllocator());
-
-	ot::JsonObject obj;
-	_parametrizedDataHandler->GetSerializedColour().addToJsonObject(obj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Color, obj, doc.GetAllocator());
-
-	std::string tmp;
-	uiComponent()->sendMessage(true, doc, tmp);
 }

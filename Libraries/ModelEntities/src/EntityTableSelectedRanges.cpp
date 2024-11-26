@@ -114,10 +114,11 @@ const std::string EntityTableSelectedRanges::getTableName()
 	return tableNameEnt->getValue();
 }
 
-const std::string EntityTableSelectedRanges::getTableOrientation()
+const ot::TableHeaderOrientation EntityTableSelectedRanges::getTableOrientation()
 {
 	auto headerPosEnt = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Header position"));
-	return headerPosEnt->getValue();
+	ot::TableHeaderOrientation orientation =	ot::stringToHeaderOrientation(headerPosEnt->getValue());
+	return orientation;
 }
 
 ot::TableRange EntityTableSelectedRanges::getSelectedRange()

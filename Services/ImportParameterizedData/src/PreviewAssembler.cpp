@@ -79,7 +79,7 @@ void PreviewAssembler::CountPreviewFieldsFromSelectedRanges()
 	for (size_t i = 0; i < _selectedRangeEntities.size(); i++)
 	{
 		ot::TableRange selectedRange =	_selectedRangeEntities[i]->getSelectedRange();
-		if (_selectedRangeEntities[i]->getTableOrientation() == EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
+		if (_selectedRangeEntities[i]->getTableOrientation() == ot::TableHeaderOrientation::horizontal)
 		{
 			_numberOfFields += selectedRange.getRightColumn() - selectedRange.getLeftColumn() + 1;
 		}

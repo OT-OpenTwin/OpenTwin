@@ -18,7 +18,7 @@ void EntityParameterizedDataTable::SetSourceFile(std::string sourceFileName, std
 	_sourceFilePath = sourceFilePath;
 }
 
-void EntityParameterizedDataTable::createProperties(HeaderOrientation defaultOrientation)
+void EntityParameterizedDataTable::createProperties(ot::TableHeaderOrientation defaultOrientation)
 {
 
 	auto numberOfRowsProperty = new EntityPropertiesInteger("Number of rows", _numberOfRows);
@@ -37,13 +37,13 @@ void EntityParameterizedDataTable::createProperties(HeaderOrientation defaultOri
 	filePathProperty->setReadOnly(true);
 	getProperties().createProperty(filePathProperty, "Source file");
 
-	if (defaultOrientation == HeaderOrientation::vertical)
+	if (defaultOrientation == ot::TableHeaderOrientation::vertical)
 	{
 		_minRow = 0;
 		_minCol = 1;
 	}
 
-	EntityPropertiesSelection::createProperty("Table header", "Header position", { _headerSettingHorizontal,_headerSettingVertical }, GetHeaderOrientation(defaultOrientation) , _defaulCategory, getProperties());
+	EntityPropertiesSelection::createProperty("Table header", "Header position", { ot::toString(ot::TableHeaderOrientation::horizontal),ot::toString(ot::TableHeaderOrientation::vertical) }, ot::toString(defaultOrientation) , _defaulCategory, getProperties());
 
 	EntityResultTable<std::string>::createProperties();
 }
@@ -54,18 +54,11 @@ std::string EntityParameterizedDataTable::getSelectedHeaderOrientationString()
 	return selectedOrientation->getValue();
 }
 
-EntityParameterizedDataTable::HeaderOrientation EntityParameterizedDataTable::getSelectedHeaderOrientation()
+ot::TableHeaderOrientation EntityParameterizedDataTable::getSelectedHeaderOrientation()
 {
 	auto selectedOrientation = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Header position"));
-	if (selectedOrientation->getValue() == _headerSettingHorizontal)
-	{
-		return HeaderOrientation::horizontal;
-	}
-	else
-	{
-		return HeaderOrientation::vertical;
-	}
-
+	ot::TableHeaderOrientation orientation = ot::stringToHeaderOrientation(selectedOrientation->getValue());
+	return orientation;
 }
 
 void EntityParameterizedDataTable::AddStorageData(bsoncxx::builder::basic::document & storage)
@@ -106,17 +99,3 @@ void EntityParameterizedDataTable::readSpecificDataFromDataBase(bsoncxx::documen
 		_numberOfUniquesInColumns.push_back(static_cast<uint32_t>(data.get_int32()));
 	}
 }
-
-std::string EntityParameterizedDataTable::GetHeaderOrientation(HeaderOrientation orientation)
-{
-	std::string temp = EntityParameterizedDataTable::_orientationToString[orientation];
-	return temp;
-}
-
-const std::string EntityParameterizedDataTable::_headerSettingHorizontal = "First row";
-const std::string EntityParameterizedDataTable::_headerSettingVertical = "First column";
-
-std::map<EntityParameterizedDataTable::HeaderOrientation, const std::string> EntityParameterizedDataTable::_orientationToString{ 
-	{HeaderOrientation::horizontal, EntityParameterizedDataTable::_headerSettingHorizontal}, 
-	{HeaderOrientation::vertical, EntityParameterizedDataTable::_headerSettingVertical}
-};

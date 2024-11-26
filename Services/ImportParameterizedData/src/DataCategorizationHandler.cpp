@@ -21,7 +21,7 @@ DataCategorizationHandler::DataCategorizationHandler(std::string _baseFolder, st
 
 }
 
-std::string DataCategorizationHandler::markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
+void DataCategorizationHandler::markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
 {
 	ensureEssentials();
 	clearBufferedMetadata();
@@ -43,13 +43,12 @@ std::string DataCategorizationHandler::markSelectionForStorage(const std::list<o
 			EntityBase* baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), versionID, Application::instance()->getClassFactory());
 			selectedEntities.push_back(baseEnt);
 		}
-		std::string returnValue("");
+		std::string tableName("");
 		if (isValidSelection(selectedEntities))
 		{
-			const std::string tableName = getTableFromSelection(selectedEntities);
+			tableName = getTableFromSelection(selectedEntities);
 			bufferCorrespondingMetadataNames(selectedEntities,_category);
 			setBackgroundColour(_category);
-			returnValue = tableName;
 		}
 
 		for (EntityBase*& selectedEntity : selectedEntities)
@@ -57,8 +56,11 @@ std::string DataCategorizationHandler::markSelectionForStorage(const std::list<o
 			delete selectedEntity;
 			selectedEntity = nullptr;
 		}
+		if (tableName != "")
+		{
+			requestRangeSelection(tableName);
+		}
 		
-		return returnValue;
 	}
 	catch (std::exception e)
 	{
@@ -69,7 +71,6 @@ std::string DataCategorizationHandler::markSelectionForStorage(const std::list<o
 			delete entity;
 			entity = nullptr;
 		}
-		return "";
 	}
 }
 
@@ -337,6 +338,24 @@ void DataCategorizationHandler::addNewCategorizationEntity(std::string name, Ent
 	}
 }
 
+void DataCategorizationHandler::requestRangeSelection(const std::string& _tableName)
+{
+	const std::string serviceURL = Application::instance()->getServiceURL();
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SetCurrentSelectionBackground, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_tableName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_RequestCallback, true, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(serviceURL, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("CreateSelectedRangeEntity", doc.GetAllocator()), doc.GetAllocator());
+
+	ot::JsonObject obj;
+	m_backgroundColour.addToJsonObject(obj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Color, obj, doc.GetAllocator());
+
+	std::string tmp;
+	Application::instance()->uiComponent()->sendMessage(true, doc, tmp);
+}
+
 ot::TableRange DataCategorizationHandler::userRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation)
 {
 	//First we switch from base-1 index to base -0 index
@@ -370,6 +389,17 @@ ot::TableRange DataCategorizationHandler::selectionRangeToUserRange(const ot::Ta
 	int rangeColumnRight = _range.getRightColumn() + 1;
 	ot::TableRange userRange(rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
 	return userRange;
+}
+
+ot::TableRange DataCategorizationHandler::userRangeToSelectionRange(const ot::TableRange& _range)
+{
+	//We switch base-1 to base-0 index
+	int rangeRowBottom = _range.getBottomRow() - 1;
+	int rangeRowTop = _range.getTopRow() - 1;
+	int rangeColumnLeft = _range.getLeftColumn() - 1;
+	int rangeColumnRight = _range.getRightColumn() - 1;
+	ot::TableRange selectionRange(rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
+	return selectionRange;
 }
 
 ot::TableRange DataCategorizationHandler::selectionRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation)
@@ -487,7 +517,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 			// We need to initialise the entityProperty with the python folder
 			ot::EntityInformation entityInfo;
 			std::list<std::string> allScripts = _modelComponent->getListOfFolderItems(ot::FolderNames::PythonScriptFolder);
-			_modelComponent->getEntityInformation(*allScripts.begin(), entityInfo);
+
 			if (allScripts.size() > 0)
 			{
 				_modelComponent->getEntityInformation(*allScripts.begin(), entityInfo);
@@ -506,8 +536,8 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 			// The name of the entity should correspond to the header value of the table. This header value will later be used as key of the database entry
 			std::string name = "";
 			ot::MatrixEntryPointer matrixPtr;
-			const std::string selectedTableOrientation =	tableRange->getTableOrientation();
-			if (selectedTableOrientation == EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
+			const ot::TableHeaderOrientation selectedTableOrientation =	tableRange->getTableOrientation();
+			if (selectedTableOrientation == ot::TableHeaderOrientation::horizontal)
 			{
 				matrixPtr.m_row = 0;
 				for (matrixPtr.m_column = static_cast<uint32_t>(_ranges[i].getLeftColumn()); matrixPtr.m_column <= static_cast<uint32_t>(_ranges[i].getRightColumn()); matrixPtr.m_column++)
@@ -830,7 +860,7 @@ std::tuple<std::list<std::string>, std::list<std::string>> DataCategorizationHan
 			newSelection->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, selection->getScriptName(), entityInfo.getEntityID(),dataType);
 			
 			
-			newSelection->SetTableProperties(selection->getTableName(),entityInfo.getEntityID(),selection->getTableOrientation());
+			newSelection->SetTableProperties(selection->getTableName(),entityInfo.getEntityID(),ot::toString(selection->getTableOrientation()));
 			
 			ot::TableRange selectedRange = selection->getSelectedRange();
 			newSelection->setRange(selectedRange);
@@ -902,7 +932,7 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 	}
 }
 
-void DataCategorizationHandler::SelectRange(ot::UIDList iDs, ot::UIDList versions)
+void DataCategorizationHandler::selectRange(ot::UIDList iDs, ot::UIDList versions)
 {
 	std::map<std::string, std::map<uint32_t,std::list<ot::TableRange>>> rangesByColourIDByTableNames;
 	auto versionIt = versions.begin();
@@ -915,7 +945,8 @@ void DataCategorizationHandler::SelectRange(ot::UIDList iDs, ot::UIDList version
 		
 		//First we get the selected range
 		
-		ot::TableRange selectedRange =  rangeEntity->getSelectedRange();
+		ot::TableRange userRange =  rangeEntity->getSelectedRange();
+		ot::TableRange selectionRange =	userRangeToSelectionRange(userRange);
 
 		//Now we determine the colour for the range
 		const std::string tableName = rangeEntity->getTableName();
@@ -947,7 +978,7 @@ void DataCategorizationHandler::SelectRange(ot::UIDList iDs, ot::UIDList version
 		}
 
 		//Now we store the range for its colour and table 
-		rangesByColourIDByTableNames[tableName][colourID].push_back(selectedRange);
+		rangesByColourIDByTableNames[tableName][colourID].push_back(selectionRange);
 	}
 
 	bool clearSelection = true;

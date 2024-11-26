@@ -16,7 +16,6 @@
 #include "EntityParameterizedDataTable.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Color.h"
-#include "OTGui/TableRange.h"
 #include "OTServiceFoundation/EntityInformation.h"
 #include "MetadataAssemblyData.h"
 #include "EntityTableSelectedRanges.h"
@@ -39,22 +38,21 @@ public:
 	DataCategorizationHandler(const DataCategorizationHandler& other) = delete;
 	DataCategorizationHandler& operator=(const DataCategorizationHandler& other) = delete;
 	
-	//! @brief If the selection is valid it returns the table name. Otherwise the string is empty.
-	std::string markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities,EntityParameterizedDataCategorization::DataCategorie _category);
+	void markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities,EntityParameterizedDataCategorization::DataCategorie _category);
 	
 
 	
 	void storeSelectionRanges(const std::vector<ot::TableRange>& _ranges);
 	void CreateNewScriptDescribedMSMD();
 
-	void SelectRange(ot::UIDList iDs, ot::UIDList versions);
+	void selectRange(ot::UIDList iDs, ot::UIDList versions);
 
 	inline void ensureEssentials();
 
-	ot::Color GetSerializedColour() const
-	{ 
-		return m_backgroundColour;
-	};
+	static ot::TableRange userRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation);
+	static ot::TableRange selectionRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation);
+	static ot::TableRange selectionRangeToUserRange(const ot::TableRange& _range);
+	static ot::TableRange userRangeToSelectionRange(const ot::TableRange& _range);
 
 private:
 	const std::string m_baseFolder;
@@ -94,10 +92,11 @@ private:
 	void addSMDEntries(std::list<EntityBase*>& _selectedEntities);
 	void addParamOrQuantityEntries(std::list<EntityBase*>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
 	void addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive);
+	void requestRangeSelection(const std::string& _tableName);
 
-	ot::TableRange userRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation);
-	ot::TableRange selectionRangeToMatrixRange(const ot::TableRange& _range,const ot::TableHeaderOrientation& _headerOrientation);
-	ot::TableRange selectionRangeToUserRange(const ot::TableRange& _range);
+
+
+
 
 	void requestToOpenTable(const std::string& _tableName);
 	void requestColouringRanges(bool _clearSelection ,const std::string& _tableName, const ot::Color& _colour, const std::list<ot::TableRange>& ranges);

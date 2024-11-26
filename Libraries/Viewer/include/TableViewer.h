@@ -41,7 +41,7 @@ public:
 	 * 
 	 * \param table
 	 */
-	bool CreateNewTable(std::shared_ptr<EntityResultTable<std::string>> table, EntityParameterizedDataTable::HeaderOrientation orientation = EntityParameterizedDataTable::HeaderOrientation::horizontal);
+	bool CreateNewTable(std::shared_ptr<EntityResultTable<std::string>> table, ot::TableHeaderOrientation orientation = ot::TableHeaderOrientation::horizontal);
 	std::vector <ot::TableRange> GetSelectedRanges();
 	void ChangeColorOfSelection(ot::Color& background);
 	void SelectRanges(std::vector <ot::TableRange>& ranges);
@@ -56,7 +56,7 @@ private:
 	std::shared_ptr <EntityResultTable<std::string>> _activeTable = nullptr;
 	Table* _table = nullptr;
 
-	EntityParameterizedDataTable::HeaderOrientation	_tableOrientation = EntityParameterizedDataTable::HeaderOrientation::horizontal;
+	ot::TableHeaderOrientation	_tableOrientation = ot::TableHeaderOrientation::horizontal;
 	uint32_t _shownMinCol = 0;
 	uint32_t _shownMaxCol = 0;
 	uint32_t _shownMinRow = 0;

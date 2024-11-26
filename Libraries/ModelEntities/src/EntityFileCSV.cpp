@@ -26,14 +26,8 @@ std::string EntityFileCSV::getColumnDelimiter()
 ot::TableHeaderOrientation EntityFileCSV::getHeaderOrientation()
 {
 	auto selectedOrientation = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Header position"));
-	if (selectedOrientation->getValue() == m_headerSettingHorizontal)
-	{
-		return ot::TableHeaderOrientation::horizontal;
-	}
-	else
-	{
-		return ot::TableHeaderOrientation::vertical;
-	}
+	ot::TableHeaderOrientation orientation =ot::stringToHeaderOrientation(selectedOrientation->getValue());
+	return orientation;
 }
 
 bool EntityFileCSV::visualiseText()
@@ -46,7 +40,7 @@ void EntityFileCSV::setSpecializedProperties()
 	EntityFileText::setSpecializedProperties();
 	EntityPropertiesString::createProperty("CSV Properties", "Row Delimiter", m_rowDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 	EntityPropertiesString::createProperty("CSV Properties", "Column Delimiter", m_columnDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
-	EntityPropertiesSelection::createProperty("Table header", "Header position", { m_headerSettingHorizontal,m_headerSettingVertical }, m_headerSettingHorizontal, "tableInformation", getProperties());
+	EntityPropertiesSelection::createProperty("Table header", "Header position", { ot::toString(ot::TableHeaderOrientation::horizontal), ot::toString(ot::TableHeaderOrientation::vertical) }, ot::toString(ot::TableHeaderOrientation::horizontal), "tableInformation", getProperties());
 }
 
 void EntityFileCSV::AddStorageData(bsoncxx::builder::basic::document & storage)
