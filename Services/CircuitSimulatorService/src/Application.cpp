@@ -331,12 +331,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationTypeProperty != nullptr);
 
-	//const int sessionCount = Application::instance()->getSessionCount();
-	//const int serviceID = Application::instance()->getServiceIDAsInt();
-	//if (_subprocessHandler == nullptr)
-	//{
-	//	_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
-	//}
+
 
 	std::string name =  extractStringAfterDelimiter(circuitName->getValueName(), '/', 1);
 	std::string solverName = solver.getEntityName();
@@ -363,6 +358,9 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	}
 	m_blockEntityHandler.createResultCurves(solverName,simulationTypeProperty->getValue(),circuitName->getValueName());
 	m_ngSpice.clearBufferStructure(name);
+
+	//Tesing
+	//m_subprocessHandler->stopSubprocess();
 	
 }
 
@@ -467,7 +465,7 @@ std::string Application::handleRemoveGraphicsItemConnection(ot::JsonDocument& _d
 
 std::string Application::handleItemChanged(ot::JsonDocument& _document) {
 	std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-	ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::create(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	ot::GraphicsItemCfg* itemConfig = ot::GraphicsItemCfgFactory::instance().createFromJSON(ot::json::getObject(_document, OT_ACTION_PARAM_Config), OT_JSON_MEMBER_GraphicsItemCfgType);
 	if (!itemConfig) return "";
 
 	const ot::UID blockID = itemConfig->getUid();
@@ -502,12 +500,16 @@ void Application::run(void) {
 		assert(0);
 	}
 
-	/*const int sessionCount = Application::instance()->getSessionCount();
-	const int serviceID = Application::instance()->getServiceIDAsInt();
-	if (_subprocessHandler == nullptr)
-	{
-		_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
-	}*/
+	//Testing
+	//const int sessionCount = Application::instance()->getSessionCount();
+	//const int serviceID = Application::instance()->getServiceIDAsInt();
+	//if (m_subprocessHandler == nullptr)
+	//{
+	//	m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
+	//}
+
+	//m_subprocessHandler->startSubprocess();
+
 }
 
 std::string Application::processAction(const std::string & _action, ot::JsonDocument & _doc) {
@@ -531,13 +533,13 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 	/*m_blockEntityHandler.setPackageName("Circuit"); */
 	m_blockEntityHandler.OrderUIToCreateBlockPicker();
 
-	//if (_subprocessHandler == nullptr)
+	//if (m_subprocessHandler == nullptr)
 	//{
 	//	const int sessionCount = Application::instance()->getSessionCount();
 	//	const int serviceID = Application::instance()->getServiceIDAsInt();
-	//	_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
+	//	m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
 	//}
-	//_subprocessHandler->setUIComponent(_ui);
+	//m_subprocessHandler->setUIComponent(_ui);
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 
@@ -547,15 +549,16 @@ void Application::uiDisconnected(const ot::components::UiComponent * _ui) {
 
 }
 
+
 void Application::modelConnected(ot::components::ModelComponent * _model) {
 	m_blockEntityHandler.setModelComponent(_model);
-	//if (_subprocessHandler == nullptr)
+	//if (m_subprocessHandler == nullptr)
 	//{
 	//	const int sessionCount = Application::instance()->getSessionCount();
 	//	const int serviceID = Application::instance()->getServiceIDAsInt();
-	//	_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
+	//	m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
 	//}
-	//_subprocessHandler->setModelComponent(_model);
+	//m_subprocessHandler->setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model) {

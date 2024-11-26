@@ -41,7 +41,7 @@ private:
 	NGSpice m_ngSpice;
 	BlockEntityHandler m_blockEntityHandler;
 	std::list<ot::UID>	selectedEntities;
-	//SubprocessHandler* _subprocessHandler = nullptr;
+	//SubprocessHandler* m_subprocessHandler = nullptr;
 
 	
 public:

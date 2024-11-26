@@ -55,6 +55,10 @@ void DisConnect()
 
 
 int main(int argc, char* argv[], char* envp[]){
+
+
+
+
 	QApplication a(argc, argv);
 #ifdef _RELEASEDEBUG
 	const std::string serverName = "TestServer";
