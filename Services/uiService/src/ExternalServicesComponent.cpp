@@ -3753,7 +3753,15 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	ot::TextEditorCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	ot::TextEditorView* editor = AppBase::instance()->findOrCreateTextEditor(config, info, insertFlags);
+	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(config.getEntityName());
+	if (editor) {
+		editor->setupFromConfig(config, true);
+		editor->setAsCurrentViewTab();
+	}
+	else {
+		editor = AppBase::instance()->findOrCreateTextEditor(config, info, insertFlags);
+	}
+
 	editor->setContentChanged(false);
 	
 	const std::string& name = editor->getViewData().getEntityName();
@@ -3809,23 +3817,29 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 	info.setFromJsonObject(_document.GetConstObject());
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
-	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
-		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	if (_document.HasMember(OT_ACTION_PARAM_VIEW_SetActiveView)) {
+		if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
+			insertFlags |= ot::WidgetView::KeepCurrentFocus;
+		}
 	}
-
-	bool overrideCurrentContent = ot::json::getBool(_document, OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent);
-
+	
+	bool overrideCurrentContent = true;
+	if (_document.HasMember(OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent)) {
+		overrideCurrentContent = ot::json::getBool(_document, OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent);
+	}
+	
 	ot::TableCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
 	ot::TableView* table = AppBase::instance()->findTable(config.getEntityName());
-	if (table == nullptr)
-	{
+	if (table == nullptr) {
 		table = AppBase::instance()->createNewTable(config, info, insertFlags);
 	}
-	else if (overrideCurrentContent)
-	{
+	else if (overrideCurrentContent) {
 		table->setupFromConfig(config);
+		if (!(insertFlags & ot::WidgetView::KeepCurrentFocus)) {
+			table->setAsCurrentViewTab();
+		}
 	}
 	
 	table->setContentChanged(false);
@@ -3875,6 +3889,8 @@ std::string ExternalServicesComponent::handleInsertTableRowAfter(ot::JsonDocumen
 	int rowIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
 	table->insertRow(rowIndex + 1);
 	table->setContentChanged(true);
+
+	table->setAsCurrentViewTab();
 	return "";
 }
 
@@ -3890,6 +3906,8 @@ std::string ExternalServicesComponent::handleInsertTableRowBefore(ot::JsonDocume
 	int rowIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
 	table->insertRow(rowIndex);
 	table->setContentChanged(true);
+
+	table->setAsCurrentViewTab();
 	return "";
 }
 
@@ -3905,6 +3923,8 @@ std::string ExternalServicesComponent::handleRemoveTableRow(ot::JsonDocument& _d
 	int rowIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
 	table->removeRow(rowIndex);
 	table->setContentChanged(true);
+
+	table->setAsCurrentViewTab();
 	return "";
 }
 
@@ -3920,6 +3940,8 @@ std::string ExternalServicesComponent::handleInsertTableColumnAfter(ot::JsonDocu
 	int columnIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
 	table->insertColumn(columnIndex + 1);
 	table->setContentChanged(true);
+
+	table->setAsCurrentViewTab();
 	return "";
 }
 
@@ -3935,6 +3957,7 @@ std::string ExternalServicesComponent::handleInsertTableColumnBefore(ot::JsonDoc
 	int columnIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
 	table->insertColumn(columnIndex);
 	table->setContentChanged(true);
+	table->setAsCurrentViewTab();
 	return "";
 }
 
@@ -3950,6 +3973,8 @@ std::string ExternalServicesComponent::handleRemoveTableColumn(ot::JsonDocument&
 	int columnIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
 	table->removeColumn(columnIndex);
 	table->setContentChanged(true);
+
+	table->setAsCurrentViewTab();
 	return "";
 }
 
@@ -3997,6 +4022,8 @@ std::string ExternalServicesComponent::handleSetTableSelection(ot::JsonDocument&
 	for (const ot::TableRange& range : ranges) {		
 		table->setRangeSelected(ot::QtFactory::toQTableRange(range), true);
 	}
+
+	table->setAsCurrentViewTab();
 
 	return "";
 }
@@ -4080,6 +4107,8 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 	if (callback) {
 		this->sendTableSelectionInformation(callbackUrl, callbackFunction, table);
 	}
+
+	table->setAsCurrentViewTab();
 
 	return "";
 }
