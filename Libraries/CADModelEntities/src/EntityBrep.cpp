@@ -3,7 +3,7 @@
 
 #include "EntityBrep.h"
 #include "DataBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "Bnd_Box.hxx"
 #include "BRepBndLib.hxx"

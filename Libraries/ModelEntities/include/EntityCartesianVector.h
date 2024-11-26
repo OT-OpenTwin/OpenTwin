@@ -3,7 +3,7 @@
 
 #include "EntityCompressedVector.h"
 #include "EntityResultBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include <list>
 #include <vector>

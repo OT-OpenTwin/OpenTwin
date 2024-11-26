@@ -4,8 +4,8 @@
 EntityBlockDataDimensionReducer::EntityBlockDataDimensionReducer(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlock(ID,parent,obs,ms,factory,owner)
 {
-	_navigationTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_navigationTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
 	_blockTitle = "Matrix Element Selection";
 
 	const std::string inputConnectorName = "In";

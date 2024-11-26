@@ -13,8 +13,8 @@ EntityBlockCircuitDiode::EntityBlockCircuitDiode(ot::UID ID, EntityBase* parent,
 	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
 {
 
-	_navigationTreeIconName = "Diod2";
-	_navigationTreeIconNameHidden = "Diod2";
+	_navigationOldTreeIconName = "Diod2";
+	_navigationOldTreeIconNameHidden = "Diod2";
 	_blockTitle = "Diode";
 	const std::string connectorNameLeft = "Left2";
 	m_LeftConnector = { ot::ConnectorType::Out,connectorNameLeft,connectorNameLeft };

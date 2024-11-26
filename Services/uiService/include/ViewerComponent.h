@@ -113,16 +113,16 @@ public:
 	void refreshSelection(ViewerUIDtype visualizationModelID);
 	void selectObject(ModelUIDtype visualizationModelID, ak::UID entityID);
 	void addNodeFromFacetData(ViewerUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3],
-		double edgeColorRGB[3], ViewerUIDtype modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes,
+		double edgeColorRGB[3], ViewerUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes,
 		std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNameMap, std::string &errors, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected);
-	void addNodeFromFacetDataBase(ViewerUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
+	void addNodeFromFacetDataBase(ViewerUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, ModelUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
 		double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ak::UID entityID, ak::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation);
-	void addVisualizationContainerNode(ViewerUIDtype visModelID, const std::string &treeName, ViewerUIDtype modelEntityID, const TreeIcon &treeIcons, bool editable);
+	void addVisualizationContainerNode(ViewerUIDtype visModelID, const std::string &treeName, ViewerUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool editable);
 
-	virtual void addVisualizationVis2D3DNode(ViewerUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, ViewerUIDtype visualizationDataID, ViewerUIDtype visualizationDataVersion);
+	virtual void addVisualizationVis2D3DNode(ViewerUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, ViewerUIDtype visualizationDataID, ViewerUIDtype visualizationDataVersion);
 	virtual void updateVisualizationVis2D3DNode(ViewerUIDtype visModelID, ViewerUIDtype modelEntityID, const std::string &projectName, ViewerUIDtype visualizationDataID, ViewerUIDtype visualizationDataVersion);
 
-	void addVisualizationAnnotationNode(ViewerUIDtype visModelID, const std::string &treeName, ViewerUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden, 
+	void addVisualizationAnnotationNode(ViewerUIDtype visModelID, const std::string &treeName, ViewerUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, 
 		const double edgeColorRGB[3],
 		const std::vector<std::array<double, 3>> &points,
 		const std::vector<std::array<double, 3>> &points_rgb,

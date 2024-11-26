@@ -617,7 +617,7 @@ void ViewerComponent::selectObject(ModelUIDtype visualizationModelID, ot::UID en
 }
 
 void ViewerComponent::addNodeFromFacetData(ViewerUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3],
-										   double edgeColorRGB[3], ViewerUIDtype modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes,
+										   double edgeColorRGB[3], ViewerUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling, double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes,
 										   std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNameMap, std::string &errors,
 										   bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected)
 {
@@ -633,7 +633,7 @@ void ViewerComponent::addNodeFromFacetData(ViewerUIDtype visModelID, const std::
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-void ViewerComponent::addNodeFromFacetDataBase(ViewerUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
+void ViewerComponent::addNodeFromFacetDataBase(ViewerUIDtype visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, ModelUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
 		double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ak::UID entityID, ak::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation
 ) {
 	try {
@@ -645,7 +645,7 @@ void ViewerComponent::addNodeFromFacetDataBase(ViewerUIDtype visModelID, const s
 	catch (...) { throw ak::aException("Unknown error", "ViewerComponent::addNodeFromFacetData()"); }
 }
 
-void ViewerComponent::addVisualizationContainerNode(ViewerUIDtype visModelID, const std::string &treeName, ViewerUIDtype modelEntityID, const TreeIcon &treeIcons, bool editable)
+void ViewerComponent::addVisualizationContainerNode(ViewerUIDtype visModelID, const std::string &treeName, ViewerUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool editable)
 {
 	try {
 		try {
@@ -658,7 +658,7 @@ void ViewerComponent::addVisualizationContainerNode(ViewerUIDtype visModelID, co
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-void ViewerComponent::addVisualizationVis2D3DNode(ViewerUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, ViewerUIDtype visualizationDataID, ViewerUIDtype visualizationDataVersion)
+void ViewerComponent::addVisualizationVis2D3DNode(ViewerUIDtype visModelID, const std::string &treeName, ModelUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, ViewerUIDtype visualizationDataID, ViewerUIDtype visualizationDataVersion)
 {
 	try {
 		try {
@@ -684,7 +684,7 @@ void ViewerComponent::updateVisualizationVis2D3DNode(ViewerUIDtype visModelID, V
 	catch (const ak::aException & _e) { AppBase::instance()->showErrorPrompt(_e.what(), "Error"); }
 }
 
-void ViewerComponent::addVisualizationAnnotationNode(ViewerUIDtype visModelID, const std::string &treeName, ViewerUIDtype modelEntityID, const TreeIcon &treeIcons, bool isHidden,
+void ViewerComponent::addVisualizationAnnotationNode(ViewerUIDtype visModelID, const std::string &treeName, ViewerUIDtype modelEntityID, const OldTreeIcon &treeIcons, bool isHidden,
 	const double edgeColorRGB[3],
 	const std::vector<std::array<double, 3>> &points,
 	const std::vector<std::array<double, 3>> &points_rgb,

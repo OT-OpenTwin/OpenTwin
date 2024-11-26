@@ -12,7 +12,7 @@ class EntityMeshTet;
 #include <map>
 #include <string>
 
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 namespace gmsh
 {

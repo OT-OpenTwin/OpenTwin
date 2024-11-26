@@ -3,7 +3,7 @@
 
 // OpenTwin header
 #include "OTGui/PropertyGridCfg.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 // std header
 #include <string>

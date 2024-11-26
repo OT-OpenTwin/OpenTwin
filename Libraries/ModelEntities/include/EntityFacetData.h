@@ -3,7 +3,7 @@
 
 #include "EntityBase.h"
 #include "Geometry.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include <list>
 #include <vector>

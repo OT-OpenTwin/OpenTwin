@@ -3,7 +3,7 @@
 
 #include "EntityVis2D3D.h"
 #include "EntityResultBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 #include "PropertyBundlePlane.h"
 #include "PropertyBundleScaling.h"
 #include "PropertyBundleVisUnstructuredVector.h"

@@ -3,7 +3,7 @@
 
 #include "EntityMaterial.h"
 #include "DataBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -57,7 +57,7 @@ void EntityMaterial::addVisualizationNodes(void)
 
 void EntityMaterial::addVisualizationItem(bool isHidden)
 {
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "MaterialVisible";
 	treeIcons.hiddenIcon = "MaterialHidden";

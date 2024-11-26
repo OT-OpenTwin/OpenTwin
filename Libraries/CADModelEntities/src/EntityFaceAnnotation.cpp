@@ -5,7 +5,7 @@
 #include "EntityFacetData.h"
 #include "EntityBrep.h"
 #include "DataBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -142,7 +142,7 @@ void EntityFaceAnnotation::updateVisualization(bool isHidden)
 	std::string errors;
 
 	// Note: this call will modify a potentially existing node rather than creating a new one
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "FaceAnnotationVisible";
 	treeIcons.hiddenIcon = "FaceAnnotationHidden";

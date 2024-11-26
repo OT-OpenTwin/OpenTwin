@@ -4,7 +4,7 @@
 #include "EntityAnnotation.h"
 #include "EntityAnnotationData.h"
 #include "DataBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include <OTCommunication/ActionTypes.h>
 #include <bsoncxx/builder/basic/array.hpp>
@@ -198,7 +198,7 @@ void EntityAnnotation::addVisualizationItem(bool isHidden)
 		assert(annotationDataStorageId != -1);
 	}
 
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "WarningVisible";
 	treeIcons.hiddenIcon = "WarningHidden";

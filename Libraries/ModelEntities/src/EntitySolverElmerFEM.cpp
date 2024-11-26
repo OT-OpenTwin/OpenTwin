@@ -1,6 +1,6 @@
 
 #include "EntitySolverElmerFEM.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

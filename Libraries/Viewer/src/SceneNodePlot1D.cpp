@@ -93,11 +93,11 @@ const ot::Plot1DCurveInfoCfg& SceneNodePlot1D::getCurveInfo(size_t _index) const
 void SceneNodePlot1D::applyConfigInfo(void) {
 	this->setName(m_config.getName());
 	this->setModelEntityID(m_config.getUid());
-	TreeIcon icons;
+	OldTreeIcon icons;
 	icons.size = 32;
-	icons.visibleIcon = m_config.getTreeIcons().getVisibleIcon();
-	icons.hiddenIcon = m_config.getTreeIcons().getHiddenIcon();
-	this->setTreeIcons(icons);
+	icons.visibleIcon = m_config.getOldTreeIcons().getVisibleIcon();
+	icons.hiddenIcon = m_config.getOldTreeIcons().getHiddenIcon();
+	this->setOldTreeIcons(icons);
 }
 
 bool SceneNodePlot1D::isAnyChildSelectedAndVisible(SceneNodeBase *root)

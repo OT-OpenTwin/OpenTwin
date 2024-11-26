@@ -4,7 +4,7 @@
 #include "EntityResult1DCurve.h"
 #include "EntityResult1DCurveData.h"
 #include "DataBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "OTGui/Plot1DCurveInfoCfg.h"
 #include "OTCommunication/ActionTypes.h"
@@ -100,7 +100,7 @@ void EntityResult1DCurve::addVisualizationNodes(void)
 {
 	if (!getName().empty())
 	{
-		TreeIcon treeIcons;
+		OldTreeIcon treeIcons;
 		treeIcons.size = 32;
 		treeIcons.visibleIcon = "TextVisible";
 		treeIcons.hiddenIcon = "TextHidden";

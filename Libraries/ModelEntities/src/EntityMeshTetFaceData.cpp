@@ -3,7 +3,7 @@
 #include "EntityMeshTetFace.h"
 #include "EntityMeshTetInfo.h"
 #include "DataBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

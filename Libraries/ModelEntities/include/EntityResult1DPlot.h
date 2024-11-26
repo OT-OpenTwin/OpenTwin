@@ -2,7 +2,7 @@
 #pragma warning(disable : 4251)
 
 #include "EntityContainer.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 #include "OTCore/UIDNamePair.h"
 #include "OTGui/Plot1DDataBaseCfg.h"
 

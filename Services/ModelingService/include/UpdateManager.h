@@ -1,7 +1,7 @@
 #pragma once
 
 #include "OTCore/CoreTypes.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "TopoDS_TShape.hxx"
 

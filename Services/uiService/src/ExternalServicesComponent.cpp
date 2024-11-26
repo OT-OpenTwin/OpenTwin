@@ -1817,9 +1817,9 @@ std::vector<std::array<double, 3>> ExternalServicesComponent::getVectorDoubleArr
 	return result;
 }
 
-TreeIcon ExternalServicesComponent::getTreeIconsFromDocument(ot::JsonDocument &doc)
+OldTreeIcon ExternalServicesComponent::getOldTreeIconsFromDocument(ot::JsonDocument &doc)
 {
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 
 	try {
 		treeIcons.size = doc[OT_ACTION_PARAM_UI_TREE_IconSize].GetInt();
@@ -2923,7 +2923,7 @@ std::string ExternalServicesComponent::handleAddNodeFromFacetData(ot::JsonDocume
 	std::list<Geometry::Edge> edges;
 	getListEdgeFromDocument(_document, OT_ACTION_PARAM_MODEL_ITM_Edges, edges);
 	std::string errors = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_Errors);
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 
 	std::map<ot::UID, std::string> faceNameMap;
 
@@ -2955,7 +2955,7 @@ std::string ExternalServicesComponent::handleAddNodeFromDataBase(ot::JsonDocumen
 	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
 	ModelUIDtype entityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 	ModelUIDtype entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 	std::vector<double> transformation;
 
 	if (ot::json::exists(_document, OT_ACTION_PARAM_MODEL_ITM_Transformation))
@@ -2980,7 +2980,7 @@ std::string ExternalServicesComponent::handleAddContainerNode(ot::JsonDocument& 
 	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 	std::string treeName = ot::json::getString(_document, OT_ACTION_PARAM_UI_TREE_Name);
 	ModelUIDtype modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
 
 	AppBase::instance()->getViewerComponent()->addVisualizationContainerNode(visModelID, treeName, modelEntityID, treeIcons, editable);
@@ -2995,7 +2995,7 @@ std::string ExternalServicesComponent::handleAddSceneNode(ot::JsonDocument& _doc
 	ot::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 	std::string treeName = ot::json::getString(_document, OT_ACTION_PARAM_UI_TREE_Name);
 	ot::UID modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
 	ot::VisualisationTypes visualisationTypes;
 	visualisationTypes.setFromJsonObject(_document.GetConstObject());
@@ -3008,7 +3008,7 @@ std::string ExternalServicesComponent::handleAddVis2D3DNode(ot::JsonDocument& _d
 	ak::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
 	std::string treeName = ot::json::getString(_document, OT_ACTION_PARAM_UI_TREE_Name);
 	ModelUIDtype modelEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 	bool editable = _document[OT_ACTION_PARAM_MODEL_ITM_IsEditable].GetBool();
 	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
 	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
@@ -3174,7 +3174,7 @@ std::string ExternalServicesComponent::handleAddAnnotationNode(ot::JsonDocument&
 	std::vector<std::array<double, 3>> triangle_p2 = getVectorDoubleArrayFromDocument(_document, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_p2);
 	std::vector<std::array<double, 3>> triangle_p3 = getVectorDoubleArrayFromDocument(_document, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_p3);
 	std::vector<std::array<double, 3>> triangle_rgb = getVectorDoubleArrayFromDocument(_document, OT_ACTION_PARAM_MODEL_ITM_Points_Triangle_Color);
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 
 	AppBase::instance()->getViewerComponent()->addVisualizationAnnotationNode(visModelID, name, uid, treeIcons, isHidden, edgeColorRGB, points, points_rgb, triangle_p1, triangle_p2, triangle_p3, triangle_rgb);
 	
@@ -3189,7 +3189,7 @@ std::string ExternalServicesComponent::handleAddAnnotationNodeFromDataBase(ot::J
 	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
 	ak::UID entityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 	ak::UID entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 
 	ViewerAPI::addVisualizationAnnotationNodeDataBase(visModelID, name, uid, treeIcons, isHidden, projectName, entityID, entityVersion);
 
@@ -3208,7 +3208,7 @@ std::string ExternalServicesComponent::handleAddMeshNodeFromFacetDataBase(ot::Js
 	ak::UID entityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 	ak::UID entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 	bool displayTetEdges = _document[OT_ACTION_PARAM_MODEL_TET_DISPLAYEDGES].GetBool();
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 
 	ViewerAPI::addVisualizationMeshNodeFromFacetDataBase(visModelID, name, uid, treeIcons, edgeColorRGB, displayTetEdges, projectName, entityID, entityVersion);
 	
@@ -3237,7 +3237,7 @@ std::string ExternalServicesComponent::handleAddCartesianMeshNode(ot::JsonDocume
 	ak::UID faceListEntityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
 	ak::UID nodeListEntityID = _document[OT_ACTION_PARAM_MESH_NODE_ID].GetUint64();
 	ak::UID nodeListEntityVersion = _document[OT_ACTION_PARAM_MESH_NODE_VERSION].GetUint64();
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 
 	ViewerAPI::addVisualizationCartesianMeshNode(visModelID, name, uid, treeIcons, isHidden, edgeColorRGB, meshLineColorRGB, showMeshLines, meshCoordsX, meshCoordsY, meshCoordsZ, projectName, faceListEntityID, faceListEntityVersion, nodeListEntityID, nodeListEntityVersion);
 	
@@ -3260,7 +3260,7 @@ std::string ExternalServicesComponent::handleAddCartesianMeshItem(ot::JsonDocume
 	ak::UID uid = _document[OT_ACTION_PARAM_UI_UID].GetUint64();
 	bool isHidden = _document[OT_ACTION_PARAM_MODEL_ITM_IsHidden].GetBool();
 	std::vector<int> facesList = ot::json::getIntVector(_document, OT_ACTION_PARAM_MODEL_ITM_FacesList);
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 	double colorRGB[3];
 	colorRGB[0] = _document[OT_ACTION_PARAM_MESH_ITEM_COLOR_R].GetDouble();
 	colorRGB[1] = _document[OT_ACTION_PARAM_MESH_ITEM_COLOR_G].GetDouble();
@@ -3289,7 +3289,7 @@ std::string ExternalServicesComponent::handleAddMeshItemFromFacetDatabase(ot::Js
 	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
 	ak::UID entityID = _document[OT_ACTION_PARAM_MODEL_ITM_ID].GetUint64();
 	ak::UID entityVersion = _document[OT_ACTION_PARAM_MODEL_ITM_Version].GetUint64();
-	TreeIcon treeIcons = getTreeIconsFromDocument(_document);
+	OldTreeIcon treeIcons = getOldTreeIconsFromDocument(_document);
 	long long tetEdgesID = _document[OT_ACTION_PARAM_MODEL_TETEDGES_ID].GetUint64();;
 	long long tetEdgesVersion = _document[OT_ACTION_PARAM_MODEL_TETEDGES_Version].GetUint64();
 

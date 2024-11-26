@@ -929,7 +929,7 @@ void Model::createVisualizationItems(void)
 
 void Model::addVisualizationContainerNode(const std::string &name, ot::UID entityID, bool isEditable)
 {
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "ContainerVisible";
 	treeIcons.hiddenIcon = "ContainerHidden";
@@ -938,7 +938,7 @@ void Model::addVisualizationContainerNode(const std::string &name, ot::UID entit
 
 void Model::addVisualizationMeshNode(const std::string &name, ot::UID entityID)
 {
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "MeshVisible";
 	treeIcons.hiddenIcon = "MeshHidden";
@@ -1014,7 +1014,7 @@ void Model::createNewMaterial()
 	EntityMaterial *materialItem = createNewMaterial(materialName);
 
 	// Here we also need to add a new visualitation container item to the visualization model
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "MaterialVisible";
 	treeIcons.hiddenIcon = "MaterialHidden";
@@ -1048,7 +1048,7 @@ void Model::createNewParameter()
 	EntityParameter *parameterItem = createNewParameterItem(parameterName);
 
 	// Here we also need to add a new visualitation container item to the visualization model
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "ParameterVisible";
 	treeIcons.hiddenIcon = "ParameterHidden";
@@ -1251,7 +1251,7 @@ void Model::facetEntity(EntityGeometry *entity, double deflection, bool isHidden
 		std::vector<double> transformation;
 		entity->getTransformation(transformation);
 
-		TreeIcon treeIcons;
+		OldTreeIcon treeIcons;
 		treeIcons.size = 32;
 		treeIcons.visibleIcon = "ModelVisible";
 		treeIcons.hiddenIcon = "ModelHidden";
@@ -1267,14 +1267,14 @@ void Model::facetEntity(EntityGeometry *entity, double deflection, bool isHidden
 	entity->releaseFacets();
 }
 
-void Model::addVisualizationNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
+void Model::addVisualizationNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
 										      double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors,
 											  bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected)
 {
 	Application::instance()->getNotifier()->addVisualizationNodeFromFacetData(visualizationModelID, treeName, surfaceColorRGB, edgeColorRGB, modelEntityID, treeIcons, backFaceCulling, offsetFactor, isEditable, nodes, triangles, edges, errors, selectChildren, manageParentVisibility, manageChildVisibility, showWhenSelected);
 }
 
-void Model::addVisualizationNodeFromFacetDataBase(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
+void Model::addVisualizationNodeFromFacetDataBase(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
 										          double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ot::UID entityID, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation
 )
 {
@@ -3351,7 +3351,7 @@ void Model::addAnnotationEntities(std::list<EntityAnnotation *> &errorAnnotation
 	}
 }
 
-void Model::addVisualizationAnnotationNode(const std::string &name, ot::UID UID, const TreeIcon &treeIcons, bool isHidden,
+void Model::addVisualizationAnnotationNode(const std::string &name, ot::UID UID, const OldTreeIcon &treeIcons, bool isHidden,
 										   const double edgeColorRGB[3],
 										   const std::vector<std::array<double, 3>> &points,
 										   const std::vector<std::array<double, 3>> &points_rgb,
@@ -4397,12 +4397,12 @@ void Model::addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion
 			if (geomEntity != nullptr)
 			{
 				std::string iconVisible, iconHidden;
-				geomEntity->getTreeIcons(iconVisible, iconHidden);
+				geomEntity->getOldTreeIcons(iconVisible, iconHidden);
 
 				iconVisible += "Base";
 				iconHidden += "Base";
 
-				geomEntity->setTreeIcons(iconVisible, iconHidden);
+				geomEntity->setOldTreeIcons(iconVisible, iconHidden);
 			}
 
 			isBaseShape = false;

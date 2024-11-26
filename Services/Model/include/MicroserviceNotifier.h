@@ -5,7 +5,7 @@
 #include <string>
 #include <map>
 
-#include "Types.h"
+#include "OldTreeIcon.h"
 #include "Geometry.h"
 
 #include "OTCore/CoreTypes.h"
@@ -63,12 +63,12 @@ public:
 	//Not existing in uiComponent
 	void promptChoice(const std::string& _message, ot::MessageDialogCfg::BasicIcon _icon, ot::MessageDialogCfg::BasicButtons _buttons, const std::string& _promptResponse, const std::string& _parameter1);
 	//Not existing in uiComponent
-	void addVisualizationNodeFromFacetData(ot::UID visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
+	void addVisualizationNodeFromFacetData(ot::UID visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
 		double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected);
-	void addVisualizationNodeFromFacetDataBase(ot::UID visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
+	void addVisualizationNodeFromFacetDataBase(ot::UID visModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
 		double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ot::UID entityID, ot::UID entityVersion, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation);
-	void addVisualizationContainerNode(ot::UID visModelID, const std::string &treeName, ot::UID modelEntityID, const TreeIcon &treeIcons, bool isEditable);
-	void addVisualizationAnnotationNode(ot::UID visModelID, const std::string &name, ot::UID UID, const TreeIcon &treeIcons, bool isHidden,
+	void addVisualizationContainerNode(ot::UID visModelID, const std::string &treeName, ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool isEditable);
+	void addVisualizationAnnotationNode(ot::UID visModelID, const std::string &name, ot::UID UID, const OldTreeIcon &treeIcons, bool isHidden,
 		const double edgeColorRGB[3],
 		const std::vector<std::array<double, 3>> &points,
 		const std::vector<std::array<double, 3>> &points_rgb,

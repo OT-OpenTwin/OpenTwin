@@ -13,8 +13,8 @@
 
 EntityBlockCircuitResistor::EntityBlockCircuitResistor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner) {
-	_navigationTreeIconName = "ResistorBG";
-	_navigationTreeIconNameHidden = "ResistorBG";
+	_navigationOldTreeIconName = "ResistorBG";
+	_navigationOldTreeIconNameHidden = "ResistorBG";
 	_blockTitle = "Resistor";
 
 	const std::string connectorNameLeft = "Left1";

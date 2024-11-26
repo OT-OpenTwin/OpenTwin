@@ -1,6 +1,6 @@
 
 #include "EntityVis2D3D.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 #include "Database.h"
 
 #include "OTCommunication/ActionTypes.h"
@@ -88,7 +88,7 @@ void EntityVis2D3D::addVisualizationNodes(void)
 {
 	if (!getName().empty())
 	{
-		TreeIcon treeIcons;
+		OldTreeIcon treeIcons;
 		treeIcons.size = 32;
 		treeIcons.visibleIcon = "Vis2DVisible";
 		treeIcons.hiddenIcon = "Vis2DHidden";

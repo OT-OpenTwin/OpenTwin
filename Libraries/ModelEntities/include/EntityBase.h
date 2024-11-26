@@ -10,7 +10,7 @@
 
 #include "EntityProperties.h"
 #include "ModelState.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 class EntityBase;
 class ClassFactoryHandler;

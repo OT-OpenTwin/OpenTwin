@@ -2,7 +2,7 @@
 #include "EntityMeshCartesianItem.h"
 #include "EntityMeshCartesian.h"
 #include "DataBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -107,7 +107,7 @@ void EntityMeshCartesianItem::addVisualizationNodes(void)
 
 void EntityMeshCartesianItem::addVisualizationItem(bool isHidden)
 {
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "MeshItemVisible";
 	treeIcons.hiddenIcon = "MeshItemHidden";

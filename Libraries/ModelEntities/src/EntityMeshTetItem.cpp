@@ -5,7 +5,7 @@
 #include "EntityMeshTet.h"
 #include "EntityMeshTetFace.h"
 #include "DataBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -343,7 +343,7 @@ void EntityMeshTetItem::addVisualizationNodes(void)
 
 void EntityMeshTetItem::addVisualizationItem(bool isHidden)
 {
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "MeshItemVisible";
 	treeIcons.hiddenIcon = "MeshItemHidden";

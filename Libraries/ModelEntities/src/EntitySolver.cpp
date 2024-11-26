@@ -1,6 +1,6 @@
 
 #include "EntitySolver.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -19,7 +19,7 @@ void EntitySolver::addVisualizationNodes(void)
 {
 	if (!getName().empty())
 	{
-		TreeIcon treeIcons;
+		OldTreeIcon treeIcons;
 		treeIcons.size = 32;
 		treeIcons.visibleIcon = "SolverVisible";
 		treeIcons.hiddenIcon = "SolverHidden";

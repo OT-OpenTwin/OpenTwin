@@ -34,7 +34,7 @@ bool EntityFile::updateFromProperties(void)
 
 void EntityFile::addVisualizationNodes(void)
 {
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "TextVisible";
 	treeIcons.hiddenIcon = "TextHidden";

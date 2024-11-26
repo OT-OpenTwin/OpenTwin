@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Types.h>
+#include "OldTreeIcon.h"
 
 #include <string>
 

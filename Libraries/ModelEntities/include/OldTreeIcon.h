@@ -2,12 +2,13 @@
 #pragma warning(disable : 4251)
 
 #include "OTCore/JSON.h"
+#include "OTCore/OTClassHelper.h"
 #include "OTCore/CoreTypes.h"
 
-class __declspec(dllexport) TreeIcon
+OT_DECL_DEPRECATED("Use Gui/NavigationTreeIcon instead") class __declspec(dllexport) OldTreeIcon
 {
 public:
-	TreeIcon() :
+	OldTreeIcon() :
 		size(0)
 	{};
 

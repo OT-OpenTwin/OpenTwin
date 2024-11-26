@@ -26,12 +26,12 @@
 
 //! \def OT_DECL_DEPRECATED
 //! \brief Marks the method or class as deprecated.
-#define OT_DECL_DEPRECATED __declspec(deprecated)
+#define OT_DECL_DEPRECATED(___message) __declspec(deprecated(___message))
 
 #elif defined(OT_COMPILER_GNU) || defined(OT_COMPILER_CLANG)
 
 //! \def OT_DECL_DEPRECATED
 //! \brief Marks the method or class as deprecated.
-#define OT_DECL_DEPRECATED __attribute__((deprecated))
+#define OT_DECL_DEPRECATED(___message) __attribute__((deprecated))
 
 #endif

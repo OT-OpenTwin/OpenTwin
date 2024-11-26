@@ -47,8 +47,8 @@ protected:
 	ot::UID _coordinate2DEntityID = 0;
 	ot::BasicServiceInformation _info;
 	std::string	_graphicsScenePackage;
-	std::string _navigationTreeIconName = "";
-	std::string _navigationTreeIconNameHidden = "";
+	std::string _navigationOldTreeIconName = "";
+	std::string _navigationOldTreeIconNameHidden = "";
 
 	std::map<std::string,ot::Connector> _connectorsByName;
 	//std::map<std::string, ot::BlockConnection> _connectionsByConnectionKey;

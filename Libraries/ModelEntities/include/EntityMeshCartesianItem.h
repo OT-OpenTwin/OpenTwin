@@ -4,7 +4,7 @@
 #include "EntityBase.h"
 #include "Geometry.h"
 #include "BoundingBox.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 class EntityMeshCartesianData;
 

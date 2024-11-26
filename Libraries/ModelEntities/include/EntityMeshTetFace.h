@@ -4,7 +4,7 @@
 #include "EntityContainer.h"
 #include "BoundingBox.h"
 #include "EntityBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include <list>
 

@@ -202,7 +202,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 		geometryEntity->setManageChildVisibility(false);
 		//geometryEntity->setManageParentVisibility(false);  // The new boolean entity should manage the parent visibility as usual
 		geometryEntity->setBrep(shape);
-		geometryEntity->setTreeIcons(treeIconVisible, treeIconHidden);
+		geometryEntity->setOldTreeIcons(treeIconVisible, treeIconHidden);
 		geometryEntity->getBrepEntity()->setFaceNameMap(resultFaceNames);
 
 		geometryEntity->getProperties() = baseEntity->getProperties();

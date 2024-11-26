@@ -7,7 +7,7 @@
 
 #include "EntityContainer.h"
 #include "Geometry.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 #include "ModelState.h"
 #include "EntityBase.h"
 #include "ClassFactoryModel.h"
@@ -89,13 +89,13 @@ public:
 	std::string getScriptsRootName(void) { return "Scripts"; };
 	std::string getUnitRootName(void) { return "Units"; };
 
-	void addVisualizationNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
+	void addVisualizationNodeFromFacetData(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
 										   double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::string &errors, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected);
-	void addVisualizationNodeFromFacetDataBase(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
+	void addVisualizationNodeFromFacetDataBase(const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool textureReflective, ot::UID modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
 										       double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, ot::UID entityID, bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation);
 
 	void addAnnotationEntities(std::list<EntityAnnotation *> &errorAnnotations);
-	void addVisualizationAnnotationNode(const std::string &name, ot::UID UID, const TreeIcon &treeIcons, bool isHidden,
+	void addVisualizationAnnotationNode(const std::string &name, ot::UID UID, const OldTreeIcon &treeIcons, bool isHidden,
 									    const double edgeColorRGB[3],
 										const std::vector<std::array<double, 3>> &points,
 										const std::vector<std::array<double, 3>> &points_rgb,

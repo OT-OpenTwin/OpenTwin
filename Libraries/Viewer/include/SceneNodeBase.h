@@ -6,7 +6,7 @@
 #include <list>
 #include <cassert>
 
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 namespace osg { class Switch; };
 
@@ -87,8 +87,8 @@ public:
 	void removeChild(SceneNodeBase *child) { assert(std::find(children.begin(), children.end(), child) != children.end());  children.remove(child); };
 	const std::list<SceneNodeBase*> &getChildren(void) { return children; };
 
-	void setTreeIcons(const TreeIcon &icons) { treeIcons = icons; };
-	const TreeIcon &getTreeIcons(void) { return treeIcons; };
+	void setOldTreeIcons(const OldTreeIcon &icons) { treeIcons = icons; };
+	const OldTreeIcon &getOldTreeIcons(void) { return treeIcons; };
 
 	virtual void getPrefetch(std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs) {};
 
@@ -119,7 +119,7 @@ private:
 	std::string        errors;
 	SceneNodeBase *    parent;
 	std::list<SceneNodeBase*> children;
-	TreeIcon		   treeIcons;
+	OldTreeIcon		   treeIcons;
 
 	std::list<Visualiser*> m_visualiser;
 };

@@ -7,8 +7,8 @@
 EntityBlockConnection::EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBase(ID, parent, obs, ms, factory, owner), m_lineStyle(2., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder))
 {
-	_navigationTreeIconName = "connection";
-	_navigationTreeIconNameHidden = "connection";
+	_navigationOldTreeIconName = "connection";
+	_navigationOldTreeIconNameHidden = "connection";
 }
 
 EntityBlockConnection::~EntityBlockConnection()
@@ -112,13 +112,13 @@ void EntityBlockConnection::addVisualizationNodes(void)
 
 void EntityBlockConnection::CreateNavigationTreeEntry()
 {
-	if (_navigationTreeIconName != "" && _navigationTreeIconNameHidden != "")
+	if (_navigationOldTreeIconName != "" && _navigationOldTreeIconNameHidden != "")
 	{
-		TreeIcon treeIcons;
+		OldTreeIcon treeIcons;
 		treeIcons.size = 32;
 
-		treeIcons.visibleIcon = _navigationTreeIconName;
-		treeIcons.hiddenIcon = _navigationTreeIconNameHidden;
+		treeIcons.visibleIcon = _navigationOldTreeIconName;
+		treeIcons.hiddenIcon = _navigationOldTreeIconNameHidden;
 
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());

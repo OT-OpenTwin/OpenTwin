@@ -5,7 +5,7 @@ class DataSourceManagerItem;
 #include <string>
 #include <map>
 
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 

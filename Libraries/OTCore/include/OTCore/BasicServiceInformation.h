@@ -18,7 +18,7 @@ namespace ot {
 	//! \class BasicServiceInformation
 	//! \brief The BasicServiceInformation class is used to hold a service name and type.
 	//! The BasicServiceInformation can be used as a key in a map.
-	OT_DECL_DEPRECATED class OT_CORE_API_EXPORT BasicServiceInformation : public ot::Serializable {
+	class OT_CORE_API_EXPORT BasicServiceInformation : public ot::Serializable {
 	public:
 		BasicServiceInformation();
 		BasicServiceInformation(const std::string& _serviceNameAndType);

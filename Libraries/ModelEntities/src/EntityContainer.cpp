@@ -1,6 +1,6 @@
 // OpenTwin header
 #include "EntityContainer.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 #include "OTCore/JSON.h"
 #include <OTCommunication/ActionTypes.h>
 
@@ -222,7 +222,7 @@ void EntityContainer::addVisualizationNodes(void)
 
 	if (!getName().empty())
 	{
-		TreeIcon treeIcons;
+		OldTreeIcon treeIcons;
 		treeIcons.size = 32;
 		treeIcons.visibleIcon = "ContainerVisible";
 		treeIcons.hiddenIcon = "ContainerHidden";

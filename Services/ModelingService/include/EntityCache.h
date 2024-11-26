@@ -10,7 +10,7 @@ namespace ot
 }
 
 #include "OTCore/CoreTypes.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include <map>
 #include <list>

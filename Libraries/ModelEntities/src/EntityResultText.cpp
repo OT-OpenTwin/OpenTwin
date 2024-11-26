@@ -5,7 +5,7 @@
 #include "EntityResultText.h"
 #include "EntityResultTextData.h"
 #include "DataBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 #include "OTGui/VisualisationTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
@@ -70,7 +70,7 @@ void EntityResultText::addVisualizationNodes(void)
 
 void EntityResultText::addVisualizationItem(bool isHidden)
 {
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "TextVisible";
 	treeIcons.hiddenIcon = "TextHidden";

@@ -64,7 +64,7 @@
     <ClInclude Include="include\ModelState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Types.h">
+    <ClInclude Include="include\OldTreeIcon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\EntityBase.h">
@@ -402,7 +402,7 @@
     <ClCompile Include="src\ModelState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Types.cpp">
+    <ClCompile Include="src\OldTreeIcon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ClassFactory.cpp">

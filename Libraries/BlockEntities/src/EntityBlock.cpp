@@ -124,13 +124,13 @@ void EntityBlock::readSpecificDataFromDataBase(bsoncxx::document::view& doc_view
 
 void EntityBlock::CreateNavigationTreeEntry()
 {
-	if (_navigationTreeIconName != "" && _navigationTreeIconNameHidden != "")
+	if (_navigationOldTreeIconName != "" && _navigationOldTreeIconNameHidden != "")
 	{
-		TreeIcon treeIcons;
+		OldTreeIcon treeIcons;
 		treeIcons.size = 32;
 
-		treeIcons.visibleIcon = _navigationTreeIconName;
-		treeIcons.hiddenIcon = _navigationTreeIconNameHidden;
+		treeIcons.visibleIcon = _navigationOldTreeIconName;
+		treeIcons.hiddenIcon = _navigationOldTreeIconNameHidden;
 
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());

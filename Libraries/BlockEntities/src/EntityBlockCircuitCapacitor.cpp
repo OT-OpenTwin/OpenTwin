@@ -12,8 +12,8 @@
 EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
 {
-	_navigationTreeIconName = "Capacitor";
-	_navigationTreeIconNameHidden = "Capacitor";
+	_navigationOldTreeIconName = "Capacitor";
+	_navigationOldTreeIconNameHidden = "Capacitor";
 	_blockTitle = "Capacitor";
 
 	const std::string connectorNameLeft = "Left7";

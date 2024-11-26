@@ -14,7 +14,7 @@
 
 #include "ClassFactoryCAD.h"
 
-#include <Types.h>
+#include "OldTreeIcon.h"
 
 // C++ header
 #include <string>

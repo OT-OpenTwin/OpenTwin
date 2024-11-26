@@ -12,7 +12,7 @@
 #include "ClassFactory.h"
 #include "EntityProperties.h"
 
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"

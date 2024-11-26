@@ -13,7 +13,7 @@ void EntityTableSelectedRanges::addVisualizationNodes()
 {
 	if (!getName().empty())
 	{
-		TreeIcon treeIcons;
+		OldTreeIcon treeIcons;
 		treeIcons.size = 32;
 		treeIcons.visibleIcon = "SelectedRange";
 		treeIcons.hiddenIcon = "SelectedRange";

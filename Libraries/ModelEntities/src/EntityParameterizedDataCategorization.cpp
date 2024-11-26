@@ -11,7 +11,7 @@ void EntityParameterizedDataCategorization::addVisualizationNodes()
 {
 	if (!getName().empty())
 	{
-		TreeIcon treeIcons;
+		OldTreeIcon treeIcons;
 		treeIcons.size = 32;
 		treeIcons.visibleIcon = "Categorization";
 		treeIcons.hiddenIcon = "Categorization";

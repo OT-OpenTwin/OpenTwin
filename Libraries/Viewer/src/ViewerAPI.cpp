@@ -182,7 +182,7 @@ void ViewerAPI::freeze3DView(unsigned long long osgModelID, bool flag)
 	getModelFromID(osgModelID)->freeze3DView(flag);
 }
 
-void ViewerAPI::addNodeFromFacetData(ot::UID osgModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], unsigned long long modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
+void ViewerAPI::addNodeFromFacetData(ot::UID osgModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
 									 double offsetFactor, bool isEditable, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNameMap, std::string &errors,
 									 bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected)
 {
@@ -200,7 +200,7 @@ void ViewerAPI::addNodeFromFacetData(ot::UID osgModelID, const std::string &tree
 }
 
 void ViewerAPI::addNodeFromFacetDataBase(ot::UID osgModelID, const std::string &treeName, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, 
-										 const std::string &textureType, bool reflective, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool backFaceCulling,
+										 const std::string &textureType, bool reflective, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool backFaceCulling,
 										 double offsetFactor, bool isHidden, bool isEditable, const std::string &projectName, unsigned long long entityID, unsigned long long version,
 										 bool selectChildren, bool manageParentVisibility, bool manageChildVisibility, bool showWhenSelected, std::vector<double> &transformation)
 {
@@ -217,7 +217,7 @@ void ViewerAPI::addNodeFromFacetDataBase(ot::UID osgModelID, const std::string &
 	}
 }
 
-void ViewerAPI::addVisualizationContainerNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool editable)
+void ViewerAPI::addVisualizationContainerNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool editable)
 {
 	try
 	{
@@ -232,7 +232,7 @@ void ViewerAPI::addVisualizationContainerNode(ot::UID osgModelID, const std::str
 }
 
 
-void ViewerAPI::addVisualizationNode(ot::UID osgModelID, const std::string& treeName, unsigned long long modelEntityID, const TreeIcon& treeIcons, bool editable, ot::VisualisationTypes _visualisationTypes)
+void ViewerAPI::addVisualizationNode(ot::UID osgModelID, const std::string& treeName, unsigned long long modelEntityID, const OldTreeIcon& treeIcons, bool editable, ot::VisualisationTypes _visualisationTypes)
 {
 	try
 	{
@@ -246,7 +246,7 @@ void ViewerAPI::addVisualizationNode(ot::UID osgModelID, const std::string& tree
 	}
 }
 
-void ViewerAPI::addVTKNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
+void ViewerAPI::addVTKNode(ot::UID osgModelID, const std::string &treeName, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, bool editable, const std::string &projectName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion)
 {
 	try
 	{
@@ -275,7 +275,7 @@ void ViewerAPI::updateVTKNode(ot::UID osgModelID, unsigned long long modelEntity
 }
 
 void ViewerAPI::addVisualizationAnnotationNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, 
-											   const TreeIcon &treeIcons, bool isHidden,
+											   const OldTreeIcon &treeIcons, bool isHidden,
 										       const double edgeColorRGB[3],
 											   const std::vector<std::array<double, 3>> &points,
 											   const std::vector<std::array<double, 3>> &points_rgb,
@@ -296,7 +296,7 @@ void ViewerAPI::addVisualizationAnnotationNode(ot::UID osgModelID, const std::st
 	}
 }
 
-void ViewerAPI::addVisualizationAnnotationNodeDataBase(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long version)
+void ViewerAPI::addVisualizationAnnotationNodeDataBase(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long version)
 {
 	try
 	{
@@ -310,7 +310,7 @@ void ViewerAPI::addVisualizationAnnotationNodeDataBase(ot::UID osgModelID, const
 	}
 }
 
-void ViewerAPI::addVisualizationMeshNodeFromFacetDataBase(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const TreeIcon &treeIcons, double edgeColorRGB[3], bool displayTetEdges, const std::string &projectName, unsigned long long entityID, unsigned long long version)
+void ViewerAPI::addVisualizationMeshNodeFromFacetDataBase(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, double edgeColorRGB[3], bool displayTetEdges, const std::string &projectName, unsigned long long entityID, unsigned long long version)
 {
 	try
 	{
@@ -324,7 +324,7 @@ void ViewerAPI::addVisualizationMeshNodeFromFacetDataBase(ot::UID osgModelID, co
 	}
 }
 
-void ViewerAPI::addVisualizationCartesianMeshNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, double edgeColorRGB[3], double meshLineColorRGB[3], bool showMeshLines, const std::vector<double> &meshCoordsX, const std::vector<double> &meshCoordsY, const std::vector<double> &meshCoordsZ,
+void ViewerAPI::addVisualizationCartesianMeshNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, double edgeColorRGB[3], double meshLineColorRGB[3], bool showMeshLines, const std::vector<double> &meshCoordsX, const std::vector<double> &meshCoordsY, const std::vector<double> &meshCoordsZ,
 												  const std::string &projectName, unsigned long long faceListEntityID, unsigned long long faceListEntityVersion, unsigned long long nodeListEntityID, unsigned long long nodeListEntityVersion)
 {
 	try
@@ -405,7 +405,7 @@ void ViewerAPI::removeSelectedCurveNodes(ot::UID osgModelID)
 	model->removedSelectedCurveNodes();
 }
 
-void ViewerAPI::addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3])
+void ViewerAPI::addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, std::vector<int> &facesList, double color[3])
 {
 	try
 	{
@@ -419,7 +419,7 @@ void ViewerAPI::addVisualizationCartesianMeshItemNode(ot::UID osgModelID, const 
 	}
 }
 
-void ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const TreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long version, long long tetEdgesID, long long tetEdgesVersion)
+void ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(ot::UID osgModelID, const std::string &name, unsigned long long modelEntityID, const OldTreeIcon &treeIcons, bool isHidden, const std::string &projectName, unsigned long long entityID, unsigned long long version, long long tetEdgesID, long long tetEdgesVersion)
 {
 	try
 	{

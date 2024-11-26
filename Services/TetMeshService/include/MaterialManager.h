@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Properties.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include <list>
 #include <string>

@@ -368,7 +368,7 @@ private:
 
 	// JSON helper functions
 	std::vector<std::array<double, 3>> getVectorDoubleArrayFromDocument(ot::JsonDocument &doc, const std::string &name);
-	TreeIcon getTreeIconsFromDocument(ot::JsonDocument &doc);
+	OldTreeIcon getOldTreeIconsFromDocument(ot::JsonDocument &doc);
 	void getVectorNodeFromDocument(ot::JsonDocument &doc, const std::string &name, std::vector<Geometry::Node> &result);
 	void getListTriangleFromDocument(ot::JsonDocument &doc, const std::string &name, std::list<Geometry::Triangle> &result);
 	void getListEdgeFromDocument(ot::JsonDocument &doc, const std::string &name, std::list<Geometry::Edge> &result);

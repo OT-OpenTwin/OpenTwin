@@ -12,8 +12,8 @@
 EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
 {
-	_navigationTreeIconName = "Inductor";
-	_navigationTreeIconNameHidden = "Inductor";
+	_navigationOldTreeIconName = "Inductor";
+	_navigationOldTreeIconNameHidden = "Inductor";
 	_blockTitle = "Inductor";
 
 	const std::string connectorNameLeft = "Left8";

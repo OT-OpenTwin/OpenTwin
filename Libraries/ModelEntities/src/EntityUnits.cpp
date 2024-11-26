@@ -146,7 +146,7 @@ void EntityUnits::addVisualizationNodes(void)
 {
 		if (!getName().empty())
 		{
-			TreeIcon treeIcons;
+			OldTreeIcon treeIcons;
 			treeIcons.size = 32;
 			treeIcons.visibleIcon = "Units";
 			treeIcons.hiddenIcon = "Units";

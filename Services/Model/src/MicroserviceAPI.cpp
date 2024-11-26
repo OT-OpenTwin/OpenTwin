@@ -4,7 +4,7 @@
 #include "MicroserviceNotifier.h"
 #include "ProjectTypeManager.h"
 #include "Model.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 #include "curl/curl.h"
 
 #include "EntityGeometry.h"
@@ -47,7 +47,7 @@ ot::JsonDocument MicroserviceAPI::BuildJsonDocFromString(std::string json)
 	return doc;
 }
 
-void MicroserviceAPI::addTreeIconsToJsonDoc(ot::JsonDocument &doc, const TreeIcon &treeIcons)
+void MicroserviceAPI::addOldTreeIconsToJsonDoc(ot::JsonDocument &doc, const OldTreeIcon &treeIcons)
 {
 	doc.AddMember(OT_ACTION_PARAM_UI_TREE_IconSize, rapidjson::Value(treeIcons.size), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_TREE_IconItemVisible, rapidjson::Value(treeIcons.visibleIcon.c_str(), doc.GetAllocator()), doc.GetAllocator());

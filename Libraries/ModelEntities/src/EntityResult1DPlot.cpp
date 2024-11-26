@@ -3,7 +3,7 @@
 
 #include "EntityResult1DPlot.h"
 #include "DataBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "OTCore/OTAssert.h"
 #include "OTCommunication/ActionTypes.h"
@@ -199,7 +199,7 @@ void EntityResult1DPlot::addBasicsToConfig(ot::Plot1DCfg& _config)
 	_config.setUid(this->getEntityID());
 	_config.setTitle(this->getTitle());
 	_config.setProjectName(DataBase::GetDataBase()->getProjectName());
-	_config.setTreeIcons(ot::NavigationTreeItemIcon("Plot1DVisible", "Plot1DHidden"));
+	_config.setOldTreeIcons(ot::NavigationTreeItemIcon("Plot1DVisible", "Plot1DHidden"));
 
 	_config.setPlotType(ot::Plot1DCfg::stringToPlotType(this->getPlotType()));
 	_config.setAxisQuantity(ot::Plot1DCfg::stringToAxisQuantity(this->getPlotQuantity()));

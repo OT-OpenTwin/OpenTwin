@@ -6,7 +6,7 @@
 #include "TopoDS_TShape.hxx"
 #include "TopoDS_Face.hxx"
 #include "TopoDS_TFace.hxx"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include <list>
 #include <map>

@@ -10,7 +10,7 @@
 #include <list>
 #include <string>
 #include <map>
-#include <Types.h>
+#include "OldTreeIcon.h"
 
 namespace ot {
 

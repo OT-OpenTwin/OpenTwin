@@ -4,7 +4,7 @@
 #include <list>
 #include <map>
 
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "XCAFDoc_ColorTool.hxx"
 #include "XCAFDoc_ShapeTool.hxx"

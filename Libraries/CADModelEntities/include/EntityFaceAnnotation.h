@@ -4,7 +4,7 @@
 #include "EntityBase.h"
 #include "BoundingBox.h"
 #include "Geometry.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "TopoDS_Shape.hxx"
 

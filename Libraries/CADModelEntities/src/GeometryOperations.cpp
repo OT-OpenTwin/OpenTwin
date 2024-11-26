@@ -22,7 +22,7 @@
 #include "EntityGeometry.h"
 #include "GeometryOperations.h"
 #include "CheckGeometry.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 #include "TemplateDefaultManager.h"
 
 bool GeometryOperations::facetEntity(TopoDS_Shape &shape, EntityBrep *brep, double deflection, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles, std::list<Geometry::Edge> &edges, std::map<ot::UID, std::string>& faceNames, std::string &errors)

@@ -11,8 +11,8 @@
 
 EntityBlockCircuitCurrentMeter::EntityBlockCircuitCurrentMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner) {
-	_navigationTreeIconName = "CurrentMeter";
-	_navigationTreeIconNameHidden = "CurrentMeter";
+	_navigationOldTreeIconName = "CurrentMeter";
+	_navigationOldTreeIconNameHidden = "CurrentMeter";
 	_blockTitle = "Current Meter";
 
 	const std::string connectorNameLeft = "Left6";

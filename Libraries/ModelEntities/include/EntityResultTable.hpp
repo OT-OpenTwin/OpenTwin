@@ -2,7 +2,7 @@
 #include "EntityResultTable.h"
 #include "EntityResultTableData.h"
 #include "DataBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -78,7 +78,7 @@ void EntityResultTable<T>::readSpecificDataFromDataBase(bsoncxx::document::view 
 template <class T>
 void EntityResultTable<T>::addVisualizationNodes()
 {
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "TableVisible";
 	treeIcons.hiddenIcon = "TableHidden";
@@ -102,7 +102,7 @@ void EntityResultTable<T>::addVisualizationNodes()
 template <class T>
 void EntityResultTable<T>::addVisualizationItem(bool isHidden)
 {
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "TableVisible";
 	treeIcons.hiddenIcon = "TableHidden";

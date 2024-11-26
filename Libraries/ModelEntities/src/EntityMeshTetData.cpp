@@ -4,7 +4,7 @@
 #include "EntityMeshTetFace.h"
 #include "EntityMeshTetFaceData.h"
 #include "DataBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -291,7 +291,7 @@ void EntityMeshTetData::addVisualizationItem(void)
 {
 	if (getObserver() == nullptr) return;
 
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "ContainerVisible";
 	treeIcons.hiddenIcon = "ContainerHidden";

@@ -4,7 +4,7 @@
 #include <list>
 
 #include "EntityBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 #include "EntityBinaryData.h"
 
 class __declspec(dllexport) EntityResultUnstructuredMesh : public EntityBase

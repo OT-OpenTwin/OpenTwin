@@ -12,7 +12,7 @@
 #include "OTCore/CoreTypes.h"					// open twins rapid json layer
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "OTServiceFoundation/EntityInformation.h"
-#include <Types.h>
+#include "OldTreeIcon.h"
 
 #include "ClassFactoryCAD.h"
 

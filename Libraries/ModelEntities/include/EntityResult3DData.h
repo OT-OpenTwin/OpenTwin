@@ -5,11 +5,11 @@
 
 #include "EntityBase.h"
 #include "EntityResultBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 #include "EntityCompressedVector.h"
 #include "EntityMeshCartesian.h"
 #include "EntityMeshCartesianData.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 class __declspec(dllexport) EntityResult3DData : public EntityBase , public EntityResultBase
 {

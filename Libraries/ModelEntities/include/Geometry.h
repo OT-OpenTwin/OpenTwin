@@ -8,7 +8,7 @@
 
 #include <bsoncxx/builder/basic/document.hpp>
 
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 namespace Geometry {
 

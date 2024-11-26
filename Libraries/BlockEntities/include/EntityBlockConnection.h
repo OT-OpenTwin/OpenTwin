@@ -22,8 +22,8 @@ public:
 	virtual void addVisualizationNodes(void) override;
 	virtual int getSchemaVersion(void) override { return 1; };
 private:
-	std::string _navigationTreeIconName = "";
-	std::string _navigationTreeIconNameHidden = "";
+	std::string _navigationOldTreeIconName = "";
+	std::string _navigationOldTreeIconNameHidden = "";
 	ot::GraphicsConnectionCfg::ConnectionShape _lineShape = ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
 	ot::OutlineF m_lineStyle;
 

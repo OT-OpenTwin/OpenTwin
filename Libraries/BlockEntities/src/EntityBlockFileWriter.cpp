@@ -6,8 +6,8 @@ EntityBlockFileWriter::EntityBlockFileWriter(ot::UID ID, EntityBase* parent, Ent
 {
 	m_inputConnector = { ot::ConnectorType::In, "Input", "Input" };
 	_connectorsByName[m_inputConnector.getConnectorName()] = m_inputConnector;
-	_navigationTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_navigationTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
 	_blockTitle = "File Writer";
 }
 

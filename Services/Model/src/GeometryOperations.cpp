@@ -23,7 +23,7 @@
 #include "EntityGeometry.h"
 #include "GeometryOperations.h"
 #include "CheckGeometry.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 #include "TemplateDefaultManager.h"
 
 extern std::string getServiceName(void);

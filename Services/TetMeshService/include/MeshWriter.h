@@ -19,7 +19,7 @@ class EntityProperties;
 #include <array>
 #include <string>
 
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 namespace gmsh
 {

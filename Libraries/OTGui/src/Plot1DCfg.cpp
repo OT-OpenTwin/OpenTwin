@@ -112,7 +112,7 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 
 	JsonObject treeIconsObject;
 	m_treeIcons.addToJsonObject(treeIconsObject, _allocator);
-	_object.AddMember("TreeIcons", treeIconsObject, _allocator);
+	_object.AddMember("OldTreeIcons", treeIconsObject, _allocator);
 
 	JsonObject xAxisObject;
 	m_xAxis.addToJsonObject(xAxisObject, _allocator);
@@ -139,7 +139,7 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_isHidden = json::getBool(_object, "Hidden");
 	m_legendVisible = json::getBool(_object, "LegendVisible");
 
-	m_treeIcons.setFromJsonObject(json::getObject(_object, "TreeIcons"));
+	m_treeIcons.setFromJsonObject(json::getObject(_object, "OldTreeIcons"));
 
 	m_xAxis.setFromJsonObject(json::getObject(_object, "XAxis"));
 	m_yAxis.setFromJsonObject(json::getObject(_object, "YAxis"));

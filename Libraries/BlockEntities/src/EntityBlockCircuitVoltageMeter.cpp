@@ -12,8 +12,8 @@
 EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
 	:EntityBlockCircuitElement(ID, parent, obs, ms, factory, owner)
 {
-	_navigationTreeIconName = "VoltMeter";
-	_navigationTreeIconNameHidden = "VoltMeter";
+	_navigationOldTreeIconName = "VoltMeter";
+	_navigationOldTreeIconNameHidden = "VoltMeter";
 	_blockTitle = "Voltage Meter";
 
 	const std::string connectorNameLeft = "Left4";

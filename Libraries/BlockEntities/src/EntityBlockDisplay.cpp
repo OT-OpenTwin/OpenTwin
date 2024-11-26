@@ -6,8 +6,8 @@ EntityBlockDisplay::EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObs
 {
 	_inputConnector = { ot::ConnectorType::In, "Input", "Input"};
 	_connectorsByName[_inputConnector.getConnectorName()] = _inputConnector;
-	_navigationTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
-	_navigationTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	_navigationOldTreeIconName = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
+	_navigationOldTreeIconNameHidden = BlockEntities::SharedResources::getCornerImagePath() + getIconName();
 	_blockTitle = "Display";
 }
 

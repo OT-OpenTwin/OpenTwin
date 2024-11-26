@@ -3,7 +3,7 @@
 
 #include "EntityParameter.h"
 #include "DataBase.h"
-#include "Types.h"
+#include "OldTreeIcon.h"
 
 #include "OTCommunication/ActionTypes.h"
 
@@ -109,7 +109,7 @@ void EntityParameter::addVisualizationNodes(void)
 
 void EntityParameter::addVisualizationItem(bool isHidden)
 {
-	TreeIcon treeIcons;
+	OldTreeIcon treeIcons;
 	treeIcons.size = 32;
 	treeIcons.visibleIcon = "ParameterVisible";
 	treeIcons.hiddenIcon = "ParameterHidden";

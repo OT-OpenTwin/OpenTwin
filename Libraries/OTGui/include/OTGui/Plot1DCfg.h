@@ -95,8 +95,8 @@ namespace ot {
 		void setLegendVisible(bool _isVisible) { m_legendVisible = _isVisible; };
 		bool getLegendVisible(void) const { return m_legendVisible; };
 
-		void setTreeIcons(const NavigationTreeItemIcon& _icons) { m_treeIcons = _icons; };
-		const NavigationTreeItemIcon& getTreeIcons(void) const { return m_treeIcons; };
+		void setOldTreeIcons(const NavigationTreeItemIcon& _icons) { m_treeIcons = _icons; };
+		const NavigationTreeItemIcon& getOldTreeIcons(void) const { return m_treeIcons; };
 
 		void setXAxis(const Plot1DAxisCfg& _xAxis) { m_xAxis = _xAxis; };
 		const Plot1DAxisCfg& getXAxis(void) const { return m_xAxis; };

@@ -129,7 +129,7 @@ void EdgesOperationBase::performOperation(const std::string &selectionInfo)
 	geometryEntity->setSelectChildren(false);
 	geometryEntity->setManageChildVisibility(false);
 	geometryEntity->setBrep(shape);
-	geometryEntity->setTreeIcons(getVisibleTreeItemName(), getHiddenTreeItemName());
+	geometryEntity->setOldTreeIcons(getVisibleTreeItemName(), getHiddenTreeItemName());
 
 	geometryEntity->getProperties() = baseEntity->getProperties();
 
