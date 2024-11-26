@@ -1159,6 +1159,7 @@ void AppBase::closeAllViewerTabs(void) {
 	m_textEditors.clear();
 	m_tables.clear();
 	m_versionGraph = nullptr;
+	m_lastFocusedCentralView = nullptr;
 	ot::WidgetViewManager::instance().closeViews();
 }
 
