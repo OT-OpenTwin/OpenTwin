@@ -3587,8 +3587,8 @@ std::string ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocume
 
 	AppBase::instance()->addGraphicsPickerPackage(pckg, info);
 
-	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info);
-	view->setAsCurrentViewTab();
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.title()), info, insertFlags);
 
 	return "";
 }
@@ -3600,7 +3600,8 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 	ot::GraphicsScenePackage pckg("");
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags);
 
 	for (auto graphicsItemCfg : pckg.items()) {
 		ot::GraphicsItem* graphicsItem = ot::GraphicsItemFactory::itemFromConfig(graphicsItemCfg, true);
@@ -3627,7 +3628,9 @@ std::string ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument
 		// Specific view
 
 		std::string editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
-		ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info);
+
+		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+		ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(editorName, QString::fromStdString(editorName), info, insertFlags);
 
 		if (editor) {
 			for (auto itemUID : itemUids) {
@@ -3656,7 +3659,8 @@ std::string ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocum
 	ot::GraphicsConnectionPackage pckg;
 	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags);
 
 	for (const auto& connection : pckg.connections()) {
 		editor->addConnectionIfConnectedItemsExist(connection);
@@ -3676,8 +3680,8 @@ std::string ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDo
 
 	if (!pckg.name().empty()) {
 		// Specific editor
-
-		ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info);
+		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+		ot::GraphicsView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.name(), QString::fromStdString(pckg.name()), info, insertFlags);
 
 		for (auto connection : pckg.connections()) {
 			editor->removeConnection(connection.getUid());
@@ -3741,15 +3745,17 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());
 
-	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	}
 	
 	ot::TextEditorCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	ot::TextEditorView* editor = AppBase::instance()->findOrCreateTextEditor(config, info);
+	ot::TextEditorView* editor = AppBase::instance()->findOrCreateTextEditor(config, info, insertFlags);
 	editor->setContentChanged(false);
-	editor->setAsCurrentViewTab();
-
+	
 	const std::string& name = editor->getViewData().getEntityName();
 	const auto& viewerType = editor->getViewData().getViewType();
 	ot::UID globalActiveViewModel = -1;
@@ -3802,26 +3808,24 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.GetConstObject());
 
-	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
+	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::NoInsertFlags);
+	if (!ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView)) {
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	}
+
 	bool overrideCurrentContent = ot::json::getBool(_document, OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent);
 
 	ot::TableCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-
 	ot::TableView* table = AppBase::instance()->findTable(config.getEntityName());
 	if (table == nullptr)
 	{
-		table = AppBase::instance()->createNewTable(config, info);
+		table = AppBase::instance()->createNewTable(config, info, insertFlags);
 	}
 	else if (overrideCurrentContent)
 	{
 		table->setupFromConfig(config);
-	}
-
-	if (setViewAsActive)
-	{
-		table->setAsCurrentViewTab();
 	}
 	
 	table->setContentChanged(false);

@@ -858,7 +858,7 @@ void AppBase::createUi(void) {
 
 			ot::WidgetViewManager::instance().setUseFocusInfo(true);
 
-			m_projectNavigation->getViewDockWidget()->setAsCurrentTab();
+			m_projectNavigation->setAsCurrentViewTab();
 
 			uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->getQWidget());
 			//uiAPI::window::setCentralWidget(m_mainWindow, m_oldWelcomeScreen->widget());
@@ -1511,7 +1511,7 @@ void AppBase::clearGraphicsPickerData(void) {
 	m_graphicsPickerManager.setCurrentOwner(ot::BasicServiceInformation());
 }
 
-ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo) {
+ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
 	ot::GraphicsViewView* newEditor = this->findGraphicsEditor(_entityName);
 	if (newEditor != nullptr) {
 		OT_LOG_D("GraphicsEditor already exists { \"Editor.Name\": \"" + _entityName + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
@@ -1539,7 +1539,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	newEditor->getGraphicsScene()->setGridLineStyle(newOutline);
 
 	m_graphicsViews.insert_or_assign(_entityName, newEditor);
-	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor);
+	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor, _viewInsertFlags);
 
 	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
@@ -1562,7 +1562,7 @@ ot::GraphicsViewView* AppBase::findGraphicsEditor(const std::string& _entityName
 	}
 }
 
-ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo) {
+ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
 	ot::GraphicsViewView* v = this->findGraphicsEditor(_entityName);
 	if (v) {
 		return v;
@@ -1570,7 +1570,7 @@ ot::GraphicsViewView* AppBase::findOrCreateGraphicsEditor(const std::string& _en
 
 	OT_LOG_D("Graphics Editor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _entityName + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 
-	return this->createNewGraphicsEditor(_entityName, _title, _serviceInfo);
+	return this->createNewGraphicsEditor(_entityName, _title, _serviceInfo, _viewInsertFlags);
 }
 
 std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors(void) {
@@ -1581,7 +1581,7 @@ std::list<ot::GraphicsViewView*> AppBase::getAllGraphicsEditors(void) {
 
 // Text Editor
 
-ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
+ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
 	ot::TextEditorView* newEditor = this->findTextEditor(_config.getEntityName());
 	if (newEditor != nullptr) {
 		OT_LOG_D("TextEditor already exists { \"Editor.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
@@ -1598,7 +1598,7 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	newEditor->getViewData().getViewType();
 	newEditor->getViewData().getEntityName();
 	m_textEditors.insert_or_assign(_config.getEntityName(), newEditor);
-	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor);
+	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor, _viewInsertFlags);
 
 	this->connect(newEditor, &ot::TextEditor::saveRequested, this, &AppBase::slotTextEditorSaveRequested);
 
@@ -1617,7 +1617,7 @@ ot::TextEditorView* AppBase::findTextEditor(const std::string& _entityName) {
 	}
 }
 
-ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
+ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
 	ot::TextEditorView* v = this->findTextEditor(_config.getEntityName());
 	if (v) {
 		v->setupFromConfig(_config, true);
@@ -1625,7 +1625,7 @@ ot::TextEditorView* AppBase::findOrCreateTextEditor(const ot::TextEditorCfg& _co
 	}
 
 	OT_LOG_D("TextEditor does not exist. Creating new empty editor. { \"Editor.Name\": \"" + _config.getEntityName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
-	return this->createNewTextEditor(_config, _serviceInfo);
+	return this->createNewTextEditor(_config, _serviceInfo, _viewInsertFlags);
 }
 
 void AppBase::closeTextEditor(const std::string& _entityName) {
@@ -1649,7 +1649,7 @@ void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInf
 
 // Table
 
-ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
+ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
 	ot::TableView* newTable = this->findTable(_config.getEntityName());
 	if (newTable != nullptr) {
 		OT_LOG_D("Table already exists { \"Table.Name\": \"" + _config.getEntityName() + "\", \"Service.Name\": \"" + _serviceInfo.serviceName() + "\", \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }. Skipping creation");
@@ -1665,7 +1665,7 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 	newTable->setupFromConfig(_config);
 
 	m_tables.insert_or_assign(_config.getEntityName(), newTable);
-	ot::WidgetViewManager::instance().addView(_serviceInfo, newTable);
+	ot::WidgetViewManager::instance().addView(_serviceInfo, newTable, _viewInsertFlags);
 
 	this->connect(newTable, &ot::TableView::saveRequested, this, &AppBase::slotTableSaveRequested);
 
@@ -1684,7 +1684,7 @@ ot::TableView* AppBase::findTable(const std::string& _entityName) {
 	}
 }
 
-ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo) {
+ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags) {
 	ot::TableView* v = this->findTable(_config.getEntityName());
 	if (v) {
 		v->setupFromConfig(_config);
@@ -1692,7 +1692,7 @@ ot::TableView* AppBase::findOrCreateTable(const ot::TableCfg& _config, const ot:
 	}
 
 	OT_LOG_D("Table does not exist. Creating new table. { \"Table.Name\": \"" + _config.getEntityName() + "\"; \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
-	return this->createNewTable(_config, _serviceInfo);
+	return this->createNewTable(_config, _serviceInfo, _viewInsertFlags);
 }
 
 void AppBase::closeTable(const std::string& _entityName) {

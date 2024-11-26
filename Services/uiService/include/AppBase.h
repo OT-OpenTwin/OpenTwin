@@ -29,6 +29,7 @@
 #include "OTGui/MessageDialogCfg.h"
 #include "OTGui/GraphicsPickerCollectionManager.h"
 #include "OTWidgets/ColorStyle.h"
+#include "OTWidgets/WidgetView.h"
 #include "OTWidgets/MessageBoxHandler.h"
 
 #include <akGui/aWindowEventHandler.h>
@@ -414,11 +415,11 @@ public:
 	//! \brief Clears the graphics picker and stored service picker data.
 	void clearGraphicsPickerData(void);
 
-	ot::GraphicsViewView* createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo);
+	ot::GraphicsViewView* createNewGraphicsEditor(const std::string& _entityName, const QString& _title, ot::BasicServiceInformation _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
 
 	ot::GraphicsViewView* findGraphicsEditor(const std::string& _entityName);
 
-	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo);
+	ot::GraphicsViewView* findOrCreateGraphicsEditor(const std::string& _entityName, const QString& _title, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
 
 	std::list<ot::GraphicsViewView*> getAllGraphicsEditors(void);
 
@@ -426,11 +427,11 @@ public:
 
 	// Text Editor
 
-	ot::TextEditorView* createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
+	ot::TextEditorView* createNewTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
 
 	ot::TextEditorView* findTextEditor(const std::string& _entityName);
 
-	ot::TextEditorView* findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
+	ot::TextEditorView* findOrCreateTextEditor(const ot::TextEditorCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
 
 	void closeTextEditor(const std::string& _entityName);
 
@@ -440,11 +441,11 @@ public:
 
 	// Table
 
-	ot::TableView* createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
+	ot::TableView* createNewTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
 
 	ot::TableView* findTable(const std::string& _entityName);
 
-	ot::TableView* findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo);
+	ot::TableView* findOrCreateTable(const ot::TableCfg& _config, const ot::BasicServiceInformation& _serviceInfo, const ot::WidgetView::InsertFlags& _viewInsertFlags);
 
 	void closeTable(const std::string& _name);
 

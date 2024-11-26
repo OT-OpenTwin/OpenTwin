@@ -84,6 +84,8 @@ namespace ot {
 
 		void setAsCurrentViewTab(void);
 
+		bool isCurrentViewTab(void) const;
+
 	protected:
 
 		//! @brief Call this function as soon as the widget for this view is created to add it to the dock

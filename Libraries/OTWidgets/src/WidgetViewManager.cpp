@@ -433,13 +433,27 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 
 	_view->getViewDockWidget()->setWindowIcon(ot::IconManager::getApplicationIcon());
 
-
+	// Determine 
 	ads::CDockAreaWidget* area = nullptr;
-	
 	if (m_useFocusInfo) {
 		area = this->getBestDockArea(_view);
 	}
 
+	// If the current focus settings should not change store the current active views
+	std::list<WidgetView*> focusedViews;
+	bool dockSignalsBlocked = m_dockManager->signalsBlocked();
+
+	if (_insertFlags & WidgetView::KeepCurrentFocus) {
+		for (const ViewEntry& entry : m_views) {
+			if (entry.second->isCurrentViewTab()) {
+				focusedViews.push_back(entry.second);
+			}
+		}
+
+		m_dockManager->blockSignals(true);
+	}
+
+	// Add the new view
 	m_dockManager->addView(_view, area, _insertFlags);
 	
 	// Add view toggle (if view is closeable)
@@ -454,8 +468,16 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	newViewEntry.second = _view;
 	m_views.push_back(newViewEntry);
 
-	// Update focus information
-	this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
+	// Update focus information or reset the current focus depending on the insert mode
+	if (_insertFlags & WidgetView::KeepCurrentFocus) {
+		for (WidgetView* view : focusedViews) {
+			view->setAsCurrentViewTab();
+		}
+		m_dockManager->blockSignals(dockSignalsBlocked);
+	}
+	else {
+		this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
+	}
 
 	// Connect signals
 	this->connect(_view->getViewDockWidget(), &ads::CDockWidget::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
