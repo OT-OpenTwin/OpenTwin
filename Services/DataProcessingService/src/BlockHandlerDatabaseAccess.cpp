@@ -182,6 +182,10 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		{
 			throw std::exception("Query returned nothing.");
 		}
+		
+		if (Application::instance()->uiComponent()) {
+			Application::instance()->uiComponent()->displayMessage("Query returned " + std::to_string(numberOfDocuments) + " results.");
+		}
 
 		for (uint32_t i = 0; i < numberOfDocuments; i++)
 		{
