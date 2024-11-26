@@ -8,7 +8,12 @@
 #include "OTWidgets/MessageDialog.h"
 
 ot::MessageDialogCfg::BasicButton ot::MessageDialog::showDialog(const MessageDialogCfg& _config, QWidget* _parent) {
-	QMessageBox msg(convertIcon(_config.icon()), QString::fromStdString(_config.getTitle()), QString::fromStdString(_config.text()), convertButtons(_config.buttons()), _parent);
+	QMessageBox msg(
+		MessageDialog::convertIcon(_config.getIcon()),
+		QString::fromStdString(_config.getTitle()),
+		QString::fromStdString(_config.getText()),
+		MessageDialog::convertButtons(_config.getButtons()), _parent
+	);
 	
 	QMessageBox::StandardButton btn = (QMessageBox::StandardButton)msg.exec();
 	
@@ -53,7 +58,7 @@ QMessageBox::Icon ot::MessageDialog::convertIcon(MessageDialogCfg::BasicIcon _ic
 	}
 }
 
-QMessageBox::StandardButtons ot::MessageDialog::convertButtons(MessageDialogCfg::BasicButtons _buttons) {
+QMessageBox::StandardButtons ot::MessageDialog::convertButtons(const MessageDialogCfg::BasicButtons& _buttons) {
 	QMessageBox::StandardButtons ret = QMessageBox::NoButton;
 
 	if (_buttons & MessageDialogCfg::Ok) ret |= QMessageBox::Ok;

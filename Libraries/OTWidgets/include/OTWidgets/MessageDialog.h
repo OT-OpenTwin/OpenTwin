@@ -22,7 +22,7 @@ namespace ot {
 		
 		static QMessageBox::Icon convertIcon(MessageDialogCfg::BasicIcon _icon);
 
-		static QMessageBox::StandardButtons convertButtons(MessageDialogCfg::BasicButtons _buttons);
+		static QMessageBox::StandardButtons convertButtons(const MessageDialogCfg::BasicButtons& _buttons);
 
 	private:
 		MessageDialog() = delete;

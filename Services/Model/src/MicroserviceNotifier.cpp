@@ -266,7 +266,7 @@ void MicroserviceNotifier::promptChoice(const std::string& _message, ot::Message
 	ot::MessageDialogCfg config;
 	config.setText(_message);
 	config.setIcon(_icon);
-	config.setButton(_buttons);
+	config.setButtons(_buttons);
 	config.setTitle("Open Twin");
 	ot::JsonObject configObj;
 	config.addToJsonObject(configObj, doc.GetAllocator());

@@ -17,25 +17,25 @@ namespace ot {
 	class OT_GUI_API_EXPORT MessageDialogCfg : public DialogCfg {
 	public:
 		enum BasicButton {
-			NoButtons       = 0x00000,
-			Ok              = 0x00001,
-			Save            = 0x00002,
-			SaveAll         = 0x00004,
-			Open            = 0x00008,
-			Yes             = 0x00010,
-			YesToAll        = 0x00020,
-			No              = 0x00040,
-			NoToAll         = 0x00080,
-			Abort           = 0x00100,
-			Retry           = 0x00200,
-			Ignore          = 0x00400,
-			Close           = 0x00800,
-			Cancel          = 0x01000,
-			Discard         = 0x02000,
-			Help            = 0x04000,
-			Apply           = 0x08000,
-			Reset           = 0x10000,
-			RestoreDefaults = 0x20000
+			NoButtons       = 0 << 0,
+			Ok              = 1 << 0,
+			Save            = 1 << 1,
+			SaveAll         = 1 << 2,
+			Open            = 1 << 3,
+			Yes             = 1 << 4,
+			YesToAll        = 1 << 5,
+			No              = 1 << 6,
+			NoToAll         = 1 << 7,
+			Abort           = 1 << 8,
+			Retry           = 1 << 9,
+			Ignore          = 1 << 10,
+			Close           = 1 << 11,
+			Cancel          = 1 << 12,
+			Discard         = 1 << 13,
+			Help            = 1 << 14,
+			Apply           = 1 << 15,
+			Reset           = 1 << 16,
+			RestoreDefaults = 1 << 17
 		};
 		typedef Flags<BasicButton> BasicButtons;
 
@@ -69,14 +69,14 @@ namespace ot {
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		void setText(const std::string& _text) { m_text = _text; };
-		const std::string& text(void) const { return m_text; };
+		const std::string& getText(void) const { return m_text; };
 
 		void setButton(BasicButton _button, bool _active = true) { m_buttons.setFlag(_button, _active); };
 		void setButtons(BasicButtons _buttons) { m_buttons = _buttons; };
-		BasicButtons buttons(void) const { return m_buttons; };
+		const BasicButtons& getButtons(void) const { return m_buttons; };
 
 		void setIcon(BasicIcon _icon) { m_icon = _icon; };
-		BasicIcon icon(void) const { return m_icon; };
+		BasicIcon getIcon(void) const { return m_icon; };
 
 	private:
 		std::string m_text;
