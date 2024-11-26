@@ -430,13 +430,27 @@ ot::TableRange DataCategorizationHandler::selectionRangeToMatrixRange(const ot::
 
 void DataCategorizationHandler::requestToOpenTable(const std::string& _tableName)
 {
+	ot::EntityInformation entityInfo;
+	Application::instance()->modelComponent()->getEntityInformation(_tableName, entityInfo);
+	EntityBase* entityBase = Application::instance()->modelComponent()->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
+	IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entityBase);
+	assert(table != nullptr);
+		
 	ot::JsonDocument document;
-	document.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_Setup, document.GetAllocator()), document.GetAllocator());
-	document.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_tableName, document.GetAllocator()), document.GetAllocator());
+	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
+	info.addToJsonObject(document, document.GetAllocator());
+	document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TABLE_Setup, document.GetAllocator());
 	document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, true, document.GetAllocator());
-	
+	document.AddMember(OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent, false, document.GetAllocator());
+
+	ot::TableCfg tableCfg = table->getTableConfig();;
+	ot::JsonObject cfgObj;
+	tableCfg.addToJsonObject(cfgObj, document.GetAllocator());
+
+	document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
+		
 	std::string answer;
-	Application::instance()->modelComponent()->sendMessage(false, document, answer);
+	Application::instance()->uiComponent()->sendMessage(false, document, answer);
 }
 
 void DataCategorizationHandler::requestColouringRanges(bool _clearSelection, const std::string& _tableName, const ot::Color& _colour, const std::list<ot::TableRange>& ranges)
