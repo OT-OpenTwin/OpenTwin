@@ -24,6 +24,7 @@ DataCategorizationHandler::DataCategorizationHandler(std::string _baseFolder, st
 std::string DataCategorizationHandler::markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category)
 {
 	ensureEssentials();
+	clearBufferedMetadata();
 	if (_selectedEntities.empty())
 	{
 		_uiComponent->displayMessage("No table selection detected.");
@@ -336,6 +337,67 @@ void DataCategorizationHandler::addNewCategorizationEntity(std::string name, Ent
 	}
 }
 
+ot::TableRange DataCategorizationHandler::userRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation)
+{
+	//First we switch from base-1 index to base -0 index
+	int rangeRowBottom =_range.getBottomRow() - 1;
+	int rangeRowTop = _range.getTopRow() -1;
+	int rangeColumnLeft = _range.getLeftColumn() -1;
+	int rangeColumnRight = _range.getRightColumn() -1;
+	
+	//Now we take the header in consideration, which is part of the matrix and its row/column index, but the TableConfig handles the header as separate vector
+	if (_headerOrientation == ot::TableHeaderOrientation::horizontal)
+	{
+		rangeRowBottom += 1;
+		rangeRowTop += 1;
+	}
+	else if (_headerOrientation == ot::TableHeaderOrientation::vertical)
+	{
+		rangeColumnLeft += 1;
+		rangeColumnRight += 1;
+	}
+	ot::TableRange matrixRange (rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
+	return matrixRange;
+}
+
+
+ot::TableRange DataCategorizationHandler::selectionRangeToUserRange(const ot::TableRange& _range)
+{
+	//We switch base-0 to base-1 index
+	int rangeRowBottom = _range.getBottomRow() +1 ;
+	int rangeRowTop = _range.getTopRow() + 1;
+	int rangeColumnLeft = _range.getLeftColumn() + 1;
+	int rangeColumnRight = _range.getRightColumn() + 1;
+	ot::TableRange userRange(rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
+	return userRange;
+}
+
+ot::TableRange DataCategorizationHandler::selectionRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation)
+{
+	//Both QTable and matrix work with a base-0 index. Nothing needs to be changed in this regard
+	//The QTable handles the header as a separate vector, in the matrix it is simply part of the matrix. Here we need to make an adjustment
+		//First we switch from base-1 index to base -0 index
+	int rangeRowBottom = _range.getBottomRow();
+	int rangeRowTop = _range.getTopRow();
+	int rangeColumnLeft = _range.getLeftColumn();
+	int rangeColumnRight = _range.getRightColumn();
+
+	//Now we take the header in consideration, which is part of the matrix and its row/column index, but the TableConfig handles the header as separate vector
+	if (_headerOrientation == ot::TableHeaderOrientation::horizontal)
+	{
+		rangeRowBottom += 1;
+		rangeRowTop += 1;
+	}
+	else if (_headerOrientation == ot::TableHeaderOrientation::vertical)
+	{
+		rangeColumnLeft += 1;
+		rangeColumnRight += 1;
+	}
+	ot::TableRange matrixRange (rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
+	
+	return matrixRange;
+}
+
 void DataCategorizationHandler::requestToOpenTable(const std::string& _tableName)
 {
 	ot::JsonDocument document;
@@ -404,8 +466,15 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 
 	
 	assert(m_scriptFolderUID != -1);
-		
-	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr->getTable(), _ranges);
+
+	std::vector<ot::TableRange> matrixRanges;
+	matrixRanges.reserve(_ranges.size());
+	for (const auto& selectionRange : _ranges)
+	{
+		matrixRanges.push_back(selectionRangeToMatrixRange(selectionRange, tableEntPtr->getHeaderOrientation()));
+	}
+
+	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr->getTable(), matrixRanges);
 
 	//Now we create the selection entities
 	for (auto& bufferedCategorisationName : m_bufferedCategorisationNames)
@@ -429,14 +498,16 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 				tableRange->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, "", -1,dataType);
 			}
 			
-			tableRange->setRange(_ranges[i]);
+			ot::TableRange userRange = selectionRangeToUserRange(_ranges[i]);
+			tableRange->setRange(userRange);
 			tableRange->SetTableProperties(tableBase->getName(), tableBase->getEntityID(), ot::toString(tableEntPtr->getHeaderOrientation()));
 			tableRange->setEditable(true);
 			
 			// The name of the entity should correspond to the header value of the table. This header value will later be used as key of the database entry
 			std::string name = "";
 			ot::MatrixEntryPointer matrixPtr;
-			if (tableRange->getTableOrientation() == EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
+			const std::string selectedTableOrientation =	tableRange->getTableOrientation();
+			if (selectedTableOrientation == EntityParameterizedDataTable::GetHeaderOrientation(EntityParameterizedDataTable::HeaderOrientation::horizontal))
 			{
 				matrixPtr.m_row = 0;
 				for (matrixPtr.m_column = static_cast<uint32_t>(_ranges[i].getLeftColumn()); matrixPtr.m_column <= static_cast<uint32_t>(_ranges[i].getRightColumn()); matrixPtr.m_column++)
@@ -490,51 +561,11 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 		topologyEntityIDList.push_back(categoryEntity->getEntityID());
 		topologyEntityVersionList.push_back(categoryEntity->getEntityStorageVersion());
 		topologyEntityForceVisible.push_back(false);
-
-		/*auto newPreviewEntity = new EntityParameterizedDataPreviewTable(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
-		newPreviewEntity->setName(categoryEntity->getName() + "/" + _previewTableName);
-
-		newPreviewEntity->StoreToDataBase();
-		topologyEntityIDList.push_back(newPreviewEntity->getEntityID());
-		topologyEntityVersionList.push_back(newPreviewEntity->getEntityStorageVersion());
-		topologyEntityForceVisible.push_back(false);*/
 	}
 
 	_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible,
 		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new table selection range");
 }
-
-//std::pair<ot::UID, ot::UID> DataCategorizationHandler::GetPreview(ot::EntityInformation selectedPreviewTable)
-//{
-//	std::string tableName = selectedPreviewTable.getName();
-//	std::string containerName = tableName.substr(0, tableName.find_last_of("/"));
-//
-//	std::list<std::pair<ot::UID, ot::UID>> existingRanges;
-//	FindExistingRanges(containerName, existingRanges);
-//
-//	auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(selectedPreviewTable.getID(), selectedPreviewTable.getVersion(), Application::instance()->getClassFactory());
-//	std::shared_ptr<EntityParameterizedDataPreviewTable> currentPreview(dynamic_cast<EntityParameterizedDataPreviewTable*>(baseEnt));
-//
-//	if (currentPreview == nullptr)
-//	{
-//		assert(0);
-//	}
-//
-//	if (CheckIfPreviewIsUpToDate(currentPreview,existingRanges) && currentPreview->getTableDataStorageId() != -1 && currentPreview->getTableDataStorageVersion() != -1)
-//	{
-//		return std::make_pair<ot::UID, ot::UID>(selectedPreviewTable.getID(),selectedPreviewTable.getVersion());
-//	}
-//	else
-//	{
-//		std::pair<ot::UID, ot::UID> categorizationEntityIdentifier;
-//		FindContainerEntity(containerName, categorizationEntityIdentifier);
-//		auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(categorizationEntityIdentifier.first, categorizationEntityIdentifier.second, Application::instance()->getClassFactory());
-//		std::unique_ptr<EntityParameterizedDataCategorization> categoryEnt(dynamic_cast<EntityParameterizedDataCategorization*>(baseEnt));
-//		auto newTableIdentifier = createNewTable(tableName, categoryEnt->GetSelectedDataCategorie(), existingRanges);
-//		return newTableIdentifier;
-//	}
-//
-//}
 
 void DataCategorizationHandler::FindExistingRanges(std::string containerName, std::list<std::pair<ot::UID, ot::UID>>& existingRanges)
 {

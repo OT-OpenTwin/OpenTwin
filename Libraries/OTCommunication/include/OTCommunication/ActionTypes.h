@@ -262,7 +262,6 @@
 #define OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn "UI.VIEW.Table.ADDCOLUMN"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn "UI.VIEW.Table.DELETECOLUMN"
 #define OT_ACTION_CMD_UI_VIEW_OBJ_ColourSelection "UI.VIEW.ColourSelection"
-#define OT_ACTION_CMD_UI_VIEW_OBJ_SelectRanges "UI.VIEW.SelectRanges"
 
 #define OT_ACTION_CMD_PYTHON_EXECUTE "Python.Execute"
 #define OT_ACTION_CMD_PYTHON_EXECUTE_Scripts "Python.Execute.Scripts"

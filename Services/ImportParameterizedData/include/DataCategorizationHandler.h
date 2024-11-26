@@ -23,6 +23,8 @@
 #include "OTCore/Variable.h"
 #include "OTServiceFoundation/PythonServiceInterface.h"
 #include "OTCore/GenericDataStructMatrix.h"
+#include "OTGui/TableRange.h"
+#include "OTGui/TableHeaderOrientation.h"
 
 #include <optional>
 #include <map>
@@ -92,6 +94,10 @@ private:
 	void addSMDEntries(std::list<EntityBase*>& _selectedEntities);
 	void addParamOrQuantityEntries(std::list<EntityBase*>& _selectedEntities, EntityParameterizedDataCategorization::DataCategorie _category);
 	void addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive);
+
+	ot::TableRange userRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation);
+	ot::TableRange selectionRangeToMatrixRange(const ot::TableRange& _range,const ot::TableHeaderOrientation& _headerOrientation);
+	ot::TableRange selectionRangeToUserRange(const ot::TableRange& _range);
 
 	void requestToOpenTable(const std::string& _tableName);
 	void requestColouringRanges(bool _clearSelection ,const std::string& _tableName, const ot::Color& _colour, const std::list<ot::TableRange>& ranges);

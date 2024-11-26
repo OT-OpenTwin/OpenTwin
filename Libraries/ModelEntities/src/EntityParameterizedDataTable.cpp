@@ -113,8 +113,8 @@ std::string EntityParameterizedDataTable::GetHeaderOrientation(HeaderOrientation
 	return temp;
 }
 
-const std::string EntityParameterizedDataTable::_headerSettingHorizontal = "first row";
-const std::string EntityParameterizedDataTable::_headerSettingVertical = "first column";
+const std::string EntityParameterizedDataTable::_headerSettingHorizontal = "First row";
+const std::string EntityParameterizedDataTable::_headerSettingVertical = "First column";
 
 std::map<EntityParameterizedDataTable::HeaderOrientation, const std::string> EntityParameterizedDataTable::_orientationToString{ 
 	{HeaderOrientation::horizontal, EntityParameterizedDataTable::_headerSettingHorizontal}, 
