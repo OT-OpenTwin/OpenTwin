@@ -343,12 +343,6 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	}
 
 	
-	//Testing
-	const int sessionCount = Application::instance()->getSessionCount();
-	const int serviceID = Application::instance()->getServiceIDAsInt();
-	m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
-
-
 	m_blockEntityHandler.setPackageName(name);
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
 	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections();
@@ -365,8 +359,8 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	m_blockEntityHandler.createResultCurves(solverName,simulationTypeProperty->getValue(),circuitName->getValueName());
 	m_ngSpice.clearBufferStructure(name);
 
-	//Tesing
-	/*m_subprocessHandler->stopSubprocess();*/
+	////Testing
+	//m_subprocessHandler->stopSubprocess();
 	
 }
 
@@ -507,12 +501,12 @@ void Application::run(void) {
 	}
 
 	//Testing
-	//const int sessionCount = Application::instance()->getSessionCount();
-	//const int serviceID = Application::instance()->getServiceIDAsInt();
-	//if (m_subprocessHandler == nullptr)
-	//{
-	//	m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
-	//}
+	const int sessionCount = Application::instance()->getSessionCount();
+	const int serviceID = Application::instance()->getServiceIDAsInt();
+	if (m_subprocessHandler == nullptr)
+	{
+		m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
+	}
 
 	//m_subprocessHandler->startSubprocess();
 

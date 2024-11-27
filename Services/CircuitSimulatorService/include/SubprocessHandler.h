@@ -18,6 +18,11 @@ public:
 	~SubprocessHandler();
 
 
+	void RunSubprocess();
+	bool startSubprocess();
+	void stopSubprocess();
+	bool isSubprocessHealthy();
+	void restartSubprocess();
 
 private:
 	std::string m_serverName;
@@ -28,11 +33,6 @@ private:
 	std::atomic_bool m_isHealthy;
 	std::atomic_bool m_initialisationPrepared = false;
 
-	void RunSubprocess();
-	bool startSubprocess();
-	void stopSubprocess();
-	bool isSubprocessHealthy();
-	void restartSubprocess();
 
 	std::vector<std::string> m_initialisationRoutines;
 	const int m_numberOfInitialisationRoutines = 4;
