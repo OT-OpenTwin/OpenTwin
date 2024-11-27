@@ -5,8 +5,8 @@
 
 BsonViewOrValue AdvancedQueryBuilder::CreateComparison(const std::string& comparator, const ot::Variable& variable)
 {
-	auto mongoComparator = _mongoDBComparators.find(comparator);
-	if (mongoComparator == _mongoDBComparators.end() || mongoComparator->second == "$in" || mongoComparator->second == "$nin")
+	auto mongoComparator = m_mongoDBComparators.find(comparator);
+	if (mongoComparator == m_mongoDBComparators.end() || mongoComparator->second == "$in" || mongoComparator->second == "$nin")
 	{
 		assert(0);
 		throw std::exception("Not supported comparator selected for comparison query.");

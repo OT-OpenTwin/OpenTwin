@@ -7,6 +7,7 @@
 #include "AdvancedQueryBuilder.h"
 #include "ResultCollectionMetadataAccess.h"
 #include "ResultDataStorageAPI.h"
+#include "OTCore/StringToVariableConverter.h"
 
 class BlockHandlerDatabaseAccess : public BlockHandler
 {
@@ -26,15 +27,16 @@ private:
 	
 	DataStorageAPI::ResultDataStorageAPI* m_resultCollectionAccess = nullptr;
 	ResultCollectionMetadataAccess* m_resultCollectionMetadataAccess = nullptr;
-	std::list< BsonViewOrValue> _comparisons;
+	std::list< BsonViewOrValue> m_comparisons;
 	
 	std::list< QueryDescription> m_queryDescriptions;
 
-	BsonViewOrValue _query;
-	BsonViewOrValue _projection;
+	BsonViewOrValue m_query;
+	BsonViewOrValue m_projection;
 
-	bool _isValid = true;
-
-	void AddComparision(const ValueComparisionDefinition& definition);
-	void AddParameter(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName);
+	void buildRangeQuery(const ValueComparisionDefinition& _definition, AdvancedQueryBuilder& _builder, ot::StringToVariableConverter& _converter);
+	void buildContainsQuery(const ValueComparisionDefinition& _definition, AdvancedQueryBuilder& _builder, ot::StringToVariableConverter& _converter, bool _contains);
+	void setValueFromString(std::unique_ptr<ot::Variable>& _value, const std::string& _valueString, const std::string& _valueType) const;
+	void addComparision(const ValueComparisionDefinition& _definition);
+	void addParameter(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName);
 };

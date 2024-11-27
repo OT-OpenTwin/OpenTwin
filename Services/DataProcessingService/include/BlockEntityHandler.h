@@ -11,7 +11,7 @@
 
 class ClassFactory;
 
-class BlockEntityHandler  : public BusinessLogicHandler
+class BlockEntityHandler : public BusinessLogicHandler
 {
 public:
 	void CreateBlockEntity(const std::string& editorName, const std::string& blockName, ot::Point2DD& position);
