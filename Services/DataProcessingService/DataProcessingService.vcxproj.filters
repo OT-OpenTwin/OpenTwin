@@ -12,10 +12,6 @@
     <Filter Include="Header Files\BlockFunctionality">
       <UniqueIdentifier>{89e29ce9-6af8-450f-8a78-e27680275438}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Header Files\GraphHandling">
       <UniqueIdentifier>{47c53168-2789-4b63-8e14-1373dc17104c}</UniqueIdentifier>
     </Filter>
