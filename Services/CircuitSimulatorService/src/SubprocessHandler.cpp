@@ -75,11 +75,11 @@ void SubprocessHandler::RunSubprocess()
 			OT_LOG_E(message);
 			throw std::exception(message.c_str());
 		}
-		OT_LOG_D("Python Subprocess started");
+		OT_LOG_D("Circuit Subprocess started");
 	}
 	catch (std::exception& e)
 	{
-		const std::string exceptionMessage("Starting the python subprocess failed due to: " + std::string(e.what()) + ". Shutting down.");
+		const std::string exceptionMessage("Starting the circuit subprocess failed due to: " + std::string(e.what()) + ". Shutting down.");
 		OT_LOG_E(exceptionMessage);
 		exit(0);
 	}

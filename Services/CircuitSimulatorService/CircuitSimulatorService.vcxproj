@@ -201,6 +201,7 @@
     <ClCompile Include="src\CircuitElements\VoltageMeter.cpp" />
     <ClCompile Include="src\CircuitElements\VoltageSource.cpp" />
     <ClCompile Include="src\Connection.cpp" />
+    <ClCompile Include="src\ConnectionManager.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\NGSpice.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="include\CircuitElements\VoltageMeter.h" />
     <ClInclude Include="include\CircuitElements\VoltageSource.h" />
     <ClInclude Include="include\Connection.h" />
+    <ClInclude Include="include\ConnectionManager.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\NGSpice.h" />
     <ClInclude Include="include\SimulationResults.h" />

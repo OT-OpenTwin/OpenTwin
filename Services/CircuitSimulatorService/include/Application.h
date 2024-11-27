@@ -15,6 +15,7 @@
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h"	// Base class
 #include "SubprocessHandler.h"
+#include "ConnectionManager.h"
 // C++ header
 #include <string>
 #include <map>
@@ -150,5 +151,5 @@ public:
 
 private:
 	SubprocessHandler* m_subprocessHandler = nullptr;
-	
+	ConnectionManager* m_connectionManager = nullptr;
 };
