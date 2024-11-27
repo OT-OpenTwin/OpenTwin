@@ -47,7 +47,7 @@
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\OwnerService.cpp" />
     <ClCompile Include="src\Size2D.cpp" />
-    <ClCompile Include="src\StringHelper.cpp" />
+    <ClCompile Include="src\String.cpp" />
     <ClCompile Include="src\StringToVariableConverter.cpp" />
     <ClCompile Include="src\TextEncoding.cpp" />
     <ClCompile Include="src\ThisService.cpp" />
@@ -101,7 +101,7 @@
     <ClInclude Include="include\OTCore\Serializable.h" />
     <ClInclude Include="include\OTCore\ServiceBase.h" />
     <ClInclude Include="include\OTCore\Size2D.h" />
-    <ClInclude Include="include\OTCore\StringHelper.h" />
+    <ClInclude Include="include\OTCore\String.h" />
     <ClInclude Include="include\OTCore\StringToNumericCheck.h" />
     <ClInclude Include="include\OTCore\StringToVariableConverter.h" />
     <ClInclude Include="include\OTCore\TemplateTypeName.h" />
@@ -115,6 +115,9 @@
     <ClInclude Include="include\OTCore\VariableToBSONStringConverter.h" />
     <ClInclude Include="include\OTCore\VariableToJSONConverter.h" />
     <ClInclude Include="include\OTCore\VariableToStringConverter.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

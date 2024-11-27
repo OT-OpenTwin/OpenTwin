@@ -9,7 +9,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/StringHelper.h"
+#include "OTCore/String.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/ComboBox.h"
 #include "OTWidgets/PushButton.h"
@@ -104,7 +104,7 @@ void NetworkTools::slotRunPortBlocker(void) {
 	else {
 		// Collect ports to block
 		std::list<quint16> portsToBlock;
-		std::list<std::string> portStrings = ot::splitString(m_portBlockerPorts->toPlainText().toStdString(), '\n', true);
+		std::list<std::string> portStrings = ot::String::split(m_portBlockerPorts->toPlainText().toStdString(), '\n', true);
 
 		for (const std::string& port : portStrings) {
 			size_t ix = port.find('-');
@@ -114,7 +114,7 @@ void NetworkTools::slotRunPortBlocker(void) {
 			}
 			else if (ix == std::string::npos) {
 				bool convertFailed = false;
-				quint16 actualPort = ot::stringToNumber<quint16>(port, convertFailed);
+				quint16 actualPort = ot::String::toNumber<quint16>(port, convertFailed);
 				if (convertFailed) {
 					OT_LOG_E("Invalid number format at port \"" + port + "\". Skipping...");
 				}
@@ -127,10 +127,10 @@ void NetworkTools::slotRunPortBlocker(void) {
 				std::string toPort = port.substr(ix + 1);
 
 				bool convertFromFailed = false;
-				quint16 actualFromPort = ot::stringToNumber<quint16>(fromPort, convertFromFailed);
+				quint16 actualFromPort = ot::String::toNumber<quint16>(fromPort, convertFromFailed);
 				
 				bool convertToFailed = false;
-				quint16 actualToPort = ot::stringToNumber<quint16>(toPort, convertToFailed);
+				quint16 actualToPort = ot::String::toNumber<quint16>(toPort, convertToFailed);
 
 				if (convertFromFailed || convertToFailed) {
 					OT_LOG_E("Invalid number format at port range \"" + port + "\". Skipping...");

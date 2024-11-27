@@ -4,7 +4,7 @@
 #include "DataBase.h"
 #include "OldTreeIcon.h"
 #include "ClassFactory.h"
-#include "OTCore/StringHelper.h"
+#include "OTCore/String.h"
 
 #include "OTCore/Logger.h"
 
@@ -60,7 +60,7 @@ DataStorageAPI::UniqueUIDGenerator *EntityBase::getUidGenerator(void)
 
 std::string EntityBase::getNameOnly() const
 {
-	std::list<std::string> tmp = ot::splitString(this->getName(), '/', true);
+	std::list<std::string> tmp = ot::String::split(this->getName(), '/', true);
 	if (tmp.empty()) { return this->getName(); }
 	else { return tmp.back(); }
 }

@@ -9,7 +9,7 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTCore/StringHelper.h"
+#include "OTCore/String.h"
 #include "OTCommunication/ActionTypes.h"
 
 // SSL
@@ -27,7 +27,7 @@ WebsocketClient::WebsocketClient(const std::string& _socketUrl) :
 	QObject(nullptr), m_isConnected(false), m_currentlyProcessingQueuedMessage(false), m_sessionIsClosing(false)
 {
 	std::string wsUrl = "wss://" + _socketUrl;
-	wsUrl = ot::stringReplace(wsUrl, "127.0.0.1", "localhost");
+	wsUrl = ot::String::replace(wsUrl, "127.0.0.1", "localhost");
 	m_url = QUrl(wsUrl.c_str());
 
 	QString caStr = QCoreApplication::applicationDirPath() + "\\Certificates\\ca.pem";

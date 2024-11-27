@@ -3,7 +3,7 @@
 #include "Application.h"
 
 #include "AdvancedQueryBuilder.h"
-#include "OTCore/StringHelper.h"
+#include "OTCore/String.h"
 #include "OTCore/JSONToVariableConverter.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTCore/GenericDataStructSingle.h"
@@ -375,7 +375,7 @@ void BlockHandlerDatabaseAccess::buildContainsQuery(const ValueComparisionDefini
 	}
 	
 	// Get values
-	std::list<std::string> valueStrings = ot::splitString(valueStr, delimiter);
+	std::list<std::string> valueStrings = ot::String::split(valueStr, delimiter);
 	std::list<ot::Variable> values;
 	for (const std::string& value : valueStrings) {
 		values.push_back(ot::Variable(_converter(value, '.')));

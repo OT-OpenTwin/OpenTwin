@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/StringHelper.h"
+#include "OTCore/String.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/ImagePainter.h"
 #include "OTWidgets/SvgImagePainter.h"
@@ -50,7 +50,7 @@ void ot::ImagePainterManager::importFromFile(const std::string& _fileSubPath) {
 		return;
 	}
 
-	std::list<std::string> filePath = ot::splitString(_fileSubPath, '.', true);
+	std::list<std::string> filePath = ot::String::split(_fileSubPath, '.', true);
 	ImagePainter* newPainter = nullptr;
 
 	if (filePath.empty()) newPainter = this->importPng(_fileSubPath);

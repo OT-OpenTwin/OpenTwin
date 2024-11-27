@@ -1,14 +1,14 @@
 #include "EntityFileText.h"
 #include <locale>
 
-#include "OTCommunication/ActionTypes.h"
 #include "DataBase.h"
+#include "OTCore/String.h"
+#include "OTCore/Logger.h"
 #include "OTCore/EncodingGuesser.h"
 #include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 #include "OTCore/EncodingConverter_UTF16ToUTF8.h"
-#include "OTCore/Logger.h"
 #include "OTGui/VisualisationTypes.h"
-#include "OTCore/StringHelper.h"
+#include "OTCommunication/ActionTypes.h"
 
 EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	: EntityFile(_ID,_parent,_obs,_ms,_factory,_owner)
@@ -173,8 +173,7 @@ void EntityFileText::setSpecializedProperties()
 		, std::string(1, defaulDecimalSeparator),
 		"default", getProperties());
 
-	std::string fileType = getFileType();
-	ot::stringToLowerCase(fileType);
+	std::string fileType = ot::String::toLower(this->getFileType());
 	ot::DocumentSyntax defaultSyntaxHighlighting;
 	if (fileType == "py")
 	{

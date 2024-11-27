@@ -16,7 +16,7 @@
     <ClCompile Include="src\ServiceBase.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\StringHelper.cpp">
+    <ClCompile Include="src\String.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\TextEncoding.cpp">
@@ -189,7 +189,7 @@
     <ClInclude Include="include\OTCore\ServiceBase.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\StringHelper.h">
+    <ClInclude Include="include\OTCore\String.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\TemplateTypeName.h">
@@ -327,5 +327,8 @@
     <Filter Include="src\Geometry">
       <UniqueIdentifier>{5d7cb18f-7ed2-451e-9db2-d3da422a0bca}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/StringHelper.h"
+#include "OTCore/String.h"
 #include "OTGui/Painter2D.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTWidgets/StyledTextConverter.h"
@@ -17,7 +17,7 @@ QString ot::StyledTextConverter::toHtml(const StyledTextBuilder& _builder) {
 	QString result("<p>");
 	
 	for (const StyledTextEntry& entry : _builder.getEntries()) {
-		std::list<std::string> lst = ot::splitString(entry.getText(), "\n");
+		std::list<std::string> lst = ot::String::split(entry.getText(), "\n");
 		bool first = true;
 		for (const std::string& text : lst) {
 			if (!first) {

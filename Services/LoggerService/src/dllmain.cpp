@@ -7,7 +7,7 @@
 #include "AppBase.h"
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTCore/StringHelper.h"
+#include "OTCore/String.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
@@ -79,7 +79,7 @@ namespace ot {
 		}
 
 		char* dispatchAction(const char* _json, ot::MessageType _messageType) {
-			return ot::getCStringCopy(dispatchActionWrapper(_json, _messageType));
+			return ot::String::getCStringCopy(dispatchActionWrapper(_json, _messageType));
 		}
 	}
 }
@@ -134,7 +134,7 @@ extern "C"
 	};
 
 	_declspec(dllexport) const char *getServiceURL(void) {
-		return ot::getCStringCopy(AppBase::instance().getServiceURL());
+		return ot::String::getCStringCopy(AppBase::instance().getServiceURL());
 	};
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP) {

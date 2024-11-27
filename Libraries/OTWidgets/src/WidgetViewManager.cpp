@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/StringHelper.h"
+#include "OTCore/String.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/IconManager.h"
 #include "OTWidgets/WidgetViewManager.h"
@@ -253,7 +253,7 @@ bool ot::WidgetViewManager::restoreState(std::string _state, int _version) {
 	size_t ix = _state.find(';');
 	bool convertFail = false;
 	while (ix != std::string::npos) {
-		tmp.append((char)ot::stringToNumber<int>(_state.substr(0, ix), convertFail));
+		tmp.append((char)ot::String::toNumber<int>(_state.substr(0, ix), convertFail));
 		if (convertFail) {
 			OT_LOG_E("State contains invalid characters");
 			return false;
@@ -263,7 +263,7 @@ bool ot::WidgetViewManager::restoreState(std::string _state, int _version) {
 	}
 
 	if (!_state.empty()) {
-		tmp.append((char)ot::stringToNumber<int>(_state, convertFail));
+		tmp.append((char)ot::String::toNumber<int>(_state, convertFail));
 	}
 
 	bool result = m_dockManager->restoreState(tmp, _version);

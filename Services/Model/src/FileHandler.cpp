@@ -1,18 +1,19 @@
 #include "stdafx.h"
+#include "Model.h"
 #include "FileHandler.h"
-#include "OTCommunication/ActionTypes.h"
 #include "Application.h"
+#include "EntityFileCSV.h"
+#include "EntityFileText.h"
+#include "OTCore/String.h"
+#include "OTCore/FolderNames.h"
+#include "OTCore/EncodingGuesser.h"
+#include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/Encryption.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "OTCore/EncodingGuesser.h"
-#include "EntityFileText.h"
-#include "EntityFileCSV.h"
-#include "Model.h"
-#include "OTCore/FolderNames.h"
-#include <assert.h>
 #include "QueuingHttpRequestsRAII.h"
 #include "QueuingDatabaseWritingRAII.h"
-#include "OTCore/StringHelper.h"
+
+#include <assert.h>
 
 void FileHandler::addButtons(ot::components::UiComponent* _uiComponent, const std::string& _pageName)
 {
@@ -326,9 +327,7 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	size_t fileNamePos = _fileName.find_last_of("/");
 	std::string path = _fileName.substr(0, fileNamePos);
 	std::string name = _fileName.substr(fileNamePos + 1);
-	std::string type = name.substr(name.find_last_of('.') + 1);
-
-	ot::stringToLowerCase(type);
+	std::string type = ot::String::toLower(name.substr(name.find_last_of('.') + 1));
 
 	std::unique_ptr<EntityFileText> textFile;
 	if (type == "csv")

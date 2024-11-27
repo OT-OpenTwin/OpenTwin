@@ -59,7 +59,6 @@ void EntityFileCSV::readSpecificDataFromDataBase(bsoncxx::document::view & doc_v
 	m_columnDelimiter = std::string(doc_view["ColumnDelimiter"].get_utf8().value.data());
 }
 
-
 const ot::GenericDataStructMatrix EntityFileCSV::getTable()
 {
 	CSVProperties properties;

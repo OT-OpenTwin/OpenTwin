@@ -12,7 +12,7 @@
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
-#include "OTCore/StringHelper.h"
+#include "OTCore/String.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/SpinBox.h"
 #include "OTWidgets/CheckBox.h"

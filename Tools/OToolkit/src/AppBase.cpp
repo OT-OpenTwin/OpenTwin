@@ -27,7 +27,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON.h"
-#include "OTCore/StringHelper.h"
+#include "OTCore/String.h"
 #include "OTGui/FillPainter2D.h"
 #include "OTGui/StyleRefPainter2D.h"
 #include "OTGui/CheckerboardPainter2D.h"
@@ -196,7 +196,7 @@ void AppBase::setUrl(const QString& _url) {
 }
 
 void AppBase::parseStartArgs(const std::string& _args) {
-	std::list<std::string> tmp = ot::splitString(_args, ' ', true);
+	std::list<std::string> tmp = ot::String::split(_args, ' ', true);
 	for (const std::string& arg : tmp) {
 		if (arg == "-logexport") m_startArgs.push_back(StartOption::LogExport);
 		else {

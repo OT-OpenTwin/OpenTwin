@@ -1260,7 +1260,6 @@ void Application::handleAsyncSelectionChanged(const ot::JsonDocument& _document)
 
 	// It might happen that the UI still has some reference to entitires which have already been deleted.
 	// Therefore we filter the items by checing whether they still exist.
-
 	std::list<ot::UID> selectedEntityIDsVerified, selectedVisibleEntityIDsVerified;
 	for (auto entityID : selectedEntityIDs)
 	{

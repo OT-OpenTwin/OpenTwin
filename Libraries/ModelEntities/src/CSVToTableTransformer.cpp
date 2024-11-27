@@ -1,7 +1,7 @@
 #include "CSVToTableTransformer.h"
 #include "OTCore/VariableToStringConverter.h"
-ot::GenericDataStructMatrix CSVToTableTransformer::operator()(const std::string& _csvText, const CSVProperties& _properties) 
-{
+
+ot::GenericDataStructMatrix CSVToTableTransformer::operator()(const std::string& _csvText, const CSVProperties& _properties) {
 	assert(_properties.m_columnDelimiter != "" && _properties.m_rowDelimiter != "");
 	std::vector<std::string> rows = splitByDelimiter(_csvText, _properties.m_rowDelimiter);
 
@@ -19,8 +19,7 @@ ot::GenericDataStructMatrix CSVToTableTransformer::operator()(const std::string&
 	return matrix;
 }
 
-std::string CSVToTableTransformer::operator()(const ot::GenericDataStructMatrix& _matrix, const CSVProperties& _properties)
-{
+std::string CSVToTableTransformer::operator()(const ot::GenericDataStructMatrix& _matrix, const CSVProperties& _properties) {
 	ot::MatrixEntryPointer matrixEntry;
 	uint32_t numberOfColumns =	_matrix.getNumberOfColumns();
 	uint32_t numberOfRows = _matrix.getNumberOfRows();

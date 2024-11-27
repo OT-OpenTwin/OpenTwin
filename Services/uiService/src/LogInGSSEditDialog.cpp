@@ -8,7 +8,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/StringHelper.h"
+#include "OTCore/String.h"
 #include "OTWidgets/Label.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/PushButton.h"
@@ -132,7 +132,7 @@ bool LogInGSSEditDialogEntry::isValidIpV4(void) const {
 		if (lst.count() == 4) {
 			bool failed = false;
 			for (const QString& str : lst) {
-				int number = ot::stringToNumber<int>(str.toStdString(), failed);
+				int number = ot::String::toNumber<int>(str.toStdString(), failed);
 				if (failed) return false;
 				if (number < 0 || number > 255) return false;
 			}
@@ -150,7 +150,7 @@ bool LogInGSSEditDialogEntry::isValidPort(void) const {
 	if (m_port->text().isEmpty()) return false;
 	
 	bool failed = false;
-	int number = ot::stringToNumber<int>(m_port->text().toStdString(), failed);
+	int number = ot::String::toNumber<int>(m_port->text().toStdString(), failed);
 	if (failed) return false;
 	
 	if (number < 0 || number > 65535) return false;

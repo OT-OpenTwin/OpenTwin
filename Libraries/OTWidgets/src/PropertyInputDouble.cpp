@@ -5,7 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/StringHelper.h"
+#include "OTCore/String.h"
 #include "OTGui/PropertyDouble.h"
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/DoubleSpinBox.h"
@@ -38,7 +38,7 @@ void ot::PropertyInputDouble::addPropertyInputValueToJson(ot::JsonValue& _object
 	else {
 		OTAssertNullptr(m_lineEdit);
 		bool failed = false;
-		double n = stringToNumber<double>(m_lineEdit->text().toStdString(), failed);
+		double n = String::toNumber<double>(m_lineEdit->text().toStdString(), failed);
 		if (failed) {
 			OT_LOG_W("Invalid number format. Defaulting");
 			n = 0.;
@@ -55,7 +55,7 @@ QVariant ot::PropertyInputDouble::getCurrentValue(void) const {
 	else {
 		OTAssertNullptr(m_lineEdit);
 		bool failed = false;
-		double n = stringToNumber<double>(m_lineEdit->text().toStdString(), failed);
+		double n = String::toNumber<double>(m_lineEdit->text().toStdString(), failed);
 		if (failed) {
 			OT_LOG_W("Invalid number format. Defaulting");
 			n = 0.;
@@ -91,7 +91,7 @@ double ot::PropertyInputDouble::getValue(void) const {
 	else {
 		OTAssertNullptr(m_lineEdit);
 		bool failed = false;
-		double n = stringToNumber<double>(m_lineEdit->text().toStdString(), failed);
+		double n = String::toNumber<double>(m_lineEdit->text().toStdString(), failed);
 		if (failed) {
 			OT_LOG_W("Invalid number format. Defaulting");
 			n = 0.;
@@ -108,7 +108,7 @@ bool ot::PropertyInputDouble::hasInputError(void) const {
 	else {
 		OTAssertNullptr(m_lineEdit);
 		bool failed = false;
-		stringToNumber<double>(m_lineEdit->text().toStdString(), failed);
+		String::toNumber<double>(m_lineEdit->text().toStdString(), failed);
 		return failed;
 	}
 }
