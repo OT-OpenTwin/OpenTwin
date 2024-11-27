@@ -186,8 +186,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_PYTHON_LIBPATH);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(Qt_LIBPATH_)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);python39.lib;BlockEntities.lib;%(AdditionalDependencies);$(Qt_LIBS_)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_PYTHON_LIBPATH);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(QT_LIBPATH)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);python39.lib;BlockEntities.lib;%(AdditionalDependencies);Qt6Core.lib;Qt6Network.lib;Qt6Widgets.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDebug|x64'">
