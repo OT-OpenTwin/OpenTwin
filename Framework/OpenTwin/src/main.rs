@@ -121,11 +121,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
         
         tokio::task::spawn(async move {
             warp::serve(download_route.or(installer_route))
-            .run(([127, 0, 0, 1], 80))
+            .run(([0, 0, 0, 0], 80))
             .await;
         });
 
-        println!("HTTP Server listening on http://127.0.0.1:80")
+        println!("HTTP Server listening on \"0.0.0.0:80\"")
     }
     
     // GET /any path
