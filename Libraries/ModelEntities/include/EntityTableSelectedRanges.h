@@ -16,7 +16,7 @@ public:
 	virtual void addVisualizationNodes() override;
 	virtual bool updateFromProperties(void) override;
 	void createProperties(const std::string& pythonScriptFolder, ot::UID pythonScriptFolderID, const std::string& pythonScriptName, ot::UID pythonScriptID, const std::string& _defaultType);
-	void SetTableProperties(std::string tableName, ot::UID tableID, std::string tableOrientation);
+	void setTableProperties(std::string tableName, ot::UID tableID, std::string tableOrientation);
 
 	std::string getSelectedType();
 	const std::string getTableName();

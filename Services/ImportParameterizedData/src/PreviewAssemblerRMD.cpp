@@ -53,9 +53,9 @@ std::map<std::string, std::list<std::string>> PreviewAssemblerRMD::CollectUnique
 		{
 			if (sourceTable->getName() == _selectedRangeEntities[i]->getTableName())
 			{
-				ot::TableRange selectionRange =  _selectedRangeEntities[i]->getSelectedRange();
+				ot::TableRange userRange =  _selectedRangeEntities[i]->getSelectedRange();
 				ot::TableHeaderOrientation headerOrientation = _selectedRangeEntities[i]->getTableOrientation();
-				ot::TableRange matrixRange =	DataCategorizationHandler::selectionRangeToMatrixRange(selectionRange,headerOrientation);
+				ot::TableRange matrixRange =	DataCategorizationHandler::userRangeToMatrixRange(userRange,headerOrientation);
 				uint32_t minColumn = static_cast<uint32_t>(matrixRange.getLeftColumn());
 				uint32_t maxColumn = static_cast<uint32_t>(matrixRange.getRightColumn());
 				uint32_t minRow = static_cast<uint32_t>(matrixRange.getTopRow());

@@ -6,7 +6,6 @@
 #include "Application.h"
 #include "PreviewAssemblerRMD.h"
 #include "LocaleSettingsSwitch.h"
-#include "IVisualisationTable.h"
 
 #include "Documentation.h"
 #include "OTCore/StringToVariableConverter.h"
@@ -518,7 +517,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 		matrixRanges.push_back(selectionRangeToMatrixRange(selectionRange, tableEntPtr->getHeaderOrientation()));
 	}
 
-	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr->getTable(), matrixRanges);
+	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr.get(), matrixRanges);
 
 	//Now we create the selection entities
 	for (auto& bufferedCategorisationName : m_bufferedCategorisationNames)
@@ -544,7 +543,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 			
 			ot::TableRange userRange = selectionRangeToUserRange(_ranges[i]);
 			tableRange->setRange(userRange);
-			tableRange->SetTableProperties(tableBase->getName(), tableBase->getEntityID(), ot::toString(tableEntPtr->getHeaderOrientation()));
+			tableRange->setTableProperties(tableBase->getName(), tableBase->getEntityID(), ot::toString(tableEntPtr->getHeaderOrientation()));
 			tableRange->setEditable(true);
 			
 			// The name of the entity should correspond to the header value of the table. This header value will later be used as key of the database entry
@@ -688,7 +687,7 @@ bool DataCategorizationHandler::CheckIfPreviewIsUpToDate(std::shared_ptr<EntityP
 	return previewIsUpToDate;
 }
 
-std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(const ot::GenericDataStructMatrix& _tableContent, const std::vector<ot::TableRange>& _selectedRanges)
+std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisualisationTable* _table, const std::vector<ot::TableRange>& _selectedRanges)
 {
 	ot::StringToVariableConverter converter;
 	std::bitset<5> dataType;
@@ -697,7 +696,8 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(const 
 	auto rangeIt = _selectedRanges.begin();
 	ot::MatrixEntryPointer matrixPointer;
 	
-	
+	ot::GenericDataStructMatrix tableContent = _table->getTable();
+	char decimalDelimiter =	_table->getDecimalDelimiter();
 	while (!stringDetected && rangeIt != _selectedRanges.end())
 	{
 		matrixPointer.m_row = static_cast<uint32_t>(rangeIt->getTopRow());
@@ -706,12 +706,12 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(const 
 			matrixPointer.m_column = static_cast<uint32_t>(rangeIt->getLeftColumn());
 			while(!stringDetected && matrixPointer.m_column <= static_cast<uint32_t>(rangeIt->getRightColumn()))
 			{
-				const ot::Variable& cellValue = _tableContent.getValue(matrixPointer);
+				const ot::Variable& cellValue = tableContent.getValue(matrixPointer);
 				assert(cellValue.isConstCharPtr());
 				std::string value = cellValue.getConstCharPtr();
 				if (value != "")
 				{
-					ot::Variable variable = converter(value,'.');
+					ot::Variable variable = converter(value, decimalDelimiter);
 				
 					dataType[0] = dataType[0] || variable.isInt32();
 					dataType[1] = dataType[1] || variable.isInt64();
@@ -874,7 +874,7 @@ std::tuple<std::list<std::string>, std::list<std::string>> DataCategorizationHan
 			newSelection->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, selection->getScriptName(), entityInfo.getEntityID(),dataType);
 			
 			
-			newSelection->SetTableProperties(selection->getTableName(),entityInfo.getEntityID(),ot::toString(selection->getTableOrientation()));
+			newSelection->setTableProperties(selection->getTableName(),entityInfo.getEntityID(),ot::toString(selection->getTableOrientation()));
 			
 			ot::TableRange selectedRange = selection->getSelectedRange();
 			newSelection->setRange(selectedRange);

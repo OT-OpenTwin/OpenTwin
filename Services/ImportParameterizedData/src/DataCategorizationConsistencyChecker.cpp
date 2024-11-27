@@ -11,16 +11,16 @@ bool DataCategorizationConsistencyChecker::isValidAllMSMDHaveParameterAndQuantit
 	{
 		const MetadataAssemblyData* metadataAssembly = &element.second;
 		
-		if (metadataAssembly->dataCategory == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
+		if (metadataAssembly->m_dataCategory == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
 		{
-			if (metadataAssembly->next == nullptr)
+			if (metadataAssembly->m_next == nullptr)
 			{
 				Documentation::INSTANCE()->AddToDocumentation("MSMD \"" + element.first + "\" has no parameter assigned.\n");
 				foundIssue = true;
 			}
 			else
 			{
-				if (metadataAssembly->next->next == nullptr)
+				if (metadataAssembly->m_next->m_next == nullptr)
 				{
 					Documentation::INSTANCE()->AddToDocumentation("MSMD \"" + element.first + "\" has no quantities assigned.\n");
 					foundIssue = true;
@@ -36,18 +36,18 @@ bool DataCategorizationConsistencyChecker::isValidAllParameterAndQuantitiesRefer
 	bool issueFound = false;
 	for (const auto& element : allMetadataAssembliesByName)
 	{
-		if (element.second.dataCategory != EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
+		if (element.second.m_dataCategory != EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
 		{
 			continue;
 		}
 		std::set<std::string> tableNames;
 		const MetadataAssemblyData* metadataAssembly = &element.second;
-		if (metadataAssembly->next == nullptr || metadataAssembly->next->next == nullptr)
+		if (metadataAssembly->m_next == nullptr || metadataAssembly->m_next->m_next == nullptr)
 		{
 			continue;
 		}
-		auto allSelectionRangesParameter = metadataAssembly->next->allSelectionRanges;
-		auto allSelectionRangesQuantities= metadataAssembly->next->next->allSelectionRanges;
+		auto allSelectionRangesParameter = metadataAssembly->m_next->m_allSelectionRanges;
+		auto allSelectionRangesQuantities= metadataAssembly->m_next->m_next->m_allSelectionRanges;
 
 		for (const auto& tableSelectionEntity : allSelectionRangesParameter)
 		{
@@ -71,7 +71,7 @@ bool DataCategorizationConsistencyChecker::isValidAllParameterAndQuantitiesRefer
 	return !issueFound;
 }
 
-bool DataCategorizationConsistencyChecker::isValidQuantityAndParameterNumberMatches(MetadataAssemblyRangeData& parameterData, MetadataAssemblyRangeData& quantityData)
+bool DataCategorizationConsistencyChecker::isValidQuantityAndParameterNumberMatches(KeyValuesExtractor& parameterData, KeyValuesExtractor& quantityData)
 {
 
 	std::map<uint64_t,std::list<std::string>> numberOfParameter;

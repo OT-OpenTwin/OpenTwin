@@ -24,8 +24,8 @@ public:
 	
 private:
 	void createProperties() override {};
-	uint32_t _numberOfColumns;
-	uint32_t _numberOfRows;
+	uint32_t _numberOfColumns = 0;
+	uint32_t _numberOfRows = 0;
 	std::vector<uint32_t> _numberOfUniquesInColumns;
 	std::string _sourceFileName;
 	std::string _sourceFilePath;

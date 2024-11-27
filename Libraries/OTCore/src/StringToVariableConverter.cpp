@@ -38,14 +38,53 @@ ot::Variable ot::StringToVariableConverter::operator()(const std::string& _value
 	return transformedValue;
 }
 
-void ot::StringToVariableConverter::removeThousandsSeparators(std::string& _value, const char _currentSeparator)
+bool ot::StringToVariableConverter::normaliseNumericString(std::string& _value, const char _decimalSeparator)
 {
-	_value.erase(std::remove(_value.begin(), _value.end(), _currentSeparator), _value.end());
+	char thousandsSeparator(' ');
+	bool needsNormalisation = false;
+	if (_decimalSeparator == '.')
+	{
+		thousandsSeparator = ',';
+	}
+	else
+	{
+		thousandsSeparator = '.';
+		needsNormalisation = true;
+	}
+	size_t numberOfDecimalSeparators = std::count(_value.begin(), _value.end(), _decimalSeparator);
+	_value.erase(std::remove(_value.begin(), _value.end(), '"'), _value.end());
+	if (numberOfDecimalSeparators <= 1)
+	{
+		removeThousandsSeparators(_value, thousandsSeparator);
+		removeWhitespaces(_value);
+		removeControlCharacters(_value);
+		if (needsNormalisation)
+		{
+			ensurePointAsDecimalSeparator(_value);
+		}
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void ot::StringToVariableConverter::removeThousandsSeparators(std::string& _value, const char _thousandsSeparator)
+{
+	_value.erase(std::remove(_value.begin(), _value.end(), _thousandsSeparator), _value.end());
 }
 
 void ot::StringToVariableConverter::removeWhitespaces(std::string& _value)
 {
 	_value.erase(std::remove(_value.begin(), _value.end(), ' '), _value.end());
+}
+
+void ot::StringToVariableConverter::removeControlCharacters(std::string& _value)
+{
+	_value.erase(std::remove(_value.begin(), _value.end(), '\n'), _value.end());
+	_value.erase(std::remove(_value.begin(), _value.end(), '\r'), _value.end());
+	_value.erase(std::remove(_value.begin(), _value.end(), '\t'), _value.end());
 }
 
 void ot::StringToVariableConverter::ensurePointAsDecimalSeparator(std::string& _value)

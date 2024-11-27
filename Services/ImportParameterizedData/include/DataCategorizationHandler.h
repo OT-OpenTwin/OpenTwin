@@ -24,6 +24,7 @@
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTGui/TableRange.h"
 #include "OTGui/TableHeaderOrientation.h"
+#include "IVisualisationTable.h"
 
 #include <optional>
 #include <map>
@@ -105,7 +106,7 @@ private:
 	void FindContainerEntity(std::string containerName, std::pair<ot::UID, ot::UID>& categorizationEntityIdentifier);
 	bool CheckIfPreviewIsUpToDate(std::shared_ptr<EntityParameterizedDataPreviewTable> categorizationEntity, std::list<std::pair<ot::UID, ot::UID>>& existingRanges);
 
-	std::string determineDataTypeOfSelectionRanges(const ot::GenericDataStructMatrix& _tableContent,const std::vector<ot::TableRange>& _selectedRanges);
+	std::string determineDataTypeOfSelectionRanges(IVisualisationTable* _table,const std::vector<ot::TableRange>& _selectedRanges);
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> FindAllTableSelectionsWithScripts();
 	std::map<std::string, std::string> LoadAllPythonScripts(std::list< std::string>& scriptNames);

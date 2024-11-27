@@ -35,12 +35,35 @@ bool EntityFileCSV::visualiseText()
 	return true;
 }
 
+char EntityFileCSV::getDecimalDelimiter()
+{
+	EntityPropertiesBase* baseProperty = getProperties().getProperty("Decimal point character");
+	if (baseProperty == nullptr)
+	{
+		return '.';
+	}
+	auto selection = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
+
+	const char separator = selection->getValue()[0];
+	return separator;
+}
+
 void EntityFileCSV::setSpecializedProperties()
 {
 	EntityFileText::setSpecializedProperties();
 	EntityPropertiesString::createProperty("CSV Properties", "Row Delimiter", m_rowDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 	EntityPropertiesString::createProperty("CSV Properties", "Column Delimiter", m_columnDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 	EntityPropertiesSelection::createProperty("Table header", "Header position", { ot::toString(ot::TableHeaderOrientation::horizontal), ot::toString(ot::TableHeaderOrientation::vertical) }, ot::toString(ot::TableHeaderOrientation::horizontal), "tableInformation", getProperties());
+	std::locale mylocale("");
+	auto defaulDecimalSeparator = std::use_facet<std::numpunct<char>>(mylocale).decimal_point();
+	EntityPropertiesSelection::createProperty("Text Properties", "Decimal point character",
+		{
+			".",
+			","
+		}
+		, std::string(1, defaulDecimalSeparator),
+		"default", getProperties());
+
 }
 
 void EntityFileCSV::AddStorageData(bsoncxx::builder::basic::document & storage)
@@ -65,7 +88,7 @@ const ot::GenericDataStructMatrix EntityFileCSV::getTable()
 
 	properties.m_rowDelimiter = getRowDelimiter();
 	properties.m_columnDelimiter = getColumnDelimiter();
-	properties.m_decimalDelimiter = getSelectedDecimalSeparator();
+	properties.m_decimalDelimiter = getDecimalDelimiter();
 	const std::string text = getText();
 
 	CSVToTableTransformer transformer;
@@ -80,7 +103,7 @@ void EntityFileCSV::setTable(const ot::GenericDataStructMatrix& _table)
 
 	properties.m_rowDelimiter = getRowDelimiter();
 	properties.m_columnDelimiter = getColumnDelimiter();
-	properties.m_decimalDelimiter = getSelectedDecimalSeparator();
+	properties.m_decimalDelimiter = getDecimalDelimiter();
 
 	CSVToTableTransformer transformer;
 

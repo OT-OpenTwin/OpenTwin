@@ -23,6 +23,7 @@ public:
 
 	ot::TableHeaderOrientation getHeaderOrientation() override;
 	bool visualiseText() override;
+	char getDecimalDelimiter() override;
 private:
 	void setSpecializedProperties() override;
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;

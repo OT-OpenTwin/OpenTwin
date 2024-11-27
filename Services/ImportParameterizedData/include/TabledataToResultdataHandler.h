@@ -13,12 +13,11 @@
 
 #include "BusinessLogicHandler.h"
 #include "MetadataAssemblyData.h"
-#include "MetadataAssemblyRangeData.h"
-#include "EntityParameterizedDataTable.h"
+#include "KeyValuesExtractor.h"
 #include "EntityMetadataCampaign.h"
 #include "MetadataEntry.h"
 #include "DatasetDescription.h"
-
+#include "IVisualisationTable.h"
 
 class TabledataToResultdataHandler : public BusinessLogicHandler
 {
@@ -40,14 +39,14 @@ private:
 
 	std::map<std::string, MetadataAssemblyData> getAllMetadataAssemblies();
 	void addRequiredTables(const MetadataAssemblyData& _dataAssembly, std::list<string>& _requiredTables);
-	void loadRequiredTables(std::list<string>& _requiredTables, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& _loadedTables);
+	void loadRequiredTables(std::list<string>& _requiredTables, std::map<std::string, std::shared_ptr<IVisualisationTable>>& _loadedTables);
 
 	void extractRMDAndAllMSMD(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities);
 	void extractAllParameter(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities);
 	void extractAllQuantities(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities);
 
-	std::list<std::shared_ptr<MetadataEntry>> rangeData2MetadataEntries(MetadataAssemblyRangeData&& _assembyRangeData);
+	std::list<std::shared_ptr<MetadataEntry>> rangeData2MetadataEntries(KeyValuesExtractor&& _assembyRangeData);
 
-	std::list<DatasetDescription> extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>> loadedTables);
+	std::list<DatasetDescription> extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<IVisualisationTable>> loadedTables);
 	std::string extractUnitFromName(std::string& _name);
 };

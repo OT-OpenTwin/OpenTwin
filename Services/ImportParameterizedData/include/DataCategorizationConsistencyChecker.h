@@ -2,7 +2,7 @@
 #include <map>
 #include <string>
 #include "MetadataAssemblyData.h"
-#include "MetadataAssemblyRangeData.h"
+#include "KeyValuesExtractor.h"
 
 class DataCategorizationConsistencyChecker
 {
@@ -14,7 +14,7 @@ public:
 	/// <returns></returns>
 	bool isValidAllMSMDHaveParameterAndQuantities(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName);
 	bool isValidAllParameterAndQuantitiesReferenceSameTable(std::map<std::string, MetadataAssemblyData>& allMetadataAssembliesByName);
-	bool isValidQuantityAndParameterNumberMatches(MetadataAssemblyRangeData& parameterData, MetadataAssemblyRangeData& quantityData);
+	bool isValidQuantityAndParameterNumberMatches(KeyValuesExtractor& parameterData, KeyValuesExtractor& quantityData);
 
 private:
 	template <class T>

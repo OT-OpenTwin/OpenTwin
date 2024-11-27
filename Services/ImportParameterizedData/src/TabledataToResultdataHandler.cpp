@@ -2,7 +2,7 @@
 #include "Application.h"
 #include "ClassFactory.h"
 
-#include "MetadataAssemblyRangeData.h"
+#include "KeyValuesExtractor.h"
 #include "EntityMetadataSeries.h"
 #include "EntityMetadataCampaign.h"
 #include "BranchSynchronizer.h"
@@ -79,7 +79,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	for (const auto& metadataAssemblyByName : allMetadataAssembliesByNames)
 	{
 		const MetadataAssemblyData* metadataAssembly = &metadataAssemblyByName.second;
-		if (metadataAssembly->dataCategory == EntityParameterizedDataCategorization::DataCategorie::researchMetadata)
+		if (metadataAssembly->m_dataCategory == EntityParameterizedDataCategorization::DataCategorie::researchMetadata)
 		{
 			rmdAssemblyData = metadataAssembly;
 			break;
@@ -88,7 +88,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	if (rmdAssemblyData == nullptr) { throw std::exception("RMD categorization entity could not be found."); }
 	_uiComponent->displayMessage("Updating Campaign metadata\n");
 	std::list<std::string> requiredTables;
-	std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>> loadedTables;
+	std::map<std::string, std::shared_ptr<IVisualisationTable>> loadedTables;
 	addRequiredTables(*rmdAssemblyData, requiredTables);
 	requiredTables.unique();
 	if (requiredTables.size() == 0)
@@ -109,8 +109,8 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		Documentation::INSTANCE()->ClearDocumentation();
 
 		//Filling a new EntityMetadataSeries object with its fields.
-		MetadataAssemblyRangeData rmdData;
-		rmdData.LoadAllRangeSelectionInformation(rmdAssemblyData->allSelectionRanges, loadedTables);
+		KeyValuesExtractor rmdData;
+		rmdData.loadAllRangeSelectionInformation(*rmdAssemblyData, loadedTables);
 		std::list<std::shared_ptr<MetadataEntry>> allMetadataEntries = rangeData2MetadataEntries(std::move(rmdData));
 		for (std::shared_ptr<MetadataEntry> metadataEntry : allMetadataEntries)
 		{
@@ -128,7 +128,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	for (const auto& metadataAssemblyByName : allMetadataAssembliesByNames)
 	{
 		const MetadataAssemblyData* metadataAssembly = &metadataAssemblyByName.second;
-		if (metadataAssembly->dataCategory == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
+		if (metadataAssembly->m_dataCategory == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
 		{
 			allMSMDMetadataAssembliesByNames.push_back(&metadataAssemblyByName);
 		}
@@ -240,7 +240,7 @@ void TabledataToResultdataHandler::extractRMDAndAllMSMD(std::map<std::string, Me
 		{
 			if (_allMetadataAssembliesByName.find(containerName) == _allMetadataAssembliesByName.end())
 			{
-				_allMetadataAssembliesByName[containerName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::researchMetadata;
+				_allMetadataAssembliesByName[containerName].m_dataCategory = EntityParameterizedDataCategorization::DataCategorie::researchMetadata;
 				rmdHasSelections = true;
 			}
 		}
@@ -248,10 +248,10 @@ void TabledataToResultdataHandler::extractRMDAndAllMSMD(std::map<std::string, Me
 		{
 			if (_allMetadataAssembliesByName.find(containerName) == _allMetadataAssembliesByName.end())
 			{
-				_allMetadataAssembliesByName[containerName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata;
+				_allMetadataAssembliesByName[containerName].m_dataCategory = EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata;
 			}
 		}
-		_allMetadataAssembliesByName[containerName].allSelectionRanges.push_back(*it);
+		_allMetadataAssembliesByName[containerName].m_allSelectionRanges.push_back(*it);
 		it = _allRangeEntities.erase(it);
 	}
 	
@@ -263,7 +263,7 @@ void TabledataToResultdataHandler::extractRMDAndAllMSMD(std::map<std::string, Me
 		size_t secondDelimiter = fullName.find("/", fullName.find_first_of("/") + 1);
 		std::string rmdAssemblyName = fullName.substr(0,secondDelimiter);
 
-		_allMetadataAssembliesByName[rmdAssemblyName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::researchMetadata;
+		_allMetadataAssembliesByName[rmdAssemblyName].m_dataCategory = EntityParameterizedDataCategorization::DataCategorie::researchMetadata;
 	}
 }
 
@@ -282,17 +282,17 @@ void TabledataToResultdataHandler::extractAllParameter(std::map<std::string, Met
 		{
 			if (_allMetadataAssembliesByName.find(containerName) == _allMetadataAssembliesByName.end())
 			{
-				_allMetadataAssembliesByName[containerName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::parameter;
+				_allMetadataAssembliesByName[containerName].m_dataCategory = EntityParameterizedDataCategorization::DataCategorie::parameter;
 			}
-			_allMetadataAssembliesByName[containerName].allSelectionRanges.push_back(*it);
+			_allMetadataAssembliesByName[containerName].m_allSelectionRanges.push_back(*it);
 			it = _allRangeEntities.erase(it);
 
 			std::string msmdName = containerName.substr(0, containerName.find_last_of("/"));
 			if (_allMetadataAssembliesByName.find(msmdName) == _allMetadataAssembliesByName.end())
 			{
-				_allMetadataAssembliesByName[msmdName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata;
+				_allMetadataAssembliesByName[msmdName].m_dataCategory = EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata;
 			}
-			_allMetadataAssembliesByName[msmdName].next = &_allMetadataAssembliesByName[containerName];
+			_allMetadataAssembliesByName[msmdName].m_next = &_allMetadataAssembliesByName[containerName];
 		}
 		else
 		{
@@ -316,10 +316,10 @@ void TabledataToResultdataHandler::extractAllQuantities(std::map<std::string, Me
 
 		if (_allMetadataAssembliesByName.find(containerName) == _allMetadataAssembliesByName.end())
 		{
-			_allMetadataAssembliesByName[containerName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::quantity;
+			_allMetadataAssembliesByName[containerName].m_dataCategory = EntityParameterizedDataCategorization::DataCategorie::quantity;
 		}
 
-		_allMetadataAssembliesByName[containerName].allSelectionRanges.push_back(*it);
+		_allMetadataAssembliesByName[containerName].m_allSelectionRanges.push_back(*it);
 		it = _allRangeEntities.erase(it);
 
 		std::string msmdName = containerName.substr(0, containerName.find_last_of("/"));
@@ -327,21 +327,21 @@ void TabledataToResultdataHandler::extractAllQuantities(std::map<std::string, Me
 		//In case that the corresponding msmd had no range
 		if (_allMetadataAssembliesByName.find(msmdName) == _allMetadataAssembliesByName.end())
 		{
-			_allMetadataAssembliesByName[msmdName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata;
-			_allMetadataAssembliesByName[parameterName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::parameter;
-			_allMetadataAssembliesByName[msmdName].next = &_allMetadataAssembliesByName[parameterName];
+			_allMetadataAssembliesByName[msmdName].m_dataCategory = EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata;
+			_allMetadataAssembliesByName[parameterName].m_dataCategory = EntityParameterizedDataCategorization::DataCategorie::parameter;
+			_allMetadataAssembliesByName[msmdName].m_next = &_allMetadataAssembliesByName[parameterName];
 		}
 		else if (_allMetadataAssembliesByName.find(parameterName) == _allMetadataAssembliesByName.end())
 		{
-			_allMetadataAssembliesByName[parameterName].dataCategory = EntityParameterizedDataCategorization::DataCategorie::parameter;
-			_allMetadataAssembliesByName[msmdName].next = &_allMetadataAssembliesByName[parameterName];
+			_allMetadataAssembliesByName[parameterName].m_dataCategory = EntityParameterizedDataCategorization::DataCategorie::parameter;
+			_allMetadataAssembliesByName[msmdName].m_next = &_allMetadataAssembliesByName[parameterName];
 		}
-		_allMetadataAssembliesByName[parameterName].next = &_allMetadataAssembliesByName[containerName];
+		_allMetadataAssembliesByName[parameterName].m_next = &_allMetadataAssembliesByName[containerName];
 	}
 }
 
 //! @brief Turning the selection ranges in a generic format, holding different options of data structures
-std::list<std::shared_ptr<MetadataEntry>> TabledataToResultdataHandler::rangeData2MetadataEntries(MetadataAssemblyRangeData&& _assembyRangeData)
+std::list<std::shared_ptr<MetadataEntry>> TabledataToResultdataHandler::rangeData2MetadataEntries(KeyValuesExtractor&& _assembyRangeData)
 {
 	std::list<std::shared_ptr<MetadataEntry>> allMetadataEntries;
 	auto field = _assembyRangeData.getFields()->begin();
@@ -364,18 +364,18 @@ std::list<std::shared_ptr<MetadataEntry>> TabledataToResultdataHandler::rangeDat
 	return allMetadataEntries;	
 }
 
-std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>> _loadedTables)
+std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<IVisualisationTable>> _loadedTables)
 {
 	std::list<std::string> requiredTables;
 	
 	//Load all required tables that are not loaded yet.
 	addRequiredTables(_metadataAssembly, requiredTables); //for msmd
 	
-	auto parameterAssembly = _metadataAssembly.next;
+	auto parameterAssembly = _metadataAssembly.m_next;
 	addRequiredTables(*(parameterAssembly), requiredTables); //for parameter
 	
-	auto quantityAssembly = parameterAssembly->next;
-	addRequiredTables(*(_metadataAssembly.next->next), requiredTables); //for quantities
+	auto quantityAssembly = parameterAssembly->m_next;
+	addRequiredTables(*(_metadataAssembly.m_next->m_next), requiredTables); //for quantities
 	
 	requiredTables.unique();
 
@@ -391,17 +391,17 @@ std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const
 	Documentation::INSTANCE()->ClearDocumentation();
 
 	//Filling a new EntityMetadataSeries object with its fields.
-	MetadataAssemblyRangeData rangeData;
-	rangeData.LoadAllRangeSelectionInformation(_metadataAssembly.allSelectionRanges, _loadedTables);
+	KeyValuesExtractor rangeData;
+	rangeData.loadAllRangeSelectionInformation(_metadataAssembly, _loadedTables);
 
 	//Loading parameter information
 
-	MetadataAssemblyRangeData parameterData;
-	parameterData.LoadAllRangeSelectionInformation(parameterAssembly->allSelectionRanges, _loadedTables);
+	KeyValuesExtractor parameterData;
+	parameterData.loadAllRangeSelectionInformation(*parameterAssembly, _loadedTables);
 
 	//Loading quantity information
-	MetadataAssemblyRangeData quantityData;
-	quantityData.LoadAllRangeSelectionInformation(quantityAssembly->allSelectionRanges, _loadedTables);
+	KeyValuesExtractor quantityData;
+	quantityData.loadAllRangeSelectionInformation(*quantityAssembly, _loadedTables);
 	DataCategorizationConsistencyChecker checker;
 
 	bool isValid = checker.isValidQuantityAndParameterNumberMatches(parameterData, quantityData);
@@ -467,13 +467,13 @@ std::string TabledataToResultdataHandler::extractUnitFromName(std::string& _name
 //! @brief Adds the table names of the tables referenced by the selection ranges of the _dataAssembly.
 void TabledataToResultdataHandler::addRequiredTables(const MetadataAssemblyData& _dataAssembly, std::list<string>& _requiredTables)
 {
-	for (auto range : _dataAssembly.allSelectionRanges)
+	for (auto range : _dataAssembly.m_allSelectionRanges)
 	{
 		_requiredTables.push_back(range->getTableName());
 	}
 }
 
-void TabledataToResultdataHandler::loadRequiredTables(std::list<string>& _requiredTables, std::map<std::string, std::shared_ptr<EntityParameterizedDataTable>>& _loadedTables)
+void TabledataToResultdataHandler::loadRequiredTables(std::list<string>& _requiredTables, std::map<std::string, std::shared_ptr<IVisualisationTable>>& _loadedTables)
 {
 	//Deleting all loaded tables that are not needed anymore
 	auto it = _loadedTables.begin();
@@ -521,7 +521,7 @@ void TabledataToResultdataHandler::loadRequiredTables(std::list<string>& _requir
 	//Load all missing tables
 	if (_requiredTables.size() != 0)
 	{
-		auto allTables = _modelComponent->getListOfFolderItems(m_tableFolder);
+		auto allTables = _modelComponent->getListOfFolderItems(ot::FolderNames::FilesFolder);
 		std::list<ot::EntityInformation> entityInfos;
 		_modelComponent->getEntityInformation(allTables, entityInfos);
 		ot::UIDList tableToLoadIDs;
@@ -540,9 +540,9 @@ void TabledataToResultdataHandler::loadRequiredTables(std::list<string>& _requir
 		for (ot::UID tableID : tableToLoadIDs)
 		{
 			auto baseEnt = _modelComponent->readEntityFromEntityIDandVersion(tableID, Application::instance()->getPrefetchedEntityVersion(tableID), Application::instance()->getClassFactory());
-			auto tableEntity = std::shared_ptr<EntityParameterizedDataTable>(dynamic_cast<EntityParameterizedDataTable*>(baseEnt));
-			tableEntity->getTableData();
-			_loadedTables.insert({ tableEntity->getName(), tableEntity });
+			IVisualisationTable* visEnt = dynamic_cast<IVisualisationTable*>(baseEnt);
+			std::shared_ptr<IVisualisationTable>tableEntity(visEnt);
+			_loadedTables.insert({ baseEnt->getName(), tableEntity });
 		}
 	}
 }

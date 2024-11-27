@@ -24,7 +24,6 @@ public:
 	ot::ContentChangedHandling getTextContentChangedHandling() override;
 
 	void setContentChangedHandling(ot::ContentChangedHandling _contentChangedHandling);
-	char getSelectedDecimalSeparator();
 protected:
 	void setSpecializedProperties() override;
 	virtual void AddStorageData(bsoncxx::builder::basic::document& _storage) override;

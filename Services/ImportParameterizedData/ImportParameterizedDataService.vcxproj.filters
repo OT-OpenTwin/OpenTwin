@@ -49,7 +49,7 @@
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c">
       <Filter>include\ThirdParty</Filter>
     </ClCompile>
-    <ClCompile Include="src\MetadataAssemblyRangeData.cpp">
+    <ClCompile Include="src\KeyValuesExtractor.cpp">
       <Filter>src\ResultdataHandler</Filter>
     </ClCompile>
     <ClCompile Include="src\MetadataParameterBundle.cpp">
@@ -156,7 +156,7 @@
     <ClInclude Include="include\MetadataParameterBundle.h">
       <Filter>include\ResultdataHandler</Filter>
     </ClInclude>
-    <ClInclude Include="include\MetadataAssemblyRangeData.h">
+    <ClInclude Include="include\KeyValuesExtractor.h">
       <Filter>include\ResultdataHandler</Filter>
     </ClInclude>
     <ClInclude Include="include\MetadataAssemblyData.h">

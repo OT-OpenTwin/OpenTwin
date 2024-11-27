@@ -1,6 +1,7 @@
 #include "EntityFileText.h"
 #include <locale>
 
+#include "OTCommunication/ActionTypes.h"
 #include "DataBase.h"
 #include "OTCore/String.h"
 #include "OTCore/Logger.h"
@@ -8,7 +9,7 @@
 #include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 #include "OTCore/EncodingConverter_UTF16ToUTF8.h"
 #include "OTGui/VisualisationTypes.h"
-#include "OTCommunication/ActionTypes.h"
+#include "OTCore/StringHelper.h"
 
 EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	: EntityFile(_ID,_parent,_obs,_ms,_factory,_owner)
@@ -32,20 +33,6 @@ void EntityFileText::setTextEncoding(ot::TextEncoding::EncodingStandard _encodin
 	}
 }
 
-char EntityFileText::getSelectedDecimalSeparator()
-{
-	EntityPropertiesBase* baseProperty = getProperties().getProperty("Decimal point character");
-	if (baseProperty == nullptr)
-	{
-		std::locale mylocale("");
-		auto defaulDecimalSeparator = std::use_facet<std::numpunct<char>>(mylocale).decimal_point();
-		return defaulDecimalSeparator; // Maybe create the property if not existing ?
-	}
-	auto selection = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
-
-	const char separator = selection->getValue()[0];
-	return separator;
-}
 
 ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding() 
 {
@@ -162,18 +149,8 @@ void EntityFileText::setSpecializedProperties()
 		encoding.getString(m_encoding),
 		"default",getProperties());
 		
-	std::locale mylocale("");
-	auto defaulDecimalSeparator = std::use_facet<std::numpunct<char>>(mylocale).decimal_point();
-
-	EntityPropertiesSelection::createProperty("Text Properties", "Decimal point character",
-		{
-			".",
-			","
-		}
-		, std::string(1, defaulDecimalSeparator),
-		"default", getProperties());
-
-	std::string fileType = ot::String::toLower(this->getFileType());
+	std::string fileType = getFileType();
+	ot::stringToLowerCase(fileType);
 	ot::DocumentSyntax defaultSyntaxHighlighting;
 	if (fileType == "py")
 	{

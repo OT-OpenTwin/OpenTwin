@@ -114,7 +114,7 @@ double calculate(double start, double decrement, int count)
 	return start;
 }
 
-double calculate(float start, float decrement, int count)
+float calculate(float start, float decrement, int count)
 {
 	for (int i = 0; i < count; ++i)
 		start -= decrement;
@@ -288,7 +288,7 @@ TEST(StringToVariable, StringToStringVariable)
 	const ot::Variable actualValue = converter(expectedValue, '.');
 
 	EXPECT_TRUE(actualValue.isConstCharPtr());
-	EXPECT_EQ(actualValue.getConstCharPtr(), expectedValue, '.');
+	EXPECT_EQ(actualValue.getConstCharPtr(), expectedValue);
 }
 
 TEST(StringToVariable, String)
@@ -332,7 +332,7 @@ TEST(VariableTest, StringMove)
 
 TEST(StringToVariable, StringToFloatVariableWithThousandSeparators)
 {
-	constexpr const float expectedValue = 1512345.13;
+	constexpr const float expectedValue = 1512345.13f;
 	std::string str = "1,512,345.13";
 	ot::StringToVariableConverter converter;
 	const ot::Variable actualValue = converter(str, '.');
@@ -343,7 +343,7 @@ TEST(StringToVariable, StringToFloatVariableWithThousandSeparators)
 
 TEST(StringToVariable, StringToFloatVariableWithCommaDecimalSeparator)
 {
-	constexpr const float expectedValue = 1512345.13;
+	constexpr const float expectedValue = 1512345.13f;
 	std::string str = "1512345,13";
 	ot::StringToVariableConverter converter;
 	const ot::Variable actualValue = converter(str, ',');

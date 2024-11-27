@@ -90,13 +90,13 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 	getProperties().createProperty(passOnScript, updateStrategyGroup);
 }
 
-void EntityTableSelectedRanges::SetTableProperties(std::string tableName, ot::UID tableID, std::string tableOrientation)
+void EntityTableSelectedRanges::setTableProperties(std::string _tableName, ot::UID _tableID, std::string _tableOrientation)
 {
 	auto tableNameEnt = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Table name"));
 	auto headerPosEnt = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Header position"));
-	tableNameEnt->setValue(tableName);
-	headerPosEnt->setValue(tableOrientation);
-	_tableID = tableID;
+	tableNameEnt->setValue(_tableName);
+	headerPosEnt->setValue(_tableOrientation);
+	_tableID = _tableID;
 	setModified();
 }
 
