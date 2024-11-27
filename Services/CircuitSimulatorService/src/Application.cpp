@@ -160,8 +160,6 @@ void Application::createNewCircuit() {
 	// Message is queued, no response here
 	std::string tmp;
 	m_uiComponent->sendMessage(true, doc, tmp);
-
-	
 }
 
 
@@ -313,6 +311,8 @@ void Application::runCircuitSimulation() {
 	// Get the current model version
 	std::string modelVersion = m_modelComponent->getCurrentModelVersion();
 
+
+
 	// Finally start the worker thread to run the solvers
 	std::thread workerThread(&Application::solverThread, this, solverInfo, modelVersion, solverMap);
 	workerThread.detach();
@@ -342,6 +342,12 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 		return;
 	}
 
+	
+	//Testing
+	const int sessionCount = Application::instance()->getSessionCount();
+	const int serviceID = Application::instance()->getServiceIDAsInt();
+	m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
+
 
 	m_blockEntityHandler.setPackageName(name);
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
@@ -360,7 +366,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	m_ngSpice.clearBufferStructure(name);
 
 	//Tesing
-	//m_subprocessHandler->stopSubprocess();
+	/*m_subprocessHandler->stopSubprocess();*/
 	
 }
 

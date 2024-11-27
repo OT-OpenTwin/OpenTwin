@@ -41,7 +41,6 @@ private:
 	NGSpice m_ngSpice;
 	BlockEntityHandler m_blockEntityHandler;
 	std::list<ot::UID>	selectedEntities;
-	//SubprocessHandler* m_subprocessHandler = nullptr;
 
 	
 public:
@@ -149,6 +148,7 @@ public:
 	virtual bool settingChanged(const ot::Property* _item) override;
 
 
-
+private:
+	SubprocessHandler* m_subprocessHandler = nullptr;
 	
 };

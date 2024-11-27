@@ -160,7 +160,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(NGSPICE_LIBPATHR);$(OT_BLOCKENTITIES_ROOT)\$(OT_DLLR);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_DLLR);%(AdditionalLibraryDirectories);$(QT_LIBPATH)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);ngspice.lib;ResultDataAccess.lib;BlockEntities.lib;Qt6Cored.lib;Qt6Networkd.lib;Qt6Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);ngspice.lib;ResultDataAccess.lib;BlockEntities.lib;Qt6Core.lib;Qt6Network.lib;Qt6Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">

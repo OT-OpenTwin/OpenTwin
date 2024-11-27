@@ -17,10 +17,6 @@ public:
 	SubprocessHandler(const std::string& serverName, int sessionID, int serviceID);
 	~SubprocessHandler();
 
-	bool startSubprocess();
-	void stopSubprocess();
-	bool isSubprocessHealthy();
-	void restartSubprocess();
 
 
 private:
@@ -30,9 +26,16 @@ private:
 	QProcess m_subProcess;
 	QLocalServer m_server;
 	std::atomic_bool m_isHealthy;
+	std::atomic_bool m_initialisationPrepared = false;
 
-	std::vector<std::string> _initialisationRoutines;
-	const int _numberOfInitialisationRoutines = 4;
+	void RunSubprocess();
+	bool startSubprocess();
+	void stopSubprocess();
+	bool isSubprocessHealthy();
+	void restartSubprocess();
+
+	std::vector<std::string> m_initialisationRoutines;
+	const int m_numberOfInitialisationRoutines = 4;
 
 	std::string FindSubprocessPath();
 	void InitiateProcess();
@@ -45,6 +48,7 @@ private:
 	
 	void ProcessErrorOccured(std::string& message);
 
-
+	//void ModelComponentWasSet() override;
+	//void UIComponentWasSet() override;
 
 };

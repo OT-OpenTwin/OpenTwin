@@ -2,30 +2,37 @@
 #include "SubprocessHandler.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/OperatingSystem.h"
-
-
-
-
+#include "QtCore/qcoreapplication.h"
 
 SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionID, int serviceID) :m_serverName(serverName) ,m_isHealthy(false) {
-	_initialisationRoutines.reserve(_numberOfInitialisationRoutines);
+	m_initialisationRoutines.reserve(m_numberOfInitialisationRoutines);
 
+	 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, doc.GetAllocator()), doc.GetAllocator());
 
 	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, sessionID, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, serviceID, doc.GetAllocator());
-	_initialisationRoutines.push_back(doc.toJson());
+	m_initialisationRoutines.push_back(doc.toJson());
+
+	
+	
 
 	m_subprocessPath = FindSubprocessPath() + m_executableName;
 
 	InitiateProcess();
-
-	m_server.listen(serverName.c_str());
-
-	std::thread workerThread(&SubprocessHandler::startSubprocess, this);
+	
+#ifdef _DEBUG
+	m_serverName = "TestServer";
+#endif
+	m_server.listen(m_serverName.c_str());
+#ifndef _DEBUG
+	std::thread workerThread(&SubprocessHandler::RunSubprocess, this);
 	workerThread.detach();
+#else
+	startSubprocess();
+#endif
 }
 
 SubprocessHandler::~SubprocessHandler() {
@@ -55,6 +62,27 @@ void SubprocessHandler::InitiateProcess()
 	m_subProcess.setStandardOutputFile(QProcess::nullDevice());
 	m_subProcess.setStandardErrorFile(QProcess::nullDevice());
 	m_subProcess.setProgram(m_subprocessPath.c_str());
+}
+
+void SubprocessHandler::RunSubprocess()
+{
+	try
+	{
+		const bool startSuccessfull = startSubprocess();
+		if (!startSuccessfull)
+		{
+			std::string message = "Starting Python Subprocess timeout.";
+			OT_LOG_E(message);
+			throw std::exception(message.c_str());
+		}
+		OT_LOG_D("Python Subprocess started");
+	}
+	catch (std::exception& e)
+	{
+		const std::string exceptionMessage("Starting the python subprocess failed due to: " + std::string(e.what()) + ". Shutting down.");
+		OT_LOG_E(exceptionMessage);
+		exit(0);
+	}
 }
 
 bool SubprocessHandler::startSubprocess() {
@@ -126,3 +154,26 @@ void SubprocessHandler::ProcessErrorOccured(std::string& message)
 {
 	message = m_subProcess.errorString().toStdString();
 }
+
+//void SubprocessHandler::ModelComponentWasSet()
+//{
+//	const std::string url = _modelComponent->getServiceURL();
+//	ot::JsonDocument doc;
+//	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+//	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_MODEL, doc.GetAllocator()), doc.GetAllocator());
+//	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(url, doc.GetAllocator()), doc.GetAllocator());
+//	m_initialisationRoutines.push_back(doc.toJson());
+//	m_initialisationPrepared = m_initialisationRoutines.size() == m_numberOfInitialisationRoutines;
+//}
+
+//void SubprocessHandler::UIComponentWasSet()
+//{
+//	const std::string url = _uiComponent->getServiceURL();
+//	ot::JsonDocument doc;
+//	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+//	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, doc.GetAllocator()), doc.GetAllocator());
+//	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(url, doc.GetAllocator()), doc.GetAllocator());
+//	m_initialisationRoutines.push_back(doc.toJson());
+//	m_initialisationPrepared = m_initialisationRoutines.size() == m_numberOfInitialisationRoutines;
+//	
+//}
