@@ -18,9 +18,6 @@
     <ClCompile Include="src\TestrJSON.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="TestVariable.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\TestPerformanceTest.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -37,6 +34,15 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\TestGenericDataStruct.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestVariable.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestString.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestContainerHelper.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

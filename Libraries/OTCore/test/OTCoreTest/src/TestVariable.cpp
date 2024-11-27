@@ -162,7 +162,7 @@ TEST(VariableTest, FloatComparision)
 	for (auto i = 0; i < total; ++i)
 	{
 		float expected = (i / 10.0f);
-		float actual = calculate(9.0f + expected, 0.01f, 900);
+		float actual = (float)calculate(9.0f + expected, 0.01f, 900);
 		if (ot::Variable(actual) == ot::Variable(expected))
 		{
 			++count;

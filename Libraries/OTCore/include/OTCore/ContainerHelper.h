@@ -16,7 +16,7 @@ namespace ot {
 	//! @tparam V Map value type.
 	//! @param _map Data.
 	//! @return List of values.
-	template <typename K, typename V> std::list<V> listFromMapKeys(const std::map<K, V>& _map);
+	template <typename K, typename V> std::list<K> listFromMapKeys(const std::map<K, V>& _map);
 
 	//! @brief Creates a list containing all the values from the provided map.
 	//! @tparam K Map key type.
@@ -31,11 +31,14 @@ namespace ot {
 	//! @param _map 
 	//! @param _value 
 	template <class K, class V> void removeFromMapByValue(std::map<K, V>& _map, const V& _value);
+
+	template <typename T> std::vector<T> vectorFromList(const std::list<T>& _list);
+	template <typename T> std::list<T> listFromVector(const std::vector<T>& _vector);
 }
 
 template <typename K, typename V>
-std::list<V> ot::listFromMapKeys(const std::map<K, V>& _map) {
-	std::list<V> result;
+std::list<K> ot::listFromMapKeys(const std::map<K, V>& _map) {
+	std::list<K> result;
 
 	for (const auto& it : _map) {
 		result.push_back(it.first);
@@ -65,4 +68,23 @@ void ot::removeFromMapByValue(std::map<K, V>& _map, const V& _value) {
 			it++;
 		}
 	}
+}
+
+template <typename T>
+std::vector<T> ot::vectorFromList(const std::list<T>& _list) {
+	std::vector<T> result;
+	result.reserve(_list.size());
+	for (const T& entry : _list) {
+		result.push_back(entry);
+	}
+	return result;
+}
+
+template <typename T>
+std::list<T> ot::listFromVector(const std::vector<T>& _vector) {
+	std::list<T> result;
+	for (const T& entry : _vector) {
+		result.push_back(entry);
+	}
+	return result;
 }

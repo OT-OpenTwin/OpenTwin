@@ -1008,8 +1008,17 @@ std::string Application::handleVisualisationDataRequest(ot::JsonDocument& _docum
 	ot::UID entityID =  ot::json::getUInt64(_document,OT_ACTION_PARAM_MODEL_EntityID);
 	const std::string visualisationType = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
 	bool setViewAsActive = ot::json::getBool(_document, OT_ACTION_PARAM_VIEW_SetActiveView);
-	m_visualisationHandler.handleVisualisationRequest(entityID,visualisationType,setViewAsActive);
-	return "";
+	try
+	{
+		m_visualisationHandler.handleVisualisationRequest(entityID,visualisationType,setViewAsActive);
+	}
+	catch (std::exception& e)
+	{
+		OT_LOG_W(e.what());
+		ot::ReturnMessage(ot::ReturnMessage::Failed, e.what()).toJson();
+	}
+
+	return ot::ReturnMessage().toJson();
 }
 // ##################################################################################################################################################################################################################
 

@@ -25,6 +25,9 @@ namespace ot {
 		//! @brief Changes the provided string to the lower case.
 		static std::string toLower(const std::string& _string);
 
+		//! @brief Evaluates any escape characters in this string.
+		static std::string evaluateEscapeCharacters(const std::string& _string);
+
 		//! @brief Split the provided string
 		//! @param _str String to split
 		//! @param _splitBy Char to split at
@@ -48,6 +51,8 @@ namespace ot {
 		//! @param _splitBy String to split at
 		//! @param _skipEmpty If true, all empty parts will be skipped
 		static std::list<std::wstring> split(const std::wstring& _str, const std::wstring& _splitBy, bool _skipEmpty = false);
+
+		static std::list<std::string> smartSplit(const std::string& _str, const std::string& _splitBy, bool _evaluateEscapeCharacters = true, bool _skipEmpty = false);
 
 		//! \brief Replaces all what occurances in the provided string and returns the result.
 		static std::string replace(const std::string& _str, const std::string& _what, const std::string& _with);

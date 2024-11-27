@@ -38,12 +38,14 @@
   <ItemGroup>
     <ClCompile Include="src\FixtureTextEncoding.cpp" />
     <ClCompile Include="src\FixtureVariable.cpp" />
+    <ClCompile Include="src\TestContainerHelper.cpp" />
     <ClCompile Include="src\TestGenericDataStruct.cpp" />
     <ClCompile Include="src\TestPerformanceTest.cpp" />
     <ClCompile Include="src\TestReturnValues.cpp" />
     <ClCompile Include="src\TestrJSON.cpp" />
+    <ClCompile Include="src\TestString.cpp" />
     <ClCompile Include="src\TestTextEncoding.cpp" />
-    <ClCompile Include="TestVariable.cpp" />
+    <ClCompile Include="src\TestVariable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="TestEncodingTypeFiles\ANSI.txt" />

@@ -24,6 +24,8 @@ public:
 	ot::TableHeaderOrientation getHeaderOrientation() override;
 	bool visualiseText() override;
 	char getDecimalDelimiter() override;
+	bool getEvaluateEscapeCharacter(void);
+
 private:
 	void setSpecializedProperties() override;
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
@@ -31,6 +33,7 @@ private:
 
 	std::string m_rowDelimiter = "\n";
 	std::string m_columnDelimiter = ";";
+	bool m_evaluateEscapeCharacter = false;
 
 	ot::ContentChangedHandling m_tableContentChangedHandling = ot::ContentChangedHandling::ModelServiceSaves;
 };

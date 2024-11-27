@@ -33,7 +33,6 @@ void EntityFileText::setTextEncoding(ot::TextEncoding::EncodingStandard _encodin
 	}
 }
 
-
 ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding() 
 {
 	EntityPropertiesBase* base = getProperties().getProperty("Text Encoding");
