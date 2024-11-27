@@ -26,6 +26,10 @@ std::string EntityFileCSV::getColumnDelimiter()
 ot::TableHeaderOrientation EntityFileCSV::getHeaderOrientation()
 {
 	auto selectedOrientation = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Header position"));
+	if (selectedOrientation == nullptr)
+	{
+		throw std::exception("Legacy entity. Please reimport the file");
+	}
 	ot::TableHeaderOrientation orientation =ot::stringToHeaderOrientation(selectedOrientation->getValue());
 	return orientation;
 }
