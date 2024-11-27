@@ -222,14 +222,14 @@ void DataCategorizationHandler::addSMDEntries(std::list<EntityBase*>& _selectedE
 		
 		if (categorizationEntity != nullptr)
 		{
-			if (categorizationEntity->GetSelectedDataCategorie() != EntityParameterizedDataCategorization::measurementSeriesMetadata)
+			if (categorizationEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::measurementSeriesMetadata)
 			{
 				m_bufferedCategorisationNames.insert(categorizationEntity->getName());
 			}
-			else if (categorizationEntity->GetSelectedDataCategorie() != EntityParameterizedDataCategorization::parameter|| categorizationEntity->GetSelectedDataCategorie() != EntityParameterizedDataCategorization::quantity)
+			else if (categorizationEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::parameter|| categorizationEntity->GetSelectedDataCategorie() == EntityParameterizedDataCategorization::quantity)
 			{
 				size_t lastDevider = categorizationEntity->getName().find_last_of('/');
-				const std::string seriesMetadataName =	categorizationEntity->getName().substr(0, lastDevider - 1);
+				const std::string seriesMetadataName =	categorizationEntity->getName().substr(0, lastDevider);
 				m_bufferedCategorisationNames.insert(seriesMetadataName);
 			}
 			else
