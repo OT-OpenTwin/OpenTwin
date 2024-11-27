@@ -272,8 +272,17 @@ std::list<std::string> ot::String::smartSplit(const std::string& _str, const std
 		}
 	}
 
+	if (isEscape) {
+		OT_LOG_EA("Escape character specifier missing");
+		currentSegment.push_back('\\');
+	}
+
 	if (!currentSegment.empty() || !_skipEmpty) {
 		result.push_back(currentSegment);
+	}
+
+	if (insideQuotes) {
+		OT_LOG_WA("Closing quote missing");
 	}
 
 	return result;

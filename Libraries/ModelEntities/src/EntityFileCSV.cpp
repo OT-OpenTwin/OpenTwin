@@ -1,10 +1,11 @@
 #include "EntityFileCSV.h"
 
 #include "CSVToTableTransformer.h"
+#include "OTCore/String.h"
+#include "OTCore/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "CSVProperties.h"
 #include <string>
-
 
 EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 : EntityFileText(ID,parent,obs,ms,factory,owner){}
@@ -46,10 +47,22 @@ char EntityFileCSV::getDecimalDelimiter()
 	{
 		return '.';
 	}
+
 	auto selection = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
 
 	const char separator = selection->getValue()[0];
 	return separator;
+}
+
+bool EntityFileCSV::getEvaluateEscapeCharacter() {
+	EntityPropertiesBase* baseProperty = getProperties().getProperty("Evaluate Escape Characters");
+	if (baseProperty == nullptr) {
+		return false;
+	}
+	auto prop = dynamic_cast<EntityPropertiesBoolean*>(baseProperty);
+
+	m_evaluateEscapeCharacter = prop->getValue();
+	return m_evaluateEscapeCharacter;
 }
 
 void EntityFileCSV::setSpecializedProperties()
@@ -57,6 +70,7 @@ void EntityFileCSV::setSpecializedProperties()
 	EntityFileText::setSpecializedProperties();
 	EntityPropertiesString::createProperty("CSV Properties", "Row Delimiter", m_rowDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 	EntityPropertiesString::createProperty("CSV Properties", "Column Delimiter", m_columnDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
+	EntityPropertiesBoolean::createProperty("CSV Properties", "Evaluate Escape Characters", m_evaluateEscapeCharacter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 	EntityPropertiesSelection::createProperty("Table header", "Header position", { ot::toString(ot::TableHeaderOrientation::horizontal), ot::toString(ot::TableHeaderOrientation::vertical) }, ot::toString(ot::TableHeaderOrientation::horizontal), "tableInformation", getProperties());
 	std::locale mylocale("");
 	auto defaulDecimalSeparator = std::use_facet<std::numpunct<char>>(mylocale).decimal_point();
@@ -67,32 +81,34 @@ void EntityFileCSV::setSpecializedProperties()
 		}
 		, std::string(1, defaulDecimalSeparator),
 		"default", getProperties());
-
 }
 
 void EntityFileCSV::AddStorageData(bsoncxx::builder::basic::document & storage)
 {
 	EntityFile::AddStorageData(storage);
 	storage.append(
-		bsoncxx::builder::basic::kvp("RowDelimiter",m_rowDelimiter),
-		bsoncxx::builder::basic::kvp("ColumnDelimiter",m_columnDelimiter)
+		bsoncxx::builder::basic::kvp("RowDelimiter", m_rowDelimiter),
+		bsoncxx::builder::basic::kvp("ColumnDelimiter", m_columnDelimiter),
+		bsoncxx::builder::basic::kvp("EvaluateEscape", m_evaluateEscapeCharacter)
 	);
 }
 
 void EntityFileCSV::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityFile::readSpecificDataFromDataBase(doc_view, entityMap);
-	m_rowDelimiter =std::string(doc_view["RowDelimiter"].get_utf8().value.data());
+	m_rowDelimiter = std::string(doc_view["RowDelimiter"].get_utf8().value.data());
 	m_columnDelimiter = std::string(doc_view["ColumnDelimiter"].get_utf8().value.data());
+	m_evaluateEscapeCharacter = doc_view["EvaluateEscape"].get_bool();
 }
 
 const ot::GenericDataStructMatrix EntityFileCSV::getTable()
 {
 	CSVProperties properties;
 
-	properties.m_rowDelimiter = getRowDelimiter();
-	properties.m_columnDelimiter = getColumnDelimiter();
+	properties.m_rowDelimiter = ot::String::evaluateEscapeCharacters(getRowDelimiter());
+	properties.m_columnDelimiter = ot::String::evaluateEscapeCharacters(getColumnDelimiter());
 	properties.m_decimalDelimiter = getDecimalDelimiter();
+	properties.m_evaluateEscapeCharacters = getEvaluateEscapeCharacter();
 	const std::string text = getText();
 
 	CSVToTableTransformer transformer;
@@ -108,6 +124,7 @@ void EntityFileCSV::setTable(const ot::GenericDataStructMatrix& _table)
 	properties.m_rowDelimiter = getRowDelimiter();
 	properties.m_columnDelimiter = getColumnDelimiter();
 	properties.m_decimalDelimiter = getDecimalDelimiter();
+	properties.m_evaluateEscapeCharacters = getEvaluateEscapeCharacter();
 
 	CSVToTableTransformer transformer;
 

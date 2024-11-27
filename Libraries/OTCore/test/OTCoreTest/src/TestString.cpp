@@ -3,6 +3,13 @@
 #include "OTCore/ContainerHelper.h"
 #include <string>
 
+TEST(StringTests, StringEscapeTest) {
+	std::string src = "Test\\nString\"\\\"with some escape\\bcharacters";
+
+	std::string result = ot::String::evaluateEscapeCharacters(src);
+	EXPECT_EQ(result, "Test\nString\"\"with some escape\bcharacters");
+}
+
 TEST(StringTests, StringSmartSplit) {
 	std::string src = "Test\nString \"containing\nsubstring with\\nsome escape\\\"\"\n";
 
