@@ -36,6 +36,12 @@ REM System files
 REM ==========================================
 
 REM This files are needed for the distribution of the frontend
+
+ECHO.
+ECHO ==========================================
+ECHO 	Copy System files
+ECHO ==========================================
+
 SET SYSTEM_32=%SYSTEMROOT%\System32
 COPY %SYSTEM_32%\downlevel\api-ms-win-crt-runtime-l1-1-0.dll %OPENTWIN_FRONTEND_DEPLOYMENT%
 COPY %SYSTEM_32%\msvcp140.dll 					      		 %OPENTWIN_FRONTEND_DEPLOYMENT%
@@ -48,6 +54,11 @@ COPY %SYSTEM_32%\vcruntime140_1.dll			 				 %OPENTWIN_FRONTEND_DEPLOYMENT%
 REM ==========================================
 REM Copy ThirdParty files
 REM ==========================================
+
+ECHO.
+ECHO ==========================================
+ECHO 	Copy ThirdParty Libs
+ECHO ==========================================
 
 REM Curl
 COPY "%CURL_DLLR%\libcurl.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
@@ -141,6 +152,11 @@ REM ==========================================
 REM Copy OpenTwin Assets
 REM ==========================================
 
+ECHO.
+ECHO ==========================================
+ECHO 	Copy OpenTwin Assets
+ECHO ==========================================
+
 REM Icons
 MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\icons"
 XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\Icons" "%OPENTWIN_FRONTEND_DEPLOYMENT%\icons"
@@ -156,6 +172,11 @@ XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\GraphicsItems" "%OPENTWIN_FRONTEND_DEPLOYME
 REM ==========================================
 REM Copy OpenTwin build files
 REM ==========================================
+
+ECHO.
+ECHO ==========================================
+ECHO 	Copy OpenTwin libs
+ECHO ==========================================
 
 REM CADModelEntities
 COPY "%OT_CADMODELENTITIES_ROOT%\%OT_DLLR%\CADModelEntities.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
@@ -217,6 +238,11 @@ ECHO Plugins = .\\plugins >> "%OPENTWIN_FRONTEND_DEPLOYMENT%\qt.conf"
 REM ==========================================
 REM Finally create the Installer
 REM ==========================================
+
+ECHO.
+ECHO ==========================================
+ECHO 	Creating Installer
+ECHO ==========================================
 
 CALL "C:\Program Files (x86)\NSIS\makensis.exe" Install-OpenTwin.nsi
 

@@ -21,9 +21,9 @@ OutFile "Install_${NAME}.exe"
 Unicode True
 !define MUI_PAGE_HEADER_TEXT "Welcome to OpenTwin"
 BrandingText "(C) OpenTwin 2024"
-RequestExecutionLevel Admin ; Request admin rights on WinVista+ (when UAC is turned on)
-InstallDir "$ProgramFiles\$(^Name)"
-InstallDirRegKey HKLM "${REGPATH_UNINSTSUBKEY}" "UninstallString"
+RequestExecutionLevel user ; User rights on WinVista+ (when UAC is turned on)
+InstallDir "$LOCALAPPDATA\$(^Name)"
+InstallDirRegKey HKCU "${REGPATH_UNINSTSUBKEY}" "UninstallString"
 
 !include LogicLib.nsh
 !include Integration.nsh
@@ -45,17 +45,18 @@ InstallDirRegKey HKLM "${REGPATH_UNINSTSUBKEY}" "UninstallString"
 !insertmacro MUI_LANGUAGE "English"
 
 !macro UninstallExisting exitcode uninstcommand
-Push `${uninstcommand}`
-Call UninstallExisting
-Pop ${exitcode}
+	Push `${uninstcommand}`
+	Call UninstallExisting
+	Pop ${exitcode}
 !macroend
+
 Function UninstallExisting
-Exch $1 ; uninstcommand
-Push $2 ; Uninstaller
-Push $3 ; Len
-StrCpy $3 ""
-StrCpy $2 $1 1
-StrCmp $2 '"' qloop sloop
+	Exch $1 ; uninstcommand
+	Push $2 ; Uninstaller
+	Push $3 ; Len
+	StrCpy $3 ""
+	StrCpy $2 $1 1
+	StrCmp $2 '"' qloop sloop
 sloop:
 	StrCpy $2 $1 1 $3
 	IntOp $3 $3 + 1
@@ -80,38 +81,29 @@ run:
 	Delete "$2" ; Delete the uninstaller
 	RMDir "$3" ; Try to delete $InstDir
 	RMDir "$3\.." ; (Optional) Try to delete the parent of $InstDir
-Pop $3
-Pop $2
-Exch $1 ; exitcode
+
+	Pop $3
+	Pop $2
+	Exch $1 ; exitcode
 FunctionEnd
 
-!macro EnsureAdminRights
-  UserInfo::GetAccountType
-  Pop $0
-  ${If} $0 != "admin" ; Require admin rights on WinNT4+
-    MessageBox MB_IconStop "Administrator rights required!"
-    SetErrorLevel 740 ; ERROR_ELEVATION_REQUIRED
-    Quit
-  ${EndIf}
-!macroend
-
 Function .onInit
-  SetShellVarContext All
-  !insertmacro EnsureAdminRights
-  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" "UninstallString"
-${If} $0 != ""
-${AndIf} ${Cmd} `MessageBox MB_YESNO|MB_ICONQUESTION "Uninstall previous version?" /SD IDYES IDYES`
-	!insertmacro UninstallExisting $0 $0
-	${If} $0 <> 0
-		MessageBox MB_YESNO|MB_ICONSTOP "Failed to uninstall, continue anyway?" /SD IDYES IDYES +2
-			Abort
+	SetShellVarContext All
+	ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" "UninstallString"
+	
+	${If} $0 != "" 
+	${AndIf} ${Cmd} `MessageBox MB_YESNO|MB_ICONQUESTION "Uninstall previous version?" /SD IDYES IDYES`
+		!insertmacro UninstallExisting $0 $0
+	
+		${If} $0 <> 0
+			MessageBox MB_YESNO|MB_ICONSTOP "Failed to uninstall, continue anyway?" /SD IDYES IDYES +2
+				Abort
+		${EndIf}
 	${EndIf}
-${EndIf}
 FunctionEnd
 
 Function un.onInit
   SetShellVarContext All
-  !insertmacro EnsureAdminRights
 FunctionEnd
 
 Section "Program files (Required)"
@@ -119,11 +111,11 @@ Section "Program files (Required)"
 
   SetOutPath $InstDir
   WriteUninstaller "$InstDir\Uninst.exe"
-  WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayName" "OpenTwin"
-  WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$InstDir\OpenTwin.exe,0"
-  WriteRegStr HKLM "${REGPATH_UNINSTSUBKEY}" "UninstallString" '"$InstDir\Uninst.exe"'
-  WriteRegDWORD HKLM "${REGPATH_UNINSTSUBKEY}" "NoModify" 1
-  WriteRegDWORD HKLM "${REGPATH_UNINSTSUBKEY}" "NoRepair" 1
+  WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "DisplayName" "OpenTwin"
+  WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$InstDir\OpenTwin.exe,0"
+  WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "UninstallString" '"$InstDir\Uninst.exe"'
+  WriteRegDWORD HKCU "${REGPATH_UNINSTSUBKEY}" "NoModify" 1
+  WriteRegDWORD HKCU "${REGPATH_UNINSTSUBKEY}" "NoRepair" 1
 
   File /r ..\..\Deployment_Frontend\*.*
 SectionEnd
@@ -140,5 +132,5 @@ Section -Uninstall
 
   RMDir /r "$InstDir"
 
-  DeleteRegKey HKLM "${REGPATH_UNINSTSUBKEY}"
+  DeleteRegKey HKCU "${REGPATH_UNINSTSUBKEY}"
 SectionEnd
