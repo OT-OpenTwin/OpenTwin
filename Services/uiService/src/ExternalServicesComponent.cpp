@@ -3040,7 +3040,7 @@ std::string ExternalServicesComponent::handleRemoveShapes(ot::JsonDocument& _doc
 	std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
 	for (auto view : views) {
 		for (auto uid : entityID) {
-			view->removeItem(uid);
+			view->removeItem(uid, true);
 			view->removeConnection(uid);
 		}
 	}
