@@ -19,6 +19,7 @@ static ot::PropertyInputFactoryRegistrar<ot::PropertyInputStringList> propertyIn
 ot::PropertyInputStringList::PropertyInputStringList()
 {
 	m_comboButton = new ComboButton;
+	m_comboButton->setFocusPolicy(Qt::NoFocus);
 	this->connect(m_comboButton, &ComboButton::textChanged, this, qOverload<>(&PropertyInput::slotValueChanged));
 }
 
