@@ -76,6 +76,9 @@
     <ClCompile Include="src\OptionsParameterHandlerFormat.cpp">
       <Filter>src\Touchstone</Filter>
     </ClCompile>
+    <ClCompile Include="src\RangleSelectionVisualisationHandler.cpp">
+      <Filter>src\ParameterizedDataHandler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -170,6 +173,18 @@
     </ClInclude>
     <ClInclude Include="include\TouchstoneToResultdata.h">
       <Filter>include\ResultdataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RangleSelectionVisualisationHandler.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TableIndexSchemata.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SelectionCategorisationColours.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CategorisationFolderNames.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

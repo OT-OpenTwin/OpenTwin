@@ -24,14 +24,12 @@ class TabledataToResultdataHandler : public BusinessLogicHandler
 	friend class FixtureTabledataToResultdataHandler;
 
 public:
-	TabledataToResultdataHandler(const std::string& _baseFolder, const std::string& _datasetFolder, const std::string& _parameterFolder, const std::string& _quantityFolder, const std::string& _tableFolder);
+	TabledataToResultdataHandler(const std::string& _datasetFolder, const std::string& _tableFolder);
 	void createDataCollection(const std::string& _dbURL, const std::string& _projectName);
 
 private:
-	const std::string m_baseFolder;
+	
 	const std::string m_datasetFolder;
-	const std::string m_parameterFolder;
-	const std::string m_quantityFolder;
 	const std::string m_tableFolder;
 	const std::string m_dbURL;
 	

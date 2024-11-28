@@ -209,6 +209,7 @@
     <ClCompile Include="src\OptionsParameterHandlerFrequency.cpp" />
     <ClCompile Include="src\OptionsParameterHandlerParameter.cpp" />
     <ClCompile Include="src\OptionsParameterHandlerReference.cpp" />
+    <ClCompile Include="src\RangleSelectionVisualisationHandler.cpp" />
     <ClCompile Include="src\TabledataToResultdataHandler.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\Documentation.cpp" />
@@ -232,7 +233,10 @@
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\BranchSynchronizer.h" />
     <ClInclude Include="include\BusinessLogicHandler.h" />
+    <ClInclude Include="include\CategorisationFolderNames.h" />
     <ClInclude Include="include\DataCategorizationConsistencyChecker.h" />
+    <ClInclude Include="include\RangleSelectionVisualisationHandler.h" />
+    <ClInclude Include="include\SelectionCategorisationColours.h" />
     <ClInclude Include="include\TabledataToResultdataHandler.h" />
     <ClInclude Include="include\Documentation.h" />
     <ClInclude Include="include\FileToTableExtractorFactory.h" />
@@ -251,6 +255,7 @@
     <ClInclude Include="include\OptionsParameterHandlerReference.h" />
     <ClInclude Include="include\PreviewAssembler.h" />
     <ClInclude Include="include\PreviewAssemblerRMD.h" />
+    <ClInclude Include="include\TableIndexSchemata.h" />
     <ClInclude Include="include\TouchstoneHandler.h" />
     <ClInclude Include="include\TableExtractor.h" />
     <ClInclude Include="include\TableExtractorCSV.h" />

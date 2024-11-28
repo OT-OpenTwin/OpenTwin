@@ -6,16 +6,18 @@
 #include "Application.h"
 #include "PreviewAssemblerRMD.h"
 #include "LocaleSettingsSwitch.h"
-
+#include "CategorisationFolderNames.h"
+#include "SelectionCategorisationColours.h"
 #include "Documentation.h"
 #include "OTCore/StringToVariableConverter.h"
+#include "TableIndexSchemata.h"
 
 #include <algorithm>
 #include <bitset>
 
-DataCategorizationHandler::DataCategorizationHandler(std::string _baseFolder, std::string _parameterFolder, std::string _quantityFolder, std::string _tableFolder, std::string _previewTableName)
-	:m_baseFolder(_baseFolder), m_parameterFolder(_parameterFolder), m_quantityFolder(_quantityFolder), m_tableFolder(_tableFolder), m_previewTableName(_previewTableName),
-	m_rmdColour(88, 175, 233, 100), m_msmdColour(166, 88, 233, 100), m_parameterColour(88, 233, 122, 100), m_quantityColour(233, 185, 88, 100)
+
+DataCategorizationHandler::DataCategorizationHandler(std::string _tableFolder, std::string _previewTableName)
+	:m_tableFolder(_tableFolder), m_previewTableName(_previewTableName)
 {
 
 }
@@ -142,7 +144,7 @@ void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<Entit
 		}
 		else
 		{
-			std::string entityName = CreateNewUniqueTopologyName(m_rmdEntityName, m_smdFolder);
+			std::string entityName = CreateNewUniqueTopologyName(m_rmdEntityName, CategorisationFolderNames::getSeriesMetadataFolderName());
 			bool addNewEntityToActiveList;
 			if (_category == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
 			{
@@ -156,11 +158,11 @@ void DataCategorizationHandler::bufferCorrespondingMetadataNames(std::list<Entit
 
 				if (_category == EntityParameterizedDataCategorization::DataCategorie::parameter)
 				{
-					entityName += "/" + m_parameterFolder;
+					entityName += "/" + CategorisationFolderNames::getParameterFolderName();
 				}
 				else
 				{
-					entityName += "/" + m_quantityFolder;
+					entityName += "/" + CategorisationFolderNames::getQuantityFolderName();
 				}
 
 				addNewEntityToActiveList = true;
@@ -174,19 +176,19 @@ void DataCategorizationHandler::setBackgroundColour(EntityParameterizedDataCateg
 {
 	if (_category == EntityParameterizedDataCategorization::DataCategorie::researchMetadata)
 	{
-		m_backgroundColour = m_rmdColour;
+		m_backgroundColour = SelectionCategorisationColours::getRMDColour();
 	}
 	else if (_category == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
 	{
-		m_backgroundColour = m_msmdColour;
+		m_backgroundColour = SelectionCategorisationColours::getSMDColour();
 	}
 	else if (_category == EntityParameterizedDataCategorization::DataCategorie::parameter)
 	{
-		m_backgroundColour = m_parameterColour;
+		m_backgroundColour = SelectionCategorisationColours::getParameterColour();
 	}
 	else if (_category == EntityParameterizedDataCategorization::DataCategorie::quantity)
 	{
-		m_backgroundColour = m_quantityColour;
+		m_backgroundColour = SelectionCategorisationColours::getQuantityColour();
 	}
 	else 
 	{
@@ -241,7 +243,7 @@ void DataCategorizationHandler::addSMDEntries(std::list<EntityBase*>& _selectedE
 	// If none is selected, we need to create a new smd categorisation.
 	if (m_bufferedCategorisationNames.size() == 0)
 	{
-		std::string entityName = CreateNewUniqueTopologyName(m_rmdEntityName, m_smdFolder);
+		std::string entityName = CreateNewUniqueTopologyName(m_rmdEntityName, CategorisationFolderNames::getSeriesMetadataFolderName());
 		bool addToActiveEntities = true;
 		addNewCategorizationEntity(entityName, EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata, addToActiveEntities);
 	}
@@ -285,11 +287,11 @@ void DataCategorizationHandler::addParamOrQuantityEntries(std::list<EntityBase*>
 			std::string entityName;
 			if (_category == EntityParameterizedDataCategorization::DataCategorie::quantity)
 			{
-				entityName = seriesCategorisation->getName() + "/" + m_quantityFolder;
+				entityName = seriesCategorisation->getName() + "/" + CategorisationFolderNames::getQuantityFolderName();
 			}
 			else
 			{
-				entityName = seriesCategorisation->getName() + "/" + m_parameterFolder;
+				entityName = seriesCategorisation->getName() + "/" + CategorisationFolderNames::getParameterFolderName();
 			}
 			const bool addEntityToActiveList = true;
 			addNewCategorizationEntity(entityName, _category, addEntityToActiveList);
@@ -305,17 +307,17 @@ void DataCategorizationHandler::addParamOrQuantityEntries(std::list<EntityBase*>
 	//If nothing was selected, we nee to create a new series + quantity/parameter
 	if (m_bufferedCategorisationNames.size() == 0)
 	{
-		std::string entityName = CreateNewUniqueTopologyName(m_rmdEntityName, m_smdFolder);
+		std::string entityName = CreateNewUniqueTopologyName(m_rmdEntityName, CategorisationFolderNames::getSeriesMetadataFolderName());
 		bool addToActiveEntities = false;
 		addNewCategorizationEntity(entityName, EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata, addToActiveEntities);
 
 		if (_category == EntityParameterizedDataCategorization::DataCategorie::quantity)
 		{
-			entityName += "/" + m_quantityFolder;
+			entityName += "/" + CategorisationFolderNames::getQuantityFolderName();
 		}
 		else
 		{
-			entityName += "/" + m_parameterFolder;
+			entityName += "/" + CategorisationFolderNames::getParameterFolderName();
 		}
 		addToActiveEntities = true;
 		addNewCategorizationEntity(entityName, _category, addToActiveEntities);
@@ -355,130 +357,6 @@ void DataCategorizationHandler::requestRangeSelection(const std::string& _tableN
 	Application::instance()->uiComponent()->sendMessage(true, doc, tmp);
 }
 
-ot::TableRange DataCategorizationHandler::userRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation)
-{
-	//First we switch from base-1 index to base -0 index
-	int rangeRowBottom =_range.getBottomRow() - 1;
-	int rangeRowTop = _range.getTopRow() -1;
-	int rangeColumnLeft = _range.getLeftColumn() -1;
-	int rangeColumnRight = _range.getRightColumn() -1;
-	
-	//Now we take the header in consideration, which is part of the matrix and its row/column index, but the TableConfig handles the header as separate vector
-	if (_headerOrientation == ot::TableHeaderOrientation::horizontal)
-	{
-		rangeRowBottom += 1;
-		rangeRowTop += 1;
-	}
-	else if (_headerOrientation == ot::TableHeaderOrientation::vertical)
-	{
-		rangeColumnLeft += 1;
-		rangeColumnRight += 1;
-	}
-	ot::TableRange matrixRange (rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
-	return matrixRange;
-}
-
-
-ot::TableRange DataCategorizationHandler::selectionRangeToUserRange(const ot::TableRange& _range)
-{
-	//We switch base-0 to base-1 index
-	int rangeRowBottom = _range.getBottomRow() +1 ;
-	int rangeRowTop = _range.getTopRow() + 1;
-	int rangeColumnLeft = _range.getLeftColumn() + 1;
-	int rangeColumnRight = _range.getRightColumn() + 1;
-	ot::TableRange userRange(rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
-	return userRange;
-}
-
-ot::TableRange DataCategorizationHandler::userRangeToSelectionRange(const ot::TableRange& _range)
-{
-	//We switch base-1 to base-0 index
-	int rangeRowBottom = _range.getBottomRow() - 1;
-	int rangeRowTop = _range.getTopRow() - 1;
-	int rangeColumnLeft = _range.getLeftColumn() - 1;
-	int rangeColumnRight = _range.getRightColumn() - 1;
-	ot::TableRange selectionRange(rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
-	return selectionRange;
-}
-
-ot::TableRange DataCategorizationHandler::selectionRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation)
-{
-	//Both QTable and matrix work with a base-0 index. Nothing needs to be changed in this regard
-	//The QTable handles the header as a separate vector, in the matrix it is simply part of the matrix. Here we need to make an adjustment
-		//First we switch from base-1 index to base -0 index
-	int rangeRowBottom = _range.getBottomRow();
-	int rangeRowTop = _range.getTopRow();
-	int rangeColumnLeft = _range.getLeftColumn();
-	int rangeColumnRight = _range.getRightColumn();
-
-	//Now we take the header in consideration, which is part of the matrix and its row/column index, but the TableConfig handles the header as separate vector
-	if (_headerOrientation == ot::TableHeaderOrientation::horizontal)
-	{
-		rangeRowBottom += 1;
-		rangeRowTop += 1;
-	}
-	else if (_headerOrientation == ot::TableHeaderOrientation::vertical)
-	{
-		rangeColumnLeft += 1;
-		rangeColumnRight += 1;
-	}
-	ot::TableRange matrixRange (rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
-	
-	return matrixRange;
-}
-
-void DataCategorizationHandler::requestToOpenTable(const std::string& _tableName)
-{
-	ot::EntityInformation entityInfo;
-	Application::instance()->modelComponent()->getEntityInformation(_tableName, entityInfo);
-	EntityBase* entityBase = Application::instance()->modelComponent()->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
-	IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entityBase);
-	assert(table != nullptr);
-		
-	ot::JsonDocument document;
-	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
-	info.addToJsonObject(document, document.GetAllocator());
-	document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TABLE_Setup, document.GetAllocator());
-	document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, true, document.GetAllocator());
-	document.AddMember(OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent, false, document.GetAllocator());
-
-	ot::TableCfg tableCfg = table->getTableConfig();;
-	ot::JsonObject cfgObj;
-	tableCfg.addToJsonObject(cfgObj, document.GetAllocator());
-
-	document.AddMember(OT_ACTION_PARAM_Config, cfgObj, document.GetAllocator());
-		
-	std::string answer;
-	Application::instance()->uiComponent()->sendMessage(false, document, answer);
-}
-
-void DataCategorizationHandler::requestColouringRanges(bool _clearSelection, const std::string& _tableName, const ot::Color& _colour, const std::list<ot::TableRange>& ranges)
-{
-	ot::JsonDocument doc;
-
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_SetCurrentSelectionBackground, doc.GetAllocator()), doc.GetAllocator());
-
-	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_tableName,doc.GetAllocator()),doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_ClearSelection, _clearSelection, doc.GetAllocator());
-
-	ot::JsonObject obj;
-	_colour.addToJsonObject(obj, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Color, obj, doc.GetAllocator());
-
-	ot::JsonArray vectOfRanges;
-	for (auto range : ranges)
-	{
-		ot::JsonObject temp;
-		range.addToJsonObject(temp, doc.GetAllocator());
-		vectOfRanges.PushBack(temp, doc.GetAllocator());
-	}
-	doc.AddMember(OT_ACTION_PARAM_Ranges, vectOfRanges, doc.GetAllocator());
-
-	std::string answer;
-	_uiComponent->sendMessage(true, doc, answer);
-}
-
 
 
 void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::TableRange>& _ranges)
@@ -514,7 +392,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 	matrixRanges.reserve(_ranges.size());
 	for (const auto& selectionRange : _ranges)
 	{
-		matrixRanges.push_back(selectionRangeToMatrixRange(selectionRange, tableEntPtr->getHeaderOrientation()));
+		matrixRanges.push_back(TableIndexSchemata::selectionRangeToMatrixRange(selectionRange, tableEntPtr->getHeaderOrientation()));
 	}
 
 	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr.get(), matrixRanges);
@@ -541,7 +419,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 				tableRange->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, "", -1,dataType);
 			}
 			
-			ot::TableRange userRange = selectionRangeToUserRange(_ranges[i]);
+			ot::TableRange userRange = TableIndexSchemata::selectionRangeToUserRange(_ranges[i]);
 			tableRange->setRange(userRange);
 			tableRange->setTableProperties(tableBase->getName(), tableBase->getEntityID(), ot::toString(tableEntPtr->getHeaderOrientation()));
 			tableRange->setEditable(true);
@@ -763,7 +641,7 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisua
 std::list<std::shared_ptr<EntityTableSelectedRanges>> DataCategorizationHandler::FindAllTableSelectionsWithScripts()
 {
 	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
-	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(m_baseFolder, tempEntity.getClassName(), true);
+	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(CategorisationFolderNames::getRootFolderName(), tempEntity.getClassName(), true);
 	Application::instance()->prefetchDocumentsFromStorage(selectionRangeIDs);
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRangeEntities;
@@ -844,7 +722,7 @@ std::tuple<std::list<std::string>, std::list<std::string>> DataCategorizationHan
 	for (auto& elements : allRelevantTableSelectionsByMSMD)
 	{
 		std::unique_ptr<EntityParameterizedDataCategorization> newMSMD(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-		newMSMD->setName(CreateNewUniqueTopologyName(m_rmdEntityName, m_smdFolder));
+		newMSMD->setName(CreateNewUniqueTopologyName(m_rmdEntityName, CategorisationFolderNames::getSeriesMetadataFolderName()));
 		allMSMDNames += newMSMD->getName() + ", ";
 		newMSMD->CreateProperties(EntityParameterizedDataCategorization::measurementSeriesMetadata);
 		newMSMD->StoreToDataBase();
@@ -912,7 +790,7 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 	for (const auto& tableSelection : allRelevantTableSelections)
 	{
 		std::string tableSelectionName = tableSelection->getName();
-		tableSelectionName = tableSelectionName.substr(tableSelectionName.find(m_smdFolder), tableSelectionName.size());
+		tableSelectionName = tableSelectionName.substr(tableSelectionName.find(CategorisationFolderNames::getSeriesMetadataFolderName()), tableSelectionName.size());
 		std::string msmdName = tableSelectionName.substr(0, tableSelectionName.find_first_of('/'));
 		allRelevantTableSelectionsByMSMD[msmdName].push_back(tableSelection);
 	}
@@ -946,96 +824,13 @@ void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
 	}
 }
 
-void DataCategorizationHandler::selectRange(ot::UIDList iDs, ot::UIDList versions)
-{
-	std::map<std::string, std::map<uint32_t,std::list<ot::TableRange>>> rangesByColourIDByTableNames;
-	auto versionIt = versions.begin();
-	for (auto idIt = iDs.begin(); idIt != iDs.end(); ++idIt)
-	{
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(*idIt, *versionIt, Application::instance()->getClassFactory());
-		versionIt++;
-
-		std::unique_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
-		
-		//First we get the selected range
-		
-		ot::TableRange userRange =  rangeEntity->getSelectedRange();
-		ot::TableRange selectionRange =	userRangeToSelectionRange(userRange);
-
-		//Now we determine the colour for the range
-		const std::string tableName = rangeEntity->getTableName();
-		uint32_t colourID;
-		std::string name = rangeEntity->getName();
-		std::string::difference_type n = std::count(name.begin(), name.end(), '/');
-		if (n == 2) //First topology level: RMD
-		{
-			colourID = 0;
-		}
-		else if (n == 3) //Second topology level: MSMD files
-		{
-			colourID = 1;
-		}
-		else if (n == 4) //Third topology level: Parameter and Quantities
-		{
-			if (name.find(m_parameterFolder) != std::string::npos)
-			{
-				colourID = 2;
-			}
-			else
-			{
-				colourID = 3;
-			}
-		}
-		else
-		{
-			assert(0);
-		}
-
-		//Now we store the range for its colour and table 
-		rangesByColourIDByTableNames[tableName][colourID].push_back(selectionRange);
-	}
-
-	bool clearSelection = true;
-	for (const auto& rangesByColourIDByTableName : rangesByColourIDByTableNames)
-	{
-		const std::string tableName = rangesByColourIDByTableName.first;
-		auto& rangesByColourIDs = rangesByColourIDByTableName.second;
-		for(const auto& rangesByColourID : rangesByColourIDs)
-		{	
-			uint32_t colourID = rangesByColourID.first;
-			ot::Color typeColour;
-			if (colourID == 0)
-			{
-				typeColour = m_rmdColour;
-			}
-			else if (colourID == 1)
-			{
-				typeColour = m_msmdColour;
-			}
-			else if (colourID == 2)
-			{
-				typeColour = m_parameterColour;
-			}
-			else
-			{
-				assert(colourID == 3);
-				typeColour = m_quantityColour;
-			}
-			
-			const auto& ranges = rangesByColourID.second;
-			requestToOpenTable(tableName);
-			requestColouringRanges(clearSelection,tableName, typeColour, ranges);
-			clearSelection = false;
-		}
-	}
-}
 
 inline void DataCategorizationHandler::ensureEssentials()
 {
 	if (m_rmdEntityName == "")
 	{
 		ot::EntityInformation entityInfo;
-		std::list<std::string> allItems = _modelComponent->getListOfFolderItems(m_baseFolder);
+		std::list<std::string> allItems = _modelComponent->getListOfFolderItems(CategorisationFolderNames::getRootFolderName());
 		_modelComponent->getEntityInformation(*allItems.begin(), entityInfo);
 		m_rmdEntityName = entityInfo.getEntityName();
 	}

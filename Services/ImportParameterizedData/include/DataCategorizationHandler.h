@@ -35,43 +35,27 @@
 class DataCategorizationHandler : public BusinessLogicHandler
 {
 public:
-	DataCategorizationHandler(std::string baseFolder, std::string parameterFolder, std::string quantityFolder, std::string tableFolder, std::string previewTableName);
+	DataCategorizationHandler(std::string tableFolder, std::string previewTableName);
 	DataCategorizationHandler(const DataCategorizationHandler& other) = delete;
 	DataCategorizationHandler& operator=(const DataCategorizationHandler& other) = delete;
 	
 	void markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities,EntityParameterizedDataCategorization::DataCategorie _category);
 	
-
-	
 	void storeSelectionRanges(const std::vector<ot::TableRange>& _ranges);
 	void CreateNewScriptDescribedMSMD();
 
-	void selectRange(ot::UIDList iDs, ot::UIDList versions);
-
 	inline void ensureEssentials();
 
-	static ot::TableRange userRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation);
-	static ot::TableRange selectionRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation);
-	static ot::TableRange selectionRangeToUserRange(const ot::TableRange& _range);
-	static ot::TableRange userRangeToSelectionRange(const ot::TableRange& _range);
-
 private:
-	const std::string m_baseFolder;
-	const std::string m_parameterFolder;
-	const std::string m_quantityFolder;
 	const std::string m_tableFolder;
 	const std::string m_previewTableName;
-	const std::string m_smdFolder = "Series Metadata";
+	
 	
 	ot::UID m_scriptFolderUID = -1;
 	std::string m_rmdEntityName;
 
 	const std::string _selectionRangeName = "Selection";
 
-	const ot::Color m_rmdColour;
-	const ot::Color m_msmdColour;
-	const ot::Color m_quantityColour;
-	const ot::Color m_parameterColour;
 
 	ot::Color m_backgroundColour;
 
@@ -95,12 +79,6 @@ private:
 	void addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive);
 	void requestRangeSelection(const std::string& _tableName);
 
-
-
-
-
-	void requestToOpenTable(const std::string& _tableName);
-	void requestColouringRanges(bool _clearSelection ,const std::string& _tableName, const ot::Color& _colour, const std::list<ot::TableRange>& ranges);
 
 	void FindExistingRanges(std::string containerName, std::list<std::pair<ot::UID, ot::UID>>& existingRanges);
 	void FindContainerEntity(std::string containerName, std::pair<ot::UID, ot::UID>& categorizationEntityIdentifier);

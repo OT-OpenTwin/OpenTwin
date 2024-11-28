@@ -20,6 +20,7 @@
 #include "TabledataToResultdataHandler.h"
 #include "TouchstoneToResultdata.h"
 #include "ResultCollectionMetadataAccess.h"
+#include "RangleSelectionVisualisationHandler.h"
 
 #include "OTCore/FolderNames.h"
 
@@ -132,9 +133,7 @@ private:
 	const std::string _dataSourcesFolder = "Files";
 	const std::string _scriptsFolder = ot::FolderNames::PythonScriptFolder;
 	const std::string _tableFolder = "Tables";
-	const std::string _dataCategorizationFolder = "Data Categorization";
-	const std::string _parameterFolder = "Parameterset";
-	const std::string _quantityFolder = "Quantityset";
+	
 	const std::string _previewTableNAme = "Preview";
 	const std::string _datasetFolder = ot::FolderNames::DatasetFolder;
 
@@ -145,6 +144,7 @@ private:
 	TabledataToResultdataHandler* _tabledataToResultdataHandler = nullptr;
 	TouchstoneToResultdata* _touchstoneToResultdata = nullptr;
 	ResultCollectionMetadataAccess* m_resultAccess = nullptr;
+	RangleSelectionVisualisationHandler m_rangleSelectionVisualisationHandler;
 		
 	void HandleSelectionChanged();
 	void ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc);

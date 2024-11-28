@@ -23,8 +23,10 @@
 #include "QuantityDescriptionCurve.h"
 #include "ParameterDescription.h"
 
-TabledataToResultdataHandler::TabledataToResultdataHandler(const std::string& _baseFolder, const std::string& _datasetFolder, const std::string& _parameterFolder, const std::string& _quantityFolder, const std::string& _tableFolder)
-	: m_baseFolder(_baseFolder), m_datasetFolder(_datasetFolder), m_parameterFolder(_parameterFolder), m_quantityFolder(_quantityFolder), m_tableFolder(_tableFolder)
+#include "CategorisationFolderNames.h"
+
+TabledataToResultdataHandler::TabledataToResultdataHandler(const std::string& _datasetFolder, const std::string& _tableFolder)
+	: m_datasetFolder(_datasetFolder), m_tableFolder(_tableFolder)
 {
 }
 
@@ -192,7 +194,7 @@ std::map<std::string, MetadataAssemblyData> TabledataToResultdataHandler::getAll
 {
 	//Load all selection ranges
 	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
-	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(m_baseFolder, tempEntity.getClassName(), true);
+	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(CategorisationFolderNames::getRootFolderName(), tempEntity.getClassName(), true);
 	Application::instance()->prefetchDocumentsFromStorage(selectionRangeIDs);
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRangeEntities;
@@ -278,7 +280,7 @@ void TabledataToResultdataHandler::extractAllParameter(std::map<std::string, Met
 		std::string rangeName = (*it)->getName();
 		std::string containerName = rangeName.substr(0, rangeName.find_last_of("/"));
 
-		if (containerName.find(m_parameterFolder) != std::string::npos)
+		if (containerName.find(CategorisationFolderNames::getParameterFolderName()) != std::string::npos)
 		{
 			if (_allMetadataAssembliesByName.find(containerName) == _allMetadataAssembliesByName.end())
 			{
@@ -312,7 +314,7 @@ void TabledataToResultdataHandler::extractAllQuantities(std::map<std::string, Me
 		std::string rangeName = (*it)->getName();
 		std::string containerName = rangeName.substr(0, rangeName.find_last_of("/"));
 
-		assert(containerName.find(m_quantityFolder) != std::string::npos);
+		assert(containerName.find(CategorisationFolderNames::getQuantityFolderName()) != std::string::npos);
 
 		if (_allMetadataAssembliesByName.find(containerName) == _allMetadataAssembliesByName.end())
 		{
@@ -323,7 +325,7 @@ void TabledataToResultdataHandler::extractAllQuantities(std::map<std::string, Me
 		it = _allRangeEntities.erase(it);
 
 		std::string msmdName = containerName.substr(0, containerName.find_last_of("/"));
-		std::string parameterName = msmdName + "/" + m_parameterFolder;
+		std::string parameterName = msmdName + "/" + CategorisationFolderNames::getParameterFolderName();
 		//In case that the corresponding msmd had no range
 		if (_allMetadataAssembliesByName.find(msmdName) == _allMetadataAssembliesByName.end())
 		{

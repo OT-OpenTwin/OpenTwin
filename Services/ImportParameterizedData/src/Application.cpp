@@ -21,6 +21,7 @@
 #include "OTGui/OnePropertyDialogCfg.h"
 #include "OTGui/PropertyInt.h"
 #include "EntityFileCSV.h"
+#include "CategorisationFolderNames.h"
 
 
 //Application specific includes
@@ -49,8 +50,8 @@ Application::Application()
 {
 	
 	_tableHandler = new TableHandler( _tableFolder);
-	_parametrizedDataHandler = new DataCategorizationHandler( _dataCategorizationFolder, _parameterFolder, _quantityFolder, _tableFolder, _previewTableNAme);
-	_tabledataToResultdataHandler = new TabledataToResultdataHandler(_dataCategorizationFolder,_datasetFolder, _parameterFolder, _quantityFolder, _tableFolder);
+	_parametrizedDataHandler = new DataCategorizationHandler( _tableFolder, _previewTableNAme);
+	_tabledataToResultdataHandler = new TabledataToResultdataHandler(_datasetFolder, _tableFolder);
 	_touchstoneToResultdata = new TouchstoneToResultdata();
 }
 
@@ -372,7 +373,7 @@ void Application::HandleSelectionChanged()
 		for (auto entityInfo : selectedEntityInfo)
 		{
 			std::string name = entityInfo.getEntityName();
-			if (name.find(_dataCategorizationFolder) != std::string::npos)
+			if (name.find(CategorisationFolderNames::getRootFolderName()) != std::string::npos)
 			{
 				potentialRangesID.push_back(entityInfo.getEntityID());
 				potentialRangesVersions.push_back(entityInfo.getEntityVersion());
@@ -399,7 +400,7 @@ void Application::HandleSelectionChanged()
 			}
 			version++;
 		}
-		_parametrizedDataHandler->selectRange(selectedRangesID, selectedRangesVersion);
+		m_rangleSelectionVisualisationHandler.selectRange(selectedRangesID, selectedRangesVersion);
 	}
 	catch (std::exception& e)
 	{
