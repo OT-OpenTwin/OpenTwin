@@ -24,7 +24,7 @@ namespace TableIndexSchemata
 			rangeColumnLeft += 1;
 			rangeColumnRight += 1;
 		}
-		ot::TableRange matrixRange(rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
+		ot::TableRange matrixRange(rangeRowTop, rangeColumnLeft, rangeRowBottom, rangeColumnRight);
 		return matrixRange;
 	}
 	static ot::TableRange selectionRangeToMatrixRange(const ot::TableRange& _range, ot::TableCfg::TableHeaderMode _headerOrientation)
@@ -48,7 +48,7 @@ namespace TableIndexSchemata
 			rangeColumnLeft += 1;
 			rangeColumnRight += 1;
 		}
-		ot::TableRange matrixRange(rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
+		ot::TableRange matrixRange(rangeRowTop, rangeColumnLeft, rangeRowBottom, rangeColumnRight);
 
 		return matrixRange;
 	}
@@ -59,7 +59,7 @@ namespace TableIndexSchemata
 		int rangeRowTop = _range.getTopRow() + 1;
 		int rangeColumnLeft = _range.getLeftColumn() + 1;
 		int rangeColumnRight = _range.getRightColumn() + 1;
-		ot::TableRange userRange(rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
+		ot::TableRange userRange(rangeRowTop, rangeColumnLeft, rangeRowBottom, rangeColumnRight);
 		return userRange;
 	}
 	static ot::TableRange userRangeToSelectionRange(const ot::TableRange& _range)
@@ -69,7 +69,7 @@ namespace TableIndexSchemata
 		int rangeRowTop = _range.getTopRow() - 1;
 		int rangeColumnLeft = _range.getLeftColumn() - 1;
 		int rangeColumnRight = _range.getRightColumn() - 1;
-		ot::TableRange selectionRange(rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
+		ot::TableRange selectionRange(rangeRowTop, rangeColumnLeft, rangeRowBottom, rangeColumnRight);
 		return selectionRange;
 	}
 }

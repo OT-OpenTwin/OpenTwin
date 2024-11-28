@@ -124,7 +124,7 @@ ot::TableRange EntityTableSelectedRanges::getSelectedRange()
 	auto leftColumnEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Left column"));
 	auto rightColumnEnt = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Right column"));
 
-	ot::TableRange tableRange(topRowEnt->getValue(), bottomRowEnt->getValue(), leftColumnEnt->getValue(), rightColumnEnt->getValue());
+	ot::TableRange tableRange(topRowEnt->getValue(), leftColumnEnt->getValue(), bottomRowEnt->getValue(), rightColumnEnt->getValue());
 	return tableRange;
 }
 

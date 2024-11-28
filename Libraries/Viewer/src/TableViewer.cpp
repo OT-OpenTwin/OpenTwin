@@ -22,7 +22,7 @@ std::vector<ot::TableRange> TableViewer::GetSelectedRanges()
 	int rowOffset = _activeTable->getMinRow();
 	for (auto range : ranges)
 	{
-		rangesInternalType.push_back(ot::TableRange(range.topRow() + rowOffset, range.bottomRow() + rowOffset, range.leftColumn() + colOffset, range.rightColumn() + colOffset));
+		rangesInternalType.push_back(ot::TableRange(range.topRow() + rowOffset, range.leftColumn() + colOffset, range.bottomRow() + rowOffset, range.rightColumn() + colOffset));
 	}
 	return rangesInternalType;
 }

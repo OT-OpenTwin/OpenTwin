@@ -16,7 +16,7 @@ namespace ot {
 	class OT_GUI_API_EXPORT TableRange : public ot::Serializable {
 	public:
 		TableRange();
-		TableRange(int topRow, int bottomRow, int leftColumn, int rightColumn);
+		TableRange(int _topRow, int _leftColumn, int _bottomRow, int _rightColumn);
 
 		TableRange(const TableRange& other);
 		TableRange& operator=(const TableRange& other);

@@ -9,16 +9,18 @@
 // OpenTwin header
 #include "OTGui/TableRange.h"
 
-ot::TableRange::TableRange() {
+ot::TableRange::TableRange()
+	: m_topRow(-1), m_leftColumn(-1), m_bottomRow(-1), m_rightColumn(-1)
+{
 
 }
 
-ot::TableRange::TableRange(int topRow, int bottomRow, int leftColumn, int rightColumn) :
-	m_topRow(topRow), m_bottomRow(bottomRow), m_leftColumn(leftColumn), m_rightColumn(rightColumn) {
+ot::TableRange::TableRange(int _topRow, int _leftColumn, int _bottomRow, int _rightColumn)
+	: m_topRow(_topRow), m_leftColumn(_leftColumn), m_bottomRow(_bottomRow), m_rightColumn(_rightColumn) {
 }
 
 ot::TableRange::TableRange(const TableRange& other)
-	: m_topRow(other.m_topRow), m_bottomRow(other.m_bottomRow), m_leftColumn(other.m_leftColumn), m_rightColumn(other.m_rightColumn) {
+	: m_topRow(other.m_topRow), m_leftColumn(other.m_leftColumn), m_bottomRow(other.m_bottomRow), m_rightColumn(other.m_rightColumn) {
 }
 
 ot::TableRange& ot::TableRange::operator=(const TableRange& other) {
