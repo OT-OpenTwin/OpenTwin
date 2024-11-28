@@ -364,43 +364,7 @@ void Application::HandleSelectionChanged()
 {
 	try
 	{
-		
-		std::list<ot::EntityInformation> selectedEntityInfo;
-		if (m_modelComponent == nullptr) { assert(0); throw std::exception("Model is not connected"); }
-		m_modelComponent->getEntityInformation(m_selectedEntities, selectedEntityInfo);
-		
-		ot::UIDList potentialRangesID, potentialRangesVersions;
-		for (auto entityInfo : selectedEntityInfo)
-		{
-			std::string name = entityInfo.getEntityName();
-			if (name.find(CategorisationFolderNames::getRootFolderName()) != std::string::npos)
-			{
-				potentialRangesID.push_back(entityInfo.getEntityID());
-				potentialRangesVersions.push_back(entityInfo.getEntityVersion());
-			}
-		}
-		Application::instance()->prefetchDocumentsFromStorage(potentialRangesID);
-		auto version = potentialRangesVersions.begin();
-		ot::UIDList selectedRangesID, selectedRangesVersion;
-		for (const ot::UID& uid : potentialRangesID)
-		{
-			EntityBase* entBase = m_modelComponent->readEntityFromEntityIDandVersion(uid, *version, getClassFactory());
-			EntityTableSelectedRanges* selectionRange = dynamic_cast<EntityTableSelectedRanges*>(entBase);
-			if (selectionRange != nullptr)
-			{
-				selectedRangesID.push_back(uid);
-				selectedRangesVersion.push_back(*version);
-				delete selectionRange;
-				selectionRange = nullptr;
-			}
-			else
-			{
-				delete entBase;
-				entBase = nullptr;
-			}
-			version++;
-		}
-		m_rangleSelectionVisualisationHandler.selectRange(selectedRangesID, selectedRangesVersion);
+		m_rangleSelectionVisualisationHandler.selectRange(m_selectedEntities);
 	}
 	catch (std::exception& e)
 	{

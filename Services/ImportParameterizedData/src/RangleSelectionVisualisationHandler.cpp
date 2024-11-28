@@ -7,90 +7,156 @@
 #include <map>
 
 
-void RangleSelectionVisualisationHandler::selectRange(ot::UIDList iDs, ot::UIDList versions)
+void RangleSelectionVisualisationHandler::selectRange(const ot::UIDList& _selectedEntityIDs)
 {
-	std::map<std::string, std::map<uint32_t, std::list<ot::TableRange>>> rangesByColourIDByTableNames;
-	auto versionIt = versions.begin();
-	for (auto idIt = iDs.begin(); idIt != iDs.end(); ++idIt)
+	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionEntities = extractSelectionRanges(_selectedEntityIDs);
+	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionsThatNeedVisualisation = findSelectionsThatNeedVisualisation(selectionEntities);
+	bufferSelectionEntities(selectionEntities);
+	if (!selectionsThatNeedVisualisation.empty())
 	{
-		auto modelComponent =	Application::instance()->modelComponent();
-		auto baseEntity = modelComponent->readEntityFromEntityIDandVersion(*idIt, *versionIt, Application::instance()->getClassFactory());
-		versionIt++;
-
-		std::unique_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
-
-		//First we get the selected range
-
-		ot::TableRange userRange = rangeEntity->getSelectedRange();
-		ot::TableRange selectionRange = TableIndexSchemata::userRangeToSelectionRange(userRange);
-
-		//Now we determine the colour for the range
-		const std::string tableName = rangeEntity->getTableName();
-		uint32_t colourID;
-		std::string name = rangeEntity->getName();
-		std::string::difference_type n = std::count(name.begin(), name.end(), '/');
-		if (n == 2) //First topology level: RMD
+		std::map<std::string, std::map<uint32_t, std::list<ot::TableRange>>> rangesByColourIDByTableNames;
+		for (auto selectionEntity : selectionsThatNeedVisualisation)
 		{
-			colourID = 0;
-		}
-		else if (n == 3) //Second topology level: MSMD files
-		{
-			colourID = 1;
-		}
-		else if (n == 4) //Third topology level: Parameter and Quantities
-		{
-			if (name.find(CategorisationFolderNames::getParameterFolderName()) != std::string::npos)
+			//First we get the selected range
+			ot::TableRange userRange = selectionEntity->getSelectedRange();
+			ot::TableRange selectionRange = TableIndexSchemata::userRangeToSelectionRange(userRange);
+
+			//Now we determine the colour for the range
+			const std::string tableName = selectionEntity->getTableName();
+			uint32_t colourID;
+			std::string name = selectionEntity->getName();
+			std::string::difference_type n = std::count(name.begin(), name.end(), '/');
+			if (n == 2) //First topology level: RMD
 			{
-				colourID = 2;
+				colourID = 0;
+			}
+			else if (n == 3) //Second topology level: MSMD files
+			{
+				colourID = 1;
+			}
+			else if (n == 4) //Third topology level: Parameter and Quantities
+			{
+				if (name.find(CategorisationFolderNames::getParameterFolderName()) != std::string::npos)
+				{
+					colourID = 2;
+				}
+				else
+				{
+					colourID = 3;
+				}
 			}
 			else
 			{
-				colourID = 3;
+				assert(0);
 			}
+
+			//Now we store the range for its colour and table 
+			rangesByColourIDByTableNames[tableName][colourID].push_back(selectionRange);
+		}
+
+		bool clearSelection = true;
+		for (const auto& rangesByColourIDByTableName : rangesByColourIDByTableNames)
+		{
+			const std::string tableName = rangesByColourIDByTableName.first;
+			auto& rangesByColourIDs = rangesByColourIDByTableName.second;
+			for (const auto& rangesByColourID : rangesByColourIDs)
+			{
+				uint32_t colourID = rangesByColourID.first;
+				ot::Color typeColour;
+				if (colourID == 0)
+				{
+					typeColour = SelectionCategorisationColours::getRMDColour();
+				}
+				else if (colourID == 1)
+				{
+					typeColour = SelectionCategorisationColours::getSMDColour();
+				}
+				else if (colourID == 2)
+				{
+					typeColour = SelectionCategorisationColours::getParameterColour();
+				}
+				else
+				{
+					assert(colourID == 3);
+					typeColour = SelectionCategorisationColours::getQuantityColour();
+				}
+
+				const auto& ranges = rangesByColourID.second;
+				requestToOpenTable(tableName);
+				requestColouringRanges(clearSelection, tableName, typeColour, ranges);
+				clearSelection = false;
+			}
+		}
+	}
+}
+
+
+void RangleSelectionVisualisationHandler::bufferSelectionEntities(const std::list<std::shared_ptr<EntityTableSelectedRanges>>& _selectedEntities)
+{
+	m_bufferedSelectionRanges.clear();
+	for (auto& selectionEntity : _selectedEntities)
+	{
+		m_bufferedSelectionRanges.push_back(selectionEntity->getEntityID());
+	}
+}
+
+std::list<std::shared_ptr<EntityTableSelectedRanges>> RangleSelectionVisualisationHandler::extractSelectionRanges(const ot::UIDList& _selectedEntityIDs)
+{
+	auto modelComponent = Application::instance()->modelComponent();
+	if (modelComponent == nullptr)
+	{
+		assert(0);
+		throw std::exception("Model is not connected");
+	}
+	std::list<ot::EntityInformation> selectedEntityInfo;
+	modelComponent->getEntityInformation(_selectedEntityIDs, selectedEntityInfo);
+
+	//First we do a preselection on the base of the name. 
+	ot::UIDList relevantIDs, relevantVersions;
+	for (auto entityInfo : selectedEntityInfo)
+	{
+		std::string name = entityInfo.getEntityName();
+		if (name.find(CategorisationFolderNames::getRootFolderName()) != std::string::npos)
+		{
+			relevantIDs.push_back(entityInfo.getEntityID());
+			relevantVersions.push_back(entityInfo.getEntityVersion());
+		}
+	}
+	Application::instance()->prefetchDocumentsFromStorage(relevantIDs);
+	auto version = relevantVersions.begin();
+
+	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionEntities;
+	for (const ot::UID& uid : relevantIDs)
+	{
+		EntityBase* entBase = modelComponent->readEntityFromEntityIDandVersion(uid, *version, Application::instance()->getClassFactory());
+		EntityTableSelectedRanges* selectionRange = dynamic_cast<EntityTableSelectedRanges*>(entBase);
+		if (selectionRange != nullptr)
+		{
+			selectionEntities.push_back(std::shared_ptr<EntityTableSelectedRanges>(selectionRange));
 		}
 		else
 		{
-			assert(0);
+			delete entBase;
+			entBase = nullptr;
 		}
-
-		//Now we store the range for its colour and table 
-		rangesByColourIDByTableNames[tableName][colourID].push_back(selectionRange);
+		version++;
 	}
+	return selectionEntities;
+}
 
-	bool clearSelection = true;
-	for (const auto& rangesByColourIDByTableName : rangesByColourIDByTableNames)
+const std::list<std::shared_ptr<EntityTableSelectedRanges>> RangleSelectionVisualisationHandler::findSelectionsThatNeedVisualisation(const std::list<std::shared_ptr<EntityTableSelectedRanges>>& _selectionEntities)
+{
+	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionThatNeedVisualisation;
+	for (auto& selectedRange : _selectionEntities)
 	{
-		const std::string tableName = rangesByColourIDByTableName.first;
-		auto& rangesByColourIDs = rangesByColourIDByTableName.second;
-		for (const auto& rangesByColourID : rangesByColourIDs)
+		const ot::UID entityID = selectedRange->getEntityID();
+		auto entry = std::find(m_bufferedSelectionRanges.begin(), m_bufferedSelectionRanges.end(), entityID);
+		if (entry == m_bufferedSelectionRanges.end())
 		{
-			uint32_t colourID = rangesByColourID.first;
-			ot::Color typeColour;
-			if (colourID == 0)
-			{
-				typeColour = SelectionCategorisationColours::getRMDColour();
-			}
-			else if (colourID == 1)
-			{
-				typeColour = SelectionCategorisationColours::getSMDColour();
-			}
-			else if (colourID == 2)
-			{
-				typeColour = SelectionCategorisationColours::getParameterColour();
-			}
-			else
-			{
-				assert(colourID == 3);
-				typeColour = SelectionCategorisationColours::getQuantityColour();
-			}
-
-			const auto& ranges = rangesByColourID.second;
-			requestToOpenTable(tableName);
-			requestColouringRanges(clearSelection, tableName, typeColour, ranges);
-			clearSelection = false;
+			selectionThatNeedVisualisation.push_back(selectedRange);
 		}
 	}
-
+	return selectionThatNeedVisualisation;
 }
 
 void RangleSelectionVisualisationHandler::requestToOpenTable(const std::string& _tableName)
