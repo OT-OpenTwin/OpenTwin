@@ -2945,8 +2945,6 @@ std::string ExternalServicesComponent::handleAddContainerNode(ot::JsonDocument& 
 	return "";
 }
 
-#include "OTGui/VisualisationTypes.h"
-
 std::string ExternalServicesComponent::handleAddSceneNode(ot::JsonDocument& _document)
 {
 	ot::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
