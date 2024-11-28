@@ -17,6 +17,17 @@ ot::GraphicsBoxLayoutItem::GraphicsBoxLayoutItem(Qt::Orientation _orientation, G
 	this->createLayoutWrapper(this);
 }
 
+ot::GraphicsBoxLayoutItem::~GraphicsBoxLayoutItem() {
+	for (int i = 0; i < this->count(); i++) {
+		if (this->itemAt(i)) {
+			GraphicsItem* element = dynamic_cast<GraphicsItem*>(this->itemAt(i));
+			if (element) {
+				element->setParentGraphicsItem(nullptr);
+			}
+		}
+	}
+}
+
 bool ot::GraphicsBoxLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	const GraphicsBoxLayoutItemCfg* cfg = dynamic_cast<const GraphicsBoxLayoutItemCfg*>(_cfg);
 	if (cfg == nullptr) {
@@ -56,7 +67,9 @@ bool ot::GraphicsBoxLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 void ot::GraphicsBoxLayoutItem::getAllItems(std::list<QGraphicsLayoutItem*>& _items) const {
 	for (int i = 0; i < this->count(); i++) {
-		if (this->itemAt(i)) _items.push_back(this->itemAt(i));
+		if (this->itemAt(i)) {
+			_items.push_back(this->itemAt(i));
+		}
 	}
 }
 

@@ -18,7 +18,7 @@ namespace ot {
 		OT_DECL_NOCOPY(GraphicsGridLayoutItem)
 	public:
 		GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
-		virtual ~GraphicsGridLayoutItem() {};
+		virtual ~GraphicsGridLayoutItem();
 
 		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 

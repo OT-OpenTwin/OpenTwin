@@ -18,7 +18,7 @@ namespace ot {
 		OT_DECL_NOCOPY(GraphicsBoxLayoutItem)
 	public:
 		GraphicsBoxLayoutItem(Qt::Orientation _orientation, GraphicsItemCfg* _configuration, QGraphicsLayoutItem* _parentItem = (QGraphicsLayoutItem*)nullptr);
-		virtual ~GraphicsBoxLayoutItem() {};
+		virtual ~GraphicsBoxLayoutItem();
 
 		virtual bool setupFromConfig(const GraphicsItemCfg* _cfg) override;
 

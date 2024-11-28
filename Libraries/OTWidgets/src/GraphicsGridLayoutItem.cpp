@@ -19,6 +19,17 @@ ot::GraphicsGridLayoutItem::GraphicsGridLayoutItem(QGraphicsLayoutItem* _parentI
 	this->createLayoutWrapper(this);
 }
 
+ot::GraphicsGridLayoutItem::~GraphicsGridLayoutItem() {
+	for (int r = 0; r < this->rowCount(); r++) {
+		for (int c = 0; c < this->columnCount(); c++) {
+			GraphicsItem* element = dynamic_cast<GraphicsItem*>(this->itemAt(r, c));
+			if (element) {
+				element->setParentGraphicsItem(nullptr);
+			}
+		}
+	}
+}
+
 bool ot::GraphicsGridLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	const GraphicsGridLayoutItemCfg* cfg = dynamic_cast<const GraphicsGridLayoutItemCfg*>(_cfg);
 	if (cfg == nullptr) {
