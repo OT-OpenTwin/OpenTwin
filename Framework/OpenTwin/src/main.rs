@@ -103,7 +103,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
     GLOBAL.set(lib_path.to_string());
 	
     // creating path to file which will be downloaded depending on if it is an enduser or a developer machine
-    let download_file_path: String = if option_env!("OPENTWIN_DEV_ROOT").is_some() {
+    let installer_path: String = if option_env!("OPENTWIN_DEV_ROOT").is_some() {
         env!("OPENTWIN_DEV_ROOT").to_owned() + "/Deployment/FrontendInstaller/Install_OpenTwin_Frontend.exe"
     } else {
         std::env::current_exe().unwrap().to_str().unwrap().to_string() + "/FrontendInstaller/Install_OpenTwin_Frontend.exe"
@@ -117,7 +117,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
             .map(|| warp::reply::html(get_download_html_body()));
 
         let installer_route = warp::path("installer")
-            .and(warp::fs::file(download_file_path));
+            .and(warp::fs::file(installer_path));
         
         tokio::task::spawn(async move {
             warp::serve(download_route.or(installer_route))
@@ -444,7 +444,7 @@ fn get_download_html_body() -> String {
             KoCFLklSAf4/G8ayBHfTCwQAAAAASUVORK5CYII=\">
 
             <div id=\"welcome_txt\">Welcome to OpenTwin</div>
-            <a href=\"http://127.0.0.1:80/installer/Install_OpenTwin_Frontend.exe\" download>
+            <a href=\"/installer/Install_OpenTwin_Frontend.exe\" download>
                 <button id=\"downloadBtn\">Download</button>
             </a>
 
@@ -494,7 +494,7 @@ fn get_download_html_body() -> String {
             </style>
             <script type=\"text/javascript\">
                 document.getElementById(\"downloadBtn\").addEventListener(\"click\", () => {
-                    alert(\"Downloading Installer...\\nPlease execute the installer after the download.\");
+                    alert(\"Downloading Installer...\\nPlease execute the installer after the download.\\nThe download can take a short moment.\");
                 });
             </script>
         </body>".to_string()
