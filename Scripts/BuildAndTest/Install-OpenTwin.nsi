@@ -25,6 +25,8 @@ RequestExecutionLevel user ; User rights on WinVista+ (when UAC is turned on)
 InstallDir "$LOCALAPPDATA\$(^Name)"
 InstallDirRegKey HKCU "${REGPATH_UNINSTSUBKEY}" "UninstallString"
 
+!define OPENTWIN_APP_ICON "$InstDir\icons\Application\OpenTwin.ico"
+
 !include LogicLib.nsh
 !include Integration.nsh
 
@@ -88,8 +90,8 @@ run:
 FunctionEnd
 
 Function .onInit
-	SetShellVarContext All
-	ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}" "UninstallString"
+	SetShellVarContext current
+	ReadRegStr $0 HKCU ${REGPATH_UNINSTSUBKEY} "UninstallString"
 	
 	${If} $0 != "" 
 	${AndIf} ${Cmd} `MessageBox MB_YESNO|MB_ICONQUESTION "Uninstall previous version?" /SD IDYES IDYES`
@@ -103,34 +105,36 @@ Function .onInit
 FunctionEnd
 
 Function un.onInit
-  SetShellVarContext All
+  SetShellVarContext current
 FunctionEnd
 
 Section "Program files (Required)"
   SectionIn Ro
 
   SetOutPath $InstDir
+  
   WriteUninstaller "$InstDir\Uninst.exe"
   WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "DisplayName" "OpenTwin"
   WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$InstDir\OpenTwin.exe,0"
   WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "UninstallString" '"$InstDir\Uninst.exe"'
   WriteRegDWORD HKCU "${REGPATH_UNINSTSUBKEY}" "NoModify" 1
   WriteRegDWORD HKCU "${REGPATH_UNINSTSUBKEY}" "NoRepair" 1
-
+  
   File /r ..\..\Deployment_Frontend\*.*
 SectionEnd
 
 Section "Start Menu shortcut"
-  SetOutPath $SMPROGRAMS\$StartMenuGroup
-  SetOutPath $INSTDIR
-  CreateShortcut "$SMPrograms\${NAME}.lnk" "$InstDir\OpenTwin.exe"
+	CreateShortcut "$SMPROGRAMS\${NAME}.lnk" "$InstDir\OpenTwin.exe" "" "${OPENTWIN_APP_ICON}"
+	CreateShortcut "$DESKTOP\OpenTwin.lnk" "$InstDir\OpenTwin.exe" "" "${OPENTWIN_APP_ICON}"
 SectionEnd
 
 Section -Uninstall
-  ${UnpinShortcut} "$SMPrograms\${NAME}.lnk"
-  Delete "$SMPrograms\${NAME}.lnk"
+	${UNPINSHORTCUT} "$SMPROGRAMS\${NAME}.lnk"
+	Delete "$SMPROGRAMS\${NAME}.lnk"
+	${UNPINSHORTCUT} "$DESKTOP\OpenTwin.lnk"
+	Delete "$DESKTOP\OpenTwin.lnk"
 
-  RMDir /r "$InstDir"
+	RMDir /r "$InstDir"
 
-  DeleteRegKey HKCU "${REGPATH_UNINSTSUBKEY}"
+	DeleteRegKey HKCU "${REGPATH_UNINSTSUBKEY}"
 SectionEnd
