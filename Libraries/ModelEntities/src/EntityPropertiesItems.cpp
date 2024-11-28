@@ -18,39 +18,43 @@
 #include "OTGui/PropertyPainter2D.h"
 #include "OTGui/PropertyStringList.h"
 
-void EntityPropertiesBase::setNeedsUpdate(void)
-{
-	if (container != nullptr) container->setNeedsUpdate(); 
-	
-	needsUpdateFlag = true; 
-}
+EntityPropertiesBase::EntityPropertiesBase()
+	: m_container(nullptr), m_needsUpdateFlag(false), m_multipleValues(false), m_readOnly(false), m_protectedProperty(true),
+	m_visible(true), m_errorState(false) 
+{}
 
 EntityPropertiesBase::EntityPropertiesBase(const EntityPropertiesBase &other)
 { 
-	name = other.name; 
-	group = other.group;
+	m_name = other.m_name;
+	m_group = other.m_group;
 
-	multipleValues = other.multipleValues; 
-	container = other.container;
-	needsUpdateFlag = other.needsUpdateFlag;
-	readOnly = other.readOnly;
-	protectedProperty = other.protectedProperty;
-	visible = other.visible;
-	errorState = other.errorState;
+	m_multipleValues = other.m_multipleValues;
+	m_container = other.m_container;
+	m_needsUpdateFlag = other.m_needsUpdateFlag;
+	m_readOnly = other.m_readOnly;
+	m_protectedProperty = other.m_protectedProperty;
+	m_visible = other.m_visible;
+	m_errorState = other.m_errorState;
+}
+
+void EntityPropertiesBase::setNeedsUpdate(void) {
+	if (m_container != nullptr) m_container->setNeedsUpdate();
+
+	m_needsUpdateFlag = true;
 }
 
 void EntityPropertiesBase::copySettings(EntityPropertiesBase *other, EntityBase *root)
 { 
-	assert(name == other->getName()); 
+	assert(m_name == other->getName());
 
 	// We keep the container unchanged, since we don't want to overwrite the ownership of this item
 	// We also dont assign the group, since the group assignment of a property can not be changed
-	multipleValues = other->multipleValues;
-	needsUpdateFlag = other->needsUpdateFlag;
-	readOnly = other->readOnly;
-	protectedProperty = other->protectedProperty;
-	visible = other->visible;
-	errorState = other->errorState;
+	m_multipleValues = other->m_multipleValues;
+	m_needsUpdateFlag = other->m_needsUpdateFlag;
+	m_readOnly = other->m_readOnly;
+	m_protectedProperty = other->m_protectedProperty;
+	m_visible = other->m_visible;
+	m_errorState = other->m_errorState;
 }
 
 EntityPropertiesBase& EntityPropertiesBase::operator=(const EntityPropertiesBase &other)
@@ -58,14 +62,14 @@ EntityPropertiesBase& EntityPropertiesBase::operator=(const EntityPropertiesBase
 	if (&other != this) 
 	{ 
 		// We keep the container unchanged, since we don't want to overwrite the ownership of this item
-		name = other.name;
-		group = other.group;
-		multipleValues = other.multipleValues; 
-		needsUpdateFlag = other.needsUpdateFlag;
-		readOnly = other.readOnly;
-		protectedProperty = other.protectedProperty;
-		visible = other.visible;
-		errorState = other.errorState;
+		m_name = other.m_name;
+		m_group = other.m_group;
+		m_multipleValues = other.m_multipleValues;
+		m_needsUpdateFlag = other.m_needsUpdateFlag;
+		m_readOnly = other.m_readOnly;
+		m_protectedProperty = other.m_protectedProperty;
+		m_visible = other.m_visible;
+		m_errorState = other.m_errorState;
 	}
 	
 	return *this; 
@@ -97,7 +101,7 @@ void EntityPropertiesBase::addBaseDataToJsonDocument(ot::JsonValue& container, o
 
 bool EntityPropertiesBase::needsUpdate(void)
 {
-	return needsUpdateFlag;
+	return m_needsUpdateFlag;
 }
 
 // ################################################################################################################################################################
@@ -245,11 +249,11 @@ bool EntityPropertiesDouble::hasSameValue(EntityPropertiesBase* other) {
 	return (getValue() == entity->getValue());
 }
 
-void EntityPropertiesDouble::createProperty(const std::string& _group, const std::string& _name, double _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties) {
-	EntityPropertiesDouble::createProperty(_group, _name, _defaultValue, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max(), _defaultCategory, _properties);
+EntityPropertiesDouble* EntityPropertiesDouble::createProperty(const std::string& _group, const std::string& _name, double _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties) {
+	return EntityPropertiesDouble::createProperty(_group, _name, _defaultValue, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max(), _defaultCategory, _properties);
 }
 
-void EntityPropertiesDouble::createProperty(const std::string& _group, const std::string& _name, double _defaultValue, double _minValue, double _maxValue, const std::string& _defaultCategory, EntityProperties& _properties) {
+EntityPropertiesDouble* EntityPropertiesDouble::createProperty(const std::string& _group, const std::string& _name, double _defaultValue, double _minValue, double _maxValue, const std::string& _defaultCategory, EntityProperties& _properties) {
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(_defaultCategory);
 
@@ -261,6 +265,7 @@ void EntityPropertiesDouble::createProperty(const std::string& _group, const std
 	newProperty->setMin(_minValue);
 	newProperty->setMax(_maxValue);
 	_properties.createProperty(newProperty, _group);
+	return newProperty;
 }
 
 // ################################################################################################################################################################
@@ -405,7 +410,7 @@ void EntityPropertiesInteger::copySettings(EntityPropertiesBase* other, EntityBa
 	}
 }
 
-void EntityPropertiesInteger::createProperty(const std::string& _group, const std::string& _name, long _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties) {
+EntityPropertiesInteger* EntityPropertiesInteger::createProperty(const std::string& _group, const std::string& _name, long _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties) {
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(_defaultCategory);
 
@@ -413,10 +418,12 @@ void EntityPropertiesInteger::createProperty(const std::string& _group, const st
 	long value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultLong(_defaultCategory, _name, _defaultValue);
 
 	// Finally create the new property
-	_properties.createProperty(new EntityPropertiesInteger(_name, value), _group);
+	EntityPropertiesInteger* newProperty = new EntityPropertiesInteger(_name, value);
+	_properties.createProperty(newProperty, _group);
+	return newProperty;
 }
 
-void EntityPropertiesInteger::createProperty(const std::string& _group, const std::string& _name, long _defaultValue, long _minValue, long _maxValue, const std::string& _defaultCategory, EntityProperties& _properties) {
+EntityPropertiesInteger* EntityPropertiesInteger::createProperty(const std::string& _group, const std::string& _name, long _defaultValue, long _minValue, long _maxValue, const std::string& _defaultCategory, EntityProperties& _properties) {
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(_defaultCategory);
 
@@ -428,11 +435,12 @@ void EntityPropertiesInteger::createProperty(const std::string& _group, const st
 	newProperty->setMin(_minValue);
 	newProperty->setMax(_maxValue);
 	_properties.createProperty(newProperty, _group);
+	return newProperty;
 }
 
 // ################################################################################################################################################################
 
-void EntityPropertiesBoolean::createProperty(const std::string &group, const std::string &name, bool defaultValue, const std::string &defaultCategory, EntityProperties &properties)
+EntityPropertiesBoolean* EntityPropertiesBoolean::createProperty(const std::string &group, const std::string &name, bool defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
@@ -441,7 +449,9 @@ void EntityPropertiesBoolean::createProperty(const std::string &group, const std
 	bool value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultBool(defaultCategory, name, defaultValue);
 
 	// Finally create the new property
-	properties.createProperty(new EntityPropertiesBoolean(name, value), group);
+	EntityPropertiesBoolean* newProperty = new EntityPropertiesBoolean(name, value);
+	properties.createProperty(newProperty, group);
+	return newProperty;
 }
 
 void EntityPropertiesBoolean::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root)
@@ -509,7 +519,7 @@ bool EntityPropertiesBoolean::hasSameValue(EntityPropertiesBase* other)
 
 // ################################################################################################################################################################
 
-void EntityPropertiesString::createProperty(const std::string &group, const std::string &name, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties)
+EntityPropertiesString* EntityPropertiesString::createProperty(const std::string &group, const std::string &name, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
@@ -518,7 +528,9 @@ void EntityPropertiesString::createProperty(const std::string &group, const std:
 	std::string value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name, defaultValue);
 
 	// Finally create the new property
-	properties.createProperty(new EntityPropertiesString(name, value), group);
+	EntityPropertiesString* newProperty = new EntityPropertiesString(name, value);
+	properties.createProperty(newProperty, group);
+	return newProperty;
 }
 
 void EntityPropertiesString::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root)
@@ -585,7 +597,7 @@ bool EntityPropertiesString::hasSameValue(EntityPropertiesBase* other)
 
 // ################################################################################################################################################################
 
-void EntityPropertiesSelection::createProperty(const std::string &group, const std::string &name, std::list<std::string>& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties)
+EntityPropertiesSelection* EntityPropertiesSelection::createProperty(const std::string &group, const std::string &name, std::list<std::string>& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
@@ -602,9 +614,11 @@ void EntityPropertiesSelection::createProperty(const std::string &group, const s
 	prop->setValue(value);
 
 	properties.createProperty(prop, group);
+
+	return prop;
 }
 
-void EntityPropertiesSelection::createProperty(const std::string& group, const std::string& name, std::list<std::string>&& options, const std::string& defaultValue, const std::string& defaultCategory, EntityProperties& properties)
+EntityPropertiesSelection* EntityPropertiesSelection::createProperty(const std::string& group, const std::string& name, std::list<std::string>&& options, const std::string& defaultValue, const std::string& defaultCategory, EntityProperties& properties)
 {
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
@@ -621,6 +635,8 @@ void EntityPropertiesSelection::createProperty(const std::string& group, const s
 	prop->setValue(value);
 
 	properties.createProperty(prop, group);
+
+	return prop;
 }
 
 void EntityPropertiesSelection::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root)
@@ -762,7 +778,7 @@ bool EntityPropertiesSelection::isCompatible(EntityPropertiesBase* other)
 
 // ################################################################################################################################################################
 
-void EntityPropertiesColor::createProperty(const std::string &group, const std::string &name, std::vector<int> defaultValue, const std::string &defaultCategory, EntityProperties &properties)
+EntityPropertiesColor* EntityPropertiesColor::createProperty(const std::string &group, const std::string &name, std::vector<int> defaultValue, const std::string &defaultCategory, EntityProperties &properties)
 {
 	assert(defaultValue.size() == 3);
 
@@ -775,7 +791,9 @@ void EntityPropertiesColor::createProperty(const std::string &group, const std::
 	int valueB = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultColor(defaultCategory, name, 2, defaultValue[2]);
 
 	// Finally create the new property
-	properties.createProperty(new EntityPropertiesColor(name, valueR / 255.0, valueG / 255.0, valueB / 255.0), group);
+	EntityPropertiesColor* newProperty = new EntityPropertiesColor(name, valueR / 255.0, valueG / 255.0, valueB / 255.0);
+	properties.createProperty(newProperty, group);
+	return newProperty;
 }
 
 void EntityPropertiesColor::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root)
@@ -1064,7 +1082,7 @@ void EntityPropertiesEntityList::copySettings(EntityPropertiesBase *other, Entit
 	}
 }
 
-void EntityPropertiesEntityList::createProperty(const std::string& group, const std::string& name, const std::string& contName, ot::UID contID, const std::string& valName, ot::UID valID, const std::string& defaultCategory, EntityProperties& properties)
+EntityPropertiesEntityList* EntityPropertiesEntityList::createProperty(const std::string& group, const std::string& name, const std::string& contName, ot::UID contID, const std::string& valName, ot::UID valID, const std::string& defaultCategory, EntityProperties& properties)
 {
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
@@ -1073,7 +1091,9 @@ void EntityPropertiesEntityList::createProperty(const std::string& group, const 
 	std::string value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name, valName);
 
 	// Finally create the new property
-	properties.createProperty(new EntityPropertiesEntityList(name, contName, contID, value, valID), group);
+	EntityPropertiesEntityList* newProperty = new EntityPropertiesEntityList(name, contName, contID, value, valID);
+	properties.createProperty(newProperty, group);
+	return newProperty;
 }
 
 void EntityPropertiesEntityList::updateValueAndContainer(EntityBase* _root, std::list<std::string>& _containerOptions) {
@@ -1272,8 +1292,7 @@ void EntityPropertiesGuiPainter::setValue(ot::Painter2D* _painter) {
 	this->setNeedsUpdate();
 }
 
-void EntityPropertiesGuiPainter::createProperty(const std::string& group, const std::string& name, ot::Painter2D* _defaultPainter, const std::string& defaultCategory, EntityProperties& properties)
-{
+EntityPropertiesGuiPainter* EntityPropertiesGuiPainter::createProperty(const std::string& group, const std::string& name, ot::Painter2D* _defaultPainter, const std::string& defaultCategory, EntityProperties& properties) {
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
 
@@ -1286,7 +1305,9 @@ void EntityPropertiesGuiPainter::createProperty(const std::string& group, const 
 	}
 
 	// Finally create the new property
-	properties.createProperty(new EntityPropertiesGuiPainter(name, _defaultPainter), group);
+	EntityPropertiesGuiPainter* newProperty = new EntityPropertiesGuiPainter(name, _defaultPainter);
+	properties.createProperty(newProperty, group);
+	return newProperty;
 }
 
 void EntityPropertiesGuiPainter::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)

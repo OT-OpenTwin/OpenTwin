@@ -19,30 +19,30 @@ namespace ot { class Painter2D; };
 class __declspec(dllexport) EntityPropertiesBase
 {
 public:
-	EntityPropertiesBase() : container(nullptr), needsUpdateFlag(false), multipleValues(false), readOnly(false), protectedProperty(true), visible(true), errorState(false) {};
+	EntityPropertiesBase();
 	virtual ~EntityPropertiesBase() {};
 
 	EntityPropertiesBase(const EntityPropertiesBase &other);
 
 	virtual EntityPropertiesBase *createCopy(void) = 0;
 
-	void setContainer(EntityProperties *c) { container = c; };
+	void setContainer(EntityProperties *c) { m_container = c; };
 
-	void setName(const std::string &n) { name = n; };
-	const std::string &getName(void) { return name; };
+	void setName(const std::string& _name) { m_name = _name; };
+	const std::string &getName(void) { return m_name; };
 
-	void setGroup(const std::string &g) { group = g; };
-	const std::string &getGroup(void) { return group; };
+	void setGroup(const std::string& _group) { m_group = _group; };
+	const std::string &getGroup(void) { return m_group; };
 
 	enum eType { DOUBLE, INTEGER, BOOLEAN, STRING, SELECTION, COLOR, ENTITYLIST, PROJECTLIST, GUIPAINTER };
 	virtual eType getType(void) = 0;
 
-	void resetNeedsUpdate(void) { needsUpdateFlag = false; };
+	void resetNeedsUpdate(void) { m_needsUpdateFlag = false; };
 	bool needsUpdate(void);
 	void setNeedsUpdate(void);
 
-	bool hasMultipleValues(void) { return multipleValues; };
-	void setHasMultipleValues(bool b) { multipleValues = b; };
+	bool hasMultipleValues(void) { return m_multipleValues; };
+	void setHasMultipleValues(bool b) { m_multipleValues = b; };
 
 	virtual bool isCompatible(EntityPropertiesBase *other) { return true; };
 	virtual bool hasSameValue(EntityPropertiesBase *other) = 0;
@@ -53,17 +53,17 @@ public:
 	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) = 0;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) = 0;
 
-	void setReadOnly(bool flag) { readOnly = flag; };
-	bool getReadOnly(void) { return readOnly; };
+	void setReadOnly(bool flag) { m_readOnly = flag; };
+	bool getReadOnly(void) { return m_readOnly; };
 
-	void setProtected(bool flag) { protectedProperty = flag; };
-	bool getProtected(void) { return protectedProperty; };
+	void setProtected(bool flag) { m_protectedProperty = flag; };
+	bool getProtected(void) { return m_protectedProperty; };
 
-	void setVisible(bool flag) { visible = flag; };
-	bool getVisible(void) { return visible; };
+	void setVisible(bool flag) { m_visible = flag; };
+	bool getVisible(void) { return m_visible; };
 	
-	void setErrorState(bool flag) { errorState = flag; };
-	bool getErrorState(void) { return errorState; };
+	void setErrorState(bool flag) { m_errorState = flag; };
+	bool getErrorState(void) { return m_errorState; };
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
@@ -74,17 +74,17 @@ protected:
 	void addBaseDataToJsonDocument(ot::JsonValue& container, ot::JsonAllocator& allocator, const std::string& type);
 
 private:
-	void setMultipleValues(void) { multipleValues = true; }
+	void setMultipleValues(void) { m_multipleValues = true; }
 
-	EntityProperties *container;
-	bool needsUpdateFlag;
-	std::string name;
-	std::string group;
-	bool multipleValues;
-	bool readOnly;
-	bool protectedProperty;
-	bool visible;
-	bool errorState;
+	EntityProperties* m_container;
+	bool m_needsUpdateFlag;
+	std::string m_name;
+	std::string m_group;
+	bool m_multipleValues;
+	bool m_readOnly;
+	bool m_protectedProperty;
+	bool m_visible;
+	bool m_errorState;
 };
 
 // ################################################################################################################################################################
@@ -127,8 +127,8 @@ public:
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
-	static void createProperty(const std::string& _group, const std::string& _name, double _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties);
-	static void createProperty(const std::string& _group, const std::string& _name, double _defaultValue, double _minValue, double _maxValue, const std::string& _defaultCategory, EntityProperties& _properties);
+	static EntityPropertiesDouble* createProperty(const std::string& _group, const std::string& _name, double _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties);
+	static EntityPropertiesDouble* createProperty(const std::string& _group, const std::string& _name, double _defaultValue, double _minValue, double _maxValue, const std::string& _defaultCategory, EntityProperties& _properties);
 
 private:
 	double m_value;
@@ -177,8 +177,8 @@ public:
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
-	static void createProperty(const std::string& _group, const std::string& _name, long _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties);
-	static void createProperty(const std::string& _group, const std::string& _name, long _defaultValue, long _minValue, long _maxValue, const std::string& _defaultCategory, EntityProperties& _properties);
+	static EntityPropertiesInteger* createProperty(const std::string& _group, const std::string& _name, long _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties);
+	static EntityPropertiesInteger* createProperty(const std::string& _group, const std::string& _name, long _defaultValue, long _minValue, long _maxValue, const std::string& _defaultCategory, EntityProperties& _properties);
 
 private:
 	long m_value;
@@ -218,7 +218,7 @@ public:
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
-	static void createProperty(const std::string &group, const std::string &name, bool defaultValue, const std::string &defaultCategory, EntityProperties &properties);
+	static EntityPropertiesBoolean* createProperty(const std::string &group, const std::string &name, bool defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 
 private:
 	bool value;
@@ -255,7 +255,7 @@ public:
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
-	static void createProperty(const std::string &group, const std::string &name, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
+	static EntityPropertiesString* createProperty(const std::string &group, const std::string &name, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 
 private:
 	std::string value;
@@ -297,8 +297,8 @@ public:
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
-	static void createProperty(const std::string &group, const std::string &name, std::list<std::string>& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
-	static void createProperty(const std::string &group, const std::string &name, std::list<std::string>&& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
+	static EntityPropertiesSelection* createProperty(const std::string &group, const std::string &name, std::list<std::string>& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
+	static EntityPropertiesSelection* createProperty(const std::string &group, const std::string &name, std::list<std::string>&& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 
 private:
 	bool checkCompatibilityOfSettings(const EntityPropertiesSelection &other);
@@ -345,7 +345,7 @@ public:
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
-	static void createProperty(const std::string &group, const std::string &name, std::vector<int> defaultValue, const std::string &defaultCategory, EntityProperties &properties);
+	static EntityPropertiesColor* createProperty(const std::string &group, const std::string &name, std::vector<int> defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 
 private:
 	double color[3];
@@ -391,7 +391,7 @@ public:
 	std::string getValueName(void) const { return valueName; };
 	ot::UID getValueID(void) const { return valueID; };
 
-	static void createProperty(const std::string &group, const std::string &name, const std::string &contName, ot::UID contID, const std::string &valName, ot::UID valID, const std::string &defaultCategory, EntityProperties &properties);
+	static EntityPropertiesEntityList* createProperty(const std::string &group, const std::string &name, const std::string &contName, ot::UID contID, const std::string &valName, ot::UID valID, const std::string &defaultCategory, EntityProperties &properties);
 
 private:
 
@@ -473,7 +473,7 @@ public:
 
 	virtual void copySettings(EntityPropertiesBase* other, EntityBase* root);
 
-	static void createProperty(const std::string& group, const std::string& name, ot::Painter2D* _defaultPainter, const std::string& defaultCategory, EntityProperties& properties);
+	static EntityPropertiesGuiPainter* createProperty(const std::string& group, const std::string& name, ot::Painter2D* _defaultPainter, const std::string& defaultCategory, EntityProperties& properties);
 
 private:
 	ot::Painter2D* m_painter;
