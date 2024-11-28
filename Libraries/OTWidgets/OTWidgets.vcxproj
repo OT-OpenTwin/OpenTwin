@@ -313,7 +313,7 @@
     <QtMoc Include="include\OTWidgets\PropertyInputFilePath.h" />
     <QtMoc Include="include\OTWidgets\PropertyInputString.h" />
     <ClInclude Include="include\OTWidgets\PropertyInputStringList.h" />
-    <ClInclude Include="include\OTWidgets\SpinBox.h" />
+    <QtMoc Include="include\OTWidgets\SpinBox.h" />
     <ClInclude Include="include\OTWidgets\OnePropertyDialog.h" />
     <ClInclude Include="include\OTWidgets\QtFactory.h" />
     <QtMoc Include="include\OTWidgets\PlainTextEdit.h" />

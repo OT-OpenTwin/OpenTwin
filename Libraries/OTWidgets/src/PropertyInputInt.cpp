@@ -21,7 +21,7 @@ ot::PropertyInputInt::PropertyInputInt()
 	: m_lineEdit(nullptr), m_min(std::numeric_limits<int>::lowest()), m_max(std::numeric_limits<int>::max())
 {
 	m_spinBox = new SpinBox;
-	this->connect(m_spinBox, &QSpinBox::valueChanged, this, &PropertyInputInt::lclValueChanged);
+	this->connect(m_spinBox, &SpinBox::valueChangeCompleted, this, &PropertyInputInt::lclValueChanged);
 }
 
 ot::PropertyInputInt::~PropertyInputInt() {
@@ -192,6 +192,10 @@ bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration
 		if (!m_lineEdit) m_lineEdit = new LineEdit;
 		this->connect(m_lineEdit, &LineEdit::textChanged, this, &PropertyInputInt::lclTextChanged);
 		this->connect(m_lineEdit, &LineEdit::editingFinished, this, &PropertyInputInt::lclEditingFinishedChanged);
+	}
+	else if (m_spinBox == nullptr) {
+		m_spinBox = new SpinBox;
+		this->connect(m_spinBox, &SpinBox::valueChangeCompleted, this, &PropertyInputInt::lclValueChanged);
 	}
 
 	if (m_spinBox) {
