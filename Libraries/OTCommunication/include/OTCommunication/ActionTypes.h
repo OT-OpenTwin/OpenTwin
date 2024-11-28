@@ -252,8 +252,6 @@
 #define OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode "UI.VIEW.OBJ.SceneNode"
 #define OT_ACTION_CMD_UI_VIEW_CreateRubberband "UI.VIEW.CreateRubberband"
 
-#define OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable "UI.VIEW.Table.Show"
-
 #define OT_ACTION_CMD_PYTHON_EXECUTE "Python.Execute"
 #define OT_ACTION_CMD_PYTHON_EXECUTE_Scripts "Python.Execute.Scripts"
 #define OT_ACTION_CMD_PYTHON_EXECUTE_Command "Python.Execute.Command"

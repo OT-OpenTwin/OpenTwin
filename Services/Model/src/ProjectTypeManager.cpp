@@ -57,7 +57,6 @@ void ProjectTypeManager::initializeProjectType3DSimulation(void)
 
 	_has3DView						= true;
 	_has1DView						= true;
-	_hasTableView					= false;
 	_hasBlockPicker					= false;
 }
 
@@ -77,7 +76,6 @@ void ProjectTypeManager::initializeProjectTypeDataPipeline(void)
 
 	_has3DView						= false;
 	_has1DView						= true;
-	_hasTableView					= true;
 	_hasBlockPicker					= true;
 
 	_dataCategorizationRootName = "Data Categorization";
@@ -103,7 +101,6 @@ void ProjectTypeManager::initializeProjectTypeStudioSuite(void)
 
 	_has3DView = true;
 	_has1DView = true;
-	_hasTableView = false;
 	_hasBlockPicker = false;
 
 	_datasetRootName = ot::FolderNames::DatasetFolder;
@@ -126,7 +123,6 @@ void ProjectTypeManager::initializeProjectTypeLTSpice(void)
 
 	_has3DView = false;
 	_has1DView = true;
-	_hasTableView = false;
 	_hasBlockPicker = true;
 
 	_datasetRootName = ot::FolderNames::DatasetFolder;
@@ -138,7 +134,6 @@ std::string ProjectTypeManager::getViews(void)
 	ot::JsonDocument newDoc;
 	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Visible3D, _has3DView, newDoc.GetAllocator());
 	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_Visible1D, _has1DView, newDoc.GetAllocator());
-	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_VisibleTable, _hasTableView, newDoc.GetAllocator());
 	newDoc.AddMember(OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker, _hasBlockPicker, newDoc.GetAllocator());
 
 	return newDoc.toJson();

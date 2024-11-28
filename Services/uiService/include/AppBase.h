@@ -372,12 +372,10 @@ public:
 
 	void setVisible3D(bool visible3D) { m_visible3D = visible3D; }
 	void setVisible1D(bool visible1D) { m_visible1D = visible1D; }
-	void setVisibleTable(bool visibleTable) { m_visibleTable = visibleTable; }
 	void setVisibleBlockPicker(bool visibleBlockPicker) { m_visibleBlockPicker = visibleBlockPicker; }
 
 	bool getVisible3D() { return m_visible3D; }
 	bool getVisible1D() { return m_visible1D; }
-	bool getVisibleTable() { return m_visibleTable; }
 	bool getVisibleBlockPicker() { return m_visibleBlockPicker; }
 
 	// Info text output
@@ -616,7 +614,6 @@ private:
 	
 	bool m_visible3D;
 	bool m_visible1D;
-	bool m_visibleTable;
 	bool m_visibleBlockPicker;
 
 	AppBase(AppBase&) = delete;

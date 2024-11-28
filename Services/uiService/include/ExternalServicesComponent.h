@@ -169,12 +169,6 @@ public:
 
 	void ReadFileContent(const std::string& fileName, std::string& fileContent, unsigned long long& uncompressedDataLength);
 
-	// ###################################################################################################
-
-	// Table operations
-	void RequestTableSelection(ModelUIDtype visModelID, std::string URL, std::string subsequentFunction);
-	void SetColourOfSelectedRange(ModelUIDtype visModelID, ot::Color background);
-
 	//########################################################################################################
 
 	// General purpose communication
@@ -313,9 +307,6 @@ public:
 	OT_HANDLER(handleGetTableSelection, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_GetSelection, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleSetCurrentTableSelectionBackground, ExternalServicesComponent, OT_ACTION_CMD_UI_TABLE_SetCurrentSelectionBackground, ot::MessageType::ALL_MESSAGE_TYPES)
 
-	// Table Old
-	OT_HANDLER(handleShowTable, ExternalServicesComponent, OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, ot::MessageType::ALL_MESSAGE_TYPES)
-	
 	// Studio Suite API
 	OT_HANDLER(handleStudioSuiteAction, ExternalServicesComponent, OT_ACTIONLIST(
 		OT_ACTION_CMD_UI_SS_IMPORT,

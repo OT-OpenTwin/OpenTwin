@@ -336,9 +336,6 @@
     <ClInclude Include="include\OTGui\Plot1DDataBaseCfg.h">
       <Filter>Header Files\Plot</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\TableRange.h">
-      <Filter>Header Files\General</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTGui\VisualisationTypes.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
@@ -374,6 +371,9 @@
     </ClInclude>
     <ClInclude Include="include\OTGui\MenuClickableEntryCfg.h">
       <Filter>Header Files\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\TableRange.h">
+      <Filter>Header Files\Widgets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -626,9 +626,6 @@
     <ClCompile Include="src\Plot1DDataBaseCfg.cpp">
       <Filter>Source Files\Plot</Filter>
     </ClCompile>
-    <ClCompile Include="src\TableRange.cpp">
-      <Filter>Source Files\General</Filter>
-    </ClCompile>
     <ClCompile Include="src\VisualisationTypes.cpp">
       <Filter>Source Files\General</Filter>
     </ClCompile>
@@ -664,6 +661,9 @@
     </ClCompile>
     <ClCompile Include="src\MenuClickableEntryCfg.cpp">
       <Filter>Source Files\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TableRange.cpp">
+      <Filter>Source Files\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

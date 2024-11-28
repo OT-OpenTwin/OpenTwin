@@ -7,8 +7,6 @@
 #include <QMainWindow>
 #include <QtOpenGLWidgets/qopenglwidget.h>
 
-#include "Table.h"
-
 class ViewerObjectSelectionHandler;
 class QWidget;
 class Model;
@@ -37,7 +35,6 @@ namespace osgText   { class Text; };
 namespace osg		{ class ShapeDrawable; };
 namespace osg		{ class Group; }
 namespace ot        { class Property; }
-namespace ot        { class TableViewerView; }
 namespace ot        { class PlotManager; }
 
 class Viewer : public QOpenGLWidget
@@ -60,7 +57,6 @@ public:
 	void detachFromModel(void);
 
 	ot::PlotManager* get1DPlot(void) const { return m_plot; }
-	ot::TableViewerView* getTableViewer() const { return m_tableViewer; }
 
 	void setTabNames(const std::string & _osgViewTabName, const std::string & _plotTabName, const std::string & _versionGraphTabName);
 
@@ -196,8 +192,6 @@ private:
 
 	ot::PlotManager*						m_plot;
 	std::string							m_plotTabName;
-
-	ot::TableViewerView*				m_tableViewer;
 
 	std::string							m_versionGraphTabName;
 

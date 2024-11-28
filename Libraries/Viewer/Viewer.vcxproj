@@ -67,9 +67,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleasePerfTest|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\Table.cpp" />
-    <ClCompile Include="src\TableViewer.cpp" />
-    <ClCompile Include="src\TableViewerView.cpp" />
     <ClCompile Include="src\TableVisualiser.cpp" />
     <ClCompile Include="src\TextureMapManager.cpp" />
     <ClCompile Include="src\TextVisualiser.cpp" />
@@ -129,9 +126,6 @@
     <ClInclude Include="include\SceneNodePlot1DCurve.h" />
     <ClInclude Include="include\SceneNodeVTK.h" />
     <ClInclude Include="include\stdafx.h" />
-    <QtMoc Include="include\Table.h" />
-    <ClInclude Include="include\TableViewer.h" />
-    <ClInclude Include="include\TableViewerView.h" />
     <ClInclude Include="include\TableVisualiser.h" />
     <ClInclude Include="include\TextureMapManager.h" />
     <ClInclude Include="include\TextVisualiser.h" />

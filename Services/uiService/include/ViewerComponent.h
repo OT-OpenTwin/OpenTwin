@@ -22,7 +22,6 @@
 
 // AK header
 #include <akCore/aNotifier.h>
-#include <QTableWidgetItem>
 
 namespace ak { class aTreeWidget; };
 namespace ot { class Property; }
@@ -153,8 +152,7 @@ public:
 	void prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs);
 
 	ot::WidgetView* getPlotWidget(ViewerUIDtype _viewerID);
-	ot::WidgetView* getTableWidget(ViewerUIDtype _viewerID);
-
+	
 	void viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type);
 
 	ViewerUIDtype createViewer(ModelUIDtype _modelUid, double _scaleWidth, double _scaleHeight,

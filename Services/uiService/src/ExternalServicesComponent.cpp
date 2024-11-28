@@ -1361,14 +1361,12 @@ void ExternalServicesComponent::determineViews(const std::string &modelServiceUR
 
 	bool visible3D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible3D].GetBool();
 	bool visible1D = responseDoc[OT_ACTION_PARAM_UI_TREE_Visible1D].GetBool();
-	bool visibleTable = responseDoc[OT_ACTION_PARAM_UI_TREE_VisibleTable].GetBool();
 	bool visibleBlockPicker = responseDoc[OT_ACTION_PARAM_UI_TREE_VisibleBlockPicker].GetBool();
 
 	AppBase* app{ AppBase::instance() };
 
 	app->setVisible3D(visible3D);
 	app->setVisible1D(visible1D);
-	app->setVisibleTable(visibleTable);
 	app->setVisibleBlockPicker(visibleBlockPicker);
 }
 
@@ -1586,47 +1584,6 @@ void ExternalServicesComponent::ReadFileContent(const std::string &fileName, std
 
 	delete[] base64_string;
 	base64_string = nullptr;
-}
-
-// ###################################################################################################
-
-// Table operations
-void ExternalServicesComponent::SetColourOfSelectedRange(ModelUIDtype visModelID, ot::Color background)
-{
-	ViewerAPI::ChangeColourOfSelection(visModelID, background);
-}
-
-
-void ExternalServicesComponent::RequestTableSelection(ModelUIDtype visModelID, std::string URL, std::string subsequentFunction)
-{
-	std::vector<ot::TableRange> ranges = ViewerAPI::GetSelectedTableRange(visModelID);
-	std::pair<ot::UID, ot::UID> tableIdentifyer = ViewerAPI::GetActiveTableIdentifyer(visModelID);
-
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, tableIdentifyer.first, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, tableIdentifyer.second, doc.GetAllocator());
-
-	ot::JsonArray vectOfRanges;
-	for (auto range : ranges)
-	{
-		ot::JsonObject tmp;
-		range.addToJsonObject(tmp, doc.GetAllocator());
-		vectOfRanges.PushBack(tmp, doc.GetAllocator());
-	}
-	doc.AddMember("Ranges", vectOfRanges, doc.GetAllocator());
-	
-	std::string response;
-	sendHttpRequest(EXECUTE, URL, doc, response);
-	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		assert(0); // ERROR
-	}
-	else OT_ACTION_IF_RESPONSE_WARNING(response)
-	{
-	assert(0); // WARNING
-	}
-	
 }
 
 // Slots
@@ -4109,45 +4066,6 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 	}
 
 	table->setAsCurrentViewTab();
-
-	return "";
-}
-
-// Table Old
-
-std::string ExternalServicesComponent::handleShowTable(ot::JsonDocument& _document) {
-	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-	ak::UID tableEntityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
-	ak::UID tableEntityVersion = _document[OT_ACTION_PARAM_MODEL_EntityVersion].GetUint64();
-	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
-	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-	try {
-		bool refreshColouring = ViewerAPI::setTable(visualizationModelID, tableEntityID, tableEntityVersion);
-
-		if (refreshColouring && subsequentFunction != "") {
-			std::string tableName = ViewerAPI::getTableName(visualizationModelID);
-
-			ot::JsonDocument doc;
-			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString(subsequentFunction, doc.GetAllocator()), doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, ot::JsonString(tableName, doc.GetAllocator()), doc.GetAllocator());
-
-			std::string response;
-			sendHttpRequest(EXECUTE, senderURL, doc, response);
-			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				OT_LOG_E(response);
-				AppBase::instance()->appendInfoMessage("Response while refreshing colour was false");
-			}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			OT_LOG_W(response);
-			AppBase::instance()->appendInfoMessage("Response while refreshing colour was false");
-		}
-		}
-	}
-	catch (std::exception& e) {
-		OT_LOG_E(e.what());
-		AppBase::instance()->appendInfoMessage("Table could not be shown due to exception: " + QString(e.what()));
-	}
 
 	return "";
 }

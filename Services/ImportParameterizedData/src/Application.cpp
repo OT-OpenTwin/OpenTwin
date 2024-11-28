@@ -328,25 +328,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 		}
 		else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
 		{
-			std::list<ot::EntityInformation> entityInfos;
-			m_modelComponent->getEntityInformation(m_selectedEntities, entityInfos);
-			if (entityInfos.begin()->getEntityName().find(_tableFolder) != std::string::npos)
-			{
-				if (_visualizationModel == -1)
-				{
-					_visualizationModel = m_modelComponent->getCurrentVisualizationModelID();
-				}
-				ot::JsonDocument doc;
-				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_OBJ_ShowTable, doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModel, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, (unsigned long long)entityInfos.begin()->getEntityVersion(), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, (unsigned long long)entityInfos.begin()->getEntityID(), doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, ot::JsonString("ColourRanges", doc.GetAllocator()), doc.GetAllocator());
-
-				std::string tmp;
-				uiComponent()->sendMessage(true, doc, tmp);
-			}
+			
 		}
 		else {
 			throw std::exception(OT_ACTION_RETURN_UnknownAction);

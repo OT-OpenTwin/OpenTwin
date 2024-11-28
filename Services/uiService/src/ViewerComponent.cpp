@@ -903,11 +903,6 @@ ot::WidgetView* ViewerComponent::getPlotWidget(ViewerUIDtype _viewerID) {
 	return ViewerAPI::getPlotWidget(_viewerID);
 }
 
-ot::WidgetView* ViewerComponent::getTableWidget(ViewerUIDtype _viewerID)
-{
-	return ViewerAPI::getTable(_viewerID);
-}
-
 void ViewerComponent::viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type) {
 	ViewerAPI::viewerTabChanged(_tabTitle, _type);
 }

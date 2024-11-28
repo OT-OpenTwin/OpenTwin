@@ -88,20 +88,11 @@
     <ClCompile Include="src\ClipPlaneManipulator.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Table.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TableViewer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Factory.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\EntityHandler.cpp">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TableViewerView.cpp">
-      <Filter>src\WidgetView</Filter>
     </ClCompile>
     <ClCompile Include="src\ViewerView.cpp">
       <Filter>src\WidgetView</Filter>
@@ -240,9 +231,6 @@
     <ClInclude Include="include\ClipPlaneManipulator.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\TableViewer.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\Factory.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -282,9 +270,6 @@
     <ClInclude Include="include\SceneNodeVTK.h">
       <Filter>include\SceneNodes</Filter>
     </ClInclude>
-    <ClInclude Include="include\TableViewerView.h">
-      <Filter>include\WidgetView</Filter>
-    </ClInclude>
     <ClInclude Include="include\ViewerView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
@@ -308,9 +293,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="include\Table.h">
-      <Filter>include</Filter>
-    </QtMoc>
     <QtMoc Include="include\Viewer.h">
       <Filter>include</Filter>
     </QtMoc>

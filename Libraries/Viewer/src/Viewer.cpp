@@ -9,7 +9,6 @@
 #include "AxisCross.h"
 #include "AxisCenterCross.h"
 #include "ClipPlaneManipulator.h"
-#include "TableViewerView.h"
 
 #include "HandlerBase.h"
 #include "HandleArrow.h"
@@ -61,8 +60,6 @@
 #include "SceneNodeVTK.h"
 
 #include "ViewerSettings.h"
-
-#include "EntityResultTableData.h"
 
 extern std::string globalFontPath;
 
@@ -231,9 +228,6 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	// Create new Plot
 	m_plot = new ot::PlotManager;
 
-	// Create new view handler
-	m_tableViewer = new ot::TableViewerView(this);
-
 	// Create settings
 	ot::PropertyGridCfg dataset = createSettings();
 
@@ -282,9 +276,6 @@ Viewer::~Viewer()
 
 	if (m_plot != nullptr) delete m_plot;
 	m_plot = nullptr;
-
-	if (m_tableViewer != nullptr) delete m_tableViewer;
-	m_tableViewer = nullptr;
 }
 
 void Viewer::freeze3DView(bool flag)

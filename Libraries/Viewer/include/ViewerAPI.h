@@ -192,21 +192,6 @@ namespace ViewerAPI
 
 	__declspec(dllexport) ot::WidgetView* getPlotWidget(ot::UID _viewerID);
 	
-	/***************************************** Table API *****************************************/
-	__declspec(dllexport) ot::WidgetView* getTable (ot::UID _viewerID);
-	__declspec(dllexport) void showTable(ot::UID _viewerID,const ot::GenericDataStructMatrix& data);
-	__declspec(dllexport) bool setTable (ot::UID _viewerID, ot::UID tableEntityID, ot::UID tableEntityVersion);
-	__declspec(dllexport) void setTableSelection (ot::UID _viewerID, std::vector<ot::TableRange> ranges);
-	__declspec(dllexport) std::vector<ot::TableRange> GetSelectedTableRange(ot::UID _viewerID);
-	__declspec(dllexport) void ChangeColourOfSelection(ot::UID _viewerID, ot::Color backGroundColour);
-	__declspec(dllexport) std::pair<ot::UID, ot::UID> GetActiveTableIdentifyer(ot::UID _viewerID);
-	__declspec(dllexport) std::string getTableName(ot::UID _viewerID);
-	__declspec(dllexport) void AddToSelectedTableRow(bool _insertAbove, ot::UID _viewerID);
-	__declspec(dllexport) void AddToSelectedTableColumn(bool _insertLeft, ot::UID _viewerID);
-	__declspec(dllexport) void DeleteFromSelectedTableColumn(ot::UID _viewerID);
-	__declspec(dllexport) void DeleteFromSelectedTableRow(ot::UID _viewerID);
-
-
 	/********************************************************************************************/
 
 	__declspec(dllexport) void viewerTabChanged(const std::string& _tabTitle, ot::WidgetViewBase::ViewType _type);

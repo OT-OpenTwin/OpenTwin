@@ -160,7 +160,6 @@ AppBase::AppBase()
 	m_graphicsPicker(nullptr),
 	m_visible3D(false),
 	m_visible1D(false),
-	m_visibleTable(false),
 	m_visibleBlockPicker(false),
 	m_propertyGrid(nullptr),
 	m_projectNavigation(nullptr),
@@ -1039,17 +1038,6 @@ ViewerUIDtype AppBase::createView(
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_versionGraph);
 	}
 	
-	if (getVisibleTable())
-	{	
-		ot::WidgetView* wv = m_viewerComponent->getTableWidget(viewID);
-		wv->setViewData(ot::WidgetViewBase(textTable.toStdString(), textTable.toStdString(), ot::WidgetViewBase::ViewTable, ot::WidgetViewBase::ViewIsCentral));
-		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
-	}
-	else
-	{
-		m_viewerComponent->getTableWidget(viewID)->getViewWidget()->setVisible(false);
-	}
-
 	ot::WidgetViewManager::instance().setUseFocusInfo(true);
 
 	m_graphicsPicker->pickerWidget()->setVisible(getVisibleBlockPicker());
