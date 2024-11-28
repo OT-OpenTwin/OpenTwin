@@ -10,18 +10,60 @@
 EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 : EntityFileText(ID,parent,obs,ms,factory,owner){}
 
+void EntityFileCSV::setRowDelimiter(std::string _delimiter)
+{
+	auto baseProp = getProperties().getProperty("Row Delimiter");
+	assert(baseProp != nullptr);
+	auto delim = dynamic_cast<EntityPropertiesString*>(baseProp);
+	delim->setValue(_delimiter);
+	setModified();
+}
+
+void EntityFileCSV::setColumnDelimiter(std::string _delimiter)
+{
+	auto baseProp = getProperties().getProperty("Column Delimiter");
+	assert(baseProp != nullptr);
+	auto delim = dynamic_cast<EntityPropertiesString*>(baseProp);
+	delim->setValue(_delimiter);
+	setModified();
+}
+
 std::string EntityFileCSV::getRowDelimiter()
 {
-	auto rowDelim = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Row Delimiter"));
-	m_rowDelimiter = rowDelim->getValue();
-	return m_rowDelimiter;
+	auto baseProp =	getProperties().getProperty("Row Delimiter");
+	if (baseProp == nullptr)
+	{
+		return m_rowDelimiterDefault;
+	}
+	auto rowDelim = dynamic_cast<EntityPropertiesString*>(baseProp);
+	const std::string rowDelimiter = rowDelim->getValue();
+	if (rowDelimiter == "")
+	{
+		return m_rowDelimiterDefault;
+	}
+	else
+	{
+		return rowDelimiter;
+	}
 }
 
 std::string EntityFileCSV::getColumnDelimiter()
 {
-	auto delim = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Column Delimiter"));
-	m_columnDelimiter = delim->getValue();
-	return m_columnDelimiter;
+	auto baseProp = getProperties().getProperty("Column Delimiter");
+	if (baseProp == nullptr)
+	{
+		return m_columnDelimiterDefault;
+	}
+	auto delim = dynamic_cast<EntityPropertiesString*>(baseProp);
+	const std::string columnDelimiter = delim->getValue();
+	if (columnDelimiter== "")
+	{
+		return m_columnDelimiterDefault;
+	}
+	else
+	{
+		return columnDelimiter;
+	}
 }
 
 ot::TableHeaderOrientation EntityFileCSV::getHeaderOrientation()
@@ -60,17 +102,15 @@ bool EntityFileCSV::getEvaluateEscapeCharacter() {
 		return false;
 	}
 	auto prop = dynamic_cast<EntityPropertiesBoolean*>(baseProperty);
-
-	m_evaluateEscapeCharacter = prop->getValue();
-	return m_evaluateEscapeCharacter;
+	return prop->getValue();
 }
 
 void EntityFileCSV::setSpecializedProperties()
 {
 	EntityFileText::setSpecializedProperties();
-	EntityPropertiesString::createProperty("CSV Properties", "Row Delimiter", m_rowDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
-	EntityPropertiesString::createProperty("CSV Properties", "Column Delimiter", m_columnDelimiter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
-	EntityPropertiesBoolean::createProperty("CSV Properties", "Evaluate Escape Characters", m_evaluateEscapeCharacter, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
+	EntityPropertiesString::createProperty("CSV Properties", "Row Delimiter", m_rowDelimiterDefault, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
+	EntityPropertiesString::createProperty("CSV Properties", "Column Delimiter", m_columnDelimiterDefault, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
+	EntityPropertiesBoolean::createProperty("CSV Properties", "Evaluate Escape Characters", m_evaluateEscapeCharacterDefault, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 	EntityPropertiesSelection::createProperty("Table header", "Header position", { ot::toString(ot::TableHeaderOrientation::horizontal), ot::toString(ot::TableHeaderOrientation::vertical) }, ot::toString(ot::TableHeaderOrientation::horizontal), "tableInformation", getProperties());
 	std::locale mylocale("");
 	auto defaulDecimalSeparator = std::use_facet<std::numpunct<char>>(mylocale).decimal_point();
@@ -86,19 +126,11 @@ void EntityFileCSV::setSpecializedProperties()
 void EntityFileCSV::AddStorageData(bsoncxx::builder::basic::document & storage)
 {
 	EntityFile::AddStorageData(storage);
-	storage.append(
-		bsoncxx::builder::basic::kvp("RowDelimiter", m_rowDelimiter),
-		bsoncxx::builder::basic::kvp("ColumnDelimiter", m_columnDelimiter),
-		bsoncxx::builder::basic::kvp("EvaluateEscape", m_evaluateEscapeCharacter)
-	);
 }
 
 void EntityFileCSV::readSpecificDataFromDataBase(bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityFile::readSpecificDataFromDataBase(doc_view, entityMap);
-	m_rowDelimiter = std::string(doc_view["RowDelimiter"].get_utf8().value.data());
-	m_columnDelimiter = std::string(doc_view["ColumnDelimiter"].get_utf8().value.data());
-	m_evaluateEscapeCharacter = doc_view["EvaluateEscape"].get_bool();
 }
 
 const ot::GenericDataStructMatrix EntityFileCSV::getTable()

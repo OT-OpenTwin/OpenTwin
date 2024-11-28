@@ -8,8 +8,8 @@ public:
 	
 	EntityFileCSV(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 
-	void setRowDelimiter(std::string delim) { m_rowDelimiter = delim; };
-	void setColumnDelimiter(std::string delim) { m_columnDelimiter = delim; };
+	void setRowDelimiter(std::string _delimiter); 
+	void setColumnDelimiter(std::string _delimiter);
 	std::string getRowDelimiter() ;
 	std::string getColumnDelimiter();
 	virtual std::string getClassName(void) override { return "EntityFileCSV"; };
@@ -31,9 +31,9 @@ private:
 	void AddStorageData(bsoncxx::builder::basic::document& storage) override;
 	void readSpecificDataFromDataBase(bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
-	std::string m_rowDelimiter = "\n";
-	std::string m_columnDelimiter = ";";
-	bool m_evaluateEscapeCharacter = false;
+	std::string m_rowDelimiterDefault = "\n";
+	std::string m_columnDelimiterDefault = ";";
+	bool m_evaluateEscapeCharacterDefault = false;
 
 	ot::ContentChangedHandling m_tableContentChangedHandling = ot::ContentChangedHandling::ModelServiceSaves;
 };
