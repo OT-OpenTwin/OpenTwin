@@ -21,7 +21,7 @@ ot::PropertyInputDouble::PropertyInputDouble()
 	: m_lineEdit(nullptr), m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max())
 {
 	m_spinBox = new DoubleSpinBox;
-	this->connect(m_spinBox, &QDoubleSpinBox::valueChanged, this, &PropertyInputDouble::lclValueChanged);
+	this->connect(m_spinBox, &DoubleSpinBox::valueChangeCompleted, this, &PropertyInputDouble::lclValueChanged);
 }
 
 ot::PropertyInputDouble::~PropertyInputDouble() {
@@ -113,7 +113,7 @@ bool ot::PropertyInputDouble::hasInputError(void) const {
 	}
 }
 
-void ot::PropertyInputDouble::lclValueChanged(int) {
+void ot::PropertyInputDouble::lclValueChanged(double) {
 	OTAssertNullptr(m_spinBox);
 	m_spinBox->setSpecialValueText("");
 	OTAssert(this->getValue() >= m_min && this->getValue() <= m_max, "Value out of range");

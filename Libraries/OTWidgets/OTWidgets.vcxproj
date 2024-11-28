@@ -281,7 +281,7 @@
     <ClInclude Include="include\OTWidgets\CustomGraphicsItem.h" />
     <QtMoc Include="include\OTWidgets\Dialog.h" />
     <QtMoc Include="include\OTWidgets\EventNotifier.h" />
-    <ClInclude Include="include\OTWidgets\DoubleSpinBox.h" />
+    <QtMoc Include="include\OTWidgets\DoubleSpinBox.h" />
     <ClInclude Include="include\OTWidgets\GraphicsBoxLayoutItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsConnectionItem.h" />
     <ClInclude Include="include\OTWidgets\GraphicsEllipseItem.h" />

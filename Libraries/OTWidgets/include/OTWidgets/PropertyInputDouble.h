@@ -33,7 +33,7 @@ namespace ot {
 		bool hasInputError(void) const;
 
 	private Q_SLOTS:
-		void lclValueChanged(int);
+		void lclValueChanged(double);
 		void lclTextChanged(void);
 		void lclEditingFinishedChanged(void);
 
