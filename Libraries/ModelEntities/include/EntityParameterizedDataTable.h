@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <vector>
 #include <map>
-#include "OTGui/TableHeaderOrientation.h"
+#include "OTGui/TableCfg.h"
 
 class __declspec(dllexport) EntityParameterizedDataTable : public EntityResultTable<std::string>
 {
@@ -18,9 +18,9 @@ public:
 	std::string getFileName() const { return _sourceFileName; }
 	std::string getFilePath() const { return _sourceFilePath; }
 
-	void createProperties(ot::TableHeaderOrientation defaultOrientation);
-	std::string getSelectedHeaderOrientationString();
-	ot::TableHeaderOrientation getSelectedHeaderOrientation();
+	void createProperties(ot::TableCfg::TableHeaderMode _defaultHeaderMode);
+	std::string getSelectedHeaderModeString();
+	ot::TableCfg::TableHeaderMode getSelectedHeaderMode();
 	
 private:
 	void createProperties() override {};

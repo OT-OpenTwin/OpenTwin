@@ -783,7 +783,7 @@ bool ViewerAPI::setTable(ot::UID _viewerID, ot::UID entityID, ot::UID entityVers
 
 		if (tableTopoEnt != nullptr)
 		{
-			refresh = v->getTableViewer()->CreateNewTable(tableTopoEnt, tableTopoEnt->getSelectedHeaderOrientation());
+			refresh = v->getTableViewer()->CreateNewTable(tableTopoEnt, tableTopoEnt->getSelectedHeaderMode());
 		}
 		else
 		{

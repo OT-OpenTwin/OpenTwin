@@ -51,7 +51,7 @@ void TableHandler::AddTableView(ot::UID sourceID, ot::UID sourceVersionID)
 	topoEnt->setTableData(tableData);
 	topoEnt->SetTableDimensions(static_cast<unsigned int> (tableData->getNumberOfRows()), static_cast<unsigned int> (tableData->getNumberOfColumns()));
 	topoEnt->SetSourceFile(sourceFile->getFileName() + "." + sourceFile->getFileType(), sourceFile->getPath());
-	topoEnt->createProperties(ot::TableHeaderOrientation::horizontal);
+	topoEnt->createProperties(ot::TableCfg::TableHeaderMode::Horizontal);
 	topoEnt->StoreToDataBase();
 
 	std::list<ot::UID> topologyEntityIDList = { topoEnt->getEntityID() };

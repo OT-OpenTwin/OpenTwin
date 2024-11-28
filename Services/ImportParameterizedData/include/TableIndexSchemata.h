@@ -1,10 +1,11 @@
 #pragma once
+
+#include "OTGui/TableCfg.h"
 #include "OTGui/TableRange.h"
-#include "OTGui/TableHeaderOrientation.h"
 
 namespace TableIndexSchemata
 {
-	static ot::TableRange userRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation)
+	static ot::TableRange userRangeToMatrixRange(const ot::TableRange& _range, ot::TableCfg::TableHeaderMode _headerOrientation)
 	{
 		//First we switch from base-1 index to base -0 index
 		int rangeRowBottom = _range.getBottomRow() - 1;
@@ -13,12 +14,12 @@ namespace TableIndexSchemata
 		int rangeColumnRight = _range.getRightColumn() - 1;
 
 		//Now we take the header in consideration, which is part of the matrix and its row/column index, but the TableConfig handles the header as separate vector
-		if (_headerOrientation == ot::TableHeaderOrientation::horizontal)
+		if (_headerOrientation == ot::TableCfg::TableHeaderMode::Horizontal)
 		{
 			rangeRowBottom += 1;
 			rangeRowTop += 1;
 		}
-		else if (_headerOrientation == ot::TableHeaderOrientation::vertical)
+		else if (_headerOrientation == ot::TableCfg::TableHeaderMode::Vertical)
 		{
 			rangeColumnLeft += 1;
 			rangeColumnRight += 1;
@@ -26,7 +27,7 @@ namespace TableIndexSchemata
 		ot::TableRange matrixRange(rangeRowTop, rangeRowBottom, rangeColumnLeft, rangeColumnRight);
 		return matrixRange;
 	}
-	static ot::TableRange selectionRangeToMatrixRange(const ot::TableRange& _range, const ot::TableHeaderOrientation& _headerOrientation)
+	static ot::TableRange selectionRangeToMatrixRange(const ot::TableRange& _range, ot::TableCfg::TableHeaderMode _headerOrientation)
 	{
 		//Both QTable and matrix work with a base-0 index. Nothing needs to be changed in this regard
 		//The QTable handles the header as a separate vector, in the matrix it is simply part of the matrix. Here we need to make an adjustment
@@ -37,12 +38,12 @@ namespace TableIndexSchemata
 		int rangeColumnRight = _range.getRightColumn();
 
 		//Now we take the header in consideration, which is part of the matrix and its row/column index, but the TableConfig handles the header as separate vector
-		if (_headerOrientation == ot::TableHeaderOrientation::horizontal)
+		if (_headerOrientation == ot::TableCfg::TableHeaderMode::Horizontal)
 		{
 			rangeRowBottom += 1;
 			rangeRowTop += 1;
 		}
-		else if (_headerOrientation == ot::TableHeaderOrientation::vertical)
+		else if (_headerOrientation == ot::TableCfg::TableHeaderMode::Vertical)
 		{
 			rangeColumnLeft += 1;
 			rangeColumnRight += 1;

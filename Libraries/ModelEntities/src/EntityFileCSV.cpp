@@ -66,24 +66,20 @@ std::string EntityFileCSV::getColumnDelimiter()
 	}
 }
 
-ot::TableHeaderOrientation EntityFileCSV::getHeaderOrientation()
-{
+ot::TableCfg::TableHeaderMode EntityFileCSV::getHeaderMode() {
 	auto selectedOrientation = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Header position"));
-	if (selectedOrientation == nullptr)
-	{
+	if (selectedOrientation == nullptr) {
 		throw std::exception("Legacy entity. Please reimport the file");
 	}
-	ot::TableHeaderOrientation orientation =ot::stringToHeaderOrientation(selectedOrientation->getValue());
-	return orientation;
+	ot::TableCfg::TableHeaderMode mode = ot::TableCfg::stringToHeaderMode(selectedOrientation->getValue());
+	return mode;
 }
 
-bool EntityFileCSV::visualiseText()
-{
+bool EntityFileCSV::visualiseText() {
 	return true;
 }
 
-char EntityFileCSV::getDecimalDelimiter()
-{
+char EntityFileCSV::getDecimalDelimiter() {
 	EntityPropertiesBase* baseProperty = getProperties().getProperty("Decimal point character");
 	if (baseProperty == nullptr)
 	{
@@ -105,13 +101,17 @@ bool EntityFileCSV::getEvaluateEscapeCharacter() {
 	return prop->getValue();
 }
 
-void EntityFileCSV::setSpecializedProperties()
-{
+void EntityFileCSV::setSpecializedProperties() {
 	EntityFileText::setSpecializedProperties();
 	EntityPropertiesString::createProperty("CSV Properties", "Row Delimiter", m_rowDelimiterDefault, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 	EntityPropertiesString::createProperty("CSV Properties", "Column Delimiter", m_columnDelimiterDefault, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 	EntityPropertiesBoolean::createProperty("CSV Properties", "Evaluate Escape Characters", m_evaluateEscapeCharacterDefault, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
-	EntityPropertiesSelection::createProperty("Table header", "Header position", { ot::toString(ot::TableHeaderOrientation::horizontal), ot::toString(ot::TableHeaderOrientation::vertical) }, ot::toString(ot::TableHeaderOrientation::horizontal), "tableInformation", getProperties());
+	EntityPropertiesSelection::createProperty("Table header", "Header position", {
+		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::Horizontal),
+		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::Vertical),
+		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::NoHeader)
+		},
+		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::Horizontal), "tableInformation", getProperties());
 	std::locale mylocale("");
 	auto defaulDecimalSeparator = std::use_facet<std::numpunct<char>>(mylocale).decimal_point();
 	EntityPropertiesSelection::createProperty("Text Properties", "Decimal point character",
@@ -167,8 +167,8 @@ void EntityFileCSV::setTable(const ot::GenericDataStructMatrix& _table)
 ot::TableCfg EntityFileCSV::getTableConfig()
 {
 	ot::GenericDataStructMatrix matrix = getTable();
-	ot::TableHeaderOrientation headerOrientation =	getHeaderOrientation();
-	ot::TableCfg tableCfg(matrix, headerOrientation);
+	ot::TableCfg::TableHeaderMode headerMode = getHeaderMode();
+	ot::TableCfg tableCfg(matrix, headerMode);
 	tableCfg.setEntityName(getName());
 	tableCfg.setTitle(getName());
 	return tableCfg;

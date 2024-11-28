@@ -14,5 +14,5 @@ public:
 	virtual char getDecimalDelimiter() = 0; //Needed for text to numeric conversions
 	virtual bool visualiseTable() = 0;
 	virtual ot::ContentChangedHandling getTableContentChangedHandling() = 0;
-	virtual ot::TableHeaderOrientation getHeaderOrientation() =  0;
+	virtual ot::TableCfg::TableHeaderMode getHeaderMode(void) = 0;
 };

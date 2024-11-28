@@ -4114,29 +4114,6 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 }
 
 // Table Old
-std::string ExternalServicesComponent::handleTableChange(ot::JsonDocument& _document) {
-	ak::UID visualizationModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
-	const std::string functionName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
-	if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddColumn) {
-		bool insertLeft = ot::json::getBool(_document, OT_ACTION_PARAM_BASETYPE_Bool);
-		ViewerAPI::AddToSelectedTableColumn(insertLeft, visualizationModelID);
-	}
-	else if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_AddRow) {
-		bool insertAbove = ot::json::getBool(_document, OT_ACTION_PARAM_BASETYPE_Bool);
-
-		ViewerAPI::AddToSelectedTableRow(insertAbove, visualizationModelID);
-	}
-	else if (functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteRow) {
-		ViewerAPI::DeleteFromSelectedTableRow(visualizationModelID);
-	}
-	else {
-		assert(functionName == OT_ACTION_CMD_UI_VIEW_OBJ_Table_DeleteColumn);
-		ViewerAPI::DeleteFromSelectedTableColumn(visualizationModelID);
-	}
-
-	return "";
-}
-
 
 std::string ExternalServicesComponent::handleShowTable(ot::JsonDocument& _document) {
 	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
@@ -4171,16 +4148,6 @@ std::string ExternalServicesComponent::handleShowTable(ot::JsonDocument& _docume
 		OT_LOG_E(e.what());
 		AppBase::instance()->appendInfoMessage("Table could not be shown due to exception: " + QString(e.what()));
 	}
-
-	return "";
-}
-
-std::string ExternalServicesComponent::handleSetTable(ot::JsonDocument& _document) {
-	ak::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-	auto tableContent = ot::json::getObject(_document, OT_ACTION_PARAM_Value);
-	ot::GenericDataStructMatrix data;
-	data.setFromJsonObject(tableContent);
-	ViewerAPI::showTable(visualizationModelID, data);
 
 	return "";
 }

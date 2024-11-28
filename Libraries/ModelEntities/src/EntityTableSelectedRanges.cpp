@@ -90,8 +90,7 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 	getProperties().createProperty(passOnScript, updateStrategyGroup);
 }
 
-void EntityTableSelectedRanges::setTableProperties(std::string _tableName, ot::UID _tableID, std::string _tableOrientation)
-{
+void EntityTableSelectedRanges::setTableProperties(std::string _tableName, ot::UID _tableID, std::string _tableOrientation) {
 	auto tableNameEnt = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Table name"));
 	auto headerPosEnt = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Header position"));
 	tableNameEnt->setValue(_tableName);
@@ -101,24 +100,21 @@ void EntityTableSelectedRanges::setTableProperties(std::string _tableName, ot::U
 }
 
 
-std::string EntityTableSelectedRanges::getSelectedType()
-{
+std::string EntityTableSelectedRanges::getSelectedType() {
 	auto typeSelection = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Datatype"));
 	return typeSelection->getValue();
 
 }
 
-const std::string EntityTableSelectedRanges::getTableName()
-{
+std::string EntityTableSelectedRanges::getTableName() {
 	auto tableNameEnt = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Table name"));
 	return tableNameEnt->getValue();
 }
 
-const ot::TableHeaderOrientation EntityTableSelectedRanges::getTableOrientation()
-{
-	auto headerPosEnt = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Header position"));
-	ot::TableHeaderOrientation orientation =	ot::stringToHeaderOrientation(headerPosEnt->getValue());
-	return orientation;
+ot::TableCfg::TableHeaderMode EntityTableSelectedRanges::getTableHeaderMode() {
+	auto modeProp = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Header position"));
+	ot::TableCfg::TableHeaderMode mode = ot::TableCfg::stringToHeaderMode(modeProp->getValue());
+	return mode;
 }
 
 ot::TableRange EntityTableSelectedRanges::getSelectedRange()

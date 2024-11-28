@@ -8,7 +8,6 @@
 // OpenTwin header
 #include "OTGui/WidgetViewBase.h"
 #include "OTGui/TableHeaderItemCfg.h"
-#include "TableHeaderOrientation.h"
 #include "OTCore/GenericDataStructMatrix.h"
 
 // std header
@@ -19,8 +18,17 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT TableCfg : public WidgetViewBase {
 	public:
+		enum class TableHeaderMode {
+			NoHeader,
+			Horizontal,
+			Vertical,
+		};
+
+		static std::string toString(TableHeaderMode _headerMode);
+		static TableHeaderMode stringToHeaderMode(const std::string& _headerMode);
+
 		TableCfg(int _rows = 0, int _columns = 0, WidgetViewBase _baseInfo = WidgetViewBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable));
-		TableCfg(const ot::GenericDataStructMatrix& _matrix, ot::TableHeaderOrientation _orientation);
+		TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::TableHeaderMode _headerMode);
 		TableCfg(const TableCfg& _other);
 		virtual ~TableCfg();
 

@@ -23,7 +23,7 @@
 #include "OTServiceFoundation/PythonServiceInterface.h"
 #include "OTCore/GenericDataStructMatrix.h"
 #include "OTGui/TableRange.h"
-#include "OTGui/TableHeaderOrientation.h"
+#include "OTGui/TableCfg.h"
 #include "IVisualisationTable.h"
 
 #include <optional>

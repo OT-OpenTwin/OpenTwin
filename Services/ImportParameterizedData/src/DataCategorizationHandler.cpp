@@ -392,7 +392,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 	matrixRanges.reserve(_ranges.size());
 	for (const auto& selectionRange : _ranges)
 	{
-		matrixRanges.push_back(TableIndexSchemata::selectionRangeToMatrixRange(selectionRange, tableEntPtr->getHeaderOrientation()));
+		matrixRanges.push_back(TableIndexSchemata::selectionRangeToMatrixRange(selectionRange, tableEntPtr->getHeaderMode()));
 	}
 
 	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr.get(), matrixRanges);
@@ -421,14 +421,14 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 			
 			ot::TableRange userRange = TableIndexSchemata::selectionRangeToUserRange(_ranges[i]);
 			tableRange->setRange(userRange);
-			tableRange->setTableProperties(tableBase->getName(), tableBase->getEntityID(), ot::toString(tableEntPtr->getHeaderOrientation()));
+			tableRange->setTableProperties(tableBase->getName(), tableBase->getEntityID(), ot::TableCfg::toString(tableEntPtr->getHeaderMode()));
 			tableRange->setEditable(true);
 			
 			// The name of the entity should correspond to the header value of the table. This header value will later be used as key of the database entry
 			std::string name = "";
 			ot::MatrixEntryPointer matrixPtr;
-			const ot::TableHeaderOrientation selectedTableOrientation =	tableRange->getTableOrientation();
-			if (selectedTableOrientation == ot::TableHeaderOrientation::horizontal)
+			const ot::TableCfg::TableHeaderMode selectedTableOrientation =	tableRange->getTableHeaderMode();
+			if (selectedTableOrientation == ot::TableCfg::TableHeaderMode::Horizontal)
 			{
 				matrixPtr.m_row = 0;
 				for (matrixPtr.m_column = static_cast<uint32_t>(_ranges[i].getLeftColumn()); matrixPtr.m_column <= static_cast<uint32_t>(_ranges[i].getRightColumn()); matrixPtr.m_column++)
@@ -752,7 +752,7 @@ std::tuple<std::list<std::string>, std::list<std::string>> DataCategorizationHan
 			newSelection->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, selection->getScriptName(), entityInfo.getEntityID(),dataType);
 			
 			
-			newSelection->setTableProperties(selection->getTableName(),entityInfo.getEntityID(),ot::toString(selection->getTableOrientation()));
+			newSelection->setTableProperties(selection->getTableName(),entityInfo.getEntityID(),ot::TableCfg::toString(selection->getTableHeaderMode()));
 			
 			ot::TableRange selectedRange = selection->getSelectedRange();
 			newSelection->setRange(selectedRange);

@@ -1,7 +1,8 @@
 #pragma once
+
 #include "EntityFileText.h"
 #include "IVisualisationTable.h"
-#include "OTGui/TableHeaderOrientation.h"
+
 class __declspec(dllexport) EntityFileCSV : public EntityFileText, public IVisualisationTable
 {
 public:
@@ -21,7 +22,7 @@ public:
 	bool visualiseTable() override;
 	ot::ContentChangedHandling getTableContentChangedHandling() override;
 
-	ot::TableHeaderOrientation getHeaderOrientation() override;
+	ot::TableCfg::TableHeaderMode getHeaderMode(void) override;
 	bool visualiseText() override;
 	char getDecimalDelimiter() override;
 	bool getEvaluateEscapeCharacter(void);

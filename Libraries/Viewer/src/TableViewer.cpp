@@ -28,7 +28,7 @@ std::vector<ot::TableRange> TableViewer::GetSelectedRanges()
 }
 
 
-bool TableViewer::CreateNewTable(std::shared_ptr<EntityResultTable<std::string>> table, ot::TableHeaderOrientation orientation)
+bool TableViewer::CreateNewTable(std::shared_ptr<EntityResultTable<std::string>> table, ot::TableCfg::TableHeaderMode orientation)
 {
 	if (_activeTable == nullptr || _activeTable->getEntityID() != table->getEntityID() || _activeTable->getEntityStorageVersion() != table->getEntityStorageVersion() || orientation != _tableOrientation)
 	{
@@ -79,7 +79,7 @@ void TableViewer::SelectRanges(std::vector<ot::TableRange>& ranges)
 		int minRow = _activeTable->getMinRow() < 0 ? 0 : _activeTable->getMinRow();
 		int maxRow = _activeTable->getMaxRow() < 0 ? 0 : _activeTable->getMaxRow();
 		auto paramTable = dynamic_cast<EntityParameterizedDataTable*>(_activeTable.get());
-		if (paramTable == nullptr || paramTable->getSelectedHeaderOrientation() == ot::TableHeaderOrientation::horizontal)
+		if (paramTable == nullptr || paramTable->getSelectedHeaderMode() == ot::TableCfg::TableHeaderMode::Horizontal)
 		{
 			if (minRow == 0) { minRow = 1; }
 		}
@@ -204,7 +204,7 @@ void TableViewer::SetTableData()
 
 		//Get iterators for data access
 		unsigned int rowStart(0), columnStart(0), rowEnd(0), columnEnd(0);
-		if (_tableOrientation == ot::TableHeaderOrientation::horizontal)
+		if (_tableOrientation == ot::TableCfg::TableHeaderMode::Horizontal)
 		{
 			rowStart = 1;
 		}
@@ -240,7 +240,7 @@ void TableViewer::SetTableData()
 		_table->setColumnCount(numberOfVisibleColumns);
 
 		//Setting both headers
-		if (_tableOrientation == ot::TableHeaderOrientation::horizontal)
+		if (_tableOrientation == ot::TableCfg::TableHeaderMode::Horizontal)
 		{
 			unsigned int columnPtr = 0;
 			for (unsigned int c = columnStart; c <= columnEnd ; c++)

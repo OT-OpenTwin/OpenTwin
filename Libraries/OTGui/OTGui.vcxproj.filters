@@ -342,9 +342,6 @@
     <ClInclude Include="include\OTGui\VisualisationTypes.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTGui\TableHeaderOrientation.h">
-      <Filter>Header Files\Widgets</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTGui\StyledTextBuilder.h">
       <Filter>Header Files\General</Filter>
     </ClInclude>
@@ -646,9 +643,6 @@
     </ClCompile>
     <ClCompile Include="src\StyledTextEntry.cpp">
       <Filter>Source Files\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TableHeaderOrientation.cpp">
-      <Filter>Source Files\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="src\ProjectTemplateInformation.cpp">
       <Filter>Source Files\General</Filter>

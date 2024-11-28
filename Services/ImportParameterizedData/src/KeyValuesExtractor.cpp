@@ -76,7 +76,7 @@ std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_
 	std::vector<std::string> fieldKey;
 	
 	ot::TableRange userRange = _range->getSelectedRange();
-	ot::TableHeaderOrientation headerOrientation=	_range->getTableOrientation();
+	ot::TableCfg::TableHeaderMode headerOrientation = _range->getTableHeaderMode();
 	ot::TableRange matrixRange = TableIndexSchemata::userRangeToMatrixRange(userRange,headerOrientation);
 	
 	std::map<std::string, std::map<std::uint32_t,std::string>> extractedField;
@@ -89,7 +89,7 @@ std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_
 	const ot::GenericDataStructMatrix tableData = _table->getTable();
 
 	ot::MatrixEntryPointer matrixEntry;
-	if (_range->getTableOrientation() == ot::TableHeaderOrientation::horizontal)
+	if (_range->getTableHeaderMode() == ot::TableCfg::TableHeaderMode::Horizontal)
 	{
 		fieldKey.reserve(maxColumn - minColumn + 1);
 		for (matrixEntry.m_column = minColumn; matrixEntry.m_column <= maxColumn; matrixEntry.m_column++)

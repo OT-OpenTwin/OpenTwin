@@ -55,7 +55,7 @@ std::map<std::string, std::list<std::string>> PreviewAssemblerRMD::CollectUnique
 			if (sourceTable->getName() == _selectedRangeEntities[i]->getTableName())
 			{
 				ot::TableRange userRange =  _selectedRangeEntities[i]->getSelectedRange();
-				ot::TableHeaderOrientation headerOrientation = _selectedRangeEntities[i]->getTableOrientation();
+				ot::TableCfg::TableHeaderMode headerOrientation = _selectedRangeEntities[i]->getTableHeaderMode();
 				ot::TableRange matrixRange = TableIndexSchemata::userRangeToMatrixRange(userRange,headerOrientation);
 				uint32_t minColumn = static_cast<uint32_t>(matrixRange.getLeftColumn());
 				uint32_t maxColumn = static_cast<uint32_t>(matrixRange.getRightColumn());

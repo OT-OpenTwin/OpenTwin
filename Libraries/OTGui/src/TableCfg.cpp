@@ -8,65 +8,72 @@
 #include "OTGui/TableCfg.h"
 #include "OTCore/VariableToStringConverter.h"
 
+namespace ot::TableHeaderModeNames{
+	const std::string ModeNameHorizontal = "First row";
+	const std::string ModeNameVertical = "First column";
+	const std::string ModeNameNone = "None";
+}
+
+std::string ot::TableCfg::toString(ot::TableCfg::TableHeaderMode _headerMode) {
+	switch (_headerMode) {
+	case ot::TableCfg::TableHeaderMode::NoHeader: return TableHeaderModeNames::ModeNameNone;
+	case ot::TableCfg::TableHeaderMode::Horizontal: return TableHeaderModeNames::ModeNameHorizontal;
+	case ot::TableCfg::TableHeaderMode::Vertical: return TableHeaderModeNames::ModeNameVertical;
+	default:
+		OT_LOG_EAS("Unknown header mode (" + std::to_string((int)_headerMode) + ")");
+		return TableHeaderModeNames::ModeNameNone;
+	}
+}
+
+ot::TableCfg::TableHeaderMode ot::TableCfg::stringToHeaderMode(const std::string& _headerMode) {
+	if (_headerMode == ot::TableHeaderModeNames::ModeNameNone) return TableHeaderMode::NoHeader;
+	else if (_headerMode == ot::TableHeaderModeNames::ModeNameHorizontal) return TableHeaderMode::Horizontal;
+	else if (_headerMode == TableHeaderModeNames::ModeNameVertical) return TableHeaderMode::Vertical;
+	else {
+		OT_LOG_EAS("Unknown header mode \"" + _headerMode + "\"");
+		return TableHeaderMode::NoHeader;
+	}
+}
+
 ot::TableCfg::TableCfg(int _rows, int _columns, WidgetViewBase _baseInfo)
 	: WidgetViewBase(_baseInfo), m_rows(_rows), m_columns(_columns)
 {
 	this->initialize();
 }
 
-ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, ot::TableHeaderOrientation _orientation)
+ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::TableHeaderMode _headerMode)
 	: WidgetViewBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable), m_rows(_matrix.getNumberOfRows()), m_columns(_matrix.getNumberOfColumns())
 {
 	MatrixEntryPointer matrixPointer;
 	ot::VariableToStringConverter converter;
-	uint32_t rowStarter(0), columnStarter(0);
-	if (_orientation == ot::TableHeaderOrientation::horizontal)
-	{
-		rowStarter = 1;
-		this->initialize(_matrix.getNumberOfRows() - rowStarter, _matrix.getNumberOfColumns() - columnStarter);
 
-		if(rowStarter< m_rows)
-		{
-			matrixPointer.m_row = 0;
-			for (matrixPointer.m_column= 0; matrixPointer.m_column < m_columns; matrixPointer.m_column++)
-			{
-				const ot::Variable& variable = _matrix.getValue(matrixPointer);
-				const std::string entry = converter(variable);
-				setColumnHeader(matrixPointer.m_column, entry);
-			}
+	int rowStarter = (_headerMode == TableHeaderMode::Horizontal ? 1 : 0);
+	int columnStarter = (_headerMode == TableHeaderMode::Vertical ? 1 : 0);
+	
+	this->initialize(_matrix.getNumberOfRows() - rowStarter, _matrix.getNumberOfColumns() - columnStarter);
+
+	if (rowStarter < m_rows && rowStarter > 0) {
+		matrixPointer.m_row = 0;
+		for (matrixPointer.m_column = 0; matrixPointer.m_column < m_columns; matrixPointer.m_column++) {
+			const Variable& variable = _matrix.getValue(matrixPointer);
+			const std::string entry = converter(variable);
+			this->setColumnHeader(matrixPointer.m_column, entry);
 		}
 	}
-	else if (_orientation == ot::TableHeaderOrientation::vertical)
-	{
-		columnStarter = 1;
-		initialize(_matrix.getNumberOfRows() - rowStarter, _matrix.getNumberOfColumns() - columnStarter);
-
-		if (columnStarter < m_columns)
-		{
-			matrixPointer.m_column = 0;
-			for (matrixPointer.m_row = 0; matrixPointer.m_row < m_rows; matrixPointer.m_row++)
-			{
-				const ot::Variable& variable = _matrix.getValue(matrixPointer);
-				const std::string entry = converter(variable);
-				setRowHeader(matrixPointer.m_row, entry);
-			}
+	if (columnStarter < m_columns && columnStarter > 0) {
+		matrixPointer.m_column = 0;
+		for (matrixPointer.m_row = 0; matrixPointer.m_row < m_rows; matrixPointer.m_row++) {
+			const Variable& variable = _matrix.getValue(matrixPointer);
+			const std::string entry = converter(variable);
+			this->setRowHeader(matrixPointer.m_row, entry);
 		}
 	}
-	else
-	{
-		rowStarter = 0;
-		columnStarter = 0;
-		initialize(_matrix.getNumberOfRows() - rowStarter, _matrix.getNumberOfColumns() - columnStarter);
 
-	}
-
-	for(matrixPointer.m_column = columnStarter; matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++)
-	{
-		for (matrixPointer.m_row = rowStarter; matrixPointer.m_row < _matrix.getNumberOfRows(); matrixPointer.m_row++)
-		{
-			const ot::Variable& variable =	_matrix.getValue(matrixPointer);
+	for(matrixPointer.m_column = columnStarter; matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++) {
+		for (matrixPointer.m_row = rowStarter; matrixPointer.m_row < _matrix.getNumberOfRows(); matrixPointer.m_row++) {
+			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);	
-			setCellText(matrixPointer.m_row - rowStarter, matrixPointer.m_column - columnStarter, entry);
+			this->setCellText(matrixPointer.m_row - rowStarter, matrixPointer.m_column - columnStarter, entry);
 		}
 	}	
 }

@@ -18,9 +18,7 @@ void EntityParameterizedDataTable::SetSourceFile(std::string sourceFileName, std
 	_sourceFilePath = sourceFilePath;
 }
 
-void EntityParameterizedDataTable::createProperties(ot::TableHeaderOrientation defaultOrientation)
-{
-
+void EntityParameterizedDataTable::createProperties(ot::TableCfg::TableHeaderMode _defaultHeaderMode) {
 	auto numberOfRowsProperty = new EntityPropertiesInteger("Number of rows", _numberOfRows);
 	numberOfRowsProperty->setReadOnly(true);
 	getProperties().createProperty(numberOfRowsProperty,"Table properties");
@@ -37,28 +35,30 @@ void EntityParameterizedDataTable::createProperties(ot::TableHeaderOrientation d
 	filePathProperty->setReadOnly(true);
 	getProperties().createProperty(filePathProperty, "Source file");
 
-	if (defaultOrientation == ot::TableHeaderOrientation::vertical)
+	if (_defaultHeaderMode == ot::TableCfg::TableHeaderMode::Vertical)
 	{
 		_minRow = 0;
 		_minCol = 1;
 	}
 
-	EntityPropertiesSelection::createProperty("Table header", "Header position", { ot::toString(ot::TableHeaderOrientation::horizontal),ot::toString(ot::TableHeaderOrientation::vertical) }, ot::toString(defaultOrientation) , _defaulCategory, getProperties());
+	EntityPropertiesSelection::createProperty("Table header", "Header position", { 
+		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::Horizontal),
+		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::Vertical),
+		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::NoHeader)
+		},
+		ot::TableCfg::toString(_defaultHeaderMode), _defaulCategory, getProperties());
 
 	EntityResultTable<std::string>::createProperties();
 }
 
-std::string EntityParameterizedDataTable::getSelectedHeaderOrientationString()
-{
+std::string EntityParameterizedDataTable::getSelectedHeaderModeString() {
 	auto selectedOrientation = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Header position"));
 	return selectedOrientation->getValue();
 }
 
-ot::TableHeaderOrientation EntityParameterizedDataTable::getSelectedHeaderOrientation()
-{
-	auto selectedOrientation = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Header position"));
-	ot::TableHeaderOrientation orientation = ot::stringToHeaderOrientation(selectedOrientation->getValue());
-	return orientation;
+ot::TableCfg::TableHeaderMode EntityParameterizedDataTable::getSelectedHeaderMode() {
+	ot::TableCfg::TableHeaderMode mode = ot::TableCfg::stringToHeaderMode(this->getSelectedHeaderModeString());
+	return mode;
 }
 
 void EntityParameterizedDataTable::AddStorageData(bsoncxx::builder::basic::document & storage)

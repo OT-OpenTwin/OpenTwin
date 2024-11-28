@@ -111,7 +111,6 @@
     <ClInclude Include="include\OTGui\TableCfg.h" />
     <ClInclude Include="include\OTGui\TableHeaderItemCfg.h" />
     <ClInclude Include="include\OTGui\TableRange.h" />
-    <ClInclude Include="include\OTGui\TableHeaderOrientation.h" />
     <ClInclude Include="include\OTGui\TextEditorCfg.h" />
     <ClInclude Include="include\OTGui\Transform.h" />
     <ClInclude Include="include\OTGui\VersionGraphCfg.h" />
@@ -209,7 +208,6 @@
     <ClCompile Include="src\SyntaxHighlighterRule.cpp" />
     <ClCompile Include="src\TableCfg.cpp" />
     <ClCompile Include="src\TableHeaderItemCfg.cpp" />
-    <ClCompile Include="src\TableHeaderOrientation.cpp" />
     <ClCompile Include="src\TableRange.cpp" />
     <ClCompile Include="src\TextEditorCfg.cpp" />
     <ClCompile Include="src\Transform.cpp" />
