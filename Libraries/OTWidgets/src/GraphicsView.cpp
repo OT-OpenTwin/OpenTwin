@@ -105,7 +105,7 @@ bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionCfg& 
 
 void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	auto it = m_items.find(_item->getGraphicsItemUid());
-	bool removeConnectionBufferApplied = false;
+	bool removeConnectionBufferApplied = !m_itemRemovalConnectionBuffer.empty();
 	if (it != m_items.end()) {
 		OT_LOG_D("Overwriting item with the ID \"" + std::to_string(_item->getGraphicsItemUid()));
 		removeConnectionBufferApplied = true;
