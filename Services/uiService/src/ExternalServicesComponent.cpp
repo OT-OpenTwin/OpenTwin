@@ -3711,7 +3711,10 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(config.getEntityName());
 	if (editor) {
 		editor->setupFromConfig(config, true);
-		editor->setAsCurrentViewTab();
+		
+		if (!(insertFlags & ot::WidgetView::KeepCurrentFocus)) {
+			editor->setAsCurrentViewTab();
+		}
 	}
 	else {
 		editor = AppBase::instance()->findOrCreateTextEditor(config, info, insertFlags);
