@@ -76,7 +76,20 @@ ECHO ===========================================================================
 "%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Debug /p:Platform=x64 >> buildlog_Debug.txt
 
 if %ERRORLEVEL% neq 0 (
-	ECHO --- Build failed: %1 --- >> buildlog_Debug.txt
+	IF "%3"=="BUILD" (
+		ECHO ---------------------------------------------------------------------------------------- >> buildlog_Debug.txt
+		ECHO Re-building project due to build failure: %1 >> buildlog_Debug.txt
+		ECHO ---------------------------------------------------------------------------------------- >> buildlog_Debug.txt
+		"%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" /t:Rebuild %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Debug /p:Platform=x64 >> buildlog_Debug.txt
+		
+		if %ERRORLEVEL% neq 0 (
+			ECHO --- Build failed: %1 --- >> buildlog_Debug.txt
+		) ELSE (
+			ECHO --- Build successful: %1 --- >> buildlog_Debug.txt
+		)
+	) ELSE (
+		ECHO --- Build failed: %1 --- >> buildlog_Debug.txt	
+	)
 ) ELSE (
 	ECHO --- Build successful: %1 --- >> buildlog_Debug.txt
 )
@@ -94,7 +107,20 @@ ECHO ===========================================================================
 "%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Release /p:Platform=x64 >> buildlog_Release.txt
 
 if %ERRORLEVEL% neq 0 (
-	ECHO --- Build failed: %1 --- >> buildlog_Release.txt
+	IF "%3"=="BUILD" (
+		ECHO ---------------------------------------------------------------------------------------- >> buildlog_Release.txt
+		ECHO Re-building project due to build failure: %1 >> buildlog_Release.txt
+		ECHO ---------------------------------------------------------------------------------------- >> buildlog_Release.txt
+		"%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" /t:Rebuild %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Release /p:Platform=x64 >> buildlog_Release.txt
+		
+		if %ERRORLEVEL% neq 0 (
+			ECHO --- Build failed: %1 --- >> buildlog_Release.txt
+		) ELSE (
+			ECHO --- Build successful: %1 --- >> buildlog_Release.txt
+		)
+	) ELSE (
+		ECHO --- Build failed: %1 --- >> buildlog_Release.txt	
+	)
 ) ELSE (
 	ECHO --- Build successful: %1 --- >> buildlog_Release.txt
 )
