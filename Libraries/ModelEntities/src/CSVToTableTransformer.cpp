@@ -1,16 +1,20 @@
 #include "CSVToTableTransformer.h"
 #include "OTCore/String.h"
+#include "OTCore/Logger.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/VariableToStringConverter.h"
 
 ot::GenericDataStructMatrix CSVToTableTransformer::operator()(const std::string& _csvText, const CSVProperties& _properties) {
 	assert(_properties.m_columnDelimiter != "" && _properties.m_rowDelimiter != "");
-	std::vector<std::string> rows = ot::vectorFromList(ot::String::smartSplit(_csvText, _properties.m_rowDelimiter, _properties.m_evaluateEscapeCharacters));
+	std::vector<std::string> rows = ot::vectorFromList(ot::String::smartSplit(_csvText, _properties.m_rowDelimiter, _properties.m_evaluateEscapeCharacters, true));
 
 	std::list<std::vector<std::string>> matrixRaw;
-		
+	int columnSize = -1;
 	for (const std::string& row : rows) {
 		const std::vector<std::string> columns = ot::vectorFromList(ot::String::smartSplit(row, _properties.m_columnDelimiter, _properties.m_evaluateEscapeCharacters));
+		if (columns.size() != columnSize && columnSize >= 0) {
+			OT_LOG_W("Inconsistent column count");
+		}
 		matrixRaw.push_back(columns);
 	}
 
