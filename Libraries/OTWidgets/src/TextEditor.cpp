@@ -17,7 +17,6 @@
 // Qt header
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
-#include <QtGui/qtextdocument.h>
 #include <QtGui/qtextlist.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qshortcut.h>
@@ -100,7 +99,7 @@ void ot::TextEditorLineNumberArea::paintEvent(QPaintEvent * _event) {
 // ###################################################################################################################################
 
 ot::TextEditor::TextEditor(QWidget* _parent)
-	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_contentChanged(false), m_lastSavedUndoStackCount(-1), m_searchPopup(nullptr),
+	: PlainTextEdit(_parent), m_syntaxHighlighter(nullptr), m_searchPopup(nullptr),
 	m_tabSpaces(4), m_newLineSamePrefix(false), m_enableDuplicateLineShortcut(false), m_enableSameTextHighlighting(false),
 	m_sameTextHighlightingMinimum(2)
 {
@@ -127,15 +126,15 @@ ot::TextEditor::TextEditor(QWidget* _parent)
 	this->slotUpdateLineNumberAreaWidth(0);
 	this->slotHighlightCurrentLine();
 
-	connect(this, &TextEditor::blockCountChanged, this, &TextEditor::slotUpdateLineNumberAreaWidth);
-	connect(this, &TextEditor::updateRequest, this, &TextEditor::slotUpdateLineNumberArea);
-	connect(this, &TextEditor::cursorPositionChanged, this, &TextEditor::slotHighlightCurrentLine);
-	connect(this, &TextEditor::textChanged, this, &TextEditor::slotTextChanged);
-	connect(this, &TextEditor::selectionChanged, this, &TextEditor::slotSelectionChanged);
-	connect(saveShortcut, &QShortcut::activated, this, &TextEditor::slotSaveRequested);
-	connect(findShortcut, &QShortcut::activated, this, &TextEditor::slotFindRequested);
-	connect(duplicateShortcut, &QShortcut::activated, this, &TextEditor::slotDuplicateLine);
-	connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &TextEditor::slotCurrentColorStyleChanged);
+	this->connect(this, &TextEditor::blockCountChanged, this, &TextEditor::slotUpdateLineNumberAreaWidth);
+	this->connect(this, &TextEditor::updateRequest, this, &TextEditor::slotUpdateLineNumberArea);
+	this->connect(this, &TextEditor::cursorPositionChanged, this, &TextEditor::slotHighlightCurrentLine);
+	this->connect(this, &TextEditor::selectionChanged, this, &TextEditor::slotSelectionChanged);
+	this->connect(saveShortcut, &QShortcut::activated, this, &TextEditor::slotSaveRequested);
+	this->connect(findShortcut, &QShortcut::activated, this, &TextEditor::slotFindRequested);
+	this->connect(duplicateShortcut, &QShortcut::activated, this, &TextEditor::slotDuplicateLine);
+	this->connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &TextEditor::slotCurrentColorStyleChanged);
+	this->connect(this->document(), &QTextDocument::modificationChanged, this, &TextEditor::slotContentChange);
 }
 
 ot::TextEditor::~TextEditor() {
@@ -211,16 +210,16 @@ void ot::TextEditor::lineNumberAreaPaintEvent(QPaintEvent * _event) {
 	}
 }
 
-void ot::TextEditor::setContentChanged(bool _changed) {
-	if (m_contentChanged == _changed) return;
-	m_contentChanged = _changed;
-	if (m_contentChanged) {
-		this->contentChanged();
-	}
-	else {
-		m_lastSavedUndoStackCount = this->document()->availableUndoSteps();
-		this->contentSaved();
-	}
+void ot::TextEditor::setContentChanged(void) {
+	this->document()->setModified(true);
+}
+
+void ot::TextEditor::setContentSaved(void) {
+	this->document()->setModified(false);
+}
+
+bool ot::TextEditor::getContentChanged(void) const {
+	return this->document()->isModified();
 }
 
 void ot::TextEditor::setCode(const QString& _text) {
@@ -234,7 +233,8 @@ void ot::TextEditor::setCode(const QString& _text) {
 		
 	this->setPlainText(_text);
 	this->document()->clearUndoRedoStacks();
-	m_lastSavedUndoStackCount = 0;
+	
+	this->setContentSaved();
 
 	this->slotUpdateLineNumberAreaWidth(0);
 
@@ -243,7 +243,7 @@ void ot::TextEditor::setCode(const QString& _text) {
 	}
 	this->blockSignals(tmp);
 
-	this->setContentChanged(true);
+	this->setContentChanged();
 }
 
 void ot::TextEditor::setCode(const QStringList& _lines) {
@@ -259,8 +259,9 @@ void ot::TextEditor::setCode(const QStringList& _lines) {
 	this->clear();
 	for (auto l : _lines) this->appendPlainText(l);
 	this->document()->clearUndoRedoStacks();
-	m_lastSavedUndoStackCount = 0;
 
+	this->setContentSaved();
+	
 	this->slotUpdateLineNumberAreaWidth(0);
 
 	if (m_syntaxHighlighter) {
@@ -268,7 +269,7 @@ void ot::TextEditor::setCode(const QStringList& _lines) {
 	}
 	this->blockSignals(tmp);
 
-	this->setContentChanged(true);
+	this->setContentChanged();
 }
 
 QStringList ot::TextEditor::code(void) const {
@@ -385,19 +386,10 @@ void ot::TextEditor::slotUpdateLineNumberArea(const QRect & _rect, int _dy) {
 }
 
 void ot::TextEditor::slotSaveRequested(void) {
-	if (!m_contentChanged) return;
+	if (!this->document()->isModified()) {
+		return;
+	}
 	Q_EMIT saveRequested();
-}
-
-void ot::TextEditor::slotTextChanged(void) {
-	if (m_lastSavedUndoStackCount > this->document()->availableUndoSteps()) {
-		m_lastSavedUndoStackCount = -1;
-		this->setContentChanged(true);
-	}
-	else {
-		this->setContentChanged(m_lastSavedUndoStackCount != this->document()->availableUndoSteps());
-	}
-	
 }
 
 void ot::TextEditor::slotFindRequested(void) {
@@ -438,6 +430,15 @@ void ot::TextEditor::slotCurrentColorStyleChanged(const ot::ColorStyle& _style) 
 void ot::TextEditor::slotSelectionChanged(void) {
 	if (!m_enableSameTextHighlighting) return;
 	this->slotHighlightCurrentLine();
+}
+
+void ot::TextEditor::slotContentChange(bool _changed) {
+	if (_changed) {
+		this->contentChanged();
+	}
+	else {
+		this->contentSaved();
+	}
 }
 
 void ot::TextEditor::getCurrentLineSelection(QList<QTextEdit::ExtraSelection>& _selections) {

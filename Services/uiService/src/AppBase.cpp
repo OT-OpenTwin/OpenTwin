@@ -2033,7 +2033,7 @@ void AppBase::slotTextEditorSaveRequested(void) {
 			}
 			else
 			{
-				editor->setContentChanged(false);
+				editor->setContentSaved();
 				const std::string& name = editor->getViewData().getEntityName();
 				const auto& viewerType =	editor->getViewData().getViewType();
 				ot::UID globalActiveViewModel = -1;

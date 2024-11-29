@@ -305,7 +305,7 @@ bool ColorStyleEditor::slotExportBase(void) {
 
 	settings.get()->setValue("ColorStlyeEditor.LastBaseExport", m_lastBaseFile);
 	m_editorTab->setTabText(0, "Base");
-	m_baseEditor->setContentChanged(false);
+	m_baseEditor->setContentSaved();
 	OT_LOG_I("StyleSheet Base exported to: \"" + m_lastBaseFile.toStdString() + "\"");
 
 	return true;

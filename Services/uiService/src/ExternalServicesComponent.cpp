@@ -3720,7 +3720,7 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 		editor = AppBase::instance()->findOrCreateTextEditor(config, info, insertFlags);
 	}
 
-	editor->setContentChanged(false);
+	editor->setContentSaved();
 	
 	const std::string& name = editor->getViewData().getEntityName();
 	const auto& viewerType = editor->getViewData().getViewType();
@@ -3735,7 +3735,7 @@ std::string ExternalServicesComponent::handleSetTextEditorSaved(ot::JsonDocument
 	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName);
 
 	if (editor) {
-		editor->setContentChanged(false);
+		editor->setContentSaved();
 	}
 
 	return "";
@@ -3746,7 +3746,7 @@ std::string ExternalServicesComponent::handleSetTextEditorModified(ot::JsonDocum
 	ot::TextEditorView* editor = AppBase::instance()->findTextEditor(editorName);
 
 	if (editor) {
-		editor->setContentChanged(true);
+		editor->setContentChanged();
 	}
 
 	return "";

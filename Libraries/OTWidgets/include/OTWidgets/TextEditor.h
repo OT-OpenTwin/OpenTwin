@@ -59,8 +59,9 @@ namespace ot {
 		int lineNumberAreaWidth(void) const;
 		void lineNumberAreaPaintEvent(QPaintEvent * _event);
 
-		void setContentChanged(bool _changed = true);
-		bool getContentChanged(void) const { return m_contentChanged; };
+		void setContentChanged(void);
+		void setContentSaved(void);
+		bool getContentChanged(void) const;
 
 		void setCode(const QString& _text);
 		void setCode(const QStringList& _lines);
@@ -109,12 +110,12 @@ namespace ot {
 		void slotHighlightCurrentLine();
 		void slotUpdateLineNumberArea(const QRect & _rect, int _dy);
 		void slotSaveRequested(void);
-		void slotTextChanged(void);
 		void slotFindRequested(void);
 		void slotFindClosing(void);
 		void slotDuplicateLine(void);
 		void slotCurrentColorStyleChanged(const ot::ColorStyle& _style);
 		void slotSelectionChanged(void);
+		void slotContentChange(bool _changed); 
 
 	private:
 		friend class TextEditorSearchPopup;
@@ -124,9 +125,6 @@ namespace ot {
 
 		TextEditorSearchPopup* m_searchPopup;
 		
-		int m_lastSavedUndoStackCount;
-		bool m_contentChanged;
-
 		int m_tabSpaces;
 		bool m_newLineSamePrefix;
 		bool m_enableDuplicateLineShortcut;
