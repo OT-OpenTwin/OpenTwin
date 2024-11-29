@@ -153,8 +153,8 @@ void EntityFileCSV::setTable(const ot::GenericDataStructMatrix& _table)
 {
 	CSVProperties properties;
 
-	properties.m_rowDelimiter = getRowDelimiter();
-	properties.m_columnDelimiter = getColumnDelimiter();
+	properties.m_rowDelimiter = ot::String::evaluateEscapeCharacters(getRowDelimiter());
+	properties.m_columnDelimiter = ot::String::evaluateEscapeCharacters(getColumnDelimiter());
 	properties.m_decimalDelimiter = getDecimalDelimiter();
 	properties.m_evaluateEscapeCharacters = getEvaluateEscapeCharacter();
 
