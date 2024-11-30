@@ -105,13 +105,13 @@ void EntityFileCSV::setSpecializedProperties() {
 	EntityFileText::setSpecializedProperties();
 	EntityPropertiesString::createProperty("CSV Properties", "Row Delimiter", m_rowDelimiterDefault, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 	EntityPropertiesString::createProperty("CSV Properties", "Column Delimiter", m_columnDelimiterDefault, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
-	EntityPropertiesBoolean::createProperty("CSV Properties", "Evaluate Escape Characters", m_evaluateEscapeCharacterDefault, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
+	EntityPropertiesBoolean::createProperty("CSV Properties", "Evaluate Escape Characters", m_evaluateEscapeCharacterDefault, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties())->setToolTip("If enabled escape characters in the text will be evaluated (e.g. \"\\n\" in the text will result in a new line character)");
 	EntityPropertiesSelection::createProperty("Table header", "Header position", {
 		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::Horizontal),
 		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::Vertical),
 		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::NoHeader)
 		},
-		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::Horizontal), "tableInformation", getProperties());
+		ot::TableCfg::toString(ot::TableCfg::TableHeaderMode::Horizontal), "tableInformation", getProperties())->setToolTip("Indicates how the table header is determined.");
 	std::locale mylocale("");
 	auto defaulDecimalSeparator = std::use_facet<std::numpunct<char>>(mylocale).decimal_point();
 	EntityPropertiesSelection::createProperty("Text Properties", "Decimal point character",
