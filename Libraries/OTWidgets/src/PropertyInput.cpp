@@ -20,17 +20,21 @@ bool ot::PropertyInput::setupFromConfiguration(const Property* _configuration) {
 void ot::PropertyInput::slotValueChanged(void) {
 	m_data.getPropertyFlags() &= (~Property::HasMultipleValues);
 	m_dataChanged = true;
-	Q_EMIT inputValueChanged();
+	QMetaObject::invokeMethod(this, &PropertyInput::slotEmitValueChanged, Qt::QueuedConnection);
 }
 
 void ot::PropertyInput::slotValueChanged(bool) {
 	m_data.getPropertyFlags() &= (~Property::HasMultipleValues);
 	m_dataChanged = true;
-	Q_EMIT inputValueChanged();
+	QMetaObject::invokeMethod(this, &PropertyInput::slotEmitValueChanged, Qt::QueuedConnection);
 }
 
 void ot::PropertyInput::slotValueChanged(int) {
 	m_data.getPropertyFlags() &= (~Property::HasMultipleValues);
 	m_dataChanged = true;
+	QMetaObject::invokeMethod(this, &PropertyInput::slotEmitValueChanged, Qt::QueuedConnection);
+}
+
+void ot::PropertyInput::slotEmitValueChanged(void) {
 	Q_EMIT inputValueChanged();
 }

@@ -71,6 +71,9 @@ namespace ot {
 		//! @brief If called the "inputValueChanged()" signal is emitted and the multiple values flag removed
 		void slotValueChanged(int);
 
+	private Q_SLOTS:
+		void slotEmitValueChanged(void);
+
 	private:
 		std::string m_type;
 		PropertyBase m_data;
