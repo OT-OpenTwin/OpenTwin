@@ -9,7 +9,7 @@
 #include "OTGui/PropertyFilePath.h"
 #include "OTGui/PropertyFactoryRegistrar.h"
 
-static ot::PropertyFactoryRegistrar<ot::PropertyFilePath> propertyFilePathRegistrar(OT_PROPERTY_TYPE_FilePath);
+static ot::PropertyFactoryRegistrar<ot::PropertyFilePath> propertyFilePathRegistrar(ot::PropertyFilePath::propertyTypeString());
 
 ot::PropertyFilePath::PropertyFilePath(const PropertyFilePath* _other) 
 	: Property(_other), m_browseMode(_other->m_browseMode), m_filters(_other->m_filters), m_path(_other->m_path)

@@ -10,7 +10,7 @@
 #include "OTWidgets/PropertyInputString.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
-static ot::PropertyInputFactoryRegistrar<ot::PropertyInputString> propertyInputStringRegistrar(OT_PROPERTY_TYPE_String);
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputString> propertyInputStringRegistrar(ot::PropertyString::propertyTypeString());
 
 ot::PropertyInputString::PropertyInputString(const QString& _text) 
 	: m_text(_text)

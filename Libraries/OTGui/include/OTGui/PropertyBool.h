@@ -8,8 +8,6 @@
 // OpenTwin header
 #include "OTGui/Property.h"
 
-#define OT_PROPERTY_TYPE_Bool "Bool"
-
 namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyBool : public Property {
@@ -22,7 +20,8 @@ namespace ot {
 		PropertyBool(const std::string& _name, bool _value, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyBool() {};
 
-		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Bool; };
+		static std::string propertyTypeString(void) { return "Bool"; };
+		virtual std::string getPropertyType(void) const override { return PropertyBool::propertyTypeString(); };
 
 		virtual Property* createCopy(void) const override;
 

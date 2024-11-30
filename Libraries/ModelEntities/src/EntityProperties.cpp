@@ -242,12 +242,12 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 	for (const ot::Property* p : _groupConfig->getProperties()) {
 		EntityPropertiesBase* newSetting(nullptr);
 
-		if (p->getPropertyType() == OT_PROPERTY_TYPE_Bool) newSetting = new EntityPropertiesBoolean;
-		else if (p->getPropertyType() == OT_PROPERTY_TYPE_Color) newSetting = new EntityPropertiesColor;
-		else if (p->getPropertyType() == OT_PROPERTY_TYPE_Int) newSetting = new EntityPropertiesInteger;
-		else if (p->getPropertyType() == OT_PROPERTY_TYPE_Double) newSetting = new EntityPropertiesDouble;
-		else if (p->getPropertyType() == OT_PROPERTY_TYPE_String) newSetting = new EntityPropertiesString;
-		else if (p->getPropertyType() == OT_PROPERTY_TYPE_StringList) {
+		if (p->getPropertyType() == ot::PropertyBool::propertyTypeString()) newSetting = new EntityPropertiesBoolean;
+		else if (p->getPropertyType() == ot::PropertyColor::propertyTypeString()) newSetting = new EntityPropertiesColor;
+		else if (p->getPropertyType() == ot::PropertyInt::propertyTypeString()) newSetting = new EntityPropertiesInteger;
+		else if (p->getPropertyType() == ot::PropertyDouble::propertyTypeString()) newSetting = new EntityPropertiesDouble;
+		else if (p->getPropertyType() == ot::PropertyString::propertyTypeString()) newSetting = new EntityPropertiesString;
+		else if (p->getPropertyType() == ot::PropertyStringList::propertyTypeString()) {
 			if (p->getSpecialType() == "EntityList") newSetting = new EntityPropertiesEntityList;
 			else if (p->getSpecialType() == "ProjectList") newSetting = new EntityPropertiesProjectList;
 			else if (p->getSpecialType().empty()) newSetting = new EntityPropertiesSelection;
@@ -256,7 +256,7 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 				return;
 			}
 		}
-		else if (p->getPropertyType() == OT_PROPERTY_TYPE_Painter2D) newSetting = new EntityPropertiesGuiPainter;
+		else if (p->getPropertyType() == ot::PropertyPainter2D::propertyTypeString()) newSetting = new EntityPropertiesGuiPainter;
 		else {
 			OT_LOG_E("Unknown type \"" + p->getPropertyType() + "\"");
 			return;

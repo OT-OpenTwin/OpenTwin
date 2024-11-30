@@ -12,7 +12,7 @@
 #include "OTWidgets/PropertyInputDouble.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
-static ot::PropertyInputFactoryRegistrar<ot::PropertyInputDouble> propertyInputDoubleRegistrar(OT_PROPERTY_TYPE_Double);
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputDouble> propertyInputDoubleRegistrar(ot::PropertyDouble::propertyTypeString());
 
 #define OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR "."
 #define OT_PROPERTY_DOUBLE_MULTIPLEVALUESTEXT OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR OT_PROPERTY_DOUBLE_MULTIPLEVALUESCHAR

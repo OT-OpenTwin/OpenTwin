@@ -9,7 +9,7 @@
 #include "OTGui/PropertyBool.h"
 #include "OTGui/PropertyFactoryRegistrar.h"
 
-static ot::PropertyFactoryRegistrar<ot::PropertyBool> propertyBoolRegistrar(OT_PROPERTY_TYPE_Bool);
+static ot::PropertyFactoryRegistrar<ot::PropertyBool> propertyBoolRegistrar(ot::PropertyBool::propertyTypeString());
 
 ot::PropertyBool::PropertyBool(const PropertyBool* _other)
 	: Property(_other), m_value(_other->m_value)

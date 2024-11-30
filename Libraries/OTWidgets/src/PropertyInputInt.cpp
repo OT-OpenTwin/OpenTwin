@@ -12,7 +12,7 @@
 #include "OTWidgets/PropertyInputInt.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
-static ot::PropertyInputFactoryRegistrar<ot::PropertyInputInt> propertyInputIntRegistrar(OT_PROPERTY_TYPE_Int);
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputInt> propertyInputIntRegistrar(ot::PropertyInt::propertyTypeString());
 
 #define OT_PROPERTY_INT_MULTIPLEVALUESCHAR "."
 #define OT_PROPERTY_INT_MULTIPLEVALUESTEXT OT_PROPERTY_INT_MULTIPLEVALUESCHAR OT_PROPERTY_INT_MULTIPLEVALUESCHAR OT_PROPERTY_INT_MULTIPLEVALUESCHAR

@@ -13,7 +13,7 @@
 #include "OTWidgets/PropertyInputPainter2D.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
-static ot::PropertyInputFactoryRegistrar<ot::PropertyInputPainter2D> propertyInputPainter2DRegistrar(OT_PROPERTY_TYPE_Painter2D);
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputPainter2D> propertyInputPainter2DRegistrar(ot::PropertyPainter2D::propertyTypeString());
 
 ot::PropertyInputPainter2D::PropertyInputPainter2D()
 {

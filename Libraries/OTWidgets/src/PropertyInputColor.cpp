@@ -11,7 +11,7 @@
 #include "OTWidgets/PropertyInputColor.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
-static ot::PropertyInputFactoryRegistrar<ot::PropertyInputColor> propertyInputColorRegistrar(OT_PROPERTY_TYPE_Color);
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputColor> propertyInputColorRegistrar(ot::PropertyColor::propertyTypeString());
 
 ot::PropertyInputColor::PropertyInputColor()
 {

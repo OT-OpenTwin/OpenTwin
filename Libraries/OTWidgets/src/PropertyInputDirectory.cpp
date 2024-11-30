@@ -15,7 +15,7 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qfiledialog.h>
 
-static ot::PropertyInputFactoryRegistrar<ot::PropertyInputDirectory> propertyInputDirectoryRegistrar(OT_PROPERTY_TYPE_Directory);
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputDirectory> propertyInputDirectoryRegistrar(ot::PropertyDirectory::propertyTypeString());
 
 ot::PropertyInputDirectory::PropertyInputDirectory()
 {

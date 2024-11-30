@@ -9,7 +9,7 @@
 #include "OTGui/PropertyDirectory.h"
 #include "OTGui/PropertyFactoryRegistrar.h"
 
-static ot::PropertyFactoryRegistrar<ot::PropertyDirectory> propertyDirectoryRegistrar(OT_PROPERTY_TYPE_Directory);
+static ot::PropertyFactoryRegistrar<ot::PropertyDirectory> propertyDirectoryRegistrar(ot::PropertyDirectory::propertyTypeString());
 
 ot::PropertyDirectory::PropertyDirectory(const PropertyDirectory* _other) 
 	: Property(_other), m_path(_other->m_path)

@@ -9,7 +9,7 @@
 #include "OTGui/PropertyStringList.h"
 #include "OTGui/PropertyFactoryRegistrar.h"
 
-static ot::PropertyFactoryRegistrar<ot::PropertyStringList> propertyStringListRegistrar(OT_PROPERTY_TYPE_StringList);
+static ot::PropertyFactoryRegistrar<ot::PropertyStringList> propertyStringListRegistrar(ot::PropertyStringList::propertyTypeString());
 
 ot::PropertyStringList::PropertyStringList(const PropertyStringList* _other) 
 	: Property(_other), m_current(_other->m_current), m_list(_other->m_list)

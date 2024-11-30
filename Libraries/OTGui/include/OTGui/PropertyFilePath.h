@@ -11,8 +11,6 @@
 // std header
 #include <string>
 
-#define OT_PROPERTY_TYPE_FilePath "FilePath"
-
 namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyFilePath : public Property {
@@ -35,7 +33,8 @@ namespace ot {
 		PropertyFilePath(const std::string& _name, const std::string& _path, BrowseMode _mode = ReadFile, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyFilePath() {};
 
-		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_FilePath; };
+		static std::string propertyTypeString(void) { return "FilePath"; };
+		virtual std::string getPropertyType(void) const override { return PropertyFilePath::propertyTypeString(); };
 
 		virtual Property* createCopy(void) const override;
 

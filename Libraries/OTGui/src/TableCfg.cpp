@@ -54,7 +54,7 @@ ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::Tab
 
 	if (rowStarter < m_rows && rowStarter > 0) {
 		matrixPointer.m_row = 0;
-		for (matrixPointer.m_column = 0; matrixPointer.m_column < m_columns; matrixPointer.m_column++) {
+		for (matrixPointer.m_column = 0; (int)matrixPointer.m_column < m_columns; matrixPointer.m_column++) {
 			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);
 			this->setColumnHeader(matrixPointer.m_column, entry);
@@ -62,15 +62,15 @@ ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::Tab
 	}
 	if (columnStarter < m_columns && columnStarter > 0) {
 		matrixPointer.m_column = 0;
-		for (matrixPointer.m_row = 0; matrixPointer.m_row < m_rows; matrixPointer.m_row++) {
+		for (matrixPointer.m_row = 0; (int)matrixPointer.m_row < m_rows; matrixPointer.m_row++) {
 			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);
 			this->setRowHeader(matrixPointer.m_row, entry);
 		}
 	}
 
-	for(matrixPointer.m_column = columnStarter; matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++) {
-		for (matrixPointer.m_row = rowStarter; matrixPointer.m_row < _matrix.getNumberOfRows(); matrixPointer.m_row++) {
+	for(matrixPointer.m_column = columnStarter; (int)matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++) {
+		for (matrixPointer.m_row = rowStarter; (int)matrixPointer.m_row < _matrix.getNumberOfRows(); matrixPointer.m_row++) {
 			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);	
 			this->setCellText(matrixPointer.m_row - rowStarter, matrixPointer.m_column - columnStarter, entry);
@@ -102,20 +102,20 @@ ot::TableCfg& ot::TableCfg::operator = (const TableCfg& _other) {
 	this->initialize();
 
 	// Copy table
-	for (uint32_t r = 0; r < m_rows; r++) {
-		for (uint32_t c = 0; c < m_columns; c++) {
+	for (int r = 0; r < m_rows; r++) {
+		for (int c = 0; c < m_columns; c++) {
 			m_data[r][c] = _other.m_data[r][c];
 		}
 	}
 
 	// Copy header
-	for (uint32_t i = 0; i < m_rows; i++) {
+	for (int i = 0; i < m_rows; i++) {
 		OTAssert(i < m_rowHeader.size(), "Index out of range");
 		if (_other.m_rowHeader[i]) {
 			m_rowHeader[i] = new TableHeaderItemCfg(*_other.m_rowHeader[i]);
 		}
 	}
-	for (uint32_t i = 0; i < m_columns; i++) {
+	for (int i = 0; i < m_columns; i++) {
 		OTAssert(i < m_columnHeader.size(), "Index out of range");
 		if (_other.m_columnHeader[i]) {
 			m_columnHeader[i] = new TableHeaderItemCfg(*_other.m_columnHeader[i]);
@@ -233,46 +233,46 @@ void ot::TableCfg::clear(void) {
 	m_columns = 0;
 }
 
-void ot::TableCfg::setCellText(uint32_t _row, uint32_t _column, const std::string& _text) {
+void ot::TableCfg::setCellText(int _row, int _column, const std::string& _text) {
 	OTAssert(_row < m_rows, "Index out of range");
 	OTAssert(_column < m_columns, "Index out of range");
 	m_data[_row][_column] = _text;
 }
 
-const std::string& ot::TableCfg::getCellText(uint32_t _row, uint32_t _column) const {
+const std::string& ot::TableCfg::getCellText(int _row, int _column) const {
 	OTAssert(_row < m_rows, "Index out of range");
 	OTAssert(_column < m_columns, "Index out of range");
 	return m_data[_row][_column];
 }
 
-void ot::TableCfg::setRowHeader(uint32_t _row, const std::string& _headerText) {
+void ot::TableCfg::setRowHeader(int _row, const std::string& _headerText) {
 	this->setRowHeader(_row, new TableHeaderItemCfg(_headerText));
 }
 
-void ot::TableCfg::setRowHeader(uint32_t _row, TableHeaderItemCfg* _item) {
+void ot::TableCfg::setRowHeader(int _row, TableHeaderItemCfg* _item) {
 	OTAssert(_row < m_rows, "Index out of range");
 	if (m_rowHeader[_row] == _item) return;
 	if (m_rowHeader[_row]) delete m_rowHeader[_row];
 	m_rowHeader[_row] = _item;
 }
 
-const ot::TableHeaderItemCfg* ot::TableCfg::getRowHeader(uint32_t _row) const {
+const ot::TableHeaderItemCfg* ot::TableCfg::getRowHeader(int _row) const {
 	OTAssert(_row < m_rows, "Index out of range");
 	return m_rowHeader[_row];
 }
 
-void ot::TableCfg::setColumnHeader(uint32_t _column, const std::string& _headerText) {
+void ot::TableCfg::setColumnHeader(int _column, const std::string& _headerText) {
 	this->setColumnHeader(_column, new TableHeaderItemCfg(_headerText));
 }
 
-void ot::TableCfg::setColumnHeader(uint32_t _column, TableHeaderItemCfg* _item) {
+void ot::TableCfg::setColumnHeader(int _column, TableHeaderItemCfg* _item) {
 	OTAssert(_column < m_columns, "Index out of range");
 	if (m_columnHeader[_column] == _item) return;
 	if (m_columnHeader[_column]) delete m_columnHeader[_column];
 	m_columnHeader[_column] = _item;
 }
 
-const ot::TableHeaderItemCfg* ot::TableCfg::getColumnHeader(uint32_t _column) const {
+const ot::TableHeaderItemCfg* ot::TableCfg::getColumnHeader(int _column) const {
 	OTAssert(_column < m_columns, "Index out of range");
 	return m_columnHeader[_column];
 }
@@ -281,7 +281,7 @@ void ot::TableCfg::initialize(void) {
 	OTAssert(m_rows >= 0, "Index out of range");
 	OTAssert(m_columns >= 0, "Index out of range");
 
-	for (uint32_t r = 0; r < m_rows; r++) {
+	for (int r = 0; r < m_rows; r++) {
 		m_data.push_back(std::vector<std::string>(m_columns, std::string()));
 	}
 
@@ -289,7 +289,7 @@ void ot::TableCfg::initialize(void) {
 	m_columnHeader = std::move(std::vector<TableHeaderItemCfg*>(m_columns, nullptr));
 }
 
-void ot::TableCfg::initialize(uint32_t _rows, uint32_t _columns)
+void ot::TableCfg::initialize(int _rows, int _columns)
 {
 	m_rows = _rows;
 	m_columns = _columns;

@@ -11,8 +11,6 @@
 // std header
 #include <string>
 
-#define OT_PROPERTY_TYPE_Directory "Directory"
-
 namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyDirectory : public Property {
@@ -25,7 +23,8 @@ namespace ot {
 		PropertyDirectory(const std::string& _name, const std::string& _path, PropertyFlags _flags = PropertyFlags(NoFlags)) : Property(_name, _flags), m_path(_path) {};
 		virtual ~PropertyDirectory() {};
 
-		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Directory; };
+		static std::string propertyTypeString(void) { return "Directory"; };
+		virtual std::string getPropertyType(void) const override { return PropertyDirectory::propertyTypeString(); };
 
 		virtual Property* createCopy(void) const override;
 

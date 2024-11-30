@@ -9,7 +9,7 @@
 #include "OTGui/PropertyString.h"
 #include "OTGui/PropertyFactoryRegistrar.h"
 
-static ot::PropertyFactoryRegistrar<ot::PropertyString> propertyStringRegistrar(OT_PROPERTY_TYPE_String);
+static ot::PropertyFactoryRegistrar<ot::PropertyString> propertyStringRegistrar(ot::PropertyString::propertyTypeString());
 
 ot::PropertyString::PropertyString(const PropertyString* _other) 
 	: Property(_other), m_value(_other->m_value), m_placeholderText(_other->m_placeholderText), m_maxLength(_other->m_maxLength)

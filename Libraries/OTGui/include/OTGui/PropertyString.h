@@ -11,8 +11,6 @@
 // std header
 #include <string>
 
-#define OT_PROPERTY_TYPE_String "String"
-
 namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyString : public Property {
@@ -25,7 +23,8 @@ namespace ot {
 		PropertyString(const std::string& _name, const std::string& _value, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyString() {};
 
-		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_String; };
+		static std::string propertyTypeString(void) { return "String"; };
+		virtual std::string getPropertyType(void) const override { return PropertyString::propertyTypeString(); };
 
 		virtual Property* createCopy(void) const override;
 

@@ -9,7 +9,7 @@
 #include "OTGui/PropertyColor.h"
 #include "OTGui/PropertyFactoryRegistrar.h"
 
-static ot::PropertyFactoryRegistrar<ot::PropertyColor> propertyColorRegistrar(OT_PROPERTY_TYPE_Color);
+static ot::PropertyFactoryRegistrar<ot::PropertyColor> propertyColorRegistrar(ot::PropertyColor::propertyTypeString());
 
 ot::PropertyColor::PropertyColor(const PropertyColor* _other) 
 	: Property(_other), m_value(_other->m_value)

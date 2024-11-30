@@ -561,7 +561,7 @@ ot::Property* ExternalServicesComponent::createCleanedProperty(const ot::Propert
 	}
 
 	// For the EntityList property we remove the value id since we dont know the id of the entity
-	if (propertyList.front()->getPropertyType() == OT_PROPERTY_TYPE_StringList && propertyList.front()->getSpecialType() == "EntityList") {
+	if (propertyList.front()->getPropertyType() == ot::PropertyStringList::propertyTypeString() && propertyList.front()->getSpecialType() == "EntityList") {
 		ot::JsonDocument dataDoc;
 		ot::JsonDocument newDataDoc;
 		dataDoc.fromJson(propertyList.front()->getAdditionalPropertyData("EntityData"));

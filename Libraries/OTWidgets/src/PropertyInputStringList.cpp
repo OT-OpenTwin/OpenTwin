@@ -14,7 +14,7 @@
 #include <QtWidgets/qmenu.h>
 #include <QtWidgets/qaction.h>
 
-static ot::PropertyInputFactoryRegistrar<ot::PropertyInputStringList> propertyInputStringListRegistrar(OT_PROPERTY_TYPE_StringList);
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputStringList> propertyInputStringListRegistrar(ot::PropertyStringList::propertyTypeString());
 
 ot::PropertyInputStringList::PropertyInputStringList()
 {

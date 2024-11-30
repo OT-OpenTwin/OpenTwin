@@ -51,23 +51,23 @@ namespace ot {
 		int getRowCount(void) const { return m_rows; };
 		int getColumnCount(void) const { return m_columns; };
 
-		void setCellText(uint32_t _row, uint32_t _column, const std::string& _text);
-		const std::string& getCellText(uint32_t _row, uint32_t _column) const;
+		void setCellText(int _row, int _column, const std::string& _text);
+		const std::string& getCellText(int _row, int _column) const;
 		
-		void setRowHeader(uint32_t _row, const std::string& _headerText);
-		void setRowHeader(uint32_t _row, TableHeaderItemCfg* _item);
-		const TableHeaderItemCfg* getRowHeader(uint32_t _row) const;
+		void setRowHeader(int _row, const std::string& _headerText);
+		void setRowHeader(int _row, TableHeaderItemCfg* _item);
+		const TableHeaderItemCfg* getRowHeader(int _row) const;
 
-		void setColumnHeader(uint32_t _column, const std::string& _headerText);
-		void setColumnHeader(uint32_t _column, TableHeaderItemCfg* _item);
-		const TableHeaderItemCfg* getColumnHeader(uint32_t _column) const;
+		void setColumnHeader(int _column, const std::string& _headerText);
+		void setColumnHeader(int _column, TableHeaderItemCfg* _item);
+		const TableHeaderItemCfg* getColumnHeader(int _column) const;
 
 	private:
 		void initialize(void);
-		void initialize(uint32_t _rows, uint32_t _columns);
+		void initialize(int _rows, int _columns);
 
-		uint32_t m_rows;
-		uint32_t m_columns;
+		int m_rows;
+		int m_columns;
 
 		std::vector<TableHeaderItemCfg*> m_rowHeader;
 		std::vector<TableHeaderItemCfg*> m_columnHeader;

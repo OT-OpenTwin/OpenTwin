@@ -9,7 +9,7 @@
 #include "OTGui/PropertyInt.h"
 #include "OTGui/PropertyFactoryRegistrar.h"
 
-static ot::PropertyFactoryRegistrar<ot::PropertyInt> propertyIntRegistrar(OT_PROPERTY_TYPE_Int);
+static ot::PropertyFactoryRegistrar<ot::PropertyInt> propertyIntRegistrar(ot::PropertyInt::propertyTypeString());
 
 ot::PropertyInt::PropertyInt(const PropertyInt* _other) 
 	: Property(_other), m_min(_other->m_min), m_max(_other->m_max), m_value(_other->m_value)

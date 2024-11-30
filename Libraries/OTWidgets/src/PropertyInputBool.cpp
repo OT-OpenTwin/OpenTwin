@@ -10,7 +10,7 @@
 #include "OTWidgets/PropertyInputBool.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
-static ot::PropertyInputFactoryRegistrar<ot::PropertyInputBool> propertyInputBoolRegistrar(OT_PROPERTY_TYPE_Bool);
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputBool> propertyInputBoolRegistrar(ot::PropertyBool::propertyTypeString());
 
 ot::PropertyInputBool::PropertyInputBool()
 {

@@ -15,7 +15,7 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qfiledialog.h>
 
-static ot::PropertyInputFactoryRegistrar<ot::PropertyInputFilePath> propertyInputFilePathRegistrar(OT_PROPERTY_TYPE_FilePath);
+static ot::PropertyInputFactoryRegistrar<ot::PropertyInputFilePath> propertyInputFilePathRegistrar(ot::PropertyFilePath::propertyTypeString());
 
 ot::PropertyInputFilePath::PropertyInputFilePath()
 	: m_mode(PropertyFilePath::ReadFile)

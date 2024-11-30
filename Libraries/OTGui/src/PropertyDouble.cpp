@@ -9,7 +9,7 @@
 #include "OTGui/PropertyDouble.h"
 #include "OTGui/PropertyFactoryRegistrar.h"
 
-static ot::PropertyFactoryRegistrar<ot::PropertyDouble> propertyDoubleRegistrar(OT_PROPERTY_TYPE_Double);
+static ot::PropertyFactoryRegistrar<ot::PropertyDouble> propertyDoubleRegistrar(ot::PropertyDouble::propertyTypeString());
 
 ot::PropertyDouble::PropertyDouble(const PropertyDouble* _other) 
 	: Property(_other), m_value(_other->m_value), m_min(_other->m_min), m_max(_other->m_max), m_precision(_other->m_precision)

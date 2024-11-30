@@ -8,8 +8,6 @@
 // OpenTwin header
 #include "OTGui/Property.h"
 
-#define OT_PROPERTY_TYPE_Double "Double"
-
 namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyDouble : public Property {
@@ -23,7 +21,8 @@ namespace ot {
 		PropertyDouble(const std::string& _name, double _value, double _min, double _max, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyDouble() {};
 
-		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Double; };
+		static std::string propertyTypeString(void) { return "Double"; };
+		virtual std::string getPropertyType(void) const override { return PropertyDouble::propertyTypeString(); };
 
 		virtual Property* createCopy(void) const override;
 

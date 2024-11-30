@@ -8,8 +8,6 @@
 // OpenTwin header
 #include "OTGui/Property.h"
 
-#define OT_PROPERTY_TYPE_Int "Int"
-
 namespace ot {
 
 	class OT_GUI_API_EXPORT PropertyInt : public Property {
@@ -23,7 +21,8 @@ namespace ot {
 		PropertyInt(const std::string& _name, int _value, int _min, int _max, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyInt() {};
 
-		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Int; };
+		static std::string propertyTypeString(void) { return "Int"; };
+		virtual std::string getPropertyType(void) const override { return PropertyInt::propertyTypeString(); };
 
 		virtual Property* createCopy(void) const override;
 

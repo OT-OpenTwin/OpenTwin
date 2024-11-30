@@ -12,7 +12,7 @@
 #include "OTGui/Painter2DFactory.h"
 #include "OTGui/PropertyPainter2D.h"
 
-static ot::PropertyFactoryRegistrar<ot::PropertyPainter2D> propertyPainter2DRegistrar(OT_PROPERTY_TYPE_Painter2D);
+static ot::PropertyFactoryRegistrar<ot::PropertyPainter2D> propertyPainter2DRegistrar(ot::PropertyPainter2D::propertyTypeString());
 
 ot::PropertyPainter2D::PropertyPainter2D(const PropertyPainter2D* _other)
 	: Property(_other), m_painter(nullptr)

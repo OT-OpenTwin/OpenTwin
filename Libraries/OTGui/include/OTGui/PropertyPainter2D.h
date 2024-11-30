@@ -9,8 +9,6 @@
 #include "OTGui/Property.h"
 #include "OTGui/OTGuiAPIExport.h"
 
-#define OT_PROPERTY_TYPE_Painter2D "Painter2D"
-
 namespace ot {
 
 	class Painter2D;
@@ -42,7 +40,8 @@ namespace ot {
 		PropertyPainter2D(const std::string& _name, const Painter2D* _painter, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyPainter2D();
 
-		virtual std::string getPropertyType(void) const override { return OT_PROPERTY_TYPE_Painter2D; };
+		static std::string propertyTypeString(void) { return "Painter2D"; };
+		virtual std::string getPropertyType(void) const override { return PropertyPainter2D::propertyTypeString(); };
 
 		virtual Property* createCopy(void) const override;
 
