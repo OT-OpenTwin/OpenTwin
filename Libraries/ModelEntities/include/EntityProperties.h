@@ -15,7 +15,7 @@ namespace ot { class PropertyGroup; };
 class __declspec(dllexport) EntityProperties
 {
 public:
-	EntityProperties() : needsUpdate(false) {};
+	EntityProperties() : m_needsUpdate(false) {};
 	EntityProperties(const EntityProperties &other);
 	virtual ~EntityProperties();
 
@@ -29,8 +29,8 @@ public:
 
 	EntityPropertiesBase *getProperty(const std::string &_name, const std::string& _groupName = "");
 
-	void setNeedsUpdate(void) { needsUpdate = true; };
-	bool anyPropertyNeedsUpdate(void) {return needsUpdate; };
+	void setNeedsUpdate(void) { m_needsUpdate = true; };
+	bool anyPropertyNeedsUpdate(void) const { return m_needsUpdate; };
 	void checkWhetherUpdateNecessary(void);
 	void forceResetUpdateForAllProperties();
 
@@ -52,17 +52,18 @@ public:
 	std::list<EntityPropertiesBase*> getListOfAllProperties(void);
 	std::list<EntityPropertiesBase *> getListOfPropertiesWhichNeedUpdate(void);
 	std::list<EntityPropertiesDouble *> getListOfNumericalProperties(void);
-	size_t getNumberOfProperties(void) { return properties.size(); }
+	size_t getNumberOfProperties(void) const { return m_properties.size(); }
 
-	std::list<std::string> getListOfPropertiesForGroup(const std::string &group);
+	std::list<std::string> getListOfPropertiesForGroup(const std::string &group) const;
 
-	static const std::string createKey(const std::string& _name, const std::string& _group);
-	const bool isKey(const std::string _accesser);
-	const std::string extractNameFromKey(const std::string& _key);
+	static std::string createKey(const std::string& _name, const std::string& _group);
+	bool isKey(const std::string _accesser) const;
+	std::string extractNameFromKey(const std::string& _key) const;
+
 private:
 	void deleteAllProperties(void);
 
-	bool needsUpdate;
-	std::map<std::string, EntityPropertiesBase *> properties;
-	std::list<EntityPropertiesBase *> propertiesList; // The storage in the list is redundant, but allows to keep the order of the properties
+	bool m_needsUpdate;
+	std::map<std::string, EntityPropertiesBase *> m_properties;
+	std::list<EntityPropertiesBase *> m_propertiesList; // The storage in the list is redundant, but allows to keep the order of the properties
 };

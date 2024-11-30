@@ -29,10 +29,10 @@ public:
 	void setContainer(EntityProperties *c) { m_container = c; };
 
 	void setName(const std::string& _name) { m_name = _name; };
-	const std::string &getName(void) { return m_name; };
+	const std::string& getName(void) const { return m_name; };
 
 	void setGroup(const std::string& _group) { m_group = _group; };
-	const std::string &getGroup(void) { return m_group; };
+	const std::string& getGroup(void) const { return m_group; };
 
 	enum eType { DOUBLE, INTEGER, BOOLEAN, STRING, SELECTION, COLOR, ENTITYLIST, PROJECTLIST, GUIPAINTER };
 	virtual eType getType(void) = 0;
@@ -192,21 +192,21 @@ private:
 class __declspec(dllexport) EntityPropertiesBoolean : public EntityPropertiesBase
 {
 public:
-	EntityPropertiesBoolean() : value(false) {};
+	EntityPropertiesBoolean() : m_value(false) {};
 	virtual ~EntityPropertiesBoolean() {};
 
-	EntityPropertiesBoolean(const std::string &n, bool v) : value(v) { setName(n); };
+	EntityPropertiesBoolean(const std::string &n, bool v) : m_value(v) { setName(n); };
 
-	EntityPropertiesBoolean(const EntityPropertiesBoolean &other) : EntityPropertiesBase(other) { value = other.value; };
+	EntityPropertiesBoolean(const EntityPropertiesBoolean &other) : EntityPropertiesBase(other) { m_value = other.m_value; };
 
 	virtual EntityPropertiesBase *createCopy(void) override { return new EntityPropertiesBoolean(*this); };
 
-	EntityPropertiesBoolean& operator=(const EntityPropertiesBoolean &other) { if (&other != this) { EntityPropertiesBase::operator=(other); value = other.getValue(); }; return *this; };
+	EntityPropertiesBoolean& operator=(const EntityPropertiesBoolean &other) { if (&other != this) { EntityPropertiesBase::operator=(other); m_value = other.getValue(); }; return *this; };
 
 	virtual eType getType(void) override { return BOOLEAN; };
 
-	void setValue(bool b) { if (value != b) setNeedsUpdate(); value = b; };
-	bool getValue(void) const { return value; };
+	void setValue(bool b) { if (m_value != b) setNeedsUpdate(); m_value = b; };
+	bool getValue(void) const { return m_value; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
@@ -221,7 +221,7 @@ public:
 	static EntityPropertiesBoolean* createProperty(const std::string &group, const std::string &name, bool defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 
 private:
-	bool value;
+	bool m_value;
 };
 
 // ################################################################################################################################################################
@@ -232,18 +232,18 @@ public:
 	EntityPropertiesString() {};
 	virtual ~EntityPropertiesString() {};
 
-	EntityPropertiesString(const std::string &n, const std::string &v) : value(v) { setName(n); };
+	EntityPropertiesString(const std::string &n, const std::string &v) : m_value(v) { setName(n); };
 
-	EntityPropertiesString(const EntityPropertiesString &other) : EntityPropertiesBase(other) { value = other.value; };
+	EntityPropertiesString(const EntityPropertiesString &other) : EntityPropertiesBase(other) { m_value = other.m_value; };
 
 	virtual EntityPropertiesBase *createCopy(void) override { return new EntityPropertiesString(*this); };
 
-	EntityPropertiesString& operator=(const EntityPropertiesString &other) { if (&other != this) { EntityPropertiesBase::operator=(other); value =other.getValue(); }; return *this; };
+	EntityPropertiesString& operator=(const EntityPropertiesString &other) { if (&other != this) { EntityPropertiesBase::operator=(other); m_value =other.getValue(); }; return *this; };
 
 	virtual eType getType(void) override { return STRING; };
 
-	void setValue(const std::string &s) { if (value != s) setNeedsUpdate(); value = s; };
-	const std::string& getValue(void) const { return value; };
+	void setValue(const std::string &s) { if (m_value != s) setNeedsUpdate(); m_value = s; };
+	const std::string& getValue(void) const { return m_value; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
@@ -258,7 +258,7 @@ public:
 	static EntityPropertiesString* createProperty(const std::string &group, const std::string &name, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 
 private:
-	std::string value;
+	std::string m_value;
 };
 
 // ################################################################################################################################################################
@@ -269,23 +269,23 @@ public:
 	EntityPropertiesSelection() {};
 	virtual ~EntityPropertiesSelection() {};
 
-	EntityPropertiesSelection(const EntityPropertiesSelection &other) : EntityPropertiesBase(other) { options = other.options; value = other.value; };
+	EntityPropertiesSelection(const EntityPropertiesSelection &other) : EntityPropertiesBase(other) { m_options = other.m_options; m_value = other.m_value; };
 
 	virtual EntityPropertiesBase *createCopy(void) override { return new EntityPropertiesSelection(*this); };
 
-	EntityPropertiesSelection& operator=(const EntityPropertiesSelection &other) { if (&other != this) { assert(checkCompatibilityOfSettings(other)); EntityPropertiesBase::operator=(other); value = other.getValue(); }; return *this; };
+	EntityPropertiesSelection& operator=(const EntityPropertiesSelection &other) { if (&other != this) { assert(checkCompatibilityOfSettings(other)); EntityPropertiesBase::operator=(other); m_value = other.getValue(); }; return *this; };
 
 	virtual eType getType(void) override { return SELECTION; };
 
 	virtual bool isCompatible(EntityPropertiesBase *other) override;
 
 	bool setValue(const std::string &s);
-	const std::string& getValue(void)const { return value; };
+	const std::string& getValue(void)const { return m_value; };
 
-	void clearOptions() { options.clear(); };
-	void addOption(const std::string &option) { assert(std::find(options.begin(), options.end(), option) == options.end());  options.push_back(option); }
+	void clearOptions() { m_options.clear(); };
+	void addOption(const std::string &option) { assert(std::find(m_options.begin(), m_options.end(), option) == m_options.end());  m_options.push_back(option); }
 	void resetOptions(std::list<std::string>& _options);
-	const std::vector<std::string> &getOptions(void) { return options; };
+	const std::vector<std::string> &getOptions(void) { return m_options; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
@@ -303,8 +303,8 @@ public:
 private:
 	bool checkCompatibilityOfSettings(const EntityPropertiesSelection &other);
 
-	std::vector<std::string> options;
-	std::string value;
+	std::vector<std::string> m_options;
+	std::string m_value;
 };
 
 // ################################################################################################################################################################
@@ -312,11 +312,11 @@ private:
 class __declspec(dllexport) EntityPropertiesColor : public EntityPropertiesBase
 {
 public:
-	EntityPropertiesColor() : color{ 0.0, 0.0, 0.0 } {};
+	EntityPropertiesColor() : m_color{ 0.0, 0.0, 0.0 } {};
 
-	EntityPropertiesColor(const EntityPropertiesColor &other) : EntityPropertiesBase(other) { color[0] = other.getColorR(); color[1] = other.getColorG(); color[2] = other.getColorB(); };
+	EntityPropertiesColor(const EntityPropertiesColor &other) : EntityPropertiesBase(other) { m_color[0] = other.getColorR(); m_color[1] = other.getColorG(); m_color[2] = other.getColorB(); };
 
-	EntityPropertiesColor(const std::string &n, double r, double g, double b) : color{ r, g, b } { setName(n); };
+	EntityPropertiesColor(const std::string &n, double r, double g, double b) : m_color{ r, g, b } { setName(n); };
 	virtual ~EntityPropertiesColor() {};
 
 	virtual EntityPropertiesBase *createCopy(void) override { return new EntityPropertiesColor(*this); };
@@ -325,15 +325,15 @@ public:
 
 	virtual eType getType(void) override { return COLOR; };
 
-	void setColorR(double c) { if (color[0] != c) setNeedsUpdate(); color[0] = c; };
-	void setColorG(double c) { if (color[1] != c) setNeedsUpdate(); color[1] = c; };
-	void setColorB(double c) { if (color[2] != c) setNeedsUpdate(); color[2] = c; };
+	void setColorR(double c) { if (m_color[0] != c) setNeedsUpdate(); m_color[0] = c; };
+	void setColorG(double c) { if (m_color[1] != c) setNeedsUpdate(); m_color[1] = c; };
+	void setColorB(double c) { if (m_color[2] != c) setNeedsUpdate(); m_color[2] = c; };
 
-	void setColorRGB(double r, double g, double b) { if (color[0] != r || color[1] != g || color[2] != b) setNeedsUpdate(); color[0] = r; color[1] = g; color[2] = b; };
+	void setColorRGB(double r, double g, double b) { if (m_color[0] != r || m_color[1] != g || m_color[2] != b) setNeedsUpdate(); m_color[0] = r; m_color[1] = g; m_color[2] = b; };
 
-	double getColorR(void) const { return color[0]; };
-	double getColorG(void) const { return color[1]; };
-	double getColorB(void) const { return color[2]; };
+	double getColorR(void) const { return m_color[0]; };
+	double getColorG(void) const { return m_color[1]; };
+	double getColorB(void) const { return m_color[2]; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) override;
 
@@ -348,7 +348,7 @@ public:
 	static EntityPropertiesColor* createProperty(const std::string &group, const std::string &name, std::vector<int> defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 
 private:
-	double color[3];
+	double m_color[3];
 };
 
 // ################################################################################################################################################################
@@ -356,10 +356,10 @@ private:
 class __declspec(dllexport) EntityPropertiesEntityList : public EntityPropertiesBase
 {
 public:
-	EntityPropertiesEntityList() : entityContainerID(0), valueID(0) {};
+	EntityPropertiesEntityList() : m_entityContainerID(0), m_valueID(0) {};
 
-	EntityPropertiesEntityList(const EntityPropertiesEntityList &other) : EntityPropertiesBase(other) { entityContainerName = other.getEntityContainerName(); entityContainerID = other.getEntityContainerID(); valueName = other.getValueName(); valueID = other.getValueID(); };
-	EntityPropertiesEntityList(const std::string &n, const std::string &contName, ot::UID contID, const std::string &valName, ot::UID valID) : entityContainerName(contName), entityContainerID(contID), valueName(valName), valueID(valID) { setName(n); };
+	EntityPropertiesEntityList(const EntityPropertiesEntityList &other) : EntityPropertiesBase(other) { m_entityContainerName = other.getEntityContainerName(); m_entityContainerID = other.getEntityContainerID(); m_valueName = other.getValueName(); m_valueID = other.getValueID(); };
+	EntityPropertiesEntityList(const std::string &n, const std::string &contName, ot::UID contID, const std::string &valName, ot::UID valID) : m_entityContainerName(contName), m_entityContainerID(contID), m_valueName(valName), m_valueID(valID) { setName(n); };
 
 	virtual ~EntityPropertiesEntityList() {};
 
@@ -379,17 +379,17 @@ public:
 
 	virtual void copySettings(EntityPropertiesBase *other, EntityBase *root);
 
-	void setEntityContainerName(const std::string &containerName) { if (entityContainerName != containerName) setNeedsUpdate(); entityContainerName = containerName; };
-	void setEntityContainerID(ot::UID containerID) { if (entityContainerID != containerID) setNeedsUpdate(); entityContainerID = containerID; };
+	void setEntityContainerName(const std::string &containerName) { if (m_entityContainerName != containerName) setNeedsUpdate(); m_entityContainerName = containerName; };
+	void setEntityContainerID(ot::UID containerID) { if (m_entityContainerID != containerID) setNeedsUpdate(); m_entityContainerID = containerID; };
 
-	void setValueName(const std::string &vname) { if (valueName != vname) setNeedsUpdate(); valueName = vname; };
-	void setValueID(ot::UID vid) { if (valueID != vid) setNeedsUpdate(); valueID = vid; };
+	void setValueName(const std::string &vname) { if (m_valueName != vname) setNeedsUpdate(); m_valueName = vname; };
+	void setValueID(ot::UID vid) { if (m_valueID != vid) setNeedsUpdate(); m_valueID = vid; };
 
-	std::string getEntityContainerName(void) const { return entityContainerName; };
-	ot::UID getEntityContainerID(void) const { return entityContainerID; };
+	std::string getEntityContainerName(void) const { return m_entityContainerName; };
+	ot::UID getEntityContainerID(void) const { return m_entityContainerID; };
 
-	std::string getValueName(void) const { return valueName; };
-	ot::UID getValueID(void) const { return valueID; };
+	std::string getValueName(void) const { return m_valueName; };
+	ot::UID getValueID(void) const { return m_valueID; };
 
 	static EntityPropertiesEntityList* createProperty(const std::string &group, const std::string &name, const std::string &contName, ot::UID contID, const std::string &valName, ot::UID valID, const std::string &defaultCategory, EntityProperties &properties);
 
@@ -405,11 +405,11 @@ private:
 	EntityBase *findEntityFromName(EntityBase *root, const std::string &entityName);
 	EntityBase *findEntityFromID(EntityBase *root, ot::UID entityID);
 
-	std::string entityContainerName;
-	ot::UID entityContainerID;
+	std::string m_entityContainerName;
+	ot::UID m_entityContainerID;
 
-	std::string valueName;
-	ot::UID valueID;
+	std::string m_valueName;
+	ot::UID m_valueID;
 };
 
 // ################################################################################################################################################################
@@ -431,10 +431,10 @@ public:
 	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) override;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) override;
 
-	void setValue(std::string& value) { _value = value; }
-	std::string getValue() const {return _value;}
+	void setValue(std::string& value) { m_value = value; }
+	std::string getValue() const {return m_value;}
 private:
-	std::string _value;
+	std::string m_value;
 };
 
 // ################################################################################################################################################################

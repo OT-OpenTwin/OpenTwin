@@ -8,8 +8,7 @@
 
 class EntityAnnotationData;
 
-class __declspec(dllexport) EntityAnnotation : public EntityBase
-{
+class __declspec(dllexport) EntityAnnotation : public EntityBase {
 public:
 	EntityAnnotation(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
 	virtual ~EntityAnnotation();

@@ -22,31 +22,31 @@ EntityProperties::~EntityProperties()
 
 void EntityProperties::merge(EntityProperties& other)
 {
-	for (auto prop : other.propertiesList)
+	for (auto prop : other.m_propertiesList)
 	{
 		EntityPropertiesBase* property = getProperty(prop->getName(), prop->getGroup());
 		if (property == nullptr)
 		{
 			const std::string key = createKey(prop->getName(), prop->getGroup());
-			properties[key] = prop;
-			propertiesList.push_back(prop);
+			m_properties[key] = prop;
+			m_propertiesList.push_back(prop);
 		}
 	}
-	other.properties.clear();
-	other.propertiesList.clear();
+	other.m_properties.clear();
+	other.m_propertiesList.clear();
 }
 
 void EntityProperties::deleteAllProperties(void)
 {
 	// Delete all properties
-	for (std::map<std::string, EntityPropertiesBase *>::iterator it = properties.begin(); it != properties.end(); it++)
+	for (std::map<std::string, EntityPropertiesBase *>::iterator it = m_properties.begin(); it != m_properties.end(); it++)
 	{
 		delete it->second;
 	}
 
 	// Now erase the map and the list
-	properties.clear();
-	propertiesList.clear();
+	m_properties.clear();
+	m_propertiesList.clear();
 }
 
 bool EntityProperties::createProperty(EntityPropertiesBase *prop, const std::string &group, bool addToFront)
@@ -58,15 +58,15 @@ bool EntityProperties::createProperty(EntityPropertiesBase *prop, const std::str
 	prop->setGroup(group);
 	prop->setContainer(this);
 	const std::string key = createKey(prop->getName(), group);
-	properties[key] = prop;
+	m_properties[key] = prop;
 
 	if (addToFront)
 	{
-		propertiesList.push_front(prop);
+		m_propertiesList.push_front(prop);
 	}
 	else
 	{
-		propertiesList.push_back(prop);
+		m_propertiesList.push_back(prop);
 	}
 
 	return true;
@@ -78,9 +78,9 @@ bool EntityProperties::updateProperty(EntityPropertiesBase* prop, const std::str
 
 	if (property != nullptr)
 	{
-		propertiesList.remove(property);
+		m_propertiesList.remove(property);
 		const std::string key = createKey(prop->getName(), group);
-		properties.erase(key);
+		m_properties.erase(key);
 		delete property;
 		property = nullptr;
 	}
@@ -89,9 +89,9 @@ bool EntityProperties::updateProperty(EntityPropertiesBase* prop, const std::str
 	prop->setContainer(this);
 
 	const std::string key = createKey(prop->getName(), group);
-	properties[key] = prop;
+	m_properties[key] = prop;
 
-	propertiesList.push_back(prop);
+	m_propertiesList.push_back(prop);
 
 	return true;
 }
@@ -103,8 +103,8 @@ bool EntityProperties::deleteProperty(const std::string &_name, const std::strin
 	if (property == nullptr) return false; // Delete failed, because item does not exist
 
 	const std::string key = createKey(_name, _groupName);
-	properties.erase(key);
-	propertiesList.remove(property);
+	m_properties.erase(key);
+	m_propertiesList.remove(property);
 
 	delete property;
 	property = nullptr;
@@ -119,8 +119,8 @@ EntityPropertiesBase *EntityProperties::getProperty(const std::string& _name, co
 		const bool accesserIsAKey = isKey(_name);
 		if(accesserIsAKey)
 		{
-			auto property = properties.find(_name);
-			if (property == properties.end())
+			auto property = m_properties.find(_name);
+			if (property == m_properties.end())
 			{
 				return nullptr;
 			}
@@ -132,13 +132,13 @@ EntityPropertiesBase *EntityProperties::getProperty(const std::string& _name, co
 		else
 		{
 			//Find first of name
-			for (auto property : properties)
+			for (auto property : m_properties)
 			{
 				const std::string& keyOfCurrentProperty = property.first;
 				const std::string name = extractNameFromKey(keyOfCurrentProperty);
 				if (name == _name)
 				{
-					return properties[keyOfCurrentProperty];
+					return m_properties[keyOfCurrentProperty];
 				}
 			}
 		}
@@ -148,13 +148,11 @@ EntityPropertiesBase *EntityProperties::getProperty(const std::string& _name, co
 	else
 	{
 		const std::string key =	createKey(_name, _groupName);
-		if (properties.count(key) == 0)
-		{
+		if (m_properties.count(key) == 0) {
 			return nullptr;
 		}
-		else
-		{
-			return properties[key];
+		else {
+			return m_properties[key];
 		}
 	}
 }
@@ -167,29 +165,29 @@ bool EntityProperties::propertyExists(const std::string &_name, const std::strin
 
 void EntityProperties::checkWhetherUpdateNecessary(void)
 {
-	needsUpdate = false;
+	m_needsUpdate = false;
 
-	for (std::map<std::string, EntityPropertiesBase *>::iterator it = properties.begin(); it != properties.end(); it++)
+	for (std::map<std::string, EntityPropertiesBase *>::iterator it = m_properties.begin(); it != m_properties.end(); it++)
 	{
-		if (it->second->needsUpdate()) needsUpdate = true;
+		if (it->second->needsUpdate()) m_needsUpdate = true;
 	}
 }
 
 void EntityProperties::forceResetUpdateForAllProperties(void)
 {
-	for (std::map<std::string, EntityPropertiesBase *>::iterator it = properties.begin(); it != properties.end(); it++)
+	for (std::map<std::string, EntityPropertiesBase *>::iterator it = m_properties.begin(); it != m_properties.end(); it++)
 	{
 		it->second->resetNeedsUpdate();
 	}
 
-	needsUpdate = false;
+	m_needsUpdate = false;
 }
 
 EntityProperties::EntityProperties(const EntityProperties& other)
 {
-	needsUpdate = other.needsUpdate;
+	m_needsUpdate = other.m_needsUpdate;
 
-	for (auto prop : other.propertiesList)
+	for (auto prop : other.m_propertiesList)
 	{
 		// Add the current property
 		EntityPropertiesBase* newProp = prop->createCopy();
@@ -202,9 +200,9 @@ EntityProperties& EntityProperties::operator=(const EntityProperties &other)
 {
 	deleteAllProperties();
 
-	needsUpdate = other.needsUpdate;
+	m_needsUpdate = other.m_needsUpdate;
 
-	for (auto prop : other.propertiesList)
+	for (auto prop : other.m_propertiesList)
 	{
 		// Add the current property
 		EntityPropertiesBase *newProp =prop->createCopy();
@@ -219,7 +217,7 @@ void EntityProperties::addToConfiguration(EntityBase *root, bool visibleOnly, ot
 {
 	// Here we convert the entire container with all its entities into a JSON document
 		
-	for (auto prop : propertiesList)
+	for (auto prop : m_propertiesList)
 	{
 		if (!visibleOnly || prop->getVisible())
 		{
@@ -291,7 +289,7 @@ std::string EntityProperties::createJSON(EntityBase* root, bool visibleOnly)
 
 	ot::JsonDocument jsonDoc;
 
-	for (auto prop : propertiesList)
+	for (auto prop : m_propertiesList)
 	{
 		if (!visibleOnly || prop->getVisible())
 		{
@@ -401,7 +399,7 @@ void EntityProperties::checkMatchingProperties(EntityProperties &other)
 
 	std::list<std::pair<std::string, std::string>> removeProperties;
 
-	for (std::map<std::string, EntityPropertiesBase *>::const_iterator it = other.properties.begin(); it != other.properties.end(); it++)
+	for (std::map<std::string, EntityPropertiesBase *>::const_iterator it = other.m_properties.begin(); it != other.m_properties.end(); it++)
 	{
 		EntityPropertiesBase *otherProp = it->second;
 
@@ -452,7 +450,7 @@ void EntityProperties::readFromProperties(const EntityProperties &other, EntityB
 {
 	// This function sets the properties of our entities from the values in the collection handed over in the argument list
 
-	for (std::map<std::string, EntityPropertiesBase *>::const_iterator it = other.properties.begin(); it != other.properties.end(); it++)
+	for (std::map<std::string, EntityPropertiesBase *>::const_iterator it = other.m_properties.begin(); it != other.m_properties.end(); it++)
 	{
 		EntityPropertiesBase *modified = it->second;
 
@@ -489,7 +487,7 @@ void EntityProperties::readFromProperties(const EntityProperties &other, EntityB
 
 void EntityProperties::setAllPropertiesReadOnly(void)
 {
-	for (auto prop : properties)
+	for (auto prop : m_properties)
 	{
 		prop.second->setReadOnly(true);
 	}
@@ -497,7 +495,7 @@ void EntityProperties::setAllPropertiesReadOnly(void)
 
 void EntityProperties::setAllPropertiesNonProtected(void)
 {
-	for (auto prop : properties)
+	for (auto prop : m_properties)
 	{
 		prop.second->setProtected(false);
 	}
@@ -507,7 +505,7 @@ std::list<EntityPropertiesBase*> EntityProperties::getListOfAllProperties(void)
 {
 	std::list<EntityPropertiesBase*> allProperties;
 
-	for (auto prop : properties)
+	for (auto prop : m_properties)
 	{
 		allProperties.push_back(prop.second);
 	}
@@ -519,7 +517,7 @@ std::list<EntityPropertiesBase *> EntityProperties::getListOfPropertiesWhichNeed
 {
 	std::list<EntityPropertiesBase *> needsUpdate;
 
-	for (auto prop : properties)
+	for (auto prop : m_properties)
 	{
 		if (prop.second->needsUpdate())
 		{
@@ -534,7 +532,7 @@ std::list<EntityPropertiesDouble *> EntityProperties::getListOfNumericalProperti
 {
 	std::list<EntityPropertiesDouble *> numericalProperty;
 
-	for (auto prop : properties)
+	for (auto prop : m_properties)
 	{
 		EntityPropertiesDouble *doubleProp = dynamic_cast<EntityPropertiesDouble *>(prop.second);
 
@@ -553,11 +551,10 @@ std::list<EntityPropertiesDouble *> EntityProperties::getListOfNumericalProperti
 	return numericalProperty;
 }
 
-std::list<std::string> EntityProperties::getListOfPropertiesForGroup(const std::string &group)
-{
+std::list<std::string> EntityProperties::getListOfPropertiesForGroup(const std::string &group) const {
 	std::list<std::string> propertyList;
 
-	for (auto prop : properties)
+	for (auto prop : m_properties)
 	{
 		if (prop.second->getGroup() == group)
 		{
@@ -568,19 +565,16 @@ std::list<std::string> EntityProperties::getListOfPropertiesForGroup(const std::
 	return propertyList;
 }
 
-const std::string EntityProperties::createKey(const std::string& _name, const std::string& _group)
-{
+std::string EntityProperties::createKey(const std::string& _name, const std::string& _group) {
 	return _group + "/" + _name;
 }
 
-const bool EntityProperties::isKey(const std::string _accesser)
-{
+bool EntityProperties::isKey(const std::string _accesser) const {
 	size_t posGroupSeperator = _accesser.find('/');
 	return posGroupSeperator != std::string::npos;
 }
 
-const std::string EntityProperties::extractNameFromKey(const std::string& _key)
-{
+std::string EntityProperties::extractNameFromKey(const std::string& _key) const {
 	size_t posGroupSeperator = _key.find('/');
 	const std::string nameOfKey = _key.substr(posGroupSeperator + 1, _key.size());
 	return nameOfKey;
