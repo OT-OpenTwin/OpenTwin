@@ -175,9 +175,6 @@
     <ClCompile Include="src\ColorPreviewBox.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\ComboButton.cpp">
-      <Filter>src\Widgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\DockWatcherAction.cpp">
       <Filter>src\Widgets</Filter>
     </ClCompile>
@@ -860,9 +857,6 @@
       <Filter>include\General</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ColorPickButton.h">
-      <Filter>include\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\OTWidgets\ComboButton.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\OTWidgets\DockWatcherAction.h">

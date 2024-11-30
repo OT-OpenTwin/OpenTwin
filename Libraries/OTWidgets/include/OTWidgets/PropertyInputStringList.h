@@ -10,7 +10,7 @@
 
 namespace ot {
 
-	class ComboButton;
+	class ComboBox;
 
 	class OT_WIDGETS_API_EXPORT PropertyInputStringList : public PropertyInput {
 		OT_DECL_NOCOPY(PropertyInputStringList)
@@ -30,7 +30,7 @@ namespace ot {
 		QStringList getPossibleSelection(void) const;
 
 	private:
-		ComboButton* m_comboButton;
+		ComboBox* m_comboBox;
 	};
 
 }

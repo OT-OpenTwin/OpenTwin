@@ -6,7 +6,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/PropertyStringList.h"
-#include "OTWidgets/ComboButton.h"
+#include "OTWidgets/ComboBox.h"
 #include "OTWidgets/PropertyInputStringList.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
@@ -18,36 +18,37 @@ static ot::PropertyInputFactoryRegistrar<ot::PropertyInputStringList> propertyIn
 
 ot::PropertyInputStringList::PropertyInputStringList()
 {
-	m_comboButton = new ComboButton;
-	m_comboButton->setFocusPolicy(Qt::NoFocus);
-	this->connect(m_comboButton, &ComboButton::textChanged, this, qOverload<>(&PropertyInput::slotValueChanged));
+	m_comboBox = new ComboBox;
+	m_comboBox->setEditable(false);
+	m_comboBox->setFocusPolicy(Qt::NoFocus);
+	this->connect(m_comboBox, &ComboBox::currentTextChanged, this, qOverload<>(&PropertyInput::slotValueChanged));
 }
 
 ot::PropertyInputStringList::~PropertyInputStringList() {
-	delete m_comboButton;
+	delete m_comboBox;
 }
 
 void ot::PropertyInputStringList::addPropertyInputValueToJson(ot::JsonValue& _object, const char* _memberNameValue, ot::JsonAllocator& _allocator) {
-	_object.AddMember(JsonString(_memberNameValue, _allocator), JsonString(m_comboButton->text().toStdString(), _allocator), _allocator);
+	_object.AddMember(JsonString(_memberNameValue, _allocator), JsonString(m_comboBox->currentText().toStdString(), _allocator), _allocator);
 }
 
 QVariant ot::PropertyInputStringList::getCurrentValue(void) const {
-	return QVariant(m_comboButton->text());
+	return QVariant(m_comboBox->currentText());
 }
 
 QWidget* ot::PropertyInputStringList::getQWidget(void) {
-	return m_comboButton;
+	return m_comboBox;
 }
 
 ot::Property* ot::PropertyInputStringList::createPropertyConfiguration(void) const {
 	ot::PropertyStringList* newProperty = new ot::PropertyStringList(this->data());
 
 	std::list<std::string> lst;
-	for (const QAction* a : m_comboButton->menu()->actions()) {
-		lst.push_back(a->text().toStdString());
+	for (int i = 0; i < m_comboBox->count(); i++) {
+		lst.push_back(m_comboBox->itemText(i).toStdString());
 	}
 	newProperty->setList(lst);
-	newProperty->setCurrent(m_comboButton->text().toStdString());
+	newProperty->setCurrent(m_comboBox->currentText().toStdString());
 
 	return newProperty;
 }
@@ -65,34 +66,38 @@ bool ot::PropertyInputStringList::setupFromConfiguration(const Property* _config
 		lst.push_back(QString::fromStdString(itm));
 	}
 	
-	m_comboButton->blockSignals(true);
+	m_comboBox->blockSignals(true);
 
-	m_comboButton->setItems(lst);
-	if (this->data().getPropertyFlags() & Property::HasMultipleValues) m_comboButton->setText("...");
-	else m_comboButton->setText(QString::fromStdString(actualProperty->getCurrent()));
-	m_comboButton->setEnabled(!(this->data().getPropertyFlags() & Property::IsReadOnly));
+	m_comboBox->addItems(lst);
+	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
+		m_comboBox->setCurrentText("...");
+	}
+	else {
+		m_comboBox->setCurrentText(QString::fromStdString(actualProperty->getCurrent()));
+	}
+	m_comboBox->setEnabled(!(this->data().getPropertyFlags() & Property::IsReadOnly));
 
-	m_comboButton->blockSignals(false);
+	m_comboBox->blockSignals(false);
 
 	return true;
 }
 
 void ot::PropertyInputStringList::focusPropertyInput(void) {
-	m_comboButton->setFocus();
+	m_comboBox->setFocus();
 }
 
 void ot::PropertyInputStringList::setCurrentText(const QString& _text) {
-	m_comboButton->setText(_text);
+	m_comboBox->setCurrentText(_text);
 }
 
 QString ot::PropertyInputStringList::getCurrentText(void) const {
-	return m_comboButton->text();
+	return m_comboBox->currentText();
 }
 
 QStringList ot::PropertyInputStringList::getPossibleSelection(void) const {
 	QStringList lst;
-	for (const QAction* a : m_comboButton->menu()->actions()) {
-		lst.append(a->text());
+	for (int i = 0; i < m_comboBox->count(); i++) {
+		lst.append(m_comboBox->itemText(i));
 	}
 	return lst;
 }
