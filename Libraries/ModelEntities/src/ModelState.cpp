@@ -14,25 +14,9 @@
 
 #include <fstream>
 
-std::ostream *logFile = nullptr;
-
-__declspec(dllexport) void openLogFile(const std::string &fileName)
-{
-	logFile = new std::ofstream(fileName);
-}
-
-__declspec(dllexport) void logMessage(const std::string &message)
-{
-	if (logFile != nullptr)
-	{
-		*logFile << message << std::endl;
-		logFile->flush();
-	}
-}
-
 ModelState::ModelState(unsigned int sessionID, unsigned int serviceID) :
-	stateModified(false),
-	maxNumberArrayEntitiesPerState(250000)
+	m_stateModified(false),
+	m_maxNumberArrayEntitiesPerState(250000)
 {
 	DataStorageAPI::UniqueUIDGenerator *uidGenerator = EntityBase::getUidGenerator();
 	if (uidGenerator == nullptr)
@@ -40,8 +24,8 @@ ModelState::ModelState(unsigned int sessionID, unsigned int serviceID) :
 		uidGenerator = new DataStorageAPI::UniqueUIDGenerator(sessionID, serviceID);
 	}
 
-	uniqueUIDGenerator = uidGenerator;
-	EntityBase::setUidGenerator(uniqueUIDGenerator);
+	m_uniqueUIDGenerator = uidGenerator;
+	EntityBase::setUidGenerator(m_uniqueUIDGenerator);
 }
 
 ModelState::~ModelState()
@@ -55,14 +39,14 @@ ModelState::~ModelState()
 void ModelState::reset(void)
 {
 	m_graphCfg.clear();
-	currentModelBaseStateVersion.clear();
+	m_currentModelBaseStateVersion.clear();
 
-	entities.clear();
-	addedOrModifiedEntities.clear();
-	removedEntities.clear();
-	entityChildrenList.clear();
+	m_entities.clear();
+	m_addedOrModifiedEntities.clear();
+	m_removedEntities.clear();
+	m_entityChildrenList.clear();
 
-	stateModified = false;
+	m_stateModified = false;
 }
 
 bool ModelState::openProject(void) {
@@ -87,8 +71,8 @@ bool ModelState::openProject(void) {
 	std::string activeBranch = result->view()["ActiveBranch"].get_utf8().value.data();
 	std::string activeVersion = result->view()["ActiveVersion"].get_utf8().value.data();
 
-	activeBranchInModelEntity = activeBranch;
-	activeVersionInModelEntity = activeVersion;
+	m_activeBranchInModelEntity = activeBranch;
+	m_activeVersionInModelEntity = activeVersion;
 
 	// Activate the branch
 	m_graphCfg.setActiveBranchVersionName(activeBranch);
@@ -108,12 +92,12 @@ bool ModelState::openProject(void) {
 
 unsigned long long ModelState::createEntityUID(void)
 {
-	return uniqueUIDGenerator->getUID();
+	return m_uniqueUIDGenerator->getUID();
 }
 
 void ModelState::storeEntity(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID, ModelStateEntity::EntityVersion entityVersion, ModelStateEntity::tEntityType entityType)
 {
-	if (entities.count(entityID) == 0)
+	if (m_entities.count(entityID) == 0)
 	{
 		// We have a new entity to store
 		addNewEntity(entityID, parentEntityID, entityVersion, entityType);
@@ -134,20 +118,20 @@ void ModelState::addNewEntity(ModelStateEntity::EntityID entityID, ModelStateEnt
 	// Add the new entity to the parent / child list
 	addEntityToParent(entityID, parentEntityID);
 
-	assert(entities.count(entityID) == 0); // Ensure that the entity does not already exist
-	entities[entityID] = newEntity;
-	addedOrModifiedEntities[entityID] = newEntity;
-	stateModified = true;
+	assert(m_entities.count(entityID) == 0); // Ensure that the entity does not already exist
+	m_entities[entityID] = newEntity;
+	m_addedOrModifiedEntities[entityID] = newEntity;
+	m_stateModified = true;
 }
 
 void ModelState::modifyEntity(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID, ModelStateEntity::EntityVersion entityVersion, ModelStateEntity::tEntityType entityType)
 {
-	if (entities.count(entityID) > 0)
+	if (m_entities.count(entityID) > 0)
 	{
-		ModelStateEntity::EntityID previousParentID = entities[entityID].getParentEntityID();
+		ModelStateEntity::EntityID previousParentID = m_entities[entityID].getParentEntityID();
 
 		// This entity is a topology entity
-		ModelStateEntity modifiedEntity = entities[entityID];
+		ModelStateEntity modifiedEntity = m_entities[entityID];
 		modifiedEntity.setVersion(entityVersion);
 		modifiedEntity.setParentEntityID(parentEntityID);
 		modifiedEntity.setEntityType(entityType);
@@ -159,9 +143,9 @@ void ModelState::modifyEntity(ModelStateEntity::EntityID entityID, ModelStateEnt
 			addEntityToParent(entityID, parentEntityID);
 		}
 
-		entities[entityID] = modifiedEntity;
-		addedOrModifiedEntities[entityID] = modifiedEntity;
-		stateModified = true;
+		m_entities[entityID] = modifiedEntity;
+		m_addedOrModifiedEntities[entityID] = modifiedEntity;
+		m_stateModified = true;
 	}
 	else
 	{
@@ -171,15 +155,15 @@ void ModelState::modifyEntity(ModelStateEntity::EntityID entityID, ModelStateEnt
 
 void ModelState::modifyEntityVersion(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityVersion entityVersion)
 {
-	if (entities.count(entityID) > 0)
+	if (m_entities.count(entityID) > 0)
 	{
 		// This entity is a topology entity
-		ModelStateEntity modifiedEntity = entities[entityID];
+		ModelStateEntity modifiedEntity = m_entities[entityID];
 		modifiedEntity.setVersion(entityVersion);
 
-		entities[entityID] = modifiedEntity;
-		addedOrModifiedEntities[entityID] = modifiedEntity;
-		stateModified = true;
+		m_entities[entityID] = modifiedEntity;
+		m_addedOrModifiedEntities[entityID] = modifiedEntity;
+		m_stateModified = true;
 	}
 	else
 	{
@@ -189,15 +173,15 @@ void ModelState::modifyEntityVersion(ModelStateEntity::EntityID entityID, ModelS
 
 void ModelState::modifyEntityParent(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentEntityID)
 {
-	if (entities.count(entityID) > 0)
+	if (m_entities.count(entityID) > 0)
 	{
 		// This entity is a topology entity
-		ModelStateEntity modifiedEntity = entities[entityID];
+		ModelStateEntity modifiedEntity = m_entities[entityID];
 		modifiedEntity.setParentEntityID(parentEntityID);
 
-		entities[entityID] = modifiedEntity;
-		addedOrModifiedEntities[entityID] = modifiedEntity;
-		stateModified = true;
+		m_entities[entityID] = modifiedEntity;
+		m_addedOrModifiedEntities[entityID] = modifiedEntity;
+		m_stateModified = true;
 	}
 	else
 	{
@@ -209,12 +193,12 @@ void ModelState::removeEntity(ModelStateEntity::EntityID entityID, bool consider
 {
 	//std::cout << "remove entity: " << entityID << std::endl;
 
-	if (entities.count(entityID) > 0)
+	if (m_entities.count(entityID) > 0)
 	{
 		// This entity is a topology entity
-		removedEntities[entityID] = entities[entityID];
-		entities.erase(entityID);
-		stateModified = true;
+		m_removedEntities[entityID] = m_entities[entityID];
+		m_entities.erase(entityID);
+		m_stateModified = true;
 	}
 	else
 	{
@@ -226,9 +210,9 @@ void ModelState::removeEntity(ModelStateEntity::EntityID entityID, bool consider
 	if (considerChildren)
 	{
 
-		if (entityChildrenList.count(entityID) > 0)
+		if (m_entityChildrenList.count(entityID) > 0)
 		{
-			std::list<ModelStateEntity::EntityID> children = entityChildrenList[entityID];
+			std::list<ModelStateEntity::EntityID> children = m_entityChildrenList[entityID];
 
 			for (auto child : children)
 			{
@@ -236,7 +220,7 @@ void ModelState::removeEntity(ModelStateEntity::EntityID entityID, bool consider
 			}
 
 			// And finally remove the children information for the current entity
-			entityChildrenList.erase(entityID);
+			m_entityChildrenList.erase(entityID);
 		}
 	}
 }
@@ -285,14 +269,14 @@ bool ModelState::loadModelState(const std::string& _version)
 
 void ModelState::clearChildrenInformation(void)
 {
-	entityChildrenList.clear();
+	m_entityChildrenList.clear();
 }
 
 void ModelState::buildChildrenInformation(void)
 {
-	entityChildrenList.clear();
+	m_entityChildrenList.clear();
 
-	for (auto entity : entities)
+	for (auto entity : m_entities)
 	{
 		addEntityToParent(entity.first, entity.second.getParentEntityID());
 	}
@@ -300,30 +284,30 @@ void ModelState::buildChildrenInformation(void)
 
 void ModelState::addEntityToParent(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentID)
 {
-	if (entityChildrenList.count(parentID) > 0)
+	if (m_entityChildrenList.count(parentID) > 0)
 	{
-		entityChildrenList.find(parentID)->second.push_back(entityID);
+		m_entityChildrenList.find(parentID)->second.push_back(entityID);
 	}
 	else
 	{
 		std::list<ModelStateEntity::EntityID> childList;
 		childList.push_back(entityID);
 
-		entityChildrenList[parentID] = childList;
+		m_entityChildrenList[parentID] = childList;
 	}
 }
 
 void ModelState::removeEntityFromParent(ModelStateEntity::EntityID entityID, ModelStateEntity::EntityID parentID)
 {
-	if (entityChildrenList.count(parentID) > 0)
+	if (m_entityChildrenList.count(parentID) > 0)
 	{
-		entityChildrenList.find(parentID)->second.remove(entityID);
+		m_entityChildrenList.find(parentID)->second.remove(entityID);
 	}
 }
 
 bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const std::string &saveComment)
 {
-	if (!stateModified && !forceSave)
+	if (!m_stateModified && !forceSave)
 	{
 		// Nothing to save. The model state has not changed.
 		return true;
@@ -340,13 +324,13 @@ bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const s
 		createAndActivateNewBranch();
 	}
 
-	size_t numberArrayEntitiesAbsolute = 3 * entities.size();
-	size_t numberArrayEntitiesRelative = 3 * addedOrModifiedEntities.size() + removedEntities.size();
+	size_t numberArrayEntitiesAbsolute = 3 * m_entities.size();
+	size_t numberArrayEntitiesRelative = 3 * m_addedOrModifiedEntities.size() + m_removedEntities.size();
 
 	// We perform a relative save if the size of the relative state is five times less than the size of the absolute state
 	bool saveAbsolute = (numberArrayEntitiesRelative * 5 > numberArrayEntitiesAbsolute);
 
-	if (numberArrayEntitiesRelative > maxNumberArrayEntitiesPerState)
+	if (numberArrayEntitiesRelative > m_maxNumberArrayEntitiesPerState)
 	{
 		// In case that we need to store extension documents, we store an absolute state
 		saveAbsolute = true;
@@ -358,7 +342,7 @@ bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const s
 		saveAbsolute = true;
 	}
 
-	if (currentModelBaseStateVersion.empty())
+	if (m_currentModelBaseStateVersion.empty())
 	{
 		// We can not save a relative state without having the base state
 		saveAbsolute = true;
@@ -381,11 +365,11 @@ bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const s
 	}
 
 	// The document is up-to-date
-	stateModified = false;
+	m_stateModified = false;
 
 	// We need to remove the modification information
-	addedOrModifiedEntities.clear();
-	removedEntities.clear();
+	m_addedOrModifiedEntities.clear();
+	m_removedEntities.clear();
 
 	storeCurrentVersionInModelEntity();
 
@@ -395,31 +379,31 @@ bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const s
 ModelStateEntity::EntityVersion ModelState::getCurrentEntityVersion(ModelStateEntity::EntityID entityID)
 {
 	// If the entity is not part of the current state, return -1
-	if (entities.count(entityID) == 0)
+	if (m_entities.count(entityID) == 0)
 	{
 		return -1;
 	}
 
 	// Ensure that the entity exists
-	assert(entities.count(entityID) > 0);
+	assert(m_entities.count(entityID) > 0);
 
 	// Now return the current version of the entity
-	return entities[entityID].getEntityVersion();
+	return m_entities[entityID].getEntityVersion();
 }
 
 ModelStateEntity::EntityID ModelState::getCurrentEntityParent(ModelStateEntity::EntityID entityID)
 {
 	// Ensure that the entity exists
-	assert(entities.count(entityID) > 0);
+	assert(m_entities.count(entityID) > 0);
 
 	// Now return the current version of the entity
-	return entities[entityID].getParentEntityID();
+	return m_entities[entityID].getParentEntityID();
 }
 
 void ModelState::getListOfTopologyEntites(std::list<unsigned long long> &topologyEntities)
 {
 	// Loop through all entities and add the topology entities to the list
-	for (auto entity : entities)
+	for (auto entity : m_entities)
 	{
 		if (entity.second.getEntityType() == ModelStateEntity::tEntityType::TOPOLOGY)
 		{
@@ -439,22 +423,22 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 		// We have an absolute model state document
 
 		// The corresponding base state is our own state
-		currentModelBaseStateVersion = docView["Version"].get_utf8().value.data();
+		m_currentModelBaseStateVersion = docView["Version"].get_utf8().value.data();
 
 		return loadAbsoluteState(docView);
 	}
 	else if (storageType == "relative")
 	{
-		currentModelBaseStateVersion = docView["BaseState"].get_utf8().value.data();
+		m_currentModelBaseStateVersion = docView["BaseState"].get_utf8().value.data();
 		std::string incrementalStateVersion = docView["Version"].get_utf8().value.data();
 
 		// Find and load the last absolute state
-		if (!loadModelState(currentModelBaseStateVersion)) return false;
+		if (!loadModelState(m_currentModelBaseStateVersion)) return false;
 		
 		// Now load the following (incremental) versions until we reach the desired version
 		DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
 
-		std::string nextVersion = currentModelBaseStateVersion;
+		std::string nextVersion = m_currentModelBaseStateVersion;
 		do
 		{
 			nextVersion = getNextVersion(nextVersion);
@@ -523,12 +507,12 @@ void ModelState::clearModelState(void)
 {
 	m_graphCfg.setActiveVersionName("");
 
-	entities.clear();
+	m_entities.clear();
 
-	addedOrModifiedEntities.clear();
-	removedEntities.clear();
+	m_addedOrModifiedEntities.clear();
+	m_removedEntities.clear();
 
-	stateModified = false;
+	m_stateModified = false;
 }
 
 bool ModelState::loadAbsoluteState(bsoncxx::document::view docView)
@@ -583,7 +567,7 @@ bool ModelState::loadState(bsoncxx::document::view docView, const std::string &e
 	}
 
 	// The state has not been modified compared to the stored (and named) version
-	stateModified = false;
+	m_stateModified = false;
 
 	return true;
 }
@@ -602,7 +586,7 @@ void ModelState::loadStateData(bsoncxx::document::view docView)
 
 		for (unsigned long index = 0; index < numberElements; index++)
 		{
-			entities.erase(cId->get_int64());
+			m_entities.erase(cId->get_int64());
 			cId++;
 		}
 	}
@@ -619,7 +603,7 @@ void ModelState::loadStateData(bsoncxx::document::view docView)
 
 		for (unsigned long index = 0; index < numberElements; index++)
 		{
-			entities.erase(cId->get_int64());
+			m_entities.erase(cId->get_int64());
 			cId++;
 		}
 	}
@@ -650,7 +634,7 @@ void ModelState::loadStateData(bsoncxx::document::view docView)
 			entity.setVersion(cVersion->get_int64());
 			entity.setEntityType(ModelStateEntity::tEntityType::TOPOLOGY);
 
-			entities[cId->get_int64()] = entity;
+			m_entities[cId->get_int64()] = entity;
 
 			cId++;
 			cParent++;
@@ -684,7 +668,7 @@ void ModelState::loadStateData(bsoncxx::document::view docView)
 			entity.setVersion(cVersion->get_int64());
 			entity.setEntityType(ModelStateEntity::tEntityType::DATA);
 
-			entities[cId->get_int64()] = entity;
+			m_entities[cId->get_int64()] = entity;
 
 			cId++;
 			cParent++;
@@ -696,9 +680,9 @@ void ModelState::loadStateData(bsoncxx::document::view docView)
 bool ModelState::saveAbsoluteState(const std::string &saveComment)
 {
 	// Count entities and check whether we need an extension document
-	size_t numberEntities = 3 * entities.size();
+	size_t numberEntities = 3 * m_entities.size();
 
-	bool extension = (numberEntities > maxNumberArrayEntitiesPerState);
+	bool extension = (numberEntities > m_maxNumberArrayEntitiesPerState);
 
 	if (extension)
 	{
@@ -716,7 +700,7 @@ bool ModelState::saveAbsoluteState(const std::string &saveComment)
 	doc.append(bsoncxx::builder::basic::kvp("Extension", false));
 	doc.append(bsoncxx::builder::basic::kvp("Description", saveComment));
 
-	if (!entities.empty())
+	if (!m_entities.empty())
 	{
 		// Add the entities (if any)
 
@@ -731,7 +715,7 @@ bool ModelState::saveAbsoluteState(const std::string &saveComment)
 		bool hasTopoEntities = false;
 		bool hasDataEntities = false;
 
-		for (auto entity : entities)
+		for (auto entity : m_entities)
 		{
 			switch (entity.second.getEntityType())
 			{
@@ -777,7 +761,7 @@ bool ModelState::saveAbsoluteState(const std::string &saveComment)
 	DataBase::GetDataBase()->StorePlainDataItem(doc);
 
 	// The current version becomes the new base state
-	currentModelBaseStateVersion = m_graphCfg.getActiveVersionName();
+	m_currentModelBaseStateVersion = m_graphCfg.getActiveVersionName();
 	
 	return true;
 }
@@ -785,12 +769,12 @@ bool ModelState::saveAbsoluteState(const std::string &saveComment)
 bool ModelState::saveAbsoluteStateWithExtension(const std::string &saveComment)
 {
 	// Count entities and check whether we need an extension document
-	size_t numberEntities = 3 * entities.size();
+	size_t numberEntities = 3 * m_entities.size();
 
-	bool extension = (numberEntities > maxNumberArrayEntitiesPerState);
+	bool extension = (numberEntities > m_maxNumberArrayEntitiesPerState);
 	assert(extension);
 
-	std::map<ModelStateEntity::EntityID, ModelStateEntity> entitiesLeft = entities;
+	std::map<ModelStateEntity::EntityID, ModelStateEntity> entitiesLeft = m_entities;
 
 	writeMainDocument(entitiesLeft, saveComment);
 
@@ -800,7 +784,7 @@ bool ModelState::saveAbsoluteStateWithExtension(const std::string &saveComment)
 	}
 
 	// The current version becomes the new base state
-	currentModelBaseStateVersion = m_graphCfg.getActiveVersionName();
+	m_currentModelBaseStateVersion = m_graphCfg.getActiveVersionName();
 
 	return true;
 }
@@ -838,9 +822,9 @@ bool ModelState::writeMainDocument(std::map<ModelStateEntity::EntityID, ModelSta
 		bool hasTopoEntities = false;
 		bool hasDataEntities = false;
 
-		for (auto entity : entities)
+		for (auto entity : m_entities)
 		{
-			if (numberArrayEntriesWritten > maxNumberArrayEntitiesPerState) break;
+			if (numberArrayEntriesWritten > m_maxNumberArrayEntitiesPerState) break;
 
 			entitiesLocal.erase((long long)entity.first);
 
@@ -918,7 +902,7 @@ bool ModelState::writeExtensionDocument(std::map<ModelStateEntity::EntityID, Mod
 
 		for (auto entity : entitiesLocal)
 		{
-			if (numberArrayEntriesWritten > maxNumberArrayEntitiesPerState) break;
+			if (numberArrayEntriesWritten > m_maxNumberArrayEntitiesPerState) break;
 
 			entitiesLocal.erase((long long)entity.first);
 
@@ -968,9 +952,9 @@ bool ModelState::writeExtensionDocument(std::map<ModelStateEntity::EntityID, Mod
 bool ModelState::saveIncrementalState(const std::string &saveComment)
 {
 	// Count entities and check whether we need an extension document
-	size_t numberEntities = 3 * addedOrModifiedEntities.size() + removedEntities.size();
+	size_t numberEntities = 3 * m_addedOrModifiedEntities.size() + m_removedEntities.size();
 
-	bool extension = (numberEntities > maxNumberArrayEntitiesPerState);
+	bool extension = (numberEntities > m_maxNumberArrayEntitiesPerState);
 	assert(!extension); // We do not handle extensions for relative states yet.
 
 	// Create a document and write the header information
@@ -982,11 +966,11 @@ bool ModelState::saveIncrementalState(const std::string &saveComment)
 	doc.append(bsoncxx::builder::basic::kvp("ParentVersion", getPreviousVersion(m_graphCfg.getActiveVersionName())));
 	doc.append(bsoncxx::builder::basic::kvp("Type", "relative"));
 	doc.append(bsoncxx::builder::basic::kvp("Extension", extension));
-	doc.append(bsoncxx::builder::basic::kvp("BaseState", currentModelBaseStateVersion));
+	doc.append(bsoncxx::builder::basic::kvp("BaseState", m_currentModelBaseStateVersion));
 	doc.append(bsoncxx::builder::basic::kvp("Description", saveComment));
 
 	// Store the added or modified entities (if any)
-	if (!addedOrModifiedEntities.empty())
+	if (!m_addedOrModifiedEntities.empty())
 	{
 		// Store the topology entities as arrays in the document (id, parent, version)
 		auto topo_id = bsoncxx::builder::basic::array();
@@ -1000,7 +984,7 @@ bool ModelState::saveIncrementalState(const std::string &saveComment)
 		bool hasTopoEntities = false;
 		bool hasDataEntities = false;
 
-		for (auto entity : addedOrModifiedEntities)
+		for (auto entity : m_addedOrModifiedEntities)
 		{
 			switch (entity.second.getEntityType())
 			{
@@ -1038,7 +1022,7 @@ bool ModelState::saveIncrementalState(const std::string &saveComment)
 	}
 
 	// Store the removed entities (if any)
-	if (!removedEntities.empty())
+	if (!m_removedEntities.empty())
 	{
 		// Store the topology entities as arrays in the document (id, parent, version)
 		auto topo_id = bsoncxx::builder::basic::array();
@@ -1047,7 +1031,7 @@ bool ModelState::saveIncrementalState(const std::string &saveComment)
 		bool hasTopoEntities = false;
 		bool hasDataEntities = false;
 
-		for (auto entity : removedEntities)
+		for (auto entity : m_removedEntities)
 		{
 			switch (entity.second.getEntityType())
 			{
@@ -1660,7 +1644,7 @@ bool ModelState::branchExists(const std::string& _branch)
 }
 
 void ModelState::storeCurrentVersionInModelEntity(void) {
-	if (activeVersionInModelEntity != m_graphCfg.getActiveVersionName() || activeBranchInModelEntity != m_graphCfg.getActiveBranchVersionName()) {
+	if (m_activeVersionInModelEntity != m_graphCfg.getActiveVersionName() || m_activeBranchInModelEntity != m_graphCfg.getActiveBranchVersionName()) {
 		if (m_graphCfg.getActiveVersionName().empty()) {
 			OT_LOG_E("Attempting to store empty version { \"Version\": \"" + m_graphCfg.getActiveVersionName() + "\", \"Branch\": \"" + m_graphCfg.getActiveBranchVersionName() + "\" }");
 			return;
@@ -1683,8 +1667,8 @@ void ModelState::storeCurrentVersionInModelEntity(void) {
 
 		collection.update_one(queryDoc.view(), modifyDoc.view());
 
-		activeBranchInModelEntity = m_graphCfg.getActiveBranchVersionName();
-		activeVersionInModelEntity = m_graphCfg.getActiveVersionName();
+		m_activeBranchInModelEntity = m_graphCfg.getActiveBranchVersionName();
+		m_activeVersionInModelEntity = m_graphCfg.getActiveVersionName();
 	}
 }
 

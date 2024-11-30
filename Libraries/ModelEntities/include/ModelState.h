@@ -20,21 +20,21 @@ public:
 
 	enum tEntityType { TOPOLOGY, DATA };
 
-	ModelStateEntity() : entityVersion(0), parentEntityID(0), entityType(tEntityType::DATA) {};
+	ModelStateEntity() : m_entityVersion(0), m_parentEntityID(0), m_entityType(tEntityType::DATA) {};
 	~ModelStateEntity() {};
 
-	void setParentEntityID(EntityID id) { parentEntityID = id; };
-	void setVersion(EntityVersion version) { entityVersion = version; };
-	void setEntityType(tEntityType type) { entityType = type; };
+	void setParentEntityID(EntityID id) { m_parentEntityID = id; };
+	void setVersion(EntityVersion version) { m_entityVersion = version; };
+	void setEntityType(tEntityType type) { m_entityType = type; };
 
-	EntityID getParentEntityID(void) { return parentEntityID; };
-	EntityVersion getEntityVersion(void) { return entityVersion; };
-	tEntityType getEntityType(void) { return entityType; };
+	EntityID getParentEntityID(void) { return m_parentEntityID; };
+	EntityVersion getEntityVersion(void) { return m_entityVersion; };
+	tEntityType getEntityType(void) { return m_entityType; };
 
 private:
-	EntityVersion entityVersion;
-	EntityID parentEntityID;
-	tEntityType entityType;
+	EntityVersion m_entityVersion;
+	EntityID m_parentEntityID;
+	tEntityType m_entityType;
 };
 
 class __declspec(dllexport) ModelState
@@ -52,7 +52,7 @@ public:
 	void reset(void);
 
 	// Check whether the model state has been modified since the last save
-	bool isModified() { return stateModified; };
+	bool isModified(void) const { return m_stateModified; };
 
 	// Open a project, load the version grap and the currently active version
 	bool openProject(void);
@@ -86,10 +86,10 @@ public:
 	void removeEntity(ModelStateEntity::EntityID entityID, bool considerChildren = true);
 
 	// Determine the current modelStateVersion (the last saved one)
-	std::string getModelStateVersion(void) { return m_graphCfg.getActiveVersionName(); };
+	const std::string& getModelStateVersion(void) const { return m_graphCfg.getActiveVersionName(); };
 
 	// Determine the currently active branch
-	std::string getActiveBranch(void) { return m_graphCfg.getActiveBranchVersionName(); }
+	const std::string& getActiveBranch(void) const { return m_graphCfg.getActiveBranchVersionName(); }
 
 	// Save the current modified model state. The version counter is incremented automatically in the last digit (e.g. 1.2.1 -> 1.2.2)
 	bool saveModelState(bool forceSave, bool forceAbsoluteState, const std::string &saveComment);
@@ -257,32 +257,32 @@ private:
 	void updateSchema_1_2(void);
 
 	// When we load a relative state, the attribute will hold the version of the last absolute state (base state)
-	std::string currentModelBaseStateVersion;
+	std::string m_currentModelBaseStateVersion;
 
 	// Information regarding the entities which are currently part of the model
-	std::map<ModelStateEntity::EntityID, ModelStateEntity> entities;
+	std::map<ModelStateEntity::EntityID, ModelStateEntity> m_entities;
 
 	// Information about the added / modified / removed entities with regard to the last saved model state
-	std::map<ModelStateEntity::EntityID, ModelStateEntity> addedOrModifiedEntities;
-	std::map<ModelStateEntity::EntityID, ModelStateEntity> removedEntities;
+	std::map<ModelStateEntity::EntityID, ModelStateEntity> m_addedOrModifiedEntities;
+	std::map<ModelStateEntity::EntityID, ModelStateEntity> m_removedEntities;
 
 	// Information about entity children
-	std::map<ModelStateEntity::EntityID, std::list<ModelStateEntity::EntityID>> entityChildrenList;
+	std::map<ModelStateEntity::EntityID, std::list<ModelStateEntity::EntityID>> m_entityChildrenList;
 
 	// A flag which indicates whether the model state has been modified compared to the last stored state.
-	bool stateModified;
+	bool m_stateModified;
 
 	// The maximum number of array entities per state
-	const size_t maxNumberArrayEntitiesPerState;
+	const size_t m_maxNumberArrayEntitiesPerState;
 		
 	// The active branch which is currently stored in the model entity
-	std::string activeBranchInModelEntity;
+	std::string m_activeBranchInModelEntity;
 
 	// The active version which is currently stored in the model entity
-	std::string activeVersionInModelEntity;
+	std::string m_activeVersionInModelEntity;
 
 	// The member for creation of Unique IDs
-	DataStorageAPI::UniqueUIDGenerator *uniqueUIDGenerator;
+	DataStorageAPI::UniqueUIDGenerator* m_uniqueUIDGenerator;
 
 	// The version graph (for each version: version, parentVersion, description).
 	// The version graph needs to be loaded when the project is opened and will then be kept up to date
