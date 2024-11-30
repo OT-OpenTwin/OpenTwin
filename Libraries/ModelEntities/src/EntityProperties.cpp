@@ -247,6 +247,7 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 		else if (p->getPropertyType() == ot::PropertyInt::propertyTypeString()) newSetting = new EntityPropertiesInteger;
 		else if (p->getPropertyType() == ot::PropertyDouble::propertyTypeString()) newSetting = new EntityPropertiesDouble;
 		else if (p->getPropertyType() == ot::PropertyString::propertyTypeString()) newSetting = new EntityPropertiesString;
+		else if (p->getPropertyType() == ot::PropertyPainter2D::propertyTypeString()) newSetting = new EntityPropertiesGuiPainter;
 		else if (p->getPropertyType() == ot::PropertyStringList::propertyTypeString()) {
 			if (p->getSpecialType() == "EntityList") newSetting = new EntityPropertiesEntityList;
 			else if (p->getSpecialType() == "ProjectList") newSetting = new EntityPropertiesProjectList;
@@ -256,7 +257,6 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 				return;
 			}
 		}
-		else if (p->getPropertyType() == ot::PropertyPainter2D::propertyTypeString()) newSetting = new EntityPropertiesGuiPainter;
 		else {
 			OT_LOG_E("Unknown type \"" + p->getPropertyType() + "\"");
 			return;
@@ -268,14 +268,6 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 		}
 
 		newSetting->setFromConfiguration(p, root);
-		newSetting->setName(p->getPropertyName());
-		newSetting->setHasMultipleValues(p->getPropertyFlags() & ot::Property::HasMultipleValues);
-		newSetting->setReadOnly(p->getPropertyFlags() & ot::Property::IsReadOnly);
-		newSetting->setProtected(!(p->getPropertyFlags() & ot::Property::IsDeletable));
-		newSetting->setVisible(!(p->getPropertyFlags() & ot::Property::IsHidden));
-		newSetting->setErrorState(p->getPropertyFlags() & ot::Property::HasInputError);
-		newSetting->setToolTip(p->getPropertyTip());
-
 		this->createProperty(newSetting, _groupConfig->getGroupPath());
 	}
 
@@ -323,74 +315,36 @@ void EntityProperties::buildFromJSON(const std::string& prop, EntityBase* root)
 		{
 			//const rapidjson::Value &object = i->value;
 			std::string type = ot::json::getString(i->value, "Type");
-			bool multipleValues = ot::json::getBool(i->value, "MultipleValues");
-
-			bool readOnly = false;
-			if (i->value.HasMember("ReadOnly"))
-			{
-				readOnly = ot::json::getBool(i->value, "ReadOnly");
-			}
-
-			bool protectedProperty = true;
-			if (i->value.HasMember("Protected"))
-			{
-				protectedProperty = ot::json::getBool(i->value, "Protected");
-			}
-
-			bool visible = true;
-			if (i->value.HasMember("Visible"))
-			{
-				visible = ot::json::getBool(i->value, "Visible");
-			}
-
-			bool errorState = false;
-			if (i->value.HasMember("ErrorState"))
-			{
-				errorState = ot::json::getBool(i->value, "ErrorState");
-			}
-
 			std::string group;
-			if (i->value.HasMember("Group"))
-			{
+			if (i->value.HasMember("Group")) {
 				group = ot::json::getString(i->value, "Group");
-			}
-
-			std::string toolTip;
-			if (i->value.HasMember("ToolTip")) {
-				toolTip = ot::json::getString(i->value, "ToolTip");
 			}
 
 			EntityPropertiesBase* newSetting(nullptr);
 
-			if (type == "double") newSetting = new EntityPropertiesDouble;
-			else if (type == "integer") newSetting = new EntityPropertiesInteger;
-			else if (type == "boolean") newSetting = new EntityPropertiesBoolean;
-			else if (type == "string") newSetting = new EntityPropertiesString;
-			else if (type == "selection") newSetting = new EntityPropertiesSelection;
-			else if (type == "color") newSetting = new EntityPropertiesColor;
-			else if (type == "entitylist") newSetting = new EntityPropertiesEntityList;
-			else if (type == "projectlist") newSetting = new EntityPropertiesProjectList;
-			else if (type == "guipainter") newSetting = new EntityPropertiesGuiPainter;
+			if (type == EntityPropertiesDouble::typeString()) newSetting = new EntityPropertiesDouble;
+			else if (type == EntityPropertiesInteger::typeString()) newSetting = new EntityPropertiesInteger;
+			else if (type == EntityPropertiesBoolean::typeString()) newSetting = new EntityPropertiesBoolean;
+			else if (type == EntityPropertiesString::typeString()) newSetting = new EntityPropertiesString;
+			else if (type == EntityPropertiesSelection::typeString()) newSetting = new EntityPropertiesSelection;
+			else if (type == EntityPropertiesColor::typeString()) newSetting = new EntityPropertiesColor;
+			else if (type == EntityPropertiesEntityList::typeString()) newSetting = new EntityPropertiesEntityList;
+			else if (type == EntityPropertiesProjectList::typeString()) newSetting = new EntityPropertiesProjectList;
+			else if (type == EntityPropertiesGuiPainter::typeString()) newSetting = new EntityPropertiesGuiPainter;
 			else
 			{
 				OT_LOG_EAS("Unknown property type \"" + type + "\"");
 				return;
 			}
 
-			assert(newSetting != nullptr);
-
-			if (newSetting != nullptr)
-			{
+			if (newSetting) {
 				newSetting->readFromJsonObject(i->value.GetObject(), root);
 				newSetting->setName(propertyName);
-				newSetting->setHasMultipleValues(multipleValues);
-				newSetting->setReadOnly(readOnly);
-				newSetting->setProtected(protectedProperty);
-				newSetting->setVisible(visible);
-				newSetting->setErrorState(errorState);
-				newSetting->setToolTip(toolTip);
 
 				this->createProperty(newSetting, group);
+			}
+			else {
+				OT_LOG_EA("Failed to create property");
 			}
 		}
 		else
