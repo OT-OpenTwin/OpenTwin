@@ -3798,9 +3798,9 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 		if (!(insertFlags & ot::WidgetView::KeepCurrentFocus)) {
 			table->setAsCurrentViewTab();
 		}
+		table->setContentChanged(false);
 	}
 	
-	table->setContentChanged(false);
 	const std::string& name = table->getViewData().getEntityName();
 	const auto& viewerType = table->getViewData().getViewType();
 	ot::UID globalActiveViewModel = -1;
