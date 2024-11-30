@@ -19,8 +19,6 @@
 
 #include <akGui/aObjectManager.h>
 
-#include <akWidgets/aComboButtonWidgetItem.h>
-
 // Qt header
 #include <qstring.h>					// QString
 #include <qicon.h>						// QIcon
@@ -256,24 +254,6 @@ namespace ak {
 			UID									_creatorUid,
 			const QString &						_text,
 			bool								_checked = false
-		);
-
-		//! @brief Will create a new ComboBox and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @throw ak::Exception if the API is not initialized
-		UICORE_API_EXPORT UID createComboBox(
-			UID									_creatorUid
-		);
-
-		//! @brief Will create a new ComboButton and return its UID
-		//! @param _creatorUid The UID of the creator who creates this object
-		//! @param _text The initial text of the ComboButton
-		//! @param _possibleSelection The items the ComboButton will display when showing the drop-down menu
-		//! @throw ak::Exception if the API is not initialized
-		UICORE_API_EXPORT UID createComboButton(
-			UID									_creatorUid,
-			const QString &						_text = QString(""),
-			const std::vector<QString> &		_possibleSelection = std::vector<QString>()
 		);
 
 		//! @brief Will create a line edit and return its UID

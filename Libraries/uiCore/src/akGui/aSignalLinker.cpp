@@ -13,6 +13,7 @@
  // AK Core header
 #include <akCore/aException.h>
 #include <akCore/aMessenger.h>
+#include <akCore/aUidMangager.h>
 #include <akCore/aSingletonAllowedMessages.h>
 
 // AK GUI header
@@ -22,8 +23,6 @@
 
 // AK Widgets header
 #include <akWidgets/aCheckBoxWidget.h>
-#include <akWidgets/aComboBoxWidget.h>
-#include <akWidgets/aComboButtonWidget.h>
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
 #include <akWidgets/aToolButtonWidget.h>
@@ -68,19 +67,6 @@ ak::aSignalLinker::~aSignalLinker()
 			itm->second.object->disconnect(itm->second.object, SIGNAL(clicked()), this, SLOT(slotClicked()));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(toggled(bool)), this, SLOT(slotToggled(bool)));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(stateChanged(int)), this, SLOT(slotStateChanged(int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
-			break;
-		case otComboBox:
-			itm->second.object->disconnect(itm->second.object, SIGNAL(activated(int)), this, SLOT(slotIndexActivated(int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(currentIndexChanged(int)), this, SLOT(slotIndexChanged(int)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(keyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
-			break;
-		case otComboButton:
-			itm->second.object->disconnect(itm->second.object, SIGNAL(clicked()), this, SLOT(slotClicked()));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(toggled(bool)), this, SLOT(slotToggled(bool)));
-			itm->second.object->disconnect(itm->second.object, SIGNAL(changed()), this, SLOT(slotChanged()));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyPressed(QKeyEvent *)), this, SLOT(slotKeyPressed(QKeyEvent *)));
 			itm->second.object->disconnect(itm->second.object, SIGNAL(keyReleased(QKeyEvent *)), this, SLOT(slotKeyReleased(QKeyEvent *)));
 			break;
@@ -166,41 +152,6 @@ ak::UID ak::aSignalLinker::addLink(
 	_object->connect(_object, &aCheckBoxWidget::stateChanged, this, &aSignalLinker::slotStateChanged);
 	_object->connect(_object, &aCheckBoxWidget::keyPressed, this, &aSignalLinker::slotKeyPressed);
 	_object->connect(_object, &aCheckBoxWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
-
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aComboBoxWidget *								_object,
-	UID												_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otComboBox });
-
-	_object->connect(_object, qOverload<int>(&aComboBoxWidget::activated), this, &aSignalLinker::slotIndexActivated);
-	_object->connect(_object, qOverload<int>(&aComboBoxWidget::currentIndexChanged), this, &aSignalLinker::slotIndexChanged);
-	_object->connect(_object, &aComboBoxWidget::keyPressed, this, &aSignalLinker::slotKeyPressed);
-	_object->connect(_object, &aComboBoxWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
-
-	return _objectUid;
-}
-
-ak::UID ak::aSignalLinker::addLink(
-	aComboButtonWidget *							_object,
-	UID												_objectUid
-) {
-	if (_objectUid == ak::invalidUID) { _objectUid = m_uidManager->getId(); }
-	assert(m_objects.count(_objectUid) == 0); // Object with the provided UID already exists
-	_object->setUid(_objectUid);
-	m_objects.insert_or_assign(_objectUid, struct_object{ _object, otComboButton });
-
-	_object->connect(_object, &aComboButtonWidget::clicked, this, &aSignalLinker::slotClicked);
-	_object->connect(_object, &aComboButtonWidget::toggled, this, &aSignalLinker::slotToggled);
-	_object->connect(_object, &aComboButtonWidget::changed, this, &aSignalLinker::slotChanged);
-	_object->connect(_object, &aComboButtonWidget::keyPressed, this, &aSignalLinker::slotKeyPressed);
-	_object->connect(_object, &aComboButtonWidget::keyReleased, this, &aSignalLinker::slotKeyReleased);
 
 	return _objectUid;
 }

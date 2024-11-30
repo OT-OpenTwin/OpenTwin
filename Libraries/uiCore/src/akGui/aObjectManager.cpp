@@ -29,8 +29,6 @@
 
 // AK Widgets header
 #include <akWidgets/aCheckBoxWidget.h>
-#include <akWidgets/aComboBoxWidget.h>
-#include <akWidgets/aComboButtonWidget.h>
 #include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
@@ -117,50 +115,6 @@ ak::UID ak::aObjectManager::createCheckBox(
 	// Set parameter
 	obj->setChecked(_checked);
 	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createComboBox(
-	UID												_creatorUid
-) {
-	// Create object
-	aComboBoxWidget * obj = new aComboBoxWidget();
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createComboButton(
-	UID												_creatorUid,
-	const QString &										_initialText,
-	const std::vector<QString> &						_possibleSelection
-) {
-	// Create object
-	aComboButtonWidget * obj = new aComboButtonWidget(_initialText);
-	// Set parameter
-	m_signalLinker->addLink(obj);
-	obj->setItems(_possibleSelection);
-	// Store data
-	m_mapObjects.insert_or_assign(obj->uid(), obj);
-	addCreatedUid(_creatorUid, obj->uid());
-	return obj->uid();
-}
-
-ak::UID ak::aObjectManager::createComboButtonItem(
-	UID												_creatorUid,
-	const QIcon &										_icon,
-	const QString &										_text
-) {
-	// Create object
-	aComboButtonWidgetItem * obj = new aComboButtonWidgetItem(_icon, _text);
-	// Set parameter
-	obj->setUid(m_uidManager->getId());
 	// Store data
 	m_mapObjects.insert_or_assign(obj->uid(), obj);
 	addCreatedUid(_creatorUid, obj->uid());

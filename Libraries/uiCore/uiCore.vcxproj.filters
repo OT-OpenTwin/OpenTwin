@@ -105,15 +105,6 @@
     <ClCompile Include="src\akWidgets\aCheckBoxWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="src\akWidgets\aComboBoxWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aComboButtonWidget.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="src\akWidgets\aComboButtonWidgetItem.cpp">
-      <Filter>Source Files\ak\Widgets</Filter>
-    </ClCompile>
     <ClCompile Include="src\akWidgets\aLabelWidget.cpp">
       <Filter>Source Files\ak\Widgets</Filter>
     </ClCompile>
@@ -230,15 +221,6 @@
       <Filter>Header Files\ak\Gui</Filter>
     </QtMoc>
     <QtMoc Include="include\akWidgets\aCheckBoxWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aComboBoxWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aComboButtonWidget.h">
-      <Filter>Header Files\ak\Widgets</Filter>
-    </QtMoc>
-    <QtMoc Include="include\akWidgets\aComboButtonWidgetItem.h">
       <Filter>Header Files\ak\Widgets</Filter>
     </QtMoc>
     <QtMoc Include="include\akWidgets\aLabelWidget.h">

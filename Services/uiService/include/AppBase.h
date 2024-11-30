@@ -14,7 +14,6 @@
 // AK header
 #include <akCore/aException.h>
 #include <akCore/globalDataTypes.h>
-#include <akWidgets/aComboButtonWidgetItem.h>
 #include <akWidgets/aWindow.h>
 
 #include "OTCore/Logger.h"

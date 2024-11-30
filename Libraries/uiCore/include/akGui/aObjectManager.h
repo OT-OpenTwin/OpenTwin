@@ -75,31 +75,6 @@ namespace ak {
 			bool												_checked = false
 		);
 
-		//! @brief Will create a combo box and return its UID
-		//! @param _creatorUid The UID of the creator
-		UID createComboBox(
-			UID												_creatorUid
-		);
-
-		//! @brief Will create a combo button and return its UID
-		//! @param _creatorUid The UID of the creator
-		//! @param _initialText The initial text of the combo button
-		//! @param _possibleSelection The items that can be selected in the combo button
-		UID createComboButton(
-			UID												_creatorUid,
-			const QString &										_initialText = QString(""),
-			const std::vector<QString> &						_possibleSelection = std::vector<QString>()
-		);
-
-		//! @brief Will create a combo button item and return its UID
-		//! @param _creatorUid The UID of the creator
-		//! @param _icon The icon of the combo button item
-		UID createComboButtonItem(
-			UID												_creatorUid,
-			const QIcon &										_icon,
-			const QString &										_text = QString("")
-		);
-
 		//! @brief Will create a line edit and return its UID
 		//! param _creatorUid The UID of the creator
 		//! @param _initialText The initial text to display

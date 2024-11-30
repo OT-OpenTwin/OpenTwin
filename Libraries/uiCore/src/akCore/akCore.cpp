@@ -203,14 +203,11 @@ QString ak::toQString(
 	{
 	case otNone: return QString("None");
 	case otAction: return QString("Action");
-	case otComboBox: return QString("ComboBox");
-	case otComboButton: return QString("ComboButton");
 	case otCheckBox: return QString("CheckBox");
 	case otLabel: return QString("Label");
 	case otLineEdit: return QString("LineEdit");
 	case otMainWindow: return QString("Window");
 	case otNiceLineEdit: return QString("NiceLineEdit");
-	case otSpinBox: return QString("SpinBox");
 	case otTabToolbar: return QString("TabToolBar");
 	case otTabToolbarGroup: return QString("TabToolBarGroup");
 	case otTabToolbarPage: return QString("TabBoolBarPage");

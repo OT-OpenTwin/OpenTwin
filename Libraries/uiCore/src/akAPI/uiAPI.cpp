@@ -29,8 +29,6 @@
 
 // AK widgets
 #include <akWidgets/aCheckBoxWidget.h>
-#include <akWidgets/aComboBoxWidget.h>
-#include <akWidgets/aComboButtonWidget.h>
 #include <akWidgets/aLabelWidget.h>
 #include <akWidgets/aLineEditWidget.h>
 #include <akWidgets/aNiceLineEditWidget.h>
@@ -256,22 +254,6 @@ ak::UID ak::uiAPI::createCheckbox(
 ) {
 	assert(m_objManager != nullptr); // API not initialized
 	return m_objManager->createCheckBox(_creatorUid, _text, _checked);
-}
-
-ak::UID ak::uiAPI::createComboBox(
-	UID												_creatorUid
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createComboBox(_creatorUid);
-}
-
-ak::UID ak::uiAPI::createComboButton(
-	UID												_creatorUid,
-	const QString &										_text,
-	const std::vector<QString> &						_possibleSelection
-) {
-	assert(m_objManager != nullptr); // API not initialized
-	return m_objManager->createComboButton(_creatorUid, _text, _possibleSelection);
 }
 
 ak::UID ak::uiAPI::createLineEdit(
@@ -569,8 +551,6 @@ void ak::uiAPI::object::setEnabled(
 	switch (obj->type())
 	{
 	case otAction: akCastObject<aAction>(obj)->setEnabled(_enabled); return;
-	case otComboBox: akCastObject<aComboBoxWidget>(obj)->setEnabled(_enabled); return;
-	case otComboButton: akCastObject<aComboButtonWidget>(obj)->setEnabled(_enabled); return;
 	case otCheckBox: akCastObject<aCheckBoxWidget>(obj)->setEnabled(_enabled); return;
 	case otLabel: akCastObject<aLabelWidget>(obj)->setEnabled(_enabled); return;
 	case otLineEdit: akCastObject<aLineEditWidget>(obj)->setEnabled(_enabled); return;
@@ -593,8 +573,6 @@ bool ak::uiAPI::object::getIsEnabled(
 	switch (obj->type())
 	{
 	case otAction: return akCastObject<aAction>(obj)->isEnabled();
-	case otComboBox: return akCastObject<aComboBoxWidget>(obj)->isEnabled();
-	case otComboButton: return akCastObject<aComboButtonWidget>(obj)->isEnabled();
 	case otCheckBox: return akCastObject<aCheckBoxWidget>(obj)->isEnabled();
 	case otLabel: return akCastObject<aLabelWidget>(obj)->isEnabled();
 	case otLineEdit: return akCastObject<aLineEditWidget>(obj)->isEnabled();
