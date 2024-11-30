@@ -10,71 +10,70 @@
 
 _declspec(dllexport) DataStorageAPI::UniqueUIDGenerator *globalUidGenerator = nullptr;
 
-EntityBase::EntityBase(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	entityID(ID),
-	entityStorageVersion(0),
-	initiallyHidden(false),
-	isEditable(false),
-	parentEntity(parent),
-	observer(obs),
-	isModified(true),
-	selectChildren(true),
-	manageParentVisibility(true),
-	manageChildVisibility(true),
-	modelState(ms),
-	owningService(owner),
-	name("")
+EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner) :
+	m_entityID(_ID),
+	m_entityStorageVersion(0),
+	m_initiallyHidden(false),
+	m_isEditable(false),
+	m_parentEntity(_parent),
+	m_observer(_obs),
+	m_isModified(true),
+	m_selectChildren(true),
+	m_manageParentVisibility(true),
+	m_manageChildVisibility(true),
+	m_modelState(_ms),
+	m_owningService(_owner),
+	m_name(""),
+	m_isDeletable(true)
 {
-	if (factory != nullptr && factory->GetChainRoot() != nullptr)
-	{
-		classFactory = factory->GetChainRoot();
+	if (_factory != nullptr && _factory->GetChainRoot() != nullptr) {
+		m_classFactory = _factory->GetChainRoot();
 	}
-	else
-	{
-		classFactory = factory;
+	else {
+		m_classFactory = _factory;
 	}
 }
 
-EntityBase::~EntityBase() 
-{ 
-	if (parentEntity != nullptr) parentEntity->removeChild(this); 
-	if (observer != nullptr) observer->entityRemoved(this);
+EntityBase::~EntityBase() {
+	if (m_parentEntity != nullptr) {
+		m_parentEntity->removeChild(this);
+	}
+	if (m_observer != nullptr) {
+		m_observer->entityRemoved(this);
+	}
 }
 
-void EntityBase::setUidGenerator(DataStorageAPI::UniqueUIDGenerator *_uidGenerator) 
-{ 
-	if (globalUidGenerator == nullptr)
-	{
+void EntityBase::setUidGenerator(DataStorageAPI::UniqueUIDGenerator *_uidGenerator) {
+	if (globalUidGenerator == nullptr) {
 		globalUidGenerator = _uidGenerator;
 	}
-	else
-	{
+	else {
 		assert(globalUidGenerator == _uidGenerator);
 	}
 }
 
-DataStorageAPI::UniqueUIDGenerator *EntityBase::getUidGenerator(void)
-{	
+DataStorageAPI::UniqueUIDGenerator *EntityBase::getUidGenerator(void) {
 	return globalUidGenerator;
 }
 
-std::string EntityBase::getNameOnly() const
-{
+std::string EntityBase::getNameOnly() const {
 	std::list<std::string> tmp = ot::String::split(this->getName(), '/', true);
-	if (tmp.empty()) { return this->getName(); }
-	else { return tmp.back(); }
+	if (tmp.empty()) {
+		return this->getName();
+	}
+	else {
+		return tmp.back();
+	}
 }
 
 
-void EntityBase::setModified(void)
-{ 
-	if (observer != nullptr) observer->entityModified(this);
+void EntityBase::setModified(void) {
+	if (m_observer != nullptr) m_observer->entityModified(this);
 	
-	isModified = true; 
+	m_isModified = true;
 }
 
-bool EntityBase::updateFromProperties(void)
-{
+bool EntityBase::updateFromProperties(void) {
 	// This is the standard base class handler. Therefore no specific update code is provided for this entity.
 	// We check whether there are any property updates needed (which should not be the case).
 	assert(!getProperties().anyPropertyNeedsUpdate());
@@ -82,23 +81,25 @@ bool EntityBase::updateFromProperties(void)
 	return false; // No property grid update necessary
 }
 
-void EntityBase::StoreToDataBase(void)
-{
-	if (!getModified()) return;
+void EntityBase::StoreToDataBase(void) {
+	if (!getModified()) {
+		return;
+	}
 
 	assert(globalUidGenerator != nullptr);
-	if (globalUidGenerator == nullptr) return;
+	if (globalUidGenerator == nullptr) {
+		return;
+	}
 
 	ot::UID entityVersion = globalUidGenerator->getUID();
 
 	StoreToDataBase(entityVersion);
 }
 
-void EntityBase::StoreToDataBase(ot::UID givenEntityVersion)
-{
+void EntityBase::StoreToDataBase(ot::UID givenEntityVersion) {
 	if (!getModified()) return;
 
-	entityStorageVersion = givenEntityVersion; 
+	m_entityStorageVersion = givenEntityVersion;
 	entityIsStored();
 
 	// This item collects all information about the entity and adds it to the storage data 
@@ -106,21 +107,21 @@ void EntityBase::StoreToDataBase(ot::UID givenEntityVersion)
 
 	doc.append(bsoncxx::builder::basic::kvp("SchemaType", getClassName()));
 
-	assert(!owningService.empty());
+	assert(!m_owningService.empty());
 
-	bsoncxx::document::value bsonObj = bsoncxx::from_json(properties.createJSON(nullptr, false));
+	bsoncxx::document::value bsonObj = bsoncxx::from_json(m_properties.createJSON(nullptr, false));
 
 	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_" + getClassName(), getSchemaVersion()),
-		bsoncxx::builder::basic::kvp("EntityID", (long long)entityID),
-		bsoncxx::builder::basic::kvp("Version", (long long)entityStorageVersion),
-		bsoncxx::builder::basic::kvp("Name", name),
-		bsoncxx::builder::basic::kvp("isDeletable", isDeletable),
-		bsoncxx::builder::basic::kvp("initiallyHidden", initiallyHidden),
-		bsoncxx::builder::basic::kvp("isEditable", isEditable),
-		bsoncxx::builder::basic::kvp("selectChildren", selectChildren),
-		bsoncxx::builder::basic::kvp("manageParentVisibility", manageParentVisibility),
-		bsoncxx::builder::basic::kvp("manageChildVisibility", manageChildVisibility),
-		bsoncxx::builder::basic::kvp("Owner", owningService),
+		bsoncxx::builder::basic::kvp("EntityID", (long long)m_entityID),
+		bsoncxx::builder::basic::kvp("Version", (long long)m_entityStorageVersion),
+		bsoncxx::builder::basic::kvp("Name", m_name),
+		bsoncxx::builder::basic::kvp("isDeletable", m_isDeletable),
+		bsoncxx::builder::basic::kvp("initiallyHidden", m_initiallyHidden),
+		bsoncxx::builder::basic::kvp("isEditable", m_isEditable),
+		bsoncxx::builder::basic::kvp("selectChildren", m_selectChildren),
+		bsoncxx::builder::basic::kvp("manageParentVisibility", m_manageParentVisibility),
+		bsoncxx::builder::basic::kvp("manageChildVisibility", m_manageChildVisibility),
+		bsoncxx::builder::basic::kvp("Owner", m_owningService),
 		bsoncxx::builder::basic::kvp("Properties", bsonObj)
 	);
 
@@ -131,8 +132,7 @@ void EntityBase::StoreToDataBase(ot::UID givenEntityVersion)
 	resetModified();
 }
 
-void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, ModelState *ms, bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
-{
+void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, ModelState *ms, bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) {
 	setParent(parent);
 	setObserver(obs);
 	setModelState(ms);
@@ -142,99 +142,90 @@ void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, Mo
 	entityMap[getEntityID()] = this;
 }
 
-void EntityBase::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
-{
-	try
-	{
+void EntityBase::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) {
+	try {
 		std::string schemaVersionKey = "SchemaVersion_" + getClassName();
 		int schemaVersion = (int) DataBase::GetIntFromView(doc_view, schemaVersionKey.c_str());
 		if (schemaVersion != getSchemaVersion()) throw (std::exception());
 
-		entityID             = DataBase::GetIntFromView(doc_view, "EntityID");
-		entityStorageVersion = DataBase::GetIntFromView(doc_view, "Version");
-		name                 = doc_view["Name"].get_utf8().value.data();
-		initiallyHidden      = doc_view["initiallyHidden"].get_bool();
-		auto bsonObj         = doc_view["Properties"].get_document();
+		m_entityID             = DataBase::GetIntFromView(doc_view, "EntityID");
+		m_entityStorageVersion = DataBase::GetIntFromView(doc_view, "Version");
+		m_name                 = doc_view["Name"].get_utf8().value.data();
+		m_initiallyHidden      = doc_view["initiallyHidden"].get_bool();
+		auto bsonObj           = doc_view["Properties"].get_document();
 
-		owningService = "Model";
+		m_owningService = "Model";
 		try {
-			owningService = doc_view["Owner"].get_utf8().value.data();
+			m_owningService = doc_view["Owner"].get_utf8().value.data();
 		}
 		catch (std::exception)
 		{
 		}
 
-		isEditable = false;
+		m_isEditable = false;
 		try {
-			isEditable = doc_view["isEditable"].get_bool();
+			m_isEditable = doc_view["isEditable"].get_bool();
 		}
 		catch (std::exception)
 		{
 		}
 
-		selectChildren = true;
+		m_selectChildren = true;
 		try {
-			selectChildren = doc_view["selectChildren"].get_bool();
+			m_selectChildren = doc_view["selectChildren"].get_bool();
 		}
 		catch (std::exception)
 		{
 		}
 
-		manageParentVisibility = true;
+		m_manageParentVisibility = true;
 		try {
-			manageParentVisibility = doc_view["manageParentVisibility"].get_bool();
+			m_manageParentVisibility = doc_view["manageParentVisibility"].get_bool();
 		}
 		catch (std::exception)
 		{
 		}
 
-		manageChildVisibility = true;
+		m_manageChildVisibility = true;
 		try {
-			manageChildVisibility = doc_view["manageChildVisibility"].get_bool();
+			m_manageChildVisibility = doc_view["manageChildVisibility"].get_bool();
 		}
 		catch (std::exception)
 		{
 		}
 
-		isDeletable = true;
-		if (doc_view.find("isDeletable") != doc_view.end())
-		{
-			isDeletable = doc_view["isDeletable"].get_bool();
+		m_isDeletable = true;
+		if (doc_view.find("isDeletable") != doc_view.end()) {
+			m_isDeletable = doc_view["isDeletable"].get_bool();
 		}
 
 		std::string propertiesJSON = bsoncxx::to_json(bsonObj);
-		properties.buildFromJSON(propertiesJSON, nullptr);
-		properties.forceResetUpdateForAllProperties();
+		m_properties.buildFromJSON(propertiesJSON, nullptr);
+		m_properties.forceResetUpdateForAllProperties();
 		
 		resetModified();
 	}
-	catch (std::exception _e)
-	{
+	catch (std::exception _e) {
 		OT_LOG_EAS(_e.what()); // Read failed
 	}
 }
 
-void EntityBase::addPrefetchingRequirementsForTopology(std::list<ot::UID> &prefetchIds)
-{
-	if (getEntityID() > 0)
-	{
+void EntityBase::addPrefetchingRequirementsForTopology(std::list<ot::UID> &prefetchIds) {
+	if (getEntityID() > 0) {
 		prefetchIds.push_back(getEntityID());
 	}
 }
 
-ot::UID EntityBase::createEntityUID(void)
-{
+ot::UID EntityBase::createEntityUID(void) {
 	assert(getUidGenerator() != nullptr);
 
 	return getUidGenerator()->getUID();
 }
 
-EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap, ClassFactoryHandler* factory)
-{
+EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap, ClassFactoryHandler* factory) {
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(entityID, version, doc))
-	{
+	if (!DataBase::GetDataBase()->GetDocumentFromEntityIDandVersion(entityID, version, doc)) {
 		return nullptr;
 	}
 
@@ -242,11 +233,10 @@ EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot:
 
 	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
 
-	assert(classFactory != nullptr || factory != nullptr);
-	EntityBase *entity = (classFactory != nullptr ? classFactory : factory)->CreateEntity(entityType);
+	assert(m_classFactory != nullptr || factory != nullptr);
+	EntityBase *entity = (m_classFactory != nullptr ? m_classFactory : factory)->CreateEntity(entityType);
 
-	if (entity == nullptr)
-	{
+	if (entity == nullptr) {
 		return nullptr;
 	}
 
@@ -255,27 +245,23 @@ EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot:
 	return entity;
 }
 
-EntityBase *EntityBase::readEntityFromEntityID(EntityBase *parent, ot::UID entityID, std::map<ot::UID, EntityBase *> &entityMap)
-{
-	assert(modelState != nullptr);
-	ot::UID version = modelState->getCurrentEntityVersion(entityID);
+EntityBase *EntityBase::readEntityFromEntityID(EntityBase *parent, ot::UID entityID, std::map<ot::UID, EntityBase *> &entityMap) {
+	assert(m_modelState != nullptr);
+	ot::UID version = m_modelState->getCurrentEntityVersion(entityID);
 
 	return readEntityFromEntityIDAndVersion(parent, entityID, version, entityMap);
 }
 
-ot::UID EntityBase::getCurrentEntityVersion(ot::UID entityID)
-{
-	assert(modelState != nullptr);
-	return modelState->getCurrentEntityVersion(entityID);
+ot::UID EntityBase::getCurrentEntityVersion(ot::UID entityID) {
+	assert(m_modelState != nullptr);
+	return m_modelState->getCurrentEntityVersion(entityID);
 }
 
-void EntityBase::entityIsStored(void)
-{
+void EntityBase::entityIsStored(void) {
 	// Determined the parent ID
 	ot::UID parentID = 0;
 
-	if (getParent() != nullptr)
-	{
+	if (getParent() != nullptr) {
 		parentID = getParent()->getEntityID();
 		assert(parentID != 0);
 	}
@@ -285,8 +271,7 @@ void EntityBase::entityIsStored(void)
 
 	ModelStateEntity::tEntityType entityType = ModelStateEntity::tEntityType::DATA;
 
-	switch (getEntityType())
-	{
+	switch (getEntityType()) {
 	case EntityBase::TOPOLOGY:
 		entityType = ModelStateEntity::tEntityType::TOPOLOGY;
 		break;
@@ -297,18 +282,14 @@ void EntityBase::entityIsStored(void)
 		assert(0); // Unknown entity type
 	}
 
-	if (modelState != nullptr)
-	{
-		modelState->storeEntity(getEntityID(), parentID, getEntityStorageVersion(), entityType);
+	if (m_modelState != nullptr) {
+		m_modelState->storeEntity(getEntityID(), parentID, getEntityStorageVersion(), entityType);
 	}
 }
 
-void EntityBase::detachFromHierarchy(void)
-{
+void EntityBase::detachFromHierarchy(void) {
 	// Here we detach the entity from the hierarcy which means detaching from the parent.
-
-	if (getParent() != nullptr)
-	{
+	if (getParent() != nullptr) {
 		getParent()->removeChild(this);
 		setParent(nullptr);
 	}

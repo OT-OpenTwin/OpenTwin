@@ -24,47 +24,47 @@ public:
 	virtual void entityRemoved(EntityBase *entity) {};
 	virtual void entityModified(EntityBase *entity) {};
 
-	virtual void sendMessageToViewer(ot::JsonDocument& doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds;  sendMessageToViewer(doc, prefetchIds); };
+	virtual void sendMessageToViewer(ot::JsonDocument& doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(doc, prefetchIds); };
 	virtual void sendMessageToViewer(ot::JsonDocument& doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) {};
 
 };
 
-//! The Entity class is the base class for model entities and provides basic access properties to model entities. 
+//! \brief The Entity class is the base class for model entities and provides basic access properties to model entities. 
 class  __declspec(dllexport) EntityBase
 {
 public:
-	EntityBase(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler *factory, const std::string &owner);
+	EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner);
 	virtual ~EntityBase();
 
 	static void setUidGenerator(DataStorageAPI::UniqueUIDGenerator *_uidGenerator);
 	static DataStorageAPI::UniqueUIDGenerator *getUidGenerator(void);
 
-	void		setName(std::string n) { name = n; setModified(); };
-	std::string getName(void)  const { return name; };
+	void setName(std::string n) { m_name = n; setModified(); };
+	std::string getName(void)  const { return m_name; };
+
 	//! \brief Returns the name of the entity without the parent entity names.
 	//! If the name is "root/entity" then the function will return "entity".
-	std::string getNameOnly() const; 
+	std::string getNameOnly() const;
 
-	void         setEntityID(ot::UID id) { entityID = id;  setModified(); };
-	ot::UID getEntityID(void) const { return entityID; };
+	void setEntityID(ot::UID id) { m_entityID = id; setModified(); };
+	ot::UID getEntityID(void) const { return m_entityID; };
 
-	//void         setEntityStorageVersion(ot::UID version) { entityStorageVersion = version; };
-	ot::UID getEntityStorageVersion(void) const { return entityStorageVersion; };
+	ot::UID getEntityStorageVersion(void) const { return m_entityStorageVersion; };
 
-	void setInitiallyHidden(bool flag) { initiallyHidden = flag; };
-	bool getInitiallyHidden(void) { return initiallyHidden; };
+	void setInitiallyHidden(bool flag) { m_initiallyHidden = flag; };
+	bool getInitiallyHidden(void) { return m_initiallyHidden; };
 
-	void setEditable(bool flag) { isEditable = flag; }
-	bool getEditable(void) { return isEditable; }
+	void setEditable(bool flag) { m_isEditable = flag; }
+	bool getEditable(void) { return m_isEditable; }
 
-	void setSelectChildren(bool flag) { selectChildren = flag; }
-	bool getSelectChildren(void) { return selectChildren; }
+	void setSelectChildren(bool flag) { m_selectChildren = flag; }
+	bool getSelectChildren(void) { return m_selectChildren; }
 
-	void setManageParentVisibility(bool flag) { manageParentVisibility = flag; }
-	bool getManageParentVisibility(void) { return manageParentVisibility; }
+	void setManageParentVisibility(bool flag) { m_manageParentVisibility = flag; }
+	bool getManageParentVisibility(void) { return m_manageParentVisibility; }
 
-	void setManageChildVisibility(bool flag) { manageChildVisibility = flag; }
-	bool getManageChildVisibility(void) { return manageChildVisibility; }
+	void setManageChildVisibility(bool flag) { m_manageChildVisibility = flag; }
+	bool getManageChildVisibility(void) { return m_manageChildVisibility; }
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) = 0;
 
@@ -72,20 +72,20 @@ public:
 
 	virtual bool updateFromProperties(void);
 
-	void setModelState(ModelState *ms) { modelState = ms; };
-	ModelState *getModelState(void) { return modelState; };
+	void setModelState(ModelState *ms) { m_modelState = ms; };
+	ModelState *getModelState(void) { return m_modelState; };
 
-	EntityBase *getParent(void) { return parentEntity; };
-	void setParent(EntityBase *parent) { parentEntity = parent; };  // The parent information is not persistent. Changing it therefore does not set the modified flag for the entity.
+	EntityBase *getParent(void) { return m_parentEntity; };
+	void setParent(EntityBase *parent) { m_parentEntity = parent; };  // The parent information is not persistent. Changing it therefore does not set the modified flag for the entity.
 
-	void setObserver(EntityObserver *obs) { observer = obs; };
-	EntityObserver *getObserver(void) { return observer; };
+	void setObserver(EntityObserver *obs) { m_observer = obs; };
+	EntityObserver *getObserver(void) { return m_observer; };
 
-	ClassFactoryHandler *getClassFactory(void) { return classFactory; };
+	ClassFactoryHandler *getClassFactory(void) { return m_classFactory; };
 
-	EntityProperties &getProperties(void) { return properties; };
+	EntityProperties &getProperties(void) { return m_properties; };
 
-	virtual EntityBase *getEntityFromName(const std::string &n) { if (name == n) return this; return nullptr; };
+	virtual EntityBase *getEntityFromName(const std::string &n) { if (m_name == n) return this; return nullptr; };
 
 	virtual bool considerForPropertyFilter(void) { return true; };
 	virtual bool considerChildrenForPropertyFilter(void) { return true; };
@@ -94,8 +94,8 @@ public:
 	virtual void StoreToDataBase(ot::UID givenEntityVersion);
 
 	void setModified(void);
-	void resetModified(void) { isModified = false; };
-	bool getModified(void) { return (isModified || properties.anyPropertyNeedsUpdate()); };
+	void resetModified(void) { m_isModified = false; };
+	bool getModified(void) { return (m_isModified || m_properties.anyPropertyNeedsUpdate()); };
 
 	void restoreFromDataBase(EntityBase *parent, EntityObserver *obs, ModelState *ms, bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap);
 
@@ -108,13 +108,13 @@ public:
 	enum entityType {TOPOLOGY, DATA};
 	virtual entityType getEntityType(void) = 0;
 
-	void setOwningService(const std::string &owner) { owningService = owner; };
-	const std::string &getOwningService(void) { return owningService; };
+	void setOwningService(const std::string &owner) { m_owningService = owner; };
+	const std::string &getOwningService(void) { return m_owningService; };
 
 	virtual void detachFromHierarchy(void);
 
-	void setDeletable(bool deletable) { isDeletable = deletable; };
-	const bool deletable() const { return isDeletable; }
+	void setDeletable(bool deletable) { m_isDeletable = deletable; };
+	const bool deletable() const { return m_isDeletable; }
 
 protected:
 	virtual int getSchemaVersion(void) { return 1; };
@@ -129,23 +129,23 @@ protected:
 
 private:
 	// Persistent attributes
-	std::string		    name;
-	ot::UID				    entityID;
-	ot::UID				    entityStorageVersion;
-	bool                initiallyHidden;
-	bool				isEditable;
-	bool				isDeletable = true;
-	bool				selectChildren;
-	bool				manageParentVisibility;
-	bool				manageChildVisibility;
-	EntityProperties    properties;
-	std::string			owningService;
+	std::string		     m_name;
+	ot::UID              m_entityID;
+	ot::UID				 m_entityStorageVersion;
+	bool                 m_initiallyHidden;
+	bool			 	 m_isEditable;
+	bool				 m_isDeletable;
+	bool				 m_selectChildren;
+	bool				 m_manageParentVisibility;
+	bool				 m_manageChildVisibility;
+	EntityProperties     m_properties;
+	std::string			 m_owningService;
 
 	// Temporary attributes
-	EntityBase         *parentEntity;
-	EntityObserver     *observer;
-	bool			    isModified;
-	ModelState		   *modelState;
-	ClassFactoryHandler *classFactory;
+	EntityBase*          m_parentEntity;
+	EntityObserver*      m_observer;
+	bool			     m_isModified;
+	ModelState*          m_modelState;
+	ClassFactoryHandler* m_classFactory;
 };
 
