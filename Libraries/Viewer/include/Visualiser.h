@@ -21,6 +21,8 @@ public:
 
 	SceneNodeBase* getSceneNode(void) const { return m_node; };
 	
+	ot::WidgetViewBase::ViewType getViewType(void) const { return m_viewType; };
+
 protected:
 	SceneNodeBase* m_node = nullptr;
 	bool m_visible = true;
