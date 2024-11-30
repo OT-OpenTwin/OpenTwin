@@ -35,6 +35,7 @@ EntityPropertiesBase::EntityPropertiesBase(const EntityPropertiesBase &other)
 	m_protectedProperty = other.m_protectedProperty;
 	m_visible = other.m_visible;
 	m_errorState = other.m_errorState;
+	m_toolTip = other.m_toolTip;
 }
 
 void EntityPropertiesBase::setNeedsUpdate(void) {
@@ -55,6 +56,7 @@ void EntityPropertiesBase::copySettings(EntityPropertiesBase *other, EntityBase 
 	m_protectedProperty = other->m_protectedProperty;
 	m_visible = other->m_visible;
 	m_errorState = other->m_errorState;
+	m_toolTip = other->m_toolTip;
 }
 
 EntityPropertiesBase& EntityPropertiesBase::operator=(const EntityPropertiesBase &other)
@@ -70,6 +72,7 @@ EntityPropertiesBase& EntityPropertiesBase::operator=(const EntityPropertiesBase
 		m_protectedProperty = other.m_protectedProperty;
 		m_visible = other.m_visible;
 		m_errorState = other.m_errorState;
+		m_toolTip = other.m_toolTip;
 	}
 	
 	return *this; 
@@ -82,6 +85,7 @@ void EntityPropertiesBase::setupPropertyData(ot::PropertyGridCfg& _configuration
 	if (!this->getProtected()) _property->setPropertyFlag(ot::Property::IsDeletable);
 	if (!this->getVisible()) _property->setPropertyFlag(ot::Property::IsHidden);
 	if (this->getErrorState()) _property->setPropertyFlag(ot::Property::HasInputError);
+	_property->setPropertyTip(m_toolTip);
 
 	ot::PropertyGroup* group = _configuration.findOrCreateGroup(this->getGroup());
 	OTAssertNullptr(group);
@@ -97,6 +101,7 @@ void EntityPropertiesBase::addBaseDataToJsonDocument(ot::JsonValue& container, o
 	container.AddMember("Visible", this->getVisible(), allocator);
 	container.AddMember("ErrorState", this->getErrorState(), allocator);
 	container.AddMember("Group", ot::JsonString(this->getGroup(), allocator), allocator);
+	container.AddMember("ToolTip", ot::JsonString(this->getToolTip(), allocator), allocator);
 }
 
 bool EntityPropertiesBase::needsUpdate(void)

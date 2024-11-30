@@ -41,8 +41,8 @@ public:
 	bool needsUpdate(void);
 	void setNeedsUpdate(void);
 
-	bool hasMultipleValues(void) { return m_multipleValues; };
 	void setHasMultipleValues(bool b) { m_multipleValues = b; };
+	bool hasMultipleValues(void) const { return m_multipleValues; };
 
 	virtual bool isCompatible(EntityPropertiesBase *other) { return true; };
 	virtual bool hasSameValue(EntityPropertiesBase *other) = 0;
@@ -52,6 +52,9 @@ public:
 
 	virtual void addToJsonDocument(ot::JsonDocument& jsonDoc, EntityBase* root) = 0;
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root) = 0;
+
+	void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
+	const std::string& getToolTip(void) const { return m_toolTip; };
 
 	void setReadOnly(bool flag) { m_readOnly = flag; };
 	bool getReadOnly(void) { return m_readOnly; };
@@ -80,6 +83,7 @@ private:
 	bool m_needsUpdateFlag;
 	std::string m_name;
 	std::string m_group;
+	std::string m_toolTip;
 	bool m_multipleValues;
 	bool m_readOnly;
 	bool m_protectedProperty;

@@ -274,6 +274,7 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 		newSetting->setProtected(!(p->getPropertyFlags() & ot::Property::IsDeletable));
 		newSetting->setVisible(!(p->getPropertyFlags() & ot::Property::IsHidden));
 		newSetting->setErrorState(p->getPropertyFlags() & ot::Property::HasInputError);
+		newSetting->setToolTip(p->getPropertyTip());
 
 		this->createProperty(newSetting, _groupConfig->getGroupPath());
 	}
@@ -354,6 +355,11 @@ void EntityProperties::buildFromJSON(const std::string& prop, EntityBase* root)
 				group = ot::json::getString(i->value, "Group");
 			}
 
+			std::string toolTip;
+			if (i->value.HasMember("ToolTip")) {
+				toolTip = ot::json::getString(i->value, "ToolTip");
+			}
+
 			EntityPropertiesBase* newSetting(nullptr);
 
 			if (type == "double") newSetting = new EntityPropertiesDouble;
@@ -367,7 +373,8 @@ void EntityProperties::buildFromJSON(const std::string& prop, EntityBase* root)
 			else if (type == "guipainter") newSetting = new EntityPropertiesGuiPainter;
 			else
 			{
-				assert(0); // Unknown type
+				OT_LOG_EAS("Unknown property type \"" + type + "\"");
+				return;
 			}
 
 			assert(newSetting != nullptr);
@@ -381,6 +388,7 @@ void EntityProperties::buildFromJSON(const std::string& prop, EntityBase* root)
 				newSetting->setProtected(protectedProperty);
 				newSetting->setVisible(visible);
 				newSetting->setErrorState(errorState);
+				newSetting->setToolTip(toolTip);
 
 				this->createProperty(newSetting, group);
 			}
