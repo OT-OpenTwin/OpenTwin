@@ -626,9 +626,6 @@
     <ClInclude Include="include\OTWidgets\PropertyInputPainter2D.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\ComboBox.h">
-      <Filter>include\Widgets</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyGridItemDelegate.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
@@ -806,6 +803,9 @@
     <ClInclude Include="include\OTWidgets\WidgetViewDockManager.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyInputStringList.h">
+      <Filter>include\Properties</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
@@ -952,8 +952,8 @@
     <QtMoc Include="include\OTWidgets\DoubleSpinBox.h">
       <Filter>include\Widgets</Filter>
     </QtMoc>
-    <QtMoc Include="include\OTWidgets\PropertyInputStringList.h">
-      <Filter>include\Properties</Filter>
+    <QtMoc Include="include\OTWidgets\ComboBox.h">
+      <Filter>include\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

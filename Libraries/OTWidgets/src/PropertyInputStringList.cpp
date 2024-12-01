@@ -29,7 +29,7 @@ ot::PropertyInputStringList::PropertyInputStringList()
 	customLineEdit->setReadOnly(true);
 	m_comboBox->setLineEdit(customLineEdit);
 	this->connect(m_comboBox, &ComboBox::currentTextChanged, this, qOverload<>(&PropertyInput::slotValueChanged));
-	this->connect(customLineEdit, &LineEdit::leftMouseButtonPressed, this, &PropertyInputStringList::slotTogglePopup);
+	this->connect(customLineEdit, &LineEdit::leftMouseButtonPressed, m_comboBox, &ComboBox::togglePopup);
 }
 
 ot::PropertyInputStringList::~PropertyInputStringList() {
@@ -108,13 +108,4 @@ QStringList ot::PropertyInputStringList::getPossibleSelection(void) const {
 		lst.append(m_comboBox->itemText(i));
 	}
 	return lst;
-}
-
-void ot::PropertyInputStringList::slotTogglePopup(void) {
-	if (m_comboBox->view()->isVisible()) {
-		m_comboBox->hidePopup();
-	}
-	else {
-		m_comboBox->showPopup();
-	}
 }
