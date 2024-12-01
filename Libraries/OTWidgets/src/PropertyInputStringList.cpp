@@ -7,21 +7,29 @@
 #include "OTCore/Logger.h"
 #include "OTGui/PropertyStringList.h"
 #include "OTWidgets/ComboBox.h"
+#include "OTWidgets/LineEdit.h"
 #include "OTWidgets/PropertyInputStringList.h"
 #include "OTWidgets/PropertyInputFactoryRegistrar.h"
 
 // Qt header
 #include <QtWidgets/qmenu.h>
 #include <QtWidgets/qaction.h>
+#include <QtWidgets/qlineedit.h>
+#include <QtWidgets/qabstractitemview.h>
 
 static ot::PropertyInputFactoryRegistrar<ot::PropertyInputStringList> propertyInputStringListRegistrar(ot::PropertyStringList::propertyTypeString());
 
 ot::PropertyInputStringList::PropertyInputStringList()
 {
 	m_comboBox = new ComboBox;
-	m_comboBox->setEditable(false);
+	m_comboBox->setEditable(true);
 	m_comboBox->setFocusPolicy(Qt::NoFocus);
+
+	LineEdit* customLineEdit = new LineEdit;
+	customLineEdit->setReadOnly(true);
+	m_comboBox->setLineEdit(customLineEdit);
 	this->connect(m_comboBox, &ComboBox::currentTextChanged, this, qOverload<>(&PropertyInput::slotValueChanged));
+	this->connect(customLineEdit, &LineEdit::leftMouseButtonPressed, this, &PropertyInputStringList::slotTogglePopup);
 }
 
 ot::PropertyInputStringList::~PropertyInputStringList() {
@@ -100,4 +108,13 @@ QStringList ot::PropertyInputStringList::getPossibleSelection(void) const {
 		lst.append(m_comboBox->itemText(i));
 	}
 	return lst;
+}
+
+void ot::PropertyInputStringList::slotTogglePopup(void) {
+	if (m_comboBox->view()->isVisible()) {
+		m_comboBox->hidePopup();
+	}
+	else {
+		m_comboBox->showPopup();
+	}
 }

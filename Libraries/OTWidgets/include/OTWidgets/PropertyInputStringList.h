@@ -13,6 +13,7 @@ namespace ot {
 	class ComboBox;
 
 	class OT_WIDGETS_API_EXPORT PropertyInputStringList : public PropertyInput {
+		Q_OBJECT
 		OT_DECL_NOCOPY(PropertyInputStringList)
 	public:
 		PropertyInputStringList();
@@ -28,6 +29,9 @@ namespace ot {
 		void setCurrentText(const QString& _text);
 		QString getCurrentText(void) const;
 		QStringList getPossibleSelection(void) const;
+
+	private Q_SLOTS:
+		void slotTogglePopup(void);
 
 	private:
 		ComboBox* m_comboBox;

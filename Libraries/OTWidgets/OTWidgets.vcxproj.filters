@@ -593,9 +593,6 @@
     <ClInclude Include="include\OTWidgets\PropertyInputBool.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyInputStringList.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyInputColor.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
@@ -954,6 +951,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\DoubleSpinBox.h">
       <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyInputStringList.h">
+      <Filter>include\Properties</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

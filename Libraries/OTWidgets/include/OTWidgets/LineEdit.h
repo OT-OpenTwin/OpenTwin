@@ -27,5 +27,11 @@ namespace ot {
 	public Q_SLOTS:
 		void setInputErrorStateProperty(void);
 		void unsetInputErrorStateProperty(void);
+
+	Q_SIGNALS:
+		void leftMouseButtonPressed(void);
+
+	protected:
+		virtual void mousePressEvent(QMouseEvent* _event) override;
 	};
 }

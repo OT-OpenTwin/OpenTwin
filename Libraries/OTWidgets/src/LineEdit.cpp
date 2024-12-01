@@ -7,6 +7,7 @@
 #include "OTWidgets/LineEdit.h"
 
 // Qt header
+#include <QtGui/qevent.h>
 #include <QtWidgets/qstyle.h>
 
 ot::LineEdit::LineEdit(QWidget* _parentWidget)
@@ -31,4 +32,11 @@ void ot::LineEdit::unsetInputErrorStateProperty(void) {
 	this->setProperty("HasInputError", false);
 	this->style()->unpolish(this);
 	this->style()->polish(this);
+}
+
+void ot::LineEdit::mousePressEvent(QMouseEvent* _event) {
+	QLineEdit::mousePressEvent(_event);
+	if (_event->button() == Qt::LeftButton) {
+		Q_EMIT leftMouseButtonPressed();
+	}
 }
