@@ -2,9 +2,8 @@
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTCore/ReturnMessage.h"
 
-#include <QtNetwork/qlocalserver.h>
 #include <QtNetwork/qlocalsocket.h>
-#include <QtCore/qobject.h>
+#include <QtNetwork/qlocalserver.h>
 
 
 #include <atomic>
@@ -13,14 +12,18 @@
 class ConnectionManager {
 	
 public:	
-	ConnectionManager(const std::string& serverName);
+	ConnectionManager();
 	~ConnectionManager();
 
-	bool connectToSubprocess();
+	//bool connectToSubprocess();
 	std::string sendRequest(std::string& message);
 	std::string receiveResponse();
+
+	//Getter
+
 
 private:
 	std::string m_serverName;
 	QLocalSocket* m_socket = nullptr;
+	QLocalServer m_server;
 };

@@ -22,11 +22,14 @@ SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionI
 	m_subprocessPath = FindSubprocessPath() + m_executableName;
 
 	InitiateProcess();
+
+	ConnectionManager m_connectionManager;
 	
 #ifdef _DEBUG
 	m_serverName = "TestServer";
 #endif
 	m_server.listen(m_serverName.c_str());
+	
 #ifndef _DEBUG
 	std::thread workerThread(&SubprocessHandler::RunSubprocess, this);
 	workerThread.detach();
@@ -71,11 +74,13 @@ void SubprocessHandler::RunSubprocess()
 		const bool startSuccessfull = startSubprocess();
 		if (!startSuccessfull)
 		{
-			std::string message = "Starting Python Subprocess timeout.";
+			std::string message = "Starting Circuit Subprocess timeout.";
 			OT_LOG_E(message);
 			throw std::exception(message.c_str());
 		}
 		OT_LOG_D("Circuit Subprocess started");
+
+		
 	}
 	catch (std::exception& e)
 	{
@@ -107,7 +112,7 @@ bool SubprocessHandler::startSubprocess() {
 			{
 				std::string errorMessage;
 				ProcessErrorOccured(errorMessage);
-				errorMessage = "Error occured while starting Python Subservice: " + errorMessage;
+				errorMessage = "Error occured while starting Circuit Subservice: " + errorMessage;
 				throw std::exception(errorMessage.c_str());
 			}
 		}

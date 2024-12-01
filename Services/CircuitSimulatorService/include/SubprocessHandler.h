@@ -1,6 +1,7 @@
 #pragma once
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTCore/ReturnMessage.h"
+#include "ConnectionManager.h"
 
 #include <QtNetwork/qlocalserver.h>
 #include <QtNetwork/qlocalsocket.h>
@@ -32,7 +33,7 @@ private:
 	QLocalServer m_server;
 	std::atomic_bool m_isHealthy;
 	std::atomic_bool m_initialisationPrepared = false;
-
+	ConnectionManager m_connectionManager;
 
 	std::vector<std::string> m_initialisationRoutines;
 	const int m_numberOfInitialisationRoutines = 4;
