@@ -130,10 +130,13 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	_item->setBlockConfigurationNotifications(false);
 
 	if (removeConnectionBufferApplied) {
+		std::list<GraphicsConnectionCfg> newBuffer;
 		for (const GraphicsConnectionCfg& bufferedConnection : m_itemRemovalConnectionBuffer) {
-			this->addConnection(bufferedConnection);
+			if (!this->addConnectionIfConnectedItemsExist(bufferedConnection)) {
+				newBuffer.push_back(bufferedConnection);
+			}
 		}
-		m_itemRemovalConnectionBuffer.clear();
+		m_itemRemovalConnectionBuffer = newBuffer;
 	}
 
 	auto currentConnection = m_connectionCreationBuffer.begin();
