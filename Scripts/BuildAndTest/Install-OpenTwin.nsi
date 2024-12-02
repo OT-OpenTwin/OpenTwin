@@ -115,7 +115,7 @@ Section "Program files (Required)"
   
   WriteUninstaller "$InstDir\Uninst.exe"
   WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "DisplayName" "OpenTwin"
-  WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$InstDir\OpenTwin.exe,0"
+  WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$InstDir\icons\Application\OpenTwin.ico"
   WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "UninstallString" '"$InstDir\Uninst.exe"'
   WriteRegDWORD HKCU "${REGPATH_UNINSTSUBKEY}" "NoModify" 1
   WriteRegDWORD HKCU "${REGPATH_UNINSTSUBKEY}" "NoRepair" 1
