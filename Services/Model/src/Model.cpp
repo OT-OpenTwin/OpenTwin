@@ -3763,6 +3763,7 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	}
 
 	// Enable write caching to database
+	DataBase::GetDataBase()->queueWriting(false);
 	DataBase::GetDataBase()->queueWriting(true);
 
 	// Serialize the model content to the data base
@@ -3818,8 +3819,10 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	std::string previousModelVersion = getStateManager()->getModelStateVersion();
 
 	// Check whether we have redo information
-	if (getStateManager()->canRedo() && !silentlyCreateBranch)
-	{
+	if (getStateManager()->canRedo() && !silentlyCreateBranch) {
+		// Disable write caching to database (this will also flush all pending writes)
+		DataBase::GetDataBase()->queueWriting(false);
+
 		Application::instance()->getNotifier()->promptChoice("There is redo information available which will be discarded if you change the model at this stage. \n\n"
 			"Do you want to create a new version branch for these changes?", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No, "DiscardRedoInfoAndSave", comment);
 
@@ -3828,6 +3831,9 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 
 	// Save the model state for the latest version
 	getStateManager()->saveModelState(false, false, comment);
+
+	// Disable write caching to database (this will also flush all pending writes)
+	DataBase::GetDataBase()->queueWriting(false);
 
 	// Add the new state and activate it
 	std::string currentModelVersion = getStateManager()->getModelStateVersion();
@@ -3839,9 +3845,6 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	}
 
 	addNewVersionTreeStateAndActivate(previousModelVersion, activeBranch, ot::VersionGraphVersionCfg(currentModelVersion, "", comment));
-
-	// Disable write caching to database (this will also flush all pending writes
-	DataBase::GetDataBase()->queueWriting(false);
 
 	updateUndoRedoStatus();
 	resetModified();
