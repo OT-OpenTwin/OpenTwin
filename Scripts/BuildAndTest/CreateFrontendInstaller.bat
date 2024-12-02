@@ -235,6 +235,9 @@ COPY "%OT_ENCRYPTIONKEY_ROOT%\ca.pem" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Certificat
 ECHO [Paths] > "%OPENTWIN_FRONTEND_DEPLOYMENT%\qt.conf"
 ECHO Plugins = .\\plugins >> "%OPENTWIN_FRONTEND_DEPLOYMENT%\qt.conf"
 
+REM Copy the build information files
+COPY "%OPENTWIN_DEV_ROOT%\Deployment\BuildInfo.txt" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
 REM ==========================================
 REM Finally create the Installer
 REM ==========================================
