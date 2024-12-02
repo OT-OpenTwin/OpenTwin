@@ -33,6 +33,8 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 
 ECHO Building Project %1
 
+SETLOCAL enabledelayedexpansion
+
 REM Open project
 
 SET RELEASE=1
@@ -75,15 +77,15 @@ ECHO Building project: %1 >> buildlog_Debug.txt
 ECHO ======================================================================================== >> buildlog_Debug.txt
 "%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Debug /p:Platform=x64 >> buildlog_Debug.txt
 
-if %ERRORLEVEL% neq 0 (
+if !ERRORLEVEL! neq 0 (
 	IF "%3"=="BUILD" (
 		ECHO ---------------------------------------------------------------------------------------- >> buildlog_Debug.txt
 		ECHO Re-building project due to build failure: %1 >> buildlog_Debug.txt
 		ECHO ---------------------------------------------------------------------------------------- >> buildlog_Debug.txt
-		cmd /c exit 0
+		ver >nul
 		"%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" /t:Rebuild %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Debug /p:Platform=x64 >> buildlog_Debug.txt
 		
-		if %ERRORLEVEL% neq 0 (
+		if !ERRORLEVEL! neq 0 (
 			ECHO --- Build failed: %1 --- >> buildlog_Debug.txt
 		) ELSE (
 			ECHO --- Build successful: %1 --- >> buildlog_Debug.txt
@@ -107,15 +109,15 @@ ECHO Building project: %1 >> buildlog_Release.txt
 ECHO ======================================================================================== >> buildlog_Release.txt
 "%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" %TYPE% %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Release /p:Platform=x64 >> buildlog_Release.txt
 
-if %ERRORLEVEL% neq 0 (
+if !ERRORLEVEL! neq 0 (
 	IF "%3"=="BUILD" (
 		ECHO ---------------------------------------------------------------------------------------- >> buildlog_Release.txt
 		ECHO Re-building project due to build failure: %1 >> buildlog_Release.txt
 		ECHO ---------------------------------------------------------------------------------------- >> buildlog_Release.txt
-		cmd /c exit 0
+		ver >nul
 		"%DEVENV_ROOT_2022%\..\..\MSBuild\Current\Bin\MSBuild.exe" "%1" /t:Rebuild %PARALLEL_BUILD% /Verbosity:minimal /p:Configuration=Release /p:Platform=x64 >> buildlog_Release.txt
 		
-		if %ERRORLEVEL% neq 0 (
+		if !ERRORLEVEL! neq 0 (
 			ECHO --- Build failed: %1 --- >> buildlog_Release.txt
 		) ELSE (
 			ECHO --- Build successful: %1 --- >> buildlog_Release.txt
