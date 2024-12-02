@@ -72,7 +72,14 @@ cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CreateDeployment.bat"
 
 ECHO ===================================================================
-ECHO Build the installers
+ECHO Build the frontend installer
+ECHO ===================================================================
+
+cd /D "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CreateFrontendInstaller.bat"
+
+ECHO ===================================================================
+ECHO Build the full installers
 ECHO ===================================================================
 
 cd /D "%OPENTWIN_DEV_ROOT%\Scripts\Installer"
