@@ -14,10 +14,12 @@
 #include "OTCore/ServiceBase.h"
 
 // Std header
-#include <exception>
-#include <iostream>
 #include <ctime>
 #include <thread>
+#include <fstream>
+#include <iostream>
+#include <exception>
+#include <filesystem>
 
 #define OT_ACTION_PARAM_LOG_Service "Log.Service"
 #define OT_ACTION_PARAM_LOG_Function "Log.Function"
@@ -176,6 +178,50 @@ void ot::LogNotifierStdCout::log(const LogMessage& _message) {
 
 // ######################################################################################################################################################
 
+ot::LogNotifierFileWriter::LogNotifierFileWriter(const std::string& _serviceName) {
+	std::string baseName = _serviceName + "_log";
+	std::string extension = ".txt";
+	std::string fileName;
+	int counter = 0;
+
+	do {
+		fileName = baseName;
+		if (counter > 0) {
+			fileName += "_" + std::to_string(counter);
+		}
+		fileName += extension;
+		counter++;
+	} while (std::filesystem::exists(fileName));
+
+	m_stream = new std::ofstream(fileName);
+	if (!m_stream->is_open()) {
+		delete m_stream;
+		m_stream = nullptr;
+
+		OT_LOG_EAS("Unable to create file \"" + fileName  + "\"");
+	}
+}
+
+ot::LogNotifierFileWriter::~LogNotifierFileWriter() {
+	if (m_stream) {
+		m_stream->close();
+		delete m_stream;
+		m_stream = nullptr;
+	}
+}
+
+void ot::LogNotifierFileWriter::log(const LogMessage& _message) {
+	if (m_stream) {
+		*m_stream << _message << std::endl;
+	}
+}
+
+// ######################################################################################################################################################
+
+// ######################################################################################################################################################
+
+// ######################################################################################################################################################
+
 ot::LogDispatcher& ot::LogDispatcher::instance(void) {
 	static LogDispatcher g_instance;
 	return g_instance;
@@ -185,6 +231,11 @@ ot::LogDispatcher& ot::LogDispatcher::initialize(const std::string& _serviceName
 	if (!_serviceName.empty()) LogDispatcher::instance().setServiceName(_serviceName);
 	if (_addCoutReceiver) { LogDispatcher::instance().addReceiver(new LogNotifierStdCout); }
 	return LogDispatcher::instance();
+}
+
+void ot::LogDispatcher::addFileWriter(void) {
+	LogDispatcher& dispatcher = LogDispatcher::instance();
+	dispatcher.addReceiver(new LogNotifierFileWriter(dispatcher.m_serviceName));
 }
 
 // #################################################################################
