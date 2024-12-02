@@ -18,8 +18,10 @@
 #include "OTWidgets/Positioning.h"
 #include "OTWidgets/ImagePreview.h"
 #include "OTCommunication/Msg.h"
+#include "OTCommunication/DownloadFile.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/SystemInformation.h"
+#include "OTSystem/Application.h"
 
 // Qt header
 #include <QtCore/qjsonarray.h>
@@ -516,12 +518,47 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 		msg = "Login failed:\n";
 	}
 
+	if (_error == WorkerError::IncompatibleVersions)
+	{
+		msg.append("Incompatible versions of frontend and backend services.\n\n"
+				   "Do you want to update the frontend to match the backend?");
+
+		QMessageBox msgBox(QMessageBox::Critical, "Login Error", msg, QMessageBox::Yes | QMessageBox::Cancel);
+
+		if (msgBox.exec() == QMessageBox::Yes)
+		{
+			// We try to update the frontend installation
+			std::string gssUrl = m_loginData.getGss().getUrl().toStdString();
+			std::string tmpFile = "Install_OpenTwin_Frontend.exe";
+			std::string tempFolder, error;
+			if (ot::DownloadFile::download(gssUrl + "/installer/" + tmpFile, tmpFile, tempFolder, error))
+			{
+				// The installer could be successfully downloaded. Now run the installer and close the application
+				std::string applicationPath = tempFolder + "\\" + tmpFile;
+				std::string commandLine = "\"" + applicationPath + "\" /S";
+				OT_PROCESS_HANDLE processHandle;
+				ot::app::runApplication(applicationPath, commandLine, processHandle, false);
+				exit(0);
+			}
+			else
+			{
+				// Error in downloading the installer
+				QMessageBox msgBox(QMessageBox::Critical, "Login Error", error.c_str(), QMessageBox::Ok | QMessageBox::Cancel);
+			}
+
+			m_loginData.clear();
+			this->setControlsEnabled(true);
+			return;
+		}
+
+		m_loginData.clear();
+		this->setControlsEnabled(true);
+		return;
+	}
+
 
 	switch (_error)
 	{
-	case WorkerError::IncompatibleVersions:
-		msg.append("Incompatible versions of frontend and backend services.");
-		break;
 	case WorkerError::GSSConnectionFailed:
 		msg.append("Failed to connect to Global Session Service. Check backend service status, firewall settings and certificates.");
 		break;
@@ -562,6 +599,7 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 	QMessageBox msgBox(QMessageBox::Critical, "Login Error", msg, QMessageBox::Ok);
 	msgBox.exec();
 
+	m_loginData.clear();
 	this->setControlsEnabled(true);
 }
 
@@ -689,7 +727,6 @@ void LogInDialog::updateGssOptions(void) {
 // Async worker
 
 void LogInDialog::stopWorkerWithError(WorkerError _error) {
-	m_loginData.clear();
 	QMetaObject::invokeMethod(this, "slotWorkerError", Qt::QueuedConnection, Q_ARG(WorkerError, _error));
 }
 
