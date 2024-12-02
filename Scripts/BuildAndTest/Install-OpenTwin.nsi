@@ -121,6 +121,10 @@ Section "Program files (Required)"
   WriteRegDWORD HKCU "${REGPATH_UNINSTSUBKEY}" "NoRepair" 1
   
   File /r ..\..\Deployment_Frontend\*.*
+  
+  IfSilent "" +2 ; If the installer is silent then we run the executable in a last step
+  ExecShell "" "$InstDir\OpenTwin.exe"
+  
 SectionEnd
 
 Section "Start Menu shortcut"
