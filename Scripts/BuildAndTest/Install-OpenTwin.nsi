@@ -47,6 +47,7 @@ InstallDirRegKey HKCU "${REGPATH_UNINSTSUBKEY}" "UninstallString"
 !insertmacro MUI_LANGUAGE "English"
 
 !macro UninstallExisting exitcode uninstcommand
+	Sleep 1000
 	Push `${uninstcommand}`
 	Call UninstallExisting
 	Pop ${exitcode}
@@ -133,6 +134,7 @@ Section "Start Menu shortcut"
 SectionEnd
 
 Section -Uninstall
+
 	${UNPINSHORTCUT} "$SMPROGRAMS\${NAME}.lnk"
 	Delete "$SMPROGRAMS\${NAME}.lnk"
 	${UNPINSHORTCUT} "$DESKTOP\OpenTwin.lnk"
