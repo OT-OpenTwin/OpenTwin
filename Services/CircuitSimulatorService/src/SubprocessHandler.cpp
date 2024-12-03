@@ -119,14 +119,14 @@ bool SubprocessHandler::startSubprocess() {
 
 void SubprocessHandler::stopSubprocess() {
 	if (m_subProcess.state() == QProcess::Running) {
-		OT_LOG_D("Stopping CircuitExecution!");
-		m_subProcess.terminate();
+		//OT_LOG_D("Stopping CircuitExecution!");
+		//m_subProcess.terminate();
 
-		if (!m_subProcess.waitForFinished(5000)) { // Timeout: 5 Sekunden
-			OT_LOG_D("CircuitExecution not responding. Killing Process.");
-			m_subProcess.kill();
-			m_subProcess.waitForFinished();
-		}
+		
+		OT_LOG_D("CircuitExecution not responding. Killing Process.");
+		m_subProcess.kill();
+		m_subProcess.waitForFinished();
+		
 	}
 
 	m_isHealthy = false;

@@ -374,9 +374,8 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	m_blockEntityHandler.createResultCurves(solverName,simulationTypeProperty->getValue(),circuitName->getValueName());
 	m_ngSpice.clearBufferStructure(name);
 
-	//Now we stop the SubProcess
-	m_subprocessHandler->stopSubprocess();
 
+	// Here we stop the Subprocess
 	delete m_subprocessHandler;
 	m_subprocessHandler = nullptr;
 	
