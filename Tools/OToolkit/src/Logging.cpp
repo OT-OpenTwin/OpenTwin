@@ -356,7 +356,7 @@ void Logging::slotViewCellContent(QTableWidgetItem* _itm) {
 	for (auto itm : m_messages) {
 		if (i++ == _itm->row()) {
 			LogVisualizationItemViewDialog dia(itm, i, m_table);
-			dia.exec();
+			dia.showDialog();
 			return;
 		}
 	}

@@ -28,9 +28,17 @@ namespace ot {
 			Cancel
 		};
 
+		enum ShowFlag {
+			DefaultShow    = 0 << 0,
+			CenterOnParent = 1 << 0, //! \brief Positions this dialog in the middle of the parent widget.
+			FitOnScreen    = 1 << 1, //! \brief Ensures the dialog fits on any screen.
+			IdealFit       = CenterOnParent | FitOnScreen
+		};
+		typedef Flags<ShowFlag> ShowFlags;
+
 		enum class DialogState {
-			NoState = 0x00,
-			MousePressed = 0x01
+			NoState        = 0 << 0,
+			MousePressed   = 1 << 0
 		};
 		typedef Flags<DialogState> DialogStateFlags;
 
@@ -42,7 +50,7 @@ namespace ot {
 		virtual QWidget* getQWidget(void) { return this; }
 
 		//! @brief Center the dialog on parent and call exec
-		DialogResult showDialog(void);
+		DialogResult showDialog(const ShowFlags& _showFlags = ShowFlags(IdealFit));
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -88,4 +96,5 @@ namespace ot {
 	};
 }
 
+OT_ADD_FLAG_FUNCTIONS(ot::Dialog::ShowFlag)
 OT_ADD_FLAG_FUNCTIONS(ot::Dialog::DialogState)

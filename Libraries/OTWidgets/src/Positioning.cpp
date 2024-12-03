@@ -108,7 +108,7 @@ QRect ot::Positioning::fitOnScreen(const QRect& _sourceRect, bool _primaryScreen
 			return _sourceRect;
 		}
 	}
-	else {
+	else {	
 		for (QScreen* s : QGuiApplication::screens()) {
 			if (s->availableGeometry().contains(_sourceRect)) {
 				return _sourceRect;
