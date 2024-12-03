@@ -54,11 +54,12 @@ void RangleSelectionVisualisationHandler::selectRange(const ot::UIDList& _select
 			rangesByColourIDByTableNames[tableName][colourID].push_back(selectionRange);
 		}
 
-		bool clearSelection = true;
 		for (const auto& rangesByColourIDByTableName : rangesByColourIDByTableNames)
 		{
 			const std::string tableName = rangesByColourIDByTableName.first;
 			auto& rangesByColourIDs = rangesByColourIDByTableName.second;
+			bool clearSelection = true;
+			requestToOpenTable(tableName);
 			for (const auto& rangesByColourID : rangesByColourIDs)
 			{
 				uint32_t colourID = rangesByColourID.first;
@@ -82,7 +83,6 @@ void RangleSelectionVisualisationHandler::selectRange(const ot::UIDList& _select
 				}
 
 				const auto& ranges = rangesByColourID.second;
-				requestToOpenTable(tableName);
 				requestColouringRanges(clearSelection, tableName, typeColour, ranges);
 				clearSelection = false;
 			}

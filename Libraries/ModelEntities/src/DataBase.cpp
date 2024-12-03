@@ -256,16 +256,21 @@ void DataBase::PrefetchDocumentsFromStorage(std::list<std::pair<unsigned long lo
 	// Now results is an array with all documents found
 
 	size_t numberPrefetchedDocs = 0;
-
-	for (auto result : results)
+	auto resultPointer = results.begin();
+	if (resultPointer == results.end())
 	{
-		auto insertType = result["InsertType"].get_int32().value;
+		/*auto tempQueryView = filterQuery.view();
+		std::string filterString =	bsoncxx::to_json(tempQueryView);*/
+	}
+	for (; resultPointer != results.end(); resultPointer++)
+	{
+		auto insertType = (*resultPointer)["InsertType"].get_int32().value;
 		if (InsertType(insertType) == InsertType::Database)
 		{
 			bsoncxx::builder::basic::document *doc = new bsoncxx::builder::basic::document{};
-			doc->append(bsoncxx::builder::concatenate(result));
+			doc->append(bsoncxx::builder::concatenate(*resultPointer));
 
-			unsigned long long entityID = result["EntityID"].get_int64();
+			unsigned long long entityID = (*resultPointer)["EntityID"].get_int64();
 
 			prefetchedDocuments[entityID] = doc;
 			numberPrefetchedDocs++;
