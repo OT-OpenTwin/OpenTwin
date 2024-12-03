@@ -125,10 +125,10 @@ QRect ot::Positioning::fitOnScreen(const QRect& _sourceRect, bool _primaryScreen
 	else {
 		double closestDistance = std::numeric_limits<double>::max();
 		for (QScreen* s : QGuiApplication::screens()) {
-			double distanceLeft = _sourceRect.left() - s->availableGeometry().right();
-			double distanceRight = _sourceRect.right() - s->availableGeometry().left();
-			double distanceTop = _sourceRect.top() - s->availableGeometry().bottom();
-			double distanceBottom = _sourceRect.bottom() - s->availableGeometry().top();
+			double distanceLeft = _sourceRect.left() - s->availableGeometry().left();
+			double distanceRight = _sourceRect.right() - s->availableGeometry().right();
+			double distanceTop = _sourceRect.top() - s->availableGeometry().top();
+			double distanceBottom = _sourceRect.bottom() - s->availableGeometry().bottom();
 
 			if (distanceLeft < 0.) distanceLeft *= (-1);
 			if (distanceRight < 0.) distanceRight *= (-1);
