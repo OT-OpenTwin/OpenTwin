@@ -129,6 +129,8 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 
 	_item->setBlockConfigurationNotifications(false);
 
+	OT_LOG_D("Item added { \"UID\": " + std::to_string(_item->getGraphicsItemUid()) + " }");
+
 	if (removeConnectionBufferApplied) {
 		std::list<GraphicsConnectionCfg> newBuffer;
 		for (const GraphicsConnectionCfg& bufferedConnection : m_itemRemovalConnectionBuffer) {
@@ -176,6 +178,8 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool bufferConnection
 	delete graphicsItem;
 	m_items.erase(_itemUid);
 	
+	OT_LOG_D("Item removed { \"UID\": " + std::to_string(_itemUid) + " }");
+
 	m_scene->blockSignals(false);
 	this->blockSignals(false);
 }
@@ -209,15 +213,12 @@ std::list<ot::GraphicsItem*> ot::GraphicsView::getSelectedGraphicsItems(void) co
 
 bool ot::GraphicsView::addConnectionIfConnectedItemsExist(const GraphicsConnectionCfg& _config)
 {
-	if (connectedGraphicItemsExist(_config))
-	{
+	if (connectedGraphicItemsExist(_config)) {
 		addConnection(_config);
 		return true;
 	}
-	else
-	{
-		if (std::find(m_connectionCreationBuffer.begin(), m_connectionCreationBuffer.end(), _config) == m_connectionCreationBuffer.end())
-		{
+	else {
+		if (std::find(m_connectionCreationBuffer.begin(), m_connectionCreationBuffer.end(), _config) == m_connectionCreationBuffer.end()) {
 			m_connectionCreationBuffer.push_back(_config);
 		}
 		return false;
@@ -228,6 +229,14 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 	this->removeConnection(_config.getUid());
 	ot::GraphicsItem* src = this->getItem(_config.getOriginUid());
 	ot::GraphicsItem* dest = this->getItem(_config.getDestinationUid());
+	if (!src) {
+		OT_LOG_EA("Connection source not found { \"UID\": " + std::to_string(_config.getOriginUid()) + " }");
+		return;
+	}
+	if (!dest) {
+		OT_LOG_EA("Connection destination not found { \"UID\": " + std::to_string(_config.getDestinationUid()) + " }");
+		return;
+	}
 	ot::GraphicsItem* srcConn = src->findItem(_config.getOriginConnectable());
 	ot::GraphicsItem* destConn = dest->findItem(_config.getDestConnectable());
 
@@ -245,10 +254,11 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 	newConnection->setZValue(1);
 
 	m_connections.insert_or_assign(_config.getUid(), newConnection);
+
+	OT_LOG_D("New connection added { \"UID\": " + std::to_string(_config.getUid()) + " }");
 }
 
-bool ot::GraphicsView::connectedGraphicItemsExist(const GraphicsConnectionCfg& _config)
-{
+bool ot::GraphicsView::connectedGraphicItemsExist(const GraphicsConnectionCfg& _config) {
 	ot::GraphicsItem* src = this->getItem(_config.getOriginUid());
 	ot::GraphicsItem* dest = this->getItem(_config.getDestinationUid());
 
@@ -259,8 +269,7 @@ void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connection
 	this->removeConnection(_connectionInformation.getUid());
 }
 
-void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
-{
+void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID) {
 	// Ensure connection exists
 	auto connectionByUID = m_connections.find(_connectionUID);
 	if (connectionByUID == m_connections.end()) {
@@ -285,6 +294,8 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
 	// Erase connection from map
 	m_connections.erase(_connectionUID);
 	
+	OT_LOG_D("Connection removed { \"UID\": " + std::to_string(_connectionUID) + " }");
+
 	m_scene->blockSignals(false);
 	this->blockSignals(false);
 }
