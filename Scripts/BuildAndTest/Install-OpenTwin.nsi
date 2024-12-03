@@ -47,6 +47,7 @@ InstallDirRegKey HKCU "${REGPATH_UNINSTSUBKEY}" "UninstallString"
 !insertmacro MUI_LANGUAGE "English"
 
 !macro UninstallExisting exitcode uninstcommand
+	Sleep 1000
 	Push `${uninstcommand}`
 	Call UninstallExisting
 	Pop ${exitcode}
@@ -115,12 +116,16 @@ Section "Program files (Required)"
   
   WriteUninstaller "$InstDir\Uninst.exe"
   WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "DisplayName" "OpenTwin"
-  WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$InstDir\OpenTwin.exe,0"
+  WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "DisplayIcon" "$InstDir\icons\Application\OpenTwin.ico"
   WriteRegStr HKCU "${REGPATH_UNINSTSUBKEY}" "UninstallString" '"$InstDir\Uninst.exe"'
   WriteRegDWORD HKCU "${REGPATH_UNINSTSUBKEY}" "NoModify" 1
   WriteRegDWORD HKCU "${REGPATH_UNINSTSUBKEY}" "NoRepair" 1
   
   File /r ..\..\Deployment_Frontend\*.*
+  
+  IfSilent "" +2 ; If the installer is silent then we run the executable in a last step
+  ExecShell "" "$InstDir\OpenTwin.exe"
+  
 SectionEnd
 
 Section "Start Menu shortcut"
@@ -129,6 +134,7 @@ Section "Start Menu shortcut"
 SectionEnd
 
 Section -Uninstall
+
 	${UNPINSHORTCUT} "$SMPROGRAMS\${NAME}.lnk"
 	Delete "$SMPROGRAMS\${NAME}.lnk"
 	${UNPINSHORTCUT} "$DESKTOP\OpenTwin.lnk"

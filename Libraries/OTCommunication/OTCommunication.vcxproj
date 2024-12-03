@@ -24,6 +24,7 @@
     <ClCompile Include="src\ActionHandler.cpp" />
     <ClCompile Include="src\CommunicationTypes.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\DownloadFile.cpp" />
     <ClCompile Include="src\IpConverter.cpp" />
     <ClCompile Include="src\Msg.cpp" />
     <ClCompile Include="src\ServiceLogNotifier.cpp" />
@@ -36,6 +37,7 @@
     <ClInclude Include="include\OTCommunication\ActionTypes.h" />
     <ClInclude Include="include\OTCommunication\CommunicationAPIExport.h" />
     <ClInclude Include="include\OTCommunication\CommunicationTypes.h" />
+    <ClInclude Include="include\OTCommunication\DownloadFile.h" />
     <ClInclude Include="include\OTCommunication\IpConverter.h" />
     <ClInclude Include="include\OTCommunication\Msg.h" />
     <ClInclude Include="include\OTCommunication\ServiceLogNotifier.h" />
@@ -120,7 +122,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;OPENTWINCOMMUNICATION_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;OPENTWINCOMMUNICATION_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(R_JSON_INCD);$(CURL_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -168,7 +170,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;OPENTWINCOMMUNICATION_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;OPENTWINCOMMUNICATION_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(R_JSON_INCR);$(CURL_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

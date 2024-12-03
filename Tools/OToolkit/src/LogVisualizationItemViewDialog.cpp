@@ -8,6 +8,9 @@
 #include "Logging.h"
 #include "LogVisualizationItemViewDialog.h"
 
+// OpenTwin header
+#include "OTWidgets/Positioning.h"
+
 // Qt header
 #include <QtCore/qjsondocument.h>
 #include <QtCore/qregularexpression.h>
@@ -21,7 +24,8 @@
 #include <QtWidgets/qplaintextedit.h>
 
 LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMessage& _msg, size_t _index, QWidget* _parent)
-	: QDialog(_parent), m_msg(_msg) {
+	: ot::Dialog(_parent), m_msg(_msg) 
+{
 	// Create layouts
 	m_centralLayout = new QVBoxLayout;
 	m_dataLayout = new QGridLayout;
@@ -69,11 +73,11 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 
 	m_okButton = new QPushButton("Ok");
 	m_okButton->setMinimumWidth(100);
-	this->connect(m_okButton, &QPushButton::clicked, this, &LogVisualizationItemViewDialog::close);
+	this->connect(m_okButton, &QPushButton::clicked, this, &LogVisualizationItemViewDialog::closeCancel);
 
 	// Create shortcuts
 	m_closeShortcut = new QShortcut(QKeySequence("Esc"), this);
-	this->connect(m_closeShortcut, &QShortcut::activated, this, &LogVisualizationItemViewDialog::close);
+	this->connect(m_closeShortcut, &QShortcut::activated, this, &LogVisualizationItemViewDialog::closeCancel);
 
 	m_recenterShortcut = new QShortcut(QKeySequence("F11"), this);
 	this->connect(m_recenterShortcut, &QShortcut::activated, this, &LogVisualizationItemViewDialog::slotRecenter);
@@ -116,12 +120,21 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 	this->setWindowFlag(Qt::WindowContextHelpButtonHint, false);
 	this->setWindowIcon(AppBase::instance()->windowIcon());
 
-	this->setMinimumSize(400, 300);
+	const int minWidth = 400;
+	const int minHeight = 300;
+
+	this->setMinimumSize(minWidth, minHeight);
 	this->setFocusPolicy(Qt::ClickFocus);
 
 	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
-	this->move(settings->value("LogVisualizationItemViewDialog.X", 0).toInt(), settings->value("LogVisualizationItemViewDialog.Y", 0).toInt());
-	this->resize(settings->value("LogVisualizationItemViewDialog.W", 800).toInt(), settings->value("LogVisualizationItemViewDialog.H", 600).toInt());
+	QRect newRect(
+		QPoint(settings->value("LogVisualizationItemViewDialog.X", 0).toInt(), settings->value("LogVisualizationItemViewDialog.Y", 0).toInt()),
+		QSize(std::max(settings->value("LogVisualizationItemViewDialog.W", 800).toInt(), minWidth), std::max(settings->value("LogVisualizationItemViewDialog.H", 600).toInt(), minHeight))
+	);
+	newRect = ot::Positioning::fitOnScreen(newRect);
+	this->move(newRect.topLeft());
+	this->resize(newRect.size());
+
 	m_findMessageSyntax->setChecked(settings->value("LogVisualizationItemViewDialog.FindSyntax", true).toBool());
 
 	this->slotDisplayMessageText((int)m_findMessageSyntax->checkState());
@@ -145,10 +158,10 @@ void LogVisualizationItemViewDialog::closeEvent(QCloseEvent* _event) {
 
 void LogVisualizationItemViewDialog::mousePressEvent(QMouseEvent* _event) {
 	if (!geometry().contains(_event->globalPos())) {
-		close();
+		closeCancel();
 	}
 	else {
-		QDialog::mousePressEvent(_event);
+		ot::Dialog::mousePressEvent(_event);
 	}
 }
 
@@ -158,19 +171,19 @@ bool LogVisualizationItemViewDialog::eventFilter(QObject* _obj, QEvent* _event) 
 		m.exec();
 		QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(_event);
 		if (!geometry().contains(mouseEvent->globalPos())) {
-			close(); // Close the dialog
+			closeCancel(); // Close the dialog
 			return true; // Event handled
 		}
 		if (mouseEvent->globalPos().x() > (this->pos().x() + this->width())) {
-			close(); // Close the dialog
+			closeCancel(); // Close the dialog
 			return true; // Event handled
 		}
 	}
-	return QDialog::eventFilter(_obj, _event); // Pass the event to the base class
+	return ot::Dialog::eventFilter(_obj, _event); // Pass the event to the base class
 }
 
 bool LogVisualizationItemViewDialog::event(QEvent* _event) {
-	return QDialog::event(_event); // Pass the event to the base class
+	return ot::Dialog::event(_event); // Pass the event to the base class
 }
 
 void LogVisualizationItemViewDialog::slotRecenter(void) {

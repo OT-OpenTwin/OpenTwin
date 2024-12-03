@@ -140,6 +140,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 
 		std::string seriesName = metadataAssemblyByName->first;
 		seriesName = seriesName.substr(seriesName.find_last_of('/') + 1, seriesName.size());
+		seriesName = m_datasetFolder + "/" + seriesName;
 		auto seriesMetadata = resultCollectionExtender.findMetadataSeries(seriesName);
 		if (seriesMetadata != nullptr)
 		{
@@ -147,7 +148,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		}
 		else
 		{
-			seriesName = m_datasetFolder + "/" + seriesName;
+
 			std::list<DatasetDescription> datasets = extractDataset(metadataAssemblyByName->second, loadedTables);
 
 			if (datasets.empty())

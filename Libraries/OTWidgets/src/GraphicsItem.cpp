@@ -342,7 +342,7 @@ QRectF ot::GraphicsItem::calculatePaintArea(const QSizeF& _innerSize) {
 	}
 	else {
 		// Calculate the inner rectangle
-		return ot::calculateChildRect(r, inner, this->getGraphicsItemAlignment());
+		return ot::Positioning::calculateChildRect(r, inner, this->getGraphicsItemAlignment());
 	}
 }
 

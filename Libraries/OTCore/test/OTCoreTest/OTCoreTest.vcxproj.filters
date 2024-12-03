@@ -18,9 +18,6 @@
     <ClCompile Include="src\TestrJSON.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\TestPerformanceTest.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\FixtureTextEncoding.cpp">
       <Filter>src</Filter>
     </ClCompile>

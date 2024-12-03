@@ -1144,7 +1144,6 @@ EntityPropertiesEntityList* EntityPropertiesEntityList::createProperty(const std
 }
 
 void EntityPropertiesEntityList::updateValueAndContainer(EntityBase* _root, std::list<std::string>& _containerOptions) {
-	OT_LOG_D("DEBUG");
 	OTAssertNullptr(_root);
 
 	EntityContainer* container = this->findContainerFromID(_root, getEntityContainerID());

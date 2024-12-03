@@ -11,7 +11,7 @@
 #include <QtGui/qscreen.h>
 #include <QtGui/qguiapplication.h>
 
-QRect ot::calculateChildRect(const QRect& _parentRect, const QSize& _childSize, ot::Alignment _childAlignment) {
+QRect ot::Positioning::calculateChildRect(const QRect& _parentRect, const QSize& _childSize, ot::Alignment _childAlignment) {
 	// Get the top left point of the outer rectangle
 	QPoint pt(_parentRect.topLeft());
 
@@ -56,7 +56,7 @@ QRect ot::calculateChildRect(const QRect& _parentRect, const QSize& _childSize, 
 	return QRect(pt, _childSize);
 }
 
-QRectF ot::calculateChildRect(const QRectF& _parentRect, const QSizeF& _childSize, ot::Alignment _childAlignment) {
+QRectF ot::Positioning::calculateChildRect(const QRectF& _parentRect, const QSizeF& _childSize, ot::Alignment _childAlignment) {
 	// Get the top left point of the outer rectangle
 	QPointF pt(_parentRect.topLeft());
 
@@ -101,8 +101,22 @@ QRectF ot::calculateChildRect(const QRectF& _parentRect, const QSizeF& _childSiz
 	return QRectF(pt, _childSize);
 }
 
-QRect ot::fitOnScreen(const QRect& _sourceRect, bool _primaryScreenOnly) {
-	// Get the screen at the initial position of the rect
+QRect ot::Positioning::fitOnScreen(const QRect& _sourceRect, bool _primaryScreenOnly) {
+	// Check if the rect is already in a screen
+	if (_primaryScreenOnly) {
+		if (QGuiApplication::primaryScreen()->availableGeometry().contains(_sourceRect)) {
+			return _sourceRect;
+		}
+	}
+	else {	
+		for (QScreen* s : QGuiApplication::screens()) {
+			if (s->availableGeometry().contains(_sourceRect)) {
+				return _sourceRect;
+			}
+		}
+	}
+
+	// Get the screen closest to the initial position of the rect
 	QScreen* screen = nullptr;
 
 	if (_primaryScreenOnly) {
@@ -111,10 +125,10 @@ QRect ot::fitOnScreen(const QRect& _sourceRect, bool _primaryScreenOnly) {
 	else {
 		double closestDistance = std::numeric_limits<double>::max();
 		for (QScreen* s : QGuiApplication::screens()) {
-			double distanceLeft = _sourceRect.left() - s->geometry().right();
-			double distanceRight = _sourceRect.right() - s->geometry().left();
-			double distanceTop = _sourceRect.top() - s->geometry().bottom();
-			double distanceBottom = _sourceRect.bottom() - s->geometry().top();
+			double distanceLeft = _sourceRect.left() - s->availableGeometry().left();
+			double distanceRight = _sourceRect.right() - s->availableGeometry().right();
+			double distanceTop = _sourceRect.top() - s->availableGeometry().top();
+			double distanceBottom = _sourceRect.bottom() - s->availableGeometry().bottom();
 
 			if (distanceLeft < 0.) distanceLeft *= (-1);
 			if (distanceRight < 0.) distanceRight *= (-1);

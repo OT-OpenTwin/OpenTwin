@@ -6,6 +6,7 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTWidgets/Dialog.h"
+#include "OTWidgets/Positioning.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -29,10 +30,17 @@ ot::Dialog::Dialog(const DialogCfg& _config, QWidget* _parent)
 
 ot::Dialog::~Dialog() {}
 
-ot::Dialog::DialogResult ot::Dialog::showDialog(void) {
-	if (this->parentWidget()) {
+ot::Dialog::DialogResult ot::Dialog::showDialog(const ShowFlags& _showFlags) {
+	if (_showFlags & CenterOnParent && this->parentWidget()) {
 		this->centerOnParent(this->parentWidget());
 	}
+	if (_showFlags & FitOnScreen) {
+		QRect newRec = Positioning::fitOnScreen(QRect(this->pos(), this->size()));
+		if (this->pos() != newRec.topLeft()) {
+			this->move(newRec.topLeft());
+		}
+	}
+
 	this->exec();
 	return m_result;
 }

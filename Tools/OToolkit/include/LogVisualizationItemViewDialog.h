@@ -7,9 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-
-// Qt header
-#include <QtWidgets/qdialog.h>
+#include "OTWidgets/Dialog.h"
 
 class QLabel;
 class QWidget;
@@ -22,12 +20,15 @@ class QGridLayout;
 class QPushButton;
 class QPlainTextEdit;
 
-class LogVisualizationItemViewDialog : public QDialog {
+class LogVisualizationItemViewDialog : public ot::Dialog {
 	Q_OBJECT
+	OT_DECL_NOCOPY(LogVisualizationItemViewDialog)
+	OT_DECL_NODEFAULT(LogVisualizationItemViewDialog)
 public:
 	LogVisualizationItemViewDialog(const ot::LogMessage& _msg, size_t _index, QWidget* _parent);
 	virtual ~LogVisualizationItemViewDialog();
 
+protected:
 	virtual void closeEvent(QCloseEvent* _event) override;
 
 	virtual void mousePressEvent(QMouseEvent* _event) override;

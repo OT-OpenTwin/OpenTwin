@@ -423,7 +423,27 @@ namespace ot {
 		virtual ~LogNotifierStdCout() {};
 
 		//! @brief Called when the a log message was created.
-		inline virtual void log(const LogMessage& _message) override;
+		virtual void log(const LogMessage& _message) override;
+	};
+
+	// ######################################################################################################################################################
+
+	// ######################################################################################################################################################
+
+	// ######################################################################################################################################################
+
+	class OT_CORE_API_EXPORT LogNotifierFileWriter : public AbstractLogNotifier {
+		OT_DECL_NODEFAULT(LogNotifierFileWriter)
+		OT_DECL_NOCOPY(LogNotifierFileWriter)
+	public:
+		LogNotifierFileWriter(const std::string& _serviceName);
+		virtual ~LogNotifierFileWriter();
+
+		//! @brief Called when the a log message was created.
+		virtual void log(const LogMessage& _message) override;
+
+	private:
+		std::ofstream* m_stream;
 	};
 
 	// ######################################################################################################################################################
@@ -439,6 +459,7 @@ namespace ot {
 		static LogDispatcher& instance(void);
 		static LogDispatcher& initialize(const std::string& _serviceName, bool _addCoutReceiver = false);
 		static inline bool mayLog(LogFlag _flags) { return ((_flags & LogDispatcher::instance().m_logFlags.data()) == _flags); };
+		static void addFileWriter(void);
 
 		// #################################################################################
 

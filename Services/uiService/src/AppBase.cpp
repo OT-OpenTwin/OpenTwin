@@ -2178,7 +2178,11 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 				}
 			}
 
+			// Update focus information
 			m_lastFocusedCentralView = _focusedView;
+
+			// Central views will get its focus set
+			_focusedView->getViewWidget()->setFocus();
 		}
 
 	}
@@ -2715,6 +2719,10 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	}
 	if (table) {
 		ot::removeFromMapByValue(m_tables, table);
+	}
+
+	if (m_lastFocusedCentralView == _view) {
+		m_lastFocusedCentralView = nullptr;
 	}
 	
 }
