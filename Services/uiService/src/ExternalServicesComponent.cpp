@@ -163,6 +163,14 @@ extern "C"
 	};
 }
 
+namespace ot {
+	namespace intern {
+		void exitAsync(int _code) {
+			exit(_code);
+		}
+	}
+}
+
 // ###################################################################################################
 
 ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
@@ -1312,6 +1320,7 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 			auto oldService = m_serviceIdMap.find(senderID);
 			if (oldService == m_serviceIdMap.end()) {
+				OT_LOG_D("Service registered { \"ServiceName\": \"" + senderName + "\", \"SenderID\": " + std::to_string(senderID) + " }");
 				m_serviceIdMap.insert_or_assign(senderID, new ServiceDataUi{ senderName, senderType, senderURL, senderID });
 			}
 			else {
@@ -1659,7 +1668,8 @@ void ExternalServicesComponent::deallocateData(const char *data)
 void ExternalServicesComponent::shutdownAfterSessionServiceDisconnected(void) {
 	ot::stopSessionServiceHealthCheck();
 	AppBase::instance()->showErrorPrompt("The session service has died unexpectedly. The application will be closed now.", "Error");
-	exit(0);
+	std::thread exitThread(&ot::intern::exitAsync, 0);
+	exitThread.detach();
 }
 
 void ExternalServicesComponent::sendExecuteRequest(const char* url, const char* message)
@@ -2053,7 +2063,9 @@ std::string ExternalServicesComponent::handleMessage(ot::JsonDocument& _document
 std::string ExternalServicesComponent::handleShutdown(ot::JsonDocument& _document) {
 	OT_LOG_D("Showdown received");
 	AppBase::instance()->showErrorPrompt("Shutdown requested by session service.", "Error");
-	exit(0);	//NOTE, Add external shutdown
+	
+	std::thread exitThread(&ot::intern::exitAsync, 0);
+	exitThread.detach();
 
 	return "";
 }
@@ -2066,7 +2078,9 @@ std::string ExternalServicesComponent::handlePreShutdown(ot::JsonDocument& _docu
 
 std::string ExternalServicesComponent::handleEmergencyShutdown(ot::JsonDocument& _document) {
 	AppBase::instance()->showErrorPrompt("An unexpected error occurred and the session needs to be closed.", "Error");
-	exit(1);
+	
+	std::thread exitThread(&ot::intern::exitAsync, 1);
+	exitThread.detach();
 
 	return "";
 }
@@ -2098,6 +2112,8 @@ std::string ExternalServicesComponent::handleServiceConnected(ot::JsonDocument& 
 	ServiceDataUi* connectedService = new ServiceDataUi(senderName, senderType, senderURL, senderID);
 	m_serviceIdMap.insert_or_assign(senderID, connectedService);
 
+	OT_LOG_D("Service registered { \"ServiceName\": \"" + senderName + "\", \"SenderID\": " + std::to_string(senderID) + " }");
+
 	return "";
 }
 
@@ -2120,6 +2136,8 @@ std::string ExternalServicesComponent::handleServiceDisconnected(ot::JsonDocumen
 		// Clean up entry
 		m_serviceIdMap.erase(actualService->getServiceID());
 		removeServiceFromList(m_modelViewNotifier, actualService);
+
+		OT_LOG_D("Service deregistered { \"ServiceName\": \"" + senderName + "\", \"SenderID\": " + std::to_string(senderID) + " }");
 
 		delete actualService;
 	}
