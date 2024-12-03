@@ -125,7 +125,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
             .await;
         });
 
-        println!("HTTP Server listening on \"0.0.0.0:80\"")
+        println!("HTTP Server listening on \"0.0.0.0:80\"");
     }
     
     // GET /any path
@@ -444,7 +444,7 @@ fn get_download_html_body() -> String {
             KoCFLklSAf4/G8ayBHfTCwQAAAAASUVORK5CYII=\">
 
             <div id=\"welcome_txt\">Welcome to OpenTwin</div>
-            <a href=\"/installer/Install_OpenTwin_Frontend.exe\" download>
+            <a href=\"/installer\" download>
                 <button id=\"downloadBtn\">Download</button>
             </a>
 
@@ -494,7 +494,8 @@ fn get_download_html_body() -> String {
             </style>
             <script type=\"text/javascript\">
                 document.getElementById(\"downloadBtn\").addEventListener(\"click\", () => {
-                    alert(\"Downloading Installer...\\nPlease execute the installer after the download.\\nThe download can take a short moment.\");
+                    alert(\"Downloading Installer...\\nPlease execute the installer after the download.
+							\\nThe download can take a short moment.\");
                 });
             </script>
         </body>".to_string()
