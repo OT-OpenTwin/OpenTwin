@@ -230,11 +230,11 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 	ot::GraphicsItem* src = this->getItem(_config.getOriginUid());
 	ot::GraphicsItem* dest = this->getItem(_config.getDestinationUid());
 	if (!src) {
-		OT_LOG_EA("Connection source not found { \"UID\": " + std::to_string(_config.getOriginUid()) + " }");
+		OT_LOG_EAS("Connection source not found { \"UID\": " + std::to_string(_config.getOriginUid()) + " }");
 		return;
 	}
 	if (!dest) {
-		OT_LOG_EA("Connection destination not found { \"UID\": " + std::to_string(_config.getDestinationUid()) + " }");
+		OT_LOG_EAS("Connection destination not found { \"UID\": " + std::to_string(_config.getDestinationUid()) + " }");
 		return;
 	}
 	ot::GraphicsItem* srcConn = src->findItem(_config.getOriginConnectable());
