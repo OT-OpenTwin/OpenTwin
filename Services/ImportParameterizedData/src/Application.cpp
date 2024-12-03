@@ -251,7 +251,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
 			{
-				_parametrizedDataHandler->CreateNewScriptDescribedMSMD();
+				_parametrizedDataHandler->createNewScriptDescribedMSMD();
 			}
 			else if (action == _buttonCreateDataCollection.GetFullDescription())
 			{

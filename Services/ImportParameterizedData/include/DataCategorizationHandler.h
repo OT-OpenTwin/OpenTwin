@@ -42,7 +42,7 @@ public:
 	void markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities,EntityParameterizedDataCategorization::DataCategorie _category);
 	
 	void storeSelectionRanges(const std::vector<ot::TableRange>& _ranges);
-	void CreateNewScriptDescribedMSMD();
+	void createNewScriptDescribedMSMD();
 
 	inline void ensureEssentials();
 

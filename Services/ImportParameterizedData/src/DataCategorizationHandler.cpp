@@ -780,7 +780,7 @@ std::tuple<std::list<std::string>, std::list<std::string>> DataCategorizationHan
 	return { selectionEntityNames, pythonScriptNames };
 }
 
-void DataCategorizationHandler::CreateNewScriptDescribedMSMD()
+void DataCategorizationHandler::createNewScriptDescribedMSMD()
 {
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRelevantTableSelections = FindAllTableSelectionsWithScripts();
