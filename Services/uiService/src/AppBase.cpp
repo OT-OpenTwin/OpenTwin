@@ -2178,7 +2178,11 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 				}
 			}
 
+			// Update focus information
 			m_lastFocusedCentralView = _focusedView;
+
+			// Central views will get its focus set
+			_focusedView->getViewWidget()->setFocus();
 		}
 
 	}
