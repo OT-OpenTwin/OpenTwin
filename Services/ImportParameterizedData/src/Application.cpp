@@ -97,6 +97,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_parametrizedDataHandler->setUIComponent(_ui);
 	_tabledataToResultdataHandler->setUIComponent(_ui);
 	_touchstoneToResultdata->setUIComponent(_ui);
+	m_batchedCategorisationHandler.setUIComponent(_ui);
 
 	_ui->addMenuPage(pageName);
 
@@ -151,6 +152,7 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 	_parametrizedDataHandler->setModelComponent(_model);
 	_tabledataToResultdataHandler->setModelComponent(_model);
 	_touchstoneToResultdata->setModelComponent(_model);
+	m_batchedCategorisationHandler.setModelComponent(_model);
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model)
@@ -251,7 +253,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
 			{
-				_parametrizedDataHandler->createNewScriptDescribedMSMD();
+				m_batchedCategorisationHandler.createNewScriptDescribedMSMD();
 			}
 			else if (action == _buttonCreateDataCollection.GetFullDescription())
 			{

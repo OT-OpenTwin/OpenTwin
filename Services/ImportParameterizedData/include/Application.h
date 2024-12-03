@@ -20,7 +20,9 @@
 #include "TabledataToResultdataHandler.h"
 #include "TouchstoneToResultdata.h"
 #include "ResultCollectionMetadataAccess.h"
-#include "RangleSelectionVisualisationHandler.h"
+#include "RangeSelectionVisualisationHandler.h"
+#include "BatchedCategorisationHandler.h"
+
 
 #include "OTCore/FolderNames.h"
 
@@ -144,8 +146,8 @@ private:
 	TabledataToResultdataHandler* _tabledataToResultdataHandler = nullptr;
 	TouchstoneToResultdata* _touchstoneToResultdata = nullptr;
 	ResultCollectionMetadataAccess* m_resultAccess = nullptr;
-	RangleSelectionVisualisationHandler m_rangleSelectionVisualisationHandler;
-		
+	RangeSelectionVisualisationHandler m_rangleSelectionVisualisationHandler;
+	BatchedCategorisationHandler m_batchedCategorisationHandler;
 	void HandleSelectionChanged();
 	void ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc);
 };

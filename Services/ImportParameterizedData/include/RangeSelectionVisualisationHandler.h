@@ -8,7 +8,7 @@
 #include "OTCore/Color.h"
 #include "EntityTableSelectedRanges.h"
 
-class RangleSelectionVisualisationHandler
+class RangeSelectionVisualisationHandler
 {
 public: 
 	void selectRange(const ot::UIDList& _selectedEntityIDs);

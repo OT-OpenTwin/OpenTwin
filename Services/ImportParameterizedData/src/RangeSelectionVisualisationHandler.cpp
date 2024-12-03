@@ -1,4 +1,4 @@
-#include "RangleSelectionVisualisationHandler.h"
+#include "RangeSelectionVisualisationHandler.h"
 #include "Application.h"
 #include "TableIndexSchemata.h"
 #include "SelectionCategorisationColours.h"
@@ -7,7 +7,7 @@
 #include <map>
 
 
-void RangleSelectionVisualisationHandler::selectRange(const ot::UIDList& _selectedEntityIDs)
+void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selectedEntityIDs)
 {
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionEntities = extractSelectionRanges(_selectedEntityIDs);
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionsThatNeedVisualisation = findSelectionsThatNeedVisualisation(selectionEntities);
@@ -90,7 +90,7 @@ void RangleSelectionVisualisationHandler::selectRange(const ot::UIDList& _select
 }
 
 
-void RangleSelectionVisualisationHandler::bufferSelectionEntities(const std::list<std::shared_ptr<EntityTableSelectedRanges>>& _selectedEntities)
+void RangeSelectionVisualisationHandler::bufferSelectionEntities(const std::list<std::shared_ptr<EntityTableSelectedRanges>>& _selectedEntities)
 {
 	m_bufferedSelectionRanges.clear();
 	for (auto& selectionEntity : _selectedEntities)
@@ -99,7 +99,7 @@ void RangleSelectionVisualisationHandler::bufferSelectionEntities(const std::lis
 	}
 }
 
-std::list<std::shared_ptr<EntityTableSelectedRanges>> RangleSelectionVisualisationHandler::extractSelectionRanges(const ot::UIDList& _selectedEntityIDs)
+std::list<std::shared_ptr<EntityTableSelectedRanges>> RangeSelectionVisualisationHandler::extractSelectionRanges(const ot::UIDList& _selectedEntityIDs)
 {
 	auto modelComponent = Application::instance()->modelComponent();
 	if (modelComponent == nullptr)
@@ -143,7 +143,7 @@ std::list<std::shared_ptr<EntityTableSelectedRanges>> RangleSelectionVisualisati
 	return selectionEntities;
 }
 
-const std::list<std::shared_ptr<EntityTableSelectedRanges>> RangleSelectionVisualisationHandler::findSelectionsThatNeedVisualisation(const std::list<std::shared_ptr<EntityTableSelectedRanges>>& _selectionEntities)
+const std::list<std::shared_ptr<EntityTableSelectedRanges>> RangeSelectionVisualisationHandler::findSelectionsThatNeedVisualisation(const std::list<std::shared_ptr<EntityTableSelectedRanges>>& _selectionEntities)
 {
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionThatNeedVisualisation;
 	for (auto& selectedRange : _selectionEntities)
@@ -158,7 +158,7 @@ const std::list<std::shared_ptr<EntityTableSelectedRanges>> RangleSelectionVisua
 	return selectionThatNeedVisualisation;
 }
 
-void RangleSelectionVisualisationHandler::requestToOpenTable(const std::string& _tableName)
+void RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _tableName)
 {
 	ot::EntityInformation entityInfo;
 	Application::instance()->modelComponent()->getEntityInformation(_tableName, entityInfo);
@@ -183,7 +183,7 @@ void RangleSelectionVisualisationHandler::requestToOpenTable(const std::string& 
 	Application::instance()->uiComponent()->sendMessage(false, document, answer);
 }
 
-void RangleSelectionVisualisationHandler::requestColouringRanges(bool _clearSelection, const std::string& _tableName, const ot::Color& _colour, const std::list<ot::TableRange>& ranges)
+void RangeSelectionVisualisationHandler::requestColouringRanges(bool _clearSelection, const std::string& _tableName, const ot::Color& _colour, const std::list<ot::TableRange>& ranges)
 {
 	ot::JsonDocument doc;
 

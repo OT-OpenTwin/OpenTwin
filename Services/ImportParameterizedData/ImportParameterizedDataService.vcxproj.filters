@@ -76,7 +76,10 @@
     <ClCompile Include="src\OptionsParameterHandlerFormat.cpp">
       <Filter>src\Touchstone</Filter>
     </ClCompile>
-    <ClCompile Include="src\RangleSelectionVisualisationHandler.cpp">
+    <ClCompile Include="src\RangeSelectionVisualisationHandler.cpp">
+      <Filter>src\ParameterizedDataHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BatchedCategorisationHandler.cpp">
       <Filter>src\ParameterizedDataHandler</Filter>
     </ClCompile>
   </ItemGroup>
@@ -174,7 +177,7 @@
     <ClInclude Include="include\TouchstoneToResultdata.h">
       <Filter>include\ResultdataHandler</Filter>
     </ClInclude>
-    <ClInclude Include="include\RangleSelectionVisualisationHandler.h">
+    <ClInclude Include="include\RangeSelectionVisualisationHandler.h">
       <Filter>include\ParameterizedDataHandler</Filter>
     </ClInclude>
     <ClInclude Include="include\TableIndexSchemata.h">
@@ -185,6 +188,12 @@
     </ClInclude>
     <ClInclude Include="include\CategorisationFolderNames.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BatchedCategorisationHandler.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BatchUpdateInformation.h">
+      <Filter>include\ParameterizedDataHandler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

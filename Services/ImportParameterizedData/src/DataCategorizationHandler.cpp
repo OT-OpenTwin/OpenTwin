@@ -488,83 +488,6 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 		dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added new table selection range");
 }
 
-void DataCategorizationHandler::FindExistingRanges(std::string containerName, std::list<std::pair<ot::UID, ot::UID>>& existingRanges)
-{
-	std::list<std::string> folderItems = _modelComponent->getListOfFolderItems(containerName);
-	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent->getEntityInformation(folderItems, entityInfos);
-	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-
-	for (auto entityInfo : entityInfos)
-	{
-		EntityBase* base = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
-		EntityTableSelectedRanges* selectionRange = dynamic_cast<EntityTableSelectedRanges*>(base);
-		if (selectionRange != nullptr)
-		{
-			existingRanges.push_back(std::make_pair<>(entityInfo.getEntityID(), entityInfo.getEntityVersion()));
-			delete selectionRange;
-			selectionRange = nullptr;
-		}
-		else
-		{
-			delete base;
-			base = nullptr;
-		}
-	}
-}
-
-void DataCategorizationHandler::FindContainerEntity(std::string containerName, std::pair<ot::UID, ot::UID>& categorizationEntityIdentifier)
-{
-	std::string rootContainer = containerName.substr(0, containerName.find_last_of("/"));
-	std::list<std::string> folderItems = _modelComponent->getListOfFolderItems(rootContainer);
-	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent->getEntityInformation(folderItems, entityInfos);
-
-	categorizationEntityIdentifier = { -1,-1 };
-	for (auto entityInfo : entityInfos)
-	{
-		if (entityInfo.getEntityName() == containerName)
-		{
-			categorizationEntityIdentifier.first = entityInfo.getEntityID();
-			categorizationEntityIdentifier.second = entityInfo.getEntityVersion();
-			break;
-		}
-	}
-
-	if (categorizationEntityIdentifier.first == -1 || categorizationEntityIdentifier.second == -1)
-	{
-		assert(0);
-	}
-
-}
-
-
-bool DataCategorizationHandler::CheckIfPreviewIsUpToDate(std::shared_ptr<EntityParameterizedDataPreviewTable> currentPreviewTable, std::list<std::pair<ot::UID, ot::UID>>& existingRanges)
-{
-	std::vector<std::pair<ot::UID, ot::UID>> lastShownPreview = currentPreviewTable->GetLastStatusOfPreview();
-	
-	if (existingRanges.size() != lastShownPreview.size())
-	{
-		return false;
-	}
-
-	bool previewIsUpToDate = true;
-	for (auto existingRange : existingRanges)
-	{
-		bool foundRange = false;
-		for (auto storedRange : lastShownPreview)
-		{
-			if (existingRange.first == storedRange.first && existingRange.second == storedRange.second)
-			{
-				foundRange = true;
-				break;
-			}
-		}
-		previewIsUpToDate &= foundRange;
-	}
-	return previewIsUpToDate;
-}
-
 std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisualisationTable* _table, const std::vector<ot::TableRange>& _selectedRanges)
 {
 	ot::StringToVariableConverter converter;
@@ -638,64 +561,6 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisua
 	return typeName;
 }
 
-std::list<std::shared_ptr<EntityTableSelectedRanges>> DataCategorizationHandler::FindAllTableSelectionsWithScripts()
-{
-	EntityTableSelectedRanges tempEntity(-1, nullptr, nullptr, nullptr, nullptr, "");
-	ot::UIDList selectionRangeIDs = _modelComponent->getIDsOfFolderItemsOfType(CategorisationFolderNames::getRootFolderName(), tempEntity.getClassName(), true);
-	Application::instance()->prefetchDocumentsFromStorage(selectionRangeIDs);
-
-	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRangeEntities;
-	for (ot::UID selectionRangeID : selectionRangeIDs)
-	{
-		auto baseEntity = _modelComponent->readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID), Application::instance()->getClassFactory());
-		std::shared_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
-		assert(rangeEntity != nullptr);
-		if (rangeEntity->getConsiderForBatchprocessing())
-		{
-			allRangeEntities.push_back(std::move(rangeEntity));
-		}
-	}
-	return allRangeEntities;
-}
-
-std::map<std::string, std::string> DataCategorizationHandler::LoadAllPythonScripts(std::list<std::string>& scriptNames)
-{
-
-	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent->getEntityInformation(scriptNames, entityInfos);
-	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
-	std::map<std::string, std::string> pythonScripts;
-	for (const ot::EntityInformation& entityInfo : entityInfos)
-	{
-		auto entityBase = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
-		auto script = dynamic_cast<EntityFile*>(entityBase);
-		
-		const std::vector<char> scriptContentRaw = script->getData()->getData();
-		pythonScripts[entityInfo.getEntityName()] = std::string(scriptContentRaw.begin(), scriptContentRaw.end());
-	}
-
-	return pythonScripts;
-}
-
-
-std::map<std::string, std::pair<ot::UID, ot::UID>> DataCategorizationHandler::GetAllTables()
-{
-	std::map<std::string, std::pair<ot::UID, ot::UID>> allTableIdentifierByName;
-	std::list<std::string> allTables =	_modelComponent->getListOfFolderItems(m_tableFolder);
-	std::list<ot::EntityInformation> entityInfos;
-	_modelComponent->getEntityInformation(allTables, entityInfos);
-
-	
-	for (const auto& entityInfo : entityInfos)
-	{
-		
-		std::pair<ot::UID, ot::UID> tableIdentifier = { entityInfo.getEntityID(), entityInfo.getEntityVersion() };
-		allTableIdentifierByName[entityInfo.getEntityName()] = tableIdentifier;
-	}
-	
-	return allTableIdentifierByName;
-}
-
 std::map<std::string, ot::UID> DataCategorizationHandler::getAllScripts()
 {
 	std::map<std::string, ot::UID> scriptUIDsByName;
@@ -711,120 +576,6 @@ std::map<std::string, ot::UID> DataCategorizationHandler::getAllScripts()
 	return scriptUIDsByName;
 }
 
-std::tuple<std::list<std::string>, std::list<std::string>> DataCategorizationHandler::CreateNewMSMDWithSelections(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& allRelevantTableSelectionsByMSMD)
-{
-	ot::UIDList topoIDs, topoVers, dataEnt{};
-	std::list<bool> forceVis;
-	std::list<std::string> selectionEntityNames;
-	std::list<std::string> pythonScriptNames;
-
-	std::string allMSMDNames = "";
-	for (auto& elements : allRelevantTableSelectionsByMSMD)
-	{
-		std::unique_ptr<EntityParameterizedDataCategorization> newMSMD(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-		newMSMD->setName(CreateNewUniqueTopologyName(m_rmdEntityName, CategorisationFolderNames::getSeriesMetadataFolderName()));
-		allMSMDNames += newMSMD->getName() + ", ";
-		newMSMD->CreateProperties(EntityParameterizedDataCategorization::measurementSeriesMetadata);
-		newMSMD->StoreToDataBase();
-		topoVers.push_back(newMSMD->getEntityStorageVersion());
-		topoIDs.push_back(newMSMD->getEntityID());
-		forceVis.push_back(false);
-
-		std::string prefix = newMSMD->getName();
-		std::list<std::shared_ptr<EntityTableSelectedRanges>>& selections = elements.second;
-		for (auto& selection : selections)
-		{
-			std::string selectionName = selection->getName();
-			int position = static_cast<uint32_t>(selectionName.find_first_of("/"));
-			position = static_cast<uint32_t>(selectionName.find("/",static_cast<uint64_t>(position)));
-			position = static_cast<uint32_t>(selectionName.find("/", static_cast<uint64_t>(position+ 1)));
-			position = static_cast<uint32_t>(selectionName.find("/", static_cast<uint64_t>(position+ 1)));
-
-			std::string postfix = selectionName.substr(position, selectionName.size());
-			std::string newSelectionName=	prefix + postfix;
-			
-			std::unique_ptr<EntityTableSelectedRanges> newSelection( new EntityTableSelectedRanges(_modelComponent->createEntityUID(),nullptr,nullptr,nullptr,nullptr,OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-			
-			newSelection->setName(newSelectionName);
-			ot::EntityInformation entityInfo;
-			_modelComponent->getEntityInformation(selection->getTableName(), entityInfo);
-			std::string dataType = selection->getSelectedType();
-			newSelection->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, selection->getScriptName(), entityInfo.getEntityID(),dataType);
-			
-			
-			newSelection->setTableProperties(selection->getTableName(),entityInfo.getEntityID(),ot::TableCfg::toString(selection->getTableHeaderMode()));
-			
-			ot::TableRange selectedRange = selection->getSelectedRange();
-			newSelection->setRange(selectedRange);
-			_modelComponent->getEntityInformation(selection->getScriptName(), entityInfo);
-			newSelection->setConsiderForBatchprocessing(true);
-			newSelection->StoreToDataBase();
-
-			topoIDs.push_back(newSelection->getEntityID());
-			topoVers.push_back(newSelection->getEntityStorageVersion());
-			forceVis.push_back(false);
-
-			selectionEntityNames.push_back(newSelectionName);
-			pythonScriptNames.push_back(newSelection->getScriptName());
-
-			selection->setConsiderForBatchprocessing(false);
-			selection->StoreToDataBase();
-			topoIDs.push_back(selection->getEntityID());
-			topoVers.push_back(selection->getEntityStorageVersion());
-			forceVis.push_back(false);
-		}
-	}
-	allMSMDNames = allMSMDNames.substr(0, allMSMDNames.size() - 2);
-	_modelComponent->addEntitiesToModel(topoIDs, topoVers, forceVis, dataEnt, dataEnt, dataEnt, "Automatic creation of " + allMSMDNames);
-	
-	return { selectionEntityNames, pythonScriptNames };
-}
-
-void DataCategorizationHandler::createNewScriptDescribedMSMD()
-{
-
-	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRelevantTableSelections = FindAllTableSelectionsWithScripts();
-	std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>> allRelevantTableSelectionsByMSMD;
-	
-	allRelevantTableSelectionsByMSMD.clear();
-	for (const auto& tableSelection : allRelevantTableSelections)
-	{
-		std::string tableSelectionName = tableSelection->getName();
-		tableSelectionName = tableSelectionName.substr(tableSelectionName.find(CategorisationFolderNames::getSeriesMetadataFolderName()), tableSelectionName.size());
-		std::string msmdName = tableSelectionName.substr(0, tableSelectionName.find_first_of('/'));
-		allRelevantTableSelectionsByMSMD[msmdName].push_back(tableSelection);
-	}
-	allRelevantTableSelections.clear();
-
-	auto newSelectionNamesAndPythonScripts = CreateNewMSMDWithSelections(allRelevantTableSelectionsByMSMD);
-	std::list<std::string>& newSelectionEntityNames = std::get<0>(newSelectionNamesAndPythonScripts);
-	std::list<std::string>& pythonScriptNames = std::get<1>(newSelectionNamesAndPythonScripts);
-
-	if (_pythonInterface == nullptr)
-	{
-		auto pythonService = Application::instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE);
-		_pythonInterface = new ot::PythonServiceInterface(pythonService->getServiceURL());
-	}
-	auto pythonScriptName = pythonScriptNames.begin();
-	for (auto newSelectionEntityName = newSelectionEntityNames.begin(); newSelectionEntityName != newSelectionEntityNames.end(); newSelectionEntityName++)
-	{
-		ot::Variable parameterEntityName = (*newSelectionEntityName).c_str();
-		std::list<ot::Variable> parameterList{parameterEntityName};
-		_pythonInterface->AddScriptWithParameter(*pythonScriptName, parameterList);
-		pythonScriptName++;
-	}
-	ot::ReturnMessage returnValue = _pythonInterface->SendExecutionOrder();
-	if (returnValue.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
-	{
-		_uiComponent->displayMessage("Python execution succeeded.\n");
-	}
-	else
-	{
-		_uiComponent->displayMessage("Python execution failed due to error: " + returnValue.getWhat() + ".\n");
-	}
-}
-
-
 inline void DataCategorizationHandler::ensureEssentials()
 {
 	if (m_rmdEntityName == "")
@@ -837,7 +588,7 @@ inline void DataCategorizationHandler::ensureEssentials()
 	if (m_scriptFolderUID == -1)
 	{
 		ot::EntityInformation entityInfo;
-		_modelComponent->getEntityInformation(ot::FolderNames::PythonScriptFolder , entityInfo);
+		_modelComponent->getEntityInformation(ot::FolderNames::PythonScriptFolder, entityInfo);
 		m_scriptFolderUID = entityInfo.getEntityID();
 	}
 }

@@ -203,13 +203,14 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\ThirdParty\base64\base64.c" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\BatchedCategorisationHandler.cpp" />
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
     <ClCompile Include="src\DataCategorizationConsistencyChecker.cpp" />
     <ClCompile Include="src\OptionsParameterHandlerFormat.cpp" />
     <ClCompile Include="src\OptionsParameterHandlerFrequency.cpp" />
     <ClCompile Include="src\OptionsParameterHandlerParameter.cpp" />
     <ClCompile Include="src\OptionsParameterHandlerReference.cpp" />
-    <ClCompile Include="src\RangleSelectionVisualisationHandler.cpp" />
+    <ClCompile Include="src\RangeSelectionVisualisationHandler.cpp" />
     <ClCompile Include="src\TabledataToResultdataHandler.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\Documentation.cpp" />
@@ -231,11 +232,13 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\ThirdParty\base64\base64.h" />
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\BatchedCategorisationHandler.h" />
+    <ClInclude Include="include\BatchUpdateInformation.h" />
     <ClInclude Include="include\BranchSynchronizer.h" />
     <ClInclude Include="include\BusinessLogicHandler.h" />
     <ClInclude Include="include\CategorisationFolderNames.h" />
     <ClInclude Include="include\DataCategorizationConsistencyChecker.h" />
-    <ClInclude Include="include\RangleSelectionVisualisationHandler.h" />
+    <ClInclude Include="include\RangeSelectionVisualisationHandler.h" />
     <ClInclude Include="include\SelectionCategorisationColours.h" />
     <ClInclude Include="include\TabledataToResultdataHandler.h" />
     <ClInclude Include="include\Documentation.h" />

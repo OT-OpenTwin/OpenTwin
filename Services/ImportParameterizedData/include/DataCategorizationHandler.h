@@ -42,21 +42,15 @@ public:
 	void markSelectionForStorage(const std::list<ot::EntityInformation>& _selectedEntities,EntityParameterizedDataCategorization::DataCategorie _category);
 	
 	void storeSelectionRanges(const std::vector<ot::TableRange>& _ranges);
-	void createNewScriptDescribedMSMD();
 
 	inline void ensureEssentials();
 
 private:
 	const std::string m_tableFolder;
 	const std::string m_previewTableName;
-	
-	
-	ot::UID m_scriptFolderUID = -1;
+	ot::UID m_scriptFolderUID;
 	std::string m_rmdEntityName;
-
 	const std::string _selectionRangeName = "Selection";
-
-
 	ot::Color m_backgroundColour;
 
 	std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>> _allRelevantTableSelectionsByMSMD;
@@ -66,7 +60,7 @@ private:
 	ot::UID m_bufferedTableVersion = -1;
 	std::vector<std::shared_ptr<EntityParameterizedDataCategorization>> m_markedForStorringEntities;
 
-	ot::PythonServiceInterface* _pythonInterface = nullptr;
+
 
 	bool isValidSelection(std::list<EntityBase*>& _selectedEntities);
 	std::string getTableFromSelection(std::list<EntityBase*>& _selectedEntities);
@@ -79,19 +73,6 @@ private:
 	void addNewCategorizationEntity(std::string name, EntityParameterizedDataCategorization::DataCategorie category, bool addToActive);
 	void requestRangeSelection(const std::string& _tableName);
 
-
-	void FindExistingRanges(std::string containerName, std::list<std::pair<ot::UID, ot::UID>>& existingRanges);
-	void FindContainerEntity(std::string containerName, std::pair<ot::UID, ot::UID>& categorizationEntityIdentifier);
-	bool CheckIfPreviewIsUpToDate(std::shared_ptr<EntityParameterizedDataPreviewTable> categorizationEntity, std::list<std::pair<ot::UID, ot::UID>>& existingRanges);
-
 	std::string determineDataTypeOfSelectionRanges(IVisualisationTable* _table,const std::vector<ot::TableRange>& _selectedRanges);
-
-	std::list<std::shared_ptr<EntityTableSelectedRanges>> FindAllTableSelectionsWithScripts();
-	std::map<std::string, std::string> LoadAllPythonScripts(std::list< std::string>& scriptNames);
-	
-	std::map<std::string, std::pair<ot::UID, ot::UID>> GetAllTables();
 	std::map<std::string, ot::UID> getAllScripts();
-	
-	std::tuple<std::list<std::string>, std::list<std::string>> CreateNewMSMDWithSelections(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& allRelevantTableSelectionsByMSMD);
-	
 };
