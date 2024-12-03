@@ -102,7 +102,21 @@ QRectF ot::Positioning::calculateChildRect(const QRectF& _parentRect, const QSiz
 }
 
 QRect ot::Positioning::fitOnScreen(const QRect& _sourceRect, bool _primaryScreenOnly) {
-	// Get the screen at the initial position of the rect
+	// Check if the rect is already in a screen
+	if (_primaryScreenOnly) {
+		if (QGuiApplication::primaryScreen()->availableGeometry().contains(_sourceRect)) {
+			return _sourceRect;
+		}
+	}
+	else {
+		for (QScreen* s : QGuiApplication::screens()) {
+			if (s->availableGeometry().contains(_sourceRect)) {
+				return _sourceRect;
+			}
+		}
+	}
+
+	// Get the screen closest to the initial position of the rect
 	QScreen* screen = nullptr;
 
 	if (_primaryScreenOnly) {
@@ -111,10 +125,10 @@ QRect ot::Positioning::fitOnScreen(const QRect& _sourceRect, bool _primaryScreen
 	else {
 		double closestDistance = std::numeric_limits<double>::max();
 		for (QScreen* s : QGuiApplication::screens()) {
-			double distanceLeft = _sourceRect.left() - s->geometry().right();
-			double distanceRight = _sourceRect.right() - s->geometry().left();
-			double distanceTop = _sourceRect.top() - s->geometry().bottom();
-			double distanceBottom = _sourceRect.bottom() - s->geometry().top();
+			double distanceLeft = _sourceRect.left() - s->availableGeometry().right();
+			double distanceRight = _sourceRect.right() - s->availableGeometry().left();
+			double distanceTop = _sourceRect.top() - s->availableGeometry().bottom();
+			double distanceBottom = _sourceRect.bottom() - s->availableGeometry().top();
 
 			if (distanceLeft < 0.) distanceLeft *= (-1);
 			if (distanceRight < 0.) distanceRight *= (-1);
