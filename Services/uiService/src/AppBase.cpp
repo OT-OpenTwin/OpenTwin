@@ -2716,5 +2716,9 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	if (table) {
 		ot::removeFromMapByValue(m_tables, table);
 	}
+
+	if (m_lastFocusedCentralView == _view) {
+		m_lastFocusedCentralView = nullptr;
+	}
 	
 }
