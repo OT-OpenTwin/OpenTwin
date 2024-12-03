@@ -1,60 +1,39 @@
 /*
  * Application.cpp
  *
- *  Created on:
- *	Author:
+ *  Created on: 03.12.2024
+ *	Author: Sebastian Urmann
  *  Copyright (c)
  */
 
 #include "Application.h"
-#include "OTCommunication/Msg.h"
-#include "OTCommunication/ActionTypes.h"
-#include "DataBase.h"
 
-void Application::setModelServiceURL(const std::string& url)
+
+Application* Application::instance = nullptr;
+
+Application* Application::getInstance()
 {
-	m_modelServiceAPI = new ot::ModelServiceAPI("", url);
-}
-
-void Application::setUIServiceURL(const std::string& url)
-{
-	m_uiURL = url;
-}
-
-ClassFactory& Application::getClassFactory()
-{
-
-	return m_classFactory;
-}
-
-void Application::prefetchDocumentsFromStorage(const std::list<ot::UID>& entities)
-{
-	// First get the version information for all entities
-	std::list<ot::EntityInformation> entityInfo;
-	m_modelServiceAPI->getEntityInformation(entities, entityInfo);
-
-	// Now prefetch the documents
-	prefetchDocumentsFromStorage(entityInfo);
-	 
-}
-
-
-void Application::prefetchDocumentsFromStorage(const std::list<ot::EntityInformation>& entityInfo)
-{
-	std::list<std::pair<ot::UID, ot::UID>> prefetchIdandVersion;
-
-	for (auto entity : entityInfo)
-	{
-		m_prefetchedEntityVersions[entity.getEntityID()] = entity.getEntityVersion();
-
-		prefetchIdandVersion.push_back(std::pair<ot::UID, ot::UID>(entity.getEntityID(), entity.getEntityVersion()));
+	if (instance == nullptr) {
+		instance = new Application();
 	}
-
-	DataBase::GetDataBase()->PrefetchDocumentsFromStorage(prefetchIdandVersion);
+	
+	return instance;
 }
-ot::UID Application::getPrefetchedEntityVersion(ot::UID entityID)
+
+void Application::deleteInstance(void)
 {
-	OTAssert(m_prefetchedEntityVersions.count(entityID) > 0, "The entity was not prefetched");
-
-	return m_prefetchedEntityVersions[entityID];
+	if (instance) {
+		delete instance;
+	}
+	instance = nullptr;
 }
+
+Application::Application() {
+
+}
+
+Application::~Application()
+{
+
+}
+

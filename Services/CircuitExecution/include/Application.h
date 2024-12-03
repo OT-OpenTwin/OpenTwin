@@ -1,37 +1,28 @@
+/*
+ * Application.h
+ *
+ *  Created on: 03.12.2024
+ *	Author: Sebastian Urmann
+ *  Copyright (c)
+ */
+
+
 #pragma once
-#include "OTServiceFoundation/ModelServiceAPI.h"
-#include "ClassFactory.h"
-#include "ClassFactoryBlock.h"
 
 class Application
 {
 public:
-	static Application* instance()
-	{
-		static Application INSTANCE;
-		return &INSTANCE;
-	}
+	static Application* getInstance();
 
-	ot::ModelServiceAPI& ModelServiceAPI() { return *m_modelServiceAPI; };
-	void setModelServiceURL(const std::string& url);
-	void setUIServiceURL(const std::string& url);
+	static void deleteInstance(void);
 
-	ClassFactory& getClassFactory();
-
-	void prefetchDocumentsFromStorage(const std::list<ot::UID>& entities);
-	void prefetchDocumentsFromStorage(const std::list<ot::EntityInformation>& entityInfo);
-	ot::UID getPrefetchedEntityVersion(ot::UID entityID);
+	// Delete Copy & Move Constructors
+	Application(const Application&) = delete;
+	Application& operator=(const Application&) = delete;
 
 private:
-	Application()
-	{
-		m_classFactory.SetNextHandler(&m_classFactoryBlock);
-		m_classFactoryBlock.SetChainRoot(&m_classFactory);
-	}
-	ClassFactory m_classFactory;
-	ClassFactoryBlock m_classFactoryBlock;
-	ot::ModelServiceAPI* m_modelServiceAPI = nullptr;
+	Application();
+	~Application();
 
-	std::map<ot::UID, ot::UID> m_prefetchedEntityVersions;
-	std::string m_uiURL;
+	static Application* instance;
 };

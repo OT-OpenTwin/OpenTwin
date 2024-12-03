@@ -5,17 +5,6 @@
 #include "QtCore/qcoreapplication.h"
 
 SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionID, int serviceID) :m_serverName(serverName) ,m_isHealthy(false) {
-	m_initialisationRoutines.reserve(m_numberOfInitialisationRoutines);
-
-	 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_CircuitSimulatorService, doc.GetAllocator()), doc.GetAllocator());
-
-	doc.AddMember(OT_ACTION_PARAM_SESSION_ID, sessionID, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, serviceID, doc.GetAllocator());
-	m_initialisationRoutines.push_back(doc.toJson());
-
 	
 	
 
@@ -159,26 +148,3 @@ void SubprocessHandler::ProcessErrorOccured(std::string& message)
 {
 	message = m_subProcess.errorString().toStdString();
 }
-
-//void SubprocessHandler::ModelComponentWasSet()
-//{
-//	const std::string url = _modelComponent->getServiceURL();
-//	ot::JsonDocument doc;
-//	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
-//	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_MODEL, doc.GetAllocator()), doc.GetAllocator());
-//	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(url, doc.GetAllocator()), doc.GetAllocator());
-//	m_initialisationRoutines.push_back(doc.toJson());
-//	m_initialisationPrepared = m_initialisationRoutines.size() == m_numberOfInitialisationRoutines;
-//}
-
-//void SubprocessHandler::UIComponentWasSet()
-//{
-//	const std::string url = _uiComponent->getServiceURL();
-//	ot::JsonDocument doc;
-//	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
-//	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_UI, doc.GetAllocator()), doc.GetAllocator());
-//	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(url, doc.GetAllocator()), doc.GetAllocator());
-//	m_initialisationRoutines.push_back(doc.toJson());
-//	m_initialisationPrepared = m_initialisationRoutines.size() == m_numberOfInitialisationRoutines;
-//	
-//}

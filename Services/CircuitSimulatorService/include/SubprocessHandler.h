@@ -33,10 +33,9 @@ private:
 	QLocalServer m_server;
 	std::atomic_bool m_isHealthy;
 	std::atomic_bool m_initialisationPrepared = false;
+
 	ConnectionManager m_connectionManager;
 
-	std::vector<std::string> m_initialisationRoutines;
-	const int m_numberOfInitialisationRoutines = 4;
 
 	std::string FindSubprocessPath();
 	void InitiateProcess();
@@ -49,7 +48,6 @@ private:
 	
 	void ProcessErrorOccured(std::string& message);
 
-	//void ModelComponentWasSet() override;
-	//void UIComponentWasSet() override;
+
 
 };

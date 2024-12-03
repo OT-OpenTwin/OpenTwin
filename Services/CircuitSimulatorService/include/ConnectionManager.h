@@ -15,11 +15,10 @@ public:
 	ConnectionManager();
 	~ConnectionManager();
 
-	//bool connectToSubprocess();
-	std::string sendRequest(std::string& message);
-	std::string receiveResponse();
+	
 
-	//Getter
+
+
 
 
 private:
