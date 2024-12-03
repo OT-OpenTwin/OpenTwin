@@ -8,6 +8,9 @@
 #include "Logging.h"
 #include "LogVisualizationItemViewDialog.h"
 
+// OpenTwin header
+#include "OTWidgets/Positioning.h"
+
 // Qt header
 #include <QtCore/qjsondocument.h>
 #include <QtCore/qregularexpression.h>
@@ -116,12 +119,21 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 	this->setWindowFlag(Qt::WindowContextHelpButtonHint, false);
 	this->setWindowIcon(AppBase::instance()->windowIcon());
 
-	this->setMinimumSize(400, 300);
+	const int minWidth = 400;
+	const int minHeight = 300;
+
+	this->setMinimumSize(minWidth, minHeight);
 	this->setFocusPolicy(Qt::ClickFocus);
 
 	otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
-	this->move(settings->value("LogVisualizationItemViewDialog.X", 0).toInt(), settings->value("LogVisualizationItemViewDialog.Y", 0).toInt());
-	this->resize(settings->value("LogVisualizationItemViewDialog.W", 800).toInt(), settings->value("LogVisualizationItemViewDialog.H", 600).toInt());
+	QRect newRect(
+		QPoint(settings->value("LogVisualizationItemViewDialog.X", 0).toInt(), settings->value("LogVisualizationItemViewDialog.Y", 0).toInt()),
+		QSize(std::max(settings->value("LogVisualizationItemViewDialog.W", 800).toInt(), minWidth), std::max(settings->value("LogVisualizationItemViewDialog.H", 600).toInt(), minHeight))
+	);
+	newRect = ot::fitOnScreen(newRect);
+	this->move(newRect.topLeft());
+	this->resize(newRect.size());
+
 	m_findMessageSyntax->setChecked(settings->value("LogVisualizationItemViewDialog.FindSyntax", true).toBool());
 
 	this->slotDisplayMessageText((int)m_findMessageSyntax->checkState());

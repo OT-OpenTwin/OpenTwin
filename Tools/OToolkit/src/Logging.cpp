@@ -73,32 +73,7 @@ Logging::Logging()
 }
 
 Logging::~Logging() {
-	/*otoolkit::SettingsRef settings = AppBase::instance()->createSettingsInstance();
 
-	settings->setValue("Logging.AutoScrollToBottom", m_autoScrollToBottom->isChecked());
-
-	settings->setValue("Logging.FilterActive.Detailed", m_msgTypeFilterDetailed->isChecked());
-	settings->setValue("Logging.FilterActive.Info", m_msgTypeFilterInfo->isChecked());
-	settings->setValue("Logging.FilterActive.Warning", m_msgTypeFilterWarning->isChecked());
-	settings->setValue("Logging.FilterActive.Error", m_msgTypeFilterError->isChecked());
-	settings->setValue("Logging.FilterActive.Message.In", m_msgTypeFilterMsgIn->isChecked());
-	settings->setValue("Logging.FilterActive.Message.Out", m_msgTypeFilterMsgOut->isChecked());
-
-	QJsonArray serviceFilterArr;
-	for (int i = 0; i < m_serviceFilter->count(); i++) {
-		QJsonObject serviceObj;
-		serviceObj["Name"] = m_serviceFilter->item(i)->text();
-		serviceObj["Active"] = (m_serviceFilter->item(i)->checkState() == Qt::Checked);
-		serviceFilterArr.push_back(serviceObj);
-	}
-	QJsonDocument serviceFilterDoc(serviceFilterArr);
-	settings->setValue("Logging.ServiceFilter.List", QVariant(serviceFilterDoc.toJson(QJsonDocument::Compact)));
-
-	QString tableColumnWidths;
-	for (int i = 0; i < m_table->columnCount(); i++) {
-		tableColumnWidths.append(QString::number(m_table->columnWidth(i)) + ";");
-	}
-	settings->setValue("Logging.Table.ColumnWidth", tableColumnWidths);*/
 }
 
 QString Logging::getToolName(void) const {
@@ -226,16 +201,6 @@ void Logging::restoreToolSettings(QSettings& _settings) {
 		QMetaObject::invokeMethod(this, &Logging::slotAutoConnect, Qt::QueuedConnection);
 	}
 }
-
-//QList<QWidget *> Logging::statusBarWidgets(void) const {
-//	QList<QWidget *> ret;
-//	
-//	ret.push_back(m_errorCountLabel);
-//	ret.push_back(m_warningCountLabel);
-//	ret.push_back(m_messageCountLabel);
-//
-//	return ret;
-//}
 
 bool Logging::prepareToolShutdown(QSettings& _settings) {
 	_settings.setValue("Logging.AutoScrollToBottom", m_autoScrollToBottom->isChecked());
