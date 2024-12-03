@@ -86,6 +86,6 @@ void ot::GraphicsPixmapItem::paintCustomItem(QPainter* _painter, const QStyleOpt
 		adjustedSize = _rect.size();
 	}
 
-	QRectF adjustedRect = ot::calculateChildRect(_rect, adjustedSize, this->getGraphicsItemAlignment());
+	QRectF adjustedRect = ot::Positioning::calculateChildRect(_rect, adjustedSize, this->getGraphicsItemAlignment());
 	painter->paintImage(_painter, adjustedRect);
 }

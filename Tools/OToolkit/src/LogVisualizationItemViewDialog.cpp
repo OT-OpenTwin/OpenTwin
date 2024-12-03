@@ -130,7 +130,7 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 		QPoint(settings->value("LogVisualizationItemViewDialog.X", 0).toInt(), settings->value("LogVisualizationItemViewDialog.Y", 0).toInt()),
 		QSize(std::max(settings->value("LogVisualizationItemViewDialog.W", 800).toInt(), minWidth), std::max(settings->value("LogVisualizationItemViewDialog.H", 600).toInt(), minHeight))
 	);
-	newRect = ot::fitOnScreen(newRect);
+	newRect = ot::Positioning::fitOnScreen(newRect);
 	this->move(newRect.topLeft());
 	this->resize(newRect.size());
 

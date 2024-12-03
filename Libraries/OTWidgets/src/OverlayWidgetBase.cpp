@@ -74,7 +74,7 @@ void ot::OverlayWidgetBase::updateOverlayGeometry(void) {
 
     QSize newSize = this->minimumSize().expandedTo(rec.size()).boundedTo(this->maximumSize());
 
-    rec = ot::calculateChildRect(rec, newSize, m_alignment);
+    rec = ot::Positioning::calculateChildRect(rec, newSize, m_alignment);
 
     this->setGeometry(rec);
 }

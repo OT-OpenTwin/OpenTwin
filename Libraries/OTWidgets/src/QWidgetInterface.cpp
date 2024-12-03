@@ -23,9 +23,9 @@ void ot::QWidgetInterface::centerOnParent(const QWidget*const _parentWidget) {
 
 QPoint ot::QWidgetInterface::calculateCenterOnParentPos(const QWidget* const _parentWidget) {
 	if (_parentWidget) {
-		return ot::calculateChildRect(_parentWidget->rect(), this->getQWidget()->size(), ot::AlignCenter).topLeft();
+		return ot::Positioning::calculateChildRect(_parentWidget->rect(), this->getQWidget()->size(), ot::AlignCenter).topLeft();
 	}
 	else {
-		return ot::calculateChildRect(QApplication::primaryScreen()->geometry(), this->getQWidget()->size(), ot::AlignCenter).topLeft();
+		return ot::Positioning::calculateChildRect(QApplication::primaryScreen()->geometry(), this->getQWidget()->size(), ot::AlignCenter).topLeft();
 	}
 }

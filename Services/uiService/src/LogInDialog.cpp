@@ -180,7 +180,7 @@ LogInDialog::LogInDialog()
 	topLeftPos.setX(settings->value("LogInPos.X", topLeftPos.x()).toInt());
 	topLeftPos.setY(settings->value("LogInPos.Y", topLeftPos.y()).toInt());
 	newTargetRect.moveTo(topLeftPos);
-	this->move(ot::fitOnScreen(newTargetRect).topLeft());
+	this->move(ot::Positioning::fitOnScreen(newTargetRect).topLeft());
 
 	// Connect signals
 	this->connect(m_logInButton, &PushButton::clicked, this, &LogInDialog::slotLogIn);

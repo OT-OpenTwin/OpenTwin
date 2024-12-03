@@ -11,7 +11,7 @@
 #include <QtGui/qscreen.h>
 #include <QtGui/qguiapplication.h>
 
-QRect ot::calculateChildRect(const QRect& _parentRect, const QSize& _childSize, ot::Alignment _childAlignment) {
+QRect ot::Positioning::calculateChildRect(const QRect& _parentRect, const QSize& _childSize, ot::Alignment _childAlignment) {
 	// Get the top left point of the outer rectangle
 	QPoint pt(_parentRect.topLeft());
 
@@ -56,7 +56,7 @@ QRect ot::calculateChildRect(const QRect& _parentRect, const QSize& _childSize, 
 	return QRect(pt, _childSize);
 }
 
-QRectF ot::calculateChildRect(const QRectF& _parentRect, const QSizeF& _childSize, ot::Alignment _childAlignment) {
+QRectF ot::Positioning::calculateChildRect(const QRectF& _parentRect, const QSizeF& _childSize, ot::Alignment _childAlignment) {
 	// Get the top left point of the outer rectangle
 	QPointF pt(_parentRect.topLeft());
 
@@ -101,7 +101,7 @@ QRectF ot::calculateChildRect(const QRectF& _parentRect, const QSizeF& _childSiz
 	return QRectF(pt, _childSize);
 }
 
-QRect ot::fitOnScreen(const QRect& _sourceRect, bool _primaryScreenOnly) {
+QRect ot::Positioning::fitOnScreen(const QRect& _sourceRect, bool _primaryScreenOnly) {
 	// Get the screen at the initial position of the rect
 	QScreen* screen = nullptr;
 
