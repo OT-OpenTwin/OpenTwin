@@ -127,7 +127,7 @@ void SubprocessHandler::stopSubprocess() {
 		//OT_LOG_D("Stopping CircuitExecution!");
 		//m_subProcess.terminate();
 
-		m_subProcess.waitForFinished(5000);
+		//m_subProcess.waitForFinished(5000);
 		OT_LOG_D("CircuitExecution not responding. Killing Process.");
 		m_subProcess.kill();
 		m_subProcess.waitForFinished();
