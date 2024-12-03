@@ -15,12 +15,12 @@ public:
 	ConnectionManager();
 	~ConnectionManager();
 
+	void startListen(std::string serverName);
+
+	QLocalSocket* getSocket();
+	QLocalServer& getServer();
+
 	
-
-
-
-
-
 private:
 	std::string m_serverName;
 	QLocalSocket* m_socket = nullptr;

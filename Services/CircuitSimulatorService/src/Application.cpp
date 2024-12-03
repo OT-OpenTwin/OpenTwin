@@ -325,13 +325,28 @@ void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std:
 }
 
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity) {
+	//starting subservice  CircuitExecution
+	const int sessionCount = Application::instance()->getSessionCount();
+	const int serviceID = Application::instance()->getServiceIDAsInt();
+	if (m_subprocessHandler == nullptr)
+	{
+		m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
+	}
+
+
+
 	EntityPropertiesEntityList* circuitName = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Circuit"));
 	assert(circuitName != nullptr);
 
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationTypeProperty != nullptr);
 
+	
 
+
+
+
+	
 
 	std::string name =  extractStringAfterDelimiter(circuitName->getValueName(), '/', 1);
 	std::string solverName = solver.getEntityName();
@@ -359,8 +374,11 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	m_blockEntityHandler.createResultCurves(solverName,simulationTypeProperty->getValue(),circuitName->getValueName());
 	m_ngSpice.clearBufferStructure(name);
 
-	////Testing
-	//m_subprocessHandler->stopSubprocess();
+	//Now we stop the SubProcess
+	m_subprocessHandler->stopSubprocess();
+
+	delete m_subprocessHandler;
+	m_subprocessHandler = nullptr;
 	
 }
 
@@ -500,15 +518,8 @@ void Application::run(void) {
 		assert(0);
 	}
 
-	//Testing
-	const int sessionCount = Application::instance()->getSessionCount();
-	const int serviceID = Application::instance()->getServiceIDAsInt();
-	if (m_subprocessHandler == nullptr)
-	{
-		m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
-	}
 
-	//m_subprocessHandler->startSubprocess();
+	
 
 }
 

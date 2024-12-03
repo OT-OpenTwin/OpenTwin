@@ -25,16 +25,24 @@ public:
 	bool isSubprocessHealthy();
 	void restartSubprocess();
 
+	
+	
+	
+
+	
 private:
-	std::string m_serverName;
+	
 	const std::string m_executableName = "CircuitExecution.exe";
 	std::string m_subprocessPath;
-	QProcess m_subProcess;
-	QLocalServer m_server;
+	
+	
 	std::atomic_bool m_isHealthy;
 	std::atomic_bool m_initialisationPrepared = false;
 
-	ConnectionManager m_connectionManager;
+	ConnectionManager *m_connectionManager;
+	QProcess m_subProcess;
+	QLocalServer m_server;
+	std::string m_serverName;
 
 
 	std::string FindSubprocessPath();

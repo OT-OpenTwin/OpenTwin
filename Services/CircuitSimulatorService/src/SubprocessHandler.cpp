@@ -5,26 +5,27 @@
 #include "QtCore/qcoreapplication.h"
 
 SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionID, int serviceID) :m_serverName(serverName) ,m_isHealthy(false) {
-	
+
 	
 
 	m_subprocessPath = FindSubprocessPath() + m_executableName;
 
 	InitiateProcess();
 
-	ConnectionManager m_connectionManager;
 	
 #ifdef _DEBUG
 	m_serverName = "TestServer";
 #endif
 	m_server.listen(m_serverName.c_str());
-	
+	//m_connectionManager->startListen(m_serverName);
+
 #ifndef _DEBUG
 	std::thread workerThread(&SubprocessHandler::RunSubprocess, this);
 	workerThread.detach();
 #else
 	startSubprocess();
 #endif
+
 }
 
 SubprocessHandler::~SubprocessHandler() {
@@ -142,6 +143,7 @@ void SubprocessHandler::restartSubprocess() {
 	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	startSubprocess();
 }
+
 
 
 void SubprocessHandler::ProcessErrorOccured(std::string& message)
