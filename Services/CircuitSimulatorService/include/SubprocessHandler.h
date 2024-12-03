@@ -26,10 +26,7 @@ public:
 	void restartSubprocess();
 
 	
-	
-	
 
-	
 private:
 	
 	const std::string m_executableName = "CircuitExecution.exe";
@@ -50,8 +47,7 @@ private:
 
 	const int m_numberOfRetries = 3;
 	const int m_timeoutSubprocessStart = 50000;//5 seconds
-	const int m_timeoutServerConnect = m_timeoutSubprocessStart;
-	const int m_timeoutSendingMessage = m_timeoutSubprocessStart;
+
 	const int m_heartBeat = m_timeoutSubprocessStart;
 	
 	void ProcessErrorOccured(std::string& message);

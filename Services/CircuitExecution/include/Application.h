@@ -20,6 +20,9 @@ public:
 	Application(const Application&) = delete;
 	Application& operator=(const Application&) = delete;
 
+	//void initializeServiceLogNotifier();
+
+
 private:
 	Application();
 	~Application();

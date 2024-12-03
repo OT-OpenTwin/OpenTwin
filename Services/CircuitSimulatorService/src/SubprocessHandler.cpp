@@ -11,8 +11,9 @@ SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionI
 	m_subprocessPath = FindSubprocessPath() + m_executableName;
 
 	InitiateProcess();
-
 	
+	m_connectionManager = new ConnectionManager();
+
 #ifdef _DEBUG
 	m_serverName = "TestServer";
 #endif
@@ -23,7 +24,9 @@ SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionI
 	std::thread workerThread(&SubprocessHandler::RunSubprocess, this);
 	workerThread.detach();
 #else
-	startSubprocess();
+	RunSubprocess();
+	
+
 #endif
 
 }
@@ -69,8 +72,10 @@ void SubprocessHandler::RunSubprocess()
 			throw std::exception(message.c_str());
 		}
 		OT_LOG_D("Circuit Subprocess started");
-
 		
+		m_connectionManager->setServerName(m_serverName);
+		//m_connectionManager->connectWithSubprocess();
+	
 	}
 	catch (std::exception& e)
 	{
@@ -122,7 +127,7 @@ void SubprocessHandler::stopSubprocess() {
 		//OT_LOG_D("Stopping CircuitExecution!");
 		//m_subProcess.terminate();
 
-		
+		m_subProcess.waitForFinished(5000);
 		OT_LOG_D("CircuitExecution not responding. Killing Process.");
 		m_subProcess.kill();
 		m_subProcess.waitForFinished();
