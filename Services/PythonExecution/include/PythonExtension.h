@@ -28,7 +28,7 @@ namespace PythonExtensions
          std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args,0,"Parameter 0");
          std::string propertyName = pyObBuilder.getStringValueFromTuple(args, 1, "Parameter 1");
 
-         PyObject* returnValue = EntityBuffer::INSTANCE().GetEntityPropertyValue(absoluteEntityName, propertyName);
+         PyObject* returnValue = EntityBuffer::INSTANCE().getEntityPropertyValue(absoluteEntityName, propertyName);
          return returnValue;
     }
 
@@ -44,7 +44,7 @@ namespace PythonExtensions
         std::string absoluteScriptName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
         
 
-        auto baseEntity = EntityBuffer::INSTANCE().GetEntity(absoluteScriptName);
+        auto baseEntity = EntityBuffer::INSTANCE().getEntity(absoluteScriptName);
         ot::EntityInformation entityInfo(baseEntity.get());
         std::optional<std::string> moduleName =  PythonLoadedModules::INSTANCE()->getModuleName(entityInfo);
         CPythonObjectNew moduleImported(nullptr);
@@ -57,7 +57,7 @@ namespace PythonExtensions
                 throw std::exception("Requested script execution cannot be done, since the entity is not a python script.");
             }
 
-            PythonLoadedModules::INSTANCE()->AddModuleForEntity(entityInfo);
+            PythonLoadedModules::INSTANCE()->addModuleForEntity(entityInfo);
             moduleName = PythonLoadedModules::INSTANCE()->getModuleName(entityInfo);
 
             auto plainData = script->getData()->getData();
@@ -78,7 +78,7 @@ namespace PythonExtensions
             moduleImported = PyImport_ImportModule(moduleName.value().c_str());
         }
 
-        std::string entryPoint = PythonModuleAPI::GetModuleEntryPoint(moduleImported);
+        std::string entryPoint = PythonModuleAPI::INSTANCE().getModuleEntryPoint(moduleImported);
         return PyObject_GetAttrString(moduleImported, entryPoint.c_str());   
     }
 
@@ -96,7 +96,7 @@ namespace PythonExtensions
         std::string propertyName = pyObBuilder.getStringValueFromTuple(args, 1, "Parameter 1");
         CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(args, 2, "Parameter 2");
 
-        EntityBuffer::INSTANCE().UpdateEntityPropertyValue(absoluteEntityName, propertyName,pvalue);
+        EntityBuffer::INSTANCE().updateEntityPropertyValue(absoluteEntityName, propertyName,pvalue);
         return PyBool_FromLong(true);
     }
 
@@ -107,7 +107,7 @@ namespace PythonExtensions
             throw std::exception("OT_Flush expects zero arguments");
         }
 
-        EntityBuffer::INSTANCE().SaveChangedEntities();
+        EntityBuffer::INSTANCE().saveChangedEntities();
         PythonObjectBuilder pyObBuilder;
         return PyBool_FromLong(true);
     }
@@ -120,7 +120,7 @@ namespace PythonExtensions
         {
             throw std::exception("OT_FlushEntity expects one argument");
         }
-        EntityBuffer::INSTANCE().SaveChangedEntities();
+        EntityBuffer::INSTANCE().saveChangedEntities();
         PythonObjectBuilder pyObBuilder;
         return pyObBuilder.setBool(true);
     }
@@ -138,7 +138,7 @@ namespace PythonExtensions
         int32_t row = pyObBuilder.getInt32ValueFromTuple(args, 1, "Parameter 1");
         int32_t column = pyObBuilder.getInt32ValueFromTuple(args, 2, "Parameter 2");
 
-        PyObject* returnValue = EntityBuffer::INSTANCE().GetTableCellValue(absoluteEntityName, row, column);
+        PyObject* returnValue = EntityBuffer::INSTANCE().getTableCellValue(absoluteEntityName, row, column);
         return returnValue;
     }
     

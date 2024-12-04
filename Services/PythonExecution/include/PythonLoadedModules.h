@@ -6,10 +6,13 @@
  * \date   July 2023
  *********************************************************************/
 #pragma once
-#include <map>
 #include <string>
 #include <set>
+#include <map>
 #include <optional>
+
+#include "OTServiceFoundation/EntityInformation.h"
+#include "OTCore/Logger.h"
 
 class PythonLoadedModules
 {
@@ -20,43 +23,14 @@ public:
 		return &instance;
 	}
 	
-	std::optional<std::string> getModuleName(ot::EntityInformation& scriptEntityInfos) 
-	{
-		bool found = false;
-		std::string moduleName = CreateUniqueModuleName(scriptEntityInfos);
-		for (std::string& name : _moduleNames)
-		{
-			if (moduleName == name)
-			{
-				found = true;
-				break;
-			}
-		}
-		
-		if(!found)
-		{
-			return {};
-		}
-		else
-		{
-			return moduleName;
-		}
-	}
-
-	std::string AddModuleForEntity(ot::EntityInformation& scriptEntityInfo)
-	{
-		std::string moduleName = CreateUniqueModuleName(scriptEntityInfo);
-		_moduleNames.push_back(moduleName);
-		return moduleName;
-	};
-
-	std::string CreateUniqueModuleName(ot::EntityInformation& entityInfo)
-	{
-		return std::to_string(entityInfo.getEntityID()) + std::to_string(entityInfo.getEntityVersion());
-	}
+	std::optional<std::string> getModuleName(const ot::EntityInformation& _scriptEntityInfos);
+	std::string addModuleForEntity(const ot::EntityInformation& _scriptEntityInfo);
+	std::string createUniqueModuleName(const ot::EntityInformation& _entityInfo);
+	
+	std::string getEntityName(const std::string& _moduleName);
 private:
 
 	PythonLoadedModules() {};
-	std::list<std::string> _moduleNames;
-
+	std::set<std::string> m_moduleNames;
+	std::map<std::string, std::string> m_entityNameByModuleName;
 };

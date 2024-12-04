@@ -168,7 +168,7 @@ ot::ReturnMessage ActionHandler::ExecuteScript(ot::JsonDocument& doc)
 		}
 
 		//Execute
-		ot::ReturnValues result = _pythonAPI.Execute(scripts, allParameter);
+		ot::ReturnValues result = _pythonAPI.execute(scripts, allParameter);
 		PortDataBuffer::INSTANCE().AddModifiedPortData(result);
 
 		if (result.getNumberOfEntries() != 0)
@@ -193,7 +193,7 @@ ot::ReturnMessage ActionHandler::ExecuteCommand(ot::JsonDocument& doc)
 	std::string executionCommand = ot::json::getString(doc, OT_ACTION_CMD_PYTHON_Command);
 	try
 	{
-		ot::ReturnValues result = _pythonAPI.Execute(executionCommand);
+		ot::ReturnValues result = _pythonAPI.execute(executionCommand);
 		if (result.getNumberOfEntries() != 0)
 		{
 			return ot::ReturnMessage(result);

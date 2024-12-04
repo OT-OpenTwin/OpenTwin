@@ -11,7 +11,7 @@
 #include <string>
 #include <memory>
 #include "OTServiceFoundation/ModelServiceAPI.h"
-#include "EntityResultTable.h"
+#include "IVisualisationTable.h"
 #include "ClassFactory.h"
 
 
@@ -24,29 +24,32 @@ public:
 		static EntityBuffer instance;
 		return instance;
 	} 
-	void setModelServiceAPI(ot::ModelServiceAPI* modelServiceAPI) { _modelServiceAPI = modelServiceAPI; };
+	void setModelServiceAPI(ot::ModelServiceAPI* _modelServiceAPI) 
+	{ 
+		assert(_modelServiceAPI != nullptr);
+		m_modelServiceAPI = _modelServiceAPI;
+	};
 
-	PyObject* GetEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName);
-	PyObject* GetTableCellValue(const std::string& absoluteEntityName, int32_t row, int32_t column);
-	void UpdateEntityPropertyValue(const std::string& absoluteEntityName, const std::string& propertyName, const CPythonObject& values);
-	std::shared_ptr<EntityBase> GetEntity (const std::string& absoluteEntityName);
+	PyObject* getEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName);
+	PyObject* getTableCellValue(const std::string& _absoluteEntityName, int32_t _row, int32_t _column);
+	void updateEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName, const CPythonObject& _values);
+	std::shared_ptr<EntityBase> getEntity (const std::string& _absoluteEntityName);
 	
-	void SaveChangedEntities();
-	bool SaveChangedEntities(std::string absoluteEntityName);
+	void saveChangedEntities();
+	bool saveChangedEntities(const std::string& _absoluteEntityName);
 
-	void ClearBuffer();
+	void clearBuffer();
 
 private:
-	EntityBuffer();
+	EntityBuffer() = default;
 
-	std::map<std::string, std::shared_ptr<EntityBase>> _bufferedEntities;
-	std::map<std::string, std::shared_ptr<EntityResultTable<std::string>>> _bufferedTableEntities;
-	std::map<std::string, EntityPropertiesBase*> _bufferedEntityProperties;
+	std::map<std::string, std::shared_ptr<EntityBase>> m_bufferedEntities;
+	std::map<std::string, std::shared_ptr<IVisualisationTable>> m_bufferedTableEntities;
+	std::map<std::string, EntityPropertiesBase*> m_bufferedEntityProperties;
 
-	ot::ModelServiceAPI* _modelServiceAPI = nullptr;
-	void EnsurePropertyToBeLoaded(const std::string& absoluteEntityName, const std::string& propertyName);
-	void EnsureTableToBeLoaded(const std::string& absoluteEntityName);
-	std::shared_ptr<EntityBase> LoadEntity(const std::string& absoluteEntityName);
-
-
+	ot::ModelServiceAPI* m_modelServiceAPI = nullptr;
+	
+	void ensurePropertyToBeLoaded(const std::string& _absoluteEntityName, const std::string& _propertyName);
+	void ensureTableToBeLoaded(const std::string& _absoluteEntityName);
+	std::shared_ptr<EntityBase> loadEntity(const std::string& _absoluteEntityName);
 };

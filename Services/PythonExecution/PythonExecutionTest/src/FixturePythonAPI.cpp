@@ -3,5 +3,5 @@
 
 void FixturePythonAPI::SetupModule(const std::string& script)
 {
-	_wrapper.Execute(script, _moduleName);
+	_wrapper.execute(script, _moduleName);
 }

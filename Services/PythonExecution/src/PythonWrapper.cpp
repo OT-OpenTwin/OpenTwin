@@ -31,7 +31,7 @@ int PythonWrapper::initiateNumpy()
 
 std::string PythonWrapper::checkNumpyVersion()
 {
-	Execute("import numpy\n"
+	execute("import numpy\n"
 		"numpyVersion = numpy.version.version", "__main__");
 	CPythonObjectBorrowed variable = GetGlobalVariable("numpyVersion","__main__");
 	PythonObjectBuilder builder;
@@ -110,14 +110,14 @@ void PythonWrapper::ResetSysPath()
 	{
 		resetPythonPath += "sys.path.append(\"" +pathComponent +"\")\n";
 	}
-	Execute(resetPythonPath);
+	execute(resetPythonPath);
 }
 
 void PythonWrapper::AddToSysPath(const std::string& newPathComponent)
 {
 	const std::string addToPythonPath = "import sys\n"
 		"sys.path.append(\""+newPathComponent+"\")\n";
-	Execute(addToPythonPath);
+	execute(addToPythonPath);
 }
 
 std::string PythonWrapper::DeterminePythonRootDirectory()
@@ -188,11 +188,11 @@ void PythonWrapper::signalHandlerAbort(int sig)
 	throw std::exception("Abort was called.");
 }
 
-CPythonObjectNew PythonWrapper::Execute(const std::string& executionCommand, const std::string& moduleName)
+CPythonObjectNew PythonWrapper::execute(const std::string& _executionCommand, const std::string& _moduleName)
 {
-	CPythonObjectNew module(GetModule(moduleName));
+	CPythonObjectNew module(GetModule(_moduleName));
 	CPythonObjectBorrowed globalDirectory(PyModule_GetDict(module));
-	CPythonObjectNew result(PyRun_String(executionCommand.c_str(), Py_file_input, globalDirectory, globalDirectory));
+	CPythonObjectNew result(PyRun_String(_executionCommand.c_str(), Py_file_input, globalDirectory, globalDirectory));
 	if (result == nullptr)
 	{
 		throw PythonException();

@@ -1,17 +1,24 @@
-/*****************************************************************//**
- * \file   PythonModuleAPI.h
- * \brief  Functions that investigate an existing module for the starting function. If the module contains only one funtion, it will be the starting function of the module.
- *			If the module holds multiple function definitions it requires one function called "__main__", which will be the starting function of the module.
- * 
- * \author Wagner
- * \date   July 2023
- *********************************************************************/
+//! @brief  Functions that investigate an existing module for the starting function. If the module contains only one funtion, it will be the starting function of the module. 
+//!			If the module holds multiple function definitions it requires one function called "__main__", which will be the starting function of the module.
+
 #pragma once
 #include <string>
 #include "CPythonObject.h"
 class PythonModuleAPI
 {
 public:
-	static std::string GetModuleEntryPoint(const std::string& moduleName);
-	static std::string GetModuleEntryPoint(CPythonObject& module);
+	static const PythonModuleAPI& INSTANCE()
+	{
+		static PythonModuleAPI instance;
+		return instance;
+	}
+	std::string getModuleEntryPoint(const std::string& _moduleName) const;
+	std::string getModuleEntryPoint(CPythonObject& _module) const;
+
+public:
+	PythonModuleAPI() = default;
+	std::string m_defaultEntryPoint = "__main__";
+
+	bool hasScriptHasEntryPoint(const CPythonObject& _module) const;
 };
+

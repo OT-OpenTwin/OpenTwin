@@ -69,7 +69,7 @@ int main(int argc, char* argv[], char* envp[])
 {
 	QApplication a(argc, argv);
 #ifdef _RELEASEDEBUG
-	const std::string serverName = "TestServer";
+	const std::string serverName = "TestServerPython";
 	ot::ServiceLogNotifier::initialize("PythonSubprocess", "", true);
 	
 #else
@@ -96,7 +96,7 @@ int main(int argc, char* argv[], char* envp[])
 		if (_socket.state() != QLocalSocket::ConnectedState)
 		{
 			auto socketError = _socket.errorString();
-			OT_LOG_E("Error while trying to connect to PYthon Service: " + socketError.toStdString());
+			OT_LOG_E("Error while trying to connect to Python Service: " + socketError.toStdString());
 			OT_LOG_E("Shutting down");
 			exit(0);
 		}

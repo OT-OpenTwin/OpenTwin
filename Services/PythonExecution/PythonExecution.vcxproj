@@ -290,6 +290,7 @@
     <ClCompile Include="src\PortDataBuffer.cpp" />
     <ClCompile Include="src\PropertyPythonObjectConverter.cpp" />
     <ClCompile Include="src\PythonAPI.cpp" />
+    <ClCompile Include="src\PythonLoadedModules.cpp" />
     <ClCompile Include="src\PythonModuleAPI.cpp" />
     <ClCompile Include="src\PythonObjectBuilder.cpp" />
     <ClCompile Include="src\PythonWrapper.cpp" />

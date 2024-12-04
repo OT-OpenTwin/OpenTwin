@@ -11,7 +11,7 @@ FixturePythonWrapper::FixturePythonWrapper()
 
 void FixturePythonWrapper::ExecuteString(const std::string& command, const std::string& moduleName)
 {
-	_wrapper.Execute(command, moduleName);
+	_wrapper.execute(command, moduleName);
 }
 
 std::string FixturePythonWrapper::ExecuteFunctionWithReturnValue(const std::string& functionName, const std::string& moduleName)

@@ -48,6 +48,9 @@
     <ClCompile Include="src\ActionHandler.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\PythonLoadedModules.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CPythonObject.h">

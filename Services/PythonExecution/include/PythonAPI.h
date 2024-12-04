@@ -12,11 +12,11 @@ class PythonAPI
 	friend class FixturePythonAPI;
 public:
 	PythonAPI();
-	ot::ReturnValues Execute(std::list<std::string>& scripts, std::list<std::list<ot::Variable>>& parameterSet) noexcept(false);
-	ot::ReturnValues Execute(const std::string& command) noexcept(false);
+	ot::ReturnValues execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet) noexcept(false);
+	ot::ReturnValues execute(const std::string& _command) noexcept(false);
 private:
-	std::map<std::string , std::string> _moduleEntrypointByModuleName;
-	PythonWrapper _wrapper;
-	std::list<ot::EntityInformation> EnsureScriptsAreLoaded(std::list<std::string> scripts);
-	void LoadScipt(ot::EntityInformation& entityInformation);
+	std::map<std::string , std::string> m_moduleEntrypointByModuleName;
+	PythonWrapper m_wrapper;
+	std::list<ot::EntityInformation> ensureScriptsAreLoaded(const std::list<std::string>& _scripts);
+	void loadScipt(const ot::EntityInformation& _entityInformation);
 };
