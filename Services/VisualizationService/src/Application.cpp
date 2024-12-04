@@ -185,7 +185,11 @@ std::pair<ot::UID, ot::UID> Application::createDataItems(EntityVis2D3D *visEntit
 {
 	// Update the visualization -> Create a new visualization data object
 	VtkDriver *vtkDriver = VtkDriverFactory::createDriver(visEntity);
-	
+	if (vtkDriver == nullptr)
+	{
+		throw std::exception();
+	}
+
 	vtkDriver->setProperties(visEntity);
 
 	// Load the data item
@@ -226,7 +230,15 @@ void Application::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, bo
 	
 	if (itemsVisible)
 	{
-		binaryDataItems = createDataItems(visEntity);
+		try
+		{
+			binaryDataItems = createDataItems(visEntity);
+		}
+		catch (std::exception)
+		{
+			uiComponent()->displayMessage("ERROR: Unable to create the data item.");
+			return;
+		}
 	}
 
 	// Send the information about the new visualization data to the model. The model then updates the EntityVis2D item and sends the update message to the viewer.

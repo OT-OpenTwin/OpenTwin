@@ -13,7 +13,6 @@ void PropertyBundleDataHandlePlane::LoadCurrentData(EntityBase * thisObject)
 	assert(normalProperty != nullptr);
 	normalDescription = properties.GetNormalDescription(normalProperty->getValue());
 
-
 	auto centerXProperty = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetPropertyNameCenterX()));
 	assert(centerXProperty != nullptr);
 	centerX = centerXProperty->getValue();
