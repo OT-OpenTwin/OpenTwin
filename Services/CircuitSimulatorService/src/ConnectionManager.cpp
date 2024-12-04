@@ -1,74 +1,70 @@
 #include "ConnectionManager.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/OperatingSystem.h"
-
+#include "QtNetwork/qlocalserver.h"
+#include "QtNetwork/qlocalsocket.h"
 
 ConnectionManager::ConnectionManager(QObject* parent) : QObject(parent) {
+    m_server = new QLocalServer(this);
+    m_socket = nullptr;
     
 }
 
 ConnectionManager::~ConnectionManager()
 {
-    if (m_socket)
-    {
-        m_socket->disconnectFromServer();
-        m_socket->deleteLater();
+    delete m_server;
+    m_server = nullptr;
+}
+
+void ConnectionManager::startListen(const std::string& _serverName) {
+    
+    QObject::connect(m_server, &QLocalServer::newConnection, this, &ConnectionManager::handleConnection);
+    m_server->listen(QString::fromStdString(_serverName));
+    OT_LOG_D("CircuitSimulatorService starting to listen");
+}
+
+void ConnectionManager::handleReadyRead() {
+    QByteArray data = m_socket->readAll();
+    OT_LOG_D("Received Data: " + data.toStdString());
+}
+
+void ConnectionManager::handleDisconnected() {
+
+    OT_LOG_D("Client disconnected");
+    delete m_socket;
+    m_socket = nullptr;
+}
+
+
+
+void ConnectionManager::handleConnection() {
+    QLocalSocket* clientSocket = m_server->nextPendingConnection();
+    
+    // Check if connection already exists
+    if (m_socket != nullptr) {
+        OT_LOG_E("Connection already established");
+        clientSocket->disconnect();
+        delete clientSocket;
+        return;
     }
-}
+    
+    m_socket = clientSocket;
+    
+    connect(m_socket, &QLocalSocket::readyRead, this, &ConnectionManager::handleReadyRead);
+    connect(m_socket, &QLocalSocket::disconnected, this, &ConnectionManager::handleDisconnected);
 
-void ConnectionManager::startListen(std::string serverName) {
-    m_server.listen(m_serverName.c_str());
-}
+    m_socket->write("Hello I am CircuitSimulatorService");
+    m_socket->flush();
 
-QLocalSocket* ConnectionManager::getSocket()
-{
-    return m_socket;
-}
-
-QLocalServer& ConnectionManager::getServer()
-{
-    return m_server;
-}
-
-void ConnectionManager::connectWithSubprocess()
-{
-	OT_LOG_D("Waiting for connection servername: " + m_serverName);
-	bool connected = m_server.waitForNewConnection(m_timeoutServerConnect);
-	if (connected)
-	{
-		m_socket = m_server.nextPendingConnection();
-		m_socket->waitForConnected(m_timeoutServerConnect);
-		connected = m_socket->state() == QLocalSocket::ConnectedState;
-		if (connected)
-		{
-			OT_LOG_D("Connection with subservice established");
-		}
-		else
-		{
-			std::string errorMessage;
-			SocketErrorOccured(errorMessage);
-			errorMessage = "Error occured while connecting with Python Subservice: " + errorMessage;
-			throw std::exception(errorMessage.c_str());
-		}
-	}
-	else
-	{
-		throw std::exception("Timout while waiting for subprocess to connect with server.");
-	}
-}
-
-void ConnectionManager::setServerName(std::string serverName)
-{
-	this->m_serverName = serverName;
 }
 
 
 
 
-void ConnectionManager::SocketErrorOccured(std::string& message)
-{
-	message = m_socket->errorString().toStdString();
-}
+
+
+
+
 
 
 

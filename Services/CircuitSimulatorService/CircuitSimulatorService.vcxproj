@@ -221,6 +221,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\NGSpice.cpp" />
+    <ClCompile Include="src\QtWrapper.cpp" />
     <ClCompile Include="src\SimulationResults.cpp" />
     <ClCompile Include="src\SubprocessHandler.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
@@ -241,6 +242,7 @@
     <QtMoc Include="include\ConnectionManager.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\NGSpice.h" />
+    <ClInclude Include="include\QtWrapper.h" />
     <ClInclude Include="include\SimulationResults.h" />
     <ClInclude Include="include\SubprocessHandler.h" />
     <ClInclude Include="include\UiNotifier.h" />

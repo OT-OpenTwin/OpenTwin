@@ -78,6 +78,9 @@
     <ClCompile Include="src\ConnectionManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\QtWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -129,6 +132,9 @@
       <Filter>Header Files\CircuitElements</Filter>
     </ClInclude>
     <ClInclude Include="include\SubprocessHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QtWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

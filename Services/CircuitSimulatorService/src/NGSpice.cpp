@@ -692,12 +692,12 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 	
 
-	// I want to be able to have always the same structure and naming of nodeNumbers in the circuit in all cases the user might build the circuit.
-	// Means that the user can start with every element to drop in the scene and start with any connection he want and this will not influence the results of the simulation
-	// and the coordination and of the nodenumbers and elements
-	// I want always a flow from positive node to negative node 
-	// I first start with the voltageSource and give it the connection id = 0 then i will go to the next element at the connection and to the opposite connetor and give it the 
-	// next nodenumber. I will take use of traversing graphs with my code of checking parallel connections. I just need a good understandable structure
+// I want to be able to have always the same structure and naming of nodeNumbers in the circuit in all cases the user might build the circuit.
+// Means that the user can start with every element to drop in the scene and start with any connection he want and this will not influence the results of the simulation
+// and the coordination and of the nodenumbers and elements
+// I want always a flow from positive node to negative node 
+// I first start with the voltageSource and give it the connection id = 0 then i will go to the next element at the connection and to the opposite connetor and give it the 
+// next nodenumber. I will take use of traversing graphs with my code of checking parallel connections. I just need a good understandable structure
 
 	// First I get all the VoltageSources of the Circuit
 	auto vectorGND = it->second.getMapOfEntityBlcks().find("EntityBlockCircuitGND");

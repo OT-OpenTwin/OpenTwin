@@ -10,6 +10,7 @@
 #include "Application.h"
 #include "ModelNotifier.h"
 #include "UiNotifier.h"
+#include "QtWrapper.h"
 
 // Open twin header
 #include "OTCore/ReturnMessage.h"
@@ -90,7 +91,8 @@ Application::Application()
 }
 
 Application::~Application() {
-
+	delete m_qtWrapper;
+	m_qtWrapper = nullptr;
 }
 
 // ##################################################################################################################################################################################################################
@@ -106,6 +108,7 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	}
 	else if (action == "Circuit Simulator:Simulate:Run Simulation") {
 		runCircuitSimulation();
+
 		
 	}
 	else if (action == "Circuit Simulator:Edit:Add Circuit") {
@@ -325,13 +328,14 @@ void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std:
 }
 
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity) {
+	
 	//starting subservice  CircuitExecution
-	const int sessionCount = Application::instance()->getSessionCount();
-	const int serviceID = Application::instance()->getServiceIDAsInt();
-	if (m_subprocessHandler == nullptr)
-	{
-		m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
-	}
+	//const int sessionCount = Application::instance()->getSessionCount();
+	//const int serviceID = Application::instance()->getServiceIDAsInt();
+	//if (m_subprocessHandler == nullptr)
+	//{
+	//	m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
+	//}
 
 
 
@@ -341,12 +345,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationTypeProperty != nullptr);
 
-	
 
-
-
-
-	
 
 	std::string name =  extractStringAfterDelimiter(circuitName->getValueName(), '/', 1);
 	std::string solverName = solver.getEntityName();
@@ -375,9 +374,9 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	m_ngSpice.clearBufferStructure(name);
 
 
-	// Here we stop the Subprocess
-	delete m_subprocessHandler;
-	m_subprocessHandler = nullptr;
+	//// Here we stop the Subprocess
+	//delete m_subprocessHandler;
+	//m_subprocessHandler = nullptr;
 	
 }
 
@@ -517,8 +516,9 @@ void Application::run(void) {
 		assert(0);
 	}
 
+	m_qtWrapper = new QtWrapper();
 
-	
+	m_qtWrapper->run(sessionID());
 
 }
 

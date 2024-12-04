@@ -3,6 +3,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/OperatingSystem.h"
 #include "QtCore/qcoreapplication.h"
+#include"QtCore/qtimer.h"
 
 SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionID, int serviceID) :m_serverName(serverName) ,m_isHealthy(false) {
 
@@ -11,23 +12,12 @@ SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionI
 	m_subprocessPath = FindSubprocessPath() + m_executableName;
 
 	InitiateProcess();
+
 	
-	m_connectionManager = new ConnectionManager();
 
-#ifdef _DEBUG
-	m_serverName = "TestServer";
-#endif
-	m_server.listen(m_serverName.c_str());
-	//m_connectionManager->startListen(m_serverName);
 
-#ifndef _DEBUG
 	std::thread workerThread(&SubprocessHandler::RunSubprocess, this);
 	workerThread.detach();
-#else
-	RunSubprocess();
-	
-
-#endif
 
 }
 
@@ -73,9 +63,8 @@ void SubprocessHandler::RunSubprocess()
 		}
 		OT_LOG_D("Circuit Subprocess started");
 		
-		m_connectionManager->setServerName(m_serverName);
-		//m_connectionManager->connectWithSubprocess();
-	
+		
+
 	}
 	catch (std::exception& e)
 	{

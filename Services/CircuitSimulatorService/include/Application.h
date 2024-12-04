@@ -29,12 +29,15 @@ namespace ot {
 	}
 }
 
+class QtWrapper;
+
+
 class Application : public ot::ApplicationBase {
 public:
 	static Application * instance(void);
 	static void deleteInstance(void);
 	
-	
+
 private:
 	
 	Application();
@@ -151,5 +154,5 @@ public:
 
 private:
 	SubprocessHandler* m_subprocessHandler = nullptr;
-	ConnectionManager* m_connectionManager = nullptr;
+	QtWrapper* m_qtWrapper = nullptr;
 };

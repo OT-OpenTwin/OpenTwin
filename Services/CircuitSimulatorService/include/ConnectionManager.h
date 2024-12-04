@@ -1,19 +1,17 @@
 #pragma once
 
+//OpenTwin Header
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTCore/ReturnMessage.h"
 
-#include <QtNetwork/qlocalsocket.h>
-#include <QtNetwork/qlocalserver.h>
+//Qt Header
 #include <QtCore/qobject.h>
-#include <QtCore/qjsondocument.h>
-#include <QtCore/qjsonobject.h>
-#include <QtCore/qjsonarray.h>
+#include <QtCore/qstring.h>
+
+class QLocalSocket;
+class QLocalServer;
 
 
-
-#include <atomic>
-#include <chrono>
 
 class ConnectionManager : public QObject {
 	Q_OBJECT
@@ -21,23 +19,19 @@ public:
 	ConnectionManager(QObject* parent = (QObject*)nullptr);
 	~ConnectionManager();
 
-	void startListen(std::string serverName);
+	void startListen(const std::string& _serverName);
 
-	QLocalSocket* getSocket();
-	QLocalServer& getServer();
-
-	void connectWithSubprocess();
-
-	void setServerName(std::string serverName);
-
+private Q_SLOTS:
+	void handleConnection();
+	void handleReadyRead();
+	void handleDisconnected();
 private:
-	std::string m_serverName;
-	QLocalSocket* m_socket = nullptr;
-	QLocalServer m_server;
+	
+	QLocalServer* m_server;
+	QLocalSocket* m_socket;
 
-	const int m_timeoutServerConnect =  50000;
-	const int m_timeoutSendingMessage = m_timeoutServerConnect;
 
-	void SocketErrorOccured(std::string& message);
+
+	
 };
 

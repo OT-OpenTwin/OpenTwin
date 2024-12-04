@@ -7,13 +7,16 @@
 #include <QtNetwork/qlocalsocket.h>
 #include <QtCore/qprocess.h>
 #include <QtCore/qdebug.h>
-
+#include "QtCore/qobject.h"
 
 #include <atomic>
 #include <chrono>
 
+class ConnectionManager;
+
 class SubprocessHandler : public BusinessLogicHandler
 {
+	
 public:
 	SubprocessHandler(const std::string& serverName, int sessionID, int serviceID);
 	~SubprocessHandler();
@@ -36,11 +39,11 @@ private:
 	std::atomic_bool m_isHealthy;
 	std::atomic_bool m_initialisationPrepared = false;
 
-	ConnectionManager *m_connectionManager;
 	QProcess m_subProcess;
 	QLocalServer m_server;
 	std::string m_serverName;
 
+	ConnectionManager* m_connectionManager;
 
 	std::string FindSubprocessPath();
 	void InitiateProcess();
