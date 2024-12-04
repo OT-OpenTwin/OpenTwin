@@ -1163,7 +1163,8 @@ void EntityPropertiesEntityList::updateValueAndContainer(EntityBase* _root, std:
 		}
 	}
 	else {
-		OT_LOG_EA("Container not found");
+		//OT_LOG_EA("Container not found"); For copied items, e.g. mesh data items, this information is now available, so the current information in the entity should be used.
+		//							        No error message should be shown in this case.
 	}
 
 	EntityBase* entity = this->findEntityFromID(_root, this->getValueID());
@@ -1177,7 +1178,8 @@ void EntityPropertiesEntityList::updateValueAndContainer(EntityBase* _root, std:
 			this->setValueID(entity->getEntityID());
 		}
 		else {
-			OT_LOG_EA("Value not found");
+			//OT_LOG_EA("Value not found");  For copied items, e.g. mesh data items, this information is now available, so the current information in the entity should be used.
+			//							     No error message should be shown in this case.
 		}
 	}
 }
