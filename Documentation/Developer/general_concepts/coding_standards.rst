@@ -70,8 +70,32 @@ Bracketing
 
 Inside function or method body place opening curly bracket on same line.
 Outside that the Namespace, Class and methods levels use separate line for the opening bracket. 
-Notice that curlies are not required if you have single statement, but complex statements are easier to keep correct with the braces.
-Try to use the curlies for single statements aswell to match the look.
+Note that curlies are not required if you have a single statement, but it is very easy to accidentally change a control flow if you do not use { and }.
+For instance:
+
+.. code:: c++
+
+    if (condition)
+        do_something();
+    else
+        do_something_else();
+        
+    must_always_do_this();
+
+This code can change its behaviour simply by outcommanting one statement:
+
+.. code:: c++
+
+    if (condition)
+        do_something();
+    else
+        //do_something_else();
+
+    must_always_do_this();
+
+This would cause the "must_always_do_this" method to be called only in the else case. There are other cases where omitting the parentheses could lead to unwanted control flow behaviour. 
+It is better to code unambiguously what is intended.
+Try to use the curlies for single statements as well to match the look.
 
 .. code:: c++
 
