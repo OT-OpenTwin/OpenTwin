@@ -97,6 +97,9 @@ void WebsocketClient::sendMessage(const std::string& _message, std::string& _res
 
 	// We have received a response and return the text
 	_response = m_responseText;
+
+	this->queueMessageProcessingIfNeeded();
+
 }
 
 void WebsocketClient::sendResponse(const std::string& _message) {
@@ -111,12 +114,7 @@ void WebsocketClient::finishedProcessingQueuedMessage(void) {
 	assert(m_currentlyProcessingQueuedMessage);
 	m_currentlyProcessingQueuedMessage = false;
 
-	if (!m_commandQueue.empty()) {
-		QString message = m_commandQueue.front();
-		m_commandQueue.pop_front();
-
-		this->slotMessageReceived(message);
-	}
+	this->slotProcessMessageQueue();
 }
 
 // ###############################################################################################################################################
@@ -130,43 +128,8 @@ void WebsocketClient::slotConnected() {
 	m_isConnected = true;
 }
 
-void WebsocketClient::slotMessageReceived(const QString& _message)
-{
-	// Get the action from the message
-	int index1 = _message.indexOf('\n');
-	int index2 = _message.indexOf('\n', index1 + 1);
-
-	QString action = _message.left(index1);
-	QString senderIP = _message.mid(index1 + 1, index2 - index1 - 1);
-
-	// Process the action
-	if (action == "response")
-	{
-		m_responseText = _message.mid(index2 + 1).toStdString();
-		m_waitingForResponse[senderIP.toStdString()] = false;
-	}
-	else if (action == "execute")
-	{
-		if (m_currentlyProcessingQueuedMessage || m_waitingForResponse[senderIP.toStdString()])
-		{
-			m_commandQueue.push_back(_message);
-		}
-		else
-		{
-			sendExecuteOrQueueMessage(_message);
-		}
-	}
-	else if (action == "queue")
-	{
-		if (m_currentlyProcessingQueuedMessage || m_waitingForResponse[senderIP.toStdString()])
-		{
-			m_commandQueue.push_back(_message);
-		}
-		else
-		{
-			sendExecuteOrQueueMessage(_message);
-		}
-	}
+void WebsocketClient::slotMessageReceived(const QString& _message) {
+	this->handleMessageReceived(_message, true);
 }
 
 void WebsocketClient::slotSocketDisconnected() {
@@ -185,25 +148,71 @@ void WebsocketClient::slotSocketDisconnected() {
 	}
 }
 
-void WebsocketClient::slotSslErrors(const QList<QSslError>& errors) {
-	//Q_UNUSED(errors);
-
-	foreach(QSslError err, errors) {
-		OT_LOG_E(err.errorString().toStdString());
+void WebsocketClient::slotSslErrors(const QList<QSslError>& _errors) {
+	for (const QSslError& error : _errors) {
+		OT_LOG_E(error.errorString().toStdString());
 	}
-	// WARNING: Never ignore SSL errors in production code.
-	// The proper way to handle self-signed certificates is to add a custom root
-	// to the CA store.
-
-	// TODO: REMOVE THIS AFTER Qt UPDATE
 	m_webSocket.ignoreSslErrors();
+}
+
+void WebsocketClient::slotProcessMessageQueue(void) {
+	if (!m_commandQueue.empty()) {
+		QString message = m_commandQueue.front();
+		m_commandQueue.pop_front();
+
+		this->handleMessageReceived(message, false);
+	}
 }
 
 // ###############################################################################################################################################
 
 // Private helper
 
-void WebsocketClient::processMessages(void) 
+void WebsocketClient::handleMessageReceived(const QString& _message, bool _isExternalMessage) {
+	// Get the action from the message
+	int index1 = _message.indexOf('\n');
+	int index2 = _message.indexOf('\n', index1 + 1);
+
+	QString action = _message.left(index1);
+	QString senderIP = _message.mid(index1 + 1, index2 - index1 - 1);
+
+	// Process the action
+	if (action == "response") {
+		m_responseText = _message.mid(index2 + 1).toStdString();
+		m_waitingForResponse[senderIP.toStdString()] = false;
+	}
+	else if (action == "execute") {
+		if (m_currentlyProcessingQueuedMessage || this->anyWaitingForResponse() || (!m_commandQueue.empty() && _isExternalMessage)) {
+			OT_LOG_D("Putting action in command queue: " + action.toStdString() + ". Message: " + _message.toStdString());
+			if (_isExternalMessage) {
+				m_commandQueue.push_back(_message);
+			}
+			else {
+				m_commandQueue.push_front(_message);
+			}
+		}
+		else {
+			sendExecuteOrQueueMessage(_message);
+			this->queueMessageProcessingIfNeeded();
+		}
+	}
+	else if (action == "queue") {
+		if (m_currentlyProcessingQueuedMessage || this->anyWaitingForResponse() || (!m_commandQueue.empty() && _isExternalMessage)) {
+			OT_LOG_D("Putting action in command queue: " + action.toStdString() + ". Message: " + _message.toStdString());
+			if (_isExternalMessage) {
+				m_commandQueue.push_back(_message);
+			}
+			else {
+				m_commandQueue.push_front(_message);
+			}
+		}
+		else {
+			sendExecuteOrQueueMessage(_message);
+		}
+	}
+}
+
+void WebsocketClient::processMessages(void)
 {
 	QEventLoop eventLoop;		
 	eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
@@ -264,4 +273,19 @@ bool WebsocketClient::ensureConnection(void) {
 	assert(m_isConnected);
 
 	return m_isConnected;
+}
+
+void WebsocketClient::queueMessageProcessingIfNeeded(void) {
+	if (!m_commandQueue.empty()) {
+		QMetaObject::invokeMethod(this, &WebsocketClient::slotProcessMessageQueue, Qt::QueuedConnection);
+	}
+}
+
+bool WebsocketClient::anyWaitingForResponse(void) const {
+	for (const auto& it : m_waitingForResponse) {
+		if (it.second) {
+			return true;
+		}
+	}
+	return false;
 }

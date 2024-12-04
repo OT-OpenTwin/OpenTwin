@@ -821,21 +821,23 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std
 
 		std::string globalServiceURL = AppBase::instance()->getServiceURL();
 
-		if (m_websocket != nullptr) { return sendRelayedRequest(operation, url, message, response); }
+		if (m_websocket != nullptr) {
+			return sendRelayedRequest(operation, url, message, response);
+		}
 
 		bool success = false;
 
-
-		switch (operation)
-		{
+		switch (operation) {
 		case EXECUTE:
 			success = ot::msg::send(globalServiceURL, url, ot::EXECUTE_ONE_WAY_TLS, message, response);
 			break;
+
 		case QUEUE:
 			success = ot::msg::send(globalServiceURL, url, ot::QUEUE, message, response);
 			break;
+
 		default:
-			assert(0);
+			OTAssert(0, "Unknown request type");
 		}
 
 		return success;

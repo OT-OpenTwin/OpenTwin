@@ -28,12 +28,16 @@ private Q_SLOTS:
 	void slotConnected();
 	void slotMessageReceived(const QString& _message);
 	void slotSocketDisconnected();
-	void slotSslErrors(const QList<QSslError> &errors);
+	void slotSslErrors(const QList<QSslError>& _errors);
+	void slotProcessMessageQueue(void);
 
 private:
+	void handleMessageReceived(const QString& _message, bool _isExternalMessage);
 	void processMessages(void);	
 	void sendExecuteOrQueueMessage(QString message);
 	bool ensureConnection(void);
+	void queueMessageProcessingIfNeeded(void);
+	bool anyWaitingForResponse(void) const;
 
 	QWebSocket m_webSocket;
 	QUrl m_url;
