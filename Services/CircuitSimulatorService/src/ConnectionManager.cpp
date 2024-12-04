@@ -3,7 +3,7 @@
 #include "OTSystem/OperatingSystem.h"
 
 
-ConnectionManager::ConnectionManager(QObject* parent) : QObject(parent), m_server(new QLocalServer(this)), m_socket(nullptr) {
+ConnectionManager::ConnectionManager(QObject* parent) : QObject(parent) {
     
 }
 

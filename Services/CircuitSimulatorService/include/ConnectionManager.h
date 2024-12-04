@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "OTServiceFoundation/BusinessLogicHandler.h"
@@ -11,13 +10,15 @@
 #include <QtCore/qjsonobject.h>
 #include <QtCore/qjsonarray.h>
 
+
+
 #include <atomic>
 #include <chrono>
 
 class ConnectionManager : public QObject {
-	
+	Q_OBJECT
 public:	
-	ConnectionManager(QObject* parent = nullptr);
+	ConnectionManager(QObject* parent = (QObject*)nullptr);
 	~ConnectionManager();
 
 	void startListen(std::string serverName);
