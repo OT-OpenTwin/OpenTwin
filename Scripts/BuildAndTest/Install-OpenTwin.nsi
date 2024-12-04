@@ -25,6 +25,7 @@ RequestExecutionLevel user ; User rights on WinVista+ (when UAC is turned on)
 InstallDir "$LOCALAPPDATA\$(^Name)"
 InstallDirRegKey HKCU "${REGPATH_UNINSTSUBKEY}" "UninstallString"
 
+!define OPENTWIN_APP_NAME "OpenTwin"
 !define OPENTWIN_APP_ICON "$InstDir\icons\Application\OpenTwin.ico"
 
 !include LogicLib.nsh
@@ -129,17 +130,17 @@ Section "Program files (Required)"
 SectionEnd
 
 Section "Start Menu shortcut"
-	CreateShortcut "$SMPROGRAMS\${NAME}.lnk" "$InstDir\OpenTwin.exe" "" "${OPENTWIN_APP_ICON}"
-	CreateShortcut "$DESKTOP\OpenTwin.lnk" "$InstDir\OpenTwin.exe" "" "${OPENTWIN_APP_ICON}"
+	CreateShortcut "$SMPROGRAMS\${OPENTWIN_APP_NAME}.lnk" "$InstDir\OpenTwin.exe" "" "${OPENTWIN_APP_NAME}"
+	CreateShortcut "$DESKTOP\${OPENTWIN_APP_NAME}.lnk" "$InstDir\OpenTwin.exe" "" "${OPENTWIN_APP_NAME}"
 SectionEnd
 
 Section -Uninstall
 
-	${UNPINSHORTCUT} "$SMPROGRAMS\${NAME}.lnk"
-	Delete "$SMPROGRAMS\${NAME}.lnk"
-	${UNPINSHORTCUT} "$DESKTOP\OpenTwin.lnk"
-	Delete "$DESKTOP\OpenTwin.lnk"
-
+	${UNPINSHORTCUT} "$SMPROGRAMS\${OPENTWIN_APP_NAME}.lnk"
+	Delete "$SMPROGRAMS\${OPENTWIN_APP_NAME}.lnk"
+	${UNPINSHORTCUT} "$DESKTOP\${OPENTWIN_APP_NAME}.lnk"
+	Delete "$DESKTOP\${OPENTWIN_APP_NAME}.lnk"
+	
 	RMDir /r "$InstDir"
 
 	DeleteRegKey HKCU "${REGPATH_UNINSTSUBKEY}"
