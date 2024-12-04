@@ -125,11 +125,12 @@ ot::ReturnMessage ActionHandler::ExecuteScript(ot::JsonDocument& doc)
 		OT_LOG_D("Number of scripts being executed: " + std::to_string(scripts.size()));
 
 		//Extract parameter array from json doc
-		auto parameterArrayArray = doc[OT_ACTION_CMD_PYTHON_Parameter].GetArray();
+		auto parameterArrayArray = ot::json::getArray(doc, OT_ACTION_CMD_PYTHON_Parameter);
 		std::list<std::list<ot::Variable>> allParameter;
 
 		ot::JSONToVariableConverter converterJ2V;
-		for (uint32_t i = 0; i < parameterArrayArray.Size(); i++)
+		size_t numberOfParameterArrays = parameterArrayArray.Size();
+		for (size_t i = 0; i < numberOfParameterArrays; i++)
 		{
 			if (parameterArrayArray[i].IsNull())
 			{
@@ -137,6 +138,7 @@ ot::ReturnMessage ActionHandler::ExecuteScript(ot::JsonDocument& doc)
 			}
 			else
 			{
+				
 				auto parameterArray = ot::json::getArray(parameterArrayArray, i);
 				//Todo: support of lists/maps as parameter
 

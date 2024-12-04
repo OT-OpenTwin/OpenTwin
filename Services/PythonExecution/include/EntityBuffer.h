@@ -44,7 +44,7 @@ private:
 	EntityBuffer() = default;
 
 	std::map<std::string, std::shared_ptr<EntityBase>> m_bufferedEntities;
-	std::map<std::string, std::shared_ptr<IVisualisationTable>> m_bufferedTableEntities;
+	std::map<std::string, IVisualisationTable*> m_bufferedTableEntities;
 	std::map<std::string, EntityPropertiesBase*> m_bufferedEntityProperties;
 
 	ot::ModelServiceAPI* m_modelServiceAPI = nullptr;

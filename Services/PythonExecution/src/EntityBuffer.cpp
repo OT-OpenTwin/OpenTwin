@@ -96,7 +96,7 @@ void EntityBuffer::ensureTableToBeLoaded(const std::string& _absoluteEntityName)
 	if (m_bufferedTableEntities.find(_absoluteEntityName) == m_bufferedTableEntities.end())
 	{
 		std::shared_ptr<EntityBase> entity = loadEntity(_absoluteEntityName);
-		std::shared_ptr<IVisualisationTable> newResultTable(dynamic_cast<IVisualisationTable*>(entity.get()));
+		IVisualisationTable* newResultTable(dynamic_cast<IVisualisationTable*>(entity.get()));
 		if (newResultTable == nullptr)
 		{
 			throw std::exception(("Requested table " + _absoluteEntityName + " is not a table.").c_str());
@@ -126,4 +126,5 @@ void EntityBuffer::clearBuffer()
 {
 	m_bufferedEntities.clear();
 	m_bufferedEntityProperties.clear();
+	m_bufferedTableEntities.clear();
 }

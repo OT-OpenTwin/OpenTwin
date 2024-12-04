@@ -59,31 +59,38 @@ void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selecte
 		{
 			const std::string tableName = rangesByColourIDByTableName.first;
 			auto& rangesByColourIDs = rangesByColourIDByTableName.second;
-			requestToOpenTable(tableName);
-			for (const auto& rangesByColourID : rangesByColourIDs)
+			bool tableExisting = requestToOpenTable(tableName);
+			if (!tableExisting)
 			{
-				uint32_t colourID = rangesByColourID.first;
-				ot::Color typeColour;
-				if (colourID == 0)
+				OT_LOG_E("Selection has a not existing table listed.");
+			}
+			else
+			{
+				for (const auto& rangesByColourID : rangesByColourIDs)
 				{
-					typeColour = SelectionCategorisationColours::getRMDColour();
-				}
-				else if (colourID == 1)
-				{
-					typeColour = SelectionCategorisationColours::getSMDColour();
-				}
-				else if (colourID == 2)
-				{
-					typeColour = SelectionCategorisationColours::getParameterColour();
-				}
-				else
-				{
-					assert(colourID == 3);
-					typeColour = SelectionCategorisationColours::getQuantityColour();
-				}
+					uint32_t colourID = rangesByColourID.first;
+					ot::Color typeColour;
+					if (colourID == 0)
+					{
+						typeColour = SelectionCategorisationColours::getRMDColour();
+					}
+					else if (colourID == 1)
+					{
+						typeColour = SelectionCategorisationColours::getSMDColour();
+					}
+					else if (colourID == 2)
+					{
+						typeColour = SelectionCategorisationColours::getParameterColour();
+					}
+					else
+					{
+						assert(colourID == 3);
+						typeColour = SelectionCategorisationColours::getQuantityColour();
+					}
 
-				const auto& ranges = rangesByColourID.second;
-				requestColouringRanges(clearSelection, tableName, typeColour, ranges);
+					const auto& ranges = rangesByColourID.second;
+					requestColouringRanges(clearSelection, tableName, typeColour, ranges);
+				}
 			}
 		}
 	}
@@ -158,13 +165,16 @@ const std::list<std::shared_ptr<EntityTableSelectedRanges>> RangeSelectionVisual
 	return selectionThatNeedVisualisation;
 }
 
-void RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _tableName)
+bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _tableName)
 {
 	ot::EntityInformation entityInfo;
 	Application::instance()->modelComponent()->getEntityInformation(_tableName, entityInfo);
 	EntityBase* entityBase = Application::instance()->modelComponent()->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
 	IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entityBase);
-	assert(table != nullptr);
+	if (table == nullptr)
+	{
+		return false;
+	}
 
 	ot::JsonDocument document;
 	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
@@ -181,6 +191,7 @@ void RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _
 
 	std::string answer;
 	Application::instance()->uiComponent()->sendMessage(false, document, answer);
+	return true;
 }
 
 void RangeSelectionVisualisationHandler::requestColouringRanges(bool _clearSelection, const std::string& _tableName, const ot::Color& _colour, const std::list<ot::TableRange>& ranges)
