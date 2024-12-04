@@ -19,7 +19,7 @@ SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionI
 	InitiateProcess();
 
 #ifdef _DEBUG
-	_serverName = "TestServer";
+	_serverName = "TestServerPython";
 #endif
 	_server.listen(_serverName.c_str());
 #ifndef _DEBUG
