@@ -4,9 +4,9 @@
 
 
 class ConnectionManager : public QObject {
-
+	Q_OBJECT
 public: 
-	//ConnectionManager();
+	ConnectionManager(QObject* parent = (QObject*)nullptr);
 	//~ConnectionManager();
 
 	//void connectoToServer(std::string &serverName);
