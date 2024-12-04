@@ -141,8 +141,8 @@ Section "Program files (Required)"
 SectionEnd
 
 Section "Start Menu shortcut"
-	CreateShortcut "$SMPROGRAMS\${OPENTWIN_APP_NAME}.lnk" "$InstDir\OpenTwin.exe" "" "${OPENTWIN_APP_NAME}"
-	CreateShortcut "$DESKTOP\${OPENTWIN_APP_NAME}.lnk" "$InstDir\OpenTwin.exe" "" "${OPENTWIN_APP_NAME}"
+	CreateShortcut "$SMPROGRAMS\${OPENTWIN_APP_NAME}.lnk" "$InstDir\OpenTwin.exe" "" "${OPENTWIN_APP_ICON}"
+	CreateShortcut "$DESKTOP\${OPENTWIN_APP_NAME}.lnk" "$InstDir\OpenTwin.exe" "" "${OPENTWIN_APP_ICON}"
 SectionEnd
 
 Section -Uninstall
