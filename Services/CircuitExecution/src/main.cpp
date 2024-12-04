@@ -1,6 +1,10 @@
 #include <QtWidgets/qapplication.h>
 #include "OTCommunication/ServiceLogNotifier.h"
 #include <QtCore/qeventloop.h>
+#include "Application.h"
+#include <QtCore/qobject.h>
+
+
 
 int main(int argc, char* argv[], char* envp[]) {
 
@@ -14,9 +18,11 @@ int main(int argc, char* argv[], char* envp[]) {
 	ot::ServiceLogNotifier::initialize("CircuitSubprocess", "", false);
 #endif // _DEBUG
 
+	Application::getInstance()->start(serverName);
+	
 
 	return a.exec();
 
 
-
+	
 }

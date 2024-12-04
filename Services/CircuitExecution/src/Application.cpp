@@ -28,6 +28,15 @@ void Application::deleteInstance(void)
 	instance = nullptr;
 }
 
+
+void Application::start(const std::string& serverName)
+{
+	QString qStr = QString::fromStdString(serverName);
+	ConnectionManager m_connectionManager;
+	m_connectionManager.connectToCircuitSimulatorService(qStr);
+	
+}
+
 Application::Application() {
 
 }

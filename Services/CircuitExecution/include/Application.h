@@ -8,6 +8,7 @@
 
 
 #pragma once
+#include "ConnectionManager.h"
 
 class Application
 {
@@ -20,7 +21,7 @@ public:
 	Application(const Application&) = delete;
 	Application& operator=(const Application&) = delete;
 
-	//void initializeServiceLogNotifier();
+	void start(const std::string& serverName);
 
 
 private:
@@ -28,4 +29,5 @@ private:
 	~Application();
 
 	static Application* instance;
+	
 };
