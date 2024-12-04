@@ -97,15 +97,13 @@ Function .onInit
 	
 	ReadEnvStr $0 SYSTEMROOT
 testRunning:
-	ClearErrors
-	ExecWait "CMD /C $0\System32\tasklist /NH /FI $\"IMAGENAME eq OpenTwin.exe$\" | $0\System32\find /I $\"OpenTwin.exe$\""
-	IfErrors notRunning 0
-	MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "Application is running. Please close all existing OpenTwin applications to continue installation." IDOK +2
+	nsExec::Exec 'CMD /C $0\System32\tasklist /NH /FI "IMAGENAME eq OpenTwin.exe" | $0\System32\find /I "OpenTwin.exe"'
+	Pop $1
+	${If} $1 == 0
+		MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "Application is running. Please close all existing OpenTwin applications to continue installation." IDOK +2
 		Abort
-	GOTO testRunning
-
-notRunning:	
-	ClearErrors
+		GOTO testRunning
+	${EndIf}		
 
 	ReadRegStr $0 HKCU ${REGPATH_UNINSTSUBKEY} "UninstallString"
 	${If} $0 != "" 
