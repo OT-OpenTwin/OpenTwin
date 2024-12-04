@@ -876,12 +876,26 @@ std::string SessionService::handleGetDebugInformation(ot::JsonDocument& _command
 std::string SessionService::handleCheckStartupCompleted(ot::JsonDocument& _commandDoc) {
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	Session * theSession = getSession(sessionID);
-	if (theSession) {
+	if (theSession) 
+	{
 		// Check whether the initialization has been completed succesfully
-		if (theSession->requestedServices().empty()) return OT_ACTION_RETURN_VALUE_TRUE;
-		else return OT_ACTION_RETURN_VALUE_FALSE;
+		if (theSession->requestedServices().empty())
+		{
+			return OT_ACTION_RETURN_VALUE_TRUE;
+		}
+		else
+		{
+			std::string missingServices("");
+			for (auto& services : theSession->requestedServices())
+			{
+				missingServices += services.first + ", ";
+			}
+			OT_LOG_D("Missing services:" + missingServices.substr(0, missingServices.size()-2));
+			return OT_ACTION_RETURN_VALUE_FALSE;
+		}
 	}
-	else {
+	else 
+	{
 		return OT_ACTION_RETURN_INDICATOR_Error "Invalid Session ID";
 	}
 }
