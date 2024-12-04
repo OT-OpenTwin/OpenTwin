@@ -1683,7 +1683,8 @@ void Model::updatePropertyGrid(void)
 	}	
 	else
 	{
-		this->addCommonPropertiesToConfig(selectedVisibleEntityIDs, true, cfg);
+		const ot::UIDList& selectedEntityIDs = Application::instance()->getSelectionHandler().getSelectedEntityIDs();
+		this->addCommonPropertiesToConfig(selectedEntityIDs, true, cfg);
 	}
 
 	m_selectedVersion.clear();
