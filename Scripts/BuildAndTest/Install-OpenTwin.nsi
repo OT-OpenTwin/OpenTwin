@@ -48,7 +48,6 @@ InstallDirRegKey HKCU "${REGPATH_UNINSTSUBKEY}" "UninstallString"
 !insertmacro MUI_LANGUAGE "English"
 
 !macro UninstallExisting exitcode uninstcommand
-	Sleep 1000
 	Push `${uninstcommand}`
 	Call UninstallExisting
 	Pop ${exitcode}
@@ -93,16 +92,30 @@ FunctionEnd
 
 Function .onInit
 	SetShellVarContext current
+	
+	Sleep 1000
+	
+	ReadEnvStr $0 SYSTEMROOT
+testRunning:
+	ClearErrors
+	ExecWait "CMD /C $0\System32\tasklist /NH /FI $\"IMAGENAME eq OpenTwin.exe$\" | $0\System32\find /I $\"OpenTwin.exe$\""
+	IfErrors notRunning 0
+	MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "Application is running. Please close all existing OpenTwin applications to continue installation." IDOK +2
+		Abort
+	GOTO testRunning
+
+notRunning:	
+	ClearErrors
+
 	ReadRegStr $0 HKCU ${REGPATH_UNINSTSUBKEY} "UninstallString"
-	
 	${If} $0 != "" 
-	${AndIf} ${Cmd} `MessageBox MB_YESNO|MB_ICONQUESTION "Uninstall previous version?" /SD IDYES IDYES`
 		!insertmacro UninstallExisting $0 $0
+	${EndIf}
 	
-		${If} $0 <> 0
-			MessageBox MB_YESNO|MB_ICONSTOP "Failed to uninstall, continue anyway?" /SD IDYES IDYES +2
-				Abort
-		${EndIf}
+	ReadRegStr $0 HKCU ${REGPATH_UNINSTSUBKEY} "UninstallString"
+	${If} $0 != "" 
+		MessageBox MB_OK|MB_ICONSTOP "Failed to uninstall, installation failed" 
+		Abort
 	${EndIf}
 FunctionEnd
 
