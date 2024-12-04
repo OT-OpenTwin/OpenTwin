@@ -463,11 +463,9 @@ std::string SessionService::handleRegisterNewService(ot::JsonDocument& _commandD
 	}
 
 	// Get the requested session
-	m_masterLock.lock();
 	Session * theSession = getSession(sessionID, false);
 
 	if (theSession == nullptr) {
-		m_masterLock.unlock();
 		OT_LOG_E("A session with the id \"" + sessionID + "\" could not be found");
 		throw ErrorException(("A session with the id \"" + sessionID + "\" could not be found").c_str());
 	}
@@ -495,12 +493,6 @@ std::string SessionService::handleRegisterNewService(ot::JsonDocument& _commandD
 		theService = theSession->registerService(senderIP, serviceName, serviceType, newID);
 	}
 	
-	// Add service to health check (this is done when the service was started in debug mode)
-	
-	// If the notify connected parameter was provided a connected message will be send to all services in the session
-	//theSession->broadcastMessage(theService, OT_ACTION_MESSAGE_ServiceConnected);
-	m_masterLock.unlock();
-
 	// Add response information
 	response.AddMember(OT_ACTION_PARAM_SERVICE_ID, newID, response.GetAllocator());
 
@@ -595,7 +587,6 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	catch (...) {}
 
 	// Create the session
-	m_masterLock.lock();
 	Session * theSession = createSession(sessionID, userName, projectName, collectionName, sessionType);
 
 	// Set the user credentials
@@ -638,8 +629,6 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 		OT_LOG_D("Session created without relay service (for session creator)");
 		theService = theSession->registerService(senderIP, serviceName, serviceType, newID);
 	}
-
-	m_masterLock.unlock();
 
 	if (runMandatory) {
 		OT_LOG_D("Running mandatory services");
@@ -689,19 +678,16 @@ std::string SessionService::handleSendBroadcastMessage(ot::JsonDocument& _comman
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	std::string message(ot::json::getString(_commandDoc, OT_ACTION_PARAM_MESSAGE));
 
-	m_masterLock.lock();
 	Session * theSession = getSession(sessionID, false);
 	if (theSession) {
 		Service * theService = theSession->getService(serviceID);
 		if (theService == nullptr) {
 			std::string errorMessage("A service with the ID \"");
 			errorMessage.append(std::to_string(serviceID)).append("\" was not registered");
-			m_masterLock.unlock();
 			throw ErrorException(errorMessage.c_str());
 		}
 		theSession->broadcastMessage(theService, message);
 	}
-	m_masterLock.unlock();
 
 	return OT_ACTION_RETURN_VALUE_OK;
 }
@@ -709,15 +695,12 @@ std::string SessionService::handleSendBroadcastMessage(ot::JsonDocument& _comman
 std::string SessionService::handleGetServicesInSession(ot::JsonDocument& _commandDoc) {
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 
-	m_masterLock.lock();
 	auto s = m_sessionMap.find(sessionID);
 	if (s == m_sessionMap.end()) {
 		std::string errorMessage("A session with the ID \"");
 		errorMessage.append(sessionID).append("\" does not exist");
-		m_masterLock.unlock();
 		throw ErrorException(errorMessage.c_str());
 	}
-	m_masterLock.unlock();
 	return s->second->getServiceListJSON();
 }
 
@@ -729,13 +712,11 @@ std::string SessionService::handleGetSessionExists(ot::JsonDocument& _commandDoc
 }
 
 std::string SessionService::handleServiceClosing(ot::JsonDocument& _commandDoc) {
-	m_masterLock.lock();
 	ot::serviceID_t serviceID(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	Session * theSession = getSession(sessionID);
 	Service * actualService = theSession->getService(serviceID);
 	serviceClosing(actualService, true, true);
-	m_masterLock.unlock();
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
@@ -760,8 +741,6 @@ std::string SessionService::handleShutdownSession(ot::JsonDocument& _commandDoc)
 std::string SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc) {
 	OT_LOG_D("Service failure: Received.. Locking service...");
 	
-	m_masterLock.lock();
-
 	// Get information of the service that failed
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 
@@ -805,8 +784,6 @@ std::string SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc) 
 	// Finally delete the session
 	removeSession(actualSession);
 
-	m_masterLock.unlock();
-
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
@@ -840,7 +817,6 @@ std::string SessionService::handleDisableServiceDebug(ot::JsonDocument& _command
 }
 
 std::string SessionService::handleReset(ot::JsonDocument& _commandDoc) {
-	m_masterLock.lock();
 	for (auto s : m_sessionMap) {
 		Session * actualSession = s.second;
 		delete actualSession;
@@ -851,8 +827,7 @@ std::string SessionService::handleReset(ot::JsonDocument& _commandDoc) {
 
 	OT_LOG_I("[RESET] The session service was successfully set back to initial state.");
 	OT_LOG_I("[RESET] All session and service informations were removed from the memory");
-	m_masterLock.unlock();
-
+	
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
@@ -980,8 +955,6 @@ std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _comman
 	std::string serviceType = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_TYPE);
 	std::string sessionID = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID);
 	
-	m_masterLock.lock();
-
 	// Get service info (if it exists)
 	Session * actualSession = getSession(sessionID);
 	auto services = actualSession->getServicesByName(serviceName);
@@ -1021,8 +994,6 @@ std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _comman
 	// Finally delete the session
 	removeSession(actualSession);
 
-	m_masterLock.unlock();
-
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
@@ -1039,7 +1010,6 @@ std::string SessionService::handleSetGlobalLogFlags(ot::JsonDocument& _commandDo
 }
 
 void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, std::string _sessionId) {
-	m_masterLock.lock();
 	// Get service info
 	Session* theSession = getSession(_sessionId);
 	Service* theService = theSession->getService(_serviceId);
@@ -1076,7 +1046,6 @@ void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, std::stri
 	// Show info log
 	OT_LOG_D("The session with the ID \"" + _sessionId +
 		"\" was closed. Reason: Shutdown requested by service \"" + senderServiceName + "\"");
-	m_masterLock.unlock();
 }
 
 void SessionService::initializeSystemInformation() {

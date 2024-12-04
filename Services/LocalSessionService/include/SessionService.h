@@ -22,10 +22,9 @@
 #include "OTSystem/SystemInformation.h"
 
 // C++ header
-#include <string>
 #include <map>
 #include <vector>
-#include <mutex>
+#include <string>
 
 class Session;
 class RelayService;
@@ -193,8 +192,6 @@ private:
 	std::string									m_dataBaseURL;						//! The database IP address
 	std::string									m_siteID;							//! The site ID
 	std::string									m_serviceAuthorisationURL;			//! The authorization service IP address
-
-	std::mutex									m_masterLock;
 
 	std::string									m_ip;
 	std::string									m_port;
