@@ -33,6 +33,11 @@ namespace ot {
 		int getLeftColumn()const { return m_leftColumn; }
 		int getRightColumn() const { return m_rightColumn; }
 
+		void setTopRow(int _topRow) { m_topRow = _topRow; }
+		void setBottomRow(int _bottomRow) { m_bottomRow = _bottomRow; }
+		void setLeftColumn(int _leftColumn) { m_leftColumn = _leftColumn; }
+		void setRightColumn(int _rightColumn) { m_rightColumn = _rightColumn; }
+
 	private:
 		int m_topRow;
 		int m_bottomRow;
