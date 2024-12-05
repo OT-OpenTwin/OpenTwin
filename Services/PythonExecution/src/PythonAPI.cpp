@@ -30,6 +30,7 @@ ot::ReturnValues PythonAPI::execute(std::list<std::string>& _scripts, std::list<
 	
 	PythonObjectBuilder pyObBuilder;
 	ot::ReturnValues returnValues;
+	EntityBuffer::INSTANCE().clearBuffer();// Entities and properties are buffered by name. It needs to be cleared, so that no outdated entities are accessed in the next execution.
 	for (ot::EntityInformation& scriptEntity : scriptEntities)
 	{
 		try
@@ -49,7 +50,6 @@ ot::ReturnValues PythonAPI::execute(std::list<std::string>& _scripts, std::list<
 			returnValues.addData(scriptEntity.getEntityName(), pyObBuilder.getGenericDataStructList(pReturnValue));
 			currentParameterSet++;
 			OT_LOG_D("Script execution succeeded");
-			EntityBuffer::INSTANCE().clearBuffer();// Entities and properties are buffered by name. It needs to be cleared, so that no outdated entities are accessed in the next execution.
 		}
 		catch (const std::exception& e)
 		{
@@ -57,6 +57,7 @@ ot::ReturnValues PythonAPI::execute(std::list<std::string>& _scripts, std::list<
 			throw std::exception(message.c_str());
 		}
 	}
+	EntityBuffer::INSTANCE().saveChangedEntities();
 	return returnValues;
 }
 
