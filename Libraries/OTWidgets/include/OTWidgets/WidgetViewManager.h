@@ -188,6 +188,7 @@ namespace ot {
 		bool addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags);
 
 		ads::CDockAreaWidget* getBestDockArea(const WidgetView* _view) const;
+		ads::CDockAreaWidget* getFirstMatchingView(WidgetViewBase::ViewFlag _viewTypeFlag) const;
 
 		ViewNameTypeList* findViewNameTypeList(const BasicServiceInformation& _owner);
 		ViewNameTypeList* findOrCreateViewNameTypeList(const BasicServiceInformation& _owner);

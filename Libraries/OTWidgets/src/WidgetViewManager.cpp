@@ -486,18 +486,45 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 }
 
 ads::CDockAreaWidget* ot::WidgetViewManager::getBestDockArea(const WidgetView* _view) const {
-	if (_view->getViewData().getViewFlags() & WidgetViewBase::ViewIsTool && m_focusInfo.lastTool) {
-		return m_focusInfo.lastTool->getViewDockWidget()->dockAreaWidget();
+	if (_view->getViewData().getViewFlags() & WidgetViewBase::ViewIsTool) {
+		if (m_focusInfo.lastTool) {
+			return m_focusInfo.lastTool->getViewDockWidget()->dockAreaWidget();
+		}
+		else {
+			ads::CDockAreaWidget* area = this->getFirstMatchingView(WidgetViewBase::ViewIsTool);
+			if (area) {
+				return area;
+			}
+		}
 	}
-	else if (_view->getViewData().getViewFlags() & (WidgetViewBase::ViewIsTool |WidgetViewBase::ViewIsSide) && m_focusInfo.lastSide) {
-		return m_focusInfo.lastSide->getViewDockWidget()->dockAreaWidget();
+
+	if (_view->getViewData().getViewFlags() & (WidgetViewBase::ViewIsTool | WidgetViewBase::ViewIsSide)) {
+		if (m_focusInfo.lastSide) {
+			return m_focusInfo.lastSide->getViewDockWidget()->dockAreaWidget();
+		}
+		else {
+			ads::CDockAreaWidget* area = this->getFirstMatchingView(WidgetViewBase::ViewIsSide);
+			if (area) {
+				return area;
+			}
+		}
 	}
-	else if (m_focusInfo.lastCentral) {
+
+	if (m_focusInfo.lastCentral) {
 		return m_focusInfo.lastCentral->getViewDockWidget()->dockAreaWidget();
 	}
 	else {
-		return nullptr;
+		return this->getFirstMatchingView(WidgetViewBase::ViewIsCentral);
 	}
+}
+
+ads::CDockAreaWidget* ot::WidgetViewManager::getFirstMatchingView(WidgetViewBase::ViewFlag _viewTypeFlag) const {
+	for (const ViewEntry& entry : m_views) {
+		if (entry.second->getViewData().getViewFlags() & _viewTypeFlag) {
+			return entry.second->getViewDockWidget()->dockAreaWidget();
+		}
+	}
+	return nullptr;
 }
 
 ot::WidgetViewManager::ViewNameTypeList* ot::WidgetViewManager::findViewNameTypeList(const BasicServiceInformation& _owner) {
