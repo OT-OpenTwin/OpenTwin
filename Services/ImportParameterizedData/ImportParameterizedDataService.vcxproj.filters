@@ -180,9 +180,6 @@
     <ClInclude Include="include\RangeSelectionVisualisationHandler.h">
       <Filter>include\ParameterizedDataHandler</Filter>
     </ClInclude>
-    <ClInclude Include="include\TableIndexSchemata.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\SelectionCategorisationColours.h">
       <Filter>include</Filter>
     </ClInclude>

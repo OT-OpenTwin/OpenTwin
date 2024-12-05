@@ -51,5 +51,7 @@ private:
 	
 	void ensurePropertyToBeLoaded(const std::string& _absoluteEntityName, const std::string& _propertyName);
 	void ensureTableToBeLoaded(const std::string& _absoluteEntityName);
+	void ensureValidRangeSelections(EntityBase* _entityBase);
+
 	std::shared_ptr<EntityBase> loadEntity(const std::string& _absoluteEntityName);
 };

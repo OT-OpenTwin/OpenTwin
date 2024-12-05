@@ -1,6 +1,6 @@
 #include "PreviewAssemblerRMD.h"
 #include "DataCategorizationHandler.h"
-#include "TableIndexSchemata.h"
+#include "OTServiceFoundation/TableIndexSchemata.h"
 void PreviewAssemblerRMD::InitiatePreviewTable(std::shared_ptr<EntityResultTableData<std::string>> previewTableData)
 {
 	previewTableData->setNumberOfRows(1);
@@ -56,7 +56,7 @@ std::map<std::string, std::list<std::string>> PreviewAssemblerRMD::CollectUnique
 			{
 				ot::TableRange userRange =  _selectedRangeEntities[i]->getSelectedRange();
 				ot::TableCfg::TableHeaderMode headerOrientation = _selectedRangeEntities[i]->getTableHeaderMode();
-				ot::TableRange matrixRange = TableIndexSchemata::userRangeToMatrixRange(userRange,headerOrientation);
+				ot::TableRange matrixRange = ot::TableIndexSchemata::userRangeToMatrixRange(userRange,headerOrientation);
 				uint32_t minColumn = static_cast<uint32_t>(matrixRange.getLeftColumn());
 				uint32_t maxColumn = static_cast<uint32_t>(matrixRange.getRightColumn());
 				uint32_t minRow = static_cast<uint32_t>(matrixRange.getTopRow());

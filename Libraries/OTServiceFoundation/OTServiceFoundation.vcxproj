@@ -235,6 +235,7 @@
     <ClInclude Include="include\OTServiceFoundation\ModelServiceAPI.h" />
     <ClInclude Include="include\OTServiceFoundation\ProgressUpdater.h" />
     <ClInclude Include="include\OTServiceFoundation\PythonServiceInterface.h" />
+    <ClInclude Include="include\OTServiceFoundation\TableIndexSchemata.h" />
     <ClInclude Include="include\OTServiceFoundation\TypeConverter.h" />
     <ClInclude Include="include\OTServiceFoundation\UiComponent.h" />
     <ClInclude Include="include\OTServiceFoundation\UserCredentials.h" />

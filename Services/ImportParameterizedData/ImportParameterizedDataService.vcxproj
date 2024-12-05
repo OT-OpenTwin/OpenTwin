@@ -258,7 +258,6 @@
     <ClInclude Include="include\OptionsParameterHandlerReference.h" />
     <ClInclude Include="include\PreviewAssembler.h" />
     <ClInclude Include="include\PreviewAssemblerRMD.h" />
-    <ClInclude Include="include\TableIndexSchemata.h" />
     <ClInclude Include="include\TouchstoneHandler.h" />
     <ClInclude Include="include\TableExtractor.h" />
     <ClInclude Include="include\TableExtractorCSV.h" />

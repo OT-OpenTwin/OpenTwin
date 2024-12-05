@@ -3,7 +3,7 @@
 #include "OTCore/StringToNumericCheck.h"
 #include "OTCore/StringToVariableConverter.h"
 #include "Documentation.h"
-#include "TableIndexSchemata.h"
+#include "OTServiceFoundation/TableIndexSchemata.h"
 
 
 void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData , std::map<std::string, std::shared_ptr<IVisualisationTable>>& _allTablesByName)
@@ -77,7 +77,7 @@ std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_
 	
 	ot::TableRange userRange = _range->getSelectedRange();
 	ot::TableCfg::TableHeaderMode headerOrientation = _range->getTableHeaderMode();
-	ot::TableRange matrixRange = TableIndexSchemata::userRangeToMatrixRange(userRange,headerOrientation);
+	ot::TableRange matrixRange = ot::TableIndexSchemata::userRangeToMatrixRange(userRange,headerOrientation);
 	
 	std::map<std::string, std::map<std::uint32_t,std::string>> extractedField;
 

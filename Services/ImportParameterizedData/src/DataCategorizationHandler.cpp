@@ -10,7 +10,7 @@
 #include "SelectionCategorisationColours.h"
 #include "Documentation.h"
 #include "OTCore/StringToVariableConverter.h"
-#include "TableIndexSchemata.h"
+#include "OTServiceFoundation/TableIndexSchemata.h"
 
 #include <algorithm>
 #include <bitset>
@@ -392,7 +392,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 	matrixRanges.reserve(_ranges.size());
 	for (const auto& selectionRange : _ranges)
 	{
-		matrixRanges.push_back(TableIndexSchemata::selectionRangeToMatrixRange(selectionRange, tableEntPtr->getHeaderMode()));
+		matrixRanges.push_back(ot::TableIndexSchemata::selectionRangeToMatrixRange(selectionRange, tableEntPtr->getHeaderMode()));
 	}
 
 	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr.get(), matrixRanges);
@@ -423,7 +423,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 				tableRange->createProperties(ot::FolderNames::PythonScriptFolder, m_scriptFolderUID, "", -1,dataType);
 			}
 			
-			ot::TableRange userRange = TableIndexSchemata::selectionRangeToUserRange(_ranges[i]);
+			ot::TableRange userRange = ot::TableIndexSchemata::selectionRangeToUserRange(_ranges[i]);
 			
 			//Next we check if an entire row/column is selected. By setting this boolean we allow batch created ranges to select an entire row/column even if the refered table has different dimensions
 			uint32_t numberOfSelectedColumns = userRange.getRightColumn() - userRange.getLeftColumn() + 1;

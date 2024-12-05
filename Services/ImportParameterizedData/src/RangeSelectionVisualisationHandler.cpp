@@ -1,6 +1,6 @@
 #include "RangeSelectionVisualisationHandler.h"
 #include "Application.h"
-#include "TableIndexSchemata.h"
+#include "OTServiceFoundation/TableIndexSchemata.h"
 #include "SelectionCategorisationColours.h"
 #include "CategorisationFolderNames.h"
 
@@ -19,7 +19,7 @@ void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selecte
 		{
 			//First we get the selected range
 			ot::TableRange userRange = selectionEntity->getSelectedRange();
-			ot::TableRange selectionRange = TableIndexSchemata::userRangeToSelectionRange(userRange);
+			ot::TableRange selectionRange = ot::TableIndexSchemata::userRangeToSelectionRange(userRange);
 
 			//Now we determine the colour for the range
 			const std::string tableName = selectionEntity->getTableName();
@@ -95,7 +95,6 @@ void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selecte
 		}
 	}
 }
-
 
 void RangeSelectionVisualisationHandler::bufferSelectionEntities(const std::list<std::shared_ptr<EntityTableSelectedRanges>>& _selectedEntities)
 {
