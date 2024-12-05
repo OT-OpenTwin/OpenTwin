@@ -62,13 +62,17 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 	EntityPropertiesSelection::createProperty(categoryGroup, "Datatype", { ot::TypeNames::getDoubleTypeName(),ot::TypeNames::getFloatTypeName(), ot::TypeNames::getInt64TypeName(), ot::TypeNames::getInt32TypeName(), ot::TypeNames::getStringTypeName() }, _defaultType, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
 
 	const std::string rangeGroup = "Range";
-	auto topRow = new EntityPropertiesInteger("Top row", 0);
+	auto topRow = new EntityPropertiesInteger("Top row", 1);
+	topRow->setMin(1);
 	topRow->setReadOnly(true);
-	auto bottomRow = new EntityPropertiesInteger("Bottom row", 0);
+	auto bottomRow = new EntityPropertiesInteger("Bottom row", 1);
+	bottomRow->setMin(1);
 	bottomRow->setReadOnly(true);
-	auto leftColumn = new EntityPropertiesInteger("Left column", 0);
+	auto leftColumn = new EntityPropertiesInteger("Left column", 1);
+	leftColumn->setMin(1);
 	leftColumn->setReadOnly(true);
-	auto rightColumn = new EntityPropertiesInteger("Right column", 0);
+	auto rightColumn = new EntityPropertiesInteger("Right column", 1);
+	rightColumn->setMin(1);
 	rightColumn->setReadOnly(true);
 	
 	const std::string updateStrategyGroup = "Update strategy";
