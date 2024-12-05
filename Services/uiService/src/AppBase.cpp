@@ -221,6 +221,7 @@ bool AppBase::initialize() {
 
 bool AppBase::logIn(void) {
 	LogInDialog loginDia;
+	loginDia.showNormal();
 	if (loginDia.showDialog() != ot::Dialog::Ok) {
 		return false;
 	}
