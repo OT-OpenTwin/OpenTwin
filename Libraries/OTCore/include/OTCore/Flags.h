@@ -7,6 +7,12 @@
 // std header
 #include <type_traits>
 
+//! \brief Adds bitwise operations for the provided enum.
+//! Use conveinience OT_ADD_FLAG_FUNCTIONS or OT_ADD_PRIVATE_FLAG_FUNCTIONS.
+#define OT_ADD_FLAG_FUNCTIONS_IMPL(___prefix, ___castType, ___enumName) ___prefix constexpr ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<___castType>(_lhv) | static_cast<___castType>(_rhv)); }; \
+___prefix constexpr ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<___castType>(_lhv) & static_cast<___castType>(_rhv)); };  \
+___prefix constexpr ___enumName operator ~ (___enumName _lhv) { return static_cast<___enumName>(~(static_cast<___castType>(_lhv))); };
+
 #ifdef OT_OS_64Bit
 
 //! \def OT_ADD_FLAG_FUNCTIONS
@@ -21,13 +27,22 @@
 //!			typedef ot::Flags<MyEnum> MyFlags;
 //!		};
 //! 
-//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum, MyClass::MyFlags)
-//!		
-//! \param ___enumName Full enum name (e.g. ot::EnumName).
-//! \param ___flagsName Full flags name (e.g. ot::FlagsName).
-#define OT_ADD_FLAG_FUNCTIONS(___enumName) constexpr ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<long long>(_lhv) | static_cast<long long>(_rhv)); }; \
-constexpr ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<long long>(_lhv) & static_cast<long long>(_rhv)); };  \
-constexpr ___enumName operator ~ (___enumName _lhv) { return static_cast<___enumName>(~(static_cast<long long>(_lhv))); };
+//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum)
+#define OT_ADD_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(, long long, ___enumName)
+
+//! \def OT_ADD_PRIVATE_FLAG_FUNCTIONS
+//! \brief Will add the default bitwise operations for the provided private 64 bit bitfield.
+//! Use this at the bottom of the class where the enum and flags are defined.
+//! 
+//!		class MyClass {
+//!		private:
+//!			enum MyEnum {
+//!				...
+//!			}
+//!			typedef ot::Flags<MyEnum> MyFlags;
+//!         OT_ADD_PRIVATE_FLAG_FUNCTIONS(MyClass::MyEnum)
+//!		};
+#define OT_ADD_PRIVATE_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(friend , long long, ___enumName)
 #else
 //! \def OT_ADD_FLAG_FUNCTIONS
 //! \brief Will add the default bitwise operations for the provided 32 bit bitfield.
@@ -41,18 +56,12 @@ constexpr ___enumName operator ~ (___enumName _lhv) { return static_cast<___enum
 //!			typedef ot::Flags<MyEnum> MyFlags;
 //!		};
 //! 
-//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum, MyClass::MyFlags)
-//!		
-//! \param ___enumName Full enum name (e.g. ot::EnumName).
-//! \param ___flagsName Full flags name (e.g. ot::FlagsName).
-#define OT_ADD_FLAG_FUNCTIONS(___enumName, ___flagsName) constexpr  ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<long>(_lhv) | static_cast<long>(_rhv)); }; \
-constexpr  ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<long>(_lhv) & static_cast<long>(_rhv)); };  \
-constexpr  ___enumName operator ~ (___enumName _lhv) { return static_cast<___enumName>(~(static_cast<long>(_lhv))); };
-#endif
+//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum)
+#define OT_ADD_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(, long, ___enumName)
 
-//! \def OT_FRIEND_FLAG_FUNCTIONS
-//! \brief Adds a friend for the flag functions.
-//! Use this at the bottom of the file where the enum and flags are defined.
+//! \def OT_ADD_PRIVATE_FLAG_FUNCTIONS
+//! \brief Will add the default bitwise operations for the provided private 32 bit bitfield.
+//! Use this at the bottom of the class where the enum and flags are defined.
 //! 
 //!		class MyClass {
 //!		private:
@@ -60,22 +69,10 @@ constexpr  ___enumName operator ~ (___enumName _lhv) { return static_cast<___enu
 //!				...
 //!			}
 //!			typedef ot::Flags<MyEnum> MyFlags;
-//! 
-//!			OT_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum, MyClass::MyFlags)
+//!         OT_ADD_PRIVATE_FLAG_FUNCTIONS(MyClass::MyEnum)
 //!		};
-//! 
-//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum, MyClass::MyFlags)
-//!	
-//! \warning If the class is located in a namespace add the OT_ADD_FLAG_FUNCTIONS macro inside of the namespace.
-//! \param ___enumName Full enum name (e.g. ot::EnumName).
-//! \param ___flagsName Full flags name (e.g. ot::FlagsName).
-#define OT_FRIEND_FLAG_FUNCTIONS(___enumName) friend constexpr  ___enumName operator | (___enumName _lhv, ___enumName _rhv); \
-friend constexpr  ___enumName operator & (___enumName _lhv, ___enumName _rhv);  \
-friend constexpr  ___enumName operator ~ (___enumName _lhv);
-
-#define OT_ADD_PRIVATE_FLAG_FUNCTIONS(___enumName) friend constexpr ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<long long>(_lhv) | static_cast<long long>(_rhv)); }; \
-friend constexpr ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<long long>(_lhv) & static_cast<long long>(_rhv)); };  \
-friend constexpr ___enumName operator ~ (___enumName _lhv) { return static_cast<___enumName>(~(static_cast<long long>(_lhv))); };
+#define OT_ADD_PRIVATE_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(friend , long, ___enumName)
+#endif
 
 namespace ot {
 
