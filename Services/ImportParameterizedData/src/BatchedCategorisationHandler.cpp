@@ -123,10 +123,9 @@ BatchUpdateInformation BatchedCategorisationHandler::createNewMSMDWithSelections
 			std::string postfix = selectionName.substr(position, selectionName.size());
 			std::string newSelectionName = prefix + postfix;
 
+			//Now we create a new selection range entity with new values
 			std::unique_ptr<EntityTableSelectedRanges> newSelection(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
-
 			newSelection->setName(newSelectionName);
-
 			std::string dataType = selection->getSelectedType();
 			const std::string scriptName = selection->getScriptName();
 			ot::UID scriptUID = scriptIDByNames[scriptName];
@@ -138,22 +137,27 @@ BatchUpdateInformation BatchedCategorisationHandler::createNewMSMDWithSelections
 
 			ot::TableRange selectedRange = selection->getSelectedRange();
 			newSelection->setRange(selectedRange);
+			newSelection->setSelectEntireColumn(selection->getSelectEntireColumn());
+			newSelection->setSelectEntireRow(selection->getSelectEntireRow());
 
-			newSelection->setConsiderForBatchprocessing(true);
+			//Switch the batching strategy.
+			bool passOnScript = selection->getPassOnScript();
+			newSelection->setConsiderForBatchprocessing(passOnScript);
+	
+			selection->setConsiderForBatchprocessing(!passOnScript);
+			selection->StoreToDataBase();
+			topoIDs.push_back(selection->getEntityID());
+			topoVers.push_back(selection->getEntityStorageVersion());
+			forceVis.push_back(false);
+
+			//Storing the new selection range
 			newSelection->StoreToDataBase();
-
 			topoIDs.push_back(newSelection->getEntityID());
 			topoVers.push_back(newSelection->getEntityStorageVersion());
 			forceVis.push_back(false);
 
 			batchUpdateInformation.m_selectionEntityNames.push_back(newSelectionName);
 			batchUpdateInformation.m_pythonScriptNames.push_back(newSelection->getScriptName());
-
-			selection->setConsiderForBatchprocessing(false);
-			selection->StoreToDataBase();
-			topoIDs.push_back(selection->getEntityID());
-			topoVers.push_back(selection->getEntityStorageVersion());
-			forceVis.push_back(false);
 		}
 	}
 	allMSMDNames = allMSMDNames.substr(0, allMSMDNames.size() - 2);

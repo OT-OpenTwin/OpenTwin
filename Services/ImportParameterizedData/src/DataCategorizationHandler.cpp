@@ -397,6 +397,10 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 
 	std::string dataType = determineDataTypeOfSelectionRanges(tableEntPtr.get(), matrixRanges);
 
+	const ot::GenericDataStructMatrix table = tableEntPtr->getTable();
+	uint32_t totalNumberOfColumns =	table.getNumberOfColumns();
+	uint32_t totalNumberOfRows = table.getNumberOfRows();
+
 	//Now we create the selection entities
 	for (auto& bufferedCategorisationName : m_bufferedCategorisationNames)
 	{	
@@ -420,6 +424,24 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 			}
 			
 			ot::TableRange userRange = TableIndexSchemata::selectionRangeToUserRange(_ranges[i]);
+			
+			//Next we check if an entire row/column is selected. By setting this boolean we allow batch created ranges to select an entire row/column even if the refered table has different dimensions
+			uint32_t numberOfSelectedColumns = userRange.getRightColumn() - userRange.getLeftColumn() + 1;
+			uint32_t numberOfSelectedRows = userRange.getBottomRow() - userRange.getTopRow() + 1;
+			uint32_t rowOffset(0), columnOffset(0);
+			if (tableEntPtr->getHeaderMode() == ot::TableCfg::TableHeaderMode::Horizontal)
+			{
+				rowOffset = 1;
+			}
+			else
+			{
+				columnOffset = 1;
+			}
+			bool entireRowSelected = (totalNumberOfColumns - columnOffset) == numberOfSelectedColumns;
+			bool entireColumnSelected = (totalNumberOfRows - rowOffset) == numberOfSelectedRows;
+			tableRange->setSelectEntireColumn(entireColumnSelected);
+			tableRange->setSelectEntireRow(entireRowSelected);
+
 			tableRange->setRange(userRange);
 			tableRange->setTableProperties(tableBase->getName(), tableBase->getEntityID(), ot::TableCfg::toString(tableEntPtr->getHeaderMode()));
 			tableRange->setEditable(true);

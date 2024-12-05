@@ -12,18 +12,13 @@
 
 #include "BusinessLogicHandler.h"
 #include "EntityParameterizedDataCategorization.h"
-#include "EntityParameterizedDataPreviewTable.h"
-#include "EntityParameterizedDataTable.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Color.h"
 #include "OTServiceFoundation/EntityInformation.h"
 #include "MetadataAssemblyData.h"
 #include "EntityTableSelectedRanges.h"
 #include "OTCore/Variable.h"
-#include "OTServiceFoundation/PythonServiceInterface.h"
-#include "OTCore/GenericDataStructMatrix.h"
 #include "OTGui/TableRange.h"
-#include "OTGui/TableCfg.h"
 #include "IVisualisationTable.h"
 
 #include <optional>
@@ -48,7 +43,7 @@ public:
 private:
 	const std::string m_tableFolder;
 	const std::string m_previewTableName;
-	ot::UID m_scriptFolderUID;
+	ot::UID m_scriptFolderUID = -1;
 	std::string m_rmdEntityName;
 	const std::string _selectionRangeName = "Selection";
 	ot::Color m_backgroundColour;
