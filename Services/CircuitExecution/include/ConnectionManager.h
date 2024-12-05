@@ -12,11 +12,12 @@ public:
 	~ConnectionManager() = default;
 
 	void connectToCircuitSimulatorService(const QString& serverName);
+	void sendMessage();
 private slots:
 	void receiveResponse();
 	void sendHello();
 	void handleError(QLocalSocket::LocalSocketError error);
-
+	void handleDisconnected();
 private:
 	QLocalSocket* m_socket;
 

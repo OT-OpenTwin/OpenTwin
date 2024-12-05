@@ -6,9 +6,13 @@
  *  Copyright (c)
  */
 
+//std Header
+#include <string>
+
 
 #pragma once
-#include "ConnectionManager.h"
+
+class ConnectionManager;
 
 class Application
 {
@@ -21,7 +25,7 @@ public:
 	Application(const Application&) = delete;
 	Application& operator=(const Application&) = delete;
 
-	void start(const std::string& serverName);
+	void start(const std::string& _serverName);
 
 
 private:
@@ -29,5 +33,5 @@ private:
 	~Application();
 
 	static Application* instance;
-	
+	ConnectionManager* m_connectionManager;
 };

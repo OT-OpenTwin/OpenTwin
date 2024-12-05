@@ -1,7 +1,7 @@
 #pragma once
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTCore/ReturnMessage.h"
-#include "ConnectionManager.h"
+
 
 #include <QtNetwork/qlocalserver.h>
 #include <QtNetwork/qlocalsocket.h>
@@ -12,7 +12,7 @@
 #include <atomic>
 #include <chrono>
 
-class ConnectionManager;
+
 
 class SubprocessHandler : public BusinessLogicHandler
 {
@@ -40,11 +40,7 @@ private:
 	std::atomic_bool m_initialisationPrepared = false;
 
 	QProcess m_subProcess;
-	QLocalServer m_server;
 	std::string m_serverName;
-
-	ConnectionManager* m_connectionManager;
-
 	std::string FindSubprocessPath();
 	void InitiateProcess();
 

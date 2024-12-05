@@ -45,6 +45,7 @@ private:
 	NGSpice m_ngSpice;
 	BlockEntityHandler m_blockEntityHandler;
 	std::list<ot::UID>	selectedEntities;
+	std::string m_serverName;
 
 	
 public:
@@ -75,6 +76,7 @@ public:
 	void runCircuitSimulation();
 	void solverThread(std::list<ot::EntityInformation> solverInfo, std::string modelVersion,  std::map<std::string, EntityBase*> solverMap);
 	void runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion,  EntityBase* solverEntity);
+	
 
 	std::string extractStringAfterDelimiter(const std::string& inputString, char delimiter, size_t occurrence);
 

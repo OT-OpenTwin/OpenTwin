@@ -10,7 +10,7 @@ int main(int argc, char* argv[], char* envp[]) {
 
 	QCoreApplication a(argc, argv);
 #ifdef _DEBUG
-	const std::string serverName = "TestServer";
+	const std::string serverName = "TestServerCircuit";
 	ot::ServiceLogNotifier::initialize("CircuitSubprocess", "", true);
 
 #else

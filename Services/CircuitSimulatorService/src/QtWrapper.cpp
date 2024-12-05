@@ -7,6 +7,7 @@
 
 //Qt Header
 #include <QtCore/qcoreapplication.h>
+#include <QtNetwork/qlocalsocket.h>
 
 
 QtWrapper::QtWrapper() {
@@ -24,6 +25,7 @@ void QtWrapper::worker(std::string _serverName) {
 	m_application = new QCoreApplication(argc, nullptr);
 	m_connectionManager = new ConnectionManager;
 	m_connectionManager->startListen(_serverName);
+	
 
 	m_application->exec();
 

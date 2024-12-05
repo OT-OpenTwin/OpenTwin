@@ -88,11 +88,11 @@ Application::Application()
 	ClassFactoryBlock* classFactoryBlock = new ClassFactoryBlock();
 	classFactoryBlock->SetChainRoot(&classFactory);
 	classFactory.SetNextHandler(classFactoryBlock);
+	
 }
 
 Application::~Application() {
-	delete m_qtWrapper;
-	m_qtWrapper = nullptr;
+
 }
 
 // ##################################################################################################################################################################################################################
@@ -108,6 +108,7 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 	}
 	else if (action == "Circuit Simulator:Simulate:Run Simulation") {
 		runCircuitSimulation();
+		
 
 		
 	}
@@ -329,14 +330,13 @@ void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std:
 
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity) {
 	
-	//starting subservice  CircuitExecution
-	//const int sessionCount = Application::instance()->getSessionCount();
-	//const int serviceID = Application::instance()->getServiceIDAsInt();
-	//if (m_subprocessHandler == nullptr)
-	//{
-	//	m_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
-	//}
-
+	
+	const int sessionCount = Application::instance()->getSessionCount();
+	const int serviceID = Application::instance()->getServiceIDAsInt();
+	if (m_subprocessHandler == nullptr) {
+		
+		m_subprocessHandler = new SubprocessHandler(m_serverName, sessionCount, serviceID);
+	}
 
 
 	EntityPropertiesEntityList* circuitName = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Circuit"));
@@ -379,6 +379,8 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	//m_subprocessHandler = nullptr;
 	
 }
+
+
 
 std::string Application::extractStringAfterDelimiter(const std::string& inputString, char delimiter, size_t occurrence) {
 	size_t pos = 0;
@@ -515,10 +517,9 @@ void Application::run(void) {
 	{
 		assert(0);
 	}
-
+	m_serverName = sessionID() + OT_INFO_SERVICE_TYPE_CircuitSimulatorService;
 	m_qtWrapper = new QtWrapper();
-
-	m_qtWrapper->run(sessionID());
+	m_qtWrapper->run(m_serverName);
 
 }
 

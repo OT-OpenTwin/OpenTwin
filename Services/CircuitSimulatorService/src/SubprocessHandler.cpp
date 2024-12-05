@@ -13,8 +13,6 @@ SubprocessHandler::SubprocessHandler(const std::string& serverName, int sessionI
 
 	InitiateProcess();
 
-	
-
 
 	std::thread workerThread(&SubprocessHandler::RunSubprocess, this);
 	workerThread.detach();

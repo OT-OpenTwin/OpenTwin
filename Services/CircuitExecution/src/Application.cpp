@@ -7,7 +7,7 @@
  */
 
 #include "Application.h"
-
+#include "ConnectionManager.h"
 
 Application* Application::instance = nullptr;
 
@@ -29,16 +29,18 @@ void Application::deleteInstance(void)
 }
 
 
-void Application::start(const std::string& serverName)
+void Application::start(const std::string& _serverName)
 {
-	QString qStr = QString::fromStdString(serverName);
-	ConnectionManager m_connectionManager;
-	m_connectionManager.connectToCircuitSimulatorService(qStr);
+	QString qStr = QString::fromStdString(_serverName);
+	m_connectionManager = new ConnectionManager();
+	m_connectionManager->connectToCircuitSimulatorService(qStr);
+
+	//m_connectionManager->sendMessage();
 	
 }
 
 Application::Application() {
-
+	m_connectionManager = nullptr;
 }
 
 Application::~Application()

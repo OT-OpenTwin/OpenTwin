@@ -696,10 +696,11 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 // Means that the user can start with every element to drop in the scene and start with any connection he want and this will not influence the results of the simulation
 // and the coordination and of the nodenumbers and elements
 // I want always a flow from positive node to negative node 
-// I first start with the voltageSource and give it the connection id = 0 then i will go to the next element at the connection and to the opposite connetor and give it the 
-// next nodenumber. I will take use of traversing graphs with my code of checking parallel connections. I just need a good understandable structure
+// I first start with the voltageSource and give it the connection id = 0 then i will go to the next element at the connection and to the opposite connetor
+// and give it the  next nodenumber. I will take use of traversing graphs with my code of checking parallel connections. I just need a good understandable structure
 
-	// First I get all the VoltageSources of the Circuit
+
+// First I get all the VoltageSources of the Circuit
 	auto vectorGND = it->second.getMapOfEntityBlcks().find("EntityBlockCircuitGND");
 	if (vectorGND != it->second.getMapOfEntityBlcks().end()) {
 		std::set<ot::UID> visitedElements; // Initialize visited set
@@ -774,7 +775,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	std::vector<std::vector<std::string>> nodesOfCurrentMeter;
 	std::vector<std::string> namesOfCurrentMeter;
 	std::vector<std::string> nameOfRShunts;
-	int rshuntCounter = 1; // Initialisiere den Zähler
+	int rshuntCounter = 1; // Initialisiere den ZÃ¤hler
 	// I need to get the type of Simulation to set then the voltage source if its ac dc or tran
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationTypeProperty != nullptr);
@@ -877,7 +878,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		{
 				CurrentMeter* currentMeter = dynamic_cast<CurrentMeter*>(circuitElement);
 				namesOfCurrentMeter.push_back(currentMeter->getCustomName());
-				std::string name = "Rshunt" + std::to_string(rshuntCounter++); // Erhöhe den Zähler nach jedem Schritt
+				std::string name = "Rshunt" + std::to_string(rshuntCounter++); // ErhÃ¶he den ZÃ¤hler nach jedem Schritt
 				nameOfRShunts.push_back(name);
 				addToCustomNameToNetlistMap(currentMeter->getCustomName(), to_lowercase(name));
 				addToNetlistNameToCustomMap(currentMeter->getCustomName(), to_lowercase(name));
@@ -911,7 +912,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 				nodesOfCurrentMeter.push_back(nodeNumbers);
 
-				// Hier überspringen wir die Instanzlinien-Generierung für dieses Element
+				// Hier Ã¼berspringen wir die Instanzlinien-Generierung fÃ¼r dieses Element
 				continue;
 		}
 		else if (circuitElement->type() == "Capacitor")
@@ -1040,16 +1041,16 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 	//Now i will do a loop through the nodes of the voltageMeter to get the potential diffirence with probe
 	for (auto nodes : nodesOfVoltageMeter)
 	{
-		std::string nodeString = "("; // Beginne den String mit einer öffnenden Klammer
+		std::string nodeString = "("; // Beginne den String mit einer Ã¶ffnenden Klammer
 		for (size_t i = 0; i < nodes.size(); ++i)
 		{
 			nodeString += nodes[i];
 			if (i < nodes.size() - 1)
 			{
-				nodeString += ","; // Füge ein Komma und ein Leerzeichen zwischen den Nodes hinzu
+				nodeString += ","; // FÃ¼ge ein Komma und ein Leerzeichen zwischen den Nodes hinzu
 			}
 		}
-		nodeString += ")"; // Schließe den String mit einer schließenden Klammer ab
+		nodeString += ")"; // SchlieÃŸe den String mit einer schlieÃŸenden Klammer ab
 
 		std::ostringstream oss;
 		oss << "circbyline .probe vd" << nodeString;

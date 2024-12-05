@@ -1,14 +1,3 @@
-/*
- * Application.cpp
- *
- *  Created on:
- *	Author:
- *  Copyright (c)
- */
-
-
-
-
 //Service Header
 #include "Circuit.h"
 #include "Application.h" 
@@ -77,7 +66,7 @@ void Circuit::setId(std::string id) {
 
 	}
 	else {
-		Application::instance()->uiComponent()->displayMessage("Element not found"); // Auf OtLog umändern
+		Application::instance()->uiComponent()->displayMessage("Element not found"); // Auf OtLog umÃ¤ndern
 		/*return false;*/
 
 	}
