@@ -194,7 +194,7 @@ public:
 	void updateMeshColor(unsigned long long modelEntityID, double colorRGB[3]);
 	void updateObjectFacetsFromDataBase(unsigned long long modelEntityID, unsigned long long entityID, unsigned long long entityVersion);
 
-	void setSelectedTreeItems(std::list<ot::UID> &selected, std::list<unsigned long long> &selectedModelItems, std::list<unsigned long long> &selectedVisibleModelItems);
+	void setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, bool _selectionFromTree);
 	void executeAction(unsigned long long buttonID);
 	void setHoverTreeItem(ot::UID hoverTreeItemID);
 	void clearHoverView(void);
@@ -276,7 +276,7 @@ private:
 	void	   setupUIControls3D(void);
 	void	   setupUIControls1D(void);
 	void	   removeUIControls(void);
-	void	   updateUIControlState(std::list<ot::UID> &selectedTreeItemID);
+	void	   updateUIControlState(const ot::UIDList& _selectedTreeItemID);
 	void	   showAllSceneNodes(SceneNodeBase *root);
 	void	   hideAllSceneNodes(SceneNodeBase *root);
 	void	   showSelectedSceneNodes(SceneNodeBase *root);

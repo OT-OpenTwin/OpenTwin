@@ -2149,7 +2149,7 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 				itemToDeselect = nullptr;
 			}
 
-			if (m_lastFocusedCentralView != _focusedView && (itemToSelect  || itemToDeselect)) {
+			if (itemToSelect || itemToDeselect) {
 				bool changed = false;
 				bool blocked = m_projectNavigation->signalsBlocked();
 				m_projectNavigation->blockSignals(blocked);
@@ -2174,7 +2174,8 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 				// Notify if needed
 				if (changed) {
-					m_projectNavigation->selectionChangedEvent(true);
+					m_projectNavigation->selectionChangedEvent(false);
+					m_viewerComponent->handleSelectionChanged(false);
 				}
 			}
 

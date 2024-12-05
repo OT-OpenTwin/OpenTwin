@@ -66,7 +66,7 @@ namespace ViewerAPI
 		virtual void setCurrentVisualizationTabFromTitle(const std::string & _tabTitle) {}
 		virtual std::string getCurrentVisualizationTabTitle(void) { return ""; }
 
-		virtual void enableDisableControls(std::list<unsigned long long> &enabled, std::list<unsigned long long> &disabled) {};
+		virtual void enableDisableControls(const ot::UIDList& _enabledControls, const ot::UIDList& _disabledControls) {};
 
 		virtual void entitiesSelected(ot::serviceID_t replyTo, const std::string &selectionAction, const std::string &selectionInfo, std::list<std::string> &optionNames, std::list<std::string> &optionValues) {};
 
@@ -107,7 +107,7 @@ namespace ViewerAPI
 
 	__declspec(dllexport) void setTreeStateRecording(ot::UID osgModelID, bool flag);
 
-	__declspec(dllexport) void setSelectedTreeItems(std::list<ot::UID> &selected, std::list<unsigned long long> &selectedModelItems, std::list<unsigned long long> &selectedVisibleModelItems);
+	__declspec(dllexport) void setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, bool _selectionFromTree);
 	__declspec(dllexport) void executeAction(unsigned long long buttonID);
 
 	__declspec(dllexport) void setHoverTreeItem(ot::UID hoverItemID);

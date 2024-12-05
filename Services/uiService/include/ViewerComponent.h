@@ -75,7 +75,7 @@ public:
 	virtual void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) override;
 	virtual std::string getCurrentVisualizationTabTitle(void) override;
 
-	virtual void enableDisableControls(std::list<ViewerUIDtype> &enabled, std::list<ViewerUIDtype> &disabled) override;
+	virtual void enableDisableControls(const ot::UIDList& _enabledControls, const ot::UIDList& _disabledControls) override;
 
 	virtual void entitiesSelected(ot::serviceID_t replyTo, const std::string &selectionAction, const std::string &selectionInfo, std::list<std::string> &optionNames, std::list<std::string> &optionValues) override;
 
@@ -169,6 +169,9 @@ public:
 	void registerAtNotifier(void);
 
 	void setDataBaseConnectionInformation(const std::string &databaseURL, const std::string &userName, const std::string &encryptedPassword);
+	
+	//! \brief Handle navigation tree selection changed event.
+	//! \param _selectionFromTree If true the selection event was emitted from the tree or tree operation.
 	void handleSelectionChanged(bool _selectionFromTree);
 
 	void setTabTitles(ViewerUIDtype visualizationModelID, const std::string & _tabName3D, const std::string & _tabName1D, const std::string & _tabNameVersions);

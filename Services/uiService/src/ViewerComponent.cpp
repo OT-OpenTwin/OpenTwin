@@ -372,16 +372,16 @@ std::string ViewerComponent::getCurrentVisualizationTabTitle(void)
 	return AppBase::instance()->getCurrentVisualizationTabTitle();
 }
 
-void ViewerComponent::enableDisableControls(std::list<ak::UID> &enabled, std::list<ak::UID> &disabled)
+void ViewerComponent::enableDisableControls(const ot::UIDList& _enabledControls, const ot::UIDList& _disabledControls)
 {
 	try {
 		try {
-			for (auto objectID : enabled) { 
+			for (ot::UID objectID : _enabledControls) {
 				if (ak::uiAPI::object::exists(objectID)) {
 					ak::uiAPI::object::setEnabled(objectID, true);
 				}
 			}
-			for (auto objectID : disabled) {
+			for (ot::UID objectID : _disabledControls) {
 				if (ak::uiAPI::object::exists(objectID)) {
 					ak::uiAPI::object::setEnabled(objectID, false);
 				}
@@ -508,7 +508,7 @@ void ViewerComponent::handleSelectionChanged(bool _selectionFromTree) {
 
 	// Send the selection changed notification to the viewer component and the model component
 	std::list<ak::UID> selectedModelItems, selectedVisibleModelItems;
-	ViewerAPI::setSelectedTreeItems(selectedTreeItems, selectedModelItems, selectedVisibleModelItems);
+	ViewerAPI::setSelectedTreeItems(selectedTreeItems, selectedModelItems, selectedVisibleModelItems, _selectionFromTree);
 
 	// Model function
 	ot::UID activeModel = ViewerAPI::getActiveDataModel();

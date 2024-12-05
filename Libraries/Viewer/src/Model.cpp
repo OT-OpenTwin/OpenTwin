@@ -1024,28 +1024,27 @@ void Model::setSelectedShapesOpaqueAndOthersTransparent(SceneNodeBase *root)
 	}
 }
 
-void Model::setSelectedTreeItems(std::list<ot::UID> &selectedTreeItemID, std::list<unsigned long long> &selectedModelItems, std::list<unsigned long long> &selectedVisibleModelItems)
+void Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems, bool _selectionFromTree)
 {
-	selectedModelItems.clear();
+	_selectedModelItems.clear();
 
 	// Set the selection flag for all nodes to false
 	resetSelection(sceneNodesRoot);
 
-	if (selectedTreeItemID.empty())
-	{
+	if (_selectedTreeItems.empty()) {
 		// No shape selected -> Draw all shapes opaque
 		setAllShapesOpaque(sceneNodesRoot);
 
 		// Update the working plane transformation 
 		updateWorkingPlaneTransform();
 		
-		updateUIControlState(selectedTreeItemID);
+		updateUIControlState(_selectedTreeItems);
 		clear1DPlot();
 		refreshAllViews();
 		return;
 	}
 
-	singleItemSelected = (selectedTreeItemID.size() == 1);
+	singleItemSelected = (_selectedTreeItems.size() == 1);
 
 	// Now at least one shape is selected
 	// -> selected shapes are drawn opaque and all others are drawn transparent
@@ -1054,22 +1053,19 @@ void Model::setSelectedTreeItems(std::list<ot::UID> &selectedTreeItemID, std::li
 	bool isItem3DSelected = false;
 
 	// First set the selected state for all selected nodes
-	for (auto item : selectedTreeItemID)
-	{
+	for (ot::UID item : _selectedTreeItems) {
 		SceneNodeBase *sceneNode = treeItemToSceneNodesMap[item];
 
-		if (sceneNode != nullptr)
-		{
+		if (sceneNode != nullptr) {
 			isItem1DSelected |= sceneNode->isItem1D();
 			isItem3DSelected |= sceneNode->isItem3D();
 
 			assert(sceneNode != nullptr);
 			sceneNode->setSelected(true);
-			selectedModelItems.push_back(sceneNode->getModelEntityID());
+			_selectedModelItems.push_back(sceneNode->getModelEntityID());
 
-			if (sceneNode->isVisible())
-			{
-				selectedVisibleModelItems.push_back(sceneNode->getModelEntityID());
+			if (sceneNode->isVisible()) {
+				_selectedVisibleModelItems.push_back(sceneNode->getModelEntityID());
 			}
 		}
 	}
@@ -1078,27 +1074,23 @@ void Model::setSelectedTreeItems(std::list<ot::UID> &selectedTreeItemID, std::li
 	setSelectedShapesOpaqueAndOthersTransparent(sceneNodesRoot);
 	
 	// Update the UI state and the view
-	updateUIControlState(selectedTreeItemID);
+	updateUIControlState(_selectedTreeItems);
 	refreshAllViews();
 
 	// reset the 1d view, if necessary
-	if (!isItem1DSelected)
-	{
+	if (!isItem1DSelected) {
 		clear1DPlot();
 	}
-	else
-	{
+	else {
 		update1DPlot(sceneNodesRoot);
 	}
 
-	if (isItem1DSelected && !isItem3DSelected)
-	{
+	if (isItem1DSelected && !isItem3DSelected) {
 		// Ensure that we have the 1D view active
 		ensure1DView();
 	}
 
-	if (isItem3DSelected && !isItem1DSelected)
-	{
+	if (isItem3DSelected && !isItem1DSelected) {
 		// Ensure that we have the 3D view active
 		ensure3DView();
 	}
@@ -1898,21 +1890,19 @@ void Model::clearHoverView(void)
 	}
 }
 
-void Model::updateUIControlState(std::list<ot::UID> &selectedTreeItemID)
+void Model::updateUIControlState(const ot::UIDList& _selectedTreeItemID)
 {
 	if (!removeItemIDList.empty())
 	{
 		std::list<unsigned long long> enabled;
 		std::list<unsigned long long> disabled;
 
-		if (selectedTreeItemID.size() > 0)
-		{
+		if (_selectedTreeItemID.size() > 0) {
 			enabled.push_back(uiControls.showSelectedButtonID);
 			enabled.push_back(uiControls.hideSelectedButtonID);
 			enabled.push_back(uiControls.hideUnselectedButtonID);
 		}
-		else
-		{
+		else {
 			disabled.push_back(uiControls.showSelectedButtonID);
 			disabled.push_back(uiControls.hideSelectedButtonID);
 			disabled.push_back(uiControls.hideUnselectedButtonID);
