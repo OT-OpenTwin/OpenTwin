@@ -337,9 +337,24 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CD
 
 	if (n) {
 		m_focusInfo.last = n;
-		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsCentral) m_focusInfo.lastCentral = n;
-		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsSide) m_focusInfo.lastSide = n;
-		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsTool) m_focusInfo.lastTool = n;
+		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsCentral) {
+			m_focusInfo.lastCentral = n;
+			if (!(m_config & IgnoreFocusOnViewInsert) && m_config & FocusCentralViewOnFocus) {
+				n->getViewWidget()->setFocus();
+			}
+		}
+		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsSide) {
+			m_focusInfo.lastSide = n;
+			if (!(m_config & IgnoreFocusOnViewInsert) && m_config & FocusSideViewOnFocus) {
+				n->getViewWidget()->setFocus();
+			}
+		}
+		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsTool) {
+			m_focusInfo.lastTool = n;
+			if (!(m_config & IgnoreFocusOnViewInsert) && m_config & FocusToolViewOnFocus) {
+				n->getViewWidget()->setFocus();
+			}
+		}
 		Q_EMIT viewFocusChanged(n, o);
 	}
 }
@@ -375,7 +390,7 @@ void ot::WidgetViewManager::slotUpdateViewVisibility(void) {
 // Private
 
 ot::WidgetViewManager::WidgetViewManager()
-	: m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_useFocusInfo(false)
+	: m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_useFocusInfo(false), m_config(NoFlags), m_state(DefaultState)
 {
 	m_focusInfo.last = nullptr;
 	m_focusInfo.lastSide = nullptr;
@@ -454,8 +469,10 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 	}
 
 	// Add the new view
+	m_state |= InsertViewState;
 	m_dockManager->addView(_view, area, _insertFlags);
-	
+	m_state &= (~InsertViewState);
+
 	// Add view toggle (if view is closeable)
 	if (_view->getViewDockWidget()->features() & ads::CDockWidget::DockWidgetClosable) {
 		m_dockToggleRoot->menu()->addAction(_view->getViewDockWidget()->toggleViewAction());

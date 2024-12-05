@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Flags.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/WidgetViewBase.h"
@@ -41,6 +42,15 @@ namespace ot {
 		typedef std::pair<std::string, WidgetViewBase::ViewType> ViewNameTypeListEntry;
 		typedef std::list<ViewNameTypeListEntry> ViewNameTypeList;
 		typedef std::pair<BasicServiceInformation, ot::WidgetView*> ViewEntry;
+
+		enum ManagerConfigFlag {
+			NoFlags                 = 0 << 0, //! \brief No manager flags.
+			FocusCentralViewOnFocus = 1 << 0, //! \brief Central views will get widget input focus when their view tab was focused.
+			FocusSideViewOnFocus    = 1 << 1, //! \brief Side views will get widget input focus when their view tab was focused.
+			FocusToolViewOnFocus    = 1 << 2, //! \brief Tool views will get widget input focus when their view tab was focused.
+			IgnoreFocusOnViewInsert = 1 << 3 //! \brief View widgets won't get input focus when a view is added.
+		};
+		typedef Flags<ManagerConfigFlag> ManagerConfigFlags;
 
 		//! @brief Return the clobal instance
 		static WidgetViewManager& instance(void);
@@ -107,6 +117,7 @@ namespace ot {
 		//! @param _entityName Widget view name.
 		WidgetView* forgetView(const std::string& _entityName, WidgetViewBase::ViewType _type);
 
+		//! @brief If enabled the manager will use the last focused views to determine the best dock area.
 		void setUseFocusInfo(bool _use) { m_useFocusInfo = _use; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -128,6 +139,10 @@ namespace ot {
 		//! @param _state State to restore.
 		//! @param _version State version. If the versions mismatch the restore state will cancel and return false.
 		bool restoreState(std::string _state, int _version = 0);
+
+		void setConfigFlag(ManagerConfigFlag _flag, bool _active = true) { m_config.setFlag(_flag, _active); };
+		void setConfigFlags(const ManagerConfigFlags& _flags) { m_config = _flags; };
+		const ManagerConfigFlags& getConfigFlags(void) const { return m_config; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -174,6 +189,19 @@ namespace ot {
 		void slotUpdateViewVisibility(void);
 
 	private:
+		enum ManagerState {
+			DefaultState    = 0 << 0, //! \brief Default manager state.
+			InsertViewState = 1 << 0, //! \brief View insert in progress.
+		};
+		typedef Flags<ManagerState> ManagerStateFlags;
+
+		struct FocusInfo {
+			WidgetView* last;
+			WidgetView* lastCentral;
+			WidgetView* lastSide;
+			WidgetView* lastTool;
+		};
+
 		WidgetViewManager();
 		~WidgetViewManager();
 
@@ -195,17 +223,19 @@ namespace ot {
 
 		WidgetViewDockManager* m_dockManager; //! @brief Dock manager managed by this manager
 		QAction*           m_dockToggleRoot; //! @brief Action containing the toggle dock visibility menu and actions
-		struct FocusInfo {
-			WidgetView* last;
-			WidgetView* lastCentral;
-			WidgetView* lastSide;
-			WidgetView* lastTool;
-		};
+		
+		ManagerStateFlags m_state;
+		ManagerConfigFlags m_config;
+
 		FocusInfo        m_focusInfo;
 		bool             m_useFocusInfo;
 
 		std::map<BasicServiceInformation, ViewNameTypeList*> m_viewOwnerMap; //! @brief Maps owners to widget view names and types
 		std::list<ViewEntry> m_views; //! @brief Contains all views and their owners.
+
+		OT_ADD_PRIVATE_FLAG_FUNCTIONS(ManagerState)
 	};
 
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::WidgetViewManager::ManagerConfigFlag)

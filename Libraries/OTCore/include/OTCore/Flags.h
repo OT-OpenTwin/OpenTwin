@@ -73,6 +73,10 @@ constexpr  ___enumName operator ~ (___enumName _lhv) { return static_cast<___enu
 friend constexpr  ___enumName operator & (___enumName _lhv, ___enumName _rhv);  \
 friend constexpr  ___enumName operator ~ (___enumName _lhv);
 
+#define OT_ADD_PRIVATE_FLAG_FUNCTIONS(___enumName) friend constexpr ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<long long>(_lhv) | static_cast<long long>(_rhv)); }; \
+friend constexpr ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<long long>(_lhv) & static_cast<long long>(_rhv)); };  \
+friend constexpr ___enumName operator ~ (___enumName _lhv) { return static_cast<___enumName>(~(static_cast<long long>(_lhv))); };
+
 namespace ot {
 
 	//! \class Flags

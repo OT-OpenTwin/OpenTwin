@@ -856,6 +856,7 @@ void AppBase::createUi(void) {
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker);
 
 			ot::WidgetViewManager::instance().setUseFocusInfo(true);
+			ot::WidgetViewManager::instance().setConfigFlags(ot::WidgetViewManager::FocusCentralViewOnFocus | ot::WidgetViewManager::IgnoreFocusOnViewInsert);
 
 			m_projectNavigation->setAsCurrentViewTab();
 
@@ -2181,9 +2182,6 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 
 			// Update focus information
 			m_lastFocusedCentralView = _focusedView;
-
-			// Central views will get its focus set
-			_focusedView->getViewWidget()->setFocus();
 		}
 
 	}
