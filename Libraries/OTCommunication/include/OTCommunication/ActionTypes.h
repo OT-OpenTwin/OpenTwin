@@ -282,7 +282,6 @@
 #define OT_ACTION_CMD_UI_RequestTextData "UI.TextEditor.RequestData"
 
 #define OT_ACTION_CMD_UI_TABLE_Setup "UI.Table.Setup"
-#define OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent "UI.Table.Override"
 #define OT_ACTION_CMD_UI_TABLE_SaveRequest "UI.Table.SaveRequest"
 #define OT_ACTION_CMD_UI_TABLE_SetSaved "UI.Table.SetSaved"
 #define OT_ACTION_CMD_UI_TABLE_SetModified "UI.Table.SetModified"
@@ -324,6 +323,7 @@
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"
+#define OT_ACTION_PARAM_OverwriteContent "OverwriteContent"
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
 #define OT_ACTION_PARAM_ICON "Icon"

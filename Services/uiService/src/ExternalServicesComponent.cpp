@@ -3802,8 +3802,8 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 	}
 	
 	bool overrideCurrentContent = true;
-	if (_document.HasMember(OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent)) {
-		overrideCurrentContent = ot::json::getBool(_document, OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent);
+	if (_document.HasMember(OT_ACTION_PARAM_OverwriteContent)) {
+		overrideCurrentContent = ot::json::getBool(_document, OT_ACTION_PARAM_OverwriteContent);
 	}
 	
 	ot::TableCfg config;

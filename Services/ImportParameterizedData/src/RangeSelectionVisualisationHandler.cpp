@@ -181,7 +181,7 @@ bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _
 	info.addToJsonObject(document, document.GetAllocator());
 	document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TABLE_Setup, document.GetAllocator());
 	document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, true, document.GetAllocator());
-	document.AddMember(OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent, false, document.GetAllocator());
+	document.AddMember(OT_ACTION_PARAM_OverwriteContent, false, document.GetAllocator());
 
 	ot::TableCfg tableCfg = table->getTableConfig();;
 	ot::JsonObject cfgObj;

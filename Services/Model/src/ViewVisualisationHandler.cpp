@@ -22,7 +22,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 			info.addToJsonObject(document, document.GetAllocator());
 			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TABLE_Setup, document.GetAllocator());
 			document.AddMember(OT_ACTION_PARAM_VIEW_SetActiveView, _setAsActiveView, document.GetAllocator());
-			document.AddMember(OT_ACTION_CMD_UI_TABLE_OverrideOfCurrentContent, _overrideContent, document.GetAllocator());
+			document.AddMember(OT_ACTION_PARAM_OverwriteContent, _overrideContent, document.GetAllocator());
 		
 			ot::TableCfg tableCfg = tableEntity->getTableConfig();
 			ot::JsonObject cfgObj;
