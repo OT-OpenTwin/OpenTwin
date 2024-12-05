@@ -24,6 +24,13 @@ public:
 	bool getConsiderForBatchprocessing();
 	void setConsiderForBatchprocessing(bool considerForBatchprocessing);
 
+	bool getSelectEntireColumn();
+	bool getSelectEntireRow();
+
+	void setSelectEntireColumn(bool _selectAll);
+	void setSelectEntireRow(bool _selectAll);
+	
+
 	bool getPassOnScript();
 	std::string getScriptName();
 	void setRange(const ot::TableRange& _range);

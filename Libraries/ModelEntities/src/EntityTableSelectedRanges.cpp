@@ -88,6 +88,9 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 	getProperties().createProperty(considerInAutomaticCreation, updateStrategyGroup);
 	getProperties().createProperty(updateScript, updateStrategyGroup);
 	getProperties().createProperty(passOnScript, updateStrategyGroup);
+	
+	EntityPropertiesBoolean::createProperty(updateStrategyGroup, "Select entire row", false, "default", getProperties());
+	EntityPropertiesBoolean::createProperty(updateStrategyGroup, "Select entire column", false, "default", getProperties());
 }
 
 void EntityTableSelectedRanges::setTableProperties(std::string _tableName, ot::UID _tableID, std::string _tableOrientation) {
@@ -139,6 +142,56 @@ void EntityTableSelectedRanges::setConsiderForBatchprocessing(bool considerForBa
 	auto considerForBatchProcessing = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNameConsiderForBatchProcessing));
 	considerForBatchProcessing->setValue(considerForBatchprocessing);
 	UpdateVisibility();
+}
+
+bool EntityTableSelectedRanges::getSelectEntireColumn()
+{
+	EntityPropertiesBase* baseProperty = getProperties().getProperty("Select entire column");
+	if (baseProperty != nullptr)
+	{
+		auto boolProperty = dynamic_cast<EntityPropertiesBoolean*>(baseProperty);
+		return boolProperty->getValue();
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool EntityTableSelectedRanges::getSelectEntireRow()
+{
+	EntityPropertiesBase* baseProperty = getProperties().getProperty("Select entire row");
+	if (baseProperty != nullptr)
+	{
+		auto boolProperty = dynamic_cast<EntityPropertiesBoolean*>(baseProperty);
+		return boolProperty->getValue();
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void EntityTableSelectedRanges::setSelectEntireColumn(bool _selectAll)
+{
+	EntityPropertiesBase* baseProperty = getProperties().getProperty("Select entire column");
+	if (baseProperty != nullptr)
+	{
+		auto boolProperty = dynamic_cast<EntityPropertiesBoolean*>(baseProperty);
+		boolProperty->setValue(_selectAll);
+		setModified();
+	}
+}
+
+void EntityTableSelectedRanges::setSelectEntireRow(bool _selectAll)
+{
+	EntityPropertiesBase* baseProperty = getProperties().getProperty("Select entire row");
+	if (baseProperty != nullptr)
+	{
+		auto boolProperty = dynamic_cast<EntityPropertiesBoolean*>(baseProperty);
+		boolProperty->setValue(_selectAll);
+		setModified();
+	}
 }
 
 bool EntityTableSelectedRanges::getPassOnScript()
