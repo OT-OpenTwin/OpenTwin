@@ -242,9 +242,16 @@ void SessionService::serviceClosing(
 	bool									_notifyOthers,
 	bool									_autoCloseSessionIfMandatory
 ) {
-	assert(_service != nullptr);
+	if (_service == nullptr) {
+		OT_LOG_EA("Service is nullptr");
+		return;
+	}
 	// Get services session
 	Session * actualSession = _service->getSession();
+	if (actualSession == nullptr) {
+		OT_LOG_EA("No session set");
+		return;
+	}
 
 	// Remove the service from the session, after this call the pointer is invalid
 	actualSession->removeService(_service->id(), _notifyOthers);
@@ -505,6 +512,8 @@ std::string SessionService::handleRegisterNewService(ot::JsonDocument& _commandD
 		response.AddMember(OT_ACTION_PARAM_LogFlags, logArr, response.GetAllocator());
 	}
 
+	OTAssertNullptr(theService);
+
 	// Add service to run starter (will send run command later)
 	ServiceRunStarter::instance().addService(theSession, theService);
 
@@ -637,6 +646,8 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	else {
 		OT_LOG_D("Creator does NOT want the mandatory services to be started");
 	}
+
+	OTAssertNullptr(theService);
 	
 	// Add response information
 	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, newID, responseDoc.GetAllocator());
@@ -909,7 +920,16 @@ std::string SessionService::handleServiceHide(ot::JsonDocument& _commandDoc) {
 	ot::serviceID_t serviceID(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	Session * theSession = getSession(sessionID);
+	if (theSession == nullptr) {
+		OT_LOG_EAS("Session \"" + sessionID + "\" not found");
+		return OT_ACTION_RETURN_VALUE_FAILED;
+	}
+
 	Service * theService = theSession->getService(serviceID);
+	if (theService == nullptr) {
+		OT_LOG_EAS("Service (" + std::to_string(serviceID) + ")not found");
+		return OT_ACTION_RETURN_VALUE_FAILED;
+	}
 	theService->setHidden();
 	return OT_ACTION_RETURN_VALUE_OK;
 }
@@ -1012,7 +1032,12 @@ std::string SessionService::handleSetGlobalLogFlags(ot::JsonDocument& _commandDo
 void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, std::string _sessionId) {
 	// Get service info
 	Session* theSession = getSession(_sessionId);
+	if (theSession == nullptr) {
+		OT_LOG_EAS("Session \"" + _sessionId + "\" does not exist");
+		return;
+	}
 	Service* theService = theSession->getService(_serviceId);
+
 	std::string senderServiceName("<No service name>");
 	if (theService) {
 		senderServiceName = theService->name();

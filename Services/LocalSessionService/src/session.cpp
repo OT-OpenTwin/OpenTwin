@@ -13,6 +13,7 @@
 #include <RelayService.h>	// relayService
 #include <Exception.h>		// Error handling
 
+#include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
