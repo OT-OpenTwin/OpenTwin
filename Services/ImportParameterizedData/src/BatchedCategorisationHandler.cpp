@@ -114,6 +114,8 @@ BatchUpdateInformation BatchedCategorisationHandler::createNewMSMDWithSelections
 		std::list<std::shared_ptr<EntityTableSelectedRanges>>& selections = elements.second;
 		const std::string oldSMDName = elements.first;
 
+		std::unique_ptr<EntityParameterizedDataCategorization> parameter(nullptr), quantity(nullptr);
+
 		for (auto& selection : selections)
 		{
 			//First we cut off the original name after the smd name and change the prefix of the selection entity name
@@ -122,6 +124,29 @@ BatchUpdateInformation BatchedCategorisationHandler::createNewMSMDWithSelections
 			position += static_cast<uint32_t>(oldSMDName.size());
 			std::string postfix = selectionName.substr(position, selectionName.size());
 			std::string newSelectionName = prefix + postfix;
+
+			//Now we check if we need to create a parameter/quantity entity as well
+			if (parameter == nullptr && newSelectionName.find(CategorisationFolderNames::getParameterFolderName()) != std::string::npos)
+			{
+				parameter.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+				parameter->CreateProperties(EntityParameterizedDataCategorization::parameter);
+				parameter->setName(prefix + "/" + CategorisationFolderNames::getParameterFolderName());
+				parameter->StoreToDataBase();
+				topoVers.push_back(parameter->getEntityStorageVersion());
+				topoIDs.push_back(parameter->getEntityID());
+				forceVis.push_back(false);
+			}
+
+			if (quantity == nullptr && newSelectionName.find(CategorisationFolderNames::getQuantityFolderName()) != std::string::npos)
+			{
+				quantity.reset(new EntityParameterizedDataCategorization(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
+				quantity->CreateProperties(EntityParameterizedDataCategorization::quantity);
+				quantity->setName(prefix + "/" + CategorisationFolderNames::getQuantityFolderName());
+				quantity->StoreToDataBase();
+				topoVers.push_back(quantity->getEntityStorageVersion());
+				topoIDs.push_back(quantity->getEntityID());
+				forceVis.push_back(false);
+			}
 
 			//Now we create a new selection range entity with new values
 			std::unique_ptr<EntityTableSelectedRanges> newSelection(new EntityTableSelectedRanges(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService));
@@ -158,6 +183,8 @@ BatchUpdateInformation BatchedCategorisationHandler::createNewMSMDWithSelections
 
 			batchUpdateInformation.m_selectionEntityNames.push_back(newSelectionName);
 			batchUpdateInformation.m_pythonScriptNames.push_back(newSelection->getScriptName());
+
+
 		}
 	}
 	allMSMDNames = allMSMDNames.substr(0, allMSMDNames.size() - 2);
