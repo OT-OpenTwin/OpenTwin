@@ -161,6 +161,7 @@ LogInDialog::LogInDialog()
 	m_toggleChangePasswordModeLabel = new Label(TOGGLE_MODE_LABEL_SwitchToChangePassword);
 	m_toggleChangePasswordModeLabel->setObjectName("LogInDialogChangePasswordLabel");
 	m_toggleChangePasswordModeLabel->setMargin(4);
+	m_toggleChangePasswordModeLabel->setVisible(false);
 	changePasswordLayout->addStretch(1);
 	changePasswordLayout->addWidget(m_toggleChangePasswordModeLabel);
 	changePasswordLayout->addStretch(1);
@@ -360,7 +361,7 @@ void LogInDialog::slotToggleLogInAndRegisterMode(void) {
 		m_passwordConfirmLabel->setHidden(true);
 		m_passwordConfirm->setHidden(true);
 		m_toggleRegisterModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToRegister);
-		m_toggleChangePasswordModeLabel->setHidden(false);
+		//m_toggleChangePasswordModeLabel->setHidden(false);
 		m_state &= (~LogInStateFlag::RegisterMode);
 	}
 	else {
@@ -369,7 +370,7 @@ void LogInDialog::slotToggleLogInAndRegisterMode(void) {
 		m_passwordConfirm->setHidden(false);
 		m_passwordConfirmLabel->setHidden(false);
 		m_toggleRegisterModeLabel->setText(TOGGLE_MODE_LABEL_SwitchToLogIn);
-		m_toggleChangePasswordModeLabel->setHidden(true);
+		//m_toggleChangePasswordModeLabel->setHidden(true);
 		m_state |= LogInStateFlag::RegisterMode;
 
 		if (m_state & LogInStateFlag::RestoredPassword) {
