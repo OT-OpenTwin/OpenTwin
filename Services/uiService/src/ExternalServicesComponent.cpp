@@ -1302,7 +1302,7 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 			std::string ex("From ");
 			ex.append(m_sessionServiceURL).append(": ").append(response);
 			throw std::exception(ex.c_str());
-		}
+		}	
 
 		// Add services that are running in this session to the services list
 		ot::JsonDocument serviceListDoc;

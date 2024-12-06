@@ -14,6 +14,7 @@
 #include "Service.h"
 #include "RelayService.h"
 #include "globalDatatypes.h"
+#include "GlobalMutex.h"
 #include "ServiceRunStarter.h"
 
 // Open Twin header
@@ -154,19 +155,15 @@ Session * SessionService::createSession(
 	return newSession;
 }
 
-Session * SessionService::getSession(
-	const std::string &						_sessionID,
-	bool									_throwException
-) {
+Session * SessionService::getSession(const std::string& _sessionID) {
 	auto s = m_sessionMap.find(_sessionID);
 	if (s == m_sessionMap.end()) {
-		if (!_throwException) { return nullptr; }
-		std::string ex("A session with the ID \"");
-		ex.append(_sessionID);
-		ex.append("\" could not be found");
-		throw ErrorException(ex.c_str());
+		OT_LOG_E("Session not found \"" + _sessionID + "\"");
+		return nullptr;
 	}
-	return s->second;
+	else {
+		return s->second;
+	}
 }
 
 bool SessionService::runMandatoryServices(
@@ -470,10 +467,9 @@ std::string SessionService::handleRegisterNewService(ot::JsonDocument& _commandD
 	}
 
 	// Get the requested session
-	Session * theSession = getSession(sessionID, false);
+	Session * theSession = getSession(sessionID);
 
 	if (theSession == nullptr) {
-		OT_LOG_E("A session with the id \"" + sessionID + "\" could not be found");
 		throw ErrorException(("A session with the id \"" + sessionID + "\" could not be found").c_str());
 	}
 
@@ -689,7 +685,7 @@ std::string SessionService::handleSendBroadcastMessage(ot::JsonDocument& _comman
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	std::string message(ot::json::getString(_commandDoc, OT_ACTION_PARAM_MESSAGE));
 
-	Session * theSession = getSession(sessionID, false);
+	Session * theSession = getSession(sessionID);
 	if (theSession) {
 		Service * theService = theSession->getService(serviceID);
 		if (theService == nullptr) {
@@ -698,6 +694,9 @@ std::string SessionService::handleSendBroadcastMessage(ot::JsonDocument& _comman
 			throw ErrorException(errorMessage.c_str());
 		}
 		theSession->broadcastMessage(theService, message);
+	}
+	else {
+		return OT_ACTION_RETURN_VALUE_FAILED;
 	}
 
 	return OT_ACTION_RETURN_VALUE_OK;
@@ -726,6 +725,10 @@ std::string SessionService::handleServiceClosing(ot::JsonDocument& _commandDoc) 
 	ot::serviceID_t serviceID(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	Session * theSession = getSession(sessionID);
+	if (!theSession) {
+		return OT_ACTION_RETURN_VALUE_FAILED;
+	}
+
 	Service * actualService = theSession->getService(serviceID);
 	serviceClosing(actualService, true, true);
 	return OT_ACTION_RETURN_VALUE_OK;
@@ -758,6 +761,10 @@ std::string SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc) 
 	// Get service info (if it exists)
 
 	Session * actualSession = getSession(sessionID);
+	if (actualSession == nullptr) {
+		return OT_ACTION_RETURN_VALUE_FAILED;
+	}
+
 	Service * actualService = nullptr;
 
 	std::string serviceName(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME));
@@ -895,7 +902,6 @@ std::string SessionService::handleServiceShow(ot::JsonDocument& _commandDoc)
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	Session * theSession = getSession(sessionID);
 	if (theSession == nullptr) {
-		OT_LOG_E("A session with the id \"" + sessionID + "\" was not found");
 		return OT_ACTION_RETURN_INDICATOR_Error "Invalid session id";
 	}
 	
@@ -921,7 +927,6 @@ std::string SessionService::handleServiceHide(ot::JsonDocument& _commandDoc) {
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	Session * theSession = getSession(sessionID);
 	if (theSession == nullptr) {
-		OT_LOG_EAS("Session \"" + sessionID + "\" not found");
 		return OT_ACTION_RETURN_VALUE_FAILED;
 	}
 
@@ -977,6 +982,9 @@ std::string SessionService::handleServiceStartupFailed(ot::JsonDocument& _comman
 	
 	// Get service info (if it exists)
 	Session * actualSession = getSession(sessionID);
+	if (!actualSession) {
+		return OT_ACTION_RETURN_VALUE_FAILED;
+	}
 	auto services = actualSession->getServicesByName(serviceName);
 	Service * actualService = nullptr;
 	for (auto s : services) {
@@ -1030,10 +1038,10 @@ std::string SessionService::handleSetGlobalLogFlags(ot::JsonDocument& _commandDo
 }
 
 void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, std::string _sessionId) {
+	OT_LSS_GLOBAL_LOCK
 	// Get service info
 	Session* theSession = getSession(_sessionId);
 	if (theSession == nullptr) {
-		OT_LOG_EAS("Session \"" + _sessionId + "\" does not exist");
 		return;
 	}
 	Service* theService = theSession->getService(_serviceId);

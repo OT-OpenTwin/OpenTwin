@@ -106,10 +106,7 @@ public:
 	//! @param _sessionID The ID of the session to get
 	//! @param _throwException If true, exceptions will be thrown, otherwise a nullptr will be returned
 	//! @throw std::exception if the specified session ID is invalid
-	Session * getSession(
-		const std::string &						_sessionID,
-		bool									_throwException = true
-	);
+	Session * getSession(const std::string& _sessionID);
 
 	//! @brief Will ensure that all mandatory services for the specified session are running
 	//! @param _sessionID The ID of the session
@@ -207,6 +204,8 @@ private:
 
 	GlobalSessionService *						m_globalSessionService;
 	GlobalDirectoryService *					m_globalDirectoryService;
+
+	std::list<std::string> m_sessionShutdownQueue;
 
 	ot::LogModeManager m_logModeManager;
 

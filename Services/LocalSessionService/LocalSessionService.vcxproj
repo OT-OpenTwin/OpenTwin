@@ -192,6 +192,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\GlobalDirectoryService.h" />
+    <ClInclude Include="include\GlobalMutex.h" />
     <ClInclude Include="include\GlobalSessionService.h" />
     <ClInclude Include="include\Exception.h" />
     <ClInclude Include="include\globalDatatypes.h" />

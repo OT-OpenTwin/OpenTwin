@@ -98,7 +98,7 @@ void ServiceRunStarter::worker(void) {
 			doc.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(info.sessionType, doc.GetAllocator()), doc.GetAllocator());
 
 			// Get session
-			Session* session = SessionService::instance()->getSession(info.sessionId, false);
+			Session* session = SessionService::instance()->getSession(info.sessionId);
 			if (session == nullptr) {
 				m_mutex.unlock();																// Unlock
 

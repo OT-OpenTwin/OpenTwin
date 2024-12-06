@@ -18,6 +18,7 @@
 // SessionService header
 #include "globalDatatypes.h"
 #include "SessionService.h"
+#include "GlobalMutex.h"
 #include "GlobalSessionService.h"
 
 #include "OTCore/Logger.h"
@@ -174,17 +175,20 @@ extern "C"
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP)
 	{
+		OT_LSS_GLOBAL_LOCK
 		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderIP, ot::EXECUTE);
 	};
 
 	_declspec(dllexport) const char *performActionOneWayTLS(const char * _json, const char * _senderIP)
 	{
+		OT_LSS_GLOBAL_LOCK
 		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderIP, ot::EXECUTE_ONE_WAY_TLS);
 	};
 
 	// The session service is not queueing actions
 	_declspec(dllexport) const char *queueAction(const char *_json, const char *_senderIP)
 	{
+		OT_LSS_GLOBAL_LOCK
 		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderIP, ot::QUEUE);
 	};
 
