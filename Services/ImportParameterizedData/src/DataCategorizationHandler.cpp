@@ -487,6 +487,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 				}
 			}
 			std::replace(name.begin(), name.end(), '/', '\\');
+			name.erase(std::remove(name.begin(), name.end(), '"'), name.end());
 			name =	CreateNewUniqueTopologyNamePlainPossible(bufferedCategorisationName, name, takenNames);
 			tableRange->setName(name);
 

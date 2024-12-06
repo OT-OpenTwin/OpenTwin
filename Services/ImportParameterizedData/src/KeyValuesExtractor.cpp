@@ -117,7 +117,7 @@ bool KeyValuesExtractor::isRangeWithinTableDimensions(std::shared_ptr<EntityTabl
 
 std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> _range, const ot::GenericDataStructMatrix& _tableData, std::map<std::string, std::map<std::uint32_t, ot::Variable>>& _outAllSortedFields)
 {
-	std::vector<std::string> fieldKey;
+	std::vector<std::string> fieldKeys;
 	
 	ot::TableRange userRange = _range->getSelectedRange();
 	ot::TableCfg::TableHeaderMode headerOrientation = _range->getTableHeaderMode();
@@ -164,38 +164,42 @@ std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_
 	ot::MatrixEntryPointer matrixEntry;
 	if (_range->getTableHeaderMode() == ot::TableCfg::TableHeaderMode::Horizontal)
 	{
-		fieldKey.reserve(maxColumn - minColumn + 1);
+		fieldKeys.reserve(maxColumn - minColumn + 1);
 		for (matrixEntry.m_column = minColumn; matrixEntry.m_column <= maxColumn; matrixEntry.m_column++)
 		{
 			matrixEntry.m_row = 0;
 			const ot::Variable& entry = _tableData.getValue(matrixEntry);
 			assert(entry.isConstCharPtr());
-			fieldKey.push_back(entry.getConstCharPtr());
+			std::string fieldKey = entry.getConstCharPtr();
+			cleanFieldKey(fieldKey);
+			fieldKeys.push_back(fieldKey);
 			for (matrixEntry.m_row = minRow; matrixEntry.m_row <= maxRow; matrixEntry.m_row++)
 			{
 				const ot::Variable& entry = _tableData.getValue(matrixEntry);
-				_outAllSortedFields[fieldKey.back()].insert({matrixEntry.m_row, entry});
+				_outAllSortedFields[fieldKey].insert({matrixEntry.m_row, entry});
 			}
 		}
 	}
 	else
 	{
-		fieldKey.reserve(maxRow - minRow + 1);
+		fieldKeys.reserve(maxRow - minRow + 1);
 		for (matrixEntry.m_row = minRow; matrixEntry.m_row <= maxRow; matrixEntry.m_row++)
 		{
 			matrixEntry.m_column = 0;
 			const ot::Variable& entry = _tableData.getValue(matrixEntry);
 			assert(entry.isConstCharPtr());
-			fieldKey.push_back(entry.getConstCharPtr());
+			std::string fieldKey = entry.getConstCharPtr();
+			cleanFieldKey(fieldKey);
+			fieldKeys.push_back(fieldKey);
 			for (matrixEntry.m_column = minColumn; matrixEntry.m_column <= maxColumn; matrixEntry.m_column++)
 			{
 				const ot::Variable& value = _tableData.getValue(matrixEntry);
-				_outAllSortedFields[fieldKey.back()].insert({ matrixEntry.m_column, value});
+				_outAllSortedFields[fieldKey].insert({ matrixEntry.m_column, value});
 			}
 		}
 	}
-	fieldKey.shrink_to_fit();
-	return fieldKey;
+	fieldKeys.shrink_to_fit();
+	return fieldKeys;
 }
 
 
@@ -289,4 +293,9 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 	}
 	assert(_allFields.size() == 0);
 	return allFieldsConverted;
+}
+
+void KeyValuesExtractor::cleanFieldKey(std::string& _key)
+{
+	_key.erase(std::remove(_key.begin(), _key.end(), '"'), _key.end());
 }

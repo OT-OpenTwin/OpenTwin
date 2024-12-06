@@ -41,6 +41,8 @@ private:
 	//! @return true, if all conversions were possible. False, if a conversion failed
 	bool transformSelectedDataIntoSelectedDataType(std::map<std::string, std::list<ot::Variable>>& _allFields, std::map<std::string, std::string>& _rangeTypesByRangeNames, const char _decimalSeparator);
 	
+	void cleanFieldKey(std::string& _key);
+
 	std::map<std::string,std::list<ot::Variable>> m_fields;
 };
 
