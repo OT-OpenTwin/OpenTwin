@@ -1443,6 +1443,11 @@ void Model::deleteSelectedShapes(void)
 		selectedEntities.push_back(entityMap[entityID]);
 	}
 
+	// No shapes are selected. Ignore
+	if (selectedEntities.empty()) {
+		return;
+	}
+
 	// Remove all protected entities from the list
 	std::list<EntityBase *> selectedUnprotectedEntities;
 	std::list<EntityBase *> protectedEntities;
