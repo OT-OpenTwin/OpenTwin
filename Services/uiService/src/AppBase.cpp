@@ -1075,11 +1075,21 @@ ViewerUIDtype AppBase::createView(
 }
 
 void AppBase::setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
+	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
+	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
+
 	ot::WidgetViewManager::instance().setCurrentView(_entityName, _viewType);
+
+	ot::WidgetViewManager::instance().setConfigFlags(managerFlags);
 }
 
 void AppBase::setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) {
+	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
+	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
+
 	ot::WidgetViewManager::instance().setCurrentViewFromTitle(_tabTitle);
+
+	ot::WidgetViewManager::instance().setConfigFlags(managerFlags);
 }
 
 std::string AppBase::getCurrentVisualizationTabTitle(void) {

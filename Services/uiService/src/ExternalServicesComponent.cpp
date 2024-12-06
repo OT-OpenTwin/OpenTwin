@@ -64,6 +64,7 @@
 #include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyGridGroup.h"
+#include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/StyledTextConverter.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
@@ -3588,7 +3589,7 @@ std::string ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _
 		}
 	}
 
-	editor->setAsCurrentViewTab();
+	this->makeWidgetViewCurrentWithoutInputFocus(editor);
 
 	return "";
 }
@@ -3641,7 +3642,7 @@ std::string ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocum
 		editor->addConnectionIfConnectedItemsExist(connection);
 	}
 
-	editor->setAsCurrentViewTab();
+	this->makeWidgetViewCurrentWithoutInputFocus(editor);
 
 	return "";
 }
@@ -3733,7 +3734,7 @@ std::string ExternalServicesComponent::handleSetupTextEditor(ot::JsonDocument& _
 		editor->setupFromConfig(config, true);
 		
 		if (!(insertFlags & ot::WidgetView::KeepCurrentFocus)) {
-			editor->setAsCurrentViewTab();
+			this->makeWidgetViewCurrentWithoutInputFocus(editor);
 		}
 	}
 	else {
@@ -3821,7 +3822,7 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 	else if (overrideCurrentContent) {
 		table->setupFromConfig(config);
 		if (!(insertFlags & ot::WidgetView::KeepCurrentFocus)) {
-			table->setAsCurrentViewTab();
+			this->makeWidgetViewCurrentWithoutInputFocus(table);
 		}
 		table->setContentChanged(false);
 	}
@@ -3873,7 +3874,8 @@ std::string ExternalServicesComponent::handleInsertTableRowAfter(ot::JsonDocumen
 	table->insertRow(rowIndex + 1);
 	table->setContentChanged(true);
 
-	table->setAsCurrentViewTab();
+	this->makeWidgetViewCurrentWithoutInputFocus(table);
+
 	return "";
 }
 
@@ -3890,7 +3892,8 @@ std::string ExternalServicesComponent::handleInsertTableRowBefore(ot::JsonDocume
 	table->insertRow(rowIndex);
 	table->setContentChanged(true);
 
-	table->setAsCurrentViewTab();
+	this->makeWidgetViewCurrentWithoutInputFocus(table);
+
 	return "";
 }
 
@@ -3907,7 +3910,7 @@ std::string ExternalServicesComponent::handleRemoveTableRow(ot::JsonDocument& _d
 	table->removeRow(rowIndex);
 	table->setContentChanged(true);
 
-	table->setAsCurrentViewTab();
+	this->makeWidgetViewCurrentWithoutInputFocus(table);
 	return "";
 }
 
@@ -3924,7 +3927,8 @@ std::string ExternalServicesComponent::handleInsertTableColumnAfter(ot::JsonDocu
 	table->insertColumn(columnIndex + 1);
 	table->setContentChanged(true);
 
-	table->setAsCurrentViewTab();
+	this->makeWidgetViewCurrentWithoutInputFocus(table);
+
 	return "";
 }
 
@@ -3940,7 +3944,9 @@ std::string ExternalServicesComponent::handleInsertTableColumnBefore(ot::JsonDoc
 	int columnIndex = ot::json::getInt(_document, OT_ACTION_PARAM_Index);
 	table->insertColumn(columnIndex);
 	table->setContentChanged(true);
-	table->setAsCurrentViewTab();
+	
+	this->makeWidgetViewCurrentWithoutInputFocus(table);
+
 	return "";
 }
 
@@ -3957,7 +3963,8 @@ std::string ExternalServicesComponent::handleRemoveTableColumn(ot::JsonDocument&
 	table->removeColumn(columnIndex);
 	table->setContentChanged(true);
 
-	table->setAsCurrentViewTab();
+	this->makeWidgetViewCurrentWithoutInputFocus(table);
+
 	return "";
 }
 
@@ -4006,7 +4013,7 @@ std::string ExternalServicesComponent::handleSetTableSelection(ot::JsonDocument&
 		table->setRangeSelected(ot::QtFactory::toQTableRange(range), true);
 	}
 
-	table->setAsCurrentViewTab();
+	this->makeWidgetViewCurrentWithoutInputFocus(table);
 
 	return "";
 }
@@ -4091,7 +4098,7 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 		this->sendTableSelectionInformation(callbackUrl, callbackFunction, table);
 	}
 
-	table->setAsCurrentViewTab();
+	this->makeWidgetViewCurrentWithoutInputFocus(table);
 
 	return "";
 }
@@ -4230,6 +4237,15 @@ void ExternalServicesComponent::sendTableSelectionInformation(const std::string&
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
 		OT_LOG_WAS(response);
 	}
+}
+
+void ExternalServicesComponent::makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view) const {
+	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
+	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
+
+	_view->setAsCurrentViewTab();
+
+	ot::WidgetViewManager::instance().setConfigFlags(managerFlags);
 }
 
 // ###################################################################################################
