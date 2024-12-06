@@ -53,6 +53,11 @@ namespace ot {
 		//! @brief Returns the widget that is set to this widget view.
 		virtual QWidget* getViewWidget(void) = 0;
 
+		//! \brief Sets the input focus to the view widget.
+		//! Custom widget views with nested widgets can override this method to set the focus to the correct widget.
+		//! By default the root widget (widget returned by WidgetView::getViewWidget()) will get the focus set.
+		virtual void setViewWidgetFocus(void);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter/Getter

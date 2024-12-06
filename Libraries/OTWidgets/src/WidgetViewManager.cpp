@@ -340,19 +340,19 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CD
 		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsCentral) {
 			m_focusInfo.lastCentral = n;
 			if (!(m_config & IgnoreInputFocusOnViewInsert && m_state & InsertViewState) && m_config & InputFocusCentralViewOnFocusChange) {
-				n->getViewWidget()->setFocus();
+				n->setViewWidgetFocus();
 			}
 		}
 		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsSide) {
 			m_focusInfo.lastSide = n;
 			if (!(m_config & IgnoreInputFocusOnViewInsert && m_state & InsertViewState) && m_config & InputFocusSideViewOnFocusChange) {
-				n->getViewWidget()->setFocus();
+				n->setViewWidgetFocus();
 			}
 		}
 		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsTool) {
 			m_focusInfo.lastTool = n;
 			if (!(m_config & IgnoreInputFocusOnViewInsert && m_state & InsertViewState) && m_config & InputFocusToolViewOnFocusChange) {
-				n->getViewWidget()->setFocus();
+				n->setViewWidgetFocus();
 			}
 		}
 		Q_EMIT viewFocusChanged(n, o);

@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/OTAssert.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/WidgetViewManager.h"
 
@@ -49,6 +50,11 @@ ot::WidgetView::~WidgetView() {
 QAction* ot::WidgetView::getViewToggleAction(void) const {
 	if (!m_dockWidget) return nullptr;
 	else return m_dockWidget->toggleViewAction();
+}
+
+void ot::WidgetView::setViewWidgetFocus(void) {
+	OTAssertNullptr(this->getViewWidget());
+	this->getViewWidget()->setFocus();
 }
 
 void ot::WidgetView::setViewData(const WidgetViewBase& _data) {
