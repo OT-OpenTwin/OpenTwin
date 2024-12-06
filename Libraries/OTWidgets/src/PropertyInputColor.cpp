@@ -17,6 +17,7 @@ ot::PropertyInputColor::PropertyInputColor()
 {
 	m_colorBtn = new ColorPickButton;
 	m_colorBtn->getQWidget()->setContentsMargins(0, 0, 0, 0);
+	m_colorBtn->getPushButton()->setObjectName("OT_PropertyInputColor_Button");
 	this->connect(m_colorBtn, &ColorPickButton::colorChanged, this, qOverload<>(&PropertyInput::slotValueChanged));
 }
 

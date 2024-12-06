@@ -2270,6 +2270,24 @@ QCheckBox#LogInDialogSavePassword::indicator:indeterminate:pressed {
     border: 1px solid rgba(70,70,70,255);
 }
 
+#OT_PropertyInputColor_Button {
+    background-color: rgba(30,30,30,255);
+    color: rgba(255,255,255,255);
+    border: 1px solid rgba(70,70,70,255);
+}
+
+#OT_PropertyInputColor_Button:hover:!pressed {
+    background-color: rgba(30,30,30,255);
+    color: rgba(255,255,255,255);
+    border: 1px solid rgba(0,215,255,255);
+}
+
+#OT_PropertyInputColor_Button:pressed {
+    background-color: rgba(30,30,30,255);
+    color: rgba(255,255,255,255);
+    border: 1px solid rgba(0,255,0,255);
+}
+
 /* ##################################################################################### */
 
 /* TabToolBar */

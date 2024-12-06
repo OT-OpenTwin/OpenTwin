@@ -2264,6 +2264,24 @@ QCheckBox#LogInDialogSavePassword::indicator:indeterminate:pressed {
     border: 1px solid %color:Border Color%;
 }
 
+#OT_PropertyInputColor_Button {
+    background-color: %color:Widget Background%;
+    color: %color:Widget Foreground%;
+    border: 1px solid %color:Border Color%;
+}
+
+#OT_PropertyInputColor_Button:hover:!pressed {
+    background-color: %color:Widget Background%;
+    color: %color:Widget Foreground%;
+    border: 1px solid %color:Border Hover Color%;
+}
+
+#OT_PropertyInputColor_Button:pressed {
+    background-color: %color:Widget Background%;
+    color: %color:Widget Foreground%;
+    border: 1px solid %color:Border Selection Color%;
+}
+
 /* ##################################################################################### */
 
 /* TabToolBar */
