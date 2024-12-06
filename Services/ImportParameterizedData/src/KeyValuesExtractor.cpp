@@ -13,25 +13,42 @@ void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssembly
 	{
 		const std::string& tableName = tableByName.first;
 		const std::shared_ptr<IVisualisationTable> table = tableByName.second;
+
+		ot::GenericDataStructMatrix tableContent =	table->getTable();
+
 		
 		//Sort out all ranges associated with the this table
 		std::list<std::shared_ptr<EntityTableSelectedRanges>> relevantSelections;
 		auto& allRanges = _assemblyData.m_allSelectionRanges;
+		bool allRangesAreValid = true;
+		std::string defectRanges("");
 		for (const auto& range : allRanges)
 		{
 			if (range->getTableName() == tableName)
 			{
 				relevantSelections.push_back(range);
+				bool rangeIsValid =	isRangeWithinTableDimensions(range,tableContent);
+				allRangesAreValid &= rangeIsValid;
+				if (rangeIsValid)
+				{
+					defectRanges += range->getName() + ", ";
+				}
 			}
 		}
 		
+		if (!allRangesAreValid)
+		{
+			const std::string message = defectRanges.substr(defectRanges.size() - 2);
+			throw std::exception(message.c_str());
+		}
+
 		//Extract content that is refered by the ranges
 		std::map<std::string, std::map<std::uint32_t, ot::Variable>> allFieldsSorted;
 		std::map<std::string, std::string> rangeTypesByRangeNames;
 
 		for (const auto& range : relevantSelections)
 		{
-			const std::vector<std::string> fieldKeys = extractFieldsFromRange(range, table, allFieldsSorted);
+			const std::vector<std::string> fieldKeys = extractFieldsFromRange(range, tableContent, allFieldsSorted);
 			const std::string& type = range->getSelectedType();
 			
 			for (const std::string fieldKey : fieldKeys)
@@ -71,7 +88,34 @@ uint64_t KeyValuesExtractor::getNumberOfFields() const
 	return m_fields.size();
 }
 
-std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> _range, std::shared_ptr<IVisualisationTable> _table, std::map<std::string, std::map<std::uint32_t, ot::Variable>>& _outAllSortedFields)
+bool KeyValuesExtractor::isRangeWithinTableDimensions(std::shared_ptr<EntityTableSelectedRanges> _range, const ot::GenericDataStructMatrix& _tableData)
+{
+	int32_t maxColumns = static_cast<int32_t>(_tableData.getNumberOfColumns());
+	int32_t maxRows = static_cast<int32_t>(_tableData.getNumberOfRows());
+
+	ot::TableRange userRange =	_range->getSelectedRange();
+	ot::TableRange matrixRange = ot::TableIndexSchemata::userRangeToMatrixRange(userRange, _range->getTableHeaderMode());
+
+	bool rowsAreValid = matrixRange.getTopRow() >= 0 &&
+		matrixRange.getBottomRow() < maxRows;
+	
+	bool columnsAreValid = matrixRange.getLeftColumn() >= 0 &&
+		matrixRange.getRightColumn() < maxColumns;
+
+	bool selectionIsValid = true;
+	if (!_range->getSelectEntireRow())
+	{
+		selectionIsValid &= columnsAreValid;
+	}
+	if (!_range->getSelectEntireColumn())
+	{
+		selectionIsValid &= rowsAreValid;
+	}
+	
+	return selectionIsValid;
+}
+
+std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> _range, const ot::GenericDataStructMatrix& _tableData, std::map<std::string, std::map<std::uint32_t, ot::Variable>>& _outAllSortedFields)
 {
 	std::vector<std::string> fieldKey;
 	
@@ -81,12 +125,41 @@ std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_
 	
 	std::map<std::string, std::map<std::uint32_t,std::string>> extractedField;
 
-	uint32_t minColumn = static_cast<uint32_t>(matrixRange.getLeftColumn());
-	uint32_t maxColumn = static_cast<uint32_t>(matrixRange.getRightColumn());
-	uint32_t minRow = static_cast<uint32_t>(matrixRange.getTopRow());
-	uint32_t maxRow = static_cast<uint32_t>(matrixRange.getBottomRow());
+	//Setup the min/max values of the interation range, considering the property that allows to select an entire row/column
+	uint32_t minColumn(-1), maxColumn(-1), minRow(-1), maxRow(-1), minColumnOfTableContent(0), minRowOfTableContent(0);
+	if (_range->getTableHeaderMode() == ot::TableCfg::TableHeaderMode::Horizontal)
+	{
+		minRowOfTableContent = 1;
+	}
+	if (_range->getTableHeaderMode() == ot::TableCfg::TableHeaderMode::Vertical)
+	{
+		minColumnOfTableContent = 1;
+	}
 
-	const ot::GenericDataStructMatrix tableData = _table->getTable();
+	if (_range->getSelectEntireColumn())
+	{
+		minRow = minRowOfTableContent;
+		maxRow = _tableData.getNumberOfRows() - 1;
+	}
+	else
+	{
+
+		minRow = static_cast<uint32_t>(matrixRange.getTopRow());
+		maxRow = static_cast<uint32_t>(matrixRange.getBottomRow());
+	}
+
+	if (_range->getSelectEntireRow())
+	{
+		minColumn = minColumnOfTableContent;
+		maxColumn = _tableData.getNumberOfColumns() - 1;
+	}
+	else
+	{
+
+		minColumn = static_cast<uint32_t>(matrixRange.getLeftColumn());
+		maxColumn = static_cast<uint32_t>(matrixRange.getRightColumn());
+	}
+
 
 	ot::MatrixEntryPointer matrixEntry;
 	if (_range->getTableHeaderMode() == ot::TableCfg::TableHeaderMode::Horizontal)
@@ -95,12 +168,12 @@ std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_
 		for (matrixEntry.m_column = minColumn; matrixEntry.m_column <= maxColumn; matrixEntry.m_column++)
 		{
 			matrixEntry.m_row = 0;
-			const ot::Variable& entry = tableData.getValue(matrixEntry);
+			const ot::Variable& entry = _tableData.getValue(matrixEntry);
 			assert(entry.isConstCharPtr());
 			fieldKey.push_back(entry.getConstCharPtr());
 			for (matrixEntry.m_row = minRow; matrixEntry.m_row <= maxRow; matrixEntry.m_row++)
 			{
-				const ot::Variable& entry = tableData.getValue(matrixEntry);
+				const ot::Variable& entry = _tableData.getValue(matrixEntry);
 				_outAllSortedFields[fieldKey.back()].insert({matrixEntry.m_row, entry});
 			}
 		}
@@ -111,12 +184,12 @@ std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_
 		for (matrixEntry.m_row = minRow; matrixEntry.m_row <= maxRow; matrixEntry.m_row++)
 		{
 			matrixEntry.m_column = 0;
-			const ot::Variable& entry = tableData.getValue(matrixEntry);
+			const ot::Variable& entry = _tableData.getValue(matrixEntry);
 			assert(entry.isConstCharPtr());
 			fieldKey.push_back(entry.getConstCharPtr());
 			for (matrixEntry.m_column = minColumn; matrixEntry.m_column <= maxColumn; matrixEntry.m_column++)
 			{
-				const ot::Variable& value = tableData.getValue(matrixEntry);
+				const ot::Variable& value = _tableData.getValue(matrixEntry);
 				_outAllSortedFields[fieldKey.back()].insert({ matrixEntry.m_column, value});
 			}
 		}

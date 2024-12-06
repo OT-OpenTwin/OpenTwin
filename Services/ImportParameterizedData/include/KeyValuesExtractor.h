@@ -30,10 +30,12 @@ public:
 
 private:
 
+	bool isRangeWithinTableDimensions(std::shared_ptr<EntityTableSelectedRanges> _range, const ot::GenericDataStructMatrix& _tableData);
+
 	//! @brief Extracts the selected ranges from the table. All cell values are string values. 
 	//! They are sorted by a key value, which is the corresponding value in either the first row or collumn of the table.range 
 	//! Each is contained in a map with its index (row or column) as key. 
-	std::vector<std::string> extractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> _range, std::shared_ptr<IVisualisationTable> _table, std::map<std::string, std::map<std::uint32_t, ot::Variable>>& _outAllSortedFields);
+	std::vector<std::string> extractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> _range, const ot::GenericDataStructMatrix& _tableData, std::map<std::string, std::map<std::uint32_t, ot::Variable>>& _outAllSortedFields);
 
 	//! @brief Empties allFields and adds its content after casting the values to the corresponding member attribute.
 	//! @return true, if all conversions were possible. False, if a conversion failed
