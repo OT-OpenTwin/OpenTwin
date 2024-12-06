@@ -3815,6 +3815,11 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 	ot::TableCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
+	AppBase::ViewHandlingFlags viewHandlingFlags = AppBase::instance()->getViewHandlingConfigFlags();
+	if (keepCurrentEntitySelection) {
+		AppBase::instance()->setViewHandlingConfigFlags(viewHandlingFlags & (~AppBase::ViewHandlingConfig::SkipEntitySelection));
+	}
+
 	ot::TableView* table = AppBase::instance()->findTable(config.getEntityName());
 	if (table == nullptr) {
 		table = AppBase::instance()->createNewTable(config, info, insertFlags);
@@ -3827,6 +3832,8 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 		table->setContentChanged(false);
 	}
 	
+	AppBase::instance()->setViewHandlingConfigFlags(viewHandlingFlags);
+
 	const std::string& name = table->getViewData().getEntityName();
 	const auto& viewerType = table->getViewData().getViewType();
 	ot::UID globalActiveViewModel = -1;

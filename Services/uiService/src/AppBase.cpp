@@ -2162,6 +2162,10 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 		if (_focusedView->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
 			m_viewerComponent->viewerTabChanged(_focusedView->getViewData().getEntityName(), _focusedView->getViewData().getViewType());
 
+			if (m_viewHandling & ViewHandlingConfig::SkipEntitySelection) {
+				return;
+			}
+
 			ak::aTreeWidgetItem* itemToSelect = m_projectNavigation->itemFromPath(QString::fromStdString(_focusedView->getViewData().getEntityName()), '/');
 
 			// Change item selection according to focused view

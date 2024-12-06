@@ -87,6 +87,11 @@ struct structModelViewInfo
 class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier, ot::AbstractLogNotifier, ot::MessageBoxHandler {
 	Q_OBJECT
 public:
+	enum class ViewHandlingConfig : uint32_t {
+		NoConfig            = 0 << 0, //! \brief Default view handling.
+		SkipEntitySelection = 1 << 0  //! \brief Entity selection will not be performed on view focus changes
+	};
+	typedef ot::Flags<ViewHandlingConfig> ViewHandlingFlags;
 	
 	//! @brief Deconstructor
 	virtual ~AppBase();
@@ -256,6 +261,10 @@ public:
 
 	void SetCollectionName(const std::string _collectionName);
 	void startSessionRefreshTimer(void);
+
+	void setViewHandlingConfigFlag(ViewHandlingConfig _flag, bool _active = true) { m_viewHandling.setFlag(_flag, _active); };
+	void setViewHandlingConfigFlags(const ViewHandlingFlags& _flags) { m_viewHandling = _flags; };
+	const ViewHandlingFlags& getViewHandlingConfigFlags(void) const { return m_viewHandling; };
 
 	// ############################################################################################
 
@@ -556,6 +565,7 @@ private:
 	void cleanupWidgetViewInfo(ot::WidgetView* _view);
 
 	AppStateFlags               m_state;
+	ViewHandlingFlags           m_viewHandling;
 
 	std::string					m_uiServiceURL;
 	int							m_siteID;
@@ -622,4 +632,4 @@ private:
 	OT_ADD_PRIVATE_FLAG_FUNCTIONS(AppBase::AppState)
 };
 
-
+OT_ADD_FLAG_FUNCTIONS(AppBase::ViewHandlingConfig)
