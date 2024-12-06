@@ -363,6 +363,10 @@ void ViewerComponent::displayText(const std::string &text)
 	AppBase::instance()->appendInfoMessage(QString::fromStdString(text));
 }
 
+void ViewerComponent::setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
+	AppBase::instance()->setCurrentVisualizationTabFromEntityName(_entityName, _viewType);
+}
+
 void ViewerComponent::setCurrentVisualizationTabFromTitle(const std::string & _tabTitle) {
 	AppBase::instance()->setCurrentVisualizationTabFromTitle(_tabTitle);
 }

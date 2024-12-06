@@ -234,6 +234,7 @@ public:
 		const std::string &				_projectName
 	);
 
+	void setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType);
 	void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle);
 	std::string getCurrentVisualizationTabTitle(void);
 

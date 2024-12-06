@@ -1070,7 +1070,11 @@ ViewerUIDtype AppBase::createView(
 	return viewID;
 }
 
-void AppBase::setCurrentVisualizationTabFromTitle(const std::string & _tabTitle) {
+void AppBase::setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
+
+}
+
+void AppBase::setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) {
 	ot::WidgetViewManager::instance().setCurrentViewFromTitle(_tabTitle);
 }
 

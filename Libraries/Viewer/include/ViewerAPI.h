@@ -63,8 +63,9 @@ namespace ViewerAPI
 
 		virtual void displayText(const std::string &text) { };
 
-		virtual void setCurrentVisualizationTabFromTitle(const std::string & _tabTitle) {}
-		virtual std::string getCurrentVisualizationTabTitle(void) { return ""; }
+		virtual void setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {};
+		virtual void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) {};
+		virtual std::string getCurrentVisualizationTabTitle(void) { return ""; };
 
 		virtual void enableDisableControls(const ot::UIDList& _enabledControls, const ot::UIDList& _disabledControls) {};
 

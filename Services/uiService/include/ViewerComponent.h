@@ -72,6 +72,7 @@ public:
 
 	virtual void displayText(const std::string &text) override;
 
+	virtual void setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) override;
 	virtual void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) override;
 	virtual std::string getCurrentVisualizationTabTitle(void) override;
 
