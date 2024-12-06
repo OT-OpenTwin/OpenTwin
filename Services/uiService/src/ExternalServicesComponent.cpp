@@ -3806,6 +3806,11 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 		overrideCurrentContent = ot::json::getBool(_document, OT_ACTION_PARAM_OverwriteContent);
 	}
 	
+	bool keepCurrentEntitySelection = false;
+	if (_document.HasMember(OT_ACTION_PARAM_KeepCurrentEntitySelection)) {
+		keepCurrentEntitySelection = ot::json::getBool(_document, OT_ACTION_PARAM_KeepCurrentEntitySelection);
+	}
+
 	ot::TableCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
