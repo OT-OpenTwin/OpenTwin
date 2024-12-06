@@ -774,6 +774,7 @@ void AppBase::createUi(void) {
 			defaultView->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::Default, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsCentral));
 			defaultView->setViewIsPermanent(true);
 			defaultView->setPlainText(BUILD_INFO);
+			defaultView->setReadOnly(true);
 			defaultView->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
 
 			m_output = new ot::PlainTextEditView;
@@ -856,8 +857,11 @@ void AppBase::createUi(void) {
 			
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_graphicsPicker);
 
-			ot::WidgetViewManager::instance().setUseFocusInfo(true);
-			ot::WidgetViewManager::instance().setConfigFlags(ot::WidgetViewManager::FocusCentralViewOnFocus | ot::WidgetViewManager::IgnoreFocusOnViewInsert);
+			ot::WidgetViewManager::instance().setConfigFlags(
+				ot::WidgetViewManager::InputFocusCentralViewOnFocusChange |
+				ot::WidgetViewManager::IgnoreInputFocusOnViewInsert |
+				ot::WidgetViewManager::UseBestAreaFinderOnViewInsert
+			);
 
 			m_projectNavigation->setAsCurrentViewTab();
 
@@ -1000,7 +1004,7 @@ ViewerUIDtype AppBase::createView(
 	QString textBlock = availableTabText("BlockDiagram");
 	QString textTable = availableTabText("Table");
 
-	ot::WidgetViewManager::instance().setUseFocusInfo(false);
+	ot::WidgetViewManager::instance().setConfigFlag(ot::WidgetViewManager::UseBestAreaFinderOnViewInsert, false);
 
 	if (getVisible3D())
 	{
@@ -1040,7 +1044,7 @@ ViewerUIDtype AppBase::createView(
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_versionGraph);
 	}
 	
-	ot::WidgetViewManager::instance().setUseFocusInfo(true);
+	ot::WidgetViewManager::instance().setConfigFlag(ot::WidgetViewManager::UseBestAreaFinderOnViewInsert, true);
 
 	m_graphicsPicker->pickerWidget()->setVisible(getVisibleBlockPicker());
 
@@ -1071,7 +1075,7 @@ ViewerUIDtype AppBase::createView(
 }
 
 void AppBase::setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType) {
-
+	ot::WidgetViewManager::instance().setCurrentView(_entityName, _viewType);
 }
 
 void AppBase::setCurrentVisualizationTabFromTitle(const std::string& _tabTitle) {

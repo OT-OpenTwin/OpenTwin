@@ -516,7 +516,11 @@ AppBase::AppBase(QApplication* _app)
 
 	ot::WidgetViewManager::instance().addView(ot::BasicServiceInformation(), defaultView);
 	ot::WidgetViewManager::instance().addView(ot::BasicServiceInformation(), m_output);
-	ot::WidgetViewManager::instance().setUseFocusInfo(true);
+
+	ot::WidgetViewManager::instance().setConfigFlags(
+		ot::WidgetViewManager::InputFocusCentralViewOnFocusChange |
+		ot::WidgetViewManager::UseBestAreaFinderOnViewInsert
+	);
 
 	// Setup global shortcuts
 	m_recenterShortcut = new QShortcut(QKeySequence("F11"), this, nullptr, nullptr, Qt::WindowShortcut);

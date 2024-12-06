@@ -43,12 +43,26 @@ namespace ot {
 		typedef std::list<ViewNameTypeListEntry> ViewNameTypeList;
 		typedef std::pair<BasicServiceInformation, ot::WidgetView*> ViewEntry;
 
-		enum ManagerConfigFlag {
-			NoFlags                 = 0 << 0, //! \brief No manager flags.
-			FocusCentralViewOnFocus = 1 << 0, //! \brief Central views will get widget input focus when their view tab was focused.
-			FocusSideViewOnFocus    = 1 << 1, //! \brief Side views will get widget input focus when their view tab was focused.
-			FocusToolViewOnFocus    = 1 << 2, //! \brief Tool views will get widget input focus when their view tab was focused.
-			IgnoreFocusOnViewInsert = 1 << 3 //! \brief View widgets won't get input focus when a view is added.
+		enum ManagerConfigFlag : uint32_t {
+			NoFlags                            = 0 << 0, //! \brief No manager flags.
+			InputFocusCentralViewOnFocusChange = 1 << 0, //! \brief Central views will get widget input focus when their view tab was focused.
+			InputFocusSideViewOnFocusChange    = 1 << 1, //! \brief Side views will get widget input focus when their view tab was focused.
+			InputFocusToolViewOnFocusChange    = 1 << 2, //! \brief Tool views will get widget input focus when their view tab was focused.
+			IgnoreInputFocusOnViewInsert       = 1 << 3, //! \brief View widgets won't get input focus when a view is added.
+
+			//! \brief Same as setting InputFocusCentralViewOnFocusChange | InputFocusSideViewOnFocusChange | InputFocusToolViewOnFocusChange
+			InputFocusOnAnyViewFocusChange     = InputFocusCentralViewOnFocusChange | InputFocusSideViewOnFocusChange | InputFocusToolViewOnFocusChange,
+
+			//! \brief Mask used to unset any input focus on focus changed.
+			InputFocusOnFocusChangeMask        = ~InputFocusOnAnyViewFocusChange,
+
+
+			//! \brief If enabled the manager will try to determine the best parent dock when inserting a new view.
+			//! The last focused view of the same category will be used as the main source for the parent dock area. <br>
+			//! If no view of the same category was ever focused the "oldest" view of the same category will be used. <br>
+			//! If there does not exist any view in the same category the next higher category will be checked (Tool < Side < Central).
+			UseBestAreaFinderOnViewInsert      = 1 << 4
+			
 		};
 		typedef Flags<ManagerConfigFlag> ManagerConfigFlags;
 
@@ -116,9 +130,6 @@ namespace ot {
 		//! The caller takes ownership of the view.
 		//! @param _entityName Widget view name.
 		WidgetView* forgetView(const std::string& _entityName, WidgetViewBase::ViewType _type);
-
-		//! @brief If enabled the manager will use the last focused views to determine the best dock area.
-		void setUseFocusInfo(bool _use) { m_useFocusInfo = _use; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -191,7 +202,7 @@ namespace ot {
 	private:
 		enum ManagerState {
 			DefaultState    = 0 << 0, //! \brief Default manager state.
-			InsertViewState = 1 << 0, //! \brief View insert in progress.
+			InsertViewState = 1 << 0 //! \brief View insert in progress.
 		};
 		typedef Flags<ManagerState> ManagerStateFlags;
 
@@ -228,8 +239,7 @@ namespace ot {
 		ManagerConfigFlags m_config;
 
 		FocusInfo        m_focusInfo;
-		bool             m_useFocusInfo;
-
+		
 		std::map<BasicServiceInformation, ViewNameTypeList*> m_viewOwnerMap; //! @brief Maps owners to widget view names and types
 		std::list<ViewEntry> m_views; //! @brief Contains all views and their owners.
 

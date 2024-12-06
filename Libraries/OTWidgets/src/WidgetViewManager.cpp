@@ -339,19 +339,19 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CD
 		m_focusInfo.last = n;
 		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsCentral) {
 			m_focusInfo.lastCentral = n;
-			if (!(m_config & IgnoreFocusOnViewInsert && m_state & InsertViewState) && m_config & FocusCentralViewOnFocus) {
+			if (!(m_config & IgnoreInputFocusOnViewInsert && m_state & InsertViewState) && m_config & InputFocusCentralViewOnFocusChange) {
 				n->getViewWidget()->setFocus();
 			}
 		}
 		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsSide) {
 			m_focusInfo.lastSide = n;
-			if (!(m_config & IgnoreFocusOnViewInsert && m_state & InsertViewState) && m_config & FocusSideViewOnFocus) {
+			if (!(m_config & IgnoreInputFocusOnViewInsert && m_state & InsertViewState) && m_config & InputFocusSideViewOnFocusChange) {
 				n->getViewWidget()->setFocus();
 			}
 		}
 		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsTool) {
 			m_focusInfo.lastTool = n;
-			if (!(m_config & IgnoreFocusOnViewInsert && m_state & InsertViewState) && m_config & FocusToolViewOnFocus) {
+			if (!(m_config & IgnoreInputFocusOnViewInsert && m_state & InsertViewState) && m_config & InputFocusToolViewOnFocusChange) {
 				n->getViewWidget()->setFocus();
 			}
 		}
@@ -390,7 +390,7 @@ void ot::WidgetViewManager::slotUpdateViewVisibility(void) {
 // Private
 
 ot::WidgetViewManager::WidgetViewManager()
-	: m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_useFocusInfo(false), m_config(NoFlags), m_state(DefaultState)
+	: m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_config(NoFlags), m_state(DefaultState)
 {
 	m_focusInfo.last = nullptr;
 	m_focusInfo.lastSide = nullptr;
@@ -450,7 +450,7 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 
 	// Determine 
 	ads::CDockAreaWidget* area = nullptr;
-	if (m_useFocusInfo) {
+	if (m_config & UseBestAreaFinderOnViewInsert) {
 		area = this->getBestDockArea(_view);
 	}
 
