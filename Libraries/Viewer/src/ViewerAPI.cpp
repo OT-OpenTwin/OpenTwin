@@ -10,6 +10,7 @@
 #include "EntityBase.h"
 #include "Factory.h"
 
+#include "OTCore/Logger.h"
 #include "OTCore/VariableToStringConverter.h"
 
 ot::UID modelCount = 0;
@@ -742,9 +743,7 @@ void ViewerAPI::createRubberband(ot::UID _viewerID, ot::serviceID_t _senderId, s
 
 	Rubberband * rubberband = viewer->second->getRubberband();
 	if (rubberband) {
-		std::string msg{ "[VIEW] [WARNING] A rubberband is already active. Created by service: " };
-		msg.append(std::to_string(rubberband->creator())).append("\n");
-		globalNotifier->displayText(msg);
+		OT_LOG_W("A rubberband is already active. Created by service: " + std::to_string(rubberband->creator()));
 		return;
 	}
 
