@@ -49,8 +49,8 @@ void ot::WidgetViewManager::initialize(WidgetViewDockManager* _dockManager) {
 
 // View Management
 
-bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags) {
-	return this->addViewImpl(_owner, _view, _insertFlags);
+bool ot::WidgetViewManager::addView(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags, WidgetView* _parentView) {
+	return this->addViewImpl(_owner, _view, _insertFlags, _parentView);
 }
 
 ot::WidgetView* ot::WidgetViewManager::findView(const std::string& _entityName, WidgetViewBase::ViewType _type) const {
@@ -416,7 +416,7 @@ ot::WidgetView* ot::WidgetViewManager::findView(const ViewNameTypeListEntry& _en
 	return nullptr;
 }
 
-bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags) {
+bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags, WidgetView* _parentView) {
 	OTAssertNullptr(m_dockManager);
 	OTAssertNullptr(_view);
 	// Ensure view does not exist
@@ -448,9 +448,12 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 
 	_view->getViewDockWidget()->setWindowIcon(ot::IconManager::getApplicationIcon());
 
-	// Determine 
+	// Determine parent area
 	ads::CDockAreaWidget* area = nullptr;
-	if (m_config & UseBestAreaFinderOnViewInsert) {
+	if (_parentView) {
+		area = _parentView->getViewDockWidget()->dockAreaWidget();
+	}
+	else if (m_config & UseBestAreaFinderOnViewInsert) {
 		area = this->getBestDockArea(_view);
 	}
 

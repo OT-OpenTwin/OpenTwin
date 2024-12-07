@@ -1004,8 +1004,6 @@ ViewerUIDtype AppBase::createView(
 	QString textBlock = availableTabText("BlockDiagram");
 	QString textTable = availableTabText("Table");
 
-	ot::WidgetViewManager::instance().setConfigFlag(ot::WidgetViewManager::UseBestAreaFinderOnViewInsert, false);
-
 	if (getVisible3D())
 	{
 		ot::WidgetView* wv = m_viewerComponent->getViewerWidget(viewID);
@@ -1021,7 +1019,7 @@ ViewerUIDtype AppBase::createView(
 	{
 		ot::WidgetView* wv = m_viewerComponent->getPlotWidget(viewID);
 		wv->setViewData(ot::WidgetViewBase(text1D.toStdString(), text1D.toStdString(), ot::WidgetViewBase::View1D, ot::WidgetViewBase::ViewIsCentral));
-		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv);
+		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), wv, ot::WidgetView::KeepCurrentFocus);
 	}
 	else
 	{
@@ -1041,11 +1039,9 @@ ViewerUIDtype AppBase::createView(
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivatRequest, this, &AppBase::slotRequestVersion);
-		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_versionGraph);
+		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_versionGraph, ot::WidgetView::KeepCurrentFocus, m_output);
 	}
 	
-	ot::WidgetViewManager::instance().setConfigFlag(ot::WidgetViewManager::UseBestAreaFinderOnViewInsert, true);
-
 	m_graphicsPicker->pickerWidget()->setVisible(getVisibleBlockPicker());
 
 	// #######################################################################

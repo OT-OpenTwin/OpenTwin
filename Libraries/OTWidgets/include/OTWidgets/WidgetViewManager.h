@@ -84,7 +84,7 @@ namespace ot {
 		//! @param _owner Widget view owner.
 		//! @param _view Widget view to add.
 		//! \param _insertArea The relative area to add the view.
-		bool addView(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags = WidgetView::InsertFlags(WidgetView::NoInsertFlags));
+		bool addView(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags = WidgetView::InsertFlags(WidgetView::NoInsertFlags), WidgetView* _parentView = (WidgetView*)nullptr);
 
 		//! @brief Returns the widget view with the specified name.
 		//! If the view does not exists return 0.
@@ -224,7 +224,7 @@ namespace ot {
 		//! The view's dock widget will get the IconManager::getApplicationIcon() set.
 		//! \param _parentArea The target area to add the view to.
 		//! \param _insertArea The relative area to add the view.
-		bool addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags);
+		bool addViewImpl(const BasicServiceInformation& _owner, WidgetView* _view, const WidgetView::InsertFlags& _insertFlags, WidgetView* _parentView);
 
 		ads::CDockAreaWidget* getBestDockArea(const WidgetView* _view) const;
 		ads::CDockAreaWidget* getFirstMatchingView(WidgetViewBase::ViewFlag _viewTypeFlag) const;
