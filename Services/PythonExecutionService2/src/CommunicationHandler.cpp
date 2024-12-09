@@ -4,6 +4,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"
 
 // Qt header
@@ -42,8 +43,16 @@ void CommunicationHandler::slotMessageReceived(void) {
 	
 	// Check state
 	if (m_clientState == ClientState::WaitForPing) {
-		if (message != OT_ACTION_CMD_Ping) {
-			OT_LOG_E("Invalid client ping response");
+		ot::JsonDocument responseDoc;
+		if (!responseDoc.fromJson(message)) {
+			OT_LOG_E("Invalid client ping response: \"" + message + "\"");
+			m_client->disconnect();
+			return;
+		}
+		ot::ReturnMessage msg;
+		msg.setFromJsonObject(responseDoc.GetConstObject());
+		if (msg.getStatus() != ot::ReturnMessage::Ok || msg.getWhat() != OT_ACTION_CMD_Ping) {
+			OT_LOG_E("Invalid client ping response: \"" + message + "\"");
 			m_client->disconnect();
 			return;
 		}
