@@ -259,14 +259,17 @@ void TabledataToResultdataHandler::extractRMDAndAllMSMD(std::map<std::string, Me
 	}
 	
 	//If the rmd has no selection, we still require a corresponding entry in the output.
-	if(!rmdHasSelections)
-	{
+	if (!rmdHasSelections) {
+		if (_allRangeEntities.empty()) {
+			OT_LOG_W("No entities selected.");
+			return;
+		}
 		auto firstSelectionRange = *_allRangeEntities.begin();
 		const std::string fullName = firstSelectionRange->getName();
 		size_t secondDelimiter = fullName.find("/", fullName.find_first_of("/") + 1);
-		std::string rmdAssemblyName = fullName.substr(0,secondDelimiter);
-
+		std::string rmdAssemblyName = fullName.substr(0, secondDelimiter);
 		_allMetadataAssembliesByName[rmdAssemblyName].m_dataCategory = EntityParameterizedDataCategorization::DataCategorie::researchMetadata;
+
 	}
 }
 
