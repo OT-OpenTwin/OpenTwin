@@ -1159,7 +1159,7 @@ void Application::preShutdown(void) {
 		return;
 	}
 
-	m_model->projectSave("", false);
+	//m_model->projectSave("", false);
 
 	// Here we disconnect all viewers, but leave them alone
 	m_model->detachAllViewer();
