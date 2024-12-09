@@ -53,7 +53,12 @@ public:
 	virtual void setVisible(bool v) { visible = v; };
 
 	bool isSelected(void) { return selected; };
-	virtual void setSelected(bool s) { selected = s; };
+	virtual void setSelected(bool _selected, bool _selectionFromNavigationTree) 
+	{ 
+		selected = _selected; 
+
+	};
+	
 
 	bool isTransparent(void) { return transparent; };
 	virtual void setTransparent(bool t) { transparent = t; };
@@ -109,6 +114,7 @@ private:
 	bool			   editable;
 	bool               visible;
 	bool               selected;
+	bool               m_selectionFromNavigationTree;
 	bool               transparent;
 	bool               wireframe;
 	bool			   highlighted;

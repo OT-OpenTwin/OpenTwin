@@ -996,7 +996,7 @@ SceneNodeBase *Model::getParentNode(const std::string &treeName)
 
 void Model::resetSelection(SceneNodeBase *root)
 {
-	root->setSelected(false);
+	root->setSelected(false, false);
 
 	for (auto child : root->getChildren())
 	{
@@ -1061,7 +1061,7 @@ void Model::setSelectedTreeItems(const std::list<ot::UID>& _selectedTreeItems, s
 			isItem3DSelected |= sceneNode->isItem3D();
 
 			assert(sceneNode != nullptr);
-			sceneNode->setSelected(true);
+			sceneNode->setSelected(true,_selectionFromTree);
 			_selectedModelItems.push_back(sceneNode->getModelEntityID());
 
 			if (sceneNode->isVisible()) {

@@ -22,7 +22,7 @@ public:
 
 	void setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
 
-	virtual void setSelected(bool _selection) override;
+	virtual void setSelected(bool _selection, bool _selectionFromNavigationTree) override;
 
 	void setStorage(const std::string& _projectName) { projectName = _projectName; }
 

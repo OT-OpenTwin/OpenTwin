@@ -65,7 +65,7 @@ void SceneNodeMultiVisualisation::setViewChange(const ot::ViewChangedStates& _st
 	}
 }
 
-void SceneNodeMultiVisualisation::setSelected(bool _selection)
+void SceneNodeMultiVisualisation::setSelected(bool _selection, bool _selectionFromNavigationTree)
 {
 	if (getModel() != nullptr)
 	{
@@ -74,13 +74,14 @@ void SceneNodeMultiVisualisation::setSelected(bool _selection)
 			const std::list<Visualiser*> visualisers = getVisualiser();
 			for (Visualiser* visualiser : visualisers)
 			{
-				if (visualiser->isVisible() && !visualiser->viewIsCurrentlyOpen())
+				if (visualiser->isVisible() && !visualiser->viewIsCurrentlyOpen() && _selectionFromNavigationTree)
 				{
 					visualiser->visualise();
 				}
+
 			}
 		}
 	}
 
-	SceneNodeBase::setSelected(_selection);
+	SceneNodeBase::setSelected(_selection, _selectionFromNavigationTree);
 }

@@ -399,9 +399,9 @@ void SceneNodeGeometry::setEdgeHighlight(unsigned long long faceId, bool h, doub
 	}
 }
 
-void SceneNodeGeometry::setSelected(bool selected)
+void SceneNodeGeometry::setSelected(bool selected, bool _selectionFromNavigationTree)
 {
-	SceneNodeBase::setSelected(selected);
+	SceneNodeBase::setSelected(selected, _selectionFromNavigationTree);
 
 	// Handle visibility state
 	if (showWhenSelected)
