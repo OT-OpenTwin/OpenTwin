@@ -282,9 +282,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="src\ActionHandler.cpp" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PortData.cpp" />
     <ClCompile Include="src\EntityBuffer.cpp" />
     <ClCompile Include="src\PortDataBuffer.cpp" />

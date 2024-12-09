@@ -39,9 +39,6 @@
     <ClCompile Include="src\PortData.cpp">
       <Filter>src\DataHandling</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Application.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -49,6 +46,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\PythonLoadedModules.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
