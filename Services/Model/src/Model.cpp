@@ -3850,7 +3850,10 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 		activeBranch.append(".1");
 	}
 
-	addNewVersionTreeStateAndActivate(previousModelVersion, activeBranch, ot::VersionGraphVersionCfg(currentModelVersion, "", comment));
+	if (currentModelVersion != previousModelVersion)  // In case no changed occurred, it may happen that the model state version did not change
+	{
+		addNewVersionTreeStateAndActivate(previousModelVersion, activeBranch, ot::VersionGraphVersionCfg(currentModelVersion, "", comment));
+	}
 
 	updateUndoRedoStatus();
 	resetModified();
