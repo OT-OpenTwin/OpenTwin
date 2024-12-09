@@ -2314,25 +2314,26 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 	std::string fileMask = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
 	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_FunctionName);
 	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
-	bool loadContent = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadContent);
-	bool loadMultiple = false;
-	try
-	{
-		if (_document.HasMember(OT_ACTION_PARAM_FILE_LoadContent))
-		{
-			loadMultiple = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadMultiple);
-		}
 
-		if (loadMultiple)
-		{
+	bool loadContent = false;
+	if (_document.HasMember(OT_ACTION_PARAM_FILE_LoadContent)) {
+		loadContent = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadContent);
+	}
+
+	bool loadMultiple = false;
+	if (_document.HasMember(OT_ACTION_PARAM_FILE_LoadMultiple)) {
+		loadMultiple = ot::json::getBool(_document, OT_ACTION_PARAM_FILE_LoadMultiple);
+	}
+
+	try {
+		if (loadMultiple) {
 			QStringList fileNames = QFileDialog::getOpenFileNames(
 				nullptr,
 				dialogTitle.c_str(),
 				QDir::currentPath(),
 				QString(fileMask.c_str()) + " ;; All files (*.*)");
 
-			if (!fileNames.isEmpty())
-			{
+			if (!fileNames.isEmpty()) {
 				ot::JsonDocument inDoc;
 				inDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteFunction, inDoc.GetAllocator()), inDoc.GetAllocator());
 				inDoc.AddMember(OT_ACTION_PARAM_MODEL_FunctionName, rapidjson::Value(subsequentFunction.c_str(), inDoc.GetAllocator()), inDoc.GetAllocator());
@@ -2357,8 +2358,7 @@ std::string ExternalServicesComponent::handleRequestFileForReading(ot::JsonDocum
 					}
 				}
 				inDoc.AddMember(OT_ACTION_PARAM_FILE_OriginalName, fileNamesJson, inDoc.GetAllocator());
-				if (loadContent)
-				{
+				if (loadContent) {
 					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content, fileContents, inDoc.GetAllocator());
 					inDoc.AddMember(OT_ACTION_PARAM_FILE_Content_UncompressedDataLength, uncompressedDataLengths, inDoc.GetAllocator());
 					inDoc.AddMember(OT_ACTION_PARAM_FILE_Mode, fileModes, inDoc.GetAllocator());
