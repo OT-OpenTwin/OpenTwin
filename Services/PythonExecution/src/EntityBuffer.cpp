@@ -107,27 +107,21 @@ void EntityBuffer::ensureTableToBeLoaded(const std::string& _absoluteEntityName)
 	}
 }
 
-void EntityBuffer::ensureValidRangeSelections(EntityBase* _entityBase)
-{
+void EntityBuffer::ensureValidRangeSelections(EntityBase* _entityBase) {
 	EntityTableSelectedRanges* range = dynamic_cast<EntityTableSelectedRanges*>(_entityBase);
-	if (range != nullptr)
-	{
+	if (range != nullptr) {
 		const std::string tableName = range->getTableName();
 		bool exists = true;
-		try
-		{
+		try {
 			ensureTableToBeLoaded(tableName);
 		}
-		catch (std::exception& e)
-		{
+		catch (...) {
 			exists = false;
 		}
-		if (!exists)
-		{
+		if (!exists) {
 			OT_LOG_E("Range selection \"" + range->getName() + "\" references a non existing table: "+ tableName);
 		}
-		else
-		{
+		else {
 
 			auto tableByName = m_bufferedTableEntities.find(tableName);
 			IVisualisationTable* table = tableByName->second;

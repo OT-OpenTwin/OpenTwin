@@ -22,6 +22,7 @@ private:
 	handlerMethod _noParameterCheck = [](ot::JsonDocument& doc) { return ot::ReturnMessage(ot::ReturnMessage::Ok, "No check performed."); };
 	PythonAPI _pythonAPI;
 
+	ot::ReturnMessage handlePing(ot::JsonDocument& _doc);
 	ot::ReturnMessage ShutdownProcess(ot::JsonDocument& doc);
 	ot::ReturnMessage ExecuteScript(ot::JsonDocument& doc);
 	ot::ReturnMessage ExecuteCommand(ot::JsonDocument& doc);

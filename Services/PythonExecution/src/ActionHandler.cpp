@@ -19,6 +19,9 @@ ActionHandler::ActionHandler()
 	_checkParameterFunctions[OT_ACTION_CMD_ServiceShutdown] = _noParameterCheck;
 	_handlingFunctions[OT_ACTION_CMD_ServiceShutdown] = std::bind(&ActionHandler::ShutdownProcess, this, arguments);
 
+	_checkParameterFunctions[OT_ACTION_CMD_Ping] = _noParameterCheck;
+	_handlingFunctions[OT_ACTION_CMD_Ping] = std::bind(&ActionHandler::handlePing, this, arguments);
+
 	_checkParameterFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Scripts] = std::bind(&ActionHandler::CheckParameterExecuteScript, this, arguments);
 	_handlingFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Scripts] = std::bind(&ActionHandler::ExecuteScript, this, arguments);
 
@@ -105,6 +108,10 @@ ot::ReturnMessage ActionHandler::Initialise(ot::JsonDocument& doc)
 	return returnMessage;
 }
 
+ot::ReturnMessage ActionHandler::handlePing(ot::JsonDocument& _doc) {
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, OT_ACTION_CMD_Ping);
+}
+
 ot::ReturnMessage ActionHandler::ShutdownProcess(ot::JsonDocument& doc)
 {
 	OT_LOG_D("Requested Shuttdown. Shutting down process now.");
@@ -129,8 +136,8 @@ ot::ReturnMessage ActionHandler::ExecuteScript(ot::JsonDocument& doc)
 		std::list<std::list<ot::Variable>> allParameter;
 
 		ot::JSONToVariableConverter converterJ2V;
-		size_t numberOfParameterArrays = parameterArrayArray.Size();
-		for (size_t i = 0; i < numberOfParameterArrays; i++)
+		ot::JsonSizeType numberOfParameterArrays = parameterArrayArray.Size();
+		for (ot::JsonSizeType i = 0; i < numberOfParameterArrays; i++)
 		{
 			if (parameterArrayArray[i].IsNull())
 			{
