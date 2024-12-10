@@ -96,15 +96,15 @@ bool Service::shutdown(void) {
 	return true;
 }
 
-void Service::incrStartCounter(void) { m_startCounter++; }
+void Service::incrStartCounter(void) {
+	m_startCounter++;
+}
 
-bool Service::checkAlive(void)
-{
+bool Service::checkAlive(void) {
 #if defined(OT_OS_WINDOWS)
 	// Checking the exit code of the service
 	DWORD exitCode = STILL_ACTIVE;
-	if (GetExitCodeProcess(m_processHandle, &exitCode))
-	{
+	if (GetExitCodeProcess(m_processHandle, &exitCode)) {
 		if (exitCode != STILL_ACTIVE) {
 			m_isAlive = false;
 			CloseHandle(m_processHandle);

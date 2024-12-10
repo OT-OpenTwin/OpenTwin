@@ -209,9 +209,6 @@ bool SessionService::runMandatoryServices(
 			OT_LOG_E("Failed to run service in debug mode (Name = \"" + s.getServiceName() + "\"; Type = \"" + s.getServiceType() + "\")");
 			return false;
 		}
-		else {
-			_session->addRequestedService(s.getServiceName(), s.getServiceType());
-		}
 	}
 
 	// Send release mode services to the GDS
