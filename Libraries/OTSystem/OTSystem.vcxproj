@@ -38,6 +38,9 @@
     <ClInclude Include="include\OTSystem\SystemTypes.h" />
     <ClInclude Include="include\OTSystem\UrlEncoding.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{5891ABB0-83B7-498C-8270-D8B689AA5CA8}</ProjectGuid>

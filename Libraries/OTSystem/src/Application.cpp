@@ -103,6 +103,17 @@ ot::app::RunResult ot::app::runApplication(const std::wstring& _applicationPath,
 
 	return result;
 }
+
+bool ot::app::isApplicationRunning(OT_PROCESS_HANDLE& _processHandle) {
+	DWORD exitCode;
+	if (GetExitCodeProcess(_processHandle, &exitCode)) {
+		return (exitCode == STILL_ACTIVE);
+	}
+	else {
+		return false;
+	}
+}
+
 #endif
 
 std::string ot::app::getCurrentExecutableDirectory(void) {

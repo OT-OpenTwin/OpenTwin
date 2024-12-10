@@ -45,6 +45,9 @@ namespace ot {
 		//! \param _waitForResponse If true, the function will wait until the process was successfully started.
 		OT_SYS_API_EXPORT RunResult runApplication(const std::wstring& _applicationPath, const std::wstring& _commandLine, OT_PROCESS_HANDLE& _processHandle, bool _waitForResponse = true, unsigned long _waitTimeout = OT_INFINITE_TIMEOUT);
 
+		//! @brief Returns true if the provided process is still alive.
+		OT_SYS_API_EXPORT bool isApplicationRunning(OT_PROCESS_HANDLE& _processHandle);
+
 		//! \brief Will return a string containing the current directory where the current executable is located at.
 		OT_SYS_API_EXPORT std::string getCurrentExecutableDirectory(void);
 
