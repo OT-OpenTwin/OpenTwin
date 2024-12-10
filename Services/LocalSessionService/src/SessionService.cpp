@@ -14,7 +14,6 @@
 #include "Service.h"
 #include "RelayService.h"
 #include "globalDatatypes.h"
-#include "GlobalMutex.h"
 #include "ServiceRunStarter.h"
 
 // Open Twin header
@@ -32,8 +31,6 @@
 #include <algorithm>
 
 static SessionService *		g_instance{ nullptr };
-
-void logMessage(const std::string &msg);
 
 size_t writeFunction(void *, size_t, size_t, std::string*);
 
@@ -1038,7 +1035,6 @@ std::string SessionService::handleSetGlobalLogFlags(ot::JsonDocument& _commandDo
 }
 
 void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, std::string _sessionId) {
-	OT_LSS_GLOBAL_LOCK
 	// Get service info
 	Session* theSession = getSession(_sessionId);
 	if (theSession == nullptr) {

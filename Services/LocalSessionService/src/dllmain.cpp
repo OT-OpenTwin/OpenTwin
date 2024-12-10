@@ -18,7 +18,6 @@
 // SessionService header
 #include "globalDatatypes.h"
 #include "SessionService.h"
-#include "GlobalMutex.h"
 #include "GlobalSessionService.h"
 
 #include "OTCore/Logger.h"
@@ -26,16 +25,6 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
-
-std::ofstream *logfile = nullptr;
-
-void logMessage(const std::string &msg)
-{
-	if (logfile == nullptr) return;
-
-	*logfile << msg << std::endl;
-	logfile->flush();
-}
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -62,8 +51,7 @@ static bool initDone{ false };
 extern "C"
 {
 	// todo: switch from auth port to auth url
-	_declspec(dllexport) int init(const char * _loggerServiceURL, const char * _ownUrl, const char * _globalSessionServiceURL, const char * _authPort)
-	{
+	_declspec(dllexport) int init(const char * _loggerServiceURL, const char * _ownUrl, const char * _globalSessionServiceURL, const char * _authPort) {
 		std::string loggerServiceURL(_loggerServiceURL);
 
 		// Initialize logging
@@ -78,16 +66,21 @@ extern "C"
 			OT_LOG_I("Local Session Service initialization");
 
 			// Now store the command line arguments and perform the initialization
-			if (_ownUrl == nullptr) { return -1; }
-			if (_globalSessionServiceURL == nullptr) { return -2; }
-			if (_authPort == nullptr) { return -3; }
+			if (_ownUrl == nullptr) {
+				return -1;
+			}
+			if (_globalSessionServiceURL == nullptr) {
+				return -2;
+			}
+			if (_authPort == nullptr) {
+				return -3;
+			}
 
 			std::string ownUrl(_ownUrl);
 
 			// Determine a good starting port for the services based on our own port number 
 			size_t colonIndex = ownUrl.rfind(':');
-			if (colonIndex == std::string::npos)
-			{
+			if (colonIndex == std::string::npos) {
 				OT_LOG_E("Unable to determine own port");
 				assert(0);
 				return 1;
@@ -173,27 +166,20 @@ extern "C"
 		}
 	};
 
-	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP)
-	{
-		OT_LSS_GLOBAL_LOCK
+	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP) {
 		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderIP, ot::EXECUTE);
 	};
 
-	_declspec(dllexport) const char *performActionOneWayTLS(const char * _json, const char * _senderIP)
-	{
-		OT_LSS_GLOBAL_LOCK
+	_declspec(dllexport) const char *performActionOneWayTLS(const char * _json, const char * _senderIP) {
 		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderIP, ot::EXECUTE_ONE_WAY_TLS);
 	};
 
 	// The session service is not queueing actions
-	_declspec(dllexport) const char *queueAction(const char *_json, const char *_senderIP)
-	{
-		OT_LSS_GLOBAL_LOCK
+	_declspec(dllexport) const char *queueAction(const char *_json, const char *_senderIP) {
 		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderIP, ot::QUEUE);
 	};
 
-	_declspec(dllexport) const char *getServiceURL(void)
-	{
+	_declspec(dllexport) const char *getServiceURL(void) {
 		assert(initDone);	// Init function not called
 		std::string serviceURL = SessionService::instance()->url();
 
@@ -202,11 +188,11 @@ extern "C"
 		return retVal;
 	}
 
-	_declspec(dllexport) void deallocateData(const char *data)
-	{
+	_declspec(dllexport) void deallocateData(const char *data) {
 		assert(initDone);	// Init function not called
 		// Destroy data (return value form performAction and queueAction functions)
-		if (data != nullptr)
-		{ delete[] data; }
+		if (data != nullptr) {
+			delete[] data;
+		}
 	};
 }

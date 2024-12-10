@@ -77,8 +77,5 @@
     <ClInclude Include="include\ServiceRunStarter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\GlobalMutex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
