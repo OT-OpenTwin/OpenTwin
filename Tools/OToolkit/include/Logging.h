@@ -85,6 +85,7 @@ public Q_SLOTS:
 	void slotUpdateCheckboxColors(void);
 	void slotToggleAutoConnect(void);
 	void slotViewCellContent(QTableWidgetItem* _itm);
+	void slotScrollToItem(int _row);
 
 private:
 	void iniTableItem(int _row, int _column, QTableWidgetItem* _itm);

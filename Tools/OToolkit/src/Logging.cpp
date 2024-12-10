@@ -327,8 +327,24 @@ void Logging::slotClearAll(void) {
 
 void Logging::slotFilterChanged(void) {
 	int r = 0;
+	QList<QTableWidgetItem*> lst = m_table->selectedItems();
+	int focusedRow = -1;
+	for (const QTableWidgetItem* item : lst) {
+		if (item->row() != focusedRow && focusedRow != -1) {
+			OT_LOG_E("Invalid row selection");
+			focusedRow = -1;
+			break;
+		}
+		focusedRow = item->row();
+	}
+
 	for (const ot::LogMessage& msg : m_messages) {
-		m_table->setRowHidden(r++, !m_filterView->filterMessage(msg));
+		bool messageVisible = m_filterView->filterMessage(msg);
+		m_table->setRowHidden(r++, !messageVisible);
+	}
+
+	if (focusedRow >= 0) {
+		QMetaObject::invokeMethod(this, "slotScrollToItem", Qt::QueuedConnection, Q_ARG(int, focusedRow));
 	}
 }
 
@@ -360,6 +376,16 @@ void Logging::slotViewCellContent(QTableWidgetItem* _itm) {
 			return;
 		}
 	}
+}
+
+void Logging::slotScrollToItem(int _row) {
+	if (_row < m_table->rowCount()) {
+		QTableWidgetItem* item = m_table->item(_row, tableColumns::tMessage);
+		if (!m_table->isRowHidden(_row)) {
+			m_table->scrollToItem(item);
+		}
+	}
+	
 }
 
 void Logging::appendLogMessage(const ot::LogMessage& _msg) {
