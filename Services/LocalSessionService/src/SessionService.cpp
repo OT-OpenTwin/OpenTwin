@@ -274,12 +274,14 @@ void SessionService::serviceClosing(
 	}
 }
 
-void SessionService::removeSession(
-	Session *								_session
-) {
+void SessionService::removeSession(Session* _session) {
+	this->forgetSession(_session);
+	delete _session;
+}
+
+void SessionService::forgetSession(Session* _session) {
 	ServiceRunStarter::instance().sessionClosing(_session->id());
 	m_sessionMap.erase(_session->id());
-	delete _session;
 }
 
 std::list<const Session *> SessionService::sessions(void) {
@@ -743,10 +745,18 @@ std::string SessionService::handleShutdownSession(ot::JsonDocument& _commandDoc)
 	ot::serviceID_t serviceID(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	
-	std::thread t(&SessionService::workerShutdownSession, this, serviceID, sessionID);
-	t.detach();
-
-	return OT_ACTION_RETURN_VALUE_OK;
+	Session* session = this->getSession(sessionID);
+	if (session) {
+		this->forgetSession(session);
+		std::thread t(&SessionService::workerShutdownSession, this, serviceID, session);
+		t.detach();
+		return OT_ACTION_RETURN_VALUE_OK;
+	}
+	else {
+		OT_LOG_E("Session not found: \"" + sessionID + "\"");
+		return OT_ACTION_RETURN_VALUE_FAILED;
+	}
+	
 }
 
 std::string SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc) {
@@ -1034,13 +1044,13 @@ std::string SessionService::handleSetGlobalLogFlags(ot::JsonDocument& _commandDo
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
-void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, std::string _sessionId) {
+void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, Session* _session) {
 	// Get service info
-	Session* theSession = getSession(_sessionId);
-	if (theSession == nullptr) {
+	if (_session == nullptr) {
+		OT_LOG_E("No session provided");
 		return;
 	}
-	Service* theService = theSession->getService(_serviceId);
+	Service* theService = _session->getService(_serviceId);
 
 	std::string senderServiceName("<No service name>");
 	if (theService) {
@@ -1048,13 +1058,13 @@ void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, std::stri
 		theService->setReceiveBroadcastMessages(false);
 	}
 	// Notify GDS
-	m_globalDirectoryService->notifySessionClosed(_sessionId);
+	m_globalDirectoryService->notifySessionClosed(_session->id());
 
 #ifdef OT_USE_GSS
 	// Notify GSS
 	ot::JsonDocument gssShutdownDoc;
 	gssShutdownDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ShutdownSessionCompleted, gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
-	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_sessionId, gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
+	gssShutdownDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(_session->id(), gssShutdownDoc.GetAllocator()), gssShutdownDoc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send(url(), m_globalSessionService->getServiceURL(), ot::EXECUTE, gssShutdownDoc.toJson(), response)) {
@@ -1065,16 +1075,17 @@ void SessionService::workerShutdownSession(ot::serviceID_t _serviceId, std::stri
 	}
 
 #endif
-	// Close service
-	serviceClosing(theService, false, false);
+	// Remove service that requested shutdown
+	_session->removeService(_serviceId, false);
 
 	// Close session
-	theSession->shutdown(nullptr);
-	removeSession(theSession);
+	_session->shutdown(nullptr);
 
 	// Show info log
-	OT_LOG_D("The session with the ID \"" + _sessionId +
-		"\" was closed. Reason: Shutdown requested by service \"" + senderServiceName + "\"");
+	OT_LOG_D("The session with the ID \"" + _session->id() + "\" was closed. Reason: Shutdown requested by service \"" + senderServiceName + "\"");
+
+	// Finally delete the session
+	delete _session;
 }
 
 void SessionService::initializeSystemInformation() {

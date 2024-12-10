@@ -131,9 +131,10 @@ public:
 	//! Will NOT perform the session shutdown().
 	//! Will clear the memory of the provided pointer.
 	//! @param _session The session to remove
-	void removeSession(
-		Session *								_session
-	);
+	void removeSession(Session* _session);
+
+	//! \brief Removes the session from the service run starter and all maps.
+	void forgetSession(Session* _session);
 
 	std::list<const Session *> sessions(void);
 	
@@ -184,7 +185,7 @@ private:
 
 	OT_HANDLER(handleSetGlobalLogFlags, SessionService, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
 
-	void workerShutdownSession(ot::serviceID_t _serviceId, std::string _sessionId);
+	void workerShutdownSession(ot::serviceID_t _serviceId, Session* _session);
 
 	std::string									m_dataBaseURL;						//! The database IP address
 	std::string									m_siteID;							//! The site ID

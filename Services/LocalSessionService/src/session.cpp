@@ -111,16 +111,16 @@ Service * Session::registerService(Service * _service) {
 void Session::removeService(ot::serviceID_t _serviceID, bool _notifyOthers) {
 	auto itm = m_serviceMap.find(_serviceID);
 	if (itm == m_serviceMap.end()) {
-		std::string errorMessage("A service with the ID \"");
-		errorMessage.append(std::to_string(_serviceID));
-		errorMessage.append("\" was not registered");
-		throw ErrorException(errorMessage.c_str());
+		OT_LOG_EAS("Service (" + std::to_string(_serviceID) + ") not found");
+		return;
 	}
 	Service * theService = itm->second;
 	m_serviceMap.erase(_serviceID);
 	m_serviceIdManager.freeID(_serviceID);
 
-	if (_notifyOthers) { broadcastAction(theService, OT_ACTION_CMD_ServiceDisconnected); }
+	if (_notifyOthers) {
+		broadcastAction(theService, OT_ACTION_CMD_ServiceDisconnected);
+	}
 
 	OT_LOG_D("The service " + theService->toJSON() + " was deregistered from the session " + infoToJSON());
 
