@@ -182,19 +182,7 @@ void WebsocketClient::handleMessageReceived(const QString& _message, bool _isExt
 		m_waitingForResponse[senderIP.toStdString()] = false;
 	}
 	else if (action == "execute") {
-		if (m_currentlyProcessingQueuedMessage || this->anyWaitingForResponse() || (!m_commandQueue.empty() && _isExternalMessage)) {
-			OT_LOG_D("Putting action in command queue: " + action.toStdString() + ". Message: " + _message.toStdString());
-			if (_isExternalMessage) {
-				m_commandQueue.push_back(_message);
-			}
-			else {
-				m_commandQueue.push_front(_message);
-			}
-		}
-		else {
-			sendExecuteOrQueueMessage(_message);
-			this->queueMessageProcessingIfNeeded();
-		}
+		OT_LOG_EA("No execute requests to frontend allowed");
 	}
 	else if (action == "queue") {
 		if (m_currentlyProcessingQueuedMessage || this->anyWaitingForResponse() || (!m_commandQueue.empty() && _isExternalMessage)) {

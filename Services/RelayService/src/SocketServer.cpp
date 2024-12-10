@@ -131,17 +131,12 @@ QString SocketServer::performAction(const char* json, const char* senderIP)
 				return OT_ACTION_RETURN_VALUE_FALSE;
 			}
 		}
-		else if (action == OT_ACTION_CMD_SetGlobalLogFlags) {
-			ot::ConstJsonArray logData = ot::json::getArray(doc, OT_ACTION_PARAM_Flags);
-			ot::LogFlags newGlobalFlags = ot::logFlagsFromJsonArray(logData);
-			ot::LogDispatcher::instance().setLogFlags(newGlobalFlags);
+		else if (action == OT_ACTION_CMD_ShutdownRequestedByService) {
+			shutdown();
+			return OT_ACTION_RETURN_VALUE_OK;
 		}
 
 		OT_LOG_E("Received HTTP execute message (not yet suported by relay service): " + action);
-
-		if (action == OT_ACTION_CMD_ShutdownRequestedByService) {
-			shutdown();
-		}
 
 		std::string response = sendProcessWSMessage("execute", senderIP, json);
 
