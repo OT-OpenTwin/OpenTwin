@@ -37,6 +37,10 @@ SubprocessManager::~SubprocessManager() {
 }
 
 bool SubprocessManager::sendRequest(const ot::JsonDocument& _document, std::string& _response) {
+	if (!this->ensureWorkerRunning()) {
+		return false;
+	}
+
 	if (!this->ensureSubprocessRunning()) {
 		return false;
 	}
@@ -46,6 +50,18 @@ bool SubprocessManager::sendRequest(const ot::JsonDocument& _document, std::stri
 }
 
 bool SubprocessManager::ensureSubprocessRunning(void) {
+	std::string serverName;
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		serverName = m_communicationHandler->getServerName();
+	}
+	if (!m_subprocessHandler->ensureSubprocessRunning(serverName)) {
+		OT_LOG_E("Failed to start subprocess");
+		return;
+	}
+}
+
+bool SubprocessManager::ensureWorkerRunning(void) {
 	const int tickTime = 10;
 	int timeout = Timeouts::connectionTimeout / tickTime;
 	while (!isWorkerAlive()) {
@@ -77,9 +93,10 @@ void SubprocessManager::worker(std::string _projectName) {
 		QCoreApplication app(argc, nullptr);
 
 		// Create communication handler
-		std::unique_lock<std::mutex> lock(m_mutex);
-		m_communicationHandler = new CommunicationHandler(this, _projectName);
-		lock.unlock();
+		{
+			std::lock_guard<std::mutex> lock(m_mutex);
+			m_communicationHandler = new CommunicationHandler(this, _projectName);
+		}
 
 		// Run Qt event loop
 		app.exec();

@@ -128,6 +128,11 @@ bool Application::settingChanged(const ot::Property * _item) {
 std::string Application::handleExecuteAction(ot::JsonDocument& _doc) {
 	std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 	OT_LOG_D("Executing action: " + action);
-	std::string returnMessage;// = _subprocessHandler->Send(_doc.toJson());
+	
+	std::string returnMessage;
+	if (!m_subprocessManager->sendRequest(_doc, returnMessage)) {
+		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send request").toJson();
+	}
+	
 	return returnMessage;
 }

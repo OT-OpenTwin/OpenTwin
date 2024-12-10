@@ -22,10 +22,12 @@ public:
 	
 	bool sendRequest(const ot::JsonDocument& _document, std::string& _response);
 
+	bool ensureSubprocessRunning(void);
+
 private:
 	//! @brief Runs the subservice if needed and checks connection with a ping.
 	//! @return Return false if the connection could not be established.
-	bool ensureSubprocessRunning(void);
+	bool ensureWorkerRunning(void);
 
 	//! @brief Returns true if the worker has started successfully.
 	//! Starting the working will only start the event loop and communication handler.
