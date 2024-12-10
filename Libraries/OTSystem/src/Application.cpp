@@ -69,13 +69,13 @@ ot::app::RunResult ot::app::runApplication(const std::wstring& _applicationPath,
 	ZeroMemory(&info, sizeof(info));
 	info.cb = sizeof(info);
 	info.lpTitle = cl;
+	info.dwFlags = STARTF_USESHOWWINDOW;
+	info.wShowWindow = SW_HIDE;
 	ZeroMemory(&processInfo, sizeof(processInfo));
 
 	RunResult result = app::GeneralError;
 
-	if (CreateProcess(app, cl, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT | CREATE_NEW_CONSOLE | ABOVE_NORMAL_PRIORITY_CLASS, penv, NULL, &info, &processInfo))
-	//if (CreateProcess(app, cl, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT | CREATE_NO_WINDOW, penv, NULL, &info, &processInfo))
-	{
+	if (CreateProcess(app, cl, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT | CREATE_NEW_CONSOLE | ABOVE_NORMAL_PRIORITY_CLASS, penv, NULL, &info, &processInfo)) {
 		if (_waitForResponse) {
 			DWORD response = WaitForSingleObject(processInfo.hProcess, _waitTimeout);
 			switch (response)
