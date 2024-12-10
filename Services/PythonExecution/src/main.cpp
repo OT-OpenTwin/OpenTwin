@@ -32,18 +32,20 @@ ot::ReturnMessage HandleMessage(ot::JsonDocument& message)
 
 void Send(const std::string& message)
 {
+	OT_LOG(message, ot::OUTGOING_MESSAGE_LOG);
+
 	_socket.write((message + "\n").c_str());
 	_socket.flush();
 	bool allIsWritten = _socket.waitForBytesWritten(-1);
 }
 
-void MessageReceived()
-{
-	if(_socket.canReadLine())
-	{
+void MessageReceived() {
+	if(_socket.canReadLine()) {
 		try
 		{
 			const std::string message(_socket.readLine().data());
+
+			OT_LOG(message, ot::INBOUND_MESSAGE_LOG);
 
 			ot::JsonDocument document;
 			document.fromJson(message);
@@ -73,8 +75,14 @@ int main(int argc, char* argv[], char* envp[])
 	ot::ServiceLogNotifier::initialize("PythonSubprocess", "", true);
 	
 #else
-	const std::string serverName = argv[1];
 	ot::ServiceLogNotifier::initialize("PythonSubprocess", "", false);
+
+	std::string serverName;
+	if (argc < 2) {
+		OT_LOG_E("Missing arguments");
+		return 1;
+	}
+	serverName = argv[1];
 #endif // _DEBUG
 	try
 	{

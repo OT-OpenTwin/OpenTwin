@@ -44,20 +44,19 @@ ot::ReturnMessage ActionHandler::Handle(ot::JsonDocument& doc)
 	{
 		auto& checkParameter = _checkParameterFunctions[action];
 		auto checkResult = checkParameter(doc);
-		if (checkResult.getStatus() == ot::ReturnMessage::Ok)
-		{
+		if (checkResult.getStatus() == ot::ReturnMessage::Ok) {
 			OT_LOG_D("Executing action " + action);
 			auto& handlingFunction = _handlingFunctions[action];
 			returnMessage = handlingFunction(doc);
 		}
-		else
-		{
+		else {
+			OT_LOG_D("Check parameter failed");
 			returnMessage = checkResult;
 		}
 	}
 	else
 	{
-		assert(0); // Action not supported
+		OT_LOG_EAS("Action \"" + action + "\" not supported. Document: " + doc.toJson());
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Action \"" + action + "\" not supported.");
 	}
 
