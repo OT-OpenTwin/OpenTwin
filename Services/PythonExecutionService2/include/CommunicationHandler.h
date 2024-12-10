@@ -1,5 +1,8 @@
 #pragma once
 
+// Service header
+#include "DataBaseInfo.h"
+
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/Flags.h"
@@ -20,7 +23,13 @@ public:
 
 	bool sendToClient(const ot::JsonDocument& _document, std::string& _response);
 
+	void setModelUrl(const std::string& _url) { m_modelUrl = _url; m_modelUrlSet = false; };
+	void setFrontendUrl(const std::string& _url) { m_frontendUrl = _url; m_frontendUrlSet = false; };
+	void setDataBaseInfo(const DataBaseInfo& _info) { m_databaseInfo = _info; m_databaseInfoSet = false; };
+
 	const std::string& getServerName(void) const { return m_serverName; };
+
+	bool sendConfigToClient(void);
 
 private Q_SLOTS:
 	void slotNewConnection(void);
@@ -38,14 +47,28 @@ private:
 
 	void processNextEvent(void);
 
+	bool sendModelConfigToClient(void);
+	bool sendFrontendConfigToClient(void);
+	bool sendDataBaseConfigToClient(void);
+
 	bool waitForClient(void);
-	bool sendToClient(const QByteArray& _data, std::string& _response);
+	bool sendToClient(const QByteArray& _data, bool _expectResponse, std::string& _response);
 
 	SubprocessManager* m_manager;
 	std::string m_serverName;
 
 	QLocalSocket* m_client;
 	ClientState m_clientState;
+	bool m_isInitializingClient;
+
+	std::string m_frontendUrl;
+	bool m_frontendUrlSet;
+
+	std::string m_modelUrl;
+	bool m_modelUrlSet;
+
+	DataBaseInfo m_databaseInfo;
+	bool m_databaseInfoSet;
 
 	std::string m_response;
 

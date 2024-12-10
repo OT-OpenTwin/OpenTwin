@@ -5,6 +5,7 @@
 #include "OTSystem/SystemTypes.h"
 
 // std header
+#include <mutex>
 #include <string>
 
 class SubprocessManager;
@@ -23,10 +24,12 @@ private:
 	std::string findSubprocessPath(void) const;
 	void healthCheckWorker(void);
 
+	std::mutex m_mutex;
+
 	bool m_performHealthCheck;
 	SubprocessManager* m_manager;
 	const std::string m_executableName = "PythonExecution.exe";
 	
 	std::thread* m_healthCheckThread;
-	OT_PROCESS_HANDLE m_process;
+	OT_PROCESS_HANDLE m_clientHandle;
 };

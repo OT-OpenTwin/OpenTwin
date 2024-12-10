@@ -11,7 +11,7 @@
 #include <thread>
 
 SubprocessHandler::SubprocessHandler(SubprocessManager* _manager)
-	: m_manager(_manager), m_process(nullptr), m_performHealthCheck(false), m_healthCheckThread(nullptr)
+	: m_manager(_manager), m_clientHandle(nullptr), m_performHealthCheck(false), m_healthCheckThread(nullptr)
 {
 	OTAssertNullptr(m_manager);
 }
@@ -26,7 +26,8 @@ SubprocessHandler::~SubprocessHandler() {
 }
 
 bool SubprocessHandler::ensureSubprocessRunning(const std::string& _serverName) {
-	if (!m_process) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+	if (!m_clientHandle) {
 		if (m_healthCheckThread) {
 			OT_LOG_E("Health check thread already exists");
 			delete m_healthCheckThread;
@@ -35,12 +36,12 @@ bool SubprocessHandler::ensureSubprocessRunning(const std::string& _serverName) 
 
 		// Create start args
 		std::string subprocessPath = this->findSubprocessPath();
-		std::string commandLine = "\"" + _serverName + "\"";
+		std::string commandLine = "\"" + subprocessPath + "\" \"" + _serverName + "\"";
 
 		// Run sub
-		ot::app::RunResult result = ot::app::runApplication(this->findSubprocessPath() + m_executableName, commandLine, m_process, true, Timeouts::connectionTimeout);
+		ot::app::RunResult result = ot::app::runApplication(subprocessPath + m_executableName, commandLine, m_clientHandle, false, Timeouts::connectionTimeout);
 		if (result != ot::app::OK) {
-			m_process = nullptr;
+			m_clientHandle = nullptr;
 			OT_LOG_E("Failed to start subprocess");
 			return false;
 		}
@@ -74,6 +75,14 @@ std::string SubprocessHandler::findSubprocessPath(void) const {
 
 void SubprocessHandler::healthCheckWorker(void) {
 	while (m_performHealthCheck) {
-
+		std::this_thread::sleep_for(std::chrono::microseconds(100));
+		{
+			std::lock_guard<std::mutex> lock(m_mutex);
+			if (!ot::app::isApplicationRunning(m_clientHandle)) {
+				m_performHealthCheck = false;
+				m_clientHandle = nullptr;
+				OT_LOG_E("Client process stopped working");
+			}
+		}
 	}
 }

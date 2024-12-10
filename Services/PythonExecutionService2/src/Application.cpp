@@ -63,6 +63,25 @@ void Application::run(void) {
 
 	// Create new subprocess manager
 	m_subprocessManager = new SubprocessManager(this);
+
+	if (EnsureDataBaseConnection()) {
+		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
+	}
+	DataBaseInfo info;
+	info.setSiteId(this->siteID());
+	info.setDataBaseUrl(DataBase::GetDataBase()->getDataBaseServerURL());
+	info.setCollectionName(this->m_collectionName);
+	info.setUserName(DataBase::GetDataBase()->getUserName());
+	info.setUserPassword(DataBase::GetDataBase()->getUserPassword());
+
+	m_subprocessManager->setDataBaseInfo(info);
+
+	if (this->uiComponent()) {
+		m_subprocessManager->setFrontendUrl(this->uiComponent()->getServiceURL());
+	}
+	if (this->modelComponent()) {
+		m_subprocessManager->setModelUrl(this->modelComponent()->getServiceURL());
+	}
 }
 
 
@@ -75,19 +94,27 @@ std::string Application::processMessage(ServiceBase * _sender, const std::string
 }
 
 void Application::uiConnected(ot::components::UiComponent * _ui) {
-	
+	if (m_subprocessManager) {
+		m_subprocessManager->setFrontendUrl(_ui->getServiceURL());
+	}
 }
 
 void Application::uiDisconnected(const ot::components::UiComponent * _ui) {
-
+	if (m_subprocessManager) {
+		m_subprocessManager->setFrontendUrl("");
+	}
 }
 
 void Application::modelConnected(ot::components::ModelComponent * _model) {
-	
+	if (m_subprocessManager) {
+		m_subprocessManager->setModelUrl(_model->getServiceURL());
+	}
 }
 
 void Application::modelDisconnected(const ot::components::ModelComponent * _model) {
-
+	if (m_subprocessManager) {
+		m_subprocessManager->setModelUrl("");
+	}
 }
 
 void Application::serviceConnected(ot::ServiceBase * _service) {

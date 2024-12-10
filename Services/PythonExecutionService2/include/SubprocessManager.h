@@ -1,5 +1,8 @@
 #pragma once
 
+// Service header
+#include "DataBaseInfo.h"
+
 // OpenTwin header
 #include "OTCore/JSON.h"
 #include "OTCore/OTClassHelper.h"
@@ -20,6 +23,10 @@ public:
 	SubprocessManager(Application* _app);
 	~SubprocessManager();
 	
+	void setModelUrl(const std::string& _url);
+	void setFrontendUrl(const std::string& _url);
+	void setDataBaseInfo(const DataBaseInfo& _info);
+
 	bool sendRequest(const ot::JsonDocument& _document, std::string& _response);
 
 	bool ensureSubprocessRunning(void);

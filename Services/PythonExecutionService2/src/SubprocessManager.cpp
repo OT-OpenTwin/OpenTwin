@@ -36,6 +36,45 @@ SubprocessManager::~SubprocessManager() {
 	}
 }
 
+void SubprocessManager::setModelUrl(const std::string& _url) {
+	if (!this->ensureWorkerRunning()) {
+		return;
+	}
+	
+	std::lock_guard<std::mutex> lock(m_mutex);
+	if (!m_communicationHandler) {
+		OT_LOG_E("Fatal Error: Communication handler not set");
+		return;
+	}
+	return m_communicationHandler->setModelUrl(_url);
+}
+
+void SubprocessManager::setFrontendUrl(const std::string& _url) {
+	if (!this->ensureWorkerRunning()) {
+		return;
+	}
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+	if (!m_communicationHandler) {
+		OT_LOG_E("Fatal Error: Communication handler not set");
+		return;
+	}
+	return m_communicationHandler->setFrontendUrl(_url);
+}
+
+void SubprocessManager::setDataBaseInfo(const DataBaseInfo& _info) {
+	if (!this->ensureWorkerRunning()) {
+		return;
+	}
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+	if (!m_communicationHandler) {
+		OT_LOG_E("Fatal Error: Communication handler not set");
+		return;
+	}
+	return m_communicationHandler->setDataBaseInfo(_info);
+}
+
 bool SubprocessManager::sendRequest(const ot::JsonDocument& _document, std::string& _response) {
 	if (!this->ensureWorkerRunning()) {
 		return false;
@@ -57,8 +96,10 @@ bool SubprocessManager::ensureSubprocessRunning(void) {
 	}
 	if (!m_subprocessHandler->ensureSubprocessRunning(serverName)) {
 		OT_LOG_E("Failed to start subprocess");
-		return;
+		return false;
 	}
+
+	return true;
 }
 
 bool SubprocessManager::ensureWorkerRunning(void) {
