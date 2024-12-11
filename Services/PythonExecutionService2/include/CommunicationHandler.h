@@ -35,6 +35,7 @@ private Q_SLOTS:
 	void slotNewConnection(void);
 	void slotMessageReceived(void);
 	void slotClientDisconnected(void);
+	void slotProcessMessage(std::string _message);
 
 private:
 	enum class ClientState {

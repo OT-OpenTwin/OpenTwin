@@ -66,39 +66,7 @@ void CommunicationHandler::slotMessageReceived(void) {
 	std::string message;
 	message = m_client->readAll().toStdString();
 	
-	OT_LOG_D("Message from client: \"" + message + "\"");
-
-	// Check state
-	if (m_clientState == ClientState::WaitForPing) {
-		ot::JsonDocument responseDoc;
-		if (!responseDoc.fromJson(message)) {
-			OT_LOG_E("Invalid client ping response: \"" + message + "\"");
-			m_client->disconnect();
-			return;
-		}
-		ot::ReturnMessage msg;
-		msg.setFromJsonObject(responseDoc.GetConstObject());
-		//if (msg.getStatus() != ot::ReturnMessage::Ok || msg.getWhat() != OT_ACTION_CMD_Ping) {
-		if (msg.getStatus() != ot::ReturnMessage::Ok || msg.getWhat() != OT_ACTION_CMD_CheckStartupCompleted) {
-			OT_LOG_E("Invalid client ping response: \"" + message + "\"");
-			m_client->disconnect();
-			return;
-		}
-
-		m_isInitializingClient = true;
-		m_clientState = ClientState::Ready;
-
-		if (!this->sendConfigToClient()) {
-			m_client->disconnect();
-		}
-	}
-	else if (m_clientState == ClientState::WaitForResponse) {
-		m_response = std::move(message);
-		m_clientState = ClientState::ReponseReceived;
-	}
-	else {
-		OT_LOG_W("Client send unexpected message: \"" + message + "\"");
-	}
+	QMetaObject::invokeMethod(this, "slotProcessMessage", Qt::QueuedConnection, Q_ARG(std::string, message));
 }
 
 void CommunicationHandler::slotClientDisconnected(void) {
@@ -206,6 +174,42 @@ bool CommunicationHandler::waitForClient(void) {
 	}
 
 	return true;
+}
+
+void CommunicationHandler::slotProcessMessage(std::string _message) {
+	OT_LOG_D("Message from client: \"" + _message + "\"");
+
+	// Check state
+	if (m_clientState == ClientState::WaitForPing) {
+		ot::JsonDocument responseDoc;
+		if (!responseDoc.fromJson(_message)) {
+			OT_LOG_E("Invalid client ping response: \"" + _message + "\"");
+			m_client->disconnect();
+			return;
+		}
+		ot::ReturnMessage msg;
+		msg.setFromJsonObject(responseDoc.GetConstObject());
+		//if (msg.getStatus() != ot::ReturnMessage::Ok || msg.getWhat() != OT_ACTION_CMD_Ping) {
+		if (msg.getStatus() != ot::ReturnMessage::Ok || msg.getWhat() != OT_ACTION_CMD_CheckStartupCompleted) {
+			OT_LOG_E("Invalid client ping response: \"" + _message + "\"");
+			m_client->disconnect();
+			return;
+		}
+
+		m_isInitializingClient = true;
+		m_clientState = ClientState::Ready;
+
+		if (!this->sendConfigToClient()) {
+			m_client->disconnect();
+		}
+	}
+	else if (m_clientState == ClientState::WaitForResponse) {
+		m_response = std::move(_message);
+		m_clientState = ClientState::ReponseReceived;
+	}
+	else {
+		OT_LOG_W("Client send unexpected message: \"" + _message + "\"");
+	}
 }
 
 bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectResponse, std::string& _response) {
