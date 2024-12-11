@@ -73,16 +73,51 @@ std::string SubprocessHandler::findSubprocessPath(void) const {
 
 }
 
+void SubprocessHandler::shutdownSubprocess(void) {
+	if (!m_clientHandle) {
+		return;
+	}
+
+	// Stop health check
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		m_performHealthCheck = false;
+	}
+	if (m_healthCheckThread) {
+		m_healthCheckThread->join();
+		delete m_healthCheckThread;
+		m_healthCheckThread = nullptr;
+	}
+
+	// Terminate the subprocess
+	if (TerminateProcess(m_clientHandle, 0)) {
+		CloseHandle(m_clientHandle);
+		m_clientHandle = nullptr;
+		OT_LOG_D("Subprocess terminated");
+	}
+	else {
+		OT_LOG_EA("Failed to terminate subproces");
+	}
+}
+
 void SubprocessHandler::healthCheckWorker(void) {
-	while (m_performHealthCheck) {
+	while (this->shouldPerformHealthCheck()) {
 		std::this_thread::sleep_for(std::chrono::microseconds(100));
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
 			if (!ot::app::isApplicationRunning(m_clientHandle)) {
 				m_performHealthCheck = false;
+				
+				CloseHandle(m_clientHandle);
 				m_clientHandle = nullptr;
+				
 				OT_LOG_E("Client process stopped working");
 			}
 		}
 	}
+}
+
+bool SubprocessHandler::shouldPerformHealthCheck(void) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+	return m_performHealthCheck;
 }

@@ -88,6 +88,12 @@ bool SubprocessManager::sendRequest(const ot::JsonDocument& _document, std::stri
 	return m_communicationHandler->sendToClient(_document, _response);
 }
 
+bool SubprocessManager::sendSingleRequest(const ot::JsonDocument& _document, std::string& _response) {
+	bool result = this->sendRequest(_document, _response);
+	this->shutdownSubprocess();
+	return result;
+}
+
 bool SubprocessManager::ensureSubprocessRunning(void) {
 	std::string serverName;
 	{
@@ -102,8 +108,12 @@ bool SubprocessManager::ensureSubprocessRunning(void) {
 	return true;
 }
 
+void SubprocessManager::shutdownSubprocess(void) {
+	m_subprocessHandler->shutdownSubprocess();
+}
+
 bool SubprocessManager::ensureWorkerRunning(void) {
-	const int tickTime = 10;
+	const int tickTime = Timeouts::defaultTickTime;
 	int timeout = Timeouts::connectionTimeout / tickTime;
 	while (!isWorkerAlive()) {
 		if (timeout--) {

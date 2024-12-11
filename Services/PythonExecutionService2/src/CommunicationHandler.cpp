@@ -160,7 +160,7 @@ bool CommunicationHandler::sendDataBaseConfigToClient(void) {
 }
 
 bool CommunicationHandler::waitForClient(void) {
-	const int tickTime = 10;
+	const int tickTime = Timeouts::defaultTickTime;
 	int timeout = Timeouts::connectionTimeout / tickTime;
 	while (m_clientState != ClientState::Ready || m_isInitializingClient) {
 		if (timeout--) {
@@ -238,7 +238,7 @@ bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectRes
 	// We know the request was sent successfully, so we set the state to wait for response and wait..
 	m_clientState = ClientState::WaitForResponse;
 
-	const int tickTime = 10;
+	const int tickTime = Timeouts::defaultTickTime;
 	int timeout = Timeouts::responseTimeout / tickTime;
 	while (m_clientState == ClientState::WaitForResponse) {
 		if (timeout--) {

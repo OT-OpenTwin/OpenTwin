@@ -20,9 +20,12 @@ public:
 
 	bool ensureSubprocessRunning(const std::string& _serverName);
 
+	void shutdownSubprocess(void);
+
 private:
 	std::string findSubprocessPath(void) const;
 	void healthCheckWorker(void);
+	bool shouldPerformHealthCheck(void);
 
 	std::mutex m_mutex;
 

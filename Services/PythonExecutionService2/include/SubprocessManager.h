@@ -27,11 +27,20 @@ public:
 	void setFrontendUrl(const std::string& _url);
 	void setDataBaseInfo(const DataBaseInfo& _info);
 
+	//! @brief Sends the request to the Subprocess.
+	//! Will start the subprocess if needed.
 	bool sendRequest(const ot::JsonDocument& _document, std::string& _response);
+
+	//! @brief Sends the request to the Subprocess.
+	//! Will start the subprocess if needed.
+	//! Will shutdown the subprocess after finished.
+	bool sendSingleRequest(const ot::JsonDocument& _document, std::string& _response);
 
 	bool ensureSubprocessRunning(void);
 
 private:
+	void shutdownSubprocess(void);
+
 	//! @brief Runs the subservice if needed and checks connection with a ping.
 	//! @return Return false if the connection could not be established.
 	bool ensureWorkerRunning(void);
