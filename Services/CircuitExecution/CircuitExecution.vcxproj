@@ -204,9 +204,11 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\ConnectionManager.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\NGSpice.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\NGSpice.h" />
     <QtMoc Include="include\ConnectionManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

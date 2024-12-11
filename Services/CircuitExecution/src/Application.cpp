@@ -30,12 +30,13 @@ void Application::deleteInstance(void)
 
 
 void Application::start(const std::string& _serverName)
-{
+{	
+	
 	QString qStr = QString::fromStdString(_serverName);
 	m_connectionManager = new ConnectionManager();
 	m_connectionManager->connectToCircuitSimulatorService(qStr);
 
-	//m_connectionManager->sendMessage();
+	
 	
 }
 

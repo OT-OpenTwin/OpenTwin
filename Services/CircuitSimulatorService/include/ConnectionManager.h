@@ -17,7 +17,7 @@ public:
 		ExecuteNetlist
 	};
 
-	static std::string toString(RequestType _type);
+	static QString toString(RequestType _type);
 
 	ConnectionManager(QObject* parent = (QObject*)nullptr);
 	~ConnectionManager();

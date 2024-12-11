@@ -6,13 +6,14 @@
 #include "QtNetwork/qlocalsocket.h"
 #include "QtCore/qjsonarray.h"
 #include "QtCore/qjsondocument.h"
+#include "QtCore/qjsonobject.h"
 
 // OpenTwin Header
 #include "OTCore/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/OperatingSystem.h"
 
-std::string ConnectionManager::toString(RequestType _type) {
+QString ConnectionManager::toString(RequestType _type) {
     
     switch (_type) {
     case ConnectionManager::ExecuteNetlist: return "ExecuteNetlist";
@@ -64,26 +65,22 @@ void ConnectionManager::handleDisconnected() {
 void ConnectionManager::handleQueueRequest(RequestType _type, std::list<std::string> _data) {
 
     //In this function I set the netlist which I got from Application
+    QJsonObject jsonObject;
 
-    if (!_data.empty()) {
-        QStringList m_netlistToSend;
-        for (const auto& stdStr : _data) {
-            QString qStr = QString::fromStdString(stdStr);
-            if (qStr.isEmpty()) {
-                OT_LOG_W("Warning: Empty QString from std::string");
-            }
-            m_netlistToSend.append(qStr);
-        }
+    jsonObject["type"] = toString(_type);
 
-        // Serialize QStringList
-        QJsonArray jsonArray;
-        for (const QString& qStr : m_netlistToSend) {
-            jsonArray.append(qStr);
-        }
+    QJsonArray jsonArray;
 
-        QJsonDocument jsonDoc(jsonArray);
-        m_netlist = jsonDoc.toJson();
+    for (const auto& str : _data) {
+        jsonArray.append(QString::fromStdString(str));
     }
+    jsonObject["data"] = jsonArray;
+
+    QJsonDocument jsonDoc(jsonObject);
+    QByteArray jsonData = jsonDoc.toJson();
+
+    m_netlist = jsonData;
+    
 }
 
 

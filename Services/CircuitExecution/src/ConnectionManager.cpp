@@ -1,8 +1,16 @@
+// Service Header
 #include "ConnectionManager.h"
+#include "NGSpice.h"
+
+// Qt Header
+#include "QtCore/qjsondocument.h"
+#include "QtCore/qjsonobject.h"
+#include "QtCore/qjsonarray.h"
 
 ConnectionManager::ConnectionManager(QObject* parent) :QObject(parent) {
 
     m_socket = new QLocalSocket(this);
+    m_ngSpice = new NGSpice();
 
     QObject::connect(m_socket, &QLocalSocket::connected, this, &ConnectionManager::sendHello);
 	QObject::connect(m_socket, &QLocalSocket::readyRead, this, &ConnectionManager::receiveResponse);
@@ -25,8 +33,27 @@ void ConnectionManager::connectToCircuitSimulatorService(const QString& serverNa
 }
 
 void ConnectionManager::receiveResponse() {
-    QByteArray response = m_socket->readAll();
-    OT_LOG_D("Got following netlist: " + response.toStdString());
+    QByteArray jsonData = m_socket->readAll();
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
+
+    if (!jsonDoc.isObject()) {
+        OT_LOG_E("No correct Json Format");
+        return;
+    }
+
+    QJsonObject jsonObject = jsonDoc.object();
+
+    //Getting action type
+    QString typeString = jsonObject["type"].toString();
+    
+    //Getting data
+    QJsonArray jsonArray = jsonObject["data"].toArray();
+    std::list<std::string> data;
+    for (const QJsonValue& value : jsonArray) {
+        data.push_back(value.toString().toStdString());
+    }
+
+    handleActionType(typeString, jsonArray);
 }
 
 void ConnectionManager::sendHello() {
@@ -43,4 +70,17 @@ void ConnectionManager::handleError(QLocalSocket::LocalSocketError error) {
 void ConnectionManager::handleDisconnected() {
     OT_LOG_D("Client disconnected from server");
     exit(0);
+}
+
+void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) {
+
+    QJsonDocument doc(_data);
+    QString jsonString = doc.toJson(QJsonDocument::Compact);
+
+    if (_actionType.toStdString() == "ExecuteNetlist") {
+        OT_LOG_D("Execute Netlist:" + jsonString.toStdString());
+    }
+    else {
+        OT_LOG_D("Normal Message:" + jsonString.toStdString());
+    }
 }

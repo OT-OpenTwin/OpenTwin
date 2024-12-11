@@ -5,9 +5,19 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
+class NGSpice;
+
 class ConnectionManager : public QObject {
 	Q_OBJECT
-public: 
+public:
+
+	enum RequestType {
+		ExecuteNetlist,
+		Message
+	};
+
+	
+
 	ConnectionManager(QObject* parent = (QObject*)nullptr);
 	~ConnectionManager() = default;
 
@@ -17,9 +27,11 @@ private slots:
 	void sendHello();
 	void handleError(QLocalSocket::LocalSocketError error);
 	void handleDisconnected();
+
 private:
 	QLocalSocket* m_socket;
-
+	NGSpice* m_ngSpice;
+	void handleActionType(QString _actionType, QJsonArray _data);
 
 	
 

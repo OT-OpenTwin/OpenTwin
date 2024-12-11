@@ -14,6 +14,7 @@
 
 class ConnectionManager;
 
+
 class Application
 {
 public:
@@ -34,4 +35,5 @@ private:
 
 	static Application* instance;
 	ConnectionManager* m_connectionManager;
+
 };
