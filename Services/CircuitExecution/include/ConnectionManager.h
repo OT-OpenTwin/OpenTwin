@@ -12,7 +12,6 @@ public:
 	~ConnectionManager() = default;
 
 	void connectToCircuitSimulatorService(const QString& serverName);
-	void sendMessage();
 private slots:
 	void receiveResponse();
 	void sendHello();

@@ -4,6 +4,8 @@
 
 #include "QtNetwork/qlocalserver.h"
 #include "QtNetwork/qlocalsocket.h"
+#include "QtCore/qjsonarray.h"
+#include "QtCore/qjsondocument.h"
 
 // OpenTwin Header
 #include "OTCore/Logger.h"
@@ -41,8 +43,10 @@ void ConnectionManager::startListen(const std::string& _serverName) {
     OT_LOG_D("CircuitSimulatorService starting to listen: " + _serverName);
 }
 
-void ConnectionManager::queueRequest(RequestType _type, const std::string& _data) {
-    QMetaObject::invokeMethod(this, "handleQueueRequest", Qt::QueuedConnection, Q_ARG(RequestType, _type), Q_ARG(std::string, _data));
+void ConnectionManager::queueRequest(RequestType _type, const std::list<std::string>& _data) {
+    
+    QMetaObject::invokeMethod(this, "handleQueueRequest", Qt::QueuedConnection, Q_ARG(RequestType, _type), Q_ARG(std::list<std::string>, _data));
+   
 }
 
 void ConnectionManager::handleReadyRead() {
@@ -57,8 +61,29 @@ void ConnectionManager::handleDisconnected() {
     m_socket = nullptr;
 }
 
-void ConnectionManager::handleQueueRequest(RequestType _type, std::string _data) {
+void ConnectionManager::handleQueueRequest(RequestType _type, std::list<std::string> _data) {
 
+    //In this function I set the netlist which I got from Application
+
+    if (!_data.empty()) {
+        QStringList m_netlistToSend;
+        for (const auto& stdStr : _data) {
+            QString qStr = QString::fromStdString(stdStr);
+            if (qStr.isEmpty()) {
+                OT_LOG_W("Warning: Empty QString from std::string");
+            }
+            m_netlistToSend.append(qStr);
+        }
+
+        // Serialize QStringList
+        QJsonArray jsonArray;
+        for (const QString& qStr : m_netlistToSend) {
+            jsonArray.append(qStr);
+        }
+
+        QJsonDocument jsonDoc(jsonArray);
+        m_netlist = jsonDoc.toJson();
+    }
 }
 
 
@@ -79,7 +104,9 @@ void ConnectionManager::handleConnection() {
     connect(m_socket, &QLocalSocket::readyRead, this, &ConnectionManager::handleReadyRead);
     connect(m_socket, &QLocalSocket::disconnected, this, &ConnectionManager::handleDisconnected);
 
-    m_socket->write("Hello I am CircuitSimulatorService");
+    //I only send the netlist when the connection is established to prevent sending before connected
+    OT_LOG_D("Send netlist");
+    m_socket->write(m_netlist);
     m_socket->flush();
 
 }

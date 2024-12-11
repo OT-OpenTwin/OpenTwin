@@ -107,10 +107,23 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 		addSolver();
 	}
 	else if (action == "Circuit Simulator:Simulate:Run Simulation") {
-		runCircuitSimulation();
-		
 
-		
+		runCircuitSimulation();
+
+		std::list<std::string> testList;
+		testList.push_back("Yellow");
+		testList.push_back("Green");
+		testList.push_back("blue");
+
+
+		sendNetlistToSubService(testList);
+
+		const int sessionCount = Application::instance()->getSessionCount();
+		const int serviceID = Application::instance()->getServiceIDAsInt();
+		if (m_subprocessHandler == nullptr) {
+
+			m_subprocessHandler = new SubprocessHandler(m_serverName, sessionCount, serviceID);
+		}
 	}
 	else if (action == "Circuit Simulator:Edit:Add Circuit") {
 		createNewCircuit();
@@ -331,12 +344,7 @@ void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std:
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity) {
 	
 	
-	const int sessionCount = Application::instance()->getSessionCount();
-	const int serviceID = Application::instance()->getServiceIDAsInt();
-	if (m_subprocessHandler == nullptr) {
-		
-		m_subprocessHandler = new SubprocessHandler(m_serverName, sessionCount, serviceID);
-	}
+
 
 
 	EntityPropertiesEntityList* circuitName = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Circuit"));
@@ -374,10 +382,19 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	m_ngSpice.clearBufferStructure(name);
 
 
-	//// Here we stop the Subprocess
+	// Here we stop the Subprocess
 	//delete m_subprocessHandler;
 	//m_subprocessHandler = nullptr;
+	//
+}
+
+void Application::sendNetlistToSubService(std::list<std::string>& _netlist) {
+	if (m_qtWrapper == nullptr) {
+		OT_LOG_W("QtWrapper is nullptr");
+	}
+
 	
+	m_qtWrapper->getConnectionManager()->queueRequest(ConnectionManager::ExecuteNetlist, _netlist);
 }
 
 

@@ -24,20 +24,14 @@ void ConnectionManager::connectToCircuitSimulatorService(const QString& serverNa
 
 }
 
-void ConnectionManager::sendMessage() {
-    QByteArray message = "Please give me a Netlist";
-    m_socket->write(message);
-    m_socket->flush();
-}
-
 void ConnectionManager::receiveResponse() {
     QByteArray response = m_socket->readAll();
-    OT_LOG_D("Answer from CircuitSimulatorService: " + response.toStdString());
+    OT_LOG_D("Got following netlist: " + response.toStdString());
 }
 
 void ConnectionManager::sendHello() {
-    //OT_LOG_D("Connection to CircuitSimulatorService is established. Sending.");
-    QByteArray message = "Hello";
+    OT_LOG_D("Connected");
+    QByteArray message = "Connected";
     m_socket->write(message);
     m_socket->flush();
 }

@@ -24,18 +24,19 @@ public:
 
 
 	void startListen(const std::string& _serverName);
-	void queueRequest(RequestType _type, const std::string& _data);
+	void queueRequest(RequestType _type, const std::list<std::string>& _data);
 
 private Q_SLOTS:
 	void handleConnection();
 	void handleReadyRead();
 	void handleDisconnected();
-	void handleQueueRequest(RequestType _type, std::string _data);
+	void handleQueueRequest(RequestType _type, std::list<std::string> _data);
 
 private:
 	
 	QLocalServer* m_server;
 	QLocalSocket* m_socket;
+	QByteArray m_netlist;
 
 
 

@@ -20,6 +20,10 @@ void QtWrapper::run(const std::string& _serverName) {
 	workerThread.detach();
 }
 
+ConnectionManager* QtWrapper::getConnectionManager() {
+	return m_connectionManager;
+}
+
 void QtWrapper::worker(std::string _serverName) {
 	int argc = 0;
 	m_application = new QCoreApplication(argc, nullptr);

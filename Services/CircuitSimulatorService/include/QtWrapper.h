@@ -11,6 +11,8 @@ public:
 	QtWrapper();
 	
 	void run(const std::string& _serverName);
+
+	ConnectionManager* getConnectionManager();
 private:
 	QCoreApplication* m_application;
 	ConnectionManager* m_connectionManager;
