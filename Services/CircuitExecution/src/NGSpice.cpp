@@ -81,7 +81,6 @@ int NGSpice::MySendInitDataFunction(pvecinfoall vectorInfoAll, int idNumNGSpiceS
 
 void NGSpice::runSimulation(std::list<std::string>& _netlist) {
 	for (const std::string& command : _netlist) {
-		OT_LOG_D("Run Simulation: " + command);
 		ngSpice_Command(const_cast<char*>(command.c_str()));
 	}
 }

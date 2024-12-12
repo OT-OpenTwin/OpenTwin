@@ -1,11 +1,23 @@
 #pragma once
+//Service Header
+#include "BlockEntityHandler.h"
+
+
+//Qt Header
+#include "QtCore/qjsonarray.h"
+#include "QtCore/qjsondocument.h"
+#include "QtCore/qjsonobject.h"
+
+//Open Twin Header
+#include "OTServiceFoundation/BusinessLogicHandler.h"
 
 //C++ Header
 #include <vector>
 #include <map>
 #include <string>
+#include <mutex>
 
-class SimulationResults
+class SimulationResults : public BusinessLogicHandler
 {
 
 public:
@@ -14,6 +26,8 @@ public:
     void addToResultMap(const std::string& key, double value);
     std::map<std::string, std::vector<double>>& getResultMap() {   return resultMap; }
 
+    void addResults(QString _result);
+    void setSolverInformation(std::string solverName, std::string simulationType, std::string circuitName);
     //Setter
     void setVecAmount(int amount)
     {
@@ -31,6 +45,13 @@ private:
     static SimulationResults* instance;
     std::map<std::string, std::vector<double>> resultMap;
     int vecAmount;
+    BlockEntityHandler m_blockEntityHandler;
+    std::string solverName;
+    std::string simulationType;
+    std::string circuitName;
+    std::mutex m_mutex;
+
+
 };
 
 

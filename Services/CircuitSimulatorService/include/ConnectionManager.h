@@ -18,13 +18,13 @@ public:
 	};
 
 	static QString toString(RequestType _type);
-
 	ConnectionManager(QObject* parent = (QObject*)nullptr);
 	~ConnectionManager();
 
 
 	void startListen(const std::string& _serverName);
 	void queueRequest(RequestType _type, const std::list<std::string>& _data);
+
 
 private Q_SLOTS:
 	void handleConnection();

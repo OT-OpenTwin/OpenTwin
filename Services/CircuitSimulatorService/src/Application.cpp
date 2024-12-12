@@ -11,7 +11,7 @@
 #include "ModelNotifier.h"
 #include "UiNotifier.h"
 #include "QtWrapper.h"
-
+#include "SimulationResults.h"
 // Open twin header
 #include "OTCore/ReturnMessage.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -333,6 +333,9 @@ void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std:
 
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity) {
 	
+	//Enusre that subprocessHandler is null before starting
+	m_subprocessHandler = nullptr;
+	
 	
 	EntityPropertiesEntityList* circuitName = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Circuit"));
 	assert(circuitName != nullptr);
@@ -351,7 +354,9 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 		return;
 	}
 
-	
+	//Setting the members of SimulationResults
+	SimulationResults::getInstance()->setSolverInformation(solverName, simulationTypeProperty->getValue(), circuitName->getValueName());
+
 	m_blockEntityHandler.setPackageName(name);
 	auto allEntitiesByBlockID = m_blockEntityHandler.findAllBlockEntitiesByBlockID();
 	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections();
@@ -369,6 +374,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	//Now i send the netlist to the subprocess
 	sendNetlistToSubService(_netlist);
 
+	m_ngSpice.clearBufferStructure(name);
 	//And start the subprocess
 	const int sessionCount = Application::instance()->getSessionCount();
 	const int serviceID = Application::instance()->getServiceIDAsInt();
@@ -377,10 +383,9 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 		m_subprocessHandler = new SubprocessHandler(m_serverName, sessionCount, serviceID);
 	}
 
-
-	//m_blockEntityHandler.createResultCurves(solverName,simulationTypeProperty->getValue(),circuitName->getValueName());
-	m_ngSpice.clearBufferStructure(name);
-
+	
+	
+	
 
 	
 }
@@ -577,6 +582,7 @@ void Application::uiDisconnected(const ot::components::UiComponent * _ui) {
 
 void Application::modelConnected(ot::components::ModelComponent * _model) {
 	m_blockEntityHandler.setModelComponent(_model);
+	SimulationResults::getInstance()->setModelComponent(_model);
 	//if (m_subprocessHandler == nullptr)
 	//{
 	//	const int sessionCount = Application::instance()->getSessionCount();

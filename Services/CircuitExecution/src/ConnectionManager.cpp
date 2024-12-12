@@ -65,9 +65,6 @@ void ConnectionManager::receiveResponse() {
 
 void ConnectionManager::sendHello() {
     OT_LOG_D("Connected");
-    QByteArray message = "Connected";
-    m_socket->write(message);
-    m_socket->flush();
 }
 
 void ConnectionManager::handleError(QLocalSocket::LocalSocketError error) {
@@ -76,41 +73,35 @@ void ConnectionManager::handleError(QLocalSocket::LocalSocketError error) {
 
 void ConnectionManager::handleDisconnected() {
     OT_LOG_D("Client disconnected from server");
+    SimulationResults::getInstance()->getResultMap().clear();
     exit(0);
 }
 
 void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) {
 
-    QJsonDocument doc(_data);
-    QString jsonString = doc.toJson(QJsonDocument::Compact);
+ 
 
     if (_actionType.toStdString() == "ExecuteNetlist") {
-        handleRunSimulation(jsonString);
+        std::list<std::string> netlist;
+
+        for (const QJsonValue& value : _data) {
+            // Umwandlung von QJsonValue (String) zu std::string
+            QString item = value.toString();
+            netlist.push_back(item.toStdString());  // QString zu std::string konvertieren
+        }
+
+        handleRunSimulation(netlist);
     }
     else {
-        OT_LOG_D("Normal Message:" + jsonString.toStdString());
+        QJsonDocument doc(_data);
+        QByteArray byteArray = doc.toJson(QJsonDocument::Indented);
+        QString message = QString::fromUtf8(byteArray);
+        OT_LOG_D("Normal Message:" + message.toStdString());
     }
 }
 
-void ConnectionManager::handleRunSimulation(QString _netlistString) {
+void ConnectionManager::handleRunSimulation(std::list<std::string> _netlist) {
     
-    //First getting the std::list
-    std::list<std::string> _netlist;
-
-    //Here i erase the []
-    std::string temp = _netlistString.toStdString();
-    temp.erase(std::remove(temp.begin(), temp.end(), '['), temp.end());
-    temp.erase(std::remove(temp.begin(), temp.end(), ']'), temp.end());
-    
-    //Now i put the strings into the netlist and delete the ""
-    std::stringstream ss(temp);
-    std::string item;
-    while (std::getline(ss, item, ',')) {
-        // Schritt 3: Entferne zusätzliche Anführungszeichen
-        item.erase(std::remove(item.begin(), item.end(), '\"'), item.end());
-        _netlist.push_back(item);
-    }
-
    
     //Executing run from NGSpice
     m_ngSpice->runSimulation(_netlist);
@@ -126,6 +117,7 @@ void ConnectionManager::sendBackResults(std::map<std::string, std::vector<double
         handleDisconnected();
     }
 
+    
 
     QJsonObject jsonObject;
     QJsonArray jsonArray;
@@ -147,8 +139,10 @@ void ConnectionManager::sendBackResults(std::map<std::string, std::vector<double
     QJsonDocument jsonDoc(jsonObject);
     QByteArray data = jsonDoc.toJson();
     
-    OT_LOG_D("Sendling back results: " + data.toStdString());
-
+    
+    OT_LOG_D("Sending Back Results");
     m_socket->write(data);
     m_socket->flush();
+
+    handleDisconnected();
 }

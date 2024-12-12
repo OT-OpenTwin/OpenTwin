@@ -32,7 +32,7 @@ private:
 	QLocalSocket* m_socket;
 	NGSpice* m_ngSpice;
 	void handleActionType(QString _actionType, QJsonArray _data);
-	void handleRunSimulation(QString _netlistString);
+	void handleRunSimulation( std::list<std::string> _netlist);
 	void sendBackResults(std::map<std::string, std::vector<double>> _results);
 
 	

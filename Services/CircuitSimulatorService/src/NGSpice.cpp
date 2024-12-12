@@ -58,7 +58,7 @@ void NGSpice::clearBufferStructure(std::string name)
 	this->customNameToNetlistNameMap.clear();
 	this->netlistNameToCustomNameMap.clear();
 	Numbers::nodeNumber = 1;
-	SimulationResults::getInstance()->getResultMap().clear();
+	//SimulationResults::getInstance()->getResultMap().clear();
 	/*ngSpice_Command(const_cast<char*>("show"));*/
 	//ngSpice_Command(const_cast<char*>("reset"));
 	
@@ -1120,25 +1120,6 @@ std::string NGSpice::generateNetlistTRANSimulation(EntityBase* solverEntity, std
 
 std::list<std::string> NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
-	SendChar* printfcn = MySendCharFunction;
-	SendStat* statfcn = MySendStat;
-	ControlledExit* ngexit = MyControlledExit;
-	SendData* datfcn = MySendDataFunction;
-	SendInitData* initData = MySendInitDataFunction;
-	std::string myString;
-
-	int status = ngSpice_Init(MySendCharFunction, MySendStat, MyControlledExit, MySendDataFunction, MySendInitDataFunction, nullptr, nullptr);
-
-	if (status == 0)
-	{
-		OT_LOG_D("Worked");
-
-	}
-	else if (status == 1)
-	{
-		OT_LOG_E("Something went wrong");
-	}
-
 	
 	updateBufferClasses(allConnectionEntities, allEntitiesByBlockID, editorname);
 
@@ -1150,90 +1131,6 @@ std::list<std::string> NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std:
 
 }
 
-
-//Callback Functions for NGSpice
-int NGSpice::MySendCharFunction(char* output, int ident, void* userData)
-{
-	Application::instance()->uiComponent()->displayMessage(std::string(output) + "\n");
-	if (strstr(output, "simulation(s) aborted")) {
-
-		/*ngSpice_Command(const_cast<char*>("reset"));*/
-		//ngSpice_Init(MySendCharFunction, MySendStat, MyControlledExit, MySendDataFunction, MySendInitDataFunction, nullptr, nullptr);
-		/*ngSpice_Command(const_cast<char*>("quit"));*/
-	
-	}
-
-
-	return 0;
-}
-
-int NGSpice::MySendStat(char* outputReturn, int ident, void* userData)
-{
-	Application::instance()->uiComponent()->displayMessage(std::string(outputReturn) + "\n");
-
-
-	return 0;
-}
-
-int NGSpice::MyControlledExit(int exitstatus, bool immediate, bool quitexit, int ident, void* userdata)
-{
-	
-	Application::instance()->uiComponent()->displayMessage(std::to_string(exitstatus) + "\n");
-	ngSpice_Init(MySendCharFunction, MySendStat, MyControlledExit, MySendDataFunction, MySendInitDataFunction, nullptr, nullptr);
-	return 0;
-}
-
-
-
-int NGSpice::MySendDataFunction(pvecvaluesall vectorsAll, int numStructs, int idNumNGSpiceSharedLib, void* userData)
-{
-	
-	for (int i = 0; i < vectorsAll->veccount; ++i) {
-		std::string name = vectorsAll->vecsa[i]->name;
-
-		double value = 0;
-		if (vectorsAll->vecsa[i]->is_complex)
-		{
-			value = calculateMagnitude(vectorsAll->vecsa[i]->creal, vectorsAll->vecsa[i]->cimag);
-		}
-		else
-		{
-			value = vectorsAll->vecsa[i]->creal;
-		}
-		
-		SimulationResults::getInstance()->getResultMap().at(name).push_back(value);
-	}
-	
-	return 0;
-}
-
-int NGSpice::MySendInitDataFunction(pvecinfoall vectorInfoAll, int idNumNGSpiceSharedLib, void* userData)
-{
-	for (int i = 0; i < vectorInfoAll->veccount; i++)
-	{
-		std::string name = vectorInfoAll->vecs[i]->vecname;
-		std::vector<double> values;
-		SimulationResults::getInstance()->setVecAmount(vectorInfoAll->veccount);
-		if (name != "voltagemeterconnection")
-		{
-			SimulationResults::getInstance()->getResultMap().insert_or_assign(name, values);
-		}
-		else
-		{
-			continue;
-		}
-		
-
-
-	}
-
-	return 0;
-}
-
-double NGSpice::calculateMagnitude(double real, double imag)
-{
-	return sqrt(real * real + imag * imag);
-}
 
 bool NGSpice::addToCustomNameToNetlistMap(const std::string& customName, const std::string& netlistName) {
 	
@@ -1268,10 +1165,6 @@ std::string NGSpice::to_lowercase(const std::string& str) {
 	return lower_str;
 }
 
-//void NGSpice::setInitStatus(int status)
-//{
-//	initStatus = status;
-//}
 
 std::string NGSpice::getNetlistNameOfMap(const std::string& customName) const
 {
@@ -1285,16 +1178,5 @@ std::string NGSpice::getNetlistNameOfMap(const std::string& customName) const
 	}
 }
 
-//int NGSpice::getInitStatus()
-//{
-//	return initStatus;
-//}
-
-//NGSpice* NGSpice::getInstance() {
-//	if (!instance) {
-//		instance = new NGSpice();
-//	}
-//	return instance;
-//}
 
 

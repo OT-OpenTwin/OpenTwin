@@ -1,7 +1,8 @@
-
+// Service Header
 #include "ConnectionManager.h"
+#include "SimulationResults.h"
 
-
+// Qt Header
 #include "QtNetwork/qlocalserver.h"
 #include "QtNetwork/qlocalsocket.h"
 #include "QtCore/qjsonarray.h"
@@ -23,6 +24,8 @@ QString ConnectionManager::toString(RequestType _type) {
         return "";
     }
 }
+
+
 
 ConnectionManager::ConnectionManager(QObject* parent) : QObject(parent) {
     m_server = new QLocalServer(this);
@@ -52,8 +55,10 @@ void ConnectionManager::queueRequest(RequestType _type, const std::list<std::str
 
 void ConnectionManager::handleReadyRead() {
     QByteArray data = m_socket->readAll();
-    
-    OT_LOG_D("Received Data: " + data.toStdString());
+    QString result = QString::fromUtf8(data);
+
+    OT_LOG_D("Got the Results: " + result.toStdString());
+    SimulationResults::getInstance()->addResults(result);   
 }
 
 void ConnectionManager::handleDisconnected() {
