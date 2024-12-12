@@ -1,6 +1,7 @@
 // Service Header
 #include "ConnectionManager.h"
 #include "NGSpice.h"
+#include "SimulationResults.h"
 
 // Qt Header
 #include "QtCore/qjsondocument.h"
@@ -54,6 +55,12 @@ void ConnectionManager::receiveResponse() {
     }
 
     handleActionType(typeString, jsonArray);
+
+    //After Simulating I send back the results
+    sendBackResults(SimulationResults::getInstance()->getResultMap());
+
+
+
 }
 
 void ConnectionManager::sendHello() {
@@ -78,9 +85,70 @@ void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) 
     QString jsonString = doc.toJson(QJsonDocument::Compact);
 
     if (_actionType.toStdString() == "ExecuteNetlist") {
-        OT_LOG_D("Execute Netlist:" + jsonString.toStdString());
+        handleRunSimulation(jsonString);
     }
     else {
         OT_LOG_D("Normal Message:" + jsonString.toStdString());
     }
+}
+
+void ConnectionManager::handleRunSimulation(QString _netlistString) {
+    
+    //First getting the std::list
+    std::list<std::string> _netlist;
+
+    //Here i erase the []
+    std::string temp = _netlistString.toStdString();
+    temp.erase(std::remove(temp.begin(), temp.end(), '['), temp.end());
+    temp.erase(std::remove(temp.begin(), temp.end(), ']'), temp.end());
+    
+    //Now i put the strings into the netlist and delete the ""
+    std::stringstream ss(temp);
+    std::string item;
+    while (std::getline(ss, item, ',')) {
+        // Schritt 3: Entferne zusätzliche Anführungszeichen
+        item.erase(std::remove(item.begin(), item.end(), '\"'), item.end());
+        _netlist.push_back(item);
+    }
+
+   
+    //Executing run from NGSpice
+    m_ngSpice->runSimulation(_netlist);
+
+    //The results are being pushed in the callbacks to SimulationResults map
+
+}
+
+void ConnectionManager::sendBackResults(std::map<std::string, std::vector<double>> _results) {
+
+    if (_results.empty()) {
+        OT_LOG_E("No Results");
+        handleDisconnected();
+    }
+
+
+    QJsonObject jsonObject;
+    QJsonArray jsonArray;
+
+    for (const auto& pair : _results) {
+        QJsonObject entry;
+        entry["key"] = QString::fromStdString(pair.first);
+        QJsonArray valuesArray;
+        for (double value : pair.second) {
+            valuesArray.append(value);
+        }
+        entry["values"] = valuesArray;
+        jsonArray.append(entry);
+    }
+    
+    jsonObject["results"] = jsonArray;
+
+    
+    QJsonDocument jsonDoc(jsonObject);
+    QByteArray data = jsonDoc.toJson();
+    
+    OT_LOG_D("Sendling back results: " + data.toStdString());
+
+    m_socket->write(data);
+    m_socket->flush();
 }

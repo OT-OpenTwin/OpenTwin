@@ -19,4 +19,5 @@ public:
 private:
 	void initializeCallbacks();
 	void intializeNGSpice();
+	static double calculateMagnitude(double real, double imag);
 };

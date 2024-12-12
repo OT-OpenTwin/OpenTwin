@@ -1,6 +1,6 @@
 //Service Header
 #include "NGSpice.h"
-
+#include "SimulationResults.h"
 
 
 NGSpice::NGSpice() {
@@ -32,7 +32,7 @@ int NGSpice::MySendStat(char* outputReturn, int ident, void* userData) {
 int NGSpice::MyControlledExit(int exitstatus, bool immediate, bool quitexit, int ident, void* userdata) {
 
 	OT_LOG_E(std::to_string(exitstatus));
-
+	SimulationResults::getInstance()->getResultMap().clear();
 	return 0;
 }
 
@@ -40,20 +40,50 @@ int NGSpice::MyControlledExit(int exitstatus, bool immediate, bool quitexit, int
 
 int NGSpice::MySendDataFunction(pvecvaluesall vectorsAll, int numStructs, int idNumNGSpiceSharedLib, void* userData) {
 
+	for (int i = 0; i < vectorsAll->veccount; ++i) {
+		std::string name = vectorsAll->vecsa[i]->name;
 
+		double value = 0;
+		if (vectorsAll->vecsa[i]->is_complex) {
+			value = calculateMagnitude(vectorsAll->vecsa[i]->creal, vectorsAll->vecsa[i]->cimag);
+		}
+		else {
+			value = vectorsAll->vecsa[i]->creal;
+		}
+
+		SimulationResults::getInstance()->getResultMap().at(name).push_back(value);
+	}
 
 	return 0;
+
+
 }
 
 int NGSpice::MySendInitDataFunction(pvecinfoall vectorInfoAll, int idNumNGSpiceSharedLib, void* userData) {
 
+	for (int i = 0; i < vectorInfoAll->veccount; i++) {
+		std::string name = vectorInfoAll->vecs[i]->vecname;
+		std::vector<double> values;
+		SimulationResults::getInstance()->setVecAmount(vectorInfoAll->veccount);
+		if (name != "voltagemeterconnection") {
+			SimulationResults::getInstance()->getResultMap().insert_or_assign(name, values);
+		}
+		else {
+			continue;
+		}
 
-	
+
+	}
+
 	return 0;
+	
 }
 
 void NGSpice::runSimulation(std::list<std::string>& _netlist) {
-	OT_LOG_D("Run Simulation");
+	for (const std::string& command : _netlist) {
+		OT_LOG_D("Run Simulation: " + command);
+		ngSpice_Command(const_cast<char*>(command.c_str()));
+	}
 }
 
 void NGSpice::initializeCallbacks() {
@@ -72,4 +102,9 @@ void NGSpice::intializeNGSpice() {
 	else if (status == 1) {
 		OT_LOG_E("Something went wrong");
 	}
+}
+
+
+double NGSpice::calculateMagnitude(double real, double imag) {
+	return sqrt(real * real + imag * imag);
 }

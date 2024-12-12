@@ -1059,6 +1059,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 
 	_netlist.push_back(const_cast<char*>("circbyline .Control"));
 	_netlist.push_back(const_cast<char*>("circbyline run"));
+	//_netlist.push_back(const_cast<char*>("circbyline echo Simulation Complete"));
 	_netlist.push_back(const_cast<char*>("circbyline .endc"));
 	_netlist.push_back(const_cast<char*>("circbyline .end"));
 

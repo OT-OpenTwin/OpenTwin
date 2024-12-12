@@ -52,6 +52,7 @@ void ConnectionManager::queueRequest(RequestType _type, const std::list<std::str
 
 void ConnectionManager::handleReadyRead() {
     QByteArray data = m_socket->readAll();
+    
     OT_LOG_D("Received Data: " + data.toStdString());
 }
 
@@ -105,6 +106,8 @@ void ConnectionManager::handleConnection() {
     OT_LOG_D("Send netlist");
     m_socket->write(m_netlist);
     m_socket->flush();
+
+   
 
 }
 
