@@ -110,20 +110,10 @@ std::string Application::handleExecuteModelAction(ot::JsonDocument& _document) {
 
 		runCircuitSimulation();
 
-		std::list<std::string> testList;
-		testList.push_back("Yellow");
-		testList.push_back("Green");
-		testList.push_back("blue");
+		
 
 
-		sendNetlistToSubService(testList);
-
-		const int sessionCount = Application::instance()->getSessionCount();
-		const int serviceID = Application::instance()->getServiceIDAsInt();
-		if (m_subprocessHandler == nullptr) {
-
-			m_subprocessHandler = new SubprocessHandler(m_serverName, sessionCount, serviceID);
-		}
+		
 	}
 	else if (action == "Circuit Simulator:Edit:Add Circuit") {
 		createNewCircuit();
@@ -344,9 +334,6 @@ void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std:
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity) {
 	
 	
-
-
-
 	EntityPropertiesEntityList* circuitName = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Circuit"));
 	assert(circuitName != nullptr);
 
@@ -370,22 +357,32 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	auto allConnectionEntitiesByID = m_blockEntityHandler.findAllEntityBlockConnections();
 
 
-
-	std::string status = m_ngSpice.ngSpice_Initialize (solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name);
-	if (status == "failed")
+	//Here i generate my netlist
+	std::list<std::string> _netlist = m_ngSpice.ngSpice_Initialize (solverEntity,allConnectionEntitiesByID,allEntitiesByBlockID, name);
+	if (_netlist.empty())
 	{
 		OT_LOG_E("NGSpice Initialize function failed!");
 		m_ngSpice.clearBufferStructure(name);
 		return;
 	}
-	m_blockEntityHandler.createResultCurves(solverName,simulationTypeProperty->getValue(),circuitName->getValueName());
+
+	//Now i send the netlist to the subprocess
+	sendNetlistToSubService(_netlist);
+
+	//And start the subprocess
+	const int sessionCount = Application::instance()->getSessionCount();
+	const int serviceID = Application::instance()->getServiceIDAsInt();
+	if (m_subprocessHandler == nullptr) {
+
+		m_subprocessHandler = new SubprocessHandler(m_serverName, sessionCount, serviceID);
+	}
+
+
+	//m_blockEntityHandler.createResultCurves(solverName,simulationTypeProperty->getValue(),circuitName->getValueName());
 	m_ngSpice.clearBufferStructure(name);
 
 
-	// Here we stop the Subprocess
-	//delete m_subprocessHandler;
-	//m_subprocessHandler = nullptr;
-	//
+	
 }
 
 void Application::sendNetlistToSubService(std::list<std::string>& _netlist) {

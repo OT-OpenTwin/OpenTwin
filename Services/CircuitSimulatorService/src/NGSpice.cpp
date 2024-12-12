@@ -60,7 +60,7 @@ void NGSpice::clearBufferStructure(std::string name)
 	Numbers::nodeNumber = 1;
 	SimulationResults::getInstance()->getResultMap().clear();
 	/*ngSpice_Command(const_cast<char*>("show"));*/
-	ngSpice_Command(const_cast<char*>("reset"));
+	//ngSpice_Command(const_cast<char*>("reset"));
 	
 	//ngSpice_Init(MySendCharFunction, MySendStat, MyControlledExit, MySendDataFunction, MySendInitDataFunction, nullptr, nullptr);
 }
@@ -741,33 +741,16 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 
 
 
-std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
+std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
 	
 	//Here i first create the Title of the Netlist and send it to NGSpice
+	std::list<std::string> _netlist;
 	std::string TitleLine = "circbyline *Test";
-	
+	_netlist.push_back(const_cast<char*>(TitleLine.c_str()));
 
-	try
-	{
-		ngSpice_Command(const_cast<char*>(TitleLine.c_str()));
 
-	
-	}
-	catch (const std::exception& e) {
-		// Fehlerbehandlung, falls ein Fehler auftritt
-		std::cerr << "Ausnahme bei ngspice: " << e.what() << std::endl;
-	}
-	
-	/*ngSpice_Command(const_cast<char*>("circbyline V1 1 0 AC 1 0"));
-	ngSpice_Command(const_cast<char*>("circbyline R1 1 2 1k"));
-	ngSpice_Command(const_cast<char*>("circbyline L1 2 3 100mH"));
-	ngSpice_Command(const_cast<char*>("circbyline C1 3 0 1uF"));
-	ngSpice_Command(const_cast<char*>("circbyline .ac dec 10 10 100k"));
-	ngSpice_Command(const_cast<char*>("circbyline .Control"));
-	ngSpice_Command(const_cast<char*>("circbyline run"));
-	ngSpice_Command(const_cast<char*>("circbyline .endc"));
-	ngSpice_Command(const_cast<char*>("circbyline .end"));*/
+
 
 	//As next i create the Circuit Element Netlist Lines by getting the information out of the BufferClasses 
 
@@ -979,11 +962,12 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		}
 
 
-		//Here i send the instance Lines to NGSpice dll
-		ngSpice_Command(const_cast<char*>(netlistLine.c_str()));
+		//Here i put the netlist instance line into my _netlist
+		_netlist.push_back(const_cast<char*>(netlistLine.c_str()));
+		
 		if (modelNetlistLine != "circbyline ")
 		{
-			ngSpice_Command(const_cast<char*>(modelNetlistLine.c_str()));
+			_netlist.push_back(const_cast<char*>(modelNetlistLine.c_str()));
 		}
 	}
 
@@ -1009,7 +993,10 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 
 	if (simulationLine == "failed")
 	{
-		return "failed";
+	
+		OT_LOG_E("Failed at creating Simulation Line");
+		_netlist.clear();
+		return _netlist;
 	}
 	simulationLine = "circbyline " + simulationLine;
 
@@ -1032,11 +1019,13 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		tempVecOfShunts.push_back(name);
 		nameOfRShunts.erase(nameOfRShunts.begin());
 		std::string temp = oss.str();
-		ngSpice_Command(const_cast<char*>(temp.c_str()));
+		_netlist.push_back(const_cast<char*>(temp.c_str()));
+		
 	}
 
 	//Here are my Simulation properties which i send to NGSpice
-	ngSpice_Command(const_cast<char*>(simulationLine.c_str()));
+	_netlist.push_back(const_cast<char*>(simulationLine.c_str()));
+	
 
 	//Now i will do a loop through the nodes of the voltageMeter to get the potential diffirence with probe
 	for (auto nodes : nodesOfVoltageMeter)
@@ -1055,7 +1044,7 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		std::ostringstream oss;
 		oss << "circbyline .probe vd" << nodeString;
 		std::string probeLine = oss.str();
-		ngSpice_Command(const_cast<char*>(probeLine.c_str()));
+		_netlist.push_back(const_cast<char*>(probeLine.c_str()));
 	}
 
 	
@@ -1065,19 +1054,15 @@ std::string NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, 
 		std::ostringstream oss;
 		oss << "circbyline .probe I(" << name << ")";
 		std::string probeLine = oss.str();
-		ngSpice_Command(const_cast<char*>(probeLine.c_str()));
+		_netlist.push_back(const_cast<char*>(probeLine.c_str()));
 	}
-	
-	ngSpice_Command(const_cast<char*>("circbyline .Control"));
-	//ngSpice_Command(const_cast<char*>("circbyline unset askquit"));
-	ngSpice_Command(const_cast<char*>("circbyline run"));
-	ngSpice_Command(const_cast<char*>("circbyline .endc"));
-	ngSpice_Command(const_cast<char*>("circbyline .end"));
 
-	
+	_netlist.push_back(const_cast<char*>("circbyline .Control"));
+	_netlist.push_back(const_cast<char*>("circbyline run"));
+	_netlist.push_back(const_cast<char*>("circbyline .endc"));
+	_netlist.push_back(const_cast<char*>("circbyline .end"));
 
-	return "success";
-	
+	return _netlist;
 }
 
 std::string NGSpice::generateNetlistDCSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string editorname)
@@ -1132,7 +1117,7 @@ std::string NGSpice::generateNetlistTRANSimulation(EntityBase* solverEntity, std
 	return simulationLine;
 }
 
-std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
+std::list<std::string> NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
 	SendChar* printfcn = MySendCharFunction;
 	SendStat* statfcn = MySendStat;
@@ -1156,17 +1141,12 @@ std::string NGSpice::ngSpice_Initialize(EntityBase* solverEntity,std::map<ot::UI
 	
 	updateBufferClasses(allConnectionEntities, allEntitiesByBlockID, editorname);
 
-	std::string temp =  generateNetlist( solverEntity, allConnectionEntities,allEntitiesByBlockID, editorname);
-	if (temp == "failed")
-	{
-		return "failed";
-	}
-
+	std::list<std::string> temp =  generateNetlist( solverEntity, allConnectionEntities,allEntitiesByBlockID, editorname);
+	
 	Numbers::RshunNumbers = 0;
 	
-	myString = std::to_string(status);
+	return temp;
 
-	return myString;
 }
 
 
