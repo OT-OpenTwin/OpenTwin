@@ -4,6 +4,6 @@
 
 struct BatchUpdateInformation
 {
-	std::list<std::string> m_pythonScriptNames;
-	std::list<std::string> m_selectionEntityNames;
+	std::string m_pythonScriptNames;
+	std::string m_selectionEntityNames;
 };

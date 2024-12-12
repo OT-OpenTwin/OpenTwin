@@ -19,7 +19,7 @@ private:
 
 	inline void ensureEssentials();
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> findAllTableSelectionsWithConsiderForBatching();
-	BatchUpdateInformation createNewMSMDWithSelections(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& _allRelevantTableSelectionsByMSMD);
+	std::map<uint32_t, std::list<BatchUpdateInformation>> createNewMSMDWithSelections(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& _allRelevantTableSelectionsByMSMD);
 	std::map<std::string, ot::UID> getTableUIDByNames(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& _allRelevantTableSelectionsByMSMD);
 	std::map<std::string, ot::UID> getPythonScriptUIDByNames(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& _allRelevantTableSelectionsByMSMD);
 };

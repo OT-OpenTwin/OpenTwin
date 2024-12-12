@@ -30,8 +30,12 @@ public:
 	void setSelectEntireColumn(bool _selectAll);
 	void setSelectEntireRow(bool _selectAll);
 	
+	uint32_t getBatchingPriority();
+	void setBatchingPriority(uint32_t _priority);
 
 	bool getPassOnScript();
+	void setPassOnScript(bool _passOn);
+
 	std::string getScriptName();
 	void setRange(const ot::TableRange& _range);
 

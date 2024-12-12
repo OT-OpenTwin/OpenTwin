@@ -21,17 +21,21 @@ void BatchedCategorisationHandler::createNewScriptDescribedMSMD()
 		}
 		allRelevantTableSelections.clear();
 
-		auto newSelectionNamesAndPythonScripts = createNewMSMDWithSelections(allRelevantTableSelectionsByMSMD);
+		auto batchingInformationsByPriority= createNewMSMDWithSelections(allRelevantTableSelectionsByMSMD);
 
-		auto pythonScriptName = newSelectionNamesAndPythonScripts.m_pythonScriptNames.begin();
-		std::list<std::string>&	newsSelectionEntityNames = newSelectionNamesAndPythonScripts.m_selectionEntityNames;
-		for (auto newSelectionEntityName = newsSelectionEntityNames.begin(); newSelectionEntityName != newsSelectionEntityNames.end(); newSelectionEntityName++)
+		
+		for (auto batchingInformationByPriority = batchingInformationsByPriority.rbegin(); batchingInformationByPriority != batchingInformationsByPriority.rend(); batchingInformationByPriority++)
 		{
-			ot::Variable parameterEntityName((*newSelectionEntityName));
-			std::list<ot::Variable> parameterList{ parameterEntityName };
-			m_pythonInterface->AddScriptWithParameter(*pythonScriptName, parameterList);
-			pythonScriptName++;
+			std::list<BatchUpdateInformation>&  batchingInformations = batchingInformationByPriority->second;
+			for (BatchUpdateInformation& batchingInformation : batchingInformations)
+			{
+				ot::Variable parameterEntityName(batchingInformation.m_selectionEntityNames);
+				std::list<ot::Variable> parameterList{ parameterEntityName };
+				const std::string pythonScriptName = batchingInformation.m_pythonScriptNames;
+				m_pythonInterface->AddScriptWithParameter(pythonScriptName , parameterList);
+			}
 		}
+
 		ot::ReturnMessage returnValue = m_pythonInterface->SendExecutionOrder();
 		if (returnValue.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Ok)
 		{
@@ -86,11 +90,11 @@ std::list<std::shared_ptr<EntityTableSelectedRanges>> BatchedCategorisationHandl
 	return allRangeEntities;
 }
 
-BatchUpdateInformation BatchedCategorisationHandler::createNewMSMDWithSelections(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& _allRelevantTableSelectionsByMSMD)
+std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandler::createNewMSMDWithSelections(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& _allRelevantTableSelectionsByMSMD)
 {
 	ot::UIDList topoIDs, topoVers, dataEnt{};
 	std::list<bool> forceVis;
-	BatchUpdateInformation batchUpdateInformation;
+	std::map<uint32_t, std::list<BatchUpdateInformation>> batchUpdateInformationByPriority;
 
 	std::string allMSMDNames = "";
 	auto tableIDByNames = getTableUIDByNames(_allRelevantTableSelectionsByMSMD);
@@ -164,11 +168,14 @@ BatchUpdateInformation BatchedCategorisationHandler::createNewMSMDWithSelections
 			newSelection->setRange(selectedRange);
 			newSelection->setSelectEntireColumn(selection->getSelectEntireColumn());
 			newSelection->setSelectEntireRow(selection->getSelectEntireRow());
+			newSelection->setBatchingPriority(selection->getBatchingPriority());
 
 			//Switch the batching strategy.
+			bool considerForBatching = selection->getConsiderForBatchprocessing();
+			newSelection->setConsiderForBatchprocessing(considerForBatching);
 			bool passOnScript = selection->getPassOnScript();
-			newSelection->setConsiderForBatchprocessing(passOnScript);
-	
+			newSelection->setPassOnScript(passOnScript);
+
 			selection->setConsiderForBatchprocessing(!passOnScript);
 			selection->StoreToDataBase();
 			topoIDs.push_back(selection->getEntityID());
@@ -181,17 +188,19 @@ BatchUpdateInformation BatchedCategorisationHandler::createNewMSMDWithSelections
 			topoVers.push_back(newSelection->getEntityStorageVersion());
 			forceVis.push_back(false);
 
-			batchUpdateInformation.m_selectionEntityNames.push_back(newSelectionName);
-			batchUpdateInformation.m_pythonScriptNames.push_back(newSelection->getScriptName());
-
-
+			BatchUpdateInformation batchUpdateInformation;
+			batchUpdateInformation.m_selectionEntityNames = (newSelectionName);
+			batchUpdateInformation.m_pythonScriptNames = (newSelection->getScriptName());
+			
+			uint32_t priority = newSelection->getBatchingPriority();
+			batchUpdateInformationByPriority[priority].push_back(batchUpdateInformation);
 		}
 	}
 	allMSMDNames = allMSMDNames.substr(0, allMSMDNames.size() - 2);
 	_modelComponent->addEntitiesToModel(topoIDs, topoVers, forceVis, dataEnt, dataEnt, dataEnt, "Automatic creation of " + allMSMDNames);
 
 
-	return batchUpdateInformation;
+	return batchUpdateInformationByPriority;
 }
 
 std::map<std::string, ot::UID> BatchedCategorisationHandler::getTableUIDByNames(std::map<std::string, std::list<std::shared_ptr<EntityTableSelectedRanges>>>& _allRelevantTableSelectionsByMSMD)

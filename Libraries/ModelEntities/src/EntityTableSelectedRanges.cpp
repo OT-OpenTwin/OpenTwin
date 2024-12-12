@@ -95,6 +95,9 @@ void EntityTableSelectedRanges::createProperties(const std::string& pythonScript
 	
 	EntityPropertiesBoolean::createProperty(updateStrategyGroup, "Select entire row", false, "default", getProperties());
 	EntityPropertiesBoolean::createProperty(updateStrategyGroup, "Select entire column", false, "default", getProperties());
+	EntityPropertiesInteger* executionPriority = new EntityPropertiesInteger("Execution priority", 0);
+	executionPriority->setMin(0);
+	getProperties().createProperty(executionPriority, updateStrategyGroup);
 }
 
 void EntityTableSelectedRanges::setTableProperties(std::string _tableName, ot::UID _tableID, std::string _tableOrientation) {
@@ -198,10 +201,53 @@ void EntityTableSelectedRanges::setSelectEntireRow(bool _selectAll)
 	}
 }
 
+uint32_t EntityTableSelectedRanges::getBatchingPriority()
+{
+	auto baseProperty = getProperties().getProperty("Execution priority");
+	if (baseProperty == nullptr)
+	{
+		return 0; //Default priority is the lowest priority
+	}
+	auto intProperty = dynamic_cast<EntityPropertiesInteger*>(baseProperty);
+	
+	return static_cast<uint32_t>(intProperty->getValue());
+}
+
+void EntityTableSelectedRanges::setBatchingPriority(uint32_t _priority)
+{
+	auto baseProperty = getProperties().getProperty("Execution priority");
+	if (baseProperty != nullptr)
+	{
+		auto intProperty = dynamic_cast<EntityPropertiesInteger*>(baseProperty);
+		intProperty->setValue(static_cast<int32_t>( _priority));
+		setModified();
+	}
+	else
+	{
+		assert(0);//Property not set.
+	}
+
+}
+
 bool EntityTableSelectedRanges::getPassOnScript()
 {
 	auto considerForBatchProcessing = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty(_propNamePassOnScript));
 	return considerForBatchProcessing->getValue();
+}
+
+void EntityTableSelectedRanges::setPassOnScript(bool _passOn)
+{
+	EntityPropertiesBase* baseProp =  getProperties().getProperty(_propNamePassOnScript);
+	if (baseProp != nullptr)
+	{
+		auto considerForBatchProcessing = dynamic_cast<EntityPropertiesBoolean*>(baseProp);
+		considerForBatchProcessing->setValue(_passOn);
+		setModified();
+	}
+	else
+	{
+		assert(0); //Property not set
+	}
 }
 
 std::string EntityTableSelectedRanges::getScriptName()
