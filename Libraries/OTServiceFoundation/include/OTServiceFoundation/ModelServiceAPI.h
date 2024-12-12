@@ -9,9 +9,7 @@
 #include "EntityBase.h"
 
 namespace ot {
-	class OT_SERVICEFOUNDATION_API_EXPORT ModelServiceAPI
-	{
-
+	class OT_SERVICEFOUNDATION_API_EXPORT ModelServiceAPI {
 	public:
 		ModelServiceAPI(const std::string& thisServiceURL, const std::string& modelServiceURL)
 			: m_thisServiceURL(thisServiceURL), m_modelServiceURL(modelServiceURL) {}

@@ -146,7 +146,11 @@ void SubprocessManager::worker(std::string _projectName) {
 		// Create communication handler
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
+#ifdef _DEBUG
+			m_communicationHandler = new CommunicationHandler(this, "TestServerPython");
+#else
 			m_communicationHandler = new CommunicationHandler(this, _projectName);
+#endif
 		}
 
 		// Run Qt event loop
