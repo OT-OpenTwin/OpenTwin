@@ -108,6 +108,7 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 	{
 		MetadataQuantity quantity;
 		
+		// First the regular fields
 		auto quantityFields = extractMetadataFields(*quantityDocument);
 		for (std::shared_ptr<MetadataEntry> entry : quantityFields)
 		{
@@ -135,6 +136,7 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 			}
 		}
 
+		//Next the additional information and value descriptions. Both of which are subdocuments
 		auto objectList = extractMetadataObjects(*quantityDocument);
 		for (auto& object : objectList)
 		{
@@ -190,6 +192,17 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 				quantity.metaData[object->getEntryName()] = object;
 			}
 		}
+		
+		//By now everything should be set, except of the quantity index of the quantity. This is not an own identifier but is contained in the value descriptions (Currently)
+		if (!quantity.valueDescriptions.empty())
+		{
+			quantity.quantityIndex = quantity.valueDescriptions.begin()->quantityIndex;
+		}
+		else
+		{
+			assert(0);//Should never be empty
+		}
+
 		seriesMetadata.addQuantity(quantity);
 	}
 

@@ -281,6 +281,8 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 			newQuantity.quantityLabel =  identicalQuantity->quantityLabel;
 			newQuantity.quantityIndex=  identicalQuantity->quantityIndex;
 			newQuantity.valueDescriptions = identicalQuantity->valueDescriptions;
+			newQuantity.dataDimensions = identicalQuantity->dataDimensions;
+			newQuantity.metaData = identicalQuantity->metaData;
 		}
 		else
 		{

@@ -36,14 +36,16 @@ void MetadataCampaign::updateMetadataOverview(MetadataSeries& seriesMetadata)
 	auto allQuanties = seriesMetadata.getQuantities();
 	for (auto& quantity : allQuanties)
 	{
-		auto& valueDescriptions = quantity.valueDescriptions;
-		assert(valueDescriptions.size()>= 1);
-		ot::UID index = valueDescriptions.begin()->quantityIndex;
-		auto existingQuantityEntry = m_quantityOverviewByUID.find(index);
+		assert(quantity.quantityIndex != 0);
+		auto existingQuantityEntry = m_quantityOverviewByUID.find(quantity.quantityIndex);
 		if (existingQuantityEntry == m_quantityOverviewByUID.end())
 		{
-			m_quantityOverviewByUID[index] = quantity;
-			m_quantityOverviewByLabel[quantity.quantityLabel] = &m_quantityOverviewByUID[index];
+			m_quantityOverviewByUID[quantity.quantityIndex] = quantity;
+			m_quantityOverviewByLabel[quantity.quantityLabel] = &m_quantityOverviewByUID[quantity.quantityIndex];
+		}
+		else
+		{
+			assert(0); //Each quantity should have its unique ID.
 		}
 	}
 }

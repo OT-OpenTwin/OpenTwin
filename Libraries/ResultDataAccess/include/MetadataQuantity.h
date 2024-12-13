@@ -63,7 +63,8 @@ struct __declspec(dllexport) MetadataQuantity
 	const bool operator==(const MetadataQuantity& _other) const
 	{
 		//Two metadata quantities are equal, if they have the same data structure:
-		const bool isEqual  = this->dataDimensions == _other.dataDimensions &&
+		const bool isEqual  = this->quantityName == _other.quantityName && 
+			this->dataDimensions == _other.dataDimensions &&
 			this->valueDescriptions == _other.valueDescriptions;
 		return isEqual;
 	}
