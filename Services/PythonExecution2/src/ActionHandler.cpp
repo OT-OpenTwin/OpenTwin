@@ -13,23 +13,9 @@
 #include "DataBase.h"
 #include "EntityBase.h"
 
-ActionHandler::ActionHandler() {
-	auto arguments = std::placeholders::_1;
-	m_checkParameterFunctions[OT_ACTION_CMD_ServiceShutdown] = m_noParameterCheck;
-	m_handlingFunctions[OT_ACTION_CMD_ServiceShutdown] = std::bind(&ActionHandler::shutdownProcess, this, arguments);
-
-	m_checkParameterFunctions[OT_ACTION_CMD_Ping] = m_noParameterCheck;
-	m_handlingFunctions[OT_ACTION_CMD_Ping] = std::bind(&ActionHandler::handlePing, this, arguments);
-
-	m_checkParameterFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Scripts] = std::bind(&ActionHandler::checkParameterExecuteScript, this, arguments);
-	m_handlingFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Scripts] = std::bind(&ActionHandler::executeScript, this, arguments);
-
-	m_checkParameterFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Command] = std::bind(&ActionHandler::checkParameterExecuteCommand, this, arguments);
-	m_handlingFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Command] = std::bind(&ActionHandler::executeCommand, this, arguments);
-
-	m_checkParameterFunctions[OT_ACTION_CMD_Init] = m_noParameterCheck;
-	m_handlingFunctions[OT_ACTION_CMD_Init] = std::bind(&ActionHandler::initialise, this, arguments);
-
+ActionHandler& ActionHandler::instance(void) {
+	static ActionHandler g_instance;
+	return g_instance;
 }
 
 ot::ReturnMessage ActionHandler::handleAction(const ot::JsonDocument& doc) {
@@ -57,6 +43,25 @@ ot::ReturnMessage ActionHandler::handleAction(const ot::JsonDocument& doc) {
 	}
 
 	return returnMessage;
+}
+
+ActionHandler::ActionHandler() {
+	auto arguments = std::placeholders::_1;
+	m_checkParameterFunctions[OT_ACTION_CMD_ServiceShutdown] = m_noParameterCheck;
+	m_handlingFunctions[OT_ACTION_CMD_ServiceShutdown] = std::bind(&ActionHandler::shutdownProcess, this, arguments);
+
+	m_checkParameterFunctions[OT_ACTION_CMD_Ping] = m_noParameterCheck;
+	m_handlingFunctions[OT_ACTION_CMD_Ping] = std::bind(&ActionHandler::handlePing, this, arguments);
+
+	m_checkParameterFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Scripts] = std::bind(&ActionHandler::checkParameterExecuteScript, this, arguments);
+	m_handlingFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Scripts] = std::bind(&ActionHandler::executeScript, this, arguments);
+
+	m_checkParameterFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Command] = std::bind(&ActionHandler::checkParameterExecuteCommand, this, arguments);
+	m_handlingFunctions[OT_ACTION_CMD_PYTHON_EXECUTE_Command] = std::bind(&ActionHandler::executeCommand, this, arguments);
+
+	m_checkParameterFunctions[OT_ACTION_CMD_Init] = m_noParameterCheck;
+	m_handlingFunctions[OT_ACTION_CMD_Init] = std::bind(&ActionHandler::initialise, this, arguments);
+
 }
 
 ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
@@ -157,7 +162,7 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 
 		//Execute
 		ot::ReturnValues result = m_pythonAPI.execute(scripts, allParameter);
-		PortDataBuffer::instance().AddModifiedPortData(result);
+		PortDataBuffer::instance().addModifiedPortData(result);
 
 		if (result.getNumberOfEntries() != 0) {
 			return ot::ReturnMessage(std::move(result));;

@@ -21,14 +21,16 @@ public:
 
 Q_SIGNALS:
 	void disconnected(void);
-	void dataReceived(std::string _data);
 
 private Q_SLOTS:
 	void slotDataReceived(void);
-	void slotProcessMessage(std::string _data);
+	void slotProcessMessage(std::string _message);
 	void slotDisconnected(void);
 
 private:
+	bool writeToServer(const std::string& _message);
+	void processNextEvent(void);
+
 	std::string m_serverName;
 	QLocalSocket* m_serverSocket;
 

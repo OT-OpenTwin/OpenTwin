@@ -101,18 +101,21 @@
     <ClInclude Include="include\PortData.h">
       <Filter>include\DataHandling</Filter>
     </ClInclude>
-    <ClInclude Include="include\Application.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\ActionHandler.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\PythonExtension.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Timeouts.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\CommunicationHandler.h">
+      <Filter>include</Filter>
+    </QtMoc>
+    <QtMoc Include="include\Application.h">
       <Filter>include</Filter>
     </QtMoc>
   </ItemGroup>

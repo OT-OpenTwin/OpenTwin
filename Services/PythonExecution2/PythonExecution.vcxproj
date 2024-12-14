@@ -299,7 +299,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ActionHandler.h" />
-    <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\Timeouts.h" />
+    <QtMoc Include="include\Application.h" />
     <QtMoc Include="include\CommunicationHandler.h" />
     <ClInclude Include="include\CPythonObject.h" />
     <ClInclude Include="include\CPythonObjectBorrowed.h" />

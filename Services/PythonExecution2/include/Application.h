@@ -1,9 +1,16 @@
 #pragma once
+
+// OpenTwin header
 #include "OTServiceFoundation/ModelServiceAPI.h"
+#include "CommunicationHandler.h"
 #include "ClassFactory.h"
 #include "ClassFactoryBlock.h"
 
-class Application {
+// Qt header
+#include <QtCore/qobject.h>
+
+class Application : public QObject {
+	Q_OBJECT
 public:
 	static Application& instance(void);
 
@@ -11,7 +18,8 @@ public:
 	void setModelServiceURL(const std::string& url);
 	void setUIServiceURL(const std::string& url);
 
-	ClassFactory& getClassFactory();
+	ClassFactory& getClassFactory(void);
+	CommunicationHandler& getCommunicationHandler(void) { return m_communicationHandler; };
 
 	void prefetchDocumentsFromStorage(const std::list<ot::UID>& entities);
 	void prefetchDocumentsFromStorage(const std::list<ot::EntityInformation>& entityInfo);
@@ -19,6 +27,8 @@ public:
 
 private:
 	Application();
+
+	CommunicationHandler m_communicationHandler;
 
 	ClassFactory m_classFactory;
 	ClassFactoryBlock m_classFactoryBlock;

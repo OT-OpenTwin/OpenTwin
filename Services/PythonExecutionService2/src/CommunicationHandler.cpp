@@ -190,7 +190,7 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 		ot::ReturnMessage msg;
 		msg.setFromJsonObject(responseDoc.GetConstObject());
 		//if (msg.getStatus() != ot::ReturnMessage::Ok || msg.getWhat() != OT_ACTION_CMD_Ping) {
-		if (msg.getStatus() != ot::ReturnMessage::Ok || msg.getWhat() != OT_ACTION_CMD_CheckStartupCompleted) {
+		if (msg.getStatus() != ot::ReturnMessage::Ok || msg.getWhat() != OT_ACTION_CMD_Ping) {
 			OT_LOG_E("Invalid client ping response: \"" + _message + "\"");
 			m_client->disconnect();
 			return;
@@ -297,7 +297,7 @@ void CommunicationHandler::slotNewConnection(void) {
 	this->connect(m_client, &QLocalSocket::disconnected, this, &CommunicationHandler::slotClientDisconnected);
 
 	ot::JsonDocument pingDoc;
-	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
-	//m_client->write(QByteArray::fromStdString(pingDoc.toJson()));
-	//m_client->flush();
+	pingDoc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
+	m_client->write(QByteArray::fromStdString(pingDoc.toJson()));
+	m_client->flush();
 }

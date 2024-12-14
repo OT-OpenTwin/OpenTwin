@@ -140,6 +140,6 @@ PyObject* PythonExtensions::OT_SetPortData(PyObject* _self, PyObject* _args) {
     std::string portName = pyObBuilder.getStringValueFromTuple(_args, 0, "Parameter 0");
     CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(_args, 1, "Parameter 1");
     auto values = pyObBuilder.getGenericDataStructList(pvalue);
-    PortDataBuffer::instance().OverridePortData(portName, std::move(values));
+    PortDataBuffer::instance().overridePortData(portName, std::move(values));
     return PyBool_FromLong(true);
 }

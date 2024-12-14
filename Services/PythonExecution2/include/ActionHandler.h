@@ -7,13 +7,15 @@
 #include "PythonAPI.h"
 #include "OTCore/ReturnMessage.h"
 
-class ActionHandler
-{
+class ActionHandler {
 public:
-	ActionHandler();
+	static ActionHandler& instance(void);
+
 	ot::ReturnMessage handleAction(const ot::JsonDocument& doc);
 
 private:
+	ActionHandler();
+
 	using handlerMethod = std::function<ot::ReturnMessage(const ot::JsonDocument&)>;
 	
 	std::mutex m_mutex;
