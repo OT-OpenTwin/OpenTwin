@@ -6,7 +6,6 @@
 #include <Windows.h>
 
 // Service header
-#include "MutexLock.h"
 #include "Application.h"
 
 // OpenTwin header
@@ -31,13 +30,10 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 extern "C" {
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP) {
-		MutexLock lock;
 		return ot::foundation::performAction(_json, _senderIP);
 	};
 
 	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP) {
-		MutexLock lock;
-
 		//ToDo: If you want to actually queue the command implement the queueing logic here
 		// At this point we are simply forwarding the message to the perform action function to execute the action immediatly
 		return ot::foundation::performAction(_json, _senderIP);
@@ -58,7 +54,6 @@ extern "C" {
 
 	// This function is called once upon startup of this service
 	_declspec(dllexport) int init(const char * _siteID, const char * _ownIP, const char * _sessionServiceIP, const char * _sessionID) {
-		MutexLock lock;
 		return ot::foundation::init(_siteID, _ownIP, _sessionServiceIP, _sessionID, Application::instance());
 
 	};

@@ -226,9 +226,7 @@
     <ClCompile Include="src\CommunicationHandler.cpp" />
     <ClCompile Include="src\DataBaseInfo.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
-    <ClCompile Include="src\MainLockManager.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
-    <ClCompile Include="src\MutexLock.cpp" />
     <ClCompile Include="src\SubprocessHandler.cpp" />
     <ClCompile Include="src\SubprocessManager.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
@@ -237,8 +235,6 @@
     <ClInclude Include="include\Application.h" />
     <QtMoc Include="include\CommunicationHandler.h" />
     <ClInclude Include="include\DataBaseInfo.h" />
-    <ClInclude Include="include\MainLockManager.h" />
-    <ClInclude Include="include\MutexLock.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\SubprocessHandler.h" />
     <ClInclude Include="include\SubprocessManager.h" />
