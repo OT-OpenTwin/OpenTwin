@@ -328,9 +328,19 @@ ECHO ===============================================================
 CALL "%OT_PYTHON_EXECUTION_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
+ECHO Build Service: PythonExecutionService 2
+ECHO ===============================================================
+CALL "%OT_PYTHON_EXECUTION_SERVICE_ROOT%2\build.bat" %1 %2
+
+ECHO ===============================================================
 ECHO Build Service: PythonExecution
 ECHO ===============================================================
 CALL "%OT_PYTHON_EXECUTION_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
+ECHO Build Service: PythonExecution 2
+ECHO ===============================================================
+CALL "%OT_PYTHON_EXECUTION_ROOT%2\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: BlockEditorService
