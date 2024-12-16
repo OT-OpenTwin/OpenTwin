@@ -394,15 +394,14 @@ ot::LockTypeFlags ot::toLockTypeFlags(const std::list<std::string>& _flags) {
 }
 
 ot::LockTypeFlag ot::toLockTypeFlag(const std::string& _flag) {
-	LockTypeFlags f;
-	if (_flag == toString(ot::LockViewWrite)) f |= ot::LockViewWrite;
-	else if (_flag == toString(ot::LockViewRead)) f |= ot::LockViewRead;
-	else if (_flag == toString(ot::LockModelWrite)) f |= ot::LockModelWrite;
-	else if (_flag == toString(ot::LockModelRead)) f |= ot::LockModelRead;
-	else if (_flag == toString(ot::LockAll)) f |= ot::LockAll;
-	else if (_flag == toString(ot::LockProperties)) f |= ot::LockProperties;
-	else if (_flag == toString(ot::LockNavigationWrite)) f |= ot::LockNavigationWrite;
-	else if (_flag == toString(ot::LockNavigationAll)) f |= ot::LockNavigationAll;
+	if (_flag == toString(ot::LockViewWrite)) return ot::LockViewWrite;
+	else if (_flag == toString(ot::LockViewRead)) return ot::LockViewRead;
+	else if (_flag == toString(ot::LockModelWrite)) return ot::LockModelWrite;
+	else if (_flag == toString(ot::LockModelRead)) return ot::LockModelRead;
+	else if (_flag == toString(ot::LockAll)) return ot::LockAll;
+	else if (_flag == toString(ot::LockProperties)) return ot::LockProperties;
+	else if (_flag == toString(ot::LockNavigationWrite)) return ot::LockNavigationWrite;
+	else if (_flag == toString(ot::LockNavigationAll)) return ot::LockNavigationAll;
 	else if (_flag != toString(ot::NoLockFlags)) {
 		OT_LOG_E("Unknown lock type flag \"" + _flag + "\"");
 	}
