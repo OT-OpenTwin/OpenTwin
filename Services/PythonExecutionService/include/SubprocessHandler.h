@@ -1,65 +1,38 @@
 #pragma once
-#include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "OTCore/ReturnMessage.h"
 
-#include <QtNetwork/qlocalserver.h>
-#include <QtNetwork/qlocalsocket.h>
-#include <QtCore/qobject.h>
-#include <QtCore/qprocess.h>
+// OpenTwin header
+#include "OTCore/OTClassHelper.h"
+#include "OTSystem/SystemTypes.h"
 
-#include <atomic>
-#include <chrono>
+// std header
+#include <mutex>
+#include <string>
 
-class SubprocessHandler : public BusinessLogicHandler
-{
+class SubprocessManager;
+namespace std { class thread; };
+
+class SubprocessHandler {
+	OT_DECL_NOCOPY(SubprocessHandler)
+	OT_DECL_NODEFAULT(SubprocessHandler)
 public:
-	SubprocessHandler(const std::string& serverName, int sessionID, int serviceID);
+	SubprocessHandler(SubprocessManager* _manager);
 	~SubprocessHandler();
-	std::string Send(const std::string& message);
-	
-	void setDatabase(const std::string& url, const std::string& userName, const std::string& psw, const std::string& collectionName, const std::string& siteID);
+
+	bool ensureSubprocessRunning(const std::string& _serverName);
+
+	void shutdownSubprocess(void);
 
 private:
-	std::string _serverName;
-	const std::string _executableName = "PythonExecution.exe";
-	std::string _subprocessPath;
-	std::string _pythonModulePath;
+	std::string findSubprocessPath(void) const;
+	void healthCheckWorker(void);
+	bool shouldPerformHealthCheck(void);
 
-	std::vector<std::string> _initialisationRoutines;
-	const int _numberOfInitialisationRoutines = 4;
+	std::mutex m_mutex;
+
+	bool m_performHealthCheck;
+	SubprocessManager* m_manager;
+	const std::string m_executableName = "PythonExecution.exe";
 	
-	std::atomic_bool _startupChecked = false;
-	std::atomic_bool _initialisationPrepared = false;
-
-	std::mutex _mtx;
-
-	const int _numberOfRetries = 3;
-	const int _timeoutSubprocessStart = 50000;//5 seconds
-	const int _timeoutServerConnect = _timeoutSubprocessStart;
-	const int _timeoutSendingMessage = _timeoutSubprocessStart;
-	const int _heartBeat = _timeoutSubprocessStart;
-
-	QProcess _subProcess;
-	QLocalServer _server;
-	QLocalSocket* _socket = nullptr;
-	
-	void ModelComponentWasSet() override;
-	void UIComponentWasSet() override;
-	void SetPythonPath();
-
-	std::string FindSubprocessPath();
-	void InitiateProcess();
-	
-	void RunSubprocess();
-	bool StartProcess();
-	void ConnectWithSubprocess();
-	void CloseSubprocess();
-	
-	bool WaitForResponse();
-	bool SubprocessResponsive(std::string& errorMessage);
-	void ProcessErrorOccured(std::string& message);
-	void SocketErrorOccured(std::string& message);
-
-	void InitialiseSubprocess();
-
+	std::thread* m_healthCheckThread;
+	OT_PROCESS_HANDLE m_clientHandle;
 };

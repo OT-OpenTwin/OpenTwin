@@ -1,5 +1,10 @@
 #include "PythonLoadedModules.h"
 
+PythonLoadedModules& PythonLoadedModules::instance(void) {
+	static PythonLoadedModules g_instance;
+	return g_instance;
+}
+
 std::optional<std::string> PythonLoadedModules::getModuleName(const ot::EntityInformation& _scriptEntityInfos)
 {
 	bool found = false;

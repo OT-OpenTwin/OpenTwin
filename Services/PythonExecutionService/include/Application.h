@@ -9,24 +9,16 @@
 #pragma once
 
 // Open twin header
-#include "OTServiceFoundation/ApplicationBase.h" // Base class
+#include "OTServiceFoundation/ApplicationBase.h"
 
-#include "SubprocessHandler.h"
-
-// C++ header
+// std header
 #include <string>
 
-// Forward declaration
-namespace ot {
-	namespace components {
-		class UiComponent;
-		class ModelComponent;
-	}
-}
+class SubprocessManager;
 
 class Application : public ot::ApplicationBase {
 public:
-	static Application * instance(void);
+	static Application* instance(void);
 	static void deleteInstance(void);
 
 private:
@@ -112,6 +104,9 @@ public:
 	//! @param The item that has been changed in the uiService (instance will be deleted after this function call)
 	virtual bool settingChanged(const ot::Property* _item) override;
 
+	// Handler
+	OT_HANDLER(handleExecuteAction, Application, OT_ACTION_CMD_MODEL_ExecuteAction, ot::SECURE_MESSAGE_TYPES)
+
 private:
-	SubprocessHandler* _subprocessHandler = nullptr;
+	SubprocessManager* m_subprocessManager;
 };

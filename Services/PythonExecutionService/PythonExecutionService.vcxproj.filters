@@ -27,7 +27,16 @@
     <ClCompile Include="src\ModelNotifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SubprocessManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\SubprocessHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommunicationHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataBaseInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,8 +50,22 @@
     <ClInclude Include="include\ModelNotifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\SubprocessManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\SubprocessHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Timeouts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataBaseInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="include\CommunicationHandler.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
 </Project>

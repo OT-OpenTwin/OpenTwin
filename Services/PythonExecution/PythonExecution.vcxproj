@@ -284,12 +284,14 @@
   <ItemGroup>
     <ClCompile Include="src\ActionHandler.cpp" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\CommunicationHandler.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PortData.cpp" />
     <ClCompile Include="src\EntityBuffer.cpp" />
     <ClCompile Include="src\PortDataBuffer.cpp" />
     <ClCompile Include="src\PropertyPythonObjectConverter.cpp" />
     <ClCompile Include="src\PythonAPI.cpp" />
+    <ClCompile Include="src\PythonException.cpp" />
     <ClCompile Include="src\PythonLoadedModules.cpp" />
     <ClCompile Include="src\PythonModuleAPI.cpp" />
     <ClCompile Include="src\PythonObjectBuilder.cpp" />
@@ -297,7 +299,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ActionHandler.h" />
-    <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\Timeouts.h" />
+    <QtMoc Include="include\Application.h" />
+    <QtMoc Include="include\CommunicationHandler.h" />
     <ClInclude Include="include\CPythonObject.h" />
     <ClInclude Include="include\CPythonObjectBorrowed.h" />
     <ClInclude Include="include\CPythonObjectNew.h" />
@@ -308,6 +312,7 @@
     <ClInclude Include="include\PythonAPI.h" />
     <ClInclude Include="include\PythonException.h" />
     <ClInclude Include="include\PythonExtension.h" />
+    <ClInclude Include="include\PythonExtension.hpp" />
     <ClInclude Include="include\PythonLoadedModules.h" />
     <ClInclude Include="include\PythonModuleAPI.h" />
     <ClInclude Include="include\PythonObjectBuilder.h" />

@@ -17,11 +17,7 @@
 class PythonLoadedModules
 {
 public:
-	static PythonLoadedModules* INSTANCE()
-	{
-		static PythonLoadedModules instance;
-		return &instance;
-	}
+	static PythonLoadedModules& instance(void);
 	
 	std::optional<std::string> getModuleName(const ot::EntityInformation& _scriptEntityInfos);
 	std::string addModuleForEntity(const ot::EntityInformation& _scriptEntityInfo);

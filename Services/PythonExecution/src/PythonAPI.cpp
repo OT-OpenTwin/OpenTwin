@@ -25,17 +25,17 @@ ot::ReturnValues PythonAPI::execute(std::list<std::string>& _scripts, std::list<
 {
 	assert(_scripts.size() == _parameterSet.size());
 	std::list<ot::EntityInformation> scriptEntities = ensureScriptsAreLoaded(_scripts);
-	EntityBuffer::INSTANCE().setModelServiceAPI(&Application::instance()->ModelServiceAPI());
+	EntityBuffer::instance().setModelServiceAPI(&Application::instance().getModelServiceAPI());
 	auto currentParameterSet = _parameterSet.begin();
 	
 	PythonObjectBuilder pyObBuilder;
 	ot::ReturnValues returnValues;
-	EntityBuffer::INSTANCE().clearBuffer();// Entities and properties are buffered by name. It needs to be cleared, so that no outdated entities are accessed in the next execution.
+	EntityBuffer::instance().clearBuffer();// Entities and properties are buffered by name. It needs to be cleared, so that no outdated entities are accessed in the next execution.
 	for (ot::EntityInformation& scriptEntity : scriptEntities)
 	{
 		try
 		{
-			std::string moduleName = PythonLoadedModules::INSTANCE()->getModuleName(scriptEntity).value();
+			std::string moduleName = PythonLoadedModules::instance().getModuleName(scriptEntity).value();
 			std::string entryPoint = m_moduleEntrypointByModuleName[moduleName];
 
 			std::list<ot::Variable>& parameterSetForScript = *currentParameterSet;
@@ -57,7 +57,7 @@ ot::ReturnValues PythonAPI::execute(std::list<std::string>& _scripts, std::list<
 			throw std::exception(message.c_str());
 		}
 	}
-	EntityBuffer::INSTANCE().saveChangedEntities();
+	EntityBuffer::instance().saveChangedEntities();
 	return returnValues;
 }
 
@@ -78,7 +78,7 @@ std::list<ot::EntityInformation> PythonAPI::ensureScriptsAreLoaded(const std::li
 	uniqueScriptNames.sort();
 	uniqueScriptNames.unique();
 	std::list<ot::EntityInformation> entityInfos;
-	auto modelComponent = Application::instance()->ModelServiceAPI();
+	auto modelComponent = Application::instance().getModelServiceAPI();
 	modelComponent.getEntityInformation(uniqueScriptNames, entityInfos);
 	
 	std::map<std::string, ot::EntityInformation> entityInfosByName;
@@ -105,7 +105,7 @@ std::list<ot::EntityInformation> PythonAPI::ensureScriptsAreLoaded(const std::li
 	}
 	
 	//Now we load all scripts
-	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
+	Application::instance().prefetchDocumentsFromStorage(entityInfos);
 	for (ot::EntityInformation& entityInfo : entityInfos)
 	{
 		OT_LOG_D("Loading script " + entityInfo.getEntityName());
@@ -126,13 +126,13 @@ void PythonAPI::loadScipt(const ot::EntityInformation& _entityInformation)
 {
 	try
 	{
-		auto modelComponent = Application::instance()->ModelServiceAPI();
-		auto baseEntity = modelComponent.readEntityFromEntityIDandVersion(_entityInformation.getEntityID(), _entityInformation.getEntityVersion(), Application::instance()->getClassFactory());
+		ot::ModelServiceAPI& modelComponent = Application::instance().getModelServiceAPI();
+		EntityBase* baseEntity = modelComponent.readEntityFromEntityIDandVersion(_entityInformation.getEntityID(), _entityInformation.getEntityVersion(), Application::instance().getClassFactory());
 		std::unique_ptr<EntityFileText> script(dynamic_cast<EntityFileText*>(baseEntity));
 		std::string execution = script->getText();
 
 		//First we add a module for the script execution. This way there won't be any namespace conflicts between the scripts since they are all executed in the same namespace
-		const std::string moduleName = PythonLoadedModules::INSTANCE()->addModuleForEntity(_entityInformation);
+		const std::string moduleName = PythonLoadedModules::instance().addModuleForEntity(_entityInformation);
 		if (moduleName == "")
 		{
 			const std::string message = "failed to determine a module name for script: " + _entityInformation.getEntityName();

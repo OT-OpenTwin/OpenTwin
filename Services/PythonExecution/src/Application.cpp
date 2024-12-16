@@ -3,27 +3,30 @@
 #include "OTCommunication/ActionTypes.h"
 #include "DataBase.h"
 
+Application& Application::instance(void) {
+	static Application g_instance;
+	return g_instance;
+}
+
 void Application::setModelServiceURL(const std::string& url)
 {
-	_modelServiceAPI = new ot::ModelServiceAPI("", url);
+	m_modelServiceAPI = new ot::ModelServiceAPI("", url);
 }
 
 void Application::setUIServiceURL(const std::string& url)
 {
-	_uiURL = url;
+	m_uiURL = url;
 }
 
-ClassFactory& Application::getClassFactory()
-{
-	
-	return _classFactory;
+ClassFactory& Application::getClassFactory() {
+	return m_classFactory;
 }
 
 void Application::prefetchDocumentsFromStorage(const std::list<ot::UID>& entities)
 {
 	// First get the version information for all entities
 	std::list<ot::EntityInformation> entityInfo;
-	_modelServiceAPI->getEntityInformation(entities, entityInfo);
+	m_modelServiceAPI->getEntityInformation(entities, entityInfo);
 
 	// Now prefetch the documents
 	prefetchDocumentsFromStorage(entityInfo);
@@ -49,4 +52,11 @@ ot::UID Application::getPrefetchedEntityVersion(ot::UID entityID)
 	OTAssert(m_prefetchedEntityVersions.count(entityID) > 0, "The entity was not prefetched");
 
 	return m_prefetchedEntityVersions[entityID];
+}
+
+Application::Application() 
+	: m_modelServiceAPI(nullptr)
+{
+	m_classFactory.SetNextHandler(&m_classFactoryBlock);
+	m_classFactoryBlock.SetChainRoot(&m_classFactory);
 }

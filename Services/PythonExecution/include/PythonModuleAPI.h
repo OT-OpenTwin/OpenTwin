@@ -7,11 +7,8 @@
 class PythonModuleAPI
 {
 public:
-	static const PythonModuleAPI& INSTANCE()
-	{
-		static PythonModuleAPI instance;
-		return instance;
-	}
+	static const PythonModuleAPI& instance(void);
+
 	std::string getModuleEntryPoint(const std::string& _moduleName) const;
 	std::string getModuleEntryPoint(CPythonObject& _module) const;
 

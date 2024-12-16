@@ -19,21 +19,14 @@ class EntityBuffer
 {
 public:
 	friend class FixtureEntityBuffer;
-	static EntityBuffer& INSTANCE()
-	{
-		static EntityBuffer instance;
-		return instance;
-	} 
-	void setModelServiceAPI(ot::ModelServiceAPI* _modelServiceAPI) 
-	{ 
-		assert(_modelServiceAPI != nullptr);
-		m_modelServiceAPI = _modelServiceAPI;
-	};
+	static EntityBuffer& instance();
+
+	void setModelServiceAPI(ot::ModelServiceAPI* _modelServiceAPI);
 
 	PyObject* getEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName);
 	PyObject* getTableCellValue(const std::string& _absoluteEntityName, int32_t _row, int32_t _column);
 	void updateEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName, const CPythonObject& _values);
-	std::shared_ptr<EntityBase> getEntity (const std::string& _absoluteEntityName);
+	std::shared_ptr<EntityBase> getEntity(const std::string& _absoluteEntityName);
 	
 	void saveChangedEntities();
 	bool saveChangedEntities(const std::string& _absoluteEntityName);
@@ -41,13 +34,13 @@ public:
 	void clearBuffer();
 
 private:
-	EntityBuffer() = default;
+	EntityBuffer();
 
 	std::map<std::string, std::shared_ptr<EntityBase>> m_bufferedEntities;
 	std::map<std::string, IVisualisationTable*> m_bufferedTableEntities;
 	std::map<std::string, EntityPropertiesBase*> m_bufferedEntityProperties;
 
-	ot::ModelServiceAPI* m_modelServiceAPI = nullptr;
+	ot::ModelServiceAPI* m_modelServiceAPI;
 	
 	void ensurePropertyToBeLoaded(const std::string& _absoluteEntityName, const std::string& _propertyName);
 	void ensureTableToBeLoaded(const std::string& _absoluteEntityName);

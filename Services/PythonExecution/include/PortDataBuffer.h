@@ -9,22 +9,18 @@
 #include "PortData.h"
 #include "CPythonObject.h"
 
-class PortDataBuffer
-{
+class PortDataBuffer {
 public:
-	static PortDataBuffer& INSTANCE()
-	{
-		static PortDataBuffer instance;
-		return instance;
-	}
+	static PortDataBuffer& instance(void);
 
-	void addNewPortData(const std::string& portName,const ot::GenericDataStructList& data);
-	void OverridePortData(const std::string& portName,const ot::GenericDataStructList& data);
+	void addNewPortData(const std::string& _portName, const ot::GenericDataStructList& _data);
+	void overridePortData(const std::string& _portName, const ot::GenericDataStructList& _data);
 	void clearPortData();
-	PyObject* getPortData(const std::string& portName);
-	void AddModifiedPortData(ot::ReturnValues& returnValues);
+	PyObject* getPortData(const std::string& _portName);
+	void addModifiedPortData(ot::ReturnValues& _returnValues);
 
 private:
-	std::map<std::string, PortData> _portData;
+	std::map<std::string, PortData> m_portData;
+
 	PortDataBuffer() {};
 };

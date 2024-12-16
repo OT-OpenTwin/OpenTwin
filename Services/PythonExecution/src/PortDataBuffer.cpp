@@ -2,54 +2,55 @@
 #include "OTCore/Logger.h"
 #include "PythonObjectBuilder.h"
 
-void PortDataBuffer::addNewPortData(const std::string& portName, const ot::GenericDataStructList& data)
-{
-	assert(_portData.find(portName) == _portData.end());
-	_portData.insert(std::pair<std::string, PortData>(portName, PortData(portName, data, false)));
+PortDataBuffer& PortDataBuffer::instance(void) {
+	static PortDataBuffer g_instance;
+	return g_instance;
 }
 
-void PortDataBuffer::OverridePortData(const std::string& portName, const ot::GenericDataStructList& data)
+void PortDataBuffer::addNewPortData(const std::string& _portName, const ot::GenericDataStructList& _data)
 {
-	if (_portData.find(portName) == _portData.end())
+	assert(m_portData.find(_portName) == m_portData.end());
+	m_portData.insert(std::pair<std::string, PortData>(_portName, PortData(_portName, _data, false)));
+}
+
+void PortDataBuffer::overridePortData(const std::string& _portName, const ot::GenericDataStructList& _data)
+{
+	if (m_portData.find(_portName) == m_portData.end())
 	{
-		_portData.insert(std::pair<std::string, PortData>(portName, PortData(portName, data, true)));
+		m_portData.insert(std::pair<std::string, PortData>(_portName, PortData(_portName, _data, true)));
 	}
 	else
 	{
-		_portData.find(portName)->second.overrideValues(data);
+		m_portData.find(_portName)->second.overrideValues(_data);
 	}
 }
 void PortDataBuffer::clearPortData()
 {
-	_portData.clear();
+	m_portData.clear();
 }
 
-PyObject* PortDataBuffer::getPortData(const std::string& portName)
+PyObject* PortDataBuffer::getPortData(const std::string& _portName)
 {
-	auto portEntry = _portData.find(portName);
+	auto portEntry = m_portData.find(_portName);
 	PythonObjectBuilder builder;
-	if (portEntry != _portData.end())
-	{
+	if (portEntry != m_portData.end()) {
 		ot::GenericDataStructList values = portEntry->second.getValues();
 		CPythonObjectNew pObject = builder.setGenericDataStructList(values);
 		Py_INCREF(pObject);
 		return pObject;
 	}
-	else
-	{
+	else {
 		throw std::exception("Python script tried to get data from a unknown port .");
 		return nullptr;
 	}
 }
 
-void PortDataBuffer::AddModifiedPortData(ot::ReturnValues& returnValues)
+void PortDataBuffer::addModifiedPortData(ot::ReturnValues& _returnValues)
 {
-	for (auto& item : _portData)
-	{
+	for (auto& item : m_portData) {
 		PortData& portData = item.second;
-		if (portData.getModified())
-		{
-			returnValues.addData(item.first, std::move(portData.HandDataOver()));
+		if (portData.getModified()) {
+			_returnValues.addData(item.first, std::move(portData.HandDataOver()));
 		}
 	}
 }

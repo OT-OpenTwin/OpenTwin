@@ -7,23 +7,19 @@
  */
 
 // Service header
+#include "UiNotifier.h"
 #include "Application.h"
 #include "ModelNotifier.h"
-#include "UiNotifier.h"
+#include "SubprocessManager.h"
 
 // Open twin header
-#include "OTServiceFoundation/UiComponent.h"
-#include "OTServiceFoundation/ModelComponent.h"
-#include <vector>
-#include <string>
 #include "OTCore/Variable.h"
 #include "OTCore/TypeNames.h"
-#include "TemplateDefaultManager.h"
-
-#include <rapidjson/document.h>
-#include <rapidjson/rapidjson.h>
-#include "DataBase.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/ModelComponent.h"
+#include "TemplateDefaultManager.h"
+#include "DataBase.h"
 
 Application * g_instance{ nullptr };
 
@@ -38,7 +34,8 @@ void Application::deleteInstance(void) {
 }
 
 Application::Application()
-	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, new UiNotifier(), new ModelNotifier())
+	: ot::ApplicationBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, new UiNotifier(), new ModelNotifier()),
+	m_subprocessManager(nullptr)
 {
 	
 }
@@ -58,95 +55,73 @@ Application::~Application()
 
 // Required functions
 
-void Application::run(void)
-{
-	if (EnsureDataBaseConnection())
-	{
+void Application::run(void) {
+	if (m_subprocessManager) {
+		OT_LOG_EA("Application already in run mode");
+		return;
+	}
+
+	// Create new subprocess manager
+	m_subprocessManager = new SubprocessManager(this);
+
+	if (EnsureDataBaseConnection()) {
 		TemplateDefaultManager::getTemplateDefaultManager()->loadDefaultTemplate();
 	}
-	const int sessionCount = Application::instance()->getSessionCount();
-	const int serviceID = Application::instance()->getServiceIDAsInt();
-	if (_subprocessHandler == nullptr)
-	{
-		_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
-	}
-	const std::string dbURL = DataBase::GetDataBase()->getDataBaseServerURL();
-	const std::string userName= DataBase::GetDataBase()->getUserName();
-	const std::string psw = DataBase::GetDataBase()->getUserPassword();
-	const std::string siteID = this->siteID();
-	const std::string collectionName = this->m_collectionName;
-	_subprocessHandler->setDatabase(dbURL, userName, psw,collectionName,siteID);
-}
+	DataBaseInfo info;
+	info.setSiteId(this->siteID());
+	info.setDataBaseUrl(DataBase::GetDataBase()->getDataBaseServerURL());
+	info.setCollectionName(this->m_collectionName);
+	info.setUserName(DataBase::GetDataBase()->getUserName());
+	info.setUserPassword(DataBase::GetDataBase()->getUserPassword());
 
+	m_subprocessManager->setDataBaseInfo(info);
 
-std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc)
-{
-	try
-	{
-		if (_action == OT_ACTION_CMD_MODEL_ExecuteAction)
-		{			
-			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
-			OT_LOG_D("Executing action: " + action);
-			std::string returnMessage = _subprocessHandler->Send(_doc.toJson());
-			return returnMessage;
-		}
-		else
-		{
-			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported action").toJson();
-		}
+	if (this->uiComponent()) {
+		m_subprocessManager->setFrontendUrl(this->uiComponent()->getServiceURL());
 	}
-	catch (const std::exception& e)
-	{
-		std::string errorMessage = "Failed to execute action " + _action + " due to exception: " + e.what();
-		m_uiComponent->displayMessage(errorMessage);
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, errorMessage).toJson();
+	if (this->modelComponent()) {
+		m_subprocessManager->setModelUrl(this->modelComponent()->getServiceURL());
 	}
 }
 
-std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc)
-{
+
+std::string Application::processAction(const std::string & _action, ot::JsonDocument& _doc) {
+	return ot::ReturnMessage(ot::ReturnMessage::Failed, "Not supported action").toJson();
+}
+
+std::string Application::processMessage(ServiceBase * _sender, const std::string & _message, ot::JsonDocument& _doc) {
 	return ""; // Return empty string if the request does not expect a return
 }
 
-void Application::uiConnected(ot::components::UiComponent * _ui)
-{
-	if (_subprocessHandler == nullptr)
-	{
-		const int sessionCount = Application::instance()->getSessionCount();
-		const int serviceID = Application::instance()->getServiceIDAsInt();
-		_subprocessHandler = new SubprocessHandler(sessionID(),sessionCount,serviceID);
+void Application::uiConnected(ot::components::UiComponent * _ui) {
+	if (m_subprocessManager) {
+		m_subprocessManager->setFrontendUrl(_ui->getServiceURL());
 	}
-	_subprocessHandler->setUIComponent(_ui);
 }
 
-void Application::uiDisconnected(const ot::components::UiComponent * _ui)
-{
-
-}
-
-void Application::modelConnected(ot::components::ModelComponent * _model)
-{
-	if (_subprocessHandler == nullptr)
-	{
-		const int sessionCount = Application::instance()->getSessionCount();
-		const int serviceID = Application::instance()->getServiceIDAsInt();
-		_subprocessHandler = new SubprocessHandler(sessionID(), sessionCount, serviceID);
+void Application::uiDisconnected(const ot::components::UiComponent * _ui) {
+	if (m_subprocessManager) {
+		m_subprocessManager->setFrontendUrl("");
 	}
-	_subprocessHandler->setModelComponent(_model);
 }
 
-void Application::modelDisconnected(const ot::components::ModelComponent * _model)
-{
+void Application::modelConnected(ot::components::ModelComponent * _model) {
+	if (m_subprocessManager) {
+		m_subprocessManager->setModelUrl(_model->getServiceURL());
+	}
+}
+
+void Application::modelDisconnected(const ot::components::ModelComponent * _model) {
+	if (m_subprocessManager) {
+		m_subprocessManager->setModelUrl("");
+	}
+}
+
+void Application::serviceConnected(ot::ServiceBase * _service) {
 
 }
 
-void Application::serviceConnected(ot::ServiceBase * _service)
-{
-
-}
-
-void Application::serviceDisconnected(const ot::ServiceBase * _service)
-{
+void Application::serviceDisconnected(const ot::ServiceBase * _service) {
 
 }
 
@@ -154,13 +129,11 @@ void Application::preShutdown(void) {
 
 }
 
-void Application::shuttingDown(void)
-{
+void Application::shuttingDown(void) {
 
 }
 
-bool Application::startAsRelayService(void) const
-{
+bool Application::startAsRelayService(void) const {
 	return false;	// Do not want the service to start a relay service. Otherwise change to true
 }
 
@@ -178,3 +151,15 @@ bool Application::settingChanged(const ot::Property * _item) {
 
 
 // ##################################################################################################################################################################################################################
+
+std::string Application::handleExecuteAction(ot::JsonDocument& _doc) {
+	std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
+	OT_LOG_D("Executing action: " + action);
+	
+	std::string returnMessage;
+	if (!m_subprocessManager->sendSingleRequest(_doc, returnMessage)) {
+		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send request").toJson();
+	}
+	
+	return returnMessage;
+}

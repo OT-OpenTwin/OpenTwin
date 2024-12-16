@@ -7,6 +7,16 @@
 #include "EntityTableSelectedRanges.h"
 #include "OTServiceFoundation/TableIndexSchemata.h"
 
+EntityBuffer& EntityBuffer::instance() {
+	static EntityBuffer g_instance;
+	return g_instance;
+}
+
+void EntityBuffer::setModelServiceAPI(ot::ModelServiceAPI* _modelServiceAPI) {
+	assert(_modelServiceAPI != nullptr);
+	m_modelServiceAPI = _modelServiceAPI;
+}
+
 PyObject* EntityBuffer::getEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName)
 {
 	ensurePropertyToBeLoaded(_absoluteEntityName, _propertyName);
@@ -220,7 +230,7 @@ std::shared_ptr<EntityBase> EntityBuffer::loadEntity(const std::string& _absolut
 		{
 			throw std::exception(("Requested entity " + _absoluteEntityName + " does not exist.").c_str());
 		}
-		EntityBase* entity = m_modelServiceAPI->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance()->getClassFactory());
+		EntityBase* entity = m_modelServiceAPI->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), Application::instance().getClassFactory());
 		m_bufferedEntities[_absoluteEntityName] = std::shared_ptr<EntityBase>(entity);
 	}
 	return m_bufferedEntities[_absoluteEntityName];
@@ -231,4 +241,10 @@ void EntityBuffer::clearBuffer()
 	m_bufferedEntities.clear();
 	m_bufferedEntityProperties.clear();
 	m_bufferedTableEntities.clear();
+}
+
+EntityBuffer::EntityBuffer()
+	: m_modelServiceAPI(nullptr)
+{
+
 }

@@ -2,20 +2,25 @@
 #include "PythonObjectBuilder.h"
 #include "PythonLoadedModules.h"
 
+const PythonModuleAPI& PythonModuleAPI::instance(void) {
+	static PythonModuleAPI g_instance;
+	return g_instance;
+}
+
 std::string PythonModuleAPI::getModuleEntryPoint(const std::string& _moduleName) const
 {
 
 	CPythonObjectBorrowed pyhtonModule(PyImport_ImportModule(_moduleName.c_str()));
 	if (pyhtonModule == nullptr)
 	{
-		const std::string entityName =	PythonLoadedModules::INSTANCE()->getEntityName(_moduleName);
+		const std::string entityName =	PythonLoadedModules::instance().getEntityName(_moduleName);
 		const std::string message = "Failed to import module of entity " + entityName;
 		throw std::exception(message.c_str());
 	}
 	
 	if (!hasScriptHasEntryPoint(pyhtonModule))
 	{
-		const std::string entityName = PythonLoadedModules::INSTANCE()->getEntityName(_moduleName);
+		const std::string entityName = PythonLoadedModules::instance().getEntityName(_moduleName);
 		const std::string message = "Script " + entityName + " has no entry point. Each script in OpenTwin requires a function: " + m_defaultEntryPoint;
 		throw std::exception(message.c_str());
 	}
