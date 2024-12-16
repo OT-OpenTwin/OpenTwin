@@ -74,6 +74,7 @@ void EntityFile::EnsureDataIsLoaded()
 		assert(m_dataUID != -1 && m_dataVersion != -1);
 		std::map<ot::UID, EntityBase*> entitymap;
 		EntityBase* entityBase = readEntityFromEntityIDAndVersion(this, m_dataUID, m_dataVersion, entitymap);
+		entityBase->setObserver(nullptr);
 		assert(entityBase != nullptr);
 		m_data.reset(dynamic_cast<EntityBinaryData*>(entityBase));
 		entityBase = nullptr;

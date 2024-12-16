@@ -70,6 +70,7 @@ void EntityBlockPython::updateBlockAccordingToScriptHeader()
 	assert(baseEntity != nullptr);
 	std::shared_ptr<EntityFile> scriptEntity(dynamic_cast<EntityFile*>(baseEntity));
 	assert(scriptEntity != nullptr);
+	scriptEntity->setObserver(nullptr);
 
 	PythonHeaderInterpreter headerInterpreter;
 	const bool interpretationSuccessfull = headerInterpreter.interprete(scriptEntity);
