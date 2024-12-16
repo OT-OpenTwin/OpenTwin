@@ -2172,7 +2172,7 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 			if (itemToSelect || itemToDeselect) {
 				bool changed = false;
 				bool blocked = m_projectNavigation->signalsBlocked();
-				m_projectNavigation->blockSignals(blocked);
+				m_projectNavigation->blockSignals(true);
 
 				// Deselect
 				if (itemToDeselect) {
