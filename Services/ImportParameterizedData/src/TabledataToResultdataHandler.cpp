@@ -135,6 +135,9 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 			allMSMDMetadataAssembliesByNames.push_back(&metadataAssemblyByName);
 		}
 	}
+
+	ResultImportLogger& logger = resultCollectionExtender.getLogger();
+	logger.clearLog();
 	for (auto& metadataAssemblyByName : allMSMDMetadataAssembliesByNames)
 	{
 
@@ -148,9 +151,9 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		}
 		else
 		{
-
-			std::list<DatasetDescription> datasets = extractDataset(metadataAssemblyByName->second, loadedTables);
-
+			KeyValuesExtractor seriesMetaDataRangeSelections;
+			std::list<DatasetDescription> datasets = extractDataset(metadataAssemblyByName->second, loadedTables, seriesMetaDataRangeSelections);
+			std::list<std::shared_ptr<MetadataEntry>> seriesMetadata = rangeData2MetadataEntries(std::move(seriesMetaDataRangeSelections));
 			if (datasets.empty())
 			{
 				_uiComponent->displayMessage("Skipped creation of series \"" + seriesName + "\" due to this issue:\n");
@@ -160,7 +163,10 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 			else
 			{
 				_uiComponent->displayMessage("Create " + seriesName + ":\n");
-				ot::UID seriesUID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, {});
+				ot::UID seriesUID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, seriesMetadata);
+				const std::string extensionLog = logger.getLog();
+				_uiComponent->displayMessage(extensionLog);
+				logger.clearLog();
 				_uiComponent->displayMessage("Storing quantity container\n");
 
 				//Now we store the datapoints
@@ -172,7 +178,10 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 				{
 					for (DatasetDescription& dataset : datasets)
 					{
-						resultCollectionExtender.processDataPoints(&dataset, seriesUID);
+	/*					resultCollectionExtender.processDataPoints(&dataset, seriesUID);
+						const std::string extensionLog = logger.getLog();
+						_uiComponent->displayMessage(extensionLog);
+						logger.clearLog();*/
 						updater.triggerUpdate(counter);
 					}
 				}
@@ -370,7 +379,7 @@ std::list<std::shared_ptr<MetadataEntry>> TabledataToResultdataHandler::rangeDat
 	return allMetadataEntries;	
 }
 
-std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<IVisualisationTable>> _loadedTables)
+std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<IVisualisationTable>> _loadedTables, KeyValuesExtractor& _outSeriesMetadata)
 {
 	std::list<std::string> requiredTables;
 	
@@ -397,8 +406,7 @@ std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const
 	Documentation::INSTANCE()->ClearDocumentation();
 
 	//Filling a new EntityMetadataSeries object with its fields.
-	KeyValuesExtractor rangeData;
-	rangeData.loadAllRangeSelectionInformation(_metadataAssembly, _loadedTables);
+	_outSeriesMetadata.loadAllRangeSelectionInformation(_metadataAssembly, _loadedTables);
 
 	//Loading parameter information
 
@@ -448,6 +456,7 @@ std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const
 			quantityDescription->setDataPoints(quantityEntry.second);
 			datasetDescription.setQuantityDescription(quantityDescription.release());
 			datasetDescription.addParameterDescriptions(sharedParameter);
+
 			datasetDescriptions.push_back(std::move(datasetDescription));
 		}
 	}

@@ -7,6 +7,7 @@
 #include "MetadataSeries.h"
 #include "MetadataEntry.h"
 #include "QuantityContainer.h"
+#include "ResultImportLogger.h"
 
 #include "DatasetDescription.h"
 #include "ResultDataStorageAPI.h"
@@ -41,6 +42,9 @@ public:
 	
 	void storeCampaignChanges();
 	bool removeSeries(ot::UID _uid);
+
+	ResultImportLogger& getLogger() { return m_logger; }
+
 protected:
 	inline bool invariant() { return true; }
 
@@ -50,6 +54,8 @@ protected:
 	
 	std::map<std::string,uint32_t> m_parameterBuckets;
 	const std::string m_ownerServiceName;
+
+	ResultImportLogger m_logger;
 
 	ot::UIDList addCampaignContextDataToParameters(DatasetDescription& _dataDescription);
 	void addCampaignContextDataToQuantities(DatasetDescription& _dataDescription, ot::UIDList& _dependingParameter);

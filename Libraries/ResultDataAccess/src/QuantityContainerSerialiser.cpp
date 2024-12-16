@@ -1,9 +1,10 @@
 #include "QuantityContainerSerialiser.h"
 
 
-QuantityContainerSerialiser::QuantityContainerSerialiser(const std::string& _collectionName)
-	:m_dataStorageAccess(_collectionName)
+QuantityContainerSerialiser::QuantityContainerSerialiser(const std::string& _collectionName, ResultImportLogger& _logger)
+	:m_dataStorageAccess(_collectionName), m_logger(_logger)
 {
+	m_logger.log("Buffer for database write operation: " + std::to_string(m_bufferSize) + " documents");
 	m_quantityContainer.reserve(m_bufferSize);
 }
 
@@ -12,6 +13,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	auto curveDescription =	dynamic_cast<QuantityDescriptionCurve*>(_quantityDescription);
 	if (curveDescription != nullptr)
 	{
+		m_logger.log("Storing data points as curve.");
 		storeDataPoints(_seriesIndex, _parameterIDs, _constParameterValues, _changingParameterValues, _numberOfParameterValues,curveDescription);
 		flushQuantityContainer(); 
 		return;
@@ -19,6 +21,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	auto complexCurveDescription = dynamic_cast<QuantityDescriptionCurveComplex*>(_quantityDescription);
 	if (complexCurveDescription != nullptr)
 	{
+		m_logger.log("Storing data points as complex curve.");
 		storeDataPoints(_seriesIndex, _parameterIDs, _constParameterValues, _changingParameterValues, _numberOfParameterValues, complexCurveDescription);
 		flushQuantityContainer();
 		return;
@@ -26,6 +29,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	auto sparameterDescription = dynamic_cast<QuantityDescriptionSParameter*>(_quantityDescription);
 	if (sparameterDescription != nullptr)
 	{
+		m_logger.log("Storing data points as s-parameter.");
 		storeDataPoints(_seriesIndex, _parameterIDs, _constParameterValues, _changingParameterValues, _numberOfParameterValues, sparameterDescription);
 		flushQuantityContainer();
 		return;
@@ -55,6 +59,9 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	ot::UID quantityID = valueDescription->quantityIndex;
 
 	m_bucketSize = 1;
+	
+	const size_t numberOfDocuments = _numberOfParameterValues;
+	m_logger.log("Storing " + std::to_string(numberOfDocuments) + " documents");
 
 	for (uint64_t i = 0; i < _numberOfParameterValues; i++)
 	{
@@ -115,6 +122,9 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	
 	m_bucketSize = 1;
 
+	const size_t numberOfDocuments = _numberOfParameterValues * 2;
+	m_logger.log("Storing " + std::to_string(numberOfDocuments) + " documents");
+
 	for (uint64_t i = 0; i < _numberOfParameterValues; i++)
 	{
 		std::list<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
@@ -167,6 +177,8 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	MetadataQuantityValueDescription& firstValueDescription = *valueDescriptionIt++;
 	MetadataQuantityValueDescription& secondValueDescription = *valueDescriptionIt;
 
+	const size_t numberOfDocuments = _numberOfParameterValues * 2;
+	m_logger.log("Storing " + std::to_string(numberOfDocuments) + " documents");
 	for (size_t i = 0; i < _numberOfParameterValues; i++)
 	{
 		std::list<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };

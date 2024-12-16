@@ -30,6 +30,9 @@
     <Filter Include="include\Creation Helper\Container for complete datasets">
       <UniqueIdentifier>{874e995a-5fea-4ef7-9d16-737b9c290e0f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Logging">
+      <UniqueIdentifier>{6a55db06-9459-4f53-b178-6bacd7855527}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\QuantityContainer.h">
@@ -110,6 +113,15 @@
     <ClInclude Include="include\QuantityDescriptionMatrix.h">
       <Filter>include\Creation Helper\Container for quantity metadata and datapoints</Filter>
     </ClInclude>
+    <ClInclude Include="include\ResultImportLogger.h">
+      <Filter>include\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultImportLoggerVerbosity.h">
+      <Filter>include\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultImportLoggerEntry.h">
+      <Filter>include\Logging</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\QuantityContainer.cpp">
@@ -161,6 +173,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\QuantityDescriptionSParameter.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultImportLogger.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

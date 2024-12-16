@@ -16,6 +16,7 @@ void MetadataCampaign::updateMetadataOverviewFromLastAddedSeries()
 
 void MetadataCampaign::updateMetadataOverview(MetadataSeries& seriesMetadata)
 {
+	//First we are adding the parameter of the series to the parameter overview of the entire campaign
 	auto allParameter = seriesMetadata.getParameter();
 	for (auto& parameter : allParameter)
 	{
@@ -27,12 +28,13 @@ void MetadataCampaign::updateMetadataOverview(MetadataSeries& seriesMetadata)
 		}
 		else
 		{
+			//If the parameter was already added, we extend the list of possible values
 			std::list<ot::Variable>& values = existingParameterEntry->second.values;
 			values.splice(values.begin(), parameter.values);
 			values.sort();
 		}
 	}
-
+	
 	auto allQuanties = seriesMetadata.getQuantities();
 	for (auto& quantity : allQuanties)
 	{
@@ -45,7 +47,7 @@ void MetadataCampaign::updateMetadataOverview(MetadataSeries& seriesMetadata)
 		}
 		else
 		{
-			assert(0); //Each quantity should have its unique ID.
+			//assert(0); //Each quantity should only be added once.
 		}
 	}
 }

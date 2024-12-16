@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClInclude Include="include\CrossCollectionAccess.h" />
     <ClInclude Include="include\AdvancedQueryBuilder.h" />
+    <ClInclude Include="include\ResultImportLoggerEntry.h" />
+    <ClInclude Include="include\ResultImportLoggerVerbosity.h" />
     <ClInclude Include="include\ParameterDescription.h" />
     <ClInclude Include="include\ProjectToCollectionConverter.h" />
     <ClInclude Include="include\QuantityContainerSerialiser.h" />
@@ -43,6 +45,7 @@
     <ClInclude Include="include\MetadataSeries.h" />
     <ClInclude Include="include\ResultCollectionMetadataAccess.h" />
     <ClInclude Include="include\DatasetDescription.h" />
+    <ClInclude Include="include\ResultImportLogger.h" />
     <ClInclude Include="include\ValueFormatSetter.h" />
     <ClInclude Include="include\DatasetOverviewVisualiser.h" />
   </ItemGroup>
@@ -64,6 +67,7 @@
     <ClCompile Include="src\MetadataEntrySingle.cpp" />
     <ClCompile Include="src\QuantityContainer.cpp" />
     <ClCompile Include="src\ResultCollectionMetadataAccess.cpp" />
+    <ClCompile Include="src\ResultImportLogger.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

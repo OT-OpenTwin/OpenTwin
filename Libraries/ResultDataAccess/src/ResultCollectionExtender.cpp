@@ -9,6 +9,7 @@
 #include "QuantityDescriptionSParameter.h"
 #include "OTCore/DefensiveProgramming.h"
 #include "QuantityContainerSerialiser.h"
+#include "OTCore/VariableToStringConverter.h"
 
 ResultCollectionExtender::ResultCollectionExtender(const std::string& _collectionName, ot::components::ModelComponent& _modelComponent, ClassFactory* _classFactory, const std::string& _ownerServiceName)
 	:ResultCollectionMetadataAccess(_collectionName,&_modelComponent,_classFactory), m_requiresUpdateMetadataCampaign(false), m_ownerServiceName(_ownerServiceName)
@@ -16,8 +17,13 @@ ResultCollectionExtender::ResultCollectionExtender(const std::string& _collectio
 
 ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>& _seriesMetadata)
 {
+	m_logger.log("Creating new series with " + std::to_string(_datasetDescriptions.size()) + " datasets.");
+	uint32_t count(1);
 	for (DatasetDescription& datasetDescription : _datasetDescriptions)
 	{
+		m_logger.log("Dataset " + std::to_string(count));
+		count++;
+
 		ot::UIDList parameterIDs = addCampaignContextDataToParameters(datasetDescription);
 		addCampaignContextDataToQuantities(datasetDescription, parameterIDs);
 	}
@@ -27,13 +33,7 @@ ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescripti
 
 ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, std::list<std::shared_ptr<MetadataEntry>>&& _seriesMetadata)
 {
-	for (DatasetDescription& datasetDescription : _datasetDescriptions)
-	{
-		ot::UIDList parameterIDs = addCampaignContextDataToParameters(datasetDescription);
-		addCampaignContextDataToQuantities(datasetDescription, parameterIDs);
-	}
-	const ot::UID newSeriesID = createNewSeries(_datasetDescriptions, _seriesName, _seriesMetadata);
-	return newSeriesID;
+	return buildSeriesMetadata(_datasetDescriptions, _seriesName, _seriesMetadata);
 }
 
 bool ResultCollectionExtender::campaignMetadataWithSameNameExists(std::shared_ptr<MetadataEntry> _otherMetadata)
@@ -69,6 +69,7 @@ void ResultCollectionExtender::processDataPoints(DatasetDescription* _dataDescri
 
 	std::map < uint64_t, std::list<std::string>> parameterNamesByNumberOfParameterValues;
 
+	ot::VariableToStringConverter converter;
 	for (const auto& parameterDescription : parameterDescriptions)
 	{
 		auto& parameterMetadata = parameterDescription->getMetadataParameter();
@@ -82,6 +83,7 @@ void ResultCollectionExtender::processDataPoints(DatasetDescription* _dataDescri
 			auto parameterValues = parameterDescription->getMetadataParameter().values;
 			assert(parameterValues.size() == 1);
 			sharedParameterValues.push_back(*parameterValues.begin());
+			m_logger.log("Parameter " + parameterMetadata.parameterName + " has the value " + converter(*parameterValues.begin()) + " for the entire data set");
 		}
 		else
 		{
@@ -114,9 +116,10 @@ void ResultCollectionExtender::processDataPoints(DatasetDescription* _dataDescri
 
 	//Add all the other parameters
 	QuantityDescription* currentQuantityDescription = _dataDescription->getQuantityDescription();
-	QuantityContainerSerialiser quantityContainerSerialiser(m_collectionName);
+	QuantityContainerSerialiser quantityContainerSerialiser(m_collectionName, m_logger);
 
 	std::list<ot::UID> parameterIndices = parameterIndicesConstant;
+
 	parameterIndices.insert(parameterIndices.end(), parameterIndicesNonConstant.begin(), parameterIndicesNonConstant.end());
 	quantityContainerSerialiser.storeDataPoints(_seriesMetadataIndex, parameterIndices, sharedParameterValues, allParameterValueIt, numberOfParameter, currentQuantityDescription);
 }
@@ -163,7 +166,6 @@ bool ResultCollectionExtender::removeSeries(ot::UID _uid)
 ot::UIDList ResultCollectionExtender::addCampaignContextDataToParameters(DatasetDescription& _dataDescription)
 {
 
-	//Muss die bereits behandelten aus der dataset liste berücksichtigen, ansonsten könnte labeluneindeutig werden
 	ot::UIDList dependingParameterIDs;
 	auto& allParameterDescriptions = _dataDescription.getParameters();
 	assert(allParameterDescriptions.size() > 0);
@@ -175,12 +177,18 @@ ot::UIDList ResultCollectionExtender::addCampaignContextDataToParameters(Dataset
 		{
 			const std::string parameterName = newParameter.parameterName;
 			std::list<MetadataParameter*> existingParameterInSeries = findParameterWithSameName(parameterName);
+
 			//Since multiple dataset descriptions are considered, it may be that duplicates exists amongst them
 			std::list<MetadataParameter*> existingParameters;
+			if (!existingParameterInSeries.empty())
+			{
+				m_logger.log("Parameter name " + parameterName + " already exists in this campaign");
+			}
 			existingParameters.splice(existingParameters.end(), existingParameterInSeries);
 			auto parameterUpForStorageByName = m_parameterUpForStorageByName.find(parameterName);
 			if (parameterUpForStorageByName != m_parameterUpForStorageByName.end())
 			{
+				m_logger.log("Parameter name " + parameterName + " appears more then once in the dataset");
 				std::list<MetadataParameter*> existingParameterUpForStorage = parameterUpForStorageByName->second;
 				existingParameters.splice(existingParameters.end(), existingParameterUpForStorage);
 			}
@@ -193,7 +201,7 @@ ot::UIDList ResultCollectionExtender::addCampaignContextDataToParameters(Dataset
 				{
 					if (newParameter == *parameter)
 					{
-						assert(identicalParameter == nullptr);
+						m_logger.log("Parameter " + parameterName + " is identical to an already existing parameter entry.");
 						identicalParameter = parameter;
 					}
 				}
@@ -220,7 +228,7 @@ ot::UIDList ResultCollectionExtender::addCampaignContextDataToParameters(Dataset
 
 					} while (!newLabelFound);
 					newParameter.parameterLabel = newParameterLabel;
-
+					m_logger.log("Parameter was given a new unique label: " + newParameterLabel);
 				}
 				else
 				{
@@ -235,6 +243,7 @@ ot::UIDList ResultCollectionExtender::addCampaignContextDataToParameters(Dataset
 			}
 			if (newParameter.parameterUID == 0)
 			{
+				m_logger.log("Parameter " + parameterName + " stored as new parameter with label: " + newParameter.parameterLabel);
 				newParameter.parameterUID = findNextFreeParameterIndex();
 				m_parameterUpForStorageByName[newParameter.parameterName].push_back(&newParameter);
 			}
@@ -253,12 +262,18 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 
 	std::string quantityName = newQuantity.quantityName;
 	std::list<MetadataQuantity*> existingQuantitiesInSeries = findQuantityWithSameName(quantityName);
+	
+	if (!existingQuantitiesInSeries.empty())
+	{
+		m_logger.log("Quantity name " + quantityName+ " already exists in this campaign");
+	}
 	//Since multiple dataset descriptions are considered, it may be that duplicates exists amongst them
 	std::list<MetadataQuantity*> existingQuantities;
 	existingQuantities.splice(existingQuantities.end(),existingQuantitiesInSeries);
-	auto quantityUpForStorageByName =	m_quantitiesUpForStorageByName.find(quantityName);
+	auto quantityUpForStorageByName = m_quantitiesUpForStorageByName.find(quantityName);
 	if (quantityUpForStorageByName != m_quantitiesUpForStorageByName.end())
 	{
+		m_logger.log("Quantity name " + quantityName + " appears more then once in the dataset");
 		std::list<MetadataQuantity*> existingQuantityUpForStorage = quantityUpForStorageByName->second;
 		existingQuantities.splice(existingQuantities.end(), existingQuantityUpForStorage);
 	}
@@ -270,7 +285,7 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 		{
 			if (newQuantity == *existingQuantity)
 			{
-				assert(identicalQuantity == nullptr); //Quantities are supposed to be unique.
+				m_logger.log("Quantity " + quantityName + " is identical to an already existing quantity entry.");
 				identicalQuantity = existingQuantity;
 			}
 		}
@@ -282,7 +297,7 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 			newQuantity.quantityIndex=  identicalQuantity->quantityIndex;
 			newQuantity.valueDescriptions = identicalQuantity->valueDescriptions;
 			newQuantity.dataDimensions = identicalQuantity->dataDimensions;
-			newQuantity.metaData = identicalQuantity->metaData;
+			
 		}
 		else
 		{
@@ -306,7 +321,7 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 
 			} while (!newLabelFound);
 			newQuantity.quantityLabel = newQuantityLabel;
-
+			m_logger.log("Quantity was given a new unique label: " + newQuantityLabel);
 			//Discarded aproach, which copies the shared value descriptions
 			// ot::UID newQuantityIndex = 0;
 			////First possible difference: The quantities are the same, except of a difference in the value descriptions:
@@ -349,7 +364,9 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 	{
 		newQuantity.quantityLabel = newQuantity.quantityName;
 	}
-
+	
+	newQuantity.dependingParameterIds = std::vector<ot::UID>(_dependingParameterIDs.begin(), _dependingParameterIDs.end());
+	m_logger.log("Quantity depends on " + std::to_string(_dependingParameterIDs.size()) + " parameter.");
 	if (newQuantity.quantityIndex == 0)
 	{
 		std::set<std::string> valueDescriptionLabels;
@@ -368,6 +385,7 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 				}
 			} while (labelExists);
 			valueDescription.quantityValueLabel = valueDescriptionLabel;
+			m_logger.log("Quantity got new value description label" + valueDescriptionLabel);
 			valueDescriptionLabels.insert(valueDescription.quantityValueLabel);
 		}
 
@@ -375,9 +393,15 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 		{
 			quantityValueDescription.quantityIndex = findNextFreeQuantityIndex();
 		}
-		newQuantity.dependingParameterIds = std::vector<ot::UID>(_dependingParameterIDs.begin(), _dependingParameterIDs.end());
 
 		newQuantity.quantityIndex = newQuantity.valueDescriptions.begin()->quantityIndex;
+	}
+
+	//The quantity shall only be stored if the quantity was not stored for this series yet.
+	quantityUpForStorageByName = m_quantitiesUpForStorageByName.find(quantityName);
+	if (quantityUpForStorageByName != m_quantitiesUpForStorageByName.end())
+	{
+		m_logger.log("Quantity " + newQuantity.quantityName + " is stored as new quantity.");
 		m_quantitiesUpForStorageByName[newQuantity.quantityName].push_back(&newQuantity);
 	}
 }
@@ -388,7 +412,7 @@ ot::UID ResultCollectionExtender::createNewSeries(std::list<DatasetDescription>&
 	const MetadataSeries* existingSeries = findMetadataSeries(_seriesName);
 
 	//Series with the same name exists already in the campaign.
-	std::string seriesLabel;
+	std::string seriesLabel(_seriesName);
 	int i = 0;
 	while (existingSeries != nullptr)
 	{
@@ -400,6 +424,8 @@ ot::UID ResultCollectionExtender::createNewSeries(std::list<DatasetDescription>&
 	
 	MetadataSeries newSeries(_seriesName);
 	newSeries.setLabel(seriesLabel);
+	m_logger.log("Series received unique label:" + seriesLabel);
+
 	ot::UID seriesID = findNextFreeSeriesIndex();
 	newSeries.setIndex(seriesID);
 	

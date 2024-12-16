@@ -45,6 +45,6 @@ private:
 
 	std::list<std::shared_ptr<MetadataEntry>> rangeData2MetadataEntries(KeyValuesExtractor&& _assembyRangeData);
 
-	std::list<DatasetDescription> extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<IVisualisationTable>> loadedTables);
+	std::list<DatasetDescription> extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<IVisualisationTable>> loadedTables, KeyValuesExtractor& _outSeriesMetadata);
 	std::string extractUnitFromName(std::string& _name);
 };

@@ -32,6 +32,7 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 	//MetadataSeries seriesMetadata(name);
 	MetadataSeries seriesMetadata(entityName);
 	seriesMetadata.setIndex(_seriesMetadataEntity->getEntityID());
+
 	std::vector<std::string> allTopLevelDocumentNames = _seriesMetadataEntity->getDocumentsNames();
 	
 	//First we extract the series meta data
@@ -298,7 +299,7 @@ void MetadataEntityInterface::storeCampaign(ot::components::ModelComponent& _mod
 	}
 
 	std::list<bool> visibillity(m_newEntityIDs.size(), false);
-	assert(m_newEntityIDs.size() == m_newEntityVersions.size() == visibillity.size());
+	assert(m_newEntityIDs.size() == m_newEntityVersions.size() && m_newEntityVersions.size() == visibillity.size());
 	_modelComponent.addEntitiesToModel(std::move(m_newEntityIDs), std::move(m_newEntityVersions), std::move(visibillity), {}, {}, {}, "Updated result data collection", true, _saveModel);
 }
 
