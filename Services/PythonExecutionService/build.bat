@@ -11,7 +11,7 @@ REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 REM Call the build shell
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildSingleProject.bat" "%OT_PYTHON_EXECUTION_SERVICE_ROOT%2\PythonExecutionService.sln" %1 %2 
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildSingleProject.bat" "%OT_PYTHON_EXECUTION_SERVICE_ROOT%\PythonExecutionService.sln" %1 %2 
 
 GOTO END
 
