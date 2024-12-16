@@ -324,6 +324,7 @@
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"
 #define OT_ACTION_PARAM_OverwriteContent "OverwriteContent"
+#define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"

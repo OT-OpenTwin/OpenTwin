@@ -4069,6 +4069,10 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 	if (_document.HasMember(OT_ACTION_PARAM_ClearSelection)) {
 		clearSelection = ot::json::getBool(_document, OT_ACTION_PARAM_ClearSelection);
 	}
+	bool clearSelectionAfter = false;
+	if (_document.HasMember(OT_ACTION_PARAM_ClearSelectionAfter)) {
+		clearSelectionAfter = ot::json::getBool(_document, OT_ACTION_PARAM_ClearSelectionAfter);
+	}
 
 	std::vector<ot::TableRange> ranges;
 	if (_document.HasMember(OT_ACTION_PARAM_Ranges)) {
@@ -4103,6 +4107,10 @@ std::string ExternalServicesComponent::handleSetCurrentTableSelectionBackground(
 	// Callback if required
 	if (callback) {
 		this->sendTableSelectionInformation(callbackUrl, callbackFunction, table);
+	}
+
+	if (clearSelectionAfter) {
+		table->clearSelection();
 	}
 
 	this->makeWidgetViewCurrentWithoutInputFocus(table);
