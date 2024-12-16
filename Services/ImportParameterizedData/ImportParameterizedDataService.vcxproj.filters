@@ -192,6 +192,9 @@
     <ClInclude Include="include\BatchUpdateInformation.h">
       <Filter>include\ParameterizedDataHandler</Filter>
     </ClInclude>
+    <ClInclude Include="include\UILockWrapper.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

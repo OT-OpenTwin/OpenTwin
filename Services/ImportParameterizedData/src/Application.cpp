@@ -32,6 +32,7 @@
 #include <rapidjson/rapidjson.h>
 #include "DatasetOverviewVisualiser.h"
 #include "EntityMetadataSeries.h"
+//#include "UILockWrapper.h"
 
 Application * g_instance{ nullptr };
 
@@ -253,10 +254,12 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
 			{
+				//UILockWrapper uiLock(ot::LockModelWrite);
 				m_batchedCategorisationHandler.createNewScriptDescribedMSMD();
 			}
 			else if (action == _buttonCreateDataCollection.GetFullDescription())
 			{
+				//UILockWrapper uiLock(ot::LockModelWrite);
 				m_uiComponent->displayMessage("===========================================================================\n");
 				m_uiComponent->displayMessage("Start creation of dataset\n");
 				_tabledataToResultdataHandler->createDataCollection(dataBaseURL(), m_collectionName);
@@ -265,7 +268,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else
 			{
-				throw std::exception(OT_ACTION_RETURN_UnknownAction);
+				OT_LOG_W(OT_ACTION_RETURN_UnknownAction);
 			}
 		}
 		else if (_action == OT_ACTION_CMD_MODEL_ExecuteFunction)
@@ -273,6 +276,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
 			if (subsequentFunction == "importTouchstoneData")
 			{
+				//UILockWrapper uiLock(ot::LockModelWrite);
 				std::string originalName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 
 				std::string fileContent = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
@@ -325,15 +329,15 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else
 			{
-				throw std::exception(OT_ACTION_RETURN_UnknownAction);
+				OT_LOG_W(OT_ACTION_RETURN_UnknownAction);
 			}
 		}
 		else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)
 		{
-			
+			//The message is expected to come, but nothing needs to be done
 		}
 		else {
-			throw std::exception(OT_ACTION_RETURN_UnknownAction);
+			OT_LOG_W(OT_ACTION_RETURN_UnknownAction);
 		}
 		m_uiComponent->displayMessage(returnMessage);
 	}

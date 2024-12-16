@@ -265,6 +265,7 @@
     <ClInclude Include="include\TableHandler.h" />
     <ClInclude Include="include\TableStatisticAnalyser.h" />
     <ClInclude Include="include\TouchstoneToResultdata.h" />
+    <ClInclude Include="include\UILockWrapper.h" />
     <ClInclude Include="include\UiNotifier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
