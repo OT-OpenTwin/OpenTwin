@@ -795,7 +795,7 @@ void ak::aTreeWidget::clearItem(
 // ###########################################################################################################################################
 
 ak::aTreeWidgetBase::aTreeWidgetBase(aTreeWidget * _ownerTree)
-	: QTreeWidget(), ak::aWidget(otTree), m_ownerTree(_ownerTree), m_moveNotifier(nullptr)
+	: QTreeWidget(), ak::aWidget(otTree), m_ownerTree(_ownerTree)
 {
 	setContextMenuPolicy(Qt::CustomContextMenu);
 }
@@ -858,13 +858,6 @@ void ak::aTreeWidgetBase::dropEvent(QDropEvent * _event) {
 		break;
 	}
 
-	if (m_moveNotifier) {
-		if (!m_moveNotifier->allowItemDrop(actualItemList, dropToItem)) {
-			_event->ignore();
-			return;
-		}
-	}
-
 	QList<ID> itemIdList;
 	QList<ID> oldParentList;
 
@@ -912,23 +905,11 @@ void ak::aTreeWidgetBase::dropEvent(QDropEvent * _event) {
 }
 
 void ak::aTreeWidgetBase::dragEnterEvent(QDragEnterEvent * _event) {
-	if (m_moveNotifier) {
-		if (m_moveNotifier->allowItemGrab(selectedItemsRef())) {
-			QTreeWidget::dragEnterEvent(_event);
-		}
-		else {
-			// Ignore the event
-			_event->ignore();
-		}
-	}
-	else {
-		QTreeWidget::dragEnterEvent(_event);
-	}
+	QTreeWidget::dragEnterEvent(_event);
 }
 
 void ak::aTreeWidgetBase::dragLeaveEvent(QDragLeaveEvent * _event) {
 	QTreeWidget::dragLeaveEvent(_event);
-	if (m_moveNotifier) m_moveNotifier->itemMoveEnded();
 }
 
 // #######################################################################################################

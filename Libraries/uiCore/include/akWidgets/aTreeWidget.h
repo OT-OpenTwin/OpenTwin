@@ -45,39 +45,7 @@ namespace ak {
 	class aTreeWidget;
 	class aTreeWidgetBase;
 	class aTreeWidgetItem;
-	class aTreeWidgetItemMoveNotifier;
 	class aLineEditWidget;
-
-	class UICORE_API_EXPORT aTreeWidgetItemMoveNotifier {
-	public:
-		aTreeWidgetItemMoveNotifier() {}
-		virtual ~aTreeWidgetItemMoveNotifier() {}
-
-		//! @brief Will be called when the user dropped an item and the drop is just about to be processed
-		//! Return false if the drop should not be allowed
-		//! @param _items Contains all items that are about to be dropped
-		//! @param _destinationItem The item where the items are about to be dropped to
-		virtual bool allowItemDrop(const QList<aTreeWidgetItem *>& _items, aTreeWidgetItem * _destinationItem) { return true; };
-
-		//! @brief Will be called when the user wants to grab an item to move it
-		//! Return false if the grab/move should not be allowed
-		//! @param _items Contains all items that are about to be moved
-		virtual bool allowItemGrab(const QList<aTreeWidgetItem *>& _items) { return true; };
-
-		//! @brief Will be called when the user finished to move the item
-		//! The function will not be called when at the "allow item grab" false was returned
-		virtual void itemMoveEnded(void) {};
-
-	private:
-		aTreeWidgetItemMoveNotifier(aTreeWidgetItemMoveNotifier&) = delete;
-		aTreeWidgetItemMoveNotifier& operator = (aTreeWidgetItemMoveNotifier&) = delete;
-	};
-
-	// #########################################################################################################################################
-
-	// #########################################################################################################################################
-
-	// #########################################################################################################################################
 
 	class UICORE_API_EXPORT aTreeWidget : public QObject, public aWidget {
 		Q_OBJECT
@@ -577,8 +545,6 @@ namespace ak {
 		QList<aTreeWidgetItem *> selectedItemsRef(void) const;
 		void extendedItemSelectionInformation(const QList<aTreeWidgetItem *>& _selectedItems, QList<ID>& _selectedItemIds, QList<ID>& _itemParentIds) const;
 
-		void setItemMoveNotifier(aTreeWidgetItemMoveNotifier * _notifier) { m_moveNotifier = _notifier; }
-
 	Q_SIGNALS:
 		void keyPressed(QKeyEvent *);
 		void keyReleased(QKeyEvent *);
@@ -588,8 +554,7 @@ namespace ak {
 	private:
 		aTreeWidget *						m_ownerTree;
 		std::map<ID, aTreeWidgetItem *>		m_topLevelItems;
-		aTreeWidgetItemMoveNotifier *		m_moveNotifier;
-
+		
 		aTreeWidgetBase(aTreeWidgetBase &) = delete;
 		aTreeWidgetBase& operator = (aTreeWidgetBase &) = delete;
 	};
