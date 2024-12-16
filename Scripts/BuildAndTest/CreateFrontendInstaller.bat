@@ -148,6 +148,14 @@ COPY "%QWT_LIB_DLLR%\qwt.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 REM ZLib
 COPY "%ZLIB_DLLPATHR%\zlib.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 
+REM Python
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\Python"
+
+COPY "%OT_PYTHON_ROOT%\python.exe" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+COPY "%OT_PYTHON_ROOT%\python39.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+XCOPY /S "%OT_PYTHON_ROOT%\Lib" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Python\Lib\" 
+XCOPY /S "%OT_PYTHON_ROOT%\DLLs" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Python\DLLs\" 
+
 REM ==========================================
 REM Copy OpenTwin Assets
 REM ==========================================
@@ -168,6 +176,10 @@ XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\ColorStyles" "%OPENTWIN_FRONTEND_DEPLOYMENT
 REM GraphicsItems
 MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\GraphicsItems"
 XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\GraphicsItems" "%OPENTWIN_FRONTEND_DEPLOYMENT%\GraphicsItems"
+
+REM Fonts
+MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\fonts"
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\Fonts" "%OPENTWIN_FRONTEND_DEPLOYMENT%\fonts"
 
 REM ==========================================
 REM Copy OpenTwin build files
