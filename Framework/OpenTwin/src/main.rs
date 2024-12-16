@@ -444,7 +444,7 @@ fn get_download_html_body() -> String {
             KoCFLklSAf4/G8ayBHfTCwQAAAAASUVORK5CYII=\">
 
             <div id=\"welcome_txt\">Welcome to OpenTwin</div>
-            <a href=\"/installer\" download>
+            <a href=\"/installer\" download=\"Install_OpenTwin_Frontend.exe\">
                 <button id=\"downloadBtn\">Download</button>
             </a>
 
@@ -494,8 +494,7 @@ fn get_download_html_body() -> String {
             </style>
             <script type=\"text/javascript\">
                 document.getElementById(\"downloadBtn\").addEventListener(\"click\", () => {
-                    alert(\"Downloading Installer...\\nPlease execute the installer after the download.
-							\\nThe download can take a short moment.\");
+                    alert(\"Downloading Installer...\\nPlease execute the installer after the download.\");
                 });
             </script>
         </body>".to_string()
