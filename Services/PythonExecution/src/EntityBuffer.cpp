@@ -24,7 +24,7 @@ PyObject* EntityBuffer::getEntityPropertyValue(const std::string& _absoluteEntit
 	return interface.GetValue();
 }
 
-PyObject* EntityBuffer::getTableCellValue(const std::string& _absoluteEntityName, int32_t _row, int32_t _column)
+PyObject* EntityBuffer::getTableCellValue(const std::string& _absoluteEntityName, uint32_t _row, uint32_t _column)
 {
 	ensureTableToBeLoaded(_absoluteEntityName);
 	auto tableData = m_bufferedTableEntities[_absoluteEntityName]->getTable(); 

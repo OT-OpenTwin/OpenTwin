@@ -114,7 +114,12 @@ PyObject* PythonExtensions::OT_GetTableCell(PyObject* _self, PyObject* _args) {
     int32_t row = pyObBuilder.getInt32ValueFromTuple(_args, 1, "Parameter 1");
     int32_t column = pyObBuilder.getInt32ValueFromTuple(_args, 2, "Parameter 2");
 
-    PyObject* returnValue = EntityBuffer::instance().getTableCellValue(absoluteEntityName, row, column);
+    if (row < 0 || column < 0)
+    {
+        throw std::exception("OT_GetTableCell requires positive indices");
+    }
+
+    PyObject* returnValue = EntityBuffer::instance().getTableCellValue(absoluteEntityName, static_cast<uint32_t>(row), static_cast<uint32_t>(column));
     return returnValue;
 }
 

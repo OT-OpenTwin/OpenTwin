@@ -17,8 +17,9 @@ PythonWrapper::PythonWrapper() {
 	_pythonPath.push_back(_pythonRoot);
 	_pythonPath.push_back(_pythonRoot + "\\Lib");
 	_pythonPath.push_back(_pythonRoot + "\\DLLs");
-	std::string sitePackageDirectory = DeterminePythonSitePackageDirectory();
+	std::string sitePackageDirectory = determineMandatoryPythonSitePackageDirectory();
 	_pythonPath.push_back(sitePackageDirectory);
+	addOptionalUserPythonSitePackageDirectory();
 	OT_LOG_D("Setting Python site-package path: " + sitePackageDirectory);
 	signal(SIGABRT, &signalHandlerAbort);
 }
@@ -130,41 +131,37 @@ std::string PythonWrapper::DeterminePythonRootDirectory() {
 #endif
 }
 
-std::string PythonWrapper::DeterminePythonSitePackageDirectory() {
-	std::string envName = "OT_PYTHON_SITE_PACKAGE_PATH";
-	const char * pythonSitePackagePath = ot::os::getEnvironmentVariable(envName.c_str());
+std::string PythonWrapper::determineMandatoryPythonSitePackageDirectory() {
+
 	std::string path;
 
-	if (pythonSitePackagePath == nullptr)
-	{
 #ifdef _RELEASEDEBUG
-		envName = "OT_PYTHON_ROOT";
-		const char* pythonRoot = ot::os::getEnvironmentVariable(envName.c_str());
-		assert(pythonRoot != nullptr);
-		path = pythonRoot;
-#else
-		std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
-		const char* devEnvRoot = ot::os::getEnvironmentVariable(devEnvRootName.c_str());
+	//If we are in debug, we are a developer. And we want the path to the deployment folder.
+	
+	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
+	const char* devEnvRoot = ot::os::getEnvironmentVariable(devEnvRootName.c_str());
+	assert(devEnvRoot != nullptr);
+	
+	path = std::string(devEnvRoot) + "\\Deployment\\Python";
 
-		if (devEnvRoot != nullptr)
-		{
-			// Execution from deployment folder
-			path = std::string(devEnvRoot) + "\\Deployment\\Python";
-		}
-		else
-		{
-			// Execution from current working directory folder
-			path = ".\\Python";
-		}
+#else
+	//In Release we are already in the deployment folder
+	path = ".\\Python";
 #endif
 
-	}
-	else
-	{
-		path =(pythonSitePackagePath);
-	}
 	path += "\\Lib\\site-packages";
 	return path;
+}
+
+void PythonWrapper::addOptionalUserPythonSitePackageDirectory()
+{
+	std::string envName = "OT_PYTHON_SITE_PACKAGE_PATH";
+	const char* pythonSitePackagePath = ot::os::getEnvironmentVariable(envName.c_str());
+
+	if (pythonSitePackagePath != nullptr)
+	{
+		_pythonPath.push_back(pythonSitePackagePath);
+	}
 }
 
 void PythonWrapper::signalHandlerAbort(int sig) {

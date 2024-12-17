@@ -51,7 +51,8 @@ private:
 	int initiateNumpy();
 	std::string checkNumpyVersion();
 	std::string DeterminePythonRootDirectory();
-	std::string DeterminePythonSitePackageDirectory();
+	std::string determineMandatoryPythonSitePackageDirectory();
+	void addOptionalUserPythonSitePackageDirectory();
 
 	static void signalHandlerAbort(int sig);
 

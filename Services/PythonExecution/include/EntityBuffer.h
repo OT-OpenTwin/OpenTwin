@@ -24,7 +24,7 @@ public:
 	void setModelServiceAPI(ot::ModelServiceAPI* _modelServiceAPI);
 
 	PyObject* getEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName);
-	PyObject* getTableCellValue(const std::string& _absoluteEntityName, int32_t _row, int32_t _column);
+	PyObject* getTableCellValue(const std::string& _absoluteEntityName, uint32_t _row, uint32_t _column);
 	void updateEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName, const CPythonObject& _values);
 	std::shared_ptr<EntityBase> getEntity(const std::string& _absoluteEntityName);
 	
