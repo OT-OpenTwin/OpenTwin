@@ -7,6 +7,7 @@
 // std header
 #include <mutex>
 #include <string>
+#include <atomic>
 
 class SubprocessManager;
 namespace std { class thread; };
@@ -25,11 +26,11 @@ public:
 private:
 	std::string findSubprocessPath(void) const;
 	void healthCheckWorker(void);
-	bool shouldPerformHealthCheck(void);
 
 	std::mutex m_mutex;
 
-	bool m_performHealthCheck;
+	std::atomic_bool m_performHealthCheck;
+
 	SubprocessManager* m_manager;
 	const std::string m_executableName = "PythonExecution.exe";
 	

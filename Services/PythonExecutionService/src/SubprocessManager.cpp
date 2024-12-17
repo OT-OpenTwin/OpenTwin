@@ -129,12 +129,16 @@ bool SubprocessManager::ensureWorkerRunning(void) {
 }
 
 bool SubprocessManager::isWorkerAlive(void) {
-	bool ret = false;
 	std::lock_guard<std::mutex> lock(m_mutex);
+	
 	if (m_communicationHandler) {
-		ret = m_communicationHandler->isListening();
+		return m_communicationHandler->isListening();
 	}
-	return ret;
+	else
+	{
+		return false;
+	}
+	
 }
 
 void SubprocessManager::worker(std::string _projectName) {

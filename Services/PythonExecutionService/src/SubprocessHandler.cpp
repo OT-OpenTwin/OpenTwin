@@ -101,7 +101,7 @@ void SubprocessHandler::shutdownSubprocess(void) {
 }
 
 void SubprocessHandler::healthCheckWorker(void) {
-	while (this->shouldPerformHealthCheck()) {
+	while (m_performHealthCheck) {
 		std::this_thread::sleep_for(std::chrono::microseconds(100));
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
@@ -117,7 +117,3 @@ void SubprocessHandler::healthCheckWorker(void) {
 	}
 }
 
-bool SubprocessHandler::shouldPerformHealthCheck(void) {
-	std::lock_guard<std::mutex> lock(m_mutex);
-	return m_performHealthCheck;
-}
