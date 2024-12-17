@@ -7,6 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/PerformanceTest.h"
 #include "OTGui/NavigationTreeItem.h"
 #include "OTGui/PropertyDialogCfg.h"
 #include "OTGui/PropertyStringList.h"
@@ -109,34 +110,73 @@ void WidgetTest::slotVersionSelected(const std::string& _versionName) {
 
 void WidgetTest::slotVersionActivatRequest(const std::string& _versionName) {
 	OT_LOG_D("Version activate request: " + _versionName);
-	this->updateVersionConfig(_versionName, "1.1.3");
+	this->updateVersionConfig(_versionName, _versionName);
 }
 
 void WidgetTest::updateVersionConfig(const std::string& _activeVersionName, const std::string& _activeVersionBranch) {
 	ot::VersionGraphCfg cfg;
-	cfg.setRootVersion("1", "Initial commit");
+	{
+		ot::PerformanceIntervalTest test;
+
+		cfg.setRootVersion("1", "Initial commit");
+
+		cfg.getRootVersion()->addChildVersion("2")->addChildVersion("3");
+		ot::VersionGraphVersionCfg* branchItem = cfg.getRootVersion()
+			->addChildVersion("1.1.1", "Done some longer work on this item so we have to check the title")
+			->addChildVersion("1.1.2");
+
+		branchItem->addChildVersion("1.1.3")
+			->addChildVersion("1.1.4")
+			->addChildVersion("1.1.5")
+			->addChildVersion("1.1.6")
+			->addChildVersion("1.1.7")
+			->addChildVersion("1.1.8", "testing label filter mode")
+			->addChildVersion("1.1.9")
+			->addChildVersion("1.1.10")
+			->addChildVersion("1.1.11");
+
+		ot::VersionGraphVersionCfg* bigBranchTestA = branchItem;
+		ot::VersionGraphVersionCfg* bigBranchTestB = branchItem;
+		ot::VersionGraphVersionCfg* bigBranchTestC = branchItem;
+		for (int i = 1; i < 2000; i++) {
+			bigBranchTestA = bigBranchTestA->addChildVersion("1.1.2.1." + std::to_string(i));
+			bigBranchTestB = bigBranchTestB->addChildVersion("1.1.2.2." + std::to_string(i));
+			bigBranchTestC = bigBranchTestC->addChildVersion("1.1.2.3." + std::to_string(i));
+		}
+
+		cfg.setActiveVersionName(_activeVersionName);
+		cfg.setActiveBranchVersionName(_activeVersionBranch);
+
+		test.logCurrentInterval("Create config");
+	}
+
+	// Serialize
+	std::string jsonString;
+	{
+		ot::PerformanceIntervalTest test;
+		ot::JsonDocument doc;
+		cfg.addToJsonObject(doc, doc.GetAllocator());
+
+		jsonString = doc.toJson();
+
+		test.logCurrentInterval("Serialize");
+	}
 	
-	cfg.getRootVersion()->addChildVersion("2")->addChildVersion("3");
-	ot::VersionGraphVersionCfg* branchItem = cfg.getRootVersion()
-		->addChildVersion("1.1.1", "Done some longer work on this item so we have to check the title")
-		->addChildVersion("1.1.2");
+	ot::VersionGraphCfg newCfg;
+	{
+		ot::PerformanceIntervalTest test;
 
-	branchItem->addChildVersion("1.1.3")
-		->addChildVersion("1.1.4")
-		->addChildVersion("1.1.5")
-		->addChildVersion("1.1.6")
-		->addChildVersion("1.1.7")
-		->addChildVersion("1.1.8", "testing label filter mode")
-		->addChildVersion("1.1.9")
-		->addChildVersion("1.1.10")
-		->addChildVersion("1.1.11");
+		ot::JsonDocument newDoc;
+		newDoc.fromJson(jsonString);
+		newCfg.setFromJsonObject(newDoc.GetConstObject());
 
-	branchItem->addChildVersion("1.1.2.1.1")
-		->addChildVersion("1.1.2.1.2")
-		->addChildVersion("1.1.2.1.3");
+		test.logCurrentInterval("Deserialize");
+	}
 
-	cfg.setActiveVersionName(_activeVersionName);
-	cfg.setActiveBranchVersionName(_activeVersionBranch);
-
-	m_versionGraph->setupConfig(cfg);
+	{
+		ot::PerformanceIntervalTest test;
+		m_versionGraph->setupConfig(newCfg);
+		test.logCurrentInterval("Setup graph");
+	}
+	
 }
