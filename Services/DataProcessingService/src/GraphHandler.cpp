@@ -154,10 +154,7 @@ Graph GraphHandler::buildGraph(std::map<ot::UID, std::shared_ptr<EntityBlock>>& 
 		{
 			ClassFactoryBlock classFactory;
 			EntityBase* baseEnt = _modelComponent->readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion(), classFactory);
-			if (baseEnt == nullptr)
-			{
-				throw std::exception("Failed to load connection");
-			}
+			
 			std::unique_ptr<EntityBlockConnection>connectionEnt(dynamic_cast<EntityBlockConnection*>(baseEnt));
 			auto connection = connectionEnt->getConnectionCfg();
 			const std::string* thisConnectorName = nullptr;

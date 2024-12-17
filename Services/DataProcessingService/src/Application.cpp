@@ -27,7 +27,6 @@
 #include "ExternalDependencies.h"
 #include "ClassFactoryBlock.h"
 
-#include "OTServiceFoundation/UILockWrapper.h"
 
 Application * g_instance{ nullptr };
 
@@ -53,20 +52,6 @@ Application::Application()
 Application::~Application()
 {
 
-}
-
-void Application::runPipeline()
-{
- 	UILockWrapper lockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
-
-	auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID();
-	const bool isValid = _graphHandler.blockDiagramIsValid(allBlockEntities);
-	if (isValid)
-	{
-		const std::list<std::shared_ptr<GraphNode>>& rootNodes = _graphHandler.getRootNodes();
-		const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
-		_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
-	}
 }
 
 // ##################################################################################################################################################################################################################
@@ -99,8 +84,14 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 			if (action == _buttonRunPipeline.GetFullDescription())
 			{
-				std::thread worker(&Application::runPipeline, this);
-				worker.detach();
+				auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID();
+				const bool isValid = _graphHandler.blockDiagramIsValid(allBlockEntities);
+				if (isValid)
+				{
+					const std::list<std::shared_ptr<GraphNode>>& rootNodes = _graphHandler.getRootNodes();
+					const std::map<ot::UID, std::shared_ptr<GraphNode>> graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
+					_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
+				}
 			}
 		}
 		else if (_action == OT_ACTION_CMD_MODEL_PropertyChanged)

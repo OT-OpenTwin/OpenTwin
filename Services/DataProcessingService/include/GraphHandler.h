@@ -12,7 +12,7 @@ public:
 	bool blockDiagramIsValid(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID);
 
 	const std::map<ot::UID, std::shared_ptr<GraphNode>>& getgraphNodesByBlockID() const { return _graphNodeByBlockID; };
-	const std::list < std::shared_ptr<GraphNode>>& getRootNodes() const { return _rootNodes; }
+	const std::list < std::shared_ptr<GraphNode>> getRootNodes() const { return _rootNodes; }
 
 private:
 	std::string _blockFolder = ot::FolderNames::BlockFolder;

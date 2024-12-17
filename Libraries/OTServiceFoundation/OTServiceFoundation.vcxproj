@@ -238,7 +238,6 @@
     <ClInclude Include="include\OTServiceFoundation\TableIndexSchemata.h" />
     <ClInclude Include="include\OTServiceFoundation\TypeConverter.h" />
     <ClInclude Include="include\OTServiceFoundation\UiComponent.h" />
-    <ClInclude Include="include\OTServiceFoundation\UILockWrapper.h" />
     <ClInclude Include="include\OTServiceFoundation\UserCredentials.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
