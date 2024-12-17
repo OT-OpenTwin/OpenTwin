@@ -135,6 +135,9 @@
     <ClInclude Include="include\OTServiceFoundation\TableIndexSchemata.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTServiceFoundation\UILockWrapper.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
