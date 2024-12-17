@@ -1567,7 +1567,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	newEditor->getGraphicsScene()->setGridLineStyle(newOutline);
 
 	//m_ExternalServicesComponent->service
-	this->lockManager()->uiElementCreated(this->getBasicServiceInformation(), m_versionGraph->getGraph(), ot::LockAll | ot::LockModelWrite | ot::LockModelRead | ot::LockViewRead | ot::LockViewWrite);
+	this->lockManager()->uiElementCreated(this->getBasicServiceInformation(), newEditor, ot::LockAll | ot::LockModelWrite);
 
 	m_graphicsViews.insert_or_assign(_entityName, newEditor);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor, _viewInsertFlags);
@@ -1628,6 +1628,9 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	newEditor->setupFromConfig(_config, false);
 	newEditor->getViewData().getViewType();
 	newEditor->getViewData().getEntityName();
+
+	this->lockManager()->uiViewCreated(this->getBasicServiceInformation(), newEditor, ot::LockAll | ot::LockModelWrite);
+
 	m_textEditors.insert_or_assign(_config.getEntityName(), newEditor);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor, _viewInsertFlags);
 
@@ -1694,6 +1697,8 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Ba
 
 	newTable = new ot::TableView;
 	newTable->setupFromConfig(_config);
+
+	this->lockManager()->uiViewCreated(this->getBasicServiceInformation(), newTable, ot::LockAll | ot::LockModelWrite);
 
 	m_tables.insert_or_assign(_config.getEntityName(), newTable);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newTable, _viewInsertFlags);
