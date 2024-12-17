@@ -32,13 +32,21 @@ PyObject* EntityBuffer::getTableCellValue(const std::string& _absoluteEntityName
 	ot::MatrixEntryPointer matrixEntry;
 	matrixEntry.m_column = _column;
 	matrixEntry.m_row = _row;
-	ot::Variable cellValue  = tableData.getValue(matrixEntry);
-	assert(cellValue.isConstCharPtr());
+	if(_row < tableData.getNumberOfRows() && _column < tableData.getNumberOfColumns())
+	{
+		tableData.getNumberOfColumns();
+		ot::Variable cellValue  = tableData.getValue(matrixEntry);
+		assert(cellValue.isConstCharPtr());
 
-	PythonObjectBuilder builder;
-	auto pCellValue = builder.setString(cellValue.getConstCharPtr());
-	Py_INCREF(pCellValue);
-	return pCellValue;
+		PythonObjectBuilder builder;
+		auto pCellValue = builder.setString(cellValue.getConstCharPtr());
+		Py_INCREF(pCellValue);
+		return pCellValue;
+	}
+	else
+	{
+		throw std::exception("Cell access out of range");
+	}
 }
 
 void EntityBuffer::updateEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName, const CPythonObject& _values)
