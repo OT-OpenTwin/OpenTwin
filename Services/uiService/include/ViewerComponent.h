@@ -92,6 +92,8 @@ public:
 
 	virtual void messageModelService(const std::string& _message) override;
 
+	virtual void removeGraphicsElements(ot::UID _modelID) override;
+
 	// #####################################################################################################################################
 
 	void setProcessingGroupOfMessages(bool _flag);

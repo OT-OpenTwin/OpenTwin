@@ -60,6 +60,7 @@ namespace ViewerAPI
 		virtual unsigned long long addMenuPushButton(unsigned long long menuGroupID, const std::string &buttonName, const std::string &iconName, const std::string &keySequence) { return 0; };
 
 		virtual void removeUIElements(std::list<unsigned long long> &itemIDList) {};
+		virtual void removeGraphicsElements(ot::UID _modelID) {};
 
 		virtual void displayText(const std::string &text) { };
 

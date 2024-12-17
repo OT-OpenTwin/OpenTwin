@@ -20,6 +20,7 @@
 #include "OTWidgets/DoubleSpinBox.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyInputDouble.h"
+#include "OTWidgets/GraphicsViewView.h"
 
 // C++ header
 #include <exception>
@@ -441,6 +442,17 @@ void ViewerComponent::messageModelService(const std::string& _message)
 {
 	std::string response;
 	AppBase::instance()->getExternalServicesComponent()->sendToModelService(_message, response);
+}
+
+void ViewerComponent::removeGraphicsElements(ot::UID _modelID)
+{
+	//If entity is has a block item associated, it gets removed from all editors.
+	std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
+	for (auto view : views) {
+		view->removeItem(_modelID, true);
+		view->removeConnection(_modelID);
+	}
+
 }
 
 void ViewerComponent::setProcessingGroupOfMessages(bool flag)

@@ -3054,15 +3054,6 @@ std::string ExternalServicesComponent::handleRemoveShapes(ot::JsonDocument& _doc
 	std::list<ak::UID> entityID = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_ITM_ID);
 	
 	AppBase::instance()->getViewerComponent()->removeShapes(visualizationModelID, entityID);
-
-	//If entity is has a block item associated, it gets removed from all editors.
-	std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
-	for (auto view : views) {
-		for (auto uid : entityID) {
-			view->removeItem(uid, true);
-			view->removeConnection(uid);
-		}
-	}
 	
 	std::list<std::string> curveNames = ViewerAPI::getSelectedCurves(visualizationModelID);
 	ViewerAPI::removeSelectedCurveNodes(visualizationModelID);

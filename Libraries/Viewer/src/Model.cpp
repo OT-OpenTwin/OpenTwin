@@ -1971,6 +1971,9 @@ void Model::removeSceneNodeAndChildren(SceneNodeBase *node, std::list<ot::UID> &
 
 	// Remove the shape from the tree
 	treeItemDeleteList.push_back(node->getTreeItemID());
+	
+	//Deletes graphics item if one is associated
+	getNotifier()->removeGraphicsElements(node->getModelEntityID());
 
 	// Ensure that we are not deleting the current hover item
 	if (currentHoverItem == node)
@@ -2024,7 +2027,7 @@ void Model::removeShapes(std::list<unsigned long long> modelEntityIDList)
 
 	// Remove the shapes from the tree
 	getNotifier()->removeTreeItems(treeItemDeleteList);
-
+	
 	// Refresh the views 
 	refreshAllViews();
 }
