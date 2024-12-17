@@ -122,7 +122,7 @@ std::string StudioConnector::openProject(const std::string& fileName)
 
 StudioConnector::~StudioConnector()
 {
-	if (subProcessRunning)
+	if (m_subProcessRunning)
 	{
 		closeSubprocess();
 	}
@@ -485,19 +485,19 @@ void StudioConnector::determineStudioSuiteInstallation(int &version, std::string
 
 void StudioConnector::startSubprocess()
 {
-	if (subProcessRunning) return;
+	if (m_subProcessRunning) return;
 
 	// Determine new unique server name
 	QUuid uidGenerator = QUuid::createUuid();
-	serverName = uidGenerator.toString().toStdString();
+	m_serverName = uidGenerator.toString().toStdString();
 
-	subprocessPath = findSubprocessPath() + executableName;
+	m_subprocessPath = findSubprocessPath() + m_executableName;
 	initiateProcess();
 
 #ifdef DEBUG_PYTHON_SERVER
 	serverName = "TestServer";
 #endif
-	server.listen(serverName.c_str());
+	m_server.listen(m_serverName.c_str());
 #ifndef DEBUG_PYTHON_SERVER
 	//std::thread workerThread(&StudioConnector::runSubprocess, this);
 	//workerThread.detach();
@@ -515,11 +515,11 @@ void StudioConnector::startSubprocess()
 
 	if (waitForResponse())
 	{
-		std::string response = socket->readLine().data();
+		std::string response = m_socket->readLine().data();
 		ot::ReturnMessage msg;
 		msg.fromJson(response);
 		assert(msg.getStatus() == ot::ReturnMessage::Ok);
-		startupChecked = true;
+		m_startupChecked = true;
 
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
@@ -542,7 +542,7 @@ void StudioConnector::startSubprocess()
 		assert(0);
 	}
 
-	subProcessRunning = true;
+	m_subProcessRunning = true;
 }
 
 std::string StudioConnector::findSubprocessPath()
@@ -561,13 +561,13 @@ std::string StudioConnector::findSubprocessPath()
 
 void StudioConnector::initiateProcess()
 {
-	QStringList arguments{ QString(serverName.c_str()) };
-	subProcess.setArguments(arguments);
+	QStringList arguments{ QString(m_serverName.c_str()) };
+	m_subProcess.setArguments(arguments);
 
 	//Turning off the default communication channels of the process. Communication will be handled via QLocalServer and QLocalSocket
-	subProcess.setStandardOutputFile(QProcess::nullDevice());
-	subProcess.setStandardErrorFile(QProcess::nullDevice());
-	subProcess.setProgram(subprocessPath.c_str());
+	m_subProcess.setStandardOutputFile(QProcess::nullDevice());
+	m_subProcess.setStandardErrorFile(QProcess::nullDevice());
+	m_subProcess.setProgram(m_subprocessPath.c_str());
 }
 
 void StudioConnector::runSubprocess()
@@ -594,23 +594,23 @@ void StudioConnector::runSubprocess()
 bool StudioConnector::startProcess()
 {
 	bool processStarted = false;
-	for (int i = 1; i <= numberOfRetries; i++)
+	for (int i = 1; i <= m_numberOfRetries; i++)
 	{
-		OT_LOG_D("Starting the subprocess: " + subProcess.program().toStdString() + " trial: " + std::to_string(i) + "/" + std::to_string(numberOfRetries));
-		subProcess.start();
-		auto state = subProcess.state();
+		OT_LOG_D("Starting the subprocess: " + m_subProcess.program().toStdString() + " trial: " + std::to_string(i) + "/" + std::to_string(m_numberOfRetries));
+		m_subProcess.start();
+		auto state = m_subProcess.state();
 		if (state == QProcess::NotRunning)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(timeoutSubprocessStart));
+			std::this_thread::sleep_for(std::chrono::milliseconds(m_timeoutSubprocessStart));
 		}
 		else if (state == QProcess::Starting)
 		{
-			processStarted = subProcess.waitForStarted(timeoutSubprocessStart);
+			processStarted = m_subProcess.waitForStarted(m_timeoutSubprocessStart);
 			if (processStarted)
 			{
 				return true;
 			}
-			else if (subProcess.error() != QProcess::Timedout)
+			else if (m_subProcess.error() != QProcess::Timedout)
 			{
 				std::string errorMessage;
 				getProcessErrorOccured(errorMessage);
@@ -631,13 +631,13 @@ bool StudioConnector::startProcess()
 
 void StudioConnector::connectWithSubprocess()
 {
-	OT_LOG_D("Waiting for connection servername: " + serverName);
-	bool connected = server.waitForNewConnection(timeoutServerConnect);
+	OT_LOG_D("Waiting for connection servername: " + m_serverName);
+	bool connected = m_server.waitForNewConnection(m_timeoutServerConnect);
 	if (connected)
 	{
-		socket = server.nextPendingConnection();
-		socket->waitForConnected(timeoutServerConnect);
-		connected = socket->state() == QLocalSocket::ConnectedState;
+		m_socket = m_server.nextPendingConnection();
+		m_socket->waitForConnected(m_timeoutServerConnect);
+		connected = m_socket->state() == QLocalSocket::ConnectedState;
 		if (connected)
 		{
 			OT_LOG_D("Connection with subservice established");
@@ -667,9 +667,9 @@ ot::ReturnMessage StudioConnector::executeCommand(const std::string& command)
 
 ot::ReturnMessage StudioConnector::send(const std::string& message)
 {
-	while (!startupChecked)
+	while (!m_startupChecked)
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(timeoutSubprocessStart));
+		std::this_thread::sleep_for(std::chrono::milliseconds(m_timeoutSubprocessStart));
 	}
 
 	std::string errorMessage;
@@ -682,16 +682,16 @@ ot::ReturnMessage StudioConnector::send(const std::string& message)
 		runSubprocess();
 	}
 	const std::string messageAsLine = message + "\n";
-	socket->write(messageAsLine.c_str());
-	socket->flush();
-	bool allIsWritten = socket->waitForBytesWritten(timeoutSendingMessage);
+	m_socket->write(messageAsLine.c_str());
+	m_socket->flush();
+	bool allIsWritten = m_socket->waitForBytesWritten(m_timeoutSendingMessage);
 
 	if (!waitForResponse())
 	{
 		return send(message);
 	}
 
-	const std::string returnString(socket->readLine().data());
+	const std::string returnString(m_socket->readLine().data());
 	ot::ReturnMessage returnMessage = ot::ReturnMessage::fromJson(returnString);
 
 	return returnMessage;
@@ -702,17 +702,17 @@ bool StudioConnector::checkSubprocessResponsive(std::string& errorMessage)
 	bool subProcessResponsive = true;
 
 #ifndef DEBUG_PYTHON_SERVER
-	if (subProcess.state() != QProcess::Running)
+	if (m_subProcess.state() != QProcess::Running)
 	{
-		OT_LOG_E("Sending message failed. Process state: " + subProcess.state());
+		OT_LOG_E("Sending message failed. Process state: " + m_subProcess.state());
 		subProcessResponsive = false;
 		getProcessErrorOccured(errorMessage);
 	}
 #endif // DEBUG_PYTHON_SERVER
 
-	if (!socket->isValid())
+	if (!m_socket->isValid())
 	{
-		OT_LOG_E("Sending message failed. Socket state: " + socket->state());
+		OT_LOG_E("Sending message failed. Socket state: " + m_socket->state());
 		subProcessResponsive = false;
 		getSocketErrorOccured(errorMessage);
 	}
@@ -721,30 +721,30 @@ bool StudioConnector::checkSubprocessResponsive(std::string& errorMessage)
 
 void StudioConnector::closeSubprocess()
 {
-	if (socket != nullptr)
+	if (m_socket != nullptr)
 	{
 		//subProcess.kill();
 		//delete socket;
 		//socket = nullptr;
 
-		subProcessRunning = false;
-		startupChecked = false;
+		m_subProcessRunning = false;
+		m_startupChecked = false;
 
-		socket->close();
-		socket->waitForDisconnected(timeoutServerConnect);
-		subProcess.waitForFinished(timeoutSubprocessStart);
+		m_socket->close();
+		m_socket->waitForDisconnected(m_timeoutServerConnect);
+		m_subProcess.waitForFinished(m_timeoutSubprocessStart);
 		OT_LOG_D("Closed Python Subprocess");
 
-		delete socket;
-		socket = nullptr;
+		delete m_socket;
+		m_socket = nullptr;
 	}
 }
 
 bool StudioConnector::waitForResponse()
 {
-	while (!socket->canReadLine())
+	while (!m_socket->canReadLine())
 	{
-		bool receivedMessage = socket->waitForReadyRead(heartBeat);
+		bool receivedMessage = m_socket->waitForReadyRead(m_heartBeat);
 		if (!receivedMessage)
 		{
 			std::string errorMessage;
@@ -763,10 +763,10 @@ bool StudioConnector::waitForResponse()
 
 void StudioConnector::getProcessErrorOccured(std::string& message)
 {
-	message = subProcess.errorString().toStdString();
+	message = m_subProcess.errorString().toStdString();
 }
 
 void StudioConnector::getSocketErrorOccured(std::string& message)
 {
-	message = socket->errorString().toStdString();
+	message = m_socket->errorString().toStdString();
 }

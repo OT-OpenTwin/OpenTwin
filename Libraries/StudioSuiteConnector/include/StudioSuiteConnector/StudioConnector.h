@@ -42,21 +42,21 @@ private:
     std::string generateOpenScript(const std::string& studioPath, std::string fileName);
     std::string generateCloseScript(const std::string& studioPath, std::string fileName, std::list<long long> studioPidList);
 
-    bool subProcessRunning = false;
-    std::string serverName;
-    const std::string executableName = "PythonExecution.exe";
-    std::string subprocessPath;
-    std::string pythonModulePath;
+    bool m_subProcessRunning = false;
+    std::string m_serverName;
+    const std::string m_executableName = "PythonExecution.exe";
+    std::string m_subprocessPath;
+    std::string m_pythonModulePath;
 
-    const int numberOfRetries = 3;
-    const int timeoutSubprocessStart = 50000;//5 seconds
-    const int timeoutServerConnect = timeoutSubprocessStart;
-    const int timeoutSendingMessage = timeoutSubprocessStart;
-    const int heartBeat = timeoutSubprocessStart;
+    const int m_numberOfRetries = 3;
+    const int m_timeoutSubprocessStart = 50000;//5 seconds
+    const int m_timeoutServerConnect = m_timeoutSubprocessStart;
+    const int m_timeoutSendingMessage = m_timeoutSubprocessStart;
+    const int m_heartBeat = m_timeoutSubprocessStart;
 
-    std::atomic_bool startupChecked = false;
+    std::atomic_bool m_startupChecked = false;
 
-    QProcess subProcess;
-    QLocalServer server;
-    QLocalSocket* socket = nullptr;
+    QProcess m_subProcess;
+    QLocalServer m_server;
+    QLocalSocket* m_socket = nullptr;
 };
