@@ -185,6 +185,17 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	}
 }
 
+bool ot::GraphicsItem::handleMouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
+	const GraphicsScene* sc = this->getGraphicsScene();
+	if (sc) {
+		const GraphicsView* view = sc->getGraphicsView();
+		if (view) {
+			return !view->isReadOnly();
+		}
+	}
+	return true;
+}
+
 void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 	if (m_parent) {
 		m_parent->handleMouseReleaseEvent(_event);

@@ -89,7 +89,7 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	root->addWidget(m_versionGraph->getQWidget());
 	this->connect(m_versionGraph->getGraph(), &VersionGraph::versionDeselected, this, &WidgetTest::slotVersionDeselected);
 	this->connect(m_versionGraph->getGraph(), &VersionGraph::versionSelected, this, &WidgetTest::slotVersionSelected);
-	this->connect(m_versionGraph->getGraph(), &VersionGraph::versionActivatRequest, this, &WidgetTest::slotVersionActivatRequest);
+	this->connect(m_versionGraph->getGraph(), &VersionGraph::versionActivateRequest, this, &WidgetTest::slotVersionActivatRequest);
 
 	TestToolBar* test = new TestToolBar(this);
 	QAction* testAction = test->addAction("Test");

@@ -187,9 +187,15 @@ void ot::GraphicsStackItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	QGraphicsItemGroup::mousePressEvent(_event);
 }
 
+void ot::GraphicsStackItem::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
+	if (this->handleMouseMoveEvent(_event)) {
+		QGraphicsItemGroup::mouseMoveEvent(_event);
+	}
+}
+
 void ot::GraphicsStackItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 	GraphicsItem::handleMouseReleaseEvent(_event);
-	QGraphicsItem::mouseReleaseEvent(_event);
+	QGraphicsItemGroup::mouseReleaseEvent(_event);
 }
 
 void ot::GraphicsStackItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {

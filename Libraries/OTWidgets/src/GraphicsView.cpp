@@ -633,7 +633,9 @@ void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 }
 
 void ot::GraphicsView::beginItemMove(void) {
-	if (m_viewStateFlags & ItemMoveInProgress) return;
+	if (m_viewStateFlags & (ItemMoveInProgress | ReadOnlyState)) {
+		return;
+	}
 
 	m_viewStateFlags.setFlag(ItemMoveInProgress, true);
 
@@ -646,7 +648,9 @@ void ot::GraphicsView::beginItemMove(void) {
 }
 
 void ot::GraphicsView::endItemMove(void) {
-	if (!(m_viewStateFlags & ItemMoveInProgress)) return;
+	if (m_viewStateFlags & (ItemMoveInProgress | ReadOnlyState)) {
+		return;
+	}
 
 	m_viewStateFlags.setFlag(ItemMoveInProgress, false);
 

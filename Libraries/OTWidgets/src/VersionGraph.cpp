@@ -109,7 +109,7 @@ void ot::VersionGraph::slotCenterOnActiveVersion(void) {
 }
 
 void ot::VersionGraph::slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item) {
-	Q_EMIT versionActivatRequest(_item->getGraphicsItemName());
+	Q_EMIT versionActivateRequest(_item->getGraphicsItemName());
 }
 
 void ot::VersionGraph::showEvent(QShowEvent* _event) {

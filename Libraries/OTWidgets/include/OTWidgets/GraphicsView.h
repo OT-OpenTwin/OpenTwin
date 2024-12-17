@@ -44,12 +44,10 @@ namespace ot {
 		typedef Flags<GraphicsViewFlag> GraphicsViewFlags;
 
 		enum ViewStateFlag {
-			DefaultState            = 0x0000,
-			ItemMoveInProgress      = 0x0001,
-			//LeftMousePressedState   = 0x0100,
-			MiddleMousePressedState = 0x0200,
-			//RightMousePressedState  = 0x0400,
-
+			DefaultState            = 0 << 0,
+			ItemMoveInProgress      = 1 << 0,
+			MiddleMousePressedState = 1 << 1,
+			ReadOnlyState           = 1 << 2
 		};
 		typedef ot::Flags<ViewStateFlag> ViewStateFlags;
 
@@ -108,6 +106,9 @@ namespace ot {
 		void notifyItemConfigurationChanged(const ot::GraphicsItem* _item);
 
 		QRectF getVisibleSceneRect(void) const;
+
+		void setReadOnly(bool _isReadOnly) { m_viewStateFlags.setFlag(ViewStateFlag::ReadOnlyState, _isReadOnly); };
+		bool isReadOnly(void) const { return m_viewStateFlags.flagIsSet(ViewStateFlag::ReadOnlyState); };
 
 	Q_SIGNALS:
 		//! @brief Will be emitted when an item was dropped into the scene by the user

@@ -83,6 +83,12 @@ void ot::CustomGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	QGraphicsItem::mousePressEvent(_event);
 }
 
+void ot::CustomGraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
+	if (this->handleMouseMoveEvent(_event)) {
+		QGraphicsItem::mouseMoveEvent(_event);
+	}
+}
+
 void ot::CustomGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 	this->handleMouseReleaseEvent(_event);
 	QGraphicsItem::mouseReleaseEvent(_event);

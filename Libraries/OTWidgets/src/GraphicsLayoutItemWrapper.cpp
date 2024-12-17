@@ -30,6 +30,12 @@ void ot::GraphicsLayoutItemWrapper::mousePressEvent(QGraphicsSceneMouseEvent* _e
 	QGraphicsWidget::mousePressEvent(_event);
 }
 
+void ot::GraphicsLayoutItemWrapper::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
+	if (this->handleMouseMoveEvent(_event)) {
+		QGraphicsItem::mouseMoveEvent(_event);
+	}
+}
+
 void ot::GraphicsLayoutItemWrapper::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 	OTAssertNullptr(m_owner);
 	m_owner->handleMouseReleaseEvent(_event);

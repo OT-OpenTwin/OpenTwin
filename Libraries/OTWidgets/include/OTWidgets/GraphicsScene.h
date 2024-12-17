@@ -83,6 +83,7 @@ namespace ot {
 		void checkMaxTriggerDistance(const MarginsD& _triggerDistance);
 
 		GraphicsView* getGraphicsView(void) { return m_view; };
+		const GraphicsView* getGraphicsView(void) const { return m_view; };
 
 		void setConnectionPreviewShape(GraphicsConnectionCfg::ConnectionShape _shape) { m_connectionPreviewShape = _shape; };
 		GraphicsConnectionCfg::ConnectionShape getConnectionPreviewShape(void) const { return m_connectionPreviewShape; };

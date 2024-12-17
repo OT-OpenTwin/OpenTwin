@@ -126,6 +126,10 @@ namespace ot {
 		// Event handler
 
 		void handleMousePressEvent(QGraphicsSceneMouseEvent* _event);
+
+		//! @brief General event handler for mouse move events.
+		//! @return Returns true if the event should be processed.
+		bool handleMouseMoveEvent(QGraphicsSceneMouseEvent* _event);
 		void handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event);
 		void handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event);
 		void handleToolTip(QGraphicsSceneHoverEvent* _event);

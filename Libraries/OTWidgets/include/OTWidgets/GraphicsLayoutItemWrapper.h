@@ -23,6 +23,7 @@ namespace ot {
 		virtual void prepareGraphicsItemGeometryChange(void) override;
 
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* _event) override;
+		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* _event) override;
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) override;
 		virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* _event) override;
 		virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) override;

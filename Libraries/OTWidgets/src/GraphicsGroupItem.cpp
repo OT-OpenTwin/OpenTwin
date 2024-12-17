@@ -144,13 +144,19 @@ QVariant ot::GraphicsGroupItem::itemChange(QGraphicsItem::GraphicsItemChange _ch
 }
 
 void ot::GraphicsGroupItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMousePressEvent(_event);
+	this->handleMousePressEvent(_event);
 	QGraphicsItemGroup::mousePressEvent(_event);
 }
 
+void ot::GraphicsGroupItem::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
+	if (this->handleMouseMoveEvent(_event)) {
+		QGraphicsItemGroup::mouseMoveEvent(_event);
+	}
+}
+
 void ot::GraphicsGroupItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
-	GraphicsItem::handleMouseReleaseEvent(_event);
-	QGraphicsItem::mouseReleaseEvent(_event);
+	this->handleMouseReleaseEvent(_event);
+	QGraphicsItemGroup::mouseReleaseEvent(_event);
 }
 
 void ot::GraphicsGroupItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
@@ -200,7 +206,7 @@ void ot::GraphicsGroupItem::addItem(GraphicsItem* _item) {
 }
 
 double ot::GraphicsGroupItem::getMaxAdditionalTriggerDistance(void) const {
-	double maxDist = ot::GraphicsItem::getMaxAdditionalTriggerDistance();
+	double maxDist = this->getMaxAdditionalTriggerDistance();
 	for (auto itm : this->childItems()) {
 		const GraphicsItem* actualItem = dynamic_cast<const GraphicsItem*>(itm);
 		if (actualItem) {

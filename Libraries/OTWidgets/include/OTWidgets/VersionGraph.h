@@ -29,7 +29,7 @@ namespace ot {
 	Q_SIGNALS:
 		void versionDeselected(void);
 		void versionSelected(const std::string& _versionName);
-		void versionActivatRequest(const std::string& _versionName);
+		void versionActivateRequest(const std::string& _versionName);
 
 	public Q_SLOTS:
 		void slotSelectionChanged(void);
