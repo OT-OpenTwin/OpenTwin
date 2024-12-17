@@ -509,31 +509,19 @@ void StudioConnector::startSubprocess() {
 	ot::JsonDocument pingDoc;
 	pingDoc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
 	send(pingDoc.toJson());
-
-	if (waitForResponse()) {
-		std::string response = m_socket->readLine().data();
-		ot::ReturnMessage msg;
-		msg.fromJson(response);
-		assert(msg.getStatus() == ot::ReturnMessage::Ok);
 		
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
 
-		doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, 0, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, 0, doc.GetAllocator());   
+	doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, 0, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, 0, doc.GetAllocator());   
 
-		ot::ReturnMessage returnMessage = send(doc.toJson());
+	ot::ReturnMessage returnMessage = send(doc.toJson());
 
-		if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Failed) {
-			OT_LOG_E("Failed to initialise Python subprocess");
-			std::string errorMessage = "Failed to initialise Python subprocess, due to following error: " + returnMessage.getWhat();
-			throw std::string(errorMessage);
-		}
-	}
-	else {
-		OT_LOG_E("Failed to initialise Python subprocess: No ping response");
-		std::string errorMessage = "Failed to initialise Python subprocess, due to following error: No ping response";
+	if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Failed) {
+		OT_LOG_E("Failed to initialise Python subprocess");
+		std::string errorMessage = "Failed to initialise Python subprocess, due to following error: " + returnMessage.getWhat();
 		throw std::string(errorMessage);
 	}
 

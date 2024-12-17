@@ -33,6 +33,7 @@ bool CommunicationHandler::ensureConnectionToServer(void) {
 	this->connect(m_serverSocket, &QLocalSocket::readyRead, this, &CommunicationHandler::slotDataReceived);
 	this->connect(m_serverSocket, &QLocalSocket::disconnected, this, &CommunicationHandler::slotDisconnected);
 
+	OT_LOG_D("Connecting with server " + m_serverName);
 	m_serverSocket->connectToServer(QString::fromStdString(m_serverName));
 
 	int timeout = Timeouts::connection / Timeouts::tickRate;
@@ -48,7 +49,7 @@ bool CommunicationHandler::ensureConnectionToServer(void) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(Timeouts::tickRate));
 		this->processNextEvent();
 	}
-
+	OT_LOG_D("Connected with server");
 	return true;
 }
 
@@ -65,7 +66,7 @@ void CommunicationHandler::slotDataReceived(void) {
 
 void CommunicationHandler::slotProcessMessage(std::string _message) {
 	OT_LOG(_message, ot::INBOUND_MESSAGE_LOG);
-
+	
 	ot::JsonDocument doc;
 	if (!doc.fromJson(_message)) {
 		OT_LOG_E("Failed to parse document");
@@ -97,6 +98,7 @@ void CommunicationHandler::slotDisconnected(void) {
 
 bool CommunicationHandler::writeToServer(const std::string& _message) {
 	QByteArray data = QByteArray::fromStdString(_message);
+	data.append("\n");
 	if (!m_serverSocket) {
 		OT_LOG_E("Not connected");
 		return false;
