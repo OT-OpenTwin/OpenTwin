@@ -121,4 +121,5 @@ private:
 	BlockEntityHandler _blockEntityHandler;
 	GraphHandler _graphHandler;
 	PropertyHandlerDatabaseAccessBlock m_propertyHandlerDatabaseAccessBlock;
+	void runPipeline();
 };

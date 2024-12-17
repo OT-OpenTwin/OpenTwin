@@ -32,7 +32,7 @@
 #include <rapidjson/rapidjson.h>
 #include "DatasetOverviewVisualiser.h"
 #include "EntityMetadataSeries.h"
-#include "UILockWrapper.h"
+#include "OTServiceFoundation/UILockWrapper.h"
 
 Application * g_instance{ nullptr };
 
@@ -254,12 +254,12 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
 			{
-				UILockWrapper uiLock(ot::LockModelWrite);
+				UILockWrapper uiLock(Application::instance()->uiComponent(),ot::LockModelWrite);
 				m_batchedCategorisationHandler.createNewScriptDescribedMSMD();
 			}
 			else if (action == _buttonCreateDataCollection.GetFullDescription())
 			{
-				UILockWrapper uiLock(ot::LockModelWrite);
+				UILockWrapper uiLock(Application::instance()->uiComponent(),ot::LockModelWrite);
 				m_uiComponent->displayMessage("===========================================================================\n");
 				m_uiComponent->displayMessage("Start creation of dataset\n");
 				_tabledataToResultdataHandler->createDataCollection(dataBaseURL(), m_collectionName);
@@ -276,7 +276,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
 			if (subsequentFunction == "importTouchstoneData")
 			{
-				UILockWrapper uiLock(ot::LockModelWrite);
+				UILockWrapper uiLock(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::string originalName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 
 				std::string fileContent = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
