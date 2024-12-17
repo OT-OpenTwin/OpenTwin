@@ -108,6 +108,13 @@ bool SubprocessManager::ensureSubprocessRunning(void) {
 	return true;
 }
 
+void SubprocessManager::stopConnectionHandlingAfterCrash(void) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+	if (m_communicationHandler) {
+		m_communicationHandler->cleanupAfterCrash();
+	}
+}
+
 void SubprocessManager::shutdownSubprocess(void) {
 	m_subprocessHandler->shutdownSubprocess();
 }

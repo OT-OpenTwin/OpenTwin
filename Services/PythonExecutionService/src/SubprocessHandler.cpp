@@ -1,6 +1,7 @@
 // Service header
 #include "Timeouts.h"
 #include "SubprocessHandler.h"
+#include "SubprocessManager.h"
 
 // OpenTwin header
 #include "OTSystem/Application.h"
@@ -26,31 +27,37 @@ SubprocessHandler::~SubprocessHandler() {
 }
 
 bool SubprocessHandler::ensureSubprocessRunning(const std::string& _serverName) {
-	std::lock_guard<std::mutex> lock(m_mutex);
-	if (!m_clientHandle) {
-		if (m_healthCheckThread) {
-			OT_LOG_E("Health check thread already exists");
-			delete m_healthCheckThread;
-			m_healthCheckThread = nullptr;
-		}
-
-		// Create start args
-		std::string subprocessPath = this->findSubprocessPath();
-		std::string commandLine = "\"" + subprocessPath + "\" \"" + _serverName + "\"";
-
-		// Run sub
-		ot::app::RunResult result = ot::app::runApplication(subprocessPath + m_executableName, commandLine, m_clientHandle, false, Timeouts::connectionTimeout);
-		if (result != ot::app::OK) {
-			m_clientHandle = nullptr;
-			OT_LOG_E("Failed to start subprocess");
-			return false;
-		}
-
-		// Start health check
-		m_performHealthCheck = true;
-		m_healthCheckThread = new std::thread(&SubprocessHandler::healthCheckWorker, this);
+	if (m_clientHandle) {
+		return true;
 	}
-	
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+	if (m_healthCheckThread) {
+		if (m_performHealthCheck) {
+			OT_LOG_E("Health check thread already exists");
+		}
+		m_performHealthCheck = false;
+		m_healthCheckThread->join();
+		delete m_healthCheckThread;
+		m_healthCheckThread = nullptr;
+	}
+
+	// Create start args
+	std::string subprocessPath = this->findSubprocessPath();
+	std::string commandLine = "\"" + subprocessPath + "\" \"" + _serverName + "\"";
+
+	// Run sub
+	ot::app::RunResult result = ot::app::runApplication(subprocessPath + m_executableName, commandLine, m_clientHandle, false, Timeouts::connectionTimeout);
+	if (result != ot::app::OK) {
+		m_clientHandle = nullptr;
+		OT_LOG_E("Failed to start subprocess");
+		return false;
+	}
+
+	// Start health check
+	m_performHealthCheck = true;
+	m_healthCheckThread = new std::thread(&SubprocessHandler::healthCheckWorker, this);
+
 	return true;
 }
 
@@ -110,8 +117,12 @@ void SubprocessHandler::healthCheckWorker(void) {
 				
 				CloseHandle(m_clientHandle);
 				m_clientHandle = nullptr;
-				
+
 				OT_LOG_E("Client process stopped working");
+
+				if (m_manager) {
+					m_manager->stopConnectionHandlingAfterCrash();
+				}
 			}
 		}
 	}

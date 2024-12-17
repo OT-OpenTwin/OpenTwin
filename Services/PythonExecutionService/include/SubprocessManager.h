@@ -38,6 +38,9 @@ public:
 
 	bool ensureSubprocessRunning(void);
 
+	//! @brief Stops the connection handler.
+	void stopConnectionHandlingAfterCrash(void);
+
 private:
 	void shutdownSubprocess(void);
 

@@ -31,6 +31,8 @@ public:
 
 	bool sendConfigToClient(void);
 
+	void cleanupAfterCrash(void);
+
 private Q_SLOTS:
 	void slotNewConnection(void);
 	void slotMessageReceived(void);

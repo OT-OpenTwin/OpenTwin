@@ -60,6 +60,10 @@ bool CommunicationHandler::sendConfigToClient(void) {
 	return true;
 }
 
+void CommunicationHandler::cleanupAfterCrash(void) {
+	this->slotClientDisconnected();
+}
+
 void CommunicationHandler::slotMessageReceived(void) {
 	if (!m_client) {
 		OT_LOG_EA("Client not set");
@@ -81,9 +85,12 @@ void CommunicationHandler::slotClientDisconnected(void) {
 	}
 
 	m_clientState = ClientState::Disconnected;
+	
+	m_serviceAndSessionInfoSet = false;
 	m_modelUrlSet = false;
 	m_frontendUrlSet = false;
 	m_databaseInfoSet = false;
+
 	m_isInitializingClient = false;
 }
 
