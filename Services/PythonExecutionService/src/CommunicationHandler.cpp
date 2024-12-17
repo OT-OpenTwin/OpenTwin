@@ -272,17 +272,9 @@ bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectRes
 	// We know the request was sent successfully, so we set the state to wait for response and wait..
 	m_clientState = ClientState::WaitForResponse;
 
-	const int tickTime = Timeouts::defaultTickTime;
-	int timeout = Timeouts::responseTimeout / tickTime;
 	while (m_clientState == ClientState::WaitForResponse) {
-		if (timeout--) {
-			std::this_thread::sleep_for(std::chrono::microseconds(tickTime));
-			this->processNextEvent();
-		}
-		else {
-			OT_LOG_EA("Client response timeout");
-			return false;
-		}
+		std::this_thread::sleep_for(std::chrono::microseconds(Timeouts::defaultTickTime));
+		this->processNextEvent();
 	}
 
 	// Check if the client has received a response or disconnected.
