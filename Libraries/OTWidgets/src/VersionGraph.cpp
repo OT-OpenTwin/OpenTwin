@@ -72,7 +72,7 @@ bool ot::VersionGraph::isVersionIsEndOfBranch(const std::string& _versionName) c
 }
 
 void ot::VersionGraph::slotSelectionChanged(void) {
-	if (m_configFlags & VersionGraph::IgnoreSelectionHandlingOnReadOnly) {
+	if ((m_configFlags & VersionGraph::IgnoreSelectionHandlingOnReadOnly) && this->isReadOnly()) {
 		return;
 	}
 
@@ -113,7 +113,7 @@ void ot::VersionGraph::slotCenterOnActiveVersion(void) {
 }
 
 void ot::VersionGraph::slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item) {
-	if (m_configFlags & VersionGraph::IgnoreActivateRequestOnReadOnly) {
+	if ((m_configFlags & VersionGraph::IgnoreActivateRequestOnReadOnly) && this->isReadOnly()) {
 		return;
 	}
 	Q_EMIT versionActivateRequest(_item->getGraphicsItemName());
