@@ -54,8 +54,6 @@ private:
     const int m_timeoutSendingMessage = m_timeoutSubprocessStart;
     const int m_heartBeat = m_timeoutSubprocessStart;
 
-    std::atomic_bool m_startupChecked = false;
-
     QProcess m_subProcess;
     QLocalServer m_server;
     QLocalSocket* m_socket = nullptr;

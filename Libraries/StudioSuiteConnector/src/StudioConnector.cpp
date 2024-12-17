@@ -483,8 +483,7 @@ void StudioConnector::determineStudioSuiteInstallation(int &version, std::string
 	studioPath = studioKey.value("INSTALLPATH").toString().toStdString();
 }
 
-void StudioConnector::startSubprocess()
-{
+void StudioConnector::startSubprocess() {
 	if (m_subProcessRunning) return;
 
 	// Determine new unique server name
@@ -505,22 +504,18 @@ void StudioConnector::startSubprocess()
 	runSubprocess();
 #endif
 	connectWithSubprocess();
-	// Send ping before
+	
+	// Send ping
+	ot::JsonDocument pingDoc;
+	pingDoc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
+	send(pingDoc.toJson());
 
-
-
-
-
-
-
-	if (waitForResponse())
-	{
+	if (waitForResponse()) {
 		std::string response = m_socket->readLine().data();
 		ot::ReturnMessage msg;
 		msg.fromJson(response);
 		assert(msg.getStatus() == ot::ReturnMessage::Ok);
-		m_startupChecked = true;
-
+		
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
@@ -530,16 +525,16 @@ void StudioConnector::startSubprocess()
 
 		ot::ReturnMessage returnMessage = send(doc.toJson());
 
-		if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Failed)
-		{
+		if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Failed) {
 			OT_LOG_E("Failed to initialise Python subprocess");
 			std::string errorMessage = "Failed to initialise Python subprocess, due to following error: " + returnMessage.getWhat();
 			throw std::string(errorMessage);
 		}
 	}
-	else
-	{
-		assert(0);
+	else {
+		OT_LOG_E("Failed to initialise Python subprocess: No ping response");
+		std::string errorMessage = "Failed to initialise Python subprocess, due to following error: No ping response";
+		throw std::string(errorMessage);
 	}
 
 	m_subProcessRunning = true;
@@ -665,13 +660,7 @@ ot::ReturnMessage StudioConnector::executeCommand(const std::string& command)
 	return send(doc.toJson());
 }
 
-ot::ReturnMessage StudioConnector::send(const std::string& message)
-{
-	while (!m_startupChecked)
-	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(m_timeoutSubprocessStart));
-	}
-
+ot::ReturnMessage StudioConnector::send(const std::string& message) {
 	std::string errorMessage;
 	bool readyToWrite = checkSubprocessResponsive(errorMessage);
 	if (!readyToWrite)
@@ -728,7 +717,6 @@ void StudioConnector::closeSubprocess()
 		//socket = nullptr;
 
 		m_subProcessRunning = false;
-		m_startupChecked = false;
 
 		m_socket->close();
 		m_socket->waitForDisconnected(m_timeoutServerConnect);
