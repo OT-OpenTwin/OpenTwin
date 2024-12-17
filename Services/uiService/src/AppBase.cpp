@@ -936,6 +936,10 @@ void AppBase::createUi(void) {
 			f.setFlag(ot::LockModelWrite);
 			lockManager->uiElementCreated(this->getBasicServiceInformation(), m_propertyGrid, f);
 
+			if (m_graphicsPicker) {
+				lockManager->uiViewCreated(this->getBasicServiceInformation(), m_graphicsPicker, f);
+			}
+
 			f.removeFlag(ot::LockProperties);
 			f.setFlag(ot::LockNavigationAll);
 			f.setFlag(ot::LockNavigationWrite);
