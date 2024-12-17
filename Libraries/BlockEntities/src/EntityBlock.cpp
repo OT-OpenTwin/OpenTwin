@@ -7,19 +7,14 @@
 #include "EntityBlockConnection.h"
 
 EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms, ClassFactoryHandler* factory, const std::string& owner)
-	:EntityBase(ID, parent, obs, ms, factory, owner){}
+	:EntityBase(ID, parent, obs, ms, factory, owner)
+{
+	
+}
 
 EntityBlock::~EntityBlock()
 {
-	auto modelState = getModelState();
-	if ( modelState != nullptr)
-	{
-		//Remove the related connections.
-		for (ot::UID connectionID : _connectionIDs)
-		{
-			modelState->removeEntity(connectionID);
-		}		
-	}
+	
 }
 
 
