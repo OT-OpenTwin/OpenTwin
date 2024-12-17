@@ -505,6 +505,13 @@ void StudioConnector::startSubprocess()
 	runSubprocess();
 #endif
 	connectWithSubprocess();
+	// Send ping before
+
+
+
+
+
+
 
 	if (waitForResponse())
 	{
@@ -518,7 +525,7 @@ void StudioConnector::startSubprocess()
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
 
-		doc.AddMember(OT_ACTION_PARAM_SESSION_ID, 0, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, 0, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, 0, doc.GetAllocator());   
 
 		ot::ReturnMessage returnMessage = send(doc.toJson());

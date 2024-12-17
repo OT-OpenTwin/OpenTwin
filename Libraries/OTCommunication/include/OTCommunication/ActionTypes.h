@@ -437,6 +437,7 @@
 #define OT_ACTION_PARAM_SERVICE_GDSURL "Service.GdsUrl"
 
 #define OT_ACTION_PARAM_SESSION_ID "Session.ID"
+#define OT_ACTION_PARAM_SESSION_COUNT "Session.Count"
 #define OT_ACTION_PARAM_SESSION_TYPE "Session.Type"
 #define OT_ACTION_PARAM_SESSION_PROJECT "Session.Project"
 #define OT_ACTION_PARAM_SESSION_USER "Session.User"

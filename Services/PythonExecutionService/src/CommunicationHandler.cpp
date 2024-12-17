@@ -1,5 +1,6 @@
 // Service header
 #include "Timeouts.h"
+#include "Application.h"
 #include "CommunicationHandler.h"
 
 // OpenTwin header
@@ -16,7 +17,7 @@
 
 CommunicationHandler::CommunicationHandler(SubprocessManager* _manager, const std::string& _serverName)
 	: m_manager(_manager), m_serverName(_serverName), m_client(nullptr), m_clientState(ClientState::Disconnected),
-	m_frontendUrlSet(false), m_modelUrlSet(false), m_databaseInfoSet(false), m_isInitializingClient(false)
+	m_frontendUrlSet(false), m_modelUrlSet(false), m_databaseInfoSet(false), m_isInitializingClient(false), m_serviceAndSessionInfoSet(false)
 {
 	OTAssertNullptr(m_manager);
 
@@ -40,6 +41,9 @@ bool CommunicationHandler::sendToClient(const ot::JsonDocument& _document, std::
 bool CommunicationHandler::sendConfigToClient(void) {
 	OT_LOG_D("Sending configuration to client");
 
+	if (!this->sendServiceInfoToClient()) {
+		return false;
+	}
 	if (!this->sendModelConfigToClient()) {
 		return false;
 	}
@@ -86,6 +90,29 @@ void CommunicationHandler::slotClientDisconnected(void) {
 void CommunicationHandler::processNextEvent(void) {
 	QEventLoop loop;
 	loop.processEvents(QEventLoop::ProcessEventsFlag::AllEvents);
+}
+
+bool CommunicationHandler::sendServiceInfoToClient(void) {
+	if (!m_serviceAndSessionInfoSet) {
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ActionName, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SESSION_COUNT, Application::instance()->getSessionCount(), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, Application::instance()->getServiceID(), doc.GetAllocator());
+
+		QByteArray request = QByteArray::fromStdString(doc.toJson());
+		request.append('\n');
+
+		std::string response;
+		if (!this->sendToClient(request, true, response)) {
+			OT_LOG_E("Failed to send model info to client");
+			return false;
+		}
+
+		m_serviceAndSessionInfoSet = true;
+	}
+
+	return true;
 }
 
 bool CommunicationHandler::sendModelConfigToClient(void) {

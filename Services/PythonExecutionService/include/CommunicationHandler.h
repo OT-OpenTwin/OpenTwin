@@ -48,6 +48,7 @@ private:
 
 	void processNextEvent(void);
 
+	bool sendServiceInfoToClient(void);
 	bool sendModelConfigToClient(void);
 	bool sendFrontendConfigToClient(void);
 	bool sendDataBaseConfigToClient(void);
@@ -61,6 +62,8 @@ private:
 	QLocalSocket* m_client;
 	ClientState m_clientState;
 	bool m_isInitializingClient;
+
+	bool m_serviceAndSessionInfoSet;
 
 	std::string m_frontendUrl;
 	bool m_frontendUrlSet;

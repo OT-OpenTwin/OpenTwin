@@ -81,9 +81,9 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc) {
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE) {
 		OT_LOG_D("Initialise UID Generator");
-		const int sessionID = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_ID);
+		const int sessionCount = ot::json::getInt(doc, OT_ACTION_PARAM_SESSION_COUNT);
 		const int serviceID = ot::json::getInt(doc, OT_ACTION_PARAM_SERVICE_ID);
-		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionID, serviceID));
+		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(sessionCount, serviceID));
 	}
 	else if (serviceName == OT_INFO_SERVICE_TYPE_MODEL) {
 		OT_LOG_D("Connecting with modelService");
