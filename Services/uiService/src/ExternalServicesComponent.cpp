@@ -1463,8 +1463,8 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 			app->shortcutManager()->creatorDestroyed(s.second);
 			delete s.second;
 		}
-		m_lockManager->cleanService(AppBase::instance()->getBasicServiceInformation());
-		m_controlsManager->serviceDisconnected(AppBase::instance()->getBasicServiceInformation());
+		m_lockManager->cleanService(AppBase::instance()->getViewerComponent()->getBasicServiceInformation());
+		m_controlsManager->serviceDisconnected(AppBase::instance()->getViewerComponent()->getBasicServiceInformation());
 
 		app->shortcutManager()->clearViewerHandler();
 		app->clearNavigationTree();
