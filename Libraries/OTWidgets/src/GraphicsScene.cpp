@@ -67,6 +67,12 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 	OTAssertNullptr(m_view);
 	if (m_view->getGraphicsViewFlags() & GraphicsView::IgnoreConnectionByUser) return;
 
+	// Ignore new connection on read only mode
+	if (m_view->isReadOnly()) {
+		this->stopConnection(); // Stop connection if read only was set during drag
+		return;
+	}
+
 	if (m_connectionOrigin == nullptr) {
 		// Start new connection
 		m_connectionOrigin = _item;
@@ -89,6 +95,7 @@ void ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
 			this->stopConnection();
 			return;
 		}
+
 		OT_LOG_D("New conncetion");
 		UID originUid = m_connectionOrigin->getRootItem()->getGraphicsItemUid();
 		std::string originConnectable = m_connectionOrigin->getGraphicsItemName();

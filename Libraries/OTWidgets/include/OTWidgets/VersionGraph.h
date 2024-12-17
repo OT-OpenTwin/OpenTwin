@@ -16,6 +16,13 @@ namespace ot {
 	class OT_WIDGETS_API_EXPORT VersionGraph : public GraphicsView {
 		Q_OBJECT
 	public:
+		enum VersionGraphConfig {
+			NoConfigFlags                     = 0 << 0, //! \brief No VersionGraph configuration flags.
+			IgnoreActivateRequestOnReadOnly   = 1 << 0, //! \brief Activate version requests will be suppressed if the VersionGraph is in read-only state.
+			IgnoreSelectionHandlingOnReadOnly = 1 << 1  //! \brief Version selection changed signals will be suppressed if the VersionGraph is in read-only state.
+		};
+		typedef Flags<VersionGraphConfig> VersionGraphConfigFlags;
+
 		VersionGraph();
 		virtual ~VersionGraph();
 
@@ -25,6 +32,10 @@ namespace ot {
 
 		bool isCurrentVersionEndOfBranch(void) const;
 		bool isVersionIsEndOfBranch(const std::string& _versionName) const;
+
+		void setVersionGraphConfig(VersionGraphConfig _config, bool _active = true) { m_configFlags.setFlag(_config, _active); };
+		void setVersionGraphConfigFlags(const VersionGraphConfigFlags& _flags) { m_configFlags = _flags; };
+		const VersionGraphConfigFlags& getVersionGraphConfigFlags(void) const { return m_configFlags; };
 
 	Q_SIGNALS:
 		void versionDeselected(void);
@@ -51,8 +62,9 @@ namespace ot {
 		std::string m_activeVersion;
 		std::string m_activeVersionBranch;
 		VersionGraphItem* m_rootItem;
-
+		VersionGraphConfigFlags m_configFlags;
 	};
 
 }
 
+OT_ADD_FLAG_FUNCTIONS(ot::VersionGraph::VersionGraphConfig)

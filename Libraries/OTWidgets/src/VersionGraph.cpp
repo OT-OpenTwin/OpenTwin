@@ -9,7 +9,7 @@
 #include "OTWidgets/VersionGraphItem.h"
 
 ot::VersionGraph::VersionGraph() 
-	: m_rootItem(nullptr), m_updateItemPositionRequired(false)
+	: m_rootItem(nullptr), m_updateItemPositionRequired(false), m_configFlags(NoConfigFlags)
 {
 	this->getGraphicsScene()->setGridFlags(ot::Grid::NoGridFlags);
 	this->getGraphicsScene()->setMultiselectionEnabled(false);
@@ -72,6 +72,10 @@ bool ot::VersionGraph::isVersionIsEndOfBranch(const std::string& _versionName) c
 }
 
 void ot::VersionGraph::slotSelectionChanged(void) {
+	if (m_configFlags & VersionGraph::IgnoreSelectionHandlingOnReadOnly) {
+		return;
+	}
+
 	std::list<ot::GraphicsItem*> selection = this->getSelectedGraphicsItems();
 	if (selection.size() > 1) {
 		OT_LOG_EA("Invalid selection");
@@ -109,6 +113,9 @@ void ot::VersionGraph::slotCenterOnActiveVersion(void) {
 }
 
 void ot::VersionGraph::slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item) {
+	if (m_configFlags & VersionGraph::IgnoreActivateRequestOnReadOnly) {
+		return;
+	}
 	Q_EMIT versionActivateRequest(_item->getGraphicsItemName());
 }
 

@@ -133,7 +133,6 @@ const QString c_promtIcoPath = "Default";
 
 #define WAITING_ANIMATION_NAME "OpenTwinLoading"
 
-
 static AppBase	*	g_app{ nullptr };	//! The API manager
 
 // #####################################################################################################################################################
@@ -1031,14 +1030,15 @@ ViewerUIDtype AppBase::createView(
 			OT_LOG_EA("Version graph already exists");
 			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
 			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
-			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivatRequest, this, &AppBase::slotRequestVersion);
+			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivateRequest, this, &AppBase::slotRequestVersion);
 			delete m_versionGraph;
 		}
 		m_versionGraph = new ot::VersionGraphManagerView;
+		m_versionGraph->getGraph()->setVersionGraphConfigFlags(ot::VersionGraph::IgnoreActivateRequestOnReadOnly);
 		m_versionGraph->setViewData(ot::WidgetViewBase(textVersion.toStdString(), textVersion.toStdString(), ot::WidgetViewBase::ViewVersion, ot::WidgetViewBase::ViewFlag::ViewIsSide));
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
-		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivatRequest, this, &AppBase::slotRequestVersion);
+		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivateRequest, this, &AppBase::slotRequestVersion);
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_versionGraph, ot::WidgetView::KeepCurrentFocus, m_output);
 	}
 	

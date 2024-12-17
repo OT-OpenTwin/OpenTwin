@@ -839,6 +839,7 @@ bool ExternalServicesComponent::sendHttpRequest(RequestType operation, const std
 
 		default:
 			OTAssert(0, "Unknown request type");
+			break;
 		}
 
 		return success;
