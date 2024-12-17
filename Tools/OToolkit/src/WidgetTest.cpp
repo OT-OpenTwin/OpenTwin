@@ -175,7 +175,7 @@ void WidgetTest::updateVersionConfig(const std::string& _activeVersionName, cons
 
 	{
 		ot::PerformanceIntervalTest test;
-		m_versionGraph->setupConfig(newCfg);
+		m_versionGraph->setupConfig(std::move(newCfg));
 		test.logCurrentInterval("Setup graph");
 	}
 	

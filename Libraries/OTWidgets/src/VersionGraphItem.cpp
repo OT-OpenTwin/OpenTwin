@@ -208,7 +208,7 @@ void ot::VersionGraphItem::updateVersionPositionAndSize(void) {
 	m_currentSize = this->boundingRect().size();
 
 	// Calculate positioning
-	Point2DD newPos(0., (OT_VERSIONGRAPHITEM_Height + OT_VERSIONGRAPHITEM_VSpacing) * (double)m_row);
+	QPoint newPos(0., (OT_VERSIONGRAPHITEM_Height + OT_VERSIONGRAPHITEM_VSpacing) * (double)m_row);
 
 	if (m_parentVersion) {
 		newPos.setX(
@@ -216,7 +216,7 @@ void ot::VersionGraphItem::updateVersionPositionAndSize(void) {
 			m_parentVersion->getCurrentSize().width() + OT_VERSIONGRAPHITEM_HSpacing
 		);
 	}
-	this->setGraphicsItemPos(newPos);
+	this->getQGraphicsItem()->setPos(newPos);
 
 	// Update childs
 	for (VersionGraphItem* child : m_childVersions) {

@@ -13,10 +13,11 @@ namespace ot {
 	class OT_GUI_API_EXPORT VersionGraphCfg : public Serializable {
 	public:
 		VersionGraphCfg();
-		VersionGraphCfg(const VersionGraphCfg& _other);
+		VersionGraphCfg(const VersionGraphCfg& _other) = delete;
 		virtual ~VersionGraphCfg();
 
-		VersionGraphCfg& operator = (const VersionGraphCfg& _other);
+		VersionGraphCfg& operator = (const VersionGraphCfg& _other) = delete;
+		VersionGraphCfg& operator = (VersionGraphCfg&& _other) noexcept;
 
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.

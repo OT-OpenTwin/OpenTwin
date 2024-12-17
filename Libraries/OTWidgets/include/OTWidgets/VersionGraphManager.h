@@ -36,7 +36,7 @@ namespace ot {
 		VersionGraph* getGraph(void) { return m_graph; };
 		const VersionGraph* getGraph(void) const { return m_graph; };
 
-		void setupConfig(const VersionGraphCfg& _config);
+		void setupConfig(VersionGraphCfg&& _config);
 
 		void setCurrentViewMode(ViewMode _mode);
 		ViewMode getCurrentViewMode(void) const;

@@ -73,8 +73,8 @@ ot::VersionGraphManager::~VersionGraphManager() {
 
 }
 
-void ot::VersionGraphManager::setupConfig(const VersionGraphCfg& _config) {
-	m_config = _config;
+void ot::VersionGraphManager::setupConfig(VersionGraphCfg&& _config) {
+	m_config = std::move(_config);
 	this->updateCurrentGraph();
 }
 
