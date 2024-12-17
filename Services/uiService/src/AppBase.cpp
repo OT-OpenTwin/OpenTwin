@@ -484,11 +484,11 @@ void AppBase::lockSelectionAndModification(bool flag)
 
 	if (flag)
 	{
-		lockManager()->lock(nullptr, lockFlags);
+		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
 	}
 	else
 	{
-		lockManager()->unlock(nullptr, lockFlags);
+		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
 	}
 
 	lockWelcomeScreen(flag);
@@ -501,7 +501,7 @@ void AppBase::lockUI(bool flag)
 
 	if (flag)
 	{
-		lockManager()->lock(nullptr, lockFlags);
+		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
 		lockWelcomeScreen(true);
 		uiAPI::window::enableTabToolBar(m_mainWindow, false);
 		uiAPI::window::setWaitingAnimationVisible(m_mainWindow, false);
@@ -509,7 +509,7 @@ void AppBase::lockUI(bool flag)
 	else
 	{
 		lockWelcomeScreen(false);
-		lockManager()->unlock(nullptr, lockFlags);
+		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
 		uiAPI::window::enableTabToolBar(m_mainWindow, true);
 	}
 }
@@ -931,14 +931,15 @@ void AppBase::createUi(void) {
 			// Add default items to lock manager
 			auto lockManager = m_ExternalServicesComponent->lockManager();
 
-			ot::LockTypeFlags f{ ot::LockAll };
+			ot::LockTypeFlags f(ot::LockAll);
 			f.setFlag(ot::LockProperties);
-			lockManager->uiElementCreated(this, m_propertyGrid, f);
+			f.setFlag(ot::LockModelWrite);
+			lockManager->uiElementCreated(this->getBasicServiceInformation(), m_propertyGrid, f);
 
 			f.removeFlag(ot::LockProperties);
 			f.setFlag(ot::LockNavigationAll);
 			f.setFlag(ot::LockNavigationWrite);
-			lockManager->uiElementCreated(this, m_projectNavigation, f);
+			lockManager->uiElementCreated(this->getBasicServiceInformation(), m_projectNavigation, f);
 
 			// Update status
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Done");
@@ -1028,6 +1029,9 @@ ViewerUIDtype AppBase::createView(
 	{
 		if (m_versionGraph) {
 			OT_LOG_EA("Version graph already exists");
+		
+			this->lockManager()->uiElementDestroyed(m_versionGraph->getGraph());
+			
 			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
 			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
 			this->disconnect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivateRequest, this, &AppBase::slotRequestVersion);
@@ -1039,6 +1043,9 @@ ViewerUIDtype AppBase::createView(
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionSelected, this, &AppBase::slotVersionSelected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionDeselected, this, &AppBase::slotVersionDeselected);
 		this->connect(m_versionGraph->getGraph(), &ot::VersionGraph::versionActivateRequest, this, &AppBase::slotRequestVersion);
+		
+		this->lockManager()->uiElementCreated(this->getBasicServiceInformation(), m_versionGraph->getGraph(), ot::LockAll | ot::LockModelWrite);
+		
 		ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_versionGraph, ot::WidgetView::KeepCurrentFocus, m_output);
 	}
 	
@@ -1159,6 +1166,22 @@ void AppBase::switchToTab(const std::string &menu) {
 }
 
 void AppBase::closeAllViewerTabs(void) {
+	LockManager* manager = this->lockManager();
+
+	for (auto element : m_graphicsViews) {
+		manager->uiElementDestroyed(static_cast<ot::GraphicsView*>(element.second));
+	}
+	for (auto element : m_textEditors) {
+		manager->uiViewDestroyed(element.second);
+	}
+	for (auto element : m_tables) {
+		manager->uiViewDestroyed(element.second);
+	}
+	if (m_versionGraph) {
+		manager->uiElementDestroyed(m_versionGraph->getGraph());
+	}
+	
+
 	m_graphicsViews.clear();
 	m_textEditors.clear();
 	m_tables.clear();
@@ -1542,6 +1565,9 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	newOutline.setCap(ot::RoundCap);
 	newOutline.setStyle(ot::DotLine);
 	newEditor->getGraphicsScene()->setGridLineStyle(newOutline);
+
+	//m_ExternalServicesComponent->service
+	this->lockManager()->uiElementCreated(this->getBasicServiceInformation(), m_versionGraph->getGraph(), ot::LockAll | ot::LockModelWrite | ot::LockModelRead | ot::LockViewRead | ot::LockViewWrite);
 
 	m_graphicsViews.insert_or_assign(_entityName, newEditor);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor, _viewInsertFlags);
@@ -2731,12 +2757,15 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	ot::TableView* table = dynamic_cast<ot::TableView*>(_view);
 	if (graphics) {
 		ot::removeFromMapByValue(m_graphicsViews, graphics);
+		this->lockManager()->uiElementDestroyed(graphics);
 	}
 	if (txt) {
 		ot::removeFromMapByValue(m_textEditors, txt);
+		this->lockManager()->uiViewDestroyed(txt);
 	}
 	if (table) {
 		ot::removeFromMapByValue(m_tables, table);
+		this->lockManager()->uiViewDestroyed(table);
 	}
 
 	if (m_lastFocusedCentralView == _view) {

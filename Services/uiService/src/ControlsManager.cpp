@@ -11,8 +11,10 @@
 
 // OT header
 #include "OTCore/ServiceBase.h"
+#include "OTWidgets/WidgetView.h"
 #include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/PropertyGrid.h"
+#include "OTWidgets/GraphicsView.h"
 
 // AK header
 #include <akAPI/uiAPI.h>
@@ -22,7 +24,7 @@ ControlsManager::~ControlsManager() {
 	for (auto itm : m_creatorMap) { delete itm.second; }
 }
 
-void ControlsManager::uiElementCreated(ot::ServiceBase * _creator, ak::UID _controlUid, bool _elementHasEvents) {
+void ControlsManager::uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ak::UID _controlUid, bool _elementHasEvents) {
 	
 	// Store ui info
 	if (_elementHasEvents) {
@@ -31,16 +33,16 @@ void ControlsManager::uiElementCreated(ot::ServiceBase * _creator, ak::UID _cont
 			assert(0);
 			throw std::exception("Item was already registered");
 		}
-		m_uiToCreatorMap.insert_or_assign(_controlUid, _creator);
+		m_uiToCreatorMap.insert_or_assign(_controlUid, _serviceInfo);
 	}
 	
 	// Store creator info
-	auto creatorList{ m_creatorMap.find(_creator) };
+	auto creatorList{ m_creatorMap.find(_serviceInfo) };
 	if (creatorList == m_creatorMap.end()) {
 		// Creators first element
 		std::vector<ak::UID> * newVector{ new std::vector<ak::UID> };
 		newVector->push_back(_controlUid);
-		m_creatorMap.insert_or_assign(_creator, newVector);
+		m_creatorMap.insert_or_assign(_serviceInfo, newVector);
 	}
 	else { creatorList->second->push_back(_controlUid); }
 }
@@ -87,21 +89,22 @@ void ControlsManager::uiControlWasDestroyed(ak::UID _controlUid) {
 	}
 }
 
-void ControlsManager::serviceDisconnected(ot::ServiceBase * _service) {
+void ControlsManager::serviceDisconnected(const ot::BasicServiceInformation& _serviceInfo) {
 	// Get the controls created by this service
-	auto controlsList = m_creatorMap.find(_service);
+	auto controlsList = m_creatorMap.find(_serviceInfo);
 	if (controlsList != m_creatorMap.end()) {
 		destroyUiControls(*controlsList->second);
 		delete controlsList->second;
 		// Finally remove the creator information from the creator map
-		m_creatorMap.erase(_service);
+		m_creatorMap.erase(_serviceInfo);
 	}
 }
 
-ot::ServiceBase * ControlsManager::objectCreator(ak::UID _itemUid) {
+ot::BasicServiceInformation ControlsManager::objectCreator(ak::UID _itemUid) {
 	auto itm{ m_uiToCreatorMap.find(_itemUid) };
 	if (itm == m_uiToCreatorMap.end()) {
-		return nullptr;
+		OT_LOG_E("Creator not found");
+		return ot::BasicServiceInformation();
 	}
 	return itm->second;
 }
@@ -113,14 +116,14 @@ ot::ServiceBase * ControlsManager::objectCreator(ak::UID _itemUid) {
 // #######################################################################################################################
 
 LockManager::LockManager(AppBase* _owner)
-	: m_owner(_owner), m_tree(nullptr), m_prop(nullptr)
+	: m_owner(_owner)
 {}
 
 LockManager::~LockManager() {
 	
 }
 
-void LockManager::uiElementCreated(ot::ServiceBase * _service, ak::UID _uid, const ot::LockTypeFlags & _typeFlags) {
+void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ak::UID _uid, const ot::LockTypeFlags & _typeFlags) {
 	// Check for duplicate
 	auto oldItm{ m_uiElements.find(_uid) };
 	assert(oldItm == m_uiElements.end());	// Element information already stored
@@ -130,7 +133,7 @@ void LockManager::uiElementCreated(ot::ServiceBase * _service, ak::UID _uid, con
 	m_uiElements.insert_or_assign(_uid, uiElement);
 
 	// Initialize enabled list
-	auto lst{ serviceEnabledLevel(_service) };
+	auto lst = serviceEnabledLevel(_serviceInfo);
 	lst->insert_or_assign(_uid, 0);
 
 	// Check existing locks
@@ -143,31 +146,61 @@ void LockManager::uiElementCreated(ot::ServiceBase * _service, ak::UID _uid, con
 	}
 }
 
-void LockManager::uiElementCreated(ot::ServiceBase* _service, ak::aTreeWidget* _tree, const ot::LockTypeFlags& _typeFlags) {
+void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ak::aTreeWidget* _tree, const ot::LockTypeFlags& _typeFlags) {
 	// Create new entrys
-	OTAssert(m_tree == nullptr, "");
-	m_tree = new LockManagerElement{ _tree, _typeFlags };
+	LockManagerElement* newTree = new LockManagerElement(_tree, _typeFlags);
+	m_specials.push_back(newTree);
 
 	// Check existing locks
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
-				m_tree->lock(lockLevel.second, lockLevel.first);
+				newTree->lock(lockLevel.second, lockLevel.first);
 			}
 		}
 	}
 }
 
-void LockManager::uiElementCreated(ot::ServiceBase* _service, ot::PropertyGrid* _propertyGrid, const ot::LockTypeFlags& _typeFlags) {
+void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::PropertyGrid* _propertyGrid, const ot::LockTypeFlags& _typeFlags) {
 	// Create new entrys
-	OTAssert(m_prop == nullptr, "");
-	m_prop = new LockManagerElement{ _propertyGrid, _typeFlags };
+	LockManagerElement* newProp = new LockManagerElement(_propertyGrid, _typeFlags);
+	m_specials.push_back(newProp);
 
 	// Check existing locks
 	for (auto itm : m_serviceToUiLockLevel) {
 		for (auto lockLevel : *itm.second) {
 			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
-				m_prop->lock(lockLevel.second, lockLevel.first);
+				newProp->lock(lockLevel.second, lockLevel.first);
+			}
+		}
+	}
+}
+
+void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::GraphicsView* _graphicsView, const ot::LockTypeFlags& _typeFlags) {
+	// Create new entrys
+	LockManagerElement* newGraphics = new LockManagerElement(_graphicsView, _typeFlags);
+	m_specials.push_back(newGraphics);
+
+	// Check existing locks
+	for (auto itm : m_serviceToUiLockLevel) {
+		for (auto lockLevel : *itm.second) {
+			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+				newGraphics->lock(lockLevel.second, lockLevel.first);
+			}
+		}
+	}
+}
+
+void LockManager::uiViewCreated(const ot::BasicServiceInformation& _serviceInfo, ot::WidgetView* _view, const ot::LockTypeFlags& _typeFlags) {
+	// Create new entrys
+	LockManagerElement* newView = new LockManagerElement(_view, _typeFlags);
+	m_specials.push_back(newView);
+
+	// Check existing locks
+	for (auto itm : m_serviceToUiLockLevel) {
+		for (auto lockLevel : *itm.second) {
+			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+				newView->lock(lockLevel.second, lockLevel.first);
 			}
 		}
 	}
@@ -189,8 +222,44 @@ void LockManager::uiElementDestroyed(ak::UID _uid) {
 	
 }
 
-void LockManager::lock(ot::ServiceBase * _service, ot::LockTypeFlag _type) {
-	auto service = serviceLockLevel(_service);
+void LockManager::uiElementDestroyed(ak::aTreeWidget* _tree) {
+	for (LockManagerElement* element : m_specials) {
+		if (element->getTree() == _tree) {
+			this->removeSpeciaElement(element);
+			return;
+		}
+	}
+}
+
+void LockManager::uiElementDestroyed(ot::PropertyGrid* _propertyGrid) {
+	for (LockManagerElement* element : m_specials) {
+		if (element->getProp() == _propertyGrid) {
+			this->removeSpeciaElement(element);
+			return;
+		}
+	}
+}
+
+void LockManager::uiElementDestroyed(ot::GraphicsView* _graphicsView) {
+	for (LockManagerElement* element : m_specials) {
+		if (element->getGraphics() == _graphicsView) {
+			this->removeSpeciaElement(element);
+			return;
+		}
+	}
+}
+
+void LockManager::uiViewDestroyed(ot::WidgetView* _view) {
+	for (LockManagerElement* element : m_specials) {
+		if (element->getView() == _view) {
+			this->removeSpeciaElement(element);
+			return;
+		}
+	}
+}
+
+void LockManager::lock(const ot::BasicServiceInformation& _serviceInfo, ot::LockTypeFlag _type) {
+	auto service = serviceLockLevel(_serviceInfo);
 
 	// Get old value
 	auto oldLevel = service->find(_type);
@@ -206,49 +275,51 @@ void LockManager::lock(ot::ServiceBase * _service, ot::LockTypeFlag _type) {
 		itm.second->lock(1, _type);
 	}
 
-	if (m_tree) m_tree->lock(1, _type);
-	if (m_prop) m_prop->lock(1, _type);
+	for (LockManagerElement* specialElement : m_specials) {
+		specialElement->lock(1, _type);
+	}
 
 	if (_type == ot::LockAll) { m_owner->setWaitingAnimationVisible(true); }
 }
 
-void LockManager::lock(ot::ServiceBase * _service, const ot::LockTypeFlags & _typeFlags) {
+void LockManager::lock(const ot::BasicServiceInformation& _serviceInfo, const ot::LockTypeFlags & _typeFlags) {
 	if (_typeFlags.flagIsSet(ot::LockAll)) {
-		lock(_service, ot::LockAll);
+		lock(_serviceInfo, ot::LockAll);
 	} 
 	if (_typeFlags.flagIsSet(ot::LockModelWrite)) {
-		lock(_service, ot::LockModelWrite);
+		lock(_serviceInfo, ot::LockModelWrite);
 	}
 	if (_typeFlags.flagIsSet(ot::LockModelRead)) {
-		lock(_service, ot::LockModelRead);
+		lock(_serviceInfo, ot::LockModelRead);
 	}
 	if (_typeFlags.flagIsSet(ot::LockNavigationAll)) {
-		lock(_service, ot::LockNavigationAll);
+		lock(_serviceInfo, ot::LockNavigationAll);
 	}
 	if (_typeFlags.flagIsSet(ot::LockNavigationWrite)) {
-		lock(_service, ot::LockNavigationWrite);
+		lock(_serviceInfo, ot::LockNavigationWrite);
 	}
 	if (_typeFlags.flagIsSet(ot::LockProperties)) {
-		lock(_service, ot::LockProperties);
+		lock(_serviceInfo, ot::LockProperties);
 	}
 	if (_typeFlags.flagIsSet(ot::LockViewRead)) {
-		lock(_service, ot::LockViewRead);
+		lock(_serviceInfo, ot::LockViewRead);
 	}
 	if (_typeFlags.flagIsSet(ot::LockViewWrite)) {
-		lock(_service, ot::LockViewWrite);
+		lock(_serviceInfo, ot::LockViewWrite);
 	}
 }
 
-void LockManager::unlock(ot::ServiceBase * _service) {
-	auto service = serviceLockLevel(_service);
+void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo) {
+	auto service = serviceLockLevel(_serviceInfo);
 
 	for (auto lockVal : *service) {
 		for (auto itm : m_uiElements) {
 			itm.second->unlock(lockVal.second, lockVal.first);
 		}
 
-		if (m_tree) m_tree->unlock(lockVal.second, lockVal.first);
-		if (m_prop) m_prop->unlock(lockVal.second, lockVal.first);
+		for (LockManagerElement* specialElement : m_specials) {
+			specialElement->unlock(lockVal.second, lockVal.first);
+		}
 
 		service->insert_or_assign(lockVal.first, 0);
 	}
@@ -256,8 +327,8 @@ void LockManager::unlock(ot::ServiceBase * _service) {
 	if (lockLevel(ot::LockAll) <= 0) { m_owner->setWaitingAnimationVisible(false); }
 }
 
-void LockManager::unlock(ot::ServiceBase * _service, ot::LockTypeFlag _type) {
-	auto service = serviceLockLevel(_service);
+void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, ot::LockTypeFlag _type) {
+	auto service = serviceLockLevel(_serviceInfo);
 
 	// Get old value
 	auto oldLevel = service->find(_type);
@@ -273,8 +344,9 @@ void LockManager::unlock(ot::ServiceBase * _service, ot::LockTypeFlag _type) {
 			itm.second->unlock(1, _type);
 		}
 
-		if (m_tree) m_tree->unlock(1, _type);
-		if (m_prop) m_prop->unlock(1, _type);
+		for (LockManagerElement* specialElement : m_specials) {
+			specialElement->unlock(1, _type);
+		}
 	}
 	else {
 		service->insert_or_assign(_type, v);
@@ -285,35 +357,35 @@ void LockManager::unlock(ot::ServiceBase * _service, ot::LockTypeFlag _type) {
 	}
 }
 
-void LockManager::unlock(ot::ServiceBase * _service, const ot::LockTypeFlags & _typeFlags) {
+void LockManager::unlock(const ot::BasicServiceInformation& _serviceInfo, const ot::LockTypeFlags & _typeFlags) {
 	if (_typeFlags.flagIsSet(ot::LockAll)) {
-		unlock(_service, ot::LockAll);
+		unlock(_serviceInfo, ot::LockAll);
 	}
 	if (_typeFlags.flagIsSet(ot::LockModelWrite)) {
-		unlock(_service, ot::LockModelWrite);
+		unlock(_serviceInfo, ot::LockModelWrite);
 	}
 	if (_typeFlags.flagIsSet(ot::LockModelRead)) {
-		unlock(_service, ot::LockModelRead);
+		unlock(_serviceInfo, ot::LockModelRead);
 	}
 	if (_typeFlags.flagIsSet(ot::LockNavigationAll)) {
-		unlock(_service, ot::LockNavigationAll);
+		unlock(_serviceInfo, ot::LockNavigationAll);
 	}
 	if (_typeFlags.flagIsSet(ot::LockNavigationWrite)) {
-		unlock(_service, ot::LockNavigationWrite);
+		unlock(_serviceInfo, ot::LockNavigationWrite);
 	}
 	if (_typeFlags.flagIsSet(ot::LockProperties)) {
-		unlock(_service, ot::LockProperties);
+		unlock(_serviceInfo, ot::LockProperties);
 	}
 	if (_typeFlags.flagIsSet(ot::LockViewRead)) {
-		unlock(_service, ot::LockViewRead);
+		unlock(_serviceInfo, ot::LockViewRead);
 	}
 	if (_typeFlags.flagIsSet(ot::LockViewWrite)) {
-		unlock(_service, ot::LockViewWrite);
+		unlock(_serviceInfo, ot::LockViewWrite);
 	}
 }
 
-void LockManager::disable(ot::ServiceBase * _service, ak::UID _element) {
-	auto service = serviceEnabledLevel(_service);
+void LockManager::disable(const ot::BasicServiceInformation& _serviceInfo, ak::UID _element) {
+	auto service = serviceEnabledLevel(_serviceInfo);
 	auto serviceEnabledVal = service->find(_element);
 	if (serviceEnabledVal == service->end()) {
 		service->insert_or_assign(_element, 1);
@@ -324,8 +396,8 @@ void LockManager::disable(ot::ServiceBase * _service, ak::UID _element) {
 	uiElement(_element)->disable(1);
 }
 
-void LockManager::enable(ot::ServiceBase * _service, ak::UID _element, bool _resetCounter) {
-	auto service = serviceEnabledLevel(_service);
+void LockManager::enable(const ot::BasicServiceInformation& _serviceInfo, ak::UID _element, bool _resetCounter) {
+	auto service = serviceEnabledLevel(_serviceInfo);
 	auto serviceEnabledVal = service->find(_element);
 	if (serviceEnabledVal == service->end()) {
 		service->insert_or_assign(_element, 0);
@@ -345,9 +417,9 @@ void LockManager::enable(ot::ServiceBase * _service, ak::UID _element, bool _res
 	}
 }
 
-void LockManager::cleanService(ot::ServiceBase * _service, bool _reenableElement, bool _eraseUiElements) {
-	auto serviceE = serviceEnabledLevel(_service);
-	auto serviceL = serviceLockLevel(_service);
+void LockManager::cleanService(const ot::BasicServiceInformation& _serviceInfo, bool _reenableElement, bool _eraseUiElements) {
+	auto serviceE = serviceEnabledLevel(_serviceInfo);
+	auto serviceL = serviceLockLevel(_serviceInfo);
 
 	for (auto e : *serviceE) {
 		if (e.second > 0 && _reenableElement) {
@@ -368,17 +440,20 @@ void LockManager::cleanService(ot::ServiceBase * _service, bool _reenableElement
 				itm.second->unlock(l.second, l.first);
 			}
 			
-			if (m_tree) m_tree->unlock(l.second, l.first);
-			if (m_prop) m_prop->unlock(l.second, l.first);
+			for (LockManagerElement* specialElement : m_specials) {
+				specialElement->unlock(l.second, l.first);
+			}
 		}
 	}
 
 	delete serviceE;
 	delete serviceL;
-	m_serviceToUiEnabledLevel.erase(_service);
-	m_serviceToUiLockLevel.erase(_service);
+	m_serviceToUiEnabledLevel.erase(_serviceInfo);
+	m_serviceToUiLockLevel.erase(_serviceInfo);
 
-	if (lockLevel(ot::LockAll) <= 0) { m_owner->setWaitingAnimationVisible(false); }
+	if (lockLevel(ot::LockAll) <= 0) { 
+		m_owner->setWaitingAnimationVisible(false);
+	}
 }
 
 int LockManager::lockLevel(ot::LockTypeFlag _type) {
@@ -417,24 +492,34 @@ LockManagerElement * LockManager::uiElement(ak::UID _uid) {
 	return itm->second;
 }
 
-std::map<ot::LockTypeFlag, int> * LockManager::serviceLockLevel(ot::ServiceBase * _service) {
-	auto itm = m_serviceToUiLockLevel.find(_service);
+std::map<ot::LockTypeFlag, int> * LockManager::serviceLockLevel(const ot::BasicServiceInformation& _serviceInfo) {
+	auto itm = m_serviceToUiLockLevel.find(_serviceInfo);
 	if (itm == m_serviceToUiLockLevel.end()) {
 		auto newMap = new std::map<ot::LockTypeFlag, int>;
-		m_serviceToUiLockLevel.insert_or_assign(_service, newMap);
+		m_serviceToUiLockLevel.insert_or_assign(_serviceInfo, newMap);
 		return newMap;
 	}
 	else { return itm->second; }
 }
 
-std::map<ak::UID, int> * LockManager::serviceEnabledLevel(ot::ServiceBase * _service) {
-	auto itm = m_serviceToUiEnabledLevel.find(_service);
+std::map<ak::UID, int> * LockManager::serviceEnabledLevel(const ot::BasicServiceInformation& _serviceInfo) {
+	auto itm = m_serviceToUiEnabledLevel.find(_serviceInfo);
 	if (itm == m_serviceToUiEnabledLevel.end()) {
 		auto newMap = new std::map<ak::UID, int>;
-		m_serviceToUiEnabledLevel.insert_or_assign(_service, newMap);
+		m_serviceToUiEnabledLevel.insert_or_assign(_serviceInfo, newMap);
 		return newMap;
 	}
 	else { return itm->second; }
+}
+
+void LockManager::removeSpeciaElement(LockManagerElement* _element) {
+	auto it = std::find(m_specials.begin(), m_specials.end(), _element);
+	if (it != m_specials.end()) {
+		m_specials.erase(it);
+	}
+	else {
+		OT_LOG_E("Unknown lock manager element");
+	}
 }
 
 // #######################################################################################################################
@@ -444,15 +529,23 @@ std::map<ak::UID, int> * LockManager::serviceEnabledLevel(ot::ServiceBase * _ser
 // #######################################################################################################################
 
 LockManagerElement::LockManagerElement(ak::UID _uid, const ot::LockTypeFlags & _flags)
-	: m_disabledCount{ 0 }, m_lockCount{ 0 }, m_lockTypes{ _flags }, m_uid{ _uid }, m_tree(nullptr), m_prop(nullptr)
+	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(_uid), m_tree(nullptr), m_prop(nullptr), m_graphics(nullptr), m_view(nullptr)
 {}
 
 LockManagerElement::LockManagerElement(ak::aTreeWidget* _tree, const ot::LockTypeFlags& _flags) 
-	: m_disabledCount{ 0 }, m_lockCount{ 0 }, m_lockTypes{ _flags }, m_uid{ ak::invalidUID }, m_tree(_tree), m_prop(nullptr)
+	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(ak::invalidUID), m_tree(_tree), m_prop(nullptr), m_graphics(nullptr), m_view(nullptr)
 {}
 
 LockManagerElement::LockManagerElement(ot::PropertyGrid* _prop, const ot::LockTypeFlags& _flags)
-	: m_disabledCount{ 0 }, m_lockCount{ 0 }, m_lockTypes{ _flags }, m_uid{ ak::invalidUID }, m_tree(nullptr), m_prop(_prop)
+	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(ak::invalidUID), m_tree(nullptr), m_prop(_prop), m_graphics(nullptr), m_view(nullptr)
+{}
+
+LockManagerElement::LockManagerElement(ot::GraphicsView * _graphics, const ot::LockTypeFlags & _flags)
+	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(ak::invalidUID), m_tree(nullptr), m_prop(nullptr), m_graphics(_graphics), m_view(nullptr)
+{}
+
+LockManagerElement::LockManagerElement(ot::WidgetView* _view, const ot::LockTypeFlags& _flags)
+	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(ak::invalidUID), m_tree(nullptr), m_prop(nullptr), m_graphics(nullptr), m_view(_view)
 {}
 
 void LockManagerElement::enable(int _value) {
@@ -470,6 +563,12 @@ void LockManagerElement::enable(int _value) {
 		else if (m_prop) {
 			m_prop->getTreeWidget()->setEnabled(true);
 		}
+		else if (m_graphics) {
+			m_graphics->setReadOnly(false);
+		}
+		else if (m_view) {
+			m_view->getViewWidget()->setEnabled(true);
+		}
 		else {
 			ak::uiAPI::object::setEnabled(m_uid, true);
 		}
@@ -485,6 +584,12 @@ void LockManagerElement::disable(int _value) {
 		}
 		else if (m_prop) {
 			m_prop->getTreeWidget()->setEnabled(false);
+		}
+		else if (m_graphics) {
+			m_graphics->setReadOnly(true);
+		}
+		else if (m_view) {
+			m_view->getViewWidget()->setEnabled(false);
 		}
 		else {
 			ak::uiAPI::object::setEnabled(m_uid, false);
@@ -504,6 +609,12 @@ void LockManagerElement::lock(int _value, ot::LockTypeFlag _lockType) {
 			}
 			else if (m_prop) {
 				m_prop->getTreeWidget()->setEnabled(false);
+			}
+			else if (m_graphics) {
+				m_graphics->setReadOnly(true);
+			}
+			else if (m_view) {
+				m_view->getViewWidget()->setEnabled(false);
 			}
 			else {
 				ak::uiAPI::object::setEnabled(m_uid, false);
@@ -530,6 +641,12 @@ void LockManagerElement::unlock(int _value, ot::LockTypeFlag _lockType) {
 			}
 			else if (m_prop) {
 				m_prop->getTreeWidget()->setEnabled(true);
+			}
+			else if (m_graphics) {
+				m_graphics->setReadOnly(false);
+			}
+			else if (m_view) {
+				m_view->getViewWidget()->setEnabled(true);
 			}
 			else {
 				ak::uiAPI::object::setEnabled(m_uid, true);

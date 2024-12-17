@@ -36,6 +36,8 @@ using namespace ak;
 ToolBar::ToolBar(AppBase * _owner)
 	: m_owner(_owner)
 {
+	OTAssertNullptr(m_owner);
+
 	uiAPI::window::setTabToolBarVisible(m_owner->m_mainWindow);
 
 	// Create groups and pages
@@ -83,14 +85,14 @@ ToolBar::ToolBar(AppBase * _owner)
 	
 	// Create lock flags
 	ot::LockTypeFlags lockFlags(ot::LockAll);
-	m_owner->controlsManager()->uiElementCreated(m_owner, m_file.gDefault_aImport);
-	m_owner->controlsManager()->uiElementCreated(m_owner, m_file.gDefault_aGroup);
-	m_owner->controlsManager()->uiElementCreated(m_owner, m_file.gDefault_aSettings);
-	m_owner->controlsManager()->uiElementCreated(m_owner, m_view.gUserInterface_aSettings);
-	m_owner->lockManager()->uiElementCreated(m_owner, m_file.gDefault_aImport, lockFlags);
-	m_owner->lockManager()->uiElementCreated(m_owner, m_file.gDefault_aGroup, lockFlags);
-	m_owner->lockManager()->uiElementCreated(m_owner, m_file.gDefault_aSettings, lockFlags);
-	m_owner->lockManager()->uiElementCreated(m_owner, m_view.gUserInterface_aSettings, lockFlags);
+	m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aImport);
+	m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aGroup);
+	m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aSettings);
+	m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_view.gUserInterface_aSettings);
+	m_owner->lockManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aImport, lockFlags);
+	m_owner->lockManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aGroup, lockFlags);
+	m_owner->lockManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aSettings, lockFlags);
+	m_owner->lockManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_view.gUserInterface_aSettings, lockFlags);
 
 	// Register notifier
 	uiAPI::registerUidNotifier(m_file.gDefault_aExit, this);
@@ -171,7 +173,7 @@ ak::UID ToolBar::addNiceLineEdit(ak::UID _creator, ak::UID _container, const QSt
 }
 
 void ToolBar::addDefaultControlsToLockManager(LockManager * _lockManger, ot::LockTypeFlags& _flags) {
-	_lockManger->uiElementCreated(m_owner, m_file.gDefault_aSettings, _flags);
-	_lockManger->uiElementCreated(m_owner, m_file.gDefault_aImport, _flags);
-	_lockManger->uiElementCreated(m_owner, m_file.gDefault_aGroup, _flags);
+	_lockManger->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aSettings, _flags);
+	_lockManger->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aImport, _flags);
+	_lockManger->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aGroup, _flags);
 }

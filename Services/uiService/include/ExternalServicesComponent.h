@@ -177,6 +177,7 @@ public:
 
 	ServiceDataUi* getServiceFromName(const std::string& _serviceName);
 
+	ServiceDataUi* getServiceFromNameType(const ot::BasicServiceInformation& _info);
 	ServiceDataUi* getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType);
 
 	//########################################################################################################

@@ -456,7 +456,8 @@ void ExternalServicesComponent::notify(ak::UID _senderId, ak::eventType _event, 
 
 		if (_event == ak::etClicked || _event == ak::etEditingFinished)
 		{
-			auto receiver = m_controlsManager->objectCreator(_senderId);
+			auto receiver = this->getServiceFromNameType(m_controlsManager->objectCreator(_senderId));
+			
 			if (receiver != nullptr) {
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ExecuteAction, doc.GetAllocator()), doc.GetAllocator());
@@ -1123,7 +1124,7 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		OT_LOG_D("Open project requested (Project name = \"" + _projectName + ")");
 
-		m_lockManager->lock(app, ot::LockAll);
+		m_lockManager->lock(app->getBasicServiceInformation(), ot::LockAll);
 
 		StudioSuiteConnectorAPI::openProject();
 
@@ -1265,7 +1266,7 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 		do
 		{
 			if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, checkCommandString, response)) {
-				m_lockManager->unlock(AppBase::instance(), ot::LockAll);
+				m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockAll);
 				throw std::exception("Failed to send http request to Session Service");
 			}
 			if (response == OT_ACTION_RETURN_VALUE_TRUE) {
@@ -1276,7 +1277,7 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 				std::this_thread::sleep_for(1s);
 			}
 			else {
-				m_lockManager->unlock(AppBase::instance(), ot::LockAll);
+				m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockAll);
 				OT_LOG_E("Invalid Session Service response: " + response);
 				throw std::exception(("Invalid Session Service response: " + response).c_str());
 			}
@@ -1293,13 +1294,13 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 			throw std::exception("Failed to send http request");
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			m_lockManager->unlock(AppBase::instance(), ot::LockAll);
+			m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockAll);
 			std::string ex("From ");
 			ex.append(m_sessionServiceURL).append(": ").append(response);
 			throw std::exception(ex.c_str());
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			m_lockManager->unlock(AppBase::instance(), ot::LockAll);
+			m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockAll);
 			std::string ex("From ");
 			ex.append(m_sessionServiceURL).append(": ").append(response);
 			throw std::exception(ex.c_str());
@@ -1457,13 +1458,13 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 
 		// Reset all service information
 		for (auto s : m_serviceIdMap) {
-			m_lockManager->cleanService(s.second, false, true);
-			m_controlsManager->serviceDisconnected(s.second);
+			m_lockManager->cleanService(s.second->getBasicServiceInformation(), false, true);
+			m_controlsManager->serviceDisconnected(s.second->getBasicServiceInformation());
 			app->shortcutManager()->creatorDestroyed(s.second);
 			delete s.second;
 		}
-		m_lockManager->cleanService(app->getViewerComponent());
-		m_controlsManager->serviceDisconnected(app->getViewerComponent());
+		m_lockManager->cleanService(AppBase::instance()->getBasicServiceInformation());
+		m_controlsManager->serviceDisconnected(AppBase::instance()->getBasicServiceInformation());
 
 		app->shortcutManager()->clearViewerHandler();
 		app->clearNavigationTree();
@@ -1723,7 +1724,7 @@ void ExternalServicesComponent::lockGui(void)
 	lockFlags.setFlag(ot::LockViewWrite);
 	lockFlags.setFlag(ot::LockModelRead);
 
-	m_lockManager->lock(nullptr, lockFlags);
+	m_lockManager->lock(AppBase::instance()->getBasicServiceInformation(), lockFlags);
 }
 
 void ExternalServicesComponent::unlockGui(void)
@@ -1733,7 +1734,7 @@ void ExternalServicesComponent::unlockGui(void)
 	lockFlags.setFlag(ot::LockViewWrite);
 	lockFlags.setFlag(ot::LockModelRead);
 
-	m_lockManager->unlock(nullptr, lockFlags);
+	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), lockFlags);
 }
 
 void ExternalServicesComponent::showError(const char* message)
@@ -1960,6 +1961,10 @@ ServiceDataUi* ExternalServicesComponent::getServiceFromName(const std::string& 
 	return nullptr;
 }
 
+ServiceDataUi* ExternalServicesComponent::getServiceFromNameType(const ot::BasicServiceInformation& _info) {
+	return this->getServiceFromNameType(_info.serviceName(), _info.serviceType());
+}
+
 ServiceDataUi* ExternalServicesComponent::getServiceFromNameType(const std::string& _serviceName, const std::string& _serviceType) {
 	for (auto service : m_serviceIdMap)
 	{
@@ -1991,7 +1996,7 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 	rapidjson::Value prefetchVersion = _document[OT_ACTION_PARAM_PREFETCH_Version].GetArray();
 
 	ot::LockTypeFlags lockFlags(ot::LockAll);
-	m_lockManager->lock(nullptr, lockFlags);
+	m_lockManager->lock(AppBase::instance()->getBasicServiceInformation(), lockFlags);
 
 	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs;
 	size_t numberPrefetch = prefetchID.Size();
@@ -2047,7 +2052,7 @@ std::string ExternalServicesComponent::handleCompound(ot::JsonDocument& _documen
 	// Nofify the viewer about the end of the bulk processing
 	AppBase::instance()->getViewerComponent()->setProcessingGroupOfMessages(false);
 
-	m_lockManager->unlock(nullptr, lockFlags);
+	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), lockFlags);
 
 	return "";
 }
@@ -2133,8 +2138,8 @@ std::string ExternalServicesComponent::handleServiceDisconnected(ot::JsonDocumen
 		assert(actualService != nullptr);
 
 		// Clean up elements
-		m_lockManager->cleanService(actualService, false, true);
-		m_controlsManager->serviceDisconnected(actualService);
+		m_lockManager->cleanService(actualService->getBasicServiceInformation(), false, true);
+		m_controlsManager->serviceDisconnected(actualService->getBasicServiceInformation());
 		AppBase::instance()->shortcutManager()->creatorDestroyed(actualService);
 
 		// Clean up entry
@@ -2175,7 +2180,7 @@ std::string ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocum
 
 	AppBase::instance()->switchToViewTab();
 	AppBase::instance()->lockWelcomeScreen(false);
-	m_lockManager->unlock(AppBase::instance(), ot::LockAll);
+	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockAll);
 
 	AppBase::instance()->restoreSessionState();
 
@@ -2508,7 +2513,7 @@ std::string ExternalServicesComponent::handleAddMenuPage(ot::JsonDocument& _docu
 	ak::UID p = AppBase::instance()->getToolBar()->addPage(getServiceUiUid(service), pageName.c_str());
 	//NOTE, add corresponding functions in uiServiceAPI
 	ak::uiAPI::object::setObjectUniqueName(p, pageName.c_str());
-	m_controlsManager->uiElementCreated(service, p, false);
+	m_controlsManager->uiElementCreated(service->getBasicServiceInformation(), p, false);
 
 	return "";
 }
@@ -2528,7 +2533,7 @@ std::string ExternalServicesComponent::handleAddMenuGroup(ot::JsonDocument& _doc
 	ak::UID g = AppBase::instance()->getToolBar()->addGroup(getServiceUiUid(service), pageUID, groupName.c_str());
 	//NOTE, add corresponding functions in uiServiceAPI
 	ak::uiAPI::object::setObjectUniqueName(g, (pageName + ":" + groupName).c_str());
-	m_controlsManager->uiElementCreated(service, g, false);
+	m_controlsManager->uiElementCreated(service->getBasicServiceInformation(), g, false);
 
 	return "";
 }
@@ -2549,7 +2554,7 @@ std::string ExternalServicesComponent::handleAddMenuSubgroup(ot::JsonDocument& _
 	ak::UID sg = AppBase::instance()->getToolBar()->addSubGroup(getServiceUiUid(service), groupUID, subgroupName.c_str());
 	//NOTE, add corresponding functions in uiServiceAPI
 	ak::uiAPI::object::setObjectUniqueName(sg, (pageName + ":" + groupName + ":" + subgroupName).c_str());
-	m_controlsManager->uiElementCreated(service, sg, false);
+	m_controlsManager->uiElementCreated(service->getBasicServiceInformation(), sg, false);
 
 	return "";
 }
@@ -2596,8 +2601,8 @@ std::string ExternalServicesComponent::handleAddMenuButton(ot::JsonDocument& _do
 	else {
 		ak::uiAPI::object::setObjectUniqueName(buttonID, (pageName + ":" + groupName + ":" + subgroupName + ":" + buttonName).c_str());
 	}
-	m_controlsManager->uiElementCreated(senderService, buttonID);
-	m_lockManager->uiElementCreated(senderService, buttonID, flags);
+	m_controlsManager->uiElementCreated(senderService->getBasicServiceInformation(), buttonID);
+	m_lockManager->uiElementCreated(senderService->getBasicServiceInformation(), buttonID, flags);
 
 	ak::uiAPI::registerUidNotifier(buttonID, this);
 
@@ -2658,8 +2663,8 @@ std::string ExternalServicesComponent::handleAddMenuCheckbox(ot::JsonDocument& _
 		ak::uiAPI::object::setObjectUniqueName(boxID, (pageName + ":" + groupName + ":" + boxName).c_str());
 	}
 
-	m_controlsManager->uiElementCreated(service, boxID);
-	m_lockManager->uiElementCreated(service, boxID, flags);
+	m_controlsManager->uiElementCreated(service->getBasicServiceInformation(), boxID);
+	m_lockManager->uiElementCreated(service->getBasicServiceInformation(), boxID, flags);
 
 	ak::uiAPI::registerUidNotifier(boxID, this);
 
@@ -2703,8 +2708,8 @@ std::string ExternalServicesComponent::handleAddMenuLineEdit(ot::JsonDocument& _
 	else {
 		ak::uiAPI::object::setObjectUniqueName(editID, (pageName + ":" + groupName + ":" + editName).c_str());
 	}
-	m_controlsManager->uiElementCreated(service, editID);
-	m_lockManager->uiElementCreated(service, editID, flags);
+	m_controlsManager->uiElementCreated(service->getBasicServiceInformation(), editID);
+	m_lockManager->uiElementCreated(service->getBasicServiceInformation(), editID, flags);
 
 	ak::uiAPI::registerUidNotifier(editID, this);
 
@@ -2808,7 +2813,7 @@ std::string ExternalServicesComponent::handleSetControlsEnabledState(ot::JsonDoc
 		auto uid = ak::uiAPI::object::getUidFromObjectUniqueName(controlName.c_str());
 		if (uid != ak::invalidUID)
 		{
-			m_lockManager->enable(service, uid, true);
+			m_lockManager->enable(service->getBasicServiceInformation(), uid, true);
 		}
 	}
 
@@ -2818,7 +2823,7 @@ std::string ExternalServicesComponent::handleSetControlsEnabledState(ot::JsonDoc
 		auto uid = ak::uiAPI::object::getUidFromObjectUniqueName(controlName.c_str());
 		if (uid != ak::invalidUID)
 		{
-			m_lockManager->disable(service, uid);
+			m_lockManager->disable(service->getBasicServiceInformation(), uid);
 		}
 	}
 
@@ -3401,7 +3406,7 @@ std::string ExternalServicesComponent::handleCreateRubberband(ot::JsonDocument& 
 std::string ExternalServicesComponent::handleLock(ot::JsonDocument& _document) {
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 	ot::LockTypeFlags flags = ot::toLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
-	m_lockManager->lock(getService(serviceId), flags);
+	m_lockManager->lock(getService(serviceId)->getBasicServiceInformation(), flags);
 
 	return "";
 }
@@ -3409,7 +3414,7 @@ std::string ExternalServicesComponent::handleLock(ot::JsonDocument& _document) {
 std::string ExternalServicesComponent::handleUnlock(ot::JsonDocument& _document) {
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 	ot::LockTypeFlags flags = ot::toLockTypeFlags(ot::json::getStringList(_document, OT_ACTION_PARAM_ElementLockTypes));
-	m_lockManager->unlock(getService(serviceId), flags);
+	m_lockManager->unlock(getService(serviceId)->getBasicServiceInformation(), flags);
 
 	return "";
 }

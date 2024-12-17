@@ -274,7 +274,7 @@ ViewerUIDtype ViewerComponent::addMenuPage(const std::string &pageName)
 	try {
 		try {
 			ak::UID page = AppBase::instance()->getToolBar()->addPage(AppBase::instance()->getViewerUID(), pageName.c_str());
-			AppBase::instance()->controlsManager()->uiElementCreated(this, page, false);
+			AppBase::instance()->controlsManager()->uiElementCreated(AppBase::instance()->getBasicServiceInformation(), page, false);
 			return page;
 		}
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::addMenuPage()"); }
@@ -290,7 +290,7 @@ ViewerUIDtype ViewerComponent::addMenuGroup(ViewerUIDtype menuPageID, const std:
 	try {
 		try {
 			ak::UID group = AppBase::instance()->getToolBar()->addGroup(AppBase::instance()->getViewerUID(), menuPageID, groupName.c_str());
-			AppBase::instance()->controlsManager()->uiElementCreated(this, group, false);
+			AppBase::instance()->controlsManager()->uiElementCreated(AppBase::instance()->getBasicServiceInformation(), group, false);
 			return group;
 		}
 		catch (const ak::aException & e) { throw ak::aException(e, "ViewerComponent::addMenuGroup()"); }
@@ -307,12 +307,12 @@ ViewerUIDtype ViewerComponent::addMenuPushButton(ViewerUIDtype menuGroupID, cons
 		try {
 			//NOTE, add actual icon path
 			ViewerUIDtype btnUid = AppBase::instance()->getToolBar()->addToolButton(AppBase::instance()->getViewerUID(), menuGroupID, iconName.c_str(), "Default", buttonName.c_str(), this);
-			AppBase::instance()->controlsManager()->uiElementCreated(this, btnUid, true);
+			AppBase::instance()->controlsManager()->uiElementCreated(AppBase::instance()->getBasicServiceInformation(), btnUid, true);
 			ot::LockTypeFlags flags;
 			flags.setFlag(ot::LockAll);
 			//flags.setFlag(ot::LockViewWrite);
 			flags.setFlag(ot::LockViewRead);
-			AppBase::instance()->lockManager()->uiElementCreated(this, btnUid, flags);
+			AppBase::instance()->lockManager()->uiElementCreated(AppBase::instance()->getBasicServiceInformation(), btnUid, flags);
 
 			return btnUid;
 		}
