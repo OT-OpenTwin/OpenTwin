@@ -79,7 +79,7 @@ void SceneNodeMultiVisualisation::setSelected(bool _selection, bool _selectionFr
 				{
 					visualiser->visualise();
 				}
-				else if (visualiser->viewIsCurrentlyOpen())
+				else if (visualiser->viewIsCurrentlyOpen() && _selectionFromNavigationTree)
 				{
 					getNotifier()->setCurrentVisualizationTabFromEntityName(getName(), visualiser->getViewType());
 				}
