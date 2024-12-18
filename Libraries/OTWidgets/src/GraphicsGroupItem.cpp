@@ -206,7 +206,7 @@ void ot::GraphicsGroupItem::addItem(GraphicsItem* _item) {
 }
 
 double ot::GraphicsGroupItem::getMaxAdditionalTriggerDistance(void) const {
-	double maxDist = this->getMaxAdditionalTriggerDistance();
+	double maxDist = GraphicsItem::getMaxAdditionalTriggerDistance();
 	for (auto itm : this->childItems()) {
 		const GraphicsItem* actualItem = dynamic_cast<const GraphicsItem*>(itm);
 		if (actualItem) {
