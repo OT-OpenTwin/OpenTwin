@@ -23,7 +23,6 @@ void VisualisationTypeSerialiser::operator()(EntityBase* _baseEntity, ot::JsonVa
 
 	if (hasVisualisation)
 	{
-		visTypes.addTextVisualisation();
 		visTypes.addToJsonObject(_object, _allocator);
 	}
 }

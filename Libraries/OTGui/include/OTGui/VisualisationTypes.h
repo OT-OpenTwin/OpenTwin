@@ -27,6 +27,6 @@ namespace ot
 
 		std::list<uint32_t> m_visualisations;
 		const uint32_t m_visualisationAsText = 0;
-		const uint32_t m_visualisationAsTable = 0;
+		const uint32_t m_visualisationAsTable = 1;
 	};
 }

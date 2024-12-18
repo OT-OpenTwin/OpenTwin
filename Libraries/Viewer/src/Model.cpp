@@ -716,14 +716,14 @@ void Model::addSceneNode(const std::string& _treeName, ot::UID _modelEntityID, c
 	
 	if (_visualisationTypes.visualiseAsTable())
 	{
-		auto textVis = new TextVisualiser(sceneNode);
-		sceneNode->addVisualiser(textVis);
+		auto tableVis = new TableVisualiser(sceneNode);
+		sceneNode->addVisualiser(tableVis);
 	}
 
 	if (_visualisationTypes.visualiseAsText())
 	{
-		auto tableVis = new TableVisualiser(sceneNode);
-		sceneNode->addVisualiser(tableVis);
+		auto textVis = new TextVisualiser(sceneNode);
+		sceneNode->addVisualiser(textVis);
 	}
 
 	// Get the parent scene node
