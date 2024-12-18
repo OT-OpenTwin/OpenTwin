@@ -516,10 +516,6 @@ void ViewerComponent::handleSelectionChanged(bool _selectionFromTree) {
 	std::list<ot::UID> selectedTreeItems;
 	for (auto itm : selection) {
 		selectedTreeItems.push_back(itm);
-		//						if (itm == 6) {
-		//							QString path = uiServiceAPI::tree::getPathString(itm);
-		//							int x = 0;
-		//						}
 	}
 
 	// Send the selection changed notification to the viewer component and the model component

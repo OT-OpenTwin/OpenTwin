@@ -2253,22 +2253,27 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 		if (ot::MessageDialog::showDialog(msgCfg) != ot::MessageDialogCfg::Yes) return;
 	}
 
+	// Cleanup data
 	this->cleanupWidgetViewInfo(_view);
 	std::string viewName = _view->getViewData().getEntityName();
 	ot::WidgetViewBase::ViewType viewType = _view->getViewData().getViewType();
 	ot::UID globalActiveViewModel = -1;
 	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedStates::viewClosed, viewType);
 
-	ot::WidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
-
 	// Deselect navigation item if exists
 	auto itm = m_projectNavigation->itemFromPath(QString::fromStdString(viewName), '/');
 	if (itm) {
+		bool blocked = m_projectNavigation->signalsBlocked();
+		m_projectNavigation->blockSignals(true);
 		m_projectNavigation->setItemSelected(itm->id(), false);
+		m_projectNavigation->blockSignals(blocked);
 	}
 	else {
 		OT_LOG_W("Navigation entry for view not found. { \"ViewName\": \"" + viewName + "\" }");
 	}
+
+	// Now close the view
+	ot::WidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
 }
 
 void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
