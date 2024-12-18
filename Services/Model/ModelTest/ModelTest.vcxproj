@@ -52,19 +52,19 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-	  <IncludePath> $(GOOGLE_TEST_INC);$(SolutionDir)include;$(ProjectDir)include;$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC);$(BOOST_INCD)\;$(OT_BLOCKENTITIES_ROOT)\$(OT_INC)</IncludePath>
+      <IncludePath> $(GOOGLE_TEST_INC);$(SolutionDir)include;$(ProjectDir)include;$(OT_DEFAULT_SERVICE_INCD);$(OT_CADMODELENTITIES_ROOT)\$(OT_INC);$(EXPREVAL_INC);$(BOOST_INCD)\;$(OT_BLOCKENTITIES_ROOT)\$(OT_INC)</IncludePath>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-	  <AdditionalLibraryDirectories>$(SolutionDir)$(OT_DLLD);$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBD);$(OC_LIBPATHD);$(ZLIB_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_LIBD)</AdditionalLibraryDirectories>
-	  <AdditionalDependencies>Model.lib; $(OT_DEFAULT_SERVICE_LIBD);CADModelEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBD);BlockEntities.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(OT_DLLD);$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_CADMODELENTITIES_ROOT)\$(OT_LIBD);$(OC_LIBPATHD);$(ZLIB_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_LIBD)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Model.lib; $(OT_DEFAULT_SERVICE_LIBD);CADModelEntities.lib;$(CFG_OC_LIBS);$(ZLIB_LIBD);BlockEntities.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>
       </MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -95,7 +95,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
