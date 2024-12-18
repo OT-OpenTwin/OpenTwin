@@ -3814,7 +3814,7 @@ std::string ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _docum
 
 	AppBase::ViewHandlingFlags viewHandlingFlags = AppBase::instance()->getViewHandlingConfigFlags();
 	if (keepCurrentEntitySelection) {
-		AppBase::instance()->setViewHandlingConfigFlags(viewHandlingFlags & (~AppBase::ViewHandlingConfig::SkipEntitySelection));
+		AppBase::instance()->setViewHandlingConfigFlags(viewHandlingFlags | AppBase::ViewHandlingConfig::SkipEntitySelection);
 	}
 
 	ot::TableView* table = AppBase::instance()->findTable(config.getEntityName());
