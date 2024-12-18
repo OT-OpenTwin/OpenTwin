@@ -239,6 +239,7 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
+      <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);%UICORE_LIB_ROOT%\x64\Debug;%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Debug;%SIM_PLAT_ROOT%\Libraries\Model\x64\Debug;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -253,6 +254,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_OTOOLKITAPI_ROOT)\$(OT_INC);$(ProjectDir)include;$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);$(R_JSON_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild />
+      <PreprocessorDefinitions>NDEBUG;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_GUI_ROOT)\$(OT_LIBR);$(OT_WIDGETS_ROOT)\$(OT_LIBR);$(OT_OTOOLKITAPI_ROOT)\$(OT_LIBR);$(QT_ADS_ROOT)\lib;$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -268,6 +270,7 @@
       <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild>
       </MinimalRebuild>
+      <PreprocessorDefinitions>NDEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);%UICORE_LIB_ROOT%\x64\Release;%SIM_PLAT_ROOT%\Libraries\Viewer\x64\Release;%SIM_PLAT_ROOT%\Libraries\Model\x64\Release;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\DataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
