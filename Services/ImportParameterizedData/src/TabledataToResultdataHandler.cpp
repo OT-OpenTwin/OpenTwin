@@ -2,6 +2,8 @@
 #include "Application.h"
 #include "ClassFactory.h"
 
+
+#include "EntityResultText.h"
 #include "KeyValuesExtractor.h"
 #include "EntityMetadataSeries.h"
 #include "EntityMetadataCampaign.h"
@@ -32,16 +34,13 @@ TabledataToResultdataHandler::TabledataToResultdataHandler(const std::string& _d
 
 void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL, const std::string& projectName)
 {
-	//To guarantee the uniqueness of parameter and quantity indices, a branch overreaching mutual exclusion has to be realized. 
-	//So far branching is not realized yet, thus this implementation is a place holder. Ultimately, a client-server mutual exclusion with (maybe) the modelservice needs to be implemented.
-	BranchSynchronizer branchSynchronizer;
-	_uiComponent->displayMessage("Waiting for branch synchronization\n");
-	branchSynchronizer.WaitForTurn();
-	_uiComponent->displayMessage("Branches synchronized.\n");
-
 	//All sorted ranges by the metadata they belong to. MSMD has a pointer to the parameter metadata, parameter has a pointer to the quantity metadata
+
+	std::string fullReport("");
+	
 	Documentation::INSTANCE()->ClearDocumentation();
 	auto allMetadataAssembliesByNames = getAllMetadataAssemblies();
+	fullReport += Documentation::INSTANCE()->GetFullDocumentation();
 	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 	Documentation::INSTANCE()->ClearDocumentation();
 
@@ -50,14 +49,12 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		_uiComponent->displayInformationPrompt("No range selections found for creating a dataset.\n");
 		return;
 	}
-	else
-	{
-		std::string numberOfAssemblies = std::to_string(allMetadataAssembliesByNames.size());
-		_uiComponent->displayMessage(numberOfAssemblies + " range selections are considered.\n");
-	}
 
 	//Load all existing metadata. They are henceforth neglected in selections.
 	ResultCollectionExtender resultCollectionExtender(projectName, *_modelComponent, &Application::instance()->getClassFactory(), OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	ResultImportLogger& logger = resultCollectionExtender.getLogger();
+	logger.clearLog();
+	resultCollectionExtender.setSaveModel(false);
 	/*_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 	Documentation::INSTANCE()->ClearDocumentation();*/
 
@@ -70,12 +67,13 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	if (!categorizationsAreValid)
 	{
 		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+		fullReport += Documentation::INSTANCE()->GetFullDocumentation();
 		Documentation::INSTANCE()->ClearDocumentation();
 		return;
 	}
 
 	_uiComponent->displayMessage("Start analysis of range selections.\n\n");
-
+	bool newDataHasBeenAdded = false;
 	//Updating RMD
 	const MetadataAssemblyData* rmdAssemblyData = nullptr;
 	for (const auto& metadataAssemblyByName : allMetadataAssembliesByNames)
@@ -108,6 +106,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 
 		loadRequiredTables(requiredTables, loadedTables);
 		_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+		fullReport += Documentation::INSTANCE()->GetFullDocumentation();
 		Documentation::INSTANCE()->ClearDocumentation();
 
 		//Filling a new EntityMetadataSeries object with its fields.
@@ -123,6 +122,9 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 				resultCollectionExtender.addCampaignMetadata(metadataEntry);
 			}
 		}
+		fullReport += logger.getLog();
+		logger.clearLog();
+		newDataHasBeenAdded = true;
 	}
 
 	//Only the MSMDs are analysed here. They reference to their contained parameter and quantity objects.
@@ -136,8 +138,9 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		}
 	}
 
-	ResultImportLogger& logger = resultCollectionExtender.getLogger();
-	logger.clearLog();
+	
+	_uiComponent->displayMessage("Start analysis of series metadata.\n");
+
 	for (auto& metadataAssemblyByName : allMSMDMetadataAssembliesByNames)
 	{
 
@@ -158,14 +161,14 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 			{
 				_uiComponent->displayMessage("Skipped creation of series \"" + seriesName + "\" due to this issue:\n");
 				_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
+				fullReport += Documentation::INSTANCE()->GetFullDocumentation();
 				Documentation::INSTANCE()->ClearDocumentation();
 			}
 			else
 			{
 				_uiComponent->displayMessage("Create " + seriesName + ":\n");
 				ot::UID seriesUID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, seriesMetadata);
-				const std::string extensionLog = logger.getLog();
-				_uiComponent->displayMessage(extensionLog);
+				fullReport += logger.getLog();
 				logger.clearLog();
 				_uiComponent->displayMessage("Storing quantity container\n");
 
@@ -178,10 +181,11 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 				{
 					for (DatasetDescription& dataset : datasets)
 					{
-	/*					resultCollectionExtender.processDataPoints(&dataset, seriesUID);
+						resultCollectionExtender.processDataPoints(&dataset, seriesUID);
 						const std::string extensionLog = logger.getLog();
 						_uiComponent->displayMessage(extensionLog);
-						logger.clearLog();*/
+						fullReport += logger.getLog();
+						logger.clearLog();
 						updater.triggerUpdate(counter);
 					}
 				}
@@ -195,7 +199,27 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 				}
 			}
 			resultCollectionExtender.storeCampaignChanges();
+			newDataHasBeenAdded = true;
 		}
+	}
+
+	if (newDataHasBeenAdded)
+	{
+		auto& factory = Application::instance()->getClassFactory();
+		EntityResultText importReport(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr, &factory, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+		const std::string reportName = CreateNewUniqueTopologyName(ot::FolderNames::DatasetFolder + "/Reports", "Import from Table");
+		importReport.setName(reportName);
+		importReport.setText(fullReport);
+		importReport.createProperties();
+		importReport.StoreToDataBase();
+
+		_modelComponent->addEntitiesToModel({ importReport.getEntityID() }, 
+			{ importReport.getEntityStorageVersion() }, 
+			{ false }, 
+			{ static_cast<ot::UID>(importReport.getTextDataStorageId()) }, 
+			{ static_cast<ot::UID>(importReport.getTextDataStorageVersion()) }, 
+			{ importReport.getEntityID() }, 
+			"Data import from table");
 	}
 }
 

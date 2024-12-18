@@ -241,9 +241,11 @@ void ResultCollectionMetadataAccess::loadExistingCampaignData(ClassFactory* _cla
 		else
 		{
 			EntityMetadataSeries* series =	dynamic_cast<EntityMetadataSeries*>(entity);
-			assert(series != nullptr);
-			metadataSeriesEntities.push_back(std::shared_ptr<EntityMetadataSeries>(series));
-			series = nullptr;
+			if (series != nullptr)
+			{
+				metadataSeriesEntities.push_back(std::shared_ptr<EntityMetadataSeries>(series));
+				series = nullptr;
+			}
 		}
 	}
 	
