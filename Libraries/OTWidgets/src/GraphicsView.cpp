@@ -381,23 +381,28 @@ void ot::GraphicsView::wheelEvent(QWheelEvent* _event)
 	this->ensureViewInBounds();
 }
 
-void ot::GraphicsView::mousePressEvent(QMouseEvent* _event)
-{
+void ot::GraphicsView::mousePressEvent(QMouseEvent* _event) {
 	QGraphicsView::mousePressEvent(_event);
+
 	if (_event->button() == Qt::MiddleButton) {
 		this->viewport()->setCursor(Qt::ClosedHandCursor);
 		m_lastPanPos = _event->pos();
 		m_viewStateFlags |= MiddleMousePressedState;
 	}
+	else if (_event->button() == Qt::LeftButton) {
+		this->beginItemMove();
+	}
 }
 
-void ot::GraphicsView::mouseReleaseEvent(QMouseEvent* _event)
-{
+void ot::GraphicsView::mouseReleaseEvent(QMouseEvent* _event) {
 	QGraphicsView::mouseReleaseEvent(_event);
 
 	if (_event->button() == Qt::MiddleButton) {
 		m_viewStateFlags &= (~MiddleMousePressedState);
 		this->viewport()->setCursor(Qt::CrossCursor);
+	}
+	else if (_event->button() == Qt::LeftButton) {
+		this->endItemMove();
 	}
 }
 
@@ -648,7 +653,7 @@ void ot::GraphicsView::beginItemMove(void) {
 }
 
 void ot::GraphicsView::endItemMove(void) {
-	if (m_viewStateFlags & (ItemMoveInProgress | ReadOnlyState)) {
+	if (!(m_viewStateFlags & ItemMoveInProgress) || (m_viewStateFlags & ReadOnlyState)) {
 		return;
 	}
 

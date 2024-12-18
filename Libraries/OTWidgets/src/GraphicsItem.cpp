@@ -668,7 +668,9 @@ void ot::GraphicsItem::notifyMoveIfRequired(void) {
 	OTAssertNullptr(this->getQGraphicsItem());
 	OTAssertNullptr(this->getGraphicsScene());
 	OTAssertNullptr(this->getGraphicsScene()->getGraphicsView());
-	if (m_moveStartPt != this->getQGraphicsItem()->pos()) {
+	QPointF newPos = this->getQGraphicsItem()->pos();
+	if (m_moveStartPt != newPos) {
+		m_moveStartPt = newPos;
 		this->getGraphicsScene()->getGraphicsView()->notifyItemMoved(this);
 		this->getGraphicsScene()->getGraphicsView()->notifyItemConfigurationChanged(this);
 	}
