@@ -109,7 +109,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(QWT_LIB_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>QWTW_LIB;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;QWTW_LIB;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(QWT_LIB_LIBPATHD);$(QWTPOLAR_LIB_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -125,7 +125,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(QWT_LIB_INCD);$(QWTPOLAR_LIB_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>QWTW_LIB;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;QWTW_LIB;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(QWT_LIB_ROOT)\lib;$(QWT_POLAR_LIB_ROOT)\lib;$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -145,7 +145,7 @@
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>$(QWT_LIB_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>QWTW_LIB;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;QWTW_LIB;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <CustomBuildStep>
       <Command>copy $(MSBuildProjectDirectory)\qt.conf $(OutputPath)</Command>
@@ -159,7 +159,7 @@
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>$(QWT_LIB_INCR);$(QWTPOLAR_LIB_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>QWTW_LIB;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;QWTW_LIB;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <CustomBuildStep>
       <Command>copy $(MSBuildProjectDirectory)\qt.conf $(OutputPath)</Command>
