@@ -13,6 +13,7 @@
 #include "OTCore/ServiceBase.h"
 #include "OTWidgets/WidgetView.h"
 #include "OTWidgets/TreeWidget.h"
+#include "OTWidgets/TextEditor.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/GraphicsView.h"
 
@@ -191,6 +192,21 @@ void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceIn
 	}
 }
 
+void LockManager::uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::TextEditor* _text, const ot::LockTypeFlags& _typeFlags) {
+	// Create new entrys
+	LockManagerElement* newText = new LockManagerElement(_text, _typeFlags);
+	m_specials.push_back(newText);
+
+	// Check existing locks
+	for (auto itm : m_serviceToUiLockLevel) {
+		for (auto lockLevel : *itm.second) {
+			if (_typeFlags.flagIsSet(lockLevel.first) && lockLevel.second > 0) {
+				newText->lock(lockLevel.second, lockLevel.first);
+			}
+		}
+	}
+}
+
 void LockManager::uiViewCreated(const ot::BasicServiceInformation& _serviceInfo, ot::WidgetView* _view, const ot::LockTypeFlags& _typeFlags) {
 	// Create new entrys
 	LockManagerElement* newView = new LockManagerElement(_view, _typeFlags);
@@ -243,6 +259,15 @@ void LockManager::uiElementDestroyed(ot::PropertyGrid* _propertyGrid) {
 void LockManager::uiElementDestroyed(ot::GraphicsView* _graphicsView) {
 	for (LockManagerElement* element : m_specials) {
 		if (element->getGraphics() == _graphicsView) {
+			this->removeSpeciaElement(element);
+			return;
+		}
+	}
+}
+
+void LockManager::uiElementDestroyed(ot::TextEditor* _text) {
+	for (LockManagerElement* element : m_specials) {
+		if (element->getText() == _text) {
 			this->removeSpeciaElement(element);
 			return;
 		}
@@ -529,23 +554,27 @@ void LockManager::removeSpeciaElement(LockManagerElement* _element) {
 // #######################################################################################################################
 
 LockManagerElement::LockManagerElement(ak::UID _uid, const ot::LockTypeFlags & _flags)
-	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(_uid), m_tree(nullptr), m_prop(nullptr), m_graphics(nullptr), m_view(nullptr)
+	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(_uid), m_tree(nullptr), m_prop(nullptr), m_graphics(nullptr), m_text(nullptr), m_view(nullptr)
 {}
 
 LockManagerElement::LockManagerElement(ak::aTreeWidget* _tree, const ot::LockTypeFlags& _flags) 
-	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(ak::invalidUID), m_tree(_tree), m_prop(nullptr), m_graphics(nullptr), m_view(nullptr)
+	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(ak::invalidUID), m_tree(_tree), m_prop(nullptr), m_graphics(nullptr), m_text(nullptr), m_view(nullptr)
 {}
 
 LockManagerElement::LockManagerElement(ot::PropertyGrid* _prop, const ot::LockTypeFlags& _flags)
-	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(ak::invalidUID), m_tree(nullptr), m_prop(_prop), m_graphics(nullptr), m_view(nullptr)
+	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(ak::invalidUID), m_tree(nullptr), m_prop(_prop), m_graphics(nullptr), m_text(nullptr), m_view(nullptr)
 {}
 
 LockManagerElement::LockManagerElement(ot::GraphicsView * _graphics, const ot::LockTypeFlags & _flags)
-	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(ak::invalidUID), m_tree(nullptr), m_prop(nullptr), m_graphics(_graphics), m_view(nullptr)
+	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(ak::invalidUID), m_tree(nullptr), m_prop(nullptr), m_graphics(_graphics), m_text(nullptr), m_view(nullptr)
 {}
 
+LockManagerElement::LockManagerElement(ot::TextEditor* _text, const ot::LockTypeFlags& _flags)
+	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(ak::invalidUID), m_tree(nullptr), m_prop(nullptr), m_graphics(nullptr), m_text(_text), m_view(nullptr) 		{
+}
+
 LockManagerElement::LockManagerElement(ot::WidgetView* _view, const ot::LockTypeFlags& _flags)
-	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(ak::invalidUID), m_tree(nullptr), m_prop(nullptr), m_graphics(nullptr), m_view(_view)
+	: m_disabledCount(0), m_lockCount(0), m_lockTypes(_flags), m_uid(ak::invalidUID), m_tree(nullptr), m_prop(nullptr), m_graphics(nullptr), m_text(nullptr), m_view(_view)
 {}
 
 void LockManagerElement::enable(int _value) {
@@ -565,6 +594,9 @@ void LockManagerElement::enable(int _value) {
 		}
 		else if (m_graphics) {
 			m_graphics->setReadOnly(false);
+		}
+		else if (m_text) {
+			m_text->setReadOnly(false);
 		}
 		else if (m_view) {
 			m_view->getViewWidget()->setEnabled(true);
@@ -587,6 +619,9 @@ void LockManagerElement::disable(int _value) {
 		}
 		else if (m_graphics) {
 			m_graphics->setReadOnly(true);
+		}
+		else if (m_text) {
+			m_text->setReadOnly(true);
 		}
 		else if (m_view) {
 			m_view->getViewWidget()->setEnabled(false);
@@ -612,6 +647,9 @@ void LockManagerElement::lock(int _value, ot::LockTypeFlag _lockType) {
 			}
 			else if (m_graphics) {
 				m_graphics->setReadOnly(true);
+			}
+			else if (m_text) {
+				m_text->setReadOnly(true);
 			}
 			else if (m_view) {
 				m_view->getViewWidget()->setEnabled(false);
@@ -644,6 +682,9 @@ void LockManagerElement::unlock(int _value, ot::LockTypeFlag _lockType) {
 			}
 			else if (m_graphics) {
 				m_graphics->setReadOnly(false);
+			}
+			else if (m_text) {
+				m_text->setReadOnly(false);
 			}
 			else if (m_view) {
 				m_view->getViewWidget()->setEnabled(true);

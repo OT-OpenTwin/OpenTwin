@@ -27,6 +27,7 @@ namespace ak { class aTreeWidget; }
 namespace ot { class PropertyGrid; }
 namespace ot { class GraphicsView; }
 namespace ot { class WidgetView; }
+namespace ot { class TextEditor; }
 
 class ControlsManager {
 public:
@@ -65,6 +66,7 @@ public:
 	void uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ak::aTreeWidget* _tree, const ot::LockTypeFlags & _typeFlags);
 	void uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::PropertyGrid* _propertyGrid, const ot::LockTypeFlags & _typeFlags);
 	void uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::GraphicsView* _graphicsView, const ot::LockTypeFlags & _typeFlags);
+	void uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::TextEditor* _text, const ot::LockTypeFlags & _typeFlags);
 	void uiViewCreated(const ot::BasicServiceInformation& _serviceInfo, ot::WidgetView* _view, const ot::LockTypeFlags & _typeFlags);
 
 	//! @brief Will remove all the stored information about the UI element
@@ -73,6 +75,7 @@ public:
 	void uiElementDestroyed(ak::aTreeWidget* _tree);
 	void uiElementDestroyed(ot::PropertyGrid* _propertyGrid);
 	void uiElementDestroyed(ot::GraphicsView* _graphicsView);
+	void uiElementDestroyed(ot::TextEditor* _text);
 	void uiViewDestroyed(ot::WidgetView* _view);
 
 	void lock(const ot::BasicServiceInformation& _serviceInfo, ot::LockTypeFlag _type);
@@ -115,6 +118,7 @@ public:
 	LockManagerElement(ak::aTreeWidget* _tree, const ot::LockTypeFlags & _flags);
 	LockManagerElement(ot::PropertyGrid* _prop, const ot::LockTypeFlags & _flags);
 	LockManagerElement(ot::GraphicsView* _graphics, const ot::LockTypeFlags & _flags);
+	LockManagerElement(ot::TextEditor* _text, const ot::LockTypeFlags & _flags);
 	LockManagerElement(ot::WidgetView* _view, const ot::LockTypeFlags & _flags);
 
 	void enable(int _value);
@@ -126,6 +130,7 @@ public:
 	ak::aTreeWidget* getTree(void) const { return m_tree; };
 	ot::PropertyGrid* getProp(void) const { return m_prop; };
 	ot::GraphicsView* getGraphics(void) const { return m_graphics; };
+	ot::TextEditor* getText(void) const { return m_text; };
 	ot::WidgetView* getView(void) const { return m_view; };
 
 private:
@@ -133,6 +138,7 @@ private:
 	ak::aTreeWidget* m_tree;
 	ot::PropertyGrid* m_prop;
 	ot::GraphicsView* m_graphics;
+	ot::TextEditor* m_text;
 	ot::WidgetView* m_view;
 	ak::UID							m_uid;
 	ot::LockTypeFlags		m_lockTypes;

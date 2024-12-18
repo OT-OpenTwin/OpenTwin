@@ -1176,7 +1176,7 @@ void AppBase::closeAllViewerTabs(void) {
 		manager->uiElementDestroyed(static_cast<ot::GraphicsView*>(element.second));
 	}
 	for (auto element : m_textEditors) {
-		manager->uiViewDestroyed(element.second);
+		manager->uiElementDestroyed(static_cast<ot::TextEditor*>(element.second));
 	}
 	for (auto element : m_tables) {
 		manager->uiViewDestroyed(element.second);
@@ -1633,7 +1633,7 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	newEditor->getViewData().getViewType();
 	newEditor->getViewData().getEntityName();
 
-	this->lockManager()->uiViewCreated(_serviceInfo, newEditor, ot::LockAll | ot::LockModelWrite);
+	this->lockManager()->uiElementCreated(_serviceInfo, newEditor, ot::LockAll | ot::LockModelWrite);
 
 	m_textEditors.insert_or_assign(_config.getEntityName(), newEditor);
 	ot::WidgetViewManager::instance().addView(_serviceInfo, newEditor, _viewInsertFlags);
@@ -2775,7 +2775,7 @@ void AppBase::cleanupWidgetViewInfo(ot::WidgetView* _view) {
 	}
 	if (txt) {
 		ot::removeFromMapByValue(m_textEditors, txt);
-		this->lockManager()->uiViewDestroyed(txt);
+		this->lockManager()->uiElementDestroyed(txt);
 	}
 	if (table) {
 		ot::removeFromMapByValue(m_tables, table);
