@@ -11,15 +11,17 @@
 #include <bsoncxx/builder/basic/array.hpp>
 
 EntityResultText::EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner) :
-	EntityContainer(ID, parent, obs, ms, factory, owner),
-	textData(nullptr),
-	textDataStorageId(-1),
-	textDataStorageVersion(-1)
+	EntityBase(ID, parent, obs, ms, factory, owner)
 {
 }
 
 EntityResultText::~EntityResultText()
 {
+	if (m_textData != nullptr)
+	{
+		delete m_textData;
+		m_textData = nullptr;
+	}
 }
 
 bool EntityResultText::getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
@@ -29,7 +31,7 @@ bool EntityResultText::getEntityBox(double &xmin, double &xmax, double &ymin, do
 
 void EntityResultText::StoreToDataBase(void)
 {
-	if (textData != nullptr)
+	if (m_textData != nullptr)
 	{
 		storeTextData();
 	}
@@ -39,24 +41,22 @@ void EntityResultText::StoreToDataBase(void)
 
 void EntityResultText::AddStorageData(bsoncxx::builder::basic::document &storage)
 {
-	// We store the parent class information first 
-	EntityContainer::AddStorageData(storage);
-
+	EntityBase::AddStorageData(storage);
 	// Now we store the particular information about the current object
 	storage.append(
-		bsoncxx::builder::basic::kvp("TextDataID", textDataStorageId),
-		bsoncxx::builder::basic::kvp("TextDataVersion", textDataStorageVersion)
+		bsoncxx::builder::basic::kvp("TextDataID", static_cast<int64_t>(m_textDataStorageId)),
+		bsoncxx::builder::basic::kvp("TextDataVersion", static_cast<int64_t>(m_textDataStorageVersion))
 	);
 }
 
 void EntityResultText::readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
 {
 	// We read the parent class information first 
-	EntityContainer::readSpecificDataFromDataBase(doc_view, entityMap);
+	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 
 	// Here we can load any special information about the entity
-	textDataStorageId = doc_view["TextDataID"].get_int64();
-	textDataStorageVersion = doc_view["TextDataVersion"].get_int64();
+	m_textDataStorageId = doc_view["TextDataID"].get_int64();
+	m_textDataStorageVersion = doc_view["TextDataVersion"].get_int64();
 
 	resetModified();
 }
@@ -90,16 +90,6 @@ void EntityResultText::addVisualizationItem(bool isHidden)
 	getObserver()->sendMessageToViewer(doc);
 }
 
-void EntityResultText::removeChild(EntityBase *child)
-{
-	if (child == textData)
-	{
-		textData = nullptr;
-	}
-
-	EntityContainer::removeChild(child);
-}
-
 void EntityResultText::createProperties(void)
 {
 	// This item has no properties yet	
@@ -121,18 +111,18 @@ bool EntityResultText::updateFromProperties(void)
 
 EntityResultTextData *EntityResultText::getTextData(void)
 {
-	EnsureTextDataLoaded();
-	assert(textData != nullptr);
+	ensureTextDataLoaded();
+	assert(m_textData != nullptr);
 
-	return textData;
+	return m_textData;
 }
 
 std::string EntityResultText::getText()
 {
-	EnsureTextDataLoaded();
-	assert(textData != nullptr);
+	ensureTextDataLoaded();
+	assert(m_textData != nullptr);
 
-	return textData->getText();
+	return m_textData->getText();
 }
 
 bool EntityResultText::visualiseText()
@@ -159,64 +149,63 @@ ot::ContentChangedHandling EntityResultText::getTextContentChangedHandling()
 
 void EntityResultText::deleteTextData(void)
 {
-	textData = nullptr;
-	textDataStorageId = -1;
-	textDataStorageVersion = -1;
+	m_textData = nullptr;
+	m_textDataStorageId = 0;
+	m_textDataStorageVersion = 0;
 
 	setModified();
 }
 
 void EntityResultText::storeTextData(void)
 {
-	if (textData == nullptr) return;
-	assert(textData != nullptr);
+	if (m_textData == nullptr) return;
+	assert(m_textData != nullptr);
 
-	textData->StoreToDataBase();
+	m_textData->StoreToDataBase();
 
-	if (textDataStorageId != textData->getEntityID() || textDataStorageVersion != textData->getEntityStorageVersion())
+	if (m_textDataStorageId != m_textData->getEntityID() || m_textDataStorageVersion != m_textData->getEntityStorageVersion())
 	{
 		setModified();
 	}
 
-	textDataStorageId = textData->getEntityID();
-	textDataStorageVersion = textData->getEntityStorageVersion();
+	m_textDataStorageId = m_textData->getEntityID();
+	m_textDataStorageVersion = m_textData->getEntityStorageVersion();
 }
 
 void EntityResultText::releaseTextData(void)
 {
-	if (textData == nullptr) return;
+	if (m_textData == nullptr) return;
 
 	storeTextData();
 
-	delete textData;
-	textData = nullptr;
+	delete m_textData;
+	m_textData = nullptr;
 }
 
-void EntityResultText::EnsureTextDataLoaded(void)
+void EntityResultText::ensureTextDataLoaded(void)
 {
-	if (textData == nullptr)
+	if (m_textData == nullptr)
 	{
-		if (textDataStorageId == -1)
+		if (m_textDataStorageId == 0)
 		{
-			textData = new EntityResultTextData(getUidGenerator()->getUID(), this, getObserver(), getModelState(), getClassFactory(), getOwningService());
+			m_textData = new EntityResultTextData(getUidGenerator()->getUID(), this, getObserver(), getModelState(), getClassFactory(), getOwningService());
 		}
 		else
 		{
 			std::map<ot::UID, EntityBase *> entityMap;
-			textData = dynamic_cast<EntityResultTextData *>(readEntityFromEntityID(this, textDataStorageId, entityMap));
+			m_textData = dynamic_cast<EntityResultTextData *>(readEntityFromEntityID(this, m_textDataStorageId, entityMap));
 		}
 
-		assert(textData != nullptr);
-		addChild(textData);
+		assert(m_textData != nullptr);
 	}
 }
 
 void EntityResultText::setText(const std::string &text)
 {
-	EnsureTextDataLoaded();
-	assert(textData != nullptr);
+	ensureTextDataLoaded();
+	assert(m_textData != nullptr);
 
-	textData->setText(text);
+	m_textData->setText(text);
 
 	storeTextData();
 }

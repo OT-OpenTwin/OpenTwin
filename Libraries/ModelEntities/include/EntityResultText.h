@@ -7,7 +7,7 @@
 
 class EntityResultTextData;
 
-class __declspec(dllexport) EntityResultText : public EntityContainer, public IVisualisationText
+class __declspec(dllexport) EntityResultText : public EntityBase, public IVisualisationText
 {
 public:
 	EntityResultText(ot::UID ID, EntityBase *parent, EntityObserver *mdl, ModelState *ms, ClassFactoryHandler* factory, const std::string &owner);
@@ -25,8 +25,7 @@ public:
 	virtual std::string getClassName(void) { return "EntityResultText"; };
 
 	virtual entityType getEntityType(void) override { return TOPOLOGY; };
-	virtual void removeChild(EntityBase *child) override;
-
+	
 	void createProperties(void);
 
 	virtual bool updateFromProperties(void) override;
@@ -36,8 +35,8 @@ public:
 	void storeTextData(void);
 	void releaseTextData(void);
 
-	long long getTextDataStorageId(void) { return textDataStorageId; }
-	long long getTextDataStorageVersion(void) { return textDataStorageVersion; }
+	ot::UID getTextDataStorageId(void) { return m_textDataStorageId; }
+	ot::UID getTextDataStorageVersion(void) { return m_textDataStorageVersion; }
 
 	// Inherited via IVisualisationText
 	void setText(const std::string &text) override;
@@ -47,17 +46,16 @@ public:
 	ot::ContentChangedHandling getTextContentChangedHandling() override;
 
 private:
-	void EnsureTextDataLoaded(void);
+	void ensureTextDataLoaded(void);
 	virtual int getSchemaVersion(void) { return 1; };
-	virtual void AddStorageData(bsoncxx::builder::basic::document &storage);
+	virtual void AddStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	EntityResultTextData *getTextData(void);
 
-	EntityResultTextData *textData;
-	long long textDataStorageId;
-	long long textDataStorageVersion;
+	EntityResultTextData *m_textData = nullptr;
+	ot::UID m_textDataStorageId = 0;
+	ot::UID m_textDataStorageVersion = 0;
 	ot::ContentChangedHandling m_contentChangedHandling = ot::ContentChangedHandling::ModelServiceSaves;
-
 };
 
 
