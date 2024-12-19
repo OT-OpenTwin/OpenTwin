@@ -1,0 +1,58 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Build Logs
+buildLog_Debug.txt
+buildLog_Release.txt
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+*.pdb
+*.ilk
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Google test directory
+packages
+
+# VS internal build directory
+/**/.vs
+
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
