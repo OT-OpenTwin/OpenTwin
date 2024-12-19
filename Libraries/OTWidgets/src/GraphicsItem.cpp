@@ -204,7 +204,6 @@ void ot::GraphicsItem::handleMouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
 
 	if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsMoveable)) {
 		this->setBlockConfigurationNotifications(false);
-		this->notifyMoveIfRequired();
 	}
 }
 

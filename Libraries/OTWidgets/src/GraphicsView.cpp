@@ -347,9 +347,13 @@ void ot::GraphicsView::notifyItemMoved(const ot::GraphicsItem* _item) {
 
 void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _item) {
 	// Avoid notification of child items
-	if (_item != _item->getRootItem()) return;
+	if (_item != _item->getRootItem()) {
+		return;
+	}
 
-	if (m_viewStateFlags & ItemMoveInProgress) return;
+	if (m_viewStateFlags & ItemMoveInProgress) {
+		return;
+	}
 	Q_EMIT itemConfigurationChanged(_item->getConfiguration());
 }
 
