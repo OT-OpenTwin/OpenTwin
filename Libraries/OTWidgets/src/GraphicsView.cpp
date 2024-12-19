@@ -176,6 +176,7 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid, bool bufferConnection
 	m_scene->removeItem(graphicsItem->getQGraphicsItem());
 	graphicsItem->setGraphicsScene(nullptr);
 	delete graphicsItem;
+	graphicsItem = nullptr;
 	m_items.erase(_itemUid);
 	
 	OT_LOG_D("Item removed { \"UID\": " + std::to_string(_itemUid) + " }");
