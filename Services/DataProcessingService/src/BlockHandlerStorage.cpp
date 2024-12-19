@@ -32,6 +32,7 @@ bool BlockHandlerStorage::executeSpecialized()
 
 	if (allInputsAvailable())
 	{
+		_uiComponent->displayMessage("Executing Storage Block: " + _blockName);
 		std::list<DatasetDescription> datasets = std::move(createDatasets());
 		const std::string seriesName = ot::FolderNames::DatasetFolder + "/" + m_blockEntityStorage->getSeriesName();
 		std::list<std::shared_ptr<MetadataEntry>>seriesMetadata;

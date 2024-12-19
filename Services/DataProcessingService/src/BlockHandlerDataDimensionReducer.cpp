@@ -13,6 +13,7 @@ BlockHandlerDataDimensionReducer::BlockHandlerDataDimensionReducer(EntityBlockDa
 
 bool BlockHandlerDataDimensionReducer::executeSpecialized()
 {
+	_uiComponent->displayMessage("Executing Data Dimension Reduction Block: " + _blockName);
 	PipelineData& incommingPortData = _dataPerPort[m_inputConnectorName];
 	auto& genericDataBlocks = incommingPortData.m_data;
 

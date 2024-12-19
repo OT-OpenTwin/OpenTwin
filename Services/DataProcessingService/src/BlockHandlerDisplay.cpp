@@ -13,6 +13,7 @@ BlockHandlerDisplay::BlockHandlerDisplay(EntityBlockDisplay* blockEntity, const 
 
 bool BlockHandlerDisplay::executeSpecialized()
 {
+	_uiComponent->displayMessage("Executing Display Block: " + _blockName);
 	PipelineData& incommingPortData = _dataPerPort[_input.getConnectorName()];
 	GenericDataList& dataList = incommingPortData.m_data;
 	std::string displayMessage = _description + "\n";

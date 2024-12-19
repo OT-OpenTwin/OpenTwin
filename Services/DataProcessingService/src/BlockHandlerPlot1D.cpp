@@ -52,6 +52,8 @@ bool BlockHandlerPlot1D::executeSpecialized()
 	
 	if (allSet)
 	{
+		_uiComponent->displayMessage("Executing Plot 1D Block: " + _blockName);
+
 		PipelineData& xAxisData = _dataPerPort[_xDataConnector];
 		if (_xunit == "")
 		{

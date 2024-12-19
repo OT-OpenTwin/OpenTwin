@@ -164,12 +164,15 @@ BlockHandlerDatabaseAccess::~BlockHandlerDatabaseAccess()
 
 bool BlockHandlerDatabaseAccess::executeSpecialized()
 {
+	_uiComponent->displayMessage("Executing Database Acccess Block: " + _blockName);
 	const std::string debugQuery = bsoncxx::to_json(m_query.view());
 	//if (Application::instance()->uiComponent()) {
 	//	Application::instance()->uiComponent()->displayMessage("Executing query: " + debugQuery);
 	//}
 
 	const std::string debugProjection = bsoncxx::to_json(m_projection.view());
+	_uiComponent->displayMessage("Executing query: " + debugProjection);
+
 	auto dbResponse = m_resultCollectionAccess->SearchInResultCollection(m_query, m_projection, 0);
 	ot::JSONToVariableConverter converter;
 

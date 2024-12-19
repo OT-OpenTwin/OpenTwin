@@ -68,9 +68,6 @@
     <ClCompile Include="src\PipelineHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\BlockHandlerPython.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\BlockHandlerDataDimensionReducer.cpp">
       <Filter>Source Files\BlockFunctionality</Filter>
     </ClCompile>
@@ -84,6 +81,9 @@
       <Filter>Source Files\BlockFunctionality</Filter>
     </ClCompile>
     <ClCompile Include="src\PipelineData.cpp">
+      <Filter>Source Files\BlockFunctionality</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BlockHandlerPython.cpp">
       <Filter>Source Files\BlockFunctionality</Filter>
     </ClCompile>
   </ItemGroup>

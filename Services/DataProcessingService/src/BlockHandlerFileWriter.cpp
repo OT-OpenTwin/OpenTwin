@@ -29,6 +29,7 @@ BlockHandlerFileWriter::BlockHandlerFileWriter(EntityBlockFileWriter* blockEntit
 
 bool BlockHandlerFileWriter::executeSpecialized()
 {
+	_uiComponent->displayMessage("Executing Filewriter Block: " + _blockName);
 	PipelineData& incommingPortData	= _dataPerPort[m_input.getConnectorName()];
 	GenericDataList& dataList = incommingPortData.m_data;
 	char lastCharacter = m_filePath[m_filePath.size()-1];
