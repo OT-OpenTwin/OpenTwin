@@ -3,6 +3,7 @@
 #include "EntityResult1DCurve.h"
 #include "GraphNode.h"
 #include "OTCore/GenericDataStructSingle.h"
+#include "OTCore/GenericDataStructMatrix.h"
 
 BlockHandlerPlot1D::BlockHandlerPlot1D(EntityBlockPlot1D* blockEntity, const HandlerMap& handlerMap)
 	:BlockHandler(blockEntity ,handlerMap)
@@ -152,9 +153,8 @@ void BlockHandlerPlot1D::setLabel(PipelineData& _pipelineData, std::string& _lab
 		assert(_pipelineData.m_quantity != nullptr);
 		_label = _pipelineData.m_quantity->quantityLabel + " " + _pipelineData.m_quantityDescription->quantityValueLabel;
 	}
-	else
+	else if(_pipelineData.m_parameter != nullptr)
 	{
-		assert(_pipelineData.m_parameter != nullptr);
 		_label = _pipelineData.m_parameter->parameterLabel;
 	}
 }
@@ -165,9 +165,8 @@ void BlockHandlerPlot1D::setUnit(PipelineData& _pipelineData, std::string& _unit
 	{
 		_unit = _pipelineData.m_quantityDescription->unit;
 	}
-	else
+	else if(_pipelineData.m_parameter != nullptr)
 	{
-		assert(_pipelineData.m_parameter != nullptr);
 		_unit = _pipelineData.m_parameter->unit;
 	}
 }
@@ -175,9 +174,9 @@ void BlockHandlerPlot1D::setUnit(PipelineData& _pipelineData, std::string& _unit
 std::vector<double> BlockHandlerPlot1D::transformDataToDouble(GenericDataList& genericDataBlocks)
 {
 	std::vector<double> doubleValues;
-	doubleValues.reserve(genericDataBlocks.size());
 	if (genericDataBlocks.size() > 1)
 	{
+		doubleValues.reserve(genericDataBlocks.size());
 		for (auto& genericDataBlock : genericDataBlocks)
 		{
 			ot::GenericDataStructSingle* entry = dynamic_cast<ot::GenericDataStructSingle*>(genericDataBlock.get());
@@ -192,17 +191,44 @@ std::vector<double> BlockHandlerPlot1D::transformDataToDouble(GenericDataList& g
 	}
 	else
 	{
-		ot::GenericDataStructVector* entry = dynamic_cast<ot::GenericDataStructVector*>(genericDataBlocks.begin()->get());
-		if (entry == nullptr)
-		{
-			throw std::exception("Plot 1D block detected incompatible data format in data input. Only one-dimensional data structures are supported.");
-		}
-		const std::vector<ot::Variable> values = entry->getValues();
-		for (const ot::Variable& value : values)
-		{
-			doubleValues.push_back(VariableToDouble(value));
-		}
+		ot::GenericDataStruct* genericDataStruc = genericDataBlocks.begin()->get();
 
+		ot::GenericDataStructMatrix* matrixStruct = dynamic_cast<ot::GenericDataStructMatrix*>(genericDataStruc);
+		if (matrixStruct != nullptr)
+		{
+			uint32_t numberOfRows = matrixStruct->getNumberOfRows();
+			uint32_t numberOfColumns = matrixStruct->getNumberOfColumns();
+			if (numberOfRows > 1 && numberOfColumns > 1)
+			{
+				throw std::exception("Plot 1D block detected incompatible data format in data input. Only one-dimensional data structures are supported.");
+			}
+			uint32_t numberOfEntries = matrixStruct->getNumberOfEntries();
+			doubleValues.reserve(numberOfEntries);
+			ot::MatrixEntryPointer matrixEntry;
+			
+			for (matrixEntry.m_row = 0; matrixEntry.m_row < numberOfRows; matrixEntry.m_row++)
+			{
+				for (matrixEntry.m_column = 0; matrixEntry.m_column < numberOfColumns; matrixEntry.m_column++)
+				{
+					const ot::Variable& value = matrixStruct->getValue(matrixEntry);
+					doubleValues.push_back(VariableToDouble(value));
+				}
+			}
+		}
+		else
+		{
+			ot::GenericDataStructVector* entry = dynamic_cast<ot::GenericDataStructVector*>(genericDataStruc);
+			if (entry == nullptr)
+			{
+				throw std::exception("Plot 1D block detected incompatible data format in data input. Only one-dimensional data structures are supported.");
+			}
+			doubleValues.reserve(entry->getNumberOfEntries());
+			const std::vector<ot::Variable> values = entry->getValues();
+			for (const ot::Variable& value : values)
+			{
+				doubleValues.push_back(VariableToDouble(value));
+			}
+		}
 	}
 	return doubleValues;
 }

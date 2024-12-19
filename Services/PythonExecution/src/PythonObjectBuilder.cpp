@@ -387,10 +387,18 @@ ot::GenericDataStruct* PythonObjectBuilder::getGenericDataStruct(CPythonObject& 
 		PyObject* pValueBase = pValue;
 		npy_intp* shape = PyArray_SHAPE((PyArrayObject*)pValueBase);
 		int type = PyArray_TYPE((PyArrayObject*)pValueBase);
+		int dimensions = PyArray_NDIM((PyArrayObject*)pValueBase);
 
 		ot::MatrixEntryPointer matrixEntry;
 		matrixEntry.m_row= static_cast<uint32_t>(shape[0]);
-		matrixEntry.m_column = static_cast<uint32_t>(shape[1]);
+		if (dimensions > 1)
+		{
+			matrixEntry.m_column = static_cast<uint32_t>(shape[1]);
+		}
+		else
+		{
+			matrixEntry.m_column = 1;
+		}
 		uint32_t size = matrixEntry.m_row * matrixEntry.m_column;
 		ot::GenericDataStructMatrix* matrix(new ot::GenericDataStructMatrix(matrixEntry));
 		void* pyArrayData =	PyArray_DATA((PyArrayObject*)pValueBase);

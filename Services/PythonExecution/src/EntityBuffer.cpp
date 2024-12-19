@@ -69,8 +69,12 @@ void EntityBuffer::saveChangedEntities()
 		topoEntVersion.push_back(entity->getEntityStorageVersion());
 		forceVis.push_back(false);
 	}
-	m_modelServiceAPI->addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
-	m_modelServiceAPI->updatePropertyGrid();
+
+	if (topoEntID.size() > 0)
+	{
+		m_modelServiceAPI->addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
+		m_modelServiceAPI->updatePropertyGrid();
+	}
 	clearBuffer();
 }
 
