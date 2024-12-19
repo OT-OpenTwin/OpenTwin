@@ -40,7 +40,8 @@ private:
 	//! @brief Stores the string as byte array. Content cannot be searched for but it is not necessary to guarantee UTF8 encoding
 	void storeTextFile(ot::JsonDocument& _doc, const std::string& _folderName);
 	void addTextFilesToModel();
-	
+	void clearBuffer();
+
 	void handleChangedText(ot::JsonDocument& _doc);
 	void handleChangedTable(ot::JsonDocument& _doc);
 	ot::GenericDataStructMatrix createMatrix(const ot::TableCfg& _tableCfg);

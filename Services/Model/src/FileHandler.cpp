@@ -113,6 +113,7 @@ void FileHandler::storeTextFile(ot::JsonDocument& _document, const std::string& 
 	}
 
 	addTextFilesToModel();
+	clearBuffer();
 }
 
 void FileHandler::handleChangedTable(ot::JsonDocument& _doc)
@@ -359,6 +360,15 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	m_entityIDsData.push_back(entIDData);
 	m_entityVersionsData.push_back(fileContent.getEntityStorageVersion());
 	m_forceVisible.push_back(false);
+}
+
+void FileHandler::clearBuffer()
+{
+	m_entityVersionsData.clear();
+	m_entityVersionsTopo.clear();
+	m_entityIDsData.clear();
+	m_entityIDsTopo.clear();
+	m_forceVisible.clear();
 }
 
 void FileHandler::addTextFilesToModel()
