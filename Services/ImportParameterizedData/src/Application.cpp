@@ -339,7 +339,10 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 		else {
 			OT_LOG_W(OT_ACTION_RETURN_UnknownAction);
 		}
-		m_uiComponent->displayMessage(returnMessage);
+		if (returnMessage != "")
+		{
+			m_uiComponent->displayMessage(returnMessage);
+		}
 	}
 	catch (std::runtime_error& e)
 	{

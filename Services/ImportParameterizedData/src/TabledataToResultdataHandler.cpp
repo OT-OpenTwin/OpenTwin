@@ -154,6 +154,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		}
 		else
 		{
+			_uiComponent->displayMessage("Create " + seriesName + ":\n");
 			KeyValuesExtractor seriesMetaDataRangeSelections;
 			std::list<DatasetDescription> datasets = extractDataset(metadataAssemblyByName->second, loadedTables, seriesMetaDataRangeSelections);
 			std::list<std::shared_ptr<MetadataEntry>> seriesMetadata = rangeData2MetadataEntries(std::move(seriesMetaDataRangeSelections));
@@ -187,6 +188,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 						fullReport += logger.getLog();
 						logger.clearLog();
 						updater.triggerUpdate(counter);
+						counter++;
 					}
 				}
 				catch (std::exception& e)
@@ -574,6 +576,7 @@ void TabledataToResultdataHandler::loadRequiredTables(std::list<string>& _requir
 				}
 			}
 		}
+
 
 		Application::instance()->prefetchDocumentsFromStorage(tableToLoadIDs);
 		for (ot::UID tableID : tableToLoadIDs)
