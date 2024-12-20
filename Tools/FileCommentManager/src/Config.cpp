@@ -13,11 +13,6 @@
 #define LOG_W(___message) LOG_WARNING("Config", ___message)
 #define LOG_E(___message) LOG_ERROR("Config", ___message)
 
-Config& Config::instance(void) {
-	static Config g_instance;
-	return g_instance;
-}
-
 bool Config::readFromFile(const QString& _filePath, const QString& _devRoot) {
 	// Ini dev root
 	QString devRoot = _devRoot;

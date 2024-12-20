@@ -1,7 +1,9 @@
 // Project header
 #include "File.h"
 #include "Logger.h"
+#include "AppBase.h"
 #include "Project.h"
+#include "ScanData.h"
 
 // Qt header
 #include <QtCore/qfile.h>
@@ -13,6 +15,7 @@
 #define LOG_E(___message) LOG_ERROR("Project", ___message)
 
 Project::Project() {
+
 }
 
 bool Project::scan(const QString& _path, const QString& _projectName) {
@@ -91,9 +94,18 @@ bool Project::scan(const QString& _path, const QString& _projectName) {
         
         cacheFile.close();
     }
+
+    return true;
 }
 
-bool Project::scanFiles(const AppBase* _app) {
-    
-    return false;
+bool Project::scanFiles(const AppBase* _app, const ScanOptions& _options) {
+    ScanData scanData(_app->getProjects(), m_fileHashData);
+
+    for (File* file : m_headers) {
+        if (!file->process(scanData, _options)) {
+
+        }
+    }
+
+    return true;
 }

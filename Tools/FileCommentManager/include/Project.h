@@ -1,5 +1,9 @@
 #pragma once
 
+// Project header
+#include "ScanData.h"
+#include "ScanOptions.h"
+
 // Qt header
 #include <QtCore/qstring.h>
 
@@ -15,7 +19,7 @@ public:
 
 	bool scan(const QString& _path, const QString& _projectName);
 
-	bool scanFiles(const AppBase* _app);
+	bool scanFiles(const AppBase* _app, const ScanOptions& _options);
 
 	const QString& getPath(void) const { return m_path; };
 	const QString& getName(void) const { return m_projectName; };

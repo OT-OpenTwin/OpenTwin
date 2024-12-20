@@ -1,5 +1,9 @@
 #pragma once
 
+// Project header
+#include "ScanData.h"
+#include "ScanOptions.h"
+
 // Qt header
 #include <QtCore/qfile.h>
 
@@ -11,6 +15,8 @@ public:
 	};
 	
 	File(const QString& _filePath, FileType _type);
+
+	bool process(const ScanData& _scanData, const ScanOptions& _options);
 
 private:
 	QString m_path;

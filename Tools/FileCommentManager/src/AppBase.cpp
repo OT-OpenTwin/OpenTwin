@@ -33,6 +33,9 @@ void AppBase::slotRun(void) {
 	// Detect projects
 	this->scanProjects();
 
+	// Process data
+
+
 	// Log duration
 	std::chrono::steady_clock::time_point endTime = std::chrono::steady_clock::now();
 	std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
@@ -47,7 +50,15 @@ void AppBase::slotExit(int _exitCode) {
 }
 
 bool AppBase::iniConfigEnv(void) {
-	// Check Environment
+	// Check User
+	QString user = QString::fromStdString(qgetenv("OPENTWIN_DEV_USER").toStdString());
+	if (user.isEmpty()) {
+		LOG_E("No user specified in environment \"OPENTWIN_DEV_USER\". Skipping processing..");
+		this->slotExit(0);
+		return false;
+	}
+
+	// Check Development Environment
 	QByteArray otdevenv = qgetenv("OPENTWIN_DEV_ROOT");
 	if (otdevenv.isEmpty()) {
 		LOG_E("OpenTwin development environment is not set: \"OPENTWIN_DEV_ROOT\".");

@@ -14,3 +14,8 @@ File::File(const QString& _filePath, FileType _type)
 {
 
 }
+
+bool File::process(const ScanData& _scanData, const ScanOptions& _options) {
+
+	return false;
+}

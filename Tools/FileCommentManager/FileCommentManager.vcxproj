@@ -23,6 +23,8 @@
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Project.cpp" />
+    <ClCompile Include="src\ScanData.cpp" />
+    <ClCompile Include="src\ScanOptions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AppBase.h" />
@@ -31,6 +33,8 @@
     <ClInclude Include="include\JSONMember.h" />
     <ClInclude Include="include\Logger.h" />
     <ClInclude Include="include\Project.h" />
+    <ClInclude Include="include\ScanData.h" />
+    <ClInclude Include="include\ScanOptions.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E9C14DEE-33BD-48A1-89FF-B6B7AFFACC4D}</ProjectGuid>
