@@ -1146,18 +1146,13 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
-		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			OT_LOG_EAS(response);
-			app->showErrorPrompt(response, "Error");
+		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+		if (responseMessage != ot::ReturnMessage::Ok) {
+			app->showErrorPrompt(responseMessage.getWhat(), "Error");
 			ot::LogDispatcher::instance().setProjectName("");
 			return;
 		}
-		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			OT_LOG_WAS(response);
-			app->showWarningPrompt(response, "Warning");
-			ot::LogDispatcher::instance().setProjectName("");
-			return;
-		}
+
 		m_sessionServiceURL = response;
 
 		OT_LOG_D("GSS provided the LSS at \"" + m_sessionServiceURL + "\"");

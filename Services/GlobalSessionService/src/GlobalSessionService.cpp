@@ -13,8 +13,9 @@
 
 // OpenTwin header
 #include "OTSystem/SystemInformation.h"
-#include "OTCore/OTAssert.h"
 #include "OTCore/Logger.h"
+#include "OTCore/OTAssert.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 #include "DataBase.h"
@@ -106,35 +107,48 @@ std::string GlobalSessionService::handleGetGlobalServicesURL(ot::JsonDocument& _
 }
 
 std::string GlobalSessionService::handleCreateSession(ot::JsonDocument& _doc) {
-	std::string sessionID = ot::json::getString(_doc, OT_ACTION_PARAM_SESSION_ID);
-	std::string userName = ot::json::getString(_doc, OT_ACTION_PARAM_USER_NAME);
+	Session newSession;
+	newSession.setId(ot::json::getString(_doc, OT_ACTION_PARAM_SESSION_ID));
+	newSession.setUserName(ot::json::getString(_doc, OT_ACTION_PARAM_USER_NAME));
 
 	std::lock_guard<std::mutex> lock(m_mapMutex);
 
 	// Check if the session already exists
-	auto it = m_sessionToServiceMap.find(sessionID);
+	auto it = m_sessionToServiceMap.find(newSession.id());
 	if (it != m_sessionToServiceMap.end()) {
+		const Session* session = it->second->getSessionById(newSession.id());
+		OTAssertNullptr(session);
 
 		// Check if the username differs
-		if (it->second->getSessionById(sessionID)->userName() != userName) {
-			OT_LOG_W("Session opened by other user");
-			OTAssert(0, "Session open by other user");
-			return OT_ACTION_RETURN_INDICATOR_Error "Session open by other user";
+		if (session->userName() != newSession.userName()) {
+			OT_LOG_WAS("Session opened by other user");
+			ot::ReturnMessage response(ot::ReturnMessage::Failed, "Session open by other user");
+			return response.toJson();
 		}
 		else {
-			return it->second->url();
+			ot::ReturnMessage response(ot::ReturnMessage::Failed, "Session already open in another frontend instance or from another device.");
+			return response.toJson();
 		}
 	}
 	else {
 		LocalSessionService* ss = leastLoadedSessionService();
 		if (ss) {
-			OT_LOG_D("Session service @ " + ss->url() + " with id=" + std::to_string(ss->id()) + " provided for session with id=" + sessionID);
-			return ss->url();
+			// Register set session as open for the specified LSS.
+			ss->addSession(newSession);
+
+			// This may be only problematic if the user/service requesting to create a new session will crash after receiving
+			// the response and won't continue with the create session request to the provided LSS.
+			m_sessionToServiceMap.insert_or_assign(newSession.id(), ss);
+
+			OT_LOG_D("Session service @ " + ss->url() + " with id=" + std::to_string(ss->id()) + " provided for session with id=" + newSession.id());
+			ot::ReturnMessage response(ot::ReturnMessage::Ok, ss->url());
+			return response.toJson();
 		}
 		else {
 			OT_LOG_E("No session service connected");
 			OTAssert(0, "No session service connected");
-			return OT_ACTION_RETURN_INDICATOR_Error "No session service connected";
+			ot::ReturnMessage response(ot::ReturnMessage::Failed, "No session service connected");
+			return response.toJson();
 		}
 	}
 }
@@ -150,7 +164,14 @@ std::string GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument& _doc)
 		return std::string();
 	}
 	else {
-		return it->second->getSessionById(projectName)->userName();
+		Session* session = it->second->getSessionById(projectName);
+		if (session) {
+			return session->userName();
+		}
+		else {
+			OT_LOG_E("Session \"" + projectName + "\" does not exist in the LSS at \"" + it->second->url() + "\"");
+			return std::string("<error while searching for user>");
+		}
 	}
 }
 
