@@ -1,4 +1,4 @@
-import fesRequest from "../../FesRequest/fesRequest";
+import authRequest from "../../FesRequest/authRequest";
 import { getUserData } from "../../../../screens/LoginPage/LoginPage";
 
 export function GetAllProjectCount() {
@@ -11,24 +11,7 @@ export function GetAllProjectCount() {
     LoggedInUserPassword: enteredPassword,
   };
 
-  return new Promise((resolve) => {
-    fesRequest({
-      method: "POST",
-      mode: "no-cors",
-      headers: { "content-type": "application/json" },
-      data: JSON.stringify(data),
-      url: "https://127.0.0.1:8092/execute-one-way-tls",
-    })
-      .then((res) => {
-        if (res.data === 0) {
-          return resolve(res.data);
-        }
-        return resolve(res);
-      })
-      .catch((err) => {
-        resolve(err);
-      });
-  });
+  return authRequest(data);
 }
 
 export default GetAllProjectCount;
