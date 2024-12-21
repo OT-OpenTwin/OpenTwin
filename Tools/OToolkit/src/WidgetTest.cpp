@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTCore/PerformanceTest.h"
+#include "OTCore/PerformanceTests.h"
 #include "OTGui/NavigationTreeItem.h"
 #include "OTGui/PropertyDialogCfg.h"
 #include "OTGui/PropertyStringList.h"
