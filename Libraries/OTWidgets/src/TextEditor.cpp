@@ -22,61 +22,14 @@
 #include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qscrollbar.h>
 
-/*
+#define OT_INTERN_TEXTEDITOR_PERFORMANCETEST_ENABLED false
 
-ot::TextEditorSyntaxHighlighterTest::TextEditorSyntaxHighlighterTest(TextEditor * _editor)
-	: QSyntaxHighlighter(_editor->document())
-{
-	HighlightingRule rule;
-
-	m_keywordFormat.setForeground(Qt::GlobalColor::blue);
-	m_keywordFormat.setFontWeight(QFont::Bold);
-	const QString keywordPatterns[] = {
-		QStringLiteral("\\bchar\\b"), QStringLiteral("\\bclass\\b"), QStringLiteral("\\bconst\\b"),
-		QStringLiteral("\\bdouble\\b"), QStringLiteral("\\benum\\b"), QStringLiteral("\\bexplicit\\b"),
-		QStringLiteral("\\bfriend\\b"), QStringLiteral("\\binline\\b"), QStringLiteral("\\bint\\b"),
-		QStringLiteral("\\blong\\b"), QStringLiteral("\\bnamespace\\b"), QStringLiteral("\\boperator\\b"),
-		QStringLiteral("\\bprivate\\b"), QStringLiteral("\\bprotected\\b"), QStringLiteral("\\bpublic\\b"),
-		QStringLiteral("\\bshort\\b"), QStringLiteral("\\bsignals\\b"), QStringLiteral("\\bsigned\\b"),
-		QStringLiteral("\\bslots\\b"), QStringLiteral("\\bstatic\\b"), QStringLiteral("\\bstruct\\b"),
-		QStringLiteral("\\btemplate\\b"), QStringLiteral("\\btypedef\\b"), QStringLiteral("\\btypename\\b"),
-		QStringLiteral("\\bunion\\b"), QStringLiteral("\\bunsigned\\b"), QStringLiteral("\\bvirtual\\b"),
-		QStringLiteral("\\bvoid\\b"), QStringLiteral("\\bvolatile\\b"), QStringLiteral("\\bbool\\b")
-	};
-	for (const QString &pattern : keywordPatterns) {
-		rule.pattern = QRegularExpression(pattern);
-		rule.format = m_keywordFormat;
-		m_highlightingRules.append(rule);
-	}
-
-	m_classFormat.setFontWeight(QFont::Bold);
-	m_classFormat.setForeground(Qt::darkMagenta);
-	rule.pattern = QRegularExpression(QStringLiteral("\\bQ[A-Za-z]+\\b"));
-	rule.format = m_classFormat;
-	m_highlightingRules.append(rule);
-
-	m_quotationFormat.setForeground(Qt::darkGreen);
-	rule.pattern = QRegularExpression(QStringLiteral("\".*\""));
-	rule.format = m_quotationFormat;
-	m_highlightingRules.append(rule);
-
-	m_functionFormat.setFontItalic(true);
-	m_functionFormat.setForeground(Qt::blue);
-	rule.pattern = QRegularExpression(QStringLiteral("\\b[A-Za-z0-9_]+(?=\\()"));
-	rule.format = m_functionFormat;
-	m_highlightingRules.append(rule);
-
-	m_singleLineCommentFormat.setForeground(Qt::green);
-	rule.pattern = QRegularExpression(QStringLiteral("//[^\n]*"));
-	rule.format = m_singleLineCommentFormat;
-	m_highlightingRules.append(rule);
-
-	m_multiLineCommentFormat.setForeground(Qt::green);
-	m_commentStartExpression = QRegularExpression(QStringLiteral("/\\*"));
-	m_commentEndExpression = QRegularExpression(QStringLiteral("\\* /"));  <- no space
-}
-
-*/
+#if OT_INTERN_TEXTEDITOR_PERFORMANCETEST_ENABLED==true
+#include "OTCore/PerformanceTests.h"
+#define OT_INTERN_TEXTEDITOR_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_texteditor_lcl_performancetest, "TextEditor " ___testText)
+#else
+#define OT_INTERN_TEXTEDITOR_PERFORMANCE_TEST(___testText)
+#endif
 
 ot::TextEditorLineNumberArea::TextEditorLineNumberArea(TextEditor* _editor)
 	: QWidget(_editor), m_editor(_editor)
@@ -142,6 +95,8 @@ ot::TextEditor::~TextEditor() {
 }
 
 void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _isUpdate) {
+	OT_INTERN_TEXTEDITOR_PERFORMANCE_TEST("Setup from config");
+
 	bool tmp = this->signalsBlocked();
 	this->blockSignals(true);
 
@@ -285,14 +240,6 @@ ot::SyntaxHighlighter* ot::TextEditor::takeSyntaxHighlighter(void) {
 	SyntaxHighlighter* result = m_syntaxHighlighter;
 	m_syntaxHighlighter = nullptr;
 	return result;
-}
-
-bool ot::TextEditor::requiresRefreshing(ot::UID displayedTextEntityID, ot::UID displayedTextEntityVersion)
-{
-	bool refreshingNeeded = displayedTextEntityID != m_displayedTextEntityID || m_displayedTextEntityVersion != displayedTextEntityVersion;
-	m_displayedTextEntityID = displayedTextEntityID;
-	m_displayedTextEntityVersion = displayedTextEntityVersion;
-	return refreshingNeeded;
 }
 
 void ot::TextEditor::keyPressEvent(QKeyEvent* _event) {

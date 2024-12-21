@@ -81,8 +81,6 @@ namespace ot {
 		//! The caller takes ownership of the highlighter.
 		SyntaxHighlighter* takeSyntaxHighlighter(void);
 
-		bool requiresRefreshing(ot::UID displayedTextEntityID, ot::UID displayedTextEntityVersion);
-
 		void setTabSpaces(int _spaces) { m_tabSpaces = _spaces; };
 		int tabSpaces(void) const { return m_tabSpaces; };
 
@@ -131,10 +129,7 @@ namespace ot {
 		bool m_enableSameTextHighlighting;
 		int m_sameTextHighlightingMinimum;
 
-		ot::UID								m_displayedTextEntityID = 0;
-		ot::UID								m_displayedTextEntityVersion = 0;
-
-		TextEditorLineNumberArea*			m_lineNumberArea;
-		SyntaxHighlighter*				m_syntaxHighlighter;
+		TextEditorLineNumberArea* m_lineNumberArea;
+		SyntaxHighlighter*		  m_syntaxHighlighter;
 	};
 }
