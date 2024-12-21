@@ -32,7 +32,7 @@
     <ClCompile Include="src\GenericDataStructSingle.cpp" />
     <ClCompile Include="src\GenericDataStructVector.cpp" />
     <ClCompile Include="src\JSON.cpp" />
-    <ClCompile Include="src\PerformanceTest.cpp" />
+    <ClCompile Include="src\PerformanceTests.cpp" />
     <ClCompile Include="src\StringToNumericCheck.cpp" />
     <ClCompile Include="src\LogModeManager.cpp" />
     <ClCompile Include="src\Math.cpp" />
@@ -68,7 +68,7 @@
     <ClInclude Include="include\OTCore\LocalSettingsSwitch.h" />
     <ClInclude Include="include\OTCore\LogModeManager.h" />
     <ClInclude Include="include\OTCore\Math.h" />
-    <ClInclude Include="include\OTCore\PerformanceTest.h" />
+    <ClInclude Include="include\OTCore\PerformanceTests.h" />
     <ClInclude Include="include\OTCore\Rect.h" />
     <ClInclude Include="include\OTCore\Color.h" />
     <ClInclude Include="include\OTCore\CoreAPIExport.h" />

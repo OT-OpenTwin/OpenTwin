@@ -115,7 +115,7 @@
     <ClCompile Include="src\BasicEntityInformation.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\PerformanceTest.cpp">
+    <ClCompile Include="src\PerformanceTests.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -283,7 +283,7 @@
     <ClInclude Include="include\OTCore\ContainerHelper.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\PerformanceTest.h">
+    <ClInclude Include="include\OTCore\PerformanceTests.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

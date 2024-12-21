@@ -36,7 +36,9 @@ namespace ot {
 
 	private:
 		std::string niceIntervalString(long long _ms) const;
-
+		
+		bool m_logOnDeleteEnabled;
+		std::string m_logOnDelete;
 		std::chrono::steady_clock::time_point m_startTime;
 	};
 
