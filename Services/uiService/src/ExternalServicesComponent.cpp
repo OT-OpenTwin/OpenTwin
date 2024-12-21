@@ -1117,14 +1117,12 @@ std::list<ot::ProjectTemplateInformation> ExternalServicesComponent::getListOfPr
 void ExternalServicesComponent::openProject(const std::string & _projectName, const std::string& _projectType, const std::string & _collectionName) {
 
 	AppBase * app{ AppBase::instance() };
-	app->lockWelcomeScreen(true);
-
 	try {
 		ot::LogDispatcher::instance().setProjectName(_projectName);
 
 		OT_LOG_D("Open project requested (Project name = \"" + _projectName + ")");
 
-		m_lockManager->lock(app->getBasicServiceInformation(), ot::LockAll);
+		ScopedLockManagerLock uiLock(m_lockManager, app->getBasicServiceInformation(), ot::LockAll);
 
 		StudioSuiteConnectorAPI::openProject();
 
@@ -1153,7 +1151,7 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 			return;
 		}
 
-		m_sessionServiceURL = response;
+		m_sessionServiceURL = responseMessage.getWhat();
 
 		OT_LOG_D("GSS provided the LSS at \"" + m_sessionServiceURL + "\"");
 #endif
@@ -1261,7 +1259,6 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 		do
 		{
 			if (!sendHttpRequest(EXECUTE, m_sessionServiceURL, checkCommandString, response)) {
-				m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockAll);
 				throw std::exception("Failed to send http request to Session Service");
 			}
 			if (response == OT_ACTION_RETURN_VALUE_TRUE) {
@@ -1272,7 +1269,6 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 				std::this_thread::sleep_for(1s);
 			}
 			else {
-				m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockAll);
 				OT_LOG_E("Invalid Session Service response: " + response);
 				throw std::exception(("Invalid Session Service response: " + response).c_str());
 			}
@@ -1289,13 +1285,11 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 			throw std::exception("Failed to send http request");
 		}
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockAll);
 			std::string ex("From ");
 			ex.append(m_sessionServiceURL).append(": ").append(response);
 			throw std::exception(ex.c_str());
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockAll);
 			std::string ex("From ");
 			ex.append(m_sessionServiceURL).append(": ").append(response);
 			throw std::exception(ex.c_str());
@@ -1333,17 +1327,17 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 		ot::startSessionServiceHealthCheck(m_sessionServiceURL);
 #endif // OT_USE_GSS
 
+		uiLock.setNoUnlock();
+
 		OT_LOG_D("Open project completed");
 	}
 	catch (const std::exception & e) {
 		OT_LOG_EAS(e.what());
-		app->lockWelcomeScreen(false);
 		app->showErrorPrompt(e.what(), "Error");
 		ot::LogDispatcher::instance().setProjectName("");
 	}
 	catch (...) {
 		OT_LOG_EA("[FATAL] Unknown error");
-		app->lockWelcomeScreen(false);
 		app->showErrorPrompt("Unknown error occured while creating a new session", "Fatal Error");
 		ot::LogDispatcher::instance().setProjectName("");
 	}
@@ -2174,7 +2168,6 @@ std::string ExternalServicesComponent::handleServiceSetupCompleted(ot::JsonDocum
 	m_servicesUiSetupCompleted = true;
 
 	AppBase::instance()->switchToViewTab();
-	AppBase::instance()->lockWelcomeScreen(false);
 	m_lockManager->unlock(AppBase::instance()->getBasicServiceInformation(), ot::LockAll);
 
 	AppBase::instance()->restoreSessionState();

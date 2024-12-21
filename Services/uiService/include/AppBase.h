@@ -201,8 +201,6 @@ public:
 		const QString &					_projectType
 	);
 
-	void lockWelcomeScreen(bool flag);
-
 public:
 
 	void initializeDefaultUserSettings(void);

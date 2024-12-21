@@ -491,7 +491,6 @@ void AppBase::lockSelectionAndModification(bool flag)
 		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
 	}
 
-	lockWelcomeScreen(flag);
 	m_projectNavigation->setEnabled(!flag);
 }
 
@@ -499,16 +498,12 @@ void AppBase::lockUI(bool flag)
 {
 	ot::LockTypeFlags lockFlags(ot::LockAll);
 
-	if (flag)
-	{
+	if (flag) {
 		lockManager()->lock(this->getBasicServiceInformation(), lockFlags);
-		lockWelcomeScreen(true);
 		uiAPI::window::enableTabToolBar(m_mainWindow, false);
 		uiAPI::window::setWaitingAnimationVisible(m_mainWindow, false);
 	}
-	else
-	{
-		lockWelcomeScreen(false);
+	else{
 		lockManager()->unlock(this->getBasicServiceInformation(), lockFlags);
 		uiAPI::window::enableTabToolBar(m_mainWindow, true);
 	}
@@ -517,11 +512,6 @@ void AppBase::lockUI(bool flag)
 void AppBase::refreshWelcomeScreen(void)
 {
 	m_welcomeScreen->slotRefreshProjectList();
-}
-
-void AppBase::lockWelcomeScreen(bool flag)
-{
-	m_welcomeScreen->lock(flag);
 }
 
 void AppBase::exportProjectWorker(std::string selectedProjectName, std::string exportFileName)
@@ -932,8 +922,10 @@ void AppBase::createUi(void) {
 			auto lockManager = m_ExternalServicesComponent->lockManager();
 
 			ot::LockTypeFlags f(ot::LockAll);
-			f.setFlag(ot::LockProperties);
 			f.setFlag(ot::LockModelWrite);
+			lockManager->registerLockable(this->getBasicServiceInformation(), m_welcomeScreen, f);
+
+			f.setFlag(ot::LockProperties);
 			lockManager->uiElementCreated(this->getBasicServiceInformation(), m_propertyGrid, f);
 
 			if (m_graphicsPicker) {

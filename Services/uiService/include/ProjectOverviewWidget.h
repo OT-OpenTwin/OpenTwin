@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "ControlsManager.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTWidgets/QWidgetInterface.h"
 
@@ -61,7 +62,7 @@ private:
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-class ProjectOverviewWidget : public QObject, public ot::QWidgetInterface {
+class ProjectOverviewWidget : public QObject, public ot::QWidgetInterface, public LockableWidget {
 	Q_OBJECT
 	OT_DECL_NODEFAULT(ProjectOverviewWidget)
 public:
@@ -73,9 +74,9 @@ public:
 	ProjectOverviewWidget(tt::Page* _ttbPage);
 	virtual ~ProjectOverviewWidget();
 
-	virtual QWidget* getQWidget(void) override { return m_widget; };
+	virtual void setWidgetLocked(bool _isLocked) override;
 
-	void lock(bool _flag);
+	virtual QWidget* getQWidget(void) override { return m_widget; };
 
 	QString getCurrentProjectFilter(void) const;
 
@@ -129,8 +130,6 @@ private:
 	ot::LineEdit* m_filter;
 	ot::Table* m_table;
 	ot::Label* m_countLabel;
-
-	int m_lockCount;
 
 	ot::ToolButton* m_createButton;
 	ot::ToolButton* m_refreshButton;

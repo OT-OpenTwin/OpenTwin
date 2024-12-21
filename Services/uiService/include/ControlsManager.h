@@ -55,6 +55,15 @@ private:
 	ControlsManager& operator = (const ControlsManager &) = delete;
 };
 
+class LockableWidget {
+	OT_DECL_NOCOPY(LockableWidget)
+public:
+	LockableWidget() {};
+	virtual ~LockableWidget() {};
+
+	virtual void setWidgetLocked(bool _isLocked) = 0;
+};
+
 class LockManager {
 public:
 	LockManager(AppBase* _owner);
@@ -68,6 +77,7 @@ public:
 	void uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::GraphicsView* _graphicsView, const ot::LockTypeFlags & _typeFlags);
 	void uiElementCreated(const ot::BasicServiceInformation& _serviceInfo, ot::TextEditor* _text, const ot::LockTypeFlags & _typeFlags);
 	void uiViewCreated(const ot::BasicServiceInformation& _serviceInfo, ot::WidgetView* _view, const ot::LockTypeFlags & _typeFlags);
+	void registerLockable(const ot::BasicServiceInformation& _serviceInfo, LockableWidget* _lockable, const ot::LockTypeFlags & _typeFlags);
 
 	//! @brief Will remove all the stored information about the UI element
 	//! This function will be called from the controls manager automatically if the lock manager was set
@@ -77,6 +87,7 @@ public:
 	void uiElementDestroyed(ot::GraphicsView* _graphicsView);
 	void uiElementDestroyed(ot::TextEditor* _text);
 	void uiViewDestroyed(ot::WidgetView* _view);
+	void deregisterLockable(LockableWidget* _lockable);
 
 	void lock(const ot::BasicServiceInformation& _serviceInfo, ot::LockTypeFlag _type);
 	void lock(const ot::BasicServiceInformation& _serviceInfo, const ot::LockTypeFlags & _typeFlags);
@@ -112,6 +123,23 @@ private:
 	LockManager& operator = (const LockManager &) = delete;
 };
 
+class ScopedLockManagerLock {
+	OT_DECL_NOCOPY(ScopedLockManagerLock)
+	OT_DECL_NODEFAULT(ScopedLockManagerLock)
+public:
+	ScopedLockManagerLock(LockManager* _manager, const ot::BasicServiceInformation& _serviceInfo, const ot::LockTypeFlags& _typeFlags);
+	~ScopedLockManagerLock();
+
+	//! @brief If set the lock flags won't be unset when destroying.
+	void setNoUnlock(void);
+
+private:
+	bool m_skipUnlock;
+	LockManager* m_manager;
+	ot::BasicServiceInformation m_service;
+	ot::LockTypeFlags m_flags;
+};
+
 class LockManagerElement {
 public:
 	LockManagerElement(ak::UID _uid, const ot::LockTypeFlags & _flags);
@@ -120,6 +148,7 @@ public:
 	LockManagerElement(ot::GraphicsView* _graphics, const ot::LockTypeFlags & _flags);
 	LockManagerElement(ot::TextEditor* _text, const ot::LockTypeFlags & _flags);
 	LockManagerElement(ot::WidgetView* _view, const ot::LockTypeFlags & _flags);
+	LockManagerElement(LockableWidget* _lockable, const ot::LockTypeFlags & _flags);
 
 	void enable(int _value);
 	void disable(int _value);
@@ -132,6 +161,7 @@ public:
 	ot::GraphicsView* getGraphics(void) const { return m_graphics; };
 	ot::TextEditor* getText(void) const { return m_text; };
 	ot::WidgetView* getView(void) const { return m_view; };
+	LockableWidget* getLockable(void) const { return m_lockable; };
 
 private:
 
@@ -140,6 +170,7 @@ private:
 	ot::GraphicsView* m_graphics;
 	ot::TextEditor* m_text;
 	ot::WidgetView* m_view;
+	LockableWidget* m_lockable;
 	ak::UID							m_uid;
 	ot::LockTypeFlags		m_lockTypes;
 	int								m_disabledCount;

@@ -86,7 +86,7 @@ void ProjectOverviewEntry::slotCheckedChanged(void) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
-	: m_lockCount(0), m_mode(ViewMode::ViewAll)
+	: m_mode(ViewMode::ViewAll)
 {
 	// Create layouts
 	m_widget = new QWidget;
@@ -161,31 +161,12 @@ ProjectOverviewWidget::~ProjectOverviewWidget() {
 
 }
 
-void ProjectOverviewWidget::lock(bool _flag) {
-	if (_flag) {
-		if (m_lockCount == 0) {
-			m_widget->setEnabled(false);
-			this->updateToolButtonsEnabledState(true);
-			m_createButton->setEnabled(false);
-			m_refreshButton->setEnabled(false);
-			m_toggleViewModeButton->setEnabled(false);
-		}
-		m_lockCount++;
-	}
-	else if (m_lockCount == 0) {
-		OTAssert(0, "No lock set, check locks");
-		return;
-	}
-	else {
-		m_lockCount--;
-		if (m_lockCount == 0) {
-			m_widget->setEnabled(true);
-			this->updateToolButtonsEnabledState();
-			m_createButton->setEnabled(true);
-			m_refreshButton->setEnabled(true);
-			m_toggleViewModeButton->setEnabled(true);
-		}
-	}
+void ProjectOverviewWidget::setWidgetLocked(bool _isLocked) {
+	m_widget->setEnabled(!_isLocked);
+	this->updateToolButtonsEnabledState(_isLocked);
+	m_createButton->setEnabled(!_isLocked);
+	m_refreshButton->setEnabled(!_isLocked);
+	m_toggleViewModeButton->setEnabled(!_isLocked);
 }
 
 QString ProjectOverviewWidget::getCurrentProjectFilter(void) const {
