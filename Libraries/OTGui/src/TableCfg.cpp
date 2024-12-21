@@ -8,6 +8,15 @@
 #include "OTGui/TableCfg.h"
 #include "OTCore/VariableToStringConverter.h"
 
+#define OT_INTERN_TABLECFG_PERFORMANCETEST_ENABLED false
+
+#if OT_INTERN_TABLECFG_PERFORMANCETEST_ENABLED==true
+#include "OTCore/PerformanceTests.h"
+#define OT_INTERN_TABLECFG_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_tablecfg_lcl_performancetest, "TableCfg " ___testText)
+#else
+#define OT_INTERN_TABLECFG_PERFORMANCE_TEST(___testText)
+#endif
+
 namespace ot::TableHeaderModeNames{
 	const std::string ModeNameHorizontal = "First row";
 	const std::string ModeNameVertical = "First column";
@@ -44,6 +53,7 @@ ot::TableCfg::TableCfg(int _rows, int _columns, WidgetViewBase _baseInfo)
 ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::TableHeaderMode _headerMode)
 	: WidgetViewBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable), m_rows(_matrix.getNumberOfRows()), m_columns(_matrix.getNumberOfColumns())
 {
+	OT_INTERN_TABLECFG_PERFORMANCE_TEST("GenericDataStructMatrix constructor");
 	MatrixEntryPointer matrixPointer;
 	ot::VariableToStringConverter converter;
 
@@ -126,6 +136,8 @@ ot::TableCfg& ot::TableCfg::operator = (const TableCfg& _other) {
 }
 
 void ot::TableCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	OT_INTERN_TABLECFG_PERFORMANCE_TEST("Export");
+
 	WidgetViewBase::addToJsonObject(_object, _allocator);
 
 	_object.AddMember("Rows", m_rows, _allocator);
@@ -168,6 +180,8 @@ void ot::TableCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _a
 }
 
 void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
+	OT_INTERN_TABLECFG_PERFORMANCE_TEST("Import");
+
 	WidgetViewBase::setFromJsonObject(_object);
 
 	this->clear();
@@ -216,6 +230,8 @@ void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 }
 
 void ot::TableCfg::clear(void) {
+	OT_INTERN_TABLECFG_PERFORMANCE_TEST("Clear");
+
 	// Clear data
 	for (TableHeaderItemCfg* itm : m_rowHeader) {
 		if (itm) delete itm;
@@ -291,6 +307,7 @@ void ot::TableCfg::initialize(void) {
 
 void ot::TableCfg::initialize(int _rows, int _columns)
 {
+	OT_INTERN_TABLECFG_PERFORMANCE_TEST("Initialize");
 	m_rows = _rows;
 	m_columns = _columns;
 	this->initialize();
