@@ -103,11 +103,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
     GLOBAL.set(lib_path.to_string());
 	
     // creating path to file which will be downloaded depending on if it is an enduser or a developer machine
-    let installer_path: String = if option_env!("OPENTWIN_DEV_ROOT").is_some() {
-        env!("OPENTWIN_DEV_ROOT").to_owned() + "/Deployment/FrontendInstaller/Install_OpenTwin_Frontend.exe"
-    } else {
-        std::env::current_exe()?.parent().expect("Unable to determine path.").join("FrontendInstaller").join("Install_OpenTwin_Frontend.exe").display().to_string()
-    };
+    let mut installer_path: String = std::env::current_exe()?.parent().expect("Unable to determine path.").join("FrontendInstaller").join("Install_OpenTwin_Frontend.exe").display().to_string();
+
+    if !(Path::new(&installer_path).exists()) {
+        installer_path = env!("OPENTWIN_DEV_ROOT").to_owned() + "/Deployment/FrontendInstaller/Install_OpenTwin_Frontend.exe";
+    }
+
     let dll_file_name = Path::new(GLOBAL.get()).file_name().unwrap().to_str();
     let service_name = Path::new(dll_file_name.unwrap()).file_stem().unwrap().to_str();
 
