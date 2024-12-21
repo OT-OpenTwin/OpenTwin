@@ -52,8 +52,7 @@ void GlobalSessionService::deleteInstance(void) {
 // Service handling
 
 bool GlobalSessionService::addSessionService(LocalSessionService& _service) {
-	// LOCK
-	m_mapMutex.lock();
+	std::lock_guard<std::mutex> lock(m_mapMutex);
 
 	// Check URL duplicate
 	for (auto it : m_sessionServiceIdMap) {
@@ -61,8 +60,6 @@ bool GlobalSessionService::addSessionService(LocalSessionService& _service) {
 			OT_LOG_W("Session with the url (" + _service.url() + ") is already registered");
 			OTAssert(0, "Session url already registered");
 			_service.setId(it.second->id());
-			// UNLOCK
-			m_mapMutex.unlock();
 			return true;
 		}
 	}
@@ -89,9 +86,6 @@ bool GlobalSessionService::addSessionService(LocalSessionService& _service) {
 		worker.detach();
 	}
 
-	// UNLOCK
-	m_mapMutex.unlock();
-
 	return true;
 }
 
@@ -115,7 +109,7 @@ std::string GlobalSessionService::handleCreateSession(ot::JsonDocument& _doc) {
 	std::string sessionID = ot::json::getString(_doc, OT_ACTION_PARAM_SESSION_ID);
 	std::string userName = ot::json::getString(_doc, OT_ACTION_PARAM_USER_NAME);
 
-	m_mapMutex.lock();
+	std::lock_guard<std::mutex> lock(m_mapMutex);
 
 	// Check if the session already exists
 	auto it = m_sessionToServiceMap.find(sessionID);
@@ -123,30 +117,21 @@ std::string GlobalSessionService::handleCreateSession(ot::JsonDocument& _doc) {
 
 		// Check if the username differs
 		if (it->second->getSessionById(sessionID)->userName() != userName) {
-			m_mapMutex.unlock();
-
 			OT_LOG_W("Session opened by other user");
 			OTAssert(0, "Session open by other user");
 			return OT_ACTION_RETURN_INDICATOR_Error "Session open by other user";
 		}
 		else {
-			m_mapMutex.unlock();
-
 			return it->second->url();
 		}
 	}
 	else {
 		LocalSessionService* ss = leastLoadedSessionService();
 		if (ss) {
-			m_mapMutex.unlock();
-
 			OT_LOG_D("Session service @ " + ss->url() + " with id=" + std::to_string(ss->id()) + " provided for session with id=" + sessionID);
-
 			return ss->url();
 		}
 		else {
-			m_mapMutex.unlock();
-
 			OT_LOG_E("No session service connected");
 			OTAssert(0, "No session service connected");
 			return OT_ACTION_RETURN_INDICATOR_Error "No session service connected";
@@ -157,16 +142,14 @@ std::string GlobalSessionService::handleCreateSession(ot::JsonDocument& _doc) {
 std::string GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument& _doc) {
 	std::string projectName = ot::json::getString(_doc, OT_ACTION_PARAM_PROJECT_NAME);
 
-	m_mapMutex.lock();
+	std::lock_guard<std::mutex> lock(m_mapMutex);
 
 	//todo: replace response by a document
 	auto it = m_sessionToServiceMap.find(projectName);
 	if (it == m_sessionToServiceMap.end()) {
-		m_mapMutex.unlock();
 		return std::string();
 	}
 	else {
-		m_mapMutex.unlock();
 		return it->second->getSessionById(projectName)->userName();
 	}
 }
@@ -342,7 +325,7 @@ std::string GlobalSessionService::handleRegisterSessionService(ot::JsonDocument&
 std::string GlobalSessionService::handleShutdownSession(ot::JsonDocument& _doc) {
 	std::string sessionID = ot::json::getString(_doc, OT_ACTION_PARAM_SESSION_ID);
 
-	m_mapMutex.lock();
+	std::lock_guard<std::mutex> lock(m_mapMutex);
 
 	auto it = m_sessionToServiceMap.find(sessionID);
 	if (it != m_sessionToServiceMap.end()) {
@@ -350,8 +333,6 @@ std::string GlobalSessionService::handleShutdownSession(ot::JsonDocument& _doc) 
 		ss->removeSession(ss->getSessionById(sessionID));
 		m_sessionToServiceMap.erase(sessionID);
 	}
-
-	m_mapMutex.unlock();
 
 	OT_LOG_D("Session was closed (ID = \"" + sessionID + "\")");
 
@@ -391,13 +372,13 @@ std::string GlobalSessionService::handleNewGlobalDirectoryService(ot::JsonDocume
 	lssDoc.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_globalDirectoryUrl, lssDoc.GetAllocator()), lssDoc.GetAllocator());
 
 	// Notify connected Local Session Services
-	m_mapMutex.lock();
+	std::lock_guard<std::mutex> lock(m_mapMutex);
+
 	std::string response;
 	for (auto ss : m_sessionServiceIdMap) {
 		if (!ot::msg::send("", ss.second->url(), ot::EXECUTE, lssDoc.toJson(), response)) {
 			assert(0);
 			OT_LOG_E("Failed to send message to Local Session Service (url = " + ss.second->url() + ")");
-			m_mapMutex.unlock();
 			return OT_ACTION_RETURN_INDICATOR_Error "Failed to send message to Local Session Service (url = " + ss.second->url() + ")";
 		}
 		if (response != OT_ACTION_RETURN_VALUE_OK) {
@@ -405,8 +386,7 @@ std::string GlobalSessionService::handleNewGlobalDirectoryService(ot::JsonDocume
 			OT_LOG_E("Invalid response from LSS (url = " + ss.second->url() + "): " + response);
 		}
 	}
-	m_mapMutex.unlock();
-
+	
 	return OT_ACTION_RETURN_VALUE_OK;
 }
 
@@ -470,7 +450,8 @@ void GlobalSessionService::healthCheck() {
 		}
 		m_forceHealthCheck = false;
 		if (m_healthCheckRunning) {
-			m_mapMutex.lock();
+			std::lock_guard<std::mutex> lock(m_mapMutex);
+
 			bool running{ true };
 			// Use running in case of a disconnected service
 			while (running) {
@@ -510,7 +491,6 @@ void GlobalSessionService::healthCheck() {
 					}
 				}
 			}
-			m_mapMutex.unlock();
 		}
 	}
 }
