@@ -35,3 +35,7 @@
 #define OT_DECL_DEPRECATED(___message) __attribute__((deprecated))
 
 #endif
+
+//! \def OT_UNUSED
+//! \brief Avoid "warning C4101: unreferenced local variable".
+#define OT_UNUSED(___unusedVariable) (void)(___unusedVariable);

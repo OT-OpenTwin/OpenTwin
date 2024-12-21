@@ -265,6 +265,8 @@ void ot::LogDispatcher::dispatch(const LogMessage& _message) {
 			OTAssert(0, "Error occured while dispatching log message");
 #ifdef _DEBUG
 			std::cerr << "Dispatch error: " << _e.what() << std::endl;
+#else
+			OT_UNUSED(_e);
 #endif // _DEBUG
 
 		}
