@@ -78,7 +78,7 @@ bool initializeOpenGL(void) {
 			"At least OpenGL version 2.0.0 is required.\n\n"
 			"You may use software rendering by renaming the file opengl32sw.dll to opengl32.dll in the installation directory.";
 
-		OT_LOG_E(errorString);
+		//OT_LOG_E(errorString);  This does not worl if OpenGL is not properly initialized due to the HTML styling
 		QMessageBox msgBox(QMessageBox::Critical, "OpenGL error", QString::fromStdString(errorString), QMessageBox::Ok);
 		msgBox.exec();
 		return false;
@@ -175,7 +175,7 @@ int main(int _argc, char *_argv[])
 		// Initialize
 
 		initializeLogging();
-		
+
 		QApplication* app = initializeQt(_argc, _argv);
 		
 		initializeAppBase();
