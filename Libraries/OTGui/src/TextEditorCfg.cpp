@@ -6,6 +6,15 @@
 // OpenTwin header
 #include "OTGui/TextEditorCfg.h"
 
+#define OT_INTERN_TEXTEDITORCFG_PERFORMANCETEST_ENABLED false
+
+#if OT_INTERN_TEXTEDITORCFG_PERFORMANCETEST_ENABLED==true
+#include "OTCore/PerformanceTests.h"
+#define OT_INTERN_TEXTEDITORCFG_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_texteditor_lcl_performancetest, "TextEditorCfg " ___testText)
+#else
+#define OT_INTERN_TEXTEDITORCFG_PERFORMANCE_TEST(___testText)
+#endif
+
 ot::TextEditorCfg::TextEditorCfg() 
 	: WidgetViewBase(WidgetViewBase::ViewText, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable), m_syntax(DocumentSyntax::PlainText)
 {}
@@ -29,6 +38,8 @@ ot::TextEditorCfg& ot::TextEditorCfg::operator = (const TextEditorCfg& _other) {
 }
 
 void ot::TextEditorCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	OT_INTERN_TEXTEDITORCFG_PERFORMANCE_TEST("Export");
+
 	WidgetViewBase::addToJsonObject(_object, _allocator);
 
 	_object.AddMember("Text", JsonString(m_text, _allocator), _allocator);
@@ -36,6 +47,8 @@ void ot::TextEditorCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 }
 
 void ot::TextEditorCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
+	OT_INTERN_TEXTEDITORCFG_PERFORMANCE_TEST("Import");
+
 	WidgetViewBase::setFromJsonObject(_object);
 	
 	m_text = json::getString(_object, "Text");
