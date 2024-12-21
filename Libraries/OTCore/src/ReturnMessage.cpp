@@ -2,14 +2,6 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logger.h"
 
-namespace ot {
-	namespace intern {
-		void setReturnMessageFromJson(ReturnMessage& _msg, const JsonDocument& _doc) {
-			_msg.setFromJsonObject(_doc.GetObject());
-		}
-	}
-}
-
 std::string ot::ReturnMessage::statusToString(ot::ReturnMessage::ReturnMessageStatus _status) {
 	switch (_status)
 	{
@@ -31,7 +23,7 @@ ot::ReturnMessage::ReturnMessageStatus ot::ReturnMessage::stringToStatus(const s
 }
 
 ot::ReturnMessage ot::ReturnMessage::fromJson(const std::string& _json) {
-	ReturnMessage msg(ot::ReturnMessage::Ok);
+	ReturnMessage msg(ot::ReturnMessage::Failed);
 	if (_json.empty()) { return msg; }
 
 	JsonDocument doc;
@@ -42,19 +34,16 @@ ot::ReturnMessage ot::ReturnMessage::fromJson(const std::string& _json) {
 
 	if (doc.IsObject()) {
 		try {
-			intern::setReturnMessageFromJson(msg, doc);
+			msg.setFromJsonObject(doc.GetConstObject());
 		}
 		catch (const std::exception& _e) {
-			msg = ot::ReturnMessage::Failed;
 			msg = "Failed to deserialize return message \"" + _json + "\" with error: "  + std::string(_e.what());
 		}
 		catch (...) {
-			msg = ot::ReturnMessage::Failed;
 			msg = "Failed to deserialize return message \"" + _json + "\": Unknown error";
 		}
 	}
 	else {
-		msg = ot::ReturnMessage::Failed;
 		msg = "Failed to deserialize return message \"" + _json + "\": Invalid format";
 	}
 	return msg;
@@ -153,8 +142,8 @@ void ot::ReturnMessage::addToJsonObject(JsonValue& _object, JsonAllocator& _allo
 void ot::ReturnMessage::setFromJsonObject(const ConstJsonObject& _object) {
 	m_what = json::getString(_object, "What");
 	m_status = stringToStatus(json::getString(_object, "Status"));
-		if(_object.HasMember("Values"))
-	{
+	
+	if(_object.HasMember("Values")) {
 		const auto& temp = _object["Values"];
 		m_values.setFromJsonObject(temp.GetObject());
 	}
