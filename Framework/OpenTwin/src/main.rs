@@ -106,7 +106,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
     let installer_path: String = if option_env!("OPENTWIN_DEV_ROOT").is_some() {
         env!("OPENTWIN_DEV_ROOT").to_owned() + "/Deployment/FrontendInstaller/Install_OpenTwin_Frontend.exe"
     } else {
-        std::env::current_exe().unwrap().to_str().unwrap().to_string() + "/FrontendInstaller/Install_OpenTwin_Frontend.exe"
+        std::env::current_exe()?.parent().expect("Unable to determine path.").join("FrontendInstaller").join("Install_OpenTwin_Frontend.exe").display().to_string()
     };
     let dll_file_name = Path::new(GLOBAL.get()).file_name().unwrap().to_str();
     let service_name = Path::new(dll_file_name.unwrap()).file_stem().unwrap().to_str();
