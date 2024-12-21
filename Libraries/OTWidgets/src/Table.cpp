@@ -46,7 +46,7 @@ ot::Table::~Table() {
 void ot::Table::setupFromConfig(const TableCfg& _config) {
 	OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Total");
 
-	bool tmp = this->signalsBlocked();
+	bool thisBlocked = this->signalsBlocked();
 	this->blockSignals(true);
 
 	{
@@ -65,6 +65,8 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 
 	// Initialize data
 	QAbstractItemModel* dataModel = this->model();
+	bool dataModelBlocked = dataModel->signalsBlocked();
+	dataModel->blockSignals(true);
 
 	{
 		OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Set data");
@@ -101,8 +103,9 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 	else {
 		m_resizeRequired = true;
 	}
-	
-	this->blockSignals(tmp);
+
+	dataModel->blockSignals(dataModelBlocked);
+	this->blockSignals(thisBlocked);
 }
 
 ot::TableCfg ot::Table::createConfig(void) const {
