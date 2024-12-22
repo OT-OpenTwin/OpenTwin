@@ -23,8 +23,10 @@ ot::ReturnMessage::ReturnMessageStatus ot::ReturnMessage::stringToStatus(const s
 }
 
 ot::ReturnMessage ot::ReturnMessage::fromJson(const std::string& _json) {
+	if (_json.empty()) {
+		return ReturnMessage(ot::ReturnMessage::Ok);
+	}
 	ReturnMessage msg(ot::ReturnMessage::Failed);
-	if (_json.empty()) { return msg; }
 
 	JsonDocument doc;
 	if (!doc.fromJson(_json)) {
