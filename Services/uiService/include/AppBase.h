@@ -77,14 +77,13 @@ namespace ot { class NavigationTreeView; }
 namespace ot { class AbstractSettingsItem; }
 namespace ot { class VersionGraphManagerView; }
 
-struct structModelViewInfo
-{
+struct structModelViewInfo {
 	ViewerUIDtype	view;
 	ModelUIDtype	model;
 };
 
 //! The API manager is used to manage the global objects required for this API to work
-class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier, ot::AbstractLogNotifier, ot::MessageBoxHandler {
+class AppBase : public QObject, public ot::ServiceBase, public ak::aWindowEventHandler, public ak::aNotifier, public ot::AbstractLogNotifier, public ot::MessageBoxHandler {
 	Q_OBJECT
 public:
 	enum class ViewHandlingConfig : uint32_t {
@@ -120,43 +119,20 @@ public:
 
 	// Component functions
 
-	//! @brief Will set the uid of this wrapper
-	//! @param _uid The UID to set
-	void setUiServiceUID(
-		ak::UID					_uid
-	);
+	void setUiServiceUID(ak::UID _uid) { m_uid = _uid; };
+	ak::UID getUiServiceUID(void) const { return m_uid; }
 
-	//! @brief Will set the uid of the viewer
-	//! @param _uid The UID to set
-	void setViewerUID(
-		ak::UID					_uid
-	);
+	void setViewerUID(ak::UID _uid) { m_viewerUid = _uid; };
+	ak::UID getViewerUID(void) const { return m_viewerUid; };
 
-	//! @brief Will set the uid of the model
-	//! @param _uid The UID to set
-	void setModelUID(
-		ak::UID					_uid
-	);
+	void setModelUID(ak::UID _uid) { m_modelUid = _uid; };
+	ak::UID getModelUID(void) const { return m_modelUid; };
 
-	//! @brief Will return the UID of this wrapper
-	ak::UID getUiServiceUID(void) const;
-
-	//! @brief Will return the UID of the viewer
-	ak::UID getViewerUID(void) const;
-
-	//! @brief Will return the UID of the model
-	ak::UID getModelUID(void) const;
-
-	//! @brief Will return the ViewerComponent of this uiService
-	ViewerComponent * getViewerComponent(void) const;
-
-	//! @brief Will return the ExternalServicesComponent of this uiService
-	ExternalServicesComponent * getExternalServicesComponent(void) const;
+	ViewerComponent* getViewerComponent(void) const { return m_viewerComponent; };
+	ExternalServicesComponent* getExternalServicesComponent(void) const { return m_ExternalServicesComponent; };
 
 	//! @brief Will set the current project as modified and apply UI changes
-	void setCurrentProjectIsModified(
-		bool								_isModified = true
-	);
+	void setCurrentProjectIsModified(bool _isModified = true);
 
 	//! @brief Will get the current project as modified state
 	bool getCurrentProjectIsModified(void) const;
@@ -187,19 +163,11 @@ public:
 	//! @param _info1 Message addition 1
 	//! @param _info2 Message addition 2
 	//! @throw sim::Exception to forward exceptions coming from the application core class
-	virtual void notify(
-		ak::UID					_senderId,
-		ak::eventType			_eventType,
-		int						_info1,
-		int						_info2
-	) override;
+	virtual void notify(ak::UID _senderId, ak::eventType _eventType, int _info1, int _info2) override;
 
 	virtual bool closeEvent(void) override;
 
-	bool createNewProjectInDatabase(
-		const QString &					_projectName,
-		const QString &					_projectType
-	);
+	bool createNewProjectInDatabase(const QString& _projectName, const QString & _projectType);
 
 public:
 
@@ -223,19 +191,11 @@ public:
 
 	bool debug(void) const;
 
-	void setDebugOutputUid(ak::UID _uid);
-
-	void registerSession(
-		const std::string &				_projectName,
-		const std::string &				_collectionName
-	);
+	void registerSession(const std::string& _projectName, const std::string& _collectionName);
 
 	ModelUIDtype createModel();
 
-	ViewerUIDtype createView(
-		ModelUIDtype					_modelUID,
-		const std::string &				_projectName
-	);
+	ViewerUIDtype createView(ModelUIDtype _modelUID, const std::string& _projectName);
 
 	void setCurrentVisualizationTabFromEntityName(const std::string& _entityName, ot::WidgetViewBase::ViewType _viewType);
 	void setCurrentVisualizationTabFromTitle(const std::string& _tabTitle);
@@ -316,7 +276,6 @@ public:
 	void updateLogIntensityInfo(void);
 
 public Q_SLOTS:
-
 	void lockUI(bool flag);
 	void refreshWelcomeScreen(void);
 	void lockSelectionAndModification(bool flag);
@@ -329,9 +288,7 @@ public Q_SLOTS:
 
 public:
 
-	QString availableTabText(
-		const QString &				_initialTabText
-	);
+	QString availableTabText(const QString& _initialTabText);
 
 	ToolBar * getToolBar(void) const { return m_ttb; }
 
@@ -463,7 +420,6 @@ public:
 	ot::MessageDialogCfg::BasicButton showPrompt(const std::string& _message, const std::string& _title, ot::MessageDialogCfg::BasicIcon _icon, const ot::MessageDialogCfg::BasicButtons& _buttons);
 
 public Q_SLOTS:
-
 	void showInfoPrompt(const std::string& _message, const std::string& _title);
 
 	void showWarningPrompt(const std::string& _message, const std::string& _title);

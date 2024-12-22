@@ -141,8 +141,8 @@ static AppBase	*	g_app{ nullptr };	//! The API manager
 
 // #####################################################################################################################################################
 
-AppBase::AppBase()
-	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_UI, OT_INFO_SERVICE_TYPE_UI),
+AppBase::AppBase() :
+	ot::ServiceBase(OT_INFO_SERVICE_TYPE_UI, OT_INFO_SERVICE_TYPE_UI),
 	m_isInitialized(false),
 	m_appIsRunning(false),
 	m_uid(invalidUID),
@@ -304,31 +304,7 @@ std::shared_ptr<QSettings> AppBase::createSettingsInstance(void) const {
 
 // Component functions
 
-void AppBase::setUiServiceUID(
-	UID					_uid
-) { m_uid = _uid; }
-
-void AppBase::setViewerUID(
-	UID					_uid
-) { m_viewerUid = _uid; }
-
-void AppBase::setModelUID(
-	UID					_uid
-) { m_modelUid = _uid; }
-
-UID AppBase::getUiServiceUID(void) const { return m_uid; }
-
-UID AppBase::getViewerUID(void) const { return m_viewerUid; }
-
-UID AppBase::getModelUID(void) const { return m_modelUid; }
-
-ViewerComponent * AppBase::getViewerComponent(void) const { return m_viewerComponent; }
-
-ExternalServicesComponent * AppBase::getExternalServicesComponent(void) const { return m_ExternalServicesComponent; }
-
-void AppBase::setCurrentProjectIsModified(
-	bool								_isModified
-) {
+void AppBase::setCurrentProjectIsModified(bool _isModified) {
 	assert(m_currentProjectName.length());	// No project is open
 	QString title(m_currentProjectName.c_str());
 	if (_isModified) {
@@ -352,10 +328,12 @@ aWindow * AppBase::mainWindow(void) {
 }
 
 ControlsManager * AppBase::controlsManager(void) {
+	OTAssertNullptr(m_ExternalServicesComponent);
 	return m_ExternalServicesComponent->controlsManager();
 }
 
 LockManager * AppBase::lockManager(void) {
+	OTAssertNullptr(m_ExternalServicesComponent);
 	return m_ExternalServicesComponent->lockManager();
 }
 
@@ -381,12 +359,7 @@ void AppBase::log(const ot::LogMessage& _message) {
 	}
 }
 
-void AppBase::notify(
-	UID					_senderId,
-	eventType			_eventType,
-	int						_info1,
-	int						_info2
-) {
+void AppBase::notify(UID _senderId, eventType _eventType, int _info1, int _info2) {
 	try {
 		// Main window
 		if (_senderId == m_mainWindow) {
@@ -464,10 +437,7 @@ bool AppBase::closeEvent() {
 	return true;
 }
 
-bool AppBase::createNewProjectInDatabase(
-	const QString& _projectName,
-	const QString& _projectType
-) {
+bool AppBase::createNewProjectInDatabase(const QString& _projectName, const QString& _projectType) {
 	ProjectManagement pManager(m_loginData);
 
 	assert(pManager.InitializeConnection()); // Failed to connect
@@ -965,10 +935,7 @@ void AppBase::setDebug(bool _debug) { m_isDebug = _debug; }
 
 bool AppBase::debug(void) const { return m_isDebug; }
 
-void AppBase::registerSession(
-	const std::string &				_projectName,
-	const std::string &				_collectionName
-) {
+void AppBase::registerSession(const std::string& _projectName, const std::string& _collectionName) {
 
 }
 
@@ -979,12 +946,8 @@ ModelUIDtype AppBase::createModel() {
 	return view;
 }
 
-ViewerUIDtype AppBase::createView(
-	ModelUIDtype					_modelUID,
-	const std::string &				_projectName
-) {
+ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _projectName) {
 	// Get DPI Ratio
-	
 	int DPIRatio = uiAPI::window::devicePixelRatio();
 
 	ot::Color col(255, 255, 255);
@@ -1323,9 +1286,7 @@ void AppBase::setProgressBarValue(int progressPercentage)
 	uiAPI::window::setStatusProgressValue(m_mainWindow, progressPercentage);
 }
 
-QString AppBase::availableTabText(
-	const QString &				_initialTabText
-) {
+QString AppBase::availableTabText(const QString& _initialTabText) {
 	if (!ot::WidgetViewManager::instance().getViewTitleExists(_initialTabText.toStdString())) {
 		return _initialTabText;
 	}
