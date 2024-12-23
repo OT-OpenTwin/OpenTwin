@@ -180,6 +180,9 @@ REM Fonts
 MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\fonts"
 XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\Fonts" "%OPENTWIN_FRONTEND_DEPLOYMENT%\fonts"
 
+REM OpenGL Software Rendering
+COPY "%OPENTWIN_THIRDPARTY_ROOT%\MesaOpenGL\*.*" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
+
 REM ==========================================
 REM Copy OpenTwin build files
 REM ==========================================
@@ -242,6 +245,7 @@ COPY "%OT_VIEWER_ROOT%\%OT_DLLR%\Viewer.dll" "%OPENTWIN_FRONTEND_DEPLOYMENT%"
 REM Certificates
 MKDIR "%OPENTWIN_FRONTEND_DEPLOYMENT%\Certificates"
 COPY "%OT_ENCRYPTIONKEY_ROOT%\ca.pem" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Certificates"
+COPY "%OT_ENCRYPTIONKEY_ROOT%\certificateKeyFile.pem" "%OPENTWIN_FRONTEND_DEPLOYMENT%\Certificates"
 
 ECHO [Paths] > "%OPENTWIN_FRONTEND_DEPLOYMENT%\qt.conf"
 ECHO Plugins = .\\plugins >> "%OPENTWIN_FRONTEND_DEPLOYMENT%\qt.conf"
