@@ -187,6 +187,7 @@
     <ClCompile Include="src\WidgetViewManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTWidgets\SignalBlockWrapper.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewDockManager.h" />
     <QtMoc Include="include\OTWidgets\ApplicationPropertiesManager.h" />
     <ClInclude Include="include\OTWidgets\AbstractPlot.h" />

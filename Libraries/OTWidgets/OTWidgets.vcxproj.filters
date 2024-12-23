@@ -806,6 +806,9 @@
     <ClInclude Include="include\OTWidgets\PropertyInputStringList.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTWidgets\SignalBlockWrapper.h">
+      <Filter>include\General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\OTWidgets\GraphicsScene.h">
