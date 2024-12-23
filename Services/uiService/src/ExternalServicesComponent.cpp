@@ -176,6 +176,7 @@ namespace ot {
 
 ExternalServicesComponent::ExternalServicesComponent(AppBase * _owner) :
 	m_websocket{ nullptr },
+	m_keepAliveTimer { nullptr },
 	m_isRelayServiceRequired{ false },
 	m_controlsManager{ nullptr },
 	m_lockManager{ nullptr },
@@ -1327,6 +1328,11 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 		ot::startSessionServiceHealthCheck(m_sessionServiceURL);
 #endif // OT_USE_GSS
 
+		assert(m_keepAliveTimer == nullptr);
+		m_keepAliveTimer = new QTimer(this);
+		connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAlive()));
+		m_keepAliveTimer->start(120000);
+
 		uiLock.setNoUnlock();
 
 		OT_LOG_D("Open project completed");
@@ -1411,6 +1417,14 @@ void ExternalServicesComponent::closeProject(bool _saveChanges) {
 		// Stop the session service health check
 		ot::stopSessionServiceHealthCheck();
 #endif // OT_USE_GSS
+
+		if (m_keepAliveTimer != nullptr)
+		{
+			m_keepAliveTimer->stop();
+			delete m_keepAliveTimer;
+
+			m_keepAliveTimer = nullptr;
+		}
 
 		QEventLoop eventLoop;
 		//eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
@@ -4246,6 +4260,22 @@ void ExternalServicesComponent::makeWidgetViewCurrentWithoutInputFocus(ot::Widge
 	_view->setAsCurrentViewTab();
 
 	ot::WidgetViewManager::instance().setConfigFlags(managerFlags);
+}
+
+void ExternalServicesComponent::keepAlive()
+{
+	// The keep alive signal is necessary, since a remote firewall will usually close the connection in case of 
+	// inactivity of about 10 minutes.
+
+	if (m_websocket != nullptr)
+	{
+		ot::JsonDocument pingDoc;
+		pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
+		std::string ping = pingDoc.toJson();
+
+		std::string response;
+		sendToModelService(ping, response);
+	}
 }
 
 // ###################################################################################################

@@ -28,6 +28,7 @@
 
 // Qt header
 #include <qobject.h>				// QObject
+#include <qtimer.h>
 #include <qmetatype.h>
 #include <qmetaobject.h>				// QMetaObject
 
@@ -353,6 +354,7 @@ public Q_SLOTS:
 	void showError(const char* message);
 	void showInformation(const char* message);
 	void activateModelVersion(const char* version);
+	void keepAlive();
 
 private:
 	// ###################################################################################################
@@ -410,6 +412,7 @@ private:
 	std::string										m_uiRelayServiceHTTP;
 	std::string										m_uiRelayServiceWS;
 	WebsocketClient *								m_websocket;
+	QTimer*											m_keepAliveTimer;
 
 	bool											m_prefetchingDataCompleted;
 	bool                                            m_servicesUiSetupCompleted;
