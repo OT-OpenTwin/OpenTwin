@@ -38,7 +38,7 @@ void ot::ServiceLogNotifier::setLoggingServiceURL(const std::string& _url) {
 		JsonDocument pingDoc;
 		pingDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_Ping, pingDoc.GetAllocator());
 		std::string response;
-		if (ot::msg::send("", _url, ot::EXECUTE, pingDoc.toJson(), response, 3000, false, false)) {
+		if (ot::msg::send("", _url, ot::EXECUTE_ONE_WAY_TLS, pingDoc.toJson(), response, 3000, false, false)) {
 			if (response == OT_ACTION_CMD_Ping) {
 				m_loggingServiceURL = _url;
 			}
