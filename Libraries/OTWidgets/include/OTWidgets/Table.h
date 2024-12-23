@@ -62,11 +62,12 @@ namespace ot {
 		void slotResizeColumnToContent(int _column);
 		void slotRestoreRowSize(int _row);
 		void slotResizeRowToContent(int _row);
-
+		
 	private:
 		void ini(void);
 		void resizeColumnsToContentIfNeeded(void);
 		void resizeRowsToContentIfNeeded(void);
+		void setResizeRequired(void);
 
 		bool m_stopResizing;
 		bool m_resizeRequired;

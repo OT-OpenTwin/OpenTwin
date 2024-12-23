@@ -8,6 +8,7 @@
 #include "OTWidgets/Table.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/TableItemDelegate.h"
+#include "OTWidgets/SignalBlockWrapper.h"
 
 // Qt header
 #include <QtCore/qtimer.h>
@@ -46,8 +47,7 @@ ot::Table::~Table() {
 void ot::Table::setupFromConfig(const TableCfg& _config) {
 	OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Total");
 
-	bool thisBlocked = this->signalsBlocked();
-	this->blockSignals(true);
+	SignalBlockWrapper blocker(this);
 
 	{
 		OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Clear");
@@ -63,23 +63,9 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 		this->setColumnCount(_config.getColumnCount());
 	}
 
-	// Initialize data
-	QAbstractItemModel* dataModel = this->model();
-	bool dataModelBlocked = dataModel->signalsBlocked();
-	dataModel->blockSignals(true);
-
-	{
-		OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Set data");
-		for (int r = 0; r < _config.getRowCount(); r++) {
-			for (int c = 0; c < _config.getColumnCount(); c++) {
-				dataModel->setData(dataModel->index(r, c), QString::fromStdString(_config.getCellText(r, c)));
-			}
-		}
-	}
-
 	// Initialize Header
 	{
-		OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Set header");
+		OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Set vertical header");
 		QHeaderView* header = this->verticalHeader();
 		for (int r = 0; r < _config.getRowCount(); r++) {
 			const TableHeaderItemCfg* headerItem = _config.getRowHeader(r);
@@ -87,8 +73,10 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 				this->setVerticalHeaderItem(r, new QTableWidgetItem(QString::fromStdString(headerItem->getText())));
 			}
 		}
-
-		header = this->horizontalHeader();
+	}
+	{
+		OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Set horizontal header");
+		QHeaderView* header = this->horizontalHeader();
 		for (int c = 0; c < _config.getColumnCount(); c++) {
 			const TableHeaderItemCfg* headerItem = _config.getColumnHeader(c);
 			if (headerItem) {
@@ -97,15 +85,23 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 		}
 	}
 
-	if (this->isVisible()) {
-		this->resizeColumnsToContentIfNeeded();
-	}
-	else {
-		m_resizeRequired = true;
+	// Initialize data
+	{
+		OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Set data");
+		QAbstractItemModel* dataModel = this->model();
+		SignalBlockWrapper blocker(dataModel);
+
+		int rows = _config.getRowCount();
+		int columns = _config.getColumnCount();
+
+		for (int r = 0; r < rows; r++) {
+			for (int c = 0; c < columns; c++) {
+				dataModel->setData(dataModel->index(r, c), QString::fromStdString(_config.getCellText(r, c)));
+			}
+		}
 	}
 
-	dataModel->blockSignals(dataModelBlocked);
-	this->blockSignals(thisBlocked);
+	this->setResizeRequired();
 }
 
 ot::TableCfg ot::Table::createConfig(void) const {
@@ -155,12 +151,11 @@ void ot::Table::setSelectedCellsBackground(const ot::Color& _color) {
 }
 
 void ot::Table::setSelectedCellsBackground(const QColor& _color) {
-	bool blocked = this->signalsBlocked();
-	this->blockSignals(true);
+	SignalBlockWrapper blocker(this);
+	
 	for (QTableWidgetItem* item : this->selectedItems()) {
 		item->setBackground(QBrush(_color));
 	}
-	this->blockSignals(blocked);
 }
 
 void ot::Table::prepareForDataChange(void) {
@@ -341,4 +336,13 @@ void ot::Table::resizeRowsToContentIfNeeded(void) {
 	// Start resizing
 	m_stopResizing = false;
 	this->slotResizeRowToContent(0);
+}
+
+void ot::Table::setResizeRequired(void) {
+	if (this->isVisible()) {
+		this->resizeColumnsToContentIfNeeded();
+	}
+	else {
+		m_resizeRequired = true;
+	}
 }
