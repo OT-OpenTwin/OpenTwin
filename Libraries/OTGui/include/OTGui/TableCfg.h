@@ -30,9 +30,11 @@ namespace ot {
 		TableCfg(int _rows = 0, int _columns = 0, WidgetViewBase _baseInfo = WidgetViewBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable));
 		TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::TableHeaderMode _headerMode);
 		TableCfg(const TableCfg& _other);
+		TableCfg(TableCfg&& _other) noexcept;
 		virtual ~TableCfg();
 
 		TableCfg& operator = (const TableCfg& _other);
+		TableCfg& operator = (TableCfg&& _other) noexcept;
 
 		//! \brief Add the object contents to the provided JSON object.
 		//! \param _object Json object reference to write the data to.
@@ -50,6 +52,9 @@ namespace ot {
 
 		int getRowCount(void) const { return m_rows; };
 		int getColumnCount(void) const { return m_columns; };
+
+		const std::vector<std::vector<std::string>>& getRows(void) const { return m_data; };
+		const std::vector<std::string>& getRow(int _row) const;
 
 		void setCellText(int _row, int _column, const std::string& _text);
 		const std::string& getCellText(int _row, int _column) const;

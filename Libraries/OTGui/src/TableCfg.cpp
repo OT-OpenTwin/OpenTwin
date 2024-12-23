@@ -94,6 +94,17 @@ ot::TableCfg::TableCfg(const TableCfg& _other)
 	*this = _other;
 }
 
+ot::TableCfg::TableCfg(TableCfg&& _other) noexcept 
+	: WidgetViewBase(_other)
+{
+	m_rows = _other.m_rows;
+	m_columns = _other.m_columns;
+
+	m_rowHeader = std::move(_other.m_rowHeader);
+	m_columnHeader = std::move(_other.m_columnHeader);
+	m_data = std::move(_other.m_data);
+}
+
 ot::TableCfg::~TableCfg() {
 	this->clear();
 }
@@ -135,6 +146,18 @@ ot::TableCfg& ot::TableCfg::operator = (const TableCfg& _other) {
 		}
 	}
 
+	return *this;
+}
+
+ot::TableCfg& ot::TableCfg::operator=(TableCfg&& _other) noexcept {
+	if (this != &_other) {
+		m_rows = _other.m_rows;
+		m_columns = _other.m_columns;
+
+		m_rowHeader = std::move(_other.m_rowHeader);
+		m_columnHeader = std::move(_other.m_columnHeader);
+		m_data = std::move(_other.m_data);
+	}
 	return *this;
 }
 
@@ -250,6 +273,11 @@ void ot::TableCfg::clear(void) {
 
 	m_rows = 0;
 	m_columns = 0;
+}
+
+const std::vector<std::string>& ot::TableCfg::getRow(int _row) const {
+	OTAssert(_row < m_rows, "Index out of range");
+	return m_data[_row];
 }
 
 void ot::TableCfg::setCellText(int _row, int _column, const std::string& _text) {
