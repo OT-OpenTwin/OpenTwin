@@ -948,12 +948,13 @@ ModelUIDtype AppBase::createModel() {
 
 ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _projectName) {
 	// Get DPI Ratio
-	int DPIRatio = uiAPI::window::devicePixelRatio();
+	
+	double DPIRatio = uiAPI::window::devicePixelRatio();
 
 	ot::Color col(255, 255, 255);
 	ot::Color overlayCol;
 
-	ViewerUIDtype viewID = m_viewerComponent->createViewer(_modelUID, (double)DPIRatio, (double)DPIRatio,
+	ViewerUIDtype viewID = m_viewerComponent->createViewer(_modelUID, DPIRatio, DPIRatio,
 		col.r(), col.g(), col.b(), overlayCol.r(), overlayCol.g(), overlayCol.b());
 
 	//NOTE, in future need to store tab information

@@ -1014,7 +1014,7 @@ namespace ak {
 			);
 
 			//! @brief Will return the device pixel ratio of the currently used device
-			UICORE_API_EXPORT int devicePixelRatio(void);
+			UICORE_API_EXPORT double devicePixelRatio(void);
 
 			//! @brief Will resize the window
 			UICORE_API_EXPORT void resize(

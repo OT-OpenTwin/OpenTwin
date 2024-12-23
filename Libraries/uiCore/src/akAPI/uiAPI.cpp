@@ -940,7 +940,7 @@ void ak::uiAPI::window::setCentralWidgetMinimumSize(
 	int													_height
 ) { object::get<aWindowManager>(_windowUID)->setCentralWidgetMinimumSize(QSize(_width, _height)); }
 
-int ak::uiAPI::window::devicePixelRatio(void) { return m_apiManager.screen()->devicePixelRatio(); }
+double ak::uiAPI::window::devicePixelRatio(void) { return m_apiManager.screen()->devicePixelRatio(); }
 
 void ak::uiAPI::window::resize(
 	UID												_windowUID,
