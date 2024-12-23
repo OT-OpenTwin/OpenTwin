@@ -135,6 +135,8 @@ Section "Program files (Required)"
   
   File /r ..\..\Deployment_Frontend\*.*
   
+  nsExec::Exec 'CMD /C certutil -f -addstore -user root "$InstDir\Certificates\ca.pem"'	
+
   IfSilent "" +2 ; If the installer is silent then we run the executable in a last step
   ExecShell "" "$InstDir\OpenTwin.exe"
   
