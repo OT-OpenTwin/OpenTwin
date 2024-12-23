@@ -6,10 +6,20 @@
 #include "OTCore/String.h"
 #include "OTCore/Logger.h"
 #include "OTCore/EncodingGuesser.h"
+#include "OTCore/PerformanceTests.h"
 #include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 #include "OTCore/EncodingConverter_UTF16ToUTF8.h"
 #include "OTGui/VisualisationTypes.h"
 #include "OTCore/String.h"
+
+#define OT_INTERN_ENTITYFILETEXT_PERFORMANCETEST_ENABLED false
+
+#if OT_INTERN_ENTITYFILETEXT_PERFORMANCETEST_ENABLED==true
+#include "OTCore/PerformanceTests.h"
+#define OT_INTERN_ENTITYFILETEXT_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_entityfiletext_lcl_performancetest, "EntityFileText " ___testText)
+#else
+#define OT_INTERN_ENTITYFILETEXT_PERFORMANCE_TEST(___testText)
+#endif
 
 EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
 	: EntityFile(_ID,_parent,_obs,_ms,_factory,_owner)
@@ -50,7 +60,7 @@ ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding()
 
 std::string EntityFileText::getText(void) 
 {
-	
+	OT_INTERN_ENTITYFILETEXT_PERFORMANCE_TEST("Get text");
 	const std::vector<char> plainData = getData()->getData();
 	std::string textFromBinary(plainData.begin(), plainData.end());
 
@@ -104,6 +114,8 @@ void EntityFileText::setText(const std::string& _text)
 }
 
 ot::TextEditorCfg EntityFileText::createConfig(void) {
+	OT_INTERN_ENTITYFILETEXT_PERFORMANCE_TEST("Create config");
+
 	ot::TextEditorCfg result;
 	result.setEntityName(this->getName());
 	result.setTitle(this->getName());

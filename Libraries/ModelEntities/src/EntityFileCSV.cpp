@@ -3,9 +3,19 @@
 #include "CSVToTableTransformer.h"
 #include "OTCore/String.h"
 #include "OTCore/Logger.h"
+#include "OTCore/PerformanceTests.h"
 #include "OTCommunication/ActionTypes.h"
 #include "CSVProperties.h"
 #include <string>
+
+#define OT_INTERN_ENTITYFILECSV_PERFORMANCETEST_ENABLED false
+
+#if OT_INTERN_ENTITYFILECSV_PERFORMANCETEST_ENABLED==true
+#include "OTCore/PerformanceTests.h"
+#define OT_INTERN_ENTITYFILECSV_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_entityfiletext_lcl_performancetest, "EntityFileCSV " ___testText)
+#else
+#define OT_INTERN_ENTITYFILECSV_PERFORMANCE_TEST(___testText)
+#endif
 
 EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
 : EntityFileText(ID,parent,obs,ms,factory,owner){}
@@ -135,6 +145,8 @@ void EntityFileCSV::readSpecificDataFromDataBase(bsoncxx::document::view & doc_v
 
 const ot::GenericDataStructMatrix EntityFileCSV::getTable()
 {
+	OT_INTERN_ENTITYFILECSV_PERFORMANCE_TEST("Get table");
+
 	CSVProperties properties;
 
 	properties.m_rowDelimiter = ot::String::evaluateEscapeCharacters(getRowDelimiter());
@@ -151,6 +163,8 @@ const ot::GenericDataStructMatrix EntityFileCSV::getTable()
 
 void EntityFileCSV::setTable(const ot::GenericDataStructMatrix& _table)
 {
+	OT_INTERN_ENTITYFILECSV_PERFORMANCE_TEST("Set table");
+
 	CSVProperties properties;
 
 	properties.m_rowDelimiter = ot::String::evaluateEscapeCharacters(getRowDelimiter());
@@ -166,6 +180,7 @@ void EntityFileCSV::setTable(const ot::GenericDataStructMatrix& _table)
 
 ot::TableCfg EntityFileCSV::getTableConfig()
 {
+	OT_INTERN_ENTITYFILECSV_PERFORMANCE_TEST("Get table config");
 	ot::GenericDataStructMatrix matrix = getTable();
 	ot::TableCfg::TableHeaderMode headerMode = getHeaderMode();
 	ot::TableCfg tableCfg(matrix, headerMode);
