@@ -15,6 +15,7 @@ import logo from "../../resources/logo/logo.png";
 
 import AuthenticateAdmin from "../../services/api/AuthorisationService/AuthenticateAdmin/AuthenticateAdmin";
 import GetAuthServiceAddress from "../../services/api/GetServiceAddress/GetAuthServiceAddress";
+import GetGlobalDirServiceAddress from "../../services/api/GetServiceAddress/GetGlobalDirServiceAddress";
 
 export function setUserData(username, password) {
   sessionStorage.setItem("username", JSON.stringify(username));
@@ -65,18 +66,23 @@ const LoginPage = (props) => {
       {
           sessionStorage.setItem("authServiceAddress", address);
 
-          // Check the admin user credentials
-          AuthenticateAdmin({ enteredUsername, enteredPassword }).then((data) => {
-            if (data.successful === true) {
-              setIsSubmitted(true);
-              props.setLoggedIn(true);
-              props.setToken(true);
-            } else if (data.successful === false) {
-              setErrorMessages({ name: "unameOrPassword", message: error });
-            } else {
-              setServerErrPopup(true);
-            }
-          });
+          GetGlobalDirServiceAddress().then((address) => {
+
+            sessionStorage.setItem("globalDirServiceAddress", address);
+
+            // Check the admin user credentials
+            AuthenticateAdmin({ enteredUsername, enteredPassword }).then((data) => {
+              if (data.successful === true) {
+                setIsSubmitted(true);
+                props.setLoggedIn(true);
+                props.setToken(true);
+              } else if (data.successful === false) {
+                setErrorMessages({ name: "unameOrPassword", message: error });
+              } else {
+                setServerErrPopup(true);
+              }
+            });
+          });  
       }
     });
   };

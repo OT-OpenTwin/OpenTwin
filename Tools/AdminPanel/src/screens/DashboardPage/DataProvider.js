@@ -39,7 +39,7 @@ class DataProvider {
         try {
             this.globalServices = await GetGlobalServices(this.globalSessionSericeURL); // Get global services
             this.globalSessionService = await GetInformation(this.globalSessionSericeURL); // Get global session service info
-            this.globalDirectoryService = await GetInformation(this.globalDirectoryService); // Get global directory service info
+            this.globalDirectoryService = await GetInformation(sessionStorage.getItem("globalDirServiceAddress")); // Get global directory service info
         } catch (error) {
             console.error("Error fetching data:", error); // Log any errors
         }
