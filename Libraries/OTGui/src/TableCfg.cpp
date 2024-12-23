@@ -100,6 +100,9 @@ ot::TableCfg::~TableCfg() {
 
 ot::TableCfg& ot::TableCfg::operator = (const TableCfg& _other) {
 	if (this == &_other) return *this;
+
+	OT_INTERN_TABLECFG_PERFORMANCE_TEST("Assignment copy");
+
 	WidgetViewBase::operator=(_other);
 
 	// Clear data
@@ -298,7 +301,7 @@ void ot::TableCfg::initialize(void) {
 	OTAssert(m_columns >= 0, "Index out of range");
 
 	for (int r = 0; r < m_rows; r++) {
-		m_data.push_back(std::vector<std::string>(m_columns, std::string()));
+		m_data.push_back(std::move(std::vector<std::string>(m_columns, std::string())));
 	}
 
 	m_rowHeader = std::move(std::vector<TableHeaderItemCfg*>(m_rows, nullptr));
