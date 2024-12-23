@@ -33,7 +33,7 @@ WebsocketClient::WebsocketClient(const std::string& _socketUrl) :
 	QString caStr = QCoreApplication::applicationDirPath() + "\\Certificates\\ca.pem";
 
 	// Check whether local cert file ca.pem exists
-	if (!QFile::exists("caStr"))
+	if (!QFile::exists(caStr))
 	{
 		// Get the development root environment variable
 		std::cout << "Using development root certificate file" << std::endl;
