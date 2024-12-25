@@ -8,12 +8,16 @@
 // OpenTwin header
 #include "OTGui/VersionGraphVersionCfg.h"
 
+// std header
+#include <list>
+
 namespace ot {
 
 	class OT_GUI_API_EXPORT VersionGraphCfg : public Serializable {
 	public:
 		VersionGraphCfg();
 		VersionGraphCfg(const VersionGraphCfg& _other) = delete;
+		VersionGraphCfg(VersionGraphCfg&& _other) noexcept;
 		virtual ~VersionGraphCfg();
 
 		VersionGraphCfg& operator = (const VersionGraphCfg& _other) = delete;
@@ -45,41 +49,27 @@ namespace ot {
 		//! The first child a version in an active branch belongs to the active branch (after the active branch version, parent versions are handled by the parent).
 		const std::string& getActiveBranchVersionName(void) const { return m_activeBranchVersionName; };
 
-		void setRootVersion(const std::string& _name, const std::string& _label = std::string(), const std::string& _description = std::string());
-		
-		//! \brief Set the provided version as the root version.
-		//! The current root version will be 
-		void setRootVersion(VersionGraphVersionCfg* _version);
-
-		//! \brief Returns the root version.
-		//! The VersionGraphCfg keeps ownership of the version.
-		VersionGraphVersionCfg* getRootVersion(void) { return m_rootVersion; };
-
-		//! \brief Returns the root version.
-		//! The VersionGraphCfg keeps ownership of the version.
-		const VersionGraphVersionCfg* getRootVersion(void) const { return m_rootVersion; };
-
-		//! \brief Returns the version with the given name.
+		//! \brief Returns the version with the given name (Expensive).
 		VersionGraphVersionCfg* findVersion(const std::string& _version);
 
-		//! \brief Returns the version with the given name.
+		//! \brief Returns the version with the given name (Expensive).
 		const VersionGraphVersionCfg* findVersion(const std::string& _version) const;
 
-		//! \brief Returns true if a version with the given name prefix exists in any of the versions.
+		//! \brief Returns true if a version with the given name prefix exists in any of the versions (Expensive).
 		bool versionStartingWithNameExists(const std::string& _prefix);
 
-		//! \brief Removes the version and all of its childs if the version exists.
+		//! \brief Removes the version and all of its childs if the version exists (Expensive).
 		void removeVersion(const std::string& _version);
+
+		const std::list<std::list<VersionGraphVersionCfg>>& getBranches(void) const { return m_branches; };
 
 		//! \breif Clear the version graph.
 		void clear(void);
 
 	private:
-		void addVersionAndChildsToArray(const VersionGraphVersionCfg* _version, JsonArray& _versionsArray, JsonAllocator& _allocator) const;
-
 		std::string m_activeVersionName;
 		std::string m_activeBranchVersionName;
-		VersionGraphVersionCfg* m_rootVersion;
+		std::list<std::list<VersionGraphVersionCfg>> m_branches;
 	};
 
 }

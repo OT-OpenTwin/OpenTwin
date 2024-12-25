@@ -19,19 +19,26 @@ namespace ot {
 
 	class VersionGraphCfg;
 
-	class OT_GUI_API_EXPORT VersionGraphVersionCfg {
+	class OT_GUI_API_EXPORT VersionGraphVersionCfg : public Serializable {
 	public:
 		VersionGraphVersionCfg();
 		VersionGraphVersionCfg(const std::string& _name, const std::string& _label = std::string(), const std::string& _description = std::string());
 		VersionGraphVersionCfg(const VersionGraphVersionCfg& _other);
+		VersionGraphVersionCfg(VersionGraphVersionCfg&& _other) noexcept;
 		virtual ~VersionGraphVersionCfg();
 
 		VersionGraphVersionCfg& operator = (const VersionGraphVersionCfg& _other);
+		VersionGraphVersionCfg& operator = (VersionGraphVersionCfg&& _other) noexcept;
+		
+		//! @brief Returns true if the version name is equal to the provided name.
+		bool operator == (const std::string& _name) const;
 
-		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator, const std::string& _customParentVersion) const;
+		//! @brief Returns true if the version name is not equal to the provided name.
+		bool operator != (const std::string& _name) const;
 
-		//! \return Returns true if the version was added to the version graph.
-		bool setFromJsonObject(const ot::ConstJsonObject& _object, VersionGraphCfg* _graph);
+		void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
+
+		void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		//! \see getName
 		void setName(const std::string& _name) { m_name = _name; };
@@ -51,31 +58,8 @@ namespace ot {
 		void setDescription(const std::string& _description) { m_description = _description; };
 		const std::string& getDescription(void) const { return m_description; };
 
-		VersionGraphVersionCfg* addChildVersion(const std::string& _name, const std::string& _label = std::string(), const std::string& _description = std::string());
-
-		//! \brief Adds the provided version as a child.
-		//! This version takes ownership of the provided child version.
-		void addChildVersion(VersionGraphVersionCfg* _child);
-		void setChildVersions(const std::list<VersionGraphVersionCfg*>& _versions);
-
-		//! \brief Returns the child versions.
-		//! This version keeps ownership of the versions.
-		const std::list<VersionGraphVersionCfg*>& getChildVersions(void) const { return m_childVersions; };
-
-		//! \brief Returns the version with the given name.
-		//! The version may be this version.
-		VersionGraphVersionCfg* findVersion(const std::string& _versionName);
-
-		//! \brief Returns the version with the given name.
-		//! The version may be this version.
-		const VersionGraphVersionCfg* findVersion(const std::string& _versionName) const;
-
-		//! \brief Returns true if a version with the given name prefix exists in any of the versions childs.
-		//! Also checks this version.
-		bool versionStartingWithNameExists(const std::string& _prefix) const;
-
-		//! \brief Returns the last version in this branch (first child versions).
-		VersionGraphVersionCfg* getLastBranchVersion(void);
+		void setParentVersion(const std::string& _version) { m_parentVersion = _version; };
+		const std::string& getParentVersion(void) const { return m_parentVersion; };
 
 		//! \see getDirectParentIsHidden
 		void setDirectParentIsHidden(bool _isHidden) { m_directParentIsHidden = _isHidden; };
@@ -83,23 +67,11 @@ namespace ot {
 		//! \brief If the direct parent is hidden the connection line will be displayed as a dashed line.
 		bool getDirectParentIsHidden(void) const { return m_directParentIsHidden; };
 
-		//! \brief Copy data excluding child versions.
-		void applyConfigOnly(const VersionGraphVersionCfg& _other);
-
-		VersionGraphVersionCfg* getParentVersion(void) { return m_parentVersion; };
-		const VersionGraphVersionCfg* getParentVersion(void) const { return m_parentVersion; };
-
 	private:
-		void setParentVersion(VersionGraphVersionCfg* _parent) { m_parentVersion = _parent; };
-		void eraseChildVersion(VersionGraphVersionCfg* _child);
-		void clear(void);
-		void clearChilds(void);
-
 		std::string m_name;
 		std::string m_label;
 		std::string m_description;
-		VersionGraphVersionCfg* m_parentVersion;
-		std::list<VersionGraphVersionCfg*> m_childVersions;
+		std::string m_parentVersion;
 		bool m_directParentIsHidden;
 	};
 
