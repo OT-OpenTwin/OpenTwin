@@ -89,7 +89,7 @@ public:
 	const std::string& getModelStateVersion(void) const { return m_graphCfg.getActiveVersionName(); };
 
 	// Determine the currently active branch
-	const std::string& getActiveBranch(void) const { return m_graphCfg.getActiveBranchVersionName(); }
+	const std::string& getActiveBranch(void) const { return m_graphCfg.getActiveBranchName(); }
 
 	// Save the current modified model state. The version counter is incremented automatically in the last digit (e.g. 1.2.1 -> 1.2.2)
 	bool saveModelState(bool forceSave, bool forceAbsoluteState, const std::string &saveComment);

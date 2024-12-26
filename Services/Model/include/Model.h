@@ -280,7 +280,7 @@ private:
 	void updateVersionGraph(void);
 	void setActiveVersionTreeState(void);
 	void removeVersionGraphVersions(const std::list<std::string> &versions);
-	void addNewVersionTreeStateAndActivate(const std::string& _parentVersion, const std::string& _branch, const ot::VersionGraphVersionCfg& _version);
+	void addNewVersionTreeStateAndActivate(const std::string& _branch, const ot::VersionGraphVersionCfg& _version);
 	void getIDsOfFolderItemsOfType(EntityContainer *container, const std::string &className, bool recursive, std::list<ot::UID> &itemList);
 	size_t getNumberOfVisualizationTriangles(std::list<EntityGeometry *> geometryEntities);
 	std::list<EntityBase*> getListOfEntitiesToConsiderForPropertyChange(const std::list<EntityBase*>& entities);

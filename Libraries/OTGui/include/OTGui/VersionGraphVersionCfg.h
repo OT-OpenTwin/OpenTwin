@@ -22,6 +22,8 @@ namespace ot {
 	class OT_GUI_API_EXPORT VersionGraphVersionCfg : public Serializable {
 	public:
 		VersionGraphVersionCfg();
+		//! \brief Assignment constructor.
+		//! \ref ot::VersionGraphVersionCfg::getName
 		VersionGraphVersionCfg(const std::string& _name, const std::string& _label = std::string(), const std::string& _description = std::string());
 		VersionGraphVersionCfg(const VersionGraphVersionCfg& _other);
 		VersionGraphVersionCfg(VersionGraphVersionCfg&& _other) noexcept;
@@ -45,8 +47,22 @@ namespace ot {
 
 		//! \brief Returns the version name.
 		//! The name is used to identify the version in a graph.
-		//! The name will be displayed on the version.
+		//! The name will be displayed on the version. <br>
+		//! The name must follow the following syntax: <br>
+		//! - <Version> <br>
+		//! - or <br>
+		//! - <Branch>.<Version> <br>
+		//! - or
+		//! - <Branch>.<Version>.<Branch>.<Version> and so on.
 		const std::string& getName(void) const { return m_name; };
+
+		//! @brief Returns the name of this versions branch.
+		//! \ref getName
+		std::string getBranchName(void) const;
+
+		//! @brief Returns the name of the branch node.
+		//! If this version is "2.1.1" the branch node is version "2".
+		std::string getBranchNodeName(void) const;
 
 		//! \see getLabel
 		void setLabel(const std::string& _title) { m_label = _title; };

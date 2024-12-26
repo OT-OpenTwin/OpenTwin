@@ -80,3 +80,28 @@ void ot::VersionGraphVersionCfg::setFromJsonObject(const ot::ConstJsonObject& _o
 	m_description = json::getString(_object, "Description");
 	m_parentVersion = json::getString(_object, "ParentVersion");
 }
+
+std::string ot::VersionGraphVersionCfg::getBranchName(void) const {
+	size_t ix = this->getName().rfind('.');
+	if (ix == std::string::npos) {
+		return std::string();
+	}
+	else {
+		return this->getName().substr(0, ix);
+	}
+}
+
+std::string ot::VersionGraphVersionCfg::getBranchNodeName(void) const {
+	size_t ix = this->getName().rfind('.');
+	if (ix == std::string::npos) {
+		return std::string(); // "Main" branch
+	}
+	size_t ix2 = this->getName().rfind('.', ix - 1);
+	if (ix2 != std::string::npos) {
+		return this->getName().substr(0, ix2); // Branch node
+	}
+	else {
+		OT_LOG_E("Version name format error");
+		return std::string(); // Error
+	}
+}

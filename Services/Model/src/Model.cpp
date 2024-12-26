@@ -1791,7 +1791,7 @@ void Model::setVersionPropertiesFromJson(const ot::PropertyGridCfg& _configurati
 	getStateManager()->updateVersionEntity(m_selectedVersion);
 
 	const ot::VersionGraphCfg& cfg = getStateManager()->getVersionGraph();
-	this->sendVersionGraphToUI(cfg, cfg.getActiveVersionName(), cfg.getActiveBranchVersionName());
+	this->sendVersionGraphToUI(cfg, cfg.getActiveVersionName(), cfg.getActiveBranchName());
 }
 
 void Model::setVersionLabel(const std::string& version, const std::string& label)
@@ -1808,7 +1808,7 @@ void Model::setVersionLabel(const std::string& version, const std::string& label
 	getStateManager()->updateVersionEntity(version);
 
 	const ot::VersionGraphCfg& cfg = getStateManager()->getVersionGraph();
-	this->sendVersionGraphToUI(cfg, cfg.getActiveVersionName(), cfg.getActiveBranchVersionName());
+	this->sendVersionGraphToUI(cfg, cfg.getActiveVersionName(), cfg.getActiveBranchName());
 }
 
 void Model::deleteProperty(const std::list<ot::UID> &entityIDList, const std::string& propertyName, const std::string& propertyGroup)
@@ -3852,7 +3852,9 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 
 	if (currentModelVersion != previousModelVersion)  // In case no changed occurred, it may happen that the model state version did not change
 	{
-		addNewVersionTreeStateAndActivate(previousModelVersion, activeBranch, ot::VersionGraphVersionCfg(currentModelVersion, "", comment));
+		ot::VersionGraphVersionCfg newVersion(currentModelVersion, "", comment);
+		newVersion.setParentVersion(previousModelVersion);
+		addNewVersionTreeStateAndActivate(activeBranch, newVersion);
 	}
 
 	updateUndoRedoStatus();
@@ -4024,8 +4026,7 @@ void Model::setActiveVersionTreeState(void)
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 }
 
-void Model::removeVersionGraphVersions(const std::list<std::string> &versions)
-{
+void Model::removeVersionGraphVersions(const std::list<std::string> &versions) {
 	ot::JsonDocument notify;
 	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_RemoveVersionGraphVersions, notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, notify.GetAllocator());
@@ -4035,22 +4036,20 @@ void Model::removeVersionGraphVersions(const std::list<std::string> &versions)
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 }
 
-void Model::addNewVersionTreeStateAndActivate(const std::string& _parentVersion, const std::string& _branch, const ot::VersionGraphVersionCfg& _version)
-{
+void Model::addNewVersionTreeStateAndActivate(const std::string& _branch, const ot::VersionGraphVersionCfg& _version) {
 	ot::JsonDocument notify;
 	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddAndActivateNewVersionGraphVersion, notify.GetAllocator()), notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_UI_GRAPH_BRANCH, ot::JsonString(_branch, notify.GetAllocator()), notify.GetAllocator());
 
 	ot::JsonObject versionObj;
-	_version.addToJsonObject(versionObj, notify.GetAllocator(), _parentVersion);
+	_version.addToJsonObject(versionObj, notify.GetAllocator());
 	notify.AddMember(OT_ACTION_PARAM_Config, versionObj, notify.GetAllocator());
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 }
 
-void Model::sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds)
-{
+void Model::sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) {
 	// Here we need to add the information about the visualization model to the document 
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ID, visualizationModelID, doc.GetAllocator());
 
