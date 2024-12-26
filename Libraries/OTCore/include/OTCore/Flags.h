@@ -79,15 +79,17 @@ namespace ot {
 	//! \class Flags
 	//! \brief This class is used to manage flags.
 	//! Don't forget to add OT_ADD_FLAG_FUNCTIONS and the bottom of your header.
-	//! The type should be an enumeration where every value represents a single bit in a 32/64 bit value.
-	//! e.g:
-	//! enum enumName {
-	//!		enumValue1	= 0x01,	//	0001
-	//!		enumValue2	= 0x02,	//	0010
-	//!		enumValue3	= 0x04,	//	0100
-	//!			...
+	//! Use OT_ADD_PRIVATE_FLAG_FUNCTIONS for private enums. <br>
+	//! The type should be an enumeration where every value represents a single bit in a 32/64 bit value. <br>
+	//! e.g: <br>
+	//! enum enumName { <br>
+	//!		enumValue1	= 0 << 0,	//	0000 <br>
+	//!		enumValue2	= 1 << 0,	//	0001 <br>
+	//!		enumValue3	= 1 << 1,	//	0010 <br>
+	//!		enumValue4	= 1 << 2,	//	0100 <br>
+	//!			... <br>
 	//!	};
-	//! \note Note that only enumration types are allowed.
+	//! \note Only enumration types are allowed.
 	template<typename T> class OT_CORE_API_EXPORTONLY Flags {
 	private:
 #ifdef OT_OS_64Bit
@@ -101,7 +103,7 @@ namespace ot {
 #endif // _WIN64
 
 		static_assert((sizeof(T) <= sizeof(FlagCastType)), "Flags type may overflow.");
-		static_assert((std::is_enum<T>::value), "Flags accepts only enumeration types.");
+		static_assert((std::is_enum<T>::value), "Flags accept only enumeration types.");
 
 		T m_data; //! \brief Data.
 
