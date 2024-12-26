@@ -119,19 +119,6 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 	this->finalizeGraphicsItem();
 
 	m_currentSize = this->boundingRect().size();
-
-	// Create childs
-	int childRow = m_row;
-
-	for (const VersionGraphVersionCfg* childCfg : m_config.getChildVersions()) {
-		VersionGraphItem* newChild = new VersionGraphItem(*childCfg, childRow, _activeVersion, _scene);
-		newChild->setParentVersionItem(this);
-		newChild->connectToParent();
-
-		m_childVersions.push_back(newChild);
-
-		childRow = newChild->getMaxRowIndex() + 1;
-	}
 }
 
 ot::VersionGraphItem::~VersionGraphItem() {
@@ -192,16 +179,6 @@ void ot::VersionGraphItem::connectToParent(void) {
 	this->getGraphicsScene()->addItem(m_parentConnection);
 }
 
-ot::VersionGraphItem* ot::VersionGraphItem::findVersionByName(const std::string& _versionName) {
-	if (_versionName == m_config.getName()) return this;
-	VersionGraphItem* result = nullptr;
-	for (VersionGraphItem* item : m_childVersions) {
-		result = item->findVersionByName(_versionName);
-		if (result) break;
-	}
-	return result;
-}
-
 void ot::VersionGraphItem::updateVersionPositionAndSize(void) {
 	this->prepareGeometryChange();
 
@@ -225,18 +202,8 @@ void ot::VersionGraphItem::updateVersionPositionAndSize(void) {
 }
 
 void ot::VersionGraphItem::setAsActiveVersionBranch(void) {
-	VersionGraphItem* lastItem = this;
-	while (!lastItem->getChildVersions().empty()) {
-		lastItem = lastItem->getChildVersions().front();
-	}
-	lastItem->updateToRootAsActiveBranch();
-}
-
-void ot::VersionGraphItem::updateToRootAsActiveBranch(void) {
 	if (m_parentConnection) {
 		m_parentConnection->setLinePainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemSelectionBorder));
 	}
-	if (m_parentVersion) {
-		m_parentVersion->updateToRootAsActiveBranch();
-	}
 }
+

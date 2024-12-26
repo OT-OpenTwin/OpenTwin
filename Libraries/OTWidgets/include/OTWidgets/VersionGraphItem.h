@@ -39,17 +39,13 @@ namespace ot {
 
 		void connectToParent(void);
 
-		VersionGraphItem* findVersionByName(const std::string& _versionName);
-
 		void updateVersionPositionAndSize(void);
 
 		void setAsActiveVersionBranch(void);
 
 		const QSizeF& getCurrentSize(void) const { return m_currentSize; };
 
-	private:
-		void updateToRootAsActiveBranch(void);
-		
+	private:		
 		VersionGraphVersionCfg m_config;
 		VersionGraphItem* m_parentVersion;
 		GraphicsConnectionItem* m_parentConnection;

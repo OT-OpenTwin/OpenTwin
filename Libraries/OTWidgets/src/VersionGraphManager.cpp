@@ -111,10 +111,7 @@ void ot::VersionGraphManager::addVersion(const std::string& _parentVersionName, 
 
 ot::VersionGraphVersionCfg* ot::VersionGraphManager::addVersion(const ConstJsonObject& _versionConfig) {
 	VersionGraphVersionCfg* newVersion = new VersionGraphVersionCfg;
-	if (!newVersion->setFromJsonObject(_versionConfig, &m_config)) {
-		delete newVersion;
-		newVersion = nullptr;
-	}
+	newVersion->setFromJsonObject(_versionConfig);
 	return newVersion;
 }
 
@@ -166,13 +163,13 @@ void ot::VersionGraphManager::updateCurrentGraphViewAllMode(void) {
 	newConfig.setActiveVersionName(m_config.getActiveVersionName());
 
 	// Determine branch version
-	if (!m_config.getActiveBranchVersionName().empty()) {
-		VersionGraphVersionCfg* branchVersion = m_config.findVersion(m_config.getActiveBranchVersionName());
+	if (!m_config.getActiveBranchName().empty()) {
+		VersionGraphVersionCfg* branchVersion = m_config.findVersion(m_config.getActiveBranchName());
 		if (branchVersion) {
-			newConfig.setActiveBranchVersionName(branchVersion->getLastBranchVersion()->getName());
+			newConfig.setActiveBranchName(branchVersion->getLastBranchVersion()->getName());
 		}
 		else {
-			OT_LOG_EAS("Branch version not found: \"" + m_config.getActiveBranchVersionName() + "\"");
+			OT_LOG_EAS("Branch version not found: \"" + m_config.getActiveBranchName() + "\"");
 		}
 	}
 
@@ -202,13 +199,13 @@ void ot::VersionGraphManager::updateCurrentGraphLabeledOnlyMode(void) {
 	newConfig.setActiveVersionName(m_config.getActiveVersionName());
 
 	// Determine branch version
-	if (!m_config.getActiveBranchVersionName().empty()) {
-		VersionGraphVersionCfg* branchVersion = m_config.findVersion(m_config.getActiveBranchVersionName());
+	if (!m_config.getActiveBranchName().empty()) {
+		VersionGraphVersionCfg* branchVersion = m_config.findVersion(m_config.getActiveBranchName());
 		if (branchVersion) {
 			newConfig.setActiveBranchVersionName(branchVersion->getLastBranchVersion()->getName());
 		}
 		else {
-			OT_LOG_EAS("Branch version not found: \"" + m_config.getActiveBranchVersionName() + "\"");
+			OT_LOG_EAS("Branch version not found: \"" + m_config.getActiveBranchName() + "\"");
 		}
 	}
 
@@ -265,13 +262,13 @@ void ot::VersionGraphManager::startProcessCompact(bool _includeLabeledVersions, 
 	newConfig.setActiveVersionName(m_config.getActiveVersionName());
 
 	// Determine branch version
-	if (!m_config.getActiveBranchVersionName().empty()) {
-		VersionGraphVersionCfg* branchVersion = m_config.findVersion(m_config.getActiveBranchVersionName());
+	if (!m_config.getActiveBranchName().empty()) {
+		VersionGraphVersionCfg* branchVersion = m_config.findVersion(m_config.getActiveBranchName());
 		if (branchVersion) {
 			newConfig.setActiveBranchVersionName(branchVersion->getLastBranchVersion()->getName());
 		}
 		else {
-			OT_LOG_EAS("Branch version not found: \"" + m_config.getActiveBranchVersionName() + "\"");
+			OT_LOG_EAS("Branch version not found: \"" + m_config.getActiveBranchName() + "\"");
 		}
 	}
 

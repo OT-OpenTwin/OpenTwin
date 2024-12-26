@@ -31,7 +31,7 @@ namespace ot {
 		void clear(void);
 
 		bool isCurrentVersionEndOfBranch(void) const;
-		bool isVersionIsEndOfBranch(const std::string& _versionName) const;
+		bool isVersionEndOfBranch(const std::string& _versionName) const;
 
 		void setVersionGraphConfig(VersionGraphConfig _config, bool _active = true) { m_configFlags.setFlag(_config, _active); };
 		void setVersionGraphConfigFlags(const VersionGraphConfigFlags& _flags) { m_configFlags = _flags; };
@@ -52,16 +52,24 @@ namespace ot {
 		virtual void paintEvent(QPaintEvent* _event) override;
 
 	private:
+		typedef std::list<VersionGraphItem*> VersionsList;
+
 		void updateVersionPositions(void);
 		QRectF calculateFittedViewportRect(void) const;
-		VersionGraphItem* getVersion(const std::string& _name) const;
-		void highlightVersion(const std::string& _name);
+		VersionGraphItem* findVersion(const std::string& _versionName);
+		const VersionGraphItem* findVersion(const std::string& _versionName) const;
+		VersionGraphItem* findVersion(const std::string& _versionName, VersionsList*& _list, VersionsList::const_iterator& _iterator);
+		const VersionGraphItem* findVersion(const std::string& _versionName, const VersionsList*& _list, VersionsList::const_iterator& _iterator) const;
+		const VersionsList* findBranch(const std::string& _branchName) const;
+		void highlightVersion(const std::string& _versionName);
 
 		bool m_updateItemPositionRequired;
 		QRectF m_lastViewportRect;
 		std::string m_activeVersion;
 		std::string m_activeVersionBranch;
-		VersionGraphItem* m_rootItem;
+		
+		std::list<VersionsList> m_branches;
+
 		VersionGraphConfigFlags m_configFlags;
 	};
 

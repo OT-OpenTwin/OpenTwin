@@ -9,7 +9,7 @@
 #include "OTWidgets/VersionGraphItem.h"
 
 ot::VersionGraph::VersionGraph() 
-	: m_rootItem(nullptr), m_updateItemPositionRequired(false), m_configFlags(NoConfigFlags)
+	: m_updateItemPositionRequired(false), m_configFlags(NoConfigFlags)
 {
 	this->getGraphicsScene()->setGridFlags(ot::Grid::NoGridFlags);
 	this->getGraphicsScene()->setMultiselectionEnabled(false);
@@ -24,49 +24,87 @@ ot::VersionGraph::~VersionGraph() {
 }
 
 void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
-	if (m_rootItem) {
+	if (m_branches.empty()) {
 		m_lastViewportRect = this->getVisibleSceneRect().marginsRemoved(QMarginsF(2., 2., 2., 2.));
 	}
 
 	this->clear();
 
-	if (!_config.getRootVersion()) {
-		OT_LOG_EA("No root version set");
-		return;
-	}
-
 	m_activeVersion = _config.getActiveVersionName();
-	m_activeVersionBranch = _config.getActiveBranchVersionName();
+	m_activeVersionBranch = _config.getActiveBranchName();
 
-	m_rootItem = new VersionGraphItem(*_config.getRootVersion(), 0, m_activeVersion, this->getGraphicsScene());
+	// Create versions
+	int row = 0;
+	for (const auto& branchVersions : _config.getBranches()) {
+		if (branchVersions.empty()) {
+			continue;
+		}
 
-	VersionGraphItem* branchVersion = this->getVersion(m_activeVersionBranch);
-	if (!branchVersion) {
-		branchVersion = m_rootItem;
+		VersionsList newList;
+
+		VersionGraphItem* lastParentItem = nullptr;
+		if (!branchVersions.front().getBranchNodeName().empty()) {
+			lastParentItem = this->findVersion(branchVersions.front().getBranchNodeName());
+		}
+
+		for (const ot::VersionGraphVersionCfg& versionCfg : branchVersions) {
+			VersionGraphItem* newVersion = new VersionGraphItem(versionCfg, row, m_activeVersion, this->getGraphicsScene());
+			if (lastParentItem) {
+				newVersion->setParentVersionItem(lastParentItem);
+				newVersion->connectToParent();
+			}
+			lastParentItem = newVersion;
+			newList.push_back(newVersion);
+		}
+		row++;
+		if (!newList.empty()) {
+			m_branches.push_back(std::move(newList));
+		}
 	}
-	if (branchVersion) {
-		branchVersion->setAsActiveVersionBranch();
+
+	// Get branch version
+	VersionsList* lst = nullptr;
+	VersionsList::const_iterator it;
+	this->findVersion(m_activeVersionBranch, lst, it);
+	if (!lst) {
+		if (!m_branches.empty()) {
+			lst = &m_branches.front();
+			it = lst->begin();
+		}
+	}
+	if (lst) {
+		VersionGraphItem* version = lst->back();
+		while (version) {
+			version->setAsActiveVersionBranch();
+			version = version->getParentVersionItem();
+		}
 	}
 
 	m_updateItemPositionRequired = true;
 }
 
 void ot::VersionGraph::clear(void) {
-	if (m_rootItem) delete m_rootItem;
-	m_rootItem = nullptr;
+	for (const VersionsList& branchVersions : m_branches) {
+		for (VersionGraphItem* version : branchVersions) {
+			delete version;
+		}
+	}
+	m_branches.clear();
 }
 
 bool ot::VersionGraph::isCurrentVersionEndOfBranch(void) const {
-	return this->isVersionIsEndOfBranch(m_activeVersion);
+	return this->isVersionEndOfBranch(m_activeVersion);
 }
 
-bool ot::VersionGraph::isVersionIsEndOfBranch(const std::string& _versionName) const {
-	VersionGraphItem* version = this->getVersion(_versionName);
+bool ot::VersionGraph::isVersionEndOfBranch(const std::string& _versionName) const {
+	const VersionsList* lst = nullptr;
+	VersionsList::const_iterator it;
+	const ot::VersionGraphItem* version = this->findVersion(_versionName, lst, it);
 	if (version) {
-		return version->getChildVersions().empty();
+		return version == lst->back();
 	}
 	else {
-		OT_LOG_EA("Invalid version name");
+		OT_LOG_E("Version \"" + _versionName + "\" not found");
 		return false;
 	}
 }
@@ -136,11 +174,11 @@ void ot::VersionGraph::paintEvent(QPaintEvent* _event) {
 void ot::VersionGraph::updateVersionPositions(void) {
 	m_updateItemPositionRequired = false;
 
-	if (!m_rootItem) {
-		return;
+	for (const VersionsList& branchVersions : m_branches) {
+		for (VersionGraphItem* version : branchVersions) {
+			version->updateVersionPositionAndSize();
+		}
 	}
-
-	m_rootItem->updateVersionPositionAndSize();
 
 	QRectF itmRect = this->getGraphicsScene()->itemsBoundingRect();
 	itmRect.adjust(-10, -10, 10, 10);
@@ -153,7 +191,7 @@ void ot::VersionGraph::updateVersionPositions(void) {
 
 QRectF ot::VersionGraph::calculateFittedViewportRect(void) const {
 	if (m_activeVersion.empty()) return QRectF();
-	VersionGraphItem* item = this->getVersion(m_activeVersion);
+	const VersionGraphItem* item = this->findVersion(m_activeVersion);
 	if (item) {
 		// Get the bounding rectangle of the item
 		QRectF itemRect = item->boundingRect();
@@ -184,18 +222,56 @@ QRectF ot::VersionGraph::calculateFittedViewportRect(void) const {
 	}
 }
 
-ot::VersionGraphItem* ot::VersionGraph::getVersion(const std::string& _name) const {
-	if (m_rootItem) {
-		return m_rootItem->findVersionByName(_name);
-	}
-	else {
-		OT_LOG_EA("Root item not set");
-		return nullptr;
-	}
+ot::VersionGraphItem* ot::VersionGraph::findVersion(const std::string& _versionName) {
+	VersionsList* lst;
+	VersionsList::const_iterator it;
+	return this->findVersion(_versionName, lst, it);
 }
 
-void ot::VersionGraph::highlightVersion(const std::string& _name) {
-	VersionGraphItem* item = this->getVersion(_name);
+const ot::VersionGraphItem* ot::VersionGraph::findVersion(const std::string& _versionName) const {
+	const VersionsList* lst;
+	VersionsList::const_iterator it;
+	return this->findVersion(_versionName, lst, it);
+}
+
+ot::VersionGraphItem* ot::VersionGraph::findVersion(const std::string& _versionName, VersionsList*& _list, VersionsList::const_iterator& _iterator) {
+	for (VersionsList& branchVersions : m_branches) {
+		for (VersionsList::const_iterator it = branchVersions.begin(); it != branchVersions.end(); it++) {
+			if ((*it)->getVersionConfig().getName() == _versionName) {
+				_list = &branchVersions;
+				_iterator = it;
+				return *it;
+			}
+		}
+	}
+	return nullptr;
+}
+
+const ot::VersionGraphItem* ot::VersionGraph::findVersion(const std::string& _versionName, const VersionsList*& _list, VersionsList::const_iterator& _iterator) const {
+	for (const VersionsList& branchVersions : m_branches) {
+		for (VersionsList::const_iterator it = branchVersions.begin(); it != branchVersions.end(); it++) {
+			if ((*it)->getVersionConfig().getName() == _versionName) {
+				_list = &branchVersions;
+				_iterator = it;
+				return *it;
+			}
+		}
+	}
+	return nullptr;
+}
+
+const ot::VersionGraph::VersionsList* ot::VersionGraph::findBranch(const std::string& _branchName) const {
+	for (const VersionsList& branchVersions : m_branches) {
+		if (branchVersions.front()->getVersionConfig().getBranchName() == _branchName) {
+			return &branchVersions;
+		}
+	}
+
+	return nullptr;
+}
+
+void ot::VersionGraph::highlightVersion(const std::string& _versionName) {
+	VersionGraphItem* item = this->findVersion(_versionName);
 	if (item) {
 		item->setGraphicsItemSelected(true);
 	}
