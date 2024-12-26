@@ -160,7 +160,17 @@ const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findPreviousVersion(const
 			return nullptr;
 		}
 		else {
-			return this->findVersion(branchNode);
+			const ot::VersionGraphVersionCfg* version = this->findVersion(branchNode);
+			if (version) {
+				return version;
+			}
+
+			// Version does not exist. Finding other
+			const VersionsList* branch = this->findBranch(versionIt->getBranchNodeBranchName());
+			if (branch) {
+
+			}
+
 		}
 	}
 	else {

@@ -64,6 +64,11 @@ namespace ot {
 		//! If this version is "2.1.1" the branch node is version "2".
 		std::string getBranchNodeName(void) const;
 
+		//! @brief Returns the name of the branch node.
+		//! If this version is "1.2.3" the branch node branch name is "". <br>
+		//! If this version is "1.2.3.4.5" the branch node branch name is "1.2".
+		std::string getBranchNodeBranchName(void) const;
+
 		//! \see getLabel
 		void setLabel(const std::string& _title) { m_label = _title; };
 

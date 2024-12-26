@@ -87,8 +87,10 @@ namespace ot {
 		bool versionStartingWithNameExists(const std::string& _prefix);
 
 		//! \brief Removes the version and all of its childs if the version exists (Expensive).
-		void removeVersion(const std::string& _version);
+		void removeVersion(const std::string& _version);	
 
+		void setBranches(const std::list<std::list<VersionGraphVersionCfg>>& _branches) { m_branches = _branches; };
+		void setBranches(std::list<std::list<VersionGraphVersionCfg>>&& _branches) { m_branches = std::move(_branches); };
 		const std::list<std::list<VersionGraphVersionCfg>>& getBranches(void) const { return m_branches; };
 
 		//! \breif Clear the version graph.

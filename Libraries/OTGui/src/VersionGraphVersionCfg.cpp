@@ -105,3 +105,22 @@ std::string ot::VersionGraphVersionCfg::getBranchNodeName(void) const {
 		return std::string(); // Error
 	}
 }
+
+std::string ot::VersionGraphVersionCfg::getBranchNodeBranchName(void) const {
+	size_t ix = this->getName().rfind('.');
+	std::string result;
+	if (ix == std::string::npos) {
+		return result; // "Main" branch
+	}
+	size_t ix2 = this->getName().rfind('.', ix - 1);
+	if (ix2 == std::string::npos) {
+		OT_LOG_E("Version name format error");
+		return result;
+	}
+
+	size_t ix3 = this->getName().rfind('.', ix2 - 1);
+	if (ix3 != std::string::npos) {
+		result = this->getName().substr(0, ix3);
+	}
+	return result;
+}
