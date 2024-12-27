@@ -70,13 +70,13 @@ void ot::VersionGraphCfg::setFromJsonObject(const ot::ConstJsonObject& _object) 
 	}
 }
 
-void ot::VersionGraphCfg::addVersion(const std::string& _version, const std::string& _parentVersion, const std::string& _label, const std::string& _description) {
+ot::VersionGraphVersionCfg& ot::VersionGraphCfg::addVersion(const std::string& _version, const std::string& _parentVersion, const std::string& _label, const std::string& _description) {
 	VersionGraphVersionCfg newVersion(_version, _label, _description);
 	newVersion.setParentVersion(_parentVersion);
-	this->addVersion(std::move(newVersion));
+	return this->addVersion(std::move(newVersion));
 }
 
-void ot::VersionGraphCfg::addVersion(VersionGraphVersionCfg&& _version) {
+ot::VersionGraphVersionCfg& ot::VersionGraphCfg::addVersion(VersionGraphVersionCfg&& _version) {
 	std::string branchName = _version.getBranchName();
 
 	// Add version to existing branch
@@ -84,7 +84,7 @@ void ot::VersionGraphCfg::addVersion(VersionGraphVersionCfg&& _version) {
 		OTAssert(!branchVersions.empty(), "Empty branch stored");
 		if (branchVersions.front().getBranchName() == branchName) {
 			branchVersions.push_back(std::move(_version));
-			return;
+			return branchVersions.back();
 		}
 	}
 
@@ -92,6 +92,7 @@ void ot::VersionGraphCfg::addVersion(VersionGraphVersionCfg&& _version) {
 	std::list<VersionGraphVersionCfg> newBranch;
 	newBranch.push_back(std::move(_version));
 	m_branches.push_back(std::move(newBranch));
+	return m_branches.back().back();
 }
 
 ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findVersion(const std::string& _version) {
@@ -107,7 +108,6 @@ ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findVersion(const std::string& 
 			}
 		}
 	}
-	OT_LOG_E("Version \"" + _version + "\" not found");
 	return nullptr;
 }
 
@@ -138,7 +138,7 @@ const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findVersion(const std::st
 			}
 		}
 	}
-	OT_LOG_E("Version \"" + _version + "\" not found");
+	OT_LOG_EAS("Version \"" + _version + "\" not found");
 	return nullptr;
 }
 
@@ -147,57 +147,88 @@ const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findPreviousVersion(const
 	const VersionsList* versionsList = nullptr;
 	VersionsList::const_iterator versionIt;
 	if (!this->findVersionIterator(_version, versionsList, versionIt)) {
-		OT_LOG_W("Version \"" + _version + "\" not found");
+		OT_LOG_EAS("Version \"" + _version + "\" not found");
 		return nullptr;
 	}
 
+	// Version is beginning of a branch, find in other branches.
 	if (versionIt == versionsList->begin()) {
-		// Version is beginning of a branch, find in other branches.
 
-		const std::string branchNode = versionIt->getBranchNodeName();
-		if (branchNode.empty()) {
-			// Either the specified version is the first version of the "main" branch, or the version is invalid
-			return nullptr;
-		}
-		else {
-			const ot::VersionGraphVersionCfg* version = this->findVersion(branchNode);
-			if (version) {
-				return version;
-			}
+		// Example structure:
+		// 
+		// 1 --+----> 3
+		//     |
+		//     +--> 1.2.2.3.3.4.4
+		//                      ^-- Searching from here.
+		// 
+		// Version / BranchNode  -  Branch / BranchNodeBranch
+		// 1                     -  <empty>      
+		// 1.2.2                 -  1.2           ^
+		// 1.2.2.3.3             -  1.2.2.3       |
+		// 1.2.2.3.3.4.4         -  1.2.2.3.3.4   |
+		//                                        |
 
-			// Version does not exist. Finding other
-			const VersionsList* branch = this->findBranch(versionIt->getBranchNodeBranchName());
+		VersionGraphVersionCfg branchNode(versionIt->getBranchNodeName());
+		while (!branchNode.getName().empty()) {
+			const VersionsList* branch = this->findBranch(branchNode.getBranchName());
 			if (branch) {
+				const VersionGraphVersionCfg* parentVersion = nullptr;
+				for (const VersionGraphVersionCfg& branchVersion : *branch) {
+					if (branchVersion.getVersionNumber() > branchNode.getVersionNumber()) {
+						break;
+					}
+					OTAssert((parentVersion == nullptr ? true : parentVersion->getVersionNumber() < branchVersion.getVersionNumber()), "");
+					parentVersion = &branchVersion;
+				}
 
+				if (parentVersion) {
+					return nullptr;
+				}
+
+				branchNode = VersionGraphVersionCfg(branchNode.getBranchNodeName());
 			}
-
 		}
+
+		// This should happen only for version "1" since this version should always exist.
+		OTAssert(_version == "1", "Previous version could not be found");
+		return nullptr;
 	}
 	else {
-		// Version is in the middle/end of a branch
+		// Version is in the middle/end of a branch:
+		// 1 --+-- 2 ...
+		//     |
+		//     +-- 1.2.1 --- 1.2.2 --- 1.2.3  <-searching from 1.2.3, parent is 1.2.2
 		versionIt--;
 		return &(*versionIt);
 	}
 }
 
 const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findNextVersion(const std::string& _version) const {
+	return this->findNextVersion(_version, m_activeBranchName);
+}
+
+const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findNextVersion(const std::string& _version, const std::string& _activeBranch) const {
 	const VersionsList* tmp = nullptr;
 	VersionsList::const_iterator tmpIt;
-	return this->findNextVersion(_version, tmp, tmpIt);
+	return this->findNextVersion(_version, _activeBranch, tmp, tmpIt);
 }
 
 std::list<const ot::VersionGraphVersionCfg*> ot::VersionGraphCfg::findNextVersions(const std::string& _version, const std::string& _lastVersion) {
+	return this->findNextVersions(_version, m_activeBranchName, _lastVersion);
+}
+
+std::list<const ot::VersionGraphVersionCfg*> ot::VersionGraphCfg::findNextVersions(const std::string& _version, const std::string& _activeBranch, const std::string& _lastVersion) {
 	const VersionsList* lst = nullptr;
 	VersionsList::const_iterator it;
-	
-	std::list<const ot::VersionGraphVersionCfg*> result;
-	const ot::VersionGraphVersionCfg* nextVersion = this->findNextVersion(_version, lst, it);
+
+	std::list<const VersionGraphVersionCfg*> result;
+	const VersionGraphVersionCfg* nextVersion = this->findNextVersion(_version, _activeBranch, lst, it);
 	while (nextVersion) {
 		result.push_back(nextVersion);
 		if (nextVersion->getName() == _lastVersion) {
 			break;
 		}
-		nextVersion = this->findNextVersion(nextVersion->getName(), lst, it);
+		nextVersion = this->findNextVersion(nextVersion->getName(), _activeBranch, lst, it);
 	}
 	return result;
 }
@@ -208,7 +239,7 @@ std::list<const ot::VersionGraphVersionCfg*> ot::VersionGraphCfg::findAllNextVer
 	const VersionsList* lst = nullptr;
 	VersionsList::const_iterator it;
 	if (!this->findVersionIterator(_version, lst, it)) {
-		OT_LOG_E("Version \"" + _version + "\" not found");
+		OT_LOG_EAS("Version \"" + _version + "\" not found");
 		return result;
 	}
 
@@ -277,14 +308,14 @@ void ot::VersionGraphCfg::clear(void) {
 	m_activeVersionName.clear();
 }
 
-const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findNextVersion(const std::string& _version, const VersionsList*& _versionList, VersionsList::const_iterator& _currentVersionListIterator) const {
+const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findNextVersion(const std::string& _version, const std::string& _activeBranch, const VersionsList*& _versionList, VersionsList::const_iterator& _currentVersionListIterator) const {
 	// First check if any branch starts as child of this version
 	for (const VersionsList& branchVersions : m_branches) {
 		OTAssert(!branchVersions.empty(), "Empty branch stored");
 		const std::string branchNode = branchVersions.front().getBranchNodeName();
 
 		// Check if the first version of the branch has _version as a branch node name and check if the active branch name starts with the branch node name aswell.
-		if (branchVersions.front().getBranchNodeName() == _version && m_activeBranchName.find(branchNode) == 0) {
+		if (branchVersions.front().getBranchNodeName() == _version && _activeBranch.find(branchNode) == 0) {
 			_versionList = &branchVersions;
 			_currentVersionListIterator = branchVersions.begin();
 			return &branchVersions.front();
@@ -296,7 +327,7 @@ const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findNextVersion(const std
 	// Find the iterator
 	if (_versionList == nullptr) {
 		if (!this->findVersionIterator(_version, _versionList, _currentVersionListIterator)) {
-			OT_LOG_W("Version not found \"" + _version + "\"");
+			OT_LOG_EAS("Version not found \"" + _version + "\"");
 			return nullptr;
 		}
 	}
@@ -352,7 +383,5 @@ const ot::VersionGraphCfg::VersionsList* ot::VersionGraphCfg::findBranch(const s
 			return &branchVersions;
 		}
 	}
-
-	OT_LOG_W("Branch \"" + _branchName + "\" not found");
 	return nullptr;
 }

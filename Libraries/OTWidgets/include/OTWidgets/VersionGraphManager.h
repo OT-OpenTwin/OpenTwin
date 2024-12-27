@@ -41,7 +41,7 @@ namespace ot {
 		void setCurrentViewMode(ViewMode _mode);
 		ViewMode getCurrentViewMode(void) const;
 
-		void addVersion(VersionGraphVersionCfg&& _config);
+		VersionGraphVersionCfg& addVersion(VersionGraphVersionCfg&& _config);
 
 		VersionGraphVersionCfg* addVersion(const ConstJsonObject& _versionConfig);
 

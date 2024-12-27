@@ -127,16 +127,6 @@ ot::VersionGraphItem::~VersionGraphItem() {
 		delete m_parentConnection;
 		m_parentConnection = nullptr;
 	}
-
-	if (m_parentVersion) {
-		m_parentVersion->forgetChildVersion(this);
-		m_parentVersion = nullptr;
-	}
-
-	for (VersionGraphItem* child : m_childVersions) {
-		child->setParentVersionItem(nullptr);
-		delete child;
-	}
 }
 
 int ot::VersionGraphItem::getMaxRowIndex(void) const {

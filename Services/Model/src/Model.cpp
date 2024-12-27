@@ -3845,11 +3845,6 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	std::string currentModelVersion = getStateManager()->getModelStateVersion();
 	std::string activeBranch        = getStateManager()->getActiveBranch();
 
-	// Add the first version to the active branch version so the graph can find the version
-	if (!activeBranch.empty()) {
-		activeBranch.append(".1");
-	}
-
 	if (currentModelVersion != previousModelVersion)  // In case no changed occurred, it may happen that the model state version did not change
 	{
 		ot::VersionGraphVersionCfg newVersion(currentModelVersion, "", comment);
@@ -3986,9 +3981,6 @@ void Model::sendVersionGraphToUI(const ot::VersionGraphCfg& _versionGraph, const
 		versionGraphCreated = true;
 
 		// Add the first version to the active branch version so the graph can find the version
-		if (!_activeBranch.empty()) {
-			_activeBranch.append(".1");
-		}
 
 		ot::JsonDocument notify;
 		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_SetVersionGraph, notify.GetAllocator()), notify.GetAllocator());
@@ -4009,13 +4001,8 @@ void Model::sendVersionGraphToUI(const ot::VersionGraphCfg& _versionGraph, const
 
 void Model::setActiveVersionTreeState(void)
 {
-	std::string currentVersion = getStateManager()->getModelStateVersion();
-	std::string activeBranch   = getStateManager()->getActiveBranch();
-
-	// If there is a branch we use the first version of this branch to specify
-	if (!activeBranch.empty()) {
-		activeBranch.append(".1");
-	}
+	const std::string& currentVersion = getStateManager()->getModelStateVersion();
+	const std::string& activeBranch   = getStateManager()->getActiveBranch();
 
 	ot::JsonDocument notify;
 	notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_SetVersionGraphActive, notify.GetAllocator()), notify.GetAllocator());

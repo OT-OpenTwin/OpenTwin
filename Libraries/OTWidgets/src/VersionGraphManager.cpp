@@ -94,14 +94,20 @@ ot::VersionGraphManager::ViewMode ot::VersionGraphManager::getCurrentViewMode(vo
 	return stringToViewMode(m_modeSelector->currentText().toStdString());
 }
 
-void ot::VersionGraphManager::addVersion(VersionGraphVersionCfg&& _config) {
-	m_config.addVersion(std::move(_config));
+ot::VersionGraphVersionCfg& ot::VersionGraphManager::addVersion(VersionGraphVersionCfg&& _config) {
+	return m_config.addVersion(std::move(_config));
 }
 
 ot::VersionGraphVersionCfg* ot::VersionGraphManager::addVersion(const ConstJsonObject& _versionConfig) {
-	VersionGraphVersionCfg* newVersion = new VersionGraphVersionCfg;
-	newVersion->setFromJsonObject(_versionConfig);
-	return newVersion;
+	VersionGraphVersionCfg newVersion;
+	newVersion.setFromJsonObject(_versionConfig);
+	if (newVersion.getName().empty()) {
+		OT_LOG_EA("Invalid version configuration");
+		return nullptr;
+	}
+	else {
+		return &this->addVersion(std::move(newVersion));
+	}
 }
 
 void ot::VersionGraphManager::activateVersion(const std::string& _versionName, const std::string& _activeBranchVersionName) {

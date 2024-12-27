@@ -5,17 +5,29 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/String.h"
 #include "OTGui/VersionGraphCfg.h"
 #include "OTGui/VersionGraphVersionCfg.h"
 
-ot::VersionGraphVersionCfg::VersionGraphVersionCfg() 
+ot::VersionGraphVersionCfg ot::VersionGraphVersionCfg::createBranchNodeFromBranch(const std::string& _branch) {
+	VersionGraphVersionCfg version;
+	if (!_branch.empty()) {
+		size_t ix = _branch.rfind('.');
+		if (ix != std::string::npos) {
+			version.setName(_branch.substr(0, ix));
+		}
+	}
+	return version;
+}
+
+ot::VersionGraphVersionCfg::VersionGraphVersionCfg()
 	: m_directParentIsHidden(false)
 {
 
 }
 
-ot::VersionGraphVersionCfg::VersionGraphVersionCfg(const std::string& _name, const std::string& _label, const std::string& _description)
-	: m_name(_name), m_label(_label), m_description(_description), m_directParentIsHidden(false)
+ot::VersionGraphVersionCfg::VersionGraphVersionCfg(const std::string& _versionName, const std::string& _label, const std::string& _description)
+	: m_name(_versionName), m_label(_label), m_description(_description), m_directParentIsHidden(false)
 {
 
 }
@@ -106,21 +118,49 @@ std::string ot::VersionGraphVersionCfg::getBranchNodeName(void) const {
 	}
 }
 
-std::string ot::VersionGraphVersionCfg::getBranchNodeBranchName(void) const {
-	size_t ix = this->getName().rfind('.');
-	std::string result;
+int ot::VersionGraphVersionCfg::getVersionNumber(const std::string& _version) {
+	size_t ix = _version.rfind('.');
+	int result = 0;
+	bool failed = false;
 	if (ix == std::string::npos) {
-		return result; // "Main" branch
+		result = String::toNumber<int>(_version, failed);
 	}
-	size_t ix2 = this->getName().rfind('.', ix - 1);
-	if (ix2 == std::string::npos) {
-		OT_LOG_E("Version name format error");
-		return result;
+	else {
+		result = String::toNumber<int>(_version.substr(ix + 1), failed);
 	}
 
-	size_t ix3 = this->getName().rfind('.', ix2 - 1);
-	if (ix3 != std::string::npos) {
-		result = this->getName().substr(0, ix3);
+	if (failed) {
+		if (ix == std::string::npos) {
+			OT_LOG_EAS("Failed to convert version \"" + _version + "\" to number");
+		}
+		else {
+			OT_LOG_EAS("Failed to convert version \"" + _version.substr(ix + 1) + "\" to number");
+		}
 	}
+
 	return result;
+}
+
+bool ot::VersionGraphVersionCfg::isValid(void) const {
+	return VersionGraphVersionCfg::isValid(m_name);
+}
+
+bool ot::VersionGraphVersionCfg::isValid(const std::string& _versionName) {
+	size_t fromIx = 0;
+	const size_t len = _versionName.length();
+	while (fromIx < len) {
+		size_t ix = _versionName.find('.');
+		if (ix == std::string::npos) {
+			return String::isNumber<int>(_versionName.substr(fromIx));
+		}
+		else {
+			if (!String::isNumber<int>(_versionName.substr(fromIx, (ix - fromIx) - 1))) {
+				return false;
+			}
+			fromIx = ix + 1;
+		}
+	}
+
+	// Empty version name is not valid.
+	return false;
 }

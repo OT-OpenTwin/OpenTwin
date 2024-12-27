@@ -429,8 +429,9 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 	}
 	else if (storageType == "relative")
 	{
+		ot::VersionGraphVersionCfg incrementalStateVersion(docView["Version"].get_utf8().value.data());
+
 		m_currentModelBaseStateVersion = docView["BaseState"].get_utf8().value.data();
-		std::string incrementalStateVersion = docView["Version"].get_utf8().value.data();
 
 		// Find and load the last absolute state
 		if (!loadModelState(m_currentModelBaseStateVersion)) return false;
@@ -438,7 +439,8 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 		// Now load the following (incremental) versions until we reach the desired version
 		DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::GetDataBase()->getProjectName());
 
-		std::list<const ot::VersionGraphVersionCfg*> versionsToImport = m_graphCfg.findNextVersions(m_currentModelBaseStateVersion, incrementalStateVersion);
+		
+		std::list<const ot::VersionGraphVersionCfg*> versionsToImport = m_graphCfg.findNextVersions(m_currentModelBaseStateVersion, incrementalStateVersion.getBranchName(), incrementalStateVersion.getName());
 
 		for (const ot::VersionGraphVersionCfg* versionData : versionsToImport) {
 			auto queryDoc = bsoncxx::builder::basic::document{};
@@ -449,7 +451,7 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 
 			auto result = docBase.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
 			if (!result) {
-				OT_LOG_EAS("Model state not found { \"Version\": \"" + incrementalStateVersion + "\" }");
+				OT_LOG_EAS("Model state not found { \"Version\": \"" + incrementalStateVersion.getName() + "\" }");
 				return false; // Model state not found
 			}
 

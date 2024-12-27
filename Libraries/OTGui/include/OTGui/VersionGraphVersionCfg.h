@@ -21,10 +21,12 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT VersionGraphVersionCfg : public Serializable {
 	public:
+		static VersionGraphVersionCfg createBranchNodeFromBranch(const std::string& _branch);
+
 		VersionGraphVersionCfg();
 		//! \brief Assignment constructor.
 		//! \ref ot::VersionGraphVersionCfg::getName
-		VersionGraphVersionCfg(const std::string& _name, const std::string& _label = std::string(), const std::string& _description = std::string());
+		VersionGraphVersionCfg(const std::string& _versionName, const std::string& _label = std::string(), const std::string& _description = std::string());
 		VersionGraphVersionCfg(const VersionGraphVersionCfg& _other);
 		VersionGraphVersionCfg(VersionGraphVersionCfg&& _other) noexcept;
 		virtual ~VersionGraphVersionCfg();
@@ -64,11 +66,6 @@ namespace ot {
 		//! If this version is "2.1.1" the branch node is version "2".
 		std::string getBranchNodeName(void) const;
 
-		//! @brief Returns the name of the branch node.
-		//! If this version is "1.2.3" the branch node branch name is "". <br>
-		//! If this version is "1.2.3.4.5" the branch node branch name is "1.2".
-		std::string getBranchNodeBranchName(void) const;
-
 		//! \see getLabel
 		void setLabel(const std::string& _title) { m_label = _title; };
 
@@ -87,6 +84,19 @@ namespace ot {
 
 		//! \brief If the direct parent is hidden the connection line will be displayed as a dashed line.
 		bool getDirectParentIsHidden(void) const { return m_directParentIsHidden; };
+
+		//! \ref getVersionNumber
+		int getVersionNumber(void) const { return VersionGraphVersionCfg::getVersionNumber(m_name); };
+
+		//! \brief Returns the number of the version of the versions branch.
+		//! Will only take into account the version number of the last branch. For example: <br>
+		//! "11.22.3" will have the value 3.
+		static int getVersionNumber(const std::string& _version);
+
+		bool isValid(void) const;
+		
+		//! @brief Returns true if the version name matches the version name syntax.
+		static bool isValid(const std::string& _versionName);
 
 	private:
 		std::string m_name;

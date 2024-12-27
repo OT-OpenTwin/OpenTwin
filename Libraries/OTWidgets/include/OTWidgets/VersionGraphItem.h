@@ -33,9 +33,12 @@ namespace ot {
 		//! \brief Returns the maximum row index of this version and all of its childs.
 		int getMaxRowIndex(void) const;
 
+		//! @param _version Version to add. Caller keeps ownership of the pointer.
 		void addChildVersion(VersionGraphItem* _version);
+
+		//! @brief Remove version from list.
 		void forgetChildVersion(VersionGraphItem* _version);
-		std::list<VersionGraphItem*> getChildVersions(void) const { return m_childVersions; };
+		const std::list<VersionGraphItem*>& getChildVersions(void) const { return m_childVersions; };
 
 		void connectToParent(void);
 

@@ -7,6 +7,7 @@
 #include "OTWidgets/VersionGraph.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/VersionGraphItem.h"
+#include "OTWidgets/SignalBlockWrapper.h"
 
 ot::VersionGraph::VersionGraph() 
 	: m_updateItemPositionRequired(false), m_configFlags(NoConfigFlags)
@@ -62,28 +63,43 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 		}
 	}
 
-	// Get branch version
-	VersionsList* lst = nullptr;
-	VersionsList::const_iterator it;
-	this->findVersion(m_activeVersionBranch, lst, it);
-	if (!lst) {
-		if (!m_branches.empty()) {
-			lst = &m_branches.front();
-			it = lst->begin();
-		}
+	if (m_branches.empty()) {
+		return;
 	}
+
+	// Find "deepest" branch available
+	const VersionsList* lst = this->findBranch(m_activeVersionBranch);
+	if (!lst) {
+		VersionGraphVersionCfg branchNode = VersionGraphVersionCfg::createBranchNodeFromBranch(m_activeVersionBranch);
+		while (branchNode.isValid()) {
+			lst = this->findBranch(branchNode.getBranchName());
+			if (lst) {
+				break;
+			}
+			else {
+				branchNode.setName(branchNode.getBranchNodeName());
+			}
+		}
+		
+	}
+
 	if (lst) {
 		VersionGraphItem* version = lst->back();
 		while (version) {
 			version->setAsActiveVersionBranch();
 			version = version->getParentVersionItem();
 		}
-	}
 
-	m_updateItemPositionRequired = true;
+		m_updateItemPositionRequired = true;
+	}
+	else {
+		OT_LOG_E("Active branch \"" + m_activeVersionBranch + "\" not found");
+	}
 }
 
 void ot::VersionGraph::clear(void) {
+	SignalBlockWrapper signalsBlock(this);
+
 	for (const VersionsList& branchVersions : m_branches) {
 		for (VersionGraphItem* version : branchVersions) {
 			delete version;

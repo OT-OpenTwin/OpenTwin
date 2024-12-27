@@ -48,9 +48,9 @@ namespace ot {
 		//! All parent versions of this version are in the active branch.
 		const std::string& getActiveBranchName(void) const { return m_activeBranchName; };
 
-		void addVersion(const std::string& _version, const std::string& _parentVersion, const std::string& _label = std::string(), const std::string& _description = std::string());
+		VersionGraphVersionCfg& addVersion(const std::string& _version, const std::string& _parentVersion, const std::string& _label = std::string(), const std::string& _description = std::string());
 
-		void addVersion(VersionGraphVersionCfg&& _version);
+		VersionGraphVersionCfg& addVersion(VersionGraphVersionCfg&& _version);
 
 		//! \brief Returns the version with the given name (Expensive).
 		VersionGraphVersionCfg* findVersion(const std::string& _version);
@@ -69,12 +69,14 @@ namespace ot {
 
 		//! @brief Returns the next version to the specified version by taking the current branch into account.
 		const VersionGraphVersionCfg* findNextVersion(const std::string& _version) const;
+		const VersionGraphVersionCfg* findNextVersion(const std::string& _version, const std::string& _activeBranch) const;
 
 		//! @brief Returns a list containing all next versions.
 		//! The resulting list will not contain the specified _version.
 		//! @param _version The version to start searching from.
 		//! @param _lastVersion The last version to add to the list. Versions after that will be ignored.
-		std::list<const VersionGraphVersionCfg*> findNextVersions(const std::string& _version, const std::string& _lastVersion = std::string());
+		std::list<const VersionGraphVersionCfg*> findNextVersions(const std::string& _version, const std::string& _lastVersion);
+		std::list<const VersionGraphVersionCfg*> findNextVersions(const std::string& _version, const std::string& _activeBranch, const std::string& _lastVersion);
 
 		//! @brief Find all child versions of the specified versions. 
 		std::list<const VersionGraphVersionCfg*> findAllNextVersions(const std::string& _version);
@@ -108,7 +110,7 @@ namespace ot {
 		//! On success the list will be set to the corresponding list of the result or null if there is no next version.
 		//! \param _currentVersionListIterator List iterator of the _versionList pointing to the current version.
 		//! On success the iterator will be set to the corresponding list iterator of the result.
-		const ot::VersionGraphVersionCfg* findNextVersion(const std::string& _version, const VersionsList*& _versionList, VersionsList::const_iterator& _currentVersionListIterator) const;
+		const ot::VersionGraphVersionCfg* findNextVersion(const std::string& _version, const std::string& _activeBranch, const VersionsList*& _versionList, VersionsList::const_iterator& _currentVersionListIterator) const;
 		
 		void findAllNextVersions(std::list<const VersionGraphVersionCfg*>& _result, const VersionsList* _list, VersionsList::const_iterator _iterator) const;
 
