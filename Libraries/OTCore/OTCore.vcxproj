@@ -103,6 +103,7 @@
     <ClInclude Include="include\OTCore\ServiceBase.h" />
     <ClInclude Include="include\OTCore\Size2D.h" />
     <ClInclude Include="include\OTCore\String.h" />
+    <ClInclude Include="include\OTCore\String.hpp" />
     <ClInclude Include="include\OTCore\StringToNumericCheck.h" />
     <ClInclude Include="include\OTCore\StringToVariableConverter.h" />
     <ClInclude Include="include\OTCore\TemplateTypeName.h" />

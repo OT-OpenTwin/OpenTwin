@@ -12,8 +12,6 @@
 // std header
 #include <list>
 #include <string>
-#include <sstream>
-#include <iomanip>
 
 namespace ot {
 
@@ -71,6 +69,11 @@ namespace ot {
 		//! @param _failed Will be set to true if the operation failed
 		template <class T> static inline T toNumber(const std::string& _string, bool& _failed);
 
+		//! @brief Returns true if the provided string is a number.
+		//! @tparam T Number type.
+		//! @param _string Number string.
+		template <class T> static inline bool isNumber(const std::string& _string);
+
 		//! \brief Returns a hex string representing the provided number.
 		//! \param _number Number to convert.
 		//! \param _fill Fill character.
@@ -79,20 +82,4 @@ namespace ot {
 	};
 }
 
-template <class T> T ot::String::toNumber(const std::string& _string, bool& _failed) {
-	std::stringstream ss(_string);
-	T v;
-	ss >> v;
-	_failed = false;
-	if (ss.fail()) { _failed = true; }
-	std::string rest;
-	ss >> rest;
-	if (!rest.empty()) { _failed = true; }
-	return v;
-}
-
-template <class T> inline std::string ot::String::numberToHexString(T _number, char _fill, int _length) {
-	std::stringstream ss;
-	ss << std::hex << std::setw(_length) << std::setfill(_fill) << _number;
-	return std::move(ss.str());
-}
+#include "OTCore/String.hpp"

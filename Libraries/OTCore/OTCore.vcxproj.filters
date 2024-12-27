@@ -286,6 +286,9 @@
     <ClInclude Include="include\OTCore\PerformanceTests.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTCore\String.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
