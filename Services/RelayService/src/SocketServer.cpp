@@ -27,7 +27,7 @@ SocketServer& SocketServer::instance(void) {
 }
 
 bool SocketServer::startServer(void) {
-	OT_LOG_D("Setting up websocket");
+	OT_LOG_D("Setting up websocket \"" + m_websocketIp + "\"");
 
 	QHostAddress serverAddress;
 	serverAddress.setAddress(m_websocketIp.c_str());
@@ -67,14 +67,13 @@ bool SocketServer::startServer(void) {
 		return true;
 	}
 	else {
+		OT_LOG_E("Failed to start websocket server");
 		return false;
 	}
 }
 
-bool SocketServer::sendHttpRequest(const std::string& operation, const std::string& url, const std::string& jsonData, std::string& response)
-{
+bool SocketServer::sendHttpRequest(const std::string& operation, const std::string& url, const std::string& jsonData, std::string& response) {
 	try {
-
 		OT_LOG_D("Sending http request (" + operation + ") to " + url + ": " + jsonData);
 
 		bool success = false;
@@ -142,7 +141,7 @@ QString SocketServer::performAction(const char* json, const char* senderIP)
 
 		QString retVal = response.c_str();
 
-		OT_LOG_I("Returning received websocket answer to HTTP sender");
+		OT_LOG_D("Returning received websocket answer to HTTP sender");
 
 		return retVal;
 	}
@@ -164,7 +163,7 @@ void SocketServer::queueAction(const char* json, const char* senderIP)
 
 		std::string action = ot::json::getString(doc, "action");
 
-		OT_LOG_I("Received HTTP queue message: " + action);
+		OT_LOG("Received HTTP queue message: " + action, ot::QUEUED_INBOUND_MESSAGE_LOG);
 
 		if (action == OT_ACTION_CMD_ShutdownRequestedByService) {
 			shutdown();
