@@ -974,7 +974,7 @@ void ExternalServicesComponent::versionSelected(const std::string& _version) {
 			OT_LOG_EA(OT_INFO_SERVICE_TYPE_MODEL " service not found");
 			return;
 		}
-		OT_LOG_D("Version requested { \"Version\": \"" + _version + "\" }");
+		OT_LOG_D("Version selected { \"Version\": \"" + _version + "\" }");
 
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_VersionSelected, doc.GetAllocator()), doc.GetAllocator());
