@@ -3485,6 +3485,7 @@ std::string ExternalServicesComponent::handleSetVersionGraph(ot::JsonDocument& _
 
 	config.setActiveVersionName(ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_ACTIVE));
 	config.setActiveBranchName(ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_BRANCH));
+	config.sortBranches();
 
 	graphManager->setupConfig(std::move(config));
 

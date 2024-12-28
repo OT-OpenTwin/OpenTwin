@@ -15,6 +15,9 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT VersionGraphCfg : public Serializable {
 	public:
+		typedef std::list<VersionGraphVersionCfg> VersionsList;
+		typedef std::list<VersionsList> BranchesList;
+
 		VersionGraphCfg();
 		VersionGraphCfg(const VersionGraphCfg& _other) = delete;
 		VersionGraphCfg(VersionGraphCfg&& _other) noexcept;
@@ -51,6 +54,10 @@ namespace ot {
 		VersionGraphVersionCfg& addVersion(const std::string& _version, const std::string& _parentVersion, const std::string& _label = std::string(), const std::string& _description = std::string());
 
 		VersionGraphVersionCfg& addVersion(VersionGraphVersionCfg&& _version);
+
+		VersionsList& addBranch(VersionsList&& _branch);
+
+		static VersionsList& addBranch(VersionsList&& _branch, std::list<VersionsList>& _branchesList);
 
 		//! \brief Returns the version with the given name (Expensive).
 		VersionGraphVersionCfg* findVersion(const std::string& _version);
@@ -95,13 +102,13 @@ namespace ot {
 		void setBranches(std::list<std::list<VersionGraphVersionCfg>>&& _branches) { m_branches = std::move(_branches); };
 		const std::list<std::list<VersionGraphVersionCfg>>& getBranches(void) const { return m_branches; };
 
+		static void sortBranches(std::list<std::list<VersionGraphVersionCfg>>& _branches);
+		void sortBranches(void);
+
 		//! \breif Clear the version graph.
 		void clear(void);
 
 	private:
-		typedef std::list<VersionGraphVersionCfg> VersionsList;
-		typedef std::list<VersionsList> BranchesList;
-
 		//! \brief Finds the next version.
 		//! This method is designed to improve performance when "iterating" trough the current branch.
 		//! \param _version Version to find the next version of.
