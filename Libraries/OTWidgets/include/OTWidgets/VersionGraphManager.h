@@ -51,6 +51,8 @@ namespace ot {
 
 		void removeVersions(const std::list<std::string>& _versionNames);
 
+		bool versionIsBranchNode(const std::string& _versionName);
+
 	public Q_SLOTS:
 		void updateCurrentGraph(void);
 
@@ -59,11 +61,15 @@ namespace ot {
 			None = 0 << 0,
 			IsActive = 1 << 0,
 			IsDirect = 1 << 1,
+			IsBranchNode = 1 << 2
 		};
 		typedef Flags<ParentFlag> ParentFlags;
 
 		struct ParentInfo {
-			ParentInfo();
+			ParentInfo() :
+				parent(nullptr),
+				flags(ParentFlag::None)
+			{};
 
 			const VersionGraphVersionCfg* parent;
 			ParentFlags flags;

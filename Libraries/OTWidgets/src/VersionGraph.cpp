@@ -38,15 +38,16 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 	int row = 0;
 	for (const auto& branchVersions : _config.getBranches()) {
 		if (branchVersions.empty()) {
-			continue;
+			OT_LOG_E("Empty branch stored");
 		}
 
 		VersionsList newList;
 
 		VersionGraphItem* lastParentItem = nullptr;
 		if (!branchVersions.front().getBranchNodeName().empty()) {
-			lastParentItem = this->findVersion(branchVersions.front().getBranchNodeName());
+			lastParentItem = this->findExistingParentVersionOfBranchLeave(branchVersions.front().getBranchName());
 		}
+		OTAssert(lastParentItem || branchVersions.front().getName() == "1", "Parent not found");
 
 		for (const ot::VersionGraphVersionCfg& versionCfg : branchVersions) {
 			VersionGraphItem* newVersion = new VersionGraphItem(versionCfg, row, m_activeVersion, this->getGraphicsScene());
@@ -54,6 +55,7 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 				newVersion->setParentVersionItem(lastParentItem);
 				newVersion->connectToParent();
 			}
+
 			lastParentItem = newVersion;
 			newList.push_back(newVersion);
 		}
@@ -86,7 +88,7 @@ void ot::VersionGraph::setupFromConfig(const VersionGraphCfg& _config) {
 	if (lst) {
 		VersionGraphItem* version = lst->back();
 		while (version) {
-			version->setAsActiveVersionBranch();
+			version->setIsInActiveBranch();
 			version = version->getParentVersionItem();
 		}
 
@@ -242,6 +244,33 @@ ot::VersionGraphItem* ot::VersionGraph::findVersion(const std::string& _versionN
 	VersionsList* lst;
 	VersionsList::const_iterator it;
 	return this->findVersion(_versionName, lst, it);
+}
+
+ot::VersionGraphItem* ot::VersionGraph::findExistingParentVersionOfBranchLeave(const std::string& _branchLeaveName) {
+	VersionGraphVersionCfg branchNode = VersionGraphVersionCfg::createBranchNodeFromBranch(_branchLeaveName);
+
+	while (!branchNode.getName().empty()) {
+		const int branchNodeNumber = branchNode.getVersionNumber();
+		const VersionsList* branch = this->findBranch(branchNode.getBranchName());
+		if (branch) {
+			ot::VersionGraphItem* parentNode = nullptr;
+			for (VersionGraphItem* branchVersion : *branch) {
+				if (VersionGraphVersionCfg::getVersionNumber(branchVersion->getVersionConfig().getName()) <= branchNodeNumber) {
+					parentNode = branchVersion;
+				}
+				else {
+					break; // Remaining versions should all be greater or they are invalid.
+				}
+			}
+			if (parentNode) {
+				return parentNode;
+			}
+		}
+
+		branchNode = branchNode.getBranchNodeName();
+	}
+
+	return nullptr;
 }
 
 const ot::VersionGraphItem* ot::VersionGraph::findVersion(const std::string& _versionName) const {

@@ -102,9 +102,6 @@ namespace ot {
 		void setBranches(std::list<std::list<VersionGraphVersionCfg>>&& _branches) { m_branches = std::move(_branches); };
 		const std::list<std::list<VersionGraphVersionCfg>>& getBranches(void) const { return m_branches; };
 
-		static void sortBranches(std::list<std::list<VersionGraphVersionCfg>>& _branches);
-		void sortBranches(void);
-
 		//! \breif Clear the version graph.
 		void clear(void);
 

@@ -57,6 +57,7 @@ namespace ot {
 		void updateVersionPositions(void);
 		QRectF calculateFittedViewportRect(void) const;
 		VersionGraphItem* findVersion(const std::string& _versionName);
+		VersionGraphItem* findExistingParentVersionOfBranchLeave(const std::string& _branchLeaveName);
 		const VersionGraphItem* findVersion(const std::string& _versionName) const;
 		VersionGraphItem* findVersion(const std::string& _versionName, VersionsList*& _list, VersionsList::const_iterator& _iterator);
 		const VersionGraphItem* findVersion(const std::string& _versionName, const VersionsList*& _list, VersionsList::const_iterator& _iterator) const;

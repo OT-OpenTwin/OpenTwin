@@ -108,27 +108,36 @@ ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::addBranch(VersionsList&&
 		_branchesList.push_front(std::move(_branch));
 		return _branchesList.front();
 	}
-	
-	const std::string& newBranchName = _branch.front().getName();
+
+
+	const std::string& newBranchName = _branch.front().getBranchName();
 	bool failed = false;
 
 	for (auto it = _branchesList.begin(); it != _branchesList.end(); it++) {
+		if (it->front().getBranchName().empty()) {
+			continue; // Main branch always first
+		}
+
 		size_t newFrom = 0;
 		size_t newTo = 0;
 
-		const std::string& existingBranchName = it->front().getName();
+		const std::string& existingBranchName = it->front().getBranchName();
 		size_t branchFrom = 0;
 		size_t branchTo = 0;
 
+		// Example structure:
+		// 
+		// 1 --+----> 3 ---> 4 ---> ...
+		//     |      :      |
+		//     |      :      +--> branch A: 4.1.1 ---> ...
+		//     |      :
+		//     |      + ~                              <-- insert here (branch B: 3.1.1 ---> ...)
+		//     |
+		//     +--> branch C: 1.2.2.3.3.4.4 --> ...
+
 		bool isVersion = true;
 		while (newFrom != std::string::npos && branchFrom != std::string::npos) {
-			if (newFrom != 0) {
-				newFrom++;
-			}
-			if (branchFrom != 0) {
-				branchFrom++;
-			}
-
+			// Find next value of the branch to insert
 			newTo = newBranchName.find('.', newFrom);
 			int newValue = String::toNumber<int>((newTo == std::string::npos ? newBranchName.substr(newFrom) : newBranchName.substr(newFrom, newTo - newFrom)), failed);
 			if (failed) {
@@ -137,8 +146,9 @@ ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::addBranch(VersionsList&&
 				return _branchesList.back();
 			}			
 			
+			// Find next value of the existing branch
 			branchTo = existingBranchName.find('.', branchFrom);
-			int existingValue = String::toNumber<int>((newTo == std::string::npos ? existingBranchName.substr(branchFrom) : existingBranchName.substr(branchFrom, branchTo - branchFrom)), failed);
+			int existingValue = String::toNumber<int>((branchTo == std::string::npos ? existingBranchName.substr(branchFrom) : existingBranchName.substr(branchFrom, branchTo - branchFrom)), failed);
 			if (failed) {
 				OT_LOG_E("Invalid number format in \"" + existingBranchName + "\"");
 				_branchesList.push_back(std::move(_branch));
@@ -146,20 +156,31 @@ ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::addBranch(VersionsList&&
 			}
 
 			if (isVersion && (newValue > existingValue)) {
+				// The branch version number is greater than the than the one of the existing, put "above".
 				_branchesList.insert(it, std::move(_branch));
 				return *it;
 			}
 			else if (!isVersion && (newValue < existingValue)) {
+				// The branch number (e.g. 1.>2<.1) is lower than the one of the existing, put "above".
 				_branchesList.insert(it, std::move(_branch));
 				return *it;
 			}
 
-			newFrom = newTo;
-			branchFrom = branchTo;
 			isVersion = !isVersion;
+			
+			newFrom = newTo;
+			if (newFrom != std::string::npos) {
+				newFrom++;
+			}
+			
+			branchFrom = branchTo;
+			if (branchFrom != std::string::npos) {
+				branchFrom++;
+			}
 		}
 	}
 
+	// No insert location found, put "at bottom".
 	_branchesList.push_back(std::move(_branch));
 	return _branchesList.back();
 }
@@ -246,16 +267,15 @@ const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findPreviousVersion(const
 					if (branchVersion.getVersionNumber() > branchNode.getVersionNumber()) {
 						break;
 					}
-					OTAssert((parentVersion == nullptr ? true : parentVersion->getVersionNumber() < branchVersion.getVersionNumber()), "");
+					OTAssert((parentVersion == nullptr ? true : parentVersion->getVersionNumber() < branchVersion.getVersionNumber()), "Invalid version order");
 					parentVersion = &branchVersion;
 				}
 
 				if (parentVersion) {
-					return nullptr;
+					return parentVersion;
 				}
-
-				branchNode = VersionGraphVersionCfg(branchNode.getBranchNodeName());
 			}
+			branchNode = VersionGraphVersionCfg(branchNode.getBranchNodeName());
 		}
 
 		// This should happen only for version "1" since this version should always exist.
@@ -371,53 +391,6 @@ void ot::VersionGraphCfg::removeVersion(const std::string& _version) {
 	}
 }
 
-void ot::VersionGraphCfg::sortBranches(std::list<std::list<VersionGraphVersionCfg>>& _branches) {
-	std::list<VersionsList> tmp = std::move(_branches);
-	int layer = 0;
-	bool found = true;
-	while (found) {
-		found = false;
-		std::list<VersionsList> layerBranches;
-
-		for (VersionsList& branchVersions : tmp) {
-			// Check every remaining branch.
-			if (!branchVersions.empty()) {
-				found = true;
-				// Check if version is on current layer.
-				const std::string& frontVersionName = branchVersions.front().getName();
-				if (std::count(frontVersionName.begin(), frontVersionName.end(), '.') == layer) {
-					// Find sorted insert position.
-					for (auto it = layerBranches.begin(); it != layerBranches.end(); it++) {
-						if (branchVersions.front().getVersionNumber() > it->front().getVersionNumber()) {
-							// Greater version exists in list, move before.
-							layerBranches.insert(it, std::move(branchVersions));
-							break;
-						}
-					}
-
-					// Add to end
-					if (!branchVersions.empty()) {
-						layerBranches.push_back(std::move(branchVersions));
-					}
-				}
-			}
-		}
-
-		// Check next layer
-		layer += 2;
-
-		if (!layerBranches.empty()) {
-			for (VersionsList& layerBranch : layerBranches) {
-				_branches.push_back(std::move(layerBranch));
-			}
-		}
-	}
-}
-
-void ot::VersionGraphCfg::sortBranches(void) {
-	VersionGraphCfg::sortBranches(m_branches);
-}
-
 void ot::VersionGraphCfg::clear(void) {
 	m_branches.clear();
 	m_activeBranchName.clear();
@@ -428,10 +401,10 @@ const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findNextVersion(const std
 	// First check if any branch starts as child of this version
 	for (const VersionsList& branchVersions : m_branches) {
 		OTAssert(!branchVersions.empty(), "Empty branch stored");
-		const std::string branchNode = branchVersions.front().getBranchNodeName();
+		const std::string branchName = branchVersions.front().getBranchName();
 
 		// Check if the first version of the branch has _version as a branch node name and check if the active branch name starts with the branch node name aswell.
-		if (branchVersions.front().getBranchNodeName() == _version && _activeBranch.find(branchNode) == 0) {
+		if (branchVersions.front().getBranchNodeName() == _version && _activeBranch.find(branchName) == 0) {
 			_versionList = &branchVersions;
 			_currentVersionListIterator = branchVersions.begin();
 			return &branchVersions.front();

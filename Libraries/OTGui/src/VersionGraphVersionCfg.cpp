@@ -113,7 +113,7 @@ std::string ot::VersionGraphVersionCfg::getBranchNodeName(void) const {
 		return this->getName().substr(0, ix2); // Branch node
 	}
 	else {
-		OT_LOG_E("Version name format error");
+		OT_LOG_E("Version name format error. ThisVersion \"" + this->getName() + "\"");
 		return std::string(); // Error
 	}
 }
@@ -149,12 +149,14 @@ bool ot::VersionGraphVersionCfg::isValid(const std::string& _versionName) {
 	size_t fromIx = 0;
 	const size_t len = _versionName.length();
 	while (fromIx < len) {
-		size_t ix = _versionName.find('.');
+		size_t ix = _versionName.find('.', fromIx);
 		if (ix == std::string::npos) {
+			// Last version number (e.g. (1 = 1) or (1.2.2 = 1.2.>2<, ...) 
 			return String::isNumber<int>(_versionName.substr(fromIx));
 		}
 		else {
-			if (!String::isNumber<int>(_versionName.substr(fromIx, (ix - fromIx) - 1))) {
+			// Mid version/branch number (e.g. (1.2.2 = >1<.2.2, or 1.>2<.2, ...)
+			if (!String::isNumber<int>(_versionName.substr(fromIx, ix - fromIx))) {
 				return false;
 			}
 			fromIx = ix + 1;

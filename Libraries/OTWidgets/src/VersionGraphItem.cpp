@@ -191,7 +191,7 @@ void ot::VersionGraphItem::updateVersionPositionAndSize(void) {
 	}
 }
 
-void ot::VersionGraphItem::setAsActiveVersionBranch(void) {
+void ot::VersionGraphItem::setIsInActiveBranch(void) {
 	if (m_parentConnection) {
 		m_parentConnection->setLinePainter(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemSelectionBorder));
 	}

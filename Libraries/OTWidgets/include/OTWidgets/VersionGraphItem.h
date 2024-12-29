@@ -44,7 +44,7 @@ namespace ot {
 
 		void updateVersionPositionAndSize(void);
 
-		void setAsActiveVersionBranch(void);
+		void setIsInActiveBranch(void);
 
 		const QSizeF& getCurrentSize(void) const { return m_currentSize; };
 

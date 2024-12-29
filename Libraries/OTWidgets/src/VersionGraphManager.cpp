@@ -128,6 +128,17 @@ void ot::VersionGraphManager::removeVersions(const std::list<std::string>& _vers
 	this->updateCurrentGraph();
 }
 
+bool ot::VersionGraphManager::versionIsBranchNode(const std::string& _versionName) {
+	OTAssert(_versionName.empty(), "Empty version name");
+	for (const VersionGraphCfg::VersionsList& branchVersions : m_config.getBranches()) {
+		OTAssert(!branchVersions.empty(), "Empty branch stored");
+		if (branchVersions.front().getBranchNodeName() == _versionName) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void ot::VersionGraphManager::updateCurrentGraph(void) {	
 	switch (this->getCurrentViewMode()) {
 	case ot::VersionGraphManager::ViewAll:
@@ -175,9 +186,8 @@ void ot::VersionGraphManager::updateCurrentGraphViewAllMode(void) {
 				parentInfo.parent = nullptr;
 				
 				if (!this->findParentVersionInOtherBranches(version, newBranches, parentInfo.parent)) {
-					OT_LOG_EA("Failed to find parent branch");
+					OT_LOG_EAS("Failed to find parent branch of version \"" + version.getName() + "\"");
 				}
-				
 			}
 			isFirst = false;
 
@@ -501,7 +511,3 @@ void ot::VersionGraphManager::processLabeledOnlyItem(VersionGraphVersionCfg* _pa
 	}
 }
 */
-
-ot::VersionGraphManager::ParentInfo::ParentInfo() 
-	: parent(nullptr), flags(ParentFlag::None)
-{}
