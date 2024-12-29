@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Grid/DimensionPadding.h"
 #include "SystemDependencies/SystemProperties.h"
 

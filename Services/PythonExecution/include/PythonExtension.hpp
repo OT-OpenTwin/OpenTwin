@@ -1,3 +1,5 @@
+#pragma once
+
 #include "PythonExtension.h"
 #include "PythonException.h"
 #include "PythonModuleAPI.h"

@@ -1,3 +1,4 @@
+#pragma once
 
 #include "EntityResultTableData.h"
 #include "DataBase.h"

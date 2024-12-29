@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Simulation/FITTD3DLoopNoVectorization.h"
 
 template<class T>

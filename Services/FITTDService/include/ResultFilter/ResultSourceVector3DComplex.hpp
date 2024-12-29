@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ResultFilter/ResultSourceVector3DComplex.h"
 #include "ResultContainerVector3DComplex.h"
 
