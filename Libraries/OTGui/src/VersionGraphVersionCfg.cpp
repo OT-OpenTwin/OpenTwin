@@ -166,3 +166,32 @@ bool ot::VersionGraphVersionCfg::isValid(const std::string& _versionName) {
 	// Empty version name is not valid.
 	return false;
 }
+
+bool ot::VersionGraphVersionCfg::isOnActivePath(const std::string& _activeBranchName) const {
+	OTAssert(this->isValid(), "Invalid version");
+
+	VersionGraphVersionCfg branchNode;
+	if (_activeBranchName.empty()) {
+		// "main branch"
+		branchNode.setName(std::to_string(std::numeric_limits<int>::max()));
+	}
+	else {
+		// other branches
+		branchNode.setName(_activeBranchName + "." + std::to_string(std::numeric_limits<int>::max()));
+	}
+
+	// Find branch
+	while (branchNode.isValid()) {
+		if (this->getBranchName() == branchNode.getBranchName()) {
+			return this->getVersionNumber() <= branchNode.getVersionNumber();
+		}
+		branchNode = branchNode.getBranchNodeName();
+	}
+
+	return false;
+}
+
+bool ot::VersionGraphVersionCfg::isOnActivePath(const std::string& _versionName, const std::string& _activeBranchName) {
+	VersionGraphVersionCfg version(_versionName);
+	return version.isOnActivePath(_activeBranchName);
+}

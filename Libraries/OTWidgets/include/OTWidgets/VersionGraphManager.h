@@ -23,7 +23,8 @@ namespace ot {
 			ViewAll,
 			Compact,
 			CompactLabeled,
-			LabeledOnly
+			LabeledOnly,
+			Iterator
 		};
 		static std::string viewModeToString(ViewMode _mode);
 		static ViewMode stringToViewMode(const std::string& _mode);
@@ -82,6 +83,7 @@ namespace ot {
 		bool filterModeCompact(const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo);
 		bool filterModeCompactLabeled(const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo);
 		bool filterModeLabeledOnly(const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo);
+		bool filterModeIterator(const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo);
 
 		bool checkTextFilter(const VersionInfo& _versionInfo, const std::string& _filter) const;
 

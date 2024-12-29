@@ -20,8 +20,8 @@ namespace ot {
 		OT_DECL_NOCOPY(VersionInfo)
 	public:
 		enum VersionInfoFlag {
-			None = 0 << 0, //! \brief No information.
-			IsActive = 1 << 1, //! \brief Version is active version.
+			None           = 0 << 0, //! \brief No information.
+			IsActive       = 1 << 1, //! \brief Version is active version.
 
 			//! \brief Version has branches.
 			//! For example only version 2 would need this flag set: <br>
@@ -31,10 +31,11 @@ namespace ot {
 			//!             +-- 2.1.1 ----- ... <br>
 			//!             |                   <br>
 			//!             +-- 2.2.1 ----- ... <br>
-			//!  
-			IsBranchNode = 1 << 2,
-			IsEndOfBranch = 1 << 3, //! \brief Version is end of branch
-			IsDirect = 1 << 4  //! \brief Version is direct parent/child
+			//! 
+			IsBranchNode   = 1 << 2,
+			IsEndOfBranch  = 1 << 3, //! \brief Version is end of branch
+			IsDirect       = 1 << 4,  //! \brief Version is direct parent/child
+			IsOnActivePath = 1 << 5
 		};
 		OT_ADD_FRIEND_FLAG_FUNCTIONS(VersionInfoFlag)
 		typedef Flags<VersionInfoFlag> VersionInfoFlags;
@@ -64,6 +65,7 @@ namespace ot {
 
 			m_flags.setFlag(IsActive, m_versionConfig->getName() == _graphConfig.getActiveVersionName());
 			m_flags.setFlag(IsBranchNode, _graphConfig.getBranchesCountFromNode(m_versionConfig->getName()) > 0);
+			m_flags.setFlag(IsOnActivePath, m_versionConfig->isOnActivePath(_graphConfig.getActiveBranchName()));
 		}
 
 	private:
@@ -79,6 +81,7 @@ std::string ot::VersionGraphManager::viewModeToString(ViewMode _mode) {
 	case ot::VersionGraphManager::Compact: return "Compact View";
 	case ot::VersionGraphManager::CompactLabeled: return "Compact View + Labeled";
 	case ot::VersionGraphManager::LabeledOnly: return "Labeled Only";
+	case ot::VersionGraphManager::Iterator: return "Iterator";
 	default:
 		OT_LOG_EAS("Unknown view mode (" + std::to_string((int)_mode) + ")");
 		return "View All";
@@ -90,6 +93,7 @@ ot::VersionGraphManager::ViewMode ot::VersionGraphManager::stringToViewMode(cons
 	else if (_mode == viewModeToString(ViewMode::Compact)) return ViewMode::Compact;
 	else if (_mode == viewModeToString(ViewMode::CompactLabeled)) return ViewMode::CompactLabeled;
 	else if (_mode == viewModeToString(ViewMode::LabeledOnly)) return ViewMode::LabeledOnly;
+	else if (_mode == viewModeToString(ViewMode::Iterator)) return ViewMode::Iterator;
 	else {
 		OT_LOG_EAS("Unknown view mode \"" + _mode + "\"");
 		return ViewMode::ViewAll;
@@ -111,7 +115,8 @@ ot::VersionGraphManager::VersionGraphManager() {
 		QString::fromStdString(viewModeToString(ViewMode::ViewAll)),
 		QString::fromStdString(viewModeToString(ViewMode::Compact)),
 		QString::fromStdString(viewModeToString(ViewMode::CompactLabeled)),
-		QString::fromStdString(viewModeToString(ViewMode::LabeledOnly))
+		QString::fromStdString(viewModeToString(ViewMode::LabeledOnly)),
+		QString::fromStdString(viewModeToString(ViewMode::Iterator))
 	});
 	m_modeSelector->setCurrentText(QString::fromStdString(viewModeToString(ViewMode::ViewAll)));
 
@@ -418,6 +423,7 @@ bool ot::VersionGraphManager::filterVersion(ViewMode _viewMode, const std::strin
 	case ot::VersionGraphManager::Compact: return this->filterModeCompact(_activeVersionName, _filterText, _parentInfo, _versionInfo, _childsInfo);
 	case ot::VersionGraphManager::CompactLabeled: return this->filterModeCompactLabeled(_activeVersionName, _filterText, _parentInfo, _versionInfo, _childsInfo);
 	case ot::VersionGraphManager::LabeledOnly: return this->filterModeLabeledOnly(_activeVersionName, _filterText, _parentInfo, _versionInfo, _childsInfo);
+	case ot::VersionGraphManager::Iterator: return this->filterModeIterator(_activeVersionName, _filterText, _parentInfo, _versionInfo, _childsInfo);
 	default:
 		OT_LOG_EAS("Unknown view mode (" + std::to_string((int)_viewMode) + ")");
 		return this->filterModeAll(_activeVersionName, _filterText, _parentInfo, _versionInfo, _childsInfo);
@@ -462,6 +468,20 @@ bool ot::VersionGraphManager::filterModeLabeledOnly(const std::string& _activeVe
 
 	if (visibleDefault || visibleLabeled) {
 		return this->checkTextFilter(_versionInfo, _filterText);
+	}
+	return false;
+}
+
+bool ot::VersionGraphManager::filterModeIterator(const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo) {
+	bool visibleDefault = _versionInfo.getConfig()->getName() == _activeVersionName 
+		|| _versionInfo.getConfig()->getName() == "1"
+		|| ((_versionInfo.getFlags() & (VersionInfo::IsOnActivePath | VersionInfo::IsEndOfBranch)) == (VersionInfo::IsOnActivePath | VersionInfo::IsEndOfBranch));
+
+	bool visibleNeighbour = _parentInfo.getFlags() & VersionInfo::IsActive 
+		|| _childsInfo.getFlags() & VersionInfo::IsActive;
+
+	if (visibleDefault || visibleNeighbour) {
+		return true;
 	}
 	return false;
 }

@@ -98,6 +98,10 @@ namespace ot {
 		//! @brief Returns true if the version name matches the version name syntax.
 		static bool isValid(const std::string& _versionName);
 
+		bool isOnActivePath(const std::string& _activeBranchName) const;
+
+		static bool isOnActivePath(const std::string& _versionName, const std::string& _activeBranchName);
+
 	private:
 		std::string m_name;
 		std::string m_label;
