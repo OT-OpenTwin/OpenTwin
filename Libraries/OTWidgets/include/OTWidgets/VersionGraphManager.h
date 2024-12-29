@@ -57,35 +57,14 @@ namespace ot {
 		void updateCurrentGraph(void);
 
 	private:
-		enum class ParentFlag {
-			None = 0 << 0,
-			IsActive = 1 << 0,
-			IsDirect = 1 << 1,
-			IsBranchNode = 1 << 2
-		};
-		typedef Flags<ParentFlag> ParentFlags;
-
-		struct ParentInfo {
-			ParentInfo() :
-				parent(nullptr),
-				flags(ParentFlag::None)
-			{};
-
-			const VersionGraphVersionCfg* parent;
-			ParentFlags flags;
-		};
-
-		void updateCurrentGraphViewAllMode(void);
-		void updateCurrentGraphCompactMode(void);
-		void updateCurrentGraphCompactLabelMode(void);
-		void updateCurrentGraphLabeledOnlyMode(void);
+		class VersionInfo;
 
 		//! @brief Returns true if the version number of _left is greater than _right (only concidering branch version number)
 		//! @param _left Greater value
 		//! @param _right Lower equal value
 		bool isVersionGreater(const std::string& _left, const std::string& _right) const;
 
-		bool findParentVersionInOtherBranches(const VersionGraphVersionCfg& _version, const std::list<std::list<VersionGraphVersionCfg>>& _branches, const VersionGraphVersionCfg*& _parent);
+		bool findParentVersionInOtherBranches(const VersionGraphVersionCfg& _version, const std::list<std::list<VersionGraphVersionCfg>>& _branches, VersionInfo& _parentInfo);
 
 		//! \brief Returns true if the filter matches the version or the filter is empty
 		bool checkFilterValid(const VersionGraphVersionCfg* _versionConfig, const QString& _filterText) const;
@@ -93,7 +72,18 @@ namespace ot {
 		//! Allows all versions to be shown.
 		//! If a text filter is set the filter will be used case insensitive in the version name, label and description.
 		//! Version "1" is always shown.
-		bool filterModeAll(const VersionGraphVersionCfg& _thisVersion, const std::string& _activeVersionName, const std::string& _filterText, const ParentInfo& _parentInfo);
+		bool filterVersion(ViewMode _viewMode, const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo);
+
+		//! Allows all versions to be shown.
+		//! If a text filter is set the filter will be used case insensitive in the version name, label and description.
+		//! Version "1" is always shown.
+		bool filterModeAll(const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo);
+
+		bool filterModeCompact(const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo);
+		bool filterModeCompactLabeled(const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo);
+		bool filterModeLabeledOnly(const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo);
+
+		bool checkTextFilter(const VersionInfo& _versionInfo, const std::string& _filter) const;
 
 		/*void startProcessCompact(bool _includeLabeledVersions, const QString& _filterText);
 		void processCompactItem(VersionGraphVersionCfg* _parent, const VersionGraphVersionCfg* _config, const std::string& _activeVersion, bool _isDirectParent, bool _includeLabeledVersions, const QString& _filterText);
@@ -105,8 +95,6 @@ namespace ot {
 		ComboBox* m_modeSelector;
 
 		VersionGraphCfg m_config;
-
-		OT_ADD_FRIEND_FLAG_FUNCTIONS(ParentFlag)
 	};
 
 }

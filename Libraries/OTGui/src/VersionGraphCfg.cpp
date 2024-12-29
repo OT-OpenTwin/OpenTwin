@@ -391,6 +391,29 @@ void ot::VersionGraphCfg::removeVersion(const std::string& _version) {
 	}
 }
 
+int ot::VersionGraphCfg::getBranchesCountFromNode(const std::string& _version) const {
+	int result = 0;
+	for (const VersionsList& branchVersions : m_branches) {
+		OTAssert(!branchVersions.empty(), "Empty branch stored");
+		if (branchVersions.front().getBranchNodeName() == _version) {
+			result++;
+		}
+	}
+	return result;
+}
+
+std::list<std::list<ot::VersionGraphVersionCfg>> ot::VersionGraphCfg::getBranchesFromNode(const std::string& _version) const {
+	std::list<std::list<VersionGraphVersionCfg>> branches;
+	for (const VersionsList& branchVersions : m_branches) {
+		OTAssert(!branchVersions.empty(), "Empty branch stored");
+		if (branchVersions.front().getBranchNodeName() == _version) {
+			branches.push_back(branchVersions);
+		}
+	}
+
+	return branches;
+}
+
 void ot::VersionGraphCfg::clear(void) {
 	m_branches.clear();
 	m_activeBranchName.clear();
@@ -398,6 +421,10 @@ void ot::VersionGraphCfg::clear(void) {
 }
 
 const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findNextVersion(const std::string& _version, const std::string& _activeBranch, const VersionsList*& _versionList, VersionsList::const_iterator& _currentVersionListIterator) const {
+	if (_version.empty()) {
+		return nullptr;
+	}
+	
 	// First check if any branch starts as child of this version
 	for (const VersionsList& branchVersions : m_branches) {
 		OTAssert(!branchVersions.empty(), "Empty branch stored");

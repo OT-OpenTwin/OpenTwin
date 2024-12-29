@@ -102,6 +102,12 @@ namespace ot {
 		void setBranches(std::list<std::list<VersionGraphVersionCfg>>&& _branches) { m_branches = std::move(_branches); };
 		const std::list<std::list<VersionGraphVersionCfg>>& getBranches(void) const { return m_branches; };
 
+		//! @brief Returns the number of branches that have the specified version as a branch node.
+		int getBranchesCountFromNode(const std::string& _version) const;
+
+		//! @brief Returns a list of direct branches that have the specified version as a branch node.
+		std::list<std::list<VersionGraphVersionCfg>> getBranchesFromNode(const std::string& _version) const;
+
 		//! \breif Clear the version graph.
 		void clear(void);
 

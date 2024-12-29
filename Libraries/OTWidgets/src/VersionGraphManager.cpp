@@ -14,6 +14,65 @@
 // Qt header
 #include <QtWidgets/qlayout.h>
 
+namespace ot {
+
+	class VersionGraphManager::VersionInfo {
+		OT_DECL_NOCOPY(VersionInfo)
+	public:
+		enum VersionInfoFlag {
+			None = 0 << 0, //! \brief No information.
+			IsActive = 1 << 1, //! \brief Version is active version.
+
+			//! \brief Version has branches.
+			//! For example only version 2 would need this flag set: <br>
+			//!  <br>
+			//! 1 ----- 2 --+-- 3 ----- ...     <br>
+			//!             |                   <br>
+			//!             +-- 2.1.1 ----- ... <br>
+			//!             |                   <br>
+			//!             +-- 2.2.1 ----- ... <br>
+			//!  
+			IsBranchNode = 1 << 2,
+			IsEndOfBranch = 1 << 3, //! \brief Version is end of branch
+			IsDirect = 1 << 4  //! \brief Version is direct parent/child
+		};
+		OT_ADD_FRIEND_FLAG_FUNCTIONS(VersionInfoFlag)
+		typedef Flags<VersionInfoFlag> VersionInfoFlags;
+
+		VersionInfo() : m_flags(VersionInfoFlag::None), m_versionConfig(nullptr) {};
+		VersionInfo(VersionInfo&& _other) noexcept = delete;
+		VersionInfo& operator = (VersionInfo&& _other) noexcept {
+			if (this != &_other) {
+				m_flags = std::move(_other.m_flags);
+				m_versionConfig = _other.m_versionConfig;
+				_other.m_versionConfig = nullptr;
+			}
+			return *this;
+		}
+
+		void setFlag(VersionInfoFlag _flag, bool _active = true) { m_flags.setFlag(_flag, _active); };
+		void setFlags(const VersionInfoFlags& _flags) { m_flags = _flags; };
+		const VersionInfoFlags& getFlags(void) const { return m_flags; };
+
+		void setConfig(const VersionGraphVersionCfg* _config) { m_versionConfig = _config; };
+		const VersionGraphVersionCfg* getConfig(void) const { return m_versionConfig; };
+
+		void applyActiveAndBranchFlags(const VersionGraphCfg& _graphConfig) {
+			if (!m_versionConfig) {
+				return;
+			}
+
+			m_flags.setFlag(IsActive, m_versionConfig->getName() == _graphConfig.getActiveVersionName());
+			m_flags.setFlag(IsBranchNode, _graphConfig.getBranchesCountFromNode(m_versionConfig->getName()) > 0);
+		}
+
+	private:
+		VersionInfoFlags m_flags;
+		const VersionGraphVersionCfg* m_versionConfig;
+	};
+
+}
+
 std::string ot::VersionGraphManager::viewModeToString(ViewMode _mode) {
 	switch (_mode) {
 	case ot::VersionGraphManager::ViewAll: return "View All";
@@ -129,7 +188,7 @@ void ot::VersionGraphManager::removeVersions(const std::list<std::string>& _vers
 }
 
 bool ot::VersionGraphManager::versionIsBranchNode(const std::string& _versionName) {
-	OTAssert(_versionName.empty(), "Empty version name");
+	OTAssert(!_versionName.empty(), "Empty version name");
 	for (const VersionGraphCfg::VersionsList& branchVersions : m_config.getBranches()) {
 		OTAssert(!branchVersions.empty(), "Empty branch stored");
 		if (branchVersions.front().getBranchNodeName() == _versionName) {
@@ -139,38 +198,14 @@ bool ot::VersionGraphManager::versionIsBranchNode(const std::string& _versionNam
 	return false;
 }
 
-void ot::VersionGraphManager::updateCurrentGraph(void) {	
-	switch (this->getCurrentViewMode()) {
-	case ot::VersionGraphManager::ViewAll:
-		this->updateCurrentGraphViewAllMode();
-		break;
-
-	case ot::VersionGraphManager::Compact:
-		this->updateCurrentGraphCompactMode();
-		break;
-
-	case ot::VersionGraphManager::CompactLabeled:
-		this->updateCurrentGraphCompactLabelMode();
-		break;
-
-	case ot::VersionGraphManager::LabeledOnly:
-		this->updateCurrentGraphLabeledOnlyMode();
-		break;
-
-	default:
-		OT_LOG_EAS("Unknown view mode (" + std::to_string((int)this->getCurrentViewMode()) + ")");
-		m_graph->setupFromConfig(m_config);
-		break;
-	}
-}
-
-void ot::VersionGraphManager::updateCurrentGraphViewAllMode(void) {
+void ot::VersionGraphManager::updateCurrentGraph(void) {
+	ViewMode viewMode = this->getCurrentViewMode();
+	
 	VersionGraphCfg newConfig;
 	newConfig.setActiveVersionName(m_config.getActiveVersionName());
 	newConfig.setActiveBranchName(m_config.getActiveBranchName());
 
-	std::list<std::list<VersionGraphVersionCfg>> newBranches;
-	ParentInfo parentInfo;
+	VersionInfo parentInfo;
 	std::string filterText = m_textFilter->text().toStdString();
 
 	// Go trough all branches
@@ -179,94 +214,98 @@ void ot::VersionGraphManager::updateCurrentGraphViewAllMode(void) {
 
 		// Go trough all versions
 		bool isFirst = true;
-		for (const VersionGraphVersionCfg& version : branchVersions) {
+		for (auto versionIt = branchVersions.begin(); versionIt != branchVersions.end(); versionIt++) {
 			// Check if already a parent exists, so we know we are in a branch
-			if (parentInfo.parent && isFirst) {
+			if (!versionIt->isValid()) {
+				OT_LOG_E("Invalid version stored. Version: \"" + versionIt->getName() + "\"");
+				continue;
+			}
+
+			// Set current info
+			VersionInfo currentInfo;
+			currentInfo.setConfig(&(*versionIt));
+			currentInfo.applyActiveAndBranchFlags(m_config);
+			currentInfo.setFlag(VersionInfo::IsEndOfBranch, &(*versionIt) == &branchVersions.back());
+
+			// Check if we are at the beginning of a branch and are not on the main branch.
+			if (parentInfo.getConfig() && isFirst) {
 				// Update parent info to branch node
-				parentInfo.parent = nullptr;
-				
-				if (!this->findParentVersionInOtherBranches(version, newBranches, parentInfo.parent)) {
-					OT_LOG_EAS("Failed to find parent branch of version \"" + version.getName() + "\"");
+				parentInfo.setConfig(nullptr);
+
+				if (!this->findParentVersionInOtherBranches(currentInfo.getConfig()->getName(), newConfig.getBranches(), parentInfo)) {
+					OT_LOG_EAS("Failed to find parent branch of version \"" + currentInfo.getConfig()->getName() + "\"");
+				}
+				parentInfo.applyActiveAndBranchFlags(m_config);
+
+				if (parentInfo.getConfig()) {
+					parentInfo.setFlag(VersionInfo::IsDirect, parentInfo.getConfig()->getName() == currentInfo.getConfig()->getBranchNodeName());
+				}
+				else {
+					parentInfo.setFlag(VersionInfo::IsDirect, false);
 				}
 			}
 			isFirst = false;
 
-			// Check if the version should be added
-			if (this->filterModeAll(version, newConfig.getActiveVersionName(), filterText, parentInfo)) {
-				VersionGraphVersionCfg newVersion(version);
+			// Gather childs information
+			VersionInfo childsInfo;
 
-				// Set parent info
-				if (parentInfo.parent) {
-					newVersion.setParentVersion(parentInfo.parent->getName());
+			// Check if child is end of branch
+			if (currentInfo.getConfig() == &branchVersions.back()) {
+				childsInfo.setFlag(VersionInfo::IsEndOfBranch, true);
+			}
+			else {
+				// Check if next version is active
+				auto it2 = versionIt;
+				it2++;
+				if (it2 != branchVersions.end()) {
+					childsInfo.setFlag(VersionInfo::IsActive, it2->getName() == newConfig.getActiveVersionName());
+				}
+			}
+
+			// Check if any child branch exists and if any of them start with the active version.
+			for (const std::list<VersionGraphVersionCfg>& existingBranchVersions : m_config.getBranchesFromNode(currentInfo.getConfig()->getName())) {
+				OTAssert(!existingBranchVersions.empty(), "Empty branch stored");
+				if (existingBranchVersions.front().getName() == newConfig.getActiveVersionName()) {
+					childsInfo.setFlag(VersionInfo::IsActive, true);
+				}
+				childsInfo.setFlag(VersionInfo::IsBranchNode, true);
+			}
+
+			// Check if the version should be added
+			if (this->filterVersion(viewMode, newConfig.getActiveVersionName(), filterText, parentInfo, currentInfo, childsInfo)) {
+				// Copy original config
+				VersionGraphVersionCfg newVersion(*currentInfo.getConfig());
+
+				// Set parent
+				if (parentInfo.getConfig()) {
+					newVersion.setParentVersion(parentInfo.getConfig()->getName());
 				}
 				else {
 					newVersion.setParentVersion("");
 				}
-				newVersion.setDirectParentIsHidden(!(parentInfo.flags & ParentFlag::IsDirect));
+				newVersion.setDirectParentIsHidden(!(parentInfo.getFlags() & VersionInfo::IsDirect));
+
+				// Add config
 				newVersions.push_back(std::move(newVersion));
 
 				// Update current parent info
-				parentInfo.parent = &version;
-				parentInfo.flags |= ParentFlag::IsDirect;
-				if (version == newConfig.getActiveVersionName()) {
-					parentInfo.flags |= ParentFlag::IsActive;
-				}
-				else {
-					parentInfo.flags &= ~ParentFlag::IsActive;
-				}
+				parentInfo = std::move(currentInfo);
+				parentInfo.setFlag(VersionInfo::IsDirect, true);
 			}
 			else {
 				// Version should not be added, only update current parent info
-				parentInfo.flags &= ~ParentFlag::IsDirect;
+				parentInfo.setFlag(VersionInfo::IsDirect, false);
 			}
 		}
 
+		// If any versions were added to the branch add the branch
 		if (!newVersions.empty()) {
-			newBranches.push_back(std::move(newVersions));
+			newConfig.addBranch(std::move(newVersions));
 		}
 	}
 
 	// Apply new config
-	newConfig.setBranches(std::move(newBranches));
 	m_graph->setupFromConfig(newConfig);
-}
-
-void ot::VersionGraphManager::updateCurrentGraphCompactMode(void) {
-	//this->startProcessCompact(false, m_textFilter->text());
-}
-
-void ot::VersionGraphManager::updateCurrentGraphCompactLabelMode(void) {
-	//this->startProcessCompact(true, m_textFilter->text());
-}
-
-void ot::VersionGraphManager::updateCurrentGraphLabeledOnlyMode(void) {
-/*
-	VersionGraphCfg newConfig;
-	newConfig.setActiveVersionName(m_config.getActiveVersionName());
-
-	// Determine branch version
-	if (!m_config.getActiveBranchName().empty()) {
-		VersionGraphVersionCfg* branchVersion = m_config.findVersion(m_config.getActiveBranchName());
-		if (branchVersion) {
-			newConfig.setActiveBranchVersionName(branchVersion->getLastBranchVersion()->getName());
-		}
-		else {
-			OT_LOG_EAS("Branch version not found: \"" + m_config.getActiveBranchName() + "\"");
-		}
-	}
-
-	// Copy root config
-	VersionGraphVersionCfg* newItem = new VersionGraphVersionCfg;
-	newItem->applyConfigOnly(*m_config.getRootVersion());
-
-	// Process item childs
-	for (const VersionGraphVersionCfg* childCfg : m_config.getRootVersion()->getChildVersions()) {
-		this->processLabeledOnlyItem(newItem, childCfg, newConfig.getActiveVersionName(), true, m_textFilter->text());
-	}
-
-	newConfig.setRootVersion(newItem);
-	m_graph->setupFromConfig(newConfig);
-	*/
 }
 
 bool ot::VersionGraphManager::isVersionGreater(const std::string& _left, const std::string& _right) const {
@@ -317,7 +356,7 @@ bool ot::VersionGraphManager::isVersionGreater(const std::string& _left, const s
 	return versionLeft > versionRight;
 }
 
-bool ot::VersionGraphManager::findParentVersionInOtherBranches(const VersionGraphVersionCfg& _version, const std::list<std::list<VersionGraphVersionCfg>>& _branches, const VersionGraphVersionCfg*& _parent) {
+bool ot::VersionGraphManager::findParentVersionInOtherBranches(const VersionGraphVersionCfg& _version, const std::list<std::list<VersionGraphVersionCfg>>& _branches, VersionInfo& _parentInfo) {
 	VersionGraphVersionCfg tmpVersion(_version);
 
 	// Check in current branch
@@ -332,7 +371,7 @@ bool ot::VersionGraphManager::findParentVersionInOtherBranches(const VersionGrap
 				for (const VersionGraphVersionCfg& otherVersion : otherBranchVersions) {
 					if (otherVersion.getName() == tmpVersion.getName()) {
 						// Direct parent found
-						_parent = &otherVersion;
+						_parentInfo.setConfig(&otherVersion);
 						return true;
 					}
 					else if (!this->isVersionGreater(otherVersion.getName(), tmpVersion.getName())) {
@@ -345,7 +384,7 @@ bool ot::VersionGraphManager::findParentVersionInOtherBranches(const VersionGrap
 
 				// Direct parent version not found but one of its parents.
 				if (lastVersion) {
-					_parent = lastVersion;
+					_parentInfo.setConfig(lastVersion);
 					return true;
 				}
 			}
@@ -371,22 +410,79 @@ bool ot::VersionGraphManager::checkFilterValid(const VersionGraphVersionCfg* _ve
 	}
 }
 
-bool ot::VersionGraphManager::filterModeAll(const VersionGraphVersionCfg& _thisVersion, const std::string& _activeVersionName, const std::string& _filterText, const ParentInfo& _parentInfo) {
-	if (_thisVersion.getName() == _activeVersionName || _filterText.empty() || _thisVersion.getName() == "1") {
+bool ot::VersionGraphManager::filterVersion(ViewMode _viewMode, const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo) {
+	OTAssertNullptr(_versionInfo.getConfig());
+
+	switch (_viewMode) {
+	case ot::VersionGraphManager::ViewAll: return this->filterModeAll(_activeVersionName, _filterText, _parentInfo, _versionInfo, _childsInfo);
+	case ot::VersionGraphManager::Compact: return this->filterModeCompact(_activeVersionName, _filterText, _parentInfo, _versionInfo, _childsInfo);
+	case ot::VersionGraphManager::CompactLabeled: return this->filterModeCompactLabeled(_activeVersionName, _filterText, _parentInfo, _versionInfo, _childsInfo);
+	case ot::VersionGraphManager::LabeledOnly: return this->filterModeLabeledOnly(_activeVersionName, _filterText, _parentInfo, _versionInfo, _childsInfo);
+	default:
+		OT_LOG_EAS("Unknown view mode (" + std::to_string((int)_viewMode) + ")");
+		return this->filterModeAll(_activeVersionName, _filterText, _parentInfo, _versionInfo, _childsInfo);
+	}
+}
+
+bool ot::VersionGraphManager::filterModeAll(const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo) {
+	if (_versionInfo.getConfig()->getName() == _activeVersionName || _filterText.empty() || _versionInfo.getConfig()->getName() == "1") {
 		return true;
 	}
-	QString filterText = QString::fromStdString(_filterText).toLower();
-	QString entry = QString::fromStdString(_thisVersion.getName()).toLower();
-	if (entry.contains(filterText, Qt::CaseInsensitive)) {
+	else {
+		return this->checkTextFilter(_versionInfo, _filterText);
+	}
+}
+
+bool ot::VersionGraphManager::filterModeCompact(const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo) {
+	bool visibleDefault = _versionInfo.getConfig()->getName() == _activeVersionName || _versionInfo.getConfig()->getName() == "1";
+	bool visibleNeighbour = _parentInfo.getFlags() & VersionInfo::IsActive || _childsInfo.getFlags() & VersionInfo::IsActive;
+	bool visibleBranch = _versionInfo.getFlags() & VersionInfo::IsBranchNode || _versionInfo.getFlags() & VersionInfo::IsEndOfBranch;
+
+	if (visibleDefault || visibleNeighbour || visibleBranch) {
+		return this->checkTextFilter(_versionInfo, _filterText);
+	}
+	return false;
+}
+
+bool ot::VersionGraphManager::filterModeCompactLabeled(const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo) {
+	bool visibleDefault = _versionInfo.getConfig()->getName() == _activeVersionName || _versionInfo.getConfig()->getName() == "1";
+	bool visibleNeighbour = _parentInfo.getFlags() & VersionInfo::IsActive || _childsInfo.getFlags() & VersionInfo::IsActive;
+	bool visibleBranch = _versionInfo.getFlags() & VersionInfo::IsBranchNode || _versionInfo.getFlags() & VersionInfo::IsEndOfBranch;
+	bool visibleLabeled = !_versionInfo.getConfig()->getLabel().empty();
+
+	if (visibleDefault || visibleNeighbour || visibleBranch || visibleLabeled) {
+		return this->checkTextFilter(_versionInfo, _filterText);
+	}
+	return false;
+}
+
+bool ot::VersionGraphManager::filterModeLabeledOnly(const std::string& _activeVersionName, const std::string& _filterText, const VersionInfo& _parentInfo, const VersionInfo& _versionInfo, const VersionInfo& _childsInfo) {
+	bool visibleDefault = _versionInfo.getConfig()->getName() == _activeVersionName || _versionInfo.getConfig()->getName() == "1";
+	bool visibleLabeled = !_versionInfo.getConfig()->getLabel().empty();
+
+	if (visibleDefault || visibleLabeled) {
+		return this->checkTextFilter(_versionInfo, _filterText);
+	}
+	return false;
+}
+
+bool ot::VersionGraphManager::checkTextFilter(const VersionInfo& _versionInfo, const std::string& _filter) const {
+	if (_filter.empty() || !_versionInfo.getConfig()) {
 		return true;
 	}
-	
-	entry = QString::fromStdString(_thisVersion.getLabel()).toLower();
+
+	QString filterText = QString::fromStdString(_filter).toLower();
+	QString entry = QString::fromStdString(_versionInfo.getConfig()->getName()).toLower();
 	if (entry.contains(filterText, Qt::CaseInsensitive)) {
 		return true;
 	}
 
-	entry = QString::fromStdString(_thisVersion.getDescription()).toLower();
+	entry = QString::fromStdString(_versionInfo.getConfig()->getLabel()).toLower();
+	if (entry.contains(filterText, Qt::CaseInsensitive)) {
+		return true;
+	}
+
+	entry = QString::fromStdString(_versionInfo.getConfig()->getDescription()).toLower();
 	if (entry.contains(filterText, Qt::CaseInsensitive)) {
 		return true;
 	}
