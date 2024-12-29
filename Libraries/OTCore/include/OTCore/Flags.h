@@ -8,7 +8,7 @@
 #include <type_traits>
 
 //! \brief Adds bitwise operations for the provided enum.
-//! Use conveinience OT_ADD_FLAG_FUNCTIONS or OT_ADD_PRIVATE_FLAG_FUNCTIONS.
+//! Use conveinience OT_ADD_FLAG_FUNCTIONS or OT_ADD_FRIEND_FLAG_FUNCTIONS.
 #define OT_ADD_FLAG_FUNCTIONS_IMPL(___prefix, ___castType, ___enumName) ___prefix constexpr ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<___castType>(_lhv) | static_cast<___castType>(_rhv)); }; \
 ___prefix constexpr ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<___castType>(_lhv) & static_cast<___castType>(_rhv)); };  \
 ___prefix constexpr ___enumName operator ~ (___enumName _lhv) { return static_cast<___enumName>(~(static_cast<___castType>(_lhv))); };
@@ -17,61 +17,78 @@ ___prefix constexpr ___enumName operator ~ (___enumName _lhv) { return static_ca
 
 //! \def OT_ADD_FLAG_FUNCTIONS
 //! \brief Will add the default bitwise operations for the provided 64 bit bitfield.
-//! Use this at the bottom of the file where the enum and flags are defined.
+//! Use this at the bottom of the File where the enum is defined.                 <br>
+//!                                                                               <br>
+//!		class MyClass {                                                           <br>
+//!		public:                                                                   <br>
+//!			enum MyEnum {                                                         <br>
+//!				...                                                               <br>
+//!			}                                                                     <br>
+//!			typedef ot::Flags<MyEnum> MyFlags;                                    <br>
+//!			// Not here                                                           <br>
+//!		};                                                                        <br>
+//!                                                                               <br>
+//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum)                                    <br>
 //! 
-//!		class MyClass {
-//!		public:
-//!			enum MyEnum {
-//!				...
-//!			}
-//!			typedef ot::Flags<MyEnum> MyFlags;
-//!		};
-//! 
-//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum)
+//! \note Only enumration types are allowed.
 #define OT_ADD_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(, long long, ___enumName)
 
-//! \def OT_ADD_PRIVATE_FLAG_FUNCTIONS
+//! \def OT_ADD_FRIEND_FLAG_FUNCTIONS
 //! \brief Will add the default bitwise operations for the provided private 64 bit bitfield.
-//! Use this at the bottom of the class where the enum and flags are defined.
+//! Use this at the same scope inside the Class where the enum is defined.        <br>
+//!                                                                               <br>
+//!		class MyClass {                                                           <br>
+//!		private:                                                                  <br>
+//!			enum MyEnum {                                                         <br>
+//!				...                                                               <br>
+//!			}                                                                     <br>
+//!			typedef ot::Flags<MyEnum> MyFlags;                                    <br>
+//!			OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum)                         <br>
+//!		};                                                                        <br>
+//!                                                                               <br>
+//!		// Not here                                                               <br>
 //! 
-//!		class MyClass {
-//!		private:
-//!			enum MyEnum {
-//!				...
-//!			}
-//!			typedef ot::Flags<MyEnum> MyFlags;
-//!         OT_ADD_PRIVATE_FLAG_FUNCTIONS(MyClass::MyEnum)
-//!		};
-#define OT_ADD_PRIVATE_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(friend , long long, ___enumName)
+//! \note Only enumration types are allowed.
+#define OT_ADD_FRIEND_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(friend , long long, ___enumName)
+
 #else
+
 //! \def OT_ADD_FLAG_FUNCTIONS
 //! \brief Will add the default bitwise operations for the provided 32 bit bitfield.
-//! Use this at the bottom of the file where the enum and flags are defined.
+//! Use this at the bottom of the File where the enum is defined.                 <br>
+//!                                                                               <br>
+//!		class MyClass {                                                           <br>
+//!		public:                                                                   <br>
+//!			enum MyEnum {                                                         <br>
+//!				...                                                               <br>
+//!			}                                                                     <br>
+//!			typedef ot::Flags<MyEnum> MyFlags;                                    <br>
+//!			// Not here                                                           <br>
+//!		};                                                                        <br>
+//!                                                                               <br>
+//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum)                                    <br>
 //! 
-//!		class MyClass {
-//!		public:
-//!			enum MyEnum {
-//!				...
-//!			}
-//!			typedef ot::Flags<MyEnum> MyFlags;
-//!		};
-//! 
-//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum)
+//! \note Only enumration types are allowed.
 #define OT_ADD_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(, long, ___enumName)
 
-//! \def OT_ADD_PRIVATE_FLAG_FUNCTIONS
+//! \def OT_ADD_FRIEND_FLAG_FUNCTIONS
 //! \brief Will add the default bitwise operations for the provided private 32 bit bitfield.
-//! Use this at the bottom of the class where the enum and flags are defined.
+//! Use this at the same scope inside the Class where the enum is defined.        <br>
+//!                                                                               <br>
+//!		class MyClass {                                                           <br>
+//!		private:                                                                  <br>
+//!			enum MyEnum {                                                         <br>
+//!				...                                                               <br>
+//!			}                                                                     <br>
+//!			typedef ot::Flags<MyEnum> MyFlags;                                    <br>
+//!			OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum)                         <br>
+//!		};                                                                        <br>
+//!                                                                               <br>
+//!		// Not here                                                               <br>
 //! 
-//!		class MyClass {
-//!		private:
-//!			enum MyEnum {
-//!				...
-//!			}
-//!			typedef ot::Flags<MyEnum> MyFlags;
-//!         OT_ADD_PRIVATE_FLAG_FUNCTIONS(MyClass::MyEnum)
-//!		};
-#define OT_ADD_PRIVATE_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(friend , long, ___enumName)
+//! \note Only enumration types are allowed.
+#define OT_ADD_FRIEND_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(friend , long, ___enumName)
+
 #endif
 
 namespace ot {
@@ -79,7 +96,7 @@ namespace ot {
 	//! \class Flags
 	//! \brief This class is used to manage flags.
 	//! Don't forget to add OT_ADD_FLAG_FUNCTIONS and the bottom of your header.
-	//! Use OT_ADD_PRIVATE_FLAG_FUNCTIONS for private enums. <br>
+	//! Use OT_ADD_FRIEND_FLAG_FUNCTIONS for private enums or public enums of private classes. <br>
 	//! The type should be an enumeration where every value represents a single bit in a 32/64 bit value. <br>
 	//! e.g: <br>
 	//! enum enumName { <br>

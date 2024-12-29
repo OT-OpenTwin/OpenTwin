@@ -142,5 +142,5 @@ private:
 	WorkerError workerRegister(const UserManagement& _userManager);
 	WorkerError workerChangePassword(const UserManagement& _userManager);
 
-	OT_ADD_PRIVATE_FLAG_FUNCTIONS(LogInDialog::LogInStateFlag)
+	OT_ADD_FRIEND_FLAG_FUNCTIONS(LogInDialog::LogInStateFlag)
 };

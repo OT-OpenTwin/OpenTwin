@@ -106,7 +106,7 @@ namespace ot {
 
 		VersionGraphCfg m_config;
 
-		OT_ADD_PRIVATE_FLAG_FUNCTIONS(ParentFlag)
+		OT_ADD_FRIEND_FLAG_FUNCTIONS(ParentFlag)
 	};
 
 }

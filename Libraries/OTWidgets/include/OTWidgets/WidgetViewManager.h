@@ -243,7 +243,7 @@ namespace ot {
 		std::map<BasicServiceInformation, ViewNameTypeList*> m_viewOwnerMap; //! @brief Maps owners to widget view names and types
 		std::list<ViewEntry> m_views; //! @brief Contains all views and their owners.
 
-		OT_ADD_PRIVATE_FLAG_FUNCTIONS(ManagerState)
+		OT_ADD_FRIEND_FLAG_FUNCTIONS(ManagerState)
 	};
 
 }

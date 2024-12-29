@@ -583,7 +583,7 @@ private:
 	AppBase(AppBase&) = delete;
 	AppBase& operator = (AppBase&) = delete;
 
-	OT_ADD_PRIVATE_FLAG_FUNCTIONS(AppBase::AppState)
+	OT_ADD_FRIEND_FLAG_FUNCTIONS(AppBase::AppState)
 };
 
 OT_ADD_FLAG_FUNCTIONS(AppBase::ViewHandlingConfig)
