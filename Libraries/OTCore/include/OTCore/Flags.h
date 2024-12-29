@@ -1,3 +1,7 @@
+//! @file Flags.h
+//! @author Alexander Kuester (alexk95)
+// ###########################################################################################################################################################################################################################################################################################################################
+
 #pragma once
 
 // OpenTwin header
@@ -127,71 +131,91 @@ namespace ot {
 	public:
 		//! \brief Default constructor.
 		//! Initializes the data with 0.
-		inline Flags() : m_data{ static_cast<T>(0) } {};
+		inline constexpr Flags() : m_data(static_cast<T>(0)) {};
 
 		//! \brief Assignment constructor.
 		//! \param _initialData Initial data.
-		inline Flags(T _initialData) : m_data{ _initialData } {}
+		inline constexpr Flags(T _initialData) : m_data(_initialData) {};
 
 		//! \brief Copy constructor.
 		//! \param _other Other flags.
-		inline Flags(const Flags<T>& _other) : m_data{ _other.data() } {};
+		inline constexpr Flags(const Flags<T>& _other) : m_data(_other.data()) {};
+
+		//! \brief Move constructor;
+		//! \param _other Other flags.
+		inline constexpr Flags(Flags<T>&& _other) {
+			m_data = _other.m_data;
+			_other.m_data = static_cast<T>(0);
+		};
 
 		//! @brief Returns a copy of the data
-		inline T data(void) const { return m_data; };
+		inline constexpr T data(void) const { return m_data; };
 
 		//! @brief Replace the current data
 		//! @param _data The data that should be replaced with
-		inline void set(T _data) { m_data = _data; };
+		inline constexpr void set(T _data) { m_data = _data; };
 
 		//! @brief Set the provided flag
 		//! @param _flag The flag to set
-		inline void setFlag(T _flag) { m_data = m_data | _flag; };
+		inline constexpr void setFlag(T _flag) { m_data = m_data | _flag; };
 
 		//! @brief Set or remove the provided flag
 		//! @param _flag The flag to set
 		//! @param _flagIsSet If true the flag will be set, otherwise removed
-		inline void setFlag(T _flag, bool _flagIsSet) {
+		inline constexpr void setFlag(T _flag, bool _flagIsSet) {
 			if (_flagIsSet) { m_data = m_data | _flag; }
 			else { m_data = m_data & (~_flag); }
 		};
 
 		//! @brief Remove the provided flag
 		//! @param _flag The flag to remove
-		inline void removeFlag(T _flag) { m_data = m_data & (~_flag); };
+		inline constexpr void removeFlag(T _flag) { m_data = m_data & (~_flag); };
 
 		//! @brief Returns true if the provided flag is set
 		//! @param _flag the flag that should be checked
-		inline bool flagIsSet(T _flag) const { return (m_data & _flag); };
+		inline constexpr bool flagIsSet(T _flag) const { return (m_data & _flag); };
 
 		//! \brief Operator T is used to assign the Flags to a enum variable with the same type that is managed by Flags.
-		inline operator T(void) const { return m_data; };
+		inline constexpr operator T(void) const { return m_data; };
 
 		//! \brief Returns true if at least one flag is set (assuming 0 = no flags).
-		inline operator bool(void) const { return (bool)m_data; };
+		inline constexpr operator bool(void) const { return (bool)m_data; };
 
-		inline Flags<T>& operator = (T _flag) { m_data = _flag; return *this; };
-		inline Flags<T>& operator = (const Flags<T>& _other) { m_data = _other.m_data; return *this; };
+		inline constexpr Flags<T>& operator = (T _flag) { m_data = _flag; return *this; };
+		inline constexpr Flags<T>& operator = (const Flags<T>& _other) { m_data = _other.m_data; return *this; };
 
-		inline Flags<T> operator | (T _flag) const { return Flags<T>{ m_data | _flag }; };
-		inline Flags<T> operator | (const Flags<T>& _other) const { return Flags<T>{ _other.m_data | m_data }; };
+		//! @brief Move assign.
+		//! @param _other Data will be copied to this object. Data in _other object will be set to 0.
+		inline constexpr Flags<T>& operator = (Flags<T>&& _other) { 
+			if (this != &_other) {
+				m_data = _other.m_data;
+				_other.m_data = static_cast<T>(0);
+			}
+			
+			return *this; 
+		};
 
-		inline Flags<T> operator & (T _flag) const { return Flags<T>{ m_data & _flag }; };
-		inline Flags<T> operator & (const Flags<T>& _other) const { return Flags<T>{ _other.m_data & m_data }; };
+		inline constexpr Flags<T> operator | (T _flag) const { return Flags<T>{ m_data | _flag }; };
+		inline constexpr Flags<T> operator | (const Flags<T>& _other) const { return Flags<T>{ _other.m_data | m_data }; };
 
-		inline Flags<T>& operator |= (T _flag) { m_data = m_data | _flag; return *this; };
-		inline Flags<T>& operator |= (const Flags<T>& _other) { m_data = m_data | _other.m_data; return *this; };
+		inline constexpr Flags<T> operator & (T _flag) const { return Flags<T>{ m_data & _flag }; };
+		inline constexpr Flags<T> operator & (const Flags<T>& _other) const { return Flags<T>{ _other.m_data & m_data }; };
 
-		inline Flags<T>& operator &= (T _flag) { m_data = m_data & _flag; return *this; };
-		inline Flags<T>& operator &= (const Flags<T>& _other) { m_data = m_data & _other.m_data; return *this; };
+		inline constexpr Flags<T>& operator |= (T _flag) { m_data = m_data | _flag; return *this; };
+		inline constexpr Flags<T>& operator |= (const Flags<T>& _other) { m_data = m_data | _other.m_data; return *this; };
 
-		inline Flags<T> operator ~(void) const { return Flags<T>{ ~m_data }; };
+		inline constexpr Flags<T>& operator &= (T _flag) { m_data = m_data & _flag; return *this; };
+		inline constexpr Flags<T>& operator &= (const Flags<T>& _other) { m_data = m_data & _other.m_data; return *this; };
 
-		inline bool operator == (T _flag) const { return m_data == _flag; };
-		inline bool operator == (const Flags<T>& _other) const { return m_data == _other.m_data; };
+		inline constexpr Flags<T> operator ~(void) const { return Flags<T>{ ~m_data }; };
 
-		inline bool operator != (T _flag) const { return m_data != _flag; };
-		inline bool operator != (const Flags<T>& _other) const { return m_data != _other.m_data; };
+		inline constexpr bool operator == (T _flag) const { return m_data == _flag; };
+		inline constexpr bool operator == (const Flags<T>& _other) const { return m_data == _other.m_data; };
+
+		inline constexpr bool operator != (T _flag) const { return m_data != _flag; };
+		inline constexpr bool operator != (const Flags<T>& _other) const { return m_data != _other.m_data; };
 	};
 
 }
+
+#include "OTCore/Flags.hpp"
