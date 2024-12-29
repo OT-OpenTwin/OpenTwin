@@ -200,6 +200,9 @@ void ot::VersionGraph::updateVersionPositions(void) {
 
 	QRectF itmRect = this->getGraphicsScene()->itemsBoundingRect();
 	itmRect.adjust(-10, -10, 10, 10);
+	if (m_lastViewportRect.isValid()) {
+		itmRect = itmRect.united(m_lastViewportRect);
+	}
 	this->setSceneRect(itmRect);
 
 	if (!m_activeVersion.empty()) {
