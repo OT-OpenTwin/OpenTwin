@@ -65,7 +65,6 @@
     <ClInclude Include="include\OTCore\ContainerHelper.h" />
     <ClInclude Include="include\OTCore\DefensiveProgramming.h" />
     <ClInclude Include="include\OTCore\BasicEntityInformation.h" />
-    <ClInclude Include="include\OTCore\Flags.hpp" />
     <ClInclude Include="include\OTCore\LocalSettingsSwitch.h" />
     <ClInclude Include="include\OTCore\LogModeManager.h" />
     <ClInclude Include="include\OTCore\Math.h" />

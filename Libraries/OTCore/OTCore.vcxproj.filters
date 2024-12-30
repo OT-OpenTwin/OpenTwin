@@ -289,9 +289,6 @@
     <ClInclude Include="include\OTCore\String.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\Flags.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
