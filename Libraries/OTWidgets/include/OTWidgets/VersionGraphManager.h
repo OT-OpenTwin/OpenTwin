@@ -42,9 +42,9 @@ namespace ot {
 		void setCurrentViewMode(ViewMode _mode);
 		ViewMode getCurrentViewMode(void) const;
 
-		VersionGraphVersionCfg& addVersion(VersionGraphVersionCfg&& _config);
+		VersionGraphVersionCfg& insertVersion(VersionGraphVersionCfg&& _config);
 
-		VersionGraphVersionCfg* addVersion(const ConstJsonObject& _versionConfig);
+		VersionGraphVersionCfg* insertVersion(const ConstJsonObject& _versionConfig);
 
 		void activateVersion(const std::string& _versionName, const std::string& _activeBranchVersionName);
 

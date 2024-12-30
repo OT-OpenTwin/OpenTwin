@@ -174,9 +174,6 @@ private:
 	// This function clears the entire model state information
 	void clearModelState(void);
 
-	// Increment the version of the current model state
-	void incrementVersion(void);
-
 	// Load the entity data from a state document
 	void loadStateData(bsoncxx::document::view docView);
 
@@ -222,9 +219,6 @@ private:
 	// Get the description for the given version
 	std::string getVersionDescription(const std::string &version);
 
-	// Add an item to the version graph
-	void addVersionGraphItem(const std::string& _version, const std::string& _parentVersion, const std::string& _label, const std::string& _description);
-
 	// Remove an item from the version graph
 	void removeVersionGraphItem(const std::string &version);
 
@@ -246,9 +240,6 @@ private:
 
 	// Create a new branch and activate it (also update the model entity)
 	void createAndActivateNewBranch(void);
-
-	// Check whether the specified branch already exists
-	bool branchExists(const std::string& _branch);
 
 	// Count the number of dots in a version string
 	int countNumberOfDots(const std::string &text);

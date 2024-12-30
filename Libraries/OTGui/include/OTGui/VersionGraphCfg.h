@@ -43,6 +43,10 @@ namespace ot {
 		//! The active version is the currently active model version.
 		const std::string& getActiveVersionName(void) const { return m_activeVersionName; };
 
+		void incrementActiveVersion(void);
+
+		static std::string incrementVersion(const std::string& _version);
+
 		//! \see getActiveBranchName
 		void setActiveBranchName(const std::string& _version) { m_activeBranchName = _version; };
 
@@ -51,25 +55,25 @@ namespace ot {
 		//! All parent versions of this version are in the active branch.
 		const std::string& getActiveBranchName(void) const { return m_activeBranchName; };
 
-		VersionGraphVersionCfg& addVersion(const std::string& _version, const std::string& _parentVersion, const std::string& _label = std::string(), const std::string& _description = std::string());
+		VersionGraphVersionCfg& insertVersion(const std::string& _version, const std::string& _parentVersion, const std::string& _label = std::string(), const std::string& _description = std::string());
 
-		VersionGraphVersionCfg& addVersion(VersionGraphVersionCfg&& _version);
+		VersionGraphVersionCfg& insertVersion(VersionGraphVersionCfg&& _version);
 
 		VersionsList& insertBranch(VersionsList&& _branch);
 
 		static VersionsList& insertBranch(VersionsList&& _branch, std::list<VersionsList>& _branchesList);
 
-		//! \brief Returns the version with the given name (Expensive).
+		//! \brief Returns the version with the given name.
 		VersionGraphVersionCfg* findVersion(const std::string& _version);
+
+		//! \brief Returns the version with the given name.
+		const VersionGraphVersionCfg* findVersion(const std::string& _version) const;
 
 		//! @brief Returns the last version in the active branch.
 		const VersionGraphVersionCfg* findLastVersion(void);
 
 		//! @brief Returns the last version in the specified branch.
 		const VersionGraphVersionCfg* findLastVersion(const std::string& _branchName);
-
-		//! \brief Returns the version with the given name (Expensive).
-		const VersionGraphVersionCfg* findVersion(const std::string& _version) const;
 
 		//! @brief Returns the previous version to the specified version.
 		const VersionGraphVersionCfg* findPreviousVersion(const std::string& _version) const;
@@ -98,6 +102,8 @@ namespace ot {
 		//! \brief Removes the version and all of its childs if the version exists (Expensive).
 		void removeVersion(const std::string& _version);	
 
+		bool getBranchExists(const std::string& _branchName) const;
+
 		const std::list<std::list<VersionGraphVersionCfg>>& getBranches(void) const { return m_branches; };
 
 		//! @brief Returns the number of branches that have the specified version as a branch node.
@@ -124,6 +130,10 @@ namespace ot {
 
 		bool findVersionIterator(const std::string& _versionName, const VersionsList*& _list, VersionsList::const_iterator& _iterator) const;
 
+		typedef VersionsList* (FindBranchFun(const std::string& _branchName));
+		VersionsList* findBranch(const std::string& _branchName);
+
+		typedef const VersionsList* (ConstFindBranchFun(const std::string& _branchName));
 		const VersionsList* findBranch(const std::string& _branchName) const;
 
 		std::string m_activeVersionName;

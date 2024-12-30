@@ -158,11 +158,11 @@ ot::VersionGraphManager::ViewMode ot::VersionGraphManager::getCurrentViewMode(vo
 	return stringToViewMode(m_modeSelector->currentText().toStdString());
 }
 
-ot::VersionGraphVersionCfg& ot::VersionGraphManager::addVersion(VersionGraphVersionCfg&& _config) {
-	return m_config.addVersion(std::move(_config));
+ot::VersionGraphVersionCfg& ot::VersionGraphManager::insertVersion(VersionGraphVersionCfg&& _config) {
+	return m_config.insertVersion(std::move(_config));
 }
 
-ot::VersionGraphVersionCfg* ot::VersionGraphManager::addVersion(const ConstJsonObject& _versionConfig) {
+ot::VersionGraphVersionCfg* ot::VersionGraphManager::insertVersion(const ConstJsonObject& _versionConfig) {
 	VersionGraphVersionCfg newVersion;
 	newVersion.setFromJsonObject(_versionConfig);
 	if (newVersion.getName().empty()) {
@@ -170,7 +170,7 @@ ot::VersionGraphVersionCfg* ot::VersionGraphManager::addVersion(const ConstJsonO
 		return nullptr;
 	}
 	else {
-		return &this->addVersion(std::move(newVersion));
+		return &this->insertVersion(std::move(newVersion));
 	}
 }
 

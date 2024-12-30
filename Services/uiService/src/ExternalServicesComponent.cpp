@@ -3530,8 +3530,7 @@ std::string ExternalServicesComponent::handleAddAndActivateVersionGraphVersion(o
 	}
 
 	std::string activeBranch = ot::json::getString(_document, OT_ACTION_PARAM_UI_GRAPH_BRANCH);
-	
-	ot::VersionGraphVersionCfg* newVersion = graphManager->addVersion(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	ot::VersionGraphVersionCfg* newVersion = graphManager->insertVersion(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 	if (newVersion) {
 		graphManager->activateVersion(newVersion->getName(), activeBranch);
 	}

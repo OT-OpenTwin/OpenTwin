@@ -1,12 +1,13 @@
-
-#include "OTSystem/SystemInformation.h"
+// OpenTwin header
 #include "OTSystem/Application.h"
+#include "OTSystem/SystemInformation.h"
 
-#include <windows.h>
-#include <psapi.h>
+// std header
 #include <thread>
-#include <filesystem>
+#include <psapi.h>
 #include <fstream>
+#include <windows.h>
+#include <filesystem>
 
 ot::SystemInformation::SystemInformation() :
 	m_initialized(false),

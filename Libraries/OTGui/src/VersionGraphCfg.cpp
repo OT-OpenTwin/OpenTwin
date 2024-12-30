@@ -71,14 +71,69 @@ void ot::VersionGraphCfg::setFromJsonObject(const ot::ConstJsonObject& _object) 
 	}
 }
 
-ot::VersionGraphVersionCfg& ot::VersionGraphCfg::addVersion(const std::string& _version, const std::string& _parentVersion, const std::string& _label, const std::string& _description) {
-	VersionGraphVersionCfg newVersion(_version, _label, _description);
-	newVersion.setParentVersion(_parentVersion);
-	return this->addVersion(std::move(newVersion));
+void ot::VersionGraphCfg::incrementActiveVersion(void) {
+	m_activeVersionName = this->incrementVersion(m_activeVersionName);
 }
 
-ot::VersionGraphVersionCfg& ot::VersionGraphCfg::addVersion(VersionGraphVersionCfg&& _version) {
+std::string ot::VersionGraphCfg::incrementVersion(const std::string& _version) {
+	if (_version.empty()) {
+		OT_LOG_EA("Active version is empty!");
+		return std::string();
+	}
+
+	// Find current version number
+	size_t ix = _version.rfind('.');
+	std::string prefix;
+	VersionGraphVersionCfg::VersionNumberType versionNumber = 0;
+	bool failed = false;
+	
+	if (ix == std::string::npos) {
+		versionNumber = String::toNumber<VersionGraphVersionCfg::VersionNumberType>(_version, failed);
+	}
+	else {
+		versionNumber = String::toNumber<VersionGraphVersionCfg::VersionNumberType>(_version.substr(ix + 1), failed);
+		if (!failed) {
+			prefix = _version.substr(0, ix + 1);
+		}
+	}
+
+	if (failed) {
+		OT_LOG_EAS("Version syntax error on version \"" + _version + "\"");
+		return std::string();
+	}
+	else {
+		// Increment version
+		versionNumber++;
+
+		return prefix + std::to_string(versionNumber);
+	}
+}
+
+ot::VersionGraphVersionCfg& ot::VersionGraphCfg::insertVersion(const std::string& _version, const std::string& _parentVersion, const std::string& _label, const std::string& _description) {
+	VersionGraphVersionCfg newVersion(_version, _label, _description);
+	newVersion.setParentVersion(_parentVersion);
+	return this->insertVersion(std::move(newVersion));
+}
+
+ot::VersionGraphVersionCfg& ot::VersionGraphCfg::insertVersion(VersionGraphVersionCfg&& _version) {
 	std::string branchName = _version.getBranchName();
+
+	VersionsList* branch = this->findBranch(_version.getBranchName());
+	if (branch) {
+		// Insert into existing branch
+		VersionGraphVersionCfg::VersionNumberType versionNumber = _version.getVersionNumber();
+		for (auto it = branch->begin(); it != branch->end(); it++) {
+			if (versionNumber < it->getVersionNumber()) {
+				// Greater version found, insert before
+				return *branch->insert(it, std::move(_version));
+			}
+			else if (versionNumber == it->getVersionNumber()) {
+				// Duplicate version
+				OT_LOG_W("Version \"" + _version.getName() + "\" already exists in branch \"" + _version.getBranchName() + "\"");
+				return *it; // return existing version
+			}
+		}
+	}
 
 	// Add version to existing branch
 	for (std::list<VersionGraphVersionCfg>& branchVersions : m_branches) {
@@ -139,7 +194,7 @@ ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::insertBranch(VersionsLis
 		while (newFrom != std::string::npos && branchFrom != std::string::npos) {
 			// Find next value of the branch to insert
 			newTo = newBranchName.find('.', newFrom);
-			int newValue = String::toNumber<int>((newTo == std::string::npos ? newBranchName.substr(newFrom) : newBranchName.substr(newFrom, newTo - newFrom)), failed);
+			VersionGraphVersionCfg::VersionNumberType newValue = String::toNumber<VersionGraphVersionCfg::VersionNumberType>((newTo == std::string::npos ? newBranchName.substr(newFrom) : newBranchName.substr(newFrom, newTo - newFrom)), failed);
 			if (failed) {
 				OT_LOG_E("Invalid number format in \"" + newBranchName + "\"");
 				_branchesList.push_back(std::move(_branch));
@@ -148,7 +203,7 @@ ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::insertBranch(VersionsLis
 			
 			// Find next value of the existing branch
 			branchTo = existingBranchName.find('.', branchFrom);
-			int existingValue = String::toNumber<int>((branchTo == std::string::npos ? existingBranchName.substr(branchFrom) : existingBranchName.substr(branchFrom, branchTo - branchFrom)), failed);
+			VersionGraphVersionCfg::VersionNumberType existingValue = String::toNumber<VersionGraphVersionCfg::VersionNumberType>((branchTo == std::string::npos ? existingBranchName.substr(branchFrom) : existingBranchName.substr(branchFrom, branchTo - branchFrom)), failed);
 			if (failed) {
 				OT_LOG_E("Invalid number format in \"" + existingBranchName + "\"");
 				_branchesList.push_back(std::move(_branch));
@@ -157,13 +212,11 @@ ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::insertBranch(VersionsLis
 
 			if (isVersion && (newValue > existingValue)) {
 				// The branch version number is greater than the than the one of the existing, put "above".
-				_branchesList.insert(it, std::move(_branch));
-				return *it;
+				return *_branchesList.insert(it, std::move(_branch));
 			}
 			else if (!isVersion && (newValue < existingValue)) {
 				// The branch number (e.g. 1.>2<.1) is lower than the one of the existing, put "above".
-				_branchesList.insert(it, std::move(_branch));
-				return *it;
+				return *_branchesList.insert(it, std::move(_branch));
 			}
 
 			isVersion = !isVersion;
@@ -186,18 +239,48 @@ ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::insertBranch(VersionsLis
 }
 
 ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findVersion(const std::string& _version) {
-	for (std::list<VersionGraphVersionCfg>& branchVersions : m_branches) {
-		if (!branchVersions.empty()) {
-			if (_version == branchVersions.back()) {
-				return &branchVersions.back();
-			}
+	VersionGraphVersionCfg versionInfo(_version);
+
+	// Get branch
+	VersionsList* branchVersions = this->findBranch(versionInfo.getBranchName());
+
+	if (branchVersions) {
+		// First check back since it it is the most common access.
+		if (_version == branchVersions->back().getName()) {
+			return &branchVersions->back();
 		}
-		for (VersionGraphVersionCfg& version : branchVersions) {
-			if (_version == version) {
+
+		// Check all branch versions.
+		for (VersionGraphVersionCfg& version : *branchVersions) {
+			if (_version == version.getName()) {
 				return &version;
 			}
 		}
 	}
+
+	return nullptr;
+}
+
+const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findVersion(const std::string& _version) const {
+	VersionGraphVersionCfg versionInfo(_version);
+
+	// Get branch
+	const VersionsList* branchVersions = this->findBranch(versionInfo.getBranchName());
+
+	if (branchVersions) {
+		// First check back since it it is the most common access.
+		if (_version == branchVersions->back().getName()) {
+			return &branchVersions->back();
+		}
+
+		// Check all branch versions.
+		for (const VersionGraphVersionCfg& version : *branchVersions) {
+			if (_version == version.getName()) {
+				return &version;
+			}
+		}
+	}
+
 	return nullptr;
 }
 
@@ -213,23 +296,6 @@ const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findLastVersion(const std
 	else {
 		return nullptr;
 	}
-}
-
-const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findVersion(const std::string& _version) const {
-	for (const std::list<VersionGraphVersionCfg>& branchVersions : m_branches) {
-		if (!branchVersions.empty()) {
-			if (_version == branchVersions.back()) {
-				return &branchVersions.back();
-			}
-		}
-		for (const VersionGraphVersionCfg& version : branchVersions) {
-			if (_version == version) {
-				return &version;
-			}
-		}
-	}
-	OT_LOG_EAS("Version \"" + _version + "\" not found");
-	return nullptr;
 }
 
 const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findPreviousVersion(const std::string& _version) const {
@@ -259,7 +325,7 @@ const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findPreviousVersion(const
 		//                                        |
 
 		VersionGraphVersionCfg branchNode(versionIt->getBranchNodeName());
-		while (!branchNode.getName().empty()) {
+		while (branchNode.isValid()) {
 			const VersionsList* branch = this->findBranch(branchNode.getBranchName());
 			if (branch) {
 				const VersionGraphVersionCfg* parentVersion = nullptr;
@@ -391,6 +457,10 @@ void ot::VersionGraphCfg::removeVersion(const std::string& _version) {
 	}
 }
 
+bool ot::VersionGraphCfg::getBranchExists(const std::string& _branchName) const {
+	return this->findBranch(_branchName) != nullptr;
+}
+
 int ot::VersionGraphCfg::getBranchesCountFromNode(const std::string& _version) const {
 	int result = 0;
 	for (const VersionsList& branchVersions : m_branches) {
@@ -489,6 +559,16 @@ bool ot::VersionGraphCfg::findVersionIterator(const std::string& _versionName, c
 	}
 
 	return false;
+}
+
+ot::VersionGraphCfg::VersionsList* ot::VersionGraphCfg::findBranch(const std::string& _branchName) {
+	for (VersionsList& branchVersions : m_branches) {
+		OTAssert(!branchVersions.empty(), "Empty branch stored");
+		if (branchVersions.front().getBranchName() == _branchName) {
+			return &branchVersions;
+		}
+	}
+	return nullptr;
 }
 
 const ot::VersionGraphCfg::VersionsList* ot::VersionGraphCfg::findBranch(const std::string& _branchName) const {

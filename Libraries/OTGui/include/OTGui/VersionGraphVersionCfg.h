@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTSystem/ArchitectureInfo.h"
 #include "OTCore/Serializable.h"
 #include "OTGui/OTGuiAPIExport.h"
 
@@ -21,6 +22,12 @@ namespace ot {
 
 	class OT_GUI_API_EXPORT VersionGraphVersionCfg : public Serializable {
 	public:
+#ifdef OT_OS_64Bit
+		typedef long long VersionNumberType;
+#else
+		typedef long VersionNumberType;
+#endif
+
 		static VersionGraphVersionCfg createBranchNodeFromBranch(const std::string& _branch);
 
 		VersionGraphVersionCfg();
@@ -86,12 +93,12 @@ namespace ot {
 		bool getDirectParentIsHidden(void) const { return m_directParentIsHidden; };
 
 		//! \ref getVersionNumber
-		int getVersionNumber(void) const { return VersionGraphVersionCfg::getVersionNumber(m_name); };
+		VersionNumberType getVersionNumber(void) const { return VersionGraphVersionCfg::getVersionNumber(m_name); };
 
 		//! \brief Returns the number of the version of the versions branch.
 		//! Will only take into account the version number of the last branch. For example: <br>
 		//! "11.22.3" will have the value 3.
-		static int getVersionNumber(const std::string& _version);
+		static VersionNumberType getVersionNumber(const std::string& _version);
 
 		bool isValid(void) const;
 		

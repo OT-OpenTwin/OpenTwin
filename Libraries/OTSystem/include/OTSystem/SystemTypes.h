@@ -5,6 +5,7 @@
 
 #pragma once
 
+// OpenTwin header
 #include "OTSystem/ArchitectureInfo.h"
 
 namespace ot {

@@ -118,15 +118,15 @@ std::string ot::VersionGraphVersionCfg::getBranchNodeName(void) const {
 	}
 }
 
-int ot::VersionGraphVersionCfg::getVersionNumber(const std::string& _version) {
+ot::VersionGraphVersionCfg::VersionNumberType ot::VersionGraphVersionCfg::getVersionNumber(const std::string& _version) {
 	size_t ix = _version.rfind('.');
-	int result = 0;
+	VersionNumberType result = 0;
 	bool failed = false;
 	if (ix == std::string::npos) {
-		result = String::toNumber<int>(_version, failed);
+		result = String::toNumber<VersionNumberType>(_version, failed);
 	}
 	else {
-		result = String::toNumber<int>(_version.substr(ix + 1), failed);
+		result = String::toNumber<VersionNumberType>(_version.substr(ix + 1), failed);
 	}
 
 	if (failed) {
@@ -152,17 +152,17 @@ bool ot::VersionGraphVersionCfg::isValid(const std::string& _versionName) {
 		size_t ix = _versionName.find('.', fromIx);
 		if (ix == std::string::npos) {
 			// Last version number (e.g. (1 = 1) or (1.2.2 = 1.2.>2<, ...) 
-			return String::isNumber<int>(_versionName.substr(fromIx));
+			return String::isNumber<VersionNumberType>(_versionName.substr(fromIx));
 		}
 		else {
 			// Mid version/branch number (e.g. (1.2.2 = >1<.2.2, or 1.>2<.2, ...)
-			if (!String::isNumber<int>(_versionName.substr(fromIx, ix - fromIx))) {
+			if (!String::isNumber<VersionNumberType>(_versionName.substr(fromIx, ix - fromIx))) {
 				return false;
 			}
 			fromIx = ix + 1;
 		}
 	}
-
+		
 	// Empty version name is not valid.
 	return false;
 }
@@ -173,11 +173,11 @@ bool ot::VersionGraphVersionCfg::isOnActivePath(const std::string& _activeBranch
 	VersionGraphVersionCfg branchNode;
 	if (_activeBranchName.empty()) {
 		// "main branch"
-		branchNode.setName(std::to_string(std::numeric_limits<int>::max()));
+		branchNode.setName(std::to_string(std::numeric_limits<VersionNumberType>::max()));
 	}
 	else {
 		// other branches
-		branchNode.setName(_activeBranchName + "." + std::to_string(std::numeric_limits<int>::max()));
+		branchNode.setName(_activeBranchName + "." + std::to_string(std::numeric_limits<VersionNumberType>::max()));
 	}
 
 	// Find branch

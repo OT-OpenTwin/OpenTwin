@@ -2008,8 +2008,8 @@ void Model::addTopologyEntitiesToModel(std::list<EntityBase*>& entities, std::li
 	std::list<EntityBase*> topLevelEntities = getTopLevelEntitiesByName(entities);
 	std::set<EntityBase*> topLevelEntitySet(std::begin(topLevelEntities), std::end(topLevelEntities));
 
-	for (EntityBase* entity : entities)
-	{
+	for (EntityBase* entity : entities) {
+
 		// We only need to add visualization containers above the top level entities if needed, since
 		// all containers below the top level entities are part of the model and therefore are children of the top
 		// level entities. These children will be added together with the entity below.
