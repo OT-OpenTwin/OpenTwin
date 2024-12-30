@@ -305,7 +305,7 @@ void ot::VersionGraphManager::updateCurrentGraph(void) {
 
 		// If any versions were added to the branch add the branch
 		if (!newVersions.empty()) {
-			newConfig.addBranch(std::move(newVersions));
+			newConfig.insertBranch(std::move(newVersions));
 		}
 	}
 

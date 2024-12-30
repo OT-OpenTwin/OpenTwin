@@ -92,14 +92,14 @@ ot::VersionGraphVersionCfg& ot::VersionGraphCfg::addVersion(VersionGraphVersionC
 	// Create new branch
 	std::list<VersionGraphVersionCfg> newBranch;
 	newBranch.push_back(std::move(_version));
-	return this->addBranch(std::move(newBranch)).back();
+	return this->insertBranch(std::move(newBranch)).back();
 }
 
-ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::addBranch(VersionsList&& _branch) {
-	return VersionGraphCfg::addBranch(std::move(_branch), m_branches);
+ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::insertBranch(VersionsList&& _branch) {
+	return VersionGraphCfg::insertBranch(std::move(_branch), m_branches);
 }
 
-ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::addBranch(VersionsList&& _branch, std::list<VersionsList>& _branchesList) {
+ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::insertBranch(VersionsList&& _branch, std::list<VersionsList>& _branchesList) {
 	OTAssert(!_branch.empty(), "Empty branch provided");
 	OTAssert(_branch.front().isValid(), "Invalid branch");
 

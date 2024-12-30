@@ -48,10 +48,12 @@ namespace ot {
 
 		const QSizeF& getCurrentSize(void) const { return m_currentSize; };
 
-	private:		
+	private:
 		VersionGraphVersionCfg m_config;
+
 		VersionGraphItem* m_parentVersion;
 		GraphicsConnectionItem* m_parentConnection;
+
 		GraphicsTextItem* m_nameItem;
 		GraphicsTextItem* m_labelItem;
 		GraphicsInvisibleItem* m_inConnector;

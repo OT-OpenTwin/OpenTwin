@@ -55,9 +55,9 @@ namespace ot {
 
 		VersionGraphVersionCfg& addVersion(VersionGraphVersionCfg&& _version);
 
-		VersionsList& addBranch(VersionsList&& _branch);
+		VersionsList& insertBranch(VersionsList&& _branch);
 
-		static VersionsList& addBranch(VersionsList&& _branch, std::list<VersionsList>& _branchesList);
+		static VersionsList& insertBranch(VersionsList&& _branch, std::list<VersionsList>& _branchesList);
 
 		//! \brief Returns the version with the given name (Expensive).
 		VersionGraphVersionCfg* findVersion(const std::string& _version);
@@ -98,8 +98,6 @@ namespace ot {
 		//! \brief Removes the version and all of its childs if the version exists (Expensive).
 		void removeVersion(const std::string& _version);	
 
-		void setBranches(const std::list<std::list<VersionGraphVersionCfg>>& _branches) { m_branches = _branches; };
-		void setBranches(std::list<std::list<VersionGraphVersionCfg>>&& _branches) { m_branches = std::move(_branches); };
 		const std::list<std::list<VersionGraphVersionCfg>>& getBranches(void) const { return m_branches; };
 
 		//! @brief Returns the number of branches that have the specified version as a branch node.

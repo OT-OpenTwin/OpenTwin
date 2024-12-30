@@ -122,10 +122,24 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 }
 
 ot::VersionGraphItem::~VersionGraphItem() {
+	// Erase parent information from childs
+	for (VersionGraphItem* child : m_childVersions) {
+		child->setParentVersionItem(nullptr);
+	}
+
+	// Forget childs
+	m_childVersions.clear();
+
+	// Forget parent connection
 	if (m_parentConnection) {
 		m_parentConnection->disconnectItems();
 		delete m_parentConnection;
 		m_parentConnection = nullptr;
+
+		// Erase this information from parent
+		if (m_parentVersion) {
+			m_parentVersion->forgetChildVersion(this);
+		}
 	}
 }
 
@@ -167,6 +181,9 @@ void ot::VersionGraphItem::connectToParent(void) {
 	m_parentConnection->setZValue(1);
 	OTAssertNullptr(this->getGraphicsScene());
 	this->getGraphicsScene()->addItem(m_parentConnection);
+
+	// Register at parent
+	m_parentVersion->addChildVersion(this);
 }
 
 void ot::VersionGraphItem::updateVersionPositionAndSize(void) {

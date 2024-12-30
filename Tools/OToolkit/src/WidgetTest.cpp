@@ -84,8 +84,9 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	_content.addView(r);
 
 	m_versionGraph = new ot::VersionGraphManager;
+	m_versionGraph->setCurrentViewMode(ot::VersionGraphManager::Iterator);
 
-	this->updateVersionConfig("2.1.3", "2.1");
+	this->updateVersionConfig(ot::VersionGraphVersionCfg("2.1.3"));
 
 	root->addWidget(m_versionGraph->getQWidget());
 	this->connect(m_versionGraph->getGraph(), &VersionGraph::versionDeselected, this, &WidgetTest::slotVersionDeselected);
@@ -110,16 +111,18 @@ void WidgetTest::slotVersionSelected(const std::string& _versionName) {
 
 void WidgetTest::slotVersionActivatRequest(const std::string& _versionName) {
 	OT_LOG_D("Version activate request: " + _versionName);
-	this->updateVersionConfig(_versionName, _versionName);
+	ot::VersionGraphVersionCfg version(_versionName);
+	this->updateVersionConfig(version);
 }
 
-void WidgetTest::updateVersionConfig(const std::string& _activeVersionName, const std::string& _activeVersionBranch) {
+void WidgetTest::updateVersionConfig(const ot::VersionGraphVersionCfg& _version) {
 	ot::VersionGraphCfg cfg;
+	cfg.setActiveVersionName(_version.getName());
+	cfg.setActiveBranchName(_version.getBranchName());
 	{
 		ot::PerformanceIntervalTest test;
 
-		std::list<std::list<ot::VersionGraphVersionCfg>> branches;
-		std::list<ot::VersionGraphVersionCfg> b1;
+		std::list<ot::VersionGraphVersionCfg> currentBranch;
 		
 		// 1 - 5
 		for (int i = 1, par = 0; i < 6; i++, par++) {
@@ -130,11 +133,13 @@ void WidgetTest::updateVersionConfig(const std::string& _activeVersionName, cons
 			else {
 				v.setParentVersion(std::to_string(par));
 			}
-			b1.push_back(std::move(v));
+			currentBranch.push_back(std::move(v));
+		}
+		if (!currentBranch.empty()) {
+			cfg.insertBranch(std::move(currentBranch));
 		}
 
 		// 2.1.1 - 2.1.5
-		std::list<ot::VersionGraphVersionCfg> b2;
 		for (int i = 1, par = 0; i < 6; i++, par++) {
 			ot::VersionGraphVersionCfg v("2.1." + std::to_string(i));
 			if (par == 0) {
@@ -143,11 +148,13 @@ void WidgetTest::updateVersionConfig(const std::string& _activeVersionName, cons
 			else {
 				v.setParentVersion("2.1." + std::to_string(par));
 			}
-			b2.push_back(std::move(v));
+			currentBranch.push_back(std::move(v));
+		}
+		if (!currentBranch.empty()) {
+			cfg.insertBranch(std::move(currentBranch));
 		}
 
 		// 4.1.1 - 4.1.2
-		std::list<ot::VersionGraphVersionCfg> b3;
 		for (int i = 1, par = 0; i < 4; i++, par++) {
 			ot::VersionGraphVersionCfg v("4.1." + std::to_string(i));
 			if (par == 0) {
@@ -156,35 +163,35 @@ void WidgetTest::updateVersionConfig(const std::string& _activeVersionName, cons
 			else {
 				v.setParentVersion("4.1." + std::to_string(par));
 			}
-			b3.push_back(std::move(v));
+			currentBranch.push_back(std::move(v));
+		}
+		if (!currentBranch.empty()) {
+			cfg.insertBranch(std::move(currentBranch));
 		}
 
-		std::list<ot::VersionGraphVersionCfg> b4;
-		std::list<ot::VersionGraphVersionCfg> b5;
-		for (int i = 1, par = 0; i < 4; i++, par++) {
-			ot::VersionGraphVersionCfg v("4.1.2.1." + std::to_string(i));
-			ot::VersionGraphVersionCfg v2("4.1.2.2." + std::to_string(i));
+		std::list<ot::VersionGraphVersionCfg> currentBranchA;
+		std::list<ot::VersionGraphVersionCfg> currentBranchB;
+		
+		for (int i = 1, par = 0; i < 2000; i++, par++) {
+			ot::VersionGraphVersionCfg a("4.1.2.1." + std::to_string(i));
+			ot::VersionGraphVersionCfg b("4.1.2.2." + std::to_string(i));
 			if (par == 0) {
-				v.setParentVersion("4.1.2");
+				a.setParentVersion("4.1.2");
+				b.setParentVersion("4.1.2");
 			}
 			else {
-				v.setParentVersion("4.1.2.1." + std::to_string(par));
-				v2.setParentVersion("4.1.2.2." + std::to_string(par));
+				a.setParentVersion("4.1.2.1." + std::to_string(par));
+				b.setParentVersion("4.1.2.2." + std::to_string(par));
 			}
-			b4.push_back(std::move(v));
-			b5.push_back(std::move(v2));
+			currentBranchA.push_back(std::move(a));
+			currentBranchB.push_back(std::move(b));
 		}
-
-		branches.push_back(b1);
-		branches.push_back(b2);
-		branches.push_back(b3);
-		branches.push_back(b4);
-		branches.push_back(b5);
-
-		cfg.setBranches(branches);
-	
-		cfg.setActiveVersionName(_activeVersionName);
-		cfg.setActiveBranchName(_activeVersionBranch);
+		if (!currentBranchA.empty()) {
+			cfg.insertBranch(std::move(currentBranchA));
+		}
+		if (!currentBranchB.empty()) {
+			cfg.insertBranch(std::move(currentBranchB));
+		}
 
 		test.logCurrentInterval("Create config");
 	}

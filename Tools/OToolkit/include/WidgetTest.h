@@ -6,8 +6,11 @@
 #pragma once
 
 // Toolkit API header
-#include "OTCore/OTClassHelper.h"
 #include "OToolkitAPI/Tool.h"
+
+// OpenTwin header
+#include "OTCore/OTClassHelper.h"
+#include "OTGui/VersionGraphVersionCfg.h"
 
 // Qt header
 #include <QtCore/qobject.h>
@@ -41,7 +44,7 @@ private Q_SLOTS:
 	void slotVersionActivatRequest(const std::string& _versionName);
 
 private:
-	void updateVersionConfig(const std::string& _activeVersionName, const std::string& _activeVersionBranch);
+	void updateVersionConfig(const ot::VersionGraphVersionCfg& _version);
 
 	ot::VersionGraphManager* m_versionGraph;
 

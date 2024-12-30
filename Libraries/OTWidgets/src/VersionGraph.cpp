@@ -147,7 +147,8 @@ void ot::VersionGraph::slotSelectionChanged(void) {
 
 void ot::VersionGraph::slotCenterOnActiveVersion(void) {
 	QRectF rect = this->calculateFittedViewportRect();
-
+	
+	// If a previous viewport rect was set expand the new rect if needed.
 	if (m_lastViewportRect.isValid()) {
 		qreal w = 0.;
 		if (m_lastViewportRect.width() > rect.width()) {
@@ -157,6 +158,8 @@ void ot::VersionGraph::slotCenterOnActiveVersion(void) {
 		if (m_lastViewportRect.height() > rect.height()) {
 			h = (m_lastViewportRect.height() - rect.height()) / 2.;
 		}
+
+		// Expand rect
 		rect.adjust(-w, -h, w, h);
 	}
 
@@ -200,8 +203,16 @@ void ot::VersionGraph::updateVersionPositions(void) {
 
 	QRectF itmRect = this->getGraphicsScene()->itemsBoundingRect();
 	itmRect.adjust(-10, -10, 10, 10);
+
 	if (m_lastViewportRect.isValid()) {
-		itmRect = itmRect.united(m_lastViewportRect);
+		QSizeF newSize = itmRect.size();
+		if (newSize.width() < m_lastViewportRect.width()) {
+			newSize.setWidth(m_lastViewportRect.width());
+		}
+		if (newSize.height() < m_lastViewportRect.height()) {
+			newSize.setHeight(m_lastViewportRect.height());
+		}
+		itmRect.setSize(newSize);
 	}
 	this->setSceneRect(itmRect);
 
