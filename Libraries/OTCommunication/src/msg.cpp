@@ -143,25 +143,30 @@ bool ot::msg::send(
 	{
 		if (ca_cert_file.empty())
 		{
-			// Get the path of the executable (
-#ifdef _WIN32
-			char path[MAX_PATH] = { 0 };
-			GetModuleFileNameA(NULL, path, MAX_PATH);
-			ca_cert_file = path;
-#else
-			char result[PATH_MAX];
-			ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-			ca_cert_flile = std::string(result, (count > 0) ? count : 0);
-#endif
-			ca_cert_file = ca_cert_file.substr(0, ca_cert_file.rfind('\\'));
-			ca_cert_file += "\\Certificates\\ca.pem";
+			ca_cert_file = get_env_var("OPEN_TWIN_CA_CERT");
 
-			// Chyeck whether local cert file ca.pem exists
 			if (!std::filesystem::exists(ca_cert_file))
 			{
-				// Get the development root environment variable and build the path to the deployment cert file
-				std::string dev_root = get_env_var("OPENTWIN_DEV_ROOT");
-				ca_cert_file = dev_root + "\\Deployment\\Certificates\\ca.pem";
+				// Get the path of the executable 
+#ifdef _WIN32
+				char path[MAX_PATH] = { 0 };
+				GetModuleFileNameA(NULL, path, MAX_PATH);
+				ca_cert_file = path;
+#else
+				char result[PATH_MAX];
+				ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+				ca_cert_flile = std::string(result, (count > 0) ? count : 0);
+#endif
+				ca_cert_file = ca_cert_file.substr(0, ca_cert_file.rfind('\\'));
+				ca_cert_file += "\\Certificates\\ca.pem";
+
+				// Check whether local cert file ca.pem exists
+				if (!std::filesystem::exists(ca_cert_file))
+				{
+					// Get the development root environment variable and build the path to the deployment cert file
+					std::string dev_root = get_env_var("OPENTWIN_DEV_ROOT");
+					ca_cert_file = dev_root + "\\Deployment\\Certificates\\ca.pem";
+				}
 			}
 		}
 
