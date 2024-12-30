@@ -30,19 +30,29 @@ WebsocketClient::WebsocketClient(const std::string& _socketUrl) :
 	wsUrl = ot::String::replace(wsUrl, "127.0.0.1", "localhost");
 	m_url = QUrl(wsUrl.c_str());
 
-	QString caStr = QCoreApplication::applicationDirPath() + "\\Certificates\\ca.pem";
+	QString caStr = QProcessEnvironment::systemEnvironment().value("OPEN_TWIN_CA_CERT", "");
 
-	// Check whether local cert file ca.pem exists
+	// Check whether cert file ca.pem exists by using environment variable
 	if (!QFile::exists(caStr))
 	{
-		// Get the development root environment variable
-		std::cout << "Using development root certificate file" << std::endl;
+		caStr = QCoreApplication::applicationDirPath() + "\\Certificates\\ca.pem";
 
-		caStr = QProcessEnvironment::systemEnvironment().value("OPENTWIN_DEV_ROOT", "") + "\\Deployment\\Certificates\\ca.pem";
+		// Check whether local cert file ca.pem exists
+		if (!QFile::exists(caStr))
+		{
+			// Get the development root environment variable
+			std::cout << "Using development root certificate file" << std::endl;
+
+			caStr = QProcessEnvironment::systemEnvironment().value("OPENTWIN_DEV_ROOT", "") + "\\Deployment\\Certificates\\ca.pem";
+		}
+		else
+		{
+			std::cout << "Using local certificate file" << std::endl;
+		}
 	}
 	else
 	{
-		std::cout << "Using local certificate file" << std::endl;
+		std::cout << "Using global certificate file (OPEN_TWIN_CA_CERT)" << std::endl;
 	}
 
 	// SSL/ TLS Configuration
