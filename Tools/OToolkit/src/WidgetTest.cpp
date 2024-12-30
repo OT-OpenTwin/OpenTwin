@@ -116,6 +116,9 @@ void WidgetTest::slotVersionActivatRequest(const std::string& _versionName) {
 }
 
 void WidgetTest::updateVersionConfig(const ot::VersionGraphVersionCfg& _version) {
+	ot::PerformanceIntervalTest totalTest;
+	totalTest.logOnDelete("UpdateVersion: Total time");
+
 	ot::VersionGraphCfg cfg;
 	cfg.setActiveVersionName(_version.getName());
 	cfg.setActiveBranchName(_version.getBranchName());
@@ -171,29 +174,53 @@ void WidgetTest::updateVersionConfig(const ot::VersionGraphVersionCfg& _version)
 
 		std::list<ot::VersionGraphVersionCfg> currentBranchA;
 		std::list<ot::VersionGraphVersionCfg> currentBranchB;
+		std::list<ot::VersionGraphVersionCfg> currentBranchC;
+		std::list<ot::VersionGraphVersionCfg> currentBranchD;
+		std::list<ot::VersionGraphVersionCfg> currentBranchE;
 		
-		for (int i = 1, par = 0; i < 2000; i++, par++) {
+		for (int i = 1, par = 0; i < 20000; i++, par++) {
 			ot::VersionGraphVersionCfg a("4.1.2.1." + std::to_string(i));
 			ot::VersionGraphVersionCfg b("4.1.2.2." + std::to_string(i));
+			ot::VersionGraphVersionCfg c("4.1.2.3." + std::to_string(i));
+			ot::VersionGraphVersionCfg d("4.1.2.4." + std::to_string(i));
+			ot::VersionGraphVersionCfg e("4.1.2.5." + std::to_string(i));
 			if (par == 0) {
 				a.setParentVersion("4.1.2");
 				b.setParentVersion("4.1.2");
+				c.setParentVersion("4.1.2");
+				d.setParentVersion("4.1.2");
+				e.setParentVersion("4.1.2");
 			}
 			else {
 				a.setParentVersion("4.1.2.1." + std::to_string(par));
 				b.setParentVersion("4.1.2.2." + std::to_string(par));
+				c.setParentVersion("4.1.2.3." + std::to_string(par));
+				d.setParentVersion("4.1.2.4." + std::to_string(par));
+				e.setParentVersion("4.1.2.5." + std::to_string(par));
 			}
 			currentBranchA.push_back(std::move(a));
 			currentBranchB.push_back(std::move(b));
+			currentBranchC.push_back(std::move(c));
+			currentBranchD.push_back(std::move(d));
+			currentBranchE.push_back(std::move(e));
 		}
-		if (!currentBranchA.empty()) {
-			cfg.insertBranch(std::move(currentBranchA));
+		if (!currentBranchE.empty()) {
+			cfg.insertBranch(std::move(currentBranchE));
+		}
+		if (!currentBranchD.empty()) {
+			cfg.insertBranch(std::move(currentBranchD));
+		}
+		if (!currentBranchC.empty()) {
+			cfg.insertBranch(std::move(currentBranchC));
 		}
 		if (!currentBranchB.empty()) {
 			cfg.insertBranch(std::move(currentBranchB));
 		}
+		if (!currentBranchA.empty()) {
+			cfg.insertBranch(std::move(currentBranchA));
+		}
 
-		test.logCurrentInterval("Create config");
+		test.logCurrentInterval("UpdateVersion: Create config");
 	}
 
 	// Serialize
@@ -205,7 +232,7 @@ void WidgetTest::updateVersionConfig(const ot::VersionGraphVersionCfg& _version)
 
 		jsonString = doc.toJson();
 
-		test.logCurrentInterval("Serialize");
+		test.logCurrentInterval("UpdateVersion: Serialize");
 	}
 	
 	ot::VersionGraphCfg newCfg;
@@ -216,13 +243,12 @@ void WidgetTest::updateVersionConfig(const ot::VersionGraphVersionCfg& _version)
 		newDoc.fromJson(jsonString);
 		newCfg.setFromJsonObject(newDoc.GetConstObject());
 
-		test.logCurrentInterval("Deserialize");
+		test.logCurrentInterval("UpdateVersion: Deserialize");
 	}
 
 	{
 		ot::PerformanceIntervalTest test;
 		m_versionGraph->setupConfig(std::move(newCfg));
-		test.logCurrentInterval("Setup graph");
+		test.logCurrentInterval("UpdateVersion: Setup graph");
 	}
-	
 }

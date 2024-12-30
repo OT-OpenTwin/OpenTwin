@@ -147,7 +147,10 @@ void ot::VersionGraph::slotSelectionChanged(void) {
 
 void ot::VersionGraph::slotCenterOnActiveVersion(void) {
 	QRectF rect = this->calculateFittedViewportRect();
-	
+	if (!rect.isValid()) {
+		return;
+	}
+
 	// If a previous viewport rect was set expand the new rect if needed.
 	if (m_lastViewportRect.isValid()) {
 		qreal w = 0.;
@@ -212,8 +215,9 @@ void ot::VersionGraph::updateVersionPositions(void) {
 		if (newSize.height() < m_lastViewportRect.height()) {
 			newSize.setHeight(m_lastViewportRect.height());
 		}
-		itmRect.setSize(newSize);
+		itmRect = QRectF(itmRect.topLeft(), newSize);
 	}
+
 	this->setSceneRect(itmRect);
 
 	if (!m_activeVersion.empty()) {
@@ -222,7 +226,10 @@ void ot::VersionGraph::updateVersionPositions(void) {
 }
 
 QRectF ot::VersionGraph::calculateFittedViewportRect(void) const {
-	if (m_activeVersion.empty()) return QRectF();
+	if (m_activeVersion.empty()) {
+		return QRectF();
+	}
+
 	const VersionGraphItem* item = this->findVersion(m_activeVersion);
 	if (item) {
 		// Get the bounding rectangle of the item
