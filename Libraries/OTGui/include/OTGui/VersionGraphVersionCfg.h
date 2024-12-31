@@ -12,6 +12,7 @@
 
 // std header
 #include <list>
+#include <vector>
 #include <string>
 
 #pragma warning(disable:4251)
@@ -99,6 +100,9 @@ namespace ot {
 		//! Will only take into account the version number of the last branch. For example: <br>
 		//! "11.22.3" will have the value 3.
 		static VersionNumberType getVersionNumber(const std::string& _version);
+
+		std::vector<VersionNumberType> getVersionNumbers(void) const;
+		static std::vector<VersionNumberType> getVersionNumbers(const std::string& _version);
 
 		bool isValid(void) const;
 		

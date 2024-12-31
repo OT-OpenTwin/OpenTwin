@@ -66,7 +66,7 @@ void ot::VersionGraphCfg::setFromJsonObject(const ot::ConstJsonObject& _object) 
 			versions.push_back(std::move(newVersion));
 		}
 		if (!versions.empty()) {
-			m_branches.push_back(std::move(versions));
+			this->insertBranch(std::move(versions));
 		}
 	}
 }
@@ -77,7 +77,7 @@ void ot::VersionGraphCfg::incrementActiveVersion(void) {
 
 std::string ot::VersionGraphCfg::incrementVersion(const std::string& _version) {
 	if (_version.empty()) {
-		OT_LOG_EA("Active version is empty!");
+		OT_LOG_E("Active version is empty!");
 		return std::string();
 	}
 
@@ -98,7 +98,7 @@ std::string ot::VersionGraphCfg::incrementVersion(const std::string& _version) {
 	}
 
 	if (failed) {
-		OT_LOG_EAS("Version syntax error on version \"" + _version + "\"");
+		OT_LOG_E("Version syntax error on version \"" + _version + "\"");
 		return std::string();
 	}
 	else {
@@ -133,6 +133,9 @@ ot::VersionGraphVersionCfg& ot::VersionGraphCfg::insertVersion(VersionGraphVersi
 				return *it; // return existing version
 			}
 		}
+
+		branch->push_back(std::move(_version));
+		return branch->back();
 	}
 
 	// Add version to existing branch
@@ -158,78 +161,50 @@ ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::insertBranch(VersionsLis
 	OTAssert(!_branch.empty(), "Empty branch provided");
 	OTAssert(_branch.front().isValid(), "Invalid branch");
 
+	std::vector<VersionGraphVersionCfg::VersionNumberType> newBranchNumbers = VersionGraphVersionCfg::getVersionNumbers(_branch.front().getBranchName());
+
 	// "main" branch should always be first
-	if (_branch.front().getBranchName().empty()) {
+	if (newBranchNumbers.empty()) {
 		_branchesList.push_front(std::move(_branch));
 		return _branchesList.front();
 	}
-
-
-	const std::string& newBranchName = _branch.front().getBranchName();
-	bool failed = false;
 
 	for (auto it = _branchesList.begin(); it != _branchesList.end(); it++) {
 		if (it->front().getBranchName().empty()) {
 			continue; // Main branch always first
 		}
+		else if (it->front().getBranchName() == _branch.front().getBranchName()) {
+			throw std::exception("Branch already exists");
+		}
 
-		size_t newFrom = 0;
-		size_t newTo = 0;
-
-		const std::string& existingBranchName = it->front().getBranchName();
-		size_t branchFrom = 0;
-		size_t branchTo = 0;
-
-		// Example structure:
-		// 
-		// 1 --+----> 3 ---> 4 ---> ...
-		//     |      :      |
-		//     |      :      +--> branch A: 4.1.1 ---> ...
-		//     |      :
-		//     |      + ~                              <-- insert here (branch B: 3.1.1 ---> ...)
-		//     |
-		//     +--> branch C: 1.2.2.3.3.4.4 --> ...
+		std::vector<VersionGraphVersionCfg::VersionNumberType> existingBranchNumbers = VersionGraphVersionCfg::getVersionNumbers(it->front().getBranchName());
 
 		bool isVersion = true;
-		while (newFrom != std::string::npos && branchFrom != std::string::npos) {
-			// Find next value of the branch to insert
-			newTo = newBranchName.find('.', newFrom);
-			VersionGraphVersionCfg::VersionNumberType newValue = String::toNumber<VersionGraphVersionCfg::VersionNumberType>((newTo == std::string::npos ? newBranchName.substr(newFrom) : newBranchName.substr(newFrom, newTo - newFrom)), failed);
-			if (failed) {
-				OT_LOG_E("Invalid number format in \"" + newBranchName + "\"");
-				_branchesList.push_back(std::move(_branch));
-				return _branchesList.back();
-			}			
-			
-			// Find next value of the existing branch
-			branchTo = existingBranchName.find('.', branchFrom);
-			VersionGraphVersionCfg::VersionNumberType existingValue = String::toNumber<VersionGraphVersionCfg::VersionNumberType>((branchTo == std::string::npos ? existingBranchName.substr(branchFrom) : existingBranchName.substr(branchFrom, branchTo - branchFrom)), failed);
-			if (failed) {
-				OT_LOG_E("Invalid number format in \"" + existingBranchName + "\"");
-				_branchesList.push_back(std::move(_branch));
-				return _branchesList.back();
-			}
-
-			if (isVersion && (newValue > existingValue)) {
-				// The branch version number is greater than the than the one of the existing, put "above".
+		size_t ix = 0;
+		bool allEqual = true;
+		while (ix < newBranchNumbers.size() && ix < existingBranchNumbers.size()) {
+			if (isVersion && (newBranchNumbers[ix] > existingBranchNumbers[ix])) {
+				// Branch node version > than existing
 				return *_branchesList.insert(it, std::move(_branch));
 			}
-			else if (!isVersion && (newValue < existingValue)) {
-				// The branch number (e.g. 1.>2<.1) is lower than the one of the existing, put "above".
+			else if (isVersion && (newBranchNumbers[ix] < existingBranchNumbers[ix])) {
+				allEqual = false;
+			}
+			else if (!isVersion && allEqual && (newBranchNumbers[ix] < existingBranchNumbers[ix])) {
+				// Branch number < existing
 				return *_branchesList.insert(it, std::move(_branch));
 			}
+			else if (!isVersion && (newBranchNumbers[ix] > existingBranchNumbers[ix])) {
+				allEqual = false;
+			}
 
+			ix++;
 			isVersion = !isVersion;
-			
-			newFrom = newTo;
-			if (newFrom != std::string::npos) {
-				newFrom++;
-			}
-			
-			branchFrom = branchTo;
-			if (branchFrom != std::string::npos) {
-				branchFrom++;
-			}
+		}
+
+		if (allEqual && isVersion && ix < existingBranchNumbers.size()) {
+			// e.g. existing 3.1.3.1 inserting 3.2
+			return *_branchesList.insert(it, std::move(_branch));
 		}
 	}
 
@@ -303,7 +278,7 @@ const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findPreviousVersion(const
 	const VersionsList* versionsList = nullptr;
 	VersionsList::const_iterator versionIt;
 	if (!this->findVersionIterator(_version, versionsList, versionIt)) {
-		OT_LOG_EAS("Version \"" + _version + "\" not found");
+		OT_LOG_E("Version \"" + _version + "\" not found");
 		return nullptr;
 	}
 
@@ -394,7 +369,7 @@ std::list<const ot::VersionGraphVersionCfg*> ot::VersionGraphCfg::findAllNextVer
 	const VersionsList* lst = nullptr;
 	VersionsList::const_iterator it;
 	if (!this->findVersionIterator(_version, lst, it)) {
-		OT_LOG_EAS("Version \"" + _version + "\" not found");
+		OT_LOG_E("Version \"" + _version + "\" not found");
 		return result;
 	}
 
@@ -513,7 +488,7 @@ const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findNextVersion(const std
 	// Find the iterator
 	if (_versionList == nullptr) {
 		if (!this->findVersionIterator(_version, _versionList, _currentVersionListIterator)) {
-			OT_LOG_EAS("Version not found \"" + _version + "\"");
+			OT_LOG_E("Version not found \"" + _version + "\"");
 			return nullptr;
 		}
 	}

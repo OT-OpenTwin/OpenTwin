@@ -276,7 +276,6 @@
     <ClInclude Include="include\OTCore\StringToNumericCheck.h">
       <Filter>include\VariableType</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTCore\LocalSettingsSwitch.h" />
     <ClInclude Include="include\OTCore\BasicEntityInformation.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -333,8 +332,5 @@
     <Filter Include="src\Geometry">
       <UniqueIdentifier>{5d7cb18f-7ed2-451e-9db2-d3da422a0bca}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

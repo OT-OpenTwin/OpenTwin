@@ -244,6 +244,13 @@ void ot::LogDispatcher::addReceiver(AbstractLogNotifier* _receiver) {
 	m_messageReceiver.push_back(_receiver);
 }
 
+void ot::LogDispatcher::forgetReceiver(AbstractLogNotifier* _receiver) {
+	auto it = std::find(m_messageReceiver.begin(), m_messageReceiver.end(), _receiver);
+	if (it != m_messageReceiver.end()) {
+		m_messageReceiver.erase(it);
+	}
+}
+
 void ot::LogDispatcher::dispatch(const std::string& _text, const std::string& _functionName, const LogFlags& _logFlags) {
 	this->dispatch(LogMessage(m_serviceName, _functionName, _text, _logFlags));
 }

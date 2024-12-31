@@ -9,11 +9,11 @@
 #include "OTCore/JSON.h"
 #include "OTCore/Logger.h"
 
-#define OT_JSON_checkMemberExists(___object, ___memberName, ___errorAction) if (!___object.HasMember(___memberName)) { OT_LOG_EAS("JSON object member \"" + std::string(___memberName) + "\" missing"); ___errorAction; }
+#define OT_JSON_checkMemberExists(___object, ___memberName, ___errorAction) if (!___object.HasMember(___memberName)) { OT_LOG_E("JSON object member \"" + std::string(___memberName) + "\" missing"); ___errorAction; }
 
 #define OT_JSON_createMemberIterator(___object, ___memberName, ___iteratorName) ot::JsonMemberIterator ___iteratorName = ___object.FindMember(___memberName)
 
-#define OT_JSON_checkMemberIteratorType(___it, ___memberName, ___memberType, ___errorAction) if (!___it->value.Is##___memberType()) { OT_LOG_EAS("JSON object member \"" + std::string(___memberName) + "\" is not a " #___memberType); ___errorAction; }
+#define OT_JSON_checkMemberIteratorType(___it, ___memberName, ___memberType, ___errorAction) if (!___it->value.Is##___memberType()) { OT_LOG_E("JSON object member \"" + std::string(___memberName) + "\" is not a " #___memberType); ___errorAction; }
 
 #define OT_JSON_getFromObject(___object, ___memberName, ___memberType, ___errorAction) \
 OT_JSON_checkMemberExists(___object, ___memberName, ___errorAction); \
@@ -26,7 +26,7 @@ OT_JSON_checkMemberExists(___object, ___memberName, ___errorAction); \
 OT_JSON_createMemberIterator(___object, ___memberName, lclit); \
 OT_JSON_checkMemberIteratorType(lclit, ___memberName, Array, ___errorAction); \
 for (rapidjson::SizeType i = 0; i < lclit->value.Size(); i++) { \
-	if (!lclit->value[i].Is##___entryType()) { OT_LOG_EAS("Array entry at index \"" + std::to_string(i) + "\" is not a " #___entryType); ___errorAction; } \
+	if (!lclit->value[i].Is##___entryType()) { OT_LOG_E("Array entry at index \"" + std::to_string(i) + "\" is not a " #___entryType); ___errorAction; } \
 	___list.push_back(lclit->value[i].Get##___entryType()); \
 } \
 return ___list
@@ -39,12 +39,12 @@ OT_JSON_checkMemberIteratorType(lclit, ___memberName, Array, return ret); \
 ___sizeMember = lclit->value.Size(); \
 ret = new ___entryType[___sizeMember]; \
 for (JsonSizeType i = 0; i < ___sizeMember; i++) { \
-	if (!lclit->value[i].Is##___entryTypeJson()) { OT_LOG_EAS("Array entry at index \"" + std::to_string(i) + "\" is not a " #___entryTypeJson); delete[]ret; return ret; } \
+	if (!lclit->value[i].Is##___entryTypeJson()) { OT_LOG_E("Array entry at index \"" + std::to_string(i) + "\" is not a " #___entryTypeJson); delete[]ret; return ret; } \
 	ret[i] = lclit->value[i].Get##___entryTypeJson(); \
 } \
 return ret;
 
-#define OT_JSON_checkArrayEntry(___array, ___ix, ___entryType, ___errorAction) if (!_value[_ix].Is##___entryType()) { OT_LOG_EAS("Array entry \"" + std::to_string(_ix) + "\" is not a " #___entryType); ___errorAction; }
+#define OT_JSON_checkArrayEntry(___array, ___ix, ___entryType, ___errorAction) if (!_value[_ix].Is##___entryType()) { OT_LOG_E("Array entry \"" + std::to_string(_ix) + "\" is not a " #___entryType); ___errorAction; }
 
 #define OT_JSON_getFromArray(___array, ___ix, ___entryType, ___errorAction) \
 OT_JSON_checkArrayEntry(___array, ___ix, ___entryType, ___errorAction); \

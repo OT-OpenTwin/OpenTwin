@@ -482,6 +482,7 @@ namespace ot {
 		//! Every registered receiver will be notified about every log message that was created.
 		//! @param _receiver The receiver to add
 		void addReceiver(AbstractLogNotifier* _receiver);
+		void forgetReceiver(AbstractLogNotifier* _receiver);
 
 		// #################################################################################
 

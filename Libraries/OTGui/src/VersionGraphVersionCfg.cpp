@@ -141,6 +141,46 @@ ot::VersionGraphVersionCfg::VersionNumberType ot::VersionGraphVersionCfg::getVer
 	return result;
 }
 
+std::vector<ot::VersionGraphVersionCfg::VersionNumberType> ot::VersionGraphVersionCfg::getVersionNumbers(void) const {
+	return VersionGraphVersionCfg::getVersionNumbers(m_name);
+}
+
+std::vector<ot::VersionGraphVersionCfg::VersionNumberType> ot::VersionGraphVersionCfg::getVersionNumbers(const std::string& _version) {
+	std::vector<VersionNumberType> result;
+	size_t fromIx = 0;
+	const size_t len = _version.length();
+	while (fromIx < len) {
+		size_t ix = _version.find('.', fromIx);
+		VersionNumberType number = 0;
+		bool failed = false;
+		if (ix == std::string::npos) {
+			// Last version number (e.g. (1 = 1) or (1.2.2 = 1.2.>2<, ...) 
+			number = String::toNumber<VersionNumberType>(_version.substr(fromIx), failed);
+			if (failed) {
+				OT_LOG_EAS("Invalid version syntax \"" + _version.substr(fromIx) + "\"");
+			}
+			else {
+				result.push_back(number);
+			}
+			break;
+		}
+		else {
+			// Mid version/branch number (e.g. (1.2.2 = >1<.2.2, or 1.>2<.2, ...)
+			number = String::toNumber<VersionNumberType>(_version.substr(fromIx, ix - fromIx), failed);
+			if (failed) {
+				OT_LOG_EAS("Invalid version syntax \"" + _version.substr(fromIx, ix - fromIx) + "\"");
+				break;
+			}
+			else {
+				fromIx = ix + 1;
+				result.push_back(number);
+			}
+		}
+	}
+
+	return result;
+}
+
 bool ot::VersionGraphVersionCfg::isValid(void) const {
 	return VersionGraphVersionCfg::isValid(m_name);
 }
