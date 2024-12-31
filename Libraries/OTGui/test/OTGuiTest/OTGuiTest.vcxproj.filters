@@ -21,5 +21,8 @@
     <ClCompile Include="src\TestNavigationTreePackage.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\VersionGraphCfgTest.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
