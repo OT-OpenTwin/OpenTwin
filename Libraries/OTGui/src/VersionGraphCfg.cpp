@@ -138,15 +138,6 @@ ot::VersionGraphVersionCfg& ot::VersionGraphCfg::insertVersion(VersionGraphVersi
 		return branch->back();
 	}
 
-	// Add version to existing branch
-	for (std::list<VersionGraphVersionCfg>& branchVersions : m_branches) {
-		OTAssert(!branchVersions.empty(), "Empty branch stored");
-		if (branchVersions.front().getBranchName() == branchName) {
-			branchVersions.push_back(std::move(_version));
-			return branchVersions.back();
-		}
-	}
-
 	// Create new branch
 	std::list<VersionGraphVersionCfg> newBranch;
 	newBranch.push_back(std::move(_version));
@@ -183,7 +174,7 @@ ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::insertBranch(VersionsLis
 		size_t ix = 0;
 		bool allEqual = true;
 		while (ix < newBranchNumbers.size() && ix < existingBranchNumbers.size()) {
-			if (isVersion && (newBranchNumbers[ix] > existingBranchNumbers[ix])) {
+			if (isVersion && allEqual && (newBranchNumbers[ix] > existingBranchNumbers[ix])) {
 				// Branch node version > than existing
 				return *_branchesList.insert(it, std::move(_branch));
 			}
@@ -203,7 +194,7 @@ ot::VersionGraphCfg::VersionsList& ot::VersionGraphCfg::insertBranch(VersionsLis
 		}
 
 		if (allEqual && isVersion && ix < existingBranchNumbers.size()) {
-			// e.g. existing 3.1.3.1 inserting 3.2
+			// e.g. existing 3.1.3.1 inserting 3.1
 			return *_branchesList.insert(it, std::move(_branch));
 		}
 	}

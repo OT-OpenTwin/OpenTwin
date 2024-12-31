@@ -124,6 +124,7 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 ot::VersionGraphItem::~VersionGraphItem() {
 	// Erase parent information from childs
 	for (VersionGraphItem* child : m_childVersions) {
+		child->disconnectFromParent();
 		child->setParentVersionItem(nullptr);
 	}
 
@@ -135,11 +136,11 @@ ot::VersionGraphItem::~VersionGraphItem() {
 		m_parentConnection->disconnectItems();
 		delete m_parentConnection;
 		m_parentConnection = nullptr;
+	}
 
-		// Erase this information from parent
-		if (m_parentVersion) {
-			m_parentVersion->forgetChildVersion(this);
-		}
+	// Erase this information from parent
+	if (m_parentVersion) {
+		m_parentVersion->forgetChildVersion(this);
 	}
 }
 
@@ -152,7 +153,7 @@ int ot::VersionGraphItem::getMaxRowIndex(void) const {
 }
 
 void ot::VersionGraphItem::addChildVersion(VersionGraphItem* _version) {
-	OTAssert(std::find(m_childVersions.begin(), m_childVersions.end(), _version) != m_childVersions.end(), "Child version already stored");
+	OTAssert(std::find(m_childVersions.begin(), m_childVersions.end(), _version) == m_childVersions.end(), "Child version already stored");
 	m_childVersions.push_back(_version);
 }
 
@@ -167,6 +168,7 @@ void ot::VersionGraphItem::connectToParent(void) {
 	if (m_parentConnection) {
 		OT_LOG_WA("Connection already set");
 		delete m_parentConnection;
+		m_parentConnection = nullptr;
 	}
 	
 	m_parentConnection = new GraphicsConnectionItem;
@@ -184,6 +186,14 @@ void ot::VersionGraphItem::connectToParent(void) {
 
 	// Register at parent
 	m_parentVersion->addChildVersion(this);
+}
+
+void ot::VersionGraphItem::disconnectFromParent(void) {
+	if (m_parentConnection) {
+		m_parentConnection->disconnectItems();
+		delete m_parentConnection;
+		m_parentConnection = nullptr;
+	}
 }
 
 void ot::VersionGraphItem::updateVersionPositionAndSize(void) {

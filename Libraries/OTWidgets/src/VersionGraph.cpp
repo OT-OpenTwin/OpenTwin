@@ -104,6 +104,11 @@ void ot::VersionGraph::clear(void) {
 
 	for (const VersionsList& branchVersions : m_branches) {
 		for (VersionGraphItem* version : branchVersions) {
+			for (VersionGraphItem* child : version->getChildVersions()) {
+				child->disconnectFromParent();
+				child->setParentVersionItem(nullptr);
+			}
+			version->clearChildVersions();
 			delete version;
 		}
 	}

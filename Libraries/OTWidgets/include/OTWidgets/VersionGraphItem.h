@@ -39,8 +39,10 @@ namespace ot {
 		//! @brief Remove version from list.
 		void forgetChildVersion(VersionGraphItem* _version);
 		const std::list<VersionGraphItem*>& getChildVersions(void) const { return m_childVersions; };
+		void clearChildVersions(void) { m_childVersions.clear(); };
 
 		void connectToParent(void);
+		void disconnectFromParent(void);
 
 		void updateVersionPositionAndSize(void);
 
