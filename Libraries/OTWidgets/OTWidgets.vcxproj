@@ -34,6 +34,7 @@
     <ClCompile Include="src\CartesianPlotPicker.cpp" />
     <ClCompile Include="src\CartesianPlotWidgetCanvas.cpp" />
     <ClCompile Include="src\CartesianPlotZoomer.cpp" />
+    <ClCompile Include="src\CentralWidgetManager.cpp" />
     <ClCompile Include="src\CheckBox.cpp" />
     <ClCompile Include="src\ColorPickButton.cpp" />
     <ClCompile Include="src\ColorPreviewBox.cpp" />
@@ -89,6 +90,8 @@
     <ClCompile Include="src\ImagePreview.cpp" />
     <ClCompile Include="src\Label.cpp" />
     <ClCompile Include="src\LineEdit.cpp" />
+    <ClCompile Include="src\MainWindow.cpp" />
+    <ClCompile Include="src\MainWindowManager.cpp" />
     <ClCompile Include="src\ManagedGuiObject.cpp" />
     <ClCompile Include="src\MessageBoxHandler.cpp" />
     <ClCompile Include="src\MessageBoxManager.cpp" />
@@ -144,6 +147,7 @@
     <ClCompile Include="src\QWidgetInterface.cpp" />
     <ClCompile Include="src\SpinBox.cpp" />
     <ClCompile Include="src\Splitter.cpp" />
+    <ClCompile Include="src\StatusBarManager.cpp" />
     <ClCompile Include="src\StyledTextConverter.cpp" />
     <ClCompile Include="src\SvgImagePainter.cpp" />
     <ClCompile Include="src\SyntaxHighlighter.cpp" />
@@ -172,6 +176,7 @@
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
     <ClCompile Include="src\TextEditorView.cpp" />
+    <ClCompile Include="src\TabToolBarManager.cpp" />
     <ClCompile Include="src\ToolButton.cpp" />
     <ClCompile Include="src\ToolTipHandler.cpp" />
     <ClCompile Include="src\TreeWidget.cpp" />
@@ -187,7 +192,14 @@
     <ClCompile Include="src\WidgetViewManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\OTWidgets\AbstractStatusBar.h" />
+    <ClInclude Include="include\OTWidgets\AbstractToolBar.h" />
+    <ClInclude Include="include\OTWidgets\CentralWidgetManager.h" />
+    <ClInclude Include="include\OTWidgets\MainWindow.h" />
+    <ClInclude Include="include\OTWidgets\MainWindowManager.h" />
     <ClInclude Include="include\OTWidgets\SignalBlockWrapper.h" />
+    <ClInclude Include="include\OTWidgets\StatusBarManager.h" />
+    <ClInclude Include="include\OTWidgets\TabToolBarManager.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewDockManager.h" />
     <QtMoc Include="include\OTWidgets\ApplicationPropertiesManager.h" />
     <ClInclude Include="include\OTWidgets\AbstractPlot.h" />
@@ -434,7 +446,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(QT_TT_INCD);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
       <PreprocessorDefinitions>_DEBUG;OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -445,8 +457,8 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;qtadvanceddockingd.lib;$(QWT_LIB_LIBD);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(QT_ADS_ROOT)\lib;$(QWT_LIB_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;qtadvanceddockingd.lib;$(QT_TT_LIBD);$(QWT_LIB_LIBD);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBD);$(OT_CORE_ROOT)\$(OT_LIBD);$(OT_GUI_ROOT)\$(OT_LIBD);$(QT_TT_LIBPATHD);$(QT_ADS_ROOT)\lib;$(QWT_LIB_LIBPATHD);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -457,7 +469,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCD);$(QT_TT_INCD);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCD);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SDLCheck>
       </SDLCheck>
       <PreprocessorDefinitions>_DEBUG;OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -479,7 +491,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(QT_TT_INCR);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -488,8 +500,8 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;qtadvanceddocking.lib;$(QWT_LIB_LIBR);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(QT_ADS_ROOT)\lib;$(QWT_LIB_LIBPATHR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OTSystem.lib;OTCore.lib;OTGui.lib;qtadvanceddocking.lib;$(QT_TT_LIBR);$(QWT_LIB_LIBR);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_SYSTEM_ROOT)\$(OT_LIBR);$(OT_CORE_ROOT)\$(OT_LIBR);$(OT_GUI_ROOT)\$(OT_LIBR);$(QT_TT_LIBPATHR);$(QT_ADS_ROOT)\lib;$(QWT_LIB_LIBPATHR);$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
@@ -500,7 +512,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OT_SYSTEM_ROOT)\$(OT_INC);$(OT_CORE_ROOT)\$(OT_INC);$(OT_GUI_ROOT)\$(OT_INC);$(R_JSON_INCR);$(QT_TT_INCR);$(QT_ADS_ROOT)\include;$(QWT_LIB_INCR);$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;OT_WIDGETS_EXPORTS;$(Qt_DEFINES_);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile />
       <LanguageStandard>stdcpp20</LanguageStandard>

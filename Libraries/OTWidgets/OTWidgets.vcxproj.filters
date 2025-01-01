@@ -418,6 +418,21 @@
     <ClCompile Include="src\WidgetViewDockManager.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
+    <ClCompile Include="src\MainWindow.cpp">
+      <Filter>src\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CentralWidgetManager.cpp">
+      <Filter>src\WindowManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StatusBarManager.cpp">
+      <Filter>src\WindowManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MainWindowManager.cpp">
+      <Filter>src\WindowManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TabToolBarManager.cpp">
+      <Filter>src\WindowManagement</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -515,6 +530,12 @@
     </Filter>
     <Filter Include="src\ContextMenu">
       <UniqueIdentifier>{1702c1b1-239b-4758-8bfa-9bdb661cb348}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\WindowManagement">
+      <UniqueIdentifier>{79972c7d-71b0-4a16-8762-b13888200384}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\WindowManagement">
+      <UniqueIdentifier>{1b70c9a8-a5b0-4dba-89b9-0603ca9efd88}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -808,6 +829,27 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\SignalBlockWrapper.h">
       <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\MainWindow.h">
+      <Filter>include\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\MainWindowManager.h">
+      <Filter>include\WindowManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CentralWidgetManager.h">
+      <Filter>include\WindowManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\StatusBarManager.h">
+      <Filter>include\WindowManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\AbstractStatusBar.h">
+      <Filter>include\WindowManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\AbstractToolBar.h">
+      <Filter>include\WindowManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\TabToolBarManager.h">
+      <Filter>include\WindowManagement</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
