@@ -225,7 +225,7 @@ QRect ot::Positioning::getCenterWidgetOnParentRect(const QWidget* _parentWidget,
 	else {
 		QScreen* screen = QApplication::primaryScreen();
 		if (screen) {
-			return Positioning::calculateChildRect(_parentWidget->geometry(), _childWidget->size(), ot::AlignCenter);
+			return Positioning::calculateChildRect(screen->geometry(), _childWidget->size(), ot::AlignCenter);
 		}
 		else {
 			OT_LOG_EA("Primary screen not found");
