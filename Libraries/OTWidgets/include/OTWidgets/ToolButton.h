@@ -31,7 +31,8 @@ namespace ot {
 		// Base class functions
 
 		//! @brief Will return the widgets widget to display it
-		virtual QWidget* getQWidget(void) override { return this; }
+		virtual QWidget* getQWidget(void) override { return this; };
+		virtual const QWidget* getQWidget(void) const override { return this; };
 
 		// #######################################################################################################
 

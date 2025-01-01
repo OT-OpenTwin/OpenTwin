@@ -41,6 +41,7 @@ namespace ot {
 
 		//! @brief Returns the root widget of the input (allows nested widgets)
 		virtual QWidget* getQWidget(void) override = 0;
+		virtual const QWidget* getQWidget(void) const override = 0;
 
 		//! @brief Setup the input from the provided configration
 		virtual bool setupFromConfiguration(const Property* _configuration);

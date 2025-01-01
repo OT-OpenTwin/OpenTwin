@@ -40,6 +40,10 @@ QWidget* ot::PropertyInputColor::getQWidget(void) {
 	return m_colorBtn->getQWidget();
 }
 
+const QWidget* ot::PropertyInputColor::getQWidget(void) const {
+	return m_colorBtn->getQWidget();
+}
+
 ot::Property* ot::PropertyInputColor::createPropertyConfiguration(void) const {
 	ot::PropertyColor* newProperty = new ot::PropertyColor(this->data());
 

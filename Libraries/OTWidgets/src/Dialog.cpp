@@ -32,7 +32,7 @@ ot::Dialog::~Dialog() {}
 
 ot::Dialog::DialogResult ot::Dialog::showDialog(const ShowFlags& _showFlags) {
 	if (_showFlags & CenterOnParent && this->parentWidget()) {
-		this->centerOnParent(this->parentWidget());
+		Positioning::centerWidgetOnParent(this->parentWidget(), this);
 	}
 	if (_showFlags & FitOnScreen) {
 		QRect newRec = Positioning::fitOnScreen(QRect(this->pos(), this->size()));
@@ -81,7 +81,7 @@ void ot::Dialog::closeCancel(void) {
 void ot::Dialog::keyPressEvent(QKeyEvent* _event) {
 	QDialog::keyPressEvent(_event);
 	if ((_event->key() == Qt::Key_F11) && (m_flags & DialogCfg::DialogFlag::RecenterOnF11)) {
-		this->centerOnParent(nullptr);
+		Positioning::centerWidgetOnParent(nullptr, static_cast<QWidget*>(this));
 	}
 }
 

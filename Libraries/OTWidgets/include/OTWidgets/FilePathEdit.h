@@ -35,6 +35,7 @@ namespace ot {
 		virtual ~FilePathEdit();
 
 		virtual QWidget* getQWidget(void) override { return m_root; };
+		virtual const QWidget* getQWidget(void) const override { return m_root; };
 
 		void setFilePath(const QString& _file);
 		const QString& getFilePath(void) const { return m_file; };

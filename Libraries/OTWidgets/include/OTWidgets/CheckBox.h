@@ -21,7 +21,8 @@ namespace ot {
 		CheckBox(const QString& _text, QWidget* _parent = (QWidget*)nullptr);
 		virtual ~CheckBox() {};
 
-		virtual QWidget* getQWidget(void) override;
+		virtual QWidget* getQWidget(void) override { return this; };
+		virtual const QWidget* getQWidget(void) const override { return this; };
 	};
 
 }

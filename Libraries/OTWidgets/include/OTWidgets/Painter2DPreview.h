@@ -30,6 +30,7 @@ namespace ot {
 		virtual void paintEvent(QPaintEvent* _event) override;
 
 		virtual QWidget* getQWidget(void) override { return this; };
+		virtual const QWidget* getQWidget(void) const override { return this; };
 
 		void setMaintainAspectRatio(bool _maintain) { m_maintainAspectRatio = _maintain; };
 		bool isMaintainAspectRatio(void) const { return m_maintainAspectRatio; };

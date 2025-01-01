@@ -43,6 +43,10 @@ QWidget* ot::PropertyInputPainter2D::getQWidget(void) {
 	return m_button->getQWidget();
 }
 
+const QWidget* ot::PropertyInputPainter2D::getQWidget(void) const {
+	return m_button->getQWidget();
+}
+
 ot::Property* ot::PropertyInputPainter2D::createPropertyConfiguration(void) const {
 	ot::PropertyPainter2D* newProperty = new ot::PropertyPainter2D(this->data());
 

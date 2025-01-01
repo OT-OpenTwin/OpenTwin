@@ -26,6 +26,7 @@ namespace ot {
 		virtual ~ColorPreviewBox();
 
 		virtual QWidget* getQWidget(void) override { return this; };
+		virtual const QWidget* getQWidget(void) const override { return this; };
 
 		virtual QSize sizeHint(void) const override { return QSize(16, 16); };
 

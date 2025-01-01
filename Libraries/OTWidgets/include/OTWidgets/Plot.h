@@ -46,7 +46,8 @@ namespace ot {
 
 		// Getter
 
-		virtual QWidget* getQWidget(void) override { return m_centralWidget; }
+		virtual QWidget* getQWidget(void) override { return m_centralWidget; };
+		virtual const QWidget* getQWidget(void) const override { return m_centralWidget; };
 
 		CartesianPlot* getCartesianPlot(void) { return m_cartesianPlot; };
 

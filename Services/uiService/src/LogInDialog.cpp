@@ -168,7 +168,7 @@ LogInDialog::LogInDialog()
 	this->connect(m_toggleChangePasswordModeLabel, &Label::mousePressed, this, &LogInDialog::slotToggleChangePasswordMode);
 
 	// Setup window
-	QRect newTargetRect(this->calculateCenterOnParentPos(nullptr), QSize(350, 500));
+	QRect newTargetRect(ot::Positioning::getCenterWidgetOnParentRect(nullptr, static_cast<QWidget*>(this)).topLeft(), QSize(350, 500));
 
 	this->setObjectName("LogInDialog");
 	this->setWindowTitle("OpenTwin Login");

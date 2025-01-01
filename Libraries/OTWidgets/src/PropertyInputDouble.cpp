@@ -74,6 +74,16 @@ QWidget* ot::PropertyInputDouble::getQWidget(void) {
 	}
 }
 
+const QWidget* ot::PropertyInputDouble::getQWidget(void) const {
+	if (m_spinBox) {
+		return m_spinBox;
+	}
+	else {
+		OTAssertNullptr(m_lineEdit);
+		return m_lineEdit;
+	}
+}
+
 void ot::PropertyInputDouble::setValue(double _value) {
 	if (m_spinBox) {
 		m_spinBox->setValue(_value);

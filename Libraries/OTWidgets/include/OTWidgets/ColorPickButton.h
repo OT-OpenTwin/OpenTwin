@@ -28,6 +28,7 @@ namespace ot {
 		virtual ~ColorPickButton();
 
 		virtual QWidget* getQWidget(void) override { return this; };
+		virtual const QWidget* getQWidget(void) const override { return this; };
 
 		void setColor(const ot::Color& _color);
 		void setColor(const QColor& _color);

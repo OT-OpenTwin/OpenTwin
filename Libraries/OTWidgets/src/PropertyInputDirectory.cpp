@@ -48,6 +48,10 @@ QWidget* ot::PropertyInputDirectory::getQWidget(void) {
 	return m_root;
 }
 
+const QWidget* ot::PropertyInputDirectory::getQWidget(void) const {
+	return m_root;
+}
+
 void ot::PropertyInputDirectory::slotFind(void) {
 	QString pth = QFileDialog::getExistingDirectory(m_edit, QString::fromStdString(this->data().getPropertyTitle()), m_edit->text());
 	if (!pth.isEmpty() && m_edit->text() != pth) {

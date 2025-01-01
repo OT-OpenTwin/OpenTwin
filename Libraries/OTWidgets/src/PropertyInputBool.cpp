@@ -35,6 +35,10 @@ QWidget* ot::PropertyInputBool::getQWidget(void) {
 	return m_checkBox;
 }
 
+const QWidget* ot::PropertyInputBool::getQWidget(void) const {
+	return m_checkBox;
+}
+
 ot::Property* ot::PropertyInputBool::createPropertyConfiguration(void) const {
 	ot::PropertyBool* newProperty = new ot::PropertyBool(this->data());
 	newProperty->setValue(m_checkBox->isChecked());

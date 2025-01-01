@@ -55,6 +55,7 @@ namespace ot {
 		virtual ~GraphicsView();
 
 		virtual QWidget* getQWidget(void) override { return this; };
+		virtual const QWidget* getQWidget(void) const override { return this; };
 
 		void resetView(void);
 		void ensureViewInBounds(void);

@@ -33,6 +33,7 @@ namespace ot {
 		virtual ~VersionGraphManager();
 
 		virtual QWidget* getQWidget(void) override { return m_root; };
+		virtual const QWidget* getQWidget(void) const override { return m_root; };
 
 		VersionGraph* getGraph(void) { return m_graph; };
 		const VersionGraph* getGraph(void) const { return m_graph; };

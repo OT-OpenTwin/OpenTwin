@@ -6,9 +6,10 @@
 #include "ConnectToLoggerDialog.h"
 #include "AppBase.h"
 
-#include "OTWidgets/IconManager.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
+#include "OTWidgets/IconManager.h"
+#include "OTWidgets/Positioning.h"
 
 #include <QtCore/qsettings.h>
 #include <QtWidgets/qlayout.h>
@@ -116,7 +117,7 @@ void ConnectToLoggerDialog::slotDone(void) {
 }
 
 void ConnectToLoggerDialog::slotRecenter(void) {
-	this->centerOnParent(otoolkit::api::getGlobalInterface()->rootWidget());
+	ot::Positioning::centerWidgetOnParent(otoolkit::api::getGlobalInterface()->rootWidget(), static_cast<QWidget*>(this));
 }
 
 void ConnectToLoggerDialog::worker(QString _url) {

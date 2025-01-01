@@ -48,6 +48,10 @@ QWidget* ot::PropertyInputStringList::getQWidget(void) {
 	return m_comboBox;
 }
 
+const QWidget* ot::PropertyInputStringList::getQWidget(void) const {
+	return m_comboBox;
+}
+
 ot::Property* ot::PropertyInputStringList::createPropertyConfiguration(void) const {
 	ot::PropertyStringList* newProperty = new ot::PropertyStringList(this->data());
 

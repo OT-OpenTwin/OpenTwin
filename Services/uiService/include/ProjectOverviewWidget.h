@@ -77,6 +77,7 @@ public:
 	virtual void setWidgetLocked(bool _isLocked) override;
 
 	virtual QWidget* getQWidget(void) override { return m_widget; };
+	virtual const QWidget* getQWidget(void) const override { return m_widget; };
 
 	QString getCurrentProjectFilter(void) const;
 

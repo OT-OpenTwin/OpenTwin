@@ -50,6 +50,10 @@ QWidget* ot::PropertyInputFilePath::getQWidget(void) {
 	return m_root;
 }
 
+const QWidget* ot::PropertyInputFilePath::getQWidget(void) const {
+	return m_root;
+}
+
 void ot::PropertyInputFilePath::slotFind(void) {
 	QString pth;
 	if (m_mode == PropertyFilePath::ReadFile) {

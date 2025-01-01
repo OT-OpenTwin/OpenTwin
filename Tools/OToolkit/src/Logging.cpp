@@ -16,6 +16,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 #include "OTWidgets/Splitter.h"
+#include "OTWidgets/Positioning.h"
 
 // Qt header
 #include <QtCore/qtimer.h>
@@ -485,7 +486,8 @@ void Logging::runQuickExport(void) {
 	}
 
 	QuickLogExport exportDia(m_messages);
-	exportDia.centerOnParent(m_root->getViewWidget());
+	ot::Positioning::centerWidgetOnParent(m_root->getViewWidget(), static_cast<QWidget*>(&exportDia));
+
 	if (exportDia.showDialog() == ot::Dialog::Ok) {
 		if (exportDia.isAutoClose()) AppBase::instance()->close();
 	}

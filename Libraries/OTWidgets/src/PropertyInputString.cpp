@@ -35,6 +35,10 @@ QWidget* ot::PropertyInputString::getQWidget(void) {
 	return m_lineEdit;
 }
 
+const QWidget* ot::PropertyInputString::getQWidget(void) const {
+	return m_lineEdit;
+}
+
 void ot::PropertyInputString::lclValueChanged(void) {
 	// Avoid input on multiple values
 	if (m_lineEdit->text() == "..." && (this->data().getPropertyFlags() & PropertyBase::HasMultipleValues)) return;

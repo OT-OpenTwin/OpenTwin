@@ -21,6 +21,7 @@ namespace ot {
 		virtual ~ComboBox() {};
 
 		virtual QWidget* getQWidget(void) override { return this; };
+		virtual const QWidget* getQWidget(void) const override { return this; };
 
 		bool isPopupVisible(void) const { return m_popupVisible; };
 

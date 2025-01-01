@@ -60,13 +60,13 @@ void ot::TreeWidgetFilter::clearFilter(void) {
 }
 
 void ot::TreeWidgetFilter::slotReturnPressed(void) {
-	if (m_widgetFlags.flagIsSet(ot::ApplyFilterOnReturn)) {
+	if (this->otWidgetFlags().flagIsSet(ot::ApplyFilterOnReturn)) {
 		dispatchFilter(m_lineEdit->text());
 	}
 }
 
 void ot::TreeWidgetFilter::slotTextChanged(void) {
-	if (m_widgetFlags.flagIsSet(ot::ApplyFilterOnTextChange)) {
+	if (this->otWidgetFlags().flagIsSet(ot::ApplyFilterOnTextChange)) {
 		dispatchFilter(m_lineEdit->text());
 	}
 }

@@ -26,6 +26,7 @@ namespace ot {
 		virtual ~DoubleSpinBox();
 
 		virtual QWidget* getQWidget(void) override { return this; };
+		virtual const QWidget* getQWidget(void) const override { return this; };
 
 		void setChangeDelay(int _delayInMs);
 

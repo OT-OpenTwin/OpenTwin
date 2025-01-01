@@ -25,6 +25,7 @@ namespace ot {
 
 		//! @brief Returns a pointer to the root widget of this object
 		virtual QWidget* getQWidget(void) override { return this; };
+		virtual const QWidget* getQWidget(void) const override { return this; };
 
 	Q_SIGNALS:
 		void widgetGotFocus(void);

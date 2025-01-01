@@ -23,6 +23,7 @@ namespace ot {
 		virtual ~ImagePreview();
 
 		virtual QWidget* getQWidget(void) override { return this; };
+		virtual const QWidget* getQWidget(void) const override { return this; };
 
 		virtual void paintEvent(QPaintEvent* _event) override;
 

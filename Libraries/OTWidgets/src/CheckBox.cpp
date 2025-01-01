@@ -13,8 +13,3 @@ ot::CheckBox::CheckBox(QWidget* _parent)
 ot::CheckBox::CheckBox(const QString& _text, QWidget* _parent)
 	: QCheckBox(_text, _parent) 
 {}
-
-QWidget* ot::CheckBox::getQWidget(void) 
-{ 
-	return this; 
-}

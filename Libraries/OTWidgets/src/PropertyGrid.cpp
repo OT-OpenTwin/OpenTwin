@@ -78,6 +78,10 @@ QWidget* ot::PropertyGrid::getQWidget(void) {
 	return m_tree;
 }
 
+const QWidget* ot::PropertyGrid::getQWidget(void) const {
+	return m_tree;
+}
+
 ot::TreeWidget* ot::PropertyGrid::getTreeWidget(void) const {
 	return m_tree;
 }

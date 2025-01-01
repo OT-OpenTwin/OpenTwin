@@ -47,7 +47,8 @@ namespace ot {
 		virtual ~Dialog();
 		
 		//! @brief Returns a pointer to the root widget of this object
-		virtual QWidget* getQWidget(void) { return this; }
+		virtual QWidget* getQWidget(void) override { return this; };
+		virtual const QWidget* getQWidget(void) const override { return this; };
 
 		//! @brief Center the dialog on parent and call exec
 		DialogResult showDialog(const ShowFlags& _showFlags = ShowFlags(IdealFit));

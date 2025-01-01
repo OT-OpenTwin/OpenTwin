@@ -23,6 +23,7 @@ namespace ot {
 
 		//! @brief Returns a pointer to the root widget of this object
 		virtual QWidget* getQWidget(void) override { return this; };
+		virtual const QWidget* getQWidget(void) const override { return this; };
 
 		void setAutoScrollToBottomEnabled(bool _enabled);
 		bool isAutoScrollToBottomEnabled(void) const { return m_autoScrollToBottom; }
