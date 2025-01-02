@@ -40,7 +40,7 @@ public:
 	void setUrl(const std::string& _url) { m_url = _url; };
 	const std::string& url(void) const { return m_url; };
 
-	void setDatabaseUrl(const std::string& _url) { m_databaseUrl = _url; };
+	void setDatabaseUrl(const std::string& _url);
 	const std::string databaseUrl(void) const { return m_databaseUrl; };
 
 	void setAuthorizationUrl(const std::string& _url) { m_authorizationUrl = _url; };

@@ -20,6 +20,10 @@ int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const
 {
 	serviceURL  = _ownIP;
 	databaseURL = _databaseIP;
+	if (databaseURL.find("tls@") != std::string::npos)
+	{
+		databaseURL = databaseURL.substr(4);
+	}
 	databasePWD = _databasePWD;
 
 	OT_LOG_I("Starting Authorisation Service");

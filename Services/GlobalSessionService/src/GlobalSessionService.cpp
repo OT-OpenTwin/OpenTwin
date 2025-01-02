@@ -90,6 +90,15 @@ bool GlobalSessionService::addSessionService(LocalSessionService& _service) {
 	return true;
 }
 
+void GlobalSessionService::setDatabaseUrl(const std::string& _url)
+{
+	 m_databaseUrl = _url;
+	 if (m_databaseUrl.find("tls@") != std::string::npos)
+	 {
+		 m_databaseUrl = m_databaseUrl.substr(4);
+	 }
+}
+
 // ###################################################################################################
 
 // Handler
