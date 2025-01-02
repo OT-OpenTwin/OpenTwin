@@ -193,7 +193,7 @@ LogInDialog::LogInDialog()
 }
 
 LogInDialog::~LogInDialog() {
-
+	
 }
 
 void LogInDialog::setControlsEnabled(bool _enabled) {
@@ -211,13 +211,9 @@ void LogInDialog::setControlsEnabled(bool _enabled) {
 	m_exitButton->setEnabled(_enabled);
 }
 
-void LogInDialog::closeEvent(QCloseEvent* _event) {
-	if (m_state & LogInStateFlag::WorkerRunning) {
-		_event->ignore();
-	}
-	else {
-		ot::Dialog::closeEvent(_event);
-	}
+bool LogInDialog::mayCloseDialogWindow(void) const {
+	return !(m_state & LogInStateFlag::WorkerRunning);
+
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -726,7 +722,11 @@ void LogInDialog::updateGssOptions(void) {
 	for (const LogInGSSEntry& entry : m_gssData) {
 		options.append(entry.getDisplayText());
 	}
-	if (options.isEmpty()) options.append(QString());
+	
+	if (options.isEmpty()) {
+		options.append(QString());
+	}
+	
 	options.append(EDIT_GSS_TEXT);
 
 	m_gss->clear();

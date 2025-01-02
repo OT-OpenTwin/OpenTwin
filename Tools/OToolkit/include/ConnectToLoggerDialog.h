@@ -5,11 +5,14 @@
 
 #pragma once
 
+// OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTWidgets/Dialog.h"
 
+// Qt header
 #include <QtCore/qlist.h>
 
+// std header
 #include <list>
 
 class QVBoxLayout;
@@ -32,6 +35,9 @@ public:
 	void queueConnectRequest(void);
 	void queueRecenterRequest(void);
 
+protected:
+	virtual bool mayCloseDialogWindow(void) const override;
+
 private Q_SLOTS:
 	void slotCancel(void);
 	void slotConnect(void);
@@ -39,9 +45,14 @@ private Q_SLOTS:
 	void slotRegisterFail(void);
 	void slotDone(void);
 	void slotRecenter(void);
+	void slotEnable(void);
 
 private:
 	void worker(QString _url);
+	void stopWorker(void);
+
+	std::atomic_bool			m_workerRunning;
+	std::atomic_bool			m_stopWorker;
 
 	QVBoxLayout *				m_centralLayout;
 	QGridLayout *				m_inputLayout;

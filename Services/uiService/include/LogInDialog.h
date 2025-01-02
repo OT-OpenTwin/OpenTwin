@@ -41,7 +41,7 @@ public:
 	const LoginData& getLoginData(void) const { return m_loginData; };
 
 protected:
-	virtual void closeEvent(QCloseEvent* _event) override;
+	virtual bool mayCloseDialogWindow(void) const override;
 
 private:
 	enum class LogInStateFlag {
