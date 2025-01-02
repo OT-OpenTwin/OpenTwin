@@ -32,6 +32,14 @@
 #include <akAPI/uiAPI.h>
 #include <akCore/aException.h>
 
+#define OT_INTERN_VIEWERSELETIONCHANGE_PERFORMANCETEST_ENABLED false
+
+#if OT_INTERN_VIEWERSELETIONCHANGE_PERFORMANCETEST_ENABLED==true
+#include "OTCore/PerformanceTests.h"
+#define OT_INTERN_VIEWERSELETIONCHANGE_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_table_lcl_performancetest, "Viewer " ___testText)
+#else
+#define OT_INTERN_VIEWERSELETIONCHANGE_PERFORMANCE_TEST(___testText)
+#endif
 
 ViewerComponent::ViewerComponent()
 	: ot::ServiceBase("ViewerComponent", "Viewer", "127.0.0.1", ot::invalidServiceID), processingGroupCounter(0), treeSelectionReceived(false)
@@ -506,6 +514,8 @@ void ViewerComponent::notify(
 }
 
 void ViewerComponent::handleSelectionChanged(bool _selectionFromTree) {
+	OT_INTERN_VIEWERSELETIONCHANGE_PERFORMANCE_TEST("Selection Changed");
+
 	if (processingGroupCounter > 0)
 	{
 		treeSelectionReceived = true;

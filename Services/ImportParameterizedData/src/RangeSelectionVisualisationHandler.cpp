@@ -1,95 +1,110 @@
-#include "RangeSelectionVisualisationHandler.h"
+// Project header
 #include "Application.h"
-#include "OTServiceFoundation/TableIndexSchemata.h"
-#include "SelectionCategorisationColours.h"
 #include "CategorisationFolderNames.h"
+#include "SelectionCategorisationColours.h"
+#include "RangeSelectionVisualisationHandler.h"
 
+// OpenTwin header
+#include "OTServiceFoundation/TableIndexSchemata.h"
+
+// std header
 #include <map>
+
+#define OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED false
+
+#if OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED==true
+#include "OTCore/PerformanceTests.h"
+#define OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_rangeselectionvisualizationhandler_lcl_performancetest, "RangeSelectionVisualization " ___testText)
+#else
+#define OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCE_TEST(___testText)
+#endif
 
 
 void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selectedEntityIDs)
 {
+	OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCE_TEST("Select range: Total");
+
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionEntities = extractSelectionRanges(_selectedEntityIDs);
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionsThatNeedVisualisation = findSelectionsThatNeedVisualisation(selectionEntities);
-	bufferSelectionEntities(selectionEntities);
+	
+	this->bufferSelectionEntities(selectionEntities);
+
+	std::map<std::string, std::map<uint32_t, std::list<ot::TableRange>>> rangesByColourIDByTableNames;
+
 	if (!selectionsThatNeedVisualisation.empty())
 	{
-		std::map<std::string, std::map<uint32_t, std::list<ot::TableRange>>> rangesByColourIDByTableNames;
-		for (auto selectionEntity : selectionsThatNeedVisualisation)
 		{
-			//First we get the selected range
-			ot::TableRange userRange = selectionEntity->getSelectedRange();
-			ot::TableRange selectionRange = ot::TableIndexSchemata::userRangeToSelectionRange(userRange);
+			OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCE_TEST("Select range: Gather ranges");
 
-			//Now we determine the colour for the range
-			const std::string tableName = selectionEntity->getTableName();
-			uint32_t colourID;
-			std::string name = selectionEntity->getName();
-			std::string::difference_type n = std::count(name.begin(), name.end(), '/');
-			if (n == 2) //First topology level: RMD
-			{
-				colourID = 0;
-			}
-			else if (n == 3) //Second topology level: MSMD files
-			{
-				colourID = 1;
-			}
-			else if (n == 4) //Third topology level: Parameter and Quantities
-			{
-				if (name.find(CategorisationFolderNames::getParameterFolderName()) != std::string::npos)
-				{
-					colourID = 2;
-				}
-				else
-				{
-					colourID = 3;
-				}
-			}
-			else
-			{
-				assert(0);
-			}
+			for (auto selectionEntity : selectionsThatNeedVisualisation) {
+				//First we get the selected range
+				ot::TableRange userRange = selectionEntity->getSelectedRange();
+				ot::TableRange selectionRange = ot::TableIndexSchemata::userRangeToSelectionRange(userRange);
 
-			//Now we store the range for its colour and table 
-			rangesByColourIDByTableNames[tableName][colourID].push_back(selectionRange);
+				//Now we determine the colour for the range
+				const std::string tableName = selectionEntity->getTableName();
+				uint32_t colourID;
+				std::string name = selectionEntity->getName();
+				std::string::difference_type n = std::count(name.begin(), name.end(), '/');
+				if (n == 2) //First topology level: RMD
+				{
+					colourID = 0;
+				}
+				else if (n == 3) //Second topology level: MSMD files
+				{
+					colourID = 1;
+				}
+				else if (n == 4) //Third topology level: Parameter and Quantities
+				{
+					if (name.find(CategorisationFolderNames::getParameterFolderName()) != std::string::npos) {
+						colourID = 2;
+					}
+					else {
+						colourID = 3;
+					}
+				}
+				else {
+					assert(0);
+				}
+
+				//Now we store the range for its colour and table 
+				rangesByColourIDByTableNames[tableName][colourID].push_back(selectionRange);
+			}
 		}
 
 		const bool clearSelection = true;
-		for (const auto& rangesByColourIDByTableName : rangesByColourIDByTableNames)
-		{
-			const std::string tableName = rangesByColourIDByTableName.first;
-			auto& rangesByColourIDs = rangesByColourIDByTableName.second;
-			bool tableExisting = requestToOpenTable(tableName);
-			if (!tableExisting)
-			{
-				OT_LOG_E("Selection has a not existing table listed.");
-			}
-			else
-			{
-				for (const auto& rangesByColourID : rangesByColourIDs)
-				{
-					uint32_t colourID = rangesByColourID.first;
-					ot::Color typeColour;
-					if (colourID == 0)
-					{
-						typeColour = SelectionCategorisationColours::getRMDColour();
-					}
-					else if (colourID == 1)
-					{
-						typeColour = SelectionCategorisationColours::getSMDColour();
-					}
-					else if (colourID == 2)
-					{
-						typeColour = SelectionCategorisationColours::getParameterColour();
-					}
-					else
-					{
-						assert(colourID == 3);
-						typeColour = SelectionCategorisationColours::getQuantityColour();
-					}
 
-					const auto& ranges = rangesByColourID.second;
-					requestColouringRanges(clearSelection, tableName, typeColour, ranges);
+		{
+			OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCE_TEST("Select range: Request coloring");
+
+			for (const auto& rangesByColourIDByTableName : rangesByColourIDByTableNames) {
+				const std::string tableName = rangesByColourIDByTableName.first;
+				auto& rangesByColourIDs = rangesByColourIDByTableName.second;
+				bool tableExisting = requestToOpenTable(tableName);
+				if (!tableExisting) {
+					OT_LOG_E("Selection has a not existing table listed.");
+				}
+				else {
+					for (const auto& rangesByColourID : rangesByColourIDs) {
+						uint32_t colourID = rangesByColourID.first;
+						ot::Color typeColour;
+						if (colourID == 0) {
+							typeColour = SelectionCategorisationColours::getRMDColour();
+						}
+						else if (colourID == 1) {
+							typeColour = SelectionCategorisationColours::getSMDColour();
+						}
+						else if (colourID == 2) {
+							typeColour = SelectionCategorisationColours::getParameterColour();
+						}
+						else {
+							assert(colourID == 3);
+							typeColour = SelectionCategorisationColours::getQuantityColour();
+						}
+
+						const auto& ranges = rangesByColourID.second;
+						requestColouringRanges(clearSelection, tableName, typeColour, ranges);
+					}
 				}
 			}
 		}
