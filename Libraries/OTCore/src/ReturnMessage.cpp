@@ -77,8 +77,6 @@ ot::ReturnMessage::ReturnMessage(ReturnMessageStatus _status, const ot::JsonDocu
 	m_what = _document.toJson();
 }
 
-ot::ReturnMessage::ReturnMessage(const ReturnMessage& _other) : m_status(_other.m_status), m_what(_other.m_what) {}
-
 ot::ReturnMessage& ot::ReturnMessage::operator = (const ReturnMessage& _other) {
 	if (this != &_other) {
 		m_status = _other.m_status;

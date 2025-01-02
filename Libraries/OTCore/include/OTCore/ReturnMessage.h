@@ -50,7 +50,11 @@ namespace ot
 		//! @param _status The status
 		//! @param _document The document that will be serialized and set as what()
 		ReturnMessage(ReturnMessageStatus _status, const ot::JsonDocument& _document);
-		ReturnMessage(const ReturnMessage& _other);
+		
+		
+		ReturnMessage(const ReturnMessage& _other) = default;
+		ReturnMessage(ReturnMessage&& _other) = default;
+
 		~ReturnMessage() {};
 		ReturnMessage& operator = (const ReturnMessage& _other);
 		ReturnMessage& operator = (ReturnMessage&& _other) noexcept;

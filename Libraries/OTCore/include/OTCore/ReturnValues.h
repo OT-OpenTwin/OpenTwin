@@ -13,20 +13,14 @@ namespace ot
 		ReturnValues() {}
 		~ReturnValues();
 
-		/// <summary>
-		/// Deep copy of GenericDataStructs
-		/// </summary>
-		/// <param name="other"></param>
+		//! @brief Deep copy of GenericDataStructs
 		ReturnValues(const ReturnValues& other);
-		ReturnValues(ReturnValues&& other) noexcept;
+		ReturnValues(ReturnValues&& other) noexcept = default;
 
-		/// <summary>
-		/// Deep copy of GenericDataStructs
-		/// </summary>
-		/// <param name="other"></param>
-		/// <returns></returns>
+				
+		//! @brief Deep copy of GenericDataStructs
 		ReturnValues& operator=(const ReturnValues& other);
-		ReturnValues& operator=(ReturnValues&& other) noexcept;
+		ReturnValues& operator=(ReturnValues&& other) noexcept = default;
 
 		bool operator==(const ReturnValues& other) const;
 		bool operator!=(const ReturnValues& other) const;
