@@ -46,6 +46,8 @@
     <ClCompile Include="src\ContextMenuManager.cpp" />
     <ClCompile Include="src\CreateProjectDialog.cpp" />
     <ClCompile Include="src\CustomGraphicsItem.cpp" />
+    <ClCompile Include="src\DelayedCallHandler.cpp" />
+    <ClCompile Include="src\DelayedShowHideHandler.cpp" />
     <ClCompile Include="src\Dialog.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\DockWatcherAction.cpp" />
@@ -91,7 +93,6 @@
     <ClCompile Include="src\Label.cpp" />
     <ClCompile Include="src\LineEdit.cpp" />
     <ClCompile Include="src\MainWindow.cpp" />
-    <ClCompile Include="src\MainWindowManager.cpp" />
     <ClCompile Include="src\ManagedGuiObject.cpp" />
     <ClCompile Include="src\MessageBoxHandler.cpp" />
     <ClCompile Include="src\MessageBoxManager.cpp" />
@@ -195,8 +196,10 @@
     <ClInclude Include="include\OTWidgets\AbstractStatusBar.h" />
     <ClInclude Include="include\OTWidgets\AbstractToolBar.h" />
     <ClInclude Include="include\OTWidgets\CentralWidgetManager.h" />
+    <QtMoc Include="include\OTWidgets\DelayedCallHandler.h" />
+    <QtMoc Include="include\OTWidgets\DelayedShowHideHandler.h" />
+    <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <ClInclude Include="include\OTWidgets\MainWindow.h" />
-    <ClInclude Include="include\OTWidgets\MainWindowManager.h" />
     <ClInclude Include="include\OTWidgets\SignalBlockWrapper.h" />
     <ClInclude Include="include\OTWidgets\StatusBarManager.h" />
     <ClInclude Include="include\OTWidgets\TabToolBarManager.h" />

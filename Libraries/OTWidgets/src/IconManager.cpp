@@ -50,51 +50,51 @@ const QStringList& ot::IconManager::searchPaths(void) {
 	return IconManager::instance().m_searchPaths;
 }
 
-QIcon& ot::IconManager::getIcon(const QString& _subPath) {
+const QIcon& ot::IconManager::getIcon(const QString& _subPath) {
 	IconManager& manager = IconManager::instance();
-	return manager.getOrCreate<QIcon>(_subPath, manager.m_icons, manager.m_emptyIcon);
+	return *manager.getOrCreate<QIcon>(_subPath, manager.m_icons, manager.m_emptyIcon);
 }
 
-QPixmap& ot::IconManager::getPixmap(const QString& _subPath) {
+const QPixmap& ot::IconManager::getPixmap(const QString& _subPath) {
 	IconManager& manager = IconManager::instance();
-	return manager.getOrCreate<QPixmap>(_subPath, manager.m_pixmaps, manager.m_emptyPixmap);
+	return *manager.getOrCreate<QPixmap>(_subPath, manager.m_pixmaps, manager.m_emptyPixmap);
 }
 
-QMovie& ot::IconManager::getMovie(const QString& _subPath) {
+std::shared_ptr<QMovie> ot::IconManager::getMovie(const QString& _subPath) {
 	IconManager& manager = IconManager::instance();
 	return manager.getOrCreate<QMovie>(_subPath, manager.m_movies, manager.m_emptyMovie);
 }
 
-QByteArray& ot::IconManager::getSvgData(const QString& _subPath) {
+const QByteArray& ot::IconManager::getSvgData(const QString& _subPath) {
 	IconManager& manager = IconManager::instance();
-	manager.m_mutex.lock();
+	std::lock_guard<std::mutex> lock(manager.m_mutex);
 
 	// Find existing
-	const auto& it = manager.m_svgData.find(_subPath);
-	if (it != manager.m_svgData.end()) {
-		manager.m_mutex.unlock();
-		return it->second;
+	std::optional<std::shared_ptr<QByteArray>*> existing = manager.getWhileLocked<QByteArray>(_subPath, manager.m_svgData);
+	if (existing.has_value()) {
+		if (existing.value()) {
+			return *(*existing.value());
+		}
 	}
 
 	// Find new
 	QString path = manager.findFullPath(_subPath);
 	if (path.isEmpty()) {
-		manager.m_mutex.unlock();
-		OT_LOG_EAS("Icon \"" + _subPath.toStdString() + "\" not found");
-		return manager.m_emptySvgData;
+		OT_LOG_E("Icon \"" + _subPath.toStdString() + "\" not found");
+		return *manager.m_emptySvgData;
 	}
 
 	// Create and store new
 	QFile file(path);
 	if (!file.open(QIODevice::ReadOnly)) {
-		OT_LOG_EAS("Failed to open file for reading: \"" + path.toStdString() + "\"");
-		return manager.m_emptySvgData;
+		OT_LOG_E("Failed to open file for reading: \"" + path.toStdString() + "\"");
+		return *manager.m_emptySvgData;
 	}
-	manager.m_svgData.insert_or_assign(_subPath, file.readAll());
+	
+	//auto result = manager.m_svgData.insert_or_assign(_subPath, file.readAll());
 	file.close();
-	manager.m_mutex.unlock();
-
-	return IconManager::getSvgData(_subPath);
+	return *manager.m_emptySvgData;
+	//return *result.first->second;
 }
 
 void ot::IconManager::setApplicationIcon(const QIcon& _icon) {
@@ -112,12 +112,12 @@ QString ot::IconManager::findFullPath(const QString& _subPath) {
 	return QString();
 }
 
-ot::IconManager::IconManager() {
+ot::IconManager::IconManager()
+	: m_emptyIcon(new QIcon), m_emptyMovie(new QMovie), m_emptyPixmap(new QPixmap), m_emptySvgData(new QByteArray)
+{
 
 }
 
 ot::IconManager::~IconManager() {
-	for (auto i : m_icons) delete i.second;
-	for (auto i : m_pixmaps) delete i.second;
-	for (auto i : m_movies) delete i.second;
+
 }

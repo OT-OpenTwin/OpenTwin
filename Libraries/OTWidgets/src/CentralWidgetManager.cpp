@@ -4,14 +4,15 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTWidgets/MainWindow.h"
 #include "OTWidgets/CentralWidgetManager.h"
 
 // Qt header
 #include <QtCore/qtimer.h>
 #include <QtWidgets/qlabel.h>
 
-ot::CentralWidgetManager::CentralWidgetManager()
-	: m_currentCentral(nullptr), m_showDelay(0), m_hideDelay(0)
+ot::CentralWidgetManager::CentralWidgetManager(MainWindow* _window)
+	: m_currentCentral(nullptr), m_animationVisible(false)
 {
 	// Create animation label
 	m_animationLabel = new QLabel("");
@@ -20,26 +21,32 @@ ot::CentralWidgetManager::CentralWidgetManager()
 	m_animationLabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 	m_animationLabel->hide();
 
-	// Setup delay timer
-	m_delayTimer = new QTimer;
-	m_delayTimer->setSingleShot(true);
-	connect(m_delayTimer, &QTimer::timeout, this, &CentralWidgetManager::slotTimeout);
+	// Attach to window if set
+	if (_window) {
+		_window->setCentralWidget(this);
+	}
+
+	// Connect signals
+	this->connect(&m_animationShowHideHandler, &DelayedShowHideHandler::showRequest, this, &CentralWidgetManager::slotShowAnimation);
+	this->connect(&m_animationShowHideHandler, &DelayedShowHideHandler::hideRequest, this, &CentralWidgetManager::slotHideAnimation);
 }
 
 ot::CentralWidgetManager::~CentralWidgetManager() {
-	m_delayTimer->stop();
+	// Stop animation handling and animation itself
+	m_animationShowHideHandler.stop();
 	if (m_animationLabel->movie()) {
 		m_animationLabel->movie()->stop();
 	}
+
+	// Destroy animation label
 	delete m_animationLabel;
-	delete m_delayTimer;
 }
 
-QWidget* ot::CentralWidgetManager::replaceCurrentCentralWidget(QWidget* _widget) {
+std::unique_ptr<QWidget> ot::CentralWidgetManager::replaceCurrentCentralWidget(QWidget* _widget) {
 	QSize newSize = this->size();
 
 	if (_widget == m_currentCentral) {
-		return m_currentCentral;
+		return std::unique_ptr<QWidget>(); // Nothing replaced
 	}
 	QWidget* result = m_currentCentral;
 	if (result) {
@@ -58,59 +65,62 @@ QWidget* ot::CentralWidgetManager::replaceCurrentCentralWidget(QWidget* _widget)
 
 		m_animationLabel->setParent(nullptr);
 
-		if (m_animationFlags & AnimationState::IsVisible) {
+
+		if (m_animationVisible) {
 			this->applyWaitingAnimationVisible(true);
 		}
 	}
 
-	return result;
+	return std::unique_ptr<QWidget>(result);
 }
 
-QMovie* ot::CentralWidgetManager::replaceWaitingAnimation(QMovie* _animation) {
-	QMovie* result = nullptr;
-
+void ot::CentralWidgetManager::setOverlayAnimation(std::shared_ptr<QMovie> _animation) {
 	if (m_animationLabel->movie()) {
 		m_animationLabel->movie()->stop();
-		result = m_animationLabel->movie();
 	}
-	
-	m_animationLabel->setMovie(_animation);
-	if (m_animationFlags & AnimationState::IsVisible) {
+
+	m_animationLabel->setMovie(_animation.get());
+	m_animation = _animation;
+
+	if (m_animationVisible) {
 		this->applyWaitingAnimationVisible(true);
 	}
-
-	return result;
 }
 
-QMovie* ot::CentralWidgetManager::getWaitingAnimation(void) const {
-	return m_animationLabel->movie();
-}
-
-void ot::CentralWidgetManager::setWaitingAnimationVisible(bool _visible, bool _noDelay) {
-	m_delayTimer->stop();
-	m_animationFlags &= ~AnimationState::DelayedShow;
-	m_animationFlags &= ~AnimationState::DelayedHide;
-
+void ot::CentralWidgetManager::setOverlayAnimationVisible(bool _visible, bool _noDelay) {
+	m_animationShowHideHandler.stop();
 	if (_visible) {	
-		if (_noDelay || m_showDelay <= 0) {
-			this->applyWaitingAnimationVisible(true);
+		if (_noDelay) {
+			this->slotShowAnimation();
 		}
 		else {
-			m_delayTimer->setInterval(m_showDelay);
-			m_animationFlags |= AnimationState::DelayedShow;
-			m_delayTimer->start();
+			m_animationShowHideHandler.show();
 		}
 	}
 	else {
-		if (_noDelay || m_showDelay <= 0) {
-			this->applyWaitingAnimationVisible(false);
+		if (_noDelay) {
+			this->slotHideAnimation();
 		}
 		else {
-			m_delayTimer->setInterval(m_showDelay);
-			m_animationFlags |= AnimationState::DelayedHide;
-			m_delayTimer->start();
+			m_animationShowHideHandler.hide();
 		}
 	}
+}
+
+void ot::CentralWidgetManager::setOverlayAnimatioShowDelay(int _delay) {
+	m_animationShowHideHandler.setShowDelay(_delay);
+}
+
+int ot::CentralWidgetManager::getOverlayAnimatioShowDelay(void) const {
+	return m_animationShowHideHandler.getShowDelay();
+}
+
+void ot::CentralWidgetManager::setOverlayAnimatioHideDelay(int _delay) {
+	m_animationShowHideHandler.setHideDelay(_delay);
+}
+
+int ot::CentralWidgetManager::getOverlayAnimatioHideDelay(void) const {
+	return m_animationShowHideHandler.getHideDelay();
 }
 
 void ot::CentralWidgetManager::resizeEvent(QResizeEvent* _event) {
@@ -121,7 +131,17 @@ void ot::CentralWidgetManager::resizeEvent(QResizeEvent* _event) {
 	m_animationLabel->resize(this->size());
 }
 
+void ot::CentralWidgetManager::slotShowAnimation(void) {
+	this->applyWaitingAnimationVisible(true);
+}
+
+void ot::CentralWidgetManager::slotHideAnimation(void) {
+	this->applyWaitingAnimationVisible(false);
+}
+
 void ot::CentralWidgetManager::applyWaitingAnimationVisible(bool _visible) {
+	m_animationShowHideHandler.stop();
+
 	if (_visible) {
 		if (m_currentCentral) {
 			m_animationLabel->setParent(m_currentCentral);
@@ -133,29 +153,14 @@ void ot::CentralWidgetManager::applyWaitingAnimationVisible(bool _visible) {
 		m_animationLabel->movie()->start();
 		m_animationLabel->setGeometry(this->rect());
 		m_animationLabel->show();
-
-		m_animationFlags |= AnimationState::IsVisible;
+		m_animationVisible = true;
 	}
-	else {
-		m_delayTimer->stop();
-		
+	else {		
 		if (m_animationLabel->movie()) {
 			m_animationLabel->movie()->stop();
 		}
 		m_animationLabel->setParent(nullptr);
 		m_animationLabel->hide();
-
-		m_animationFlags &= ~AnimationState::IsVisible;
-	}
-}
-
-void ot::CentralWidgetManager::slotTimeout(void) {
-	if (m_animationFlags | AnimationState::DelayedShow) {
-		m_animationFlags &= ~AnimationState::DelayedShow;
-		this->applyWaitingAnimationVisible(true);
-	}
-	else if (m_animationFlags | AnimationState::DelayedHide) {
-		m_animationFlags &= ~AnimationState::DelayedHide;
-		this->applyWaitingAnimationVisible(false);
+		m_animationVisible = false;
 	}
 }

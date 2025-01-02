@@ -8,17 +8,23 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTCore/PerformanceTests.h"
-#include "OTGui/NavigationTreeItem.h"
-#include "OTGui/PropertyDialogCfg.h"
-#include "OTGui/PropertyStringList.h"
 #include "OTGui/PropertyGroup.h"
+#include "OTGui/PropertyDialogCfg.h"
+#include "OTGui/NavigationTreeItem.h"
+#include "OTGui/PropertyStringList.h"
 #include "OTWidgets/Splitter.h"
 #include "OTWidgets/TextEditor.h"
 #include "OTWidgets/TreeWidget.h"
+#include "OTWidgets/IconManager.h"
 #include "OTWidgets/TreeWidgetFilter.h"
 #include "OTWidgets/PropertyDialog.h"
 #include "OTWidgets/PropertyGridGroup.h"
 #include "OTWidgets/VersionGraphManager.h"
+
+#include "OTWidgets/MainWindow.h"
+#include "OTWidgets/TabToolBarManager.h"
+#include "OTWidgets/StatusBarManager.h"
+#include "OTWidgets/CentralWidgetManager.h"
 
 // Qt header
 #include <QtCore/qfile.h>
@@ -28,52 +34,40 @@
 
 class TestToolBar : public QToolBar {
 public:
-	TestToolBar(WidgetTest* _owner) : m_owner(_owner) {
+	TestToolBar(WidgetTest* _owner) :
+		m_owner(_owner), m_window(nullptr), m_centralWidgetManager(nullptr), m_toolBarManager(nullptr), m_statusBarManager(nullptr)
+	{
 
 	}
 
 public Q_SLOTS:
 	void slotTest(void) {
-		QString fileName = QFileDialog::getOpenFileName(this, "Open JSON file", "", "JSON (*.json)");
-		if (fileName.isEmpty()) return;
+		using namespace ot;
 
-		QFile file(fileName);
-		if (!file.open(QIODevice::ReadOnly)) {
-			QMessageBox msg(QMessageBox::Critical, "Error", "Failed to open file for reading", QMessageBox::Ok);
-			msg.exec();
-			return;
+		if (m_window) {
+			OT_LOG_EA("Main window already created");
 		}
+		m_window = new MainWindow;
 
-		std::string str = file.readAll().toStdString();
-		file.close();
+		m_centralWidgetManager = new CentralWidgetManager;
+		
+		m_centralWidgetManager->setOverlayAnimation(IconManager::getMovie("Animations/OpenTwinLoading.gif"));
 
-		try {
-			ot::JsonDocument result;
-			if (result.fromJson(str)) {
-				QMessageBox msg(QMessageBox::Information, "Ok", "Parse Ok", QMessageBox::Ok);
-				msg.exec();
-				return;
-			}
-			else {
-				QMessageBox msg(QMessageBox::Warning, "Error", "Parse error", QMessageBox::Ok);
-				msg.exec();
-				return;
-			}
-		}
-		catch (const std::exception& _e) {
-			QMessageBox msg(QMessageBox::Critical, "Error", _e.what(), QMessageBox::Ok);
-			msg.exec();
-			return;
-		}
-		catch (...) {
-			QMessageBox msg(QMessageBox::Critical, "Error", "Unknown error", QMessageBox::Ok);
-			msg.exec();
-			return;
-		}
+		m_window->setCentralWidget(m_centralWidgetManager);
+
+		m_toolBarManager = new TabToolBarManager;
+
+
+		m_statusBarManager = new StatusBarManager;
 	}
 
 private:
 	WidgetTest* m_owner;
+
+	ot::MainWindow* m_window;
+	ot::CentralWidgetManager* m_centralWidgetManager;
+	ot::TabToolBarManager* m_toolBarManager;
+	ot::StatusBarManager* m_statusBarManager;
 };
 
 bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {

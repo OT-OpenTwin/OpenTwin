@@ -931,7 +931,7 @@ void ak::uiAPI::window::setWaitingAnimation(
 	UID												_windowUID,
 	const QString &										_animationName
 ) {
-	object::get<aWindowManager>(_windowUID)->setWaitingAnimation(&ot::IconManager::getMovie("Animations/" + _animationName + ".gif"));
+	object::get<aWindowManager>(_windowUID)->setWaitingAnimation(ot::IconManager::getMovie("Animations/" + _animationName + ".gif").get());
  }
 
 void ak::uiAPI::window::setCentralWidgetMinimumSize(
@@ -1023,7 +1023,7 @@ const QPixmap & ak::uiAPI::getPixmap(
 QMovie * ak::uiAPI::getMovie(
 	const QString&											_name
 ) {
-	return &ot::IconManager::getMovie("Animations/" + _name + ".gif");
+	return ot::IconManager::getMovie("Animations/" + _name + ".gif").get();
 }
 
 // ###############################################################################################################################################

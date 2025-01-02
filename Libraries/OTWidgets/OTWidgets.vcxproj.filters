@@ -427,11 +427,14 @@
     <ClCompile Include="src\StatusBarManager.cpp">
       <Filter>src\WindowManagement</Filter>
     </ClCompile>
-    <ClCompile Include="src\MainWindowManager.cpp">
-      <Filter>src\WindowManagement</Filter>
-    </ClCompile>
     <ClCompile Include="src\TabToolBarManager.cpp">
       <Filter>src\WindowManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DelayedCallHandler.cpp">
+      <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DelayedShowHideHandler.cpp">
+      <Filter>src\General</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -833,9 +836,6 @@
     <ClInclude Include="include\OTWidgets\MainWindow.h">
       <Filter>include\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\MainWindowManager.h">
-      <Filter>include\WindowManagement</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\CentralWidgetManager.h">
       <Filter>include\WindowManagement</Filter>
     </ClInclude>
@@ -850,6 +850,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\TabToolBarManager.h">
       <Filter>include\WindowManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\IconManager.hpp">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -999,6 +1002,12 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\ComboBox.h">
       <Filter>include\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\DelayedShowHideHandler.h">
+      <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\DelayedCallHandler.h">
+      <Filter>include\General</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

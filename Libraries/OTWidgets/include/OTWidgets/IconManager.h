@@ -20,6 +20,7 @@
 // std header
 #include <map>
 #include <mutex>
+#include <optional>
 
 namespace ot {
 
@@ -38,17 +39,17 @@ namespace ot {
 
 		static const QStringList& searchPaths(void);
 
-		//! @brief Create and return the icon
-		static QIcon& getIcon(const QString& _subPath);
+		//! @brief Return or import and return the icon.
+		static const QIcon& getIcon(const QString& _subPath);
 
-		//! @brief Create and return the pixmap
-		static QPixmap& getPixmap(const QString& _subPath);
+		//! @brief Return or import and return the pixmap.
+		static const QPixmap& getPixmap(const QString& _subPath);
 
-		//! @brief Create and return the movie
-		static QMovie& getMovie(const QString& _subPath);
+		//! @brief Return or import and return the movie.
+		static std::shared_ptr<QMovie> getMovie(const QString& _subPath);
 
-		//! \brief Create and return the svg data.
-		static QByteArray& getSvgData(const QString& _subPath);
+		//! @brief Return or import and return the pixmap.
+		static const QByteArray& getSvgData(const QString& _subPath);
 
 		//! \brief Stores the application icon.
 		static void setApplicationIcon(const QIcon& _icon);
@@ -59,7 +60,13 @@ namespace ot {
 
 	private:
 		template <class T>
-		T& getOrCreate(const QString& _subPath, std::map<QString, T*>& _dataMap, T& _default);
+		std::shared_ptr<T>& getOrCreate(const QString& _subPath, std::map<QString, std::shared_ptr<T>>& _dataMap, std::shared_ptr<T>& _default);
+
+		template <class T>
+		std::optional<std::shared_ptr<T>*> get(const QString& _subPath, std::map<QString, std::shared_ptr<T>>& _dataMap);
+
+		template <class T>
+		std::optional<std::shared_ptr<T>*> getWhileLocked(const QString& _subPath, std::map<QString, std::shared_ptr<T>>& _dataMap);
 
 		QString findFullPath(const QString& _subPath);
 
@@ -68,42 +75,17 @@ namespace ot {
 
 		QStringList m_searchPaths;
 		std::mutex m_mutex;
-		std::map<QString, QIcon*> m_icons;
-		std::map<QString, QPixmap*> m_pixmaps;
-		std::map<QString, QMovie*> m_movies;
-		std::map<QString, QByteArray> m_svgData;
-		QIcon m_emptyIcon;
-		QPixmap m_emptyPixmap;
-		QMovie m_emptyMovie;
-		QByteArray m_emptySvgData;
+		std::map<QString, std::shared_ptr<QIcon>> m_icons;
+		std::map<QString, std::shared_ptr<QPixmap>> m_pixmaps;
+		std::map<QString, std::shared_ptr<QMovie>> m_movies;
+		std::map<QString, std::shared_ptr<QByteArray>> m_svgData;
+		std::shared_ptr<QIcon> m_emptyIcon;
+		std::shared_ptr<QPixmap> m_emptyPixmap;
+		std::shared_ptr<QMovie> m_emptyMovie;
+		std::shared_ptr<QByteArray> m_emptySvgData;
 		QIcon m_applicationIcon;
 	};
 
 }
 
-template <class T>
-T& ot::IconManager::getOrCreate(const QString& _subPath, std::map<QString, T*>& _dataMap, T& _default) {
-	this->m_mutex.lock();
-
-	// Find existing
-	const auto& it = _dataMap.find(_subPath);
-	if (it != _dataMap.end()) {
-		this->m_mutex.unlock();
-		return *it->second;
-	}
-
-	// Find new
-	QString path = this->findFullPath(_subPath);
-	if (path.isEmpty()) {
-		this->m_mutex.unlock();
-		OT_LOG_EAS("Icon \"" + _subPath.toStdString() + "\" not found");
-		return _default;
-	}
-
-	// Create and store new
-	T* newEntry = new T(path);
-	_dataMap.insert_or_assign(_subPath, newEntry);
-
-	this->m_mutex.unlock();
-	return *newEntry;
-}
+#include "OTWidgets/IconManager.hpp"

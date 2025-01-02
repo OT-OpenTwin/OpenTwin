@@ -8,66 +8,69 @@
 // OpenTwin header
 #include "OTCore/Flags.h"
 #include "OTCore/OTClassHelper.h"
+#include "OTWidgets/DelayedShowHideHandler.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qt header
 #include <QtGui/qmovie.h>
 #include <QtWidgets/qwidget.h>
 
-class QTimer;
 class QLabel;
 
 namespace ot {
 
+	class MainWindow;
+
 	class OT_WIDGETS_API_EXPORT CentralWidgetManager : public QWidget {
 		OT_DECL_NOCOPY(CentralWidgetManager)
 	public:
-		CentralWidgetManager();
+
+		//! @brief Constructor.
+		//! @param _window If provided the CentralWidgetManager will set itself as the central widget. This may destroy the previously set central widget.
+		CentralWidgetManager(MainWindow* _window = (MainWindow*)nullptr);
 		virtual ~CentralWidgetManager();
 
 		//! @brief Replaces the current central widget.
 		//! An existing widget will be hidden an returned.
 		//! Caller takes ownership of the replaced widget.
-		QWidget* replaceCurrentCentralWidget(QWidget* _widget);
+		std::unique_ptr<QWidget> replaceCurrentCentralWidget(QWidget* _widget);
 
-		QMovie* replaceWaitingAnimation(QMovie* _animation);
-		QMovie* getWaitingAnimation(void) const;
+		//! @brief Returns writeable pointer to the currently set central widget.
+		//! The CentralWidgetManager keeps ownership of the central widget.
+		QWidget* getCurrentCentralWidget(void) { return m_currentCentral; };
 
-		void setWaitingAnimationVisible(bool _visible, bool _noDelay = false);
+		//! @brief Returns read-only pointer to the currently set central widget.
+		//! The CentralWidgetManager keeps ownership of the central widget.
+		const QWidget* getCurrentCentralWidget(void) const { return m_currentCentral; };
+
+		void setOverlayAnimation(std::shared_ptr<QMovie> _animation);
+
+		std::shared_ptr<QMovie> getCurrentOverlayAnimation(void) const { return m_animation; };
+
+		void setOverlayAnimationVisible(bool _visible, bool _noDelay = false);
 		
-		void setShowDelay(int _delay) { m_showDelay = _delay; };
-		int getShowDelay(void) const { return m_showDelay; };
+		void setOverlayAnimatioShowDelay(int _delay);
+		int getOverlayAnimatioShowDelay(void) const;
 
-		void setHideDelay(int _delay) { m_hideDelay = _delay; };
-		int getHideDelay(void) const { return m_hideDelay; };
+		void setOverlayAnimatioHideDelay(int _delay);
+		int getOverlayAnimatioHideDelay(void) const;
 
 	protected:
 		virtual void resizeEvent(QResizeEvent* _event) override;
 
 	private Q_SLOTS:
-		void slotTimeout(void);
+		void slotShowAnimation(void);
+		void slotHideAnimation(void);
 
 	private:
 		void applyWaitingAnimationVisible(bool _visible);
 
-		enum class AnimationState {
-			HiddenState = 0 << 0,
-			DelayedShow = 1 << 0,
-			DelayedHide = 1 << 1,
-			IsVisible   = 1 << 2
-		};
-		OT_ADD_FRIEND_FLAG_FUNCTIONS(AnimationState)
-		typedef Flags<AnimationState> AnimationFlags;
-
 		QWidget* m_currentCentral;
 
-		QTimer* m_delayTimer;
-		int m_showDelay;
-		int m_hideDelay;
-
+		DelayedShowHideHandler m_animationShowHideHandler;
+		std::shared_ptr<QMovie> m_animation;
 		QLabel* m_animationLabel;
-		AnimationFlags m_animationFlags;
-
+		bool m_animationVisible;
 	};
 
 }

@@ -4,6 +4,7 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTWidgets/MainWindow.h"
 #include "OTWidgets/TabToolBarManager.h"
 
 // TTB header
@@ -16,10 +17,14 @@ ot::TabToolBarManager* ot::TabToolBarManager::createDefault(void) {
 	return newManager;
 }
 
-ot::TabToolBarManager::TabToolBarManager()
+ot::TabToolBarManager::TabToolBarManager(MainWindow* _window)
 	: m_toolBar(nullptr)
 {
 	m_toolBar = new tt::TabToolbar;
+
+	if (_window) {
+		_window->addToolBar(m_toolBar);
+	}
 }
 
 ot::TabToolBarManager::~TabToolBarManager() {

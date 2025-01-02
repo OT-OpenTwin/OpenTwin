@@ -14,12 +14,14 @@ namespace tt {
 
 namespace ot {
 
+	class MainWindow;
+
 	class OT_WIDGETS_API_EXPORT TabToolBarManager : public AbstractToolBar {
 		OT_DECL_NOCOPY(TabToolBarManager)
 	public:
 		static TabToolBarManager* createDefault(void);
 
-		TabToolBarManager();
+		TabToolBarManager(MainWindow* _window = (MainWindow*)nullptr);
 		virtual ~TabToolBarManager();
 
 		virtual QToolBar* getToolBar(void) override;
