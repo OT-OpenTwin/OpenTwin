@@ -25,6 +25,7 @@
 
 
 #include "OTCore/FolderNames.h"
+#include "OTServiceFoundation/UILockWrapper.h"
 
 // Forward declaration
 namespace ot {
@@ -117,10 +118,13 @@ public:
 	//OT_HANDLER(myHandleFunctionName, Application, "actionToHandle");
 
 	virtual void modelSelectionChanged(void) override;
-
+	virtual ~Application();
 private:
 	Application();
-	virtual ~Application();
+
+	std::mutex m_onlyOneActionPerTime;
+	UILockWrapper* m_twoPartsAction = nullptr;
+
 	ot::MenuButtonDescription _buttonImportTouchstone;
 	
 	ot::MenuButtonDescription _buttonCreateMSMDEntry;
@@ -128,7 +132,6 @@ private:
 	ot::MenuButtonDescription _buttonCreateParameterEntry;
 	ot::MenuButtonDescription _buttonCreateQuantityEntry;
 	ot::MenuButtonDescription _buttonAutomaticCreationMSMD;
-
 
 	ot::MenuButtonDescription _buttonCreateDataCollection;
 

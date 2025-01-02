@@ -154,6 +154,8 @@ void LogVisualizationItemViewDialog::closeEvent(QCloseEvent* _event) {
 	settings->setValue("LogVisualizationItemViewDialog.W", size().width());
 	settings->setValue("LogVisualizationItemViewDialog.H", size().height());
 	settings->setValue("LogVisualizationItemViewDialog.FindSyntax", m_findMessageSyntax->isChecked());
+
+	ot::Dialog::closeEvent(_event);
 }
 
 void LogVisualizationItemViewDialog::mousePressEvent(QMouseEvent* _event) {

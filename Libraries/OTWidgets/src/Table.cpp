@@ -151,6 +151,8 @@ void ot::Table::setSelectedCellsBackground(const ot::Color& _color) {
 }
 
 void ot::Table::setSelectedCellsBackground(const QColor& _color) {
+	OT_INTERN_TABLE_PERFORMANCE_TEST("Set selected cells background");
+
 	SignalBlockWrapper blocker(this);
 	
 	for (QTableWidgetItem* item : this->selectedItems()) {

@@ -109,3 +109,14 @@ void ot::Dialog::mouseReleaseEvent(QMouseEvent* _event) {
 		m_state.setFlag(DialogState::MousePressed, false);
 	}
 }
+
+void ot::Dialog::closeEvent(QCloseEvent* _event) {
+	m_state.setFlag(DialogState::Closing, true);
+
+	if (this->mayCloseDialogWindow()) {
+		QDialog::closeEvent(_event);
+	}
+	else {
+		_event->accept();
+	}
+}

@@ -115,8 +115,7 @@ LogInDialog::LogInDialog()
 	}
 
 	this->initializeGssData(settings);
-	this->updateGssOptions();
-
+	
 	// Setup layouts
 	imageViewLayout->addStretch(1);
 	imageViewLayout->addWidget(titleImageView);
@@ -194,7 +193,7 @@ LogInDialog::LogInDialog()
 }
 
 LogInDialog::~LogInDialog() {
-
+	
 }
 
 void LogInDialog::setControlsEnabled(bool _enabled) {
@@ -212,13 +211,9 @@ void LogInDialog::setControlsEnabled(bool _enabled) {
 	m_exitButton->setEnabled(_enabled);
 }
 
-void LogInDialog::closeEvent(QCloseEvent* _event) {
-	if (m_state & LogInStateFlag::WorkerRunning) {
-		_event->ignore();
-	}
-	else {
-		ot::Dialog::closeEvent(_event);
-	}
+bool LogInDialog::mayCloseDialogWindow(void) const {
+	return !(m_state & LogInStateFlag::WorkerRunning);
+
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -419,7 +414,9 @@ void LogInDialog::slotToggleChangePasswordMode(void) {
 }
 
 void LogInDialog::slotGSSChanged(void) {
-	if (m_gss->currentText() != EDIT_GSS_TEXT) return;
+	if (m_gss->currentText() != EDIT_GSS_TEXT) {
+		return;
+	}
 
 	LogInGSSEditDialog dialog(m_gssData);
 
@@ -437,7 +434,9 @@ void LogInDialog::slotGSSChanged(void) {
 }
 
 void LogInDialog::slotPasswordChanged(void) {
-	if (!(m_state & LogInStateFlag::RestoredPassword)) return;
+	if (!(m_state & LogInStateFlag::RestoredPassword)) {
+		return;
+	}
 
 	QString txt = m_password->text();
 	QString newTxt;
@@ -642,12 +641,17 @@ void LogInDialog::saveUserSettings(void) const {
 }
 
 LogInGSSEntry LogInDialog::findCurrentGssEntry(void) {
-	if (m_gss->currentIndex() < 0 || m_gss->currentIndex() >= m_gssData.size()) return LogInGSSEntry();
-	else return m_gssData[m_gss->currentIndex()];
+	int index = m_gss->currentIndex();
+	if (index < 0 || index >= m_gssData.size()) {
+		return LogInGSSEntry();
+	}
+	else {
+		return m_gssData[index];
+	}
 }
 
 void LogInDialog::initializeGssData(std::shared_ptr<QSettings> _settings) {
-	QString lastSessionService = _settings->value("SessionServiceURL", "").toString();
+	QString lastSessionServiceName = _settings->value("SessionServiceURL", "").toString();
 	QByteArray sessionServiceJSON = _settings->value("SessionServiceJSON", QByteArray()).toByteArray();
 	int newCurrentIndex = -1;
 	int counter = 0;
@@ -691,12 +695,14 @@ void LogInDialog::initializeGssData(std::shared_ptr<QSettings> _settings) {
 				LogInGSSEntry newEntry(obj["Name"].toString(), obj["IP"].toString(), obj["Port"].toString());
 				m_gssData.push_back(newEntry);
 
-				if (newEntry.getName() == lastSessionService) {
+				if (newEntry.getName() == lastSessionServiceName) {
 					newCurrentIndex = counter;
 				}
 
 				counter++;
 			}
+
+			this->updateGssOptions();
 
 			if (newCurrentIndex >= 0) {
 				m_gss->setCurrentIndex(newCurrentIndex);
@@ -716,7 +722,11 @@ void LogInDialog::updateGssOptions(void) {
 	for (const LogInGSSEntry& entry : m_gssData) {
 		options.append(entry.getDisplayText());
 	}
-	if (options.isEmpty()) options.append(QString());
+	
+	if (options.isEmpty()) {
+		options.append(QString());
+	}
+	
 	options.append(EDIT_GSS_TEXT);
 
 	m_gss->clear();

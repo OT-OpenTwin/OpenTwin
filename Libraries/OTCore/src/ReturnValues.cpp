@@ -25,11 +25,6 @@ ot::ReturnValues::ReturnValues(const ReturnValues& other)
 	*this = other;
 }
 
-ot::ReturnValues::ReturnValues(ReturnValues&& other) noexcept
-{
-	_valuesByName = std::move(other._valuesByName);
-}
-
 ot::ReturnValues& ot::ReturnValues::operator=(const ReturnValues& other)
 {
 	for (const auto& valueByName : other._valuesByName)
@@ -69,11 +64,6 @@ ot::ReturnValues& ot::ReturnValues::operator=(const ReturnValues& other)
 	return *this;
 }
 
-ot::ReturnValues& ot::ReturnValues::operator=(ReturnValues&& other) noexcept
-{
-	_valuesByName = std::move(other._valuesByName);
-	return *this;
-}
 
 bool ot::ReturnValues::operator==(const ReturnValues& other) const
 {

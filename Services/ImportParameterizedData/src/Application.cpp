@@ -58,7 +58,11 @@ Application::Application()
 
 Application::~Application()
 {
-
+	if (m_twoPartsAction == nullptr)
+	{
+		delete m_twoPartsAction;
+		m_twoPartsAction = nullptr;
+	}
 }
 
 
@@ -207,8 +211,7 @@ void Application::modelSelectionChanged(void)
 
 void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocument _doc)
 {
-	std::mutex onlyOneActionPerTime;
-	std::lock_guard<std::mutex> lock (onlyOneActionPerTime);
+	std::lock_guard<std::mutex> lock(m_onlyOneActionPerTime);
 	try
 	{
 		std::string returnMessage = "";
@@ -217,6 +220,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			std::string action = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_ActionName);
 			if (action == _buttonImportTouchstone.GetFullDescription())
 			{
+				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				ot::JsonDocument doc;
 				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
 				doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString("Import Touchstone File", doc.GetAllocator()), doc.GetAllocator());
@@ -230,36 +234,40 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action == _buttonCreateRMDEntry.GetFullDescription())
 			{
+				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
 				m_modelComponent->getSelectedEntityInformation(selectedEntities);
 				 _parametrizedDataHandler->markSelectionForStorage(selectedEntities,EntityParameterizedDataCategorization::researchMetadata);
 			}
 			else if (action == _buttonCreateMSMDEntry.GetFullDescription())
 			{
+				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
 				m_modelComponent->getSelectedEntityInformation(selectedEntities);
 				_parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::measurementSeriesMetadata);
 			}
 			else if (action == _buttonCreateParameterEntry.GetFullDescription())
-			{
+			{			
+				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
 				m_modelComponent->getSelectedEntityInformation(selectedEntities);
 				_parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::parameter);
 			}
 			else if (action == _buttonCreateQuantityEntry.GetFullDescription())
 			{
+				m_twoPartsAction = new UILockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::list<ot::EntityInformation> selectedEntities;
 				m_modelComponent->getSelectedEntityInformation(selectedEntities);
 				_parametrizedDataHandler->markSelectionForStorage(selectedEntities, EntityParameterizedDataCategorization::quantity);
 			}
 			else if (action == _buttonAutomaticCreationMSMD.GetFullDescription())
 			{
-				UILockWrapper uiLock(Application::instance()->uiComponent(),ot::LockModelWrite);
+				UILockWrapper uiLock(Application::instance()->uiComponent(), ot::LockModelWrite);
 				m_batchedCategorisationHandler.createNewScriptDescribedMSMD();
 			}
 			else if (action == _buttonCreateDataCollection.GetFullDescription())
 			{
-				UILockWrapper uiLock(Application::instance()->uiComponent(),ot::LockModelWrite);
+				UILockWrapper uiLock(Application::instance()->uiComponent(), ot::LockModelWrite);
 				m_uiComponent->displayMessage("===========================================================================\n");
 				m_uiComponent->displayMessage("Start creation of dataset\n");
 				_tabledataToResultdataHandler->createDataCollection(dataBaseURL(), m_collectionName);
@@ -276,7 +284,6 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			std::string subsequentFunction = ot::json::getString(_doc, OT_ACTION_PARAM_MODEL_FunctionName);
 			if (subsequentFunction == "importTouchstoneData")
 			{
-				UILockWrapper uiLock(Application::instance()->uiComponent(), ot::LockModelWrite);
 				std::string originalName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 
 				std::string fileContent = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Content);
@@ -305,14 +312,9 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			else if (subsequentFunction == "SetNumberOfPorts")
 			{
 				auto value = ot::json::getInt( _doc,OT_ACTION_PARAM_Value);
-				//ot::OnePropertyDialogCfg onePropertyDialogCfg;
-				//onePropertyDialogCfg.setFromJsonObject(jOnePropertyDialog);
-				//
-				//ot::Property* dialogProperty = onePropertyDialogCfg.getProperty();
-				//ot::PropertyInt* dialogPropertyInt = dynamic_cast<ot::PropertyInt*>(dialogProperty);
-				//dialogPropertyInt->setFromJsonObject
-				//_touchstoneToResultdata->CreateResultdata(dialogPropertyInt->value());
 				_touchstoneToResultdata->createResultdata(value);
+				delete m_twoPartsAction;
+				m_twoPartsAction = nullptr;
 			}
 			else if (subsequentFunction == "CreateSelectedRangeEntity")
 			{
@@ -326,6 +328,8 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 					ranges.push_back(tableRange);
 				}
 				_parametrizedDataHandler->storeSelectionRanges(ranges);
+				delete m_twoPartsAction;
+				m_twoPartsAction = nullptr;
 			}
 			else
 			{
@@ -339,6 +343,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 		else {
 			OT_LOG_W(OT_ACTION_RETURN_UnknownAction);
 		}
+
 		if (returnMessage != "")
 		{
 			m_uiComponent->displayMessage(returnMessage);
@@ -348,6 +353,11 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 	{
 		std::string errorMessage = "Failed to execute action " + _action + " due to runtime error: " + e.what();
 		m_uiComponent->displayMessage(errorMessage);
+		if (m_twoPartsAction != nullptr)
+		{
+			delete m_twoPartsAction;
+			m_twoPartsAction = nullptr;
+		}
 	}
 }
 

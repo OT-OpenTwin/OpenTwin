@@ -57,30 +57,34 @@ ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::Tab
 	MatrixEntryPointer matrixPointer;
 	ot::VariableToStringConverter converter;
 
-	int rowStarter = (_headerMode == TableHeaderMode::Horizontal ? 1 : 0);
-	int columnStarter = (_headerMode == TableHeaderMode::Vertical ? 1 : 0);
+	uint32_t rowStarter = (_headerMode == TableHeaderMode::Horizontal ? 1 : 0);
+	uint32_t columnStarter = (_headerMode == TableHeaderMode::Vertical ? 1 : 0);
 	
 	this->initialize(_matrix.getNumberOfRows() - rowStarter, _matrix.getNumberOfColumns() - columnStarter);
 
-	if (rowStarter < m_rows && rowStarter > 0) {
+	//First we set the column header, if the header mode is set accordingly
+	if (rowStarter <= _matrix.getNumberOfRows() && rowStarter > 0) {
 		matrixPointer.m_row = 0;
-		for (matrixPointer.m_column = 0; (int)matrixPointer.m_column < m_columns; matrixPointer.m_column++) {
+		for (matrixPointer.m_column = 0; matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++) {
 			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);
 			this->setColumnHeader(matrixPointer.m_column, entry);
 		}
 	}
-	if (columnStarter < m_columns && columnStarter > 0) {
+	
+	//Next comes the column header
+	if (columnStarter <= _matrix.getNumberOfColumns() && columnStarter > 0) {
 		matrixPointer.m_column = 0;
-		for (matrixPointer.m_row = 0; (int)matrixPointer.m_row < m_rows; matrixPointer.m_row++) {
+		for (matrixPointer.m_row = 0; matrixPointer.m_row < _matrix.getNumberOfRows(); matrixPointer.m_row++) {
 			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);
 			this->setRowHeader(matrixPointer.m_row, entry);
 		}
 	}
 
-	for(matrixPointer.m_column = columnStarter; (int)matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++) {
-		for (matrixPointer.m_row = rowStarter; (int)matrixPointer.m_row < _matrix.getNumberOfRows(); matrixPointer.m_row++) {
+	//Now we add the table content
+	for(matrixPointer.m_column = columnStarter; matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++) {
+		for (matrixPointer.m_row = rowStarter; matrixPointer.m_row < _matrix.getNumberOfRows(); matrixPointer.m_row++) {
 			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);	
 			this->setCellText(matrixPointer.m_row - rowStarter, matrixPointer.m_column - columnStarter, entry);
