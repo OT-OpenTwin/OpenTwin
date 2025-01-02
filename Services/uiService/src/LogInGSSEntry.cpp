@@ -17,12 +17,11 @@ LogInGSSEntry::LogInGSSEntry(const LogInGSSEntry& _other) {
 }
 
 LogInGSSEntry& LogInGSSEntry::operator = (const LogInGSSEntry& _other) {
-	if (this == &_other) return *this;
-
-	m_name = _other.m_name;
-	m_url = _other.m_url;
-	m_port = _other.m_port;
-
+	if (this != &_other) {
+		m_name = _other.m_name;
+		m_url = _other.m_url;
+		m_port = _other.m_port;
+	}
 	return *this;
 }
 
