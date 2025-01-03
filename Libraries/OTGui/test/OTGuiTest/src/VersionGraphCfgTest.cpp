@@ -131,7 +131,7 @@ namespace ot {
 
 				ot::intern::test::testBranchesOrder(_graph.getBranches(), std::list<std::string>({ "3.1" }));
 				ot::intern::test::testBranchesEqual(_graph.getBranches(), std::list<std::list<std::string>>({
-					std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" })
+					std::list<std::string>({"3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" })
 					}));
 
 				// 1 - 10
@@ -147,7 +147,7 @@ namespace ot {
 				ot::intern::test::testBranchesOrder(_graph.getBranches(), std::list<std::string>({ "", "3.1" }));
 				ot::intern::test::testBranchesEqual(_graph.getBranches(), std::list<std::list<std::string>>({
 					std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-					std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" })
+					std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" })
 					}));
 
 				// 7.1.1 - 7.1.3
@@ -163,8 +163,8 @@ namespace ot {
 				ot::intern::test::testBranchesOrder(_graph.getBranches(), std::list<std::string>({ "", "7.1", "3.1" }));
 				ot::intern::test::testBranchesEqual(_graph.getBranches(), std::list<std::list<std::string>>({
 					std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-					std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-					std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" })
+					std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+					std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" })
 					}));
 
 				// 1.2.1 - 1.2.9
@@ -180,9 +180,9 @@ namespace ot {
 				ot::intern::test::testBranchesOrder(_graph.getBranches(), std::list<std::string>({ "", "7.1", "3.1", "1.2" }));
 				ot::intern::test::testBranchesEqual(_graph.getBranches(), std::list<std::list<std::string>>({
 					std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-					std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-					std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
-					std::list<std::string>({ "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+					std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+					std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+					std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
 					}));
 
 				// 3.1.3.1.1 - 3.1.3.1.6
@@ -198,10 +198,10 @@ namespace ot {
 				ot::intern::test::testBranchesOrder(_graph.getBranches(), std::list<std::string>({ "", "7.1", "3.1", "3.1.3.1", "1.2" }));
 				ot::intern::test::testBranchesEqual(_graph.getBranches(), std::list<std::list<std::string>>({
 					std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-					std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-					std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
-					std::list<std::string>({ "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
-					std::list<std::string>({ "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+					std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+					std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+					std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+					std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
 					}));
 
 				// 1.1.1 - 1.1.2
@@ -217,11 +217,11 @@ namespace ot {
 				ot::intern::test::testBranchesOrder(_graph.getBranches(), std::list<std::string>({ "", "7.1", "3.1", "3.1.3.1", "1.1", "1.2" }));
 				ot::intern::test::testBranchesEqual(_graph.getBranches(), std::list<std::list<std::string>>({
 					std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-					std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-					std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
-					std::list<std::string>({ "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
-					std::list<std::string>({ "1.1.1", "1.1.2" }),
-					std::list<std::string>({ "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+					std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+					std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+					std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+					std::list<std::string>({  "1.1.1", "1.1.2" }),
+					std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
 					}));
 			}
 		}
@@ -279,12 +279,12 @@ TEST(VersionGraphCfgTest, Setup) {
 	ot::intern::test::fillTestVersionGraph(graph);
 	ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "7.1", "3.1", "3.1.3.1", "1.1", "1.2" }));
 	ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
-		std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-		std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-		std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
-		std::list<std::string>({ "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
-		std::list<std::string>({ "1.1.1", "1.1.2" }),
-		std::list<std::string>({ "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
 		}));
 
 	// Test adding additional versions
@@ -294,12 +294,12 @@ TEST(VersionGraphCfgTest, Setup) {
 		ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "7.1", "3.1", "3.1.3.1", "3.2", "1.1", "1.2" }));
 		ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
 			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-			std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-			std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
-			std::list<std::string>({ "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
-			std::list<std::string>({ "3.2.1" }),
-			std::list<std::string>({ "1.1.1", "1.1.2" }),
-			std::list<std::string>({ "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({            "3.2.1" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
 			}));
 	}
 	{
@@ -308,12 +308,12 @@ TEST(VersionGraphCfgTest, Setup) {
 		ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "7.1", "3.1", "3.1.3.1", "3.2", "1.1", "1.2" }));
 		ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
 			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-			std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-			std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
-			std::list<std::string>({ "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
-			std::list<std::string>({ "3.2.1", "3.2.2" }),
-			std::list<std::string>({ "1.1.1", "1.1.2" }),
-			std::list<std::string>({ "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({            "3.2.1", "3.2.2" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
 			}));
 	}
 	{
@@ -322,13 +322,13 @@ TEST(VersionGraphCfgTest, Setup) {
 		ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "7.1", "7.2", "3.1", "3.1.3.1", "3.2", "1.1", "1.2" }));
 		ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
 			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-			std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-			std::list<std::string>({ "7.2.2" }),
-			std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
-			std::list<std::string>({ "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
-			std::list<std::string>({ "3.2.1", "3.2.2" }),
-			std::list<std::string>({ "1.1.1", "1.1.2" }),
-			std::list<std::string>({ "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({                                "7.2.2" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({            "3.2.1", "3.2.2" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
 			}));
 	}
 	{
@@ -337,14 +337,14 @@ TEST(VersionGraphCfgTest, Setup) {
 		ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "7.1", "7.2", "3.1", "3.1.3.1", "3.1.3.1.1.2", "3.2", "1.1", "1.2"}));
 		ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
 			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-			std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-			std::list<std::string>({ "7.2.2" }),
-			std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
-			std::list<std::string>({ "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
-			std::list<std::string>({ "3.1.3.1.1.2.2" }),
-			std::list<std::string>({ "3.2.1", "3.2.2" }),
-			std::list<std::string>({ "1.1.1", "1.1.2" }),
-			std::list<std::string>({ "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({                                "7.2.2" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({                                 "3.1.3.1.1.2.2" }),
+			std::list<std::string>({            "3.2.1", "3.2.2" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
 			}));
 	}
 	{
@@ -353,15 +353,15 @@ TEST(VersionGraphCfgTest, Setup) {
 		ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "7.1", "7.2", "3.1", "3.1.3.1", "3.1.3.1.1.1", "3.1.3.1.1.2", "3.2", "1.1", "1.2" }));
 		ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
 			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-			std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-			std::list<std::string>({ "7.2.2" }),
-			std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
-			std::list<std::string>({ "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
-			std::list<std::string>({ "3.1.3.1.1.1.1" }),
-			std::list<std::string>({ "3.1.3.1.1.2.2" }),
-			std::list<std::string>({ "3.2.1", "3.2.2" }),
-			std::list<std::string>({ "1.1.1", "1.1.2" }),
-			std::list<std::string>({ "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({                                "7.2.2" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({                                 "3.1.3.1.1.1.1" }),
+			std::list<std::string>({                                 "3.1.3.1.1.2.2" }),
+			std::list<std::string>({            "3.2.1", "3.2.2" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
 			}));
 	}
 	{
@@ -370,15 +370,15 @@ TEST(VersionGraphCfgTest, Setup) {
 		ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "7.1", "7.2", "3.1", "3.1.3.1", "3.1.3.1.1.1", "3.1.3.1.1.2", "3.2", "1.1", "1.2" }));
 		ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
 			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-			std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-			std::list<std::string>({ "7.2.2" }),
-			std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
-			std::list<std::string>({ "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
-			std::list<std::string>({ "3.1.3.1.1.1.1" }),
-			std::list<std::string>({ "3.1.3.1.1.2.1", "3.1.3.1.1.2.2" }),
-			std::list<std::string>({ "3.2.1", "3.2.2" }),
-			std::list<std::string>({ "1.1.1", "1.1.2" }),
-			std::list<std::string>({ "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({                                "7.2.2" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({                                 "3.1.3.1.1.1.1" }),
+			std::list<std::string>({                                 "3.1.3.1.1.2.1", "3.1.3.1.1.2.2" }),
+			std::list<std::string>({            "3.2.1", "3.2.2" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
 			}));
 	}
 	{
@@ -387,16 +387,16 @@ TEST(VersionGraphCfgTest, Setup) {
 		ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "8.2", "7.1", "7.2", "3.1", "3.1.3.1", "3.1.3.1.1.1", "3.1.3.1.1.2", "3.2", "1.1", "1.2" }));
 		ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
 			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-			std::list<std::string>({ "8.2.1" }),
-			std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-			std::list<std::string>({ "7.2.2" }),
-			std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
-			std::list<std::string>({ "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
-			std::list<std::string>({ "3.1.3.1.1.1.1" }),
-			std::list<std::string>({ "3.1.3.1.1.2.1", "3.1.3.1.1.2.2" }),
-			std::list<std::string>({ "3.2.1", "3.2.2" }),
-			std::list<std::string>({ "1.1.1", "1.1.2" }),
-			std::list<std::string>({ "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+			std::list<std::string>({                                     "8.2.1" }),
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({                                "7.2.2" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({                                 "3.1.3.1.1.1.1" }),
+			std::list<std::string>({                                 "3.1.3.1.1.2.1", "3.1.3.1.1.2.2" }),
+			std::list<std::string>({            "3.2.1", "3.2.2" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
 			}));
 	}
 	{
@@ -405,17 +405,17 @@ TEST(VersionGraphCfgTest, Setup) {
 		ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "8.1", "8.2", "7.1", "7.2", "3.1", "3.1.3.1", "3.1.3.1.1.1", "3.1.3.1.1.2", "3.2", "1.1", "1.2" }));
 		ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
 			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-			std::list<std::string>({ "8.1.1" }),
-			std::list<std::string>({ "8.2.1" }),
-			std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-			std::list<std::string>({ "7.2.2" }),
-			std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
-			std::list<std::string>({ "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
-			std::list<std::string>({ "3.1.3.1.1.1.1" }),
-			std::list<std::string>({ "3.1.3.1.1.2.1", "3.1.3.1.1.2.2" }),
-			std::list<std::string>({ "3.2.1", "3.2.2" }),
-			std::list<std::string>({ "1.1.1", "1.1.2" }),
-			std::list<std::string>({ "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+			std::list<std::string>({                                     "8.1.1" }),
+			std::list<std::string>({                                     "8.2.1" }),
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({                                "7.2.2" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({                                 "3.1.3.1.1.1.1" }),
+			std::list<std::string>({                                 "3.1.3.1.1.2.1", "3.1.3.1.1.2.2" }),
+			std::list<std::string>({            "3.2.1", "3.2.2" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
 			}));
 	}
 	{
@@ -424,18 +424,104 @@ TEST(VersionGraphCfgTest, Setup) {
 		ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "8.1", "8.2", "8.3", "7.1", "7.2", "3.1", "3.1.3.1", "3.1.3.1.1.1", "3.1.3.1.1.2", "3.2", "1.1", "1.2" }));
 		ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
 			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
-			std::list<std::string>({ "8.1.1" }),
-			std::list<std::string>({ "8.2.1" }),
-			std::list<std::string>({ "8.3.1" }),
-			std::list<std::string>({ "7.1.1", "7.1.2", "7.1.3" }),
-			std::list<std::string>({ "7.2.2" }),
-			std::list<std::string>({ "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
-			std::list<std::string>({ "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
-			std::list<std::string>({ "3.1.3.1.1.1.1" }),
-			std::list<std::string>({ "3.1.3.1.1.2.1", "3.1.3.1.1.2.2" }),
-			std::list<std::string>({ "3.2.1", "3.2.2" }),
-			std::list<std::string>({ "1.1.1", "1.1.2" }),
-			std::list<std::string>({ "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+			std::list<std::string>({                                     "8.1.1" }),
+			std::list<std::string>({                                     "8.2.1" }),
+			std::list<std::string>({                                     "8.3.1" }),
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({                                "7.2.2" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({                                 "3.1.3.1.1.1.1" }),
+			std::list<std::string>({                                 "3.1.3.1.1.2.1", "3.1.3.1.1.2.2" }),
+			std::list<std::string>({            "3.2.1", "3.2.2" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+			}));
+	}
+	{
+		ot::VersionGraphVersionCfg newVersion("8.3.1");
+		graph.insertVersion(std::move(newVersion));
+		ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "8.1", "8.2", "8.3", "7.1", "7.2", "3.1", "3.1.3.1", "3.1.3.1.1.1", "3.1.3.1.1.2", "3.2", "1.1", "1.2" }));
+		ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
+			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
+			std::list<std::string>({                                     "8.1.1" }),
+			std::list<std::string>({                                     "8.2.1" }),
+			std::list<std::string>({                                     "8.3.1" }),
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({                                "7.2.2" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({                                 "3.1.3.1.1.1.1" }),
+			std::list<std::string>({                                 "3.1.3.1.1.2.1", "3.1.3.1.1.2.2" }),
+			std::list<std::string>({            "3.2.1", "3.2.2" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" })
+			}));
+	}
+	{
+		ot::VersionGraphVersionCfg newVersion("1.2.1.1.1");
+		graph.insertVersion(std::move(newVersion));
+		ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "8.1", "8.2", "8.3", "7.1", "7.2", "3.1", "3.1.3.1", "3.1.3.1.1.1", "3.1.3.1.1.2", "3.2", "1.1", "1.2", "1.2.1.1" }));
+		ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
+			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
+			std::list<std::string>({                                     "8.1.1" }),
+			std::list<std::string>({                                     "8.2.1" }),
+			std::list<std::string>({                                     "8.3.1" }),
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({                                "7.2.2" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({                                 "3.1.3.1.1.1.1" }),
+			std::list<std::string>({                                 "3.1.3.1.1.2.1", "3.1.3.1.1.2.2" }),
+			std::list<std::string>({            "3.2.1", "3.2.2" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" }),
+			std::list<std::string>({    "1.2.1.1.1" })
+			}));
+	}
+	{
+		ot::VersionGraphVersionCfg newVersion("1.2.8.1.1");
+		graph.insertVersion(std::move(newVersion));
+		ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "8.1", "8.2", "8.3", "7.1", "7.2", "3.1", "3.1.3.1", "3.1.3.1.1.1", "3.1.3.1.1.2", "3.2", "1.1", "1.2", "1.2.8.1", "1.2.1.1" }));
+		ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
+			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
+			std::list<std::string>({                                     "8.1.1" }),
+			std::list<std::string>({                                     "8.2.1" }),
+			std::list<std::string>({                                     "8.3.1" }),
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({                                "7.2.2" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({                                 "3.1.3.1.1.1.1" }),
+			std::list<std::string>({                                 "3.1.3.1.1.2.1", "3.1.3.1.1.2.2" }),
+			std::list<std::string>({            "3.2.1", "3.2.2" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" }),
+			std::list<std::string>({                                                                   "1.2.8.1.1" }),
+			std::list<std::string>({    "1.2.1.1.1" })
+			}));
+	}
+	{
+		ot::VersionGraphVersionCfg newVersion("1.2.3.1.1");
+		graph.insertVersion(std::move(newVersion));
+		ot::intern::test::testBranchesOrder(graph.getBranches(), std::list<std::string>({ "", "8.1", "8.2", "8.3", "7.1", "7.2", "3.1", "3.1.3.1", "3.1.3.1.1.1", "3.1.3.1.1.2", "3.2", "1.1", "1.2", "1.2.8.1", "1.2.3.1", "1.2.1.1" }));
+		ot::intern::test::testBranchesEqual(graph.getBranches(), std::list<std::list<std::string>>({
+			std::list<std::string>({ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }),
+			std::list<std::string>({                                     "8.1.1" }),
+			std::list<std::string>({                                     "8.2.1" }),
+			std::list<std::string>({                                     "8.3.1" }),
+			std::list<std::string>({                                "7.1.1", "7.1.2", "7.1.3" }),
+			std::list<std::string>({                                "7.2.2" }),
+			std::list<std::string>({            "3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5" }),
+			std::list<std::string>({                               "3.1.3.1.1", "3.1.3.1.2", "3.1.3.1.3", "3.1.3.1.4", "3.1.3.1.5", "3.1.3.1.6" }),
+			std::list<std::string>({                                 "3.1.3.1.1.1.1" }),
+			std::list<std::string>({                                 "3.1.3.1.1.2.1", "3.1.3.1.1.2.2" }),
+			std::list<std::string>({            "3.2.1", "3.2.2" }),
+			std::list<std::string>({  "1.1.1", "1.1.2" }),
+			std::list<std::string>({  "1.2.1", "1.2.2", "1.2.3", "1.2.4", "1.2.5", "1.2.6", "1.2.7", "1.2.8", "1.2.9" }),
+			std::list<std::string>({                                                                   "1.2.8.1.1" }),
+			std::list<std::string>({                      "1.2.3.1.1" }),
+			std::list<std::string>({    "1.2.1.1.1" })
 			}));
 	}
 }
