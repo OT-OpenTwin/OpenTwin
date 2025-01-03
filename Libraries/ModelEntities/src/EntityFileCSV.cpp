@@ -3,18 +3,23 @@
 #include "CSVToTableTransformer.h"
 #include "OTCore/String.h"
 #include "OTCore/Logger.h"
-#include "OTCore/PerformanceTests.h"
+#include "OTCore/RuntimeTests.h"
 #include "OTCommunication/ActionTypes.h"
 #include "CSVProperties.h"
 #include <string>
 
-#define OT_INTERN_ENTITYFILECSV_PERFORMANCETEST_ENABLED false
-
-#if OT_INTERN_ENTITYFILECSV_PERFORMANCETEST_ENABLED==true
-#include "OTCore/PerformanceTests.h"
-#define OT_INTERN_ENTITYFILECSV_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_entityfiletext_lcl_performancetest, "EntityFileCSV " ___testText)
+#if OT_TESTING_GLOBAL_AllTestsEnabled==true
+#define OT_TESTING_LOCAL_ENTITYFILECSV_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
+#elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true
+#define OT_TESTING_LOCAL_ENTITYFILECSV_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_RuntimeTestingEnabled
 #else
-#define OT_INTERN_ENTITYFILECSV_PERFORMANCE_TEST(___testText)
+#define OT_TESTING_LOCAL_ENTITYFILECSV_PERFORMANCETEST_ENABLED false
+#endif 
+
+#if OT_TESTING_LOCAL_ENTITYFILECSV_PERFORMANCETEST_ENABLED==true
+#define OT_TEST_ENTITYFILECSV_Interval(___testText) OT_TEST_Interval(ot_intern_entityfilecsv_lcl_performancetest, "EntityFileCSV", ___testText)
+#else
+#define OT_TEST_ENTITYFILECSV_Interval(___testText)
 #endif
 
 EntityFileCSV::EntityFileCSV(ot::UID ID, EntityBase * parent, EntityObserver * obs, ModelState * ms, ClassFactoryHandler* factory, const std::string & owner)
@@ -145,7 +150,7 @@ void EntityFileCSV::readSpecificDataFromDataBase(bsoncxx::document::view & doc_v
 
 const ot::GenericDataStructMatrix EntityFileCSV::getTable()
 {
-	OT_INTERN_ENTITYFILECSV_PERFORMANCE_TEST("Get table");
+	OT_TEST_ENTITYFILECSV_Interval("Get table");
 
 	CSVProperties properties;
 
@@ -163,7 +168,7 @@ const ot::GenericDataStructMatrix EntityFileCSV::getTable()
 
 void EntityFileCSV::setTable(const ot::GenericDataStructMatrix& _table)
 {
-	OT_INTERN_ENTITYFILECSV_PERFORMANCE_TEST("Set table");
+	OT_TEST_ENTITYFILECSV_Interval("Set table");
 
 	CSVProperties properties;
 
@@ -180,7 +185,7 @@ void EntityFileCSV::setTable(const ot::GenericDataStructMatrix& _table)
 
 ot::TableCfg EntityFileCSV::getTableConfig()
 {
-	OT_INTERN_ENTITYFILECSV_PERFORMANCE_TEST("Get table config");
+	OT_TEST_ENTITYFILECSV_Interval("Get table config");
 	ot::GenericDataStructMatrix matrix = getTable();
 	ot::TableCfg::TableHeaderMode headerMode = getHeaderMode();
 	ot::TableCfg tableCfg(matrix, headerMode);

@@ -4,15 +4,21 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/RuntimeTests.h"
 #include "OTGui/TextEditorCfg.h"
 
-#define OT_INTERN_TEXTEDITORCFG_PERFORMANCETEST_ENABLED false
-
-#if OT_INTERN_TEXTEDITORCFG_PERFORMANCETEST_ENABLED==true
-#include "OTCore/PerformanceTests.h"
-#define OT_INTERN_TEXTEDITORCFG_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_texteditor_lcl_performancetest, "TextEditorCfg " ___testText)
+#if OT_TESTING_GLOBAL_AllTestsEnabled==true
+#define OT_TESTING_LOCAL_TEXTEDITORCFG_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
+#elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true
+#define OT_TESTING_LOCAL_TEXTEDITORCFG_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_RuntimeTestingEnabled
 #else
-#define OT_INTERN_TEXTEDITORCFG_PERFORMANCE_TEST(___testText)
+#define OT_TESTING_LOCAL_TEXTEDITORCFG_PERFORMANCETEST_ENABLED false
+#endif 
+
+#if OT_TESTING_LOCAL_TEXTEDITORCFG_PERFORMANCETEST_ENABLED==true
+#define OT_TEST_TEXTEDITORCFG_Interval(___testText) OT_TEST_Interval(ot_intern_texteditorcfg_lcl_performancetest, "TextEditorCfg", ___testText)
+#else
+#define OT_TEST_TEXTEDITORCFG_Interval(___testText)
 #endif
 
 ot::TextEditorCfg::TextEditorCfg() 
@@ -38,7 +44,7 @@ ot::TextEditorCfg& ot::TextEditorCfg::operator = (const TextEditorCfg& _other) {
 }
 
 void ot::TextEditorCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	OT_INTERN_TEXTEDITORCFG_PERFORMANCE_TEST("Export");
+	OT_TEST_TEXTEDITORCFG_Interval("Export");
 
 	WidgetViewBase::addToJsonObject(_object, _allocator);
 
@@ -47,7 +53,7 @@ void ot::TextEditorCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 }
 
 void ot::TextEditorCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	OT_INTERN_TEXTEDITORCFG_PERFORMANCE_TEST("Import");
+	OT_TEST_TEXTEDITORCFG_Interval("Import");
 
 	WidgetViewBase::setFromJsonObject(_object);
 	

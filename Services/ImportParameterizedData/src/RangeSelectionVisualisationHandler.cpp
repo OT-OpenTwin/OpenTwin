@@ -5,24 +5,29 @@
 #include "RangeSelectionVisualisationHandler.h"
 
 // OpenTwin header
+#include "OTCore/RuntimeTests.h"
 #include "OTServiceFoundation/TableIndexSchemata.h"
 
 // std header
 #include <map>
 
-#define OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED false
-
-#if OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED==true
-#include "OTCore/PerformanceTests.h"
-#define OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_rangeselectionvisualizationhandler_lcl_performancetest, "RangeSelectionVisualization " ___testText)
+#if OT_TESTING_GLOBAL_AllTestsEnabled==true
+#define OT_TESTING_LOCAL_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
+#elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true
+#define OT_TESTING_LOCAL_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_RuntimeTestingEnabled
 #else
-#define OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCE_TEST(___testText)
-#endif
+#define OT_TESTING_LOCAL_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED false
+#endif 
 
+#if OT_TESTING_LOCAL_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED==true
+#define OT_TEST_RANGESELECTIONVISUALIZATIONHANDLER_Interval(___testText) OT_TEST_Interval(ot_intern_rangeselectionvisualizationhandler_lcl_performancetest, "RangeSelectionVisualization", ___testText)
+#else
+#define OT_TEST_RANGESELECTIONVISUALIZATIONHANDLER_Interval(___testText)
+#endif
 
 void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selectedEntityIDs)
 {
-	OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCE_TEST("Select range: Total");
+	OT_TEST_RANGESELECTIONVISUALIZATIONHANDLER_Interval("Select range: Total");
 
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionEntities = extractSelectionRanges(_selectedEntityIDs);
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> selectionsThatNeedVisualisation = findSelectionsThatNeedVisualisation(selectionEntities);
@@ -34,7 +39,7 @@ void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selecte
 	if (!selectionsThatNeedVisualisation.empty())
 	{
 		{
-			OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCE_TEST("Select range: Gather ranges");
+			OT_TEST_RANGESELECTIONVISUALIZATIONHANDLER_Interval("Select range: Gather ranges");
 
 			for (auto selectionEntity : selectionsThatNeedVisualisation) {
 				//First we get the selected range
@@ -75,7 +80,7 @@ void RangeSelectionVisualisationHandler::selectRange(const ot::UIDList& _selecte
 		const bool clearSelection = true;
 
 		{
-			OT_INTERN_RANGESELECTIONVISUALIZATIONHANDLER_PERFORMANCE_TEST("Select range: Request coloring");
+			OT_TEST_RANGESELECTIONVISUALIZATIONHANDLER_Interval("Select range: Request coloring");
 
 			for (const auto& rangesByColourIDByTableName : rangesByColourIDByTableNames) {
 				const std::string tableName = rangesByColourIDByTableName.first;

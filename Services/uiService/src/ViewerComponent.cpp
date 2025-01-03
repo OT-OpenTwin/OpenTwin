@@ -17,6 +17,7 @@
 #include "OTCore/ReturnMessage.h"
 
 #include "OTCore/OTAssert.h"
+#include "OTCore/RuntimeTests.h"
 #include "OTWidgets/DoubleSpinBox.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyInputDouble.h"
@@ -32,13 +33,18 @@
 #include <akAPI/uiAPI.h>
 #include <akCore/aException.h>
 
-#define OT_INTERN_VIEWERSELETIONCHANGE_PERFORMANCETEST_ENABLED false
-
-#if OT_INTERN_VIEWERSELETIONCHANGE_PERFORMANCETEST_ENABLED==true
-#include "OTCore/PerformanceTests.h"
-#define OT_INTERN_VIEWERSELETIONCHANGE_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_table_lcl_performancetest, "Viewer " ___testText)
+#if OT_TESTING_GLOBAL_AllTestsEnabled==true
+#define OT_TESTING_LOCAL_VIEWECOMPONENT_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
+#elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true
+#define OT_TESTING_LOCAL_VIEWECOMPONENT_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_RuntimeTestingEnabled
 #else
-#define OT_INTERN_VIEWERSELETIONCHANGE_PERFORMANCE_TEST(___testText)
+#define OT_TESTING_LOCAL_VIEWECOMPONENT_PERFORMANCETEST_ENABLED false
+#endif 
+
+#if OT_TESTING_LOCAL_VIEWECOMPONENT_PERFORMANCETEST_ENABLED==true
+#define OT_TEST_VIEWECOMPONENT_Interval(___testText) OT_TEST_Interval(ot_intern_viewercomponent_lcl_performancetest, "ViewerComponent", ___testText)
+#else
+#define OT_TEST_VIEWECOMPONENT_Interval(___testText)
 #endif
 
 ViewerComponent::ViewerComponent()
@@ -514,7 +520,7 @@ void ViewerComponent::notify(
 }
 
 void ViewerComponent::handleSelectionChanged(bool _selectionFromTree) {
-	OT_INTERN_VIEWERSELETIONCHANGE_PERFORMANCE_TEST("Selection Changed");
+	OT_TEST_VIEWECOMPONENT_Interval("Selection Changed");
 
 	if (processingGroupCounter > 0)
 	{
