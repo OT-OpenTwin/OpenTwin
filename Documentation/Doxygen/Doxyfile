@@ -937,7 +937,7 @@ WARN_LINE_FORMAT       = "at line $line of file $file"
 # specified the warning and error messages are written to standard output
 # (stdout).
 
-WARN_LOGFILE           =
+WARN_LOGFILE           = $(OPENTWIN_DEV_ROOT)/Documentation/Doxygen/ErrorLog.txt
 
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
