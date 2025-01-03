@@ -5,15 +5,20 @@
 #include "IVisualisationText.h"
 #include "IVisualisationTable.h"
 
-#include "OTCore/PerformanceTests.h"
+#include "OTCore/RuntimeTests.h"
 
-#define OT_INTERN_VISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED false
-
-#if OT_INTERN_VISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED==true
-#include "OTCore/PerformanceTests.h"
-#define OT_INTERN_VISUALIZATIONHANDLER_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_entityfiletext_lcl_performancetest, "ViewVisualisationHandler " ___testText)
+#if OT_TESTING_GLOBAL_AllTestsEnabled==true
+#define OT_TESTING_LOCAL_VISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
+#elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true
+#define OT_TESTING_LOCAL_VISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_RuntimeTestingEnabled
 #else
-#define OT_INTERN_VISUALIZATIONHANDLER_PERFORMANCE_TEST(___testText)
+#define OT_TESTING_LOCAL_VISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED false
+#endif 
+
+#if OT_TESTING_LOCAL_VISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED==true
+#define OT_TEST_VISUALIZATIONHANDLER_Interval(___testText) OT_TEST_Interval(ot_intern_visualizationhandler_lcl_performancetest, "ViewVisualisationHandler", ___testText)
+#else
+#define OT_TEST_VISUALIZATIONHANDLER_Interval(___testText)
 #endif
 
 void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, const std::string& _visualisationType, bool _setAsActiveView, bool _overrideContent)
@@ -25,7 +30,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 	ot::BasicServiceInformation info(OT_INFO_SERVICE_TYPE_MODEL);
 	if (_visualisationType == OT_ACTION_CMD_UI_TABLE_Setup)
 	{
-		OT_INTERN_VISUALIZATIONHANDLER_PERFORMANCE_TEST("Visualize table");
+		OT_TEST_VISUALIZATIONHANDLER_Interval("Visualize table");
 
 		IVisualisationTable* tableEntity = dynamic_cast<IVisualisationTable*>(baseEntity);
 		assert(tableEntity != nullptr);
@@ -48,7 +53,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, con
 	}
 	else if (_visualisationType == OT_ACTION_CMD_UI_TEXTEDITOR_Setup)
 	{
-		OT_INTERN_VISUALIZATIONHANDLER_PERFORMANCE_TEST("Visualize text");
+		OT_TEST_VISUALIZATIONHANDLER_Interval("Visualize text");
 
 		IVisualisationText* textEntity = dynamic_cast<IVisualisationText*>(baseEntity);
 		assert(textEntity != nullptr);

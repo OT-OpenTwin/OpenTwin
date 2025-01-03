@@ -6,15 +6,21 @@
 // OpenTwin header
 #include "OTCore/Logger.h"
 #include "OTGui/TableCfg.h"
+#include "OTCore/RuntimeTests.h"
 #include "OTCore/VariableToStringConverter.h"
 
-#define OT_INTERN_TABLECFG_PERFORMANCETEST_ENABLED false
-
-#if OT_INTERN_TABLECFG_PERFORMANCETEST_ENABLED==true
-#include "OTCore/PerformanceTests.h"
-#define OT_INTERN_TABLECFG_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_tablecfg_lcl_performancetest, "TableCfg " ___testText)
+#if OT_TESTING_GLOBAL_AllTestsEnabled==true
+#define OT_TESTING_LOCAL_TABLECFG_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
+#elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true
+#define OT_TESTING_LOCAL_TABLECFG_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_RuntimeTestingEnabled
 #else
-#define OT_INTERN_TABLECFG_PERFORMANCE_TEST(___testText)
+#define OT_TESTING_LOCAL_TABLECFG_PERFORMANCETEST_ENABLED false
+#endif
+
+#if OT_TESTING_LOCAL_TABLECFG_PERFORMANCETEST_ENABLED==true
+#define OT_TEST_TABLECFG_Interval(___testText) OT_TEST_Interval(ot_intern_tablecfg_lcl_performancetest, "TableCfg", ___testText)
+#else
+#define OT_TEST_TABLECFG_Interval(___testText)
 #endif
 
 namespace ot::TableHeaderModeNames{
@@ -53,34 +59,38 @@ ot::TableCfg::TableCfg(int _rows, int _columns, WidgetViewBase _baseInfo)
 ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::TableHeaderMode _headerMode)
 	: WidgetViewBase(WidgetViewBase::ViewTable, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable), m_rows(_matrix.getNumberOfRows()), m_columns(_matrix.getNumberOfColumns())
 {
-	OT_INTERN_TABLECFG_PERFORMANCE_TEST("GenericDataStructMatrix constructor");
+	OT_TEST_TABLECFG_Interval("GenericDataStructMatrix constructor");
 	MatrixEntryPointer matrixPointer;
 	ot::VariableToStringConverter converter;
 
-	int rowStarter = (_headerMode == TableHeaderMode::Horizontal ? 1 : 0);
-	int columnStarter = (_headerMode == TableHeaderMode::Vertical ? 1 : 0);
+	uint32_t rowStarter = (_headerMode == TableHeaderMode::Horizontal ? 1 : 0);
+	uint32_t columnStarter = (_headerMode == TableHeaderMode::Vertical ? 1 : 0);
 	
 	this->initialize(_matrix.getNumberOfRows() - rowStarter, _matrix.getNumberOfColumns() - columnStarter);
 
-	if (rowStarter < m_rows && rowStarter > 0) {
+	//First we set the column header, if the header mode is set accordingly
+	if (rowStarter <= _matrix.getNumberOfRows() && rowStarter > 0) {
 		matrixPointer.m_row = 0;
-		for (matrixPointer.m_column = 0; (int)matrixPointer.m_column < m_columns; matrixPointer.m_column++) {
+		for (matrixPointer.m_column = 0; matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++) {
 			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);
 			this->setColumnHeader(matrixPointer.m_column, entry);
 		}
 	}
-	if (columnStarter < m_columns && columnStarter > 0) {
+	
+	//Next comes the column header
+	if (columnStarter <= _matrix.getNumberOfColumns() && columnStarter > 0) {
 		matrixPointer.m_column = 0;
-		for (matrixPointer.m_row = 0; (int)matrixPointer.m_row < m_rows; matrixPointer.m_row++) {
+		for (matrixPointer.m_row = 0; matrixPointer.m_row < _matrix.getNumberOfRows(); matrixPointer.m_row++) {
 			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);
 			this->setRowHeader(matrixPointer.m_row, entry);
 		}
 	}
 
-	for(matrixPointer.m_column = columnStarter; (int)matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++) {
-		for (matrixPointer.m_row = rowStarter; (int)matrixPointer.m_row < _matrix.getNumberOfRows(); matrixPointer.m_row++) {
+	//Now we add the table content
+	for(matrixPointer.m_column = columnStarter; matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++) {
+		for (matrixPointer.m_row = rowStarter; matrixPointer.m_row < _matrix.getNumberOfRows(); matrixPointer.m_row++) {
 			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);	
 			this->setCellText(matrixPointer.m_row - rowStarter, matrixPointer.m_column - columnStarter, entry);
@@ -112,7 +122,7 @@ ot::TableCfg::~TableCfg() {
 ot::TableCfg& ot::TableCfg::operator = (const TableCfg& _other) {
 	if (this == &_other) return *this;
 
-	OT_INTERN_TABLECFG_PERFORMANCE_TEST("Assignment copy");
+	OT_TEST_TABLECFG_Interval("Assignment copy");
 
 	WidgetViewBase::operator=(_other);
 
@@ -162,7 +172,7 @@ ot::TableCfg& ot::TableCfg::operator=(TableCfg&& _other) noexcept {
 }
 
 void ot::TableCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	OT_INTERN_TABLECFG_PERFORMANCE_TEST("Export");
+	OT_TEST_TABLECFG_Interval("Export");
 
 	WidgetViewBase::addToJsonObject(_object, _allocator);
 
@@ -206,7 +216,7 @@ void ot::TableCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _a
 }
 
 void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
-	OT_INTERN_TABLECFG_PERFORMANCE_TEST("Import");
+	OT_TEST_TABLECFG_Interval("Import");
 
 	WidgetViewBase::setFromJsonObject(_object);
 
@@ -256,7 +266,7 @@ void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 }
 
 void ot::TableCfg::clear(void) {
-	OT_INTERN_TABLECFG_PERFORMANCE_TEST("Clear");
+	OT_TEST_TABLECFG_Interval("Clear");
 
 	// Clear data
 	for (TableHeaderItemCfg* itm : m_rowHeader) {
@@ -338,7 +348,7 @@ void ot::TableCfg::initialize(void) {
 
 void ot::TableCfg::initialize(int _rows, int _columns)
 {
-	OT_INTERN_TABLECFG_PERFORMANCE_TEST("Initialize");
+	OT_TEST_TABLECFG_Interval("Initialize");
 	m_rows = _rows;
 	m_columns = _columns;
 	this->initialize();

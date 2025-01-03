@@ -342,7 +342,7 @@ LockManager * AppBase::lockManager(void) {
 // Event handling
 
 void AppBase::log(const ot::LogMessage& _message) {
-	static const ot::LogFlag flags = ot::ERROR_LOG | ot::WARNING_LOG;
+	static const ot::LogFlag flags = ot::ERROR_LOG | ot::WARNING_LOG | ot::TEST_LOG;
 	if (_message.getFlags() & flags) {
 		ot::StyledTextBuilder message;
 
@@ -352,6 +352,9 @@ void AppBase::log(const ot::LogMessage& _message) {
 		}
 		else if (_message.getFlags() & ot::WARNING_LOG) {
 			message << ot::StyledText::Warning << ot::StyledText::Bold << "WARNING" << ot::StyledText::ClearStyle;
+		}
+		else if (_message.getFlags() & ot::TEST_LOG) {
+			message << ot::StyledText::Highlight << ot::StyledText::Bold << "TEST" << ot::StyledText::ClearStyle;
 		}
 		message << "] [Frontend] " << _message.getText();
 
@@ -1232,6 +1235,7 @@ void AppBase::updateLogIntensityInfo(void) {
 	if (flags & ot::ERROR_LOG) info.append("\n - Error");
 	if (flags & ot::ALL_INCOMING_MESSAGE_LOG_FLAGS) info.append("\n - Inbound Messages");
 	if (flags & ot::ALL_OUTGOING_MESSAGE_LOG_FLAGS) info.append("\n - Outbound Messages");
+	if (flags & ot::TEST_LOG) info.append("\n - Testing");
 
 	if (flags == ot::NO_LOG) {
 		// NONE

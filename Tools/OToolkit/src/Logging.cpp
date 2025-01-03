@@ -49,6 +49,7 @@
 #define TABLE_TXT_MSG_QUEUE "Msg Queue"
 #define TABLE_TXT_MSG_OW_TLS "Msg one-way TLS"
 #define TABLE_TXT_MSG_OUT "Msg Out"
+#define TABLE_TXT_TEST "Test"
 
 #define LOGVIS_LOG(___message) OTOOLKIT_LOG("Log Visualization", ___message)
 #define LOGVIS_LOGW(___message) OTOOLKIT_LOGW("Log Visualization", ___message)
@@ -408,6 +409,10 @@ void Logging::appendLogMessage(const ot::LogMessage& _msg) {
 		iconItm->setIcon(QIcon(":/images/Error.png"));
 		m_errorCount++;
 	}
+	else if (_msg.getFlags() & ot::TEST_LOG) {
+		iconItm->setIcon(QIcon(":/images/Test.png"));
+		m_errorCount++;
+	}
 	else {
 		iconItm->setIcon(QIcon(":/images/Info.png"));
 	}
@@ -526,6 +531,10 @@ QString Logging::logMessageTypeString(const ot::LogMessage& _msg) {
 	if (_msg.getFlags() & ot::OUTGOING_MESSAGE_LOG) {
 		if (!typeString.isEmpty()) typeString.append(" | ");
 		typeString.append(TABLE_TXT_MSG_OUT);
+	}
+	if (_msg.getFlags() & ot::TEST_LOG) {
+		if (!typeString.isEmpty()) typeString.append(" | ");
+		typeString.append(TABLE_TXT_TEST);
 	}
 
 	return typeString;

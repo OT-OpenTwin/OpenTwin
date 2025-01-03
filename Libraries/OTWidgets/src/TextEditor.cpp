@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/RuntimeTests.h"
 #include "OTGui/ColorStyleTypes.h"
 #include "OTGui/DefaultSyntaxHighlighterRules.h"
 #include "OTWidgets/LineEdit.h"
@@ -22,13 +23,18 @@
 #include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qscrollbar.h>
 
-#define OT_INTERN_TEXTEDITOR_PERFORMANCETEST_ENABLED false
-
-#if OT_INTERN_TEXTEDITOR_PERFORMANCETEST_ENABLED==true
-#include "OTCore/PerformanceTests.h"
-#define OT_INTERN_TEXTEDITOR_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_texteditor_lcl_performancetest, "TextEditor " ___testText)
+#if OT_TESTING_GLOBAL_AllTestsEnabled==true
+#define OT_TESTING_LOCAL_TEXTEDITOR_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
+#elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true
+#define OT_TESTING_LOCAL_TEXTEDITOR_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_RuntimeTestingEnabled
 #else
-#define OT_INTERN_TEXTEDITOR_PERFORMANCE_TEST(___testText)
+#define OT_TESTING_LOCAL_TEXTEDITOR_PERFORMANCETEST_ENABLED false
+#endif 
+
+#if OT_TESTING_LOCAL_TEXTEDITOR_PERFORMANCETEST_ENABLED==true
+#define OT_TEST_TEXTEDITOR_Interval(___testText) OT_TEST_Interval(ot_intern_texteditor_lcl_performancetest, "TextEditor", ___testText)
+#else
+#define OT_TEST_TEXTEDITOR_Interval(___testText)
 #endif
 
 ot::TextEditorLineNumberArea::TextEditorLineNumberArea(TextEditor* _editor)
@@ -95,7 +101,7 @@ ot::TextEditor::~TextEditor() {
 }
 
 void ot::TextEditor::setupFromConfig(const TextEditorCfg& _config, bool _isUpdate) {
-	OT_INTERN_TEXTEDITOR_PERFORMANCE_TEST("Setup from config");
+	OT_TEST_TEXTEDITOR_Interval("Setup from config");
 
 	bool tmp = this->signalsBlocked();
 	this->blockSignals(true);

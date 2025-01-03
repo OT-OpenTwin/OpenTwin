@@ -17,6 +17,7 @@
 #include "OTCore/ReturnMessage.h"
 
 #include "OTCore/OTAssert.h"
+#include "OTCore/RuntimeTests.h"
 #include "OTWidgets/DoubleSpinBox.h"
 #include "OTWidgets/PropertyGridItem.h"
 #include "OTWidgets/PropertyInputDouble.h"
@@ -32,6 +33,19 @@
 #include <akAPI/uiAPI.h>
 #include <akCore/aException.h>
 
+#if OT_TESTING_GLOBAL_AllTestsEnabled==true
+#define OT_TESTING_LOCAL_VIEWECOMPONENT_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
+#elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true
+#define OT_TESTING_LOCAL_VIEWECOMPONENT_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_RuntimeTestingEnabled
+#else
+#define OT_TESTING_LOCAL_VIEWECOMPONENT_PERFORMANCETEST_ENABLED false
+#endif 
+
+#if OT_TESTING_LOCAL_VIEWECOMPONENT_PERFORMANCETEST_ENABLED==true
+#define OT_TEST_VIEWECOMPONENT_Interval(___testText) OT_TEST_Interval(ot_intern_viewercomponent_lcl_performancetest, "ViewerComponent", ___testText)
+#else
+#define OT_TEST_VIEWECOMPONENT_Interval(___testText)
+#endif
 
 ViewerComponent::ViewerComponent()
 	: ot::ServiceBase("ViewerComponent", "Viewer", "127.0.0.1", ot::invalidServiceID), processingGroupCounter(0), treeSelectionReceived(false)
@@ -506,6 +520,8 @@ void ViewerComponent::notify(
 }
 
 void ViewerComponent::handleSelectionChanged(bool _selectionFromTree) {
+	OT_TEST_VIEWECOMPONENT_Interval("Selection Changed");
+
 	if (processingGroupCounter > 0)
 	{
 		treeSelectionReceived = true;

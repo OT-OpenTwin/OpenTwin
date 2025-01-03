@@ -1279,7 +1279,7 @@ void Application::handleAsyncSelectionChanged(const ot::JsonDocument& _document)
 		else
 		{
 			const std::string message = "Notification about selected entity that does not exist in this model state; id: " + std::to_string(entityID);
-			OT_LOG_W(message);
+			//OT_LOG_W(message);
 		}
 	}
 
@@ -1292,7 +1292,7 @@ void Application::handleAsyncSelectionChanged(const ot::JsonDocument& _document)
 		else
 		{
 			const std::string message = "Notification about selected visible entity that does not exist in this model state; id: " + std::to_string(entityID);
-			OT_LOG_W(message);
+			//OT_LOG_W(message);
 		}
 	}
 

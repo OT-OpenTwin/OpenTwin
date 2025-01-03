@@ -30,7 +30,8 @@ ot::ReturnMessage ot::PythonServiceInterface::SendExecutionOrder()
 	std::string response;
 	OT_LOG_D("Sending python execution request");
 	ot::msg::send("", _pythonExecutionServiceURL, ot::MessageType::EXECUTE, this->AssembleMessage().toJson(), response,0);
-	return ot::ReturnMessage::fromJson(response);
+	ot::ReturnMessage message = ot::ReturnMessage::fromJson(response);
+	return message;
 }
 
 ot::ReturnMessage ot::PythonServiceInterface::SendSingleExecutionCommand(const std::string& command)

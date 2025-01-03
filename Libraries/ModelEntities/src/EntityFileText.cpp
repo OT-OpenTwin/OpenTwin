@@ -5,20 +5,24 @@
 #include "DataBase.h"
 #include "OTCore/String.h"
 #include "OTCore/Logger.h"
+#include "OTCore/RuntimeTests.h"
 #include "OTCore/EncodingGuesser.h"
-#include "OTCore/PerformanceTests.h"
-#include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 #include "OTCore/EncodingConverter_UTF16ToUTF8.h"
+#include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 #include "OTGui/VisualisationTypes.h"
-#include "OTCore/String.h"
 
-#define OT_INTERN_ENTITYFILETEXT_PERFORMANCETEST_ENABLED false
-
-#if OT_INTERN_ENTITYFILETEXT_PERFORMANCETEST_ENABLED==true
-#include "OTCore/PerformanceTests.h"
-#define OT_INTERN_ENTITYFILETEXT_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_entityfiletext_lcl_performancetest, "EntityFileText " ___testText)
+#if OT_TESTING_GLOBAL_AllTestsEnabled==true
+#define OT_TESTING_LOCAL_ENTITYFILETEXT_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
+#elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true
+#define OT_TESTING_LOCAL_ENTITYFILETEXT_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_RuntimeTestingEnabled
 #else
-#define OT_INTERN_ENTITYFILETEXT_PERFORMANCE_TEST(___testText)
+#define OT_TESTING_LOCAL_ENTITYFILETEXT_PERFORMANCETEST_ENABLED false
+#endif 
+
+#if OT_TESTING_LOCAL_ENTITYFILETEXT_PERFORMANCETEST_ENABLED==true
+#define OT_TEST_ENTITYFILETEXT_Interval(___testText) OT_TEST_Interval(ot_intern_entityfiletext_lcl_performancetest, "EntityFileText", ___testText)
+#else
+#define OT_TEST_ENTITYFILETEXT_Interval(___testText)
 #endif
 
 EntityFileText::EntityFileText(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms, ClassFactoryHandler* _factory, const std::string& _owner)
@@ -60,7 +64,7 @@ ot::TextEncoding::EncodingStandard EntityFileText::getTextEncoding()
 
 std::string EntityFileText::getText(void) 
 {
-	OT_INTERN_ENTITYFILETEXT_PERFORMANCE_TEST("Get text");
+	OT_TEST_ENTITYFILETEXT_Interval("Get text");
 	const std::vector<char> plainData = getData()->getData();
 	std::string textFromBinary(plainData.begin(), plainData.end());
 
@@ -114,7 +118,7 @@ void EntityFileText::setText(const std::string& _text)
 }
 
 ot::TextEditorCfg EntityFileText::createConfig(void) {
-	OT_INTERN_ENTITYFILETEXT_PERFORMANCE_TEST("Create config");
+	OT_TEST_ENTITYFILETEXT_Interval("Create config");
 
 	ot::TextEditorCfg result;
 	result.setEntityName(this->getName());

@@ -61,6 +61,7 @@ private:
 	QCheckBox* m_msgTypeFilterError;
 	QCheckBox* m_msgTypeFilterMsgIn;
 	QCheckBox* m_msgTypeFilterMsgOut;
+	QCheckBox* m_msgTypeFilterTest;
 
 	QComboBox* m_userFilter;
 	QComboBox* m_sessionFilter;

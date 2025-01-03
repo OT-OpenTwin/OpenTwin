@@ -32,7 +32,7 @@
     <ClCompile Include="src\GenericDataStructSingle.cpp" />
     <ClCompile Include="src\GenericDataStructVector.cpp" />
     <ClCompile Include="src\JSON.cpp" />
-    <ClCompile Include="src\PerformanceTests.cpp" />
+    <ClCompile Include="src\RuntimeTests.cpp" />
     <ClCompile Include="src\StringToNumericCheck.cpp" />
     <ClCompile Include="src\LogModeManager.cpp" />
     <ClCompile Include="src\Math.cpp" />
@@ -67,7 +67,7 @@
     <ClInclude Include="include\OTCore\BasicEntityInformation.h" />
     <ClInclude Include="include\OTCore\LogModeManager.h" />
     <ClInclude Include="include\OTCore\Math.h" />
-    <ClInclude Include="include\OTCore\PerformanceTests.h" />
+    <ClInclude Include="include\OTCore\RuntimeTests.h" />
     <ClInclude Include="include\OTCore\Rect.h" />
     <ClInclude Include="include\OTCore\Color.h" />
     <ClInclude Include="include\OTCore\CoreAPIExport.h" />
@@ -107,6 +107,7 @@
     <ClInclude Include="include\OTCore\StringToVariableConverter.h" />
     <ClInclude Include="include\OTCore\TemplateTypeName.h" />
     <ClInclude Include="include\OTCore\TemplateTypeName.hpp" />
+    <ClInclude Include="include\OTCore\GlobalTestingFlags.h" />
     <ClInclude Include="include\OTCore\TextEncoding.h" />
     <ClInclude Include="include\OTCore\ThisService.h" />
     <ClInclude Include="include\OTCore\TypeNames.h" />

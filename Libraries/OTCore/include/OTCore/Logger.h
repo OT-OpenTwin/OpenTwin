@@ -45,6 +45,10 @@
 //! If undefined the OT_LOG_E macros wont generate any code (empty line)
 #define OT_GLOBAL_LOGFLAG_LOG_EEnabled
 
+//! @brief OpenTwin log test macros enabled
+//! If undefined the OT_LOG_T macros wont generate any code (empty line)
+#define OT_GLOBAL_LOGFLAG_LOG_TEnabled
+
 #ifdef OT_GLOBAL_LOGFLAG_LOGEnabled
 
 #ifdef _DEBUG
@@ -207,6 +211,20 @@
 
 #endif // ifdef OT_GLOBAL_LOGFLAG_LOG_EEnabled
 
+#ifdef OT_GLOBAL_LOGFLAG_LOG_TEnabled
+
+//! @brief Log a test message according to the service logger configuration.
+//! @param ___text The log message.
+#define OT_LOG_T(___text) OT_LOG(___text, ot::TEST_LOG)
+
+#else // ifdef OT_GLOBAL_LOGFLAG_LOG_EEnabled
+
+//! @brief Log a test message according to the service logger configuration.
+//! @param ___text The log message.
+#define OT_LOG_T(___text)
+
+#endif // ifdef OT_GLOBAL_LOGFLAG_LOG_EEnabled
+
 #else // ifdef OT_GLOBAL_LOGFLAG_LOGEnabled
 
 //! Log a message according to the service logger configuration and the provided flags
@@ -282,20 +300,34 @@ namespace ot {
 
 	//! @brief Log message verbouse level
 	enum LogFlag {
-		NO_LOG                          = 0x0000, //! @brief No log flags
-		INFORMATION_LOG                 = 0x0001, //! @brief Information log (few logs)
-		DETAILED_LOG                    = 0x0002, //! @brief Detailed log (more logs)
-		WARNING_LOG                     = 0x0004, //! @brief Warning log
-		ERROR_LOG                       = 0x0008, //! @brief Error log
-		INBOUND_MESSAGE_LOG             = 0x0010, //! @brief Execute endpoint log
-		QUEUED_INBOUND_MESSAGE_LOG      = 0x0020, //! @brief Queue endpoint log
-		ONEWAY_TLS_INBOUND_MESSAGE_LOG  = 0x0040, //! @brief OneWay-TLS endpoint log
-		OUTGOING_MESSAGE_LOG            = 0x0080, //! @brief Message out log
-		ALL_GENERAL_LOG_FLAGS           = 0x000F, //! @brief Mask used to set all general log flags
-		ALL_INCOMING_MESSAGE_LOG_FLAGS  = 0x0070, //! @brief Mask used to set all incoming message log flags
-		ALL_OUTGOING_MESSAGE_LOG_FLAGS  = 0x0080, //! @brief Mask used to set all outgoing message log flags
-		ALL_MESSAGE_LOG_FLAGS           = 0x00F0, //! @brief Mask used to set all incoming and outgoing message log flags
-		ALL_LOG_FLAGS                   = 0xFFFF  //! @brief Mask used to set all log flags
+		NO_LOG                          = 0 << 0, //! @brief No log flags.
+		INFORMATION_LOG                 = 1 << 0, //! @brief Information log (few logs).
+		DETAILED_LOG                    = 1 << 1, //! @brief Detailed log (more logs).
+		WARNING_LOG                     = 1 << 2, //! @brief Warning log.
+		ERROR_LOG                       = 1 << 3, //! @brief Error log.
+		
+		//! @brief Mask used to set all general log flags.
+		ALL_GENERAL_LOG_FLAGS           = INFORMATION_LOG | DETAILED_LOG | WARNING_LOG | ERROR_LOG,
+
+		INBOUND_MESSAGE_LOG             = 1 << 4, //! @brief Execute endpoint log.
+		QUEUED_INBOUND_MESSAGE_LOG      = 1 << 5, //! @brief Queue endpoint log
+		ONEWAY_TLS_INBOUND_MESSAGE_LOG  = 1 << 6, //! @brief OneWay-TLS endpoint log
+		
+		//! @brief Mask used to set all incoming message log flags.
+		ALL_INCOMING_MESSAGE_LOG_FLAGS = INBOUND_MESSAGE_LOG | QUEUED_INBOUND_MESSAGE_LOG | ONEWAY_TLS_INBOUND_MESSAGE_LOG,
+		
+		OUTGOING_MESSAGE_LOG            = 1 << 7, //! \brief Outgoing message log.
+
+		//! @brief Mask used to set all outgoing message log flags.
+		ALL_OUTGOING_MESSAGE_LOG_FLAGS = OUTGOING_MESSAGE_LOG,
+
+		TEST_LOG                        = 1 << 8,
+		
+		//! @brief Mask used to set all incoming and outgoing message log flags.
+		ALL_MESSAGE_LOG_FLAGS           = ALL_INCOMING_MESSAGE_LOG_FLAGS | ALL_OUTGOING_MESSAGE_LOG_FLAGS,
+
+		//! @brief Mask used to set all log flags.
+		ALL_LOG_FLAGS                   = ALL_GENERAL_LOG_FLAGS | ALL_MESSAGE_LOG_FLAGS
 	};
 
 	typedef Flags<LogFlag> LogFlags;

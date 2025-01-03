@@ -38,7 +38,8 @@ namespace ot {
 
 		enum class DialogState {
 			NoState        = 0 << 0,
-			MousePressed   = 1 << 0
+			MousePressed   = 1 << 0,
+			Closing        = 1 << 1
 		};
 		typedef Flags<DialogState> DialogStateFlags;
 
@@ -66,6 +67,8 @@ namespace ot {
 		void setDialogName(const std::string& _name) { m_dialogName = _name; };
 		const std::string& dialogName(void) const { return m_dialogName; };
 
+		const DialogStateFlags& getDialogState(void) const { return m_state; };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Public slots
@@ -87,6 +90,9 @@ namespace ot {
 		virtual void mousePressEvent(QMouseEvent* _event) override;
 		virtual void mouseMoveEvent(QMouseEvent* _event) override;
 		virtual void mouseReleaseEvent(QMouseEvent* _event) override;
+		virtual void closeEvent(QCloseEvent* _event) override;
+
+		virtual bool mayCloseDialogWindow(void) const { return true; };
 
 	private:
 		DialogStateFlags m_state;

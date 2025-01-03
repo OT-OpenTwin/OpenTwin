@@ -68,6 +68,7 @@ LoggingFilterView::LoggingFilterView()
 	m_msgTypeFilterError = new QCheckBox("Error");
 	m_msgTypeFilterMsgIn = new QCheckBox("Inbound Message");
 	m_msgTypeFilterMsgOut = new QCheckBox("Outgoing Message");
+	m_msgTypeFilterTest = new QCheckBox("Testing");
 
 	m_serviceFilter = new QListWidget;
 	QPushButton* btnSelectAllServices = new QPushButton("Select All");
@@ -96,6 +97,7 @@ LoggingFilterView::LoggingFilterView()
 	filterByMessageTypeLayout->addWidget(m_msgTypeFilterError);
 	filterByMessageTypeLayout->addWidget(m_msgTypeFilterMsgIn);
 	filterByMessageTypeLayout->addWidget(m_msgTypeFilterMsgOut);
+	filterByMessageTypeLayout->addWidget(m_msgTypeFilterTest);
 
 	filterByServiceLayout->addWidget(m_serviceFilter);
 	filterByServiceLayout->addWidget(btnSelectAllServices);
@@ -108,6 +110,7 @@ LoggingFilterView::LoggingFilterView()
 	this->connect(m_msgTypeFilterError, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
 	this->connect(m_msgTypeFilterMsgIn, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
 	this->connect(m_msgTypeFilterMsgOut, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
+	this->connect(m_msgTypeFilterTest, &QCheckBox::stateChanged, this, &LoggingFilterView::slotUpdateCheckboxColors);
 
 	this->connect(m_messageFilter, &QLineEdit::returnPressed, this, &LoggingFilterView::slotFilterChanged);
 
@@ -117,6 +120,7 @@ LoggingFilterView::LoggingFilterView()
 	this->connect(m_msgTypeFilterError, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
 	this->connect(m_msgTypeFilterMsgIn, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
 	this->connect(m_msgTypeFilterMsgOut, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
+	this->connect(m_msgTypeFilterTest, &QCheckBox::stateChanged, this, &LoggingFilterView::slotFilterChanged);
 
 	this->connect(m_userFilter, &QComboBox::currentTextChanged, this, &LoggingFilterView::slotFilterChanged);
 	this->connect(m_sessionFilter, &QComboBox::currentTextChanged, this, &LoggingFilterView::slotFilterChanged);
@@ -203,6 +207,7 @@ bool LoggingFilterView::filterMessage(const ot::LogMessage& _msg) {
 	else if (m_msgTypeFilterError->isChecked() && (_msg.getFlags() & ot::ERROR_LOG)) typePass = true;
 	else if (m_msgTypeFilterMsgIn->isChecked() && (_msg.getFlags() & ot::ALL_INCOMING_MESSAGE_LOG_FLAGS)) typePass = true;
 	else if (m_msgTypeFilterMsgOut->isChecked() && (_msg.getFlags() & ot::ALL_OUTGOING_MESSAGE_LOG_FLAGS)) typePass = true;
+	else if (m_msgTypeFilterTest->isChecked() && (_msg.getFlags() & ot::TEST_LOG)) typePass = true;
 
 	// User
 
@@ -246,6 +251,7 @@ void LoggingFilterView::restoreSettings(QSettings& _settings) {
 	m_msgTypeFilterError->setChecked(_settings.value("LoggingFilterView.FilterActive.Error", true).toBool());
 	m_msgTypeFilterMsgIn->setChecked(_settings.value("LoggingFilterView.FilterActive.Message.In", false).toBool());
 	m_msgTypeFilterMsgOut->setChecked(_settings.value("LoggingFilterView.FilterActive.Message.Out", false).toBool());
+	m_msgTypeFilterTest->setChecked(_settings.value("LoggingFilterView.FilterActive.Test", false).toBool());
 
 	QByteArray serviceFilter = _settings.value("LoggingFilterView.ServiceFilter.List", QByteArray()).toByteArray();
 	if (!serviceFilter.isEmpty()) {
@@ -281,6 +287,7 @@ void LoggingFilterView::saveSettings(QSettings& _settings) {
 	_settings.setValue("LoggingFilterView.FilterActive.Error", m_msgTypeFilterError->isChecked());
 	_settings.setValue("LoggingFilterView.FilterActive.Message.In", m_msgTypeFilterMsgIn->isChecked());
 	_settings.setValue("LoggingFilterView.FilterActive.Message.Out", m_msgTypeFilterMsgOut->isChecked());
+	_settings.setValue("LoggingFilterView.FilterActive.Test", m_msgTypeFilterTest->isChecked());
 
 	QJsonArray serviceFilterArr;
 	for (int i = 0; i < m_serviceFilter->count(); i++) {
@@ -304,6 +311,7 @@ void LoggingFilterView::slotUpdateCheckboxColors(void) {
 	m_msgTypeFilterError->setStyleSheet(m_msgTypeFilterError->isChecked() ? green : red);
 	m_msgTypeFilterMsgIn->setStyleSheet(m_msgTypeFilterMsgIn->isChecked() ? green : red);
 	m_msgTypeFilterMsgOut->setStyleSheet(m_msgTypeFilterMsgOut->isChecked() ? green : red);
+	m_msgTypeFilterTest->setStyleSheet(m_msgTypeFilterTest->isChecked() ? green : red);
 }
 
 void LoggingFilterView::slotFilterChanged(void) {

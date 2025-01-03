@@ -9,8 +9,8 @@ TEST(ReturnValues, Serialize)
 	ot::ReturnValues returnValues;
 	ot::GenericDataStructList values({ new ot::GenericDataStructVector({ 1,2,3,4,5,6 }) });
 	returnValues.addData("name", { values });
-	ot::JsonDocument (doc);
-	ot::JsonValue (object);
+	ot::JsonDocument doc;
+	ot::JsonValue object;
 	object.SetObject();
 	returnValues.addToJsonObject(object,doc.GetAllocator());
 	std::string temp = doc.toJson();

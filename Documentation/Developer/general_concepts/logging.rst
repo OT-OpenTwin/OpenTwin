@@ -88,6 +88,8 @@ When creating the Service Logger instance, it sets the logging options from the 
 
         * OUTGOING_MESSAGE_LOG *Outgoing message log*
 
+        * TEST_LOG *Test (e.g. Runtime Test) message log*
+
         * ALL_GENERAL_LOG_FLAGS *All general log flags will be set (Default, Detailed, Warning, Error)*
 
         * ALL_INCOMING_MESSAGE_LOG_FLAGS *All flags for incoming messages will be set*
@@ -136,12 +138,18 @@ The example above will generate a log message with:
 Log Macros
 ^^^^^^^^^^
 
-* ``OT_LOG_I`` Information log: General information
-* ``OT_LOG_D`` Detailed log: Detailed information
-* ``OT_LOG_W`` Warning log
-* ``OT_LOG_E`` Error log
+* ``OT_LOG_I`` Information log: General information.
+* ``OT_LOG_D`` Detailed log: Detailed information.
+* ``OT_LOG_W`` Warning log.
+* ``OT_LOG_E`` Error log.
+* ``OT_LOG_T`` Test log.
 
 If any other log type(s) should be set for the log message, use the ``OT_LOG`` macro.
+
+The Information, Detailed, Warning and Error logs have the following special types:
+
+* ``A`` Assert before log. The log message will be displayed in the assert messsage. Message must be a C-String (const char*) (e.g. LOG_EA("Test") -> Log Error & Assert).
+* ``AS`` Assert simple before log. The Assert will have no message set. Especially useful when wanting to assert but to log a std::string at the same time (e.g. LOG_EAS("Test: " + myString) -> Log Error & Assert simple).
 
 ============
 View the Log

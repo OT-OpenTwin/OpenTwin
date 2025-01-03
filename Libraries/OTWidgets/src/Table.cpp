@@ -5,6 +5,7 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/RuntimeTests.h"
 #include "OTWidgets/Table.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/TableItemDelegate.h"
@@ -15,13 +16,18 @@
 #include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qheaderview.h>
 
-#define OT_INTERN_TABLE_PERFORMANCETEST_ENABLED false
-
-#if OT_INTERN_TABLE_PERFORMANCETEST_ENABLED==true
-#include "OTCore/PerformanceTests.h"
-#define OT_INTERN_TABLE_PERFORMANCE_TEST(___testText) OT_TEST_Interval(ot_intern_table_lcl_performancetest, "Table " ___testText)
+#if OT_TESTING_GLOBAL_AllTestsEnabled==true
+#define OT_TESTING_LOCAL_TABLE_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
+#elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true
+#define OT_TESTING_LOCAL_TABLE_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_RuntimeTestingEnabled
 #else
-#define OT_INTERN_TABLE_PERFORMANCE_TEST(___testText)
+#define OT_TESTING_LOCAL_TABLE_PERFORMANCETEST_ENABLED false
+#endif 
+
+#if OT_TESTING_LOCAL_TABLE_PERFORMANCETEST_ENABLED==true
+#define OT_TEST_TABLE_Interval(___testText) OT_TEST_Interval(ot_intern_table_lcl_performancetest, "Table", ___testText)
+#else
+#define OT_TEST_TABLE_Interval(___testText)
 #endif
 
 ot::Table::Table(QWidget* _parentWidget)
@@ -45,12 +51,12 @@ ot::Table::~Table() {
 // Setter / Getter
 
 void ot::Table::setupFromConfig(const TableCfg& _config) {
-	OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Total");
+	OT_TEST_TABLE_Interval("Setup from config: Total");
 
 	SignalBlockWrapper blocker(this);
 
 	{
-		OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Clear");
+		OT_TEST_TABLE_Interval("Setup from config: Clear");
 		this->clear();
 		m_columnWidthBuffer.clear();
 		m_rowHeightBuffer.clear();
@@ -58,14 +64,14 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 
 	// Initialize dimensions
 	{
-		OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Ini");
+		OT_TEST_TABLE_Interval("Setup from config: Ini");
 		this->setRowCount(_config.getRowCount());
 		this->setColumnCount(_config.getColumnCount());
 	}
 
 	// Initialize Header
 	{
-		OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Set vertical header");
+		OT_TEST_TABLE_Interval("Setup from config: Set vertical header");
 		QHeaderView* header = this->verticalHeader();
 		for (int r = 0; r < _config.getRowCount(); r++) {
 			const TableHeaderItemCfg* headerItem = _config.getRowHeader(r);
@@ -75,7 +81,7 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 		}
 	}
 	{
-		OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Set horizontal header");
+		OT_TEST_TABLE_Interval("Setup from config: Set horizontal header");
 		QHeaderView* header = this->horizontalHeader();
 		for (int c = 0; c < _config.getColumnCount(); c++) {
 			const TableHeaderItemCfg* headerItem = _config.getColumnHeader(c);
@@ -87,7 +93,7 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 
 	// Initialize data
 	{
-		OT_INTERN_TABLE_PERFORMANCE_TEST("Setup from config: Set data");
+		OT_TEST_TABLE_Interval("Setup from config: Set data");
 		QAbstractItemModel* dataModel = this->model();
 		SignalBlockWrapper blocker(dataModel);
 
@@ -105,7 +111,7 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 }
 
 ot::TableCfg ot::Table::createConfig(void) const {
-	OT_INTERN_TABLE_PERFORMANCE_TEST("Create config");
+	OT_TEST_TABLE_Interval("Create config");
 
 	TableCfg cfg(this->rowCount(), this->columnCount());
 	
@@ -151,6 +157,8 @@ void ot::Table::setSelectedCellsBackground(const ot::Color& _color) {
 }
 
 void ot::Table::setSelectedCellsBackground(const QColor& _color) {
+	OT_TEST_TABLE_Interval("Set selected cells background");
+
 	SignalBlockWrapper blocker(this);
 	
 	for (QTableWidgetItem* item : this->selectedItems()) {
@@ -167,7 +175,7 @@ void ot::Table::prepareForDataChange(void) {
 // Protected
 
 void ot::Table::showEvent(QShowEvent* _event) {
-	OT_INTERN_TABLE_PERFORMANCE_TEST("Show event");
+	OT_TEST_TABLE_Interval("Show event");
 	QTableWidget::showEvent(_event);
 
 	if (!m_columnWidthBuffer.empty() || !m_rowHeightBuffer.empty()) {
