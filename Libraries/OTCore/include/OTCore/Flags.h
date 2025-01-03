@@ -12,7 +12,7 @@
 #include <type_traits>
 
 //! \brief Adds bitwise operations for the provided enum.
-//! Use conveinience OT_ADD_FLAG_FUNCTIONS or OT_ADD_FRIEND_FLAG_FUNCTIONS.
+//! Use conveinience OT_ADD_FLAG_FUNCTIONS or OT_ADD_FRIEND_FLAG_FUNCTIONS for most cases.
 #define OT_ADD_FLAG_FUNCTIONS_IMPL(___prefix, ___castType, ___enumName) ___prefix constexpr ___enumName operator | (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<___castType>(_lhv) | static_cast<___castType>(_rhv)); }; \
 ___prefix constexpr ___enumName operator & (___enumName _lhv, ___enumName _rhv) { return static_cast<___enumName>(static_cast<___castType>(_lhv) & static_cast<___castType>(_rhv)); };  \
 ___prefix constexpr ___enumName operator ~ (___enumName _lhv) { return static_cast<___enumName>(~(static_cast<___castType>(_lhv))); };
@@ -20,37 +20,66 @@ ___prefix constexpr ___enumName operator ~ (___enumName _lhv) { return static_ca
 #ifdef OT_OS_64Bit
 
 //! \def OT_ADD_FLAG_FUNCTIONS
-//! \brief Will add the default bitwise operations for the provided 64 bit bitfield.
-//! Use this at the bottom of the File where the enum is defined.                 <br>
-//!                                                                               <br>
-//!		class MyClass {                                                           <br>
-//!		public:                                                                   <br>
-//!			enum MyEnum {                                                         <br>
-//!				...                                                               <br>
-//!			}                                                                     <br>
-//!			typedef ot::Flags<MyEnum> MyFlags;                                    <br>
-//!			// Not here                                                           <br>
-//!		};                                                                        <br>
-//!                                                                               <br>
-//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum)                                    <br>
+//! \brief Will add the default bitwise operations for the provided private 32/64 bit bitfield.
+//! Use this if the enum is in a public scope.
+//! 
+//!		namespace MyNamespace {
+//!		
+//!			enum MyEnum {
+//!				...
+//!			};
+//!			typedef ot::Flags<MyEnum> MyFlags;
+//! 
+//!			// or
+//! 
+//!			class MyClass {
+//!			private:
+//!				enum MyEnum2 {
+//!					...
+//!				};
+//!				typedef ot::Flags<MyEnum2> MyFlags2;
+//!			};
+//!		}
+//! 
+//!		OT_ADD_FLAG_FUNCTIONS(MyNamespace::MyEnum)
+//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum2)
 //! 
 //! \note Only enumration types are allowed.
 #define OT_ADD_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(, long long, ___enumName)
 
 //! \def OT_ADD_FRIEND_FLAG_FUNCTIONS
-//! \brief Will add the default bitwise operations for the provided private 64 bit bitfield.
-//! Use this at the same scope inside the Class where the enum is defined.        <br>
-//!                                                                               <br>
-//!		class MyClass {                                                           <br>
-//!		private:                                                                  <br>
-//!			enum MyEnum {                                                         <br>
-//!				...                                                               <br>
-//!			}                                                                     <br>
-//!			typedef ot::Flags<MyEnum> MyFlags;                                    <br>
-//!			OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum)                         <br>
-//!		};                                                                        <br>
-//!                                                                               <br>
-//!		// Not here                                                               <br>
+//! \brief Will add the default bitwise operations for the provided private 32/64 bit bitfield.
+//! Use this at the same scope inside the class where the enum is defined.
+//! 
+//!		class MyClass {
+//!		private:
+//!			enum MyEnum {
+//!				...
+//!			};
+//!			typedef ot::Flags<MyEnum> MyFlags;
+//! 
+//!			// Friend is needed since enum is in a private scope.
+//!			OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum)
+//!		};
+//! 
+//!		// or
+//! 
+//!		class MyClass2 {
+//!		private:
+//!				class MyNestedClass {
+//!				public:
+//!					enum MyEnum2 {
+//!						...
+//!					};
+//!					typedef ot::Flags<MyEnum2> MyFlags2;
+//! 
+//!					// Friend is needed since it is a public enum
+//!					// but the parent class is in a private scope.
+//!					OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum2)
+//!				};
+//!		};
+//! 
+//!		// < Not here! >
 //! 
 //! \note Only enumration types are allowed.
 #define OT_ADD_FRIEND_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(friend , long long, ___enumName)
@@ -58,37 +87,66 @@ ___prefix constexpr ___enumName operator ~ (___enumName _lhv) { return static_ca
 #else
 
 //! \def OT_ADD_FLAG_FUNCTIONS
-//! \brief Will add the default bitwise operations for the provided 32 bit bitfield.
-//! Use this at the bottom of the File where the enum is defined.                 <br>
-//!                                                                               <br>
-//!		class MyClass {                                                           <br>
-//!		public:                                                                   <br>
-//!			enum MyEnum {                                                         <br>
-//!				...                                                               <br>
-//!			}                                                                     <br>
-//!			typedef ot::Flags<MyEnum> MyFlags;                                    <br>
-//!			// Not here                                                           <br>
-//!		};                                                                        <br>
-//!                                                                               <br>
-//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum)                                    <br>
+//! \brief Will add the default bitwise operations for the provided private 32/64 bit bitfield.
+//! Use this if the enum is in a public scope.
+//! 
+//!		namespace MyNamespace {
+//!		
+//!			enum MyEnum {
+//!				...
+//!			};
+//!			typedef ot::Flags<MyEnum> MyFlags;
+//! 
+//!			// or
+//! 
+//!			class MyClass {
+//!			private:
+//!				enum MyEnum2 {
+//!					...
+//!				};
+//!				typedef ot::Flags<MyEnum2> MyFlags2;
+//!			};
+//!		}
+//! 
+//!		OT_ADD_FLAG_FUNCTIONS(MyNamespace::MyEnum)
+//!		OT_ADD_FLAG_FUNCTIONS(MyClass::MyEnum2)
 //! 
 //! \note Only enumration types are allowed.
 #define OT_ADD_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(, long, ___enumName)
 
 //! \def OT_ADD_FRIEND_FLAG_FUNCTIONS
-//! \brief Will add the default bitwise operations for the provided private 32 bit bitfield.
-//! Use this at the same scope inside the Class where the enum is defined.        <br>
-//!                                                                               <br>
-//!		class MyClass {                                                           <br>
-//!		private:                                                                  <br>
-//!			enum MyEnum {                                                         <br>
-//!				...                                                               <br>
-//!			}                                                                     <br>
-//!			typedef ot::Flags<MyEnum> MyFlags;                                    <br>
-//!			OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum)                         <br>
-//!		};                                                                        <br>
-//!                                                                               <br>
-//!		// Not here                                                               <br>
+//! \brief Will add the default bitwise operations for the provided private 32/64 bit bitfield.
+//! Use this at the same scope inside the class where the enum is defined.
+//! 
+//!		class MyClass {
+//!		private:
+//!			enum MyEnum {
+//!				...
+//!			};
+//!			typedef ot::Flags<MyEnum> MyFlags;
+//! 
+//!			// Friend is needed since enum is in a private scope.
+//!			OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum)
+//!		};
+//! 
+//!		// or
+//! 
+//!		class MyClass2 {
+//!		private:
+//!				class MyNestedClass {
+//!				public:
+//!					enum MyEnum2 {
+//!						...
+//!					};
+//!					typedef ot::Flags<MyEnum2> MyFlags2;
+//! 
+//!					// Friend is needed since it is a public enum
+//!					// but the parent class is in a private scope.
+//!					OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum2)
+//!				};
+//!		};
+//! 
+//!		// < Not here! >
 //! 
 //! \note Only enumration types are allowed.
 #define OT_ADD_FRIEND_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(friend , long, ___enumName)
@@ -98,19 +156,29 @@ ___prefix constexpr ___enumName operator ~ (___enumName _lhv) { return static_ca
 namespace ot {
 
 	//! \class Flags
-	//! \brief This class is used to manage flags.
-	//! Don't forget to add OT_ADD_FLAG_FUNCTIONS and the bottom of your header.
-	//! Use OT_ADD_FRIEND_FLAG_FUNCTIONS for private enums or public enums of private classes. <br>
-	//! The type should be an enumeration where every value represents a single bit in a 32/64 bit value. <br>
-	//! e.g: <br>
-	//! enum enumName { <br>
-	//!		enumValue1	= 0 << 0,	//	0000 <br>
-	//!		enumValue2	= 1 << 0,	//	0001 <br>
-	//!		enumValue3	= 1 << 1,	//	0010 <br>
-	//!		enumValue4	= 1 << 2,	//	0100 <br>
-	//!			... <br>
+	//! \brief The Flags class is a wrapper around a enum that allows bitwise operations (flags).
+	//! OT_ADD_FLAG_FUNCTIONS or custom bitwise operations must be provided for the enum.
+	//! The type should be an enumeration where every value represents a single bit in a 32/64 bit value.
+	//! 
+	//!		// This enum contains values represeting single bits,
+	//!		// or masks used for bitwise operations.
+	//!		enum EnumName {
+	//!			// This should always be provided as somewhat of default value,
+	//!			// since ot::Flags<EnumName> will assume 0x00 to be the default.
+	//!			//                                   // +------+------+---------+
+	//!			//                                   // | Hex  | Bin  |  Info   |
+	//!			//                                   // +------+------+---------+
+	//!			EmptyFlags = 0 << 0,                 // | 0x00 | 0000 | Default |
+	//!			EnumValue1 = 1 << 0,                 // | 0x01 | 0001 | Value 1 |
+	//!			EnumValue2 = 1 << 1,	             // | 0x02 | 0010 | Value 2 |
+	//!			EnumMask1  = EnumValue1 | EnumValue2 // | 0x03 | 0011 | Mask 1  |
+	//!			EnumValue3 = 1 << 2,                 // | 0x04 | 0100 | Value 3 |
+	//!			...                                  // +------+------+---------+
 	//!	};
 	//! \note Only enumration types are allowed.
+	//! The enumerations should provided const expressions in the same (or higher) scope the flags are used at.
+	//! \ref OT_ADD_FLAG_FUNCTIONS_IMPL
+	//! \ref OT_ADD_FRIEND_FLAG_FUNCTIONS
 	template<typename T> class OT_CORE_API_EXPORTONLY Flags {
 	private:
 #ifdef OT_OS_64Bit
