@@ -58,14 +58,21 @@ Application::~Application()
 void Application::runPipeline()
 {
  	UILockWrapper lockWrapper(Application::instance()->uiComponent(), ot::LockModelWrite);
-
-	auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID();
-	const bool isValid = _graphHandler.blockDiagramIsValid(allBlockEntities);
-	if (isValid)
+	try
 	{
-		const std::list<std::shared_ptr<GraphNode>>& rootNodes = _graphHandler.getRootNodes();
-		const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
-		_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
+
+		auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID();
+		const bool isValid = _graphHandler.blockDiagramIsValid(allBlockEntities);
+		if (isValid)
+		{
+			const std::list<std::shared_ptr<GraphNode>>& rootNodes = _graphHandler.getRootNodes();
+			const std::map<ot::UID, std::shared_ptr<GraphNode>>& graphNodesByBlockID = _graphHandler.getgraphNodesByBlockID();
+			_pipelineHandler.RunAll(rootNodes, graphNodesByBlockID, allBlockEntities);
+		}
+	}
+	catch (const std::exception& e)
+	{
+		OT_LOG_E("Pipeline run failed: " + std::string(e.what()));
 	}
 }
 
