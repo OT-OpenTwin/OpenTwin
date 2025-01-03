@@ -24,7 +24,6 @@ ___prefix constexpr ___enumName operator ~ (___enumName _lhv) { return static_ca
 //! Use this if the enum is in a public scope.
 //! 
 //!		namespace MyNamespace {
-//!		
 //!			enum MyEnum {
 //!				...
 //!			};
@@ -91,7 +90,6 @@ ___prefix constexpr ___enumName operator ~ (___enumName _lhv) { return static_ca
 //! Use this if the enum is in a public scope.
 //! 
 //!		namespace MyNamespace {
-//!		
 //!			enum MyEnum {
 //!				...
 //!			};
@@ -174,7 +172,8 @@ namespace ot {
 	//!			EnumMask1  = EnumValue1 | EnumValue2 // | 0x03 | 0011 | Mask 1  |
 	//!			EnumValue3 = 1 << 2,                 // | 0x04 | 0100 | Value 3 |
 	//!			...                                  // +------+------+---------+
-	//!	};
+	//!		};
+	//! 
 	//! \note Only enumration types are allowed.
 	//! The enumerations should provided const expressions in the same (or higher) scope the flags are used at.
 	//! \ref OT_ADD_FLAG_FUNCTIONS_IMPL
