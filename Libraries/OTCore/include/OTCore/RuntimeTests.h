@@ -29,6 +29,8 @@
 #define OT_TEST_Interval(___objectName, ___testCategory, ___testText)
 #endif
 
+#pragma warning(disable:4251)
+
 namespace ot {
 
 	class OT_CORE_API_EXPORT RuntimeIntervalTest {
