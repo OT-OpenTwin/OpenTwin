@@ -365,6 +365,7 @@ void Application::HandleSelectionChanged()
 {
 	try
 	{
+		UILockWrapper wrapper(Application::instance()->uiComponent(),ot::LockModelWrite);
 		m_rangleSelectionVisualisationHandler.selectRange(m_selectedEntities);
 	}
 	catch (std::exception& e)

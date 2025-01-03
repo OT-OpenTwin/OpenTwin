@@ -234,12 +234,12 @@ void Model::resetToNew(void)
 		addEntityToModel(newDataCatEntity->getName(), newDataCatEntity, entityRoot, true, allNewEntities);
 	}
 
-	if (typeManager.hasRMDCategorizationPreview())
-	{
-		auto rmdCategorizationPreview = new EntityParameterizedDataPreviewTable(createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
-		rmdCategorizationPreview->setName(typeManager.getRMDCategorizationName() + "/Preview");
-		addEntityToModel(rmdCategorizationPreview->getName(), rmdCategorizationPreview, entityRoot, true, allNewEntities);
-	}
+	//if (typeManager.hasRMDCategorizationPreview())
+	//{
+	//	auto rmdCategorizationPreview = new EntityParameterizedDataPreviewTable(createEntityUID(), nullptr, nullptr, nullptr, nullptr, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService);
+	//	rmdCategorizationPreview->setName(typeManager.getRMDCategorizationName() + "/Preview");
+	//	addEntityToModel(rmdCategorizationPreview->getName(), rmdCategorizationPreview, entityRoot, true, allNewEntities);
+	//}
 
 	if (typeManager.hasDatasetRoot())
 	{
