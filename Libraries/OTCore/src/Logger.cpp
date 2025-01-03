@@ -40,6 +40,7 @@ void ot::addLogFlagsToJsonArray(const LogFlags& _flags, JsonArray& _flagsArray, 
 	if (_flags & QUEUED_INBOUND_MESSAGE_LOG) _flagsArray.PushBack(JsonString("QueuedMessage", _allocator), _allocator);
 	if (_flags & ONEWAY_TLS_INBOUND_MESSAGE_LOG) _flagsArray.PushBack(JsonString("OneWayTLSMessage", _allocator), _allocator);
 	if (_flags & OUTGOING_MESSAGE_LOG) _flagsArray.PushBack(JsonString("OutgoingMessage", _allocator), _allocator);
+	if (_flags & TEST_LOG) _flagsArray.PushBack(JsonString("Test", _allocator), _allocator);
 }
 
 ot::LogFlags ot::logFlagsFromJsonArray(const ConstJsonArray& _flagsArray) {
@@ -55,6 +56,7 @@ ot::LogFlags ot::logFlagsFromJsonArray(const ConstJsonArray& _flagsArray) {
 		else if (f == "QueuedMessage") result |= QUEUED_INBOUND_MESSAGE_LOG;
 		else if (f == "OneWayTLSMessage") result |= ONEWAY_TLS_INBOUND_MESSAGE_LOG;
 		else if (f == "OutgoingMessage") result |= OUTGOING_MESSAGE_LOG;
+		else if (f == "Test") result |= TEST_LOG;
 		else {
 			OT_LOG_EAS("Unknown log flag \"" + f + "\"");
 		}
@@ -146,13 +148,18 @@ void ot::LogMessage::setFromJsonObject(const ConstJsonObject& _object) {
 
 std::ostream& ot::operator << (std::ostream& _stream, const LogMessage& _msg) {
 	// General Message Information
-	if (_msg.m_globalSystemTime.empty()) _stream << "[" << _msg.m_localSystemTime << "] [" << _msg.m_serviceName << "] ";
-	else _stream << "[" << _msg.m_globalSystemTime << "] [" << _msg.m_serviceName << "] ";
+	if (_msg.m_globalSystemTime.empty()) {
+		_stream << "[" << _msg.m_localSystemTime << "] [" << _msg.m_serviceName << "] ";
+	}
+	else {
+		_stream << "[" << _msg.m_globalSystemTime << "] [" << _msg.m_serviceName << "] ";
+	}
 
 	// General Log Type
 	if (_msg.m_flags & ot::DETAILED_LOG) _stream << "[DETAILED] ";
 	else if (_msg.m_flags & ot::WARNING_LOG) _stream << "[WARNING] ";
 	else if (_msg.m_flags & ot::ERROR_LOG) _stream << "[ERROR] ";
+	else if (_msg.m_flags & ot::TEST_LOG) _stream << "[TEST] ";
 	else _stream << "[INFO] ";
 
 	// Log source
@@ -228,8 +235,13 @@ ot::LogDispatcher& ot::LogDispatcher::instance(void) {
 }
 
 ot::LogDispatcher& ot::LogDispatcher::initialize(const std::string& _serviceName, bool _addCoutReceiver) {
-	if (!_serviceName.empty()) LogDispatcher::instance().setServiceName(_serviceName);
-	if (_addCoutReceiver) { LogDispatcher::instance().addReceiver(new LogNotifierStdCout); }
+	if (!_serviceName.empty()) {
+		LogDispatcher::instance().setServiceName(_serviceName);
+	}
+	if (_addCoutReceiver) {
+		LogDispatcher::instance().addReceiver(new LogNotifierStdCout);
+	}
+
 	return LogDispatcher::instance();
 }
 
@@ -256,7 +268,9 @@ void ot::LogDispatcher::dispatch(const std::string& _text, const std::string& _f
 }
 
 void ot::LogDispatcher::dispatch(const LogMessage& _message) {
-	if ((_message.getFlags() & m_logFlags) != _message.getFlags()) return;
+	if ((_message.getFlags() & m_logFlags) != _message.getFlags()) {
+		return;
+	}
 
 	// Create Timestamp
 	LogMessage msg(_message);
@@ -295,6 +309,7 @@ void ot::LogDispatcher::applyEnvFlag(const std::string& _str) {
 	else if (_str == "QUEUED_INBOUND_MESSAGE_LOG") m_logFlags |= ot::QUEUED_INBOUND_MESSAGE_LOG;
 	else if (_str == "ONEWAY_TLS_INBOUND_MESSAGE_LOG") m_logFlags |= ot::ONEWAY_TLS_INBOUND_MESSAGE_LOG;
 	else if (_str == "OUTGOING_MESSAGE_LOG") m_logFlags |= ot::OUTGOING_MESSAGE_LOG;
+	else if (_str == "TEST_LOG") m_logFlags |= ot::TEST_LOG;
 	else if (_str == "ALL_GENERAL_LOG_FLAGS") m_logFlags |= ot::ALL_GENERAL_LOG_FLAGS;
 	else if (_str == "ALL_INCOMING_MESSAGE_LOG_FLAGS") m_logFlags |= ot::ALL_INCOMING_MESSAGE_LOG_FLAGS;
 	else if (_str == "ALL_OUTGOING_MESSAGE_LOG_FLAGS") m_logFlags |= ot::ALL_OUTGOING_MESSAGE_LOG_FLAGS;
@@ -338,7 +353,9 @@ ot::LogDispatcher::LogDispatcher() : m_serviceName("!! <NO SERVICE ATTACHED> !!"
 
 ot::LogDispatcher::~LogDispatcher() {
 	for (auto r : m_messageReceiver) {
-		if (!r->getDeleteLogNotifierLater()) { delete r; }
+		if (!r->getDeleteLogNotifierLater()) {
+			delete r;
+		}
 	}
 	m_messageReceiver.clear();
 }

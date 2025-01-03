@@ -21,7 +21,7 @@ ot::ErrorWarningLogFrontendNotifier::~ErrorWarningLogFrontendNotifier() {
 }
 
 void ot::ErrorWarningLogFrontendNotifier::log(const LogMessage& _message) {
-	static const ot::LogFlag flags = ot::ERROR_LOG | ot::WARNING_LOG;
+	static const ot::LogFlag flags = ot::ERROR_LOG | ot::WARNING_LOG | ot::TEST_LOG;
 	if (_message.getFlags() & flags) {
 		if (m_app->isUiConnected()) {
 			OTAssertNullptr(m_app->uiComponent());
@@ -34,6 +34,9 @@ void ot::ErrorWarningLogFrontendNotifier::log(const LogMessage& _message) {
 			}
 			else if (_message.getFlags() & ot::WARNING_LOG) {
 				message << StyledText::Warning << StyledText::Bold << "WARNING" << StyledText::ClearStyle;
+			}
+			else if (_message.getFlags() & ot::TEST_LOG) {
+				message << StyledText::Highlight << StyledText::Bold << "TEST" << StyledText::ClearStyle;
 			}
 			message << "] [" << _message.getServiceName() << "] " << _message.getText();
 			

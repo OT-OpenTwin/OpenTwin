@@ -22,7 +22,7 @@ ot::PerformanceIntervalTest::~PerformanceIntervalTest() {
 }
 
 void ot::PerformanceIntervalTest::logCurrentInterval(const std::string& _testName) const {
-	OT_LOG_W("Test \"" + _testName + "\" result: " + this->niceIntervalString(this->currentInterval()));
+	OT_LOG_T("Test \"" + _testName + "\" result: " + this->niceIntervalString(this->currentInterval()));
 }
 
 long long ot::PerformanceIntervalTest::currentInterval(void) const {

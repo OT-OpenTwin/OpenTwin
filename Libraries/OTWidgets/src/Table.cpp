@@ -15,7 +15,7 @@
 #include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qheaderview.h>
 
-#define OT_INTERN_TABLE_PERFORMANCETEST_ENABLED false
+#define OT_INTERN_TABLE_PERFORMANCETEST_ENABLED true
 
 #if OT_INTERN_TABLE_PERFORMANCETEST_ENABLED==true
 #include "OTCore/PerformanceTests.h"
