@@ -9,6 +9,9 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
+// Qt header
+#include <QtCore/qstring.h>
+
 // std header
 #include <list>
 

@@ -25,7 +25,7 @@
 #include "OTWidgets/VersionGraphManager.h"
 
 #include "OTWidgets/MainWindow.h"
-#include "OTWidgets/TabToolBarManager.h"
+#include "OTWidgets/TabToolBar.h"
 #include "OTWidgets/StatusBarManager.h"
 #include "OTWidgets/CentralWidgetManager.h"
 
@@ -58,7 +58,7 @@ public Q_SLOTS:
 
 		m_window->setCentralWidget(m_centralWidgetManager);
 
-		m_toolBarManager = new TabToolBarManager;
+		m_toolBarManager = new TabToolBar;
 
 
 		m_statusBarManager = new StatusBarManager;
@@ -69,7 +69,7 @@ private:
 
 	ot::MainWindow* m_window;
 	ot::CentralWidgetManager* m_centralWidgetManager;
-	ot::TabToolBarManager* m_toolBarManager;
+	ot::TabToolBar* m_toolBarManager;
 	ot::StatusBarManager* m_statusBarManager;
 };
 
