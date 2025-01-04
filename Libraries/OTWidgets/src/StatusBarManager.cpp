@@ -9,14 +9,6 @@
 // Qt header
 #include <QtWidgets/qstatusbar.h>
 
-ot::StatusBarManager* ot::StatusBarManager::createDefault(void) {
-	StatusBarManager* newManager = new StatusBarManager;
-
-
-
-	return newManager;
-}
-
 ot::StatusBarManager::StatusBarManager()
 	: m_statusBar(nullptr)
 {

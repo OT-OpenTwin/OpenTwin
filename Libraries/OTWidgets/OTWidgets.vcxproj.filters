@@ -427,14 +427,23 @@
     <ClCompile Include="src\StatusBarManager.cpp">
       <Filter>src\WindowManagement</Filter>
     </ClCompile>
-    <ClCompile Include="src\TabToolBarManager.cpp">
-      <Filter>src\WindowManagement</Filter>
-    </ClCompile>
     <ClCompile Include="src\DelayedCallHandler.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
     <ClCompile Include="src\DelayedShowHideHandler.cpp">
       <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TabToolBar.cpp">
+      <Filter>src\ToolBar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TabToolBarGroup.cpp">
+      <Filter>src\ToolBar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TabToolBarSubGroup.cpp">
+      <Filter>src\ToolBar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TabToolBarPage.cpp">
+      <Filter>src\ToolBar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -539,6 +548,12 @@
     </Filter>
     <Filter Include="src\WindowManagement">
       <UniqueIdentifier>{1b70c9a8-a5b0-4dba-89b9-0603ca9efd88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\ToolBar">
+      <UniqueIdentifier>{b695e346-e794-45fb-b3fb-f3c36129b86d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ToolBar">
+      <UniqueIdentifier>{6dc99e89-1351-4258-a4d9-8f3e315ccee8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -845,14 +860,23 @@
     <ClInclude Include="include\OTWidgets\AbstractStatusBar.h">
       <Filter>include\WindowManagement</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\AbstractToolBar.h">
-      <Filter>include\WindowManagement</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\TabToolBarManager.h">
-      <Filter>include\WindowManagement</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\IconManager.hpp">
       <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\AbstractToolBar.h">
+      <Filter>include\ToolBar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\TabToolBarPage.h">
+      <Filter>include\ToolBar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\TabToolBarGroup.h">
+      <Filter>include\ToolBar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\TabToolBarSubGroup.h">
+      <Filter>include\ToolBar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\TabToolBar.h">
+      <Filter>include\ToolBar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

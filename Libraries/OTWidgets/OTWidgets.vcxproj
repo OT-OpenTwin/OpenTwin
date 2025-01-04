@@ -155,6 +155,9 @@
     <ClCompile Include="src\Table.cpp" />
     <ClCompile Include="src\TableItemDelegate.cpp" />
     <ClCompile Include="src\TableView.cpp" />
+    <ClCompile Include="src\TabToolBarGroup.cpp" />
+    <ClCompile Include="src\TabToolBarPage.cpp" />
+    <ClCompile Include="src\TabToolBarSubGroup.cpp" />
     <ClCompile Include="src\TabWidget.cpp" />
     <ClCompile Include="src\TextEditor.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
@@ -177,7 +180,7 @@
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
     <ClCompile Include="src\TextEditorView.cpp" />
-    <ClCompile Include="src\TabToolBarManager.cpp" />
+    <ClCompile Include="src\TabToolBar.cpp" />
     <ClCompile Include="src\ToolButton.cpp" />
     <ClCompile Include="src\ToolTipHandler.cpp" />
     <ClCompile Include="src\TreeWidget.cpp" />
@@ -202,7 +205,10 @@
     <ClInclude Include="include\OTWidgets\MainWindow.h" />
     <ClInclude Include="include\OTWidgets\SignalBlockWrapper.h" />
     <ClInclude Include="include\OTWidgets\StatusBarManager.h" />
-    <ClInclude Include="include\OTWidgets\TabToolBarManager.h" />
+    <ClInclude Include="include\OTWidgets\TabToolBar.h" />
+    <ClInclude Include="include\OTWidgets\TabToolBarGroup.h" />
+    <ClInclude Include="include\OTWidgets\TabToolBarPage.h" />
+    <ClInclude Include="include\OTWidgets\TabToolBarSubGroup.h" />
     <ClInclude Include="include\OTWidgets\WidgetViewDockManager.h" />
     <QtMoc Include="include\OTWidgets\ApplicationPropertiesManager.h" />
     <ClInclude Include="include\OTWidgets\AbstractPlot.h" />
