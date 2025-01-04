@@ -21,7 +21,7 @@ namespace ot {
 		enum class TableHeaderMode {
 			NoHeader,
 			Horizontal,
-			Vertical,
+			Vertical
 		};
 
 		static std::string toString(TableHeaderMode _headerMode);

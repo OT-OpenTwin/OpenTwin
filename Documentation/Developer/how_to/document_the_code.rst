@@ -46,10 +46,12 @@ If the return is not described in the ``\brief`` or detailed description add a `
 
     //! \fn bool switchToRed(bool _delay)
     //! \brief Brief description.
-    //! Detailed description.
-    //! Detailed description.
+    //! More detailed description.
+    //! More detailed description.
     //! \param _delay Parameter description.
+    //! More _delay parameter description.
     //! \return Return value description.
+    //! More return value description.
     bool switchToRed(bool _delay);
 
 Class Members
@@ -64,8 +66,8 @@ Class members should have a ``\brief`` set. Adding ``\var`` allows to reference 
 
         //! \var m_dbl
         //! \brief Description.
-        //! Detailed description.
-        //! Detailed description.
+        //! More detailed description.
+        //! More detailed description.
         double m_dbl;
     };
 
@@ -78,14 +80,16 @@ Enums should have a ``\brief`` set for the enum and every entry in the enum.
 
     //! \enum MyEnum
     //! \brief Brief description.
-    //! Detailed description.
-    //! Detailed description.
+    //! More detailed description.
+    //! More detailed description.
     enum MyEnum {
         MyValue, //! \brief Description
 
         //! \brief Brief description
-        //! Detailed description.
-        //! Detailed description.
+        //! More detailed description.
+        //! More detailed description.
+        //! \warning Warning box content.
+        //! More warning box content.
         MySecondValue
     };
 
@@ -98,8 +102,8 @@ Macros or preprocessor definitions should have a ``\brief`` set.
 
     //! \def MY_MACRO
     //! \brief Brief description.
-    //! Detailed description.
-    //! Detailed description.
+    //! More detailed description.
+    //! More detailed description.
     #define MY_MACRO
 
 Namespaces
@@ -113,11 +117,12 @@ To display a box around the text use either ``\note``, ``\question`` or ``\warni
 .. code:: c++
 
     //! \brief Brief description.
-    //! Detailed description.
-    //! Detailed description.
+    //! More detailed description.
+    //! More detailed description.
     //! \warning Warning box content.
-    //! Detailed description.
+    //! More warning content.
     //! \note Note box content.
+    //! More note content.
     //! \param _force Parameter description.
     //! \return Return value decription.
     bool shutdown(bool _force);

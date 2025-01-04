@@ -48,7 +48,8 @@ ___prefix constexpr ___enumName operator ~ (___enumName _lhv) { return static_ca
 
 //! \def OT_ADD_FRIEND_FLAG_FUNCTIONS
 //! \brief Will add the default bitwise operations for the provided private 32/64 bit bitfield.
-//! Use this at the same scope inside the class where the enum is defined.
+//! Use this at the same scope inside the class where the enum is defined. <br>
+//! It is not wrong to use OT_ADD_FRIEND_FLAG_FUNCTIONS instead of OT_ADD_FLAG_FUNCTIONS but the scope is important.
 //! 
 //!		class MyClass {
 //!		private:
@@ -61,24 +62,39 @@ ___prefix constexpr ___enumName operator ~ (___enumName _lhv) { return static_ca
 //!			OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum)
 //!		};
 //! 
-//!		// or
+//!		//  - - - or - - -
 //! 
 //!		class MyClass2 {
+//!		public:
+//!			enum MyEnum2 {
+//!				...
+//!			};
+//!			typedef ot::Flags<MyEnum2> MyFlags2;
+//! 
+//!			// Friend is not needed but also not wrong.
+//!			// Instead of OT_ADD_FRIEND_FLAG_FUNCTIONS use:
+//!			// OT_ADD_FLAG_FUNCTIONS at the end of the file.
+//!			OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass2::MyEnum2)
+//!		};
+//! 
+//!		//  - - - or - - -
+//! 
+//!		class MyClass3 {
 //!		private:
 //!				class MyNestedClass {
 //!				public:
-//!					enum MyEnum2 {
+//!					enum MyEnum3 {
 //!						...
 //!					};
-//!					typedef ot::Flags<MyEnum2> MyFlags2;
+//!					typedef ot::Flags<MyEnum3> MyFlags3;
 //! 
 //!					// Friend is needed since it is a public enum
 //!					// but the parent class is in a private scope.
-//!					OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum2)
+//!					OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass3::MyEnum3)
 //!				};
 //!		};
 //! 
-//!		// < Not here! >
+//!		// < Here only OT_ADD_FLAG_FUNCTIONS >
 //! 
 //! \note Only enumration types are allowed.
 #define OT_ADD_FRIEND_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(friend , long long, ___enumName)
@@ -114,7 +130,8 @@ ___prefix constexpr ___enumName operator ~ (___enumName _lhv) { return static_ca
 
 //! \def OT_ADD_FRIEND_FLAG_FUNCTIONS
 //! \brief Will add the default bitwise operations for the provided private 32/64 bit bitfield.
-//! Use this at the same scope inside the class where the enum is defined.
+//! Use this at the same scope inside the class where the enum is defined. <br>
+//! It is not wrong to use OT_ADD_FRIEND_FLAG_FUNCTIONS instead of OT_ADD_FLAG_FUNCTIONS but the scope is important.
 //! 
 //!		class MyClass {
 //!		private:
@@ -127,24 +144,39 @@ ___prefix constexpr ___enumName operator ~ (___enumName _lhv) { return static_ca
 //!			OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum)
 //!		};
 //! 
-//!		// or
+//!		//  - - - or - - -
 //! 
 //!		class MyClass2 {
+//!		public:
+//!			enum MyEnum2 {
+//!				...
+//!			};
+//!			typedef ot::Flags<MyEnum2> MyFlags2;
+//! 
+//!			// Friend is not needed but also not wrong.
+//!			// Instead of OT_ADD_FRIEND_FLAG_FUNCTIONS use:
+//!			// OT_ADD_FLAG_FUNCTIONS at the end of the file.
+//!			OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass2::MyEnum2)
+//!		};
+//! 
+//!		//  - - - or - - -
+//! 
+//!		class MyClass3 {
 //!		private:
 //!				class MyNestedClass {
 //!				public:
-//!					enum MyEnum2 {
+//!					enum MyEnum3 {
 //!						...
 //!					};
-//!					typedef ot::Flags<MyEnum2> MyFlags2;
+//!					typedef ot::Flags<MyEnum3> MyFlags3;
 //! 
 //!					// Friend is needed since it is a public enum
 //!					// but the parent class is in a private scope.
-//!					OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass::MyEnum2)
+//!					OT_ADD_FRIEND_FLAG_FUNCTIONS(MyClass3::MyEnum3)
 //!				};
 //!		};
 //! 
-//!		// < Not here! >
+//!		// < Here only OT_ADD_FLAG_FUNCTIONS >
 //! 
 //! \note Only enumration types are allowed.
 #define OT_ADD_FRIEND_FLAG_FUNCTIONS(___enumName) OT_ADD_FLAG_FUNCTIONS_IMPL(friend , long, ___enumName)
@@ -176,7 +208,8 @@ namespace ot {
 	//! 
 	//! \note Only enumration types are allowed.
 	//! The enumerations should provided const expressions in the same (or higher) scope the flags are used at.
-	//! \ref OT_ADD_FLAG_FUNCTIONS_IMPL
+	//! 
+	//! \ref OT_ADD_FLAG_FUNCTIONS
 	//! \ref OT_ADD_FRIEND_FLAG_FUNCTIONS
 	template<typename T> class OT_CORE_API_EXPORTONLY Flags {
 	private:
