@@ -47,7 +47,7 @@ void ShapesBase::deleteNonStandardProperties(EntityGeometry* geometryEntity)
 
 	for (auto prop : propertyList)
 	{
-		if (prop->getGroup() != "Appearance" && prop->getGroup() != "Transformation" && prop->getGroup() != "Solver" && prop->getGroup() != "Mesh")
+		if (prop->getGroup() != "Appearance" && prop->getGroup() != "Transformation" && prop->getGroup() != "Solver" && prop->getGroup() != "Mesh" && prop->getGroup() != "Mesh refinement")
 		{
 			// We do have a property belonging to a non-standard group
 			geometryEntity->getProperties().deleteProperty(prop->getName(), prop->getGroup());
