@@ -29,6 +29,8 @@ namespace ot {
 		TabToolBarGroup(TabToolBarPage* _parentPage, const QString& _name);
 		virtual ~TabToolBarGroup();
 
+		const std::string& getName(void) const { return m_name; };
+
 		void setParentTabToolBarPage(TabToolBarPage* _parentTabToolBarPage) { m_parentPage = _parentTabToolBarPage; };
 		TabToolBarPage* getParentTabToolBarPage(void) { return m_parentPage; };
 		const TabToolBarPage* getParentTabToolBarPage(void) const { return m_parentPage; };
@@ -38,6 +40,7 @@ namespace ot {
 		void forgetSubGroup(TabToolBarSubGroup* _subGroup);
 
 	private:
+		std::string m_name;
 		tt::Group* m_group;
 
 		TabToolBarPage* m_parentPage;

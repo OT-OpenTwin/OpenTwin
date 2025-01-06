@@ -22,11 +22,14 @@ namespace ot {
 		TabToolBarSubGroup(TabToolBarGroup* _parentGroup);
 		virtual ~TabToolBarSubGroup();
 
+		const std::string& getName(void) const { return m_name; };
+
 		void setParentTabToolBarGroup(TabToolBarGroup* _parentTabToolBarGroup) { m_parentGroup = _parentTabToolBarGroup; };
 		TabToolBarGroup* getParentTabToolBarGroup(void) { return m_parentGroup; };
 		const TabToolBarGroup* getParentTabToolBarGroup(void) const { return m_parentGroup; };
 
 	private:
+		std::string m_name;
 		tt::SubGroup* m_subGroup;
 
 		TabToolBarGroup* m_parentGroup;

@@ -8,8 +8,12 @@
 // OpenTwin header
 #include "OTWidgets/AbstractToolBar.h"
 
+// Qt header
+#include <QtCore/qstring.h>
+
 // std header
 #include <list>
+#include <string>
 
 namespace tt { class TabToolbar; }
 
@@ -27,9 +31,17 @@ namespace ot {
 		virtual QToolBar* getToolBar(void) override;
 		virtual const QToolBar* getToolBar(void) const override;
 
+		TabToolBarPage* addPage(const std::string& _pageName);
+
 		//! @brief Removes the specified page from the lists.
 		//! Caller keeps ownership of the page.
 		void forgetPage(TabToolBarPage* _page);
+
+		TabToolBarPage* findPage(const std::string& _pageName);
+		const TabToolBarPage* findPage(const std::string& _pageName) const;
+		bool hasPage(const std::string& _pageName) const { return this->findPage(_pageName) != nullptr; };
+
+		TabToolBarPage* findPageFromTitle(const QString& _pageTitle);
 
 	private:
 		tt::TabToolbar* m_toolBar;

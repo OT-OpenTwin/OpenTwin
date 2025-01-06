@@ -14,6 +14,7 @@
 
 // std header
 #include <list>
+#include <string>
 
 namespace tt { class Page; }
 
@@ -26,8 +27,11 @@ namespace ot {
 		OT_DECL_NOCOPY(TabToolBarPage)
 		OT_DECL_NODEFAULT(TabToolBarPage)
 	public:
-		TabToolBarPage(TabToolBar* _parentTabToolBar, int _index, const QString& _name);
+		TabToolBarPage(TabToolBar* _parentTabToolBar, tt::Page* _page, const std::string& _name);
 		virtual ~TabToolBarPage();
+
+		const std::string& getName(void) const { return m_name; };
+		QString getTitle(void) const;
 
 		void setParentTabToolBar(TabToolBar* _parentTabToolBar) { m_parentTabToolBar = _parentTabToolBar; };
 		TabToolBar* getParentTabToolBar(void) { return m_parentTabToolBar; };
@@ -38,6 +42,7 @@ namespace ot {
 		void forgetGroup(TabToolBarGroup* _group);
 
 	private:
+		std::string m_name;
 		tt::Page* m_page;
 
 		TabToolBar* m_parentTabToolBar;

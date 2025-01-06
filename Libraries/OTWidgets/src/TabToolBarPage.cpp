@@ -11,10 +11,10 @@
 // TabToolBar header
 #include <TabToolbar/Page.h>
 
-ot::TabToolBarPage::TabToolBarPage(TabToolBar* _parentTabToolBar, int _index, const QString& _name)
-	: m_parentTabToolBar(_parentTabToolBar)
+ot::TabToolBarPage::TabToolBarPage(TabToolBar* _parentTabToolBar, tt::Page* _page, const std::string& _name) :
+	m_name(_name), m_page(_page), m_parentTabToolBar(_parentTabToolBar)
 {
-	m_page = new tt::Page(_index, _name);
+
 }
 
 ot::TabToolBarPage::~TabToolBarPage() {
@@ -27,6 +27,10 @@ ot::TabToolBarPage::~TabToolBarPage() {
 
 	delete m_page;
 	m_page = nullptr;
+}
+
+QString ot::TabToolBarPage::getTitle(void) const {
+	return m_page->objectName();
 }
 
 void ot::TabToolBarPage::forgetGroup(TabToolBarGroup* _group) {
