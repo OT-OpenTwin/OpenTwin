@@ -1331,7 +1331,7 @@ void ExternalServicesComponent::openProject(const std::string & _projectName, co
 		assert(m_keepAliveTimer == nullptr);
 		m_keepAliveTimer = new QTimer(this);
 		connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAlive()));
-		m_keepAliveTimer->start(120000);
+		m_keepAliveTimer->start(60000);
 
 		uiLock.setNoUnlock();
 
@@ -2093,6 +2093,15 @@ std::string ExternalServicesComponent::handlePreShutdown(ot::JsonDocument& _docu
 std::string ExternalServicesComponent::handleEmergencyShutdown(ot::JsonDocument& _document) {
 	AppBase::instance()->showErrorPrompt("An unexpected error occurred and the session needs to be closed.", "Error");
 	
+	std::thread exitThread(&ot::intern::exitAsync, 1);
+	exitThread.detach();
+
+	return "";
+}
+
+std::string ExternalServicesComponent::handleConnectionLoss(ot::JsonDocument& _document) {
+	AppBase::instance()->showErrorPrompt("The session needs to be closed, since the connection to the server has been lost.\n\nPlease note that the project may remain locked for up to two minutes before it can be reopened.", "Error");
+
 	std::thread exitThread(&ot::intern::exitAsync, 1);
 	exitThread.detach();
 

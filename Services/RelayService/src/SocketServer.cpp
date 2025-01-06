@@ -208,11 +208,22 @@ void SocketServer::onNewConnection()
     connect(pSocket, &QWebSocket::textMessageReceived, this, &SocketServer::processMessage);
     connect(pSocket, &QWebSocket::disconnected, this, &SocketServer::socketDisconnected);
 
+	m_lastReceiveTime = std::chrono::system_clock::now();
+
+	if (m_keepAliveTimer == nullptr)
+	{
+		m_keepAliveTimer = new QTimer(this);
+		connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAlive()));
+		m_keepAliveTimer->start(30000);
+	}
+
     m_clients << pSocket;
 }
 
 void SocketServer::processMessage(QString message)
 {
+	m_lastReceiveTime = std::chrono::system_clock::now();
+
 	try {
 		std::string stdMessage = message.toStdString();
 
@@ -300,17 +311,44 @@ void SocketServer::slotSocketClosed(void) {
 	QCoreApplication::quit();
 }
 
+void SocketServer::keepAlive()
+{
+	auto currentTime = std::chrono::system_clock::now();
+
+	std::chrono::duration<double> elapsed_seconds = currentTime - m_lastReceiveTime;
+
+	if (elapsed_seconds.count() > 120.0)
+	{
+		// We have not heard from the frontend for more than two minutes (altough we should at least get a ping every 60 seconds)
+		// Therefore, we assume that the connection was interrupted, but we did not get a socket closed message.
+		// In order to avoid blocking the session, we will now terminate 
+		
+		OT_LOG_E("No data received from frontend for more than 120 seconds. Assuming connection is lost");
+
+		exit(0);
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Helper
 
 SocketServer::SocketServer()
-	: QObject(nullptr), m_pWebSocketServer(nullptr), responseReceived(false), m_websocketPort(0)
+	: QObject(nullptr), m_pWebSocketServer(nullptr), responseReceived(false), m_websocketPort(0), m_keepAliveTimer(nullptr)
 {
 
 }
 
 SocketServer::~SocketServer() {
+	
+	if (m_keepAliveTimer != nullptr)
+	{
+		m_keepAliveTimer->stop();
+		delete m_keepAliveTimer;
+
+		m_keepAliveTimer = nullptr;
+	}
+
 	if (m_pWebSocketServer) {
 		m_pWebSocketServer->close();
 		delete m_pWebSocketServer;
