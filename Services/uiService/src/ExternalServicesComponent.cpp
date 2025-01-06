@@ -1381,9 +1381,11 @@ void ExternalServicesComponent::determineViews(const std::string &modelServiceUR
 
 void ExternalServicesComponent::closeProject(bool _saveChanges) {
 	try {
+		AppBase* app{ AppBase::instance() };
+
 		UserSettings::instance().clear();
 
-		AppBase * app{ AppBase::instance() };
+		app->initializeDefaultUserSettings();
 
 		OT_LOG_D("Closing project { name = \"" + app->getCurrentProjectName() + "\"; SaveChanges = " + (_saveChanges ? "True" : "False"));
 
