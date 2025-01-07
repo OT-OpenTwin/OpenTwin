@@ -166,12 +166,10 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 {
 	_uiComponent->displayMessage("Executing Database Acccess Block: " + _blockName);
 	const std::string debugQuery = bsoncxx::to_json(m_query.view());
-	//if (Application::instance()->uiComponent()) {
-	//	Application::instance()->uiComponent()->displayMessage("Executing query: " + debugQuery);
-	//}
-
-	const std::string debugProjection = bsoncxx::to_json(m_projection.view());
 	_uiComponent->displayMessage("Executing query: " + debugQuery);
+	
+	const std::string debugProjection = bsoncxx::to_json(m_projection.view());
+	_uiComponent->displayMessage("Executing projection: " + debugProjection);
 
 	auto dbResponse = m_resultCollectionAccess->SearchInResultCollection(m_query, m_projection, 0);
 	ot::JSONToVariableConverter converter;
@@ -328,9 +326,9 @@ void BlockHandlerDatabaseAccess::buildRangeQuery(const ValueComparisionDefinitio
 		if (dataTypeCompatible) {
 			const std::string firstValue = valueStr.substr(0, posDelimiter);
 			const std::string secondValue = valueStr.substr(posDelimiter + 1);
-
-			ot::Variable vFirstValue(_converter(firstValue, '.'));
-			ot::Variable vSecondValue(_converter(secondValue, '.'));
+			
+			ot::Variable vFirstValue= setValueFromString(firstValue, type);
+			ot::Variable vSecondValue= setValueFromString(secondValue, type);
 
 			std::string correspondingComparator;
 			if (openingBracket == '(') {
@@ -341,6 +339,7 @@ void BlockHandlerDatabaseAccess::buildRangeQuery(const ValueComparisionDefinitio
 			}
 
 			auto firstCompare = _builder.CreateComparison(correspondingComparator, vFirstValue);
+			auto firstCompareQuery = _builder.GenerateFilterQuery(name, std::move(firstCompare));
 
 			if (closingBracket == ')') {
 				correspondingComparator = "<";
@@ -348,11 +347,10 @@ void BlockHandlerDatabaseAccess::buildRangeQuery(const ValueComparisionDefinitio
 			else {
 				correspondingComparator = "<=";
 			}
-
 			auto secondCompare = _builder.CreateComparison(correspondingComparator, vSecondValue);
-
-			m_comparisons.push_back(_builder.GenerateFilterQuery(name, std::move(firstCompare)));
-			m_comparisons.push_back(_builder.GenerateFilterQuery(name, std::move(secondCompare)));
+			auto secondCompareQuery = _builder.GenerateFilterQuery(name, std::move(secondCompare));
+			
+			m_comparisons.push_back(_builder.ConnectWithAND({ firstCompareQuery,secondCompareQuery}));
 		}
 		else {
 			throw std::invalid_argument("Query for interval incorrect. The datatype of the selected field helds no numerical value.");
