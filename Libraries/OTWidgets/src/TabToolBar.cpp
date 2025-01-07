@@ -41,18 +41,46 @@ const QToolBar* ot::TabToolBar::getToolBar(void) const {
 	return m_toolBar;
 }
 
-ot::TabToolBarPage* ot::TabToolBar::addPage(const std::string& _pageName) {
-	if (this->hasPage(_pageName)) {
-		OT_LOG_E("Page \"" + _pageName + "\" already exists");
-		return nullptr;
+ot::TabToolBarPage* ot::TabToolBar::addPage(const std::string& _pageName, bool _returnExisting) {
+	TabToolBarPage* newPage = this->findPage(_pageName);
+	if (newPage) {
+		if (_returnExisting) {
+			return newPage;
+		}
+		else {
+			OT_LOG_E("Page \"" + _pageName + "\" already exists");
+			return nullptr;
+		}
 	}
 	
 	tt::Page* page = m_toolBar->AddPage(QString::fromStdString(_pageName));
 
-	TabToolBarPage* newPage = new TabToolBarPage(this, page, _pageName);
+	newPage = new TabToolBarPage(this, page, _pageName);
 	m_pages.push_back(newPage);
 
 	return newPage;
+}
+
+ot::TabToolBarGroup* ot::TabToolBar::addGroup(const std::string& _pageName, const std::string& _groupName, bool _returnExisting) {
+	TabToolBarPage* page = this->findPage(_pageName);
+	if (!page) {
+		OT_LOG_E("Page \"" + _pageName + "\" not found");
+		return nullptr;
+	}
+	else {
+		return page->addGroup(_groupName, _returnExisting);
+	}
+}
+
+ot::TabToolBarSubGroup* ot::TabToolBar::addSubGroup(const std::string& _pageName, const std::string& _groupName, const std::string& _subGroupName, bool _returnExisting) {
+	TabToolBarPage* page = this->findPage(_pageName);
+	if (!page) {
+		OT_LOG_E("Page \"" + _pageName + "\" not found");
+		return nullptr;
+	}
+	else {
+		return page->addSubGroup(_groupName, _subGroupName, _returnExisting);
+	}
 }
 
 void ot::TabToolBar::forgetPage(TabToolBarPage* _page) {
@@ -80,11 +108,46 @@ const ot::TabToolBarPage* ot::TabToolBar::findPage(const std::string& _pageName)
 	return nullptr;
 }
 
-ot::TabToolBarPage* ot::TabToolBar::findPageFromTitle(const QString& _pageTitle) {
-	for (TabToolBarPage* page : m_pages) {
-		if (page->getTitle() == _pageTitle) {
-			return page;
-		}
+ot::TabToolBarGroup* ot::TabToolBar::findGroup(const std::string& _pageName, const std::string& _groupName) {
+	TabToolBarPage* page = this->findPage(_pageName);
+	if (!page) {
+		OT_LOG_E("Page \"" + _pageName + "\" not found");
+		return nullptr;
 	}
-	return nullptr;
+	else {
+		return page->findGroup(_groupName);
+	}
+}
+
+const ot::TabToolBarGroup* ot::TabToolBar::findGroup(const std::string& _pageName, const std::string& _groupName) const {
+	const TabToolBarPage* page = this->findPage(_pageName);
+	if (!page) {
+		OT_LOG_E("Page \"" + _pageName + "\" not found");
+		return nullptr;
+	}
+	else {
+		return page->findGroup(_groupName);
+	}
+}
+
+ot::TabToolBarSubGroup* ot::TabToolBar::findSubGroup(const std::string& _pageName, const std::string& _groupName, const std::string& _subGroupName) {
+	TabToolBarPage* page = this->findPage(_pageName);
+	if (!page) {
+		OT_LOG_E("Page \"" + _pageName + "\" not found");
+		return nullptr;
+	}
+	else {
+		return page->findSubGroup(_groupName, _subGroupName);
+	}
+}
+
+const ot::TabToolBarSubGroup* ot::TabToolBar::findSubGroup(const std::string& _pageName, const std::string& _groupName, const std::string& _subGroupName) const {
+	const TabToolBarPage* page = this->findPage(_pageName);
+	if (!page) {
+		OT_LOG_E("Page \"" + _pageName + "\" not found");
+		return nullptr;
+	}
+	else {
+		return page->findSubGroup(_groupName, _subGroupName);
+	}
 }
