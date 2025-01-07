@@ -391,8 +391,6 @@ private:
 
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
 
-	void makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view) const;
-
 	// #################################################################
 
 	std::string										m_sessionServiceURL;

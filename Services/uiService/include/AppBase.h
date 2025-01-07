@@ -432,6 +432,8 @@ public:
 
 	void destroyObjects(const std::vector<ak::UID> & _objects);
 
+	void makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view, bool _ignoreEntitySelect);
+
 	static AppBase * instance(void);
 
 	// #######################################################################################################################

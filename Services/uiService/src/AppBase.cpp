@@ -1751,6 +1751,22 @@ void AppBase::destroyObjects(const std::vector<ot::UID> & _objects) {
 	}
 }
 
+void AppBase::makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view, bool _ignoreEntitySelect) {
+	ot::WidgetViewManager::ManagerConfigFlags managerFlags = ot::WidgetViewManager::instance().getConfigFlags();
+	ot::WidgetViewManager::instance().setConfigFlags(managerFlags & ot::WidgetViewManager::InputFocusOnFocusChangeMask);
+
+	ViewHandlingFlags viewFlags = m_viewHandling;
+	if (_ignoreEntitySelect) {
+		m_viewHandling |= ViewHandlingConfig::SkipEntitySelection;
+	}
+
+	_view->setAsCurrentViewTab();
+
+	m_viewHandling = viewFlags;
+
+	ot::WidgetViewManager::instance().setConfigFlags(managerFlags);
+}
+
 AppBase * AppBase::instance(void) {
 	if (g_app == nullptr) {
 		g_app = new AppBase;
