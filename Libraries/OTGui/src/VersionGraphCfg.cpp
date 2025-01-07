@@ -76,9 +76,9 @@ void ot::VersionGraphCfg::incrementActiveVersion(void) {
 }
 
 std::string ot::VersionGraphCfg::incrementVersion(const std::string& _version) {
+	// If the current version is empty the incremented version is 1
 	if (_version.empty()) {
-		OT_LOG_E("Active version is empty!");
-		return std::string();
+		return "1";
 	}
 
 	// Find current version number
