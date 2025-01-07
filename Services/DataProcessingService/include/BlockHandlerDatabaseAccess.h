@@ -37,6 +37,7 @@ private:
 	void buildRangeQuery(const ValueComparisionDefinition& _definition, AdvancedQueryBuilder& _builder, ot::StringToVariableConverter& _converter);
 	void buildContainsQuery(const ValueComparisionDefinition& _definition, AdvancedQueryBuilder& _builder, ot::StringToVariableConverter& _converter, bool _contains);
 	void setValueFromString(std::unique_ptr<ot::Variable>& _value, const std::string& _valueString, const std::string& _valueType) const;
+	ot::Variable setValueFromString(const std::string& _valueString, const std::string& _valueType) const;
 	void addComparision(const ValueComparisionDefinition& _definition);
 	void addParameter(ValueComparisionDefinition& definition, const MetadataParameter& parameter, const std::string& connectorName);
 };

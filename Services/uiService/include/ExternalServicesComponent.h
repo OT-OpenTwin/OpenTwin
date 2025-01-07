@@ -191,6 +191,7 @@ public:
 	OT_HANDLER(handleShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceShutdown, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handlePreShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServicePreShutdown, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleEmergencyShutdown, ExternalServicesComponent, OT_ACTION_CMD_ServiceEmergencyShutdown, ot::MessageType::ALL_MESSAGE_TYPES)
+	OT_HANDLER(handleConnectionLoss, ExternalServicesComponent, OT_ACTION_CMD_ServiceConnectionLost, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceConnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceConnected, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleServiceDisconnected, ExternalServicesComponent, OT_ACTION_CMD_ServiceDisconnected, ot::MessageType::ALL_MESSAGE_TYPES)
 	OT_HANDLER(handleShutdownRequestedByService, ExternalServicesComponent, OT_ACTION_CMD_ShutdownRequestedByService, ot::MessageType::ALL_MESSAGE_TYPES)
@@ -389,8 +390,6 @@ private:
 	void determineViews(const std::string& modelServiceURL);
 
 	void sendTableSelectionInformation(const std::string& _serviceUrl, const std::string& _callbackFunction, ot::TableView* _table);
-
-	void makeWidgetViewCurrentWithoutInputFocus(ot::WidgetView* _view) const;
 
 	// #################################################################
 

@@ -152,7 +152,7 @@ void WebsocketClient::slotSocketDisconnected() {
 	if (!m_sessionIsClosing) {
 		// This is an unexpected disconnect of the relay service -> we need to close the session
 		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceEmergencyShutdown, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceConnectionLost, doc.GetAllocator()), doc.GetAllocator());
 		m_currentlyProcessingQueuedMessage = true;
 		queueAction(doc.toJson().c_str(), "");
 	}

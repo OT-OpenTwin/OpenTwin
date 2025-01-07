@@ -461,6 +461,10 @@ void EdgesOperationBase::performOperation(EntityGeometry* geometryEntity, Entity
 		
 		geometryEntity->getBrepEntity()->setFaceNameMap(resultFaceNames);
 	}
+	else
+	{
+		resultFaceNames = allFaceNames; // We did not change the shape
+	}
 }
 
 void EdgesOperationBase::getAllEdgesForVertex(EntityBrep* baseBrep, TopoDS_Vertex& aVertex, std::map<const opencascade::handle<TopoDS_TShape>, std::string>& allEdgesForOperation, std::list<opencascade::handle<TopoDS_TShape>>& allEdgesForVertex)
