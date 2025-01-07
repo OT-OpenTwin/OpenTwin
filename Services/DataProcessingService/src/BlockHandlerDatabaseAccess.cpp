@@ -171,7 +171,7 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	//}
 
 	const std::string debugProjection = bsoncxx::to_json(m_projection.view());
-	_uiComponent->displayMessage("Executing query: " + debugProjection);
+	_uiComponent->displayMessage("Executing query: " + debugQuery);
 
 	auto dbResponse = m_resultCollectionAccess->SearchInResultCollection(m_query, m_projection, 0);
 	ot::JSONToVariableConverter converter;
@@ -380,8 +380,10 @@ void BlockHandlerDatabaseAccess::buildContainsQuery(const ValueComparisionDefini
 	// Get values
 	std::list<std::string> valueStrings = ot::String::split(valueStr, delimiter);
 	std::list<ot::Variable> values;
-	for (const std::string& value : valueStrings) {
-		values.push_back(ot::Variable(_converter(value, '.')));
+	
+	for (const std::string& valueStr : valueStrings) {
+		ot::Variable value = setValueFromString(valueStr, _definition.getType());
+		values.push_back(value);
 	}
 	if (values.empty()) {
 		throw std::invalid_argument("Query for contains incorrect. No values provided.");
@@ -389,7 +391,9 @@ void BlockHandlerDatabaseAccess::buildContainsQuery(const ValueComparisionDefini
 
 	if (_contains) {
 		auto compare = _builder.CreateComparisionEqualToAnyOf(values);
-		m_comparisons.push_back(_builder.GenerateFilterQuery(name, std::move(compare)));
+		auto containsQuery = _builder.GenerateFilterQuery(name, std::move(compare));
+		const std::string temp = bsoncxx::to_json(containsQuery.view());
+		m_comparisons.push_back(containsQuery);
 	}
 	else {
 		auto compare = _builder.CreateComparisionEqualNoneOf(values);
@@ -398,35 +402,43 @@ void BlockHandlerDatabaseAccess::buildContainsQuery(const ValueComparisionDefini
 }
 
 void BlockHandlerDatabaseAccess::setValueFromString(std::unique_ptr<ot::Variable>& _value, const std::string& _valueString, const std::string& _valueType) const {
+	ot::Variable value = setValueFromString(_valueString, _valueType);
+	_value.reset(new ot::Variable(value));
+}
+
+ot::Variable BlockHandlerDatabaseAccess::setValueFromString(const std::string& _valueString, const std::string& _valueType) const
+{
+	ot::Variable value;
 	if (_valueType == ot::TypeNames::getBoolTypeName()) {
 		std::string boolString = _valueString;
 		std::transform(boolString.begin(), boolString.end(), boolString.begin(),
 			[](unsigned char c) { return std::tolower(c); });
 		if (boolString == "true") {
-			_value.reset(new ot::Variable(true));
+			value = ot::Variable(true);
 		}
 		else if (boolString == "false") {
-			_value.reset(new ot::Variable(false));
+			value = ot::Variable(false);
 		}
 		else {
 			throw std::invalid_argument("Boolean value expected (true or false).");
 		}
 	}
 	else if (_valueType == ot::TypeNames::getStringTypeName()) {
-		_value.reset(new ot::Variable(_valueString));
+		value = ot::Variable(_valueString);
 	}
 	else if (_valueType == ot::TypeNames::getDoubleTypeName()) {
-		_value.reset(new ot::Variable(std::stod(_valueString)));
+		value = ot::Variable(std::stod(_valueString));
 	}
 	else if (_valueType == ot::TypeNames::getFloatTypeName()) {
-		_value.reset(new ot::Variable(std::stof(_valueString)));
+		value = ot::Variable(std::stof(_valueString));
 	}
 	else if (_valueType == ot::TypeNames::getInt32TypeName()) {
-		_value.reset(new ot::Variable(std::stoi(_valueString)));
+		value = ot::Variable(std::stoi(_valueString));
 	}
 	else if (_valueType == ot::TypeNames::getInt64TypeName()) {
-		_value.reset(new ot::Variable(std::stoll(_valueString)));
+		value = ot::Variable(std::stoll(_valueString));
 	}
+	return value;
 }
 
 void BlockHandlerDatabaseAccess::addComparision(const ValueComparisionDefinition& _definition)
