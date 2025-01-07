@@ -156,7 +156,16 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		{
 			_uiComponent->displayMessage("Create " + seriesName + ":\n");
 			KeyValuesExtractor seriesMetaDataRangeSelections;
-			std::list<DatasetDescription> datasets = extractDataset(metadataAssemblyByName->second, loadedTables, seriesMetaDataRangeSelections);
+			std::list<DatasetDescription> datasets; 
+			try
+			{
+				datasets = extractDataset(metadataAssemblyByName->second, loadedTables, seriesMetaDataRangeSelections);
+			}
+			catch (std::exception& e)
+			{
+				_uiComponent->displayMessage("Failed to extract data from tables. " + std::string(e.what()) + "\n" + Documentation::INSTANCE()->GetFullDocumentation());
+				return;
+			}
 			std::list<std::shared_ptr<MetadataEntry>> seriesMetadata = rangeData2MetadataEntries(std::move(seriesMetaDataRangeSelections));
 			if (datasets.empty())
 			{

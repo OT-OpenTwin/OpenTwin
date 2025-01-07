@@ -9,6 +9,7 @@
 #include <QtCore/qlist.h>
 #include <QtCore/qbytearray.h>
 #include <QtNetwork/qsslerror.h>
+#include <QtCore/qtimer.h>
 
 // std header
 #include <string>
@@ -61,6 +62,7 @@ private Q_SLOTS:
 	void socketDisconnected(void);
 	void onSslErrors(const QList<QSslError> &errors);
 	void slotSocketClosed(void);
+	void keepAlive();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -85,6 +87,8 @@ private:
 	std::string responseText;
 	bool responseReceived;
 	ot::SystemInformation m_systemLoad;
+	std::chrono::system_clock::time_point m_lastReceiveTime;
+	QTimer* m_keepAliveTimer;
 };
 
 #endif //SOCKETSERVER_H
