@@ -118,7 +118,7 @@ ot::VersionGraphManager::VersionGraphManager() {
 		QString::fromStdString(viewModeToString(ViewMode::LabeledOnly)),
 		QString::fromStdString(viewModeToString(ViewMode::Iterator))
 	});
-	m_modeSelector->setCurrentText(QString::fromStdString(viewModeToString(ViewMode::ViewAll)));
+	m_modeSelector->setCurrentText(QString::fromStdString(viewModeToString(ViewMode::Compact)));
 
 	m_graph = new VersionGraph;
 
