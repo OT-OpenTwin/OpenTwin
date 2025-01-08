@@ -21,8 +21,10 @@
   <ItemGroup>
     <ClInclude Include="include\OTGui\BasicGraphicsIntersectionItem.h" />
     <ClInclude Include="include\OTGui\Border.h" />
+    <ClInclude Include="include\OTGui\CheckBoxCfg.h" />
     <ClInclude Include="include\OTGui\CheckerboardPainter2D.h" />
     <ClInclude Include="include\OTGui\ColorStyleTypes.h" />
+    <ClInclude Include="include\OTGui\LineEditCfg.h" />
     <ClInclude Include="include\OTGui\MenuCfg.h" />
     <ClInclude Include="include\OTGui\MenuClickableEntryCfg.h" />
     <ClInclude Include="include\OTGui\MenuEntryCfg.h" />
@@ -112,15 +114,19 @@
     <ClInclude Include="include\OTGui\TableHeaderItemCfg.h" />
     <ClInclude Include="include\OTGui\TableRange.h" />
     <ClInclude Include="include\OTGui\TextEditorCfg.h" />
+    <ClInclude Include="include\OTGui\ToolButtonCfg.h" />
     <ClInclude Include="include\OTGui\Transform.h" />
     <ClInclude Include="include\OTGui\VersionGraphCfg.h" />
     <ClInclude Include="include\OTGui\VersionGraphVersionCfg.h" />
     <ClInclude Include="include\OTGui\VisualisationTypes.h" />
+    <ClInclude Include="include\OTGui\WidgetBaseCfg.h" />
+    <ClInclude Include="include\OTGui\WidgetBaseCfgFactory.h" />
     <ClInclude Include="include\OTGui\WidgetViewBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BasicGraphicsIntersectionItem.cpp" />
     <ClCompile Include="src\Border.cpp" />
+    <ClCompile Include="src\CheckBoxCfg.cpp" />
     <ClCompile Include="src\CheckerboardPainter2D.cpp" />
     <ClCompile Include="src\ColorStyleTypes.cpp" />
     <ClCompile Include="src\DefaultSyntaxHighlighterRules.cpp" />
@@ -137,6 +143,7 @@
     <ClCompile Include="src\GraphicsShapeItemCfg.cpp" />
     <ClCompile Include="src\Grid.cpp" />
     <ClCompile Include="src\KeySequence.cpp" />
+    <ClCompile Include="src\LineEditCfg.cpp" />
     <ClCompile Include="src\MenuCfg.cpp" />
     <ClCompile Include="src\MenuClickableEntryCfg.cpp" />
     <ClCompile Include="src\MenuEntryCfg.cpp" />
@@ -210,10 +217,13 @@
     <ClCompile Include="src\TableHeaderItemCfg.cpp" />
     <ClCompile Include="src\TableRange.cpp" />
     <ClCompile Include="src\TextEditorCfg.cpp" />
+    <ClCompile Include="src\ToolButtonCfg.cpp" />
     <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\VersionGraphCfg.cpp" />
     <ClCompile Include="src\VersionGraphVersionCfg.cpp" />
     <ClCompile Include="src\VisualisationTypes.cpp" />
+    <ClCompile Include="src\WidgetBaseCfg.cpp" />
+    <ClCompile Include="src\WidgetBaseCfgFactory.cpp" />
     <ClCompile Include="src\WidgetViewBase.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

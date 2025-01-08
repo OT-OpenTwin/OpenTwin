@@ -30,7 +30,6 @@ namespace ot {
 
 		class OT_SERVICEFOUNDATION_API_EXPORT UiComponent : public ServiceBase {
 		public:
-
 			enum entitySelectionType {
 				FACE,
 				EDGE,

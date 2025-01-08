@@ -375,6 +375,21 @@
     <ClInclude Include="include\OTGui\TableRange.h">
       <Filter>Header Files\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\WidgetBaseCfg.h">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\ToolButtonCfg.h">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\CheckBoxCfg.h">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\LineEditCfg.h">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTGui\WidgetBaseCfgFactory.h">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -663,6 +678,21 @@
       <Filter>Source Files\Menu</Filter>
     </ClCompile>
     <ClCompile Include="src\TableRange.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WidgetBaseCfg.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LineEditCfg.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CheckBoxCfg.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ToolButtonCfg.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WidgetBaseCfgFactory.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
   </ItemGroup>

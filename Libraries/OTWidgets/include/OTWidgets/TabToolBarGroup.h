@@ -35,6 +35,10 @@ namespace ot {
 		TabToolBarPage* getParentTabToolBarPage(void) { return m_parentPage; };
 		const TabToolBarPage* getParentTabToolBarPage(void) const { return m_parentPage; };
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Child management
+		
 		//! @brief Adds a new sub group to the TabToolBar group and returns it.
 		//! @param _subGroupName Name/Title of the sub group.
 		//! @param _returnExisting If true the sub group will be returned if it already exists. Otherwise nullptr will be returned in this case.
