@@ -25,13 +25,14 @@ BlockHandlerStorage::~BlockHandlerStorage()
 
 bool BlockHandlerStorage::executeSpecialized()
 {
-	auto& classFactory = Application::instance()->getClassFactory();
-	const auto modelComponent = Application::instance()->modelComponent();
-	const std::string collectionName = Application::instance()->getCollectionName();
-	ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, OT_INFO_SERVICE_TYPE_DataProcessingService);
 
 	if (allInputsAvailable())
 	{
+		auto& classFactory = Application::instance()->getClassFactory();
+		const auto modelComponent = Application::instance()->modelComponent();
+		const std::string collectionName = Application::instance()->getCollectionName();
+		ResultCollectionExtender resultCollectionExtender(collectionName, *modelComponent, &classFactory, OT_INFO_SERVICE_TYPE_DataProcessingService);
+
 		_uiComponent->displayMessage("Executing Storage Block: " + _blockName);
 		std::list<DatasetDescription> datasets = std::move(createDatasets());
 		const std::string seriesName = ot::FolderNames::DatasetFolder + "/" + m_blockEntityStorage->getSeriesName();
@@ -263,7 +264,8 @@ QuantityDescription* BlockHandlerStorage::extractQuantityDescription(const ot::C
 		for (auto dataEntry : pipelineData)
 		{
 			singleEntry = dynamic_cast<ot::GenericDataStructSingle*>(dataEntry.get());
-			quantityDescriptionCurve->addDatapoint(singleEntry);
+			ot::Variable value = singleEntry->getValue();
+			quantityDescriptionCurve->addDatapoint(std::move(value));
 		}
 		quantityDescription = quantityDescriptionCurve.release();
 	}
@@ -359,14 +361,29 @@ void BlockHandlerStorage::extractQuantityProperties(const ot::Connector& _connec
 	}
 	else
 	{
-		if (selectedProperties.m_propertyName == "" || selectedProperties.m_propertyUnit == "" || selectedProperties.m_propertyType == "")
+		if (selectedProperties.m_propertyName == "")
 		{
 			const std::string errorMessagePropertyMustBeSet = portLabel + " did not receive meta data from the processing pipeline. All properties for this quantity have to be set manually, which is currently not the case.";
 			throw std::exception(errorMessagePropertyMustBeSet.c_str());
 		}
 		_outName = selectedProperties.m_propertyName;
-		_outValueName = selectedProperties.m_propertyType;
-		_outUnit = selectedProperties.m_propertyUnit;
+
+		if (selectedProperties.m_propertyUnit == "")
+		{
+			_outUnit = " ";
+		}
+		else
+		{
+			_outUnit = selectedProperties.m_propertyUnit;
+		}
+		if (selectedProperties.m_propertyType == "")
+		{
+			_outValueName = " ";
+		}
+		else
+		{
+			_outValueName = selectedProperties.m_propertyType;
+		}
 	}
 
 
