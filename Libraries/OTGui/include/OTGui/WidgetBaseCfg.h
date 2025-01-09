@@ -12,6 +12,8 @@
 // std header
 #include <string>
 
+#pragma warning(disable:4251)
+
 namespace ot {
 
 	class OT_GUI_API_EXPORT WidgetBaseCfg : public Serializable {
