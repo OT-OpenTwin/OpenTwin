@@ -1,19 +1,18 @@
-//! @file ManagedGuiObject.cpp
+//! @file Widget.cpp
 //! @author Alexander Kuester (alexk95)
-//! @date September 2024
+//! @date January 2025
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTWidgets/ManagedGuiObject.h"
+#include "OTWidgets/Widget.h"
 
-ot::ManagedGuiObject::ManagedGuiObject()
-	: m_isEnabled(true), m_disabledCounter(0)
-{
+ot::Widget::Widget()
+	: m_isEnabled(true), m_isUnlocked(true), m_disabledCounter(0) {
 
 }
 
-ot::ManagedGuiObject::~ManagedGuiObject() {
+ot::Widget::~Widget() {
 
 }
 
@@ -21,31 +20,31 @@ ot::ManagedGuiObject::~ManagedGuiObject() {
 
 // State management
 
-void ot::ManagedGuiObject::setGuiObjectEnabled(bool _enabled, int _counter) {
+void ot::Widget::setWidgetEnabled(bool _enabled, int _counter) {
 	m_disabledCounter += (_enabled ? (-_counter) : _counter);
 	this->evaluateEnabledState();
 }
 
-void ot::ManagedGuiObject::resetGuiObjectDisabledCounter(void) {
+void ot::Widget::resetWidgetDisabledCounter(void) {
 	m_disabledCounter = 0;
 	this->evaluateEnabledState();
 }
 
-void ot::ManagedGuiObject::lockGuiObject(const LockTypeFlags& _flags, int _lockCount) {
+void ot::Widget::lockWidget(const LockTypeFlags& _flags, int _lockCount) {
 	for (LockTypeFlag flag : ot::getAllLockTypeFlags()) {
-		if (_flags.flagIsSet(flag)) this->lockGuiObjectFlag(flag, _lockCount);
+		if (_flags.flagIsSet(flag)) this->lockWidgetFlag(flag, _lockCount);
 	}
 	this->evaluateEnabledState();
 }
 
-void ot::ManagedGuiObject::unlockGuiObject(const LockTypeFlags& _flags, int _unlockCount) {
+void ot::Widget::unlockWidget(const LockTypeFlags& _flags, int _unlockCount) {
 	for (LockTypeFlag flag : ot::getAllLockTypeFlags()) {
-		if (_flags.flagIsSet(flag)) this->unlockGuiObjectFlag(flag, _unlockCount);
+		if (_flags.flagIsSet(flag)) this->unlockWidgetFlag(flag, _unlockCount);
 	}
 	this->evaluateEnabledState();
 }
 
-void ot::ManagedGuiObject::resetGuiObjectLockCounter(void) {
+void ot::Widget::resetWidgetLockCounter(void) {
 	for (auto& it : m_lockCounter) {
 		it.second = 0;
 	}
@@ -56,19 +55,19 @@ void ot::ManagedGuiObject::resetGuiObjectLockCounter(void) {
 
 // Private
 
-void ot::ManagedGuiObject::lockGuiObjectFlag(LockTypeFlag _flag, int _lockCount) {
+void ot::Widget::lockWidgetFlag(LockTypeFlag _flag, int _lockCount) {
 	int& ct = this->getLockCounter(_flag);
 	ct = ct + _lockCount;
 	this->evaluateEnabledState();
 }
 
-void ot::ManagedGuiObject::unlockGuiObjectFlag(LockTypeFlag _flag, int _unlockCount) {
+void ot::Widget::unlockWidgetFlag(LockTypeFlag _flag, int _unlockCount) {
 	int& ct = this->getLockCounter(_flag);
 	ct = ct - _unlockCount;
 	this->evaluateEnabledState();
 }
 
-void ot::ManagedGuiObject::evaluateEnabledState(void) {
+void ot::Widget::evaluateEnabledState(void) {
 	OTAssert(m_disabledCounter >= 0, "Disabled counter out of range");
 
 	bool enabled = m_disabledCounter > 0;
@@ -82,13 +81,14 @@ void ot::ManagedGuiObject::evaluateEnabledState(void) {
 		}
 	}
 
-	if ((enabled && unlocked) != m_isEnabled) {
-		m_isEnabled = (enabled && unlocked);
-		this->updateGuiObjectEnabledState(m_isEnabled);
+	if ((enabled != m_isEnabled) || (unlocked != m_isUnlocked)) {
+		m_isEnabled = enabled;
+		m_isUnlocked = unlocked;
+		this->updateWidgetEnabledState(m_isEnabled, !m_isUnlocked);
 	}
 }
 
-int& ot::ManagedGuiObject::getLockCounter(LockTypeFlag _flag) {
+int& ot::Widget::getLockCounter(LockTypeFlag _flag) {
 	auto it = m_lockCounter.find(_flag);
 	if (it == m_lockCounter.end()) {
 		m_lockCounter.insert_or_assign(_flag, 0);

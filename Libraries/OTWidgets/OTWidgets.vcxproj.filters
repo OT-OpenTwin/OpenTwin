@@ -295,10 +295,7 @@
     <ClCompile Include="src\TableView.cpp">
       <Filter>src\WidgetView</Filter>
     </ClCompile>
-    <ClCompile Include="src\GuiObjectManager.cpp">
-      <Filter>src\General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ManagedGuiObject.cpp">
+    <ClCompile Include="src\WidgetManager.cpp">
       <Filter>src\General</Filter>
     </ClCompile>
     <ClCompile Include="src\VersionGraphManagerView.cpp">
@@ -444,6 +441,9 @@
     </ClCompile>
     <ClCompile Include="src\TabToolBarPage.cpp">
       <Filter>src\ToolBar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Widget.cpp">
+      <Filter>src\General</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -740,7 +740,7 @@
     <ClInclude Include="include\OTWidgets\TableView.h">
       <Filter>include\WidgetView</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\GuiObjectManager.h">
+    <ClInclude Include="include\OTWidgets\WidgetManager.h">
       <Filter>include\General</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\ManagedGuiObject.h">
@@ -877,6 +877,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\TabToolBar.h">
       <Filter>include\ToolBar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\Widget.h">
+      <Filter>include\General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
