@@ -212,6 +212,8 @@ namespace ot {
 
 	OT_GUI_API_EXPORT LockTypeFlag toLockTypeFlag(const std::string& _flag);
 
+	OT_GUI_API_EXPORT std::list<LockTypeFlag> getAllSetFlags(const LockTypeFlags& _lockFlags);
+
 	OT_GUI_API_EXPORT std::list<std::string> toStringList(const LockTypeFlags& _flags);
 
 	OT_GUI_API_EXPORT std::string toString(LockTypeFlag _type);

@@ -408,6 +408,21 @@ ot::LockTypeFlag ot::toLockTypeFlag(const std::string& _flag) {
 	return ot::NoLockFlags;
 }
 
+std::list<ot::LockTypeFlag> ot::getAllSetFlags(const LockTypeFlags& _lockFlags) {
+	std::list<LockTypeFlag> result;
+
+	if (_lockFlags & LockViewWrite) result.push_back(LockViewWrite);
+	if (_lockFlags & LockViewRead) result.push_back(LockViewRead);
+	if (_lockFlags & LockModelWrite) result.push_back(LockModelWrite);
+	if (_lockFlags & LockModelRead) result.push_back(LockModelRead);
+	if (_lockFlags & LockProperties) result.push_back(LockProperties);
+	if (_lockFlags & LockNavigationWrite) result.push_back(LockNavigationWrite);
+	if (_lockFlags & LockNavigationAll) result.push_back(LockNavigationAll);
+	if (_lockFlags & LockAll) result.push_back(LockAll);
+
+	return result;
+}
+
 std::list<std::string> ot::toStringList(const LockTypeFlags& _flags) {
 	std::list<std::string> ret;
 
