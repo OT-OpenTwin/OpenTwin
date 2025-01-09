@@ -118,6 +118,9 @@
     <ClCompile Include="src\RuntimeTests.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\OTObject.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTCore\Owner.h">
@@ -289,6 +292,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTCore\GlobalTestingFlags.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTCore\OTObject.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

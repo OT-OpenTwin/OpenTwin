@@ -15,7 +15,7 @@
 
 //! \def OT_DECL_NOMOVE
 //! \brief Removes the default move constructor and move operator
-#define OT_DECL_NOMOVE(___class) ___class(const ___class&&) = delete; ___class& operator = (const ___class&&) = delete;
+#define OT_DECL_NOMOVE(___class) ___class(___class&&) = delete; ___class& operator = (___class&&) = delete;
 
 //! \def OT_DECL_NODEFAULT
 //! \brief Removes the default copy constructor and assignment operator

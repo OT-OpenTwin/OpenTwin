@@ -32,6 +32,7 @@
     <ClCompile Include="src\GenericDataStructSingle.cpp" />
     <ClCompile Include="src\GenericDataStructVector.cpp" />
     <ClCompile Include="src\JSON.cpp" />
+    <ClCompile Include="src\OTObject.cpp" />
     <ClCompile Include="src\RuntimeTests.cpp" />
     <ClCompile Include="src\StringToNumericCheck.cpp" />
     <ClCompile Include="src\LogModeManager.cpp" />
@@ -67,6 +68,7 @@
     <ClInclude Include="include\OTCore\BasicEntityInformation.h" />
     <ClInclude Include="include\OTCore\LogModeManager.h" />
     <ClInclude Include="include\OTCore\Math.h" />
+    <ClInclude Include="include\OTCore\OTObject.h" />
     <ClInclude Include="include\OTCore\RuntimeTests.h" />
     <ClInclude Include="include\OTCore\Rect.h" />
     <ClInclude Include="include\OTCore\Color.h" />
