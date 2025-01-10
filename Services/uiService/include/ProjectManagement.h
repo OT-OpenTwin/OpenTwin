@@ -55,6 +55,7 @@ private:
 	bool createNewCollection(const std::string &collectionName, const std::string &defaultSettingTemplate);
 	bool hasError(const std::string &response);
 	bool hasSuccessful(const std::string &response);
+	void copyCollection(const std::string& sourceCollectionName, const std::string& destinationCollectionName);
 
 	bool isConnected;
 	std::string databaseURL;

@@ -489,20 +489,35 @@ bool ProjectManagement::copyProject(const std::string &sourceProjectName, const 
 	std::string sourceProjectCollection = getProjectCollection(sourceProjectName);
 	std::string destinationProjectCollection = getProjectCollection(destinationProjectName);
 
+	// Copy the project collection
+	copyCollection(sourceProjectCollection, destinationProjectCollection);
+
+	// Copy large data collections
+	copyCollection(sourceProjectCollection + ".files", destinationProjectCollection + ".files");
+	copyCollection(sourceProjectCollection + ".chunks", destinationProjectCollection + ".chunks");
+
+	// Copy result collection
+	copyCollection(sourceProjectCollection + ".results", destinationProjectCollection + ".results");
+
+	return true;
+}
+
+void ProjectManagement::copyCollection(const std::string& sourceCollectionName, const std::string& destinationCollectionName)
+{
+	if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(dataBaseName, sourceCollectionName)) return;
+
 	// Get the collection pointers for both projects
-	auto sourceCollection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, sourceProjectCollection);
+	auto sourceCollection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, sourceCollectionName);
 
 	// Copy the content by using the collection.aggregate method
 
 	mongocxx::pipeline stages;
 
 	stages.match({});
-	stages.out(destinationProjectCollection);
+	stages.out(destinationCollectionName);
 
 	auto cursor = sourceCollection.aggregate(stages, mongocxx::options::aggregate{});
 	auto count = std::distance(cursor.begin(), cursor.end());
-
-	return true;
 }
 
 std::vector<std::string> ProjectManagement::getDefaultTemplateList(void)
@@ -535,6 +550,13 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 
 	auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, collectionName);
 
+	size_t numberResultDocuments = 0;
+	if (DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(dataBaseName, collectionName + ".results"))
+	{
+		auto resultCollection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, collectionName + ".results");
+		numberResultDocuments = resultCollection.count_documents({});
+	}
+
 	// Now we read all data base items one by one and write them in binary mode to the output file.
 
 	std::ofstream exportFile;
@@ -548,7 +570,7 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 		return "Unable to open the export file for writing (" + std::string(e.what()) + ")";
 	}
 
-	size_t fileVersion = 2;
+	size_t fileVersion = 3;
 	exportFile.write((const char *)&fileVersion, sizeof(size_t));
 
 	// In export file version 2, we also export the project type
@@ -560,13 +582,17 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 
 	// Write the number of data documents
 	size_t numberDocuments = collection.count_documents({});
-	exportFile.write((const char *)&numberDocuments, sizeof(size_t));
+	exportFile.write((const char*)&numberDocuments, sizeof(size_t));
+
+	// In export file version 3, we also export the number of result documents (and the documents themselves later)
+	exportFile.write((const char*)&numberResultDocuments, sizeof(size_t));
 
 	char internalStorage = 1;
 	char gridStorage     = 2;
 	char gridStorageAsc = 3;
 
 	size_t documentCount = 0;
+	int oldPercent = -1;
 
 	auto cursor = collection.find({});
 
@@ -654,14 +680,53 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 
 			documentCount++;
 
-			int percent = std::min(100, (int)(100.0 * documentCount / numberDocuments));
-			QMetaObject::invokeMethod(parent, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, percent));
+			int percent = std::min(100, (int)(100.0 * documentCount / (numberDocuments + numberResultDocuments)));
+			if (percent > oldPercent)
+			{
+				oldPercent = percent;
+				QMetaObject::invokeMethod(parent, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, percent));
+			}
 		}
 	}
 	catch (std::exception &e)
 	{
 		exportFile.close();
 		return "Unable to write data to the export file (" + std::string(e.what()) + ")";
+	}
+
+	// Now we export the result data collection, if any
+	if (numberResultDocuments > 0)
+	{
+		auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, collectionName + ".results");
+
+		auto cursor = collection.find({});
+
+		try
+		{
+			for (auto&& doc : cursor)
+			{
+				// The data is always stored in the data base
+				const uint8_t* buffer = reinterpret_cast<const uint8_t*>(doc.data());
+				size_t size = doc.length();
+
+				exportFile.write((const char*)&size, sizeof(size_t));
+				exportFile.write((const char*)buffer, size);
+			}
+
+			documentCount++;
+
+			int percent = std::min(100, (int)(100.0 * documentCount / (numberDocuments + numberResultDocuments)));
+			if (percent > oldPercent)
+			{
+				oldPercent = percent;
+				QMetaObject::invokeMethod(parent, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, percent));
+			}
+		}
+		catch (std::exception& e)
+		{
+			exportFile.close();
+			return "Unable to write result data to the export file (" + std::string(e.what()) + ")";
+		}
 	}
 
 	exportFile.close();
@@ -686,7 +751,7 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 	{
 		size_t fileVersion = 0;
 		importFile.read((char *)&fileVersion, sizeof(size_t));
-		if (fileVersion > 2) return "Wrong file version of the import data file: " + std::to_string(fileVersion) + " (only supported up to 1)";
+		if (fileVersion > 3) return "Wrong file version of the import data file: " + std::to_string(fileVersion) + " (only supported up to 3)";
 
 		std::string projectType = OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT;
 
@@ -717,6 +782,12 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 		size_t numberDocuments = collection.count_documents({});
 		importFile.read((char *)&numberDocuments, sizeof(size_t));
 
+		size_t numberResultDocuments = 0;
+		if (fileVersion >= 3)
+		{
+			importFile.read((char*)&numberResultDocuments, sizeof(size_t));
+		}
+
 		// Read the items in the import file until we reach the end of the file
 
 		char internalStorage = 1;
@@ -724,8 +795,9 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 		char gridStorageAsc = 3;
 
 		size_t docCount = 0;
+		int oldPercent = -1;
 
-		while (!importFile.eof())
+		for (size_t index = 0; index < numberDocuments; index++)
 		{
 			char dataType = 0;
 			importFile.read((char *)&dataType, sizeof(char));
@@ -823,9 +895,6 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 				bsoncxx::types::value result = fsDoc.InsertDocumentUsingGridFs(dataDoc.view(), collectionName, fileMetaData);
 				
 				// Next we modify the fileId in the document
-
-
-
 				long long entityID = metaDoc.view()["EntityID"].get_int64();
 				long long entityVersion;
 
@@ -860,8 +929,41 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 
 			docCount++;
 
-			int percent = std::min(100, (int)(100.0 * docCount / numberDocuments));
-			QMetaObject::invokeMethod(parent, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, percent));
+			int percent = std::min(100, (int)(100.0 * docCount / (numberDocuments + numberResultDocuments)));
+			if (percent > oldPercent)
+			{
+				oldPercent = percent;
+				QMetaObject::invokeMethod(parent, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, percent));
+			}
+		}
+
+		if (numberResultDocuments > 0)
+		{
+			// Try to load the result data
+			auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, collectionName + ".results");
+
+			for (size_t index = 0; index < numberResultDocuments; index++)
+			{
+				// The document is stored directly in the data base
+				size_t length = 0;
+				importFile.read((char*)&length, sizeof(size_t));
+
+				std::uint8_t* data = new std::uint8_t[length];
+				importFile.read((char*)data, length);
+
+				bsoncxx::document::value dataDoc(data, length, deleteData);
+
+				collection.insert_one(dataDoc.view());
+
+				docCount++;
+
+				int percent = std::min(100, (int)(100.0 * docCount / (numberDocuments + numberResultDocuments)));
+				if (percent > oldPercent)
+				{
+					oldPercent = percent;
+					QMetaObject::invokeMethod(parent, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, percent));
+				}
+			}
 		}
 	}
 	catch (std::exception &e)
@@ -869,6 +971,8 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 		importFile.close();
 		return "Unable to store data from import file in database (" + std::string(e.what()) + ")";
 	}
+
+
 
 	importFile.close();
 	return "";
