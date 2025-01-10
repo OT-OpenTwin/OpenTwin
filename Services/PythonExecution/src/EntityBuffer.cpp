@@ -64,10 +64,13 @@ void EntityBuffer::saveChangedEntities()
 	{
 		ensureValidRangeSelections(bufferedEntity.second.get());
 		auto entity = bufferedEntity.second;
-		entity->StoreToDataBase();
-		topoEntID.push_back(entity->getEntityID());
-		topoEntVersion.push_back(entity->getEntityStorageVersion());
-		forceVis.push_back(false);
+		if (entity->getModified())
+		{
+			entity->StoreToDataBase();
+			topoEntID.push_back(entity->getEntityID());
+			topoEntVersion.push_back(entity->getEntityStorageVersion());
+			forceVis.push_back(false);
+		}
 	}
 
 	if (topoEntID.size() > 0)
