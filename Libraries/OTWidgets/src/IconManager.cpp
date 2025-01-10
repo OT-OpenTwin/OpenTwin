@@ -91,10 +91,9 @@ const QByteArray& ot::IconManager::getSvgData(const QString& _subPath) {
 		return *manager.m_emptySvgData;
 	}
 	
-	//auto result = manager.m_svgData.insert_or_assign(_subPath, file.readAll());
+	std::shared_ptr<QByteArray> newData = std::shared_ptr<QByteArray>(new QByteArray(file.readAll()));
 	file.close();
-	return *manager.m_emptySvgData;
-	//return *result.first->second;
+	return *manager.m_svgData.insert_or_assign(_subPath, newData).first->second;
 }
 
 void ot::IconManager::setApplicationIcon(const QIcon& _icon) {
