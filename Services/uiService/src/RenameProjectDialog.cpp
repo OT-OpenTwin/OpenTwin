@@ -5,6 +5,7 @@
 
 // Frontend header
 #include "RenameProjectDialog.h"
+#include "ProjectManagement.h"
 
 // OpenTwin header
 #include "OTWidgets/Label.h"
@@ -16,8 +17,8 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qmessagebox.h>
 
-RenameProjectDialog::RenameProjectDialog(const QString& _projectToRename)
-	: m_projectToRename(_projectToRename) {
+RenameProjectDialog::RenameProjectDialog(const QString& _projectToRename, ProjectManagement& projectManager)
+	: m_projectToRename(_projectToRename), m_projectManager(&projectManager) {
 	// Create layouts
 	QVBoxLayout* centralLayout = new QVBoxLayout(this);
 
@@ -49,7 +50,6 @@ RenameProjectDialog::RenameProjectDialog(const QString& _projectToRename)
 	this->setMinimumWidth(200);
 
 	// Connect signals
-	this->connect(m_edit, &ot::LineEdit::returnPressed, this, &RenameProjectDialog::slotConfirm);
 	this->connect(confirmButton, &ot::PushButton::clicked, this, &RenameProjectDialog::slotConfirm);
 	this->connect(cancelButton, &ot::PushButton::clicked, this, &RenameProjectDialog::closeCancel);
 }
@@ -66,5 +66,14 @@ void RenameProjectDialog::slotConfirm() {
 		msg.exec();
 		return;
 	}
+
+	bool canBeDeleted = false;
+	if (m_projectManager->projectExists(this->getProjectName().toStdString(), canBeDeleted))
+	{
+		QMessageBox msg(QMessageBox::Warning, "Invalid Name", "A project with the new name already exists.\nPlease choose another unique name.", QMessageBox::Ok, m_edit);
+		msg.exec();
+		return;
+	}
+	
 	this->closeOk();
 }

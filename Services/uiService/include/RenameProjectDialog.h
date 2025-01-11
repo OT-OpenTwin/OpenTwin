@@ -10,12 +10,14 @@
 
 namespace ot { class LineEdit; };
 
+class ProjectManagement;
+
 class RenameProjectDialog : public ot::Dialog {
 	Q_OBJECT
 	OT_DECL_NOCOPY(RenameProjectDialog)
 	OT_DECL_NODEFAULT(RenameProjectDialog)
 public:
-	RenameProjectDialog(const QString& _projectToRename);
+	RenameProjectDialog(const QString& _projectToRename, ProjectManagement &projectManager);
 	virtual ~RenameProjectDialog();
 
 	QString getProjectName(void) const;
@@ -26,5 +28,6 @@ private Q_SLOTS:
 private:
 	QString       m_projectToRename;
 	ot::LineEdit* m_edit;
+	ProjectManagement* m_projectManager;
 	
 };
