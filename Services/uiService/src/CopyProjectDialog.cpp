@@ -52,7 +52,6 @@ CopyProjectDialog::CopyProjectDialog(const QString& _projectToCopy, ProjectManag
 	this->setMinimumWidth(200);
 
 	// Connect signals
-	this->connect(m_edit, &ot::LineEdit::returnPressed, this, &CopyProjectDialog::slotConfirm);
 	this->connect(confirmButton, &ot::PushButton::clicked, this, &CopyProjectDialog::slotConfirm);
 	this->connect(cancelButton, &ot::PushButton::clicked, this, &CopyProjectDialog::closeCancel);
 }

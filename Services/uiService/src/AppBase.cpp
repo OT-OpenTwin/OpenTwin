@@ -2499,14 +2499,24 @@ void AppBase::slotRenameProject(void) {
 		return;
 	}
 
+	ProjectManagement projectManager(m_loginData);
+
 	const QString& selectedProjectName = selectedProjects.front();
 
-	RenameProjectDialog dia(selectedProjectName);
+	RenameProjectDialog dia(selectedProjectName, projectManager);
 	if (dia.showDialog() != ot::Dialog::Ok) {
 		return;
 	}
 
 	std::string newProjectName = dia.getProjectName().toStdString();
+
+	// Check whether new project name already exists
+	bool canBeDeleted = false;
+	if (projectManager.projectExists(newProjectName, canBeDeleted))
+	{
+		OT_LOG_EA("Rename project: A project with the new name already exists");
+		return;
+	}
 
 	if (selectedProjectName.toStdString() != m_currentProjectName) {
 		std::string projectUser;
@@ -2530,7 +2540,6 @@ void AppBase::slotRenameProject(void) {
 		reopenProject = true;
 	}
 
-	ProjectManagement projectManager(m_loginData);
 	projectManager.renameProject(selectedProjectName.toStdString(), newProjectName);
 
 	// Now we add the copied project to the recently used projects list
