@@ -10,7 +10,7 @@
 #include <bsoncxx/oid.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 
-std::vector<bsoncxx::builder::basic::document *> queuedDocuments;
+std::list<bsoncxx::builder::basic::document *> queuedDocuments;
 
 namespace DataStorageAPI
 {
