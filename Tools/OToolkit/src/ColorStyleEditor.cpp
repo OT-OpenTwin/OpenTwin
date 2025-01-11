@@ -784,8 +784,8 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	tehb->setFinalStop(Point2DD(0.5, 1.));
 	tehb->addStop(GradientPainterStop2D(0., Color(ot::Gray)));
 	tehb->addStop(GradientPainterStop2D(0.04, Color(ot::Gray)));
-	tehb->addStop(GradientPainterStop2D(0.05, Color(ot::White)));
-	tehb->addStop(GradientPainterStop2D(0.98, Color(ot::White)));
+	tehb->addStop(GradientPainterStop2D(0.05, Color(0, 64, 128)));
+	tehb->addStop(GradientPainterStop2D(0.98, Color(0, 64, 128)));
 	tehb->addStop(GradientPainterStop2D(0.99, Color(ot::Gray)));
 	tehb->addStop(GradientPainterStop2D(1., Color(ot::Gray)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TextEditorLineBorder), new PropertyPainter2D(tehb));
