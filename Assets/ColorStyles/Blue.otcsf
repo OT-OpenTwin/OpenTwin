@@ -2258,7 +2258,55 @@ QCheckBox#LogInDialogSavePassword::indicator:indeterminate:pressed {
 
 /* ##################################################################################### */
 
-/* Push Button */
+/* Combo Button */
+
+ot--ComboButton {
+    background-color: rgba(0,64,128,255);
+    color: rgba(255,255,255,255);
+    border: 1px solid rgba(0,0,128,255);
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+ot--ComboButton:!hover:!pressed {
+    background-color: rgba(0,64,128,255);
+    color: rgba(255,255,255,255);
+    border: 1px solid rgba(0,0,128,255);
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+ot--ComboButton:hover:!pressed {
+    background-color: rgba(0,64,128,255);
+    color: rgba(255,255,255,255);
+    border: 1px solid rgba(0,215,255,255);
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+ot--ComboButton[IsSelected="true"] {
+    background-color: rgba(0,64,128,255);
+    color: rgba(255,255,255,255);
+    border: 1px solid rgba(210,90,10,255);
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+ot--ComboButton[IsSelected="false"]:!hover:pressed {
+    background-color: rgba(0,64,128,255);
+    color: rgba(255,255,255,255);
+    border: 1px solid rgba(0,0,128,255);
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+ot--ComboButton[IsSelected="false"]:hover:pressed {
+    background-color: rgba(0,64,128,255);
+    color: rgba(255,255,255,255);
+    border: 1px solid rgba(0,215,255,255);
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
 
 /* ##################################################################################### */
 

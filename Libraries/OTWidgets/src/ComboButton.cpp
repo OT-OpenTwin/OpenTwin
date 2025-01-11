@@ -13,8 +13,6 @@
 ot::ComboButton::ComboButton(QWidget* _parent)
 	: PushButton(_parent)
 {
-	this->setObjectName("OT_ComboButton");
-
 	m_menu = new QMenu(this);
 
 	this->ini();
@@ -23,8 +21,6 @@ ot::ComboButton::ComboButton(QWidget* _parent)
 ot::ComboButton::ComboButton(const QString& _text, QWidget* _parent) 
 	: PushButton(_text, _parent)
 {
-	this->setObjectName("OT_ComboButton");
-
 	m_menu = new QMenu(this);
 	m_menu->addAction(_text);
 
@@ -34,8 +30,6 @@ ot::ComboButton::ComboButton(const QString& _text, QWidget* _parent)
 ot::ComboButton::ComboButton(const QString& _text, const QStringList& _items, QWidget* _parent)
 	: PushButton(_text, _parent)
 {
-	this->setObjectName("OT_ComboButton");
-
 	m_menu = new QMenu(this);
 	for (const QString& itm : _items) {
 		m_menu->addAction(itm);
@@ -65,7 +59,11 @@ void ot::ComboButton::slotActionTriggered(QAction* _action) {
 }
 
 void ot::ComboButton::ini(void) {
+	this->setObjectName("OT_ComboButton");
+
 	this->setMenu(m_menu);
+	this->setFocusPolicy(Qt::NoFocus);
+
 	this->connect(m_menu, &QMenu::triggered, this, &ComboButton::slotActionTriggered);
 	this->connect(m_menu, &QMenu::aboutToShow, this, &ComboButton::setSelectedProperty);
 	this->connect(m_menu, &QMenu::aboutToHide, this, &ComboButton::unsetSelectedProperty);
