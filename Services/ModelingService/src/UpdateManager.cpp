@@ -456,6 +456,9 @@ void UpdateManager::updateSingleEntity(ot::UID entityID, ot::UID entityVersion, 
 				// Delete the geometry entity (will be updated later in the model). We have created a copy of the cache item, so its safe to delete. 
 				delete geomEntity;
 				geomEntity = nullptr;
+
+				// The shape geometry does not need to be updated
+				return;
 			}
 			else
 			{
