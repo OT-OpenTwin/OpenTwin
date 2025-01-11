@@ -42,6 +42,7 @@
     <ClCompile Include="src\ColorStyle.cpp" />
     <ClCompile Include="src\ColorStyleValue.cpp" />
     <ClCompile Include="src\ComboBox.cpp" />
+    <ClCompile Include="src\ComboButton.cpp" />
     <ClCompile Include="src\ContextMenu.cpp" />
     <ClCompile Include="src\ContextMenuAction.cpp" />
     <ClCompile Include="src\ContextMenuManager.cpp" />
@@ -301,6 +302,7 @@
     <QtMoc Include="include\OTWidgets\CheckBox.h" />
     <QtMoc Include="include\OTWidgets\ColorPickButton.h" />
     <ClInclude Include="include\OTWidgets\ColorPreviewBox.h" />
+    <QtMoc Include="include\OTWidgets\ComboButton.h" />
     <ClInclude Include="include\OTWidgets\CustomGraphicsItem.h" />
     <QtMoc Include="include\OTWidgets\Dialog.h" />
     <QtMoc Include="include\OTWidgets\EventNotifier.h" />
