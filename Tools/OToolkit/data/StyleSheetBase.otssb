@@ -386,7 +386,7 @@ QMenuBar::item:pressed {
 /* QMenu */
 
 QMenu {
-    border: 0px solid %color:Widget Background%;
+    border: 1px solid %color:Border Light Color%;
     color: %color:Widget Foreground%;
     margin: 0px;
     background-color: %color:Widget Background%;
