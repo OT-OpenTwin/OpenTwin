@@ -209,18 +209,19 @@ void SocketServer::onNewConnection()
 
 	m_lastReceiveTime = std::chrono::system_clock::now();
 
-	if (m_keepAliveTimer == nullptr)
-	{
+	if (m_keepAliveTimer == nullptr) {
 		m_keepAliveTimer = new QTimer(this);
 		connect(m_keepAliveTimer, SIGNAL(timeout()), this, SLOT(keepAlive()));
 		m_keepAliveTimer->start(30000);
+	}
+	else {
+		OT_LOG_E("Keep alive timer already set");
 	}
 
     m_clients << pSocket;
 }
 
-void SocketServer::processMessage(QString message)
-{
+void SocketServer::processMessage(QString message) {
 	m_lastReceiveTime = std::chrono::system_clock::now();
 
 	try {
@@ -261,6 +262,14 @@ void SocketServer::processMessage(QString message)
 				pClient->sendTextMessage(response.c_str());
 				pClient->flush();
 
+			}
+		}
+		else if (operation == "noinactivitycheck") {
+			if (m_keepAliveTimer) {
+				OT_LOG_W("Keep alive timer stopped");
+				m_keepAliveTimer->stop();
+				delete m_keepAliveTimer;
+				m_keepAliveTimer = nullptr;
 			}
 		}
 		else

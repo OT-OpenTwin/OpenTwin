@@ -63,7 +63,6 @@ WebsocketClient::WebsocketClient(const std::string& _socketUrl) :
 	QSslCertificate caCert(&caCertFile, QSsl::Pem);
 	caCertFile.close();
 
-	
 	QList<QSslCertificate> caCerts = sslConfiguration.caCertificates();
 	caCerts.append(caCert);
 	sslConfiguration.setCaCertificates(caCerts);
@@ -136,6 +135,11 @@ void WebsocketClient::slotConnected() {
 
 	connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &WebsocketClient::slotMessageReceived);
 	m_isConnected = true;
+
+#ifdef _DEBUG
+	m_webSocket.sendTextMessage("noinactivitycheck");
+#endif // _DEBUG
+
 }
 
 void WebsocketClient::slotMessageReceived(const QString& _message) {
