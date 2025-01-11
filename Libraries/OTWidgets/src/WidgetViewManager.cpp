@@ -496,7 +496,9 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 		m_dockManager->blockSignals(dockSignalsBlocked);
 	}
 	else {
+		m_state |= InsertViewState;
 		this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
+		m_state &= (~InsertViewState);
 	}
 
 	// Connect signals
