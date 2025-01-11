@@ -20,6 +20,8 @@
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 
+#include <mongocxx/client.hpp>
+
 class AppBase;
 
 class ProjectManagement
@@ -56,6 +58,7 @@ private:
 	bool hasError(const std::string &response);
 	bool hasSuccessful(const std::string &response);
 	void copyCollection(const std::string& sourceCollectionName, const std::string& destinationCollectionName);
+	void flushCachedDocuments(std::list<bsoncxx::builder::basic::document*>& cachedDocuments, mongocxx::collection& collection);
 
 	bool isConnected;
 	std::string databaseURL;

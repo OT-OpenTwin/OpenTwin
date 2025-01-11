@@ -942,6 +942,8 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 			// Try to load the result data
 			auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, collectionName + ".results");
 
+			std::list<bsoncxx::builder::basic::document*> cachedDocuments;
+
 			for (size_t index = 0; index < numberResultDocuments; index++)
 			{
 				// The document is stored directly in the data base
@@ -953,7 +955,14 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 
 				bsoncxx::document::value dataDoc(data, length, deleteData);
 
-				collection.insert_one(dataDoc.view());
+				bsoncxx::builder::basic::document* doc = new bsoncxx::builder::basic::document{};
+				doc->append(bsoncxx::builder::concatenate(dataDoc.view()));
+				cachedDocuments.push_back(doc);
+
+				if (cachedDocuments.size() == 100)
+				{
+					flushCachedDocuments(cachedDocuments, collection);
+				}
 
 				docCount++;
 
@@ -964,6 +973,8 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 					QMetaObject::invokeMethod(parent, "setProgressBarValue", Qt::QueuedConnection, Q_ARG(int, percent));
 				}
 			}
+
+			flushCachedDocuments(cachedDocuments,collection);
 		}
 	}
 	catch (std::exception &e)
@@ -972,10 +983,30 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 		return "Unable to store data from import file in database (" + std::string(e.what()) + ")";
 	}
 
-
-
 	importFile.close();
 	return "";
+}
+
+void ProjectManagement::flushCachedDocuments(std::list<bsoncxx::builder::basic::document*>& cachedDocuments, mongocxx::collection &collection)
+{
+	if (cachedDocuments.empty()) return;
+
+	std::vector<bsoncxx::document::value> documents;
+	documents.reserve(cachedDocuments.size());
+
+	for (auto doc : cachedDocuments)
+	{
+		documents.push_back(doc->extract());
+	}
+
+	collection.insert_many(documents);
+
+	for (auto doc : cachedDocuments)
+	{
+		delete doc;
+	}
+
+	cachedDocuments.clear();
 }
 
 bool ProjectManagement::canAccessProject(const std::string &projectCollection)
