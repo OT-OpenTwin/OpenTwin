@@ -453,8 +453,9 @@ std::string SessionService::handleRegisterNewService(ot::JsonDocument& _commandD
 	std::string serviceName = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string serviceType = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_TYPE);
 	std::string servicePort = ot::json::getString(_commandDoc, OT_ACTION_PARAM_PORT);
+	std::string hostAddress = ot::json::getString(_commandDoc, OT_ACTION_PARAM_HOST);
 	// fixme: instead of providing the service port, the service URL should be passed to the sender
-	std::string senderIP(ot::IpConverter::filterIpFromSender("127.0.0.1:xxxx", servicePort));
+	std::string senderIP(ot::IpConverter::filterIpFromSender(hostAddress + ":xxxx", servicePort));
 
 	// Optional params
 	bool shouldRunRelayService = false;
@@ -521,6 +522,8 @@ std::string SessionService::handleGetSystemInformation(ot::JsonDocument& _doc) {
 	m_systemLoadInformation.getCurrentProcessCPUAndMemoryLoad(processCpuLoad, processMemoryLoad);
 
 	ot::JsonDocument reply;
+	reply.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, "Local Session Service", reply.GetAllocator());
+
 	reply.AddMember(OT_ACTION_PARAM_GLOBAL_CPU_LOAD, globalCpuLoad, reply.GetAllocator());
 	reply.AddMember(OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD, globalMemoryLoad, reply.GetAllocator());
 	reply.AddMember(OT_ACTION_PARAM_PROCESS_CPU_LOAD, processCpuLoad, reply.GetAllocator());
@@ -577,8 +580,9 @@ std::string SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc
 	std::string serviceName = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME);
 	std::string serviceType = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_TYPE);
 	std::string servicePort = ot::json::getString(_commandDoc, OT_ACTION_PARAM_PORT);
+	std::string hostAddress = ot::json::getString(_commandDoc, OT_ACTION_PARAM_HOST);
 	// fixme: critical: instead of providing the service port, the service URL should be passed to the sender
-	std::string senderIP(ot::IpConverter::filterIpFromSender("127.0.0.1:xxxx", servicePort));
+	std::string senderIP(ot::IpConverter::filterIpFromSender(hostAddress + ":xxxx", servicePort));
 
 	// Optional params
 	bool runMandatory = true;

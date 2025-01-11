@@ -31,3 +31,10 @@ std::string ot::IpConverter::portFromIp(
 	return _ip.substr(_ip.rfind(':') + 1);
 }
 
+std::string ot::IpConverter::hostFromIp(
+	const std::string& _ip
+) {
+	return _ip.substr(0, _ip.rfind(':'));
+}
+
+

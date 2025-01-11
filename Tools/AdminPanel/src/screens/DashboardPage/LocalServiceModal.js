@@ -68,7 +68,7 @@ const LocalSessionServiceModal = ({ isOpen, onRequestClose, modalContent, fetchS
                 overlayClassName="modal-overlay"
                 className="modal-content"
             >
-                <h2 className='modal-header'>Local Directory Service Details</h2>
+                <h2 className='modal-header'>{modalContent && modalContent["Service.Type"] ? modalContent["Service.Type"] + " Details" : ""}</h2>
                 <button className='modal-close-button' onClick={onRequestClose}>Close</button>
                 {modalContent ? (
                     <>
@@ -77,7 +77,6 @@ const LocalSessionServiceModal = ({ isOpen, onRequestClose, modalContent, fetchS
                             <p>Global Memory usage: {parseFloat(modalContent["Global.Memory.Load"]).toFixed(2)}%</p>
                             <p>Process CPU usage: {parseFloat(modalContent["Process.CPU.Load"]).toFixed(2)}%</p>
                             <p>Process Memory usage: {parseFloat(modalContent["Process.Memory.Load"]).toFixed(2)}%</p>
-                            <h5>Session Services:</h5>
                         </div>
                         {modalContent["Services.Supported"] && (
                             <ul className='supported-services'>

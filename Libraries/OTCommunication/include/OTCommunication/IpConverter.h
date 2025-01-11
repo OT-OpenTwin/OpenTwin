@@ -30,6 +30,10 @@ namespace ot {
 		//! @param _ip The IP adress
 		static std::string portFromIp(const std::string& _ip);
 
+		//! @brief Will return the host from the provided IP
+		//! @param _ip The IP adress
+		static std::string hostFromIp(const std::string& _ip);
+
 	private:
 		IpConverter(const IpConverter&) = delete;
 	};

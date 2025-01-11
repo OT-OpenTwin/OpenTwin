@@ -336,6 +336,7 @@
 #define OT_ACTION_PARAM_ANSWER "Answer"
 #define OT_ACTION_PARAM_PARAMETER1 "Parameter1"
 #define OT_ACTION_PARAM_PORT "Port"
+#define OT_ACTION_PARAM_HOST "Host"
 #define OT_ACTION_PARAM_POSITION "Position"
 
 #define OT_ACTION_PARAM_COUNT "Count"
@@ -424,6 +425,8 @@
 #define OT_ACTION_PARAM_GLOBAL_MEMORY_LOAD "Global.Memory.Load"
 #define OT_ACTION_PARAM_PROCESS_CPU_LOAD "Process.CPU.Load"
 #define OT_ACTION_PARAM_PROCESS_MEMORY_LOAD "Process.Memory.Load"
+
+#define OT_ACTION_PARAM_SERVICE_TYPE "Service.Type"
 
 #define OT_ACTION_PARAM_PREFETCH_Documents "Prefetch.Documents"
 #define OT_ACTION_PARAM_PREFETCH_ID "Prefetch.ID"
