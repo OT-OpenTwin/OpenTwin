@@ -2455,16 +2455,29 @@ void AppBase::slotCopyProject(void) {
 		return;
 	}
 
+	ProjectManagement projectManager(m_loginData);
+
 	const QString& selectedProjectName = selectedProjects.front();
 
-	CopyProjectDialog dia(selectedProjectName);
+	CopyProjectDialog dia(selectedProjectName, projectManager);
 	if (dia.showDialog() != ot::Dialog::Ok) {
 		return;
 	}
 
 	std::string newProjectName = dia.getProjectName().toStdString();
 
-	ProjectManagement projectManager(m_loginData);
+	bool canBeDeleted = false;
+	if (projectManager.projectExists(newProjectName, canBeDeleted))
+	{
+		if (!canBeDeleted)
+		{
+			OT_LOG_EA("Copy project: Existing project should be overwritten, but could not.");
+			return;
+		}
+	
+		projectManager.deleteProject(newProjectName);
+	}
+
 	projectManager.copyProject(selectedProjectName.toStdString(), newProjectName, m_loginData.getUserName());
 
 	// Now we add the copied project to the recently used projects list

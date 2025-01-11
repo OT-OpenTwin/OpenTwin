@@ -5,6 +5,7 @@
 
 // Frontend header
 #include "CopyProjectDialog.h"
+#include "ProjectManagement.h"
 
 // OpenTwin header
 #include "OTWidgets/Label.h"
@@ -16,8 +17,9 @@
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qmessagebox.h>
 
-CopyProjectDialog::CopyProjectDialog(const QString& _projectToCopy) 
-	: m_projectToCopy(_projectToCopy)
+CopyProjectDialog::CopyProjectDialog(const QString& _projectToCopy, ProjectManagement& projectManager)
+	: m_projectToCopy(_projectToCopy),
+	  m_projectManagement(&projectManager)
 {
 	// Create layouts
 	QVBoxLayout* centralLayout = new QVBoxLayout(this);
@@ -67,5 +69,30 @@ void CopyProjectDialog::slotConfirm() {
 		msg.exec();
 		return;
 	}
+
+	bool canBeDeleted = false;
+	if (m_projectManagement->projectExists(this->getProjectName().toStdString(), canBeDeleted))
+	{
+		if (canBeDeleted)
+		{
+			QMessageBox msg(QMessageBox::Warning, "Project already exists", "A project with the new name already exists. Do you want to overwrite the existing project?\n\n"
+																		    "Please note that this operation cannot be undone!", QMessageBox::Yes | QMessageBox::Cancel, m_edit);
+			if (msg.exec() == QMessageBox::Yes)
+			{
+				this->closeOk();
+			}
+			else
+			{
+				return;
+			}
+		}
+		else
+		{
+			QMessageBox msg(QMessageBox::Warning, "Project already exists", "A project with the new name already exists and cannot be overwritten. \nPlease choose another name for the new project.", QMessageBox::Ok, m_edit);
+			msg.exec();
+			return;
+		}
+	}
+
 	this->closeOk();
 }
