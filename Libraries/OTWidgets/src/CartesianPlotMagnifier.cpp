@@ -4,11 +4,13 @@
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/Logger.h"
 #include "OTWidgets/Plot.h"
 #include "OTWidgets/PlotDataset.h"
 #include "OTWidgets/CartesianPlot.h"
-#include "OTWidgets/CartesianPlotMarker.h"
 #include "OTWidgets/CartesianPlotMagnifier.h"
+#include "OTWidgets/CartesianPlotTextMarker.h"
+#include "OTWidgets/CartesianPlotCrossMarker.h"
 
 // Qwt header
 #include <qwt_text.h>
@@ -18,12 +20,17 @@
 #include <QtGui/qevent.h>
 
 ot::CartesianPlotMagnifier::CartesianPlotMagnifier(CartesianPlot* _plot)
-	: QwtPlotMagnifier(_plot->canvas()), m_rightMouseIsPressed(false), m_mouseMoved(false), m_plot(_plot) 
+	: QwtPlotMagnifier(_plot->canvas()), m_plot(_plot), m_rightMouseIsPressed(false)
 {
-	m_marker = new CartesianPlotMarker(0);
-	m_marker->attach(m_plot);
-	m_marker->setVisible(false);
-	m_marker->setLinePen(QColor(255, 50, 50), 0.0, Qt::DashDotDotLine);
+	m_crossMarker = new CartesianPlotCrossMarker;
+	m_crossMarker->attach(m_plot);
+	m_crossMarker->setVisible(false);
+	m_crossMarker->setLinePen(QColor(255, 50, 50), 0.0, Qt::DashDotDotLine);
+
+	m_textMarker = new CartesianPlotTextMarker;
+	m_textMarker->attach(m_plot);
+	m_textMarker->setVisible(false);
+	m_textMarker->setLinePen(QColor(255, 50, 50), 0.0, Qt::DashDotDotLine);
 
 	this->setMouseButton(Qt::MouseButton::NoButton);
 }
@@ -31,38 +38,26 @@ ot::CartesianPlotMagnifier::CartesianPlotMagnifier(CartesianPlot* _plot)
 void ot::CartesianPlotMagnifier::widgetMousePressEvent(QMouseEvent* _event) {
 	if (_event->button() == Qt::MouseButton::RightButton) {
 		m_rightMouseIsPressed = true;
-		m_mouseMoved = false;
+		m_crossMarker->setVisible(true);
+		m_textMarker->setVisible(true);
+		this->updateMarkers(_event->pos());
 	}
 	QwtPlotMagnifier::widgetMousePressEvent(_event);
 }
 
 void ot::CartesianPlotMagnifier::widgetMouseMoveEvent(QMouseEvent* _event) {
-
-	m_mouseMoved = true;
-
 	if (m_rightMouseIsPressed) {
-		int itemId;
-		QwtPlotCurve* curve = m_plot->findNearestCurve(_event->pos(), itemId);
-
-		if (curve != nullptr) {
-			double x, y;
-			m_plot->getOwner()->findDataset(curve)->getDataAt(itemId, x, y);
-			m_marker->setValue(x, y);
-			m_marker->setLabel(QwtText((std::to_string(x) + ", " + std::to_string(y)).c_str()));
-			m_marker->setVisible(true);
-			m_plot->replot();
-		}
+		this->updateMarkers(_event->pos());
 	}
 	QwtPlotMagnifier::widgetMouseMoveEvent(_event);
 }
 
 void ot::CartesianPlotMagnifier::widgetMouseReleaseEvent(QMouseEvent* _event) {
 	if (_event->button() == Qt::MouseButton::RightButton) {
-		if (m_mouseMoved) {
-			m_marker->setVisible(false);
-			m_plot->replot();
-		}
 		m_rightMouseIsPressed = false;
+		m_crossMarker->setVisible(false);
+		m_textMarker->setVisible(false);
+		m_plot->replot();
 	}
 	QwtPlotMagnifier::widgetMouseReleaseEvent(_event);
 }
@@ -82,7 +77,6 @@ void ot::CartesianPlotMagnifier::widgetWheelEvent(QWheelEvent* _wheelEvent) {
 
 		this->rescale(f);
 	}
-
 }
 
 void ot::CartesianPlotMagnifier::rescale(double _factor) {
@@ -147,5 +141,72 @@ void ot::CartesianPlotMagnifier::rescale(double _factor) {
 
 	if (doReplot) {
 		plt->replot();
+	}
+}
+
+void ot::CartesianPlotMagnifier::updateMarkers(const QPoint& _pos) {
+	int itemId;
+	QwtPlotCurve* curve = m_plot->findNearestCurve(_pos, itemId);
+
+	if (curve != nullptr) {
+		// Find dataset
+		OTAssertNullptr(m_plot->getOwner());
+
+		PlotDataset* dataset = m_plot->getOwner()->findDataset(curve);
+		OTAssertNullptr(dataset);
+
+		double x, y;
+		if (!dataset->getDataAt(itemId, x, y)) {
+			return;
+		}
+
+		// Set new label
+		QwtText newText(QString::number(x) + "; " + QString::number(y), QwtText::PlainText);
+		newText.setColor(QColor(255, 50, 50));
+
+		// Get canvas rect and transform maps
+		const QwtScaleMap xMap = m_plot->canvasMap(QwtPlot::xBottom);
+		const QwtScaleMap yMap = m_plot->canvasMap(QwtPlot::yLeft);
+		const QRectF canvasRect(QPointF(xMap.s1(), yMap.s1()), QPointF(xMap.s2(), yMap.s2()));
+
+		// Determine text size in canvas
+		QSizeF textSize = newText.textSize();
+		QPointF textTopLeft(x, y);
+		
+		textSize.setWidth((xMap.invTransform(xMap.transform(0) + textSize.width())) - xMap.invTransform(xMap.transform(0)));
+		textSize.setHeight((yMap.invTransform(yMap.transform(0) + textSize.height())) - yMap.invTransform(yMap.transform(0)));
+
+		if (textSize.width() < 0.) {
+			textSize.setWidth(textSize.width() * (-1.));
+			textTopLeft.setX(textTopLeft.x() - textSize.width());
+		}
+		if (textSize.height() < 0.) {
+			textSize.setHeight(textSize.height() * (-1.));
+			textTopLeft.setY(textTopLeft.y() - textSize.height());
+		}
+		QRectF textBoundingRect(textTopLeft, textSize);
+
+		// Ensure text rect is in canvas
+		double adjustedX = x;
+		double adjustedY = y;
+
+		if (textBoundingRect.right() > canvasRect.right()) {
+			adjustedX -= textBoundingRect.right() - canvasRect.right();
+		}
+		if (textBoundingRect.left() < canvasRect.left()) {
+			adjustedX += canvasRect.left() - textBoundingRect.left();
+		}
+		if (textBoundingRect.bottom() > canvasRect.bottom()) {
+			adjustedY -= textBoundingRect.bottom() - canvasRect.bottom();
+		}
+		if (textBoundingRect.top() < canvasRect.top()) {
+			adjustedY += canvasRect.top() - textBoundingRect.top();
+		}
+
+		// Apply
+		m_crossMarker->setValue(x, y);
+		m_textMarker->setValue(adjustedX, adjustedY);
+		m_textMarker->setLabel(newText);
+		m_plot->replot();
 	}
 }

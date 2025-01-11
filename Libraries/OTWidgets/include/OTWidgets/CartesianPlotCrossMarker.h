@@ -1,4 +1,4 @@
-//! @file CartesianPlotMarker.h
+//! @file CartesianPlotCrossMarker.h
 //! @author Alexander Kuester (alexk95)
 //! @date October 2024
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -6,6 +6,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/OTClassHelper.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
 // Qwt header
@@ -13,23 +14,16 @@
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT CartesianPlotMarker : public QwtPlotMarker {
+	class OT_WIDGETS_API_EXPORT CartesianPlotCrossMarker : public QwtPlotMarker {
+		OT_DECL_NOCOPY(CartesianPlotCrossMarker)
 	public:
-		CartesianPlotMarker(int _id);
-		virtual ~CartesianPlotMarker();
-
-		int getId(void) const { return m_id; };
+		CartesianPlotCrossMarker();
+		virtual ~CartesianPlotCrossMarker();
 
 		void setStyle(const QColor& _innerColor, const QColor& _outerColor, int _size = 8, double _outerColorSize = 2.0);
 
 	private:
-		int			m_id;
 		QwtSymbol* m_symbol;
-
-		CartesianPlotMarker() = delete;
-		CartesianPlotMarker(CartesianPlotMarker&) = delete;
-		CartesianPlotMarker& operator = (CartesianPlotMarker&) = delete;
-
 	};
 
 }

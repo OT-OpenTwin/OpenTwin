@@ -349,7 +349,7 @@
     <ClCompile Include="src\CartesianPlotMagnifier.cpp">
       <Filter>src\Plot\Cartesian</Filter>
     </ClCompile>
-    <ClCompile Include="src\CartesianPlotMarker.cpp">
+    <ClCompile Include="src\CartesianPlotCrossMarker.cpp">
       <Filter>src\Plot\Cartesian</Filter>
     </ClCompile>
     <ClCompile Include="src\CartesianPlotPanner.cpp">
@@ -444,6 +444,9 @@
     </ClCompile>
     <ClCompile Include="src\Widget.cpp">
       <Filter>src\General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CartesianPlotTextMarker.cpp">
+      <Filter>src\Plot\Cartesian</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -782,7 +785,7 @@
     <ClInclude Include="include\OTWidgets\CartesianPlotMagnifier.h">
       <Filter>include\Plot\Cartesian</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\CartesianPlotMarker.h">
+    <ClInclude Include="include\OTWidgets\CartesianPlotCrossMarker.h">
       <Filter>include\Plot\Cartesian</Filter>
     </ClInclude>
     <ClInclude Include="include\OTWidgets\CartesianPlotPanner.h">
@@ -880,6 +883,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\Widget.h">
       <Filter>include\General</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\CartesianPlotTextMarker.h">
+      <Filter>include\Plot\Cartesian</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

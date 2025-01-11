@@ -17,7 +17,8 @@
 namespace ot {
 
 	class CartesianPlot;
-	class CartesianPlotMarker;
+	class CartesianPlotTextMarker;
+	class CartesianPlotCrossMarker;
 
 	class OT_WIDGETS_API_EXPORT CartesianPlotMagnifier : public QwtPlotMagnifier {
 	public:
@@ -33,14 +34,14 @@ namespace ot {
 
 		virtual void rescale(double _factor) override;
 
-		CartesianPlotMarker* marker(void) const { return m_marker; }
-
 	private:
-		QPointF			m_cursorPos;
-		bool			m_rightMouseIsPressed;
-		bool			m_mouseMoved;
+		QPointF m_cursorPos;
+		bool m_rightMouseIsPressed;
 		CartesianPlot* m_plot;
-		CartesianPlotMarker* m_marker;
+		CartesianPlotCrossMarker* m_crossMarker;
+		CartesianPlotTextMarker* m_textMarker;
+
+		void updateMarkers(const QPoint& _pos);
 
 	};
 
