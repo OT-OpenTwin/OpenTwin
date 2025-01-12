@@ -18,9 +18,9 @@
 #include "OTCore/Serializable.h"
 
 // std header
+#include <list>
 #include <string>
 #include <ostream>
-#include <list>
 
 //! @brief Time format string for the timetamps
 #define OT_LOG_TIME_FORMAT_STDSTRING "%Y-%m-%d %H:%M:%S"
@@ -416,6 +416,10 @@ namespace ot {
 	//! @param _stream Output stream to write to.
 	//! @param _msg The log message to write.
 	OT_CORE_API_EXPORT std::ostream& operator << (std::ostream& _stream, const LogMessage& _msg);
+
+	OT_CORE_API_EXPORT std::string exportLogMessagesToString(const std::list<LogMessage>& _messages);
+
+	OT_CORE_API_EXPORT bool importLogMessagesFromString(const std::string& _string, std::list<LogMessage>& _messages);
 
 	// ######################################################################################################################################################
 

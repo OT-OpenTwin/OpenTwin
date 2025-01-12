@@ -120,6 +120,9 @@
     <ClInclude Include="include\OTCore\VariableToJSONConverter.h" />
     <ClInclude Include="include\OTCore\VariableToStringConverter.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{E58DB32D-7D02-400E-9DD6-D9A95EFEA088}</ProjectGuid>

@@ -169,6 +169,50 @@ std::ostream& ot::operator << (std::ostream& _stream, const LogMessage& _msg) {
 	return _stream;
 }
 
+std::string ot::exportLogMessagesToString(const std::list<LogMessage>& _messages) {
+	std::string result;
+
+	ot::JsonDocument doc(rapidjson::kArrayType);
+
+	for (const LogMessage& msg : _messages) {
+		ot::JsonObject msgObj;
+		msg.addToJsonObject(msgObj, doc.GetAllocator());
+		doc.PushBack(msgObj, doc.GetAllocator());
+	}
+
+	result = doc.toJson();
+
+	return result;
+}
+
+bool ot::importLogMessagesFromString(const std::string& _string, std::list<LogMessage>& _messages) {
+	ot::JsonDocument doc;
+	doc.fromJson(_string);
+
+	if (!doc.IsArray()) {
+		OT_LOG_E("Document is not an array");
+		return false;
+	}
+
+	for (rapidjson::SizeType i = 0; i < doc.Size(); i++) {
+		try {
+			ot::ConstJsonObject obj = ot::json::getObject(doc, i);
+
+			ot::LogMessage msg;
+			msg.setFromJsonObject(obj);
+			_messages.push_back(msg);
+		}
+		catch (const std::exception& _e) {
+			OT_LOG_E(_e.what());
+		}
+		catch (...) {
+			OT_LOG_E("[FATAL] Unknown error");
+		}
+	}
+
+	return true;
+}
+
 // ######################################################################################################################################################
 
 // ######################################################################################################################################################

@@ -244,39 +244,22 @@ void Logging::slotImport(void) {
 		return;
 	}
 
-	ot::JsonDocument doc;
-	doc.fromJson(f.readAll().toStdString());
+	std::string data = f.readAll().toStdString();
 	f.close();
 
-	if (!doc.IsArray()) {
-		LOGVIS_LOGE("Import failed: Document is not an array");
+	std::list<ot::LogMessage> messages;
+
+	if (!ot::importLogMessagesFromString(data, messages)) {
+		return;
 	}
 
-	QList<ot::LogMessage> msg;
-
-	for (rapidjson::SizeType i = 0; i < doc.Size(); i++) {
-		try {
-			ot::ConstJsonObject obj = ot::json::getObject(doc, i);
-
-			ot::LogMessage m;
-			m.setFromJsonObject(obj);
-			msg.push_back(m);
-		}
-		catch (const std::exception& _e) {
-			LOGVIS_LOGE(_e.what());
-		}
-		catch (...) {
-			LOGVIS_LOGE("[FATAL] Unknown error");
-		}
-	}
-
-	if (msg.empty()) {
+	if (messages.empty()) {
 		LOGVIS_LOGW("No data imported");
 		return;
 	}
 
 	this->slotClear();
-	this->appendLogMessages(msg);
+	this->appendLogMessages(messages);
 
 	settings->setValue("Logging.LastExportedFile", fn);
 	LOGVIS_LOG("Log Messages successfully import from file \"" + fn + "\"");
@@ -298,15 +281,9 @@ void Logging::slotExport(void) {
 		return;
 	}
 
-	ot::JsonDocument doc(rapidjson::kArrayType);
+	std::string data = ot::exportLogMessagesToString(m_messages);
 
-	for (auto m : m_messages) {
-		ot::JsonObject msgObj;
-		m.addToJsonObject(msgObj, doc.GetAllocator());
-		doc.PushBack(msgObj, doc.GetAllocator());
-	}
-
-	f.write(QByteArray::fromStdString(doc.toJson()));
+	f.write(QByteArray::fromStdString(data));
 	f.close();
 
 	settings->setValue("Logging.LastExportedFile", fn);
@@ -444,11 +421,11 @@ void Logging::appendLogMessage(const ot::LogMessage& _msg) {
 	m_table->setRowHidden(r, !m_filterView->filterMessage(_msg));
 }
 
-void Logging::appendLogMessages(const QList<ot::LogMessage>& _messages) {
+void Logging::appendLogMessages(const std::list<ot::LogMessage>& _messages) {
 	bool actb = m_autoScrollToBottom->isChecked();
 	m_autoScrollToBottom->setChecked(false);
-	for (auto m : _messages) {
-		appendLogMessage(m);
+	for (const ot::LogMessage& msg : _messages) {
+		this->appendLogMessage(msg);
 	}
 	m_autoScrollToBottom->setChecked(actb);
 }

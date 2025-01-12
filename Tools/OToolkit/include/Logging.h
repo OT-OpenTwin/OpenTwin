@@ -16,6 +16,9 @@
 #include <QtCore/qlist.h>
 #include <QtWidgets/qdialog.h>
 
+// std header
+#include <list>
+
 class LogModeSetter;
 class LoggingFilterView;
 
@@ -67,7 +70,7 @@ public:
 	// Log Visualization
 
 	void appendLogMessage(const ot::LogMessage& _msg);
-	void appendLogMessages(const QList<ot::LogMessage>& _messages);
+	void appendLogMessages(const std::list<ot::LogMessage>& _messages);
 
 public Q_SLOTS:
 	void slotUpdateColumnWidth(void);

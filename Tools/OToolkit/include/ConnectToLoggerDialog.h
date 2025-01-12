@@ -28,7 +28,7 @@ public:
 	ConnectToLoggerDialog();
 	virtual ~ConnectToLoggerDialog();
 
-	const QList<ot::LogMessage>& messageBuffer(void) const { return m_messageBuffer; };
+	const std::list<ot::LogMessage>& messageBuffer(void) const { return m_messageBuffer; };
 
 	QString loggerServiceUrl(void) const;
 
@@ -64,5 +64,5 @@ private:
 	QPushButton *				m_btnCancel;
 	QPushButton *				m_btnConnect;
 
-	QList<ot::LogMessage>	m_messageBuffer;
+	std::list<ot::LogMessage>	m_messageBuffer;
 };
