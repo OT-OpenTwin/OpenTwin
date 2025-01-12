@@ -4,6 +4,7 @@
 #include "MongoConstants.h"
 #include "MongoUserFunctions.h"
 #include "OTCore/JSON.h"
+#include "OTCommunication/ActionTypes.h"
 
 /*
 * The following functionalities have to be implemented
@@ -687,11 +688,11 @@ namespace MongoProjectFunctions
 	{
 		ot::JsonDocument json;
 		json.AddMember("id", ot::JsonString(project._id.to_string(), json.GetAllocator()), json.GetAllocator());
-		json.AddMember("name", ot::JsonString(project.name, json.GetAllocator()), json.GetAllocator());
+		json.AddMember(OT_PARAM_AUTH_NAME, ot::JsonString(project.name, json.GetAllocator()), json.GetAllocator());
 		json.AddMember("ProjectType", ot::JsonString(project.type, json.GetAllocator()), json.GetAllocator());
 		json.AddMember("collectionName", ot::JsonString(project.collectionName, json.GetAllocator()), json.GetAllocator());
-		json.AddMember("creatingUser", ot::JsonString(project.creatingUser.username, json.GetAllocator()), json.GetAllocator());
-		json.AddMember("LastAccessed", project.lastAccessedOn.value.count(), json.GetAllocator());
+		json.AddMember(OT_PARAM_AUTH_OWNER, ot::JsonString(project.creatingUser.username, json.GetAllocator()), json.GetAllocator());
+		json.AddMember(OT_PARAM_AUTH_PROJECT_LASTACCESS, project.lastAccessedOn.value.count(), json.GetAllocator());
 		
 		std::list<std::string> groups;
 

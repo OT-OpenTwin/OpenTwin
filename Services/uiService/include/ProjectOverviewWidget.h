@@ -54,6 +54,7 @@ private:
 	ot::CheckBox* m_checkBox;
 	QTableWidgetItem* m_nameItem;
 	QTableWidgetItem* m_ownerItem;
+	QTableWidgetItem* m_lastAccessTimeItem;
 
 };
 

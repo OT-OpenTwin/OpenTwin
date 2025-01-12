@@ -43,7 +43,7 @@ public:
 	bool projectExists(const std::string &projectName, bool &canBeDeleted);
 	std::string getProjectCollection(const std::string &projectName);
 	bool findProjectNames(const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ProjectInformation>& _projectsFound, bool& _maxLengthExceeded);
-	bool getProjectAuthor(const std::string &projectName, std::string &author);
+	ProjectInformation getProjectInformation(const std::string& _projectName);
 	bool readProjectsInfo(std::list<std::string>& _projects);
 	bool copyProject(const std::string &sourceProjectName, const std::string &destinationProjectName, const std::string &userName);
 	std::vector<std::string> getDefaultTemplateList(void);
@@ -58,10 +58,10 @@ private:
 	void copyCollection(const std::string& sourceCollectionName, const std::string& destinationCollectionName);
 	void flushCachedDocuments(std::list<bsoncxx::builder::basic::document*>& cachedDocuments, mongocxx::collection& collection);
 
-	bool isConnected;
-	std::string databaseURL;
-	std::string authServerURL;
-	const std::string dataBaseName;
-	const std::string projectCatalogCollectionName;
-	std::map<std::string, ProjectInformation> projectInfoMap;
+	bool m_isConnected;
+	std::string m_databaseURL;
+	std::string m_authServerURL;
+	const std::string m_dataBaseName;
+	const std::string m_projectCatalogCollectionName;
+	std::map<std::string, ProjectInformation> m_projectInfoMap;
 };

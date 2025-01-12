@@ -37,19 +37,19 @@
 #include <iomanip>
 
 ProjectManagement::ProjectManagement() :
-	isConnected(false),
-	dataBaseName("Projects"),
-	projectCatalogCollectionName("Catalog")
+	m_isConnected(false),
+	m_dataBaseName("Projects"),
+	m_projectCatalogCollectionName("Catalog")
 {
 
 }
 
 ProjectManagement::ProjectManagement(const LoginData& _data) 
-	: isConnected(false),
-	dataBaseName("Projects"),
-	projectCatalogCollectionName("Catalog"),
-	databaseURL(_data.getDatabaseUrl()),
-	authServerURL(_data.getAuthorizationUrl())
+	: m_isConnected(false),
+	m_dataBaseName("Projects"),
+	m_projectCatalogCollectionName("Catalog"),
+	m_databaseURL(_data.getDatabaseUrl()),
+	m_authServerURL(_data.getAuthorizationUrl())
 {
 
 }
@@ -61,17 +61,17 @@ ProjectManagement::~ProjectManagement()
 
 void ProjectManagement::setDataBaseURL(const std::string &url)
 {
-	databaseURL = url;
+	m_databaseURL = url;
 }
 
 void ProjectManagement::setAuthServerURL(const std::string &url)
 {
-	authServerURL = url;
+	m_authServerURL = url;
 }
 
 bool ProjectManagement::createProject(const std::string &projectName, const std::string& projectType, const std::string &userName, const std::string &defaultSettingTemplate)
 {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
 	AppBase * app{ AppBase::instance() };
 
@@ -83,7 +83,7 @@ bool ProjectManagement::createProject(const std::string &projectName, const std:
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_TYPE, ot::JsonString(projectType, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -106,7 +106,7 @@ bool ProjectManagement::createProject(const std::string &projectName, const std:
 
 bool ProjectManagement::deleteProject(const std::string &projectName)
 {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
 	AppBase * app{ AppBase::instance() };
 
@@ -117,7 +117,7 @@ bool ProjectManagement::deleteProject(const std::string &projectName)
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -127,7 +127,7 @@ bool ProjectManagement::deleteProject(const std::string &projectName)
 
 bool ProjectManagement::renameProject(const std::string &oldProjectName, const std::string &newProjectName)
 {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
 	AppBase * app{ AppBase::instance() };
 
@@ -139,7 +139,7 @@ bool ProjectManagement::renameProject(const std::string &oldProjectName, const s
 	doc.AddMember(OT_PARAM_AUTH_NEW_PROJECT_NAME, ot::JsonString(newProjectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -149,7 +149,7 @@ bool ProjectManagement::renameProject(const std::string &oldProjectName, const s
 
 bool ProjectManagement::projectExists(const std::string &projectName, bool &canBeDeleted)
 {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
 	AppBase * app{ AppBase::instance() };
 
@@ -160,7 +160,7 @@ bool ProjectManagement::projectExists(const std::string &projectName, bool &canB
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -218,7 +218,7 @@ bool ProjectManagement::hasSuccessful(const std::string &response)
 
 std::string ProjectManagement::getProjectCollection(const std::string &projectName)
 {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
 	AppBase * app{ AppBase::instance() };
 
@@ -229,7 +229,7 @@ std::string ProjectManagement::getProjectCollection(const std::string &projectNa
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return "";
 	}
@@ -258,7 +258,7 @@ std::string ProjectManagement::getProjectCollection(const std::string &projectNa
 
 std::string ProjectManagement::getProjectType(const std::string& projectName)
 {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
 	AppBase* app{ AppBase::instance() };
 
@@ -269,7 +269,7 @@ std::string ProjectManagement::getProjectType(const std::string& projectName)
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		OT_LOG_E("Request failed");
 		return "";
@@ -301,10 +301,10 @@ std::string ProjectManagement::getProjectType(const std::string& projectName)
 
 bool ProjectManagement::findProjectNames(const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ProjectInformation>& _projectsFound, bool& _maxLengthExceeded)
 {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
 	_projectsFound.clear();
-	projectInfoMap.clear();
+	m_projectInfoMap.clear();
 
 	AppBase * app{ AppBase::instance() };
 
@@ -316,7 +316,7 @@ bool ProjectManagement::findProjectNames(const std::string& _projectNameFilter, 
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, _maxNumberOfResults + 1, doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -338,9 +338,10 @@ bool ProjectManagement::findProjectNames(const std::string& _projectNameFilter, 
 		ProjectInformation newInfo;
 		newInfo.setProjectName(projectDoc[OT_PARAM_AUTH_NAME].GetString());
 		newInfo.setUserName(projectDoc[OT_PARAM_AUTH_OWNER].GetString());
+		newInfo.setLastAccessTime(QDateTime::fromMSecsSinceEpoch(ot::json::getInt64(projectDoc, OT_PARAM_AUTH_PROJECT_LASTACCESS)));
 
 		_projectsFound.push_back(newInfo);
-		projectInfoMap[newInfo.getProjectName()] = newInfo;
+		m_projectInfoMap[newInfo.getProjectName()] = newInfo;
 	}
 
 	while (_projectsFound.size() > _maxNumberOfResults) {
@@ -363,7 +364,7 @@ bool ProjectManagement::createNewCollection(const std::string &collectionName, c
 		doc.append(bsoncxx::builder::basic::kvp("SchemaType", "DefaultTemplate"));
 		doc.append(bsoncxx::builder::basic::kvp("TemplateName", defaultSettingTemplate));
 
-		DataStorageAPI::DocumentAccess docManager(dataBaseName, collectionName);
+		DataStorageAPI::DocumentAccess docManager(m_dataBaseName, collectionName);
 
 		DataStorageAPI::DataStorageResponse res = docManager.InsertDocumentToDatabase(doc.view(), false);
 		assert(res.getSuccess());
@@ -374,44 +375,45 @@ bool ProjectManagement::createNewCollection(const std::string &collectionName, c
 
 bool ProjectManagement::InitializeConnection(void)
 {
-	if (isConnected) return true;
+	if (m_isConnected) {
+		return true;
+	}
 
-	try
-	{
+	try {
 		AppBase * app{ AppBase::instance() };
-		DataStorageAPI::ConnectionAPI::establishConnection(databaseURL, "1", app->getCurrentLoginData().getSessionUser(), app->getCurrentLoginData().getSessionPassword());
+		DataStorageAPI::ConnectionAPI::establishConnection(m_databaseURL, "1", app->getCurrentLoginData().getSessionUser(), app->getCurrentLoginData().getSessionPassword());
 
 		// Now we run a command on the server and check whether its is really responding to us (the following command throws an exception if not)
-		isConnected = DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(dataBaseName, projectCatalogCollectionName);
+		m_isConnected = DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(m_dataBaseName, m_projectCatalogCollectionName);
 
-		if (!isConnected)
-		{
+		if (!m_isConnected) {
 			// It might be that the catalog has not been created yet. Try to create the catalog.
-			DataStorageAPI::ConnectionAPI::getInstance().createCollection(dataBaseName, projectCatalogCollectionName);
-			isConnected = DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(dataBaseName, projectCatalogCollectionName);
+			DataStorageAPI::ConnectionAPI::getInstance().createCollection(m_dataBaseName, m_projectCatalogCollectionName);
+			m_isConnected = DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(m_dataBaseName, m_projectCatalogCollectionName);
 		}
 
-		return isConnected; 
+		return m_isConnected;
 	}
-	catch (std::exception&)
-	{
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
 		return false; // Connection failed
 	}
 }
 
-bool ProjectManagement::getProjectAuthor(const std::string &projectName, std::string &author) {
-	if (projectInfoMap.count(projectName) > 0)
-	{
-		author = projectInfoMap[projectName].getUserName();
+ProjectInformation ProjectManagement::getProjectInformation(const std::string& _projectName) {
+	auto it = m_projectInfoMap.find(_projectName);
+	if (it == m_projectInfoMap.end()) {
+		return ProjectInformation();
 	}
-
-	return true;
+	else {
+		return it->second;
+	}
 }
 
 bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
-	assert(!authServerURL.empty());
+	assert(!m_authServerURL.empty());
 
-	projectInfoMap.clear();
+	m_projectInfoMap.clear();
 
 	AppBase * app{ AppBase::instance() };
 
@@ -424,7 +426,7 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAMES, ot::JsonArray(_projects, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
 	{
 		return false;
 	}
@@ -446,10 +448,11 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
 		ProjectInformation newInfo;
 		newInfo.setProjectName(projectDoc[OT_PARAM_AUTH_NAME].GetString());
 		newInfo.setUserName(projectDoc[OT_PARAM_AUTH_OWNER].GetString());
+		newInfo.setLastAccessTime(QDateTime::fromMSecsSinceEpoch(ot::json::getInt64(projectDoc, OT_PARAM_AUTH_PROJECT_LASTACCESS)));
 
 		validProjects.push_back(newInfo.getProjectName());
 
-		projectInfoMap[newInfo.getProjectName()] = newInfo;
+		m_projectInfoMap[newInfo.getProjectName()] = newInfo;
 	}
 
 	// Now loop through all projects and check the validity
@@ -458,11 +461,11 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
 	bool uManagerInitialized = false;
 
 	for (const std::string& projectName : _projects) {
-		if (projectInfoMap.count(projectName) == 0) {
+		if (m_projectInfoMap.count(projectName) == 0) {
 			// Remove the project from the recent projects list
 			if (!uManagerInitialized) {
-				uManager.setAuthServerURL(authServerURL);
-				uManager.setDatabaseURL(databaseURL);
+				uManager.setAuthServerURL(m_authServerURL);
+				uManager.setDatabaseURL(m_databaseURL);
 				
 				bool checkConnection = uManager.checkConnection();
 				assert(checkConnection); // Connect and check
@@ -507,10 +510,10 @@ bool ProjectManagement::copyProject(const std::string &sourceProjectName, const 
 
 void ProjectManagement::copyCollection(const std::string& sourceCollectionName, const std::string& destinationCollectionName)
 {
-	if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(dataBaseName, sourceCollectionName)) return;
+	if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(m_dataBaseName, sourceCollectionName)) return;
 
 	// Get the collection pointers for both projects
-	auto sourceCollection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, sourceCollectionName);
+	auto sourceCollection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, sourceCollectionName);
 
 	// Copy the content by using the collection.aggregate method
 
@@ -549,14 +552,14 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 	if (collectionName.empty()) return "Unable to determine the project data to be exported";  // The collection name could not be found, so we cannot continue
 
 																							   // Get the collection
-	if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(dataBaseName, collectionName)) return "Unable to access the project data to be exported";
+	if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(m_dataBaseName, collectionName)) return "Unable to access the project data to be exported";
 
-	auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, collectionName);
+	auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName);
 
 	size_t numberResultDocuments = 0;
-	if (DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(dataBaseName, collectionName + ".results"))
+	if (DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(m_dataBaseName, collectionName + ".results"))
 	{
-		auto resultCollection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, collectionName + ".results");
+		auto resultCollection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName + ".results");
 		numberResultDocuments = resultCollection.count_documents({});
 	}
 
@@ -700,7 +703,7 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 	// Now we export the result data collection, if any
 	if (numberResultDocuments > 0)
 	{
-		auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, collectionName + ".results");
+		auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName + ".results");
 
 		auto cursor = collection.find({});
 
@@ -778,7 +781,7 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 		std::string collectionName = getProjectCollection(projectName);
 		if (collectionName.empty()) return "Unable to determine the project data location for import";  // The collection name could not be found, so we cannot continue
 
-		auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, collectionName);
+		auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName);
 	
 		// Import the data from the file
 
@@ -943,7 +946,7 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 		if (numberResultDocuments > 0)
 		{
 			// Try to load the result data
-			auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, collectionName + ".results");
+			auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName + ".results");
 
 			std::list<bsoncxx::builder::basic::document*> cachedDocuments;
 
@@ -1012,17 +1015,17 @@ void ProjectManagement::flushCachedDocuments(std::list<bsoncxx::builder::basic::
 	cachedDocuments.clear();
 }
 
-bool ProjectManagement::canAccessProject(const std::string &projectCollection)
-{
-	if (projectCollection.empty()) return false;
+bool ProjectManagement::canAccessProject(const std::string &projectCollection) {
+	if (projectCollection.empty()) {
+		return false;
+	}
 
-	try
-	{
-		auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(dataBaseName, projectCollection);
+	try {
+		auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, projectCollection);
 		size_t numberDocuments = collection.count_documents({});
 	}
-	catch (std::exception &e)
-	{
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
 		return false;
 	}
 

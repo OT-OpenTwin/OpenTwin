@@ -12,6 +12,7 @@
 
 // ADS header
 #include <ads/DockManager.h>
+#include <ads/IconProvider.h>
 #include <ads/DockAreaWidget.h>
 
 // Qt header
@@ -39,10 +40,21 @@ void ot::WidgetViewManager::initialize(WidgetViewDockManager* _dockManager) {
 		m_dockManager->setStyleSheet("");
 	}
 
+	// Initialize custom icons
+	ads::CIconProvider& iconProvider = m_dockManager->iconProvider();
+
+	QPixmap pixmap(8, 8);
+	pixmap.fill(QColor(0, 0, 0, 0));
+	QIcon transparentIcon(pixmap);
+
+	iconProvider.registerCustomIcon(ads::TabCloseIcon, transparentIcon);
+
+	// Initialze dock toggle action
 	m_dockToggleRoot = new QAction("Windows");
 	QMenu* newMenu = new QMenu;
 	m_dockToggleRoot->setMenu(newMenu);
 
+	// Connect signals
 	this->connect(m_dockManager, &ads::CDockManager::focusedDockWidgetChanged, this, &WidgetViewManager::slotViewFocused);
 }
 

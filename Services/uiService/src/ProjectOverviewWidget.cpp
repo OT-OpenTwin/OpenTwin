@@ -31,6 +31,7 @@ enum TableColumn {
 	ColumnCheck,
 	ColumnName,
 	ColumnOwner,
+	ColumnLastAccess,
 	ColumnCount
 };
 
@@ -51,9 +52,14 @@ ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInf
 	m_ownerItem->setFlags(m_nameItem->flags());
 	m_ownerItem->setText(QString::fromStdString(_projectInfo.getUserName()));
 
+	m_lastAccessTimeItem = new QTableWidgetItem;
+	m_lastAccessTimeItem->setFlags(m_nameItem->flags());
+	m_lastAccessTimeItem->setText(_projectInfo.getLastAccessTime().toString("yyyy.MM.dd hh:mm:ss"));
+
 	_table->setCellWidget(m_row, TableColumn::ColumnCheck, m_checkBox);
 	_table->setItem(m_row, TableColumn::ColumnName, m_nameItem);
 	_table->setItem(m_row, TableColumn::ColumnOwner, m_ownerItem);
+	_table->setItem(m_row, TableColumn::ColumnLastAccess, m_lastAccessTimeItem);
 
 	this->connect(m_checkBox, &ot::CheckBox::stateChanged, this, &ProjectOverviewEntry::slotCheckedChanged);
 }
@@ -125,7 +131,7 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 	m_filter->setPlaceholderText("Find...");
 	m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_table->horizontalHeader()->setSectionResizeMode(TableColumn::ColumnName, QHeaderView::Stretch);
-	m_table->setHorizontalHeaderLabels({ "", "Name", "Owner" });
+	m_table->setHorizontalHeaderLabels({ "", "Name", "Owner", "Last Access" });
 	m_table->verticalHeader()->setHidden(true);
 
 	glWidget->setMaximumSize(1, 1);
@@ -251,13 +257,14 @@ void ProjectOverviewWidget::slotRefreshRecentProjects(void) {
 	
 	for (const std::string& proj : recent) {
 		std::string editorName("< Unknown >");
-		projectManager.getProjectAuthor(proj, editorName);
+		ProjectInformation newInfo = projectManager.getProjectInformation(proj);
 
-		ProjectInformation newInfo;
-		newInfo.setProjectName(proj);
-		newInfo.setUserName(editorName);
-
-		this->addProject(newInfo, newInfo.getUserName() == currentUser);
+		if (newInfo.getProjectName().empty()) {
+			OT_LOG_E("Project information for project \"" + proj + "\" not found");
+		}
+		else {
+			this->addProject(newInfo, newInfo.getUserName() == currentUser);
+		}
 	}
 
 	this->updateCountLabel(false);

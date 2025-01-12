@@ -797,6 +797,7 @@
 #define OT_PARAM_AUTH_PROJECT_LIMIT "ProjectLimit"
 #define OT_PARAM_AUTH_PROJECT_COLLECTION "collectionName"
 #define OT_PARAM_AUTH_PROJECT_TYPE "ProjectType"
+#define OT_PARAM_AUTH_PROJECT_LASTACCESS "LastAccessed"
 #define OT_PARAM_AUTH_NAME "name"
 #define OT_PARAM_AUTH_OWNER "creatingUser"
 #define OT_PARAM_AUTH_GROUP "groupName"
