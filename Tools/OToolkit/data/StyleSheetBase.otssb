@@ -2401,7 +2401,7 @@ QScrollArea#dockWidgetScrollArea {
 
 ads--CDockWidgetTab {
     border: 1px solid transparent;
-    padding: 0px;
+    padding: 2px;
 }
 
 ads--CDockWidgetTab[activeTab="false"]::hover {
@@ -2411,7 +2411,7 @@ ads--CDockWidgetTab[activeTab="false"]::hover {
     border-bottom: 1px solid transparent;
     border-top-left-radius: %double:Border Radius Big%;
     border-top-right-radius: %double:Border Radius Big%;
-    margin-bottom: -1px;
+    margin-bottom: -2px;
 }
 
 ads--CDockWidgetTab[activeTab="true"] {
@@ -2421,13 +2421,13 @@ ads--CDockWidgetTab[activeTab="true"] {
     border-bottom: 1px solid %color:Widget Background%;
     border-top-left-radius: %double:Border Radius Big%;
     border-top-right-radius: %double:Border Radius Big%;
-    margin-bottom: -1px;
+    margin-bottom: -2px;
 }
 
 ads--CDockWidgetTab QLabel {
     color: %color:Widget Foreground%;
-    padding-left: 0px;
-    padding-right: 0px;
+    padding: 0px;
+    margin: 0px;
 }
 
 ads--CDockWidgetTab[activeTab="true"] QLabel {
@@ -2437,20 +2437,23 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
 #tabCloseButton {
     background: %color:Widget Background%;
     color: %color:Widget Foreground%;
-    border: 1px solid transparent;
+    border: 0px solid transparent;
     padding: 0px;
+    margin: 0px;
+    width: 8px;
+    image: url('%file:Window Close Icon%');
 }
 
 #tabCloseButton::hover::!pressed {
-    color: %color:Widget Hover Background%;
+    image: url('%file:Window Close Focus Icon%');
 }
 
 #tabCloseButton::pressed {
-    color: %color:Widget Selection Background%;
+    image: url('%file:Window Close Pressed Icon%');
 }
 
 #tabCloseButton::disabled {
-    color: %color:Widget Disabled Background%;
+    image: url('%file:Window Close Disabled Icon%');
 }
 
 #tabsMenuButton::menu-indicator {

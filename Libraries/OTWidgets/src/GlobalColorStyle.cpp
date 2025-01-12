@@ -5,8 +5,12 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTWidgets/WidgetViewManager.h"
 #include "OTWidgets/GlobalColorStyle.h"
 #include "OTGui/ColorStyleTypes.h"
+
+// ADS header
+#include <ads/IconProvider.h>
 
 // Qt header
 #include <QtCore/qdir.h>
@@ -186,4 +190,14 @@ std::list<std::string> ot::GlobalColorStyle::getAvailableStyleNames(void) const 
 
 ot::GlobalColorStyle::GlobalColorStyle() : m_app(nullptr) {
 	m_invalidStyle.setColorStyleName("<Invalid>");
+
+	// Register custom icons to widget view manager
+	OTAssertNullptr(WidgetViewManager::instance().getDockManager());
+	ads::CIconProvider& iconProvider = WidgetViewManager::instance().getDockManager()->iconProvider();
+
+	QPixmap pixmap(8, 8);
+	pixmap.fill(QColor(0, 0, 0, 0));
+	QIcon transparentIcon(pixmap);
+
+	iconProvider.registerCustomIcon(ads::TabCloseIcon, transparentIcon);
 }
