@@ -204,6 +204,8 @@ public:
 	void importProject(void);
 	void manageGroups(void);
 
+	void exportLogs(void);
+
 	// ############################################################################################
 
 	// Information setter

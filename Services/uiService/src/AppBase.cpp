@@ -76,7 +76,9 @@
 #include "OTWidgets/PropertyInputStringList.h"
 #include "OTWidgets/VersionGraphManagerView.h"
 
+#include "OTCommunication/msg.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ServiceLogNotifier.h"
 
 // ADS header
 #include <ads/DockManager.h>
@@ -568,6 +570,80 @@ void AppBase::manageGroups(void)
 	groupManager.showDialog();
 
 	lockUI(false);
+}
+
+void AppBase::exportLogs(void) {
+	if (m_loginData.getUserName().empty()) {
+		OT_LOG_E("User name empty");
+		return;
+	}
+
+	if (ot::ServiceLogNotifier::instance().loggingServiceURL().empty()) {
+		OT_LOG_E("Logger service url empty");
+		this->showErrorPrompt("No logger service not found", "Export Log");
+		return;
+	}
+
+	// Pull logs from logger
+	ot::JsonDocument requestDoc;
+	requestDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_GetUserLogs, requestDoc.GetAllocator());
+	requestDoc.AddMember(OT_ACTION_PARAM_USER_NAME, ot::JsonString(m_loginData.getUserName(), requestDoc.GetAllocator()), requestDoc.GetAllocator());
+
+	std::string response;
+	if (!ot::msg::send("", ot::ServiceLogNotifier::instance().loggingServiceURL(), ot::EXECUTE_ONE_WAY_TLS, requestDoc.toJson(), response)) {
+		return;
+	}
+
+	// Deserialize
+	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+
+	if (responseMessage != ot::ReturnMessage::Ok) {
+		OT_LOG_E("Invalid response: " + responseMessage.getWhat());
+		this->showErrorPrompt("Invalid response from logger service", "Export Log");
+		return;
+	}
+
+	ot::JsonDocument messagesDoc;
+	if (!messagesDoc.fromJson(responseMessage.getWhat())) {
+		OT_LOG_E("Invalid response syntax");
+		this->showErrorPrompt("Invalid response syntax from logger service", "Export Log");
+		return;
+	}
+
+	std::list<ot::LogMessage> messages;
+	for (ot::JsonSizeType i = 0; i < messagesDoc.Size(); i++) {
+		ot::LogMessage msg;
+		msg.setFromJsonObject(ot::json::getObject(messagesDoc.constRef(), i));
+		messages.push_back(msg);
+	}
+
+	if (messages.empty()) {
+		this->showInfoPrompt("No log messages to export", "Export Log");
+		return;
+	}
+
+	std::string exportString = ot::exportLogMessagesToString(messages);
+
+	std::shared_ptr<QSettings> settings = this->createSettingsInstance();
+	QString exportName = settings->value("ExportLogPath", QString()).toString();
+	exportName = QFileDialog::getSaveFileName(this->mainWindow(), "Export Log", exportName, "OpenTwin log file (*.otlog.json)");
+	if (exportName.isEmpty()) {
+		return;
+	}
+
+	QFile file(exportName);
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+		OT_LOG_E("Failed to open file for writing");
+		this->showErrorPrompt("Failed to open file for writing.\nFile: \"" + exportName.toStdString() + "\"", "Export Log");
+		return;
+	}
+
+	file.write(exportString.c_str());
+	file.close();
+
+	settings->setValue("ExportLogPath", exportName);
+
+	this->showInfoPrompt("Log files written to file \"" + exportName.toStdString() + "\"", "Export Log");
 }
 
 void AppBase::importProjectWorker(std::string projectName, std::string currentUser, std::string importFileName)

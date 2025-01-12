@@ -67,6 +67,7 @@ private:
 		ak::UID				gDefault_aSettings;
 		ak::UID				gDefault_aImport;
 		ak::UID				gDefault_aGroup;
+		ak::UID				gDefault_aExportLog;
 	};
 
 	AppBase *			m_owner;
