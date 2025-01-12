@@ -21,7 +21,7 @@ ViewerSettings::ViewerSettings()
 	axisCenterCrossDashedLineVisible(true), axisCenterCrossLineAtFront(false),
 	geometryHighlightColor(255, 0, 0, 255), geometryEdgeColorMode("Same as geometry"), geometryEdgeColorMode_geom("Same as geometry"), geometryEdgeColorMode_custom("Custom"),
 	geometryEdgeColorMode_noColor("No Color"), geometryEdgeColor(255, 0, 0, 255), geometryLightSourceDistance("Medium"),
-	viewBackgroundColorAutomatic(true), viewBackgroundColor(255, 255, 255, 255), viewForegroundColor(0, 0, 0, 255), useDisplayLists(true), useVertexBufferObjects(false)
+	viewBackgroundColorAutomatic(true), viewBackgroundColor(255, 255, 255, 255), viewForegroundColor(0, 0, 0, 255), useDisplayLists(false), useVertexBufferObjects(true)
 {}
 
 ViewerSettings::~ViewerSettings() {}
