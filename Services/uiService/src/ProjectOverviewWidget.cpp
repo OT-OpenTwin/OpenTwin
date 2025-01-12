@@ -92,7 +92,7 @@ void ProjectOverviewEntry::slotCheckedChanged(void) {
 // ###########################################################################################################################################################################################################################################################################################################################
 
 ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
-	: m_mode(ViewMode::ViewAll)
+	: m_mode(ViewMode::ViewAll), m_sortMode(SortMode::NameAscending)
 {
 	// Create layouts
 	m_widget = new QWidget;
@@ -151,6 +151,7 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 	this->connect(m_filter, &ot::LineEdit::textChanged, this, &ProjectOverviewWidget::slotFilterChanged);
 	this->connect(m_table, &ot::Table::cellDoubleClicked, this, &ProjectOverviewWidget::slotProjectDoubleClicked);
 	this->connect(m_table, &ot::Table::itemSelectionChanged, this, &ProjectOverviewWidget::slotUpdateItemSelection);
+	this->connect(m_table->horizontalHeader(), &QHeaderView::sectionClicked, this, &ProjectOverviewWidget::slotHeaderClicked);
 	this->connect(m_createButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotCreateProject);
 	this->connect(m_refreshButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotRefreshProjectList);
 	this->connect(m_toggleViewModeButton, &ot::ToolButton::clicked, this, &ProjectOverviewWidget::slotToggleViewMode);
@@ -234,6 +235,8 @@ void ProjectOverviewWidget::slotRefreshProjectList(void) {
 		OT_LOG_EA("Unknown view mode");
 		break;
 	}
+
+	this->sortTable();
 }
 
 void ProjectOverviewWidget::slotRefreshRecentProjects(void) {
@@ -359,6 +362,33 @@ void ProjectOverviewWidget::slotProjectCheckedChanged(int _row) {
 	this->updateToolButtonsEnabledState();
 }
 
+void ProjectOverviewWidget::slotHeaderClicked(int _index) {
+	if (_index == TableColumn::ColumnName) {
+		if (m_sortMode == NameAscending) {
+			m_sortMode = NameDescending;
+		}
+		else if (m_sortMode == NameDescending) {
+			m_sortMode = NameAscending;
+		}
+		else {
+			m_sortMode = NameAscending;
+		}
+		this->sortTable();
+	}
+	else if (_index == TableColumn::ColumnLastAccess) {
+		if (m_sortMode == LastAccessAscending) {
+			m_sortMode = LastAccessDescending;
+		}
+		else if (m_sortMode == LastAccessDescending) {
+			m_sortMode = LastAccessAscending;
+		}
+		else {
+			m_sortMode = LastAccessAscending;
+		}
+		this->sortTable();
+	}
+}
+
 ot::ToolButton* ProjectOverviewWidget::iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip) {
 	ot::ToolButton* newButton = new ot::ToolButton(ot::IconManager::getIcon(_iconPath), _text);
 	const int iconSize = QApplication::style()->pixelMetric(QStyle::PM_LargeIconSize);
@@ -476,4 +506,24 @@ bool ProjectOverviewWidget::hasDifferentSelectedOwner(void) {
 		}
 	}
 	return false;
+}
+
+void ProjectOverviewWidget::sortTable(void) {
+	switch (m_sortMode) {
+	case ProjectOverviewWidget::NameAscending:
+		m_table->sortByColumn(TableColumn::ColumnName, Qt::AscendingOrder);
+		break;
+	case ProjectOverviewWidget::NameDescending:
+		m_table->sortByColumn(TableColumn::ColumnName, Qt::DescendingOrder);
+		break;
+	case ProjectOverviewWidget::LastAccessAscending:
+		m_table->sortByColumn(TableColumn::ColumnLastAccess, Qt::AscendingOrder);
+		break;
+	case ProjectOverviewWidget::LastAccessDescending:
+		m_table->sortByColumn(TableColumn::ColumnLastAccess, Qt::DescendingOrder);
+		break;
+	default:
+		OT_LOG_E("Unknown sort mode");
+		break;
+	}
 }

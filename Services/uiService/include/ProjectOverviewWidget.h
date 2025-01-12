@@ -117,6 +117,8 @@ public Q_SLOTS:
 	void slotFilterChanged(void);
 	void slotProjectCheckedChanged(int _row);
 
+	void slotHeaderClicked(int _index);
+
 private:
 	ot::ToolButton* iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip);
 	void clear(void);
@@ -125,8 +127,17 @@ private:
 	void updateToggleViewModeButton(void);
 	void updateToolButtonsEnabledState(bool _forceDisabled = false);
 	bool hasDifferentSelectedOwner(void);
+	void sortTable(void);
+
+	enum SortMode {
+		NameAscending,
+		NameDescending,
+		LastAccessAscending,
+		LastAccessDescending
+	};
 
 	ViewMode m_mode;
+	SortMode m_sortMode;
 
 	QWidget* m_widget;
 
