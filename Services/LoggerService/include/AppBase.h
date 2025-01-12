@@ -37,6 +37,8 @@ public:
 	OT_HANDLER(handleGetDebugInfo, AppBase, OT_ACTION_CMD_GetDebugInformation, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleSetGlobalLogFlags, AppBase, OT_ACTION_CMD_SetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleSetCacheSize, AppBase, OT_ACTION_CMD_SetLogCacheSize, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetAllLogs, AppBase, OT_ACTION_CMD_GetAllLogs, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleGetUserLogs, AppBase, OT_ACTION_CMD_GetUserLogs, ot::ALL_MESSAGE_TYPES)
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

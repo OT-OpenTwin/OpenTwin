@@ -63,6 +63,8 @@
 #define OT_ACTION_CMD_SetGlobalLogFlags "Logger.SetGlobal"
 #define OT_ACTION_CMD_SetSpecificLogFlags "Logger.SetSpecific"
 #define OT_ACTION_CMD_SetLogCacheSize "Logger.SetCacheSize"
+#define OT_ACTION_CMD_GetAllLogs "Logger.GetAllLogs"
+#define OT_ACTION_CMD_GetUserLogs "Logger.GetUserLogs"
 
 #define OT_ACTION_CMD_ServiceEnableDebug "Service.DebugEnable"
 #define OT_ACTION_CMD_ServiceDisableDebug "Service.DebugDisable"

@@ -5,6 +5,7 @@
 
 #include "AppBase.h"
 
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 
@@ -154,6 +155,51 @@ std::string AppBase::handleSetCacheSize(ot::JsonDocument& _jsonDocument) {
 	this->resizeBuffer();
 
 	return OT_ACTION_RETURN_VALUE_OK;
+}
+
+std::string AppBase::handleGetAllLogs(ot::JsonDocument& _jsonDocument) {
+	ot::ReturnMessage response;
+
+	response = ot::ReturnMessage::Ok;
+
+	ot::JsonDocument doc(rapidjson::kArrayType);
+
+	for (const ot::LogMessage& msg : m_messages) {
+		ot::JsonObject msgObj;
+		msg.addToJsonObject(msgObj, doc.GetAllocator());
+		doc.PushBack(msgObj, doc.GetAllocator());
+	}
+
+	response = doc.toJson();
+
+	return response.toJson();
+}
+
+std::string AppBase::handleGetUserLogs(ot::JsonDocument& _jsonDocument) {
+	std::string userName = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_USER_NAME);
+	ot::ReturnMessage response;
+
+	if (userName.empty()) {
+		response = ot::ReturnMessage::Failed;
+		response = "User name is empty";
+	}
+	else {
+		response = ot::ReturnMessage::Ok;
+		
+		ot::JsonDocument doc(rapidjson::kArrayType);
+
+		for (const ot::LogMessage& msg : m_messages) {
+			if (msg.getUserName() == userName) {
+				ot::JsonObject msgObj;
+				msg.addToJsonObject(msgObj, doc.GetAllocator());
+				doc.PushBack(msgObj, doc.GetAllocator());
+			}
+		}
+
+		response = doc.toJson();
+	}
+
+	return response.toJson();
 }
 
 void AppBase::updateBufferSizeFromLogFlags(const ot::LogFlags& _flags) {
