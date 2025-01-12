@@ -272,6 +272,10 @@ void AppBase::slotProcessMessage(const QString& _json) {
 // Private: Slots
 
 void AppBase::slotLogMessage(const QString& _sender, const QString& _message) {
+	if (!m_output) {
+		return;
+	}
+
 	m_logMutex.lock();
 	
 	QTextCursor cursor = m_output->textCursor();
@@ -469,20 +473,21 @@ void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
 AppBase::AppBase(QApplication* _app) 
 	: m_mainThread(QThread::currentThreadId()), m_app(_app), m_logger(nullptr), m_replaceTransparentColorStyleValue(true)
 {
-	// Create the output first so log messages can be created
-	m_output = new ot::PlainTextEditView;
-
 	this->setDeleteLogNotifierLater(true);
 	ot::LogDispatcher::instance().addReceiver(this);
-	
-	// Initialize Toolkit API
-	otoolkit::api::initialize(this);
 
+	// Initialize dock manager
 	ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::AutoHideFeatureEnabled);
 	ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::AutoHideButtonTogglesArea);
 	ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::AutoHideShowOnMouseOver);
 	ads::CDockManager::setAutoHideConfigFlag(ads::CDockManager::DockAreaHasAutoHideButton);
 	ot::WidgetViewManager::instance().initialize();
+
+	// Create output
+	m_output = new ot::PlainTextEditView;
+
+	// Initialize Toolkit API
+	otoolkit::api::initialize(this);
 
 	// Create tool manager
 	m_toolManager = new ToolManager(this);
