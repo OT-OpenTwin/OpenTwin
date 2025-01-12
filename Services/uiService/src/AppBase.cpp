@@ -373,8 +373,7 @@ void AppBase::notify(UID _senderId, eventType _eventType, int _info1, int _info2
 				if (_info1 == 0 && !m_widgetIsWelcome) {
 					uiAPI::window::setCentralWidget(m_mainWindow, m_welcomeScreen->getQWidget());
 					m_widgetIsWelcome = true;
-					m_welcomeScreen->slotRefreshProjectList();
-					m_welcomeScreen->slotRefreshRecentProjects();
+					m_welcomeScreen->refreshRecentProjects();
 				}
 				else if (m_widgetIsWelcome) {
 					// Changing from welcome screen to other tabView
@@ -486,7 +485,7 @@ void AppBase::lockUI(bool flag)
 
 void AppBase::refreshWelcomeScreen(void)
 {
-	m_welcomeScreen->slotRefreshProjectList();
+	m_welcomeScreen->refreshProjectList();
 }
 
 void AppBase::exportProjectWorker(std::string selectedProjectName, std::string exportFileName)
@@ -875,7 +874,7 @@ void AppBase::createUi(void) {
 
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Set widgets to docks");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 25);
-			m_welcomeScreen->slotRefreshRecentProjects();
+			m_welcomeScreen->refreshRecentProjects();
 
 			// #######################################################################
 
@@ -2428,7 +2427,7 @@ void AppBase::slotCreateProject(void) {
 
 		// Delete Project
 		projectManager.deleteProject(currentName);
-		m_welcomeScreen->slotRefreshProjectList();
+		m_welcomeScreen->refreshProjectList();
 	}
 
 	projectManager.createProject(currentName, projectType, m_loginData.getUserName(), templateName);
@@ -2496,7 +2495,7 @@ void AppBase::slotOpenProject(void) {
 					this->showErrorPrompt("Unable to access this project. The access permission might have been changed.", "Open Project");
 
 					userManager.removeRecentProject(selectedProjectName);
-					m_welcomeScreen->slotRefreshProjectList();
+					m_welcomeScreen->refreshProjectList();
 				}
 				else {
 					//Store project info
@@ -2520,7 +2519,7 @@ void AppBase::slotOpenProject(void) {
 			this->showErrorPrompt("Unable to access this project. The access permission might have been changed or the project has been deleted.", "Open Project");
 
 			userManager.removeRecentProject(selectedProjectName);
-			m_welcomeScreen->slotRefreshProjectList();
+			m_welcomeScreen->refreshProjectList();
 		}
 }
 
@@ -2565,7 +2564,7 @@ void AppBase::slotCopyProject(void) {
 	userManager.addRecentProject(newProjectName);
 
 	// And refresh the view
-	m_welcomeScreen->slotRefreshProjectList();
+	m_welcomeScreen->refreshProjectList();
 }
 
 void AppBase::slotRenameProject(void) {
@@ -2633,7 +2632,7 @@ void AppBase::slotRenameProject(void) {
 	}
 
 	// And refresh the view
-	m_welcomeScreen->slotRefreshProjectList();
+	m_welcomeScreen->refreshProjectList();
 }
 
 void AppBase::slotDeleteProject(void) {
@@ -2686,7 +2685,7 @@ void AppBase::slotDeleteProject(void) {
 		userManager.removeRecentProject(proj.toStdString());
 	}
 
-	m_welcomeScreen->slotRefreshProjectList();
+	m_welcomeScreen->refreshProjectList();
 }
 
 void AppBase::slotExportProject(void) {
@@ -2772,7 +2771,7 @@ void AppBase::slotManageProjectOwner(void) {
 		userManager.removeRecentProject(selectedProjectName.toStdString());
 	}
 
-	m_welcomeScreen->slotRefreshProjectList();
+	m_welcomeScreen->refreshProjectList();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

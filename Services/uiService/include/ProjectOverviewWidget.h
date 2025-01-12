@@ -16,7 +16,7 @@
 #include <QtCore/qstring.h>
 
 // std header
-#include <vector>
+#include <list>
 
 class QTableWidget;
 class QTableWidgetItem;
@@ -35,21 +35,19 @@ class ProjectOverviewEntry : public QObject {
 public:
 	ProjectOverviewEntry(const ProjectInformation& _projectInfo, bool _ownerIsCreator, QTableWidget* _table);
 
-	int getRow(void) const { return m_row; };
 	void setIsChecked(bool _checked);
 	bool getIsChecked(void) const;
 	QString getProjectName(void) const;
 	bool getOwnerIsCreator(void) const { return m_ownerIsCreator; };
 
 Q_SIGNALS:
-	void checkedChanged(int _row);
+	void checkedChanged();
 
 private Q_SLOTS:
 	void slotCheckedChanged(void);
 
 private:
 	QTableWidget* m_table;
-	int m_row;
 	bool m_ownerIsCreator;
 	ot::CheckBox* m_checkBox;
 	QTableWidgetItem* m_nameItem;
@@ -85,6 +83,9 @@ public:
 
 	std::list<QString> getSelectedProjects(void) const;
 
+	void refreshProjectList(void);
+	void refreshRecentProjects(void);
+
 Q_SIGNALS:
 	void createProjectRequest(void);
 	void openProjectRequest(void);
@@ -95,7 +96,7 @@ Q_SIGNALS:
 	void projectAccessRequest(void);
 	void projectOwnerRequest(void);
 
-public Q_SLOTS:
+private Q_SLOTS:
 	void slotUpdateItemSelection(void);
 
 	void slotCreateProject(void);
@@ -115,7 +116,7 @@ public Q_SLOTS:
 	void slotOwnerProject(void);
 
 	void slotFilterChanged(void);
-	void slotProjectCheckedChanged(int _row);
+	void slotProjectCheckedChanged(void);
 
 	void slotHeaderClicked(int _index);
 
@@ -127,6 +128,7 @@ private:
 	void updateToggleViewModeButton(void);
 	void updateToolButtonsEnabledState(bool _forceDisabled = false);
 	bool hasDifferentSelectedOwner(void);
+	ProjectOverviewEntry* findEntry(const QString& _projectName);
 	void sortTable(void);
 
 	enum SortMode {
@@ -157,5 +159,5 @@ private:
 	ot::ToolButton* m_accessButton;
 	ot::ToolButton* m_ownerButton;
 
-	std::vector<ProjectOverviewEntry*> m_entries;
+	std::list<ProjectOverviewEntry*> m_entries;
 };

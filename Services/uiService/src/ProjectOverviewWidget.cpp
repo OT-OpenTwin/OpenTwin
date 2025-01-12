@@ -38,8 +38,8 @@ enum TableColumn {
 ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInfo, bool _ownerIsCreator, QTableWidget* _table)
 	: m_ownerIsCreator(_ownerIsCreator), m_table(_table)
 {
-	m_row = _table->rowCount();
-	_table->insertRow(m_row);
+	int row = _table->rowCount();
+	_table->insertRow(row);
 
 	m_checkBox = new ot::CheckBox;
 	m_checkBox->setFocusPolicy(Qt::NoFocus);
@@ -56,10 +56,10 @@ ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInf
 	m_lastAccessTimeItem->setFlags(m_nameItem->flags());
 	m_lastAccessTimeItem->setText(_projectInfo.getLastAccessTime().toString("yyyy.MM.dd hh:mm:ss"));
 
-	_table->setCellWidget(m_row, TableColumn::ColumnCheck, m_checkBox);
-	_table->setItem(m_row, TableColumn::ColumnName, m_nameItem);
-	_table->setItem(m_row, TableColumn::ColumnOwner, m_ownerItem);
-	_table->setItem(m_row, TableColumn::ColumnLastAccess, m_lastAccessTimeItem);
+	_table->setCellWidget(row, TableColumn::ColumnCheck, m_checkBox);
+	_table->setItem(row, TableColumn::ColumnName, m_nameItem);
+	_table->setItem(row, TableColumn::ColumnOwner, m_ownerItem);
+	_table->setItem(row, TableColumn::ColumnLastAccess, m_lastAccessTimeItem);
 
 	this->connect(m_checkBox, &ot::CheckBox::stateChanged, this, &ProjectOverviewEntry::slotCheckedChanged);
 }
@@ -82,7 +82,7 @@ void ProjectOverviewEntry::slotCheckedChanged(void) {
 	m_nameItem->setSelected(m_checkBox->isChecked());
 	m_ownerItem->setSelected(m_checkBox->isChecked());
 	m_table->blockSignals(isBlock);
-	Q_EMIT checkedChanged(m_row);
+	Q_EMIT checkedChanged();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -190,6 +190,14 @@ std::list<QString> ProjectOverviewWidget::getSelectedProjects(void) const {
 	return result;
 }
 
+void ProjectOverviewWidget::refreshProjectList(void) {
+	this->slotRefreshProjectList();
+}
+
+void ProjectOverviewWidget::refreshRecentProjects(void) {
+	this->slotRefreshRecentProjects();
+}
+
 void ProjectOverviewWidget::slotUpdateItemSelection(void) {
 	QList<QTableWidgetItem*> selection = m_table->selectedItems();
 	bool isBlock = m_table->signalsBlocked();
@@ -201,7 +209,14 @@ void ProjectOverviewWidget::slotUpdateItemSelection(void) {
 			OT_LOG_EA("Data mismatch");
 			break;
 		}
-		m_entries[r]->setIsChecked(m_table->item(r, TableColumn::ColumnName)->isSelected() || m_table->item(r, TableColumn::ColumnOwner)->isSelected());
+
+		ProjectOverviewEntry* entry = this->findEntry(m_table->item(r, TableColumn::ColumnName)->text());
+		if (entry) {
+			entry->setIsChecked(m_table->item(r, TableColumn::ColumnName)->isSelected() || m_table->item(r, TableColumn::ColumnOwner)->isSelected());
+		}
+		else {
+			OT_LOG_E("Entry not found for project \"" + m_table->item(r, TableColumn::ColumnName)->text().toStdString() + "\"");
+		}
 	}
 
 	m_table->blockSignals(isBlock);
@@ -219,8 +234,15 @@ void ProjectOverviewWidget::slotProjectDoubleClicked(int _row, int _column) {
 	for (ProjectOverviewEntry* entry : m_entries) {
 		entry->setIsChecked(false);
 	}
-	m_entries[_row]->setIsChecked(true);
-	this->slotOpenProject();
+
+	ProjectOverviewEntry* entry = this->findEntry(m_table->item(_row, TableColumn::ColumnName)->text());
+	if (entry) {
+		entry->setIsChecked(true);
+		this->slotOpenProject();
+	}
+	else {
+		OT_LOG_E("Entry not found for project \"" + m_table->item(_row, TableColumn::ColumnName)->text().toStdString() + "\"");
+	}
 }
 
 void ProjectOverviewWidget::slotRefreshProjectList(void) {
@@ -235,8 +257,6 @@ void ProjectOverviewWidget::slotRefreshProjectList(void) {
 		OT_LOG_EA("Unknown view mode");
 		break;
 	}
-
-	this->sortTable();
 }
 
 void ProjectOverviewWidget::slotRefreshRecentProjects(void) {
@@ -273,6 +293,7 @@ void ProjectOverviewWidget::slotRefreshRecentProjects(void) {
 	this->updateCountLabel(false);
 	this->updateToggleViewModeButton();
 	this->updateToolButtonsEnabledState();
+	this->sortTable();
 }
 
 void ProjectOverviewWidget::slotRefreshAllProjects(void) {
@@ -298,6 +319,7 @@ void ProjectOverviewWidget::slotRefreshAllProjects(void) {
 	this->updateCountLabel(resultExceeded);
 	this->updateToggleViewModeButton();
 	this->updateToolButtonsEnabledState();
+	this->sortTable();
 }
 
 void ProjectOverviewWidget::slotToggleViewMode(void) {
@@ -353,12 +375,12 @@ void ProjectOverviewWidget::slotFilterChanged(void) {
 	else {
 		for (int r = 0; r < m_table->rowCount(); r++) {
 			OTAssert(r < m_entries.size(), "Index mismatch");
-			m_table->setRowHidden(r, !(m_entries[r]->getProjectName().contains(m_filter->text(), Qt::CaseInsensitive)));
+			m_table->setRowHidden(r, !(m_table->item(r, TableColumn::ColumnName)->text().contains(m_filter->text(), Qt::CaseInsensitive)));
 		}
 	}
 }
 
-void ProjectOverviewWidget::slotProjectCheckedChanged(int _row) {
+void ProjectOverviewWidget::slotProjectCheckedChanged(void) {
 	this->updateToolButtonsEnabledState();
 }
 
@@ -420,10 +442,10 @@ void ProjectOverviewWidget::addProject(const ProjectInformation& _projectInfo, b
 	bool blocked = m_table->signalsBlocked();
 	m_table->blockSignals(true);
 	ProjectOverviewEntry* newEntry = new ProjectOverviewEntry(_projectInfo, _ownerIsCreator, m_table);
-	OTAssert(newEntry->getRow() == m_entries.size(), "Index mismatch");
 	m_entries.push_back(newEntry);
 	this->connect(newEntry, &ProjectOverviewEntry::checkedChanged, this, &ProjectOverviewWidget::slotProjectCheckedChanged);
 	m_table->blockSignals(blocked);
+	this->sortTable();
 }
 
 void ProjectOverviewWidget::updateCountLabel(bool _hasMore) {
@@ -506,6 +528,15 @@ bool ProjectOverviewWidget::hasDifferentSelectedOwner(void) {
 		}
 	}
 	return false;
+}
+
+ProjectOverviewEntry* ProjectOverviewWidget::findEntry(const QString& _projectName) {
+	for (ProjectOverviewEntry* entry : m_entries) {
+		if (entry->getProjectName() == _projectName) {
+			return entry;
+		}
+	}
+	return nullptr;
 }
 
 void ProjectOverviewWidget::sortTable(void) {
