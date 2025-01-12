@@ -107,41 +107,8 @@ namespace MongoProjectFunctions
 		}
 
 		value projectValue = optional.value();
-		Project tmpProject(projectValue.view(), userClient);
-		tmpProject._id = projectValue.view()["_id"].get_oid().value;
-		tmpProject.name = std::string(projectValue.view()["project_name"].get_utf8().value.data());
-
-		try
-		{
-			tmpProject.type = std::string(projectValue.view()["project_type"].get_utf8().value.data());
-		}
-		catch (std::exception)
-		{
-			tmpProject.type = "Development"; // Earlier projects do not have a project type
-		}
-
-		tmpProject.roleName = std::string(projectValue.view()["project_role_name"].get_utf8().value.data());
-		tmpProject.collectionName = std::string(projectValue.view()["collection_name"].get_utf8().value.data());
-		tmpProject.createdOn = projectValue.view()["created_on"].get_date();
-		tmpProject.lastAccessedOn = projectValue.view()["last_accessed_on"].get_date();
-		tmpProject.version = projectValue.view()["version"].get_int32().value;
-
-		std::string userId(projectValue.view()["created_by"].get_utf8().value.data());
-
-		tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(userId, userClient);
-
-		auto groupsArr = projectValue.view()["groups"].get_array().value;
-
-		for (const auto& groupId : groupsArr)
-		{
-			const std::string id = std::string(groupId.get_utf8().value.data());
-
-			Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
-
-			tmpProject.groups.push_back(currentGroup);
-		}
-
-		return tmpProject;
+		
+		return Project(projectValue.view(), userClient);
 	}
 
 	Project getProject(std::string projectName, mongocxx::client& userClient)
@@ -161,43 +128,7 @@ namespace MongoProjectFunctions
 		}
 
 		value projectValue = optional.value();
-
-		Project tmpProject{};
-
-		tmpProject._id = projectValue.view()["_id"].get_oid().value;
-		tmpProject.name = std::string(projectValue.view()["project_name"].get_utf8().value.data());
-
-		try
-		{
-			tmpProject.type = std::string(projectValue.view()["project_type"].get_utf8().value.data());
-		}
-		catch (std::exception)
-		{
-			tmpProject.type = "Development"; // Earlier projects do not have a project type
-		}
-
-		tmpProject.roleName = std::string(projectValue.view()["project_role_name"].get_utf8().value.data());
-		tmpProject.collectionName = std::string(projectValue.view()["collection_name"].get_utf8().value.data());
-		tmpProject.createdOn = projectValue.view()["created_on"].get_date();
-		tmpProject.lastAccessedOn = projectValue.view()["last_accessed_on"].get_date();
-		tmpProject.version = projectValue.view()["version"].get_int32(); // TODO: CHECK THIS 
-
-		std::string userId = std::string(projectValue.view()["created_by"].get_utf8().value.data());
-
-		tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(userId, userClient);
-
-		auto groupsArr = projectValue.view()["groups"].get_array().value;
-
-		for (const auto& groupId : groupsArr)
-		{
-			std::string id = std::string(groupId.get_utf8().value.data());
-
-			Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
-
-			tmpProject.groups.push_back(currentGroup);
-		}
-
-		return tmpProject;
+		return Project(projectValue.view(), userClient);
 	}
 
 	std::string getProjectsInfo(const std::list<std::string>& _projectNames, mongocxx::client& _adminClient)
@@ -220,23 +151,8 @@ namespace MongoProjectFunctions
 		mongocxx::cursor cursor = projectsCollection.find(filter.view());
 
 		std::vector<Project> projects{};
-		for (auto doc : cursor)
-		{
-			// Research std::move() 
-
-			Project tmpProject{};
-			tmpProject._id = doc["_id"].get_oid().value;
-			tmpProject.name = std::string(doc["project_name"].get_utf8().value.data());
-			tmpProject.roleName = std::string(doc["project_role_name"].get_utf8().value.data());
-			tmpProject.collectionName = std::string(doc["collection_name"].get_utf8().value.data());
-			tmpProject.createdOn = doc["created_on"].get_date();
-			tmpProject.lastAccessedOn = doc["last_accessed_on"].get_date();
-
-			std::string creatingUserId(doc["created_by"].get_utf8().value.data());
-
-			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(creatingUserId, _adminClient);
-
-			projects.push_back(tmpProject);
+		for (auto doc : cursor) {
+			projects.push_back(Project(doc, _adminClient));
 		}
 
 		return projectsToJson(projects);
@@ -304,16 +220,9 @@ namespace MongoProjectFunctions
 		{
 			// Research std::move() 
 
-			Project tmpProject{};
-			tmpProject._id = doc["_id"].get_oid().value;
-			tmpProject.name = std::string(doc["project_name"].get_utf8().value.data());
-			tmpProject.roleName = std::string(doc["project_role_name"].get_utf8().value.data());
-			tmpProject.collectionName = std::string(doc["collection_name"].get_utf8().value.data());
-			tmpProject.createdOn = doc["created_on"].get_date();
-			tmpProject.lastAccessedOn = doc["last_accessed_on"].get_date();
-
+			Project tmpProject(doc);
 			const std::string creatingUserId = std::string(doc["created_by"].get_utf8().value.data());
-			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient);
+			tmpProject.setUser(MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient));
 
 			auto groupsArr = doc["groups"].get_array().value;
 
@@ -323,7 +232,7 @@ namespace MongoProjectFunctions
 
 				Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
 
-				tmpProject.groups.push_back(currentGroup);
+				tmpProject.addGroup(currentGroup);
 			}
 
 			projects.push_back(tmpProject);
@@ -346,41 +255,15 @@ namespace MongoProjectFunctions
 
 		mongocxx::pipeline p{};
 		p.match(filterDoc.view());
-		if (limit > 0)
-		{
+		if (limit > 0) {
 			p.limit(limit);
 		}
 
 		mongocxx::cursor cursor = projectsCollection.aggregate(p);
 
 		std::vector<Project> projects{};
-		for (auto doc : cursor)
-		{
-			// Research std::move() 
-
-			Project tmpProject{};
-			tmpProject._id = doc["_id"].get_oid().value;
-			tmpProject.name = std::string(doc["project_name"].get_utf8().value.data());
-			tmpProject.roleName = std::string(doc["project_role_name"].get_utf8().value.data());
-			tmpProject.collectionName = std::string(doc["collection_name"].get_utf8().value.data());
-			tmpProject.createdOn = doc["created_on"].get_date();
-			tmpProject.lastAccessedOn = doc["last_accessed_on"].get_date();
-
-			std::string creatingUserId = std::string(doc["created_by"].get_utf8().value.data());
-			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient);
-
-			auto groupsArr = doc["groups"].get_array().value;
-
-			for (const auto& groupId : groupsArr)
-			{
-				std::string id (groupId.get_utf8().value.data());
-
-				Group currentGroup = MongoGroupFunctions::getGroupDataById(id, userClient);
-
-				tmpProject.groups.push_back(currentGroup);
-			}
-
-			projects.push_back(tmpProject);
+		for (auto doc : cursor) {
+			projects.push_back(Project(doc, userClient));
 		}
 
 		return projects;
@@ -423,7 +306,7 @@ namespace MongoProjectFunctions
 		mongocxx::collection projectsCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
 
 		value filter = document{}
-			<< "_id" << project._id
+			<< "_id" << project.getId()
 			<< finalize;
 
 		value update = document{}
@@ -444,7 +327,7 @@ namespace MongoProjectFunctions
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
-			project.name = newName;
+			project.setName(newName);
 			return project;
 		}
 
@@ -457,7 +340,7 @@ namespace MongoProjectFunctions
 		mongocxx::collection projectsCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
 
 		value filter = document{}
-			<< "_id" << project._id
+			<< "_id" << project.getId()
 			<< finalize;
 
 		value update = document{}
@@ -478,10 +361,10 @@ namespace MongoProjectFunctions
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
-			MongoRoleFunctions::addRoleToUser(project.roleName, newOwner.username, adminClient);
-			MongoRoleFunctions::removeRoleFromUser(project.roleName, project.creatingUser.username, adminClient);
+			MongoRoleFunctions::addRoleToUser(project.getRoleName(), newOwner.username, adminClient);
+			MongoRoleFunctions::removeRoleFromUser(project.getRoleName(), project.getUser().username, adminClient);
 
-			project.creatingUser = newOwner;
+			project.setUser(newOwner);
 			return project;
 		}
 
@@ -495,7 +378,7 @@ namespace MongoProjectFunctions
 		mongocxx::collection projectCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
 
 		// checking whether it is already contained
-		for (auto alreadyContainedGroup : project.groups)
+		for (auto alreadyContainedGroup : project.getGroups())
 		{
 			if (alreadyContainedGroup.id == group.id)
 			{
@@ -504,12 +387,12 @@ namespace MongoProjectFunctions
 		}
 
 		// Adding project role to this group role
-		MongoRoleFunctions::addRoleToGroupRole(project.roleName, group, adminClient);
+		MongoRoleFunctions::addRoleToGroupRole(project.getRoleName(), group, adminClient);
 
 
 		// Adding this group to the group list of this project
 		value filter = document{}
-			<< "_id" << project._id
+			<< "_id" << project.getId()
 			<< finalize;
 
 		value change = document{}
@@ -546,7 +429,7 @@ namespace MongoProjectFunctions
 
 		bool isContained = false;
 		// checking whether it is already contained
-		for (auto alreadyContainedGroup : project.groups)
+		for (auto alreadyContainedGroup : project.getGroups())
 		{
 			if (alreadyContainedGroup.id == group.id)
 			{
@@ -560,12 +443,12 @@ namespace MongoProjectFunctions
 			return false;
 		}
 
-		MongoRoleFunctions::removeRoleFromGroupRole(project.roleName, group, adminClient);
+		MongoRoleFunctions::removeRoleFromGroupRole(project.getRoleName(), group, adminClient);
 
 
 		// Adding this group to the group list of this project
 		value filter = document{}
-			<< "_id" << project._id
+			<< "_id" << project.getId()
 			<< finalize;
 
 		value change = document{}
@@ -599,13 +482,13 @@ namespace MongoProjectFunctions
 		// then remove project collection
 		// then remove the project from the catalog
 
-		MongoRoleFunctions::removeRole(project.roleName, adminClient);
+		MongoRoleFunctions::removeRole(project.getRoleName(), adminClient);
 
 		mongocxx::database secondaryDb = adminClient.database(MongoConstants::PROJECTS_DB);
-		mongocxx::collection projectDataCollection = secondaryDb.collection(project.collectionName);
-		mongocxx::collection projectFilesCollection = secondaryDb.collection(project.collectionName + ".files");
-		mongocxx::collection projectChunksCollection = secondaryDb.collection(project.collectionName + ".chunks");
-		mongocxx::collection projectResultsCollection = secondaryDb.collection(project.collectionName + ".results");
+		mongocxx::collection projectDataCollection = secondaryDb.collection(project.getCollectionName());
+		mongocxx::collection projectFilesCollection = secondaryDb.collection(project.getCollectionName() + ".files");
+		mongocxx::collection projectChunksCollection = secondaryDb.collection(project.getCollectionName() + ".chunks");
+		mongocxx::collection projectResultsCollection = secondaryDb.collection(project.getCollectionName() + ".results");
 
 		projectDataCollection.drop();
 		projectFilesCollection.drop();
@@ -615,7 +498,7 @@ namespace MongoProjectFunctions
 		mongocxx::collection projectsCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
 
 		value filter = document{}
-			<< "_id" << project._id
+			<< "_id" << project.getId()
 			<< finalize;
 
 		auto result = projectsCollection.delete_one(filter.view());
@@ -641,7 +524,7 @@ namespace MongoProjectFunctions
 
 		Project project = getProject(projectId, adminClient);
 
-		if (project.creatingUser.userId != oldOwner.userId)
+		if (project.getUser().userId != oldOwner.userId)
 		{
 			throw std::runtime_error("The logged in user is not the creator of this project! He cannot make the requested changes!");
 		}
@@ -671,7 +554,7 @@ namespace MongoProjectFunctions
 
 		if (matchedCount == 1 && modifiedCount == 1)
 		{
-			MongoRoleFunctions::addRoleToUser(project.roleName, newOwner.username, adminClient);
+			MongoRoleFunctions::addRoleToUser(project.getRoleName(), newOwner.username, adminClient);
 			return true;
 		}
 
@@ -687,17 +570,16 @@ namespace MongoProjectFunctions
 	std::string projectToJson(Project& project)
 	{
 		ot::JsonDocument json;
-		json.AddMember("id", ot::JsonString(project._id.to_string(), json.GetAllocator()), json.GetAllocator());
-		json.AddMember(OT_PARAM_AUTH_NAME, ot::JsonString(project.name, json.GetAllocator()), json.GetAllocator());
-		json.AddMember("ProjectType", ot::JsonString(project.type, json.GetAllocator()), json.GetAllocator());
-		json.AddMember("collectionName", ot::JsonString(project.collectionName, json.GetAllocator()), json.GetAllocator());
-		json.AddMember(OT_PARAM_AUTH_OWNER, ot::JsonString(project.creatingUser.username, json.GetAllocator()), json.GetAllocator());
-		json.AddMember(OT_PARAM_AUTH_PROJECT_LASTACCESS, project.lastAccessedOn.value.count(), json.GetAllocator());
+		json.AddMember("id", ot::JsonString(project.getId().to_string(), json.GetAllocator()), json.GetAllocator());
+		json.AddMember(OT_PARAM_AUTH_NAME, ot::JsonString(project.getName(), json.GetAllocator()), json.GetAllocator());
+		json.AddMember(OT_PARAM_AUTH_PROJECT_TYPE, ot::JsonString(project.getType(), json.GetAllocator()), json.GetAllocator());
+		json.AddMember(OT_PARAM_AUTH_PROJECT_COLLECTION, ot::JsonString(project.getCollectionName(), json.GetAllocator()), json.GetAllocator());
+		json.AddMember(OT_PARAM_AUTH_OWNER, ot::JsonString(project.getUser().username, json.GetAllocator()), json.GetAllocator());
+		json.AddMember(OT_PARAM_AUTH_PROJECT_LASTACCESS, project.getLastAccessedOn().value.count(), json.GetAllocator());
 		
 		std::list<std::string> groups;
 
-		for (auto group : project.groups)
-		{
+		for (auto group : project.getGroups()) {
 			groups.push_back(group.name);
 		}
 		json.AddMember("groups", ot::JsonArray(groups, json.GetAllocator()), json.GetAllocator());

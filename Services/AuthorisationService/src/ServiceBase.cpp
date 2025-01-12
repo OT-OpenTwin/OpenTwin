@@ -831,7 +831,7 @@ std::string ServiceBase::handleChangeProjectName(const ot::ConstJsonObject& _act
 
 	Project proj = MongoProjectFunctions::getProject(projectName, adminClient);
 
-	if (proj.creatingUser.userId == _loggedInUser.userId || isAdminUser(_loggedInUser))
+	if (proj.getUser().userId == _loggedInUser.userId || isAdminUser(_loggedInUser))
 	{
 		proj = MongoProjectFunctions::changeProjectName(proj, newProjectName, adminClient);
 	}
@@ -850,7 +850,7 @@ std::string ServiceBase::handleChangeProjectOwner(const ot::ConstJsonObject& _ac
 	Project proj = MongoProjectFunctions::getProject(projectName, adminClient);
 	User newOwner = MongoUserFunctions::getUserDataThroughUsername(newOwnerUsername, adminClient);
 
-	if (proj.creatingUser.userId == _loggedInUser.userId || isAdminUser(_loggedInUser))
+	if (proj.getUser().userId == _loggedInUser.userId || isAdminUser(_loggedInUser))
 	{
 		proj = MongoProjectFunctions::changeProjectOwner(proj, newOwner, adminClient);
 	}
@@ -920,7 +920,7 @@ std::string ServiceBase::handleRemoveProject(const ot::ConstJsonObject& _actionD
 	Project pr = MongoProjectFunctions::getProject(projectName, adminClient);
 
 	bool successful = false;
-	if (pr.creatingUser.userId == _loggedInUser.userId || isAdminUser(_loggedInUser))
+	if (pr.getUser().userId == _loggedInUser.userId || isAdminUser(_loggedInUser))
 	{
 		successful = MongoProjectFunctions::removeProject(pr, adminClient);
 	}

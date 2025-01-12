@@ -15,43 +15,59 @@ class Project
 {
 
 public:
-	Project(const bsoncxx::v_noabi::document::view& _view, mongocxx::client& _userClient)
-	{
-		_id = _view["_id"].get_oid().value;
-		name = std::string(_view["project_name"].get_utf8().value.data());
-		
-		roleName = std::string(_view["project_role_name"].get_utf8().value.data());
-		collectionName = std::string(_view["collection_name"].get_utf8().value.data());
-		createdOn = _view["created_on"].get_date();
-		lastAccessedOn = _view["last_accessed_on"].get_date();
+	Project();
+	Project(const bsoncxx::v_noabi::document::view& _view);
+	Project(const bsoncxx::v_noabi::document::view& _view, mongocxx::client& _userClient);
+	Project(const Project&) = default;
+	Project(Project&&) = default;
+	~Project() {};
 
-		std::string userId = std::string(_view["created_by"].get_utf8().value.data());
+	Project& operator = (const Project&) = default;
+	Project& operator = (Project&&) = default;
 
-		creatingUser = MongoUserFunctions::getUserDataThroughId(userId, _userClient);
+	void setId(const bsoncxx::oid& _id) { m_id = _id; };
+	const bsoncxx::oid& getId(void) const { return m_id; };
 
-		auto groupsArr = _view["groups"].get_array().value;
+	void setName(const std::string& _name) { m_name = _name; };
+	const std::string& getName(void) const { return m_name; };
 
-		for (const auto& groupId : groupsArr)
-		{
-			std::string currId = std::string(groupId.get_utf8().value.data());
+	void setType(const std::string& _type) { m_type = _type; };
+	const std::string& getType(void) const { return m_type; };
 
-			Group currentGroup = MongoGroupFunctions::getGroupDataById(currId, _userClient);
-			groups.push_back(currentGroup);
-		}
-	}
-	Project() = default;
+	void setRoleName(const std::string& _roleName) { m_roleName = _roleName; };
+	const std::string& getRoleName(void) const { return m_roleName; };
 
-	bsoncxx::oid _id;
-	std::string name = "";
-	std::string type = "";
-	std::string roleName ="";
-	std::string collectionName = "";
-	bsoncxx::types::b_date createdOn{ std::chrono::system_clock::now() };
-	User creatingUser;
-	std::vector<Group> groups{};
-	int version = -1;
-	bsoncxx::types::b_date lastAccessedOn{ std::chrono::system_clock::now() };
+	void setCollectionName(const std::string& _collectionName) { m_collectionName = _collectionName; };
+	const std::string& getCollectionName(void) const { return m_collectionName; };
 
+	void setCreatedOn(bsoncxx::types::b_date _msSinceEpoch) { m_createdOn = _msSinceEpoch; };
+	bsoncxx::types::b_date getCreatedOn(void) const { return m_createdOn; };
 
+	void setUser(const User& _user) { m_creatingUser = _user; };
+	const User& getUser(void) const { return m_creatingUser; };
+
+	void addGroup(const Group& _group);
+	void setGroups(const std::vector<Group>& _groups) { m_groups = _groups; };
+	const std::vector<Group>& getGroups(void) const { return m_groups; };
+
+	void setVersion(int _version) { m_version = _version; };
+	int getVersion(void) const { return m_version; };
+
+	void setLastAccessedOn(bsoncxx::types::b_date _msSinceEpoch) { m_lastAccessedOn = _msSinceEpoch; };
+	bsoncxx::types::b_date getLastAccessedOn(void) const { return m_lastAccessedOn; };
+
+private:
+	void importData(const bsoncxx::v_noabi::document::view& _view);
+
+	bsoncxx::oid m_id;
+	std::string m_name;
+	std::string m_type;
+	std::string m_roleName;
+	std::string m_collectionName;
+	bsoncxx::types::b_date m_createdOn;
+	User m_creatingUser;
+	std::vector<Group> m_groups;
+	int m_version;
+	bsoncxx::types::b_date m_lastAccessedOn;
 };
 
