@@ -23,6 +23,7 @@ public:
 		roleName = std::string(_view["project_role_name"].get_utf8().value.data());
 		collectionName = std::string(_view["collection_name"].get_utf8().value.data());
 		createdOn = _view["created_on"].get_date();
+		lastAccessedOn = _view["last_accessed_on"].get_date();
 
 		std::string userId = std::string(_view["created_by"].get_utf8().value.data());
 

@@ -50,7 +50,6 @@ public:
 	std::vector<std::string> getDefaultTemplateList(void);
 	bool canAccessProject(const std::string &projectCollection);
 
-	void setProjectType(const std::string& projectName, const std::string& projectType);
 	std::string getProjectType(const std::string& projectName);
 
 private:

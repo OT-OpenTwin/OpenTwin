@@ -229,6 +229,7 @@ namespace MongoProjectFunctions
 			tmpProject.roleName = std::string(doc["project_role_name"].get_utf8().value.data());
 			tmpProject.collectionName = std::string(doc["collection_name"].get_utf8().value.data());
 			tmpProject.createdOn = doc["created_on"].get_date();
+			tmpProject.lastAccessedOn = doc["last_accessed_on"].get_date();
 
 			std::string creatingUserId(doc["created_by"].get_utf8().value.data());
 
@@ -308,6 +309,7 @@ namespace MongoProjectFunctions
 			tmpProject.roleName = std::string(doc["project_role_name"].get_utf8().value.data());
 			tmpProject.collectionName = std::string(doc["collection_name"].get_utf8().value.data());
 			tmpProject.createdOn = doc["created_on"].get_date();
+			tmpProject.createdOn = doc["last_accessed_on"].get_date();
 
 			const std::string creatingUserId = std::string(doc["created_by"].get_utf8().value.data());
 			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient);
@@ -361,6 +363,7 @@ namespace MongoProjectFunctions
 			tmpProject.roleName = std::string(doc["project_role_name"].get_utf8().value.data());
 			tmpProject.collectionName = std::string(doc["collection_name"].get_utf8().value.data());
 			tmpProject.createdOn = doc["created_on"].get_date();
+			tmpProject.createdOn = doc["last_accessed_on"].get_date();
 
 			std::string creatingUserId = std::string(doc["created_by"].get_utf8().value.data());
 			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(creatingUserId, userClient);
@@ -688,8 +691,7 @@ namespace MongoProjectFunctions
 		json.AddMember("ProjectType", ot::JsonString(project.type, json.GetAllocator()), json.GetAllocator());
 		json.AddMember("collectionName", ot::JsonString(project.collectionName, json.GetAllocator()), json.GetAllocator());
 		json.AddMember("creatingUser", ot::JsonString(project.creatingUser.username, json.GetAllocator()), json.GetAllocator());
-		json.AddMember("creatingUser", ot::JsonString(project.creatingUser.username, json.GetAllocator()), json.GetAllocator());
-
+		
 		std::list<std::string> groups;
 
 		for (auto group : project.groups)

@@ -37,7 +37,6 @@ namespace MongoProjectFunctions
 
 	std::string generateProjectCollectionName(mongocxx::client& adminClient);
 
-
 	Project getProject(bsoncxx::oid& projectId, mongocxx::client& userClient);
 
 	Project getProject(std::string projectName, mongocxx::client& userClient);
