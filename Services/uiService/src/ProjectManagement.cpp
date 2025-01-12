@@ -5,20 +5,19 @@
  *  Copyright (c) 2020 openTwin
  */
 
+// Frontend header
 #include "ProjectManagement.h"
 #include "UserManagement.h"
 #include "AppBase.h"
 #include "DataBase.h"
 
-#include <iomanip>
+// OpenTwin header
+#include "OTCore/JSON.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Msg.h"
+#include "OTCore/ReturnMessage.h"
 
-#include <bsoncxx/json.hpp>
-#include <mongocxx/client.hpp>
-#include <mongocxx/instance.hpp>
-#include <mongocxx/pipeline.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-
+// DB header
 #include "DocumentAPI.h"
 #include "Connection\ConnectionAPI.h"
 #include "Document\DocumentAccess.h"
@@ -26,10 +25,16 @@
 #include "Helper\QueryBuilder.h"
 #include "Helper\BsonValuesHelper.h"
 
-#include "OTCore/JSON.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/Msg.h"
-#include "OTCore/ReturnMessage.h"
+// MongoDB header
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/pipeline.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+
+// std header
+#include <iomanip>
 
 ProjectManagement::ProjectManagement() :
 	isConnected(false),
@@ -294,12 +299,12 @@ std::string ProjectManagement::getProjectType(const std::string& projectName)
 	return projectType;
 }
 
-bool ProjectManagement::findProjectNames(const std::string &projectNameFilter, int maxNumberOfResults, std::list<std::string> &projectsFound, bool &maxLengthExceeded)
+bool ProjectManagement::findProjectNames(const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ProjectInformation>& _projectsFound, bool& _maxLengthExceeded)
 {
 	assert(!authServerURL.empty());
 
-	projectsFound.clear();
-	projectAuthorMap.clear();
+	_projectsFound.clear();
+	projectInfoMap.clear();
 
 	AppBase * app{ AppBase::instance() };
 
@@ -307,8 +312,8 @@ bool ProjectManagement::findProjectNames(const std::string &projectNameFilter, i
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString(projectNameFilter, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, maxNumberOfResults + 1, doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString(_projectNameFilter, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, _maxNumberOfResults + 1, doc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
@@ -330,20 +335,20 @@ bool ProjectManagement::findProjectNames(const std::string &projectNameFilter, i
 		ot::JsonDocument projectDoc;
 		projectDoc.fromJson(projectData);
 
-		std::string projectName = projectDoc[OT_PARAM_AUTH_NAME].GetString();
-		std::string owner = projectDoc[OT_PARAM_AUTH_OWNER].GetString();
+		ProjectInformation newInfo;
+		newInfo.setProjectName(projectDoc[OT_PARAM_AUTH_NAME].GetString());
+		newInfo.setUserName(projectDoc[OT_PARAM_AUTH_OWNER].GetString());
 
-		projectsFound.push_back(projectName);
-		projectAuthorMap[projectName] = owner;
+		_projectsFound.push_back(newInfo);
+		projectInfoMap[newInfo.getProjectName()] = newInfo;
 	}
 
-	if (projectsFound.size() > maxNumberOfResults)
-	{
-		maxLengthExceeded = true;
-		projectsFound.pop_back();
+	while (_projectsFound.size() > _maxNumberOfResults) {
+		_maxLengthExceeded = true;
+		_projectsFound.pop_back();
 	}
 
-	return (!projectsFound.empty());
+	return (!_projectsFound.empty());
 }
 
 bool ProjectManagement::createNewCollection(const std::string &collectionName, const std::string &defaultSettingTemplate)
@@ -394,20 +399,19 @@ bool ProjectManagement::InitializeConnection(void)
 	}
 }
 
-bool ProjectManagement::getProjectAuthor(const std::string &projectName, std::string &author)
-{
-	if (projectAuthorMap.count(projectName) > 0)
+bool ProjectManagement::getProjectAuthor(const std::string &projectName, std::string &author) {
+	if (projectInfoMap.count(projectName) > 0)
 	{
-		author = projectAuthorMap[projectName];
+		author = projectInfoMap[projectName].getUserName();
 	}
 
 	return true;
 }
 
-bool ProjectManagement::readProjectsInfo(std::list<std::string> &projects) {
+bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
 	assert(!authServerURL.empty());
 
-	projectAuthorMap.clear();
+	projectInfoMap.clear();
 
 	AppBase * app{ AppBase::instance() };
 
@@ -417,7 +421,7 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string> &projects) {
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_PROJECT_INFO, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAMES, ot::JsonArray(projects, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAMES, ot::JsonArray(_projects, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send("", authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response))
@@ -439,12 +443,13 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string> &projects) {
 		ot::JsonDocument projectDoc;
 		projectDoc.fromJson(projectData);
 
-		std::string projectName = projectDoc[OT_PARAM_AUTH_NAME].GetString();
-		std::string owner = projectDoc[OT_PARAM_AUTH_OWNER].GetString();
+		ProjectInformation newInfo;
+		newInfo.setProjectName(projectDoc[OT_PARAM_AUTH_NAME].GetString());
+		newInfo.setUserName(projectDoc[OT_PARAM_AUTH_OWNER].GetString());
 
-		validProjects.push_back(projectName);
+		validProjects.push_back(newInfo.getProjectName());
 
-		projectAuthorMap[projectName] = owner;
+		projectInfoMap[newInfo.getProjectName()] = newInfo;
 	}
 
 	// Now loop through all projects and check the validity
@@ -452,16 +457,15 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string> &projects) {
 	UserManagement uManager;
 	bool uManagerInitialized = false;
 
-	for (auto projectName : projects)
-	{
-		if (projectAuthorMap.count(projectName) == 0)
-		{
+	for (const std::string& projectName : _projects) {
+		if (projectInfoMap.count(projectName) == 0) {
 			// Remove the project from the recent projects list
-			if (!uManagerInitialized)
-			{
+			if (!uManagerInitialized) {
 				uManager.setAuthServerURL(authServerURL);
 				uManager.setDatabaseURL(databaseURL);
-				bool checkConnection = uManager.checkConnection(); assert(checkConnection); // Connect and check
+				
+				bool checkConnection = uManager.checkConnection();
+				assert(checkConnection); // Connect and check
 
 				uManagerInitialized = true;
 			}
@@ -470,7 +474,7 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string> &projects) {
 		}
 	}
 
-	projects = validProjects;
+	_projects = validProjects;
 
 	return true;
 }

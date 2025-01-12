@@ -9,23 +9,22 @@
 
 // Frontend header
 #include "LoginData.h"
+#include "ProjectInformation.h"
 
 // std header
-#include <string>
-#include <list>
 #include <map>
+#include <list>
+#include <string>
 #include <vector>
 
 // BSON header
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-
 #include <mongocxx/client.hpp>
 
 class AppBase;
 
-class ProjectManagement
-{
+class ProjectManagement {
 public:
 	ProjectManagement();
 	ProjectManagement(const LoginData& _data);
@@ -43,9 +42,9 @@ public:
 	bool renameProject(const std::string &oldProjectName, const std::string &newProjectName);
 	bool projectExists(const std::string &projectName, bool &canBeDeleted);
 	std::string getProjectCollection(const std::string &projectName);
-	bool findProjectNames(const std::string &projectNameFilter, int maxNumberOfResults, std::list<std::string> &projectsFound, bool &maxLengthExceeded);
+	bool findProjectNames(const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ProjectInformation>& _projectsFound, bool& _maxLengthExceeded);
 	bool getProjectAuthor(const std::string &projectName, std::string &author);
-	bool readProjectsInfo(std::list<std::string> &projects);
+	bool readProjectsInfo(std::list<std::string>& _projects);
 	bool copyProject(const std::string &sourceProjectName, const std::string &destinationProjectName, const std::string &userName);
 	std::vector<std::string> getDefaultTemplateList(void);
 	bool canAccessProject(const std::string &projectCollection);
@@ -64,5 +63,5 @@ private:
 	std::string authServerURL;
 	const std::string dataBaseName;
 	const std::string projectCatalogCollectionName;
-	std::map<std::string, std::string> projectAuthorMap;
+	std::map<std::string, ProjectInformation> projectInfoMap;
 };

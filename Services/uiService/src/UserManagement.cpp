@@ -512,14 +512,13 @@ void UserManagement::getListOfRecentProjects(std::list<std::string> &recentProje
 	std::string recentProjects = restoreSetting("RecentProjects");
 	if (recentProjects.empty()) return;
 
-	try
-	{
+	try {
 		ot::JsonDocument doc;
 		doc.fromJson(recentProjects);
 		recentProjectList = ot::json::getStringList(doc, "Names");
 	}
-	catch (std::exception)
-	{
+	catch (const std::exception& _e) {
+		OT_LOG_E(_e.what());
 	}
 }
 

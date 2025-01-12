@@ -34,7 +34,7 @@ enum TableColumn {
 	ColumnCount
 };
 
-ProjectOverviewEntry::ProjectOverviewEntry(const QString& _projectName, const QString& _owner, bool _ownerIsCreator, QTableWidget* _table) 
+ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInfo, bool _ownerIsCreator, QTableWidget* _table)
 	: m_ownerIsCreator(_ownerIsCreator), m_table(_table)
 {
 	m_row = _table->rowCount();
@@ -45,11 +45,11 @@ ProjectOverviewEntry::ProjectOverviewEntry(const QString& _projectName, const QS
 	
 	m_nameItem = new QTableWidgetItem;
 	m_nameItem->setFlags(m_nameItem->flags() & ~Qt::ItemIsEditable);
-	m_nameItem->setText(_projectName);
+	m_nameItem->setText(QString::fromStdString(_projectInfo.getProjectName()));
 
 	m_ownerItem = new QTableWidgetItem;
 	m_ownerItem->setFlags(m_nameItem->flags());
-	m_ownerItem->setText(_owner);
+	m_ownerItem->setText(QString::fromStdString(_projectInfo.getUserName()));
 
 	_table->setCellWidget(m_row, TableColumn::ColumnCheck, m_checkBox);
 	_table->setItem(m_row, TableColumn::ColumnName, m_nameItem);
@@ -253,7 +253,11 @@ void ProjectOverviewWidget::slotRefreshRecentProjects(void) {
 		std::string editorName("< Unknown >");
 		projectManager.getProjectAuthor(proj, editorName);
 
-		this->addProject(QString::fromStdString(proj), QString::fromStdString(editorName), editorName == currentUser);
+		ProjectInformation newInfo;
+		newInfo.setProjectName(proj);
+		newInfo.setUserName(editorName);
+
+		this->addProject(newInfo, newInfo.getUserName() == currentUser);
 	}
 
 	this->updateCountLabel(false);
@@ -269,16 +273,16 @@ void ProjectOverviewWidget::slotRefreshAllProjects(void) {
 	AppBase* app = AppBase::instance();
 	std::string currentUser = app->getCurrentLoginData().getUserName();
 
-	std::list<std::string> projects;
+	std::list<ProjectInformation> projects;
 	bool resultExceeded = false;
 	ProjectManagement projectManager(app->getCurrentLoginData());
 	projectManager.findProjectNames(m_filter->text().toStdString(), 100, projects, resultExceeded);
 
-	for (const std::string& proj : projects) {
+	for (const ProjectInformation& proj : projects) {
 		std::string editorName("< Unknown >");
-		projectManager.getProjectAuthor(proj, editorName);
+		//projectManager.getProjectAuthor(proj.getProjectName(), editorName);
 
-		this->addProject(QString::fromStdString(proj), QString::fromStdString(editorName), editorName == currentUser);
+		this->addProject(proj, proj.getUserName() == currentUser);
 	}
 
 	this->updateCountLabel(resultExceeded);
@@ -375,10 +379,10 @@ void ProjectOverviewWidget::clear(void) {
 	m_table->blockSignals(blocked);
 }
 
-void ProjectOverviewWidget::addProject(const QString& _projectName, const QString& _owner, bool _ownerIsCreator) {
+void ProjectOverviewWidget::addProject(const ProjectInformation& _projectInfo, bool _ownerIsCreator) {
 	bool blocked = m_table->signalsBlocked();
 	m_table->blockSignals(true);
-	ProjectOverviewEntry* newEntry = new ProjectOverviewEntry(_projectName, _owner, _ownerIsCreator, m_table);
+	ProjectOverviewEntry* newEntry = new ProjectOverviewEntry(_projectInfo, _ownerIsCreator, m_table);
 	OTAssert(newEntry->getRow() == m_entries.size(), "Index mismatch");
 	m_entries.push_back(newEntry);
 	this->connect(newEntry, &ProjectOverviewEntry::checkedChanged, this, &ProjectOverviewWidget::slotProjectCheckedChanged);
