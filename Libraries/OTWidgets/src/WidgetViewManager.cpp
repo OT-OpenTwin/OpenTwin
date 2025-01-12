@@ -34,6 +34,7 @@ void ot::WidgetViewManager::initialize(WidgetViewDockManager* _dockManager) {
 	if (!m_dockManager) {
 		ads::CDockManager::setConfigFlag(ads::CDockManager::DisableTabTextEliding, true);
 		ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
+		ads::CDockManager::setConfigFlag(ads::CDockManager::AllTabsHaveCloseButton, true);
 		m_dockManager = new WidgetViewDockManager;
 		m_dockManager->setStyleSheet("");
 	}
