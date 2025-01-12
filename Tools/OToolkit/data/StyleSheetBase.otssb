@@ -2426,6 +2426,8 @@ ads--CDockWidgetTab[activeTab="true"] {
 
 ads--CDockWidgetTab QLabel {
     color: %color:Widget Foreground%;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
 ads--CDockWidgetTab[activeTab="true"] QLabel {

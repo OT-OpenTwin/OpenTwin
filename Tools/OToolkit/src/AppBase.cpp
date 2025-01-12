@@ -500,7 +500,7 @@ AppBase::AppBase(QApplication* _app)
 	m_toolManager->getToolViewManager()->addIgnoredView(defaultView);
 
 	// Create output
-	m_output->setViewData(ot::WidgetViewBase("Output", "Output", ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewFlag::ViewIsSide));
+	m_output->setViewData(ot::WidgetViewBase("Output", "Output", ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewFlag::ViewIsSide | ot::WidgetViewBase::ViewFlag::ViewIsCloseable | ot::WidgetViewBase::ViewFlag::ViewDefaultCloseHandling));
 	m_output->setObjectName("OToolkit_Output");
 	m_output->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	m_toolManager->getToolViewManager()->addIgnoredView(m_output);
