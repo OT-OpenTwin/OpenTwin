@@ -131,7 +131,7 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 	m_filter->setPlaceholderText("Find...");
 	m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_table->horizontalHeader()->setSectionResizeMode(TableColumn::ColumnName, QHeaderView::Stretch);
-	m_table->setHorizontalHeaderLabels({ "", "Name", "Owner", "Last Access" });
+	m_table->setHorizontalHeaderLabels({ "", "Name", "Owner", "Last Modified" });
 	m_table->verticalHeader()->setHidden(true);
 
 	glWidget->setMaximumSize(1, 1);
