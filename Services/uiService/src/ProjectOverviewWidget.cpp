@@ -244,7 +244,7 @@ void ProjectOverviewWidget::slotRefreshRecentProjects(void) {
 
 	std::list<std::string> recent;
 	userManager.getListOfRecentProjects(recent);
-	if (!projectManager.readProjectAuthor(recent)) {
+	if (!projectManager.readProjectsInfo(recent)) {
 		OT_LOG_E("Read project author failed");
 		return;
 	}

@@ -45,7 +45,7 @@ public:
 	std::string getProjectCollection(const std::string &projectName);
 	bool findProjectNames(const std::string &projectNameFilter, int maxNumberOfResults, std::list<std::string> &projectsFound, bool &maxLengthExceeded);
 	bool getProjectAuthor(const std::string &projectName, std::string &author);
-	bool readProjectAuthor(std::list<std::string> &projects);
+	bool readProjectsInfo(std::list<std::string> &projects);
 	bool copyProject(const std::string &sourceProjectName, const std::string &destinationProjectName, const std::string &userName);
 	std::vector<std::string> getDefaultTemplateList(void);
 	bool canAccessProject(const std::string &projectCollection);

@@ -404,8 +404,7 @@ bool ProjectManagement::getProjectAuthor(const std::string &projectName, std::st
 	return true;
 }
 
-bool ProjectManagement::readProjectAuthor(std::list<std::string> &projects)
-{
+bool ProjectManagement::readProjectsInfo(std::list<std::string> &projects) {
 	assert(!authServerURL.empty());
 
 	projectAuthorMap.clear();
@@ -415,7 +414,7 @@ bool ProjectManagement::readProjectAuthor(std::list<std::string> &projects)
 	std::list<std::string> validProjects;
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_PROJECT_OWNERS, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_PROJECT_INFO, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAMES, ot::JsonArray(projects, doc.GetAllocator()), doc.GetAllocator());

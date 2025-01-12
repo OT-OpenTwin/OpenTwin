@@ -199,11 +199,11 @@ namespace MongoProjectFunctions
 		return tmpProject;
 	}
 
-	std::string getProjectOwners(std::list<std::string> projectNames, mongocxx::client& adminClient)
+	std::string getProjectsInfo(const std::list<std::string>& _projectNames, mongocxx::client& _adminClient)
 	{
 		auto array_builder = bsoncxx::builder::basic::array{};
 
-		for (const auto& projectName : projectNames) {
+		for (const auto& projectName : _projectNames) {
 			array_builder.append(projectName);
 		}
 
@@ -213,7 +213,7 @@ namespace MongoProjectFunctions
 			"project_name" << inArr
 			<< finalize;
 
-		mongocxx::database db = adminClient.database(MongoConstants::PROJECTS_DB);
+		mongocxx::database db = _adminClient.database(MongoConstants::PROJECTS_DB);
 		mongocxx::collection projectsCollection = db.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
 
 		mongocxx::cursor cursor = projectsCollection.find(filter.view());
@@ -233,7 +233,7 @@ namespace MongoProjectFunctions
 
 			std::string creatingUserId(doc["created_by"].get_utf8().value.data());
 
-			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(creatingUserId, adminClient);
+			tmpProject.creatingUser = MongoUserFunctions::getUserDataThroughId(creatingUserId, _adminClient);
 
 			projects.push_back(tmpProject);
 		}
@@ -691,6 +691,7 @@ namespace MongoProjectFunctions
 		json.AddMember("ProjectType", ot::JsonString(project.type, json.GetAllocator()), json.GetAllocator());
 		json.AddMember("collectionName", ot::JsonString(project.collectionName, json.GetAllocator()), json.GetAllocator());
 		json.AddMember("creatingUser", ot::JsonString(project.creatingUser.username, json.GetAllocator()), json.GetAllocator());
+		json.AddMember("LastAccessed", project.lastAccessedOn.value.count(), json.GetAllocator());
 		
 		std::list<std::string> groups;
 

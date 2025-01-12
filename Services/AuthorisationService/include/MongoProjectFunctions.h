@@ -41,7 +41,7 @@ namespace MongoProjectFunctions
 
 	Project getProject(std::string projectName, mongocxx::client& userClient);
 
-	std::string getProjectOwners(std::list<std::string> projectNames, mongocxx::client& adminClient);
+	std::string getProjectsInfo(const std::list<std::string>& _projectNames, mongocxx::client& _adminClient);
 
 	std::vector<Project> getAllGroupProjects(Group& group, mongocxx::client& userClient);
 

@@ -393,7 +393,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_CREATE_PROJECT) { return handleCreateProject(_actionDocument.GetObject(), loggedInUser); }
 	//                                                       v-- CAN BE PERFORMED BY THE UI CLIENT --v
 	else if (_action == OT_ACTION_GET_PROJECT_DATA) { return handleGetProjectData(_actionDocument.GetObject()); }
-	else if (_action == OT_ACTION_GET_ALL_PROJECT_OWNERS) { return handleGetAllProjectOwners(_actionDocument.GetObject(), loggedInUser); }
+	else if (_action == OT_ACTION_GET_ALL_PROJECT_INFO) { return handleGetProjectsInfo(_actionDocument.GetObject(), loggedInUser); }
 	else if (_action == OT_ACTION_GET_ALL_USER_PROJECTS) { return handleGetAllUserProjects(_actionDocument.GetObject(), loggedInUser); }
 	else if (_action == OT_ACTION_GET_ALL_PROJECTS) { return handleGetAllProjects(_actionDocument.GetObject(), loggedInUser); }
 	else if (_action == OT_ACTION_GET_ALL_PROJECT_COUNT) { return handleGetAllProjectsCount(_actionDocument.GetObject(), loggedInUser); }
@@ -782,9 +782,9 @@ std::string ServiceBase::handleGetProjectData(const ot::ConstJsonObject& _action
 	}
 }
 
-std::string ServiceBase::handleGetAllProjectOwners(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
+std::string ServiceBase::handleGetProjectsInfo(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {
 	auto projectNames = ot::json::getStringList(_actionDocument, OT_PARAM_AUTH_PROJECT_NAMES);
-	return MongoProjectFunctions::getProjectOwners(projectNames, adminClient);
+	return MongoProjectFunctions::getProjectsInfo(projectNames, adminClient);
 }
 
 std::string ServiceBase::handleGetAllUserProjects(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser) {

@@ -776,7 +776,7 @@
 // Project Functionalities
 #define OT_ACTION_CREATE_PROJECT "CreateProject"
 #define OT_ACTION_GET_PROJECT_DATA "GetProjectData"
-#define OT_ACTION_GET_ALL_PROJECT_OWNERS "GetAllProjectOwners"
+#define OT_ACTION_GET_ALL_PROJECT_INFO "GetAllProjectsInfo"
 #define OT_ACTION_GET_ALL_PROJECTS "GetAllProjects"
 #define OT_ACTION_GET_ALL_USER_PROJECTS "GetAllUserProjects"
 #define OT_ACTION_GET_ALL_PROJECT_COUNT "GetAllProjectCount"

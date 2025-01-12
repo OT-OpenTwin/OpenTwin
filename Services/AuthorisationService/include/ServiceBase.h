@@ -83,7 +83,7 @@ private:
 
 	std::string handleCreateProject(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleGetProjectData(const ot::ConstJsonObject& _actionDocument);
-	std::string handleGetAllProjectOwners(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
+	std::string handleGetProjectsInfo(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleGetAllUserProjects(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleGetAllProjects(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
 	std::string handleGetAllProjectsCount(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser);
