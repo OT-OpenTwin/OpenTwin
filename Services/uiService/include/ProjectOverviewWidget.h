@@ -14,9 +14,12 @@
 // Qt header
 #include <QtCore/qobject.h>
 #include <QtCore/qstring.h>
+#include <QtGui/qicon.h>
 
 // std header
+#include <map>
 #include <list>
+#include <string>
 
 class QTableWidget;
 class QTableWidgetItem;
@@ -33,7 +36,7 @@ class ProjectOverviewEntry : public QObject {
 	Q_OBJECT
 	OT_DECL_NODEFAULT(ProjectOverviewEntry)
 public:
-	ProjectOverviewEntry(const ProjectInformation& _projectInfo, bool _ownerIsCreator, QTableWidget* _table);
+	ProjectOverviewEntry(const ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table);
 
 	void setIsChecked(bool _checked);
 	bool getIsChecked(void) const;
@@ -50,6 +53,7 @@ private:
 	QTableWidget* m_table;
 	bool m_ownerIsCreator;
 	ot::CheckBox* m_checkBox;
+	QTableWidgetItem* m_typeItem;
 	QTableWidgetItem* m_nameItem;
 	QTableWidgetItem* m_ownerItem;
 	QTableWidgetItem* m_lastAccessTimeItem;

@@ -337,6 +337,7 @@ bool ProjectManagement::findProjectNames(const std::string& _projectNameFilter, 
 
 		ProjectInformation newInfo;
 		newInfo.setProjectName(projectDoc[OT_PARAM_AUTH_NAME].GetString());
+		newInfo.setProjectType(projectDoc[OT_PARAM_AUTH_PROJECT_TYPE].GetString());
 		newInfo.setUserName(projectDoc[OT_PARAM_AUTH_OWNER].GetString());
 		newInfo.setLastAccessTime(QDateTime::fromMSecsSinceEpoch(ot::json::getInt64(projectDoc, OT_PARAM_AUTH_PROJECT_LASTACCESS)));
 
@@ -447,6 +448,7 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
 
 		ProjectInformation newInfo;
 		newInfo.setProjectName(projectDoc[OT_PARAM_AUTH_NAME].GetString());
+		newInfo.setProjectType(projectDoc[OT_PARAM_AUTH_PROJECT_TYPE].GetString());
 		newInfo.setUserName(projectDoc[OT_PARAM_AUTH_OWNER].GetString());
 		newInfo.setLastAccessTime(QDateTime::fromMSecsSinceEpoch(ot::json::getInt64(projectDoc, OT_PARAM_AUTH_PROJECT_LASTACCESS)));
 

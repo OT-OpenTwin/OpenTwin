@@ -24,6 +24,9 @@ public:
 	void setProjectName(const std::string& _name) { m_name = _name; };
 	const std::string& getProjectName(void) const { return m_name; };
 
+	void setProjectType(const std::string& _type) { m_type = _type; };
+	const std::string& getProjectType(void) const { return m_type; };
+
 	void setUserName(const std::string& _name) { m_user = _name; };
 	const std::string& getUserName(void) const { return m_user; };
 
@@ -32,6 +35,7 @@ public:
 
 private:
 	std::string m_name;
+	std::string m_type;
 	std::string m_user;
 	QDateTime m_lastAccessTime;
 

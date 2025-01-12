@@ -206,7 +206,7 @@ int main(int _argc, char *_argv[])
 
 		// Cleanup
 		ExternalServicesComponent * extComp = AppBase::instance()->getExternalServicesComponent();
-		if (extComp != nullptr) { 
+		if (extComp != nullptr) {
 			extComp->shutdown(); 
 		}
 

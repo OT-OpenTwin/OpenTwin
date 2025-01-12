@@ -277,6 +277,10 @@ public:
 
 	void updateLogIntensityInfo(void);
 
+	const QIcon& getDefaultProjectTypeIcon(void) const { return m_defaultProjectTypeIcon; };
+	const std::map<std::string, std::string>& getProjectTypeDefaultIconNameMap(void) const { return m_projectTypeDefaultIconNameMap; };
+	const std::map<std::string, std::string>& getProjectTypeCustomIconNameMap(void) const { return m_projectTypeCustomIconNameMap; };
+
 public Q_SLOTS:
 	void lockUI(bool flag);
 	void refreshWelcomeScreen(void);
@@ -580,6 +584,10 @@ private:
 	std::map<std::string, ot::TextEditorView*> m_textEditors;
 	std::map<std::string, ot::TableView*> m_tables;
 	
+	QIcon m_defaultProjectTypeIcon;
+	std::map<std::string, std::string> m_projectTypeDefaultIconNameMap;
+	std::map<std::string, std::string> m_projectTypeCustomIconNameMap;
+
 	bool m_visible3D;
 	bool m_visible1D;
 	bool m_visibleBlockPicker;

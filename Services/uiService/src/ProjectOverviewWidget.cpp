@@ -17,6 +17,7 @@
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/ToolButton.h"
 #include "OTWidgets/IconManager.h"
+#include "OTCommunication/ActionTypes.h"
 
 // TabToolbar
 #include <TabToolbar/Page.h>
@@ -29,13 +30,14 @@
 
 enum TableColumn {
 	ColumnCheck,
+	ColumnType,
 	ColumnName,
 	ColumnOwner,
 	ColumnLastAccess,
 	ColumnCount
 };
 
-ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInfo, bool _ownerIsCreator, QTableWidget* _table)
+ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInfo, const QIcon& _projectTypeIcon, bool _ownerIsCreator, QTableWidget* _table)
 	: m_ownerIsCreator(_ownerIsCreator), m_table(_table)
 {
 	int row = _table->rowCount();
@@ -44,19 +46,24 @@ ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInf
 	m_checkBox = new ot::CheckBox;
 	m_checkBox->setFocusPolicy(Qt::NoFocus);
 	
+	m_typeItem = new QTableWidgetItem;
+	m_typeItem->setFlags(m_typeItem->flags() & ~Qt::ItemIsEditable);
+	m_typeItem->setIcon(_projectTypeIcon);
+
 	m_nameItem = new QTableWidgetItem;
-	m_nameItem->setFlags(m_nameItem->flags() & ~Qt::ItemIsEditable);
+	m_nameItem->setFlags(m_typeItem->flags());
 	m_nameItem->setText(QString::fromStdString(_projectInfo.getProjectName()));
 
 	m_ownerItem = new QTableWidgetItem;
-	m_ownerItem->setFlags(m_nameItem->flags());
+	m_ownerItem->setFlags(m_typeItem->flags());
 	m_ownerItem->setText(QString::fromStdString(_projectInfo.getUserName()));
 
 	m_lastAccessTimeItem = new QTableWidgetItem;
-	m_lastAccessTimeItem->setFlags(m_nameItem->flags());
+	m_lastAccessTimeItem->setFlags(m_typeItem->flags());
 	m_lastAccessTimeItem->setText(_projectInfo.getLastAccessTime().toString("yyyy.MM.dd hh:mm:ss"));
 
 	_table->setCellWidget(row, TableColumn::ColumnCheck, m_checkBox);
+	_table->setItem(row, TableColumn::ColumnType, m_typeItem);
 	_table->setItem(row, TableColumn::ColumnName, m_nameItem);
 	_table->setItem(row, TableColumn::ColumnOwner, m_ownerItem);
 	_table->setItem(row, TableColumn::ColumnLastAccess, m_lastAccessTimeItem);
@@ -131,7 +138,7 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 	m_filter->setPlaceholderText("Find...");
 	m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_table->horizontalHeader()->setSectionResizeMode(TableColumn::ColumnName, QHeaderView::Stretch);
-	m_table->setHorizontalHeaderLabels({ "", "Name", "Owner", "Last Modified" });
+	m_table->setHorizontalHeaderLabels({ "", "", "Name", "Owner", "Last Modified" });
 	m_table->verticalHeader()->setHidden(true);
 
 	glWidget->setMaximumSize(1, 1);
@@ -441,7 +448,14 @@ void ProjectOverviewWidget::clear(void) {
 void ProjectOverviewWidget::addProject(const ProjectInformation& _projectInfo, bool _ownerIsCreator) {
 	bool blocked = m_table->signalsBlocked();
 	m_table->blockSignals(true);
-	ProjectOverviewEntry* newEntry = new ProjectOverviewEntry(_projectInfo, _ownerIsCreator, m_table);
+
+	QIcon projectTypeIcon = AppBase::instance()->getDefaultProjectTypeIcon();
+	auto iconIt = AppBase::instance()->getProjectTypeDefaultIconNameMap().find(_projectInfo.getProjectType());
+	if (iconIt != AppBase::instance()->getProjectTypeDefaultIconNameMap().end()) {
+		projectTypeIcon = ot::IconManager::getIcon(QString::fromStdString(iconIt->second));
+	}
+
+	ProjectOverviewEntry* newEntry = new ProjectOverviewEntry(_projectInfo, projectTypeIcon, _ownerIsCreator, m_table);
 	m_entries.push_back(newEntry);
 	this->connect(newEntry, &ProjectOverviewEntry::checkedChanged, this, &ProjectOverviewWidget::slotProjectCheckedChanged);
 	m_table->blockSignals(blocked);

@@ -204,6 +204,23 @@ bool AppBase::initialize() {
 		m_modelUid = uiAPI::createUid();
 		m_viewerUid = uiAPI::createUid();
 
+		m_defaultProjectTypeIcon = ot::IconManager::getIcon("ProjectTemplates/DefaultIcon.png");
+		m_projectTypeDefaultIconNameMap = std::map<std::string, std::string>({
+			{OT_ACTION_PARAM_SESSIONTYPE_3DSIM, "ProjectTemplates/3D.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE, "ProjectTemplates/Pipeline.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, "ProjectTemplates/CST.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_LTSPICE, "ProjectTemplates/LTSpice.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT, "ProjectTemplates/Development.png"}
+			});
+
+		m_projectTypeCustomIconNameMap = std::map<std::string, std::string>({
+			{OT_ACTION_PARAM_SESSIONTYPE_3DSIM, "ProjectTemplates/Custom3D.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE, "ProjectTemplates/CustomPipeline.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, "ProjectTemplates/CustomCST.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_LTSPICE, "ProjectTemplates/CustomLTSpice.png"},
+			{OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT, "ProjectTemplates/CustomDevelopment.png"}
+			});
+
 		// Connect color style change signal
 		this->connect(&ot::GlobalColorStyle::instance(), &ot::GlobalColorStyle::currentStyleChanged, this, &AppBase::slotColorStyleChanged);
 
@@ -2370,22 +2387,9 @@ void AppBase::slotCreateProject(void) {
 	ot::CreateProjectDialog newProjectDialog(this->mainWindow());
 
 	// Fill icon maps
-	newProjectDialog.setDefaultIcon(ot::IconManager::getIcon("ProjectTemplates/DefaultIcon.png"));
-	newProjectDialog.setDefaultIconMap(std::map<std::string, std::string>({
-		{OT_ACTION_PARAM_SESSIONTYPE_3DSIM, "ProjectTemplates/3D.png"},
-		{OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE, "ProjectTemplates/Pipeline.png"},
-		{OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, "ProjectTemplates/CST.png"},
-		{OT_ACTION_PARAM_SESSIONTYPE_LTSPICE, "ProjectTemplates/LTSpice.png"},
-		{OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT, "ProjectTemplates/Development.png"}
-		}));
-
-	newProjectDialog.setCustomIconMap(std::map<std::string, std::string>({
-		{OT_ACTION_PARAM_SESSIONTYPE_3DSIM, "ProjectTemplates/Custom3D.png"},
-		{OT_ACTION_PARAM_SESSIONTYPE_DATAPIPELINE, "ProjectTemplates/CustomPipeline.png"},
-		{OT_ACTION_PARAM_SESSIONTYPE_STUDIOSUITE, "ProjectTemplates/CustomCST.png"},
-		{OT_ACTION_PARAM_SESSIONTYPE_LTSPICE, "ProjectTemplates/CustomLTSpice.png"},
-		{OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT, "ProjectTemplates/CustomDevelopment.png"}
-		}));
+	newProjectDialog.setDefaultIcon(m_defaultProjectTypeIcon);
+	newProjectDialog.setDefaultIconMap(m_projectTypeDefaultIconNameMap);
+	newProjectDialog.setCustomIconMap(m_projectTypeCustomIconNameMap);
 
 	// Initialize data
 	newProjectDialog.setProjectTemplates(m_ExternalServicesComponent->getListOfProjectTemplates());
