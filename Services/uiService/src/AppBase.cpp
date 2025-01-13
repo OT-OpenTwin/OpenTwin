@@ -58,6 +58,7 @@
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/TextEditorView.h"
+#include "OTWidgets/BasicWidgetView.h"
 #include "OTWidgets/GraphicsViewView.h"
 #include "OTWidgets/PropertyGridView.h"
 #include "OTWidgets/PropertyGridItem.h"
@@ -82,6 +83,7 @@
 
 // ADS header
 #include <ads/DockManager.h>
+#include <ads/DockAreaWidget.h>
 
 // Qt header
 #include <QtCore/qfile.h>
@@ -170,7 +172,8 @@ AppBase::AppBase() :
 	m_welcomeScreen(nullptr),
 	m_ttb(nullptr),
 	m_logIntensity(nullptr),
-	m_lastFocusedCentralView(nullptr)
+	m_lastFocusedCentralView(nullptr),
+	m_defaultView(nullptr)
 {
 	m_currentStateWindow.viewShown = false;
 
@@ -824,12 +827,11 @@ void AppBase::createUi(void) {
 			// Create docks
 			OT_LOG_D("Creating views");
 
-			ot::PlainTextEditView* defaultView = new ot::PlainTextEditView;
-			defaultView->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::Default, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsCentral));
-			defaultView->setViewIsPermanent(true);
-			defaultView->setPlainText(BUILD_INFO);
-			defaultView->setReadOnly(true);
-			defaultView->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
+			ot::Label* defaultLabel = new ot::Label;
+			m_defaultView = new ot::BasicWidgetView(defaultLabel);
+			m_defaultView->setViewData(ot::WidgetViewBase("Debug", "OpenTwin", ot::WidgetViewBase::Default, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsCentral));
+			m_defaultView->setViewIsPermanent(true);
+			m_defaultView->getViewDockWidget()->setFeature(ads::CDockWidget::NoTab, true);
 
 			m_output = new ot::PlainTextEditView;
 			m_output->setViewData(ot::WidgetViewBase(TITLE_DOCK_OUTPUT, TITLE_DOCK_OUTPUT, ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
@@ -904,7 +906,7 @@ void AppBase::createUi(void) {
 			// Display docks
 			OT_LOG_D("Settings up dock window visibility");
 	
-			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), defaultView);
+			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_defaultView);
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_output);
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_projectNavigation);
 			ot::WidgetViewManager::instance().addView(this->getBasicServiceInformation(), m_propertyGrid);
@@ -1271,6 +1273,21 @@ void AppBase::restoreSessionState(void) {
 
 	m_currentStateWindow.view = s;
 	ot::WidgetViewManager::instance().restoreState(m_currentStateWindow.view);
+
+	// Set first tab as current view in central view
+	OTAssertNullptr(m_defaultView);
+	OTAssertNullptr(m_defaultView->getViewDockWidget());
+	ads::CDockAreaWidget* area = m_defaultView->getViewDockWidget()->dockAreaWidget();
+	if (area) {
+		for (ads::CDockWidget* dock : area->dockWidgets()) {
+			if (!dock->isClosed()) {
+				if (dock != m_defaultView->getViewDockWidget()) {
+					dock->setAsCurrentTab();
+					break;
+				}
+			}
+		}
+	}
 }
 
 void AppBase::storeSessionState(void) {
