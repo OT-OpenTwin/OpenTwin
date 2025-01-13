@@ -5,10 +5,10 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
-#include "OTWidgets/TreeWidget.h"
 #include "OTWidgets/PropertyGrid.h"
 #include "OTWidgets/PropertyInput.h"
 #include "OTWidgets/PropertyGridItem.h"
+#include "OTWidgets/PropertyGridTree.h"
 #include "OTWidgets/PropertyGridGroup.h"
 #include "OTWidgets/PropertyGridItemDelegate.h"
 
@@ -16,49 +16,8 @@
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 
-class ot::PropertyGrid::PropertyGridTree : public TreeWidget {
-public:
-	PropertyGridTree() 
-		: m_wasShown(false)
-	{
-		
-	}
-
-protected:
-	virtual void mousePressEvent(QMouseEvent* _event) override {
-		QModelIndex index = indexAt(_event->pos());
-		bool last_state = isExpanded(index);
-		
-		TreeWidget::mousePressEvent(_event);
-		
-		if (index.isValid() && last_state == isExpanded(index) && this->itemFromIndex(index) && this->itemFromIndex(index)->childCount() > 0) {
-			this->setExpanded(index, !last_state);
-		}
-			
-	}
-
-	virtual void showEvent(QShowEvent* _event) {
-		if (!m_wasShown) {
-			this->setColumnWidth(0, this->width() / 2);
-			m_wasShown = true;
-		}
-		TreeWidget::showEvent(_event);
-	}
-
-	virtual void resizeEvent(QResizeEvent* _event) {
-		TreeWidget::resizeEvent(_event);
-	}
-
-	virtual void drawRow(QPainter* _painter, const QStyleOptionViewItem& _options, const QModelIndex& _index) const override {
-		TreeWidget::drawRow(_painter, _options, _index);
-	}
-
-private:
-	bool m_wasShown;
-};
-
 ot::PropertyGrid::PropertyGrid(QObject* _parentObject) : QObject(_parentObject) {
-	m_tree = new PropertyGrid::PropertyGridTree;
+	m_tree = new PropertyGridTree;
 	m_tree->setColumnCount(2);
 	m_tree->setHeaderLabels({ "Name", "Value" });
 	m_tree->setIndentation(0);

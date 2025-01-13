@@ -23,6 +23,7 @@ namespace ot {
 	class Property;
 	class TreeWidget;
 	class PropertyGridItem;
+	class PropertyGridTree;
 	class PropertyGridGroup;
 
 	class OT_WIDGETS_API_EXPORT PropertyGrid : public QObject, public QWidgetInterface {
@@ -71,7 +72,6 @@ namespace ot {
 	private:
 		PropertyGridGroup* findGroup(QTreeWidgetItem* _parentTreeItem, const std::list<std::string>& _groupPath) const;
 
-		class PropertyGridTree;
 		PropertyGridTree* m_tree;
 	};
 

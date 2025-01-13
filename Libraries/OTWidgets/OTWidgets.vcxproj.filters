@@ -451,6 +451,9 @@
     <ClCompile Include="src\CartesianPlotTextMarker.cpp">
       <Filter>src\Plot\Cartesian</Filter>
     </ClCompile>
+    <ClCompile Include="src\PropertyGridTree.cpp">
+      <Filter>src\Properties</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -1047,6 +1050,9 @@
     </QtMoc>
     <QtMoc Include="include\OTWidgets\DelayedCallHandler.h">
       <Filter>include\General</Filter>
+    </QtMoc>
+    <QtMoc Include="include\OTWidgets\PropertyGridTree.h">
+      <Filter>include\Properties</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

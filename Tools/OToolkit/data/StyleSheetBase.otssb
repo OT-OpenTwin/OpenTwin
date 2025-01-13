@@ -1057,7 +1057,7 @@ QDialogButtonBox QPushButton {
     min-width: 80px;
 }
 
-#OT_PushButton {
+ot--PushButton {
     /* Fixes issue with ot::PushButton */
     color: %color:Widget Foreground%;
 }
@@ -2088,17 +2088,17 @@ QAbstractView:selected {
 
 /* Property Grid */
 
-#ot_property_grid::item {
+ot--PropertyGridTree::item {
     background-color: transparent;
     color: %color:Widget Foreground%;
 }
 
-#ot_property_grid::item:hover:!selected {
+ot--PropertyGridTree::item:hover:!selected {
     background-color: transparent;
     color: %color:Widget Foreground%;
 }
 
-#ot_property_grid::item:selected {
+ot--PropertyGridTree::item:selected {
     background-color: transparent;
     color: %color:Widget Foreground%;
 }
@@ -2110,21 +2110,6 @@ QAbstractView:selected {
 #OT_TransparentPushButton {
     background-color: transparent;
     border: 1px solid transparent;
-}
-
-/* Combo Button */
-
-#OT_ComboButton {
-    color: %color:Widget Foreground%;
-    border-radius: 0;
-}
-
-#OT_ComboButton:disabled {
-    border-radius: 0;
-}
-
-#OT_ComboButton:checked:disabled {
-    border-radius: 0;
 }
 
 /* ##################################################################################### */
@@ -2260,6 +2245,7 @@ ot--ComboButton {
     border: 1px solid %color:Border Light Color%;
     padding-top: 4px;
     padding-bottom: 4px;
+    text-align: left;
 }
 
 ot--ComboButton:!hover:!pressed {
@@ -2268,6 +2254,7 @@ ot--ComboButton:!hover:!pressed {
     border: 1px solid %color:Border Light Color%;
     padding-top: 4px;
     padding-bottom: 4px;
+    text-align: left;
 }
 
 ot--ComboButton:hover:!pressed {
@@ -2276,6 +2263,7 @@ ot--ComboButton:hover:!pressed {
     border: 1px solid %color:Border Hover Color%;
     padding-top: 4px;
     padding-bottom: 4px;
+    text-align: left;
 }
 
 ot--ComboButton[IsSelected="true"] {
@@ -2284,6 +2272,7 @@ ot--ComboButton[IsSelected="true"] {
     border: 1px solid %color:Border Selection Color%;
     padding-top: 4px;
     padding-bottom: 4px;
+    text-align: left;
 }
 
 ot--ComboButton[IsSelected="false"]:!hover:pressed {
@@ -2292,6 +2281,7 @@ ot--ComboButton[IsSelected="false"]:!hover:pressed {
     border: 1px solid %color:Border Light Color%;
     padding-top: 4px;
     padding-bottom: 4px;
+    text-align: left;
 }
 
 ot--ComboButton[IsSelected="false"]:hover:pressed {
@@ -2300,6 +2290,7 @@ ot--ComboButton[IsSelected="false"]:hover:pressed {
     border: 1px solid %color:Border Hover Color%;
     padding-top: 4px;
     padding-bottom: 4px;
+    text-align: left;
 }
 
 /* ##################################################################################### */

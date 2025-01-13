@@ -21,6 +21,7 @@ ot::PropertyInputDirectory::PropertyInputDirectory()
 {
 	m_root = new QWidget;
 	QHBoxLayout* rLay = new QHBoxLayout(m_root);
+	rLay->setContentsMargins(0, 0, 0, 0);
 
 	m_edit = new LineEdit;
 	rLay->addWidget(m_edit, 1);

@@ -58,6 +58,7 @@ void ot::FilePathEdit::slotEditChanged(void) {
 void ot::FilePathEdit::ini(QWidget* _parent) {
 	m_root = new QWidget(_parent);
 	QHBoxLayout* rootLayout = new QHBoxLayout(m_root);
+	rootLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_edit = new LineEdit(m_file);
 
