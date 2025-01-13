@@ -17,7 +17,6 @@
 #include "OTWidgets/LineEdit.h"
 #include "OTWidgets/ToolButton.h"
 #include "OTWidgets/IconManager.h"
-#include "OTCommunication/ActionTypes.h"
 
 // TabToolbar
 #include <TabToolbar/Page.h>
@@ -49,6 +48,7 @@ ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInf
 	m_typeItem = new QTableWidgetItem;
 	m_typeItem->setFlags(m_typeItem->flags() & ~Qt::ItemIsEditable);
 	m_typeItem->setIcon(_projectTypeIcon);
+	m_typeItem->setToolTip(QString::fromStdString(_projectInfo.getProjectType()));
 
 	m_nameItem = new QTableWidgetItem;
 	m_nameItem->setFlags(m_typeItem->flags());
@@ -106,7 +106,7 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 	QVBoxLayout* centralLayout = new QVBoxLayout(m_widget);
 
 	// Crete controls
-	ot::Label* welcomeLabel = new ot::Label("Welcome");
+	ot::Label* welcomeLabel = new ot::Label("Projects");
 	m_filter = new ot::LineEdit;
 	m_table = new ot::Table(0, TableColumn::ColumnCount);
 	m_countLabel = new ot::Label;
@@ -132,7 +132,7 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 
 	// Setup controls
 	QFont welcomeFont = welcomeLabel->font();
-	welcomeFont.setPixelSize(48);
+	welcomeFont.setPixelSize(28);
 	welcomeLabel->setFont(welcomeFont);
 
 	m_filter->setPlaceholderText("Find...");
