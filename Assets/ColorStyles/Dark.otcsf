@@ -2111,44 +2111,35 @@ ot--PropertyGridTree::item:selected {
 
 /* ##################################################################################### */
 
-/* Special Buttons */
-
-#OT_TransparentPushButton {
-    background-color: transparent;
-    border: 1px solid transparent;
-}
-
-/* ##################################################################################### */
-
 /* Log In */
 
-#LogInDialog {
+LogInDialog {
     background: rgb(2, 41, 92);
     border: 1px solid white;
 }
 
-#LogInDialog QLabel {
+LogInDialog QLabel {
     color: white;
 }
 
-#LogInDialogRegisterLabel:hover {
+LogInDialog #LogInDialogRegisterLabel:hover {
     color: rgba(0,215,255,255);
 }
 
-#LogInDialogChangePasswordLabel:hover {
+LogInDialog #LogInDialogChangePasswordLabel:hover {
     color: rgba(0,215,255,255);
 }
 
-#LogInDialogImageView {
+LogInDialog #LogInDialogImageView {
     background: rgb(2, 41, 92);
 }
 
-#LogInDialogSessionServiceUrl {
+LogInDialog #LogInDialogSessionServiceUrl {
     border-radius: 0;
     text-align: left;
 }
 
-QCheckBox#LogInDialogSavePassword {
+LogInDialog #LogInDialogSavePassword {
     background-color: transparent;
     color: white;
     spacing: 4px;
@@ -2157,77 +2148,77 @@ QCheckBox#LogInDialogSavePassword {
     padding-bottom: 4px;
 }
     
-QCheckBox#LogInDialogSavePassword:focus {
+LogInDialog #LogInDialogSavePassword:focus {
     border: none;
 }
 
-QCheckBox#LogInDialogSavePassword:disabled {
+LogInDialog #LogInDialogSavePassword:disabled {
     background-color: transparent;
     color: lightgray;
 }
 
-QCheckBox#LogInDialogSavePassword::indicator {
+LogInDialog #LogInDialogSavePassword::indicator {
     margin-left: 2px;
     height: 14px;
     width: 14px;
 }
  
-QCheckBox#LogInDialogSavePassword::indicator:unchecked {
+LogInDialog #LogInDialogSavePassword::indicator:unchecked {
     image: url('%root%/icons/log_in_checkbox_unchecked.png');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:unchecked:hover,
-QCheckBox#LogInDialogSavePassword::indicator:unchecked:focus {
+LogInDialog #LogInDialogSavePassword::indicator:unchecked:hover,
+LogInDialog #LogInDialogSavePassword::indicator:unchecked:focus {
     border: none;
     image: url('%root%/icons/log_in_checkbox_unchecked_focus.png');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:unchecked:pressed {
+LogInDialog #LogInDialogSavePassword::indicator:unchecked:pressed {
     border: none;
     image: url('%root%/icons/log_in_checkbox_unchecked_pressed.png');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:unchecked:disabled {
+LogInDialog #LogInDialogSavePassword::indicator:unchecked:disabled {
     image: url('%root%/icons/log_in_checkbox_unchecked_disabled.png');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:checked {
+LogInDialog #LogInDialogSavePassword::indicator:checked {
     image: url('%root%/icons/log_in_checkbox_checked.png');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:checked:hover,
-QCheckBox#LogInDialogSavePassword::indicator:checked:focus {
+LogInDialog #LogInDialogSavePassword::indicator:checked:hover,
+LogInDialog #LogInDialogSavePassword::indicator:checked:focus {
     border: none;
     image: url('%root%/icons/log_in_checkbox_checked_focus.png');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:checked:pressed {
+LogInDialog #LogInDialogSavePassword::indicator:checked:pressed {
     border: none;
     image: url('%root%/icons/log_in_checkbox_checked_pressed.png');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:checked:disabled {
+LogInDialog #LogInDialogSavePassword::indicator:checked:disabled {
     border: none;
     image: url('%root%/icons/log_in_checkbox_checked_disabled.png');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:indeterminate {
+LogInDialog #LogInDialogSavePassword::indicator:indeterminate {
     border: none;
     image: url('%root%/icons/log_in_checkbox_indeterminate.png');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:indeterminate:disabled {
+LogInDialog #LogInDialogSavePassword::indicator:indeterminate:disabled {
     border: none;
     image: url('%root%/icons/log_in_checkbox_indeterminate_disabled.png');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:indeterminate:focus,
-QCheckBox#LogInDialogSavePassword::indicator:indeterminate:hover {
+LogInDialog #LogInDialogSavePassword::indicator:indeterminate:focus,
+LogInDialog #LogInDialogSavePassword::indicator:indeterminate:hover {
     border: none;
     image: url('%root%/icons/log_in_checkbox_indeterminate_focus.png');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:indeterminate:pressed {
+LogInDialog #LogInDialogSavePassword::indicator:indeterminate:pressed {
     border: none;
     image: url('%root%/icons/log_in_checkbox_indeterminate_pressed.png');
 }
@@ -2237,7 +2228,7 @@ QCheckBox#LogInDialogSavePassword::indicator:indeterminate:pressed {
 
 /* Line Edit */
 
-#OT_LineEdit {
+ot--LineEdit {
     border-radius: 0;
 }
 
@@ -2303,25 +2294,51 @@ ot--ComboButton[IsSelected="false"]:hover:pressed {
 
 /* Text Edit Search Popup */
 
-#OT_TextEditSearchPopup {
+ot--TextEditorSearchPopup {
     background-color: rgba(50,50,50,255);
     padding: 4px;
     border: 1px solid rgba(70,70,70,255);
 }
 
-#OT_PropertyInputColor_Button {
+/* ##################################################################################### */
+
+/* Property Input Color */
+
+ot--ColorPickButton #OT_PropertyInputColor_Button {
     background-color: rgba(30,30,30,255);
     color: rgba(255,255,255,255);
     border: 1px solid rgba(70,70,70,255);
 }
 
-#OT_PropertyInputColor_Button:hover:!pressed {
+ot--ColorPickButton #OT_PropertyInputColor_Button:hover:!pressed {
     background-color: rgba(30,30,30,255);
     color: rgba(255,255,255,255);
     border: 1px solid rgba(0,215,255,255);
 }
 
-#OT_PropertyInputColor_Button:pressed {
+ot--ColorPickButton #OT_PropertyInputColor_Button:pressed {
+    background-color: rgba(30,30,30,255);
+    color: rgba(255,255,255,255);
+    border: 1px solid rgba(0,255,0,255);
+}
+
+/* ##################################################################################### */
+
+/* Property Input Painter2D */
+
+ot--Painter2DEditButton #OT_PropertyInputPainter2D_Button {
+    background-color: rgba(30,30,30,255);
+    color: rgba(255,255,255,255);
+    border: 1px solid rgba(70,70,70,255);
+}
+
+ot--Painter2DEditButton #OT_PropertyInputPainter2D_Button:hover:!pressed {
+    background-color: rgba(30,30,30,255);
+    color: rgba(255,255,255,255);
+    border: 1px solid rgba(0,215,255,255);
+}
+
+ot--Painter2DEditButton #OT_PropertyInputPainter2D_Button:pressed {
     background-color: rgba(30,30,30,255);
     color: rgba(255,255,255,255);
     border: 1px solid rgba(0,255,0,255);
@@ -2431,7 +2448,7 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
     color: rgba(255,255,255,255);
 }
 
-#tabCloseButton {
+ads--CDockWidgetTab #tabCloseButton {
     background: rgba(30,30,30,255);
     color: rgba(255,255,255,255);
     border: 0px solid transparent;
@@ -2441,15 +2458,15 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
     image: url('%root%/icons/window_close.png');
 }
 
-#tabCloseButton::hover::!pressed {
+ads--CDockWidgetTab #tabCloseButton::hover::!pressed {
     image: url('%root%/icons/window_close_focus.png');
 }
 
-#tabCloseButton::pressed {
+ads--CDockWidgetTab #tabCloseButton::pressed {
     image: url('%root%/icons/window_close_pressed.png');
 }
 
-#tabCloseButton::disabled {
+ads--CDockWidgetTab #tabCloseButton::disabled {
     image: url('%root%/icons/window_close_disabled.png');
 }
 

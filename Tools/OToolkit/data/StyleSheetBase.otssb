@@ -2105,44 +2105,35 @@ ot--PropertyGridTree::item:selected {
 
 /* ##################################################################################### */
 
-/* Special Buttons */
-
-#OT_TransparentPushButton {
-    background-color: transparent;
-    border: 1px solid transparent;
-}
-
-/* ##################################################################################### */
-
 /* Log In */
 
-#LogInDialog {
+LogInDialog {
     background: rgb(2, 41, 92);
     border: 1px solid white;
 }
 
-#LogInDialog QLabel {
+LogInDialog QLabel {
     color: white;
 }
 
-#LogInDialogRegisterLabel:hover {
+LogInDialog #LogInDialogRegisterLabel:hover {
     color: %color:Widget Hover Background%;
 }
 
-#LogInDialogChangePasswordLabel:hover {
+LogInDialog #LogInDialogChangePasswordLabel:hover {
     color: %color:Widget Hover Background%;
 }
 
-#LogInDialogImageView {
+LogInDialog #LogInDialogImageView {
     background: rgb(2, 41, 92);
 }
 
-#LogInDialogSessionServiceUrl {
+LogInDialog #LogInDialogSessionServiceUrl {
     border-radius: 0;
     text-align: left;
 }
 
-QCheckBox#LogInDialogSavePassword {
+LogInDialog #LogInDialogSavePassword {
     background-color: transparent;
     color: white;
     spacing: 4px;
@@ -2151,77 +2142,77 @@ QCheckBox#LogInDialogSavePassword {
     padding-bottom: 4px;
 }
     
-QCheckBox#LogInDialogSavePassword:focus {
+LogInDialog #LogInDialogSavePassword:focus {
     border: none;
 }
 
-QCheckBox#LogInDialogSavePassword:disabled {
+LogInDialog #LogInDialogSavePassword:disabled {
     background-color: transparent;
     color: lightgray;
 }
 
-QCheckBox#LogInDialogSavePassword::indicator {
+LogInDialog #LogInDialogSavePassword::indicator {
     margin-left: 2px;
     height: 14px;
     width: 14px;
 }
  
-QCheckBox#LogInDialogSavePassword::indicator:unchecked {
+LogInDialog #LogInDialogSavePassword::indicator:unchecked {
     image: url('%file:LogIn CheckBox Unchecked Icon%');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:unchecked:hover,
-QCheckBox#LogInDialogSavePassword::indicator:unchecked:focus {
+LogInDialog #LogInDialogSavePassword::indicator:unchecked:hover,
+LogInDialog #LogInDialogSavePassword::indicator:unchecked:focus {
     border: none;
     image: url('%file:LogIn CheckBox Unchecked Focus Icon%');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:unchecked:pressed {
+LogInDialog #LogInDialogSavePassword::indicator:unchecked:pressed {
     border: none;
     image: url('%file:LogIn CheckBox Unchecked Pressed Icon%');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:unchecked:disabled {
+LogInDialog #LogInDialogSavePassword::indicator:unchecked:disabled {
     image: url('%file:LogIn CheckBox Unchecked Disabled Icon%');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:checked {
+LogInDialog #LogInDialogSavePassword::indicator:checked {
     image: url('%file:LogIn CheckBox Checked Icon%');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:checked:hover,
-QCheckBox#LogInDialogSavePassword::indicator:checked:focus {
+LogInDialog #LogInDialogSavePassword::indicator:checked:hover,
+LogInDialog #LogInDialogSavePassword::indicator:checked:focus {
     border: none;
     image: url('%file:LogIn CheckBox Checked Focus Icon%');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:checked:pressed {
+LogInDialog #LogInDialogSavePassword::indicator:checked:pressed {
     border: none;
     image: url('%file:LogIn CheckBox Checked Pressed Icon%');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:checked:disabled {
+LogInDialog #LogInDialogSavePassword::indicator:checked:disabled {
     border: none;
     image: url('%file:LogIn CheckBox Checked Disabled Icon%');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:indeterminate {
+LogInDialog #LogInDialogSavePassword::indicator:indeterminate {
     border: none;
     image: url('%file:LogIn CheckBox Indeterminate Icon%');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:indeterminate:disabled {
+LogInDialog #LogInDialogSavePassword::indicator:indeterminate:disabled {
     border: none;
     image: url('%file:LogIn CheckBox Indeterminate Disabled Icon%');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:indeterminate:focus,
-QCheckBox#LogInDialogSavePassword::indicator:indeterminate:hover {
+LogInDialog #LogInDialogSavePassword::indicator:indeterminate:focus,
+LogInDialog #LogInDialogSavePassword::indicator:indeterminate:hover {
     border: none;
     image: url('%file:LogIn CheckBox Indeterminate Focus Icon%');
 }
 
-QCheckBox#LogInDialogSavePassword::indicator:indeterminate:pressed {
+LogInDialog #LogInDialogSavePassword::indicator:indeterminate:pressed {
     border: none;
     image: url('%file:LogIn CheckBox Indeterminate Pressed Icon%');
 }
@@ -2231,7 +2222,7 @@ QCheckBox#LogInDialogSavePassword::indicator:indeterminate:pressed {
 
 /* Line Edit */
 
-#OT_LineEdit {
+ot--LineEdit {
     border-radius: 0;
 }
 
@@ -2297,25 +2288,51 @@ ot--ComboButton[IsSelected="false"]:hover:pressed {
 
 /* Text Edit Search Popup */
 
-#OT_TextEditSearchPopup {
+ot--TextEditorSearchPopup {
     background-color: %color:Title Background%;
     padding: 4px;
     border: 1px solid %color:Border Color%;
 }
 
-#OT_PropertyInputColor_Button {
+/* ##################################################################################### */
+
+/* Property Input Color */
+
+ot--ColorPickButton #OT_PropertyInputColor_Button {
     background-color: %color:Widget Background%;
     color: %color:Widget Foreground%;
     border: 1px solid %color:Border Color%;
 }
 
-#OT_PropertyInputColor_Button:hover:!pressed {
+ot--ColorPickButton #OT_PropertyInputColor_Button:hover:!pressed {
     background-color: %color:Widget Background%;
     color: %color:Widget Foreground%;
     border: 1px solid %color:Border Hover Color%;
 }
 
-#OT_PropertyInputColor_Button:pressed {
+ot--ColorPickButton #OT_PropertyInputColor_Button:pressed {
+    background-color: %color:Widget Background%;
+    color: %color:Widget Foreground%;
+    border: 1px solid %color:Border Selection Color%;
+}
+
+/* ##################################################################################### */
+
+/* Property Input Painter2D */
+
+ot--Painter2DEditButton #OT_PropertyInputPainter2D_Button {
+    background-color: %color:Widget Background%;
+    color: %color:Widget Foreground%;
+    border: 1px solid %color:Border Color%;
+}
+
+ot--Painter2DEditButton #OT_PropertyInputPainter2D_Button:hover:!pressed {
+    background-color: %color:Widget Background%;
+    color: %color:Widget Foreground%;
+    border: 1px solid %color:Border Hover Color%;
+}
+
+ot--Painter2DEditButton #OT_PropertyInputPainter2D_Button:pressed {
     background-color: %color:Widget Background%;
     color: %color:Widget Foreground%;
     border: 1px solid %color:Border Selection Color%;
@@ -2425,7 +2442,7 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
     color: %color:Widget Foreground%;
 }
 
-#tabCloseButton {
+ads--CDockWidgetTab #tabCloseButton {
     background: %color:Widget Background%;
     color: %color:Widget Foreground%;
     border: 0px solid transparent;
@@ -2435,15 +2452,15 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
     image: url('%file:Window Close Icon%');
 }
 
-#tabCloseButton::hover::!pressed {
+ads--CDockWidgetTab #tabCloseButton::hover::!pressed {
     image: url('%file:Window Close Focus Icon%');
 }
 
-#tabCloseButton::pressed {
+ads--CDockWidgetTab #tabCloseButton::pressed {
     image: url('%file:Window Close Pressed Icon%');
 }
 
-#tabCloseButton::disabled {
+ads--CDockWidgetTab #tabCloseButton::disabled {
     image: url('%file:Window Close Disabled Icon%');
 }
 

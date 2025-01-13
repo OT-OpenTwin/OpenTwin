@@ -641,9 +641,6 @@
     <ClInclude Include="include\OTWidgets\PropertyInputBool.h">
       <Filter>include\Properties</Filter>
     </ClInclude>
-    <ClInclude Include="include\OTWidgets\PropertyInputColor.h">
-      <Filter>include\Properties</Filter>
-    </ClInclude>
     <ClInclude Include="include\OTWidgets\MessageDialog.h">
       <Filter>include\Dialogs</Filter>
     </ClInclude>
@@ -892,6 +889,9 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\CartesianPlotTextMarker.h">
       <Filter>include\Plot\Cartesian</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OTWidgets\PropertyInputColor.h">
+      <Filter>include\Properties</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

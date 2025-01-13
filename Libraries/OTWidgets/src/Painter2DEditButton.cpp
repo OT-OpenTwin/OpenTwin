@@ -19,13 +19,17 @@
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qlayout.h>
 
-ot::Painter2DEditButton::Painter2DEditButton(Painter2D* _painter) : m_painter(_painter) {
+ot::Painter2DEditButton::Painter2DEditButton(Painter2D* _painter, QWidget* _parent)
+	: QFrame(_parent), m_painter(_painter) 
+{
 	if (!m_painter) m_painter = new FillPainter2D;
 
 	this->ini();
 }
 
-ot::Painter2DEditButton::Painter2DEditButton(const Painter2D* _painter) : m_painter(nullptr) {
+ot::Painter2DEditButton::Painter2DEditButton(const Painter2D* _painter, QWidget* _parent) 
+	: QFrame(_parent), m_painter(nullptr) 
+{
 	if (_painter) m_painter = _painter->createCopy();
 	else m_painter = new FillPainter2D;
 
@@ -34,7 +38,6 @@ ot::Painter2DEditButton::Painter2DEditButton(const Painter2D* _painter) : m_pain
 
 ot::Painter2DEditButton::~Painter2DEditButton() {
 	delete m_painter;
-	delete m_rootWidget;
 }
 
 bool ot::Painter2DEditButton::eventFilter(QObject* _obj, QEvent* _event) {
@@ -79,10 +82,9 @@ void ot::Painter2DEditButton::slotClicked(void) {
 }
 
 void ot::Painter2DEditButton::ini(void) {
-	m_rootWidget = new QWidget;
-	m_rootWidget->setContentsMargins(QMargins(0, 0, 0, 0));
-	QHBoxLayout* rootLay = new QHBoxLayout(m_rootWidget);
+	QHBoxLayout* rootLay = new QHBoxLayout(this);
 	rootLay->setContentsMargins(QMargins(0, 0, 0, 0));
+	
 	m_btn = new PushButton;
 
 	m_preview = new Painter2DPreview(m_painter);
@@ -91,6 +93,7 @@ void ot::Painter2DEditButton::ini(void) {
 	m_preview->setMinimumWidth(24);
 	m_preview->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
 	m_preview->setMaintainAspectRatio(true);
+	
 	rootLay->addWidget(m_preview);
 	rootLay->addWidget(m_btn, 1);
 

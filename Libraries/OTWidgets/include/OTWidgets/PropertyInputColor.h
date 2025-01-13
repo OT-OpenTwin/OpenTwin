@@ -6,7 +6,11 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/Color.h"
 #include "OTWidgets/PropertyInput.h"
+
+// Qt header
+#include <QtGui/qcolor.h>
 
 namespace ot {
 

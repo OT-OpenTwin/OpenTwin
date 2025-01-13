@@ -18,7 +18,8 @@ static ot::PropertyInputFactoryRegistrar<ot::PropertyInputPainter2D> propertyInp
 ot::PropertyInputPainter2D::PropertyInputPainter2D()
 {
 	m_button = new Painter2DEditButton;
-	
+	m_button->getPushButton()->setObjectName("OT_PropertyInputPainter2D_Button");
+
 	this->connect(m_button, &Painter2DEditButton::painter2DChanged, this, qOverload<>(&PropertyInput::slotValueChanged));
 }
 
@@ -68,11 +69,11 @@ bool ot::PropertyInputPainter2D::setupFromConfiguration(const Property* _configu
 	m_button->blockSignals(true);
 
 	m_button->setPainter(actualProperty->getPainter());
-	m_button->getButton()->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
+	m_button->getPushButton()->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
-		m_button->getButton()->setText("...");
+		m_button->getPushButton()->setText("...");
 	}
-	m_button->getButton()->setEnabled(!(this->data().getPropertyFlags() & Property::IsReadOnly));
+	m_button->getPushButton()->setEnabled(!(this->data().getPropertyFlags() & Property::IsReadOnly));
 
 	m_button->blockSignals(false);
 
@@ -80,7 +81,7 @@ bool ot::PropertyInputPainter2D::setupFromConfiguration(const Property* _configu
 }
 
 void ot::PropertyInputPainter2D::focusPropertyInput(void) {
-	m_button->getButton()->setFocus();
+	m_button->getPushButton()->setFocus();
 }
 
 const ot::Painter2D* ot::PropertyInputPainter2D::getPainter(void) const {

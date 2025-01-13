@@ -10,7 +10,7 @@
 #include "OTWidgets/QWidgetInterface.h"
 
 // Qt header
-#include <QtCore/qobject.h>
+#include <QtWidgets/qframe.h>
 
 namespace ot{
 
@@ -18,24 +18,25 @@ namespace ot{
 	class PushButton;
 	class Painter2DPreview;
 
-	class OT_WIDGETS_API_EXPORT Painter2DEditButton : public QObject, public QWidgetInterface {
+	class OT_WIDGETS_API_EXPORT Painter2DEditButton : public QFrame, public QWidgetInterface {
 		Q_OBJECT
 		OT_DECL_NOCOPY(Painter2DEditButton)
 	public:
 		//! @brief Creates an instance.
 		//! Object takes ownership of the painter.
-		Painter2DEditButton(Painter2D* _painter = (Painter2D*)nullptr);
+		Painter2DEditButton(Painter2D* _painter = (Painter2D*)nullptr, QWidget* _parent = (QWidget*)nullptr);
+
 		//! @brief Creates an instance.
 		//! Objects creates a copy of the painter.
-		Painter2DEditButton(const Painter2D* _painter);
+		Painter2DEditButton(const Painter2D* _painter, QWidget* _parent = (QWidget*)nullptr);
 		virtual ~Painter2DEditButton();
 
 		virtual bool eventFilter(QObject* _obj, QEvent* _event) override;
 
-		virtual QWidget* getQWidget(void) override { return m_rootWidget; };
-		virtual const QWidget* getQWidget(void) const override { return m_rootWidget; };
+		virtual QWidget* getQWidget(void) override { return this; };
+		virtual const QWidget* getQWidget(void) const override { return this; };
 
-		PushButton* getButton(void) const { return m_btn; };
+		PushButton* getPushButton(void) const { return m_btn; };
 
 		void setPainter(Painter2D* _painter);
 		void setPainter(const Painter2D* _painter);
@@ -48,7 +49,6 @@ namespace ot{
 		void slotClicked(void);
 
 	private:
-		QWidget* m_rootWidget;
 		Painter2D* m_painter;
 		PushButton* m_btn;
 		QString m_btnTip;
