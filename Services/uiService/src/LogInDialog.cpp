@@ -903,6 +903,15 @@ LogInDialog::WorkerError LogInDialog::workerConnectToGSS(void) {
 	m_loginData.setDatabaseUrl(ot::json::getString(responseDoc, OT_ACTION_PARAM_SERVICE_DBURL));
 	m_loginData.setAuthorizationUrl(ot::json::getString(responseDoc, OT_ACTION_PARAM_SERVICE_AUTHURL));
 
+	if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLogFlags)) {
+		if (!responseDoc[OT_ACTION_PARAM_GlobalLogFlags].IsArray()) {
+			return WorkerError::InvalidGssResponseSyntax;
+		}
+
+		ot::ConstJsonArray flags = ot::json::getArray(responseDoc, OT_ACTION_PARAM_GlobalLogFlags);
+		ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(flags));
+	}
+
 	return WorkerError::NoError;
 }
 
