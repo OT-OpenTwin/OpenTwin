@@ -56,6 +56,7 @@ private:
 	QTableWidgetItem* m_typeItem;
 	QTableWidgetItem* m_nameItem;
 	QTableWidgetItem* m_ownerItem;
+	QTableWidgetItem* m_groupsItem;
 	QTableWidgetItem* m_lastAccessTimeItem;
 
 };

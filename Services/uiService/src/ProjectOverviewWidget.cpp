@@ -32,6 +32,7 @@ enum TableColumn {
 	ColumnType,
 	ColumnName,
 	ColumnOwner,
+	ColumnGroups,
 	ColumnLastAccess,
 	ColumnCount
 };
@@ -58,6 +59,23 @@ ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInf
 	m_ownerItem->setFlags(m_typeItem->flags());
 	m_ownerItem->setText(QString::fromStdString(_projectInfo.getUserName()));
 
+	m_groupsItem = new QTableWidgetItem;
+	m_groupsItem->setFlags(m_typeItem->flags());
+	if (!_projectInfo.getGroups().empty()) {
+		m_groupsItem->setIcon(ot::IconManager::getIcon("Default/Groups.png"));
+		QString tip;
+		if (_projectInfo.getGroups().size() == 1) {
+			tip = "Shared with group:";
+		}
+		else {
+			tip = "Shared with groups:";
+		}
+		for (const std::string& group : _projectInfo.getGroups()) {
+			tip.append("\n  - " + QString::fromStdString(group));
+		}
+		m_groupsItem->setToolTip(tip);
+	}
+
 	m_lastAccessTimeItem = new QTableWidgetItem;
 	m_lastAccessTimeItem->setFlags(m_typeItem->flags());
 	m_lastAccessTimeItem->setText(_projectInfo.getLastAccessTime().toString("yyyy.MM.dd hh:mm:ss"));
@@ -66,6 +84,7 @@ ProjectOverviewEntry::ProjectOverviewEntry(const ProjectInformation& _projectInf
 	_table->setItem(row, TableColumn::ColumnType, m_typeItem);
 	_table->setItem(row, TableColumn::ColumnName, m_nameItem);
 	_table->setItem(row, TableColumn::ColumnOwner, m_ownerItem);
+	_table->setItem(row, TableColumn::ColumnGroups, m_groupsItem);
 	_table->setItem(row, TableColumn::ColumnLastAccess, m_lastAccessTimeItem);
 
 	this->connect(m_checkBox, &ot::CheckBox::stateChanged, this, &ProjectOverviewEntry::slotCheckedChanged);
@@ -86,8 +105,11 @@ QString ProjectOverviewEntry::getProjectName(void) const {
 void ProjectOverviewEntry::slotCheckedChanged(void) {
 	bool isBlock = m_table->signalsBlocked();
 	m_table->blockSignals(true);
+	m_typeItem->setSelected(m_checkBox->isChecked());
 	m_nameItem->setSelected(m_checkBox->isChecked());
 	m_ownerItem->setSelected(m_checkBox->isChecked());
+	m_groupsItem->setSelected(m_checkBox->isChecked());
+	m_lastAccessTimeItem->setSelected(m_checkBox->isChecked());
 	m_table->blockSignals(isBlock);
 	Q_EMIT checkedChanged();
 }
@@ -138,7 +160,7 @@ ProjectOverviewWidget::ProjectOverviewWidget(tt::Page* _ttbPage)
 	m_filter->setPlaceholderText("Find...");
 	m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_table->horizontalHeader()->setSectionResizeMode(TableColumn::ColumnName, QHeaderView::Stretch);
-	m_table->setHorizontalHeaderLabels({ "", "", "Name", "Owner", "Last Modified" });
+	m_table->setHorizontalHeaderLabels({ "", "", "Name", "Owner", "", "Last Modified" });
 	m_table->verticalHeader()->setHidden(true);
 
 	glWidget->setMaximumSize(1, 1);
@@ -219,7 +241,7 @@ void ProjectOverviewWidget::slotUpdateItemSelection(void) {
 
 		ProjectOverviewEntry* entry = this->findEntry(m_table->item(r, TableColumn::ColumnName)->text());
 		if (entry) {
-			entry->setIsChecked(m_table->item(r, TableColumn::ColumnName)->isSelected() || m_table->item(r, TableColumn::ColumnOwner)->isSelected());
+			entry->setIsChecked(m_table->item(r, TableColumn::ColumnType)->isSelected() || m_table->item(r, TableColumn::ColumnName)->isSelected() || m_table->item(r, TableColumn::ColumnOwner)->isSelected() || m_table->item(r, TableColumn::ColumnGroups)->isSelected() || m_table->item(r, TableColumn::ColumnLastAccess)->isSelected());
 		}
 		else {
 			OT_LOG_E("Entry not found for project \"" + m_table->item(r, TableColumn::ColumnName)->text().toStdString() + "\"");
@@ -367,10 +389,12 @@ void ProjectOverviewWidget::slotExportProject(void) {
 
 void ProjectOverviewWidget::slotAccessProject(void) {
 	Q_EMIT projectAccessRequest();
+	this->refreshProjectList();
 }
 
 void ProjectOverviewWidget::slotOwnerProject(void) {
 	Q_EMIT projectOwnerRequest();
+	this->refreshProjectList();
 }
 
 void ProjectOverviewWidget::slotFilterChanged(void) {

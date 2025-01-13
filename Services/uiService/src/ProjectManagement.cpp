@@ -335,12 +335,7 @@ bool ProjectManagement::findProjectNames(const std::string& _projectNameFilter, 
 		ot::JsonDocument projectDoc;
 		projectDoc.fromJson(projectData);
 
-		ProjectInformation newInfo;
-		newInfo.setProjectName(projectDoc[OT_PARAM_AUTH_NAME].GetString());
-		newInfo.setProjectType(projectDoc[OT_PARAM_AUTH_PROJECT_TYPE].GetString());
-		newInfo.setUserName(projectDoc[OT_PARAM_AUTH_OWNER].GetString());
-		newInfo.setLastAccessTime(QDateTime::fromMSecsSinceEpoch(ot::json::getInt64(projectDoc, OT_PARAM_AUTH_PROJECT_LASTACCESS)));
-
+		ProjectInformation newInfo(projectDoc.GetConstObject());
 		_projectsFound.push_back(newInfo);
 		m_projectInfoMap[newInfo.getProjectName()] = newInfo;
 	}
@@ -446,14 +441,8 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
 		ot::JsonDocument projectDoc;
 		projectDoc.fromJson(projectData);
 
-		ProjectInformation newInfo;
-		newInfo.setProjectName(projectDoc[OT_PARAM_AUTH_NAME].GetString());
-		newInfo.setProjectType(projectDoc[OT_PARAM_AUTH_PROJECT_TYPE].GetString());
-		newInfo.setUserName(projectDoc[OT_PARAM_AUTH_OWNER].GetString());
-		newInfo.setLastAccessTime(QDateTime::fromMSecsSinceEpoch(ot::json::getInt64(projectDoc, OT_PARAM_AUTH_PROJECT_LASTACCESS)));
-
+		ProjectInformation newInfo(projectDoc.GetConstObject());
 		validProjects.push_back(newInfo.getProjectName());
-
 		m_projectInfoMap[newInfo.getProjectName()] = newInfo;
 	}
 
