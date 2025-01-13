@@ -344,10 +344,20 @@ void Application::runSolver(void)
 }
 
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase *> solverMap) {
+	ot::LockTypeFlags lock;
+	lock.setFlag(ot::LockModelWrite);
+	lock.setFlag(ot::LockNavigationWrite);
+	lock.setFlag(ot::LockViewWrite);
+	lock.setFlag(ot::LockProperties);
+
+	m_uiComponent->lockUI(lock);
+
 	for (auto solver : solverInfo)
 	{
 		runSingleSolver(solver, meshInfo, solverMap[solver.getEntityName()]);
 	}
+
+	m_uiComponent->unlockUI(lock);
 }
 
 void Application::runSingleSolver(ot::EntityInformation &solver, std::list<ot::EntityInformation> &meshInfo, EntityBase *solverEntity) 
