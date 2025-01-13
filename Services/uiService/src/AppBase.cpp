@@ -88,6 +88,7 @@
 // Qt header
 #include <QtCore/qfile.h>
 #include <QtGui/qscreen.h>
+#include <QtWidgets/qmenu.h>
 #include <QtWidgets/qstatusbar.h>
 #include <QtWidgets/qfiledialog.h>
 #include <QtWidgets/qmessagebox.h>
@@ -836,8 +837,10 @@ void AppBase::createUi(void) {
 			m_output = new ot::PlainTextEditView;
 			m_output->setViewData(ot::WidgetViewBase(TITLE_DOCK_OUTPUT, TITLE_DOCK_OUTPUT, ot::WidgetViewBase::Bottom, ot::WidgetViewBase::ViewText, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_output->setViewIsPermanent(true);
+			m_output->setContextMenuPolicy(Qt::CustomContextMenu);
 			//m_output->getViewDockWidget()->setFeature(ads::CDockWidget::DockWidgetClosable, true);
-			
+			this->connect(m_output, &ot::PlainTextEditView::customContextMenuRequested, this, &AppBase::slotShowOutputContextMenu);
+
 			m_propertyGrid = new ot::PropertyGridView;
 			m_propertyGrid->setViewData(ot::WidgetViewBase(TITLE_DOCK_PROPERTIES, TITLE_DOCK_PROPERTIES, ot::WidgetViewBase::Right, ot::WidgetViewBase::ViewProperties, ot::WidgetViewBase::ViewIsSide | ot::WidgetViewBase::ViewDefaultCloseHandling | ot::WidgetViewBase::ViewIsCloseable));
 			m_propertyGrid->setViewIsPermanent(true);
@@ -2366,6 +2369,38 @@ void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
 	UserManagement uM(m_loginData);
 
 	uM.storeSetting(STATE_NAME_COLORSTYLE, _style.colorStyleName());
+}
+
+void AppBase::slotShowOutputContextMenu(QPoint _pos) {
+	OTAssertNullptr(m_output);
+	QMenu menu(m_output);
+	menu.move(m_output->mapToGlobal(_pos));
+	
+	QAction* copyAction = new QAction("Copy");
+	copyAction->setShortcut(QKeySequence("Ctrl+C"));
+	copyAction->setShortcutVisibleInContextMenu(true);
+	menu.addAction(copyAction);
+
+	QAction* pasteAction = new QAction("Paste");
+	pasteAction->setShortcut(QKeySequence("Ctrl+V"));
+	pasteAction->setShortcutVisibleInContextMenu(true);
+	menu.addAction(pasteAction);
+
+	QAction* clearAction = new QAction("Clear");
+	menu.addAction(clearAction);
+
+	QAction* action = menu.exec();
+	if (action) {
+		if (action->text() == "Copy") {
+			m_output->copy();
+		}
+		else if (action->text() == "Paste") {
+			m_output->paste();
+		}
+		else if (action->text() == "Clear") {
+			m_output->clear();
+		}
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -470,6 +470,8 @@ private Q_SLOTS:
 	void slotViewCloseRequested(ot::WidgetView* _view);
 	void slotColorStyleChanged(const ot::ColorStyle& _style);
 
+	void slotShowOutputContextMenu(QPoint _pos);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Welcome Screen Slots
