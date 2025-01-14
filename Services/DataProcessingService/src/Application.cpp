@@ -17,6 +17,7 @@
 #include "OTCore/OwnerServiceGlobal.h"
 #include "OTGui/GraphicsItemCfg.h"
 #include "OTGui/GraphicsItemCfgFactory.h"
+#include "OTGui/GraphicsCopyInformation.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTCommunication/ActionTypes.h"
@@ -161,6 +162,16 @@ std::string Application::processAction(const std::string& _action, ot::JsonDocum
 			const ot::UID blockID = itemConfig->getUid();
 			_blockEntityHandler.UpdateBlockPosition(blockID, itemConfig->getPosition(), &getClassFactory());
 
+		}
+		else if (_action == OT_ACTION_CMD_UI_GRAPHICSEDITOR_CopyItems) {
+			ot::GraphicsCopyInformation info;
+			info.setFromJsonObject(ot::json::getObject(_doc, OT_ACTION_PARAM_Package));
+
+			/*std::string dbg("Copy requested. Target view: \"" + info.getViewName() + "\".");
+			for (const ot::GraphicsCopyInformation::ItemInformation& item : info.getItemInformation()) {
+				dbg.append("\n - Item { \"UID\": " + std::to_string(item.uid) + ", \"NewPos.X\": " + std::to_string(item.pos.x()) + ", \"NewPos.Y\": " + std::to_string(item.pos.y()) + " }");
+			}
+			OT_LOG_W(dbg);*/
 		}
 	}
 	catch (const std::exception& e)

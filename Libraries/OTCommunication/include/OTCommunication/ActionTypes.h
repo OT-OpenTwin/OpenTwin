@@ -274,6 +274,7 @@
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnectionToConnection "UI.GraphicsEditor.Connection.AddToConnection"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection "UI.GraphicsEditor.Connection.Remove"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemChanged "UI.GraphicsEditor.ItemChanged"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_CopyItems "UI.GraphicsEditor.CopyItems"
 
 #define OT_ACTION_CMD_UI_TEXTEDITOR_Setup "UI.TextEditor.Setup"
 #define OT_ACTION_CMD_UI_TEXTEDITOR_SaveRequest "UI.TextEditor.SaveRequest"

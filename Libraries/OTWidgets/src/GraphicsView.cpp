@@ -12,12 +12,16 @@
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsItemPreviewDrag.h"
+#include "OTWidgets/GraphicsViewClipboardData.h"
 
 // Qt header
 #include <QtGui/qevent.h>
 #include <QtGui/qmatrix4x4.h>
+#include <QtGui/qclipboard.h>
 #include <QtCore/qmimedata.h>
+#include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qscrollbar.h>
+#include <QtWidgets/qapplication.h>
 #include <QtWidgets/qgraphicsproxywidget.h>
 
 ot::GraphicsView::GraphicsView(GraphicsScene* _scene) 
@@ -31,10 +35,20 @@ ot::GraphicsView::GraphicsView(GraphicsScene* _scene)
 	this->setAlignment(Qt::AlignAbsolute);
 
 	this->setUpdatesEnabled(true);
+
+	QShortcut* copyShortcut = new QShortcut(this);
+	copyShortcut->setKey(QKeySequence("Ctrl+C"));
+	copyShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+	this->connect(copyShortcut, &QShortcut::activated, this, &GraphicsView::slotCopy);
+
+	QShortcut* pasteShortcut = new QShortcut(this);
+	pasteShortcut->setKey(QKeySequence("Ctrl+V"));
+	pasteShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+	this->connect(pasteShortcut, &QShortcut::activated, this, &GraphicsView::slotPaste);
 }
 
 ot::GraphicsView::~GraphicsView() {
-
+	
 }
 
 // ########################################################################################################
@@ -640,6 +654,80 @@ void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 	}
 
 	_event->acceptProposedAction();
+}
+
+void ot::GraphicsView::slotCopy(void) {
+	QClipboard* clip = QApplication::clipboard();
+	if (!clip) {
+		OT_LOG_E("No clipboard found");
+		return;
+	}
+
+	std::list<GraphicsItem*> selection = this->getSelectedGraphicsItems();
+	if (selection.empty()) {
+		return;
+	}
+
+	GraphicsViewClipboardData* newData = new GraphicsViewClipboardData;
+	newData->setViewOwner(m_owner);
+
+	GraphicsCopyInformation copyInfo;
+	for (GraphicsItem* itm : selection) {
+		// Copy top level items only
+		if (!itm->getParentGraphicsItem()) {
+			copyInfo.addItemInformation(itm->getGraphicsItemUid(), itm->getGraphicsItemPos());
+		}
+	}
+
+	newData->setCopyInfo(copyInfo);
+	clip->setMimeData(newData);
+}
+
+void ot::GraphicsView::slotPaste(void) {
+	QClipboard* clip = QApplication::clipboard();
+	if (!clip) {
+		OT_LOG_E("No clipboard found");
+		return;
+	}
+
+	// Get data
+	const GraphicsViewClipboardData* data = dynamic_cast<const GraphicsViewClipboardData*>(clip->mimeData());
+	if (!data) {
+		return;
+	}
+
+	// Ensure same view owner
+	if (data->getViewOwner() != m_owner) {
+		return;
+	}
+
+	// Create paste info
+	GraphicsCopyInformation info = data->getCopyInfo();
+	info.setViewName(m_viewName);
+
+	
+	QPoint mousePos = this->mapFromGlobal(QCursor::pos());
+	if (this->rect().contains(mousePos)) {
+		// If mouse is over the view paste at cursor
+		QPointF mouseScenePos = m_scene->snapToGrid(this->mapToScene(mousePos));
+		info.moveItemsToPoint(QtFactory::toPoint2D(mouseScenePos));
+	}
+	else {
+		// If mouse is outside the view move by 2*grid size or 20 in X and Y directions.
+		Point2DD moveDistance(20., 20.);
+
+		const Grid& grid = m_scene->getGrid();
+		if (grid.getGridStep().x() > 0) {
+			moveDistance.setX(grid.getGridStep().x() * 2.);
+		}
+		if (grid.getGridStep().y() > 0) {
+			moveDistance.setY(grid.getGridStep().y() * 2.);
+		}
+
+		info.moveItemsBy(moveDistance);
+	}
+	
+	Q_EMIT itemCopyRequested(info);
 }
 
 void ot::GraphicsView::beginItemMove(void) {

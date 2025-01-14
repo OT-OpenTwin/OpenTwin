@@ -390,6 +390,9 @@
     <ClInclude Include="include\OTGui\WidgetBaseCfgFactory.h">
       <Filter>Header Files\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="include\OTGui\GraphicsCopyInformation.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -694,6 +697,9 @@
     </ClCompile>
     <ClCompile Include="src\WidgetBaseCfgFactory.cpp">
       <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsCopyInformation.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

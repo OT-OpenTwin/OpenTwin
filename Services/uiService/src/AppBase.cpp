@@ -1649,6 +1649,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
 	connect(newEditor, &ot::GraphicsView::connectionToConnectionRequested, this, &AppBase::slotGraphicsConnectionToConnectionRequested);
+	connect(newEditor, &ot::GraphicsView::itemCopyRequested, this, &AppBase::slotGraphicsCopyRequested);
 	connect(newEditor, &ot::GraphicsView::itemConfigurationChanged, this, &AppBase::slotGraphicsItemChanged);
 	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChangeFinished, this, &AppBase::slotGraphicsSelectionChanged);
 
@@ -2116,6 +2117,34 @@ void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const 
 	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds, ot::JsonArray(_items, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionIds, ot::JsonArray(_connections, doc.GetAllocator()), doc.GetAllocator());
 	ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+
+	std::string response;
+	if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
+		OT_LOG_EA("Failed to send http request");
+		return;
+	}
+
+	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
+	if (rMsg != ot::ReturnMessage::Ok) {
+		OT_LOG_E("Request failed: " + rMsg.getWhat());
+		return;
+	}
+}
+
+void AppBase::slotGraphicsCopyRequested(const ot::GraphicsCopyInformation& _info) {
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
+	if (view == nullptr) {
+		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CopyItems, doc.GetAllocator()), doc.GetAllocator());
+	ot::JsonObject pckg;
+	_info.addToJsonObject(pckg, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Package, pckg, doc.GetAllocator());
 
 	std::string response;
 	if (!m_ExternalServicesComponent->sendHttpRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {

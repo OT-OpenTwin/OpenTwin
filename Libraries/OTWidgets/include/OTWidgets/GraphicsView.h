@@ -10,6 +10,7 @@
 #include "OTCore/Point2D.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/BasicServiceInformation.h"
+#include "OTGui/GraphicsCopyInformation.h"
 #include "OTWidgets/QWidgetInterface.h"
 #include "OTWidgets/OTWidgetsAPIExport.h"
 
@@ -132,6 +133,8 @@ namespace ot {
 
 		void removeItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 
+		void itemCopyRequested(const GraphicsCopyInformation& _info);
+
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;
 		virtual void mousePressEvent(QMouseEvent* _event) override;
@@ -144,6 +147,10 @@ namespace ot {
 		virtual void dragEnterEvent(QDragEnterEvent* _event) override;
 		virtual void dropEvent(QDropEvent* _event) override;
 		virtual void dragMoveEvent(QDragMoveEvent* _event) override;
+
+	private Q_SLOTS:
+		void slotCopy(void);
+		void slotPaste(void);
 
 	private:
 		//! \brief Begins the item move handling if needed.

@@ -87,6 +87,7 @@
     <ClCompile Include="src\GraphicsTriangleItem.cpp" />
     <ClCompile Include="src\GraphicsVBoxLayoutItem.cpp" />
     <ClCompile Include="src\GraphicsView.cpp" />
+    <ClCompile Include="src\GraphicsViewClipboardData.cpp" />
     <ClCompile Include="src\GraphicsViewView.cpp" />
     <ClCompile Include="src\PropertyGridTree.cpp" />
     <ClCompile Include="src\WidgetManager.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="include\OTWidgets\CentralWidgetManager.h" />
     <QtMoc Include="include\OTWidgets\DelayedCallHandler.h" />
     <QtMoc Include="include\OTWidgets\DelayedShowHideHandler.h" />
+    <ClInclude Include="include\OTWidgets\GraphicsViewClipboardData.h" />
     <ClInclude Include="include\OTWidgets\IconManager.hpp" />
     <ClInclude Include="include\OTWidgets\MainWindow.h" />
     <QtMoc Include="include\OTWidgets\PropertyGridTree.h" />
