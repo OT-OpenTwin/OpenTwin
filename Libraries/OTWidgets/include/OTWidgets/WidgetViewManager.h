@@ -193,11 +193,13 @@ namespace ot {
 	Q_SIGNALS:
 		void viewFocusChanged(WidgetView* _focusedView, WidgetView* _previousView);
 		void viewCloseRequested(WidgetView* _view);
+		void viewTabClicked(WidgetView* _view);
 
 	private Q_SLOTS:
 		void slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus);
 		void slotViewCloseRequested(void);
 		void slotUpdateViewVisibility(void);
+		void slotViewTabClicked(void);
 
 	private:
 		enum ManagerState {

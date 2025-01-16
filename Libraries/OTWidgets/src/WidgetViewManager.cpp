@@ -13,6 +13,7 @@
 // ADS header
 #include <ads/DockManager.h>
 #include <ads/IconProvider.h>
+#include <ads/DockWidgetTab.h>
 #include <ads/DockAreaWidget.h>
 
 // Qt header
@@ -399,6 +400,20 @@ void ot::WidgetViewManager::slotUpdateViewVisibility(void) {
 	}
 }
 
+void ot::WidgetViewManager::slotViewTabClicked(void) {
+	ads::CDockWidgetTab* tab = dynamic_cast<ads::CDockWidgetTab*>(sender());
+	if (!tab) {
+		return;
+	}
+
+	WidgetView* view = this->getViewFromDockWidget(tab->dockWidget());
+	if (!view) {
+		return;
+	}
+
+	Q_EMIT viewTabClicked(view);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private
@@ -517,7 +532,10 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 
 	// Connect signals
 	this->connect(_view->getViewDockWidget(), &ads::CDockWidget::closeRequested, this, &WidgetViewManager::slotViewCloseRequested);
-
+	if (_view->getViewDockWidget()->tabWidget()) {
+		this->connect(_view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
+	}
+	
 	return true;
 }
 

@@ -949,6 +949,7 @@ void AppBase::createUi(void) {
 
 			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewFocusChanged, this, &AppBase::slotViewFocusChanged);
 			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &AppBase::slotViewCloseRequested);
+			this->connect(&ot::WidgetViewManager::instance(), &ot::WidgetViewManager::viewTabClicked, this, &AppBase::slotViewTabClicked);
 
 			uiAPI::registerUidNotifier(m_mainWindow, this);
 			
@@ -2389,6 +2390,46 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view) {
 
 	// Now close the view
 	ot::WidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
+}
+
+void AppBase::slotViewTabClicked(ot::WidgetView* _view) {
+	if (!_view) {
+		return;
+	}
+
+	// Update graphics picker content
+
+	// Forward focus events of central views to the viewer component
+	if (_view->getViewData().getViewFlags() & ot::WidgetViewBase::ViewIsCentral) {
+		if (m_viewHandling & ViewHandlingConfig::SkipEntitySelection) {
+			return;
+		}
+
+		ak::aTreeWidgetItem* itemToSelect = m_projectNavigation->itemFromPath(QString::fromStdString(_view->getViewData().getEntityName()), '/');
+
+		// Change item selection according to focused view
+		if (itemToSelect) {
+			bool changed = false;
+			bool blocked = m_projectNavigation->signalsBlocked();
+			m_projectNavigation->blockSignals(true);
+
+			// Select
+			if (itemToSelect) {
+				if (!itemToSelect->isSelected()) {
+					itemToSelect->setSelected(true);
+					changed = true;
+				}
+			}
+
+			m_projectNavigation->blockSignals(blocked);
+
+			// Notify if needed
+			if (changed) {
+				m_projectNavigation->selectionChangedEvent(false);
+				m_viewerComponent->handleSelectionChanged(false);
+			}
+		}
+	}
 }
 
 void AppBase::slotColorStyleChanged(const ot::ColorStyle& _style) {
