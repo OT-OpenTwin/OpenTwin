@@ -13,12 +13,12 @@
 
 // Open twin header
 #include "OTCore/Logger.h"
+#include "OTCore/String.h"
 #include "OTCommunication/Msg.h"
 #include "OTSystem/PortManager.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "OTServiceFoundation/TypeConverter.h"
 
 #include <thread>
 #include <iostream>
@@ -70,7 +70,7 @@ int Application::initialize(const char * _ownURL, const char * _globalDirectoryS
 	std::string port = m_serviceURL.substr(ix + 1);
 	if (port.find(':') != std::string::npos) return LDS_EXIT_InvalidURLSyntax;
 	bool convertFailed = false;
-	ot::port_t portNr = ot::convert::toNumber<ot::port_t>(port, convertFailed);
+	ot::port_t portNr = ot::String::toNumber<ot::port_t>(port, convertFailed);
 	if (convertFailed) return LDS_EXIT_InvalidURLSyntax;
 	
 	m_serviceManager.setServiceIP(ip);

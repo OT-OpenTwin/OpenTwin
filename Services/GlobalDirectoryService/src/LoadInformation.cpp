@@ -3,8 +3,8 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/String.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTServiceFoundation/TypeConverter.h"
 
 LoadInformation::LoadInformation() 
 	: m_currentPhysicalMemoryLoad(100.), m_currentVirtualMemoryLoad(100.),
@@ -60,16 +60,16 @@ bool LoadInformation::updateSystemUsageValues(ot::JsonDocument& _jsonDocument) {
 	if (!_jsonDocument[OT_ACTION_PARAM_SYSTEM_TotalVirtualMemory].IsString()) { OT_LOG_W("JSON member is not a string: " OT_ACTION_PARAM_SYSTEM_TotalVirtualMemory); return false; }
 
 	bool convertFailed = false;
-	memory_t availablePhysicalMemory = ot::convert::toNumber<memory_t>(_jsonDocument[OT_ACTION_PARAM_SYSTEM_AvailablePhysicalMemory].GetString(), convertFailed);
+	memory_t availablePhysicalMemory = ot::String::toNumber<memory_t>(_jsonDocument[OT_ACTION_PARAM_SYSTEM_AvailablePhysicalMemory].GetString(), convertFailed);
 	if (convertFailed) { OT_LOG_W("Convert failed for: " OT_ACTION_PARAM_SYSTEM_AvailablePhysicalMemory); return false; }
 
-	memory_t availableVirtualMemory = ot::convert::toNumber<memory_t>(_jsonDocument[OT_ACTION_PARAM_SYSTEM_AvailableVirtualMemory].GetString(), convertFailed);
+	memory_t availableVirtualMemory = ot::String::toNumber<memory_t>(_jsonDocument[OT_ACTION_PARAM_SYSTEM_AvailableVirtualMemory].GetString(), convertFailed);
 	if (convertFailed) { OT_LOG_W("Convert failed for: " OT_ACTION_PARAM_SYSTEM_AvailableVirtualMemory); return false; }
 
-	memory_t totalPhysicalMemory = ot::convert::toNumber<memory_t>(_jsonDocument[OT_ACTION_PARAM_SYSTEM_TotalPhysicalMemory].GetString(), convertFailed);
+	memory_t totalPhysicalMemory = ot::String::toNumber<memory_t>(_jsonDocument[OT_ACTION_PARAM_SYSTEM_TotalPhysicalMemory].GetString(), convertFailed);
 	if (convertFailed) { OT_LOG_W("Convert failed for: " OT_ACTION_PARAM_SYSTEM_TotalPhysicalMemory); return false; }
 
-	memory_t totalVirtualMemory = ot::convert::toNumber<memory_t>(_jsonDocument[OT_ACTION_PARAM_SYSTEM_TotalVirtualMemory].GetString(), convertFailed);
+	memory_t totalVirtualMemory = ot::String::toNumber<memory_t>(_jsonDocument[OT_ACTION_PARAM_SYSTEM_TotalVirtualMemory].GetString(), convertFailed);
 	if (convertFailed) { OT_LOG_W("Convert failed for: " OT_ACTION_PARAM_SYSTEM_TotalVirtualMemory); return false; }
 
 	m_totalPhysicalMemory = totalPhysicalMemory;
