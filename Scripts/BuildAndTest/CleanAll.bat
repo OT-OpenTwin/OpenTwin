@@ -87,6 +87,11 @@ ECHO ===============================================================
 CALL "%OT_BLOCKENTITIES_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
+ECHO Clean Library: ModelAPI
+ECHO ===============================================================
+CALL "%OT_MODELAPI_ROOT%\Clean.bat" 
+
+ECHO ===============================================================
 ECHO Clean Library: ServiceFoundation
 ECHO ===============================================================
 CALL "%OT_FOUNDATION_ROOT%\Clean.bat" 

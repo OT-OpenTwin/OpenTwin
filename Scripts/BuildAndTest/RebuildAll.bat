@@ -169,6 +169,11 @@ ECHO ===============================================================
 CALL "%OT_BLOCKENTITIES_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
+ECHO Build Library: OTModelAPI
+ECHO ===============================================================
+CALL "%OT_MODELAPI_ROOT%\build.bat" %1 %2
+
+ECHO ===============================================================
 ECHO Build Library: ServiceFoundation
 ECHO ===============================================================
 CALL "%OT_FOUNDATION_ROOT%\build.bat" %1 %2
