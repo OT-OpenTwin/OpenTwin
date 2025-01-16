@@ -701,19 +701,19 @@ void LogInDialog::initializeGssData(std::shared_ptr<QSettings> _settings) {
 
 				counter++;
 			}
-
-			this->updateGssOptions();
-
-			if (newCurrentIndex >= 0) {
-				m_gss->setCurrentIndex(newCurrentIndex);
-			}
-			else if (counter >= 0) {
-				m_gss->setCurrentIndex(0);
-			}
 		}
 		else {
 			OT_LOG_EA("SessionService list is not a JSON array");
 		}
+	}
+
+	this->updateGssOptions();
+
+	if (newCurrentIndex >= 0) {
+		m_gss->setCurrentIndex(newCurrentIndex);
+	}
+	else if (counter >= 0) {
+		m_gss->setCurrentIndex(0);
 	}
 }
 
