@@ -17,7 +17,7 @@ NGSpice::NGSpice() {
 //Callback Functions for NGSpice
 int NGSpice::MySendCharFunction(char* output, int ident, void* userData) {
 
-	SimulationResults::getInstance()->triggerCallback("Message", std::string(output));
+	//SimulationResults::getInstance()->triggerCallback("Message", std::string(output));
 	
 	OT_LOG_D(std::string(output));
 	
@@ -26,7 +26,7 @@ int NGSpice::MySendCharFunction(char* output, int ident, void* userData) {
 
 int NGSpice::MySendStat(char* outputReturn, int ident, void* userData) {
 	
-	SimulationResults::getInstance()->triggerCallback("Message", std::string(outputReturn));
+	//SimulationResults::getInstance()->triggerCallback("Message", std::string(outputReturn));
 	OT_LOG_D(std::string(outputReturn));
 
 	return 0;
