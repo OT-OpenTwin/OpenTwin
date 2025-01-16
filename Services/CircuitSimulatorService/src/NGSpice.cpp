@@ -744,6 +744,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, std::shared_ptr<EntityBlockC
 std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
 	
+	
 	//Here i first create the Title of the Netlist and send it to NGSpice
 	std::list<std::string> _netlist;
 	std::string TitleLine = "circbyline *Test";

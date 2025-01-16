@@ -5,14 +5,15 @@
  *	Author: Sebastian Urmann
  *  Copyright (c)
  */
-
+#pragma once
 //std Header
 #include <string>
 
 
-#pragma once
+//Service Header
+#include "ConnectionManager.h"
 
-class ConnectionManager;
+
 
 
 class Application
@@ -28,6 +29,9 @@ public:
 
 	void start(const std::string& _serverName);
 
+
+signals:
+	void callback(std::string messageType, std::string message);
 
 private:
 	Application();

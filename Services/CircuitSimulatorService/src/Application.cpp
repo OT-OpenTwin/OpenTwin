@@ -562,7 +562,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 	m_blockEntityHandler.setUIComponent(_ui);
 	/*m_blockEntityHandler.setPackageName("Circuit"); */
 	m_blockEntityHandler.OrderUIToCreateBlockPicker();
-
+	SimulationResults::getInstance()->setUIComponent(_ui);
 	//if (m_subprocessHandler == nullptr)
 	//{
 	//	const int sessionCount = Application::instance()->getSessionCount();

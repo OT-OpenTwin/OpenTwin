@@ -12,16 +12,20 @@ class ConnectionManager : public QObject {
 public:
 
 	enum RequestType {
-		ExecuteNetlist,
-		Message
+		SendResults,
+		Message,
+		Error
 	};
-
+	static QString toString(RequestType _type);
 	
 
 	ConnectionManager(QObject* parent = (QObject*)nullptr);
 	~ConnectionManager() = default;
 
 	void connectToCircuitSimulatorService(const QString& serverName);
+
+public slots:
+	void send(std::string messageType,std::string message);
 private slots:
 	void receiveResponse();
 	void sendHello();

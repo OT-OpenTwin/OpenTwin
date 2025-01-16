@@ -1,7 +1,7 @@
 //Service Header
 #include "NGSpice.h"
 #include "SimulationResults.h"
-
+#include "ConnectionManager.h"
 
 NGSpice::NGSpice() {
 	//Initialize Callbacks of NGSpice
@@ -17,21 +17,26 @@ NGSpice::NGSpice() {
 //Callback Functions for NGSpice
 int NGSpice::MySendCharFunction(char* output, int ident, void* userData) {
 
+	
 	OT_LOG_D(std::string(output));
-
+	
 	return 0;
 }
 
 int NGSpice::MySendStat(char* outputReturn, int ident, void* userData) {
 	
+	/*ConnectionManager m_connectionManager;
+	m_connectionManager.send("Message", std::string(outputReturn));*/
 	OT_LOG_D(std::string(outputReturn));
 
 	return 0;
 }
 
 int NGSpice::MyControlledExit(int exitstatus, bool immediate, bool quitexit, int ident, void* userdata) {
+	
 
 	OT_LOG_E(std::to_string(exitstatus));
+
 	SimulationResults::getInstance()->getResultMap().clear();
 	return 0;
 }
@@ -78,6 +83,8 @@ int NGSpice::MySendInitDataFunction(pvecinfoall vectorInfoAll, int idNumNGSpiceS
 	return 0;
 	
 }
+
+
 
 void NGSpice::runSimulation(std::list<std::string>& _netlist) {
 	for (const std::string& command : _netlist) {

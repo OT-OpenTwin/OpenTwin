@@ -13,12 +13,15 @@
 #include "OTCore/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/OperatingSystem.h"
+#include "OTGui/StyledTextBuilder.h"
 
 QString ConnectionManager::toString(RequestType _type) {
     
     switch (_type) {
     case ConnectionManager::ExecuteNetlist: return "ExecuteNetlist";
-        
+    case ConnectionManager::Message: return "Message";
+    case ConnectionManager::Error: return "Error";
+
     default:
         OT_LOG_EAS("Unknown request type (" + std::to_string((int)_type) + ")");
         return "";
@@ -54,11 +57,44 @@ void ConnectionManager::queueRequest(RequestType _type, const std::list<std::str
 }
 
 void ConnectionManager::handleReadyRead() {
-    QByteArray data = m_socket->readAll();
-    QString result = QString::fromUtf8(data);
+    QByteArray jsonData = m_socket->readAll();
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
 
-    OT_LOG_D("Got the Results: " + result.toStdString());
-    SimulationResults::getInstance()->addResults(result);   
+    if (!jsonDoc.isObject()) {
+        OT_LOG_E("Incorrect json format");
+        return;
+    }
+    QJsonObject jsonObject = jsonDoc.object();
+
+    
+    // Getting message Type
+    if (!jsonObject.contains("type")) {
+        OT_LOG_E("Missing json object member \"type\"");
+        return;
+    }
+    if (!jsonObject["type"].isString()) {
+        OT_LOG_E("JSON object member \"type\" is not a string");
+        return;
+    }
+
+    QString typeString = jsonObject["type"].toString();
+
+    // Getting message data
+    if (!jsonObject.contains("results")) {
+        OT_LOG_E("Missing json object member \"results\"");
+        return;
+    }
+    if (!jsonObject["results"].isString() && !jsonObject["results"].isArray()) {
+        OT_LOG_E("JSON object member \"results\" is not a string and not an array");
+        return;
+    }
+
+    std::list<std::string> data;
+    const QJsonValue resultsValue = jsonObject["results"];
+
+    
+    handleMessageType(typeString, resultsValue);
+ 
 }
 
 void ConnectionManager::handleDisconnected() {
@@ -89,6 +125,51 @@ void ConnectionManager::handleQueueRequest(RequestType _type, std::list<std::str
     
 }
 
+void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue& data) {
+
+    
+            
+        if (_actionType.toStdString() == "Error") {
+            // ot::StyledTextBuilder textBuilder;
+
+            if (data.isString()){
+                SimulationResults::getInstance()->displayError(data.toString().toStdString());
+            }
+            else {
+                OT_LOG_E("JSON array entry is not a string");
+                return;
+            }  
+        }
+        else if (_actionType.toStdString() == "Message") {
+            if (data.isString()) {
+                SimulationResults::getInstance()->displayMessage(data.toString().toStdString());
+
+            }
+            else {
+                OT_LOG_E("JSON array entry is not a string");
+                return;
+            }
+        }
+        else if (_actionType.toStdString() == "SendResults") {
+
+            SimulationResults::getInstance()->handleResults(data);
+        }
+        else {
+            if (data.isString()) {
+                SimulationResults::getInstance()->handleUnknownMessageType(data.toString().toStdString());
+
+            }
+            else {
+                OT_LOG_E("JSON array entry is not a string");
+                return;
+            }
+            
+            
+        }
+    
+}
+       
+
 
 
 void ConnectionManager::handleConnection() {
@@ -110,10 +191,7 @@ void ConnectionManager::handleConnection() {
     //I only send the netlist when the connection is established to prevent sending before connected
     OT_LOG_D("Send netlist");
     m_socket->write(m_netlist);
-    m_socket->flush();
-
-   
-
+    m_socket->flush(); 
 }
 
 

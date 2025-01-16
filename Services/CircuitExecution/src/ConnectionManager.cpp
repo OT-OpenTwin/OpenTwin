@@ -8,15 +8,30 @@
 #include "QtCore/qjsonobject.h"
 #include "QtCore/qjsonarray.h"
 
+QString ConnectionManager::toString(RequestType _type) {
+
+    switch (_type) {
+    case ConnectionManager::SendResults: return "SendResults";
+    case ConnectionManager::Message: return "Message";
+    case ConnectionManager::Error: return "Error";
+
+    default:
+        OT_LOG_EAS("Unknown request type (" + std::to_string((int)_type) + ")");
+        return "";
+    }
+}
+
 ConnectionManager::ConnectionManager(QObject* parent) :QObject(parent) {
 
     m_socket = new QLocalSocket(this);
     m_ngSpice = new NGSpice();
 
+
     QObject::connect(m_socket, &QLocalSocket::connected, this, &ConnectionManager::sendHello);
 	QObject::connect(m_socket, &QLocalSocket::readyRead, this, &ConnectionManager::receiveResponse);
     QObject::connect(m_socket, &QLocalSocket::errorOccurred, this, &ConnectionManager::handleError);
     QObject::connect(m_socket, &QLocalSocket::disconnected, this, &ConnectionManager::handleDisconnected);
+    
 }
 
 
@@ -33,6 +48,19 @@ void ConnectionManager::connectToCircuitSimulatorService(const QString& serverNa
 
 }
 
+void ConnectionManager::send(std::string messageType, std::string message) {
+    QJsonObject jsonObject;
+
+    jsonObject["type"] = messageType.c_str();
+    jsonObject["results"] = message.c_str();
+
+    QJsonDocument jsonDoc(jsonObject);
+    QByteArray data = jsonDoc.toJson();
+
+    m_socket->write(data);
+    m_socket->flush();
+}
+
 void ConnectionManager::receiveResponse() {
     QByteArray jsonData = m_socket->readAll();
     QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
@@ -44,7 +72,7 @@ void ConnectionManager::receiveResponse() {
 
     QJsonObject jsonObject = jsonDoc.object();
 
-    //Getting action type
+    //Getting message type
     QString typeString = jsonObject["type"].toString();
     
     //Getting data
@@ -65,6 +93,9 @@ void ConnectionManager::receiveResponse() {
 
 void ConnectionManager::sendHello() {
     OT_LOG_D("Connected");
+    
+    send(toString(ConnectionManager::RequestType::Message).toStdString(), "Hello CircuitSimulatorService, i am CircuitExecution.");
+  
 }
 
 void ConnectionManager::handleError(QLocalSocket::LocalSocketError error) {
@@ -135,6 +166,8 @@ void ConnectionManager::sendBackResults(std::map<std::string, std::vector<double
     
     jsonObject["results"] = jsonArray;
 
+    //Adding Action
+    jsonObject["type"] = toString(ConnectionManager::SendResults);
     
     QJsonDocument jsonDoc(jsonObject);
     QByteArray data = jsonDoc.toJson();

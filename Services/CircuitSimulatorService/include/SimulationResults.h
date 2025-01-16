@@ -26,8 +26,14 @@ public:
     void addToResultMap(const std::string& key, double value);
     std::map<std::string, std::vector<double>>& getResultMap() {   return resultMap; }
 
-    void addResults(QString _result);
+    void addResults(const QJsonValue& _result);
     void setSolverInformation(std::string solverName, std::string simulationType, std::string circuitName);
+
+    //Message handling
+    void displayMessage(std::string _message);
+    void displayError(std::string _message);
+    void handleResults(const QJsonValue& _result);
+    void handleUnknownMessageType(std::string _message);
     //Setter
     void setVecAmount(int amount)
     {

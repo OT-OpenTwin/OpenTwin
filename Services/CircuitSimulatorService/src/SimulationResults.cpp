@@ -4,6 +4,7 @@ SimulationResults* SimulationResults::instance = nullptr;
 
 SimulationResults* SimulationResults::getInstance()
 {
+    
     if (!instance) {
         instance = new SimulationResults();
     }
@@ -18,15 +19,11 @@ void SimulationResults::addToResultMap(const std::string& key, double value)
     resultMap[key].push_back(value);
 }
 
-void SimulationResults::addResults(QString _result) {
-    std::lock_guard<std::mutex> lock(m_mutex);
+void SimulationResults::addResults(const QJsonValue& _result) {
+    
+    
 
-    // JSON-Daten in ein QJsonDocument laden
-    QJsonDocument doc = QJsonDocument::fromJson(_result.toUtf8());
-
-    QJsonObject jsonObj = doc.object();
-
-    QJsonArray resultsArray = jsonObj["results"].toArray();
+    QJsonArray resultsArray = _result.toArray();
 
     for (const QJsonValue& value : resultsArray) {
         if (value.isObject()) {
@@ -61,4 +58,26 @@ void SimulationResults::setSolverInformation(std::string _solverName, std::strin
     this->circuitName = _circuitName;
     
 }
+
+void SimulationResults::displayMessage(std::string _message) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    this->getInstance()->_uiComponent->displayMessage(_message);
+}
+
+void SimulationResults::displayError(std::string _message) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    this->getInstance()->_uiComponent->displayErrorPrompt(_message);
+}
+
+void SimulationResults::handleResults(const QJsonValue& _result) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    addResults(_result);
+}
+
+void SimulationResults::handleUnknownMessageType(std::string _message) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    this->getInstance()->_uiComponent->displayErrorPrompt("Unknown Message Type: " + _message);
+}
+
 

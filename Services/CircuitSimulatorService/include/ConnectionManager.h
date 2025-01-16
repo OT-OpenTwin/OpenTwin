@@ -13,8 +13,10 @@ class QLocalServer;
 class ConnectionManager : public QObject {
 	Q_OBJECT
 public:
-	enum RequestType{
-		ExecuteNetlist
+	enum RequestType {
+		ExecuteNetlist,
+		Message,
+		Error
 	};
 
 	static QString toString(RequestType _type);
@@ -38,6 +40,7 @@ private:
 	QLocalSocket* m_socket;
 	QByteArray m_netlist;
 
+	void handleMessageType(QString& _actionType, const QJsonValue& _data);
 
 
 	

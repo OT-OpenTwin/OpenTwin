@@ -4,6 +4,9 @@
 
 //OpenTwin Header
 #include "OTCore/Logger.h"
+
+//Service Header
+#include "ConnectionManager.h"
 class NGSpice {
 public:
 	NGSpice();
@@ -14,7 +17,10 @@ public:
 	static int MySendDataFunction(pvecvaluesall, int, int, void*);
 	static int MySendInitDataFunction(pvecinfoall, int, void*);
 
+	
+
 	void runSimulation(std::list<std::string>& _netlist);
+
 
 private:
 	void initializeCallbacks();
