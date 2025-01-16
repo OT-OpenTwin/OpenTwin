@@ -454,9 +454,6 @@
     <ClCompile Include="src\PropertyGridTree.cpp">
       <Filter>src\Properties</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsViewClipboardData.cpp">
-      <Filter>src\Graphics</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -895,9 +892,6 @@
     </ClInclude>
     <ClInclude Include="include\OTWidgets\PropertyInputColor.h">
       <Filter>include\Properties</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTWidgets\GraphicsViewClipboardData.h">
-      <Filter>include\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

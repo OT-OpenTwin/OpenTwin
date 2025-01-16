@@ -1649,7 +1649,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	connect(newEditor, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(newEditor, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
 	connect(newEditor, &ot::GraphicsView::connectionToConnectionRequested, this, &AppBase::slotGraphicsConnectionToConnectionRequested);
-	connect(newEditor, &ot::GraphicsView::itemCopyRequested, this, &AppBase::slotGraphicsCopyRequested);
+	connect(newEditor, &ot::GraphicsView::itemCopyRequested, this, &AppBase::slotCopyRequested);
 	connect(newEditor, &ot::GraphicsView::itemConfigurationChanged, this, &AppBase::slotGraphicsItemChanged);
 	connect(newEditor->getGraphicsScene(), &ot::GraphicsScene::selectionChangeFinished, this, &AppBase::slotGraphicsSelectionChanged);
 
@@ -2131,7 +2131,7 @@ void AppBase::slotGraphicsRemoveItemsRequested(const ot::UIDList& _items, const 
 	}
 }
 
-void AppBase::slotGraphicsCopyRequested(const ot::GraphicsCopyInformation& _info) {
+void AppBase::slotCopyRequested(const ot::CopyInformation* _info) {
 	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(sender());
 	if (view == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
@@ -2141,9 +2141,9 @@ void AppBase::slotGraphicsCopyRequested(const ot::GraphicsCopyInformation& _info
 	ot::BasicServiceInformation info = ot::WidgetViewManager::instance().getOwnerFromView(view);
 
 	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CopyItems, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CopyItems, doc.GetAllocator()), doc.GetAllocator());
 	ot::JsonObject pckg;
-	_info.addToJsonObject(pckg, doc.GetAllocator());
+	_info->addToJsonObject(pckg, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Package, pckg, doc.GetAllocator());
 
 	std::string response;

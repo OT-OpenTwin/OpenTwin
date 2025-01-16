@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClCompile Include="src\BasicServiceInformation.cpp" />
     <ClCompile Include="src\Color.cpp" />
+    <ClCompile Include="src\CopyInformation.cpp" />
+    <ClCompile Include="src\CopyInformationFactory.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\EncodingConverter_ISO88591ToUTF8.cpp" />
     <ClCompile Include="src\EncodingConverter_UTF16ToUTF8.cpp" />
@@ -64,6 +66,8 @@
     <ClInclude Include="include\OTCore\BasicServiceInformation.h" />
     <ClInclude Include="include\OTCore\ComplexNumbers.h" />
     <ClInclude Include="include\OTCore\ContainerHelper.h" />
+    <ClInclude Include="include\OTCore\CopyInformation.h" />
+    <ClInclude Include="include\OTCore\CopyInformationFactory.h" />
     <ClInclude Include="include\OTCore\DefensiveProgramming.h" />
     <ClInclude Include="include\OTCore\BasicEntityInformation.h" />
     <ClInclude Include="include\OTCore\LogModeManager.h" />
@@ -119,9 +123,6 @@
     <ClInclude Include="include\OTCore\VariableToBSONStringConverter.h" />
     <ClInclude Include="include\OTCore\VariableToJSONConverter.h" />
     <ClInclude Include="include\OTCore\VariableToStringConverter.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -1,13 +1,23 @@
-//! @file GraphicsCopyInformation.h
+//! @file GraphicsCopyInformation.cpp
 //! @author Alexander Kuester (alexk95)
 //! @date January 2025
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // OpenTwin header
+#include "OTCore/CopyInformationFactory.h"
 #include "OTGui/GraphicsCopyInformation.h"
 
+static ot::CopyInformationFactoryRegistrar<ot::GraphicsCopyInformation> graphicsCopyInformationRegistrar(ot::GraphicsCopyInformation::getGraphicsCopyInformationType());
+
 void ot::GraphicsCopyInformation::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	CopyInformation::addToJsonObject(_object, _allocator);
+
 	_object.AddMember("ViewName", JsonString(m_viewName, _allocator), _allocator);
+
+	JsonObject ownerObj;
+	m_viewOwner.addToJsonObject(ownerObj, _allocator);
+	_object.AddMember("ViewOwner", ownerObj, _allocator);
+
 	JsonArray itemsArr;
 	for (const ItemInformation& info : m_items) {
 		JsonObject itemObj;
@@ -23,9 +33,12 @@ void ot::GraphicsCopyInformation::addToJsonObject(ot::JsonValue& _object, ot::Js
 }
 
 void ot::GraphicsCopyInformation::setFromJsonObject(const ot::ConstJsonObject& _object) {
+	CopyInformation::setFromJsonObject(_object);
+
 	m_items.clear();
 
 	m_viewName = json::getString(_object, "ViewName");
+	m_viewOwner.setFromJsonObject(json::getObject(_object, "ViewOwner"));
 
 	for (const ConstJsonObject& itemObj : json::getObjectList(_object, "Items")) {
 		ItemInformation info;
@@ -70,4 +83,8 @@ void ot::GraphicsCopyInformation::moveItemsBy(const Point2DD& _dist) {
 	for (ItemInformation& info : m_items) {
 		info.pos = info.pos + _dist;
 	}
+}
+
+bool ot::GraphicsCopyInformation::isValid(void) const {
+	return !m_viewName.empty() && !m_items.empty();
 }

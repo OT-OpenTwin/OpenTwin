@@ -133,7 +133,7 @@ namespace ot {
 
 		void removeItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 
-		void itemCopyRequested(const GraphicsCopyInformation& _info);
+		void itemCopyRequested(const GraphicsCopyInformation* _info);
 
 	protected:
 		virtual void wheelEvent(QWheelEvent* _event) override;

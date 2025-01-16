@@ -5,14 +5,15 @@
 
 // OpenTwin header
 #include "OTCore/Logger.h"
+#include "OTCore/CopyInformationFactory.h"
 #include "OTGui/GraphicsItemCfg.h"
+#include "OTGui/GraphicsCopyInformation.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/GraphicsView.h"
 #include "OTWidgets/GraphicsScene.h"
 #include "OTWidgets/GraphicsItem.h"
 #include "OTWidgets/GraphicsConnectionItem.h"
 #include "OTWidgets/GraphicsItemPreviewDrag.h"
-#include "OTWidgets/GraphicsViewClipboardData.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -668,10 +669,9 @@ void ot::GraphicsView::slotCopy(void) {
 		return;
 	}
 
-	GraphicsViewClipboardData* newData = new GraphicsViewClipboardData;
-	newData->setViewOwner(m_owner);
-
 	GraphicsCopyInformation copyInfo;
+	copyInfo.setViewOwner(this->getOwner());
+
 	for (GraphicsItem* itm : selection) {
 		// Copy top level items only
 		if (!itm->getParentGraphicsItem()) {
@@ -679,8 +679,10 @@ void ot::GraphicsView::slotCopy(void) {
 		}
 	}
 
-	newData->setCopyInfo(copyInfo);
-	clip->setMimeData(newData);
+	JsonDocument exportDoc;
+	copyInfo.addToJsonObject(exportDoc, exportDoc.GetAllocator());
+
+	clip->setText(QString::fromStdString(exportDoc.toJson()));
 }
 
 void ot::GraphicsView::slotPaste(void) {
@@ -691,26 +693,37 @@ void ot::GraphicsView::slotPaste(void) {
 	}
 
 	// Get data
-	const GraphicsViewClipboardData* data = dynamic_cast<const GraphicsViewClipboardData*>(clip->mimeData());
-	if (!data) {
+	std::string importString = clip->text().toStdString();
+	if (importString.empty()) {
+		return;
+	}
+
+	JsonDocument importDoc;
+	if (!importDoc.fromJson(importString)) {
+		return;
+	}
+	if (!importDoc.IsObject()) {
+		return;
+	}
+
+	GraphicsCopyInformation* info = dynamic_cast<GraphicsCopyInformation*>(CopyInformationFactory::create(importDoc.GetConstObject()));
+	if (!info) {
 		return;
 	}
 
 	// Ensure same view owner
-	if (data->getViewOwner() != m_owner) {
+	if (info->getViewOwner() != m_owner) {
 		return;
 	}
 
 	// Create paste info
-	GraphicsCopyInformation info = data->getCopyInfo();
-	info.setViewName(m_viewName);
-
+	info->setViewName(m_viewName);
 	
 	QPoint mousePos = this->mapFromGlobal(QCursor::pos());
 	if (this->rect().contains(mousePos)) {
 		// If mouse is over the view paste at cursor
 		QPointF mouseScenePos = m_scene->snapToGrid(this->mapToScene(mousePos));
-		info.moveItemsToPoint(QtFactory::toPoint2D(mouseScenePos));
+		info->moveItemsToPoint(QtFactory::toPoint2D(mouseScenePos));
 	}
 	else {
 		// If mouse is outside the view move by 2*grid size or 20 in X and Y directions.
@@ -724,10 +737,12 @@ void ot::GraphicsView::slotPaste(void) {
 			moveDistance.setY(grid.getGridStep().y() * 2.);
 		}
 
-		info.moveItemsBy(moveDistance);
+		info->moveItemsBy(moveDistance);
 	}
 	
 	Q_EMIT itemCopyRequested(info);
+
+	delete info;
 }
 
 void ot::GraphicsView::beginItemMove(void) {

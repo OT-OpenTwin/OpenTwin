@@ -44,7 +44,6 @@ template<class ValueType>
 ValueType* ot::FactoryTemplate<ValueType>::createFromJSON(const ConstJsonObject& _jsonObject, const char* _typeKey) {
 	std::string t = json::getString(_jsonObject, _typeKey);
 	if (t.empty()) {
-		OT_LOG_E("Key empty");
 		return nullptr;
 	}
 
