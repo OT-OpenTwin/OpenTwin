@@ -11,7 +11,7 @@ MongoDBShellExecutor::MongoDBShellExecutor(const MongoDBSettings& _settings)
 
     //const std::string temp = "mongodb://admin:admin@127.0.0.1:27017/?tls=true&tlsCertificateKeyFile=C:\\Users\\JWagner\\OpenTwin_Cert\\certificateKeyFile.pem";
     mongocxx::uri uri(connectionString);
-
+    Logger::INSTANCE().write("Connecting shell with MongoDB: " + connectionString);
     try
     {
         m_client = mongocxx::client(uri);
@@ -33,7 +33,7 @@ int MongoDBShellExecutor::getFeatureCompatibilityVersion()
     std::string resultStr = bsoncxx::to_json(result);
     rapidjson::Document resultJson(rapidjson::kObjectType);
     resultJson.Parse(resultStr.c_str());
-    
+    Logger::INSTANCE().write("CSV request response: " + resultStr + "\n");
     //{ "featureCompatibilityVersion" : { "version" : "7.0" }, "ok" : 1.0 }
     auto subDoc = resultJson["featureCompatibilityVersion"].GetObject();
     std::string versionString = subDoc["version"].GetString();

@@ -17,6 +17,9 @@ MongoDBUpgrader::MongoDBUpgrader(const MongoDBSettings& _settings, const std::st
 int MongoDBUpgrader::checkForFeatureCompatibilityVersion(int _startVersion)
 {
     int foundFCV = 0;
+
+    Logger::INSTANCE().write("Run mongoDB server with settings: " + m_settings.toString());
+
     for (int version = _startVersion; version <= maxVersion; version++)
     {
         std::string serverVersion("");
@@ -49,8 +52,10 @@ int MongoDBUpgrader::checkForFeatureCompatibilityVersion(int _startVersion)
             {
                 MongoDBShellExecutor mongoOperator(m_settings);
                 foundFCV = mongoOperator.getFeatureCompatibilityVersion();
+                Logger::INSTANCE().write("Shut down database.\n");
                 mongoOperator.shutdownDatabase();
                 //std::this_thread::sleep_for(std::chrono::seconds(1));
+                Logger::INSTANCE().write("Terminate process.\n");
                 server->terminate();
                 return foundFCV;
             }
@@ -101,6 +106,7 @@ void MongoDBUpgrader::updateServerFCV(const std::string& _version)
     Logger::INSTANCE().write("Performing upgrade to version " + _version + "\n");
     const std::string mongoServerPath = CurrentPaths::INSTANCE().getMongoServerCollectionDirectory();
     std::string serverExecutablePath = mongoServerPath + "\\" + _version + "\\mongod.exe";
+    
     MongoDBServerRunner mongoDBProcess(serverExecutablePath, m_cfgPath);
     MongoDBShellExecutor mongoOperator(m_settings);
     mongoOperator.setFeatureCompatibilityVersion(_version);
