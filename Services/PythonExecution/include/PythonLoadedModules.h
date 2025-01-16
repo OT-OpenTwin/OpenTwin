@@ -11,7 +11,7 @@
 #include <map>
 #include <optional>
 
-#include "OTServiceFoundation/EntityInformation.h"
+#include "EntityInformation.h"
 #include "OTCore/Logger.h"
 
 class PythonLoadedModules

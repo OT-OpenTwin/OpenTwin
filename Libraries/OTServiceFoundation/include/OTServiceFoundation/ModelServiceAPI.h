@@ -3,10 +3,10 @@
 #include <list>
 #include <vector>
 
-#include "OTServiceFoundation/FoundationAPIExport.h"
-#include "OTServiceFoundation/EntityInformation.h"
 #include "OTCore/Logger.h"
+#include "OTServiceFoundation/FoundationAPIExport.h"
 #include "EntityBase.h"
+#include "EntityInformation.h"
 
 namespace ot {
 	class OT_SERVICEFOUNDATION_API_EXPORT ModelServiceAPI {

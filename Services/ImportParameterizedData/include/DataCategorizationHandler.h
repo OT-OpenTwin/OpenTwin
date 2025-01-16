@@ -14,7 +14,7 @@
 #include "EntityParameterizedDataCategorization.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/Color.h"
-#include "OTServiceFoundation/EntityInformation.h"
+#include "EntityInformation.h"
 #include "MetadataAssemblyData.h"
 #include "EntityTableSelectedRanges.h"
 #include "OTCore/Variable.h"

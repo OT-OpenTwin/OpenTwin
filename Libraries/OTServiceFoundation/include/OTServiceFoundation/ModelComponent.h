@@ -13,8 +13,8 @@
 #include "OTServiceFoundation/ModelServiceAPI.h"
 #include "OTCore/JSON.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
-#include "OTServiceFoundation/EntityInformation.h"
 
+#include "EntityInformation.h"
 #include "EntityProperties.h"
 
 #include "UniqueUIDGenerator.h"

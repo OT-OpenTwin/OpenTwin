@@ -7,7 +7,7 @@
 #include "UpdateManager.h"
 
 #include "OTCommunication/ActionTypes.h"
-#include "OTServiceFoundation/EntityInformation.h"
+#include "EntityInformation.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 

@@ -391,6 +391,9 @@
     <ClInclude Include="include\VisualisationTypeSerialiser.h">
       <Filter>Header Files\EntityInterfaces</Filter>
     </ClInclude>
+    <ClInclude Include="include\EntityInformation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityProperties.cpp">
@@ -661,6 +664,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\VisualisationTypeSerialiser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityInformation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

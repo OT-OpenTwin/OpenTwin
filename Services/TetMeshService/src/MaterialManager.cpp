@@ -8,7 +8,7 @@
 #include "ClassFactoryCAD.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
-#include "OTServiceFoundation/EntityInformation.h"
+#include "EntityInformation.h"
 
 void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometryEntities, Properties &properties)
 {

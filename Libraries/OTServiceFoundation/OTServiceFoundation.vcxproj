@@ -197,7 +197,6 @@
     <ClCompile Include="src\ApplicationBase.cpp" />
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
     <ClCompile Include="src\Encryption.cpp" />
-    <ClCompile Include="src\EntityInformation.cpp" />
     <ClCompile Include="src\ErrorWarningLogFrontendNotifier.cpp" />
     <ClCompile Include="src\Foundation.cpp" />
     <ClCompile Include="src\ModelServiceAPI.cpp" />
@@ -217,7 +216,6 @@
     <ClInclude Include="include\OTServiceFoundation\ApplicationBase.h" />
     <ClInclude Include="include\OTServiceFoundation\BusinessLogicHandler.h" />
     <ClInclude Include="include\OTServiceFoundation\Encryption.h" />
-    <ClInclude Include="include\OTServiceFoundation\EntityInformation.h" />
     <ClInclude Include="include\OTServiceFoundation\ErrorWarningLogFrontendNotifier.h" />
     <ClInclude Include="include\OTServiceFoundation\ExternalServicesComponent.h" />
     <ClInclude Include="include\OTServiceFoundation\Foundation.h" />

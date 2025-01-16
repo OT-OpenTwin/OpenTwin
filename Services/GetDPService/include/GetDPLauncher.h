@@ -5,7 +5,7 @@
 #include <map>
 
 #include "OTCore/CoreTypes.h"
-#include "OTServiceFoundation/EntityInformation.h"
+#include "EntityInformation.h"
 
 #include "EntityProperties.h"
 

@@ -2,7 +2,6 @@
 
 // OpenTwin header
 #include "OTCore/BasicEntityInformation.h"
-#include "OTServiceFoundation/FoundationAPIExport.h"
 
 // std header
 #include <string>
@@ -11,7 +10,7 @@ class EntityBase;
 
 namespace ot {
 
-	class OT_SERVICEFOUNDATION_API_EXPORT EntityInformation : public BasicEntityInformation {
+	class __declspec(dllexport) EntityInformation : public BasicEntityInformation {
 	public:
 		EntityInformation();
 		EntityInformation(EntityBase* _entity);

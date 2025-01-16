@@ -6,7 +6,7 @@
 #include "ClassFactoryCAD.h"
 #include "ClassFactory.h"
 
-#include "OTServiceFoundation/EntityInformation.h"
+#include "EntityInformation.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 

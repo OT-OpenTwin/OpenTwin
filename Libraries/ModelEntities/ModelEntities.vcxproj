@@ -29,6 +29,7 @@
     <ClInclude Include="include\CSVProperties.h" />
     <ClInclude Include="include\CSVToTableTransformer.h" />
     <ClInclude Include="include\EntityCoordinates2D.h" />
+    <ClInclude Include="include\EntityInformation.h" />
     <ClInclude Include="include\EntityResultText.h" />
     <ClInclude Include="include\EntityResultTextData.h" />
     <ClInclude Include="include\IVisualisationTable.h" />
@@ -149,6 +150,7 @@
     <ClCompile Include="src\EntityCoordinates2D.cpp" />
     <ClCompile Include="src\EntityFacetData.cpp" />
     <ClCompile Include="src\EntityFileText.cpp" />
+    <ClCompile Include="src\EntityInformation.cpp" />
     <ClCompile Include="src\EntityMaterial.cpp" />
     <ClCompile Include="src\EntityMetadataSeries.cpp" />
     <ClCompile Include="src\EntityMeshCartesian.cpp" />

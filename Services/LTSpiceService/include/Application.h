@@ -10,7 +10,7 @@
 
 // Open twin header
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
-#include "OTServiceFoundation/EntityInformation.h"
+#include "EntityInformation.h"
 #include "EntityGeometry.h"
 
 #include "InfoFileManager.h"

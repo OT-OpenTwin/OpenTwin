@@ -1,9 +1,7 @@
-
-
 // OpenTwin header
 #include "OTCore/OTAssert.h"
-#include "OTServiceFoundation/EntityInformation.h"
 #include "EntityBase.h"
+#include "EntityInformation.h"
 
 ot::EntityInformation::EntityInformation() {}
 

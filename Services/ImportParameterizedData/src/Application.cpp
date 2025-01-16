@@ -16,7 +16,7 @@
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "OTServiceFoundation/EntityInformation.h"
+#include "EntityInformation.h"
 #include "OTGui/TableRange.h"
 #include "OTGui/OnePropertyDialogCfg.h"
 #include "OTGui/PropertyInt.h"

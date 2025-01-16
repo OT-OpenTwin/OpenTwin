@@ -4,7 +4,7 @@
 #include "PythonWrapper.h"
 #include "EntityFile.h"
 #include "PythonObjectBuilder.h"
-#include "OTServiceFoundation/EntityInformation.h"
+#include "EntityInformation.h"
 #include "OTCore/ReturnValues.h"
 
 class PythonAPI

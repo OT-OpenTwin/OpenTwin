@@ -11,8 +11,8 @@
 // Open twin header
 #include "OTCore/CoreTypes.h"					// open twins rapid json layer
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
-#include "OTServiceFoundation/EntityInformation.h"
 #include "OldTreeIcon.h"
+#include "EntityInformation.h"
 
 #include "ClassFactoryCAD.h"
 

@@ -15,8 +15,8 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ActionHandler.h"
 #include "OTCommunication/ActionHandleConnector.h"
-#include "OTServiceFoundation/EntityInformation.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
+#include "EntityInformation.h"
 
 #include "ClassFactory.h"
 

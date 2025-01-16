@@ -46,9 +46,6 @@
     <ClCompile Include="src\ErrorWarningLogFrontendNotifier.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntityInformation.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OTServiceFoundation\AbstractModelNotifier.h">
@@ -64,9 +61,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\Encryption.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OTServiceFoundation\EntityInformation.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\OTServiceFoundation\ExternalServicesComponent.h">

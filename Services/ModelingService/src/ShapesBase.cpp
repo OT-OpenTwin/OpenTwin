@@ -9,7 +9,7 @@
 
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
-#include "OTServiceFoundation/EntityInformation.h"
+#include "EntityInformation.h"
 
 #include <BRepBuilderAPI_Transform.hxx>
 #include <STEPControl_Writer.hxx>
