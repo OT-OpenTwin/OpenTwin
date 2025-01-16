@@ -40,6 +40,7 @@ private:
 	QLocalSocket* m_socket;
 	QByteArray m_netlist;
 
+	void handleWithJson(const QJsonObject& data);
 	void handleMessageType(QString& _actionType, const QJsonValue& _data);
 
 

@@ -57,45 +57,25 @@ void ConnectionManager::queueRequest(RequestType _type, const std::list<std::str
 }
 
 void ConnectionManager::handleReadyRead() {
-    QByteArray jsonData = m_socket->readAll();
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
+    QByteArray rawData = m_socket->readAll();
 
-    if (!jsonDoc.isObject()) {
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(rawData);
+
+    if (!jsonDoc.isObject() && !jsonDoc.isArray()) {
         OT_LOG_E("Incorrect json format");
         return;
     }
     QJsonObject jsonObject = jsonDoc.object();
 
-    
-    // Getting message Type
-    if (!jsonObject.contains("type")) {
-        OT_LOG_E("Missing json object member \"type\"");
-        return;
-    }
-    if (!jsonObject["type"].isString()) {
-        OT_LOG_E("JSON object member \"type\" is not a string");
-        return;
-    }
-
-    QString typeString = jsonObject["type"].toString();
-
-    // Getting message data
-    if (!jsonObject.contains("results")) {
-        OT_LOG_E("Missing json object member \"results\"");
-        return;
-    }
-    if (!jsonObject["results"].isString() && !jsonObject["results"].isArray()) {
-        OT_LOG_E("JSON object member \"results\" is not a string and not an array");
-        return;
-    }
-
-    std::list<std::string> data;
-    const QJsonValue resultsValue = jsonObject["results"];
-
-    
-    handleMessageType(typeString, resultsValue);
- 
+    handleWithJson(jsonObject);
 }
+
+    
+
+    
+    
+ 
+
 
 void ConnectionManager::handleDisconnected() {
 
@@ -123,6 +103,36 @@ void ConnectionManager::handleQueueRequest(RequestType _type, std::list<std::str
 
     m_netlist = jsonData;
     
+}
+
+void ConnectionManager::handleWithJson(const QJsonObject& jsonObject) {
+    // Getting message Type
+    if (!jsonObject.contains("type")) {
+        OT_LOG_E("Missing json object member \"type\"");
+        return;
+    }
+    if (!jsonObject["type"].isString()) {
+        OT_LOG_E("JSON object member \"type\" is not a string");
+        return;
+    }
+
+    QString typeString = jsonObject["type"].toString();
+
+    // Getting message data
+    if (!jsonObject.contains("results")) {
+        OT_LOG_E("Missing json object member \"results\"");
+        return;
+    }
+    if (!jsonObject["results"].isString() && !jsonObject["results"].isArray()) {
+        OT_LOG_E("JSON object member \"results\" is not a string and not an array");
+        return;
+    }
+
+    std::list<std::string> data;
+    const QJsonValue resultsValue = jsonObject["results"];
+
+
+    handleMessageType(typeString, resultsValue);
 }
 
 void ConnectionManager::handleMessageType(QString& _actionType, const QJsonValue& data) {

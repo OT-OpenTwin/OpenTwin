@@ -210,7 +210,7 @@
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\NGSpice.h" />
-    <ClInclude Include="include\SimulationResults.h" />
+    <QtMoc Include="include\SimulationResults.h" />
     <QtMoc Include="include\ConnectionManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

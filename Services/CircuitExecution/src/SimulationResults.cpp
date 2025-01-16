@@ -3,6 +3,7 @@
 SimulationResults* SimulationResults::instance = nullptr;
 
 SimulationResults* SimulationResults::getInstance() {
+    
     if (!instance) {
         instance = new SimulationResults();
     }
@@ -11,5 +12,11 @@ SimulationResults* SimulationResults::getInstance() {
 }
 
 void SimulationResults::addToResultMap(const std::string& key, double value) {
+
     resultMap[key].push_back(value);
+}
+
+void SimulationResults::triggerCallback(std::string messageType, std::string message) {
+ 
+    emit callback(messageType, message);
 }

@@ -10,8 +10,7 @@
 #include <string>
 
 
-//Service Header
-#include "ConnectionManager.h"
+class ConnectionManager;
 
 
 
@@ -30,8 +29,6 @@ public:
 	void start(const std::string& _serverName);
 
 
-signals:
-	void callback(std::string messageType, std::string message);
 
 private:
 	Application();

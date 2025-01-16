@@ -1,11 +1,17 @@
 #pragma once
-//C++ Header
+// C++ Header
 #include <vector>
 #include <map>
 #include <string>
 
-class SimulationResults {
 
+// Service Header
+#include "ConnectionManager.h"
+
+
+
+class SimulationResults: public QObject {
+    Q_OBJECT
 public:
 
     static SimulationResults* getInstance();
@@ -21,10 +27,17 @@ public:
     int getVecAmount() {
         return this->vecAmount;
     }
+
+    void triggerCallback(std::string messageType, std::string message);
+
+signals:
+    void callback(std::string messageType, std::string message);
+
 private:
 
     SimulationResults() { this->vecAmount = 0; }
     static SimulationResults* instance;
     std::map<std::string, std::vector<double>> resultMap;
     int vecAmount;
+   
 };

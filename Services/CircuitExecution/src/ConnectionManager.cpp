@@ -25,13 +25,13 @@ ConnectionManager::ConnectionManager(QObject* parent) :QObject(parent) {
 
     m_socket = new QLocalSocket(this);
     m_ngSpice = new NGSpice();
-
+    SimulationResults* simulationResults = SimulationResults::getInstance();
 
     QObject::connect(m_socket, &QLocalSocket::connected, this, &ConnectionManager::sendHello);
 	QObject::connect(m_socket, &QLocalSocket::readyRead, this, &ConnectionManager::receiveResponse);
     QObject::connect(m_socket, &QLocalSocket::errorOccurred, this, &ConnectionManager::handleError);
     QObject::connect(m_socket, &QLocalSocket::disconnected, this, &ConnectionManager::handleDisconnected);
-    
+    QObject::connect(simulationResults, &SimulationResults::callback, this, &ConnectionManager::send);
 }
 
 
@@ -120,7 +120,6 @@ void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) 
             QString item = value.toString();
             netlist.push_back(item.toStdString());  // QString zu std::string konvertieren
         }
-
         handleRunSimulation(netlist);
     }
     else {
